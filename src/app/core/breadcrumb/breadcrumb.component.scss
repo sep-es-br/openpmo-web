@@ -1,0 +1,99 @@
+@use 'src/variables' as v;
+
+.app-breadcrumb {
+  display: flex;
+  padding: 0 2em;
+
+  .home {
+    display: flex;
+    align-items: center;
+    min-height: 70px;
+    padding: 1.2rem 0;
+    margin-top: -5px;
+    position: sticky;
+    top: 0;
+    left: 0;
+    background-color: #eaeae8;
+    box-shadow: -5px 0px 10px 7px #eaeae8;
+    z-index: 500;
+
+    i {
+      cursor: pointer;
+    }
+    &.adjust-padding {
+      padding-bottom: 15px;
+    }
+    &:focus {
+      outline: none !important;
+    }
+  }
+  .crumbs {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: visible;
+    align-items: center;
+    flex: 1;
+
+    i {
+      color: v.$bgBreadcrumb;
+      margin: 0 .5rem;
+    }
+
+    .crumb {
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      padding: 1.2rem 0;
+
+      .link {
+        padding: .3em 1em;
+        border-radius: 25px;
+        background-color: v.$bgBreadcrumb;
+        color: v.$fontBreadcrumb;
+        cursor: pointer;
+        flex: 1;
+        text-align: center;
+      }
+      .info {
+        max-width: 200px;
+        font-size: .8rem;
+        white-space: nowrap;
+        word-break: break-word;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        margin-top: .1rem;
+        margin-bottom: -1.2rem;
+        padding: 0 .5rem;
+      }
+    }
+  }
+  &.mobile {
+    font-size: .688rem;
+    padding: 0 7.5px;
+
+    .home {
+      padding: 0;
+      margin-top: 0;
+    }
+
+    .crumbs {
+      overflow-x: scroll;
+      -ms-overflow-style: none;
+
+      &::-webkit-scrollbar {
+        display: none;
+      }
+      .crumb {
+        margin-right: .1em;
+        padding: 0;
+
+        .link {
+          padding: .3em .5em;
+          color: v.$fontBreadcrumbMobile;
+          background-color: transparent;
+        }
+      }
+    }
+  }
+}

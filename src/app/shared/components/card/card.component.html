@@ -1,0 +1,38 @@
+<p-panel class="app-card"
+  [toggleable]="properties.collapseble && (!properties.toggleable || properties.initialStateToggle && properties.toggleable)"
+  [collapsed]="properties.initialStateCollapse || !(!properties.toggleable || (properties.toggleable && properties.initialStateToggle))"
+  expandIcon="pi pi-angle-down"
+  collapseIcon="pi pi-angle-up"
+  [class.mobile]="responsive"
+>
+  <p-header class="card-header" [class.card-header-mobile]="responsive">
+    <div class="header-title">
+     <div class="header-title-text">
+      <span class="card-title"
+      [class.card-title-mobile]="responsive"
+      >{{ properties.cardTitle | translate }}</span>
+      <p-inputSwitch class="app-toggle" *ngIf="properties.toggleable" [(ngModel)]="properties.initialStateToggle"
+        (ngModelChange)="properties.onToggle?.emit($event)">
+      </p-inputSwitch>
+     </div>
+     <div class="header-title-dates" *ngIf="properties.headerDates">
+       <span class="start-date">{{properties.headerDates?.startDate|date:'yyyy/MM/dd'}}</span>
+       <i class="fas fa-caret-right"></i>
+       <span class="end-date">{{properties.headerDates?.endDate|date:'yyyy/MM/dd'}}</span>
+     </div>
+    </div>
+    <div class="header-values-cost-account" *ngIf="properties.progressBarValues">
+      <div class="progress-bar-cost-container" *ngFor="let progressBar of properties.progressBarValues">
+        <app-progress-bar [total]="progressBar.total" [class.progress-bar-mobile]="responsive"
+        [progress]="progressBar.progress"
+        [labelTotal]="progressBar.labelTotal"
+        [labelProgress]="progressBar.labelProgress"
+        [valueUnit]="progressBar.valueUnit"
+        [color]="progressBar.color"
+        >
+      </app-progress-bar>
+      </div>
+    </div>
+  </p-header>
+  <ng-content></ng-content>
+</p-panel>

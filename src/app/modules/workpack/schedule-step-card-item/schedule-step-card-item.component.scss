@@ -1,0 +1,233 @@
+@use "src/variables" as v;
+
+::ng-deep .app-step-card-item .p-card {
+  background: transparent;
+  .p-card-header {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    .card-item-header {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      .header-title {
+        margin-left: 0.5em;
+        .title-month {
+          font-weight: bold;
+          color: v.$fontInput;
+          font-size: 0.9em;
+          font-family: v.$fontFamilyMedium;
+        }
+        .title-day {
+          color: v.$fontLabel;
+          font-size: 0.7em;
+          font-family: v.$fontFamilyMedium;
+        }
+      }
+    }
+    .card-item-header p-menu {
+      .p-menu-overlay .p-menu-list .p-menuitem .p-menuitem-link {
+        .p-menuitem-icon {
+          font-size: 0.8rem;
+          color: #939393;
+        }
+        .p-menuitem-text {
+          font-size: 0.9rem;
+          font-family: v.$fontFamilyMedium;
+          color: #939393;
+        }
+      }
+    }
+    .card-item-header .p-button {
+      background-color: transparent;
+      border: none !important;
+      box-shadow: none !important;
+      .p-button-icon {
+        font-size: 0.9rem;
+        color: #939393;
+      }
+    }
+  }
+  .p-card-body {
+    width: 100%;
+    padding: 0;
+    height: 100%;
+    .p-float-label input:focus ~ label,
+    .p-float-label input.p-filled ~ label,
+    .p-float-label textarea:focus ~ label,
+    .p-float-label textarea.p-filled ~ label,
+    .p-float-label .p-inputwrapper-focus ~ label,
+    .p-float-label .p-inputwrapper-filled ~ label {
+      top: -0.100rem;
+    }
+    .p-float-label > label {
+      left: 0;
+      width: 100%;
+      text-align: center;
+    }
+  }
+  .p-card-content {
+    width: 100%;
+    padding: 0;
+    height: 100%;
+  }
+  .card-item-content {
+    max-width: 100%;
+    padding: 0 0.5em;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 0.5em;
+    align-items: center;
+    color: #888e96;
+    .unitValues, .costValues {
+      display: flex;
+      flex-direction: column;
+      align-content: center;
+      .progress-bar-unit-container {
+        margin-top: 0.2em;
+      }
+      .progress-bar-cost-container {
+        margin-top: 0.2em;
+      }
+    }
+    .unitValues .unitInputs {
+      display: flex;
+      flex-direction: column;
+      padding: 0.2em 1em;
+      background: #ffffff;
+      .column-title {
+        font-size: 0.7rem;
+        text-align: center;
+        margin-bottom: 1.2em;
+        font-weight: bold;
+        color: v.$fontInput;
+      }
+      .app-input-number {
+        .p-inputnumber-input {
+          font-size: 0.9rem;
+          padding: 0;
+          text-align: center;
+        }
+      }
+      .app-input-label {
+        font-size: 0.6rem;
+        text-align: center;
+      }
+    }
+    .costValues .costInputs {
+      display: flex;
+      flex-direction: column;
+      padding: 0.2em 1em;
+      background: #ffffff;
+      .column-title {
+        font-size: 0.7rem;
+        text-align: center;
+        margin-bottom: 1.2em;
+        font-weight: bold;
+        color: v.$fontInput;
+      }
+      .app-input-number {
+        .p-inputnumber-input {
+          font-size: 0.9rem;
+          padding: 0;
+          text-align: center;
+        }
+      }
+      .app-input-label {
+        font-size: 0.6rem;
+        text-align: center;
+      }
+    }
+  }
+  .card-item-footer {
+    display: flex;
+    justify-content: flex-end;
+    padding: 0.5em;
+    .card-item-id {
+      color: #888e96;
+        font-size: 0.6rem;
+        font-family: v.$fontFamilyMedium;
+    }
+  }
+}
+
+::ng-deep p-card.app-step-card-item-resume .p-card {
+  background: transparent;
+  .p-card-header {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    .card-item-header {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      .header-title {
+        margin-left: 0.5em;
+        .title-month {
+          font-weight: bold;
+          color: v.$fontInput;
+          font-size: 0.8em;
+          font-family: v.$fontFamilyMedium;
+        }
+        .title-day {
+          color: v.$fontLabel;
+          font-size: 0.7em;
+          font-family: v.$fontFamilyMedium;
+        }
+      }
+    }
+  }
+  .p-card-body {
+    width: 100%;
+    padding: 0;
+    height: 100%;
+  }
+  .p-card-content {
+    width: 100%;
+    padding: 0;
+    height: 100%;
+  }
+  .card-item-content {
+    width: 100%;
+    height: 100%;
+    padding: 0.5em;
+    display: flex;
+    flex-direction: column;
+    .progress-values-container {
+      margin-bottom: 0.3em;
+      display: flex;
+      .progress-bar-unit {
+        margin-left: 0.3em;
+        color: v.$fontLabel;
+        font-size: 0.5rem;
+        font-family: v.$fontFamilyMedium;
+      }
+    }
+    .progress-bar-unit-container, .progress-bar-cost-container {
+      width: 100%;
+    }
+  }
+}
+
+::ng-deep .app-new-step-card-item .p-card {
+    background: transparent;
+    .p-card-body {
+      padding: 0.5em;
+    }
+    .p-card-body .p-card-content {
+      padding: 0;
+    }
+    .p-card-body .p-card-content .card-item-content {
+    display: flex;
+    height: 5%;
+    align-items: center;
+    justify-content: center;
+    .app-icon {
+      cursor: pointer;
+    }
+  }
+}

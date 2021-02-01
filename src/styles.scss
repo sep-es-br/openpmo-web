@@ -1,0 +1,626 @@
+/* You can add global styles to this file, and also import other style files */
+@use 'src/variables' as v;
+
+:root {
+  --font-family: v.$fontFamilyMedium !important;
+}
+body {
+  font-family: v.$fontFamilyMedium;
+  min-height: 100vh;
+  height: 100%;
+  background-color: #eaeae8;
+  margin: 0;
+}
+
+.p-component {
+  font-family: v.$fontFamilyMedium !important;
+}
+
+.spacer {
+  flex: 1;
+}
+
+.white-icon {
+  color: #ffffff;
+}
+
+.grey-icon {
+  color: v.$iconGrey;
+}
+
+.light-grey-icon {
+  color: v.$iconLightGrey;
+}
+
+.red-icon {
+  color: v.$iconRed;
+}
+
+.admin-icon {
+  color: v.$bgMenuAdmin;
+}
+
+.margin-top{
+  margin-top: 28px;
+}
+.full-line {
+  width: 100%;
+}
+
+.app-input-text.p-inputtext {
+  font-family: v.$fontFamilyMedium;
+  font-size: 1rem;
+  border: none;
+  border-bottom: 1px solid v.$borderInput;
+  border-radius: 0;
+  background-color: transparent;
+  color: v.$fontInput;
+
+  &:enabled:focus {
+    border-bottom: 1px solid v.$borderInput;
+    box-shadow: none;
+  }
+  &:hover {
+    margin-bottom: -1px;
+    border-bottom: 1px solid v.$borderInputHover !important;
+    box-shadow: none;
+  }
+  .full-line {
+    width: 100%;
+  }
+}
+
+.app-text-area.p-inputtextarea {
+  font-family: v.$fontFamilyMedium;
+  font-size: 1rem;
+  border: none;
+  border-bottom: 1px solid v.$borderInput;
+  border-radius: 0;
+  background-color: transparent;
+  color: v.$fontInput;
+  width: 100%;
+
+  &:enabled:focus{
+    border-bottom: 1px solid v.$borderInputHover;
+    box-shadow: none;
+  }
+
+  &:hover{
+    border-bottom: 1px solid v.$borderInputHover !important;
+  }
+}
+
+.app-input-number {
+  .p-inputnumber {
+    border: none;
+    border-radius: 0;
+    background-color: transparent;
+
+    &:enabled:focus {
+      border-bottom: 1px solid v.$borderInputHover;
+      box-shadow: none;
+    }
+    &:hover {
+      border-bottom: 1px solid v.$borderInputHover !important;
+      box-shadow: none;
+    }
+  }
+  .p-inputnumber {
+    .p-inputtext {
+      font-family: v.$fontFamilyMedium;
+      font-size: 1rem;
+      border: none;
+      border-bottom: 1px solid v.$borderInput !important;
+      border-radius: 0;
+      background-color: transparent;
+      color: v.$fontInput;
+    }
+    .p-inputtext:enabled:focus {
+      border:none;
+      box-shadow: none;
+    }
+  }
+}
+
+.app-select-date {
+  .p-calendar-w-btn .p-inputtext {
+    font-family: v.$fontFamilyMedium;
+    border: none;
+    border-bottom: 1px solid v.$borderInput;
+    border-radius: 0;
+    background-color: transparent;
+    color: v.$fontInput;
+  }
+  .p-calendar-w-btn .p-inputtext:hover {
+    border: none;
+    border-bottom: 1px solid v.$borderInputHover;
+    border-radius: 0;
+    background-color: transparent;
+     color: v.$fontInput;
+  }
+  .p-calendar-w-btn .p-inputtext:enabled:focus {
+    box-shadow: none;
+  }
+  .p-calendar-w-btn .p-button {
+    color: #004660;
+    background-color: transparent;
+    border: none;
+    border-bottom: 1px solid v.$borderInput;
+    border-radius: 0;
+  }
+  .p-calendar-w-btn .p-button:hover {
+    color: #004660;
+    background-color: transparent;
+    border: none;
+    border-bottom: 1px solid v.$borderInput;
+    border-radius: 0;
+  }
+}
+
+.app-toggle {
+  margin-left: 0.5rem;
+  width: 2.4em;
+  height: 1.4em;
+  display: flex;
+  align-items: center;
+  .p-inputswitch{
+    width: 2.4em;
+    height: 1.1em;
+    align-content: center;
+  }
+  .p-inputswitch.p-focus .p-inputswitch-slider {
+    box-shadow: 0 0 0 0.1rem #13bc75bf;
+  }
+  .p-inputswitch-checked .p-inputswitch-slider{
+    background-color: #13bc75bf !important;
+  }
+  .p-inputswitch .p-inputswitch-slider {
+    align-content: center;
+  }
+  .p-inputswitch .p-inputswitch-slider::before {
+    width: 0.9em;
+    height: 0.9em;
+    top: 0.7em;
+    left: 2px;
+  }
+}
+
+.app-tree-selection {
+  .p-tree {
+    font-size: 0.9rem;
+    font-family: v.$fontFamilyMedium !important;
+    color: v.$fontInput;
+    .p-tree-container .p-treenode .p-treenode-content:focus {
+      box-shadow: 0 0 0 0.2rem v.$borderInput;
+    }
+    .p-tree-container .p-treenode .p-treenode-content.p-highlight {
+      background: transparent;
+    }
+    .p-checkbox:not(.p-checkbox-disabled) .p-checkbox-box.p-highlight {
+      border: #13bc75bf;
+      background: #13bc75bf;
+    }
+    .p-checkbox:not(.p-checkbox-disabled) .p-checkbox-box.p-highlight:hover {
+      border-color: #13bc75bf;
+      background: #13bc75bf;
+    }
+    .p-checkbox:not(.p-checkbox-disabled) .p-checkbox-box:hover {
+      border-color: #13bc75bf;
+    }
+    .p-tree-container .p-treenode .p-treenode-content .p-tree-toggler:focus {
+      box-shadow: none;
+      background-color: transparent;
+    }
+    .p-tree-container .p-treenode .p-treenode-content .p-tree-toggler:enabled:hover {
+      background-color: transparent;
+    }
+  }
+}
+
+.app-single-selection {
+  .p-dropdown {
+    background-color: transparent;
+    border: none;
+    border-radius: 0;
+    border-bottom: 1px solid v.$borderInput;
+  }
+  .p-dropdown:not(.p-disabled).p-focus {
+    box-shadow: none;
+    border: none;
+    border-bottom: 1px solid v.$borderInput;
+  }
+  .p-dropdown:hover {
+    border: none;
+    border-bottom: 1px solid v.$borderInputHover !important;
+  }
+  .p-dropdown .p-inputtext {
+    color: v.$fontInput;
+    font-size: 1rem;
+    font-family: v.$fontFamilyMedium;
+  }
+  .p-dropdown-panel .p-dropdown-items {
+    font-size: 1rem;
+    font-family: v.$fontFamilyMedium;
+    color: v.$fontInput;
+    .p-dropdown-item.p-highlight {
+      background-color: #13bc75bf;
+      color: #ffffff;
+    }
+  }
+  .p-dropdown-trigger {
+    justify-content: flex-end;
+  }
+  .p-dropdown-trigger-icon {
+    color: #004660;
+    font-size: 1.2rem;
+  }
+}
+
+.app-multiple-selection {
+  .p-multiselect {
+    background-color: transparent;
+    border: none;
+    border-radius: 0;
+    border-bottom: 1px solid v.$borderInput;
+  }
+  .p-multiselect:hover {
+    border: none;
+    border-bottom: 1px solid v.$borderInputHover !important;
+  }
+  .p-multiselect-filter-container .p-inputtext {
+    color: v.$fontInput;
+    font-size: 1rem;
+    font-family: v.$fontFamilyMedium;
+  }
+  .p-multiselect-filter-container .p-inputtext:hover {
+    border-color: v.$borderInput;
+  }
+  .p-multiselect-filter-container .p-inputtext:enabled:focus {
+    border: 2px solid v.$borderInput;
+    box-shadow: none;
+  }
+  .p-multiselect-label-container {
+    color: v.$fontInput;
+    font-size: 1rem;
+    font-family: v.$fontFamilyMedium;
+  }
+  .p-multiselect-trigger {
+    justify-content: flex-end;
+  }
+  .p-multiselect-trigger-icon {
+    color: #004660;
+    font-size: 1.2rem;
+  }
+  .p-multiselect-panel .p-multiselect-items {
+    font-size: 1rem;
+    font-family: v.$fontFamilyMedium;
+    color: v.$fontInput;
+    .p-multiselect-item.p-highlight {
+      background-color: transparent;
+      border: none;
+      box-shadow: none;
+    }
+    .p-multiselect-item:focus {
+      background-color: transparent;
+      border: none;
+      box-shadow: none;
+    }
+  }
+  .p-checkbox:not(.p-checkbox-disabled) .p-checkbox-box.p-highlight {
+    border: #13bc75bf;
+    background: #13bc75bf;
+  }
+  .p-checkbox:not(.p-checkbox-disabled) .p-checkbox-box.p-highlight:hover {
+    border-color: #13bc75bf;
+    background: #13bc75bf;
+  }
+  .p-checkbox:not(.p-checkbox-disabled) .p-checkbox-box:hover {
+    border-color: #13bc75bf;
+  }
+}
+
+.app-input-label {
+  font-size: 0.9rem;
+  font-style: italic;
+  color: v.$fontLabel;
+  font-family: v.$fontFamilyRegular;
+
+  .required-indicator {
+    margin-left: 5px;
+  }
+}
+
+// componente input inline desabled
+.app-input-text-inline.p-inputtext {
+  font-family: v.$fontFamilyMedium;
+  font-size: 1rem;
+  border: none;
+  border-bottom: 1px solid v.$borderInput;
+  border-radius: 0;
+  background-color: #fff;
+  color: v.$fontInput;
+
+  &:enabled:focus {
+    border-bottom: 1px solid v.$borderInput;
+    box-shadow: none;
+  }
+  &:hover {
+    border-bottom: 1px solid v.$borderInputHover !important;
+    box-shadow: none;
+  }
+  .full-line {
+    width: 100%;
+  }
+}
+
+// Component p-chips
+.app-input-chips .p-chips .p-inputtext {
+  font-family: v.$fontFamilyMedium;
+  font-size: 1rem;
+  border: none;
+  border-bottom: 1px solid v.$borderInput;
+  border-radius: 0;
+  background-color: transparent;
+  color: v.$fontInput;
+
+  &.p-focus {
+    border-color: transparent !important;
+    border-bottom: 1px solid v.$borderInput !important;
+    box-shadow: none !important;
+  }
+  &:enabled:focus {
+    border-bottom: 1px solid v.$borderInput;
+    box-shadow: none;
+  }
+  &:hover {
+    border-bottom: 1px solid v.$borderInputHover !important;
+    box-shadow: none;
+  }
+  .full-line {
+    width: 100%;
+  }
+}
+
+// Component checkbox
+.app-checkbox {
+  .p-checkbox:not(.p-checkbox-disabled) .p-checkbox-box.p-highlight {
+    border-color: #13bc75bf;
+    background: #13bc75bf;
+  }
+  .p-checkbox:not(.p-checkbox-disabled) .p-checkbox-box.p-highlight:hover {
+    border-color: #13bc75bf;
+    background: #13bc75bf;
+  }
+  .p-checkbox:not(.p-checkbox-disabled) .p-checkbox-box:hover {
+    border-color: #13bc75bf;
+  }
+  .p-checkbox:not(.p-checkbox-disabled) .p-checkbox-box.p-focus {
+    border-color: #13bc75aa; // TODO: FIND BRIGHTER COLOR
+    box-shadow: 0 0 0 0.2rem #13bc75aa;
+  }
+}
+
+
+.p-chips .p-chips-multiple-container .p-chips-token {
+  background: v.$borderLightGrey !important;
+}
+
+.p-dialog.p-confirm-dialog {
+  font-family: v.$fontFamilyMedium !important;
+
+  > div {
+    background: v.$bgCard !important;
+  }
+  .p-dialog-title {
+    color: v.$fontTitle;
+  }
+  .p-confirm-dialog-message,
+  .p-confirm-dialog-icon {
+    color: v.$fontDark;
+    max-width: 500px;
+  }
+  .p-dialog-footer {
+    display: flex;
+    justify-content: space-around;
+  }
+  .p-button {
+    background: transparent !important;
+    border: 1px solid transparent;
+    color: v.$fontDark !important;
+
+    &:hover {
+      border: 1px solid v.$borderDarkGrey;
+    }
+    &:focus {
+      box-shadow: none !important;
+    }
+  }
+}
+
+.p-dataview .p-dataview-content .p-grid .card-item-container {
+  flex-basis: min(270px, 100vw);
+  @media screen and (max-width: 768px) {
+    flex-basis: 100%;
+  }
+}
+
+.p-toast-message .p-toast-message-text .p-toast-detail {
+  white-space: pre-line;
+}
+
+.p-grid {
+  margin: 0 !important;
+}
+
+.p-toast {
+  opacity: 1 !important;
+}
+
+@font-face {
+  font-family: 'icopmo';
+  src:  url('assets/fonts/icopmo.eot?3w7r9');
+  src:  url('assets/fonts/icopmo.eot?3w7r9#iefix') format('embedded-opentype'),
+    url('assets/fonts/icopmo.ttf?3w7r9') format('truetype'),
+    url('assets/fonts/icopmo.woff?3w7r9') format('woff'),
+    url('assets/fonts/icopmo.svg?3w7r9#icopmo') format('svg');
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
+}
+
+[class^="app-icon"], [class*=" app-icon"] {
+  /* use !important to prevent issues with browser extensions that change fonts */
+  font-family: 'icopmo' !important;
+  speak: never;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+
+  /* Better Font Rendering =========== */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.app-icon {
+
+  &.folder-open2:before {
+    content: "\e901";
+  }
+  &.cog:before {
+    content: "\e902";
+  }
+  &.cogs2:before {
+    content: "\e903";
+  }
+  &.ccb-view:before {
+    content: "\e904";
+  }
+  &.offices:before {
+    content: "\e905";
+  }
+  &.permission2:before {
+    content: "\e906";
+  }
+  &.permission:before {
+    content: "\e907";
+  }
+  &.open-pmo:before {
+    content: "\e908";
+  }
+  &.boxes:before {
+    content: "\e909";
+  }
+  &.flag-check:before {
+    content: "\e90a";
+  }
+  &.map-marked:before {
+    content: "\e90b";
+  }
+  &.arrow-left:before {
+    content: "\e90c";
+  }
+  &.angle-up:before {
+    content: "\e90d";
+  }
+  &.angle-right:before {
+    content: "\e90e";
+  }
+  &.angle-left:before {
+    content: "\e90f";
+  }
+  &.angle-down:before {
+    content: "\e910";
+  }
+  &.ellipsis-v:before {
+    content: "\e911";
+  }
+  &.sort:before {
+    content: "\e912";
+  }
+  &.sort-down:before {
+    content: "\e913";
+  }
+  &.sort-up:before {
+    content: "\e914";
+  }
+  &.plus:before {
+    content: "\e915";
+  }
+  &.unit-selection:before {
+    content: "\e916";
+  }
+  &.toggle-on:before {
+    content: "\e917";
+  }
+  &.toggle-off:before {
+    content: "\e918";
+  }
+  &.text-area:before {
+    content: "\e919";
+  }
+  &.text:before {
+    content: "\e91a";
+  }
+  &.selection:before {
+    content: "\e91b";
+  }
+  &.locality-selection:before {
+    content: "\e91c";
+  }
+  &.integer:before {
+    content: "\e91d";
+  }
+  &.date:before {
+    content: "\e91e";
+  }
+  &.currency:before {
+    content: "\e91f";
+  }
+  &.chess-knight:before {
+    content: "\e920";
+  }
+  &.trash-alt:before {
+    content: "\e921";
+  }
+  &.trash:before {
+    content: "\e922";
+  }
+  &.home:before {
+    content: "\e923";
+  }
+  &.folder-open:before {
+    content: "\e924";
+  }
+  &.cogs:before {
+    content: "\e925";
+  }
+  &.portfolio:before {
+    content: "\e926";
+  }
+  &.sign-out-alt:before {
+    content: "\e927";
+  }
+  &.flag:before {
+    content: "\e928";
+  }
+  &.plan:before {
+    content: "\e929";
+  }
+  &.briefcase:before {
+    content: "\e92a";
+  }
+  &.user-circle:before {
+    content: "\e92b";
+  }
+  &.building:before {
+    content: "\e92c";
+  }
+  &.users:before {
+    content: "\e92d";
+  }
+  &.number:before {
+    content: "\e900";
+  }
+}

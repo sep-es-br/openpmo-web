@@ -1,0 +1,18 @@
+<ng-container *ngIf="property?.multipleSelection; else singleSelection">
+  <div class="app-tree-selection" [class.workpack-tree-selection-mobile]="responsive"
+    [class.workpack-tree-selection]="property.fullLine"
+    [class.workpack-tree-selection-not-fullLine]="!property.fullLine" *ngIf="property?.multipleSelection">
+    <label class="app-input-label">{{property?.label}} {{ property.required ? '*' : ''}}</label>
+    <p-tree [value]="property?.localityList" selectionMode="checkbox" [(selection)]="property.localitiesSelected"
+      (onNodeSelect)="changed.emit($event)" (onNodeUnselect)="changed.emit($event)"></p-tree>
+  </div>
+</ng-container>
+<ng-template #singleSelection>
+  <div class="app-tree-selection" [class.workpack-tree-selection-mobile]="responsive"
+    [class.workpack-tree-selection]="property.fullLine"
+    [class.workpack-tree-selection-not-fullLine]="!property.fullLine" *ngIf="!property.multipleSelection">
+    <label class="app-input-label">{{property.label}} {{ property.required ? '*' : ''}}</label>
+    <p-tree [value]="property.localityList" selectionMode="single" [(selection)]="property.localitiesSelected"
+    (onNodeSelect)="changed.emit($event)" (onNodeUnselect)="changed.emit($event)"></p-tree>
+  </div>
+</ng-template>

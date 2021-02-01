@@ -1,0 +1,64 @@
+@use "src/variables" as v;
+.app-organization{
+    width: 100%;
+
+    .app-organization-header {
+        padding: 0.5em 0;
+        font-size: 0.9rem;
+        font-family: v.$fontTitle !important;
+        color: v.$fontInput;
+        .app-organization-header-text {
+          margin-left: 0.5em;
+        }
+    }
+    .app-organization-header-mobile {
+      font-size: 1rem;
+      font-family: v.$fontFamilyBold !important;
+      font-weight: bold;
+    }
+
+    .mobile{
+      width: 100%;
+    }
+
+    .desktop{
+      width: 30%;
+    }
+}
+
+::ng-deep .form-organization{
+  .app-input-mask .p-inputmask.p-inputtext {
+      font-family: v.$fontFamilyMedium;
+      font-size: 1rem;
+      border: none;
+      border-bottom: 1px solid v.$borderInput;
+      border-radius: 0;
+      background-color: transparent;
+      color: v.$fontInput;
+
+      &:enabled:focus {
+        border-bottom: 1px solid v.$borderInput;
+        box-shadow: none;
+      }
+      &:hover {
+        border-bottom: 2px solid v.$borderInput !important;
+        box-shadow: none;
+      }
+      .mobile{
+        width: 100%;
+      }
+
+       .desktop{
+        width: 30%;
+      }
+
+    }
+
+    .app-input-mask.desktop .p-inputmask.p-inputtext  {
+      width: 30%;
+    }
+    .app-input-mask.mobile .p-inputmask.p-inputtext {
+      width: 100%;
+    }
+
+}

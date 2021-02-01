@@ -1,0 +1,103 @@
+@use "src/variables" as v;
+
+.app-plan-permission-detail {
+  width: 100%;
+ .app-permission-detail-header {
+    padding: 0.5em 0;
+    font-size: 0.9rem;
+    font-family: v.$fontTitle !important;
+    color: v.$fontInput;
+  }
+  .app-permission-detail-header-mobile {
+    font-size: 1rem;
+    font-family: v.$fontFamilyBold !important;
+    font-weight: bold;
+  }
+  .card-properties-permission {
+    width: 100%;
+    .person-properties {
+      .search-container {
+        margin-bottom: 1.5em;
+        .input-search {
+          width: 24%;
+        }
+        .responsive {
+          width: 100%;
+        }
+      }
+      ::ng-deep.card-person {
+        background-color: transparent;
+        box-shadow: none;
+        display: flex;
+        flex-direction: column;
+        width: 24%;
+        .p-card-content {
+          display: flex;
+          flex-direction: column;
+          align-items: flex-start;
+          padding: 0;
+          .person-name {
+            font-size: 1rem;
+            color: v.$fontTitle;
+            font-family: v.$fontFamilyMedium;
+            padding: 5px 0;
+          }
+          .person-email {
+            font-size: 0.9rem;
+            color: v.$fontTitle;
+            font-family: v.$fontFamilyMedium;
+          }
+        }
+      }
+      .responsive {
+        width: 100%;
+      }
+    }
+  }
+
+  .data-view-containter {
+    margin-top: 1em;
+  }
+  ::ng-deep .dataview-card-items {
+    position: static !important;
+    background-color: transparent;
+    .p-dataview-content, .p-grid {
+      background-color: transparent;
+    }
+    .card-item-container {
+      padding: 0.5em;
+      min-height: 9.5em !important;
+    }
+    .card-item-container.responsive {
+      padding: 0.5em 0;
+    }
+  }
+
+  .app-save-button-layout {
+    position: relative;
+    height: 20vh;
+    width: 100%;
+    overflow: hidden;
+  }
+  .app-save-button-wrapper {
+    position: absolute;
+    bottom: 50%;
+    left: 0;
+    z-index: 100;
+
+    .button-label {
+      background-color: v.$bgButtonGreen;
+      color: #ffffff;
+      font-size: 1.25rem;
+      padding: .5em 1.5em;
+      text-align: center;
+      border-radius: 5px;
+      box-shadow: 1px 7px 20px 2px rgba(0,0,0,.1);
+      cursor: pointer;
+
+      &:hover {
+        background-color: v.$bgButtonGreenHover;
+      }
+    }
+  }
+}

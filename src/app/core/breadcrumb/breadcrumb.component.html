@@ -1,0 +1,16 @@
+<div class="app-breadcrumb" [class.mobile]="isMobileView">
+  <div class="crumbs" #crumbsEl>
+    <div class="home" [class.adjust-padding]="isOverflowing">
+      <i class="app-icon home" [ngStyle]="{ fontSize: isMobileView ? '1.5rem' : '2.5rem' }" [routerLink]="['/']"></i>
+    </div>
+    <ng-container *ngFor="let crumb of crumbs; let i = index">
+      <i class="app-icon angle-right" [ngStyle]="{ fontSize: isMobileView ? '.65rem' : '.8rem' }"></i>
+      <div class="crumb" >
+        <div class="link" (click)="navigateTo(crumb, i)">{{ crumb?.key | translate }}</div>
+        <div class="info" [pTooltip]="crumb?.info" *ngIf="crumb?.info && !isMobileView">
+          {{ crumb?.info }}
+        </div>
+      </div>
+    </ng-container>
+  </div>
+</div>

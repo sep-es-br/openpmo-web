@@ -1,0 +1,21 @@
+<span class="p-float-label" [class.workpack-input-number-mobile]="responsive"
+  [class.workpack-input-number]="property.fullLine" [class.workpack-input-number-not-fullLine]="!property.fullLine">
+  <ng-container [ngSwitch]="property.type">
+    <p-inputNumber *ngSwitchCase="type.IntegerModel" class="app-input-number" [id]="property.name" name="name"
+      [(ngModel)]="property.value" [required]="property.required" [mode]="mode" [min]="property.min"
+      [max]="property.max" (ngModelChange)="changed.emit($event)" [disabled]="property.disabled">
+    </p-inputNumber>
+    <p-inputNumber *ngSwitchCase="type.NumberModel" class="app-input-number" [id]="property.name" name="name"
+      [(ngModel)]="property.value" [required]="property.required" [mode]="mode" [min]="property.min"
+      [max]="property.max" [minFractionDigits]="property.decimals ? property.decimals : 0"
+      [maxFractionDigits]="property.decimals ? property.decimals : 0" (ngModelChange)="changed.emit($event)"
+      [disabled]="property.disabled">
+    </p-inputNumber>
+    <p-inputNumber *ngSwitchCase="type.CurrencyModel" class="app-input-number" [id]="property.name" name="name"
+      [(ngModel)]="property.value" [required]="property.required" [mode]="mode" currency="BRL"
+      (ngModelChange)="changed.emit($event)" [disabled]="property.disabled">
+
+    </p-inputNumber>
+  </ng-container>
+  <label class="app-input-label" [for]="property.name">{{property.label}} {{ property.required ? '*' : ''}}</label>
+</span>

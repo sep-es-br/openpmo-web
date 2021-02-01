@@ -1,0 +1,70 @@
+<div class="app-plan">
+  <div class="app-plan-header" [class.app-plan-header-mobile]="responsive">
+    <span class="app-plan-header-label" *ngIf="!planData?.id">{{'newPlan' | translate}}</span>
+    <span class="app-plan-header-text" *ngIf="planData">{{planData.fullName}}</span>
+  </div>
+
+  <div class="card-properties-plan">
+    <app-card [properties]="cardPlanProperties">
+      <div class="p-grid">
+        <form [formGroup]="formPlan">
+          <div class="p-fluid">
+            <div class="p-field">
+              <span class="p-float-label">
+                <input class="app-input-text" [class.responsive]="responsive" id="float-name" name="name"
+                  formControlName="name" type="text" [ngStyle]="{'width': '30%'}" pInputText />
+                <label class="app-input-label" for="float-name">{{ "name" | translate }} * </label>
+              </span>
+              <app-input-message [form]="formPlan" field="name"></app-input-message>
+            </div>
+            <div class="p-field">
+              <span class="p-float-label">
+                <textarea pInputTextarea id="float-fullName" formControlName="fullName" class="app-text-area" rows="1">
+                </textarea>
+                <label class="app-input-label" for="float-fullName">{{ "fullName" | translate }} * </label>
+              </span>
+            </div>
+          </div>
+          <div class="p-formgroup-inline">
+            <div class="p-field" [class.responsive]="responsive">
+              <span class="p-float-label" [class.responsive]="responsive">
+                <p-calendar id="float-start" formControlName="start" class="app-select-date" showIcon="true"
+                  [monthNavigator]="true" [yearNavigator]="true" yearRange="2020:2030" [class.responsive]="responsive"
+                  icon="fas fa-calendar-alt" dateFormat="yy/mm/dd">
+                </p-calendar>
+                <label class="app-input-label" for="float-start">{{ "start" | translate }} * </label>
+              </span>
+            </div>
+            <div class="p-field" [class.responsive]="responsive">
+              <span class="p-float-label" [class.responsive]="responsive">
+                <p-calendar id="float-finish" formControlName="finish" class="app-select-date" showIcon="true"
+                  [monthNavigator]="true" [yearNavigator]="true" yearRange="2020:2030" [class.responsive]="responsive"
+                  icon="fas fa-calendar-alt" dateFormat="yy/mm/dd">
+                </p-calendar>
+                <label class="app-input-label" class="properties-label" for="float-finish">{{ "finish" |
+                  translate}} * </label>
+              </span>
+            </div>
+          </div>
+          <app-save-button [form]="formPlan" (save)="savePlan()"></app-save-button>
+        </form>
+      </div>
+    </app-card>
+  </div>
+
+  <section *ngIf="idPlan" class="workpackModels-cards-section">
+    <div class="card-workpack-model" *ngFor="let workpackModel of cardsPlanWorkPackModels">
+      <app-card [properties]="workpackModel.propertiesCard" *ngIf="workpackModel.workPackItemCardList && workpackModel.workPackItemCardList.length > 0">
+        <p-dataView [value]="workpackModel.workPackItemCardList" layout="grid" styleClass="dataview-card-items" [emptyMessage]="'loadingEllipsis' | translate">
+          <ng-template let-cardItem pTemplate="gridItem">
+            <div class="p-col-12 p-md-3 p-sm-12 card-item-container">
+              <app-card-item [properties]="cardItem"></app-card-item>
+            </div>
+          </ng-template>
+        </p-dataView>
+        <div>
+        </div>
+      </app-card>
+    </div>
+  </section>
+</div>

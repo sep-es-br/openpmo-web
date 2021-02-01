@@ -1,0 +1,46 @@
+<div class="app-strategy">
+    <div class="app-strategy-header" [class.app-strategy-header-mobile]="responsive">
+      <span class="app-strategy-header-text" *ngIf="!propertiesStrategy">{{'new' | translate}} {{'strategy' | translate}}:</span>
+      <span class="app-strategy-header-text" *ngIf="propertiesStrategy">{{propertiesStrategy.fullName}}</span>
+    </div>
+    <div class="card-properties" *ngIf="cardProperties">
+      <app-card [properties]="cardProperties">
+        <div>
+          <form [formGroup]="formStrategy">
+            <span class="p-float-label">
+              <input id="float-input" formControlName="name" type="text" pInputText class="app-input-text" [class.mobile]="responsive" [class.desktop]="!responsive">
+              <label for="float-input" class="app-input-label">{{'name' | translate}}<span class="required-indicator">*</span></label>
+            </span>
+            <app-input-message [form]="formStrategy" field="name"></app-input-message>
+            <span class="p-float-label margin-top">
+              <textarea pInputTextarea
+                        id="float-input"
+                        formControlName="fullName"
+                        class="app-text-area"
+                        rows="1"
+              >
+              </textarea>
+              <label for="float-input" class="app-input-label">{{'fullName' | translate}}<span class="required-indicator">*</span></label>
+            </span>
+            <app-input-message [form]="formStrategy" field="fullName"></app-input-message>
+            <app-save-button (save)="handleOnSubmit()"></app-save-button>
+          </form>
+        </div>
+      </app-card>
+    </div>
+    <section *ngIf="propertiesStrategy" class="models-cards-section">
+      <div class="card-plans">
+        <app-card [properties]="cardModels" *ngIf="cardItemsModels && cardItemsModels.length > 0">
+          <p-dataView [value]="cardItemsModels" layout="grid" styleClass="dataview-card-items" [emptyMessage]="'loadingEllipsis' | translate">
+            <ng-template let-cardItem pTemplate="gridItem">
+              <div class="p-col-12 p-md-3 p-sm-12 card-item-container">
+                <app-card-item [properties]="cardItem"></app-card-item>
+              </div>
+            </ng-template>
+          </p-dataView>
+        </app-card>
+      </div>
+    </section>
+  </div>
+
+

@@ -1,0 +1,39 @@
+<p-card class="app-card-item-role" styleClass="card-item-role" *ngIf="properties.type === 'role-card'">
+  <div class="card-item-header">
+    <span class="p-float-label">
+      <p-dropdown id="level-dropdown" dropdownIcon="fas fa-caret-down" class="app-single-selection"
+        [disabled]="!properties.role.active" [autoDisplayFirst]="false" [options]="properties.personRoleOptions"
+        (onChange)="handleRoleChange()" [(ngModel)]="properties.role.role">
+      </p-dropdown>
+      <label class="app-input-label" for="level-dropdown">{{ "role" | translate }}</label>
+    </span>
+    <div class="card-header-toggle">
+      <p-inputSwitch class="app-toggle" [(ngModel)]="properties.role.active" (onChange)="handleRoleChange()">
+      </p-inputSwitch>
+    </div>
+  </div>
+  <div class="card-item-dates">
+    <span class="p-float-label">
+      <p-calendar id="float-from" class="app-select-date" showIcon="true" [(ngModel)]="properties.role.from"
+        [disabled]="!properties.role.active" [monthNavigator]="true" [yearNavigator]="true" yearRange="2020:2030"
+        icon="fas fa-calendar-alt" dateFormat="yy/mm/dd" (onSelect)="handleRoleChange()">
+      </p-calendar>
+      <label class="app-input-label" for="float-from">{{ "from" | translate }}</label>
+    </span>
+    <span class="p-float-label">
+      <p-calendar id="float-to" class="app-select-date" showIcon="true" [disabled]="!properties.role.active"
+        [(ngModel)]="properties.role.to" [monthNavigator]="true" (onSelect)="handleRoleChange()" [yearNavigator]="true"
+        yearRange="2020:2030" icon="fas fa-calendar-alt" dateFormat="yy/mm/dd">
+      </p-calendar>
+      <label class="app-input-label" for="float-to">{{ "to" | translate }}</label>
+    </span>
+  </div>
+</p-card>
+
+<p-card class="new-card-item-role" (click)="handleNewCardItemRole()"
+  [class.new-card-item-role-mobile]="responsive"
+  *ngIf="properties.type === 'new-role-card'">
+  <div class="card-item-content">
+    <i [ngClass]="[ 'app-icon', iconsEnum.Plus, 'light-grey-icon' ]" [ngStyle]="{ fontSize: responsive ? '2rem' : '3em' }"></i>
+  </div>
+</p-card>

@@ -1,0 +1,18 @@
+<div class="app-office-permissions">
+  <div class="app-office-permissions-header" [class.app-office-permissions-header-mobile]="responsive">
+    <span class="app-office-header-text" *ngIf="propertiesOffice">{{propertiesOffice.fullName}}</span>
+  </div>
+  <div class="card-permissions" *ngIf="idOffice">
+    <app-card [properties]="cardOfficePermissions">
+      <p-dataView [value]="cardItemsOfficePermissions" layout="grid" styleClass="dataview-card-items" [emptyMessage]="'loadingEllipsis' | translate">
+        <ng-template let-cardItem pTemplate="gridItem">
+          <div class="p-col-12 p-md-3 p-sm-12 card-item-container">
+            <app-card-item-permission [properties]="cardItem"></app-card-item-permission>
+          </div>
+        </ng-template>
+      </p-dataView>
+      <div>
+      </div>
+    </app-card>
+  </div>
+</div>

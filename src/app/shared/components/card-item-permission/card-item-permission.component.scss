@@ -1,0 +1,165 @@
+@use "src/variables" as v;
+
+::ng-deep .app-card-item-permission.new-card-item .p-card {
+  width: 100%;
+  height: 100%;
+}
+
+::ng-deep .app-card-item-permission .p-card {
+
+  .p-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    .card-item-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+    }
+    .card-item-header p-menu {
+      .p-menu-overlay .p-menu-list .p-menuitem .p-menuitem-link {
+        .p-menuitem-icon {
+          font-size: 0.8rem;
+          color: #939393;
+        }
+        .p-menuitem-text {
+          font-size: 0.9rem;
+          font-family: v.$fontFamilyMedium;
+          color: #939393;
+        }
+      }
+    }
+    .card-item-header .p-button {
+      background-color: transparent;
+      border: none !important;
+      box-shadow: none !important;
+      .p-button-icon {
+        font-size: 0.9rem;
+        color: #939393;
+      }
+    }
+    .card-item-title {
+      font-size: 1rem;
+      font-family: v.$fontFamilyMedium;
+      color: v.$fontTitle;
+      padding: 0.7em;
+    }
+  }
+  .p-card-body {
+    :focus{
+      outline: none;
+    }
+    padding: 0;
+    height: 100%;
+  }
+  .p-card-content {
+    height: 100%;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    .card-item-footer {
+      display: flex;
+      justify-content: flex-end;
+      padding: 0.5em;
+      .card-item-id {
+        color: #888e96;
+          font-size: 0.6rem;
+          font-family: v.$fontFamilyMedium;
+      }
+    }
+  }
+
+  .card-item-content {
+    padding: 0 2em 4em 0;
+    .card-item-role-description {
+      font-size: 1rem;
+      font-family: v.$fontFamilyMedium;
+      padding: 0.2em 0.7em;
+      color: v.$fontLabel;
+    }
+  }
+}
+
+.card-link {
+  cursor: pointer;
+  border: none;
+}
+
+::ng-deep .editItem {
+  width: 100%;
+  .p-card-body {
+    margin-top: 1.5em !important;
+    padding-left: 0.5em !important;
+    padding-right: 0.5em !important;
+    .p-float-label input:focus ~ label,
+    .p-float-label input.p-filled ~ label,
+    .p-float-label textarea:focus ~ label,
+    .p-float-label textarea.p-filled ~ label,
+    .p-float-label .p-inputwrapper-focus ~ label,
+    .p-float-label .p-inputwrapper-filled ~ label {
+      top: -0.100rem;
+    }
+  }
+  p-dropdown {
+    width: 100% !important;
+    .p-dropdown {
+      width: 100% !important;
+    }
+  }
+
+}
+
+::ng-deep .app-card-item-permission.new-card-item {
+  .p-card {
+    background-color: transparent;
+    box-shadow: none;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    cursor: pointer;
+    height: 100%;
+    .p-card-body .p-card-content p-menu {
+      .p-menu-overlay .p-menu-list {
+        max-width: 20em;
+        .p-menuitem .p-menuitem-link {
+          .p-menuitem-icon {
+            font-size: 0.8rem;
+            color: #939393;
+          }
+          .p-menuitem-text {
+            font-size: 0.9rem;
+            font-family: v.$fontFamilyMedium;
+            color: #939393;
+          }
+        }
+      }
+    }
+    .p-card-body {
+      padding: 0 !important;
+      height: 100%;
+    }
+    .p-card-content .card-item-content {
+      width: 100%;
+      height: 100%;
+      padding: 1em;
+      display: flex;
+      align-items: center;
+      justify-content: center !important;
+    }
+  }
+}
+
+::ng-deep .app-card-item-permission.new-card-item.new-card-item-mobile {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+}
+
+::ng-deep .app-card-item-permission.new-card-item.new-card-item-mobile .p-card {
+  width: 30%;
+  height: 50%;
+}

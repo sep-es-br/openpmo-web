@@ -1,0 +1,9 @@
+<div class="app-template" [class.mobile]="responsiveSrv.observable | async">
+  <app-menu></app-menu>
+  <main>
+    <app-breadcrumb></app-breadcrumb>
+    <div class="outlet">
+      <router-outlet></router-outlet>
+    </div>
+  </main>
+</div>

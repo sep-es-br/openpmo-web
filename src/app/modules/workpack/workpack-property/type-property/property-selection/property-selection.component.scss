@@ -1,0 +1,32 @@
+::ng-deep .workpack-selection {
+  .p-multiselect {
+    width: 20%;
+  }
+}
+
+::ng-deep .workpack-selection-not-fullLine {
+  .p-multiselect {
+    width: 100%;
+  }
+}
+
+::ng-deep .workpack-selection {
+  .app-single-selection .p-dropdown {
+    width: 20%;
+  }
+}
+
+::ng-deep .workpack-selection-not-fullLine {
+  .app-single-selection .p-dropdown {
+    width: 100%;
+  }
+}
+
+::ng-deep .workpack-selection-mobile {
+  .p-multiselect {
+    width: 100%;
+  }
+  .app-single-selection .p-dropdown {
+    width: 100%;
+  }
+}

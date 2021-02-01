@@ -1,0 +1,330 @@
+@use 'src/variables' as v;
+$mobileMenuHeight: 72px;
+
+.app-menu {
+  display: flex;
+  flex-direction: column;
+  width: 64px;
+  background-color: v.$bgMenuUser;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  position: relative;
+  z-index: 1000;
+  max-height: 100vh;
+  position: sticky;
+  top: 0;
+
+  .logo {
+    padding: 1em 0;
+
+    img {
+      width: 2rem;
+      height: 2rem;
+    }
+  }
+  .item {
+    color: #eeeeee;
+    font-size: 1.5rem;
+    padding: 1em 0;
+    cursor: pointer;
+    width: 100%;
+    text-align: center;
+    &:focus {
+      outline: none !important;
+    }
+    .item-label {
+      font-size: 1rem;
+      max-width: 95%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+    }
+  }
+  .app-icon {
+    color: #ffffff;
+  }
+  &.admin-menu {
+    background-color: v.$bgMenuAdmin;
+    .item {
+      color: v.$bgMenuAdmin !important;
+    }
+  }
+  &.mobile {
+    width: 100%;
+    flex-direction: row;
+    height: $mobileMenuHeight;
+    background-color: v.$bg;
+    position: fixed;
+    top: auto;
+    bottom: 0;
+    font-size: .688rem;
+
+    .app-icon {
+      color: v.$iconGrey;
+    }
+    &.admin-menu {
+      .app-icon {
+        color: v.$bgMenuAdmin;
+      }
+    }
+    .item {
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      height: 100%;
+      color: v.$fontLabel;
+
+      .item-label {
+        font-size: .9rem;
+        padding-top: 5px;
+        max-width: 100%;
+      }
+    }
+  }
+}
+
+.app-menu-slide {
+  position: fixed;
+  top: 0;
+  left: 64px;
+  min-height: 100vh;
+  max-height: 100vh;
+  height: 100vh;
+  z-index: 999;
+  width: 100%;
+  background-color: transparent;
+
+  .slide-wrapper {
+    background-color: rgba(251, 254, 255, 0.980392156862745);
+    border-color: rgba(227, 227, 227, 1);
+    height: 100%;
+  }
+  .top-bar {
+    padding: 1em;
+    display: flex;
+    justify-content: space-between;
+    color: v.$fontTitle;
+
+    .title {
+      font-size: 1rem;
+      font-weight: 700;
+    }
+    .action .app-icon {
+      cursor: pointer;
+    }
+  }
+  .action-mobile {
+    margin: 1.5em 0;
+    display: flex;
+    justify-content: center;
+
+    .app-icon {
+      color: rgba(251, 254, 255, 0.980392156862745);
+      cursor: pointer;
+      background-color: v.$bgMenuItem;
+      padding: 10px 5px 8px;
+      border-radius: 46px;
+    }
+  }
+  .more-menu {
+    padding: .5em 1.5em;
+    .item {
+      padding: .8rem 0;
+      display: flex;
+      align-items: center;
+      .icon-wrapper {
+        margin-right: .5em;
+        min-width: 40px;
+        text-align: center;
+      }
+      .menu-label {
+        color: v.$fontDark;
+      }
+    }
+  }
+  .menu-layout-splitter {
+    height: 100%;
+    width: 100%;
+  }
+  &:not(.changing) {
+    transition: transform 250ms ease-in-out;
+  }
+  &:not(.mobile) {
+    transform: translateX(-100%);
+
+    &.open {
+      transform: translateX(0);
+    }
+  }
+  &.mobile {
+    position: fixed;
+    left: 0;
+    bottom: $mobileMenuHeight;
+    width: 100%;
+    top: auto;
+    min-height: auto !important;
+    max-height: calc(100vh - 72px) !important;
+    height: auto !important;
+    transform: translateY(100%);
+    transform-origin: bottom;
+    overflow-y: hidden;
+    background-color: rgba(251, 254, 255, 0.980392156862745);
+    border-color: rgba(227, 227, 227, 1);
+    &.open {
+      box-shadow: 0px -7px 20px 2px rgba(0,0,0,.1);
+      transform: translateY(0);
+    }
+  }
+}
+.user-slide {
+  bottom: 0;
+  top: auto;
+  height: auto;
+  min-height: auto !important;
+  font-size: 1.25rem;
+  font-weight: 700;
+  background-color: rgba(251, 254, 255, 0.980392156862745);
+  border-color: rgba(227, 227, 227, 1);
+  width: auto;
+
+  .top-bar {
+    color: v.$fontDark;
+    .title {
+      font-size: 1.25rem;
+      max-width: 90%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+  .logout {
+    padding: 1em;
+    display: flex;
+    color: v.$fontLogout;
+    font-family: v.$fontFamilyBold;
+    cursor: pointer;
+
+    span {
+      padding-left: .5em;
+    }
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.05);
+    }
+  }
+}
+.menu-layout {
+  position: fixed;
+  top: 0;
+  height: 100vh;
+  width: 100vw;
+  z-index: 998;
+}
+
+::ng-deep .app-menu-slide {
+
+  .p-splitter {
+    height: 100%;
+    width: 100%;
+    background-color: transparent;
+
+    .p-splitter-panel-nested {
+      flex-direction: column;
+    }
+  }
+  &:not(.mobile) .p-panelmenu {
+    // width: 300px;
+    height: calc(100% - 3.3rem);
+    overflow-y: auto;
+  }
+  &.mobile .p-panelmenu {
+    height: auto;
+    max-height: calc(100vh - 72px - 4.5rem - 3rem);
+    overflow-y: auto;
+  }
+  .p-panelmenu .p-panelmenu-header > a {
+    font-weight: 500;
+    font-family: 'Montserrat Medium', 'Montserrat Regular', 'Montserrat', sans-serif;
+    color: v.$fontDark;
+    .p-panelmenu-icon {
+      font-size: .7rem;
+    }
+    &:focus {
+      box-shadow: none !important;
+    }
+  }
+  .p-panelmenu .p-panelmenu-content .p-menuitem .p-menuitem-link:focus {
+    box-shadow: none !important;
+  }
+  .p-panelmenu-header-link,
+  .p-panelmenu-content {
+    border: none !important;
+  }
+  .p-panelmenu-header-link {
+    background-color: v.$bgMenuItem !important;
+  }
+  .more-menu .item .app-icon {
+    color: v.$iconDarkGrey;
+  }
+  .p-panelmenu-header.active .p-menuitem-text,
+  .p-menuitem.active > .p-menuitem-link > .p-menuitem-text {
+    font-weight: bold;
+  }
+  .p-menuitem-text.active {
+    font-weight: bold;
+  }
+}
+
+::ng-deep .user-slide {
+  .p-tieredmenu {
+    border: none !important;
+    padding: 0 !important;
+    .p-menuitem-link {
+      padding: 1em;
+      &:focus {
+        box-shadow: none;
+      }
+    }
+    .p-submenu-list {
+      padding: 0 !important;
+    }
+  }
+  .p-menuitem-link {
+    background-color: rgba(251, 254, 255, 0.980392156862745);
+  }
+  .p-menuitem {
+    font-size: 1.25rem;
+
+    .p-submenu-icon {
+      font-size: 1.25rem;
+    }
+    .p-menuitem-icon,
+    .p-submenu-icon,
+    .p-menuitem-text {
+      color: v.$fontDark !important;
+
+    }
+    .p-menuitem-text {
+      font-family: v.$fontFamilyBold;
+      font-weight: 700;
+    }
+  }
+}
+
+::ng-deep .app-menu {
+  app-icon svg {
+    fill: #ffffff;
+  }
+  &.mobile {
+    app-icon svg {
+      fill: v.$iconGrey;
+    }
+    &.admin-menu {
+      app-icon svg {
+        fill: v.$bgMenuAdmin;
+      }
+    }
+  }
+}

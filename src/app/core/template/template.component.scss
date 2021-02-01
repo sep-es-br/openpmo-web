@@ -1,0 +1,53 @@
+@use "src/variables" as v;
+
+$loadingBarHeight: .3rem;
+
+.app-template {
+  display: flex;
+  height: 100%;
+  min-height: 100vh;
+
+  main {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    overflow-x: hidden;
+  }
+  &.mobile {
+    flex-direction: column-reverse;
+
+    main {
+      padding-bottom: 72px;
+    }
+    .outlet {
+      padding: 0 7.5px;
+    }
+  }
+  .loading-layout {
+    margin-bottom: -$loadingBarHeight;
+  }
+  p-progressbar {
+    width: 100%;
+  }
+  .outlet {
+    height: 100%;
+    transition: opacity 250ms ease-in;
+    opacity: 1;
+    padding: 1rem 50px 25px 50px;
+
+    &.is-loading {
+      transition: opacity 25ms ease-in;
+      opacity: 0;
+      pointer-events: none;
+    }
+  }
+}
+
+::ng-deep .p-progressbar.p-component {
+  border-radius: 0 !important;
+  height: $loadingBarHeight;
+
+  .p-progressbar-value {
+    background: v.$borderDarkGrey;
+  }
+}

@@ -1,0 +1,92 @@
+::ng-deep p-card.app-card-item-role .p-card {
+  height: 100%;
+  padding: 1em 0.5em;
+  
+  .p-card-body {
+    height: 100%;
+    padding: 0;
+    .p-float-label input:focus ~ label, 
+    .p-float-label input.p-filled ~ label, 
+    .p-float-label textarea:focus ~ label, 
+    .p-float-label textarea.p-filled ~ label, 
+    .p-float-label .p-inputwrapper-focus ~ label, 
+    .p-float-label .p-inputwrapper-filled ~ label {
+      top: -0.05rem;
+    }
+  }
+  .p-card-content {
+    height: 100%;
+    padding: 0;
+    .card-item-header {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      .p-float-label {
+        margin-top: 1em;
+      }
+      .p-dropdown {
+        width: 100%;
+        .p-inputtext {
+          font-size: 0.8rem;
+        }
+      }
+      .card-header-toggle {
+        display: flex;
+        justify-content: flex-end;
+      }
+    }
+    .card-item-dates {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      column-gap: 5px;
+      margin-top: 2em;
+      padding-bottom: 1em;
+      .app-select-date {
+        .p-calendar .p-inputtext {
+          font-size: 0.8rem;
+          padding: 0.5em;
+        }
+      }
+    }
+  }
+}
+::ng-deep p-card.new-card-item-role {
+  .p-card {
+    background-color: transparent;
+    box-shadow: none;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    cursor: pointer;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    .p-card-content {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+  }
+}
+
+::ng-deep .new-card-item-role.new-card-item-role-mobile {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  padding: 1em;
+  .p-card {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 30%;
+    height: 60%;
+    padding: 0;
+    .p-card-body .p-card-content .carditem-content {
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      height: 100%;
+      width: 100%;
+    }
+  }
+}

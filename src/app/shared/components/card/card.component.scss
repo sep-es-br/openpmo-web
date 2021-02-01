@@ -1,0 +1,116 @@
+@use "src/variables" as v;
+
+::ng-deep .app-card {
+  background-color: v.$bgCard;
+  width: 100%;
+  margin: 0 auto;
+  .p-panel {
+    width: 100%;
+    background-color: v.$bgCard;
+  }
+  p-header.card-header {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    .header-title {
+      display: flex;
+      flex-direction: column;
+
+      .header-title-text {
+        display: flex;
+        align-items: center;
+      }
+    }
+    .header-title-dates {
+      display: flex;
+      align-items: center;
+      padding: 0.5em 0;
+      .start-date, .end-date {
+        color: v.$fontTitle;
+        font-family: v.$fontFamilyMedium;
+        font-size: 0.9rem;
+        margin-right: 5px;
+      }
+      i {
+        font-size: 0.8rem;
+        color: v.$fontTitle;
+        margin-right: 5px;
+      }
+    }
+    .card-title {
+      color: v.$fontTitle;
+      font-family: v.$fontFamilyMedium;
+      font-size: 1rem;
+      text-transform: uppercase;
+    }
+    .card-title-mobile {
+      font-size: 0.75rem;
+    }
+    .header-values-cost-account {
+      display: flex;
+      justify-content: flex-end;
+      width: 40%;
+      color: v.$fontTitle;
+      font-family: v.$fontFamilyMedium;
+      font-size: 1rem;
+      text-transform: uppercase;
+      .progress-bar-cost-container {
+        width: 50%;
+        display: flex;
+        justify-content: flex-end;
+      }
+    }
+  }
+
+  p-header.card-header-mobile {
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    .header-values-cost-account {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      color: v.$fontTitle;
+      font-family: v.$fontFamilyMedium;
+      font-size: 1rem;
+      text-transform: uppercase;
+      .progress-bar-cost-container {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        margin-top: 1em;
+        .progress-bar-mobile {
+          width: 100%;
+        }
+      }
+    }
+  }
+  .p-panel .p-panel-header .p-panel-icons .p-panel-header-icon:focus {
+    box-shadow: none !important;
+  }
+  .p-panel .p-panel-header .p-panel-icons .p-panel-header-icon:enabled:hover {
+    background: transparent !important;
+  }
+  .p-panel .p-panel-header {
+    background-color: v.$bgCard;
+    border-color: v.$bgCard;
+  }
+  p-panel .p-toggleable-content {
+    background-color: v.$bgCard;
+    border-color: v.$bgCard;
+  }
+  .p-panel .p-toggleable-content .p-panel-content {
+    background-color: v.$bgCard;
+    border-color: v.$bgCard;
+    padding-left: 1.5em;
+    padding-right: 1.5em;
+  }
+  &.mobile {
+    .p-panel .p-toggleable-content .p-panel-content {
+      padding: 0 7.5px !important;
+    }
+  }
+}

@@ -1,0 +1,112 @@
+<ng-container [ngSwitch]="type">
+  <p-card *ngSwitchCase="'listStep'" class="app-step-card-item">
+    <p-header *ngIf="properties.menuItems" class="card-item-header">
+      <div class="header-title">
+        <span class="title-month">
+          {{properties.stepName|date:'MMMM'}}
+        </span>
+        <span class="title-day">
+          {{properties.stepDay ? (properties.stepDay|date:'d') : ''}}
+        </span>
+      </div>
+      <p-menu #menu [popup]="true" [model]="properties.menuItems"></p-menu>
+      <button type="button" pButton icon="pi pi-ellipsis-v" (click)="menu.toggle($event)"></button>
+    </p-header>
+    <div class="card-item-content">
+      <div class="unitValues">
+        <div class="unitInputs p-fluid">
+          <span class="column-title">{{properties.unitName}}</span>
+          <span class="p-float-label p-field">
+            <p-inputNumber class="app-input-number" (onBlur)="handleStepChange()" id="float-unitPlanned"
+              [(ngModel)]="properties.unitPlanned">
+            </p-inputNumber>
+            <label class="app-input-label" for="float-unitPlanned">{{ "planned" |translate }}</label>
+          </span>
+          <span class="p-float-label p-field">
+            <p-inputNumber class="app-input-number" (onBlur)="handleStepChange()" id="float-unitActual"
+              [(ngModel)]="properties.unitActual">
+            </p-inputNumber>
+            <label class="app-input-label" for="float-unitActual">{{ "actual" |translate }}</label>
+          </span>
+        </div>
+        <div class="progress-bar-unit-container">
+          <app-progress-bar [total]="properties.unitPlanned" [progress]="properties.unitActual"
+            [color]="properties.unitProgressBar.color">
+          </app-progress-bar>
+        </div>
+      </div>
+      <div class="costValues">
+        <div class="costInputs p-fluid">
+          <span class="column-title"> R$ </span>
+          <span class="p-float-label p-field">
+            <p-inputNumber class="app-input-number" id="float-costPlanned" disabled="true"
+              [(ngModel)]="properties.costPlanned">
+            </p-inputNumber>
+            <label class="app-input-label" for="float-costPlanned">{{ "planned" |translate }}</label>
+          </span>
+          <span class="p-float-label p-field">
+            <p-inputNumber class="app-input-number" id="float-costActual" disabled="true"
+              [(ngModel)]="properties.costActual">
+            </p-inputNumber>
+            <label class="app-input-label" for="float-costActual">{{ "actual" |translate }}</label>
+          </span>
+        </div>
+        <div class="progress-bar-cost-container">
+          <app-progress-bar [total]="properties.costProgressBar.total" [progress]="properties.costProgressBar.progress"
+            [color]="properties.costProgressBar.color">
+          </app-progress-bar>
+        </div>
+      </div>
+    </div>
+    <div class="card-item-footer" *ngIf="cardIdItem">
+      <span class="card-item-id">
+        {{cardIdItem}}
+      </span>
+    </div>
+  </p-card>
+
+  <p-card *ngSwitchCase="'listStepResumed'" class="app-step-card-item-resume">
+    <p-header *ngIf="properties.menuItems" class="card-item-header">
+      <div class="header-title">
+        <span class="title-month">
+          {{properties.stepName|date:'MMMM'}}
+        </span>
+        <span class="title-day">
+          {{properties.stepDay ? (properties.stepDay|date:'d') : ''}}
+        </span>
+      </div>
+    </p-header>
+    <div class="card-item-content">
+      <div class="progress-values-container">
+        <div class="progress-bar-unit-container">
+          <app-progress-bar [total]="properties.unitPlanned" [progress]="properties.unitActual"
+            [color]="properties.unitProgressBar.color">
+          </app-progress-bar>
+        </div>
+        <span class="progress-bar-unit">{{properties.unitName}}</span>
+      </div>
+      <div class="progress-values-container">
+        <div class="progress-bar-cost-container">
+          <app-progress-bar [total]="properties.costProgressBar.total" [progress]="properties.costProgressBar.progress"
+            [color]="properties.costProgressBar.color">
+          </app-progress-bar>
+        </div>
+        <span class="progress-bar-unit"> R$ </span>
+      </div>
+    </div>
+  </p-card>
+
+  <p-card *ngSwitchCase="'newStart'" class="app-new-step-card-item" [class.card-link]="properties.urlCard"
+    (click)="properties.urlCard && navigateToPage(properties.urlCard, properties.urlParams)">
+    <div class="card-item-content">
+      <i [ngClass]="[ 'app-icon', iconEnum.Plus, 'light-grey-icon' ]" [ngStyle]="{ fontSize: '2rem' }"></i>
+    </div>
+  </p-card>
+
+  <p-card *ngSwitchCase="'newEnd'" class="app-new-step-card-item" [class.card-link]="properties.urlCard"
+    (click)="properties.urlCard && navigateToPage(properties.urlCard, properties.urlParams)">
+    <div class="card-item-content">
+      <i [ngClass]="[ 'app-icon', iconEnum.Plus, 'light-grey-icon' ]" [ngStyle]="{ fontSize: '2rem' }"></i>
+    </div>
+  </p-card>
+</ng-container>

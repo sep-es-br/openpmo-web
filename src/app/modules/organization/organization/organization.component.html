@@ -1,0 +1,64 @@
+<div class="app-organization">
+    <div class="app-organization-header" [class.app-organization-header-mobile]="responsive">
+      <span class="app-organization-header-text" *ngIf="!propertiesOrganization">{{'new' | translate}} {{'organization' | translate}}:</span>
+      <span class="app-organization-header-text" *ngIf="propertiesOrganization">{{propertiesOrganization.name}}</span>
+    </div>
+    <div class="card-properties" *ngIf="cardProperties">
+      <app-card [properties]="cardProperties">
+        <div>
+          <form [formGroup]="formOrganization" class="form-organization">
+            <div class="p-fluid p-formgroup-inline p-grid">
+              <span class="p-field p-col-12 p-md-6 p-lg-3 p-float-label margin-top">
+                <p-dropdown [options]="optionsSector" dropdownIcon="fas fa-caret-down" id="float-input" formControlName="sector"
+                class="app-single-selection" [class.mobile]="responsive" [class.desktop]="!responsive" [autoDisplayFirst]="false" optionLabel="name" optionValue="value">
+              </p-dropdown>
+                <label for="float-input" class="app-input-label">{{'sector' | translate}}</label>
+              </span>
+              <span class="p-field p-col-12 p-md-6 p-lg-3 p-float-label margin-top">
+                <input id="float-input" formControlName="name" type="text" pInputText class="app-input-text"  [class.mobile]="responsive" >
+                <label for="float-input" class="app-input-label">{{'businessName' | translate}}<span class="required-indicator">*</span></label>
+                <app-input-message [form]="formOrganization" field="name"></app-input-message>
+              </span>
+            </div>
+            <span class="p-float-label margin-top">
+              <textarea pInputTextarea
+                        id="float-input"
+                        formControlName="fullName"
+                        class="app-text-area"
+                        rows="1"
+              >
+              </textarea>
+              <label for="float-input" class="app-input-label">{{'socialName' | translate}}<span class="required-indicator">*</span></label>
+            </span>
+            <app-input-message [form]="formOrganization" field="fullName"></app-input-message>
+            <span class="p-float-label margin-top margin-top">
+              <textarea pInputTextarea
+                        id="float-input"
+                        formControlName="address"
+                        class="app-text-area"
+                        rows="1"
+              >
+              </textarea>
+              <label for="float-input" class="app-input-label">{{'address' | translate}}</label>
+            </span>
+              <span class="p-float-label margin-top">
+                <p-inputMask class="app-input-mask short-input" [class.mobile]="responsive" [class.desktop]="!responsive" id="float-phoneNumber"
+                name="phoneNumber" formControlName="phoneNumber" [unmask]="false"
+                mask="(99) 99999-9999"></p-inputMask>
+                <label for="float-phoneNumber" class="app-input-label">{{'phone' | translate}}</label>
+              </span>
+              <span class="p-float-label margin-top">
+                <input id="float-input" formControlName="contactEmail" type="text" pInputText class="app-input-text" [class.mobile]="responsive" [class.desktop]="!responsive">
+                <label for="float-input" class="app-input-label">{{'contactEmail' | translate}}</label>
+              </span>
+              <app-input-message [form]="formOrganization" field="contactEmail"></app-input-message>
+              <span class="p-float-label margin-top">
+                <input id="float-input" formControlName="website" type="text" pInputText class="app-input-text" [class.mobile]="responsive" [class.desktop]="!responsive">
+                <label for="float-input" class="app-input-label">Website</label>
+              </span>
+              <app-save-button (save)="handleOnSubmit()"></app-save-button>
+          </form>
+        </div>
+      </app-card>
+    </div>
+</div>

@@ -1,0 +1,17 @@
+::ng-deep .workpack-unit-selection {
+  .app-single-selection .p-dropdown {
+    width: 20%;
+  }
+}
+
+::ng-deep .workpack-unit-selection-not-fullLine {
+  .app-single-selection .p-dropdown {
+    width: 100%;
+  }
+}
+
+::ng-deep .workpack-unit-selection-mobile {
+  .app-single-selection .p-dropdown {
+    width: 100%;
+  }
+}

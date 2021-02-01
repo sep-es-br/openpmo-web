@@ -1,0 +1,21 @@
+<div class="app-cost-account">
+  <div class="app-cost-account-header" [class.app-cost-account-header-mobile]="responsive" *ngIf="!idCostAccount">
+    <span class="app-cost-account-header-label">{{'new' | translate}}</span>
+    <span class="app-cost-account-header-text">{{ 'account' | translate}}</span>
+  </div>
+  <div class="app-cost-account-header" *ngIf="idCostAccount">
+    <span class="app-cost-account-header-label">{{'account' | translate}}: </span>
+    <span class="app-cost-account-header-text">{{costAccountName}}</span>
+  </div>
+
+  <div class="card-properties-cost-account" *ngIf="sectionCostAccountProperties">
+    <app-card [properties]="cardCostAccountProperties">
+      <div class="properties-container">
+        <div class="property-container" *ngFor="let property of sectionCostAccountProperties" [class.fullLine]="property.fullLine">
+          <app-workpack-property [property]="property" (changed)="saveButton.showButton()"></app-workpack-property>
+        </div>
+      </div>
+      <app-save-button #saveButton (save)="saveCostAccount()"></app-save-button>
+    </app-card>
+  </div>
+</div>

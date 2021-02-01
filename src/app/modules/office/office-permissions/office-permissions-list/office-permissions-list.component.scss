@@ -1,0 +1,38 @@
+@use "src/variables" as v;
+
+.app-office-permissions {
+  width: 100%;
+  .app-office-permissions-header {
+    padding: 0.5em 0;
+    font-size: 0.9rem;
+    font-family: v.$fontTitle !important;
+    color: v.$fontInput;
+    .app-office-header-text {
+      margin-left: 0.5em;
+    }
+  }
+  .app-office-permissions-header-mobile {
+    font-size: 1rem;
+    font-family: v.$fontFamilyBold !important;
+    font-weight: bold;
+  }
+  ::ng-deep .dataview-card-items {
+    position: static !important;
+    background-color: transparent;
+    .p-dataview-content, .p-grid {
+      background-color: transparent;
+    }
+    .card-item-container {
+      padding: 0.5em;
+    }
+  }
+}
+
+::ng-deep .card-permissions {
+  .p-panel-content {
+    min-height: 13.5em !important;
+    .card-item-container {
+      min-height: 9.5em !important;
+    }
+  }
+}

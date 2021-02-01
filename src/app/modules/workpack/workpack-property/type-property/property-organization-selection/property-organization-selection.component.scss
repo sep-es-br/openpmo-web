@@ -1,0 +1,32 @@
+::ng-deep .workpack-organization-selection {
+  .p-multiselect {
+    width: 20%;
+  }
+}
+
+::ng-deep .workpack-organization-selection {
+  .app-single-selection .p-dropdown {
+    width: 20%;
+  }
+}
+
+::ng-deep .workpack-organization-selection-not-fullLine {
+  .p-multiselect {
+    width: 100%;
+  }
+}
+
+::ng-deep .workpack-organization-selection-not-fullLine {
+  .app-single-selection .p-dropdown {
+    width: 100%;
+  }
+}
+
+::ng-deep .workpack-organization-selection-mobile {
+  .p-multiselect {
+    width: 100%;
+  }
+  .app-single-selection .p-dropdown {
+    width: 100%;
+  }
+}

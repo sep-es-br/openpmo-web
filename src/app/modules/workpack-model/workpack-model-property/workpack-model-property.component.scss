@@ -1,0 +1,110 @@
+@use "src/variables" as v;
+
+::ng-deep .app-workpack-model-property.p-panel {
+  display: inline-flex;
+  width: auto;
+  background-color: transparent;
+
+  .workpack-model-property-header {
+    display: flex;
+    flex: 1;
+    justify-content: space-between;
+
+    .left-side {
+      display: flex;
+      align-items: center;
+
+      i {
+        border: 1px solid v.$borderLightGrey;
+        border-radius: 2px;
+        margin-right: .5em;
+        padding: 5px 7.5px;
+        font-size: 1.25rem;
+        color: v.$iconGrey;
+        &.app-icon {
+          font-size: 1rem;
+        }
+      }
+    }
+    .right-side {
+      display: flex;
+      align-items: center;
+      .app-icon {
+        display: flex;
+        margin-right: .5em;
+        cursor: pointer;
+      }
+
+      .app-toggle {
+        display: inline-flex;
+      }
+    }
+  }
+  .p-panel-header {
+    display: inline-flex;
+    min-width: 200px;
+    background-color: rgba(250, 250, 249, 1);
+    border-color: v.$borderLightGrey;;
+    padding: .5em;
+  }
+  .p-toggleable-content  .p-panel-content {
+    background-color: rgba(250, 250, 249, 1);
+    border-color: v.$borderLightGrey;;
+    border-top: none !important;
+
+    .workpack-model-property {
+      display: inline-flex;
+      flex-wrap: wrap;
+
+      > span:not(:last-of-type) {
+        margin-right: 1em;
+      }
+      .p-field {
+        margin-bottom: 1.5rem;
+      }
+    }
+  }
+  .p-toggleable-content {
+    display: none;
+  }
+  .input-number-scroll,
+  .input-date-default-value {
+    .p-datepicker-trigger,
+    .p-button {
+      background-color: transparent;
+      margin-left: 0;
+
+      .p-button-icon {
+        color: v.$fontLabel;
+      }
+    }
+  }
+  &.open {
+    display: block;
+
+    .p-toggleable-content {
+      display: block;
+    }
+
+    .p-panel-header {
+      display: flex;
+      border-bottom: none !important;
+    }
+  }
+  .mw-200 {
+    min-width: 200px;
+  }
+  &.mobile {
+    .workpack-model-property-header .left-side {
+      display: flex;
+      align-items: center;
+    }
+    .property-input {
+      margin: 1rem 0 !important;
+      width: 100%;
+    }
+    .property-checkbox {
+      width: 100%;
+    }
+  }
+}

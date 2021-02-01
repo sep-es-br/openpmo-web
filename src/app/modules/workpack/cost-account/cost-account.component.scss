@@ -1,0 +1,32 @@
+@use "src/variables" as v;
+
+::ng-deep .app-cost-account {
+  width: 100%;
+  .app-cost-account-header {
+    padding: 0.5em 0;
+    font-size: 0.9rem;
+    font-family: v.$fontTitle !important;
+    color: v.$fontInput;
+    .app-cost-account-header-text {
+      margin-left: 0.5em;
+    }
+  }
+  .app-cost-account-header-mobile {
+    font-size: 1rem;
+    font-family: v.$fontFamilyBold !important;
+    font-weight: bold;
+  }
+  .card-properties-cost-account{
+    width: 100%;
+    .properties-container {
+      display: flex;
+      flex-wrap: wrap;
+      .property-container {
+        margin-right: 1em;
+      }
+      .fullLine {
+        width: 100%;
+      }
+    }
+  }
+}

@@ -1,0 +1,71 @@
+<div class="app-stakeholder-organization">
+  <div class="app-stakeholder-header" [class.app-stakeholder-header-mobile]="responsive">
+    <span class="header-text" *ngIf="!organization">{{ "newStakeholder" | translate }}</span>
+    <span class="header-text" *ngIf="organization">{{ organization?.name }}</span>
+  </div>
+  <div class="card-organization" *ngIf="cardOrganization">
+    <app-card [properties]="cardOrganization">
+      <div class="organization-properties">
+        <div class="search-container" *ngIf="!idOrganization">
+          <span class="p-float-label">
+            <p-dropdown id="organization-dropdown" dropdownIcon="fas fa-caret-down" class="app-single-selection"
+              [autoDisplayFirst]="false" (onChange)="handleSelectOrganization()" [class.responsive]="responsive"
+              [options]="organizationListOptions" [(ngModel)]="organizationSelected">
+            </p-dropdown>
+            <label class="app-input-label" for="organization-dropdown">{{ "search" | translate }}</label>
+          </span>
+        </div>
+        <div class="organization-header" *ngIf="organization">
+          <div class="organization-property">
+            <label class="property-label">Business name</label>
+            <span class="property-value">{{organization?.name}}</span>
+          </div>
+          <div class="organization-property property-sector">
+            <label class="property-label">Sector</label>
+            <span class="property-value">{{organization?.sector}}</span>
+          </div>
+        </div>
+        <div class="organization-property" *ngIf="organization">
+          <label class="property-label">Social name</label>
+          <span class="property-value">{{organization?.fullName}}</span>
+        </div>
+        <div class="organization-property" *ngIf="organization?.address">
+          <label class="property-label">address</label>
+          <span class="property-value">{{organization?.address}}</span>
+        </div>
+        <div class="organization-property" *ngIf="organization?.phoneNumber">
+          <label class="property-label">Phone</label>
+          <span class="property-value">{{organization?.phoneNumber}}</span>
+        </div>
+        <div class="organization-property" *ngIf="organization?.contactEmail">
+          <label class="property-label">Contact e-mail</label>
+          <span class="property-value">{{organization?.contactEmail}}</span>
+        </div>
+        <div class="organization-property" *ngIf="organization?.website">
+          <label class="property-label">Website</label>
+          <span class="property-value">{{organization?.website}}</span>
+        </div>
+      </div>
+    </app-card>
+  </div>
+  <div class="card-roles" *ngIf="organization">
+    <app-card [properties]="cardRoles">
+      <div class="card-item-roles-container">
+        <p-dataView [value]="stakeholderRolesCardItems" layout="grid" styleClass="dataview-card-items" [emptyMessage]="'loadingEllipsis' | translate">
+          <ng-template let-cardItem pTemplate="gridItem">
+            <div class="p-col-12 p-md-3 p-sm-12 card-item-container" [class.responsive]="responsive">
+              <app-stakeholder-role-card-item [properties]="cardItem" (newCardItemRole)="createNewCardItemRole()"
+                (roleChanged)="handleShowSaveButton()">
+              </app-stakeholder-role-card-item>
+            </div>
+          </ng-template>
+        </p-dataView>
+      </div>
+    </app-card>
+  </div>
+  <div class="app-save-button-layout">
+    <div class="app-save-button-wrapper" *ngIf="showSaveButton" @enterLeave>
+      <span class="button-label" (click)="saveStakeholder()">{{ 'save' | translate }}</span>
+    </div>
+  </div>
+</div>

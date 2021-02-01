@@ -1,0 +1,151 @@
+@use "src/variables" as v;
+
+.app-workpack-model {
+  width: 100%;
+
+  .app-workpack-model-header {
+    padding: 0.5em 0 0 0;
+    font-size: 1rem;
+    font-family: v.$fontTitle !important;
+    color: v.$fontInput;
+    font-weight: 500;
+
+    .app-workpack-model-header-text {
+      margin-left: 0.5em;
+    }
+    &.has-model {
+      .app-workpack-model-header-label {
+        font-size: .688rem;
+        color: v.$fontLabel;
+      }
+    }
+  }
+  .property-input {
+    display: inline-block;
+
+    &:not(:last-of-type) {
+      margin-right: 1em;
+    }
+    &.p-field {
+      margin-bottom: 1.5rem;
+    }
+  }
+  .app-input-chips {
+    &:not(:first-of-type) {
+      margin-top: 2em;
+    }
+  }
+  .under-label {
+    font-size: .7rem;
+    display: block;
+    color: v.$fontLabel;
+    font-style: italic;
+    padding-left: .5rem;
+  }
+  .card {
+    margin-top: 1em;
+  }
+  .icon-item {
+    display: flex;
+    flex: 1;
+    justify-content: space-between;
+    text-transform: capitalize;
+
+    i {
+      font-size: 1.5rem;
+      margin-right: 1em;
+    }
+  }
+  .icon-item-selected i {
+    font-size: 1rem;
+  }
+  .workpack-model-group {
+    padding: 1.75em 1em 1em 1em;
+    border: 1px solid rgba(229, 229, 228, 1);
+    border-radius: 5px;
+    margin-top: 1.5em;
+  }
+  &.mobile {
+    .property-input {
+      width: 100%;
+      &.p-field {
+        margin-bottom: 1.8rem;
+      }
+    }
+    .app-input-chips {
+      margin-top: 1.8rem;
+      margin-bottom: 1rem;
+    }
+  }
+}
+
+::ng-deep .app-workpack-model {
+  .app-input-chips {
+    .p-chips,
+    .p-inputtext {
+      width: 100%;
+    }
+  }
+  .app-single-selection .p-dropdown {
+    min-width: 200px;
+
+    .p-dropdown-panel {
+      width: max-content;
+    }
+  }
+  .workpack-model-addicional-properties {
+    .p-button {
+      background-color: v.$bgButtonGreen;
+      border: none !important;
+      margin: 0 .5em;
+
+      &:hover {
+        background-color: v.$bgButtonGreenHover;
+      }
+    }
+    .p-menu-overlay {
+      width: auto;
+    }
+    .addicional-properties {
+      display: inline-flex;
+      margin-right: 1em;
+      margin-bottom: 1em;
+      &.open {
+        width: 100%;
+      }
+    }
+    &.add-actions {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 1em;
+    }
+  }
+  .dataview-card-items {
+    position: static !important;
+    background-color: transparent;
+
+    .p-dataview-content, .p-grid {
+      background-color: transparent;
+    }
+    .card-item-container {
+      padding: 0.5em;
+    }
+  }
+  &.mobile {
+    .workpack-model-addicional-properties {
+      .addicional-properties {
+        margin-right: 0;
+        width: 100%;
+        .p-panel-header {
+          flex: 1;
+        }
+        p-panel {
+          width: 100%;
+          .app-workpack-model-property.p-panel {
+            width: 100%;
+          }
+        }
+      }
+    }
+  }
+}

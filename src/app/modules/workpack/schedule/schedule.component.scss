@@ -1,0 +1,176 @@
+@use "src/variables" as v;
+
+::ng-deep .app-schedule {
+  width: 100%;
+  .app-schedule-header {
+    padding: 0.5em 0;
+    font-size: 0.9rem;
+    font-family: v.$fontTitle !important;
+    color: v.$fontInput;
+    .app-schedule-header-text {
+      margin-left: 0.5em;
+    }
+  }
+  .app-schedule-header-mobile {
+    font-size: 1rem;
+    font-family: v.$fontFamilyBold !important;
+    font-weight: bold;
+  }
+  .card-properties-schedule{
+    width: 100%;
+    form {
+      width: 100%;
+      .p-formgroup-inline {
+        width: 40%;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        column-gap: 1em;
+        .p-field {
+          margin-right: 0;
+        }
+        .app-select-date {
+          display: flex;
+          width: 100%;
+          .p-calendar {
+            width: 100%;
+          }
+        }
+        .app-input-number {
+          display: flex;
+          width: 100%;
+          .p-inputnumber {
+            display: flex;
+            width: 100% !important;
+            .p-inputtext {
+              display: flex;
+              width: 100% !important;
+            }
+          }
+        }
+      }
+      .p-formgroup-inline.responsive {
+        width: 100%;
+        display: flex;
+        .app-input-number {
+          display: flex;
+          width: 100%;
+          .p-inputnumber {
+            display: flex;
+            width: 100% !important;
+            .p-inputtext {
+              display: flex;
+              width: 100% !important;
+            }
+          }
+        }
+      }
+      .schedule-totals {
+        margin-top: 2em;
+        .totals-title {
+          text-transform: uppercase;
+          font-size: 1rem;
+          font-family: v.$fontTitle !important;
+          color: v.$fontInput;
+        }
+        .cost-assignments-totals {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          column-gap: 1em;
+          align-items: center;
+          width: 40%;
+          margin-top: 1em;
+          .planned-total, .actual-total {
+            display: flex;
+            flex-direction: column;
+            .label {
+              font-size: 0.9rem;
+              font-style: italic;
+              color: v.$fontLabel;
+            }
+            .value {
+              font-family: v.$fontFamilyMedium;
+              font-size: 1rem;
+              color: v.$fontInput;
+              padding: 0.5em 0;
+            }
+          }
+        }
+        .cost-assignments-totals.responsive {
+          display: flex;
+          flex-direction: column;
+          .planned-total, .actual-total {
+            width: 100%;
+            .value {
+              border-bottom: solid 1px #b6c8cd;
+            }
+          }
+          .actual-total {
+            margin-top: 1em;
+          }
+        }
+      }
+      ::ng-deep .p-field.responsive {
+        margin-right: 0 !important;
+      }
+      ::ng-deep .responsive {
+        width: 100% !important;
+        .p-calendar {
+          width: 100%;
+        }
+      }
+      ::ng-deep .app-input-number.responsive {
+        width: 100%;
+        .p-inputnumber {
+          width: 100%;
+        }
+      }
+    }
+  }
+  ::ng-deep .dataview-card-items-cost {
+    position: static !important;
+    background-color: transparent;
+    .p-dataview-content, .p-grid {
+      background-color: transparent;
+    }
+    .card-item-container {
+      padding: 0.5em;
+      min-height: 9.5em !important;
+      &:first-child {
+        padding: 0.5em 0.5em 0.5em 0;
+      }
+    }
+    .card-item-container.responsive {
+      padding: 0.5em 0;
+    }
+  }
+  .app-save-button-layout {
+    position: relative;
+    height: 20vh;
+    width: 100%;
+    overflow: hidden;
+  }
+  .app-save-button-wrapper {
+    position: absolute;
+    bottom: 50%;
+    left: 0;
+    z-index: 100;
+
+    .button-label {
+      background-color: v.$bgButtonGreen;
+      color: #ffffff;
+      font-size: 1.25rem;
+      padding: .5em 1.5em;
+      text-align: center;
+      border-radius: 5px;
+      box-shadow: 1px 7px 20px 2px rgba(0,0,0,.1);
+      cursor: pointer;
+
+      &:hover {
+        background-color: v.$bgButtonGreenHover;
+      }
+    }
+  }
+  .p-float-label {
+    margin-top: 2.5em;
+  }
+}

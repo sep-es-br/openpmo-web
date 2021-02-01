@@ -1,0 +1,21 @@
+<div class="app-login">
+  <div class="form" [class.mobile]="responsiveSrv.observable | async">
+    <img src="assets/svg/LogoOpenPMOHorizontal.svg" alt="Logo">
+    <div class="action">
+      <div class="button" (click)="signIn()">
+        <ng-container *ngIf="authButtonIcon; else defaultIcon">
+          <ng-container *ngIf="authButtonIcon?.indexOf('.') !== -1; else elseTemplate">
+            <img [src]="authButtonIcon" alt="Auth Button Icon">
+          </ng-container>
+          <ng-template #elseTemplate>
+            <i [ngClass]="authButtonIcon" alt="Auth Button Icon"></i>
+          </ng-template>
+        </ng-container>
+        <ng-template #defaultIcon>
+          <i [ngClass]="[ 'app-icon', 'users', 'white-icon' ]" [ngStyle]="{ fontSize: '2rem' }" alt="Auth Button Icon"></i>
+        </ng-template>
+        {{ 'authButtonText' | translate }}
+      </div>
+    </div>
+  </div>
+</div>

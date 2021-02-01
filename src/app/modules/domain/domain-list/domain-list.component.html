@@ -1,0 +1,22 @@
+<div class="app-domain">
+  <div class="app-header" [class.app-header-mobile]="responsive">
+    <span class="app-header-text" *ngIf="propertiesOffice">{{propertiesOffice.name}}</span>
+  </div>
+    <div class="card-container">
+      <app-card [properties]="cardProperties">
+        <p-dataView
+          [value]="cardItemsProperties"
+          layout="grid" [rows]="1"
+          class="dataview-app-domains"
+          [emptyMessage]="editPermission !== false ? ('loadingEllipsis' | translate) : ('noContent' | translate)"
+        >
+          <ng-template let-cardItem pTemplate="gridItem">
+            <div class="p-col-12 p-sm-12 p-md-4 p-lg-3 card-item-container" [ngStyle]="{'padding': '10px 15px'}">
+              <app-card-item [properties]="cardItem"></app-card-item>
+            </div>
+          </ng-template>
+      </p-dataView>
+      </app-card>
+    </div>
+  </div>
+

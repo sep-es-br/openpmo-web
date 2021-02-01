@@ -1,0 +1,188 @@
+@use "src/variables" as v;
+
+::ng-deep .app-stakeholder-person {
+  width: 100%;
+ .app-stakeholder-header {
+    padding: 0.5em 0;
+    font-size: 0.9rem;
+    font-family: v.$fontTitle !important;
+    color: v.$fontInput;
+  }
+  .app-stakeholder-header-mobile {
+    font-size: 1rem;
+    font-family: v.$fontFamilyBold !important;
+    font-weight: bold;
+  }
+  .card-person {
+    width: 100%;
+    .person-properties {
+      .search-container {
+        padding-bottom: 2em;
+        .input-search {
+          width: 30%;
+        }
+        .responsive {
+          width: 100%;
+        }
+        .input-message-error {
+          color: white;
+          background: #f44336;
+          padding: 4px 8px;
+          display: inline-flex;
+          margin-top: 2px;
+          border-radius: 5px;
+          font-size: 0.7rem;
+          font-family: v.$fontFamilyMedium;
+        }
+      }
+    }
+    .form-stakeholder .p-float-label {
+      margin-top: 2em;
+    }
+    .form-stakeholder .name-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      column-gap: 1em;
+    }
+    .form-stakeholder .name-container.responsive {
+      display: flex;
+      flex-direction: column;
+    }
+    .form-stakeholder {
+      .app-input-mask .p-inputmask.p-inputtext {
+        font-family: v.$fontFamilyMedium;
+        font-size: 1rem;
+        border: none;
+        border-bottom: 1px solid v.$borderInput;
+        border-radius: 0;
+        background-color: transparent;
+        color: v.$fontInput;
+
+        &:enabled:focus {
+          border-bottom: 1px solid v.$borderInput;
+          box-shadow: none;
+        }
+        &:hover {
+          border-bottom: 2px solid v.$borderInput !important;
+          box-shadow: none;
+        }
+        .full-line {
+          width: 100%;
+        }
+      }
+    }
+    .p-fluid .p-inputtext.short-input {
+      width: 30%;
+    }
+    .p-fluid .p-inputtext.short-input.responsive {
+      width: 100%;
+    }
+  }
+  .card-roles {
+    margin-top: 2em;
+  }
+  ::ng-deep .dataview-card-items {
+    position: static !important;
+    background-color: transparent;
+    .p-dataview-content, .p-grid {
+      background-color: transparent;
+    }
+    .card-item-container {
+      padding: 0.5em;
+      min-height: 9.5em !important;
+      &:first-child {
+        padding: 0.5em 0.5em 0.5em 0;
+      }
+    }
+    .card-item-container.responsive {
+      padding: 0.5em 0;
+    }
+  }
+
+  .app-save-button-layout {
+    position: relative;
+    height: 20vh;
+    width: 100%;
+    overflow: hidden;
+  }
+  .app-save-button-wrapper {
+    position: absolute;
+    bottom: 50%;
+    left: 0;
+    z-index: 100;
+
+    .button-label {
+      background-color: v.$bgButtonGreen;
+      color: #ffffff;
+      font-size: 1.25rem;
+      padding: .5em 1.5em;
+      text-align: center;
+      border-radius: 5px;
+      box-shadow: 1px 7px 20px 2px rgba(0,0,0,.1);
+      cursor: pointer;
+
+      &:hover {
+        background-color: v.$bgButtonGreenHover;
+      }
+    }
+  }
+  ::ng-deep .card-permissions {
+    margin-top: 2em;
+    p-card.app-card-item-permission .p-card {
+      height: 100%;
+      padding: 0.2em;
+
+      .card-item-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+        .card-item-title {
+          font-size: 1rem;
+          font-family: v.$fontFamilyMedium;
+          color: v.$fontTitle;
+          padding: 0.5em;
+        }
+      }
+      .p-card-body {
+        :focus{
+          outline: none;
+        }
+        height: 100%;
+        width: 100%;
+        padding: 0;
+        margin-top: 0.5em !important;
+        padding-left: 0.5em !important;
+        padding-right: 0.5em !important;
+        .p-float-label input:focus ~ label,
+        .p-float-label input.p-filled ~ label,
+        .p-float-label textarea:focus ~ label,
+        .p-float-label textarea.p-filled ~ label,
+        .p-float-label .p-inputwrapper-focus ~ label,
+        .p-float-label .p-inputwrapper-filled ~ label {
+          top: -0.2rem;
+        }
+        p-dropdown {
+          width: 100% !important;
+          .p-dropdown {
+            width: 100% !important;
+          }
+        }
+      }
+      .p-card-content {
+        height: 100%;
+        padding: 0;
+      }
+      .card-item-content {
+        height: 100%;
+        margin-top: 2em;
+        .card-item-role-description {
+          font-size: 1rem;
+          font-family: v.$fontFamilyMedium;
+          padding: 0.2em 0.7em;
+          color: v.$fontLabel;
+        }
+      }
+    }
+  }
+}

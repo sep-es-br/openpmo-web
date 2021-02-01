@@ -1,0 +1,23 @@
+::ng-deep .p-float-label.workpack-date {
+  width: 100%;
+  .app-select-date .p-calendar {
+    width: 20%;
+  }
+}
+
+::ng-deep .p-float-label.workpack-date-not-fullLine {
+  width: 100%;
+  .app-select-date .p-calendar {
+    width: 100%;
+  }
+}
+
+::ng-deep .p-float-label.workpack-date.workpack-date-mobile {
+  width: 100%;
+  .app-select-date {
+    width: 100%;
+    .p-calendar {
+      width: 100%;
+    }
+  }
+}

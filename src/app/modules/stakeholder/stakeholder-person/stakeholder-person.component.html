@@ -1,0 +1,131 @@
+<div class="app-stakeholder-person">
+  <div class="app-stakeholder-header" [class.app-stakeholder-header-mobile]="responsive">
+    <span class="header-text" *ngIf="!stakeholder">{{ "newStakeholder" | translate}}</span>
+    <span class="header-text" *ngIf="stakeholder">{{stakeholder?.person.name}}</span>
+  </div>
+  <div class="card-person" >
+    <app-card [properties]="cardPerson" *ngIf="cardPerson">
+      <div class="person-properties">
+        <div class="search-container" *ngIf="!emailPerson">
+          <span class="p-float-label">
+            <input class="app-input-text input-search" [class.responsive]="responsive" id="float-search"
+              name="searchPerson" [(ngModel)]="searchedEmailPerson" type="search"
+              pInputText (ngModelChange)="debounceSearch.next($event)"/>
+            <label class="app-input-label" for="float-search">{{ "searchPerson" | translate }}</label>
+          </span>
+          <span class="input-message-error" *ngIf="showSearchInputMessage">
+            Email não encontrado
+          </span>
+        </div>
+        <form [formGroup]="stakeholderForm" class="form-stakeholder">
+          <div class="p-fluid">
+            <div class="p-field">
+              <span class="p-float-label">
+                <input class="app-input-text short-input" [class.responsive]="responsive" id="float-email" name="email"
+                  (change)="handleShowSaveButton()" formControlName="email" type="email"
+                  pInputText />
+                <label class="app-input-label" for="float-email">E-mail *</label>
+              </span>
+              <app-input-message [form]="stakeholderForm" field="email"></app-input-message>
+            </div>
+            <div class="name-container" [class.responsive]="responsive">
+              <div class="p-field">
+                <span class="p-float-label">
+                  <input class="app-input-text" [class.responsive]="responsive"
+                    (change)="handleShowSaveButton()"
+                    id="float-name" name="name" formControlName="name" type="text"
+                    pInputText />
+                  <label class="app-input-label" for="float-name">{{ "name" | translate }} * </label>
+                </span>
+                <app-input-message [form]="stakeholderForm" field="name"></app-input-message>
+              </div>
+              <div class="p-field">
+                <span class="p-float-label">
+                  <input class="app-input-text" [class.responsive]="responsive" id="float-fullName" name="fullName"
+                    (change)="handleShowSaveButton()" [disabled]="person?.fullName" formControlName="fullName"
+                    type="text" pInputText />
+                  <label class="app-input-label" for="float-fullName">{{ "fullName" | translate }} * </label>
+                </span>
+                <app-input-message [form]="stakeholderForm" field="fullName"></app-input-message>
+              </div>
+            </div>
+
+            <div class="p-field">
+              <span class="p-float-label">
+                <textarea pInputTextarea id="float-address" formControlName="address" class="app-text-area"
+                  [class.responsive]="responsive" (change)="handleShowSaveButton()" rows="1">
+                </textarea>
+                <label class="app-input-label" for="float-address">{{ "address" | translate }}</label>
+              </span>
+            </div>
+            <div class="p-field">
+              <span class="p-float-label">
+                <p-inputMask class="app-input-mask short-input" [class.responsive]="responsive" id="float-phoneNumber"
+                  name="phoneNumber" formControlName="phoneNumber"
+                  mask="(99) 99999-9999"
+                  (change)="handleShowSaveButton()"></p-inputMask>
+                <label class="app-input-label" for="float-phoneNumber">{{ "phoneNumber" | translate }}</label>
+              </span>
+              <app-input-message [form]="stakeholderForm" field="phoneNumber"></app-input-message>
+            </div>
+            <div class="p-field">
+              <span class="p-float-label">
+                <input class="app-input-text short-input" [class.responsive]="responsive" id="float-contactEmail"
+                  name="contactEmail" formControlName="contactEmail" type="contactEmail"
+                  (change)="handleShowSaveButton()" pInputText />
+                <label class="app-input-label" for="float-contactEmail">{{"contactEmail" | translate}}</label>
+              </span>
+              <app-input-message [form]="stakeholderForm" field="contactEmail"></app-input-message>
+            </div>
+          </div>
+        </form>
+      </div>
+    </app-card>
+  </div>
+  <div class="card-roles">
+    <app-card [properties]="cardRoles" *ngIf="cardRoles">
+      <div class="card-item-roles-container">
+        <p-dataView [value]="stakeholderRolesCardItems" layout="grid" styleClass="dataview-card-items" [emptyMessage]="'loadingEllipsis' | translate">
+          <ng-template let-cardItem pTemplate="gridItem">
+            <div class="p-col-12 p-md-3 p-sm-12 card-item-container" [class.responsive]="responsive">
+              <app-stakeholder-role-card-item [properties]="cardItem" (newCardItemRole)="createNewCardItemRole()"
+                (roleChanged)="handleShowSaveButton()">
+              </app-stakeholder-role-card-item>
+            </div>
+          </ng-template>
+        </p-dataView>
+      </div>
+    </app-card>
+  </div>
+  <div class="card-permissions">
+    <app-card [properties]="cardPermissions" *ngIf="cardPermissions">
+      <div class="card-item-permissions-container">
+        <p-dataView [value]="stakeholderPermissions" layout="grid" styleClass="dataview-card-items" [emptyMessage]="'loadingEllipsis' | translate">
+          <ng-template let-cardItem pTemplate="gridItem">
+            <div class="p-col-12 p-md-3 p-sm-12 card-item-container">
+              <p-card class="app-card-item-permission" styleClass="editItem">
+                <div class="card-item-header">
+                  <span class="card-item-title">{{cardItem.role}}</span>
+                </div>
+                <div class="card-item-content">
+                  <span class="p-float-label">
+                    <p-dropdown id="level-dropdown" dropdownIcon="fas fa-caret-down" class="app-single-selection"
+                      [autoDisplayFirst]="false" (onChange)="handleShowSaveButton()"
+                      [options]="permissionLevelListOptions" [(ngModel)]="cardItem.level">
+                    </p-dropdown>
+                    <label class="app-input-label" for="level-dropdown">{{ "level" | translate }}</label>
+                  </span>
+                </div>
+              </p-card>
+            </div>
+          </ng-template>
+        </p-dataView>
+      </div>
+    </app-card>
+  </div>
+  <div class="app-save-button-layout">
+    <div class="app-save-button-wrapper" *ngIf="showSaveButton" @enterLeave>
+      <span class="button-label" (click)="saveStakeholder()">{{ 'save' | translate }}</span>
+    </div>
+  </div>
+</div>
