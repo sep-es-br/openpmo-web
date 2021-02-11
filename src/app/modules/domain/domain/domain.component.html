@@ -22,7 +22,6 @@
                 class="required-indicator">*</span></label>
           </span>
           <app-input-message [form]="formDomain" field="fullName"></app-input-message>
-          <app-save-button (save)="handleOnSubmit()"></app-save-button>
         </form>
       </div>
     </app-card>
@@ -31,7 +30,7 @@
     <div class="card-plans">
       <app-card [properties]="cardLocalities">
         <p-dataView [value]="cardItemsLocalities" layout="grid" styleClass="dataview-card-items"
-          [emptyMessage]="'loadingEllipsis' | translate">
+          [emptyMessage]="(!cardItemsLocalities ? 'loadingEllipsis' : 'noContent') | translate">
           <ng-template let-cardItem pTemplate="gridItem">
             <div class="p-col-12 p-md-3 p-sm-12 card-item-container">
               <app-card-item [properties]="cardItem"></app-card-item>
@@ -41,4 +40,5 @@
       </app-card>
     </div>
   </section>
+  <app-save-button (save)="handleOnSubmit()"></app-save-button>
 </div>

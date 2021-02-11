@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Location } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -18,6 +18,7 @@ import { PersonService } from 'src/app/shared/services/person.service';
 import { enterLeave } from '../../../shared/animations/enterLeave.animation';
 import { formatDateToString } from 'src/app/shared/utils/formatDateToString';
 import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
+import { SaveButtonComponent } from 'src/app/shared/components/save-button/save-button.component';
 
 interface ICardItemRole {
   type: string;
@@ -35,6 +36,8 @@ interface ICardItemRole {
 })
 export class StakeholderPersonComponent implements OnInit, OnDestroy {
 
+  @ViewChild(SaveButtonComponent) saveButton: SaveButtonComponent;
+
   idWorkpack: number;
   workpack: IWorkpack;
   personRolesOptions: { label: string; value: string }[];
@@ -50,7 +53,6 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
   stakeholderRoles: IStakeholderRole[];
   stakeholderRolesCardItems: ICardItemRole[];
   stakeholderPermissions: IStakeholderPermission[];
-  showSaveButton = false;
   showSearchInputMessage = false;
   permissionLevelListOptions = [
     { label: this.translateSrv.instant('read'), value: 'READ' },
@@ -264,12 +266,9 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
 
   handleShowSaveButton() {
     if (this.stakeholderForm.valid) {
-      if (this.validateStakeholder()) {
-        this.showSaveButton = true;
-        return;
-      }
-      this.showSaveButton = false;
-      return;
+      return this.validateStakeholder()
+        ? this.saveButton?.showButton()
+        : this.saveButton?.hideButton();
     }
     return;
   }

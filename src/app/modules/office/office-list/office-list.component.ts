@@ -24,8 +24,9 @@ export class OfficeListComponent implements OnInit {
     collapseble: false,
     initialStateCollapse: false
   };
-  cardItemsProperties: ICardItem[] = [];
+  cardItemsProperties: ICardItem[];
   isUserAdmin: boolean;
+  isListEmpty = false;
 
   constructor(
     private officeSvr: OfficeService,
@@ -52,6 +53,7 @@ export class OfficeListComponent implements OnInit {
       }
     ] : [];
     if (success) {
+      this.isListEmpty = !data.length;
       itemsProperties.unshift(... data.map( office => {
         const editPermissions = (!this.isUserAdmin && office.permissions) && office.permissions.filter( p => p.level === 'EDIT');
         const editPermission =  this.isUserAdmin ? true : (editPermissions && editPermissions.length > 0 ? true : false);
@@ -63,9 +65,9 @@ export class OfficeListComponent implements OnInit {
           fullNameCardItem: office.fullName,
           itemId: office.id,
           menuItems: [
-            { label: this.translateSvr.instant('strategies'), icon: 'fas fa-chess-knight',
+            { label: this.translateSvr.instant('strategies'), icon: 'app-icon plan-model-solid',
               command: () => this.navigateToPage('strategies', office.id) },
-            { label: this.translateSvr.instant('organizations'), icon: 'far fa-building',
+            { label: this.translateSvr.instant('organizations'), icon: 'fas fa-building',
               command: () => this.navigateToPage('organizations', office.id) },
             { label: this.translateSvr.instant('domains'), icon: 'fas fa-map-marked-alt',
               command: () => this.navigateToPage('domains', office.id) },

@@ -1,9 +1,11 @@
-<span class="p-float-label"
-[class.workpack-input-text]="property.fullLine"
-[class.workpack-input-text-not-fullLine]="!property.fullLine"
-[class.workpack-input-text-mobile]="responsive">
+<span class="p-float-label" [class.workpack-input-text]="property.fullLine"
+  [class.workpack-input-text-not-fullLine]="!property.fullLine" [class.workpack-input-text-mobile]="responsive">
   <input class="app-input-text" [id]="property.name" name="name" [(ngModel)]="property.value" type="text" pInputText
-    [disabled]="property.disabled" [required]="property.required" [defaultValue]="property.defaultValue"
-    [minLength]="property.min" [maxlength]="property.max" (ngModelChange)="changed.emit($event)" />
+    [disabled]="property.disabled" [defaultValue]="property.defaultValue" [required]="property.required"
+    [minLength]="property.min" [maxlength]="property.max" (ngModelChange)="changed.emit($event)" 
+    />
   <label class="app-input-label" [for]="property.name">{{property.label}} {{ property.required ? '*' : ''}}</label>
+</span>
+<span class="input-message-error" *ngIf="property.invalid">
+  {{ property.message }}
 </span>

@@ -38,6 +38,7 @@ import { AuthService } from 'src/app/shared/services/auth.service';
 import { OfficePermissionService } from 'src/app/shared/services/office-permission.service';
 import { PlanPermissionService } from 'src/app/shared/services/plan-permissions.service';
 import { SaveButtonComponent } from 'src/app/shared/components/save-button/save-button.component';
+import { MenuService } from 'src/app/shared/services/menu.service';
 
 interface ISection {
   idWorkpackModel?: number;
@@ -117,7 +118,8 @@ export class WorkpackComponent implements OnDestroy {
     private authSrv: AuthService,
     private planPermissionSrv: PlanPermissionService,
     private officePermissionSrv: OfficePermissionService,
-    private messageSrv: MessageService
+    private messageSrv: MessageService,
+    private menuSrv: MenuService
   ) {
     this.actRouter.queryParams.subscribe(async({ id, idPlan, idWorkpackModel, idWorkpackParent }) => {
       this.idWorkpack = id;
@@ -243,7 +245,7 @@ export class WorkpackComponent implements OnDestroy {
   }
 
  async instanceProperty(propertyModel: IWorkpackModelProperty): Promise<PropertyTemplateModel> {
-    const property = new PropertyTemplateModel();
+    const property = new PropertyTemplateModel(this.translateSrv);
     const propertyWorkpack = this.workpack && this.workpack.properties.find( wp => wp.idPropertyModel === propertyModel.id);
 
     property.id = propertyWorkpack && propertyWorkpack.id;
@@ -978,6 +980,10 @@ export class WorkpackComponent implements OnDestroy {
 
   async saveWorkpack() {
     this.workpackProperties = this.sectionPropertiesProperties.map(p => p.getValues());
+    this.sectionPropertiesProperties.forEach( p => p.validate());
+    if (this.sectionPropertiesProperties.filter( p => p.invalid).length > 0) {
+      return;
+    }
     const isPut = !!this.idWorkpack;
     const workpack = isPut
       ? {
@@ -1004,10 +1010,12 @@ export class WorkpackComponent implements OnDestroy {
         this.idWorkpack = data.id;
         await this.loadProperties();
       }
-      const propertyNameWorkpackModel = this.workpack.model.properties.find(p => p.name === 'name' && p.session === 'PROPERTIES');
+      const propertyNameWorkpackModel = (this.workpack?.model || this.workpackModel)
+        .properties.find(p => p.name === 'name' && p.session === 'PROPERTIES');
       const propertyNameWorkpack = this.workpackProperties.find(p => p.idPropertyModel === propertyNameWorkpackModel.id);
       this.workpackName = propertyNameWorkpack.value as string;
-      const propertyFullNameWorkpackModel = this.workpack.model.properties.find(p => p.name === 'fullName' && p.session === 'PROPERTIES');
+      const propertyFullNameWorkpackModel = (this.workpack?.model || this.workpackModel)
+        .properties.find(p => p.name === 'fullName' && p.session === 'PROPERTIES');
       const propertyFullNameWorkpack = this.workpackProperties.find(p => p.idPropertyModel === propertyFullNameWorkpackModel.id);
       this.workpackFullName = propertyFullNameWorkpack.value as string;
       this.breadcrumbSrv.updateLastCrumb({
@@ -1024,6 +1032,7 @@ export class WorkpackComponent implements OnDestroy {
         summary: this.translateSrv.instant('success'),
         detail: this.translateSrv.instant('messages.savedSuccessfully')
       });
+      this.menuSrv.reloadMenuPortfolio();
     }
   }
 }

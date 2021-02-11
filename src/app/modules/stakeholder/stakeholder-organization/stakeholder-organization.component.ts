@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { Location } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ResponsiveService } from 'src/app/shared/services/responsive.service';
@@ -15,6 +15,7 @@ import { OrganizationService } from 'src/app/shared/services/organization.servic
 import { PlanService } from 'src/app/shared/services/plan.service';
 import { formatDateToString } from 'src/app/shared/utils/formatDateToString';
 import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
+import { SaveButtonComponent } from 'src/app/shared/components/save-button/save-button.component';
 
 interface ICardItemRole {
   type: string;
@@ -32,6 +33,8 @@ interface ICardItemRole {
 })
 export class StakeholderOrganizationComponent implements OnInit {
 
+  @ViewChild(SaveButtonComponent) saveButton: SaveButtonComponent;
+
   idWorkpack: number;
   workpack: IWorkpack;
   rolesOptions: { label: string; value: string }[];
@@ -46,7 +49,6 @@ export class StakeholderOrganizationComponent implements OnInit {
   stakeholder: IStakeholder;
   stakeholderRoles: IStakeholderRole[];
   stakeholderRolesCardItems: ICardItemRole[];
-  showSaveButton = false;
 
   constructor(
     private actRouter: ActivatedRoute,
@@ -163,7 +165,7 @@ export class StakeholderOrganizationComponent implements OnInit {
       this.organization = organization;
       this.stakeholderRoles = null;
       this.loadStakeholderRolesCardsItems();
-      this.showSaveButton = false;
+      this.saveButton?.hideButton();
     }
   }
 
@@ -213,12 +215,9 @@ export class StakeholderOrganizationComponent implements OnInit {
 
   handleShowSaveButton() {
     if (this.organization) {
-      if (this.validateStakeholder()){
-        this.showSaveButton = true;
-        return;
-      }
-      this.showSaveButton = false;
-      return;
+      return this.validateStakeholder()
+        ? this.saveButton?.showButton()
+        : this.saveButton?.hideButton();
     }
     return;
   }

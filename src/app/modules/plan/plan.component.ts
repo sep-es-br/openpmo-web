@@ -1,9 +1,9 @@
-import { Component, OnDestroy, OnInit, ViewChildren } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild, ViewChildren } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Calendar } from 'primeng/calendar';
 import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { filter, takeUntil } from 'rxjs/operators';
 import { TranslateService } from '@ngx-translate/core';
 
 import { ICard } from 'src/app/shared/interfaces/ICard';
@@ -20,6 +20,8 @@ import { AuthService } from 'src/app/shared/services/auth.service';
 import { MenuItem, MessageService } from 'primeng/api';
 import { OfficeService } from 'src/app/shared/services/office.service';
 import { PlanPermissionService } from 'src/app/shared/services/plan-permissions.service';
+import { SaveButtonComponent } from 'src/app/shared/components/save-button/save-button.component';
+import { MenuService } from 'src/app/shared/services/menu.service';
 
 
 interface IWorkpackModelCard {
@@ -35,7 +37,9 @@ interface IWorkpackModelCard {
 })
 export class PlanComponent implements OnInit, OnDestroy {
 
+  @ViewChild(SaveButtonComponent) saveButton: SaveButtonComponent;
   @ViewChildren(Calendar) calendarComponents: Calendar[];
+
   responsive: boolean;
   idPlanModel: number;
   idOffice: number;
@@ -59,7 +63,8 @@ export class PlanComponent implements OnInit, OnDestroy {
     private authSrv: AuthService,
     private officeSrv: OfficeService,
     private planPermissionSrv: PlanPermissionService,
-    private messageSrv: MessageService
+    private messageSrv: MessageService,
+    private menuSrv: MenuService
   ) {
     this.actRouter.queryParams.subscribe(({ id, idOffice, idPlanModel}) => {
       this.idOffice = +idOffice;
@@ -76,6 +81,12 @@ export class PlanComponent implements OnInit, OnDestroy {
       start: [null, Validators.required],
       finish: [null, Validators.required],
     });
+    this.formPlan.statusChanges
+      .pipe(takeUntil(this.$destroy), filter(status => status === 'INVALID'))
+      .subscribe(() => this.saveButton.hideButton());
+    this.formPlan.valueChanges
+      .pipe(takeUntil(this.$destroy), filter(() => this.formPlan.dirty && this.formPlan.valid))
+      .subscribe(() => this.saveButton.showButton());
   }
 
   ngOnDestroy(): void {
@@ -100,7 +111,7 @@ export class PlanComponent implements OnInit, OnDestroy {
       initialStateToggle: false,
       cardTitle: 'properties',
       collapseble: true,
-      initialStateCollapse: this.idPlan ? true : false
+      initialStateCollapse: !!this.idPlan
     };
     if (this.idPlan) {
       const result = await this.planSrv.GetById(this.idPlan);
@@ -170,6 +181,7 @@ export class PlanComponent implements OnInit, OnDestroy {
         info: this.planData.name,
         tooltip: this.planData?.fullName
       });
+      this.menuSrv.reloadMenuOffice();
       return;
     };
   }

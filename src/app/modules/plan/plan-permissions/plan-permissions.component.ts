@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Location } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
@@ -15,6 +15,7 @@ import { PersonService } from 'src/app/shared/services/person.service';
 import { enterLeave } from '../../../shared/animations/enterLeave.animation';
 import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
 import { MessageService } from 'primeng/api';
+import { SaveButtonComponent } from 'src/app/shared/components/save-button/save-button.component';
 
 @Component({
   selector: 'app-plan-permissions',
@@ -26,6 +27,8 @@ import { MessageService } from 'primeng/api';
 })
 export class PlanPermissionsComponent implements OnInit, OnDestroy {
 
+  @ViewChild(SaveButtonComponent) saveButton: SaveButtonComponent;
+
   idPlan: number;
   cardPersonPermission: ICard;
   personEmail: string;
@@ -33,7 +36,6 @@ export class PlanPermissionsComponent implements OnInit, OnDestroy {
   searchedEmailPerson: string;
   permission: IPlanPermission;
   person: IPerson;
-  showSaveButton = false;
   showSearchInputMessage = false;
   cardItemsPlanPermission: ICardItemPermission[];
   debounceSearch = new Subject();
@@ -116,7 +118,7 @@ export class PlanPermissionsComponent implements OnInit, OnDestroy {
   }
 
   async searchPerson() {
-    this.showSaveButton = false;
+    this.saveButton?.hideButton();
     if (this.searchedEmailPerson) {
       const { data } = await this.personSrv.GetByEmail(this.searchedEmailPerson);
       if (data) {
@@ -151,10 +153,6 @@ export class PlanPermissionsComponent implements OnInit, OnDestroy {
       this.permission = null;
     }
     this.loadCardItemsPersonPermissions();
-  }
-
-  handleShowSaveButton() {
-    this.showSaveButton = true;
   }
 
   async savePermission() {

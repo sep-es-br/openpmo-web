@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ICard } from 'src/app/shared/interfaces/ICard';
 import { ResponsiveService } from 'src/app/shared/services/responsive.service';
@@ -22,6 +22,7 @@ import { ILocalityList } from 'src/app/shared/interfaces/ILocality';
 import { LocalityService } from 'src/app/shared/services/locality.service';
 import { PlanService } from 'src/app/shared/services/plan.service';
 import { MeasureUnitService } from 'src/app/shared/services/measure-unit.service';
+import { SaveButtonComponent } from 'src/app/shared/components/save-button/save-button.component';
 
 @Component({
   selector: 'app-cost-account',
@@ -29,6 +30,8 @@ import { MeasureUnitService } from 'src/app/shared/services/measure-unit.service
   styleUrls: ['./cost-account.component.scss']
 })
 export class CostAccountComponent implements OnInit {
+
+  @ViewChild(SaveButtonComponent) saveButton: SaveButtonComponent;
 
   responsive: boolean;
   idWorkpack: number;
@@ -67,6 +70,14 @@ export class CostAccountComponent implements OnInit {
     this.responsiveSrv.observable.subscribe(value => {
       this.responsive = value;
     });
+  }
+
+  handleChangeProperty() {
+    const valid = this.sectionCostAccountProperties
+      ?.reduce((a, b) => a ? (!b.required || (!!b.value || !!b.selectedValue || !!b.selectedValues)) : a, true);
+    return valid
+      ? this.saveButton?.showButton()
+      : this.saveButton?.hideButton();
   }
 
   async ngOnInit() {
@@ -159,7 +170,7 @@ export class CostAccountComponent implements OnInit {
   }
 
   instanceProperty(propertyModel: IWorkpackModelProperty): PropertyTemplateModel {
-    const property = new PropertyTemplateModel();
+    const property = new PropertyTemplateModel(this.translateSrv);
     const propertyCostAccount = this.costAccount && this.costAccount.properties.find( cost => cost.idPropertyModel === propertyModel.id);
 
     property.id = propertyCostAccount && propertyCostAccount.id;
@@ -323,6 +334,10 @@ export class CostAccountComponent implements OnInit {
 
   async saveCostAccount() {
     this.costAccountProperties = this.sectionCostAccountProperties.map(p => p.getValues());
+    this.sectionCostAccountProperties.forEach( p => p.validate());
+    if (this.sectionCostAccountProperties.filter( p => p.invalid).length > 0) {
+      return;
+    }
     if (this.idCostAccount) {
       const costAccount = {
         id: this.idCostAccount,

@@ -33,7 +33,7 @@ export class DomainListComponent implements OnInit, OnDestroy {
   };
   idOffice: number;
   propertiesOffice: IOffice;
-  cardItemsProperties: ICardItem[] = [];
+  cardItemsProperties: ICardItem[];
   isUserAdmin: boolean;
   editPermission: boolean;
   $destroy = new Subject();

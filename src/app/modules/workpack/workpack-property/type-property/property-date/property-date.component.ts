@@ -23,6 +23,7 @@ export class PropertyDateComponent implements OnInit, OnDestroy {
   dateMax: Date;
   responsive: boolean;
   $destroy = new Subject();
+  message: string;
 
   constructor(
     private responsiveSrv: ResponsiveService,
@@ -48,6 +49,17 @@ export class PropertyDateComponent implements OnInit, OnDestroy {
     this.defaultValue = defaultValueDate && new Date(defaultValueDate);
     this.dateMin = this.property.min && new Date(this.property.min);
     this.dateMax = this.property.max && new Date(this.property.max);
+  }
+
+  isInvalid() {
+    if (this.property.value) {
+      this.property.invalid = false;
+      return false;
+    } else {
+      this.property.invalid = true;
+      this.message = this.translateSrv.instant('required');
+      return true;
+    }
   }
 
 }

@@ -4,6 +4,7 @@ import { ActivatedRoute } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { MenuItem, MessageService } from 'primeng/api';
 import { Subject } from 'rxjs';
+import { filter, takeUntil } from 'rxjs/operators';
 
 import { SaveButtonComponent } from 'src/app/shared/components/save-button/save-button.component';
 import { IconsEnum } from 'src/app/shared/enums/IconsEnum';
@@ -38,10 +39,7 @@ export class MeasureUnitComponent implements OnInit {
     initialStateCollapse: false
   };
   idOffice: number;
-  cardItemsProperties: ICardItemMeasureUnit[] = [{
-    typeCardItem: 'newCardItem',
-    icon: IconsEnum.Plus,
-  }];
+  cardItemsProperties: ICardItemMeasureUnit[] = [];
   $destroy = new Subject();
   isUserAdmin: boolean;
   editPermission: boolean;
@@ -109,13 +107,15 @@ export class MeasureUnitComponent implements OnInit {
         command: () => this.deleteMeasureUnit(measureUnit),
         disabled: !this.editPermission }] as MenuItem[],
       }));
-    } else if (this.cardItemsProperties.length > 1) {
+    } else if (this.cardItemsProperties?.length > 1) {
       this.cardItemsProperties = this.editPermission ? [{
         typeCardItem: 'newCardItem',
         icon: IconsEnum.Plus,
       }] : [];
+    } else if (this.editPermission) {
+      this.cardItemsProperties = [{ typeCardItem: 'newCardItem', icon: IconsEnum.Plus }];
     }
-    if (this.cardItemsProperties[0].typeCardItem === 'listItem' && this.editPermission) {
+    if (this.cardItemsProperties[0]?.typeCardItem === 'listItem' && this.editPermission) {
       this.cardItemsProperties.push({ typeCardItem: 'newCardItem', icon: IconsEnum.Plus });
     }
   }
@@ -132,6 +132,15 @@ export class MeasureUnitComponent implements OnInit {
       }));
       if (!this.editPermission) {
         this.formsMeasureUnits.forEach( item => item.form.disable());
+      } else {
+        this.formsMeasureUnits.forEach( item => {
+          item.form.statusChanges
+            .pipe(takeUntil(this.$destroy), filter(status => status === 'INVALID'))
+            .subscribe(() => this.saveButton?.hideButton());
+          item.form.valueChanges
+          .pipe(takeUntil(this.$destroy), filter(() => item.form.dirty && item.form.valid))
+          .subscribe(() => this.saveButton?.showButton());
+        });
       }
     } else {
       this.formsMeasureUnits = [];
@@ -210,13 +219,21 @@ export class MeasureUnitComponent implements OnInit {
   }
 
   newForm(newId) {
-    this.formsMeasureUnits.push({
+    const newForm = {
       id: newId,
       form:  this.formBuilder.group({
         id: null,
         name: ['', [Validators.required, Validators.maxLength(25)]],
         fullName: ['', [Validators.required]]
-    })});
+      })
+    };
+    newForm.form.statusChanges
+      .pipe(takeUntil(this.$destroy), filter(status => status === 'INVALID'))
+      .subscribe(() => this.saveButton?.hideButton());
+    newForm.form.valueChanges
+      .pipe(takeUntil(this.$destroy), filter(() => newForm.form.dirty && newForm.form.valid))
+      .subscribe(() => this.saveButton?.showButton());
+    this.formsMeasureUnits.push(newForm);
   }
 
   deleteCardItem(indexCard: string) {

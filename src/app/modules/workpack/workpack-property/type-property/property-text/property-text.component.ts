@@ -1,4 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { TranslateService } from '@ngx-translate/core';
 import { PropertyTemplateModel } from 'src/app/shared/models/PropertyTemplateModel';
 import { ResponsiveService } from 'src/app/shared/services/responsive.service';
 
@@ -12,9 +13,10 @@ export class PropertyTextComponent implements OnInit {
   @Input() property: PropertyTemplateModel;
   @Output() changed = new EventEmitter();
   responsive: boolean;
+  message: string;
 
   constructor(
-    private responsiveSrv: ResponsiveService
+    private responsiveSrv: ResponsiveService,
   ) {
     this.responsiveSrv.observable.subscribe(value => {
       this.responsive = value;
@@ -25,3 +27,4 @@ export class PropertyTextComponent implements OnInit {
   }
 
 }
+

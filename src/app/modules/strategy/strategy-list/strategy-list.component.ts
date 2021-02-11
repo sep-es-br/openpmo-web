@@ -90,7 +90,7 @@ export class StrategyListComponent implements OnInit {
       itemsProperties.unshift(... data.map(strategy => ({
         typeCardItem: 'listItem',
         iconSvg: true,
-        icon: IconsEnum.ChessKnight,
+        icon: IconsEnum.PlanModel,
         nameCardItem: strategy.name,
         fullNameCardItem: strategy.fullName,
         itemId: strategy.id,

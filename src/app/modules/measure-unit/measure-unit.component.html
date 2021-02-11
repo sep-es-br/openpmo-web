@@ -5,9 +5,8 @@
   <div class="card-container">
     <app-card [properties]="cardProperties">
       <p-dataView [value]="cardItemsProperties" layout="grid" [rows]="1" class="dataview-card-items"
-        [emptyMessage]="editPermission !== false ? ('loadingEllipsis' | translate) : ('noContent' | translate)">
+        [emptyMessage]="((editPermission === undefined || editPermission) ? 'loadingEllipsis' : 'noContent') | translate">
         <ng-template let-cardItem pTemplate="gridItem">
-
           <div class="p-col-12 p-sm-12 p-md-4 p-lg-3 card-item-container">
             <p-card *ngIf="cardItem.typeCardItem === 'listItem'" class="app-card-item listItem">
               <p-header *ngIf="cardItem.menuItems" class="card-item-header">
@@ -18,15 +17,13 @@
                 <i [ngClass]="[ 'app-icon', cardItem.icon ]" [ngStyle]="{ fontSize: '1.5rem' }"></i>
                 <form [formGroup]="getFormById(cardItem.id || cardItem.newId)" class="p-fluid">
                   <span class="p-float-label p-field">
-                    <input id="float-input" formControlName="name" type="text" pInputText class="app-input-text"
-                      (input)="saveButton.showButton()">
+                    <input id="float-input" formControlName="name" type="text" pInputText class="app-input-text">
                     <label for="float-input" class="app-input-label">{{'name' | translate}}<span
                         class="required-indicator">*</span></label>
                   </span>
                   <app-input-message [form]="getFormById(cardItem.id || cardItem.newId)" field="name"></app-input-message>
                   <span class="p-float-label p-field margin-top">
-                    <input id="float-input" formControlName="fullName" type="text" pInputText class="app-input-text"
-                      (input)="saveButton.showButton()">
+                    <input id="float-input" formControlName="fullName" type="text" pInputText class="app-input-text">
                     <label for="float-input" class="app-input-label">{{'fullName' | translate}}<span
                         class="required-indicator">*</span></label>
                   </span>

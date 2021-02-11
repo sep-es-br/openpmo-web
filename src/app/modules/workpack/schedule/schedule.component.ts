@@ -1,5 +1,5 @@
 import { Location } from '@angular/common';
-import { Component, OnDestroy, OnInit, ViewChildren } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild, ViewChildren } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
@@ -19,6 +19,7 @@ import { ScheduleService } from 'src/app/shared/services/schedule.service';
 import { WorkpackService } from 'src/app/shared/services/workpack.service';
 import { CostAccountService } from 'src/app/shared/services/cost-account.service';
 import { enterLeave } from 'src/app/shared/animations/enterLeave.animation';
+import { SaveButtonComponent } from 'src/app/shared/components/save-button/save-button.component';
 
 interface ICartItemCostAssignment {
   type: string;
@@ -41,7 +42,9 @@ interface ICartItemCostAssignment {
 })
 export class ScheduleComponent implements OnInit, OnDestroy {
 
+  @ViewChild(SaveButtonComponent) saveButton: SaveButtonComponent;
   @ViewChildren(Calendar) calendarComponents: Calendar[];
+
   responsive: boolean;
   idWorkpack: number;
   unitMeasure: IMeasureUnit;
@@ -51,7 +54,6 @@ export class ScheduleComponent implements OnInit, OnDestroy {
   costs: ICost[];
   cardCostAssignmentsProperties: ICard;
   costAssignmentsCardItems: ICartItemCostAssignment[];
-  showSaveButton = false;
   menuItemsCostAccounts: MenuItem[];
   costAssignmentsTotals = { plannedTotal: 0,  actualTotal: 0};
   $destroy = new Subject();
@@ -68,7 +70,8 @@ export class ScheduleComponent implements OnInit, OnDestroy {
     private workpackSrv: WorkpackService,
     private costAccountSrv: CostAccountService,
     private messageSrv: MessageService,
-    private router: Router
+    private router: Router,
+    private detectSrv: ChangeDetectorRef
   ) {
     this.actRouter.queryParams.subscribe(async queryParams => {
       this.idWorkpack = queryParams.idWorkpack;
@@ -78,10 +81,10 @@ export class ScheduleComponent implements OnInit, OnDestroy {
       setTimeout(() => this.calendarComponents?.map(calendar => calendar.ngOnInit(), 150))
     );
     this.formSchedule = this.formBuilder.group({
-      start: [null, Validators.required],
-      end: [null, Validators.required],
-      plannedWork: [null, Validators.required],
-      actualWork: null
+      start: [new Date('2021-02-01'), Validators.required],
+      end: [new Date('2021-02-20'), Validators.required],
+      plannedWork: [1000, Validators.required],
+      actualWork: 500
     });
   }
 
@@ -226,24 +229,18 @@ export class ScheduleComponent implements OnInit, OnDestroy {
   handleChangeValuesCardItems() {
     this.reloadCostAssignmentTotals();
     if (this.formSchedule.valid) {
-      if (this.costAssignmentsCardItems && this.costAssignmentsCardItems.length > 1) {
-        this.reloadCostAssignmentTotals();
-          this.showSaveButton = true;
+      if (this.costAssignmentsCardItems && this.costAssignmentsCardItems.length > 0) {
+        this.saveButton?.showButton();
       }
     }
   }
 
   reloadCostAssignmentTotals() {
-    const plannedTotal = this.costAssignmentsCardItems.filter( card => card.type === 'cost-card')
-      .reduce( ( total, cost) => total + cost.plannedWork, 0);
-    const actualTotal = this.costAssignmentsCardItems.filter( card => card.type === 'cost-card')
-      .reduce( ( total, cost) => total + cost.actualWork, 0);
-    this.costAssignmentsTotals = {
-      actualTotal,
-      plannedTotal
-    };
+    const items = this.costAssignmentsCardItems.filter( card => card.type === 'cost-card');
+    const plannedTotal = items.reduce( ( total, cost) => total + cost.plannedWork, 0);
+    const actualTotal = items.reduce( ( total, cost) => total + cost.actualWork, 0);
+    this.costAssignmentsTotals = { actualTotal, plannedTotal };
   }
-
 
   async saveSchedule() {
     this.schedule = {

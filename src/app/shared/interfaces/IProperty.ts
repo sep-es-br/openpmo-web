@@ -27,5 +27,7 @@ export interface IProperty {
   value?: string | number | boolean | string[] | Date | number[];
   selectedValues?: number[] | number;
   selectedValue?: number;
+  invalid?: boolean;
+  message?: string;
   getValues();
 }

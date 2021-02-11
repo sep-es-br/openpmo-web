@@ -549,6 +549,9 @@ body {
     content: "\e915";
   }
   &.unit-selection:before {
+    content: "\e92e";
+  }
+  &.unit-selection-solid:before {
     content: "\e916";
   }
   &.toggle-on:before {
@@ -623,4 +626,11 @@ body {
   &.number:before {
     content: "\e900";
   }
+  &.plan-model:before {
+    content: "\e92f";
+  }
+  &.plan-model-solid:before {
+    content: "\e930";
+  }
+
 }

@@ -5,7 +5,7 @@
           [value]="cardItemsProperties"
           layout="grid" [rows]="1"
           class="dataview-offices"
-          [emptyMessage]="'loadingEllipsis' | translate"
+          [emptyMessage]="(!cardItemsProperties ? 'loadingEllipsis' : 'noContent') | translate"
         >
           <ng-template let-cardItem pTemplate="gridItem">
             <div class="card-item-container" [ngStyle]="{'padding': '10px 15px'}">

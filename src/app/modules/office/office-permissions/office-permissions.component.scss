@@ -74,33 +74,6 @@
     }
   }
 
-  .app-save-button-layout {
-    position: relative;
-    height: 15vh;
-    width: 100%;
-    overflow: hidden;
-  }
-  .app-save-button-wrapper {
-    position: absolute;
-    bottom: 30%;
-    left: 0;
-    z-index: 100;
-
-    .button-label {
-      background-color: v.$bgButtonGreen;
-      color: #ffffff;
-      font-size: 1.25rem;
-      padding: .5em 1.5em;
-      text-align: center;
-      border-radius: 5px;
-      box-shadow: 1px 7px 10px 2px rgba(0,0,0,.1);
-      cursor: pointer;
-
-      &:hover {
-        background-color: v.$bgButtonGreenHover;
-      }
-    }
-  }
   .input-message-error {
     color: white;
     background: #f44336;

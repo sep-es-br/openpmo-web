@@ -43,6 +43,9 @@ export enum IconsEnum {
   Trash = 'trash',
   TrashAlt = 'trash-alt',
   UnitSelection = 'unit-selection',
+  UnitSelectionSolid = 'unit-selection-solid',
   UserCircle = 'user-circle',
-  Users = 'users'
+  Users = 'users',
+  PlanModel = 'plan-model',
+  PlanModelSolid = 'plan-model-solid'
 }

@@ -1,13 +1,12 @@
 export interface IMenuOffice {
   id: number;
   fullName: string;
-  planModels: IMenuPlan[];
+  plans: IMenuPlan[];
 }
 
 export interface IMenuPlan {
   id: string;
   name: string;
-  models: IMenuWorkpackModel[];
 }
 
 export interface IMenuWorkpackModel {

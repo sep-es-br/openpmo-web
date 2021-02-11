@@ -1,6 +1,6 @@
 import { Location } from '@angular/common';
 import { Inject, Injectable, Injector } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Subject } from 'rxjs';
 import { BaseService } from '../base/base.service';
 import { IHttpResult } from '../interfaces/IHttpResult';
 
@@ -13,6 +13,8 @@ import { PrepareHttpParams } from '../utils/query.util';
 export class MenuService extends BaseService<any> {
 
   adminsPath = [ 'strategies', 'organizations', 'domains', 'measure-units', 'offices/permission', 'workpack-model' ];
+  private $reloadMenuOffice = new Subject();
+  private $reloadMenuPortfolio = new Subject();
   private isAdminMenuObservable = new BehaviorSubject<boolean>(false);
 
   constructor(
@@ -24,6 +26,22 @@ export class MenuService extends BaseService<any> {
       const [ path, query ] = url.slice(2).split('?');
       this.isAdminMenuObservable.next(!!this.adminsPath.find(p => path.startsWith(p)));
     });
+  }
+
+  reloadMenuOffice() {
+    this.$reloadMenuOffice.next();
+  }
+
+  obsReloadMenuOffice() {
+    return this.$reloadMenuOffice.asObservable();
+  }
+
+  reloadMenuPortfolio() {
+    this.$reloadMenuPortfolio.next();
+  }
+
+  obsReloadMenuPortfolio() {
+    return this.$reloadMenuPortfolio.asObservable();
   }
 
   getItemsOffice(): Promise<IHttpResult<IMenuOffice[]>> {

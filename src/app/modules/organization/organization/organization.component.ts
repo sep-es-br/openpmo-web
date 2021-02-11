@@ -61,6 +61,9 @@ export class OrganizationComponent implements OnInit, OnDestroy {
       sector: null,
       website: ''
     });
+    this.formOrganization.statusChanges
+      .pipe(takeUntil(this.$destroy), filter(status => status === 'INVALID'))
+      .subscribe(() => this.saveButton.hideButton());
     this.formOrganization.valueChanges
       .pipe(takeUntil(this.$destroy), filter(() => this.formOrganization.dirty))
       .subscribe(() => this.saveButton.showButton());

@@ -64,6 +64,9 @@ export class StrategyComponent implements OnDestroy {
       name: ['', [Validators.required, Validators.maxLength(25)]],
       fullName: ['', [Validators.required]]
     });
+    this.formStrategy.statusChanges
+      .pipe(takeUntil(this.$destroy), filter(status => status === 'INVALID'))
+      .subscribe(() => this.saveButton.hideButton());
     this.formStrategy.valueChanges
       .pipe(takeUntil(this.$destroy), filter(() => this.formStrategy.dirty))
       .subscribe(() => this.saveButton.showButton());
@@ -225,14 +228,15 @@ export class StrategyComponent implements OnDestroy {
         key: 'strategy',
         routerLink: ['/strategies', 'strategy' ],
         queryParams: { id: this.idStrategy, idOffice: this.idOffice },
-        info: this.propertiesStrategy?.name,
-        tooltip: this.propertiesStrategy?.fullName,
+        info: isPut ? this.propertiesStrategy?.name : this.formStrategy.controls.name?.value,
+        tooltip: isPut ? this.propertiesStrategy?.fullName : this.formStrategy.controls.fullName?.value,
       });
       this.messageSrv.add({
         severity: 'success',
         summary: this.translateSrv.instant('success'),
         detail: this.translateSrv.instant('messages.savedSuccessfully')
       });
+      this.formStrategy.reset(this.formStrategy.value);
       if (!isPut) {
         this.router.navigate([], {
           queryParams: {

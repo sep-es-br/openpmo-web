@@ -63,9 +63,5 @@
       </div>
     </app-card>
   </div>
-  <div class="app-save-button-layout">
-    <div class="app-save-button-wrapper" *ngIf="showSaveButton" @enterLeave>
-      <span class="button-label" (click)="saveStakeholder()">{{ 'save' | translate }}</span>
-    </div>
-  </div>
 </div>
+<app-save-button (save)="saveStakeholder()"></app-save-button>

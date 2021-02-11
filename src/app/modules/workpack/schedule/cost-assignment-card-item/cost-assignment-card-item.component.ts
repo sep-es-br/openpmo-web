@@ -42,7 +42,7 @@ export class CostAssignmentCardItemComponent implements OnInit {
   }
 
   handleCostChange() {
-    this.costChanged.next();
+    this.costChanged.emit();
   }
 
 }

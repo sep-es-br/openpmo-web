@@ -20,6 +20,7 @@ import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
 import { SaveButtonComponent } from 'src/app/shared/components/save-button/save-button.component';
 import { AuthService } from 'src/app/shared/services/auth.service';
 import { OfficePermissionService } from 'src/app/shared/services/office-permission.service';
+import { MenuService } from 'src/app/shared/services/menu.service';
 
 @Component({
   selector: 'app-office',
@@ -57,7 +58,8 @@ export class OfficeComponent implements OnDestroy {
     private breadcrumbSrv: BreadcrumbService,
     private authSrv: AuthService,
     private officePermissionSrv: OfficePermissionService,
-    private messageSrv: MessageService
+    private messageSrv: MessageService,
+    private menuSrv: MenuService
   ) {
     this.activeRoute.queryParams.subscribe(async({ id }) => {
       this.idOffice = +id;
@@ -68,8 +70,11 @@ export class OfficeComponent implements OnDestroy {
       name: ['', [Validators.required, Validators.maxLength(25)]],
       fullName: ['', [Validators.required]]
     });
+    this.formOffice.statusChanges
+      .pipe(takeUntil(this.$destroy), filter(status => status === 'INVALID'))
+      .subscribe(() =>  this.saveButton.hideButton());
     this.formOffice.valueChanges
-      .pipe(takeUntil(this.$destroy), filter(() => this.formOffice.dirty))
+      .pipe(takeUntil(this.$destroy), filter(() => this.formOffice.dirty && this.formOffice.valid))
       .subscribe(() => this.saveButton.showButton());
     this.responsiveSvr.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.responsive = value);
   }
@@ -137,7 +142,7 @@ export class OfficeComponent implements OnDestroy {
     this.menuItemsNewPlan = this.planModelsOfficeList.map(planModel =>
       ({
         label: planModel.name,
-        icon: 'fas fa-chess-knight',
+        icon: 'app-icon plan-model',
         command: () => this.navigateToNewPlan(planModel.id)
       })
     );
@@ -246,7 +251,9 @@ export class OfficeComponent implements OnDestroy {
       });
       if (!isPut) {
         this.loadPlans();
+        this.router.navigate([], { queryParams: { id: this.idOffice }});
       }
+      this.menuSrv.reloadMenuOffice();
     }
   }
 

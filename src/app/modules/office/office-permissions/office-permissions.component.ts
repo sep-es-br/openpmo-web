@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Location } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
@@ -15,6 +15,7 @@ import { IPerson } from 'src/app/shared/interfaces/IPerson';
 import { PersonService } from 'src/app/shared/services/person.service';
 import { enterLeave } from '../../../shared/animations/enterLeave.animation';
 import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
+import { SaveButtonComponent } from 'src/app/shared/components/save-button/save-button.component';
 
 @Component({
   selector: 'app-office-permissions',
@@ -26,6 +27,8 @@ import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
 })
 export class OfficePermissionsComponent implements OnInit, OnDestroy {
 
+  @ViewChild(SaveButtonComponent) saveButton: SaveButtonComponent;
+
   idOffice: number;
   cardPersonPermission: ICard;
   personEmail: string;
@@ -33,7 +36,6 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
   searchedEmailPerson: string;
   permission: IOfficePermission;
   person: IPerson;
-  showSaveButton = false;
   showSearchInputMessage = false;
   cardItemsOfficePermission: ICardItemPermission[];
   debounceSearch = new Subject<string>();
@@ -57,7 +59,6 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
       this.responsive = value;
     });
     this.breadcrumbSrv.setMenu([
-      // CHECK
       { key: 'offices', routerLink: ['/offices'] },
       { key: 'officePermissions', routerLink: ['/offices', 'permission'], queryParams: { idOffice: this.idOffice }},
       { key: 'permissions', routerLink: ['/offices', 'permission', 'detail'],
@@ -118,7 +119,7 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
   }
 
   async searchPerson() {
-    this.showSaveButton = false;
+    this.saveButton?.hideButton();
     if (this.searchedEmailPerson) {
       const { data } = await this.personSrv.GetByEmail(this.searchedEmailPerson);
       if (data) {
@@ -155,12 +156,8 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
     this.loadCardItemsPersonPermissions();
   }
 
-  handleShowSaveButton() {
-    this.showSaveButton = true;
-  }
-
   async savePermission() {
-    this.showSaveButton = false;
+    this.saveButton?.hideButton();
     this.permission.permissions = this.cardItemsOfficePermission.map(cardItem => (
       {
         id: cardItem.itemId,

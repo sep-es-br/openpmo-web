@@ -1,5 +1,5 @@
 <div class="app-save-button-layout" [class.mobile]="responsive">
   <div class="app-save-button-wrapper" *ngIf="isShowingButton" @enterLeave>
-    <span class="button-label" (click)="handleClick()">{{ 'save' | translate }}</span>
+    <div class="button-label" (click)="handleClick()">{{ 'save' | translate }}</div>
   </div>
 </div>

@@ -1,13 +1,16 @@
 import { Location } from '@angular/common';
-import { ChangeDetectorRef, Component, ElementRef, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { MenuItem } from 'primeng/api';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 import { IMenuWorkpack, IMenuWorkpackModel } from 'src/app/shared/interfaces/IMenu';
 import { IPerson } from 'src/app/shared/interfaces/IPerson';
 import { AuthService } from 'src/app/shared/services/auth.service';
 import { MenuService } from 'src/app/shared/services/menu.service';
+import { OfficePermissionService } from 'src/app/shared/services/office-permission.service';
 import { OfficeService } from 'src/app/shared/services/office.service';
 import { ResponsiveService } from 'src/app/shared/services/responsive.service';
 import { TranslateChangeService } from 'src/app/shared/services/translate-change.service';
@@ -22,7 +25,7 @@ interface IMenu {
   templateUrl: './menu.component.html',
   styleUrls: ['./menu.component.scss'],
 })
-export class MenuComponent implements OnInit {
+export class MenuComponent implements OnInit, OnDestroy {
 
   @ViewChild('menuSliderOffices') menuOffices: ElementRef<HTMLDivElement>;
   @ViewChild('menuSliderPortfolio') menuPortfolio: ElementRef<HTMLDivElement>;
@@ -37,6 +40,7 @@ export class MenuComponent implements OnInit {
   isMobileView = false;
   isChangingView = false;
   items: MenuItem[] = [];
+  itemsOfficeUnchanged: MenuItem[] = [];
   itemsOffice: MenuItem[] = [];
   itemsPorfolio: MenuItem[] = [];
   itemsLanguages: MenuItem[] = [];
@@ -45,6 +49,8 @@ export class MenuComponent implements OnInit {
   isUserAdmin = false;
   currentURL = '';
   currentUserInfo: IPerson;
+  $destroy = new Subject();
+  editPermissionOnOffice = false;
 
   constructor(
     private menuSrv: MenuService,
@@ -54,21 +60,35 @@ export class MenuComponent implements OnInit {
     private responsiveSrv: ResponsiveService,
     private router: Router,
     private locationSrv: Location,
-    private officeSrv: OfficeService
+    private officeSrv: OfficeService,
+    private officePermissionSrv: OfficePermissionService
   ) {
     this.translateChangeSrv.getCurrentLang()
+      .pipe(takeUntil(this.$destroy))
       .subscribe(({ lang }) => this.handleChangeLanguage(lang));
-    this.menuSrv.isAdminMenu.subscribe(isAdminMenu => this.isAdminMenu = isAdminMenu);
-    this.responsiveSrv.observable.subscribe(responsive => {
+    this.menuSrv.isAdminMenu.pipe(takeUntil(this.$destroy)).subscribe(isAdminMenu => {
+      this.isAdminMenu = isAdminMenu;
+      this.updateMenuOfficeOnAdminChange();
+    });
+    this.officeSrv.observableIdOffice().pipe(takeUntil(this.$destroy)).subscribe(id => {
+      this.currentIDOffice = id;
+      this.loadPortfolioMenu();
+    });
+    this.menuSrv.obsReloadMenuOffice().pipe(takeUntil(this.$destroy)).subscribe(() => this.loadOfficeMenu());
+    this.menuSrv.obsReloadMenuPortfolio().pipe(takeUntil(this.$destroy)).subscribe(() => this.loadPortfolioMenu());
+    this.menuSrv.isAdminMenu.pipe(takeUntil(this.$destroy)).subscribe(isAdminMenu => {
+      this.isAdminMenu = isAdminMenu;
+      this.updateMenuOfficeOnAdminChange();
+      if (isAdminMenu) {
+        this.getOfficePermission();
+      }
+    });
+    this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(responsive => {
       this.isChangingView = true;
       this.isMobileView = responsive;
       setTimeout(() => {
         this.isChangingView = false;
       }, 250);
-    });
-    this.officeSrv.observableIdOffice().subscribe(id => {
-      this.currentIDOffice = id;
-      this.loadPortfolioMenu();
     });
     this.locationSrv.onUrlChange(url => {
       this.currentURL = url.slice(2);
@@ -76,16 +96,32 @@ export class MenuComponent implements OnInit {
     });
   }
 
+  ngOnDestroy(): void {
+    this.$destroy.next();
+    this.$destroy.complete();
+  }
+
   async ngOnInit() {
     this.isUserAdmin = await this.authSrv.isUserAdmin();
     const payload = this.authSrv.getTokenPayload();
-    if (this.isUserAdmin) {
-      this.loadOfficeMenu();
-    }
+    this.loadOfficeMenu();
     this.currentUserInfo = await this.authSrv.getInfoPerson();
     this.username = this.isUserAdmin
       ? 'Admin'
       : ( this.currentUserInfo.name?.split(' ').shift() || payload.email );
+  }
+
+  updateMenuOfficeOnAdminChange() {
+    this.itemsOffice = this.itemsOffice
+      .map((office, i) => ((office.items = this.isAdminMenu ? undefined : this.itemsOfficeUnchanged[i].items), office));
+  }
+
+  async getOfficePermission() {
+    if (this.currentIDOffice) {
+      this.editPermissionOnOffice = await this.officePermissionSrv.getPermissions(this.currentIDOffice);
+    } else {
+      setTimeout(() => this.getOfficePermission(), 150);
+    }
   }
 
   handleChangeLanguage(language: string) {
@@ -110,28 +146,25 @@ export class MenuComponent implements OnInit {
   async loadOfficeMenu() {
     const { success, data: itemsOffice } = await this.menuSrv.getItemsOffice();
     if (success) {
-      this.itemsOffice = itemsOffice.map(office => ({
+      this.itemsOfficeUnchanged = itemsOffice.map(office => ({
         label: office.fullName,
         icon: 'app-icon building',
-        styleClass: `office-strategies-${office.id} ${this.currentURL === `strategies?idOffice=${office.id}` ? 'active' : ''}`,
+        styleClass: `office-${office.id} ${this.currentURL === `offices/office?id=${office.id}` ? 'active' : ''}`,
         command: (e) => {
           if (e.originalEvent?.target?.classList?.contains('p-menuitem-text')) {
-            this.router.navigate([ '/strategies' ], { queryParams: { idOffice: office.id }});
+            this.router.navigate([ '/offices', 'office' ], { queryParams: { id: office.id }});
             this.closeAllMenus();
           }
         },
-        items: office.planModels
-          ? office.planModels.map(planModel =>
+        items: office.plans
+          ? office.plans.map(plan =>
             ({
-              label: planModel.name,
-              icon: 'app-icon chess-knight',
-              styleClass: `strategy-${planModel.id} ${this.currentURL === `strategies/strategy?id=${planModel.id}&idOffice=${office.id}`
-                ? 'active'
-                : ''}`,
-              items: planModel.models ? this.buildMenuItemOffices(planModel.models, office.id, Number(planModel.id)) : undefined,
+              label: plan.name,
+              icon: 'app-icon plan',
+              styleClass: `plan-${plan.id} ${this.currentURL === `plan?id=${plan.id}` ? 'active' : ''}`,
               command: (e) => {
                 if (e.originalEvent?.target?.classList?.contains('p-menuitem-text')) {
-                  this.router.navigate([ '/strategies', 'strategy' ], { queryParams: { id: planModel.id, idOffice: office.id }});
+                  this.router.navigate([ '/plan' ], { queryParams: { id: plan.id }});
                   this.closeAllMenus();
                 }
               }
@@ -139,6 +172,7 @@ export class MenuComponent implements OnInit {
           )
           : undefined
       }));
+      this.itemsOffice = this.itemsOfficeUnchanged.map(item => Object.assign({}, item));
     }
   }
 
@@ -152,19 +186,13 @@ export class MenuComponent implements OnInit {
     for(const el of els) {
       el.classList.remove('active');
     }
-    const id = this.getIdFromURL(url); //url.split('id=')[1];
+    const id = this.getIdFromURL(url);
     if(url.startsWith('offices/office')) {
-      this.menuOffices?.nativeElement.getElementsByClassName('office-' + id)[0]?.classList.add('active');
+      this.menuOffices?.nativeElement.querySelector('.office-' + id)?.classList.add('active');
     } else if (url.startsWith('plan')) {
-      this.menuOffices?.nativeElement.getElementsByClassName('plan-' + id)[0]?.classList.add('active');
-    } else if (url.startsWith('workpack-model')){
-      this.menuOffices?.nativeElement.getElementsByClassName('workpack-model-' + id)[0]?.classList.add('active');
+      this.menuOffices?.nativeElement.querySelector('.plan-' + id)?.classList.add('active');
     } else if (url.startsWith('workpack')){
-      this.menuPortfolio?.nativeElement.getElementsByClassName('workpack-' + id)[0]?.classList.add('active');
-    } else if (url.startsWith('strategies/strategy')){
-      this.menuOffices?.nativeElement.getElementsByClassName('strategy-' + id)[0]?.classList.add('active');
-    } else if (url.startsWith('strategies')){
-      this.menuOffices?.nativeElement.getElementsByClassName('office-strategies-' + id)[0]?.classList.add('active');
+      this.menuPortfolio?.nativeElement.querySelector('.workpack-' + id)?.classList.add('active');
     }
   }
 

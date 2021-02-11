@@ -1,3 +1,5 @@
+@use "src/variables" as v;
+
 ::ng-deep .workpack-organization-selection {
   .p-multiselect {
     width: 20%;
@@ -29,4 +31,15 @@
   .app-single-selection .p-dropdown {
     width: 100%;
   }
+}
+
+.input-message-error {
+  color: white;
+  background: #f44336;
+  padding: 4px 8px;
+  display: inline-flex;
+  margin-top: 2px;
+  border-radius: 5px;
+  font-size: 0.7rem;
+  font-family: v.$fontFamilyMedium;
 }

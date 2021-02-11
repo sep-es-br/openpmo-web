@@ -23,17 +23,13 @@
         <p-dataView [value]="cardItemsPlanPermission" layout="grid" styleClass="dataview-card-items" [emptyMessage]="'loadingEllipsis' | translate">
           <ng-template let-cardItem pTemplate="gridItem">
             <div class="p-col-12 p-md-3 p-sm-12 card-item-container" [class.responsive]="responsive">
-              <app-card-item-permission [properties]="cardItem" (changeSelected)="handleShowSaveButton()">
+              <app-card-item-permission [properties]="cardItem" (changeSelected)="saveButton.showButton()">
               </app-card-item-permission>
             </div>
           </ng-template>
         </p-dataView>
       </div>
-      <div class="app-save-button-layout" *ngIf="showSaveButton">
-        <div class="app-save-button-wrapper" @enterLeave>
-          <span class="button-label" (click)="savePermission()">{{ 'save' | translate }}</span>
-        </div>
-      </div>
+      <app-save-button #saveButton (save)="savePermission()"></app-save-button>
     </app-card>
   </div>
 </div>

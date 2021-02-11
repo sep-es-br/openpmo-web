@@ -16,3 +16,6 @@
     (onNodeSelect)="changed.emit($event)" (onNodeUnselect)="changed.emit($event)"></p-tree>
   </div>
 </ng-template>
+<span class="input-message-error" *ngIf="property.invalid">
+  {{ property.message }}
+</span>

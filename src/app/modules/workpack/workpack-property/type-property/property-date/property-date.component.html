@@ -2,8 +2,12 @@
   [class.workpack-date-not-fullLine]="!property.fullLine">
   <p-calendar [id]="property.name" [(ngModel)]="property.value" class="app-select-date" showIcon="true"
     icon="fas fa-calendar-alt" dateFormat="yy/mm/dd" [defaultDate]="defaultValue" [monthNavigator]="true"
-    [yearNavigator]="true" yearRange="2020:2030" [required]="property.required" [minDate]="dateMin" [maxDate]="dateMax"
+    [yearNavigator]="true" yearRange="2020:2030" [required]="property.required" 
+    [minDate]="dateMin" [maxDate]="dateMax"
     [disabled]="property.disabled" (ngModelChange)="changed.emit($event)">
   </p-calendar>
   <label class="app-input-label" [for]="property.name">{{ property.label}} {{ property.required ? '*' : ''}}</label>
+</span>
+<span class="input-message-error" *ngIf="property.invalid">
+  {{ property.message }}
 </span>

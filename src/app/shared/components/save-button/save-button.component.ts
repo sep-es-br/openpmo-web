@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnDestroy, Output } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { Subject, Subscription } from 'rxjs';
+import { Subject } from 'rxjs';
 import { filter, takeUntil } from 'rxjs/operators';
 
 import { enterLeave } from '../../animations/enterLeave.animation';
@@ -11,7 +11,11 @@ import { ResponsiveService } from '../../services/responsive.service';
   templateUrl: './save-button.component.html',
   styleUrls: ['./save-button.component.scss'],
   animations: [
-    enterLeave({ opacity: 0, pointerEvents: 'none' }, { opacity: 1, pointerEvents: 'all' }, 300)
+    enterLeave(
+      { opacity: 0, pointerEvents: 'none', transform: 'translateY(100%)' },
+      { opacity: 1, pointerEvents: 'all', transform: 'translateY(0)' },
+      300
+    )
   ]
 })
 export class SaveButtonComponent implements OnDestroy {

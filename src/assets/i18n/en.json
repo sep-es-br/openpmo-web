@@ -83,6 +83,8 @@
   "deleteSchedule": "Delete schedule",
   "step": "Step",
   "newMonth": "New Month",
+  "minLenght": "Minimun lenght",
+  "maxLenght": "Maximun lenght",
   "messages": {
     "personNotFound": "Person not found.",
     "scheduleNotValid": "Schedule is incomplet.",
@@ -291,5 +293,6 @@
   "search": "Search",
   "from": "From",
   "to": "To",
-  "workpackModel": "Workpack Model"
+  "workpackModel": "Workpack Model",
+  "officesAndPlans": "Offices and Plans"
 }

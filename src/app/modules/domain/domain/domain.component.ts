@@ -70,8 +70,11 @@ export class DomainComponent implements OnInit, OnDestroy {
       name: ['', [Validators.required, Validators.maxLength(25)]],
       fullName: ['', Validators.required]
     });
+    this.formDomain.statusChanges
+      .pipe(takeUntil(this.$destroy), filter(status => status === 'INVALID'))
+      .subscribe(() => this.saveButton.hideButton());
     this.formDomain.valueChanges
-      .pipe(takeUntil(this.$destroy), filter(() => this.formDomain.dirty))
+      .pipe(takeUntil(this.$destroy), filter(() => this.formDomain.dirty && this.formDomain.valid))
       .subscribe(() => this.saveButton.showButton());
     this.responsiveSvr.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.responsive = value);
   }

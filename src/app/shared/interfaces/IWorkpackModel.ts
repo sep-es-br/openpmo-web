@@ -9,7 +9,6 @@ export interface IWorkpackModel {
   modelName: string;
   modelNameInPlural?: string;
   fontIcon: string;
-  sortBy?: string;
   childWorkpackModelSessionActive?: boolean;
   children?: IWorkpackModel[];
   costSessionActive?: boolean;
@@ -23,4 +22,5 @@ export interface IWorkpackModel {
   stakeholderSessionActive?: boolean;
   scheduleSessionActive?: boolean;
   properties?: IWorkpackModelProperty[];
+  sortBy: IWorkpackModelProperty;
 }

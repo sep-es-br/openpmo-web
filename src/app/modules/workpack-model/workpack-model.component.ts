@@ -131,10 +131,13 @@ export class WorkpackModelComponent implements OnInit {
       name: [ '', Validators.required ],
       nameInPlural: [ '', Validators.required ],
       icon: [ undefined, Validators.required ],
-      sortedBy: 'name'
+      sortedBy: 'Name'
     });
+    this.formProperties.statusChanges
+      .pipe(takeUntil(this.$destroy), filter(status => status === 'INVALID'))
+      .subscribe(() => this.saveButton?.hideButton());
     this.formProperties.valueChanges
-      .pipe(takeUntil(this.$destroy), filter(() => this.formProperties.dirty))
+      .pipe(takeUntil(this.$destroy), filter(() => this.formProperties.dirty && this.formProperties.valid))
       .subscribe(() => this.saveButton?.showButton());
     this.translateSrv.onDefaultLangChange
       .pipe(takeUntil(this.$destroy)).subscribe(({ lang }) => {
@@ -147,7 +150,7 @@ export class WorkpackModelComponent implements OnInit {
   }
 
   get sortedByList(): SelectItem[] {
-    return this.modelProperties.map(p => ({ label: p.label, value: p.name }));
+    return this.modelProperties.filter(p => p.label !== undefined).map(p => ({ label: p.label, value: p.label }));
   }
 
   resetValues() {
@@ -192,7 +195,8 @@ export class WorkpackModelComponent implements OnInit {
         obligatory: true,
         max: 25,
         sortIndex: 0,
-        fullLine: true
+        fullLine: true,
+        required: true
       },
       {
         active: true,
@@ -201,7 +205,8 @@ export class WorkpackModelComponent implements OnInit {
         type: TypePropertyEnum.TextAreaModel,
         sortIndex: 1,
         obligatory: true,
-        fullLine: true
+        fullLine: true,
+        required: true
       }
     ];
     switch (this.workpackModelType) {
@@ -363,7 +368,8 @@ export class WorkpackModelComponent implements OnInit {
         max: 25,
         sortIndex: 0,
         session: PropertySessionEnum.COST,
-        fullLine: true
+        fullLine: true,
+        required: true
       },
       {
         active: true,
@@ -373,7 +379,8 @@ export class WorkpackModelComponent implements OnInit {
         sortIndex: 1,
         obligatory: true,
         session: PropertySessionEnum.COST,
-        fullLine: true
+        fullLine: true,
+        required: true
       },
       {
         active: true,
@@ -433,7 +440,7 @@ export class WorkpackModelComponent implements OnInit {
         name: data.modelName,
         nameInPlural: data.modelNameInPlural || '',
         icon: data.fontIcon || '',
-        sortedBy: data.sortBy || 'name'
+        sortedBy: data.sortBy?.label || 'Name'
       });
       this.posibleRolesOrg = data.organizationRoles || [];
       this.posibleRolesPerson = data.personRoles || [];
@@ -515,6 +522,7 @@ export class WorkpackModelComponent implements OnInit {
     property.session = property.session || PropertySessionEnum.PROPERTIES;
     property.requiredFields = requiredFields;
     property.viewOnly = !this.editPermission;
+    property.obligatory = ['name', 'fullName'].includes(property.name);
   }
 
   deleteProperty(property: IWorkpackModelProperty) {
@@ -857,6 +865,7 @@ export class WorkpackModelComponent implements OnInit {
       idPlanModel: this.idStrategy,
       modelName,
       modelNameInPlural,
+      // sortBy: this.modelProperties.find(p => p.id === sortBy),
       sortBy,
       organizationRoles: this.posibleRolesOrg,
       personRoles: this.posibleRolesPerson,

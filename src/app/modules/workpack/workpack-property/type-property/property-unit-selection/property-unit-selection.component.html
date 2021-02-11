@@ -13,3 +13,6 @@
   </p-dropdown>
   <label class="app-input-label" [for]="property.name">{{property.label}} {{ property.required ? '*' : ''}}</label>
 </span>
+<span class="input-message-error" *ngIf="property.invalid">
+  {{ property.message }}
+</span>

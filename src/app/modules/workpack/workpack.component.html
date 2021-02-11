@@ -17,7 +17,6 @@
           <app-workpack-property [property]="property" (changed)="saveButton.showButton()"></app-workpack-property>
         </div>
       </div>
-      <app-save-button #saveButton (save)="saveWorkpack()"></app-save-button>
     </app-card>
   </div>
 
@@ -118,4 +117,7 @@
       </div>
     </app-card>
   </div>
+
+  <app-save-button #saveButton (save)="saveWorkpack()"></app-save-button>
+
 </div>

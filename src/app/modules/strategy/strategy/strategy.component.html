@@ -23,7 +23,6 @@
               <label for="float-input" class="app-input-label">{{'fullName' | translate}}<span class="required-indicator">*</span></label>
             </span>
             <app-input-message [form]="formStrategy" field="fullName"></app-input-message>
-            <app-save-button (save)="handleOnSubmit()"></app-save-button>
           </form>
         </div>
       </app-card>
@@ -41,6 +40,7 @@
         </app-card>
       </div>
     </section>
+    <app-save-button (save)="handleOnSubmit()"></app-save-button>
   </div>
 
 
