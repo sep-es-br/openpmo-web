@@ -53,6 +53,7 @@ export class StrategyListComponent implements OnInit {
       this.breadcrumbSrv.pushMenu({
         key: 'strategies',
         info: this.propertiesOffice?.name,
+        tooltip: this.propertiesOffice?.fullName,
         routerLink: [ '/strategies' ],
         queryParams: { idOffice: this.idOffice }
       });
@@ -89,7 +90,7 @@ export class StrategyListComponent implements OnInit {
       itemsProperties.unshift(... data.map(strategy => ({
         typeCardItem: 'listItem',
         iconSvg: true,
-        icon: IconsEnum.MapMarked,
+        icon: IconsEnum.ChessKnight,
         nameCardItem: strategy.name,
         fullNameCardItem: strategy.fullName,
         itemId: strategy.id,

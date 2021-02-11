@@ -177,7 +177,7 @@ export class StepComponent implements OnInit, OnDestroy {
         const propertyName = costAccount.properties.find(p => p.idPropertyModel === propertyModelName.id);
         return {
           type: 'cost-card',
-          unitMeasureName: 'R$',
+          unitMeasureName: '$',
           idCost: consume.idCostAccount,
           idCostAssignment: consume.id,
           costAccountName: propertyName.value as string,
@@ -238,7 +238,7 @@ export class StepComponent implements OnInit, OnDestroy {
       this.costAssignmentsCardItems = costAssignmentsCardItemsList;
       this.costAssignmentsCardItems.push({
         type: 'cost-card',
-        unitMeasureName: 'R$',
+        unitMeasureName: '$',
         idCost,
         costAccountName: costName,
         plannedWork: null,
@@ -258,7 +258,7 @@ export class StepComponent implements OnInit, OnDestroy {
     this.costAssignmentsCardItems = [
       {
         type: 'cost-card',
-        unitMeasureName: 'R$',
+        unitMeasureName: '$',
         idCost,
         costAccountName: costName,
         plannedWork: null,

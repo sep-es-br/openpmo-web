@@ -66,7 +66,7 @@
   "contactEmail": "Email de contato",
   "model": "Modelo",
   "models": "Modelos",
-  "strategy": "Stratégia",
+  "strategy": "Estratégia",
   "program": "Programa",
   "organizer": "Organizador",
   "deliverable": "Entrega",
@@ -175,7 +175,7 @@
   "maximum": "Máximo",
   "rows": "Linhas",
   "possibleValues": "Possíveis valores",
-  "currency": "R$",
+  "currency": "$",
   "labels": {
     "labels": "Legendas",
     "IntegerModel": "Inteiro",
@@ -290,5 +290,6 @@
   "person": "Pessoa",
   "search": "Procurar",
   "from": "De",
-  "to": "Até"
+  "to": "Até",
+  "workpackModel": "Modelo de Pacote de Trabalho"
 }

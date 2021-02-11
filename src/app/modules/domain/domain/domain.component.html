@@ -2,7 +2,7 @@
   <div class="app-domain-header" [class.app-domain-header-mobile]="responsive">
     <span class="app-domain-header-text" *ngIf="!propertiesDomain">{{'new' | translate}} {{'domain' |
       translate}}:</span>
-    <span class="app-domain-header-text" *ngIf="propertiesDomain">{{propertiesDomain.fullName}}</span>
+    <span class="app-domain-header-text" *ngIf="propertiesDomain">{{propertiesDomain.name}}</span>
   </div>
   <div class="card-properties" *ngIf="cardProperties">
     <app-card [properties]="cardProperties">

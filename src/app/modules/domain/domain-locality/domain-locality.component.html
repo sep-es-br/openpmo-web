@@ -1,7 +1,7 @@
 <div class="app-locality">
     <div class="app-locality-header" [class.app-locality-header-mobile]="responsive">
       <span class="app-locality-header-text" *ngIf="!propertiesLocality">{{'new' | translate}} {{'locality' | translate}}:</span>
-      <span class="app-locality-header-text" *ngIf="propertiesLocality">{{propertiesLocality.fullName}}</span>
+      <span class="app-locality-header-text" *ngIf="propertiesLocality">{{propertiesLocality.name}}</span>
     </div>
     <div class="card-properties" *ngIf="cardProperties">
       <app-card [properties]="cardProperties" *ngIf="cardProperties">

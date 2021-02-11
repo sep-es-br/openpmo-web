@@ -1,7 +1,7 @@
 <div class="app-plan">
   <div class="app-plan-header" [class.app-plan-header-mobile]="responsive">
     <span class="app-plan-header-label" *ngIf="!planData?.id">{{'newPlan' | translate}}</span>
-    <span class="app-plan-header-text" *ngIf="planData">{{planData.fullName}}</span>
+    <span class="app-plan-header-text" *ngIf="planData">{{planData.name}}</span>
   </div>
 
   <div class="card-properties-plan">

@@ -113,7 +113,7 @@ export class WorkpackModelComponent implements OnInit {
       await this.loadDetails();
       this.loadCardItemsModels();
       this.breadcrumbSrv.pushMenu({
-        key: 'model',
+        key: 'workpackModel',
         info: this.idWorkpackModel
           ? this.formProperties.controls.name.value
           : `${this.translateSrv.instant('new')} ${this.translateSrv.instant('labels.' + this.workpackModelType)}`,
@@ -862,46 +862,21 @@ export class WorkpackModelComponent implements OnInit {
       personRoles: this.posibleRolesPerson,
       properties: propertiesClone
     };
-    if (this.idWorkpackModel) {
-      const { success } = await this.workpackModelSrv.put({
-        ... { id: this.idWorkpackModel },
-        ... form,
-        ... this.idParentWorkpack ? { idParent: this.idParentWorkpack } : {}
-      });
-      if (success) {
-        this.refreshPropertiesLists();
-        this.messageSrv.add({
-          severity: 'success',
-          summary: this.translateSrv.instant('success'),
-          detail: this.translateSrv.instant('messages.savedSuccessfully')
+    const isPut = !!this.idWorkpackModel;
+    const { success, data } = isPut
+      ? await this.workpackModelSrv.put({
+          ... { id: this.idWorkpackModel },
+          ... form,
+          ... this.idParentWorkpack ? { idParent: this.idParentWorkpack } : {}
+        })
+      : await this.workpackModelSrv.post({
+          ... form,
+          ... this.idParentWorkpack ? { idParent: this.idParentWorkpack } : {}
         });
-      }
-    } else {
-      const { success, data } = await this.workpackModelSrv.post({
-        ... form,
-        ... this.idParentWorkpack ? { idParent: this.idParentWorkpack } : {}
-      });
-      if (success) {
-        // Update Query URL
+    if (success) {
+      if (!isPut) {
         this.idWorkpackModel = data.id;
         this.loadCardItemsModels();
-        this.refreshPropertiesLists();
-        this.messageSrv.add({
-          severity: 'success',
-          summary: this.translateSrv.instant('success'),
-          detail: this.translateSrv.instant('messages.savedSuccessfully')
-        });
-        this.breadcrumbSrv.updateLastCrumb({
-          key: 'model',
-          info: this.formProperties.controls.name.value,
-          routerLink: [ '/workpack-model' ],
-          queryParams: {
-            idStrategy: this.idStrategy,
-            id: this.idWorkpackModel,
-            type: this.workpackModelType,
-            idOffice: this.idOffice
-          }
-        });
         this.router.navigate([], {
           queryParams: {
             type: this.workpackModelType,
@@ -911,7 +886,24 @@ export class WorkpackModelComponent implements OnInit {
             ... this.idParentWorkpack ? { idParent: this.idParentWorkpack} : {}
           }
         });
-      };
+      }
+      this.refreshPropertiesLists();
+      this.breadcrumbSrv.updateLastCrumb({
+        key: 'model',
+        info: this.formProperties.controls.name.value,
+        routerLink: [ '/workpack-model' ],
+        queryParams: {
+          idStrategy: this.idStrategy,
+          id: this.idWorkpackModel,
+          type: this.workpackModelType,
+          idOffice: this.idOffice
+        }
+      });
+      this.messageSrv.add({
+        severity: 'success',
+        summary: this.translateSrv.instant('success'),
+        detail: this.translateSrv.instant('messages.savedSuccessfully')
+      });
     }
   }
 

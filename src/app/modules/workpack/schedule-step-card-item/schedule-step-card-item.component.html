@@ -37,16 +37,16 @@
       </div>
       <div class="costValues">
         <div class="costInputs p-fluid">
-          <span class="column-title"> R$ </span>
+          <span class="column-title"> $ </span>
           <span class="p-float-label p-field">
             <p-inputNumber class="app-input-number" id="float-costPlanned" disabled="true"
-              [(ngModel)]="properties.costPlanned">
+              [(ngModel)]="properties.costPlanned" [minFractionDigits]="2" [maxFractionDigits]="2">
             </p-inputNumber>
             <label class="app-input-label" for="float-costPlanned">{{ "planned" |translate }}</label>
           </span>
           <span class="p-float-label p-field">
             <p-inputNumber class="app-input-number" id="float-costActual" disabled="true"
-              [(ngModel)]="properties.costActual">
+              [(ngModel)]="properties.costActual" [minFractionDigits]="2" [maxFractionDigits]="2">
             </p-inputNumber>
             <label class="app-input-label" for="float-costActual">{{ "actual" |translate }}</label>
           </span>
@@ -91,7 +91,7 @@
             [color]="properties.costProgressBar.color">
           </app-progress-bar>
         </div>
-        <span class="progress-bar-unit"> R$ </span>
+        <span class="progress-bar-unit"> $ </span>
       </div>
     </div>
   </p-card>

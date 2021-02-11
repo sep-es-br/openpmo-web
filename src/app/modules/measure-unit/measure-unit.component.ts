@@ -73,6 +73,7 @@ export class MeasureUnitComponent implements OnInit {
     this.breadcrumbSrv.pushMenu({
       key: 'measureUnits',
       info: this.propertiesOffice?.name,
+      tooltip: this.propertiesOffice?.fullName,
       routerLink: ['/measure-units'],
       queryParams: { idOffice: this.idOffice }
     });

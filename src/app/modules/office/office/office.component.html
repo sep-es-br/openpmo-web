@@ -2,7 +2,7 @@
     <div class="app-office-header" [class.app-office-header-mobile]="responsive">
       <span class="app-office-header-text" *ngIf="!propertiesOffice">{{'new' | translate}} {{'office' |
         translate}}:</span>
-      <span class="app-office-header-text" *ngIf="propertiesOffice">{{propertiesOffice.fullName}}</span>
+      <span class="app-office-header-text" *ngIf="propertiesOffice">{{propertiesOffice.name}}</span>
     </div>
     <div class="card-properties" *ngIf="cardProperties">
       <app-card [properties]="cardProperties">

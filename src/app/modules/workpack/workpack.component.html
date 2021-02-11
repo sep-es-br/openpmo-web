@@ -38,14 +38,14 @@
   <div class="card-schedule" *ngIf="sectionSchedule">
     <app-card [properties]="sectionSchedule.cardSection">
       <button type="button" class="p-button-text button-new-schedule" *ngIf="!schedule" (click)="handleNewSchedule()"
-        pButton icon="pi pi-plus" iconPos="left" [label]="translateSrv.instant('newSchedule')">
+        pButton icon="pi pi-plus" iconPos="left" [label]="translateSrv.instant('newSchedule')" [disabled]="!editPermission">
       </button>
       <div class="schedule-buttons" *ngIf="schedule" [class.schedule-buttons-mobile]="responsive">
         <button type="button" class="p-button-text button-details" (click)="handleShowDetails()" pButton
           [icon]=" showDetails ? 'far fa-eye-stash' : 'far fa-eye'" iconPos="left"
           [label]="showDetails ? translateSrv.instant('hideDetails') : translateSrv.instant('showDetails')">
         </button>
-        <button type="button" class="p-button-text button-delete" (click)="handleDeleteSchedule()" pButton
+        <button type="button" class="p-button-text button-delete" (click)="handleDeleteSchedule()" pButton [disabled]="!editPermission"
           icon="fas fa-trash-alt" iconPos="left" [label]="translateSrv.instant('deleteSchedule')">
         </button>
       </div>
@@ -53,7 +53,7 @@
         <div class="schedule-steps-container" *ngFor="let groupStep of sectionSchedule.groupStep" [class.schedule-steps-container-mobile]="responsive">
             <div class="new-start-step-container">
               <app-schedule-step-card-item [properties]="sectionSchedule.startScheduleStep" type="newStart"
-                *ngIf="sectionSchedule.startScheduleStep && groupStep.start"></app-schedule-step-card-item>
+                *ngIf="sectionSchedule.startScheduleStep && groupStep.start && editPermission"></app-schedule-step-card-item>
             </div>
             <div class="data-view-steps-container">
               <span class="group-step-year">{{groupStep.year}}</span>
@@ -77,7 +77,7 @@
             <div class="new-end-step-container">
               <app-schedule-step-card-item [properties]="sectionSchedule.endScheduleStep" type="newEnd"
                 [class.new-end-card-mobile]="responsive"
-                *ngIf="sectionSchedule.endScheduleStep && groupStep.end"></app-schedule-step-card-item>
+                *ngIf="sectionSchedule.endScheduleStep && groupStep.end && editPermission"></app-schedule-step-card-item>
             </div>
         </div>
       </div>

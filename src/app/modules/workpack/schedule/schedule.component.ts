@@ -176,7 +176,7 @@ export class ScheduleComponent implements OnInit, OnDestroy {
       this.costAssignmentsCardItems = costAssignmentsCardItemsList;
       this.costAssignmentsCardItems.push({
         type: 'cost-card',
-        unitMeasureName: 'R$',
+        unitMeasureName: '$',
         idCost,
         costAccountName: costName,
         plannedWork: null,
@@ -196,7 +196,7 @@ export class ScheduleComponent implements OnInit, OnDestroy {
     this.costAssignmentsCardItems = [
       {
         type: 'cost-card',
-        unitMeasureName: 'R$',
+        unitMeasureName: '$',
         idCost,
         costAccountName: costName,
         plannedWork: null,

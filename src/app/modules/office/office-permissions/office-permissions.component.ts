@@ -57,6 +57,7 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
       this.responsive = value;
     });
     this.breadcrumbSrv.setMenu([
+      // CHECK
       { key: 'offices', routerLink: ['/offices'] },
       { key: 'officePermissions', routerLink: ['/offices', 'permission'], queryParams: { idOffice: this.idOffice }},
       { key: 'permissions', routerLink: ['/offices', 'permission', 'detail'],

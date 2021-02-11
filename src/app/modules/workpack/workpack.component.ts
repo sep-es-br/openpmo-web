@@ -1,7 +1,7 @@
 import { Component, OnDestroy, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import { MessageService, TreeNode } from 'primeng/api';
+import { MenuItem, MessageService, TreeNode } from 'primeng/api';
 
 import { ICard } from 'src/app/shared/interfaces/ICard';
 import { ResponsiveService } from 'src/app/shared/services/responsive.service';
@@ -77,6 +77,7 @@ export class WorkpackComponent implements OnDestroy {
   cardWorkpackProperties: ICard;
   workpack: IWorkpack;
   workpackName: string;
+  workpackFullName: string;
   sectionPropertiesProperties: PropertyTemplateModel[];
   workpackProperties: IWorkpackProperty[];
   sectionStakeholder: ISection;
@@ -127,6 +128,7 @@ export class WorkpackComponent implements OnDestroy {
       this.breadcrumbSrv.pushMenu({
         key: this.workpackModel.modelName,
         info: this.workpackName,
+        tooltip: this.workpackFullName,
         routerLink: [ '/workpack' ],
         queryParams: {
           id: this.idWorkpack
@@ -149,6 +151,7 @@ export class WorkpackComponent implements OnDestroy {
     this.cardWorkpackProperties = undefined;
     this.workpack = undefined;
     this.workpackName = undefined;
+    this.workpackFullName = undefined;
     this.sectionPropertiesProperties = [];
     this.workpackProperties = [];
     this.sectionStakeholder = undefined;
@@ -173,7 +176,6 @@ export class WorkpackComponent implements OnDestroy {
     } else {
       await this.loadWorkpackModel(this.idWorkpackModel);
     }
-
     const workpackModelActivesProperties = this.workpackModel.properties.filter(w => w.active && w.session === 'PROPERTIES');
     this.sectionPropertiesProperties = await Promise.all(workpackModelActivesProperties.map(p => this.instanceProperty(p)));
     if (this.idWorkpack) { await this.loadSectionsWorkpackModel(); }
@@ -196,6 +198,9 @@ export class WorkpackComponent implements OnDestroy {
       const propertyNameWorkpackModel = this.workpack.model.properties.find(p => p.name === 'name' && p.session === 'PROPERTIES');
       const propertyNameWorkpack = this.workpack.properties.find(p => p.idPropertyModel === propertyNameWorkpackModel.id);
       this.workpackName = propertyNameWorkpack.value as string;
+      const propertyFullNameWorkpackModel = this.workpack.model.properties.find(p => p.name === 'fullName' && p.session === 'PROPERTIES');
+      const propertyFullNameWorkpack = this.workpack.properties.find(p => p.idPropertyModel === propertyFullNameWorkpackModel.id);
+      this.workpackFullName = propertyFullNameWorkpack.value as string;
       this.idPlan = this.workpack.plan.id;
       if (!this.isUserAdmin && this.workpack) {
         await this.loadUserPermission();
@@ -208,6 +213,8 @@ export class WorkpackComponent implements OnDestroy {
     const editPermission = !!this.workpack.permissions?.find( p => p.level === 'EDIT');
     if (!editPermission) {
       this.editPermission = await this.planPermissionSrv.getPermissions(this.idPlan);
+    } else {
+      this.editPermission = editPermission;
     }
   }
 
@@ -484,8 +491,9 @@ export class WorkpackComponent implements OnDestroy {
           menuItems: [{
             label: this.translateSrv.instant('delete'),
             icon: 'fas fa-trash-alt',
-            command: (event) => this.deleteWorkpackChildren(workpack)
-          }],
+            command: (event) => this.deleteWorkpackChildren(workpack),
+            disabled: !this.editPermission
+          }] as MenuItem[],
           urlCard: '/workpack',
         };
       });
@@ -709,32 +717,35 @@ export class WorkpackComponent implements OnDestroy {
           menuItems: [{
             label: this.translateSrv.instant('delete'),
             icon: 'fas fa-trash-alt',
-            command: (event) => this.deleteCostAccount(cost)
-          }],
+            command: (event) => this.deleteCostAccount(cost),
+            disabled: !this.editPermission
+          }] as MenuItem[],
           urlCard: '/workpack/cost-account',
           paramsUrlCard: null,
           iconMenuItems: null
         };
       });
-      cardItems.push({
-        typeCardItem: 'newCardItem',
-        icon: IconsEnum.Plus,
-        iconSvg: true,
-        nameCardItem: null,
-        fullNameCardItem: null,
-        subtitleCardItem: null,
-        costAccountsValue: null,
-        itemId: null,
-        menuItems: [],
-        urlCard: '/workpack/cost-account',
-        paramsUrlCard: [
-          { name: 'idWorkpack', value: this.idWorkpack },
-        ],
-        iconMenuItems: null
-      });
+      if (this.editPermission) {
+        cardItems.push({
+          typeCardItem: 'newCardItem',
+          icon: IconsEnum.Plus,
+          iconSvg: true,
+          nameCardItem: null,
+          fullNameCardItem: null,
+          subtitleCardItem: null,
+          costAccountsValue: null,
+          itemId: null,
+          menuItems: [],
+          urlCard: '/workpack/cost-account',
+          paramsUrlCard: [
+            { name: 'idWorkpack', value: this.idWorkpack },
+          ],
+          iconMenuItems: null
+        });
+      }
       return cardItems;
     }
-    const cardItemsNew =  [{
+    const cardItemsNew =  this.editPermission ? [{
       typeCardItem: 'newCardItem',
       icon: IconsEnum.Plus,
       iconSvg: true,
@@ -748,14 +759,13 @@ export class WorkpackComponent implements OnDestroy {
         { name: 'idWorkpack', value: this.idWorkpack },
       ],
       iconMenuItems: null
-    }];
+    }] : [];
     return cardItemsNew;
   }
 
   async deleteCostAccount(cost: ICostAccount) {
     const result = await this.costAccountSrv.delete(cost);
     if (result.success) {
-      // Check
       return;
     }
   }
@@ -968,49 +978,52 @@ export class WorkpackComponent implements OnDestroy {
 
   async saveWorkpack() {
     this.workpackProperties = this.sectionPropertiesProperties.map(p => p.getValues());
-    if (this.idWorkpack) {
-      const workpack = {
-        id: this.idWorkpack,
-        idParent: this.workpack.idParent,
-        idPlan: this.workpack.plan.id,
-        idWorkpackModel: this.workpack.model.id,
-        type: this.workpack.type,
-        properties: this.workpackProperties,
-      };
-      const { success } = await this.workpackSrv.put(workpack);
-      if (success) {
-        this.messageSrv.add({
-          severity: 'success',
-          summary: this.translateSrv.instant('success'),
-          detail: this.translateSrv.instant('messages.savedSuccessfully')
-        });
-      }
-    } else {
-      const workpack = {
-        idPlan: this.idPlan,
-        idWorkpackModel: this.idWorkpackModel,
-        idParent: this.idWorkpackParent,
-        type: TypeWorkpackEnum[this.workpackModel.type],
-        properties: this.workpackProperties,
-      };
-      const result = await this.workpackSrv.post(workpack);
-      if (result.success) {
-        this.idWorkpack = result.data.id;
+    const isPut = !!this.idWorkpack;
+    const workpack = isPut
+      ? {
+          id: this.idWorkpack,
+          idParent: this.workpack.idParent,
+          idPlan: this.workpack.plan.id,
+          idWorkpackModel: this.workpack.model.id,
+          type: this.workpack.type,
+          properties: this.workpackProperties,
+        }
+      : {
+          idPlan: this.idPlan,
+          idWorkpackModel: this.idWorkpackModel,
+          idParent: this.idWorkpackParent,
+          type: TypeWorkpackEnum[this.workpackModel.type],
+          properties: this.workpackProperties,
+        };
+    const { success, data } = isPut
+      ? await this.workpackSrv.put(workpack)
+      : await this.workpackSrv.post(workpack);
+
+    if (success) {
+      if (!isPut) {
+        this.idWorkpack = data.id;
         await this.loadProperties();
-        this.messageSrv.add({
-          severity: 'success',
-          summary: this.translateSrv.instant('success'),
-          detail: this.translateSrv.instant('messages.savedSuccessfully')
-        });
-        this.breadcrumbSrv.updateLastCrumb({
-          key: this.workpackModel.modelName,
-          info: this.workpackName,
-          routerLink: [ '/workpack' ],
-          queryParams: {
-            id: this.idWorkpack
-          }
-        });
       }
+      const propertyNameWorkpackModel = this.workpack.model.properties.find(p => p.name === 'name' && p.session === 'PROPERTIES');
+      const propertyNameWorkpack = this.workpackProperties.find(p => p.idPropertyModel === propertyNameWorkpackModel.id);
+      this.workpackName = propertyNameWorkpack.value as string;
+      const propertyFullNameWorkpackModel = this.workpack.model.properties.find(p => p.name === 'fullName' && p.session === 'PROPERTIES');
+      const propertyFullNameWorkpack = this.workpackProperties.find(p => p.idPropertyModel === propertyFullNameWorkpackModel.id);
+      this.workpackFullName = propertyFullNameWorkpack.value as string;
+      this.breadcrumbSrv.updateLastCrumb({
+        key: this.workpackModel.modelName,
+        info: this.workpackName,
+        tooltip: this.workpackFullName,
+        routerLink: [ '/workpack' ],
+        queryParams: {
+          id: this.idWorkpack
+        }
+      });
+      this.messageSrv.add({
+        severity: 'success',
+        summary: this.translateSrv.instant('success'),
+        detail: this.translateSrv.instant('messages.savedSuccessfully')
+      });
     }
   }
 }

@@ -6,7 +6,7 @@ describe('CostAssignmentCardItemComponent', () => {
   let component: CostAssignmentCardItemComponent;
   let fixture: ComponentFixture<CostAssignmentCardItemComponent>;
 
-  beforeEach(async () => {
+  beforeEach(async() => {
     await TestBed.configureTestingModule({
       declarations: [ CostAssignmentCardItemComponent ]
     })

@@ -70,7 +70,8 @@ export class PlanPermissionsComponent implements OnInit, OnDestroy {
       key: 'permission',
       routerLink: [ '/plan', 'permission', 'detail' ],
       queryParams: { idPlan: this.idPlan, email: this.personEmail },
-      info: this.person?.name
+      info: this.person?.name,
+      tooltip: this.person?.fullName
     });
   }
 

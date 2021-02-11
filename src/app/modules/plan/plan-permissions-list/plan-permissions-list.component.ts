@@ -52,7 +52,8 @@ export class PlanPermissionsListComponent implements OnInit {
       key: 'planPermissions',
       routerLink: [ '/plan', 'permission' ],
       queryParams: { idPlan: this.idPlan },
-      info: this.propertiesPlan?.name
+      info: this.propertiesPlan?.name,
+      tooltip: this.propertiesPlan?.fullName
     });
   }
 

@@ -89,7 +89,8 @@ export class PlanComponent implements OnInit, OnDestroy {
       key: 'plan',
       routerLink: ['/plan'],
       queryParams: { id: this.idPlan },
-      info: this.planData?.name
+      info: this.planData?.name,
+      tooltip: this.planData?.fullName
     });
   }
 
@@ -131,24 +132,16 @@ export class PlanComponent implements OnInit, OnDestroy {
       start: this.formPlan.controls.start.value,
       finish: this.formPlan.controls.finish.value,
     };
-    if (this.planData.id) {
-      const result = await this.planSrv.put({
-        id: this.planData.id,
-        name: this.planData.name,
-        fullName: this.planData.fullName,
-        start: this.planData.start,
-        finish: this.planData.finish
-      });
-      if (result.success) {
-        this.messageSrv.add({
-          severity: 'success',
-          summary: this.translateSrv.instant('success'),
-          detail: this.translateSrv.instant('messages.savedSuccessfully')
-        });
-        return;
-      }
-    } else {
-      const result = await this.planSrv.post({
+    const isPut = !!this.planData.id;
+    const { success, data } = isPut
+      ? await this.planSrv.put({
+          id: this.planData.id,
+          name: this.planData.name,
+          fullName: this.planData.fullName,
+          start: this.planData.start,
+          finish: this.planData.finish
+        })
+      : await this.planSrv.post({
         idOffice: this.planData.idOffice,
         idPlanModel: this.planData.idPlanModel,
         name: this.planData.name,
@@ -156,27 +149,29 @@ export class PlanComponent implements OnInit, OnDestroy {
         start: this.planData.start,
         finish: this.planData.finish
       });
-      if (result.success) {
-        this.idPlan = result.data.id;
+    if (success) {
+      if (!isPut) {
+        this.idPlan = data.id;
         const isUserAdmin = await this.authSrv.isUserAdmin();
         if (!isUserAdmin) {
-          await this.createPlanPermission(result.data.id);
+          await this.createPlanPermission(data.id);
         }
         await this.loadPropertiesPlan();
-        this.messageSrv.add({
-          severity: 'success',
-          summary: this.translateSrv.instant('success'),
-          detail: this.translateSrv.instant('messages.savedSuccessfully')
-        });
-        this.breadcrumbSrv.updateLastCrumb({
-          key: 'plan',
-          routerLink: ['/plan'],
-          queryParams: { id: this.idPlan },
-          info: this.planData.name
-        });
-        return;
-      };
-    }
+      }
+      this.messageSrv.add({
+        severity: 'success',
+        summary: this.translateSrv.instant('success'),
+        detail: this.translateSrv.instant('messages.savedSuccessfully')
+      });
+      this.breadcrumbSrv.updateLastCrumb({
+        key: 'plan',
+        routerLink: ['/plan'],
+        queryParams: { id: this.idPlan },
+        info: this.planData.name,
+        tooltip: this.planData?.fullName
+      });
+      return;
+    };
   }
 
   async createPlanPermission(idPlan: number) {

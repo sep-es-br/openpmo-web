@@ -50,8 +50,7 @@
         [ngStyle]="{ fontSize: '2.5rem' }"></i>
       <span class="card-item-name">{{properties.nameCardItem}}</span>
       <span class="card-item-funder" *ngIf="properties.subtitleCardItem">{{properties.subtitleCardItem}}</span>
-      <span class="card-item-costValue" *ngIf="properties.costAccountsValue">{{properties.costAccountsValue |
-        currency:'BRL':'symbol':'0.2-2':'pt' }}</span>
+      <span class="card-item-costValue" *ngIf="properties.costAccountsValue">{{properties.costAccountsValue |number}}</span>
     </div>
     <div class="card-item-footer" *ngIf="cardIdItem">
       <span class="card-item-id">

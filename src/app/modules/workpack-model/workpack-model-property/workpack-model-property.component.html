@@ -78,7 +78,7 @@
         </span>
         <span *ngSwitchCase="'CurrencyModel'" class="p-float-label property-input p-field input-number-scroll">
           <p-inputNumber class="app-input-number" [(ngModel)]="property.defaultValue" [disabled]="property.viewOnly"
-            [required]="true" mode="currency" currency="BRL" [min]="property.min" [max]="property.max"
+            [required]="true" mode="decimal"  [min]="property.min" [max]="property.max" [minFractionDigits]="2" [maxFractionDigits]="2"
             (ngModelChange)="changed.emit($event)" [showButtons]="true">
           </p-inputNumber>
           <label class="app-input-label">{{ 'defaultValue' | translate }}</label>

@@ -87,7 +87,8 @@ export class OfficeComponent implements OnDestroy {
       key: 'office',
       routerLink: [ '/offices', 'office' ],
       queryParams: { id: this.idOffice },
-      info: this.propertiesOffice?.name
+      info: this.propertiesOffice?.name,
+      tooltip: this.propertiesOffice?.fullName
     });
     if (this.idOffice) {
       this.loadPlans();
@@ -221,35 +222,29 @@ export class OfficeComponent implements OnDestroy {
   }
 
   async handleOnSubmit() {
-    if (this.propertiesOffice) {
-      const { success } = await this.officeSrv.put({ ...this.formOffice.value, id: this.idOffice });
-      if (success) {
-        await this.loadPropertiesOffice();
-        this.messageSrv.add({
-          severity: 'success',
-          summary: this.translateSrv.instant('success'),
-          detail: this.translateSrv.instant('messages.savedSuccessfully')
-        });
+    const isPut = !!this.propertiesOffice;
+    const { success, data } = isPut
+      ? await this.officeSrv.put({ ...this.formOffice.value, id: this.idOffice })
+      : await this.officeSrv.post(this.formOffice.value);
+    if (success) {
+      this.idOffice = data.id;
+      if (!this.isUserAdmin && !isPut) {
+        await this.createOfficePermission(data.id);
       }
-    } else {
-      const { data, success } = await this.officeSrv.post(this.formOffice.value);
-      if (success) {
-        this.idOffice = data.id;
-        if (!this.isUserAdmin) {
-          await this.createOfficePermission(data.id);
-        }
-        await this.loadPropertiesOffice();
-        this.messageSrv.add({
-          severity: 'success',
-          summary: this.translateSrv.instant('success'),
-          detail: this.translateSrv.instant('messages.savedSuccessfully')
-        });
-        this.breadcrumbSrv.updateLastCrumb({
-          key: 'office',
-          routerLink: [ '/offices', 'office' ],
-          queryParams: { id: this.idOffice },
-          info: this.propertiesOffice?.name
-        });
+      await this.loadPropertiesOffice();
+      this.breadcrumbSrv.updateLastCrumb({
+        key: 'office',
+        routerLink: [ '/offices', 'office' ],
+        queryParams: { id: this.idOffice },
+        info: this.propertiesOffice?.name,
+        tooltip: this.propertiesOffice?.fullName
+      });
+      this.messageSrv.add({
+        severity: 'success',
+        summary: this.translateSrv.instant('success'),
+        detail: this.translateSrv.instant('messages.savedSuccessfully')
+      });
+      if (!isPut) {
         this.loadPlans();
       }
     }

@@ -83,6 +83,7 @@ export class StrategyComponent implements OnDestroy {
       this.breadcrumbSrv.pushMenu({
         key: 'strategy',
         info: this.propertiesStrategy?.name,
+        tooltip: this.propertiesStrategy?.fullName,
         routerLink: [ '/strategies', 'strategy' ],
         queryParams: { id: this.idStrategy, idOffice: this.idOffice }
       });
@@ -213,42 +214,34 @@ export class StrategyComponent implements OnDestroy {
   }
 
   async handleOnSubmit() {
-    if (this.propertiesStrategy) {
-      const { success } = await this.planModelSvr.put({
-        ...this.formStrategy.value,
-        id: this.idStrategy,
-        idOffice: this.propertiesStrategy.idOffice
-      });
+    const isPut = !!this.propertiesStrategy;
+    const { success, data } = isPut
+      ? await this.planModelSvr.put({ ...this.formStrategy.value, id: this.idStrategy, idOffice: this.propertiesStrategy.idOffice })
+      : await this.planModelSvr.post({...this.formStrategy.value, idOffice: this.idOffice});
 
-      if (success) {
-        await this.loadPropertiesStrategy();
-        this.messageSrv.add({
-          severity: 'success',
-          summary: this.translateSrv.instant('success'),
-          detail: this.translateSrv.instant('messages.savedSuccessfully')
-        });
-      }
-    } else {
-      const { data , success} = await this.planModelSvr.post({...this.formStrategy.value, idOffice: this.idOffice});
-      if (success) {
-        this.idStrategy = data.id;
-        this.breadcrumbSrv.updateLastCrumb({
-          key: 'strategy',
-          routerLink: ['/strategies', 'strategy' ],
-          queryParams: { id: this.idStrategy, idOffice: this.idOffice },
-          info: this.propertiesStrategy?.name
-        });
-        this.messageSrv.add({
-          severity: 'success',
-          summary: this.translateSrv.instant('success'),
-          detail: this.translateSrv.instant('messages.savedSuccessfully')
-        });
+    if (success) {
+      this.idStrategy = data.id;
+      this.breadcrumbSrv.updateLastCrumb({
+        key: 'strategy',
+        routerLink: ['/strategies', 'strategy' ],
+        queryParams: { id: this.idStrategy, idOffice: this.idOffice },
+        info: this.propertiesStrategy?.name,
+        tooltip: this.propertiesStrategy?.fullName,
+      });
+      this.messageSrv.add({
+        severity: 'success',
+        summary: this.translateSrv.instant('success'),
+        detail: this.translateSrv.instant('messages.savedSuccessfully')
+      });
+      if (!isPut) {
         this.router.navigate([], {
           queryParams: {
             id: this.idStrategy,
             idOffice: this.idOffice
           }
         });
+      } else {
+        await this.loadPropertiesStrategy();
       }
     }
   }

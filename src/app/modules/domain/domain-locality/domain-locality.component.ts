@@ -70,6 +70,7 @@ export class DomainLocalityComponent implements OnInit, OnDestroy {
       this.breadcrumbSrv.pushMenu({
         key: 'locality',
         info: this.propertiesLocality?.name,
+        tooltip: this.propertiesLocality?.fullName,
         routerLink: [ '/domains', 'locality' ],
         queryParams: { id, idOffice, idDomain, type, idParent }
       });
@@ -181,6 +182,7 @@ export class DomainLocalityComponent implements OnInit, OnDestroy {
         paramsUrlCard: [
           { name: 'idDomain', value: this.propertiesLocality.domain.id },
           { name: 'idParent', value: this.idLocality },
+          { name: 'idOffice', value: this.idOffice},
           { name: 'type', value: this.propertiesLocality?.children ? this.propertiesLocality.children[0].type : undefined }
         ]
       }
@@ -204,6 +206,12 @@ export class DomainLocalityComponent implements OnInit, OnDestroy {
             },
           ] as MenuItem[],
           urlCard: '/domains/locality',
+          paramsUrlCard: [
+            { name: 'idDomain', value: this.propertiesLocality.domain.id },
+            { name: 'idParent', value: this.idLocality },
+            { name: 'idOffice', value: this.idOffice},
+            { name: 'type', value: this.propertiesLocality?.children ? this.propertiesLocality.children[0].type : undefined }
+          ]
         }
       )));
     }
@@ -218,20 +226,11 @@ export class DomainLocalityComponent implements OnInit, OnDestroy {
   }
 
   async handleOnSubmit() {
-    if (this.propertiesLocality) {
-      const idDomain = this.propertiesLocality.domain.id;
-      delete this.propertiesLocality.domain;
-      const { success } = await this.localitySvr.put({ ...this.propertiesLocality, ...this.formLocality.value, idDomain });
-      if (success) {
-        await this.loadPropertiesLocality();
-        this.messageSrv.add({
-          severity: 'success',
-          summary: this.translateSrv.instant('success'),
-          detail: this.translateSrv.instant('messages.savedSuccessfully')
-        });
-      }
-    } else {
-      const { success, data } = await this.localitySvr.post(
+    const idDomain = this.propertiesLocality?.domain?.id;
+    delete this.propertiesLocality?.domain;
+    const { success, data } = this.propertiesLocality
+      ? await this.localitySvr.put({ ...this.propertiesLocality, ...this.formLocality.value, idDomain })
+      : await this.localitySvr.post(
         {
           ...this.formLocality.value,
           idDomain: this.idDomain,
@@ -239,21 +238,21 @@ export class DomainLocalityComponent implements OnInit, OnDestroy {
           type: this.type
         }
       );
-      if (success) {
-        this.idLocality = data.id;
-        await this.loadPropertiesLocality();
-        this.messageSrv.add({
-          severity: 'success',
-          summary: this.translateSrv.instant('success'),
-          detail: this.translateSrv.instant('messages.savedSuccessfully')
-        });
-        this.breadcrumbSrv.updateLastCrumb({
-          key: 'locality',
-          routerLink: ['/domains', 'locality'],
-          queryParams: { id: this.idLocality },
-          info: this.propertiesLocality?.name
-        });
-      }
+    if (success) {
+      this.idLocality = data.id;
+      await this.loadPropertiesLocality();
+      this.messageSrv.add({
+        severity: 'success',
+        summary: this.translateSrv.instant('success'),
+        detail: this.translateSrv.instant('messages.savedSuccessfully')
+      });
+      this.breadcrumbSrv.updateLastCrumb({
+        key: 'locality',
+        routerLink: ['/domains', 'locality'],
+        queryParams: { id: this.idLocality, idOffice: this.idOffice },
+        info: this.propertiesLocality?.name,
+        tooltip: this.propertiesLocality?.fullName
+      });
     }
   }
 

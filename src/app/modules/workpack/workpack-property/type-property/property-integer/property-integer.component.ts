@@ -12,7 +12,6 @@ export class PropertyIntegerComponent implements OnInit {
 
   @Input() property: PropertyTemplateModel;
   @Output() changed = new EventEmitter();
-  mode = 'decimal';
   type = TypePropertyModelEnum;
   responsive: boolean;
 
@@ -25,9 +24,6 @@ export class PropertyIntegerComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    if (this.property.type === TypePropertyModelEnum.CurrencyModel) {
-      this.mode = 'currency';
-    }
   }
 
 }

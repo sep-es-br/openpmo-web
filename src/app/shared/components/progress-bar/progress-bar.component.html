@@ -2,12 +2,12 @@
   <div class="progress-bar-header">
     <div class="progress">
       <span class="header-label" *ngIf="labelProgress">{{labelProgress}}</span>
-      <span class="progress-value" *ngIf="valueUnit">{{valueUnit === 'currency' ? (progress |currency:'BRL':'symbol':'0.2-2':'pt') 
+      <span class="progress-value" *ngIf="valueUnit">{{valueUnit === 'currency' ? (progress | number:'0.2-2':'pt') 
         : progress}} {{valueUnit !== 'currency' ? valueUnit : ''}}</span>
     </div>
     <div class="total">
       <span class="header-label" *ngIf="labelTotal">{{labelTotal}}</span>
-      <span class="total-value" *ngIf="valueUnit">{{valueUnit === 'currency' ? (total |currency:'BRL':'symbol':'0.2-2':'pt') 
+      <span class="total-value" *ngIf="valueUnit">{{valueUnit === 'currency' ? (total | number:'0.2-2':'pt') 
         : total}} {{valueUnit !== 'currency' ? valueUnit : ''}}</span>
     </div>
     <div class="total"></div>

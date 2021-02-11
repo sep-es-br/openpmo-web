@@ -76,7 +76,8 @@ export class StakeholderOrganizationComponent implements OnInit {
       key: 'stakeholder',
       routerLink: ['/stakeholder/organization'],
       queryParams: { idWorkpack: this.idWorkpack, idOrganization: this.idOrganization },
-      info: this.stakeholder?.organization.name
+      info: this.stakeholder?.organization?.name,
+      tooltip: this.stakeholder?.organization?.fullName
     });
   }
 

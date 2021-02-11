@@ -59,6 +59,7 @@ export class OrganizationListComponent implements OnInit {
     this.breadcrumbSrv.pushMenu({
       key: 'organizations',
       info: this.propertiesOffice?.name,
+      tooltip: this.propertiesOffice?.fullName,
       routerLink: [ '/organizations' ],
       queryParams: { idOffice: this.idOffice }
     });

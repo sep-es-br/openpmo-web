@@ -55,7 +55,8 @@ export class OfficePermissionsListComponent implements OnInit {
         key: 'officePermissions',
         routerLink: ['/offices', 'permission'],
         queryParams: { idOffice: this.idOffice },
-        info: this.propertiesOffice?.name
+        info: this.propertiesOffice?.name,
+        tooltip: this.propertiesOffice?.fullName
       }
     ]);
   }

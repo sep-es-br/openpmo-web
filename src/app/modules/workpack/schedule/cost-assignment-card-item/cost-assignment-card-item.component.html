@@ -7,14 +7,14 @@
   <div class="card-item-values p-fluid">
     <span class="p-float-label" [class.responsive]="responsive">
       <p-inputNumber class="app-input-number" id="float-planned" [(ngModel)]="properties.plannedWork"
-        (onInput)="handleCostChange()" mode="currency" currency="BRL">
+        (onInput)="handleCostChange()" mode="decimal" [minFractionDigits]="2" [maxFractionDigits]="2">
       </p-inputNumber>
       <label class="app-input-label" for="float-planned">{{properties.unitMeasureName}} {{ "planned" |translate
         }}</label>
     </span>
     <span class="p-float-label" [class.responsive]="responsive">
       <p-inputNumber class="app-input-number" id="float-planned" [(ngModel)]="properties.actualWork"
-        (onInput)="handleCostChange()" mode="currency" currency="BRL">
+        (onInput)="handleCostChange()" mode="decimal" [minFractionDigits]="2" [maxFractionDigits]="2">
       </p-inputNumber>
       <label class="app-input-label" for="float-planned">{{properties.unitMeasureName}} {{ "actual" |translate
         }}</label>

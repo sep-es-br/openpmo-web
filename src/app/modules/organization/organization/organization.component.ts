@@ -89,6 +89,7 @@ export class OrganizationComponent implements OnInit, OnDestroy {
     this.breadcrumbSrv.pushMenu({
       key: 'organization',
       info: this.propertiesOrganization?.name,
+      tooltip: this.propertiesOrganization?.fullName,
       routerLink: [ '/organizations', 'organization' ],
       queryParams: { id: this.idOrganization }
     });

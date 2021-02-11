@@ -42,6 +42,7 @@ export class CostAccountComponent implements OnInit {
   costAccountProperties: IWorkpackProperty[];
   typePropertyModel = TypePropertyModelEnum;
   idOffice: number;
+  editPermission = false;
 
   constructor(
     private actRouter: ActivatedRoute,
@@ -128,6 +129,7 @@ export class CostAccountComponent implements OnInit {
     const result = await this.workpackSrv.GetById(this.idWorkpack);
     if (result.success) {
       this.workpack = result.data;
+      this.editPermission = !!this.workpack.permissions?.find( p => p.level === 'EDIT');
       const plan = await this.planSrv.GetById(this.workpack.plan.id);
       if (plan.success) {
         this.idOffice = plan.data.idOffice;
@@ -168,6 +170,7 @@ export class CostAccountComponent implements OnInit {
     property.label = propertyModel.label;
     property.name = propertyModel.name;
     property.required = propertyModel.required;
+    property.disabled = !this.editPermission;
     property.session = propertyModel.session;
     property.sortIndex = propertyModel.sortIndex;
     property.multipleSelection = propertyModel.multipleSelection;

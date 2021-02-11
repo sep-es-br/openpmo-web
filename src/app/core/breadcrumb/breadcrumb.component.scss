@@ -45,7 +45,15 @@
       flex-direction: column;
       position: relative;
       padding: 1.2rem 0;
-
+      &.last-crumb {
+        .link {
+          cursor: auto;
+        }
+        .info {
+          opacity: 0;
+          pointer-events: none;
+        }
+      }
       .link {
         padding: .3em 1em;
         border-radius: 25px;

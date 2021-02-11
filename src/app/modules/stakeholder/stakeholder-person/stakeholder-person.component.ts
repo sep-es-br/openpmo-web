@@ -54,7 +54,8 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
   showSearchInputMessage = false;
   permissionLevelListOptions = [
     { label: this.translateSrv.instant('read'), value: 'READ' },
-    { label: this.translateSrv.instant('edit'), value: 'EDIT' }
+    { label: this.translateSrv.instant('edit'), value: 'EDIT' },
+    { label: this.translateSrv.instant('none'), value: 'None' }
   ];
   debounceSearch = new Subject<string>();
   $destroy = new Subject();
@@ -103,7 +104,8 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
       key: 'stakeholder',
       routerLink: ['/stakeholder/person'],
       queryParams: { idWorkpack: this.idWorkpack, emailPerson: this.emailPerson },
-      info: this.stakeholder?.person.name
+      info: this.stakeholder?.person?.name,
+      tooltip: this.stakeholder?.person.fullName
     });
   }
 
@@ -170,7 +172,7 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
     if (!this.stakeholderPermissions) {
       this.stakeholderPermissions = [{
         role: 'User',
-        level: null
+        level: 'None'
       }];
     }
     this.loadStakeholderRolesCardsItems();
@@ -212,7 +214,7 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
       this.stakeholderRoles = null;
       this.stakeholderPermissions = [{
         role: 'User',
-        level: null
+        level: 'None'
       }];
       this.loadStakeholderRolesCardsItems();
     }
@@ -280,6 +282,7 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
     if (!validated) {
       return;
     }
+    const permissions = this.stakeholderPermissions.filter( p => p.level !== 'None' );
     const stakeholderModel = {
       idWorkpack: this.idWorkpack,
       name: this.stakeholderForm.controls.name.value,
@@ -293,7 +296,7 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
         to: r.to !== null ? formatDateToString(r.to as Date, true) : null,
         from: formatDateToString(r.from as Date, true)
       })),
-      permissions: this.stakeholderPermissions
+      permissions
     };
 
     if (this.emailPerson) {
@@ -348,12 +351,6 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
       }
     });
     if(roleNotOk && roleNotOk.length > 0) {
-      return false;
-    }
-    if(!this.stakeholderPermissions) {
-      return false;
-    }
-    if(!this.stakeholderPermissions.find(r => r.level)) {
       return false;
     }
     return true;

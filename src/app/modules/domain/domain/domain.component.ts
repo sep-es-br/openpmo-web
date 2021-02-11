@@ -89,6 +89,7 @@ export class DomainComponent implements OnInit, OnDestroy {
     this.breadcrumbSrv.pushMenu({
       key: 'domain',
       info: this.propertiesDomain?.name,
+      tooltip: this.propertiesDomain?.fullName,
       routerLink: ['/domains', 'detail'],
       queryParams: { id: this.idDomain, idOffice: this.idOffice }
     });
@@ -137,7 +138,7 @@ export class DomainComponent implements OnInit, OnDestroy {
   }
 
   navigateToPage(type: string) {
-    this.router.navigate(['/domains/locality'], { queryParams: { type, idDomain: this.idDomain } });
+    this.router.navigate(['/domains/locality'], { queryParams: { type, idDomain: this.idDomain, idOffice: this.idOffice } });
   }
 
   loadCardItemsLocalities() {
@@ -213,35 +214,24 @@ export class DomainComponent implements OnInit, OnDestroy {
   }
 
   async handleOnSubmit() {
-    if (this.propertiesDomain) {
-      const { success } = await this.domainSvr.put({ ...this.formDomain.value, id: this.idDomain });
-
-      if (success) {
-        await this.loadPropertiesDomain();
-        this.messageSrv.add({
-          severity: 'success',
-          summary: this.translateSrv.instant('success'),
-          detail: this.translateSrv.instant('messages.savedSuccessfully')
-        });
-      }
-    } else {
-      const { success, data } = await this.domainSvr.post({ ...this.formDomain.value, idOffice: this.idOffice });
-      if (success) {
-        this.idDomain = data.id;
-        await this.loadPropertiesDomain();
-        this.messageSrv.add({
-          severity: 'success',
-          summary: this.translateSrv.instant('success'),
-          detail: this.translateSrv.instant('messages.savedSuccessfully')
-        });
-        this.breadcrumbSrv.updateLastCrumb({
-          key: 'domain',
-          routerLink: ['/domains', 'detail'],
-          queryParams: { id: this.idDomain, idOffice: this.idOffice },
-          info: this.propertiesDomain?.name
-        });
-      }
+    const { success, data } = this.propertiesDomain
+      ? await this.domainSvr.put({ ...this.formDomain.value, id: this.idDomain })
+      : await this.domainSvr.post({ ...this.formDomain.value, idOffice: this.idOffice });
+    if (success) {
+      this.idDomain = data.id;
+      await this.loadPropertiesDomain();
+      this.messageSrv.add({
+        severity: 'success',
+        summary: this.translateSrv.instant('success'),
+        detail: this.translateSrv.instant('messages.savedSuccessfully')
+      });
+      this.breadcrumbSrv.updateLastCrumb({
+        key: 'domain',
+        routerLink: ['/domains', 'detail'],
+        queryParams: { id: this.idDomain, idOffice: this.idOffice },
+        info: this.propertiesDomain?.name,
+        tooltip: this.propertiesDomain?.fullName
+      });
     }
   }
-
 }

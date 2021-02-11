@@ -62,6 +62,7 @@ export class DomainListComponent implements OnInit, OnDestroy {
     this.breadcrumbSrv.pushMenu({
       key: 'domains',
       info: this.propertiesOffice?.name,
+      tooltip: this.propertiesOffice?.fullName,
       routerLink: ['/domains'],
       queryParams: { idOffice: this.idOffice }
     });
