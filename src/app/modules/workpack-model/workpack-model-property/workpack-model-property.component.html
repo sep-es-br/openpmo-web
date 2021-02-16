@@ -69,7 +69,7 @@
           </p-inputNumber>
           <label class="app-input-label">{{ 'defaultValue' | translate }}</label>
         </span>
-        <span *ngSwitchCase="'NumModel'" class="p-float-label property-input p-field input-number-scroll">
+        <span *ngSwitchCase="'NumberModel'" class="p-float-label property-input p-field input-number-scroll">
           <p-inputNumber class="app-input-number" [(ngModel)]="property.defaultValue" [disabled]="property.viewOnly"
             [required]="true" mode="decimal" [min]="property.min" [max]="property.max" [minFractionDigits]="0"
             [maxFractionDigits]="20" (ngModelChange)="changed.emit($event)" [showButtons]="true">
@@ -187,7 +187,7 @@
           (ngModelChange)="changed.emit($event)" [disabled]="property.viewOnly"></p-checkbox>
         <label class="app-input-label">{{ 'fullLine' | translate }}</label>
       </span>
-      <span class="property-checkbox p-field-checkbox">
+      <span class="property-checkbox p-field-checkbox" *ngIf="property.type !== 'ToggleModel'">
         <p-checkbox class="app-checkbox" [(ngModel)]="property.required" binary="true"
           (ngModelChange)="changed.emit($event)" [disabled]="property.viewOnly"></p-checkbox>
         <label class="app-input-label">{{ 'required' | translate }}</label>
@@ -199,13 +199,13 @@
         <label class="app-input-label">{{ 'multipleSelection' | translate }}</label>
       </span>
       <span class="p-float-label property-input p-field input-number-scroll"
-        *ngIf="[ 'IntegerModel', 'TextModel', 'TextAreaModel', 'NumModel', 'CurrencyModel' ].includes(property.type)">
+        *ngIf="[ 'IntegerModel', 'TextModel', 'TextAreaModel', 'NumberModel' ].includes(property.type)">
         <p-inputNumber inputStyleClass="app-input-text" [(ngModel)]="property.min" [showButtons]="true"
           (ngModelChange)="changed.emit($event)" [disabled]="property.viewOnly"></p-inputNumber>
         <label class="app-input-label">{{ 'minimum' | translate }}</label>
       </span>
       <span class="p-float-label property-input p-field input-number-scroll"
-        *ngIf="[ 'IntegerModel', 'TextModel', 'TextAreaModel', 'NumModel', 'CurrencyModel' ].includes(property.type)">
+        *ngIf="[ 'IntegerModel', 'TextModel', 'TextAreaModel', 'NumberModel' ].includes(property.type)">
         <p-inputNumber inputStyleClass="app-input-text" [(ngModel)]="property.max" [showButtons]="true"
           (ngModelChange)="changed.emit($event)" [disabled]="property.viewOnly"></p-inputNumber>
         <label class="app-input-label">{{ 'maximum' | translate }}</label>

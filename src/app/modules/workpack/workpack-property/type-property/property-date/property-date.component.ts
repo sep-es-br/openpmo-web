@@ -51,15 +51,9 @@ export class PropertyDateComponent implements OnInit, OnDestroy {
     this.dateMax = this.property.max && new Date(this.property.max);
   }
 
-  isInvalid() {
-    if (this.property.value) {
-      this.property.invalid = false;
-      return false;
-    } else {
-      this.property.invalid = true;
-      this.message = this.translateSrv.instant('required');
-      return true;
-    }
+  clearErrorMessage() {
+    this.property.invalid = false;
+    this.property.message = '';
   }
 
 }

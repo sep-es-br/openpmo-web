@@ -40,6 +40,7 @@ export class PlanPermissionsComponent implements OnInit, OnDestroy {
   cardItemsPlanPermission: ICardItemPermission[];
   debounceSearch = new Subject();
   $destroy = new Subject();
+  invalidMailMessage: string;
 
   constructor(
     private actRouter: ActivatedRoute,
@@ -58,7 +59,15 @@ export class PlanPermissionsComponent implements OnInit, OnDestroy {
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => {
       this.responsive = value;
     });
-    this.debounceSearch.pipe(debounceTime(500), takeUntil(this.$destroy)).subscribe(() => this.searchPerson());
+    this.debounceSearch.pipe(debounceTime(500), takeUntil(this.$destroy)).subscribe(() => {
+      if (this.searchedEmailPerson.length > 5 && this.validateEmail()) {
+        this.searchPerson();
+        this.invalidMailMessage = undefined;
+      } else {
+        this.invalidMailMessage = this.translateSrv.instant('messages.invalidEmail');
+        this.person = null;
+      }
+    });
   }
 
   ngOnDestroy(): void {
@@ -75,6 +84,19 @@ export class PlanPermissionsComponent implements OnInit, OnDestroy {
       info: this.person?.name,
       tooltip: this.person?.fullName
     });
+  }
+
+  validateEmail() {
+    if (this.searchedEmailPerson.includes('@')) {
+      const email = this.searchedEmailPerson.split('@');
+      if (email[1] !== '') {
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      return false;
+    }
   }
 
   async loadPermission() {

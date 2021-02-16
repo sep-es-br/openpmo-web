@@ -113,7 +113,7 @@ export class OrganizationComponent implements OnInit, OnDestroy {
       const { data, success } = await this.organizationSvr.GetById(this.idOrganization);
       if (success) {
         this.propertiesOrganization = data;
-        this.formOrganization.setValue(
+        this.formOrganization.reset(
           Object.keys(this.formOrganization.controls).reduce(( a, key ) => ( a[key] = data[key] || '', a ), { })
         );
         if (!this.editPermission) {

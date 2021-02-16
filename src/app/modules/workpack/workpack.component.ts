@@ -148,6 +148,16 @@ export class WorkpackComponent implements OnDestroy {
     }
   }
 
+  checkProperties() {
+    const arePropertiesValid: boolean = this.sectionPropertiesProperties
+      .filter(({ required }) => required)
+      .map(({ value }) => value instanceof Array
+        ? value.length > 0
+        : typeof value == 'boolean' || typeof value == 'number' || !!value)
+      .reduce((a, b) => a ? b : a, true);
+    return arePropertiesValid ? this.saveButton?.showButton() : this.saveButton?.hideButton();
+  }
+
   async resetWorkpack() {
     this.workpackModel = undefined;
     this.cardWorkpackProperties = undefined;
@@ -978,10 +988,21 @@ export class WorkpackComponent implements OnDestroy {
     }
   }
 
+  scrollTop() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
   async saveWorkpack() {
     this.workpackProperties = this.sectionPropertiesProperties.map(p => p.getValues());
     this.sectionPropertiesProperties.forEach( p => p.validate());
     if (this.sectionPropertiesProperties.filter( p => p.invalid).length > 0) {
+      this.messageSrv.add({
+        severity: 'warn',
+        summary: this.translateSrv.instant('messages.invalidField'),
+        detail: this.translateSrv.instant('messages.invalidField'),
+        life: 3000
+      });
+      this.scrollTop();
       return;
     }
     const isPut = !!this.idWorkpack;

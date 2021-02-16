@@ -3,7 +3,7 @@
     <p-header *ngIf="properties.menuItems" class="card-item-header">
       <div class="header-title">
         <span class="title-month">
-          {{properties.stepName|date:'MMMM'}}
+          {{ language === 'pt' ? (properties.stepName|date:'MMMM':'IST':'pt'|titlecase) : (properties.stepName|date:'MMMM')}}
         </span>
         <span class="title-day">
           {{properties.stepDay ? (properties.stepDay|date:'d') : ''}}
@@ -69,7 +69,7 @@
     <p-header *ngIf="properties.menuItems" class="card-item-header">
       <div class="header-title">
         <span class="title-month">
-          {{properties.stepName|date:'MMMM'}}
+          {{ language === 'pt' ? (properties.stepName|date:'MMMM':'IST':'pt'|titlecase) : (properties.stepName|date:'MMMM')}}
         </span>
         <span class="title-day">
           {{properties.stepDay ? (properties.stepDay|date:'d') : ''}}

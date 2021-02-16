@@ -29,7 +29,7 @@ export class TranslateChangeService {
 
   getCurrentLang(): Observable<any> {
     setTimeout(() => {
-      const lang = localStorage.getItem(StoreKeys.defaultLanguage) || 'pt';
+      const lang = localStorage.getItem(StoreKeys.defaultLanguage) || 'en';
       this.subject.next({ lang });
     }, 250);
     return this.subject.asObservable();

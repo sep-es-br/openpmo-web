@@ -40,6 +40,7 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
   cardItemsOfficePermission: ICardItemPermission[];
   debounceSearch = new Subject<string>();
   $destroy = new Subject();
+  invalidMailMessage: string;
 
   constructor(
     private actRouter: ActivatedRoute,
@@ -64,7 +65,15 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
       { key: 'permissions', routerLink: ['/offices', 'permission', 'detail'],
         queryParams: { idOffice: this.idOffice, email: this.personEmail }}
     ]);
-    this.debounceSearch.pipe(debounceTime(500), takeUntil(this.$destroy)).subscribe(() => this.searchPerson());
+    this.debounceSearch.pipe(debounceTime(500), takeUntil(this.$destroy)).subscribe(() => {
+      if (this.searchedEmailPerson.length > 5 && this.validateEmail()) {
+        this.searchPerson();
+        this.invalidMailMessage = undefined;
+      } else {
+        this.invalidMailMessage = this.translateSrv.instant('messages.invalidEmail');
+        this.person = null;
+      }
+    });
   }
 
   ngOnDestroy(): void {
@@ -74,6 +83,19 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.loadPermission();
+  }
+
+  validateEmail() {
+    if (this.searchedEmailPerson.includes('@')) {
+      const email = this.searchedEmailPerson.split('@');
+      if (email[1] !== '') {
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      return false;
+    }
   }
 
   async loadPermission() {

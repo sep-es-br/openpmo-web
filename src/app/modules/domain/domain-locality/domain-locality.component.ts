@@ -122,10 +122,7 @@ export class DomainLocalityComponent implements OnInit, OnDestroy {
       const { success, data } = await this.localitySvr.GetById(this.idLocality);
       if (success) {
         this.propertiesLocality = data as ILocalityList;
-        this.formLocality.reset();
-        this.formLocality.setValue(
-          Object.keys(this.formLocality.controls).reduce(( a, key ) => ( a[key] = data[key] || '', a ), { })
-        );
+        this.formLocality.reset(Object.keys(this.formLocality.controls).reduce(( a, key ) => ( a[key] = data[key] || '', a ), { }));
         if (!this.editPermission) {
           this.formLocality.disable();
         }

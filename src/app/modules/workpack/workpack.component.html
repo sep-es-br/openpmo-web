@@ -14,7 +14,7 @@
         <div class="property-container" *ngFor="let property of sectionPropertiesProperties"
           [class.not-fullLine]="!property.fullLine && property.type !== 'TextArea'"
           [class.fullLine]="property.fullLine || property.type === 'TextArea'">
-          <app-workpack-property [property]="property" (changed)="saveButton.showButton()"></app-workpack-property>
+          <app-workpack-property [property]="property" (changed)="checkProperties()"></app-workpack-property>
         </div>
       </div>
     </app-card>

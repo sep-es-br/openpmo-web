@@ -138,8 +138,8 @@ export class WorkpackModelComponent implements OnInit {
       .subscribe(() => this.saveButton?.hideButton());
     this.formProperties.valueChanges
       .pipe(takeUntil(this.$destroy), filter(() => this.formProperties.dirty && this.formProperties.valid))
-      .subscribe(() => this.saveButton?.showButton());
-    this.translateSrv.onDefaultLangChange
+      .subscribe(() => this.checkProperties());
+    this.translateSrv.onLangChange
       .pipe(takeUntil(this.$destroy)).subscribe(({ lang }) => {
         this.currentLang = lang;
         this.loadIcons();
@@ -436,7 +436,7 @@ export class WorkpackModelComponent implements OnInit {
     const { data, success } = await this.workpackModelSrv.GetById(this.idWorkpackModel);
     if (success) {
       this.workpackModelType = TypeWorkpackModelEnum[data.type];
-      this.formProperties.setValue({
+      this.formProperties.reset({
         name: data.modelName,
         nameInPlural: data.modelNameInPlural || '',
         icon: data.fontIcon || '',
@@ -455,6 +455,13 @@ export class WorkpackModelComponent implements OnInit {
             };
             if (p.idDomain) {
               p.extraList = await this.getListLocalities(p.idDomain);
+            }
+            //alterei aqui
+            if (p.defaults) {
+              const isArray = p.defaults instanceof Array;
+              if (!p.multipleSelection && isArray) {
+                p.defaults = (p.defaults as any[]).shift();
+              }
             }
             await this.checkProperty(p);
             return [ p, i ];
@@ -546,6 +553,48 @@ export class WorkpackModelComponent implements OnInit {
       // Domain selection changed
       event.property.extraList = await this.getListLocalities(event.property?.idDomain);
     }
+    this.checkProperties();
+  }
+
+  checkProperties() {
+    const properties: IWorkpackModelProperty[] = [ ... this.modelProperties, ... this.modelCostProperties ];
+    // Value check
+    const propertiesChecks: { valid: boolean; invalidKeys: string[]; prop: IWorkpackModelProperty}[] = properties.map(p => ({
+      valid: p.requiredFields
+        .map(r => (p[r] instanceof Array
+          ? p[r].length > 0
+          : typeof p[r] == 'boolean' || typeof p[r] == 'number' || !!p[r]))
+        .reduce((acc, v) => acc ? v : acc, true),
+      invalidKeys: p.requiredFields
+        .filter(r => !(p[r] instanceof Array
+          ? p[r].length > 0
+          : typeof p[r] == 'boolean' || typeof p[r] == 'number' || !!p[r])),
+      prop: p
+    }));
+    const arePropertiesValid = propertiesChecks.reduce((a, b) => a ? b.valid : a, true);
+    // Stakeholder
+    const arePossiblesValuesValid = (this.posibleRolesOrg.length > 0 && this.posibleRolesPerson.length > 0)
+      || !this.cardPropertiesStakeholders.initialStateToggle
+      || this.workpackModelType === TypeWorkpackModelEnum.MilestoneModel;
+
+    if (this.formProperties.invalid || !arePropertiesValid || !arePossiblesValuesValid) {
+      this.saveButton?.hideButton();
+      return;
+    };
+    const separationForDuplicateCheck = properties.map(prop => [ prop.name + prop.session, prop.label + prop.session ])
+      .reduce((a, b) => ((a[0].push(b[0])), a[1].push(b[1]), a),[[], []]);
+    // Duplicated name check
+    if (new Set(separationForDuplicateCheck[0]).size !== properties.length) {
+      this.saveButton?.hideButton();
+      return;
+    };
+    // Duplicated label check
+    if (new Set(separationForDuplicateCheck[1]).size !== properties.length) {
+      this.saveButton?.hideButton();
+      return;
+    }
+    this.saveButton?.showButton();
+    return;
   }
 
   addGroup(session: PropertySessionEnum, group?: IGroup) {
@@ -590,12 +639,10 @@ export class WorkpackModelComponent implements OnInit {
   }
 
   async getListLocalities(idDomain: number) {
-    if (!this.listLocalities.length) {
       const result = await this.localitySrv.GetAll({ 'id-domain': idDomain });
       if (result.success) {
         this.listLocalities = result.data.map(d => ({ label: d.name, value: d.id }));
       }
-    }
     return this.listLocalities;
   }
 
@@ -658,8 +705,10 @@ export class WorkpackModelComponent implements OnInit {
       initialStateToggle: true,
       cardTitle: 'stakeholders',
       collapseble: true,
-      initialStateCollapse: false
+      initialStateCollapse: false,
+      onToggle: new EventEmitter<boolean>()
     };
+    this.cardPropertiesStakeholders.onToggle.pipe(takeUntil(this.$destroy)).subscribe(() => this.checkProperties());
     this.cardPropertiesCostAccount = {
       toggleable: this.editPermission,
       initialStateToggle: this.workpackModelType === TypeWorkpackModelEnum.DeliverableModel,
@@ -667,13 +716,6 @@ export class WorkpackModelComponent implements OnInit {
       collapseble: true,
       initialStateCollapse: false,
       onToggle: new EventEmitter<boolean>()
-    };
-    this.cardPropertiesModels = {
-      toggleable: this.editPermission,
-      initialStateToggle: true,
-      cardTitle: 'models',
-      collapseble: true,
-      initialStateCollapse: false
     };
     this.cardPropertiesCostAccount.onToggle.pipe(takeUntil(this.$destroy)).subscribe(toggleOn => {
       if (!toggleOn && this.cardPropertiesSchedule?.initialStateToggle) {
@@ -684,14 +726,23 @@ export class WorkpackModelComponent implements OnInit {
         });
         setTimeout(() => this.cardPropertiesCostAccount.initialStateToggle = true, 0);
       } else {
-        this.saveButton?.showButton();
         if (toggleOn) {
           this.loadDefaultPropertiesCostAccount();
         } else {
           this.modelCostProperties = [];
         }
+        setTimeout(() => this.checkProperties(), 150);
       }
     });
+    this.cardPropertiesModels = {
+      toggleable: this.editPermission,
+      initialStateToggle: true,
+      cardTitle: 'models',
+      collapseble: true,
+      initialStateCollapse: false,
+      onToggle: new EventEmitter<boolean>()
+    };
+    this.cardPropertiesModels.onToggle.pipe(takeUntil(this.$destroy)).subscribe(() => this.checkProperties());
     if (this.workpackModelType === TypeWorkpackModelEnum.DeliverableModel) {
       this.cardPropertiesSchedule = {
         toggleable: this.editPermission,
@@ -710,136 +761,20 @@ export class WorkpackModelComponent implements OnInit {
           });
           setTimeout(() => this.cardPropertiesSchedule.initialStateToggle = false, 0);
         }
+        this.checkProperties();
       });
     }
   }
 
   async handleSubmit() {
-    const properties: IWorkpackModelProperty[] = [ ... this.modelProperties, ... this.modelCostProperties ];
-    // Value check
-    const propertiesChecks: { valid: boolean; invalidKeys: string[]; prop: IWorkpackModelProperty}[] = properties.map(p => ({
-      valid: p.requiredFields
-        .map(r => (p[r] instanceof Array
-          ? p[r].length > 0
-          : typeof p[r] == 'boolean' || typeof p[r] == 'number' || !!p[r]))
-        .reduce((acc, v) => acc ? v : acc, true),
-      invalidKeys: p.requiredFields
-        .filter(r => !(p[r] instanceof Array
-          ? p[r].length > 0
-          : typeof p[r] == 'boolean' || typeof p[r] == 'number' || !!p[r])),
-      prop: p
-    }));
-    const arePropertiesValid = propertiesChecks.reduce((a, b) => a ? b.valid : a, true);
-    // Stakeholder
-    const arePossiblesValuesValid = (this.posibleRolesOrg.length > 0 && this.posibleRolesPerson.length > 0)
-      || !this.cardPropertiesStakeholders.initialStateToggle
-      || this.workpackModelType === TypeWorkpackModelEnum.MilestoneModel;
-    if (this.formProperties.invalid || !arePropertiesValid || !arePossiblesValuesValid) {
-      const fields = propertiesChecks.filter(p => !p.valid)
-        .map(p => {
-          p.prop.isCollapsed = false;
-          return this.translateSrv.instant('messages.setValueOfInvalidFieldProperty', {
-            field : Object.values(this.translateSrv.instant(p.invalidKeys)).join(', '),
-            prop: p.prop.label
-        });
-      });
-      if (this.workpackModelType !== TypeWorkpackModelEnum.MilestoneModel) {
-        fields.push(...[
-          ... !this.posibleRolesOrg.length && this.cardPropertiesStakeholders.initialStateToggle
-            ? [ this.translateSrv.instant('possibleRolesOrg') ]
-            : [],
-          ... !this.posibleRolesPerson.length && this.cardPropertiesStakeholders.initialStateToggle
-            ? [ this.translateSrv.instant('possibleRolesPerson') ]
-            : []
-        ]);
-      }
-      fields.push(... Object.keys(this.formProperties.controls)
-        .filter(k => this.formProperties.controls[k].invalid)
-        .map(k => {
-          switch (k) {
-            case 'name':
-              return this.translateSrv.instant('modelName');
-            case 'nameInPlural':
-              return this.translateSrv.instant('modelNameInPlural');
-            case 'icon':
-              return this.translateSrv.instant('icon');
-            case 'sortedBy':
-              return this.translateSrv.instant('sortedBy');
-          };
-        })
-      );
-      this.scrollTop();
-      this.messageSrv.add({
-        severity: 'warn',
-        summary: this.translateSrv.instant('messages.invalidField'),
-        detail: this.translateSrv.instant('messages.invalidFields', { fields: fields.join(', \n') }),
-        life: 10000
-      });
-      return;
-    };
-    const separationForDuplicateCheck = properties.map(prop => [ prop.name + prop.session, prop.label + prop.session ])
-      .reduce((a, b) => ((a[0].push(b[0])), a[1].push(b[1]), a),[[], []]);
-    // Duplicated name check
-    if (new Set(separationForDuplicateCheck[0]).size !== properties.length) {
-      const duplicateCountName = properties.map(prop => ({ prop, nameProp: prop.name.trim().toLowerCase() }))
-        .reduce((a, { prop, nameProp }) => (( a[nameProp] ? undefined : a[nameProp] = { nameProp, propsModel: [], propsCost: [] })
-          , prop.session === PropertySessionEnum.COST ? a[nameProp].propsCost.push(prop) : a[nameProp].propsModel.push(prop)
-          , a
-          ), {});
-      const duplicatedPropertyName = Object.keys(duplicateCountName)
-        .filter(key => duplicateCountName[key].propsModel.length > 1 || duplicateCountName[key].propsCost.length > 1)
-        .map(key => duplicateCountName[key])
-        .map(duplicate => {
-          if (duplicate.propsModel.length > 1) {
-            duplicate.propsModel.forEach(prop => prop.isCollapsed = false);
-          }
-          if (duplicate.propsCost.length > 1) {
-            duplicate.propsCost.forEach(prop => prop.isCollapsed = false);
-          }
-          return duplicate.propsModel[0]?.name || duplicate.propsCost[0]?.name;
-        });
-      this.messageSrv.add({
-        severity: 'warn',
-        summary: this.translateSrv.instant('messages.invalidField'),
-        detail: this.translateSrv.instant('messages.duplicatedNames', { names: duplicatedPropertyName.join(', \n') }),
-        life: 10000
-      });
-      this.scrollTop();
-      return;
-    };
-    // Duplicated label check
-    if (new Set(separationForDuplicateCheck[1]).size !== properties.length) {
-      const duplicateCountLabel = properties.map(prop => ({ prop, labelProp: prop.label.trim().toLowerCase() }))
-        .reduce((a, { prop, labelProp }) => (( a[labelProp] ? undefined : a[labelProp] = { labelProp, propsModel: [], propsCost: [] })
-          , prop.session === PropertySessionEnum.COST ? a[labelProp].propsCost.push(prop) : a[labelProp].propsModel.push(prop)
-          , a
-          ), {});
-      const duplicatedPropertyLabel = Object.keys(duplicateCountLabel)
-        .filter(key => duplicateCountLabel[key].propsModel.length > 1 || duplicateCountLabel[key].propsCost.length > 1)
-        .map(key => duplicateCountLabel[key])
-        .map(duplicate => {
-          if (duplicate.propsModel.length > 1) {
-            duplicate.propsModel.forEach(prop => prop.isCollapsed = false);
-          }
-          if (duplicate.propsCost.length > 1) {
-            duplicate.propsCost.forEach(prop => prop.isCollapsed = false);
-          }
-          return duplicate.propsModel[0]?.label || duplicate.propsCost[0]?.label;
-        });
-      this.messageSrv.add({
-        severity: 'warn',
-        summary: this.translateSrv.instant('messages.invalidField'),
-        detail: this.translateSrv.instant('messages.duplicatedLabels', { labels: duplicatedPropertyLabel.join(', \n') }),
-        life: 10000
-      });
-      this.scrollTop();
-      return;
-    }
     const propertiesClone: IWorkpackModelProperty[] = JSON.parse(JSON.stringify([ ...this.modelProperties, ...this.modelCostProperties ]));
     propertiesClone.map(prop => {
       Object.keys(prop).map(key => {
         if (prop[key] && prop[key] instanceof Array && key !== 'defaults') {
           prop[key] = prop[key].map(v => typeof v == 'string' ? v.trim() : v).join(',') as string;
+        }
+        if (prop[key] && !(prop[key] instanceof Array) && key === 'defaults' && prop.type !== 'UnitSelectionModel') {
+          prop[key] = [prop[key]] as number[];
         }
       });
       delete prop.requiredFields;
@@ -849,12 +784,7 @@ export class WorkpackModelComponent implements OnInit {
       delete prop.viewOnly;
       delete prop.obligatory;
     });
-    const {
-      name: modelName,
-      nameInPlural: modelNameInPlural,
-      icon,
-      sortedBy: sortBy
-    } = this.formProperties.value;
+    const { name: modelName, nameInPlural: modelNameInPlural, icon, sortedBy: sortBy } = this.formProperties.value;
     const form: IWorkpackModel = {
       childWorkpackModelSessionActive: !!this.cardPropertiesModels?.initialStateToggle,
       scheduleSessionActive: !!this.cardPropertiesSchedule?.initialStateToggle,
@@ -865,7 +795,6 @@ export class WorkpackModelComponent implements OnInit {
       idPlanModel: this.idStrategy,
       modelName,
       modelNameInPlural,
-      // sortBy: this.modelProperties.find(p => p.id === sortBy),
       sortBy,
       organizationRoles: this.posibleRolesOrg,
       personRoles: this.posibleRolesPerson,
@@ -1005,6 +934,12 @@ export class WorkpackModelComponent implements OnInit {
             };
             if (p.idDomain) {
               p.extraList = await this.getListLocalities(p.idDomain);
+            }
+            if (p.defaults) {
+              const isArray = p.defaults instanceof Array;
+              if (!p.multipleSelection && isArray) {
+                p.defaults = (p.defaults as any[]).shift();
+              }
             }
             await this.checkProperty(p);
             return [ p, i ];

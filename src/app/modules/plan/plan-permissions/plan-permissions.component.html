@@ -9,9 +9,12 @@
         <div class="search-container" *ngIf="!personEmail">
           <span class="p-float-label">
             <input class="app-input-text input-search" [class.responsive]="responsive" id="float-search"
-              name="searchPerson" [(ngModel)]="searchedEmailPerson" type="search"
-              pInputText (ngModelChange)="debounceSearch.next()"/>
+              name="searchPerson" [(ngModel)]="searchedEmailPerson" type="search" pInputText
+              (ngModelChange)="debounceSearch.next()" />
             <label class="app-input-label" for="float-search">{{ "searchPerson" | translate }}</label>
+          </span>
+          <span class="input-message-error" *ngIf="invalidMailMessage">
+            {{ invalidMailMessage }}
           </span>
         </div>
         <p-card class="card-person" *ngIf="person" [class.responsive]="responsive">
@@ -20,7 +23,8 @@
         </p-card>
       </div>
       <div class="data-view-containter" *ngIf="person">
-        <p-dataView [value]="cardItemsPlanPermission" layout="grid" styleClass="dataview-card-items" [emptyMessage]="'loadingEllipsis' | translate">
+        <p-dataView [value]="cardItemsPlanPermission" layout="grid" styleClass="dataview-card-items"
+          [emptyMessage]="'loadingEllipsis' | translate">
           <ng-template let-cardItem pTemplate="gridItem">
             <div class="p-col-12 p-md-3 p-sm-12 card-item-container" [class.responsive]="responsive">
               <app-card-item-permission [properties]="cardItem" (changeSelected)="saveButton.showButton()">

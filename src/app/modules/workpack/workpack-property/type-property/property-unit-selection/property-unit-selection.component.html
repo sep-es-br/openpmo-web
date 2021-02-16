@@ -9,7 +9,7 @@
     [(ngModel)]="property.selectedValue" dropdownIcon="fas fa-caret-down"
     [autoDisplayFirst]="false"
     [required]="property.required"
-    (ngModelChange)="changed.emit($event)">
+    (ngModelChange)="changed.emit($event); clearErrorMessage()">
   </p-dropdown>
   <label class="app-input-label" [for]="property.name">{{property.label}} {{ property.required ? '*' : ''}}</label>
 </span>

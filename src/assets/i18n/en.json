@@ -97,6 +97,7 @@
     "invalidForm": "Invalid form",
     "invalidField": "Invalid field",
     "invalidFields": "Invalid field(s): \n{{ fields }}",
+    "invalidEmail": "Invalid mail",
     "setValueOfInvalidFieldProperty": "Set fields {{ field }} on property {{ prop }}",
     "cantRemoveCostAccountWithScheduleOn": "First disable schedule then proceed",
     "cantEnableScheduleWithoutCostAccountOn": "First enable Cost Account then proceed",

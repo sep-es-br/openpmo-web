@@ -11,7 +11,7 @@
       optionLabel="label"
       [required]="property.required"
       optionValue="value"
-      (ngModelChange)="changed.emit($event)"></p-multiSelect>
+      (ngModelChange)="changed.emit($event); clearErrorMessage()"></p-multiSelect>
     <label class="app-input-label" for="float-label">{{property.label}} {{ property.required ? '*' : ''}}</label>
   </span>
 </ng-container>
@@ -27,7 +27,7 @@
       [autoDisplayFirst]="false"
       [disabled]="property.disabled"
       [required]="property.required"
-      (ngModelChange)="changed.emit($event)">
+      (ngModelChange)="changed.emit($event); clearErrorMessage()">
     </p-dropdown>
     <label class="app-input-label" [for]="property.name">{{property.label}} {{ property.required ? '*' : ''}}</label>
   </span>

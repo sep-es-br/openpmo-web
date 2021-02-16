@@ -26,5 +26,10 @@ export class PropertyTextComponent implements OnInit {
   ngOnInit(): void {
   }
 
+  clearErrorMessage() {
+    this.property.invalid = false;
+    this.property.message = '';
+  }
+
 }
 
