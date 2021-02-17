@@ -532,7 +532,19 @@ export class WorkpackModelComponent implements OnInit {
     property.obligatory = ['name', 'fullName'].includes(property.name);
   }
 
-  deleteProperty(property: IWorkpackModelProperty) {
+  async deleteProperty(property: IWorkpackModelProperty) {
+    if (property.id) {
+      const result = await this.workpackModelSrv.canDeleteProperty(property.id);
+      if (!result.success || result.data === false) {
+        this.messageSrv.add({
+          severity: 'warn',
+          summary: this.translateSrv.instant('warn'),
+          detail: this.translateSrv.instant('messages.cantRemovePropertyUsedInWorkpack')
+        });
+        return;
+      }
+    }
+
     this.confirmationSrv.confirm({
       message: `${this.translateSrv.instant('messages.deletePropertyConfirmation')} ${property.label}?`,
       key: 'deleteConfirm',
@@ -544,6 +556,7 @@ export class WorkpackModelComponent implements OnInit {
         } else {
           this.modelProperties = this.modelProperties.filter(p => p !== property);
         }
+        this.saveButton?.showButton();
       }
     });
   }

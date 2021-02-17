@@ -15,4 +15,8 @@ export class WorkpackModelService extends BaseService<IWorkpackModel> {
   hasParentProject(idWorkpackModel: number) {
     return this.http.get<IHttpResult<boolean>>(`${this.urlBase}/${idWorkpackModel}/parent-project`).toPromise();
   }
+
+  canDeleteProperty(idProperty: number) {
+    return this.http.get<IHttpResult<boolean>>(`${this.urlBase}/can-delete-property/${idProperty}`).toPromise();
+  }
 }

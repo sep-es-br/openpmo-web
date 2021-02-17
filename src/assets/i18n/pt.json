@@ -100,6 +100,7 @@
     "invalidEmail": "Email inválido",
     "setValueOfInvalidFieldProperty": "Definir campos {{ field }} na propriedade {{ prop }}",
     "cantRemoveCostAccountWithScheduleOn": "Primeiro desabilite o Cronograma depois prossiga",
+    "cantRemovePropertyUsedInWorkpack": "Essa propriedade já está em uso em um workpack. Não pode ser excluída.",
     "cantEnableScheduleWithoutCostAccountOn": "Primeiro ative o Centros de Custo depois prossiga",
     "duplicatedNames": "Nomes duplicados: \n{{ names }}",
     "duplicatedLabels": "Legendas duplicadas: \n {{ labels }}",
@@ -152,6 +153,13 @@
         "delete": {
           "relationship": {
             "error": "Não é possível a exclusão pois o mesmo possui localidades relacionadas."
+          }
+        }
+      },
+      "propertyModel": {
+        "delete": {
+          "relationship": {
+            "error": "Essa propriedade já está em uso em um workpack. Não pode ser excluída."
           }
         }
       }

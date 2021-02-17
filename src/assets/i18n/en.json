@@ -101,6 +101,7 @@
     "setValueOfInvalidFieldProperty": "Set fields {{ field }} on property {{ prop }}",
     "cantRemoveCostAccountWithScheduleOn": "First disable schedule then proceed",
     "cantEnableScheduleWithoutCostAccountOn": "First enable Cost Account then proceed",
+    "cantRemovePropertyUsedInWorkpack": "This property already in a workpack. This can't be deleted",
     "duplicatedNames": "Duplicated names: \n{{ names }}",
     "duplicatedLabels": "Duplicated labels: \n {{ labels }}",
     "error": {
@@ -152,6 +153,13 @@
         "delete": {
           "relationship": {
             "error": "Exclusion is not possible as it has related localities."
+          }
+        }
+      },
+      "propertyModel": {
+        "delete": {
+          "relationship": {
+            "error": "This property already in a workpack. This can't be deleted"
           }
         }
       }
