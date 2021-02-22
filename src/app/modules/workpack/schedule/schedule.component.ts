@@ -57,6 +57,7 @@ export class ScheduleComponent implements OnInit, OnDestroy {
   menuItemsCostAccounts: MenuItem[];
   costAssignmentsTotals = { plannedTotal: 0,  actualTotal: 0};
   $destroy = new Subject();
+  calendarFormat: string;
 
   constructor(
     private actRouter: ActivatedRoute,
@@ -71,20 +72,24 @@ export class ScheduleComponent implements OnInit, OnDestroy {
     private costAccountSrv: CostAccountService,
     private messageSrv: MessageService,
     private router: Router,
-    private detectSrv: ChangeDetectorRef
   ) {
     this.actRouter.queryParams.subscribe(async queryParams => {
       this.idWorkpack = queryParams.idWorkpack;
     });
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.responsive = value);
-    this.translateSrv.onLangChange.pipe(takeUntil(this.$destroy)).subscribe(() =>
-      setTimeout(() => this.calendarComponents?.map(calendar => calendar.ngOnInit(), 150))
+    this.translateSrv.onLangChange.pipe(takeUntil(this.$destroy)).subscribe(() => {
+        setTimeout(() => this.calendarComponents?.map(calendar => {
+          calendar.ngOnInit();
+          calendar.dateFormat = this.translateSrv.instant('dateFormat');
+          calendar.updateInputfield();
+        }, 150));
+      }
     );
     this.formSchedule = this.formBuilder.group({
-      start: [new Date('2021-02-01'), Validators.required],
-      end: [new Date('2021-02-20'), Validators.required],
-      plannedWork: [1000, Validators.required],
-      actualWork: 500
+      start: [new Date(), Validators.required],
+      end: [new Date(), Validators.required],
+      plannedWork: [null, Validators.required],
+      actualWork: null
     });
   }
 
@@ -94,6 +99,7 @@ export class ScheduleComponent implements OnInit, OnDestroy {
   }
 
   async ngOnInit() {
+    this.calendarFormat = this.translateSrv.instant('dateFormat');
     await this.loadPropertiesSchedule();
     this.breadcrumbSrv.pushMenu({
       key: 'schedule',

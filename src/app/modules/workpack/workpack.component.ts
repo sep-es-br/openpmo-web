@@ -1,4 +1,4 @@
-import { Component, OnDestroy, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { MenuItem, MessageService, TreeNode } from 'primeng/api';
@@ -148,14 +148,59 @@ export class WorkpackComponent implements OnDestroy {
     }
   }
 
-  checkProperties() {
-    const arePropertiesValid: boolean = this.sectionPropertiesProperties
+  checkProperties(property: PropertyTemplateModel) {
+    const arePropertiesRequiredValid: boolean = this.sectionPropertiesProperties
       .filter(({ required }) => required)
-      .map(({ value }) => value instanceof Array
-        ? value.length > 0
-        : typeof value == 'boolean' || typeof value == 'number' || !!value)
+      .map(( prop ) => {
+        let valid = (prop.value instanceof Array
+          ? (prop.value.length > 0 )
+          : typeof prop.value == 'boolean' || typeof prop.value == 'number'
+            || !!prop.value || (prop.value !== null && prop.value !== undefined && prop.value !== ''));
+        if (['OrganizationSelection','UnitSelection', 'LocalitySelection'].includes(prop.type)) {
+          if (prop.type === 'LocalitySelection') {
+            if (!prop.multipleSelection) {
+              const selectedLocality = prop.localitiesSelected as TreeNode;
+              prop.selectedValues = [selectedLocality.data];
+            }
+            if (prop.multipleSelection) {
+              const selectedLocality = prop.localitiesSelected as TreeNode[];
+              prop.selectedValues = selectedLocality.filter(locality => locality.data !== prop.idDomain)
+                .map(l => l.data);
+            }
+          }
+          valid = ( typeof prop.selectedValue === 'number' || ( prop.selectedValues instanceof Array ?
+            prop.selectedValues.length > 0 : typeof prop.selectedValues == 'number'));
+        }
+        if (property.idPropertyModel === prop.idPropertyModel) {
+          prop.invalid = !valid;
+          prop.message = valid ? '' : this.translateSrv.instant('required');
+        }
+        return valid;
+      })
       .reduce((a, b) => a ? b : a, true);
-    return arePropertiesValid ? this.saveButton?.showButton() : this.saveButton?.hideButton();
+
+    const arePropertiesStringValid: boolean = this.sectionPropertiesProperties
+      .filter(({min, max, value}) => ( (min || max) && typeof value == 'string'))
+      .map(( prop ) => {
+        let valid = true;
+        valid = prop.min ? String(prop.value).length >= prop.min : true;
+        if (property.idPropertyModel === prop.idPropertyModel) {
+          prop.invalid = !valid;
+          prop.message = !valid ? prop.message = this.translateSrv.instant('minLenght') : '';
+        }
+        if (valid) {
+          valid = prop.max ? ( !prop.required ? String(prop.value).length <= prop.max
+          : String(prop.value).length <= prop.max && String(prop.value).length > 0) : true;
+          if (property.idPropertyModel === prop.idPropertyModel) {
+            prop.invalid = !valid;
+            prop.message = !valid ? ( String(prop.value).length > 0 ? prop.message = this.translateSrv.instant('maxLenght')
+              : prop.message = this.translateSrv.instant('required')) : '';
+          }
+        }
+        return valid;
+      })
+      .reduce((a, b) => a ? b : a, true);
+    return ( arePropertiesRequiredValid && arePropertiesStringValid ) ? this.saveButton?.showButton() : this.saveButton?.hideButton();
   }
 
   async resetWorkpack() {
@@ -169,6 +214,7 @@ export class WorkpackComponent implements OnDestroy {
     this.sectionStakeholder = undefined;
     this.stakeholders = undefined;
     this.sectionCostAccount = undefined;
+    this.costAccounts = undefined;
     this.sectionSchedule = undefined;
     this.schedule = undefined;
     this.sectionWorkpackModelChildren = undefined;
@@ -255,7 +301,7 @@ export class WorkpackComponent implements OnDestroy {
   }
 
  async instanceProperty(propertyModel: IWorkpackModelProperty): Promise<PropertyTemplateModel> {
-    const property = new PropertyTemplateModel(this.translateSrv);
+    const property = new PropertyTemplateModel();
     const propertyWorkpack = this.workpack && this.workpack.properties.find( wp => wp.idPropertyModel === propertyModel.id);
 
     property.id = propertyWorkpack && propertyWorkpack.id;
@@ -300,7 +346,7 @@ export class WorkpackComponent implements OnDestroy {
         data: domain.id,
         children: undefined,
         parent: undefined,
-        selectable: this.editPermission
+        selectable: (this.editPermission && property.multipleSelection)
       };
       rootNode.children = this.loadLocality(localityList, rootNode);
       property.idDomain = propertyModel.idDomain;
@@ -778,6 +824,8 @@ export class WorkpackComponent implements OnDestroy {
   async deleteCostAccount(cost: ICostAccount) {
     const result = await this.costAccountSrv.delete(cost);
     if (result.success) {
+      this.sectionCostAccount.cardItemsSection =
+        Array.from(this.sectionCostAccount.cardItemsSection.filter( item => item.itemId !== cost.id));
       return;
     }
   }
@@ -819,7 +867,7 @@ export class WorkpackComponent implements OnDestroy {
           costProgressBar: {
             total: step.consumes.reduce( (total, v) => ( total + v.plannedCost), 0),
             progress: step.consumes.reduce( (total, v) => ( total + v.actualCost), 0),
-            color: '#13bc75bf'
+            color: '#44B39B'
           },
           unitName: unit && unit.name,
           idStep: step.id
@@ -874,7 +922,7 @@ export class WorkpackComponent implements OnDestroy {
               labelTotal: this.translateSrv.instant('planned'),
               labelProgress: this.translateSrv.instant('actual'),
               valueUnit: 'currency',
-              color: '#13bc75bf'
+              color: '#44B39B'
             }
           ]
         },
@@ -994,7 +1042,7 @@ export class WorkpackComponent implements OnDestroy {
 
   async saveWorkpack() {
     this.workpackProperties = this.sectionPropertiesProperties.map(p => p.getValues());
-    this.sectionPropertiesProperties.forEach( p => p.validate());
+    // this.sectionPropertiesProperties.forEach( p => p.validate());
     if (this.sectionPropertiesProperties.filter( p => p.invalid).length > 0) {
       this.messageSrv.add({
         severity: 'warn',

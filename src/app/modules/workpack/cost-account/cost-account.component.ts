@@ -23,6 +23,7 @@ import { LocalityService } from 'src/app/shared/services/locality.service';
 import { PlanService } from 'src/app/shared/services/plan.service';
 import { MeasureUnitService } from 'src/app/shared/services/measure-unit.service';
 import { SaveButtonComponent } from 'src/app/shared/components/save-button/save-button.component';
+import { TreeNode } from 'primeng/api';
 
 @Component({
   selector: 'app-cost-account',
@@ -72,14 +73,6 @@ export class CostAccountComponent implements OnInit {
     });
   }
 
-  handleChangeProperty() {
-    const valid = this.sectionCostAccountProperties
-      ?.reduce((a, b) => a ? (!b.required || (!!b.value || !!b.selectedValue || !!b.selectedValues)) : a, true);
-    return valid
-      ? this.saveButton?.showButton()
-      : this.saveButton?.hideButton();
-  }
-
   async ngOnInit() {
     await this.loadProperties();
     this.breadcrumbSrv.pushMenu({
@@ -120,7 +113,7 @@ export class CostAccountComponent implements OnInit {
             progress: costAccountTotalValues.data.atual,
             labelProgress: this.translateSrv.instant('actual'),
             labelTotal: this.translateSrv.instant('planned'),
-            color: '#13bc75bf',
+            color: '#44B39B',
             valueUnit: 'currency'
           }]
         };
@@ -170,7 +163,7 @@ export class CostAccountComponent implements OnInit {
   }
 
   instanceProperty(propertyModel: IWorkpackModelProperty): PropertyTemplateModel {
-    const property = new PropertyTemplateModel(this.translateSrv);
+    const property = new PropertyTemplateModel();
     const propertyCostAccount = this.costAccount && this.costAccount.properties.find( cost => cost.idPropertyModel === propertyModel.id);
 
     property.id = propertyCostAccount && propertyCostAccount.id;
@@ -332,9 +325,63 @@ export class CostAccountComponent implements OnInit {
     }
   }
 
+  checkProperties(property: PropertyTemplateModel) {
+    const arePropertiesRequiredValid: boolean = this.sectionCostAccountProperties
+      .filter(({ required }) => required)
+      .map(( prop ) => {
+        let valid = (prop.value instanceof Array
+          ? (prop.value.length > 0 )
+          : typeof prop.value == 'boolean' || typeof prop.value == 'number'
+            || !!prop.value || (prop.value !== null && prop.value !== undefined));
+        if (['OrganizationSelection','UnitSelection', 'LocalitySelection'].includes(prop.type)) {
+          if (prop.type === 'LocalitySelection') {
+            if (!prop.multipleSelection) {
+              const selectedLocality = prop.localitiesSelected as TreeNode;
+              prop.selectedValues = [selectedLocality.data];
+            }
+            if (prop.multipleSelection) {
+              const selectedLocality = prop.localitiesSelected as TreeNode[];
+              prop.selectedValues = selectedLocality.filter(locality => locality.data !== prop.idDomain)
+                .map(l => l.data);
+            }
+          }
+          valid = ( typeof prop.selectedValue === 'number' || ( prop.selectedValues instanceof Array ?
+            prop.selectedValues.length > 0 : typeof prop.selectedValues == 'number'));
+        }
+        if (property.idPropertyModel === prop.idPropertyModel) {
+          prop.invalid = !valid;
+          prop.message = valid ? '' : this.translateSrv.instant('required');
+        }
+        return valid;
+      })
+      .reduce((a, b) => a ? b : a, true);
+
+    const arePropertiesStringValid: boolean = this.sectionCostAccountProperties
+      .filter(({min, max, value}) => ( (min || max) && typeof value == 'string'))
+      .map(( prop ) => {
+        let valid = true;
+        valid = prop.min ? String(prop.value).length >= prop.min : true;
+        if (property.idPropertyModel === prop.idPropertyModel) {
+          prop.invalid = !valid;
+          prop.message = !valid ? prop.message = this.translateSrv.instant('minLenght') : '';
+        }
+        if (valid) {
+          valid = prop.max ? ( !prop.required ? String(prop.value).length <= prop.max
+          : String(prop.value).length <= prop.max && String(prop.value).length > 0) : true;
+          if (property.idPropertyModel === prop.idPropertyModel) {
+            prop.invalid = !valid;
+            prop.message = !valid ? ( String(prop.value).length > 0 ? prop.message = this.translateSrv.instant('maxLenght')
+              : prop.message = this.translateSrv.instant('required')) : '';
+          }
+        }
+        return valid;
+      })
+      .reduce((a, b) => a ? b : a, true);
+    return ( arePropertiesRequiredValid && arePropertiesStringValid ) ? this.saveButton?.showButton() : this.saveButton?.hideButton();
+  }
+
   async saveCostAccount() {
     this.costAccountProperties = this.sectionCostAccountProperties.map(p => p.getValues());
-    this.sectionCostAccountProperties.forEach( p => p.validate());
     if (this.sectionCostAccountProperties.filter( p => p.invalid).length > 0) {
       return;
     }

@@ -61,6 +61,7 @@ export class StepComponent implements OnInit, OnDestroy {
   menuItemsCostAccounts: MenuItem[];
   costAssignmentsTotals = { plannedTotal: 0,  actualTotal: 0};
   $destroy = new Subject();
+  calendarFormat: string;
 
   constructor(
     private actRouter: ActivatedRoute,
@@ -81,8 +82,13 @@ export class StepComponent implements OnInit, OnDestroy {
       this.unitName = queryParams.unitName;
     });
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.responsive = value);
-    this.translateSrv.onLangChange.pipe(takeUntil(this.$destroy)).subscribe(() =>
-      setTimeout(() => this.calendarComponents?.map(calendar => calendar.ngOnInit(), 150))
+    this.translateSrv.onLangChange.pipe(takeUntil(this.$destroy)).subscribe(() => {
+        setTimeout(() => this.calendarComponents?.map(calendar => {
+          calendar.ngOnInit();
+          calendar.dateFormat = this.translateSrv.instant('dateFormat');
+          calendar.updateInputfield();
+        }, 150));
+      }
     );
     this.formStep = this.formBuilder.group({
       start: null,
@@ -98,6 +104,7 @@ export class StepComponent implements OnInit, OnDestroy {
   }
 
   async ngOnInit() {
+    this.calendarFormat = this.translateSrv.instant('dateFormat');
     await this.loadPropertiesStep();
     this.breadcrumbSrv.pushMenu({
       key: 'step',

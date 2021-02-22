@@ -169,10 +169,10 @@ body {
     align-content: center;
   }
   .p-inputswitch.p-focus .p-inputswitch-slider {
-    box-shadow: 0 0 0 0.1rem #13bc75bf;
+    box-shadow: 0 0 0 0.1rem #44B39B;
   }
   .p-inputswitch-checked .p-inputswitch-slider{
-    background-color: #13bc75bf !important;
+    background-color: #44B39B !important;
   }
   .p-inputswitch .p-inputswitch-slider {
     align-content: center;
@@ -197,15 +197,15 @@ body {
       background: transparent;
     }
     .p-checkbox:not(.p-checkbox-disabled) .p-checkbox-box.p-highlight {
-      border: #13bc75bf;
-      background: #13bc75bf;
+      border: #44B39B;
+      background: #44B39B;
     }
     .p-checkbox:not(.p-checkbox-disabled) .p-checkbox-box.p-highlight:hover {
-      border-color: #13bc75bf;
-      background: #13bc75bf;
+      border-color: #44B39B;
+      background: #44B39B;
     }
     .p-checkbox:not(.p-checkbox-disabled) .p-checkbox-box:hover {
-      border-color: #13bc75bf;
+      border-color: #44B39B;
     }
     .p-tree-container .p-treenode .p-treenode-content .p-tree-toggler:focus {
       box-shadow: none;
@@ -243,7 +243,7 @@ body {
     font-family: v.$fontFamilyMedium;
     color: v.$fontInput;
     .p-dropdown-item.p-highlight {
-      background-color: #13bc75bf;
+      background-color: #44B39B;
       color: #ffffff;
     }
   }
@@ -307,15 +307,15 @@ body {
     }
   }
   .p-checkbox:not(.p-checkbox-disabled) .p-checkbox-box.p-highlight {
-    border: #13bc75bf;
-    background: #13bc75bf;
+    border: #44B39B;
+    background: #44B39B;
   }
   .p-checkbox:not(.p-checkbox-disabled) .p-checkbox-box.p-highlight:hover {
-    border-color: #13bc75bf;
-    background: #13bc75bf;
+    border-color: #44B39B;
+    background: #44B39B;
   }
   .p-checkbox:not(.p-checkbox-disabled) .p-checkbox-box:hover {
-    border-color: #13bc75bf;
+    border-color: #44B39B;
   }
 }
 
@@ -384,15 +384,15 @@ body {
 // Component checkbox
 .app-checkbox {
   .p-checkbox:not(.p-checkbox-disabled) .p-checkbox-box.p-highlight {
-    border-color: #13bc75bf;
-    background: #13bc75bf;
+    border-color: #44B39B;
+    background: #44B39B;
   }
   .p-checkbox:not(.p-checkbox-disabled) .p-checkbox-box.p-highlight:hover {
-    border-color: #13bc75bf;
-    background: #13bc75bf;
+    border-color: #44B39B;
+    background: #44B39B;
   }
   .p-checkbox:not(.p-checkbox-disabled) .p-checkbox-box:hover {
-    border-color: #13bc75bf;
+    border-color: #44B39B;
   }
   .p-checkbox:not(.p-checkbox-disabled) .p-checkbox-box.p-focus {
     border-color: #13bc75aa; // TODO: FIND BRIGHTER COLOR

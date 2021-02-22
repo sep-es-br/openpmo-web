@@ -40,7 +40,7 @@
           <label class="app-input-label" for="input-icon">{{ 'icon' | translate }} *</label>
         </span>
         <span class="p-float-label property-input p-field">
-          <p-dropdown class="app-single-selection" [autoDisplayFirst]="true" inputId="input-sort-by" [options]="sortedByList" formControlName="sortedBy">
+          <p-dropdown class="app-single-selection" inputId="input-sort-by" (onClick)="getSortedByList()" [options]="sortedByList" formControlName="sortedBy">
           </p-dropdown>
           <label class="app-input-label" for="input-sort-by">{{ 'sortedBy' | translate }}*</label>
         </span>

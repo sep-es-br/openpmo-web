@@ -6,7 +6,7 @@ describe('PropertyUnitSelectionComponent', () => {
   let component: PropertyUnitSelectionComponent;
   let fixture: ComponentFixture<PropertyUnitSelectionComponent>;
 
-  beforeEach(async () => {
+  beforeEach(async() => {
     await TestBed.configureTestingModule({
       declarations: [ PropertyUnitSelectionComponent ]
     })

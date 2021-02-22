@@ -94,7 +94,7 @@
   .card-schedule {
     margin-top: 2em;
     .button-new-schedule {
-      background: #13bc75bf;
+      background: #44B39B;
       color: #ffffff;
       font-size: 0.8rem;
       font-family: v.$fontFamilyMedium;
@@ -210,4 +210,15 @@
       }
     }
   }
+}
+
+.input-message-error {
+  color: white;
+  background: #f44336;
+  padding: 4px 8px;
+  display: inline-flex;
+  margin-top: 2px;
+  border-radius: 5px;
+  font-size: 0.7rem;
+  font-family: v.$fontFamilyMedium;
 }

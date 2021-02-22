@@ -12,8 +12,7 @@
     <app-card [properties]="cardCostAccountProperties">
       <div class="properties-container">
         <div class="property-container" *ngFor="let property of sectionCostAccountProperties" [class.fullLine]="property.fullLine">
-          <app-workpack-property [property]="property" (changed)="handleChangeProperty()">
-
+          <app-workpack-property [property]="property" (changed)="checkProperties(property)">
           </app-workpack-property>
         </div>
       </div>

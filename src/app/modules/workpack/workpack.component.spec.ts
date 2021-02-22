@@ -6,7 +6,7 @@ describe('WorkpackComponent', () => {
   let component: WorkpackComponent;
   let fixture: ComponentFixture<WorkpackComponent>;
 
-  beforeEach(async () => {
+  beforeEach(async() => {
     await TestBed.configureTestingModule({
       declarations: [ WorkpackComponent ]
     })

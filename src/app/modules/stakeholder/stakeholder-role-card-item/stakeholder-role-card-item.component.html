@@ -16,14 +16,17 @@
     <span class="p-float-label">
       <p-calendar id="float-from" class="app-select-date" showIcon="true" [(ngModel)]="properties.role.from"
         [disabled]="!properties.role.active" [monthNavigator]="true" [yearNavigator]="true" yearRange="2020:2030"
-        icon="fas fa-calendar-alt" dateFormat="yy/mm/dd" (onSelect)="handleRoleChange()">
+        icon="fas fa-calendar-alt" 
+        [dateFormat]="calendarFormat" 
+        (onSelect)="handleRoleChange()">
       </p-calendar>
       <label class="app-input-label" for="float-from">{{ "from" | translate }}</label>
     </span>
     <span class="p-float-label">
       <p-calendar id="float-to" class="app-select-date" showIcon="true" [disabled]="!properties.role.active"
         [(ngModel)]="properties.role.to" [monthNavigator]="true" (onSelect)="handleRoleChange()" [yearNavigator]="true"
-        yearRange="2020:2030" icon="fas fa-calendar-alt" dateFormat="yy/mm/dd">
+        yearRange="2020:2030" icon="fas fa-calendar-alt" 
+        [dateFormat]="calendarFormat">
       </p-calendar>
       <label class="app-input-label" for="float-to">{{ "to" | translate }}</label>
     </span>

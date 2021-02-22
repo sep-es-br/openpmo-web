@@ -23,7 +23,7 @@ export class PropertyDateComponent implements OnInit, OnDestroy {
   dateMax: Date;
   responsive: boolean;
   $destroy = new Subject();
-  message: string;
+  calendarFormat: string;
 
   constructor(
     private responsiveSrv: ResponsiveService,
@@ -31,7 +31,12 @@ export class PropertyDateComponent implements OnInit, OnDestroy {
   ) {
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.responsive = value);
     this.translateSrv.onLangChange.pipe(takeUntil(this.$destroy)).subscribe(() =>
-      setTimeout(() => this.calendarComponent?.ngOnInit(), 150)
+      setTimeout(() =>
+      {
+        this.calendarComponent?.ngOnInit();
+        this.calendarComponent.dateFormat = this.translateSrv.instant('dateFormat');
+        this.calendarComponent.updateInputfield();
+      }, 150)
     );
   }
 
@@ -41,6 +46,7 @@ export class PropertyDateComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.calendarFormat = this.translateSrv.instant('dateFormat');
     this.loadDates();
   }
 
@@ -49,11 +55,6 @@ export class PropertyDateComponent implements OnInit, OnDestroy {
     this.defaultValue = defaultValueDate && new Date(defaultValueDate);
     this.dateMin = this.property.min && new Date(this.property.min);
     this.dateMax = this.property.max && new Date(this.property.max);
-  }
-
-  clearErrorMessage() {
-    this.property.invalid = false;
-    this.property.message = '';
   }
 
 }

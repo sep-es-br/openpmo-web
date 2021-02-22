@@ -29,8 +29,10 @@
             <div class="p-field" [class.responsive]="responsive">
               <span class="p-float-label" [class.responsive]="responsive">
                 <p-calendar id="float-start" formControlName="start" class="app-select-date" showIcon="true"
-                  [monthNavigator]="true" [yearNavigator]="true" yearRange="2020:2030" [class.responsive]="responsive"
-                  icon="fas fa-calendar-alt" dateFormat="yy/mm/dd">
+                  [monthNavigator]="true" [yearNavigator]="true" yearRange="2020:2030" 
+                  [class.responsive]="responsive"
+                  icon="fas fa-calendar-alt" 
+                  [dateFormat]="calendarFormat">
                 </p-calendar>
                 <label class="app-input-label" for="float-start">{{ "start" | translate }} * </label>
               </span>
@@ -39,7 +41,7 @@
               <span class="p-float-label" [class.responsive]="responsive">
                 <p-calendar id="float-finish" formControlName="finish" class="app-select-date" showIcon="true"
                   [monthNavigator]="true" [yearNavigator]="true" yearRange="2020:2030" [class.responsive]="responsive"
-                  icon="fas fa-calendar-alt" dateFormat="yy/mm/dd">
+                  icon="fas fa-calendar-alt" [dateFormat]="calendarFormat">
                 </p-calendar>
                 <label class="app-input-label" class="properties-label" for="float-finish">{{ "finish" |
                   translate}} * </label>

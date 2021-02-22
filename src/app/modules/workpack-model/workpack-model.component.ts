@@ -81,6 +81,7 @@ export class WorkpackModelComponent implements OnInit {
   $destroy = new Subject();
   isMobileView = false;
   editPermission = false;
+  sortedByList: SelectItem[];
 
   constructor(
     private router: Router,
@@ -149,8 +150,8 @@ export class WorkpackModelComponent implements OnInit {
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(r => this.isMobileView = r);
   }
 
-  get sortedByList(): SelectItem[] {
-    return this.modelProperties.filter(p => p.label !== undefined).map(p => ({ label: p.label, value: p.label }));
+  getSortedByList() {
+    this.sortedByList = this.modelProperties.filter(p => p.label !== undefined).map(p => ({ label: p.label, value: p.label }));
   }
 
   resetValues() {
@@ -164,6 +165,11 @@ export class WorkpackModelComponent implements OnInit {
     this.modelCostProperties = [];
     this.childrenModels = [];
     this.cardItemsModels = [];
+    this.cardProperties = null;
+    this.cardPropertiesStakeholders = null;
+    this.cardPropertiesCostAccount = null;
+    this.cardPropertiesModels = null;
+    this.cardPropertiesSchedule = null;
   }
 
   ngOnInit(): void {
@@ -456,12 +462,15 @@ export class WorkpackModelComponent implements OnInit {
             if (p.idDomain) {
               p.extraList = await this.getListLocalities(p.idDomain);
             }
-            //alterei aqui
             if (p.defaults) {
               const isArray = p.defaults instanceof Array;
               if (!p.multipleSelection && isArray) {
                 p.defaults = (p.defaults as any[]).shift();
               }
+            }
+            if (p.type === TypePropertyEnum.DateModel) {
+              const value = p.defaultValue && p.defaultValue.toLocaleString();
+              p.defaultValue = value && new Date(value);
             }
             await this.checkProperty(p);
             return [ p, i ];
@@ -473,6 +482,7 @@ export class WorkpackModelComponent implements OnInit {
         this.modelProperties = dataProperties.filter(p => !p.session || p.session === PropertySessionEnum.PROPERTIES);
         this.modelCostProperties = dataProperties.filter(p => p.session === PropertySessionEnum.COST);
       }
+      this.getSortedByList();
       this.cardPropertiesCostAccount.initialStateToggle = data.costSessionActive;
       this.cardPropertiesModels.initialStateToggle = data.childWorkpackModelSessionActive;
       this.cardPropertiesStakeholders.initialStateToggle = data.stakeholderSessionActive;
@@ -953,6 +963,10 @@ export class WorkpackModelComponent implements OnInit {
               if (!p.multipleSelection && isArray) {
                 p.defaults = (p.defaults as any[]).shift();
               }
+            }
+            if (p.type === TypePropertyEnum.DateModel) {
+              const value = p.defaultValue && p.defaultValue.toLocaleString();
+              p.defaultValue = value && new Date(value);
             }
             await this.checkProperty(p);
             return [ p, i ];

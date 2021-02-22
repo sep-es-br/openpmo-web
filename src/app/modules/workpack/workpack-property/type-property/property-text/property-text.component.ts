@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { PropertyTemplateModel } from 'src/app/shared/models/PropertyTemplateModel';
 import { ResponsiveService } from 'src/app/shared/services/responsive.service';
@@ -13,7 +13,6 @@ export class PropertyTextComponent implements OnInit {
   @Input() property: PropertyTemplateModel;
   @Output() changed = new EventEmitter();
   responsive: boolean;
-  message: string;
 
   constructor(
     private responsiveSrv: ResponsiveService,
@@ -24,11 +23,6 @@ export class PropertyTextComponent implements OnInit {
   }
 
   ngOnInit(): void {
-  }
-
-  clearErrorMessage() {
-    this.property.invalid = false;
-    this.property.message = '';
   }
 
 }

@@ -1,14 +1,11 @@
 <span class="p-float-label" [class.workpack-date-mobile]="responsive" [class.workpack-date]="property.fullLine"
   [class.workpack-date-not-fullLine]="!property.fullLine">
   <p-calendar [id]="property.name" [(ngModel)]="property.value" class="app-select-date" showIcon="true"
-    icon="fas fa-calendar-alt" dateFormat="yy/mm/dd" [defaultDate]="defaultValue" [monthNavigator]="true"
-    [yearNavigator]="true" yearRange="2020:2030" [required]="property.required" 
-    (onBlur)="clearErrorMessage()"
-    [minDate]="dateMin" [maxDate]="dateMax"
-    [disabled]="property.disabled" (ngModelChange)="changed.emit($event)">
+    icon="fas fa-calendar-alt" [dateFormat]="calendarFormat" [defaultDate]="defaultValue" [monthNavigator]="true"
+    [yearNavigator]="true" yearRange="2020:2030" [required]="property.required" [minDate]="dateMin" [maxDate]="dateMax"
+    [disabled]="property.disabled" [class.ng-invalid]="property.invalid" (ngModelChange)="changed.emit($event)"
+    (onBlur)="changed.emit($event)"
+    >
   </p-calendar>
   <label class="app-input-label" [for]="property.name">{{ property.label}} {{ property.required ? '*' : ''}}</label>
-</span>
-<span class="input-message-error" *ngIf="property.invalid">
-  {{ property.message }}
 </span>

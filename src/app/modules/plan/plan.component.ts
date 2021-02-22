@@ -50,6 +50,7 @@ export class PlanComponent implements OnInit, OnDestroy {
   planData: IPlan;
   $destroy = new Subject();
   editPermission = false;
+  calendarFormat: string;
 
   constructor(
     private actRouter: ActivatedRoute,
@@ -66,14 +67,19 @@ export class PlanComponent implements OnInit, OnDestroy {
     private messageSrv: MessageService,
     private menuSrv: MenuService
   ) {
-    this.actRouter.queryParams.subscribe(({ id, idOffice, idPlanModel}) => {
+    this.actRouter.queryParams.subscribe(({ id, idOffice, idPlanModel }) => {
       this.idOffice = +idOffice;
       this.idPlanModel = +idPlanModel;
       this.idPlan = +id;
     });
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.responsive = value);
-    this.translateSrv.onLangChange.pipe(takeUntil(this.$destroy)).subscribe(() =>
-      setTimeout(() => this.calendarComponents?.map(calendar => calendar.ngOnInit(), 150))
+    this.translateSrv.onLangChange.pipe(takeUntil(this.$destroy)).subscribe(() => {
+        setTimeout(() => this.calendarComponents?.map(calendar => {
+          calendar.ngOnInit();
+          calendar.dateFormat = this.translateSrv.instant('dateFormat');
+          calendar.updateInputfield();
+        }, 150));
+      }
     );
     this.formPlan = this.formBuilder.group({
       name: ['', [Validators.required, Validators.maxLength(50)]],
@@ -95,6 +101,7 @@ export class PlanComponent implements OnInit, OnDestroy {
   }
 
   async ngOnInit() {
+    this.calendarFormat = this.translateSrv.instant('dateFormat');
     await this.loadPropertiesPlan();
     this.breadcrumbSrv.pushMenu({
       key: 'plan',
@@ -146,12 +153,12 @@ export class PlanComponent implements OnInit, OnDestroy {
     const isPut = !!this.planData.id;
     const { success, data } = isPut
       ? await this.planSrv.put({
-          id: this.planData.id,
-          name: this.planData.name,
-          fullName: this.planData.fullName,
-          start: this.planData.start,
-          finish: this.planData.finish
-        })
+        id: this.planData.id,
+        name: this.planData.name,
+        fullName: this.planData.fullName,
+        start: this.planData.start,
+        finish: this.planData.finish
+      })
       : await this.planSrv.post({
         idOffice: this.planData.idOffice,
         idPlanModel: this.planData.idPlanModel,
@@ -235,12 +242,12 @@ export class PlanComponent implements OnInit, OnDestroy {
       noLoading: true
     });
     const workpacks = result.success && result.data;
-    const workPackItemCardList: ICardItem[] = workpacks.map( workpack => {
+    const workPackItemCardList: ICardItem[] = workpacks.map(workpack => {
       const propertyNameWorkpackModel = workpack.model?.properties?.find(p => p.name === 'name');
       const propertyNameWorkpack = workpack.properties.find(p => p.idPropertyModel === propertyNameWorkpackModel?.id);
       const propertyfullnameWorkpackModel = workpack.model?.properties?.find(p => p.name === 'fullname');
       const propertyFullnameWorkpack = workpack.properties.find(p => p.idPropertyModel === propertyfullnameWorkpackModel?.id);
-      const workpackPermissions = workpack.permissions && workpack.permissions.find( p => p.level === 'EDIT');
+      const workpackPermissions = workpack.permissions && workpack.permissions.find(p => p.level === 'EDIT');
       const workpackEditPermission = workpackPermissions ? true : this.editPermission;
       return {
         typeCardItem: 'listItem',

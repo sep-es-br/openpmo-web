@@ -56,6 +56,11 @@
       }
       .link {
         padding: .3em 1em;
+        max-width: 200px;
+        white-space: nowrap;
+        word-break: break-word;
+        overflow: hidden;
+        text-overflow: ellipsis;
         border-radius: 25px;
         background-color: v.$bgBreadcrumb;
         color: v.$fontBreadcrumb;

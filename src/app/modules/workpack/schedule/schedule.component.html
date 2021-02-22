@@ -10,9 +10,13 @@
           <div class="p-formgroup-inline" [class.responsive]="responsive">
             <div class="p-field" [class.responsive]="responsive">
               <span class="p-float-label" [class.responsive]="responsive">
-                <p-calendar id="float-start" class="app-select-date" showIcon="true" [monthNavigator]="true"
-                  [yearNavigator]="true" formControlName="start" Range="2020:2030" [class.responsive]="responsive"
-                  icon="fas fa-calendar-alt" dateFormat="yy/mm/dd">
+                <p-calendar id="float-start" class="app-select-date" showIcon="true" 
+                  [monthNavigator]="true"
+                  [yearNavigator]="true" formControlName="start" 
+                  yearRange="2020:2030" 
+                  [class.responsive]="responsive"
+                  icon="fas fa-calendar-alt" 
+                  [dateFormat]="calendarFormat">
                 </p-calendar>
                 <label class="app-input-label" for="float-start">{{ "start" | translate }}</label>
               </span>
@@ -20,8 +24,11 @@
             <div class="p-field" [class.responsive]="responsive">
               <span class="p-float-label" [class.responsive]="responsive">
                 <p-calendar id="float-end" formControlName="end" class="app-select-date" showIcon="true"
-                  [monthNavigator]="true" [yearNavigator]="true" yearRange="2020:2030" [class.responsive]="responsive"
-                  icon="fas fa-calendar-alt" dateFormat="yy/mm/dd">
+                  [monthNavigator]="true" 
+                  [yearNavigator]="true" 
+                  yearRange="2020:2030" [class.responsive]="responsive"
+                  icon="fas fa-calendar-alt" 
+                  [dateFormat]="calendarFormat">
                 </p-calendar>
                 <label class="app-input-label" class="properties-label" for="float-end">{{ "finish" |
                   translate}}</label>
@@ -38,7 +45,7 @@
                       [class.responsive]="responsive">
                     </p-inputNumber>
                     <label class="app-input-label" for="float-planned">{{unitMeasure.name}} {{ "planned" |translate
-                      }}</label>
+                      }} * </label>
                   </span>
                 </div>
                 <div class="p-field" [class.responsive]="responsive">

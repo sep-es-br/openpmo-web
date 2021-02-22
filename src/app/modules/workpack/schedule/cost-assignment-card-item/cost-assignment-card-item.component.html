@@ -10,7 +10,7 @@
         (ngModelChange)="handleCostChange()" mode="decimal" [minFractionDigits]="2" [maxFractionDigits]="2">
       </p-inputNumber>
       <label class="app-input-label" for="float-planned">{{properties.unitMeasureName}} {{ "planned" |translate
-        }}</label>
+        }} * </label>
     </span>
     <span class="p-float-label" [class.responsive]="responsive">
       <p-inputNumber class="app-input-number" id="float-planned" [(ngModel)]="properties.actualWork"

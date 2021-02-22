@@ -23,18 +23,24 @@ export class WorkpackModelPropertyComponent implements OnDestroy, AfterViewInit 
   IconsEnum = IconPropertyWorkpackModelEnum;
   responsive = false;
   $destroy = new Subject();
+  calendarFormat: string;
 
   constructor(
     private translateSrv: TranslateService,
     private responsiveSrv: ResponsiveService
   ) {
+    this.calendarFormat = this.translateSrv.instant('dateFormat');
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(responsive => this.responsive = responsive);
   }
 
   ngAfterViewInit(): void {
     if (this.property?.type === TypePropertyWorkpackModelEnum.DateModel) {
       this.translateSrv.onLangChange.pipe(takeUntil(this.$destroy)).subscribe(() =>
-        setTimeout(() => this.calendarComponent?.ngOnInit(), 150)
+        setTimeout(() => {
+          this.calendarComponent?.ngOnInit();
+          this.calendarComponent.dateFormat = this.translateSrv.instant('dateFormat');
+          this.calendarComponent.updateInputfield();
+        }, 150)
       );
     }
   }

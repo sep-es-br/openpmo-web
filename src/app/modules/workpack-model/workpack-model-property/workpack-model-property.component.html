@@ -175,8 +175,16 @@
           <label class="app-input-label">{{ 'defaultValue' | translate }} *</label>
         </span>
         <span *ngSwitchCase="'DateModel'" class="p-float-label property-input p-field input-date-default-value">
-          <p-calendar [(ngModel)]="property.defaultValue" class="app-select-date" showIcon="true" [disabled]="property.viewOnly"
-            icon="fas fa-calendar-alt" dateFormat="yy/mm/dd" (ngModelChange)="changed.emit($event)">
+          <p-calendar 
+            [(ngModel)]="property.defaultValue"
+            class="app-select-date" showIcon="true" 
+            [disabled]="property.viewOnly"
+            icon="fas fa-calendar-alt" 
+            [dateFormat]="calendarFormat" 
+            [monthNavigator]="true"
+            [yearNavigator]="true" 
+            yearRange="2020:2030" 
+            (ngModelChange)="changed.emit($event)">
           </p-calendar>
           <label class="app-input-label">{{ 'defaultValue' | translate }}</label>
         </span>

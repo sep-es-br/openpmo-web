@@ -1,18 +1,9 @@
-<span class="p-float-label" 
-  [class.workpack-unit-selection]="property.fullLine"
-  [class.workpack-unit-selection-not-fullLine]="!property.fullLine"
-  [class.workpack-unit-selection-mobile]="responsive">
-  <p-dropdown class="app-single-selection"
-    [id]="property.name"
-    [options]="property.possibleValuesIds"
-    [disabled]="property.disabled"
-    [(ngModel)]="property.selectedValue" dropdownIcon="fas fa-caret-down"
-    [autoDisplayFirst]="false"
-    [required]="property.required"
-    (ngModelChange)="changed.emit($event); clearErrorMessage()">
+<span class="p-float-label" [class.workpack-unit-selection]="property.fullLine"
+  [class.workpack-unit-selection-not-fullLine]="!property.fullLine" [class.workpack-unit-selection-mobile]="responsive">
+  <p-dropdown class="app-single-selection" [id]="property.name" [options]="property.possibleValuesIds"
+    [class.ng-invalid]="property.invalid" (onBlur)="changed.emit($event)" [disabled]="property.disabled"
+    [(ngModel)]="property.selectedValue" dropdownIcon="fas fa-caret-down" [autoDisplayFirst]="false"
+    [required]="property.required" (ngModelChange)="changed.emit($event)">
   </p-dropdown>
   <label class="app-input-label" [for]="property.name">{{property.label}} {{ property.required ? '*' : ''}}</label>
-</span>
-<span class="input-message-error" *ngIf="property.invalid">
-  {{ property.message }}
 </span>

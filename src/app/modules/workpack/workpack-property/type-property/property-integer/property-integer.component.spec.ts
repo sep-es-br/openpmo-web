@@ -6,7 +6,7 @@ describe('PropertyIntegerComponent', () => {
   let component: PropertyIntegerComponent;
   let fixture: ComponentFixture<PropertyIntegerComponent>;
 
-  beforeEach(async () => {
+  beforeEach(async() => {
     await TestBed.configureTestingModule({
       declarations: [ PropertyIntegerComponent ]
     })

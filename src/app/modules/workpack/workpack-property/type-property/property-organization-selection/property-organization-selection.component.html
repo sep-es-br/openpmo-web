@@ -1,36 +1,24 @@
 <ng-container *ngIf="property.multipleSelection; else singleSelection">
-  <span class="p-float-label"
-  [class.workpack-organization-selection-mobile]="responsive"
-  [class.workpack-organization-selection]="property.fullLine"
-  [class.workpack-organization-selection-not-fullLine]="!property.fullLine"
-  >
-    <p-multiSelect class="app-multiple-selection"
-      [class.workpack-organization-selection]="responsive"
-      dropdownIcon="fas fa-caret-down"
-      [options]="property.possibleValuesIds"
-      [id]="property.name"
-      [(ngModel)]="property.selectedValues"
-      [required]="property.required"
-      [disabled]="property.disabled"
-      maxSelectedLabels="2"
-      (ngModelChange)="changed.emit($event); clearErrorMessage()"></p-multiSelect>
+  <span class="p-float-label" [class.workpack-organization-selection-mobile]="responsive"
+    [class.workpack-organization-selection]="property.fullLine"
+    [class.workpack-organization-selection-not-fullLine]="!property.fullLine">
+    <p-multiSelect class="app-multiple-selection" [class.workpack-organization-selection]="responsive"
+      dropdownIcon="fas fa-caret-down" [options]="property.possibleValuesIds" [id]="property.name"
+      (onBlur)="changed.emit($event)" [(ngModel)]="property.selectedValues" [required]="property.required"
+      [disabled]="property.disabled" [class.ng-invalid]="property.invalid" maxSelectedLabels="2"
+      (ngModelChange)="changed.emit($event)">
+    </p-multiSelect>
     <label class="app-input-label" for="float-label">{{property.label}} {{ property.required ? '*' : ''}}</label>
   </span>
 </ng-container>
 <ng-template #singleSelection>
-  <span class="p-float-label"
-  [class.workpack-organization-selection-mobile]="responsive"
-  [class.workpack-organization-selection]="property.fullLine"
-  [class.workpack-organization-selection-not-fullLine]="!property.fullLine"
-  >
-    <p-dropdown class="app-single-selection"
-      [id]="property.name"
-      [options]="property.possibleValuesIds"
-      [autoDisplayFirst]="false"
-      [disabled]="property.disabled"
-      [(ngModel)]="property.selectedValues" dropdownIcon="fas fa-caret-down"
-      [required]="property.required"
-      (ngModelChange)="changed.emit($event); clearErrorMessage()">
+  <span class="p-float-label" [class.workpack-organization-selection-mobile]="responsive"
+    [class.workpack-organization-selection]="property.fullLine"
+    [class.workpack-organization-selection-not-fullLine]="!property.fullLine">
+    <p-dropdown class="app-single-selection" [id]="property.name" [options]="property.possibleValuesIds"
+      [autoDisplayFirst]="false" [disabled]="property.disabled" [class.ng-invalid]="property.invalid"
+      [(ngModel)]="property.selectedValues" (onBlur)="changed.emit($event)" dropdownIcon="fas fa-caret-down"
+      [required]="property.required" (ngModelChange)="changed.emit($event)">
     </p-dropdown>
     <label class="app-input-label" [for]="property.name">{{property.label}} {{ property.required ? '*' : ''}}</label>
   </span>
@@ -38,5 +26,3 @@
 <span class="input-message-error" *ngIf="property.invalid">
   {{ property.message }}
 </span>
-
-

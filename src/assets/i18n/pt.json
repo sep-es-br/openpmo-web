@@ -162,6 +162,13 @@
             "error": "Essa propriedade já está em uso em um workpack. Não pode ser excluída."
           }
         }
+      },
+      "costAccount": {
+        "delete": {
+          "relationship": {
+            "error": "Centro de Custo já vinculado ao schedule. Não pode ser excluído."
+          }
+        }
       }
     }
   },
@@ -276,6 +283,7 @@
   "premises": "Premissas",
   "restrictions": "Restrições",
   "date": "Data",
+  "dateFormat": "dd/mm/yy",
   "statusCompleted": "Status completado",
   "projectManagement": "Gestão do Projeto",
   "agreement": "Convênio",

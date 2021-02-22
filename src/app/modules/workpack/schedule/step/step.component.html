@@ -12,8 +12,9 @@
             <div class="p-field" [class.responsive]="responsive" *ngIf="stepType !== 'end'">
               <span class="p-float-label" [class.responsive]="responsive">
                 <p-calendar id="float-start" class="app-select-date" showIcon="true" [monthNavigator]="true"
-                  disabled="true" [yearNavigator]="true" formControlName="start" Range="2020:2030"
-                  [class.responsive]="responsive" icon="fas fa-calendar-alt" dateFormat="yy/mm/dd">
+                  disabled="true" [yearNavigator]="true" formControlName="start" yearRange="2020:2030"
+                  [class.responsive]="responsive" icon="fas fa-calendar-alt" 
+                  [dateFormat]="calendarFormat">
                 </p-calendar>
                 <label class="app-input-label" for="float-start">{{ "start" | translate }}</label>
               </span>
@@ -22,7 +23,8 @@
               <span class="p-float-label" [class.responsive]="responsive">
                 <p-calendar id="float-end" formControlName="end" class="app-select-date" showIcon="true"
                   [monthNavigator]="true" [yearNavigator]="true" yearRange="2020:2030" [class.responsive]="responsive"
-                  disabled="true" icon="fas fa-calendar-alt" dateFormat="yy/mm/dd">
+                  disabled="true" icon="fas fa-calendar-alt" 
+                  [dateFormat]="calendarFormat">
                 </p-calendar>
                 <label class="app-input-label" class="properties-label" for="float-end">{{ "finish" |
                   translate}}</label>

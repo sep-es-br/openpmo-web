@@ -162,6 +162,13 @@
             "error": "This property already in a workpack. This can't be deleted"
           }
         }
+      },
+      "costAccount": {
+        "delete": {
+          "relationship": {
+            "error": "This cost account already in a schedule. This can't be deleted"
+          }
+        }
       }
     }
   },
@@ -276,6 +283,7 @@
   "premises": "Assumptions",
   "restrictions": "Restrictions",
   "date": "Date",
+  "dateFormat": "yy/mm/dd",
   "statusCompleted": "Status Completed",
   "projectManagement": "Project Management",
   "agreement": "Agreement",

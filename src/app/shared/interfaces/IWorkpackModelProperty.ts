@@ -11,7 +11,7 @@ export interface IWorkpackModelProperty {
   required?: boolean;
   session?: string;
   sortIndex?: number;
-  defaultValue?: number | number[] | string | string[] | boolean;
+  defaultValue?: number | number[] | string | string[] | boolean | Date;
   defaults?: number | number[];
   min?: number | string;
   max?: number | string;

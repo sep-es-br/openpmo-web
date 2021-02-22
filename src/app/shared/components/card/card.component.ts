@@ -26,4 +26,8 @@ export class CardComponent implements OnDestroy {
     this.properties?.onToggle?.complete();
   }
 
+  handleCollapsed() {
+    this.properties.initialStateCollapse = !this.properties.initialStateCollapse;
+  }
+
 }

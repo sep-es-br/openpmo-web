@@ -1,4 +1,4 @@
-import { Component, Input, EventEmitter, Output, ViewChildren, OnDestroy } from '@angular/core';
+import { Component, Input, EventEmitter, Output, ViewChildren, OnDestroy, OnInit } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { Calendar } from 'primeng/calendar';
 import { Subject } from 'rxjs';
@@ -19,7 +19,7 @@ interface ICardItemRole {
   templateUrl: './stakeholder-role-card-item.component.html',
   styleUrls: ['./stakeholder-role-card-item.component.scss']
 })
-export class StakeholderRoleCardItemComponent implements OnDestroy {
+export class StakeholderRoleCardItemComponent implements OnInit, OnDestroy {
 
   @ViewChildren(Calendar) calendarComponents: Calendar[];
   @Input() properties: ICardItemRole;
@@ -28,6 +28,7 @@ export class StakeholderRoleCardItemComponent implements OnDestroy {
   @Output() roleChanged = new EventEmitter();
   responsive: boolean;
   iconsEnum = IconsEnum;
+  calendarFormat: string;
   $destroy = new Subject();
 
   constructor(
@@ -37,9 +38,18 @@ export class StakeholderRoleCardItemComponent implements OnDestroy {
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => {
       this.responsive = value;
     });
-    this.translateSrv.onLangChange.pipe(takeUntil(this.$destroy)).subscribe(() =>
-      setTimeout(() => this.calendarComponents?.map(calendar => calendar.ngOnInit(), 150))
-    );
+    this.translateSrv.onLangChange.pipe(takeUntil(this.$destroy)).subscribe(() => {
+      setTimeout(() => this.calendarComponents?.map(calendar => {
+        calendar.ngOnInit();
+        calendar.dateFormat = this.translateSrv.instant('dateFormat');
+        calendar.updateInputfield();
+      }, 150));
+    }
+  );
+  }
+
+  ngOnInit(): void {
+    this.calendarFormat = this.translateSrv.instant('dateFormat');
   }
 
   ngOnDestroy(): void {
