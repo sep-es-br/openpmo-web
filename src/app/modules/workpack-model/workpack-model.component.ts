@@ -566,7 +566,9 @@ export class WorkpackModelComponent implements OnInit {
         } else {
           this.modelProperties = this.modelProperties.filter(p => p !== property);
         }
-        this.saveButton?.showButton();
+        if (property.id) {
+          this.saveButton?.showButton();
+        }
       }
     });
   }

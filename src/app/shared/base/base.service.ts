@@ -4,7 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
 import { ConfirmationService, MessageService } from 'primeng/api';
 
-import { environment } from '../../../environments/environment';
+import { APP_CONFIG } from '../tokens/AppConfigToken';
 import { IHttpResult } from '../interfaces/IHttpResult';
 import { PrepareHttpParams } from '../utils/query.util';
 
@@ -21,8 +21,9 @@ export abstract class BaseService<T> {
     public url: string,
     @Inject(Injector) injector: Injector
   ) {
-    this.urlBase = `${environment.API}/${this.url}`;
-    this.urlBaseOriginal = `${environment.API}/${this.url}`;
+    const appConfig = injector.get(APP_CONFIG);
+    this.urlBase = `${appConfig.API}/${this.url}`;
+    this.urlBaseOriginal = `${appConfig.API}/${this.url}`;
     this.http = injector.get(HttpClient);
     this.confirmationSrv = injector.get(ConfirmationService);
     this.messageSrv = injector.get(MessageService);

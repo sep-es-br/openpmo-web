@@ -85,9 +85,9 @@ export class OfficeComponent implements OnDestroy {
   }
 
   async load() {
-    this.loadCards();
     this.isUserAdmin = await this.authSrv.isUserAdmin();
     await this.loadPropertiesOffice();
+    this.loadCards();
     this.breadcrumbSrv.pushMenu({
       key: 'office',
       routerLink: [ '/offices', 'office' ],

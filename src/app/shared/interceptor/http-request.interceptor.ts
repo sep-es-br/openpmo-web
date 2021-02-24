@@ -1,9 +1,7 @@
-import * as _ from 'lodash';
-
+import { Inject, Injectable } from '@angular/core';
 import {
   HttpErrorResponse,
   HttpEvent,
-  HttpEventType,
   HttpHandler,
   HttpHeaders,
   HttpInterceptor,
@@ -11,22 +9,28 @@ import {
   HttpResponse,
 } from '@angular/common/http';
 import { of } from 'rxjs';
-import { catchError, finalize, map } from 'rxjs/operators';
+import { catchError, map } from 'rxjs/operators';
+import { TranslateService } from '@ngx-translate/core';
+import { MessageService } from 'primeng/api';
+import * as _ from 'lodash';
 
 import { AuthService } from '../services/auth.service';
-import { Injectable } from '@angular/core';
-import { MessageService } from 'primeng/api';
-import { TranslateService } from '@ngx-translate/core';
-import { environment } from 'src/environments/environment';
+import { IAppConfig } from '../interfaces/IAppConfig';
+import { APP_CONFIG } from '../tokens/AppConfigToken';
 
 @Injectable()
 export class HttpRequestInterceptor implements HttpInterceptor {
 
+  appConfig: IAppConfig;
+
   constructor(
     private authService: AuthService,
     private messageSrv: MessageService,
-    private translateSrv: TranslateService
-  ) { }
+    private translateSrv: TranslateService,
+    @Inject(APP_CONFIG) appConfig: IAppConfig
+  ) {
+    this.appConfig = appConfig;
+  }
 
   intercept(
     req: HttpRequest<any>,
@@ -37,7 +41,7 @@ export class HttpRequestInterceptor implements HttpInterceptor {
     req = req.clone({ headers });
     return next.handle(req).pipe(
       map((event: HttpEvent<any>) => {
-        if (event instanceof HttpResponse && req.url.startsWith(environment.API)) {
+        if (event instanceof HttpResponse && req.url.startsWith(this.appConfig.API)) {
           const body = event.body;
           return event.clone({
             body: {

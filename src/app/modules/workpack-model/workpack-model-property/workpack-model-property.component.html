@@ -1,5 +1,5 @@
 <p-panel [styleClass]="['app-workpack-model-property', property.isCollapsed ? 'collapsed' : 'open', responsive ? 'mobile' : ''].join(' ')" [toggleable]="true"
-  [(collapsed)]="property.isCollapsed" expandIcon="pi pi-angle-down" collapseIcon="pi pi-angle-up">
+  [collapsed]="property.isCollapsed" (collapsedChange)="handleCollapseChanged($event)" expandIcon="pi pi-angle-down" collapseIcon="pi pi-angle-up">
   <p-header class="workpack-model-property-header">
     <span class="left-side">
       <i [ngClass]="IconsEnum[property.type]"></i>
@@ -65,20 +65,20 @@
       <ng-container [ngSwitch]="property.type">
         <span *ngSwitchCase="'IntegerModel'" class="p-float-label property-input p-field input-number-scroll">
           <p-inputNumber class="app-input-number" [(ngModel)]="property.defaultValue" [disabled]="property.viewOnly"
-            [required]="true" [min]="property.min" [max]="property.max" (ngModelChange)="changed.emit($event)" [showButtons]="true">
+            [min]="property.min" [max]="property.max" (ngModelChange)="changed.emit($event)" [showButtons]="true">
           </p-inputNumber>
           <label class="app-input-label">{{ 'defaultValue' | translate }}</label>
         </span>
         <span *ngSwitchCase="'NumberModel'" class="p-float-label property-input p-field input-number-scroll">
           <p-inputNumber class="app-input-number" [(ngModel)]="property.defaultValue" [disabled]="property.viewOnly"
-            [required]="true" mode="decimal" [min]="property.min" [max]="property.max" [minFractionDigits]="0"
+            mode="decimal" [min]="property.min" [max]="property.max" [minFractionDigits]="0"
             [maxFractionDigits]="20" (ngModelChange)="changed.emit($event)" [showButtons]="true">
           </p-inputNumber>
           <label class="app-input-label">{{ 'defaultValue' | translate }}</label>
         </span>
         <span *ngSwitchCase="'CurrencyModel'" class="p-float-label property-input p-field input-number-scroll">
           <p-inputNumber class="app-input-number" [(ngModel)]="property.defaultValue" [disabled]="property.viewOnly"
-            [required]="true" mode="decimal"  [min]="property.min" [max]="property.max" [minFractionDigits]="2" [maxFractionDigits]="2"
+            mode="decimal"  [min]="property.min" [max]="property.max" [minFractionDigits]="2" [maxFractionDigits]="2"
             (ngModelChange)="changed.emit($event)" [showButtons]="true">
           </p-inputNumber>
           <label class="app-input-label">{{ 'defaultValue' | translate }}</label>

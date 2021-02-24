@@ -1,7 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, Inject } from '@angular/core';
+
+import { APP_CONFIG } from 'src/app/shared/tokens/AppConfigToken';
+import { IAppConfig } from 'src/app/shared/interfaces/IAppConfig';
 import { AuthService } from 'src/app/shared/services/auth.service';
 import { ResponsiveService } from 'src/app/shared/services/responsive.service';
-import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-login',
@@ -11,15 +13,18 @@ import { environment } from 'src/environments/environment';
 export class LoginComponent {
 
   authButtonIcon: string;
+  appConfig: IAppConfig;
 
   constructor(
     public responsiveSrv: ResponsiveService,
-    private authSrv: AuthService
+    private authSrv: AuthService,
+    @Inject(APP_CONFIG) appConfig: IAppConfig
   ) {
-    if (environment.authButtonIcon?.length > 0) {
-      this.authButtonIcon = environment.authButtonIcon.indexOf('.') !== -1
-        ? `assets/${environment.authButtonIcon}`
-        : environment.authButtonIcon;
+    this.appConfig = appConfig;
+    if (this.appConfig.authButtonIcon?.length > 0) {
+      this.authButtonIcon = this.appConfig.authButtonIcon.indexOf('.') !== -1
+        ? `assets/${this.appConfig.authButtonIcon}`
+        : this.appConfig.authButtonIcon;
     }
   }
 

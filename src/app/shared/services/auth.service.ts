@@ -5,11 +5,12 @@ import { Router } from '@angular/router';
 import { JwtHelperService } from '@auth0/angular-jwt';
 import jwtDecode from 'jwt-decode';
 
-import { environment } from '../../../environments/environment';
 import { StoreKeys } from '../constants';
 import { IPerson } from '../interfaces/IPerson';
 import { PersonService } from './person.service';
 import { Subject } from 'rxjs';
+import { IAppConfig } from '../interfaces/IAppConfig';
+import { APP_CONFIG } from '../tokens/AppConfigToken';
 
 interface TokenPayload {
   sub: number;
@@ -21,6 +22,7 @@ interface TokenPayload {
 @Injectable({ providedIn: 'root' })
 export class AuthService {
 
+  appConfig: IAppConfig;
   currentUserInfo: IPerson;
   userLogout = new Subject();
 
@@ -29,8 +31,11 @@ export class AuthService {
     public jwtHelperService: JwtHelperService,
     public router: Router,
     @Inject(DOCUMENT) private document: Document,
-    private personSrv: PersonService
-  ) { }
+    @Inject(APP_CONFIG) appConfig: IAppConfig,
+    private personSrv: PersonService,
+  ) {
+    this.appConfig = appConfig;
+  }
 
   signIn() {
     this.document.location.href = this.getUrlForAuth();
@@ -41,7 +46,7 @@ export class AuthService {
       const refreshToken = this.getRefreshToken();
       if (refreshToken) {
         const { data, success } = await this.http.get<any>(
-          `${environment.API}/signin/refresh?refreshToken=${refreshToken}`
+          `${this.appConfig.API}/signin/refresh?refreshToken=${refreshToken}`
         ).toPromise();
         if (success) {
           this.saveToken(data);
@@ -130,7 +135,7 @@ export class AuthService {
   }
 
   private getUrlForAuth() {
-    return `${environment.API}/oauth2/authorization/idsvr?front_callback_url=${this.getFrontFallbackUrl()}`;
+    return `${this.appConfig.API}/oauth2/authorization/idsvr?front_callback_url=${this.getFrontFallbackUrl()}`;
   }
 
   private getFrontFallbackUrl(): string {

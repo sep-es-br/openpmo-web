@@ -93,6 +93,13 @@
       width: max-content;
     }
   }
+  .app-multiple-selection .p-multiselect {
+    min-width: 200px;
+
+    .p-multiselect-panel {
+      width: max-content;
+    }
+  }
   .workpack-model-addicional-properties {
     .p-button {
       background-color: v.$bgButtonGreen;
@@ -112,6 +119,9 @@
       margin-bottom: 1em;
       &.open {
         width: 100%;
+        p-panel {
+          width: 100%;
+        }
       }
     }
     &.add-actions {

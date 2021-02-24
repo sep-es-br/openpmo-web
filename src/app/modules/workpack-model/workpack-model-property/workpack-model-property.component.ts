@@ -65,7 +65,7 @@ export class WorkpackModelPropertyComponent implements OnDestroy, AfterViewInit 
     } else {
       const isArray = this.property?.defaultValue instanceof Array;
       if (this.property.multipleSelection && !isArray) {
-        this.property.defaultValue = [ this.property.defaultValue as any ];
+        this.property.defaultValue = this.property.defaultValue ? [ this.property.defaultValue as any ] : [];
       }
       if (!this.property.multipleSelection && isArray) {
         this.property.defaultValue = (this.property.defaultValue as any[]).shift();
@@ -84,5 +84,9 @@ export class WorkpackModelPropertyComponent implements OnDestroy, AfterViewInit 
     } else if (!isArray && this.property.defaultValue === value.trim()) {
       this.property.defaultValue = '';
     }
+  }
+
+  handleCollapseChanged(collapsed: boolean) {
+    this.property.isCollapsed = collapsed;
   }
 }

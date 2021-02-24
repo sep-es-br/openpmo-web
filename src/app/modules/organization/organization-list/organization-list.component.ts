@@ -87,7 +87,7 @@ export class OrganizationListComponent implements OnInit {
       itemsProperties.unshift(... data.map(organization => ({
           typeCardItem: 'listItem',
           iconSvg: true,
-          icon: IconsEnum.MapMarked,
+          icon: IconsEnum.Building,
           nameCardItem: organization.name,
           subtitleCardItem: organization.fullName,
           itemId: organization.id,
