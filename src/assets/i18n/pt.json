@@ -184,7 +184,7 @@
   "addGroup": "Adicionar grupo",
   "label": "Legenda",
   "role": "Função",
-  "sortIndex": "Ordem de ordenação",
+  "sortIndex": "Índice de Ordenação",
   "defaultValue": "Valor padrão",
   "fullLine": "Linha inteira",
   "required": "Obrigatório",
