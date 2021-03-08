@@ -2,6 +2,7 @@
 
 ::ng-deep .workpack-tree-selection {
   width: 30%;
+  padding-bottom: 10px;
   label {
     font-size: 0.8rem;
   }
@@ -9,6 +10,7 @@
 
 ::ng-deep .workpack-tree-selection-not-fullLine {
   width: 100%;
+  padding-bottom: 10px;
   label {
     font-size: 0.8rem;
   }
@@ -16,4 +18,5 @@
 
 ::ng-deep .workpack-tree-selection-mobile {
   width: 100%;
+  padding-bottom: 10px;
 }

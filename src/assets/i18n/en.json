@@ -1,5 +1,4 @@
 {
-  "authButtonText": "Sign in",
   "plan": "Plan",
   "plans": "Plans",
   "planPermissions": "Plan Permissions",
@@ -107,6 +106,7 @@
     "error": {
       "generic": "We were unable to process your request",
       "unauthorized": "You do not have permission to access this functionality",
+      "unauthorizedApplication": "You do not have permission to access this application.",
       "couldNotCheckParentProject": "Could not check if contains parent project",
       "office": {
         "not": {

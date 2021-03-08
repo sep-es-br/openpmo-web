@@ -102,13 +102,28 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
   async ngOnInit() {
     await this.loadWorkpack();
     await this.loadStakeholder();
-    this.breadcrumbSrv.pushMenu({
-      key: 'stakeholder',
-      routerLink: ['/stakeholder/person'],
-      queryParams: { idWorkpack: this.idWorkpack, emailPerson: this.emailPerson },
-      info: this.stakeholder?.person?.name,
-      tooltip: this.stakeholder?.person.fullName
-    });
+    const propertyNameWorkpackModel = this.workpack.model.properties.find(p => p.name === 'name' && p.session === 'PROPERTIES');
+    const propertyNameWorkpack = this.workpack.properties.find(p => p.idPropertyModel === propertyNameWorkpackModel.id);
+    const workpackName = propertyNameWorkpack.value as string;
+    const propertyFullNameWorkpackModel = this.workpack.model.properties.find(p => p.name === 'fullName' && p.session === 'PROPERTIES');
+    const propertyFullNameWorkpack = this.workpack.properties.find(p => p.idPropertyModel === propertyFullNameWorkpackModel.id);
+    const workpackFullName = propertyFullNameWorkpack.value as string;
+    this.breadcrumbSrv.setMenu([
+      {
+        key: this.workpack.type,
+        info: workpackName,
+        tooltip: workpackFullName,
+        routerLink: [ '/workpack' ],
+        queryParams: { id: this.idWorkpack }
+      },
+      {
+        key: 'stakeholder',
+        routerLink: ['/stakeholder/person'],
+        queryParams: { idWorkpack: this.idWorkpack, emailPerson: this.emailPerson },
+        info: this.stakeholder?.person?.name,
+        tooltip: this.stakeholder?.person.fullName
+      }
+    ]);
   }
 
   async loadWorkpack() {

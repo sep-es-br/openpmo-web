@@ -50,13 +50,13 @@ export class StrategyListComponent implements OnInit {
       this.idOffice = +idOffice;
       await this.getOfficeById();
       await this.loadPropertiesStrategies();
-      this.breadcrumbSrv.pushMenu({
+      this.breadcrumbSrv.setMenu([{
         key: 'strategies',
         info: this.propertiesOffice?.name,
         tooltip: this.propertiesOffice?.fullName,
         routerLink: [ '/strategies' ],
         queryParams: { idOffice: this.idOffice }
-      });
+      }]);
     });
     this.responsiveSrv.observable.subscribe(value => {
       this.responsive = value;

@@ -5,7 +5,7 @@
   collapseIcon="pi pi-angle-up"
   [class.mobile]="responsive"
 >
-  <p-header class="card-header" [class.card-header-mobile]="responsive" (click)="handleCollapsed()">
+  <p-header class="card-header" [class.card-header-mobile]="responsive" [class.card-collapseble]="properties.collapseble" (click)="properties.collapseble && handleCollapsed()">
     <div class="header-title">
      <div class="header-title-text">
       <span class="card-title"

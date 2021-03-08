@@ -1,10 +1,12 @@
 <div class="app-plan-permission-detail">
-  <div class="app-permission-detail-header" [class.app-permission-detail-header-mobile]="responsive">
-    <span class="header-text" *ngIf="!personEmail">{{ "newPermission" | translate}}</span>
-    <span class="header-text" *ngIf="personEmail && person">{{person.name}}</span>
+  <div class="app-content-header" [class.mobile]="responsive">
+    <span *ngIf="personEmail; else newPermissionTitle">{{ person?.name }}</span>
+    <ng-template #newPermissionTitle>
+      <span>{{ "newPermission" | translate }}</span>
+    </ng-template>
   </div>
-  <div class="card-properties-permission">
-    <app-card [properties]="cardPersonPermission">
+  <div class="card-permission">
+    <app-card [properties]="cardPersonPermission" class="mt-0" [class.inputs-float-label]="!personEmail">
       <div class="person-properties">
         <div class="search-container" *ngIf="!personEmail">
           <span class="p-float-label">
@@ -23,7 +25,7 @@
         </p-card>
       </div>
       <div class="data-view-containter" *ngIf="person">
-        <p-dataView [value]="cardItemsPlanPermission" layout="grid" styleClass="dataview-card-items"
+        <p-dataView [value]="cardItemsPlanPermission" layout="grid" class="app-dataview"
           [emptyMessage]="'loadingEllipsis' | translate">
           <ng-template let-cardItem pTemplate="gridItem">
             <div class="p-col-12 p-md-3 p-sm-12 card-item-container" [class.responsive]="responsive">
@@ -33,7 +35,7 @@
           </ng-template>
         </p-dataView>
       </div>
-      <app-save-button #saveButton (save)="savePermission()"></app-save-button>
     </app-card>
   </div>
+  <app-save-button #saveButton (save)="savePermission()"></app-save-button>
 </div>

@@ -68,13 +68,13 @@ export class MeasureUnitComponent implements OnInit {
     this.editPermission = await this.officePermissionSrv.getPermissions(this.idOffice);
     await this.loadMeasureUnitList();
     await this.getOfficeById();
-    this.breadcrumbSrv.pushMenu({
+    this.breadcrumbSrv.setMenu([{
       key: 'measureUnits',
       info: this.propertiesOffice?.name,
       tooltip: this.propertiesOffice?.fullName,
       routerLink: ['/measure-units'],
       queryParams: { idOffice: this.idOffice }
-    });
+    }]);
   }
 
   async getOfficeById() {

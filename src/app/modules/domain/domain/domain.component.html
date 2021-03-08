@@ -1,11 +1,12 @@
 <div class="app-domain">
-  <div class="app-domain-header" [class.app-domain-header-mobile]="responsive">
-    <span class="app-domain-header-text" *ngIf="!propertiesDomain">{{'new' | translate}} {{'domain' |
-      translate}}:</span>
-    <span class="app-domain-header-text" *ngIf="propertiesDomain">{{propertiesDomain.name}}</span>
+  <div class="app-content-header" [class.mobile]="responsive">
+    <span *ngIf="idDomain; else newDomainTitle">{{ propertiesDomain?.name }}</span>
+    <ng-template #newDomainTitle>
+      <span>{{ 'new' | translate }} {{ 'domain' | translate }}</span>
+    </ng-template>
   </div>
   <div class="card-properties" *ngIf="cardProperties">
-    <app-card [properties]="cardProperties">
+    <app-card [properties]="cardProperties" class="mt-0 inputs-float-label">
       <div>
         <form [formGroup]="formDomain">
           <span class="p-float-label">
@@ -29,7 +30,7 @@
   <section *ngIf="propertiesDomain" class="domains-cards-section">
     <div class="card-plans">
       <app-card [properties]="cardLocalities">
-        <p-dataView [value]="cardItemsLocalities" layout="grid" styleClass="dataview-card-items"
+        <p-dataView [value]="cardItemsLocalities" layout="grid" class="app-dataview"
           [emptyMessage]="(!cardItemsLocalities ? 'loadingEllipsis' : 'noContent') | translate">
           <ng-template let-cardItem pTemplate="gridItem">
             <div class="p-col-12 p-md-3 p-sm-12 card-item-container">

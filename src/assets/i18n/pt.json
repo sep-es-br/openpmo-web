@@ -1,5 +1,4 @@
 {
-  "authButtonText": "Entrar",
   "plan": "Plano",
   "plans": "Planos",
   "planPermissions": "Permissões do Plano",
@@ -107,6 +106,7 @@
     "error": {
       "generic": "Não foi possível processar sua solicitação",
       "unauthorized": "Você não possui permissão de acesso à essa funcionalidade",
+      "unauthorizedApplication": "Você não possui permissão para acessar esta aplicação.",
       "couldNotCheckParentProject": "Não foi possível verificar se possui parente Projeto",
       "office": {
         "not": {
@@ -284,7 +284,7 @@
   "restrictions": "Restrições",
   "date": "Data",
   "dateFormat": "dd/mm/yy",
-  "statusCompleted": "Status completado",
+  "statusCompleted": "Concluído",
   "projectManagement": "Gestão do Projeto",
   "agreement": "Convênio",
   "environmentalLicensing": "Licenciamento Ambiental",

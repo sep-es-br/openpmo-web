@@ -1,5 +1,5 @@
 <ng-container [ngSwitch]="properties.typeCardItem">
-  <p-card *ngSwitchCase="'listItem'" class="app-card-item listItem">
+  <p-card *ngSwitchCase="'listItem'" class="app-card-item listItem" [class.mobile]="responsive">
     <p-header *ngIf="properties.menuItems" class="card-item-header">
       <p-menu #menu [popup]="true" [model]="properties.menuItems"></p-menu>
       <button type="button" pButton icon="pi pi-ellipsis-v" [class.hidden]="!properties.menuItems.length"
@@ -19,7 +19,7 @@
       </span>
     </div>
   </p-card>
-  <p-card *ngSwitchCase="'listItemStakeholder'" class="app-card-item listItemStakeholder">
+  <p-card *ngSwitchCase="'listItemStakeholder'" class="app-card-item listItemStakeholder" [class.mobile]="responsive">
     <p-header *ngIf="properties.menuItems" class="card-item-header">
       <p-menu #menu [popup]="true" [model]="properties.menuItems"></p-menu>
       <button type="button" pButton icon="pi pi-ellipsis-v" [class.hidden]="!properties.menuItems.length"
@@ -38,14 +38,14 @@
       </span>
     </div>
   </p-card>
-  <p-card *ngSwitchCase="'listItemCostAccount'" class="app-card-item listItemCostAccount">
+  <p-card *ngSwitchCase="'listItemCostAccount'" class="app-card-item listItemCostAccount" [class.mobile]="responsive">
     <p-header *ngIf="properties.menuItems" class="card-item-header">
       <p-menu #menu [popup]="true" [model]="properties.menuItems"></p-menu>
       <button type="button" pButton icon="pi pi-ellipsis-v" [class.hidden]="!properties.menuItems.length"
         (click)="menu.toggle($event)"></button>
     </p-header>
     <div class="card-item-content" [class.card-link]="properties.urlCard" [routerLink]="properties.urlCard"
-      [queryParams]=" properties.itemId && {id: properties.itemId}">
+      [queryParams]="getQueryParams()">
       <i [ngClass]="properties.iconSvg ? [ 'app-icon', properties.icon, 'grey-icon'] : [ 'icon-card', properties.icon, 'grey-icon' ]"
         [ngStyle]="{ fontSize: '2.5rem' }"></i>
       <span class="card-item-name">{{properties.nameCardItem}}</span>
@@ -58,7 +58,7 @@
       </span>
     </div>
   </p-card>
-  <p-card *ngSwitchCase="'newCardItem'" class="new-carditem" [class.card-link]="properties.urlCard"
+  <p-card *ngSwitchCase="'newCardItem'" class="new-carditem" [class.card-link]="properties.urlCard" [class.mobile]="responsive"
     [class.new-card-item-mobile]="responsive" (click)="properties.urlCard && navigateToPage(properties.urlCard, properties.paramsUrlCard)">
     <div class="carditem-content">
       <i [ngClass]="[ 'app-icon', properties.icon, 'light-grey-icon']" (click)=" properties.iconMenuItems && menuIcon.toggle($event)"

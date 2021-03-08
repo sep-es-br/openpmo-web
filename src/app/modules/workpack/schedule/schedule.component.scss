@@ -2,20 +2,6 @@
 
 ::ng-deep .app-schedule {
   width: 100%;
-  .app-schedule-header {
-    padding: 0.5em 0;
-    font-size: 0.9rem;
-    font-family: v.$fontTitle !important;
-    color: v.$fontInput;
-    .app-schedule-header-text {
-      margin-left: 0.5em;
-    }
-  }
-  .app-schedule-header-mobile {
-    font-size: 1rem;
-    font-family: v.$fontFamilyBold !important;
-    font-weight: bold;
-  }
   .card-properties-schedule{
     width: 100%;
     form {
@@ -65,7 +51,7 @@
         }
       }
       .schedule-totals {
-        margin-top: 2em;
+        margin-top: 15px;
         .totals-title {
           text-transform: uppercase;
           font-size: 1rem;
@@ -78,7 +64,6 @@
           column-gap: 1em;
           align-items: center;
           width: 40%;
-          margin-top: 1em;
           .planned-total, .actual-total {
             display: flex;
             flex-direction: column;
@@ -105,7 +90,7 @@
             }
           }
           .actual-total {
-            margin-top: 1em;
+            margin-top: 15px;
           }
         }
       }
@@ -169,8 +154,5 @@
         background-color: v.$bgButtonGreenHover;
       }
     }
-  }
-  .p-float-label {
-    margin-top: 2.5em;
   }
 }

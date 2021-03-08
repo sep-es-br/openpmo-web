@@ -2,18 +2,8 @@
 
 .app-office-permission-detail {
   width: 100%;
-  .app-permission-detail-header {
-    padding: 0.5em 0;
-    font-size: 0.9rem;
-    font-family: v.$fontTitle !important;
-    color: v.$fontInput;
-  }
-  .app-permission-detail-header-mobile {
-    font-size: 1rem;
-    font-family: v.$fontFamilyBold !important;
-    font-weight: bold;
-  }
-  .card-properties-permission {
+
+  .card-permission {
     width: 100%;
     .person-properties {
       .search-container {
@@ -25,52 +15,12 @@
           width: 100%;
         }
       }
-      ::ng-deep.card-person {
-        background-color: transparent;
-        box-shadow: none;
-        display: flex;
-        flex-direction: column;
-        width: 24%;
-        .p-card-content {
-          display: flex;
-          flex-direction: column;
-          align-items: flex-start;
-          padding: 0;
-          .person-name {
-            font-size: 1rem;
-            color: v.$fontTitle;
-            font-family: v.$fontFamilyMedium;
-            padding: 5px 0;
-          }
-          .person-email {
-            font-size: 0.9rem;
-            color: v.$fontTitle;
-            font-family: v.$fontFamilyMedium;
-          }
-        }
-      }
       .responsive {
         width: 100%;
       }
     }
-  }
-
-  .data-view-containter {
-    margin-top: 1em;
-  }
-  ::ng-deep .dataview-card-items {
-    position: static !important;
-    background-color: transparent;
-    .p-dataview-content, .p-grid {
-      background-color: transparent;
-    }
-    .card-item-container {
-      padding: 0.5em;
-      min-height: 9.5em !important;
-
-    }
-    .card-item-container.responsive {
-      padding: 0.5em 0;
+    .data-view-containter {
+      margin-top: 15px;
     }
   }
 
@@ -83,6 +33,42 @@
     border-radius: 5px;
     font-size: 0.7rem;
     font-family: v.$fontFamilyMedium;
+  }
+}
+
+::ng-deep .app-office-permission-detail .card-person {
+  background-color: transparent;
+  box-shadow: none;
+  display: flex;
+  flex-direction: column;
+
+  .p-card {
+    display: flex;
+    height: 100%;
+    max-width: 280px;
+    width: 280px;
+    border: 1px solid #D4D4D4;
+    box-shadow: none;
+  }
+
+  .p-card-content {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 0;
+    width: 100%;
+
+    .person-name {
+      font-size: 1rem;
+      color: v.$fontTitle;
+      font-family: v.$fontFamilyMedium;
+      padding: 5px 0;
+    }
+    .person-email {
+      font-size: 0.9rem;
+      color: v.$fontTitle;
+      font-family: v.$fontFamilyMedium;
+    }
   }
 }
 

@@ -1,17 +1,17 @@
 <div class="app-organization">
-  <div class="app-header" [class.app-header-mobile]="responsive">
-    <span class="app-header-text" *ngIf="propertiesOffice">{{propertiesOffice.name}}</span>
+  <div class="app-content-header" [class.mobile]="responsive">
+    <span>{{ propertiesOffice?.name }}</span>
   </div>
     <div class="card-container">
-      <app-card [properties]="cardProperties">
+      <app-card [properties]="cardProperties" class="mt-0">
         <p-dataView
           [value]="cardItemsProperties"
           layout="grid" [rows]="1"
-          class="dataview-app-organizations"
+          class="app-dataview"
           [emptyMessage]="((editPermission === undefined || editPermission) ? 'loadingEllipsis' : 'noContent') | translate"
         >
           <ng-template let-cardItem pTemplate="gridItem">
-            <div class="p-col-12 p-sm-12 p-md-4 p-lg-3 card-item-container" [ngStyle]="{'padding': '10px 15px'}">
+            <div class="p-col-12 p-sm-12 p-md-4 p-lg-3 card-item-container">
               <app-card-item [properties]="cardItem"></app-card-item>
             </div>
           </ng-template>

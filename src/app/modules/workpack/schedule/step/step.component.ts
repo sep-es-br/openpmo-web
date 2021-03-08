@@ -6,7 +6,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { Calendar } from 'primeng/calendar';
-import { MenuItem } from 'primeng/api';
+import { MenuItem, MessageService } from 'primeng/api';
 
 import { ICard } from 'src/app/shared/interfaces/ICard';
 import { ICost, IStepPost, IScheduleDetail, IStep } from 'src/app/shared/interfaces/ISchedule';
@@ -17,6 +17,7 @@ import { WorkpackService } from 'src/app/shared/services/workpack.service';
 import { CostAccountService } from 'src/app/shared/services/cost-account.service';
 import { enterLeave } from 'src/app/shared/animations/enterLeave.animation';
 import { ICostAccount } from 'src/app/shared/interfaces/ICostAccount';
+import { IWorkpack } from 'src/app/shared/interfaces/IWorkpack';
 
 interface ICartItemCostAssignment {
   type: string;
@@ -42,6 +43,7 @@ export class StepComponent implements OnInit, OnDestroy {
 
   @ViewChildren(Calendar) calendarComponents: Calendar[];
   responsive: boolean;
+  workpack: IWorkpack;
   idSchedule: number;
   schedule: IScheduleDetail;
   start: Date;
@@ -73,7 +75,8 @@ export class StepComponent implements OnInit, OnDestroy {
     private location: Location,
     private workpackSrv: WorkpackService,
     private costAccountSrv: CostAccountService,
-    private router: Router
+    private router: Router,
+    private messageSrv: MessageService
   ) {
     this.actRouter.queryParams.subscribe(async queryParams => {
       this.idSchedule = queryParams.idSchedule;
@@ -106,12 +109,6 @@ export class StepComponent implements OnInit, OnDestroy {
   async ngOnInit() {
     this.calendarFormat = this.translateSrv.instant('dateFormat');
     await this.loadPropertiesStep();
-    this.breadcrumbSrv.pushMenu({
-      key: 'step',
-      routerLink: ['/workpack/schedule/step'],
-      queryParams: { id: this.idStep },
-      info: ''
-    });
   }
 
   async loadPropertiesStep() {
@@ -146,9 +143,34 @@ export class StepComponent implements OnInit, OnDestroy {
         this.schedule = result.data;
       }
     }
+    if (this.schedule.idWorkpack) {
+      const { success, data } = await this.workpackSrv.GetById(this.schedule.idWorkpack);
+      if (success) {
+        this.workpack = data;
+        this.setBreadcrumb();
+      }
+    }
     this.setStepFormValues();
     await this.loadMenuItemsCostAccounts();
     this.loadCostAssignmentSession();
+  }
+
+  setBreadcrumb() {
+    this.breadcrumbSrv.setMenu([
+      {
+        key: this.workpack.type,
+        info: this.getValueFromWorkpackProperty('name'),
+        tooltip: this.getValueFromWorkpackProperty('fullName'),
+        routerLink: [ '/workpack' ],
+        queryParams: { id: this.workpack.id }
+      },
+      {
+        key: 'step',
+        routerLink: ['/workpack/schedule/step'],
+        queryParams: { id: this.idStep },
+        info: ''
+      }
+    ]);
   }
 
   setStepFormValues() {
@@ -210,6 +232,7 @@ export class StepComponent implements OnInit, OnDestroy {
   }
 
   async loadMenuItemsCostAccounts() {
+    const costAccountsIds = this.step?.consumes ? this.step.consumes.map(consume => consume.idCostAccount) : [];
     const result = await this.costAccountSrv.GetAll({ 'id-workpack': this.schedule.idWorkpack });
     if (result.success) {
       this.costAccounts = result.data;
@@ -227,8 +250,10 @@ export class StepComponent implements OnInit, OnDestroy {
               const propertyName = workpackCost.properties.find(p => p.idPropertyModel === propertyModelName.id);
               return {
                 label: propertyName.value as string,
+                id: workpackCost.id.toString(),
+                disabled: costAccountsIds.includes(workpackCost.id),
                 command: () => this.createNewCardItemCost(workpackCost.id, propertyName.value as string)
-              };
+              } as MenuItem;
             })
           };
         }
@@ -238,9 +263,23 @@ export class StepComponent implements OnInit, OnDestroy {
 
   createNewCardItemCost(idCost: number, costName: string) {
     if (!this.formStep.valid) {
+      setTimeout(() => {
+        this.messageSrv.add({ severity: 'warn', summary: 'Erro', detail: this.translateSrv.instant('messages.scheduleNotValid') });
+      }, 500);
       return;
     }
     const costAssignmentsCardItemsList = this.costAssignmentsCardItems.filter( card => card.type === 'cost-card');
+    const costAccountsIds = costAssignmentsCardItemsList.map( cardItem => (cardItem.idCost));
+    this.menuItemsCostAccounts = Array.from(this.menuItemsCostAccounts.map(group => {
+      const items = group.items.map(item => ({
+        ...item,
+        disabled: costAccountsIds.includes( Number(item.id)) || Number(item.id) === idCost
+      }));
+      return {
+        ...group,
+        items
+      };
+    }));
     if (costAssignmentsCardItemsList.length > 0) {
       this.costAssignmentsCardItems = costAssignmentsCardItemsList;
       this.costAssignmentsCardItems.push({
@@ -284,12 +323,31 @@ export class StepComponent implements OnInit, OnDestroy {
   }
 
   deleteCost(idCost: number) {
-    const costIndex = this.costAssignmentsCardItems.findIndex( cost => cost.idCost === idCost);
-    if (costIndex > -1) {
-      this.costAssignmentsCardItems.splice(costIndex, 1);
-      this.costAssignmentsCardItems = Array.from(this.costAssignmentsCardItems);
-      this.reloadCostAssignmentTotals();
-    }
+    const menuItems = this.menuItemsCostAccounts.map( group => {
+      const items = group.items.map(item => {
+        if (Number(item.id) === idCost) {
+          return {
+            ...item,
+            disabled: false
+          };
+        } else {
+          return {
+            ...item
+          };
+        }
+      });
+      return {
+        ...group,
+        items
+      };
+    });
+    this.costAssignmentsCardItems[this.costAssignmentsCardItems.length - 1] = {
+        type: 'new-cost-card',
+        menuItemsNewCost: Array.from(menuItems)
+      };
+    this.menuItemsCostAccounts = Array.from(menuItems);
+    this.costAssignmentsCardItems = Array.from(this.costAssignmentsCardItems.filter(cost => cost.idCost !== idCost));
+    this.reloadCostAssignmentTotals();
   }
 
   handleChangeValuesCardItems() {
@@ -340,14 +398,7 @@ export class StepComponent implements OnInit, OnDestroy {
     if (this.step.id) {
       const result = await this.scheduleSrv.putScheduleStep(this.step);
       if (result.success) {
-        this.location.back();
-      }
-    }
-    if (!this.step.id) {
-      const result = await this.scheduleSrv.postScheduleStep(this.step);
-      if (result.success) {
-        this.router.navigate(
-          ['/workpack'],
+        this.router.navigate([ '/workpack' ],
           {
             queryParams: {
               id: this.schedule.idWorkpack
@@ -356,5 +407,23 @@ export class StepComponent implements OnInit, OnDestroy {
         );
       }
     }
+    if (!this.step.id) {
+      const result = await this.scheduleSrv.postScheduleStep(this.step);
+      if (result.success) {
+        this.router.navigate([ '/workpack' ],
+          {
+            queryParams: {
+              id: this.schedule.idWorkpack
+            }
+          }
+        );
+      }
+    }
+  }
+
+  getValueFromWorkpackProperty(nameProperty: string, session: string = 'PROPERTIES') {
+    const propertyWorkpackModel = this.workpack.model.properties.find(p => p.name === nameProperty && p.session === session);
+    const propertyWorkpack = this.workpack.properties.find(p => p.idPropertyModel === propertyWorkpackModel.id);
+    return propertyWorkpack.value as string;
   }
 }

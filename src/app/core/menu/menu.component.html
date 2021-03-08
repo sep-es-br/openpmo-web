@@ -18,7 +18,7 @@
 <div class="menu-layout" *ngIf="(isMenuOpen() && isMobileView) || isMenuOpen('user')" (click)="closeAllMenus()"></div>
 
 <ng-template #menuGeneral>
-  <div class="item" (click)="toggleMenu('office')" [pTooltip]="'officesAndPlans' | translate" *ngIf="isUserAdmin">
+  <div class="item" (click)="toggleMenu('office')" [pTooltip]="'officesAndPlans' | translate">
     <i class="app-icon offices" [ngStyle]="{ fontSize: '1.8rem' }"></i>
     <div class="item-label" *ngIf="isMobileView">{{ 'offices' | translate }}</div>
   </div>

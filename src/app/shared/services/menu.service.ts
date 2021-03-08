@@ -22,10 +22,13 @@ export class MenuService extends BaseService<any> {
     private locationSrv: Location
   ) {
     super('menus', injector);
-    this.locationSrv.onUrlChange(url => {
-      const [ path, query ] = url.slice(2).split('?');
-      this.isAdminMenuObservable.next(!!this.adminsPath.find(p => path.startsWith(p)));
-    });
+    this.checkURL(`#${this.locationSrv.path()}`);
+    this.locationSrv.onUrlChange(url => this.checkURL(url));
+  }
+
+  checkURL(url: string) {
+    const [ path ] = url.slice(2).split('?');
+    this.isAdminMenuObservable.next(!!this.adminsPath.find(p => path.startsWith(p)));
   }
 
   reloadMenuOffice() {

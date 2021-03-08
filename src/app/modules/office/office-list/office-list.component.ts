@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import { MenuItem } from 'primeng/api';
+import { MenuItem, MessageService } from 'primeng/api';
 
 import { IconsEnum } from 'src/app/shared/enums/IconsEnum';
 import { ICard } from 'src/app/shared/interfaces/ICard';
@@ -33,9 +33,7 @@ export class OfficeListComponent implements OnInit {
     private router: Router,
     private translateSvr: TranslateService,
     private authSrv: AuthService
-  ) {
-
-  }
+  ) { }
 
   async ngOnInit() {
     this.loadPropertiesOffice();

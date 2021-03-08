@@ -48,13 +48,15 @@ export class PlanPermissionsListComponent implements OnInit {
 
   async ngOnInit() {
     await this.loadPropertiesPlan();
-    this.breadcrumbSrv.pushMenu({
-      key: 'planPermissions',
-      routerLink: [ '/plan', 'permission' ],
-      queryParams: { idPlan: this.idPlan },
-      info: this.propertiesPlan?.name,
-      tooltip: this.propertiesPlan?.fullName
-    });
+    this.breadcrumbSrv.setMenu([
+      {
+        key: 'planPermissions',
+        routerLink: [ '/plan', 'permission' ],
+        queryParams: { idPlan: this.idPlan },
+        info: this.propertiesPlan?.name,
+        tooltip: this.propertiesPlan?.fullName
+      }
+    ]);
   }
 
   async loadPropertiesPlan() {

@@ -18,6 +18,10 @@ import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
 import { SaveButtonComponent } from 'src/app/shared/components/save-button/save-button.component';
 import { AuthService } from 'src/app/shared/services/auth.service';
 import { OfficePermissionService } from 'src/app/shared/services/office-permission.service';
+import { IOffice } from 'src/app/shared/interfaces/IOffice';
+import { IDomain } from 'src/app/shared/interfaces/IDomain';
+import { OfficeService } from 'src/app/shared/services/office.service';
+import { DomainService } from 'src/app/shared/services/domain.service';
 
 @Component({
   selector: 'app-domain-locality',
@@ -33,8 +37,10 @@ export class DomainLocalityComponent implements OnInit, OnDestroy {
   formLocality: FormGroup;
   idLocality: number;
   idDomain: number;
+  propertiesDomain: IDomain;
   idParent: number;
   idOffice: number;
+  propertiesOffice: IOffice;
   type: string;
   planModelsOfficeList: IPlanModel[];
   cardProperties: ICard;
@@ -56,7 +62,9 @@ export class DomainLocalityComponent implements OnInit, OnDestroy {
     private breadcrumbSrv: BreadcrumbService,
     private authSrv: AuthService,
     private officePermissionSrv: OfficePermissionService,
-    private messageSrv: MessageService
+    private messageSrv: MessageService,
+    private officeSrv: OfficeService,
+    private domainSrv: DomainService
   ) {
     this.activeRoute.queryParams.subscribe(async({ id, idOffice, idDomain, type, idParent }) => {
       this.idLocality = +id;
@@ -67,13 +75,23 @@ export class DomainLocalityComponent implements OnInit, OnDestroy {
       this.saveButton?.hideButton();
       this.editPermission = await this.officePermissionSrv.getPermissions(this.idOffice);
       await this.loadPropertiesLocality();
-      this.breadcrumbSrv.pushMenu({
-        key: 'locality',
-        info: this.propertiesLocality?.name,
-        tooltip: this.propertiesLocality?.fullName,
-        routerLink: [ '/domains', 'locality' ],
-        queryParams: { id, idOffice, idDomain, type, idParent }
-      });
+      this.breadcrumbSrv.setMenu([
+        {
+          key: 'domains',
+          info: this.propertiesOffice?.name,
+          tooltip: this.propertiesOffice?.fullName,
+          routerLink: ['/domains'],
+          queryParams: { idOffice: this.idOffice }
+        },
+        {
+          key: 'domain',
+          info: this.propertiesDomain?.name,
+          tooltip: this.propertiesDomain?.fullName,
+          routerLink: ['/domains', 'detail'],
+          queryParams: { id: this.idDomain, idOffice: this.idOffice }
+        },
+        ... await this.getBreadcrumbs()
+      ]);
     });
     this.formLocality = this.formBuilder.group({
       name: ['', [Validators.required, Validators.maxLength(25)]],
@@ -88,6 +106,29 @@ export class DomainLocalityComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.$destroy), filter(() => this.formLocality.dirty))
       .subscribe(() => this.saveButton.showButton());
     this.responsiveSvr.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.responsive = value);
+  }
+
+  async getBreadcrumbs() {
+    const { success, data } = await this.breadcrumbSrv.getBreadcrumbLocality(this.idLocality || this.idParent);
+    const { idOffice, idDomain, type, idParent } = this;
+    return success
+      ? [
+          ...data.map((l, i) => ({
+            key: l.type.toLowerCase(),
+            info: l?.name,
+            tooltip: l?.fullName,
+            routerLink: [ '/domains', 'locality' ],
+            queryParams: { id: l.id, idOffice, idDomain, type: l.type, idParent: i ? data[i - 1].id : '' }
+          })),
+          ... !this.idLocality
+            ? [{
+                key: this.type.toLowerCase(),
+                routerLink: [ '/domains', 'locality' ],
+                queryParams: { idOffice, idDomain, type, idParent }
+              }]
+            : []
+        ]
+      : [];
   }
 
   ngOnDestroy(): void {
@@ -131,6 +172,19 @@ export class DomainLocalityComponent implements OnInit, OnDestroy {
     } else {
       this.propertiesLocality = undefined;
       this.formLocality?.reset();
+    }
+    if (this.idOffice) {
+      const { success, data } = await this.officeSrv.GetById(this.idOffice);
+      if (success) {
+        this.propertiesOffice = data;
+      }
+    }
+    this.idDomain = this.idDomain || this.propertiesLocality?.domain?.id;
+    if (this.idDomain) {
+      const { success, data } = await this.domainSrv.GetById(this.idDomain);
+      if (success) {
+        this.propertiesDomain = data;
+      }
     }
     if (this.cardProperties) {
       this.cardProperties.initialStateCollapse = !!this.idLocality;

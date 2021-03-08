@@ -59,13 +59,13 @@ export class DomainListComponent implements OnInit, OnDestroy {
     this.editPermission = await this.officePermissionSrv.getPermissions(this.idOffice);
     await this.loadPropertiesDomains();
     await this.getOfficeById();
-    this.breadcrumbSrv.pushMenu({
+    this.breadcrumbSrv.setMenu([{
       key: 'domains',
       info: this.propertiesOffice?.name,
       tooltip: this.propertiesOffice?.fullName,
       routerLink: ['/domains'],
       queryParams: { idOffice: this.idOffice }
-    });
+    }]);
   }
 
   ngOnDestroy(): void {

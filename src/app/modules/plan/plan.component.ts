@@ -22,6 +22,7 @@ import { OfficeService } from 'src/app/shared/services/office.service';
 import { PlanPermissionService } from 'src/app/shared/services/plan-permissions.service';
 import { SaveButtonComponent } from 'src/app/shared/components/save-button/save-button.component';
 import { MenuService } from 'src/app/shared/services/menu.service';
+import { IOffice } from 'src/app/shared/interfaces/IOffice';
 
 
 interface IWorkpackModelCard {
@@ -43,6 +44,7 @@ export class PlanComponent implements OnInit, OnDestroy {
   responsive: boolean;
   idPlanModel: number;
   idOffice: number;
+  propertiesOffice: IOffice;
   idPlan: number;
   cardPlanProperties: ICard;
   cardsPlanWorkPackModels: IWorkpackModelCard[];
@@ -71,6 +73,7 @@ export class PlanComponent implements OnInit, OnDestroy {
       this.idOffice = +idOffice;
       this.idPlanModel = +idPlanModel;
       this.idPlan = +id;
+      this.resetPlan();
     });
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.responsive = value);
     this.translateSrv.onLangChange.pipe(takeUntil(this.$destroy)).subscribe(() => {
@@ -103,13 +106,30 @@ export class PlanComponent implements OnInit, OnDestroy {
   async ngOnInit() {
     this.calendarFormat = this.translateSrv.instant('dateFormat');
     await this.loadPropertiesPlan();
-    this.breadcrumbSrv.pushMenu({
-      key: 'plan',
-      routerLink: ['/plan'],
-      queryParams: { id: this.idPlan },
-      info: this.planData?.name,
-      tooltip: this.planData?.fullName
-    });
+    this.breadcrumbSrv.setMenu([
+      {
+        key: 'office',
+        routerLink: [ '/offices', 'office' ],
+        queryParams: { id: this.idOffice },
+        info: this.propertiesOffice?.name,
+        tooltip: this.propertiesOffice?.fullName
+      },
+      {
+        key: 'plan',
+        routerLink: ['/plan'],
+        queryParams: { id: this.idPlan },
+        info: this.planData?.name,
+        tooltip: this.planData?.fullName
+      }
+    ]);
+  }
+
+  async resetPlan() {
+    this.cardPlanProperties = undefined;
+    this.cardsPlanWorkPackModels = undefined;
+    this.planData = undefined;
+    this.editPermission = false;
+    await this.loadPropertiesPlan();
   }
 
   async loadPropertiesPlan() {
@@ -125,7 +145,6 @@ export class PlanComponent implements OnInit, OnDestroy {
       this.planData = result.data;
       if (this.planData) {
         this.officeSrv.nextIDOffice(this.planData.idOffice);
-        this.idOffice = this.planData.idOffice;
         this.idPlanModel = this.planData.idPlanModel;
         this.formPlan.controls.name.setValue(this.planData.name);
         this.formPlan.controls.fullName.setValue(this.planData.fullName);
@@ -134,9 +153,16 @@ export class PlanComponent implements OnInit, OnDestroy {
         this.editPermission = await this.planPermissionSrv.getPermissions(this.idPlan);
         if (!this.editPermission) {
           this.formPlan.disable();
+        } else {
+          this.formPlan.enable();
         }
         this.loadWorkPackModels();
       }
+    }
+    this.idOffice = this.planData?.idOffice || this.idOffice;
+    const resultOffice = await this.officeSrv.GetById(this.idOffice);
+    if (resultOffice.success) {
+      this.propertiesOffice = resultOffice.data;
     }
   }
 

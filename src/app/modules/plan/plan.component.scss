@@ -2,53 +2,27 @@
 
 .app-plan {
   width: 100%;
-  .workpackModels-cards-section {
-    .card-workpack-model {
-      margin-top: 1em;
-    }
-  }
-  .app-plan-header {
-    padding: 0.5em 0;
-    font-size: 0.9rem;
-    font-family: v.$fontTitle !important;
-    color: v.$fontInput;
-    .app-plan-header-text {
-      margin-left: 0.5em;
-    }
-  }
-  .app-plan-header-mobile {
-    font-size: 1rem;
-    font-family: v.$fontFamilyBold !important;
-    font-weight: bold;
-  }
+
   .card-properties-plan{
     width: 100%;
     form {
       width: 100%;
-
-      ::ng-deep .p-field.responsive {
-        margin-right: 0 !important;
-      }
-      ::ng-deep .responsive {
-        width: 100% !important;
-
-        .p-calendar {
-          width: 100%;
-        }
-      }
     }
   }
-  .p-float-label {
-    margin-top: 2.5em;
-  }
-  ::ng-deep .dataview-card-items {
-    position: static !important;
-    background-color: transparent;
-    .p-dataview-content, .p-grid {
-      background-color: transparent;
+}
+
+
+::ng-deep .app-plan {
+  .card-properties-plan form {
+    .p-field.responsive {
+      margin-right: 0 !important;
     }
-    .card-item-container {
-      padding: 0.5em;
+    .responsive {
+      width: 100% !important;
+
+      .p-calendar {
+        width: 100%;
+      }
     }
   }
 }

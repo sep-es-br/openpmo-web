@@ -5,3 +5,10 @@ export interface IBreadcrumb {
   routerLink: string[];
   queryParams?: any;
 }
+
+export interface IResultBreadcrumb {
+  id: number;
+  name: string;
+  fullName: string;
+  type: string;
+}

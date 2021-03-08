@@ -1,21 +1,21 @@
 <div class="app-schedule">
-  <div class="app-schedule-header" [class.app-schedule-header-mobile]="responsive">
-    <span class="app-schedule-header-label">{{"newSchedule" | translate}}</span>
+  <div class="app-content-header" [class.mobile]="responsive">
+    <span>{{ "newSchedule" | translate }}</span>
   </div>
 
   <div class="card-properties-schedule" *ngIf="unitMeasure && cardScheduleProperties">
-    <app-card [properties]="cardScheduleProperties">
+    <app-card [properties]="cardScheduleProperties" class="mt-0 inputs-float-label">
       <div class="p-grid">
         <form [formGroup]="formSchedule">
           <div class="p-formgroup-inline" [class.responsive]="responsive">
             <div class="p-field" [class.responsive]="responsive">
               <span class="p-float-label" [class.responsive]="responsive">
-                <p-calendar id="float-start" class="app-select-date" showIcon="true" 
+                <p-calendar id="float-start" class="app-select-date" showIcon="true"
                   [monthNavigator]="true"
-                  [yearNavigator]="true" formControlName="start" 
-                  yearRange="2020:2030" 
+                  [yearNavigator]="true" formControlName="start"
+                  yearRange="2020:2030"
                   [class.responsive]="responsive"
-                  icon="fas fa-calendar-alt" 
+                  icon="fas fa-calendar-alt"
                   [dateFormat]="calendarFormat">
                 </p-calendar>
                 <label class="app-input-label" for="float-start">{{ "start" | translate }}</label>
@@ -24,10 +24,10 @@
             <div class="p-field" [class.responsive]="responsive">
               <span class="p-float-label" [class.responsive]="responsive">
                 <p-calendar id="float-end" formControlName="end" class="app-select-date" showIcon="true"
-                  [monthNavigator]="true" 
-                  [yearNavigator]="true" 
+                  [monthNavigator]="true"
+                  [yearNavigator]="true"
                   yearRange="2020:2030" [class.responsive]="responsive"
-                  icon="fas fa-calendar-alt" 
+                  icon="fas fa-calendar-alt"
                   [dateFormat]="calendarFormat">
                 </p-calendar>
                 <label class="app-input-label" class="properties-label" for="float-end">{{ "finish" |

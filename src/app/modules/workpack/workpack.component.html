@@ -1,15 +1,18 @@
 <div class="app-workpack" *ngIf="workpackModel">
-  <div class="app-workpack-header" *ngIf="!idWorkpack" [class.app-workpack-header-mobile]="responsive">
-    <span class="app-workpack-header-label">{{'new' | translate}}</span>
-    <span class="app-workpack-header-text">{{workpackModel.modelName}}</span>
+  <div class="app-content-header workpack" *ngIf="idWorkpack; else newWorkpackTitle" [class.mobile]="responsive">
+    <span class="label">{{workpackModel.modelName}}:</span>
+    <span class="text">{{workpackName}}</span>
   </div>
-  <div class="app-workpack-header" *ngIf="idWorkpack" [class.app-workpack-header-mobile]="responsive">
-    <span class="app-workpack-header-label">{{workpackModel.modelName}}: </span>
-    <span class="app-workpack-header-text">{{workpackName}}</span>
-  </div>
+  <ng-template #newWorkpackTitle>
+    <div class="app-content-header" [class.mobile]="responsive">
+      <span class="label">{{'new' | translate}}</span>
+      <span class="text">{{workpackModel.modelName}}</span>
+    </div>
+  </ng-template>
+
 
   <div class="card-properties-workpack">
-    <app-card [properties]="cardWorkpackProperties">
+    <app-card [properties]="cardWorkpackProperties" class="mt-0 inputs-float-label">
       <div class="properties-container" [class.responsive]="responsive">
         <div class="property-container" *ngFor="let property of sectionPropertiesProperties"
           [class.not-fullLine]="!property.fullLine && property.type !== 'TextArea'"

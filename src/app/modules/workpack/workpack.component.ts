@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnDestroy, ViewChild } from '@angular/core';
+import { Component, OnDestroy, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { MenuItem, MessageService, TreeNode } from 'primeng/api';
@@ -39,6 +39,8 @@ import { OfficePermissionService } from 'src/app/shared/services/office-permissi
 import { PlanPermissionService } from 'src/app/shared/services/plan-permissions.service';
 import { SaveButtonComponent } from 'src/app/shared/components/save-button/save-button.component';
 import { MenuService } from 'src/app/shared/services/menu.service';
+import { IOffice } from 'src/app/shared/interfaces/IOffice';
+import { IPlan } from 'src/app/shared/interfaces/IPlan';
 
 interface ISection {
   idWorkpackModel?: number;
@@ -70,7 +72,9 @@ export class WorkpackComponent implements OnDestroy {
   navigationSubscription;
   responsive: boolean;
   idPlan: number;
+  propertiesPlan: IPlan;
   idOffice: number;
+  propertiesOffice: IOffice;
   idWorkpackModel: number;
   idWorkpack: number;
   idWorkpackParent: number;
@@ -127,15 +131,6 @@ export class WorkpackComponent implements OnDestroy {
       this.idWorkpackModel = idWorkpackModel;
       this.idWorkpackParent = idWorkpackParent;
       await this.resetWorkpack();
-      this.breadcrumbSrv.pushMenu({
-        key: this.workpackModel.modelName,
-        info: this.workpackName,
-        tooltip: this.workpackFullName,
-        routerLink: [ '/workpack' ],
-        queryParams: {
-          id: this.idWorkpack
-        }
-      });
     });
     this.responsiveSrv.observable.subscribe(value => {
       this.responsive = value;
@@ -223,6 +218,54 @@ export class WorkpackComponent implements OnDestroy {
     await this.loadProperties();
   }
 
+  async setBreadcrumb() {
+    this.breadcrumbSrv.setMenu([
+      {
+        key: 'office',
+        routerLink: [ '/offices', 'office' ],
+        queryParams: { id: this.idOffice },
+        info: this.propertiesOffice?.name,
+        tooltip: this.propertiesOffice?.fullName
+      },
+      {
+        key: 'plan',
+        routerLink: ['/plan'],
+        queryParams: { id: this.idPlan },
+        info: this.propertiesPlan?.name,
+        tooltip: this.propertiesPlan?.fullName
+      },
+      ... this.idWorkpack
+        ? await this.getBreadcrumbs()
+        : [{
+          key: this.workpackModel?.modelName,
+          info: this.workpackName,
+          tooltip: this.workpackFullName,
+          routerLink: [ '/workpack' ]
+        }]
+    ]);
+  }
+
+  async getBreadcrumbs() {
+    const { success, data } = await this.breadcrumbSrv.getBreadcrumbWorkpack(this.idWorkpack);
+    const currentBreadcrumb = data.pop();
+    return success
+      ? [
+          ...data.map(p => ({
+            key: p.type.toLowerCase(),
+            info: p.name,
+            tooltip: p.fullName,
+            routerLink: [ '/workpack' ],
+            queryParams: { id: p.id }
+          })),
+          {
+            key: currentBreadcrumb.type.toLowerCase(),
+            routerLink: [ '/workpack' ],
+            queryParams: { id: this.idWorkpack }
+          }
+        ]
+      : [];
+  }
+
   async loadProperties() {
     this.isUserAdmin = await this.authSrv.isUserAdmin();
     if (this.isUserAdmin || !this.idWorkpack) {
@@ -283,8 +326,16 @@ export class WorkpackComponent implements OnDestroy {
     }
     const plan = await this.planSrv.GetById(this.idPlan);
     if (plan.success) {
+      this.propertiesPlan = plan.data;
       this.idOffice = plan.data.idOffice;
+      if (this.idOffice) {
+        const { success, data } = await this.officeSrv.GetById(this.idOffice);
+        if (success) {
+          this.propertiesOffice = data;
+        }
+      }
       this.officeSrv.nextIDOffice(this.idOffice);
+      await this.setBreadcrumb();
       await this.loadPermissionsOffice();
     }
   }
@@ -779,7 +830,9 @@ export class WorkpackComponent implements OnDestroy {
             disabled: !this.editPermission
           }] as MenuItem[],
           urlCard: '/workpack/cost-account',
-          paramsUrlCard: null,
+          paramsUrlCard: [
+            { name: 'idWorkpack', value: this.idWorkpack },
+          ],
           iconMenuItems: null
         };
       });
@@ -855,18 +908,18 @@ export class WorkpackComponent implements OnDestroy {
               icon: 'fas fa-edit',
               command: () => this.editScheduleStep(step.id, unit.name, 'step')
             }]),
-          unitPlanned: step.plannedWork,
-          unitActual: step.actualWork,
+          unitPlanned: step.plannedWork ? step.plannedWork : 0,
+          unitActual: step.actualWork ? step.actualWork : 0,
           unitProgressBar: {
             total: step.plannedWork,
             progress: step.actualWork,
             color: '#FF8C00',
           },
-          costPlanned: step.consumes.reduce( (total, v) => ( total + v.plannedCost), 0),
-          costActual: step.consumes.reduce( (total, v) => ( total + v.actualCost), 0),
+          costPlanned: step.consumes.reduce( (total, v) => ( total + (v.plannedCost ? v.plannedCost : 0)), 0),
+          costActual: step.consumes.reduce( (total, v) => ( total + (v.actualCost ? v.actualCost : 0)), 0),
           costProgressBar: {
-            total: step.consumes.reduce( (total, v) => ( total + v.plannedCost), 0),
-            progress: step.consumes.reduce( (total, v) => ( total + v.actualCost), 0),
+            total: step.consumes.reduce( (total, v) => ( total +  (v.plannedCost ? v.plannedCost : 0)), 0),
+            progress: step.consumes.reduce( (total, v) => ( total + (v.actualCost ? v.actualCost : 0)), 0),
             color: '#44B39B'
           },
           unitName: unit && unit.name,
@@ -1042,7 +1095,6 @@ export class WorkpackComponent implements OnDestroy {
 
   async saveWorkpack() {
     this.workpackProperties = this.sectionPropertiesProperties.map(p => p.getValues());
-    // this.sectionPropertiesProperties.forEach( p => p.validate());
     if (this.sectionPropertiesProperties.filter( p => p.invalid).length > 0) {
       this.messageSrv.add({
         severity: 'warn',

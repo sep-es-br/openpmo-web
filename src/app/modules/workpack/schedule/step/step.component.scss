@@ -2,20 +2,7 @@
 
 ::ng-deep .app-step {
   width: 100%;
-  .app-step-header {
-    padding: 0.5em 0;
-    font-size: 0.9rem;
-    font-family: v.$fontTitle !important;
-    color: v.$fontInput;
-    .app-step-header-text {
-      margin-left: 0.5em;
-    }
-  }
-  .app-step-header-mobile {
-    font-size: 1rem;
-    font-family: v.$fontFamilyBold !important;
-    font-weight: bold;
-  }
+
   .card-properties-step{
     width: 100%;
     form {
@@ -66,7 +53,7 @@
         }
       }
       .step-totals {
-        margin-top: 2em;
+        margin-top: 15px;
         .totals-title {
           text-transform: uppercase;
           font-size: 1rem;
@@ -79,7 +66,8 @@
           column-gap: 1em;
           align-items: center;
           width: 40%;
-          margin-top: 1em;
+          margin-top: 15px;
+
           .planned-total, .actual-total {
             display: flex;
             flex-direction: column;
@@ -106,7 +94,7 @@
             }
           }
           .actual-total {
-            margin-top: 1em;
+            margin-top: 15px;
           }
         }
       }
@@ -164,8 +152,5 @@
         background-color: v.$bgButtonGreenHover;
       }
     }
-  }
-  .p-float-label {
-    margin-top: 2.5em;
   }
 }

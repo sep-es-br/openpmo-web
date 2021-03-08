@@ -108,7 +108,7 @@ export class MenuComponent implements OnInit, OnDestroy {
     this.currentUserInfo = await this.authSrv.getInfoPerson();
     this.username = this.isUserAdmin
       ? 'Admin'
-      : ( this.currentUserInfo.name?.split(' ').shift() || payload.email );
+      : (this.currentUserInfo.name?.split(' ').shift() || payload.email);
   }
 
   updateMenuOfficeOnAdminChange() {
@@ -131,12 +131,12 @@ export class MenuComponent implements OnInit, OnDestroy {
           label: this.translateSrv.instant(language === 'pt' ? 'portuguese' : 'english'),
           icon: 'fas fa-flag',
           items: [
-            { label: this.translateSrv.instant('portuguese'), command: () => this.changeLanguage('pt')},
-            { label: this.translateSrv.instant('english'), command: () => this.changeLanguage('en')}
+            { label: this.translateSrv.instant('portuguese'), command: () => this.changeLanguage('pt') },
+            { label: this.translateSrv.instant('english'), command: () => this.changeLanguage('en') }
           ]
         }
       ]
-    , 0);
+      , 0);
   }
 
   changeLanguage(language: string) {
@@ -152,23 +152,21 @@ export class MenuComponent implements OnInit, OnDestroy {
         styleClass: `office-${office.id} ${this.currentURL === `offices/office?id=${office.id}` ? 'active' : ''}`,
         command: (e) => {
           if (e.originalEvent?.target?.classList?.contains('p-menuitem-text')) {
-            this.router.navigate([ '/offices', 'office' ], { queryParams: { id: office.id }});
+            this.router.navigate(['/offices', 'office'], { queryParams: { id: office.id } });
             this.closeAllMenus();
           }
         },
         items: office.plans
           ? office.plans.map(plan =>
-            ({
-              label: plan.name,
-              icon: 'app-icon plan',
-              styleClass: `plan-${plan.id} ${this.currentURL === `plan?id=${plan.id}` ? 'active' : ''}`,
-              command: (e) => {
-                if (e.originalEvent?.target?.classList?.contains('p-menuitem-text')) {
-                  this.router.navigate([ '/plan' ], { queryParams: { id: plan.id }});
-                  this.closeAllMenus();
-                }
-              }
-            })
+          ({
+            label: plan.name,
+            icon: 'app-icon plan',
+            styleClass: `plan-${plan.id} ${this.currentURL === `plan?id=${plan.id}` ? 'active' : ''}`,
+            command: (e) => {
+              this.router.navigate(['/plan'], { queryParams: { id: plan.id } });
+              this.closeAllMenus();
+            }
+          })
           )
           : undefined
       }));
@@ -178,26 +176,26 @@ export class MenuComponent implements OnInit, OnDestroy {
 
   selectMenuActive(url: string) {
     const els = [
-      ... Array.from(this.menuOffices?.nativeElement.getElementsByClassName('p-panelmenu-header active')),
-      ... Array.from(this.menuPortfolio?.nativeElement.getElementsByClassName('p-panelmenu-header active')),
-      ... Array.from(this.menuOffices?.nativeElement.getElementsByClassName('p-menuitem active')),
-      ... Array.from(this.menuPortfolio?.nativeElement.getElementsByClassName('p-menuitem active'))
+      ...Array.from(this.menuOffices?.nativeElement.getElementsByClassName('p-panelmenu-header active')),
+      ...Array.from(this.menuPortfolio?.nativeElement.getElementsByClassName('p-panelmenu-header active')),
+      ...Array.from(this.menuOffices?.nativeElement.getElementsByClassName('p-menuitem active')),
+      ...Array.from(this.menuPortfolio?.nativeElement.getElementsByClassName('p-menuitem active'))
     ];
-    for(const el of els) {
+    for (const el of els) {
       el.classList.remove('active');
     }
     const id = this.getIdFromURL(url);
-    if(url.startsWith('offices/office')) {
+    if (url.startsWith('offices/office')) {
       this.menuOffices?.nativeElement.querySelector('.office-' + id)?.classList.add('active');
     } else if (url.startsWith('plan')) {
       this.menuOffices?.nativeElement.querySelector('.plan-' + id)?.classList.add('active');
-    } else if (url.startsWith('workpack')){
+    } else if (url.startsWith('workpack')) {
       this.menuPortfolio?.nativeElement.querySelector('.workpack-' + id)?.classList.add('active');
     }
   }
 
   getIdFromURL(url: string) {
-    const [ path, queries ] = url.split('?');
+    const [path, queries] = url.split('?');
     return queries ? Number((queries.split('id=')[1] || queries.split('idOffice=')[1])?.split('&')[0]) : 0;
   }
 
@@ -229,7 +227,7 @@ export class MenuComponent implements OnInit, OnDestroy {
       items: workpack.children?.length ? this.buildMenuItemPortfolio(workpack.children) : undefined,
       command: (e) => {
         if (e.originalEvent?.target?.classList?.contains('p-menuitem-text')) {
-          this.router.navigate(['/workpack' ], { queryParams: { id: workpack.id }});
+          this.router.navigate(['/workpack'], { queryParams: { id: workpack.id } });
           this.closeAllMenus();
         }
       }
@@ -245,7 +243,7 @@ export class MenuComponent implements OnInit, OnDestroy {
       items: model.children?.length ? this.buildMenuItemOffices(model.children, idOffice, idStrategy) : undefined,
       command: (e) => {
         if (e.originalEvent?.target?.classList?.contains('p-menuitem-text')) {
-          this.router.navigate(['/workpack-model' ], { queryParams: { id: model.id, idOffice, idStrategy }});
+          this.router.navigate(['/workpack-model'], { queryParams: { id: model.id, idOffice, idStrategy } });
           this.closeAllMenus();
         }
       }
@@ -255,7 +253,7 @@ export class MenuComponent implements OnInit, OnDestroy {
   isMenuOpen(menu?: string) {
     return menu
       ? this.menus.find(m => m.label === menu)?.isOpen
-      : this.menus.reduce((a, b) => a ? a : b.isOpen , false);
+      : this.menus.reduce((a, b) => a ? a : b.isOpen, false);
   }
 
   closeAllMenus() {

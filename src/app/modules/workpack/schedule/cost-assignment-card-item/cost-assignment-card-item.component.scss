@@ -49,15 +49,11 @@
     height: 100%;
     padding: 0;
     .card-item-values {
-      margin-top: 1em;
+      margin-top: 15px;
       display: flex;
       flex-direction: column;
       .p-float-label {
-        margin-top: 2em;
         width: 80%;
-      }
-      .p-float-label:first-child {
-        margin-top: 1em;
       }
       .p-float-label.responsive {
         width: 100%;

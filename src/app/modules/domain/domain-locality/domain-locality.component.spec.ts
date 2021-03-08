@@ -6,7 +6,7 @@ describe('DomainLocalityComponent', () => {
   let component: DomainLocalityComponent;
   let fixture: ComponentFixture<DomainLocalityComponent>;
 
-  beforeEach(async () => {
+  beforeEach(async() => {
     await TestBed.configureTestingModule({
       declarations: [ DomainLocalityComponent ]
     })

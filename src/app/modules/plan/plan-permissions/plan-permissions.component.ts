@@ -1,9 +1,9 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { Location } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { debounceTime, takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
+import { MessageService } from 'primeng/api';
 
 import { IPlanPermission } from 'src/app/shared/interfaces/IPlanPermission';
 import { PlanPermissionService } from 'src/app/shared/services/plan-permissions.service';
@@ -14,8 +14,9 @@ import { IPerson } from 'src/app/shared/interfaces/IPerson';
 import { PersonService } from 'src/app/shared/services/person.service';
 import { enterLeave } from '../../../shared/animations/enterLeave.animation';
 import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
-import { MessageService } from 'primeng/api';
 import { SaveButtonComponent } from 'src/app/shared/components/save-button/save-button.component';
+import { IPlan } from 'src/app/shared/interfaces/IPlan';
+import { PlanService } from 'src/app/shared/services/plan.service';
 
 @Component({
   selector: 'app-plan-permissions',
@@ -30,6 +31,7 @@ export class PlanPermissionsComponent implements OnInit, OnDestroy {
   @ViewChild(SaveButtonComponent) saveButton: SaveButtonComponent;
 
   idPlan: number;
+  propertiesPlan: IPlan;
   cardPersonPermission: ICard;
   personEmail: string;
   responsive: boolean;
@@ -48,9 +50,10 @@ export class PlanPermissionsComponent implements OnInit, OnDestroy {
     private planPermissionSrv: PlanPermissionService,
     private translateSrv: TranslateService,
     private personSrv: PersonService,
-    private location: Location,
     private breadcrumbSrv: BreadcrumbService,
-    private messageSrv: MessageService
+    private messageSrv: MessageService,
+    private planSrv: PlanService,
+    private router: Router
   ) {
     this.actRouter.queryParams.subscribe(async queryParams => {
       this.idPlan = queryParams.idPlan;
@@ -77,13 +80,30 @@ export class PlanPermissionsComponent implements OnInit, OnDestroy {
 
   async ngOnInit() {
     await this.loadPermission();
-    this.breadcrumbSrv.pushMenu({
-      key: 'permission',
-      routerLink: [ '/plan', 'permission', 'detail' ],
-      queryParams: { idPlan: this.idPlan, email: this.personEmail },
-      info: this.person?.name,
-      tooltip: this.person?.fullName
-    });
+    await this.loadPropertiesPlan();
+    this.breadcrumbSrv.setMenu([
+      {
+        key: 'planPermissions',
+        routerLink: [ '/plan', 'permission' ],
+        queryParams: { idPlan: this.idPlan },
+        info: this.propertiesPlan?.name,
+        tooltip: this.propertiesPlan?.fullName
+      },
+      {
+        key: 'permission',
+        routerLink: [ '/plan', 'permission', 'detail' ],
+        queryParams: { idPlan: this.idPlan, email: this.personEmail },
+        info: this.person?.name,
+        tooltip: this.person?.fullName
+      }
+    ]);
+  }
+
+  async loadPropertiesPlan() {
+    const { success, data } = await this.planSrv.GetById(this.idPlan);
+    if (success) {
+      this.propertiesPlan = data;
+    }
   }
 
   validateEmail() {
@@ -185,35 +205,24 @@ export class PlanPermissionsComponent implements OnInit, OnDestroy {
         level: cardItem.selectedOption
       }
     ));
-    if (this.personEmail) {
-      const result = await this.planPermissionSrv.put({
-        email: this.permission.person.email,
-        idPlan: this.permission.idPlan,
-        permissions: this.permission.permissions
-      });
-      if (result.success) {
-        this.messageSrv.add({
-          severity: 'success',
-          summary: this.translateSrv.instant('success'),
-          detail: this.translateSrv.instant('messages.savedSuccessfully')
+    const { success } = this.personEmail
+      ? await this.planPermissionSrv.put({
+          email: this.permission.person.email,
+          idPlan: this.permission.idPlan,
+          permissions: this.permission.permissions
+        })
+      : await this.planPermissionSrv.post({
+          email: this.permission.email,
+          idPlan: this.permission.idPlan,
+          permissions: this.permission.permissions
         });
-        this.location.back();
-      }
-    } else {
-      const result = await this.planPermissionSrv.post({
-        email: this.permission.email,
-        idPlan: this.permission.idPlan,
-        permissions: this.permission.permissions
+    if (success) {
+      this.messageSrv.add({
+        severity: 'success',
+        summary: this.translateSrv.instant('success'),
+        detail: this.translateSrv.instant('messages.savedSuccessfully')
       });
-      if (result.success) {
-        this.messageSrv.add({
-          severity: 'success',
-          summary: this.translateSrv.instant('success'),
-          detail: this.translateSrv.instant('messages.savedSuccessfully')
-        });
-        this.location.back();
-      }
+      this.router.navigate([ '/plan', 'permission' ], { queryParams: { idPlan: this.idPlan }});
     }
   }
-
 }

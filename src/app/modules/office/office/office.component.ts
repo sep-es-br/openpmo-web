@@ -88,13 +88,13 @@ export class OfficeComponent implements OnDestroy {
     this.isUserAdmin = await this.authSrv.isUserAdmin();
     await this.loadPropertiesOffice();
     this.loadCards();
-    this.breadcrumbSrv.pushMenu({
+    this.breadcrumbSrv.setMenu([{
       key: 'office',
       routerLink: [ '/offices', 'office' ],
       queryParams: { id: this.idOffice },
       info: this.propertiesOffice?.name,
       tooltip: this.propertiesOffice?.fullName
-    });
+    }]);
     if (this.idOffice) {
       this.loadPlans();
     }
@@ -168,8 +168,8 @@ export class OfficeComponent implements OnDestroy {
     ] : [];
     if (this.plans) {
       itemsPlans.unshift(... this.plans.map(plan => {
-        const editPermissions = !this.authSrv.isUserAdmin() && plan.permissions.filter( p => p.level === 'EDIT');
-        const planEditPermission =  this.authSrv.isUserAdmin() ? true : (editPermissions.length > 0 ? true : false);
+        const editPermissions = !this.isUserAdmin && plan.permissions.filter( p => p.level === 'EDIT');
+        const planEditPermission =  this.isUserAdmin ? true : (editPermissions.length > 0 ? true : false);
         return {
           typeCardItem: 'listItem',
           iconSvg: true,

@@ -1,11 +1,13 @@
 <div class="app-step">
-  <div class="app-step-header" [class.app-step-header-mobile]="responsive">
-    <span class="app-step-header-label" *ngIf="!this.stepDetail">{{"newMonth" | translate}}</span>
-    <span class="app-step-header-label" *ngIf="this.stepDetail">{{this.stepDetail.periodFromStart|date:'MMMM'}}</span>
+  <div class="app-content-header" [class.mobile]="responsive">
+    <span *ngIf="this.idStep; else newStepTitle">{{ this.stepDetail?.periodFromStart | date:'MMMM' }}</span>
+    <ng-template #newStepTitle>
+      <span>{{ "newMonth" | translate }}</span>
+    </ng-template>
   </div>
 
   <div class="card-properties-step" *ngIf="cardStepProperties">
-    <app-card [properties]="cardStepProperties">
+    <app-card [properties]="cardStepProperties" class="mt-0 inputs-float-label">
       <div class="p-grid">
         <form [formGroup]="formStep">
           <div class="p-formgroup-inline" [class.responsive]="responsive">
@@ -13,7 +15,7 @@
               <span class="p-float-label" [class.responsive]="responsive">
                 <p-calendar id="float-start" class="app-select-date" showIcon="true" [monthNavigator]="true"
                   disabled="true" [yearNavigator]="true" formControlName="start" yearRange="2020:2030"
-                  [class.responsive]="responsive" icon="fas fa-calendar-alt" 
+                  [class.responsive]="responsive" icon="fas fa-calendar-alt"
                   [dateFormat]="calendarFormat">
                 </p-calendar>
                 <label class="app-input-label" for="float-start">{{ "start" | translate }}</label>
@@ -23,7 +25,7 @@
               <span class="p-float-label" [class.responsive]="responsive">
                 <p-calendar id="float-end" formControlName="end" class="app-select-date" showIcon="true"
                   [monthNavigator]="true" [yearNavigator]="true" yearRange="2020:2030" [class.responsive]="responsive"
-                  disabled="true" icon="fas fa-calendar-alt" 
+                  disabled="true" icon="fas fa-calendar-alt"
                   [dateFormat]="calendarFormat">
                 </p-calendar>
                 <label class="app-input-label" class="properties-label" for="float-end">{{ "finish" |
@@ -39,7 +41,7 @@
                   <span class="p-float-label" [class.responsive]="responsive">
                     <p-inputNumber class="app-input-number" id="float-planned" formControlName="plannedWork" (onInput)="handleChangeTotalsValues()">
                     </p-inputNumber>
-                    <label class="app-input-label" for="float-planned">{{unitName}} {{ "planned" |translate }}</label>
+                    <label class="app-input-label" for="float-planned">{{unitName}} {{ "planned" |translate }} * </label>
                   </span>
                 </div>
                 <div class="p-field" [class.responsive]="responsive">

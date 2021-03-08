@@ -14,7 +14,7 @@ import { ResponsiveService } from './shared/services/responsive.service';
 export class AppComponent implements OnInit {
 
   isMobileView = false;
-  showTemplate = true;
+  showTemplate = false;
 
   constructor(
     private responsiveSrv: ResponsiveService,
@@ -25,7 +25,7 @@ export class AppComponent implements OnInit {
     this.responsiveSrv.observable.subscribe(isMobileView => this.isMobileView = isMobileView);
     this.router.events
       .pipe(filter((event) => event instanceof NavigationEnd))
-      .subscribe((event: NavigationEnd) => this.showTemplate = !['/login'].includes(event.url));
+      .subscribe((event: NavigationEnd) => this.showTemplate = !['/login', '/'].includes(event.url));
     this.location.subscribe(l => l.type === 'popstate' ? this.breadcrumbSrv.handleHistoryPop(l.url) : null);
   }
 

@@ -47,6 +47,7 @@ export class DomainComponent implements OnInit, OnDestroy {
   isUserAdmin: boolean;
   editPermission: boolean;
   permissionsOffices: IOffice[];
+  propertiesOffice: IOffice;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -89,13 +90,23 @@ export class DomainComponent implements OnInit, OnDestroy {
     this.editPermission = await this.officePermissionSrv.getPermissions(this.idOffice);
     await this.loadCards();
     await this.loadPropertiesDomain();
-    this.breadcrumbSrv.pushMenu({
-      key: 'domain',
-      info: this.propertiesDomain?.name,
-      tooltip: this.propertiesDomain?.fullName,
-      routerLink: ['/domains', 'detail'],
-      queryParams: { id: this.idDomain, idOffice: this.idOffice }
-    });
+    await this.loadPropertiesOffice();
+    this.breadcrumbSrv.setMenu([
+      {
+        key: 'domains',
+        info: this.propertiesOffice?.name,
+        tooltip: this.propertiesOffice?.fullName,
+        routerLink: ['/domains'],
+        queryParams: { idOffice: this.idOffice }
+      },
+      {
+        key: 'domain',
+        info: this.propertiesDomain?.name,
+        tooltip: this.propertiesDomain?.fullName,
+        routerLink: ['/domains', 'detail'],
+        queryParams: { id: this.idDomain, idOffice: this.idOffice }
+      }
+    ]);
   }
 
   loadCards() {
@@ -128,6 +139,15 @@ export class DomainComponent implements OnInit, OnDestroy {
           this.formDomain.disable();
         }
         await this.loadLocalities();
+      }
+    }
+  }
+
+  async loadPropertiesOffice() {
+    if (this.idOffice) {
+      const { data, success } = await this.officeSrv.GetById(this.idOffice);
+      if (success) {
+        this.propertiesOffice = data;
       }
     }
   }

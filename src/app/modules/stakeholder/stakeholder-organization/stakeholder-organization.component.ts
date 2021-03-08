@@ -74,13 +74,28 @@ export class StakeholderOrganizationComponent implements OnInit {
 
   async ngOnInit() {
     await this.loadStakeholder();
-    this.breadcrumbSrv.pushMenu({
-      key: 'stakeholder',
-      routerLink: ['/stakeholder/organization'],
-      queryParams: { idWorkpack: this.idWorkpack, idOrganization: this.idOrganization },
-      info: this.stakeholder?.organization?.name,
-      tooltip: this.stakeholder?.organization?.fullName
-    });
+    const propertyNameWorkpackModel = this.workpack.model.properties.find(p => p.name === 'name' && p.session === 'PROPERTIES');
+    const propertyNameWorkpack = this.workpack.properties.find(p => p.idPropertyModel === propertyNameWorkpackModel.id);
+    const workpackName = propertyNameWorkpack.value as string;
+    const propertyFullNameWorkpackModel = this.workpack.model.properties.find(p => p.name === 'fullName' && p.session === 'PROPERTIES');
+    const propertyFullNameWorkpack = this.workpack.properties.find(p => p.idPropertyModel === propertyFullNameWorkpackModel.id);
+    const workpackFullName = propertyFullNameWorkpack.value as string;
+    this.breadcrumbSrv.setMenu([
+      {
+        key: this.workpack.type,
+        info: workpackName,
+        tooltip: workpackFullName,
+        routerLink: [ '/workpack' ],
+        queryParams: { id: this.idWorkpack }
+      },
+      {
+        key: 'stakeholder',
+        routerLink: ['/stakeholder/organization'],
+        queryParams: { idWorkpack: this.idWorkpack, idOrganization: this.idOrganization },
+        info: this.stakeholder?.organization?.name,
+        tooltip: this.stakeholder?.organization?.fullName
+      }
+    ]);
   }
 
   async loadStakeholder() {
@@ -104,8 +119,7 @@ export class StakeholderOrganizationComponent implements OnInit {
         this.loadCards();
       }
       return;
-    }
-    if (!this.idOrganization) {
+    } else {
       await this.loadWorkpack();
       await this.loadOrganizationsList();
       this.loadCards();

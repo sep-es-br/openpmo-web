@@ -50,7 +50,6 @@ export class OfficePermissionsListComponent implements OnInit {
   async ngOnInit() {
     await this.loadPropertiesOffice();
     this.breadcrumbSrv.setMenu([
-      { key: 'offices', routerLink: ['/offices'] },
       {
         key: 'officePermissions',
         routerLink: ['/offices', 'permission'],

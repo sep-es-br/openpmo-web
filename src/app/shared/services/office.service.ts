@@ -21,20 +21,23 @@ export class OfficeService extends BaseService<IOffice> {
     private authSrv: AuthService
   ) {
     super('offices', injector);
-    this.locationSrv.onUrlChange(url => {
-      const [ path, query ] = url.slice(2).split('?');
-      if (query) {
-        const queries = query.split('&');
-        queries.map(q => {
-          const [ key, value ] = q.split('=');
-          if (key === 'idOffice' || (path === 'offices/office' && key === 'id')) {
-            this.currentIDOffice.next(Number(value));
-          }
-        });
-      } else if (path === 'offices') {
-        this.currentIDOffice.next(0);
-      }
-    });
+    this.checkURL(`#${this.locationSrv.path()}`);
+    this.locationSrv.onUrlChange(url => this.checkURL(url));
+  }
+
+  checkURL(url: string) {
+    const [ path, query ] = url.slice(2).split('?');
+    if (query) {
+      const queries = query.split('&');
+      queries.map(q => {
+        const [ key, value ] = q.split('=');
+        if (key === 'idOffice' || (path === 'offices/office' && key === 'id')) {
+          this.currentIDOffice.next(Number(value));
+        }
+      });
+    } else if (path === 'offices') {
+      this.currentIDOffice.next(0);
+    }
   }
 
   observableIdOffice() {

@@ -56,13 +56,13 @@ export class OrganizationListComponent implements OnInit {
     this.editPermission = await this.officePermissionSrv.getPermissions(this.idOffice);
     await this.loadPropertiesOrganizations();
     await this.getOfficeById();
-    this.breadcrumbSrv.pushMenu({
+    this.breadcrumbSrv.setMenu([{
       key: 'organizations',
       info: this.propertiesOffice?.name,
       tooltip: this.propertiesOffice?.fullName,
       routerLink: [ '/organizations' ],
       queryParams: { idOffice: this.idOffice }
-    });
+    }]);
   }
 
   async getOfficeById() {
@@ -89,7 +89,7 @@ export class OrganizationListComponent implements OnInit {
           iconSvg: true,
           icon: IconsEnum.Building,
           nameCardItem: organization.name,
-          subtitleCardItem: organization.fullName,
+          fullNameCardItem: organization.fullName,
           itemId: organization.id,
           menuItems: [{ label: 'Delete', icon: 'fas fa-trash-alt',
             command: () => this.deleteOrganization(organization),

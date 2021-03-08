@@ -11,8 +11,6 @@ export class InputMessageComponent {
   @Input() form: FormGroup;
   @Input() field: string;
 
-  constructor(
-  ) { }
 
   isInvalid() {
     try {

@@ -25,6 +25,11 @@ import { IconsTypeWorkpackModelEnum } from 'src/app/shared/enums/IconsTypeWorkpa
 import { SaveButtonComponent } from 'src/app/shared/components/save-button/save-button.component';
 import { ResponsiveService } from 'src/app/shared/services/responsive.service';
 import { OfficePermissionService } from 'src/app/shared/services/office-permission.service';
+import { IPlanModel } from 'src/app/shared/interfaces/IPlanModel';
+import { IOffice } from 'src/app/shared/interfaces/IOffice';
+import { OfficeService } from 'src/app/shared/services/office.service';
+import { PlanModelService } from 'src/app/shared/services/plan-model.service';
+import { IBreadcrumb } from 'src/app/shared/interfaces/IBreadcrumb';
 
 interface IIcon {
   name: string;
@@ -53,7 +58,9 @@ export class WorkpackModelComponent implements OnInit {
   @ViewChild(SaveButtonComponent) saveButton: SaveButtonComponent;
 
   idOffice: number;
+  propertiesOffice: IOffice;
   idStrategy: number;
+  propertiesStrategy: IPlanModel;
   idWorkpackModel: number;
   idParentWorkpack: number;
   workpackModelType: TypeWorkpackModelEnum;
@@ -97,7 +104,9 @@ export class WorkpackModelComponent implements OnInit {
     private workpackModelSrv: WorkpackModelService,
     private responsiveSrv: ResponsiveService,
     private confirmationSrv: ConfirmationService,
-    private officePermissionSrv: OfficePermissionService
+    private officePermissionSrv: OfficePermissionService,
+    private officeSrv: OfficeService,
+    private strategySrv: PlanModelService
   ) {
     this.activeRoute.queryParams.subscribe(async({ idOffice, idStrategy, id, idParent, type }) => {
       if (id && this.idWorkpackModel === Number(id)) {
@@ -110,23 +119,40 @@ export class WorkpackModelComponent implements OnInit {
       this.idParentWorkpack = +idParent;
       this.workpackModelType = type;
       this.resetValues();
+      this.scrollTop();
       this.editPermission = await this.officePermissionSrv.getPermissions(idOffice);
       await this.loadDetails();
       this.loadCardItemsModels();
-      this.breadcrumbSrv.pushMenu({
-        key: 'workpackModel',
-        info: this.idWorkpackModel
-          ? this.formProperties.controls.name.value
-          : `${this.translateSrv.instant('new')} ${this.translateSrv.instant('labels.' + this.workpackModelType)}`,
-        routerLink: [ '/workpack-model' ],
-        queryParams: {
-          idStrategy,
-          id,
-          type,
-          idOffice
-        }
-      });
-      this.scrollTop();
+      // this.breadcrumbSrv.setMenu([
+      //   {
+      //     key: 'strategies',
+      //     info: this.propertiesOffice?.name,
+      //     tooltip: this.propertiesOffice?.fullName,
+      //     routerLink: [ '/strategies' ],
+      //     queryParams: { idOffice: this.idOffice }
+      //   },
+      //   {
+      //     key: 'strategy',
+      //     info: this.propertiesStrategy?.name,
+      //     tooltip: this.propertiesStrategy?.fullName,
+      //     routerLink: [ '/strategies', 'strategy' ],
+      //     queryParams: { id: this.idStrategy, idOffice: this.idOffice }
+      //   },
+      //   ... await this.getParentsBreadcrumbs(),
+      //   {
+      //     key: 'workpackModel',
+      //     info: this.idWorkpackModel
+      //       ? this.formProperties.controls.name.value
+      //       : `${this.translateSrv.instant('new')} ${this.translateSrv.instant('labels.' + this.workpackModelType)}`,
+      //     routerLink: [ '/workpack-model' ],
+      //     queryParams: {
+      //       idStrategy,
+      //       id,
+      //       type,
+      //       idOffice
+      //     }
+      //   }
+      // ]);
     });
     this.formProperties = this.fb.group({
       name: [ '', Validators.required ],
@@ -181,6 +207,19 @@ export class WorkpackModelComponent implements OnInit {
 
   async loadDetails() {
     this.loadCards();
+    if (this.idOffice) {
+      const { success, data } = await this.officeSrv.GetById(this.idOffice);
+      if (success) {
+        this.propertiesOffice = data;
+      }
+    }
+    if (this.idStrategy) {
+      const { success, data } = await this.strategySrv.GetById(this.idStrategy);
+      if (success) {
+        this.propertiesStrategy = data;
+      }
+    }
+    this.setBreadcrumb();
     if (this.idWorkpackModel) {
       if (!this.editPermission) {
         this.formProperties.disable();
@@ -189,6 +228,56 @@ export class WorkpackModelComponent implements OnInit {
     } else if (this.editPermission){
       this.loadDefaultProperties();
     }
+  }
+
+  async setBreadcrumb() {
+    const { idOffice, idStrategy, idWorkpackModel: id, workpackModelType: type } = this;
+    this.breadcrumbSrv.setMenu([
+      {
+        key: 'strategies',
+        info: this.propertiesOffice?.name,
+        tooltip: this.propertiesOffice?.fullName,
+        routerLink: [ '/strategies' ],
+        queryParams: { idOffice: this.idOffice }
+      },
+      {
+        key: 'strategy',
+        info: this.propertiesStrategy?.name,
+        tooltip: this.propertiesStrategy?.fullName,
+        routerLink: [ '/strategies', 'strategy' ],
+        queryParams: { id: this.idStrategy, idOffice: this.idOffice }
+      },
+      ... this.idWorkpackModel
+        ? [
+          ... await this.getParentsBreadcrumbs(),
+          {
+            key: 'workpackModel',
+            info: this.formProperties.controls.name.value,
+            routerLink: [ '/workpack-model' ],
+            queryParams: { idStrategy, id, type, idOffice }
+          }]
+        : [{
+            key: 'workpackModel',
+            info: `${this.translateSrv.instant('new')} ${this.translateSrv.instant('labels.' + this.workpackModelType)}`,
+            routerLink: [ '/workpack-model' ],
+            queryParams: { idStrategy, id, type, idOffice }
+          }]
+    ]);
+  }
+
+  async getParentsBreadcrumbs() {
+    const { idStrategy, idOffice } = this;
+    const { success, data } = await this.breadcrumbSrv.getBreadcrumbWorkpackModel(this.idWorkpackModel);
+    data.pop();
+    return success
+      ? data.map(p => ({
+          key: 'workpackModel',
+          info: p.name,
+          tooltip: p.fullName,
+          routerLink: [ '/workpack-model' ],
+          queryParams: { idStrategy, id: p.id, type: p.type, idOffice }
+        }) as IBreadcrumb)
+      : [];
   }
 
   loadDefaultProperties() {
@@ -871,12 +960,17 @@ export class WorkpackModelComponent implements OnInit {
   }
 
   async loadCardItemsModels() {
-    const { success , data: hasParentProject } = await this.workpackModelSrv.hasParentProject(this.idWorkpackModel || 0);
-    if (!success) {
-      this.messageSrv.add({
-        severity: 'error',
-        detail: this.translateSrv.instant('messages.error.couldNotCheckParentProject')
-      });
+    let hasParentProject = false;
+    if (this.idWorkpackModel) {
+      const { success , data } = await this.workpackModelSrv.hasParentProject(this.idWorkpackModel);
+      if (success) {
+        hasParentProject = data;
+      } else {
+        this.messageSrv.add({
+          severity: 'error',
+          detail: this.translateSrv.instant('messages.error.couldNotCheckParentProject')
+        });
+      }
     }
     const itemsModels: ICardItem[] = this.editPermission
       ? [{

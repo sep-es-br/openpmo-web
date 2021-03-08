@@ -30,20 +30,17 @@
       margin-bottom: 1.5rem;
     }
   }
-  .app-input-chips {
-    &:not(:first-of-type) {
-      margin-top: 2em;
-    }
-  }
+  // .app-input-chips {
+  //   &:not(:first-of-type) {
+  //     margin-top: 2em;
+  //   }
+  // }
   .under-label {
     font-size: .7rem;
     display: block;
     color: v.$fontLabel;
     font-style: italic;
     padding-left: .5rem;
-  }
-  .card {
-    margin-top: 1em;
   }
   .icon-item {
     display: flex;
@@ -130,17 +127,10 @@
       margin-bottom: 1em;
     }
   }
-  .dataview-card-items {
-    position: static !important;
-    background-color: transparent;
-
-    .p-dataview-content, .p-grid {
-      background-color: transparent;
-    }
-    .card-item-container {
-      padding: 0.5em;
-    }
+  .card.stakeholders .p-panel-content {
+    padding-bottom: 15px !important;
   }
+
   &.mobile {
     .workpack-model-addicional-properties {
       .addicional-properties {
@@ -154,6 +144,14 @@
           .app-workpack-model-property.p-panel {
             width: 100%;
           }
+        }
+      }
+      &.add-actions {
+        width: 100%;
+        p-button,
+        .p-button {
+          width: 100%;
+          margin: 5px 0;
         }
       }
     }

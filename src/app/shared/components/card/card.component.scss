@@ -13,7 +13,6 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    cursor: pointer;
     .header-title {
       display: flex;
       flex-direction: column;
@@ -64,6 +63,10 @@
     }
   }
 
+  .card-collapseble {
+    cursor: pointer;
+  }
+
   p-header.card-header-mobile {
     display: flex;
     width: 100%;
@@ -106,12 +109,10 @@
   .p-panel .p-toggleable-content .p-panel-content {
     background-color: v.$bgCard;
     border-color: v.$bgCard;
-    padding-left: 1.5em;
-    padding-right: 1.5em;
   }
   &.mobile {
     .p-panel .p-toggleable-content .p-panel-content {
-      padding: 0 7.5px !important;
+      padding: 0 7.5px 7.5px 7.5px !important;
     }
   }
 }

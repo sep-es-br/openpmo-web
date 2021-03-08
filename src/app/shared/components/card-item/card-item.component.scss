@@ -1,94 +1,108 @@
 @use "src/variables" as v;
 
-::ng-deep .app-card-item .p-card {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  height: 100%;
+::ng-deep .app-card-item {
 
-  .p-card-header {
-    display: flex;
-    justify-content: flex-end;
-    .card-item-header p-menu {
-      .p-menu-overlay .p-menu-list .p-menuitem .p-menuitem-link {
-        .p-menuitem-icon {
-          font-size: 0.8rem;
-          color: #939393;
-        }
-        .p-menuitem-text {
-          font-size: 0.9rem;
-          font-family: v.$fontFamilyMedium;
-          color: #939393;
-        }
-      }
-    }
-    .card-item-header .p-button {
-      background-color: transparent;
-      border: none !important;
-      box-shadow: none !important;
-      &.hidden {
-        opacity: 0;
-        pointer-events: none;
-      }
-      .p-button-icon {
-        font-size: 0.9rem;
-        color: #939393;
-      }
-    }
-  }
-  .p-card-body {
-    padding: 0;
-    height: 100%;
-  }
-  .p-card-content {
-    padding: 0;
-    height: 100%;
+  .p-card {
     display: flex;
     flex-direction: column;
-  }
-  .card-item-content.card-link {
-    cursor: pointer;
-    border: none;
-    outline: none;
     flex: 1;
-  }
-  .card-item-content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    color: #888e96;
-    padding: 0 2em;
-    .icon-card {
-      font-size: 2.5rem;
-      color: #888e96;
-    }
-    .icon-new {
-      font-size: 3rem;
-      color: rgba(147, 147, 147, 0.5);
-    }
-    .card-item-name {
-      font-size: 1.2rem;
-      font-family: v.$fontFamilyMedium;
-      padding: 0.5em;
+    height: 100%;
+    max-width: 280px;
+    width: 280px;
+    border: 1px solid #D4D4D4;
+    box-shadow: none;
+
+    .p-card-header {
       display: flex;
+      justify-content: flex-end;
+      .card-item-header p-menu {
+        .p-menu-overlay .p-menu-list .p-menuitem .p-menuitem-link {
+          .p-menuitem-icon {
+            font-size: 0.8rem;
+            color: #939393;
+          }
+          .p-menuitem-text {
+            font-size: 0.9rem;
+            font-family: v.$fontFamilyMedium;
+            color: #939393;
+          }
+        }
+      }
+      .card-item-header .p-button {
+        background-color: transparent;
+        border: none !important;
+        box-shadow: none !important;
+        &.hidden {
+          opacity: 0;
+          pointer-events: none;
+        }
+        .p-button-icon {
+          font-size: 0.9rem;
+          color: #939393;
+        }
+      }
+    }
+    .p-card-body {
+      padding: 0;
+      height: 100%;
+    }
+    .p-card-content {
+      padding: 0;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+    .card-item-content.card-link {
+      cursor: pointer;
+      border: none;
+      outline: none;
       flex: 1;
+    }
+    .card-item-content {
+      display: flex;
+      flex-direction: column;
       align-items: center;
-      text-align: center;
-    }
-    .card-item-subtitle {
-      font-size: 0.8rem;
-      font-family: v.$fontFamilyMedium;
-      color: #009dd4;
-    }
-  }
-  .card-item-footer {
-    display: flex;
-    justify-content: flex-end;
-    padding: 0.5em;
-    .card-item-id {
       color: #888e96;
+      padding: 0 !important;
+
+      .icon-card {
+        font-size: 2.5rem;
+        color: #888e96;
+      }
+      .icon-new {
+        font-size: 3rem;
+        color: rgba(147, 147, 147, 0.5);
+      }
+      .card-item-name {
+        font-size: 1.2rem;
+        font-family: v.$fontFamilyMedium;
+        padding: 0.5em;
+        display: flex;
+        flex: 1;
+        align-items: center;
+        text-align: center;
+      }
+      .card-item-subtitle {
+        font-size: 0.8rem;
+        font-family: v.$fontFamilyMedium;
+        color: #009dd4;
+      }
+    }
+    .card-item-footer {
+      display: flex;
+      justify-content: flex-end;
+      padding: 0.5em;
+      .card-item-id {
+        color: #888e96;
         font-size: 0.6rem;
         font-family: v.$fontFamilyMedium;
+      }
+    }
+  }
+  &.mobile {
+    .p-card {
+      max-width: auto;
+      width: 100%;
     }
   }
 }
@@ -96,13 +110,15 @@
 ::ng-deep .new-carditem {
   .p-card {
     background-color: transparent;
-    box-shadow: none;
-    border: 1px solid rgba(0, 0, 0, 0.15);
     cursor: pointer;
     display: flex;
     justify-content: center;
-    width: 100%;
     height: 100%;
+    max-width: 280px;
+    width: 280px;
+    border: 1px solid #D4D4D4;
+    box-shadow: none;
+
     .p-card-body {
       padding: 0;
     }

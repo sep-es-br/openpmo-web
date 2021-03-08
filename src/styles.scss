@@ -47,6 +47,119 @@ body {
   width: 100%;
 }
 
+.app-header {
+  padding-bottom: 0 !important;
+}
+
+app-card {
+  .p-panel {
+    margin-top: 15px;
+
+    .p-panel-content {
+      padding: 0 15px !important;
+    }
+    .p-panel-header {
+      padding: 15px !important;
+
+      .p-panel-header-icon {
+        width: auto;
+        height: auto;
+
+        span.pi {
+          font-size: 1.3rem;
+        }
+      }
+    }
+    .card-item-container {
+      padding: 0 !important;
+      margin: 0 15px 15px 0 !important;
+      @media screen and (max-width: 768px) {
+        margin: 0 0 15px 0 !important;
+      }
+    }
+  }
+  &.mt-0 .p-panel {
+    margin-top: 0 !important;
+  }
+
+  &.inputs-float-label .p-panel-content {
+    margin-top: -7.5px;
+  }
+}
+
+.app-content-header {
+  padding-bottom: .5em;
+  font-size: 1rem;
+  font-family: v.$fontTitle !important;
+  color: v.$fontInput;
+
+  .text {
+    margin-left: 0.5em;
+  }
+  &.workpack .text{
+    font-family: v.$fontFamilyBold !important;
+    font-weight: bold;
+  }
+  &.has-model {
+    .label {
+      font-size: .688rem;
+      color: v.$fontLabel;
+    }
+  }
+  &.mobile :not(.label) {
+    font-family: v.$fontFamilyBold !important;
+    font-weight: bold;
+  }
+}
+
+.p-float-label {
+  margin-top: 15px;
+  padding-bottom: 10px;
+  > label {
+    left: 0 !important;
+  }
+}
+
+.outlet .p-field-checkbox, .p-field-radiobutton {
+  margin-top: 15px;
+  padding-bottom: 10px;
+  margin-bottom: 0px !important;
+}
+
+.outlet .p-field {
+  margin-bottom: 0px !important;
+}
+.p-float-label input:focus ~ label,
+.p-float-label input.p-filled ~ label,
+.p-float-label textarea:focus ~ label,
+.p-float-label textarea.p-filled ~ label,
+.p-float-label .p-inputwrapper-focus ~ label,
+.p-float-label .p-inputwrapper-filled ~ label {
+  top: 0 !important;
+  left: 0rem !important;
+}
+
+div[class^='card-properties'] app-card .p-panel {
+  margin-top: 0;
+
+  .p-panel-content {
+    padding-bottom: 5px !important;
+  }
+}
+
+
+.outlet p-dataview.app-dataview {
+  position: static !important;
+  background-color: transparent;
+
+  .p-dataview {
+    position: static !important;
+  }
+  .p-dataview-content, .p-grid {
+    background-color: transparent;
+  }
+}
+
 .app-input-text.p-inputtext {
   font-family: v.$fontFamilyMedium;
   font-size: 1rem;
@@ -55,13 +168,35 @@ body {
   border-radius: 0;
   background-color: transparent;
   color: v.$fontInput;
+  padding-left: 0;
 
   &:enabled:focus {
     border-bottom: 1px solid v.$borderInput;
     box-shadow: none;
   }
   &:hover {
-    margin-bottom: -1px;
+    border-bottom: 1px solid v.$borderInputHover !important;
+    box-shadow: none;
+  }
+  .full-line {
+    width: 100%;
+  }
+}
+.p-inputmask.p-inputtext {
+  font-family: v.$fontFamilyMedium;
+  font-size: 1rem;
+  border: none;
+  border-bottom: 1px solid v.$borderInput;
+  border-radius: 0;
+  background-color: transparent;
+  color: v.$fontInput;
+  padding-left: 0;
+
+  &:enabled:focus {
+    border-bottom: 1px solid v.$borderInput;
+    box-shadow: none;
+  }
+  &:hover {
     border-bottom: 1px solid v.$borderInputHover !important;
     box-shadow: none;
   }
@@ -79,6 +214,7 @@ body {
   background-color: transparent;
   color: v.$fontInput;
   width: 100%;
+  padding-left: 0;
 
   &:enabled:focus{
     border-bottom: 1px solid v.$borderInputHover;
@@ -95,7 +231,10 @@ body {
     border: none;
     border-radius: 0;
     background-color: transparent;
-
+    padding-left: 0;
+    input {
+      padding-left: 0;
+    }
     &:enabled:focus {
       border-bottom: 1px solid v.$borderInputHover;
       box-shadow: none;
@@ -114,6 +253,7 @@ body {
       border-radius: 0;
       background-color: transparent;
       color: v.$fontInput;
+      padding-left: 0;
     }
     .p-inputtext:enabled:focus {
       border:none;
@@ -130,6 +270,7 @@ body {
     border-radius: 0;
     background-color: transparent;
     color: v.$fontInput;
+    padding-left: 0;
   }
   .p-calendar-w-btn .p-inputtext:hover {
     border: none;
@@ -237,6 +378,7 @@ body {
     color: v.$fontInput;
     font-size: 1rem;
     font-family: v.$fontFamilyMedium;
+    padding-left: 0;
   }
   .p-dropdown-panel .p-dropdown-items {
     font-size: 1rem;
@@ -438,14 +580,20 @@ body {
 }
 
 .p-dataview .p-dataview-content .p-grid .card-item-container {
-  flex-basis: min(270px, 100vw);
+  flex-basis: 280px;
   @media screen and (max-width: 768px) {
     flex-basis: 100%;
   }
 }
 
-.p-toast-message .p-toast-message-text .p-toast-detail {
-  white-space: pre-line;
+app-root p-toast .p-toast {
+  .p-toast-message .p-toast-message-text .p-toast-detail {
+    white-space: pre-line;
+  }
+  @media screen and (max-width: 768px) {
+    width: 90vw;
+    right: 5vw !important;
+  }
 }
 
 .p-grid {

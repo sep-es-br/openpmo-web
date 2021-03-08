@@ -1,5 +1,4 @@
-import { Location } from '@angular/common';
-import { ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild, ViewChildren } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild, ViewChildren } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
@@ -10,7 +9,7 @@ import { MenuItem, MessageService } from 'primeng/api';
 
 import { TypePropertyModelEnum } from 'src/app/shared/enums/TypePropertyModelEnum';
 import { ICard } from 'src/app/shared/interfaces/ICard';
-import { ISchedule, ICost} from 'src/app/shared/interfaces/ISchedule';
+import { ISchedule, ICost } from 'src/app/shared/interfaces/ISchedule';
 import { IMeasureUnit } from 'src/app/shared/interfaces/IMeasureUnit';
 import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
 import { MeasureUnitService } from 'src/app/shared/services/measure-unit.service';
@@ -20,6 +19,7 @@ import { WorkpackService } from 'src/app/shared/services/workpack.service';
 import { CostAccountService } from 'src/app/shared/services/cost-account.service';
 import { enterLeave } from 'src/app/shared/animations/enterLeave.animation';
 import { SaveButtonComponent } from 'src/app/shared/components/save-button/save-button.component';
+import { IWorkpack } from 'src/app/shared/interfaces/IWorkpack';
 
 interface ICartItemCostAssignment {
   type: string;
@@ -47,6 +47,7 @@ export class ScheduleComponent implements OnInit, OnDestroy {
 
   responsive: boolean;
   idWorkpack: number;
+  workpack: IWorkpack;
   unitMeasure: IMeasureUnit;
   cardScheduleProperties: ICard;
   formSchedule: FormGroup;
@@ -55,7 +56,7 @@ export class ScheduleComponent implements OnInit, OnDestroy {
   cardCostAssignmentsProperties: ICard;
   costAssignmentsCardItems: ICartItemCostAssignment[];
   menuItemsCostAccounts: MenuItem[];
-  costAssignmentsTotals = { plannedTotal: 0,  actualTotal: 0};
+  costAssignmentsTotals = { plannedTotal: 0, actualTotal: 0 };
   $destroy = new Subject();
   calendarFormat: string;
 
@@ -66,7 +67,6 @@ export class ScheduleComponent implements OnInit, OnDestroy {
     private responsiveSrv: ResponsiveService,
     private translateSrv: TranslateService,
     private breadcrumbSrv: BreadcrumbService,
-    private location: Location,
     private unitMeasureSrv: MeasureUnitService,
     private workpackSrv: WorkpackService,
     private costAccountSrv: CostAccountService,
@@ -78,12 +78,12 @@ export class ScheduleComponent implements OnInit, OnDestroy {
     });
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.responsive = value);
     this.translateSrv.onLangChange.pipe(takeUntil(this.$destroy)).subscribe(() => {
-        setTimeout(() => this.calendarComponents?.map(calendar => {
-          calendar.ngOnInit();
-          calendar.dateFormat = this.translateSrv.instant('dateFormat');
-          calendar.updateInputfield();
-        }, 150));
-      }
+      setTimeout(() => this.calendarComponents?.map(calendar => {
+        calendar.ngOnInit();
+        calendar.dateFormat = this.translateSrv.instant('dateFormat');
+        calendar.updateInputfield();
+      }, 150));
+    }
     );
     this.formSchedule = this.formBuilder.group({
       start: [new Date(), Validators.required],
@@ -101,12 +101,24 @@ export class ScheduleComponent implements OnInit, OnDestroy {
   async ngOnInit() {
     this.calendarFormat = this.translateSrv.instant('dateFormat');
     await this.loadPropertiesSchedule();
-    this.breadcrumbSrv.pushMenu({
-      key: 'schedule',
-      routerLink: ['/workpack/schedule'],
-      queryParams: { id: this.idWorkpack },
-      info: ''
-    });
+  }
+
+  setBreadcrumb() {
+    this.breadcrumbSrv.setMenu([
+      {
+        key: this.workpack.type,
+        info: this.getValueFromWorkpackProperty('name'),
+        tooltip: this.getValueFromWorkpackProperty('fullName'),
+        routerLink: [ '/workpack' ],
+        queryParams: { id: this.idWorkpack }
+      },
+      {
+        key: 'schedule',
+        routerLink: ['/workpack/schedule'],
+        queryParams: { id: this.idWorkpack },
+        info: ''
+      }
+    ]);
   }
 
   async loadPropertiesSchedule() {
@@ -119,6 +131,8 @@ export class ScheduleComponent implements OnInit, OnDestroy {
     };
     const workpack = await this.workpackSrv.GetById(this.idWorkpack);
     if (workpack.success) {
+      this.workpack = workpack.data;
+      this.setBreadcrumb();
       const propertyUnit = workpack.data.properties.find(p => p.type === TypePropertyModelEnum.UnitSelectionModel);
       if (propertyUnit) {
         const idUnit = propertyUnit.selectedValue;
@@ -137,7 +151,7 @@ export class ScheduleComponent implements OnInit, OnDestroy {
       toggleable: false,
       initialStateToggle: false,
       cardTitle: 'costAssignment',
-      collapseble: true,
+      collapseble: false,
       initialStateCollapse: false
     };
     this.costAssignmentsCardItems = [{
@@ -164,6 +178,7 @@ export class ScheduleComponent implements OnInit, OnDestroy {
               const propertyName = workpackCost.properties.find(p => p.idPropertyModel === propertyModelName.id);
               return {
                 label: propertyName.value as string,
+                id: workpackCost.id.toString(),
                 command: () => this.createNewCardItemCost(workpackCost.id, propertyName.value as string)
               };
             })
@@ -180,7 +195,18 @@ export class ScheduleComponent implements OnInit, OnDestroy {
       }, 500);
       return;
     }
-    const costAssignmentsCardItemsList = this.costAssignmentsCardItems.filter( card => card.type === 'cost-card');
+    const costAssignmentsCardItemsList = this.costAssignmentsCardItems.filter(card => card.type === 'cost-card');
+    const costAccountsIds = costAssignmentsCardItemsList.map( cardItem => (cardItem.idCost));
+    this.menuItemsCostAccounts = Array.from(this.menuItemsCostAccounts.map(group => {
+      const items = group.items.map(item => ({
+        ...item,
+        disabled: costAccountsIds.includes( Number(item.id)) || Number(item.id) === idCost
+      }));
+      return {
+        ...group,
+        items
+      };
+    }));
     if (costAssignmentsCardItemsList.length > 0) {
       this.costAssignmentsCardItems = costAssignmentsCardItemsList;
       this.costAssignmentsCardItems.push({
@@ -224,12 +250,31 @@ export class ScheduleComponent implements OnInit, OnDestroy {
   }
 
   deleteCost(idCost: number) {
-    const costIndex = this.costAssignmentsCardItems.findIndex( cost => cost.idCost === idCost);
-    if (costIndex > -1) {
-      this.costAssignmentsCardItems.splice(costIndex, 1);
-      this.costAssignmentsCardItems = Array.from(this.costAssignmentsCardItems);
-      this.reloadCostAssignmentTotals();
-    }
+    const menuItems = this.menuItemsCostAccounts.map( group => {
+      const items = group.items.map(item => {
+        if (Number(item.id) === idCost) {
+          return {
+            ...item,
+            disabled: false
+          };
+        } else {
+          return {
+            ...item
+          };
+        }
+      });
+      return {
+        ...group,
+        items
+      };
+    });
+    this.costAssignmentsCardItems[this.costAssignmentsCardItems.length - 1] = {
+        type: 'new-cost-card',
+        menuItemsNewCost: Array.from(menuItems)
+      };
+    this.menuItemsCostAccounts = Array.from(menuItems);
+    this.costAssignmentsCardItems = Array.from(this.costAssignmentsCardItems.filter(cost => cost.idCost !== idCost));
+    this.reloadCostAssignmentTotals();
   }
 
   handleChangeValuesCardItems() {
@@ -242,9 +287,9 @@ export class ScheduleComponent implements OnInit, OnDestroy {
   }
 
   reloadCostAssignmentTotals() {
-    const items = this.costAssignmentsCardItems.filter( card => card.type === 'cost-card');
-    const plannedTotal = items.reduce( ( total, cost) => total + cost.plannedWork, 0);
-    const actualTotal = items.reduce( ( total, cost) => total + cost.actualWork, 0);
+    const items = this.costAssignmentsCardItems.filter(card => card.type === 'cost-card');
+    const plannedTotal = items.reduce((total, cost) => total + cost.plannedWork, 0);
+    const actualTotal = items.reduce((total, cost) => total + cost.actualWork, 0);
     this.costAssignmentsTotals = { actualTotal, plannedTotal };
   }
 
@@ -255,7 +300,7 @@ export class ScheduleComponent implements OnInit, OnDestroy {
       end: this.formSchedule.controls.end.value,
       plannedWork: this.formSchedule.controls.plannedWork.value,
       actualWork: this.formSchedule.controls.actualWork.value,
-      costs: this.costAssignmentsCardItems.filter( card => card.type === 'cost-card').map( cost => ({
+      costs: this.costAssignmentsCardItems.filter(card => card.type === 'cost-card').map(cost => ({
         id: cost.idCost,
         plannedCost: cost.plannedWork,
         actualCost: cost.actualWork
@@ -273,6 +318,11 @@ export class ScheduleComponent implements OnInit, OnDestroy {
         }
       );
     }
+  }
 
+  getValueFromWorkpackProperty(nameProperty: string, session: string = 'PROPERTIES') {
+    const propertyWorkpackModel = this.workpack.model.properties.find(p => p.name === nameProperty && p.session === session);
+    const propertyWorkpack = this.workpack.properties.find(p => p.idPropertyModel === propertyWorkpackModel.id);
+    return propertyWorkpack.value as string;
   }
 }

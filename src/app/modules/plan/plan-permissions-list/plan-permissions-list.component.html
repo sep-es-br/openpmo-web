@@ -1,18 +1,16 @@
 <div class="app-plan-permissions">
-  <div class="app-plan-permissions-header" [class.app-plan-permissions-header-mobile]="responsive">
-    <span class="app-plan-header-text" *ngIf="propertiesPlan">{{propertiesPlan.fullName}}</span>
+  <div class="app-content-header" [class.mobile]="responsive">
+    <span>{{ propertiesPlan?.fullName }}</span>
   </div>
   <div class="card-permissions" *ngIf="idPlan">
-    <app-card [properties]="cardPlanPermissions">
-      <p-dataView [value]="cardItemsPlanPermissions" layout="grid" styleClass="dataview-card-items" [emptyMessage]="'loadingEllipsis' | translate">
+    <app-card [properties]="cardPlanPermissions" class="mt-0">
+      <p-dataView [value]="cardItemsPlanPermissions" layout="grid" class="app-dataview" [emptyMessage]="'loadingEllipsis' | translate">
         <ng-template let-cardItem pTemplate="gridItem">
           <div class="p-col-12 p-md-3 p-sm-12 card-item-container">
             <app-card-item-permission [properties]="cardItem"></app-card-item-permission>
           </div>
         </ng-template>
       </p-dataView>
-      <div>
-      </div>
     </app-card>
   </div>
 </div>

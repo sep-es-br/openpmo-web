@@ -1,6 +1,5 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { Location } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { Subject } from 'rxjs';
 import { debounceTime, takeUntil } from 'rxjs/operators';
@@ -16,6 +15,8 @@ import { PersonService } from 'src/app/shared/services/person.service';
 import { enterLeave } from '../../../shared/animations/enterLeave.animation';
 import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
 import { SaveButtonComponent } from 'src/app/shared/components/save-button/save-button.component';
+import { IOffice } from 'src/app/shared/interfaces/IOffice';
+import { OfficeService } from 'src/app/shared/services/office.service';
 
 @Component({
   selector: 'app-office-permissions',
@@ -30,6 +31,7 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
   @ViewChild(SaveButtonComponent) saveButton: SaveButtonComponent;
 
   idOffice: number;
+  propertiesOffice: IOffice;
   cardPersonPermission: ICard;
   personEmail: string;
   responsive: boolean;
@@ -45,12 +47,13 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
   constructor(
     private actRouter: ActivatedRoute,
     private responsiveSrv: ResponsiveService,
+    private officeSrv: OfficeService,
     private officePermissionsSrv: OfficePermissionService,
     private translateSrv: TranslateService,
     private personSrv: PersonService,
-    private location: Location,
     private breadcrumbSrv: BreadcrumbService,
-    private messageSrv: MessageService
+    private messageSrv: MessageService,
+    private router: Router
   ) {
     this.actRouter.queryParams.subscribe(async queryParams => {
       this.idOffice = queryParams.idOffice;
@@ -59,12 +62,6 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => {
       this.responsive = value;
     });
-    this.breadcrumbSrv.setMenu([
-      { key: 'offices', routerLink: ['/offices'] },
-      { key: 'officePermissions', routerLink: ['/offices', 'permission'], queryParams: { idOffice: this.idOffice }},
-      { key: 'permissions', routerLink: ['/offices', 'permission', 'detail'],
-        queryParams: { idOffice: this.idOffice, email: this.personEmail }}
-    ]);
     this.debounceSearch.pipe(debounceTime(500), takeUntil(this.$destroy)).subscribe(() => {
       if (this.searchedEmailPerson.length > 5 && this.validateEmail()) {
         this.searchPerson();
@@ -81,8 +78,30 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
     this.$destroy.complete();
   }
 
-  ngOnInit(): void {
-    this.loadPermission();
+  async ngOnInit() {
+    await this.loadPermission();
+    await this.loadPropertiesOffice();
+    this.breadcrumbSrv.setMenu([
+      {
+        key: 'officePermissions',
+        routerLink: ['/offices', 'permission'],
+        queryParams: { idOffice: this.idOffice },
+        info: this.propertiesOffice?.name,
+        tooltip: this.propertiesOffice?.fullName
+      },
+      {
+        key: 'permissions',
+        routerLink: ['/offices', 'permission', 'detail'],
+        queryParams: { idOffice: this.idOffice, email: this.personEmail }
+      }
+    ]);
+  }
+
+  async loadPropertiesOffice() {
+    const { success, data } = await this.officeSrv.GetById(this.idOffice);
+    if (success) {
+      this.propertiesOffice = data;
+    }
   }
 
   validateEmail() {
@@ -204,7 +223,7 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
         summary: this.translateSrv.instant('success'),
         detail: this.translateSrv.instant('messages.savedSuccessfully')
       });
-      this.location.back();
+      this.router.navigate(['/offices', 'permission'], { queryParams: { idOffice: this.idOffice }});
     }
   }
 }

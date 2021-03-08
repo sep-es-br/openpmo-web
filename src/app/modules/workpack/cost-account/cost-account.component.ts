@@ -1,11 +1,12 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { TranslateService } from '@ngx-translate/core';
+import { TreeNode } from 'primeng/api';
+
 import { ICard } from 'src/app/shared/interfaces/ICard';
 import { ResponsiveService } from 'src/app/shared/services/responsive.service';
 import { WorkpackModelService } from 'src/app/shared/services/workpack-model.service';
 import { WorkpackService } from 'src/app/shared/services/workpack.service';
-import { TranslateService } from '@ngx-translate/core';
-import { Location } from '@angular/common';
 import { IWorkpack } from 'src/app/shared/interfaces/IWorkpack';
 import { IWorkpackModelProperty } from 'src/app/shared/interfaces/IWorkpackModelProperty';
 import { IWorkpackModel } from 'src/app/shared/interfaces/IWorkpackModel';
@@ -17,13 +18,12 @@ import { ICostAccount } from 'src/app/shared/interfaces/ICostAccount';
 import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
 import { DomainService } from 'src/app/shared/services/domain.service';
 import { OrganizationService } from 'src/app/shared/services/organization.service';
-import { IDomain } from 'src/app/shared/interfaces/IDomain';
 import { ILocalityList } from 'src/app/shared/interfaces/ILocality';
 import { LocalityService } from 'src/app/shared/services/locality.service';
 import { PlanService } from 'src/app/shared/services/plan.service';
 import { MeasureUnitService } from 'src/app/shared/services/measure-unit.service';
 import { SaveButtonComponent } from 'src/app/shared/components/save-button/save-button.component';
-import { TreeNode } from 'primeng/api';
+import { AuthService } from 'src/app/shared/services/auth.service';
 
 @Component({
   selector: 'app-cost-account',
@@ -36,6 +36,7 @@ export class CostAccountComponent implements OnInit {
 
   responsive: boolean;
   idWorkpack: number;
+  idCurrentWorkpack: number;
   workpackModel: IWorkpackModel;
   workpack: IWorkpack;
   idCostAccount: number;
@@ -50,6 +51,7 @@ export class CostAccountComponent implements OnInit {
 
   constructor(
     private actRouter: ActivatedRoute,
+    private authSrv: AuthService,
     private workpackModelSrv: WorkpackModelService,
     private workpackSrv: WorkpackService,
     private responsiveSrv: ResponsiveService,
@@ -61,36 +63,26 @@ export class CostAccountComponent implements OnInit {
     private localitySrv: LocalityService,
     private planSrv: PlanService,
     private unitMeasureSrv: MeasureUnitService,
-    private locationSrv: Location,
     private router: Router
   ) {
     this.actRouter.queryParams.subscribe(async queryParams => {
       this.idCostAccount = queryParams.id;
       this.idWorkpack = queryParams.idWorkpack;
     });
-    this.responsiveSrv.observable.subscribe(value => {
-      this.responsive = value;
-    });
+    this.responsiveSrv.observable.subscribe(value => this.responsive = value);
   }
 
   async ngOnInit() {
     await this.loadProperties();
-    this.breadcrumbSrv.pushMenu({
-      key: 'account',
-      info: this.costAccountName,
-      routerLink: [ '/cost-account' ],
-      queryParams: {
-        id: this.idCostAccount
-      }
-    });
   }
 
   async loadProperties() {
-    if (this.idWorkpack) {
+    if (this.idWorkpack && !this.idCostAccount) {
       await this.loadWorkpack();
       this.loadCardCostAccountProperties();
     }
     if (this.idCostAccount) {
+      await this.loadWorkpack(true);
       await this.loadCostAccount();
     }
     const workpackModelActivesProperties = this.workpackModel.properties.filter(w => w.active && w.session === 'COST');
@@ -129,11 +121,21 @@ export class CostAccountComponent implements OnInit {
     };
   }
 
-  async loadWorkpack() {
+  async loadWorkpack(onlyBreadcrumb: boolean = false) {
     const result = await this.workpackSrv.GetById(this.idWorkpack);
     if (result.success) {
+      const hasWorkpack = !!this.workpack;
       this.workpack = result.data;
-      this.editPermission = !!this.workpack.permissions?.find( p => p.level === 'EDIT');
+      if (!hasWorkpack) {
+        this.setBreadcrumb();
+        if (onlyBreadcrumb) {
+          this.idCurrentWorkpack = this.workpack.id;
+          return;
+        }
+      }
+
+      this.editPermission = !!this.workpack.permissions?.find( p => p.level === 'EDIT')
+        || await this.authSrv.isUserAdmin();
       const plan = await this.planSrv.GetById(this.workpack.plan.id);
       if (plan.success) {
         this.idOffice = plan.data.idOffice;
@@ -160,6 +162,26 @@ export class CostAccountComponent implements OnInit {
       this.costAccountName = propertyNameCostAccount.value as string;
       await this.loadCardCostAccountProperties();
     }
+  }
+
+  setBreadcrumb() {
+    this.breadcrumbSrv.setMenu([
+      {
+        key: this.workpack.type,
+        info: this.getValueFromWorkpackProperty('name'),
+        tooltip: this.getValueFromWorkpackProperty('fullName'),
+        routerLink: [ '/workpack' ],
+        queryParams: { id: this.idWorkpack }
+      },
+      {
+        key: 'account',
+        info: this.costAccountName,
+        routerLink: [ '/cost-account' ],
+        queryParams: {
+          id: this.idCostAccount
+        }
+      }
+    ]);
   }
 
   instanceProperty(propertyModel: IWorkpackModelProperty): PropertyTemplateModel {
@@ -393,7 +415,13 @@ export class CostAccountComponent implements OnInit {
       };
       const result = await this.costAccountSrv.put(costAccount);
       if (result.success) {
-        this.locationSrv.back();
+        this.router.navigate([ '/workpack' ],
+          {
+            queryParams: {
+              id: this.idCurrentWorkpack || this.idWorkpack
+            }
+          }
+        );
       }
     }
     if (!this.idCostAccount) {
@@ -403,8 +431,7 @@ export class CostAccountComponent implements OnInit {
       };
       const result = await this.costAccountSrv.post(costAccount);
       if (result.success) {
-        this.router.navigate(
-          ['/workpack'],
+        this.router.navigate([ '/workpack' ],
           {
             queryParams: {
               id: this.idWorkpack
@@ -413,5 +440,11 @@ export class CostAccountComponent implements OnInit {
         );
       }
     }
+  }
+
+  getValueFromWorkpackProperty(nameProperty: string, session: string = 'PROPERTIES') {
+    const propertyWorkpackModel = this.workpack.model.properties.find(p => p.name === nameProperty && p.session === session);
+    const propertyWorkpack = this.workpack.properties.find(p => p.idPropertyModel === propertyWorkpackModel.id);
+    return propertyWorkpack.value as string;
   }
 }

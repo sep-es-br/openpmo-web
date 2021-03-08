@@ -41,7 +41,6 @@
     }
   }
   .card-stakeholders {
-    margin-top: 2em;
     .input-toggle-stakeholder {
       display: flex;
       align-items: center;
@@ -65,7 +64,6 @@
     }
   }
   .card-workpack-model {
-    margin-top: 2em;
     .dataview-card-items {
       position: static !important;
       background-color: transparent;
@@ -78,7 +76,6 @@
     }
   }
   .card-cost-account {
-    margin-top: 2em;
     .dataview-card-items {
       position: static !important;
       background-color: transparent;
@@ -92,7 +89,9 @@
   }
 
   .card-schedule {
-    margin-top: 2em;
+    .p-panel-content {
+      padding-bottom: 15px !important;
+    }
     .button-new-schedule {
       background: #44B39B;
       color: #ffffff;
@@ -137,13 +136,13 @@
       width: 100%;
       height: 100%;
       display: flex;
-      margin-top: 2em;
+      margin-top: 15px;
       .new-start-step-container, .new-end-step-container {
         width: 5%;
         margin-top: 0.5em;
       }
       .new-start-step-container {
-        margin-top: 2em;
+        margin-top: 15px;
       }
       .new-end-step-container {
         display: flex;

@@ -1,6 +1,5 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Location } from '@angular/common';
 import { ActivatedRoute, Router} from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { Subject } from 'rxjs';
@@ -17,6 +16,7 @@ import { SaveButtonComponent } from 'src/app/shared/components/save-button/save-
 import { AuthService } from 'src/app/shared/services/auth.service';
 import { IOffice } from 'src/app/shared/interfaces/IOffice';
 import { OfficePermissionService } from 'src/app/shared/services/office-permission.service';
+import { OfficeService } from 'src/app/shared/services/office.service';
 
 @Component({
   selector: 'app-organization',
@@ -32,6 +32,7 @@ export class OrganizationComponent implements OnInit, OnDestroy {
   responsive = false;
   formOrganization: FormGroup;
   idOffice: number;
+  propertiesOffice: IOffice;
   idOrganization: number;
   cardProperties: ICard;
   $destroy = new Subject();
@@ -46,10 +47,10 @@ export class OrganizationComponent implements OnInit, OnDestroy {
     private activeRoute: ActivatedRoute,
     private router: Router,
     private responsiveSvr: ResponsiveService,
-    private location: Location,
     private breadcrumbSrv: BreadcrumbService,
     private authSrv: AuthService,
     private officePermissionSrv: OfficePermissionService,
+    private officeSrv: OfficeService,
     private messageSrv: MessageService
   ) {
     this.formOrganization = this.formBuilder.group({
@@ -89,13 +90,26 @@ export class OrganizationComponent implements OnInit, OnDestroy {
     await this.loadCard();
     this.editPermission = await this.officePermissionSrv.getPermissions(this.idOffice);
     await this.loadPropertiesOrganization();
-    this.breadcrumbSrv.pushMenu({
-      key: 'organization',
-      info: this.propertiesOrganization?.name,
-      tooltip: this.propertiesOrganization?.fullName,
-      routerLink: [ '/organizations', 'organization' ],
-      queryParams: { id: this.idOrganization }
-    });
+    const resultOffice = await this.officeSrv.GetById(this.idOffice);
+    if (resultOffice.success) {
+      this.propertiesOffice = resultOffice.data;
+    }
+    this.breadcrumbSrv.setMenu([
+      {
+        key: 'organizations',
+        info: this.propertiesOffice?.name,
+        tooltip: this.propertiesOffice?.fullName,
+        routerLink: [ '/organizations' ],
+        queryParams: { idOffice: this.idOffice }
+      },
+      {
+        key: 'organization',
+        info: this.propertiesOrganization?.name,
+        tooltip: this.propertiesOrganization?.fullName,
+        routerLink: [ '/organizations', 'organization' ],
+        queryParams: { id: this.idOrganization }
+      }
+    ]);
   }
 
   loadCard() {
@@ -133,7 +147,7 @@ export class OrganizationComponent implements OnInit, OnDestroy {
         summary: this.translateSrv.instant('success'),
         detail: this.translateSrv.instant('messages.savedSuccessfully')
       });
-      this.location.back();
+      this.router.navigate([ '/organizations' ], { queryParams: { idOffice: this.idOffice }});
     }
   }
 

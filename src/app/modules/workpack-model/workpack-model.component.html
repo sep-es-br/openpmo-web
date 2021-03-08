@@ -1,17 +1,18 @@
 <div class="app-workpack-model" [class.mobile]="isMobileView">
-  <div class="app-workpack-model-header" *ngIf="!idWorkpackModel; else newTemplate">
-    <span class="app-workpack-model-header-label">{{ 'new' | translate }}</span>
-    <span class="app-workpack-model-header-text">{{ 'labels.' + workpackModelType | translate }}</span>
+  <div *ngIf="idWorkpackModel; else newModelTitle" class="app-content-header has-model"
+    [class.mobile]="isMobileView">
+    <span class="text">{{ formProperties.controls.name.value }} </span>
+    <span class="label">({{ ('labels.' + workpackModelType) | translate }})</span>
   </div>
-  <ng-template #newTemplate>
-    <div class="app-workpack-model-header has-model">
-      <span class="app-workpack-model-header-text">{{ formProperties.controls.name.value }} </span>
-      <span class="app-workpack-model-header-label">({{ 'labels.' + workpackModelType | translate }})</span>
+  <ng-template #newModelTitle>
+    <div class="app-content-header" [class.mobile]="isMobileView">
+      <span class="label">{{ 'new' | translate }}</span>
+      <span class="text">{{ ('labels.' + workpackModelType) | translate }}</span>
     </div>
   </ng-template>
 
-  <div class="card workpack-model">
-    <app-card [properties]="cardProperties" *ngIf="cardProperties">
+  <div class="card-properties card workpack-model">
+    <app-card [properties]="cardProperties" *ngIf="cardProperties" class="mt-0 inputs-float-label">
       <div class="workpack-model-properties p-fluid" [formGroup]="formProperties">
         <span class="p-float-label property-input p-field">
           <input class="app-input-text" id="input-name" type="text" pInputText formControlName="name"/>
@@ -42,7 +43,7 @@
         <span class="p-float-label property-input p-field">
           <p-dropdown class="app-single-selection" inputId="input-sort-by" (onClick)="getSortedByList()" [options]="sortedByList" formControlName="sortedBy">
           </p-dropdown>
-          <label class="app-input-label" for="input-sort-by">{{ 'sortedBy' | translate }}*</label>
+          <label class="app-input-label" for="input-sort-by">{{ 'sortedBy' | translate }} *</label>
         </span>
       </div>
       <div class="workpack-model-addicional-properties add-actions" *ngIf="editPermission">
@@ -67,7 +68,7 @@
 
   <ng-container *ngIf="workpackModelType !== 'MilestoneModel'">
     <div class="card stakeholders">
-      <app-card [properties]="cardPropertiesStakeholders" *ngIf="cardPropertiesStakeholders">
+      <app-card [properties]="cardPropertiesStakeholders" *ngIf="cardPropertiesStakeholders" class="inputs-float-label">
         <span class="p-float-label app-input-chips">
           <p-chips [(ngModel)]="posibleRolesPerson" [required]="true" separator="," [allowDuplicate]="false" [required]="true"
             (ngModelChange)="checkProperties()" [class.p-inputwrapper-filled]="posibleRolesPerson && !!posibleRolesPerson.length"
@@ -108,7 +109,7 @@
   </ng-container>
   <div class="card models">
     <app-card [properties]="cardPropertiesModels" *ngIf="cardPropertiesModels && (editPermission || !!cardItemsModels.length)">
-      <p-dataView [value]="cardItemsModels" layout="grid" styleClass="dataview-card-items" *ngIf="idWorkpackModel" [emptyMessage]="'loadingEllipsis' | translate">
+      <p-dataView [value]="cardItemsModels" layout="grid" class="app-dataview" *ngIf="idWorkpackModel" [emptyMessage]="'loadingEllipsis' | translate">
         <ng-template let-cardItem pTemplate="gridItem">
           <div class="p-col-12 p-md-3 p-sm-12 card-item-container">
             <app-card-item [properties]="cardItem"></app-card-item>
@@ -117,7 +118,6 @@
       </p-dataView>
     </app-card>
   </div>
-
   <app-save-button *ngIf="editPermission" #saveButton (save)="handleSubmit()"></app-save-button>
 </div>
 

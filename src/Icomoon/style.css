@@ -1,0 +1,174 @@
+@font-face {
+  font-family: 'icomoon';
+  src:  url('fonts/icomoon.eot?shfvkf');
+  src:  url('fonts/icomoon.eot?shfvkf#iefix') format('embedded-opentype'),
+    url('fonts/icomoon.ttf?shfvkf') format('truetype'),
+    url('fonts/icomoon.woff?shfvkf') format('woff'),
+    url('fonts/icomoon.svg?shfvkf#icomoon') format('svg');
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
+}
+
+[class^="icon-"], [class*=" icon-"] {
+  /* use !important to prevent issues with browser extensions that change fonts */
+  font-family: 'icomoon' !important;
+  speak: never;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+
+  /* Better Font Rendering =========== */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-unit-selection-alt:before {
+  content: "\e92e";
+}
+.icon-plan-model:before {
+  content: "\e92f";
+}
+.icon-plan-model-solid:before {
+  content: "\e930";
+}
+.icon-folder-open2:before {
+  content: "\e901";
+}
+.icon-cog:before {
+  content: "\e902";
+}
+.icon-cogs2:before {
+  content: "\e903";
+}
+.icon-ccb-view:before {
+  content: "\e904";
+}
+.icon-offices:before {
+  content: "\e905";
+}
+.icon-permission2:before {
+  content: "\e906";
+}
+.icon-permission:before {
+  content: "\e907";
+}
+.icon-open-pmo:before {
+  content: "\e908";
+}
+.icon-boxes:before {
+  content: "\e909";
+}
+.icon-flag-check:before {
+  content: "\e90a";
+}
+.icon-map-marked:before {
+  content: "\e90b";
+}
+.icon-arrow-left:before {
+  content: "\e90c";
+}
+.icon-angle-up:before {
+  content: "\e90d";
+}
+.icon-angle-right:before {
+  content: "\e90e";
+}
+.icon-angle-left:before {
+  content: "\e90f";
+}
+.icon-angle-down:before {
+  content: "\e910";
+}
+.icon-ellipsis-v:before {
+  content: "\e911";
+}
+.icon-sort:before {
+  content: "\e912";
+}
+.icon-sort-down:before {
+  content: "\e913";
+}
+.icon-sort-up:before {
+  content: "\e914";
+}
+.icon-plus:before {
+  content: "\e915";
+}
+.icon-unit-selection-solid:before {
+  content: "\e916";
+}
+.icon-toggle-on:before {
+  content: "\e917";
+}
+.icon-toggle-off:before {
+  content: "\e918";
+}
+.icon-text-area:before {
+  content: "\e919";
+}
+.icon-text:before {
+  content: "\e91a";
+}
+.icon-selection:before {
+  content: "\e91b";
+}
+.icon-locality-selection:before {
+  content: "\e91c";
+}
+.icon-integer:before {
+  content: "\e91d";
+}
+.icon-date:before {
+  content: "\e91e";
+}
+.icon-currency:before {
+  content: "\e91f";
+}
+.icon-chess-knight:before {
+  content: "\e920";
+}
+.icon-trash-alt:before {
+  content: "\e921";
+}
+.icon-trash:before {
+  content: "\e922";
+}
+.icon-home:before {
+  content: "\e923";
+}
+.icon-folder-open:before {
+  content: "\e924";
+}
+.icon-cogs:before {
+  content: "\e925";
+}
+.icon-portfolio:before {
+  content: "\e926";
+}
+.icon-sign-out-alt:before {
+  content: "\e927";
+}
+.icon-flag:before {
+  content: "\e928";
+}
+.icon-Plan:before {
+  content: "\e929";
+}
+.icon-briefcase:before {
+  content: "\e92a";
+}
+.icon-user-circle:before {
+  content: "\e92b";
+}
+.icon-building:before {
+  content: "\e92c";
+}
+.icon-users:before {
+  content: "\e92d";
+}
+.icon-number:before {
+  content: "\e900";
+}

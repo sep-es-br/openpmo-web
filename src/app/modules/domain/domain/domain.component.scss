@@ -1,45 +1,11 @@
-@use "src/variables" as v;
-.app-domain{
+.app-domain {
+  width: 100%;
+
+  .mobile {
     width: 100%;
+  }
 
-    .app-domain-header {
-      padding: 0.5em 0;
-      font-size: 0.9rem;
-      font-family: v.$fontTitle !important;
-      color: v.$fontInput;
-      .app-domain-header-text {
-        margin-left: 0.5em;
-      }
-    }
-    .app-domain-header-mobile {
-      font-size: 1rem;
-      font-family: v.$fontFamilyBold !important;
-      font-weight: bold;
-    }
-    .p-float-label {
-      margin-top: 2.5em;
-    }
-    .p-float-label:first-child {
-      margin-top: 1.5em;
-    }
-    .domains-cards-section {
-      margin-top: 1em;
-    }
-    ::ng-deep .dataview-card-items {
-      position: static !important;
-      background-color: transparent;
-      .p-dataview-content, .p-grid {
-        background-color: transparent;
-      }
-      .card-item-container {
-        padding: 0.5em;
-      }
-    }
-    .mobile{
-      width: 100%;
-    }
-
-    .desktop{
-      width: 30%;
-    }
+  .desktop {
+    width: 30%;
+  }
 }

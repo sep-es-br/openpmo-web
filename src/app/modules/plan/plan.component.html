@@ -1,11 +1,13 @@
 <div class="app-plan">
-  <div class="app-plan-header" [class.app-plan-header-mobile]="responsive">
-    <span class="app-plan-header-label" *ngIf="!planData?.id">{{'newPlan' | translate}}</span>
-    <span class="app-plan-header-text" *ngIf="planData">{{planData.name}}</span>
+  <div class="app-content-header" [class.mobile]="responsive">
+    <span *ngIf="idPlan; else newPlanTitle">{{ planData?.name }}</span>
+    <ng-template #newPlanTitle>
+      <span>{{ 'newPlan' | translate }}</span>
+    </ng-template>
   </div>
 
   <div class="card-properties-plan">
-    <app-card [properties]="cardPlanProperties">
+    <app-card [properties]="cardPlanProperties" class="mt-0 inputs-float-label">
       <div class="p-grid">
         <form [formGroup]="formPlan">
           <div class="p-fluid">
@@ -29,9 +31,9 @@
             <div class="p-field" [class.responsive]="responsive">
               <span class="p-float-label" [class.responsive]="responsive">
                 <p-calendar id="float-start" formControlName="start" class="app-select-date" showIcon="true"
-                  [monthNavigator]="true" [yearNavigator]="true" yearRange="2020:2030" 
+                  [monthNavigator]="true" [yearNavigator]="true" yearRange="2020:2030"
                   [class.responsive]="responsive"
-                  icon="fas fa-calendar-alt" 
+                  icon="fas fa-calendar-alt"
                   [dateFormat]="calendarFormat">
                 </p-calendar>
                 <label class="app-input-label" for="float-start">{{ "start" | translate }} * </label>
@@ -55,8 +57,8 @@
 
   <section *ngIf="idPlan" class="workpackModels-cards-section">
     <div class="card-workpack-model" *ngFor="let workpackModel of cardsPlanWorkPackModels">
-      <app-card [properties]="workpackModel.propertiesCard" *ngIf="workpackModel.workPackItemCardList && workpackModel.workPackItemCardList.length > 0">
-        <p-dataView [value]="workpackModel.workPackItemCardList" layout="grid" styleClass="dataview-card-items" [emptyMessage]="'loadingEllipsis' | translate">
+      <app-card [properties]="workpackModel.propertiesCard" *ngIf="workpackModel.workPackItemCardList?.length > 0">
+        <p-dataView [value]="workpackModel.workPackItemCardList" layout="grid" class="app-dataview" [emptyMessage]="'loadingEllipsis' | translate">
           <ng-template let-cardItem pTemplate="gridItem">
             <div class="p-col-12 p-md-3 p-sm-12 card-item-container">
               <app-card-item [properties]="cardItem"></app-card-item>

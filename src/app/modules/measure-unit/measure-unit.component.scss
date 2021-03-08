@@ -1,37 +1,7 @@
 @use "src/variables" as v;
-.app-unit-measure {
-    width: 100%;
-    .app-header {
-      padding: 0.5em 0;
-      font-size: 0.9rem;
-      font-family: v.$fontTitle !important;
-      color: v.$fontInput;
-      .app-header-text {
-        margin-left: 0.5em;
-      }
-    }
-    .app-header-mobile {
-      font-size: 1rem;
-      font-family: v.$fontFamilyBold !important;
-      font-weight: bold;
-    }
 
-    ::ng-deep .dataview-card-items {
-      position: static !important;
-      .p-dataview {
-        position: static !important;
-         .p-dataview-header {
-           display: none;
-         }
-      }
-      background-color: transparent;
-      .p-dataview-content, .p-grid {
-        background-color: transparent;
-      }
-      .card-item-container {
-        padding: 0.5em;
-      }
-    }
+.app-unit-measure {
+  width: 100%;
 }
 
 ::ng-deep .app-unit-measure .app-card-item .p-card {
@@ -104,12 +74,11 @@
     padding: 0.5em;
     .card-item-id {
       color: #888e96;
-        font-size: 0.6rem;
-        font-family: v.$fontFamilyMedium;
+      font-size: 0.6rem;
+      font-family: v.$fontFamilyMedium;
     }
   }
 }
-
 
 ::ng-deep .app-unit-measure p-card.new-card-item {
   .p-card {
@@ -119,15 +88,14 @@
     cursor: pointer;
     height: 100%;
 
-  .p-card-body {
-    padding: 0;
-    height: 100%;
-  }
-  .p-card-content {
-    padding: 0;
-    height: 100%;
-  }
-
+    .p-card-body {
+      padding: 0;
+      height: 100%;
+    }
+    .p-card-content {
+      padding: 0;
+      height: 100%;
+    }
 
     .p-card-body .p-card-content p-menu {
       .p-menu-overlay .p-menu-list {
@@ -148,8 +116,13 @@
   }
 }
 
-
-::ng-deep .app-unit-measure p-card.new-card-item .p-card .p-card-body .p-card-content .card-item-content {
+::ng-deep
+  .app-unit-measure
+  p-card.new-card-item
+  .p-card
+  .p-card-body
+  .p-card-content
+  .card-item-content {
   padding: 2em;
   display: flex;
   align-items: center;
@@ -182,4 +155,8 @@
       width: 100%;
     }
   }
+}
+
+::ng-deep .app-dataview .p-dataview-header {
+  display: none;
 }

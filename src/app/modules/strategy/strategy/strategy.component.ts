@@ -36,6 +36,7 @@ export class StrategyComponent implements OnDestroy {
   formStrategy: FormGroup;
   idStrategy: number;
   idOffice: number;
+  propertiesOffice: IOffice;
   cardProperties: ICard;
   cardModels: ICard;
   models: IWorkpackModel[];
@@ -74,6 +75,10 @@ export class StrategyComponent implements OnDestroy {
     this.activeRoute.queryParams.subscribe(async({ id, idOffice }) => {
       this.idStrategy = +id;
       this.idOffice = +idOffice;
+      const resultOffice = await this.officeSrv.GetById(this.idOffice);
+      if (resultOffice.success) {
+        this.propertiesOffice = resultOffice.data;
+      }
       this.editPermission = await this.officePermissionSrv.getPermissions(this.idOffice);
       this.loadCards();
       if (this.isUserAdmin === undefined) {
@@ -83,13 +88,22 @@ export class StrategyComponent implements OnDestroy {
         await this.loadModels();
       }
       await this.loadPropertiesStrategy();
-      this.breadcrumbSrv.pushMenu({
-        key: 'strategy',
-        info: this.propertiesStrategy?.name,
-        tooltip: this.propertiesStrategy?.fullName,
-        routerLink: [ '/strategies', 'strategy' ],
-        queryParams: { id: this.idStrategy, idOffice: this.idOffice }
-      });
+      this.breadcrumbSrv.setMenu([
+        {
+          key: 'strategies',
+          info: this.propertiesOffice?.name,
+          tooltip: this.propertiesOffice?.fullName,
+          routerLink: [ '/strategies' ],
+          queryParams: { idOffice: this.idOffice }
+        },
+        {
+          key: 'strategy',
+          info: this.propertiesStrategy?.name,
+          tooltip: this.propertiesStrategy?.fullName,
+          routerLink: [ '/strategies', 'strategy' ],
+          queryParams: { id: this.idStrategy, idOffice: this.idOffice }
+        }
+      ]);
     });
   }
 
