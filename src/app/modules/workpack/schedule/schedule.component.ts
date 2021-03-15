@@ -20,6 +20,7 @@ import { CostAccountService } from 'src/app/shared/services/cost-account.service
 import { enterLeave } from 'src/app/shared/animations/enterLeave.animation';
 import { SaveButtonComponent } from 'src/app/shared/components/save-button/save-button.component';
 import { IWorkpack } from 'src/app/shared/interfaces/IWorkpack';
+import { PlanService } from 'src/app/shared/services/plan.service';
 
 interface ICartItemCostAssignment {
   type: string;
@@ -72,6 +73,7 @@ export class ScheduleComponent implements OnInit, OnDestroy {
     private costAccountSrv: CostAccountService,
     private messageSrv: MessageService,
     private router: Router,
+    private planSrv: PlanService
   ) {
     this.actRouter.queryParams.subscribe(async queryParams => {
       this.idWorkpack = queryParams.idWorkpack;
@@ -103,15 +105,9 @@ export class ScheduleComponent implements OnInit, OnDestroy {
     await this.loadPropertiesSchedule();
   }
 
-  setBreadcrumb() {
+  async setBreadcrumb() {
     this.breadcrumbSrv.setMenu([
-      {
-        key: this.workpack.type,
-        info: this.getValueFromWorkpackProperty('name'),
-        tooltip: this.getValueFromWorkpackProperty('fullName'),
-        routerLink: [ '/workpack' ],
-        queryParams: { id: this.idWorkpack }
-      },
+      ... await this.getBreadcrumbs(),
       {
         key: 'schedule',
         routerLink: ['/workpack/schedule'],
@@ -119,6 +115,34 @@ export class ScheduleComponent implements OnInit, OnDestroy {
         info: ''
       }
     ]);
+  }
+
+  async getBreadcrumbs() {
+    const { success, data } = await this.breadcrumbSrv.getBreadcrumbWorkpack(this.idWorkpack);
+    const breadcrumbPlan = data.find(d => d.type === 'plan');
+    if (breadcrumbPlan) {
+      this.planSrv.nextIDPlan(breadcrumbPlan.id);
+    }
+    return success
+      ? data.map(p => ({
+            key: p.type.toLowerCase(),
+            info: p.name,
+            tooltip: p.fullName,
+            routerLink: this.getRouterLinkFromType(p.type),
+            queryParams: { id: p.id }
+          }))
+      : [];
+  }
+
+  getRouterLinkFromType(type: string): string[] {
+    switch (type) {
+      case 'office':
+        return [ '/offices', 'office' ];
+      case 'plan':
+        return [ 'plan' ];
+      default:
+        return [ '/workpack' ];
+    }
   }
 
   async loadPropertiesSchedule() {
@@ -318,11 +342,5 @@ export class ScheduleComponent implements OnInit, OnDestroy {
         }
       );
     }
-  }
-
-  getValueFromWorkpackProperty(nameProperty: string, session: string = 'PROPERTIES') {
-    const propertyWorkpackModel = this.workpack.model.properties.find(p => p.name === nameProperty && p.session === session);
-    const propertyWorkpack = this.workpack.properties.find(p => p.idPropertyModel === propertyWorkpackModel.id);
-    return propertyWorkpack.value as string;
   }
 }

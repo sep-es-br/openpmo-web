@@ -8,7 +8,7 @@ import { SaveButtonComponent } from './save-button/save-button.component';
 import { CardItemPermissionComponent } from './card-item-permission/card-item-permission.component';
 import { PipesModule } from '../pipes/pipes.module';
 import { ProgressBarComponent } from './progress-bar/progress-bar.component';
-import { ProgressBar } from 'primeng/progressbar';
+import { InputUnitMeasureComponent } from './input-unit-measure/input-unit-measure.component';
 
 
 
@@ -19,7 +19,8 @@ import { ProgressBar } from 'primeng/progressbar';
     InputMessageComponent,
     SaveButtonComponent,
     CardItemPermissionComponent,
-    ProgressBarComponent
+    ProgressBarComponent,
+    InputUnitMeasureComponent
   ],
   imports: [
     CommonModule,
@@ -33,7 +34,8 @@ import { ProgressBar } from 'primeng/progressbar';
     CardItemPermissionComponent,
     InputMessageComponent,
     SaveButtonComponent,
-    ProgressBarComponent
+    ProgressBarComponent,
+    InputUnitMeasureComponent
   ]
 })
 export class ComponentsModule { }

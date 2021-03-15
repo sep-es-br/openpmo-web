@@ -2,20 +2,7 @@
 
 ::ng-deep .app-workpack {
   width: 100%;
-  .app-workpack-header {
-    padding: 0.5em 0;
-    font-size: 0.9rem;
-    font-family: v.$fontTitle !important;
-    color: v.$fontInput;
-    .app-workpack-header-text {
-      margin-left: 0.5em;
-    }
-  }
-  .app-workpack-header-mobile {
-    font-size: 1rem;
-    font-family: v.$fontFamilyBold !important;
-    font-weight: bold;
-  }
+
   .card-properties-workpack{
     width: 100%;
     .properties-container {
@@ -75,16 +62,10 @@
       }
     }
   }
-  .card-cost-account {
-    .dataview-card-items {
-      position: static !important;
-      background-color: transparent;
-      .p-dataview-content, .p-grid {
-        background-color: transparent;
-      }
-      .card-item-container {
-        padding: 0.5em;
-      }
+  .card-cost-account .card-item-container app-card-item.inherited {
+    pointer-events: none;
+    .p-card {
+      background-color: transparent !important;
     }
   }
 
@@ -103,9 +84,7 @@
       }
     }
     .schedule-buttons {
-      width: 25%;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
+      display: flex;
       column-gap: 2em;
       .button-details {
         background: rgba(22, 155, 213, 0.9);
@@ -132,17 +111,20 @@
       }
       width: 100%;
     }
+    .schedule-steps-section {
+      padding-top: 1em;
+    }
     .schedule-steps-container {
       width: 100%;
       height: 100%;
       display: flex;
-      margin-top: 15px;
+      margin-top: 1em;
       .new-start-step-container, .new-end-step-container {
         width: 5%;
         margin-top: 0.5em;
       }
       .new-start-step-container {
-        margin-top: 15px;
+        margin-top: 1.5625em;
       }
       .new-end-step-container {
         display: flex;
@@ -151,15 +133,15 @@
         padding-bottom: 1em;
       }
       .data-view-steps-container {
-        width: 90%;
+        width: 100%;
         .group-step-year {
           font-size: 1.25rem;
           font-family: v.$fontFamilyMedium;
           color: v.$fontInput;
-          padding: 0.5em;
         }
       }
       .dataview-step-card-items {
+        padding-top: 1em;
         position: static !important;
         background-color: transparent;
         .p-dataview-content, .p-grid {
@@ -194,7 +176,6 @@
           font-size: 1.25rem;
           font-family: v.$fontFamilyMedium;
           color: v.$fontInput;
-          padding: 0.5em;
         }
       }
     }
@@ -206,6 +187,41 @@
     .p-dataview-content .p-grid {
       .card-item-container {
         flex-basis: auto;
+
+        &.show-details {
+          flex-basis: 265px;
+          &.mobile:not(.new-card-item) {
+            flex-basis: 100% !important;
+          }
+        }
+        &.show-resumed {
+          flex-basis: 130px;
+          &.mobile:not(.new-card-item) {
+            flex-basis: calc(50% - .5rem) !important;
+            margin: 0 .25rem .5rem .25rem !important;
+          }
+          &.new-card-item {
+            .app-new-step-card-item .p-card {
+              height: 100%;
+
+              .p-card-body {
+                height: 100%;
+              }
+              .p-card-body .p-card-content {
+                height: 100%;
+              }
+              .p-card-body .p-card-content .card-item-content {
+                height: 100%;
+              }
+            }
+          }
+        }
+        &.new-card-item {
+          flex-basis: auto !important;
+          &.mobile {
+            margin: 0 auto 15px auto !important;
+          }
+        }
       }
     }
   }

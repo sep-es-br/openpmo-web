@@ -1,6 +1,7 @@
 import { MenuItem } from 'primeng/api';
 
 export interface IScheduleStepCardItem {
+  type: string;
   stepName?: Date;
   stepDay?: Date;
   menuItems?: MenuItem[];

@@ -22,7 +22,8 @@
     <i class="app-icon offices" [ngStyle]="{ fontSize: '1.8rem' }"></i>
     <div class="item-label" *ngIf="isMobileView">{{ 'offices' | translate }}</div>
   </div>
-  <div class="item" (click)="toggleMenu('portfolio')" [pTooltip]="'portfolios' | translate" *ngIf="!!currentIDOffice">
+  <div class="item" (click)="toggleMenu('portfolio')" [pTooltip]="'portfolios' | translate"
+    *ngIf="!!currentIDOffice && !!currentIDPlan && isPlanMenu">
       <i class="app-icon briefcase" [ngStyle]="{ fontSize: '1.5rem' }"></i>
     <div class="item-label" *ngIf="isMobileView">{{ 'portfolios' | translate }}</div>
   </div>
@@ -101,7 +102,7 @@
         <i class="app-icon arrow-left" [ngStyle]="{ fontSize: '1rem' }" (click)="closeAllMenus()"></i>
       </div>
     </div>
-    <p-panelMenu [model]="itemsPorfolio"></p-panelMenu>
+    <p-panelMenu [model]="itemsPorfolioFiltered"></p-panelMenu>
     <div class="action-mobile" *ngIf="isMobileView">
       <i class="app-icon angle-down" [ngStyle]="{ fontSize: '1rem' }" (click)="toggleMenu('portfolio')"></i>
     </div>
@@ -116,7 +117,7 @@
               <i class="app-icon arrow-left" [ngStyle]="{ fontSize: '1rem' }" (click)="closeAllMenus()"></i>
             </div>
           </div>
-          <p-panelMenu [model]="itemsPorfolio"></p-panelMenu>
+          <p-panelMenu [model]="itemsPorfolioFiltered"></p-panelMenu>
         </div>
       </ng-template>
       <ng-template>

@@ -7,7 +7,6 @@ import { ISocialLoginResult } from 'src/app/shared/interfaces/ISocialLoginResult
 import { AuthService } from 'src/app/shared/services/auth.service';
 import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
 import { TranslateChangeService } from 'src/app/shared/services/translate-change.service';
-import { StoreKeys } from '../../shared/constants';
 
 @Component({
   selector: 'app-home',
@@ -36,8 +35,8 @@ export class HomeComponent implements OnInit {
         filter((dto) => !!dto)
       ).subscribe((dto) => {
         if (dto === 'error.unauthorized') {
-         const lang = (window.navigator.language).split('-');
-         this.translateChangeSrv.changeLangDefault(lang[0]);
+         const lang = window.navigator.language;
+         this.translateChangeSrv.changeLangDefault(lang);
           this.messageSrv.add({
             severity: 'warn',
             summary: this.translateSrv.instant('warn'),
@@ -53,6 +52,6 @@ export class HomeComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.router.navigate(['/offices']);
+    setTimeout(() => this.router.navigate(['/offices']), 0);
   }
 }

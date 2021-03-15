@@ -44,6 +44,7 @@ export class PlanPermissionsListComponent implements OnInit {
     this.responsiveSrv.observable.subscribe(value => {
       this.responsive = value;
     });
+    this.planSrv.nextIDPlan(this.idPlan);
   }
 
   async ngOnInit() {

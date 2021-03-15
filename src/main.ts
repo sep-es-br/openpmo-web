@@ -6,6 +6,10 @@ import { IAppConfig } from './app/shared/interfaces/IAppConfig';
 import { APP_CONFIG } from './app/shared/tokens/AppConfigToken';
 import { environment } from './environments/environment';
 
+if (environment.production) {
+  enableProdMode();
+}
+
 const configListener = ({ target }) => {
   try {
     const configuration: IAppConfig = JSON.parse(target.responseText);
@@ -17,11 +21,7 @@ const configListener = ({ target }) => {
   }
 };
 
-const configFailed = () => console.error('Error: retrieving config.json');
-
-if (environment.production) {
-  enableProdMode();
-}
+const configFailed = () => console.error('Error: retrieving app-config.json');
 
 const request = new XMLHttpRequest();
 request.addEventListener('load', configListener);

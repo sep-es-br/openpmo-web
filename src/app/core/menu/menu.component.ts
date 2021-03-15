@@ -6,19 +6,15 @@ import { MenuItem } from 'primeng/api';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
-import { IMenuWorkpack, IMenuWorkpackModel } from 'src/app/shared/interfaces/IMenu';
+import { IMenuWorkpack, IMenuWorkpackModel, PlanMenuItem, IMenu } from 'src/app/shared/interfaces/IMenu';
 import { IPerson } from 'src/app/shared/interfaces/IPerson';
 import { AuthService } from 'src/app/shared/services/auth.service';
 import { MenuService } from 'src/app/shared/services/menu.service';
 import { OfficePermissionService } from 'src/app/shared/services/office-permission.service';
 import { OfficeService } from 'src/app/shared/services/office.service';
+import { PlanService } from 'src/app/shared/services/plan.service';
 import { ResponsiveService } from 'src/app/shared/services/responsive.service';
 import { TranslateChangeService } from 'src/app/shared/services/translate-change.service';
-
-interface IMenu {
-  label: string;
-  isOpen: boolean;
-}
 
 @Component({
   selector: 'app-menu',
@@ -42,7 +38,8 @@ export class MenuComponent implements OnInit, OnDestroy {
   items: MenuItem[] = [];
   itemsOfficeUnchanged: MenuItem[] = [];
   itemsOffice: MenuItem[] = [];
-  itemsPorfolio: MenuItem[] = [];
+  itemsPorfolio: PlanMenuItem[] = [];
+  itemsPorfolioFiltered: PlanMenuItem[] = [];
   itemsLanguages: MenuItem[] = [];
   username = '';
   currentIDOffice = 0;
@@ -51,6 +48,8 @@ export class MenuComponent implements OnInit, OnDestroy {
   currentUserInfo: IPerson;
   $destroy = new Subject();
   editPermissionOnOffice = false;
+  isPlanMenu = false;
+  currentIDPlan = 0;
 
   constructor(
     private menuSrv: MenuService,
@@ -61,18 +60,27 @@ export class MenuComponent implements OnInit, OnDestroy {
     private router: Router,
     private locationSrv: Location,
     private officeSrv: OfficeService,
-    private officePermissionSrv: OfficePermissionService
+    private officePermissionSrv: OfficePermissionService,
+    private planSrv: PlanService
   ) {
     this.translateChangeSrv.getCurrentLang()
       .pipe(takeUntil(this.$destroy))
-      .subscribe(({ lang }) => this.handleChangeLanguage(lang));
+      .subscribe(() => this.handleChangeLanguage());
     this.menuSrv.isAdminMenu.pipe(takeUntil(this.$destroy)).subscribe(isAdminMenu => {
       this.isAdminMenu = isAdminMenu;
       this.updateMenuOfficeOnAdminChange();
     });
-    this.officeSrv.observableIdOffice().pipe(takeUntil(this.$destroy)).subscribe(id => {
+    this.officeSrv.observableIdOffice().pipe(takeUntil(this.$destroy)).subscribe(async id => {
       this.currentIDOffice = id;
-      this.loadPortfolioMenu();
+      await this.loadPortfolioMenu();
+      this.refreshPortfolioMenu();
+    });
+    this.planSrv.observableIdPlan().pipe(takeUntil(this.$destroy)).subscribe(async id => {
+      this.currentIDPlan = id;
+      if (!this.itemsPorfolio?.length) {
+        await this.loadPortfolioMenu();
+      }
+      this.refreshPortfolioMenu();
     });
     this.menuSrv.obsReloadMenuOffice().pipe(takeUntil(this.$destroy)).subscribe(() => this.loadOfficeMenu());
     this.menuSrv.obsReloadMenuPortfolio().pipe(takeUntil(this.$destroy)).subscribe(() => this.loadPortfolioMenu());
@@ -82,6 +90,10 @@ export class MenuComponent implements OnInit, OnDestroy {
       if (isAdminMenu) {
         this.getOfficePermission();
       }
+    });
+    this.menuSrv.isPlanMenu.pipe(takeUntil(this.$destroy)).subscribe(isPlanMenu => {
+      this.isPlanMenu = isPlanMenu;
+      this.refreshPortfolioMenu();
     });
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(responsive => {
       this.isChangingView = true;
@@ -94,6 +106,10 @@ export class MenuComponent implements OnInit, OnDestroy {
       this.currentURL = url.slice(2);
       this.selectMenuActive(url.slice(2));
     });
+  }
+
+  refreshPortfolioMenu() {
+    this.itemsPorfolioFiltered = this.itemsPorfolio.filter(p => p.idPlan === this.currentIDPlan);
   }
 
   ngOnDestroy(): void {
@@ -124,15 +140,15 @@ export class MenuComponent implements OnInit, OnDestroy {
     }
   }
 
-  handleChangeLanguage(language: string) {
+  handleChangeLanguage() {
     setTimeout(() =>
       this.itemsLanguages = [
         {
-          label: this.translateSrv.instant(language === 'pt' ? 'portuguese' : 'english'),
+          label: this.translateSrv.instant('currentLanguage'),
           icon: 'fas fa-flag',
           items: [
-            { label: this.translateSrv.instant('portuguese'), command: () => this.changeLanguage('pt') },
-            { label: this.translateSrv.instant('english'), command: () => this.changeLanguage('en') }
+            { label: this.translateSrv.instant('portuguese'), command: () => this.changeLanguage('pt-BR') },
+            { label: this.translateSrv.instant('english'), command: () => this.changeLanguage('en-US') }
           ]
         }
       ]
@@ -147,7 +163,7 @@ export class MenuComponent implements OnInit, OnDestroy {
     const { success, data: itemsOffice } = await this.menuSrv.getItemsOffice();
     if (success) {
       this.itemsOfficeUnchanged = itemsOffice.map(office => ({
-        label: office.fullName,
+        label: office.name,
         icon: 'app-icon building',
         styleClass: `office-${office.id} ${this.currentURL === `offices/office?id=${office.id}` ? 'active' : ''}`,
         command: (e) => {
@@ -204,6 +220,7 @@ export class MenuComponent implements OnInit, OnDestroy {
       const { success, data } = await this.menuSrv.getItemsPortfolio(this.currentIDOffice);
       if (success) {
         this.itemsPorfolio = this.buildMenuItemPortfolio(data || []);
+        this.refreshPortfolioMenu();
       }
     }
     return;
@@ -223,6 +240,7 @@ export class MenuComponent implements OnInit, OnDestroy {
     return root.map(workpack => ({
       label: workpack.name,
       icon: workpack.fontIcon,
+      idPlan: workpack.idPlan,
       styleClass: `workpack-${workpack.id} ${this.currentURL === `workpack?id=${workpack.id}` ? 'active' : ''}`,
       items: workpack.children?.length ? this.buildMenuItemPortfolio(workpack.children) : undefined,
       command: (e) => {

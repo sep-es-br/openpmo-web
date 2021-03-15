@@ -23,6 +23,7 @@ import { PlanPermissionService } from 'src/app/shared/services/plan-permissions.
 import { SaveButtonComponent } from 'src/app/shared/components/save-button/save-button.component';
 import { MenuService } from 'src/app/shared/services/menu.service';
 import { IOffice } from 'src/app/shared/interfaces/IOffice';
+import { OfficePermissionService } from 'src/app/shared/services/office-permission.service';
 
 
 interface IWorkpackModelCard {
@@ -65,16 +66,18 @@ export class PlanComponent implements OnInit, OnDestroy {
     private breadcrumbSrv: BreadcrumbService,
     private authSrv: AuthService,
     private officeSrv: OfficeService,
+    private officePermissionSrv: OfficePermissionService,
     private planPermissionSrv: PlanPermissionService,
     private messageSrv: MessageService,
     private menuSrv: MenuService
   ) {
-    this.actRouter.queryParams.subscribe(({ id, idOffice, idPlanModel }) => {
-      this.idOffice = +idOffice;
-      this.idPlanModel = +idPlanModel;
-      this.idPlan = +id;
-      this.resetPlan();
-    });
+    this.actRouter.queryParams
+      .subscribe(({ id, idOffice, idPlanModel }) => {
+        this.idOffice = +idOffice;
+        this.idPlanModel = +idPlanModel;
+        this.idPlan = +id;
+        this.resetPlan();
+      });
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.responsive = value);
     this.translateSrv.onLangChange.pipe(takeUntil(this.$destroy)).subscribe(() => {
         setTimeout(() => this.calendarComponents?.map(calendar => {
@@ -96,6 +99,7 @@ export class PlanComponent implements OnInit, OnDestroy {
     this.formPlan.valueChanges
       .pipe(takeUntil(this.$destroy), filter(() => this.formPlan.dirty && this.formPlan.valid))
       .subscribe(() => this.saveButton.showButton());
+    this.planSrv.nextIDPlan(this.idPlan);
   }
 
   ngOnDestroy(): void {
@@ -105,7 +109,9 @@ export class PlanComponent implements OnInit, OnDestroy {
 
   async ngOnInit() {
     this.calendarFormat = this.translateSrv.instant('dateFormat');
-    await this.loadPropertiesPlan();
+  }
+
+  setBreacrumb() {
     this.breadcrumbSrv.setMenu([
       {
         key: 'office',
@@ -150,19 +156,31 @@ export class PlanComponent implements OnInit, OnDestroy {
         this.formPlan.controls.fullName.setValue(this.planData.fullName);
         this.formPlan.controls.start.setValue(new Date(this.planData.start + 'T00:00:00'));
         this.formPlan.controls.finish.setValue(new Date(this.planData.finish + 'T00:00:00'));
-        this.editPermission = await this.planPermissionSrv.getPermissions(this.idPlan);
-        if (!this.editPermission) {
-          this.formPlan.disable();
-        } else {
-          this.formPlan.enable();
-        }
+        await this.loadPropertiesOffice();
+        await this.loadPermissions();
         this.loadWorkPackModels();
       }
+    } else {
+      await this.loadPropertiesOffice();
     }
+  }
+
+  async loadPropertiesOffice() {
     this.idOffice = this.planData?.idOffice || this.idOffice;
-    const resultOffice = await this.officeSrv.GetById(this.idOffice);
-    if (resultOffice.success) {
-      this.propertiesOffice = resultOffice.data;
+    const { success, data } = await this.officeSrv.GetById(this.idOffice);
+    if (success) {
+      this.propertiesOffice = data;
+    }
+    this.setBreacrumb();
+  }
+
+  async loadPermissions() {
+    const officePermission = await this.officePermissionSrv.getPermissions(this.planData?.idOffice || this.idOffice);
+    this.editPermission = officePermission || await this.planPermissionSrv.getPermissions(this.idPlan);
+    if (this.editPermission) {
+      this.formPlan.enable();
+    } else {
+      this.formPlan.disable();
     }
   }
 

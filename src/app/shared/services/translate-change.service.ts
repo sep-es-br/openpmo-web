@@ -9,6 +9,7 @@ import { PrimeNGConfig } from 'primeng/api';
 })
 export class TranslateChangeService {
 
+  private supportedLangs = [ 'pt-BR', 'en-US' ];
   private subject = new Subject<any>();
 
   constructor(
@@ -20,6 +21,9 @@ export class TranslateChangeService {
 
 
   changeLangDefault(lang: string) {
+    if (!this.supportedLangs.includes(lang)) {
+      lang = 'en-US';
+    }
     localStorage.setItem(StoreKeys.defaultLanguage, lang);
     this.translate.setDefaultLang(lang);
     this.translate.use(lang);
@@ -29,7 +33,7 @@ export class TranslateChangeService {
 
   getCurrentLang(): Observable<any> {
     setTimeout(() => {
-      const lang = localStorage.getItem(StoreKeys.defaultLanguage) || 'en';
+      const lang = localStorage.getItem(StoreKeys.defaultLanguage) || window.navigator.language;
       this.subject.next({ lang });
     }, 250);
     return this.subject.asObservable();

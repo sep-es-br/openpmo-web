@@ -9,7 +9,11 @@ import { PlanPermissionsComponent } from './plan-permissions/plan-permissions.co
 import { PlanPermissionsListComponent } from './plan-permissions-list/plan-permissions-list.component';
 
 @NgModule({
-  declarations: [PlanComponent, PlanPermissionsComponent, PlanPermissionsListComponent],
+  declarations: [
+    PlanComponent,
+    PlanPermissionsComponent,
+    PlanPermissionsListComponent
+  ],
   imports: [
     CommonModule,
     CoreModule,

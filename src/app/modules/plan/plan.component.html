@@ -25,6 +25,7 @@
                 </textarea>
                 <label class="app-input-label" for="float-fullName">{{ "fullName" | translate }} * </label>
               </span>
+              <app-input-message [form]="formPlan" field="fullName"></app-input-message>
             </div>
           </div>
           <div class="p-formgroup-inline">
@@ -38,6 +39,7 @@
                 </p-calendar>
                 <label class="app-input-label" for="float-start">{{ "start" | translate }} * </label>
               </span>
+              <app-input-message [form]="formPlan" field="start"></app-input-message>
             </div>
             <div class="p-field" [class.responsive]="responsive">
               <span class="p-float-label" [class.responsive]="responsive">
@@ -48,6 +50,7 @@
                 <label class="app-input-label" class="properties-label" for="float-finish">{{ "finish" |
                   translate}} * </label>
               </span>
+              <app-input-message [form]="formPlan" field="finish"></app-input-message>
             </div>
           </div>
         </form>

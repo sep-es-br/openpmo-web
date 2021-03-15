@@ -7,7 +7,7 @@ export const appInitializerFactory = (translate: TranslateService, injector: Inj
   () => new Promise<any>((resolve: any) => {
   const locationInitialized = injector.get(LOCATION_INITIALIZED, Promise.resolve(null));
   locationInitialized.then(() => {
-    const defaultLang = localStorage.getItem(StoreKeys.defaultLanguage) || 'en';
+    const defaultLang = localStorage.getItem(StoreKeys.defaultLanguage) || window.navigator.language;
     translate.setDefaultLang(defaultLang);
     translate.use(defaultLang).subscribe(() => {
       console.log(`Successfully initialized '${defaultLang}' language.'`);

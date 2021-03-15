@@ -1,4 +1,5 @@
 {
+  "currentLanguage": "English",
   "plan": "Plan",
   "plans": "Plans",
   "planPermissions": "Plan Permissions",
@@ -86,6 +87,7 @@
   "maxLenght": "Maximun lenght",
   "messages": {
     "personNotFound": "Person not found.",
+    "invalidDate": "Selected date must be within the suggested month/year.",
     "scheduleNotValid": "Schedule is incomplet.",
     "registerSaved": "Record saved successfully!",
     "registerError": "A problem occcured!",

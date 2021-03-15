@@ -28,7 +28,7 @@
       padding: 0.5em 0;
       .start-date, .end-date {
         color: v.$fontTitle;
-        font-family: v.$fontFamilyMedium;
+        font-family: v.$fontFamily;
         font-size: 0.9rem;
         margin-right: 5px;
       }
@@ -55,6 +55,7 @@
       font-family: v.$fontFamilyMedium;
       font-size: 1rem;
       text-transform: uppercase;
+      padding-right: 2em;
       .progress-bar-cost-container {
         width: 50%;
         display: flex;
@@ -113,6 +114,9 @@
   &.mobile {
     .p-panel .p-toggleable-content .p-panel-content {
       padding: 0 7.5px 7.5px 7.5px !important;
+    }
+    .p-panel-header {
+      padding: 15px 7.5px !important;
     }
   }
 }

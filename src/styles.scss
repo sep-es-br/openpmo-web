@@ -51,6 +51,10 @@ body {
   padding-bottom: 0 !important;
 }
 
+.clickable {
+  cursor: pointer;
+}
+
 app-card {
   .p-panel {
     margin-top: 15px;
@@ -118,6 +122,10 @@ app-card {
   > label {
     left: 0 !important;
   }
+  .p-inputtextarea {
+    padding-top: 0 !important;
+    margin-top: .5rem !important;
+  }
 }
 
 .outlet .p-field-checkbox, .p-field-radiobutton {
@@ -129,6 +137,7 @@ app-card {
 .outlet .p-field {
   margin-bottom: 0px !important;
 }
+
 .p-float-label input:focus ~ label,
 .p-float-label input.p-filled ~ label,
 .p-float-label textarea:focus ~ label,

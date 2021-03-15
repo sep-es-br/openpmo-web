@@ -29,10 +29,10 @@
   <div class="card-cost-account" *ngIf="sectionCostAccount">
     <app-card [properties]="sectionCostAccount.cardSection" *ngIf="sectionCostAccount.cardItemsSection && sectionCostAccount.cardItemsSection.length > 0">
       <div class="cost-account-list-container">
-        <p-dataView [value]="sectionCostAccount.cardItemsSection" layout="grid" styleClass="dataview-card-items" [emptyMessage]="'loadingEllipsis' | translate">
+        <p-dataView [value]="sectionCostAccount.cardItemsSection" layout="grid" class="app-dataview" [emptyMessage]="'loadingEllipsis' | translate">
           <ng-template let-cardItem pTemplate="gridItem">
             <div class="p-col-12 p-md-3 p-sm-12 card-item-container">
-              <app-card-item [properties]="cardItem"></app-card-item>
+              <app-card-item [properties]="cardItem" [class.inherited]="cardItem.idWorkpack !== idWorkpack"></app-card-item>
             </div>
           </ng-template>
         </p-dataView>
@@ -47,7 +47,7 @@
       </button>
       <div class="schedule-buttons" *ngIf="schedule" [class.schedule-buttons-mobile]="responsive">
         <button type="button" class="p-button-text button-details" (click)="handleShowDetails()" pButton
-          [icon]=" showDetails ? 'far fa-eye-stash' : 'far fa-eye'" iconPos="left"
+          [icon]="showDetails ? 'far fa-eye-slash' : 'far fa-eye'" iconPos="left"
           [label]="showDetails ? translateSrv.instant('hideDetails') : translateSrv.instant('showDetails')">
         </button>
         <button type="button" class="p-button-text button-delete" (click)="handleDeleteSchedule()" pButton [disabled]="!editPermission"
@@ -56,33 +56,35 @@
       </div>
       <div class="schedule-steps-section" *ngIf="sectionSchedule && sectionSchedule.groupStep">
         <div class="schedule-steps-container" *ngFor="let groupStep of sectionSchedule.groupStep" [class.schedule-steps-container-mobile]="responsive">
-            <div class="new-start-step-container">
-              <app-schedule-step-card-item [properties]="sectionSchedule.startScheduleStep" type="newStart"
-                *ngIf="sectionSchedule.startScheduleStep && groupStep.start && editPermission"></app-schedule-step-card-item>
-            </div>
             <div class="data-view-steps-container">
               <span class="group-step-year">{{groupStep.year}}</span>
-              <p-dataView [value]="groupStep.cardItemSection" layout="grid" styleClass="dataview-step-card-items" *ngIf="showDetails" [emptyMessage]="'loadingEllipsis' | translate">
+              <p-dataView [value]="groupStep.cardItemSection" layout="grid" styleClass="dataview-step-card-items" *ngIf="showDetails; else showResumed"
+                [emptyMessage]="'loadingEllipsis' | translate">
                 <ng-template let-step pTemplate="gridItem">
-                  <div class="p-col-12 p-md-3 p-sm-12 card-item-container">
-                    <app-schedule-step-card-item [properties]="step" [type]="showDetails ? 'listStep' : 'listStepResumed'"
+                  <div class="card-item-container show-details" [class.new-card-item]="['newStart', 'newEnd'].includes(step.type)"
+                    [class.mobile]="responsive">
+                    <app-schedule-step-card-item [properties]="step" [type]="'listStep'"
                     (stepChanged)="saveStepChanged(groupStep.year, step.idStep)"></app-schedule-step-card-item>
                   </div>
                 </ng-template>
               </p-dataView>
-              <p-dataView [value]="groupStep.cardItemSection" layout="grid" styleClass="dataview-step-card-items" *ngIf="!showDetails" [emptyMessage]="'loadingEllipsis' | translate">
-                <ng-template let-step pTemplate="gridItem">
-                  <div class="p-col-6 p-md-1 p-sm-6 card-item-container">
-                    <app-schedule-step-card-item [properties]="step" [type]="showDetails ? 'listStep' : 'listStepResumed'"
-                    (stepChanged)="saveStepChanged(groupStep.year, step.idStep)"></app-schedule-step-card-item>
-                  </div>
-                </ng-template>
-              </p-dataView>
-            </div>
-            <div class="new-end-step-container">
-              <app-schedule-step-card-item [properties]="sectionSchedule.endScheduleStep" type="newEnd"
-                [class.new-end-card-mobile]="responsive"
-                *ngIf="sectionSchedule.endScheduleStep && groupStep.end && editPermission"></app-schedule-step-card-item>
+              <ng-template #showResumed>
+                <p-dataView [value]="groupStep.cardItemSection" layout="grid" styleClass="dataview-step-card-items"
+                  [emptyMessage]="'loadingEllipsis' | translate">
+                  <ng-template let-step pTemplate="gridItem">
+                    <div class="card-item-container show-resumed clickable" [class.new-card-item]="['newStart', 'newEnd'].includes(step.type)"
+                      [class.mobile]="responsive"
+                      [routerLink]="['/workpack' , 'schedule', 'step' ]"
+                      [queryParams]="{
+                        id: step.idStep,
+                        stepType: step.stepType,
+                        unitName: step.unitName
+                      }">
+                      <app-schedule-step-card-item [properties]="step" [type]="'listStepResumed'"></app-schedule-step-card-item>
+                    </div>
+                  </ng-template>
+                </p-dataView>
+              </ng-template>
             </div>
         </div>
       </div>

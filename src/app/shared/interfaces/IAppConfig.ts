@@ -1,5 +1,8 @@
 export interface IAppConfig {
   API: string;
   authButtonIcon: string;
-  authButtonText: string;
+  authButtonText: {
+    'en-US': string;
+    'pt-BR': string;
+  };
 }

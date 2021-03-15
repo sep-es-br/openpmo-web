@@ -1,7 +1,10 @@
 @use "src/variables" as v;
 
 ::ng-deep .app-step-card-item .p-card {
-  background: transparent;
+  background: #ffffff7f;
+  border: 1px solid #d4d4d4;
+  box-shadow: none;
+
   .p-card-header {
     width: 100%;
     display: flex;
@@ -13,7 +16,8 @@
       justify-content: space-between;
       align-items: center;
       .header-title {
-        margin-left: 0.5em;
+        padding: 0.5rem 0.5rem 0 0.5rem;
+
         .title-month {
           font-weight: bold;
           color: v.$fontInput;
@@ -60,7 +64,7 @@
     .p-float-label textarea.p-filled ~ label,
     .p-float-label .p-inputwrapper-focus ~ label,
     .p-float-label .p-inputwrapper-filled ~ label {
-      top: -0.100rem;
+      top: -0.1rem;
     }
     .p-float-label > label {
       left: 0;
@@ -81,7 +85,8 @@
     column-gap: 0.5em;
     align-items: center;
     color: #888e96;
-    .unitValues, .costValues {
+    .unitValues,
+    .costValues {
       display: flex;
       flex-direction: column;
       align-content: center;
@@ -100,7 +105,8 @@
       .column-title {
         font-size: 0.7rem;
         text-align: center;
-        margin-bottom: 1.2em;
+        margin-bottom: 0.6em;
+        margin-top: 0.6em;
         font-weight: bold;
         color: v.$fontInput;
       }
@@ -124,7 +130,8 @@
       .column-title {
         font-size: 0.7rem;
         text-align: center;
-        margin-bottom: 1.2em;
+        margin-bottom: 0.6em;
+        margin-top: 0.6em;
         font-weight: bold;
         color: v.$fontInput;
       }
@@ -147,14 +154,17 @@
     padding: 0.5em;
     .card-item-id {
       color: #888e96;
-        font-size: 0.6rem;
-        font-family: v.$fontFamilyMedium;
+      font-size: 0.6rem;
+      font-family: v.$fontFamilyMedium;
     }
   }
 }
 
 ::ng-deep p-card.app-step-card-item-resume .p-card {
-  background: transparent;
+  background: #ffffff7f;
+  border: 1px solid #d4d4d4;
+  box-shadow: none;
+
   .p-card-header {
     width: 100%;
     display: flex;
@@ -166,7 +176,8 @@
       justify-content: space-between;
       align-items: center;
       .header-title {
-        margin-left: 0.5em;
+        padding: 0.5rem 0.5rem 0 0.5rem;
+
         .title-month {
           font-weight: bold;
           color: v.$fontInput;
@@ -200,6 +211,7 @@
     .progress-values-container {
       margin-bottom: 0.3em;
       display: flex;
+      width: 100%;
       .progress-bar-unit {
         margin-left: 0.3em;
         color: v.$fontLabel;
@@ -207,25 +219,29 @@
         font-family: v.$fontFamilyMedium;
       }
     }
-    .progress-bar-unit-container, .progress-bar-cost-container {
-      width: 100%;
+    .progress-bar-unit-container,
+    .progress-bar-cost-container {
+      width: 80%;
     }
   }
 }
 
 ::ng-deep .app-new-step-card-item .p-card {
-    background: transparent;
-    .p-card-body {
-      padding: 0.5em;
-    }
-    .p-card-body .p-card-content {
-      padding: 0;
-    }
-    .p-card-body .p-card-content .card-item-content {
+  background: transparent;
+  border: 1px solid #d4d4d4;
+  box-shadow: none;
+
+  .p-card-body {
+    padding: 0.5em;
+  }
+  .p-card-body .p-card-content {
+    padding: 0;
+  }
+  .p-card-body .p-card-content .card-item-content {
     display: flex;
-    height: 5%;
     align-items: center;
     justify-content: center;
+    padding: 0.5rem 1rem;
     .app-icon {
       cursor: pointer;
     }

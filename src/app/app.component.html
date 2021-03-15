@@ -1,7 +1,10 @@
 <p-confirmDialog [header]="'deleteQuestion' | translate" icon="pi pi-exclamation-triangle" key="deleteConfirm">
 </p-confirmDialog>
 <p-toast position="top-right"></p-toast>
-<app-template *ngIf="showTemplate; else elseTemplate"></app-template>
-<ng-template #elseTemplate>
-  <router-outlet></router-outlet>
-</ng-template>
+<ng-container *ngIf="showTemplate !== undefined">
+  <app-template *ngIf="showTemplate; else elseTemplate"></app-template>
+  <ng-template #elseTemplate>
+    <router-outlet></router-outlet>
+  </ng-template>
+</ng-container>
+

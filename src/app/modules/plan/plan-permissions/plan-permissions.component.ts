@@ -71,6 +71,7 @@ export class PlanPermissionsComponent implements OnInit, OnDestroy {
         this.person = null;
       }
     });
+    this.planSrv.nextIDPlan(this.idPlan);
   }
 
   ngOnDestroy(): void {

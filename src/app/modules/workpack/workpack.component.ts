@@ -130,6 +130,7 @@ export class WorkpackComponent implements OnDestroy {
       this.idPlan = idPlan;
       this.idWorkpackModel = idWorkpackModel;
       this.idWorkpackParent = idWorkpackParent;
+      this.planSrv.nextIDPlan(this.idPlan);
       await this.resetWorkpack();
     });
     this.responsiveSrv.observable.subscribe(value => {
@@ -215,55 +216,55 @@ export class WorkpackComponent implements OnDestroy {
     this.sectionWorkpackModelChildren = undefined;
     this.cardsWorkPackModelChildren = [];
     this.editPermission = false;
+    await this.setBreadcrumb();
     await this.loadProperties();
   }
 
   async setBreadcrumb() {
     this.breadcrumbSrv.setMenu([
-      {
-        key: 'office',
-        routerLink: [ '/offices', 'office' ],
-        queryParams: { id: this.idOffice },
-        info: this.propertiesOffice?.name,
-        tooltip: this.propertiesOffice?.fullName
-      },
-      {
-        key: 'plan',
-        routerLink: ['/plan'],
-        queryParams: { id: this.idPlan },
-        info: this.propertiesPlan?.name,
-        tooltip: this.propertiesPlan?.fullName
-      },
+      ... await this.getBreadcrumbs(),
       ... this.idWorkpack
-        ? await this.getBreadcrumbs()
+        ? []
         : [{
-          key: this.workpackModel?.modelName,
+          key: this.workpackModel?.type?.toLowerCase().replace('model', ''),
           info: this.workpackName,
           tooltip: this.workpackFullName,
-          routerLink: [ '/workpack' ]
+          routerLink: [ '/workpack' ],
+          queryParams: {
+            idPlan: this.idPlan,
+            idWorkpackModel: this.idWorkpackModel,
+            idWorkpackParent: this.idWorkpackParent
+          }
         }]
     ]);
   }
 
   async getBreadcrumbs() {
-    const { success, data } = await this.breadcrumbSrv.getBreadcrumbWorkpack(this.idWorkpack);
-    const currentBreadcrumb = data.pop();
+    const id = this.idWorkpack || this.idWorkpackParent;
+    if (!id) {
+      return [];
+    }
+    const { success, data } = await this.breadcrumbSrv.getBreadcrumbWorkpack(id);
     return success
-      ? [
-          ...data.map(p => ({
+      ? data.map(p => ({
             key: p.type.toLowerCase(),
             info: p.name,
             tooltip: p.fullName,
-            routerLink: [ '/workpack' ],
+            routerLink: this.getRouterLinkFromType(p.type),
             queryParams: { id: p.id }
-          })),
-          {
-            key: currentBreadcrumb.type.toLowerCase(),
-            routerLink: [ '/workpack' ],
-            queryParams: { id: this.idWorkpack }
-          }
-        ]
+          }))
       : [];
+  }
+
+  getRouterLinkFromType(type: string): string[] {
+    switch (type) {
+      case 'office':
+        return [ '/offices', 'office' ];
+      case 'plan':
+        return [ 'plan' ];
+      default:
+        return [ '/workpack' ];
+    }
   }
 
   async loadProperties() {
@@ -303,6 +304,7 @@ export class WorkpackComponent implements OnDestroy {
       const propertyFullNameWorkpack = this.workpack.properties.find(p => p.idPropertyModel === propertyFullNameWorkpackModel.id);
       this.workpackFullName = propertyFullNameWorkpack.value as string;
       this.idPlan = this.workpack.plan.id;
+      this.planSrv.nextIDPlan(this.idPlan);
       if (!this.isUserAdmin && this.workpack) {
         await this.loadUserPermission();
       }
@@ -328,14 +330,7 @@ export class WorkpackComponent implements OnDestroy {
     if (plan.success) {
       this.propertiesPlan = plan.data;
       this.idOffice = plan.data.idOffice;
-      if (this.idOffice) {
-        const { success, data } = await this.officeSrv.GetById(this.idOffice);
-        if (success) {
-          this.propertiesOffice = data;
-        }
-      }
       this.officeSrv.nextIDOffice(this.idOffice);
-      await this.setBreadcrumb();
       await this.loadPermissionsOffice();
     }
   }
@@ -823,6 +818,7 @@ export class WorkpackComponent implements OnDestroy {
           subtitleCardItem: selectedFunder && selectedFunder[0].label,
           costAccountsValue: propertyLimitValue?.value as number,
           itemId: cost.id,
+          idWorkpack: cost.idWorkpack.toString(),
           menuItems: [{
             label: this.translateSrv.instant('delete'),
             icon: 'fas fa-trash-alt',
@@ -846,6 +842,7 @@ export class WorkpackComponent implements OnDestroy {
           subtitleCardItem: null,
           costAccountsValue: null,
           itemId: null,
+          idWorkpack: this.idWorkpack.toString(),
           menuItems: [],
           urlCard: '/workpack/cost-account',
           paramsUrlCard: [
@@ -864,6 +861,7 @@ export class WorkpackComponent implements OnDestroy {
       subtitleCardItem: null,
       costAccountsValue: null,
       itemId: null,
+      idWorkpack: this.idWorkpack.toString(),
       menuItems: [],
       urlCard: '/workpack/cost-account',
       paramsUrlCard: [
@@ -893,6 +891,7 @@ export class WorkpackComponent implements OnDestroy {
 
       const groupStep = this.schedule.groupStep.map( (group, groupIndex, groupArray) => {
         const cardItemSection = group.steps.map( (step, stepIndex, stepArray) => ({
+          type: 'listStep',
           stepName: new Date(step.periodFromStart + 'T00:00:00'),
           menuItems: (groupIndex === 0 && stepIndex === 0) ? [{
             label: this.translateSrv.instant('properties'),
@@ -915,11 +914,11 @@ export class WorkpackComponent implements OnDestroy {
             progress: step.actualWork,
             color: '#FF8C00',
           },
-          costPlanned: step.consumes.reduce( (total, v) => ( total + (v.plannedCost ? v.plannedCost : 0)), 0),
-          costActual: step.consumes.reduce( (total, v) => ( total + (v.actualCost ? v.actualCost : 0)), 0),
+          costPlanned: step.consumes?.reduce( (total, v) => ( total + (v.plannedCost ? v.plannedCost : 0)), 0),
+          costActual: step.consumes?.reduce( (total, v) => ( total + (v.actualCost ? v.actualCost : 0)), 0),
           costProgressBar: {
-            total: step.consumes.reduce( (total, v) => ( total +  (v.plannedCost ? v.plannedCost : 0)), 0),
-            progress: step.consumes.reduce( (total, v) => ( total + (v.actualCost ? v.actualCost : 0)), 0),
+            total: step.consumes?.reduce( (total, v) => ( total +  (v.plannedCost ? v.plannedCost : 0)), 0),
+            progress: step.consumes?.reduce( (total, v) => ( total + (v.actualCost ? v.actualCost : 0)), 0),
             color: '#44B39B'
           },
           unitName: unit && unit.name,
@@ -933,6 +932,7 @@ export class WorkpackComponent implements OnDestroy {
       const startDate = this.schedule && new Date(this.schedule.start + 'T00:00:00');
       const endDate = this.schedule && new Date(this.schedule.end + 'T00:00:00');
       const startScheduleStep = {
+        type: 'newStart',
         urlCard: 'workpack/schedule/step',
         urlParams: {
           idSchedule: this.schedule.id,
@@ -941,6 +941,7 @@ export class WorkpackComponent implements OnDestroy {
         }
       };
       const endScheduleStep = {
+        type: 'newEnd',
         urlCard: 'workpack/schedule/step',
         urlParams: {
           idSchedule: this.schedule.id,
@@ -964,16 +965,16 @@ export class WorkpackComponent implements OnDestroy {
             {
               total: this.schedule.planed,
               progress: this.schedule.actual,
-              labelTotal: this.translateSrv.instant('planned'),
-              labelProgress: this.translateSrv.instant('actual'),
+              labelTotal: 'planned',
+              labelProgress: 'actual',
               valueUnit: unit && unit.name,
               color: '#FF8C00'
             },
             {
               total: this.schedule.planedCost,
               progress: this.schedule.actualCost,
-              labelTotal: this.translateSrv.instant('planned'),
-              labelProgress: this.translateSrv.instant('actual'),
+              labelTotal: 'planned',
+              labelProgress: 'actual',
               valueUnit: 'currency',
               color: '#44B39B'
             }
@@ -985,24 +986,32 @@ export class WorkpackComponent implements OnDestroy {
       };
       if (this.sectionSchedule.groupStep && this.sectionSchedule.groupStep[0].cardItemSection) {
         this.sectionSchedule.groupStep[0].start = true;
+        const idStartStep = this.sectionSchedule.groupStep[0].cardItemSection[0].idStep;
         this.sectionSchedule.groupStep[0].cardItemSection[0].menuItems.push({
           label: this.translateSrv.instant('delete'),
           icon: 'fas fa-trash-alt',
-          command: (event) => this.deleteScheduleStep(this.sectionSchedule.groupStep[0].cardItemSection[0].idStep)
+          command: (event) => this.deleteScheduleStep(idStartStep)
         });
         this.sectionSchedule.groupStep[0].cardItemSection[0].stepDay = startDate;
+        const groupStepItems: IScheduleStepCardItem[] = [startScheduleStep];
+        this.sectionSchedule.groupStep[0].cardItemSection.forEach( card => {
+          groupStepItems.push(card);
+        });
+        this.sectionSchedule.groupStep[0].cardItemSection = Array.from(groupStepItems);
       }
       const groupLenght = this.sectionSchedule.groupStep && this.sectionSchedule.groupStep.length;
       if (this.sectionSchedule.groupStep && this.sectionSchedule.groupStep[groupLenght-1].cardItemSection) {
         this.sectionSchedule.groupStep[groupLenght-1].end = true;
         const cardItemSectionLenght = this.sectionSchedule.groupStep[groupLenght-1].cardItemSection.length;
+        const idEndStep = this.sectionSchedule.groupStep[groupLenght-1].cardItemSection[cardItemSectionLenght-1].idStep;
         this.sectionSchedule.groupStep[groupLenght-1].cardItemSection[cardItemSectionLenght-1].menuItems.push({
           label: this.translateSrv.instant('delete'),
           icon: 'fas fa-trash-alt',
           command: (event) =>
-            this.deleteScheduleStep(this.sectionSchedule.groupStep[groupLenght-1].cardItemSection[cardItemSectionLenght-1].idStep)
+            this.deleteScheduleStep(idEndStep)
         });
         this.sectionSchedule.groupStep[groupLenght-1].cardItemSection[cardItemSectionLenght-1].stepDay = endDate;
+        this.sectionSchedule.groupStep[groupLenght-1].cardItemSection.push(endScheduleStep);
       }
       return;
     }
@@ -1070,7 +1079,7 @@ export class WorkpackComponent implements OnDestroy {
       id: step.id,
       plannedWork: stepChanged.unitPlanned,
       actualWork: stepChanged.unitActual,
-      consumes: step.consumes.map( consume => ({
+      consumes: step.consumes?.map( consume => ({
         actualCost: consume.actualCost,
         plannedCost: consume.plannedCost,
         idCostAccount: consume.costAccount.id,
@@ -1140,7 +1149,7 @@ export class WorkpackComponent implements OnDestroy {
       const propertyFullNameWorkpack = this.workpackProperties.find(p => p.idPropertyModel === propertyFullNameWorkpackModel.id);
       this.workpackFullName = propertyFullNameWorkpack.value as string;
       this.breadcrumbSrv.updateLastCrumb({
-        key: this.workpackModel.modelName,
+        key: this.workpackModel?.type?.toLowerCase().replace('model', ''),
         info: this.workpackName,
         tooltip: this.workpackFullName,
         routerLink: [ '/workpack' ],

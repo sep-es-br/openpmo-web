@@ -124,19 +124,19 @@ export class CostAccountComponent implements OnInit {
   async loadWorkpack(onlyBreadcrumb: boolean = false) {
     const result = await this.workpackSrv.GetById(this.idWorkpack);
     if (result.success) {
-      const hasWorkpack = !!this.workpack;
+      const isWorkpackLoaded = !!this.workpack;
       this.workpack = result.data;
-      if (!hasWorkpack) {
+      if (!isWorkpackLoaded) {
         this.setBreadcrumb();
         if (onlyBreadcrumb) {
           this.idCurrentWorkpack = this.workpack.id;
           return;
         }
       }
-
       this.editPermission = !!this.workpack.permissions?.find( p => p.level === 'EDIT')
         || await this.authSrv.isUserAdmin();
       const plan = await this.planSrv.GetById(this.workpack.plan.id);
+      this.planSrv.nextIDPlan(plan.data.id);
       if (plan.success) {
         this.idOffice = plan.data.idOffice;
       }
@@ -164,15 +164,9 @@ export class CostAccountComponent implements OnInit {
     }
   }
 
-  setBreadcrumb() {
+  async setBreadcrumb() {
     this.breadcrumbSrv.setMenu([
-      {
-        key: this.workpack.type,
-        info: this.getValueFromWorkpackProperty('name'),
-        tooltip: this.getValueFromWorkpackProperty('fullName'),
-        routerLink: [ '/workpack' ],
-        queryParams: { id: this.idWorkpack }
-      },
+      ... await this.getBreadcrumbs(),
       {
         key: 'account',
         info: this.costAccountName,
@@ -182,6 +176,30 @@ export class CostAccountComponent implements OnInit {
         }
       }
     ]);
+  }
+
+  async getBreadcrumbs() {
+    const { success, data } = await this.breadcrumbSrv.getBreadcrumbWorkpack(this.idCurrentWorkpack || this.idWorkpack);
+    return success
+      ? data.map(p => ({
+            key: p.type.toLowerCase(),
+            info: p.name,
+            tooltip: p.fullName,
+            routerLink: this.getRouterLinkFromType(p.type),
+            queryParams: { id: p.id }
+          }))
+      : [];
+  }
+
+  getRouterLinkFromType(type: string): string[] {
+    switch (type) {
+      case 'office':
+        return [ '/offices', 'office' ];
+      case 'plan':
+        return [ 'plan' ];
+      default:
+        return [ '/workpack' ];
+    }
   }
 
   instanceProperty(propertyModel: IWorkpackModelProperty): PropertyTemplateModel {
@@ -440,11 +458,5 @@ export class CostAccountComponent implements OnInit {
         );
       }
     }
-  }
-
-  getValueFromWorkpackProperty(nameProperty: string, session: string = 'PROPERTIES') {
-    const propertyWorkpackModel = this.workpack.model.properties.find(p => p.name === nameProperty && p.session === session);
-    const propertyWorkpack = this.workpack.properties.find(p => p.idPropertyModel === propertyWorkpackModel.id);
-    return propertyWorkpack.value as string;
   }
 }

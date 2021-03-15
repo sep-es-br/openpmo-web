@@ -55,6 +55,7 @@ export interface IStepPost {
   plannedWork: number;
   actualWork: number;
   endStep?: boolean;
+  periodFromStart?: Date;
   consumes: {
     actualCost: number;
     plannedCost: number;

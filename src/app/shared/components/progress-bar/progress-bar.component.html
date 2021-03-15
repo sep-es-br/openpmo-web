@@ -1,20 +1,21 @@
 <div class="app-progress">
   <div class="progress-bar-header">
     <div class="progress">
-      <span class="header-label" *ngIf="labelProgress">{{labelProgress}}</span>
-      <span class="progress-value" *ngIf="valueUnit">{{valueUnit === 'currency' ? (progress | number:'0.2-2':'pt') 
+      <span class="header-label" *ngIf="labelProgress">{{labelProgress | translate}}</span>
+      <span class="progress-value" [ngStyle]="{color: color}"
+        *ngIf="valueUnit"> {{valueUnit === 'currency' ? '$' : ''}} {{valueUnit === 'currency' ? ( language === 'pt-BR' ? (progress | number:'0.2-2':'pt') : (progress | number:'0.2-2':'en')) 
         : progress}} {{valueUnit !== 'currency' ? valueUnit : ''}}</span>
     </div>
     <div class="total">
-      <span class="header-label" *ngIf="labelTotal">{{labelTotal}}</span>
-      <span class="total-value" *ngIf="valueUnit">{{valueUnit === 'currency' ? (total | number:'0.2-2':'pt') 
-        : total}} {{valueUnit !== 'currency' ? valueUnit : ''}}</span>
+      <span class="header-label" *ngIf="labelTotal">{{labelTotal | translate}}</span>
+      <span class="total-value" *ngIf="valueUnit"> {{valueUnit === 'currency' ? '$' : ''}} {{valueUnit === 'currency' ? (language === 'pt-BR' ? (total | number:'0.2-2':'pt') : (total | number:'0.2-2':'en')) 
+        : (language === 'pt-BR' ? (total | number:'0.0-2':'pt') : (total | number:'0.0-2':'en'))}} {{valueUnit !== 'currency' ? valueUnit : ''}}</span>
     </div>
     <div class="total"></div>
   </div>
   <div class="progress-bar-container">
     <div class="progress-bar" 
-     [ngStyle]="{width: (progress/total)*100 + '%', background: color}">
+     [ngStyle]="{width: (progress > total ? 100 : (progress/total)*100) + '%', background: color}">
     </div>
   </div>
 </div>

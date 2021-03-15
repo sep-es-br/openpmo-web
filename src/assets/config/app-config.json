@@ -1,5 +1,8 @@
 {
   "API": "https://dev.totemti.com.br:1019/openpmo",
   "authButtonIcon": "",
-  "authButtonText": "Entrar"
+  "authButtonText": {
+    "en-US": "Enter",
+    "pt-BR": "Entrar"
+  }
 }

@@ -42,9 +42,6 @@ export class BreadcrumbComponent implements OnInit {
   }
 
   navigateTo(crumb: IBreadcrumb, index: number) {
-    if (this.breadcrumbSrv.getURLFromCrumb(crumb) !== this.router.url) {
-      this.breadcrumbSrv.setMenu(this.crumbs.splice(0, index + 1));
-      this.router.navigate(crumb.routerLink, { queryParams: crumb.queryParams });
-    }
+    this.router.navigate(crumb.routerLink, { queryParams: crumb.queryParams });
   }
 }

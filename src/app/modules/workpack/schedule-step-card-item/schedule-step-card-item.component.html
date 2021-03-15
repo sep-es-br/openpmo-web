@@ -1,9 +1,8 @@
-<ng-container [ngSwitch]="type">
-  <p-card *ngSwitchCase="'listStep'" class="app-step-card-item">
+  <p-card *ngIf="type === 'listStep' && properties.type === 'listStep'" class="app-step-card-item">
     <p-header *ngIf="properties.menuItems" class="card-item-header">
       <div class="header-title">
         <span class="title-month">
-          {{ language === 'pt' ? (properties.stepName|date:'MMMM':'IST':'pt'|titlecase) : (properties.stepName|date:'MMMM')}}
+          {{ language === 'pt-BR' ? (properties.stepName|date:'MMMM':'IST':'pt'|titlecase) : (properties.stepName|date:'MMMM')}}
         </span>
         <span class="title-day">
           {{properties.stepDay ? (properties.stepDay|date:'d') : ''}}
@@ -17,15 +16,11 @@
         <div class="unitInputs p-fluid">
           <span class="column-title">{{properties.unitName}}</span>
           <span class="p-float-label p-field">
-            <p-inputNumber class="app-input-number" (onBlur)="handleStepChange()" id="float-unitPlanned"
-              [(ngModel)]="properties.unitPlanned">
-            </p-inputNumber>
+            <app-input-unit-measure [(model)]="properties.unitPlanned" (onBlur)="handleStepChange()"></app-input-unit-measure>
             <label class="app-input-label" for="float-unitPlanned">{{ "planned" |translate }}</label>
           </span>
           <span class="p-float-label p-field">
-            <p-inputNumber class="app-input-number" (onBlur)="handleStepChange()" id="float-unitActual"
-              [(ngModel)]="properties.unitActual">
-            </p-inputNumber>
+            <app-input-unit-measure [(model)]="properties.unitActual" (onBlur)="handleStepChange()"></app-input-unit-measure>
             <label class="app-input-label" for="float-unitActual">{{ "actual" |translate }}</label>
           </span>
         </div>
@@ -40,13 +35,17 @@
           <span class="column-title"> $ </span>
           <span class="p-float-label p-field">
             <p-inputNumber class="app-input-number" id="float-costPlanned" disabled="true"
-              [(ngModel)]="properties.costPlanned" [minFractionDigits]="2" [maxFractionDigits]="2">
+              [(ngModel)]="properties.costPlanned" [minFractionDigits]="2" [maxFractionDigits]="2"
+              [locale]="language === 'pt-BR' ? 'pt-BR' : 'en-US'"
+              >
             </p-inputNumber>
             <label class="app-input-label" for="float-costPlanned">{{ "planned" |translate }}</label>
           </span>
           <span class="p-float-label p-field">
             <p-inputNumber class="app-input-number" id="float-costActual" disabled="true"
-              [(ngModel)]="properties.costActual" [minFractionDigits]="2" [maxFractionDigits]="2">
+              [(ngModel)]="properties.costActual" [minFractionDigits]="2" [maxFractionDigits]="2"
+              [locale]="language === 'pt-BR' ? 'pt-BR' : 'en-US'"
+              >
             </p-inputNumber>
             <label class="app-input-label" for="float-costActual">{{ "actual" |translate }}</label>
           </span>
@@ -65,11 +64,11 @@
     </div>
   </p-card>
 
-  <p-card *ngSwitchCase="'listStepResumed'" class="app-step-card-item-resume">
+  <p-card *ngIf="type === 'listStepResumed' && properties.type === 'listStep'" class="app-step-card-item-resume">
     <p-header *ngIf="properties.menuItems" class="card-item-header">
       <div class="header-title">
         <span class="title-month">
-          {{ language === 'pt' ? (properties.stepName|date:'MMMM':'IST':'pt'|titlecase) : (properties.stepName|date:'MMMM')}}
+          {{ language === 'pt-BR' ? (properties.stepName|date:'MMMM':'IST':'pt'|titlecase) : (properties.stepName|date:'MMMM')}}
         </span>
         <span class="title-day">
           {{properties.stepDay ? (properties.stepDay|date:'d') : ''}}
@@ -96,17 +95,16 @@
     </div>
   </p-card>
 
-  <p-card *ngSwitchCase="'newStart'" class="app-new-step-card-item" [class.card-link]="properties.urlCard"
+  <p-card *ngIf="properties.type === 'newStart'" class="app-new-step-card-item" [class.card-link]="properties.urlCard"
     (click)="properties.urlCard && navigateToPage(properties.urlCard, properties.urlParams)">
     <div class="card-item-content">
       <i [ngClass]="[ 'app-icon', iconEnum.Plus, 'light-grey-icon' ]" [ngStyle]="{ fontSize: '2rem' }"></i>
     </div>
   </p-card>
 
-  <p-card *ngSwitchCase="'newEnd'" class="app-new-step-card-item" [class.card-link]="properties.urlCard"
+  <p-card *ngIf="properties.type === 'newEnd'" class="app-new-step-card-item" [class.card-link]="properties.urlCard"
     (click)="properties.urlCard && navigateToPage(properties.urlCard, properties.urlParams)">
     <div class="card-item-content">
       <i [ngClass]="[ 'app-icon', iconEnum.Plus, 'light-grey-icon' ]" [ngStyle]="{ fontSize: '2rem' }"></i>
     </div>
   </p-card>
-</ng-container>

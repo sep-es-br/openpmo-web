@@ -13,9 +13,11 @@ import { PrepareHttpParams } from '../utils/query.util';
 export class MenuService extends BaseService<any> {
 
   adminsPath = [ 'strategies', 'organizations', 'domains', 'measure-units', 'offices/permission', 'workpack-model' ];
+  plansPath = [ 'plan', 'workpack' ];
   private $reloadMenuOffice = new Subject();
   private $reloadMenuPortfolio = new Subject();
   private isAdminMenuObservable = new BehaviorSubject<boolean>(false);
+  private isPlanMenuObservable = new BehaviorSubject<boolean>(false);
 
   constructor(
     @Inject(Injector) injector: Injector,
@@ -29,6 +31,7 @@ export class MenuService extends BaseService<any> {
   checkURL(url: string) {
     const [ path ] = url.slice(2).split('?');
     this.isAdminMenuObservable.next(!!this.adminsPath.find(p => path.startsWith(p)));
+    this.isPlanMenuObservable.next(!!this.plansPath.find(p => path.startsWith(p)));
   }
 
   reloadMenuOffice() {
@@ -65,5 +68,13 @@ export class MenuService extends BaseService<any> {
 
   get isAdminMenu() {
     return this.isAdminMenuObservable.asObservable();
+  }
+
+  nextIsPlanMenu(value: boolean) {
+    this.isPlanMenuObservable.next(value);
+  }
+
+  get isPlanMenu() {
+    return this.isPlanMenuObservable.asObservable();
   }
 }

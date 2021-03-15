@@ -1,0 +1,6 @@
+
+<span class="p-inputnumber p-component">
+  <input #inputElement pInputText class="p-inputnumber-input p-inputtext p-component"
+    [(ngModel)]="valueInput" (ngModelChange)="onModelChange($event)" (focus)="handleFocus(true) && this.handleFilled()"
+    (keypress)="onKeypress($event)" (paste)="onPaste($event)" (blur)="handleFocus(false) && this.handleFilled()">
+</span>

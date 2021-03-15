@@ -2,6 +2,9 @@
 
 ::ng-deep .app-step {
   width: 100%;
+  .app-content-header > span {
+    text-transform: capitalize;
+  }
 
   .card-properties-step{
     width: 100%;

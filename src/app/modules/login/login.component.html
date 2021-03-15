@@ -14,7 +14,7 @@
         <ng-template #defaultIcon>
           <i [ngClass]="[ 'app-icon', 'users', 'white-icon' ]" [ngStyle]="{ fontSize: '2rem' }" alt="Auth Button Icon"></i>
         </ng-template>
-        {{ appConfig?.authButtonText }}
+        {{ appConfig?.authButtonText[currentLanguage] }}
       </div>
     </div>
   </div>
