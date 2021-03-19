@@ -22,6 +22,8 @@ export class ProgressBarComponent implements OnInit, OnDestroy {
 
   language: string;
   $destroy = new Subject();
+  totalProgressBar: number;
+  totalBar: number;
 
   constructor(
     private translateSrv: TranslateService
@@ -36,18 +38,6 @@ export class ProgressBarComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.setLanguage();
-    if (!this.progress) {
-      this.progress = 0;
-    }
-    if (this.total === 0) {
-      this.total = this.progress;
-    } else if (!this.total) {
-      this.total = 100;
-    }
-    if (this.progress > this.total) {
-      this.progress = 100;
-      this.total = 100;
-    }
   }
 
   ngOnDestroy(): void {

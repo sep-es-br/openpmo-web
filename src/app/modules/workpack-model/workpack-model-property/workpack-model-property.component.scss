@@ -43,6 +43,7 @@
   .p-panel-header {
     display: inline-flex;
     min-width: 200px;
+    min-height: 65px;
     background-color: rgba(250, 250, 249, 1);
     border-color: v.$borderLightGrey;;
     padding: .5em;

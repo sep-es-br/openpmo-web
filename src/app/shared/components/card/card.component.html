@@ -16,9 +16,9 @@
       </p-inputSwitch>
      </div>
      <div class="header-title-dates" *ngIf="properties.headerDates">
-       <span class="start-date">{{properties.headerDates?.startDate|date:'yyyy/MM/dd'}}</span>
+       <span class="start-date">{{language === 'pt-BR' ? (properties.headerDates?.startDate|date:'dd/MM/yyyy') : (properties.headerDates?.startDate|date:'yyyy/MM/dd')}}</span>
        <i class="fas fa-caret-right"></i>
-       <span class="end-date">{{properties.headerDates?.endDate|date:'yyyy/MM/dd'}}</span>
+       <span class="end-date">{{language === 'pt-BR' ? (properties.headerDates?.endDate|date:'dd/MM/yyyy') : (properties.headerDates?.endDate|date:'yyyy/MM/dd')}}</span>
      </div>
     </div>
     <div class="header-values-cost-account" *ngIf="properties.progressBarValues">

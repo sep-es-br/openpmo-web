@@ -4,11 +4,12 @@
       <span class="header-label" *ngIf="labelProgress">{{labelProgress | translate}}</span>
       <span class="progress-value" [ngStyle]="{color: color}"
         *ngIf="valueUnit"> {{valueUnit === 'currency' ? '$' : ''}} {{valueUnit === 'currency' ? ( language === 'pt-BR' ? (progress | number:'0.2-2':'pt') : (progress | number:'0.2-2':'en')) 
-        : progress}} {{valueUnit !== 'currency' ? valueUnit : ''}}</span>
+        : (language === 'pt-BR' ? (progress | number:'0.0-2':'pt') : (progress | number:'0.0-2':'en'))}} {{valueUnit !== 'currency' ? valueUnit : ''}}</span>
     </div>
     <div class="total">
       <span class="header-label" *ngIf="labelTotal">{{labelTotal | translate}}</span>
-      <span class="total-value" *ngIf="valueUnit"> {{valueUnit === 'currency' ? '$' : ''}} {{valueUnit === 'currency' ? (language === 'pt-BR' ? (total | number:'0.2-2':'pt') : (total | number:'0.2-2':'en')) 
+      <span class="total-value" 
+      *ngIf="valueUnit"> {{valueUnit === 'currency' ? '$' : ''}} {{valueUnit === 'currency' ? (language === 'pt-BR' ? (total | number:'0.2-2':'pt') : (total | number:'0.2-2':'en')) 
         : (language === 'pt-BR' ? (total | number:'0.0-2':'pt') : (total | number:'0.0-2':'en'))}} {{valueUnit !== 'currency' ? valueUnit : ''}}</span>
     </div>
     <div class="total"></div>

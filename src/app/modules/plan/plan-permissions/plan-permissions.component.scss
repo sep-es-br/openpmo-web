@@ -10,7 +10,8 @@
       .search-container {
         margin-bottom: 1.5em;
         .input-search {
-          width: 24%;
+          min-width: 50%;
+          max-width: 100%;
         }
         .responsive {
           width: 100%;
@@ -32,14 +33,18 @@
   box-shadow: none;
   display: flex;
   flex-direction: column;
+  max-width: 50%;
 
   .p-card {
     display: flex;
     height: 100%;
-    max-width: 280px;
-    width: 280px;
+    max-width: 100%;
     border: 1px solid #D4D4D4;
     box-shadow: none;
+  }
+
+  .p-card-body {
+    max-width: 100%;;
   }
 
   .p-card-content {
@@ -47,18 +52,26 @@
     flex-direction: column;
     align-items: flex-start;
     padding: 0;
+    max-width: 100%;
     .person-name {
+      max-width: 100%;
+      word-wrap: break-word;
       font-size: 1rem;
       color: v.$fontTitle;
       font-family: v.$fontFamilyMedium;
       padding: 5px 0;
     }
     .person-email {
+      max-width: 100%;
+      word-wrap: break-word;
       font-size: 0.9rem;
       color: v.$fontTitle;
       font-family: v.$fontFamilyMedium;
     }
   }
+}
+::ng-deep .app-plan-permission-detail .card-permission .card-person.responsive {
+  max-width: 100%;
 }
 .input-message-error {
   color: white;

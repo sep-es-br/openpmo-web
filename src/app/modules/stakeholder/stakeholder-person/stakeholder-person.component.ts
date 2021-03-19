@@ -109,13 +109,7 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
     const propertyFullNameWorkpack = this.workpack.properties.find(p => p.idPropertyModel === propertyFullNameWorkpackModel.id);
     const workpackFullName = propertyFullNameWorkpack.value as string;
     this.breadcrumbSrv.setMenu([
-      {
-        key: this.workpack.type,
-        info: workpackName,
-        tooltip: workpackFullName,
-        routerLink: [ '/workpack' ],
-        queryParams: { id: this.idWorkpack }
-      },
+      ... await this.getBreadcrumbs(this.idWorkpack),
       {
         key: 'stakeholder',
         routerLink: ['/stakeholder/person'],
@@ -124,6 +118,30 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
         tooltip: this.stakeholder?.person.fullName
       }
     ]);
+  }
+
+  async getBreadcrumbs(idWorkpack: number) {
+    const { success, data } = await this.breadcrumbSrv.getBreadcrumbWorkpack(idWorkpack);
+    return success
+      ? data.map(p => ({
+            key: p.type.toLowerCase(),
+            info: p.name,
+            tooltip: p.fullName,
+            routerLink: this.getRouterLinkFromType(p.type),
+            queryParams: { id: p.id }
+          }))
+      : [];
+  }
+
+  getRouterLinkFromType(type: string): string[] {
+    switch (type) {
+      case 'office':
+        return [ '/offices', 'office' ];
+      case 'plan':
+        return [ 'plan' ];
+      default:
+        return [ '/workpack' ];
+    }
   }
 
   async loadWorkpack() {
