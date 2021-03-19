@@ -216,8 +216,8 @@ export class WorkpackComponent implements OnDestroy {
     this.sectionWorkpackModelChildren = undefined;
     this.cardsWorkPackModelChildren = [];
     this.editPermission = false;
-    await this.setBreadcrumb();
     await this.loadProperties();
+    await this.setBreadcrumb();
   }
 
   async setBreadcrumb() {
@@ -234,7 +234,8 @@ export class WorkpackComponent implements OnDestroy {
             idPlan: this.idPlan,
             idWorkpackModel: this.idWorkpackModel,
             idWorkpackParent: this.idWorkpackParent
-          }
+          },
+          modelName: this.workpackModel?.modelName
         }]
     ]);
   }
