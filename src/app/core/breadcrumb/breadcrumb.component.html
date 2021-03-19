@@ -6,7 +6,7 @@
     <ng-container *ngFor="let crumb of crumbs; let i = index">
       <i class="app-icon angle-right" [ngStyle]="{ fontSize: isMobileView ? '.65rem' : '.8rem' }"></i>
       <div class="crumb" [class.last-crumb]="i + 1 === crumbs.length">
-        <div class="link" (click)="navigateTo(crumb, i)">{{ crumb.key | translate }}</div>
+        <div class="link" (click)="navigateTo(crumb, i)">{{ crumb.modelName ? crumb.modelName : (crumb.key | translate) }}</div>
         <div class="info" [pTooltip]="crumb.tooltip || crumb.info " *ngIf="(crumb.tooltip || crumb.info) && !isMobileView">
           {{ crumb.info || crumb.tooltip }}
         </div>

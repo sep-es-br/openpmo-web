@@ -44,7 +44,7 @@
   box-shadow: none;
   display: flex;
   flex-direction: column;
-  max-width: 50%;
+  max-width: 100%;
 
   .p-card {
     display: flex;
@@ -71,7 +71,7 @@
       font-size: 1rem;
       color: v.$fontTitle;
       font-family: v.$fontFamilyMedium;
-      padding: 5px 0;
+      padding-bottom: 5px;
     }
     .person-email {
       max-width: 100%;

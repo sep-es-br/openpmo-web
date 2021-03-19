@@ -4,6 +4,7 @@ export interface IBreadcrumb {
   tooltip?: string;
   routerLink: string[];
   queryParams?: any;
+  modelName?: string;
 }
 
 export interface IResultBreadcrumb {
@@ -11,4 +12,5 @@ export interface IResultBreadcrumb {
   name: string;
   fullName: string;
   type: string;
+  modelName?: string;
 }

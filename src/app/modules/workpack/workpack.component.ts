@@ -247,11 +247,12 @@ export class WorkpackComponent implements OnDestroy {
     const { success, data } = await this.breadcrumbSrv.getBreadcrumbWorkpack(id);
     return success
       ? data.map(p => ({
-            key: p.type.toLowerCase(),
+            key: !p.modelName ? p.type.toLowerCase() : p.modelName,
             info: p.name,
             tooltip: p.fullName,
             routerLink: this.getRouterLinkFromType(p.type),
-            queryParams: { id: p.id }
+            queryParams: { id: p.id },
+            modelName: p.modelName
           }))
       : [];
   }
@@ -519,7 +520,7 @@ export class WorkpackComponent implements OnDestroy {
   }
 
   async loadSectionsWorkpackModel() {
-    if (this.workpackModel.stakeholderSessionActive && this.editPermissionOffice) {
+    if (this.workpackModel.stakeholderSessionActive && (this.isUserAdmin || this.editPermissionOffice)) {
       await this.loadStakeholders();
       this.sectionStakeholder = {
         cardSection: {

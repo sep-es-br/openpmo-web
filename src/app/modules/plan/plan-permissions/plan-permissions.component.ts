@@ -17,6 +17,8 @@ import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
 import { SaveButtonComponent } from 'src/app/shared/components/save-button/save-button.component';
 import { IPlan } from 'src/app/shared/interfaces/IPlan';
 import { PlanService } from 'src/app/shared/services/plan.service';
+import { IOffice } from 'src/app/shared/interfaces/IOffice';
+import { OfficeService } from 'src/app/shared/services/office.service';
 
 @Component({
   selector: 'app-plan-permissions',
@@ -32,6 +34,8 @@ export class PlanPermissionsComponent implements OnInit, OnDestroy {
 
   idPlan: number;
   propertiesPlan: IPlan;
+  idOffice: number;
+  propertiesOffice: IOffice;
   cardPersonPermission: ICard;
   personEmail: string;
   responsive: boolean;
@@ -53,7 +57,8 @@ export class PlanPermissionsComponent implements OnInit, OnDestroy {
     private breadcrumbSrv: BreadcrumbService,
     private messageSrv: MessageService,
     private planSrv: PlanService,
-    private router: Router
+    private router: Router,
+    private officeSrv: OfficeService
   ) {
     this.actRouter.queryParams.subscribe(async queryParams => {
       this.idPlan = queryParams.idPlan;
@@ -82,7 +87,34 @@ export class PlanPermissionsComponent implements OnInit, OnDestroy {
   async ngOnInit() {
     await this.loadPermission();
     await this.loadPropertiesPlan();
+    await this.loadPropertiesOffice();
+  }
+
+  async loadPropertiesPlan() {
+    const { success, data } = await this.planSrv.GetById(this.idPlan);
+    if (success) {
+      this.propertiesPlan = data;
+    }
+  }
+
+  async loadPropertiesOffice() {
+    this.idOffice = this.propertiesPlan?.idOffice;
+    const { success, data } = await this.officeSrv.GetById(this.idOffice);
+    if (success) {
+      this.propertiesOffice = data;
+    }
+    this.setBreacrumb();
+  }
+
+  setBreacrumb() {
     this.breadcrumbSrv.setMenu([
+      {
+        key: 'office',
+        routerLink: [ '/offices', 'office' ],
+        queryParams: { id: this.idOffice },
+        info: this.propertiesOffice?.name,
+        tooltip: this.propertiesOffice?.fullName
+      },
       {
         key: 'planPermissions',
         routerLink: [ '/plan', 'permission' ],
@@ -98,13 +130,6 @@ export class PlanPermissionsComponent implements OnInit, OnDestroy {
         tooltip: this.person?.fullName
       }
     ]);
-  }
-
-  async loadPropertiesPlan() {
-    const { success, data } = await this.planSrv.GetById(this.idPlan);
-    if (success) {
-      this.propertiesPlan = data;
-    }
   }
 
   validateEmail() {

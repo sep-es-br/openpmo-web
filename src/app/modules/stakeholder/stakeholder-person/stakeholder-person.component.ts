@@ -124,11 +124,12 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
     const { success, data } = await this.breadcrumbSrv.getBreadcrumbWorkpack(idWorkpack);
     return success
       ? data.map(p => ({
-            key: p.type.toLowerCase(),
+            key: !p.modelName ? p.type.toLowerCase() : p.modelName,
             info: p.name,
             tooltip: p.fullName,
             routerLink: this.getRouterLinkFromType(p.type),
-            queryParams: { id: p.id }
+            queryParams: { id: p.id },
+            modelName: p.modelName
           }))
       : [];
   }

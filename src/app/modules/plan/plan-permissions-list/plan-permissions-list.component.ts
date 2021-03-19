@@ -9,6 +9,8 @@ import { ICardItemPermission } from 'src/app/shared/interfaces/ICardItemPermissi
 import { TranslateService } from '@ngx-translate/core';
 import { ICard } from 'src/app/shared/interfaces/ICard';
 import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
+import { OfficeService } from 'src/app/shared/services/office.service';
+import { IOffice } from 'src/app/shared/interfaces/IOffice';
 
 @Component({
   selector: 'app-plan-permissions-list',
@@ -18,8 +20,10 @@ import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
 export class PlanPermissionsListComponent implements OnInit {
 
   idPlan: number;
+  idOffice: number;
   responsive: boolean;
   propertiesPlan: IPlan;
+  propertiesOffice: IOffice;
   planPermissions: IPlanPermission[];
   cardItemsPlanPermissions: ICardItemPermission[];
   cardPlanPermissions: ICard = {
@@ -36,7 +40,8 @@ export class PlanPermissionsListComponent implements OnInit {
     private planSrv: PlanService,
     private planPermissionSrv: PlanPermissionService,
     private translateSrv: TranslateService,
-    private breadcrumbSrv: BreadcrumbService
+    private breadcrumbSrv: BreadcrumbService,
+    private officeSrv: OfficeService
   ) {
     this.actRouter.queryParams.subscribe(async queryParams => {
       this.idPlan = queryParams.idPlan;
@@ -49,15 +54,7 @@ export class PlanPermissionsListComponent implements OnInit {
 
   async ngOnInit() {
     await this.loadPropertiesPlan();
-    this.breadcrumbSrv.setMenu([
-      {
-        key: 'planPermissions',
-        routerLink: [ '/plan', 'permission' ],
-        queryParams: { idPlan: this.idPlan },
-        info: this.propertiesPlan?.name,
-        tooltip: this.propertiesPlan?.fullName
-      }
-    ]);
+    await this.loadPropertiesOffice();
   }
 
   async loadPropertiesPlan() {
@@ -74,6 +71,34 @@ export class PlanPermissionsListComponent implements OnInit {
       this.planPermissions = result.data;
       this.loadCardItemsPlanPermissions();
     }
+  }
+
+  async loadPropertiesOffice() {
+    this.idOffice = this.propertiesPlan?.idOffice;
+    const { success, data } = await this.officeSrv.GetById(this.idOffice);
+    if (success) {
+      this.propertiesOffice = data;
+    }
+    this.setBreacrumb();
+  }
+
+  setBreacrumb() {
+    this.breadcrumbSrv.setMenu([
+      {
+        key: 'office',
+        routerLink: [ '/offices', 'office' ],
+        queryParams: { id: this.idOffice },
+        info: this.propertiesOffice?.name,
+        tooltip: this.propertiesOffice?.fullName
+      },
+      {
+        key: 'planPermissions',
+        routerLink: [ '/plan', 'permission' ],
+        queryParams: { idPlan: this.idPlan },
+        info: this.propertiesPlan?.name,
+        tooltip: this.propertiesPlan?.fullName
+      }
+    ]);
   }
 
   loadCardItemsPlanPermissions() {
