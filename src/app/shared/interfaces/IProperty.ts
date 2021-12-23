@@ -3,7 +3,7 @@ import { TreeNode } from 'primeng/api';
 export interface IProperty {
   id?: number;
   type: string;
-  idPropertyModel: number;
+  idPropertyModel?: number;
   active: boolean;
   fullLine?: boolean;
   label: string;

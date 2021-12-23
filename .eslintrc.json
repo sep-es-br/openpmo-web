@@ -46,7 +46,8 @@
           }
         ],
         "no-shadow": "off",
-        "@typescript-eslint/no-shadow": ["error"]
+        "eqeqeq": "off",
+        "no-debugger": "off",
       }
     },
     {

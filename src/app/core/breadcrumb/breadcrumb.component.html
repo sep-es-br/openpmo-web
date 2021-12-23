@@ -1,7 +1,10 @@
 <div class="app-breadcrumb" [class.mobile]="isMobileView">
   <div class="crumbs" #crumbsEl>
     <div class="home" [class.adjust-padding]="isOverflowing">
-      <i class="app-icon home" [ngStyle]="{ fontSize: isMobileView ? '1.5rem' : '2.5rem' }" [routerLink]="['/']"></i>
+      <span class="name" *ngIf="showNameOffice"> {{crumbOffice.info}}</span>
+      <span class="name" *ngIf="showNamePlan"> {{crumbPlan.info}}</span>
+      <i class="app-icon home" [ngStyle]="{ fontSize: isMobileView ? '1.5rem' : '2.5rem' }"
+      [routerLink]="routerLinkHome()" [queryParams]="queryParamsHome()"></i>
     </div>
     <ng-container *ngFor="let crumb of crumbs; let i = index">
       <i class="app-icon angle-right" [ngStyle]="{ fontSize: isMobileView ? '.65rem' : '.8rem' }"></i>

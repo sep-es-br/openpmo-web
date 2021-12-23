@@ -1,0 +1,20 @@
+@use "src/variables" as v;
+
+::ng-deep .app-property-text {
+  width: 100%;
+  .p-inputtext {
+    width: 100%;
+  }
+}
+
+::ng-deep .workpack-input-text-not-fullLine {
+  .p-inputtext {
+    width: 100%;
+  }
+}
+
+::ng-deep .workpack-input-text-mobile {
+  .p-inputtext {
+    width: 100%;
+  }
+}

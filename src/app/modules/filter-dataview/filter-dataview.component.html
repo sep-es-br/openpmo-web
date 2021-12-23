@@ -1,0 +1,68 @@
+<div class="app-filter-dataview">
+  <div class="app-content-header" [class.mobile]="responsive">
+    <span *ngIf="idFilter; else newFilterTitle">{{ filterData?.name }}</span>
+    <ng-template #newFilterTitle>
+      <span>{{ 'newFilter' | translate }}</span>
+    </ng-template>
+  </div>
+  <div class="card-properties-filter">
+    <app-card [properties]="cardPropertiesFilter" class="mt-0 inputs-float-label">
+      <div class="p-grid properties-container">
+        <form [formGroup]="formFilter">
+          <div class="p-fluid formgroup" [class.formgroup-responsive]="responsive">
+            <div class="p-field" [class.p-field-responsive]="responsive">
+              <span class="p-float-label">
+                <input class="app-input-text" [class.responsive]="responsive" formControlName="name" type="text"
+                  pInputText />
+                <label class="app-input-label" for="float-name">{{ "name" | translate }} * </label>
+              </span>
+              <app-input-message [form]="formFilter" field="name"></app-input-message>
+            </div>
+            <div class="p-field my-default" [class.my-default-responsive]="responsive">
+              <p-checkbox [formControl]="formFilter.controls['favorite']" [binary]="true"
+                [label]="'myDefault'|translate"></p-checkbox>
+            </div>
+          </div>
+          <div class="p-fluid formgroup" [class.formgroup-responsive]="responsive">
+            <div class="p-field" [class.p-field-responsive]="responsive">
+              <span class="p-float-label">
+                <p-dropdown class="app-single-selection" [class.responsive]="responsive" [autoDisplayFirst]="false"
+                  [options]="propertiesListOptions" formControlName="sortBy"></p-dropdown>
+                <label class="app-input-label" for="float-name">{{ "sortBy" | translate }} * </label>
+              </span>
+              <app-input-message [form]="formFilter" field="sortBy"></app-input-message>
+            </div>
+            <div class="p-field direction-container" [class.direction-container-responsive]="responsive">
+              <p-radioButton class="direction-radio" value="ASC" formControlName="sortByDirection"
+                [label]="'ascending' |translate"></p-radioButton>
+              <p-radioButton class="direction-radio desc" value="DESC" formControlName="sortByDirection"
+                [label]="'descending' |translate"></p-radioButton>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="rules-container">
+        <div class="rules-container-header">
+          <span class="rules-title" [class.rules-title-responsive]="responsive">{{'rules'|translate}}</span>
+        </div>
+        <div class="dataview-container">
+          <p-dataView [value]="ruleCards" layout="grid" styleClass="dataview-card-items-rule"
+            [emptyMessage]="'loadingEllipsis' | translate">
+            <ng-template let-ruleCard let-index="rowIndex" pTemplate="gridItem">
+              <div class="p-col-12 p-md-4 p-sm-12 card-item-container" [class.responsive]="responsive"
+                [class.card-item-big]="index > 0 && ruleCard.typeCard !== 'new-card' && !responsive">
+                <app-filter-rule-card-item [filterRuleCard]="ruleCard" [indexCard]="index" [idWorkpackModel]="idWorkpackModel" [entityName]="entityName"
+                  (ruleChanged)="handlePropertyValueChanged($event)" (newCardCreated)="handleCreateNewRuleCard($event)"
+                  (deleteCardItem)="handleDeleteCardItem(index)"></app-filter-rule-card-item>
+              </div>
+            </ng-template>
+          </p-dataView>
+        </div>
+      </div>
+      <div class="delete-filter-button-container" *ngIf="idFilter">
+        <button pButton iconPos="left" icon="pi pi-times" [label]="'deleteFilter' |translate" (click)="handleDeleteFilter()"></button>
+      </div>
+    </app-card>
+  </div>
+  <app-save-button (save)="handleOnSubmit()"></app-save-button>
+</div>

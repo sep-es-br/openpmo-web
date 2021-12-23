@@ -1,11 +1,39 @@
+import { IFile } from './IFile';
+
 export interface IPerson {
   id?: number;
   name: string;
   fullName?: string;
-  email: string;
+  email?: string;
+  guid?: string;
   contactEmail?: string;
-  address?: string;
-  administrator?: boolean;
   phoneNumber?: string;
-  roles?: string[];
+  address?: string;
+  cpf?: string;
+  isUser?: boolean;
+  officePermission?: IPersonOfficePermission;
+  roles?: {role: string; workLocation?: string}[];
+  administrator?: boolean;
+  avatar?: IFile;
+  isCcbMember?: boolean;
+}
+export interface IPersonOfficePermission {
+  id: number;
+  accessLevel: string;
+  planPermissions: IPersonPlanPermission[];
+}
+
+export interface IPersonPlanPermission {
+  id: number;
+  name: string;
+  accessLevel: string;
+  workpacksPermission: IPersonWorkpackPermission[];
+}
+
+export interface IPersonWorkpackPermission {
+  id: number;
+  name: string;
+  accessLevel: string;
+  roles: {role: string; organization?: string}[];
+  icon: string;
 }

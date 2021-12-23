@@ -1,0 +1,33 @@
+ .app-config {
+  width: 100%;
+}
+
+.header-container {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  justify-content: space-between;
+  .app-content-header {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: flex-start;
+    flex: 1;
+  }
+}
+
+.header-container.mobile {
+  flex-direction: column;
+  .app-content-header {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: flex-start;
+    width: 100%;
+    flex: 1;
+  }
+}
+
+::ng-deep .admin-config .app-card-item .p-card .p-card-body {
+  padding: 2rem 0 !important;
+}

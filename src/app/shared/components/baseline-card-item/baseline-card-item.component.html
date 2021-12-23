@@ -1,0 +1,52 @@
+<ng-container [ngSwitch]="properties.typeCardItem">
+  <p-card *ngSwitchCase="'listItem'" class="baseline-card-item listItem" [class.mobile]="responsive"
+    [class.cardList]="displayModeCard === 'list'">
+    <p-header class="card-item-header">
+      <div class="header-content">
+        <i *ngIf="properties.baselineStatus === 'proposed'" [ngClass]="[ 'app-icon', 'action-required', 'grey-icon']"
+          [ngStyle]="{ fontSize: '1.5rem', color: '#ED7D31' }"></i>
+        <i *ngIf="!!properties.baselineActive" [ngClass]="[ 'app-icon', 'check-circle', 'grey-icon']"
+          [ngStyle]="{ fontSize: '1.5rem', color: '#44B39B' }"></i>
+        <i *ngIf="properties.baselineStatus !== 'proposed' && !properties.baselineActive"
+          [ngClass]="[ 'app-icon', 'user-circle', 'grey-icon']"
+          [ngStyle]="{ fontSize: '1.5rem', color: '#ffffff' }"></i>
+        <p-menu #menu [popup]="true" [model]="properties.menuItems"></p-menu>
+        <button type="button" pButton icon="pi pi-ellipsis-v" [class.hidden]="!properties.menuItems?.length"
+          (click)="menu.toggle($event)"></button>
+      </div>
+    </p-header>
+    <div class="card-item-content" [class.card-link]="properties.urlCard" [routerLink]="properties.urlCard"
+      [class.cardList]="displayModeCard === 'list'" [queryParams]="getQueryParams()">
+      <div class="icons-container">
+        <i
+          [ngClass]="properties.iconSvg ? [ 'app-icon', properties.icon, 'grey-icon'] : [ 'icon-card', properties.icon, 'grey-icon' ]"></i>
+      </div>
+      <span class="card-item-name" [pTooltip]="properties.fullNameCardItem" *ngIf="properties.icon === 'baseline'"
+        tooltipPosition="bottom">{{properties.nameCardItem}}</span>
+      <span class="card-item-name cancelling" [pTooltip]="properties.fullNameCardItem"
+        *ngIf="properties.icon === 'fas fa-times'" tooltipPosition="bottom">{{'cancelling'|translate}}</span>
+      <span class="card-item-status"  [ngStyle]="{ color: properties.baselineStatus !== 'proposed' ? '#009dd4' : '#888e96' }"
+      *ngIf="properties.baselineStatus">{{properties.baselineStatus |translate}}</span>
+      <span class="card-item-status-date" *ngIf="properties.baselineStatusDate"
+        [class.date-none]="properties?.baselineStatusDate === 'NONE'">
+        {{ properties?.baselineStatusDate !== 'NONE' ? (language === 'pt' ? (properties?.baselineStatusDate|date:'dd/MM/yyyy') :
+                        (properties?.baselineStatusDate|date:'yyyy/MM/dd')) : ''}}</span>
+    </div>
+    <div class="card-item-footer" *ngIf="cardIdItem">
+      <span class="card-item-id">
+        {{cardIdItem}}
+      </span>
+    </div>
+  </p-card>
+
+  <p-card *ngSwitchCase="'newCardItem'" class="new-carditem" [class.card-link]="properties.urlCard"
+    [class.mobile]="responsive" [class.cardList]="displayModeCard === 'list'" [class.new-card-item-mobile]="responsive"
+    (click)="properties.urlCard && navigateToPage(properties.urlCard, properties.paramsUrlCard)">
+    <div class="carditem-content">
+      <i [ngClass]="[ 'app-icon', properties.icon, 'light-grey-icon']"
+        (click)=" properties.iconMenuItems && menuIcon.toggle($event)"
+        [ngStyle]="{ fontSize: (responsive ? 2 : 3) + 'rem' }" [class.card-link]="properties.iconMenuItems"></i>
+      <p-tieredMenu #menuIcon [popup]="true" [model]="properties.iconMenuItems"></p-tieredMenu>
+    </div>
+  </p-card>
+</ng-container>

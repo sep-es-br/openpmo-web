@@ -1,0 +1,46 @@
+<div class="app-avatar">
+  <div class="avatar" [class.small]="menu">
+    <p-avatar *ngIf="!hasAvatar && !menu" icon="fas fa-user" shape="circle" size="xlarge" [class.edit]="edit"
+      (click)="edit && handleUploadAvatarModal()">
+      <span class="background" *ngIf="edit"> <i class="fas fa-camera"></i></span>
+    </p-avatar>
+    <p-avatar *ngIf="!hasAvatar && menu" icon="app-icon user-circle" shape="circle" size="xlarge" [class.edit]="edit"
+      (click)="edit && handleUploadAvatarModal()">
+      <span class="background" *ngIf="edit"> <i class="fas fa-camera"></i></span>
+    </p-avatar>
+    <p-avatar *ngIf="hasAvatar" [image]="avatarFile?.url" shape="circle" [class.edit]="edit"
+      (click)="edit && handleUploadAvatarModal()" size="xlarge">
+      <span class="background" *ngIf="edit"> <i class="fas fa-camera"></i></span>
+    </p-avatar>
+  </div>
+
+  <p-dialog [header]="'updatePhotoAvatar' | translate" [(visible)]="modalImgAvatarUpload" previewWidth="150"
+    [modal]="true" [style]="{width: '50vw'}">
+    <ng-container *ngIf="!resizableImgAvatar">
+      <p-fileUpload #uploader name="image" [customUpload]="true" [auto]="true" accept="image/*"
+        (uploadHandler)="uploadHandler($event, uploader)" uploadIcon="pi pi-upload" maxFileSize="1048576" fileLimit="1"
+        [chooseLabel]="'uploadPhoto' | translate">
+
+        <ng-template pTemplate="content">
+          <div class="p-fileupload-available" *ngIf="hasAvatar">
+            <img [src]="avatarFile?.url" height="100" width="100">
+            <span>
+              {{avatarFile ? avatarFile.name : ''}}
+            </span>
+            <button pButton type="button" icon="pi pi-trash" class="p-button-icon-only"
+              (click)="handleDeleteAvatar()"></button>
+          </div>
+        </ng-template>
+      </p-fileUpload>
+    </ng-container>
+    <ng-container *ngIf="resizableImgAvatar">
+      <image-cropper [imageChangedEvent]="imageChangedEvent" [imageFile]="avatarFile" [maintainAspectRatio]="true"
+        [aspectRatio]="1 / 1" format="jpg" (imageCropped)="imageCropped($event)"></image-cropper>
+      <div class="button-actions">
+        <button pButton type="button" class="cancel" icon="pi pi-times" [label]="'primeng.cancel' | translate"
+          (click)="handleCancel()"></button>
+        <button pButton type="button" class="save" icon="pi pi-check" [label]="'save' | translate" (click)="handleSave()"></button>
+      </div>
+    </ng-container>
+  </p-dialog>
+</div>

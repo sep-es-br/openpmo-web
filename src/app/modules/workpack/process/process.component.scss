@@ -1,0 +1,171 @@
+@use "src/variables" as v;
+
+::ng-deep .app-process {
+  width: 100%;
+  .card-properties-process {
+    width: 100%;
+    form {
+      width: 100%;
+      padding-bottom: 3em;
+      .form-group {
+        display: flex;
+        flex-direction: row;
+        align-items: flex-end;
+        padding-bottom: 1em;
+        width: 100%;
+        .p-field {
+          display: flex;
+          flex-direction: column;
+          width: 13%;
+          margin-right: 2em;
+          .p-inputtext {
+            width: 100%;
+          }
+          .p-float-label {
+            width: 100%;
+            padding-bottom: 0;
+            .p-dropdown {
+              width: 100%;
+            }
+            .p-inputtext {
+              width: 100%;
+            }
+          }
+          .input-container {
+            display: flex;
+            flex-direction: column;
+            .p-input-icon-right {
+              .pi-search {
+                color: #004660;
+              }
+            }
+          }
+        }
+      }
+      .p-fluid {
+        margin-top: 1em;
+      }
+      .priority-container {
+        display: flex;
+        flex-direction: row;
+        align-items: flex-end;
+        .label-container.not-priority {
+          label {
+            color: #b5b5b5;
+            margin-left: 0.5em;
+            font-size: 1rem;
+            font-weight: bold;
+          }
+          .other_files {
+            color: #b5b5b5;
+            font-size: 1.5rem;
+          }
+        }
+        .label-container.priority {
+          label {
+            font-weight: 700;
+            font-style: normal;
+            font-size: 16px;
+            color: #44B39B;
+            margin-left: 0.5em;
+          }
+          .process-selo {
+            color: #44B39B;
+            font-size: 1.5rem;
+          }
+        }
+      }
+    }
+  }
+  .loading-container {
+    padding: 1em 0;
+    .fa-hourglass-half {
+      font-size: 1.3rem;
+      color: #9ea4a5;
+      margin-right: 0.5em;
+    }
+  }
+  .history-container {
+    padding-top: 2em;
+    width: 50%;
+    .p-timeline-event-opposite, .p-timeline-event-content {
+      padding-bottom: 1em;
+    }
+    .p-timeline-event-marker {
+      border-color: #13546c;
+    }
+    .p-card {
+      .p-card-content {
+        padding: 0;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+      }
+      .organization-name {
+        color: #13546c;
+        font-size: 1em;
+        font-weight: bold;
+        text-transform: uppercase;
+        text-align: start;
+      }
+      .sector {
+        color: #13546c;
+        font-size: 0.7em;
+        text-transform: uppercase;
+        text-align: start;
+      }
+      .date-container {
+        margin-top: 1em;
+        color: #13546c;
+        font-size: 0.8em;
+        font-weight: bold;
+        text-align: start;
+        span {
+          margin-right: 5px;
+          text-align: start;
+        }
+      }
+      .status-container {
+        color: #13546c;
+        font-size: 0.8em;
+        text-align: start;
+        margin-top: 1em;
+        label {
+          margin-right: 5px;
+        }
+      }
+    }
+  }
+  .process-history-container.responsive {
+    .history-container {
+      width: 100%;
+      .timeline-responsive {
+        .p-timeline-event {
+          .p-timeline-event-opposite {
+            display: none;
+          }
+        }
+      }
+    }
+  }
+}
+
+::ng-deep .app-process {
+  .card-properties-process.responsive form {
+    .form-group {
+      flex-direction: column;
+      align-items: flex-start;
+      .p-field {
+        width: 100%;
+        
+        .p-inputtext {
+          width: 100%;
+        }
+      }
+      .margin-top-responsive {
+        margin-top: 1em;
+      }
+    }
+  }
+}

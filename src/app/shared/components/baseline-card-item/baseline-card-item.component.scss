@@ -1,0 +1,306 @@
+@use "src/variables" as v;
+
+::ng-deep .baseline-card-item {
+    .p-card {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    height: 100%;
+    max-width: 280px;
+    width: 280px;
+    border: 1px solid #D4D4D4;
+    box-shadow: none;
+
+    .p-card-header {
+      display: flex;
+      width: 100%;
+      .card-item-header {
+        display: flex;
+        width: 100%;
+      }
+      .header-content {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+        padding: 0.5em;
+        .p-button.p-button-icon-only {
+          padding: 0 !important;
+          width: auto;
+        }
+      }
+      .action-required, .check-circle {
+        // padding: 0.5em;
+      }
+      .card-item-header p-menu {
+        .p-menu-overlay .p-menu-list .p-menuitem .p-menuitem-link {
+          .p-menuitem-icon {
+            font-size: 0.8rem;
+            color: #939393;
+          }
+          .p-menuitem-text {
+            font-size: 0.9rem;
+            font-family: v.$fontFamilyMedium;
+            color: #939393;
+          }
+        }
+      }
+      .card-item-header .p-button {
+        background-color: transparent;
+        border: none !important;
+        box-shadow: none !important;
+        &.hidden {
+          opacity: 0;
+          pointer-events: none;
+        }
+        .p-button-icon {
+          font-size: 0.9rem;
+          color: #939393;
+        }
+      }
+      // .card-item-header .menu-config {
+      //   padding: 10px;
+      //   cursor: pointer;
+      //   .fa-tools {
+      //     font-size: 1.1rem;
+      //     transform: rotate(30deg);
+      //     color: #939393;
+      //   }
+      // }
+
+      .card-item-header .button-change {
+            display: flex;
+            flex-direction: column;
+            background-color: #44b39b;
+            border: none;
+            font-size: 0.7rem;
+            margin: 0.4rem 0.4rem 0 0;
+      }
+    }
+
+    .p-card-body {
+      padding: 0;
+      height: 100%;
+    }
+    .p-card-content {
+      padding: 0;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+    .card-item-content.card-link {
+      cursor: pointer;
+      border: none;
+      outline: none;
+      flex: 1;
+    }
+    .card-item-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: #888e96;
+      padding: 0 !important;
+      .icons-container {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        .linked {
+          margin-left: 0.5em;
+        }
+      }
+
+      .icon-card {
+        font-size: 3.5rem;
+        color: #EA5C5C;
+      }
+      .app-icon {
+        font-size: 2.5rem;
+      }
+      .icon-new {
+        font-size: 3rem;
+        color: rgba(147, 147, 147, 0.5);
+      }
+      .card-item-name {
+        font-size: 1.2rem;
+        font-family: v.$fontFamilyMedium;
+        padding: 0.5em;
+        display: flex;
+        flex: 1;
+        align-items: center;
+        text-align: center;
+      }
+      .cancelling {
+        color: #EA5C5C;
+      }
+      .card-item-status {
+        font-size: 0.8rem;
+        font-family: v.$fontFamilyMedium;
+        color: #009dd4;
+        margin-bottom: 0.5em;
+      }
+      .card-item-status-date {
+        font-size: 0.8rem;
+        font-family: v.$fontFamilyMedium;
+        color: #009dd4;
+      }
+      .date-none {
+        color: #ffffff;
+      }
+      &.cardList {
+        flex-direction: row;
+        justify-content: flex-start;
+        margin-left: 2em;
+      }
+    }
+    .card-item-footer {
+      display: flex;
+      justify-content: flex-end;
+      padding: 0 0.5em 0.5em;
+      .card-item-id {
+        color: #888e96;
+        font-size: 0.6rem;
+        font-family: v.$fontFamilyMedium;
+      }
+    }
+  }
+  &.mobile {
+    .p-card {
+      max-width: 100%;
+      width: 100%;
+    }
+  }
+  &.cardList {
+    .p-card {
+      max-width: 100%;
+      width: 100%;
+      .card-item-name {
+        flex: none;
+      }
+      .card-item-status {
+        padding-bottom: 0 !important;
+      }
+      .organization-name {
+        margin-left: 0.5em;
+      }
+    }
+  }
+}
+
+::ng-deep .p-overlaypanel-close {
+  background: #6c757d !important;
+}
+
+::ng-deep .new-carditem {
+  .p-card {
+    background-color: transparent;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    height: 100%;
+    max-width: 280px;
+    width: 280px;
+    border: 1px solid #D4D4D4;
+    box-shadow: none;
+
+    .p-card-body {
+      padding: 0;
+    }
+
+    .p-card-body .p-card-content {
+      height: 100%;
+
+      p-tieredmenu {
+        .p-tieredmenu-overlay ul {
+          max-width: 20em;
+          .p-menuitem .p-menuitem-link {
+            .p-menuitem-icon {
+              font-size: 0.8rem;
+              color: #939393;
+            }
+            .p-menuitem-text {
+              font-size: 0.9rem;
+              font-family: v.$fontFamilyMedium;
+              color: #939393;
+            }
+          }
+        }
+      }
+    }
+
+    .p-card-body .p-card-content .carditem-content {
+      padding: 2em;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      // position: absolute;
+      height: 100%;
+      width: 100%;
+      .app-icon {
+        cursor: pointer;
+      }
+    }
+    
+    .p-card-body .p-card-content .menu-model-container {
+      padding: 0 2em;
+      .menuNewModelContainer {
+        list-style: none;
+        padding: 0.5em;
+        box-shadow: 1px 1px 4px rgb(0 0 0 / 20%);
+        background-color: #ffffff;
+        li {
+          padding: 0.5em;
+          color: #888E96;
+        }
+        :hover {
+          background-color: rgba(245, 245, 245, 1);
+        }
+      }
+      .p-tree-toggler {
+        display: none !important;
+      }
+    }
+    
+  }
+  &.cardList {
+    .p-card {
+      max-width: 100%;
+      width: 100%;
+      .p-card-content {
+        padding: 0;
+      }
+    }
+  }
+}
+
+::ng-deep .new-carditem.new-card-item-mobile {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  padding: 1em;
+  .p-card {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 30%;
+    height: 60%;
+    padding: 1em 0;
+    .p-card-body .p-card-content .carditem-content {
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      height: 100%;
+      width: 100%;
+    }
+  }
+  &.cardList {
+    .p-card {
+      max-width: 100%;
+      width: 100%;
+    }
+  }
+  
+}

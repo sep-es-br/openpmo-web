@@ -13,7 +13,10 @@ import { ResponsiveService } from '../../services/responsive.service';
 export class CardItemPermissionComponent implements OnInit {
 
   @Input() properties: ICardItemPermission;
+  @Input() displayModeCard: string;
+  @Input() isReadOnly?: boolean;
   @Output() changeSelected = new EventEmitter();
+  @Output() deletedSharedCard = new EventEmitter();
 
   newItemIcon = IconsEnum.Plus;
   cardIdItem: string;
@@ -46,5 +49,9 @@ export class CardItemPermissionComponent implements OnInit {
 
   handleSelect() {
     this.changeSelected.next();
+  }
+
+  handleDeleteSharedCard() {
+    this.deletedSharedCard.next({id: this.properties.itemId, office: this.properties.titleCardItem});
   }
 }

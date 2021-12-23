@@ -1,9 +1,10 @@
 import { Inject, Injectable, Injector } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Subject, Observable } from 'rxjs';
 import { BaseService } from '../base/base.service';
 
 import { IBreadcrumb, IResultBreadcrumb } from '../interfaces/IBreadcrumb';
 import { IHttpResult } from '../interfaces/IHttpResult';
+import { PrepareHttpParams } from '../utils/query.util';
 
 @Injectable({
   providedIn: 'root'
@@ -11,6 +12,8 @@ import { IHttpResult } from '../interfaces/IHttpResult';
 export class BreadcrumbService extends BaseService<any> {
 
   private menus = new BehaviorSubject<IBreadcrumb[]>([]);
+  private currentBreadcrumb: Subject<IBreadcrumb[]> = new Subject<IBreadcrumb[]>();
+  private key = '@pmo/current-breadcrumb';
 
   constructor(
     @Inject(Injector) injector: Injector,
@@ -18,8 +21,9 @@ export class BreadcrumbService extends BaseService<any> {
     super('breadcrumbs', injector);
   }
 
-  getBreadcrumbWorkpack(idWorkpack: number) {
-    return this.http.get<IHttpResult<IResultBreadcrumb[]>>(`${this.urlBase}/workpack/${idWorkpack}`).toPromise();
+  getBreadcrumbWorkpack(idWorkpack: number, options?) {
+    return this.http.get<IHttpResult<IResultBreadcrumb[]>>(`${this.urlBase}/workpack/${idWorkpack}`,
+      { params: PrepareHttpParams(options) }).toPromise();
   }
 
   getBreadcrumbWorkpackModel(idWorkpackModel: number) {
@@ -44,4 +48,25 @@ export class BreadcrumbService extends BaseService<any> {
     newMenus.push(crumb);
     this.setMenu(newMenus);
   }
+
+  setBreadcrumbStorage(breadcrumbs: IBreadcrumb[]) {
+    localStorage.setItem(this.key, JSON.stringify(breadcrumbs));
+    this.currentBreadcrumb.next(breadcrumbs);
+  }
+
+  get get(): IBreadcrumb[] {
+    let breadcrumbs: IBreadcrumb[];
+    try {
+      breadcrumbs = JSON.parse(localStorage.getItem(this.key));
+      return breadcrumbs;
+    } catch (error) {
+      breadcrumbs = [];
+      return breadcrumbs;
+    }
+  }
+
+  get ready(): Observable<IBreadcrumb[]> {
+    return this.currentBreadcrumb.asObservable();
+  }
+
 }

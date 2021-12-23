@@ -1,3 +1,4 @@
+import { RouterModule } from '@angular/router';
 import { NgModule } from '@angular/core';
 
 import { AccordionModule } from 'primeng/accordion';
@@ -73,6 +74,13 @@ import { KeyFilterModule } from 'primeng/keyfilter';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { BreadcrumbComponent } from './breadcrumb/breadcrumb.component';
+import {DividerModule} from 'primeng/divider';
+import { MenuFixedComponent } from './menu-fixed/menu-fixed.component';
+import { FooterComponent } from './footer/footer.component';
+import {TimelineModule} from 'primeng/timeline';
+import { AvatarComponent } from './avatar/avatar.component';
+import { AvatarModule } from 'primeng/avatar';
+import { ImageCropperModule } from 'ngx-image-cropper';
 
 @NgModule({
   imports: [
@@ -122,6 +130,7 @@ import { BreadcrumbComponent } from './breadcrumb/breadcrumb.component';
     ProgressSpinnerModule,
     RadioButtonModule,
     RatingModule,
+    RouterModule,
     ScrollPanelModule,
     SelectButtonModule,
     SlideMenuModule,
@@ -146,7 +155,11 @@ import { BreadcrumbComponent } from './breadcrumb/breadcrumb.component';
     TranslateModule,
     KeyFilterModule,
     FormsModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    DividerModule,
+    TimelineModule,
+    AvatarModule,
+    ImageCropperModule
   ],
   exports: [
     AccordionModule,
@@ -195,6 +208,7 @@ import { BreadcrumbComponent } from './breadcrumb/breadcrumb.component';
     ProgressSpinnerModule,
     RadioButtonModule,
     RatingModule,
+    RouterModule,
     ScrollPanelModule,
     SelectButtonModule,
     SlideMenuModule,
@@ -219,13 +233,20 @@ import { BreadcrumbComponent } from './breadcrumb/breadcrumb.component';
     TranslateModule,
     KeyFilterModule,
     FormsModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    DividerModule,
+    FooterComponent,
+    TimelineModule,
+    AvatarComponent
   ],
   providers: [],
   declarations: [
     TemplateComponent,
     MenuComponent,
-    BreadcrumbComponent
+    MenuFixedComponent,
+    BreadcrumbComponent,
+    FooterComponent,
+    AvatarComponent
   ]
 })
 export class CoreModule { }

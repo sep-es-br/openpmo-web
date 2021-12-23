@@ -9,8 +9,9 @@ import { CardItemPermissionComponent } from './card-item-permission/card-item-pe
 import { PipesModule } from '../pipes/pipes.module';
 import { ProgressBarComponent } from './progress-bar/progress-bar.component';
 import { InputUnitMeasureComponent } from './input-unit-measure/input-unit-measure.component';
-
-
+import { ConfigDataViewPanelComponent } from './config-data-view-panel/config-data-view-panel.component';
+import { AvatarModule } from 'primeng/avatar';
+import { BaselineCardItemComponent } from './baseline-card-item/baseline-card-item.component';
 
 @NgModule({
   declarations: [
@@ -20,12 +21,15 @@ import { InputUnitMeasureComponent } from './input-unit-measure/input-unit-measu
     SaveButtonComponent,
     CardItemPermissionComponent,
     ProgressBarComponent,
-    InputUnitMeasureComponent
+    InputUnitMeasureComponent,
+    ConfigDataViewPanelComponent,
+    BaselineCardItemComponent,
   ],
   imports: [
     CommonModule,
     CoreModule,
-    PipesModule
+    PipesModule,
+    AvatarModule,
   ],
   exports: [
     PipesModule,
@@ -35,7 +39,9 @@ import { InputUnitMeasureComponent } from './input-unit-measure/input-unit-measu
     InputMessageComponent,
     SaveButtonComponent,
     ProgressBarComponent,
-    InputUnitMeasureComponent
+    InputUnitMeasureComponent,
+    ConfigDataViewPanelComponent,
+    BaselineCardItemComponent
   ]
 })
 export class ComponentsModule { }

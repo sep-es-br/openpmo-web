@@ -112,6 +112,7 @@ $mobileMenuHeight: 72px;
     .title {
       font-size: 1rem;
       font-weight: 700;
+      cursor: pointer;
     }
     .action .app-icon {
       cursor: pointer;
@@ -200,6 +201,19 @@ $mobileMenuHeight: 72px;
       text-overflow: ellipsis;
     }
   }
+  .item {
+    padding: 1em;
+    display: flex;
+    color: v.$fontDark;
+    cursor: pointer;
+
+    span {
+      padding-left: .5em;
+    }
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.05);
+    }
+  }
   .logout {
     padding: 1em;
     display: flex;
@@ -250,9 +264,22 @@ $mobileMenuHeight: 72px;
     color: v.$fontDark;
     .p-panelmenu-icon {
       font-size: .7rem;
+      font-weight: bold;
+      order: 2;
+      right: 10px;
+      position: absolute;
+    }
+    .p-menuitem-icon.app-icon {
+      font-size: 1.3rem;
     }
     &:focus {
       box-shadow: none !important;
+    }
+  }
+  .p-panelmenu .p-panelmenu-content .p-menuitem .p-menuitem-link {
+    .p-panelmenu-icon {
+      order: 2;
+      margin-left: 0.6rem;
     }
   }
   .p-panelmenu .p-panelmenu-content .p-menuitem .p-menuitem-link:focus {

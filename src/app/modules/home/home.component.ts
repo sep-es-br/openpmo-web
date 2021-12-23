@@ -3,6 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { MessageService } from 'primeng/api';
 import { filter, map } from 'rxjs/operators';
+import { IPerson } from 'src/app/shared/interfaces/IPerson';
 import { ISocialLoginResult } from 'src/app/shared/interfaces/ISocialLoginResult';
 import { AuthService } from 'src/app/shared/services/auth.service';
 import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
@@ -37,21 +38,21 @@ export class HomeComponent implements OnInit {
         if (dto === 'error.unauthorized') {
          const lang = window.navigator.language;
          this.translateChangeSrv.changeLangDefault(lang);
-          this.messageSrv.add({
-            severity: 'warn',
-            summary: this.translateSrv.instant('warn'),
-            detail: this.translateSrv.instant('messages.error.unauthorizedApplication')
-          });
-          this.router.navigate(['/login']);
+         this.authSrv.nextIsLoginDenied(true);
+         this.router.navigate(['/login']);
         } else {
           const userInfo = JSON.parse(atob(dto)) as ISocialLoginResult;
           this.authSrv.saveToken(userInfo);
+          this.authSrv.nextIsLoginDenied(false);
           this.router.navigate(['/home']);
         }
       });
   }
 
   ngOnInit(): void {
-    setTimeout(() => this.router.navigate(['/offices']), 0);
+    setTimeout(async() => {
+      const routeLink = '/offices'
+      this.router.navigate([routeLink]);
+    }, 0);
   }
 }

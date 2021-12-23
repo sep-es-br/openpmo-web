@@ -1,0 +1,109 @@
+@use "src/variables" as v;
+
+::ng-deep .app-baseline-cancelling {
+  width: 100%;
+
+  .card-properties-baseline{
+    width: 100%;
+    form {
+      width: 100%;
+    }
+  }
+  .header-container {
+    display: flex;
+    flex-direction: row;
+  }
+  .app-content-header {
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-end;
+    flex: 1;
+    color: #EA5C5C;
+    font-weight: bold;
+    .fa-times {
+      font-size: 1.5rem;
+      margin-right: 0.5em;
+    }
+  }
+  .header-container.mobile {
+    flex-direction: column;
+  }
+  .mobile {
+    width: 100%;
+  }
+
+  .attention-message {
+    display: flex;
+    flex-direction: column;
+    margin-top: 2em;
+    max-width: 23%;
+    .title {
+      color: #EA5C5C;
+      font-weight: bold;
+    }
+    .text {
+      color: #5B5B5B;
+    }
+  }
+  .attention-message-responsive {
+    margin-top: 1em;
+    max-width: 100%;
+  }
+
+  .actions-buttons-container {
+    padding-top: 4em;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    .action-button {
+      width: 10%;
+      margin-right: 1em;
+      .p-button {
+        width: 100%;
+        border-width: 0px;
+        
+        border: none;
+        border-radius: 5px;
+        box-shadow: none;
+        font-weight: 500;
+        font-style: normal;
+        font-size: 1rem;
+      }
+    }
+    .no-button {
+      .p-button {
+        background-color: rgba(157, 157, 157, 1);
+      }
+    }
+    .yes-button {
+      .p-button {
+        background-color: rgba(234, 92, 92, 1);
+      }
+    }
+
+   
+  }
+  .actions-buttons-container-responsive {
+    flex-direction: column;
+    padding-top: 1.5em;
+    .action-button {
+      width: 100%;
+      margin-top: 0.5em;
+      margin-right: 0;
+    }
+  }
+
+}
+
+
+::ng-deep .app-baseline-cancelling {
+  .card-properties-baseline form {
+    .p-field.responsive {
+      margin-right: 0 !important;
+    }
+    .responsive {
+      width: 100% !important;
+    }
+  }
+}
+

@@ -36,6 +36,8 @@ export class StakeholderOrganizationComponent implements OnInit {
   @ViewChild(SaveButtonComponent) saveButton: SaveButtonComponent;
 
   idWorkpack: number;
+  idWorkpackModelLinked: number;
+  idPlan: number;
   workpack: IWorkpack;
   rolesOptions: { label: string; value: string }[];
   organization: IOrganization;
@@ -64,7 +66,9 @@ export class StakeholderOrganizationComponent implements OnInit {
     private router: Router
   ) {
     this.actRouter.queryParams.subscribe(async queryParams => {
+      this.idPlan = queryParams.idPlan;
       this.idWorkpack = queryParams.idWorkpack;
+      this.idWorkpackModelLinked = queryParams.idWorkpackModelLinked;
       this.idOrganization = queryParams.idOrganization;
     });
     this.responsiveSrv.observable.subscribe(value => {
@@ -122,7 +126,7 @@ export class StakeholderOrganizationComponent implements OnInit {
   }
 
   async loadWorkpack() {
-    const result = await this.workpackSrv.GetById(this.idWorkpack);
+    const result = await this.workpackSrv.GetWorkpackById(this.idWorkpack, {'id-plan': this.idPlan});
     if (result.success) {
       this.workpack = result.data;
       this.rolesOptions = this.workpack?.model?.organizationRoles?.map(role => ({ label: role, value: role }));
@@ -297,7 +301,9 @@ export class StakeholderOrganizationComponent implements OnInit {
           ['/workpack'],
           {
             queryParams: {
-              id: this.idWorkpack
+              id: this.idWorkpack,
+              idPlan: this.idPlan,
+              idWorkpackModelLinked: this.idWorkpackModelLinked
             }
           }
         );
@@ -315,7 +321,9 @@ export class StakeholderOrganizationComponent implements OnInit {
           ['/workpack'],
           {
             queryParams: {
-              id: this.idWorkpack
+              id: this.idWorkpack,
+              idPlan: this.idPlan,
+              idWorkpackModelLinked: this.idWorkpackModelLinked
             }
           }
         );

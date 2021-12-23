@@ -1,0 +1,286 @@
+@use "src/variables" as v;
+
+::ng-deep .app-issue {
+  width: 100%;
+  .card-properties-issue{
+    width: 100%;
+    form {
+      width: 100%;
+      padding-bottom: 3em;
+      .p-formgroup-inline {
+        width: 40%;
+        display: grid;
+        margin-top: 1em;
+        grid-template-columns: 1fr 1fr;
+        column-gap: 1em;
+        .p-field {
+          margin-right: 0;
+        }
+        .app-input-number {
+          display: flex;
+          width: 100%;
+          .p-inputnumber {
+            display: flex;
+            width: 100% !important;
+            .p-inputtext {
+              display: flex;
+              width: 100% !important;
+            }
+          }
+        }
+      }
+      .p-formgroup-inline.responsive {
+        width: 100%;
+        display: flex;
+        .app-input-number {
+          display: flex;
+          width: 100%;
+          .p-inputnumber {
+            display: flex;
+            width: 100% !important;
+            .p-inputtext {
+              display: flex;
+              width: 100% !important;
+            }
+          }
+        }
+      }
+      .group-margin-top {
+        margin-top: 1.5em;
+      }
+      .form-group-name-trigged-by{
+        display: flex;
+        flex-direction: row;
+        align-items: flex-end;
+        width: 100%;
+        .p-field {
+          display: flex;
+          flex-direction: column;
+          width: 30%;
+          .p-float-label {
+            width: 100%;
+            .p-inputtext {
+              width: 100%;
+            }
+          }
+        }
+        .triggered-by-container {
+          margin-left: 2em;
+          padding-bottom: 10px;
+          .label-triggered-by {
+            font-size: 12px;
+            font-style: italic;
+            margin-bottom: 10px;
+            color: #6c757d;
+          }
+          .triggered-by-name-container {
+            padding-top: 10px;
+            .app-icon {
+              font-size: 2em;
+            }
+            .high {
+              color: #C0504D;
+            }
+            .medium {
+              color: #ED7D31;
+            }
+            .low {
+              color: #FFC000;
+            }
+            .risk-name {
+              margin-left: 1em;
+            }
+          }
+        }
+      }
+      .form-group {
+        display: flex;
+        flex-direction: row;
+        align-items: flex-end;
+        padding-bottom: 1em;
+        width: 100%;
+        .p-field {
+          display: flex;
+          flex-direction: column;
+          width: 15%;
+          .p-float-label {
+            width: 100%;
+            .p-dropdown {
+              width: 100%;
+            }
+          }
+        }
+        .status-container {
+          display: flex;
+          flex-direction: column;
+          margin-left: 2em;
+          .status-label {
+            font-size: 12px;
+            font-style: italic;
+            margin-top: -.5rem;
+            margin-bottom: 10px;
+            color: #6c757d;
+          }
+        }
+        .status-radios-container {
+          display: flex;
+          flex-direction: row;
+          
+          .status-radio {
+            padding-bottom: 10px;
+          }
+          .opportunity {
+            margin-left: 1em;
+          }
+          .p-radiobutton .p-radiobutton-box {
+            background-color: white !important;
+            border-color: v.$fontInput;
+            &:hover {
+              border-color: v.$fontInput;
+            }
+          }
+          .p-radiobutton .p-radiobutton-box.p-highlight {
+            background-color: white !important;
+            border-color: v.$fontInput;
+            &:hover {
+              border-color: v.$fontInput;
+              background: white !important;
+            }
+            .p-radiobutton-icon {
+              background-color: v.$fontInput;
+            }
+          }
+          p-radiobutton .p-radiobutton .p-radiobutton-box.p-highlight {
+            border-color: v.$fontInput !important;
+            background: white !important;
+            box-shadow: none;
+          }
+          .p-radiobutton.p-radiobutton-focused.p-radiobutton-checked {
+            background-color: white !important;
+            border-color: v.$fontInput;
+            box-shadow: none;
+          }
+          .p-radiobutton .p-radiobutton-box {
+            .p-radiobutton-icon {
+              background-color: v.$fontInput;
+            }
+          }
+        }
+      }
+      .nature-container {
+        display: flex;
+        flex-direction: row;
+        .nature-radio {
+          padding-bottom: 10px;
+          margin-right: 1em;
+        }
+        .opportunity {
+          margin-left: 1em;
+        }
+        .p-radiobutton .p-radiobutton-box {
+          background-color: white !important;
+          border-color: v.$fontInput;
+          &:hover {
+            border-color: v.$fontInput;
+          }
+        }
+        .p-radiobutton .p-radiobutton-box.p-highlight {
+          background-color: white !important;
+          border-color: v.$fontInput;
+          &:hover {
+            border-color: v.$fontInput;
+            background: white !important;
+          }
+          .p-radiobutton-icon {
+            background-color: v.$fontInput;
+          }
+        }
+        p-radiobutton .p-radiobutton .p-radiobutton-box.p-highlight {
+          border-color: v.$fontInput !important;
+          background: white !important;
+          box-shadow: none;
+        }
+        .p-radiobutton.p-radiobutton-focused.p-radiobutton-checked {
+          background-color: white !important;
+          border-color: v.$fontInput;
+          box-shadow: none;
+        }
+        .p-radiobutton .p-radiobutton-box {
+          .p-radiobutton-icon {
+            background-color: v.$fontInput;
+          }
+        }
+      }
+      .p-fluid {
+        margin-top: 1em;
+      }
+      .status-title {
+        margin-top: 0.5em;
+      }
+      .likely-to-happen {
+        margin-top: 1em;
+      }
+      ::ng-deep .p-field.responsive {
+        margin-right: 0 !important;
+      }
+      ::ng-deep .responsive {
+        width: 100% !important;
+        .p-calendar {
+          width: 100%;
+        }
+      }
+    }
+  }
+  ::ng-deep .dataview-card-items-issue {
+    position: static !important;
+    background-color: transparent;
+    .p-dataview-content, .p-grid {
+      background-color: transparent;
+    }
+    .card-item-container {
+      padding: 0.5em;
+      min-height: 9.5em !important;
+      &:first-child {
+        padding: 0.5em 0.5em 0.5em 0;
+      }
+    }
+    .card-item-container.responsive {
+      padding: 0.5em 0;
+    }
+  }
+}
+
+::ng-deep .app-issue {
+  .card-properties-issue.responsive form {
+    padding-bottom: 1.5em;
+    .form-group {
+      flex-direction: column;
+      align-items: flex-start;
+      .p-field {
+        width: 100%;
+        .p-inputtext {
+          width: 100%;
+        }
+      }
+    }
+    .form-group-name-trigged-by {
+      flex-direction: column;
+      align-items: flex-start;
+      .p-field {
+        width: 100%;
+        .p-inputtext {
+          width: 100%;
+        }
+      }
+      .triggered-by-container {
+        margin-left: 0;
+        margin-top: 1em;
+        margin-bottom: 1em;
+      }
+    }
+    .status-container {
+      margin-left: 0;
+      margin-top: 1.5em;
+    }
+  }
+}

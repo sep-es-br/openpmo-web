@@ -26,8 +26,8 @@ export class ScheduleService extends BaseService<any> {
     return this.http.get<IHttpResult<IStep>>(`${this.urlBase}/step/${id}`).toPromise();
   }
 
-  public postSchedule(stakeholder: ISchedule): Promise<IHttpResult<ISchedule>> {
-    return this.http.post(`${this.urlBase}`, stakeholder).toPromise() as Promise<IHttpResult<ISchedule>>;
+  public postSchedule(schedule: ISchedule): Promise<IHttpResult<ISchedule>> {
+    return this.http.post(`${this.urlBase}`, schedule).toPromise() as Promise<IHttpResult<ISchedule>>;
   }
 
   public putScheduleStep(step: IStepPost): Promise<IHttpResult<IStepPost>> {

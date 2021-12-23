@@ -6,7 +6,7 @@
 
   .home {
     display: flex;
-    align-items: center;
+    flex-direction: column;
     min-height: 70px;
     padding: 1.2rem 0;
     margin-top: -5px;
@@ -14,11 +14,16 @@
     top: 0;
     left: 0;
     background-color: #eaeae8;
-    box-shadow: -5px 0px 10px 7px #eaeae8;
     z-index: 500;
-
+    .name {
+      font-size: 12px;
+      font-family: v.$fontFamilyRegular;
+      color: v.$fontBreadcrumbMobile;
+      margin-left: 5px;
+    }
     i {
       cursor: pointer;
+      padding-top: 0.6rem;
     }
     &.adjust-padding {
       padding-bottom: 15px;
@@ -76,7 +81,7 @@
         overflow: hidden;
         text-overflow: ellipsis;
         margin-top: .1rem;
-        margin-bottom: -1.2rem;
+        margin-bottom: -1rem;
         padding: 0 .5rem;
       }
     }

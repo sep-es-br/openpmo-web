@@ -1,0 +1,31 @@
+<ng-container [ngSwitch]="properties.typeCardItem">
+  <p-card *ngSwitchCase="'listItem'" class="app-card-item-office listItem" [class.mobile]="responsive" [class.cardList]="displayModeCard === 'list'">
+    <p-header class="card-item-header">
+        <i class="fas fa-trash" (click)="handleDeleteOffice(properties.office)"></i>
+        <i class="fas fa-tools" (click)="navigateToPage(properties.urlMenuConfig, properties.paramsUrlMenuConfig)"></i>
+    </p-header>
+    <div class="card-item-content" [class.card-link]="properties.urlCard" [routerLink]="properties.urlCard" [class.cardList]="displayModeCard === 'list'"
+      [queryParams]="getQueryParams()">
+      <i [ngClass]="properties.iconSvg ? [ 'app-icon', properties.icon, 'grey-icon'] : [ 'icon-card', properties.icon, 'grey-icon' ]"
+        [class.risk-red]="properties.iconColor === 'high'"
+        [class.risk-orange]="properties.iconColor === 'medium'"
+        [class.risk-yellow]="properties.iconColor === 'low'"
+        [ngStyle]="{ fontSize: '2.5rem' }"></i>
+      <span class="card-item-name" [pTooltip]="properties.fullNameCardItem"
+      tooltipPosition="bottom">{{properties.nameCardItem}}</span>
+    </div>
+    <div class="card-item-footer" *ngIf="cardIdItem">
+      <span class="card-item-id">
+        {{cardIdItem}}
+      </span>
+    </div>
+  </p-card>
+  <p-card *ngSwitchCase="'newCardItem'" class="new-carditem" [class.card-link]="properties.urlCard" [class.mobile]="responsive" [class.cardList]="displayModeCard === 'list'"
+  [class.new-card-item-mobile]="responsive" (click)="properties.urlCard && navigateToPage(properties.urlCard, properties.paramsUrlCard)">
+  <div class="carditem-content">
+    <i [ngClass]="[ 'app-icon', properties.icon, 'light-grey-icon']" (click)=" properties.iconMenuItems && menuIcon.toggle($event)"
+      [ngStyle]="{ fontSize: (responsive ? 2 : 3) + 'rem' }" [class.card-link]="properties.iconMenuItems"></i>
+    <p-menu #menuIcon [popup]="true" [model]="properties.iconMenuItems"></p-menu>
+  </div>
+</p-card>
+</ng-container>

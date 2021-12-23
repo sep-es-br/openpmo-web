@@ -1,0 +1,11 @@
+::ng-deep .app-property-selection {
+  .p-multiselect {
+    width: 100%;
+  }
+}
+
+::ng-deep .app-property-selection {
+  .app-single-selection .p-dropdown {
+    width: 100%;
+  }
+}

@@ -1,11 +1,13 @@
 <div class="app-plan">
-  <div class="app-content-header" [class.mobile]="responsive">
-    <span *ngIf="idPlan; else newPlanTitle">{{ planData?.name }}</span>
-    <ng-template #newPlanTitle>
-      <span>{{ 'newPlan' | translate }}</span>
-    </ng-template>
+  <div class="header-container" [class.mobile]="responsive">
+    <div class="app-content-header" [class.mobile]="responsive">
+      <span *ngIf="idPlan"> <span class="label">{{ 'plan' | translate }}:</span> {{ planData?.name }}</span>
+      <span *ngIf="!idPlan">{{ 'newPlan' | translate }}</span>
+    </div>
+    <app-config-data-view-panel (changeCollapsedExpand)="handleChangeCollapseExpandPanel($event)"
+      (changeDisplayMode)="handleChangeDisplayMode($event)" (changePageSize)="handleChangePageSize($event)">
+    </app-config-data-view-panel>
   </div>
-
   <div class="card-properties-plan">
     <app-card [properties]="cardPlanProperties" class="mt-0 inputs-float-label">
       <div class="p-grid">
@@ -32,10 +34,8 @@
             <div class="p-field" [class.responsive]="responsive">
               <span class="p-float-label" [class.responsive]="responsive">
                 <p-calendar id="float-start" formControlName="start" class="app-select-date" showIcon="true"
-                  [monthNavigator]="true" [yearNavigator]="true" yearRange="2020:2030"
-                  [class.responsive]="responsive"
-                  icon="fas fa-calendar-alt"
-                  [dateFormat]="calendarFormat">
+                  [monthNavigator]="true" [yearNavigator]="true" yearRange="2020:2030" [class.responsive]="responsive"
+                  icon="fas fa-calendar-alt" [dateFormat]="calendarFormat">
                 </p-calendar>
                 <label class="app-input-label" for="float-start">{{ "start" | translate }} * </label>
               </span>
@@ -59,12 +59,27 @@
   </div>
 
   <section *ngIf="idPlan" class="workpackModels-cards-section">
-    <div class="card-workpack-model" *ngFor="let workpackModel of cardsPlanWorkPackModels">
-      <app-card [properties]="workpackModel.propertiesCard" *ngIf="workpackModel.workPackItemCardList?.length > 0">
-        <p-dataView [value]="workpackModel.workPackItemCardList" layout="grid" class="app-dataview" [emptyMessage]="'loadingEllipsis' | translate">
+    <div class="card-workpack-model" *ngFor="let workpackModel of cardsPlanWorkPackModels; let i = index">
+      <app-card [properties]="workpackModel.propertiesCard" *ngIf="workpackModel.workPackItemCardList?.length > 0"
+        (editFilter)="handleEditFilter($event, workpackModel.idWorkpackModel)" (newFilter)="handleNewFilter(workpackModel.idWorkpackModel)"
+        (selectedFilter)="handleSelectedFilter($event, workpackModel.idWorkpackModel)" (createNewElement)="handleCreateNewWorkpack(workpackModel.idWorkpackModel)">
+        <p-dataView [value]="workpackModel.workPackItemCardList" layout="grid" class="app-dataview"
+          *ngIf="displayModeAll === 'grid'" [paginator]="true" [rows]="pageSize" [showJumpToPageDropdown]="true"
+          [showPageLinks]="false" [totalRecords]="totalRecords ? totalRecords[i] : 1"
+          [emptyMessage]="'loadingEllipsis' | translate">
           <ng-template let-cardItem pTemplate="gridItem">
             <div class="p-col-12 p-md-3 p-sm-12 card-item-container">
               <app-card-item [properties]="cardItem"></app-card-item>
+            </div>
+          </ng-template>
+        </p-dataView>
+        <p-dataView [value]="workpackModel.workPackItemCardList" layout="list" class="app-dataview app-dataview-list"
+          *ngIf="displayModeAll === 'list'" [paginator]="true" [rows]="pageSize" [showJumpToPageDropdown]="true"
+          [showPageLinks]="false" [totalRecords]="totalRecords ? totalRecords[i] : 1"
+          [emptyMessage]="'loadingEllipsis' | translate">
+          <ng-template let-cardItem pTemplate="listItem">
+            <div class="p-col-12">
+              <app-card-item [properties]="cardItem" [displayModeCard]="displayModeAll"></app-card-item>
             </div>
           </ng-template>
         </p-dataView>

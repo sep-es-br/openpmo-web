@@ -1,0 +1,31 @@
+<div class="app-administrator-list">
+  <div class="header-container" [class.mobile]="responsive">
+    <app-config-data-view-panel (changeCollapsedExpand)="handleChangeCollapseExpandPanel($event)"
+      (changeDisplayMode)="handleChangeDisplayMode($event)" (changePageSize)="handleChangePageSize($event)">
+    </app-config-data-view-panel>
+  </div>
+  <div class="card-permissions" *ngIf="idCurrentPerson">
+    <app-card [properties]="cardAdministrators"
+      *ngIf="cardItemsAdministrators && cardItemsAdministrators.length > 0" class="mt-0">
+      <p-dataView [value]="cardItemsAdministrators" layout="grid" class="app-dataview"
+        *ngIf="displayModeAll === 'grid'" [paginator]="true" [rows]="pageSize" [showJumpToPageDropdown]="true"
+        [showPageLinks]="false" [totalRecords]="totalRecords" [emptyMessage]="'loadingEllipsis' | translate">
+        <ng-template let-cardItem pTemplate="gridItem">
+          <div class="p-col-12 p-md-3 p-sm-12 card-item-container">
+            <app-card-item-permission [properties]="cardItem"></app-card-item-permission>
+          </div>
+        </ng-template>
+      </p-dataView>
+      <p-dataView [value]="cardItemsAdministrators" layout="list" class="app-dataview app-dataview-list"
+        *ngIf="displayModeAll === 'list'" [paginator]="true" [rows]="pageSize" [showJumpToPageDropdown]="true"
+        [showPageLinks]="false" [totalRecords]="totalRecords" [emptyMessage]="'loadingEllipsis' | translate">
+        <ng-template let-cardItem pTemplate="listItem">
+          <div class="p-col-12">
+            <app-card-item-permission [properties]="cardItem" [displayModeCard]="displayModeAll">
+            </app-card-item-permission>
+          </div>
+        </ng-template>
+      </p-dataView>
+    </app-card>
+  </div>
+</div>

@@ -1,23 +1,26 @@
 <div class="app-domain">
-  <div class="app-content-header" [class.mobile]="responsive">
-    <span *ngIf="idDomain; else newDomainTitle">{{ propertiesDomain?.name }}</span>
-    <ng-template #newDomainTitle>
-      <span>{{ 'new' | translate }} {{ 'domain' | translate }}</span>
-    </ng-template>
+  <div class="header-container" [class.mobile]="responsive">
+    <div class="app-content-header" [class.mobile]="responsive">
+      <span *ngIf="idDomain">{{ propertiesDomain?.name }}</span>
+      <span *ngIf="!idDomain">{{ 'new' | translate }} {{ 'domain' | translate }}</span>
+    </div>
+    <app-config-data-view-panel (changeCollapsedExpand)="handleChangeCollapseExpandPanel($event)"
+        (changeDisplayMode)="handleChangeDisplayMode($event)" (changePageSize)="handleChangePageSize($event)">
+      </app-config-data-view-panel>
   </div>
   <div class="card-properties" *ngIf="cardProperties">
     <app-card [properties]="cardProperties" class="mt-0 inputs-float-label">
       <div>
         <form [formGroup]="formDomain">
           <span class="p-float-label">
-            <input id="float-input" formControlName="name" type="text" pInputText class="app-input-text"
-              [class.mobile]="responsive" [class.desktop]="!responsive">
+            <input formControlName="name" type="text" pInputText class="app-input-text" [class.mobile]="responsive"
+              [class.desktop]="!responsive">
             <label for="float-input" class="app-input-label">{{'name' | translate}}<span
                 class="required-indicator">*</span></label>
           </span>
           <app-input-message [form]="formDomain" field="name"></app-input-message>
           <span class="p-float-label margin-top">
-            <textarea pInputTextarea id="float-input" formControlName="fullName" class="app-text-area" rows="1">
+            <textarea pInputTextarea formControlName="fullName" class="app-text-area" rows="1">
               </textarea>
             <label for="float-input" class="app-input-label">{{'fullName' | translate}}<span
                 class="required-indicator">*</span></label>
@@ -27,14 +30,64 @@
       </div>
     </app-card>
   </div>
-  <section *ngIf="propertiesDomain" class="domains-cards-section">
-    <div class="card-plans">
-      <app-card [properties]="cardLocalities">
-        <p-dataView [value]="cardItemsLocalities" layout="grid" class="app-dataview"
-          [emptyMessage]="(!cardItemsLocalities ? 'loadingEllipsis' : 'noContent') | translate">
+  <div class="card-properties locality-root" *ngIf="cardLocalityRoot && !propertiesDomain?.localityRoot">
+    <app-card [properties]="cardLocalityRoot" class="mt-0 inputs-float-label">
+      <div>
+        <form [formGroup]="formLocalityRoot">
+          <span class="p-float-label">
+            <input formControlName="name" type="text" pInputText class="app-input-text"
+              [class.mobile]="responsive" [class.desktop]="!responsive">
+            <label for="float-input" class="app-input-label">{{'name' | translate}}<span
+                class="required-indicator">*</span></label>
+          </span>
+          <app-input-message [form]="formLocalityRoot" field="name"></app-input-message>
+          <span class="p-float-label">
+            <textarea pInputTextarea formControlName="fullName" class="app-text-area" rows="1">
+              </textarea>
+            <label for="float-input" class="app-input-label">{{'fullName' | translate}}<span
+                class="required-indicator">*</span></label>
+          </span>
+          <app-input-message [form]="formLocalityRoot" field="fullName"></app-input-message>
+          <div class="p-grid">
+            <span class="p-col-12 p-md-6 p-lg-3 p-float-label">
+              <input formControlName="latitude" type="text" pInputText pKeyFilter="num"
+                class="app-input-text" [class.mobile]="responsive" [class.desktop]="!responsive">
+              <label for="float-input" class="app-input-label">GPS Latitude</label>
+            </span>
+            <app-input-message [form]="formLocalityRoot" field="latitude"></app-input-message>
+            <span class="p-col-12 p-md-6 p-lg-3 p-float-label">
+              <input formControlName="longitude" type="text" pInputText pKeyFilter="num"
+                class="app-input-text" [class.mobile]="responsive" [class.desktop]="!responsive">
+              <label for="float-input" class="app-input-label">GPS Longitude</label>
+            </span>
+            <app-input-message [form]="formLocalityRoot" field="longitude"></app-input-message>
+          </div>
+        </form>
+      </div>
+    </app-card>
+  </div>
+  <section *ngIf="propertiesDomain && localities?.length > 0" class="domains-cards-section">
+    <div class="card-plans" *ngIf="cardLocalityRoot">
+      <app-card [properties]="cardLocalityRoot" (editFilter)="handleEditFilter($event)" (newFilter)="handleNewFilter()"
+        (selectedFilter)="handleSelectedFilter($event)" (createNewElement)="createNewLocality()">
+        <p-dataView [value]="cardItemsLocalities" layout="grid" class="app-dataview" *ngIf="displayModeAll === 'grid'"
+          [paginator]="true" [rows]="pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false"
+          [totalRecords]="totalRecords"
+          [emptyMessage]="(!cardItemsLocalities ? 'loadingEllipsis' : 'noContentLocalityRoot') | translate">
           <ng-template let-cardItem pTemplate="gridItem">
             <div class="p-col-12 p-md-3 p-sm-12 card-item-container">
               <app-card-item [properties]="cardItem"></app-card-item>
+            </div>
+          </ng-template>
+        </p-dataView>
+
+        <p-dataView [value]="cardItemsLocalities" layout="list" class="app-dataview app-dataview-list"
+          *ngIf="displayModeAll === 'list'" [paginator]="true" [rows]="pageSize" [showJumpToPageDropdown]="true"
+          [showPageLinks]="false" [totalRecords]="totalRecords"
+          [emptyMessage]="(!cardItemsLocalities ? 'loadingEllipsis' : 'noContentLocalityRoot') | translate">
+          <ng-template let-cardItem pTemplate="listItem">
+            <div class="p-col-12">
+              <app-card-item [properties]="cardItem" [displayModeCard]="displayModeAll"></app-card-item>
             </div>
           </ng-template>
         </p-dataView>

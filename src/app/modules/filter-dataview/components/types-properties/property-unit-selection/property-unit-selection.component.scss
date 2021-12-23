@@ -1,0 +1,7 @@
+@use "src/variables" as v;
+
+::ng-deep .app-property-unit-selection {
+  .app-single-selection .p-dropdown {
+    width: 100%;
+  }
+}

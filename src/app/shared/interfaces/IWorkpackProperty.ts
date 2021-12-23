@@ -5,4 +5,5 @@ export interface IWorkpackProperty {
   value?: string | number | boolean | string[] | number[] | Date;
   selectedValues?: number[];
   selectedValue?: number;
+  groupedProperties?: IWorkpackProperty[];
 }

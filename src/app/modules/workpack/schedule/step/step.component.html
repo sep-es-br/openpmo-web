@@ -1,6 +1,7 @@
 <div class="app-step">
   <div class="app-content-header" [class.mobile]="responsive">
-    <span *ngIf="this.idStep; else newStepTitle">{{ this.stepDetail?.periodFromStart | date: 'MMMM': 'UTC': currentLang }}</span>
+    <span *ngIf="this.idStep; else newStepTitle">{{ this.stepDetail?.periodFromStart | date: 'MMMM': 'UTC': currentLang
+      }}</span>
     <ng-template #newStepTitle>
       <span>{{ "newMonth" | translate }}</span>
     </ng-template>
@@ -11,30 +12,20 @@
       <div class="p-grid">
         <form [formGroup]="formStep">
           <div class="p-formgroup-inline" [class.responsive]="responsive">
-            <div class="p-field" [class.responsive]="responsive" *ngIf="stepType === 'start'">
+            <div class="p-field" [class.responsive]="responsive" *ngIf="stepType === 'start' || stepType === 'newStart'">
               <span class="p-float-label" [class.responsive]="responsive">
-                <p-calendar id="float-start" class="app-select-date" showIcon="true"
-                  [minDate]="minStart"
-                  [maxDate]="maxStart"
-                  [defaultDate]="start"
-                  formControlName="start"
-                  (onSelect)="showSaveButton = true"
-                  [class.responsive]="responsive" icon="fas fa-calendar-alt"
-                  [dateFormat]="calendarFormat">
+                <p-calendar id="float-start" class="app-select-date" showIcon="true" [minDate]="minStart"
+                  [maxDate]="maxStart" [defaultDate]="start" formControlName="start" (onSelect)="showSaveButton = true"
+                  [class.responsive]="responsive" icon="fas fa-calendar-alt" [dateFormat]="calendarFormat">
                 </p-calendar>
                 <label class="app-input-label" for="float-start">{{ "start" | translate }}</label>
               </span>
             </div>
-            <div class="p-field" [class.responsive]="responsive" *ngIf="stepType === 'end'">
+            <div class="p-field" [class.responsive]="responsive" *ngIf="stepType === 'end' || stepType === 'newEnd'">
               <span class="p-float-label" [class.responsive]="responsive">
                 <p-calendar id="float-end" formControlName="end" class="app-select-date" showIcon="true"
-                 [class.responsive]="responsive"
-                  icon="fas fa-calendar-alt"
-                  [minDate]="minEnd"
-                  [maxDate]="maxEnd"
-                  [defaultDate]="end"
-                  (onSelect)="showSaveButton = true"
-                  [dateFormat]="calendarFormat">
+                  [class.responsive]="responsive" icon="fas fa-calendar-alt" [minDate]="minEnd" [maxDate]="maxEnd"
+                  [defaultDate]="end" (onSelect)="showSaveButton = true" [dateFormat]="calendarFormat">
                 </p-calendar>
                 <label class="app-input-label" class="properties-label" for="float-end">{{ "finish" |
                   translate}}</label>
@@ -47,13 +38,22 @@
               <div class="p-formgroup-inline" [class.responsive]="responsive">
                 <div class="p-field" [class.responsive]="responsive">
                   <span class="p-float-label" [class.responsive]="responsive">
-                    <app-input-unit-measure [form]="formStep" controlName="plannedWork" (onInput)="handleChangeTotalsValues()"></app-input-unit-measure>
+                    <!-- <app-input-unit-measure [form]="formStep" controlName="plannedWork" (onInput)="handleChangeTotalsValues()"></app-input-unit-measure> -->
+                    <p-inputNumber class="app-input-number" formControlName="plannedWork"
+                      (change)="handleChangeTotalsValues()" [minFractionDigits]="unitPrecision"
+                      [maxFractionDigits]="unitPrecision" [locale]="currentLang === 'pt-BR' ? 'pt-BR' : 'en-US'">
+                    </p-inputNumber>
                     <label class="app-input-label">{{unitName}} {{ "planned" |translate }} * </label>
                   </span>
                 </div>
                 <div class="p-field" [class.responsive]="responsive">
                   <span class="p-float-label" [class.responsive]="responsive">
-                    <app-input-unit-measure [form]="formStep" controlName="actualWork" (onInput)="handleChangeTotalsValues()"></app-input-unit-measure>
+                    <!-- <app-input-unit-measure [form]="formStep" controlName="actualWork"
+                      (onInput)="handleChangeTotalsValues()"></app-input-unit-measure> -->
+                    <p-inputNumber class="app-input-number" formControlName="actualWork"
+                      (change)="handleChangeTotalsValues()" [minFractionDigits]="unitPrecision"
+                      [maxFractionDigits]="unitPrecision" [locale]="currentLang === 'pt-BR' ? 'pt-BR' : 'en-US'">
+                    </p-inputNumber>
                     <label class="app-input-label" for="float-actual">{{unitName}} {{ "actual" |translate }}</label>
                   </span>
                 </div>
@@ -76,7 +76,8 @@
     <div class="card-cost-assignments" *ngIf="cardCostAssignmentsProperties">
       <app-card [properties]="cardCostAssignmentsProperties">
         <div class="card-item-costs-container">
-          <p-dataView [value]="costAssignmentsCardItems" layout="grid" styleClass="dataview-card-items-cost" [emptyMessage]="'loadingEllipsis' | translate">
+          <p-dataView [value]="costAssignmentsCardItems" layout="grid" styleClass="dataview-card-items-cost"
+            [emptyMessage]="'loadingEllipsis' | translate">
             <ng-template let-cardItem pTemplate="gridItem">
               <div class="p-col-12 p-md-3 p-sm-12 card-item-container" [class.responsive]="responsive">
                 <app-cost-assignment-card-item [properties]="cardItem" (costChanged)="handleChangeValuesCardItems()">

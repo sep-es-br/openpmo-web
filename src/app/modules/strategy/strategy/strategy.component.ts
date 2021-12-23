@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ActivatedRoute, Router} from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { Subject } from 'rxjs';
 import { filter, takeUntil } from 'rxjs/operators';
@@ -46,6 +46,14 @@ export class StrategyComponent implements OnDestroy {
   isUserAdmin: boolean;
   editPermission: boolean;
   permissionsOffices: IOffice[];
+  collapsePanelsStatus = true;
+  displayModeAll = 'grid';
+  pageSize = 5;
+  totalRecords: number;
+  sharingProperties: ICard;
+  sharedWith: IOffice[] = [];
+  sharedWithAll = false;
+  officeListOptionsSharing: IOffice[];
 
   constructor(
     private formBuilder: FormBuilder,
@@ -72,7 +80,7 @@ export class StrategyComponent implements OnDestroy {
       .pipe(takeUntil(this.$destroy), filter(() => this.formStrategy.dirty))
       .subscribe(() => this.saveButton.showButton());
     this.responsiveSvr.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.responsive = value);
-    this.activeRoute.queryParams.subscribe(async({ id, idOffice }) => {
+    this.activeRoute.queryParams.subscribe(async ({ id, idOffice }) => {
       this.idStrategy = +id;
       this.idOffice = +idOffice;
       const resultOffice = await this.officeSrv.GetById(this.idOffice);
@@ -87,20 +95,28 @@ export class StrategyComponent implements OnDestroy {
       if (this.idStrategy) {
         await this.loadModels();
       }
+      await this.loadOfficeListOptionsSharing();
       await this.loadPropertiesStrategy();
       this.breadcrumbSrv.setMenu([
         {
-          key: 'strategies',
+          key: 'administration',
           info: this.propertiesOffice?.name,
           tooltip: this.propertiesOffice?.fullName,
-          routerLink: [ '/strategies' ],
+          routerLink: ['/configuration-office'],
           queryParams: { idOffice: this.idOffice }
         },
         {
-          key: 'strategy',
+          key: 'planModels',
+          info: this.propertiesOffice?.name,
+          tooltip: this.propertiesOffice?.fullName,
+          routerLink: ['/strategies'],
+          queryParams: { idOffice: this.idOffice }
+        },
+        {
+          key: 'planModel',
           info: this.propertiesStrategy?.name,
           tooltip: this.propertiesStrategy?.fullName,
-          routerLink: [ '/strategies', 'strategy' ],
+          routerLink: ['/strategies', 'strategy'],
           queryParams: { id: this.idStrategy, idOffice: this.idOffice }
         }
       ]);
@@ -110,6 +126,30 @@ export class StrategyComponent implements OnDestroy {
   ngOnDestroy(): void {
     this.$destroy.next();
     this.$destroy.complete();
+  }
+
+  handleChangeCollapseExpandPanel(event) {
+    this.collapsePanelsStatus = event.mode === 'collapse' ? true : false;
+    this.cardProperties = Object.assign({}, {
+      ...this.cardProperties,
+      initialStateCollapse: this.collapsePanelsStatus
+    });
+    this.cardModels = Object.assign({}, {
+      ...this.cardModels,
+      initialStateCollapse: this.collapsePanelsStatus
+    });
+    this.sharingProperties = Object.assign({}, {
+      ...this.sharingProperties,
+      initialStateCollapse: this.collapsePanelsStatus
+    });
+  }
+
+  handleChangeDisplayMode(event) {
+    this.displayModeAll = event.displayMode;
+  }
+
+  handleChangePageSize(event) {
+    this.pageSize = event.pageSize;
   }
 
   loadCards() {
@@ -127,6 +167,13 @@ export class StrategyComponent implements OnDestroy {
       collapseble: true,
       initialStateCollapse: false
     };
+    this.sharingProperties = {
+      toggleable: false,
+      initialStateToggle: false,
+      cardTitle: 'sharing',
+      collapseble: true,
+      initialStateCollapse: false
+    };
   }
 
   async loadPropertiesStrategy() {
@@ -138,6 +185,12 @@ export class StrategyComponent implements OnDestroy {
           name: this.propertiesStrategy?.name,
           fullName: this.propertiesStrategy?.fullName
         });
+        this.sharedWith = data.sharedWithAll ? [{
+          id: null,
+          name: 'All',
+          fullName: 'All'
+        }] : data.sharedWith;
+        this.sharedWithAll = data.sharedWithAll;
         if (!this.editPermission) {
           this.formStrategy.disable();
         }
@@ -145,15 +198,41 @@ export class StrategyComponent implements OnDestroy {
     }
   }
 
+  async loadOfficeListOptionsSharing() {
+    const result = await this.officeSrv.GetAll();
+    if (result.success) {
+      this.officeListOptionsSharing = result.data && result.data.filter( office => office.id !== this.idOffice);
+      this.officeListOptionsSharing.unshift({
+        id: null,
+        name: 'All',
+        fullName: 'All'
+      });
+    }
+  }
+
+  checkSelectAllOffices(event) {
+    if (event.itemValue && event.itemValue.name === 'All') {
+      this.sharedWith = Array.from(this.sharedWith.filter(op => op.name === 'All'));
+      this.sharedWithAll = true;
+    } else {
+      this.sharedWith = Array.from(this.sharedWith.filter(op => op.name !== 'All'));
+      this.sharedWithAll = false;
+    }
+    if (this.formStrategy.valid) {
+      this.saveButton.showButton();
+    }
+  }
+
   async loadModels() {
     const result = await this.workpackModelSvr.GetAll({ 'id-plan-model': this.idStrategy });
     if (result.success) {
+      this.totalRecords = result.data.length ? result.data.length + 1 : 1;
       this.models = result.data;
     }
     this.loadCardItemsModels();
   }
 
-  navigateToWorkpackModel(type: string){
+  navigateToWorkpackModel(type: string) {
     this.router.navigate(['/workpack-model'], {
       queryParams: {
         type,
@@ -191,7 +270,7 @@ export class StrategyComponent implements OnDestroy {
             icon: 'fas fa-folder-open'
           },
         ],
-        paramsUrlCard: [{name: 'idStrategy', value: this.idStrategy}]
+        paramsUrlCard: [{ name: 'idStrategy', value: this.idStrategy }]
       }
     ] : [];
     if (this.models) {
@@ -222,25 +301,35 @@ export class StrategyComponent implements OnDestroy {
     this.cardItemsModels = itemsModels;
   }
 
-  async deleteWorkpackModel(worckpackModel: IWorkpackModel){
+  async deleteWorkpackModel(worckpackModel: IWorkpackModel) {
     const result = await this.workpackModelSvr.delete(worckpackModel, { field: 'modelName' });
     if (result.success) {
       await this.loadModels();
-      // Check
     }
   }
 
   async handleOnSubmit() {
     const isPut = !!this.propertiesStrategy;
     const { success, data } = isPut
-      ? await this.planModelSvr.put({ ...this.formStrategy.value, id: this.idStrategy, idOffice: this.propertiesStrategy.idOffice })
-      : await this.planModelSvr.post({...this.formStrategy.value, idOffice: this.idOffice});
+      ? await this.planModelSvr.put({
+        ...this.formStrategy.value,
+        id: this.idStrategy,
+        idOffice: this.propertiesStrategy.idOffice,
+        sharedWith: this.sharedWith,
+        sharedWithAll: this.sharedWithAll
+      })
+      : await this.planModelSvr.post({
+        ...this.formStrategy.value,
+        idOffice: this.idOffice,
+        sharedWith: this.sharedWith,
+        sharedWithAll: this.sharedWithAll
+      });
 
     if (success) {
       this.idStrategy = data.id;
       this.breadcrumbSrv.updateLastCrumb({
-        key: 'strategy',
-        routerLink: ['/strategies', 'strategy' ],
+        key: 'planModel',
+        routerLink: ['/strategies', 'strategy'],
         queryParams: { id: this.idStrategy, idOffice: this.idOffice },
         info: isPut ? this.propertiesStrategy?.name : this.formStrategy.controls.name?.value,
         tooltip: isPut ? this.propertiesStrategy?.fullName : this.formStrategy.controls.fullName?.value,

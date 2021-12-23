@@ -1,10 +1,5 @@
 @use "src/variables" as v;
 
-::ng-deep .app-card-item-permission.new-card-item .p-card {
-  width: 100%;
-  height: 100%;
-}
-
 ::ng-deep .app-card-item-permission .p-card {
   display: flex;
   flex-direction: column;
@@ -53,7 +48,19 @@
       font-family: v.$fontFamilyMedium;
       color: v.$fontTitle;
       padding: 0.7em;
+      white-space: nowrap;
+      word-break: break-word;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
+    .card-item-title-shared {
+      font-size: 1rem;
+      font-family: v.$fontFamilyMedium;
+      color: v.$fontTitle;
+      font-weight: bold;
+      padding: 0.7em;
+    }
+
   }
   .p-card-body {
     :focus{
@@ -82,12 +89,29 @@
   }
 
   .card-item-content {
-    padding: 0 2em 4em 0;
+    padding: 0 2em 3em 0;
     .card-item-role-description {
       font-size: 1rem;
       font-family: v.$fontFamilyMedium;
       padding: 0.2em 0.7em;
       color: v.$fontLabel;
+    }
+  }
+}
+
+::ng-deep .app-card-item-permission.listItem.mobile .p-card {
+  width: 100%;
+  max-width: 100%;
+}
+
+::ng-deep .app-card-item-permission {
+  &.cardList {
+    .p-card {
+      max-width: 100%;
+      width: 100%;
+      .card-item-name {
+        flex: none;
+      }
     }
   }
 }
@@ -121,7 +145,7 @@
 
 }
 
-::ng-deep .app-card-item-permission.new-card-item {
+::ng-deep .new-card-item {
   .p-card {
     background-color: transparent;
     cursor: pointer;
@@ -162,25 +186,70 @@
       .card-item-container {
         height: 100%;
       }
+      p-tieredmenu {
+        .p-tieredmenu-overlay ul {
+          max-width: 20em;
+          .p-menuitem .p-menuitem-link {
+            .p-menuitem-icon {
+              font-size: 0.8rem;
+              color: #939393;
+            }
+            .p-menuitem-text {
+              font-size: 0.9rem;
+              font-family: v.$fontFamilyMedium;
+              color: #939393;
+            }
+          }
+        }
+      }
+    }
+  }
+  &.cardList {
+    .p-card {
+      max-width: 100%;
+      width: 100%;
+      .p-card-content {
+        padding: 0;
+      }
     }
   }
 }
 
-// .p-panel-content {
-//   min-height: 13.5em !important;
-//   .card-item-container {
-//     min-height: 9.5em !important;
-//   }
-// }
-::ng-deep .app-card-item-permission.new-card-item.new-card-item-mobile {
+::ng-deep .new-card-item.new-card-item-mobile {
   display: flex;
   justify-content: center;
   align-items: center;
   width: 100%;
   height: 100%;
+  flex: 1;
+  padding: 1em;
+  .p-card {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 30%;
+    height: 60%;
+    padding: 1em 0;
+    .p-card-body {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex: 1;
+    }
+    .p-card-body .p-card-content .card-item-content {
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      height: 100%;
+      width: 100%;
+      min-height: 60px;
+    }
+  }
 }
 
-::ng-deep .app-card-item-permission.new-card-item.new-card-item-mobile .p-card {
-  width: 30%;
-  height: 50%;
-}
+// ::ng-deep .app-card-item-permission.new-card-item.new-card-item-mobile .p-card {
+//   width: 30%;
+//   height: 50%;
+// }

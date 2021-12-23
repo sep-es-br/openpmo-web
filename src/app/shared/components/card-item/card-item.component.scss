@@ -1,8 +1,7 @@
 @use "src/variables" as v;
 
 ::ng-deep .app-card-item {
-
-  .p-card {
+    .p-card {
     display: flex;
     flex-direction: column;
     flex: 1;
@@ -20,6 +19,10 @@
           .p-menuitem-icon {
             font-size: 0.8rem;
             color: #939393;
+          }
+          .p-menuitem-icon.fa-times {
+            font-size: 1rem;
+            color: #EA5C5C;
           }
           .p-menuitem-text {
             font-size: 0.9rem;
@@ -41,7 +44,26 @@
           color: #939393;
         }
       }
+      .card-item-header .menu-config {
+        padding: 10px;
+        cursor: pointer;
+        .fa-tools {
+          font-size: 1.1rem;
+          transform: rotate(30deg);
+          color: #939393;
+        }
+      }
+
+      .card-item-header .button-change {
+            display: flex;
+            flex-direction: column;
+            background-color: #44b39b;
+            border: none;
+            font-size: 0.7rem;
+            margin: 0.4rem 0.4rem 0 0;
+      }
     }
+
     .p-card-body {
       padding: 0;
       height: 100%;
@@ -64,10 +86,28 @@
       align-items: center;
       color: #888e96;
       padding: 0 !important;
+      .icons-container {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        .linked {
+          margin-left: 0.5em;
+        }
+      }
 
       .icon-card {
         font-size: 2.5rem;
         color: #888e96;
+      }
+      .risk-red {
+        color: #C0504D;
+      }
+      .risk-orange {
+        color: #ED7D31;
+      }
+      .risk-yellow {
+        color: #FFC000;
       }
       .icon-new {
         font-size: 3rem;
@@ -82,10 +122,34 @@
         align-items: center;
         text-align: center;
       }
+      .role {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: #009dd4;
+      }
       .card-item-subtitle {
         font-size: 0.8rem;
         font-family: v.$fontFamilyMedium;
         color: #009dd4;
+        &.role {
+          text-align: center;
+          width: 80%;
+          display: inline-block;
+          white-space: nowrap;
+          overflow: hidden !important;
+        }
+      }
+      .subtitle-card-risk {
+        font-size: 0.8rem;
+        font-family: v.$fontFamilyMedium;
+        color:  #9f9f9f;
+      }
+      &.cardList {
+        flex-direction: row;
+        justify-content: flex-start;
+        margin-left: 2em;
       }
     }
     .card-item-footer {
@@ -99,10 +163,76 @@
       }
     }
   }
+
+  &.canceled .p-card {
+    background-color: #f5f5f3;
+    .icon-card {
+      color: #d4d4d4;
+    }
+    .card-item-name {
+      color: #d4d4d4;
+      text-decoration: line-through;
+    }
+  }
   &.mobile {
     .p-card {
       max-width: 100%;
       width: 100%;
+    }
+  }
+  &.cardList {
+    .p-card {
+      max-width: 100%;
+      width: 100%;
+      .card-item-name {
+        flex: none;
+      }
+      .card-item-subtitle {
+        padding-bottom: 0 !important;
+      }
+      .organization-name {
+        margin-left: 0.5em;
+      }
+    }
+  }
+}
+::ng-deep .node-disabled {
+  color: #dee2e6;
+}
+::ng-deep .p-overlaypanel-close {
+  background: #6c757d !important;
+}
+::ng-deep .app-card-item.process {
+  .p-card {
+    .p-card-header {
+      .card-item-header {
+        width: 100%;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        .process-selo {
+          padding: 10px;
+          color: #44B39B;
+        }
+      }
+    }
+    .p-card-content {
+      .card-item-content {
+        .card-item-name {
+          font-size: 1em;
+        }
+        .card-item-subtitle {
+          font-size: 0.8em;
+          color: #888e96;
+          padding-bottom: 0.5em;
+        }
+        .organization-name {
+          color: #009dd4;
+        }
+      }
+    }
+    .card-item-footer {
+      padding: 0 0.5em 0.5em 0.5em;
     }
   }
 }
@@ -122,11 +252,12 @@
     .p-card-body {
       padding: 0;
     }
+
     .p-card-body .p-card-content {
       height: 100%;
 
-      p-menu {
-        .p-menu-overlay .p-menu-list {
+      p-tieredmenu {
+        .p-tieredmenu-overlay ul {
           max-width: 20em;
           .p-menuitem .p-menuitem-link {
             .p-menuitem-icon {
@@ -148,10 +279,41 @@
       display: flex;
       justify-content: center;
       align-items: center;
+      // position: absolute;
       height: 100%;
       width: 100%;
       .app-icon {
         cursor: pointer;
+      }
+    }
+
+    .p-card-body .p-card-content .menu-model-container {
+      padding: 0 !important;
+      .menuNewModelContainer {
+        list-style: none;
+        padding: 0.5em;
+        box-shadow: 1px 1px 4px rgb(0 0 0 / 20%);
+        background-color: #ffffff;
+        li {
+          padding: 0.5em;
+          color: #888E96;
+        }
+        :hover {
+          background-color: rgba(245, 245, 245, 1);
+        }
+      }
+      .p-tree-toggler {
+        display: none !important;
+      }
+    }
+
+  }
+  &.cardList {
+    .p-card {
+      max-width: 100%;
+      width: 100%;
+      .p-card-content {
+        padding: 0;
       }
     }
   }
@@ -178,5 +340,53 @@
       height: 100%;
       width: 100%;
     }
+  }
+  &.cardList {
+    .p-card {
+      max-width: 100%;
+      width: 100%;
+    }
+  }
+
+}
+
+::ng-deep .new-carditem.new-card-model.new-card-item-mobile {
+  .p-card {
+    width: 100% !important;
+  }
+  .p-card-body .p-card-content .menu-model-container {
+    padding: 0 2em;
+    .menuNewModelContainer {
+      list-style: none;
+      padding: 0.5em;
+      box-shadow: 1px 1px 4px rgb(0 0 0 / 20%);
+      background-color: #ffffff;
+      li {
+        padding: 0.5em;
+        color: #888E96;
+      }
+      :hover {
+        background-color: rgba(245, 245, 245, 1);
+      }
+    }
+    .p-tree-toggler {
+      display: none !important;
+    }
+  }
+}
+
+::ng-deep .app-card-item.read-only {
+  .p-card {
+    background-color: transparent !important;
+  }
+}
+
+::ng-deep .p-tooltip.p-tooltip-top {
+  background-color: #455057;
+  .p-tooltip-text {
+    color: #fff;
+  }
+  .p-tooltip-arrow {
+    background-color: #455057;
   }
 }

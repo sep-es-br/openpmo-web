@@ -1,0 +1,61 @@
+<div class="app-baseline-cancelling">
+  <div class="header-container" [class.mobile]="responsive">
+    <div class="app-content-header" [class.mobile]="responsive">
+      <i class="fas fa-times"></i>
+      <span>{{ 'cancellationProposal' | translate }}</span>
+    </div>
+  </div>
+  <div class="card-properties-baseline">
+    <app-card [properties]="cardBaselineProperties" class="mt-0 inputs-float-label">
+      <div class="p-grid">
+        <form [formGroup]="formBaseline">
+          <div class="p-fluid">
+            <div class="p-field">
+              <span class="p-float-label">
+                <input class="app-input-text" [class.responsive]="responsive" id="float-name" name="name" [readonly]="true"
+                  formControlName="name" type="text" [ngStyle]="{'width': '30%'}" pInputText />
+                <label class="app-input-label" for="float-name">{{ "project" | translate }} * </label>
+              </span>
+              <app-input-message [form]="formBaseline" field="name"></app-input-message>
+            </div>
+            <div class="p-field">
+              <span class="p-float-label">
+                <textarea pInputTextarea id="float-description" formControlName="description" class="app-text-area"
+                  rows="1">
+                </textarea>
+                <label class="app-input-label" for="float-description">{{ "description" | translate }} * </label>
+              </span>
+              <app-input-message [form]="formBaseline" field="description"></app-input-message>
+            </div>
+            <div class="p-field">
+              <span class="p-float-label">
+                <textarea pInputTextarea id="float-message" formControlName="message" class="app-text-area" rows="1">
+                </textarea>
+                <label class="app-input-label" for="float-message">{{ "messageFromBaselineProposer" | translate }} *
+                </label>
+              </span>
+              <app-input-message [form]="formBaseline" field="message"></app-input-message>
+            </div>
+          </div>
+
+        </form>
+      </div>
+    </app-card>
+  </div>
+
+  <div class="attention-message" [class.attention-message-responsive]="responsive">
+    <span class="title">
+      {{'messages.atentionCancellingMessage'|translate}}
+    </span>
+    <span class="text">
+      {{'messages.textAtentionCancellingMessage'|translate}}
+    </span>
+  </div>
+
+  <div class="actions-buttons-container" [class.actions-buttons-container-responsive]="responsive">
+    <p-button class="action-button yes-button" [label]="'yes'|translate" (onClick)="handleSubmitBaselineCancelling()"></p-button>
+    <p-button class="action-button no-button" [label]="'no'|translate" (onClick)="handleCancelChanges()"></p-button>
+  </div>
+
+</div>
+

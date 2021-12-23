@@ -1,0 +1,71 @@
+@use "src/variables" as v;
+
+::ng-deep .app-issue-response {
+  width: 100%;
+  .card-properties-issue-response {
+    width: 100%;
+    form {
+      width: 100%;
+      padding-bottom: 3em;
+      .form-group {
+        display: flex;
+        flex-direction: column;
+        padding-bottom: 1em;
+        width: 100%;
+        .p-field {
+          display: flex;
+          flex-direction: column;
+          width: 15%;
+          margin-right: 2em;
+          .p-float-label {
+            width: 100%;
+            .p-dropdown {
+              width: 100%;
+            }
+            .p-calendar {
+              width: 100%;
+            }
+            .p-inputtext {
+              width: 100%;
+            }
+            .p-multiselect {
+              width: 100%;
+            }
+          }
+        }
+        .plan {
+          width: 100%;
+        }
+      }
+      
+      .p-fluid {
+        margin-top: 1em;
+      }
+      ::ng-deep .p-field.responsive {
+        margin-right: 0 !important;
+      }
+      ::ng-deep .responsive {
+        width: 100% !important;
+        .p-calendar {
+          width: 100%;
+        }
+      }
+    }
+  }
+}
+
+::ng-deep .app-issue-response {
+  .card-properties-issue-response.responsive form {
+    padding-bottom: 1.5em;
+    .form-group {
+      flex-direction: column;
+      align-items: flex-start;
+      .p-field {
+        width: 100%;
+        .p-inputtext {
+          width: 100%;
+        }
+      }
+    }
+  }
+}

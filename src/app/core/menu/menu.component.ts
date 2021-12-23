@@ -8,6 +8,7 @@ import { takeUntil } from 'rxjs/operators';
 
 import { IMenuWorkpack, IMenuWorkpackModel, PlanMenuItem, IMenu } from 'src/app/shared/interfaces/IMenu';
 import { IPerson } from 'src/app/shared/interfaces/IPerson';
+import { IPlan } from 'src/app/shared/interfaces/IPlan';
 import { AuthService } from 'src/app/shared/services/auth.service';
 import { MenuService } from 'src/app/shared/services/menu.service';
 import { OfficePermissionService } from 'src/app/shared/services/office-permission.service';
@@ -49,7 +50,10 @@ export class MenuComponent implements OnInit, OnDestroy {
   $destroy = new Subject();
   editPermissionOnOffice = false;
   isPlanMenu = false;
+  currentPlan: IPlan;
   currentIDPlan = 0;
+  isFixed = false;
+  menuStateChanged = false;
 
   constructor(
     private menuSrv: MenuService,
@@ -67,49 +71,77 @@ export class MenuComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.$destroy))
       .subscribe(() => this.handleChangeLanguage());
     this.menuSrv.isAdminMenu.pipe(takeUntil(this.$destroy)).subscribe(isAdminMenu => {
-      this.isAdminMenu = isAdminMenu;
-      this.updateMenuOfficeOnAdminChange();
+      if (!this.isFixed) {
+        this.isAdminMenu = isAdminMenu;
+        this.updateMenuOfficeOnAdminChange();
+      }
     });
     this.officeSrv.observableIdOffice().pipe(takeUntil(this.$destroy)).subscribe(async id => {
-      this.currentIDOffice = id;
-      await this.loadPortfolioMenu();
-      this.refreshPortfolioMenu();
+      if (!this.isFixed) {
+        this.currentIDOffice = id;
+        await this.loadPortfolioMenu();
+        this.refreshPortfolioMenu();
+      }
     });
     this.planSrv.observableIdPlan().pipe(takeUntil(this.$destroy)).subscribe(async id => {
-      this.currentIDPlan = id;
-      if (!this.itemsPorfolio?.length) {
-        await this.loadPortfolioMenu();
+      if (!this.isFixed) {
+        this.currentIDPlan = id;
+        if (this.currentIDPlan) {
+          localStorage.setItem('@currentPlan', this.currentIDPlan.toString());
+        }
+        await this.loadPropertiesPlan();
+        if (!this.itemsPorfolio?.length) {
+          await this.loadPortfolioMenu();
+        }
+        this.refreshPortfolioMenu();
       }
-      this.refreshPortfolioMenu();
     });
-    this.menuSrv.obsReloadMenuOffice().pipe(takeUntil(this.$destroy)).subscribe(() => this.loadOfficeMenu());
-    this.menuSrv.obsReloadMenuPortfolio().pipe(takeUntil(this.$destroy)).subscribe(() => this.loadPortfolioMenu());
+    this.menuSrv.obsReloadMenuOffice().pipe(takeUntil(this.$destroy)).subscribe(() => !this.isFixed && this.loadOfficeMenu());
+    this.menuSrv.obsReloadMenuPortfolio().pipe(takeUntil(this.$destroy)).subscribe(() => !this.isFixed && this.loadPortfolioMenu());
     this.menuSrv.isAdminMenu.pipe(takeUntil(this.$destroy)).subscribe(isAdminMenu => {
-      this.isAdminMenu = isAdminMenu;
-      this.updateMenuOfficeOnAdminChange();
-      if (isAdminMenu) {
-        this.getOfficePermission();
+      if (!this.isFixed) {
+        this.isAdminMenu = isAdminMenu;
+        this.updateMenuOfficeOnAdminChange();
+        if (isAdminMenu) {
+          this.getOfficePermission();
+        }
       }
     });
     this.menuSrv.isPlanMenu.pipe(takeUntil(this.$destroy)).subscribe(isPlanMenu => {
-      this.isPlanMenu = isPlanMenu;
-      this.refreshPortfolioMenu();
+      if (!this.isFixed) {
+        this.isPlanMenu = isPlanMenu;
+        this.refreshPortfolioMenu();
+      }
     });
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(responsive => {
-      this.isChangingView = true;
-      this.isMobileView = responsive;
-      setTimeout(() => {
-        this.isChangingView = false;
-      }, 250);
+      if (!this.isFixed) {
+        this.isChangingView = true;
+        this.isMobileView = responsive;
+        setTimeout(() => {
+          this.isChangingView = false;
+        }, 250);
+      }
     });
     this.locationSrv.onUrlChange(url => {
-      this.currentURL = url.slice(2);
-      this.selectMenuActive(url.slice(2));
+      if (!this.isFixed) {
+        this.currentURL = url.slice(2);
+        this.selectMenuActive(url.slice(2));
+      }
+    });
+    this.menuSrv.getMenuState.pipe(takeUntil(this.$destroy)).subscribe( async(menuState) => {
+      this.isFixed = menuState.isFixed;
+      if (!this.isFixed) {
+        this.menus = menuState.menus;
+        const authenticated = await this.authSrv.isAuthenticated();
+        if (authenticated) {
+          this.loadOfficeMenu();
+        }
+      }
     });
   }
 
   refreshPortfolioMenu() {
-    this.itemsPorfolioFiltered = this.itemsPorfolio.filter(p => p.idPlan === this.currentIDPlan);
+    this.itemsPorfolioFiltered = Array.from(this.itemsPorfolio.filter(p => p.idPlan === this.currentIDPlan));
   }
 
   ngOnDestroy(): void {
@@ -121,14 +153,25 @@ export class MenuComponent implements OnInit, OnDestroy {
     this.isUserAdmin = await this.authSrv.isUserAdmin();
     const payload = this.authSrv.getTokenPayload();
     this.loadOfficeMenu();
-    this.currentUserInfo = await this.authSrv.getInfoPerson();
+    await this.loadCurrentInfo();
     this.username = this.isUserAdmin
       ? 'Admin'
       : (this.currentUserInfo.name?.split(' ').shift() || payload.email);
   }
 
+ async loadCurrentInfo() {
+    this.currentUserInfo = await this.authSrv.getInfoPerson();
+  }
+
+  handleChangeMenuMode() {
+    this.isFixed = true;
+    const itemsOffice = this.menus[0].isOpen ? this.itemsOffice : [];
+    const itemsPortfolio = this.menus[1].isOpen ? this.itemsPorfolio : [];
+    this.menuSrv.nextMenuState({ isFixed: this.isFixed, menus: this.menus, itemsOffice, itemsPorfolio: itemsPortfolio });
+  }
+
   updateMenuOfficeOnAdminChange() {
-    this.itemsOffice = this.itemsOffice
+    this.itemsOffice = this.itemsOffice && this.itemsOffice
       .map((office, i) => ((office.items = this.isAdminMenu ? undefined : this.itemsOfficeUnchanged[i].items), office));
   }
 
@@ -159,10 +202,22 @@ export class MenuComponent implements OnInit, OnDestroy {
     this.translateChangeSrv.changeLangDefault(language);
   }
 
+  async loadPropertiesPlan() {
+    if (this.currentIDPlan) {
+      const {data, success} = await this.planSrv.GetById(this.currentIDPlan);
+      if(success) {
+        this.currentPlan = data;
+        if (this.currentPlan) {
+          this.officeSrv.nextIDOffice(this.currentPlan.idOffice);
+        }
+      }
+    }
+  }
+
   async loadOfficeMenu() {
     const { success, data: itemsOffice } = await this.menuSrv.getItemsOffice();
     if (success) {
-      this.itemsOfficeUnchanged = itemsOffice.map(office => ({
+      this.itemsOfficeUnchanged = itemsOffice && itemsOffice.map(office => ({
         label: office.name,
         icon: 'app-icon building',
         styleClass: `office-${office.id} ${this.currentURL === `offices/office?id=${office.id}` ? 'active' : ''}`,
@@ -186,7 +241,7 @@ export class MenuComponent implements OnInit, OnDestroy {
           )
           : undefined
       }));
-      this.itemsOffice = this.itemsOfficeUnchanged.map(item => Object.assign({}, item));
+      this.itemsOffice = this.itemsOfficeUnchanged && this.itemsOfficeUnchanged.map(item => Object.assign({}, item));
     }
   }
 
@@ -245,7 +300,7 @@ export class MenuComponent implements OnInit, OnDestroy {
       items: workpack.children?.length ? this.buildMenuItemPortfolio(workpack.children) : undefined,
       command: (e) => {
         if (e.originalEvent?.target?.classList?.contains('p-menuitem-text')) {
-          this.router.navigate(['/workpack'], { queryParams: { id: workpack.id } });
+          this.router.navigate(['/workpack'], { queryParams: { id: workpack.id, idWorkpaModelLinked: workpack.idWorkpackModelLinked } });
           this.closeAllMenus();
         }
       }
@@ -275,6 +330,8 @@ export class MenuComponent implements OnInit, OnDestroy {
   }
 
   closeAllMenus() {
-    this.menus.forEach(menu => menu.isOpen = false);
+    if (!this.isFixed) {
+      this.menus.forEach(menu => menu.isOpen = false);
+    }
   }
 }

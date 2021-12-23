@@ -1,0 +1,21 @@
+<div class="app-workpack-sharing">
+  <div class="header-container" [class.mobile]="responsive">
+    <div class="app-content-header" [class.mobile]="responsive">
+      <span>{{'share'|translate }} {{workpackName}} {{'with'|translate}}</span>
+    </div>
+  </div>
+  <div class="card-permissions" *ngIf="workpackSharingCard">
+    <app-card [properties]="workpackSharingCard" *ngIf="cardItemSharing && cardItemSharing.length > 0" class="mt-0">
+      <p-dataView [value]="cardItemSharing" layout="grid" class="app-dataview"
+        [emptyMessage]="'loadingEllipsis' | translate">
+        <ng-template let-cardItem pTemplate="gridItem">
+          <div class="p-col-12 p-md-3 p-sm-12 card-item-container">
+            <app-card-item-permission [properties]="cardItem" (deletedSharedCard)="deleteWorkpackShared($event)" (changeSelected)="handleShowSaveButton()">
+            </app-card-item-permission>
+          </div>
+        </ng-template>
+      </p-dataView>
+    </app-card>
+  </div>
+  <app-save-button #saveButton (save)="saveWorkpackSharing()"></app-save-button>
+</div>

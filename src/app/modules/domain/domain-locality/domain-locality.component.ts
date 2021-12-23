@@ -22,6 +22,9 @@ import { IOffice } from 'src/app/shared/interfaces/IOffice';
 import { IDomain } from 'src/app/shared/interfaces/IDomain';
 import { OfficeService } from 'src/app/shared/services/office.service';
 import { DomainService } from 'src/app/shared/services/domain.service';
+import { FilterDataviewService } from 'src/app/shared/services/filter-dataview.service';
+import { FilterDataviewPropertiesEntity } from 'src/app/shared/constants/filterDataviewPropertiesEntity';
+import { PropertyTemplateModel } from 'src/app/shared/models/PropertyTemplateModel';
 
 @Component({
   selector: 'app-domain-locality',
@@ -44,13 +47,24 @@ export class DomainLocalityComponent implements OnInit, OnDestroy {
   type: string;
   planModelsOfficeList: IPlanModel[];
   cardProperties: ICard;
-  cardLocalities: ICard;
+  cardLocalities: ICard = {
+    toggleable: false,
+    initialStateToggle: false,
+    cardTitle: 'localities',
+    collapseble: true,
+    initialStateCollapse: false
+  };
   childrenLocalities: ILocality[];
   cardItemsChildrenLocalities: ICardItem[];
   cardItemPlanMenu: MenuItem[];
   $destroy = new Subject();
   isUserAdmin: boolean;
   editPermission: boolean;
+  collapsePanelsStatus = true;
+  displayModeAll = 'grid';
+  pageSize = 5;
+  totalRecords: number;
+  idFilterSelected: number;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -64,7 +78,8 @@ export class DomainLocalityComponent implements OnInit, OnDestroy {
     private officePermissionSrv: OfficePermissionService,
     private messageSrv: MessageService,
     private officeSrv: OfficeService,
-    private domainSrv: DomainService
+    private domainSrv: DomainService,
+    private filterSrv: FilterDataviewService
   ) {
     this.activeRoute.queryParams.subscribe(async({ id, idOffice, idDomain, type, idParent }) => {
       this.idLocality = +id;
@@ -76,6 +91,13 @@ export class DomainLocalityComponent implements OnInit, OnDestroy {
       this.editPermission = await this.officePermissionSrv.getPermissions(this.idOffice);
       await this.loadPropertiesLocality();
       this.breadcrumbSrv.setMenu([
+        {
+          key: 'administration',
+          info: this.propertiesOffice?.name,
+          tooltip: this.propertiesOffice?.fullName,
+          routerLink: [ '/configuration-office' ],
+          queryParams: { idOffice: this.idOffice }
+        },
         {
           key: 'domains',
           info: this.propertiesOffice?.name,
@@ -109,26 +131,36 @@ export class DomainLocalityComponent implements OnInit, OnDestroy {
   }
 
   async getBreadcrumbs() {
-    const { success, data } = await this.breadcrumbSrv.getBreadcrumbLocality(this.idLocality || this.idParent);
-    const { idOffice, idDomain, type, idParent } = this;
-    return success
-      ? [
+    if (this.idLocality || this.idParent) {
+      const { success, data } = await this.breadcrumbSrv.getBreadcrumbLocality(this.idLocality || this.idParent);
+      const { idOffice, idDomain, type, idParent } = this;
+      return success
+        ? [
           ...data.map((l, i) => ({
             key: l.type.toLowerCase(),
             info: l?.name,
             tooltip: l?.fullName,
-            routerLink: [ '/domains', 'locality' ],
+            routerLink: ['/domains', 'locality'],
             queryParams: { id: l.id, idOffice, idDomain, type: l.type, idParent: i ? data[i - 1].id : '' }
           })),
           ... !this.idLocality
             ? [{
-                key: this.type.toLowerCase(),
-                routerLink: [ '/domains', 'locality' ],
-                queryParams: { idOffice, idDomain, type, idParent }
-              }]
+              key: this.type.toLowerCase(),
+              routerLink: ['/domains', 'locality'],
+              queryParams: { idOffice, idDomain, type, idParent }
+            }]
             : []
         ]
-      : [];
+        : [];
+    } else {
+      return [
+        {
+          key: this.type.toLowerCase(),
+          routerLink: ['/domains', 'locality'],
+          queryParams: { idOffice: this.idOffice, idDomain: this.idDomain, type: this.type }
+        }
+      ];
+    }
   }
 
   ngOnDestroy(): void {
@@ -138,10 +170,30 @@ export class DomainLocalityComponent implements OnInit, OnDestroy {
 
   async ngOnInit() {
     this.isUserAdmin = await this.authSrv.isUserAdmin();
-    this.loadCards();
+    await this.loadCards();
   }
 
-  loadCards() {
+  handleChangeCollapseExpandPanel(event) {
+    this.collapsePanelsStatus = event.mode === 'collapse' ? true : false;
+    this.cardProperties = Object.assign({}, {
+      ...this.cardProperties,
+      initialStateCollapse: this.collapsePanelsStatus
+    });
+    this.cardLocalities = Object.assign({}, {
+      ...this.cardLocalities,
+      initialStateCollapse: this.collapsePanelsStatus
+    });
+  }
+
+  handleChangeDisplayMode(event) {
+    this.displayModeAll = event.displayMode;
+  }
+
+  handleChangePageSize(event) {
+    this.pageSize = event.pageSize;
+  }
+
+  async loadCards() {
     this.cardProperties = {
       toggleable: false,
       initialStateToggle: false,
@@ -149,21 +201,16 @@ export class DomainLocalityComponent implements OnInit, OnDestroy {
       collapseble: true,
       initialStateCollapse: !!this.idLocality
     };
-    this.cardLocalities = {
-      toggleable: false,
-      initialStateToggle: false,
-      cardTitle: 'localities',
-      collapseble: true,
-      initialStateCollapse: false
-    };
   }
 
   async loadPropertiesLocality() {
+    await this.loadFiltersLocalities();
     if (this.idLocality) {
-      const { success, data } = await this.localitySvr.GetById(this.idLocality);
+      const { success, data } =
+        await this.localitySvr.getLocalityById(this.idLocality, { idFilter: this.idFilterSelected });
       if (success) {
         this.propertiesLocality = data as ILocalityList;
-        this.formLocality.reset(Object.keys(this.formLocality.controls).reduce(( a, key ) => ( a[key] = data[key] || '', a ), { }));
+        this.formLocality.reset(Object.keys(this.formLocality.controls).reduce((a, key) => (a[key] = data[key] || '', a), {}));
         if (!this.editPermission) {
           this.formLocality.disable();
         }
@@ -179,7 +226,7 @@ export class DomainLocalityComponent implements OnInit, OnDestroy {
         this.propertiesOffice = data;
       }
     }
-    this.idDomain = this.idDomain || this.propertiesLocality?.domain?.id;
+    this.idDomain = this.idDomain || (this.propertiesLocality?.domain ? this.propertiesLocality?.domain?.id : (this.propertiesLocality?.domainRoot && this.propertiesLocality?.domainRoot?.id));
     if (this.idDomain) {
       const { success, data } = await this.domainSrv.GetById(this.idDomain);
       if (success) {
@@ -197,7 +244,7 @@ export class DomainLocalityComponent implements OnInit, OnDestroy {
         queryParams: {
           type,
           idParent: this.idLocality,
-          idDomain: this.propertiesLocality.domain.id,
+          idDomain: this.propertiesLocality.domain ? this.propertiesLocality.domain.id : this.propertiesLocality.domainRoot.id,
           idOffice: this.idOffice
         },
       }
@@ -234,13 +281,15 @@ export class DomainLocalityComponent implements OnInit, OnDestroy {
         ] : undefined,
         urlCard: this.propertiesLocality?.children ? '/domains/locality' : undefined,
         paramsUrlCard: [
-          { name: 'idDomain', value: this.propertiesLocality.domain.id },
+          { name: 'idDomain', value: (this.propertiesLocality?.domain ? this.propertiesLocality?.domain?.id : this.propertiesLocality?.domainRoot && this.propertiesLocality?.domainRoot?.id) },
           { name: 'idParent', value: this.idLocality },
-          { name: 'idOffice', value: this.idOffice},
+          { name: 'idOffice', value: this.idOffice },
           { name: 'type', value: this.propertiesLocality?.children ? this.propertiesLocality.children[0].type : undefined }
         ]
       }
     ] : [];
+    this.cardLocalities.showCreateNemElementButton = this.editPermission && this.propertiesLocality
+    && this.propertiesLocality.children ? true : false;
     if (this.propertiesLocality?.children) {
       itemsChildrenLocalities.unshift(...this.propertiesLocality.children.map(locality => (
         {
@@ -261,26 +310,39 @@ export class DomainLocalityComponent implements OnInit, OnDestroy {
           ] as MenuItem[],
           urlCard: '/domains/locality',
           paramsUrlCard: [
-            { name: 'idDomain', value: this.propertiesLocality.domain.id },
+            { name: 'idDomain', value: (this.propertiesLocality?.domain ? this.propertiesLocality?.domain?.id : this.propertiesLocality?.domainRoot?.id) },
             { name: 'idParent', value: this.idLocality },
-            { name: 'idOffice', value: this.idOffice},
+            { name: 'idOffice', value: this.idOffice },
             { name: 'type', value: this.propertiesLocality?.children ? this.propertiesLocality.children[0].type : undefined }
           ]
         }
       )));
     }
     this.cardItemsChildrenLocalities = itemsChildrenLocalities;
+    this.totalRecords = this.cardItemsChildrenLocalities && this.cardItemsChildrenLocalities.length;
   }
 
   async deleteLocality(locality: ILocality) {
     const { success } = await this.localitySvr.delete(locality);
     if (success) {
       this.cardItemsChildrenLocalities = Array.from(this.cardItemsChildrenLocalities.filter(element => element.itemId !== locality.id));
+      this.totalRecords = this.cardItemsChildrenLocalities && this.cardItemsChildrenLocalities.length;
     }
   }
 
+  createNewLocality() {
+    this.router.navigate(['/domains/locality'], {
+      queryParams: {
+        idDomain: this.propertiesLocality?.domain ? this.propertiesLocality?.domain?.id : this.propertiesLocality?.domainRoot?.id,
+        idParent: this.idLocality,
+        idOffice: this.idOffice,
+        type: this.propertiesLocality?.children ? this.propertiesLocality.children[0].type : undefined
+      }
+    });
+  }
+
   async handleOnSubmit() {
-    const idDomain = this.propertiesLocality?.domain?.id;
+    const idDomain = this.propertiesLocality?.domain ? this.propertiesLocality?.domain?.id : (this.propertiesLocality?.domainRoot && this.propertiesLocality?.domainRoot?.id)
     delete this.propertiesLocality?.domain;
     const { success, data } = this.propertiesLocality
       ? await this.localitySvr.put({ ...this.propertiesLocality, ...this.formLocality.value, idDomain })
@@ -309,5 +371,88 @@ export class DomainLocalityComponent implements OnInit, OnDestroy {
       });
     }
   }
+
+  async loadFiltersLocalities() {
+    const result = await this.filterSrv.getAllFilters('localities');
+    if (result.success && result.data.length > 0) {
+      const filterDefault = result.data.find(dataFilter => !!dataFilter.favorite);
+      this.idFilterSelected = filterDefault ? filterDefault.id : undefined;
+      this.cardLocalities.filters = result.data;
+    }
+    this.cardLocalities.showFilters = true;
+  }
+
+  async handleEditFilter(event) {
+    const idFilter = event.filter;
+    if (idFilter) {
+      const filterProperties = this.loadFilterPropertiesList();
+      this.filterSrv.setFilterProperties(filterProperties);
+      await this.setBreadcrumbStorage();
+      this.router.navigate(['/filter-dataview'], {
+        queryParams: {
+          id: idFilter,
+          entityName: 'localities'
+        }
+      });
+    }
+  }
+
+  async handleSelectedFilter(event) {
+    const idFilter = event.filter;
+    if (idFilter) {
+      this.idFilterSelected = idFilter;
+      await this.loadPropertiesLocality();
+    }
+  }
+
+  async handleNewFilter() {
+    const filterProperties = this.loadFilterPropertiesList();
+    this.filterSrv.setFilterProperties(filterProperties);
+    await this.setBreadcrumbStorage();
+    this.router.navigate(['/filter-dataview'], {
+      queryParams: {
+        entityName: 'localities'
+      }
+    });
+  }
+
+  loadFilterPropertiesList() {
+    const listProperties = FilterDataviewPropertiesEntity.localities;
+    const filterPropertiesList = listProperties.map(prop => {
+      const property = new PropertyTemplateModel();
+      property.type = prop.type;
+      property.label = prop.label;
+      property.name = prop.apiValue;
+      property.active = true;
+      property.possibleValues = prop.possibleValues;
+      return property;
+    });
+    return filterPropertiesList;
+  }
+
+  async setBreadcrumbStorage() {
+    this.breadcrumbSrv.setBreadcrumbStorage([
+      {
+        key: 'domains',
+        info: this.propertiesOffice?.name,
+        tooltip: this.propertiesOffice?.fullName,
+        routerLink: ['/domains'],
+        queryParams: { idOffice: this.idOffice }
+      },
+      {
+        key: 'domain',
+        info: this.propertiesDomain?.name,
+        tooltip: this.propertiesDomain?.fullName,
+        routerLink: ['/domains', 'detail'],
+        queryParams: { id: this.idDomain, idOffice: this.idOffice }
+      },
+      ... await this.getBreadcrumbs(),
+      ...[{
+        key: 'filter',
+        routerLink: ['/filter-dataview']
+      }]
+    ]);
+  }
+
 
 }

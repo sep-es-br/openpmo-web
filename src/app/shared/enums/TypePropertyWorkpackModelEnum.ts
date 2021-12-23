@@ -9,5 +9,6 @@ export enum TypePropertyWorkpackModelEnum {
   TextModel = 'TextModel',
   TextAreaModel = 'TextAreaModel',
   UnitSelectionModel = 'UnitSelectionModel',
-  ToggleModel = 'ToggleModel'
+  ToggleModel = 'ToggleModel',
+  GroupModel = 'GroupModel'
 };

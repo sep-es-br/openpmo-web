@@ -26,6 +26,7 @@ export interface IMenuWorkpackModel {
 
 export interface IMenuWorkpack {
   id: string;
+  idWorkpackModelLinked?: string;
   name: string;
   idPlan?: number;
   fontIcon: string;

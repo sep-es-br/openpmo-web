@@ -1,0 +1,52 @@
+::ng-deep .app-person-list {
+  .app-content-header {
+    padding-bottom: 0;
+    span {
+      text-transform: uppercase;
+    }
+  }
+  .card-container {
+    .form-search {
+      display: flex;
+      width: 80%;
+      margin-bottom: 2.5rem;
+
+      .property-input {
+        background-color: #fff;
+        width: 70%;
+        margin: 0 1rem;
+        border: 1px solid #eeeeed;
+        padding-bottom: 0;
+        &.search {
+           display: flex;
+           .p-button {
+            background-color: #44B39B;
+            padding: 0.5rem 1.5rem;
+            .pi {
+              font-size: 1.2rem;
+            }
+          }
+        }
+        .p-dropdown, .p-inputtext {
+          border: 0;
+          width: 100%;
+          padding-left: 0.3rem ;
+          &:hover {
+            border: 0 !important;
+          }
+          .p-dropdown-trigger-icon {
+            display: none;
+          }
+        }
+        .app-input-label {
+          font-size: 1rem;
+          top: -0.9rem !important;
+        }
+      }
+    }
+  }
+}
+
+::ng-deep .app-person-list .app-card-item .p-card .p-card-body {
+  padding-top: 2rem;
+}

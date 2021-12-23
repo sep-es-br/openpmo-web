@@ -1,3 +1,4 @@
+import { AuthService } from './../../../../shared/services/auth.service';
 import { Location } from '@angular/common';
 import { Component, OnDestroy, OnInit, ViewChildren } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -23,6 +24,7 @@ import { PlanService } from 'src/app/shared/services/plan.service';
 interface ICartItemCostAssignment {
   type: string;
   unitMeasureName?: string;
+  unitMeasurePrecision?: number;
   idCost?: number;
   idCostAssignment?: number;
   costAccountName?: string;
@@ -30,6 +32,7 @@ interface ICartItemCostAssignment {
   actualWork?: number;
   menuItemsCost?: MenuItem[];
   menuItemsNewCost?: MenuItem[];
+  readonly?: boolean;
 }
 
 @Component({
@@ -45,6 +48,8 @@ export class StepComponent implements OnInit, OnDestroy {
   @ViewChildren(Calendar) calendarComponents: Calendar[];
   responsive: boolean;
   idSchedule: number;
+  idWorkpackModelLinked: number;
+  idPlan: number;
   schedule: IScheduleDetail;
   start: Date;
   minStart: Date;
@@ -55,6 +60,7 @@ export class StepComponent implements OnInit, OnDestroy {
   stepType: string;
   idStep: number;
   unitName: string;
+  unitPrecision: number;
   cardStepProperties: ICard;
   formStep: FormGroup;
   step: IStepPost;
@@ -69,6 +75,7 @@ export class StepComponent implements OnInit, OnDestroy {
   $destroy = new Subject();
   calendarFormat: string;
   currentLang = '';
+  editPermission = false;
 
   constructor(
     private actRouter: ActivatedRoute,
@@ -77,19 +84,22 @@ export class StepComponent implements OnInit, OnDestroy {
     private responsiveSrv: ResponsiveService,
     private translateSrv: TranslateService,
     private breadcrumbSrv: BreadcrumbService,
-    private location: Location,
     private workpackSrv: WorkpackService,
     private costAccountSrv: CostAccountService,
     private router: Router,
     private messageSrv: MessageService,
-    private planSrv: PlanService
+    private planSrv: PlanService,
+    private authSrv: AuthService
   ) {
-    this.actRouter.queryParams.subscribe(async queryParams => {
-      this.idSchedule = queryParams.idSchedule;
-      this.stepType = queryParams.stepType;
-      this.idStep = queryParams.id;
-      this.unitName = queryParams.unitName;
+    this.actRouter.queryParams.subscribe(async ({ idSchedule, idWorkpackModelLinked, stepType, id, unitName, unitPrecision }) => {
+      this.idSchedule = idSchedule;
+      this.idWorkpackModelLinked = idWorkpackModelLinked
+      this.stepType = stepType;
+      this.idStep = id;
+      this.unitName = unitName;
+      this.unitPrecision = unitPrecision;
     });
+    this.currentLang = this.translateSrv.currentLang;
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.responsive = value);
     this.currentLang = this.translateSrv.getDefaultLang();
     this.translateSrv.onLangChange.pipe(takeUntil(this.$destroy)).subscribe(({ lang }) => {
@@ -106,6 +116,7 @@ export class StepComponent implements OnInit, OnDestroy {
       plannedWork: [null, Validators.required],
       actualWork: null
     });
+    this.idPlan = Number(localStorage.getItem('@currentPlan'));
   }
 
   ngOnDestroy(): void {
@@ -149,6 +160,8 @@ export class StepComponent implements OnInit, OnDestroy {
       const result = await this.scheduleSrv.GetById(this.idSchedule);
       if (result.success) {
         this.schedule = result.data;
+        await this.loadPermissions();
+        
       }
     }
     if (this.schedule.idWorkpack) {
@@ -171,8 +184,21 @@ export class StepComponent implements OnInit, OnDestroy {
     ]);
   }
 
+  async loadPermissions() {
+    const isUserAdmin = await this.authSrv.isUserAdmin();
+    if (isUserAdmin) {
+      this.editPermission = true;
+    } else {
+      this.idPlan = Number(localStorage.getItem('@currentPlan'));
+      const result = await this.workpackSrv.GetWorkpackById(this.schedule.idWorkpack, { 'id-plan': this.idPlan });
+      if (result.success) {
+        this.editPermission = result.data.permissions.filter(p => p.level === 'EDIT').length > 0;
+      }
+    }
+  }
+
   async getBreadcrumbs() {
-    const { success, data } = await this.breadcrumbSrv.getBreadcrumbWorkpack(this.schedule.idWorkpack);
+    const { success, data } = await this.breadcrumbSrv.getBreadcrumbWorkpack(this.schedule.idWorkpack, { 'id-plan': this.idPlan });
     const breadcrumbPlan = data.find(d => d.type === 'plan');
     if (breadcrumbPlan) {
       this.planSrv.nextIDPlan(breadcrumbPlan.id);
@@ -183,7 +209,7 @@ export class StepComponent implements OnInit, OnDestroy {
         info: p.name,
         tooltip: p.fullName,
         routerLink: this.getRouterLinkFromType(p.type),
-        queryParams: { id: p.id }
+        queryParams: { id: p.id, idWorkpackModelLinked: p.idWorkpackModelLinked }
       }))
       : [];
   }
@@ -202,7 +228,7 @@ export class StepComponent implements OnInit, OnDestroy {
   setStepFormValues() {
     if (this.stepType === 'start') {
       this.start = new Date(this.schedule.start + 'T00:00:00');
-      if ( this.stepDetail) {
+      if (this.stepDetail) {
         this.formStep.controls.start.setValue(this.start);
       }
       this.start.setDate(1);
@@ -216,7 +242,7 @@ export class StepComponent implements OnInit, OnDestroy {
     }
     if (this.stepType === 'end') {
       this.end = new Date(this.schedule.end + 'T00:00:00');
-      if ( this.stepDetail) {
+      if (this.stepDetail) {
         this.formStep.controls.end.setValue(this.end);
       }
       this.end.setDate(1);
@@ -228,9 +254,28 @@ export class StepComponent implements OnInit, OnDestroy {
       this.maxEnd = new Date(this.end);
       this.maxEnd.setDate(numDays);
     }
+    if (this.stepType === 'newStart') {
+      this.start = new Date(this.schedule.start + 'T00:00:00');
+      this.start.setDate(1);
+      this.start.setMonth(this.start.getMonth() - 1);
+      this.minStart = null;
+      const numDays = moment(this.start).daysInMonth();
+      this.maxStart = new Date(this.start);
+      this.maxStart.setDate(numDays);
+    }
+    if (this.stepType === 'newEnd') {
+      this.end = new Date(this.schedule.end + 'T00:00:00');
+      this.end.setDate(1);
+      this.end.setMonth(this.end.getMonth() + 1);
+      this.minEnd = new Date(this.end);
+      this.maxEnd = null;
+    }
     if (this.stepDetail) {
       this.formStep.controls.plannedWork.setValue(this.stepDetail.plannedWork);
       this.formStep.controls.actualWork.setValue(this.stepDetail.actualWork);
+    }
+    if (!this.editPermission) {
+      this.formStep.disable();
     }
   }
 
@@ -260,18 +305,23 @@ export class StepComponent implements OnInit, OnDestroy {
             icon: 'fas fa-trash-alt',
             command: (event) => this.deleteCost(consume.idCostAccount)
           }],
+          readonly: !this.editPermission
         };
       });
-      this.costAssignmentsCardItems.push({
-        type: 'new-cost-card',
-        menuItemsNewCost: this.menuItemsCostAccounts
-      });
+      if (!!this.editPermission) {
+        this.costAssignmentsCardItems.push({
+          type: 'new-cost-card',
+          menuItemsNewCost: this.menuItemsCostAccounts
+        });
+      }
       return;
     }
-    this.costAssignmentsCardItems = [{
-      type: 'new-cost-card',
-      menuItemsNewCost: this.menuItemsCostAccounts
-    }];
+    if (!!this.editPermission) {
+      this.costAssignmentsCardItems = [{
+        type: 'new-cost-card',
+        menuItemsNewCost: this.menuItemsCostAccounts
+      }];
+    }
   }
 
   async loadMenuItemsCostAccounts() {
@@ -282,8 +332,8 @@ export class StepComponent implements OnInit, OnDestroy {
       const workpacksIds = this.costAccounts.map(cost => cost.idWorkpack);
       const workpacksIdsNotRepeated = workpacksIds.filter((w, i) => workpacksIds.indexOf(w) === i);
 
-      this.menuItemsCostAccounts = await Promise.all(workpacksIdsNotRepeated.map(async(idWorkpack) => {
-        const workpack = await this.workpackSrv.GetById(idWorkpack);
+      this.menuItemsCostAccounts = await Promise.all(workpacksIdsNotRepeated.map(async (idWorkpack) => {
+        const workpack = await this.workpackSrv.GetWorkpackById(idWorkpack, { 'id-plan': this.idPlan });
         if (workpack.success) {
           const workpackCostAccounts = this.costAccounts.filter(cost => cost.idWorkpack === idWorkpack);
           return {
@@ -294,7 +344,7 @@ export class StepComponent implements OnInit, OnDestroy {
               return {
                 label: propertyName.value as string,
                 id: workpackCost.id.toString(),
-                disabled: costAccountsIds.includes(workpackCost.id),
+                disabled: costAccountsIds.includes(workpackCost.id) || (!this.editPermission),
                 command: () => this.createNewCardItemCost(workpackCost.id, propertyName.value as string)
               } as MenuItem;
             })
@@ -430,8 +480,8 @@ export class StepComponent implements OnInit, OnDestroy {
       idSchedule: this.step ? this.step.idSchedule : this.idSchedule,
       plannedWork: this.formStep.controls.plannedWork.value,
       actualWork: this.formStep.controls.actualWork.value,
-      endStep: this.stepType === 'end' ? true : false,
-      periodFromStart: this.stepType === 'end' ? this.formStep.controls.end.value : this.formStep.controls.start.value,
+      endStep: (this.stepType === 'end' || this.stepType === 'newEnd') ? true : false,
+      periodFromStart: (this.stepType === 'end' || this.stepType === 'newEnd') ? this.formStep.controls.end.value : this.formStep.controls.start.value,
       consumes: this.costAssignmentsCardItems.filter(card => card.type === 'cost-card').map(cost => ({
         id: cost.idCostAssignment && cost.idCostAssignment,
         idCostAccount: cost.idCost,
@@ -445,7 +495,8 @@ export class StepComponent implements OnInit, OnDestroy {
         this.router.navigate(['/workpack'],
           {
             queryParams: {
-              id: this.schedule.idWorkpack
+              id: this.schedule.idWorkpack,
+              idWorkpackModelLinked: this.idWorkpackModelLinked
             }
           }
         );
@@ -457,7 +508,8 @@ export class StepComponent implements OnInit, OnDestroy {
         this.router.navigate(['/workpack'],
           {
             queryParams: {
-              id: this.schedule.idWorkpack
+              id: this.schedule.idWorkpack,
+              idWorkpackModelLinked: this.idWorkpackModelLinked
             }
           }
         );

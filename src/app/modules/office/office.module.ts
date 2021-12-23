@@ -9,11 +9,13 @@ import { OfficeListComponent } from './office-list/office-list.component';
 import { OfficePermissionsComponent } from './office-permissions/office-permissions.component';
 import { OfficeComponent } from './office/office.component';
 import { OfficePermissionsListComponent } from './office-permissions/office-permissions-list/office-permissions-list.component';
+import { CardItemOfficeComponent } from './components/card-item-office/card-item-office.component';
 
 
 
 @NgModule({
-  declarations: [ OfficeListComponent, OfficePermissionsComponent, OfficeComponent, OfficePermissionsListComponent],
+  declarations: [ OfficeListComponent, OfficePermissionsComponent, OfficeComponent,
+    OfficePermissionsListComponent, CardItemOfficeComponent],
   imports: [
     CommonModule,
     OficceRoutingModule,

@@ -92,10 +92,17 @@ app-card {
 }
 
 .app-content-header {
-  padding-bottom: .5em;
+  padding-bottom: 1.3em;
   font-size: 1rem;
-  font-family: v.$fontTitle !important;
+  font-family: v.$fontFamilyMedium !important;
   color: v.$fontInput;
+  font-weight: 500;
+
+  .label {
+    font-family: v.$fontFamilyRegular !important;
+    color: v.$fontBreadcrumb;
+    font-weight: 400;
+  }
 
   .text {
     margin-left: 0.5em;
@@ -167,9 +174,53 @@ div[class^='card-properties'] app-card .p-panel {
   .p-dataview-content, .p-grid {
     background-color: transparent;
   }
+  .p-paginator {
+    background: transparent;
+    .p-dropdown:not(.disabled).p-focus {
+      box-shadow: none;
+      border-color: #6c757d;
+    }
+    .p-dropdown:not(.disabled):hover {
+      border-color: #6c757d;
+    }
+    .p-dropdown-panel .p-dropdown-items .p-dropdown-item.p-highlight {
+      background: #e9ecef;
+    }
+  }
+  .p-dataview .p-paginator-bottom {
+    border: none;
+  }
+}
+
+.outlet p-dataview.app-dataview-list {
+  .p-col-12 {
+    padding-bottom: 0.5em;
+  }
 }
 
 .app-input-text.p-inputtext {
+  font-family: v.$fontFamilyMedium;
+  font-size: 1rem;
+  border: none;
+  border-bottom: 1px solid v.$borderInput;
+  border-radius: 0;
+  background-color: transparent;
+  color: v.$fontInput;
+  padding-left: 0;
+
+  &:enabled:focus {
+    border-bottom: 1px solid v.$borderInput;
+    box-shadow: none;
+  }
+  &:hover {
+    border-bottom: 1px solid v.$borderInputHover !important;
+    box-shadow: none;
+  }
+  .full-line {
+    width: 100%;
+  }
+}
+.app-autocomplete .p-autocomplete .p-inputtext {
   font-family: v.$fontFamilyMedium;
   font-size: 1rem;
   border: none;
@@ -588,6 +639,8 @@ div[class^='card-properties'] app-card .p-panel {
   }
 }
 
+
+
 .p-dataview .p-dataview-content .p-grid .card-item-container {
   flex-basis: 280px;
   @media screen and (max-width: 768px) {
@@ -643,142 +696,142 @@ app-root p-toast .p-toast {
 .app-icon {
 
   &.folder-open2:before {
-    content: "\e901";
-  }
-  &.cog:before {
-    content: "\e902";
-  }
-  &.cogs2:before {
-    content: "\e903";
-  }
-  &.ccb-view:before {
     content: "\e904";
   }
-  &.offices:before {
-    content: "\e905";
-  }
-  &.permission2:before {
-    content: "\e906";
-  }
-  &.permission:before {
-    content: "\e907";
-  }
-  &.open-pmo:before {
-    content: "\e908";
-  }
-  &.boxes:before {
-    content: "\e909";
-  }
-  &.flag-check:before {
-    content: "\e90a";
-  }
-  &.map-marked:before {
-    content: "\e90b";
-  }
-  &.arrow-left:before {
-    content: "\e90c";
-  }
-  &.angle-up:before {
-    content: "\e90d";
-  }
-  &.angle-right:before {
-    content: "\e90e";
-  }
-  &.angle-left:before {
-    content: "\e90f";
-  }
-  &.angle-down:before {
-    content: "\e910";
-  }
-  &.ellipsis-v:before {
-    content: "\e911";
-  }
-  &.sort:before {
+  &.cog:before {
     content: "\e912";
   }
+  &.cogs2:before {
+    content: "\e918";
+  }
+  &.ccb-view:before {
+    content: "\e919";
+  }
+  &.offices:before {
+    content: "\e91d";
+  }
+  &.permission2:before {
+    content: "\e91f";
+  }
+  &.permission:before {
+    content: "\e916";
+  }
+  &.open-pmo:before {
+    content: "\e923";
+  }
+  &.boxes:before {
+    content: "\e925";
+  }
+  &.flag-check:before {
+    content: "\e926";
+  }
+  &.map-marked:before {
+    content: "\e927";
+  }
+  &.arrow-left:before {
+    content: "\e928";
+  }
+  &.angle-up:before {
+    content: "\e929";
+  }
+  &.angle-right:before {
+    content: "\e92a";
+  }
+  &.angle-left:before {
+    content: "\e92b";
+  }
+  &.angle-down:before {
+    content: "\e92c";
+  }
+  &.ellipsis-v:before {
+    content: "\e92d";
+  }
+  &.sort:before {
+    content: "\e932";
+  }
   &.sort-down:before {
-    content: "\e913";
+    content: "\e933";
   }
   &.sort-up:before {
-    content: "\e914";
+    content: "\e934";
   }
   &.plus:before {
-    content: "\e915";
+    content: "\e935";
   }
-  &.unit-selection:before {
+  &.unit-selection-alt:before {
     content: "\e92e";
   }
   &.unit-selection-solid:before {
-    content: "\e916";
+    content: "\e936";
   }
   &.toggle-on:before {
-    content: "\e917";
+    content: "\e937";
   }
   &.toggle-off:before {
-    content: "\e918";
+    content: "\e938";
   }
   &.text-area:before {
-    content: "\e919";
+    content: "\e939";
   }
   &.text:before {
-    content: "\e91a";
+    content: "\e93a";
   }
   &.selection:before {
-    content: "\e91b";
+    content: "\e93b";
   }
   &.locality-selection:before {
-    content: "\e91c";
+    content: "\e93c";
   }
   &.integer:before {
-    content: "\e91d";
+    content: "\e93d";
   }
   &.date:before {
-    content: "\e91e";
+    content: "\e93e";
   }
   &.currency:before {
-    content: "\e91f";
+    content: "\e93f";
   }
   &.chess-knight:before {
-    content: "\e920";
+    content: "\e940";
   }
   &.trash-alt:before {
-    content: "\e921";
+    content: "\e941";
   }
   &.trash:before {
-    content: "\e922";
+    content: "\e942";
   }
   &.home:before {
-    content: "\e923";
+    content: "\e943";
   }
   &.folder-open:before {
-    content: "\e924";
+    content: "\e944";
   }
   &.cogs:before {
-    content: "\e925";
+    content: "\e945";
   }
   &.portfolio:before {
-    content: "\e926";
+    content: "\e946";
   }
   &.sign-out-alt:before {
-    content: "\e927";
+    content: "\e947";
   }
   &.flag:before {
-    content: "\e928";
+    content: "\e948";
   }
   &.plan:before {
-    content: "\e929";
+    content: "\e949";
   }
   &.briefcase:before {
-    content: "\e92a";
+    content: "\e94a";
   }
   &.user-circle:before {
-    content: "\e92b";
+    content: "\e94b";
   }
   &.building:before {
-    content: "\e92c";
+    content: "\e94c";
   }
   &.users:before {
-    content: "\e92d";
+    content: "\e94d";
   }
   &.number:before {
     content: "\e900";
@@ -789,5 +842,118 @@ app-root p-toast .p-toast {
   &.plan-model-solid:before {
     content: "\e930";
   }
-
+  &.baseline:before {
+    content: "\e902";
+  }
+  &.canceled:before {
+    content: "\e903";
+  }
+  &.check-circle:before {
+    content: "\e905";
+  }
+  &.edit:before {
+    content: "\e908";
+  }
+  &.excel:before {
+    content: "\e909";
+  }
+  &.expand-arrows:before {
+    content: "\e90a";
+  }
+  &.fail:before {
+    content: "\e90b";
+  }
+  &.filter:before {
+    content: "\e90c";
+  }
+  &.fire-extinguisher:before {
+    content: "\e90d";
+  }
+  &.info:before {
+    content: "\e90e";
+  }
+  &.Issue:before {
+    content: "\e90f";
+  }
+  &.jump:before {
+    content: "\e910";
+  }
+  &.not_gonna_happen:before {
+    content: "\e911";
+  }
+  &.other_files:before {
+    content: "\e913";
+  }
+  &.pdf:before {
+    content: "\e914";
+  }
+  &.people_solid:before {
+    content: "\e915";
+  }
+  &.priority:before {
+    content: "\e91a";
+  }
+  &.process:before {
+    content: "\e91b";
+  }
+  &.response_risk:before {
+    content: "\e91c";
+  }
+  &.risk:before {
+    content: "\e91e";
+  }
+  &.risk_happened:before {
+    content: "\e920";
+  }
+  &.permission1:before {
+    content: "\e921";
+  }
+  &.share:before {
+    content: "\e922";
+  }
+  &.word:before {
+    content: "\e924";
+  }
+  &.action-required:before {
+    content: "\e931";
+  }
+  &.permission1:before {
+    content: "\e921";
+  }
+  &.pin-on:before {
+    content: "\e94e";
+  }
+  &.pin-off:before {
+    content: "\e94f";
+  }
+  &.grid:before {
+    content: "\e950";
+  }
+  &.process-selo:before {
+    content: "\e951";
+  }
+  &.pistola:before {
+    content: "\e952";
+  }
+  &.user-view:before {
+    content: "\e953";
+  }
+  &.user-edit:before {
+    content: "\e954";
+  }
+  &.unlink:before {
+    content: "\e955";
+  }
+  &.paste:before {
+    content: "\e956";
+  }
+  &.link-to:before {
+    content: "\e957";
+  }
+  &.sharing:before {
+    content: "\e958";
+  }
+  &.ccb-member:before {
+    content: "\e959";
+  }
 }

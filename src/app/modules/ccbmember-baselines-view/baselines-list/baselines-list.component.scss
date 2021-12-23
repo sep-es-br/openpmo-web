@@ -1,0 +1,21 @@
+.app-baseline-list{
+  .header-container {
+    display: flex;
+    flex-direction: row;
+  }
+  .app-content-header {
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-end;
+    flex: 1;
+  }
+  .header-container.mobile {
+    flex-direction: column;
+  }
+  .mobile {
+    width: 100%;
+  }
+  .card-container {
+    margin-bottom: 2rem;
+  }
+}

@@ -36,6 +36,8 @@ export class CostAccountComponent implements OnInit {
 
   responsive: boolean;
   idWorkpack: number;
+  idWorkpackModelLinked: number;
+  idPlan: number;
   idCurrentWorkpack: number;
   workpackModel: IWorkpackModel;
   workpack: IWorkpack;
@@ -68,6 +70,7 @@ export class CostAccountComponent implements OnInit {
     this.actRouter.queryParams.subscribe(async queryParams => {
       this.idCostAccount = queryParams.id;
       this.idWorkpack = queryParams.idWorkpack;
+      this.idWorkpackModelLinked = queryParams.idWorkpackModelLinked;
     });
     this.responsiveSrv.observable.subscribe(value => this.responsive = value);
   }
@@ -77,6 +80,7 @@ export class CostAccountComponent implements OnInit {
   }
 
   async loadProperties() {
+    this.idPlan = Number(localStorage.getItem('@currentPlan'));
     if (this.idWorkpack && !this.idCostAccount) {
       await this.loadWorkpack();
       this.loadCardCostAccountProperties();
@@ -106,7 +110,8 @@ export class CostAccountComponent implements OnInit {
             labelProgress: this.translateSrv.instant('actual'),
             labelTotal: this.translateSrv.instant('planned'),
             color: '#44B39B',
-            valueUnit: 'currency'
+            valueUnit: 'currency',
+            barHeight: 17
           }]
         };
         return;
@@ -122,7 +127,7 @@ export class CostAccountComponent implements OnInit {
   }
 
   async loadWorkpack(onlyBreadcrumb: boolean = false) {
-    const result = await this.workpackSrv.GetById(this.idWorkpack);
+    const result = await this.workpackSrv.GetWorkpackById(this.idWorkpack, {'id-plan': this.idPlan});
     if (result.success) {
       const isWorkpackLoaded = !!this.workpack;
       this.workpack = result.data;
@@ -179,14 +184,14 @@ export class CostAccountComponent implements OnInit {
   }
 
   async getBreadcrumbs() {
-    const { success, data } = await this.breadcrumbSrv.getBreadcrumbWorkpack(this.idCurrentWorkpack || this.idWorkpack);
+    const { success, data } = await this.breadcrumbSrv.getBreadcrumbWorkpack(this.idCurrentWorkpack || this.idWorkpack, {'id-plan': this.idPlan});
     return success
       ? data.map(p => ({
             key: !p.modelName ? p.type.toLowerCase() : p.modelName,
             info: p.name,
             tooltip: p.fullName,
             routerLink: this.getRouterLinkFromType(p.type),
-            queryParams: { id: p.id },
+            queryParams: { id: p.id, idWorkpackModelLinked: p.idWorkpackModelLinked },
             modelName: p.modelName
           }))
       : [];
@@ -437,7 +442,8 @@ export class CostAccountComponent implements OnInit {
         this.router.navigate([ '/workpack' ],
           {
             queryParams: {
-              id: this.idCurrentWorkpack || this.idWorkpack
+              id: this.idCurrentWorkpack || this.idWorkpack,
+              idWorkpackModelLinked: this.idWorkpackModelLinked
             }
           }
         );
@@ -453,7 +459,8 @@ export class CostAccountComponent implements OnInit {
         this.router.navigate([ '/workpack' ],
           {
             queryParams: {
-              id: this.idWorkpack
+              id: this.idWorkpack,
+              idWorkpackModelLinked: this.idWorkpackModelLinked
             }
           }
         );

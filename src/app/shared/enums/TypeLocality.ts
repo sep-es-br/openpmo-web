@@ -3,5 +3,6 @@ export enum TypeLocality{
     Region = 'region',
     State = 'state',
     City = 'city',
-    District = 'district'
+    District = 'district',
+    Root = 'root'
 }

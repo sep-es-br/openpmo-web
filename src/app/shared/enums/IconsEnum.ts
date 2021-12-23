@@ -46,6 +46,8 @@ export enum IconsEnum {
   UnitSelectionSolid = 'unit-selection-solid',
   UserCircle = 'user-circle',
   Users = 'users',
+  UserEdit = 'user-edit',
+  UserRead = 'user-view',
   PlanModel = 'plan-model',
-  PlanModelSolid = 'plan-model-solid'
+  CCBMember = 'ccb-member'
 }

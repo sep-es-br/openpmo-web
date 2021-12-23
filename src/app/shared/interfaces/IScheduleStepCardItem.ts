@@ -5,6 +5,7 @@ export interface IScheduleStepCardItem {
   stepName?: Date;
   stepDay?: Date;
   menuItems?: MenuItem[];
+  stepOrder?: string;
   unitPlanned?: number;
   unitActual?: number;
   unitProgressBar?: {
@@ -20,11 +21,8 @@ export interface IScheduleStepCardItem {
   costPlanned?: number;
   costActual?: number;
   unitName?: string;
+  unitPrecision?: number;
   idStep?: number;
   urlCard?: string;
-  urlParams?: {
-    idSchedule: number;
-    stepType: string;
-    unitName: string;
-  };
+  urlParams?: {name: string; value: string | number}[];
 }

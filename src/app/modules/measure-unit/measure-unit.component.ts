@@ -1,6 +1,9 @@
+import { PropertyTemplateModel } from './../../shared/models/PropertyTemplateModel';
+import { FilterDataviewPropertiesEntity } from './../../shared/constants/filterDataviewPropertiesEntity';
+import { FilterDataviewService } from './../../shared/services/filter-dataview.service';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { MenuItem, MessageService } from 'primeng/api';
 import { Subject } from 'rxjs';
@@ -31,19 +34,19 @@ export class MeasureUnitComponent implements OnInit {
   formsMeasureUnits: { id: string; form: FormGroup }[] = [];
   measureUnits: IMeasureUnit[];
   propertiesOffice: IOffice;
-  cardProperties: ICard = {
-    toggleable: false,
-    initialStateToggle: false,
-    cardTitle: 'measureUnits',
-    collapseble: false,
-    initialStateCollapse: false
-  };
   idOffice: number;
   cardItemsProperties: ICardItemMeasureUnit[] = [];
   $destroy = new Subject();
   isUserAdmin: boolean;
   editPermission: boolean;
   responsive: boolean;
+  validatorsPrecision = [Validators.required, Validators.min(0), Validators.max(5)];
+  collapsePanelsStatus = true;
+  displayModeAll = 'grid';
+  pageSize = 5;
+  totalRecords: number;
+  idFilterSelected: number;
+  cardProperties: ICard;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -56,7 +59,9 @@ export class MeasureUnitComponent implements OnInit {
     private officePermissionSrv: OfficePermissionService,
     private responsiveSrv: ResponsiveService,
     private messageSrv: MessageService,
-    private translateSrv: TranslateService
+    private translateSrv: TranslateService,
+    private filterSrv: FilterDataviewService,
+    private router: Router
   ) {
     this.activeRoute.queryParams.subscribe(params => this.idOffice = +params.idOffice);
     this.responsiveSrv.observable.subscribe(value => this.responsive = value);
@@ -64,17 +69,50 @@ export class MeasureUnitComponent implements OnInit {
 
 
   async ngOnInit() {
+    this.cardProperties = {
+      toggleable: false,
+      initialStateToggle: false,
+      cardTitle: 'measureUnits',
+      collapseble: false,
+      initialStateCollapse: false,
+    };
     this.isUserAdmin = await this.authSrv.isUserAdmin();
     this.editPermission = await this.officePermissionSrv.getPermissions(this.idOffice);
+    await this.loadFiltersUnitMeansures();
     await this.loadMeasureUnitList();
     await this.getOfficeById();
-    this.breadcrumbSrv.setMenu([{
+    this.breadcrumbSrv.setMenu([
+      {
+        key: 'administration',
+        info: this.propertiesOffice?.name,
+        tooltip: this.propertiesOffice?.fullName,
+        routerLink: [ '/configuration-office' ],
+        queryParams: { idOffice: this.idOffice }
+      },
+      {
       key: 'measureUnits',
       info: this.propertiesOffice?.name,
       tooltip: this.propertiesOffice?.fullName,
       routerLink: ['/measure-units'],
       queryParams: { idOffice: this.idOffice }
-    }]);
+    }
+  ]);
+  }
+
+  handleChangeCollapseExpandPanel(event) {
+    this.collapsePanelsStatus = event.mode === 'collapse' ? true : false;
+    this.cardProperties = Object.assign({}, {
+      ...this.cardProperties,
+      initialStateCollapse: this.collapsePanelsStatus
+    });
+  }
+
+  handleChangeDisplayMode(event) {
+    this.displayModeAll = event.displayMode;
+  }
+
+  handleChangePageSize(event) {
+    this.pageSize = event.pageSize;
   }
 
   async getOfficeById() {
@@ -85,7 +123,7 @@ export class MeasureUnitComponent implements OnInit {
   }
 
   async loadMeasureUnitList() {
-    const result = await this.measureUnitSvr.GetAll({ idOffice: this.idOffice });
+    const result = await this.measureUnitSvr.GetAll({ idOffice: this.idOffice, idFilter: this.idFilterSelected });
     if (result.success) {
       this.measureUnits = result.data;
     }
@@ -95,7 +133,7 @@ export class MeasureUnitComponent implements OnInit {
 
   loadCardItemsMeasureUnits() {
     if (this.measureUnits.length > 0) {
-        this.cardItemsProperties = this.measureUnits.map((measureUnit, index) => ({
+      this.cardItemsProperties = this.measureUnits.map((measureUnit, index) => ({
         typeCardItem: 'listItem',
         icon: IconsEnum.UnitSelection,
         nameCardItem: measureUnit.name,
@@ -103,9 +141,11 @@ export class MeasureUnitComponent implements OnInit {
         id: measureUnit.id,
         itemId: measureUnit.id ?
           `ID: ${measureUnit.id < 10 ? '0' + measureUnit.id : measureUnit.id}` : '',
-        menuItems: [{ label: 'Delete', icon: 'fas fa-trash-alt',
-        command: () => this.deleteMeasureUnit(measureUnit),
-        disabled: !this.editPermission }] as MenuItem[],
+        menuItems: [{
+          label: 'Delete', icon: 'fas fa-trash-alt',
+          command: () => this.deleteMeasureUnit(measureUnit),
+          disabled: !this.editPermission
+        }] as MenuItem[],
       }));
     } else if (this.cardItemsProperties?.length > 1) {
       this.cardItemsProperties = this.editPermission ? [{
@@ -118,6 +158,8 @@ export class MeasureUnitComponent implements OnInit {
     if (this.cardItemsProperties[0]?.typeCardItem === 'listItem' && this.editPermission) {
       this.cardItemsProperties.push({ typeCardItem: 'newCardItem', icon: IconsEnum.Plus });
     }
+    this.totalRecords = this.cardItemsProperties && this.cardItemsProperties.length;
+    this.cardProperties.showCreateNemElementButton = this.editPermission ? true : false;
   }
 
   loadFormsMeasureUnits() {
@@ -127,19 +169,20 @@ export class MeasureUnitComponent implements OnInit {
         form: this.formBuilder.group({
           id: measureUnit.id,
           name: [measureUnit.name, [Validators.required, Validators.maxLength(25)]],
-          fullName: [measureUnit.fullName, Validators.required]
+          fullName: [measureUnit.fullName, Validators.required],
+          precision: [measureUnit.precision, this.validatorsPrecision],
         })
       }));
       if (!this.editPermission) {
-        this.formsMeasureUnits.forEach( item => item.form.disable());
+        this.formsMeasureUnits.forEach(item => item.form.disable());
       } else {
-        this.formsMeasureUnits.forEach( item => {
+        this.formsMeasureUnits.forEach(item => {
           item.form.statusChanges
             .pipe(takeUntil(this.$destroy), filter(status => status === 'INVALID'))
             .subscribe(() => this.saveButton?.hideButton());
           item.form.valueChanges
-          .pipe(takeUntil(this.$destroy), filter(() => item.form.dirty && item.form.valid))
-          .subscribe(() => this.saveButton?.showButton());
+            .pipe(takeUntil(this.$destroy), filter(() => item.form.dirty && item.form.valid))
+            .subscribe(() => this.saveButton?.showButton());
         });
       }
     } else {
@@ -152,12 +195,13 @@ export class MeasureUnitComponent implements OnInit {
     if (success) {
       this.cardItemsProperties = this.cardItemsProperties.filter(item => item.id !== measureUnit.id);
       this.formsMeasureUnits = this.formsMeasureUnits.filter(item => item.id !== measureUnit.id?.toString());
+      this.totalRecords = this.cardItemsProperties && this.cardItemsProperties.length;
     }
   };
 
   async handleOnSubmit() {
-    const formItemsChanged = this.formsMeasureUnits.filter( item => item.form.dirty && item.form.valid);
-    formItemsChanged.forEach( async({ form, id }) => {
+    const formItemsChanged = this.formsMeasureUnits.filter(item => item.form.dirty && item.form.valid);
+    formItemsChanged.forEach(async({ form, id }) => {
       const { success, data } = form.value.id
         ? await this.measureUnitSvr.put(form.value)
         : await this.measureUnitSvr.post({ ...form.value, idOffice: this.idOffice });
@@ -180,9 +224,11 @@ export class MeasureUnitComponent implements OnInit {
             id: measureUnit.id,
             itemId: measureUnit.id ?
               `ID: ${measureUnit.id < 10 ? '0' + measureUnit.id : measureUnit.id}` : '',
-            menuItems: [{ label: 'Delete', icon: 'fas fa-trash-alt',
-            command: () => this.deleteMeasureUnit(measureUnit),
-            disabled: !this.editPermission }] as MenuItem[],
+            menuItems: [{
+              label: 'Delete', icon: 'fas fa-trash-alt',
+              command: () => this.deleteMeasureUnit(measureUnit),
+              disabled: !this.editPermission
+            }] as MenuItem[],
           });
           this.cardItemsProperties = [
             ... this.cardItemsProperties.slice(0, cardItemIndex),
@@ -216,15 +262,17 @@ export class MeasureUnitComponent implements OnInit {
     });
     this.newForm(newId);
     this.cardItemsProperties.push(lastCardItemRemove);
+    this.cardItemsProperties = Array.from([...this.cardItemsProperties]);
   }
 
   newForm(newId) {
     const newForm = {
       id: newId,
-      form:  this.formBuilder.group({
+      form: this.formBuilder.group({
         id: null,
         name: ['', [Validators.required, Validators.maxLength(25)]],
-        fullName: ['', [Validators.required]]
+        fullName: ['', [Validators.required]],
+        precision: [0, this.validatorsPrecision],
       })
     };
     newForm.form.statusChanges
@@ -252,4 +300,75 @@ export class MeasureUnitComponent implements OnInit {
   getFormById(id) {
     return this.formsMeasureUnits.find(item => item.id === id.toString())?.form;
   }
+
+  async loadFiltersUnitMeansures() {
+    const result = await this.filterSrv.getAllFilters('unitMeasures');
+    if (result.success && result.data.length > 0) {
+      const filterDefault = result.data.find(filter => !!filter.favorite);
+      this.idFilterSelected = filterDefault ? filterDefault.id : undefined;
+      this.cardProperties.filters = result.data;
+    }
+    this.cardProperties.showFilters = true;
+  }
+
+  handleEditFilter(event) {
+    const idFilter = event.filter;
+    if (idFilter) {
+      const filterProperties = this.loadFilterPropertiesList();
+      this.filterSrv.setFilterProperties(filterProperties);
+      this.setBreadcrumbStorage();
+      this.router.navigate(['/filter-dataview'], {
+        queryParams: {
+          id: idFilter,
+          entityName: 'unitMeasures'
+        }
+      });
+    }
+  }
+
+  async handleSelectedFilter(event) {
+    const idFilter = event.filter;
+    if (idFilter) {
+      this.idFilterSelected = idFilter;
+      await this.loadMeasureUnitList();
+    }
+  }
+
+  handleNewFilter() {
+    const filterProperties = this.loadFilterPropertiesList();
+    this.filterSrv.setFilterProperties(filterProperties);
+    this.setBreadcrumbStorage();
+    this.router.navigate(['/filter-dataview'], {
+      queryParams: {
+        entityName: 'unitMeasures'
+      }
+    });
+  }
+
+  loadFilterPropertiesList() {
+    const listProperties = FilterDataviewPropertiesEntity.unitMeasures;
+    const filterPropertiesList = listProperties.map(prop => {
+      const property = new PropertyTemplateModel();
+      property.type = prop.type;
+      property.label = prop.label;
+      property.name = prop.apiValue;
+      property.active = true;
+      return property;
+    });
+    return filterPropertiesList;
+  }
+
+  setBreadcrumbStorage() {
+    this.breadcrumbSrv.setBreadcrumbStorage([{
+      key: 'measureUnits',
+      info: this.propertiesOffice?.name,
+      tooltip: this.propertiesOffice?.fullName,
+      routerLink: ['/measure-units'],
+      queryParams: { idOffice: this.idOffice }
+    }, {
+      key: 'filter',
+      routerLink: ['filter-dataview']
+    }]);
+  }
+
 }

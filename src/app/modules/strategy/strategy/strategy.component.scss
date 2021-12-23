@@ -12,10 +12,82 @@
   .models-cards-section {
     margin-top: 1em;
   }
+  .header-container {
+    display: flex;
+    flex-direction: row;
+  }
+  .app-content-header {
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-end;
+    flex: 1;
+  }
+  .header-container.mobile {
+    flex-direction: column;
+  }
   .mobile {
     width: 100%;
   }
   .desktop {
     width: 30%;
+  }
+  ::ng-deep .card-sharing {
+    .offices-sharing-container {
+      min-width: 20%;
+      margin-bottom: 2em;
+      .app-multiple-selection {
+        min-width: 20%;
+      }
+      .p-multiselect {
+        min-width: 20%;
+      }
+    }
+    .offices-sharing-container.responsive {
+      min-width: 100%;
+      .app-multiple-selection {
+        min-width: 100%;
+      }
+      .p-multiselect {
+        min-width: 100%;
+      }
+      .p-multiselect-label {
+        white-space: normal;
+      }
+      .p-multiselect-token {
+        margin-top: 0.5em;
+      }
+    }
+  }
+  ::ng-deep .app-multiple-selection {
+    .p-multiselect-chip {
+      padding-top: 0.5em;
+      .p-multiselect-label .p-multiselect-token .p-multiselect-token-label {
+        font-family: v.$fontFamilyMedium;
+        font-size: 1rem;
+        border: none;
+        border-bottom: 1px solid v.$borderInput;
+        border-radius: 0;
+        background-color: transparent;
+        color: v.$fontInput;
+      
+        &.p-focus {
+          border-color: transparent !important;
+          border-bottom: 1px solid v.$borderInput !important;
+          box-shadow: none !important;
+        }
+        &:enabled:focus {
+          border-bottom: 1px solid v.$borderInput;
+          box-shadow: none;
+        }
+        &:hover {
+          border-bottom: 1px solid v.$borderInputHover !important;
+          box-shadow: none;
+        }
+        .full-line {
+          width: 100%;
+        }
+      }
+    }
+    
   }
 }

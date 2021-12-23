@@ -1,7 +1,7 @@
 export interface IOffice {
     id: number;
     name: string;
-    fullName: string;
+    fullName?: string;
     permissions?: IPermission[];
 }
 

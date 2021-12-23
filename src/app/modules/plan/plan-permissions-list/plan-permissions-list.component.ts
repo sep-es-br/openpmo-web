@@ -1,5 +1,8 @@
+import { PropertyTemplateModel } from './../../../shared/models/PropertyTemplateModel';
+import { FilterDataviewPropertiesEntity } from 'src/app/shared/constants/filterDataviewPropertiesEntity';
+import { FilterDataviewService } from './../../../shared/services/filter-dataview.service';
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { IPlan } from 'src/app/shared/interfaces/IPlan';
 import { IPlanPermission } from 'src/app/shared/interfaces/IPlanPermission';
 import { PlanService } from 'src/app/shared/services/plan.service';
@@ -33,7 +36,12 @@ export class PlanPermissionsListComponent implements OnInit {
     collapseble: true,
     initialStateCollapse: false
   };
-
+  collapsePanelsStatus = true;
+  displayModeAll = 'grid';
+  pageSize = 5;
+  totalRecords: number;
+  idFilterSelected: number;
+  
   constructor(
     private actRouter: ActivatedRoute,
     private responsiveSrv: ResponsiveService,
@@ -41,7 +49,9 @@ export class PlanPermissionsListComponent implements OnInit {
     private planPermissionSrv: PlanPermissionService,
     private translateSrv: TranslateService,
     private breadcrumbSrv: BreadcrumbService,
-    private officeSrv: OfficeService
+    private officeSrv: OfficeService,
+    private filterSrv: FilterDataviewService,
+    private router: Router
   ) {
     this.actRouter.queryParams.subscribe(async queryParams => {
       this.idPlan = queryParams.idPlan;
@@ -53,8 +63,25 @@ export class PlanPermissionsListComponent implements OnInit {
   }
 
   async ngOnInit() {
+    await this.loadPlanPermissionsFilters();
     await this.loadPropertiesPlan();
     await this.loadPropertiesOffice();
+  }
+
+  handleChangeCollapseExpandPanel(event) {
+    this.collapsePanelsStatus = event.mode === 'collapse' ? true : false;
+    this.cardPlanPermissions = Object.assign({}, {
+      ...this.cardPlanPermissions,
+      initialStateCollapse: this.collapsePanelsStatus
+    });
+  }
+
+  handleChangeDisplayMode(event) {
+    this.displayModeAll = event.displayMode;
+  }
+
+  handleChangePageSize(event) {
+    this.pageSize = event.pageSize;
   }
 
   async loadPropertiesPlan() {
@@ -66,7 +93,7 @@ export class PlanPermissionsListComponent implements OnInit {
   }
 
   async loadPlanPermissions() {
-    const result = await this.planPermissionSrv.GetAll({'id-plan': this.idPlan});
+    const result = await this.planPermissionSrv.GetAll({'id-plan': this.idPlan, idFilter: this.idFilterSelected});
     if (result.success) {
       this.planPermissions = result.data;
       this.loadCardItemsPlanPermissions();
@@ -133,12 +160,104 @@ export class PlanPermissionsListComponent implements OnInit {
         ]
       }
     );
+    this.totalRecords = this.cardItemsPlanPermissions && this.cardItemsPlanPermissions.length;
+    this.cardPlanPermissions.showCreateNemElementButton = true;
+  }
+
+  handleCreateNewPlanPermission() {
+    this.router.navigate(['/plan/permission/detail'], {
+      queryParams: {
+        idPlan: this.idPlan
+      }
+    });
   }
 
   async deletePlanPermission(permission: IPlanPermission) {
     const result = await this.planPermissionSrv.deletePermission({ email: permission.person.email, 'id-plan': permission.idPlan });
     if (result.success) {
       this.cardItemsPlanPermissions = Array.from(this.cardItemsPlanPermissions.filter(p => p.itemId !== permission.person.id));
+      this.totalRecords = this.cardItemsPlanPermissions && this.cardItemsPlanPermissions.length;
     }
+  }
+
+  async loadPlanPermissionsFilters() {
+    const result = await this.filterSrv.getAllFilters('plan-permissions');
+    if (result.success && result.data.length > 0) {
+        const filterDefault = result.data.find( filter => !!filter.favorite);
+        this.idFilterSelected = filterDefault ? filterDefault.id : undefined;
+        this.cardPlanPermissions.filters = result.data;
+    }
+    this.cardPlanPermissions.showFilters = true;
+  }
+
+  handleEditFilter(event) {
+    const idFilter = event.filter;
+    if (idFilter) {
+      const filterProperties = this.loadFilterPropertiesList();
+      this.filterSrv.setFilterProperties(filterProperties);
+      this.setBreadcrumbStorage();
+      this.router.navigate(['/filter-dataview'], {
+        queryParams: {
+          id: idFilter,
+          entityName: 'plan-permissions'
+        }
+      });
+    }
+  }
+
+  async handleSelectedFilter(event) {
+    const idFilter = event.filter;
+    if (idFilter) {
+      this.idFilterSelected = idFilter;
+      await this.loadPlanPermissions();
+    }
+  }
+
+  handleNewFilter() {
+    const filterProperties = this.loadFilterPropertiesList();
+    this.filterSrv.setFilterProperties(filterProperties);
+    this.setBreadcrumbStorage();
+    this.router.navigate(['/filter-dataview'], {
+      queryParams: {
+        entityName: 'plan-permissions'
+      }
+    });
+  }
+
+  loadFilterPropertiesList() {
+    const listProperties = FilterDataviewPropertiesEntity.planPermissions;
+    const filterPropertiesList = listProperties.map( prop => {
+      const property =  new PropertyTemplateModel();
+      property.type = prop.type;
+      property.label = prop.label;
+      property.name = prop.apiValue;
+      property.active = true;
+      property.possibleValues = prop.possibleValues;
+      return property;
+    });
+    return filterPropertiesList;
+  }
+
+  setBreadcrumbStorage() {
+    this.breadcrumbSrv.setBreadcrumbStorage([
+      {
+        key: 'office',
+        routerLink: [ '/offices', 'office' ],
+        queryParams: { id: this.idOffice },
+        info: this.propertiesOffice?.name,
+        tooltip: this.propertiesOffice?.fullName
+      },
+      {
+        key: 'planPermissions',
+        routerLink: [ '/plan', 'permission' ],
+        queryParams: { idPlan: this.idPlan },
+        info: this.propertiesPlan?.name,
+        tooltip: this.propertiesPlan?.fullName
+      },
+      {
+        key: 'filter',
+        routerLink: [ 'filter-dataview' ],
+      }
+    ]);
   }
 }

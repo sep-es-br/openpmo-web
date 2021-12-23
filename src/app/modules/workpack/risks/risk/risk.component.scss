@@ -1,0 +1,218 @@
+@use "src/variables" as v;
+
+::ng-deep .app-risk {
+  width: 100%;
+  .card-properties-risk{
+    width: 100%;
+    form {
+      width: 100%;
+      padding-bottom: 3em;
+      .formgroup-dates {
+        width: 40%;
+        display: flex;
+        margin-top: 1em;
+        flex-direction: row;
+        align-items: center;
+        .p-field {
+          margin-right: 1em;
+        }
+        .app-select-date {
+          display: flex;
+          width: 100%;
+          .p-calendar {
+            width: 100%;
+          }
+        }
+        .app-input-number {
+          display: flex;
+          width: 100%;
+          .p-inputnumber {
+            display: flex;
+            width: 100% !important;
+            .p-inputtext {
+              display: flex;
+              width: 100% !important;
+            }
+          }
+        }
+      }
+      .form-group {
+        display: flex;
+        flex-direction: row;
+        align-items: flex-end;
+        padding-bottom: 1em;
+        width: 100%;
+        .p-field {
+          display: flex;
+          flex-direction: column;
+          width: 15%;
+          .p-float-label {
+            width: 100%;
+            .p-dropdown {
+              width: 100%;
+            }
+          }
+        }
+        .nature-container {
+          display: flex;
+          flex-direction: row;
+          margin-left: 2em;
+          .nature-radio {
+            padding-bottom: 10px;
+          }
+          .opportunity {
+            margin-left: 1em;
+          }
+          .p-radiobutton .p-radiobutton-box {
+            background-color: white !important;
+            border-color: v.$fontInput;
+            &:hover {
+              border-color: v.$fontInput;
+            }
+          }
+          .p-radiobutton .p-radiobutton-box.p-highlight {
+            background-color: white !important;
+            border-color: v.$fontInput;
+            &:hover {
+              border-color: v.$fontInput;
+              background: white !important;
+            }
+            .p-radiobutton-icon {
+              background-color: v.$fontInput;
+            }
+          }
+          p-radiobutton .p-radiobutton .p-radiobutton-box.p-highlight {
+            border-color: v.$fontInput !important;
+            background: white !important;
+            box-shadow: none;
+          }
+          .p-radiobutton.p-radiobutton-focused.p-radiobutton-checked {
+            background-color: white !important;
+            border-color: v.$fontInput;
+            box-shadow: none;
+          }
+          .p-radiobutton .p-radiobutton-box {
+            .p-radiobutton-icon {
+              background-color: v.$fontInput;
+            }
+          }
+        }
+      }
+      .status-container {
+        display: flex;
+        flex-direction: row;
+        .status-radio {
+          padding-bottom: 10px;
+          margin-right: 1em;
+        }
+        .opportunity {
+          margin-left: 1em;
+        }
+        .p-radiobutton .p-radiobutton-box {
+          background-color: white !important;
+          border-color: v.$fontInput;
+          &:hover {
+            border-color: v.$fontInput;
+          }
+        }
+        .p-radiobutton .p-radiobutton-box.p-highlight {
+          background-color: white !important;
+          border-color: v.$fontInput;
+          &:hover {
+            border-color: v.$fontInput;
+            background: white !important;
+          }
+          .p-radiobutton-icon {
+            background-color: v.$fontInput;
+          }
+        }
+        p-radiobutton .p-radiobutton .p-radiobutton-box.p-highlight {
+          border-color: v.$fontInput !important;
+          background: white !important;
+          box-shadow: none;
+        }
+        .p-radiobutton.p-radiobutton-focused.p-radiobutton-checked {
+          background-color: white !important;
+          border-color: v.$fontInput;
+          box-shadow: none;
+        }
+        .p-radiobutton .p-radiobutton-box {
+          .p-radiobutton-icon {
+            background-color: v.$fontInput;
+          }
+        }
+      }
+      .p-fluid {
+        margin-top: 1em;
+      }
+      .status-title {
+        margin-top: 0.5em;
+      }
+      .likely-to-happen {
+        margin-top: 1em;
+      }
+      ::ng-deep .p-field.responsive {
+        margin-right: 0 !important;
+      }
+      ::ng-deep .responsive {
+        width: 100% !important;
+        .p-calendar {
+          width: 100%;
+        }
+      }
+    }
+  }
+  ::ng-deep .dataview-card-items-risk {
+    position: static !important;
+    background-color: transparent;
+    .p-dataview-content, .p-grid {
+      background-color: transparent;
+    }
+    .card-item-container {
+      padding: 0.5em;
+      min-height: 9.5em !important;
+      &:first-child {
+        padding: 0.5em 0.5em 0.5em 0;
+      }
+    }
+    .card-item-container.responsive {
+      padding: 0.5em 0;
+    }
+  }
+
+}
+
+::ng-deep .app-risk {
+  .card-properties-risk.responsive form {
+    .form-group.responsive {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    .nature-container {
+      margin-left: 0;
+      margin-top: 1em;
+    }
+    .status-container {
+      flex-direction: column;
+    }
+    .p-field {
+      margin-right: 0 !important;
+      width: 100%;
+    }
+    .formgroup-dates {
+      width: 100%;
+      flex-direction: column;
+      align-items: flex-start;
+      .p-calendar {
+        width: 100%;
+      }
+    }
+    .responsive {
+      width: 100% !important;
+
+      .p-calendar {
+        width: 100%;
+      }
+    }
+  }
+}

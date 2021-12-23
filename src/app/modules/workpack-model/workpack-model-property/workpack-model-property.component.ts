@@ -31,6 +31,7 @@ export class WorkpackModelPropertyComponent implements OnDestroy, AfterViewInit 
   ) {
     this.calendarFormat = this.translateSrv.instant('dateFormat');
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(responsive => this.responsive = responsive);
+    
   }
 
   ngAfterViewInit(): void {
@@ -61,6 +62,8 @@ export class WorkpackModelPropertyComponent implements OnDestroy, AfterViewInit 
         if (!this.property.multipleSelection && isArray) {
           this.property.defaults = (this.property.defaults as any[]).shift();
         }
+        this.property.selectedLocalities = this.translateSrv.instant('selectDefaultValue');
+        this.property.showIconButtonSelectLocality = true;
       }
     } else {
       const isArray = this.property?.defaultValue instanceof Array;

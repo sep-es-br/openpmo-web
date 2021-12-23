@@ -1,0 +1,120 @@
+<div class="app-person">
+  <div class="header-container">
+    <div class="app-content-header" [class.mobile]="responsive">
+      <span>{{ 'profile' | translate }}</span>
+    </div>
+  </div>
+  <div class="card-container">
+    <app-card [properties]="cardProperties" class="mt-0">
+      <div class="content">
+        <div class="container-left-info">
+          <app-avatar [edit]="true" [idPerson]="idPerson"> </app-avatar>
+          <span class="name">{{propertiesPerson?.fullName}}</span>
+          <form [formGroup]="formPerson" class="form">
+            <span class="p-float-label property-input p-field">
+              <input pInputText class="app-input-text" type="text" [class.responsive]="responsive"
+                formControlName="name">
+              <label class="app-input-label">{{ 'messages.labelNameProfile' | translate }} </label>
+            </span>
+            <span class="p-float-label property-input p-field">
+              <input pInputText class="app-input-text" type="text" [class.responsive]="responsive"
+                formControlName="email" [readOnly]="true">
+              <label class="app-input-label">{{ 'accessEmail' | translate }} </label>
+            </span>
+          </form>
+        </div>
+        <div class="container-right-info">
+          <span class="p-float-label property-input p-field">
+            <p-dropdown class="app-single-selection" [options]="optionsOffices" optionLabel="label" [required]="true"
+             [class.responsive]="responsive" [(ngModel)]="idOffice"
+              (onChange)="handleChangeOffice($event)"></p-dropdown>
+            <label class="app-input-label">{{ 'office' | translate }} </label>
+          </span>
+          <section class="section">
+            <h3 class="subtitle">{{'myContactInformation' | translate}}</h3>
+            <form [formGroup]="formPerson" class="form">
+              <div class="p-fluid p-formgroup p-grid">
+                <span class="p-float-label property-input-text p-field p-col-12 p-md-4">
+                  <input pInputText class="app-input-text" type="text" [class.responsive]="responsive"
+                    formControlName="contactEmail">
+                  <label class="app-input-label">{{ 'email' | translate }} </label>
+                </span>
+                <span class="p-float-label property-input p-field p-col-12 p-md-2">
+                  <p-inputMask mask="(99) 9 9999-9999" [class.responsive]="responsive" [unmask]="true"
+                  formControlName="phoneNumber" ></p-inputMask>
+                  <label class="app-input-label">{{ 'phone' | translate }} </label>
+                </span>
+              </div>
+              <span class="p-float-label property-input p-field">
+                <textarea pInputTextarea class="app-text-area" [class.responsive]="responsive" formControlName="address"
+                  [rows]="2"></textarea>
+                <label class="app-input-label">{{ 'address' | translate }} </label>
+              </span>
+            </form>
+          </section>
+          <section class="section">
+            <div class="unifique-contacts">
+              <button pButton [label]="'unifyContactOffices' | translate" (click)="handleUnifyOfficesContacts($event)">
+              </button>
+            </div>
+            <h3 class="subtitle">{{'myRolesPermissions' | translate}}</h3>
+            <div class="container-permission">
+              <div class="permission">
+                <span class="label">{{'officePermission' | translate}}</span>
+                <span class="value">{{propertiesPerson?.officePermission?.accessLevel | translate}}</span>
+              </div>
+              <div class="button-change">
+                <button pButton [label]="'change' | translate"
+                (click)="navigateToPage('offices/permission/detail', this.propertiesPerson.email, this.idOffice)">
+                  <i class="fas fa-share"></i>
+                </button>
+              </div>
+            </div>
+
+            <ng-container *ngFor="let cardPlan of cardsPlans; let i = index">
+              <div class="card-container">
+                <app-card [properties]="cardPlan" class="mt-0">
+                  <div class="container-permission">
+                    <div class="permission">
+                      <span class="label">{{'planPermission' | translate}}</span>
+                      <span class="value">{{propertiesPerson?.officePermission?.planPermissions[i].accessLevel | translate}}</span>
+                    </div>
+                    <div class="button-change">
+                      <button pButton [label]="'change' | translate"
+                      (click)="navigateToPage('plan/permission/detail',
+                      this.propertiesPerson.email, undefined, propertiesPerson?.officePermission?.planPermissions[i].id)">
+                        <i class="fas fa-share"></i>
+                      </button>
+                    </div>
+                  </div>
+                  <p-dataView [value]="cardPlan.cardItems" layout="grid" class="app-dataview"
+                    *ngIf="displayModeAll === 'grid'" [paginator]="true" [rows]="pageSize"
+                    [showJumpToPageDropdown]="true" [showPageLinks]="false" [totalRecords]="totalRecords"
+                    [emptyMessage]="(!cardPlan.cardItems ? 'loadingEllipsis' : 'noContent') | translate">
+                    <ng-template let-cardItem pTemplate="gridItem">
+                      <div class="p-col-12 p-md-3 p-sm-12 card-item-container">
+                        <app-card-item [properties]="cardItem"></app-card-item>
+                      </div>
+                    </ng-template>
+                  </p-dataView>
+
+                  <p-dataView [value]="cardPlan.cardItems" layout="list" class="app-dataview app-dataview-list"
+                    *ngIf="displayModeAll === 'list'" [paginator]="true" [rows]="pageSize"
+                    [showJumpToPageDropdown]="true" [showPageLinks]="false" [totalRecords]="totalRecords"
+                    [emptyMessage]="(!cardPlan.cardItems ? 'loadingEllipsis' : 'noContent') | translate">
+                    <ng-template let-cardItem pTemplate="listItem">
+                      <div class="p-col-12">
+                        <app-card-item [properties]="cardItem" [displayModeCard]="displayModeAll"></app-card-item>
+                      </div>
+                    </ng-template>
+                  </p-dataView>
+                </app-card>
+              </div>
+            </ng-container>
+          </section>
+        </div>
+      </div>
+    </app-card>
+  </div>
+  <app-save-button (save)="savePerson()"></app-save-button>
+</div>

@@ -1,0 +1,9 @@
+@use "src/variables" as v;
+
+::ng-deep .app-property-tree-selection {
+  width: 100%;
+  padding-bottom: 10px;
+  label {
+    font-size: 0.8rem;
+  }
+}

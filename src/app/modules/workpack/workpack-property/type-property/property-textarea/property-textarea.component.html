@@ -1,8 +1,8 @@
 <span class="p-float-label">
-  <textarea pInputTextarea [id]="property.name" class="app-text-area" rows="1" [(ngModel)]="property.value"
+  <textarea pInputTextarea [id]="property.name" class="app-text-area" [(ngModel)]="property.value"
     [disabled]="property.disabled" [required]="property.required" [defaultValue]="property.defaultValue"
     (blur)="changed.emit($event)" [minLength]="property.min" [maxlength]="property.max"
-    [class.ng-invalid]="property.invalid" [rows]="property.rows ? property.rows : 1"
+    [class.ng-invalid]="property.invalid" [rows]="property.rows ? property.rows : 1" [autoResize]="true"
     (ngModelChange)="changed.emit($event)">
   </textarea>
   <label class="app-input-label" [for]="property.name">{{ property.label}} {{ property.required ? '*' : ''}}</label>

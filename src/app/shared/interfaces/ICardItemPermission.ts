@@ -1,3 +1,4 @@
+import { IOffice } from './IOffice';
 import { MenuItem } from 'primeng/api';
 
 export interface ICardItemPermission {
@@ -10,4 +11,7 @@ export interface ICardItemPermission {
   itemId?: number;
   levelListOptions?: { label: string; value: string}[];
   selectedOption?: string;
+  iconMenuItems?: MenuItem[]; 
+  readOnly?: boolean;
+  office?: IOffice;
 }

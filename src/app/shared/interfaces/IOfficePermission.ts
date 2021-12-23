@@ -1,16 +1,9 @@
+import { IPerson } from 'src/app/shared/interfaces/IPerson';
 export interface IOfficePermission {
   idOffice: number;
   permissions: IPermission[];
   email?: string;
-  person?: {
-    address: string;
-    administrator: boolean;
-    contactEmail: string;
-    email: string;
-    fullName: string;
-    id: number;
-    name: string;
-  };
+  person?: IPerson
 }
 
 interface IPermission {

@@ -1,0 +1,68 @@
+<div class="app-person-list">
+  <div class="header-container">
+    <div class="app-content-header" [class.mobile]="responsive">
+      <span>{{ 'people' | translate }}</span>
+    </div>
+    <app-config-data-view-panel (changeCollapsedExpand)="handleChangeCollapseExpandPanel($event)"
+      (changeDisplayMode)="handleChangeDisplayMode($event)" (changePageSize)="handleChangePageSize($event)">
+    </app-config-data-view-panel>
+  </div>
+  <div class="card-container">
+    <app-card [properties]="cardProperties" class="mt-0">
+      <form [formGroup]="formSearch" class="form-search">
+        <span class="p-float-label property-input p-field">
+          <p-dropdown class="app-single-selection" optionLabel="label" (click)="treeViewScopeOverlay.toggle($event)"
+            [class.responsive]="responsive"></p-dropdown>
+          <label class="app-input-label">{{ 'scopeLabel' | translate }} </label>
+        </span>
+        <span class="p-float-label property-input p-field">
+          <p-dropdown class="app-single-selection" [options]="optionsAccess" optionLabel="label" optionValue="value"
+            [class.responsive]="responsive" formControlName="userStatus" (onChange)="loadPersons()"></p-dropdown>
+          <label class="app-input-label">{{ 'access' | translate }} </label>
+        </span>
+        <span class="p-float-label property-input p-field">
+          <p-dropdown class="app-single-selection" [options]="optionsStakeholder" optionLabel="label" optionValue="value"
+            [class.responsive]="responsive" formControlName="stakeholderStatus" (onChange)="loadPersons()"></p-dropdown>
+          <label class="app-input-label">{{ 'stakeholder' | translate }} </label>
+        </span>
+        <span class="p-float-label property-input search p-field input-group">
+          <input pInputText class="app-input-text" type="search" [class.responsive]="responsive" formControlName="name"
+            [placeholder]="'nameOrFullName' | translate">
+          <button type="button" pButton pRipple icon="pi pi-search" (click)="loadPersons()"></button>
+          <label class="app-input-label">{{ 'search' | translate }} </label>
+        </span>
+        <p-overlayPanel #treeViewScopeOverlay [showCloseIcon]="true" [dismissable]="false" (onHide)="handleHideOverlayScope($event)">
+          <p-scrollPanel [style]="{width: '350px', height: '300px'}">
+            <ng-template pTemplate>
+              <div class="app-tree-selection">
+                <p-tree [value]="treeViewScope" selectionMode="checkbox" [(selection)]="allSelected">
+                </p-tree>
+              </div>
+            </ng-template>
+          </p-scrollPanel>
+        </p-overlayPanel>
+      </form>
+      <p-dataView [value]="cardItemsProperties" layout="grid" class="app-dataview" *ngIf="displayModeAll === 'grid'"
+        [paginator]="true" [rows]="pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false"
+        [totalRecords]="totalRecords"
+        [emptyMessage]="(!cardItemsProperties ? 'loadingEllipsis' : 'noContent') | translate">
+        <ng-template let-cardItem pTemplate="gridItem">
+          <div class="p-col-12 p-md-3 p-sm-12 card-item-container">
+            <app-card-item [properties]="cardItem"></app-card-item>
+          </div>
+        </ng-template>
+      </p-dataView>
+
+      <p-dataView [value]="cardItemsProperties" layout="list" class="app-dataview app-dataview-list"
+        *ngIf="displayModeAll === 'list'" [paginator]="true" [rows]="pageSize" [showJumpToPageDropdown]="true"
+        [showPageLinks]="false" [totalRecords]="totalRecords"
+        [emptyMessage]="(!cardItemsProperties ? 'loadingEllipsis' : 'noContent') | translate">
+        <ng-template let-cardItem pTemplate="listItem">
+          <div class="p-col-12">
+            <app-card-item [properties]="cardItem" [displayModeCard]="displayModeAll"></app-card-item>
+          </div>
+        </ng-template>
+      </p-dataView>
+    </app-card>
+  </div>
+</div>
