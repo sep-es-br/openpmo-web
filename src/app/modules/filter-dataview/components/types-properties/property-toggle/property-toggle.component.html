@@ -1,0 +1,5 @@
+<div class="app-property-toggle">
+  <p-inputSwitch class="app-toggle" [(ngModel)]="property.value"
+    [disabled]="property.disabled" (ngModelChange)="changed.emit($event)"></p-inputSwitch>
+  <label class="input-label">{{property.label}}</label>
+</div>

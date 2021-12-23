@@ -1,4 +1,4 @@
-import { SelectItem } from 'primeng/api';
+import { SelectItem, MenuItem, TreeNode } from 'primeng/api';
 import { TypePropertyEnum } from '../enums/TypePropertyWorkpackEnum';
 
 export interface IWorkpackModelProperty {
@@ -21,9 +21,14 @@ export interface IWorkpackModelProperty {
   decimals?: number;
   idDomain?: number;
   list?: SelectItem[];
-  extraList?: SelectItem[];
+  extraList?: TreeNode[];
+  extraListDefaults?: TreeNode | TreeNode[];
+  selectedLocalities?: string;
   requiredFields?: string[];
   obligatory?: boolean;
   isCollapsed?: boolean;
   viewOnly?: boolean;
+  groupedProperties?: IWorkpackModelProperty[];
+  menuModelProperties?: MenuItem[]; //only screen
+  showIconButtonSelectLocality?: boolean; //only screen
 }

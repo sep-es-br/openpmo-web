@@ -1,0 +1,27 @@
+::ng-deep .app-property-group {
+  width: 100%;
+  .p-panel .p-panel-header {
+    padding-left: 0 !important;
+    padding-top: 1.5em;
+    .p-button {
+      background-color: transparent;
+      color: #004660;
+      border: none;
+      box-shadow: none;
+      padding-left: 0;
+      .p-button-label {
+        text-transform: uppercase;
+        font-size: 1rem;
+      }
+    }
+  }
+}
+::ng-deep .app-property-group.responsive {
+  .p-panel .p-panel-header {
+    .p-button {
+      .p-button-label {
+        font-size: 0.75rem;
+      }
+    }
+  }
+}

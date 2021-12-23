@@ -1,0 +1,26 @@
+<div class="app-property-organization-selection">
+  <ng-container *ngIf="property?.multipleSelection; else singleSelection">
+    <span class="p-float-label"]="!property.fullLine">
+      <p-multiSelect class="app-multiple-selection"
+        dropdownIcon="fas fa-caret-down" [options]="property.possibleValuesIds" [id]="property.name"
+        (onBlur)="changed.emit($event)" [(ngModel)]="property.selectedValues" [required]="property.required"
+        [disabled]="property.disabled" [class.ng-invalid]="property.invalid" maxSelectedLabels="2"
+        (ngModelChange)="changed.emit($event)">
+      </p-multiSelect>
+      <label class="app-input-label" for="float-label">{{'value'| translate}}</label>
+    </span>
+  </ng-container>
+  <ng-template #singleSelection>
+    <span class="p-float-label">
+      <p-dropdown class="app-single-selection" [id]="property.name" [options]="property.possibleValuesIds"
+        [autoDisplayFirst]="false" [disabled]="property.disabled" [class.ng-invalid]="property?.invalid"
+        [(ngModel)]="property.selectedValues" (onBlur)="changed.emit($event)" dropdownIcon="fas fa-caret-down"
+        [required]="property.required" (ngModelChange)="changed.emit($event)">
+      </p-dropdown>
+      <label class="app-input-label" [for]="property.name">{{'value'| translate}}</label>
+    </span>
+  </ng-template>
+  <span class="input-message-error" *ngIf="property?.invalid">
+    {{ property.message }}
+  </span>
+</div>

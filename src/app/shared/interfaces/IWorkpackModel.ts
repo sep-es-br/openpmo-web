@@ -12,6 +12,7 @@ export interface IWorkpackModel {
   childWorkpackModelSessionActive?: boolean;
   children?: IWorkpackModel[];
   costSessionActive?: boolean;
+  journalManagementSessionActive?: boolean;
   organizationRoles?: string[];
   personRoles?: string[];
   planModel?: {
@@ -23,4 +24,14 @@ export interface IWorkpackModel {
   scheduleSessionActive?: boolean;
   properties?: IWorkpackModelProperty[];
   sortBy: IWorkpackModelProperty;
+  riskAndIssueManagementSessionActive?: boolean;
+  processesManagementSessionActive?: boolean;
+}
+
+export interface IReusableWorkpackModel {
+  id: number;
+  name: string;
+  icon: string;
+  reusable: boolean;
+  children?: IReusableWorkpackModel[];
 }

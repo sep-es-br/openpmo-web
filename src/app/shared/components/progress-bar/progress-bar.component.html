@@ -1,22 +1,41 @@
 <div class="app-progress">
-  <div class="progress-bar-header">
-    <div class="progress">
-      <span class="header-label" *ngIf="labelProgress">{{labelProgress | translate}}</span>
-      <span class="progress-value" [ngStyle]="{color: color}"
-        *ngIf="valueUnit"> {{valueUnit === 'currency' ? '$' : ''}} {{valueUnit === 'currency' ? ( language === 'pt-BR' ? (progress | number:'0.2-2':'pt') : (progress | number:'0.2-2':'en')) 
-        : (language === 'pt-BR' ? (progress | number:'0.0-2':'pt') : (progress | number:'0.0-2':'en'))}} {{valueUnit !== 'currency' ? valueUnit : ''}}</span>
-    </div>
-    <div class="total">
-      <span class="header-label" *ngIf="labelTotal">{{labelTotal | translate}}</span>
-      <span class="total-value" 
-      *ngIf="valueUnit"> {{valueUnit === 'currency' ? '$' : ''}} {{valueUnit === 'currency' ? (language === 'pt-BR' ? (total | number:'0.2-2':'pt') : (total | number:'0.2-2':'en')) 
-        : (language === 'pt-BR' ? (total | number:'0.0-2':'pt') : (total | number:'0.0-2':'en'))}} {{valueUnit !== 'currency' ? valueUnit : ''}}</span>
-    </div>
-    <div class="total"></div>
+  <div class="unit-container">
+    <span *ngIf="!['currency', 'time'].includes(valueUnit)" [ngStyle]="{color: color}">{{valueUnit}}</span>
+    <span *ngIf="valueUnit === 'currency'" [ngStyle]="{color: color}">$</span>
+    <i class="fas fa-calendar-alt" *ngIf="valueUnit === 'time'" [ngStyle]="{color: color}"></i>
   </div>
-  <div class="progress-bar-container">
-    <div class="progress-bar" 
-     [ngStyle]="{width: (progress > total ? 100 : (progress/total)*100) + '%', background: color}">
+  <div class="progress-header-values-container" [ngStyle]="{width: barHeight === 17 ? '85%' : '100%'}" [class.responsive]="responsive">
+    <div class="progress-bar-header">
+      <div class="labels">
+        <span class="header-label" *ngIf="labelProgress" [ngStyle]="{color: color}">{{labelProgress | translate}}</span>
+        <span class="header-label" *ngIf="labelTotal" [ngStyle]="{color: '#004660'}">{{labelTotal | translate}}</span>
+      </div>
+      <div class="values">
+        <span class="value" [ngStyle]="{color: color}" *ngIf="valueUnit" 
+          [pTooltip]="(valueUnit === 'currency' ? '$ ' : '') + ( language === 'pt' ?
+            (valueUnit === 'currency' ? (progress |number:'0.2-2':'pt') : (progress |number:'0.0-0':'pt')) 
+            : (valueUnit === 'currency' ? (progress |number:'0.2-2':'en') : (progress |number:'0.0-0':'en'))) + ' ' + (valueUnit === 'currency' ? '' : (valueUnit === 'time' ? ('day'|translate ) : valueUnit))">
+          {{ valueUnit !== 'time' ? (progress|shortNumber:language) : progress + 'd'}}
+        </span>
+        <span class="value" [ngStyle]="{color: '#004660'}" *ngIf="valueUnit" 
+        [pTooltip]="(valueUnit === 'currency' ? '$ ' : '') + ( language === 'pt' ?
+          (valueUnit === 'currency' ? (total |number:'0.2-2':'pt') : (total |number:'0.0-0':'pt')) 
+          : (valueUnit === 'currency' ? (total |number:'0.2-2':'en') : (total |number:'0.0-0':'en'))) + ' ' + (valueUnit === 'currency' ? '' : (valueUnit === 'time' ? ('day'|translate ) : valueUnit))">
+        {{ valueUnit !== 'time' ? (total|shortNumber:language) : total + 'd'}}
+      </span>
+        <!-- <span class="value" [ngStyle]="{color: '#004660'}" *ngIf="valueUnit" [pTooltip]="total|number">{{total|shortNumber:language}}</span> -->
+      </div>
+      <div class="total"></div>
+    </div>
+    <div class="progress-bar-total-container" *ngIf="total >= progress"
+      [ngStyle]="{width: '100%', background: barHeight === 7 ? 'rgba(0, 70, 96, 0.19)' : '#ffffff'}">
+      <div class="progress-bar" [ngStyle]="{width: (progress/total)*100 + '%', background: color, height: barHeight + 'px'}">
+      </div>
+    </div>
+    <div class="progress-bar-progress-container" *ngIf="progress > total"
+      [ngStyle]="{width: '100%', background: color, height: barHeight + 'px'}">
+      <div class="total-bar" [ngStyle]="{width: (total/progress)*100 + '%', background: 'transparent'}">
+      </div>
     </div>
   </div>
 </div>

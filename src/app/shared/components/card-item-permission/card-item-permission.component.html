@@ -1,5 +1,5 @@
 <p-card *ngIf="properties.typeCardItem === 'listItem'" class="app-card-item-permission listItem"
-  [class.card-link]="properties.urlCard">
+  [class.cardList]="displayModeCard === 'list'" [class.card-link]="properties.urlCard" [class.mobile]="responsive">
   <p-header *ngIf="properties.menuItems" class="card-item-header">
     <span class="card-item-title">{{properties.titleCardItem}}</span>
     <p-menu #menu [popup]="true" [model]="properties.menuItems"></p-menu>
@@ -17,23 +17,50 @@
 
 <p-card *ngIf="properties.typeCardItem === 'editItem'" class="app-card-item-permission" styleClass="editItem">
   <p-header class="card-item-header">
-    <span class="card-item-title">{{properties.titleCardItem}}</span>
+    <div class="card-item-title">{{properties.titleCardItem === 'citizen' ? ('citizen' |translate) : properties.titleCardItem}}</div>
   </p-header>
   <div class="card-item-content">
     <span class="p-float-label">
       <p-dropdown id="level-dropdown" dropdownIcon="fas fa-caret-down" class="app-single-selection"
-        [autoDisplayFirst]="false"
-        (onChange)="handleSelect()" [options]="properties.levelListOptions" [(ngModel)]="properties.selectedOption">
+        [readonly]="isReadOnly" [autoDisplayFirst]="false" (onChange)="handleSelect()"
+        [options]="properties.levelListOptions" [(ngModel)]="properties.selectedOption">
       </p-dropdown>
       <label class="app-input-label" for="level-dropdown">{{ "level" | translate }}</label>
     </span>
   </div>
 </p-card>
 
-<p-card *ngIf="properties.typeCardItem === 'newCardItem'" class="app-card-item-permission new-card-item"
-  [class.new-card-item-mobile]="responsive"
+<p-card *ngIf="properties.typeCardItem === 'newCardItem'" class="new-card-item"
+  [class.cardList]="displayModeCard === 'list'" [class.new-card-item-mobile]="responsive"
   [class.card-link]="properties.urlCard" (click)="navigateToPage(properties.urlCard, properties.paramsUrlCard)">
   <div class="card-item-content">
-    <i [ngClass]="[ 'app-icon', newItemIcon, 'light-grey-icon' ]" [ngStyle]="{ fontSize: !responsive ? '3rem' : '2rem' }"></i>
+    <i [ngClass]="[ 'app-icon', newItemIcon, 'light-grey-icon' ]"
+      [ngStyle]="{ fontSize: !responsive ? '3rem' : '2rem' }"></i>
+  </div>
+</p-card>
+
+<p-card *ngIf="properties.typeCardItem === 'sharedItem'" class="app-card-item-permission" styleClass="editItem">
+  <p-header class="card-item-header">
+    <span class="card-item-title-shared">{{properties.titleCardItem}}</span>
+    <button type="button" pButton icon="fas fa-trash-alt" (click)="!properties.readOnly && handleDeleteSharedCard()"></button>
+  </p-header>
+  <div class="card-item-content">
+    <span class="p-float-label">
+      <p-dropdown id="level-dropdown" dropdownIcon="fas fa-caret-down" class="app-single-selection"
+        [readonly]="isReadOnly || properties.readOnly" [autoDisplayFirst]="false" (onChange)="handleSelect()"
+        [options]="properties.levelListOptions" [(ngModel)]="properties.selectedOption">
+      </p-dropdown>
+      <label class="app-input-label" for="level-dropdown">{{ "level" | translate }}</label>
+    </span>
+  </div>
+</p-card>
+
+<p-card *ngIf="properties.typeCardItem === 'newCardItemShared'" class="new-card-item"
+  [class.cardList]="displayModeCard === 'list'" [class.new-card-item-mobile]="responsive">
+  <div class="card-item-content">
+    <i [ngClass]="[ 'app-icon', newItemIcon, 'light-grey-icon' ]"
+      (click)=" properties.iconMenuItems && menuIcon.toggle($event)"
+      [ngStyle]="{ fontSize: (responsive ? 2 : 3) + 'rem' }" [class.card-link]="properties.iconMenuItems"></i>
+    <p-tieredMenu #menuIcon [popup]="true" [model]="properties.iconMenuItems"></p-tieredMenu>
   </div>
 </p-card>

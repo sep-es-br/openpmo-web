@@ -39,6 +39,11 @@ export class StakeholderService extends BaseService<IStakeholder> {
     return result as IHttpResult<IStakeholder>;
   }
 
+  public async GetResponsibles(options?): Promise<IHttpResult<{id: number; name: string}[]>> {
+    const result = await this.http.get(`${this.urlBase}/responsibles`, { params: PrepareHttpParams(options) }).toPromise();
+    return result as IHttpResult<{id: number; name: string}[]>;
+  }
+
   public async deleteStakeholderPerson(params,
     options?: { message?: string; field?: string; useConfirm?: boolean }): Promise<IHttpResult<IStakeholder>> {
     const message = options?.message;

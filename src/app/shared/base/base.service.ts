@@ -30,6 +30,13 @@ export abstract class BaseService<T> {
     this.translateSrv = injector.get(TranslateService);
   }
 
+  setParamsFromUrl(fields: string[], values: any[]) {
+    this.urlBase = this.urlBaseOriginal;
+    fields.forEach((f, i) => {
+      this.urlBase = this.urlBase.replace(f, values[i]);
+    });
+  }
+
   public async GetAll(options?): Promise<IHttpResult<T[]>> {
     const result = await this.http.get<IHttpResult<T[]>>(`${this.urlBase}`,
       {
@@ -60,14 +67,14 @@ export abstract class BaseService<T> {
     const field: string = options?.field;
     const useConfirm: boolean = options?.useConfirm || true;
 
-    return new Promise(async(resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
       if (useConfirm) {
         this.confirmationSrv.confirm({
           message: message || `${this.translateSrv.instant('messages.deleteConfirmation')} ${model[field ? field : 'name'] || ''}?`,
           key: 'deleteConfirm',
           acceptLabel: this.translateSrv.instant('yes'),
           rejectLabel: this.translateSrv.instant('no'),
-          accept: async() => {
+          accept: async () => {
             const result = await this.http.delete<IHttpResult<T>>(`${this.urlBase}/${model['id']}`).toPromise();
             if (result.success) {
               setTimeout(() => {

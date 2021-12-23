@@ -1,0 +1,142 @@
+<div class="app-baseline">
+  <div class="header-container" [class.mobile]="responsive">
+    <div class="app-content-header" [class.mobile]="responsive" *ngIf="!baseline?.cancelation">
+      <span *ngIf="idBaseline"> <span class="label">{{ 'baseline' | translate }}:</span> {{ baseline?.name }}</span>
+      <span *ngIf="!idBaseline">{{ 'newBaseline' | translate }}</span>
+    </div>
+    <div class="app-content-header app-content-header-cancelation" [class.mobile]="responsive"  *ngIf="!!baseline?.cancelation">
+      <i class="fas fa-times"></i>
+      <span>{{ 'cancellationProposal' | translate }}</span>
+    </div>
+  </div>
+  <div class="card-properties-baseline">
+    <app-card [properties]="cardBaselineProperties" class="mt-0 inputs-float-label">
+      <div class="p-grid">
+        <form [formGroup]="formBaseline">
+          <div class="p-fluid">
+            <div class="p-field">
+              <span class="p-float-label">
+                <input class="app-input-text" [class.responsive]="responsive" id="float-name" name="name"
+                  formControlName="name" type="text" [ngStyle]="{'width': '30%'}" pInputText />
+                <label class="app-input-label" for="float-name">{{ (!baseline?.cancelation ? "name" : "project") | translate }} * </label>
+              </span>
+              <app-input-message [form]="formBaseline" field="name"></app-input-message>
+            </div>
+            <div class="p-field" *ngIf="!!baseline?.cancelation">
+              <span class="p-float-label">
+                <input class="app-input-text" [class.responsive]="responsive" id="float-proposer" name="proposer"
+                  formControlName="proposer" type="text" [ngStyle]="{'width': '30%'}" pInputText />
+                <label class="app-input-label" for="float-proposer">{{ "proposer" | translate }} * </label>
+              </span>
+              <app-input-message [form]="formBaseline" field="proposer"></app-input-message>
+            </div>
+            <div class="p-field">
+              <span class="p-float-label">
+                <textarea pInputTextarea id="float-description" formControlName="description" class="app-text-area"
+                  rows="1">
+                </textarea>
+                <label class="app-input-label" for="float-description">{{ "description" | translate }} * </label>
+              </span>
+              <app-input-message [form]="formBaseline" field="description"></app-input-message>
+            </div>
+            <div class="p-field">
+              <span class="p-float-label">
+                <textarea pInputTextarea id="float-message" formControlName="message" class="app-text-area" rows="1">
+                </textarea>
+                <label class="app-input-label" for="float-message">{{ "messageFromBaselineProposer" | translate }} *
+                </label>
+              </span>
+              <app-input-message [form]="formBaseline" field="message"></app-input-message>
+            </div>
+          </div>
+
+        </form>
+      </div>
+    </app-card>
+  </div>
+
+  <div class="card-updates-baseline" *ngIf="cardBaselineUpdates && baseline?.updates && baseline?.updates.length > 0">
+    <app-card [properties]="cardBaselineUpdates" class="mt-0 inputs-float-label">
+      <p-inputSwitch class="app-toggle toggle-all" [(ngModel)]="includeAllUpdates"
+        (onChange)="handleSetAllTogglesUpdates($event)" [disabled]="togglesReadOnly">
+      </p-inputSwitch>
+      <div class="updates-container">
+        <p-card *ngFor="let item of baseline?.updates" class="card-list-item">
+          <div class="card-item-content">
+            <div class="item-description">
+              <p-inputSwitch class="app-toggle" [(ngModel)]="item.included" [disabled]="togglesReadOnly">
+              </p-inputSwitch>
+              <div class="item-description-container" [class.item-description-container-responsive]="responsive">
+                <i *ngIf="!responsive" [ngClass]=" item.description === 'structure' ? [ 'app-icon', item.icon, 'light-grey-icon'] : [ item.icon, 'light-grey-icon']"
+                  [ngStyle]="{ fontSize: '1.8rem'}"></i>
+                <span class="item-description" [class.item-description-responsive]="responsive">
+                  {{item.description === 'structure' ? ('structure'|translate) : item.description}}
+                </span>
+              </div>
+            </div>
+            <div class="item-status" [class.item-status-responsive]="responsive">
+              <span>{{item.classification |translate}}</span>
+            </div>
+          </div>
+        </p-card>
+      </div>
+    </app-card>
+  </div>
+  <div class="actions-buttons-container" [class.actions-buttons-container-responsive]="responsive" *ngIf="!idBaseline || baseline?.status === 'DRAFT'">
+    <p-button class="action-button submit-button" [label]="'submit'|translate" (onClick)="handleSubmitBaseline()" [disabled]="!this.idBaseline"></p-button>
+    <p-button class="action-button draft-button" [label]="'draft'|translate" (onClick)="handleSaveDraftBaseline()"></p-button>
+    <p-button class="action-button cancel-button" [label]="'cancel'|translate" (onClick)="handleCancelChanges()"></p-button>
+  </div>
+
+  <div class="panel-evaluations" *ngIf="baseline?.evaluations && baseline?.evaluations.length > 0 && baseline?.status !== 'DRAFT'">
+    <p-panel class="app-card" [collapsed]="panelCollapsed" expandIcon="pi pi-angle-down" collapseIcon="pi pi-angle-up"
+      [class.mobile]="responsive" (collapsedChange)="handleCollapsed($event)">
+      <p-header class="card-header" [class.card-header-mobile]="responsive">
+        <div class="header-title" (click)="handleCollapsed()" [class.card-collapseble]="true">
+          <div class="header-title-text">
+            <span class="card-title" [class.card-title-mobile]="responsive">{{
+              'evaluations' | translate }}</span>
+          </div>
+          <div class="header-title-status">
+            <span [class.proposed]="baseline.status === 'PROPOSED'" [class.approved]="baseline.status === 'APPROVED'"
+              [class.rejected]="baseline.status === 'REJECTED'">
+              {{baseline.status |translate}}</span>
+          </div>
+        </div>
+      </p-header>
+      <div class="evaluations-container" *ngIf="baseline && baseline.status !== 'DRAFT' ">
+        <p-card *ngFor="let item of baseline?.evaluations" class="card-list-item">
+          <div class="card-item-content">
+            <div class="item-description">
+              <div class="item-description-container" [class.item-description-container-responsive]="responsive">
+                <i  [ngClass]=" [ 'app-icon', 'ccb-member', 'light-grey-icon']" [ngStyle]="{ fontSize: '2rem'}"></i>
+                <span class="item-description name" [class.item-description-responsive]="responsive">
+                  {{item.ccbMemberName}}
+                </span>
+              </div>
+            </div>
+            <div class="item-status" [class.item-status-responsive]="responsive">
+              <i *ngIf="item.comment && item.comment.length > 0" class="far fa-comment-dots light-grey-icon comment"
+                (click)="handleShowDialogComment(item.comment)" [ngStyle]="{ fontSize: '1.5rem'}"></i>
+              <i *ngIf="!item.decision" class="fas fa-hourglass-half light-grey-icon"
+                [ngStyle]="{ fontSize: '1.5rem'}"></i>
+              <i *ngIf="item.decision && item.decision === 'APPROVED'" class="fas fa-check"
+                [ngStyle]="{ fontSize: '1.5rem', color: '#44B39B'}"></i>
+              <i *ngIf="item.decision && item.decision === 'REJECTED'" class="fas fa-times"
+                [ngStyle]="{ fontSize: '1.8rem', color: '#EA5C5C', padding: '0 3px'}"></i>
+            </div>
+          </div>
+        </p-card>
+      </div>
+    </p-panel>
+  </div>
+  <p-dialog [header]="'comment'|translate" [(visible)]="!!showCommentDialog" [style]="!responsive ? {width: '30vw'} : {width: '90vw'}"
+    (onHide)="showCommentDialog=false">
+    <div class="comment-container">
+      <span class="title">{{'comment'|translate}}</span>
+      <textarea pInputTextarea class="app-text-area comment" row="3"
+        [disabled]="true">{{selectedComment}}</textarea>
+    </div>
+  </p-dialog>
+
+</div>

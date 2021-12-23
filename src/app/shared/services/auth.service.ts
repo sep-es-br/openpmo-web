@@ -8,7 +8,7 @@ import jwtDecode from 'jwt-decode';
 import { StoreKeys } from '../constants';
 import { IPerson } from '../interfaces/IPerson';
 import { PersonService } from './person.service';
-import { Subject } from 'rxjs';
+import { BehaviorSubject, Subject } from 'rxjs';
 import { IAppConfig } from '../interfaces/IAppConfig';
 import { APP_CONFIG } from '../tokens/AppConfigToken';
 
@@ -25,6 +25,8 @@ export class AuthService {
   appConfig: IAppConfig;
   currentUserInfo: IPerson;
   userLogout = new Subject();
+  private isLoginDenied = new BehaviorSubject<boolean>(false);
+
 
   constructor(
     public http: HttpClient,
@@ -62,10 +64,16 @@ export class AuthService {
   }
 
   async signOut() {
+    const token = this.getAccessToken();
+    const url = this.getUrlForSignout(token);
     this.clearTokens();
     this.userLogout.next(true);
     this.currentUserInfo = undefined;
-    this.router.navigate(['/login']);
+    this.document.location.href = url;
+  }
+
+  async signOutCitizenAccess() {
+    window.location.href = 'https://acessocidadao.es.gov.br/is/logout';
   }
 
   saveToken(data: any) {
@@ -108,12 +116,23 @@ export class AuthService {
     }
   }
 
+  getIdPerson(): number {
+    return this.getTokenPayload()?.sub;
+  }
+
   async isAuthenticated(): Promise<boolean> {
     const accessToken = this.getAccessToken();
     if (accessToken) {
       return !this.jwtHelperService.isTokenExpired(accessToken) || await this.refresh();
     }
     return false;
+  }
+
+  get obsIsLoginDenied() {
+    return this.isLoginDenied.asObservable();
+  }
+  nextIsLoginDenied(value: boolean) {
+    this.isLoginDenied.next(value);
   }
 
   async isUserAdmin(): Promise<boolean> {
@@ -136,6 +155,9 @@ export class AuthService {
 
   private getUrlForAuth() {
     return `${this.appConfig.API}/oauth2/authorization/idsvr?front_callback_url=${this.getFrontFallbackUrl()}`;
+  }
+  private getUrlForSignout(token: string) {
+    return `${this.appConfig.API}/signout?token=${token}`;
   }
 
   private getFrontFallbackUrl(): string {

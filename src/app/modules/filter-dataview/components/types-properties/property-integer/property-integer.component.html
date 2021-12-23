@@ -1,0 +1,23 @@
+<div class="app-property-integer">
+  <span class="p-float-label">
+    <ng-container [ngSwitch]="property.type">
+      <p-inputNumber *ngSwitchCase="type.IntegerModel" class="app-input-number" [class.ng-invalid]="property.invalid"
+        [id]="property.name" name="name" [(ngModel)]="property.value" [required]="property.required"
+        [min]="property.min" [max]="property.max" (ngModelChange)="changed.emit($event)" [disabled]="property.disabled"
+        (onBlur)="changed.emit($event)">
+      </p-inputNumber>
+      <p-inputNumber *ngSwitchCase="type.NumberModel" class="app-input-number" [class.ng-invalid]="property.invalid"
+        [id]="property.name" name="name" [(ngModel)]="property.value" [required]="property.required" mode="decimal"
+        [min]="property.min" [max]="property.max" [minFractionDigits]="property.decimals ? property.decimals : 0"
+        [maxFractionDigits]="property.decimals ? property.decimals : 0" (ngModelChange)="changed.emit($event)"
+        (onBlur)="changed.emit($event)" [disabled]="property.disabled">
+      </p-inputNumber>
+      <p-inputNumber *ngSwitchCase="type.CurrencyModel" class="app-input-number" [class.ng-invalid]="property.invalid"
+        [id]="property.name" name="name" [(ngModel)]="property.value" [required]="property.required" mode="decimal"
+        [minFractionDigits]="2" [maxFractionDigits]="2" (ngModelChange)="changed.emit($event)"
+        (onBlur)="changed.emit($event)" [disabled]="property.disabled">
+      </p-inputNumber>
+    </ng-container>
+    <label class="app-input-label" [for]="property.name">{{'value'| translate}}</label>
+  </span>
+</div>

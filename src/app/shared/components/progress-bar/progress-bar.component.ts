@@ -1,9 +1,10 @@
+import { ResponsiveService } from 'src/app/shared/services/responsive.service';
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import localePt from '@angular/common/locales/pt';
 import { registerLocaleData } from '@angular/common';
 import { TranslateService } from '@ngx-translate/core';
 import { takeUntil } from 'rxjs/operators';
-import { Subject } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
 registerLocaleData(localePt);
 
 @Component({
@@ -19,14 +20,18 @@ export class ProgressBarComponent implements OnInit, OnDestroy {
   @Input() labelTotal: string;
   @Input() color: string;
   @Input() valueUnit: string;
+  @Input() barHeight: number;
 
   language: string;
   $destroy = new Subject();
   totalProgressBar: number;
   totalBar: number;
+  subResponsive: Subscription;
+  responsive: boolean;
 
   constructor(
-    private translateSrv: TranslateService
+    private translateSrv: TranslateService,
+    private responsiveSrv: ResponsiveService
   ) {
     this.translateSrv.onLangChange.pipe(takeUntil(this.$destroy)).subscribe(() =>
       {
@@ -34,6 +39,7 @@ export class ProgressBarComponent implements OnInit, OnDestroy {
        this.ngOnInit();
       }
     );
+    this.subResponsive = this.responsiveSrv.observable.subscribe(value => this.responsive = value);
   }
 
   ngOnInit(): void {
@@ -41,12 +47,13 @@ export class ProgressBarComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.subResponsive?.unsubscribe();
     this.$destroy.next();
     this.$destroy.complete();
   }
 
   setLanguage() {
-    this.language = this.translateSrv.currentLang;
+    this.language = this.translateSrv.currentLang === 'pt-BR' ? 'pt' : 'en' ;
   }
 
 }

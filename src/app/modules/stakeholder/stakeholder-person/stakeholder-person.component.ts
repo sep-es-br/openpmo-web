@@ -1,11 +1,13 @@
+import { PlanService } from 'src/app/shared/services/plan.service';
+import { AuthServerService } from './../../../shared/services/auth-server.service';
+import { CitizenUserService } from './../../../shared/services/citizen-user.service';
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { Location } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
 import { MessageService } from 'primeng/api';
 import { Subject } from 'rxjs';
-import { debounceTime, takeUntil } from 'rxjs/operators';
+import { takeUntil } from 'rxjs/operators';
 
 import { ResponsiveService } from 'src/app/shared/services/responsive.service';
 import { ICard } from 'src/app/shared/interfaces/ICard';
@@ -19,6 +21,7 @@ import { enterLeave } from '../../../shared/animations/enterLeave.animation';
 import { formatDateToString } from 'src/app/shared/utils/formatDateToString';
 import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
 import { SaveButtonComponent } from 'src/app/shared/components/save-button/save-button.component';
+import { cpfValidator } from 'src/app/shared/utils/cpfValidator';
 
 interface ICardItemRole {
   type: string;
@@ -39,21 +42,40 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
   @ViewChild(SaveButtonComponent) saveButton: SaveButtonComponent;
 
   idWorkpack: number;
+  idWorkpackModelLinked: number;
+  idPlan: number;
   workpack: IWorkpack;
+  idOffice: number;
+  idPerson: number;
   personRolesOptions: { label: string; value: string }[];
   person: IPerson;
   cardPerson: ICard;
   cardRoles: ICard;
   cardPermissions: ICard;
-  emailPerson: string;
   responsive: boolean;
-  searchedEmailPerson: string;
   stakeholder: IStakeholder;
   stakeholderForm: FormGroup;
   stakeholderRoles: IStakeholderRole[];
   stakeholderRolesCardItems: ICardItemRole[];
   stakeholderPermissions: IStakeholderPermission[];
-  showSearchInputMessage = false;
+  user = false;
+  newPerson = false;
+  citizenAuthServer: boolean;
+  personSearchBy: string; // SEARCH / NEW
+  citizenSearchBy: string; //CPF | NAME
+  searchedNameUser: string;
+  searchedCpfUser: string;
+  searchedEmailUser: string;
+  selectedPerson: IPerson;
+  resultPersonsByName: IPerson[];
+  notFoundPerson = false;
+  validCpf = true;
+  publicServersResult: {name: string; sub: string}[];
+  citizenUserNotFoundByCpf = false;
+  showMessageNotFoundUserByEmail = false;
+  showListBoxPublicServers = false;
+  showMessagePublicServerNotFoundByName = false;
+  showMessageInvalidEmail = false;
   permissionLevelListOptions = [
     { label: this.translateSrv.instant('read'), value: 'READ' },
     { label: this.translateSrv.instant('edit'), value: 'EDIT' },
@@ -61,6 +83,7 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
   ];
   debounceSearch = new Subject<string>();
   $destroy = new Subject();
+  isLoading = false;
 
   constructor(
     private actRouter: ActivatedRoute,
@@ -68,100 +91,193 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
     private workpackSrv: WorkpackService,
     private stakeholderSrv: StakeholderService,
     private translateSrv: TranslateService,
-    private location: Location,
     private formBuilder: FormBuilder,
     private personSrv: PersonService,
     private messageSrv: MessageService,
     private breadcrumbSrv: BreadcrumbService,
-    private router: Router
+    private router: Router,
+    private citizenUserSrv: CitizenUserService,
+    private authServerSrv: AuthServerService,
+    private planSrv: PlanService
   ) {
     this.actRouter.queryParams.subscribe(async queryParams => {
-      this.idWorkpack = queryParams.idWorkpack;
-      this.emailPerson = queryParams.emailPerson;
+      this.idPlan = queryParams.idPlan && +queryParams.idPlan;
+      this.idWorkpack = queryParams.idWorkpack && +queryParams.idWorkpack;
+      this.idWorkpackModelLinked = queryParams.idWorkpackModelLinked && +queryParams.idWorkpackModelLinked;
+      this.idPerson = queryParams.idPerson && +queryParams.idPerson;
+      if (!this.idPerson) {
+        this.citizenUserSrv.loadCitizenUsers();
+      }
     });
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => {
       this.responsive = value;
     });
     this.stakeholderForm = this.formBuilder.group({
-      email: ['', [Validators.required, Validators.email]],
-      name: ['', [Validators.required, Validators.maxLength(25)]],
-      fullName: [''],
+      fullName: ['', [Validators.required]],
       address: [''],
       phoneNumber: [''],
-      contactEmail: ['', Validators.email],
-      id: ''
+      contactEmail: ['', [Validators.email]],
     });
-    this.debounceSearch.pipe(debounceTime(500), takeUntil(this.$destroy)).subscribe(() => this.searchPerson());
   }
 
   ngOnDestroy(): void {
     this.$destroy.next();
     this.$destroy.complete();
+    if (!this.idPerson) {
+      this.citizenUserSrv.unloadCitizenUsers();
+    }
   }
 
   async ngOnInit() {
     await this.loadWorkpack();
     await this.loadStakeholder();
-    const propertyNameWorkpackModel = this.workpack.model.properties.find(p => p.name === 'name' && p.session === 'PROPERTIES');
-    const propertyNameWorkpack = this.workpack.properties.find(p => p.idPropertyModel === propertyNameWorkpackModel.id);
-    const workpackName = propertyNameWorkpack.value as string;
-    const propertyFullNameWorkpackModel = this.workpack.model.properties.find(p => p.name === 'fullName' && p.session === 'PROPERTIES');
-    const propertyFullNameWorkpack = this.workpack.properties.find(p => p.idPropertyModel === propertyFullNameWorkpackModel.id);
-    const workpackFullName = propertyFullNameWorkpack.value as string;
+    await this.getAuthServer();
     this.breadcrumbSrv.setMenu([
       ... await this.getBreadcrumbs(this.idWorkpack),
       {
         key: 'stakeholder',
         routerLink: ['/stakeholder/person'],
-        queryParams: { idWorkpack: this.idWorkpack, emailPerson: this.emailPerson },
+        queryParams: { idWorkpack: this.idWorkpack, idPerson: this.idPerson },
         info: this.stakeholder?.person?.name,
         tooltip: this.stakeholder?.person.fullName
       }
     ]);
   }
 
+  async getAuthServer() {
+    const result = await this.authServerSrv.GetAuthServer();
+    if (result.success) {
+      this.citizenAuthServer = result.data;
+    }
+  }
+
   async getBreadcrumbs(idWorkpack: number) {
-    const { success, data } = await this.breadcrumbSrv.getBreadcrumbWorkpack(idWorkpack);
+    const { success, data } = await this.breadcrumbSrv.getBreadcrumbWorkpack(idWorkpack, {'id-plan': this.idPlan});
     return success
       ? data.map(p => ({
-            key: !p.modelName ? p.type.toLowerCase() : p.modelName,
-            info: p.name,
-            tooltip: p.fullName,
-            routerLink: this.getRouterLinkFromType(p.type),
-            queryParams: { id: p.id },
-            modelName: p.modelName
-          }))
+        key: !p.modelName ? p.type.toLowerCase() : p.modelName,
+        info: p.name,
+        tooltip: p.fullName,
+        routerLink: this.getRouterLinkFromType(p.type),
+        queryParams: { id: p.id },
+        modelName: p.modelName
+      }))
       : [];
   }
 
   getRouterLinkFromType(type: string): string[] {
     switch (type) {
       case 'office':
-        return [ '/offices', 'office' ];
+        return ['/offices', 'office'];
       case 'plan':
-        return [ 'plan' ];
+        return ['plan'];
       default:
-        return [ '/workpack' ];
+        return ['/workpack'];
     }
   }
 
   async loadWorkpack() {
-    const result = await this.workpackSrv.GetById(this.idWorkpack);
+    const result = await this.workpackSrv.GetWorkpackById(this.idWorkpack, {'id-plan': this.idPlan});
     if (result.success) {
       this.workpack = result.data;
-      this.personRolesOptions = this.workpack?.model?.personRoles?.map(role => ({ label: role, value: role }));
+      this.personRolesOptions = this.workpack?.model?.personRoles?.map(role => ({ label: role, value: role.toLowerCase() }));
+      const resultPlan = await this.planSrv.GetById(this.idPlan);
+      if (resultPlan.success) {
+        this.idOffice = resultPlan.data.idOffice;
+      }
     }
   }
 
   async loadStakeholder() {
-    this.loadCards();
-    if (this.emailPerson) {
-      const result = await this.stakeholderSrv.GetStakeholderPerson({'id-workpack': this.idWorkpack, email: this.emailPerson});
+    if (this.idPerson) {
+      const result = await this.stakeholderSrv.GetStakeholderPerson({ 'id-workpack': this.idWorkpack, idPerson: this.idPerson, 'id-plan': this.idPlan });
       if (result.success) {
         this.stakeholder = result.data;
+        this.loadCardPermissions();
       }
     }
+    this.loadCards();
     this.setStakeholderForm();
+  }
+
+  // consulta para person que não são users
+  async searchPersonByName(event) {
+    const result = await this.personSrv.GetPersonByFullName({
+      idWorkpack: this.idWorkpack,
+      fullName: event.query.toString().normalize('NFD').replace(/[\u0300-\u036f]/g, "")
+    });
+    if (result.success && result.data.length > 0) {
+      this.resultPersonsByName = result.data;
+    } else {
+      this.notFoundPerson = true;
+    }
+  }
+
+  handlePersonSelected() {
+    this.person = this.selectedPerson;
+    this.setStakeholderFormFromPerson()
+  }
+
+  validateClearSearchPerson(event) {
+    if (event && (event.length === 0 || event === null)) {
+      this.person = undefined;
+      this.setStakeholderFormFromPerson();
+    }
+  }
+
+  validateClearSearchUserName(event) {
+    if (!event || (event.length === 0)) {
+      this.publicServersResult = [];
+      this.showListBoxPublicServers = false;
+      this.showMessagePublicServerNotFoundByName = false;
+    }
+  }
+
+  validateClearSearchByCpf(event) {
+    if (!event || (event.length === 0)) {
+      this.validCpf = true;
+      this.citizenUserNotFoundByCpf = false;
+      this.person = undefined;
+      this.setStakeholderFormFromPerson();
+    }
+  }
+
+  validateClearSearchUserByEmail(event) {
+    if (!event || (event.length === 0)) {
+      this.person = undefined;
+      this.setStakeholderFormFromPerson();
+      this.showMessageInvalidEmail = false;
+      this.showMessageNotFoundUserByEmail = false;
+    }
+  }
+
+  validateClearSearchByUser() {
+    this.person = undefined;
+    this.setStakeholderFormFromPerson();
+    this.publicServersResult = [];
+    this.showListBoxPublicServers = false;
+    this.showMessagePublicServerNotFoundByName = false;
+    this.citizenUserNotFoundByCpf = false;
+    this.validCpf = true;
+    this.searchedCpfUser = null;
+    this.searchedNameUser = null;
+  }
+
+  resetPerson() {
+    this.person = undefined;
+    this.selectedPerson = undefined;
+    this.setStakeholderFormFromPerson();
+  }
+
+  handleNewPerson() {
+    this.newPerson = true;
+  }
+
+  showFullNamePerson() {
+    if (!this.idPerson && !this.user) {
+      return false;
+    }
+    return true;
   }
 
   loadCards() {
@@ -179,80 +295,204 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
       collapseble: true,
       initialStateCollapse: false
     };
-    this.cardPermissions = {
-      toggleable: false,
-      initialStateToggle: false,
-      cardTitle: 'permissions',
-      collapseble: true,
-      initialStateCollapse: false
-    };
+
+  }
+
+  loadCardPermissions() {
+    if (this.stakeholder && this.stakeholder.person.isUser) {
+      this.cardPermissions = {
+        toggleable: false,
+        initialStateToggle: false,
+        cardTitle: 'permissions',
+        collapseble: true,
+        initialStateCollapse: false
+      };
+    }
   }
 
   setStakeholderForm() {
     if (this.stakeholder) {
-      this.stakeholderForm.controls.name.setValue(this.stakeholder.person.name);
       this.stakeholderForm.controls.fullName.setValue(this.stakeholder.person.fullName);
-      this.stakeholderForm.controls.email.setValue(this.stakeholder.person.email);
       this.stakeholderForm.controls.address.setValue(this.stakeholder.person.address);
       this.stakeholderForm.controls.phoneNumber.setValue(this.stakeholder.person.phoneNumber);
       this.stakeholderForm.controls.contactEmail.setValue(this.stakeholder.person.contactEmail);
-      this.stakeholderRoles = this.stakeholder.roles && this.stakeholder.roles.map( role => ({
+      this.stakeholderRoles = this.stakeholder.roles && this.stakeholder.roles.map(role => ({
         id: role.id,
         active: role.active,
         role: role.role,
         from: new Date(role.from + 'T00:00:00'),
         to: role.to ? new Date(role.to + 'T00:00:00') : null
       }));
-      this.stakeholderPermissions = this.stakeholder.permissions;
-    }
-    if (!this.stakeholderPermissions) {
-      this.stakeholderPermissions = [{
-        role: 'User',
-        level: 'None'
-      }];
+      this.setStakeholderPermissionsCards();
     }
     this.loadStakeholderRolesCardsItems();
   }
 
-  async searchPerson() {
-    if (this.searchedEmailPerson) {
-      const { data} = await this.personSrv.GetByEmail(this.searchedEmailPerson);
+  setStakeholderPermissionsCards() {
+    this.stakeholderPermissions = this.stakeholder.permissions;
+    const rolesNotPermissions = this.stakeholder.person.roles.filter( r => this.stakeholderPermissions.filter( p => p.role === r.role).length === 0 );
+    if (rolesNotPermissions && rolesNotPermissions.length > 0) {
+      rolesNotPermissions.forEach( r => {
+        if (this.stakeholderPermissions && this.stakeholderPermissions.length > 0) {
+          this.stakeholderPermissions.push({
+            role: r.role,
+            level: "None"
+          });
+        } else {
+          this.stakeholderPermissions = [
+            {
+              role: r.role,
+              level: "None"
+            }
+          ]
+        }
+      })
+    }
+  }
+
+  async searchUserByEmail() {
+    if (this.searchedEmailUser && this.searchedEmailUser.length > 5 && this.searchedEmailUser.split('@').length > 1) {
+      const { data } = await this.personSrv.GetByEmail(this.searchedEmailUser, {
+        idOffice: this.idOffice,
+      });
       if (data) {
-        this.showSearchInputMessage = false;
         this.person = data;
+        this.showMessageNotFoundUserByEmail = false;
       } else {
-        this.showSearchInputMessage = true;
-        this.person = null;
+        this.person = {
+          name: this.searchedEmailUser.split('@')[0],
+          fullName: this.searchedEmailUser.split('@')[0],
+          email: this.searchedEmailUser
+        };
+        this.showMessageNotFoundUserByEmail = true;
       }
       this.setStakeholderFormFromPerson();
+      this.stakeholderPermissions = [{
+        role: 'Citizen',
+        level: 'None'
+      }];
     } else {
       this.person = null;
       this.setStakeholderFormFromPerson();
-      this.showSearchInputMessage = false;
+      this.showMessageInvalidEmail = true;
+    }
+  }
+
+  async searchCitizenUserByName() {
+    this.publicServersResult = [];
+    if (this.person) {
+      this.person = undefined;
+      this.setStakeholderFormFromPerson()
+    }
+    this.isLoading = true;
+    const result = await this.citizenUserSrv.GetPublicServersByName({
+      name: this.searchedNameUser,
+      idOffice: this.idOffice
+    });
+    this.isLoading = false;
+    if (result.success) {
+      this.publicServersResult = result.data;
+      this.showListBoxPublicServers = this.publicServersResult.length > 0;
+    }
+    this.showMessagePublicServerNotFoundByName = !this.publicServersResult || (this.publicServersResult && this.publicServersResult.length === 0);
+  }
+
+  async validateCpf() {
+    this.citizenUserNotFoundByCpf = false;
+    this.validCpf = cpfValidator(this.searchedCpfUser);
+    if (this.validCpf) {
+      this.isLoading = true;
+      const result = await this.citizenUserSrv.GetCitizenUserByCpf({
+        cpf: this.searchedCpfUser,
+        idOffice: this.idOffice,
+        loadWorkLocation: false
+      });
+      this.isLoading = false;
+      if (result.success) {
+        this.person = result.data;
+        this.setStakeholderFormFromPerson();
+      } else {
+        this.citizenUserNotFoundByCpf = true;
+      }
+    }
+  }
+
+  handleToggleUser(event) {
+    this.person = undefined;
+    this.setStakeholderFormFromPerson();
+    this.personSearchBy = null;
+    this.citizenSearchBy = null;
+    this.searchedNameUser = null;
+    this.searchedCpfUser = null;
+    this.searchedEmailUser = null;
+    this.selectedPerson = null;
+    this.resultPersonsByName = [];
+    this.notFoundPerson = false;
+    this.validCpf = true;
+    this.publicServersResult = [];
+    this.citizenUserNotFoundByCpf = false;
+    this.showMessageNotFoundUserByEmail = false;
+    this.showListBoxPublicServers = false;
+    this.showMessagePublicServerNotFoundByName = false;
+    this.showMessageInvalidEmail = false;
+    this.saveButton.hideButton();
+    if (event === true) {
+      this.cardPermissions = {
+        toggleable: false,
+        initialStateToggle: false,
+        cardTitle: 'permissions',
+        collapseble: true,
+        initialStateCollapse: false
+      };
+    } else {
+      this.cardPermissions = undefined;
+    }
+  }
+
+  showFormPerson() {
+    if (this.stakeholder || this.person) {
+      return true;
+    }
+    if (this.personSearchBy === 'NEW') {
+      return true;
+    }
+    return false;
+  }
+
+  async handleSelectedPublicServer(event) {
+    this.isLoading = true;
+    const publicServer = event.value;
+    const result = await this.citizenUserSrv.GetPublicServer(publicServer.sub, { idOffice: this.idOffice, loadWorkLocation: false});
+    this.isLoading = false;
+    if (result.success) {
+      this.person = result.data;
+      this.setStakeholderFormFromPerson();
+    this.searchedNameUser = '';
+    this.publicServersResult = [];
+    this.showListBoxPublicServers = false;
     }
   }
 
   setStakeholderFormFromPerson() {
     if (this.person) {
-      this.stakeholderForm.controls.name.setValue(this.person.name);
       this.stakeholderForm.controls.fullName.setValue(this.person.fullName);
-      this.stakeholderForm.controls.email.setValue(this.person.email);
       this.stakeholderForm.controls.address.setValue(this.person.address);
       this.stakeholderForm.controls.phoneNumber.setValue(this.person.phoneNumber);
       this.stakeholderForm.controls.contactEmail.setValue(this.person.contactEmail);
+      if (this.person.roles && this.user) {
+        this.stakeholderPermissions = this.person.roles.map(r => ({
+          role: r.role,
+          level: 'None'
+        }));
+      }
+      this.loadStakeholderRolesCardsItems();
     } else {
-      this.stakeholderForm.controls.name.setValue('');
       this.stakeholderForm.controls.fullName.setValue('');
-      this.stakeholderForm.controls.email.setValue('');
       this.stakeholderForm.controls.address.setValue('');
       this.stakeholderForm.controls.phoneNumber.setValue('');
       this.stakeholderForm.controls.contactEmail.setValue('');
       this.stakeholderRoles = null;
-      this.stakeholderPermissions = [{
-        role: 'User',
-        level: 'None'
-      }];
-      this.loadStakeholderRolesCardsItems();
+      this.stakeholderPermissions = [];
     }
   }
 
@@ -315,24 +555,42 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
     if (!validated) {
       return;
     }
-    const permissions = this.stakeholderPermissions.filter( p => p.level !== 'None' );
-    const stakeholderModel = {
+    const permissions = this.stakeholderPermissions.filter( permission => !permission.inheritedFrom && permission.level && permission.level !== 'None');
+    const stakeholderModel = ((!this.user && !this.stakeholder) || (this.stakeholder && !this.stakeholder.person.isUser)) ? {
       idWorkpack: this.idWorkpack,
-      name: this.stakeholderForm.controls.name.value,
-      fullName: this.stakeholderForm.controls.fullName.value,
-      address: this.stakeholderForm.controls.address.value,
-      contactEmail: this.stakeholderForm.controls.contactEmail.value,
-      email: this.stakeholderForm.controls.email.value,
-      phoneNumber: this.stakeholderForm.controls.phoneNumber.value,
-      roles: this.stakeholderRoles.map( r => ({
+      person: {
+        ...this.person,
+        fullName: this.selectedPerson ? this.selectedPerson.fullName : this.stakeholderForm.controls.fullName.value,
+        address: this.stakeholderForm.controls.address.value,
+        contactEmail: this.stakeholderForm.controls.contactEmail.value,
+        phoneNumber: this.stakeholderForm.controls.phoneNumber.value,
+        isUser: false
+      },
+      roles: this.stakeholderRoles && this.stakeholderRoles.map(r => ({
+        ...r,
+        to: r.to !== null ? formatDateToString(r.to as Date, true) : null,
+        from: formatDateToString(r.from as Date, true)
+      }))
+    } : {
+      idWorkpack: this.idWorkpack,
+      person: {
+        ...(this.person ? this.person : this.stakeholder.person),
+        fullName: this.person ? this.person.fullName : this.stakeholder.person.fullName,
+        email: this.stakeholder ? this.stakeholder.person.email : this.person.email,
+        address: this.stakeholderForm.controls.address.value,
+        contactEmail: this.stakeholderForm.controls.contactEmail.value,
+        phoneNumber: this.stakeholderForm.controls.phoneNumber.value,
+        isUser: true
+      },
+      roles: this.stakeholderRoles && this.stakeholderRoles.map(r => ({
         ...r,
         to: r.to !== null ? formatDateToString(r.to as Date, true) : null,
         from: formatDateToString(r.from as Date, true)
       })),
+      idPlan: this.idPlan,
       permissions
-    };
-
-    if (this.emailPerson) {
+    }
+    if (this.idPerson) {
       const result = await this.stakeholderSrv.putStakeholderPerson(stakeholderModel);
       if (result.success) {
         this.messageSrv.add({
@@ -344,7 +602,9 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
           ['/workpack'],
           {
             queryParams: {
-              id: this.idWorkpack
+              id: this.idWorkpack,
+              idPlan: this.idPlan,
+              idWorkpackModelLinked: this.idWorkpackModelLinked
             }
           }
         );
@@ -361,7 +621,9 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
           ['/workpack'],
           {
             queryParams: {
-              id: this.idWorkpack
+              id: this.idWorkpack,
+              idPlan: this.idPlan,
+              idWorkpackModelLinked: this.idWorkpackModelLinked
             }
           }
         );
@@ -370,11 +632,12 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
   }
 
   validateStakeholder() {
-    if(!this.stakeholderRoles) {
+    // non-user should have roles
+    if (((!this.user && !this.stakeholder) || (this.stakeholder && !this.stakeholder.person.isUser)) && !this.stakeholderRoles) {
       return false;
     }
-    const roleNotOk = this.stakeholderRoles.filter( r => {
-      if( !r.role) {
+    const roleNotOk = this.stakeholderRoles && this.stakeholderRoles.filter(r => {
+      if (!r.role) {
         return r;
       }
       if (r.to) {
@@ -383,7 +646,12 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
         }
       }
     });
-    if(roleNotOk && roleNotOk.length > 0) {
+    if (roleNotOk && roleNotOk.length > 0) {
+      return false;
+    }
+    // user should have permissions
+    if (((this.user && !this.stakeholder) || (this.stakeholder && this.stakeholder.person.isUser && !this.idPerson))
+      && (!this.stakeholderPermissions || (this.stakeholderPermissions && this.stakeholderPermissions.length === 0))) {
       return false;
     }
     return true;

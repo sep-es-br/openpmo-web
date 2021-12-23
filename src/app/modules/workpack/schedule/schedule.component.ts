@@ -48,8 +48,10 @@ export class ScheduleComponent implements OnInit, OnDestroy {
 
   responsive: boolean;
   idWorkpack: number;
+  idWorkpackModelLinked: number;
+  idPlan: number;
   workpack: IWorkpack;
-  unitMeasure: IMeasureUnit;
+  unitMeasure: string;
   cardScheduleProperties: ICard;
   formSchedule: FormGroup;
   schedule: ISchedule;
@@ -77,6 +79,8 @@ export class ScheduleComponent implements OnInit, OnDestroy {
   ) {
     this.actRouter.queryParams.subscribe(async queryParams => {
       this.idWorkpack = queryParams.idWorkpack;
+      this.idWorkpackModelLinked = queryParams.idWorkpackModelLinked;
+      this.unitMeasure = queryParams.unitMeansureName;
     });
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.responsive = value);
     this.translateSrv.onLangChange.pipe(takeUntil(this.$destroy)).subscribe(() => {
@@ -118,7 +122,7 @@ export class ScheduleComponent implements OnInit, OnDestroy {
   }
 
   async getBreadcrumbs() {
-    const { success, data } = await this.breadcrumbSrv.getBreadcrumbWorkpack(this.idWorkpack);
+    const { success, data } = await this.breadcrumbSrv.getBreadcrumbWorkpack(this.idWorkpack, {'id-plan': this.idPlan});
     const breadcrumbPlan = data.find(d => d.type === 'plan');
     if (breadcrumbPlan) {
       this.planSrv.nextIDPlan(breadcrumbPlan.id);
@@ -129,7 +133,7 @@ export class ScheduleComponent implements OnInit, OnDestroy {
             info: p.name,
             tooltip: p.fullName,
             routerLink: this.getRouterLinkFromType(p.type),
-            queryParams: { id: p.id }
+            queryParams: { id: p.id, idWorkpackModelLinked: p.idWorkpackModelLinked }
           }))
       : [];
   }
@@ -153,19 +157,21 @@ export class ScheduleComponent implements OnInit, OnDestroy {
       collapseble: true,
       initialStateCollapse: false
     };
-    const workpack = await this.workpackSrv.GetById(this.idWorkpack);
-    if (workpack.success) {
-      this.workpack = workpack.data;
-      this.setBreadcrumb();
-      const propertyUnit = workpack.data.properties.find(p => p.type === TypePropertyModelEnum.UnitSelectionModel);
-      if (propertyUnit) {
-        const idUnit = propertyUnit.selectedValue;
-        const result = await this.unitMeasureSrv.GetById(idUnit);
-        if (result.success) {
-          this.unitMeasure = result.data;
-        }
-      }
-    }
+    this.idPlan = Number(localStorage.getItem('@currentPlan'));
+    // const workpack = await this.workpackSrv.GetWorkpackById(this.idWorkpack, {'id-plan': this.idPlan});
+    // if (workpack.success) {
+    //   this.workpack = workpack.data;
+    //   await this.setBreadcrumb();
+    //   const propertyUnit = workpack.data.properties.find(p => p.type === TypePropertyModelEnum.UnitSelectionModel);
+    //   if (propertyUnit) {
+    //     const idUnit = propertyUnit.selectedValue;
+    //     const result = await this.unitMeasureSrv.GetById(idUnit);
+    //     if (result.success) {
+    //       this.unitMeasure = result.data;
+    //     }
+    //   }
+    // }
+    await this.setBreadcrumb();
     await this.loadMenuItemsCostAccounts();
     this.loadCostAssignmentSession();
   }
@@ -192,7 +198,7 @@ export class ScheduleComponent implements OnInit, OnDestroy {
       const workpacksIdsNotRepeated = workpacksIds.filter((w, i) => workpacksIds.indexOf(w) === i);
 
       this.menuItemsCostAccounts = await Promise.all(workpacksIdsNotRepeated.map(async(idWorkpack) => {
-        const workpack = await this.workpackSrv.GetById(idWorkpack);
+        const workpack = await this.workpackSrv.GetWorkpackById(idWorkpack, {'id-plan': this.idPlan});
         if (workpack.success) {
           const workpackCostAccounts = costAccounts.filter(cost => cost.idWorkpack === idWorkpack);
           return {
@@ -304,9 +310,25 @@ export class ScheduleComponent implements OnInit, OnDestroy {
   handleChangeValuesCardItems() {
     this.reloadCostAssignmentTotals();
     if (this.formSchedule.valid) {
-      if (this.costAssignmentsCardItems && this.costAssignmentsCardItems.length > 0) {
+      if (this.costAssignmentsCardItems && this.costAssignmentsCardItems.length > 0 && this.costAssignmentsCardItems.filter( item => item.plannedWork && item.plannedWork > 0).length > 0) {
         this.saveButton?.showButton();
+      } else {
+        this.saveButton?.hideButton();
       }
+    } else {
+      this.saveButton?.hideButton();
+    }
+  }
+
+  handleChangeValues() {
+    if (this.formSchedule.valid) {
+      if (this.costAssignmentsCardItems && this.costAssignmentsCardItems.length > 0 && this.costAssignmentsCardItems.filter( item => item.plannedWork && item.plannedWork > 0).length > 0) {
+        this.saveButton?.showButton();
+      }  else {
+        this.saveButton?.hideButton();
+      }
+    } else {
+      this.saveButton?.hideButton();
     }
   }
 
@@ -337,7 +359,8 @@ export class ScheduleComponent implements OnInit, OnDestroy {
         ['/workpack'],
         {
           queryParams: {
-            id: this.idWorkpack
+            id: this.idWorkpack,
+            idWorkpackModelLinked: this.idWorkpackModelLinked
           }
         }
       );

@@ -1,16 +1,9 @@
+import { IPerson } from './IPerson';
 export interface IPlanPermission {
   idPlan: number;
   permissions: IPermission[];
   email?: string;
-  person?: {
-    address: string;
-    administrator: boolean;
-    contactEmail: string;
-    email: string;
-    fullName: string;
-    id: number;
-    name: string;
-  };
+  person?: IPerson;
 }
 
 interface IPermission {

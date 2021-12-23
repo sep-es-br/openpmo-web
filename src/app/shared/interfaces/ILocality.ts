@@ -1,17 +1,22 @@
 export interface ILocality {
   id?: number;
-  idDomain: number;
+  idDomain?: number;
   idParent?: number;
   name: string;
   fullName: string;
   latitude: string;
   longitude: string;
-  type: string;
+  type?: string;
 }
 
 export interface ILocalityList {
   id: number;
   domain?: {
+    fullName: string;
+    id: number;
+    name: string;
+  };
+  domainRoot?: {
     fullName: string;
     id: number;
     name: string;
@@ -25,3 +30,10 @@ export interface ILocalityList {
 }
 
 
+export interface ILocalityRoot {
+  id?: number;
+  name: string;
+  fullName: string;
+  latitude: string;
+  longitude: string;
+}

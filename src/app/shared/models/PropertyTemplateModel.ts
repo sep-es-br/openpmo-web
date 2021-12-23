@@ -7,7 +7,7 @@ import { IWorkpackProperty } from '../interfaces/IWorkpackProperty';
 export class PropertyTemplateModel implements IProperty {
   id?: number;
   type: string;
-  idPropertyModel: number;
+  idPropertyModel?: number;
   active: boolean;
   fullLine?: boolean;
   label: string;
@@ -28,11 +28,14 @@ export class PropertyTemplateModel implements IProperty {
   localityList?: TreeNode[];
   idDomain?: number;
   localitiesSelected?: TreeNode | TreeNode[];
+  labelButtonLocalitySelected?: string;
+  showIconButton?: boolean;
   value?: string | number | boolean | string[] | Date | number[];
   selectedValues?: number[] | number;
   selectedValue?: number;
   invalid?: boolean;
   message?: string;
+  groupedProperties?: PropertyTemplateModel[];
 
   getValues() {
     const {

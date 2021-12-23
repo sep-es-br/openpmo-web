@@ -1,0 +1,87 @@
+::ng-deep .app-avatar {
+  .avatar {
+    cursor: pointer;
+    padding: 1rem 0;
+    .p-avatar-xl {
+      width: 6rem;
+      height: 6rem;
+      .p-avatar-icon {
+        font-size: 3rem;
+      }
+    }
+    .edit  {
+      .background {
+        background-color: #000;
+        width: 10rem;
+        height: 10rem;
+        border-radius: 50%;
+        opacity: 0.6;
+        position: absolute;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        visibility: hidden;
+      }
+      &:hover {
+        .p-avatar-icon {
+          color: #a0a0a0;
+        }
+        .background {
+          visibility: inherit;
+        }
+      }
+      .p-avatar-xl {
+        width: 10rem;
+        height: 10rem;
+        .p-avatar-icon {
+          font-size: 5rem;
+        }
+      }
+    }
+    &.small {
+      .p-avatar-xl {
+        width: 3rem;
+        height: 3rem;
+        background-color: transparent;
+        .p-avatar-icon {
+          font-size: 2rem;
+        }
+      }
+    }
+    .p-avatar{
+      img {
+        border-radius: 50%;
+      }
+    }
+  }
+ .p-fileupload-buttonbar .p-button {
+    background-color: #44b39b !important;
+    border: none;
+  }
+  .p-fileupload-available {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    .p-button {
+      background-color: #ea5c5c;
+      border: none;
+    }
+  }
+  .button-actions {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 3rem;
+    .p-button {
+      margin-left: 1rem;
+      &.save {
+        background-color: #44b39b !important;
+        border: none;
+      }
+      &.cancel {
+        background-color: #a7074b !important;
+        border: none;
+      }
+    }
+  }
+}

@@ -22,4 +22,6 @@ export interface IStakeholderPermission {
   id?: number;
   role: string;
   level: string;
+  inheritedFrom?: string;
+  idPlan?: number;
 }

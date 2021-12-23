@@ -16,6 +16,7 @@
                   yearRange="2020:2030"
                   [class.responsive]="responsive"
                   icon="fas fa-calendar-alt"
+                  (onSelect)="handleChangeValues()"
                   [dateFormat]="calendarFormat">
                 </p-calendar>
                 <label class="app-input-label" for="float-start">{{ "start" | translate }}</label>
@@ -28,6 +29,7 @@
                   [yearNavigator]="true"
                   yearRange="2020:2030" [class.responsive]="responsive"
                   icon="fas fa-calendar-alt"
+                  (onSelect)="handleChangeValues()"
                   [dateFormat]="calendarFormat">
                 </p-calendar>
                 <label class="app-input-label" class="properties-label" for="float-end">{{ "finish" |
@@ -41,19 +43,21 @@
               <div class="p-formgroup-inline" [class.responsive]="responsive">
                 <div class="p-field" [class.responsive]="responsive">
                   <span class="p-float-label" [class.responsive]="responsive">
-                    <p-inputNumber class="app-input-number" id="float-planned" formControlName="plannedWork"
+                    <p-inputNumber class="app-input-number" id="float-planned" formControlName="plannedWork" 
+                    (onInput)="handleChangeValues()" (onBlur)="handleChangeValues()"
                       [class.responsive]="responsive">
                     </p-inputNumber>
-                    <label class="app-input-label" for="float-planned">{{unitMeasure.name}} {{ "planned" |translate
+                    <label class="app-input-label" for="float-planned">{{unitMeasure}} {{ "planned" |translate
                       }} * </label>
                   </span>
                 </div>
                 <div class="p-field" [class.responsive]="responsive">
                   <span class="p-float-label" [class.responsive]="responsive">
                     <p-inputNumber class="app-input-number" id="float-actual" formControlName="actualWork"
+                    (onInput)="handleChangeValues()"  (onBlur)="handleChangeValues()"
                       [class.responsive]="responsive">
                     </p-inputNumber>
-                    <label class="app-input-label" for="float-actual">{{unitMeasure.name}} {{ "actual" |translate
+                    <label class="app-input-label" for="float-actual">{{unitMeasure}} {{ "actual" |translate
                       }}</label>
                   </span>
                 </div>
@@ -78,9 +82,9 @@
         <div class="card-item-costs-container">
           <p-dataView [value]="costAssignmentsCardItems" layout="grid" styleClass="dataview-card-items-cost"
             [emptyMessage]="'loadingEllipsis' | translate">
-            <ng-template let-cardItem pTemplate="gridItem">
+            <ng-template let-cardItem let-index="rowIndex" pTemplate="gridItem">
               <div class="p-col-12 p-md-3 p-sm-12 card-item-container" [class.responsive]="responsive">
-                <app-cost-assignment-card-item [properties]="cardItem" (costChanged)="handleChangeValuesCardItems()">
+                <app-cost-assignment-card-item [properties]="cardItem" (costChanged)="handleChangeValuesCardItems(index)">
                 </app-cost-assignment-card-item>
               </div>
             </ng-template>

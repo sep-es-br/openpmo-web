@@ -1,0 +1,93 @@
+<div class="app-administrator-person">
+  <div class="app-administrator-header" [class.app-administrator-header-mobile]="responsive">
+    <span class="header-text">{{ "newAdministrator" | translate}}</span>
+  </div>
+  <div class="card-person">
+    <app-card [properties]="cardAdministrator" *ngIf="cardAdministrator">
+      <div class="person-properties">
+        <div class="new-person-search">
+          <div class="search-container-non-user-citizen" *ngIf="!citizenAuthServer" [class.responsive]="responsive">
+            <div class="name-person-container" [class.responsive]="responsive">
+              <span class="p-float-label">
+                <input class="app-input-text input-search" [class.responsive]="responsive" id="float-search" (ngModelChange)="validateClearSearchUserByEmail($event)"
+                  [(ngModel)]="searchedEmailUser" pInputText (blur)="searchUserByEmail()" type="email"/>
+                <label class="app-input-label" for="float-search">{{ "searchByEmail" | translate }}</label>
+              </span>
+              <i class="fas fa-search icon-search-input"></i>
+            </div>
+            <span class="input-message-error" *ngIf="showMessageNotFoundUserByEmail">
+              {{'messages.userNotFoundByEmailCreatedPerson' | translate}}
+            </span>
+            <span *ngIf="showMessageInvalidEmail" class="input-message-error">
+              {{ 'messages.invalidEmail' | translate }}
+            </span>
+          </div>
+
+          <div class="search-container-user-citizen" *ngIf="!!citizenAuthServer">
+            <div class="search-user-by" [class.responsive]="responsive">
+              <label>{{'searchBy'|translate}}:</label>
+              <div class="radios-container">
+                <p-radioButton class="search-user-radio" value="CPF" [(ngModel)]="citizenSearchBy" [label]="'CPF'" (ngModelChange)="validateClearSearchByUser()">
+                </p-radioButton>
+                <p-radioButton class="search-user-radio" value="NAME" [(ngModel)]="citizenSearchBy" (ngModelChange)="validateClearSearchByUser()"
+                  [label]="'nameOnlyPublicServers' | translate"></p-radioButton>
+              </div>
+            </div>
+            <div *ngIf="citizenSearchBy === 'NAME'" class="search-citizen-user-by-name">
+              <div class="user-by-name-input-container">
+                <input #actualTarget class="app-input-text input-search-name" [class.responsive]="responsive"
+                  (ngModelChange)="validateClearSearchUserName($event)" [(ngModel)]="searchedNameUser" pInputText />
+                <button pButton class="button-search" [label]="!responsive ? ('search'|translate) : ''" (click)="searchCitizenUserByName()"
+                  [disabled]="!searchedNameUser || (searchedNameUser && searchedNameUser.length === 0) || isLoading"
+                  icon="fas fa-search" iconPos="left"></button>
+              </div>
+              <span class="input-message-error" *ngIf="showMessagePublicServerNotFoundByName">
+                {{'messages.publicServerNotFoundByName' | translate}}
+              </span>
+              <div class="listbox-public-servers-container" [class.responsive]="responsive">
+                <p-listbox [options]="publicServersResult" *ngIf="showListBoxPublicServers" [multiple]="false"
+                  [listStyle]="{'max-height':'250px'}" (onClick)="handleSelectedPublicServer($event)"
+                  optionLabel="name">
+                  <ng-template let-publicServer pTemplate="item">
+                    <span>
+                      {{publicServer.name}}
+                    </span>
+                  </ng-template>
+                </p-listbox>
+              </div>
+            </div>
+            <div class="search-by-cpf-container" [class.responsive]="responsive">
+              <div class="user-by-cpf-input-container" *ngIf="citizenSearchBy === 'CPF'">
+                <div  class="cpf-container">
+                  <p-inputMask [(ngModel)]="searchedCpfUser" mask="999.999.999-99" placeholder="000.000.000-00"
+                    (ngModelChange)="validateClearSearchByCpf($event)" unmask="true">
+                  </p-inputMask>
+                </div>
+                <button pButton class="button-search" [label]="!responsive ? ('search'|translate) : ''"
+                  (click)="validateCpf()"
+                  [disabled]="!searchedCpfUser || (searchedCpfUser && searchedCpfUser.length === 0) || isLoading"
+                  icon="fas fa-search" iconPos="left"></button>
+              </div>
+              <span *ngIf="!validCpf" class="input-message-error">
+                {{ 'messages.invalidCPF'|translate }}
+              </span>
+              <span *ngIf="citizenUserNotFoundByCpf" class="input-message-error">
+                {{ 'messages.citizenUserNotFoundByCpf'|translate }}
+              </span>
+            </div>
+          </div>
+        </div>
+        <div class="loading-container" *ngIf="isLoading">
+          <i class="fas fa-hourglass-half"></i>
+          <label class="loading-label">{{'messages.loading'|translate}} ...</label>
+        </div>
+        <div class="person-container" *ngIf="person">
+          <span class="fullName-person">{{person?.fullName}}</span>
+          <span class="item-person">{{person?.email}}</span>
+          <span class="item-person">{{person?.cpf}}</span>
+        </div>
+      </div>
+    </app-card>
+  </div>
+</div>
+<app-save-button (save)="savePersonToAdministrator()"></app-save-button>

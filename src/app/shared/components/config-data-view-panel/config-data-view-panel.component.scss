@@ -1,0 +1,100 @@
+::ng-deep .config-data-view-panel-app {
+  width: 100%;
+  .display-config-header {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    padding-bottom: 0.5em;
+    i {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 35px;
+      height: 30px;
+      border: solid 1px rgba(153, 153, 153, 1);
+      border-radius: 4px;
+      color: #959595;
+      margin-left: 0.5em;
+      font-size: 1.2rem;
+      cursor: pointer;
+      padding-top: 3px;
+    }
+    .grid {
+      width: 35px;
+      height: 30px;
+      border: solid 1px rgba(153, 153, 153, 1);
+      border-radius: 4px;
+      color: #959595;
+      margin-left: 0.5em;
+      font-size: 1.2rem;
+      cursor: pointer;
+    }
+    .selected {
+      border-color: rgba(68, 179, 155, 1);
+      color: #44B39B;
+    }
+    .page-size {
+      width: 50px;
+      height: 30px;
+      display: flex;
+      margin-left: 0.5em;
+      background-color: transparent;
+      p-dropdown {
+        width: 50px;
+        height: 30px;
+        flex: 1;
+        background-color: transparent;
+      }
+      .p-dropdown {
+        font-size: 0.9rem;
+        width: 50px;
+        height: 30px;
+        border: solid 1px #999999;
+        background-color: transparent;
+        .p-inputtext {
+          font-size: 0.9rem;
+          padding: 2px 0 2px 5px;
+          background-color: transparent;
+        }
+        .p-dropdown-trigger {
+          width: 1.4rem;
+          background-color: transparent;
+        }
+        .pi-chevron-down {
+          font-size: 0.8rem !important;
+        }
+      }
+      .p-dropdown:not(.disabled).p-focus {
+        box-shadow: none;
+        border-color: #6c757d;
+      }
+      .p-dropdown:not(.disabled):hover {
+        border-color: #6c757d;
+      }
+      .p-dropdown-panel .p-dropdown-items .p-dropdown-item.p-highlight {
+        background: #e9ecef;
+      }
+    }
+  }
+}
+::ng-deep .p-tooltip.p-tooltip-top {
+  background-color: transparent;
+  border: none;
+    box-shadow: none;
+  .p-tooltip-arrow {
+    background-color: transparent;
+    border: none;
+    box-shadow: none;
+  }
+  .p-tooltip-text {
+    color: #999999;
+    background-color: transparent;
+    border: none;
+    box-shadow: none;
+  }
+}
+
+.config-data-view-panel-app.responsive {
+  padding-top: 0.5em;
+}

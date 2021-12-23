@@ -10,4 +10,5 @@ export enum TypePropertyEnum {
   Currency,
   LocalitySelection,
   OrganizationSelection,
+  Group
 }

@@ -1,0 +1,21 @@
+@use "src/variables" as v;
+
+::ng-deep .app-property-integer .p-inputnumber {
+  width: 100%;
+}
+
+::ng-deep .app-property-integer .p-fluid .p-inputnumber .p-inputnumber-input {
+  width: 100%;
+}
+
+::ng-deep .app-property-integer .p-inputnumber .p-inputtext {
+  width: 100%;
+}
+
+::ng-deep .workpack-input-number-not-fullLine .p-inputnumber {
+  width: 100%;
+}
+
+::ng-deep .workpack-input-number-mobile .p-inputnumber {
+  width: 100%;
+}

@@ -1,0 +1,13 @@
+<p-confirmDialog [header]="'messages.cookiesPermissionMessage' | translate" icon="pi pi-exclamation-triangle" key="cookiesPermission">
+</p-confirmDialog>
+<div class="config-data-view-panel-app" [class.responsive]="responsive">
+  <div class="display-config-header">
+    <i class="fas fa-angle-double-down" [pTooltip]="'expandAll'|translate" tooltipPosition="top" [class.selected]="!collapsed" (click)="handleCollapseAll(false)"></i>
+    <i class="fas fa-angle-double-up" [class.selected]="collapsed" [pTooltip]="'collapseAll'|translate" tooltipPosition="top" (click)="handleCollapseAll(true)"></i>
+    <i class="fas fa-bars" [class.selected]="displayMode === 'list'" [pTooltip]="'list'|translate" tooltipPosition="top" (click)="handleChangeDisplayMode('list')"></i>
+    <i class="app-icon grid" [class.selected]="displayMode === 'grid'" [pTooltip]="'card'|translate" tooltipPosition="top" (click)="handleChangeDisplayMode('grid')"></i>
+    <div class="page-size" [pTooltip]="'perPage'|translate" tooltipPosition="top">
+      <p-dropdown [options]="pageSizeOptions" [(ngModel)]="selectedPageSize" (onChange)="handleChangePageSize()"></p-dropdown>
+    </div>
+  </div>
+</div>

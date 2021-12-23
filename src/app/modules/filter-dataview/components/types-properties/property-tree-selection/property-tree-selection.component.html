@@ -1,0 +1,16 @@
+<div class="app-property-tree-selection">
+  <ng-container *ngIf="property?.multipleSelection; else singleSelection">
+    <div class="app-tree-selection" *ngIf="property?.multipleSelection">
+      <label class="app-input-label" [class.p-error]="property.invalid">{{'value' | translate}}</label>
+      <p-tree [value]="property?.localityList" selectionMode="checkbox" [(selection)]="property.localitiesSelected"
+        (onNodeSelect)="changed.emit($event)" (onNodeUnselect)="changed.emit($event)"></p-tree>
+    </div>
+  </ng-container>
+  <ng-template #singleSelection>
+    <div class="app-tree-selection" [class.ng-invalid]="property.invalid" *ngIf="!property.multipleSelection">
+      <label class="app-input-label" [class.p-error]="property.invalid">{{'value' | translate}}</label>
+      <p-tree [value]="property.localityList" selectionMode="single" [(selection)]="property.localitiesSelected"
+        (onNodeSelect)="changed.emit($event)" (onNodeUnselect)="changed.emit($event)"></p-tree>
+    </div>
+  </ng-template>
+</div>

@@ -1,23 +1,31 @@
-import { Component, Input, OnDestroy } from '@angular/core';
+import { Component, Input, OnDestroy, Output, SimpleChanges, EventEmitter, OnInit, OnChanges } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { Subject, Subscription } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 import { ICard } from '../../interfaces/ICard';
 import { ResponsiveService } from '../../services/responsive.service';
+import { SelectItem } from 'primeng/api';
 
 @Component({
   selector: 'app-card',
   templateUrl: './card.component.html',
   styleUrls: ['./card.component.scss']
 })
-export class CardComponent implements OnDestroy {
+export class CardComponent implements OnInit, OnDestroy, OnChanges {
 
   @Input() properties: ICard;
+  @Output() selectedFilter = new EventEmitter();
+  @Output() editFilter = new EventEmitter();
+  @Output() newFilter = new EventEmitter();
+  @Output() createNewElement = new EventEmitter();
+
   responsive: boolean;
   subResponsive: Subscription;
   language: string;
   $destroy = new Subject();
+  filterListOptions: SelectItem[];
+  filterSelected: number;
 
   constructor(
     private responsiveSrv: ResponsiveService,
@@ -29,6 +37,23 @@ export class CardComponent implements OnDestroy {
         setTimeout(() => this.setLanguage(), 200);
       }
     );
+    if (this.properties && !!this.properties.showFilters) {
+      this.loadFilterListOptions();
+    }
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (
+      changes.properties && changes.properties.currentValue && !!this.properties.showFilters
+    ) {
+      this.loadFilterListOptions();
+    }
+  }
+
+  ngOnInit() {
+    if (this.properties && !!this.properties.showFilters) {
+      this.loadFilterListOptions();
+    }
   }
 
   ngOnDestroy(): void {
@@ -38,12 +63,55 @@ export class CardComponent implements OnDestroy {
     this.$destroy.complete();
   }
 
-  handleCollapsed() {
-    this.properties.initialStateCollapse = !this.properties.initialStateCollapse;
+  loadFilterListOptions() {
+    this.filterListOptions = [{
+      label: this.translateSrv.instant('filterAll'),
+      value: null
+    }];
+    if (this.properties && this.properties.filters) {
+      this.properties.filters.forEach( filter => {
+        this.filterListOptions.push({
+          label: filter.name,
+          value: filter.id
+        });
+        if (!!filter.favorite) {
+          this.filterSelected = filter.id;
+        }
+      });
+    }
+    this.filterListOptions.push({
+      label: 'divider',
+      value: -1,
+      disabled: true
+    });
+    this.filterListOptions.push({
+      label: this.translateSrv.instant('newFilter'),
+      value: -1
+    });
+  }
+
+  handleCollapsed(event?) {
+    this.properties.initialStateCollapse = event ? event : !this.properties.initialStateCollapse;
   }
 
   setLanguage() {
     this.language = this.translateSrv.currentLang;
+  }
+
+  handleFilterSelected(idFilter: number) {
+    this.selectedFilter.emit({filter: idFilter});
+  }
+
+  handleFilterEdit(idFilter: number) {
+    this.editFilter.emit({filter: idFilter});
+  }
+
+  handleNewFilter() {
+    this.newFilter.emit();
+  }
+
+  handleCreateNewElement() {
+    this.createNewElement.emit();
   }
 
 }

@@ -1,0 +1,85 @@
+::ng-deep .app-person {
+  .card-container {
+    .content {
+      display: flex;
+      .container-left-info {
+        border-right: 1px solid #d2d2d1;
+        padding-left: 1rem;
+        padding-right: 2.5rem;
+        margin-right: 2.5rem;
+        width: 22%;
+        .name {
+          font-weight: 500;
+          font-size: 0.9rem;
+        }
+        .form {
+          margin-top: 2rem;
+            .app-input-text {
+              width: 100%;
+              &:read-only {
+                border: none !important;
+              }
+            }
+        }
+      }
+      .container-right-info {
+        width: 76%;
+        .section {
+          .subtitle {
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-bottom: 1.7rem;
+          }
+          .form {
+            .property-input-text{
+              padding-left: 0;
+            }
+          }
+          .remove-permission {
+            display: flex;
+            justify-content: flex-end;
+            .p-button {
+              background-color: #ea5c5c;
+              border: none;
+              font-size: 0.8rem;
+            }
+          }
+          .container-permission {
+            display: flex;
+            margin-bottom: 1.8rem;
+            .permission {
+              display: flex;
+              flex-direction: column;
+              margin-right: 1.4rem;
+              .label {
+                color: #6c757d;
+                font-style: italic;
+                font-size: 12px;
+                margin-bottom: 0.4rem;
+              }
+            }
+            .button-change {
+              .p-button {
+                display: flex;
+                flex-direction: column;
+                background-color: #44b39b;
+                border: none;
+                font-size: 0.8rem;
+              }
+            }
+          }
+          .app-card .p-panel {
+            margin-bottom: 2rem;
+            .p-panel-header, .p-panel-content {
+              background-color: #fafaf9 ;
+            }
+            .p-panel-header {
+              border: none ;
+            }
+
+          }
+        }
+      }
+    }
+  }
+}

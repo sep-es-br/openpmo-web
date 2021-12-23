@@ -1,3 +1,6 @@
+import { FilterDataviewPropertiesEntity } from './../../../shared/constants/filterDataviewPropertiesEntity';
+import { FilterDataviewService } from './../../../shared/services/filter-dataview.service';
+import { PropertyTemplateModel } from './../../../shared/models/PropertyTemplateModel';
 import { Component, OnDestroy, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -45,6 +48,12 @@ export class OfficeComponent implements OnDestroy {
   $destroy = new Subject();
   isUserAdmin: boolean;
   editPermission: boolean;
+  collapsePanelsStatus = true;
+  displayModeAll = 'grid';
+  pageSize = 5;
+  totalRecords: number;
+  filterProperties: PropertyTemplateModel[] = this.filterSrv.get;
+  idFilterSelected: number;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -59,7 +68,8 @@ export class OfficeComponent implements OnDestroy {
     private authSrv: AuthService,
     private officePermissionSrv: OfficePermissionService,
     private messageSrv: MessageService,
-    private menuSrv: MenuService
+    private menuSrv: MenuService,
+    private filterSrv: FilterDataviewService,
   ) {
     this.activeRoute.queryParams.subscribe(async({ id }) => {
       this.idOffice = +id;
@@ -84,6 +94,26 @@ export class OfficeComponent implements OnDestroy {
     this.$destroy.complete();
   }
 
+  handleChangeCollapseExpandPanel(event) {
+    this.collapsePanelsStatus = event.mode === 'collapse' ? true : false;
+    this.cardProperties = Object.assign({}, {
+      ...this.cardProperties,
+      initialStateCollapse: this.collapsePanelsStatus
+    });
+    this.cardPlans = Object.assign({}, {
+      ...this.cardPlans,
+      initialStateCollapse: this.collapsePanelsStatus
+    });
+  }
+
+  handleChangeDisplayMode(event) {
+    this.displayModeAll = event.displayMode;
+  }
+
+  handleChangePageSize(event) {
+    this.pageSize = event.pageSize;
+  }
+
   async load() {
     this.isUserAdmin = await this.authSrv.isUserAdmin();
     await this.loadPropertiesOffice();
@@ -96,7 +126,7 @@ export class OfficeComponent implements OnDestroy {
       tooltip: this.propertiesOffice?.fullName
     }]);
     if (this.idOffice) {
-      this.loadPlans();
+      await this.loadPlans();
     }
   }
 
@@ -106,14 +136,14 @@ export class OfficeComponent implements OnDestroy {
       initialStateToggle: false,
       cardTitle: 'properties',
       collapseble: true,
-      initialStateCollapse: this.idOffice ? true : false
+      initialStateCollapse: this.idOffice ? this.collapsePanelsStatus : false
     };
     this.cardPlans = {
       toggleable: false,
       initialStateToggle: false,
       cardTitle: 'plans',
       collapseble: true,
-      initialStateCollapse: false
+      initialStateCollapse: this.collapsePanelsStatus
     };
   }
 
@@ -150,7 +180,8 @@ export class OfficeComponent implements OnDestroy {
 
   async loadPlans() {
     this.loadPlanModelsOfficeList();
-    const result = await this.planSrv.GetAll({ 'id-office': this.idOffice });
+    await this.loadFiltersPlans();
+    const result = await this.planSrv.GetAll({ 'id-office': this.idOffice, idFilter: this.idFilterSelected });
     if (result.success) {
       this.plans = result.data;
     }
@@ -196,6 +227,9 @@ export class OfficeComponent implements OnDestroy {
       }));
     }
     this.cardItemsPlans = itemsPlans;
+    this.totalRecords = this.cardItemsPlans && this.cardItemsPlans.length;
+    this.cardPlans.showCreateNemElementButton = this.editPermission && this.menuItemsNewPlan?.length > 0 ? true : false;
+    this.cardPlans.createNewElementMenuItems = this.menuItemsNewPlan;
   }
 
   navigateToNewPlan(idPlanModel: number) {
@@ -223,6 +257,7 @@ export class OfficeComponent implements OnDestroy {
     const result = await this.planSrv.delete(plan, { useConfirm: true });
     if (result.success) {
       this.cardItemsPlans = Array.from(this.cardItemsPlans.filter(p => p.itemId !== plan.id));
+      this.totalRecords = this.cardItemsPlans && this.cardItemsPlans.length;
     }
   }
 
@@ -244,6 +279,15 @@ export class OfficeComponent implements OnDestroy {
         info: this.propertiesOffice?.name,
         tooltip: this.propertiesOffice?.fullName
       });
+      this.breadcrumbSrv.setBreadcrumbStorage([
+        {
+          key: 'office',
+          routerLink: [ '/offices', 'office' ],
+          queryParams: { id: this.idOffice },
+          info: this.propertiesOffice?.name,
+          tooltip: this.propertiesOffice?.fullName
+        }
+      ]);
       this.messageSrv.add({
         severity: 'success',
         summary: this.translateSrv.instant('success'),
@@ -269,6 +313,77 @@ export class OfficeComponent implements OnDestroy {
         }]
       });
     }
+  }
+
+  async loadFiltersPlans() {
+    const result = await this.filterSrv.getAllFilters('plans');
+    if (result.success && result.data.length > 0) {
+        const filterDefault = result.data.find( defaultFilter => !!defaultFilter.favorite);
+        this.idFilterSelected = filterDefault ? filterDefault.id : undefined;
+        this.cardPlans.filters = result.data;
+    }
+    this.cardPlans.showFilters = true;
+  }
+
+  handleEditFilter(event) {
+    const idFilter = event.filter;
+    if (idFilter) {
+      this.setBreadcrumbStorage();
+      const filterProperties = this.loadFilterPropertiesList();
+      this.filterSrv.setFilterProperties(filterProperties);
+      this.router.navigate(['/filter-dataview'], {
+        queryParams: {
+          id: idFilter,
+          entityName: 'plans'
+        }
+      });
+    }
+  }
+
+  async handleSelectedFilter(event) {
+    const idFilter = event.filter;
+    if (idFilter) {
+      this.idFilterSelected = idFilter;
+      await this.loadPlans();
+    }
+  }
+
+  handleNewFilter() {
+    const filterProperties = this.loadFilterPropertiesList();
+    this.filterSrv.setFilterProperties(filterProperties);
+    this.setBreadcrumbStorage();
+    this.router.navigate(['/filter-dataview'], {
+      queryParams: {
+        entityName: 'plans'
+      }
+    });
+  }
+
+  loadFilterPropertiesList() {
+    const listProperties = FilterDataviewPropertiesEntity.plans;
+    const filterPropertiesList = listProperties.map( prop => {
+      const property =  new PropertyTemplateModel();
+      property.type = prop.type;
+      property.label = prop.label;
+      property.name = prop.apiValue;
+      property.active = true;
+      return property;
+    });
+
+    return filterPropertiesList;
+  }
+
+  setBreadcrumbStorage() {
+    this.breadcrumbSrv.setBreadcrumbStorage([{
+      key: 'office',
+      routerLink: [ '/offices', 'office' ],
+      queryParams: { id: this.idOffice },
+      info: this.propertiesOffice?.name,
+      tooltip: this.propertiesOffice?.fullName
+    }, {
+      key: 'filter',
+      routerLink: ['/filter-dataview']
+    }]);
   }
 
 }

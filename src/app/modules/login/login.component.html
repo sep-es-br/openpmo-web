@@ -1,5 +1,9 @@
 <div class="app-login">
-  <div class="form" [class.mobile]="responsiveSrv.observable | async">
+  <header class="languages">
+    <button type="button" pButton pRipple icon="fas fa-flag" [label]="'currentLanguage' | translate" (click)="menu.toggle($event)"></button>
+    <p-menu #menu [popup]="true" [model]="itemsLanguages"></p-menu>
+  </header>
+  <div class="card-login" [class.mobile]="responsiveSrv.observable | async" [class.login-denied]="isLoginDenied">
     <img src="assets/svg/LogoOpenPMOHorizontal.svg" alt="Logo">
     <div class="action">
       <div class="button" (click)="signIn()">
@@ -17,5 +21,30 @@
         {{ appConfig?.authButtonText[currentLanguage] }}
       </div>
     </div>
+    <div class="info-denied-container" *ngIf="isLoginDenied">
+      <h1 class="title">{{'messages.error.login.denied.title' | translate}}</h1>
+      <p class="subtitle">{{'messages.error.login.denied.subtitle' | translate}}</p>
+      <p class="description">{{'messages.error.login.denied.solution' | translate}}</p>
+    </div>
+    <div class="button-logout-container" *ngIf="isLoginDenied">
+      <button class="button-logout" (click)="handleClickLogout()">
+        <ng-container *ngIf="authButtonIcon; else defaultIcon">
+          <ng-container *ngIf="authButtonIcon?.indexOf('.') !== -1; else elseTemplate">
+            <img [src]="authButtonIcon" alt="Auth Button Icon">
+          </ng-container>
+          <ng-template #elseTemplate>
+            <i [ngClass]="authButtonIcon" alt="Auth Button Icon"></i>
+          </ng-template>
+        </ng-container>
+        <ng-template #defaultIcon>
+          <i [ngClass]="[ 'app-icon', 'users', 'white-icon' ]" [ngStyle]="{ fontSize: '2rem' }" alt="Auth Button Icon"></i>
+        </ng-template>
+        <div class="text">
+          {{'logoutLogin' | translate}}
+        </div>
+      </button>
+    </div>
   </div>
+
+  <app-footer style="width: 100%; bottom: 0; position: absolute;"></app-footer>
 </div>

@@ -1,0 +1,277 @@
+@use "src/variables" as v;
+
+::ng-deep .app-filter-dataview {
+  width: 100%;
+
+  .app-single-selection {
+    .p-dropdown {
+      background-color: transparent;
+      border: none;
+      border-radius: 0;
+      border-bottom: 1px solid v.$borderInput;
+      width: 100%;
+    }
+    .p-dropdown:not(.p-disabled).p-focus {
+      box-shadow: none;
+      border: none;
+      border-bottom: 1px solid v.$borderInput;
+    }
+    .p-dropdown:hover {
+      border: none;
+      border-bottom: 1px solid v.$borderInputHover !important;
+    }
+    .p-dropdown .p-inputtext {
+      color: v.$fontInput;
+      font-size: 1rem;
+      font-family: v.$fontFamilyMedium;
+      padding-left: 0;
+    }
+    .p-dropdown-panel .p-dropdown-items {
+      font-size: 1rem;
+      font-family: v.$fontFamilyMedium;
+      color: v.$fontInput;
+      .p-dropdown-item.p-highlight {
+        background-color: v.$bgCard;
+        color: v.$fontInput;
+      }
+    }
+    .p-dropdown-trigger {
+      justify-content: flex-end;
+    }
+    .p-dropdown-trigger-icon {
+      color: #004660;
+      font-size: 1rem;
+    }
+  }
+  .card-properties-filter{
+    width: 100%;
+    .formgroup {
+      display: flex;
+      flex-direction: row;
+      align-items: flex-end;
+      padding-bottom: 1em;
+      .p-field {
+        width: 15%;
+        // padding-bottom: 0.5em;
+      }
+      .direction-container {
+        display: flex;
+        flex-direction: column;
+        margin-left: 2em;
+        .direction-radio {
+          padding-bottom: 10px;
+        }
+        .p-radiobutton .p-radiobutton-box {
+          background-color: white !important;
+          border-color: #868181;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          &:hover {
+            border-color: #868181;
+          }
+          .p-radiobutton-icon {
+            width: 10px;
+            height: 10px;
+          }
+        }
+        .p-radiobutton .p-radiobutton-box.p-highlight {
+          background-color: white !important;
+          border-color: #868181;
+          &:hover {
+            border-color: #868181;
+            background: white !important;
+          }
+          .p-radiobutton-icon {
+            background-color: #868181;
+          }
+        }
+        p-radiobutton .p-radiobutton .p-radiobutton-box.p-highlight {
+          border-color: #868181 !important;
+          background: white !important;
+          box-shadow: none;
+        }
+        p-radiobutton .p-radiobutton .p-radiobutton-box.p-focus {
+          border-color: #868181 !important;
+          background: white !important;
+          box-shadow: none;
+        }
+        .p-radiobutton.p-radiobutton-focused.p-radiobutton-checked {
+          background-color: white !important;
+          border-color: #868181;
+          box-shadow: none;
+        }
+        .p-radiobutton .p-radiobutton-box {
+          .p-radiobutton-icon {
+            background-color: #868181;
+          }
+        }
+      }
+      
+      .my-default {
+        padding-bottom: 10px;
+        margin-left: 2em;
+        p-checkbox {
+          .p-checkbox .p-checkbox-box {
+            border: 2px solid #797979;
+            background: transparent;
+            width: 20px;
+            height: 20px;
+            color: #797979;
+            border-radius: 3px;
+            transition: background-color 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s;
+          }
+          .p-checkbox .p-checkbox-box.p-highlight {
+            border-color: #3b3636;
+            background: transparent;
+          }
+          .p-checkbox .p-checkbox-box.p-highlight:hover {
+            border-color: #797979;
+            background: transparent;
+          }
+          .p-checkbox .p-checkbox-box:hover {
+            border-color: #797979;
+          }
+          .p-checkbox .p-checkbox-box.p-focus {
+            border-color: #797979; // TODO: FIND BRIGHTER COLOR
+            box-shadow: none;
+          }
+          .p-checkbox .p-checkbox-box .p-checkbox-icon {
+            color: #797979;
+            font-weight: bold;
+          }
+        }
+      }
+      
+    }
+    .formgroup-responsive {
+      flex-direction: column;
+      align-items: flex-start;
+      .p-field-responsive {
+        width: 100%;
+      }
+      .my-default-responsive {
+        margin-left: 0;
+        margin-top: 1em;
+        width: 100%;
+        p-checkbox {
+          .p-checkbox {
+            width: 15px;
+            height: 15px;
+          }
+          .p-checkbox .p-checkbox-box {
+            width: 15px;
+            height: 15px;
+            color: #797979;
+          }
+          .p-checkbox-label {
+            font-size: 0.9rem;
+          }
+        }
+      }
+      .direction-container-responsive {
+        margin-left: 0;
+        margin-top: 1em;
+        width: 100%;
+        flex-direction: row;
+        .p-radiobutton {
+          width: 15px;
+          height: 15px;
+        }
+        .p-radiobutton .p-radiobutton-box {
+          width: 15px;
+          height: 15px;
+        }
+        .p-radiobutton-label {
+          font-size: 0.9rem;
+        }
+        .desc {
+          margin-left: 0.5em;
+        }
+      }
+    }
+    form {
+      width: 100%;
+    }
+    .rules-container {
+      margin-top: 2em;
+      .rules-title {
+        color: #004660;
+        font-family: "Montserrat Medium", "Montserrat Regular", "Montserrat", sans-serif;
+        font-size: 1rem;
+        text-transform: uppercase;
+      }
+      .rules-title-responsive {
+        font-size: 0.75rem;
+      }
+      .dataview-container {
+        margin-top: 1em;
+        .dataview-card-items-rule {
+          position: static !important;
+          background-color: transparent;
+          .p-dataview-content, .p-grid {
+            background-color: transparent;
+          }
+          .card-item-container {
+            padding: 0.5em;
+            min-height: 9.5em !important;
+            &:first-child {
+              padding: 0.5em 0.5em 0.5em 0;
+            }
+          }
+          .card-item-container.responsive {
+            padding: 0.5em 0;
+          }
+        }
+      }
+    }
+  }
+}
+
+
+::ng-deep .app-filter-dataview {
+  .card-properties-filter form {
+    .p-field.responsive {
+      margin-right: 0 !important;
+    }
+    .responsive {
+      width: 100% !important;
+
+      .p-calendar {
+        width: 100%;
+      }
+    }
+  }
+
+  .p-dataview .p-dataview-content .p-grid .card-item-big {
+    flex-basis: 350px;
+    min-height: 250px;
+  }
+  .p-dataview .p-dataview-content .p-grid .card-item-container {
+    min-height: 250px;
+  }
+}
+
+::ng-deep .delete-filter-button-container {
+  margin-top: 3em;
+  margin-bottom: 2em;
+  .p-button {
+    background-color: transparent;
+    border: none;
+    box-shadow: none;
+    color: #ea5c5c;
+    font-size: 1rem;
+    padding-left: 0;
+
+    .p-button-icon {
+      font-size: bold;
+    }
+
+    &:hover {
+      background-color: transparent;
+      border: none;
+      box-shadow: none;
+      color: #ea5c5c;
+    }
+  }
+}

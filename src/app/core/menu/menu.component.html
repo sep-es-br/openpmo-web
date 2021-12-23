@@ -11,21 +11,26 @@
   </ng-container>
   <div class="spacer"></div>
   <div class="item" *ngIf="!isMobileView" [pTooltip]="'user' | translate" (click)="toggleMenu('user')">
-    <i class="app-icon user-circle" [ngStyle]="{ fontSize: '1.5rem' }"></i>
+    <app-avatar [idPerson]="currentUserInfo?.id" [menu]="true"></app-avatar>
   </div>
 </nav>
 
 <div class="menu-layout" *ngIf="(isMenuOpen() && isMobileView) || isMenuOpen('user')" (click)="closeAllMenus()"></div>
 
 <ng-template #menuGeneral>
-  <div class="item" (click)="toggleMenu('office')" [pTooltip]="'officesAndPlans' | translate">
+  <div class="item" (click)="toggleMenu('office')" *ngIf="itemsOffice?.length > 0" [pTooltip]="'officesAndPlans' | translate">
     <i class="app-icon offices" [ngStyle]="{ fontSize: '1.8rem' }"></i>
     <div class="item-label" *ngIf="isMobileView">{{ 'offices' | translate }}</div>
   </div>
-  <div class="item" (click)="toggleMenu('portfolio')" [pTooltip]="'portfolios' | translate"
+  <div class="item" (click)="toggleMenu('portfolio')"  [pTooltip]="currentPlan?.name"
     *ngIf="!!currentIDOffice && !!currentIDPlan && isPlanMenu">
       <i class="app-icon briefcase" [ngStyle]="{ fontSize: '1.5rem' }"></i>
-    <div class="item-label" *ngIf="isMobileView">{{ 'portfolios' | translate }}</div>
+    <div class="item-label" *ngIf="isMobileView" [routerLink]="['/plan']" [queryParams]="{id: currentPlan?.id}">{{ currentPlan?.name }}</div>
+  </div>
+  <div class="item" *ngIf="currentUserInfo?.isCcbMember" [routerLink]="['/ccbmember-baselines-view']"
+    [pTooltip]="'baselines' | translate">
+      <i class="app-icon ccb-view" [ngStyle]="{ fontSize: '1.87rem' }"></i>
+    <div class="item-label" *ngIf="isMobileView" [routerLink]="['/ccbmember-baselines-view']">{{'baselines' | translate}}</div>
   </div>
 </ng-template>
 <ng-template #menuAdmin>
@@ -36,7 +41,7 @@
     </div>
     <div class="item">
       <i class="app-icon plan-model" [ngStyle]="{ fontSize: '2.25rem' }"></i>
-      <div class="item-label" *ngIf="isMobileView">{{ 'strategies' | translate }}</div>
+      <div class="item-label" *ngIf="isMobileView">{{ 'planModels' | translate }}</div>
     </div>
     <div class="item" (click)="toggleMenu('more')">
       <i class="app-icon ellipsis-v" [ngStyle]="{ fontSize: '2.25rem' }"></i>
@@ -47,7 +52,7 @@
     <div class="item" (click)="toggleMenu('office')" [pTooltip]="'offices' | translate" *ngIf="isUserAdmin">
       <i class="app-icon offices" [ngStyle]="{ fontSize: '1.8rem' }"></i>
     </div>
-    <div class="item" [routerLink]="['/strategies']" [queryParams]="{ idOffice: currentIDOffice }" [pTooltip]="'strategies' | translate">
+    <div class="item" [routerLink]="['/strategies']" [queryParams]="{ idOffice: currentIDOffice }" [pTooltip]="'planModels' | translate">
       <i class="app-icon plan-model" [ngStyle]="{ fontSize: '1.5rem' }"></i>
     </div>
     <div class="item" [routerLink]="['/organizations']" [queryParams]="{ idOffice: currentIDOffice }" [pTooltip]="'organizations' | translate">
@@ -57,10 +62,13 @@
       <i class="app-icon map-marked" [ngStyle]="{ fontSize: '1.5rem' }"></i>
     </div>
     <div class="item" [routerLink]="['/measure-units']" [queryParams]="{ idOffice: currentIDOffice }" [pTooltip]="'measureUnits' | translate">
-      <i class="app-icon unit-selection" [ngStyle]="{ fontSize: '.9rem' }"></i>
+      <i class="app-icon unit-selection-alt" [ngStyle]="{ fontSize: '.9rem' }"></i>
     </div>
     <div class="item" [routerLink]="['/offices/permission']" [queryParams]="{ idOffice: currentIDOffice }" [pTooltip]="'officePermissions' | translate">
-      <i class="app-icon permission2" [ngStyle]="{ fontSize: '1.5rem' }" *ngIf="editPermissionOnOffice"></i>
+      <i class="app-icon permission" [ngStyle]="{ fontSize: '1.5rem' }" *ngIf="editPermissionOnOffice"></i>
+    </div>
+    <div class="item" [routerLink]="['/persons']" [queryParams]="{ idOffice: currentIDOffice }" [pTooltip]="'persons' | translate">
+      <i class="app-icon users" [ngStyle]="{ fontSize: '1.5rem' }"></i>
     </div>
   </ng-template>
 </ng-template>
@@ -68,7 +76,7 @@
 <div class="app-menu-slide" #menuSliderOffices [class.open]="isMenuOpen('office')" [class.mobile]="isMobileView" [class.changing]="isChangingView">
   <ng-container *ngIf="isMobileView; else sliderOffice">
     <div class="top-bar">
-      <div class="title">{{ (isAdminMenu ? 'offices' : 'officesAndPlans') | translate }}</div>
+      <div class="title" [routerLink]="['/offices']">{{ (isAdminMenu ? 'offices' : 'officesAndPlans') | translate }}</div>
     </div>
     <p-panelMenu [model]="itemsOffice"></p-panelMenu>
     <div class="action-mobile">
@@ -80,9 +88,9 @@
       <ng-template>
         <div class="slide-wrapper">
           <div class="top-bar">
-            <div class="title">{{ (isAdminMenu ? 'offices' : 'officesAndPlans') | translate }}</div>
+            <div class="title" [routerLink]="['/offices']">{{ (isAdminMenu ? 'offices' : 'officesAndPlans') | translate }}</div>
             <div class="action" *ngIf="!isMobileView">
-              <i class="app-icon arrow-left" [ngStyle]="{ fontSize: '1rem' }" (click)="closeAllMenus()"></i>
+              <i [class]="isFixed ? 'app-icon pin-on' : 'app-icon pin-off'" [ngStyle]="{ fontSize: '1rem' }" (click)="handleChangeMenuMode()"></i>
             </div>
           </div>
           <p-panelMenu [model]="itemsOffice"></p-panelMenu>
@@ -112,9 +120,9 @@
       <ng-template>
         <div class="slide-wrapper">
           <div class="top-bar">
-            <div class="title">{{ 'portfolios' | translate }}</div>
+            <div class="title" [routerLink]="['/plan']" [queryParams]="{id: currentPlan?.id}">{{currentPlan?.name}}</div>
             <div class="action" *ngIf="!isMobileView">
-              <i class="app-icon arrow-left" [ngStyle]="{ fontSize: '1rem' }" (click)="closeAllMenus()"></i>
+              <i [class]="isFixed ? 'app-icon pin-on' : 'app-icon pin-off'" [ngStyle]="{ fontSize: '1rem' }" (click)="handleChangeMenuMode()"></i>
             </div>
           </div>
           <p-panelMenu [model]="itemsPorfolioFiltered"></p-panelMenu>
@@ -128,13 +136,18 @@
 </div>
 <div class="app-menu-slide user-slide" [class.open]="isMenuOpen('user')" [class.mobile]="isMobileView" [class.changing]="isChangingView">
   <div class="top-bar">
-    <div class="title" [pTooltip]="currentUserInfo?.fullName || currentUserInfo?.name">{{ username }}</div>
-    <div class="action" *ngIf="!isMobileView">
-      <i class="app-icon arrow-left" [ngStyle]="{ fontSize: '1rem' }" (click)="closeAllMenus()"></i>
-    </div>
+    <div class="title" [pTooltip]="currentUserInfo?.fullName || currentUserInfo?.name">{{ currentUserInfo?.name }}</div>
+  </div>
+  <div class="item" [routerLink]="['/persons/profile']">
+    <i class="fas fa-user" [ngStyle]="{ fontSize: '1.3rem' }"></i>
+    <span>{{ 'profile' | translate }}</span>
   </div>
   <div class="languages">
     <p-tieredMenu [model]="itemsLanguages"></p-tieredMenu>
+  </div>
+  <div class="item" [routerLink]="['/persons/administrators']">
+    <i class="fas fa-users-cog" [ngStyle]="{ fontSize: '1.4rem' }"></i>
+    <span>{{ 'administrators' | translate }}</span>
   </div>
   <div class="logout" (click)="authSrv.signOut()">
     <i class="app-icon sign-out-alt" [ngStyle]="{ fontSize: '1rem' }"></i>
@@ -157,7 +170,7 @@
     </div>
     <div class="item">
       <span class="icon-wrapper">
-        <i class="app-icon unit-selection" [ngStyle]="{ fontSize: '1rem' }"></i>
+        <i class="app-icon unit-selection-alt" [ngStyle]="{ fontSize: '1rem' }"></i>
       </span>
       <span class="menu-label">{{ 'measureUnits' | translate }}</span>
     </div>

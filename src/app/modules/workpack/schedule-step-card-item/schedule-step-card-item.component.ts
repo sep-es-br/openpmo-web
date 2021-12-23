@@ -49,19 +49,6 @@ export class ScheduleStepCardItemComponent implements OnInit, OnDestroy {
     this.language = this.translateSrv.currentLang;
   }
 
-  navigateToPage(url: string, params?: {idSchedule: number; stepType: string; unitName: string}) {
-    this.router.navigate(
-      [url],
-      {
-        queryParams: {
-          idSchedule: params.idSchedule,
-          stepType: params.stepType,
-          unitName: params.unitName
-        }
-      }
-    );
-  }
-
   handleStepChange() {
     this.stepChanged.next();
   }

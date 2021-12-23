@@ -9,17 +9,39 @@
     font-family: v.$fontTitle !important;
     color: v.$fontInput;
     font-weight: 500;
+  }
 
-    .app-workpack-model-header-text {
-      margin-left: 0.5em;
+  .header-container {
+    display: flex;
+    flex-direction: row;
+    padding: 0.5em 0 0 0;
+    font-size: 1rem;
+    font-family: v.$fontTitle !important;
+    color: v.$fontInput;
+    font-weight: 500;
+    .app-content-header {
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      flex: 1;
+      .label {
+        margin-left: 0.5em;
+      }
     }
-    &.has-model {
-      .app-workpack-model-header-label {
+    .has-model {
+      .label {
         font-size: .688rem;
         color: v.$fontLabel;
       }
     }
   }
+  .header-container.mobile {
+    flex-direction: column;
+  }
+  .mobile {
+    width: 100%;
+  }
+
   .property-input {
     display: inline-block;
 
@@ -52,12 +74,31 @@
     font-size: 1rem;
   }
   .workpack-model-group {
-    padding: 1.75em 1em 1em 1em;
+    padding: 0.5em 1em 1em 1em;
     border: 1px solid rgba(229, 229, 228, 1);
     border-radius: 5px;
     margin-top: 1.5em;
+    .group-header {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      .left-side {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        flex: 1;
+      }
+      .right-side {
+        display: flex;
+        align-items: center;
+        .app-icon {
+          display: flex;
+          cursor: pointer;
+        }
+      }
+    }
   }
-  &.mobile {
+  .workpack-model-group.mobile {
     .property-input {
       width: 100%;
       &.p-field {
@@ -67,6 +108,18 @@
     .app-input-chips {
       margin-top: 1.8rem;
       margin-bottom: 1rem;
+    }
+    .group-header {
+      .left-side {
+        flex-direction: column;
+        .property-input {
+          margin-right: 0;
+        }
+      }
+      .right-side {
+        align-items: flex-start;
+        padding-top: 5px
+      }
     }
   }
 }
@@ -105,12 +158,49 @@
     .p-menu-overlay {
       width: auto;
     }
+    .addicional-properties-container {
+      display: inline-flex;
+    }
+    &.open {
+      display: flex;
+      width: 100%;
+      p-panel {
+        width: 100%;
+      }
+    }
+    .addicional-properties-group-container {
+      display: flex;
+      &.open {
+        width: 100%;
+        display: flex;
+        p-panel {
+          width: 100%;
+        }
+      }
+    }
+    .workpack-model-groups {
+      width: 100%;
+      margin-bottom: 0.5em;
+      .p-float-label {
+        width: 20%;
+      }
+      .sort-index-group {
+        width: 10%;
+        .p-button {
+          background-color: transparent;
+          .p-button-icon {
+            color: #939393;
+          }
+        }
+      }
+    }
     .addicional-properties {
       display: inline-flex;
       margin-right: 1em;
       margin-bottom: 1em;
       &.open {
         width: 100%;
+        display: flex;
         p-panel {
           width: 100%;
         }
@@ -123,6 +213,12 @@
     }
   }
   .card.stakeholders .p-panel-content {
+    padding-bottom: 15px !important;
+  }
+  .card.risk-and-issues .p-panel-content {
+    padding-bottom: 15px !important;
+  }
+  .card.processes .p-panel-content {
     padding-bottom: 15px !important;
   }
 
@@ -142,13 +238,43 @@
         }
       }
       &.add-actions {
+        display: flex;
+        flex: 1;
+        flex-direction: row;
         width: 100%;
-        p-button,
-        .p-button {
-          width: 100%;
+        justify-content: center;
+        // flex-direction: column;
+        p-button {
+          width: 150px;
           margin: 5px 0;
+          .p-button {
+            width: 100%;
+            margin: 5px 0;
+          }
         }
+        .button-add-property {
+          margin-right: 5px;
+        }
+        .button-add-group {
+          margin-left: 5px;
+        } 
       }
+    }
+  }
+}
+
+.app-workpack-model.mobile {
+  .card-properties {
+    .workpack-model-properties {
+      .property-input {
+        width: 100%;
+        margin-right: 0;
+      }
+    }
+  }
+  .workpack-model-addicional-properties {
+    .addicional-properties-container {
+      width: 100%;
     }
   }
 }

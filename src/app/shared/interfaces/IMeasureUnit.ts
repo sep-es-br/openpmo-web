@@ -3,4 +3,5 @@ export interface IMeasureUnit{
     idOffice?: number;
     name: string;
     fullName: string;
+    precision: number;
 }

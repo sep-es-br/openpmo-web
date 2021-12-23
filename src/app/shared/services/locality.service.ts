@@ -20,6 +20,7 @@ export class LocalityService extends BaseService<ILocality | ILocalityList> {
       this.http.get<IHttpResult<ILocalityList[]>>(`${this.urlBase}/listProperty`, { params: PrepareHttpParams(options) }).toPromise();
     return success ? data : [];
   }
+
   public async getLocalitiesFirstLevel(options?): Promise<IHttpResult<ILocality[]>> {
     const result = await
       this.http.get<IHttpResult<ILocality[]>>(`${this.urlBase}/firstLevel`, { params: PrepareHttpParams(options) }).toPromise();
@@ -28,4 +29,11 @@ export class LocalityService extends BaseService<ILocality | ILocalityList> {
       }
       return result;
   }
+
+  public async getLocalityById(idLocality: number, options?): Promise<IHttpResult<ILocalityList>> {
+    const result = await this.http.get<IHttpResult<ILocalityList>>(`${this.urlBase}/${idLocality}`,
+      {params: PrepareHttpParams(options)}).toPromise();
+    return result;
+  }
+
 }

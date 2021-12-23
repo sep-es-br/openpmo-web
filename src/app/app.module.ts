@@ -15,17 +15,22 @@ import { HomeComponent } from './modules/home/home.component';
 import { HttpRequestInterceptorModule } from './shared/interceptor/http-request.interceptor.module';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { appInitializerFactory } from './translation/appInitializerFactory';
+import { CookieModule } from 'ngx-cookie';
+import { AdminOfficeConfigComponent } from './modules/admin-office-config/admin-office-config.component';
+import { ComponentsModule } from './shared/components/components.module';
 
 @NgModule({
   declarations: [
     AppComponent,
     LoginComponent,
     HomeComponent,
+    AdminOfficeConfigComponent,
   ],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
     AppRoutingModule,
+    ComponentsModule,
     HttpClientModule,
     HttpRequestInterceptorModule,
     TranslateModule.forRoot({
@@ -36,7 +41,8 @@ import { appInitializerFactory } from './translation/appInitializerFactory';
       }
     }),
     CoreModule,
-    FontAwesomeModule
+    FontAwesomeModule,
+    CookieModule.forRoot()
   ],
   providers: [
     {

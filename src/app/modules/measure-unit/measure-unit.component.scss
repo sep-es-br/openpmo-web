@@ -68,6 +68,10 @@
       color: rgba(147, 147, 147, 0.5);
     }
   }
+  .card-item-content-list {
+    align-items: flex-start;
+    padding: 0 1em;
+  }
   .card-item-footer {
     display: flex;
     justify-content: flex-end;
@@ -77,6 +81,12 @@
       font-size: 0.6rem;
       font-family: v.$fontFamilyMedium;
     }
+  }
+}
+
+::ng-deep .app-unit-measure .app-card-item.mobile .p-card {
+  .p-fluid {
+    width: 80%;
   }
 }
 

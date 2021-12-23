@@ -1,59 +1,139 @@
 <div class="app-stakeholder-person">
   <div class="app-stakeholder-header" [class.app-stakeholder-header-mobile]="responsive">
-    <span class="header-text" *ngIf="!stakeholder">{{ "newStakeholder" | translate}}</span>
-    <span class="header-text" *ngIf="stakeholder">{{stakeholder?.person.name}}</span>
+    <span class="header-text" *ngIf="!stakeholder">{{ "newStakeholderAndPermissions" | translate}}</span>
+    <span class="header-text" *ngIf="stakeholder">{{"editStakeholderAndPermissions" | translate}}</span>
   </div>
-  <div class="card-person" >
+  <div class="card-person">
     <app-card [properties]="cardPerson" *ngIf="cardPerson">
       <div class="person-properties">
-        <div class="search-container" *ngIf="!emailPerson">
-          <span class="p-float-label">
-            <input class="app-input-text input-search" [class.responsive]="responsive" id="float-search"
-              name="searchPerson" [(ngModel)]="searchedEmailPerson" type="search"
-              pInputText (ngModelChange)="debounceSearch.next($event)"/>
-            <label class="app-input-label" for="float-search">{{ "searchPerson" | translate }}</label>
-          </span>
-          <span class="input-message-error" *ngIf="showSearchInputMessage">
-            Email não encontrado
-          </span>
-        </div>
-        <form [formGroup]="stakeholderForm" class="form-stakeholder">
-          <div class="p-fluid">
-            <div class="p-field">
-              <span class="p-float-label">
-                <input class="app-input-text short-input" [class.responsive]="responsive" id="float-email" name="email"
-                  (change)="handleShowSaveButton()" formControlName="email" type="email"
-                  pInputText />
-                <label class="app-input-label" for="float-email">E-mail *</label>
+        <div class="new-person-search" *ngIf="!idPerson">
+          <div class="toggle-user-container">
+            <p-inputSwitch class="app-toggle" [(ngModel)]="user" (ngModelChange)="handleToggleUser($event)">
+            </p-inputSwitch>
+            <label class="input-label label-toggle-user">{{'user'|translate}}</label>
+          </div>
+          <div class="search-container-non-user" *ngIf="!user">
+            <div class="search-person-by">
+              <p-radioButton class="search-by-radio" value="SEARCH" [(ngModel)]="personSearchBy"
+                [label]="'searchPerson'|translate">
+              </p-radioButton>
+              <p-radioButton class="search-by-radio" value="NEW" [(ngModel)]="personSearchBy"
+                (ngModelChange)="resetPerson()" [label]="'newPerson' |translate"></p-radioButton>
+            </div>
+            <div class="search-existing-person-container" *ngIf="personSearchBy === 'SEARCH'"
+              [class.responsive]="responsive">
+              <div class="name-person-container">
+                <span class="p-float-label">
+                  <p-autoComplete class="app-autocomplete" [(ngModel)]="selectedPerson"
+                    [suggestions]="resultPersonsByName" [delay]="500" field="fullName" [forceSelection]="true"
+                    (completeMethod)="searchPersonByName($event)" (ngModelChange)="validateClearSearchPerson($event)"
+                    (onSelect)="handlePersonSelected()"></p-autoComplete>
+                  <label class="app-input-label" for="float-search">{{ "fullName" | translate }}</label>
+                </span>
+                <i class="fas fa-search icon-search-input" *ngIf="!selectedPerson"></i>
+              </div>
+              <span *ngIf="notFoundPerson" class="input-message-error">
+                {{ 'messages.personNotFound'|translate }}
               </span>
-              <app-input-message [form]="stakeholderForm" field="email"></app-input-message>
             </div>
-            <div class="name-container" [class.responsive]="responsive">
-              <div class="p-field">
-                <span class="p-float-label">
-                  <input class="app-input-text" [class.responsive]="responsive"
-                    (change)="handleShowSaveButton()"
-                    id="float-name" name="name" formControlName="name" type="text"
-                    pInputText />
-                  <label class="app-input-label" for="float-name">{{ "name" | translate }} * </label>
-                </span>
-                <app-input-message [form]="stakeholderForm" field="name"></app-input-message>
-              </div>
-              <div class="p-field">
-                <span class="p-float-label">
-                  <input class="app-input-text" [class.responsive]="responsive" id="float-fullName" name="fullName"
-                    (change)="handleShowSaveButton()" [disabled]="person?.fullName" formControlName="fullName"
-                    type="text" pInputText />
-                  <label class="app-input-label" for="float-fullName">{{ "fullName" | translate }} * </label>
-                </span>
-                <app-input-message [form]="stakeholderForm" field="fullName"></app-input-message>
-              </div>
-            </div>
+          </div>
 
+          <div class="search-container-non-user-citizen" *ngIf="user && !citizenAuthServer"
+            [class.responsive]="responsive">
+            <div class="name-person-container" [class.responsive]="responsive">
+              <span class="p-float-label">
+                <input class="app-input-text input-search" [class.responsive]="responsive" id="float-search"
+                  (ngModelChange)="validateClearSearchUserByEmail($event)" [(ngModel)]="searchedEmailUser" pInputText
+                  (blur)="searchUserByEmail()" type="email" />
+                <label class="app-input-label" for="float-search">{{ "searchByEmail" | translate }}</label>
+              </span>
+              <i class="fas fa-search icon-search-input"></i>
+            </div>
+            <pan class="input-message-error" *ngIf="showMessageNotFoundUserByEmail">
+              {{'messages.userNotFoundByEmail' |translate}}
+            </pan>
+            <span *ngIf="showMessageInvalidEmail" class="input-message-error">
+              {{ 'messages.invalidEmail'|translate }}
+            </span>
+          </div>
+
+          <div class="search-container-user-citizen" *ngIf="user && !!citizenAuthServer">
+            <div class="search-user-by" [class.responsive]="responsive">
+              <label>{{'searchBy'|translate}}:</label>
+              <div class="radios-container">
+                <p-radioButton class="search-user-radio" value="CPF" [(ngModel)]="citizenSearchBy" [label]="'CPF'"
+                  (ngModelChange)="validateClearSearchByUser()">
+                </p-radioButton>
+                <p-radioButton class="search-user-radio" value="NAME" [(ngModel)]="citizenSearchBy"
+                  (ngModelChange)="validateClearSearchByUser()" [label]="'nameOnlyPublicServers' |translate">
+                </p-radioButton>
+              </div>
+            </div>
+            <div *ngIf="citizenSearchBy === 'NAME'" class="search-citizen-user-by-name">
+              <div class="user-by-name-input-container">
+                <input #actualTarget class="app-input-text input-search-name" [class.responsive]="responsive"
+                  (ngModelChange)="validateClearSearchUserName($event)" [(ngModel)]="searchedNameUser" pInputText />
+                <button pButton class="button-search" [label]="!responsive ? ('search'|translate) : ''"
+                  (click)="searchCitizenUserByName()"
+                  [disabled]="!searchedNameUser || (searchedNameUser && searchedNameUser.length === 0) || isLoading"
+                  icon="fas fa-search" iconPos="left"></button>
+              </div>
+              <pan class="input-message-error" *ngIf="showMessagePublicServerNotFoundByName">
+                {{'messages.publicServerNotFoundByName' |translate}}
+              </pan>
+              <div class="listbox-public-servers-container" [class.responsive]="responsive">
+                <p-listbox [options]="publicServersResult" *ngIf="showListBoxPublicServers" [multiple]="false"
+                  [listStyle]="{'max-height':'250px'}" (onClick)="handleSelectedPublicServer($event)"
+                  optionLabel="name">
+                  <ng-template let-publicServer pTemplate="item">
+                    <span>
+                      {{publicServer.name}}
+                    </span>
+                  </ng-template>
+                </p-listbox>
+              </div>
+            </div>
+            <div class="search-by-cpf-container" [class.responsive]="responsive">
+              <div class="user-by-cpf-input-container" *ngIf="citizenSearchBy === 'CPF'" [class.responsive]="responsive">
+                <p-inputMask [(ngModel)]="searchedCpfUser" mask="999.999.999-99" placeholder="000.000.000-00" (ngModelChange)="validateClearSearchByCpf($event)"
+                [class.responsive]="responsive"
+                  unmask="true">
+                </p-inputMask>
+                <button pButton class="button-search" [label]="!responsive ? ('search'|translate) : ''"
+                  (click)="validateCpf()"
+                  [disabled]="!searchedCpfUser || (searchedCpfUser && searchedCpfUser.length === 0) || isLoading"
+                  icon="fas fa-search" iconPos="left"></button>
+              </div>
+              <span *ngIf="!validCpf" class="input-message-error">
+                {{ 'messages.invalidCPF'|translate }}
+              </span>
+              <span *ngIf="citizenUserNotFoundByCpf" class="input-message-error">
+                {{ 'messages.citizenUserNotFoundByCpf'|translate }}
+              </span>
+            </div>
+          </div>
+        </div>
+        <div class="loading-container" *ngIf="isLoading">
+          <i class="fas fa-hourglass-half"></i>
+          <label class="loading-label">{{'messages.loading'|translate}} ...</label>
+        </div>
+        <div class="fullName-person-container" *ngIf="showFullNamePerson()">
+          <label class="fullName-person">{{person?.fullName ? person?.fullName : stakeholder?.person?.fullName}}</label>
+        </div>
+        <form [formGroup]="stakeholderForm" class="form-stakeholder" *ngIf="showFormPerson()">
+          <div class="p-fluid">
+            <div class="p-field" *ngIf="!user && (personSearchBy === 'NEW')">
+              <span class="p-float-label">
+                <input class="app-input-text short-input" [class.responsive]="responsive" id="float-fullName"
+                  formControlName="fullName" type="text" (change)="handleShowSaveButton()" pInputText />
+                <label class="app-input-label" for="float-fullName">{{"fullName" | translate}}</label>
+              </span>
+              <app-input-message [form]="stakeholderForm" field="fullName"></app-input-message>
+            </div>
             <div class="p-field">
               <span class="p-float-label">
-                <textarea pInputTextarea id="float-address" formControlName="address" class="app-text-area"
-                  [class.responsive]="responsive" (change)="handleShowSaveButton()" rows="1">
+                <textarea pInputTextarea class="app-text-area" id="float-address" formControlName="address" rows="1"
+                  [class.responsive]="responsive" (change)="handleShowSaveButton()" [autoResize]="true">
                 </textarea>
                 <label class="app-input-label" for="float-address">{{ "address" | translate }}</label>
               </span>
@@ -61,9 +141,7 @@
             <div class="p-field">
               <span class="p-float-label">
                 <p-inputMask class="app-input-mask short-input" [class.responsive]="responsive" id="float-phoneNumber"
-                  name="phoneNumber" formControlName="phoneNumber"
-                  mask="(99) 99999-9999"
-                  (change)="handleShowSaveButton()"></p-inputMask>
+                  name="phoneNumber" formControlName="phoneNumber" mask="(99) 99999-9999" [unmask]="true" (change)="handleShowSaveButton()"></p-inputMask>
                 <label class="app-input-label" for="float-phoneNumber">{{ "phoneNumber" | translate }}</label>
               </span>
               <app-input-message [form]="stakeholderForm" field="phoneNumber"></app-input-message>
@@ -82,10 +160,11 @@
       </div>
     </app-card>
   </div>
-  <div class="card-roles">
+  <div class="card-roles" *ngIf="showFormPerson()">
     <app-card [properties]="cardRoles" *ngIf="cardRoles">
       <div class="card-item-roles-container">
-        <p-dataView [value]="stakeholderRolesCardItems" layout="grid" styleClass="dataview-card-items" [emptyMessage]="'loadingEllipsis' | translate">
+        <p-dataView [value]="stakeholderRolesCardItems" layout="grid" styleClass="dataview-card-items"
+          [emptyMessage]="'loadingEllipsis' | translate">
           <ng-template let-cardItem pTemplate="gridItem">
             <div class="p-col-12 p-md-3 p-sm-12 card-item-container" [class.responsive]="responsive">
               <app-stakeholder-role-card-item [properties]="cardItem" (newCardItemRole)="createNewCardItemRole()"
@@ -98,14 +177,16 @@
     </app-card>
   </div>
   <div class="card-permissions">
-    <app-card [properties]="cardPermissions" *ngIf="cardPermissions">
+    <app-card [properties]="cardPermissions"
+      *ngIf="cardPermissions && stakeholderPermissions && stakeholderPermissions.length > 0">
       <div class="card-item-permissions-container">
-        <p-dataView [value]="stakeholderPermissions" layout="grid" styleClass="dataview-card-items" [emptyMessage]="'loadingEllipsis' | translate">
+        <p-dataView [value]="stakeholderPermissions" layout="grid" styleClass="dataview-card-items"
+          [emptyMessage]="'loadingEllipsis' | translate">
           <ng-template let-cardItem pTemplate="gridItem">
             <div class="p-col-12 p-md-3 p-sm-12 card-item-container">
-              <p-card class="app-card-item-permission" styleClass="editItem">
+              <p-card class="app-card-item-permission" styleClass="editItem" *ngIf="!cardItem.inheritedFrom">
                 <div class="card-item-header">
-                  <span class="card-item-title">{{cardItem.role}}</span>
+                  <div class="card-item-title">{{cardItem.role}}</div>
                 </div>
                 <div class="card-item-content">
                   <span class="p-float-label">
@@ -117,16 +198,21 @@
                   </span>
                 </div>
               </p-card>
+              <p-card class="app-card-item-permission inherited" styleClass="editItem" *ngIf="!!cardItem.inheritedFrom">
+                <div class="card-item-header">
+                  <span class="card-item-title">{{cardItem.role}}</span>
+                </div>
+                <div class="card-item-content">
+                  <span class="card-item-title">{{'inheritedFrom' |translate}} {{cardItem.inheritedFrom}}</span>
+                  <label class="app-input-label">{{ "level" | translate }}</label>
+                  <span class="card-item-level-text">{{cardItem.level.toLowerCase() |translate}}</span>
+                </div>
+              </p-card>
             </div>
           </ng-template>
         </p-dataView>
       </div>
     </app-card>
   </div>
-  <!-- <div class="app-save-button-layout">
-    <div class="app-save-button-wrapper" *ngIf="showSaveButton" @enterLeave>
-      <span class="button-label" (click)="saveStakeholder()">{{ 'save' | translate }}</span>
-    </div>
-  </div> -->
 </div>
 <app-save-button (save)="saveStakeholder()"></app-save-button>

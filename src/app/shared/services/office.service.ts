@@ -4,7 +4,9 @@ import { Inject, Injectable, Injector } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { distinctUntilChanged } from 'rxjs/operators';
 import { BaseService } from '../base/base.service';
+import { IHttpResult } from '../interfaces/IHttpResult';
 import { IOffice } from '../interfaces/IOffice';
+import { ITreeViewScopeOffice } from '../interfaces/ITreeScopePersons';
 import { AuthService } from './auth.service';
 
 @Injectable({
@@ -46,5 +48,10 @@ export class OfficeService extends BaseService<IOffice> {
 
   nextIDOffice(idOffice: number) {
     this.currentIDOffice.next(idOffice);
+  }
+
+  public async GetTreeScopePersons(idOffice: number): Promise<IHttpResult<ITreeViewScopeOffice>> {
+    const result = await this.http.get(`${this.urlBase}/${idOffice}/tree-view`).toPromise();
+    return result as IHttpResult<ITreeViewScopeOffice>;
   }
 }

@@ -1,3 +1,6 @@
+import { AuthServerService } from './../../../shared/services/auth-server.service';
+import { CitizenUserService } from './../../../shared/services/citizen-user.service';
+import { cpfValidator } from 'src/app/shared/utils/cpfValidator';
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
@@ -37,7 +40,7 @@ export class PlanPermissionsComponent implements OnInit, OnDestroy {
   idOffice: number;
   propertiesOffice: IOffice;
   cardPersonPermission: ICard;
-  personEmail: string;
+  email: string;
   responsive: boolean;
   searchedEmailPerson: string;
   permission: IPlanPermission;
@@ -47,6 +50,19 @@ export class PlanPermissionsComponent implements OnInit, OnDestroy {
   debounceSearch = new Subject();
   $destroy = new Subject();
   invalidMailMessage: string;
+  citizenAuthServer: boolean;
+  citizenSearchBy: string; //CPF | NAME
+  searchedNameUser: string;
+  searchedCpfUser: string;
+  selectedPerson: IPerson;
+  validCpf = true;
+  publicServersResult: {name: string; sub: string}[];
+  citizenUserNotFoundByCpf = false;
+  showMessageNotFoundUserByEmail = false;
+  showListBoxPublicServers = false;
+  showMessagePublicServerNotFoundByName = false;
+  showMessageInvalidEmail = false;
+  isLoading = false;
 
   constructor(
     private actRouter: ActivatedRoute,
@@ -58,11 +74,16 @@ export class PlanPermissionsComponent implements OnInit, OnDestroy {
     private messageSrv: MessageService,
     private planSrv: PlanService,
     private router: Router,
-    private officeSrv: OfficeService
+    private officeSrv: OfficeService,
+    private citizenUserSrv: CitizenUserService,
+    private authServerSrv: AuthServerService,
   ) {
     this.actRouter.queryParams.subscribe(async queryParams => {
       this.idPlan = queryParams.idPlan;
-      this.personEmail = queryParams.email;
+      this.email = queryParams.email;
+      if (!this.email) {
+        this.citizenUserSrv.loadCitizenUsers();
+      }
     });
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => {
       this.responsive = value;
@@ -82,12 +103,23 @@ export class PlanPermissionsComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.$destroy.next();
     this.$destroy.complete();
+    if (!this.email) {
+      this.citizenUserSrv.unloadCitizenUsers();
+    }
   }
 
   async ngOnInit() {
+    await this.getAuthServer();
     await this.loadPermission();
     await this.loadPropertiesPlan();
     await this.loadPropertiesOffice();
+  }
+
+  async getAuthServer() {
+    const result = await this.authServerSrv.GetAuthServer();
+    if (result.success) {
+      this.citizenAuthServer = result.data;
+    }
   }
 
   async loadPropertiesPlan() {
@@ -125,7 +157,7 @@ export class PlanPermissionsComponent implements OnInit, OnDestroy {
       {
         key: 'permission',
         routerLink: [ '/plan', 'permission', 'detail' ],
-        queryParams: { idPlan: this.idPlan, email: this.personEmail },
+        queryParams: { idPlan: this.idPlan, email: this.email },
         info: this.person?.name,
         tooltip: this.person?.fullName
       }
@@ -145,6 +177,89 @@ export class PlanPermissionsComponent implements OnInit, OnDestroy {
     }
   }
 
+  validateClearSearchUserName(event) {
+    if (!event || (event.length === 0)) {
+      this.publicServersResult = [];
+      this.showListBoxPublicServers = false;
+      this.showMessagePublicServerNotFoundByName = false;
+    }
+  }
+
+  validateClearSearchByUser() {
+    this.person = undefined;
+    this.publicServersResult = [];
+    this.showListBoxPublicServers = false;
+    this.showMessagePublicServerNotFoundByName = false;
+    this.citizenUserNotFoundByCpf = false;
+    this.validCpf = true;
+    this.searchedCpfUser = null;
+    this.searchedNameUser = null;
+  }
+
+  async searchCitizenUserByName() {
+    this.saveButton.hideButton();
+    this.publicServersResult = [];
+    if (this.person) {
+      this.person = undefined;
+    }
+    this.isLoading = true;
+    const result = await this.citizenUserSrv.GetPublicServersByName({
+      name: this.searchedNameUser,
+      idOffice: this.idOffice
+    });
+    this.isLoading = false;
+    if (result.success) {
+      this.publicServersResult = result.data;
+      this.showListBoxPublicServers = this.publicServersResult.length > 0;
+    }
+    this.showMessagePublicServerNotFoundByName = !this.publicServersResult || (this.publicServersResult && this.publicServersResult.length === 0);
+  }
+
+  validateClearSearchByCpf(event) {
+    if (!event || (event.length === 0)) {
+      this.person = undefined;
+      this.loadNewPermission();
+      this.validCpf = true;
+      this.citizenUserNotFoundByCpf = false;
+    }
+  }
+
+  async validateCpf() {
+    this.saveButton.hideButton();
+    this.citizenUserNotFoundByCpf = false;
+    this.validCpf = cpfValidator(this.searchedCpfUser);
+    if (this.validCpf) {
+      this.isLoading = true;
+      const result = await this.citizenUserSrv.GetCitizenUserByCpf({
+        cpf: this.searchedCpfUser,
+        idOffice: this.idOffice,
+        loadWorkLocation: false
+      });
+      this.isLoading = false;
+      if (result.success) {
+        this.person = result.data;
+        this.loadNewPermission();
+      } else {
+        this.citizenUserNotFoundByCpf = true;
+      }
+    }
+  }
+
+  async handleSelectedPublicServer(event) {
+    this.showListBoxPublicServers = false;
+    this.isLoading = true;
+    const publicServer = event.value;
+    const result = await this.citizenUserSrv.GetPublicServer(publicServer.sub, { idOffice: this.idOffice, loadWorkLocation: false });
+    this.isLoading = false;
+    if (result.success) {
+      this.person = result.data;
+      this.searchedNameUser = '';
+      this.publicServersResult = [];
+      this.showListBoxPublicServers = false;
+      this.loadNewPermission();
+    }
+  }
+
   async loadPermission() {
     this.cardPersonPermission = {
       toggleable: false,
@@ -153,8 +268,8 @@ export class PlanPermissionsComponent implements OnInit, OnDestroy {
       collapseble: true,
       initialStateCollapse: false
     };
-    if (this.personEmail) {
-      const result = await this.planPermissionSrv.GetAll({email: this.personEmail, 'id-plan': this.idPlan});
+    if (this.email) {
+      const result = await this.planPermissionSrv.GetAll({email: this.email, 'id-plan': this.idPlan});
       if (result.success) {
         this.permission = result.data[0];
       }
@@ -162,7 +277,8 @@ export class PlanPermissionsComponent implements OnInit, OnDestroy {
         this.person = {
           name: this.permission.person.name,
           email: this.permission.person.email,
-          roles: this.permission.permissions.map(p => (p.role))
+          guid: this.permission.person.guid,
+          roles: this.permission.permissions.map(p => ({'role': p.role}))
         };
       }
       this.loadCardItemsPersonPermissions();
@@ -176,10 +292,38 @@ export class PlanPermissionsComponent implements OnInit, OnDestroy {
         titleCardItem: p.role,
         levelListOptions: [
           { label: this.translateSrv.instant('read'), value: 'READ' },
-          { label: this.translateSrv.instant('edit'), value: 'EDIT' }
+          { label: this.translateSrv.instant('edit'), value: 'EDIT' },
+          { label: this.translateSrv.instant('none'), value: 'NONE' }
         ],
         selectedOption: p.level
       }));
+      const rolesNotPermissions = this.permission.permissions ? this.permission.person.roles
+        .filter(r => this.permission.permissions.filter(p => p.role === r.role).length === 0) : this.permission.person.roles;
+      if (rolesNotPermissions) {
+        rolesNotPermissions.forEach(r => {
+          if (this.cardItemsPlanPermission && this.cardItemsPlanPermission.length > 0) {
+            this.cardItemsPlanPermission.push({
+              typeCardItem: 'editItem',
+              titleCardItem: r.role,
+              levelListOptions: [
+                { label: this.translateSrv.instant('read'), value: 'READ' },
+                { label: this.translateSrv.instant('edit'), value: 'EDIT' },
+                { label: this.translateSrv.instant('none'), value: 'NONE' }
+              ]
+            });
+          } else {
+            this.cardItemsPlanPermission = [{
+              typeCardItem: 'editItem',
+              titleCardItem: r.role,
+              levelListOptions: [
+                { label: this.translateSrv.instant('read'), value: 'READ' },
+                { label: this.translateSrv.instant('edit'), value: 'EDIT' },
+                { label: this.translateSrv.instant('none'), value: 'NONE' }
+              ]
+            }];
+          }
+        })
+      }
     } else {
       this.cardItemsPlanPermission = null;
     }
@@ -192,13 +336,15 @@ export class PlanPermissionsComponent implements OnInit, OnDestroy {
       if (data) {
         this.showSearchInputMessage = false;
         this.person = data;
+        this.person.email = this.searchedEmailPerson
       } else {
         const email = this.searchedEmailPerson.split('@');
         const name = email[0];
         this.person = {
           name,
+          fullName: name,
           email: this.searchedEmailPerson,
-          roles: [ 'user' ]
+          roles: [ {role: 'citizen'} ]
         };
       }
     } else {
@@ -210,11 +356,10 @@ export class PlanPermissionsComponent implements OnInit, OnDestroy {
   loadNewPermission() {
     if (this.person) {
       const permissions = this.person.roles
-        ?  this.person.roles.map(p => ({ role: p, level: null }))
-        : [{ role: 'User', level: null }];
+        ?  this.person.roles.map(p => ({ role: p.role, level: 'NONE' }))
+        : [{ role: 'citizen', level: 'NONE' }];
       this.permission = {
         idPlan: this.idPlan,
-        email: this.person.email,
         permissions
       };
     } else {
@@ -224,24 +369,22 @@ export class PlanPermissionsComponent implements OnInit, OnDestroy {
   }
 
   async savePermission() {
-    this.permission.permissions = this.cardItemsPlanPermission.map(cardItem => (
+    this.permission.permissions = this.cardItemsPlanPermission.filter( p => p.selectedOption && p.selectedOption !== 'NONE').map(cardItem => (
       {
         id: cardItem.itemId,
         role: cardItem.titleCardItem,
         level: cardItem.selectedOption
       }
     ));
-    const { success } = this.personEmail
-      ? await this.planPermissionSrv.put({
-          email: this.permission.person.email,
-          idPlan: this.permission.idPlan,
-          permissions: this.permission.permissions
-        })
-      : await this.planPermissionSrv.post({
-          email: this.permission.email,
-          idPlan: this.permission.idPlan,
-          permissions: this.permission.permissions
-        });
+    const permission: IPlanPermission = {
+      idPlan: this.idPlan,
+      email: this.email ? this.email : this.person.email,
+      person: this.person,
+      permissions: this.permission.permissions
+    };
+    const { success } = this.email
+      ? await this.planPermissionSrv.put(permission)
+      : await this.planPermissionSrv.post(permission);
     if (success) {
       this.messageSrv.add({
         severity: 'success',

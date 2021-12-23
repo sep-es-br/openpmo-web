@@ -1,3 +1,4 @@
+import { ShortNumberPipe } from './shortNumberPipe';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
@@ -7,14 +8,16 @@ import { FromStringArrayToSelectItemPipe } from './fromStringArrayToSelectItemPi
 @NgModule({
   declarations: [
     FormatarTelefonePipe,
-    FromStringArrayToSelectItemPipe
+    FromStringArrayToSelectItemPipe,
+    ShortNumberPipe
   ],
   imports: [
     CommonModule
   ],
   exports: [
     FormatarTelefonePipe,
-    FromStringArrayToSelectItemPipe
+    FromStringArrayToSelectItemPipe,
+    ShortNumberPipe
   ]
 })
 export class PipesModule { }

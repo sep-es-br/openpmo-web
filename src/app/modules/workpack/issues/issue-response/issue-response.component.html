@@ -1,0 +1,58 @@
+<div class="app-issue-response">
+  <div class="app-content-header">
+    <span>{{ "newResponse" | translate }}</span>
+  </div>
+
+  <div class="card-properties-issue-response" *ngIf="cardIssueResponseProperties" [class.responsive]="responsive">
+    <app-card [properties]="cardIssueResponseProperties" class="mt-0 inputs-float-label">
+      <div class="p-grid">
+        <form [formGroup]="formIssueResponse">
+          <div class="form-group">
+            <div class="p-field">
+              <span class="p-float-label">
+                <input class="app-input-text" id="float-name" name="name" formControlName="name" type="text" pInputText />
+                <label class="app-input-label" for="float-name">{{ "name" | translate }} * </label>
+              </span>
+              <app-input-message [form]="formIssueResponse" field="name"></app-input-message>
+            </div>
+            <div class="p-field">
+              <span class="p-float-label">
+                <p-calendar id="float-start" class="app-select-date" showIcon="true" [monthNavigator]="true"
+                  [yearNavigator]="true" formControlName="date" [yearRange]="yearRangeCalculated"
+                  icon="fas fa-calendar-alt" [dateFormat]="calendarFormat">
+                </p-calendar>
+                <label class="app-input-label" for="float-start">{{ "start" | translate }} * </label>
+              </span>
+            </div>
+            <div class="p-field">
+              <span class="p-float-label">
+                <p-dropdown class="app-single-selection" [options]="statusOptions" formControlName="status"
+                  dropdownIcon="fas fa-caret-down" [autoDisplayFirst]="false">
+                </p-dropdown>
+                <label class="app-input-label">{{'status'|translate}} *</label>
+              </span>
+              <app-input-message [form]="formIssueResponse" field="status"></app-input-message>
+            </div>
+            <div class="p-field plan">
+              <span class="p-float-label">
+                <textarea pInputTextarea id="float-plan" formControlName="plan" class="app-text-area" [autoResize]="true" [rows]="1">
+                </textarea>
+                <label class="app-input-label" for="float-plan">{{ "plan" | translate }} * </label>
+              </span>
+              <app-input-message [form]="formRiskResponse" field="plan"></app-input-message>
+            </div>
+            <div class="p-field">
+              <span class="p-float-label">
+                <p-multiSelect class="app-multiple-selection" dropdownIcon="fas fa-caret-down" formControlName="responsible"
+                  [options]="stakeholderOptions" optionLabel="label"optionValue="value" ></p-multiSelect>
+                <label class="app-input-label" for="float-label" >{{'responsible' |translate}}</label>
+              </span>
+              <app-input-message [form]="formRiskResponse" field="responsible"></app-input-message>
+            </div>
+          </div>
+        </form>
+      </div>
+    </app-card>
+  </div>
+</div>
+<app-save-button #saveButton (save)="saveIssueResponse()"></app-save-button>

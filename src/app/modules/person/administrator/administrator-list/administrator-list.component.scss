@@ -1,0 +1,15 @@
+.app-administrator-list {
+  width: 100%;
+
+  .header-container {
+    display: flex;
+    justify-content: flex-end;
+    flex-direction: row;
+  }
+  .header-container.mobile {
+    flex-direction: column;
+  }
+  .mobile {
+    width: 100%;
+  }
+}

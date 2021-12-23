@@ -1,0 +1,37 @@
+<div class="app-baseline-list">
+  <div class="header-container" [class.mobile]="responsive">
+    <div class="app-content-header" [class.mobile]="responsive">
+      <span class="label">{{ 'baselines' | translate }} </span>
+    </div>
+    <app-config-data-view-panel (changeCollapsedExpand)="handleChangeCollapseExpandPanel($event)"
+      (changeDisplayMode)="handleChangeDisplayMode($event)" (changePageSize)="handleChangePageSize($event)">
+    </app-config-data-view-panel>
+  </div>
+  <ng-container *ngFor="let cardBaseline of cardsBaselines; let i = index">
+    <div class="card-container">
+      <app-card [properties]="cardBaseline" class="mt-0">
+        <p-dataView [value]="cardBaseline.cardItems" layout="grid" class="app-dataview"
+          *ngIf="displayModeAll === 'grid'" [paginator]="true" [rows]="pageSize" [showJumpToPageDropdown]="true"
+          [showPageLinks]="false" [totalRecords]="cardBaseline.totalRecords"
+          [emptyMessage]="(!cardBaseline.cardItems ? 'loadingEllipsis' : 'noContent') | translate">
+          <ng-template let-cardItem pTemplate="gridItem">
+            <div class="p-col-12 p-md-3 p-sm-12 card-item-container">
+              <app-baseline-card-item [properties]="cardItem"></app-baseline-card-item>
+            </div>
+          </ng-template>
+        </p-dataView>
+
+        <p-dataView [value]="cardBaseline.cardItems" layout="list" class="app-dataview app-dataview-list"
+          *ngIf="displayModeAll === 'list'" [paginator]="true" [rows]="pageSize" [showJumpToPageDropdown]="true"
+          [showPageLinks]="false" [totalRecords]="cardBaseline.totalRecords"
+          [emptyMessage]="(!cardBaseline.cardItems ? 'loadingEllipsis' : 'noContent') | translate">
+          <ng-template let-cardItem pTemplate="listItem">
+            <div class="p-col-12">
+              <app-baseline-card-item [properties]="cardItem" [displayModeCard]="displayModeAll"></app-baseline-card-item>
+            </div>
+          </ng-template>
+        </p-dataView>
+      </app-card>
+    </div>
+  </ng-container>
+</div>

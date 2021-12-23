@@ -9,6 +9,7 @@ export interface IBreadcrumb {
 
 export interface IResultBreadcrumb {
   id: number;
+  idWorkpackModelLinked?: number;
   name: string;
   fullName: string;
   type: string;

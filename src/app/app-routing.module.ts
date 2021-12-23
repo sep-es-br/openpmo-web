@@ -1,9 +1,11 @@
+import { FilterDataviewComponent } from './modules/filter-dataview/filter-dataview.component';
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 
 import { AuthGuard } from './shared/guards/auth-guard';
 import { HomeComponent } from './modules/home/home.component';
 import { LoginComponent } from './modules/login/login.component';
+import { AdminOfficeConfigComponent } from './modules/admin-office-config/admin-office-config.component';
 
 const routes: Routes = [
   {
@@ -40,6 +42,11 @@ const routes: Routes = [
     loadChildren: () => import('./modules/office/office.module').then(m => m.OfficeModule)
   },
   {
+    path: 'configuration-office',
+    canActivate: [ AuthGuard ],
+    component: AdminOfficeConfigComponent
+  },
+  {
     path: 'domains',
     canActivate: [ AuthGuard ],
     loadChildren: () => import('./modules/domain/domain.module').then(m => m.DomainModule)
@@ -63,6 +70,21 @@ const routes: Routes = [
     path: 'strategies',
     canActivate: [ AuthGuard ],
     loadChildren: () => import('./modules/strategy/strategy.module').then(m => m.StrategyModule)
+  },
+  {
+    path: 'filter-dataview',
+    canActivate: [ AuthGuard ],
+    loadChildren: () => import('./modules/filter-dataview/filter-dataview.module').then(m => m.FilterDataviewModule)
+  },
+  {
+    path: 'persons',
+    canActivate: [ AuthGuard ],
+    loadChildren: () => import('./modules/person/person.module').then(m => m.PersonModule)
+  },
+  {
+    path: 'ccbmember-baselines-view',
+    canActivate: [ AuthGuard ],
+    loadChildren: () => import('./modules/ccbmember-baselines-view/ccbmember-baselines-view.module').then(m => m.CCBMemberBaselinesViewModule)
   },
 ];
 

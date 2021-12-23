@@ -1,6 +1,7 @@
+import { FilterDataviewService } from 'src/app/shared/services/filter-dataview.service';
 import { Component, OnDestroy, OnInit, ViewChild, ViewChildren } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Calendar } from 'primeng/calendar';
 import { Subject } from 'rxjs';
 import { filter, takeUntil } from 'rxjs/operators';
@@ -17,7 +18,7 @@ import { WorkpackService } from 'src/app/shared/services/workpack.service';
 import { IWorkpack } from 'src/app/shared/interfaces/IWorkpack';
 import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
 import { AuthService } from 'src/app/shared/services/auth.service';
-import { MenuItem, MessageService } from 'primeng/api';
+import { ConfirmationService, MenuItem, MessageService } from 'primeng/api';
 import { OfficeService } from 'src/app/shared/services/office.service';
 import { PlanPermissionService } from 'src/app/shared/services/plan-permissions.service';
 import { SaveButtonComponent } from 'src/app/shared/components/save-button/save-button.component';
@@ -54,6 +55,12 @@ export class PlanComponent implements OnInit, OnDestroy {
   $destroy = new Subject();
   editPermission = false;
   calendarFormat: string;
+  collapsePanelsStatus = true;
+  displayModeAll = 'grid';
+  pageSize = 5;
+  totalRecords: number[] = [];
+  idFilterSelected: number;
+  isUserAdmin: boolean;
 
   constructor(
     private actRouter: ActivatedRoute,
@@ -69,7 +76,10 @@ export class PlanComponent implements OnInit, OnDestroy {
     private officePermissionSrv: OfficePermissionService,
     private planPermissionSrv: PlanPermissionService,
     private messageSrv: MessageService,
-    private menuSrv: MenuService
+    private menuSrv: MenuService,
+    private filterSrv: FilterDataviewService,
+    private router: Router,
+    private confirmationSrv: ConfirmationService
   ) {
     this.actRouter.queryParams
       .subscribe(({ id, idOffice, idPlanModel }) => {
@@ -80,13 +90,14 @@ export class PlanComponent implements OnInit, OnDestroy {
       });
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.responsive = value);
     this.translateSrv.onLangChange.pipe(takeUntil(this.$destroy)).subscribe(() => {
-        setTimeout(() => this.calendarComponents?.map(calendar => {
-          calendar.ngOnInit();
-          calendar.dateFormat = this.translateSrv.instant('dateFormat');
-          calendar.updateInputfield();
-        }, 150));
-      }
+      setTimeout(() => this.calendarComponents?.map(calendar => {
+        calendar.ngOnInit();
+        calendar.dateFormat = this.translateSrv.instant('dateFormat');
+        calendar.updateInputfield();
+      }, 150));
+    }
     );
+    this.calendarFormat = this.translateSrv.instant('dateFormat');
     this.formPlan = this.formBuilder.group({
       name: ['', [Validators.required, Validators.maxLength(50)]],
       fullName: ['', Validators.required],
@@ -99,7 +110,6 @@ export class PlanComponent implements OnInit, OnDestroy {
     this.formPlan.valueChanges
       .pipe(takeUntil(this.$destroy), filter(() => this.formPlan.dirty && this.formPlan.valid))
       .subscribe(() => this.saveButton.showButton());
-    this.planSrv.nextIDPlan(this.idPlan);
   }
 
   ngOnDestroy(): void {
@@ -108,14 +118,47 @@ export class PlanComponent implements OnInit, OnDestroy {
   }
 
   async ngOnInit() {
+    if (this.idPlan) {
+      this.setCurrentPlanStorage();
+    }
+    this.isUserAdmin = await this.authSrv.isUserAdmin();
     this.calendarFormat = this.translateSrv.instant('dateFormat');
+  }
+
+  setCurrentPlanStorage() {
+    localStorage.setItem('@currentPlan', this.idPlan.toString());
+  }
+
+  handleChangeCollapseExpandPanel(event) {
+    this.collapsePanelsStatus = event.mode === 'collapse' ? true : false;
+    this.cardPlanProperties = Object.assign({}, {
+      ...this.cardPlanProperties,
+      initialStateCollapse: this.collapsePanelsStatus
+    });
+    this.cardsPlanWorkPackModels = this.cardsPlanWorkPackModels && this.cardsPlanWorkPackModels.map(card => (
+      Object.assign({
+        ...card,
+        propertiesCard: {
+          ...card.propertiesCard,
+          initialStateCollapse: this.collapsePanelsStatus
+        }
+      })
+    ));
+  }
+
+  handleChangeDisplayMode(event) {
+    this.displayModeAll = event.displayMode;
+  }
+
+  handleChangePageSize(event) {
+    this.pageSize = event.pageSize;
   }
 
   setBreacrumb() {
     this.breadcrumbSrv.setMenu([
       {
         key: 'office',
-        routerLink: [ '/offices', 'office' ],
+        routerLink: ['/offices', 'office'],
         queryParams: { id: this.idOffice },
         info: this.propertiesOffice?.name,
         tooltip: this.propertiesOffice?.fullName
@@ -131,6 +174,7 @@ export class PlanComponent implements OnInit, OnDestroy {
   }
 
   async resetPlan() {
+    this.planSrv.nextIDPlan(this.idPlan);
     this.cardPlanProperties = undefined;
     this.cardsPlanWorkPackModels = undefined;
     this.planData = undefined;
@@ -214,8 +258,8 @@ export class PlanComponent implements OnInit, OnDestroy {
     if (success) {
       if (!isPut) {
         this.idPlan = data.id;
-        const isUserAdmin = await this.authSrv.isUserAdmin();
-        if (!isUserAdmin) {
+        this.setCurrentPlanStorage();
+        if (!this.isUserAdmin) {
           await this.createPlanPermission(data.id);
         }
         await this.loadPropertiesPlan();
@@ -241,7 +285,11 @@ export class PlanComponent implements OnInit, OnDestroy {
     const payload = this.authSrv.getTokenPayload();
     if (payload) {
       const result = await this.planPermissionSrv.post({
-        email: payload.email,
+        person: {
+          name: payload.email.split('@')[0],
+          fullName: payload.email.split('@')[0],
+          email: payload.email
+        },
         idPlan,
         permissions: [{
           level: 'EDIT',
@@ -258,41 +306,75 @@ export class PlanComponent implements OnInit, OnDestroy {
     const result = await this.workpackModelSrv.GetAll({ 'id-plan-model': this.idPlanModel });
     const workpackModels = result.success && result.data;
     if (workpackModels) {
-      this.cardsPlanWorkPackModels = await Promise.all(workpackModels.map(async(workpackModel) => {
-        const propertiesCard = {
+      this.cardsPlanWorkPackModels = await Promise.all(workpackModels.map(async (workpackModel) => {
+        const propertiesCard: ICard = {
           toggleable: false,
           initialStateToggle: false,
           cardTitle: workpackModel.modelNameInPlural,
           collapseble: true,
-          initialStateCollapse: false
+          initialStateCollapse: false,
+          showFilters: true
         };
-        const workPackItemCardList = await this.loadWorkpacksFromWorkpackModel(this.planData.id, workpackModel.id);
-
+        const resultFilters = await this.filterSrv.getAllFilters(`workpackModels/${workpackModel.id}/workpacks`);
+        if (resultFilters.success && Array.isArray(resultFilters.data)) {
+          propertiesCard.filters = resultFilters.data;
+        } else {
+          propertiesCard.filters = [];
+        }
+        const idFilterSelected = propertiesCard.filters && propertiesCard.filters.find(defaultFilter => !!defaultFilter.favorite) ?
+          propertiesCard.filters.find(defaultFilter => !!defaultFilter.favorite).id : undefined;
+        const workPackItemCardList = await this.loadWorkpacksFromWorkpackModel(this.planData.id, workpackModel.id, idFilterSelected);
         return {
           idWorkpackModel: workpackModel.id,
           propertiesCard,
           workPackItemCardList
         };
       }));
+      this.cardsPlanWorkPackModels.forEach((workpackModel, i) => {
+        this.totalRecords[i] = workpackModel.workPackItemCardList && workpackModel.workPackItemCardList.length;
+        if (workpackModel.workPackItemCardList.find(card => card.typeCardItem === 'newCardItem')) {
+          workpackModel.propertiesCard.showCreateNemElementButton = true;
+        }
+      });
     }
   }
 
-  async loadWorkpacksFromWorkpackModel(idPlan: number, workpackModelId: number) {
+  async loadWorkpacksFromWorkpackModel(idPlan: number, workpackModelId: number, idFilterSelected: number) {
 
     const result = await this.workpackSrv.GetAll({
       'id-plan': idPlan,
       'id-plan-model': this.idPlanModel,
       'id-workpack-model': workpackModelId,
+      idFilter: idFilterSelected,
       noLoading: true
     });
     const workpacks = result.success && result.data;
     const workPackItemCardList: ICardItem[] = workpacks.map(workpack => {
-      const propertyNameWorkpackModel = workpack.model?.properties?.find(p => p.name === 'name');
+      const propertyNameWorkpackModel = workpack.model?.properties?.find(p => p.name === 'name' && p.session === 'PROPERTIES');
       const propertyNameWorkpack = workpack.properties.find(p => p.idPropertyModel === propertyNameWorkpackModel?.id);
-      const propertyfullnameWorkpackModel = workpack.model?.properties?.find(p => p.name === 'fullname');
+      const propertyfullnameWorkpackModel = workpack.model?.properties?.find(p => p.name === 'fullname' && p.session === 'PROPERTIES');
       const propertyFullnameWorkpack = workpack.properties.find(p => p.idPropertyModel === propertyfullnameWorkpackModel?.id);
       const workpackPermissions = workpack.permissions && workpack.permissions.find(p => p.level === 'EDIT');
       const workpackEditPermission = workpackPermissions ? true : this.editPermission;
+      const menuItems: MenuItem[] = [{
+        label: this.translateSrv.instant('delete'),
+        icon: 'fas fa-trash-alt',
+        command: (event) => this.deleteWorkpack(workpack),
+        disabled: !this.editPermission
+      }];
+      if (workpack.model.id === workpackModelId && this.editPermission) {
+        menuItems.push({
+          label: this.translateSrv.instant('sharing'),
+          icon: 'app-icon share',
+          command: (event) => this.handleSharing(workpack.id),
+        });
+        menuItems.push({
+          label: this.translateSrv.instant('cut'),
+          icon: 'fas fa-cut',
+          command: (event) => this.handleCutWorkpack(workpack),
+        });
+      }
+
       return {
         typeCardItem: 'listItem',
         icon: workpack.model.fontIcon,
@@ -300,33 +382,159 @@ export class PlanComponent implements OnInit, OnDestroy {
         nameCardItem: propertyNameWorkpack?.value as string,
         fullNameCardItem: propertyFullnameWorkpack?.value as string,
         itemId: workpack.id,
-        menuItems: [{
-          label: this.translateSrv.instant('delete'),
-          icon: 'fas fa-trash-alt',
-          command: (event) => this.deleteWorkpack(workpack),
-          disabled: !workpackEditPermission
-        }] as MenuItem[],
+        menuItems,
         urlCard: '/workpack',
-        editPermission: workpackEditPermission
+        paramsUrlCard: workpack.model.id !== workpackModelId ? [
+          { name: 'idWorkpackModelLinked', value: workpackModelId },
+          { name: 'idPlan', value: this.idPlan }
+        ] : [{ name: 'idPlan', value: this.idPlan }],
+        editPermission: workpackEditPermission,
+        linked: !!workpack.linked ? true : false,
+        shared: workpack.sharedWith && workpack.sharedWith.length > 0 ? true : false
       };
     });
 
     if (this.editPermission) {
+      const sharedWorkpackList = await this.loadSharedWorkpackList(workpackModelId);
+      const iconMenuItems: MenuItem[] = [
+        { label: this.translateSrv.instant('new'), command: () => this.handleNewWorkpack(idPlan, workpackModelId) }
+      ];
+      if (sharedWorkpackList && sharedWorkpackList.length > 0) {
+        iconMenuItems.push({
+          label: this.translateSrv.instant('linkTo'),
+          items: sharedWorkpackList.map(wp => ({
+            label: wp.name,
+            icon: `app-icon ${wp.icon}`,
+            command: () => this.handleLinkToWorkpack(wp.id, workpackModelId)
+          }))
+        });
+      }
+      const workpackCuted = this.workpackSrv.getWorkpackCuted();
+      if (workpackCuted) {
+        const { canPaste, incompatiblesProperties } = await this.checkPasteWorkpack(workpackCuted, workpackModelId);
+        const validPasteOutherOffice = workpackCuted.plan.idOffice === this.idOffice ? true : this.isUserAdmin;
+        if (canPaste && validPasteOutherOffice) {
+          iconMenuItems.push({
+            label: `${this.translateSrv.instant('paste')} ${this.getNameWorkpack(workpackCuted)}`,
+            icon: 'fas fa-paste',
+            command: (event) => this.handlePasteWorkpack(idPlan, workpackModelId, undefined, incompatiblesProperties)
+          });
+        }
+      }
       workPackItemCardList.push(
         {
           typeCardItem: 'newCardItem',
           icon: IconsEnum.Plus,
           iconSvg: true,
-          urlCard: '/workpack',
-          paramsUrlCard: [
-            { name: 'idPlan', value: idPlan },
-            { name: 'idWorkpackModel', value: workpackModelId }
-          ]
+          iconMenuItems
         }
       );
     }
     return workPackItemCardList;
+  }
 
+  getNameWorkpack(workpack: IWorkpack): string {
+    const propertyNameWorkpackModel = workpack.model?.properties?.find(p => p.name === 'name' && p.session === 'PROPERTIES');
+    const propertyNameWorkpack = workpack.properties?.find(p => p.idPropertyModel === propertyNameWorkpackModel.id);
+    return propertyNameWorkpack?.value as string;
+  }
+
+  handleCreateNewWorkpack(idWorkpackModel: number) {
+    this.router.navigate(['/workpack'], {
+      queryParams: {
+        idPlan: this.idPlan,
+        idWorkpackModel
+      }
+    });
+  }
+
+  handleSharing(idWorkpack: number) {
+    this.router.navigate(['/workpack/sharing'], {
+      queryParams: {
+        idWorkpack,
+        idPlan: this.idPlan,
+      }
+    });
+  }
+
+  handleNewWorkpack(idPlan, idWorkpackModel) {
+    this.router.navigate(['workpack'], {
+      queryParams: {
+        idPlan,
+        idWorkpackModel,
+      }
+    });
+  }
+
+  async handleCutWorkpack(workpack: IWorkpack) {
+    this.workpackSrv.setWorkpackCuted({ ...workpack });
+    await this.loadWorkPackModels();
+  }
+
+  async handlePasteWorkpack(idPlanTo: number, idWorkpackModelTo: number, idParentTo: number, incompatiblesProperties: boolean) {
+    const workpackCuted = this.workpackSrv.getWorkpackCuted();
+    if (workpackCuted) {
+      if (incompatiblesProperties) {
+        this.confirmationSrv.confirm({
+          message: this.translateSrv.instant('messages.confirmPaste'),
+          key: 'pasteConfirm',
+          acceptLabel: this.translateSrv.instant('yes'),
+          rejectLabel: this.translateSrv.instant('no'),
+          accept: async () => {
+            await this.pasteWorkpack(workpackCuted, idWorkpackModelTo, idPlanTo, idParentTo);
+          },
+          reject: () => {
+            return;
+          }
+        });
+      } else {
+        await this.pasteWorkpack(workpackCuted, idWorkpackModelTo, idPlanTo, idParentTo);
+      }
+    }
+  }
+
+  async pasteWorkpack(workpackCuted: IWorkpack, idWorkpackModelTo: number, idPlanTo: number, idParentTo: number) {
+    const result = await this.workpackSrv.pasteWorkpack(workpackCuted.id, idWorkpackModelTo, {
+      idPlanFrom: workpackCuted.plan.id,
+      idParentFrom: workpackCuted.idParent,
+      idPlanTo,
+      idParentTo,
+      idWorkpackModelFrom: workpackCuted.model.id
+    });
+    if (result.success) {
+      await this.loadWorkPackModels();
+    }
+  }
+
+  async checkPasteWorkpack(workpackCuted: IWorkpack, idWorkpackModelTo: number) {
+    const result = await this.workpackSrv.checkPasteWorkpack(workpackCuted.id, idWorkpackModelTo, {
+      idWorkpackModelFrom: workpackCuted.model.id,
+    });
+    if(result.success) {
+      return result.data;
+    } else {
+      return {} as any
+    }
+  }
+
+  async loadSharedWorkpackList(idWorkpackModel: number) {
+    const result = await this.workpackSrv.GetSharedWorkpacks({ 'id-workpack-model': idWorkpackModel });
+    if (result.success) {
+      return result.data;
+    }
+    return [];
+  }
+
+  async handleLinkToWorkpack(idWorkpack: number, idWorkpackModel: number) {
+    const result = await this.workpackSrv.linkWorkpack(idWorkpack, idWorkpackModel, { 'id-plan': this.idPlan });
+    if (result.success) {
+      this.router.navigate(['/workpack'], {
+        queryParams: {
+          id: idWorkpack,
+          idWorkpackModelLinked: idWorkpackModel
+        }
+      });
+    }
   }
 
   async deleteWorkpack(workpack: IWorkpack) {
@@ -341,8 +549,74 @@ export class PlanComponent implements OnInit, OnDestroy {
           this.cardsPlanWorkPackModels[workpackModelIndex].workPackItemCardList.splice(workpackIndex, 1);
           this.cardsPlanWorkPackModels[workpackModelIndex].workPackItemCardList =
             Array.from(this.cardsPlanWorkPackModels[workpackModelIndex].workPackItemCardList);
+          this.totalRecords[workpackModelIndex] = this.cardsPlanWorkPackModels[workpackModelIndex].workPackItemCardList.length;
         }
       }
+    }
+  }
+
+  async handleEditFilter(event, idWorkpackModel: number) {
+    const idFilter = event.filter;
+    if (idFilter) {
+      this.setBreadcrumbStorage();
+      this.router.navigate(['/filter-dataview'], {
+        queryParams: {
+          id: idFilter,
+          entityName: `workpacks`,
+          idWorkpackModel,
+          idOffice: this.idOffice
+        }
+      });
+    }
+  }
+
+  async handleSelectedFilter(event, idWorkpackModel: number) {
+    const idFilter = event.filter;
+    if (idFilter) {
+      await this.reloadWorkpacksOfWorkpackModelSelectedFilter(idFilter, idWorkpackModel);
+    }
+  }
+
+  setBreadcrumbStorage() {
+    this.breadcrumbSrv.setBreadcrumbStorage([
+      {
+        key: 'office',
+        routerLink: ['/offices', 'office'],
+        queryParams: { id: this.idOffice },
+        info: this.propertiesOffice?.name,
+        tooltip: this.propertiesOffice?.fullName
+      },
+      {
+        key: 'plan',
+        routerLink: ['/plan'],
+        queryParams: { id: this.idPlan },
+        info: this.planData?.name,
+        tooltip: this.planData?.fullName
+      },
+      {
+        key: 'filter',
+        routerLink: ['/filter-dataview'],
+      }
+    ]);
+  }
+
+  async handleNewFilter(idWorkpackModel: number) {
+    this.setBreadcrumbStorage();
+    this.router.navigate(['/filter-dataview'], {
+      queryParams: {
+        entityName: `workpacks`,
+        idWorkpackModel,
+        idOffice: this.idOffice
+      }
+    });
+  }
+
+  async reloadWorkpacksOfWorkpackModelSelectedFilter(idFilter: number, idWorkpackModel: number) {
+    const workpacksByFilter = await this.loadWorkpacksFromWorkpackModel(this.planData.id, idWorkpackModel, idFilter);
+    const workpackModelCardIndex = this.cardsPlanWorkPackModels.findIndex(card => card.idWorkpackModel === idWorkpackModel);
+    if (workpackModelCardIndex > -1) {
+      this.cardsPlanWorkPackModels[workpackModelCardIndex].workPackItemCardList = Array.from(workpacksByFilter);
+      this.totalRecords[workpackModelCardIndex] = workpacksByFilter && workpacksByFilter.length;
     }
   }
 

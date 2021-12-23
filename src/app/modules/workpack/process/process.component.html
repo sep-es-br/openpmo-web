@@ -1,0 +1,138 @@
+<div class="app-process">
+  <div class="app-content-header">
+    <span>{{ "newProcess" | translate }}</span>
+  </div>
+
+  <div class="card-properties-process" *ngIf="cardProcessProperties" [class.responsive]="responsive">
+    <app-card [properties]="cardProcessProperties" class="mt-0 inputs-float-label">
+      <div class="p-grid">
+        <form [formGroup]="formProcess">
+          <div class="form-group">
+            <div class="p-field">
+              <div class="input-container">
+                <label class="app-input-label" for="float-processNumber">{{ "processNumber" | translate }} * </label>
+                <span class="p-input-icon-right">
+                  <i class="pi pi-search"></i>
+                  <input type="text" pInputText class="app-input-text" formControlName="processNumber"
+                    (change)="debounceSearch.next($event)">
+                </span>
+              </div>
+            </div>
+            <div class="p-field margin-top-responsive" *ngIf="process">
+              <span class="p-float-label">
+                <input class="app-input-text" id="float-name" formControlName="name" type="text" pInputText />
+                <label class="app-input-label" for="float-name">{{ "name" | translate }} * </label>
+              </span>
+            </div>
+            <div class="p-field margin-top-responsive" *ngIf="process">
+              <span class="p-float-label">
+                <input class="app-input-text" id="float-status" formControlName="status" type="text" pInputText />
+                <label class="app-input-label" for="float-status">{{ "status" | translate }} * </label>
+              </span>
+            </div>
+          </div>
+          <div class="loading-container" *ngIf="isLoading">
+            <i class="fas fa-hourglass-half"></i>
+            <label class="loading-label">{{'messages.loading'|translate}} ...</label>
+          </div>
+          <div class="p-fluid" *ngIf="process">
+            <div class="p-field">
+              <span class="p-float-label">
+                <textarea pInputTextarea id="float-subject" formControlName="subject" class="app-text-area" [autoResize]="true" [rows]="1">
+                </textarea>
+                <label class="app-input-label" for="float-subject">{{ "subject" | translate }} * </label>
+              </span>
+              <app-input-message [form]="formProcess" field="subject"></app-input-message>
+            </div>
+          </div>
+          <div class="form-group" *ngIf="process">
+            <div class="p-field">
+              <span class="p-float-label">
+                <input class="app-input-text" id="float-currentOrganization" formControlName="currentOrganization"
+                  type="text" pInputText />
+                <label class="app-input-label" for="float-currentOrganization">{{ "currentOrganization" | translate }} *
+                </label>
+              </span>
+              <app-input-message [form]="formProcess" field="currentOrganization"></app-input-message>
+            </div>
+            <div class="p-field margin-top-responsive">
+              <span class="p-float-label">
+                <input class="app-input-text" id="float-lenghtOfStayOn" formControlName="lengthOfStayOn" type="text"
+                  pInputText />
+                <label class="app-input-label" for="float-lenghtOfStayOn">{{ "lenghtOfStayOn" | translate }}
+                  {{formProcess?.controls?.currentOrganization?.value}} * </label>
+              </span>
+              <app-input-message [form]="formProcess" field="lengthOfStayOn"></app-input-message>
+            </div>
+          </div>
+          <div class="p-fluid">
+            <div class="p-field" *ngIf="process">
+              <span class="p-float-label">
+                <textarea pInputTextarea id="float-note" formControlName="note" class="app-text-area" [autoResize]="true" [rows]="1">
+                </textarea>
+                <label class="app-input-label" for="float-note">{{ "note" | translate }} * </label>
+              </span>
+              <app-input-message [form]="formProcess" field="note"></app-input-message>
+            </div>
+          </div>
+          <div class="p-fluid" *ngIf="process">
+            <div class="priority-container">
+              <div class="label-container priority" *ngIf="!!process.priority">
+                <i class="app-icon process-selo"></i>
+                <label class="input-label">{{ "priority"|translate}}</label>
+              </div>
+              <div class="label-container not-priority" *ngIf="!process.priority">
+                <i class="app-icon other_files"></i>
+                <label class="input-label">{{ "nonPriority"|translate}}</label>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </app-card>
+  </div>
+  <div class="process-history-container" *ngIf="cardProcessHistory" [class.responsive]="responsive">
+    <app-card [properties]="cardProcessHistory" class="mt-0 inputs-float-label">
+      <div class="history-container" *ngIf="showProcessHistory">
+        <p-timeline [value]="process.history" align="right" *ngIf="!responsive">
+          <ng-template pTemplate="content" let-item>
+            <p-card *ngIf="item.left">
+              <span class="organization-name">{{item.organizationName}}</span>
+              <span class="sector">{{item.sector}}</span>
+              <div class="date-container">
+                <span>{{currentLang === 'pt-BR' ? (item?.date|date:'dd/MM/yyyy') :
+                  (item?.date|date:'yyyy/MM/dd')}}</span>
+                <span>{{item.daysDuration}} {{"days" |translate}}</span>
+              </div>
+            </p-card>
+          </ng-template>
+          <ng-template pTemplate="opposite" let-item>
+            <p-card *ngIf="item.right">
+              <span class="organization-name">{{item.organizationName}}</span>
+              <span class="sector">{{item.sector}}</span>
+              <div class="date-container">
+                <span>{{currentLang === 'pt-BR' ? (item?.date|date:'dd/MM/yyyy') :
+                  (item?.date|date:'yyyy/MM/dd')}}</span>
+                <span>{{item.daysDuration}} {{"days" |translate}}</span>
+              </div>
+            </p-card>
+          </ng-template>
+        </p-timeline>
+        <p-timeline class="timeline-responsive" [value]="process.processHistory" align="left" *ngIf="!!responsive">
+          <ng-template pTemplate="content" let-item>
+            <p-card>
+              <span class="organization-name">{{item.organizationName}}</span>
+              <span class="sector">{{item.sector}}</span>
+              <div class="date-container">
+                <span>{{currentLang === 'pt-BR' ? (item?.date|date:'dd/MM/yyyy') :
+                  (item?.date|date:'yyyy/MM/dd')}}</span>
+                <span>{{item.daysDuration}} {{"days" |translate}}</span>
+              </div>
+            </p-card>
+          </ng-template>
+        </p-timeline>
+      </div>
+    </app-card>
+  </div>
+</div>
+<app-save-button #saveButton (save)="saveProcess()"></app-save-button>

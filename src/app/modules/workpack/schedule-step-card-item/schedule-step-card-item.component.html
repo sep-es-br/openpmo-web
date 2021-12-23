@@ -16,18 +16,28 @@
         <div class="unitInputs p-fluid">
           <span class="column-title">{{properties.unitName}}</span>
           <span class="p-float-label p-field">
-            <app-input-unit-measure [(model)]="properties.unitPlanned" (onBlur)="handleStepChange()"></app-input-unit-measure>
+            <!-- <app-input-unit-measure [(model)]="properties.unitPlanned" (onBlur)="handleStepChange()"></app-input-unit-measure> -->
+            <p-inputNumber class="app-input-number" id="float-unitPlanned"  (onBlur)="handleStepChange()"
+              [(ngModel)]="properties.unitPlanned" [minFractionDigits]="properties.unitPrecision" [maxFractionDigits]="properties.unitPrecision"
+              [locale]="language === 'pt-BR' ? 'pt-BR' : 'en-US'"
+              >
+            </p-inputNumber>
             <label class="app-input-label" for="float-unitPlanned">{{ "planned" |translate }}</label>
           </span>
           <span class="p-float-label p-field">
-            <app-input-unit-measure [(model)]="properties.unitActual" (onBlur)="handleStepChange()"></app-input-unit-measure>
+            <p-inputNumber class="app-input-number" id="float-unitPlanned"  (onBlur)="handleStepChange()"
+              [(ngModel)]="properties.unitActual" [minFractionDigits]="properties.unitPrecision" [maxFractionDigits]="properties.unitPrecision"
+              [locale]="language === 'pt-BR' ? 'pt-BR' : 'en-US'"
+              >
+            </p-inputNumber>
+            <!-- <app-input-unit-measure [(model)]="properties.unitActual" (onBlur)="handleStepChange()"></app-input-unit-measure> -->
             <label class="app-input-label" for="float-unitActual">{{ "actual" |translate }}</label>
           </span>
         </div>
         <div class="progress-bar-unit-container">
-          <app-progress-bar [total]="properties.unitPlanned" [progress]="properties.unitActual"
-            [color]="properties.unitProgressBar.color">
-          </app-progress-bar>
+          <app-progress-bar-card-step [total]="properties.unitPlanned" [progress]="properties.unitActual"
+            [color]="properties.unitProgressBar.color" [barHeight]="13">
+          </app-progress-bar-card-step>
         </div>
       </div>
       <div class="costValues">
@@ -51,9 +61,9 @@
           </span>
         </div>
         <div class="progress-bar-cost-container">
-          <app-progress-bar [total]="properties.costProgressBar.total" [progress]="properties.costProgressBar.progress"
-            [color]="properties.costProgressBar.color">
-          </app-progress-bar>
+          <app-progress-bar-card-step [total]="properties.costProgressBar.total" [progress]="properties.costProgressBar.progress"
+            [color]="properties.costProgressBar.color" [barHeight]="13">
+          </app-progress-bar-card-step>
         </div>
       </div>
     </div>
@@ -78,32 +88,30 @@
     <div class="card-item-content">
       <div class="progress-values-container">
         <div class="progress-bar-unit-container">
-          <app-progress-bar [total]="properties.unitPlanned" [progress]="properties.unitActual"
-            [color]="properties.unitProgressBar.color">
-          </app-progress-bar>
+          <app-progress-bar-card-step [total]="properties.unitPlanned" [progress]="properties.unitActual"
+            [color]="properties.unitProgressBar.color" [barHeight]="7">
+          </app-progress-bar-card-step>
         </div>
         <span class="progress-bar-unit">{{properties.unitName}}</span>
       </div>
       <div class="progress-values-container">
         <div class="progress-bar-cost-container">
-          <app-progress-bar [total]="properties.costProgressBar.total" [progress]="properties.costProgressBar.progress"
-            [color]="properties.costProgressBar.color">
-          </app-progress-bar>
+          <app-progress-bar-card-step [total]="properties.costProgressBar.total" [progress]="properties.costProgressBar.progress"
+            [color]="properties.costProgressBar.color" [barHeight]="7">
+          </app-progress-bar-card-step>
         </div>
         <span class="progress-bar-unit"> $ </span>
       </div>
     </div>
   </p-card>
 
-  <p-card *ngIf="properties.type === 'newStart'" class="app-new-step-card-item" [class.card-link]="properties.urlCard"
-    (click)="properties.urlCard && navigateToPage(properties.urlCard, properties.urlParams)">
+  <p-card *ngIf="properties.type === 'newStart'" class="app-new-step-card-item">
     <div class="card-item-content">
       <i [ngClass]="[ 'app-icon', iconEnum.Plus, 'light-grey-icon' ]" [ngStyle]="{ fontSize: '2rem' }"></i>
     </div>
   </p-card>
 
-  <p-card *ngIf="properties.type === 'newEnd'" class="app-new-step-card-item" [class.card-link]="properties.urlCard"
-    (click)="properties.urlCard && navigateToPage(properties.urlCard, properties.urlParams)">
+  <p-card *ngIf="properties.type === 'newEnd'" class="app-new-step-card-item">
     <div class="card-item-content">
       <i [ngClass]="[ 'app-icon', iconEnum.Plus, 'light-grey-icon' ]" [ngStyle]="{ fontSize: '2rem' }"></i>
     </div>

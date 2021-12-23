@@ -1,0 +1,36 @@
+<div class="card-rule-container" [class.card-rule-container-responsive]="responsive">
+  <div class="rule-logical-operator-card" [class.rule-logical-operator-card-responsive]="responsive" *ngIf="filterRuleCard.logicalOperator && indexCard > 0">
+    <p-dropdown class="app-single-selection" [options]="logicalOperatorsOptions" [required]="true"
+      [class.responsive]="responsive" [(ngModel)]="filterRuleCard.logicalOperator"
+      (onChange)="handleChangeRoleCard()"></p-dropdown>
+  </div>
+
+  <p-card class="app-rule-card-item" [class.app-rule-card-item-responsive]="responsive" *ngIf="filterRuleCard.typeCard === 'rule-card' && !filterRuleCard.deleted">
+    <p-header class="card-item-header">
+      <p-menu #menu [popup]="true" [model]="filterRuleCard.menuItems"></p-menu>
+      <button type="button" pButton icon="pi pi-ellipsis-v" (click)="menu.toggle($event)"></button>
+    </p-header>
+    <div class="card-item-content p-fluid">
+      <span class="p-float-label">
+        <p-dropdown class="app-single-selection" [options]="filterRuleCard.propertiesList" optionLabel="label" [required]="true"
+          [autoDisplayFirst]="false" [class.responsive]="responsive" [(ngModel)]="filterRuleCard.propertySelected"
+          (onChange)="handlePropertySelected($event)"></p-dropdown>
+        <label class="app-input-label" for="float-name">{{ "property" | translate }} * </label>
+      </span>
+      <span class="p-float-label">
+        <p-dropdown class="app-single-selection" [class.responsive]="responsive" [options]="operatorsList" [required]="true"
+          [autoDisplayFirst]="false" [(ngModel)]="filterRuleCard.operator" (onChange)="handleChangeRoleCard()"></p-dropdown>
+        <label class="app-input-label" for="float-name">{{ "operator" | translate }} * </label>
+      </span>
+      <app-filter-rule-property [property]="propertySelected" (changed)="handleSetPropertyValue()">
+      </app-filter-rule-property>
+    </div>
+  </p-card>
+</div>
+
+<p-card class="new-rule-card-item" *ngIf="filterRuleCard.typeCard === 'new-card'">
+  <div class="card-item-content">
+    <i [ngClass]="[ 'app-icon', iconsEnum.Plus, 'light-grey-icon' ]" [ngStyle]="{ fontSize: '3rem' }"
+      (click)="newCardCreated.emit($event)"></i>
+  </div>
+</p-card>

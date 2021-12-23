@@ -1,36 +1,57 @@
-<p-panel class="app-card"
+<p-panel #cardPanel class="app-card"
   [toggleable]="properties.collapseble && (!properties.toggleable || properties.initialStateToggle && properties.toggleable)"
   [collapsed]="properties.initialStateCollapse || !(!properties.toggleable || (properties.toggleable && properties.initialStateToggle))"
-  expandIcon="pi pi-angle-down"
-  collapseIcon="pi pi-angle-up"
-  [class.mobile]="responsive"
->
-  <p-header class="card-header" [class.card-header-mobile]="responsive" [class.card-collapseble]="properties.collapseble" (click)="properties.collapseble && handleCollapsed()">
-    <div class="header-title">
-     <div class="header-title-text">
-      <span class="card-title"
-      [class.card-title-mobile]="responsive"
-      >{{ properties.cardTitle | translate }}</span>
-      <p-inputSwitch class="app-toggle" *ngIf="properties.toggleable" [(ngModel)]="properties.initialStateToggle"
-        (ngModelChange)="properties.onToggle?.emit($event)">
-      </p-inputSwitch>
-     </div>
-     <div class="header-title-dates" *ngIf="properties.headerDates">
-       <span class="start-date">{{language === 'pt-BR' ? (properties.headerDates?.startDate|date:'dd/MM/yyyy') : (properties.headerDates?.startDate|date:'yyyy/MM/dd')}}</span>
-       <i class="fas fa-caret-right"></i>
-       <span class="end-date">{{language === 'pt-BR' ? (properties.headerDates?.endDate|date:'dd/MM/yyyy') : (properties.headerDates?.endDate|date:'yyyy/MM/dd')}}</span>
-     </div>
+  expandIcon="pi pi-angle-down" collapseIcon="pi pi-angle-up" [class.mobile]="responsive" (collapsedChange)="handleCollapsed($event)" >
+  <p-header class="card-header" [class.card-header-mobile]="responsive">
+    <div class="header-title" (click)="properties.collapseble && handleCollapsed()"
+      [class.card-collapseble]="properties.collapseble">
+      <div class="header-title-text">
+        <span class="card-title" [class.card-title-mobile]="responsive" *ngIf="properties.cardTitle">{{ properties.cardTitle | translate }}</span>
+        <p-inputSwitch class="app-toggle" *ngIf="properties.toggleable" [(ngModel)]="properties.initialStateToggle"
+          (ngModelChange)="properties.onToggle?.emit($event)">
+        </p-inputSwitch>
+        <label class="label-toggle" *ngIf="properties.toggleLabel">{{properties.toggleLabel|translate}}</label>
+      </div>
+      <div class="header-title-dates" *ngIf="properties.headerDates">
+        <span class="start-date">{{language === 'pt-BR' ? (properties.headerDates?.startDate|date:'dd/MM/yyyy') :
+          (properties.headerDates?.startDate|date:'yyyy/MM/dd')}}</span>
+        <i class="fas fa-caret-right"></i>
+        <span class="end-date">{{language === 'pt-BR' ? (properties.headerDates?.endDate|date:'dd/MM/yyyy') :
+          (properties.headerDates?.endDate|date:'yyyy/MM/dd')}}</span>
+      </div>
     </div>
-    <div class="header-values-cost-account" *ngIf="properties.progressBarValues">
+    <div class="header-values-cost-account" *ngIf="properties.progressBarValues" [class.responsive]="responsive">
       <div class="progress-bar-cost-container" *ngFor="let progressBar of properties.progressBarValues">
         <app-progress-bar [total]="progressBar.total" [class.progress-bar-mobile]="responsive"
-        [progress]="progressBar.progress"
-        [labelTotal]="progressBar.labelTotal"
-        [labelProgress]="progressBar.labelProgress"
-        [valueUnit]="progressBar.valueUnit"
-        [color]="progressBar.color"
-        >
-      </app-progress-bar>
+          [progress]="progressBar.progress" [labelTotal]="progressBar.labelTotal"
+          [labelProgress]="progressBar.labelProgress" [valueUnit]="progressBar.valueUnit" [color]="progressBar.color" [barHeight]="progressBar.barHeight">
+        </app-progress-bar>
+      </div>
+    </div>
+    <div class="dataview-filters-container" *ngIf="properties.showFilters || properties.showCreateNemElementButton">
+      <div class="dataview-filters" *ngIf="!properties.initialStateCollapse && properties.showFilters">
+        <label>{{'show'|translate}}</label>
+        <p-dropdown class="filter-selection" [options]="filterListOptions" dropdownIcon="fas fa-caret-down" scrollHeight="300px" [(ngModel)]="filterSelected">
+          <ng-template let-filter pTemplate="item">
+            <div class="filter-item" *ngIf="filter.value !== -1">
+              <div class="filter-item-label" (click)="handleFilterSelected(filter.value)">{{filter.label}}</div>
+              <i class="fas fa-pencil-alt" (click)="handleFilterEdit(filter.value)" *ngIf="filter.value !== null"></i>
+            </div>
+            <div class="divider" *ngIf="filter.label === 'divider'">
+              <div class="divider-new-filter">
+                <p-divider></p-divider>
+              </div>
+            </div>
+            <div class="new-filter" *ngIf="filter.value === -1 && filter.label !== 'divider'" (onClick)="handleNewFilter(filter.value)">
+              <div class="label-new-filter" (click)="handleNewFilter(filter.value)">{{filter.label}}</div>
+            </div>
+          </ng-template>
+        </p-dropdown>
+      </div>
+      <div class="new-element-button-container" (click)="handleCreateNewElement()" *ngIf="!properties.initialStateCollapse && properties.showCreateNemElementButton" [class.card-link]="!properties.createNewElementMenuItems">
+        <i class="app-icon plus" (click)=" properties.createNewElementMenuItems && menuIcon.toggle($event)"
+          [class.icon-link]="properties.createNewElementMenuItems"></i>
+        <p-menu #menuIcon [popup]="true" [model]="properties.createNewElementMenuItems"></p-menu>
       </div>
     </div>
   </p-header>

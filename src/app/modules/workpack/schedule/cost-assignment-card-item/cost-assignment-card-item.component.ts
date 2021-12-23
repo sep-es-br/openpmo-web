@@ -15,6 +15,7 @@ interface ICartItemCostAssignment {
   actualWork?: number;
   menuItemsCost?: MenuItem[];
   menuItemsNewCost?: MenuItem[];
+  readonly?: boolean;
 }
 
 @Component({

@@ -1,0 +1,307 @@
+@use "src/variables" as v;
+
+::ng-deep .app-administrator-person {
+  width: 100%;
+ .app-administrator-header {
+    padding: 0.5em 0;
+    font-size: 0.9rem;
+    font-family: v.$fontTitle !important;
+    color: v.$fontInput;
+  }
+  .app-administrator-header-mobile {
+    font-size: 1rem;
+    font-family: v.$fontFamilyBold !important;
+    font-weight: bold;
+  }
+  .card-person {
+    width: 100%;
+    .person-properties {
+      .p-radiobutton .p-radiobutton-box {
+        background-color: white !important;
+        border-color: #868181;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        &:hover {
+          border-color: #868181;
+        }
+      }
+      .p-radiobutton .p-radiobutton-box.p-highlight {
+        background-color: white !important;
+        border-color: #868181;
+        &:hover {
+          border-color: #868181;
+          background: white !important;
+        }
+        .p-radiobutton-icon {
+          background-color: #868181;
+        }
+      }
+      p-radiobutton .p-radiobutton .p-radiobutton-box.p-highlight {
+        border-color: #868181 !important;
+        background: white !important;
+        box-shadow: none;
+      }
+      p-radiobutton .p-radiobutton .p-radiobutton-box.p-focus {
+        border-color: #868181 !important;
+        background: white !important;
+        box-shadow: none;
+      }
+      .p-radiobutton.p-radiobutton-focused.p-radiobutton-checked {
+        background-color: white !important;
+        border-color: #868181;
+        box-shadow: none;
+      }
+      .p-radiobutton .p-radiobutton-box {
+        .p-radiobutton-icon {
+          background-color: #868181;
+        }
+      }
+      .new-person-search {
+        padding-bottom: 2em;
+        .toggle-user-container {
+          display: flex;
+          flex-direction: row;
+          align-items: flex-end;
+          padding-bottom: 2em;
+          .app-toggle {
+            margin-left: 0 !important;
+          }
+          .label-toggle-user {
+            margin-left: 0.5em;
+          }
+        }
+        .search-container-non-user {
+          width: 100%;
+          .search-person-by {
+            padding-bottom: 2em;
+            .search-by-radio {
+              margin-right: 1em;
+            }
+          }
+          .search-existing-person-container {
+            width: 100%;
+            .p-float-label {
+              width: 30%;
+              .p-autocomplete {
+                width: 100%;
+                .p-inputtext {
+                  width: 100%;
+                }
+              }
+            }
+          }
+        }
+        .search-existing-person-container.responsive {
+          .p-float-label {
+            width: 100%;
+          }
+        }
+        .search-container-non-user-citizen {
+          width: 100%;
+          .p-float-label {
+            width: 30%;
+          }
+        }
+        .search-container-non-user-citizen.responsive {
+          width: 100%;
+          .p-float-label {
+            width: 100% !important;
+          }
+        }
+        .name-person-container {
+          display: flex;
+          flex-direction: row;
+          align-items: flex-end;
+          width: 100%;
+          .icon-search-input {
+            padding-bottom: 1em;
+            margin-left: -1em;
+            font-size: 1.2em;
+            color: #8c8c8c;
+          }
+        }
+        .search-container-user-citizen {
+          .search-user-by {
+            display: flex;
+            flex-direction: row;
+            align-items: flex-end;
+            padding-bottom: 2em;
+            color: #004660;
+            .radios-container {
+              display: flex;
+              flex-direction: row;
+              align-items: flex-end;
+            }
+            .search-user-radio {
+              margin-left: 1em;
+            }
+          }
+          .search-user-by.responsive {
+            flex-direction: column;
+            align-items: flex-start;
+            .radios-container {
+              margin-top: 1em;
+            }
+            .search-user-radio {
+              margin-left: 0;
+              margin-right: 1em;
+              font-size: 0.8rem;
+            }
+          }
+          .op-search-user-message {
+            padding: 1em;
+            font-size: 1rem;
+          }
+          .search-citizen-user-by-name {
+            width: 100%;
+            .input-search-name {
+              width: 30%;
+            }
+            .input-search-name.responsive {
+              flex: 1;
+            }
+            .user-by-name-input-container {
+              display: flex;
+              flex-direction: row;
+            }
+            .listbox-public-servers-container {
+              width: 30%;
+            }
+            .listbox-public-servers-container.responsive {
+              width: 100%;
+            }
+            .button-search {
+              background-color: v.$bgButtonGreen;
+              color: #ffffff;
+              text-align: center;
+              border-radius: 5px;
+              border: none;
+              box-shadow: 0px 0px 10px 2px rgba(0,0,0,.1);
+              cursor: pointer;
+              margin-left: 1em;
+              &:hover {
+                background-color: v.$bgButtonGreenHover;
+                border: none;
+              }
+            }
+            .public-servers-list-container {
+              display: flex;
+              flex-direction: column;
+              min-width: 200px;
+              span {
+                padding-top: 0.7em;
+                cursor: pointer;
+              }
+            }
+          }
+          .search-by-cpf-container {
+            width: 20%;
+            .p-inputmask.p-inputtext {
+              width: 100% !important;
+            }
+            .user-by-cpf-input-container {
+              display: flex;
+              flex-direction: row;
+            }
+            .button-search {
+              background-color: v.$bgButtonGreen;
+              color: #ffffff;
+              text-align: center;
+              border-radius: 5px;
+              border: none;
+              box-shadow: 0px 0px 10px 2px rgba(0,0,0,.1);
+              cursor: pointer;
+              margin-left: 1em;
+              &:hover {
+                background-color: v.$bgButtonGreenHover;
+                border: none;
+              }
+            }
+          }
+        }
+        .input-search {
+          width: 100%;
+        }
+        
+        .responsive {
+          width: 100%;
+        }
+        .input-message-error {
+          color: #f44336;
+          background: transparent;
+          padding: 4px 8px;
+          display: inline-flex;
+          margin-top: 2px;
+          border-radius: 5px;
+          font-size: 0.7rem;
+          font-family: v.$fontFamilyMedium;
+          font-weight: bold;
+        }
+      }
+    }
+
+    .loading-container {
+      padding: 1em 0;
+      .fa-hourglass-half {
+        font-size: 1.3rem;
+        color: #9ea4a5;
+        margin-right: 0.5em;
+      }
+    }
+    .person-container {
+      display: flex;
+      flex-direction: column;
+      background-color: #fafaf9;
+      border: 1px solid #e5e5e4;
+      padding: 0.5rem;
+      margin-bottom: 2rem;
+      .fullName-person {
+        font-size: 1em;
+        color: v.$fontInput;
+        margin-bottom: 0.3rem;
+      }
+      .item-person {
+        font-size: 0.9em;
+        color: v.$fontInput;
+        margin-bottom: 0.3rem;
+      }
+    }
+    .p-fluid .p-inputtext.short-input.responsive {
+      width: 100%;
+    }
+    .app-input-mask.short-input.responsive {
+      .p-inputmask.p-inputtext {
+        width: 100% !important;
+      }
+    }
+  }
+
+  .app-save-button-layout {
+    position: relative;
+    height: 15vh;
+    width: 100%;
+    overflow: hidden;
+  }
+  .app-save-button-wrapper {
+    position: absolute;
+    bottom: 30%;
+    left: 0;
+    z-index: 100;
+
+    .button-label {
+      background-color: v.$bgButtonGreen;
+      color: #ffffff;
+      font-size: 1.25rem;
+      padding: .5em 1.5em;
+      text-align: center;
+      border-radius: 5px;
+      box-shadow: 1px 7px 10px 2px rgba(0,0,0,.1);
+      cursor: pointer;
+
+      &:hover {
+        background-color: v.$bgButtonGreenHover;
+      }
+    }
+  }
+}

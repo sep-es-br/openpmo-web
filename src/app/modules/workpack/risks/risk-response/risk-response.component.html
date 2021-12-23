@@ -1,0 +1,103 @@
+<div class="app-risk-response">
+  <div class="app-content-header">
+    <span>{{ "newResponse" | translate }}</span>
+  </div>
+
+  <div class="card-properties-risk-response" *ngIf="cardRiskResponseProperties" [class.responsive]="responsive">
+    <app-card [properties]="cardRiskResponseProperties" class="mt-0 inputs-float-label">
+      <div class="p-grid">
+        <form [formGroup]="formRiskResponse">
+          <div class="form-group">
+            <div class="p-field">
+              <span class="p-float-label">
+                <input class="app-input-text" id="float-name" name="name" formControlName="name" type="text"
+                  pInputText />
+                <label class="app-input-label" for="float-name">{{ "name" | translate }} * </label>
+              </span>
+              <app-input-message [form]="formRiskResponse" field="name"></app-input-message>
+            </div>
+            <div class="p-field when-container">
+              <label class="when-label">{{'when' |translate}}</label>
+              <div class="when-radios-container">
+                <p-radioButton class="when-radio" value="PRE_OCCURRENCE" formControlName="when"
+                  [label]="'preOccurrency' |translate">
+                </p-radioButton>
+                <p-radioButton class="when-radio pos" value="POST_OCCURRENCE" formControlName="when"
+                  [label]="'postOccurrency' |translate"></p-radioButton>
+              </div>
+            </div>
+          </div>
+          <div class="form-group" *ngIf="formRiskResponse.controls.when.value === 'PRE_OCCURRENCE'">
+            <div class="p-field">
+              <span class="p-float-label">
+                <p-calendar id="float-start" class="app-select-date" showIcon="true" [monthNavigator]="true"
+                  [yearNavigator]="true" formControlName="startDate" [yearRange]="yearRangeCalculated"
+                  icon="fas fa-calendar-alt" [dateFormat]="calendarFormat">
+                </p-calendar>
+                <label class="app-input-label" for="float-start">{{ "start" | translate }}</label>
+              </span>
+            </div>
+            <div class="p-field end">
+              <span class="p-float-label">
+                <p-calendar id="float-end" formControlName="endDate" class="app-select-date" showIcon="true"
+                  [monthNavigator]="true" [yearNavigator]="true" [yearRange]="yearRangeCalculated"
+                  icon="fas fa-calendar-alt" [dateFormat]="calendarFormat">
+                </p-calendar>
+                <label class="app-input-label" class="properties-label" for="float-end">{{ "finish" |
+                  translate}}</label>
+              </span>
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="p-field">
+              <span class="p-float-label">
+                <p-dropdown class="app-single-selection" [options]="strategyOptions" formControlName="strategy"
+                  dropdownIcon="fas fa-caret-down" [autoDisplayFirst]="false">
+                </p-dropdown>
+                <label class="app-input-label">{{'strategy'|translate}}</label>
+              </span>
+              <app-input-message [form]="formRiskResponse" field="strategy"></app-input-message>
+            </div>
+            <div class="p-field">
+              <span class="p-float-label">
+                <p-dropdown class="app-single-selection" [options]="statusOptions" formControlName="status"
+                  dropdownIcon="fas fa-caret-down" [autoDisplayFirst]="false">
+                </p-dropdown>
+                <label class="app-input-label">{{'status'|translate}}</label>
+              </span>
+              <app-input-message [form]="formRiskResponse" field="status"></app-input-message>
+            </div>
+          </div>
+          <div class="p-fluid">
+            <div class="p-field">
+              <span class="p-float-label">
+                <textarea pInputTextarea id="float-trigger" formControlName="trigger" class="app-text-area" [autoResize]="true" [rows]="1">
+                </textarea>
+                <label class="app-input-label" for="float-trigger">{{ "trigger" | translate }} * </label>
+              </span>
+              <app-input-message [form]="formRiskResponse" field="trigger"></app-input-message>
+            </div>
+            <div class="p-field">
+              <span class="p-float-label">
+                <textarea pInputTextarea id="float-plan" formControlName="plan" class="app-text-area" [autoResize]="true" [rows]="1">
+                </textarea>
+                <label class="app-input-label" for="float-plan">{{ "plan" | translate }} * </label>
+              </span>
+              <app-input-message [form]="formRiskResponse" field="plan"></app-input-message>
+            </div>
+            <div class="p-field">
+              <span class="p-float-label">
+                <p-multiSelect class="app-multiple-selection" dropdownIcon="fas fa-caret-down"
+                  formControlName="responsible" [options]="stakeholderOptions" optionLabel="label" optionValue="value">
+                </p-multiSelect>
+                <label class="app-input-label" for="float-label">{{'responsible' |translate}}</label>
+              </span>
+              <app-input-message [form]="formRiskResponse" field="responsible"></app-input-message>
+            </div>
+          </div>
+        </form>
+      </div>
+    </app-card>
+  </div>
+</div>
+<app-save-button #saveButton (save)="saveRiskResponse()"></app-save-button>

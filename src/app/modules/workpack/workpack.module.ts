@@ -23,6 +23,12 @@ import {
   PropertyOrganizationSelectionComponent
 } from './workpack-property/type-property/property-organization-selection/property-organization-selection.component';
 import { ScheduleStepCardItemComponent } from './schedule-step-card-item/schedule-step-card-item.component';
+import { PropertyGroupComponent } from './workpack-property/type-property/property-group/property-group.component';
+import { ProcessComponent } from './process/process.component';
+import { ProgressBarCardStepComponent } from './components/progress-bar-card-step/progress-bar-card-step.component';
+import { SharingComponent } from './sharing/sharing.component';
+import { BaselineComponent } from './baseline/baseline.component';
+import { BaselineCancellingComponent } from './baseline-cancelling/baseline-cancelling.component';
 
 @NgModule({
   declarations: [
@@ -38,7 +44,13 @@ import { ScheduleStepCardItemComponent } from './schedule-step-card-item/schedul
     CostAccountComponent,
     PropertyUnitSelectionComponent,
     PropertyOrganizationSelectionComponent,
-    ScheduleStepCardItemComponent],
+    ScheduleStepCardItemComponent,
+    PropertyGroupComponent,
+    ProcessComponent,
+    ProgressBarCardStepComponent,
+    SharingComponent,
+    BaselineComponent,
+    BaselineCancellingComponent],
   imports: [
     CommonModule,
     WorkpackRoutingModule,

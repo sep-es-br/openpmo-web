@@ -1,0 +1,87 @@
+<div class="app-issue">
+  <div class="app-content-header">
+    <span>{{ "newIssue" | translate }}</span>
+  </div>
+
+  <div class="card-properties-issue" *ngIf="cardIssueProperties" [class.responsive]="responsive">
+    <app-card [properties]="cardIssueProperties" class="mt-0 inputs-float-label">
+      <div class="p-grid">
+        <form [formGroup]="formIssue">
+          <div class="form-group-name-trigged-by">
+            <div class="p-field">
+              <span class="p-float-label">
+                <input class="app-input-text" id="float-name" formControlName="name" type="text" 
+                  pInputText />
+                <label class="app-input-label" for="float-name">{{ "name" | translate }} * </label>
+              </span>
+              <app-input-message [form]="formIssue" field="name"></app-input-message>
+            </div>
+            <div class="triggered-by-container" *ngIf="issue && issue.triggeredBy">
+              <label class="label-triggered-by" for="float-triggeredBy">{{ "triggeredBy" | translate }}</label>
+              <div class="triggered-by-name-container">
+                <i [ngClass]="[ 'app-icon', riskPropertiesOptions.status[issue?.triggeredBy?.status].icon, 
+                    riskPropertiesOptions.importance[issue?.triggeredBy?.importance].label]"></i>
+                <span class="risk-name">{{issue?.triggeredBy?.name}}</span>
+              </div>
+              <app-input-message [form]="formIssue" field="name"></app-input-message>
+            </div>
+          </div>
+          <div class="p-fluid">
+            <div class="p-field">
+              <span class="p-float-label">
+                <textarea pInputTextarea inputId="float-description" formControlName="description" class="app-text-area" [autoResize]="true" [rows]="1">
+                </textarea>
+                <label class="app-input-label" for="float-description">{{ "description" | translate }} * </label>
+              </span>
+              <app-input-message [form]="formIssue" field="description"></app-input-message>
+            </div>
+          </div>
+          <div class="p-fluid">
+            <div class="p-field nature-container">
+              <p-radioButton class="nature-radio" value="PROBLEM" formControlName="nature" [label]="'problem' |translate" groupname="nature-group">
+              </p-radioButton>
+              <p-radioButton class="nature-radio" value="BENEFIT" formControlName="nature"
+                [label]="'benefit' |translate" groupname="nature-group"></p-radioButton>
+            </div>
+          </div>
+          <div class="form-group group-margin-top">
+            <div class="p-field">
+              <span class="p-float-label">
+                <p-dropdown class="app-single-selection" [options]="importanceOptions" formControlName="importance"
+                  dropdownIcon="fas fa-caret-down" [autoDisplayFirst]="false">
+                </p-dropdown>
+                <label class="app-input-label">{{'importance'|translate}}</label>
+              </span>
+              <app-input-message [form]="formIssue" field="importance"></app-input-message>
+            </div>
+            <div class="status-container">
+              <label class="status-label">{{'status' |translate}}</label>
+              <div class="p-field status-radios-container">
+                <p-radioButton class="status-radio" groupname="status-group" value="OPEN" formControlName="status" [label]="'open' |translate">
+                </p-radioButton>
+                <p-radioButton class="status-radio opportunity" groupname="status-group" value="CLOSED" formControlName="status"
+                  [label]="'closed' |translate"></p-radioButton>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>    
+    </app-card>
+  </div>
+  <section>
+    <app-card [properties]="cardIssueResponsesProperties" *ngIf="cardIssueResponsesProperties" class="mt-0 inputs-float-label response-card">
+      <div class="card-item-responses-container">
+        <p-dataView [value]="issueResponseCardItems" layout="grid" styleClass="dataview-card-items-issue"
+          [emptyMessage]="'loadingEllipsis' | translate">
+          <ng-template let-cardItem let-index="rowIndex" pTemplate="gridItem">
+            <div class="p-col-12 p-md-3 p-sm-12 card-item-container" [class.responsive]="responsive">
+              <app-card-item [properties]="cardItem"></app-card-item>
+            </div>
+          </ng-template>
+        </p-dataView>
+      </div>
+    </app-card>
+  </section>
+  <app-save-button #saveButton (save)="saveIssue()"></app-save-button>
+</div>
+

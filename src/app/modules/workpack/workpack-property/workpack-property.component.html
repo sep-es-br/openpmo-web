@@ -10,4 +10,5 @@
   <app-property-tree-selection *ngSwitchCase="types.LocalitySelectionModel" [property]="property" (changed)="changed.emit($event)"></app-property-tree-selection>
   <app-property-organization-selection *ngSwitchCase="types.OrganizationSelectionModel" [property]="property" (changed)="changed.emit($event)"></app-property-organization-selection>
   <app-property-unit-selection *ngSwitchCase="types.UnitSelectionModel" [property]="property" (changed)="changed.emit($event)"></app-property-unit-selection>
+  <app-property-group *ngSwitchCase="types.GroupModel" [groupProperty]="property" (changed)="changed.emit($event)"></app-property-group>
 </div>

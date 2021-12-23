@@ -7,6 +7,9 @@
   .p-panel {
     width: 100%;
     background-color: v.$bgCard;
+    .p-panel-icons {
+      align-self: flex-start;
+    }
   }
   p-header.card-header {
     width: 100%;
@@ -16,10 +19,13 @@
     .header-title {
       display: flex;
       flex-direction: column;
-
+      flex: 1;
       .header-title-text {
         display: flex;
         align-items: center;
+        .label-toggle {
+          margin-left: 0.5em;
+        }
       }
     }
     .header-title-dates {
@@ -48,20 +54,115 @@
       font-size: 0.75rem;
     }
     .header-values-cost-account {
-      display: flex;
-      justify-content: flex-end;
-      width: 40%;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      column-gap: 20px;
+      width: 50%;
       color: v.$fontTitle;
       font-family: v.$fontFamilyMedium;
       font-size: 1rem;
       text-transform: uppercase;
       padding-right: 2em;
-      .progress-bar-cost-container {
-        width: 50%;
+    }
+    .header-values-cost-account.responsive {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      padding-right: 0;
+    }
+    .dataview-filters-container {
+      display: flex;
+      flex-direction: row;
+      align-items: flex-end;
+      justify-content: flex-end;
+      width: 20%;
+      .dataview-filters {
+        margin-right: 1.5rem;
         display: flex;
-        justify-content: flex-end;
+        flex-direction: column;
+        flex: 1;
+        .filter-selection {
+          .p-dropdown {
+            background-color: transparent;
+            border: none;
+            border-radius: 0;
+            border-bottom: 1px solid v.$borderInput;
+            width: 100%;
+          }
+          .p-dropdown:not(.p-disabled).p-focus {
+            box-shadow: none;
+            border: none;
+            border-bottom: 1px solid v.$borderInput;
+          }
+          .p-dropdown:hover {
+            border: none;
+            border-bottom: 1px solid v.$borderInputHover !important;
+          }
+          .p-dropdown .p-inputtext {
+            color: v.$fontInput;
+            font-size: 1rem;
+            font-family: v.$fontFamilyMedium;
+            padding-left: 0;
+          }
+          .p-dropdown-panel .p-dropdown-items {
+            font-size: 1rem;
+            font-family: v.$fontFamilyMedium;
+            color: v.$fontInput;
+            .p-dropdown-item.p-highlight {
+              background-color: v.$bgCard;
+              color: v.$fontInput;
+            }
+          }
+          .p-dropdown-trigger {
+            justify-content: flex-end;
+          }
+          .p-dropdown-trigger-icon {
+            color: #004660;
+            font-size: 1.2rem;
+          }
+          .filter-item {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+            .filter-item-label {
+              flex: 1;
+            }
+          }
+          .new-filter {
+            display: flex;
+            flex: 1;
+            justify-content: center;
+            .label-new-filter {
+              flex: 1;
+              text-align: center;
+              color: #979797;
+              font-size: 15px;
+            }
+          }
+        }
+      }
+      .new-element-button-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 53px;
+        height: 38px;
+        border: 1px solid  rgba(212, 212, 212, 0.5);
+        margin-right: 1.5em;
+        .plus {
+          color: #d4d4d4;
+          font-size: 1.3rem;
+        }
+        .icon-link {
+          cursor: pointer;
+        }
+      }
+      .card-link {
+        cursor: pointer;
       }
     }
+    
   }
 
   .card-collapseble {
@@ -92,6 +193,33 @@
         }
       }
     }
+    .dataview-filters-container {
+      width: 100%;
+      .new-element-button-container {
+        margin-right: 0 !important;
+      }
+    }
+    .dataview-filters {
+      margin-right: 1rem;
+      margin-top: 1rem;
+      width: 75%;
+      label {
+        font-size: 13px;
+      }
+      .filter-selection {
+        width: 100%;
+        .p-dropdown {
+          width: 100%;
+        }
+        .p-dropdown .p-inputtext {
+          font-size: 0.9rem;
+        }
+        .p-dropdown-panel .p-dropdown-items {
+          font-size: 0.9rem;
+        }
+      }
+    }
+    
   }
   .p-panel .p-panel-header .p-panel-icons .p-panel-header-icon:focus {
     box-shadow: none !important;

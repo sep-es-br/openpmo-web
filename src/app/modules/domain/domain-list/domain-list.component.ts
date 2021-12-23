@@ -1,5 +1,8 @@
+import { PropertyTemplateModel } from './../../../shared/models/PropertyTemplateModel';
+import { FilterDataviewPropertiesEntity } from './../../../shared/constants/filterDataviewPropertiesEntity';
+import { FilterDataviewService } from './../../../shared/services/filter-dataview.service';
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { MenuItem } from 'primeng/api';
 import { Subject } from 'rxjs';
@@ -28,7 +31,7 @@ export class DomainListComponent implements OnInit, OnDestroy {
     toggleable: false,
     initialStateToggle: false,
     cardTitle: 'domains',
-    collapseble: false,
+    collapseble: true,
     initialStateCollapse: false
   };
   idOffice: number;
@@ -38,6 +41,11 @@ export class DomainListComponent implements OnInit, OnDestroy {
   editPermission: boolean;
   $destroy = new Subject();
   responsive: boolean;
+  collapsePanelsStatus = true;
+  displayModeAll = 'grid';
+  pageSize = 5;
+  totalRecords: number;
+  idFilterSelected: number;
 
   constructor(
     private domainSvr: DomainService,
@@ -47,7 +55,9 @@ export class DomainListComponent implements OnInit, OnDestroy {
     private breadcrumbSrv: BreadcrumbService,
     private authSrv: AuthService,
     private officePermissionSrv: OfficePermissionService,
-    private responsiveSrv: ResponsiveService
+    private responsiveSrv: ResponsiveService,
+    private filterSrv: FilterDataviewService,
+    private router: Router
   ) {
     this.activeRoute.queryParams.subscribe(params => {
       this.idOffice = +params.idOffice;
@@ -57,20 +67,46 @@ export class DomainListComponent implements OnInit, OnDestroy {
 
   async ngOnInit() {
     this.editPermission = await this.officePermissionSrv.getPermissions(this.idOffice);
+    await this.loadFiltersDomains();
     await this.loadPropertiesDomains();
     await this.getOfficeById();
-    this.breadcrumbSrv.setMenu([{
+    this.breadcrumbSrv.setMenu([
+      {
+        key: 'administration',
+        info: this.propertiesOffice?.name,
+        tooltip: this.propertiesOffice?.fullName,
+        routerLink: [ '/configuration-office' ],
+        queryParams: { idOffice: this.idOffice }
+      },
+      {
       key: 'domains',
       info: this.propertiesOffice?.name,
       tooltip: this.propertiesOffice?.fullName,
       routerLink: ['/domains'],
       queryParams: { idOffice: this.idOffice }
-    }]);
+    }
+  ]);
   }
 
   ngOnDestroy(): void {
     this.$destroy.next();
     this.$destroy.complete();
+  }
+
+  handleChangeCollapseExpandPanel(event) {
+    this.collapsePanelsStatus = event.mode === 'collapse' ? true : false;
+    this.cardProperties = Object.assign({}, {
+      ...this.cardProperties,
+      initialStateCollapse: this.collapsePanelsStatus
+    });
+  }
+
+  handleChangeDisplayMode(event) {
+    this.displayModeAll = event.displayMode;
+  }
+
+  handleChangePageSize(event) {
+    this.pageSize = event.pageSize;
   }
 
   async getOfficeById() {
@@ -81,7 +117,7 @@ export class DomainListComponent implements OnInit, OnDestroy {
   }
 
   async loadPropertiesDomains() {
-    const { success, data } = await this.domainSvr.GetAll({ 'id-office': this.idOffice });
+    const { success, data } = await this.domainSvr.GetAll({ 'id-office': this.idOffice, idFilter: this.idFilterSelected });
     const itemsProperties: ICardItem[] = this.editPermission ? [
       {
         typeCardItem: 'newCardItem',
@@ -91,7 +127,9 @@ export class DomainListComponent implements OnInit, OnDestroy {
         paramsUrlCard: [{ name: 'idOffice', value: this.idOffice }]
       }
     ] : [];
+    this.cardProperties.showCreateNemElementButton = this.editPermission ? true : false;
     if (success) {
+
       itemsProperties.unshift(...data.map(domain => ({
         typeCardItem: 'listItem',
         iconSvg: true,
@@ -107,13 +145,90 @@ export class DomainListComponent implements OnInit, OnDestroy {
       })));
     }
     this.cardItemsProperties = itemsProperties;
+    this.totalRecords = this.cardItemsProperties && this.cardItemsProperties.length;
+
   }
 
   async deleteDomain(domain: IDomain) {
     const { success } = await this.domainSvr.delete(domain);
     if (success) {
       this.cardItemsProperties = Array.from(this.cardItemsProperties.filter(element => element.itemId !== domain.id));
+      this.totalRecords = this.cardItemsProperties && this.cardItemsProperties.length;
     }
   };
+
+  async loadFiltersDomains() {
+    const result = await this.filterSrv.getAllFilters('domains');
+    if (result.success && result.data.length > 0) {
+      const filterDefault = result.data.find( filter => !!filter.favorite);
+      this.idFilterSelected = filterDefault ? filterDefault.id : undefined;
+      this.cardProperties.filters = result.data;
+    }
+    this.cardProperties.showFilters = true;
+  }
+
+  handleEditFilter(event) {
+    const idFilter = event.filter;
+    if (idFilter) {
+      const filterProperties = this.loadFilterPropertiesList();
+      this.filterSrv.setFilterProperties(filterProperties);
+      this.setBreadcrumbStorage();
+      this.router.navigate(['/filter-dataview'], {
+        queryParams: {
+          id: idFilter,
+          entityName: 'domains'
+        }
+      });
+    }
+  }
+
+  async handleSelectedFilter(event) {
+    const idFilter = event.filter;
+    if (idFilter) {
+      this.idFilterSelected = idFilter;
+      await this.loadPropertiesDomains();
+    }
+  }
+
+  handleNewFilter() {
+    const filterProperties = this.loadFilterPropertiesList();
+    this.filterSrv.setFilterProperties(filterProperties);
+    this.setBreadcrumbStorage();
+    this.router.navigate(['/filter-dataview'], {
+      queryParams: {
+        entityName: 'domains'
+      }
+    });
+  }
+
+  loadFilterPropertiesList() {
+    const listProperties = FilterDataviewPropertiesEntity.domains;
+    const filterPropertiesList = listProperties.map( prop => {
+      const property =  new PropertyTemplateModel();
+      property.type = prop.type;
+      property.label = prop.label;
+      property.name = prop.apiValue;
+      property.active = true;
+      return property;
+    });
+    return filterPropertiesList;
+  }
+
+  setBreadcrumbStorage() {
+    this.breadcrumbSrv.setBreadcrumbStorage([{
+      key: 'domains',
+      info: this.propertiesOffice?.name,
+      tooltip: this.propertiesOffice?.fullName,
+      routerLink: ['/domains'],
+      queryParams: { idOffice: this.idOffice }
+    }, {
+      key: 'filter',
+      routerLink: ['filter-dataview']
+    }]);
+  }
+
+  createNewDomain() {
+    this.router.navigate(['/domains/detail'], { queryParams: { idOffice: this.idOffice } });
+  }
 
 }

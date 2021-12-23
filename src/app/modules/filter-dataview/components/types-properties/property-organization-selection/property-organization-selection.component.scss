@@ -1,0 +1,12 @@
+
+  ::ng-deep .app-property-organization-selection {
+    .p-multiselect {
+      width: 100%;
+    }
+  }
+  
+  ::ng-deep .app-property-organization-selection {
+    .app-single-selection .p-dropdown {
+      width: 100%;
+    }
+  }
