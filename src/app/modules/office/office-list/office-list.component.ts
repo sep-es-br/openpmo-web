@@ -78,7 +78,7 @@ export class OfficeListComponent implements OnInit {
     this.cardProperties.showCreateNemElementButton = this.isUserAdmin ? true : false;
     if (success) {
       this.isListEmpty = !data.length;
-      if(this.isListEmpty) {
+      if(this.isListEmpty && !this.isUserAdmin) {
         const personInfo = await this.authSrv.getInfoPerson();
         if(personInfo.isCcbMember) {
           this.router.navigate(['/ccbmember-baselines-view']);
