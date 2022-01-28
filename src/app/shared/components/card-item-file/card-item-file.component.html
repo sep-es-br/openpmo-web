@@ -1,0 +1,42 @@
+<ng-container [ngSwitch]="properties.typeCardItem">
+  <p-card *ngSwitchCase="'listItem'" class="app-card-item listItem" [class.mobile]="responsive"
+    [class.cardList]="displayModeCard === 'list'" [class.canceled]="properties.canceled">
+    <p-header *ngIf="properties.menuItems" class="card-item-header">
+      <p-menu #menu [popup]="true" [model]="properties.menuItems"></p-menu>
+      <button type="button" pButton icon="pi pi-ellipsis-v" [class.hidden]="!properties.menuItems.length"
+        (click)="menu.toggle($event)"></button>
+    </p-header>
+    <div class="card-item-content" [class.card-link]="properties.urlCard" [routerLink]="properties.urlCard"
+      [class.cardList]="displayModeCard === 'list'" [queryParams]="getQueryParams()">
+      <span class="card-item-name" [pTooltip]="properties.fullNameCardItem"
+        tooltipPosition="bottom">{{properties.nameCardItem}}
+      </span>
+      <div class="icons-container">
+        <img [src]="properties.urlImg" width="100">
+      </div>
+      <form class="card-item-description">
+        <span class="p-float-label p-field">
+          <input class="app-input-text" pInputText type="text" [(ngModel)]="properties.givenName"
+          [ngModelOptions]="{standalone: true}">
+          <label for="float-input" class="app-input-label">{{'briefDescription' | translate}}</label>
+        </span>
+      </form>
+    </div>
+    <div class="card-item-footer" *ngIf="cardIdItem">
+      <span class="card-item-id">
+        {{cardIdItem}}
+      </span>
+    </div>
+  </p-card>
+  <p-card *ngSwitchCase="'newCardItem'" class="new-carditem" [class.card-link]="properties.urlCard"
+    [class.mobile]="responsive" [class.cardList]="displayModeCard === 'list'" [class.new-card-item-mobile]="responsive"
+    (click)="properties.urlCard && navigateToPage(properties.urlCard, properties.paramsUrlCard)">
+    <div class="carditem-content">
+      <p-fileUpload #uploader name="upload" [customUpload]="true" [auto]="true"
+        (uploadHandler)="handleUpload($event, uploader)" mode="advanced"
+        [chooseIcon]="'app-icon ' + properties.icon + ' light-grey-icon'">
+      </p-fileUpload>
+    </div>
+  </p-card>
+
+</ng-container>

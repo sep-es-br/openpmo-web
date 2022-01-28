@@ -22,6 +22,7 @@
               <span class="p-float-label">
                 <input class="app-input-text" id="float-name" formControlName="name" type="text" pInputText />
                 <label class="app-input-label" for="float-name">{{ "name" | translate }} * </label>
+                <app-input-message [form]="formProcess" field="name"></app-input-message>
               </span>
             </div>
             <div class="p-field margin-top-responsive" *ngIf="process">

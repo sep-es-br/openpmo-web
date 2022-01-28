@@ -104,6 +104,7 @@ export class RiskResponseComponent implements OnInit {
 
   async ngOnInit() {
     this.calendarFormat = this.translateSrv.instant('dateFormat');
+    this.idPlan = Number(localStorage.getItem('@currentPlan'));
     await this.loadPropertiesRiskResponse();
     await this.setBreadcrumb();
     if (!this.editPermission) {

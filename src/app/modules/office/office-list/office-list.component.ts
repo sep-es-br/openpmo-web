@@ -83,7 +83,8 @@ export class OfficeListComponent implements OnInit {
         if(personInfo.isCcbMember) {
           this.router.navigate(['/ccbmember-baselines-view']);
         } else {
-          await this.authSrv.signOut();
+          this.authSrv.nextIsLoginDenied(true);
+          await this.router.navigate(['/login']);
         }
       }
       itemsProperties.unshift(...data.map(office => {

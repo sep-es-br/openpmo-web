@@ -64,12 +64,10 @@ export class AuthService {
   }
 
   async signOut() {
-    const token = this.getAccessToken();
-    const url = this.getUrlForSignout(token);
     this.clearTokens();
     this.userLogout.next(true);
     this.currentUserInfo = undefined;
-    this.document.location.href = url;
+    window.location.href = 'https://acessocidadao.es.gov.br/is/logout';
   }
 
   async signOutCitizenAccess() {

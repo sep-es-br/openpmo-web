@@ -1,18 +1,18 @@
-import { AuthService } from './../../../shared/services/auth.service';
-import { WorkpackService } from './../../../shared/services/workpack.service';
-import { takeUntil, filter, debounceTime } from 'rxjs/operators';
-import { ProcessService } from './../../../shared/services/process.service';
-import { MessageService } from 'primeng/api';
-import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
-import { TranslateService } from '@ngx-translate/core';
-import { ResponsiveService } from 'src/app/shared/services/responsive.service';
-import { ActivatedRoute } from '@angular/router';
-import { IProcess } from './../../../shared/interfaces/IProcess';
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { ICard } from 'src/app/shared/interfaces/ICard';
-import { Subject } from 'rxjs';
-import { SaveButtonComponent } from 'src/app/shared/components/save-button/save-button.component';
-import { Component, OnInit, ViewChild, ViewChildren, EventEmitter } from '@angular/core';
+import {AuthService} from '../../../shared/services/auth.service';
+import {WorkpackService} from '../../../shared/services/workpack.service';
+import {debounceTime, filter, takeUntil} from 'rxjs/operators';
+import {ProcessService} from '../../../shared/services/process.service';
+import {MessageService} from 'primeng/api';
+import {BreadcrumbService} from 'src/app/shared/services/breadcrumb.service';
+import {TranslateService} from '@ngx-translate/core';
+import {ResponsiveService} from 'src/app/shared/services/responsive.service';
+import {ActivatedRoute} from '@angular/router';
+import {IProcess} from '../../../shared/interfaces/IProcess';
+import {FormBuilder, FormGroup, Validators} from '@angular/forms';
+import {ICard} from 'src/app/shared/interfaces/ICard';
+import {Subject} from 'rxjs';
+import {SaveButtonComponent} from 'src/app/shared/components/save-button/save-button.component';
+import {Component, EventEmitter, OnInit, ViewChild} from '@angular/core';
 import * as moment from 'moment';
 
 @Component({
@@ -56,12 +56,12 @@ export class ProcessComponent implements OnInit {
     });
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.responsive = value);
     this.formProcess = this.formBuilder.group({
-      name: '',
+      name: ['', Validators.required],
       processNumber: ['', Validators.required],
       subject: ['', Validators.required],
       currentOrganization: ['', Validators.required],
       lengthOfStayOn: ['', Validators.required],
-      note: '',
+      note: ['', Validators.required],
       priority: false,
       status: ''
     });
@@ -76,8 +76,8 @@ export class ProcessComponent implements OnInit {
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.responsive = value);
     this.currentLang = this.translateSrv.getDefaultLang();
     this.translateSrv.onLangChange.pipe(takeUntil(this.$destroy)).subscribe(() => {
-      setTimeout(() => this.setLanguage(), 200);
-    }
+        setTimeout(() => this.setLanguage(), 200);
+      }
     );
   }
 
@@ -102,19 +102,17 @@ export class ProcessComponent implements OnInit {
 
   async searchProcessByNumber() {
     this.isLoading = true;
-    const result = await this.processSrv.GetProcessByNumber({ 'process-number': this.formProcess.controls.processNumber.value });
+    const result = await this.processSrv.GetProcessByNumber({'process-number': this.formProcess.controls.processNumber.value});
     this.isLoading = false;
-    if (result.success) {
-      if (result.data) {
-        this.process = result.data;
-        this.setFormProcess();
-      } else {
-        this.messageSrv.add({
-          severity: 'warn',
-          summary: this.translateSrv.instant('attention'),
-          detail: this.translateSrv.instant('messages.processNotFound')
-        });
-      }
+    if (result.success && result.data) {
+      this.process = result.data;
+      this.setFormProcess();
+    } else {
+      this.messageSrv.add({
+        severity: 'warn',
+        summary: this.translateSrv.instant('attention'),
+        detail: this.translateSrv.instant('messages.processNotFound')
+      });
     }
   }
 
@@ -164,7 +162,7 @@ export class ProcessComponent implements OnInit {
     } else {
       const idWorkpack = this.idProcess ? this.process.idWorkpack : this.idWorkpack;
       this.idPlan = Number(localStorage.getItem('@currentPlan'));
-      const result = await this.workpackSrv.GetWorkpackById(idWorkpack, { 'id-plan': this.idPlan });
+      const result = await this.workpackSrv.GetWorkpackById(idWorkpack, {'id-plan': this.idPlan});
       if (result.success) {
         const workpack = result.data;
         this.editPermission = workpack.permissions && workpack.permissions.filter(p => p.level === 'EDIT').length > 0;
@@ -175,11 +173,11 @@ export class ProcessComponent implements OnInit {
 
   async setBreadcrumb() {
     this.breadcrumbSrv.setMenu([
-      ... await this.getBreadcrumbs(this.idWorkpack),
+      ...await this.getBreadcrumbs(this.idWorkpack),
       {
         key: 'process',
         routerLink: ['/workpack/process'],
-        queryParams: { idWorkpack: this.idWorkpack, id: this.idProcess },
+        queryParams: {idWorkpack: this.idWorkpack, id: this.idProcess},
         info: this.process?.name,
         tooltip: this.process?.name
       }
@@ -187,14 +185,15 @@ export class ProcessComponent implements OnInit {
   }
 
   async getBreadcrumbs(idWorkpack: number) {
-    const { success, data } = await this.breadcrumbSrv.getBreadcrumbWorkpack(idWorkpack, { 'id-plan': this.idPlan });
+    this.idPlan = Number(localStorage.getItem('@currentPlan'));
+    const {success, data} = await this.breadcrumbSrv.getBreadcrumbWorkpack(idWorkpack, {'id-plan': this.idPlan});
     return success
       ? data.map(p => ({
         key: !p.modelName ? p.type.toLowerCase() : p.modelName,
         info: p.name,
         tooltip: p.fullName,
         routerLink: this.getRouterLinkFromType(p.type),
-        queryParams: { id: p.id, idWorkpackModelLinked: p.idWorkpackModelLinked },
+        queryParams: {id: p.id, idWorkpackModelLinked: p.idWorkpackModelLinked},
         modelName: p.modelName
       }))
       : [];
@@ -261,7 +260,7 @@ export class ProcessComponent implements OnInit {
         detail: this.translateSrv.instant('messages.savedSuccessfully')
       });
       this.idProcess = result.data.id;
-      this.process = { ...result.data };
+      this.process = {...result.data};
     }
   }
 

@@ -1,0 +1,17 @@
+@use "src/variables" as v;
+
+::ng-deep .app-journal {
+  .card-properties-journal {
+    .form {
+      margin-bottom: 1.5rem;
+    }
+  }
+  .evidences-container {
+    .title {
+      color: v.$fontTitle;
+      font-family: v.$fontFamilyMedium;
+      font-size: 1rem;
+      text-transform: uppercase;
+    }
+  }
+}

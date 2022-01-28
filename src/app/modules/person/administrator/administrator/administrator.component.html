@@ -9,8 +9,9 @@
           <div class="search-container-non-user-citizen" *ngIf="!citizenAuthServer" [class.responsive]="responsive">
             <div class="name-person-container" [class.responsive]="responsive">
               <span class="p-float-label">
-                <input class="app-input-text input-search" [class.responsive]="responsive" id="float-search" (ngModelChange)="validateClearSearchUserByEmail($event)"
-                  [(ngModel)]="searchedEmailUser" pInputText (blur)="searchUserByEmail()" type="email"/>
+                <input class="app-input-text input-search" [class.responsive]="responsive" id="float-search"
+                       (ngModelChange)="validateClearSearchUserByEmail($event)"
+                       [(ngModel)]="searchedEmailUser" pInputText (blur)="searchUserByEmail()" type="email"/>
                 <label class="app-input-label" for="float-search">{{ "searchByEmail" | translate }}</label>
               </span>
               <i class="fas fa-search icon-search-input"></i>
@@ -22,24 +23,26 @@
               {{ 'messages.invalidEmail' | translate }}
             </span>
           </div>
-
           <div class="search-container-user-citizen" *ngIf="!!citizenAuthServer">
             <div class="search-user-by" [class.responsive]="responsive">
               <label>{{'searchBy'|translate}}:</label>
               <div class="radios-container">
-                <p-radioButton class="search-user-radio" value="CPF" [(ngModel)]="citizenSearchBy" [label]="'CPF'" (ngModelChange)="validateClearSearchByUser()">
+                <p-radioButton class="search-user-radio" value="CPF" [(ngModel)]="citizenSearchBy" [label]="'CPF'"
+                               (ngModelChange)="validateClearSearchByUser()">
                 </p-radioButton>
-                <p-radioButton class="search-user-radio" value="NAME" [(ngModel)]="citizenSearchBy" (ngModelChange)="validateClearSearchByUser()"
-                  [label]="'nameOnlyPublicServers' | translate"></p-radioButton>
+                <p-radioButton class="search-user-radio" value="NAME" [(ngModel)]="citizenSearchBy"
+                               (ngModelChange)="validateClearSearchByUser()"
+                               [label]="'nameOnlyPublicServers' | translate"></p-radioButton>
               </div>
             </div>
             <div *ngIf="citizenSearchBy === 'NAME'" class="search-citizen-user-by-name">
               <div class="user-by-name-input-container">
                 <input #actualTarget class="app-input-text input-search-name" [class.responsive]="responsive"
-                  (ngModelChange)="validateClearSearchUserName($event)" [(ngModel)]="searchedNameUser" pInputText />
-                <button pButton class="button-search" [label]="!responsive ? ('search'|translate) : ''" (click)="searchCitizenUserByName()"
-                  [disabled]="!searchedNameUser || (searchedNameUser && searchedNameUser.length === 0) || isLoading"
-                  icon="fas fa-search" iconPos="left"></button>
+                       (ngModelChange)="validateClearSearchUserName($event)" [(ngModel)]="searchedNameUser" pInputText/>
+                <button pButton class="button-search" [label]="!responsive ? ('search'|translate) : ''"
+                        (click)="searchCitizenUserByName()"
+                        [disabled]="!searchedNameUser || (searchedNameUser && searchedNameUser.length === 0) || isLoading"
+                        icon="fas fa-search" iconPos="left"></button>
               </div>
               <span class="input-message-error" *ngIf="showMessagePublicServerNotFoundByName">
                 {{'messages.publicServerNotFoundByName' | translate}}
@@ -58,15 +61,15 @@
             </div>
             <div class="search-by-cpf-container" [class.responsive]="responsive">
               <div class="user-by-cpf-input-container" *ngIf="citizenSearchBy === 'CPF'">
-                <div  class="cpf-container">
+                <div class="cpf-container">
                   <p-inputMask [(ngModel)]="searchedCpfUser" mask="999.999.999-99" placeholder="000.000.000-00"
-                    (ngModelChange)="validateClearSearchByCpf($event)" unmask="true">
+                               (ngModelChange)="validateClearSearchByCpf($event)" unmask="true">
                   </p-inputMask>
                 </div>
                 <button pButton class="button-search" [label]="!responsive ? ('search'|translate) : ''"
-                  (click)="validateCpf()"
-                  [disabled]="!searchedCpfUser || (searchedCpfUser && searchedCpfUser.length === 0) || isLoading"
-                  icon="fas fa-search" iconPos="left"></button>
+                        (click)="validateCpf()"
+                        [disabled]="!searchedCpfUser || (searchedCpfUser && searchedCpfUser.length === 0) || isLoading"
+                        icon="fas fa-search" iconPos="left"></button>
               </div>
               <span *ngIf="!validCpf" class="input-message-error">
                 {{ 'messages.invalidCPF'|translate }}

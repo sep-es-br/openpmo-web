@@ -94,6 +94,7 @@ export class WorkpackComponent implements OnDestroy {
   idWorkpackModelLinked: number;
   workpackModel: IWorkpackModel;
   cardWorkpackProperties: ICard;
+  cardJournalProperties: ICard;
   workpack: IWorkpack;
   workpackName: string;
   workpackFullName: string;
@@ -190,6 +191,10 @@ export class WorkpackComponent implements OnDestroy {
     this.collapsePanelsStatus = event.mode === 'collapse' ? true : false;
     this.cardWorkpackProperties = Object.assign({}, {
       ...this.cardWorkpackProperties,
+      initialStateCollapse: this.collapsePanelsStatus
+    });
+    this.cardJournalProperties = Object.assign({}, {
+      ...this.cardJournalProperties,
       initialStateCollapse: this.collapsePanelsStatus
     });
     this.sectionCostAccount = this.sectionCostAccount && Object.assign({}, {
@@ -330,6 +335,7 @@ export class WorkpackComponent implements OnDestroy {
   async resetWorkpack() {
     this.workpackModel = undefined;
     this.cardWorkpackProperties = undefined;
+    this.cardJournalProperties = undefined;
     this.workpack = undefined;
     this.workpackName = undefined;
     this.workpackFullName = undefined;
@@ -927,6 +933,15 @@ export class WorkpackComponent implements OnDestroy {
       };
       this.totalRecordsProcesses = this.sectionProcess.cardItemsSection && this.sectionProcess.cardItemsSection.length;
     }
+    if (this.workpackModel.journalManagementSessionActive) {
+      this.cardJournalProperties = {
+        toggleable: false,
+        initialStateToggle: false,
+        cardTitle: 'journal',
+        collapseble: true,
+        initialStateCollapse: this.collapsePanelsStatus,
+      }
+    }
     if (this.workpackModel.childWorkpackModelSessionActive && this.workpackModel.children) {
       this.sectionWorkpackModelChildren = true;
       if (!this.idWorkpackModelLinked) {
@@ -1188,10 +1203,10 @@ export class WorkpackComponent implements OnDestroy {
   }
 
   async checkPasteWorkpack(workpackCuted: IWorkpack, idWorkpackModelTo: number) {
-    const result = await this.workpackSrv.checkPasteWorkpack(workpackCuted.id, idWorkpackModelTo , {
+    const result = await this.workpackSrv.checkPasteWorkpack(workpackCuted.id, idWorkpackModelTo, {
       idWorkpackModelFrom: workpackCuted.model.id,
     });
-    if(result.success) {
+    if (result.success) {
       return result.data;
     } else {
       return {} as any

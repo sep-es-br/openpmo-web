@@ -94,6 +94,7 @@ export class IssueResponseComponent implements OnInit {
 
   async ngOnInit() {
     this.calendarFormat = this.translateSrv.instant('dateFormat');
+    this.idPlan = Number(localStorage.getItem('@currentPlan'));
     await this.loadPropertiesIssueResponse();
     await this.setBreadcrumb();
     if (!this.editPermission) {
@@ -105,7 +106,8 @@ export class IssueResponseComponent implements OnInit {
 
   setFormIssueResponse() {
       this.formIssueResponse.controls.name.setValue(this.issueResponse.name);
-      this.formIssueResponse.controls.date.setValue(new Date(this.issueResponse.date + 'T00:00:00'));
+      this.formIssueResponse.controls.date.setValue(new Date
+        (moment(this.issueResponse.date, 'DD/MM/YYYY').format('YYYY-MM-DD') + 'T00:00:00'));
       this.formIssueResponse.controls.status.setValue(this.issueResponse.status);
       this.formIssueResponse.controls.plan.setValue(this.issueResponse.plan);
       this.formIssueResponse.controls.responsible.setValue(this.issueResponse.responsible.map( resp => (resp.id)));
@@ -138,7 +140,6 @@ export class IssueResponseComponent implements OnInit {
     if (isUserAdmin) {
       this.editPermission = true;
     } else {
-      this.idPlan = Number(localStorage.getItem('@currentPlan'));
       const result = await this.workpackSrv.GetWorkpackById(this.idWorkpack, {'id-plan': this.idPlan});
       if (result.success) {
         const workpack = result.data;

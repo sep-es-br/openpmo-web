@@ -1,0 +1,29 @@
+<div class="app-journal">
+  <div class="app-content-header">
+    <span>{{ "newInformation" | translate }}</span>
+  </div>
+  <div class="card-properties-journal" *ngIf="cardJournalProperties" [class.responsive]="responsive">
+    <app-card [properties]="cardJournalProperties">
+      <form [formGroup]="formJournal" class="form">
+        <span class="p-float-label">
+          <textarea pInputTextarea [rows]="3" class="app-text-area" id="float-name"
+            formControlName="description"></textarea>
+          <label class="app-input-label" for="float-name">{{ "information" | translate }} * </label>
+        </span>
+        <app-input-message [form]="formJournal" field="description"></app-input-message>
+      </form>
+      <div class="evidences-container">
+        <h3 class="title">{{'evidences' | translate}}</h3>
+        <p-dataView [value]="cardItemsEvidences" layout="grid" class="app-dataview"
+          [emptyMessage]="(!cardItemsEvidences ? 'loadingEllipsis' : 'noContent') | translate">
+          <ng-template let-cardItem pTemplate="gridItem">
+            <div class="p-col-12 p-md-3 p-sm-12 card-item-container">
+              <app-card-item-file [properties]="cardItem" (onUploadFile)="handleUploadEvidence($event)"></app-card-item-file>
+            </div>
+          </ng-template>
+        </p-dataView>
+      </div>
+    </app-card>
+  </div>
+  <app-save-button [form]="formJournal" (save)="handleOnSubmit()"></app-save-button>
+</div>

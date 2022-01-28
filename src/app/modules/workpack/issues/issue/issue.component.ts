@@ -90,6 +90,7 @@ export class IssueComponent implements OnInit {
   }
 
   async ngOnInit() {
+    this.idPlan = Number(localStorage.getItem('@currentPlan'));
     await this.loadPropertiesIssue();
     await this.setBreadcrumb();
     if (!this.editPermission) {
@@ -120,7 +121,7 @@ export class IssueComponent implements OnInit {
       label: this.translateSrv.instant(this.issuePropertiesOptions.importance[key].label),
       value: this.issuePropertiesOptions.importance[key].value
     }));
-    const result = this.idIssue && await this.issueSrv.GetById(this.idIssue);
+    const result = !!this.idIssue && await this.issueSrv.GetById(this.idIssue);
     if (result.success) {
       this.issue = result.data;
       await this.loadPermissions();
@@ -137,7 +138,6 @@ export class IssueComponent implements OnInit {
       this.editPermission = true;
     } else {
       const idWorkpack = this.idIssue ? this.issue.idWorkpack : this.idWorkpack;
-      this.idPlan = Number(localStorage.getItem('@currentPlan'));
       const result = await this.workpackSrv.GetWorkpackById(idWorkpack, { 'id-plan': this.idPlan });
       if (result.success) {
         const workpack = result.data;

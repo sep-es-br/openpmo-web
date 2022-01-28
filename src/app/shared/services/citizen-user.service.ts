@@ -1,11 +1,10 @@
-import { IHttpResult } from '../interfaces/IHttpResult';
-import { PrepareHttpParams } from '../utils/query.util';
-import { IPerson } from 'src/app/shared/interfaces/IPerson';
-import { Inject, Injectable, Injector } from '@angular/core';
-import { BaseService } from '../base/base.service';
+import {IHttpResult} from '../interfaces/IHttpResult';
+import {PrepareHttpParams} from '../utils/query.util';
+import {IPerson} from 'src/app/shared/interfaces/IPerson';
+import {Inject, Injectable, Injector} from '@angular/core';
+import {BaseService} from '../base/base.service';
 
-
-@Injectable({ providedIn: 'root' })
+@Injectable({providedIn: 'root'})
 export class CitizenUserService extends BaseService<IPerson> {
 
   constructor(
@@ -15,7 +14,7 @@ export class CitizenUserService extends BaseService<IPerson> {
   }
 
   public async GetPublicServersByName(options) {
-    const result =  await this.http.get<IHttpResult<{name: string; sub: string}[]>>(`${this.urlBase}/name`,
+    const result = await this.http.get<IHttpResult<{ name: string; sub: string }[]>>(`${this.urlBase}/name`,
       {
         params: PrepareHttpParams(options)
       }
@@ -27,16 +26,15 @@ export class CitizenUserService extends BaseService<IPerson> {
   }
 
   public async GetPublicServer(sub: string, options?) {
-    const result =  await this.http.get<IHttpResult<IPerson>>(`${this.urlBase}/${sub}`,
+    return await this.http.get<IHttpResult<IPerson>>(`${this.urlBase}/${sub}`,
       {
         params: PrepareHttpParams(options)
       }
     ).toPromise();
-    return result;
   }
 
   public async GetCitizenUserByCpf(options) {
-    return  await this.http.get<IHttpResult<IPerson>>(`${this.urlBase}/cpf`,
+    return await this.http.get<IHttpResult<IPerson>>(`${this.urlBase}/cpf`,
       {
         params: PrepareHttpParams(options)
       }

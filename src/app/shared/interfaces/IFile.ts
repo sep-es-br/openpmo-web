@@ -5,4 +5,7 @@ export interface IFile {
   file?: string;
   url?: string;
   size?: number;
+  isImg?: boolean;
+  icon?: string;
+  givenName?: string;
 }

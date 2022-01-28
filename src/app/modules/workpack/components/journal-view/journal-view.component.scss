@@ -1,0 +1,114 @@
+::ng-deep .app-journal-view {
+  form.filters {
+    display: flex;
+    & > * {
+      margin-right: 1.6rem;
+    }
+    .p-calendar {
+      background-color: #fff;
+      padding-left: 1rem;
+      .p-inputtext.p-component,
+      .p-datepicker-trigger {
+        border: none;
+      }
+    }
+    .p-float-label {
+      margin-top: 0px;
+      label {
+        top: 40%;
+        margin-left: 0.5rem;
+      }
+      & input:focus ~ label,
+      & input.p-filled ~ label,
+      & textarea:focus ~ label,
+      & textarea.p-filled ~ label,
+      & .p-inputwrapper-focus ~ label,
+      & .p-inputwrapper-filled ~ label {
+        top: -8px !important;
+      }
+    }
+    .p-dropdown.p-component {
+      background-color: #fff;
+      border: none !important;
+      padding-right: 1rem;
+      padding-left: 1rem;
+    }
+  }
+  .journal-content {
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+    max-height: 600px;
+    overflow-y: scroll;
+    .custom-marker {
+      font-size: 2rem;
+      &.icon {
+        font-size: 1.3rem;
+        padding: 0.6rem;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+    }
+    .p-card {
+      .p-card-body {
+        padding-left: 1.5rem;
+        padding-right: 1.5rem;
+      }
+      .p-card-header {
+        padding: 2rem 1.5rem 0 1.5rem;
+      }
+      .p-card-subtitle {
+        display: flex;
+        flex-direction: column;
+        span {
+          font-size: 0.8rem;
+          margin-bottom: 0.5rem;
+        }
+      }
+      .p-card-content {
+        display: flex;
+        flex-direction: column;
+        .workpack-info {
+          font-size: 0.85rem;
+        }
+        .title {
+          font-size: 0.84rem;
+          margin-top: 1rem;
+        }
+        .description {
+          font-size: 0.8rem;
+          text-align: justify;
+        }
+        .evidences {
+          margin-top: 1rem;
+          figure {
+            margin-left: 0;
+            display: flex;
+            flex-wrap: wrap;
+            .evidence {
+              margin-right: 1.6rem;
+              margin-bottom: 1.6rem;
+              max-width: 65px;
+              .image {
+                width: 100%;
+                cursor: pointer;
+              }
+              .icon {
+                cursor: pointer;
+                font-size: 3rem;
+              }
+              .legend {
+                font-size: 0.65rem;
+                white-space: nowrap;
+                word-break: break-word;
+                overflow: hidden;
+                text-overflow: ellipsis;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

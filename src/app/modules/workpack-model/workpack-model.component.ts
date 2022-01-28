@@ -1178,6 +1178,7 @@ export class WorkpackModelComponent implements OnInit {
       initialStateCollapse: false,
       onToggle: new EventEmitter<boolean>()
     };
+    this.cardPropertiesJournal.onToggle.pipe(takeUntil(this.$destroy)).subscribe(() => this.checkProperties())
     this.cardPropertiesModels = {
       toggleable: this.editPermission,
       initialStateToggle: true,

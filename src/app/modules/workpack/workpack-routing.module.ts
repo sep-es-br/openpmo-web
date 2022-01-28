@@ -6,6 +6,7 @@ import { CostAccountComponent } from './cost-account/cost-account.component';
 import { WorkpackComponent } from './workpack.component';
 import { SharingComponent } from './sharing/sharing.component';
 import { BaselineCancellingComponent } from './baseline-cancelling/baseline-cancelling.component';
+import { JournalComponent } from './journal/journal.component';
 
 const routes: Routes = [
   {
@@ -50,6 +51,10 @@ const routes: Routes = [
       {
         path: 'baseline-cancelling',
         component: BaselineCancellingComponent
+      },
+      {
+        path: 'journal',
+        component: JournalComponent
       },
     ],
     runGuardsAndResolvers: 'always'

@@ -602,6 +602,14 @@ div[class^='card-properties'] app-card .p-panel {
   }
 }
 
+// component button
+.app-button-green {
+  .p-button {
+    background-color: #44b39b !important;
+    border: none;
+  }
+}
+
 
 .p-chips .p-chips-multiple-container .p-chips-token {
   background: v.$borderLightGrey !important;

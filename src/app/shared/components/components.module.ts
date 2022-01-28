@@ -12,6 +12,7 @@ import { InputUnitMeasureComponent } from './input-unit-measure/input-unit-measu
 import { ConfigDataViewPanelComponent } from './config-data-view-panel/config-data-view-panel.component';
 import { AvatarModule } from 'primeng/avatar';
 import { BaselineCardItemComponent } from './baseline-card-item/baseline-card-item.component';
+import { CardItemFileComponent } from './card-item-file/card-item-file.component';
 
 @NgModule({
   declarations: [
@@ -24,6 +25,7 @@ import { BaselineCardItemComponent } from './baseline-card-item/baseline-card-it
     InputUnitMeasureComponent,
     ConfigDataViewPanelComponent,
     BaselineCardItemComponent,
+    CardItemFileComponent,
   ],
   imports: [
     CommonModule,
@@ -41,7 +43,8 @@ import { BaselineCardItemComponent } from './baseline-card-item/baseline-card-it
     ProgressBarComponent,
     InputUnitMeasureComponent,
     ConfigDataViewPanelComponent,
-    BaselineCardItemComponent
+    BaselineCardItemComponent,
+    CardItemFileComponent
   ]
 })
 export class ComponentsModule { }

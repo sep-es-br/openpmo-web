@@ -65,7 +65,6 @@ export class AvatarComponent implements OnInit {
 
   imageCropped(event: ImageCroppedEvent) {
     this.croppedImageAvatar = event.base64;
-    console.log(event);
   }
 
   getSizeFormatted(tamanho: string): string {

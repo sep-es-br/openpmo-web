@@ -1,0 +1,89 @@
+<div class="app-journal-view">
+  <app-card [properties]="cardJournalProperties">
+    <form class="filters" [formGroup]="formSearch">
+      <p-button class="app-button-green" [label]="'newInformation' | translate" [routerLink]="['journal']"
+        [queryParams]="{idWorkpack: workpack.id}"></p-button>
+      <span class="p-float-label property-input p-field">
+        <p-calendar id="float-start" formControlName="from" class="app-select-date" showIcon="true"
+          [monthNavigator]="true" [yearNavigator]="true" yearRange="2020:2030" [class.responsive]="responsive"
+          icon="fas fa-calendar-alt" [dateFormat]="calendarFormat" (onClose)="loadJournalData()">
+        </p-calendar>
+        <label class="app-input-label" for="float-name">{{ "from" | translate }} </label>
+      </span>
+      <span class="p-float-label property-input p-field">
+        <p-calendar id="float-start" formControlName="to" class="app-select-date" showIcon="true"
+          [monthNavigator]="true" [yearNavigator]="true" yearRange="2020:2030" [class.responsive]="responsive"
+          icon="fas fa-calendar-alt" [dateFormat]="calendarFormat" (onClose)="loadJournalData()">
+        </p-calendar>
+        <label class="app-input-label" for="float-name">{{ "to" | translate }} </label>
+      </span>
+      <span class="p-float-label property-input p-field">
+        <p-dropdown class="app-single-selection" [class.responsive]="responsive" [autoDisplayFirst]="false"
+          [options]="optionsType" formControlName="type" (onChange)="loadJournalData()"></p-dropdown>
+        <label class="app-input-label" for="float-name">{{ "type" | translate }} </label>
+      </span>
+      <span class="p-float-label property-input p-field">
+        <p-dropdown class="app-single-selection" optionLabel="label" (click)="treeViewScopeOverlay.toggle($event)"
+          [class.responsive]="responsive"></p-dropdown>
+        <label class="app-input-label">{{ 'scopeLabel' | translate }} </label>
+      </span>
+      <p-overlayPanel #treeViewScopeOverlay [showCloseIcon]="true" [dismissable]="false"
+        (onHide)="handleHideOverlayScope($event)">
+        <p-scrollPanel [style]="{width: '350px', height: '300px'}">
+          <ng-template pTemplate>
+            <div class="app-tree-selection">
+              <p-tree [value]="treeViewScope" selectionMode="checkbox" [(selection)]="selectedWorkpacks">
+              </p-tree>
+            </div>
+          </ng-template>
+        </p-scrollPanel>
+      </p-overlayPanel>
+    </form>
+    <div class="journal-content" #journal>
+      <p-timeline [value]="journalData" [align]="responsive ? 'right' : 'alternate'">
+        <ng-template pTemplate="marker" let-event>
+          <span class="custom-marker" [style.color]="event.color" [style.backgroundColor]="event.background"
+            [class.icon]="event.type !== 'INFORMATION'">
+            <i [ngClass]="event.icon"></i>
+          </span>
+        </ng-template>
+        <ng-template pTemplate="content" let-event>
+          <p-card>
+            <ng-template pTemplate="header">
+              <strong class="title-header">
+                {{ typeJounalEnum[event.type] | translate }}
+                <span *ngIf="event.status">
+                  - {{ statusJounalEnum[event.status] | translate }}
+                </span>
+              </strong>
+            </ng-template>
+            <ng-template pTemplate="subtitle">
+              <span> {{ event.date }} </span>
+              <span> {{event.person.name}}(ID: {{event.person.id}})</span>
+            </ng-template>
+            <ng-template pTemplate="content">
+              <strong class="workpack-info" *ngIf="event.workpack">
+                {{event.workpack.workpackModelName}}: {{event.workpack.name}}(ID: {{event.workpack.id}})
+              </strong>
+              <strong class="title"> {{event.information?.title}} </strong>
+              <p class="description"> {{event.information?.description}}</p>
+              <div class="evidences" *ngIf="event.evidences && event.evidences.length > 0">
+                <figure>
+                  <ng-container *ngFor="let evidence of event.evidences; let i = index">
+                    <div class="evidence">
+                      <img class="image" *ngIf="evidence.isImg" [src]="evidence.url" [alt]="evidence.name" width="65"
+                        (click)="handleDownload(evidence.url, evidence.name)">
+                      <i class="icon" *ngIf="!evidence.isImg" [class]="evidence.icon"
+                        (click)="handleDownload(evidence.url, evidence.name)"> </i>
+                      <figcaption class="legend">{{evidence.name}}</figcaption>
+                    </div>
+                  </ng-container>
+                </figure>
+              </div>
+            </ng-template>
+          </p-card>
+        </ng-template>
+      </p-timeline>
+    </div>
+  </app-card>
+</div>

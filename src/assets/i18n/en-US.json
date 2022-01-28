@@ -1,4 +1,5 @@
 {
+  "attention": "Attention",
   "administration": "Administration",
   "administrator": "Administrator",
   "administrators": "Administrators",
@@ -7,6 +8,8 @@
   "longitude": "Longitude",
   "plan": "Plan",
   "plans": "Plans",
+  "briefDescription": "Brief Description",
+  "evidences": "Evidences",
   "planModel": "Plan Model",
   "planModels": "Plan Models",
   "planPermissions": "Plan Permissions",
@@ -91,6 +94,15 @@
   "contactEmail": "Contact e-mail",
   "contactInformation": "Contact information",
   "myContactInformation": "My Contact information",
+  "newInformation": "New information",
+  "information": "Information",
+  "edition": "Edition",
+  "failure": "Failure",
+  "riskResponse": "Risk Response",
+  "edited": "Edited",
+  "created": "Created",
+  "removed": "Removed",
+  "issueResponse": "Issue Response",
   "model": "Model",
   "models": "Models",
   "strategy": "Strategy",
@@ -293,7 +305,7 @@
     "duplicatedLabels": "Duplicated labels: \n {{ labels }}",
     "setCookiesPermission": "I would like cookies to be stored with your views preferences for this application",
     "cookiesPermissionMessage": "Cookies storage permission:",
-    "processNotFounded": "Process not founded",
+    "processNotFound": "Process not found",
     "saveToConfirm": "Contact information unified. Save to confirm.",
     "userNotFoundByEmail": "A person was not found with this email. Create a new person.",
     "userNotFoundByEmailCreatedPerson": "A person was not found with this email. A new person will be created.",
@@ -350,7 +362,7 @@
           "found": "Workpack Model not found"
         }
       },
-      "planModel":{
+      "planModel": {
         "delete": {
           "relationship": {
             "error": "Exclusion is not possible as it has related models."
@@ -466,11 +478,61 @@
     "choose": "Choose",
     "upload": "Upload",
     "cancel": "Cancel",
-    "dayNames": [ "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday" ],
-    "dayNamesShort": [ "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" ],
-    "dayNamesMin": [ "Su", "Mo", "Tu", "We", "Th", "Fr", "Sa" ],
-    "monthNames": [ "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" ],
-    "monthNamesShort": [ "Jan", "Feb", "Mar", "Apr", "May", "Jun","Jul", "Aug", "Sep", "Oct", "Nov", "Dec" ],
+    "dayNames": [
+      "Sunday",
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday"
+    ],
+    "dayNamesShort": [
+      "Sun",
+      "Mon",
+      "Tue",
+      "Wed",
+      "Thu",
+      "Fri",
+      "Sat"
+    ],
+    "dayNamesMin": [
+      "Su",
+      "Mo",
+      "Tu",
+      "We",
+      "Th",
+      "Fr",
+      "Sa"
+    ],
+    "monthNames": [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December"
+    ],
+    "monthNamesShort": [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec"
+    ],
     "today": "Today",
     "weekHeader": "Wk"
   },

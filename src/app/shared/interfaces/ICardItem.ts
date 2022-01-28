@@ -3,11 +3,13 @@ import { IFile } from './IFile';
 
 export interface ICardItem {
   typeCardItem: string;
-  icon: string;
+  icon?: string;
   iconSvg?: boolean;
   iconColor?: string;
   nameCardItem?: string;
   fullNameCardItem?: string;
+  givenName?: string;
+  urlImg?: string;
   subtitleCardItem?: string;
   statusItem?: string;
   organizationName?: string;

@@ -1,27 +1,27 @@
-import { AuthServerService } from '../../../../shared/services/auth-server.service';
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { Router } from '@angular/router';
-import { TranslateService } from '@ngx-translate/core';
-import { MessageService } from 'primeng/api';
-import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import {AuthServerService} from '../../../../shared/services/auth-server.service';
+import {Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {Router} from '@angular/router';
+import {TranslateService} from '@ngx-translate/core';
+import {MessageService} from 'primeng/api';
+import {Subject} from 'rxjs';
+import {takeUntil} from 'rxjs/operators';
 
-import { ResponsiveService } from 'src/app/shared/services/responsive.service';
-import { ICard } from 'src/app/shared/interfaces/ICard';
-import { IPerson } from 'src/app/shared/interfaces/IPerson';
-import { PersonService } from 'src/app/shared/services/person.service';
-import { enterLeave } from '../../../../shared/animations/enterLeave.animation';
-import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
-import { SaveButtonComponent } from 'src/app/shared/components/save-button/save-button.component';
-import { cpfValidator } from 'src/app/shared/utils/cpfValidator';
-import { CitizenUserService } from 'src/app/shared/services/citizen-user.service';
+import {ResponsiveService} from 'src/app/shared/services/responsive.service';
+import {ICard} from 'src/app/shared/interfaces/ICard';
+import {IPerson} from 'src/app/shared/interfaces/IPerson';
+import {PersonService} from 'src/app/shared/services/person.service';
+import {enterLeave} from '../../../../shared/animations/enterLeave.animation';
+import {BreadcrumbService} from 'src/app/shared/services/breadcrumb.service';
+import {SaveButtonComponent} from 'src/app/shared/components/save-button/save-button.component';
+import {cpfValidator} from 'src/app/shared/utils/cpfValidator';
+import {CitizenUserService} from 'src/app/shared/services/citizen-user.service';
 
 @Component({
   selector: 'app-administrator',
   templateUrl: './administrator.component.html',
   styleUrls: ['./administrator.component.scss'],
   animations: [
-    enterLeave({ opacity: 0, pointerEvents: 'none' }, { opacity: 1, pointerEvents: 'all' }, 300)
+    enterLeave({opacity: 0, pointerEvents: 'none'}, {opacity: 1, pointerEvents: 'all'}, 300)
   ]
 })
 export class AdministratorComponent implements OnInit, OnDestroy {
@@ -31,7 +31,6 @@ export class AdministratorComponent implements OnInit, OnDestroy {
   person: IPerson;
   cardAdministrator: ICard;
   responsive: boolean;
-  newPerson = false;
   citizenAuthServer: boolean;
   personSearchBy: string; // SEARCH / NEW
   citizenSearchBy: string; //CPF | NAME
@@ -42,13 +41,12 @@ export class AdministratorComponent implements OnInit, OnDestroy {
   resultPersonsByName: IPerson[];
   notFoundPerson = false;
   validCpf = true;
-  publicServersResult: { name: string; sub: string }[];
+  publicServersResult: IPerson[];
   citizenUserNotFoundByCpf = false;
   showMessageNotFoundUserByEmail = false;
   showListBoxPublicServers = false;
   showMessagePublicServerNotFoundByName = false;
   showMessageInvalidEmail = false;
-  debounceSearch = new Subject<string>();
   $destroy = new Subject();
   isLoading = false;
 
@@ -65,13 +63,13 @@ export class AdministratorComponent implements OnInit, OnDestroy {
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => {
       this.responsive = value;
     });
-    this.citizenUserSrv.loadCitizenUsers();
+    this.citizenUserSrv.loadCitizenUsers().then();
   }
 
-  ngOnDestroy(): void {
+  async ngOnDestroy(): Promise<void> {
     this.$destroy.next();
     this.$destroy.complete();
-    this.citizenUserSrv.unloadCitizenUsers();
+    await this.citizenUserSrv.unloadCitizenUsers();
   }
 
   async ngOnInit() {
@@ -175,7 +173,7 @@ export class AdministratorComponent implements OnInit, OnDestroy {
 
   async searchUserByEmail() {
     if (this.searchedEmailUser && this.searchedEmailUser.length > 5 && this.searchedEmailUser.split('@').length > 1) {
-      const { data } = await this.personSrv.GetByEmail(this.searchedEmailUser);
+      const {data} = await this.personSrv.GetByEmail(this.searchedEmailUser);
       if (data) {
         this.person = data;
         this.showMessageNotFoundUserByEmail = false;
@@ -209,13 +207,18 @@ export class AdministratorComponent implements OnInit, OnDestroy {
     if (result.success) {
       this.publicServersResult = result.data;
       this.showListBoxPublicServers = this.publicServersResult.length > 0;
-      this.saveButton.showButton();
-
     }
     this.showMessagePublicServerNotFoundByName =
       !this.publicServersResult || (this.publicServersResult && this.publicServersResult.length === 0);
-    this.showListBoxPublicServers = true;
     this.saveButton.showButton();
+  }
+
+  validateClearSearchByCpf(event) {
+    if (!event || (event.length === 0)) {
+      this.person = undefined;
+      this.validCpf = true;
+      this.citizenUserNotFoundByCpf = false;
+    }
   }
 
   async validateCpf() {
@@ -238,13 +241,7 @@ export class AdministratorComponent implements OnInit, OnDestroy {
   }
 
   showFormPerson() {
-    if (this.person) {
-      return true;
-    }
-    if (this.personSearchBy === 'NEW') {
-      return true;
-    }
-    return false;
+    return this.person ? true : this.personSearchBy === 'NEW';
   }
 
   async handleSelectedPublicServer(event) {
@@ -254,7 +251,7 @@ export class AdministratorComponent implements OnInit, OnDestroy {
     const result = await this.citizenUserSrv.GetPublicServer(publicServer.sub);
     this.isLoading = false;
     if (result.success) {
-      this.person = event.value;
+      this.person = result.data;
       this.searchedNameUser = '';
       this.publicServersResult = [];
       this.showListBoxPublicServers = false;
@@ -265,7 +262,7 @@ export class AdministratorComponent implements OnInit, OnDestroy {
     if (!this.person) {
       return;
     }
-    if (!this.showMessageNotFoundUserByEmail) {
+    if (this.person && this.person.id) {
       const result = await this.personSrv.setPersonAdministrator(this.person.id, true);
       if (result.success) {
         this.messageSrv.add({
@@ -273,7 +270,7 @@ export class AdministratorComponent implements OnInit, OnDestroy {
           summary: this.translateSrv.instant('success'),
           detail: this.translateSrv.instant('messages.savedSuccessfully')
         });
-        this.router.navigate(
+        await this.router.navigate(
           ['/persons/administrators'],
         );
       }
@@ -289,7 +286,7 @@ export class AdministratorComponent implements OnInit, OnDestroy {
           summary: this.translateSrv.instant('success'),
           detail: this.translateSrv.instant('messages.savedSuccessfully')
         });
-        this.router.navigate(
+        await this.router.navigate(
           ['/persons/administrators'],
         );
       }

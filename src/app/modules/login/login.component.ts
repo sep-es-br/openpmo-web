@@ -1,21 +1,21 @@
-import { Component, Inject, OnDestroy } from '@angular/core';
+import {Component, Inject, OnDestroy, OnInit} from '@angular/core';
 
-import { APP_CONFIG } from 'src/app/shared/tokens/AppConfigToken';
-import { IAppConfig } from 'src/app/shared/interfaces/IAppConfig';
-import { AuthService } from 'src/app/shared/services/auth.service';
-import { ResponsiveService } from 'src/app/shared/services/responsive.service';
-import { TranslateService } from '@ngx-translate/core';
-import { Subject, Subscription } from 'rxjs';
-import { MenuItem } from 'primeng/api';
-import { TranslateChangeService } from 'src/app/shared/services/translate-change.service';
-import { takeUntil } from 'rxjs/operators';
+import {APP_CONFIG} from 'src/app/shared/tokens/AppConfigToken';
+import {IAppConfig} from 'src/app/shared/interfaces/IAppConfig';
+import {AuthService} from 'src/app/shared/services/auth.service';
+import {ResponsiveService} from 'src/app/shared/services/responsive.service';
+import {TranslateService} from '@ngx-translate/core';
+import {Subject, Subscription} from 'rxjs';
+import {MenuItem} from 'primeng/api';
+import {TranslateChangeService} from 'src/app/shared/services/translate-change.service';
+import {takeUntil} from 'rxjs/operators';
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss']
 })
-export class LoginComponent implements OnDestroy {
+export class LoginComponent implements OnInit, OnDestroy {
 
   authButtonIcon: string;
   appConfig: IAppConfig;
@@ -35,8 +35,8 @@ export class LoginComponent implements OnDestroy {
   ) {
 
     this.translateChangeSrv.getCurrentLang()
-    .pipe(takeUntil(this.$destroy))
-    .subscribe(() => this.handleChangeLanguage());
+      .pipe(takeUntil(this.$destroy))
+      .subscribe(() => this.handleChangeLanguage());
     this.appConfig = appConfig;
     if (this.appConfig.authButtonIcon?.length > 0) {
       this.authButtonIcon = this.appConfig.authButtonIcon.indexOf('.') !== -1
@@ -45,13 +45,17 @@ export class LoginComponent implements OnDestroy {
     }
     this.currentLanguage = this.translateSrv.getDefaultLang();
     this.subTranslateSrv = this.translateSrv.onDefaultLangChange
-    .pipe(takeUntil(this.$destroy))
-    .subscribe(lang => {
-      this.currentLanguage = lang.lang;
-    });
+      .pipe(takeUntil(this.$destroy))
+      .subscribe(lang => {
+        this.currentLanguage = lang.lang;
+      });
     this.authSrv.obsIsLoginDenied
-    .pipe(takeUntil(this.$destroy))
-    .subscribe((value) => this.isLoginDenied = value);
+      .pipe(takeUntil(this.$destroy))
+      .subscribe((value) => this.isLoginDenied = value);
+  }
+
+  ngOnInit(): void {
+    this.changeLanguage(this.currentLanguage);
   }
 
   ngOnDestroy(): void {
@@ -63,25 +67,23 @@ export class LoginComponent implements OnDestroy {
     this.authSrv.signIn();
   }
 
-  handleClickLogout() {
-    this.authSrv.signOutCitizenAccess();
+  async handleClickLogout() {
+    await this.authSrv.signOutCitizenAccess();
   }
 
   handleChangeLanguage() {
-    setTimeout(() =>
-      this.itemsLanguages = [
-        {
-          label: this.translateSrv.instant('portuguese'),
-          command: () => this.changeLanguage('pt-BR'),
-          icon: this.currentLanguage === 'pt-BR' && 'fas fa-check'
-        },
-        {
-          label: this.translateSrv.instant('english'),
-          command: () => this.changeLanguage('en-US'),
-          icon: this.currentLanguage === 'en-US' && 'fas fa-check'
-        }
-      ]
-      , 0);
+    setTimeout(() => this.itemsLanguages = [
+      {
+        label: this.translateSrv.instant('portuguese'),
+        command: () => this.changeLanguage('pt-BR'),
+        icon: this.currentLanguage === 'pt-BR' && 'fas fa-check'
+      },
+      {
+        label: this.translateSrv.instant('english'),
+        command: () => this.changeLanguage('en-US'),
+        icon: this.currentLanguage === 'en-US' && 'fas fa-check'
+      }
+    ], 0);
   }
 
   changeLanguage(language: string) {

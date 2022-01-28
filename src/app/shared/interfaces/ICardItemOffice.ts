@@ -3,7 +3,7 @@ import { IOffice } from "./IOffice";
 
 export interface ICardItemOffice  {
   typeCardItem: string;
-  icon: string;
+  icon?: string;
   iconSvg?: boolean;
   iconColor?: string;
   nameCardItem?: string;

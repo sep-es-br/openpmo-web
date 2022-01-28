@@ -1,4 +1,5 @@
 {
+  "attention": "Atenção",
   "administration": "Administração",
   "administrator": "Administrador",
   "administrators": "Administradores",
@@ -7,6 +8,8 @@
   "longitude": "Longitude",
   "plan": "Plano",
   "plans": "Planos",
+  "briefDescription": "Breve Descrição",
+  "evidences": "Evidencias",
   "planModel": "Modelo de Plano",
   "planModels": "Modelos de Plano",
   "planPermissions": "Permissões do Plano",
@@ -91,6 +94,15 @@
   "contactEmail": "Email de contato",
   "contactInformation": "Informações de Contato",
   "myContactInformation": "Minhas informações de contato",
+  "newInformation": "Nova informação",
+  "information": "Informação",
+  "edition": "Edição",
+  "failure": "Falha",
+  "riskResponse": "Resposta Risco",
+  "edited": "Editado",
+  "created": "Criado",
+  "removed": "Removido",
+  "issueResponse": "Resposta ao Problema",
   "model": "Modelo",
   "models": "Modelos",
   "strategy": "Estratégia",
@@ -291,7 +303,7 @@
     "duplicatedNames": "Nomes duplicados: \n{{ names }}",
     "duplicatedLabels": "Legendas duplicadas: \n {{ labels }}",
     "setCookiesPermission": "Gostaria que fossem armazenados cookies com suas preferências de modos de exibição desta aplicação",
-    "processNotFounded": "Processo não encontrado.",
+    "processNotFound": "Processo não encontrado.",
     "cookiesPermissionMessage": "Permissão para armazenar cookies:",
     "saveToConfirm": "Informações de contato unificadas. Salve para confirmar.",
     "userNotFoundByEmail": "Não encontrada uma pessoa com este email. Crie uma nova pessoa.",
@@ -349,7 +361,7 @@
           "found": "Modelo de pacote de trabalho não encontrado"
         }
       },
-      "planModel":{
+      "planModel": {
         "delete": {
           "relationship": {
             "error": "Não é possível a exclusão pois o mesmo possui modelos relacionados."
@@ -465,11 +477,61 @@
     "choose": "Escolher",
     "upload": "Upload",
     "cancel": "Cancelar",
-    "dayNames": [ "Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado" ],
-    "dayNamesShort": [ "Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sab" ],
-    "dayNamesMin": [ "Do", "Se", "Te", "Qa", "Qi", "Se", "Sa" ],
-    "monthNames": [ "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro" ],
-    "monthNamesShort": [ "Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez" ],
+    "dayNames": [
+      "Domingo",
+      "Segunda",
+      "Terça",
+      "Quarta",
+      "Quinta",
+      "Sexta",
+      "Sábado"
+    ],
+    "dayNamesShort": [
+      "Dom",
+      "Seg",
+      "Ter",
+      "Qua",
+      "Qui",
+      "Sex",
+      "Sab"
+    ],
+    "dayNamesMin": [
+      "Do",
+      "Se",
+      "Te",
+      "Qa",
+      "Qi",
+      "Se",
+      "Sa"
+    ],
+    "monthNames": [
+      "Janeiro",
+      "Fevereiro",
+      "Março",
+      "Abril",
+      "Maio",
+      "Junho",
+      "Julho",
+      "Agosto",
+      "Setembro",
+      "Outubro",
+      "Novembro",
+      "Dezembro"
+    ],
+    "monthNamesShort": [
+      "Jan",
+      "Fev",
+      "Mar",
+      "Abr",
+      "Mai",
+      "Jun",
+      "Jul",
+      "Ago",
+      "Set",
+      "Out",
+      "Nov",
+      "Dez"
+    ],
     "today": "Hoje",
     "weekHeader": "Se"
   },
@@ -550,5 +612,4 @@
   "uploadPhoto": "Carregar foto",
   "configuration": "Configuração",
   "unifyContactOffices": "Unificar entre os escritórios "
-
 }

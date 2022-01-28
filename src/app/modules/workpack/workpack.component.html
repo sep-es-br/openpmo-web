@@ -344,6 +344,10 @@
     </app-card>
   </div>
 
+  <div class="card-journal" *ngIf="workpackModel.journalManagementSessionActive">
+    <app-journal-view *ngIf="cardJournalProperties && workpack" [cardJournalProperties]="cardJournalProperties" [workpack]="workpack"></app-journal-view>
+  </div>
+
   <app-save-button #saveButton (save)="saveWorkpack()"></app-save-button>
 
 </div>

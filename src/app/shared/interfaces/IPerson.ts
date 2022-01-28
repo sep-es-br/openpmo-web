@@ -1,4 +1,4 @@
-import { IFile } from './IFile';
+import {IFile} from './IFile';
 
 export interface IPerson {
   id?: number;
@@ -12,11 +12,12 @@ export interface IPerson {
   cpf?: string;
   isUser?: boolean;
   officePermission?: IPersonOfficePermission;
-  roles?: {role: string; workLocation?: string}[];
+  roles?: { role: string; workLocation?: string }[];
   administrator?: boolean;
   avatar?: IFile;
   isCcbMember?: boolean;
 }
+
 export interface IPersonOfficePermission {
   id: number;
   accessLevel: string;
@@ -34,6 +35,6 @@ export interface IPersonWorkpackPermission {
   id: number;
   name: string;
   accessLevel: string;
-  roles: {role: string; organization?: string}[];
+  roles: { role: string; organization?: string }[];
   icon: string;
 }

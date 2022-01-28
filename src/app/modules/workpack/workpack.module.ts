@@ -29,6 +29,8 @@ import { ProgressBarCardStepComponent } from './components/progress-bar-card-ste
 import { SharingComponent } from './sharing/sharing.component';
 import { BaselineComponent } from './baseline/baseline.component';
 import { BaselineCancellingComponent } from './baseline-cancelling/baseline-cancelling.component';
+import { JournalViewComponent } from './components/journal-view/journal-view.component';
+import { JournalComponent } from './journal/journal.component';
 
 @NgModule({
   declarations: [
@@ -50,7 +52,9 @@ import { BaselineCancellingComponent } from './baseline-cancelling/baseline-canc
     ProgressBarCardStepComponent,
     SharingComponent,
     BaselineComponent,
-    BaselineCancellingComponent],
+    BaselineCancellingComponent,
+    JournalViewComponent,
+    JournalComponent],
   imports: [
     CommonModule,
     WorkpackRoutingModule,

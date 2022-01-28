@@ -39,15 +39,15 @@
                 </textarea>
                 <label class="app-input-label" for="float-plan">{{ "plan" | translate }} * </label>
               </span>
-              <app-input-message [form]="formRiskResponse" field="plan"></app-input-message>
+              <app-input-message [form]="formIssueResponse" field="plan"></app-input-message>
             </div>
             <div class="p-field">
               <span class="p-float-label">
                 <p-multiSelect class="app-multiple-selection" dropdownIcon="fas fa-caret-down" formControlName="responsible"
                   [options]="stakeholderOptions" optionLabel="label"optionValue="value" ></p-multiSelect>
-                <label class="app-input-label" for="float-label" >{{'responsible' |translate}}</label>
+                <label class="app-input-label" for="float-label" >{{'responsible' |translate}} *</label>
               </span>
-              <app-input-message [form]="formRiskResponse" field="responsible"></app-input-message>
+              <app-input-message [form]="formIssueResponse" field="responsible"></app-input-message>
             </div>
           </div>
         </form>
