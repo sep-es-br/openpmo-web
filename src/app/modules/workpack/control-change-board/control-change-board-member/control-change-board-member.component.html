@@ -1,8 +1,8 @@
 <div class="app-control-change-board-member">
   <div class="app-content-header" [class.mobile]="responsive">
-    <span *ngIf="idPerson; else newPermissionTitle">{{ ccbMember.person.name }}</span>
+    <span *ngIf="idPerson; else newPermissionTitle">{{ "ccbMember"|translate }}</span>
     <ng-template #newPermissionTitle>
-      <span>{{ "ccbMember" | translate }}</span>
+      <span>{{ "newCcbMember" | translate }}</span>
     </ng-template>
   </div>
   <div class="card-person" *ngIf="cardPerson">
@@ -86,25 +86,27 @@
           <label class="loading-label">{{'messages.loading'|translate}} ...</label>
         </div>
         <form [formGroup]="formPerson" *ngIf="ccbMember.person && formPerson" class="form">
-          <span class="person-name" *ngIf="ccbMember.person">{{ccbMember.person.name}}</span>
+          <div class="person-name-container">
+            <span class="person-name" *ngIf="ccbMember.person">{{ccbMember.person.name}}</span>
+          </div>
           <div class="p-grid">
             <span class="p-col-12 p-float-label">
               <textarea pInputTextarea class="app-text-area" [class.responsive]="responsive" [rows]="2"
-                formControlName="address">
+                (change)="showSaveButton()" formControlName="address">
               </textarea>
               <label for="float-input" class="app-input-label">{{'address' | translate}}</label>
               <app-input-message [form]="formPerson" field="address"></app-input-message>
             </span>
             <span class="p-col-12 p-md-4 p-lg-4 p-float-label">
               <p-inputMask mask="(99) 9 9999-9999" [class.responsive]="responsive" [unmask]="true"
-                formControlName="phoneNumber"></p-inputMask>
+                (change)="showSaveButton()" formControlName="phoneNumber"></p-inputMask>
               <label for="float-input" class="app-input-label">{{'phoneNumber' | translate}}</label>
               <app-input-message [form]="formPerson" field="phoneNumber"></app-input-message>
             </span>
             <span class="p-col-9"></span>
             <span class="p-col-12 p-md-5 p-lg-5 p-float-label">
               <input formControlName="contactEmail" type="text" pInputText class="app-input-text"
-                [class.mobile]="responsive" [class.desktop]="!responsive">
+                (change)="showSaveButton()" [class.mobile]="responsive" [class.desktop]="!responsive">
               <label for="float-input" class="app-input-label">{{'contactEmail' | translate}}</label>
               <app-input-message [form]="formPerson" field="contactEmail"></app-input-message>
             </span>
@@ -121,7 +123,8 @@
         <ng-container *ngFor="let memberAs of ccbMember.memberAs; let i = index">
           <div class="memberAs-item" [class.responsive]="responsive">
             <div class="input-toogle-container">
-              <p-inputSwitch class="app-toggle" [(ngModel)]="memberAs.active"></p-inputSwitch>
+              <p-inputSwitch class="app-toggle" [(ngModel)]="memberAs.active" (ngModelChange)="showSaveButton()">
+              </p-inputSwitch>
               <label class="input-label">
                 <span *ngIf="memberAs.workLocation"> {{memberAs.workLocation}} - </span>
                 {{memberAs.role}}

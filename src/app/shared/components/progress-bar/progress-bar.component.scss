@@ -12,6 +12,7 @@
     display: flex;
     align-items: flex-end;
     justify-content: flex-end;
+    // margin-bottom: 0.5em;
     span {
       text-transform: none;
       font-weight: bold;
@@ -71,6 +72,28 @@
   .progress-header-values-container.responsive {
     width: 90%;
   }
+  .baseline-bar-progress-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin-top: 5px;
+    .baseline-label-value {
+      font-size: 12px;
+      font-weight: bold;
+      color: #797979;
+      text-transform: none;
+    }
+    .baseline-label-text {
+      font-size: 9px;
+      font-style: italic;
+      text-transform: none;
+    }
+  }
+}
+.app-progress-with-baseline {
+  display: flex;
+  flex-direction: row;
+  align-items: center !important;
 }
 
 

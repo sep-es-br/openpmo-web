@@ -60,7 +60,7 @@ export class PropertyTemplateModel implements IProperty {
         break;
       case TypePropertyModelEnum.SelectionModel:
         const selectedOptions = multipleSelection && value as string[];
-        const stringValue = selectedOptions ? selectedOptions.join(',') : value as string;
+        const stringValue = !!selectedOptions ? selectedOptions.join(',') : value as string;
         property.value = stringValue;
         break;
       case TypePropertyModelEnum.UnitSelectionModel:

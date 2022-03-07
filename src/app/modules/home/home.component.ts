@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
+import { CookieService } from 'ngx-cookie';
 import { MessageService } from 'primeng/api';
 import { filter, map } from 'rxjs/operators';
 import { IPerson } from 'src/app/shared/interfaces/IPerson';
@@ -16,14 +17,15 @@ import { TranslateChangeService } from 'src/app/shared/services/translate-change
 })
 export class HomeComponent implements OnInit {
 
+  routerPlanWork = false;
+
   constructor(
     private authSrv: AuthService,
     private router: Router,
     private activatedRoute: ActivatedRoute,
     private breadcrumbSrv: BreadcrumbService,
-    private messageSrv: MessageService,
-    private translateSrv: TranslateService,
-    private translateChangeSrv: TranslateChangeService
+    private translateChangeSrv: TranslateChangeService,
+    private cookieSrv: CookieService
   ) {
     this.breadcrumbSrv.setMenu([]);
     this.activatedRoute.queryParams
@@ -36,23 +38,38 @@ export class HomeComponent implements OnInit {
         filter((dto) => !!dto)
       ).subscribe((dto) => {
         if (dto === 'error.unauthorized') {
-         const lang = window.navigator.language;
-         this.translateChangeSrv.changeLangDefault(lang);
-         this.authSrv.nextIsLoginDenied(true);
-         this.router.navigate(['/login']);
+          const lang = window.navigator.language;
+          this.translateChangeSrv.changeLangDefault(lang);
+          this.authSrv.nextIsLoginDenied(true);
+          this.router.navigate(['/login']);
         } else {
           const userInfo = JSON.parse(atob(dto)) as ISocialLoginResult;
           this.authSrv.saveToken(userInfo);
           this.authSrv.nextIsLoginDenied(false);
-          this.router.navigate(['/home']);
+          const user = this.authSrv.getTokenPayload();
+          const workPlanUser = this.cookieSrv.get('planWorkUser' + user.email);
+          if (workPlanUser) {
+            this.routerPlanWork = true;
+            this.router.navigate(['plan'], {
+              queryParams: {
+                id: Number(workPlanUser)
+              }
+            })
+          } else {
+            this.router.navigate(['/home']);
+          }
         }
       });
   }
 
   ngOnInit(): void {
-    setTimeout(async() => {
-      const routeLink = '/offices'
-      this.router.navigate([routeLink]);
-    }, 0);
+    if (!this.routerPlanWork) {
+      setTimeout(async () => {
+        const routeLink = '/offices'
+        this.router.navigate([routeLink]);
+      }, 0);
+    }
+
   }
+
 }

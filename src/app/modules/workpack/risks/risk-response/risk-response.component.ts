@@ -8,7 +8,7 @@ import { RiskService } from './../../../../shared/services/risk.service';
 import { BreadcrumbService } from './../../../../shared/services/breadcrumb.service';
 import { TranslateService } from '@ngx-translate/core';
 import { ResponsiveService } from './../../../../shared/services/responsive.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { SelectItem, MessageService } from 'primeng/api';
 import { RiskResponsesPropertiesOptions } from './../../../../shared/constants/riskResponsesPropertiesOptions';
 import { IRisk } from './../../../../shared/interfaces/IRisk';
@@ -60,7 +60,8 @@ export class RiskResponseComponent implements OnInit {
     private riskResponseSrv: RiskResponseService,
     private stakeholderSrv: StakeholderService,
     private workpackSrv: WorkpackService,
-    private authSrv: AuthService
+    private authSrv: AuthService,
+    private router: Router
   ) {
     this.actRouter.queryParams.subscribe(async queryParams => {
       this.idRiskResponse = queryParams.id && +queryParams.id;
@@ -260,8 +261,12 @@ export class RiskResponseComponent implements OnInit {
         summary: this.translateSrv.instant('success'),
         detail: this.translateSrv.instant('messages.savedSuccessfully')
       });
-      this.idRiskResponse = result.data.id;
-      this.riskResponse = { ...result.data };
+      this.router.navigate(['/workpack/risks'], {
+        queryParams: {
+          idWorkpack: this.idWorkpack,
+          id: this.idRisk
+        }
+      });
     }
   }
 

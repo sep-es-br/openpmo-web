@@ -17,13 +17,10 @@ export class BreadcrumbComponent implements OnInit {
   crumpsHide: IBreadcrumb[] = [];
   isMobileView = false;
   isOverflowing = false;
-
   addCrumbHidden = true;
   crumbOffice: IBreadcrumb;
   crumbPlan: IBreadcrumb;
 
-  showNameOffice = false;
-  showNamePlan = false;
   constructor(
     public breadcrumbSrv: BreadcrumbService,
     private responsiveSrv: ResponsiveService,
@@ -39,56 +36,55 @@ export class BreadcrumbComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.breadcrumbSrv.observable.subscribe(menu => {
-      this.resetAll();
-      this.setCrumbs(menu);
+    this.breadcrumbSrv.observable.subscribe( async (menu) => {
+      await this.resetAll();
+      await this.setCrumbs(menu);
       this.detectOverflow();
     });
   }
 
-  resetAll() {
+  async resetAll() {
     this.crumbs = [];
     this.crumbPlan = undefined;
     this.crumbOffice = undefined;
-    this.showNameOffice = false;
-    this.showNamePlan = false;
   }
 
-  setCrumbs(crumbs: IBreadcrumb[]) {
+  async setCrumbs(crumbs: IBreadcrumb[]) {
     if(crumbs.length > 0) {
-      if(crumbs[0]?.key === 'office') {
-        this.crumbOffice = crumbs[0];
-        crumbs.shift();
-      }
-      if(crumbs[0]?.key === 'plan') {
-        this.crumbPlan = crumbs[0];
-        crumbs.shift();
-        this.showNameOffice = true;
-      }
-      if(crumbs.length > 0 && this.showNameOffice) {
-        this.showNamePlan = true;
-      }
+      this.crumbOffice = crumbs.find( crumb => crumb.key === 'office');
+      // if(crumbs[0]?.key === 'office') {
+      //   this.crumbOffice = crumbs[0];
+      //   // crumbs.shift();
+      // }
+      // if(crumbs[0]?.key === 'plan') {
+      //   this.crumbPlan = crumbs[0];
+      //   crumbs.shift();
+      //   this.showNameOffice = true;
+      // }
+      this.crumbPlan = crumbs.find( crumb => crumb.key === 'plan');
+      // if(crumbs.length > 0 && this.showNameOffice) {
+      //   this.showNamePlan = true;
+      // }
     }
-    this.crumbs = crumbs;
+    this.crumbs = crumbs.filter( crumb => !['office','plan'].includes(crumb.key));
   }
 
-  routerLinkHome() {
-    if(this.showNamePlan && this.showNameOffice) {
-      return this.crumbPlan?.routerLink;
-    } else if(!this.showNamePlan && this.showNameOffice) {
-      return this.crumbOffice?.routerLink;
-    } else {
-      return ['/'];
+  handleNavigateBredcrumb() {
+    if (this.crumbPlan && this.crumbOffice && this.crumbs.length > 0) {
+      this.router.navigate([...this.crumbPlan.routerLink], {
+        queryParams: this.crumbPlan.queryParams
+      });
+    } else if((this.crumbPlan && this.crumbOffice && this.crumbs.length === 0) || (!this.crumbPlan && this.crumbOffice && this.crumbs.length === 0)) {
+      this.router.navigate([...this.crumbOffice.routerLink], {
+        queryParams: this.crumbOffice.queryParams
+      });
+    } else if (!this.crumbPlan && this.crumbOffice && this.crumbs.length > 0) {
+      this.router.navigate([...this.crumbOffice.routerLink], {
+        queryParams: this.crumbOffice.queryParams
+      });
     }
-  }
-
-  queryParamsHome() {
-    if(this.showNamePlan && this.showNameOffice) {
-      return this.crumbPlan?.queryParams;
-    } else if(!this.showNamePlan && this.showNameOffice) {
-      return this.crumbOffice?.queryParams;
-    } else {
-      return undefined;
+    else {
+      this.router.navigate(['/']);
     }
   }
 
@@ -109,12 +105,15 @@ export class BreadcrumbComponent implements OnInit {
          const secondElement = 1;
          const hideCrump = this.crumbs.splice(secondElement, 1)[0];
          this.crumpsHide.push(hideCrump);
+         this.crumbs[firstCrumb].routerLink = hideCrump.routerLink;
+         this.crumbs[firstCrumb].queryParams = hideCrump.queryParams;
       } else {
         const hideCrump = this.crumbs.shift();
         this.crumpsHide.push(hideCrump);
         this.crumbs.unshift({
           key: 'reticencias',
-          routerLink: [],
+          routerLink: this.crumpsHide[this.crumpsHide.length - 1].routerLink,
+          queryParams: this.crumpsHide[this.crumpsHide.length - 1].queryParams,
           modelName: '...',
         });
       }

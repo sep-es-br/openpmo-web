@@ -1,3 +1,4 @@
+import { IFilterProperty } from 'src/app/shared/interfaces/IFilterProperty';
 import { PropertyTemplateModel } from './../../../shared/models/PropertyTemplateModel';
 import { FilterDataviewPropertiesEntity } from 'src/app/shared/constants/filterDataviewPropertiesEntity';
 import { FilterDataviewService } from './../../../shared/services/filter-dataview.service';
@@ -41,7 +42,7 @@ export class PlanPermissionsListComponent implements OnInit {
   pageSize = 5;
   totalRecords: number;
   idFilterSelected: number;
-  
+
   constructor(
     private actRouter: ActivatedRoute,
     private responsiveSrv: ResponsiveService,
@@ -93,7 +94,7 @@ export class PlanPermissionsListComponent implements OnInit {
   }
 
   async loadPlanPermissions() {
-    const result = await this.planPermissionSrv.GetAll({'id-plan': this.idPlan, idFilter: this.idFilterSelected});
+    const result = await this.planPermissionSrv.GetAll({ 'id-plan': this.idPlan, idFilter: this.idFilterSelected });
     if (result.success) {
       this.planPermissions = result.data;
       this.loadCardItemsPlanPermissions();
@@ -113,14 +114,14 @@ export class PlanPermissionsListComponent implements OnInit {
     this.breadcrumbSrv.setMenu([
       {
         key: 'office',
-        routerLink: [ '/offices', 'office' ],
+        routerLink: ['/offices', 'office'],
         queryParams: { id: this.idOffice },
         info: this.propertiesOffice?.name,
         tooltip: this.propertiesOffice?.fullName
       },
       {
         key: 'planPermissions',
-        routerLink: [ '/plan', 'permission' ],
+        routerLink: ['/plan', 'permission'],
         queryParams: { idPlan: this.idPlan },
         info: this.propertiesPlan?.name,
         tooltip: this.propertiesPlan?.fullName
@@ -135,7 +136,7 @@ export class PlanPermissionsListComponent implements OnInit {
       return {
         typeCardItem: 'listItem',
         titleCardItem: name,
-        roleDescription: (p.permissions.filter( r => r.level === 'EDIT').length > 0
+        roleDescription: (p.permissions.filter(r => r.level === 'EDIT').length > 0
           ? this.translateSrv.instant('edit')
           : this.translateSrv.instant('read')),
         menuItems: [{
@@ -146,8 +147,8 @@ export class PlanPermissionsListComponent implements OnInit {
         itemId: p.person.id,
         urlCard: 'plan/permission/detail',
         paramsUrlCard: [
-          {name: 'idPlan', value: this.idPlan},
-          {name: 'email', value: p.person.email}
+          { name: 'idPlan', value: this.idPlan },
+          { name: 'email', value: p.person.email }
         ]
       };
     });
@@ -183,9 +184,9 @@ export class PlanPermissionsListComponent implements OnInit {
   async loadPlanPermissionsFilters() {
     const result = await this.filterSrv.getAllFilters('plan-permissions');
     if (result.success && result.data.length > 0) {
-        const filterDefault = result.data.find( filter => !!filter.favorite);
-        this.idFilterSelected = filterDefault ? filterDefault.id : undefined;
-        this.cardPlanPermissions.filters = result.data;
+      const filterDefault = result.data.find(filter => !!filter.favorite);
+      this.idFilterSelected = filterDefault ? filterDefault.id : undefined;
+      this.cardPlanPermissions.filters = result.data;
     }
     this.cardPlanPermissions.showFilters = true;
   }
@@ -207,10 +208,8 @@ export class PlanPermissionsListComponent implements OnInit {
 
   async handleSelectedFilter(event) {
     const idFilter = event.filter;
-    if (idFilter) {
-      this.idFilterSelected = idFilter;
-      await this.loadPlanPermissions();
-    }
+    this.idFilterSelected = idFilter;
+    await this.loadPlanPermissions();
   }
 
   handleNewFilter() {
@@ -226,13 +225,14 @@ export class PlanPermissionsListComponent implements OnInit {
 
   loadFilterPropertiesList() {
     const listProperties = FilterDataviewPropertiesEntity.planPermissions;
-    const filterPropertiesList = listProperties.map( prop => {
-      const property =  new PropertyTemplateModel();
-      property.type = prop.type;
-      property.label = prop.label;
-      property.name = prop.apiValue;
-      property.active = true;
-      property.possibleValues = prop.possibleValues;
+    const filterPropertiesList = listProperties.map(prop => {
+      const property: IFilterProperty = {
+        type: prop.type,
+        label: prop.label,
+        name: prop.apiValue,
+        active: true,
+        possibleValues: prop.possibleValues
+      }
       return property;
     });
     return filterPropertiesList;
@@ -242,21 +242,21 @@ export class PlanPermissionsListComponent implements OnInit {
     this.breadcrumbSrv.setBreadcrumbStorage([
       {
         key: 'office',
-        routerLink: [ '/offices', 'office' ],
+        routerLink: ['/offices', 'office'],
         queryParams: { id: this.idOffice },
         info: this.propertiesOffice?.name,
         tooltip: this.propertiesOffice?.fullName
       },
       {
         key: 'planPermissions',
-        routerLink: [ '/plan', 'permission' ],
+        routerLink: ['/plan', 'permission'],
         queryParams: { idPlan: this.idPlan },
         info: this.propertiesPlan?.name,
         tooltip: this.propertiesPlan?.fullName
       },
       {
         key: 'filter',
-        routerLink: [ 'filter-dataview' ],
+        routerLink: ['filter-dataview'],
       }
     ]);
   }

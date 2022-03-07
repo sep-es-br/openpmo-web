@@ -1,0 +1,37 @@
+<div class="app-scope-constraint card-scope" *ngIf="scope">
+        <div class="header-card">
+          <div class="title-card">
+            <i class="fas fa-boxes"></i>
+            <span>{{'scopeLabel'|translate|uppercase}}</span>
+          </div>
+          <div class="variation"
+            [class.not-variation]="!scope?.variation || scope?.variation === 0"
+            [class.positive-variation]="scope?.variation < 0"
+            [class.negative-variation]="scope?.variation > 0">
+            <i class="fas" [class.fa-arrow-up]="scope?.variation < 0"
+              [class.fa-arrow-down]="scope?.variation >= 0"></i>
+            <span>{{(scope?.variation < 0 ? (scope?.variation * (-1)|number:'1.0-1') :
+                scope?.variation)|number:'1.0-1'}}%</span>
+          </div>
+        </div>
+        <div class="content-card">
+          <div *ngIf="scope?.plannedVariationPercent" class="content-card-item planned"
+            [ngStyle]="{width: (((scope?.plannedVariationPercent / maxScopeValue)*100) + '%')}">
+            <label>{{scope?.plannedVariationPercent &&
+              (scope?.plannedVariationPercent)|number:'1.0-1'}}%</label>
+            <div [ngStyle]="{width: '100%', background: '#B5B5B5', height: '28px'}"></div>
+          </div>
+          <div *ngIf="scope?.foreseenVariationPercent" class="content-card-item foreseen"
+            [ngStyle]="{width: (((scope?.foreseenVariationPercent / maxScopeValue)*100) + '%')}">
+            <label>{{scope?.foreseenVariationPercent &&
+              (scope?.foreseenVariationPercent)|number:'1.0-1'}}%</label>
+            <div [ngStyle]="{width: '100%', background: '#44B39B', height: '28px'}"></div>
+          </div>
+          <div *ngIf="scope?.actualVariationPercent" class="content-card-item actual"
+            [ngStyle]="{width: (((scope?.actualVariationPercent / maxScopeValue)*100) + '%')}">
+            <label>{{(scope?.actualVariationPercent &&
+              (scope?.actualVariationPercent))|number:'1.0-1'}}%</label>
+            <div [ngStyle]="{width: '100%', background: '#0083BB', height: '28px'}"></div>
+          </div>
+        </div>
+      </div>

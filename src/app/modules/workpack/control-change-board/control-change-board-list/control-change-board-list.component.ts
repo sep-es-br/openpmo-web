@@ -31,7 +31,8 @@ export class ControlChangeBoardListComponent implements OnInit, OnDestroy {
     cardTitle: 'members',
     collapseble: true,
     initialStateCollapse: false,
-    showFilters: true
+    showFilters: false,
+    showCreateNemElementButton: false
   };
   idOffice: number;
   projectName: string;
@@ -40,7 +41,6 @@ export class ControlChangeBoardListComponent implements OnInit, OnDestroy {
   editPermission: boolean;
   $destroy = new Subject();
   responsive: boolean;
-  collapsePanelsStatus = true;
   displayModeAll = 'grid';
   pageSize = 5;
   totalRecords: number;
@@ -62,6 +62,7 @@ export class ControlChangeBoardListComponent implements OnInit, OnDestroy {
   ) {
     this.activeRoute.queryParams.subscribe(params => {
       this.idProject = +params.idProject;
+      this.idOffice = +params.idOffice;
     });
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.responsive = value);
   }
@@ -73,6 +74,7 @@ export class ControlChangeBoardListComponent implements OnInit, OnDestroy {
       ...await this.getBreadcrumbs(this.idProject),
       ...[{
         key: 'changeControlBoard',
+        info: 'ccbMembers',
         routerLink: ['/workpack/change-control-board'],
         queryParams: {
           idProject: this.idProject,
@@ -127,14 +129,6 @@ export class ControlChangeBoardListComponent implements OnInit, OnDestroy {
     }
   }
 
-  handleChangeCollapseExpandPanel(event) {
-    this.collapsePanelsStatus = event.mode === 'collapse' ? true : false;
-    this.cardProperties = Object.assign({}, {
-      ...this.cardProperties,
-      initialStateCollapse: this.collapsePanelsStatus
-    });
-  }
-
   handleChangeDisplayMode(event) {
     this.displayModeAll = event.displayMode;
   }
@@ -154,12 +148,11 @@ export class ControlChangeBoardListComponent implements OnInit, OnDestroy {
         active: true,
         paramsUrlCard: [
           { name: 'idProject', value: this.idProject },
+          { name: 'idOffice', value: this.idOffice}
         ],
       }
     ] : [];
-    this.cardProperties.showCreateNemElementButton = this.editPermission;
     if (success) {
-
       itemsProperties.unshift(...data.map(controlChangeBoard => ({
         typeCardItem: 'listControlChangeBoard',
         iconSvg: true,
@@ -167,8 +160,8 @@ export class ControlChangeBoardListComponent implements OnInit, OnDestroy {
         nameCardItem: controlChangeBoard.person.name,
         fullNameCardItem: controlChangeBoard.person.fullName,
         roles: controlChangeBoard?.memberAs?.
-        filter(ccb=> ccb.active).
-        map(ccb => `${ccb.workLocation || ''} ${ccb.role}`),
+          filter(ccb => ccb.active).
+          map(ccb => `${ccb.workLocation || ''} ${this.translateSvr.instant(ccb.role)}`),
         itemId: controlChangeBoard.person.id,
         menuItems: [{
           label: this.translateSvr.instant('delete'), icon: 'fas fa-trash-alt',
@@ -198,66 +191,6 @@ export class ControlChangeBoardListComponent implements OnInit, OnDestroy {
       this.totalRecords = this.cardItemsProperties && this.cardItemsProperties.length;
     }
   };
-
-  handleEditFilter(event) {
-    const idFilter = event.filter;
-    if (idFilter) {
-      const filterProperties = this.loadFilterPropertiesList();
-      this.filterSrv.setFilterProperties(filterProperties);
-      this.setBreadcrumbStorage();
-      this.router.navigate(['/filter-dataview'], {
-        queryParams: {
-          id: idFilter,
-          entityName: 'controlChangeBoard'
-        }
-      });
-    }
-  }
-
-  async handleSelectedFilter(event) {
-    const idFilter = event.filter;
-    if (idFilter) {
-      this.idFilterSelected = idFilter;
-      await this.loadControlChangeBoard();
-    }
-  }
-
-  handleNewFilter() {
-    const filterProperties = this.loadFilterPropertiesList();
-    this.filterSrv.setFilterProperties(filterProperties);
-    this.setBreadcrumbStorage();
-    this.router.navigate(['/filter-dataview'], {
-      queryParams: {
-        entityName: 'controlChangeBoard'
-      }
-    });
-  }
-
-  loadFilterPropertiesList() {
-    const listProperties = FilterDataviewPropertiesEntity.domains;
-    const filterPropertiesList = listProperties.map(prop => {
-      const property = new PropertyTemplateModel();
-      property.type = prop.type;
-      property.label = prop.label;
-      property.name = prop.apiValue;
-      property.active = true;
-      return property;
-    });
-    return filterPropertiesList;
-  }
-
-  setBreadcrumbStorage() {
-    this.breadcrumbSrv.setBreadcrumbStorage([{
-      key: 'changeControlBoard',
-      routerLink: ['/workpack/change-control-board'],
-      queryParams: {
-        idProject: this.idProject,
-      },
-    }, {
-      key: 'filter',
-      routerLink: ['filter-dataview']
-    }]);
-  }
 
   createNewControlChangeBoard() {
     this.router.navigate(['/workpack/change-control-board/member'], { queryParams: { idProject: this.idProject } });

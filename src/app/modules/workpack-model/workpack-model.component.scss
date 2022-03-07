@@ -131,6 +131,65 @@
       width: 100%;
     }
   }
+  .dashboard-show-options {
+    padding-top: 0.5em;
+    padding-bottom: 0.5em;
+    display: flex;
+    flex-direction: column;
+    label {
+      padding-bottom: 0.5em;
+    }
+    .p-multiselect.p-multiselect-chip {
+      min-width: 40%;
+    }
+    .p-multiselect.p-multiselect-chip .p-multiselect-token {
+      background-color: #e5e5e4 !important;
+    }
+    .p-multiselect:hover {
+      border: 1px solid #ced4da;
+    }
+    .p-multiselect-panel .p-multiselect-items .p-multiselect-item.p-highlight {
+      background-color: rgba($color: #44B39B, $alpha: 0.4);
+    }
+    .p-multiselect-panel .p-multiselect-items .p-multiselect-item:focus {
+      box-shadow: none;
+    }
+    .p-checkbox .p-checkbox-box.p-highlight {
+      border: 2px solid #ced4da;
+      background-color: #ffff; 
+    }
+    .p-checkbox .p-checkbox-box:hover {
+      border: 2px solid #ced4da;
+    }
+    .p-checkbox .p-checkbox-box .p-checkbox-icon {
+      color: #495057;
+    }
+    .p-multiselect-filter-container .p-inputtext:enabled:focus {
+      border: 2px solid #ced4da !important;
+      box-shadow: none !important;
+    }
+    .p-multiselect-filter-container .p-inputtext:hover {
+      border: 2px solid #ced4da !important;
+      box-shadow: none !important;
+    }
+  }
+  .toggles-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    padding: 1em 0;
+    .toggle-item {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      width: 10%;
+      padding-bottom: 0.5em;
+      label {
+        color: #004660;
+      }
+    }
+  }
   .app-single-selection .p-dropdown {
     min-width: 200px;
 

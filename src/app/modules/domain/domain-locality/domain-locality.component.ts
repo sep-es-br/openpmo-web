@@ -1,3 +1,4 @@
+import { IFilterProperty } from 'src/app/shared/interfaces/IFilterProperty';
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -81,7 +82,7 @@ export class DomainLocalityComponent implements OnInit, OnDestroy {
     private domainSrv: DomainService,
     private filterSrv: FilterDataviewService
   ) {
-    this.activeRoute.queryParams.subscribe(async({ id, idOffice, idDomain, type, idParent }) => {
+    this.activeRoute.queryParams.subscribe(async ({ id, idOffice, idDomain, type, idParent }) => {
       this.idLocality = +id;
       this.idOffice = +idOffice;
       this.idDomain = +idDomain;
@@ -95,13 +96,13 @@ export class DomainLocalityComponent implements OnInit, OnDestroy {
           key: 'administration',
           info: this.propertiesOffice?.name,
           tooltip: this.propertiesOffice?.fullName,
-          routerLink: [ '/configuration-office' ],
+          routerLink: ['/configuration-office'],
           queryParams: { idOffice: this.idOffice }
         },
         {
-          key: 'domains',
-          info: this.propertiesOffice?.name,
-          tooltip: this.propertiesOffice?.fullName,
+          key: 'configuration',
+          info: 'domains',
+          tooltip: this.translateSrv.instant('domains'),
           routerLink: ['/domains'],
           queryParams: { idOffice: this.idOffice }
         },
@@ -137,7 +138,7 @@ export class DomainLocalityComponent implements OnInit, OnDestroy {
       return success
         ? [
           ...data.map((l, i) => ({
-            key: l.type.toLowerCase(),
+            key: l.type.toLowerCase() === 'root' ? 'localityRoot' : l.type.toLowerCase(),
             info: l?.name,
             tooltip: l?.fullName,
             routerLink: ['/domains', 'locality'],
@@ -170,6 +171,9 @@ export class DomainLocalityComponent implements OnInit, OnDestroy {
 
   async ngOnInit() {
     this.isUserAdmin = await this.authSrv.isUserAdmin();
+    if (!this.isUserAdmin && !this.editPermission) {
+      this.router.navigate(['/offices']);
+    }
     await this.loadCards();
   }
 
@@ -203,8 +207,10 @@ export class DomainLocalityComponent implements OnInit, OnDestroy {
     };
   }
 
-  async loadPropertiesLocality() {
-    await this.loadFiltersLocalities();
+  async loadPropertiesLocality(filterSelected?: boolean) {
+    if (!filterSelected) {
+      await this.loadFiltersLocalities();
+    }
     if (this.idLocality) {
       const { success, data } =
         await this.localitySvr.getLocalityById(this.idLocality, { idFilter: this.idFilterSelected });
@@ -284,12 +290,12 @@ export class DomainLocalityComponent implements OnInit, OnDestroy {
           { name: 'idDomain', value: (this.propertiesLocality?.domain ? this.propertiesLocality?.domain?.id : this.propertiesLocality?.domainRoot && this.propertiesLocality?.domainRoot?.id) },
           { name: 'idParent', value: this.idLocality },
           { name: 'idOffice', value: this.idOffice },
-          { name: 'type', value: this.propertiesLocality?.children ? this.propertiesLocality.children[0].type : undefined }
+          { name: 'type', value: this.propertiesLocality?.children ? this.propertiesLocality?.children[0]?.type : undefined }
         ]
       }
     ] : [];
     this.cardLocalities.showCreateNemElementButton = this.editPermission && this.propertiesLocality
-    && this.propertiesLocality.children ? true : false;
+      && this.propertiesLocality.children ? true : false;
     if (this.propertiesLocality?.children) {
       itemsChildrenLocalities.unshift(...this.propertiesLocality.children.map(locality => (
         {
@@ -399,10 +405,9 @@ export class DomainLocalityComponent implements OnInit, OnDestroy {
 
   async handleSelectedFilter(event) {
     const idFilter = event.filter;
-    if (idFilter) {
-      this.idFilterSelected = idFilter;
-      await this.loadPropertiesLocality();
-    }
+    this.idFilterSelected = idFilter;
+    const filterSelected = idFilter !== null;
+    await this.loadPropertiesLocality(filterSelected);
   }
 
   async handleNewFilter() {
@@ -419,12 +424,13 @@ export class DomainLocalityComponent implements OnInit, OnDestroy {
   loadFilterPropertiesList() {
     const listProperties = FilterDataviewPropertiesEntity.localities;
     const filterPropertiesList = listProperties.map(prop => {
-      const property = new PropertyTemplateModel();
-      property.type = prop.type;
-      property.label = prop.label;
-      property.name = prop.apiValue;
-      property.active = true;
-      property.possibleValues = prop.possibleValues;
+      const property: IFilterProperty = {
+        type: prop.type,
+        label: prop.label,
+        name: prop.apiValue,
+        active: true,
+        possibleValues: prop.possibleValues
+      }
       return property;
     });
     return filterPropertiesList;
@@ -433,9 +439,16 @@ export class DomainLocalityComponent implements OnInit, OnDestroy {
   async setBreadcrumbStorage() {
     this.breadcrumbSrv.setBreadcrumbStorage([
       {
-        key: 'domains',
+        key: 'administration',
         info: this.propertiesOffice?.name,
         tooltip: this.propertiesOffice?.fullName,
+        routerLink: ['/configuration-office'],
+        queryParams: { idOffice: this.idOffice }
+      },
+      {
+        key: 'configuration',
+        info: 'domains',
+        tooltip: this.translateSrv.instant('domains'),
         routerLink: ['/domains'],
         queryParams: { idOffice: this.idOffice }
       },

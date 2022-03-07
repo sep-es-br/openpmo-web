@@ -1,3 +1,4 @@
+import { IFilterProperty } from 'src/app/shared/interfaces/IFilterProperty';
 import { TypePropertyModelEnum } from './../../../../shared/enums/TypePropertyModelEnum';
 import { PropertyTemplateModel } from './../../../../shared/models/PropertyTemplateModel';
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
@@ -9,12 +10,14 @@ import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 })
 export class FilterRulePropertyComponent implements OnInit {
 
-  @Input() property: PropertyTemplateModel;
+  @Input() property: IFilterProperty;
+  @Input() value: string | number | boolean | string[] | Date | number[];
   @Output() changed = new EventEmitter();
 
   types = TypePropertyModelEnum;
 
   ngOnInit() {
   }
+
 
 }

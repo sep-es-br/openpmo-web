@@ -16,6 +16,7 @@ export interface IBaseline {
   cost?: ICostBaseline;
   schedule?: IScheduleBaseline;
   scope?: IScopeBaseline;
+  default?: boolean;
 }
 
 export interface IBaselineUpdates {

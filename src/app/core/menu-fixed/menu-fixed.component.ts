@@ -1,3 +1,4 @@
+import { CookieService } from 'ngx-cookie';
 import { Location } from '@angular/common';
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
@@ -16,6 +17,7 @@ import { OfficeService } from 'src/app/shared/services/office.service';
 import { PlanService } from 'src/app/shared/services/plan.service';
 import { ResponsiveService } from 'src/app/shared/services/responsive.service';
 import { TranslateChangeService } from 'src/app/shared/services/translate-change.service';
+import * as moment from 'moment';
 
 @Component({
   selector: 'app-menu-fixed',
@@ -64,7 +66,8 @@ export class MenuFixedComponent implements OnInit, OnDestroy {
     private locationSrv: Location,
     private officeSrv: OfficeService,
     private officePermissionSrv: OfficePermissionService,
-    private planSrv: PlanService
+    private planSrv: PlanService,
+    private cookieSrv: CookieService
   ) {
     this.menuSrv.getMenuState.pipe(takeUntil(this.$destroy)).subscribe(menuState => {
       this.isFixed = menuState.isFixed;
@@ -83,7 +86,11 @@ export class MenuFixedComponent implements OnInit, OnDestroy {
       .subscribe(() => this.handleChangeLanguage());
     this.menuSrv.isAdminMenu.pipe(takeUntil(this.$destroy)).subscribe(isAdminMenu => {
       this.isAdminMenu = isAdminMenu;
-      this.updateMenuOfficeOnAdminChange();
+      if (!!this.isAdminMenu) {
+        this.updateMenuOfficeOnAdminChange();
+      } else {
+        this.loadOfficeMenu()
+      }
     });
     this.officeSrv.observableIdOffice().pipe(takeUntil(this.$destroy)).subscribe(async id => {
       this.currentIDOffice = id;
@@ -148,10 +155,19 @@ export class MenuFixedComponent implements OnInit, OnDestroy {
 
   handleChangeMenuMode() {
     this.isFixed = false;
+    this.setCookieMenuMode();
     const itemsOffice = this.menus[0].isOpen ? this.itemsOffice : [];
     const itemsPortfolio = this.menus[1].isOpen ? this.itemsPorfolio : [];
     this.menuSrv.nextMenuState({ isFixed: this.isFixed, menus: this.menus, itemsOffice, itemsPorfolio: itemsPortfolio });
     this.ngOnDestroy();
+  }
+
+  setCookieMenuMode() {
+    const date = moment().add(60, 'days').calendar();
+    const user = this.authSrv.getTokenPayload();
+    if (user && user.email) {
+      this.cookieSrv.put('menuMode' + user.email, 'false', { expires: date });
+    }
   }
 
   updateMenuOfficeOnAdminChange() {
@@ -195,7 +211,11 @@ export class MenuFixedComponent implements OnInit, OnDestroy {
         styleClass: `office-${office.id} ${this.currentURL === `offices/office?id=${office.id}` ? 'active' : ''}`,
         command: (e) => {
           if (e.originalEvent?.target?.classList?.contains('p-menuitem-text')) {
-            this.router.navigate(['/offices', 'office'], { queryParams: { id: office.id } });
+            if (this.isAdminMenu) {
+              this.router.navigate(['/configuration-office'], { queryParams: { idOffice: office.id } });
+            } else {
+              this.router.navigate(['/offices', 'office'], { queryParams: { id: office.id } });
+            }
             this.closeAllMenus();
           }
         },

@@ -19,10 +19,14 @@ export interface IScheduleDetail {
   idWorkpack?: number;
   start: Date;
   end: Date;
+  baselineStart?: Date;
+  baselineEnd?: Date;
   actual: number;
   actualCost: number;
   planed: number;
+  baselinePlaned?: number;
   planedCost: number;
+  baselineCost?: number;
   groupStep: IGroupStep[];
 }
 
@@ -35,6 +39,7 @@ export interface IStep {
   id?: number;
   idSchedule?: number;
   plannedWork: number;
+  baselinePlannedWork?: number;
   actualWork: number;
   periodFromStart?: Date;
   consumes?: IConsume[];
@@ -44,6 +49,7 @@ export interface IConsume {
   id: number;
   actualCost: number;
   plannedCost: number;
+  baselinePlannedCost?: number;
   costAccount: {
     id: number;
   };

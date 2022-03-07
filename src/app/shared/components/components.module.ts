@@ -13,6 +13,12 @@ import { ConfigDataViewPanelComponent } from './config-data-view-panel/config-da
 import { AvatarModule } from 'primeng/avatar';
 import { BaselineCardItemComponent } from './baseline-card-item/baseline-card-item.component';
 import { CardItemFileComponent } from './card-item-file/card-item-file.component';
+import { DoughnutChartComponent } from './dashboards/doughnut-chart/doughnut-chart.component';
+import { GaugeChartComponent } from './dashboards/gauge-chart/gauge-chart.component';
+import { WorkpackCardItemComponent } from './workpack-card-item/workpack-card-item.component';
+import { CostConstraintComponent } from './dashboards/cost-constraint/cost-constraint.component';
+import { ScheduleConstraintComponent } from './dashboards/schedule-constraint/schedule-constraint.component';
+import { ScopeConstraintComponent } from './dashboards/scope-constraint/scope-constraint.component';
 
 @NgModule({
   declarations: [
@@ -26,6 +32,12 @@ import { CardItemFileComponent } from './card-item-file/card-item-file.component
     ConfigDataViewPanelComponent,
     BaselineCardItemComponent,
     CardItemFileComponent,
+    DoughnutChartComponent,
+    GaugeChartComponent,
+    WorkpackCardItemComponent,
+    CostConstraintComponent,
+    ScheduleConstraintComponent,
+    ScopeConstraintComponent,
   ],
   imports: [
     CommonModule,
@@ -44,7 +56,13 @@ import { CardItemFileComponent } from './card-item-file/card-item-file.component
     InputUnitMeasureComponent,
     ConfigDataViewPanelComponent,
     BaselineCardItemComponent,
-    CardItemFileComponent
+    CardItemFileComponent,
+    DoughnutChartComponent,
+    GaugeChartComponent,
+    WorkpackCardItemComponent,
+    CostConstraintComponent,
+    ScheduleConstraintComponent,
+    ScopeConstraintComponent
   ]
 })
 export class ComponentsModule { }

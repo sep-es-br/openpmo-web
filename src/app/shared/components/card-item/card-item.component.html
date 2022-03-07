@@ -11,8 +11,8 @@
         <i class="fas fa-tools" (click)="navigateToPage(properties.urlMenuConfig, properties.paramsUrlMenuConfig)"></i>
       </div>
     </p-header>
-    <div class="card-item-content" [class.card-link]="properties.urlCard" [routerLink]="properties.urlCard"
-      [class.cardList]="displayModeCard === 'list'" [queryParams]="getQueryParams()">
+    <div class="card-item-content" [class.card-link]="properties.urlCard" (click)="handleNavigateToPage()"
+      [class.cardList]="displayModeCard === 'list'">
       <div class="icons-container">
         <i [ngClass]="properties.iconSvg ? [ 'app-icon', properties.icon, 'grey-icon'] : [ 'icon-card', properties.icon, 'grey-icon' ]"
           [class.risk-red]="properties.iconColor === 'high'" [class.risk-orange]="properties.iconColor === 'medium'"
@@ -71,7 +71,8 @@
       (click)="navigateToPage(properties.urlCard, properties.paramsUrlCard)">
       <i [ngClass]="properties.iconSvg ? [ 'app-icon', properties.icon, 'grey-icon'] : [ 'icon-card', properties.icon, 'grey-icon' ]"
         [ngStyle]="{ fontSize: '2.5rem' }"></i>
-      <span class="card-item-name">{{properties.nameCardItem}}</span>
+      <span class="card-item-name" [pTooltip]="properties.fullNameCardItem"
+        tooltipPosition="bottom">{{properties.nameCardItem}}</span>
       <span class="card-item-subtitle" *ngIf="properties.subtitleCardItem">{{properties.subtitleCardItem}}</span>
     </div>
     <div class="card-item-footer" *ngIf="cardIdItem">
@@ -106,8 +107,8 @@
 
   <p-card *ngSwitchCase="'listItemPermissionWorkpack'" class="app-card-item listItem" [class.mobile]="responsive"
     [class.cardList]="displayModeCard === 'list'">
-    <p-header class="card-item-header">
-      <button class="button-change" pButton [label]="' ' | translate" [routerLink]="properties.urlCard"
+    <p-header class="card-item-header" [class.header-fixed]="!!properties.profileView">
+      <button class="button-change" pButton [label]="' ' | translate" [routerLink]="properties.urlCard" *ngIf="!properties.profileView"
         [queryParams]="getQueryParams()">
         <i class="fas fa-share"></i>
       </button>
@@ -121,7 +122,7 @@
       <span class="card-item-subtitle" *ngIf="properties.subtitleCardItem"
         [class.subtitle-card-risk]="properties.statusItem">{{properties.subtitleCardItem}}</span>
       <span class="card-item-subtitle" *ngIf="properties.statusItem"
-        [class.subtitle-card-risk]="properties.statusItem">{{properties.statusItem}}</span>
+        [class.subtitle-card-risk]="properties.statusItem">{{properties.statusItem|translate}}</span>
     </div>
     <div class="card-item-footer" *ngIf="cardIdItem">
       <span class="card-item-id">
@@ -172,7 +173,7 @@
   </p-card>
   <p-card *ngSwitchCase="'listPersons'" class="app-card-item listItem" [class.mobile]="responsive"
     [class.cardList]="displayModeCard === 'list'">
-    <p-header *ngIf="properties.menuItems" class="card-item-header">
+    <!-- <p-header *ngIf="properties.menuItems" class="card-item-header">
       <p-menu #menu [popup]="true" [model]="properties.menuItems"></p-menu>
       <button type="button" pButton icon="pi pi-ellipsis-v" [class.hidden]="!properties.menuItems.length"
         (click)="menu.toggle($event)"></button>
@@ -181,21 +182,21 @@
       <div class="menu-config">
         <i class="fas fa-tools" (click)="navigateToPage(properties.urlMenuConfig, properties.paramsUrlMenuConfig)"></i>
       </div>
-    </p-header>
+    </p-header> -->
     <div class="card-item-content" [class.card-link]="properties.urlCard" [routerLink]="properties.urlCard"
       [class.cardList]="displayModeCard === 'list'" [queryParams]="getQueryParams()">
       <app-avatar [edit]="false" [avatar]="properties.avatar"> </app-avatar>
       <span class="card-item-name" [pTooltip]="properties.fullNameCardItem"
         tooltipPosition="bottom">{{properties.nameCardItem}}</span>
-      <span class="card-item-subtitle" *ngIf="properties.subtitleCardItem"
+      <!-- <span class="card-item-subtitle" *ngIf="properties.subtitleCardItem"
         [class.subtitle-card-risk]="properties.statusItem">{{properties.subtitleCardItem}}</span>
       <span class="card-item-subtitle" *ngIf="properties.statusItem"
-        [class.subtitle-card-risk]="properties.statusItem">{{properties.statusItem}}</span>
+        [class.subtitle-card-risk]="properties.statusItem">{{properties.statusItem}}</span> -->
     </div>
     <div class="card-item-footer" *ngIf="cardIdItem">
-      <span class="card-item-id">
+      <!-- <span class="card-item-id">
         {{cardIdItem}}
-      </span>
+      </span> -->
     </div>
   </p-card>
 

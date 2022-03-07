@@ -1,3 +1,4 @@
+import { IFilterProperty } from './../interfaces/IFilterProperty';
 import { PropertyTemplateModel } from './../models/PropertyTemplateModel';
 import { Observable, Subject } from 'rxjs';
 import { IFilterDataview } from '../interfaces/IFilterDataview';
@@ -8,7 +9,7 @@ import { BaseService } from '../base/base.service';
 @Injectable({ providedIn: 'root' })
 export class FilterDataviewService extends BaseService<IFilterDataview> {
 
-  private currentFilterProperties: Subject<PropertyTemplateModel[]> = new Subject<PropertyTemplateModel[]>();
+  private currentFilterProperties: Subject<IFilterProperty[]> = new Subject<IFilterProperty[]>();
   private key: string = '@pmo/filter-properties';
 
   constructor(
@@ -63,13 +64,13 @@ export class FilterDataviewService extends BaseService<IFilterDataview> {
     });
   }
 
-  setFilterProperties(filterProperties: PropertyTemplateModel[]) {
+  setFilterProperties(filterProperties: IFilterProperty[]) {
     localStorage.setItem(this.key, JSON.stringify(filterProperties));
     this.currentFilterProperties.next(filterProperties);
   }
 
-  get get(): PropertyTemplateModel[] {
-    let filterProperties: PropertyTemplateModel[];
+  get get(): IFilterProperty[] {
+    let filterProperties: IFilterProperty[];
     try {
       filterProperties = JSON.parse(localStorage.getItem(this.key));
       return filterProperties;
@@ -79,7 +80,7 @@ export class FilterDataviewService extends BaseService<IFilterDataview> {
     }
   }
 
-  get ready(): Observable<PropertyTemplateModel[]> {
+  get ready(): Observable<IFilterProperty[]> {
     return this.currentFilterProperties.asObservable();
   }
 

@@ -1,4 +1,4 @@
-<div class="app-person">
+<div class="app-profile-person">
   <div class="header-container">
     <div class="app-content-header" [class.mobile]="responsive">
       <span>{{ 'profile' | translate }}</span>
@@ -10,24 +10,26 @@
         <div class="container-left-info">
           <app-avatar [edit]="true" [idPerson]="idPerson"> </app-avatar>
           <span class="name">{{propertiesPerson?.fullName}}</span>
+          <span class="administrator">{{'administrator'|translate}}</span>
           <form [formGroup]="formPerson" class="form">
             <span class="p-float-label property-input p-field">
               <input pInputText class="app-input-text" type="text" [class.responsive]="responsive"
                 formControlName="name">
-              <label class="app-input-label">{{ 'messages.labelNameProfile' | translate }} </label>
+              <label class="app-input-label profile">{{ 'messages.labelNameProfile' | translate }} </label>
             </span>
             <span class="p-float-label property-input p-field">
               <input pInputText class="app-input-text" type="text" [class.responsive]="responsive"
                 formControlName="email" [readOnly]="true">
-              <label class="app-input-label">{{ 'accessEmail' | translate }} </label>
+              <label class="app-input-label profile">{{ 'accessEmail' | translate }} </label>
             </span>
           </form>
         </div>
-        <div class="container-right-info">
-          <span class="p-float-label property-input p-field">
-            <p-dropdown class="app-single-selection" [options]="optionsOffices" optionLabel="label" [required]="true"
-             [class.responsive]="responsive" [(ngModel)]="idOffice"
-              (onChange)="handleChangeOffice($event)"></p-dropdown>
+        <div class="container-right-info" *ngIf="optionsOffices && optionsOffices.length > 0">
+          <span class="p-float-label property-input p-field list-offices-container">
+            <p-dropdown class="app-single-selection" [options]="optionsOffices" optionLabel="label" optionValue="value"
+              [required]="true" [class.responsive]="responsive" [(ngModel)]="idOffice"
+              (onChange)="handleChangeOffice($event)">
+            </p-dropdown>
             <label class="app-input-label">{{ 'office' | translate }} </label>
           </span>
           <section class="section">
@@ -39,72 +41,63 @@
                     formControlName="contactEmail">
                   <label class="app-input-label">{{ 'email' | translate }} </label>
                 </span>
-                <span class="p-float-label property-input p-field p-col-12 p-md-2">
+                <span class="p-float-label left property-input p-field p-col-12 p-md-2">
                   <p-inputMask mask="(99) 9 9999-9999" [class.responsive]="responsive" [unmask]="true"
-                  formControlName="phoneNumber" ></p-inputMask>
+                    formControlName="phoneNumber"></p-inputMask>
                   <label class="app-input-label">{{ 'phone' | translate }} </label>
                 </span>
               </div>
               <span class="p-float-label property-input p-field">
                 <textarea pInputTextarea class="app-text-area" [class.responsive]="responsive" formControlName="address"
-                  [rows]="2"></textarea>
+                  [rows]="1"></textarea>
                 <label class="app-input-label">{{ 'address' | translate }} </label>
               </span>
             </form>
-          </section>
-          <section class="section">
             <div class="unifique-contacts">
               <button pButton [label]="'unifyContactOffices' | translate" (click)="handleUnifyOfficesContacts($event)">
               </button>
             </div>
+          </section>
+          <section class="section" *ngIf="!isUserAdmin">
             <h3 class="subtitle">{{'myRolesPermissions' | translate}}</h3>
             <div class="container-permission">
               <div class="permission">
                 <span class="label">{{'officePermission' | translate}}</span>
-                <span class="value">{{propertiesPerson?.officePermission?.accessLevel | translate}}</span>
+                <span class="value"
+                  *ngIf="['EDIT', 'READ'].includes(propertiesPerson?.officePermission?.accessLevel)">{{propertiesPerson?.officePermission?.accessLevel
+                  | translate}}</span>
               </div>
-              <div class="button-change">
+              <!-- <div class="button-change">
                 <button pButton [label]="'change' | translate"
                 (click)="navigateToPage('offices/permission/detail', this.propertiesPerson.email, this.idOffice)">
                   <i class="fas fa-share"></i>
                 </button>
-              </div>
+              </div> -->
             </div>
-
             <ng-container *ngFor="let cardPlan of cardsPlans; let i = index">
-              <div class="card-container">
+              <div class="card-plan-container">
                 <app-card [properties]="cardPlan" class="mt-0">
                   <div class="container-permission">
                     <div class="permission">
-                      <span class="label">{{'planPermission' | translate}}</span>
-                      <span class="value">{{propertiesPerson?.officePermission?.planPermissions[i].accessLevel | translate}}</span>
+                      <span class="label">{{'planPermission' |translate}}</span>
+                      <span class="value"
+                        *ngIf="['EDIT', 'READ'].includes(propertiesPerson?.officePermission?.planPermissions[i]?.accessLevel)">
+                        {{propertiesPerson?.officePermission?.planPermissions[i]?.accessLevel |translate}}</span>
                     </div>
-                    <div class="button-change">
+                    <!-- <div class="button-change">
                       <button pButton [label]="'change' | translate"
                       (click)="navigateToPage('plan/permission/detail',
                       this.propertiesPerson.email, undefined, propertiesPerson?.officePermission?.planPermissions[i].id)">
                         <i class="fas fa-share"></i>
                       </button>
-                    </div>
+                    </div> -->
                   </div>
                   <p-dataView [value]="cardPlan.cardItems" layout="grid" class="app-dataview"
-                    *ngIf="displayModeAll === 'grid'" [paginator]="true" [rows]="pageSize"
-                    [showJumpToPageDropdown]="true" [showPageLinks]="false" [totalRecords]="totalRecords"
+                    *ngIf="cardPlan?.cardItems?.length > 0"
                     [emptyMessage]="(!cardPlan.cardItems ? 'loadingEllipsis' : 'noContent') | translate">
                     <ng-template let-cardItem pTemplate="gridItem">
                       <div class="p-col-12 p-md-3 p-sm-12 card-item-container">
                         <app-card-item [properties]="cardItem"></app-card-item>
-                      </div>
-                    </ng-template>
-                  </p-dataView>
-
-                  <p-dataView [value]="cardPlan.cardItems" layout="list" class="app-dataview app-dataview-list"
-                    *ngIf="displayModeAll === 'list'" [paginator]="true" [rows]="pageSize"
-                    [showJumpToPageDropdown]="true" [showPageLinks]="false" [totalRecords]="totalRecords"
-                    [emptyMessage]="(!cardPlan.cardItems ? 'loadingEllipsis' : 'noContent') | translate">
-                    <ng-template let-cardItem pTemplate="listItem">
-                      <div class="p-col-12">
-                        <app-card-item [properties]="cardItem" [displayModeCard]="displayModeAll"></app-card-item>
                       </div>
                     </ng-template>
                   </p-dataView>

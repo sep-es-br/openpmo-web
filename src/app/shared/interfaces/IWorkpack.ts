@@ -1,3 +1,4 @@
+import { IMilestoneDashboard, ITripleConstraintDashboard } from './IDashboard';
 import { TypeWorkpackEnum } from '../enums/TypeWorkpackEnum';
 import { TypeWorkpackModelEnum } from '../enums/TypeWorkpackModelEnum';
 import { IWorkpackModel } from './IWorkpackModel';
@@ -33,6 +34,11 @@ export interface IWorkpack {
       stakeholderSessionActive?: boolean;
       riskAndIssueManagementSessionActive?: boolean;
       processesManagementSessionActive?: boolean;
+      dashboardSessionActive?: boolean;
+      dashboardShowEva?: boolean;
+      dashboardShowMilestones?: boolean;
+      dashboardShowRisks?: boolean;
+      dashboardShowStakeholders?: string[];
     };
     plan?: {
       fullName: string;
@@ -63,8 +69,33 @@ export interface IWorkpack {
     pendingBaseline?: boolean;
     cancelPropose?: boolean;
     hasActiveBaseline?: boolean;
+    activeBaselineName?: string;
     canceled?: boolean;
     cancelable?: boolean;
+    completed?: boolean;
+    endManagementDate?: string;
+    reason?: string;
+    dashboard?: {
+      risk?: {
+        high: number,
+        low: number,
+        medium: number,
+        total: number 
+      },
+      milestone?: IMilestoneDashboard,
+      tripleConstraint?: ITripleConstraintDashboard,
+      costPerformanceIndex: {
+        costVariation: number,
+        indexValue: number
+      },
+      schedulePerformanceIndex: {
+        indexValue: number,
+        scheduleVariation: number
+      },
+      earnedValue?: number;
+    },
+    milestoneStatus?: string;
+    milestoneDate?: string;
 }
 
 interface IPermission {

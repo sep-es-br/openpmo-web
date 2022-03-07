@@ -19,6 +19,7 @@ export class ConfigDataViewPanelComponent implements OnInit, OnDestroy {
   @Output() changeDisplayMode = new EventEmitter();
   @Output() changeCollapsedExpand = new EventEmitter();
   @Output() changePageSize = new EventEmitter();
+  @Input() notShowCollapseOptions: boolean = false;
 
   collapsed = true;
   displayMode = 'grid';
@@ -55,7 +56,7 @@ export class ConfigDataViewPanelComponent implements OnInit, OnDestroy {
   }
 
   async loadUser() {
-    this.user = await this.authSrv.getTokenPayload();
+    this.user = this.authSrv.getTokenPayload();
   }
 
   loadCookiePermissionFromStorage() {

@@ -25,6 +25,8 @@ import { SaveButtonComponent } from 'src/app/shared/components/save-button/save-
 import { MenuService } from 'src/app/shared/services/menu.service';
 import { IOffice } from 'src/app/shared/interfaces/IOffice';
 import { OfficePermissionService } from 'src/app/shared/services/office-permission.service';
+import * as moment from 'moment';
+import { CookieService } from 'ngx-cookie';
 
 
 interface IWorkpackModelCard {
@@ -79,7 +81,8 @@ export class PlanComponent implements OnInit, OnDestroy {
     private menuSrv: MenuService,
     private filterSrv: FilterDataviewService,
     private router: Router,
-    private confirmationSrv: ConfirmationService
+    private confirmationSrv: ConfirmationService,
+    private cookieSrv: CookieService,
   ) {
     this.actRouter.queryParams
       .subscribe(({ id, idOffice, idPlanModel }) => {
@@ -120,6 +123,7 @@ export class PlanComponent implements OnInit, OnDestroy {
   async ngOnInit() {
     if (this.idPlan) {
       this.setCurrentPlanStorage();
+      this.setWorkPlanUser();
     }
     this.isUserAdmin = await this.authSrv.isUserAdmin();
     this.calendarFormat = this.translateSrv.instant('dateFormat');
@@ -127,6 +131,14 @@ export class PlanComponent implements OnInit, OnDestroy {
 
   setCurrentPlanStorage() {
     localStorage.setItem('@currentPlan', this.idPlan.toString());
+  }
+
+  setWorkPlanUser() {
+    const date = moment().add(60, 'days').calendar();
+    const user = this.authSrv.getTokenPayload();
+    if (user && user.email) {
+      this.cookieSrv.put('planWorkUser' + user.email, this.idPlan.toString(), { expires: date });
+    }
   }
 
   handleChangeCollapseExpandPanel(event) {
@@ -163,13 +175,13 @@ export class PlanComponent implements OnInit, OnDestroy {
         info: this.propertiesOffice?.name,
         tooltip: this.propertiesOffice?.fullName
       },
-      {
-        key: 'plan',
-        routerLink: ['/plan'],
-        queryParams: { id: this.idPlan },
-        info: this.planData?.name,
-        tooltip: this.planData?.fullName
-      }
+      // {
+      //   key: 'plan',
+      //   routerLink: ['/plan'],
+      //   queryParams: { id: this.idPlan },
+      //   info: this.planData?.name,
+      //   tooltip: this.planData?.fullName
+      // }
     ]);
   }
 
@@ -269,14 +281,9 @@ export class PlanComponent implements OnInit, OnDestroy {
         summary: this.translateSrv.instant('success'),
         detail: this.translateSrv.instant('messages.savedSuccessfully')
       });
-      this.breadcrumbSrv.updateLastCrumb({
-        key: 'plan',
-        routerLink: ['/plan'],
-        queryParams: { id: this.idPlan },
-        info: this.planData.name,
-        tooltip: this.planData?.fullName
-      });
+      this.setBreacrumb();
       this.menuSrv.reloadMenuOffice();
+      this.saveButton.hideButton();
       return;
     };
   }
@@ -312,7 +319,7 @@ export class PlanComponent implements OnInit, OnDestroy {
           initialStateToggle: false,
           cardTitle: workpackModel.modelNameInPlural,
           collapseble: true,
-          initialStateCollapse: false,
+          initialStateCollapse: this.collapsePanelsStatus,
           showFilters: true
         };
         const resultFilters = await this.filterSrv.getAllFilters(`workpackModels/${workpackModel.id}/workpacks`);
@@ -374,9 +381,8 @@ export class PlanComponent implements OnInit, OnDestroy {
           command: (event) => this.handleCutWorkpack(workpack),
         });
       }
-
       return {
-        typeCardItem: 'listItem',
+        typeCardItem: workpack.type,
         icon: workpack.model.fontIcon,
         iconSvg: false,
         nameCardItem: propertyNameWorkpack?.value as string,
@@ -390,7 +396,11 @@ export class PlanComponent implements OnInit, OnDestroy {
         ] : [{ name: 'idPlan', value: this.idPlan }],
         editPermission: workpackEditPermission,
         linked: !!workpack.linked ? true : false,
-        shared: workpack.sharedWith && workpack.sharedWith.length > 0 ? true : false
+        shared: workpack.sharedWith && workpack.sharedWith.length > 0 ? true : false,
+        canceled: workpack.canceled,
+        completed: workpack.completed,
+        endManagementDate: workpack.endManagementDate,
+        dashboard: workpack.dashboard
       };
     });
 
@@ -510,7 +520,7 @@ export class PlanComponent implements OnInit, OnDestroy {
     const result = await this.workpackSrv.checkPasteWorkpack(workpackCuted.id, idWorkpackModelTo, {
       idWorkpackModelFrom: workpackCuted.model.id,
     });
-    if(result.success) {
+    if (result.success) {
       return result.data;
     } else {
       return {} as any
@@ -572,9 +582,7 @@ export class PlanComponent implements OnInit, OnDestroy {
 
   async handleSelectedFilter(event, idWorkpackModel: number) {
     const idFilter = event.filter;
-    if (idFilter) {
-      await this.reloadWorkpacksOfWorkpackModelSelectedFilter(idFilter, idWorkpackModel);
-    }
+    await this.reloadWorkpacksOfWorkpackModelSelectedFilter(idFilter, idWorkpackModel);
   }
 
   setBreadcrumbStorage() {

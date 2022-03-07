@@ -1,5 +1,5 @@
 @use "src/variables" as v;
-.app-organization {
+::ng-deep .app-organization {
   width: 100%;
 
   .mobile {

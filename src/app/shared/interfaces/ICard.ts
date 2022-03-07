@@ -22,14 +22,23 @@ export interface ICard {
   progressBarValues?: progressBarValue[];
   onToggle?: EventEmitter<boolean>;
   cardItems?: ICardItem[];
+  showCheckCompleted?: boolean;
+  workpackCompleted?: boolean;
+  showFullScreen?: boolean;
+  fullScreen?: boolean;
 }
 
 export interface progressBarValue {
   total: number;
-  progress: number;
+  progress?: number;
   labelTotal: string;
-  labelProgress: string;
+  labelProgress?: string;
   valueUnit: string;
   color: string;
   barHeight: number;
+  baselinePlanned?: number;
+  startDateBaseline?: Date;
+  endDateBaseline?: Date;
+  startDateTotal?: Date;
+  endDateTotal?: Date;
 }

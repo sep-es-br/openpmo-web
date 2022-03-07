@@ -1,3 +1,4 @@
+import { IFilterProperty } from 'src/app/shared/interfaces/IFilterProperty';
 import { PropertyTemplateModel } from './../../shared/models/PropertyTemplateModel';
 import { FilterDataviewPropertiesEntity } from './../../shared/constants/filterDataviewPropertiesEntity';
 import { FilterDataviewService } from './../../shared/services/filter-dataview.service';
@@ -41,7 +42,6 @@ export class MeasureUnitComponent implements OnInit {
   editPermission: boolean;
   responsive: boolean;
   validatorsPrecision = [Validators.required, Validators.min(0), Validators.max(5)];
-  collapsePanelsStatus = true;
   displayModeAll = 'grid';
   pageSize = 5;
   totalRecords: number;
@@ -72,7 +72,7 @@ export class MeasureUnitComponent implements OnInit {
     this.cardProperties = {
       toggleable: false,
       initialStateToggle: false,
-      cardTitle: 'measureUnits',
+      cardTitle: '',
       collapseble: false,
       initialStateCollapse: false,
     };
@@ -86,25 +86,17 @@ export class MeasureUnitComponent implements OnInit {
         key: 'administration',
         info: this.propertiesOffice?.name,
         tooltip: this.propertiesOffice?.fullName,
-        routerLink: [ '/configuration-office' ],
+        routerLink: ['/configuration-office'],
         queryParams: { idOffice: this.idOffice }
       },
       {
-      key: 'measureUnits',
-      info: this.propertiesOffice?.name,
-      tooltip: this.propertiesOffice?.fullName,
-      routerLink: ['/measure-units'],
-      queryParams: { idOffice: this.idOffice }
-    }
-  ]);
-  }
-
-  handleChangeCollapseExpandPanel(event) {
-    this.collapsePanelsStatus = event.mode === 'collapse' ? true : false;
-    this.cardProperties = Object.assign({}, {
-      ...this.cardProperties,
-      initialStateCollapse: this.collapsePanelsStatus
-    });
+        key: 'configuration',
+        info: 'measureUnits',
+        tooltip: this.translateSrv.instant('measureUnits'),
+        routerLink: ['/measure-units'],
+        queryParams: { idOffice: this.idOffice }
+      }
+    ]);
   }
 
   handleChangeDisplayMode(event) {
@@ -201,7 +193,7 @@ export class MeasureUnitComponent implements OnInit {
 
   async handleOnSubmit() {
     const formItemsChanged = this.formsMeasureUnits.filter(item => item.form.dirty && item.form.valid);
-    formItemsChanged.forEach(async({ form, id }) => {
+    formItemsChanged.forEach(async ({ form, id }) => {
       const { success, data } = form.value.id
         ? await this.measureUnitSvr.put(form.value)
         : await this.measureUnitSvr.post({ ...form.value, idOffice: this.idOffice });
@@ -328,10 +320,8 @@ export class MeasureUnitComponent implements OnInit {
 
   async handleSelectedFilter(event) {
     const idFilter = event.filter;
-    if (idFilter) {
-      this.idFilterSelected = idFilter;
-      await this.loadMeasureUnitList();
-    }
+    this.idFilterSelected = idFilter;
+    await this.loadMeasureUnitList();
   }
 
   handleNewFilter() {
@@ -348,11 +338,12 @@ export class MeasureUnitComponent implements OnInit {
   loadFilterPropertiesList() {
     const listProperties = FilterDataviewPropertiesEntity.unitMeasures;
     const filterPropertiesList = listProperties.map(prop => {
-      const property = new PropertyTemplateModel();
-      property.type = prop.type;
-      property.label = prop.label;
-      property.name = prop.apiValue;
-      property.active = true;
+      const property: IFilterProperty = {
+        type: prop.type,
+        label: prop.label,
+        name: prop.apiValue,
+        active: true,
+      }
       return property;
     });
     return filterPropertiesList;
@@ -360,9 +351,16 @@ export class MeasureUnitComponent implements OnInit {
 
   setBreadcrumbStorage() {
     this.breadcrumbSrv.setBreadcrumbStorage([{
-      key: 'measureUnits',
+      key: 'administration',
       info: this.propertiesOffice?.name,
       tooltip: this.propertiesOffice?.fullName,
+      routerLink: ['/configuration-office'],
+      queryParams: { idOffice: this.idOffice }
+    },
+    {
+      key: 'configuration',
+      info: 'measureUnits',
+      tooltip: this.translateSrv.instant('measureUnits'),
       routerLink: ['/measure-units'],
       queryParams: { idOffice: this.idOffice }
     }, {

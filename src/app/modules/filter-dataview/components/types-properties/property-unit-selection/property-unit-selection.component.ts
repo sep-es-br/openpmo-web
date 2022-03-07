@@ -1,3 +1,4 @@
+import { IFilterProperty } from 'src/app/shared/interfaces/IFilterProperty';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { PropertyTemplateModel } from 'src/app/shared/models/PropertyTemplateModel';
 import { ResponsiveService } from 'src/app/shared/services/responsive.service';
@@ -9,7 +10,8 @@ import { ResponsiveService } from 'src/app/shared/services/responsive.service';
 })
 export class PropertyUnitSelectionComponent implements OnInit {
 
-  @Input() property: PropertyTemplateModel;
+  @Input() property: IFilterProperty;
+  @Input() value: string | number | boolean | string[] | Date | number[];
   @Output() changed = new EventEmitter();
   responsive: boolean;
 
@@ -22,6 +24,10 @@ export class PropertyUnitSelectionComponent implements OnInit {
    }
 
   ngOnInit(): void {
+  }
+
+  handleChangedValue() {
+    this.changed.next({value: this.value})
   }
 
 }

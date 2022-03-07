@@ -297,8 +297,8 @@ export class PlanPermissionsComponent implements OnInit, OnDestroy {
         ],
         selectedOption: p.level
       }));
-      const rolesNotPermissions = this.permission.permissions ? this.permission.person.roles
-        .filter(r => this.permission.permissions.filter(p => p.role === r.role).length === 0) : this.permission.person.roles;
+      const rolesNotPermissions = this.permission?.permissions ? this.permission?.person?.roles
+        .filter(r => this.permission?.permissions.filter(p => p.role === r.role).length === 0) : this.permission?.person?.roles;
       if (rolesNotPermissions) {
         rolesNotPermissions.forEach(r => {
           if (this.cardItemsPlanPermission && this.cardItemsPlanPermission.length > 0) {

@@ -16,6 +16,7 @@ export class ProgressBarCardStepComponent implements OnInit {
 
   @Input() total: number;
   @Input() progress: number;
+  @Input() baseline: number;
   @Input() labelProgress: string;
   @Input() labelTotal: string;
   @Input() color: string;
@@ -44,6 +45,9 @@ export class ProgressBarCardStepComponent implements OnInit {
 
   ngOnInit(): void {
     this.setLanguage();
+    if (!this.baseline) {
+      this.baseline = 0;
+    }
   }
 
   ngOnDestroy(): void {

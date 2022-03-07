@@ -88,10 +88,13 @@ export class StrategyComponent implements OnDestroy {
         this.propertiesOffice = resultOffice.data;
       }
       this.editPermission = await this.officePermissionSrv.getPermissions(this.idOffice);
-      this.loadCards();
       if (this.isUserAdmin === undefined) {
         this.isUserAdmin = await this.authSrv.isUserAdmin();
       }
+      if (!this.isUserAdmin && !this.editPermission) {
+        this.router.navigate(['/offices']);
+      }
+      this.loadCards();
       if (this.idStrategy) {
         await this.loadModels();
       }
@@ -106,9 +109,9 @@ export class StrategyComponent implements OnDestroy {
           queryParams: { idOffice: this.idOffice }
         },
         {
-          key: 'planModels',
-          info: this.propertiesOffice?.name,
-          tooltip: this.propertiesOffice?.fullName,
+          key: 'configuration',
+          info: 'planModels',
+          tooltip: this.translateSrv.instant('planModels'),
           routerLink: ['/strategies'],
           queryParams: { idOffice: this.idOffice }
         },

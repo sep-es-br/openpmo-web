@@ -18,6 +18,7 @@ import { FromStringArrayToSelectItemPipe } from './fromStringArrayToSelectItemPi
     FormatarTelefonePipe,
     FromStringArrayToSelectItemPipe,
     ShortNumberPipe
-  ]
+  ],
+  providers: [ShortNumberPipe]
 })
 export class PipesModule { }

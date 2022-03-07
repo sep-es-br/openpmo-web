@@ -1,0 +1,22 @@
+<div class="gauge-chart">
+  <div class="chart-container">
+    <p-chart [type]="type" [data]="data" [width]="215" [height]="132" [plugins]="plugins" [options]="options"></p-chart>
+  </div>
+  <div class="container-progress">
+    <div class="progress-content" [class.direction-left]="!progressBarRight">
+      <ng-container *ngIf="progressBarRight">
+        <span class="value blue">
+          {{config.valueProgressBar | shortNumber}}</span>
+        <span class="dividing-line"></span>
+      </ng-container>
+      <progress class="progress" [class.blue]="progressBarRight" [class.red]="!progressBarRight"
+        [value]="getNumberAbsolute(this.config.valueProgressBar)" [max]="config.maxProgressBar"> </progress>
+      <ng-container *ngIf="!progressBarRight">
+        <span class="dividing-line"></span>
+        <span class="value red" *ngIf="!config.valueProgressBar">
+          {{config.valueProgressBar | shortNumber}}</span>
+      </ng-container>
+    </div>
+    <label class="label">{{config.labelBottomProgressBar}}</label>
+  </div>
+</div>

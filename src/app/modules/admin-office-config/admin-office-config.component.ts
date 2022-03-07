@@ -1,3 +1,4 @@
+import { OfficePermissionService } from './../../shared/services/office-permission.service';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
@@ -28,8 +29,6 @@ export class AdminOfficeConfigComponent implements OnInit {
   cardItemsProperties: ICardItem[];
   idOffice: number;
   propertiesOffice: IOffice;
-
-  collapsePanelsStatus = true;
   displayModeAll = 'grid';
   responsive: boolean;
 
@@ -42,25 +41,41 @@ export class AdminOfficeConfigComponent implements OnInit {
     private breadcrumbSrv: BreadcrumbService,
     public authSrv: AuthService,
     private messageSrv: MessageService,
-    private translateSrv: TranslateService
+    private translateSrv: TranslateService,
+    private officePermissionSrv: OfficePermissionService
 
   ) {
-    this.activeRoute.queryParams.subscribe(({ idOffice }) => this.idOffice = +idOffice);
+    this.activeRoute.queryParams.subscribe( async({ idOffice }) => {
+      this.idOffice = +idOffice;
+      await this.resetConfigProperties();
+    });
     this.responsiveSrv.observable.subscribe(value => this.responsive = value);
-
   }
 
-
   async ngOnInit(): Promise<void> {
-    await this.verifyIsAdmin();
-    this.loadCardItemsProperties();
+    await this.checkPermissions();
+  }
+
+  async checkPermissions() {
+    const isAdmin = await this.authSrv.isUserAdmin();
+    const editPermission = await this.officePermissionSrv.getPermissions(this.idOffice);
+    if (!isAdmin && !editPermission) {
+      this.router.navigate(['/offices']);
+    }
+  }
+
+  async resetConfigProperties() {
+    this.propertiesOffice = undefined;
     await this.getOfficeById();
+    await this.verifyIsAdminOrEditPermission();
+    this.loadCardItemsProperties();
     this.setBreadcrumb();
   }
 
-  async verifyIsAdmin() {
+  async verifyIsAdminOrEditPermission() {
     const isAdmin = await this.authSrv.isUserAdmin();
-    if (isAdmin) {
+    const editPermission = await this.officePermissionSrv.getPermissions(this.idOffice);
+    if (isAdmin || editPermission) {
       return;
     }
     this.messageSrv.add({
@@ -140,14 +155,6 @@ export class AdminOfficeConfigComponent implements OnInit {
       routerLink: [ '/configuration-office' ],
       queryParams: { idOffice: this.idOffice }
     }]);
-  }
-
-  handleChangeCollapseExpandPanel(event) {
-    this.collapsePanelsStatus = event.mode === 'collapse' ? true : false;
-    this.cardProperties = Object.assign({}, {
-      ...this.cardProperties,
-      initialStateCollapse: this.collapsePanelsStatus
-    });
   }
 
   handleChangeDisplayMode(event) {

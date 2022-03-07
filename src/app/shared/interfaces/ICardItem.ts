@@ -1,3 +1,4 @@
+import { IBreadcrumb } from 'src/app/shared/interfaces/IBreadcrumb';
 import { MenuItem, TreeNode } from 'primeng/api';
 import { IFile } from './IFile';
 
@@ -33,5 +34,7 @@ export interface ICardItem {
   active?: boolean;
   roles?: string[];
   canceled?: boolean;
+  breadcrumbWorkpackModel?: IBreadcrumb[];
+  profileView?: boolean;
 }
 

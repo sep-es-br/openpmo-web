@@ -1,0 +1,25 @@
+.chart-doughnut {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  .legends {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    margin-bottom: 0.8rem;
+    .legend {
+      display: flex;
+      align-items: center;
+      margin-top: 0.4rem;
+      .box-color {
+        min-width: 1em;
+        height: 0.5em;
+        border-radius: 3px;
+        margin-right: 5px;
+      }
+      .label {
+        font-size: 12px;
+      }
+    }
+  }
+}

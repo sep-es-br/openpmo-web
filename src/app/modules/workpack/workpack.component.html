@@ -13,8 +13,20 @@
     <span class="text">{{workpackModel.modelName}}</span>
   </div>
 
+  <div class="card-dashboard" *ngIf="!!idWorkpack && !!workpack && !!workpackModel && !!workpackModel.dashboardSessionActive">
+    <app-dashboard [idWorkpack]="idWorkpack"
+      [workpackFullName]="workpackFullName"
+      [dashboardShowStakeholders]="workpackModel?.dashboardShowStakeholders"
+      [dashboardShowRisks]="workpackModel?.dashboardShowRisks"
+      [dashboardShowEva]="workpackModel?.dashboardShowEva"
+      [workpackType]="workpack?.type"
+      [collapsePanelsStatus]="collapsePanelsStatus"
+      [dashboardShowMilestones]="workpackModel?.dashboardShowMilestones"></app-dashboard>
+  </div>
+
   <div class="card-properties-workpack">
-    <app-card [properties]="cardWorkpackProperties" class="mt-0 inputs-float-label">
+    <app-card [properties]="cardWorkpackProperties" class="mt-0 inputs-float-label"
+      (changeCheckCompleted)="handleChangeCheckCompleted($event)">
       <div class="properties-container" [class.responsive]="responsive">
         <div class="property-container" *ngFor="let property of sectionPropertiesProperties"
           [class.not-fullLine]="!property.fullLine && property.type !== 'TextArea' && property.type !== 'Group'"
@@ -63,9 +75,9 @@
 
   <div class="card-schedule" *ngIf="sectionSchedule">
     <app-card [properties]="sectionSchedule.cardSection">
-      <button type="button" class="p-button-text button-new-schedule" *ngIf="!schedule && !!editPermission" (click)="handleNewSchedule()"
-        pButton icon="pi pi-plus" iconPos="left" [label]="translateSrv.instant('newSchedule')"
-        [disabled]="!editPermission">
+      <button type="button" class="p-button-text button-new-schedule" *ngIf="!schedule && !!editPermission"
+        (click)="handleNewSchedule()" pButton icon="pi pi-plus" iconPos="left"
+        [label]="translateSrv.instant('newSchedule')" [disabled]="!editPermission">
       </button>
       <div class="schedule-buttons" *ngIf="schedule" [class.schedule-buttons-mobile]="responsive">
         <button type="button" class="p-button-text button-details" (click)="handleShowDetails()" pButton
@@ -156,7 +168,7 @@
           [emptyMessage]="'loadingEllipsis' | translate">
           <ng-template let-cardItem pTemplate="gridItem">
             <div class="p-col-12 p-md-3 p-sm-12 card-item-container">
-              <app-card-item [properties]="cardItem"></app-card-item>
+              <app-workpack-card-item [properties]="cardItem"></app-workpack-card-item>
             </div>
           </ng-template>
         </p-dataView>
@@ -167,7 +179,8 @@
           [emptyMessage]="'loadingEllipsis' | translate">
           <ng-template let-cardItem pTemplate="listItem">
             <div class="p-col-12">
-              <app-card-item [properties]="cardItem" [displayModeCard]="displayModeAll"></app-card-item>
+              <app-workpack-card-item [properties]="cardItem" [displayModeCard]="displayModeAll">
+              </app-workpack-card-item>
             </div>
           </ng-template>
         </p-dataView>
@@ -215,7 +228,8 @@
     <app-card [properties]="sectionBaselines.cardSection"
       *ngIf="sectionBaselines.cardItemsSection && sectionBaselines.cardItemsSection.length > 0">
       <div class="input-toggle-baseline">
-        <p-inputSwitch class="app-toggle" [(ngModel)]="baselinesSectionShowInactives" (ngOnChange)="handleBaselineShowInactiveToggle($event)">
+        <p-inputSwitch class="app-toggle" [(ngModel)]="baselinesSectionShowInactives"
+          (ngOnChange)="handleBaselineShowInactiveToggle($event)">
         </p-inputSwitch>
         <label class="input-label">{{"showInactive" | translate}}</label>
       </div>
@@ -229,7 +243,7 @@
             </div>
           </ng-template>
         </p-dataView>
-        <p-dataView [value]="sectionBaseline.cardItemsSection" layout="list" class="app-dataview app-dataview-list"
+        <p-dataView [value]="sectionBaselines.cardItemsSection" layout="list" class="app-dataview app-dataview-list"
           [emptyMessage]="'loadingEllipsis' | translate" *ngIf="displayModeAll === 'list'">
           <ng-template let-cardItem pTemplate="listItem">
             <div class="p-col-12">
@@ -345,9 +359,63 @@
   </div>
 
   <div class="card-journal" *ngIf="workpackModel.journalManagementSessionActive">
-    <app-journal-view *ngIf="cardJournalProperties && workpack" [cardJournalProperties]="cardJournalProperties" [workpack]="workpack"></app-journal-view>
+    <app-journal-view *ngIf="cardJournalProperties && workpack" [cardJournalProperties]="cardJournalProperties"
+      [workpack]="workpack"></app-journal-view>
   </div>
 
   <app-save-button #saveButton (save)="saveWorkpack()"></app-save-button>
+
+  <p-dialog class="end-management-dialog" [class.responsive]="!!responsive" [header]="'endManagement' |translate"
+    [(visible)]="showDialogEndManagement" [style]="!responsive ? {width: '30vw'} : {width: '90vw'}" closable="false"
+    closeIcon="">
+    <div class="end-management-content" *ngIf="endManagementWorkpack">
+      <span class="subtitle">
+        {{'messages.endManagementAlert' |translate}}
+      </span>
+      <div class="reasons-container">
+        <label class="app-input-label" for="reasons">{{'reasons'|translate}} {{'*'}}</label>
+        <textarea id="reasons" class="reasons-end" pInputTextarea [(ngModel)]="endManagementWorkpack.reason" cols="30"
+          [autoresize]="true" rows="4"></textarea>
+      </div>
+      <div class="date-end-management-container">
+        <label class="app-input-label" for="end-date">{{'endedManagementIn'|translate}} {{'*'}}</label>
+        <p-calendar [(ngModel)]="endManagementWorkpack.endManagementDate" id="end-date" class="app-select-date"
+          showIcon="true" icon="fas fa-calendar-alt" [dateFormat]="calendarFormat">
+        </p-calendar>
+      </div>
+      <div class="buttons-container">
+        <button class="cancel-button" pButton [label]="'cancel'|translate"
+          (click)="handleCancelEndManagement()"></button>
+        <button class="end-button" pButton [label]="'endManagementLabelButton'|translate"
+          (click)="handleEndManagementDeliverable()"></button>
+      </div>
+    </div>
+  </p-dialog>
+
+  <p-dialog class="resume-management-dialog" [class.responsive]="!!responsive" [header]="'resumeManagement' |translate"
+    [(visible)]="showDialogResumeManagement" [style]="!responsive ? {width: '30vw'} : {width: '90vw'}" closable="false"
+    closeIcon="">
+    <div class="resume-management-content" *ngIf="endManagementWorkpack">
+      <span class="subtitle">
+        {{'messages.resumeManagementAlert' |translate}}
+      </span>
+      <div class="reasons-container">
+        <label class="app-input-label" for="reasons">{{'reasons'|translate}} {{'*'}}</label>
+        <textarea id="reasons" class="reasons-end" pInputTextarea [(ngModel)]="endManagementWorkpack.reason" cols="30"
+          [autoresize]="true" [disabled]="true" rows="4"></textarea>
+      </div>
+      <div class="date-container">
+        <label class="app-input-label" for="end-date">{{'endedManagementIn'|translate}}:</label>
+        <span>{{language === 'pt-BR' ? (endManagementWorkpack?.endManagementDate|date:'dd/MM/yyyy') :
+          (endManagementWorkpack?.endManagementDate|date:'yyyy/MM/dd')}}</span>
+      </div>
+      <div class="buttons-container">
+        <button class="cancel-button" pButton [label]="'cancel'|translate"
+          (click)="handleCancelResumeManagement()"></button>
+        <button class="end-button" pButton [label]="'resume'|translate"
+          (click)="handleResumeManagementDeliverable()"></button>
+      </div>
+    </div>
+  </p-dialog>
 
 </div>

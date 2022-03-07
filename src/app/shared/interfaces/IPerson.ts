@@ -35,6 +35,7 @@ export interface IPersonWorkpackPermission {
   id: number;
   name: string;
   accessLevel: string;
-  roles: { role: string; organization?: string }[];
+  roles: string[];
   icon: string;
+  ccbMember?: boolean;
 }

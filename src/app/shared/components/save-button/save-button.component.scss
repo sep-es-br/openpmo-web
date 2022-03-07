@@ -1,7 +1,7 @@
 @use 'src/variables' as v;
 
 .app-save-button-layout {
-  display: block;
+  display: flex;
   height: calc(75px + 1.25rem + 20px);
   width: 100%;
 
@@ -11,7 +11,7 @@
     position: fixed;
     width: auto;
     height: auto;
-    bottom: 0;
+    bottom: 50px;
     overflow: hidden;
 
     .button-label {
@@ -30,10 +30,21 @@
     }
   }
   &.mobile {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
     .app-save-button-wrapper {
-      width: 100%;
+      width: 96%;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+      bottom: 190px;
       .button-label {
-        display: block;
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        width: 100%;
       }
     }
   }

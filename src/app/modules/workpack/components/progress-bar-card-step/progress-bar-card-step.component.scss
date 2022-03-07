@@ -3,8 +3,8 @@
 .app-progress-card-step {
   width: 100%;
   display: flex;
-  flex-direction: row;
-  align-items: flex-end;
+  flex-direction: column;
+  // align-items: flex-end;
   .unit-container {
     flex: 1;
     margin-right: 10px;
@@ -70,6 +70,12 @@
   }
   .progress-header-values-container.responsive {
     width: 90%;
+  }
+  .baseline-bar-progress-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin-top: 5px;
   }
 }
 

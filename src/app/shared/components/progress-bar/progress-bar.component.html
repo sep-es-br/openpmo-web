@@ -1,41 +1,78 @@
-<div class="app-progress">
+<div class="app-progress" [class.app-progress-with-baseline]="baselineTotal && baselineTotal > 0" *ngIf="total && total !== 0">
   <div class="unit-container">
     <span *ngIf="!['currency', 'time'].includes(valueUnit)" [ngStyle]="{color: color}">{{valueUnit}}</span>
     <span *ngIf="valueUnit === 'currency'" [ngStyle]="{color: color}">$</span>
     <i class="fas fa-calendar-alt" *ngIf="valueUnit === 'time'" [ngStyle]="{color: color}"></i>
   </div>
-  <div class="progress-header-values-container" [ngStyle]="{width: barHeight === 17 ? '85%' : '100%'}" [class.responsive]="responsive">
+  <div class="progress-header-values-container" [ngStyle]="{width: barHeight === 17 ? '85%' : '100%'}"
+    [class.responsive]="responsive">
     <div class="progress-bar-header">
       <div class="labels">
         <span class="header-label" *ngIf="labelProgress" [ngStyle]="{color: color}">{{labelProgress | translate}}</span>
         <span class="header-label" *ngIf="labelTotal" [ngStyle]="{color: '#004660'}">{{labelTotal | translate}}</span>
       </div>
       <div class="values">
-        <span class="value" [ngStyle]="{color: color}" *ngIf="valueUnit" 
+        <span class="value" [ngStyle]="{color: color}" *ngIf="valueUnit"
           [pTooltip]="(valueUnit === 'currency' ? '$ ' : '') + ( language === 'pt' ?
             (valueUnit === 'currency' ? (progress |number:'0.2-2':'pt') : (progress |number:'0.0-0':'pt')) 
             : (valueUnit === 'currency' ? (progress |number:'0.2-2':'en') : (progress |number:'0.0-0':'en'))) + ' ' + (valueUnit === 'currency' ? '' : (valueUnit === 'time' ? ('day'|translate ) : valueUnit))">
           {{ valueUnit !== 'time' ? (progress|shortNumber:language) : progress + 'd'}}
         </span>
-        <span class="value" [ngStyle]="{color: '#004660'}" *ngIf="valueUnit" 
-        [pTooltip]="(valueUnit === 'currency' ? '$ ' : '') + ( language === 'pt' ?
+        <span class="value" [ngStyle]="{color: '#004660'}" *ngIf="valueUnit"
+          [pTooltip]="(valueUnit === 'currency' ? '$ ' : '') + ( language === 'pt' ?
           (valueUnit === 'currency' ? (total |number:'0.2-2':'pt') : (total |number:'0.0-0':'pt')) 
           : (valueUnit === 'currency' ? (total |number:'0.2-2':'en') : (total |number:'0.0-0':'en'))) + ' ' + (valueUnit === 'currency' ? '' : (valueUnit === 'time' ? ('day'|translate ) : valueUnit))">
-        {{ valueUnit !== 'time' ? (total|shortNumber:language) : total + 'd'}}
-      </span>
+          {{ valueUnit !== 'time' ? (total|shortNumber:language) : total + 'd'}}
+        </span>
         <!-- <span class="value" [ngStyle]="{color: '#004660'}" *ngIf="valueUnit" [pTooltip]="total|number">{{total|shortNumber:language}}</span> -->
       </div>
       <div class="total"></div>
     </div>
-    <div class="progress-bar-total-container" *ngIf="total >= progress"
-      [ngStyle]="{width: '100%', background: barHeight === 7 ? 'rgba(0, 70, 96, 0.19)' : '#ffffff'}">
-      <div class="progress-bar" [ngStyle]="{width: (progress/total)*100 + '%', background: color, height: barHeight + 'px'}">
+    <div class="progress-bar-total-container" *ngIf="total >= progress && total >= baselineTotal"
+      [ngStyle]="{width: '100%', background: barHeight === 7 ? 'rgba(0, 70, 96, 0.19)' : '#ffffff', 'margin-right': marginRightTotal + '%', 'margin-left': marginLeftTotal + '%'}">
+      <div class="progress-bar"
+        [ngStyle]="{width: (progress/total)*100 + '%', background: color, height: barHeight + 'px'}">
       </div>
     </div>
-    <div class="progress-bar-progress-container" *ngIf="progress > total"
-      [ngStyle]="{width: '100%', background: color, height: barHeight + 'px'}">
+    <div class="progress-bar-total-container" *ngIf="total >= progress && total < baselineTotal"
+      [ngStyle]="{width: (total/baselineTotal)*100 + '%', background: barHeight === 7 ? 'rgba(0, 70, 96, 0.19)' : '#ffffff', 'margin-right': marginRightTotal + '%', 'margin-left': marginLeftTotal + '%'}">
+      <div class="progress-bar"
+        [ngStyle]="{width: (progress/total)*100 + '%', background: color, height: barHeight + 'px'}">
+      </div>
+    </div>
+    <div class="progress-bar-progress-container" *ngIf="progress > total && progress > baselineTotal"
+      [ngStyle]="{width: '100%', background: color, height: barHeight + 'px', 'margin-right': marginRightTotal + '%', 'margin-left': marginLeftTotal + '%'}">
       <div class="total-bar" [ngStyle]="{width: (total/progress)*100 + '%', background: 'transparent'}">
       </div>
+    </div>
+    <div class="progress-bar-progress-container" *ngIf="progress > total && progress < baselineTotal"
+      [ngStyle]="{width: (progress/baselineTotal)*100 + '%', background: color, height: barHeight + 'px', 'margin-right': marginRightTotal + '%', 'margin-left': marginLeftTotal + '%'}">
+      <div class="total-bar" [ngStyle]="{width: (total/progress)*100 + '%', background: 'transparent'}">
+      </div>
+    </div>
+    <div class="baseline-bar-progress-container"
+      *ngIf="baselineTotal && baselineTotal > total && baselineTotal > progress" [ngStyle]="{'margin-right': marginLeftTotal + '%', 'margin-left': marginRightTotal + '%'}">
+      <div class="progress-bar-baseline" [ngStyle]="{width: '100%', background: '#B2B2B2', height: '4px'}">
+      </div>
+      <label class="baseline-label-value">{{valueUnit !== 'time' ? (baselineTotal|shortNumber:language) : baselineTotal
+        + 'd'}}</label>
+      <label class="baseline-label-text">{{'plannedBaseline'|translate}}</label>
+    </div>
+    <div class="baseline-bar-progress-container" *ngIf="baselineTotal && baselineTotal <= total && total >= progress" [ngStyle]="{'margin-right': marginLeftTotal + '%', 'margin-left': marginRightTotal + '%'}">
+      <div class="progress-bar-baseline"
+        [ngStyle]="{width: (baselineTotal/total)*100 + '%', background: '#B2B2B2', height: '4px'}">
+      </div>
+      <label class="baseline-label-value">{{valueUnit !== 'time' ? (baselineTotal|shortNumber:language) : baselineTotal
+        + 'd'}}</label>
+      <label class="baseline-label-text">{{'plannedBaseline'|translate}}</label>
+    </div>
+    <div class="baseline-bar-progress-container" *ngIf="baselineTotal && baselineTotal <= progress && progress > total" [ngStyle]="{'margin-right': marginLeftTotal + '%', 'margin-left': marginRightTotal + '%'}">
+      <div class="progress-bar-baseline"
+        [ngStyle]="{width: (baselineTotal/progress)*100 + '%', background: '#B2B2B2', height: '4px'}">
+      </div>
+      <label class="baseline-label-value">{{valueUnit !== 'time' ? (baselineTotal|shortNumber:language) : baselineTotal
+        + 'd'}}</label>
+      <label class="baseline-label-text">{{'plannedBaseline'|translate}}</label>
     </div>
   </div>
 </div>

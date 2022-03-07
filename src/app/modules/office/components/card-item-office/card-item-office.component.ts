@@ -1,3 +1,6 @@
+import { OfficeService } from './../../../../shared/services/office.service';
+import { AuthService } from './../../../../shared/services/auth.service';
+import { AuthServerService } from './../../../../shared/services/auth-server.service';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Router } from '@angular/router';
 import localePt from '@angular/common/locales/pt';
@@ -21,19 +24,28 @@ export class CardItemOfficeComponent implements OnInit {
   cardIdItem: string;
   iconImg;
   responsive: boolean;
+  editPermission = false;
 
   constructor(
     private router: Router,
     private responsiveSrv: ResponsiveService,
+    private authSrv: AuthService,
+    private officeSrv: OfficeService
   ) {
     this.responsiveSrv.observable.subscribe(value => {
       this.responsive = value;
     });
    }
 
-  ngOnInit(): void {
+  async ngOnInit() {
+    const isUserAdmin = await this.authSrv.isUserAdmin();
+    this.editPermission = !!isUserAdmin;
+    if (!isUserAdmin) {
+      this.editPermission = this.properties?.office?.permissions.filter( permission => permission.level === 'EDIT').length > 0; 
+    }
     this.cardIdItem = this.properties.itemId || this.properties.itemId === 0 ?
     `ID: ${ this.properties.itemId < 10 && this.properties.itemId !== 0 ? '0'+this.properties.itemId : this.properties.itemId}` : '';
+    if ( this.properties.office)  { this.officeSrv.nextIDOffice(this.properties.office.id)};
   }
 
   navigateToPage(url: string, params?: {name: string; value: string | number}[]) {

@@ -1,5 +1,5 @@
 <p-panel #cardPanel class="app-card"
-  [toggleable]="properties.collapseble && (!properties.toggleable || properties.initialStateToggle && properties.toggleable)"
+  [toggleable]="!properties.fullScreen && properties.collapseble && (!properties.toggleable || properties.initialStateToggle && properties.toggleable)"
   [collapsed]="properties.initialStateCollapse || !(!properties.toggleable || (properties.toggleable && properties.initialStateToggle))"
   expandIcon="pi pi-angle-down" collapseIcon="pi pi-angle-up" [class.mobile]="responsive" (collapsedChange)="handleCollapsed($event)" >
   <p-header class="card-header" [class.card-header-mobile]="responsive">
@@ -20,11 +20,32 @@
           (properties.headerDates?.endDate|date:'yyyy/MM/dd')}}</span>
       </div>
     </div>
+    <div class="header-title-check-completed" *ngIf="properties.showFullScreen && !properties.fullScreen"
+    [class.responsive]="responsive">
+      <i class="fas fa-expand-arrows-alt" (click)="handleChangeFullScreen()"></i>
+    </div>
+    <div class="header-title-check-completed" *ngIf="properties.showFullScreen && properties.fullScreen"
+    [class.responsive]="responsive">
+      <i class="fas fa-times" (click)="handleChangeFullScreen()"></i>
+    </div>
+    <div class="header-title-check-completed" *ngIf="properties.showCheckCompleted" [class.responsive]="responsive">
+      <label>{{'scopeCompleted'|translate}}</label>
+      <p-checkbox [(ngModel)]="properties.workpackCompleted" [binary]="true" (ngModelChange)="handleChangeCheckCompleted($event)" ></p-checkbox>
+    </div>
     <div class="header-values-cost-account" *ngIf="properties.progressBarValues" [class.responsive]="responsive">
       <div class="progress-bar-cost-container" *ngFor="let progressBar of properties.progressBarValues">
         <app-progress-bar [total]="progressBar.total" [class.progress-bar-mobile]="responsive"
-          [progress]="progressBar.progress" [labelTotal]="progressBar.labelTotal"
-          [labelProgress]="progressBar.labelProgress" [valueUnit]="progressBar.valueUnit" [color]="progressBar.color" [barHeight]="progressBar.barHeight">
+          [progress]="progressBar.progress"
+          [labelTotal]="progressBar.labelTotal"
+          [labelProgress]="progressBar.labelProgress"
+          [valueUnit]="progressBar.valueUnit"
+          [baselineTotal]="progressBar.baselinePlanned"
+          [color]="progressBar.color"
+          [startDateBaseline]="progressBar.startDateBaseline"
+          [endDateBaseline]="progressBar.endDateBaseline"
+          [startDateTotal]="progressBar.startDateTotal"
+          [endDateTotal]="progressBar.endDateTotal"
+          [barHeight]="progressBar.barHeight">
         </app-progress-bar>
       </div>
     </div>

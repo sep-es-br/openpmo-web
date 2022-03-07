@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, SimpleChanges } from '@angular/core';
 import { HexBase64BinaryEncoding } from 'crypto';
 import { ImageCroppedEvent, LoadedImage } from 'ngx-image-cropper';
 import { IFile } from 'src/app/shared/interfaces/IFile';
@@ -30,6 +30,12 @@ export class AvatarComponent implements OnInit {
     await this.redirectSetAvatarStatus();
   }
 
+  async ngOnChanges(changes: SimpleChanges) {
+   if ((changes.idPerson && changes.idPerson.currentValue) || (changes.avatar && changes.avatar.currentValue)) {
+    await this.redirectSetAvatarStatus();
+   }
+  }
+
   async redirectSetAvatarStatus() {
     if (this.idPerson) {
       await this.setAvatarPerson();
@@ -43,7 +49,7 @@ export class AvatarComponent implements OnInit {
   async setAvatarPerson() {
     if (this.idPerson) {
       const result = await this.personSrv.getAvatar(this.idPerson);
-      if (result.success) {
+      if (result.success && result.data) {
         if (Object.keys(result.data).length > 0) {
           this.avatarFile = result.data;
           this.hasAvatar = true;

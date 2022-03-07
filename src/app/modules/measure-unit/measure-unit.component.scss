@@ -2,6 +2,22 @@
 
 .app-unit-measure {
   width: 100%;
+  .header-container {
+    display: flex;
+    flex-direction: row;
+  }
+  .app-content-header {
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-end;
+    flex: 1;
+    span {
+      text-transform: uppercase;
+    }
+  }
+  .header-container.mobile {
+    flex-direction: column;
+  }
 }
 
 ::ng-deep .app-unit-measure .app-card-item .p-card {

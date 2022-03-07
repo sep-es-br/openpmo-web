@@ -1,0 +1,33 @@
+<div class="app-triple-constraint-dashboard" [class.responsive]="responsive"
+  *ngIf="tripleConstraint && (tripleConstraint?.cost || tripleConstraint?.schedule || tripleConstraint?.scope)">
+  <div class="cards-container">
+    <div class="subtitles-container">
+      <div class="subtitle-item">
+        <div class="subtitle-box subtitle-box-planned"></div>
+        <label class="subtitle-label-planned">{{'plannedBaseline'|translate}}</label>
+      </div>
+      <div class="subtitle-item">
+        <div class="subtitle-box subtitle-box-foreseen"></div>
+        <label class="subtitle-label-foreseen">{{'foreseen'|translate}}</label>
+      </div>
+      <div class="subtitle-item">
+        <div class="subtitle-box subtitle-box-actual"></div>
+        <label class="subtitle-label-actual">{{'actual'|translate}}</label>
+      </div>
+    </div>
+    <div class="cards">
+      <div class="card-constraint-container"
+        *ngIf="tripleConstraint?.cost  && (tripleConstraint?.cost?.plannedValue > 0 || tripleConstraint?.cost?.foreseenValue > 0)">
+        <app-cost-constraint [cost]="tripleConstraint?.cost"></app-cost-constraint>
+      </div>
+      <div class="card-constraint-container"
+        *ngIf="tripleConstraint?.schedule  && (tripleConstraint?.schedule.plannedStartDate || tripleConstraint?.schedule.foreseenStartDate)">
+        <app-schedule-constraint [schedule]="tripleConstraint?.schedule"></app-schedule-constraint>
+      </div>
+      <div class="card-constraint-container"
+        *ngIf="tripleConstraint?.scope  && (tripleConstraint?.scope?.plannedVariationPercent > 0 || tripleConstraint?.scope?.foreseenVariationPercent > 0)">
+        <app-scope-constraint [scope]="tripleConstraint?.scope"></app-scope-constraint>
+      </div>
+    </div>
+  </div>
+</div>

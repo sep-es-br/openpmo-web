@@ -186,13 +186,16 @@ export class StepComponent implements OnInit, OnDestroy {
 
   async loadPermissions() {
     const isUserAdmin = await this.authSrv.isUserAdmin();
-    if (isUserAdmin) {
-      this.editPermission = true;
-    } else {
-      this.idPlan = Number(localStorage.getItem('@currentPlan'));
-      const result = await this.workpackSrv.GetWorkpackById(this.schedule.idWorkpack, { 'id-plan': this.idPlan });
-      if (result.success) {
+    this.idPlan = Number(localStorage.getItem('@currentPlan'));
+    const result = await this.workpackSrv.GetWorkpackById(this.schedule.idWorkpack, { 'id-plan': this.idPlan });
+    if (result.success) {
+      if (isUserAdmin) {
+        this.editPermission = true;
+      } else {
         this.editPermission = result.data.permissions.filter(p => p.level === 'EDIT').length > 0;
+      }
+      if (result.data.endManagementDate !== null) {
+        this.editPermission = false;
       }
     }
   }

@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { VersionService } from 'src/app/shared/services/version.service';
-
+import { environment } from 'src/environments/environment';
 @Component({
   selector: 'app-footer',
   templateUrl: './footer.component.html',
@@ -21,7 +21,7 @@ export class FooterComponent implements OnInit {
   }
 
   loadWebAppVersion(){
-    const { version } = require('package.json');
+    const version = environment.version;
     this.webAppVersion = version;
   }
 

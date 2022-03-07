@@ -69,7 +69,7 @@
           [emptyMessage]="'loadingEllipsis' | translate">
           <ng-template let-cardItem pTemplate="gridItem">
             <div class="p-col-12 p-md-3 p-sm-12 card-item-container">
-              <app-card-item [properties]="cardItem"></app-card-item>
+              <app-workpack-card-item [properties]="cardItem"></app-workpack-card-item>
             </div>
           </ng-template>
         </p-dataView>
@@ -79,7 +79,7 @@
           [emptyMessage]="'loadingEllipsis' | translate">
           <ng-template let-cardItem pTemplate="listItem">
             <div class="p-col-12">
-              <app-card-item [properties]="cardItem" [displayModeCard]="displayModeAll"></app-card-item>
+              <app-workpack-card-item [properties]="cardItem" [displayModeCard]="displayModeAll"></app-workpack-card-item>
             </div>
           </ng-template>
         </p-dataView>

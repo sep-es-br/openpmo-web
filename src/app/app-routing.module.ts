@@ -1,7 +1,5 @@
-import { FilterDataviewComponent } from './modules/filter-dataview/filter-dataview.component';
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-
 import { AuthGuard } from './shared/guards/auth-guard';
 import { HomeComponent } from './modules/home/home.component';
 import { LoginComponent } from './modules/login/login.component';
@@ -43,7 +41,7 @@ const routes: Routes = [
   },
   {
     path: 'configuration-office',
-    canActivate: [ AuthGuard ],
+    canActivate: [ AuthGuard],
     component: AdminOfficeConfigComponent
   },
   {

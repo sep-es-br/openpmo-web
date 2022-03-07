@@ -1,10 +1,12 @@
+import { IPlanModel } from 'src/app/shared/interfaces/IPlanModel';
+import { PlanModelService } from 'src/app/shared/services/plan-model.service';
 import { IReusableWorkpackModel } from './../../shared/interfaces/IWorkpackModel';
 import { Component, EventEmitter, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { filter, takeUntil } from 'rxjs/operators';
-import { Subject } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
 import { ConfirmationService, MenuItem, MessageService, SelectItem, TreeNode } from 'primeng/api';
 
 import { IconPropertyWorkpackModelEnum as IconPropertyEnum } from 'src/app/shared/enums/IconPropertyWorkpackModelEnum';
@@ -60,6 +62,8 @@ export class WorkpackModelComponent implements OnInit {
   idOffice: number;
   idStrategy: number;
   idWorkpackModel: number;
+  modelName: string;
+  modelNamePlural: string;
   idParentWorkpack: number;
   workpackModelType: TypeWorkpackModelEnum;
   cardProperties: ICard;
@@ -70,6 +74,7 @@ export class WorkpackModelComponent implements OnInit {
   cardPropertiesSchedule: ICard;
   cardPropertiesRiskAndIssues: ICard;
   cardPropertiesProcesses: ICard;
+  cardPropertiesDashboard: ICard;
   posibleRolesPerson: string[] = ['Manager', 'Team Member', 'Sponsor', 'Partner'];
   posibleRolesOrg: string[] = ['Funder', 'Client', 'Competitor'];
   formProperties: FormGroup;
@@ -96,7 +101,17 @@ export class WorkpackModelComponent implements OnInit {
   totalRecords: number;
   typePropertyEnum = TypePropertyEnum;
   propertiesOffice: IOffice;
+  propertiesPlanModel: IPlanModel;
   reusableWorkpackModelsList: MenuItem[];
+  dashboardPanel = {
+    dashboardShowEva: false,
+    dashboardShowMilestones: false,
+    dashboardShowRisks: false,
+    dashboardShowStakeholders: ['Manager', 'Team Member', 'Sponsor', 'Partner', 'Funder', 'Client', 'Competitor'],
+    dashboardStakeholderRolesOptions: ['Manager', 'Team Member', 'Sponsor', 'Partner', 'Funder', 'Client', 'Competitor'].map(item => ({ label: item, value: item })),
+  };
+  currentBreadcrumbItems: IBreadcrumb[];
+  currentBreadcrumbSub: Subscription;
 
   constructor(
     private router: Router,
@@ -113,9 +128,10 @@ export class WorkpackModelComponent implements OnInit {
     private responsiveSrv: ResponsiveService,
     private confirmationSrv: ConfirmationService,
     private officePermissionSrv: OfficePermissionService,
-    private officeSrv: OfficeService
+    private officeSrv: OfficeService,
+    private planModelSrv: PlanModelService,
   ) {
-    this.activeRoute.queryParams.subscribe(async({ idOffice, idStrategy, id, idParent, type }) => {
+    this.activeRoute.queryParams.subscribe(async ({ idOffice, idStrategy, id, idParent, type }) => {
       if (id && this.idWorkpackModel === Number(id)) {
         // refresh on adding id to query
         return;
@@ -129,9 +145,19 @@ export class WorkpackModelComponent implements OnInit {
       this.setFormProperties();
       this.scrollTop();
       this.editPermission = await this.officePermissionSrv.getPermissions(idOffice);
+      if (!this.editPermission) {
+        this.router.navigate(['offices']);
+      }
       await this.getOfficeById();
+      await this.getPlanModelById();
       await this.loadDetails();
       this.loadCardItemsModels();
+    });
+    this.currentBreadcrumbItems = [];
+    this.currentBreadcrumbItems = this.breadcrumbSrv.get;
+    this.currentBreadcrumbSub = this.breadcrumbSrv.ready.subscribe(data => {
+      this.currentBreadcrumbItems = data;
+      this.setCurrentBreadcrumb();
     });
     this.setFormProperties();
     this.formProperties.statusChanges
@@ -233,7 +259,9 @@ export class WorkpackModelComponent implements OnInit {
     this.cardItemsModels = [];
     this.cardProperties = null;
     this.cardPropertiesStakeholders = null;
+    this.cardPropertiesDashboard = null;
     this.cardPropertiesRiskAndIssues = null;
+    this.cardPropertiesCostAccount = null;
     this.cardPropertiesProcesses = null;
     this.cardPropertiesCostAccount = null;
     this.cardPropertiesJournal = null;
@@ -246,11 +274,13 @@ export class WorkpackModelComponent implements OnInit {
     this.loadIcons();
     this.loadMenuProperty(PropertySessionEnum.PROPERTIES);
     this.loadMenuProperty(PropertySessionEnum.COST);
+
   }
 
   async loadDetails() {
     this.loadCards();
-    this.setBreadcrumb();
+
+    // this.setBreadcrumb();
     if (this.idWorkpackModel) {
       if (!this.editPermission) {
         this.formProperties.disable();
@@ -259,6 +289,7 @@ export class WorkpackModelComponent implements OnInit {
     } else if (this.editPermission) {
       this.loadDefaultProperties();
     }
+    this.setCurrentBreadcrumb();
   }
 
   async getOfficeById() {
@@ -268,9 +299,20 @@ export class WorkpackModelComponent implements OnInit {
     }
   }
 
-  async setBreadcrumb() {
+  async getPlanModelById() {
+    const { data, success } = await this.planModelSrv.GetById(this.idStrategy);
+    if (success) {
+      this.propertiesPlanModel = data;
+    }
+  }
+
+  setCurrentBreadcrumb() {
+    this.breadcrumbSrv.setMenu(this.getCurrentBreadcrumb());
+  }
+
+  startNewBreadcrumb() {
     const { idOffice, idStrategy, workpackModelType: type } = this;
-    this.breadcrumbSrv.setMenu([
+    return [
       {
         key: 'administration',
         info: this.propertiesOffice?.name,
@@ -278,53 +320,64 @@ export class WorkpackModelComponent implements OnInit {
         routerLink: ['/configuration-office'],
         queryParams: { idOffice: this.idOffice }
       },
-      ... await this.getBreadcrumbs(),
+      {
+        key: 'configuration',
+        info: this.translateSrv.instant('planModels'),
+        tooltip: 'planModels',
+        routerLink: ['/strategies'],
+        queryParams: { idOffice: this.idOffice }
+      },
+      {
+        key: 'planModel',
+        info: this.propertiesPlanModel?.name,
+        tooltip: this.propertiesPlanModel?.fullName,
+        routerLink: ['/strategies', 'strategy'],
+        queryParams: { id: this.idStrategy, idOffice: this.idOffice }
+      },
       ... this.idWorkpackModel
-        ? []
+        ? [{
+          key: 'workpackModel',
+          info: this.modelName,
+          tooltip: this.modelNamePlural,
+          routerLink: ['/workpack-model'],
+          queryParams: { idStrategy, id: this.idWorkpackModel, type, idOffice }
+        }]
         : [{
           key: 'workpackModel',
           routerLink: ['/workpack-model'],
           queryParams: { idStrategy, type, idOffice }
         }]
-    ]);
+    ];
   }
 
-  async getBreadcrumbs() {
-    const { success, data } = (this.idWorkpackModel || this.idParentWorkpack) ?
-      await this.breadcrumbSrv.getBreadcrumbWorkpackModel(this.idWorkpackModel || this.idParentWorkpack) :
-      { success: false, data: [] };
-    return success
-      ? data.map(p => this.getBreadcrumb(p))
-      : [];
-  }
-
-  getBreadcrumb(data: IResultBreadcrumb): IBreadcrumb {
-    const { idStrategy, idOffice } = this;
-    switch (data.type) {
-      case 'strategies':
-        return {
-          key: 'planModels',
-          info: data.name,
-          tooltip: data.fullName,
-          routerLink: ['/strategies'],
-          queryParams: { idOffice: data.id }
-        };
-      case 'strategy':
-        return {
-          key: 'planModel',
-          info: data.name,
-          tooltip: data.fullName,
-          routerLink: ['/strategies', 'strategy'],
-          queryParams: { idOffice, id: data.id }
-        };
-      default:
-        return {
-          key: 'workpackModel',
-          info: data.name,
-          tooltip: data.fullName,
-          routerLink: ['/workpack-model'],
-          queryParams: { idStrategy, id: data.id, type: data.type, idOffice }
-        };
+  getCurrentBreadcrumb() {
+    const { idOffice, idStrategy, workpackModelType: type } = this;
+    let breadcrumb;
+    if (this.currentBreadcrumbItems && this.currentBreadcrumbItems.length > 0) {
+      const breadcrumbIndex = this.currentBreadcrumbItems.findIndex(item => item.queryParams?.id === this.idWorkpackModel);
+      if (breadcrumbIndex > -1) {
+        breadcrumb = this.currentBreadcrumbItems.slice(0, breadcrumbIndex + 1);
+      } else {
+        const breadcrumbOfficeIndex = this.currentBreadcrumbItems.findIndex(item => item.queryParams?.idOffice === this.idOffice);
+        const breadcrumbPlanModelIndex = this.currentBreadcrumbItems.findIndex(item => item.key === 'planModel' && item.queryParams?.id === this.idStrategy);
+        if (breadcrumbOfficeIndex > -1 && breadcrumbPlanModelIndex > -1) {
+          breadcrumb = [...this.currentBreadcrumbItems,
+          ...[{
+            key: 'workpackModel',
+            info: this.modelName,
+            tooltip: this.modelNamePlural,
+            routerLink: ['/workpack-model'],
+            queryParams: { idStrategy, id: this.idWorkpackModel, type, idOffice }
+          }]
+          ];
+        } else {
+          breadcrumb = this.startNewBreadcrumb();
+        }
+      }
+      return breadcrumb;
+    } else {
+      breadcrumb = this.startNewBreadcrumb();
+      return breadcrumb;
     }
   }
 
@@ -363,7 +416,7 @@ export class WorkpackModelComponent implements OnInit {
           multipleSelection: false,
           possibleValues: Object.values(this.translateSrv.instant(['finished', 'structuring', 'execution', 'suspended'])),
           sortIndex: 2,
-          defaultValue: '',
+          defaultValue: 'structuring',
           fullLine: false,
           required: true
         },
@@ -463,7 +516,7 @@ export class WorkpackModelComponent implements OnInit {
             multipleSelection: false,
             possibleValues: Object.values(this.translateSrv.instant(['finished', 'structuring', 'execution', 'suspended'])),
             sortIndex: 2,
-            defaultValue: '',
+            defaultValue: 'structuring',
             fullLine: false,
             required: true
           },
@@ -604,6 +657,8 @@ export class WorkpackModelComponent implements OnInit {
   async loadWorkpackModel() {
     const { data, success } = await this.workpackModelSrv.GetById(this.idWorkpackModel);
     if (success) {
+      this.modelName = data.modelName,
+        this.modelNamePlural = data.modelNameInPlural;
       this.workpackModelType = TypeWorkpackModelEnum[data.type];
       this.formProperties.reset({
         name: data.modelName,
@@ -615,7 +670,7 @@ export class WorkpackModelComponent implements OnInit {
       this.posibleRolesPerson = data.personRoles || [];
       if (data.properties) {
         const dataPropertiesAndIndex = (await Promise.all(data.properties
-          .map(async(p, i) => {
+          .map(async (p, i) => {
             if (p.possibleValues) {
               p.possibleValues = (p.possibleValues as string).split(',');
             };
@@ -655,7 +710,7 @@ export class WorkpackModelComponent implements OnInit {
             if (p.type === TypePropertyEnum.GroupModel) {
               const menu = this.loadMenuPropertyGroup(PropertySessionEnum.PROPERTIES, p);
               p.menuModelProperties = menu;
-              p.groupedProperties.forEach(async(gp) => {
+              p.groupedProperties.forEach(async (gp) => {
                 if (gp.possibleValues) {
                   gp.possibleValues = (gp.possibleValues as string).split(',');
                 };
@@ -710,6 +765,16 @@ export class WorkpackModelComponent implements OnInit {
       this.cardPropertiesJournal.initialStateToggle = data.journalManagementSessionActive;
       this.cardPropertiesModels.initialStateToggle = data.childWorkpackModelSessionActive;
       this.cardPropertiesStakeholders.initialStateToggle = data.stakeholderSessionActive;
+      this.cardPropertiesDashboard.initialStateToggle = data.dashboardSessionActive;
+      this.dashboardPanel = {
+        dashboardShowEva: data.dashboardShowEva,
+        dashboardShowMilestones: data.dashboardShowMilestones,
+        dashboardShowRisks: data.dashboardShowRisks,
+        dashboardShowStakeholders: data.dashboardShowStakeholders,
+        dashboardStakeholderRolesOptions: ((data.organizationRoles && data.organizationRoles.length > 0) || (data.personRoles && data.personRoles.length > 0)) ?
+          data.organizationRoles.concat(data.personRoles).map(item => ({ label: item, value: item })) :
+          ['Manager', 'Team Member', 'Sponsor', 'Partner', 'Funder', 'Client', 'Competitor'].map(item => ({ label: item, value: item })),
+      }
       this.cardPropertiesRiskAndIssues.initialStateToggle = data.riskAndIssueManagementSessionActive;
       this.cardPropertiesProcesses.initialStateToggle = data.processesManagementSessionActive;
       if (this.workpackModelType === TypeWorkpackModelEnum.DeliverableModel) {
@@ -728,7 +793,9 @@ export class WorkpackModelComponent implements OnInit {
       label: '',
       name: '',
       session,
-      sortIndex: !groupProperty ? this.modelProperties.length : groupProperty.groupedProperties.length,
+      sortIndex: !groupProperty ? (session === PropertySessionEnum.PROPERTIES
+        ? this.modelProperties.length
+        : this.modelCostProperties.length) : groupProperty.groupedProperties.length,
       fullLine: true,
       required: false,
       multipleSelection: false,
@@ -857,6 +924,10 @@ export class WorkpackModelComponent implements OnInit {
   }
 
   checkProperties() {
+    if (this.formProperties.invalid) {
+      this.saveButton?.hideButton();
+      return;
+    };
     const properties: IWorkpackModelProperty[] = [... this.modelProperties, ... this.modelCostProperties];
     // Value check
     const propertiesChecks: { valid: boolean; invalidKeys: string[]; prop: IWorkpackModelProperty }[] = properties.map(p => ({
@@ -881,6 +952,13 @@ export class WorkpackModelComponent implements OnInit {
       this.saveButton?.hideButton();
       return;
     };
+    if (this.dashboardPanel) {
+      this.dashboardPanel.dashboardStakeholderRolesOptions = ((this.posibleRolesPerson && this.posibleRolesPerson.length > 0) || (this.posibleRolesOrg && this.posibleRolesOrg.length > 0)) ?
+        this.posibleRolesPerson.concat(this.posibleRolesOrg).map(item => ({ label: item, value: item })) :
+        ['Manager', 'Team Member', 'Sponsor', 'Partner', 'Funder', 'Client', 'Competitor'].map(item => ({ label: item, value: item }));
+      this.dashboardPanel.dashboardShowStakeholders = this.dashboardPanel.dashboardShowStakeholders
+        .filter(option => this.dashboardPanel.dashboardStakeholderRolesOptions.find(role => role.value === option));
+    }
     const separationForDuplicateCheck = properties.map(prop => [prop.name + prop.session, prop.label + prop.session])
       .reduce((a, b) => ((a[0].push(b[0])), a[1].push(b[1]), a), [[], []]);
     // Duplicated name check
@@ -1109,6 +1187,14 @@ export class WorkpackModelComponent implements OnInit {
       initialStateCollapse: false,
       onToggle: new EventEmitter<boolean>()
     };
+    this.cardPropertiesDashboard = {
+      toggleable: this.editPermission,
+      initialStateToggle: false,
+      cardTitle: 'dashboard',
+      collapseble: true,
+      initialStateCollapse: false,
+      onToggle: new EventEmitter<boolean>()
+    };
     this.cardPropertiesRiskAndIssues = {
       toggleable: this.editPermission,
       initialStateToggle: false,
@@ -1139,9 +1225,37 @@ export class WorkpackModelComponent implements OnInit {
           ...this.cardPropertiesStakeholders,
           initialStateCollapse: true
         });
+        this.dashboardPanel.dashboardShowStakeholders = this.posibleRolesPerson && this.posibleRolesOrg ? this.posibleRolesPerson.concat(this.posibleRolesOrg) : [];
+        this.dashboardPanel.dashboardStakeholderRolesOptions = this.posibleRolesPerson && this.posibleRolesOrg ? this.posibleRolesPerson.concat(this.posibleRolesOrg).map(item => ({ label: item, value: item })) : [];
       } else {
         this.posibleRolesPerson = [];
         this.posibleRolesOrg = [];
+      }
+      this.checkProperties();
+    });
+    this.cardPropertiesDashboard.onToggle.pipe(takeUntil(this.$destroy)).subscribe(() => {
+      if (!!this.cardPropertiesDashboard.initialStateToggle) {
+        this.cardPropertiesDashboard = Object.assign({}, {
+          ...this.cardPropertiesDashboard,
+          initialStateCollapse: true
+        });
+        if (this.posibleRolesOrg.length === 0 && this.posibleRolesPerson.length === 0) {
+          this.dashboardPanel = {
+            dashboardShowEva: false,
+            dashboardShowMilestones: false,
+            dashboardShowRisks: false,
+            dashboardShowStakeholders: ['Manager', 'Team Member', 'Sponsor', 'Partner', 'Funder', 'Client', 'Competitor'],
+            dashboardStakeholderRolesOptions: ['Manager', 'Team Member', 'Sponsor', 'Partner', 'Funder', 'Client', 'Competitor'].map(item => ({ label: item, value: item })),
+          }
+        }
+      } else {
+        this.dashboardPanel = {
+          dashboardShowEva: false,
+          dashboardShowMilestones: false,
+          dashboardShowRisks: false,
+          dashboardShowStakeholders: [],
+          dashboardStakeholderRolesOptions: ['Manager', 'Team Member', 'Sponsor', 'Partner', 'Funder', 'Client', 'Competitor'].map(item => ({ label: item, value: item })),
+        }
       }
       this.checkProperties();
     });
@@ -1274,6 +1388,11 @@ export class WorkpackModelComponent implements OnInit {
       processesManagementSessionActive: !!this.cardPropertiesProcesses.initialStateToggle,
       costSessionActive: !!this.cardPropertiesCostAccount?.initialStateToggle,
       journalManagementSessionActive: !!this.cardPropertiesJournal?.initialStateToggle,
+      dashboardSessionActive: !!this.cardPropertiesDashboard?.initialStateToggle,
+      dashboardShowEva: this.dashboardPanel?.dashboardShowEva,
+      dashboardShowMilestones: this.dashboardPanel?.dashboardShowMilestones,
+      dashboardShowRisks: this.dashboardPanel?.dashboardShowRisks,
+      dashboardShowStakeholders: this.dashboardPanel?.dashboardShowStakeholders,
       fontIcon: icon,
       type: this.workpackModelType,
       idPlanModel: this.idStrategy,
@@ -1298,7 +1417,9 @@ export class WorkpackModelComponent implements OnInit {
     if (success) {
       if (!isPut) {
         this.idWorkpackModel = data.id;
-        this.loadCardItemsModels();
+        this.modelName = this.formProperties.controls.name.value;
+        this.modelNamePlural = this.formProperties.controls.nameInPlural.value,
+          this.loadCardItemsModels();
         this.router.navigate([], {
           queryParams: {
             type: this.workpackModelType,
@@ -1310,17 +1431,7 @@ export class WorkpackModelComponent implements OnInit {
         });
       }
       this.refreshPropertiesLists();
-      this.breadcrumbSrv.updateLastCrumb({
-        key: 'model',
-        info: this.formProperties.controls.name.value,
-        routerLink: ['/workpack-model'],
-        queryParams: {
-          idStrategy: this.idStrategy,
-          id: this.idWorkpackModel,
-          type: this.workpackModelType,
-          idOffice: this.idOffice
-        }
-      });
+      this.setCurrentBreadcrumb();
       this.messageSrv.add({
         severity: 'success',
         summary: this.translateSrv.instant('success'),
@@ -1330,27 +1441,25 @@ export class WorkpackModelComponent implements OnInit {
   }
 
   async loadCardItemsModels() {
-    if (this.idWorkpackModel)  await this.loadReusableWorkpackModels();
-    let hasParentProject = false;
-    if (this.idWorkpackModel) {
-      const { success, data } = await this.workpackModelSrv.hasParentProject(this.idWorkpackModel);
-      if (success) {
-        hasParentProject = data;
-      } else {
-        this.messageSrv.add({
-          severity: 'error',
-          detail: this.translateSrv.instant('messages.error.couldNotCheckParentProject')
-        });
-      }
-    }
+    if (this.idWorkpackModel) await this.loadReusableWorkpackModels();
+    // let hasParentProject = false;
+    // if (this.idWorkpackModel) {
+    //   const { success, data } = await this.workpackModelSrv.hasParentProject(this.idWorkpackModel);
+    //   if (success) {
+    //     hasParentProject = data;
+    //   } else {
+    //     this.messageSrv.add({
+    //       severity: 'error',
+    //       detail: this.translateSrv.instant('messages.error.couldNotCheckParentProject')
+    //     });
+    //   }
+    // }
     const itemsModels: ICardItem[] = this.editPermission
       ? [{
         typeCardItem: 'newCardItemModel',
         iconSvg: true,
         icon: IconsEnum.Plus,
         iconMenuItems: Object.keys(TypeWorkpackModelEnum)
-          .filter(type => !['DeliverableModel', 'MilestoneModel'].includes(type)
-            || hasParentProject)
           .map(type => {
             const item = {
               label: this.translateSrv.instant(`labels.${TypeWorkpackModelEnum[type]}`),
@@ -1386,7 +1495,8 @@ export class WorkpackModelComponent implements OnInit {
           { name: 'type', value: TypeWorkpackModelEnum[workpackModel.type] },
           { name: 'idStrategy', value: this.idStrategy },
           { name: 'idOffice', value: this.idOffice }
-        ]
+        ],
+        breadcrumbWorkpackModel: this.getCurrentBreadcrumb()
       })));
     }
     this.cardItemsModels = itemsModels;
@@ -1406,7 +1516,8 @@ export class WorkpackModelComponent implements OnInit {
         node.children = this.loadReuseListOptions(model.children, node);
         return node;
       }
-      return { label: model.name,
+      return {
+        label: model.name,
         icon: `${model.icon}`,
         data: model.id,
         children: undefined,
@@ -1427,7 +1538,7 @@ export class WorkpackModelComponent implements OnInit {
   }
 
   async loadReusableWorkpackModels() {
-    const result = await this.workpackModelSrv.getReusableWorkpackModel(this.idWorkpackModel, {'id-plan-model': this.idStrategy});
+    const result = await this.workpackModelSrv.getReusableWorkpackModel(this.idWorkpackModel, { 'id-plan-model': this.idStrategy });
     if (result.success) {
       this.reusableWorkpackModelsList = this.loadReuseListOptions(result.data);
     }
@@ -1438,6 +1549,8 @@ export class WorkpackModelComponent implements OnInit {
     const result = await this.workpackModelSrv.reuseWorkpackModel(idReusableWorkpackModelSelected, this.idWorkpackModel);
     if (result.success) {
       const workpackModel = result.data;
+      const breadcrumb = this.getCurrentBreadcrumb();
+      this.breadcrumbSrv.setBreadcrumbStorage(breadcrumb);
       this.router.navigate(['/workpack-model'], {
         queryParams: {
           id: workpackModel.id,
@@ -1450,6 +1563,8 @@ export class WorkpackModelComponent implements OnInit {
   }
 
   navigateToWorkpackModel(type: string) {
+    const breadcrumb = this.getCurrentBreadcrumb();
+    this.breadcrumbSrv.setBreadcrumbStorage(breadcrumb);
     this.router.navigate([], {
       queryParams: {
         type,
@@ -1464,7 +1579,7 @@ export class WorkpackModelComponent implements OnInit {
     const message = workpackModel.children && workpackModel.children.length > 0 ? this.translateSrv.instant('messages.deleteWorkpackModelConfirmation') :
       this.translateSrv.instant('messages.deleteConfirmation');
 
-    const { success } = await this.workpackModelSrv.deleteWokpackModel(workpackModel, {message, field: 'modelName', useConfirm: true, idParent: this.idWorkpackModel });
+    const { success } = await this.workpackModelSrv.deleteWokpackModel(workpackModel, { message, field: 'modelName', useConfirm: true, idParent: this.idWorkpackModel });
     if (success) {
       this.childrenModels = Array.from(this.childrenModels.filter(c => c.id !== workpackModel.id));
       this.cardItemsModels = Array.from(this.cardItemsModels.filter(m => m.itemId !== workpackModel.id));
@@ -1491,7 +1606,7 @@ export class WorkpackModelComponent implements OnInit {
 
   async refreshProperties(properties) {
     return (await Promise.all(properties
-      .map(async(p, i) => {
+      .map(async (p, i) => {
         if (p.possibleValues) {
           p.possibleValues = (p.possibleValues as string).split(',');
         };

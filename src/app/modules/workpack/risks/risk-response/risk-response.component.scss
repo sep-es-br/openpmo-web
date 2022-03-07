@@ -129,6 +129,13 @@
           }
         }
       }
+      .app-multiple-selection {
+        .p-multiselect:not(.p-disabled).p-focus {
+          box-shadow: none;
+          border: none;
+          border-bottom: 1px solid #b6c8cd;
+        }
+      }
       .status-container {
         display: flex;
         flex-direction: row;

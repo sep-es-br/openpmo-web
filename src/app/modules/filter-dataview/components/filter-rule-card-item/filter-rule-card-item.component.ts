@@ -1,14 +1,17 @@
+import { TypePropertyModelEnum } from './../../../../shared/enums/TypePropertyModelEnum';
+import { IFilterProperty } from 'src/app/shared/interfaces/IFilterProperty';
 import { IWorkpackProperty } from './../../../../shared/interfaces/IWorkpackProperty';
 import { FilterDataviewOperators, FilterDataviewLogicalOperators } from './../../../../shared/constants/filterDataviewOperators';
-import { SelectItem } from 'primeng/api';
+import { SelectItem, TreeNode } from 'primeng/api';
 import { IconsEnum } from './../../../../shared/enums/IconsEnum';
-import { takeUntil } from 'rxjs/operators';
+import { takeUntil, filter } from 'rxjs/operators';
 import { TranslateService } from '@ngx-translate/core';
 import { ResponsiveService } from './../../../../shared/services/responsive.service';
 import { Subject } from 'rxjs';
 import { ICardItemFilterRules } from './../../../../shared/interfaces/ICardItemFilterRules';
 import { Component, Input, OnInit, Output, EventEmitter } from '@angular/core';
 import { PropertyTemplateModel } from 'src/app/shared/models/PropertyTemplateModel';
+import * as moment from 'moment';
 
 @Component({
   selector: 'app-filter-rule-card-item',
@@ -31,9 +34,10 @@ export class FilterRuleCardItemComponent implements OnInit {
   currentLang: string;
   $destroy = new Subject();
   operatorsList: SelectItem[];
-  propertySelected: PropertyTemplateModel;
+  propertySelected: IFilterProperty;
   logicalOperatorsOptions: SelectItem[];
   workpackModelEntitiesOptions = ['stakeholders', 'risks', 'issues', 'processes'];
+  typePropertyModel = TypePropertyModelEnum;
 
   constructor(
     private responsiveSrv: ResponsiveService,
@@ -78,11 +82,8 @@ export class FilterRuleCardItemComponent implements OnInit {
     }];
     const operators = FilterDataviewOperators;
     this.operatorsList = operators;
-    this.propertySelected = new PropertyTemplateModel();
     if (this.filterRuleCard.propertySelected) {
       this.propertySelected = this.filterRuleCard.propertySelected;
-    } else {
-      this.filterRuleCard.propertySelected = new PropertyTemplateModel();
     }
   }
 
@@ -105,17 +106,63 @@ export class FilterRuleCardItemComponent implements OnInit {
           label: this.translateSrv.instant(item.value)
         })) : this.filterRuleCard.propertySelected.possibleValues;
     }
-
+    this.setDefaultValue();
     if (this.validatedCard()) {
       this.ruleChanged.emit();
     }
   }
 
-  handleSetPropertyValue() {
-    const property: IWorkpackProperty = this.propertySelected.getValues();
-    this.filterRuleCard.propertySelected.value = property.value ? property.value : (property.selectedValue ? property.selectedValue : property.selectedValues);
+  setDefaultValue() {
+    if (this.typePropertyModel[this.propertySelected.type] === TypePropertyModelEnum.DateModel) {
+      const dateValue = (this.propertySelected.defaultValue && this.propertySelected.defaultValue.toLocaleString());
+      this.filterRuleCard.value = dateValue ? new Date(dateValue) : null;
+    }
+    if (this.typePropertyModel[this.propertySelected.type] === TypePropertyModelEnum.SelectionModel && this.propertySelected.multipleSelection) {
+      const listValues = this.propertySelected.defaultValue as string;
+      this.filterRuleCard.value = listValues.split(',');
+    }
+    if (this.propertySelected.localitiesSelected ) {
+      this.filterRuleCard.value = this.propertySelected.multipleSelection ? this.propertySelected.localitiesSelected as TreeNode[]
+      : this.propertySelected.localitiesSelected[0] as TreeNode;
+    }
+    if (this.typePropertyModel[this.propertySelected.type] === TypePropertyModelEnum.OrganizationSelectionModel) {
+      
+      if (this.propertySelected.multipleSelection) {
+        this.filterRuleCard.value = this.propertySelected.defaults as number[];
+      }
+      if (!this.propertySelected.multipleSelection) {
+        const defaults = this.propertySelected.defaults && this.propertySelected.defaults as number[];
+        const defaultsValue = defaults && defaults[0];
+        this.filterRuleCard.value = defaultsValue && defaultsValue;
+      }
+    } 
+    if (this.typePropertyModel[this.propertySelected.type] === TypePropertyModelEnum.UnitSelectionModel) {
+      this.filterRuleCard.value = this.propertySelected.defaults as number;
+    }
+  }
+
+  handleSetPropertyValue(event) {
+    this.filterRuleCard.propertySelected = this.propertySelected;
+    switch (this.propertySelected.type) {
+      case 'Date': 
+        const date = event.value as Date;
+        this.filterRuleCard.value = moment(date).toDate();
+        break;
+      case 'LocalitySelection':
+        if (!!this.propertySelected.multipleSelection) {
+          const selection = event.value as TreeNode[];
+          this.filterRuleCard.value = selection;
+        } else {
+          const selection = event.value as TreeNode;
+          this.filterRuleCard.value = selection;
+        }
+        break;
+      default:
+        this.filterRuleCard.value = event.value;
+        break;
+    }
     if (this.validatedCard()) {
-      this.ruleChanged.emit();
+      this.ruleChanged.emit(event);
     }
   }
 
@@ -129,8 +176,7 @@ export class FilterRuleCardItemComponent implements OnInit {
     if (!this.filterRuleCard.logicalOperator) {
       return false;
     }
-    const property: IWorkpackProperty = this.propertySelected.getValues();
-    if (!property || (!property.value && !property.selectedValue && (!property.selectedValues || property.selectedValues.length === 0))) {
+    if (!this.propertySelected || !this.filterRuleCard.value) {
       return false;
     }
     return true;

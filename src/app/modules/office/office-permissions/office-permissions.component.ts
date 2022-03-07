@@ -107,6 +107,10 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
   }
 
   async ngOnInit() {
+    const editPermission = await this.officePermissionsSrv.getPermissions(this.idOffice);
+    if (!editPermission) {
+      this.router.navigate(['/offices']);
+    }
     await this.getAuthServer();
     await this.loadPermission();
     await this.loadPropertiesOffice();
@@ -120,11 +124,11 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
         queryParams: { idOffice: this.idOffice }
       },
       {
-        key: 'officePermissions',
+        key: 'configuration',
+        info: 'officePermissions',
+        tooltip: this.translateSrv.instant('officePermissions'),
         routerLink: ['/offices', 'permission'],
         queryParams: { idOffice: this.idOffice },
-        info: this.propertiesOffice?.name,
-        tooltip: this.propertiesOffice?.fullName
       },
       {
         key: 'permissions',
@@ -193,7 +197,7 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
 
   loadCardItemsPersonPermissions() {
     if (this.permission) {
-      this.cardItemsOfficePermission = this.permission.permissions && this.permission.permissions.map(p => ({
+      this.cardItemsOfficePermission = this.permission?.permissions && this.permission?.permissions.map(p => ({
         typeCardItem: 'editItem',
         titleCardItem: p.role,
         levelListOptions: [
@@ -204,8 +208,8 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
         selectedOption: p.level,
         itemId: p.id
       }));
-      const rolesNotPermissions = this.permission.permissions ? this.permission.person.roles
-        .filter(r => this.permission.permissions.filter(p => p.role === r.role).length === 0) : this.permission.person.roles;
+      const rolesNotPermissions = this.permission?.permissions ? this.permission?.person?.roles
+        .filter(r => this.permission?.permissions.filter(p => p.role === r.role).length === 0) : this.permission?.person?.roles;
       if (rolesNotPermissions) {
         rolesNotPermissions.forEach(r => {
           if (this.cardItemsOfficePermission && this.cardItemsOfficePermission.length > 0) {
@@ -385,10 +389,10 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
       person: this.person,
       permissions: this.permission.permissions
     };
-    const { success } = this.email
+    const result = this.email
       ? await this.officePermissionsSrv.put(permission)
       : await this.officePermissionsSrv.post(permission);
-    if (success) {
+    if (result.success) {
       this.messageSrv.add({
         severity: 'success',
         summary: this.translateSrv.instant('success'),

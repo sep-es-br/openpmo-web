@@ -50,6 +50,10 @@ export class AdministratorListComponent implements OnInit {
   }
 
   async ngOnInit() {
+    const isUserAdmin = await this.authSrv.isUserAdmin();
+    if (!isUserAdmin) {
+      this.router.navigate['/offices'];
+    }
     this.loadCurrentUserInfo();
     await this.loadAdministrators();
     this.loadBreadcrump();

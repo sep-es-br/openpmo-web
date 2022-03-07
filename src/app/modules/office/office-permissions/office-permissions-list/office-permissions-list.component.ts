@@ -1,3 +1,4 @@
+import { IFilterProperty } from 'src/app/shared/interfaces/IFilterProperty';
 import { PropertyTemplateModel } from './../../../../shared/models/PropertyTemplateModel';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -31,11 +32,10 @@ export class OfficePermissionsListComponent implements OnInit {
   cardOfficePermissions: ICard = {
     toggleable: false,
     initialStateToggle: false,
-    cardTitle: 'permissions',
+    cardTitle: '',
     collapseble: true,
     initialStateCollapse: false
   };
-  collapsePanelsStatus = true;
   displayModeAll = 'grid';
   pageSize = 5;
   totalRecords: number;
@@ -64,6 +64,10 @@ export class OfficePermissionsListComponent implements OnInit {
   }
 
   async ngOnInit() {
+    const editPermission = await this.officePermissionsSrv.getPermissions(this.idOffice);
+    if (!editPermission) {
+      this.router.navigate(['/offices']);
+    }
     await this.loadPropertiesOffice();
     await this.loadCurrentUserInfo();
     this.breadcrumbSrv.setMenu([
@@ -71,25 +75,17 @@ export class OfficePermissionsListComponent implements OnInit {
         key: 'administration',
         info: this.propertiesOffice?.name,
         tooltip: this.propertiesOffice?.fullName,
-        routerLink: [ '/configuration-office' ],
+        routerLink: ['/configuration-office'],
         queryParams: { idOffice: this.idOffice }
       },
       {
-        key: 'officePermissions',
+        key: 'configuration',
+        info: 'officePermissions',
+        tooltip: this.translateSrv.instant('officePermissions'),
         routerLink: ['/offices', 'permission'],
         queryParams: { idOffice: this.idOffice },
-        info: this.propertiesOffice?.name,
-        tooltip: this.propertiesOffice?.fullName
       }
     ]);
-  }
-
-  handleChangeCollapseExpandPanel(event) {
-    this.collapsePanelsStatus = event.mode === 'collapse' ? true : false;
-    this.cardOfficePermissions = Object.assign({}, {
-      ...this.cardOfficePermissions,
-      initialStateCollapse: this.collapsePanelsStatus
-    });
   }
 
   handleChangeDisplayMode(event) {
@@ -110,7 +106,7 @@ export class OfficePermissionsListComponent implements OnInit {
   }
 
   async loadOfficePermissions() {
-    const result = await this.officePermissionsSrv.GetAll({'id-office': this.idOffice, idFilter: this.idFilterSelected});
+    const result = await this.officePermissionsSrv.GetAll({ 'id-office': this.idOffice, idFilter: this.idFilterSelected });
     if (result.success) {
       this.officePermissions = result.data;
       this.loadCardItemsOfficePermissions();
@@ -120,9 +116,9 @@ export class OfficePermissionsListComponent implements OnInit {
   async loadOfficePermissionsFilters() {
     const result = await this.filterSrv.getAllFilters('office-permissions');
     if (result.success && result.data.length > 0) {
-        const filterDefault = result.data.find( filter => !!filter.favorite);
-        this.idFilterSelected = filterDefault ? filterDefault.id : undefined;
-        this.cardOfficePermissions.filters = result.data;
+      const filterDefault = result.data.find(filter => !!filter.favorite);
+      this.idFilterSelected = filterDefault ? filterDefault.id : undefined;
+      this.cardOfficePermissions.filters = result.data;
     }
     this.cardOfficePermissions.showFilters = true;
   }
@@ -132,10 +128,10 @@ export class OfficePermissionsListComponent implements OnInit {
       this.cardItemsOfficePermissions = this.officePermissions.map(p => {
         const fullName = p.person.name.split(' ');
         const name = fullName.length > 1 ? fullName[0] + ' ' + fullName[1] : fullName[0];
-      return  {
+        return {
           typeCardItem: 'listItem',
           titleCardItem: name,
-          roleDescription: (p.permissions.filter( r => r.level === 'EDIT').length > 0
+          roleDescription: (p.permissions.filter(r => r.level === 'EDIT').length > 0
             ? this.translateSrv.instant('edit')
             : this.translateSrv.instant('read')),
           menuItems: [{
@@ -146,8 +142,8 @@ export class OfficePermissionsListComponent implements OnInit {
           itemId: p.person.id,
           urlCard: '/offices/permission/detail',
           paramsUrlCard: [
-            {name: 'idOffice', value: this.idOffice},
-            {name: 'email', value: p.person.email}
+            { name: 'idOffice', value: this.idOffice },
+            { name: 'email', value: p.person.email }
           ]
         };
       });
@@ -174,18 +170,18 @@ export class OfficePermissionsListComponent implements OnInit {
   }
 
   async deleteOfficePermission(permission: IOfficePermission) {
-    if(permission.person.id === this.currentUserInfo.id) {
+    if (permission.person.id === this.currentUserInfo.id) {
       return this.messageSrv.add({
         summary: this.translateSrv.instant('error'),
         severity: 'warn',
         detail: this.translateSrv.instant('messages.error.permission.delete.relationship.error')
       });
     }
-    const result = await this.officePermissionsSrv.deletePermission({email: permission.person.email, 'id-office': permission.idOffice});
+    const result = await this.officePermissionsSrv.deletePermission({ email: permission.person.email, 'id-office': permission.idOffice });
     if (result.success) {
-      const permissionIndex = this.cardItemsOfficePermissions.findIndex( p => p.itemId === permission.person.id);
+      const permissionIndex = this.cardItemsOfficePermissions.findIndex(p => p.itemId === permission.person.id);
       if (permissionIndex > -1) {
-        this.cardItemsOfficePermissions.splice(permissionIndex,1);
+        this.cardItemsOfficePermissions.splice(permissionIndex, 1);
         this.cardItemsOfficePermissions = Array.from(this.cardItemsOfficePermissions);
         this.totalRecords = this.cardItemsOfficePermissions && this.cardItemsOfficePermissions.length;
       }
@@ -209,10 +205,8 @@ export class OfficePermissionsListComponent implements OnInit {
 
   async handleSelectedFilter(event) {
     const idFilter = event.filter;
-    if (idFilter) {
-      this.idFilterSelected = idFilter;
-      await this.loadOfficePermissions();
-    }
+    this.idFilterSelected = idFilter;
+    await this.loadOfficePermissions();
   }
 
   handleNewFilter() {
@@ -228,13 +222,14 @@ export class OfficePermissionsListComponent implements OnInit {
 
   loadFilterPropertiesList() {
     const listProperties = FilterDataviewPropertiesEntity.officePermissions;
-    const filterPropertiesList = listProperties.map( prop => {
-      const property =  new PropertyTemplateModel();
-      property.type = prop.type;
-      property.label = prop.label;
-      property.name = prop.apiValue;
-      property.active = true;
-      property.possibleValues = prop.possibleValues;
+    const filterPropertiesList = listProperties.map(prop => {
+      const property: IFilterProperty = {
+        type: prop.type,
+        label: prop.label,
+        name: prop.apiValue,
+        active: true,
+        possibleValues: prop.possibleValues
+      }
       return property;
     });
     return filterPropertiesList;

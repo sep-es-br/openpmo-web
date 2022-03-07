@@ -6,3 +6,12 @@ export enum IconsTypeWorkpackModelEnum {
   ProjectModel = 'fas fa-cog',
   MilestoneModel = 'fas fa-flag'
 }
+
+export enum IconsTypeWorkpackEnum {
+  Portfolio = 'fas fa-briefcase',
+  Program = 'fas fa-cogs',
+  Organizer = 'fas fa-folder-open',
+  Deliverable = 'fas fa-boxes',
+  Project = 'fas fa-cog',
+  Milestone = 'fas fa-flag'
+}

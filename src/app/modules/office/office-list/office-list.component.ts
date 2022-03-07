@@ -1,3 +1,5 @@
+import { IFilterProperty } from './../../../shared/interfaces/IFilterProperty';
+import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
 import { FilterDataviewService } from '../../../shared/services/filter-dataview.service';
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
@@ -9,6 +11,7 @@ import { OfficeService } from 'src/app/shared/services/office.service';
 import { FilterDataviewPropertiesEntity } from 'src/app/shared/constants/filterDataviewPropertiesEntity';
 import { PropertyTemplateModel } from 'src/app/shared/models/PropertyTemplateModel';
 import { ICardItemOffice } from 'src/app/shared/interfaces/ICardItemOffice';
+import { CookieService } from 'ngx-cookie';
 
 @Component({
   selector: 'app-office-list',
@@ -27,11 +30,11 @@ export class OfficeListComponent implements OnInit {
   cardItemsProperties: ICardItemOffice[];
   isUserAdmin: boolean;
   isListEmpty = false;
-  collapsePanelsStatus = true;
+  collapsePanelsStatus = false;
   displayModeAll = 'grid';
   pageSize = 5;
   totalRecords: number;
-  filterProperties: PropertyTemplateModel[] = this.filterSrv.get;
+  filterProperties: IFilterProperty[] = this.filterSrv.get;
   idFilterSelected: number;
 
   constructor(
@@ -39,19 +42,13 @@ export class OfficeListComponent implements OnInit {
     private router: Router,
     private authSrv: AuthService,
     private filterSrv: FilterDataviewService,
+    private breadcrumbSrv: BreadcrumbService
   ) { }
 
   async ngOnInit() {
     await this.loadFiltersOffices();
     await this.loadPropertiesOffice();
-  }
-
-  handleChangeCollapseExpandPanel(event) {
-    this.collapsePanelsStatus = event.mode === 'collapse' ? true : false;
-    this.cardProperties = Object.assign({}, {
-      ...this.cardProperties,
-      initialStateCollapse: this.collapsePanelsStatus
-    });
+    this.breadcrumbSrv.setMenu([]);
   }
 
   handleChangeDisplayMode(event) {
@@ -78,9 +75,9 @@ export class OfficeListComponent implements OnInit {
     this.cardProperties.showCreateNemElementButton = this.isUserAdmin ? true : false;
     if (success) {
       this.isListEmpty = !data.length;
-      if(this.isListEmpty && !this.isUserAdmin) {
+      if (this.isListEmpty && !this.isUserAdmin) {
         const personInfo = await this.authSrv.getInfoPerson();
-        if(personInfo.isCcbMember) {
+        if (personInfo.isCcbMember) {
           this.router.navigate(['/ccbmember-baselines-view']);
         } else {
           this.authSrv.nextIsLoginDenied(true);
@@ -131,7 +128,7 @@ export class OfficeListComponent implements OnInit {
   async loadFiltersOffices() {
     const result = await this.filterSrv.getAllFilters('offices');
     if (result.success && result.data.length > 0) {
-      const filterDefault = result.data.find( filter => !!filter.favorite);
+      const filterDefault = result.data.find(filter => !!filter.favorite);
       this.idFilterSelected = filterDefault ? filterDefault.id : undefined;
       this.cardProperties.filters = result.data;
     }
@@ -139,6 +136,7 @@ export class OfficeListComponent implements OnInit {
   }
 
   handleEditFilter(event) {
+    this.setBreadcrumbStorage();
     const idFilter = event.filter;
     if (idFilter) {
       const filterProperties = this.loadFilterPropertiesList();
@@ -154,13 +152,12 @@ export class OfficeListComponent implements OnInit {
 
   async handleSelectedFilter(event) {
     const idFilter = event.filter;
-    if (idFilter) {
-      this.idFilterSelected = idFilter;
-      await this.loadPropertiesOffice();
-    }
+    this.idFilterSelected = idFilter;
+    await this.loadPropertiesOffice();
   }
 
   handleNewFilter() {
+    this.setBreadcrumbStorage();
     const filterProperties = this.loadFilterPropertiesList();
     this.filterSrv.setFilterProperties(filterProperties);
     this.router.navigate(['/filter-dataview'], {
@@ -172,15 +169,23 @@ export class OfficeListComponent implements OnInit {
 
   loadFilterPropertiesList() {
     const listProperties = FilterDataviewPropertiesEntity.offices;
-    const filterPropertiesList = listProperties.map( prop => {
-      const property =  new PropertyTemplateModel();
-      property.type = prop.type;
-      property.label = prop.label;
-      property.name = prop.apiValue;
-      property.active = true;
+    const filterPropertiesList = listProperties.map(prop => {
+      const property: IFilterProperty = {
+        type: prop.type,
+        label: prop.label,
+        name: prop.apiValue,
+        active: true,
+      }
       return property;
     });
     return filterPropertiesList;
+  }
+
+  setBreadcrumbStorage() {
+    this.breadcrumbSrv.setBreadcrumbStorage([{
+      key: 'filter',
+      routerLink: ['/filter-dataview']
+    }]);
   }
 
 }

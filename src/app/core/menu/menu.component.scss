@@ -1,7 +1,7 @@
 @use 'src/variables' as v;
-$mobileMenuHeight: 72px;
+$mobileMenuHeight: 90px;
 
-.app-menu {
+::ng-deep .app-menu {
   display: flex;
   flex-direction: column;
   width: 64px;
@@ -49,17 +49,19 @@ $mobileMenuHeight: 72px;
   &.admin-menu {
     background-color: v.$bgMenuAdmin;
     .item {
-      color: v.$bgMenuAdmin !important;
+      color: #ffffff !important;
     }
   }
   &.mobile {
     width: 100%;
+    display: flex;
     flex-direction: row;
     height: $mobileMenuHeight;
     background-color: v.$bg;
     position: fixed;
     top: auto;
     bottom: 0;
+    padding: 0.5em;
     font-size: .688rem;
 
     .app-icon {
@@ -70,18 +72,115 @@ $mobileMenuHeight: 72px;
         color: v.$bgMenuAdmin;
       }
     }
-    .item {
-      padding: 0;
+    .menuadmin-icons-mobileview-container {
+      width: 100%;
       display: flex;
-      flex-direction: column;
-      justify-content: center;
-      height: 100%;
-      color: v.$fontLabel;
-
-      .item-label {
-        font-size: .9rem;
-        padding-top: 5px;
-        max-width: 100%;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding: 0.5em;
+      .item {
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        width: 25%;
+        height: 100%;
+        color: v.$fontLabel;
+        padding: 12px 0;
+        .item-label {
+          font-size: 11px;
+          padding-top: 5px;
+          max-width: 100%;
+          color: #a7074b;
+        }
+      }
+      .item-avatar {
+        width: 25%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        padding: 12px 0;
+        height: 100%;
+        color: v.$fontLabel;
+        .item-label {
+          color: #a7074b;
+          font-size: 11px;
+        }
+        .app-avatar {
+          display: flex;
+          flex-direction: row;
+          justify-content: center;
+          width: 100%;
+          .avatar {
+            padding: 0 !important;
+          }
+          .avatar.small {
+            text-align: center !important;
+            width: 100%;
+            color: #888E96;
+            .p-avatar-xl .p-avatar-icon {
+              font-size: 2.25rem;
+            }
+          }
+          .p-avatar {
+            width: 36px;
+            height: 36px;
+          }
+        }
+      }
+    }
+    .menugeneral-icons-mobileview-container {
+      width: 100%;
+      display: flex;
+      flex-direction: row;
+      justify-content: space-evenly;
+      align-items: flex-start;
+      position: relative;
+      height: 90px;
+      .item {
+        width: 25%;
+        padding: 0.5em 0;
+        .item-label {
+          color: #888E96;
+          font-size: 11px;
+        }
+      }
+      .item-avatar {
+        width: 25%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        padding: 12px 0;
+        height: 100%;
+        color: v.$fontLabel;
+        .item-label {
+          color: #888E96;
+          font-size: 11px;
+        }
+        .app-avatar {
+          display: flex;
+          flex-direction: row;
+          justify-content: center;
+          width: 100%;
+          .avatar {
+            padding: 0 !important;
+          }
+          .avatar.small {
+            text-align: center !important;
+            width: 100%;
+            color: #888E96;
+            .p-avatar-xl .p-avatar-icon {
+              font-size: 2.25rem;
+            }
+          }
+          .p-avatar {
+            width: 36px;
+            height: 36px;
+          }
+        }
       }
     }
   }
@@ -277,9 +376,12 @@ $mobileMenuHeight: 72px;
     }
   }
   .p-panelmenu .p-panelmenu-content .p-menuitem .p-menuitem-link {
+    position: relative;
     .p-panelmenu-icon {
       order: 2;
       margin-left: 0.6rem;
+      right: 10px;
+      position: absolute;
     }
   }
   .p-panelmenu .p-panelmenu-content .p-menuitem .p-menuitem-link:focus {

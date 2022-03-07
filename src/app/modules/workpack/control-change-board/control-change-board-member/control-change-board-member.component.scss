@@ -2,18 +2,21 @@
 
 .app-control-change-board-member {
   width: 100%;
+  .app-content-header {
 
+  }
   .card-person {
     width: 100%;
     .person-properties {
       width: 100%;
-      margin-top: 2em;
+      //margin-top: 2em;
       margin-bottom: 2em;
       .input-toogle-container {
         display: flex;
-        margin-bottom: 2rem;
+        margin-bottom: 1rem;
         .app-toggle {
           margin-right: 0.5rem;
+          margin-left: 0;
         }
       }
       .search-container {
@@ -210,8 +213,12 @@
 
       .form {
         padding: 1em 0;
-        .person-name {
-          padding: 0.6rem 0 1.5rem 0.5rem;
+        .person-name-container {
+          padding: 0.5rem 0 1.5rem 0;
+          .person-name {
+            color: #004660;
+            font-weight: 500;
+          }
         }
         .app-input-text {
           width: 100%;
@@ -267,7 +274,7 @@
   display: flex;
   flex-direction: column;
   max-width: 100%;
-  margin-top: 2em;
+  // margin-top: 2em;
 
   .p-card {
     display: flex;

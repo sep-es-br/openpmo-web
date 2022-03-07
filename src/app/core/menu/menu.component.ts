@@ -2,6 +2,8 @@ import { Location } from '@angular/common';
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
+import * as moment from 'moment';
+import { CookieService } from 'ngx-cookie';
 import { MenuItem } from 'primeng/api';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -65,17 +67,18 @@ export class MenuComponent implements OnInit, OnDestroy {
     private locationSrv: Location,
     private officeSrv: OfficeService,
     private officePermissionSrv: OfficePermissionService,
-    private planSrv: PlanService
+    private planSrv: PlanService,
+    private cookieSrv: CookieService
   ) {
     this.translateChangeSrv.getCurrentLang()
       .pipe(takeUntil(this.$destroy))
       .subscribe(() => this.handleChangeLanguage());
-    this.menuSrv.isAdminMenu.pipe(takeUntil(this.$destroy)).subscribe(isAdminMenu => {
-      if (!this.isFixed) {
-        this.isAdminMenu = isAdminMenu;
-        this.updateMenuOfficeOnAdminChange();
-      }
-    });
+    // this.menuSrv.isAdminMenu.pipe(takeUntil(this.$destroy)).subscribe(isAdminMenu => {
+    //   if (!this.isFixed) {
+    //     this.isAdminMenu = isAdminMenu;
+    //     this.updateMenuOfficeOnAdminChange();
+    //   }
+    // });
     this.officeSrv.observableIdOffice().pipe(takeUntil(this.$destroy)).subscribe(async id => {
       if (!this.isFixed) {
         this.currentIDOffice = id;
@@ -138,6 +141,7 @@ export class MenuComponent implements OnInit, OnDestroy {
         }
       }
     });
+    // this.getMenuModeUser();
   }
 
   refreshPortfolioMenu() {
@@ -152,22 +156,41 @@ export class MenuComponent implements OnInit, OnDestroy {
   async ngOnInit() {
     this.isUserAdmin = await this.authSrv.isUserAdmin();
     const payload = this.authSrv.getTokenPayload();
-    this.loadOfficeMenu();
+    await this.loadOfficeMenu();
     await this.loadCurrentInfo();
     this.username = this.isUserAdmin
       ? 'Admin'
       : (this.currentUserInfo.name?.split(' ').shift() || payload.email);
+    this.getMenuModeUser();
   }
 
  async loadCurrentInfo() {
     this.currentUserInfo = await this.authSrv.getInfoPerson();
   }
 
+  getMenuModeUser() {
+    const user = this.authSrv.getTokenPayload();
+    const isFixed = this.cookieSrv.get('menuMode' + user.email) === 'true' ? true : false;
+    if (!!isFixed) {
+      this.toggleMenu('office')
+      this.handleChangeMenuMode();
+    }
+  }
+
   handleChangeMenuMode() {
     this.isFixed = true;
+    this.setCookieMenuMode();
     const itemsOffice = this.menus[0].isOpen ? this.itemsOffice : [];
     const itemsPortfolio = this.menus[1].isOpen ? this.itemsPorfolio : [];
     this.menuSrv.nextMenuState({ isFixed: this.isFixed, menus: this.menus, itemsOffice, itemsPorfolio: itemsPortfolio });
+  }
+
+  setCookieMenuMode() {
+    const date = moment().add(60, 'days').calendar();
+    const user = this.authSrv.getTokenPayload();
+    if (user && user.email) {
+      this.cookieSrv.put('menuMode' + user.email, 'true', { expires: date });
+    }
   }
 
   updateMenuOfficeOnAdminChange() {
@@ -223,11 +246,15 @@ export class MenuComponent implements OnInit, OnDestroy {
         styleClass: `office-${office.id} ${this.currentURL === `offices/office?id=${office.id}` ? 'active' : ''}`,
         command: (e) => {
           if (e.originalEvent?.target?.classList?.contains('p-menuitem-text')) {
-            this.router.navigate(['/offices', 'office'], { queryParams: { id: office.id } });
+            if (this.isAdminMenu) {
+              this.router.navigate(['/configuration-office'], { queryParams: { idOffice: office.id } });
+            } else {
+              this.router.navigate(['/offices', 'office'], { queryParams: { id: office.id } });
+            }
             this.closeAllMenus();
           }
         },
-        items: office.plans
+        items: !this.isAdminMenu && office.plans
           ? office.plans.map(plan =>
           ({
             label: plan.name,

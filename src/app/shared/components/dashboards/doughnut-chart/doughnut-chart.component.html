@@ -1,0 +1,13 @@
+<div class="chart-doughnut">
+  <div class="legends">
+    <ng-container *ngFor="let label of data.labels; let i = index">
+      <div class="legend">
+        <div class="box-color" [ngStyle]="{ backgroundColor: data.datasets[0].backgroundColor[i] }"></div>
+        <label class="label"> {{label}} </label>
+      </div>
+    </ng-container>
+  </div>
+  <div class="chart-container">
+    <p-chart [type]="type" [data]="data" [plugins]="plugins" [options]="options" [width]="251" [height]="237"></p-chart>
+  </div>
+</div>

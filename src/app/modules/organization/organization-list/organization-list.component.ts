@@ -1,3 +1,5 @@
+import { IFilterProperty } from 'src/app/shared/interfaces/IFilterProperty';
+import { TranslateService } from '@ngx-translate/core';
 import { PropertyTemplateModel } from './../../../shared/models/PropertyTemplateModel';
 import { FilterDataviewPropertiesEntity } from 'src/app/shared/constants/filterDataviewPropertiesEntity';
 import { FilterDataviewService } from './../../../shared/services/filter-dataview.service';
@@ -27,7 +29,7 @@ export class OrganizationListComponent implements OnInit {
   cardProperties: ICard = {
     toggleable: false,
     initialStateToggle: false,
-    cardTitle: 'organizations',
+    cardTitle: '',
     collapseble: true,
     initialStateCollapse: false
   };
@@ -37,7 +39,6 @@ export class OrganizationListComponent implements OnInit {
   isUserAdmin: boolean;
   editPermission: boolean;
   responsive: boolean;
-  collapsePanelsStatus = true;
   displayModeAll = 'grid';
   pageSize = 5;
   totalRecords: number;
@@ -52,7 +53,8 @@ export class OrganizationListComponent implements OnInit {
     private officePermissionSrv: OfficePermissionService,
     private responsiveSrv: ResponsiveService,
     private filterSrv: FilterDataviewService,
-    private router: Router
+    private router: Router,
+    private translateSrv: TranslateService
   ) {
     this.activeRoute.queryParams.subscribe(({ idOffice }) => this.idOffice = +idOffice);
     this.responsiveSrv.observable.subscribe(value => this.responsive = value);
@@ -62,6 +64,9 @@ export class OrganizationListComponent implements OnInit {
   async ngOnInit() {
     this.isUserAdmin = await this.authSrv.isUserAdmin();
     this.editPermission = await this.officePermissionSrv.getPermissions(this.idOffice);
+    if (! this.isUserAdmin && !this.editPermission) {
+      this.router.navigate(['/offices']);
+    }
     await this.loadFiltersOrganizations();
     await this.loadPropertiesOrganizations();
     await this.getOfficeById();
@@ -70,25 +75,17 @@ export class OrganizationListComponent implements OnInit {
         key: 'administration',
         info: this.propertiesOffice?.name,
         tooltip: this.propertiesOffice?.fullName,
-        routerLink: [ '/configuration-office' ],
+        routerLink: ['/configuration-office'],
         queryParams: { idOffice: this.idOffice }
       },
       {
-      key: 'organizations',
-      info: this.propertiesOffice?.name,
-      tooltip: this.propertiesOffice?.fullName,
-      routerLink: ['/organizations'],
-      queryParams: { idOffice: this.idOffice }
-    }
-  ]);
-  }
-
-  handleChangeCollapseExpandPanel(event) {
-    this.collapsePanelsStatus = event.mode === 'collapse' ? true : false;
-    this.cardProperties = Object.assign({}, {
-      ...this.cardProperties,
-      initialStateCollapse: this.collapsePanelsStatus
-    });
+        key: 'configuration',
+        info: 'organizations',
+        tooltip: this.translateSrv.instant('organizations'),
+        routerLink: ['/organizations'],
+        queryParams: { idOffice: this.idOffice }
+      }
+    ]);
   }
 
   handleChangeDisplayMode(event) {
@@ -130,7 +127,7 @@ export class OrganizationListComponent implements OnInit {
           command: () => this.deleteOrganization(organization),
           disabled: !this.editPermission
         }] as MenuItem[],
-        urlCard: 'organization',
+        urlCard: 'organizations/organization',
         paramsUrlCard: [{ name: 'idOffice', value: this.idOffice }],
       })
       ));
@@ -183,10 +180,8 @@ export class OrganizationListComponent implements OnInit {
 
   async handleSelectedFilter(event) {
     const idFilter = event.filter;
-    if (idFilter) {
-      this.idFilterSelected = idFilter;
-      await this.loadPropertiesOrganizations();
-    }
+    this.idFilterSelected = idFilter;
+    await this.loadPropertiesOrganizations();
   }
 
   handleNewFilter() {
@@ -203,12 +198,13 @@ export class OrganizationListComponent implements OnInit {
   loadFilterPropertiesList() {
     const listProperties = FilterDataviewPropertiesEntity.organizations;
     const filterPropertiesList = listProperties.map(prop => {
-      const property = new PropertyTemplateModel();
-      property.type = prop.type;
-      property.label = prop.label;
-      property.name = prop.apiValue;
-      property.active = true;
-      property.possibleValues = prop.possibleValues;
+      const property: IFilterProperty = {
+        type: prop.type,
+        label: prop.label,
+        name: prop.apiValue,
+        active: true,
+        possibleValues: prop.possibleValues
+      }
       return property;
     });
     return filterPropertiesList;
@@ -216,9 +212,16 @@ export class OrganizationListComponent implements OnInit {
 
   setBreadcrumbStorage() {
     this.breadcrumbSrv.setBreadcrumbStorage([{
-      key: 'organizations',
+      key: 'administration',
       info: this.propertiesOffice?.name,
       tooltip: this.propertiesOffice?.fullName,
+      routerLink: ['/configuration-office'],
+      queryParams: { idOffice: this.idOffice }
+    },
+    {
+      key: 'configuration',
+      info: 'organizations',
+      tooltip: this.translateSrv.instant('organizations'),
       routerLink: ['/organizations'],
       queryParams: { idOffice: this.idOffice }
     },

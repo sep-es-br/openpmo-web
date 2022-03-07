@@ -1,13 +1,15 @@
-<div [ngSwitch]="property.type" class="app-type-property">
-  <app-property-text *ngSwitchCase="types.TextModel" [property]="property" (changed)="changed.emit($event)"></app-property-text>
-  <app-property-date *ngSwitchCase="types.DateModel" [property]="property" (changed)="changed.emit($event)"></app-property-date>
-  <app-property-integer *ngSwitchCase="types.IntegerModel" [property]="property" (changed)="changed.emit($event)"></app-property-integer>
-  <app-property-integer *ngSwitchCase="types.NumberModel" [property]="property" (changed)="changed.emit($event)"></app-property-integer>
-  <app-property-integer *ngSwitchCase="types.CurrencyModel" [property]="property" (changed)="changed.emit($event)"></app-property-integer>
-  <app-property-selection *ngSwitchCase="types.SelectionModel" [property]="property" (changed)="changed.emit($event)"></app-property-selection>
-  <app-property-text *ngSwitchCase="types.TextAreaModel" [property]="property" (changed)="changed.emit($event)"></app-property-text>
-  <app-property-toggle *ngSwitchCase="types.ToggleModel" [property]="property" (changed)="changed.emit($event)"></app-property-toggle>
-  <app-property-tree-selection *ngSwitchCase="types.LocalitySelectionModel" [property]="property" (changed)="changed.emit($event)"></app-property-tree-selection>
-  <app-property-organization-selection *ngSwitchCase="types.OrganizationSelectionModel" [property]="property" (changed)="changed.emit($event)"></app-property-organization-selection>
-  <app-property-unit-selection *ngSwitchCase="types.UnitSelectionModel" [property]="property" (changed)="changed.emit($event)"></app-property-unit-selection>
+<div class="property-list-container" *ngIf="property">
+  <div [ngSwitch]="property.type" class="app-type-property">
+    <app-property-text *ngSwitchCase="types.TextModel" [property]="property" [value]="value" (changed)="changed.emit($event)"></app-property-text>
+    <app-property-date *ngSwitchCase="types.DateModel" [property]="property" [value]="value" (changed)="changed.emit($event)"></app-property-date>
+    <app-property-integer *ngSwitchCase="types.IntegerModel" [property]="property" [value]="value" (changed)="changed.emit($event)"></app-property-integer>
+    <app-property-integer *ngSwitchCase="types.NumberModel" [property]="property" [value]="value" (changed)="changed.emit($event)"></app-property-integer>
+    <app-property-integer *ngSwitchCase="types.CurrencyModel" [property]="property" [value]="value" (changed)="changed.emit($event)"></app-property-integer>
+    <app-property-selection *ngSwitchCase="types.SelectionModel" [property]="property" [value]="value" (changed)="changed.emit($event)"></app-property-selection>
+    <app-property-text *ngSwitchCase="types.TextAreaModel" [property]="property" [value]="value" (changed)="changed.emit($event)"></app-property-text>
+    <app-property-toggle *ngSwitchCase="types.ToggleModel" [property]="property" [value]="value" (changed)="changed.emit($event)"></app-property-toggle>
+    <app-property-tree-selection *ngSwitchCase="types.LocalitySelectionModel" [value]="value" [property]="property" (changed)="show($event); changed.emit($event)"></app-property-tree-selection>
+    <app-property-organization-selection *ngSwitchCase="types.OrganizationSelectionModel" [value]="value" [property]="property" (changed)="changed.emit($event)"></app-property-organization-selection>
+    <app-property-unit-selection *ngSwitchCase="types.UnitSelectionModel" [value]="value" [property]="property" (changed)="changed.emit($event)"></app-property-unit-selection>
+  </div>
 </div>

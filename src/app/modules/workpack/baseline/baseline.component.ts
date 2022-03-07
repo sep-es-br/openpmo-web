@@ -48,7 +48,9 @@ export class BaselineComponent implements OnInit {
     private responsiveSrv: ResponsiveService,
     private breadcrumbSrv: BreadcrumbService,
     private router: Router,
-    private authSrv: AuthService
+    private authSrv: AuthService,
+    private messageSrv: MessageService,
+    private translateSrv: TranslateService
   ) {
     this.actRouter.queryParams
       .subscribe(({ id, idWorkpack, idWorkpackModelLinked }) => {
@@ -134,7 +136,6 @@ export class BaselineComponent implements OnInit {
           this.formBaseline.disable();
           this.baseline.updates.forEach( update => update.included = true);
         }
-        console.log('baseline', this.baseline);
       }
     } else {
       this.baseline = {
@@ -200,9 +201,16 @@ export class BaselineComponent implements OnInit {
       message: this.formBaseline.controls.message.value
     };
     const result = this.idBaseline ? await this.baselineSrv.putBaseline(this.idBaseline, this.baseline) : await this.baselineSrv.post(this.baseline);
-    if (result.success && this.idBaseline) {
-      this.idBaseline = result.data.id;
-      this.baseline.id = result.data.id;
+    if (result.success) {
+      if (!this.idBaseline) {
+        this.baseline.id = result.data.id;
+        this.idBaseline = result.data.id;
+      }
+      this.messageSrv.add({
+        severity: 'success',
+        summary: this.translateSrv.instant('success'),
+        detail: this.translateSrv.instant('messages.savedSuccessfully')
+      });
     }
   }
 

@@ -93,10 +93,8 @@ export class IssueComponent implements OnInit {
     this.idPlan = Number(localStorage.getItem('@currentPlan'));
     await this.loadPropertiesIssue();
     await this.setBreadcrumb();
-    if (!this.editPermission) {
-      this.formIssue.disable;
-    } else {
-      this.formIssue.enable;
+    if (!this.idIssue) {
+      this.editPermission = true;
     }
   }
 
@@ -143,6 +141,12 @@ export class IssueComponent implements OnInit {
         const workpack = result.data;
         this.editPermission = workpack.permissions && workpack.permissions.filter(p => p.level === 'EDIT').length > 0;
       }
+    }
+
+    if (!this.editPermission) {
+      this.formIssue.disable();
+    } else {
+      this.formIssue.enable();
     }
   }
 
@@ -243,7 +247,7 @@ export class IssueComponent implements OnInit {
   async deleteIssueResponse(resp: IIssueResponse) {
     const result = await this.issueResponseSrv.delete(resp, { useConfirm: true });
     if (result.success) {
-      this.issueResponseCardItems = Array.from(this.issueResponseCardItems.filter(r => r.itemId === resp.id));
+      this.issueResponseCardItems = Array.from(this.issueResponseCardItems.filter(r => r.itemId !== resp.id));
     }
   }
 

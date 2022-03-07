@@ -2,14 +2,12 @@
 
 ::ng-deep .app-baseline {
   width: 100%;
-
   .card-properties-baseline{
     width: 100%;
     form {
       width: 100%;
     }
   }
-
   .header-container {
     display: flex;
     flex-direction: row;
@@ -26,7 +24,6 @@
   .mobile {
     width: 100%;
   }
-
   .app-content-header-cancelation {
     display: flex;
     justify-content: flex-start;
@@ -39,11 +36,10 @@
       margin-right: 0.5em;
     }
   }
-
   .card-updates-baseline {
     margin-top: 2em;
-    .toggle-all {
-      margin-left: 1em;
+    .app-toggle-container {
+      margin-left: 0.5em;
     }
     .updates-container {
       display: flex;
@@ -62,7 +58,6 @@
       
     }
   }
-
   .card-list-item {
     margin-bottom: 0.5em;
     .p-card {
@@ -111,11 +106,9 @@
         font-size: 0.9rem;
         margin-left: 0.5em;
       }
-      
     }
     .item-description-container-responsive {
       margin-left: 0;
-      
     }
     .item-status {
       display: flex;
@@ -132,9 +125,7 @@
         margin-right: 1em;
       }
     }
-    
   }
-
   .actions-buttons-container {
     padding-top: 4em;
     display: flex;
@@ -170,7 +161,6 @@
         background-color: rgba(234, 92, 92, 1);
       }
     }
-    
   }
   .actions-buttons-container-responsive {
     flex-direction: column;
@@ -181,7 +171,6 @@
       margin-right: 0;
     }
   }
-
   .panel-evaluations {
     margin-top: 2em;
     .app-card {
@@ -230,7 +219,6 @@
       .card-collapseble {
         cursor: pointer;
       }
-  
       p-header.card-header-mobile {
         display: flex;
         width: 100%;

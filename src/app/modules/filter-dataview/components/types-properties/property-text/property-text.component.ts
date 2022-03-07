@@ -1,3 +1,4 @@
+import { IFilterProperty } from 'src/app/shared/interfaces/IFilterProperty';
 import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { PropertyTemplateModel } from 'src/app/shared/models/PropertyTemplateModel';
@@ -10,7 +11,8 @@ import { ResponsiveService } from 'src/app/shared/services/responsive.service';
 })
 export class PropertyTextComponent implements OnInit {
 
-  @Input() property: PropertyTemplateModel;
+  @Input() property: IFilterProperty;
+  @Input() value: string;
   @Output() changed = new EventEmitter();
   responsive: boolean;
 
@@ -23,6 +25,10 @@ export class PropertyTextComponent implements OnInit {
   }
 
   ngOnInit(): void {
+  }
+
+  handleChangedValue() {
+    this.changed.next({value: this.value})
   }
 
 }

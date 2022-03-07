@@ -6,7 +6,7 @@ import { StakeholderService } from './../../../../shared/services/stakeholder.se
 import { BreadcrumbService } from './../../../../shared/services/breadcrumb.service';
 import { TranslateService } from '@ngx-translate/core';
 import { ResponsiveService } from './../../../../shared/services/responsive.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { SelectItem, MessageService } from 'primeng/api';
 import { IssueResponsesPropertiesOptions } from './../../../../shared/constants/issueResponsesPropertiesOptions';
 import { IIssueResponse } from './../../../../shared/interfaces/IIssueResponse';
@@ -55,7 +55,8 @@ export class IssueResponseComponent implements OnInit {
     private issueResponseSrv: IssueResponseService,
     private stakeholderSrv: StakeholderService,
     private workpackSrv: WorkpackService,
-    private authSrv: AuthService
+    private authSrv: AuthService,
+    private router: Router
   ) {
     this.actRouter.queryParams.subscribe(async queryParams => {
       this.idIssueResponse = queryParams.id && +queryParams.id;
@@ -231,8 +232,12 @@ export class IssueResponseComponent implements OnInit {
         summary: this.translateSrv.instant('success'),
         detail: this.translateSrv.instant('messages.savedSuccessfully')
       });
-      this.idIssueResponse = result.data.id;
-      this.issueResponse = {...result.data};
+      this.router.navigate(['/workpack/issues'], {
+        queryParams: {
+          idWorkpack: this.idWorkpack,
+          id: this.idIssue
+        }
+      })
     }
   }
 

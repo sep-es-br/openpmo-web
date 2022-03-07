@@ -1,3 +1,6 @@
+import { OfficePermissionService } from './../../../shared/services/office-permission.service';
+import { AuthService } from './../../../shared/services/auth.service';
+import { IOffice } from 'src/app/shared/interfaces/IOffice';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { IconsEnum } from 'src/app/shared/enums/IconsEnum';
@@ -30,24 +33,26 @@ export class PersonListComponent implements OnInit, OnDestroy {
   };
   cardItemsProperties: ICardItem[];
   isListEmpty = false;
-  collapsePanelsStatus = true;
   displayModeAll = 'grid';
   pageSize = 5;
   totalRecords: number;
 
   idOffice: number;
+  propertiesOffice: IOffice;
   responsive: boolean;
   $destroy = new Subject();
 
   treeViewScope: TreeNode[] = [];
   optionsAccess: SelectItem[] = [];
   optionsStakeholder: SelectItem[] = [];
+  optionsCCBMember: SelectItem[] = [];
   formSearch: FormGroup;
 
   allSelected: TreeNode[] = [];
   selectedOffices: TreeNode[] = [];
   selectedPlans: TreeNode[] = [];
   selectedWorkpacks: TreeNode[] = [];
+  scopeNameOptions: string[];
 
   constructor(
     private personSrv: PersonService,
@@ -57,21 +62,30 @@ export class PersonListComponent implements OnInit, OnDestroy {
     private responsiveSvr: ResponsiveService,
     private translateSrv: TranslateService,
     private formBuilder: FormBuilder,
-    private breadcrumbSrv: BreadcrumbService
+    private breadcrumbSrv: BreadcrumbService,
+    private authSrv: AuthService,
+    private officePermissionSrv: OfficePermissionService
   ) {
     this.activeRoute.queryParams.subscribe(async({ idOffice }) => {
       this.idOffice = +idOffice;
       await this.loads();
     });
     this.formSearch = this.formBuilder.group({
-      userStatus: [OptionsAccessEnum.All, Validators.required],
-      stakeholderStatus: [OptionsStakeholderEnum.All, Validators.required],
+      scopeName: '',
+      userStatus: [OptionsAccessEnum.All],
+      stakeholderStatus: [OptionsStakeholderEnum.All],
+      ccbMemberStatus: 'ALL',
       name: ['']
     });
     this.responsiveSvr.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.responsive = value);
   }
 
-  ngOnInit() {
+  async ngOnInit() {
+    const isUserAdmin = await this.authSrv.isUserAdmin();
+    const editPermission = await this.officePermissionSrv.getPermissions(this.idOffice);
+    if (!isUserAdmin && !editPermission) {
+      this.router.navigate(['/offices']);
+    }
   }
 
   ngOnDestroy(): void {
@@ -83,15 +97,16 @@ export class PersonListComponent implements OnInit, OnDestroy {
     await this.loadTreeViewScope();
     await this.loadPersons();
     this.loadOptions();
+    await this.getOfficeById();
     this.setBreadcrumb();
   }
 
   async loadPersons() {
     const { success, data } = await this.personSrv.GetAllPersons(this.idOffice, {
       ...this.formSearch?.value,
-      officeScope: this.selectedOffices.map(office => office.data),
-      planScope: this.selectedPlans.map(plan => plan.data),
-      workpackScope: this.selectedWorkpacks.map(workpack => workpack.data),
+      officeScope: this.selectedOffices.map(office => office.data).join(','),
+      planScope: this.selectedPlans.map(plan => plan.data).join(','),
+      workpackScope: this.selectedWorkpacks.map(workpack => workpack.data).join(','),
     });
     const itemsProperties: ICardItemOffice[] = [];
     this.cardProperties.showCreateNemElementButton = false;
@@ -136,6 +151,7 @@ export class PersonListComponent implements OnInit, OnDestroy {
         parent: undefined,
         children: undefined,
         selectable: true,
+        expanded: true,
         type: 'office'
       };
       node.children = data.plans.map(plan => ({
@@ -143,16 +159,31 @@ export class PersonListComponent implements OnInit, OnDestroy {
         data: plan.id,
         icon: `app-icon ${IconsEnum.Plan}`,
         parent: node,
+        expanded: true,
         children: this.loadTreeChildrens(plan.workpacks),
         selectable: true,
         type: 'plan'
 
       }) as TreeNode);
       this.treeViewScope = [{ ...node }];
-      this.allSelected = this.treeViewScope;
+      this.allSelected = this.setSelectedNodes(this.treeViewScope);
+      this.formSearch.controls.scopeName.setValue(this.allSelected[0].label);
       this.getSelectedsNode();
     }
   }
+
+  setSelectedNodes(list: TreeNode[]) {
+    let result = [];
+    list.forEach(l => {
+      result.push(l)
+      if (l.children && l.children.length > 0) {
+        const resultChildren = this.setSelectedNodes(l.children);
+        result = result.concat(resultChildren);
+      }
+    });
+    return result;
+  }
+
   loadTreeChildrens(worckpackList: ITreeViewScopeWorkpack[], parent?: TreeNode): TreeNode[] {
     if (worckpackList) {
       const list = worckpackList.map(worckpack => {
@@ -164,6 +195,7 @@ export class PersonListComponent implements OnInit, OnDestroy {
             children: undefined,
             parent,
             selectable: true,
+            expanded: true,
             type: 'workpack'
           };
           node.children = this.loadTreeChildrens(worckpack.children, node);
@@ -187,34 +219,42 @@ export class PersonListComponent implements OnInit, OnDestroy {
       { label: this.translateSrv.instant('stakeholders'), value: OptionsStakeholderEnum.Stakeholder },
       { label: this.translateSrv.instant('noStakeholders'), value: OptionsStakeholderEnum.NoStakeholder },
     ];
+    this.optionsCCBMember = [
+      { label: this.translateSrv.instant('all'), value: 'ALL' },
+      { label: this.translateSrv.instant('members'), value: 'CCB_MEMBERS' },
+      { label: this.translateSrv.instant('noMembers'), value: 'NON_CCB_MEMBERS' },
+    ]
+  }
+
+  async getOfficeById() {
+    const { success, data } = await this.officeSrv.GetById(this.idOffice);
+    if (success) {
+      this.propertiesOffice = data;
+    }
   }
 
   setBreadcrumb() {
     this.breadcrumbSrv.setMenu([
       {
         key: 'administration',
+        info: this.propertiesOffice?.name,
+        tooltip: this.propertiesOffice?.fullName,
         routerLink: ['/configuration-office'],
         queryParams: { idOffice: this.idOffice }
       },
       {
         key: 'configuration',
+        info: 'persons',
+        tooltip: this.translateSrv.instant('measureUnits'),
         routerLink: ['/persons'],
         queryParams: { idOffice: this.idOffice }
-      },
+      }
     ]);
   }
 
   navigateToPage(url: string, idPerson: number) {
     this.router.navigate([`${url}`]);
     this.router.navigate([url], { queryParams: { idPerson } });
-  }
-
-  handleChangeCollapseExpandPanel(event) {
-    this.collapsePanelsStatus = event.mode === 'collapse' ? true : false;
-    this.cardProperties = Object.assign({}, {
-      ...this.cardProperties,
-      initialStateCollapse: this.collapsePanelsStatus
-    });
   }
 
   handleChangeDisplayMode(event) {
@@ -231,8 +271,16 @@ export class PersonListComponent implements OnInit, OnDestroy {
   }
 
   getSelectedsNode() {
+    
     this.selectedOffices = this.allSelected.filter(node => node.type === 'office');
     this.selectedPlans = this.allSelected.filter(node => node.type === 'plan');
     this.selectedWorkpacks = this.allSelected.filter(node => node.type === 'workpack');
+    if (this.selectedOffices && this.selectedOffices.length > 0) {
+      this.formSearch.controls.scopeName.setValue(this.selectedOffices[0].label);
+    } else if (this.selectedPlans && this.selectedPlans.length > 0) {
+      this.formSearch.controls.scopeName.setValue(this.selectedPlans[0].label);
+    } else if (this.selectedWorkpacks && this.selectedWorkpacks.length > 0) {
+      this.formSearch.controls.scopeName.setValue(this.selectedWorkpacks[0].label);
+    }
   }
 }

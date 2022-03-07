@@ -2,8 +2,29 @@
 
 ::ng-deep .app-property-tree-selection {
   width: 100%;
-  padding-bottom: 10px;
+  // padding-bottom: 10px;
   label {
     font-size: 0.8rem;
+  }
+  .app-tree-selection.single-selection {
+    .p-tree-container .p-treenode .p-treenode-content.p-highlight {
+      background: transparent;
+      border: solid 1px #44B39B;
+    }
+  }
+  .button-select-locality-container {
+    display: flex;
+    flex-direction: column;
+    width: 250px;
+    .p-button {
+      background-color: #44B39B;
+      border: none !important;
+      margin: 0.5em 0 0;
+      width: 100%;
+      color: #ffffff;
+      .p-button-label {
+        text-align: left;
+      }
+    }
   }
 }

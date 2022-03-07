@@ -1,3 +1,6 @@
+import { IFilterProperty } from 'src/app/shared/interfaces/IFilterProperty';
+import { takeUntil } from 'rxjs/operators';
+import { IWorkpackCardItem } from './../../shared/interfaces/IWorkpackCardItem';
 import { IBaseline } from './../../shared/interfaces/IBaseline';
 import { BaselineService } from './../../shared/services/baseline.service';
 import { ProcessService } from './../../shared/services/process.service';
@@ -53,11 +56,18 @@ import { MenuService } from 'src/app/shared/services/menu.service';
 import { IOffice } from 'src/app/shared/interfaces/IOffice';
 import { IPlan } from 'src/app/shared/interfaces/IPlan';
 import * as moment from 'moment';
+import { Subject } from 'rxjs';
 
 interface ISection {
   idWorkpackModel?: number;
   cardSection: ICard;
   cardItemsSection?: ICardItem[];
+}
+
+interface ISectionWorkpacks {
+  idWorkpackModel?: number;
+  cardSection: ICard;
+  cardItemsSection?: IWorkpackCardItem[];
 }
 
 interface IScheduleSection {
@@ -81,7 +91,6 @@ interface IScheduleSection {
 export class WorkpackComponent implements OnDestroy {
 
   @ViewChild(SaveButtonComponent) saveButton: SaveButtonComponent;
-  navigationSubscription;
   responsive: boolean;
   idPlan: number;
   propertiesPlan: IPlan;
@@ -115,7 +124,7 @@ export class WorkpackComponent implements OnDestroy {
   sectionBaselines: ISection;
   organizationsOffice: IOrganization[];
   unitMeasuresOffice: IMeasureUnit[];
-  cardsWorkPackModelChildren: ISection[];
+  cardsWorkPackModelChildren: ISectionWorkpacks[];
   typePropertyModel = TypePropertyModelEnum;
   costAccounts: ICostAccount[];
   schedule: IScheduleDetail;
@@ -137,6 +146,17 @@ export class WorkpackComponent implements OnDestroy {
   processes: IProcess[];
   baselines: IBaseline[];
   unitMeansure: IMeasureUnit;
+  showDialogEndManagement = false;
+  showDialogResumeManagement = false;
+  endManagementWorkpack: {
+    idWorkpackModel?: number;
+    idWorkpack: number;
+    reason: string;
+    endManagementDate: Date;
+  };
+  calendarFormat = '';
+  $destroy = new Subject();
+  language: string;
 
   constructor(
     private actRouter: ActivatedRoute,
@@ -176,15 +196,18 @@ export class WorkpackComponent implements OnDestroy {
       this.planSrv.nextIDPlan(this.idPlan);
       await this.resetWorkpack();
     });
+    this.translateSrv.onLangChange.pipe(takeUntil(this.$destroy)).subscribe(() => {
+      setTimeout(() => this.language = this.translateSrv.currentLang, 200);
+    }
+    );
     this.responsiveSrv.observable.subscribe(value => {
       this.responsive = value;
     });
   }
 
-  ngOnDestroy() {
-    if (this.navigationSubscription) {
-      this.navigationSubscription.unsubscribe();
-    }
+  ngOnDestroy(): void {
+    this.$destroy.next();
+    this.$destroy.complete();
   }
 
   handleChangeCollapseExpandPanel(event) {
@@ -215,6 +238,13 @@ export class WorkpackComponent implements OnDestroy {
       ...this.sectionStakeholder,
       cardSection: {
         ...this.sectionStakeholder.cardSection,
+        initialStateCollapse: this.collapsePanelsStatus
+      }
+    });
+    this.sectionBaselines = this.sectionBaselines && Object.assign({}, {
+      ...this.sectionBaselines,
+      cardSection: {
+        ...this.sectionBaselines.cardSection,
         initialStateCollapse: this.collapsePanelsStatus
       }
     });
@@ -357,6 +387,7 @@ export class WorkpackComponent implements OnDestroy {
     this.idPlan = Number(localStorage.getItem('@currentPlan'));
     await this.loadProperties();
     await this.setBreadcrumb();
+    this.calendarFormat = this.translateSrv.instant('dateFormat');
   }
 
   async setBreadcrumb() {
@@ -382,7 +413,22 @@ export class WorkpackComponent implements OnDestroy {
   async getBreadcrumbs() {
     const id = this.idWorkpack || this.idWorkpackParent;
     if (!id) {
-      return [];
+      return [
+        {
+          key: 'office',
+          info: this.propertiesOffice.name,
+          tooltip: this.propertiesOffice.fullName,
+          routerLink: ['/offices', 'office'],
+          queryParams: { id: this.idOffice },
+        },
+        {
+          key: 'plan',
+          info: this.propertiesPlan.name,
+          tooltip: this.propertiesPlan.fullName,
+          routerLink: ['/plan'],
+          queryParams: { id: this.propertiesPlan.id },
+        }
+      ];
     }
     const { success, data } = await this.breadcrumbSrv.getBreadcrumbWorkpack(id, { 'id-plan': this.idPlan });
     return success
@@ -425,8 +471,8 @@ export class WorkpackComponent implements OnDestroy {
       await this.loadWorkpackModel(this.idWorkpackModel);
     }
     const workpackModelActivesProperties = (!!this.idWorkpackModelLinked && !!this.idWorkpack) ?
-      this.workpack.model.properties.filter(w => w.active && w.session === 'PROPERTIES') :
-      this.workpackModel.properties.filter(w => w.active && w.session === 'PROPERTIES');
+      this.workpack.model?.properties?.filter(w => w.active && w.session === 'PROPERTIES') :
+      this.workpackModel?.properties?.filter(w => w.active && w.session === 'PROPERTIES');
     this.sectionPropertiesProperties = await Promise.all(workpackModelActivesProperties.map(p => this.instanceProperty(p)));
     if (this.idWorkpack) {
       if (this.workpack.type === TypeWorkpackEnum.ProjectModel) {
@@ -458,7 +504,7 @@ export class WorkpackComponent implements OnDestroy {
       const propertyFullNameWorkpack = this.workpack.properties.find(p => p.idPropertyModel === propertyFullNameWorkpackModel.id);
       this.workpackFullName = propertyFullNameWorkpack.value as string;
       this.planSrv.nextIDPlan(this.idPlan);
-      if (this.workpack && this.workpack.canceled) {
+      if (this.workpack && (this.workpack.canceled || this.workpack.endManagementDate !== null)) {
         this.editPermission = false;
       } else if (!this.isUserAdmin && this.workpack) {
         await this.loadUserPermission();
@@ -499,13 +545,33 @@ export class WorkpackComponent implements OnDestroy {
     const result = await this.workpackModelSrv.GetById(idWorkpackModel);
     if (result.success) {
       this.workpackModel = result.data;
+      this.showCheckCompleted();
     }
     const plan = await this.planSrv.GetById(this.idPlan);
     if (plan.success) {
       this.propertiesPlan = plan.data;
       this.idOffice = plan.data.idOffice;
+      const office = await this.officeSrv.GetById(this.idOffice);
+      if (office.success) {
+        this.propertiesOffice = office.data;
+      }
       this.officeSrv.nextIDOffice(this.idOffice);
       await this.loadPermissionsOffice();
+    }
+  }
+
+  showCheckCompleted() {
+    if (!this.workpackModel.scheduleSessionActive) {
+      this.cardWorkpackProperties.showCheckCompleted = true;
+      this.cardWorkpackProperties.workpackCompleted = this.workpack && this.workpack.completed;
+    }
+  }
+
+  async handleChangeCheckCompleted(event) {
+    const completed = event;
+    const result = await this.workpackSrv.completeDeliverable(this.idWorkpack, completed);
+    if (result.success) {
+      this.workpack.completed = completed;
     }
   }
 
@@ -811,8 +877,8 @@ export class WorkpackComponent implements OnDestroy {
   }
 
   async loadSectionsWorkpackModel() {
-    if (this.workpackModel.stakeholderSessionActive
-      && (((this.isUserAdmin || this.editPermissionOffice) && !this.idWorkpackModelLinked)) || (this.editPermission && !!this.idWorkpackModelLinked)) {
+    if (!!this.workpackModel.stakeholderSessionActive
+      && (((this.isUserAdmin || this.editPermissionOffice) && !this.idWorkpackModelLinked) || (this.editPermission && !!this.idWorkpackModelLinked))) {
       const resultFilters = await this.filterSrv.getAllFilters(`workpackModels/${this.workpack.model.id}/stakeholders`);
       const filters = resultFilters.success && Array.isArray(resultFilters.data) ? resultFilters.data : [];
       const idFilterSelected = filters.find(defaultFilter => !!defaultFilter.favorite) ?
@@ -986,11 +1052,12 @@ export class WorkpackComponent implements OnDestroy {
       'id-plan': idPlan,
       'id-workpack-model': idWorkpackModel,
       'id-workpack-parent': this.idWorkpack,
+      'workpackLinked': idWorkpackModelLinked ? true : false,
       idFilter: idFilterSelected
     });
     const workpacks = result.success && result.data;
     if (workpacks && workpacks.length > 0) {
-      const workpackItemCardList: ICardItem[] = workpacks.map(workpack => {
+      const workpackItemCardList: IWorkpackCardItem[] = workpacks.map(workpack => {
         const propertyNameWorkpackModel = workpack.model?.properties?.find(p => p.name === 'name' && p.session === 'PROPERTIES');
         const propertyNameWorkpack = workpack.properties?.find(p => p.idPropertyModel === propertyNameWorkpackModel.id);
         const propertyFullnameWorkpackModel = workpack.model?.properties?.find(p => p.name === 'fullName' && p.session === 'PROPERTIES');
@@ -1008,6 +1075,22 @@ export class WorkpackComponent implements OnDestroy {
               label: this.translateSrv.instant('delete'),
               icon: 'fas fa-trash-alt',
               command: (event) => this.deleteWorkpackChildren(workpack),
+              disabled: !this.editPermission
+            });
+          }
+          if (workpack.type === 'Deliverable' && (!workpack.endManagementDate || workpack.endManagementDate === null)) {
+            menuItems.push({
+              label: this.translateSrv.instant('endManagement'),
+              icon: 'far fa-stop-circle',
+              command: (event) => this.endManagementOfDeliverable(workpack, idWorkpackModel),
+              disabled: !this.editPermission
+            });
+          }
+          if (workpack.type === 'Deliverable' && (!!workpack.endManagementDate && workpack.endManagementDate !== null)) {
+            menuItems.push({
+              label: this.translateSrv.instant('resumeManagement'),
+              icon: 'far fa-play-circle',
+              command: (event) => this.resumeManagementOfDeliverable(workpack, idWorkpackModel),
               disabled: !this.editPermission
             });
           }
@@ -1055,7 +1138,7 @@ export class WorkpackComponent implements OnDestroy {
           }
         }
         return {
-          typeCardItem: 'listItem',
+          typeCardItem: workpack.type,
           icon: workpack.model.fontIcon,
           iconSvg: false,
           nameCardItem: propertyNameWorkpack?.value as string,
@@ -1070,6 +1153,13 @@ export class WorkpackComponent implements OnDestroy {
           linked: !!idWorkpackModelLinked ? true : (!!workpack.linked ? true : false),
           shared: workpack.sharedWith && workpack.sharedWith.length > 0 ? true : false,
           canceled: workpack.canceled,
+          completed: workpack.completed,
+          endManagementDate: workpack.endManagementDate,
+          dashboard: workpack.dashboard,
+          hasBaseline: workpack.hasActiveBaseline,
+          baselineName: workpack.activeBaselineName,
+          subtitleCardItem: workpack.type === 'Milestone' ? workpack.milestoneDate : '',
+          statusItem: workpack.type === 'Milestone' ? workpack.milestoneStatus : ''
         };
       });
       if (this.editPermission && !idWorkpackModelLinked) {
@@ -1161,12 +1251,97 @@ export class WorkpackComponent implements OnDestroy {
     }
   }
 
+  endManagementOfDeliverable(workpack: IWorkpack, idWorkpackModel) {
+    this.showDialogEndManagement = true;
+    this.endManagementWorkpack = {
+      idWorkpackModel,
+      idWorkpack: workpack.id,
+      reason: '',
+      endManagementDate: null
+    }
+  }
+
+  async handleEndManagementDeliverable() {
+    if (this.endManagementWorkpack && this.endManagementWorkpack.reason.length > 0 && this.endManagementWorkpack.endManagementDate !== null) {
+      const result = await this.workpackSrv.endManagementDeliverable({
+        idWorkpack: this.endManagementWorkpack.idWorkpack,
+        endManagementDate: moment(this.endManagementWorkpack.endManagementDate).format('yyyy-MM-DD'),
+        reason: this.endManagementWorkpack.reason
+      });
+      if (result.success) {
+        this.messageSrv.add({
+          severity: 'success',
+          summary: this.translateSrv.instant('messages.endManagementSuccess'),
+          detail: this.translateSrv.instant('messages.endManagementSuccess'),
+          life: 3000
+        });
+        this.handleCancelEndManagement();
+        if (!this.idWorkpackModelLinked) {
+          await this.loadSectionsWorkpackChildren();
+        } else {
+          await this.loadSectionsWorkpackChildrenLinked();
+        }
+      }
+    } else {
+      this.messageSrv.add({
+        severity: 'warn',
+        summary: this.translateSrv.instant('messages.invalidForm'),
+        detail: this.translateSrv.instant('messages.endManagementInputAlert'),
+        life: 3000
+      });
+    }
+  }
+
+  handleCancelEndManagement() {
+    this.showDialogEndManagement = false;
+    this.endManagementWorkpack = undefined;
+  }
+
+  resumeManagementOfDeliverable(workpack: IWorkpack, idWorkpackModel) {
+    this.showDialogResumeManagement = true;
+    this.endManagementWorkpack = {
+      idWorkpackModel,
+      idWorkpack: workpack.id,
+      reason: workpack.reason,
+      endManagementDate: moment(workpack.endManagementDate, 'DD-MM-yyyy').toDate()
+    };
+  }
+
+  handleCancelResumeManagement() {
+    this.showDialogResumeManagement = false;
+    this.endManagementWorkpack = undefined;
+  }
+
+  async handleResumeManagementDeliverable() {
+    const result = await this.workpackSrv.endManagementDeliverable({
+      endManagementDate: null,
+      reason: this.endManagementWorkpack.reason,
+      idWorkpack: this.endManagementWorkpack.idWorkpack
+    });
+    if (result.success) {
+      this.handleCancelResumeManagement();
+      this.messageSrv.add({
+        severity: 'success',
+        summary: this.translateSrv.instant('messages.endManagementSuccess'),
+        detail: this.translateSrv.instant('messages.endManagementSuccess'),
+        life: 3000
+      });
+      if (!this.idWorkpackModelLinked) {
+        await this.loadSectionsWorkpackChildren();
+      } else {
+        await this.loadSectionsWorkpackChildrenLinked();
+      }
+    }
+  }
+
   navigateToConfigCCB(idProject: number) {
     this.router.navigate(
       ['/workpack/change-control-board'],
       {
         queryParams: {
           idProject,
+          idParent: this.idWorkpack,
+          idOffice: this.idOffice
         }
       });
   }
@@ -1319,7 +1494,8 @@ export class WorkpackComponent implements OnDestroy {
     this.router.navigate(['/workpack/sharing'], {
       queryParams: {
         idWorkpack,
-        idWorkpackParent: this.idWorkpack
+        idWorkpackParent: this.idWorkpack,
+        idPlan: this.propertiesPlan.id
       }
     });
   }
@@ -1363,7 +1539,8 @@ export class WorkpackComponent implements OnDestroy {
     if (this.stakeholders) {
       const cardItems = this.stakeholders.filter(stake => {
         if (!showInactives && stake.roles && stake.roles.length > 0) {
-          return stake.roles.find(r => r.active);
+          return stake.roles.find(r => r.active && (!r.to || r.to === null || moment(r.to, 'yyyy-MM-DD').isSameOrAfter(moment()))
+            && (!r.from || r.from === null || moment(r.from, 'yyyy-MM-DD').isSameOrBefore(moment())));
         } else { return stake; }
       }).map(stakeholder => {
         const editPermission = stakeholder.permissions && stakeholder.permissions.filter(p => p.level === 'EDIT').length > 0;
@@ -1374,7 +1551,9 @@ export class WorkpackComponent implements OnDestroy {
           icon: stakeholder.person ? (editPermission ? IconsEnum.UserEdit : (readPermission ? IconsEnum.UserRead : IconsEnum.UserCircle)) : IconsEnum.Building,
           iconSvg: true,
           nameCardItem: stakeholder.person ? stakeholder.person.name : stakeholder.organization.name,
-          subtitleCardItem: stakeholder.roles && stakeholder.roles.map(r => r.role).join(', '),
+          fullNameCardItem: stakeholder.person ? stakeholder.person.fullName : stakeholder.organization.fullName,
+          subtitleCardItem: stakeholder.roles && stakeholder.roles.filter(r => r.active && (!r.to || r.to === null || moment(r.to, 'yyyy-MM-DD').isSameOrAfter(moment()))
+            && (!r.from || r.from === null || moment(r.from, 'yyyy-MM-DD').isSameOrBefore(moment()))).map(role => this.translateSrv.instant(role.role)).join(', '),
           itemId: stakeholder.person ? stakeholder.person.id : stakeholder.organization.id,
           menuItems: [{
             label: this.translateSrv.instant('delete'),
@@ -1400,6 +1579,7 @@ export class WorkpackComponent implements OnDestroy {
         icon: IconsEnum.Plus,
         iconSvg: true,
         nameCardItem: null,
+        fullNameCardItem: null,
         subtitleCardItem: null,
         itemId: null,
         menuItems: null,
@@ -1536,36 +1716,40 @@ export class WorkpackComponent implements OnDestroy {
             { name: 'id', value: risk.id },
           ]
         }));
-      cardItems.push({
-        typeCardItem: 'newCardItem',
-        icon: IconsEnum.Plus,
-        iconColor: null,
-        iconSvg: true,
-        nameCardItem: null,
-        itemId: null,
-        menuItems: null,
-        urlCard: '/workpack/risks',
-        paramsUrlCard: [
-          { name: 'idWorkpack', value: this.idWorkpack },
-          { name: 'idWorkpackModelLinked', value: this.idWorkpackModelLinked },
-        ]
-      });
+      if (this.editPermission) {
+        cardItems.push({
+          typeCardItem: 'newCardItem',
+          icon: IconsEnum.Plus,
+          iconColor: null,
+          iconSvg: true,
+          nameCardItem: null,
+          itemId: null,
+          menuItems: null,
+          urlCard: '/workpack/risks',
+          paramsUrlCard: [
+            { name: 'idWorkpack', value: this.idWorkpack },
+            { name: 'idWorkpackModelLinked', value: this.idWorkpackModelLinked },
+          ]
+        });
+      }
       return cardItems;
     } else {
-      const cardItem = [{
-        typeCardItem: 'newCardItem',
-        icon: IconsEnum.Plus,
-        iconSvg: true,
-        nameCardItem: null,
-        itemId: null,
-        menuItems: null,
-        urlCard: '/workpack/risks',
-        paramsUrlCard: [
-          { name: 'idWorkpack', value: this.idWorkpack },
-          { name: 'idWorkpackModelLinked', value: this.idWorkpackModelLinked },
-        ]
-      }];
-      return cardItem;
+      if (this.editPermission) {
+        const cardItem = [{
+          typeCardItem: 'newCardItem',
+          icon: IconsEnum.Plus,
+          iconSvg: true,
+          nameCardItem: null,
+          itemId: null,
+          menuItems: null,
+          urlCard: '/workpack/risks',
+          paramsUrlCard: [
+            { name: 'idWorkpack', value: this.idWorkpack },
+            { name: 'idWorkpackModelLinked', value: this.idWorkpackModelLinked },
+          ]
+        }];
+        return cardItem;
+      } else return []
     }
   }
 
@@ -1633,23 +1817,25 @@ export class WorkpackComponent implements OnDestroy {
             { name: 'id', value: issue.id },
           ]
         }));
-      cardItems.push({
-        typeCardItem: 'newCardItem',
-        icon: IconsEnum.Plus,
-        iconColor: null,
-        iconSvg: true,
-        nameCardItem: null,
-        itemId: null,
-        menuItems: null,
-        urlCard: '/workpack/issues',
-        paramsUrlCard: [
-          { name: 'idWorkpack', value: this.idWorkpack },
-          { name: 'idWorkpackModelLinked', value: this.idWorkpackModelLinked },
-        ]
-      });
+      if (this.editPermission) {
+        cardItems.push({
+          typeCardItem: 'newCardItem',
+          icon: IconsEnum.Plus,
+          iconColor: null,
+          iconSvg: true,
+          nameCardItem: null,
+          itemId: null,
+          menuItems: null,
+          urlCard: '/workpack/issues',
+          paramsUrlCard: [
+            { name: 'idWorkpack', value: this.idWorkpack },
+            { name: 'idWorkpackModelLinked', value: this.idWorkpackModelLinked },
+          ]
+        });
+      }
       return cardItems;
     } else {
-      const cardItem = [{
+      const cardItem = this.editPermission ?  [{
         typeCardItem: 'newCardItem',
         icon: IconsEnum.Plus,
         iconSvg: true,
@@ -1661,7 +1847,7 @@ export class WorkpackComponent implements OnDestroy {
           { name: 'idWorkpack', value: this.idWorkpack },
           { name: 'idWorkpackModelLinked', value: this.idWorkpackModelLinked },
         ]
-      }];
+      }] : [];
       return cardItem;
     }
   }
@@ -1761,9 +1947,9 @@ export class WorkpackComponent implements OnDestroy {
         const propertyfullName = cost.models.find(p => p.name === 'fullName');
         const propertyFullnameValue = propertyfullName && cost.properties.find(p => p.idPropertyModel === propertyfullName.id);
         const propertyNameWorkpack = namesWorckpack.find(names => names.idWorkpack === cost.idWorkpack);
-        const propertyLimit = cost.models.find(p => p.name === 'limit');
+        const propertyLimit = cost.models.find(p => p.name.toLowerCase() === 'limit');
         const propertyLimitValue = propertyLimit && cost.properties.find(p => p.idPropertyModel === propertyLimit.id);
-        const propertyFunder = cost.models.find(p => p.name === 'funder');
+        const propertyFunder = cost.models.find(p => p.name.toLowerCase() === 'funder');
         const propertyFunderValue = propertyFunder && cost.properties.find(p => p.idPropertyModel === propertyFunder.id);
         const selectedFunder = propertyFunderValue && (funders
           && funders.filter(org => org.value === propertyFunderValue.selectedValues[0]));
@@ -1776,7 +1962,7 @@ export class WorkpackComponent implements OnDestroy {
           fullNameCardItem: costThisWorkpack ?
             propertyFullnameValue && propertyFullnameValue.value as string :
             propertyNameWorkpack && propertyNameWorkpack.name as string,
-          subtitleCardItem: selectedFunder && selectedFunder[0].label,
+          subtitleCardItem: selectedFunder && selectedFunder[0]?.label,
           costAccountsValue: propertyLimitValue?.value as number,
           itemId: cost.id,
           idWorkpack: cost.idWorkpack.toString(),
@@ -1915,6 +2101,7 @@ export class WorkpackComponent implements OnDestroy {
           stepOrder: (groupIndex === 0 && stepIndex === 0) ? 'start' : ((groupIndex === groupArray.length - 1 && stepIndex === stepArray.length - 1) ? 'end' : 'step'),
           unitPlanned: step.plannedWork ? step.plannedWork : 0,
           unitActual: step.actualWork ? step.actualWork : 0,
+          unitBaseline: step.baselinePlannedWork ? step.baselinePlannedWork : 0,
           unitProgressBar: {
             total: step.plannedWork,
             progress: step.actualWork,
@@ -1922,6 +2109,7 @@ export class WorkpackComponent implements OnDestroy {
           },
           costPlanned: step.consumes?.reduce((total, v) => (total + (v.plannedCost ? v.plannedCost : 0)), 0),
           costActual: step.consumes?.reduce((total, v) => (total + (v.actualCost ? v.actualCost : 0)), 0),
+          baselinePlannedCost: step.consumes?.reduce((total, v) => (total + (v.baselinePlannedCost ? v.baselinePlannedCost : 0)), 0),
           costProgressBar: {
             total: (step.consumes?.reduce((total, v) => (total + (v.plannedCost ? v.plannedCost : 0)), 0)),
             progress: step.consumes?.reduce((total, v) => (total + (v.actualCost ? v.actualCost : 0)), 0),
@@ -1955,6 +2143,9 @@ export class WorkpackComponent implements OnDestroy {
       const daysToPlanned = finalDatePlanned.diff(initialDatePlanned, 'days');
       const dateActual = moment(new Date());
       const daysToNow = dateActual.diff(initialDatePlanned, 'days');
+      const baselineStartDate = this.schedule && new Date(this.schedule.baselineStart + 'T00:00:00');
+      const baselineEndDate = this.schedule && new Date(this.schedule.baselineEnd + 'T00:00:00');
+      const baselineDaysPlanned = moment(baselineEndDate).diff(moment(baselineStartDate), 'days');
       this.sectionSchedule = {
         cardSection: {
           toggleable: false,
@@ -1974,7 +2165,8 @@ export class WorkpackComponent implements OnDestroy {
               labelProgress: 'actual',
               valueUnit: this.unitMeansure && this.unitMeansure.name,
               color: '#ffa342',
-              barHeight: 17
+              barHeight: 17,
+              baselinePlanned: Number(this.schedule.baselinePlaned.toFixed(this.unitMeansure.precision)),
             },
             {
               total: this.schedule.planedCost,
@@ -1983,7 +2175,8 @@ export class WorkpackComponent implements OnDestroy {
               labelProgress: 'actual',
               valueUnit: 'currency',
               color: '#6cd3bd',
-              barHeight: 17
+              barHeight: 17,
+              baselinePlanned: Number(this.schedule.baselineCost.toFixed(this.unitMeansure.precision)),
             },
             {
               total: daysToPlanned,
@@ -1992,9 +2185,14 @@ export class WorkpackComponent implements OnDestroy {
               labelProgress: 'actual',
               valueUnit: 'time',
               color: '#659ee1',
-              barHeight: 17
+              barHeight: 17,
+              baselinePlanned: baselineDaysPlanned,
+              startDateBaseline: baselineStartDate,
+              endDateBaseline: baselineEndDate,
+              startDateTotal: startDate,
+              endDateTotal: endDate,
             }
-          ]
+          ],
         },
         startScheduleStep,
         endScheduleStep,
@@ -2216,9 +2414,7 @@ export class WorkpackComponent implements OnDestroy {
 
   async handleSelectedFilterWorkpackModel(event, idWorkpackModel: number) {
     const idFilter = event.filter;
-    if (idFilter) {
-      await this.reloadWorkpacksOfWorkpackModelSelectedFilter(idFilter, idWorkpackModel);
-    }
+    await this.reloadWorkpacksOfWorkpackModelSelectedFilter(idFilter, idWorkpackModel);
   }
 
   async handleNewFilterWorkpackModel(idWorkpackModel: number) {
@@ -2258,13 +2454,11 @@ export class WorkpackComponent implements OnDestroy {
 
   async handleSelectedFilterCostAccount(event) {
     const idFilter = event.filter;
-    if (idFilter) {
-      this.sectionCostAccount = Object.assign({}, {
-        ...this.sectionCostAccount,
-        cardItemsSection: await this.loadCardItemsCostSession(idFilter)
-      });
-      this.totalRecordsCostAccounts = this.sectionCostAccount.cardItemsSection && this.sectionCostAccount.cardItemsSection.length;
-    }
+    this.sectionCostAccount = Object.assign({}, {
+      ...this.sectionCostAccount,
+      cardItemsSection: await this.loadCardItemsCostSession(idFilter)
+    });
+    this.totalRecordsCostAccounts = this.sectionCostAccount.cardItemsSection && this.sectionCostAccount.cardItemsSection.length;
   }
 
   async handleNewFilterCostAccount() {
@@ -2297,14 +2491,12 @@ export class WorkpackComponent implements OnDestroy {
 
   async handleSelectedFilterStakeholder(event) {
     const idFilter = event.filter;
-    if (idFilter) {
-      await this.loadStakeholders(idFilter);
-      this.sectionStakeholder = Object.assign({}, {
-        ...this.sectionStakeholder,
-        cardItemsSection: await this.loadSectionStakeholderCards(this.stakeholderSectionShowInactives)
-      });
-      this.totalRecordsStakeholders = this.sectionStakeholder.cardItemsSection && this.sectionStakeholder.cardItemsSection.length;
-    }
+    await this.loadStakeholders(idFilter);
+    this.sectionStakeholder = Object.assign({}, {
+      ...this.sectionStakeholder,
+      cardItemsSection: await this.loadSectionStakeholderCards(this.stakeholderSectionShowInactives)
+    });
+    this.totalRecordsStakeholders = this.sectionStakeholder.cardItemsSection && this.sectionStakeholder.cardItemsSection.length;
   }
 
   async handleNewFilterEntity(entityName: string) {
@@ -2322,47 +2514,41 @@ export class WorkpackComponent implements OnDestroy {
 
   async handleSelectedFilterRisk(event) {
     const idFilter = event.filter;
-    if (idFilter) {
-      this.sectionRisk = Object.assign({}, {
-        ...this.sectionRisk,
-        cardItemsSection: await this.loadSectionRisksCards(this.riskSectionShowClosed, idFilter)
-      });
-      this.totalRecordsRisks = this.sectionRisk.cardItemsSection && this.sectionRisk.cardItemsSection.length;
-    }
+    this.sectionRisk = Object.assign({}, {
+      ...this.sectionRisk,
+      cardItemsSection: await this.loadSectionRisksCards(this.riskSectionShowClosed, idFilter)
+    });
+    this.totalRecordsRisks = this.sectionRisk.cardItemsSection && this.sectionRisk.cardItemsSection.length;
   }
 
   async handleSelectedFilterIssue(event) {
     const idFilter = event.filter;
-    if (idFilter) {
-      this.sectionIssue = Object.assign({}, {
-        ...this.sectionIssue,
-        cardItemsSection: await this.loadSectionIssuesCards(this.issueSectionShowClosed, idFilter)
-      });
-      this.totalRecordsIssues = this.sectionIssue.cardItemsSection && this.sectionIssue.cardItemsSection.length;
-    }
+    this.sectionIssue = Object.assign({}, {
+      ...this.sectionIssue,
+      cardItemsSection: await this.loadSectionIssuesCards(this.issueSectionShowClosed, idFilter)
+    });
+    this.totalRecordsIssues = this.sectionIssue.cardItemsSection && this.sectionIssue.cardItemsSection.length;
   }
 
   async handleSelectedFilterProcess(event) {
     const idFilter = event.filter;
-    if (idFilter) {
-      this.sectionProcess = Object.assign({}, {
-        ...this.sectionProcess,
-        cardItemsSection: await this.loadSectionProcessesCards(idFilter)
-      });
-      this.totalRecordsIssues = this.sectionProcess.cardItemsSection && this.sectionProcess.cardItemsSection.length;
-    }
+    this.sectionProcess = Object.assign({}, {
+      ...this.sectionProcess,
+      cardItemsSection: await this.loadSectionProcessesCards(idFilter)
+    });
+    this.totalRecordsIssues = this.sectionProcess.cardItemsSection && this.sectionProcess.cardItemsSection.length;
   }
 
   loadFilterPropertiesList(entityName: string) {
     const listProperties = FilterDataviewPropertiesEntity[entityName];
     const filterPropertiesList = listProperties.map(prop => {
-      const property = new PropertyTemplateModel();
-
-      property.type = prop.type;
-      property.label = prop.label;
-      property.name = prop.apiValue;
-      property.active = true;
-      property.possibleValues = prop.possibleValues;
+      const property: IFilterProperty = {
+        type: prop.type,
+        label: prop.label,
+        name: prop.apiValue,
+        active: true,
+        possibleValues: prop.possibleValues
+      }
       if (prop.label === 'role' && entityName === 'stakeholders') {
         property.possibleValues = this.workpackModel.personRoles && this.workpackModel.personRoles.map(role => ({
           label: role,

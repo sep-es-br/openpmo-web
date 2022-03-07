@@ -10,7 +10,7 @@
         <div class="app-tree-selection" [class.workpack-tree-selection-mobile]="responsive"
           [class.workpack-tree-selection]="property.fullLine"
           [class.workpack-tree-selection-not-fullLine]="!property.fullLine" *ngIf="property?.multipleSelection">
-          <p-tree [value]="property?.localityList" selectionMode="checkbox" [(selection)]="property.localitiesSelected"
+          <p-tree [value]="property?.localityList" selectionMode="checkbox" [(selection)]="property.localitiesSelected" 
             (onNodeSelect)="changed.emit($event); setLabelButton($event)" (onNodeUnselect)="changed.emit($event); setLabelButton($event)"></p-tree>
         </div>
       </ng-container>

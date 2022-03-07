@@ -26,22 +26,36 @@
         width: 76%;
         .section {
           .subtitle {
-            font-size: 0.9rem;
+            font-size: 1rem;
             font-weight: 500;
             margin-bottom: 1.7rem;
+            color: #004660;
+          }
+          .section-header {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+            
+            .remove-permission {
+              display: flex;
+              justify-content: flex-end;
+              .p-button {
+                background-color: #ea5c5c;
+                border: none;
+                font-size: 0.8rem;
+              }
+            }
+          }
+          .p-float-label.left > label {
+            left: 0.5rem !important;
           }
           .form {
             .property-input-text{
               padding-left: 0;
             }
-          }
-          .remove-permission {
-            display: flex;
-            justify-content: flex-end;
-            .p-button {
-              background-color: #ea5c5c;
-              border: none;
-              font-size: 0.8rem;
+            .app-text-area.p-inputtextarea {
+              width: 50%;
             }
           }
           .container-permission {
@@ -52,10 +66,16 @@
               flex-direction: column;
               margin-right: 1.4rem;
               .label {
-                color: #6c757d;
+                color: #939393;
                 font-style: italic;
-                font-size: 12px;
+                font-size: 14px;
                 margin-bottom: 0.4rem;
+                font-weight: 400;
+              }
+              .value {
+                color: #004660;
+                font-size: 16px;
+                font-weight: 400;
               }
             }
             .button-change {
@@ -68,16 +88,39 @@
               }
             }
           }
-          .app-card .p-panel {
-            margin-bottom: 2rem;
-            .p-panel-header, .p-panel-content {
-              background-color: #fafaf9 ;
+          .card-plan-container {
+            .app-card p-header.card-header .card-title {
+              text-transform: none;
             }
-            .p-panel-header {
-              border: none ;
+            .app-card .p-panel {
+              margin-bottom: 2rem;
+              background-color: rgba(250, 250, 249, 1);
+              box-sizing: border-box;
+              border-width: 1px;
+              border-style: solid;
+              border-color: rgba(229, 229, 228, 1);
+              border-radius: 5px;
             }
-
+            .app-card .p-panel .p-panel-header {
+              background-color: transparent;
+              border: none;
+            }
+            .app-card .p-panel .p-panel-content {
+              background-color: transparent;
+            }
+            .app-card .p-panel .p-toggleable-content {
+              background-color: rgba(250, 250, 249, 1);
+            }
+            .app-card-item .p-card {
+              background-color: rgba(250, 250, 249, 1);
+              box-sizing: border-box;
+              border-width: 1px;
+              border-style: solid;
+              border-color: rgba(229, 229, 228, 1);
+              border-radius: 5px;
+            }
           }
+          
         }
       }
     }

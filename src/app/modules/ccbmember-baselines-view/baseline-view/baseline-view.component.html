@@ -112,7 +112,7 @@
                     <div [ngStyle]="{width: '100%', background: '#B5B5B5', height: '28px'}"></div>
                   </div>
                   <div *ngIf="baseline?.cost?.proposedValue" class="content-card-item proposed"
-                    [ngStyle]="{width: ((baseline?.cost?.currentValue && baseline?.cost?.currentValue > baseline?.cost?.proposedValue) ? ((baseline.cost.proposedValue/baseline.cost.currentValue)*100) : 100) + '%'}">
+                    [ngStyle]="{width: ((baseline?.cost?.currentValue && baseline?.cost?.currentValue >= baseline?.cost?.proposedValue) ? ((baseline.cost.proposedValue/baseline.cost.currentValue)*100) : 100) + '%'}">
                     <div [ngStyle]="{width: '100%', background: '#0083BB', height: '28px'}"></div>
                     <label>{{baseline?.cost?.proposedValue| shortNumber:language}}</label>
                   </div>
@@ -152,9 +152,9 @@
                       {{baseline?.schedule?.proposedValue}}m</div>
                     <div class="date-labels">
                       <label>{{language === 'pt' ? (baseline?.schedule?.proposedStartDate|date:'dd/MM/yyyy') :
-                        (baseline?.schedule?.currentStartDate|date:'yyyy/MM/dd')}}</label>
+                        (baseline?.schedule?.proposedStartDate|date:'yyyy/MM/dd')}}</label>
                       <label>{{language === 'pt' ? (baseline?.schedule?.proposedEndDate|date:'dd/MM/yyyy') :
-                        (baseline?.schedule?.currentEndDate|date:'yyyy/MM/dd')}}</label>
+                        (baseline?.schedule?.proposedEndDate|date:'yyyy/MM/dd')}}</label>
                     </div>
                   </div>
                 </div>
@@ -233,7 +233,7 @@
                       <span>{{( item.proposedValue && (!item.currentValue || (item.currentValue !== item.proposedValue))) ? (item.proposedValue|shortNumber:language) : ''}}</span>
                       <div class="variation-container" [class.positive-variation]="item.variation > 0"
                         [class.negative-variation]="item.variation < 0">
-                        <i class="fas" [class.fa-arrow-up]="item.variation < 0"
+                        <i *ngIf="item.variation > 0 || item.variation < 0" class="fas" [class.fa-arrow-up]="item.variation < 0"
                           [class.fa-arrow-down]="item.variation >= 0"></i>
                         <span>{{item.variation ? (item.variation < 0 ? item.variation * (-1) + '%' : item.variation
                             + '%' ) : '' }}</span>
@@ -250,8 +250,8 @@
                       </div>
                       <div class="variation-container" [class.positive-variation]="item.variation > 0"
                         [class.negative-variation]="item.variation < 0">
-                        <i class="fas" [class.fa-arrow-up]="item.variation < 0"
-                          [class.fa-arrow-down]="item.variation >= 0"></i>
+                        <i *ngIf="item.variation > 0 || item.variation < 0" class="fas" [class.fa-arrow-up]="item.variation < 0"
+                          [class.fa-arrow-down]="item.variation > 0"></i>
                         <span>{{item.variation ? (item.variation < 0 ? item.variation * (-1) + '%' : item.variation
                             + '%' ) : '' }}</span>
                       </div>
@@ -377,7 +377,7 @@
                       <span>{{(item.proposedValue && (!item?.currentValue || item.proposedValue !== item?.currentValue)) ? (item.proposedValue|shortNumber:language) + ' ' + item.unitName : ''}}</span>
                       <div class="variation-container" [class.positive-variation]="item.variation > 0"
                         [class.negative-variation]="item.variation < 0">
-                        <i class="fas" [class.fa-arrow-up]="item.variation < 0"
+                        <i *ngIf="item.variation > 0 || item.variation < 0" class="fas" [class.fa-arrow-up]="item.variation < 0"
                           [class.fa-arrow-down]="item.variation >= 0"></i>
                         <span>{{item.variation ? (item.variation < 0 ? item.variation * (-1) + '%' : item.variation
                             + '%' ) : '' }}</span>
@@ -394,7 +394,7 @@
                       </div>
                       <div class="variation-container" [class.positive-variation]="item.variation > 0"
                         [class.negative-variation]="item.variation < 0">
-                        <i class="fas" [class.fa-arrow-up]="item.variation < 0"
+                        <i *ngIf="item.variation > 0 || item.variation < 0" class="fas" [class.fa-arrow-up]="item.variation < 0"
                           [class.fa-arrow-down]="item.variation >= 0"></i>
                         <span>{{item.variation ? (item.variation < 0 ? item.variation * (-1) + '%' : item.variation
                             + '%' ) : '' }}</span>

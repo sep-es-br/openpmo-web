@@ -26,6 +26,9 @@
         .label-toggle {
           margin-left: 0.5em;
         }
+        .app-toggle {
+          margin-left: 0.5rem;
+        }
       }
     }
     .header-title-dates {
@@ -44,6 +47,7 @@
         margin-right: 5px;
       }
     }
+
     .card-title {
       color: v.$fontTitle;
       font-family: v.$fontFamilyMedium;
@@ -53,16 +57,55 @@
     .card-title-mobile {
       font-size: 0.75rem;
     }
+    .header-title-check-completed {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      margin-right: 2em;
+      label {
+        margin-right: 5px;
+      }
+      .p-checkbox .p-checkbox-box.p-highlight {
+        border-color: #2196F3;
+        background: #fff;
+      }
+      .p-checkbox .p-checkbox-box .p-checkbox-icon {
+        transition-duration: 0.2s;
+        color: #2196F3;
+        font-size: 16px;
+        font-weight: bold;
+      }
+      i {
+        cursor: pointer;
+      }
+    }
+    .header-title-check-completed.responsive {
+      flex: 1;
+      justify-content: flex-end;
+      align-self: flex-end;
+      margin-right: 5px;
+      label {
+        font-size: 0.8rem;
+      }
+    }
     .header-values-cost-account {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      column-gap: 20px;
+      display: flex;
+      // grid-template-columns: 1fr 1fr 1fr;
+      // column-gap: 20px;
+      flex-direction: row;
+      align-items: center;
+      justify-content: flex-end;
       width: 50%;
       color: v.$fontTitle;
       font-family: v.$fontFamilyMedium;
       font-size: 1rem;
       text-transform: uppercase;
       padding-right: 2em;
+      .progress-bar-cost-container {
+        width: 30%;
+        margin-right: 10px;
+        margin-left: 10px;
+      }
     }
     .header-values-cost-account.responsive {
       display: flex;
@@ -162,7 +205,7 @@
         cursor: pointer;
       }
     }
-    
+
   }
 
   .card-collapseble {
@@ -219,7 +262,7 @@
         }
       }
     }
-    
+
   }
   .p-panel .p-panel-header .p-panel-icons .p-panel-header-icon:focus {
     box-shadow: none !important;

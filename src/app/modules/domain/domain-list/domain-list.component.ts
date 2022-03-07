@@ -1,3 +1,4 @@
+import { IFilterProperty } from 'src/app/shared/interfaces/IFilterProperty';
 import { PropertyTemplateModel } from './../../../shared/models/PropertyTemplateModel';
 import { FilterDataviewPropertiesEntity } from './../../../shared/constants/filterDataviewPropertiesEntity';
 import { FilterDataviewService } from './../../../shared/services/filter-dataview.service';
@@ -30,7 +31,7 @@ export class DomainListComponent implements OnInit, OnDestroy {
   cardProperties: ICard = {
     toggleable: false,
     initialStateToggle: false,
-    cardTitle: 'domains',
+    cardTitle: '',
     collapseble: true,
     initialStateCollapse: false
   };
@@ -41,7 +42,6 @@ export class DomainListComponent implements OnInit, OnDestroy {
   editPermission: boolean;
   $destroy = new Subject();
   responsive: boolean;
-  collapsePanelsStatus = true;
   displayModeAll = 'grid';
   pageSize = 5;
   totalRecords: number;
@@ -57,7 +57,8 @@ export class DomainListComponent implements OnInit, OnDestroy {
     private officePermissionSrv: OfficePermissionService,
     private responsiveSrv: ResponsiveService,
     private filterSrv: FilterDataviewService,
-    private router: Router
+    private router: Router,
+    private translateSrv: TranslateService
   ) {
     this.activeRoute.queryParams.subscribe(params => {
       this.idOffice = +params.idOffice;
@@ -66,7 +67,11 @@ export class DomainListComponent implements OnInit, OnDestroy {
   }
 
   async ngOnInit() {
+
     this.editPermission = await this.officePermissionSrv.getPermissions(this.idOffice);
+    if (!this.editPermission) {
+      this.router.navigate(['/offices']);
+    }
     await this.loadFiltersDomains();
     await this.loadPropertiesDomains();
     await this.getOfficeById();
@@ -75,30 +80,22 @@ export class DomainListComponent implements OnInit, OnDestroy {
         key: 'administration',
         info: this.propertiesOffice?.name,
         tooltip: this.propertiesOffice?.fullName,
-        routerLink: [ '/configuration-office' ],
+        routerLink: ['/configuration-office'],
         queryParams: { idOffice: this.idOffice }
       },
       {
-      key: 'domains',
-      info: this.propertiesOffice?.name,
-      tooltip: this.propertiesOffice?.fullName,
-      routerLink: ['/domains'],
-      queryParams: { idOffice: this.idOffice }
-    }
-  ]);
+        key: 'configuration',
+        info: 'domains',
+        tooltip: this.translateSrv.instant('domains'),
+        routerLink: ['/domains'],
+        queryParams: { idOffice: this.idOffice }
+      },
+    ]);
   }
 
   ngOnDestroy(): void {
     this.$destroy.next();
     this.$destroy.complete();
-  }
-
-  handleChangeCollapseExpandPanel(event) {
-    this.collapsePanelsStatus = event.mode === 'collapse' ? true : false;
-    this.cardProperties = Object.assign({}, {
-      ...this.cardProperties,
-      initialStateCollapse: this.collapsePanelsStatus
-    });
   }
 
   handleChangeDisplayMode(event) {
@@ -137,10 +134,12 @@ export class DomainListComponent implements OnInit, OnDestroy {
         nameCardItem: domain.name,
         fullNameCardItem: domain.fullName,
         itemId: domain.id,
-        menuItems: [{ label: this.translateSvr.instant('delete'), icon: 'fas fa-trash-alt',
+        menuItems: [{
+          label: this.translateSvr.instant('delete'), icon: 'fas fa-trash-alt',
           command: () => this.deleteDomain(domain),
-          disabled: !this.editPermission }] as MenuItem[],
-        urlCard: 'detail',
+          disabled: !this.editPermission
+        }] as MenuItem[],
+        urlCard: 'domains/detail',
         paramsUrlCard: [{ name: 'idOffice', value: this.idOffice }]
       })));
     }
@@ -160,7 +159,7 @@ export class DomainListComponent implements OnInit, OnDestroy {
   async loadFiltersDomains() {
     const result = await this.filterSrv.getAllFilters('domains');
     if (result.success && result.data.length > 0) {
-      const filterDefault = result.data.find( filter => !!filter.favorite);
+      const filterDefault = result.data.find(filter => !!filter.favorite);
       this.idFilterSelected = filterDefault ? filterDefault.id : undefined;
       this.cardProperties.filters = result.data;
     }
@@ -184,10 +183,8 @@ export class DomainListComponent implements OnInit, OnDestroy {
 
   async handleSelectedFilter(event) {
     const idFilter = event.filter;
-    if (idFilter) {
-      this.idFilterSelected = idFilter;
-      await this.loadPropertiesDomains();
-    }
+    this.idFilterSelected = idFilter;
+    await this.loadPropertiesDomains();
   }
 
   handleNewFilter() {
@@ -203,12 +200,13 @@ export class DomainListComponent implements OnInit, OnDestroy {
 
   loadFilterPropertiesList() {
     const listProperties = FilterDataviewPropertiesEntity.domains;
-    const filterPropertiesList = listProperties.map( prop => {
-      const property =  new PropertyTemplateModel();
-      property.type = prop.type;
-      property.label = prop.label;
-      property.name = prop.apiValue;
-      property.active = true;
+    const filterPropertiesList = listProperties.map(prop => {
+      const property: IFilterProperty = {
+        type: prop.type,
+        label: prop.label,
+        name: prop.apiValue,
+        active: true,
+      }
       return property;
     });
     return filterPropertiesList;
@@ -216,9 +214,16 @@ export class DomainListComponent implements OnInit, OnDestroy {
 
   setBreadcrumbStorage() {
     this.breadcrumbSrv.setBreadcrumbStorage([{
-      key: 'domains',
+      key: 'administration',
       info: this.propertiesOffice?.name,
       tooltip: this.propertiesOffice?.fullName,
+      routerLink: ['/configuration-office'],
+      queryParams: { idOffice: this.idOffice }
+    },
+    {
+      key: 'configuration',
+      info: 'domains',
+      tooltip: this.translateSrv.instant('domains'),
       routerLink: ['/domains'],
       queryParams: { idOffice: this.idOffice }
     }, {

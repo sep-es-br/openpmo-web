@@ -26,6 +26,11 @@ export interface IWorkpackModel {
   sortBy: IWorkpackModelProperty;
   riskAndIssueManagementSessionActive?: boolean;
   processesManagementSessionActive?: boolean;
+  dashboardSessionActive?: boolean;
+  dashboardShowEva?: boolean;
+  dashboardShowMilestones?: boolean;
+  dashboardShowRisks?: boolean;
+  dashboardShowStakeholders?: string[];
 }
 
 export interface IReusableWorkpackModel {

@@ -16,17 +16,19 @@
     <app-card [properties]="cardProperties" *ngIf="cardProperties" class="mt-0 inputs-float-label">
       <div class="workpack-model-properties p-fluid" [formGroup]="formProperties">
         <span class="p-float-label property-input p-field">
-          <input class="app-input-text" id="input-name" type="text" pInputText formControlName="name" />
+          <input class="app-input-text" id="input-name" type="text" pInputText formControlName="name"
+            (change)="propertyChanged($event);" />
           <label class="app-input-label" for="input-name">{{ 'modelName' | translate }} *</label>
         </span>
         <span class="p-float-label property-input p-field">
-          <input class="app-input-text" id="input-name-plural" type="text" pInputText formControlName="nameInPlural" />
+          <input class="app-input-text" id="input-name-plural" type="text" pInputText formControlName="nameInPlural"
+            (change)="propertyChanged($event);" />
           <label class="app-input-label" for="input-name-plural">{{ 'modelNameInPlural' | translate }} *</label>
         </span>
         <span class="p-float-label property-input p-field">
           <p-dropdown class="app-single-selection" inputId="input-icon" [options]="icons" formControlName="icon"
             [autoDisplayFirst]="false" [filter]="true" filterBy="label" [showClear]="true" [virtualScroll]="true"
-            [itemSize]="50" optionValue="name">
+            [itemSize]="50" optionValue="name" (onChange)="propertyChanged($event);">
             <ng-template pTemplate="selectedItem">
               <div class="icon-item-selected" *ngIf="formProperties.controls.icon.value">
                 <i [ngClass]="formProperties.controls.icon.value"></i>
@@ -42,7 +44,7 @@
           <label class="app-input-label" for="input-icon">{{ 'icon' | translate }} *</label>
         </span>
         <span class="p-float-label property-input p-field">
-          <p-dropdown class="app-single-selection" inputId="input-sort-by" (onClick)="getSortedByList()"
+          <p-dropdown class="app-single-selection" inputId="input-sort-by" (onClick)="getSortedByList()" (onChange)="propertyChanged($event);"
             [autoDisplayFirst]="true" [options]="sortedByList" formControlName="sortedBy">
           </p-dropdown>
           <label class="app-input-label" for="input-sort-by">{{ 'sortedBy' | translate }} *</label>
@@ -95,6 +97,42 @@
         </span>
       </app-card>
     </div>
+    <div class="card dashboard" *ngIf="dashboardPanel">
+      <app-card [properties]="cardPropertiesDashboard" *ngIf="cardPropertiesDashboard" class="inputs-float-label">
+        <div class="dashboard-show-options app-input-chips">
+          <label class="app-input-label">{{'showStakeholders'|translate}}</label>
+          <p-multiSelect [options]="dashboardPanel.dashboardStakeholderRolesOptions" optionLabel="label"
+            (ngModelChange)="checkProperties()" optionValue="value"
+            [(ngModel)]="dashboardPanel.dashboardShowStakeholders" display="chip">
+          </p-multiSelect>
+        </div>
+        <div class="toggles-container">
+          <div class="toggle-item">
+            <label class="label-toggle">{{'milestone'|translate}}</label>
+            <p-inputSwitch class="app-toggle" [(ngModel)]="dashboardPanel.dashboardShowMilestones"
+              (ngModelChange)="checkProperties()">
+            </p-inputSwitch>
+          </div>
+          <div class="toggle-item">
+            <label class="label-toggle">EVA</label>
+            <p-inputSwitch class="app-toggle" [(ngModel)]="dashboardPanel.dashboardShowEva"
+              (ngModelChange)="checkProperties()">
+            </p-inputSwitch>
+          </div>
+          <div class="toggle-item">
+            <label class="label-toggle">{{'risk'|translate}}</label>
+            <p-inputSwitch class="app-toggle" [(ngModel)]="dashboardPanel.dashboardShowRisks"
+              (ngModelChange)="checkProperties()">
+            </p-inputSwitch>
+          </div>
+        </div>
+      </app-card>
+    </div>
+    <div class="card risk-and-issues">
+      <app-card [properties]="cardPropertiesRiskAndIssues" *ngIf="cardPropertiesRiskAndIssues"
+        class="inputs-float-label">
+      </app-card>
+    </div>
     <div class="card cost-accounts">
       <app-card [properties]="cardPropertiesCostAccount" *ngIf="cardPropertiesCostAccount">
         <div class="cost-accounts-card-content">
@@ -114,13 +152,16 @@
         </div>
       </app-card>
     </div>
-    <div class="card journal">
-      <app-card [properties]="cardPropertiesJournal" *ngIf="cardPropertiesJournal">
-
-      </app-card>
-    </div>
     <div class="card schedule" *ngIf="workpackModelType === 'DeliverableModel'">
       <app-card [properties]="cardPropertiesSchedule" *ngIf="cardPropertiesSchedule">
+      </app-card>
+    </div>
+    <div class="card processes">
+      <app-card [properties]="cardPropertiesProcesses" *ngIf="cardPropertiesProcesses" class="inputs-float-label">
+      </app-card>
+    </div>
+    <div class="card journal">
+      <app-card [properties]="cardPropertiesJournal" *ngIf="cardPropertiesJournal">
       </app-card>
     </div>
   </ng-container>
@@ -134,7 +175,8 @@
         [totalRecords]="totalRecords">
         <ng-template let-cardItem pTemplate="gridItem">
           <div class="p-col-12 p-md-3 p-sm-12 card-item-container">
-            <app-card-item [properties]="cardItem" (reuseModelSelected)="handleReuseWorkpackModel($event)"></app-card-item>
+            <app-card-item [properties]="cardItem" (reuseModelSelected)="handleReuseWorkpackModel($event)">
+            </app-card-item>
           </div>
         </ng-template>
       </p-dataView>
@@ -144,22 +186,15 @@
         [emptyMessage]="'loadingEllipsis' | translate">
         <ng-template let-cardItem pTemplate="listItem">
           <div class="p-col-12">
-            <app-card-item [properties]="cardItem" [displayModeCard]="displayModeAll" (reuseModelSelected)="handleReuseWorkpackModel($event)"></app-card-item>
+            <app-card-item [properties]="cardItem" [displayModeCard]="displayModeAll"
+              (reuseModelSelected)="handleReuseWorkpackModel($event)"></app-card-item>
           </div>
         </ng-template>
       </p-dataView>
     </app-card>
   </div>
 
-  <div class="card risk-and-issues">
-    <app-card [properties]="cardPropertiesRiskAndIssues" *ngIf="cardPropertiesRiskAndIssues" class="inputs-float-label">
-    </app-card>
-  </div>
 
-  <div class="card processes">
-    <app-card [properties]="cardPropertiesProcesses" *ngIf="cardPropertiesProcesses" class="inputs-float-label">
-    </app-card>
-  </div>
 
   <app-save-button *ngIf="editPermission" #saveButton (save)="handleSubmit()"></app-save-button>
 </div>

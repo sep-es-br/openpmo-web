@@ -90,6 +90,7 @@ export class ControlChangeBoardMemberComponent implements OnInit, OnDestroy {
     this.actRouter.queryParams.subscribe(async queryParams => {
       this.idPerson = +queryParams.idPerson;
       this.idProject = +queryParams.idProject;
+      this.idOffice = +queryParams.idOffice;
       await this.loadCcbMember();
     });
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => {
@@ -128,6 +129,7 @@ export class ControlChangeBoardMemberComponent implements OnInit, OnDestroy {
       ...[
         {
           key: 'changeControlBoard',
+          info: 'ccbMembers',
           routerLink: ['/workpack/change-control-board'],
           queryParams: {
             idProject: this.idProject,
@@ -149,7 +151,7 @@ export class ControlChangeBoardMemberComponent implements OnInit, OnDestroy {
     this.cardPerson = {
       toggleable: false,
       initialStateToggle: false,
-      cardTitle: 'person',
+      cardTitle: '',
       collapseble: true,
       initialStateCollapse: false
     };
@@ -185,7 +187,6 @@ export class ControlChangeBoardMemberComponent implements OnInit, OnDestroy {
         if (!this.ccbMember.memberAs) {
           this.setMemberAsCcbMember(this.ccbMember.person);
         }
-        this.saveButton.showButton();
       }
     }
   }
@@ -399,6 +400,6 @@ export class ControlChangeBoardMemberComponent implements OnInit, OnDestroy {
       summary: this.translateSrv.instant('success'),
       detail: this.translateSrv.instant('messages.savedSuccessfully')
     });
-    this.router.navigate(['/workpack/change-control-board'], { queryParams: { idProject: this.idProject } });
+    this.router.navigate(['/workpack/change-control-board'], { queryParams: { idProject: this.idProject, idOffice: this.idOffice } });
   }
 }

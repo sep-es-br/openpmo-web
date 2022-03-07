@@ -45,25 +45,6 @@ export class PersonService extends BaseService<IPerson> {
       result.data = [];
     }
     return result;
-    // return {
-    //   success: true,
-    //   data: [
-    //     {
-    //       id: 1,
-    //       name: 'Joãozinho',
-    //       fullName: 'João da Silva',
-    //       contactEmail: 'joao@gmail.com',
-    //       roles: ['Gerente', 'Secretário', 'Citizen']
-    //     },
-    //     {
-    //       id: 2,
-    //       name: 'João Souza',
-    //       fullName: 'João Souza',
-    //       contactEmail: 'joaosouza@gmail.com',
-    //       roles: ['Gerente', 'Citizen']
-    //     }
-    //   ]
-    // }
   }
 
   public async GetByIdAndOffice(idPerson: number, idOffice: number): Promise<IHttpResult<IPerson>> {

@@ -25,6 +25,8 @@ import { ResponsiveService } from './../../shared/services/responsive.service';
 import { Component, OnInit, OnDestroy, ViewChild, Pipe } from '@angular/core';
 import { FilterLogicalOperatorsEnum } from 'src/app/shared/enums/FilterLogicalOperatorsEnum';
 import { Location } from '@angular/common';
+import * as moment from 'moment';
+import { IFilterProperty } from 'src/app/shared/interfaces/IFilterProperty';
 
 @Component({
   selector: 'app-filter-dataview',
@@ -46,13 +48,14 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
   filterData: IFilterDataview;
   propertiesListOptions: SelectItem[];
   ruleCards: ICardItemFilterRules[];
-  filterPropertiesList: PropertyTemplateModel[] = this.filterSrv.get;
+  filterPropertiesList: IFilterProperty[] = this.filterSrv.get;
   filterPropertiesSub: Subscription;
   currentBreadcrumbItems: IBreadcrumb[] = this.breadcrumbSrv.get;
   currentBreadcrumbSub: Subscription;
   typePropertyModel = TypePropertyModelEnum;
   idOffice: number;
   workpackModelEntitiesOptions = ['stakeholders', 'risks', 'issues', 'processes'];
+  localityList;
 
   constructor(
     private responsiveSrv: ResponsiveService,
@@ -208,18 +211,16 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
     }
     if (this.filterData && this.filterData.rules && this.filterData.rules.length > 0) {
       this.ruleCards = this.filterData.rules.map(rule => {
-        let propertySelected = new PropertyTemplateModel();
-        propertySelected = (!this.idWorkpackModel || (!!this.idWorkpackModel && this.workpackModelEntitiesOptions.includes(this.entityName)))
-          ? this.filterPropertiesList.find(property => property.name === rule.propertyName) :
-          this.filterPropertiesList.find(property => property.idPropertyModel.toString() === rule.propertyName.toString());
-        propertySelected.value = rule.value;
+        const propertySelected = (!this.idWorkpackModel || (!!this.idWorkpackModel && this.workpackModelEntitiesOptions.includes(this.entityName)))
+          ? { ...this.filterPropertiesList.find(property => property.name === rule.propertyName) } :
+          { ...this.filterPropertiesList.find(property => property.idPropertyModel.toString() === rule.propertyName.toString()) };
         return {
           id: rule.id,
           typeCard: 'rule-card',
           propertySelected: propertySelected,
           propertiesList: this.filterPropertiesList,
           operator: rule.operator,
-          value: rule.value,
+          value: (!this.idWorkpackModel || (!!this.idWorkpackModel && this.workpackModelEntitiesOptions.includes(this.entityName))) ? rule.value : this.setValueProperty(propertySelected, rule.value),
           logicalOperator: rule.logicOperator,
           menuItems: [{
             label: this.translateSrv.instant('delete'),
@@ -236,7 +237,6 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
         typeCard: 'new-card'
       }];
     }
-
   }
 
   async handleCreateNewRuleCard(event?) {
@@ -277,7 +277,7 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
     }
   }
 
-  handlePropertyValueChanged() {
+  handlePropertyValueChanged(event) {
     if (this.formFilter.valid && this.validadeRulesCards()) {
       this.saveButton.showButton();
     } else {
@@ -287,7 +287,7 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
 
   validadeRulesCards() {
     const invalidCard = this.ruleCards.filter(card => card.typeCard !== 'new-card' &&
-      (!card.propertySelected || !card.propertySelected.name || !card.operator || !card.propertySelected.value));
+      (!card.propertySelected || !card.propertySelected.name || !card.operator || !card.value));
     if (invalidCard && invalidCard.length > 0) {
       return false;
     }
@@ -306,7 +306,8 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
         propertyName: (!this.idWorkpackModel || (!!this.idWorkpackModel && this.workpackModelEntitiesOptions.includes(this.entityName))) ?
           card.propertySelected.name : card.propertySelected.idPropertyModel.toString(),
         operator: card.operator,
-        value: card.propertySelected.value,
+        value: (!this.idWorkpackModel || (!!this.idWorkpackModel && this.workpackModelEntitiesOptions.includes(this.entityName))) ? card.value :
+          this.getValueProperty(card.propertySelected, card.value),
         logicOperator: card.logicalOperator
       }))
     };
@@ -316,6 +317,95 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
       this.location.back();
     }
   }
+
+  getValueProperty(property: IFilterProperty, propValue) {
+    let value;
+    switch (property.type) {
+      case TypePropertyModelEnum.DateModel:
+        const date = propValue as Date;
+        value = moment(propValue).format('yyyy-MM-DD');
+        break;
+      case TypePropertyModelEnum.SelectionModel:
+        const selectedOptions = property.multipleSelection && propValue as string[];
+        const stringValue = selectedOptions ? selectedOptions.join(',') : propValue as string;
+        value = stringValue;
+        break;
+      case TypePropertyModelEnum.UnitSelectionModel:
+        value = propValue.toString();
+        break;
+      case TypePropertyModelEnum.OrganizationSelectionModel:
+        const selectedOrganization = !property.multipleSelection && propValue as number;
+        value = selectedOrganization ? selectedOrganization.toString() : (propValue as number[]).join(',');
+        break;
+      case TypePropertyModelEnum.LocalitySelectionModel:
+        if (!property.multipleSelection) {
+          const selectedLocality = propValue as TreeNode;
+          value = selectedLocality.data.toString();
+        }
+        if (property.multipleSelection) {
+          const selectedLocality = propValue as TreeNode[];
+          value = selectedLocality.map(l => l.data).join(',');
+        }
+        break;
+      case TypePropertyModelEnum.CurrencyModel:
+        value = propValue as number;
+        break;
+      case TypePropertyModelEnum.NumberModel:
+        value = propValue as number;
+        break;
+      case TypePropertyModelEnum.IntegerModel:
+        value = propValue as number;
+        break;
+      default:
+        value = propValue as string;
+        break;
+    }
+    return value.toString();
+  }
+
+  setValueProperty(property: IFilterProperty, propertyValue) {
+    let value;
+    switch (property.type) {
+      case TypePropertyModelEnum.DateModel:
+        value = moment(propertyValue.toString().split('T')[0], 'yyyy-MM-DD').toDate() as Date;
+        break;
+      case TypePropertyModelEnum.SelectionModel:
+        const selectedOptions = property.multipleSelection && propertyValue as string;
+        const stringValue = selectedOptions ? selectedOptions.split(',') : propertyValue as string;
+        value = stringValue;
+        break;
+      case TypePropertyModelEnum.UnitSelectionModel:
+        value = Number(propertyValue);
+        break;
+      case TypePropertyModelEnum.OrganizationSelectionModel:
+        const selectedOrganization = !property.multipleSelection && propertyValue as string;
+        value = selectedOrganization ? Number(selectedOrganization) : propertyValue.split(',').map(v => Number(v));
+        break;
+      case TypePropertyModelEnum.LocalitySelectionModel:
+        const selectedLocalities = propertyValue.split(',').map(p => Number(p));
+        const selectedLocalityList = this.loadSelectedLocality(selectedLocalities, property.localityList);
+        selectedLocalityList.forEach(l => this.expandTreeToTreeNode(l));
+        value = property.multipleSelection
+          ? selectedLocalityList as TreeNode[]
+          : selectedLocalityList[0] as TreeNode;
+        break;
+      case TypePropertyModelEnum.CurrencyModel:
+        value = propertyValue as number;
+        break;
+      case TypePropertyModelEnum.NumberModel:
+        value = propertyValue as number;
+        break;
+      case TypePropertyModelEnum.IntegerModel:
+        value = propertyValue as number;
+        break;
+      default:
+        value = propertyValue as string;
+        break;
+    }
+    return value;
+  }
+
+
 
   async handleDeleteFilter() {
     const result = await this.filterSrv.deleteFilter(this.filterUrl, this.idFilter);
@@ -334,15 +424,14 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
     const dataProperties = Array.from(this.filterPropertiesList);
     this.filterPropertiesList = [];
     dataProperties.forEach(prop => {
-      let property = new PropertyTemplateModel();
-      property.type = prop.type;
-      property.label = prop.label;
-      property.name = prop.name;
-      property.type = prop.type;
-      property.active = prop.active;
-      property.possibleValues = prop.possibleValues
+      const property: IFilterProperty = {
+        type: prop.type,
+        label: prop.label,
+        name: prop.name,
+        possibleValues: prop.possibleValues
+      }
       this.filterPropertiesList.push(property);
-    })
+    });
   }
 
   async loadWorkpackFilterPropertiesList() {
@@ -361,33 +450,27 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
     this.filterPropertiesList = costAccountPropertiesList;
   }
 
-  async instanceProperty(propertyModel: IWorkpackModelProperty): Promise<PropertyTemplateModel> {
-    const property = new PropertyTemplateModel();
-    property.idPropertyModel = propertyModel.id;
-    property.type = TypePropertyModelEnum[propertyModel.type];
-    property.active = propertyModel.active;
-    property.fullLine = propertyModel.fullLine;
-    property.label = propertyModel.label;
-    property.name = propertyModel.name;
-    property.required = propertyModel.required;
-    property.disabled = false;
-    property.session = propertyModel.session;
-    property.sortIndex = propertyModel.sortIndex;
-    property.multipleSelection = propertyModel.multipleSelection;
-    property.rows = propertyModel.rows ? propertyModel.rows : 1;
-    property.decimals = propertyModel.decimals;
-    property.value = propertyModel.defaultValue;
-    property.defaultValue = propertyModel.defaultValue;
-    property.min = propertyModel.min;
-    property.max = propertyModel.max;
-    if (this.typePropertyModel[propertyModel.type] === TypePropertyModelEnum.DateModel) {
-      const dateValue = (propertyModel.defaultValue && propertyModel.defaultValue.toLocaleString());
-      property.value = dateValue ? new Date(dateValue) : null;
+  async instanceProperty(propertyModel: IWorkpackModelProperty): Promise<IFilterProperty> {
+    const property: IFilterProperty = {
+      idPropertyModel: propertyModel.id,
+      type: TypePropertyModelEnum[propertyModel.type],
+      label: propertyModel.label,
+      name: propertyModel.name,
+      multipleSelection: propertyModel.multipleSelection,
+      defaultValue: propertyModel.defaultValue,
+      min: propertyModel.min,
+      max: propertyModel.max,
+      active: propertyModel.active
     }
+
+    // if (this.typePropertyModel[propertyModel.type] === TypePropertyModelEnum.DateModel) {
+    //   const dateValue = (propertyModel.defaultValue && propertyModel.defaultValue.toLocaleString());
+    //   property.value = dateValue ? new Date(dateValue) : null;
+    // }
     if (this.typePropertyModel[propertyModel.type] === TypePropertyModelEnum.SelectionModel && propertyModel.multipleSelection) {
       const listValues = propertyModel.defaultValue as string;
       property.defaultValue = listValues.split(',');
-      property.value = listValues.split(',');
+      // property.value = listValues.split(',');
     }
 
     if (this.typePropertyModel[propertyModel.type] === TypePropertyModelEnum.SelectionModel) {
@@ -408,6 +491,7 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
       rootNode.children = this.loadLocality(localityList, rootNode);
       property.idDomain = propertyModel.idDomain;
       property.localityList = [rootNode];
+      this.localityList = [rootNode];
       const defaultSelectedLocalities = (propertyModel.defaults ? propertyModel.defaults as number[] : undefined);
       if (defaultSelectedLocalities?.length > 0) {
         const totalLocalities = this.countLocalities(localityList);
@@ -424,18 +508,18 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
 
     if (this.typePropertyModel[propertyModel.type] === TypePropertyModelEnum.OrganizationSelectionModel) {
       property.possibleValuesIds = await this.loadOrganizationsOffice();
-      if (propertyModel.multipleSelection) {
-        property.selectedValues = propertyModel.defaults as number[];
-      }
+      // if (propertyModel.multipleSelection) {
+      //   property.selectedValues = propertyModel.defaults as number[];
+      // }
       if (!propertyModel.multipleSelection) {
         const defaults = propertyModel.defaults && propertyModel.defaults as number[];
         const defaultsValue = defaults && defaults[0];
-        property.selectedValues = defaultsValue && defaultsValue;
+        // property.selectedValues = defaultsValue && defaultsValue;
       }
     }
     if (this.typePropertyModel[propertyModel.type] === TypePropertyModelEnum.UnitSelectionModel) {
       property.possibleValuesIds = await this.loadUnitMeasuresOffice();
-      property.selectedValue = propertyModel.defaults as number;
+      // property.selectedValue = propertyModel.defaults as number;
       property.defaults = propertyModel.defaults as number;
     }
     return property;

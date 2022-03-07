@@ -141,5 +141,5 @@ export const FilterDataviewPropertiesEntity = {
     { label: 'currentOrganization', apiValue: 'currentOrganization', type: TypePropertyModelEnum.TextModel },
     { label: 'note', apiValue: 'note', type: TypePropertyModelEnum.TextModel },
     { label: 'priority', apiValue: 'priority', type: TypePropertyModelEnum.ToggleModel },
-  ]
+  ],
 };

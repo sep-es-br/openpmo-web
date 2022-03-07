@@ -1,20 +1,32 @@
 ::ng-deep .app-person-list {
+  .header-container {
+    display: flex;
+    flex-direction: row;
+  }
   .app-content-header {
-    padding-bottom: 0;
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-end;
+    flex: 1;
     span {
       text-transform: uppercase;
     }
+  }
+  .header-container.mobile {
+    flex-direction: column;
   }
   .card-container {
     .form-search {
       display: flex;
       width: 80%;
       margin-bottom: 2.5rem;
-
+      .p-overlaypanel .p-overlaypanel-close {
+        background-color: #44B39B;
+      }
       .property-input {
         background-color: #fff;
         width: 70%;
-        margin: 0 1rem;
+        margin: 0 2rem 0 0;
         border: 1px solid #eeeeed;
         padding-bottom: 0;
         &.search {
@@ -42,6 +54,16 @@
           font-size: 1rem;
           top: -0.9rem !important;
         }
+      }
+    }
+    .app-card-item .p-card .p-card-body {
+      padding-top: 0.5em !important;
+      .app-avatar .avatar {
+        padding-bottom: 0;
+      }
+      .app-avatar .avatar .p-avatar-xl {
+        width: 68px;
+        height: 68px;
       }
     }
   }

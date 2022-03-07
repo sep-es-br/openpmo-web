@@ -1,3 +1,4 @@
+import { IFilterProperty } from 'src/app/shared/interfaces/IFilterProperty';
 import { PropertyTemplateModel } from './../../../shared/models/PropertyTemplateModel';
 import { FilterDataviewPropertiesEntity } from 'src/app/shared/constants/filterDataviewPropertiesEntity';
 import { Component, OnInit } from '@angular/core';
@@ -28,7 +29,7 @@ export class StrategyListComponent implements OnInit {
   cardProperties: ICard = {
     toggleable: false,
     initialStateToggle: false,
-    cardTitle: 'planModels',
+    cardTitle: '',
     collapseble: true,
     initialStateCollapse: false,
     showFilters: true
@@ -39,7 +40,6 @@ export class StrategyListComponent implements OnInit {
   isUserAdmin: boolean;
   editPermission: boolean;
   responsive: boolean;
-  collapsePanelsStatus = true;
   displayModeAll = 'grid';
   pageSize = 5;
   totalRecords: number;
@@ -58,7 +58,7 @@ export class StrategyListComponent implements OnInit {
     private filterSrv: FilterDataviewService,
     private router: Router
   ) {
-    this.activeRoute.queryParams.subscribe(async({ idOffice }) => {
+    this.activeRoute.queryParams.subscribe(async ({ idOffice }) => {
       this.idOffice = +idOffice;
       await this.getOfficeById();
       await this.loadFiltersStrategies();
@@ -68,17 +68,17 @@ export class StrategyListComponent implements OnInit {
           key: 'administration',
           info: this.propertiesOffice?.name,
           tooltip: this.propertiesOffice?.fullName,
-          routerLink: [ '/configuration-office' ],
+          routerLink: ['/configuration-office'],
           queryParams: { idOffice: this.idOffice }
         },
         {
-        key: 'planModels',
-        info: this.propertiesOffice?.name,
-        tooltip: this.propertiesOffice?.fullName,
-        routerLink: [ '/strategies' ],
-        queryParams: { idOffice: this.idOffice }
-      }
-    ]);
+          key: 'configuration',
+          info: 'planModels',
+          tooltip: this.translateSrv.instant('planModels'),
+          routerLink: ['/strategies'],
+          queryParams: { idOffice: this.idOffice }
+        },
+      ]);
     });
     this.responsiveSrv.observable.subscribe(value => {
       this.responsive = value;
@@ -87,14 +87,10 @@ export class StrategyListComponent implements OnInit {
 
   async ngOnInit() {
     this.isUserAdmin = await this.authSrv.isUserAdmin();
-  }
-
-  handleChangeCollapseExpandPanel(event) {
-    this.collapsePanelsStatus = event.mode === 'collapse' ? true : false;
-    this.cardProperties = Object.assign({}, {
-      ...this.cardProperties,
-      initialStateCollapse: this.collapsePanelsStatus
-    });
+    this.editPermission = await this.officePermissionSrv.getPermissions(this.idOffice);
+    if (!this.isUserAdmin && !this.editPermission) {
+      this.router.navigate(['/offices']);
+    }
   }
 
   handleChangeDisplayMode(event) {
@@ -114,9 +110,9 @@ export class StrategyListComponent implements OnInit {
 
   async loadPropertiesStrategies() {
     const { success, data } = await this.planModelSvr.GetAll({ 'id-office': this.idOffice, idFilter: this.idFilterSelected });
-    this.editPermission = await this.officePermissionSrv.getPermissions(this.idOffice);
+    
     if (this.editPermission) {
-      const resultSharedPlanModels = await this.planModelSvr.getSharedPlanModels({'id-office': this.idOffice});
+      const resultSharedPlanModels = await this.planModelSvr.getSharedPlanModels({ 'id-office': this.idOffice });
       if (resultSharedPlanModels.success) {
         this.sharedPlanModels = resultSharedPlanModels.data;
       }
@@ -132,12 +128,12 @@ export class StrategyListComponent implements OnInit {
             command: () => this.handleCreateNewEstrategy(),
           }
         ],
-        }]
+      }]
       : [];
     if (this.sharedPlanModels && this.sharedPlanModels.length > 0 && itemsProperties.length > 0) {
       itemsProperties[0].iconMenuItems.push({
         label: this.translateSrv.instant('fromShared'),
-        items: this.sharedPlanModels.map( plan => ({
+        items: this.sharedPlanModels.map(plan => ({
           label: plan.name,
           icon: `app-icon ${IconsEnum.PlanModel}`,
           command: () => this.handleCreateNewEstrategyFromShared(plan.id),
@@ -145,7 +141,7 @@ export class StrategyListComponent implements OnInit {
       });
     }
     if (success) {
-      itemsProperties.unshift(... data.map(strategy => ({
+      itemsProperties.unshift(...data.map(strategy => ({
         typeCardItem: 'listItem',
         iconSvg: true,
         icon: IconsEnum.PlanModel,
@@ -153,9 +149,11 @@ export class StrategyListComponent implements OnInit {
         fullNameCardItem: strategy.fullName,
         itemId: strategy.id,
         menuItems:
-          [{ label: this.translateSrv.instant('delete') ,
-            icon: 'fas fa-trash-alt', command: () => this.deleteStrategy(strategy), disabled: !this.editPermission}] as MenuItem[],
-        urlCard: 'strategy',
+          [{
+            label: this.translateSrv.instant('delete'),
+            icon: 'fas fa-trash-alt', command: () => this.deleteStrategy(strategy), disabled: !this.editPermission
+          }] as MenuItem[],
+        urlCard: 'strategies/strategy',
         paramsUrlCard: [{ name: 'idOffice', value: this.idOffice }]
       })));
     }
@@ -185,7 +183,7 @@ export class StrategyListComponent implements OnInit {
   }
 
   async deleteStrategy(strategy: IPlanModel) {
-    const { success } =await this.planModelSvr.delete(strategy);
+    const { success } = await this.planModelSvr.delete(strategy);
     if (success) {
       this.cardItemsProperties = Array.from(this.cardItemsProperties.filter(element => element.itemId !== strategy.id));
       this.totalRecords = this.cardItemsProperties && this.cardItemsProperties.length;
@@ -195,7 +193,7 @@ export class StrategyListComponent implements OnInit {
   async loadFiltersStrategies() {
     const result = await this.filterSrv.getAllFilters('plan-models');
     if (result.success && result.data.length > 0) {
-      const filterDefault = result.data.find( filter => !!filter.favorite);
+      const filterDefault = result.data.find(filter => !!filter.favorite);
       this.idFilterSelected = filterDefault ? filterDefault.id : undefined;
       this.cardProperties = Object.assign({}, {
         ...this.cardProperties,
@@ -205,6 +203,7 @@ export class StrategyListComponent implements OnInit {
   }
 
   handleEditFilter(event) {
+    this.setBreadcrumbStorage();
     const idFilter = event.filter;
     if (idFilter) {
       const filterProperties = this.loadFilterPropertiesList();
@@ -220,13 +219,12 @@ export class StrategyListComponent implements OnInit {
 
   async handleSelectedFilter(event) {
     const idFilter = event.filter;
-    if (idFilter) {
-      this.idFilterSelected = idFilter;
-      await this.loadPropertiesStrategies();
-    }
+    this.idFilterSelected = idFilter;
+    await this.loadPropertiesStrategies();
   }
 
   handleNewFilter() {
+    this.setBreadcrumbStorage();
     const filterProperties = this.loadFilterPropertiesList();
     this.filterSrv.setFilterProperties(filterProperties);
     this.router.navigate(['/filter-dataview'], {
@@ -238,15 +236,36 @@ export class StrategyListComponent implements OnInit {
 
   loadFilterPropertiesList() {
     const listProperties = FilterDataviewPropertiesEntity.strategies;
-    const filterPropertiesList = listProperties.map( prop => {
-      const property =  new PropertyTemplateModel();
-      property.type = prop.type;
-      property.label = prop.label;
-      property.name = prop.apiValue;
-      property.active = true;
+    const filterPropertiesList = listProperties.map(prop => {
+      const property: IFilterProperty = {
+        type: prop.type,
+        label: prop.label,
+        name: prop.apiValue,
+        active: true,
+      }
       return property;
     });
     return filterPropertiesList;
+  }
+
+  setBreadcrumbStorage() {
+    this.breadcrumbSrv.setBreadcrumbStorage([{
+      key: 'administration',
+      info: this.propertiesOffice?.name,
+      tooltip: this.propertiesOffice?.fullName,
+      routerLink: ['/configuration-office'],
+      queryParams: { idOffice: this.idOffice }
+    },
+    {
+      key: 'configuration',
+      info: 'planModels',
+      tooltip: this.translateSrv.instant('planModels'),
+      routerLink: ['/strategies'],
+      queryParams: { idOffice: this.idOffice }
+    }, {
+      key: 'filter',
+      routerLink: ['filter-dataview']
+    }]);
   }
 
 

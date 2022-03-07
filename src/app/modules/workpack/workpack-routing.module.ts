@@ -7,6 +7,7 @@ import { WorkpackComponent } from './workpack.component';
 import { SharingComponent } from './sharing/sharing.component';
 import { BaselineCancellingComponent } from './baseline-cancelling/baseline-cancelling.component';
 import { JournalComponent } from './journal/journal.component';
+import { ExpandedDashboardComponent } from './expanded-dashboard/expanded-dashboard.component';
 
 const routes: Routes = [
   {
@@ -55,6 +56,10 @@ const routes: Routes = [
       {
         path: 'journal',
         component: JournalComponent
+      },
+      {
+        path: 'expanded-dashboard',
+        component: ExpandedDashboardComponent
       },
     ],
     runGuardsAndResolvers: 'always'

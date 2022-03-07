@@ -157,7 +157,9 @@
 
     .p-card-body .p-card-content p-menu {
       .p-menu-overlay .p-menu-list {
-        max-width: 20em;
+        max-width: 23em;
+        max-height: 25em;
+        overflow-y: scroll;
         .p-menuitem .p-menuitem-link {
           .p-menuitem-icon {
             font-size: 0.8rem;
@@ -188,7 +190,9 @@
       }
       p-tieredmenu {
         .p-tieredmenu-overlay ul {
-          max-width: 20em;
+          max-width: 23em;
+          max-height: 25em;
+          overflow-y: scroll;
           .p-menuitem .p-menuitem-link {
             .p-menuitem-icon {
               font-size: 0.8rem;

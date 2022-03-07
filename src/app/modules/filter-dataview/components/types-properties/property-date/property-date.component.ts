@@ -1,3 +1,4 @@
+import { IFilterProperty } from 'src/app/shared/interfaces/IFilterProperty';
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { Subject } from 'rxjs';
@@ -15,10 +16,10 @@ import { ResponsiveService } from 'src/app/shared/services/responsive.service';
 export class PropertyDateComponent implements OnInit, OnDestroy {
 
   @ViewChild(Calendar) calendarComponent: Calendar;
-  @Input() property: PropertyTemplateModel;
+  @Input() property: IFilterProperty;
+  @Input() value: string | number | boolean | string[] | Date | number[];
   @Output() changed = new EventEmitter();
   defaultValue: Date;
-  value: Date;
   dateMin: Date;
   dateMax: Date;
   responsive: boolean;
@@ -55,6 +56,10 @@ export class PropertyDateComponent implements OnInit, OnDestroy {
     this.defaultValue = defaultValueDate && new Date(defaultValueDate);
     this.dateMin = this.property.min && new Date(this.property.min);
     this.dateMax = this.property.max && new Date(this.property.max);
+  }
+
+  handleChangedValue() {
+    this.changed.next({value: this.value})
   }
 
 }

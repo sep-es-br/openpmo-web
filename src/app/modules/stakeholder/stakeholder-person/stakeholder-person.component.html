@@ -186,7 +186,7 @@
             <div class="p-col-12 p-md-3 p-sm-12 card-item-container">
               <p-card class="app-card-item-permission" styleClass="editItem" *ngIf="!cardItem.inheritedFrom">
                 <div class="card-item-header">
-                  <div class="card-item-title">{{cardItem.role}}</div>
+                  <div class="card-item-title">{{cardItem.role === 'citizen' ? ('citizen' |translate) : cardItem.role}}</div>
                 </div>
                 <div class="card-item-content">
                   <span class="p-float-label">
@@ -200,7 +200,7 @@
               </p-card>
               <p-card class="app-card-item-permission inherited" styleClass="editItem" *ngIf="!!cardItem.inheritedFrom">
                 <div class="card-item-header">
-                  <span class="card-item-title">{{cardItem.role}}</span>
+                  <span class="card-item-title">{{cardItem.role === 'citizen' ? ('citizen' |translate) : cardItem.role}}</span>
                 </div>
                 <div class="card-item-content">
                   <span class="card-item-title">{{'inheritedFrom' |translate}} {{cardItem.inheritedFrom}}</span>

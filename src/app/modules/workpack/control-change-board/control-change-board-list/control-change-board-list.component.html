@@ -4,14 +4,12 @@
       <span class="label"> {{'project' | translate}}: </span>
       <span class="text"> {{ projectName }}</span>
     </div>
-    <app-config-data-view-panel (changeCollapsedExpand)="handleChangeCollapseExpandPanel($event)"
+    <app-config-data-view-panel [notShowCollapseOptions]="true"
       (changeDisplayMode)="handleChangeDisplayMode($event)" (changePageSize)="handleChangePageSize($event)">
     </app-config-data-view-panel>
   </div>
   <div class="card-container">
-    <app-card [properties]="cardProperties" *ngIf="cardProperties.showFilters" class="mt-0"
-      (editFilter)="handleEditFilter($event)" (newFilter)="handleNewFilter()"
-      (selectedFilter)="handleSelectedFilter($event)" (createNewElement)="createNewControlChangeBoard()">
+    <app-card [properties]="cardProperties" class="mt-0">
       <div class="input-toogle-show-inactive">
         <p-inputSwitch class="app-toggle" [(ngModel)]="showInactive"></p-inputSwitch>
         <label class="input-label">{{"showInactive" | translate}}</label>

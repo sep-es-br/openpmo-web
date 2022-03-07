@@ -1,3 +1,4 @@
+import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
 import { MenuComponent } from './../../../core/menu/menu.component';
 import { OverlayPanel } from 'primeng/overlaypanel';
 import { TranslateService } from '@ngx-translate/core';
@@ -32,6 +33,7 @@ export class CardItemComponent implements OnInit {
     private router: Router,
     private responsiveSrv: ResponsiveService,
     private translateSrv: TranslateService,
+    private breadcrumbSrv: BreadcrumbService
   ) {
     this.responsiveSrv.observable.subscribe(value => {
       this.responsive = value;
@@ -51,6 +53,18 @@ export class CardItemComponent implements OnInit {
         queryParams
       }
     );
+  }
+
+  handleNavigateToPage() {
+    if (!!this.properties.breadcrumbWorkpackModel) {
+      this.breadcrumbSrv.setBreadcrumbStorage(this.properties.breadcrumbWorkpackModel);
+    }
+    const params = this.properties?.paramsUrlCard ? this.properties?.paramsUrlCard : [];
+    if (this.properties?.itemId) {
+      params.push({name: 'id', value: this.properties?.itemId});
+    } 
+    
+    this.navigateToPage(this.properties.urlCard, params);
   }
 
   getQueryParams() {

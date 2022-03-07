@@ -22,7 +22,7 @@ export class AppComponent implements OnInit {
     this.router.events
       .pipe(filter((event) => event instanceof NavigationEnd))
       .subscribe((event: NavigationEnd) => {
-        const showTemplate = !['/login', '/'].includes(event.url);
+        const showTemplate = !['/login', '/', '/workpack/expanded-dashboard'].includes(event.url);
         if (this.showTemplate !== showTemplate) {
           this.showTemplate = showTemplate;
         }

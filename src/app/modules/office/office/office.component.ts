@@ -1,3 +1,4 @@
+import { IFilterProperty } from 'src/app/shared/interfaces/IFilterProperty';
 import { FilterDataviewPropertiesEntity } from './../../../shared/constants/filterDataviewPropertiesEntity';
 import { FilterDataviewService } from './../../../shared/services/filter-dataview.service';
 import { PropertyTemplateModel } from './../../../shared/models/PropertyTemplateModel';
@@ -52,7 +53,7 @@ export class OfficeComponent implements OnDestroy {
   displayModeAll = 'grid';
   pageSize = 5;
   totalRecords: number;
-  filterProperties: PropertyTemplateModel[] = this.filterSrv.get;
+  filterProperties: IFilterProperty[] = this.filterSrv.get;
   idFilterSelected: number;
 
   constructor(
@@ -71,10 +72,10 @@ export class OfficeComponent implements OnDestroy {
     private menuSrv: MenuService,
     private filterSrv: FilterDataviewService,
   ) {
-    this.activeRoute.queryParams.subscribe(async({ id }) => {
+    this.activeRoute.queryParams.subscribe(async ({ id }) => {
       this.idOffice = +id;
       this.editPermission = await this.officePermissionSrv.getPermissions(this.idOffice);
-      this.load();
+      await this.load();
     });
     this.formOffice = this.formBuilder.group({
       name: ['', [Validators.required, Validators.maxLength(25)]],
@@ -82,7 +83,7 @@ export class OfficeComponent implements OnDestroy {
     });
     this.formOffice.statusChanges
       .pipe(takeUntil(this.$destroy), filter(status => status === 'INVALID'))
-      .subscribe(() =>  this.saveButton.hideButton());
+      .subscribe(() => this.saveButton.hideButton());
     this.formOffice.valueChanges
       .pipe(takeUntil(this.$destroy), filter(() => this.formOffice.dirty && this.formOffice.valid))
       .subscribe(() => this.saveButton.showButton());
@@ -118,13 +119,6 @@ export class OfficeComponent implements OnDestroy {
     this.isUserAdmin = await this.authSrv.isUserAdmin();
     await this.loadPropertiesOffice();
     this.loadCards();
-    this.breadcrumbSrv.setMenu([{
-      key: 'office',
-      routerLink: [ '/offices', 'office' ],
-      queryParams: { id: this.idOffice },
-      info: this.propertiesOffice?.name,
-      tooltip: this.propertiesOffice?.fullName
-    }]);
     if (this.idOffice) {
       await this.loadPlans();
     }
@@ -158,6 +152,7 @@ export class OfficeComponent implements OnDestroy {
         }
       }
     }
+    this.breadcrumbSrv.setMenu([]);
   }
 
   async loadPlanModelsOfficeList() {
@@ -170,11 +165,11 @@ export class OfficeComponent implements OnDestroy {
 
   loadMenuItemsNewPlan() {
     this.menuItemsNewPlan = this.planModelsOfficeList.map(planModel =>
-      ({
-        label: planModel.name,
-        icon: 'app-icon plan-model',
-        command: () => this.navigateToNewPlan(planModel.id)
-      })
+    ({
+      label: planModel.name,
+      icon: 'app-icon plan-model',
+      command: () => this.navigateToNewPlan(planModel.id)
+    })
     );
   }
 
@@ -199,8 +194,8 @@ export class OfficeComponent implements OnDestroy {
     ] : [];
     if (this.plans) {
       itemsPlans.unshift(... this.plans.map(plan => {
-        const editPermissions = !this.isUserAdmin && plan.permissions.filter( p => p.level === 'EDIT');
-        const planEditPermission =  this.isUserAdmin ? true : (editPermissions.length > 0 ? true : false);
+        const editPermissions = !this.isUserAdmin && plan.permissions.filter(p => p.level === 'EDIT');
+        const planEditPermission = this.isUserAdmin ? true : (editPermissions.length > 0 ? true : false);
         return {
           typeCardItem: 'listItem',
           iconSvg: true,
@@ -233,7 +228,7 @@ export class OfficeComponent implements OnDestroy {
   }
 
   navigateToNewPlan(idPlanModel: number) {
-    this.router.navigate([ '/plan' ],
+    this.router.navigate(['/plan'],
       {
         queryParams: {
           idOffice: this.idOffice,
@@ -244,7 +239,7 @@ export class OfficeComponent implements OnDestroy {
   }
 
   navigateToPlanPermissions(idPlan: number) {
-    this.router.navigate([ '/plan', 'permission' ],
+    this.router.navigate(['/plan', 'permission'],
       {
         queryParams: {
           idPlan
@@ -274,7 +269,7 @@ export class OfficeComponent implements OnDestroy {
       await this.loadPropertiesOffice();
       this.breadcrumbSrv.updateLastCrumb({
         key: 'office',
-        routerLink: [ '/offices', 'office' ],
+        routerLink: ['/offices', 'office'],
         queryParams: { id: this.idOffice },
         info: this.propertiesOffice?.name,
         tooltip: this.propertiesOffice?.fullName
@@ -282,7 +277,7 @@ export class OfficeComponent implements OnDestroy {
       this.breadcrumbSrv.setBreadcrumbStorage([
         {
           key: 'office',
-          routerLink: [ '/offices', 'office' ],
+          routerLink: ['/offices', 'office'],
           queryParams: { id: this.idOffice },
           info: this.propertiesOffice?.name,
           tooltip: this.propertiesOffice?.fullName
@@ -295,7 +290,7 @@ export class OfficeComponent implements OnDestroy {
       });
       if (!isPut) {
         this.loadPlans();
-        this.router.navigate([], { queryParams: { id: this.idOffice }});
+        this.router.navigate([], { queryParams: { id: this.idOffice } });
       }
       this.menuSrv.reloadMenuOffice();
     }
@@ -318,9 +313,9 @@ export class OfficeComponent implements OnDestroy {
   async loadFiltersPlans() {
     const result = await this.filterSrv.getAllFilters('plans');
     if (result.success && result.data.length > 0) {
-        const filterDefault = result.data.find( defaultFilter => !!defaultFilter.favorite);
-        this.idFilterSelected = filterDefault ? filterDefault.id : undefined;
-        this.cardPlans.filters = result.data;
+      const filterDefault = result.data.find(defaultFilter => !!defaultFilter.favorite);
+      this.idFilterSelected = filterDefault ? filterDefault.id : undefined;
+      this.cardPlans.filters = result.data;
     }
     this.cardPlans.showFilters = true;
   }
@@ -342,10 +337,8 @@ export class OfficeComponent implements OnDestroy {
 
   async handleSelectedFilter(event) {
     const idFilter = event.filter;
-    if (idFilter) {
-      this.idFilterSelected = idFilter;
-      await this.loadPlans();
-    }
+    this.idFilterSelected = idFilter;
+    await this.loadPlans();
   }
 
   handleNewFilter() {
@@ -361,12 +354,13 @@ export class OfficeComponent implements OnDestroy {
 
   loadFilterPropertiesList() {
     const listProperties = FilterDataviewPropertiesEntity.plans;
-    const filterPropertiesList = listProperties.map( prop => {
-      const property =  new PropertyTemplateModel();
-      property.type = prop.type;
-      property.label = prop.label;
-      property.name = prop.apiValue;
-      property.active = true;
+    const filterPropertiesList = listProperties.map(prop => {
+      const property: IFilterProperty = {
+        type: prop.type,
+        label: prop.label,
+        name: prop.apiValue,
+        active: true,
+      }
       return property;
     });
 
@@ -376,7 +370,7 @@ export class OfficeComponent implements OnDestroy {
   setBreadcrumbStorage() {
     this.breadcrumbSrv.setBreadcrumbStorage([{
       key: 'office',
-      routerLink: [ '/offices', 'office' ],
+      routerLink: ['/offices', 'office'],
       queryParams: { id: this.idOffice },
       info: this.propertiesOffice?.name,
       tooltip: this.propertiesOffice?.fullName

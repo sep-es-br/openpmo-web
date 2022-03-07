@@ -134,7 +134,7 @@ export class StakeholderOrganizationComponent implements OnInit {
   }
 
   async getBreadcrumbs(idWorkpack: number) {
-    const { success, data } = await this.breadcrumbSrv.getBreadcrumbWorkpack(idWorkpack);
+    const { success, data } = await this.breadcrumbSrv.getBreadcrumbWorkpack(idWorkpack,  {'id-plan': this.idPlan});
     return success
       ? data.map(p => ({
             key: !p.modelName ? p.type.toLowerCase() : p.modelName,

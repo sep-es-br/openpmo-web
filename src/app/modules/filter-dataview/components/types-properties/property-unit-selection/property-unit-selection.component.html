@@ -1,9 +1,8 @@
 <div class="app-property-unit-selection">
   <span class="p-float-label">
     <p-dropdown class="app-single-selection" [id]="property.name" [options]="property.possibleValuesIds"
-      [class.ng-invalid]="property.invalid" (onBlur)="changed.emit($event)" [disabled]="property.disabled"
-      [(ngModel)]="property.selectedValue" dropdownIcon="fas fa-caret-down" [autoDisplayFirst]="false"
-      [required]="property.required" (ngModelChange)="changed.emit($event)">
+      [(ngModel)]="value" dropdownIcon="fas fa-caret-down" [autoDisplayFirst]="false"
+      (ngModelChange)="handleChangedValue()">
     </p-dropdown>
     <label class="app-input-label" [for]="property.name">{{'value' |translate}}</label>
   </span>

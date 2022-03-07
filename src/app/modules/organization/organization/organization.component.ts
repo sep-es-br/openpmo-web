@@ -87,8 +87,11 @@ export class OrganizationComponent implements OnInit, OnDestroy {
 
   async ngOnInit() {
     this.isUserAdmin = await this.authSrv.isUserAdmin();
-    await this.loadCard();
     this.editPermission = await this.officePermissionSrv.getPermissions(this.idOffice);
+    if (! this.isUserAdmin && !this.editPermission) {
+      this.router.navigate(['/offices']);
+    }
+    this.loadCard();
     await this.loadPropertiesOrganization();
     const resultOffice = await this.officeSrv.GetById(this.idOffice);
     if (resultOffice.success) {
@@ -103,10 +106,10 @@ export class OrganizationComponent implements OnInit, OnDestroy {
         queryParams: { idOffice: this.idOffice }
       },
       {
-        key: 'organizations',
-        info: this.propertiesOffice?.name,
-        tooltip: this.propertiesOffice?.fullName,
-        routerLink: [ '/organizations' ],
+        key: 'configuration',
+        info: 'organizations',
+        tooltip: this.translateSrv.instant('organizations'),
+        routerLink: ['/organizations'],
         queryParams: { idOffice: this.idOffice }
       },
       {

@@ -1,3 +1,4 @@
+import { IFilterProperty } from 'src/app/shared/interfaces/IFilterProperty';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { PropertyTemplateModel } from 'src/app/shared/models/PropertyTemplateModel';
 
@@ -8,12 +9,17 @@ import { PropertyTemplateModel } from 'src/app/shared/models/PropertyTemplateMod
 })
 export class PropertyToggleComponent implements OnInit {
 
-  @Input() property: PropertyTemplateModel;
+  @Input() property: IFilterProperty;
+  @Input() value: boolean;
   @Output() changed = new EventEmitter();
 
   constructor() { }
 
   ngOnInit(): void {
+  }
+
+  handleChangedValue() {
+    this.changed.next({value: this.value})
   }
 
 }

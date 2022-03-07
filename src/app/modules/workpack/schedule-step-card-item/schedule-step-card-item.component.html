@@ -35,7 +35,7 @@
           </span>
         </div>
         <div class="progress-bar-unit-container">
-          <app-progress-bar-card-step [total]="properties.unitPlanned" [progress]="properties.unitActual"
+          <app-progress-bar-card-step [total]="properties.unitPlanned" [progress]="properties.unitActual" [baseline]="properties.unitBaseline"
             [color]="properties.unitProgressBar.color" [barHeight]="13">
           </app-progress-bar-card-step>
         </div>
@@ -61,7 +61,7 @@
           </span>
         </div>
         <div class="progress-bar-cost-container">
-          <app-progress-bar-card-step [total]="properties.costProgressBar.total" [progress]="properties.costProgressBar.progress"
+          <app-progress-bar-card-step [total]="properties.costProgressBar.total" [progress]="properties.costProgressBar.progress" [baseline]="properties.baselinePlannedCost"
             [color]="properties.costProgressBar.color" [barHeight]="13">
           </app-progress-bar-card-step>
         </div>

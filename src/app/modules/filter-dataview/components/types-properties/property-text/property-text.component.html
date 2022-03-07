@@ -1,8 +1,8 @@
 <div class="app-property-text">
   <span class="p-float-label">
-    <input class="app-input-text" [id]="property.name" name="name" [(ngModel)]="property.value" type="text" pInputText
-      [disabled]="property.disabled" [defaultValue]="property.defaultValue" [required]="property.required"
-      (blur)="changed.emit($event)" (ngModelChange)="changed.emit($event)" [class.ng-invalid]="property.invalid" />
+    <input class="app-input-text" [id]="property.name" name="name" [(ngModel)]="value" type="text" pInputText
+      [defaultValue]="property.defaultValue" (ngModelChange)="handleChangedValue()"
+      />
     <label class="app-input-label" for="float-name">{{ "value" | translate }} * </label>
   </span>
 </div>

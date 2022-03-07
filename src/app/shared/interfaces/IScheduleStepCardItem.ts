@@ -8,6 +8,7 @@ export interface IScheduleStepCardItem {
   stepOrder?: string;
   unitPlanned?: number;
   unitActual?: number;
+  unitBaseline?: number;
   unitProgressBar?: {
     total: number;
     progress: number;
@@ -20,6 +21,7 @@ export interface IScheduleStepCardItem {
   };
   costPlanned?: number;
   costActual?: number;
+  baselinePlannedCost?: number;
   unitName?: string;
   unitPrecision?: number;
   idStep?: number;

@@ -31,6 +31,10 @@ import { BaselineComponent } from './baseline/baseline.component';
 import { BaselineCancellingComponent } from './baseline-cancelling/baseline-cancelling.component';
 import { JournalViewComponent } from './components/journal-view/journal-view.component';
 import { JournalComponent } from './journal/journal.component';
+import { DashboardComponent } from './dashboard/dashboard.component';
+import { TripleConstraintDashboardComponent } from './components/triple-constraint-dashboard/triple-constraint-dashboard.component';
+import { EarnedValueAnalysisDashboardComponent } from './components/earned-value-analysis-dashboard/earned-value-analysis-dashboard.component';
+import { ExpandedDashboardComponent } from './expanded-dashboard/expanded-dashboard.component';
 
 @NgModule({
   declarations: [
@@ -54,7 +58,11 @@ import { JournalComponent } from './journal/journal.component';
     BaselineComponent,
     BaselineCancellingComponent,
     JournalViewComponent,
-    JournalComponent],
+    JournalComponent,
+    DashboardComponent,
+    TripleConstraintDashboardComponent,
+    EarnedValueAnalysisDashboardComponent,
+    ExpandedDashboardComponent],
   imports: [
     CommonModule,
     WorkpackRoutingModule,
@@ -62,6 +70,6 @@ import { JournalComponent } from './journal/journal.component';
     ComponentsModule,
     FormsModule,
     ReactiveFormsModule,
-  ]
+  ],
 })
 export class WorkpackModule { }

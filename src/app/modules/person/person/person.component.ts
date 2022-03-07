@@ -1,3 +1,6 @@
+import { OfficePermissionService } from './../../../shared/services/office-permission.service';
+import { IOffice } from 'src/app/shared/interfaces/IOffice';
+import { OfficeService } from './../../../shared/services/office.service';
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ICard } from 'src/app/shared/interfaces/ICard';
@@ -13,6 +16,7 @@ import { IPerson } from 'src/app/shared/interfaces/IPerson';
 import { SaveButtonComponent } from 'src/app/shared/components/save-button/save-button.component';
 import { AuthService } from 'src/app/shared/services/auth.service';
 import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-person',
@@ -30,17 +34,12 @@ export class PersonComponent implements OnInit, OnDestroy {
   };
   cardsPlans: ICard[] = [];
   isListEmpty = false;
-  collapsePanelsStatus = true;
-  displayModeAll = 'grid';
-  pageSize = 5;
-  totalRecords: number;
-
+  office: IOffice;
   idOffice: number;
   idPerson: number;
   responsive: boolean;
   $destroy = new Subject();
   isUserAdmin: boolean;
-
   propertiesPerson: IPerson;
   formPerson: FormGroup;
 
@@ -53,9 +52,12 @@ export class PersonComponent implements OnInit, OnDestroy {
     private formBuilder: FormBuilder,
     private translateSrv: TranslateService,
     private messageSrv: MessageService,
-    private breadcrumbSrv: BreadcrumbService
+    private breadcrumbSrv: BreadcrumbService,
+    private officeSrv: OfficeService,
+    private location: Location,
+    private officePermissionSrv: OfficePermissionService
   ) {
-    this.activeRoute.queryParams.subscribe(async({ idOffice, idPerson }) => {
+    this.activeRoute.queryParams.subscribe(async ({ idOffice, idPerson }) => {
       this.idOffice = +idOffice;
       this.idPerson = +idPerson;
       await this.loads();
@@ -70,14 +72,19 @@ export class PersonComponent implements OnInit, OnDestroy {
     });
     this.formPerson.statusChanges
       .pipe(takeUntil(this.$destroy), filter(status => status === 'INVALID'))
-      .subscribe(() =>  this.saveButton.hideButton());
+      .subscribe(() => this.saveButton.hideButton());
     this.formPerson.valueChanges
       .pipe(takeUntil(this.$destroy), filter(() => this.formPerson.dirty && this.formPerson.valid))
       .subscribe(() => this.saveButton.showButton());
     this.responsiveSvr.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.responsive = value);
   }
 
-   ngOnInit() {
+  async ngOnInit() {
+    const isUserAdmin = await this.authSrv.isUserAdmin();
+    const editPermission = await this.officePermissionSrv.getPermissions(this.idOffice);
+    if (!isUserAdmin && !editPermission) {
+      this.router.navigate(['/offices']);
+    }
   }
 
   ngOnDestroy(): void {
@@ -86,9 +93,17 @@ export class PersonComponent implements OnInit, OnDestroy {
   }
 
   async loads() {
+    await this.loadOffice();
     await this.loadPerson();
     await this.loadUserAdmin();
     this.setBreadcrumb();
+  }
+
+  async loadOffice() {
+    const result = await this.officeSrv.GetById(this.idOffice);
+    if (result.success) {
+      this.office = result.data;
+    }
   }
 
   async loadPerson() {
@@ -100,7 +115,7 @@ export class PersonComponent implements OnInit, OnDestroy {
     }
   }
 
- async loadUserAdmin() {
+  async loadUserAdmin() {
     this.isUserAdmin = await this.authSrv.isUserAdmin();
   }
 
@@ -108,11 +123,15 @@ export class PersonComponent implements OnInit, OnDestroy {
     this.breadcrumbSrv.setMenu([
       {
         key: 'administration',
+        info: this.office?.name,
+        tooltip: this.office?.fullName,
         routerLink: ['/configuration-office'],
         queryParams: { idOffice: this.idOffice }
       },
       {
         key: 'configuration',
+        info: 'person',
+        tooltip: this.translateSrv.instant('measureUnits'),
         routerLink: ['/persons'],
         queryParams: { idOffice: this.idOffice }
       },
@@ -137,7 +156,9 @@ export class PersonComponent implements OnInit, OnDestroy {
   }
 
   setCardsPlans(person: IPerson) {
-    this.cardsPlans = person?.officePermission?.planPermissions?.map(plan => ({
+    this.cardsPlans = person?.officePermission?.planPermissions?.filter( planPermission => 
+      planPermission.accessLevel !== 'NONE' || (planPermission.accessLevel === 'NONE' && planPermission.workpacksPermission && planPermission.workpacksPermission.length > 0))
+      .map(plan => ({
       toggleable: false,
       initialStateToggle: false,
       collapseble: true,
@@ -148,14 +169,20 @@ export class PersonComponent implements OnInit, OnDestroy {
           icon: workpack.icon,
           typeCardItem: 'listItemPermissionWorkpack',
           itemId: workpack.id,
-          urlCard: `/stakeholder/person`,
-          paramsUrlCard: [
+          urlCard: workpack.ccbMember ? `/workpack/change-control-board/member` : `/stakeholder/person`,
+          paramsUrlCard: workpack.ccbMember ? 
+          [
+            { name: 'idProject',  value: workpack.id },
+            { name: 'idPerson', value: this.propertiesPerson.id },
+          ]
+            : [
             { name: 'idWorkpack', value: workpack.id },
-            { name: 'emailPerson', value: this.propertiesPerson.email }
+            { name: 'idPerson', value: this.propertiesPerson.id },
+            { name: 'idPlan', value: plan.id}
           ],
           nameCardItem: workpack.name,
-          subtitleCardItem: workpack?.roles?.join(', '),
-          statusItem: this.translateSrv.instant(workpack.accessLevel),
+          subtitleCardItem: workpack?.roles?.map( role => this.translateSrv.instant(role)).join(', '),
+          statusItem: workpack.ccbMember ? 'ccbMember' : workpack.accessLevel,
         };
         return cardItem;
       }),
@@ -167,46 +194,31 @@ export class PersonComponent implements OnInit, OnDestroy {
     this.router.navigate([url], { queryParams: { idPlan, email, idOffice } });
   }
 
-  handleChangeCollapseExpandPanel(event) {
-    this.collapsePanelsStatus = event.mode === 'collapse' ? true : false;
-    this.cardProperties = Object.assign({}, {
-      ...this.cardProperties,
-      initialStateCollapse: this.collapsePanelsStatus
+  async handleDeleteAllPermissions(event) {
+    const result = await this.personSrv.DeleteAllPermissions({
+      ...this.propertiesPerson,
+      ...this.formPerson.value,
+    }, this.propertiesPerson.id, this.idOffice);
+    if (result) {
+      this.location.back();
+    }
+  }
+
+  async savePerson() {
+    const { success, data } = await this.personSrv.Put({
+      ...this.propertiesPerson,
+      ...this.formPerson.value,
+      email: null,
+      idOffice: this.idOffice
     });
+    if (success) {
+      await this.loadPerson();
+      this.messageSrv.add({
+        severity: 'success',
+        summary: this.translateSrv.instant('success'),
+        detail: this.translateSrv.instant('messages.savedSuccessfully')
+      });
+    }
   }
-
-  handleChangeDisplayMode(event) {
-    this.displayModeAll = event.displayMode;
-  }
-
-  handleChangePageSize(event) {
-    this.pageSize = event.pageSize;
-  }
-
- async handleDeleteAllPermissions(event) {
-  await this.personSrv.DeleteAllPermissions({
-    ...this.propertiesPerson,
-    ...this.formPerson.value,
-  }, this.propertiesPerson.id, this.idOffice);
-
-  await this.loads();
-}
-
- async savePerson() {
-   const { success, data } = await this.personSrv.Put({
-     ...this.propertiesPerson,
-     ...this.formPerson.value,
-     email: null,
-     idOffice: this.idOffice
-   });
-   if(success) {
-    await this.loadPerson();
-    this.messageSrv.add({
-      severity: 'success',
-      summary: this.translateSrv.instant('success'),
-      detail: this.translateSrv.instant('messages.savedSuccessfully')
-    });
-   }
- }
 
 }

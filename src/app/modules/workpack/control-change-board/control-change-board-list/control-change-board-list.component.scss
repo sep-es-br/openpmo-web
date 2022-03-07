@@ -1,7 +1,6 @@
 @use "src/variables" as v;
 .app-ccb-list{
   width: 100%;
-
   .header-container {
     display: flex;
     flex-direction: row;
@@ -18,14 +17,13 @@
   .mobile {
     width: 100%;
   }
-
-
   .card-container {
     .input-toogle-show-inactive {
       display: flex;
       margin-bottom: 1rem;
       .app-toggle {
         margin-right: 10px;
+        margin-left: 0;
       }
       .input-label {
         font-size: 1rem;
@@ -35,8 +33,4 @@
       }
     }
   }
-}
-
-::ng-deep .app-card .p-panel .p-panel-header {
-  padding: 15px 15px 3px 15px  !important;
 }

@@ -1,0 +1,58 @@
+.gauge-chart {
+  .container-progress {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    .progress-content {
+      width: 100%;
+      padding-right: 0.7rem;
+      display: flex;
+      justify-content: flex-end;
+      &.direction-left {
+        justify-content: flex-start;
+      }
+      .dividing-line {
+        width: 1px;
+        height: 22px;
+        background-color: #797979;
+        position: relative;
+      }
+      .value {
+        display: flex;
+        align-items: center;
+        font-weight: bold;
+        font-size: 0.7rem;
+        margin: 0 0.5rem;
+        &.blue {
+          color: #0081c1;
+        }
+        &.red {
+          color: #fa4c4f;
+        }
+      }
+      .progress {
+        margin-top: 0.5rem;
+        border: none;
+        width: 50%;
+        &::-webkit-progress-bar {
+          background-color: transparent;
+        }
+        &.blue::-webkit-progress-value {
+          background-color: #0081c1;
+        }
+        &.red {
+          transform: rotate(180deg);
+          &::-webkit-progress-value {
+            background-color: #fa4c4f;
+          }
+        }
+      }
+    }
+    .label {
+      color: #646464;
+      margin-right: 0.7rem;
+      font-size: 0.6rem;
+    }
+  }
+}

@@ -1,10 +1,12 @@
 <div class="app-unit-measure">
-  <div class="app-content-header" [class.mobile]="responsive">
-    <span>{{ propertiesOffice?.name }}</span>
+  <div class="header-container" [class.mobile]="responsive">
+    <div class="app-content-header" [class.mobile]="responsive">
+      <span>{{ 'measureUnits'|translate }}</span>
+    </div>
+    <app-config-data-view-panel [notShowCollapseOptions]="true"
+      (changeDisplayMode)="handleChangeDisplayMode($event)" (changePageSize)="handleChangePageSize($event)">
+    </app-config-data-view-panel>
   </div>
-  <app-config-data-view-panel (changeCollapsedExpand)="handleChangeCollapseExpandPanel($event)"
-    (changeDisplayMode)="handleChangeDisplayMode($event)" (changePageSize)="handleChangePageSize($event)">
-  </app-config-data-view-panel>
   <div class="card-container" *ngIf="cardProperties">
     <app-card [properties]="cardProperties" class="mt-0" *ngIf="cardProperties.showFilters"
       (editFilter)="handleEditFilter($event)" (newFilter)="handleNewFilter()"
@@ -15,7 +17,8 @@
         [emptyMessage]="((editPermission === undefined || editPermission) ? 'loadingEllipsis' : 'noContent') | translate">
         <ng-template let-cardItem pTemplate="gridItem">
           <div class="p-col-12 p-sm-12 p-md-4 p-lg-3 card-item-container">
-            <p-card *ngIf="cardItem.typeCardItem === 'listItem'" class="app-card-item listItem" [class.mobile]="responsive">
+            <p-card *ngIf="cardItem.typeCardItem === 'listItem'" class="app-card-item listItem"
+              [class.mobile]="responsive">
               <p-header *ngIf="cardItem.menuItems" class="card-item-header">
                 <p-menu #menu [popup]="true" [model]="cardItem.menuItems"></p-menu>
                 <button type="button" pButton icon="pi pi-ellipsis-v" (click)="menu.toggle($event)"></button>

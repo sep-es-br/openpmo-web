@@ -53,7 +53,9 @@
           color: #939393;
         }
       }
-
+      .card-item-header.header-fixed {
+        height: 33.6px;
+      }
       .card-item-header .button-change {
             display: flex;
             flex-direction: column;
@@ -82,10 +84,12 @@
     }
     .card-item-content {
       display: flex;
+      max-width: 280px;
       flex-direction: column;
       align-items: center;
       color: #888e96;
       padding: 0 !important;
+      
       .icons-container {
         display: flex;
         flex-direction: row;
@@ -114,13 +118,18 @@
         color: rgba(147, 147, 147, 0.5);
       }
       .card-item-name {
+        max-width: 100%;
         font-size: 1.2rem;
         font-family: v.$fontFamilyMedium;
-        padding: 0.5em;
-        display: flex;
-        flex: 1;
-        align-items: center;
+        padding: 0.5rem 0.5rem 0;
+        // display: flex;
+        // flex: 1;
+        // align-items: center;
         text-align: center;
+        white-space: nowrap;
+        word-break: break-word;
+        overflow: hidden;
+        text-overflow: ellipsis;
       }
       .role {
         width: 100%;
@@ -133,6 +142,7 @@
         font-size: 0.8rem;
         font-family: v.$fontFamilyMedium;
         color: #009dd4;
+        padding-bottom: 5px;
         &.role {
           text-align: center;
           width: 80%;
@@ -258,7 +268,7 @@
 
       p-tieredmenu {
         .p-tieredmenu-overlay ul {
-          max-width: 20em;
+          max-width: 23em;
           .p-menuitem .p-menuitem-link {
             .p-menuitem-icon {
               font-size: 0.8rem;

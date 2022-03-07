@@ -25,23 +25,17 @@ export class PersonProfileComponent implements OnInit, OnDestroy {
   cardProperties: ICard = {
     toggleable: false,
     initialStateToggle: false,
-    collapseble: true,
+    collapseble: false,
     initialStateCollapse: false
   };
   cardsPlans: ICard[] = [];
   isListEmpty = false;
-  collapsePanelsStatus = true;
-  displayModeAll = 'grid';
-  pageSize = 5;
-  totalRecords: number;
-
   idOffice: number;
   idPerson: number;
   responsive: boolean;
   $destroy = new Subject();
   isUserAdmin: boolean;
   optionsOffices: SelectItem[] = [];
-
   propertiesPerson: IPerson;
   formPerson: FormGroup;
 
@@ -60,9 +54,9 @@ export class PersonProfileComponent implements OnInit, OnDestroy {
       name: ['', Validators.required],
       email: [''],
       contactEmail: ['', Validators.email],
-      phoneNumber: ['', Validators.required],
-      address: ['', Validators.required],
-      unify: [false, Validators.required]
+      phoneNumber: [''],
+      address: [''],
+      unify: [false]
     });
     this.formPerson.statusChanges
       .pipe(takeUntil(this.$destroy), filter(status => status === 'INVALID'))
@@ -84,9 +78,9 @@ export class PersonProfileComponent implements OnInit, OnDestroy {
 
   async loads() {
     this.loadIdPerson();
+    await this.loadUserAdmin();
     await this.loadOptionsOffices();
     await this.loadPerson();
-    await this.loadUserAdmin();
     this.setBreadcrumb();
   }
 
@@ -96,18 +90,33 @@ export class PersonProfileComponent implements OnInit, OnDestroy {
 
   async loadOptionsOffices() {
     const { success, data } = await this.personSrv.getOfficesByPerson(this.idPerson);
-    if (success) {
+    if (success && data) {
       this.optionsOffices = data.map(office => ({ label: office.name, value: office.id }));
-      this.idOffice = this.optionsOffices[0].value;
+      this.idOffice = this.optionsOffices[0]?.value;
     }
   }
 
   async loadPerson() {
-    const { success, data } = await this.personSrv.GetByIdAndOffice(this.idPerson, this.idOffice);
-    if (success) {
-      this.propertiesPerson = data;
-      this.setFormPerson(data);
-      this.setCardsPlans(data);
+    if (this.idOffice && !this.isUserAdmin) {
+      const { success, data } = await this.personSrv.GetByIdAndOffice(this.idPerson, this.idOffice);
+      if (success) {
+        this.propertiesPerson = data;
+        this.setFormPerson(data);
+        this.setCardsPlans(data);
+      }
+    } else {
+      if (this.isUserAdmin) {
+        const infoPersonByOffice = await this.personSrv.GetByIdAndOffice(this.idPerson, this.idOffice);
+        if (!infoPersonByOffice.success || !infoPersonByOffice.data) {
+          this.propertiesPerson = await this.authSrv.getInfoPerson();
+          if (this.propertiesPerson) {
+            this.propertiesPerson.email = this.authSrv.getTokenPayload()?.email;
+          }
+        } else {
+          this.propertiesPerson = infoPersonByOffice.data;
+        }
+        this.setFormPerson(this.propertiesPerson); 
+      }
     }
   }
 
@@ -155,8 +164,9 @@ export class PersonProfileComponent implements OnInit, OnDestroy {
             { name: 'emailPerson', value: this.propertiesPerson.email }
           ],
           nameCardItem: workpack.name,
-          subtitleCardItem: workpack?.roles?.map( r => r.role).join(', '),
-          statusItem: this.translateSrv.instant(workpack.accessLevel),
+          subtitleCardItem: workpack?.roles?.join(', '),
+          statusItem: workpack.ccbMember ? 'ccbMember' : workpack.accessLevel,
+          profileView: true
         };
         return cardItem;
       }),
@@ -169,7 +179,7 @@ export class PersonProfileComponent implements OnInit, OnDestroy {
   }
 
   async handleChangeOffice(event) {
-    this.idOffice = event.value.value;
+    this.idOffice = event.value;
     await this.loadPerson();
   }
 
@@ -183,28 +193,15 @@ export class PersonProfileComponent implements OnInit, OnDestroy {
     });
   }
 
-  handleChangeCollapseExpandPanel(event) {
-    this.collapsePanelsStatus = event.mode === 'collapse' ? true : false;
-    this.cardProperties = Object.assign({}, {
-      ...this.cardProperties,
-      initialStateCollapse: this.collapsePanelsStatus
-    });
-  }
-
-  handleChangeDisplayMode(event) {
-    this.displayModeAll = event.displayMode;
-  }
-
-  handleChangePageSize(event) {
-    this.pageSize = event.pageSize;
-  }
-
   async savePerson() {
-    const { success, data } = await this.personSrv.Put({
+    const sender = {
       ...this.propertiesPerson,
       ...this.formPerson.value,
       idOffice: this.idOffice,
       email: null
+    };
+    const { success, data } = await this.personSrv.Put({
+      ...sender
     });
     if (success) {
       await this.loadPerson();

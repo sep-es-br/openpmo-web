@@ -19,6 +19,8 @@ export class CardComponent implements OnInit, OnDestroy, OnChanges {
   @Output() editFilter = new EventEmitter();
   @Output() newFilter = new EventEmitter();
   @Output() createNewElement = new EventEmitter();
+  @Output() changeCheckCompleted = new EventEmitter();
+  @Output() changeFullScreen = new EventEmitter();
 
   responsive: boolean;
   subResponsive: Subscription;
@@ -112,6 +114,14 @@ export class CardComponent implements OnInit, OnDestroy, OnChanges {
 
   handleCreateNewElement() {
     this.createNewElement.emit();
+  }
+
+  handleChangeCheckCompleted(event) {
+    this.changeCheckCompleted.emit(event);
+  }
+
+  handleChangeFullScreen() {
+    this.changeFullScreen.emit();
   }
 
 }

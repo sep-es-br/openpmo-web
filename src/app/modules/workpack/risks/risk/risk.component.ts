@@ -106,10 +106,8 @@ export class RiskComponent implements OnInit {
     this.idPlan = Number(localStorage.getItem('@currentPlan'));
     await this.loadPropertiesRisk();
     await this.setBreadcrumb();
-    if (!this.editPermission) {
-      this.formRisk.disable;
-    } else {
-      this.formRisk.enable;
+    if (!this.idRisk) {
+      this.editPermission = true;
     }
   }
 
@@ -166,7 +164,11 @@ export class RiskComponent implements OnInit {
         this.editPermission = workpack.permissions && workpack.permissions.filter(p => p.level === 'EDIT').length > 0;
       }
     }
-
+    if (!this.editPermission) {
+      this.formRisk.disable();
+    } else {
+      this.formRisk.enable();
+    }
   }
 
   calculateYearRange() {
@@ -278,7 +280,7 @@ export class RiskComponent implements OnInit {
   async deleteRiskResponse(resp: IRiskResponse) {
     const result = await this.riskResponseSrv.delete(resp, {useConfirm: true});
     if (result.success) {
-      this.riskResponseCardItems = Array.from(this.riskResponseCardItems.filter(r => r.itemId === resp.id));
+      this.riskResponseCardItems = Array.from(this.riskResponseCardItems.filter(r => r.itemId !== resp.id));
     }
   }
 
@@ -304,7 +306,8 @@ export class RiskComponent implements OnInit {
       });
       this.idRisk = result.data.id;
       this.risk = {
-        ...sender
+        ...sender,
+        id: result.data.id
       };
       this.loadRiskResponseCardItems();
       if (this.risk.status === this.riskPropertiesOptions.status.HAPPENED.value) {

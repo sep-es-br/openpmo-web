@@ -1,3 +1,4 @@
+import { AuthService } from './../../../../shared/services/auth.service';
 import {AuthServerService} from '../../../../shared/services/auth-server.service';
 import {Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {Router} from '@angular/router';
@@ -58,7 +59,8 @@ export class AdministratorComponent implements OnInit, OnDestroy {
     private breadcrumbSrv: BreadcrumbService,
     private router: Router,
     private authServerSrv: AuthServerService,
-    private citizenUserSrv: CitizenUserService
+    private citizenUserSrv: CitizenUserService,
+    private authSrv: AuthService
   ) {
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => {
       this.responsive = value;
@@ -73,6 +75,10 @@ export class AdministratorComponent implements OnInit, OnDestroy {
   }
 
   async ngOnInit() {
+    const isUserAdmin = await this.authSrv.isUserAdmin();
+    if (!isUserAdmin) {
+      this.router.navigate['/offices'];
+    }
     await this.getAuthServer();
     this.loadBreadcrumb();
     this.loadCards();

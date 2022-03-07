@@ -193,6 +193,7 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
       const result = await this.stakeholderSrv.GetStakeholderPerson({ 'id-workpack': this.idWorkpack, idPerson: this.idPerson, 'id-plan': this.idPlan });
       if (result.success) {
         this.stakeholder = result.data;
+        this.person = this.stakeholder?.person;
         this.loadCardPermissions();
       }
     }
@@ -204,7 +205,7 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
   async searchPersonByName(event) {
     const result = await this.personSrv.GetPersonByFullName({
       idWorkpack: this.idWorkpack,
-      fullName: event.query.toString().normalize('NFD').replace(/[\u0300-\u036f]/g, "")
+      fullName: event.query.toString()
     });
     if (result.success && result.data.length > 0) {
       this.resultPersonsByName = result.data;
@@ -555,7 +556,7 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
     if (!validated) {
       return;
     }
-    const permissions = this.stakeholderPermissions.filter( permission => !permission.inheritedFrom && permission.level && permission.level !== 'None');
+    const permissions = this.stakeholderPermissions?.filter( permission => !permission.inheritedFrom && permission.level && permission.level !== 'None');
     const stakeholderModel = ((!this.user && !this.stakeholder) || (this.stakeholder && !this.stakeholder.person.isUser)) ? {
       idWorkpack: this.idWorkpack,
       person: {
@@ -570,7 +571,8 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
         ...r,
         to: r.to !== null ? formatDateToString(r.to as Date, true) : null,
         from: formatDateToString(r.from as Date, true)
-      }))
+      })),
+      idPlan: this.idPlan,
     } : {
       idWorkpack: this.idWorkpack,
       person: {
@@ -650,8 +652,15 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
       return false;
     }
     // user should have permissions
-    if (((this.user && !this.stakeholder) || (this.stakeholder && this.stakeholder.person.isUser && !this.idPerson))
-      && (!this.stakeholderPermissions || (this.stakeholderPermissions && this.stakeholderPermissions.length === 0))) {
+    if (
+          (
+            (this.user && !this.stakeholder) 
+              || (this.stakeholder && this.stakeholder.person.isUser && !this.idPerson)
+            )
+           && ( !this.stakeholderPermissions || (this.stakeholderPermissions && (this.stakeholderPermissions.length === 0
+                                                  || this.stakeholderPermissions.filter( permission => permission.level.toLowerCase() !== 'none').length === 0))
+              )
+        ) {
       return false;
     }
     return true;

@@ -3,7 +3,7 @@
     <div class="app-content-header" >
       <span>{{ propertiesOffice?.name }}</span>
     </div>
-    <app-config-data-view-panel (changeCollapsedExpand)="handleChangeCollapseExpandPanel($event)"
+    <app-config-data-view-panel [notShowCollapseOptions]="true"
         (changeDisplayMode)="handleChangeDisplayMode($event)">
       </app-config-data-view-panel>
   </div>
