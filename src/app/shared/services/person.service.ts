@@ -141,7 +141,7 @@ export class PersonService extends BaseService<IPerson> {
   }
 
   async getPersonsAdministrators(): Promise<IHttpResult<IPerson[]>> {
-    const result = await this.http.get(`${this.urlBase}/administrators`).toPromise();
+    const result = await this.http.get(`${this.urlBase}/administrator`).toPromise();
     return result as IHttpResult<IPerson[]>;
   }
 

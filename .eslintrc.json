@@ -47,7 +47,7 @@
         ],
         "no-shadow": "off",
         "eqeqeq": "off",
-        "no-debugger": "off",
+        "no-debugger": "off"
       }
     },
     {
