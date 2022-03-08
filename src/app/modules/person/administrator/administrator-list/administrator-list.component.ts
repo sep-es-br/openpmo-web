@@ -52,7 +52,7 @@ export class AdministratorListComponent implements OnInit {
   async ngOnInit() {
     const isUserAdmin = await this.authSrv.isUserAdmin();
     if (!isUserAdmin) {
-      this.router.navigate['/offices'];
+      await this.router.navigate(['/offices']);
     }
     this.loadCurrentUserInfo();
     await this.loadAdministrators();
@@ -111,7 +111,7 @@ export class AdministratorListComponent implements OnInit {
   }
 
   handleChangeCollapseExpandPanel(event) {
-    this.collapsePanelsStatus = event.mode === 'collapse' ? true : false;
+    this.collapsePanelsStatus = event.mode === 'collapse';
     this.cardAdministrators = Object.assign({}, {
       ...this.cardAdministrators,
       initialStateCollapse: this.collapsePanelsStatus
@@ -127,8 +127,8 @@ export class AdministratorListComponent implements OnInit {
   }
 
 
-  handleCreateNewOfficePermission() {
-    this.router.navigate(['/persons/administrators/administrator']);
+  async handleCreateNewOfficePermission() {
+    await this.router.navigate(['/persons/administrators/administrator']);
   }
 
   async deleteAdministrator(administrator: IPerson) {

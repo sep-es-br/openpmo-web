@@ -188,7 +188,7 @@ export class PersonService extends BaseService<IPerson> {
   }
 
   async setPersonAdministrator(idPerson: number, administrator: boolean): Promise<IHttpResult<any>> {
-    return await this.http.patch<IHttpResult<any>>(`${this.urlBase}/administrators/${idPerson}`, {administrator}).toPromise();
+    return await this.http.patch<IHttpResult<any>>(`${this.urlBase}/administrator/${idPerson}`, {administrator}).toPromise();
   }
 
 }
