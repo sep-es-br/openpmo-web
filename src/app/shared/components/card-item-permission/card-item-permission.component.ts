@@ -38,7 +38,7 @@ export class CardItemPermissionComponent implements OnInit {
 
   navigateToPage(url: string, params?: {name: string; value: string | number}[]) {
     this.router.navigateByUrl(url);
-    const queryParams = params.reduce((obj, item) => ((obj[item.name] = item.value), obj), {});
+    const queryParams = params && params.reduce((obj, item) => ((obj[item.name] = item.value), obj), {});
     this.router.navigate(
       [url],
       {

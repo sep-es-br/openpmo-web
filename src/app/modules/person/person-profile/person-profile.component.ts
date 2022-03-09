@@ -106,7 +106,7 @@ export class PersonProfileComponent implements OnInit, OnDestroy {
       }
     } else {
       if (this.isUserAdmin) {
-        const infoPersonByOffice = await this.personSrv.GetByIdAndOffice(this.idPerson, this.idOffice);
+        const infoPersonByOffice = this.idOffice ? await this.personSrv.GetByIdAndOffice(this.idPerson, this.idOffice) : {success: false, data: null};
         if (!infoPersonByOffice.success || !infoPersonByOffice.data) {
           this.propertiesPerson = await this.authSrv.getInfoPerson();
           if (this.propertiesPerson) {

@@ -26,7 +26,6 @@ export class AdministratorListComponent implements OnInit {
     collapseble: true,
     initialStateCollapse: false
   };
-  collapsePanelsStatus = true;
   displayModeAll = 'grid';
   pageSize = 5;
   totalRecords: number;
@@ -77,16 +76,17 @@ export class AdministratorListComponent implements OnInit {
       this.cardItemsAdministrators = this.administrators.map(administrator => {
         const fullName = administrator.name.split(' ');
         const name = fullName.length > 1 ? fullName[0] + ' ' + fullName[1] : fullName[0];
+
       return  {
           typeCardItem: 'listItem',
           titleCardItem: name,
+          fullNameUser: administrator.fullName,
           roleDescription: administrator.email,
           menuItems: [{
             label: this.translateSrv.instant('delete'),
             icon: 'fas fa-trash-alt',
             command: (event) => this.deleteAdministrator(administrator)
           }],
-          urlCard: 'persons/administrators',
           itemId: administrator.id,
         };
       });
@@ -108,14 +108,6 @@ export class AdministratorListComponent implements OnInit {
         routerLink: [ '/persons/administrators' ],
       }
     ]);
-  }
-
-  handleChangeCollapseExpandPanel(event) {
-    this.collapsePanelsStatus = event.mode === 'collapse';
-    this.cardAdministrators = Object.assign({}, {
-      ...this.cardAdministrators,
-      initialStateCollapse: this.collapsePanelsStatus
-    });
   }
 
   handleChangeDisplayMode(event) {

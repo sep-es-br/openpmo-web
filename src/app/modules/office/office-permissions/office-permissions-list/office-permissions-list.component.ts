@@ -130,6 +130,7 @@ export class OfficePermissionsListComponent implements OnInit {
         const name = fullName.length > 1 ? fullName[0] + ' ' + fullName[1] : fullName[0];
         return {
           typeCardItem: 'listItem',
+          fullNameUser: p.person.fullName,
           titleCardItem: name,
           roleDescription: (p.permissions.filter(r => r.level === 'EDIT').length > 0
             ? this.translateSrv.instant('edit')

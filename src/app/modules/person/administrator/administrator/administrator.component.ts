@@ -115,23 +115,10 @@ export class AdministratorComponent implements OnInit, OnDestroy {
     }
   }
 
-  // consulta para person que não são users
-  async searchPersonByName(event) {
-    const result = await this.personSrv.GetPersonByFullName(event.query);
-    if (result.success && result.data.length > 0) {
-      this.resultPersonsByName = result.data;
-    } else {
-      this.notFoundPerson = true;
-    }
-  }
-
-  handlePersonSelected() {
-    this.person = this.selectedPerson;
-  }
-
   validateClearSearchPerson(event) {
     if (!event || event.length === 0) {
       this.person = undefined;
+      this.saveButton.hideButton();
     }
   }
 
@@ -140,6 +127,7 @@ export class AdministratorComponent implements OnInit, OnDestroy {
       this.publicServersResult = [];
       this.showListBoxPublicServers = false;
       this.showMessagePublicServerNotFoundByName = false;
+      this.saveButton.hideButton();
     }
   }
 
@@ -148,6 +136,7 @@ export class AdministratorComponent implements OnInit, OnDestroy {
       this.person = undefined;
       this.showMessageInvalidEmail = false;
       this.showMessageNotFoundUserByEmail = false;
+      this.saveButton.hideButton();
     }
   }
 
@@ -160,6 +149,7 @@ export class AdministratorComponent implements OnInit, OnDestroy {
     this.validCpf = true;
     this.searchedCpfUser = null;
     this.searchedNameUser = null;
+    this.saveButton.hideButton();
   }
 
   resetPerson() {
@@ -216,7 +206,7 @@ export class AdministratorComponent implements OnInit, OnDestroy {
     }
     this.showMessagePublicServerNotFoundByName =
       !this.publicServersResult || (this.publicServersResult && this.publicServersResult.length === 0);
-    this.saveButton.showButton();
+    // this.saveButton.showButton();
   }
 
   validateClearSearchByCpf(event) {
@@ -241,8 +231,8 @@ export class AdministratorComponent implements OnInit, OnDestroy {
         this.saveButton.showButton();
       } else {
         this.citizenUserNotFoundByCpf = true;
+        this.saveButton.hideButton();
       }
-      this.saveButton.showButton();
     }
   }
 
@@ -261,6 +251,7 @@ export class AdministratorComponent implements OnInit, OnDestroy {
       this.searchedNameUser = '';
       this.publicServersResult = [];
       this.showListBoxPublicServers = false;
+      this.saveButton.showButton();
     }
   }
 

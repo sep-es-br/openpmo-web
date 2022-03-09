@@ -64,13 +64,13 @@ export class WorkpackCardItemComponent implements OnInit, OnDestroy {
         break;
     }
     if (this.properties.dashboard !== null) {
-      if (this.properties.dashboard.risk && this.properties.dashboard.risk.total > 0) {
-        this.riskImportance = this.properties.dashboard.risk.high > 0 ? 'high' : (this.properties.dashboard.risk.medium > 0 ? 'medium' : 'low');
+      if (this.properties?.dashboard?.risk && this.properties?.dashboard?.risk?.total > 0) {
+        this.riskImportance = this.properties.dashboard?.risk?.high > 0 ? 'high' : (this.properties.dashboard?.risk?.medium > 0 ? 'medium' : 'low');
       }
-      if (this.properties.dashboard.milestone && this.properties.dashboard.milestone.quantity > 0) {
+      if (this.properties.dashboard?.milestone && this.properties.dashboard?.milestone?.quantity > 0) {
         this.setDashboardMilestonesData();
       }
-      if (this.properties.dashboard.tripleConstraint) {
+      if (this.properties.dashboard?.tripleConstraint) {
         this.loadTripleConstraintSettings();
       }
       this.loadPerformanceIndexes();
@@ -89,8 +89,8 @@ export class WorkpackCardItemComponent implements OnInit, OnDestroy {
 
   setGaugeChartData() {
     this.gaugeChartDataCPI = {
-      value: this.properties.dashboard.costPerformanceIndex !== null ?
-        (this.properties.dashboard.costPerformanceIndex?.indexValue !== null ? this.properties.dashboard.costPerformanceIndex?.indexValue : 0) : null,
+      value: this.properties.dashboard?.costPerformanceIndex !== null ?
+        (this.properties.dashboard?.costPerformanceIndex?.indexValue !== null ? this.properties.dashboard?.costPerformanceIndex?.indexValue : 0) : null,
       labelBottom: 'CPI',
       classIconLabelBottom: 'fas fa-dollar-sign',
       valueProgressBar: this.properties.dashboard?.costPerformanceIndex !== null ? this.properties.dashboard?.costPerformanceIndex?.costVariation : null,
@@ -99,12 +99,12 @@ export class WorkpackCardItemComponent implements OnInit, OnDestroy {
     }
 
     this.gaugeChartDataSPI = {
-      value: this.properties.dashboard.schedulePerformanceIndex !== null ?
-        (this.properties.dashboard.schedulePerformanceIndex.indexValue !== null ? this.properties.dashboard.schedulePerformanceIndex.indexValue : 0) : null,
+      value: this.properties.dashboard?.schedulePerformanceIndex !== null ?
+        (this.properties.dashboard?.schedulePerformanceIndex?.indexValue !== null ? this.properties.dashboard?.schedulePerformanceIndex?.indexValue : 0) : null,
       labelBottom: 'SPI',
       classIconLabelBottom: 'fas fa-clock',
-      valueProgressBar: this.properties.dashboard.schedulePerformanceIndex !== null ? this.properties.dashboard.schedulePerformanceIndex?.scheduleVariation : null,
-      maxProgressBar: this.properties.dashboard.earnedValue,
+      valueProgressBar: this.properties.dashboard?.schedulePerformanceIndex !== null ? this.properties.dashboard?.schedulePerformanceIndex?.scheduleVariation : null,
+      maxProgressBar: this.properties.dashboard?.earnedValue,
       labelBottomProgressBar: 'SV',
     }
 
@@ -144,7 +144,7 @@ export class WorkpackCardItemComponent implements OnInit, OnDestroy {
         this.iconCostColor = '#44B39B';
       }
     } else {
-      if (this.properties.dashboard.tripleConstraint?.cost?.foreseenValue >= this.properties.dashboard.tripleConstraint?.cost?.actualValue) {
+      if (this.properties.dashboard.tripleConstraint?.cost?.foreseenValue >= this.properties.dashboard?.tripleConstraint?.cost?.actualValue) {
         this.iconCostColor = '#888E96';
       } else {
         this.iconCostColor = '#EA5C5C';
@@ -161,16 +161,16 @@ export class WorkpackCardItemComponent implements OnInit, OnDestroy {
         this.iconScheduleColor = '#44B39B';
       }
     } else {
-      if (this.properties.dashboard.tripleConstraint.schedule?.foreseenValue >= this.properties.dashboard.tripleConstraint?.schedule?.actualValue) {
+      if (this.properties.dashboard?.tripleConstraint?.schedule?.foreseenValue >= this.properties.dashboard?.tripleConstraint?.schedule?.actualValue) {
         this.iconScheduleColor = '#888E96';
       } else {
         this.iconScheduleColor = '#EA5C5C';
       }
     }
 
-    if (this.properties.dashboard && this.properties.dashboard.tripleConstraint?.scope?.plannedVariationPercent > 0) {
-      if (!!this.properties.dashboard.tripleConstraint?.scope?.variation && this.properties.dashboard.tripleConstraint?.scope?.variation !== 0) {
-        if (this.properties.dashboard.tripleConstraint?.scope?.variation < 0) {
+    if (this.properties.dashboard && this.properties.dashboard?.tripleConstraint?.scope?.plannedVariationPercent > 0) {
+      if (!!this.properties.dashboard?.tripleConstraint?.scope?.variation && this.properties.dashboard?.tripleConstraint?.scope?.variation !== 0) {
+        if (this.properties.dashboard?.tripleConstraint?.scope?.variation < 0) {
           this.iconScopeColor = '#44B39B';
         } else {
           this.iconScopeColor = '#EA5C5C';
@@ -179,7 +179,7 @@ export class WorkpackCardItemComponent implements OnInit, OnDestroy {
         this.iconScopeColor = '#EA5C5C';
       }
     } else {
-      if (this.properties.dashboard.tripleConstraint?.scope?.foreseenValue >= this.properties.dashboard.tripleConstraint?.scope?.actualValue) {
+      if (this.properties.dashboard?.tripleConstraint?.scope?.foreseenValue >= this.properties.dashboard?.tripleConstraint?.scope?.actualValue) {
         this.iconScopeColor = '#EA5C5C';
       } else {
         this.iconScopeColor = '#44B39B';

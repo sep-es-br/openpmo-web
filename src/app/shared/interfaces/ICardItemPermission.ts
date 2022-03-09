@@ -4,6 +4,7 @@ import { MenuItem } from 'primeng/api';
 export interface ICardItemPermission {
   typeCardItem: string;
   titleCardItem?: string;
+  fullNameUser?: string;
   roleDescription?: string;
   menuItems?: MenuItem[];
   urlCard?: string;

@@ -136,6 +136,7 @@ export class PlanPermissionsListComponent implements OnInit {
       return {
         typeCardItem: 'listItem',
         titleCardItem: name,
+        fullNameUser: p.person.fullName,
         roleDescription: (p.permissions.filter(r => r.level === 'EDIT').length > 0
           ? this.translateSrv.instant('edit')
           : this.translateSrv.instant('read')),

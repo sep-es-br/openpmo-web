@@ -1,7 +1,7 @@
 <p-card *ngIf="properties.typeCardItem === 'listItem'" class="app-card-item-permission listItem"
   [class.cardList]="displayModeCard === 'list'" [class.card-link]="properties.urlCard" [class.mobile]="responsive">
   <p-header *ngIf="properties.menuItems" class="card-item-header">
-    <span class="card-item-title">{{properties.titleCardItem}}</span>
+    <span class="card-item-title" [pTooltip]="properties.fullNameUser" >{{properties.titleCardItem}}</span>
     <p-menu #menu [popup]="true" [model]="properties.menuItems"></p-menu>
     <button type="button" pButton icon="pi pi-ellipsis-v" (click)="menu.toggle($event)"></button>
   </p-header>

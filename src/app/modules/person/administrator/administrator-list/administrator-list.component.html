@@ -1,6 +1,6 @@
 <div class="app-administrator-list">
   <div class="header-container" [class.mobile]="responsive">
-    <app-config-data-view-panel (changeCollapsedExpand)="handleChangeCollapseExpandPanel($event)"
+    <app-config-data-view-panel [notShowCollapseOptions]="true"
       (changeDisplayMode)="handleChangeDisplayMode($event)" (changePageSize)="handleChangePageSize($event)">
     </app-config-data-view-panel>
   </div>

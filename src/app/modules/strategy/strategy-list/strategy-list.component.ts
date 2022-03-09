@@ -60,9 +60,7 @@ export class StrategyListComponent implements OnInit {
   ) {
     this.activeRoute.queryParams.subscribe(async ({ idOffice }) => {
       this.idOffice = +idOffice;
-      await this.getOfficeById();
-      await this.loadFiltersStrategies();
-      await this.loadPropertiesStrategies();
+      
       this.breadcrumbSrv.setMenu([
         {
           key: 'administration',
@@ -91,6 +89,9 @@ export class StrategyListComponent implements OnInit {
     if (!this.isUserAdmin && !this.editPermission) {
       this.router.navigate(['/offices']);
     }
+    await this.getOfficeById();
+    await this.loadFiltersStrategies();
+    await this.loadPropertiesStrategies();
   }
 
   handleChangeDisplayMode(event) {
