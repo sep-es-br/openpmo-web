@@ -54,7 +54,6 @@ export class DomainComponent implements OnInit, OnDestroy {
   editPermission: boolean;
   permissionsOffices: IOffice[];
   propertiesOffice: IOffice;
-  collapsePanelsStatus = true;
   displayModeAll = 'grid';
   pageSize = 5;
   totalRecords: number;
@@ -146,18 +145,6 @@ export class DomainComponent implements OnInit, OnDestroy {
     ]);
   }
 
-  handleChangeCollapseExpandPanel(event) {
-    this.collapsePanelsStatus = event.mode === 'collapse' ? true : false;
-    this.cardProperties = Object.assign({}, {
-      ...this.cardProperties,
-      initialStateCollapse: this.collapsePanelsStatus
-    });
-    this.cardLocalityRoot = Object.assign({}, {
-      ...this.cardLocalityRoot,
-      initialStateCollapse: this.collapsePanelsStatus
-    });
-  }
-
   handleChangeDisplayMode(event) {
     this.displayModeAll = event.displayMode;
   }
@@ -171,15 +158,15 @@ export class DomainComponent implements OnInit, OnDestroy {
       toggleable: false,
       initialStateToggle: false,
       cardTitle: 'properties',
-      collapseble: true,
-      initialStateCollapse: this.collapsePanelsStatus
+      collapseble: false,
+      initialStateCollapse: false
     };
     this.cardLocalityRoot = {
       toggleable: false,
       initialStateToggle: false,
       cardTitle: 'localityRoot',
-      collapseble: true,
-      initialStateCollapse: this.collapsePanelsStatus,
+      collapseble: false,
+      initialStateCollapse: false,
       showCreateNemElementButton: false,
       showFilters: false
     };

@@ -28,7 +28,7 @@ export class PersonListComponent implements OnInit, OnDestroy {
   cardProperties: ICard = {
     toggleable: false,
     initialStateToggle: false,
-    collapseble: true,
+    collapseble: false,
     initialStateCollapse: false
   };
   cardItemsProperties: ICardItem[];

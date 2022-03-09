@@ -53,13 +53,13 @@ export class AdministratorListComponent implements OnInit {
     if (!isUserAdmin) {
       await this.router.navigate(['/offices']);
     }
-    this.loadCurrentUserInfo();
+    await this.loadCurrentUserInfo();
     await this.loadAdministrators();
     this.loadBreadcrump();
   }
 
-  loadCurrentUserInfo() {
-    this.idCurrentPerson = this.authSrv.getIdPerson();
+  async loadCurrentUserInfo() {
+    this.idCurrentPerson = Number(this.authSrv.getIdPerson());
   }
 
 
@@ -76,16 +76,16 @@ export class AdministratorListComponent implements OnInit {
       this.cardItemsAdministrators = this.administrators.map(administrator => {
         const fullName = administrator.name.split(' ');
         const name = fullName.length > 1 ? fullName[0] + ' ' + fullName[1] : fullName[0];
-
       return  {
           typeCardItem: 'listItem',
           titleCardItem: name,
           fullNameUser: administrator.fullName,
           roleDescription: administrator.email,
-          menuItems: [{
+          menuItems:  [{
             label: this.translateSrv.instant('delete'),
             icon: 'fas fa-trash-alt',
-            command: (event) => this.deleteAdministrator(administrator)
+            command: (event) => this.deleteAdministrator(administrator),
+            disabled: administrator.id === this.idCurrentPerson
           }],
           itemId: administrator.id,
         };
