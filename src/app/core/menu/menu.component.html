@@ -186,14 +186,14 @@
   <div class="top-bar">
     <div class="title" [pTooltip]="currentUserInfo?.fullName || currentUserInfo?.name">{{ currentUserInfo?.name }}</div>
   </div>
-  <div class="item" [routerLink]="['/persons/profile']">
+  <div class="item" [routerLink]="['/persons/profile']" (click)="closeAllMenus()">
     <i class="fas fa-user" [ngStyle]="{ fontSize: '1.3rem' }"></i>
     <span>{{ 'profile' | translate }}</span>
   </div>
   <div class="languages">
     <p-tieredMenu [model]="itemsLanguages"></p-tieredMenu>
   </div>
-  <div class="item" [routerLink]="['/persons/administrators']" *ngIf="!!isUserAdmin">
+  <div class="item" [routerLink]="['/persons/administrators']" *ngIf="!!isUserAdmin" (click)="closeAllMenus()">
     <i class="fas fa-users-cog" [ngStyle]="{ fontSize: '1.4rem' }"></i>
     <span>{{ 'administrators' | translate }}</span>
   </div>

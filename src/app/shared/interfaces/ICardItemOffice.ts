@@ -13,6 +13,7 @@ export interface ICardItemOffice  {
   paramsUrlMenuConfig?: {name: string; value: string | number}[];
   urlCard?: string;
   paramsUrlCard?: {name: string; value: string | number}[];
+  editPermission?: boolean;
   office?: IOffice;
   iconMenuItems?: MenuItem[];
 }

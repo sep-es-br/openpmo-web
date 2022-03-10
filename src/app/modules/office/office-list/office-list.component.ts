@@ -98,6 +98,7 @@ export class OfficeListComponent implements OnInit {
           urlMenuConfig: editPermission ? '/configuration-office' : undefined,
           paramsUrlMenuConfig: editPermission ? [{ name: 'idOffice', value: office.id }] : undefined,
           urlCard: 'office',
+          editPermission,
           office
         };
         return officeCardItem;
