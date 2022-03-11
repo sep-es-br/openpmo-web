@@ -11,107 +11,215 @@
     min-height: 154px;
     border: 1px solid #D4D4D4;
     box-shadow: none;
-    .p-card-header {
-      display: flex;
-      flex-direction: row;
-      flex: 1;
-      .card-item-header {
+    .card-item-header {
         display: flex;
         flex-direction: row;
         align-items: center;
         width: 100%;
+        flex: 1;
         .header-content {
           display: flex;
           flex-direction: row;
           align-items: center;
           justify-content: space-between;
           width: 100%;
-          .status-container {
-            margin-left: 8px;
-            .fa-stop-circle {
+          
+        }
+    }
+    .status-container {
+        margin-left: 8px;
+        .fa-stop-circle {
+          margin-right: 5px;
+        }
+        .fa-check-square {
+          color: #2196F3;
+        }
+    }
+    .risk-red {
+      color: #C0504D;
+    }
+    .risk-orange {
+      color: #ED7D31;
+    }
+    .risk-yellow {
+      color: #FFC000;
+    }
+    .risk-overlay-panel {
+      .p-overlaypanel {
+        max-width: 200px;
+      }
+    }
+    .risk-panel-content {
+        display: flex;
+        flex-direction: column;
+        .title {
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          margin-bottom: 0.5em;
+          .total {
+            font-weight: bold;
+            font-size: 1.5rem;
+            margin-right: 5px;
+          }
+          .text {
+            font-size: 1rem;
+          }
+        }
+        .risks-container {
+          display: flex;
+          flex-direction: column;
+          .risk-importance-item {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            padding: 5px 0;
+            i {
+              margin-right: 0.5em;
+            }
+            span {
               margin-right: 5px;
             }
-            .fa-check-square {
-              color: #2196F3;
+          }
+        }
+    }
+    .card-item-header .header-content p-menu {
+      .p-menu-overlay .p-menu-list .p-menuitem .p-menuitem-link {
+        .p-menuitem-icon {
+          font-size: 0.8rem;
+          color: #939393;
+        }
+        .p-menuitem-icon.fa-times {
+          font-size: 1rem;
+          color: #EA5C5C;
+        }
+        .p-menuitem-text {
+          font-size: 0.9rem;
+          font-family: v.$fontFamilyMedium;
+          color: #939393;
+        }
+      }
+    }
+    .card-item-header .header-content .p-button {
+      background-color: transparent;
+      border: none !important;
+      box-shadow: none !important;
+      &.hidden {
+        opacity: 0;
+        pointer-events: none;
+      }
+      .p-button-icon {
+        font-size: 0.9rem;
+        color: #939393;
+      }
+    }
+    .display-mode-grid {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      width: 100%;
+    }
+    .display-mode-list {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+      height: 100%;
+      width: 100%;
+      .left-container {
+          padding: 1rem;
+          display: flex;
+          flex-direction: row;
+          flex: 1;
+          .workpack-container {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            flex: 1;
+            max-width: 100%;
+            .card-item-name {
+              margin-left: 1em;
+              font-weight: 500;
+              font-style: normal;
+              font-size: 20px;
+              color: #888E96;   
             }
           }
-          .risk-red {
-            color: #C0504D;
+          .workpack-container.card-link {
+            cursor: pointer;
           }
-          .risk-orange {
-            color: #ED7D31;
-          }
-          .risk-yellow {
-            color: #FFC000;
-          }
-          .p-overlaypanel {
-            max-width: 200px;
-          }
-          .risk-panel-content {
+      }
+      .right-container {
+        display: flex;
+        flex-direction: row;
+        width: 40%;
+        height: 100%;
+        .dashboard-items-container {
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          justify-content: space-between;
+          width: 90%;
+          height: 100%;
+          .status-container {
+            width: 25%;
             display: flex;
-            flex-direction: column;
-            .title {
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+          }
+          .milestones-progressbar {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            width: 165px;
+            border-radius: 12px;
+            overflow: hidden;
+            background-color: #fff;
+            .ontime {
+                height: 12px;
+                background-color: #44B39B;
+                // margin-right: 1px;
+            }
+            .late {
+                height: 12px;
+                background-color: #EA5C5C;
+                // margin-right: 1px;
+            }
+            .concluded {
+                height: 12px;
+                background-color: #0083BB;
+            }
+          }
+          .indexes {
               display: flex;
               flex-direction: row;
               align-items: center;
-              margin-bottom: 0.5em;
-              .total {
+              justify-content: center;
+              width: 25%;
+            .index {
+                font-size: 12px;
                 font-weight: bold;
-                font-size: 1.5rem;
-                margin-right: 5px;
-              }
-              .text {
-                font-size: 1rem;
-              }
-            }
-            .risks-container {
-              display: flex;
-              flex-direction: column;
-              .risk-importance-item {
-                display: flex;
-                flex-direction: row;
-                align-items: center;
-                padding: 5px 0;
-                i {
-                  margin-right: 0.5em;
-                }
-                span {
-                  margin-right: 5px;
-                }
-              }
+                padding: 5px 1em 5px 0;
             }
           }
+          .triple-constraint-container {
+            width: 25%;
+            justify-content: space-between;
+          }
+        }
+        .menu-and-id-container {
+          display: flex;
+          flex-direction: column;
+          width: 10%;
         }
       }
-      .card-item-header .header-content p-menu {
-        .p-menu-overlay .p-menu-list .p-menuitem .p-menuitem-link {
-          .p-menuitem-icon {
-            font-size: 0.8rem;
-            color: #939393;
-          }
-          .p-menuitem-icon.fa-times {
-            font-size: 1rem;
-            color: #EA5C5C;
-          }
-          .p-menuitem-text {
-            font-size: 0.9rem;
-            font-family: v.$fontFamilyMedium;
-            color: #939393;
-          }
-        }
-      }
-      .card-item-header .header-content .p-button {
-        background-color: transparent;
-        border: none !important;
-        box-shadow: none !important;
-        &.hidden {
-          opacity: 0;
-          pointer-events: none;
-        }
-        .p-button-icon {
-          font-size: 0.9rem;
-          color: #939393;
-        }
+    }
+    .milestones-overlay-panel {
+      .chartjs-render-monitor {
+        width: 200px !important;
+        height: 193px !important;
       }
     }
     .p-card-body {
@@ -130,6 +238,32 @@
       outline: none;
       flex: 1;
     }
+    .triple-constraint-container {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      padding-bottom: 5px;
+      i {
+        padding: 0 0.5em;
+      }
+    }
+    .footer-info {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      .baseline {
+        font-size: 0.7rem;
+      }
+      .card-item-id {
+        color: #888e96;
+        font-size: 0.6rem;
+        font-family: v.$fontFamilyMedium;
+        padding: 0.5em;
+      }
+    }
     .card-item-content {
       display: flex;
       flex-direction: row;
@@ -142,36 +276,35 @@
         display: flex;
         flex-direction: column;
         justify-content: flex-end;
-        align-items: flex-end;
+        // align-items: flex-end;
         width: 15%;
         height: 100%;
+        padding: 0.5em;
         .milestones-progressbar {
-          width: 100%;
-          padding: 0.5em;
+          width: 8px;
           background-color: #fff;
+          border-radius: 12px;
+          overflow: hidden;
           .ontime {
-            width: 8px;
+            width: 100%;
             background-color: #44B39B;
-            border-bottom-right-radius: 12px;
-            border-bottom-left-radius: 12px;
-            margin-top: 2px;
+            // margin-top: 1px;
           }
           .late {
-            width: 8px;
+            width: 100%;
             background-color: #EA5C5C;
-            margin-top: 1px;
+            // -top: 1px;
           }
           .concluded {
-            width: 8px;
+            width: 100%;
             background-color: #0083BB;
-            border-top-right-radius: 12px;
-            border-top-left-radius: 12px;
           }
         }
       }
       .center-content {
         display: flex;
         flex-direction: column;
+        
         flex: 1;
         .workpack-container {
           display: flex;
@@ -193,17 +326,6 @@
           text-overflow: ellipsis;
           text-align: center;
         }
-        .triple-constraint-container {
-          display: flex;
-          flex-direction: row;
-          align-items: center;
-          justify-content: center;
-          width: 100%;
-          padding-bottom: 5px;
-          i {
-            padding: 0 0.5em;
-          }
-        }
       }
       .right-content {
         display: flex;
@@ -222,21 +344,7 @@
             padding: 5px 0.5em 5px 0;
           }
         }
-        .footer-info {
-          width: 100%;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          .baseline {
-            font-size: 0.7rem;
-          }
-          .card-item-id {
-            color: #888e96;
-            font-size: 0.6rem;
-            font-family: v.$fontFamilyMedium;
-            padding: 0.5em;
-          }
-        }
+        
       }
       .icons-container {
         display: flex;
@@ -247,7 +355,6 @@
           margin-left: 0.5em;
         }
       }
-
       .icon-card {
         font-size: 2.5rem;
         color: #888e96;
@@ -269,7 +376,6 @@
       }
     }
   }
-
   &.canceled .p-card {
     background-color: #f5f5f3;
     .icon-card {
@@ -284,12 +390,17 @@
     .p-card {
       max-width: 100%;
       width: 100%;
+      .center-content {
+        align-items: center;
+      }
     }
   }
   &.cardList {
     .p-card {
       max-width: 100%;
       width: 100%;
+      height: 80px;
+      min-height: 80px;
       .card-item-name {
         flex: none;
       }
@@ -310,15 +421,12 @@
     width: 280px;
     border: 1px solid #D4D4D4;
     box-shadow: none;
-    .p-card-header {
-      display: flex;
-      flex-direction: row;
-      flex: 1;
       .card-item-header {
         display: flex;
         flex-direction: row;
         align-items: center;
         width: 100%;
+        flex: 1;
         .header-content {
           display: flex;
           flex-direction: row;
@@ -357,7 +465,6 @@
           color: #939393;
         }
       }
-    }
     .p-card-body {
       padding: 0;
       height: 100%;
@@ -373,6 +480,79 @@
       border: none;
       outline: none;
       flex: 1;
+    }
+    .display-mode-list {
+      display: flex;
+      height: 100%;
+      width: 100%;
+      flex-direction: row;
+      justify-content: space-between;
+      .right-side {
+        display: flex;
+        height: 100%;
+        width: 5%;
+        flex-direction: column;
+        align-items: flex-end;
+        justify-content: space-between;
+        .card-item-footer {
+          .baline-icon {
+            margin-right: 1em;
+          }
+        }
+      }
+      .card-item-content-list {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        color: #888e96;
+        padding: 0.5em 1em !important;
+        width: 100%;
+        flex: 1;
+        .icons-container-list {
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          justify-content: center;
+          .linked {
+            margin-left: 0.5em;
+          }
+        }
+        .left-side {
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+        }
+        .description-container {
+          display: flex;
+          flex-direction: column;
+          margin-left: 1em;
+          .card-item-name {
+            font-size: 18px;
+          }
+          .card-item-status {
+            font-size: 16px;
+          }
+        }
+        .card-item-date {
+          justify-self: flex-end;
+        }
+        .attention-milestone {
+          color: #DFA11E;
+        }
+      }
+    }
+    .on-time {
+      color: #44B39B;
+    }
+    .late {
+      color: #EA5C5C;
+    }
+    .concluded {
+      color: #0083BB;
+    }
+    .late-concluded {
+      color: #806AAD;
     }
     .card-item-content {
       display: flex;
@@ -434,6 +614,29 @@
       }
     }
   }
+  &.mobile {
+    .p-card {
+      max-width: 100%;
+      width: 100%;
+      .center-content {
+        align-items: center;
+      }
+    }
+  }
+  &.cardList {
+    .p-card {
+      max-width: 100%;
+      width: 100%;
+      height: 80px;
+      min-height: 80px;
+      .card-item-name {
+        flex: none;
+      }
+      .card-item-subtitle {
+        padding-bottom: 0 !important;
+      }
+    }
+  }
 }
 
 ::ng-deep .node-disabled {
@@ -492,6 +695,7 @@
     .p-card {
       max-width: 100%;
       width: 100%;
+      height: 80px;
       .p-card-content {
         padding: 0;
       }
@@ -522,9 +726,12 @@
     }
   }
   &.cardList {
+    height: 100%;
+    padding: 0 !important;
     .p-card {
       max-width: 100%;
       width: 100%;
+      height: 100%;
     }
   }
 

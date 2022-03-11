@@ -10,10 +10,13 @@
     width: 280px;
     border: 1px solid #D4D4D4;
     box-shadow: none;
-
-    .p-card-header {
+    .card-item-header {
       display: flex;
       justify-content: flex-end;
+      .menu-none {
+        min-height: 2rem;
+      }
+    }
       .card-item-header p-menu {
         .p-menu-overlay .p-menu-list .p-menuitem .p-menuitem-link {
           .p-menuitem-icon {
@@ -64,8 +67,6 @@
             font-size: 0.7rem;
             margin: 0.4rem 0.4rem 0 0;
       }
-    }
-
     .p-card-body {
       padding: 0;
       height: 100%;
@@ -75,6 +76,43 @@
       height: 100%;
       display: flex;
       flex-direction: column;
+    }
+    .display-mode-grid {
+      display: flex;
+      height: 100%;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .display-mode-list {
+      display: flex;
+      height: 100%;
+      width: 100%;
+      flex-direction: row;
+      justify-content: space-between;
+      .right-side {
+        display: flex;
+        height: 100%;
+        width: 5%;
+        flex-direction: column;
+        align-items: flex-end;
+        justify-content: space-between;
+      }
+      .card-item-content {
+        width: 100%;
+        .card-item-funder {
+          padding: 0.5rem 0.5rem 0;
+        }
+        .card-item-costValue {
+          padding: 0.5rem 0.5rem 0;
+          margin-left: 0.5em;
+        }
+        .role-list {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          color: #009dd4;
+        } 
+      }
     }
     .card-item-content.card-link {
       cursor: pointer;
@@ -188,21 +226,54 @@
     .p-card {
       max-width: 100%;
       width: 100%;
+      .card-item-content {
+        width: 100%;
+        max-width: 100%;
+      }
+    }
+  }
+  &.listPerson {
+    .p-card-body {
+      padding-top: 0.5em !important;
+      .app-avatar .avatar {
+        padding-bottom: 0;
+      }
+      .app-avatar .avatar .p-avatar-xl {
+        width: 68px;
+        height: 68px;
+      }
     }
   }
   &.cardList {
     .p-card {
       max-width: 100%;
       width: 100%;
+      height: 80px;
       .card-item-name {
         flex: none;
+        margin-left: 8px;
       }
       .card-item-subtitle {
-        padding-bottom: 0 !important;
+        padding: 0.5rem 0.5rem 0 !important;
       }
       .organization-name {
         margin-left: 0.5em;
       }
+      .p-card-body {
+        padding: 0 !important;
+        .card-item-content {
+         max-width: 100%;
+
+        }
+        .app-avatar .avatar {
+          padding: 0 !important;
+        }
+      }
+    }
+  }
+  &.cardList.listPerson {
+    .p-card-body {
+      padding-top: 5px !important;
     }
   }
 }
@@ -214,7 +285,6 @@
 }
 ::ng-deep .app-card-item.process {
   .p-card {
-    .p-card-header {
       .card-item-header {
         width: 100%;
         display: flex;
@@ -225,7 +295,6 @@
           color: #44B39B;
         }
       }
-    }
     .p-card-content {
       .card-item-content {
         .card-item-name {
@@ -246,6 +315,14 @@
     }
   }
 }
+::ng-deep .app-card-item.process.cardList {
+  .card-item-subtitle {
+    padding: 0.5rem 0.5rem 0;
+  }
+  .organization-name {
+    padding: 0.5rem 0.5rem 0;
+  }
+} 
 
 ::ng-deep .new-carditem {
   .p-card {
@@ -258,14 +335,11 @@
     width: 280px;
     border: 1px solid #D4D4D4;
     box-shadow: none;
-
     .p-card-body {
       padding: 0;
     }
-
     .p-card-body .p-card-content {
       height: 100%;
-
       p-tieredmenu {
         .p-tieredmenu-overlay ul {
           max-width: 23em;
@@ -283,7 +357,6 @@
         }
       }
     }
-
     .p-card-body .p-card-content .carditem-content {
       padding: 2em;
       display: flex;
@@ -296,7 +369,6 @@
         cursor: pointer;
       }
     }
-
     .p-card-body .p-card-content .menu-model-container {
       padding: 0 !important;
       .menuNewModelContainer {
@@ -316,12 +388,12 @@
         display: none !important;
       }
     }
-
   }
   &.cardList {
     .p-card {
       max-width: 100%;
       width: 100%;
+      height: 80px;
       .p-card-content {
         padding: 0;
       }
@@ -352,9 +424,12 @@
     }
   }
   &.cardList {
+    height: 100%;
+    padding: 0;
     .p-card {
       max-width: 100%;
       width: 100%;
+      height: 100%;
     }
   }
 

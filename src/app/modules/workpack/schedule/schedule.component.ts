@@ -21,6 +21,7 @@ import { enterLeave } from 'src/app/shared/animations/enterLeave.animation';
 import { SaveButtonComponent } from 'src/app/shared/components/save-button/save-button.component';
 import { IWorkpack } from 'src/app/shared/interfaces/IWorkpack';
 import { PlanService } from 'src/app/shared/services/plan.service';
+import * as moment from 'moment';
 
 interface ICartItemCostAssignment {
   type: string;
@@ -62,6 +63,7 @@ export class ScheduleComponent implements OnInit, OnDestroy {
   costAssignmentsTotals = { plannedTotal: 0, actualTotal: 0 };
   $destroy = new Subject();
   calendarFormat: string;
+  yearRange: string;
 
   constructor(
     private actRouter: ActivatedRoute,
@@ -91,9 +93,10 @@ export class ScheduleComponent implements OnInit, OnDestroy {
       }, 150));
     }
     );
+    const newDate = moment();
     this.formSchedule = this.formBuilder.group({
-      start: [new Date(), Validators.required],
-      end: [new Date(), Validators.required],
+      start: [newDate.toDate(), Validators.required],
+      end: [newDate.add(1, 'days').toDate(), Validators.required],
       plannedWork: [null, Validators.required],
       actualWork: null
     });
@@ -106,6 +109,9 @@ export class ScheduleComponent implements OnInit, OnDestroy {
 
   async ngOnInit() {
     this.calendarFormat = this.translateSrv.instant('dateFormat');
+    const today = moment();
+    const yearStart = today.year();
+    this.yearRange = (yearStart-1).toString() + ':'+ (yearStart+15).toString();
     await this.loadPropertiesSchedule();
   }
 
@@ -158,19 +164,6 @@ export class ScheduleComponent implements OnInit, OnDestroy {
       initialStateCollapse: false
     };
     this.idPlan = Number(localStorage.getItem('@currentPlan'));
-    // const workpack = await this.workpackSrv.GetWorkpackById(this.idWorkpack, {'id-plan': this.idPlan});
-    // if (workpack.success) {
-    //   this.workpack = workpack.data;
-    //   await this.setBreadcrumb();
-    //   const propertyUnit = workpack.data.properties.find(p => p.type === TypePropertyModelEnum.UnitSelectionModel);
-    //   if (propertyUnit) {
-    //     const idUnit = propertyUnit.selectedValue;
-    //     const result = await this.unitMeasureSrv.GetById(idUnit);
-    //     if (result.success) {
-    //       this.unitMeasure = result.data;
-    //     }
-    //   }
-    // }
     await this.setBreadcrumb();
     await this.loadMenuItemsCostAccounts();
     this.loadCostAssignmentSession();
@@ -310,7 +303,8 @@ export class ScheduleComponent implements OnInit, OnDestroy {
   handleChangeValuesCardItems() {
     this.reloadCostAssignmentTotals();
     if (this.formSchedule.valid) {
-      if (this.costAssignmentsCardItems && this.costAssignmentsCardItems.length > 0 && this.costAssignmentsCardItems.filter( item => item.plannedWork && item.plannedWork > 0).length > 0) {
+      if (this.costAssignmentsCardItems && this.costAssignmentsCardItems.length > 0
+        && this.costAssignmentsCardItems.filter( item => item.type !== 'new-cost-card' && item.plannedWork && item.plannedWork > 0).length === this.costAssignmentsCardItems.length - 1) {
         this.saveButton?.showButton();
       } else {
         this.saveButton?.hideButton();
@@ -340,6 +334,16 @@ export class ScheduleComponent implements OnInit, OnDestroy {
   }
 
   async saveSchedule() {
+    const startDate = moment(this.formSchedule.controls.start.value);
+    const endDate = moment(this.formSchedule.controls.end.value);
+    if (startDate.isSame(endDate, 'days')) {
+      this.messageSrv.add({ severity: 'warn', summary: 'Erro', detail: this.translateSrv.instant('messages.startDateIsSameEndDate') });
+      return;
+    }
+    if (startDate.isAfter(endDate, 'days')) {
+      this.messageSrv.add({ severity: 'warn', summary: 'Erro', detail: this.translateSrv.instant('messages.startDateIsAfterEndDate') });
+      return;
+    }
     this.schedule = {
       idWorkpack: this.idWorkpack,
       start: this.formSchedule.controls.start.value,

@@ -10,10 +10,6 @@
     width: 280px;
     border: 1px solid #D4D4D4;
     box-shadow: none;
-
-    .p-card-header {
-      display: flex;
-      width: 100%;
       .card-item-header {
         display: flex;
         width: 100%;
@@ -29,9 +25,6 @@
           padding: 0 !important;
           width: auto;
         }
-      }
-      .action-required, .check-circle {
-        // padding: 0.5em;
       }
       .card-item-header p-menu {
         .p-menu-overlay .p-menu-list .p-menuitem .p-menuitem-link {
@@ -59,16 +52,6 @@
           color: #939393;
         }
       }
-      // .card-item-header .menu-config {
-      //   padding: 10px;
-      //   cursor: pointer;
-      //   .fa-tools {
-      //     font-size: 1.1rem;
-      //     transform: rotate(30deg);
-      //     color: #939393;
-      //   }
-      // }
-
       .card-item-header .button-change {
             display: flex;
             flex-direction: column;
@@ -77,8 +60,6 @@
             font-size: 0.7rem;
             margin: 0.4rem 0.4rem 0 0;
       }
-    }
-
     .p-card-body {
       padding: 0;
       height: 100%;
@@ -94,6 +75,29 @@
       border: none;
       outline: none;
       flex: 1;
+    }
+    .display-mode-list {
+      display: flex;
+      height: 100%;
+      width: 100%;
+      flex-direction: row;
+      justify-content: space-between;
+      .right-side {
+        display: flex;
+        height: 100%;
+        width: 5%;
+        flex-direction: column;
+        align-items: flex-end;
+        justify-content: space-between;
+      }
+      .card-item-content {
+        width: 100%;
+        .baseline-status-container {
+          align-self: flex-start;
+          margin-top: 0.5em;
+          margin-right: 1em;
+        }
+      }
     }
     .card-item-content {
       display: flex;
@@ -151,7 +155,7 @@
       &.cardList {
         flex-direction: row;
         justify-content: flex-start;
-        margin-left: 2em;
+        margin-left: 1em;
       }
     }
     .card-item-footer {
@@ -175,11 +179,16 @@
     .p-card {
       max-width: 100%;
       width: 100%;
+      height: 80px;
       .card-item-name {
         flex: none;
       }
       .card-item-status {
-        padding-bottom: 0 !important;
+        padding: 0.5em;
+        margin-bottom: 0 !important;
+      }
+      .card-item-status-date {
+        padding: 0.5em;
       }
       .organization-name {
         margin-left: 0.5em;

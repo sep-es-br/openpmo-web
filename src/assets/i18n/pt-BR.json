@@ -293,6 +293,8 @@
   "showStakeholders": "Exibir partes interessadas",
   "risksRequireAttention": "Ricos exigem atenção",
   "messages": {
+    "startDateIsSameEndDate": "Data inicial não pode ser igual a data final",
+    "startDateIsAfterEndDate": "Data final não pode ser menor que a data inicial",
     "endManagementAlert": "Esta ação encerrará as atividades de gestão da entrega, impedindo novas edições.",
     "resumeManagementAlert": "Esta ação retoma as atividades de gestão da entrega, permitindo sua edição.",
     "endManagementInputAlert": "Informe as razões do encerramento e selecione a data.",
@@ -364,6 +366,13 @@
       "name": {
         "not": {
           "blank": "deve ser informado"
+        }
+      },
+      "plan": {
+        "delete": {
+          "relationship": {
+            "error": "Exclusion is not possible as it has related work packages."
+          }
         }
       },
       "workpack": {

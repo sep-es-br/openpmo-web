@@ -205,7 +205,7 @@ export class PersonComponent implements OnInit, OnDestroy {
   }
 
   async savePerson() {
-    const { success, data } = await this.personSrv.Put({
+    const { success, data } = await this.personSrv.PutWithContactOffice({
       ...this.propertiesPerson,
       ...this.formPerson.value,
       email: null,

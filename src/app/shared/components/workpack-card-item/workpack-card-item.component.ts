@@ -1,3 +1,4 @@
+import { MilestoneStatusEnum } from './../../enums/MilestoneStatusEnum';
 import { takeUntil } from 'rxjs/operators';
 import { IGaugeChartData } from './../../interfaces/IGaugeChartData';
 import { TranslateService } from '@ngx-translate/core';
@@ -7,6 +8,7 @@ import { IWorkpackCardItem } from './../../interfaces/IWorkpackCardItem';
 import { Component, OnInit, Input, OnDestroy } from '@angular/core';
 import { ChartData } from 'chart.js';
 import { Subject } from 'rxjs';
+import * as moment from 'moment';
 
 @Component({
   selector: 'app-workpack-card-item',
@@ -36,6 +38,8 @@ export class WorkpackCardItemComponent implements OnInit, OnDestroy {
   gaugeChartDataCPI: IGaugeChartData;
   gaugeChartDataSPI: IGaugeChartData;
   $destroy = new Subject();
+  attentionMilestone = false;
+  milestoneStatusEnum = MilestoneStatusEnum;
 
   constructor(
     private router: Router,
@@ -50,6 +54,7 @@ export class WorkpackCardItemComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+   
     this.cardIdItem = this.properties.itemId || this.properties.itemId === 0 ?
       `ID: ${this.properties.itemId < 10 && this.properties.itemId !== 0 ? '0' + this.properties.itemId : this.properties.itemId}` : '';
     switch (this.properties.typeCardItem) {
@@ -58,6 +63,13 @@ export class WorkpackCardItemComponent implements OnInit, OnDestroy {
         break;
       case 'Milestone':
         this.cardType = 'milestone';
+        if (this.properties.subtitleCardItem) {
+          const expirationDate = moment(this.properties.subtitleCardItem, 'yyyy-MM-DD');
+          const date = moment();
+          if (this.milestoneStatusEnum[this.properties.statusItem] === 'onTime' && expirationDate.isSameOrAfter(date) && expirationDate.diff(date, 'days') <= 7) {
+            this.attentionMilestone = true;
+          }
+        }
         break;
       default:
         this.cardType = 'standard'

@@ -194,23 +194,38 @@ export class PersonProfileComponent implements OnInit, OnDestroy {
   }
 
   async savePerson() {
-    const sender = {
+    const sender = this.idOffice ? {
       ...this.propertiesPerson,
       ...this.formPerson.value,
       idOffice: this.idOffice,
       email: null
+    } : {
+      name: this.formPerson.controls.name.value
     };
-    const { success, data } = await this.personSrv.Put({
-      ...sender
-    });
-    if (success) {
-      await this.loadPerson();
-      this.messageSrv.add({
-        severity: 'success',
-        summary: this.translateSrv.instant('success'),
-        detail: this.translateSrv.instant('messages.savedSuccessfully')
+    if (this.idOffice) {
+      const { success, data } = await this.personSrv.PutWithContactOffice({
+        ...sender
       });
+      if (success) {
+        await this.loadPerson();
+        this.messageSrv.add({
+          severity: 'success',
+          summary: this.translateSrv.instant('success'),
+          detail: this.translateSrv.instant('messages.savedSuccessfully')
+        });
+      }
+    } else {
+      const { success, data} = await this.personSrv.updateNameAdministradorPerson(this.idPerson, sender.name);
+      if (success) {
+        this.messageSrv.add({
+          severity: 'success',
+          summary: this.translateSrv.instant('success'),
+          detail: this.translateSrv.instant('messages.savedSuccessfully')
+        });
+      }
     }
+     
+    
   }
 
 

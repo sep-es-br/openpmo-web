@@ -74,11 +74,9 @@ export class AdministratorListComponent implements OnInit {
   loadCardItemsAdministrators() {
     if (this.administrators) {
       this.cardItemsAdministrators = this.administrators.map(administrator => {
-        const fullName = administrator.name.split(' ');
-        const name = fullName.length > 1 ? fullName[0] + ' ' + fullName[1] : fullName[0];
       return  {
           typeCardItem: 'listItem',
-          titleCardItem: name,
+          titleCardItem: administrator.name,
           fullNameUser: administrator.fullName,
           roleDescription: administrator.email,
           menuItems:  [{

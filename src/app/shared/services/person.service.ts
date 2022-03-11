@@ -67,9 +67,14 @@ export class PersonService extends BaseService<IPerson> {
     return result as IHttpResult<IPersonProfile>;
   }
 
-  async Put(data: IPerson) {
+  async PutWithContactOffice(data: IPerson) {
     const result = await this.http.put(`${this.urlBase}/office`, data).toPromise();
     return result as IHttpResult<IPerson>;
+  }
+
+  public async updateNameAdministradorPerson(idPerson: number, name: string) {
+    const result = await this.http.patch(`${this.urlBase}/${idPerson}`, {name}).toPromise();
+    return result as IHttpResult<any>;
   }
 
   async DeleteAllPermissions(model: IPerson, idPerson: number, idOffice: number) {

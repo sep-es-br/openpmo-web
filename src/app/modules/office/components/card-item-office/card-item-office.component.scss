@@ -11,9 +11,8 @@
     width: 280px;
     border: 1px solid #D4D4D4;
     box-shadow: none;
-
-    .p-card-header {
-      display: flex;
+    display: flex;
+    .display-mode-grid, .display-mode-list {
       .card-item-header {
         width: 100%;
         display: flex;
@@ -30,6 +29,32 @@
         .fa-trash {
           font-size: 1.1rem;
           color: #939393;
+        }
+      }
+    }
+
+    .display-mode-list {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      height: 100%;
+      .right-side {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: flex-end;
+        height: 100%;
+        .card-item-header {
+          padding-bottom: 0;
+          min-height: 1rem;
+          justify-content: flex-end;
+          .fa-tools {
+            font-size: 15px;
+            margin-left: 1rem;
+          }
+          .fa-trash {
+            font-size: 15px;
+          }
         }
       }
     }
@@ -118,6 +143,7 @@
   &.cardList {
     .p-card {
       max-width: 100%;
+      height: 80px;
       width: 100%;
       .card-item-name {
         flex: none;
@@ -137,13 +163,11 @@
     width: 280px;
     border: 1px solid #D4D4D4;
     box-shadow: none;
-
     .p-card-body {
       padding: 0;
     }
     .p-card-body .p-card-content {
       height: 100%;
-
       p-menu {
         .p-menu-overlay .p-menu-list {
           max-width: 20em;
@@ -161,7 +185,6 @@
         }
       }
     }
-
     .p-card-body .p-card-content .carditem-content {
       padding: 2em;
       display: flex;
@@ -177,6 +200,7 @@
   &.cardList {
     .p-card {
       max-width: 100%;
+      height: 80px;
       width: 100%;
       .p-card-content {
         padding: 0;
@@ -208,9 +232,13 @@
     }
   }
   &.cardList {
+    padding: 0;
+    height: 80px;
     .p-card {
       max-width: 100%;
       width: 100%;
+      height: 100%;
+
     }
   }
 }

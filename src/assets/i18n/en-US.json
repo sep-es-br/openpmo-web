@@ -294,6 +294,8 @@
   "showStakeholders": "Show stakeholders",
   "risksRequireAttention": "Risks require attention",
   "messages": {
+    "startDateIsSameEndDate": "Start date can't to be same end date.",
+    "startDateIsAfterEndDate": "End date can't to be before start date.",
     "endManagementAlert": "This action will terminate the delivery management activities, preventing further edits.",
     "resumeManagementAlert": "This action resumes the delivery management activities, allowing its editing.",
     "endManagementInputAlert": "Enter the reasons for the closure and select the date.",
@@ -365,6 +367,13 @@
       "name": {
         "not": {
           "blank": "must be informed"
+        }
+      },
+      "plan": {
+        "delete": {
+          "relationship": {
+            "error": "Exclusion is not possible as it has related work packages."
+          }
         }
       },
       "workpack": {
