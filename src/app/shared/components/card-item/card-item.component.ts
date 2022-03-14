@@ -1,3 +1,4 @@
+import { takeUntil } from 'rxjs/operators';
 import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
 import { MenuComponent } from './../../../core/menu/menu.component';
 import { OverlayPanel } from 'primeng/overlaypanel';
@@ -11,6 +12,7 @@ import { registerLocaleData } from '@angular/common';
 import { ResponsiveService } from '../../services/responsive.service';
 import { Menu } from 'primeng/menu';
 import { Icon } from '@fortawesome/fontawesome-svg-core';
+import { Subject } from 'rxjs';
 registerLocaleData(localePt);
 
 @Component({
@@ -28,6 +30,8 @@ export class CardItemComponent implements OnInit {
   iconImg;
   responsive: boolean;
   showMenuNewModel = false;
+  language: string; 
+  $destroy = new Subject();
 
   constructor(
     private router: Router,
@@ -38,9 +42,13 @@ export class CardItemComponent implements OnInit {
     this.responsiveSrv.observable.subscribe(value => {
       this.responsive = value;
     });
+    this.translateSrv.onLangChange.pipe(takeUntil(this.$destroy)).subscribe(() => {
+      setTimeout(() => this.setLanguage(), 200);
+    });
   }
 
   ngOnInit(): void {
+    this.setLanguage()
     this.cardIdItem = this.properties.itemId || this.properties.itemId === 0 ?
       `ID: ${this.properties.itemId < 10 && this.properties.itemId !== 0 ? '0' + this.properties.itemId : this.properties.itemId}` : '';
   }
@@ -53,6 +61,10 @@ export class CardItemComponent implements OnInit {
         queryParams
       }
     );
+  }
+
+  setLanguage() {
+    this.language = this.translateSrv.currentLang;
   }
 
   handleNavigateToPage() {

@@ -189,8 +189,7 @@
           [ngStyle]="{ fontSize: '2.5rem' }"></i>
         <span class="card-item-name">{{properties.nameCardItem}}</span>
         <span class="card-item-funder" *ngIf="properties.subtitleCardItem">{{properties.subtitleCardItem}}</span>
-        <span class="card-item-costValue" *ngIf="properties.costAccountsValue">$ {{properties.costAccountsValue
-          |number}}</span>
+        <span class="card-item-costValue" *ngIf="properties.costAccountsValue">$ {{properties.costAccountsValue|shortNumber:language}}</span>
       </div>
       <div class="card-item-footer" *ngIf="cardIdItem">
         <span class="card-item-id">
@@ -206,8 +205,7 @@
           [ngStyle]="{ fontSize: '2.5rem' }"></i>
         <span class="card-item-name">{{properties.nameCardItem}}</span>
         <span class="card-item-funder" *ngIf="properties.subtitleCardItem">{{properties.subtitleCardItem}}</span>
-        <span class="card-item-costValue" *ngIf="properties.costAccountsValue">$ {{properties.costAccountsValue
-          |number}}</span>
+        <span class="card-item-costValue" *ngIf="properties.costAccountsValue">$ {{properties.costAccountsValue|shortNumber:language}}</span>
       </div>
       <div class="right-side">
         <p-header *ngIf="properties.menuItems" class="card-item-header">

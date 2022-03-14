@@ -292,6 +292,8 @@
   "resume": "Retormar",
   "showStakeholders": "Exibir partes interessadas",
   "risksRequireAttention": "Ricos exigem atenção",
+  "CPI": "IDC",
+  "SPI": "IDP",
   "messages": {
     "startDateIsSameEndDate": "Data inicial não pode ser igual a data final",
     "startDateIsAfterEndDate": "Data final não pode ser menor que a data inicial",

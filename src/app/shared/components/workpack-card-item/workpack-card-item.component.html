@@ -116,10 +116,10 @@
         </div>
         <div class="right-content">
           <div class="indexes">
-            <span class="index" [ngStyle]="{color: cpiColor}" (mouseenter)="cpiPanel.show($event)"
-              *ngIf="properties.dashboard" (mouseleave)="cpiPanel.hide($event)">CPI</span>
-            <span class="index" (mouseenter)="spiPanel.show($event)" (mouseleave)="spiPanel.hide($event)"
-              *ngIf="properties.dashboard" [ngStyle]="{color: spiColor}">SPI</span>
+            <span class="index" [ngStyle]="{color: cpiColor}" (mouseenter)="cpiPanel.show($event)"*ngIf="properties?.dashboard?.costPerformanceIndex"
+              (mouseleave)="cpiPanel.hide($event)">{{'CPI'|translate}}</span>
+            <span class="index" (mouseenter)="spiPanel.show($event)" (mouseleave)="spiPanel.hide($event)" *ngIf="properties?.dashboard?.schedulePerformanceIndex"
+              [ngStyle]="{color: spiColor}">{{'SPI'|translate}}</span>
           </div>
           <p-overlayPanel #cpiPanel>
             <div class="constraint-content">
@@ -215,10 +215,10 @@
             </div>
           </p-overlayPanel>
           <div class="indexes">
-            <span class="index" [ngStyle]="{color: cpiColor}" (mouseenter)="cpiPanel.show($event)"
-              *ngIf="properties.dashboard" (mouseleave)="cpiPanel.hide($event)">CPI</span>
-            <span class="index" (mouseenter)="spiPanel.show($event)" (mouseleave)="spiPanel.hide($event)"
-              *ngIf="properties.dashboard" [ngStyle]="{color: spiColor}">SPI</span>
+            <span class="index" [ngStyle]="{color: cpiColor}" (mouseenter)="cpiPanel.show($event)" *ngIf="properties?.dashboard?.costPerformanceIndex"
+              (mouseleave)="cpiPanel.hide($event)">{{'CPI'|translate}}</span>
+            <span class="index" (mouseenter)="spiPanel.show($event)" (mouseleave)="spiPanel.hide($event)" *ngIf="properties?.dashboard?.schedulePerformanceIndex"
+              [ngStyle]="{color: spiColor}">{{'SPI'|translate}}</span>
           </div>
           <p-overlayPanel #cpiPanel>
             <div class="constraint-content">

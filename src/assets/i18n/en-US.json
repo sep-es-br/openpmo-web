@@ -293,6 +293,8 @@
   "resume": "Resume",
   "showStakeholders": "Show stakeholders",
   "risksRequireAttention": "Risks require attention",
+  "CPI": "CPI",
+  "SPI": "SPI",
   "messages": {
     "startDateIsSameEndDate": "Start date can't to be same end date.",
     "startDateIsAfterEndDate": "End date can't to be before start date.",

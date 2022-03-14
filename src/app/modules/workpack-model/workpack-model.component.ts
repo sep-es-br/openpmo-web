@@ -351,16 +351,17 @@ export class WorkpackModelComponent implements OnInit {
   }
 
   getCurrentBreadcrumb() {
-    const { idOffice, idStrategy, workpackModelType: type } = this;
+    const { idOffice, idStrategy, workpackModelType: type} = this;
     let breadcrumb;
     if (this.currentBreadcrumbItems && this.currentBreadcrumbItems.length > 0) {
       const breadcrumbIndex = this.currentBreadcrumbItems.findIndex(item => item.queryParams?.id === this.idWorkpackModel);
       if (breadcrumbIndex > -1) {
         breadcrumb = this.currentBreadcrumbItems.slice(0, breadcrumbIndex + 1);
       } else {
-        const breadcrumbOfficeIndex = this.currentBreadcrumbItems.findIndex(item => item.queryParams?.idOffice === this.idOffice);
-        const breadcrumbPlanModelIndex = this.currentBreadcrumbItems.findIndex(item => item.key === 'planModel' && item.queryParams?.id === this.idStrategy);
-        if (breadcrumbOfficeIndex > -1 && breadcrumbPlanModelIndex > -1) {
+        const breadcrumbOfficeIndex = this.currentBreadcrumbItems.findIndex(item => item.queryParams?.idOffice === idOffice);
+        const breadcrumbPlanModelIndex = this.currentBreadcrumbItems.findIndex(item => item.key === 'planModel' && item.queryParams?.id === idStrategy);
+        const breadcrumbParentIndex = this.currentBreadcrumbItems.findIndex(item => item.key === 'workpackModel' && item.queryParams?.id === this.idParentWorkpack);
+        if (breadcrumbOfficeIndex > -1 && breadcrumbPlanModelIndex > -1 && breadcrumbParentIndex > -1) {
           breadcrumb = [...this.currentBreadcrumbItems,
           ...[{
             key: 'workpackModel',
@@ -1494,7 +1495,8 @@ export class WorkpackModelComponent implements OnInit {
           { name: 'id', value: workpackModel.id },
           { name: 'type', value: TypeWorkpackModelEnum[workpackModel.type] },
           { name: 'idStrategy', value: this.idStrategy },
-          { name: 'idOffice', value: this.idOffice }
+          { name: 'idOffice', value: this.idOffice },
+          { name: 'idParent', value: this.idWorkpackModel}
         ],
         breadcrumbWorkpackModel: this.getCurrentBreadcrumb()
       })));
@@ -1557,6 +1559,7 @@ export class WorkpackModelComponent implements OnInit {
           type: TypeWorkpackModelEnum[workpackModel.type],
           idStrategy: this.idStrategy,
           idOffice: this.idOffice,
+          idParent: this.idWorkpackModel
         }
       });
     }
@@ -1600,6 +1603,9 @@ export class WorkpackModelComponent implements OnInit {
           .map(prop => prop[0] as IWorkpackModelProperty);
         this.modelProperties = dataProperties.filter(p => !p.session || p.session === PropertySessionEnum.PROPERTIES);
         this.modelCostProperties = dataProperties.filter(p => p.session === PropertySessionEnum.COST);
+        this.modelProperties.filter(prop => prop.type === TypePropertyEnum.GroupModel).forEach(group => {
+          group.menuModelProperties = this.loadMenuPropertyGroup(PropertySessionEnum.PROPERTIES, group);
+        });
       }
     };
   }
@@ -1657,3 +1663,5 @@ export class WorkpackModelComponent implements OnInit {
   }
 
 }
+
+

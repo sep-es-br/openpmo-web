@@ -49,12 +49,10 @@ export class WorkpackCardItemComponent implements OnInit, OnDestroy {
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.responsive = value);
     this.translateSrv.onLangChange.pipe(takeUntil(this.$destroy)).subscribe(() => {
       setTimeout(() => this.setLanguage(), 200);
-    }
-    );
+    });
   }
 
   ngOnInit(): void {
-   
     this.cardIdItem = this.properties.itemId || this.properties.itemId === 0 ?
       `ID: ${this.properties.itemId < 10 && this.properties.itemId !== 0 ? '0' + this.properties.itemId : this.properties.itemId}` : '';
     switch (this.properties.typeCardItem) {
