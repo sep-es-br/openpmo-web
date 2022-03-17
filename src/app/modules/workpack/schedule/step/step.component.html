@@ -12,7 +12,7 @@
       <div class="p-grid">
         <form [formGroup]="formStep">
           <div class="p-formgroup-inline" [class.responsive]="responsive">
-            <div class="p-field" [class.responsive]="responsive" *ngIf="stepType === 'start' || stepType === 'newStart'">
+            <div class="p-field" [class.responsive]="responsive" *ngIf="(stepType === 'start' || !!onlyOneStep) || stepType === 'newStart'">
               <span class="p-float-label" [class.responsive]="responsive">
                 <p-calendar id="float-start" class="app-select-date" showIcon="true" [minDate]="minStart"
                   [maxDate]="maxStart" [defaultDate]="start" formControlName="start" (onSelect)="showSaveButton = true"
@@ -21,9 +21,9 @@
                 <label class="app-input-label" for="float-start">{{ "start" | translate }}</label>
               </span>
             </div>
-            <div class="p-field" [class.responsive]="responsive" *ngIf="stepType === 'end' || stepType === 'newEnd'">
+            <div class="p-field" [class.responsive]="responsive" *ngIf="(stepType === 'end' || !!onlyOneStep) || stepType === 'newEnd'">
               <span class="p-float-label" [class.responsive]="responsive">
-                <p-calendar id="float-end" formControlName="end" class="app-select-date" showIcon="true"
+                <p-calendar id="float-end" formControlName="end" class="app-select-date" showIcon="true" [readonly]="!!onlyOneStep"
                   [class.responsive]="responsive" icon="fas fa-calendar-alt" [minDate]="minEnd" [maxDate]="maxEnd"
                   [defaultDate]="end" (onSelect)="showSaveButton = true" [dateFormat]="calendarFormat">
                 </p-calendar>

@@ -822,7 +822,7 @@ export class WorkpackModelComponent implements OnInit {
     let requiredFields = ['name', 'label', 'sortIndex', 'session'];
     switch (property.type) {
       case TypePropertyEnum.LocalitySelectionModel:
-        requiredFields = requiredFields.concat(['idDomain', 'multipleSelection', 'defaults']);
+        requiredFields = requiredFields.concat(['idDomain', 'multipleSelection']);
         list = await this.getListDomains();
         break;
       case TypePropertyEnum.OrganizationSelectionModel:
@@ -833,7 +833,7 @@ export class WorkpackModelComponent implements OnInit {
         list = await this.getListMeasureUnits();
         break;
       case TypePropertyEnum.SelectionModel:
-        requiredFields = requiredFields.concat(['possibleValues', 'multipleSelection', 'defaultValue']);
+        requiredFields = requiredFields.concat(['possibleValues', 'multipleSelection']);
         break;
       case TypePropertyEnum.GroupModel:
         requiredFields = ['name', 'sortIndex', 'session', 'groupedProperties'];

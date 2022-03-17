@@ -76,6 +76,7 @@ export class StepComponent implements OnInit, OnDestroy {
   calendarFormat: string;
   currentLang = '';
   editPermission = false;
+  onlyOneStep = false;
 
   constructor(
     private actRouter: ActivatedRoute,
@@ -160,6 +161,9 @@ export class StepComponent implements OnInit, OnDestroy {
       const result = await this.scheduleSrv.GetById(this.idSchedule);
       if (result.success) {
         this.schedule = result.data;
+        if (this.schedule.groupStep.length === 1) {
+          this.onlyOneStep = this.schedule.groupStep[0].steps.length === 1;
+        }
         await this.loadPermissions();
         
       }
@@ -243,10 +247,13 @@ export class StepComponent implements OnInit, OnDestroy {
       this.maxStart = new Date(this.start);
       this.maxStart.setDate(numDays);
     }
-    if (this.stepType === 'end') {
+    if (this.stepType === 'end' || !!this.onlyOneStep) {
       this.end = new Date(this.schedule.end + 'T00:00:00');
       if (this.stepDetail) {
         this.formStep.controls.end.setValue(this.end);
+        if (this.onlyOneStep) {
+          this.formStep.controls.end.disable()
+        }
       }
       this.end.setDate(1);
       if (!this.stepDetail) {

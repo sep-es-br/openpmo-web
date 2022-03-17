@@ -10,8 +10,10 @@
         <div class="app-tree-selection" [class.workpack-tree-selection-mobile]="responsive"
           [class.workpack-tree-selection]="property.fullLine"
           [class.workpack-tree-selection-not-fullLine]="!property.fullLine" *ngIf="property?.multipleSelection">
-          <p-tree [value]="property?.localityList" selectionMode="checkbox" [(selection)]="property.localitiesSelected" 
-            (onNodeSelect)="changed.emit($event); setLabelButton($event)" (onNodeUnselect)="changed.emit($event); setLabelButton($event)"></p-tree>
+          <p-tree [value]="property?.localityList" selectionMode="checkbox" [(selection)]="property.localitiesSelected"
+            [propagateSelectionUp]="false" [propagateSelectionDown]="false"
+            (onNodeSelect)="changed.emit($event); setLabelButton($event)"
+            (onNodeUnselect)="changed.emit($event); setLabelButton($event)"></p-tree>
         </div>
       </ng-container>
       <ng-template #singleLocalitySelection>
@@ -19,7 +21,8 @@
           [class.workpack-tree-selection]="property.fullLine" [class.ng-invalid]="property.invalid"
           [class.workpack-tree-selection-not-fullLine]="!property.fullLine" *ngIf="!property.multipleSelection">
           <p-tree [value]="property.localityList" selectionMode="single" [(selection)]="property.localitiesSelected"
-            (onNodeSelect)="changed.emit($event); setLabelButton($event)" (onNodeUnselect)="changed.emit($event); setLabelButton($event)"></p-tree>
+            (onNodeSelect)="changed.emit($event); setLabelButton($event)"
+            (onNodeUnselect)="changed.emit($event); setLabelButton($event)"></p-tree>
         </div>
       </ng-template>
     </ng-template>

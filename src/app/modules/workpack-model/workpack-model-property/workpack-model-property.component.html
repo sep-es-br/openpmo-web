@@ -50,7 +50,8 @@
         <ng-template #singleDomainSelection>
           <p-dropdown class="app-single-selection" id="float-label" [options]="property.list"
             [(ngModel)]="property.idDomain" dropdownIcon="fas fa-caret-down" [autoDisplayFirst]="false"
-            [required]="true" [disabled]="property.viewOnly" (ngModelChange)="changed.emit({ property: property, domainChanged: true })">
+            [required]="true" [disabled]="property.viewOnly"
+            (ngModelChange)="changed.emit({ property: property, domainChanged: true })">
           </p-dropdown>
         </ng-template>
         <label class="input-label">{{ 'domain' | translate }} *</label>
@@ -100,7 +101,7 @@
               [disabled]="!property.possibleValues?.length || property.viewOnly" [autoDisplayFirst]="false"
               [required]="true" (ngModelChange)="changed.emit($event)"></p-dropdown>
           </ng-template>
-          <label class="input-label">{{ 'defaultValue' | translate }} *</label>
+          <label class="input-label">{{ 'defaultValue' | translate }}</label>
         </span>
         <span *ngSwitchCase="'ToggleModel'" class="property-checkbox p-field-checkbox">
           <p-inputSwitch class="app-toggle" [(ngModel)]="property.defaultValue" (ngModelChange)="changed.emit($event)"
@@ -127,8 +128,9 @@
           <label class="input-label">{{ 'defaultValue' | translate }}</label>
         </span>
         <span *ngSwitchCase="'LocalitySelectionModel'" class="p-field button-select-locality-container">
-          <label class="input-label">{{'defaultValue' | translate}} *</label>
-          <p-button class="button-select-locality" [icon]="!!property.showIconButtonSelectLocality ? 'fa fa-search' : '' " iconPos="left" 
+          <label class="input-label">{{'defaultValue' | translate}}</label>
+          <p-button class="button-select-locality"
+            [icon]="!!property.showIconButtonSelectLocality ? 'fa fa-search' : '' " iconPos="left"
             (onClick)="opLocalityDefault.toggle($event)" [label]="property.selectedLocalities"></p-button>
         </span>
         <p-overlayPanel #opLocalityDefault>
@@ -136,15 +138,16 @@
             <ng-container *ngIf="property.multipleSelection; else singleLocalitySelection">
               <div class="app-tree-selection">
                 <p-tree [value]="property.extraList" selectionMode="checkbox" [disabled]="!property.idDomain"
-                [(selection)]="property.extraListDefaults" (onNodeSelect)="changed.emit({ property: property })"
-                (onNodeUnselect)="changed.emit({ property: property })"></p-tree>
+                  [propagateSelectionUp]="false" [propagateSelectionDown]="false"
+                  [(selection)]="property.extraListDefaults" (onNodeSelect)="changed.emit({ property: property })"
+                  (onNodeUnselect)="changed.emit({ property: property })"></p-tree>
               </div>
             </ng-container>
             <ng-template #singleLocalitySelection>
               <div class="app-tree-selection">
                 <p-tree [value]="property.extraList" selectionMode="single" [(selection)]="property.extraListDefaults"
-                [disabled]="!property.idDomain" (onNodeSelect)="changed.emit({ property: property })"
-                (onNodeUnselect)="changed.emit({ property: property })"></p-tree>
+                  [disabled]="!property.idDomain" (onNodeSelect)="changed.emit({ property: property })"
+                  (onNodeUnselect)="changed.emit({ property: property })"></p-tree>
               </div>
             </ng-template>
           </ng-template>
@@ -171,7 +174,8 @@
       <span class="property-checkbox p-field-checkbox"
         *ngIf="[ 'SelectionModel', 'LocalitySelectionModel', 'OrganizationSelectionModel' ].includes(property.type)">
         <p-checkbox class="app-checkbox" [(ngModel)]="property.multipleSelection" binary="true"
-          [disabled]="property.viewOnly" [required]="true" (ngModelChange)="changed.emit({property: property, multipleSelectedChanged: true}); checkDefaultValue();">
+          [disabled]="property.viewOnly" [required]="true"
+          (ngModelChange)="changed.emit({property: property, multipleSelectedChanged: true}); checkDefaultValue();">
         </p-checkbox>
         <label class="input-label">{{ 'multipleSelection' | translate }}</label>
       </span>
