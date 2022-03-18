@@ -629,13 +629,13 @@ export class WorkpackComponent implements OnDestroy {
       const domain = await this.loadDomain(propertyModel.idDomain);
       const localityList = await this.loadDomainLocalities(domain.id);
       const rootNode: TreeNode = {
-        label: domain.name,
-        data: domain.id,
+        label: domain.localityRoot.name,
+        data: domain.localityRoot.id,
         children: undefined,
         parent: undefined,
         selectable: (this.editPermission && property.multipleSelection)
       };
-      rootNode.children = this.loadLocality(localityList, rootNode);
+      rootNode.children = this.loadLocality(localityList[0].children, rootNode);
       property.idDomain = propertyModel.idDomain;
       property.localityList = [rootNode];
       const defaultSelectedLocalities = propertyWorkpack?.selectedValues ?
@@ -692,6 +692,9 @@ export class WorkpackComponent implements OnDestroy {
 
   loadSelectedLocality(seletectedIds: number[], list: TreeNode[]) {
     let result = [];
+    list.sort( (a, b) => {
+      return a.label < b.label ? -1 : a.label > b.label ? 1 : 0;
+    });
     list.forEach(l => {
       if (seletectedIds.includes(l.data)) {
         result.push(l);
@@ -722,6 +725,9 @@ export class WorkpackComponent implements OnDestroy {
   }
 
   loadLocality(localityList: ILocalityList[], parent: TreeNode) {
+    localityList.sort( (a, b) => {
+      return a.name < b.name ? -1 : a.name > b.name ? 1 : 0;
+    });
     const list = localityList.map(locality => {
       if (locality.children) {
         const node = {

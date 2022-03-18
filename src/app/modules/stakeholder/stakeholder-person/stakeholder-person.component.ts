@@ -84,6 +84,7 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
   debounceSearch = new Subject<string>();
   $destroy = new Subject();
   isLoading = false;
+  phoneNumberPlaceholder = '';
 
   constructor(
     private actRouter: ActivatedRoute,
@@ -187,6 +188,42 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
       }
     }
   }
+
+  setPhoneNumberMask(){
+    const valor = this.stakeholderForm.controls.phoneNumber.value;
+    if (valor.length < 10 && valor) {
+      this.stakeholderForm.controls.phoneNumber.setValue(null);
+      return;
+    }
+    const retorno = this.formatPhoneNumber(valor);
+    this.stakeholderForm.controls.phoneNumber.setValue(retorno);
+  }
+
+  formatPhoneNumber(value: string) {
+    if (!value) return value;
+    let formatedValue = value.replace(/\D/g, "");
+    formatedValue = formatedValue.replace(/^0/, "");
+    if (formatedValue.length > 10) {
+      formatedValue = formatedValue.replace(/^(\d\d)(\d{5})(\d{4}).*/, "($1) $2-$3");
+    } else if (formatedValue.length > 5) {
+      formatedValue = formatedValue.replace(/^(\d\d)(\d{4})(\d{0,4}).*/, "($1) $2-$3");
+    } else if (formatedValue.length > 2) {
+      formatedValue = formatedValue.replace(/^(\d\d)(\d{0,5})/, "($1) $2");
+    } else {
+      if (formatedValue.length != 0) {
+        formatedValue = formatedValue.replace(/^(\d*)/, "($1");
+      }
+    }
+    return formatedValue;
+  }
+
+  setPhoneNumberPlaceholder() {
+    const valor = this.stakeholderForm.controls.phoneNumber.value;
+    if (!valor || valor.length === 0) {
+      this.phoneNumberPlaceholder = '(99) 99999-9999';
+    }
+  }
+
 
   async loadStakeholder() {
     if (this.idPerson) {
@@ -315,7 +352,7 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
     if (this.stakeholder) {
       this.stakeholderForm.controls.fullName.setValue(this.stakeholder.person.fullName);
       this.stakeholderForm.controls.address.setValue(this.stakeholder.person.address);
-      this.stakeholderForm.controls.phoneNumber.setValue(this.stakeholder.person.phoneNumber);
+      this.stakeholderForm.controls.phoneNumber.setValue(this.formatPhoneNumber(this.stakeholder.person.phoneNumber));
       this.stakeholderForm.controls.contactEmail.setValue(this.stakeholder.person.contactEmail);
       this.stakeholderRoles = this.stakeholder.roles && this.stakeholder.roles.map(role => ({
         id: role.id,
@@ -478,7 +515,7 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
     if (this.person) {
       this.stakeholderForm.controls.fullName.setValue(this.person.fullName);
       this.stakeholderForm.controls.address.setValue(this.person.address);
-      this.stakeholderForm.controls.phoneNumber.setValue(this.person.phoneNumber);
+      this.stakeholderForm.controls.phoneNumber.setValue(this.formatPhoneNumber(this.person.phoneNumber));
       this.stakeholderForm.controls.contactEmail.setValue(this.person.contactEmail);
       if (this.person.roles && this.user) {
         this.stakeholderPermissions = this.person.roles.map(r => ({
@@ -491,6 +528,7 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
       this.stakeholderForm.controls.fullName.setValue('');
       this.stakeholderForm.controls.address.setValue('');
       this.stakeholderForm.controls.phoneNumber.setValue('');
+      this.setPhoneNumberPlaceholder();
       this.stakeholderForm.controls.contactEmail.setValue('');
       this.stakeholderRoles = null;
       this.stakeholderPermissions = [];
@@ -564,7 +602,7 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
         fullName: this.selectedPerson ? this.selectedPerson.fullName : this.stakeholderForm.controls.fullName.value,
         address: this.stakeholderForm.controls.address.value,
         contactEmail: this.stakeholderForm.controls.contactEmail.value,
-        phoneNumber: this.stakeholderForm.controls.phoneNumber.value,
+        phoneNumber: this.stakeholderForm.controls.phoneNumber.value ? this.stakeholderForm.controls.phoneNumber.value.replace(/[^0-9]+/g,'') : null,
         isUser: false
       },
       roles: this.stakeholderRoles && this.stakeholderRoles.map(r => ({
@@ -581,7 +619,7 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
         email: this.stakeholder ? this.stakeholder.person.email : this.person.email,
         address: this.stakeholderForm.controls.address.value,
         contactEmail: this.stakeholderForm.controls.contactEmail.value,
-        phoneNumber: this.stakeholderForm.controls.phoneNumber.value,
+        phoneNumber: this.stakeholderForm.controls.phoneNumber.value ? this.stakeholderForm.controls.phoneNumber.value.replace(/[^0-9]+/g,'') : null,
         isUser: true
       },
       roles: this.stakeholderRoles && this.stakeholderRoles.map(r => ({

@@ -74,12 +74,12 @@ export class LoginComponent implements OnInit, OnDestroy {
   handleChangeLanguage() {
     setTimeout(() => this.itemsLanguages = [
       {
-        label: this.translateSrv.instant('portuguese'),
+        label: 'Português',
         command: () => this.changeLanguage('pt-BR'),
         icon: this.currentLanguage === 'pt-BR' && 'fas fa-check'
       },
       {
-        label: this.translateSrv.instant('english'),
+        label: 'English',
         command: () => this.changeLanguage('en-US'),
         icon: this.currentLanguage === 'en-US' && 'fas fa-check'
       }

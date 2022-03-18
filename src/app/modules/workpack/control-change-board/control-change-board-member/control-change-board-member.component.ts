@@ -71,6 +71,7 @@ export class ControlChangeBoardMemberComponent implements OnInit, OnDestroy {
   formPerson: FormGroup;
   ccbMember: IControlChangeBoard = {} as IControlChangeBoard;
   isUser = true;
+  phoneNumberPlaceholder = '';
 
   constructor(
     private actRouter: ActivatedRoute,
@@ -164,6 +165,42 @@ export class ControlChangeBoardMemberComponent implements OnInit, OnDestroy {
     } as ICard;
   }
 
+
+  setPhoneNumberMask(){
+    const valor = this.formPerson.controls.phoneNumber.value;
+    if (valor.length < 10 && valor) {
+      this.formPerson.controls.phoneNumber.setValue(null);
+      return;
+    }
+    const retorno = this.formatPhoneNumber(valor);
+    this.formPerson.controls.phoneNumber.setValue(retorno);
+  }
+
+  formatPhoneNumber(value: string) {
+    if (!value) return value;
+    let formatedValue = value.replace(/\D/g, "");
+    formatedValue = formatedValue.replace(/^0/, "");
+    if (formatedValue.length > 10) {
+      formatedValue = formatedValue.replace(/^(\d\d)(\d{5})(\d{4}).*/, "($1) $2-$3");
+    } else if (formatedValue.length > 5) {
+      formatedValue = formatedValue.replace(/^(\d\d)(\d{4})(\d{0,4}).*/, "($1) $2-$3");
+    } else if (formatedValue.length > 2) {
+      formatedValue = formatedValue.replace(/^(\d\d)(\d{0,5})/, "($1) $2");
+    } else {
+      if (formatedValue.length != 0) {
+        formatedValue = formatedValue.replace(/^(\d*)/, "($1");
+      }
+    }
+    return formatedValue;
+  }
+
+  setPhoneNumberPlaceholder() {
+    const valor = this.formPerson.controls.phoneNumber.value;
+    if (!valor || valor.length === 0) {
+      this.phoneNumberPlaceholder = '(99) 99999-9999';
+    }
+  }
+
   async loadPropertiesPlan() {
     this.idPlan = Number(localStorage.getItem('@currentPlan'));
     const { data, success } = await this.planSrv.GetById(this.idPlan);
@@ -219,7 +256,7 @@ export class ControlChangeBoardMemberComponent implements OnInit, OnDestroy {
   setFormPerson(person: IPerson) {
     this.formPerson = this.formBuilder.group({
       address: [person ? person.address : ''],
-      phoneNumber: [person ? person.phoneNumber : ''],
+      phoneNumber: [person ? this.formatPhoneNumber(person.phoneNumber) : ''],
       contactEmail: [person ? person.contactEmail : '', Validators.email],
     });
   }
@@ -380,6 +417,10 @@ export class ControlChangeBoardMemberComponent implements OnInit, OnDestroy {
   }
 
   async saveCcbMember() {
+    let phoneNumber = this.formPerson.controls.phoneNumber.value;
+    if (phoneNumber) {
+      phoneNumber = phoneNumber.replace(/[^0-9]+/g,'');
+    }
     const sender = {
       ...this.ccbMember,
       idOffice: this.plan.idOffice,
@@ -387,6 +428,7 @@ export class ControlChangeBoardMemberComponent implements OnInit, OnDestroy {
       person: {
         ...this.ccbMember.person,
         ...this.formPerson.value,
+        phoneNumber,
         isUser: this.isUser
       }
     } as IControlChangeBoard;

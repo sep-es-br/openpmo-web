@@ -213,8 +213,8 @@ export class MenuComponent implements OnInit, OnDestroy {
           label: this.translateSrv.instant('currentLanguage'),
           icon: 'fas fa-flag',
           items: [
-            { label: this.translateSrv.instant('portuguese'), command: () => {this.changeLanguage('pt-BR'); this.closeAllMenus()} },
-            { label: this.translateSrv.instant('english'), command: () => {this.changeLanguage('en-US'); this.closeAllMenus()} }
+            { label: 'Português', command: () => {this.changeLanguage('pt-BR'); this.closeAllMenus()} },
+            { label: 'English', command: () => {this.changeLanguage('en-US'); this.closeAllMenus()} }
           ]
         }
       ]

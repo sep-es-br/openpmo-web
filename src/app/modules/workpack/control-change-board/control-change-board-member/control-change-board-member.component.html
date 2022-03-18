@@ -98,8 +98,11 @@
               <app-input-message [form]="formPerson" field="address"></app-input-message>
             </span>
             <span class="p-col-12 p-md-4 p-lg-4 p-float-label">
-              <p-inputMask mask="(99) 9 9999-9999" [class.responsive]="responsive" [unmask]="true"
-                (change)="showSaveButton()" formControlName="phoneNumber"></p-inputMask>
+              <!-- <p-inputMask mask="(99) 9 9999-9999" [class.responsive]="responsive" [unmask]="true"
+                (change)="showSaveButton()" formControlName="phoneNumber"></p-inputMask> -->
+              <input pInputText class="app-input-text" formControlName="phoneNumber" [class.responsive]="responsive"
+                (blur)="setPhoneNumberMask()" [placeholder]="phoneNumberPlaceholder" (change)="showSaveButton()"
+                (focus)="setPhoneNumberPlaceholder()" (input)="setPhoneNumberPlaceholder()" />
               <label for="float-input" class="app-input-label">{{'phoneNumber' | translate}}</label>
               <app-input-message [form]="formPerson" field="phoneNumber"></app-input-message>
             </span>

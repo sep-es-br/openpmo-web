@@ -39,6 +39,7 @@ export class OrganizationComponent implements OnInit, OnDestroy {
   isUserAdmin: boolean;
   editPermission: boolean;
   permissionsOffices: IOffice[];
+  phoneNumberPlaceholder = '';
 
   constructor(
     private formBuilder: FormBuilder,
@@ -140,6 +141,7 @@ export class OrganizationComponent implements OnInit, OnDestroy {
         this.formOrganization.reset(
           Object.keys(this.formOrganization.controls).reduce(( a, key ) => ( a[key] = data[key] || '', a ), { })
         );
+        this.formOrganization.controls.phoneNumber.setValue(this.formatPhoneNumber(this.formOrganization.controls.phoneNumber.value));
         if (!this.editPermission) {
           this.formOrganization.disable();
         }
@@ -147,10 +149,52 @@ export class OrganizationComponent implements OnInit, OnDestroy {
     }
   }
 
+  setPhoneNumberMask(){
+    const valor = this.formOrganization.controls.phoneNumber.value;
+    if (valor.length < 10 && valor) {
+      this.formOrganization.controls.phoneNumber.setValue(null);
+      return;
+    }
+    const retorno = this.formatPhoneNumber(valor);
+    this.formOrganization.controls.phoneNumber.setValue(retorno);
+  }
+
+  formatPhoneNumber(value: string) {
+    if (!value) return value;
+    let formatedValue = value.replace(/\D/g, "");
+    formatedValue = formatedValue.replace(/^0/, "");
+    if (formatedValue.length > 10) {
+      formatedValue = formatedValue.replace(/^(\d\d)(\d{5})(\d{4}).*/, "($1) $2-$3");
+    } else if (formatedValue.length > 5) {
+      formatedValue = formatedValue.replace(/^(\d\d)(\d{4})(\d{0,4}).*/, "($1) $2-$3");
+    } else if (formatedValue.length > 2) {
+      formatedValue = formatedValue.replace(/^(\d\d)(\d{0,5})/, "($1) $2");
+    } else {
+      if (formatedValue.length != 0) {
+        formatedValue = formatedValue.replace(/^(\d*)/, "($1");
+      }
+    }
+    return formatedValue;
+  }
+
+  setPhoneNumberPlaceholder() {
+    const valor = this.formOrganization.controls.phoneNumber.value;
+    if (!valor || valor.length === 0) {
+      this.phoneNumberPlaceholder = '(99) 99999-9999';
+    }
+  }
+
   async handleOnSubmit() {
+    let phoneNumber = this.formOrganization.controls.phoneNumber.value;
+    if (phoneNumber) {
+      phoneNumber = phoneNumber.replace(/[^0-9]+/g,'');
+    }
     const { success } = this.propertiesOrganization
       ? await this.organizationSvr.put({ ...this.formOrganization.value, id: this.idOrganization })
-      : await this.organizationSvr.post({ ...this.formOrganization.value, idOffice: this.idOffice });
+      : await this.organizationSvr.post({ 
+        ...this.formOrganization.value, 
+        phoneNumber,
+        idOffice: this.idOffice });
     if (success) {
       this.messageSrv.add({
         severity: 'success',

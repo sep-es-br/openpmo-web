@@ -99,7 +99,6 @@ export class CardComponent implements OnInit, OnDestroy, OnChanges {
 
   setLanguage() {
     this.language = this.translateSrv.currentLang;
-    console.log('language', this.language)
   }
 
   handleFilterSelected(idFilter: number) {

@@ -1083,6 +1083,9 @@ export class WorkpackModelComponent implements OnInit {
 
   loadSelectedLocality(seletectedIds: number[], list: TreeNode[]) {
     let result = [];
+    list.sort( (a, b) => {
+      return a.label < b.label ? -1 : a.label > b.label ? 1 : 0;
+    });
     list.forEach(l => {
       if (seletectedIds.includes(l.data)) {
         result.push(l);
@@ -1096,6 +1099,9 @@ export class WorkpackModelComponent implements OnInit {
   }
 
   loadLocality(localityList: ILocalityList[], parent?: TreeNode) {
+    localityList.sort( (a, b) => {
+      return a.name < b.name ? -1 : a.name > b.name ? 1 : 0;
+    });
     const list = localityList.map(locality => {
       if (locality.children) {
         const node = {

@@ -42,8 +42,12 @@
                   <label class="app-input-label">{{ 'email' | translate }} </label>
                 </span>
                 <span class="p-float-label left property-input p-field p-col-12 p-md-2">
-                  <p-inputMask mask="(99) 9 9999-9999" [class.responsive]="responsive" [unmask]="true"
-                    formControlName="phoneNumber"></p-inputMask>
+                  <!-- <p-inputMask mask="(99) 9?9999-9999" [class.responsive]="responsive" [unmask]="true"
+                    formControlName="phoneNumber"></p-inputMask> -->
+                  <input pInputText class="app-input-text" formControlName="phoneNumber" [class.responsive]="responsive"
+                    (blur)="setPhoneNumberMask()" [placeholder]="phoneNumberPlaceholder" (input)="setPhoneNumberPlaceholder()"
+                    (focus)="setPhoneNumberPlaceholder()" />
+                  <label class="app-input-label">{{ 'phone' | translate }} </label>
                   <label class="app-input-label">{{ 'phone' | translate }} </label>
                 </span>
               </div>

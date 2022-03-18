@@ -37,9 +37,13 @@
             <label for="float-input" class="app-input-label">{{'address' | translate}}</label>
           </span>
           <span class="p-float-label">
-            <p-inputMask class="app-input-mask short-input" [class.mobile]="responsive" [class.desktop]="!responsive"
+            <!-- <p-inputMask class="app-input-mask short-input" [class.mobile]="responsive" [class.desktop]="!responsive"
               inputId="float-phoneNumber" name="phoneNumber" formControlName="phoneNumber" [unmask]="false"
-              mask="(99) 99999-9999"></p-inputMask>
+              mask="(99) 99999-9999"></p-inputMask> -->
+            <input pInputText class="app-input-text" formControlName="phoneNumber" [class.responsive]="responsive"
+              [class.desktop]="!responsive" (blur)="setPhoneNumberMask()" [placeholder]="phoneNumberPlaceholder"
+              inputId="float-phoneNumber" (focus)="setPhoneNumberPlaceholder()"
+              (input)="setPhoneNumberPlaceholder()" />
             <label for="float-phoneNumber" class="app-input-label">{{'phone' | translate}}</label>
           </span>
           <span class="p-float-label">

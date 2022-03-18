@@ -38,6 +38,7 @@ export class PersonProfileComponent implements OnInit, OnDestroy {
   optionsOffices: SelectItem[] = [];
   propertiesPerson: IPerson;
   formPerson: FormGroup;
+  phoneNumberPlaceholder = '';
 
   constructor(
     private personSrv: PersonService,
@@ -88,6 +89,41 @@ export class PersonProfileComponent implements OnInit, OnDestroy {
     this.idPerson = this.authSrv.getIdPerson();
   }
 
+  setPhoneNumberMask(){
+    const valor = this.formPerson.controls.phoneNumber.value;
+    if (valor.length < 10 && valor) {
+      this.formPerson.controls.phoneNumber.setValue(null);
+      return;
+    }
+    const retorno = this.formatPhoneNumber(valor);
+    this.formPerson.controls.phoneNumber.setValue(retorno);
+  }
+
+  formatPhoneNumber(value: string) {
+    if (!value) return value;
+    let formatedValue = value.replace(/\D/g, "");
+    formatedValue = formatedValue.replace(/^0/, "");
+    if (formatedValue.length > 10) {
+      formatedValue = formatedValue.replace(/^(\d\d)(\d{5})(\d{4}).*/, "($1) $2-$3");
+    } else if (formatedValue.length > 5) {
+      formatedValue = formatedValue.replace(/^(\d\d)(\d{4})(\d{0,4}).*/, "($1) $2-$3");
+    } else if (formatedValue.length > 2) {
+      formatedValue = formatedValue.replace(/^(\d\d)(\d{0,5})/, "($1) $2");
+    } else {
+      if (formatedValue.length != 0) {
+        formatedValue = formatedValue.replace(/^(\d*)/, "($1");
+      }
+    }
+    return formatedValue;
+  }
+
+  setPhoneNumberPlaceholder() {
+    const valor = this.formPerson.controls.phoneNumber.value;
+    if (!valor || valor.length === 0) {
+      this.phoneNumberPlaceholder = '(99) 99999-9999';
+    }
+  }
+
   async loadOptionsOffices() {
     const { success, data } = await this.personSrv.getOfficesByPerson(this.idPerson);
     if (success && data) {
@@ -134,13 +170,12 @@ export class PersonProfileComponent implements OnInit, OnDestroy {
     ]);
   }
 
-
   setFormPerson(person: IPerson) {
     this.formPerson.reset({
       name: person?.name,
       email: person?.email,
       contactEmail: person?.contactEmail,
-      phoneNumber: person?.phoneNumber,
+      phoneNumber: this.formatPhoneNumber(person.phoneNumber),
       address: person?.address,
       unify: false
     });
@@ -194,9 +229,14 @@ export class PersonProfileComponent implements OnInit, OnDestroy {
   }
 
   async savePerson() {
+    let phoneNumber = this.formPerson.controls.phoneNumber.value;
+    if (phoneNumber) {
+      phoneNumber = phoneNumber.replace(/[^0-9]+/g,'');
+    }
     const sender = this.idOffice ? {
       ...this.propertiesPerson,
       ...this.formPerson.value,
+      phoneNumber,
       idOffice: this.idOffice,
       email: null
     } : {
