@@ -1,3 +1,44 @@
-::ng-deep .app-office {
+::ng-deep .app-office-list-container {
   width: 100%;
+  flex: 1;
+  display: flex;
+  // align-items: center;
+  flex-direction: column;
+  justify-content: space-between;
+  .app-office-list {
+    width: 100%;
+  }
+  .user-cookies-confirmation {
+    width: 40%;
+    position: fixed;
+    bottom: 100px;
+    box-shadow: 0 -1px 3px #eaf0f6;
+    background-color: #fcfafa;
+    height: auto;
+    z-index: 100000000 !important;
+    color: #5b5e61;
+    font-size: 14px;
+    padding: 1em;
+    border-radius: 5px;
+    .cookies-buttons-actions {
+      width: 100%;
+      text-align: right;
+      .accept-button {
+        margin-right: 0.5em;
+        .p-button {
+          background-color: #888e96;
+          border-color: #888e96;
+        }
+      }
+      .decline-button {
+        .p-button {
+          color: #888e96;
+          background-color: #fff;
+          border-color: #888e96;
+        }
+      }
+    }
+  }
 }
+
+

@@ -12,6 +12,7 @@ import { FilterDataviewPropertiesEntity } from 'src/app/shared/constants/filterD
 import { PropertyTemplateModel } from 'src/app/shared/models/PropertyTemplateModel';
 import { ICardItemOffice } from 'src/app/shared/interfaces/ICardItemOffice';
 import { CookieService } from 'ngx-cookie';
+import * as moment from 'moment';
 
 @Component({
   selector: 'app-office-list',
@@ -36,19 +37,52 @@ export class OfficeListComponent implements OnInit {
   totalRecords: number;
   filterProperties: IFilterProperty[] = this.filterSrv.get;
   idFilterSelected: number;
+  showCookiesPermissionMessage = true;
 
   constructor(
     private officeSvr: OfficeService,
     private router: Router,
     private authSrv: AuthService,
     private filterSrv: FilterDataviewService,
-    private breadcrumbSrv: BreadcrumbService
+    private breadcrumbSrv: BreadcrumbService,
+    private cookieSrv: CookieService
   ) { }
 
   async ngOnInit() {
     await this.loadFiltersOffices();
     await this.loadPropertiesOffice();
     this.breadcrumbSrv.setMenu([]);
+    this.loadCookiesConfigStoraged();
+  }
+
+  loadCookiesConfigStoraged() {
+    const user = this.authSrv.getTokenPayload();
+    const cookiesPermission = this.cookieSrv.get('cookiesPermission' + user.email);
+    if(!!cookiesPermission) {
+      this.showCookiesPermissionMessage = false;
+    } else {
+      const cookiesDecline = localStorage.getItem('cookiesDecline' + user.email);
+      if (!!cookiesDecline) {
+        this.showCookiesPermissionMessage = false;
+      }
+    }
+  }
+
+  handleSetCookiesPermission() {
+    const date = moment().add(60, 'days').calendar();
+    const user = this.authSrv.getTokenPayload();
+    if (user && user.email) {
+      this.cookieSrv.put('cookiesPermission' + user.email, 'true', { expires: date });
+    }
+    this.showCookiesPermissionMessage = false;
+  }
+
+  handleSetCookiesDecline() {
+    const user = this.authSrv.getTokenPayload();
+    if (user && user.email) {
+      localStorage.setItem('cookiesDecline' + user.email, 'true')
+    }
+    this.showCookiesPermissionMessage = false;
   }
 
   handleChangeDisplayMode(event) {

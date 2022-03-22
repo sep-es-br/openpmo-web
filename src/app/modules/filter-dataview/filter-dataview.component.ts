@@ -463,14 +463,9 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
       active: propertyModel.active
     }
 
-    // if (this.typePropertyModel[propertyModel.type] === TypePropertyModelEnum.DateModel) {
-    //   const dateValue = (propertyModel.defaultValue && propertyModel.defaultValue.toLocaleString());
-    //   property.value = dateValue ? new Date(dateValue) : null;
-    // }
     if (this.typePropertyModel[propertyModel.type] === TypePropertyModelEnum.SelectionModel && propertyModel.multipleSelection) {
       const listValues = propertyModel.defaultValue as string;
       property.defaultValue = listValues.split(',');
-      // property.value = listValues.split(',');
     }
 
     if (this.typePropertyModel[propertyModel.type] === TypePropertyModelEnum.SelectionModel) {
@@ -508,18 +503,13 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
 
     if (this.typePropertyModel[propertyModel.type] === TypePropertyModelEnum.OrganizationSelectionModel) {
       property.possibleValuesIds = await this.loadOrganizationsOffice();
-      // if (propertyModel.multipleSelection) {
-      //   property.selectedValues = propertyModel.defaults as number[];
-      // }
       if (!propertyModel.multipleSelection) {
         const defaults = propertyModel.defaults && propertyModel.defaults as number[];
         const defaultsValue = defaults && defaults[0];
-        // property.selectedValues = defaultsValue && defaultsValue;
       }
     }
     if (this.typePropertyModel[propertyModel.type] === TypePropertyModelEnum.UnitSelectionModel) {
       property.possibleValuesIds = await this.loadUnitMeasuresOffice();
-      // property.selectedValue = propertyModel.defaults as number;
       property.defaults = propertyModel.defaults as number;
     }
     return property;

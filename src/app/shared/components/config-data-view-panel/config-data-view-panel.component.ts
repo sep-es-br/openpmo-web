@@ -2,7 +2,6 @@ import { takeUntil } from 'rxjs/operators';
 import { ResponsiveService } from './../../services/responsive.service';
 import { TranslateService } from '@ngx-translate/core';
 import { ConfirmationService, SelectItem } from 'primeng/api';
-import { IPerson } from './../../interfaces/IPerson';
 import { Component, Input, OnInit, Output, EventEmitter, OnDestroy } from '@angular/core';
 import { CookieService } from 'ngx-cookie';
 import { AuthService } from '../../services/auth.service';
@@ -46,7 +45,7 @@ export class ConfigDataViewPanelComponent implements OnInit, OnDestroy {
 
   async ngOnInit() {
     await this.loadUser();
-    this.loadCookiePermissionFromStorage();
+    this.loadCookiePermission();
     if (!!this.cookiesPermission) { this.getCookiesKeys() };
   }
 
@@ -59,13 +58,11 @@ export class ConfigDataViewPanelComponent implements OnInit, OnDestroy {
     this.user = this.authSrv.getTokenPayload();
   }
 
-  loadCookiePermissionFromStorage() {
+  loadCookiePermission() {
     if (this.user) {
-      const cookiesPermission = localStorage.getItem('cookiesPermission'+ this.user.email);
-      if (cookiesPermission === 'true') {
+      const cookiesPermission = this.cookieSrv.get('cookiesPermission'+ this.user.email);
+      if (!!cookiesPermission) {
         this.cookiesPermission = true;
-      } else if (cookiesPermission === 'false') {
-        this.cookiesPermission = false;
       }
     }
   }
@@ -88,23 +85,7 @@ export class ConfigDataViewPanelComponent implements OnInit, OnDestroy {
   handleCollapseAll(collapseAll: boolean) {
     const mode = collapseAll ? 'collapse' : 'expand';
     this.collapsed = collapseAll;
-    if (this.cookiesPermission === undefined) {
-      this.confirmationSrv.confirm({
-        message: `${this.translateSrv.instant('messages.setCookiesPermission')}`,
-        key: 'cookiesPermission',
-        acceptLabel: this.translateSrv.instant('yes'),
-        rejectLabel: this.translateSrv.instant('no'),
-        accept: async () => {
-          localStorage.setItem('cookiesPermission'+ this.user.email, 'true');
-          this.cookiesPermission = true;
-          this.setCookiesCollapseExpandMode(collapseAll);
-        },
-        reject: () => {
-          localStorage.setItem('cookiesPermission'+ this.user.email, 'false');
-          this.cookiesPermission = false;
-        }
-      });
-    } else if (this.cookiesPermission === true) {
+    if (!!this.cookiesPermission) {
       this.setCookiesCollapseExpandMode(collapseAll);
     }
     this.changeCollapsedExpand.emit({ mode });
@@ -112,46 +93,14 @@ export class ConfigDataViewPanelComponent implements OnInit, OnDestroy {
 
   handleChangeDisplayMode(displayMode: string) {
     this.displayMode = displayMode;
-    if (this.cookiesPermission === undefined) {
-      this.confirmationSrv.confirm({
-        message: `${this.translateSrv.instant('messages.setCookiesPermission')}`,
-        key: 'cookiesPermission',
-        acceptLabel: this.translateSrv.instant('yes'),
-        rejectLabel: this.translateSrv.instant('no'),
-        accept: async () => {
-          localStorage.setItem('cookiesPermission'+ this.user.email, 'true');
-          this.cookiesPermission = true;
-          this.setCookiesDisplayMode(displayMode);
-        },
-        reject: () => {
-          localStorage.setItem('cookiesPermission'+ this.user.email, 'false');
-          this.cookiesPermission = false;
-        }
-      });
-    } else if (this.cookiesPermission === true) {
+    if (!!this.cookiesPermission) {
       this.setCookiesDisplayMode(displayMode);
     }
     this.changeDisplayMode.emit({ displayMode });
   }
 
   handleChangePageSize() {
-    if (this.cookiesPermission === undefined) {
-      this.confirmationSrv.confirm({
-        message: `${this.translateSrv.instant('messages.setCookiesPermission')}?`,
-        key: 'cookiesPermission',
-        acceptLabel: this.translateSrv.instant('yes'),
-        rejectLabel: this.translateSrv.instant('no'),
-        accept: async () => {
-          localStorage.setItem('cookiesPermission'+ this.user.email, 'true');
-          this.cookiesPermission = true;
-          this.setCookiesPageSize(this.selectedPageSize);
-        },
-        reject: () => {
-          localStorage.setItem('cookiesPermission'+ this.user.email, 'false');
-          this.cookiesPermission = false;
-        }
-      });
-    } else if (this.cookiesPermission === true) {
+    if (!!this.cookiesPermission) {
       this.setCookiesPageSize(this.selectedPageSize);
     }
     this.changePageSize.emit({ pageSize: this.selectedPageSize });

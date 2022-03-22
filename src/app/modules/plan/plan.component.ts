@@ -134,9 +134,10 @@ export class PlanComponent implements OnInit, OnDestroy {
   }
 
   setWorkPlanUser() {
-    const date = moment().add(60, 'days').calendar();
     const user = this.authSrv.getTokenPayload();
-    if (user && user.email) {
+    const cookiesPermission = this.cookieSrv.get('cookiesPermission'+ user.email);
+    if (cookiesPermission && user && user.email) {
+      const date = moment().add(60, 'days').calendar();
       this.cookieSrv.put('planWorkUser' + user.email, this.idPlan.toString(), { expires: date });
     }
   }
@@ -271,6 +272,7 @@ export class PlanComponent implements OnInit, OnDestroy {
       if (!isPut) {
         this.idPlan = data.id;
         this.setCurrentPlanStorage();
+        this.setWorkPlanUser();
         if (!this.isUserAdmin) {
           await this.createPlanPermission(data.id);
         }
@@ -347,7 +349,6 @@ export class PlanComponent implements OnInit, OnDestroy {
   }
 
   async loadWorkpacksFromWorkpackModel(idPlan: number, workpackModelId: number, idFilterSelected: number) {
-
     const result = await this.workpackSrv.GetAll({
       'id-plan': idPlan,
       'id-plan-model': this.idPlanModel,

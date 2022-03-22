@@ -295,7 +295,9 @@
   "risksRequireAttention": "Risks require attention",
   "CPI": "CPI",
   "SPI": "SPI",
+  "decline": "Decline",
   "messages": {
+    "cookies-confirmation": "The OPEN PMO uses cookies to enable a personalized navigation. By clicking accept you are agreeing to the storage of browsing data.",
     "startDateIsSameEndDate": "Start date can't to be same end date.",
     "startDateIsAfterEndDate": "End date can't to be before start date.",
     "endManagementAlert": "This action will terminate the delivery management activities, preventing further edits.",

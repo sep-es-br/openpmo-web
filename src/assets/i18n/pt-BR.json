@@ -294,7 +294,9 @@
   "risksRequireAttention": "Ricos exigem atenção",
   "CPI": "IDC",
   "SPI": "IDP",
+  "decline": "Recusar",
   "messages": {
+    "cookies-confirmation": "O OPEN PMO utiliza cookies para possibilitar uma forma de navegação personalizada. Ao clicar em aceitar você está concordando com o armazenamento de dados de navegação.",
     "startDateIsSameEndDate": "Data inicial não pode ser igual a data final",
     "startDateIsAfterEndDate": "Data final não pode ser menor que a data inicial",
     "endManagementAlert": "Esta ação encerrará as atividades de gestão da entrega, impedindo novas edições.",

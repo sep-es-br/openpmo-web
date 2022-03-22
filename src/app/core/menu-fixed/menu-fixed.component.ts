@@ -163,9 +163,10 @@ export class MenuFixedComponent implements OnInit, OnDestroy {
   }
 
   setCookieMenuMode() {
-    const date = moment().add(60, 'days').calendar();
     const user = this.authSrv.getTokenPayload();
-    if (user && user.email) {
+    const cookiesPermission = this.cookieSrv.get('cookiesPermission'+ user.email);
+    if (!!cookiesPermission && user && user.email) {
+      const date = moment().add(60, 'days').calendar();
       this.cookieSrv.put('menuMode' + user.email, 'false', { expires: date });
     }
   }
