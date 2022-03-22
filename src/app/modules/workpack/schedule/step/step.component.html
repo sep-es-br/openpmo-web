@@ -87,7 +87,7 @@
           </p-dataView>
         </div>
         <div class="app-save-button-layout">
-          <div class="app-save-button-wrapper" *ngIf="showSaveButton" @enterLeave>
+          <div class="app-save-button-wrapper" *ngIf="!!showSaveButton" @enterLeave>
             <span class="button-label" (click)="saveStep()">{{ 'save' | translate }}</span>
           </div>
         </div>

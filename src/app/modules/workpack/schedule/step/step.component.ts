@@ -5,7 +5,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { takeUntil, filter } from 'rxjs/operators';
 import { Calendar } from 'primeng/calendar';
 import { MenuItem, MessageService } from 'primeng/api';
 import * as moment from 'moment';
@@ -118,6 +118,12 @@ export class StepComponent implements OnInit, OnDestroy {
       actualWork: null
     });
     this.idPlan = Number(localStorage.getItem('@currentPlan'));
+    this.formStep.statusChanges
+      .pipe(takeUntil(this.$destroy), filter(status => status === 'INVALID'))
+      .subscribe(() => this.handleChangeValuesCardItems());
+    this.formStep.valueChanges
+      .pipe(takeUntil(this.$destroy), filter(() => this.formStep.dirty && this.formStep.valid))
+      .subscribe(() => this.handleChangeValuesCardItems());
   }
 
   ngOnDestroy(): void {
@@ -128,7 +134,7 @@ export class StepComponent implements OnInit, OnDestroy {
   async ngOnInit() {
     this.calendarFormat = this.translateSrv.instant('dateFormat');
     await this.loadPropertiesStep();
-    this.handleChangeValuesCardItems();
+    // this.handleChangeValuesCardItems();
   }
 
   async loadPropertiesStep() {
@@ -165,7 +171,7 @@ export class StepComponent implements OnInit, OnDestroy {
           this.onlyOneStep = this.schedule.groupStep[0].steps.length === 1;
         }
         await this.loadPermissions();
-        
+
       }
     }
     if (this.schedule.idWorkpack) {
@@ -473,14 +479,16 @@ export class StepComponent implements OnInit, OnDestroy {
   }
 
   reloadCostAssignmentTotals() {
-    const plannedTotal = this.costAssignmentsCardItems.filter(card => card.type === 'cost-card')
-      .reduce((total, cost) => total + cost.plannedWork, 0);
-    const actualTotal = this.costAssignmentsCardItems.filter(card => card.type === 'cost-card')
-      .reduce((total, cost) => total + cost.actualWork, 0);
-    this.costAssignmentsTotals = {
-      actualTotal,
-      plannedTotal
-    };
+    if (this.costAssignmentsCardItems) {
+      const plannedTotal = this.costAssignmentsCardItems.filter(card => card.type === 'cost-card')
+        .reduce((total, cost) => total + cost.plannedWork, 0);
+      const actualTotal = this.costAssignmentsCardItems.filter(card => card.type === 'cost-card')
+        .reduce((total, cost) => total + cost.actualWork, 0);
+      this.costAssignmentsTotals = {
+        actualTotal,
+        plannedTotal
+      };
+    }
   }
 
 

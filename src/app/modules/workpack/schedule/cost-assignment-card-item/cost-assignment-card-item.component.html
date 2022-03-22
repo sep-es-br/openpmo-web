@@ -7,14 +7,16 @@
   <div class="card-item-values p-fluid">
     <span class="p-float-label" [class.responsive]="responsive">
       <p-inputNumber class="app-input-number" id="float-planned" [(ngModel)]="properties.plannedWork"
-        (ngModelChange)="handleCostChange()" mode="decimal" [locale]="currentLang" [minFractionDigits]="2" [maxFractionDigits]="2" [disabled]="!!properties.readonly">
+        (ngModelChange)="handleCostChange()" mode="decimal" [locale]="currentLang" [minFractionDigits]="2"
+        [maxFractionDigits]="2" [disabled]="!!properties.readonly">
       </p-inputNumber>
       <label class="app-input-label" for="float-planned">{{properties.unitMeasureName}} {{ "planned" |translate
         }} * </label>
     </span>
     <span class="p-float-label" [class.responsive]="responsive">
-      <p-inputNumber class="app-input-number" id="float-planned" [(ngModel)]="properties.actualWork" [disabled]="!!properties.readonly"
-        (ngModelChange)="handleCostChange()" mode="decimal" [locale]="currentLang" [minFractionDigits]="2" [maxFractionDigits]="2">
+      <p-inputNumber class="app-input-number" id="float-planned" [(ngModel)]="properties.actualWork"
+        [disabled]="!!properties.readonly" (ngModelChange)="handleCostChange()" mode="decimal" [locale]="currentLang"
+        [minFractionDigits]="2" [maxFractionDigits]="2">
       </p-inputNumber>
       <label class="app-input-label" for="float-planned">{{properties.unitMeasureName}} {{ "actual" |translate
         }}</label>
@@ -27,7 +29,8 @@
   </div>
 </p-card>
 
-<p-card class="new-card-item-cost" [class.new-card-item-cost-mobile]="responsive" *ngIf="properties.type === 'new-cost-card'">
+<p-card class="new-card-item-cost" [class.new-card-item-cost-mobile]="responsive"
+  *ngIf="properties.type === 'new-cost-card'">
   <div class="card-item-content">
     <i [ngClass]="[ 'app-icon', iconsEnum.Plus, 'light-grey-icon' ]" [ngStyle]="{ fontSize: '3rem' }"
       [class.card-link]="properties.menuItemsNewCost" (click)=" menuIcon.toggle($event)"></i>
