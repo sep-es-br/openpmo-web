@@ -132,6 +132,8 @@
   "newMonth": "Novo Mês",
   "minLenght": "Mínimo de caracteres",
   "maxLenght": "Máximo de caracteres",
+  "minValue": "Valor mínimo",
+  "maxValue": "Valor máximo",
   "list": "Lista",
   "card": "Cartão",
   "expandAll": "Expandir Todos",

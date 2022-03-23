@@ -11,3 +11,23 @@
 ::ng-deep .workpack-input-number-mobile .p-inputnumber {
   width: 100%;
 }
+
+::ng-deep .app-input-number {
+  .p-inputnumber {
+    border: none;
+    border-radius: 0;
+    background-color: transparent;
+    padding-left: 0;
+    input {
+      padding-left: 0;
+    }
+    &:enabled:focus {
+      border: none !important;
+      box-shadow: none;
+    }
+    &:hover {
+      border: none !important;
+      box-shadow: none;
+    }
+  }
+}

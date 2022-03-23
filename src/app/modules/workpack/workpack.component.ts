@@ -291,7 +291,8 @@ export class WorkpackComponent implements OnDestroy {
   checkProperties(property: PropertyTemplateModel) {
     const arePropertiesRequiredValid: boolean = this.checkPropertiesRequiredValid(property);
     const arePropertiesStringValid: boolean = this.checkPropertiesStringValid(property);
-    return (arePropertiesRequiredValid && arePropertiesStringValid) ? this.saveButton?.showButton() : this.saveButton?.hideButton();
+    const arePropertiesNumberValid: boolean = this.checkPropertiesNumberValid(property);
+    return (arePropertiesRequiredValid && arePropertiesStringValid && arePropertiesNumberValid) ? this.saveButton?.showButton() : this.saveButton?.hideButton();
   }
 
   checkPropertiesRequiredValid(property: PropertyTemplateModel, groupedProperties?: PropertyTemplateModel[]) {
@@ -335,8 +336,8 @@ export class WorkpackComponent implements OnDestroy {
   checkPropertiesStringValid(property: PropertyTemplateModel, groupedProperties?: PropertyTemplateModel[]) {
     const properties = !groupedProperties ? this.sectionPropertiesProperties : groupedProperties;
     return properties
-      .filter(p => (((p.min || p.max) && typeof p.value == 'string') || (p.type === 'Group' &&
-        p.groupedProperties.filter(gp => ((gp.min || gp.max) && typeof gp.value == 'string')).length > 0)))
+      .filter(p => (((p.min || p.max) && (typeof p.value == 'string' && p.type !== 'Num')) || (p.type === 'Group' &&
+        p.groupedProperties.filter(gp => ((gp.min || gp.max) && (typeof gp.value == 'string' && gp.type !== 'Number'))).length > 0)))
       .map((prop) => {
         let valid = true;
         valid = prop.min ? String(prop.value).length >= prop.min : true;
@@ -350,6 +351,36 @@ export class WorkpackComponent implements OnDestroy {
           if (property.idPropertyModel === prop.idPropertyModel) {
             prop.invalid = !valid;
             prop.message = !valid ? (String(prop.value).length > 0 ? prop.message = this.translateSrv.instant('maxLenght')
+              : prop.message = this.translateSrv.instant('required')) : '';
+          }
+        }
+        const groupedPropertiesValid = prop.type === 'Group' ? this.checkPropertiesStringValid(property, prop.groupedProperties) : true;
+        if (prop.type === 'Group') {
+          valid = groupedPropertiesValid;
+        }
+        return valid;
+      })
+      .reduce((a, b) => a ? b : a, true);
+  }
+
+  checkPropertiesNumberValid(property: PropertyTemplateModel, groupedProperties?: PropertyTemplateModel[]) {
+    const properties = !groupedProperties ? this.sectionPropertiesProperties : groupedProperties;
+    return properties
+      .filter(p => (((p.min || p.max) && (p.type === 'Num')) || (p.type === 'Group' &&
+        p.groupedProperties.filter(gp => ((gp.min || gp.max) && (gp.type === 'Num'))).length > 0)))
+      .map((prop) => {
+        let valid = true;
+        valid = prop.min ? Number(prop.value) >= prop.min : true;
+        if (property.idPropertyModel === prop.idPropertyModel) {
+          prop.invalid = !valid;
+          prop.message = !valid ? prop.message = this.translateSrv.instant('minValue') : '';
+        }
+        if (valid) {
+          valid = prop.max ? (!prop.required ? Number(prop.value) <= prop.max
+            : Number(prop.value) <= prop.max && Number(prop.value) > 0) : true;
+          if (property.idPropertyModel === prop.idPropertyModel) {
+            prop.invalid = !valid;
+            prop.message = !valid ? (Number(prop.value) > 0 ? prop.message = this.translateSrv.instant('maxValue')
               : prop.message = this.translateSrv.instant('required')) : '';
           }
         }

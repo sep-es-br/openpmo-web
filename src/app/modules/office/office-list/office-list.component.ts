@@ -13,11 +13,19 @@ import { PropertyTemplateModel } from 'src/app/shared/models/PropertyTemplateMod
 import { ICardItemOffice } from 'src/app/shared/interfaces/ICardItemOffice';
 import { CookieService } from 'ngx-cookie';
 import * as moment from 'moment';
+import { enterLeave } from '../../../shared/animations/enterLeave.animation';
 
 @Component({
   selector: 'app-office-list',
   templateUrl: './office-list.component.html',
-  styleUrls: ['./office-list.component.scss']
+  styleUrls: ['./office-list.component.scss'],
+  animations: [
+    enterLeave(
+      { opacity: 0, pointerEvents: 'none', transform: 'translateY(100%)' },
+      { opacity: 1, pointerEvents: 'all', transform: 'translateY(0)' },
+      300
+    )
+  ]
 })
 export class OfficeListComponent implements OnInit {
 
@@ -37,7 +45,7 @@ export class OfficeListComponent implements OnInit {
   totalRecords: number;
   filterProperties: IFilterProperty[] = this.filterSrv.get;
   idFilterSelected: number;
-  showCookiesPermissionMessage = true;
+  showCookiesPermissionMessage = false;
 
   constructor(
     private officeSvr: OfficeService,
@@ -64,6 +72,8 @@ export class OfficeListComponent implements OnInit {
       const cookiesDecline = localStorage.getItem('cookiesDecline' + user.email);
       if (!!cookiesDecline) {
         this.showCookiesPermissionMessage = false;
+      } else {
+        this.showCookiesPermissionMessage = true;
       }
     }
   }

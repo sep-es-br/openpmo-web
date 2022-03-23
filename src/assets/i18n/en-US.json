@@ -130,6 +130,8 @@
   "newMonth": "New Month",
   "minLenght": "Minimun lenght",
   "maxLenght": "Maximun lenght",
+  "minValue": "Minimun value",
+  "maxValue": "Maximum value",
   "list": "List",
   "card": "Card",
   "expandAll": "Expand All",

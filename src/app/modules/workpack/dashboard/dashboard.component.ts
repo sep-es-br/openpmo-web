@@ -72,9 +72,11 @@ export class DashboardComponent implements OnInit {
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.responsive = value);
     this.translateSrv.onLangChange.pipe(takeUntil(this.$destroy)).subscribe(() =>
       setTimeout(() => {
-        this.calendarComponent?.ngOnInit();
-        this.calendarComponent.dateFormat = this.translateSrv.instant('dateFormatMonthYear');
-        this.calendarComponent.updateInputfield();
+        if (this.calendarComponent) {
+          this.calendarComponent?.ngOnInit();
+          this.calendarComponent.dateFormat = this.translateSrv.instant('dateFormatMonthYear');
+          this.calendarComponent.updateInputfield();
+        }
         this.midleTextMilestones = this.translateSrv.instant('milestonesLabelChart');
         this.midleTextRisks = this.translateSrv.instant('risksLabelChart');
         this.setDashboardMilestonesData();
