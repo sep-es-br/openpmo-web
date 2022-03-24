@@ -62,7 +62,7 @@ export class InputUnitMeasureComponent implements OnInit, OnDestroy {
           this.handleFilled();
         });
     } else {
-      this.valueInput = this.model.toLocaleString(this.currentLang, { useGrouping: true, maximumFractionDigits: this.maxFractionDigits });
+      this.valueInput = this.model && this.model.toLocaleString(this.currentLang, { useGrouping: true, maximumFractionDigits: this.maxFractionDigits });
     }
     this.handleFilled();
     this.el.nativeElement.classList.add('app-input-number');

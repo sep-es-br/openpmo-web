@@ -59,6 +59,16 @@
         }
       }
     }
+    .form-search.responsive {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      .property-input:not(:first-child) {
+        width: 100%;
+        // padding-bottom: 1em;
+        margin-top: 2em
+      }
+    }
     
   }
 }

@@ -54,7 +54,7 @@ export class HomeComponent implements OnInit {
               queryParams: {
                 id: Number(workPlanUser)
               }
-            })
+            });
           } else {
             this.router.navigate(['/home']);
           }
@@ -63,13 +63,30 @@ export class HomeComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    if (!this.routerPlanWork) {
-      setTimeout(async () => {
-        const routeLink = '/offices'
-        this.router.navigate([routeLink]);
-      }, 0);
-    }
-
+    setTimeout( () => {
+      if (!this.authSrv.isAuthenticated()) {
+        setTimeout(async () => {
+          const routeLink = '/offices'
+          this.router.navigate([routeLink]);
+        }, 0);
+      } else {
+        const user = this.authSrv.getTokenPayload();
+        const workPlanUser = user ? this.cookieSrv.get('planWorkUser' + user.email) : null;
+        if ((!this.routerPlanWork && !workPlanUser) ) {
+          setTimeout(async () => {
+            const routeLink = '/offices'
+            this.router.navigate([routeLink]);
+          }, 0);
+        } else {
+          this.router.navigate(['plan'], {
+            queryParams: {
+              id: workPlanUser
+            }
+          });
+        }
+      }
+    },300)
+    
   }
 
 }

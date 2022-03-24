@@ -73,7 +73,7 @@
         <div class="item-label" *ngIf="isMobileView">{{ 'offices' | translate }}</div>
       </div>
       <div class="item">
-        <i class="app-icon plan-model" [ngStyle]="{ fontSize: '2.25rem' }"></i>
+        <i class="app-icon plan-model" [routerLink]="['/strategies']" [queryParams]="{ idOffice: currentIDOffice }" [ngStyle]="{ fontSize: '2.25rem' }"></i>
         <div class="item-label" *ngIf="isMobileView">{{ 'planModels' | translate }}</div>
       </div>
       <div class="item" (click)="toggleMenu('more')">
@@ -117,7 +117,7 @@
   [class.changing]="isChangingView">
   <ng-container *ngIf="isMobileView; else sliderOffice">
     <div class="top-bar">
-      <div class="title" [routerLink]="['/offices']">{{ (isAdminMenu ? 'offices' : 'officesAndPlans') | translate }}
+      <div class="title" (click)="closeAllMenus()" [routerLink]="['/offices']">{{ (isAdminMenu ? 'offices' : 'officesAndPlans') | translate }}
       </div>
     </div>
     <p-panelMenu [model]="itemsOffice"></p-panelMenu>
@@ -130,7 +130,7 @@
       <ng-template>
         <div class="slide-wrapper">
           <div class="top-bar">
-            <div class="title" [routerLink]="['/offices']">{{ (isAdminMenu ? 'offices' : 'officesAndPlans') | translate
+            <div class="title" (click)="closeAllMenus()" [routerLink]="['/offices']">{{ (isAdminMenu ? 'offices' : 'officesAndPlans') | translate
               }}</div>
             <div class="action" *ngIf="!isMobileView">
               <i [class]="isFixed ? 'app-icon pin-on' : 'app-icon pin-off'" [ngStyle]="{ fontSize: '1rem' }"
@@ -150,7 +150,7 @@
   [class.changing]="isChangingView">
   <ng-container *ngIf="isMobileView; else sliderPortfolio">
     <div class="top-bar">
-      <div class="title">{{ 'portfolios' | translate }}</div>
+      <div class="title" (click)="closeAllMenus()" [routerLink]="['/plan']" [queryParams]="{id: currentPlan?.id}">{{currentPlan?.name}}</div>
       <div class="action" *ngIf="!isMobileView">
         <i class="app-icon arrow-left" [ngStyle]="{ fontSize: '1rem' }" (click)="closeAllMenus()"></i>
       </div>
@@ -165,7 +165,7 @@
       <ng-template>
         <div class="slide-wrapper">
           <div class="top-bar">
-            <div class="title" [routerLink]="['/plan']" [queryParams]="{id: currentPlan?.id}">{{currentPlan?.name}}
+            <div class="title" (click)="closeAllMenus()" [routerLink]="['/plan']" [queryParams]="{id: currentPlan?.id}">{{currentPlan?.name}}
             </div>
             <div class="action" *ngIf="!isMobileView">
               <i [class]="isFixed ? 'app-icon pin-on' : 'app-icon pin-off'" [ngStyle]="{ fontSize: '1rem' }"
@@ -205,29 +205,35 @@
 <div class="app-menu-slide mobile" *ngIf="isMobileView" [class.open]="isMenuOpen('more')"
   [class.changing]="isChangingView">
   <div class="more-menu">
-    <div class="item">
+    <div class="item" (click)="closeAllMenus()" [routerLink]="['/organizations']" [queryParams]="{ idOffice: currentIDOffice }">
       <span class="icon-wrapper">
         <i class="app-icon building" [ngStyle]="{ fontSize: '1.8rem' }"></i>
       </span>
       <span class="menu-label">{{ 'organizations' | translate }}</span>
     </div>
-    <div class="item">
+    <div class="item" (click)="closeAllMenus()" [routerLink]="['/domains']" [queryParams]="{ idOffice: currentIDOffice }">
       <span class="icon-wrapper">
         <i class="app-icon map-marked" [ngStyle]="{ fontSize: '1.7rem' }"></i>
       </span>
       <span class="menu-label">{{ 'domains' | translate }}</span>
     </div>
-    <div class="item">
+    <div class="item" (click)="closeAllMenus()" [routerLink]="['/measure-units']" [queryParams]="{ idOffice: currentIDOffice }">
       <span class="icon-wrapper">
         <i class="app-icon unit-selection-alt" [ngStyle]="{ fontSize: '1rem' }"></i>
       </span>
       <span class="menu-label">{{ 'measureUnits' | translate }}</span>
     </div>
-    <div class="item">
+    <div class="item" (click)="closeAllMenus()" [routerLink]="['/offices/permission']" [queryParams]="{ idOffice: currentIDOffice }">
       <span class="icon-wrapper">
         <i class="app-icon permission2" [ngStyle]="{ fontSize: '1.5rem' }"></i>
       </span>
       <span class="menu-label">{{ 'officePermissions' | translate }}</span>
+    </div>
+    <div class="item" (click)="closeAllMenus()" [routerLink]="['/persons']" [queryParams]="{ idOffice: currentIDOffice }">
+      <span class="icon-wrapper">
+        <i class="app-icon users" [ngStyle]="{ fontSize: '1.5rem' }"></i>
+      </span>
+      <span class="menu-label">{{ 'persons' | translate }}</span>
     </div>
   </div>
   <div class="action-mobile">

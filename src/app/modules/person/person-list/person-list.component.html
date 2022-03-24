@@ -10,7 +10,7 @@
   <div class="card-container">
     <app-card [properties]="cardProperties" class="mt-0">
       <div class="card-person-container">
-        <form [formGroup]="formSearch" class="form-search">
+        <form [formGroup]="formSearch" class="form-search" [class.responsive]="!!responsive">
           <span class="p-float-label property-input p-field">
             <p-dropdown class="app-single-selection" [options]="allSelected" optionLabel="label" optionValue="label" (click)="treeViewScopeOverlay.toggle($event)" formControlName="scopeName"
               [class.responsive]="responsive"></p-dropdown>

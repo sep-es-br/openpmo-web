@@ -84,7 +84,7 @@ export class BreadcrumbComponent implements OnInit {
       });
     }
     else {
-      this.router.navigate(['/']);
+      this.router.navigate(['/offices']);
     }
   }
 
