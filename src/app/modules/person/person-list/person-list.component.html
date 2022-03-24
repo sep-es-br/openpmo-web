@@ -48,7 +48,7 @@
             </p-scrollPanel>
           </p-overlayPanel>
         </form>
-        <p-dataView [value]="cardItemsProperties" layout="grid" class="app-dataview" *ngIf="displayModeAll === 'grid'"
+        <p-dataView [value]="cardItemsProperties" layout="grid" class="app-dataview" *ngIf="displayModeAll === 'grid' || (displayModeAll === 'list' && !!responsive)"
           [paginator]="true" [rows]="pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false"
           [totalRecords]="totalRecords"
           [emptyMessage]="(!cardItemsProperties ? 'loadingEllipsis' : 'noContent') | translate">
@@ -60,7 +60,7 @@
         </p-dataView>
   
         <p-dataView [value]="cardItemsProperties" layout="list" class="app-dataview app-dataview-list"
-          *ngIf="displayModeAll === 'list'" [paginator]="true" [rows]="pageSize" [showJumpToPageDropdown]="true"
+          *ngIf="displayModeAll === 'list' && !responsive" [paginator]="true" [rows]="pageSize" [showJumpToPageDropdown]="true"
           [showPageLinks]="false" [totalRecords]="totalRecords"
           [emptyMessage]="(!cardItemsProperties ? 'loadingEllipsis' : 'noContent') | translate">
           <ng-template let-cardItem pTemplate="listItem">

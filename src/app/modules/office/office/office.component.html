@@ -35,7 +35,7 @@
       <app-card [properties]="cardPlans" *ngIf="cardItemsPlans && cardItemsPlans.length > 0"
         (editFilter)="handleEditFilter($event)" (newFilter)="handleNewFilter()"
         (selectedFilter)="handleSelectedFilter($event)">
-        <p-dataView [value]="cardItemsPlans" layout="grid" class="app-dataview" *ngIf="displayModeAll === 'grid'"
+        <p-dataView [value]="cardItemsPlans" layout="grid" class="app-dataview" *ngIf="displayModeAll === 'grid' || (displayModeAll === 'list' && !!responsive)"
           [paginator]="true" [rows]="pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false"
           [totalRecords]="totalRecords" [emptyMessage]="'loadingEllipsis' | translate">
           <ng-template let-cardItem pTemplate="gridItem">
@@ -46,7 +46,7 @@
         </p-dataView>
 
         <p-dataView [value]="cardItemsPlans" layout="list" class="app-dataview app-dataview-list"
-          *ngIf="displayModeAll === 'list'" [paginator]="true" [rows]="pageSize" [showJumpToPageDropdown]="true"
+          *ngIf="displayModeAll === 'list' && !responsive" [paginator]="true" [rows]="pageSize" [showJumpToPageDropdown]="true"
           [showPageLinks]="false" [totalRecords]="totalRecords" [emptyMessage]="'loadingEllipsis' | translate">
           <ng-template let-cardItem pTemplate="listItem">
             <div class="p-col-12">

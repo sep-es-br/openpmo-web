@@ -11,7 +11,7 @@
     <app-card [properties]="cardPlanPermissions" class="mt-0" (editFilter)="handleEditFilter($event)"
       (newFilter)="handleNewFilter()" (selectedFilter)="handleSelectedFilter($event)" (createNewElement)="handleCreateNewPlanPermission()">
       <p-dataView [value]="cardItemsPlanPermissions" layout="grid" class="app-dataview"
-        [emptyMessage]="'loadingEllipsis' | translate" *ngIf="displayModeAll === 'grid'" [paginator]="true"
+        [emptyMessage]="'loadingEllipsis' | translate" *ngIf="displayModeAll === 'grid' || (displayModeAll === 'list' && !!responsive)" [paginator]="true"
         [rows]="pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false" [totalRecords]="totalRecords">
         <ng-template let-cardItem pTemplate="gridItem">
           <div class="p-col-12 p-md-3 p-sm-12 card-item-container">
@@ -20,7 +20,7 @@
         </ng-template>
       </p-dataView>
       <p-dataView [value]="cardItemsPlanPermissions" layout="list" class="app-dataview app-dataview-list"
-        [emptyMessage]="'loadingEllipsis' | translate" *ngIf="displayModeAll === 'list'" [paginator]="true"
+        [emptyMessage]="'loadingEllipsis' | translate" *ngIf="displayModeAll === 'list' && !responsive" [paginator]="true"
         [rows]="pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false" [totalRecords]="totalRecords">
         <ng-template let-cardItem pTemplate="listItem">
           <div class="p-col-12">

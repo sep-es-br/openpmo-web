@@ -64,7 +64,7 @@
         (editFilter)="handleEditFilter($event, workpackModel.idWorkpackModel)" (newFilter)="handleNewFilter(workpackModel.idWorkpackModel)"
         (selectedFilter)="handleSelectedFilter($event, workpackModel.idWorkpackModel)" (createNewElement)="handleCreateNewWorkpack(workpackModel.idWorkpackModel)">
         <p-dataView [value]="workpackModel.workPackItemCardList" layout="grid" class="app-dataview"
-          *ngIf="displayModeAll === 'grid'" [paginator]="true" [rows]="pageSize" [showJumpToPageDropdown]="true"
+          *ngIf="displayModeAll === 'grid' || (displayModeAll === 'list' && !!responsive)" [paginator]="true" [rows]="pageSize" [showJumpToPageDropdown]="true"
           [showPageLinks]="false" [totalRecords]="totalRecords ? totalRecords[i] : 1"
           [emptyMessage]="'loadingEllipsis' | translate">
           <ng-template let-cardItem pTemplate="gridItem">
@@ -74,7 +74,7 @@
           </ng-template>
         </p-dataView>
         <p-dataView [value]="workpackModel.workPackItemCardList" layout="list" class="app-dataview app-dataview-list"
-          *ngIf="displayModeAll === 'list'" [paginator]="true" [rows]="pageSize" [showJumpToPageDropdown]="true"
+          *ngIf="displayModeAll === 'list' && !responsive" [paginator]="true" [rows]="pageSize" [showJumpToPageDropdown]="true"
           [showPageLinks]="false" [totalRecords]="totalRecords ? totalRecords[i] : 1"
           [emptyMessage]="'loadingEllipsis' | translate">
           <ng-template let-cardItem pTemplate="listItem">

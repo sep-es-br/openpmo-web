@@ -11,7 +11,7 @@
     <app-card [properties]="cardProperties" class="mt-0" *ngIf="cardProperties.showFilters"
       (editFilter)="handleEditFilter($event)" (newFilter)="handleNewFilter()"
       (selectedFilter)="handleSelectedFilter($event)" (createNewElement)="handleAddCardItem()">
-      <p-dataView [value]="cardItemsProperties" layout="grid" class="app-dataview"
+      <p-dataView [value]="cardItemsProperties" layout="grid" class="app-dataview" *ngIf="displayModeAll === 'grid' || (displayModeAll === 'list' && !!responsive)"
         [paginator]="true" [rows]="pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false"
         [totalRecords]="totalRecords"
         [emptyMessage]="((editPermission === undefined || editPermission) ? 'loadingEllipsis' : 'noContent') | translate">
@@ -24,7 +24,6 @@
                 <button type="button" pButton icon="pi pi-ellipsis-v" (click)="menu.toggle($event)"></button>
               </p-header>
               <div class="card-item-content">
-                <i [ngClass]="[ 'app-icon', cardItem.icon ]" [ngStyle]="{ fontSize: '1.5rem' }"></i>
                 <form [formGroup]="getFormById(cardItem.id || cardItem.newId)" class="p-fluid">
                   <span class="p-float-label p-field">
                     <input formControlName="name" type="text" pInputText class="app-input-text">
@@ -66,20 +65,15 @@
           </div>
         </ng-template>
       </p-dataView>
-      <!-- <p-dataView [value]="cardItemsProperties" layout="list" *ngIf="displayModeAll === 'list'"
+      <p-dataView [value]="cardItemsProperties" layout="list" *ngIf="displayModeAll === 'list' && !responsive"
         class="app-dataview app-dataview-list" [paginator]="true" [rows]="pageSize" [showJumpToPageDropdown]="true"
         [showPageLinks]="false" [totalRecords]="totalRecords"
         [emptyMessage]="((editPermission === undefined || editPermission) ? 'loadingEllipsis' : 'noContent') | translate">
         <ng-template let-cardItem pTemplate="listItem">
           <div class="p-col-12">
-            <p-card *ngIf="cardItem.typeCardItem === 'listItem'" class="app-card-item listItem">
-              <p-header *ngIf="cardItem.menuItems" class="card-item-header">
-                <p-menu #menu [popup]="true" [model]="cardItem.menuItems"></p-menu>
-                <button type="button" pButton icon="pi pi-ellipsis-v" (click)="menu.toggle($event)"></button>
-              </p-header>
+            <p-card *ngIf="cardItem.typeCardItem === 'listItem'" class="app-card-item listItem list-mode">
               <div class="card-item-content card-item-content-list">
-                <i [ngClass]="[ 'app-icon', cardItem.icon ]" [ngStyle]="{ fontSize: '1.5rem' }"></i>
-                <form [formGroup]="getFormById(cardItem.id || cardItem.newId)" class="p-fluid">
+                <form [formGroup]="getFormById(cardItem.id || cardItem.newId)" class="p-fluid form-list-mode">
                   <span class="p-float-label p-field">
                     <input formControlName="name" type="text" pInputText class="app-input-text">
                     <label for="float-input" class="app-input-label">{{'name' | translate}}<span
@@ -87,7 +81,7 @@
                   </span>
                   <app-input-message [form]="getFormById(cardItem.id || cardItem.newId)" field="name">
                   </app-input-message>
-                  <span class="p-float-label p-field margin-top">
+                  <span class="p-float-label p-field margin-top fullName">
                     <input formControlName="fullName" type="text" pInputText class="app-input-text">
                     <label for="float-input" class="app-input-label">{{'fullName' | translate}}<span
                         class="required-indicator">*</span></label>
@@ -104,13 +98,19 @@
                   </app-input-message>
                 </form>
               </div>
-              <div class="card-item-footer">
-                <span class="card-item-id">
-                  {{cardItem.itemId}}
-                </span>
+              <div class="header-footer-container">
+                <p-header *ngIf="cardItem.menuItems" class="card-item-header">
+                  <p-menu #menu [popup]="true" [model]="cardItem.menuItems"></p-menu>
+                  <button type="button" pButton icon="pi pi-ellipsis-v" (click)="menu.toggle($event)"></button>
+                </p-header>
+                <div class="card-item-footer">
+                  <span class="card-item-id">
+                    {{cardItem.itemId}}
+                  </span>
+                </div>
               </div>
             </p-card>
-            <p-card *ngIf="cardItem.typeCardItem === 'newCardItem'" class="new-card-item"
+            <p-card *ngIf="cardItem.typeCardItem === 'newCardItem'" class="new-card-item list-mode"
               [class.new-card-item-mobile]="responsive" (click)="handleAddCardItem()">
               <div class="card-item-content">
                 <i [ngClass]="[ 'app-icon', cardItem.icon, 'light-grey-icon' ]"
@@ -119,7 +119,7 @@
             </p-card>
           </div>
         </ng-template>
-      </p-dataView> -->
+      </p-dataView>
     </app-card>
     <app-save-button #saveButton (save)="handleOnSubmit()"></app-save-button>
   </div>

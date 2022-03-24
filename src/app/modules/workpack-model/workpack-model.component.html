@@ -170,7 +170,7 @@
     <app-card [properties]="cardPropertiesModels"
       *ngIf="cardPropertiesModels && (editPermission || !!cardItemsModels.length)">
       <p-dataView [value]="cardItemsModels" layout="grid" class="app-dataview"
-        [emptyMessage]="'loadingEllipsis' | translate" *ngIf="idWorkpackModel && displayModeAll === 'grid'"
+        [emptyMessage]="'loadingEllipsis' | translate" *ngIf="idWorkpackModel && displayModeAll === 'grid' || (displayModeAll === 'list' && !!responsive)"
         [paginator]="true" [rows]="pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false"
         [totalRecords]="totalRecords">
         <ng-template let-cardItem pTemplate="gridItem">
@@ -181,7 +181,7 @@
         </ng-template>
       </p-dataView>
       <p-dataView [value]="cardItemsModels" layout="list" class="app-dataview app-dataview-list"
-        *ngIf="idWorkpackModel && displayModeAll === 'list'" [paginator]="true" [rows]="pageSize"
+        *ngIf="idWorkpackModel && displayModeAll === 'list' && !responsive" [paginator]="true" [rows]="pageSize"
         [showJumpToPageDropdown]="true" [showPageLinks]="false" [totalRecords]="totalRecords"
         [emptyMessage]="'loadingEllipsis' | translate">
         <ng-template let-cardItem pTemplate="listItem">

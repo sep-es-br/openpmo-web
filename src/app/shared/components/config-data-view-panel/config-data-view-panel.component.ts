@@ -85,6 +85,7 @@ export class ConfigDataViewPanelComponent implements OnInit, OnDestroy {
   handleCollapseAll(collapseAll: boolean) {
     const mode = collapseAll ? 'collapse' : 'expand';
     this.collapsed = collapseAll;
+   
     if (!!this.cookiesPermission) {
       this.setCookiesCollapseExpandMode(collapseAll);
     }
@@ -93,6 +94,7 @@ export class ConfigDataViewPanelComponent implements OnInit, OnDestroy {
 
   handleChangeDisplayMode(displayMode: string) {
     this.displayMode = displayMode;
+    console.log('cookiesPermission', this.cookiesPermission)
     if (!!this.cookiesPermission) {
       this.setCookiesDisplayMode(displayMode);
     }

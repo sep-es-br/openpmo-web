@@ -34,7 +34,7 @@
     <div class="card-plans">
       <app-card [properties]="cardModels" *ngIf="cardItemsModels?.length > 0">
         <p-dataView [value]="cardItemsModels" class="app-dataview" layout="grid" styleClass="dataview-card-items"
-          *ngIf="displayModeAll === 'grid'" [paginator]="true" [rows]="pageSize" [showJumpToPageDropdown]="true"
+          *ngIf="displayModeAll === 'grid' || (displayModeAll === 'list' && !!responsive)" [paginator]="true" [rows]="pageSize" [showJumpToPageDropdown]="true"
           [showPageLinks]="false" [totalRecords]="totalRecords" [emptyMessage]="'loadingEllipsis' | translate">
           <ng-template let-cardItem pTemplate="gridItem">
             <div class="p-col-12 p-md-3 p-sm-12 card-item-container">
@@ -43,7 +43,7 @@
           </ng-template>
         </p-dataView>
         <p-dataView [value]="cardItemsModels" class="app-dataview app-dataview-list" layout="list"
-          styleClass="dataview-card-items" *ngIf="displayModeAll === 'list'" [paginator]="true" [rows]="pageSize"
+          styleClass="dataview-card-items" *ngIf="displayModeAll === 'list' && !responsive" [paginator]="true" [rows]="pageSize"
           [showJumpToPageDropdown]="true" [showPageLinks]="false" [totalRecords]="totalRecords"
           [emptyMessage]="'loadingEllipsis' | translate">
           <ng-template let-cardItem pTemplate="listItem">

@@ -70,7 +70,7 @@
     <div class="card-plans" *ngIf="cardLocalityRoot">
       <app-card [properties]="cardLocalityRoot" (editFilter)="handleEditFilter($event)" (newFilter)="handleNewFilter()"
         (selectedFilter)="handleSelectedFilter($event)" (createNewElement)="createNewLocality()">
-        <p-dataView [value]="cardItemsLocalities" layout="grid" class="app-dataview" *ngIf="displayModeAll === 'grid'"
+        <p-dataView [value]="cardItemsLocalities" layout="grid" class="app-dataview" *ngIf="displayModeAll === 'grid' || (displayModeAll === 'list' && !!responsive)"
           [paginator]="true" [rows]="pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false"
           [totalRecords]="totalRecords"
           [emptyMessage]="(!cardItemsLocalities ? 'loadingEllipsis' : 'noContentLocalityRoot') | translate">
@@ -82,7 +82,7 @@
         </p-dataView>
 
         <p-dataView [value]="cardItemsLocalities" layout="list" class="app-dataview app-dataview-list"
-          *ngIf="displayModeAll === 'list'" [paginator]="true" [rows]="pageSize" [showJumpToPageDropdown]="true"
+          *ngIf="displayModeAll === 'list' && !responsive" [paginator]="true" [rows]="pageSize" [showJumpToPageDropdown]="true"
           [showPageLinks]="false" [totalRecords]="totalRecords"
           [emptyMessage]="(!cardItemsLocalities ? 'loadingEllipsis' : 'noContentLocalityRoot') | translate">
           <ng-template let-cardItem pTemplate="listItem">

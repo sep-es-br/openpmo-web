@@ -11,7 +11,7 @@
     <div class="card-container">
       <app-card [properties]="cardBaseline" class="mt-0">
         <p-dataView [value]="cardBaseline.cardItems" layout="grid" class="app-dataview"
-          *ngIf="displayModeAll === 'grid'" [paginator]="true" [rows]="pageSize" [showJumpToPageDropdown]="true"
+          *ngIf="displayModeAll === 'grid' || (displayModeAll === 'list' && !!responsive)" [paginator]="true" [rows]="pageSize" [showJumpToPageDropdown]="true"
           [showPageLinks]="false" [totalRecords]="cardBaseline.totalRecords"
           [emptyMessage]="(!cardBaseline.cardItems ? 'loadingEllipsis' : 'noContent') | translate">
           <ng-template let-cardItem pTemplate="gridItem">
@@ -22,7 +22,7 @@
         </p-dataView>
 
         <p-dataView [value]="cardBaseline.cardItems" layout="list" class="app-dataview app-dataview-list"
-          *ngIf="displayModeAll === 'list'" [paginator]="true" [rows]="pageSize" [showJumpToPageDropdown]="true"
+          *ngIf="displayModeAll === 'list' && !responsive" [paginator]="true" [rows]="pageSize" [showJumpToPageDropdown]="true"
           [showPageLinks]="false" [totalRecords]="cardBaseline.totalRecords"
           [emptyMessage]="(!cardBaseline.cardItems ? 'loadingEllipsis' : 'noContent') | translate">
           <ng-template let-cardItem pTemplate="listItem">

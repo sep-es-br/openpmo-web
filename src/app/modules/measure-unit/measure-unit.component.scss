@@ -25,28 +25,29 @@
   .p-card-header {
     display: flex;
     justify-content: flex-end;
-    .card-item-header .menu p-menu {
-      .p-menu-overlay .p-menu-list .p-menuitem .p-menuitem-link {
-        .p-menuitem-icon {
-          font-size: 0.8rem;
-          color: #939393;
-          text-align: end;
-        }
-        .p-menuitem-text {
-          font-size: 0.9rem;
-          font-family: v.$fontFamilyMedium;
-          color: #939393;
-        }
+    
+  }
+  .menu p-menu {
+    .p-menu-overlay .p-menu-list .p-menuitem .p-menuitem-link {
+      .p-menuitem-icon {
+        font-size: 0.8rem;
+        color: #939393;
+        text-align: end;
       }
-    }
-    .card-item-header .p-button {
-      background-color: transparent;
-      border: none !important;
-      box-shadow: none !important;
-      .p-button-icon {
+      .p-menuitem-text {
         font-size: 0.9rem;
+        font-family: v.$fontFamilyMedium;
         color: #939393;
       }
+    }
+  }
+  .p-button {
+    background-color: transparent;
+    border: none !important;
+    box-shadow: none !important;
+    .p-button-icon {
+      font-size: 0.9rem;
+      color: #939393;
     }
   }
   .p-card-body {
@@ -83,10 +84,7 @@
       font-size: 3rem;
       color: rgba(147, 147, 147, 0.5);
     }
-  }
-  .card-item-content-list {
-    align-items: flex-start;
-    padding: 0 1em;
+    
   }
   .card-item-footer {
     display: flex;
@@ -99,6 +97,36 @@
     }
   }
 }
+
+::ng-deep .app-unit-measure .app-card-item.list-mode {
+  .p-card-content {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+  }
+  .card-item-content-list {
+    flex: 1;
+    padding: 0.5em;
+    align-items: flex-start;
+  }
+  .p-fluid.form-list-mode {
+    width: 60%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    .fullName {
+      width: 40%;
+    }
+  }
+  .header-footer-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: space-between;
+    width: 10%;
+  }
+} 
 
 ::ng-deep .app-unit-measure .app-card-item.mobile .p-card {
   .p-fluid {
@@ -180,6 +208,12 @@
       height: 100%;
       width: 100%;
     }
+  }
+}
+
+::ng-deep .app-unit-measure .new-card-item.list-mode {
+  .p-card {
+    height: 80px;
   }
 }
 

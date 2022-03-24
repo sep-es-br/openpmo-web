@@ -12,7 +12,7 @@
       (editFilter)="handleEditFilter($event)" (newFilter)="handleNewFilter()"
       (selectedFilter)="handleSelectedFilter($event)" (createNewElement)="handleCreateNewOrganization()">
       <p-dataView [value]="cardItemsProperties" layout="grid" [rows]="1" class="app-dataview"
-        *ngIf="displayModeAll === 'grid'" [paginator]="true" [rows]="pageSize" [showJumpToPageDropdown]="true"
+        *ngIf="displayModeAll === 'grid' || (displayModeAll === 'list' && !!responsive)" [paginator]="true" [rows]="pageSize" [showJumpToPageDropdown]="true"
         [showPageLinks]="false" [totalRecords]="totalRecords"
         [emptyMessage]="((editPermission === undefined || editPermission) ? 'loadingEllipsis' : 'noContent') | translate">
         <ng-template let-cardItem pTemplate="gridItem">
@@ -22,7 +22,7 @@
         </ng-template>
       </p-dataView>
       <p-dataView [value]="cardItemsProperties" layout="list" [rows]="1" class="app-dataview app-dataview-list"
-        *ngIf="displayModeAll === 'list'" [paginator]="true" [rows]="pageSize" [showJumpToPageDropdown]="true"
+        *ngIf="displayModeAll === 'list' && !responsive" [paginator]="true" [rows]="pageSize" [showJumpToPageDropdown]="true"
         [showPageLinks]="false" [totalRecords]="totalRecords"
         [emptyMessage]="((editPermission === undefined || editPermission) ? 'loadingEllipsis' : 'noContent') | translate">
         <ng-template let-cardItem pTemplate="listItem">

@@ -4,8 +4,8 @@
   <div class="display-config-header">
     <i class="fas fa-angle-double-down" *ngIf="!notShowCollapseOptions" [pTooltip]="'expandAll'|translate" tooltipPosition="top" [class.selected]="!collapsed" (click)="handleCollapseAll(false)"></i>
     <i class="fas fa-angle-double-up"  *ngIf="!notShowCollapseOptions" [class.selected]="collapsed" [pTooltip]="'collapseAll'|translate" tooltipPosition="top" (click)="handleCollapseAll(true)"></i>
-    <i class="fas fa-bars" [class.selected]="displayMode === 'list'" [pTooltip]="'list'|translate" tooltipPosition="top" (click)="handleChangeDisplayMode('list')"></i>
-    <i class="app-icon grid" [class.selected]="displayMode === 'grid'" [pTooltip]="'card'|translate" tooltipPosition="top" (click)="handleChangeDisplayMode('grid')"></i>
+    <i class="fas fa-bars" [class.selected]="displayMode === 'list'"  *ngIf="!responsive" [pTooltip]="'list'|translate" tooltipPosition="top" (click)="handleChangeDisplayMode('list')"></i>
+    <i class="app-icon grid" [class.selected]="displayMode === 'grid'"  *ngIf="!responsive" [pTooltip]="'card'|translate" tooltipPosition="top" (click)="handleChangeDisplayMode('grid')"></i>
     <div class="page-size" [pTooltip]="'perPage'|translate" tooltipPosition="top">
       <p-dropdown [options]="pageSizeOptions" [(ngModel)]="selectedPageSize" (onChange)="handleChangePageSize()"></p-dropdown>
     </div>

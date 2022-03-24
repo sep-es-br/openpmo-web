@@ -10,7 +10,7 @@
   <div class="card-container" *ngIf="cardProperties">
     <app-card [properties]="cardProperties" class="mt-0" (editFilter)="handleEditFilter($event)"
       (newFilter)="handleNewFilter()" (selectedFilter)="handleSelectedFilter($event)" (createNewElement)="handleCreateNewEstrategy()">
-      <p-dataView [value]="cardItemsProperties" layout="grid" class="app-dataview" *ngIf="displayModeAll === 'grid'"
+      <p-dataView [value]="cardItemsProperties" layout="grid" class="app-dataview" *ngIf="displayModeAll === 'grid' || (displayModeAll === 'list' && !!responsive)"
         [paginator]="true" [rows]="pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false"
         [totalRecords]="totalRecords"
         [emptyMessage]="(editPermission !== false ? 'loadingEllipsis' : 'noContent') | translate">
@@ -21,7 +21,7 @@
         </ng-template>
       </p-dataView>
       <p-dataView [value]="cardItemsProperties" layout="list" class="app-dataview app-dataview-list"
-        *ngIf="displayModeAll === 'list'" [paginator]="true" [rows]="pageSize" [showJumpToPageDropdown]="true"
+        *ngIf="displayModeAll === 'list' && !responsive" [paginator]="true" [rows]="pageSize" [showJumpToPageDropdown]="true"
         [showPageLinks]="false" [totalRecords]="totalRecords"
         [emptyMessage]="(editPermission !== false ? 'loadingEllipsis' : 'noContent') | translate">
         <ng-template let-cardItem pTemplate="listItem">
