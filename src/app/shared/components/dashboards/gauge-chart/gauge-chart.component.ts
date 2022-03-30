@@ -1,6 +1,9 @@
+import { takeUntil } from 'rxjs/operators';
+import { TranslateService } from '@ngx-translate/core';
 import { Component, Input, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 import { Chart, ChartData, ChartOptions, ChartPluginsOptions, ChartPoint } from 'chart.js';
 import { IGaugeChartData } from 'src/app/shared/interfaces/IGaugeChartData';
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'app-gauge-chart',
@@ -10,7 +13,7 @@ import { IGaugeChartData } from 'src/app/shared/interfaces/IGaugeChartData';
 export class GaugeChartComponent implements OnInit {
   
   @Input() config: IGaugeChartData;
-
+  $destroy = new Subject();
   progressBarRight: boolean = true;
   valueChart: number;
   valueChartLeft: number;
@@ -36,10 +39,25 @@ export class GaugeChartComponent implements OnInit {
     aspectRatio: 1,
   }
 
-  constructor() {
+  constructor(
+    private translateSrv: TranslateService
+  ) {
+    this.translateSrv.onLangChange.pipe(takeUntil(this.$destroy)).subscribe(() => {
+      setTimeout(() => {
+        this.setConfigValuesChart();
+        this.setPluginsChart();
+        this.setDataChart();
+      }, 200);
+    });
   }
 
   ngOnInit(): void {
+    console.log('config', this.config);
+  }
+
+  ngOnDestroy() {
+    this.$destroy.next();
+    this.$destroy.complete();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -106,7 +124,7 @@ export class GaugeChartComponent implements OnInit {
     const xFillText = chart.width / 2;
     const yFillText = (chart.height / 2) + 35;
     const label = this.config.value !== null ? (this.config.value === 0 ? '0' : this.config.value.toFixed(2)) : null;
-    const labelBottom = this.config.labelBottom;
+    const labelBottom = this.translateSrv.instant(this.config.labelBottom);
 
     ctx.fillStyle = this.valueChart !== null ? (this.valueChart > 0 ? '#0081c1' : '#fa4c4f') : '#646464';
     ctx.textAlign = 'center';

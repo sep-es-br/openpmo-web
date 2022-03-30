@@ -9,6 +9,7 @@
       padding-right: 0.7rem;
       display: flex;
       justify-content: flex-end;
+      align-items: center;
       &.direction-left {
         justify-content: flex-start;
       }
@@ -32,7 +33,7 @@
         }
       }
       .progress {
-        margin-top: 0.5rem;
+        // margin-top: 0.5rem;
         border: none;
         width: 50%;
         &::-webkit-progress-bar {
