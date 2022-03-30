@@ -107,7 +107,7 @@
       <i class="app-icon permission" [ngStyle]="{ fontSize: '1.5rem' }" *ngIf="editPermissionOnOffice"></i>
     </div>
     <div class="item" [routerLink]="['/persons']" [queryParams]="{ idOffice: currentIDOffice }"
-      [pTooltip]="'persons' | translate">
+      [pTooltip]="'people' | translate">
       <i class="app-icon users" [ngStyle]="{ fontSize: '1.5rem' }"></i>
     </div>
   </ng-template>
@@ -233,7 +233,7 @@
       <span class="icon-wrapper">
         <i class="app-icon users" [ngStyle]="{ fontSize: '1.5rem' }"></i>
       </span>
-      <span class="menu-label">{{ 'persons' | translate }}</span>
+      <span class="menu-label">{{ 'people' | translate }}</span>
     </div>
   </div>
   <div class="action-mobile">

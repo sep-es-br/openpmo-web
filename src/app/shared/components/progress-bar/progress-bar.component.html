@@ -15,13 +15,13 @@
         <span class="value" [ngStyle]="{color: color}" *ngIf="valueUnit"
           [pTooltip]="(valueUnit === 'currency' ? '$ ' : '') + ( language === 'pt' ?
             (valueUnit === 'currency' ? (progress |number:'0.2-2':'pt') : (progress |number:'0.0-0':'pt')) 
-            : (valueUnit === 'currency' ? (progress |number:'0.2-2':'en') : (progress |number:'0.0-0':'en'))) + ' ' + (valueUnit === 'currency' ? '' : (valueUnit === 'time' ? ('day'|translate ) : valueUnit))">
+            : (valueUnit === 'currency' ? (progress |number:'0.2-2':'en') : (progress |number:'0.0-0':'en'))) + ' ' + (valueUnit === 'currency' ? '' : (valueUnit === 'time' ? ('days'|translate ) : valueUnit))">
           {{ valueUnit !== 'time' ? (progress|shortNumber:language) : progress + 'd'}}
         </span>
         <span class="value" [ngStyle]="{color: '#004660'}" *ngIf="valueUnit"
           [pTooltip]="(valueUnit === 'currency' ? '$ ' : '') + ( language === 'pt' ?
           (valueUnit === 'currency' ? (total |number:'0.2-2':'pt') : (total |number:'0.0-0':'pt')) 
-          : (valueUnit === 'currency' ? (total |number:'0.2-2':'en') : (total |number:'0.0-0':'en'))) + ' ' + (valueUnit === 'currency' ? '' : (valueUnit === 'time' ? ('day'|translate ) : valueUnit))">
+          : (valueUnit === 'currency' ? (total |number:'0.2-2':'en') : (total |number:'0.0-0':'en'))) + ' ' + (valueUnit === 'currency' ? '' : (valueUnit === 'time' ? ('days'|translate ) : valueUnit))">
           {{ valueUnit !== 'time' ? (total|shortNumber:language) : total + 'd'}}
         </span>
         <!-- <span class="value" [ngStyle]="{color: '#004660'}" *ngIf="valueUnit" [pTooltip]="total|number">{{total|shortNumber:language}}</span> -->

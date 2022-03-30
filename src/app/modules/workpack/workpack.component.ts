@@ -1921,6 +1921,7 @@ export class WorkpackComponent implements OnDestroy {
         subtitleCardItem: proc.processNumber,
         organizationName: proc.currentOrganization,
         itemId: proc.id,
+        priority: proc.priority,
         menuItems: [{
           label: this.translateSrv.instant('delete'),
           icon: 'fas fa-trash-alt',
@@ -1941,6 +1942,7 @@ export class WorkpackComponent implements OnDestroy {
         subtitleCardItem: null,
         organizationName: null,
         itemId: null,
+        priority: false,
         menuItems: null,
         urlCard: '/workpack/processes',
         paramsUrlCard: [

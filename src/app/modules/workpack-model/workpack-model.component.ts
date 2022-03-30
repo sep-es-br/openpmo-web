@@ -75,8 +75,10 @@ export class WorkpackModelComponent implements OnInit {
   cardPropertiesRiskAndIssues: ICard;
   cardPropertiesProcesses: ICard;
   cardPropertiesDashboard: ICard;
-  posibleRolesPerson: string[] = ['Manager', 'Team Member', 'Sponsor', 'Partner'];
-  posibleRolesOrg: string[] = ['Funder', 'Client', 'Competitor'];
+  rolesPersonOptions = ['manager', 'teamMember', 'sponsor', 'partner'];
+  rolesOrgOptions =  ['funder', 'client', 'competitor'];
+  posibleRolesPerson: string[];
+  posibleRolesOrg: string[];
   formProperties: FormGroup;
   icons: IIcon[];
   modelProperties: IWorkpackModelProperty[] = [];
@@ -107,8 +109,8 @@ export class WorkpackModelComponent implements OnInit {
     dashboardShowEva: false,
     dashboardShowMilestones: false,
     dashboardShowRisks: false,
-    dashboardShowStakeholders: ['Manager', 'Team Member', 'Sponsor', 'Partner', 'Funder', 'Client', 'Competitor'],
-    dashboardStakeholderRolesOptions: ['Manager', 'Team Member', 'Sponsor', 'Partner', 'Funder', 'Client', 'Competitor'].map(item => ({ label: item, value: item })),
+    dashboardShowStakeholders: ['manager', 'teamMember', 'sponsor', 'partner', 'funder', 'client', 'competitor'].map( item => this.translateSrv.instant(item)),
+    dashboardStakeholderRolesOptions: ['manager', 'teamMember', 'sponsor', 'partner', 'funder', 'client', 'competitor'].map(item => ({ label: this.translateSrv.instant(item), value: this.translateSrv.instant(item) })),
   };
   currentBreadcrumbItems: IBreadcrumb[];
   currentBreadcrumbSub: Subscription;
@@ -141,6 +143,8 @@ export class WorkpackModelComponent implements OnInit {
       this.idWorkpackModel = +id;
       this.idParentWorkpack = +idParent;
       this.workpackModelType = type;
+      this.posibleRolesOrg = this.rolesOrgOptions.map( role => this.translateSrv.instant(role));
+      this.posibleRolesPerson = this.rolesPersonOptions.map(role => this.translateSrv.instant(role));
       this.resetValues();
       this.setFormProperties();
       this.scrollTop();
@@ -251,8 +255,8 @@ export class WorkpackModelComponent implements OnInit {
         { label: this.translateSrv.instant('name'), value: 'name' }
       ];
     }
-    this.posibleRolesPerson = ['Manager', 'Team Member', 'Sponsor', 'Partner'];
-    this.posibleRolesOrg = ['Funder', 'Client', 'Competitor'];
+    this.posibleRolesPerson = this.rolesPersonOptions.map( role => this.translateSrv.instant(role));
+    this.posibleRolesOrg = this.rolesOrgOptions.map( role => this.translateSrv.instant(role));
     this.modelProperties = [];
     this.modelCostProperties = [];
     this.childrenModels = [];
@@ -411,8 +415,8 @@ export class WorkpackModelComponent implements OnInit {
       case TypeWorkpackModelEnum.ProgramModel:
         defaultProperties.push({
           active: true,
-          label: 'Status',
-          name: 'Status',
+          label: this.translateSrv.instant('status'),
+          name: this.translateSrv.instant('status'),
           type: TypePropertyEnum.SelectionModel,
           multipleSelection: false,
           possibleValues: Object.values(this.translateSrv.instant(['finished', 'structuring', 'execution', 'suspended'])),
@@ -465,8 +469,8 @@ export class WorkpackModelComponent implements OnInit {
           },
           {
             active: true,
-            label: 'Status',
-            name: 'Status',
+            label: this.translateSrv.instant('status'),
+            name: this.translateSrv.instant('status'),
             type: TypePropertyEnum.SelectionModel,
             multipleSelection: false,
             possibleValues: Object.values(this.translateSrv.instant(['preparatoryActions', 'projectElaboration', 'projectElaborated',
@@ -511,8 +515,8 @@ export class WorkpackModelComponent implements OnInit {
         defaultProperties.push(
           {
             active: true,
-            label: 'Status',
-            name: 'Status',
+            label: this.translateSrv.instant('status'),
+            name: this.translateSrv.instant('status'),
             type: TypePropertyEnum.SelectionModel,
             multipleSelection: false,
             possibleValues: Object.values(this.translateSrv.instant(['finished', 'structuring', 'execution', 'suspended'])),
@@ -774,7 +778,7 @@ export class WorkpackModelComponent implements OnInit {
         dashboardShowStakeholders: data.dashboardShowStakeholders,
         dashboardStakeholderRolesOptions: ((data.organizationRoles && data.organizationRoles.length > 0) || (data.personRoles && data.personRoles.length > 0)) ?
           data.organizationRoles.concat(data.personRoles).map(item => ({ label: item, value: item })) :
-          ['Manager', 'Team Member', 'Sponsor', 'Partner', 'Funder', 'Client', 'Competitor'].map(item => ({ label: item, value: item })),
+          ['manager', 'teamMember', 'sponsor', 'partner', 'funder', 'client', 'competitor'].map(item => ({ label: this.translateSrv.instant(item), value: this.translateSrv.instant(item) })),
       }
       this.cardPropertiesRiskAndIssues.initialStateToggle = data.riskAndIssueManagementSessionActive;
       this.cardPropertiesProcesses.initialStateToggle = data.processesManagementSessionActive;
@@ -956,7 +960,7 @@ export class WorkpackModelComponent implements OnInit {
     if (this.dashboardPanel) {
       this.dashboardPanel.dashboardStakeholderRolesOptions = ((this.posibleRolesPerson && this.posibleRolesPerson.length > 0) || (this.posibleRolesOrg && this.posibleRolesOrg.length > 0)) ?
         this.posibleRolesPerson.concat(this.posibleRolesOrg).map(item => ({ label: item, value: item })) :
-        ['Manager', 'Team Member', 'Sponsor', 'Partner', 'Funder', 'Client', 'Competitor'].map(item => ({ label: item, value: item }));
+        ['manager', 'teamMember', 'sponsor', 'partner', 'funder', 'client', 'competitor'].map(item => ({ label: this.translateSrv.instant(item), value: this.translateSrv.instant(item) }));
       this.dashboardPanel.dashboardShowStakeholders = this.dashboardPanel.dashboardShowStakeholders
         .filter(option => this.dashboardPanel.dashboardStakeholderRolesOptions.find(role => role.value === option));
     }
@@ -1226,8 +1230,8 @@ export class WorkpackModelComponent implements OnInit {
     });
     this.cardPropertiesStakeholders.onToggle.pipe(takeUntil(this.$destroy)).subscribe(() => {
       if (!!this.cardPropertiesStakeholders.initialStateToggle) {
-        this.posibleRolesPerson = ['Manager', 'Team Member', 'Sponsor', 'Partner'];
-        this.posibleRolesOrg = ['Funder', 'Client', 'Competitor'];
+        this.posibleRolesPerson = this.rolesPersonOptions.map( role => this.translateSrv.instant(role));
+        this.posibleRolesOrg = this.rolesOrgOptions.map( role => this.translateSrv.instant(role));
         this.cardPropertiesStakeholders = Object.assign({}, {
           ...this.cardPropertiesStakeholders,
           initialStateCollapse: true
@@ -1251,8 +1255,8 @@ export class WorkpackModelComponent implements OnInit {
             dashboardShowEva: false,
             dashboardShowMilestones: false,
             dashboardShowRisks: false,
-            dashboardShowStakeholders: ['Manager', 'Team Member', 'Sponsor', 'Partner', 'Funder', 'Client', 'Competitor'],
-            dashboardStakeholderRolesOptions: ['Manager', 'Team Member', 'Sponsor', 'Partner', 'Funder', 'Client', 'Competitor'].map(item => ({ label: item, value: item })),
+            dashboardShowStakeholders: ['manager', 'teamMember', 'sponsor', 'partner', 'funder', 'client', 'competitor'].map( item => this.translateSrv.instant(item)),
+            dashboardStakeholderRolesOptions: ['manager', 'teamMember', 'sponsor', 'partner', 'funder', 'client', 'competitor'].map(item => ({ label: this.translateSrv.instant(item), value: this.translateSrv.instant(item) })),
           }
         }
       } else {
@@ -1261,7 +1265,7 @@ export class WorkpackModelComponent implements OnInit {
           dashboardShowMilestones: false,
           dashboardShowRisks: false,
           dashboardShowStakeholders: [],
-          dashboardStakeholderRolesOptions: ['Manager', 'Team Member', 'Sponsor', 'Partner', 'Funder', 'Client', 'Competitor'].map(item => ({ label: item, value: item })),
+          dashboardStakeholderRolesOptions: ['manager', 'teamMember', 'sponsor', 'partner', 'funder', 'client', 'competitor'].map(item => ({ label: this.translateSrv.instant(item), value: this.translateSrv.instant(item) })),
         }
       }
       this.checkProperties();

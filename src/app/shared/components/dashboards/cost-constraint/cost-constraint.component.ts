@@ -48,18 +48,20 @@ export class CostConstraintComponent implements OnInit {
 
   loadMaxCostValue() {
     const values = [];
-    if (this.cost.plannedValue) {
-      values.push(this.cost.plannedValue);
+    if (this.cost) {
+      if (this.cost.plannedValue) {
+        values.push(this.cost.plannedValue);
+      }
+      if (this.cost.foreseenValue) {
+        values.push(this.cost.foreseenValue);
+      }
+      if (this.cost.actualValue) {
+        values.push(this.cost.actualValue);
+      }
+      this.maxCostValue = values.length > 0 ? values.reduce((a, b) => {
+        return Math.max(a, b);
+      }) : 0;
     }
-    if (this.cost.foreseenValue) {
-      values.push(this.cost.foreseenValue);
-    }
-    if (this.cost.actualValue) {
-      values.push(this.cost.actualValue);
-    }
-    this.maxCostValue = values.reduce((a, b) => {
-      return Math.max(a, b);
-    });
   }
 
 }

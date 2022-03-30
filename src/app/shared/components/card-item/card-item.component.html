@@ -74,7 +74,7 @@
     [class.cardList]="displayModeCard === 'list'">
     <div class="display-mode-grid" *ngIf="displayModeCard !== 'list'">
       <p-header *ngIf="properties.menuItems" class="card-item-header">
-        <i [ngClass]="[ 'app-icon', 'process-selo']" [ngStyle]="{ fontSize: '2rem' }"></i>
+        <i [ngClass]="[ 'app-icon', 'process-selo']" [ngStyle]="{ fontSize: '2rem' }" *ngIf="!!properties.priority"></i>
         <p-menu #menu [popup]="true" [model]="properties.menuItems"></p-menu>
         <button type="button" pButton icon="pi pi-ellipsis-v" [class.hidden]="!properties.menuItems.length"
           (click)="menu.toggle($event)"></button>

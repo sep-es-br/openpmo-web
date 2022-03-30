@@ -61,7 +61,7 @@ export class ProcessComponent implements OnInit {
       subject: ['', Validators.required],
       currentOrganization: ['', Validators.required],
       lengthOfStayOn: ['', Validators.required],
-      note: ['', Validators.required],
+      note: [''],
       priority: false,
       status: ''
     });
@@ -117,11 +117,14 @@ export class ProcessComponent implements OnInit {
   }
 
   setFormProcess() {
+    const days = this.process.lengthOfStayOn === 1 ? this.process.lengthOfStayOn.toString() +' '+ this.translateSrv.instant('day') :
+      this.process.lengthOfStayOn.toString() +' '+ this.translateSrv.instant('days');
+    console.log('days', days)
     this.formProcess.controls.name.setValue(this.process.name);
     this.formProcess.controls.processNumber.setValue(this.process.processNumber);
     this.formProcess.controls.subject.setValue(this.process.subject);
     this.formProcess.controls.currentOrganization.setValue(this.process.currentOrganization);
-    this.formProcess.controls.lengthOfStayOn.setValue(this.process.lengthOfStayOn);
+    this.formProcess.controls.lengthOfStayOn.setValue(days);
     this.formProcess.controls.note.setValue(this.process.note);
     this.formProcess.controls.priority.setValue(this.process.priority);
     this.formProcess.controls.subject.disable();
@@ -247,7 +250,7 @@ export class ProcessComponent implements OnInit {
       processNumber: this.formProcess.controls.processNumber.value,
       subject: this.formProcess.controls.subject.value,
       currentOrganization: this.formProcess.controls.currentOrganization.value,
-      lengthOfStayOn: this.formProcess.controls.lengthOfStayOn.value,
+      lengthOfStayOn: this.process.lengthOfStayOn,
       note: this.formProcess.controls.note.value,
       priority: this.formProcess.controls.priority.value,
       status: this.formProcess.controls.status.value
