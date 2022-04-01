@@ -7,6 +7,7 @@ import { Calendar } from 'primeng/calendar';
 
 import { PropertyTemplateModel } from 'src/app/shared/models/PropertyTemplateModel';
 import { ResponsiveService } from 'src/app/shared/services/responsive.service';
+import * as moment from 'moment';
 
 @Component({
   selector: 'app-property-date',
@@ -25,6 +26,7 @@ export class PropertyDateComponent implements OnInit, OnDestroy {
   responsive: boolean;
   $destroy = new Subject();
   calendarFormat: string;
+  yearRange: string;
 
   constructor(
     private responsiveSrv: ResponsiveService,
@@ -48,6 +50,9 @@ export class PropertyDateComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.calendarFormat = this.translateSrv.instant('dateFormat');
+    const today = moment();
+    const yearStart = today.year();
+    this.yearRange = (yearStart-1).toString() + ':'+ (yearStart+15).toString();
     this.loadDates();
   }
 

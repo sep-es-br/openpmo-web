@@ -2,7 +2,7 @@
   <span class="p-float-label">
     <p-calendar [id]="property.name" [(ngModel)]="value" class="app-select-date" showIcon="true"
       icon="fas fa-calendar-alt" [dateFormat]="calendarFormat" [defaultDate]="defaultValue" [monthNavigator]="true"
-      [yearNavigator]="true" yearRange="2020:2030" [minDate]="dateMin"
+      [yearNavigator]="true" [yearRange]="yearRange" [minDate]="dateMin"
       [maxDate]="dateMax" (ngModelChange)="handleChangedValue()">
     </p-calendar>
     <label class="app-input-label" for="float-name">{{ "value" | translate }} * </label>

@@ -1,3 +1,4 @@
+import { takeUntil } from 'rxjs/operators';
 import { OfficePermissionService } from './../../shared/services/office-permission.service';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -11,6 +12,7 @@ import { AuthService } from 'src/app/shared/services/auth.service';
 import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
 import { OfficeService } from 'src/app/shared/services/office.service';
 import { ResponsiveService } from 'src/app/shared/services/responsive.service';
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'app-admin-office-config',
@@ -31,6 +33,7 @@ export class AdminOfficeConfigComponent implements OnInit {
   propertiesOffice: IOffice;
   displayModeAll = 'grid';
   responsive: boolean;
+  $destroy = new Subject();
 
   constructor(
     private translateSvr: TranslateService,
@@ -50,6 +53,12 @@ export class AdminOfficeConfigComponent implements OnInit {
       await this.resetConfigProperties();
     });
     this.responsiveSrv.observable.subscribe(value => this.responsive = value);
+    this.translateSrv.onLangChange.pipe(takeUntil(this.$destroy)).subscribe(() =>
+      setTimeout( () =>
+      {
+        this.loadCardItemsProperties();
+      }, 150)
+    );
   }
 
   async ngOnInit(): Promise<void> {

@@ -7,4 +7,5 @@ export enum TypeJournalEnum {
   ISSUE_RESPONSE = 'issueResponse',
   RISK = 'risk',
   RISK_RESPONSE = 'riskResponse',
+  ALL = 'all'
 }

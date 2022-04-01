@@ -1,5 +1,6 @@
 {
   "attention": "Attention",
+  "selectedItems": "selected items",
   "dashboard": "Dashboard",
   "concludedLate": "Concluded Late",
   "concluded": "Concluded",
@@ -403,8 +404,14 @@
       "workpackModel": {
         "not": {
           "found": "Workpack Model not found"
+        },
+        "delete": {
+          "relationship": {
+            "error": "Exclusion is not possible as it has related workpacks."
+          }
         }
       },
+      
       "planModel": {
         "delete": {
           "relationship": {

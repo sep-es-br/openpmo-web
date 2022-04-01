@@ -63,6 +63,7 @@ export class PlanComponent implements OnInit, OnDestroy {
   totalRecords: number[] = [];
   idFilterSelected: number;
   isUserAdmin: boolean;
+  yearRange: string;
 
   constructor(
     private actRouter: ActivatedRoute,
@@ -126,6 +127,9 @@ export class PlanComponent implements OnInit, OnDestroy {
       this.setWorkPlanUser();
     }
     this.isUserAdmin = await this.authSrv.isUserAdmin();
+    const today = moment();
+    const yearStart = today.year();
+    this.yearRange = (yearStart-1).toString() + ':'+ (yearStart+15).toString();
     this.calendarFormat = this.translateSrv.instant('dateFormat');
   }
 

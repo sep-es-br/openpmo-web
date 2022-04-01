@@ -4,13 +4,30 @@
     & > * {
       margin-right: 1.6rem;
     }
+    .property-input {
+      width: 240px;
+    }
     .p-calendar {
+      width: 100%;
       background-color: #fff;
       padding-left: 1rem;
       .p-inputtext.p-component,
       .p-datepicker-trigger {
         border: none;
       }
+    }
+    .p-multiselect {
+      width: 100%;
+      background-color: #fff;
+      border: none;
+    }
+    .p-multiselect:enabled:hover {
+      border: none;
+      box-shadow: none;
+    }
+    .p-multiselect:not(.p-disabled):hover {
+      border: none;
+      box-shadow: none;
     }
     .p-float-label {
       margin-top: 0px;
@@ -27,7 +44,21 @@
         top: -8px !important;
       }
     }
+    .scope {
+      white-space: nowrap;
+      word-break: break-word;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
     .p-dropdown.p-component {
+      width: 100%;
+      background-color: #fff;
+      border: none !important;
+      padding-right: 5px;
+      padding-left: 5px;
+    }
+    .p-inputtext {
+      width: 100%;
       background-color: #fff;
       border: none !important;
       padding-right: 1rem;
@@ -37,8 +68,8 @@
   .journal-content {
     margin-top: 2rem;
     margin-bottom: 2rem;
-    max-height: 600px;
-    overflow-y: scroll;
+    // max-height: 600px;
+    // overflow-y: scroll;
     .custom-marker {
       font-size: 2rem;
       &.icon {
@@ -81,9 +112,11 @@
           text-align: justify;
         }
         .evidences {
+          display: flex;
+          flex-direction: column;
           margin-top: 1rem;
           figure {
-            margin-left: 0;
+            margin: 0;
             display: flex;
             flex-wrap: wrap;
             .evidence {

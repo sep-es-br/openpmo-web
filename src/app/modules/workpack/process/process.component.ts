@@ -119,7 +119,6 @@ export class ProcessComponent implements OnInit {
   setFormProcess() {
     const days = this.process.lengthOfStayOn === 1 ? this.process.lengthOfStayOn.toString() +' '+ this.translateSrv.instant('day') :
       this.process.lengthOfStayOn.toString() +' '+ this.translateSrv.instant('days');
-    console.log('days', days)
     this.formProcess.controls.name.setValue(this.process.name);
     this.formProcess.controls.processNumber.setValue(this.process.processNumber);
     this.formProcess.controls.subject.setValue(this.process.subject);

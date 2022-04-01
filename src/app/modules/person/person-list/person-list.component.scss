@@ -26,6 +26,13 @@
       .p-overlaypanel .p-overlaypanel-close {
         background-color: #44B39B;
       }
+      .scope {
+        cursor: pointer;
+        white-space: nowrap;
+        word-break: break-word;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
       .property-input {
         background-color: #fff;
         width: 70%;
@@ -63,8 +70,10 @@
       display: flex;
       flex-direction: column;
       width: 100%;
-      .property-input:not(:first-child) {
+      .property-input {
         width: 100%;
+      }
+      .property-input:not(:first-child) {
         // padding-bottom: 1em;
         margin-top: 2em
       }

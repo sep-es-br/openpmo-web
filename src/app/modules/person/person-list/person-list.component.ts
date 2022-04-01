@@ -18,6 +18,7 @@ import { OptionsAccessEnum, OptionsStakeholderEnum } from 'src/app/shared/enums/
 import { TranslateService } from '@ngx-translate/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
+import { not } from '@angular/compiler/src/output/output_ast';
 
 @Component({
   selector: 'app-person-list',
@@ -167,8 +168,8 @@ export class PersonListComponent implements OnInit, OnDestroy {
       }) as TreeNode);
       this.treeViewScope = [{ ...node }];
       this.allSelected = this.setSelectedNodes(this.treeViewScope);
-      this.formSearch.controls.scopeName.setValue(this.allSelected[0].label);
       this.getSelectedsNode();
+      
     }
   }
 
@@ -271,16 +272,17 @@ export class PersonListComponent implements OnInit, OnDestroy {
   }
 
   getSelectedsNode() {
-    
     this.selectedOffices = this.allSelected.filter(node => node.type === 'office');
     this.selectedPlans = this.allSelected.filter(node => node.type === 'plan');
-    this.selectedWorkpacks = this.allSelected.filter(node => node.type === 'workpack');
+    this.selectedWorkpacks = this.allSelected.filter(node => !node.type || node.type === 'workpack');
     if (this.selectedOffices && this.selectedOffices.length > 0) {
       this.formSearch.controls.scopeName.setValue(this.selectedOffices[0].label);
     } else if (this.selectedPlans && this.selectedPlans.length > 0) {
       this.formSearch.controls.scopeName.setValue(this.selectedPlans[0].label);
     } else if (this.selectedWorkpacks && this.selectedWorkpacks.length > 0) {
       this.formSearch.controls.scopeName.setValue(this.selectedWorkpacks[0].label);
+    } else {
+      this.formSearch.controls.scopeName.setValue('');
     }
   }
 }

@@ -5,26 +5,31 @@
         [queryParams]="{idWorkpack: workpack.id}"></p-button>
       <span class="p-float-label property-input p-field">
         <p-calendar id="float-start" formControlName="from" class="app-select-date" showIcon="true"
-          [monthNavigator]="true" [yearNavigator]="true" yearRange="2020:2030" [class.responsive]="responsive"
+          [monthNavigator]="true" [yearNavigator]="true" [yearRange]="yearRange" [class.responsive]="responsive"
           icon="fas fa-calendar-alt" [dateFormat]="calendarFormat" (onClose)="loadJournalData()">
         </p-calendar>
         <label class="app-input-label" for="float-name">{{ "from" | translate }} </label>
       </span>
       <span class="p-float-label property-input p-field">
         <p-calendar id="float-start" formControlName="to" class="app-select-date" showIcon="true"
-          [monthNavigator]="true" [yearNavigator]="true" yearRange="2020:2030" [class.responsive]="responsive"
+          [monthNavigator]="true" [yearNavigator]="true" [yearRange]="yearRange" [class.responsive]="responsive"
           icon="fas fa-calendar-alt" [dateFormat]="calendarFormat" (onClose)="loadJournalData()">
         </p-calendar>
         <label class="app-input-label" for="float-name">{{ "to" | translate }} </label>
       </span>
       <span class="p-float-label property-input p-field">
-        <p-dropdown class="app-single-selection" [class.responsive]="responsive" [autoDisplayFirst]="false"
-          [options]="optionsType" formControlName="type" (onChange)="loadJournalData()"></p-dropdown>
+        <p-multiSelect class="app-multiple-selection" [filter]="false" optionLabel="label" optionValue="value" [showToggleAll]="false" [showHeader]="false"
+          [options]="optionsType" formControlName="type" [class.responsive]="responsive" (onChange)="loadJournalData()"
+        ></p-multiSelect>
+        <!-- <p-dropdown class="app-single-selection" [class.responsive]="responsive" [autoDisplayFirst]="false" (onChange)="loadJournalData()"
+          [options]="optionsType" formControlName="type" (onChange)="loadJournalData()"></p-dropdown> -->
         <label class="app-input-label" for="float-name">{{ "type" | translate }} </label>
       </span>
       <span class="p-float-label property-input p-field">
-        <p-dropdown class="app-single-selection" optionLabel="label" (click)="treeViewScopeOverlay.toggle($event)"
-          [class.responsive]="responsive"></p-dropdown>
+        <!-- <p-dropdown class="app-single-selection" optionLabel="label" (click)="treeViewScopeOverlay.toggle($event)"
+          [class.responsive]="responsive"></p-dropdown> -->
+        <input pInputText class="app-input-text scope" (click)="treeViewScopeOverlay.toggle($event)"
+          [class.responsive]="responsive" formControlName="scopeName" [readonly]="true" />
         <label class="app-input-label">{{ 'scopeLabel' | translate }} </label>
       </span>
       <p-overlayPanel #treeViewScopeOverlay [showCloseIcon]="true" [dismissable]="false"
@@ -32,7 +37,8 @@
         <p-scrollPanel [style]="{width: '350px', height: '300px'}">
           <ng-template pTemplate>
             <div class="app-tree-selection">
-              <p-tree [value]="treeViewScope" selectionMode="checkbox" [(selection)]="selectedWorkpacks">
+              <p-tree [value]="treeViewScope" selectionMode="checkbox" [(selection)]="selectedWorkpacks"
+                [propagateSelectionUp]="false">
               </p-tree>
             </div>
           </ng-template>

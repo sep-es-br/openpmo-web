@@ -8,6 +8,7 @@ import { IconPropertyWorkpackModelEnum } from 'src/app/shared/enums/IconProperty
 import { IWorkpackModelProperty } from 'src/app/shared/interfaces/IWorkpackModelProperty';
 import { ResponsiveService } from 'src/app/shared/services/responsive.service';
 import { TypePropertyWorkpackModelEnum } from 'src/app/shared/enums/TypePropertyWorkpackModelEnum';
+import * as moment from 'moment';
 
 @Component({
   selector: 'app-workpack-model-property',
@@ -24,6 +25,7 @@ export class WorkpackModelPropertyComponent implements OnDestroy, AfterViewInit 
   responsive = false;
   $destroy = new Subject();
   calendarFormat: string;
+  yearRange: string;
 
   constructor(
     private translateSrv: TranslateService,
@@ -31,7 +33,9 @@ export class WorkpackModelPropertyComponent implements OnDestroy, AfterViewInit 
   ) {
     this.calendarFormat = this.translateSrv.instant('dateFormat');
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(responsive => this.responsive = responsive);
-    
+    const today = moment();
+    const yearStart = today.year();
+    this.yearRange = (yearStart-1).toString() + ':'+ (yearStart+15).toString();
   }
 
   ngAfterViewInit(): void {

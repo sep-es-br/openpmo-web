@@ -52,7 +52,6 @@ export class GaugeChartComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    console.log('config', this.config);
   }
 
   ngOnDestroy() {

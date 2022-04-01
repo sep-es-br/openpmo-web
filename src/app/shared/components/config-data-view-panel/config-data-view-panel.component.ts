@@ -94,7 +94,6 @@ export class ConfigDataViewPanelComponent implements OnInit, OnDestroy {
 
   handleChangeDisplayMode(displayMode: string) {
     this.displayMode = displayMode;
-    console.log('cookiesPermission', this.cookiesPermission)
     if (!!this.cookiesPermission) {
       this.setCookiesDisplayMode(displayMode);
     }

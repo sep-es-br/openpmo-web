@@ -1,5 +1,6 @@
 import { Component, Input, EventEmitter, Output, ViewChildren, OnDestroy, OnInit } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
+import * as moment from 'moment';
 import { Calendar } from 'primeng/calendar';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -30,6 +31,7 @@ export class StakeholderRoleCardItemComponent implements OnInit, OnDestroy {
   iconsEnum = IconsEnum;
   calendarFormat: string;
   $destroy = new Subject();
+  yearRange: string;
 
   constructor(
     private responsiveSrv: ResponsiveService,
@@ -49,6 +51,9 @@ export class StakeholderRoleCardItemComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    const today = moment();
+    const yearStart = today.year();
+    this.yearRange = (yearStart-1).toString() + ':'+ (yearStart+15).toString();
     this.calendarFormat = this.translateSrv.instant('dateFormat');
   }
 

@@ -1,5 +1,6 @@
 {
   "attention": "Atenção",
+  "selectedItems": "itens selecionados",
   "administration": "Administração",
   "administrator": "Administrador",
   "administrators": "Administradores",
@@ -402,6 +403,11 @@
       "workpackModel": {
         "not": {
           "found": "Modelo de pacote de trabalho não encontrado"
+        },
+        "delete": {
+          "relationship": {
+            "error": "Exclusão não permitida, pois o mesmo possui pacotes de trabalho relacionados."
+          }
         }
       },
       "planModel": {
