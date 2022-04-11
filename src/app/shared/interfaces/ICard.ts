@@ -26,6 +26,7 @@ export interface ICard {
   workpackCompleted?: boolean;
   showFullScreen?: boolean;
   fullScreen?: boolean;
+  workpackType?: string;
 }
 
 export interface progressBarValue {

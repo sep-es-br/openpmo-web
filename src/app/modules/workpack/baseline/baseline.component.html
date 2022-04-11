@@ -5,7 +5,7 @@
       <span *ngIf="!idBaseline">{{ 'newBaseline' | translate }}</span>
     </div>
     <div class="app-content-header app-content-header-cancelation" [class.mobile]="responsive"
-      *ngIf="!!baseline?.cancelation">
+         *ngIf="!!baseline?.cancelation">
       <i class="fas fa-times"></i>
       <span>{{ 'cancellationProposal' | translate }}</span>
     </div>
@@ -18,7 +18,7 @@
             <div class="p-field">
               <span class="p-float-label">
                 <input class="app-input-text" [class.responsive]="responsive" id="float-name" name="name"
-                  formControlName="name" type="text" [ngStyle]="{'width': '30%'}" pInputText />
+                       formControlName="name" type="text" [ngStyle]="{'width': '30%'}" pInputText/>
                 <label class="app-input-label" for="float-name">{{ (!baseline?.cancelation ? "name" : "project") |
                   translate }} * </label>
               </span>
@@ -27,7 +27,7 @@
             <div class="p-field" *ngIf="!!baseline?.cancelation">
               <span class="p-float-label">
                 <input class="app-input-text" [class.responsive]="responsive" id="float-proposer" name="proposer"
-                  formControlName="proposer" type="text" [ngStyle]="{'width': '30%'}" pInputText />
+                       formControlName="proposer" type="text" [ngStyle]="{'width': '30%'}" pInputText/>
                 <label class="app-input-label" for="float-proposer">{{ "proposer" | translate }} * </label>
               </span>
               <app-input-message [form]="formBaseline" field="proposer"></app-input-message>
@@ -35,7 +35,7 @@
             <div class="p-field">
               <span class="p-float-label">
                 <textarea pInputTextarea id="float-description" formControlName="description" class="app-text-area"
-                  rows="1">
+                          rows="1">
                 </textarea>
                 <label class="app-input-label" for="float-description">{{ "description" | translate }} * </label>
               </span>
@@ -61,7 +61,7 @@
     <app-card [properties]="cardBaselineUpdates" class="mt-0 inputs-float-label">
       <div class="app-toggle-container">
         <p-inputSwitch class="app-toggle toggle-all" [(ngModel)]="includeAllUpdates"
-          (onChange)="handleSetAllTogglesUpdates($event)" [disabled]="togglesReadOnly">
+                       (onChange)="handleSetAllTogglesUpdates($event)" [disabled]="togglesReadOnly">
         </p-inputSwitch>
       </div>
       <div class="updates-container">
@@ -72,8 +72,8 @@
               </p-inputSwitch>
               <div class="item-description-container" [class.item-description-container-responsive]="responsive">
                 <i *ngIf="!responsive"
-                  [ngClass]=" item.description === 'structure' ? [ 'app-icon', item.icon, 'light-grey-icon'] : [ item.icon, 'light-grey-icon']"
-                  [ngStyle]="{ fontSize: '1.8rem'}"></i>
+                   [ngClass]=" item.description === 'structure' ? [ 'app-icon', item.icon, 'light-grey-icon'] : [ item.icon, 'light-grey-icon']"
+                   [ngStyle]="{ fontSize: '1.8rem'}"></i>
                 <span class="item-description" [class.item-description-responsive]="responsive">
                   {{item.description === 'structure' ? ('structure'|translate) : item.description}}
                 </span>
@@ -88,19 +88,17 @@
     </app-card>
   </div>
   <div class="actions-buttons-container" [class.actions-buttons-container-responsive]="responsive"
-    *ngIf="!idBaseline || baseline?.status === 'DRAFT'">
-    <p-button class="action-button submit-button" [label]="'submit'|translate" (onClick)="handleSubmitBaseline()"
-      [disabled]="!this.idBaseline"></p-button>
-    <p-button class="action-button draft-button" [label]="'draft'|translate" (onClick)="handleSaveDraftBaseline()">
+       *ngIf="!idBaseline">
+    <p-button class="action-button draft-button" [label]="'submit'|translate" (onClick)="saveDraftAndSubmitBaseline()">
     </p-button>
     <p-button class="action-button cancel-button" [label]="'cancel'|translate" (onClick)="handleCancelChanges()">
     </p-button>
   </div>
 
   <div class="panel-evaluations"
-    *ngIf="baseline?.evaluations && baseline?.evaluations.length > 0 && baseline?.status !== 'DRAFT'">
+       *ngIf="baseline?.evaluations && baseline?.evaluations.length > 0 && baseline?.status !== 'DRAFT'">
     <p-panel class="app-card" [collapsed]="panelCollapsed" expandIcon="pi pi-angle-down" collapseIcon="pi pi-angle-up"
-      [class.mobile]="responsive" (collapsedChange)="handleCollapsed($event)">
+             [class.mobile]="responsive" (collapsedChange)="handleCollapsed($event)">
       <p-header class="card-header" [class.card-header-mobile]="responsive">
         <div class="header-title" (click)="handleCollapsed()" [class.card-collapseble]="true">
           <div class="header-title-text">
@@ -109,7 +107,7 @@
           </div>
           <div class="header-title-status">
             <span [class.proposed]="baseline.status === 'PROPOSED'" [class.approved]="baseline.status === 'APPROVED'"
-              [class.rejected]="baseline.status === 'REJECTED'">
+                  [class.rejected]="baseline.status === 'REJECTED'">
               {{baseline.status |translate}}</span>
           </div>
         </div>
@@ -127,13 +125,13 @@
             </div>
             <div class="item-status" [class.item-status-responsive]="responsive">
               <i *ngIf="item.comment && item.comment.length > 0" class="far fa-comment-dots light-grey-icon comment"
-                (click)="handleShowDialogComment(item.comment)" [ngStyle]="{ fontSize: '1.5rem'}"></i>
+                 (click)="handleShowDialogComment(item.comment)" [ngStyle]="{ fontSize: '1.5rem'}"></i>
               <i *ngIf="!item.decision" class="fas fa-hourglass-half light-grey-icon"
-                [ngStyle]="{ fontSize: '1.5rem'}"></i>
+                 [ngStyle]="{ fontSize: '1.5rem'}"></i>
               <i *ngIf="item.decision && item.decision === 'APPROVED'" class="fas fa-check"
-                [ngStyle]="{ fontSize: '1.5rem', color: '#44B39B'}"></i>
+                 [ngStyle]="{ fontSize: '1.5rem', color: '#44B39B'}"></i>
               <i *ngIf="item.decision && item.decision === 'REJECTED'" class="fas fa-times"
-                [ngStyle]="{ fontSize: '1.8rem', color: '#EA5C5C', padding: '0 3px'}"></i>
+                 [ngStyle]="{ fontSize: '1.8rem', color: '#EA5C5C', padding: '0 3px'}"></i>
             </div>
           </div>
         </p-card>
@@ -141,10 +139,10 @@
     </p-panel>
   </div>
   <p-dialog [header]="'comment'|translate" [(visible)]="!!showCommentDialog"
-    [style]="!responsive ? {width: '30vw'} : {width: '90vw'}" (onHide)="showCommentDialog=false">
+            [style]="!responsive ? {width: '30vw'} : {width: '90vw'}" (onHide)="showCommentDialog=false">
     <div class="comment-container">
       <span class="title">{{'comment'|translate}}</span>
-      <textarea pInputTextarea class="app-text-area comment" row="3" [disabled]="true">{{selectedComment}}</textarea>
+      <textarea pInputTextarea class="app-text-area comment" rows="3" [disabled]="true">{{selectedComment}}</textarea>
     </div>
   </p-dialog>
 

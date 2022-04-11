@@ -31,7 +31,7 @@
       </app-card>
     </div>
   </div>
-  <div class="user-cookies-confirmation" *ngIf="!!showCookiesPermissionMessage" @enterLeave>
+  <div class="user-cookies-confirmation" *ngIf="!!showCookiesPermissionMessage" @enterLeave [class.responsive]="responsive">
     <p>{{'messages.cookies-confirmation'|translate}}</p>
     <div class="cookies-buttons-actions">
       <p-button class="accept-button" [label]="'accept'|translate" (click)="handleSetCookiesPermission()"></p-button>

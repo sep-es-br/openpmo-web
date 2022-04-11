@@ -1,3 +1,5 @@
+import { takeUntil } from 'rxjs/operators';
+import { ResponsiveService } from 'src/app/shared/services/responsive.service';
 import { IFilterProperty } from './../../../shared/interfaces/IFilterProperty';
 import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
 import { FilterDataviewService } from '../../../shared/services/filter-dataview.service';
@@ -14,6 +16,7 @@ import { ICardItemOffice } from 'src/app/shared/interfaces/ICardItemOffice';
 import { CookieService } from 'ngx-cookie';
 import * as moment from 'moment';
 import { enterLeave } from '../../../shared/animations/enterLeave.animation';
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'app-office-list',
@@ -46,6 +49,8 @@ export class OfficeListComponent implements OnInit {
   filterProperties: IFilterProperty[] = this.filterSrv.get;
   idFilterSelected: number;
   showCookiesPermissionMessage = false;
+  responsive = false;
+  $destroy = new Subject();
 
   constructor(
     private officeSvr: OfficeService,
@@ -53,14 +58,22 @@ export class OfficeListComponent implements OnInit {
     private authSrv: AuthService,
     private filterSrv: FilterDataviewService,
     private breadcrumbSrv: BreadcrumbService,
-    private cookieSrv: CookieService
-  ) { }
+    private cookieSrv: CookieService,
+    private responsiveSrv: ResponsiveService
+  ) {
+    this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.responsive = value);
+   }
 
   async ngOnInit() {
     await this.loadFiltersOffices();
     await this.loadPropertiesOffice();
     this.breadcrumbSrv.setMenu([]);
     this.loadCookiesConfigStoraged();
+  }
+
+  ngOnDestroy() {
+    this.$destroy.next();
+    this.$destroy.complete();
   }
 
   loadCookiesConfigStoraged() {

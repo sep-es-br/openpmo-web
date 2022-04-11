@@ -1,25 +1,22 @@
-import { AuthService } from './../../../shared/services/auth.service';
-import { AuthServerService } from './../../../shared/services/auth-server.service';
-import { BaselineService } from './../../../shared/services/baseline.service';
-import { IBaseline, IBaselineUpdates } from './../../../shared/interfaces/IBaseline';
-import { takeUntil, filter } from 'rxjs/operators';
-import { MessageService } from 'primeng/api';
-import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
-import { TranslateService } from '@ngx-translate/core';
-import { ResponsiveService } from 'src/app/shared/services/responsive.service';
-import { WorkpackService } from 'src/app/shared/services/workpack.service';
-import { ActivatedRoute, Router } from '@angular/router';
-import { Subject } from 'rxjs';
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { ICard } from 'src/app/shared/interfaces/ICard';
-import { Component, OnInit } from '@angular/core';
+import {AuthService} from '../../../shared/services/auth.service';
+import {BaselineService} from '../../../shared/services/baseline.service';
+import {IBaseline, IBaselineUpdates} from '../../../shared/interfaces/IBaseline';
+import {takeUntil} from 'rxjs/operators';
+import {BreadcrumbService} from 'src/app/shared/services/breadcrumb.service';
+import {ResponsiveService} from 'src/app/shared/services/responsive.service';
+import {WorkpackService} from 'src/app/shared/services/workpack.service';
+import {ActivatedRoute, Router} from '@angular/router';
+import {Subject} from 'rxjs';
+import {FormBuilder, FormGroup, Validators} from '@angular/forms';
+import {ICard} from 'src/app/shared/interfaces/ICard';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 
 @Component({
   selector: 'app-baseline',
   templateUrl: './baseline.component.html',
   styleUrls: ['./baseline.component.scss']
 })
-export class BaselineComponent implements OnInit {
+export class BaselineComponent implements OnInit, OnDestroy {
 
   idBaseline: number;
   idWorkpack: number;
@@ -48,12 +45,10 @@ export class BaselineComponent implements OnInit {
     private responsiveSrv: ResponsiveService,
     private breadcrumbSrv: BreadcrumbService,
     private router: Router,
-    private authSrv: AuthService,
-    private messageSrv: MessageService,
-    private translateSrv: TranslateService
+    private authSrv: AuthService
   ) {
     this.actRouter.queryParams
-      .subscribe(({ id, idWorkpack, idWorkpackModelLinked }) => {
+      .subscribe(({id, idWorkpack, idWorkpackModelLinked}) => {
         this.idWorkpack = idWorkpack && +idWorkpack;
         this.idWorkpackModelLinked = idWorkpackModelLinked && +idWorkpackModelLinked;
         this.idBaseline = id && +id;
@@ -73,17 +68,17 @@ export class BaselineComponent implements OnInit {
   }
 
   async ngOnInit() {
-    await this.loadPropertiesBaseline()
+    await this.loadPropertiesBaseline();
     await this.setBreadcrumb();
   }
 
   async setBreadcrumb() {
     this.breadcrumbSrv.setMenu([
-      ... await this.getBreadcrumbs(this.idWorkpack),
+      ...await this.getBreadcrumbs(this.idWorkpack),
       {
         key: 'baseline',
         routerLink: ['/workpack/baseline'],
-        queryParams: { idWorkpack: this.idWorkpack, id: this.idBaseline },
+        queryParams: {idWorkpack: this.idWorkpack, id: this.idBaseline},
         info: this.baseline?.name,
         tooltip: this.baseline?.name
       }
@@ -91,14 +86,14 @@ export class BaselineComponent implements OnInit {
   }
 
   async getBreadcrumbs(idWorkpack: number) {
-    const { success, data } = await this.breadcrumbSrv.getBreadcrumbWorkpack(idWorkpack, { 'id-plan': this.idPlan });
+    const {success, data} = await this.breadcrumbSrv.getBreadcrumbWorkpack(idWorkpack, {'id-plan': this.idPlan});
     return success
       ? data.map(p => ({
         key: !p.modelName ? p.type.toLowerCase() : p.modelName,
         info: p.name,
         tooltip: p.fullName,
         routerLink: this.getRouterLinkFromType(p.type),
-        queryParams: { id: p.id, idWorkpackModelLinked: p.idWorkpackModelLinked },
+        queryParams: {id: p.id, idWorkpackModelLinked: p.idWorkpackModelLinked},
         modelName: p.modelName
       }))
       : [];
@@ -134,7 +129,7 @@ export class BaselineComponent implements OnInit {
         this.formBaseline.controls.message.setValue(this.baseline.message);
         if (this.baseline.status !== 'DRAFT') {
           this.formBaseline.disable();
-          this.baseline.updates.forEach( update => update.included = true);
+          this.baseline.updates.forEach(update => update.included = true);
         }
       }
     } else {
@@ -143,7 +138,7 @@ export class BaselineComponent implements OnInit {
         status: 'DRAFT',
         name: '',
         description: '',
-      }
+      };
     }
     await this.loadPermissions();
     this.cardBaselineUpdates = {
@@ -164,7 +159,7 @@ export class BaselineComponent implements OnInit {
     if (isUserAdmin) {
       this.editPermission = true;
     } else {
-      const result = await this.workpackSrv.GetWorkpackById(this.idWorkpack, { 'id-plan': this.idPlan });
+      const result = await this.workpackSrv.GetWorkpackById(this.idWorkpack, {'id-plan': this.idPlan});
       if (result.success) {
         const workpack = result.data;
         this.editPermission = workpack.permissions && workpack.permissions.filter(p => p.level === 'EDIT').length > 0;
@@ -177,15 +172,11 @@ export class BaselineComponent implements OnInit {
   }
 
   async loadUpdates() {
-    this.baseline.updates = await this.baselineSrv.getUpdates({ 'id-workpack': this.idWorkpack });
+    this.baseline.updates = await this.baselineSrv.getUpdates({'id-workpack': this.idWorkpack});
     if (this.baseline.updates.length > 0) {
       this.baseline.updates.forEach(updates => updates.included = true);
       this.includeAllUpdates = true;
-      if (this.baseline.updates.filter(update => update.classification !== 'NEW').length === 0) {
-        this.togglesReadOnly = true;
-      } else {
-        this.togglesReadOnly = false;
-      }
+      this.togglesReadOnly = this.baseline.updates.filter(update => update.classification !== 'NEW').length === 0;
     }
   }
 
@@ -200,17 +191,14 @@ export class BaselineComponent implements OnInit {
       description: this.formBaseline.controls.description.value,
       message: this.formBaseline.controls.message.value
     };
-    const result = this.idBaseline ? await this.baselineSrv.putBaseline(this.idBaseline, this.baseline) : await this.baselineSrv.post(this.baseline);
+    const result = this.idBaseline
+      ? await this.baselineSrv.putBaseline(this.idBaseline, this.baseline)
+      : await this.baselineSrv.post(this.baseline);
     if (result.success) {
       if (!this.idBaseline) {
         this.baseline.id = result.data.id;
         this.idBaseline = result.data.id;
       }
-      this.messageSrv.add({
-        severity: 'success',
-        summary: this.translateSrv.instant('success'),
-        detail: this.translateSrv.instant('messages.savedSuccessfully')
-      });
     }
   }
 
@@ -218,12 +206,12 @@ export class BaselineComponent implements OnInit {
     const result = await this.baselineSrv.submitBaseline(this.idBaseline, this.baseline.updates);
     if (result.success) {
       const idPlan = Number(localStorage.getItem('@currentPlan'));
-      this.router.navigate(
+      await this.router.navigate(
         ['/workpack'],
         {
           queryParams: {
             id: this.idWorkpack,
-            idPlan: idPlan,
+            idPlan,
             idWorkpackModelLinked: this.idWorkpackModelLinked
           }
         }
@@ -231,14 +219,14 @@ export class BaselineComponent implements OnInit {
     }
   }
 
-  handleCancelChanges() {
+  async handleCancelChanges() {
     const idPlan = Number(localStorage.getItem('@currentPlan'));
-    this.router.navigate(
+    await this.router.navigate(
       ['/workpack'],
       {
         queryParams: {
           id: this.idWorkpack,
-          idPlan: idPlan,
+          idPlan,
           idWorkpackModelLinked: this.idWorkpackModelLinked
         }
       }
@@ -250,5 +238,9 @@ export class BaselineComponent implements OnInit {
     this.showCommentDialog = true;
   }
 
+  async saveDraftAndSubmitBaseline() {
+    await this.handleSaveDraftBaseline();
+    await this.handleSubmitBaseline();
+  }
 
 }

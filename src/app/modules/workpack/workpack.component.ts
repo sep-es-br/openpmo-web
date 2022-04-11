@@ -593,9 +593,10 @@ export class WorkpackComponent implements OnDestroy {
   }
 
   showCheckCompleted() {
-    if (!this.workpackModel.scheduleSessionActive) {
+    if (!this.workpackModel.scheduleSessionActive && this.workpack && this.workpack.id) {
       this.cardWorkpackProperties.showCheckCompleted = true;
       this.cardWorkpackProperties.workpackCompleted = this.workpack && this.workpack.completed;
+      this.cardWorkpackProperties.workpackType = this.workpack && this.workpack.type;
     }
   }
 
@@ -1240,16 +1241,16 @@ export class WorkpackComponent implements OnDestroy {
       const iconMenuItems: MenuItem[] = [
         { label: this.translateSrv.instant('new'), command: () => this.handleNewWorkpack(idPlan, idWorkpackModel, this.idWorkpack) }
       ];
-      if (sharedWorkpackList && sharedWorkpackList.length > 0) {
-        iconMenuItems.push({
-          label: this.translateSrv.instant('linkTo'),
-          items: sharedWorkpackList.map(wp => ({
-            label: wp.name,
-            icon: `app-icon ${wp.icon}`,
-            command: () => this.handleLinkToWorkpack(wp.id, idWorkpackModel)
-          }))
-        });
-      }
+      // if (sharedWorkpackList && sharedWorkpackList.length > 0) {
+      //   iconMenuItems.push({
+      //     label: this.translateSrv.instant('linkTo'),
+      //     items: sharedWorkpackList.map(wp => ({
+      //       label: wp.name,
+      //       icon: `app-icon ${wp.icon}`,
+      //       command: () => this.handleLinkToWorkpack(wp.id, idWorkpackModel)
+      //     }))
+      //   });
+      // }
       if (this.editPermission && !idWorkpackModelLinked) {
         const sharedWorkpackList = await this.loadSharedWorkpackList(idWorkpackModel);
         if (sharedWorkpackList && sharedWorkpackList.length > 0) {

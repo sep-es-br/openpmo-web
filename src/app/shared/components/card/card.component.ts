@@ -16,7 +16,6 @@ import {IWorkpack} from '../../interfaces/IWorkpack';
 export class CardComponent implements OnInit, OnDestroy, OnChanges {
 
   @Input() properties: ICard;
-  @Input() workpack: IWorkpack;
   @Output() selectedFilter = new EventEmitter();
   @Output() editFilter = new EventEmitter();
   @Output() newFilter = new EventEmitter();
@@ -128,7 +127,7 @@ export class CardComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   get label(): string {
-    return this.workpack.type === 'Milestone' ? 'completed' : 'scopeCompleted';
+    return this.properties.workpackType ? this.properties.workpackType === 'Milestone' ? 'completed' : 'scopeCompleted' : '';
   }
 
 }

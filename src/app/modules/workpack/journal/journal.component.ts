@@ -1,7 +1,7 @@
 import { Location } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { DomSanitizer } from '@angular/platform-browser';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { ActivatedRoute } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { MenuItem, MessageService } from 'primeng/api';
@@ -67,18 +67,19 @@ export class JournalComponent implements OnInit {
 
   setCardItemsEvidences(evidences: IFile[]) {
     this.cardItemsEvidences = evidences.map((evidence) => ({
-        typeCardItem: 'listItem',
-        urlImg: evidence.url,
-        nameCardItem: evidence.name,
-        givenName: evidence.givenName,
-        menuItems: [
-          {
-            label: this.translateSvr.instant('delete'),
-            icon: 'fas fa-trash-alt',
-            command: () => this.deleteEvidence(evidence),
-          }
-        ] as MenuItem[],
-      }));
+      typeCardItem: 'listItem',
+      urlImg: evidence.url,
+      nameCardItem: evidence.name,
+      icon: this.getIconFromMimeTypeFile(evidence.mimeType),
+      givenName: evidence.givenName,
+      menuItems: [
+        {
+          label: this.translateSvr.instant('delete'),
+          icon: 'fas fa-trash-alt',
+          command: () => this.deleteEvidence(evidence),
+        }
+      ] as MenuItem[],
+    }));
     this.cardItemsEvidences.push({
       typeCardItem: 'newCardItem',
       iconSvg: true,
@@ -98,6 +99,24 @@ export class JournalComponent implements OnInit {
         },
       }]
     ]);
+  }
+
+  getIconFromMimeTypeFile(mimeType: string): string {
+    const isImg = mimeType.includes('image');
+    if (isImg) {
+      return null;
+    }
+    switch (mimeType) {
+      case 'application/pdf':
+        return 'far fa-file-pdf';
+      case 'application/msword':
+        return 'far fa-file-word';
+      case 'application/vnd.ms-excel':
+      case 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
+        return 'far fa-file-excel';
+      default:
+        return 'far fa-file';
+    }
   }
 
   async getBreadcrumbs() {
@@ -136,7 +155,7 @@ export class JournalComponent implements OnInit {
 
   handleUploadEvidence(files) {
     files.map(file => {
-      const url = file.objectURL || this.sanatizer.bypassSecurityTrustResourceUrl(URL.createObjectURL(file));
+      const url = file.objectURL || this.createObjectUrl(file);
       this.evidences.push({
         url,
         mimeType: file.type,
@@ -145,6 +164,10 @@ export class JournalComponent implements OnInit {
       });
     });
     this.setCardItemsEvidences(this.evidences);
+  }
+
+  createObjectUrl(file: File): SafeResourceUrl {
+    return this.sanatizer.bypassSecurityTrustResourceUrl(URL.createObjectURL(file));
   }
 
   async handleOnSubmit() {
@@ -168,9 +191,9 @@ export class JournalComponent implements OnInit {
 
   setGivenNameFromCardToEvidence() {
     this.evidences = this.evidences.map((evidence, index) => ({
-        ...evidence,
-        givenName: this.cardItemsEvidences[index].givenName,
-      }));
+      ...evidence,
+      givenName: this.cardItemsEvidences[index].givenName,
+    }));
   }
 
   uploadEvidencesAll(data) {
