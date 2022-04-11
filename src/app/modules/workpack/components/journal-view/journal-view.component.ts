@@ -33,7 +33,7 @@ export class JournalViewComponent implements OnInit, OnDestroy {
 
   formSearch: FormGroup;
   calendarFormat: string;
-  optionsType: SelectItem[] = []
+  optionsType: SelectItem[] = [];
 
   responsive: boolean;
   $destroy = new Subject();
@@ -45,7 +45,8 @@ export class JournalViewComponent implements OnInit, OnDestroy {
   typeJounalEnum = TypeJournalEnum;
   statusJounalEnum = StatusJournalEnum;
 
-  canVerifyScroll = true;
+  hasMore = true;
+  hasAll = false;
   page = 0;
   pageSize = 5;
   yearRange: string;
@@ -65,18 +66,15 @@ export class JournalViewComponent implements OnInit, OnDestroy {
       type: [['ALL']],
       scopeName: ''
     });
-    this.optionsType = Object.keys(TypeJournalEnum).map(key => {
-      return {
-        label: this.translateSrv.instant(TypeJournalEnum[key]),
-        value: key
-      }
-    });
+    this.optionsType = Object.keys(TypeJournalEnum).map(key => ({
+      label: this.translateSrv.instant(TypeJournalEnum[key]),
+      value: key
+    }));
   }
 
   async ngOnInit(): Promise<void> {
     await this.loadTreeViewScope();
     await this.loadJournalData();
-    this.eventListenerScrollJournal();
     const today = moment();
     const yearStart = today.year();
     this.yearRange = (yearStart - 1).toString() + ':' + (yearStart + 15).toString();
@@ -98,7 +96,7 @@ export class JournalViewComponent implements OnInit, OnDestroy {
     });
     if (success) {
       this.journalData = this.journalData.concat(data);
-      this.canVerifyScroll = data.length > 0 && data.length === this.pageSize;
+      this.hasMore = data.length > 0 && data.length === this.pageSize;
     }
 
 
@@ -125,15 +123,15 @@ export class JournalViewComponent implements OnInit, OnDestroy {
           ...evidence,
           isImg,
           icon
-        }
-      })
+        };
+      });
       return {
         ...journal,
         icon: iconsJournal[journal.type].icon,
         color: iconsJournal[journal.type].color,
         background: iconsJournal[journal.type].background,
-      }
-    })
+      };
+    });
 
   }
   println(event) {
@@ -148,7 +146,8 @@ export class JournalViewComponent implements OnInit, OnDestroy {
       const treeNode = this.loadTreeNodeWorkpacks([{ ...treeWorkpackCurrent }]);
       this.treeViewScope = treeNode;
       this.selectedWorkpacks = this.setSelectedNodes(this.treeViewScope);
-      const selected = this.selectedWorkpacks && this.selectedWorkpacks.length > 1 ? this.selectedWorkpacks.length + ' ' + this.translateSrv.instant('selectedItems') :
+      const selected = this.selectedWorkpacks && this.selectedWorkpacks.length > 1 ?
+        this.selectedWorkpacks.length + ' ' + this.translateSrv.instant('selectedItems') :
         this.selectedWorkpacks[0].label;
       this.formSearch.controls.scopeName.setValue(selected);
     }
@@ -157,7 +156,7 @@ export class JournalViewComponent implements OnInit, OnDestroy {
   setSelectedNodes(list: TreeNode[]) {
     let result = [];
     list.forEach(l => {
-      result.push(l)
+      result.push(l);
       if (l.children && l.children.length > 0) {
         const resultChildren = this.setSelectedNodes(l.children);
         result = result.concat(resultChildren);
@@ -166,28 +165,12 @@ export class JournalViewComponent implements OnInit, OnDestroy {
     return result;
   }
 
-  eventListenerScrollJournal() {
-    this.journalElement.nativeElement.addEventListener('scroll', (event) => this.verifyScrollEnd(event));
-  }
-
-  async verifyScrollEnd(event) {
-    if (this.canVerifyScroll) {
-      const { scrollTop, scrollHeight, clientHeight } = this.journalElement.nativeElement;
-      const isScrollEnd = Math.ceil(scrollTop) + clientHeight >= scrollHeight;
-      if (isScrollEnd) {
-        this.canVerifyScroll = false;
-        this.page++;
-        await this.loadJournalData();
-      }
-    }
-  }
-
   findTreeWorkpack(id: number, treePlan: ITreeViewScopePlan) {
     let treeWorkpack;
     treePlan.workpacks.some(workpack => {
       treeWorkpack = workpack.id === id ? workpack : this.findTreeWorkpackChildren(id, workpack.children);
       return treeWorkpack;
-    })
+    });
     return treeWorkpack;
   }
 
@@ -197,7 +180,7 @@ export class JournalViewComponent implements OnInit, OnDestroy {
       treeWorkpacks.some(workpack => {
         treeWorkpack = workpack.id === id ? workpack : this.findTreeWorkpackChildren(id, workpack.children);
         return treeWorkpack;
-      })
+      });
     }
     return treeWorkpack;
   }
@@ -231,7 +214,7 @@ export class JournalViewComponent implements OnInit, OnDestroy {
     fetch(dataurl)
       .then(response => response.blob())
       .then(blob => {
-        const link = document.createElement("a");
+        const link = document.createElement('a');
         link.href = URL.createObjectURL(blob);
         link.download = filename;
         link.click();
@@ -240,10 +223,34 @@ export class JournalViewComponent implements OnInit, OnDestroy {
   }
 
   async handleHideOverlayScope(event?) {
-    const selected = this.selectedWorkpacks && this.selectedWorkpacks.length > 1 ? this.selectedWorkpacks.length + ' ' + this.translateSrv.instant('selectedItems') :
+    const selected = this.selectedWorkpacks && this.selectedWorkpacks.length > 1 ?
+      this.selectedWorkpacks.length + ' ' + this.translateSrv.instant('selectedItems') :
       this.selectedWorkpacks[0].label;
     this.formSearch.controls.scopeName.setValue(selected);
+    await this.handleFilter();
+  }
+
+  async handleFilter(event?) {
+    this.clearPaginate();
     await this.loadJournalData();
+  }
+
+  async handleViewMore(event) {
+    this.page++;
+    await this.loadJournalData();
+  }
+
+  async handleViewAll() {
+    this.clearPaginate();
+    this.pageSize = 9999999999999;
+    this.hasAll = true;
+    await this.loadJournalData();
+  }
+
+  clearPaginate() {
+    this.page = 0;
+    this.pageSize = 5;
+    this.journalData = [];
   }
 
 }

@@ -6,28 +6,24 @@
       <span class="p-float-label property-input p-field">
         <p-calendar id="float-start" formControlName="from" class="app-select-date" showIcon="true"
           [monthNavigator]="true" [yearNavigator]="true" [yearRange]="yearRange" [class.responsive]="responsive"
-          icon="fas fa-calendar-alt" [dateFormat]="calendarFormat" (onClose)="loadJournalData()">
+          icon="fas fa-calendar-alt" [dateFormat]="calendarFormat" (onClose)="handleFilter()">
         </p-calendar>
         <label class="app-input-label" for="float-name">{{ "from" | translate }} </label>
       </span>
       <span class="p-float-label property-input p-field">
         <p-calendar id="float-start" formControlName="to" class="app-select-date" showIcon="true"
           [monthNavigator]="true" [yearNavigator]="true" [yearRange]="yearRange" [class.responsive]="responsive"
-          icon="fas fa-calendar-alt" [dateFormat]="calendarFormat" (onClose)="loadJournalData()">
+          icon="fas fa-calendar-alt" [dateFormat]="calendarFormat" (onClose)="handleFilter()">
         </p-calendar>
         <label class="app-input-label" for="float-name">{{ "to" | translate }} </label>
       </span>
       <span class="p-float-label property-input p-field">
-        <p-multiSelect class="app-multiple-selection" [filter]="false" optionLabel="label" optionValue="value" [showToggleAll]="false" [showHeader]="false"
-          [options]="optionsType" formControlName="type" [class.responsive]="responsive" (onChange)="loadJournalData()"
-        ></p-multiSelect>
-        <!-- <p-dropdown class="app-single-selection" [class.responsive]="responsive" [autoDisplayFirst]="false" (onChange)="loadJournalData()"
-          [options]="optionsType" formControlName="type" (onChange)="loadJournalData()"></p-dropdown> -->
+        <p-multiSelect class="app-multiple-selection" [filter]="false" optionLabel="label" optionValue="value"
+          [showToggleAll]="false" [showHeader]="false" [options]="optionsType" formControlName="type"
+          [class.responsive]="responsive" (onChange)="handleFilter()"></p-multiSelect>
         <label class="app-input-label" for="float-name">{{ "type" | translate }} </label>
       </span>
       <span class="p-float-label property-input p-field">
-        <!-- <p-dropdown class="app-single-selection" optionLabel="label" (click)="treeViewScopeOverlay.toggle($event)"
-          [class.responsive]="responsive"></p-dropdown> -->
         <input pInputText class="app-input-text scope" (click)="treeViewScopeOverlay.toggle($event)"
           [class.responsive]="responsive" formControlName="scopeName" [readonly]="true" />
         <label class="app-input-label">{{ 'scopeLabel' | translate }} </label>
@@ -90,6 +86,14 @@
           </p-card>
         </ng-template>
       </p-timeline>
+    </div>
+    <div class="buttons-actions">
+      <p-button *ngIf="hasMore" type="button" icon="fas fa-plus" (onClick)="handleViewMore($event)" label="{{ 'viewMore' | translate }}"
+        class="app-button-green">
+      </p-button>
+      <p-button *ngIf="!hasAll" type="button" icon="fas fa-eye" (onClick)="handleViewAll($event)" label="{{ 'viewAll' | translate }}"
+        class="app-button-green">
+      </p-button>
     </div>
   </app-card>
 </div>

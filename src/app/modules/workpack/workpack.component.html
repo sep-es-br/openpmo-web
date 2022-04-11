@@ -25,7 +25,7 @@
   </div>
 
   <div class="card-properties-workpack">
-    <app-card [properties]="cardWorkpackProperties" class="mt-0 inputs-float-label"
+    <app-card [properties]="cardWorkpackProperties" [workpack]="workpack" class="mt-0 inputs-float-label"
       (changeCheckCompleted)="handleChangeCheckCompleted($event)">
       <div class="properties-container" [class.responsive]="responsive">
         <div class="property-container" *ngFor="let property of sectionPropertiesProperties"

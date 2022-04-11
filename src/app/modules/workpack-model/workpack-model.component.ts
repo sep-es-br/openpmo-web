@@ -133,7 +133,7 @@ export class WorkpackModelComponent implements OnInit {
     private officeSrv: OfficeService,
     private planModelSrv: PlanModelService,
   ) {
-    this.activeRoute.queryParams.subscribe(async ({ idOffice, idStrategy, id, idParent, type }) => {
+    this.activeRoute.queryParams.subscribe(async({ idOffice, idStrategy, id, idParent, type }) => {
       if (id && this.idWorkpackModel === Number(id)) {
         // refresh on adding id to query
         return;
@@ -675,7 +675,7 @@ export class WorkpackModelComponent implements OnInit {
       this.posibleRolesPerson = data.personRoles || [];
       if (data.properties) {
         const dataPropertiesAndIndex = (await Promise.all(data.properties
-          .map(async (p, i) => {
+          .map(async(p, i) => {
             if (p.possibleValues) {
               p.possibleValues = (p.possibleValues as string).split(',');
             };
@@ -715,7 +715,7 @@ export class WorkpackModelComponent implements OnInit {
             if (p.type === TypePropertyEnum.GroupModel) {
               const menu = this.loadMenuPropertyGroup(PropertySessionEnum.PROPERTIES, p);
               p.menuModelProperties = menu;
-              p.groupedProperties.forEach(async (gp) => {
+              p.groupedProperties.forEach(async(gp) => {
                 if (gp.possibleValues) {
                   gp.possibleValues = (gp.possibleValues as string).split(',');
                 };
@@ -776,10 +776,13 @@ export class WorkpackModelComponent implements OnInit {
         dashboardShowMilestones: data.dashboardShowMilestones,
         dashboardShowRisks: data.dashboardShowRisks,
         dashboardShowStakeholders: data.dashboardShowStakeholders,
-        dashboardStakeholderRolesOptions: ((data.organizationRoles && data.organizationRoles.length > 0) || (data.personRoles && data.personRoles.length > 0)) ?
+        dashboardStakeholderRolesOptions: ((data.organizationRoles && data.organizationRoles.length > 0)
+          || (data.personRoles && data.personRoles.length > 0)) ?
           data.organizationRoles.concat(data.personRoles).map(item => ({ label: item, value: item })) :
-          ['manager', 'teamMember', 'sponsor', 'partner', 'funder', 'client', 'competitor'].map(item => ({ label: this.translateSrv.instant(item), value: this.translateSrv.instant(item) })),
-      }
+          ['manager', 'teamMember', 'sponsor', 'partner', 'funder', 'client', 'competitor']
+          .map(item => ({ label: this.translateSrv.instant(item), value: this.translateSrv.instant(item) })),
+      };
+      console.log('dashboardPanel', this.dashboardPanel);
       this.cardPropertiesRiskAndIssues.initialStateToggle = data.riskAndIssueManagementSessionActive;
       this.cardPropertiesProcesses.initialStateToggle = data.processesManagementSessionActive;
       if (this.workpackModelType === TypeWorkpackModelEnum.DeliverableModel) {
@@ -1087,9 +1090,7 @@ export class WorkpackModelComponent implements OnInit {
 
   loadSelectedLocality(seletectedIds: number[], list: TreeNode[]) {
     let result = [];
-    list.sort( (a, b) => {
-      return a.label < b.label ? -1 : a.label > b.label ? 1 : 0;
-    });
+    list.sort( (a, b) => a.label < b.label ? -1 : a.label > b.label ? 1 : 0);
     list.forEach(l => {
       if (seletectedIds.includes(l.data)) {
         result.push(l);
@@ -1103,9 +1104,7 @@ export class WorkpackModelComponent implements OnInit {
   }
 
   loadLocality(localityList: ILocalityList[], parent?: TreeNode) {
-    localityList.sort( (a, b) => {
-      return a.name < b.name ? -1 : a.name > b.name ? 1 : 0;
-    });
+    localityList.sort( (a, b) => a.name < b.name ? -1 : a.name > b.name ? 1 : 0);
     const list = localityList.map(locality => {
       if (locality.children) {
         const node = {
@@ -1257,7 +1256,7 @@ export class WorkpackModelComponent implements OnInit {
             dashboardShowRisks: false,
             dashboardShowStakeholders: ['manager', 'teamMember', 'sponsor', 'partner', 'funder', 'client', 'competitor'].map( item => this.translateSrv.instant(item)),
             dashboardStakeholderRolesOptions: ['manager', 'teamMember', 'sponsor', 'partner', 'funder', 'client', 'competitor'].map(item => ({ label: this.translateSrv.instant(item), value: this.translateSrv.instant(item) })),
-          }
+          };
         }
       } else {
         this.dashboardPanel = {
@@ -1266,7 +1265,7 @@ export class WorkpackModelComponent implements OnInit {
           dashboardShowRisks: false,
           dashboardShowStakeholders: [],
           dashboardStakeholderRolesOptions: ['manager', 'teamMember', 'sponsor', 'partner', 'funder', 'client', 'competitor'].map(item => ({ label: this.translateSrv.instant(item), value: this.translateSrv.instant(item) })),
-        }
+        };
       }
       this.checkProperties();
     });
@@ -1303,7 +1302,7 @@ export class WorkpackModelComponent implements OnInit {
       initialStateCollapse: false,
       onToggle: new EventEmitter<boolean>()
     };
-    this.cardPropertiesJournal.onToggle.pipe(takeUntil(this.$destroy)).subscribe(() => this.checkProperties())
+    this.cardPropertiesJournal.onToggle.pipe(takeUntil(this.$destroy)).subscribe(() => this.checkProperties());
     this.cardPropertiesModels = {
       toggleable: this.editPermission,
       initialStateToggle: true,
@@ -1452,7 +1451,7 @@ export class WorkpackModelComponent implements OnInit {
   }
 
   async loadCardItemsModels() {
-    if (this.idWorkpackModel) await this.loadReusableWorkpackModels();
+    if (this.idWorkpackModel) {await this.loadReusableWorkpackModels();}
     // let hasParentProject = false;
     // if (this.idWorkpackModel) {
     //   const { success, data } = await this.workpackModelSrv.hasParentProject(this.idWorkpackModel);
@@ -1622,7 +1621,7 @@ export class WorkpackModelComponent implements OnInit {
 
   async refreshProperties(properties) {
     return (await Promise.all(properties
-      .map(async (p, i) => {
+      .map(async(p, i) => {
         if (p.possibleValues) {
           p.possibleValues = (p.possibleValues as string).split(',');
         };

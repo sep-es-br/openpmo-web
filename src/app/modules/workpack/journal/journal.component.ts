@@ -1,6 +1,7 @@
 import { Location } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { DomSanitizer } from '@angular/platform-browser';
 import { ActivatedRoute } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { MenuItem, MessageService } from 'primeng/api';
@@ -45,6 +46,7 @@ export class JournalComponent implements OnInit {
     private activeRoute: ActivatedRoute,
     private evidenceSrv: EvidenceService,
     private breadcrumbSrv: BreadcrumbService,
+    private sanatizer: DomSanitizer,
   ) {
     this.activeRoute.queryParams.subscribe(({ idWorkpack }) => {
       this.idWorkpack = +idWorkpack;
@@ -64,8 +66,7 @@ export class JournalComponent implements OnInit {
   }
 
   setCardItemsEvidences(evidences: IFile[]) {
-    this.cardItemsEvidences = evidences.map((evidence) => {
-      return {
+    this.cardItemsEvidences = evidences.map((evidence) => ({
         typeCardItem: 'listItem',
         urlImg: evidence.url,
         nameCardItem: evidence.name,
@@ -77,13 +78,12 @@ export class JournalComponent implements OnInit {
             command: () => this.deleteEvidence(evidence),
           }
         ] as MenuItem[],
-      }
-    })
+      }));
     this.cardItemsEvidences.push({
       typeCardItem: 'newCardItem',
       iconSvg: true,
       icon: IconsEnum.Plus,
-    })
+    });
   }
 
   async setBreadcrumb() {
@@ -136,13 +136,14 @@ export class JournalComponent implements OnInit {
 
   handleUploadEvidence(files) {
     files.map(file => {
+      const url = file.objectURL || this.sanatizer.bypassSecurityTrustResourceUrl(URL.createObjectURL(file));
       this.evidences.push({
-        url: file.objectURL,
+        url,
         mimeType: file.type,
         name: file.name,
         givenName: file.name.split('.')[0],
-      })
-    })
+      });
+    });
     this.setCardItemsEvidences(this.evidences);
   }
 
@@ -151,9 +152,9 @@ export class JournalComponent implements OnInit {
       ...this.formJournal.value,
       workpackId: this.idWorkpack
     };
-    const { data, success } = await this.journalSrv.post(sender)
+    const { data, success } = await this.journalSrv.post(sender);
     if (success) {
-      this.setGivenNameFromCardToEvidence()
+      this.setGivenNameFromCardToEvidence();
       this.uploadEvidencesAll(data);
       this.messageSrv.add({
         severity: 'success',
@@ -166,21 +167,20 @@ export class JournalComponent implements OnInit {
   }
 
   setGivenNameFromCardToEvidence() {
-    this.evidences = this.evidences.map((evidence, index) => {
-      return {
+    this.evidences = this.evidences.map((evidence, index) => ({
         ...evidence,
         givenName: this.cardItemsEvidences[index].givenName,
-      }
-    })
+      }));
   }
 
   uploadEvidencesAll(data) {
-    this.evidences.forEach(async (evidence: any) => {
-      const file = await fetch(evidence.url.changingThisBreaksApplicationSecurity)
+    this.evidences.forEach(async(evidence: any) => {
+      const file = await fetch(evidence.url.changingThisBreaksApplicationSecurity);
       const formData: FormData = new FormData();
-      formData.append('file', await file.blob(), evidence.givenName);
+      const blob = await file.blob();
+      formData.append('file', blob, evidence.name);
       await this.evidenceSrv.uploadEvidence(formData, data.id);
-    })
+    });
   }
 
 }

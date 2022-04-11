@@ -6,6 +6,7 @@ import { takeUntil } from 'rxjs/operators';
 import { ICard } from '../../interfaces/ICard';
 import { ResponsiveService } from '../../services/responsive.service';
 import { SelectItem } from 'primeng/api';
+import {IWorkpack} from '../../interfaces/IWorkpack';
 
 @Component({
   selector: 'app-card',
@@ -15,6 +16,7 @@ import { SelectItem } from 'primeng/api';
 export class CardComponent implements OnInit, OnDestroy, OnChanges {
 
   @Input() properties: ICard;
+  @Input() workpack: IWorkpack;
   @Output() selectedFilter = new EventEmitter();
   @Output() editFilter = new EventEmitter();
   @Output() newFilter = new EventEmitter();
@@ -123,6 +125,10 @@ export class CardComponent implements OnInit, OnDestroy, OnChanges {
 
   handleChangeFullScreen() {
     this.changeFullScreen.emit();
+  }
+
+  get label(): string {
+    return this.workpack.type === 'Milestone' ? 'completed' : 'scopeCompleted';
   }
 
 }

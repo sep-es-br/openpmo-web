@@ -92,9 +92,9 @@ export class StepComponent implements OnInit, OnDestroy {
     private planSrv: PlanService,
     private authSrv: AuthService
   ) {
-    this.actRouter.queryParams.subscribe(async ({ idSchedule, idWorkpackModelLinked, stepType, id, unitName, unitPrecision }) => {
+    this.actRouter.queryParams.subscribe(async({ idSchedule, idWorkpackModelLinked, stepType, id, unitName, unitPrecision }) => {
       this.idSchedule = idSchedule;
-      this.idWorkpackModelLinked = idWorkpackModelLinked
+      this.idWorkpackModelLinked = idWorkpackModelLinked;
       this.stepType = stepType;
       this.idStep = id;
       this.unitName = unitName;
@@ -257,9 +257,6 @@ export class StepComponent implements OnInit, OnDestroy {
       this.end = new Date(this.schedule.end + 'T00:00:00');
       if (this.stepDetail) {
         this.formStep.controls.end.setValue(this.end);
-        if (this.onlyOneStep) {
-          this.formStep.controls.end.disable()
-        }
       }
       this.end.setDate(1);
       if (!this.stepDetail) {
@@ -348,7 +345,7 @@ export class StepComponent implements OnInit, OnDestroy {
       const workpacksIds = this.costAccounts.map(cost => cost.idWorkpack);
       const workpacksIdsNotRepeated = workpacksIds.filter((w, i) => workpacksIds.indexOf(w) === i);
 
-      this.menuItemsCostAccounts = await Promise.all(workpacksIdsNotRepeated.map(async (idWorkpack) => {
+      this.menuItemsCostAccounts = await Promise.all(workpacksIdsNotRepeated.map(async(idWorkpack) => {
         const workpack = await this.workpackSrv.GetWorkpackById(idWorkpack, { 'id-plan': this.idPlan });
         if (workpack.success) {
           const workpackCostAccounts = this.costAccounts.filter(cost => cost.idWorkpack === idWorkpack);
@@ -493,13 +490,18 @@ export class StepComponent implements OnInit, OnDestroy {
 
 
   async saveStep() {
+    const end = moment(this.formStep.controls.end.value).format('yyyy-MM-DD');
+    const start = moment(this.formStep.controls.start.value).format('yyyy-MM-DD');
     this.step = {
       id: this.step && this.step.id,
       idSchedule: this.step ? this.step.idSchedule : this.idSchedule,
       plannedWork: this.formStep.controls.plannedWork.value,
       actualWork: this.formStep.controls.actualWork.value,
       endStep: (this.stepType === 'end' || this.stepType === 'newEnd') ? true : false,
-      periodFromStart: (this.stepType === 'end' || this.stepType === 'newEnd') ? this.formStep.controls.end.value : this.formStep.controls.start.value,
+      scheduleEnd: (this.stepType === 'end' || this.stepType === 'newEnd') ? end :
+        (this.onlyOneStep && this.step && this.step?.id ? end : null),
+      scheduleStart: (this.stepType === 'start' || this.stepType === 'newStart') ? start :
+        (this.onlyOneStep && this.step && this.step?.id ? start : null),
       consumes: this.costAssignmentsCardItems.filter(card => card.type === 'cost-card').map(cost => ({
         id: cost.idCostAssignment && cost.idCostAssignment,
         idCostAccount: cost.idCost,

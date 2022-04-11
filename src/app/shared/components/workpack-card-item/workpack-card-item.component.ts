@@ -64,7 +64,7 @@ export class WorkpackCardItemComponent implements OnInit, OnDestroy {
         if (this.properties.subtitleCardItem) {
           const expirationDate = moment(this.properties.subtitleCardItem, 'yyyy-MM-DD');
           const date = moment();
-          if (this.milestoneStatusEnum[this.properties.statusItem] === 'onTime' && expirationDate.isSameOrAfter(date) && expirationDate.diff(date, 'days') <= 7) {
+          if (this.milestoneStatusEnum[this.properties.statusItem] === 'ontime' && expirationDate.isSameOrAfter(date) && expirationDate.diff(date, 'days') <= 7) {
             this.attentionMilestone = true;
           }
         }
@@ -263,6 +263,10 @@ export class WorkpackCardItemComponent implements OnInit, OnDestroy {
       return true;
     }
     return false;
+  }
+
+  get label(): string {
+    return this.properties.typeCardItem === 'Milestone' ? 'completed' : 'scopeCompleted';
   }
 }
 

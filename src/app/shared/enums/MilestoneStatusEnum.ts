@@ -1,6 +1,6 @@
 export enum MilestoneStatusEnum {
-  ON_TIME = 'onTime',
+  ON_TIME = 'ontime',
   LATE = 'late',
   CONCLUDED = 'concluded',
-  LATE_CONCLUDED = 'lateConcluded'
+  LATE_CONCLUDED = 'lateconcluded'
 }

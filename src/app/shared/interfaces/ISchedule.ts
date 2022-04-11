@@ -38,6 +38,8 @@ export interface IGroupStep {
 export interface IStep {
   id?: number;
   idSchedule?: number;
+  scheduleStart?: Date;
+  scheduleEnd?: Date;
   plannedWork: number;
   baselinePlannedWork?: number;
   actualWork: number;
@@ -58,6 +60,8 @@ export interface IConsume {
 export interface IStepPost {
   id?: number;
   idSchedule?: number;
+  scheduleStart?: string;
+  scheduleEnd?: string;
   plannedWork: number;
   actualWork: number;
   endStep?: boolean;

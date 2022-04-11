@@ -60,23 +60,8 @@ export class StrategyListComponent implements OnInit {
   ) {
     this.activeRoute.queryParams.subscribe(async ({ idOffice }) => {
       this.idOffice = +idOffice;
-      
-      this.breadcrumbSrv.setMenu([
-        {
-          key: 'administration',
-          info: this.propertiesOffice?.name,
-          tooltip: this.propertiesOffice?.fullName,
-          routerLink: ['/configuration-office'],
-          queryParams: { idOffice: this.idOffice }
-        },
-        {
-          key: 'configuration',
-          info: 'planModels',
-          tooltip: this.translateSrv.instant('planModels'),
-          routerLink: ['/strategies'],
-          queryParams: { idOffice: this.idOffice }
-        },
-      ]);
+      await this.getOfficeById()
+      this.setBreadcrumb()
     });
     this.responsiveSrv.observable.subscribe(value => {
       this.responsive = value;
@@ -90,8 +75,28 @@ export class StrategyListComponent implements OnInit {
       this.router.navigate(['/offices']);
     }
     await this.getOfficeById();
+    this.setBreadcrumb()
     await this.loadFiltersStrategies();
     await this.loadPropertiesStrategies();
+  }
+
+  setBreadcrumb() {
+    this.breadcrumbSrv.setMenu([
+      {
+        key: 'administration',
+        info: this.propertiesOffice?.name,
+        tooltip: this.propertiesOffice?.fullName,
+        routerLink: ['/configuration-office'],
+        queryParams: { idOffice: this.idOffice }
+      },
+      {
+        key: 'configuration',
+        info: 'planModels',
+        tooltip: this.translateSrv.instant('planModels'),
+        routerLink: ['/strategies'],
+        queryParams: { idOffice: this.idOffice }
+      },
+    ]);
   }
 
   handleChangeDisplayMode(event) {

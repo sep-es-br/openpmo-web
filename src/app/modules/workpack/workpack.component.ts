@@ -1,3 +1,4 @@
+import { MilestoneStatusEnum } from './../../shared/enums/MilestoneStatusEnum';
 import { IFilterProperty } from 'src/app/shared/interfaces/IFilterProperty';
 import { takeUntil } from 'rxjs/operators';
 import { IWorkpackCardItem } from './../../shared/interfaces/IWorkpackCardItem';
@@ -187,7 +188,7 @@ export class WorkpackComponent implements OnDestroy {
     private baselineSrv: BaselineService,
     private confirmationSrv: ConfirmationService,
   ) {
-    this.actRouter.queryParams.subscribe(async ({ id, idPlan, idWorkpackModel, idWorkpackParent, idWorkpackModelLinked }) => {
+    this.actRouter.queryParams.subscribe(async({ id, idPlan, idWorkpackModel, idWorkpackParent, idWorkpackModelLinked }) => {
       this.idWorkpack = id && +id;
       this.idPlan = idPlan && +idPlan;
       this.idWorkpackModel = idWorkpackModel && +idWorkpackModel;
@@ -723,9 +724,7 @@ export class WorkpackComponent implements OnDestroy {
 
   loadSelectedLocality(seletectedIds: number[], list: TreeNode[]) {
     let result = [];
-    list.sort( (a, b) => {
-      return a.label < b.label ? -1 : a.label > b.label ? 1 : 0;
-    });
+    list.sort((a, b) => a.label < b.label ? -1 : a.label > b.label ? 1 : 0);
     list.forEach(l => {
       if (seletectedIds.includes(l.data)) {
         result.push(l);
@@ -756,9 +755,7 @@ export class WorkpackComponent implements OnDestroy {
   }
 
   loadLocality(localityList: ILocalityList[], parent: TreeNode) {
-    localityList.sort( (a, b) => {
-      return a.name < b.name ? -1 : a.name > b.name ? 1 : 0;
-    });
+    localityList.sort((a, b) => a.name < b.name ? -1 : a.name > b.name ? 1 : 0);
     const list = localityList.map(locality => {
       if (locality.children) {
         const node = {
@@ -1043,7 +1040,7 @@ export class WorkpackComponent implements OnDestroy {
         cardTitle: 'journal',
         collapseble: true,
         initialStateCollapse: this.collapsePanelsStatus,
-      }
+      };
     }
     if (this.workpackModel.childWorkpackModelSessionActive && this.workpackModel.children) {
       this.sectionWorkpackModelChildren = true;
@@ -1056,7 +1053,7 @@ export class WorkpackComponent implements OnDestroy {
   }
 
   async loadSectionsWorkpackChildren() {
-    this.cardsWorkPackModelChildren = await Promise.all(this.workpackModel.children.map(async (workpackModel) => {
+    this.cardsWorkPackModelChildren = await Promise.all(this.workpackModel.children.map(async(workpackModel) => {
       const propertiesCard: ICard = {
         toggleable: false,
         initialStateToggle: false,
@@ -1089,7 +1086,7 @@ export class WorkpackComponent implements OnDestroy {
       'id-plan': idPlan,
       'id-workpack-model': idWorkpackModel,
       'id-workpack-parent': this.idWorkpack,
-      'workpackLinked': idWorkpackModelLinked ? true : false,
+      workpackLinked: idWorkpackModelLinked ? true : false,
       idFilter: idFilterSelected
     });
     const workpacks = result.success && result.data;
@@ -1186,7 +1183,8 @@ export class WorkpackComponent implements OnDestroy {
           paramsUrlCard: workpack.model.id !== idWorkpackModel ? [
             { name: 'idWorkpackModelLinked', value: idWorkpackModel },
             { name: 'idPlan', value: this.idPlan }
-          ] : (idWorkpackModelLinked ? [{ name: 'idWorkpackModelLinked', value: idWorkpackModelLinked }, { name: 'idPlan', value: this.idPlan }] : [{ name: 'idPlan', value: this.idPlan }]),
+          ] : (idWorkpackModelLinked ? [{ name: 'idWorkpackModelLinked', value: idWorkpackModelLinked },
+          { name: 'idPlan', value: this.idPlan }] : [{ name: 'idPlan', value: this.idPlan }]),
           linked: !!idWorkpackModelLinked ? true : (!!workpack.linked ? true : false),
           shared: workpack.sharedWith && workpack.sharedWith.length > 0 ? true : false,
           canceled: workpack.canceled,
@@ -1196,7 +1194,7 @@ export class WorkpackComponent implements OnDestroy {
           hasBaseline: workpack.hasActiveBaseline,
           baselineName: workpack.activeBaselineName,
           subtitleCardItem: workpack.type === 'Milestone' ? workpack.milestoneDate : '',
-          statusItem: workpack.type === 'Milestone' ? workpack.milestoneStatus : ''
+          statusItem: workpack.type === 'Milestone' ? MilestoneStatusEnum[workpack.milestoneStatus] : ''
         };
       });
       if (this.editPermission && !idWorkpackModelLinked) {
@@ -1252,6 +1250,31 @@ export class WorkpackComponent implements OnDestroy {
           }))
         });
       }
+      if (this.editPermission && !idWorkpackModelLinked) {
+        const sharedWorkpackList = await this.loadSharedWorkpackList(idWorkpackModel);
+        if (sharedWorkpackList && sharedWorkpackList.length > 0) {
+          iconMenuItems.push({
+            label: this.translateSrv.instant('linkTo'),
+            items: sharedWorkpackList.map(wp => ({
+              label: wp.name,
+              icon: `app-icon ${wp.icon}`,
+              command: () => this.handleLinkToWorkpack(wp.id, idWorkpackModel)
+            }))
+          });
+        }
+        const workpackCuted = this.workpackSrv.getWorkpackCuted();
+        if (workpackCuted) {
+          const { canPaste, incompatiblesProperties } = await this.checkPasteWorkpack(workpackCuted, idWorkpackModel);
+          const validPasteOutherOffice = workpackCuted.plan.idOffice === this.idOffice ? true : this.isUserAdmin;
+          if (canPaste && validPasteOutherOffice) {
+            iconMenuItems.push({
+              label: `${this.translateSrv.instant('paste')} ${this.getNameWorkpack(workpackCuted)}`,
+              icon: 'fas fa-paste',
+              command: (event) => this.handlePasteWorkpack(idPlan, idWorkpackModel, this.idWorkpack, incompatiblesProperties)
+            });
+          }
+        }
+      }
       const workpackItemCardList = [
         {
           typeCardItem: 'newCardItem',
@@ -1295,7 +1318,7 @@ export class WorkpackComponent implements OnDestroy {
       idWorkpack: workpack.id,
       reason: '',
       endManagementDate: null
-    }
+    };
   }
 
   async handleEndManagementDeliverable() {
@@ -1421,7 +1444,7 @@ export class WorkpackComponent implements OnDestroy {
     if (result.success) {
       return result.data;
     } else {
-      return {} as any
+      return {} as any;
     }
   }
 
@@ -1434,7 +1457,7 @@ export class WorkpackComponent implements OnDestroy {
           key: 'pasteConfirm',
           acceptLabel: this.translateSrv.instant('yes'),
           rejectLabel: this.translateSrv.instant('no'),
-          accept: async () => {
+          accept: async() => {
             await this.pasteWorkpack(workpackCuted, idWorkpackModelTo, idPlanTo, idParentTo);
           },
           reject: () => {
@@ -1461,7 +1484,7 @@ export class WorkpackComponent implements OnDestroy {
   }
 
   async loadSectionsWorkpackChildrenLinked() {
-    this.cardsWorkPackModelChildren = await Promise.all(this.workpack.modelLinked.children.map(async (workpackModel) => {
+    this.cardsWorkPackModelChildren = await Promise.all(this.workpack.modelLinked.children.map(async(workpackModel) => {
       const propertiesCard: ICard = {
         toggleable: false,
         initialStateToggle: false,
@@ -1786,7 +1809,7 @@ export class WorkpackComponent implements OnDestroy {
           ]
         }];
         return cardItem;
-      } else return []
+      } else { return []; };
     }
   }
 
@@ -1872,7 +1895,7 @@ export class WorkpackComponent implements OnDestroy {
       }
       return cardItems;
     } else {
-      const cardItem = this.editPermission ?  [{
+      const cardItem = this.editPermission ? [{
         typeCardItem: 'newCardItem',
         icon: IconsEnum.Plus,
         iconSvg: true,
@@ -2086,7 +2109,7 @@ export class WorkpackComponent implements OnDestroy {
       .filter(cost => cost.idWorkpack != this.idWorkpack)
       .map(cost => cost.idWorkpack)
       .reduce((IdsWorkpack, idWorkpack) => IdsWorkpack.includes(idWorkpack) ? IdsWorkpack : [...IdsWorkpack, idWorkpack], [])
-      .map(async (idWorkpack) => {
+      .map(async(idWorkpack) => {
         const result = await this.workpackSrv.GetWorkpackById(idWorkpack, { 'id-plan': this.idPlan });
         if (result.success) {
           const workpack = result.data;
@@ -2587,7 +2610,7 @@ export class WorkpackComponent implements OnDestroy {
         name: prop.apiValue,
         active: true,
         possibleValues: prop.possibleValues
-      }
+      };
       if (prop.label === 'role' && entityName === 'stakeholders') {
         property.possibleValues = this.workpackModel.personRoles && this.workpackModel.personRoles.map(role => ({
           label: role,

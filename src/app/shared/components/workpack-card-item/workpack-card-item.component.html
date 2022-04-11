@@ -9,7 +9,7 @@
             <i class="far fa-stop-circle"
               *ngIf="!!properties.endManagementDate && properties.endManagementDate !== null"
               [pTooltip]="'managementEnded'|translate"></i>
-            <i class="far fa-check-square" *ngIf="!!properties.completed" [pTooltip]="'scopeCompleted'|translate"></i>
+            <i class="far fa-check-square" *ngIf="!!properties.completed" [pTooltip]="label|translate"></i>
           </div>
           <div class="status-container"
             *ngIf="(!properties.endManagementDate || properties.endManagementDate === null) && !properties.completed && properties?.dashboard?.risk?.total > 0">
@@ -168,7 +168,7 @@
             <i class="far fa-stop-circle"
               *ngIf="!!properties.endManagementDate && properties.endManagementDate !== null"
               [pTooltip]="'managementEnded'|translate"></i>
-            <i class="far fa-check-square" *ngIf="!!properties.completed" [pTooltip]="'scopeCompleted'|translate"></i>
+            <i class="far fa-check-square" *ngIf="!!properties.completed" [pTooltip]="label|translate"></i>
           </div>
           <p-overlayPanel #riskPanel class="risk-overlay-panel">
             <div class="risk-panel-content">
@@ -295,9 +295,9 @@
         <div class="icons-container">
           <i [ngClass]=" ['concluded', 'lateConcluded'].includes(properties.statusItem) ?  [ 'app-icon', 'flag-check', 'grey-icon'] : ['app-icon', 'flag-unchecked', 'grey-icon']"
             [class.linked]="!!properties.linked || !!properties.shared" [ngStyle]="{ fontSize: '2.5rem' }"
-            [class.on-time]="properties?.statusItem === 'onTime'" [class.late]="properties?.statusItem === 'late'"
+            [class.on-time]="properties?.statusItem === 'ontime'" [class.late]="properties?.statusItem === 'late'"
             [class.concluded]="properties?.statusItem === 'concluded'"
-            [class.late-concluded]="properties?.statusItem === 'lateConcluded'"></i>
+            [class.late-concluded]="properties?.statusItem === 'lateconcluded'"></i>
           <i [ngClass]="['app-icon', 'link-to', 'grey-icon', 'linked']" *ngIf="!!properties.linked"></i>
           <i [ngClass]="['app-icon', 'sharing', 'grey-icon', 'linked']"
             *ngIf="!!properties.shared && !properties.linked"></i>
@@ -308,9 +308,9 @@
           (properties?.subtitleCardItem|date:'dd/MM/yyyy') :
           (properties?.subtitleCardItem|date:'yyyy/MM/dd')}}</span>
         <span class="card-item-status" *ngIf="properties?.statusItem"
-          [class.on-time]="properties?.statusItem === 'onTime'" [class.late]="properties?.statusItem === 'late'"
+          [class.on-time]="properties?.statusItem === 'ontime'" [class.late]="properties?.statusItem === 'late'"
           [class.concluded]="properties?.statusItem === 'concluded'"
-          [class.late-concluded]="properties?.statusItem === 'lateConcluded'">{{properties?.statusItem|translate}}</span>
+          [class.late-concluded]="properties?.statusItem === 'lateconcluded'">{{properties?.statusItem|translate}}</span>
       </div>
       <div class="card-item-footer" *ngIf="cardIdItem">
         <span class="baline-icon">
@@ -329,9 +329,9 @@
           <div class="icons-container-list">
             <i [ngClass]=" ['concluded', 'lateConcluded'].includes(properties.statusItem) ?  [ 'app-icon', 'flag-check', 'grey-icon'] : ['app-icon', 'flag-unchecked', 'grey-icon']"
               [class.linked]="!!properties.linked || !!properties.shared" [ngStyle]="{ fontSize: '2rem' }"
-              [class.on-time]="milestoneStatusEnum[properties.statusItem] === 'onTime'" [class.late]="milestoneStatusEnum[properties.statusItem] === 'late'"
+              [class.on-time]="milestoneStatusEnum[properties.statusItem] === 'ontime'" [class.late]="milestoneStatusEnum[properties.statusItem] === 'late'"
               [class.concluded]="milestoneStatusEnum[properties.statusItem] === 'concluded'"
-              [class.late-concluded]="milestoneStatusEnum[properties.statusItem] === 'lateConcluded'"></i>
+              [class.late-concluded]="milestoneStatusEnum[properties.statusItem] === 'lateconcluded'"></i>
             <i [ngClass]="['app-icon', 'link-to', 'grey-icon', 'linked']" *ngIf="!!properties.linked"></i>
             <i [ngClass]="['app-icon', 'sharing', 'grey-icon', 'linked']"
               *ngIf="!!properties.shared && !properties.linked"></i>
@@ -340,9 +340,9 @@
             <span class="card-item-name" [pTooltip]="properties.fullNameCardItem"
               tooltipPosition="bottom">{{properties.nameCardItem}}</span>
             <span class="card-item-status" *ngIf="properties?.statusItem"
-              [class.on-time]="milestoneStatusEnum[properties.statusItem] === 'onTime'" [class.late]="milestoneStatusEnum[properties.statusItem] === 'late'"
+              [class.on-time]="milestoneStatusEnum[properties.statusItem] === 'ontime'" [class.late]="milestoneStatusEnum[properties.statusItem] === 'late'"
               [class.concluded]="milestoneStatusEnum[properties.statusItem] === 'concluded'"
-              [class.late-concluded]="milestoneStatusEnum[properties.statusItem] === 'lateConcluded'">{{milestoneStatusEnum[properties?.statusItem]|translate}}</span>
+              [class.late-concluded]="milestoneStatusEnum[properties.statusItem] === 'lateconcluded'">{{milestoneStatusEnum[properties?.statusItem]|translate}}</span>
           </div>
         </div>
         <span class="card-item-date" *ngIf="properties.subtitleCardItem" [class.attention-milestone]="!!attentionMilestone" >{{language === 'pt-BR' ?

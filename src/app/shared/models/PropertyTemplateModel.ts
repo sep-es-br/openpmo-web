@@ -73,11 +73,11 @@ export class PropertyTemplateModel implements IProperty {
       case TypePropertyModelEnum.LocalitySelectionModel:
         if (!multipleSelection) {
           const selectedLocality = localitiesSelected as TreeNode;
-          property.selectedValues = [selectedLocality.data];
+          property.selectedValues = [selectedLocality?.data];
         }
         if (multipleSelection) {
           const selectedLocality = localitiesSelected as TreeNode[];
-          property.selectedValues = selectedLocality.filter(locality => locality.data !== idDomain)
+          property.selectedValues = selectedLocality?.filter(locality => locality.data !== idDomain)
             .map(l => l.data);
         }
         break;

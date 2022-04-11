@@ -2,7 +2,7 @@ import { ResponsiveService } from 'src/app/shared/services/responsive.service';
 import { IBaseline } from './../../../shared/interfaces/IBaseline';
 import { takeUntil } from 'rxjs/operators';
 import { IconsTypeWorkpackEnum } from './../../../shared/enums/IconsTypeWorkpackModelEnum';
-import { Component, Input, OnInit, SimpleChanges, ViewChild } from '@angular/core';
+import { Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges, ViewChild } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { ChartData } from 'chart.js';
 import { ICard } from 'src/app/shared/interfaces/ICard';
@@ -19,7 +19,7 @@ import { Router } from '@angular/router';
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss']
 })
-export class DashboardComponent implements OnInit {
+export class DashboardComponent implements OnInit, OnChanges, OnDestroy {
 
   @ViewChild(Calendar) calendarComponent: Calendar;
   @Input() idWorkpack: number;
@@ -53,7 +53,7 @@ export class DashboardComponent implements OnInit {
   endDate: Date;
   midleTextMilestones: string;
   midleTextRisks: string;
-  
+
   constructor(
     private dashboardSrv: DashboardService,
     private translateSrv: TranslateService,
@@ -109,7 +109,7 @@ export class DashboardComponent implements OnInit {
       this.cardDashboardProperties = Object.assign({
         ...this.cardDashboardProperties,
         initialStateCollapse: this.collapsePanelsStatus
-      })
+      });
     }
   }
 
@@ -125,13 +125,13 @@ export class DashboardComponent implements OnInit {
   }
 
   async loadSheduleInterval() {
-    const result = await this.dashboardSrv.GetDashboardScheduleInterval({'id-workpack': this.idWorkpack});
+    const result = await this.dashboardSrv.GetDashboardScheduleInterval({ 'id-workpack': this.idWorkpack });
     if (result.success && result.data.startDate && result.data.startDate !== null && result.data.endDate && result.data.endDate !== null) {
       const startDate = moment(result.data.startDate, 'MM-yyyy').toDate();
       const endDate = moment(result.data.endDate, 'MM-yyyy').toDate();
       const todayMonthFormat = moment().format('MM-yyyy');
       const today = moment(todayMonthFormat, 'MM-yyyy').toDate();
-      
+
       if (moment(today).subtract(1, 'month').isSameOrBefore(startDate)) {
         this.referenceMonth = moment(startDate).toDate();
       } else if (moment(today).subtract(1, 'month').isSameOrAfter(endDate)) {
@@ -139,7 +139,7 @@ export class DashboardComponent implements OnInit {
       } else {
         this.referenceMonth = moment(today).subtract(1, 'month').toDate();
       }
-      this.yearRange = moment(startDate).year().toString() + ':' + moment(endDate).year().toString()
+      this.yearRange = moment(startDate).year().toString() + ':' + moment(endDate).year().toString();
       this.startDate = moment(startDate).toDate();
       this.endDate = moment(endDate).toDate();
     }
@@ -148,7 +148,15 @@ export class DashboardComponent implements OnInit {
   async getDashboardData() {
     if (this.referenceMonth && this.referenceMonth !== null) {
       const referenceMonth = moment(this.referenceMonth).format('MM-yyyy');
-      const { data, success } = await this.dashboardSrv.GetDashboardByWorkpack({ 'id-workpack': this.idWorkpack, 'date-reference': referenceMonth, 'id-baseline': this.selectedBaseline });
+      const { data, success } =
+        await this.dashboardSrv.GetDashboardByWorkpack(
+          { 'id-workpack': this.idWorkpack, 'date-reference': referenceMonth, 'id-baseline': this.selectedBaseline });
+      if (success) {
+        this.dashboard = data;
+      }
+    } else {
+      const { data, success } = await this.dashboardSrv.GetDashboardByWorkpack(
+        { 'id-workpack': this.idWorkpack, 'date-reference': this.referenceMonth, 'id-baseline': this.selectedBaseline });
       if (success) {
         this.dashboard = data;
       }
@@ -170,13 +178,13 @@ export class DashboardComponent implements OnInit {
           {
             data: [milestone.onTime, milestone.late, milestone.concluded, milestone.lateConcluded],
             backgroundColor: [
-              "#00b89c",
-              "#fa4c4f",
-              "#0081c1",
-              "#00aef7",
+              '#00b89c',
+              '#fa4c4f',
+              '#0081c1',
+              '#00aef7',
             ],
           }]
-      }
+      };
     } else {
       this.dashboardShowMilestones = false;
     }
@@ -196,12 +204,12 @@ export class DashboardComponent implements OnInit {
           {
             data: [risk.high, risk.medium, risk.low],
             backgroundColor: [
-              "#ce4543",
-              "#fb7800",
-              "#ffc300",
+              '#ce4543',
+              '#fb7800',
+              '#ffc300',
             ],
           }]
-      }
+      };
     } else {
       this.dashboardShowRisks = false;
     }
@@ -230,7 +238,7 @@ export class DashboardComponent implements OnInit {
       referenceMonth: this.referenceMonth,
       startDate: this.startDate,
       yearRange: this.yearRange,
-    })
+    });
     this.router.navigate(['/workpack/expanded-dashboard']);
   }
 

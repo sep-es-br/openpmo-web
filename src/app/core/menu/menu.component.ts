@@ -213,8 +213,8 @@ export class MenuComponent implements OnInit, OnDestroy {
           label: this.translateSrv.instant('currentLanguage'),
           icon: 'fas fa-flag',
           items: [
-            { label: 'Português', command: () => {this.changeLanguage('pt-BR'); this.closeAllMenus()} },
-            { label: 'English', command: () => {this.changeLanguage('en-US'); this.closeAllMenus()} }
+            { label: 'Português', command: () => {this.changeLanguage('pt-BR'); this.closeAllMenus(); } },
+            { label: 'English', command: () => {this.changeLanguage('en-US'); this.closeAllMenus(); } }
           ]
         }
       ]
@@ -223,6 +223,7 @@ export class MenuComponent implements OnInit, OnDestroy {
 
   changeLanguage(language: string) {
     this.translateChangeSrv.changeLangDefault(language);
+    window.location.reload();
   }
 
   async loadPropertiesPlan() {

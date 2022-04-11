@@ -201,6 +201,7 @@ export class MenuFixedComponent implements OnInit, OnDestroy {
 
   changeLanguage(language: string) {
     this.translateChangeSrv.changeLangDefault(language);
+    window.location.reload();
   }
 
   async loadOfficeMenu() {

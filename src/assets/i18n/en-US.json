@@ -1,11 +1,13 @@
 {
+  "viewMore": "View More",
+  "viewAll": "View All",
   "attention": "Attention",
   "selectedItems": "selected items",
   "dashboard": "Dashboard",
-  "concludedLate": "Concluded Late",
+  "concludedlate": "Concluded Late",
   "concluded": "Concluded",
   "late": "Late",
-  "onTime": "On Time",
+  "ontime": "On Time",
   "administration": "Administration",
   "administrator": "Administrator",
   "administrators": "Administrators",
@@ -288,6 +290,7 @@
   "items": "Items",
   "managementEnded": "Management ended",
   "scopeCompleted": "Escope completed",
+  "completed": "Completed",
   "endManagement": "End management",
   "resumeManagement": "Resume management",
   "endedManagementIn": "End date",
@@ -411,7 +414,7 @@
           }
         }
       },
-      
+
       "planModel": {
         "delete": {
           "relationship": {
