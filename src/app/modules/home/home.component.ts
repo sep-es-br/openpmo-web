@@ -47,6 +47,10 @@ export class HomeComponent implements OnInit {
           this.authSrv.saveToken(userInfo);
           this.authSrv.nextIsLoginDenied(false);
           const user = this.authSrv.getTokenPayload();
+          const language = user ? this.cookieSrv.get('cookiesDefaultLanguateUser' + user.email) : null;
+          if (language) {
+            this.translateChangeSrv.changeLangDefault(language);
+          }
           const workPlanUser = this.cookieSrv.get('planWorkUser' + user.email);
           if (workPlanUser) {
             this.routerPlanWork = true;
@@ -71,6 +75,10 @@ export class HomeComponent implements OnInit {
         }, 0);
       } else {
         const user = this.authSrv.getTokenPayload();
+        const language = user ? this.cookieSrv.get('cookiesDefaultLanguateUser' + user.email) : null;
+        if (language) {
+          this.translateChangeSrv.changeLangDefault(language);
+        }
         const workPlanUser = user ? this.cookieSrv.get('planWorkUser' + user.email) : null;
         if ((!this.routerPlanWork && !workPlanUser) ) {
           setTimeout(async () => {

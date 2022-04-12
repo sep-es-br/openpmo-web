@@ -10,6 +10,8 @@ import {Subject} from 'rxjs';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {ICard} from 'src/app/shared/interfaces/ICard';
 import {Component, OnDestroy, OnInit} from '@angular/core';
+import {MessageService} from "primeng/api";
+import {TranslateService} from "@ngx-translate/core";
 
 @Component({
   selector: 'app-baseline',
@@ -45,7 +47,9 @@ export class BaselineComponent implements OnInit, OnDestroy {
     private responsiveSrv: ResponsiveService,
     private breadcrumbSrv: BreadcrumbService,
     private router: Router,
-    private authSrv: AuthService
+    private authSrv: AuthService,
+    private messageSrv: MessageService,
+    private translateSrv: TranslateService
   ) {
     this.actRouter.queryParams
       .subscribe(({id, idWorkpack, idWorkpackModelLinked}) => {
@@ -184,7 +188,7 @@ export class BaselineComponent implements OnInit, OnDestroy {
     this.baseline.updates.forEach(update => update.included = event.checked);
   }
 
-  async handleSaveDraftBaseline() {
+  async handleSaveDraftBaseline(showMessage = true) {
     this.baseline = {
       ...this.baseline,
       name: this.formBaseline.controls.name.value,
@@ -198,6 +202,13 @@ export class BaselineComponent implements OnInit, OnDestroy {
       if (!this.idBaseline) {
         this.baseline.id = result.data.id;
         this.idBaseline = result.data.id;
+      }
+      if (showMessage) {
+        this.messageSrv.add({
+          severity: 'success',
+          summary: this.translateSrv.instant('success'),
+          detail: this.translateSrv.instant('messages.savedSuccessfully')
+        });
       }
     }
   }
@@ -239,7 +250,9 @@ export class BaselineComponent implements OnInit, OnDestroy {
   }
 
   async saveDraftAndSubmitBaseline() {
-    await this.handleSaveDraftBaseline();
+    if (!this.idBaseline) {
+      await this.handleSaveDraftBaseline(false);
+    }
     await this.handleSubmitBaseline();
   }
 

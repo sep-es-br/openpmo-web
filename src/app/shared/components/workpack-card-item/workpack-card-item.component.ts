@@ -211,7 +211,10 @@ export class WorkpackCardItemComponent implements OnInit, OnDestroy {
         ],
         datasets: [
           {
-            data: [milestone.onTime, milestone.late, milestone.concluded, milestone.lateConcluded],
+            data: [milestone.onTime ? milestone.onTime : 0 , 
+                  milestone.late ? milestone.late : 0, 
+                  milestone.concluded ? milestone.concluded : 0, 
+                  milestone.lateConcluded ?  milestone.lateConcluded : 0],
             backgroundColor: [
               "#00b89c",
               "#fa4c4f",

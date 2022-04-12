@@ -17,7 +17,7 @@
     <div *ngIf="schedule.plannedValue" class="content-card-item planned"
       [ngStyle]="{width: ((schedule?.plannedValue / monthsInPeriod)* 100) + '%', 'min-width': '20%', 'margin-left': this.marginLeftPlanned + '%', 'margin-right': this.marginRightPlanned + '%'}">
       <div class="date-labels">
-        <label [class.start-space]="((schedule?.foreseenValue / (monthsInPeriod))* 100) <= 20">{{language
+        <label [class.start-space]="((schedule?.plannedValue / (monthsInPeriod))* 100) <= 20">{{language
           === 'pt' ? (schedule?.plannedStartDate|date:'dd/MM/yyyy') :
           (schedule?.plannedStartDate|date:'yyyy/MM/dd')}}</label>
         <label>{{language === 'pt' ? (schedule?.plannedEndDate|date:'dd/MM/yyyy') :

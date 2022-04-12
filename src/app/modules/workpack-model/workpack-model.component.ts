@@ -283,8 +283,6 @@ export class WorkpackModelComponent implements OnInit {
 
   async loadDetails() {
     this.loadCards();
-
-    // this.setBreadcrumb();
     if (this.idWorkpackModel) {
       if (!this.editPermission) {
         this.formProperties.disable();
@@ -421,7 +419,7 @@ export class WorkpackModelComponent implements OnInit {
           multipleSelection: false,
           possibleValues: Object.values(this.translateSrv.instant(['finished', 'structuring', 'execution', 'suspended'])),
           sortIndex: 2,
-          defaultValue: 'structuring',
+          defaultValue: this.translateSrv.instant('structuring'),
           fullLine: false,
           required: true
         },
@@ -488,15 +486,6 @@ export class WorkpackModelComponent implements OnInit {
             sortIndex: 4,
             fullLine: false
           },
-          // {
-          //   active: true,
-          //   label: this.translateSrv.instant('counties'),
-          //   name: this.translateSrv.instant('counties'),
-          //   type: TypePropertyEnum.LocalitySelectionModel,
-          //   multipleSelection: true,
-          //   sortIndex: 5,
-          //   fullLine: true
-          // },
           {
             active: true,
             label: this.translateSrv.instant('measureUnit'),
@@ -521,7 +510,7 @@ export class WorkpackModelComponent implements OnInit {
             multipleSelection: false,
             possibleValues: Object.values(this.translateSrv.instant(['finished', 'structuring', 'execution', 'suspended'])),
             sortIndex: 2,
-            defaultValue: 'structuring',
+            defaultValue: this.translateSrv.instant('structuring'),
             fullLine: false,
             required: true
           },
@@ -555,7 +544,7 @@ export class WorkpackModelComponent implements OnInit {
         defaultProperties.push(
           {
             active: true, label: this.translateSrv.instant('date'), name: this.translateSrv.instant('date'),
-            type: TypePropertyEnum.DateModel, sortIndex: 2, fullLine: true
+            type: TypePropertyEnum.DateModel, sortIndex: 2, fullLine: true, required: true
           },
           {
             active: true, label: this.translateSrv.instant('statusCompleted'), name: this.translateSrv.instant('statusCompleted'),
@@ -782,7 +771,6 @@ export class WorkpackModelComponent implements OnInit {
           ['manager', 'teamMember', 'sponsor', 'partner', 'funder', 'client', 'competitor']
           .map(item => ({ label: this.translateSrv.instant(item), value: this.translateSrv.instant(item) })),
       };
-      console.log('dashboardPanel', this.dashboardPanel);
       this.cardPropertiesRiskAndIssues.initialStateToggle = data.riskAndIssueManagementSessionActive;
       this.cardPropertiesProcesses.initialStateToggle = data.processesManagementSessionActive;
       if (this.workpackModelType === TypeWorkpackModelEnum.DeliverableModel) {

@@ -55,7 +55,7 @@ export class CostAssignmentCardItemComponent implements OnInit, OnDestroy {
 
   handleCostChange(event, field: string) {
     setTimeout(() => {
-      this.properties[field] = +event.target.value;
+      this.properties[field] = event.value;
       this.costChanged.emit();
     }, 1);
   }

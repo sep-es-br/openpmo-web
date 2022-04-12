@@ -7,7 +7,7 @@
   <div class="card-item-values p-fluid">
     <span class="p-float-label" [class.responsive]="responsive">
       <p-inputNumber class="app-input-number" id="float-planned" [(ngModel)]="properties.plannedWork"
-        (onKeyDown)="handleCostChange($event,'plannedWork')" mode="decimal" [locale]="currentLang" [minFractionDigits]="2"
+        (onInput)="handleCostChange($event,'plannedWork')" mode="decimal" [locale]="currentLang" [minFractionDigits]="2"
         [maxFractionDigits]="2" [disabled]="!!properties.readonly">
       </p-inputNumber>
       <label class="app-input-label" for="float-planned">{{properties.unitMeasureName}} {{ "planned" |translate
@@ -15,7 +15,7 @@
     </span>
     <span class="p-float-label" [class.responsive]="responsive">
       <p-inputNumber class="app-input-number" id="float-planned" [(ngModel)]="properties.actualWork"
-        [disabled]="!!properties.readonly"  (onKeyDown)="handleCostChange($event,'actualWork')" mode="decimal" [locale]="currentLang"
+        [disabled]="!!properties.readonly"  (onInput)="handleCostChange($event,'actualWork')" mode="decimal" [locale]="currentLang"
         [minFractionDigits]="2" [maxFractionDigits]="2">
       </p-inputNumber>
       <label class="app-input-label" for="float-planned">{{properties.unitMeasureName}} {{ "actual" |translate

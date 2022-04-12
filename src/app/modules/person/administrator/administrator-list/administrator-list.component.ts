@@ -140,6 +140,10 @@ export class AdministratorListComponent implements OnInit {
     }
   }
 
+  handleCreateNewAdministrator() {
+    this.router.navigate(['/persons/administrators/administrator'])
+  }
+
   async handleSelectedFilter(event) {
     const idFilter = event.filter;
     if (idFilter) {

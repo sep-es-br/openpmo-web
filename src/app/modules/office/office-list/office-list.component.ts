@@ -17,6 +17,7 @@ import { CookieService } from 'ngx-cookie';
 import * as moment from 'moment';
 import { enterLeave } from '../../../shared/animations/enterLeave.animation';
 import { Subject } from 'rxjs';
+import { StoreKeys } from 'src/app/shared/constants';
 
 @Component({
   selector: 'app-office-list',
@@ -96,6 +97,8 @@ export class OfficeListComponent implements OnInit {
     const user = this.authSrv.getTokenPayload();
     if (user && user.email) {
       this.cookieSrv.put('cookiesPermission' + user.email, 'true', { expires: date });
+      const language = localStorage.getItem(StoreKeys.defaultLanguage);
+      this.cookieSrv.put('cookiesDefaultLanguateUser' + user.email, language);
     }
     this.showCookiesPermissionMessage = false;
   }

@@ -1,3 +1,5 @@
+import { CookieService } from 'ngx-cookie';
+import { AuthService } from 'src/app/shared/services/auth.service';
 import { Injectable } from '@angular/core';
 import { Subject, Observable } from 'rxjs';
 import { StoreKeys } from '../constants';
@@ -14,7 +16,9 @@ export class TranslateChangeService {
 
   constructor(
     private translate: TranslateService,
-    private config: PrimeNGConfig
+    private config: PrimeNGConfig,
+    private authSrv: AuthService,
+    private cookieSrv: CookieService
   ) {
     this.translate.get('primeng').subscribe(res => this.config.setTranslation(res));
   }
@@ -23,6 +27,13 @@ export class TranslateChangeService {
   changeLangDefault(lang: string) {
     if (!this.supportedLangs.includes(lang)) {
       lang = 'en-US';
+    }
+    const user = this.authSrv.getTokenPayload();
+    if (user) {
+      const cookiesPermission = this.cookieSrv.get('cookiesPermission'+ user.email);
+      if (!!cookiesPermission) {
+        this.cookieSrv.put('cookiesDefaultLanguateUser' + user.email, lang);
+      }
     }
     localStorage.setItem(StoreKeys.defaultLanguage, lang);
     this.translate.setDefaultLang(lang);

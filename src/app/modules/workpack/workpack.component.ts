@@ -1144,11 +1144,14 @@ export class WorkpackComponent implements OnDestroy {
                 command: (event) => this.navigateToCancelProject(workpack.id, propertyNameWorkpack.value as string),
               });
             }
-            menuItems.push({
-              label: this.translateSrv.instant('changeControlBoard'),
-              icon: 'app-icon ccb-member',
-              command: (event) => this.navigateToConfigCCB(workpack.id),
-            });
+            if (!workpack.pendingBaseline && !workpack.cancelPropose && !workpack.hasActiveBaseline) {
+              menuItems.push({
+                label: this.translateSrv.instant('delete'),
+                icon: 'fas fa-trash-alt',
+                command: (event) => this.deleteWorkpackChildren(workpack),
+                disabled: !this.editPermission
+              });
+            }
           }
           if (this.editPermission) {
             menuItems.push({

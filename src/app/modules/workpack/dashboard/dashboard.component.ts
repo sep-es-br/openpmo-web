@@ -7,7 +7,6 @@ import { TranslateService } from '@ngx-translate/core';
 import { ChartData } from 'chart.js';
 import { ICard } from 'src/app/shared/interfaces/ICard';
 import { IDashboard } from 'src/app/shared/interfaces/IDashboard';
-import { IWorkpack } from 'src/app/shared/interfaces/IWorkpack';
 import { DashboardService } from 'src/app/shared/services/dashboard.service';
 import * as moment from 'moment';
 import { Calendar } from 'primeng/calendar';

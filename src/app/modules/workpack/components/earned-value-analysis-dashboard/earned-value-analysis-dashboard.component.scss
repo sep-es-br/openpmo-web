@@ -16,6 +16,10 @@
       display: flex;
       flex-direction: column;
       width: 65%;
+      padding: 0.5em;
+      .line-chart-container {
+        padding: 1em;
+      }
       p-chart {
         width: 100%;
       }

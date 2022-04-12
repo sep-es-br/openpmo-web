@@ -264,7 +264,7 @@ export class ControlChangeBoardMemberComponent implements OnInit, OnDestroy {
   setMemberAsCcbMember(person: IPerson) {
     this.ccbMember.memberAs = person && person.roles ? person.roles.map(role => ({
       active: false,
-      role: role.role,
+      role: this.translateSrv.instant(role.role),
       workLocation: role.workLocation
     })) : [];
   }

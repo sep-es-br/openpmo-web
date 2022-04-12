@@ -25,6 +25,6 @@ export class ShortNumberPipe implements PipeTransform {
         break;
       }
     }
-    return lang === 'pt' || lang === 'pt-BR' ?  abs + key : abs.toString().replace('.', ',') + key;
+    return lang === 'pt' || lang === 'pt-BR' ?  abs.toString().replace('.', ',') + key : abs + key ;
   }
 }

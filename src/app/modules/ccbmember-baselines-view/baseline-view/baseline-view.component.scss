@@ -254,6 +254,9 @@
                         color: #B5B5B5;
                       }
                     }
+                    > div {
+                      border-radius: 5px;
+                    }
                     .progress-bar {
                       display: flex;
                       flex-direction: row;
