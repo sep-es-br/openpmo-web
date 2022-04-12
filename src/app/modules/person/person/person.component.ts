@@ -96,6 +96,10 @@ export class PersonComponent implements OnInit, OnDestroy {
 
   setPhoneNumberMask(){
     const valor = this.formPerson.controls.phoneNumber.value;
+    if (!valor || valor.length === 0) {
+      this.phoneNumberPlaceholder = '';
+      return;
+    }
     if (valor.length < 10 && valor) {
       this.formPerson.controls.phoneNumber.setValue(null);
       return;

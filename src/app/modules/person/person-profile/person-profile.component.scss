@@ -2,6 +2,7 @@
   .card-container {
     .content {
       display: flex;
+      flex-direction: row;
       padding-bottom: 2em;
       .container-left-info {
         display: flex;
@@ -132,6 +133,56 @@
               border-style: solid;
               border-color: rgba(229, 229, 228, 1);
               border-radius: 5px;
+            }
+          }
+        }
+      }
+    }
+    .content.mobile {
+      flex-direction: column;
+      .container-left-info {
+        width: 100%;
+        border-right: none;
+        padding: 0;
+        .app-avatar .avatar {
+          width: 100%;
+          display: flex;
+          flex-direction: row;
+          justify-content: center;
+        }
+      }
+      .container-right-info {
+        width: 100%;
+        .p-float-label {
+          width: 100%;
+          .app-single-selection {
+            width: 100%;
+            .p-dropdown {
+              width: 100%;
+            }
+          }
+        }
+        .section {
+          .title {
+            margin-top: 1em;
+          }
+          .p-formgroup {
+            .property-input-text {
+              margin-top: 0;
+            }
+            .property-input {
+              padding-left: 0;
+            }
+          }
+          .p-float-label.left > label {
+            left: 0 !important;
+          }
+          .p-float-label .p-inputtextarea {
+            width: 100%;
+          }
+          .unifique-contacts {
+            .p-button {
+              width: 100%;
             }
           }
         }

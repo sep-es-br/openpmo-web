@@ -191,8 +191,11 @@
     }
     .schedule-buttons {
       display: flex;
-      column-gap: 2em;
+      flex-direction: row;
+      // column-gap: 2em;
       .button-details {
+        margin-right: 2em;
+        width: 180px;
         background: rgba(22, 155, 213, 0.9);
         color: #ffffff;
         font-size: 0.8rem;
@@ -202,6 +205,7 @@
         }
       }
       .button-delete {
+        width: 180px;
         background: rgba(255,106,106, 0.9);
         color: #ffffff;
         font-size: 0.8rem;
@@ -211,11 +215,17 @@
         }
       }
     }
-    .schedule-buttons-mobile {
-      .p-button-text {
-        font-size: 0.6rem ;
-      }
+    .schedule-buttons.schedule-buttons-mobile {
+      flex-direction: column;
       width: 100%;
+      .p-button-text {
+        width: 100%;
+        font-size: 0.6rem ;
+        margin-top: 0.5em;
+      }
+      .button-delete {
+        margin-top: 1em;
+      }
     }
     .schedule-steps-section {
       padding-top: 1em;

@@ -139,6 +139,7 @@ $mobileMenuHeight: 90px;
       align-items: flex-start;
       position: relative;
       height: 90px;
+      background-color: #d9d9d9;
       .item {
         width: 25%;
         padding: 0.5em 0;
@@ -407,7 +408,7 @@ $mobileMenuHeight: 90px;
 }
 
 ::ng-deep .user-slide {
-  .p-tieredmenu {
+  .p-tieredmenu, .p-panelmenu {
     border: none !important;
     padding: 0 !important;
     .p-menuitem-link {
@@ -439,6 +440,17 @@ $mobileMenuHeight: 90px;
       font-family: v.$fontFamilyBold;
       font-weight: 700;
     }
+  }
+  .p-panelmenu .p-panelmenu-panel:first-child .p-panelmenu-header > a {
+    font-size: 1.25rem;
+    padding: 20px;
+    .p-menuitem-text {
+      font-family: v.$fontFamilyBold;
+      font-weight: 700;
+    }
+  }
+  .p-panelmenu-header-link {
+    background-color: #ffffff !important;
   }
 }
 

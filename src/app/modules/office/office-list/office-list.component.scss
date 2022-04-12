@@ -41,6 +41,13 @@
   }
   .user-cookies-confirmation.responsive {
     width: 100%;
+    background-color: #44B39B;
+    color: #fff;
+    left: 0;
+    .cookies-buttons-actions {
+      width: 100%;
+      text-align: center;
+    }
   }
 }
 

@@ -191,6 +191,10 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
 
   setPhoneNumberMask(){
     const valor = this.stakeholderForm.controls.phoneNumber.value;
+    if (!valor || valor.length === 0) {
+      this.phoneNumberPlaceholder = '';
+      return;
+    }
     if (valor.length < 10 && valor) {
       this.stakeholderForm.controls.phoneNumber.setValue(null);
       return;

@@ -142,6 +142,7 @@
             align-items: flex-start;
             .radios-container {
               margin-top: 1em;
+              align-items: center;
             }
             .search-user-radio {
               margin-left: 0;
@@ -216,6 +217,15 @@
               &:hover {
                 background-color: v.$bgButtonGreenHover;
                 border: none;
+              }
+            }
+          }
+          .search-by-cpf-container.responsive {
+            width: 100%;
+            .user-by-cpf-input-container {
+              width: 100%;
+              .cpf-container {
+                flex: 1;
               }
             }
           }
