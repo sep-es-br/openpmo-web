@@ -1137,6 +1137,11 @@ export class WorkpackComponent implements OnDestroy {
             });
           }
           if (workpack.type === 'Project' && this.editPermission) {
+            menuItems.push({
+              label: this.translateSrv.instant('changeControlBoard'),
+              icon: 'app-icon ccb-member',
+              command: (event) => this.navigateToConfigCCB(workpack.id),
+            });
             if (!workpack.pendingBaseline && !workpack.cancelPropose && !!workpack.hasActiveBaseline) {
               menuItems.push({
                 label: this.translateSrv.instant('cancel'),
@@ -1298,7 +1303,8 @@ export class WorkpackComponent implements OnDestroy {
   }
 
   async unlinkedWorkpack(idWorkpackLinked, idWorkpackModel) {
-    const result = await this.workpackSrv.unlinkWorkpack(idWorkpackLinked, idWorkpackModel, { 'id-workpack-parent': this.idWorkpack, 'id-plan': this.idPlan });
+    const result = await this.workpackSrv.unlinkWorkpack(idWorkpackLinked, idWorkpackModel,
+      { 'id-workpack-parent': this.idWorkpack, 'id-plan': this.idPlan });
     if (result.success) {
       const workpackModelIndex = this.cardsWorkPackModelChildren
         .findIndex(workpackModel => workpackModel.idWorkpackModel === idWorkpackModel);
@@ -1326,7 +1332,8 @@ export class WorkpackComponent implements OnDestroy {
   }
 
   async handleEndManagementDeliverable() {
-    if (this.endManagementWorkpack && this.endManagementWorkpack.reason.length > 0 && this.endManagementWorkpack.endManagementDate !== null) {
+    if (this.endManagementWorkpack && this.endManagementWorkpack.reason.length > 0
+      && this.endManagementWorkpack.endManagementDate !== null) {
       const result = await this.workpackSrv.endManagementDeliverable({
         idWorkpack: this.endManagementWorkpack.idWorkpack,
         endManagementDate: moment(this.endManagementWorkpack.endManagementDate).format('yyyy-MM-DD'),
