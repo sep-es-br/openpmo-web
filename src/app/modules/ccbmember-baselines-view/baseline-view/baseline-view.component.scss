@@ -50,15 +50,15 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        
+
         .card-title-mobile {
           font-size: 0.75rem;
-        }    
+        }
       }
       .card-collapseble {
         cursor: pointer;
       }
-  
+
       p-header.card-header-mobile {
         display: flex;
         width: 100%;
@@ -335,7 +335,7 @@
                       flex-direction: row !important;
                       align-items: center;
                       justify-content: space-between;
-                    }  
+                    }
                   }
                 }
               }
@@ -412,11 +412,11 @@
                   font-size: 0.9rem;
                   margin-left: 0.5em;
                 }
-                
+
               }
               .item-description-container-responsive {
                 margin-left: 0;
-                
+
               }
             }
             .card-list-item.header .p-card {
@@ -554,7 +554,7 @@
                       flex-direction: row !important;
                       align-items: center;
                       justify-content: space-between;
-                    }  
+                    }
                   }
                 }
               }
@@ -582,11 +582,11 @@
                   font-size: 0.9rem;
                   margin-left: 0.5em;
                 }
-                
+
               }
               .item-description-container-responsive {
                 margin-left: 0;
-                
+
               }
               .item-status {
                 display: flex;
@@ -603,7 +603,7 @@
                   margin-right: 1em;
                 }
               }
-              
+
             }
           }
         }
@@ -643,13 +643,13 @@
                       font-size: 15px;
                       font-family: v.$fontFamily;
                       > span {
-                        
+
                         display: flex;
                         flex-direction: row;
                         justify-content: flex-start;
                         align-items: flex-start;
                       }
-                      
+
                       .header {
                         font-weight: 700;
                         font-family: v.$fontFamilyBold;
@@ -674,7 +674,7 @@
                     .positive-variation {
                       color: #44B39B;
                     }
-                    
+
                   }
                 }
               }
@@ -685,8 +685,8 @@
           width: 100%;
           padding: 0.5em
         }
-        
-        
+
+
       }
     }
   }
@@ -760,19 +760,19 @@
             font-size: 14px;
           }
         }
-        .no {
+        .yes {
           border-color: rgba(68, 179, 155, 1);
           color: #44B39B;
         }
-        .no:hover {
+        .yes:hover {
           background-color: #44B39B;
           color: #FFFFFF;
         }
-        .yes {
+        .no {
           border-color: rgba(234, 92, 92, 1);
           color: #EA5C5C;
         }
-        .yes:hover {
+        .no:hover {
           background-color: #EA5C5C;
           color: #FFFFFF;
         }
@@ -784,5 +784,5 @@
       }
     }
   }
-  
+
 }
