@@ -204,7 +204,7 @@ export class WorkpackCardItemComponent implements OnInit, OnDestroy {
     if (data.filter(item => item > 0).length > 0) {
       this.dashboardMilestonesData = {
         labels: [
-          this.translateSrv.instant('onTime'),
+          this.translateSrv.instant('ontime'),
           this.translateSrv.instant('late'),
           this.translateSrv.instant('concluded'),
           this.translateSrv.instant('concludedLate'),
