@@ -1,36 +1,35 @@
-import { cpfValidator } from 'src/app/shared/utils/cpfValidator';
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { TranslateService } from '@ngx-translate/core';
-import { Subject } from 'rxjs';
-import { debounceTime, takeUntil } from 'rxjs/operators';
-import { MessageService } from 'primeng/api';
+import {cpfValidator} from 'src/app/shared/utils/cpfValidator';
+import {Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {ActivatedRoute, Router} from '@angular/router';
+import {TranslateService} from '@ngx-translate/core';
+import {Subject} from 'rxjs';
+import {debounceTime, takeUntil} from 'rxjs/operators';
+import {MessageService} from 'primeng/api';
 
-import { IOfficePermission } from 'src/app/shared/interfaces/IOfficePermission';
-import { ResponsiveService } from 'src/app/shared/services/responsive.service';
-import { ICardItemPermission } from 'src/app/shared/interfaces/ICardItemPermission';
-import { ICard } from 'src/app/shared/interfaces/ICard';
-import { IPerson } from 'src/app/shared/interfaces/IPerson';
-import { PersonService } from 'src/app/shared/services/person.service';
-import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
-import { SaveButtonComponent } from 'src/app/shared/components/save-button/save-button.component';
-import { IOffice } from 'src/app/shared/interfaces/IOffice';
-import { AuthService } from 'src/app/shared/services/auth.service';
-import { enterLeave } from 'src/app/shared/animations/enterLeave.animation';
-import { CitizenUserService } from 'src/app/shared/services/citizen-user.service';
-import { AuthServerService } from 'src/app/shared/services/auth-server.service';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { IControlChangeBoard } from 'src/app/shared/interfaces/IControlChangeBoard';
-import { IPlan } from 'src/app/shared/interfaces/IPlan';
-import { PlanService } from 'src/app/shared/services/plan.service';
-import { ControlChangeBoardService } from 'src/app/shared/services/control-change-board.service';
+import {IOfficePermission} from 'src/app/shared/interfaces/IOfficePermission';
+import {ResponsiveService} from 'src/app/shared/services/responsive.service';
+import {ICard} from 'src/app/shared/interfaces/ICard';
+import {IPerson} from 'src/app/shared/interfaces/IPerson';
+import {PersonService} from 'src/app/shared/services/person.service';
+import {BreadcrumbService} from 'src/app/shared/services/breadcrumb.service';
+import {SaveButtonComponent} from 'src/app/shared/components/save-button/save-button.component';
+import {IOffice} from 'src/app/shared/interfaces/IOffice';
+import {AuthService} from 'src/app/shared/services/auth.service';
+import {enterLeave} from 'src/app/shared/animations/enterLeave.animation';
+import {CitizenUserService} from 'src/app/shared/services/citizen-user.service';
+import {AuthServerService} from 'src/app/shared/services/auth-server.service';
+import {FormBuilder, FormGroup, Validators} from '@angular/forms';
+import {IControlChangeBoard} from 'src/app/shared/interfaces/IControlChangeBoard';
+import {IPlan} from 'src/app/shared/interfaces/IPlan';
+import {PlanService} from 'src/app/shared/services/plan.service';
+import {ControlChangeBoardService} from 'src/app/shared/services/control-change-board.service';
 
 @Component({
   selector: 'app-control-change-board-member',
   templateUrl: './control-change-board-member.component.html',
   styleUrls: ['./control-change-board-member.component.scss'],
   animations: [
-    enterLeave({ opacity: 0, pointerEvents: 'none' }, { opacity: 1, pointerEvents: 'all' }, 300)
+    enterLeave({opacity: 0, pointerEvents: 'none'}, {opacity: 1, pointerEvents: 'all'}, 300)
   ]
 })
 export class ControlChangeBoardMemberComponent implements OnInit, OnDestroy {
@@ -50,11 +49,9 @@ export class ControlChangeBoardMemberComponent implements OnInit, OnDestroy {
   permission: IOfficePermission;
   currentUserInfo: IPerson;
   showSearchInputMessage = false;
-  cardItemsOfficePermission: ICardItemPermission[];
   debounceSearch = new Subject<string>();
   $destroy = new Subject();
   invalidMailMessage: string;
-  isReadOnly: boolean;
   citizenAuthServer: boolean;
   citizenSearchBy: string; //CPF | NAME
   searchedNameUser: string;
@@ -63,10 +60,8 @@ export class ControlChangeBoardMemberComponent implements OnInit, OnDestroy {
   validCpf = true;
   publicServersResult: IPerson[];
   citizenUserNotFoundByCpf = false;
-  showMessageNotFoundUserByEmail = false;
   showListBoxPublicServers = false;
   showMessagePublicServerNotFoundByName = false;
-  showMessageInvalidEmail = false;
   isLoading = false;
   formPerson: FormGroup;
   ccbMember: IControlChangeBoard = {} as IControlChangeBoard;
@@ -97,9 +92,9 @@ export class ControlChangeBoardMemberComponent implements OnInit, OnDestroy {
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => {
       this.responsive = value;
     });
-    this.debounceSearch.pipe(debounceTime(500), takeUntil(this.$destroy)).subscribe(() => {
+    this.debounceSearch.pipe(debounceTime(500), takeUntil(this.$destroy)).subscribe(async() => {
       if (this.searchedEmailPerson.length > 5 && this.validateEmail()) {
-        this.searchPerson();
+        await this.searchPerson();
         this.invalidMailMessage = undefined;
       } else {
         this.invalidMailMessage = this.searchedEmailPerson.length > 0 ? this.translateSrv.instant('messages.invalidEmail') : '';
@@ -110,10 +105,10 @@ export class ControlChangeBoardMemberComponent implements OnInit, OnDestroy {
     this.ccbMember.person.isUser = true;
   }
 
-  ngOnDestroy(): void {
+  async ngOnDestroy(): Promise<void> {
     this.$destroy.next();
     this.$destroy.complete();
-    this.citizenUserSrv.unloadCitizenUsers();
+    await this.citizenUserSrv.unloadCitizenUsers();
   }
 
   async ngOnInit() {
@@ -166,7 +161,7 @@ export class ControlChangeBoardMemberComponent implements OnInit, OnDestroy {
   }
 
 
-  setPhoneNumberMask(){
+  setPhoneNumberMask() {
     const valor = this.formPerson.controls.phoneNumber.value;
     if (valor.length < 10 && valor) {
       this.formPerson.controls.phoneNumber.setValue(null);
@@ -177,18 +172,20 @@ export class ControlChangeBoardMemberComponent implements OnInit, OnDestroy {
   }
 
   formatPhoneNumber(value: string) {
-    if (!value) return value;
-    let formatedValue = value.replace(/\D/g, "");
-    formatedValue = formatedValue.replace(/^0/, "");
+    if (!value) {
+      return value;
+    }
+    let formatedValue = value.replace(/\D/g, '');
+    formatedValue = formatedValue.replace(/^0/, '');
     if (formatedValue.length > 10) {
-      formatedValue = formatedValue.replace(/^(\d\d)(\d{5})(\d{4}).*/, "($1) $2-$3");
+      formatedValue = formatedValue.replace(/^(\d\d)(\d{5})(\d{4}).*/, '($1) $2-$3');
     } else if (formatedValue.length > 5) {
-      formatedValue = formatedValue.replace(/^(\d\d)(\d{4})(\d{0,4}).*/, "($1) $2-$3");
+      formatedValue = formatedValue.replace(/^(\d\d)(\d{4})(\d{0,4}).*/, '($1) $2-$3');
     } else if (formatedValue.length > 2) {
-      formatedValue = formatedValue.replace(/^(\d\d)(\d{0,5})/, "($1) $2");
+      formatedValue = formatedValue.replace(/^(\d\d)(\d{0,5})/, '($1) $2');
     } else {
       if (formatedValue.length != 0) {
-        formatedValue = formatedValue.replace(/^(\d*)/, "($1");
+        formatedValue = formatedValue.replace(/^(\d*)/, '($1');
       }
     }
     return formatedValue;
@@ -201,9 +198,13 @@ export class ControlChangeBoardMemberComponent implements OnInit, OnDestroy {
     }
   }
 
+  clearPhoneNumberPlaceholder() {
+    this.phoneNumberPlaceholder = '';
+  }
+
   async loadPropertiesPlan() {
     this.idPlan = Number(localStorage.getItem('@currentPlan'));
-    const { data, success } = await this.planSrv.GetById(this.idPlan);
+    const {data, success} = await this.planSrv.GetById(this.idPlan);
     if (success) {
       this.plan = data;
     }
@@ -212,7 +213,7 @@ export class ControlChangeBoardMemberComponent implements OnInit, OnDestroy {
   async loadCcbMember() {
     if (this.idPerson && this.idProject) {
       this.idPlan = Number(localStorage.getItem('@currentPlan'));
-      const { data, success } = await this.ccbMemberSrv.getCcbMember(
+      const {data, success} = await this.ccbMemberSrv.getCcbMember(
         {
           'id-person': this.idPerson,
           'id-workpack': this.idProject,
@@ -229,14 +230,14 @@ export class ControlChangeBoardMemberComponent implements OnInit, OnDestroy {
   }
 
   async getBreadcrumbs(idWorkpack: number) {
-    const { success, data } = await this.breadcrumbSrv.getBreadcrumbWorkpack(idWorkpack, { 'id-plan': this.idPlan });
+    const {success, data} = await this.breadcrumbSrv.getBreadcrumbWorkpack(idWorkpack, {'id-plan': this.idPlan});
     return success
       ? data.map(p => ({
         key: !p.modelName ? p.type.toLowerCase() : p.modelName,
         info: p.name,
         tooltip: p.fullName,
         routerLink: this.getRouterLinkFromType(p.type),
-        queryParams: { id: p.id },
+        queryParams: {id: p.id},
         modelName: p.modelName
       }))
       : [];
@@ -279,14 +280,9 @@ export class ControlChangeBoardMemberComponent implements OnInit, OnDestroy {
   validateEmail() {
     if (this.searchedEmailPerson.includes('@')) {
       const email = this.searchedEmailPerson.split('@');
-      if (email[1] !== '') {
-        return true;
-      } else {
-        return false;
-      }
-    } else {
-      return false;
+      return email[1] !== '';
     }
+    return false;
   }
 
   async loadCurrentUserInfo() {
@@ -296,7 +292,7 @@ export class ControlChangeBoardMemberComponent implements OnInit, OnDestroy {
   async searchPerson() {
     this.saveButton?.hideButton();
     if (this.searchedEmailPerson) {
-      const { data } = await this.personSrv.GetByEmail(this.searchedEmailPerson);
+      const {data} = await this.personSrv.GetByEmail(this.searchedEmailPerson);
       if (data) {
         this.showSearchInputMessage = false;
         this.ccbMember.person = data;
@@ -308,7 +304,7 @@ export class ControlChangeBoardMemberComponent implements OnInit, OnDestroy {
         this.ccbMember.person = {
           name,
           email: this.searchedEmailPerson,
-          roles: [{ role: 'citizen' }]
+          roles: [{role: 'citizen'}]
         };
         this.showSaveButton();
       }
@@ -399,7 +395,10 @@ export class ControlChangeBoardMemberComponent implements OnInit, OnDestroy {
     this.showListBoxPublicServers = false;
     this.isLoading = true;
     const publicServer = event.value;
-    const result = await this.citizenUserSrv.GetPublicServer(publicServer.sub, { idOffice: this.idOffice, loadWorkLocation: false });
+    const result = await this.citizenUserSrv.GetPublicServer(publicServer.sub, {
+      idOffice: this.idOffice,
+      loadWorkLocation: false
+    });
     this.isLoading = false;
     if (result.success) {
       this.ccbMember.person = result.data;
@@ -419,7 +418,7 @@ export class ControlChangeBoardMemberComponent implements OnInit, OnDestroy {
   async saveCcbMember() {
     let phoneNumber = this.formPerson.controls.phoneNumber.value;
     if (phoneNumber) {
-      phoneNumber = phoneNumber.replace(/[^0-9]+/g,'');
+      phoneNumber = phoneNumber.replace(/\D+/g, '');
     }
     const sender = {
       ...this.ccbMember,
@@ -442,6 +441,11 @@ export class ControlChangeBoardMemberComponent implements OnInit, OnDestroy {
       summary: this.translateSrv.instant('success'),
       detail: this.translateSrv.instant('messages.savedSuccessfully')
     });
-    this.router.navigate(['/workpack/change-control-board'], { queryParams: { idProject: this.idProject, idOffice: this.idOffice } });
+    await this.router.navigate(['/workpack/change-control-board'], {
+      queryParams: {
+        idProject: this.idProject,
+        idOffice: this.idOffice
+      }
+    });
   }
 }

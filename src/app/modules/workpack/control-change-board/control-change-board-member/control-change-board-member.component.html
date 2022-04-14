@@ -16,8 +16,8 @@
           <div class="search-email-container" [class.responsive]="responsive">
             <span class="p-float-label">
               <input class="app-input-text input-search" [class.responsive]="responsive" id="float-search"
-                name="searchPerson" [(ngModel)]="searchedEmailPerson" pInputText
-                (ngModelChange)="debounceSearch.next()" />
+                     name="searchPerson" [(ngModel)]="searchedEmailPerson" pInputText
+                     (ngModelChange)="debounceSearch.next()"/>
               <label class="app-input-label" for="float-search">{{ "searchByEmail" | translate }}</label>
             </span>
             <i class="fas fa-search icon-search-input" *ngIf="!selectedPerson"></i>
@@ -31,28 +31,29 @@
             <label>{{'searchBy'|translate}}:</label>
             <div class="radios-container">
               <p-radioButton class="search-user-radio" value="CPF" [(ngModel)]="citizenSearchBy" [label]="'CPF'"
-                (ngModelChange)="validateClearSearchByUser()">
+                             (ngModelChange)="validateClearSearchByUser()">
               </p-radioButton>
               <p-radioButton class="search-user-radio" value="NAME" [(ngModel)]="citizenSearchBy"
-                (ngModelChange)="validateClearSearchByUser()" [label]="'nameOnlyPublicServers' |translate">
+                             (ngModelChange)="validateClearSearchByUser()" [label]="'nameOnlyPublicServers' |translate">
               </p-radioButton>
             </div>
           </div>
           <div *ngIf="citizenSearchBy === 'NAME'" class="search-citizen-user-by-name">
             <div class="user-by-name-input-container">
               <input #actualTarget class="app-input-text input-search-name" [class.responsive]="responsive"
-                (ngModelChange)="validateClearSearchUserName($event)" [(ngModel)]="searchedNameUser" pInputText />
+                     (ngModelChange)="validateClearSearchUserName($event)" [(ngModel)]="searchedNameUser" pInputText/>
               <button pButton class="button-search" [label]="!responsive ? ('search'|translate) : ''"
-                (click)="searchCitizenUserByName()"
-                [disabled]="!searchedNameUser || (searchedNameUser && searchedNameUser.length === 0) || isLoading"
-                icon="fas fa-search" iconPos="left"></button>
+                      (click)="searchCitizenUserByName()"
+                      [disabled]="!searchedNameUser || (searchedNameUser && searchedNameUser.length === 0) || isLoading"
+                      icon="fas fa-search" iconPos="left"></button>
             </div>
             <span class="input-message-error" *ngIf="showMessagePublicServerNotFoundByName">
               {{'messages.publicServerNotFoundByName' |translate}}
             </span>
             <div class="listbox-public-servers-container" [class.responsive]="responsive">
               <p-listbox [options]="publicServersResult" *ngIf="showListBoxPublicServers" [multiple]="false"
-                [listStyle]="{'max-height':'250px'}" (onClick)="handleSelectedPublicServer($event)" optionLabel="name">
+                         [listStyle]="{'max-height':'250px'}" (onClick)="handleSelectedPublicServer($event)"
+                         optionLabel="name">
                 <ng-template let-publicServer pTemplate="item">
                   <span>
                     {{publicServer.name}}
@@ -65,13 +66,13 @@
             <div class="user-by-cpf-input-container" *ngIf="citizenSearchBy === 'CPF'">
               <div class="cpf-container">
                 <p-inputMask [(ngModel)]="searchedCpfUser" mask="999.999.999-99" placeholder="000.000.000-00"
-                  (ngModelChange)="validateClearSearchByCpf($event)" unmask="true">
+                             (ngModelChange)="validateClearSearchByCpf($event)" unmask="true">
                 </p-inputMask>
               </div>
               <button pButton class="button-search" [label]="!responsive ? ('search'|translate) : ''"
-                (click)="validateCpf()"
-                [disabled]="!searchedCpfUser || (searchedCpfUser && searchedCpfUser.length === 0) || isLoading"
-                icon="fas fa-search" iconPos="left"></button>
+                      (click)="validateCpf()"
+                      [disabled]="!searchedCpfUser || (searchedCpfUser && searchedCpfUser.length === 0) || isLoading"
+                      icon="fas fa-search" iconPos="left"></button>
             </div>
             <span *ngIf="!validCpf" class="input-message-error">
               {{ 'messages.invalidCPF'|translate }}
@@ -91,26 +92,25 @@
           </div>
           <div class="p-grid">
             <span class="p-col-12 p-float-label">
-              <textarea pInputTextarea class="app-text-area" [class.responsive]="responsive" [rows]="2"
-                (change)="showSaveButton()" formControlName="address">
+              <textarea id="address" pInputTextarea class="app-text-area" [class.responsive]="responsive" [rows]="2"
+                        (change)="showSaveButton()" formControlName="address">
               </textarea>
-              <label for="float-input" class="app-input-label">{{'address' | translate}}</label>
+              <label for="address" class="app-input-label">{{'address' | translate}}</label>
               <app-input-message [form]="formPerson" field="address"></app-input-message>
             </span>
             <span class="p-col-12 p-md-4 p-lg-4 p-float-label">
-              <!-- <p-inputMask mask="(99) 9 9999-9999" [class.responsive]="responsive" [unmask]="true"
-                (change)="showSaveButton()" formControlName="phoneNumber"></p-inputMask> -->
-              <input pInputText class="app-input-text" formControlName="phoneNumber" [class.responsive]="responsive"
-                (blur)="setPhoneNumberMask()" [placeholder]="phoneNumberPlaceholder" (change)="showSaveButton()"
-                (focus)="setPhoneNumberPlaceholder()" (input)="setPhoneNumberPlaceholder()" />
-              <label for="float-input" class="app-input-label">{{'phoneNumber' | translate}}</label>
+              <input id="phone" pInputText class="app-input-text" formControlName="phoneNumber"
+                     [class.responsive]="responsive" [class.desktop]="!responsive" (blur)="setPhoneNumberMask()"
+                     [placeholder]="phoneNumberPlaceholder" (focusin)="setPhoneNumberPlaceholder()"
+                     (focusout)="clearPhoneNumberPlaceholder()" (input)="setPhoneNumberPlaceholder()"/>
+              <label for="phone" class="app-input-label">{{'phoneNumber' | translate}}</label>
               <app-input-message [form]="formPerson" field="phoneNumber"></app-input-message>
             </span>
             <span class="p-col-9"></span>
             <span class="p-col-12 p-md-5 p-lg-5 p-float-label">
-              <input formControlName="contactEmail" type="text" pInputText class="app-input-text"
-                (change)="showSaveButton()" [class.mobile]="responsive" [class.desktop]="!responsive">
-              <label for="float-input" class="app-input-label">{{'contactEmail' | translate}}</label>
+              <input id="contactEmail" formControlName="contactEmail" type="text" pInputText class="app-input-text"
+                     (change)="showSaveButton()" [class.mobile]="responsive" [class.desktop]="!responsive">
+              <label for="contactEmail" class="app-input-label">{{'contactEmail' | translate}}</label>
               <app-input-message [form]="formPerson" field="contactEmail"></app-input-message>
             </span>
           </div>
@@ -121,7 +121,7 @@
   </div>
   <div class="card-memberAs" *ngIf="cardMemberAs">
     <app-card [properties]="cardMemberAs" *ngIf="ccbMember?.memberAs && ccbMember?.memberAs.length > 0"
-      class="mt-0 inputs-float-label">
+              class="mt-0 inputs-float-label">
       <div class="cards-memberAs">
         <ng-container *ngFor="let memberAs of ccbMember.memberAs; let i = index">
           <div class="memberAs-item" [class.responsive]="responsive">
