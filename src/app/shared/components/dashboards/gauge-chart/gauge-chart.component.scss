@@ -33,7 +33,7 @@
         }
       }
       .progress {
-        // margin-top: 0.5rem;
+        -webkit-appearance: none;
         border: none;
         width: 50%;
         &::-webkit-progress-bar {

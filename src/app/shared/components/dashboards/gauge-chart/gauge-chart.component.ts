@@ -1,20 +1,20 @@
-import { takeUntil } from 'rxjs/operators';
-import { TranslateService } from '@ngx-translate/core';
-import { Component, Input, OnInit, OnChanges, SimpleChanges } from '@angular/core';
-import { Chart, ChartData, ChartOptions, ChartPluginsOptions, ChartPoint } from 'chart.js';
-import { IGaugeChartData } from 'src/app/shared/interfaces/IGaugeChartData';
-import { Subject } from 'rxjs';
+import {takeUntil} from 'rxjs/operators';
+import {TranslateService} from '@ngx-translate/core';
+import {Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges} from '@angular/core';
+import {Chart, ChartData, ChartOptions, ChartPluginsOptions} from 'chart.js';
+import {IGaugeChartData} from 'src/app/shared/interfaces/IGaugeChartData';
+import {Subject} from 'rxjs';
 
 @Component({
   selector: 'app-gauge-chart',
   templateUrl: './gauge-chart.component.html',
   styleUrls: ['./gauge-chart.component.scss']
 })
-export class GaugeChartComponent implements OnInit {
-  
+export class GaugeChartComponent implements OnInit, OnDestroy, OnChanges {
+
   @Input() config: IGaugeChartData;
   $destroy = new Subject();
-  progressBarRight: boolean = true;
+  progressBarRight = true;
   valueChart: number;
   valueChartLeft: number;
   valueChartRight: number;
@@ -37,7 +37,7 @@ export class GaugeChartComponent implements OnInit {
       enabled: false
     },
     aspectRatio: 1,
-  }
+  };
 
   constructor(
     private translateSrv: TranslateService
@@ -115,7 +115,7 @@ export class GaugeChartComponent implements OnInit {
   setPluginsChart() {
     this.plugins = [{
       afterDatasetDraw: (chart: Chart) => this.drawMiddleTextChart(chart)
-    }]
+    }];
   }
 
   drawMiddleTextChart(chart: Chart) {
@@ -169,7 +169,7 @@ export class GaugeChartComponent implements OnInit {
 
     iconElement.remove();
 
-    return char.replace(/\"/g, '')
+    return char.replace(/"/g, '');
   }
 
   getNumberAbsolute(value: number) {
