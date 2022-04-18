@@ -137,17 +137,17 @@
           <ng-template pTemplate>
             <ng-container *ngIf="property.multipleSelection; else singleLocalitySelection">
               <div class="app-tree-selection">
-                <p-tree [value]="property.extraList" selectionMode="checkbox" [disabled]="!property.idDomain"
+                <p-tree [value]="property.extraList" selectionMode="checkbox"
                   [propagateSelectionUp]="false" [propagateSelectionDown]="false"
-                  [(selection)]="property.extraListDefaults" (onNodeSelect)="changed.emit({ property: property })"
-                  (onNodeUnselect)="changed.emit({ property: property })"></p-tree>
+                  [(selection)]="property.extraListDefaults" (onNodeSelect)="handleNodeSelect($event)"
+                  (onNodeUnselect)="handleNodeUnselect($event)"></p-tree>
               </div>
             </ng-container>
             <ng-template #singleLocalitySelection>
               <div class="app-tree-selection">
                 <p-tree [value]="property.extraList" selectionMode="single" [(selection)]="property.extraListDefaults"
-                  [disabled]="!property.idDomain" (onNodeSelect)="changed.emit({ property: property })"
-                  (onNodeUnselect)="changed.emit({ property: property })"></p-tree>
+                   (onNodeSelect)="handleNodeSelect($event)"
+                  (onNodeUnselect)="handleNodeUnselect($event)"></p-tree>
               </div>
             </ng-template>
           </ng-template>

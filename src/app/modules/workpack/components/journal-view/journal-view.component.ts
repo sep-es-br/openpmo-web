@@ -46,7 +46,7 @@ export class JournalViewComponent implements OnInit, OnDestroy {
   statusJounalEnum = StatusJournalEnum;
 
   hasMore = true;
-  hasAll = false;
+  hasAll = true;
   page = 0;
   pageSize = 5;
   yearRange: string;
@@ -243,7 +243,7 @@ export class JournalViewComponent implements OnInit, OnDestroy {
   async handleViewAll() {
     this.clearPaginate();
     this.pageSize = 9999999999999;
-    this.hasAll = true;
+    this.hasAll = false;
     await this.loadJournalData();
   }
 

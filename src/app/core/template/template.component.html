@@ -16,10 +16,12 @@
         <ng-template>
           <div class="main-content">
             <app-breadcrumb></app-breadcrumb>
-            <div class="outlet">
-              <router-outlet></router-outlet>
+            <div class="content">
+              <div class="outlet fixed">
+                <router-outlet></router-outlet>
+              </div>
+              <app-footer></app-footer>
             </div>
-            <app-footer></app-footer>
           </div>
         </ng-template>
       </p-splitter>

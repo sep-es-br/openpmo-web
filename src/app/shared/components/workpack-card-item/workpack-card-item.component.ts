@@ -24,8 +24,8 @@ export class WorkpackCardItemComponent implements OnInit, OnDestroy {
   language: string;
   iconImg;
   responsive: boolean;
-  cardType: string = 'standard';
-  riskImportance: string = 'high';
+  cardType = 'standard';
+  riskImportance = 'high';
   dashboardMilestonesData: ChartData = {
     labels: [],
     datasets: []
@@ -70,7 +70,7 @@ export class WorkpackCardItemComponent implements OnInit, OnDestroy {
         }
         break;
       default:
-        this.cardType = 'standard'
+        this.cardType = 'standard';
         break;
     }
     if (this.properties.dashboard !== null) {
@@ -106,7 +106,7 @@ export class WorkpackCardItemComponent implements OnInit, OnDestroy {
       valueProgressBar: this.properties.dashboard?.costPerformanceIndex !== null ? this.properties.dashboard?.costPerformanceIndex?.costVariation : null,
       maxProgressBar: this.properties.dashboard?.earnedValue,
       labelBottomProgressBar: 'CV',
-    }
+    };
 
     this.gaugeChartDataSPI = {
       value: this.properties.dashboard?.schedulePerformanceIndex !== null ?
@@ -116,25 +116,25 @@ export class WorkpackCardItemComponent implements OnInit, OnDestroy {
       valueProgressBar: this.properties.dashboard?.schedulePerformanceIndex !== null ? this.properties.dashboard?.schedulePerformanceIndex?.scheduleVariation : null,
       maxProgressBar: this.properties.dashboard?.earnedValue,
       labelBottomProgressBar: 'SV',
-    }
+    };
 
   }
 
   loadPerformanceIndexes() {
     if (this.properties?.dashboard?.costPerformanceIndex) {
       if (this.properties?.dashboard?.costPerformanceIndex?.indexValue < 1) {
-        this.cpiColor = '#EA5C5C'
+        this.cpiColor = '#EA5C5C';
       } else {
-        this.cpiColor = '#44B39B'
+        this.cpiColor = '#44B39B';
       }
     } else {
       this.cpiColor = '#646464';
     }
     if (this.properties?.dashboard?.schedulePerformanceIndex) {
       if (this.properties?.dashboard?.schedulePerformanceIndex?.indexValue < 1) {
-        this.spiColor = '#EA5C5C'
+        this.spiColor = '#EA5C5C';
       } else {
-        this.spiColor = '#44B39B'
+        this.spiColor = '#44B39B';
       }
     } else {
       this.spiColor = '#646464';
@@ -211,18 +211,18 @@ export class WorkpackCardItemComponent implements OnInit, OnDestroy {
         ],
         datasets: [
           {
-            data: [milestone.onTime ? milestone.onTime : 0 , 
-                  milestone.late ? milestone.late : 0, 
-                  milestone.concluded ? milestone.concluded : 0, 
+            data: [milestone.onTime ? milestone.onTime : 0 ,
+                  milestone.late ? milestone.late : 0,
+                  milestone.concluded ? milestone.concluded : 0,
                   milestone.lateConcluded ?  milestone.lateConcluded : 0],
             backgroundColor: [
-              "#00b89c",
-              "#fa4c4f",
-              "#0081c1",
-              "#00aef7",
+              '#00b89c',
+              '#fa4c4f',
+              '#0081c1',
+              '#00aef7',
             ],
           }]
-      }
+      };
     }
   }
 

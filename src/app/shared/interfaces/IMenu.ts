@@ -19,7 +19,9 @@ export interface IMenuPlan {
 
 export interface IMenuWorkpackModel {
   id: string;
-  modelName: string;
+  idPlanModel?: number;
+  modelName?: string;
+  name?: string;
   fontIcon: string;
   children: IMenuWorkpackModel[];
 }
@@ -35,4 +37,11 @@ export interface IMenuWorkpack {
 
 export interface PlanMenuItem extends MenuItem {
   idPlan?: number;
+}
+
+export interface IMenuPlanModel {
+  id: number;
+  name: string;
+  fullName: string;
+  workpackModels: IMenuWorkpackModel[];
 }

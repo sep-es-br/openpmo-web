@@ -184,7 +184,8 @@ export class CostAccountComponent implements OnInit {
   }
 
   async getBreadcrumbs() {
-    const { success, data } = await this.breadcrumbSrv.getBreadcrumbWorkpack(this.idCurrentWorkpack || this.idWorkpack, {'id-plan': this.idPlan});
+    const { success, data } = await this.breadcrumbSrv.getBreadcrumbWorkpack
+    (this.idCurrentWorkpack || this.idWorkpack, {'id-plan': this.idPlan});
     return success
       ? data.map(p => ({
             key: !p.modelName ? p.type.toLowerCase() : p.modelName,
@@ -252,7 +253,7 @@ export class CostAccountComponent implements OnInit {
           property.localityList = [{
             label: domain.name,
             data: domain.id,
-            children: this.loadLocality(localityList)
+            children: this.loadLocality(localityList, property.multipleSelection)
           }];
           const defaultSelectedLocalities = propertyCostAccount?.selectedValues  ?
             propertyCostAccount?.selectedValues as number[] : propertyModel.defaults as number[];
@@ -298,18 +299,29 @@ export class CostAccountComponent implements OnInit {
     return null;
   }
 
-  loadLocality(localityList: ILocalityList[]) {
-    const list = localityList.map(locality => {
+  loadLocality(localityList: ILocalityList[], showSelectAll: boolean) {
+    const list: TreeNode[] = localityList.map(locality => {
       if (locality.children) {
         return {
           label: locality.name,
           data: locality.id,
-          children: this.loadLocality(locality.children)
+          children: this.loadLocality(locality.children, showSelectAll)
         };
       }
       return { label: locality.name, data: locality.id };
     });
+    if(showSelectAll) {
+      this.addSelectAllNode(list, localityList);
+    }
     return list;
+  }
+
+  addSelectAllNode(list: TreeNode[], localityList: ILocalityList[]) {
+    list?.unshift({
+      label: this.translateSrv.instant('selectAll'),
+      key: 'SELECTALL' + localityList[0]?.id,
+      styleClass: 'green-node',
+    });
   }
 
   async loadDomainLocalities(idDomain: number) {

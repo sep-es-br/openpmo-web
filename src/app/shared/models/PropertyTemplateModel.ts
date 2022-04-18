@@ -77,7 +77,7 @@ export class PropertyTemplateModel implements IProperty {
         }
         if (multipleSelection) {
           const selectedLocality = localitiesSelected as TreeNode[];
-          property.selectedValues = selectedLocality?.filter(locality => locality.data !== idDomain)
+          property.selectedValues = selectedLocality?.filter(locality => locality.data && locality.data !== idDomain)
             .map(l => l.data);
         }
         break;

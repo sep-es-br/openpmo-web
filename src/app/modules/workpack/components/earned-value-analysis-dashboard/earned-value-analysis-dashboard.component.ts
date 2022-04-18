@@ -15,7 +15,7 @@ import { ShortNumberPipe } from 'src/app/shared/pipes/shortNumberPipe';
   styleUrls: ['./earned-value-analysis-dashboard.component.scss']
 })
 export class EarnedValueAnalysisDashboardComponent implements OnInit {
-  
+
   @Input() earnedValueAnalysis: IEarnedValueAnalysisDashboard;
   @Input() referenceMonth: string;
   lineChartData: ChartData;
@@ -35,7 +35,7 @@ export class EarnedValueAnalysisDashboardComponent implements OnInit {
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.responsive = value);
     this.translateSrv.onLangChange.pipe(takeUntil(this.$destroy)).subscribe(() =>
       setTimeout(() => {
-        this.setLanguage()
+        this.setLanguage();
       }, 150)
     );
   }
@@ -91,7 +91,7 @@ export class EarnedValueAnalysisDashboardComponent implements OnInit {
           pointRadius: this.earnedValueAnalysis.earnedValueByStep?.filter( step => moment(step.date, 'yyyy-MM').isSameOrBefore(referenceMonth) ).map(item => item.earnedValue).length > 1 ? 0 : 4,
         },
       ]
-    }
+    };
 
     this.lineChartOptions = {
       plugins: {
@@ -102,13 +102,11 @@ export class EarnedValueAnalysisDashboardComponent implements OnInit {
       scales: {
         yAxes: [{
           ticks: {
-            callback: (value, index, values) => {
-              return this.shortNumberPipe.transform(value);
-            }
+            callback: (value, index, values) => this.shortNumberPipe.transform(value, this.language)
           }
         }]
       },
-    }
+    };
   }
 
   setLanguage() {
@@ -117,7 +115,7 @@ export class EarnedValueAnalysisDashboardComponent implements OnInit {
 
   setGaugeChartData() {
     this.gaugeChartDataCPI = {
-      value: this.earnedValueAnalysis?.performanceIndexes[0]?.costPerformanceIndex ? 
+      value: this.earnedValueAnalysis?.performanceIndexes[0]?.costPerformanceIndex ?
         (this.earnedValueAnalysis?.performanceIndexes[0]?.costPerformanceIndex?.indexValue === null ? 0 : this.earnedValueAnalysis?.performanceIndexes[0]?.costPerformanceIndex?.indexValue)
         : (null),
       labelBottom: 'CPI',
@@ -125,7 +123,7 @@ export class EarnedValueAnalysisDashboardComponent implements OnInit {
       valueProgressBar:  this.earnedValueAnalysis?.performanceIndexes[0]?.costPerformanceIndex ? this.earnedValueAnalysis?.performanceIndexes[0]?.costPerformanceIndex?.costVariation : null,
       maxProgressBar: this.earnedValueAnalysis?.performanceIndexes[0]?.earnedValue,
       labelBottomProgressBar: 'CV',
-    }
+    };
     this.gaugeChartDataSPI = {
       value: this.earnedValueAnalysis?.performanceIndexes[0]?.schedulePerformanceIndex ?
        ( this.earnedValueAnalysis?.performanceIndexes[0]?.schedulePerformanceIndex?.indexValue === null ? 0 : this.earnedValueAnalysis?.performanceIndexes[0]?.schedulePerformanceIndex?.indexValue)
@@ -136,7 +134,7 @@ export class EarnedValueAnalysisDashboardComponent implements OnInit {
         this.earnedValueAnalysis?.performanceIndexes[0]?.schedulePerformanceIndex?.scheduleVariation : null,
       maxProgressBar: this.earnedValueAnalysis?.performanceIndexes[0]?.earnedValue,
       labelBottomProgressBar: 'SV',
-    }
+    };
   }
 
   loadMaxProgressBar() {
@@ -147,10 +145,8 @@ export class EarnedValueAnalysisDashboardComponent implements OnInit {
       plannedValue === null ? 0 : plannedValue,
       estimatesAtCompletion === null ? 0 : estimatesAtCompletion,
       estimateToComplete === null ? 0 : estimateToComplete,
-    ]
-    this.maxProgressBar = values.reduce((a, b) => {
-      return Math.max(a, b);
-    });
+    ];
+    this.maxProgressBar = values.reduce((a, b) => Math.max(a, b));
   }
 
 }

@@ -32,6 +32,7 @@ import { IBreadcrumb, IResultBreadcrumb } from 'src/app/shared/interfaces/IBread
 import { ILocalityList } from 'src/app/shared/interfaces/ILocality';
 import { OfficeService } from 'src/app/shared/services/office.service';
 import { IOffice } from 'src/app/shared/interfaces/IOffice';
+import { MenuService } from 'src/app/shared/services/menu.service';
 
 interface IIcon {
   name: string;
@@ -132,6 +133,7 @@ export class WorkpackModelComponent implements OnInit {
     private officePermissionSrv: OfficePermissionService,
     private officeSrv: OfficeService,
     private planModelSrv: PlanModelService,
+    private menuSrv: MenuService,
   ) {
     this.activeRoute.queryParams.subscribe(async({ idOffice, idStrategy, id, idParent, type }) => {
       if (id && this.idWorkpackModel === Number(id)) {
@@ -1062,8 +1064,15 @@ export class WorkpackModelComponent implements OnInit {
     // }
     // return this.listLocalities;
     const localityList = await this.loadDomainLocalities(idDomain);
-    const rootNode: TreeNode[] = this.loadLocality(localityList);
-    return rootNode;
+    const selectable = this.editPermission;
+    const localityRoot =  localityList[0];
+    const rootNode: TreeNode = {
+      label: localityRoot.name,
+      data: localityRoot.id,
+      children: this.loadLocality(localityRoot.children, selectable),
+      selectable
+    };
+    return [rootNode];
   }
 
   async getListLocalitiesDefaults(property: IWorkpackModelProperty) {
@@ -1091,23 +1100,31 @@ export class WorkpackModelComponent implements OnInit {
     return result;
   }
 
-  loadLocality(localityList: ILocalityList[], parent?: TreeNode) {
-    localityList.sort( (a, b) => a.name < b.name ? -1 : a.name > b.name ? 1 : 0);
-    const list = localityList.map(locality => {
+  loadLocality(localityList: ILocalityList[], selectable: boolean) {
+    const list: TreeNode[] = localityList?.map(locality => {
       if (locality.children) {
-        const node = {
+        return {
           label: locality.name,
           data: locality.id,
-          children: undefined,
-          parent,
-          selectable: this.editPermission
+          children: this.loadLocality(locality.children, selectable),
+          selectable,
         };
-        node.children = this.loadLocality(locality.children, node);
-        return node;
       }
-      return { label: locality.name, data: locality.id, children: undefined, parent, selectable: this.editPermission };
+      return { label: locality.name, data: locality.id, selectable };
     });
+    if (selectable) {
+      this.addSelectAllNode(list, localityList, selectable);
+    }
     return list;
+  }
+
+  addSelectAllNode(list: TreeNode[], localityList: ILocalityList[], selectable: boolean) {
+    list?.unshift({
+      label: this.translateSrv.instant('selectAll'),
+      key: 'SELECTALL' + localityList[0]?.id,
+      selectable,
+      styleClass: 'green-node',
+    });
   }
 
   async loadDomainLocalities(idDomain: number) {
@@ -1435,6 +1452,7 @@ export class WorkpackModelComponent implements OnInit {
         summary: this.translateSrv.instant('success'),
         detail: this.translateSrv.instant('messages.savedSuccessfully')
       });
+      this.menuSrv.reloadMenuPlanModel();
     }
   }
 

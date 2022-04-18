@@ -79,7 +79,7 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.$destroy), filter(() => this.formFilter.dirty))
       .subscribe(() => {
         if (this.validadeRulesCards()) {
-          this.saveButton.showButton()
+          this.saveButton.showButton();
         }
       });
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.responsive = value);
@@ -118,7 +118,7 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
     this.translateSrv.onDefaultLangChange.pipe(takeUntil(this.$destroy)).subscribe(({ lang }) => {
       setTimeout(() => {
         this.loadPropertiesListOptions();
-      }, 250)
+      }, 250);
 
     });
   }
@@ -153,7 +153,7 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
     this.$destroy.next();
     this.$destroy.complete();
     if (!!this.filterPropertiesSub)
-      this.filterPropertiesSub.unsubscribe();
+      {this.filterPropertiesSub.unsubscribe();}
   }
 
   loadFormFilter() {
@@ -202,7 +202,7 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
       cardTitle: 'properties',
       collapseble: true,
       initialStateCollapse: false
-    }
+    };
   }
 
   async loadRuleCards() {
@@ -217,7 +217,7 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
         return {
           id: rule.id,
           typeCard: 'rule-card',
-          propertySelected: propertySelected,
+          propertySelected,
           propertiesList: this.filterPropertiesList,
           operator: rule.operator,
           value: (!this.idWorkpackModel || (!!this.idWorkpackModel && this.workpackModelEntitiesOptions.includes(this.entityName))) ? rule.value : this.setValueProperty(propertySelected, rule.value),
@@ -227,7 +227,7 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
             icon: 'fas fa-trash-alt',
             command: (event) => this.handleDeleteCardItem(this.ruleCards.length)
           }]
-        }
+        };
       });
       this.ruleCards.push({
         typeCard: 'new-card'
@@ -306,7 +306,8 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
         propertyName: (!this.idWorkpackModel || (!!this.idWorkpackModel && this.workpackModelEntitiesOptions.includes(this.entityName))) ?
           card.propertySelected.name : card.propertySelected.idPropertyModel.toString(),
         operator: card.operator,
-        value: (!this.idWorkpackModel || (!!this.idWorkpackModel && this.workpackModelEntitiesOptions.includes(this.entityName))) ? card.value :
+        value: (!this.idWorkpackModel || (!!this.idWorkpackModel && this.workpackModelEntitiesOptions
+          .includes(this.entityName))) ? card.value :
           this.getValueProperty(card.propertySelected, card.value),
         logicOperator: card.logicalOperator
       }))
@@ -344,7 +345,7 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
         }
         if (property.multipleSelection) {
           const selectedLocality = propValue as TreeNode[];
-          value = selectedLocality.map(l => l.data).join(',');
+          value = selectedLocality.filter(l => l.data).map(l => l.data).join(',');
         }
         break;
       case TypePropertyModelEnum.CurrencyModel:
@@ -429,7 +430,7 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
         label: prop.label,
         name: prop.name,
         possibleValues: prop.possibleValues
-      }
+      };
       this.filterPropertiesList.push(property);
     });
   }
@@ -461,7 +462,7 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
       min: propertyModel.min,
       max: propertyModel.max,
       active: propertyModel.active
-    }
+    };
 
     if (this.typePropertyModel[propertyModel.type] === TypePropertyModelEnum.SelectionModel && propertyModel.multipleSelection) {
       const listValues = propertyModel.defaultValue as string;
@@ -476,14 +477,13 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
     if (this.typePropertyModel[propertyModel.type] === TypePropertyModelEnum.LocalitySelectionModel) {
       const domain = await this.loadDomain(propertyModel.idDomain);
       const localityList = await this.loadDomainLocalities(domain.id);
+      const selectable = property.multipleSelection;
       const rootNode: TreeNode = {
-        label: domain.name,
-        data: domain.id,
-        children: undefined,
-        parent: undefined,
-        selectable: property.multipleSelection
+        label: domain.localityRoot.name,
+        data: domain.localityRoot.id,
+        children: this.loadLocality(localityList[0].children, selectable),
+        selectable
       };
-      rootNode.children = this.loadLocality(localityList, rootNode);
       property.idDomain = propertyModel.idDomain;
       property.localityList = [rootNode];
       this.localityList = [rootNode];
@@ -523,22 +523,31 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
     return null;
   }
 
-  loadLocality(localityList: ILocalityList[], parent: TreeNode) {
-    const list = localityList.map(locality => {
+  loadLocality(localityList: ILocalityList[], selectable: boolean) {
+    const list: TreeNode[] = localityList?.map(locality => {
       if (locality.children) {
-        const node = {
+        return {
           label: locality.name,
           data: locality.id,
-          children: undefined,
-          parent,
-          selectable: true
+          children: this.loadLocality(locality.children, selectable),
+          selectable,
         };
-        node.children = this.loadLocality(locality.children, node);
-        return node;
       }
-      return { label: locality.name, data: locality.id, children: undefined, parent, selectable: true };
+      return { label: locality.name, data: locality.id, selectable };
     });
+    if (selectable) {
+      this.addSelectAllNode(list, localityList, selectable);
+    }
     return list;
+  }
+
+  addSelectAllNode(list: TreeNode[], localityList: ILocalityList[], selectable: boolean) {
+    list?.unshift({
+      label: this.translateSrv.instant('selectAll'),
+      key: 'SELECTALL' + localityList[0]?.id,
+      selectable,
+      styleClass: 'green-node',
+    });
   }
 
   countLocalities(list: ILocalityList[]) {

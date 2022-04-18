@@ -8,7 +8,7 @@
     <app-property-selection *ngSwitchCase="types.SelectionModel" [property]="property" [value]="value" (changed)="changed.emit($event)"></app-property-selection>
     <app-property-text *ngSwitchCase="types.TextAreaModel" [property]="property" [value]="value" (changed)="changed.emit($event)"></app-property-text>
     <app-property-toggle *ngSwitchCase="types.ToggleModel" [property]="property" [value]="value" (changed)="changed.emit($event)"></app-property-toggle>
-    <app-property-tree-selection *ngSwitchCase="types.LocalitySelectionModel" [value]="value" [property]="property" (changed)="show($event); changed.emit($event)"></app-property-tree-selection>
+    <app-property-tree-selection *ngSwitchCase="types.LocalitySelectionModel" [value]="value" [property]="property" (changed)="changed.emit($event)"></app-property-tree-selection>
     <app-property-organization-selection *ngSwitchCase="types.OrganizationSelectionModel" [value]="value" [property]="property" (changed)="changed.emit($event)"></app-property-organization-selection>
     <app-property-unit-selection *ngSwitchCase="types.UnitSelectionModel" [value]="value" [property]="property" (changed)="changed.emit($event)"></app-property-unit-selection>
   </div>

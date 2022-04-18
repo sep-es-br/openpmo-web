@@ -72,8 +72,8 @@
         <i class="app-icon offices" [ngStyle]="{ fontSize: '2.25rem' }"></i>
         <div class="item-label" *ngIf="isMobileView">{{ 'offices' | translate }}</div>
       </div>
-      <div class="item">
-        <i class="app-icon plan-model" [routerLink]="['/strategies']" [queryParams]="{ idOffice: currentIDOffice }" [ngStyle]="{ fontSize: '2.25rem' }"></i>
+      <div class="item" (click)="toggleMenu('planModel')">
+        <i class="app-icon plan-model" [ngStyle]="{ fontSize: '2.25rem' }"></i>
         <div class="item-label" *ngIf="isMobileView">{{ 'planModels' | translate }}</div>
       </div>
       <div class="item" (click)="toggleMenu('more')">
@@ -86,7 +86,7 @@
     <div class="item" (click)="toggleMenu('office')" [pTooltip]="'offices' | translate" *ngIf="isUserAdmin">
       <i class="app-icon offices" [ngStyle]="{ fontSize: '1.8rem' }"></i>
     </div>
-    <div class="item" [routerLink]="['/strategies']" [queryParams]="{ idOffice: currentIDOffice }"
+    <div class="item" (click)="toggleMenu('planModel')"
       [pTooltip]="'planModels' | translate">
       <i class="app-icon plan-model" [ngStyle]="{ fontSize: '1.5rem' }"></i>
     </div>
@@ -181,6 +181,42 @@
     </p-splitter>
   </ng-template>
 </div>
+<div class="app-menu-slide" #menuSliderPlanModel [class.open]="isMenuOpen('planModel')" [class.mobile]="isMobileView"
+  [class.changing]="isChangingView">
+  <ng-container *ngIf="isMobileView; else sliderPlanModel">
+    <div class="top-bar">
+      <div class="title" (click)="closeAllMenus()" [routerLink]="['/strategies']" [queryParams]="{idOffice: currentIDOffice}">{{currentPlan?.name}}</div>
+      <div class="action" *ngIf="!isMobileView">
+        <i class="app-icon arrow-left" [ngStyle]="{ fontSize: '1rem' }" (click)="closeAllMenus()"></i>
+      </div>
+    </div>
+    <p-panelMenu [model]="itemsPlanModel"></p-panelMenu>
+    <div class="action-mobile" *ngIf="isMobileView">
+      <i class="app-icon angle-down" [ngStyle]="{ fontSize: '1rem' }" (click)="toggleMenu('planModel')"></i>
+    </div>
+  </ng-container>
+  <ng-template #sliderPlanModel>
+    <p-splitter [panelSizes]="[20,80]" [minSizes]="[20, 0]">
+      <ng-template>
+        <div class="slide-wrapper">
+          <div class="top-bar">
+            <div class="title" (click)="closeAllMenus()" [routerLink]="['/strategies']" [queryParams]="{idOffice: currentIDOffice}">{{currentPlan?.name}}
+            </div>
+            <div class="action" *ngIf="!isMobileView">
+              <i [class]="isFixed ? 'app-icon pin-on' : 'app-icon pin-off'" [ngStyle]="{ fontSize: '1rem' }"
+                (click)="handleChangeMenuMode()"></i>
+            </div>
+          </div>
+          <p-panelMenu [model]="itemsPlanModel"></p-panelMenu>
+        </div>
+      </ng-template>
+      <ng-template>
+        <div class="menu-layout-splitter" (click)="closeAllMenus()"></div>
+      </ng-template>
+    </p-splitter>
+  </ng-template>
+</div>
+
 <div class="app-menu-slide user-slide" [class.open]="isMenuOpen('user')" [class.mobile]="isMobileView"
   [class.changing]="isChangingView">
   <div class="top-bar">

@@ -293,13 +293,15 @@ export class WorkpackComponent implements OnDestroy {
     const arePropertiesRequiredValid: boolean = this.checkPropertiesRequiredValid(property);
     const arePropertiesStringValid: boolean = this.checkPropertiesStringValid(property);
     const arePropertiesNumberValid: boolean = this.checkPropertiesNumberValid(property);
-    return (arePropertiesRequiredValid && arePropertiesStringValid && arePropertiesNumberValid) ? this.saveButton?.showButton() : this.saveButton?.hideButton();
+    return (arePropertiesRequiredValid && arePropertiesStringValid && arePropertiesNumberValid) ?
+      this.saveButton?.showButton() : this.saveButton?.hideButton();
   }
 
   checkPropertiesRequiredValid(property: PropertyTemplateModel, groupedProperties?: PropertyTemplateModel[]) {
     const properties = !groupedProperties ? this.sectionPropertiesProperties : groupedProperties;
     const validated = properties
-      .filter(propReq => !!propReq.required || (propReq.type === 'Group' && propReq.groupedProperties.filter(gp => !!gp.required).length > 0))
+      .filter(propReq => !!propReq.required || (propReq.type === 'Group' && propReq.groupedProperties
+        .filter(gp => !!gp.required).length > 0))
       .map((prop) => {
         let valid = (prop.value instanceof Array
           ? (prop.value.length > 0)
@@ -546,7 +548,8 @@ export class WorkpackComponent implements OnDestroy {
   }
 
   async loadWorkpackLinked() {
-    const result = await this.workpackSrv.GetWorkpackLinked(this.idWorkpack, { 'id-workpack-model': this.idWorkpackModelLinked, 'id-plan': this.idPlan });
+    const result = await this.workpackSrv.GetWorkpackLinked(this.idWorkpack,
+      { 'id-workpack-model': this.idWorkpackModelLinked, 'id-plan': this.idPlan });
     if (result.success) {
       this.workpack = result.data;
       this.idOfficeOwnerWorkpackLinked = this.workpack.plan.idOffice;
@@ -661,14 +664,13 @@ export class WorkpackComponent implements OnDestroy {
     if (this.typePropertyModel[propertyModel.type] === TypePropertyModelEnum.LocalitySelectionModel) {
       const domain = await this.loadDomain(propertyModel.idDomain);
       const localityList = await this.loadDomainLocalities(domain.id);
+      const selectable = (this.editPermission && property.multipleSelection);
       const rootNode: TreeNode = {
         label: domain.localityRoot.name,
         data: domain.localityRoot.id,
-        children: undefined,
-        parent: undefined,
-        selectable: (this.editPermission && property.multipleSelection)
+        children: this.loadLocality(localityList[0].children, selectable),
+        selectable
       };
-      rootNode.children = this.loadLocality(localityList[0].children, rootNode);
       property.idDomain = propertyModel.idDomain;
       property.localityList = [rootNode];
       const defaultSelectedLocalities = propertyWorkpack?.selectedValues ?
@@ -702,7 +704,8 @@ export class WorkpackComponent implements OnDestroy {
     }
 
     if (this.typePropertyModel[propertyModel.type] === TypePropertyModelEnum.OrganizationSelectionModel) {
-      property.possibleValuesIds = await this.loadOrganizationsOffice(this.idOfficeOwnerWorkpackLinked ? this.idOfficeOwnerWorkpackLinked : this.idOffice);
+      property.possibleValuesIds = await this.loadOrganizationsOffice
+        (this.idOfficeOwnerWorkpackLinked ? this.idOfficeOwnerWorkpackLinked : this.idOffice);
       if (propertyModel.multipleSelection) {
         property.selectedValues = propertyWorkpack?.selectedValues ? propertyWorkpack?.selectedValues : propertyModel.defaults as number[];
       }
@@ -713,19 +716,25 @@ export class WorkpackComponent implements OnDestroy {
       }
     }
     if (this.typePropertyModel[propertyModel.type] === TypePropertyModelEnum.UnitSelectionModel) {
-      property.possibleValuesIds = await this.loadUnitMeasuresOffice(!!this.idOfficeOwnerWorkpackLinked ? this.idOfficeOwnerWorkpackLinked : this.idOffice);
+      property.possibleValuesIds = await this.loadUnitMeasuresOffice
+        (!!this.idOfficeOwnerWorkpackLinked ? this.idOfficeOwnerWorkpackLinked : this.idOffice);
       property.selectedValue = propertyWorkpack?.selectedValue ? propertyWorkpack?.selectedValue : propertyModel.defaults as number;
       property.defaults = propertyModel.defaults as number;
     }
     if (this.typePropertyModel[propertyModel.type] === TypePropertyModelEnum.GroupModel && propertyModel.groupedProperties) {
-      property.groupedProperties = await Promise.all(propertyModel.groupedProperties.map(prop => this.instanceProperty(prop, propertyWorkpack)));
+      property.groupedProperties = await Promise.all(propertyModel.groupedProperties.map
+        (prop => this.instanceProperty(prop, propertyWorkpack)));
     }
     return property;
   }
 
   loadSelectedLocality(seletectedIds: number[], list: TreeNode[]) {
     let result = [];
-    list.sort((a, b) => a.label < b.label ? -1 : a.label > b.label ? 1 : 0);
+    list.sort((a, b) => a.label < b.label && a.key < b.key ?
+      -1 :
+      a.label > b.label && a.key > b.key ?
+        1 :
+        0);
     list.forEach(l => {
       if (seletectedIds.includes(l.data)) {
         result.push(l);
@@ -755,23 +764,31 @@ export class WorkpackComponent implements OnDestroy {
     return null;
   }
 
-  loadLocality(localityList: ILocalityList[], parent: TreeNode) {
-    localityList.sort((a, b) => a.name < b.name ? -1 : a.name > b.name ? 1 : 0);
-    const list = localityList.map(locality => {
+  loadLocality(localityList: ILocalityList[], selectable: boolean) {
+    const list: TreeNode[] = localityList?.map(locality => {
       if (locality.children) {
-        const node = {
+        return {
           label: locality.name,
           data: locality.id,
-          children: undefined,
-          parent,
-          selectable: this.editPermission
+          children: this.loadLocality(locality.children, selectable),
+          selectable,
         };
-        node.children = this.loadLocality(locality.children, node);
-        return node;
       }
-      return { label: locality.name, data: locality.id, children: undefined, parent, selectable: this.editPermission };
+      return { label: locality.name, data: locality.id, selectable };
     });
+    if (selectable) {
+      this.addSelectAllNode(list, localityList, selectable);
+    }
     return list;
+  }
+
+  addSelectAllNode(list: TreeNode[], localityList: ILocalityList[], selectable: boolean) {
+    list?.unshift({
+      label: this.translateSrv.instant('selectAll'),
+      key: 'SELECTALL' + localityList[0]?.id,
+      selectable,
+      styleClass: 'green-node',
+    });
   }
 
   countLocalities(list: ILocalityList[]) {
@@ -913,7 +930,8 @@ export class WorkpackComponent implements OnDestroy {
 
   async loadSectionsWorkpackModel() {
     if (!!this.workpackModel.stakeholderSessionActive
-      && (((this.isUserAdmin || this.editPermissionOffice) && !this.idWorkpackModelLinked) || (this.editPermission && !!this.idWorkpackModelLinked))) {
+      && (((this.isUserAdmin || this.editPermissionOffice) && !this.idWorkpackModelLinked) ||
+        (this.editPermission && !!this.idWorkpackModelLinked))) {
       const resultFilters = await this.filterSrv.getAllFilters(`workpackModels/${this.workpack.model.id}/stakeholders`);
       const filters = resultFilters.success && Array.isArray(resultFilters.data) ? resultFilters.data : [];
       const idFilterSelected = filters.find(defaultFilter => !!defaultFilter.favorite) ?
@@ -1471,9 +1489,7 @@ export class WorkpackComponent implements OnDestroy {
           accept: async() => {
             await this.pasteWorkpack(workpackCuted, idWorkpackModelTo, idPlanTo, idParentTo);
           },
-          reject: () => {
-            return;
-          }
+          reject: () => { }
         });
       } else {
         await this.pasteWorkpack(workpackCuted, idWorkpackModelTo, idPlanTo, idParentTo);
@@ -1511,7 +1527,8 @@ export class WorkpackComponent implements OnDestroy {
       }
       const idFilterSelected = propertiesCard.filters.find(defaultFilter => !!defaultFilter.favorite) ?
         propertiesCard.filters.find(defaultFilter => !!defaultFilter.favorite).id : undefined;
-      const workPackItemCardList = await this.loadWorkpacksFromWorkpackModel(this.idPlan, workpackModel.idWorkpackModelOriginal, idFilterSelected, workpackModel.idWorkpackModelLinked);
+      const workPackItemCardList = await this.loadWorkpacksFromWorkpackModel
+        (this.idPlan, workpackModel.idWorkpackModelOriginal, idFilterSelected, workpackModel.idWorkpackModelLinked);
       return {
         idWorkpackModel: workpackModel.idWorkpackModelLinked,
         cardSection: propertiesCard,
@@ -1550,7 +1567,8 @@ export class WorkpackComponent implements OnDestroy {
   }
 
   async handleLinkToWorkpack(idWorkpack: number, idWorkpackModel: number) {
-    const result = await this.workpackSrv.linkWorkpack(idWorkpack, idWorkpackModel, { 'id-parent': this.idWorkpack, 'id-plan': this.idPlan });
+    const result = await this.workpackSrv.linkWorkpack(idWorkpack, idWorkpackModel,
+      { 'id-parent': this.idWorkpack, 'id-plan': this.idPlan });
     if (result.success) {
       this.router.navigate(['/workpack'], {
         queryParams: {
@@ -1616,15 +1634,19 @@ export class WorkpackComponent implements OnDestroy {
       }).map(stakeholder => {
         const editPermission = stakeholder.permissions && stakeholder.permissions.filter(p => p.level === 'EDIT').length > 0;
         const readPermission = stakeholder.permissions && stakeholder.permissions.filter(p => p.level === 'READ').length > 0;
-        const samePlan = (!stakeholder.permissions || stakeholder.permissions.length === 0) || (stakeholder.permissions && stakeholder.permissions.filter(p => p.idPlan === this.idPlan).length > 0);
+        const samePlan = (!stakeholder.permissions || stakeholder.permissions.length === 0) ||
+          (stakeholder.permissions && stakeholder.permissions.filter(p => p.idPlan === this.idPlan).length > 0);
         return {
           typeCardItem: 'listItemStakeholder',
-          icon: stakeholder.person ? (editPermission ? IconsEnum.UserEdit : (readPermission ? IconsEnum.UserRead : IconsEnum.UserCircle)) : IconsEnum.Building,
+          icon: stakeholder.person ? (editPermission ? IconsEnum.UserEdit :
+            (readPermission ? IconsEnum.UserRead : IconsEnum.UserCircle)) : IconsEnum.Building,
           iconSvg: true,
           nameCardItem: stakeholder.person ? stakeholder.person.name : stakeholder.organization.name,
           fullNameCardItem: stakeholder.person ? stakeholder.person.fullName : stakeholder.organization.fullName,
-          subtitleCardItem: stakeholder.roles && stakeholder.roles.filter(r => r.active && (!r.to || r.to === null || moment(r.to, 'yyyy-MM-DD').isSameOrAfter(moment()))
-            && (!r.from || r.from === null || moment(r.from, 'yyyy-MM-DD').isSameOrBefore(moment()))).map(role => this.translateSrv.instant(role.role)).join(', '),
+          subtitleCardItem: stakeholder.roles && stakeholder.roles.filter(r => r.active && (!r.to || r.to === null ||
+            moment(r.to, 'yyyy-MM-DD').isSameOrAfter(moment()))
+            && (!r.from || r.from === null || moment(r.from, 'yyyy-MM-DD').isSameOrBefore(moment())))
+            .map(role => this.translateSrv.instant(role.role)).join(', '),
           itemId: stakeholder.person ? stakeholder.person.id : stakeholder.organization.id,
           menuItems: [{
             label: this.translateSrv.instant('delete'),
@@ -2012,7 +2034,8 @@ export class WorkpackComponent implements OnDestroy {
     const result = await this.costAccountSrv.GetAll({ 'id-workpack': this.idWorkpack, idFilter });
     if (result.success && result.data.length > 0) {
       this.costAccounts = this.moveCostAccountOutherWorkpackToEnd(result.data);
-      const funders = (this.idOffice || this.idOfficeOwnerWorkpackLinked) && await this.loadOrganizationsOffice(this.idOfficeOwnerWorkpackLinked ? this.idOfficeOwnerWorkpackLinked : this.idOffice);
+      const funders = (this.idOffice || this.idOfficeOwnerWorkpackLinked) &&
+        await this.loadOrganizationsOffice(this.idOfficeOwnerWorkpackLinked ? this.idOfficeOwnerWorkpackLinked : this.idOffice);
       const namesWorckpack = await this.loadNameWorkpackCostAccount(result.data);
       const cardItems = this.costAccounts.map(cost => {
         const propertyName = cost.models.find(p => p.name === 'name');
@@ -2171,7 +2194,8 @@ export class WorkpackComponent implements OnDestroy {
               icon: 'fas fa-edit',
               command: () => this.editScheduleStep(step.id, this.unitMeansure.name, this.unitMeansure.precision, 'step')
             }]),
-          stepOrder: (groupIndex === 0 && stepIndex === 0) ? 'start' : ((groupIndex === groupArray.length - 1 && stepIndex === stepArray.length - 1) ? 'end' : 'step'),
+          stepOrder: (groupIndex === 0 && stepIndex === 0) ? 'start' :
+            ((groupIndex === groupArray.length - 1 && stepIndex === stepArray.length - 1) ? 'end' : 'step'),
           unitPlanned: step.plannedWork ? step.plannedWork : 0,
           unitActual: step.actualWork ? step.actualWork : 0,
           unitBaseline: step.baselinePlannedWork ? step.baselinePlannedWork : 0,
@@ -2627,11 +2651,13 @@ export class WorkpackComponent implements OnDestroy {
           label: role,
           value: role
         }));
-        property.possibleValues = this.workpackModel.organizationRoles && [...property.possibleValues, ...this.workpackModel.organizationRoles.filter(r => !property.possibleValues.find(pv => pv.label === r))
-          .map(role => ({
-            label: role,
-            value: role
-          }))];
+        property.possibleValues = this.workpackModel.organizationRoles &&
+          [...property.possibleValues, ...this.workpackModel.organizationRoles
+            .filter(r => !property.possibleValues.find(pv => pv.label === r))
+            .map(role => ({
+              label: role,
+              value: role
+            }))];
       }
       return property;
     });

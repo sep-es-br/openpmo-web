@@ -37,4 +37,10 @@
       }
     }
   }
+  .p-treenode.green-node {
+   .p-treenode-content .p-treenode-label {
+     color: #44B39B !important ;
+     font-weight: bold;
+   }
+  }
 }

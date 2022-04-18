@@ -1,23 +1,24 @@
 <div class="app-property-tree-selection">
-    <span class="button-select-locality-container">
-      <label class="app-input-label" >{{'value' | translate}}</label>
-      <p-button class="button-select-locality" [icon]="!showIconButton ? '' : 'fa fa-search'" iconPos="left"
-        (onClick)="opLocalityDefault.toggle($event)" [label]="labelButtonLocalitySelected"></p-button>
-    </span>
-    <p-overlayPanel #opLocalityDefault>
-      <ng-container *ngIf="property?.multipleSelection; else singleSelection">
-        <div class="app-tree-selection" *ngIf="property?.multipleSelection">
-          <label class="app-input-label" >{{'value' | translate}}</label>
-          <p-tree [value]="property?.localityList" selectionMode="checkbox" [(selection)]="value"
-            (onNodeSelect)="handleChangedValue(); setLabelButton($event)" (onNodeUnselect)=" handleChangedValue(); setLabelButton($event)"></p-tree>
-        </div>
-      </ng-container>
-      <ng-template #singleSelection>
-        <div class="app-tree-selection single-selection" [class.ng-invalid]="property.invalid" *ngIf="!property.multipleSelection">
-          <label class="app-input-label" >{{'value' | translate}}</label>
-          <p-tree [value]="property.localityList" selectionMode="single" [(selection)]="value"
-            (onNodeSelect)="handleChangedValue(); setLabelButton($event)" (onNodeUnselect)="handleChangedValue(); setLabelButton($event)"></p-tree>
-        </div>
-      </ng-template>
-    </p-overlayPanel>
+  <span class="button-select-locality-container">
+    <label class="app-input-label">{{'value' | translate}}</label>
+    <p-button class="button-select-locality" [icon]="!showIconButton ? '' : 'fa fa-search'" iconPos="left"
+      (onClick)="opLocalityDefault.toggle($event)" [label]="labelButtonLocalitySelected"></p-button>
+  </span>
+  <p-overlayPanel #opLocalityDefault>
+    <ng-container *ngIf="property?.multipleSelection; else singleSelection">
+      <div class="app-tree-selection" *ngIf="property?.multipleSelection">
+        <label class="app-input-label">{{'value' | translate}}</label>
+        <p-tree [value]="property?.localityList" selectionMode="checkbox" [(selection)]="value"
+          [propagateSelectionUp]="false" [propagateSelectionDown]="false" (onNodeSelect)="handleNodeSelect($event)"
+          (onNodeUnselect)=" handleNodeUnselect($event)"></p-tree>
+      </div>
+    </ng-container>
+    <ng-template #singleSelection>
+      <div class="app-tree-selection single-selection" *ngIf="!property.multipleSelection">
+        <label class="app-input-label">{{'value' | translate}}</label>
+        <p-tree [value]="property.localityList" selectionMode="single" [(selection)]="value"
+          (onNodeSelect)="handleNodeSelect($event)" (onNodeUnselect)="handleNodeUnselect($event)"></p-tree>
+      </div>
+    </ng-template>
+  </p-overlayPanel>
 </div>

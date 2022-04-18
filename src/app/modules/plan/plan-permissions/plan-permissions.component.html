@@ -43,9 +43,9 @@
                 [disabled]="!searchedNameUser || (searchedNameUser && searchedNameUser.length === 0) || isLoading"
                 icon="fas fa-search" iconPos="left"></button>
             </div>
-            <pan class="input-message-error" *ngIf="showMessagePublicServerNotFoundByName">
+            <span class="input-message-error" *ngIf="showMessagePublicServerNotFoundByName">
               {{'messages.publicServerNotFoundByName' |translate}}
-            </pan>
+            </span>
             <div class="listbox-public-servers-container" [class.responsive]="responsive">
               <p-listbox [options]="publicServersResult" *ngIf="showListBoxPublicServers" [multiple]="false"
                 [listStyle]="{'max-height':'250px'}" (onClick)="handleSelectedPublicServer($event)"

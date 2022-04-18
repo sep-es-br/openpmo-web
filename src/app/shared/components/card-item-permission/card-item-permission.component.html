@@ -1,14 +1,16 @@
 <p-card *ngIf="properties.typeCardItem === 'listItem'" class="app-card-item-permission listItem"
   [class.cardList]="displayModeCard === 'list'" [class.card-link]="properties.urlCard" [class.mobile]="responsive">
   <p-header *ngIf="properties.menuItems" class="card-item-header">
-    <span class="card-item-title" [pTooltip]="properties.fullNameUser" >{{properties.titleCardItem}}</span>
+    <span class="card-item-title" [pTooltip]="properties.fullNameUser"
+      (click)="navigateToPage(properties.urlCard, properties.paramsUrlCard)">{{properties.titleCardItem}}
+    </span>
     <p-menu #menu [popup]="true" [model]="properties.menuItems"></p-menu>
     <button type="button" pButton icon="pi pi-ellipsis-v" (click)="menu.toggle($event)"></button>
   </p-header>
   <div class="card-item-content" (click)="navigateToPage(properties.urlCard, properties.paramsUrlCard)">
     <span class="card-item-role-description">{{properties.roleDescription}}</span>
   </div>
-  <div class="card-item-footer" *ngIf="cardIdItem">
+  <div class="card-item-footer" *ngIf="cardIdItem" (click)="navigateToPage(properties.urlCard, properties.paramsUrlCard)">
     <span class="card-item-id">
       {{cardIdItem}}
     </span>
@@ -17,7 +19,8 @@
 
 <p-card *ngIf="properties.typeCardItem === 'editItem'" class="app-card-item-permission" styleClass="editItem">
   <p-header class="card-item-header">
-    <div class="card-item-title">{{properties.titleCardItem === 'citizen' ? ('citizen' |translate) : properties.titleCardItem}}</div>
+    <div class="card-item-title">{{properties.titleCardItem === 'citizen' ? ('citizen' |translate) :
+      properties.titleCardItem}}</div>
   </p-header>
   <div class="card-item-content">
     <span class="p-float-label">
@@ -42,7 +45,8 @@
 <p-card *ngIf="properties.typeCardItem === 'sharedItem'" class="app-card-item-permission" styleClass="editItem">
   <p-header class="card-item-header">
     <span class="card-item-title-shared">{{properties.titleCardItem}}</span>
-    <button type="button" pButton icon="fas fa-trash-alt" (click)="!properties.readOnly && handleDeleteSharedCard()"></button>
+    <button type="button" pButton icon="fas fa-trash-alt"
+      (click)="!properties.readOnly && handleDeleteSharedCard()"></button>
   </p-header>
   <div class="card-item-content">
     <span class="p-float-label">

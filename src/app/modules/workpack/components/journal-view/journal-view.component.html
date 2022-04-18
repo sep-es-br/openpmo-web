@@ -91,7 +91,7 @@
       <p-button *ngIf="hasMore" type="button" icon="fas fa-plus" (onClick)="handleViewMore($event)" label="{{ 'viewMore' | translate }}"
         class="app-button-green">
       </p-button>
-      <p-button *ngIf="!hasAll" type="button" icon="fas fa-eye" (onClick)="handleViewAll($event)" label="{{ 'viewAll' | translate }}"
+      <p-button *ngIf="hasAll && hasMore" type="button" icon="fas fa-eye" (onClick)="handleViewAll($event)" label="{{ 'viewAll' | translate }}"
         class="app-button-green">
       </p-button>
     </div>

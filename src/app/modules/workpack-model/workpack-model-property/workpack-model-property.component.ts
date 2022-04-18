@@ -9,6 +9,7 @@ import { IWorkpackModelProperty } from 'src/app/shared/interfaces/IWorkpackModel
 import { ResponsiveService } from 'src/app/shared/services/responsive.service';
 import { TypePropertyWorkpackModelEnum } from 'src/app/shared/enums/TypePropertyWorkpackModelEnum';
 import * as moment from 'moment';
+import { TreeNode } from 'primeng/api';
 
 @Component({
   selector: 'app-workpack-model-property',
@@ -95,5 +96,68 @@ export class WorkpackModelPropertyComponent implements OnDestroy, AfterViewInit 
 
   handleCollapseChanged(collapsed: boolean) {
     this.property.isCollapsed = collapsed;
+  }
+
+  handleNodeSelect(event) {
+    this.selectedOrUnselectAllChildren(event.node, true);
+    this.changed.emit(event);
+  }
+
+  handleNodeUnselect(event) {
+    this.selectedOrUnselectAllChildren(event.node, false);
+    this.changed.emit(event);
+  }
+
+  selectedSelectAllIfChildrenAllSelecteds(node: TreeNode) {
+    const localitiesSelected = this.property.extraListDefaults as TreeNode[];
+    const allChildrenSelected = this.verifyAllChildrenSelected(node);
+    if (allChildrenSelected) {
+      const selectAllNode = this.findSelectAllNodeFromParent(node);
+      if (selectAllNode) {
+        localitiesSelected.push(selectAllNode);
+      }
+    }
+    if (node.children) {
+      node.children.forEach(child => this.selectedSelectAllIfChildrenAllSelecteds(child));
+    }
+  }
+
+  verifyAllChildrenSelected(node: TreeNode) {
+    return node.children?.every(child => this.nodeIsSelecteAll(child) ?
+      true :
+      (this.property?.extraListDefaults as TreeNode[])?.includes(child));
+  }
+
+  findSelectAllNodeFromParent(node: TreeNode) {
+    return node.children?.find(child => child.key?.includes('SELECTALL'));
+  }
+
+  selectedOrUnselectAllChildren(node: TreeNode, selected: boolean) {
+    if (this.nodeIsSelecteAll(node)) {
+      if (node.parent) {
+        node.parent.children.forEach((child: TreeNode) =>
+          selected ? this.selectedNode(child) : this.unselectNode(child));
+      }
+    }
+  }
+
+  selectedNode(node: TreeNode) {
+    const localitiesSelected = this.property.extraListDefaults as TreeNode[];
+    const nodeIsSelected = localitiesSelected.find(locality => locality.data === node.data);
+    if (!nodeIsSelected && !this.nodeIsSelecteAll(node)) {
+      localitiesSelected.push(node);
+    }
+  }
+
+  unselectNode(node: TreeNode) {
+    const localitiesSelected = this.property.extraListDefaults as TreeNode[];
+    const indexNodeSelected = localitiesSelected.findIndex(locality => locality.data === node.data);
+    if (indexNodeSelected >= 0 && !this.nodeIsSelecteAll(node)) {
+      localitiesSelected.splice(indexNodeSelected, 1);
+    }
+  }
+
+  nodeIsSelecteAll(node: TreeNode) {
+    return node.key?.includes('SELECTALL');
   }
 }

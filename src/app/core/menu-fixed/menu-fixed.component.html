@@ -4,33 +4,37 @@
       <img src="assets/svg/LogoWhite.svg" alt="Logo">
     </div>
     <div class="item" *ngIf="isMobileView" (click)="toggleMenu('user')">
-        <i class="app-icon user-circle" [ngStyle]="{ fontSize: '2.25rem' }"></i>
+      <i class="app-icon user-circle" [ngStyle]="{ fontSize: '2.25rem' }"></i>
       <div class="item-label">{{ username }}</div>
     </div>
     <ng-container *ngIf="isAdminMenu; else menuGeneral">
       <ng-container *ngTemplateOutlet="menuAdmin"></ng-container>
     </ng-container>
     <div class="spacer"></div>
-    <div class="item" *ngIf="!isMobileView" [pTooltip]="'user' | translate" (click)="toggleMenu('user'); handleChangeMenuMode()">
+    <div class="item" *ngIf="!isMobileView" [pTooltip]="'user' | translate"
+      (click)="toggleMenu('user'); handleChangeMenuMode()">
       <app-avatar [idPerson]="currentUserInfo?.id" [menu]="true"></app-avatar>
     </div>
   </nav>
 
   <ng-template #menuGeneral>
-    <div class="item" (click)="toggleMenu('office')" *ngIf="itemsOffice?.length > 0" [pTooltip]="'officesAndPlans' | translate">
+    <div class="item" (click)="toggleMenu('office')" *ngIf="itemsOffice?.length > 0"
+      [pTooltip]="'officesAndPlans' | translate">
       <i class="app-icon offices" [ngStyle]="{ fontSize: '1.8rem' }"></i>
       <div class="item-label" *ngIf="isMobileView">{{ 'offices' | translate }}</div>
     </div>
-    <div class="item" [pTooltip]="currentPlan?.name"
-      *ngIf="!!currentIDOffice && !!currentIDPlan && isPlanMenu" (click)="toggleMenu('portfolio')">
-        <i class="app-icon briefcase" [ngStyle]="{ fontSize: '1.5rem' }"></i>
-      <div class="item-label" *ngIf="isMobileView" [routerLink]="['/plan']" [queryParams]="{id: currentPlan?.id}">{{ currentPlan?.name }}</div>
+    <div class="item" [pTooltip]="currentPlan?.name" *ngIf="!!currentIDOffice && !!currentIDPlan && isPlanMenu"
+      (click)="toggleMenu('portfolio')">
+      <i class="app-icon briefcase" [ngStyle]="{ fontSize: '1.5rem' }"></i>
+      <div class="item-label" *ngIf="isMobileView" [routerLink]="['/plan']" [queryParams]="{id: currentPlan?.id}">{{
+        currentPlan?.name }}</div>
     </div>
     <div class="item" *ngIf="currentUserInfo?.isCcbMember" [routerLink]="['/ccbmember-baselines-view']"
       [pTooltip]="'baselines' | translate">
       <i class="app-icon ccb-view" [ngStyle]="{ fontSize: '1.87rem' }"></i>
-    <div class="item-label" *ngIf="isMobileView" [routerLink]="['/ccbmember-baselines-view']">{{'baselines' | translate}}</div>
-  </div>
+      <div class="item-label" *ngIf="isMobileView" [routerLink]="['/ccbmember-baselines-view']">{{'baselines' |
+        translate}}</div>
+    </div>
   </ng-template>
   <ng-template #menuAdmin>
     <ng-container *ngIf="isMobileView; else adminWebView">
@@ -38,7 +42,7 @@
         <i class="app-icon offices" [ngStyle]="{ fontSize: '2.25rem' }"></i>
         <div class="item-label" *ngIf="isMobileView">{{ 'offices' | translate }}</div>
       </div>
-      <div class="item">
+      <div class="item" (click)="toggleMenu('planModel')">
         <i class="app-icon plan-model" [ngStyle]="{ fontSize: '2.25rem' }"></i>
         <div class="item-label" *ngIf="isMobileView">{{ 'planModels' | translate }}</div>
       </div>
@@ -51,28 +55,34 @@
       <div class="item" (click)="toggleMenu('office')" [pTooltip]="'offices' | translate" *ngIf="isUserAdmin">
         <i class="app-icon offices" [ngStyle]="{ fontSize: '1.8rem' }"></i>
       </div>
-      <div class="item" [routerLink]="['/strategies']" [queryParams]="{ idOffice: currentIDOffice }" [pTooltip]="'planModels' | translate">
+      <div class="item" (click)="toggleMenu('planModel')" [pTooltip]="'planModels' | translate">
         <i class="app-icon plan-model" [ngStyle]="{ fontSize: '1.5rem' }"></i>
       </div>
-      <div class="item" [routerLink]="['/organizations']" [queryParams]="{ idOffice: currentIDOffice }" [pTooltip]="'organizations' | translate">
+      <div class="item" [routerLink]="['/organizations']" [queryParams]="{ idOffice: currentIDOffice }"
+        [pTooltip]="'organizations' | translate">
         <i class="app-icon building" [ngStyle]="{ fontSize: '1.5rem' }"></i>
       </div>
-      <div class="item" [routerLink]="['/domains']" [queryParams]="{ idOffice: currentIDOffice }" [pTooltip]="'domains' | translate">
+      <div class="item" [routerLink]="['/domains']" [queryParams]="{ idOffice: currentIDOffice }"
+        [pTooltip]="'domains' | translate">
         <i class="app-icon map-marked" [ngStyle]="{ fontSize: '1.5rem' }"></i>
       </div>
-      <div class="item" [routerLink]="['/measure-units']" [queryParams]="{ idOffice: currentIDOffice }" [pTooltip]="'measureUnits' | translate">
+      <div class="item" [routerLink]="['/measure-units']" [queryParams]="{ idOffice: currentIDOffice }"
+        [pTooltip]="'measureUnits' | translate">
         <i class="app-icon unit-selection-alt" [ngStyle]="{ fontSize: '.9rem' }"></i>
       </div>
-      <div class="item" [routerLink]="['/offices/permission']" [queryParams]="{ idOffice: currentIDOffice }" [pTooltip]="'officePermissions' | translate">
+      <div class="item" [routerLink]="['/offices/permission']" [queryParams]="{ idOffice: currentIDOffice }"
+        [pTooltip]="'officePermissions' | translate">
         <i class="app-icon permission2" [ngStyle]="{ fontSize: '1.5rem' }" *ngIf="editPermissionOnOffice"></i>
       </div>
     </ng-template>
   </ng-template>
 
-  <div class="app-menu-slide-fixed" #menuSliderOffices *ngIf="menus[0].isOpen" [class.mobile]="isMobileView" [class.changing]="isChangingView">
+  <div class="app-menu-slide-fixed" #menuSliderOffices *ngIf="menus[0].isOpen" [class.mobile]="isMobileView"
+    [class.changing]="isChangingView">
     <ng-container *ngIf="isMobileView; else sliderOffice">
       <div class="top-bar">
-        <div class="title" [routerLink]="['/offices']">{{ (isAdminMenu ? 'offices' : 'officesAndPlans') | translate }}</div>
+        <div class="title" [routerLink]="['/offices']">{{ (isAdminMenu ? 'offices' : 'officesAndPlans') | translate }}
+        </div>
       </div>
       <p-panelMenu [model]="itemsOffice"></p-panelMenu>
       <div class="action-mobile">
@@ -82,15 +92,18 @@
     <ng-template #sliderOffice>
       <div class="slide-wrapper">
         <div class="top-bar">
-          <div class="title" [routerLink]="['/offices']">{{ (isAdminMenu ? 'offices' : 'officesAndPlans') | translate }}</div>
+          <div class="title" [routerLink]="['/offices']">{{ (isAdminMenu ? 'offices' : 'officesAndPlans') | translate }}
+          </div>
           <div class="action" *ngIf="!isMobileView">
-            <i [class]="isFixed ? 'app-icon pin-on' : 'app-icon pin-off'" [ngStyle]="{ fontSize: '1rem' }" (click)="handleChangeMenuMode()"></i>
+            <i [class]="isFixed ? 'app-icon pin-on' : 'app-icon pin-off'" [ngStyle]="{ fontSize: '1rem' }"
+              (click)="handleChangeMenuMode()"></i>
           </div>
         </div>
         <p-panelMenu [model]="itemsOffice"></p-panelMenu>
       </div>
     </ng-template>
   </div>
+
   <div class="app-menu-slide-fixed" #menuSliderPortfolio *ngIf="menus[1].isOpen">
     <ng-container *ngIf="isMobileView; else sliderPortfolio">
       <div class="top-bar">
@@ -107,15 +120,46 @@
     <ng-template #sliderPortfolio>
       <div class="slide-wrapper">
         <div class="top-bar">
-          <div class="title" [routerLink]="['/plan']" [queryParams]="{id: currentPlan?.id}">{{ currentPlan?.name }}</div>
+          <div class="title" [routerLink]="['/plan']" [queryParams]="{id: currentPlan?.id}">{{ currentPlan?.name }}
+          </div>
           <div class="action" *ngIf="!isMobileView">
-            <i [class]="isFixed ? 'app-icon pin-on' : 'app-icon pin-off'" [ngStyle]="{ fontSize: '1rem' }" (click)="handleChangeMenuMode()"></i>
+            <i [class]="isFixed ? 'app-icon pin-on' : 'app-icon pin-off'" [ngStyle]="{ fontSize: '1rem' }"
+              (click)="handleChangeMenuMode()"></i>
           </div>
         </div>
         <p-panelMenu [model]="itemsPorfolioFiltered"></p-panelMenu>
       </div>
     </ng-template>
   </div>
+
+  <div class="app-menu-slide-fixed" #menuSliderPlanModel *ngIf="menus[2].isOpen" [class.mobile]="isMobileView"
+    [class.changing]="isChangingView">
+    <ng-container *ngIf="isMobileView; else sliderPlanModel">
+      <div class="top-bar">
+        <div class="title" (click)="closeAllMenus()" [routerLink]="['/strategies']"
+          [queryParams]="{idOffice: currentIDOffice}">{{currentPlan?.name}}
+        </div>
+      </div>
+      <p-panelMenu [model]="itemsPlanModel"></p-panelMenu>
+      <div class="action-mobile">
+        <i class="app-icon angle-down" [ngStyle]="{ fontSize: '1rem' }" (click)="closeAllMenus()"></i>
+      </div>
+    </ng-container>
+    <ng-template #sliderPlanModel>
+      <div class="slide-wrapper">
+        <div class="top-bar">
+          <div class="title" (click)="closeAllMenus()" [routerLink]="['/strategies']" [queryParams]="{idOffice: currentIDOffice}">{{currentPlan?.name}}
+          </div>
+          <div class="action" *ngIf="!isMobileView">
+            <i [class]="isFixed ? 'app-icon pin-on' : 'app-icon pin-off'" [ngStyle]="{ fontSize: '1rem' }"
+              (click)="handleChangeMenuMode()"></i>
+          </div>
+        </div>
+        <p-panelMenu [model]="itemsPlanModel"></p-panelMenu>
+      </div>
+    </ng-template>
+  </div>
+
 
 
 

@@ -35,7 +35,7 @@ export class TripleConstraintDashboardComponent implements OnInit {
     private responsiveSrv: ResponsiveService
   ) {
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.responsive = value);
-   }
+  }
 
   async ngOnChanges(changes: SimpleChanges) {
     if (
@@ -72,9 +72,7 @@ export class TripleConstraintDashboardComponent implements OnInit {
     if (this.tripleConstraint.cost.actualValue) {
       values.push(this.tripleConstraint.cost.actualValue);
     }
-    this.maxCostValue = values.reduce((a, b) => {
-      return Math.max(a, b);
-    });
+    this.maxCostValue = values.reduce((a, b) => Math.max(a, b));
   }
 
   loadMaxScopeValue() {
@@ -88,9 +86,7 @@ export class TripleConstraintDashboardComponent implements OnInit {
     if (this.tripleConstraint.scope.actualVariationPercent) {
       values.push(this.tripleConstraint.scope.actualVariationPercent);
     }
-    this.maxScopeValue = values.reduce((a, b) => {
-      return Math.max(a, b);
-    });
+    this.maxScopeValue = values.reduce((a, b) => Math.max(a, b));
   }
 
   loadChartScheduleValues() {
@@ -105,10 +101,9 @@ export class TripleConstraintDashboardComponent implements OnInit {
       if (this.tripleConstraint.schedule.actualStartDate) {
         startDates.push(this.tripleConstraint.schedule.actualStartDate);
       }
-      const startDate = startDates.reduce((a, b) => {
-        if (moment(a, 'yyyy-MM-DD').isBefore(moment(b, 'yyyy-MM-DD'))) return a;
-        else return b;
-      });
+      const startDate =
+      startDates.reduce((a, b) => moment(a, 'yyyy-MM-DD')
+      .isBefore(moment(b, 'yyyy-MM-DD')) ? a : b, '');
       const endDates = [];
       if (this.tripleConstraint.schedule.plannedEndDate) {
         endDates.push(this.tripleConstraint.schedule.plannedEndDate);
@@ -120,8 +115,8 @@ export class TripleConstraintDashboardComponent implements OnInit {
         endDates.push(this.tripleConstraint.schedule.actualEndDate);
       }
       const endDate = endDates.reduce((a, b) => {
-        if (moment(a).isAfter(moment(b))) return a;
-        else return b;
+        if (moment(a).isAfter(moment(b))) { return a; }
+        else { return b; }
       });
       this.monthsInPeriod = Number((moment(endDate, 'yyyy-MM-DD').diff(moment(startDate, 'yyyy-MM-DD'), 'days') / 30).toFixed(1));
       this.difPlannedStartDateToMinStartDate = Number((moment(this.tripleConstraint.schedule.plannedStartDate, 'yyyy-MM-DD').diff(moment(startDate, 'yyyy-MM-DD'), 'days') / 30).toFixed(1));
@@ -134,7 +129,7 @@ export class TripleConstraintDashboardComponent implements OnInit {
       this.difPlannedEndDateToMaxEndDate = Number((moment(endDate, 'yyyy-MM-DD').diff(moment(this.tripleConstraint.schedule.plannedEndDate, 'yyyy-MM-DD'), 'days') / 30).toFixed(1));
       this.difForeseenEndDateToMaxEndDate = Number((moment(endDate, 'yyyy-MM-DD').diff(moment(this.tripleConstraint.schedule.foreseenEndDate, 'yyyy-MM-DD'), 'days') / 30).toFixed(1));
       this.difActualEndDateToMaxEndDate = Number((moment(endDate, 'yyyy-MM-DD').diff(moment(this.tripleConstraint.schedule.actualEndDate, 'yyyy-MM-DD'), 'days') / 30).toFixed(1));
-      
+
       this.marginRightPlanned = this.monthsInPeriod > 0 ? (100 / this.monthsInPeriod) * this.difPlannedEndDateToMaxEndDate : 0;
       this.marginRightForeseen = this.monthsInPeriod > 0 ? (100 / this.monthsInPeriod) * this.difForeseenEndDateToMaxEndDate : 0;
       this.marginRightActual = this.monthsInPeriod > 0 ? (100 / this.monthsInPeriod) * this.difActualEndDateToMaxEndDate : 0;

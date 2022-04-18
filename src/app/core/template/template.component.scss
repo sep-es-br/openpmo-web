@@ -11,7 +11,7 @@ $loadingBarHeight: .3rem;
     display: flex;
     flex-direction: column;
     flex: 1;
-    overflow-x: hidden;
+    overflow: hidden;
     height: 100%;
     min-height: 100vh;
   }
@@ -21,6 +21,11 @@ $loadingBarHeight: .3rem;
     flex: 1;
     overflow-x: hidden;
     height: 100%;
+    .content {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
   }
   .splitter-container {
     min-height: 100vh;
@@ -58,6 +63,11 @@ $loadingBarHeight: .3rem;
     transition: opacity 250ms ease-in;
     opacity: 1;
     padding: 1rem 50px 25px 50px;
+
+    &.fixed {
+      height: auto;
+      min-height: calc(100vh - 12.5rem);
+    }
 
     &.is-loading {
       transition: opacity 25ms ease-in;

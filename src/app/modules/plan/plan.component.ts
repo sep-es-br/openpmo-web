@@ -319,7 +319,7 @@ export class PlanComponent implements OnInit, OnDestroy {
     const result = await this.workpackModelSrv.GetAll({ 'id-plan-model': this.idPlanModel });
     const workpackModels = result.success && result.data;
     if (workpackModels) {
-      this.cardsPlanWorkPackModels = await Promise.all(workpackModels.map(async (workpackModel) => {
+      this.cardsPlanWorkPackModels = await Promise.all(workpackModels.map(async(workpackModel) => {
         const propertiesCard: ICard = {
           toggleable: false,
           initialStateToggle: false,
@@ -364,7 +364,9 @@ export class PlanComponent implements OnInit, OnDestroy {
     const workPackItemCardList: ICardItem[] = workpacks.map(workpack => {
       const propertyNameWorkpackModel = workpack.model?.properties?.find(p => p.name === 'name' && p.session === 'PROPERTIES');
       const propertyNameWorkpack = workpack.properties.find(p => p.idPropertyModel === propertyNameWorkpackModel?.id);
-      const propertyfullnameWorkpackModel = workpack.model?.properties?.find(p => p.name === 'fullname' && p.session === 'PROPERTIES');
+      const propertyfullnameWorkpackModel = workpack.model?.properties?.find(p => p.name.toLocaleLowerCase() === 'fullname'
+      && p.session === 'PROPERTIES');
+
       const propertyFullnameWorkpack = workpack.properties.find(p => p.idPropertyModel === propertyfullnameWorkpackModel?.id);
       const workpackPermissions = workpack.permissions && workpack.permissions.find(p => p.level === 'EDIT');
       const workpackEditPermission = workpackPermissions ? true : this.editPermission;
@@ -495,7 +497,7 @@ export class PlanComponent implements OnInit, OnDestroy {
           key: 'pasteConfirm',
           acceptLabel: this.translateSrv.instant('yes'),
           rejectLabel: this.translateSrv.instant('no'),
-          accept: async () => {
+          accept: async() => {
             await this.pasteWorkpack(workpackCuted, idWorkpackModelTo, idPlanTo, idParentTo);
           },
           reject: () => {
@@ -528,7 +530,7 @@ export class PlanComponent implements OnInit, OnDestroy {
     if (result.success) {
       return result.data;
     } else {
-      return {} as any
+      return {} as any;
     }
   }
 

@@ -14,16 +14,16 @@ import * as moment from 'moment';
 export class ScheduleConstraintComponent implements OnInit {
 
   @Input() schedule: {
-    actualEndDate: string,
-    actualStartDate: string,
-    actualValue: number,
-    foreseenEndDate: string,
-    foreseenStartDate: string,
-    foreseenValue: number,
-    plannedEndDate: string,
-    plannedStartDate: string,
-    plannedValue: number,
-    variation: number
+    actualEndDate: string;
+    actualStartDate: string;
+    actualValue: number;
+    foreseenEndDate: string;
+    foreseenStartDate: string;
+    foreseenValue: number;
+    plannedEndDate: string;
+    plannedStartDate: string;
+    plannedValue: number;
+    variation: number;
   };
   monthsInPeriod: number;
   difPlannedStartDateToMinStartDate: number;
@@ -89,10 +89,9 @@ export class ScheduleConstraintComponent implements OnInit {
       if (this.schedule.actualStartDate) {
         startDates.push(this.schedule.actualStartDate);
       }
-      const startDate = startDates.reduce((a, b) => {
-        if (moment(a, 'yyyy-MM-DD').isBefore(moment(b, 'yyyy-MM-DD'))) return a;
-        else return b;
-      });
+      const startDate =
+      startDates.reduce((a, b) => moment(a, 'yyyy-MM-DD')
+      .isBefore(moment(b, 'yyyy-MM-DD')) ? a : b, '');
       const endDates = [];
       if (this.schedule.plannedEndDate) {
         endDates.push(this.schedule.plannedEndDate);
@@ -104,8 +103,8 @@ export class ScheduleConstraintComponent implements OnInit {
         endDates.push(this.schedule.actualEndDate);
       }
       const endDate = endDates.reduce((a, b) => {
-        if (moment(a).isAfter(moment(b))) return a;
-        else return b;
+        if (moment(a).isAfter(moment(b))) {return a;}
+        else {return b;}
       });
       this.monthsInPeriod = Number((moment(endDate, 'yyyy-MM-DD').diff(moment(startDate, 'yyyy-MM-DD'), 'days') / 30).toFixed(1));
       this.difPlannedStartDateToMinStartDate = Number((moment(this.schedule.plannedStartDate, 'yyyy-MM-DD').diff(moment(startDate, 'yyyy-MM-DD'), 'days') / 30).toFixed(1));
@@ -118,7 +117,7 @@ export class ScheduleConstraintComponent implements OnInit {
       this.difPlannedEndDateToMaxEndDate = Number((moment(endDate, 'yyyy-MM-DD').diff(moment(this.schedule.plannedEndDate, 'yyyy-MM-DD'), 'days') / 30).toFixed(1));
       this.difForeseenEndDateToMaxEndDate = Number((moment(endDate, 'yyyy-MM-DD').diff(moment(this.schedule.foreseenEndDate, 'yyyy-MM-DD'), 'days') / 30).toFixed(1));
       this.difActualEndDateToMaxEndDate = Number((moment(endDate, 'yyyy-MM-DD').diff(moment(this.schedule.actualEndDate, 'yyyy-MM-DD'), 'days') / 30).toFixed(1));
-      
+
       this.marginRightPlanned = this.monthsInPeriod > 0 ? (100 / this.monthsInPeriod) * this.difPlannedEndDateToMaxEndDate : 0;
       this.marginRightForeseen = this.monthsInPeriod > 0 ? (100 / this.monthsInPeriod) * this.difForeseenEndDateToMaxEndDate : 0;
       this.marginRightActual = this.monthsInPeriod > 0 ? (100 / this.monthsInPeriod) * this.difActualEndDateToMaxEndDate : 0;

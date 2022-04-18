@@ -1,4 +1,4 @@
-import { PlanMenuItem } from './../interfaces/IMenu';
+import { IMenuPlanModel, PlanMenuItem } from './../interfaces/IMenu';
 import { MenuItem } from 'primeng/api';
 import { Location } from '@angular/common';
 import { Inject, Injectable, Injector } from '@angular/core';
@@ -30,6 +30,7 @@ export class MenuService extends BaseService<any> {
 
   private $reloadMenuOffice = new Subject();
   private $reloadMenuPortfolio = new Subject();
+  private $reloadMenuPlanModel = new Subject();
   private isAdminMenuObservable = new BehaviorSubject<boolean>(false);
   private isPlanMenuObservable = new BehaviorSubject<boolean>(false);
   private menuState = new BehaviorSubject<IMenuState>({
@@ -76,12 +77,28 @@ export class MenuService extends BaseService<any> {
     return this.$reloadMenuPortfolio.asObservable();
   }
 
+  reloadMenuPlanModel() {
+    this.$reloadMenuPlanModel.next();
+  }
+
+  obsReloadMenuPlanModel() {
+    return this.$reloadMenuPlanModel.asObservable();
+  }
+
   getItemsOffice(): Promise<IHttpResult<IMenuOffice[]>> {
     return this.http.get<IHttpResult<IMenuOffice[]>>(`${this.urlBase}/office`).toPromise();
   }
 
   getItemsPortfolio(idOffice: number): Promise<IHttpResult<IMenuWorkpack[]>> {
     return this.http.get<IHttpResult<IMenuWorkpack[]>>(`${this.urlBase}/portfolio`,
+      {
+        params: PrepareHttpParams({ 'id-office': idOffice })
+      }
+    ).toPromise();
+  }
+
+  getItemsPlanModel(idOffice: number): Promise<IHttpResult<IMenuPlanModel[]>> {
+    return this.http.get<IHttpResult<IMenuPlanModel[]>>(`${this.urlBase}/planModels`,
       {
         params: PrepareHttpParams({ 'id-office': idOffice })
       }

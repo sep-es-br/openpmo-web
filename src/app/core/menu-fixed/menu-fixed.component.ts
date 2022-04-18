@@ -7,7 +7,7 @@ import { MenuItem } from 'primeng/api';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
-import { IMenuWorkpack, IMenuWorkpackModel, PlanMenuItem, IMenu } from 'src/app/shared/interfaces/IMenu';
+import { IMenuWorkpack, IMenuWorkpackModel, PlanMenuItem, IMenu, IMenuPlanModel } from 'src/app/shared/interfaces/IMenu';
 import { IPerson } from 'src/app/shared/interfaces/IPerson';
 import { IPlan } from 'src/app/shared/interfaces/IPlan';
 import { AuthService } from 'src/app/shared/services/auth.service';
@@ -32,6 +32,7 @@ export class MenuFixedComponent implements OnInit, OnDestroy {
   menus: IMenu[] = [
     { label: 'office', isOpen: false },
     { label: 'portfolio', isOpen: false },
+    { label: 'planModel', isOpen: false },
     { label: 'user', isOpen: false },
     { label: 'more', isOpen: false }
   ];
@@ -41,6 +42,7 @@ export class MenuFixedComponent implements OnInit, OnDestroy {
   items: MenuItem[] = [];
   itemsOfficeUnchanged: MenuItem[] = [];
   itemsOffice: MenuItem[] = [];
+  itemsPlanModel: MenuItem[] = [];
   itemsPorfolio: PlanMenuItem[] = [];
   itemsPorfolioFiltered: PlanMenuItem[] = [];
   itemsLanguages: MenuItem[] = [];
@@ -89,12 +91,13 @@ export class MenuFixedComponent implements OnInit, OnDestroy {
       if (!!this.isAdminMenu) {
         this.updateMenuOfficeOnAdminChange();
       } else {
-        this.loadOfficeMenu()
+        this.loadOfficeMenu();
       }
     });
     this.officeSrv.observableIdOffice().pipe(takeUntil(this.$destroy)).subscribe(async id => {
       this.currentIDOffice = id;
       await this.loadPortfolioMenu();
+      await this.loadPlanModelMenu();
       this.refreshPortfolioMenu();
     });
     this.planSrv.observableIdPlan().pipe(takeUntil(this.$destroy)).subscribe(async id => {
@@ -103,6 +106,7 @@ export class MenuFixedComponent implements OnInit, OnDestroy {
         localStorage.setItem('@currentPlan', this.currentIDPlan.toString());
       }
       await this.loadPropertiesPlan();
+      await this.loadPlanModelMenu();
       if (!this.itemsPorfolio.length) {
         await this.loadPortfolioMenu();
       }
@@ -110,6 +114,7 @@ export class MenuFixedComponent implements OnInit, OnDestroy {
     });
     this.menuSrv.obsReloadMenuOffice().pipe(takeUntil(this.$destroy)).subscribe(() => this.loadOfficeMenu());
     this.menuSrv.obsReloadMenuPortfolio().pipe(takeUntil(this.$destroy)).subscribe(() => this.loadPortfolioMenu());
+    this.menuSrv.obsReloadMenuPlanModel().pipe(takeUntil(this.$destroy)).subscribe(() => !this.isFixed && this.loadPlanModelMenu());
     this.menuSrv.isAdminMenu.pipe(takeUntil(this.$destroy)).subscribe(isAdminMenu => {
       this.isAdminMenu = isAdminMenu;
       if (isAdminMenu) {
@@ -287,6 +292,17 @@ export class MenuFixedComponent implements OnInit, OnDestroy {
     return;
   }
 
+  async loadPlanModelMenu() {
+    if (this.currentIDOffice) {
+      const { success, data } = await this.menuSrv.getItemsPlanModel(this.currentIDOffice);
+      if (success) {
+        this.itemsPlanModel = this.buildMenuItemPlanModel(data || []);
+        this.refreshPortfolioMenu();
+      }
+    }
+    return;
+  }
+
   toggleMenu(menu: string) {
     const aDifferentMenuIsOpen = this.menus.filter(m => m.label !== menu && m.isOpen).length > 0;
     const menuFoundIndex = this.menus.findIndex(m => m.label === menu);
@@ -295,6 +311,42 @@ export class MenuFixedComponent implements OnInit, OnDestroy {
       this.menus[menuFoundIndex].isOpen = true;
     }
   }
+
+  buildMenuItemPlanModel(root: IMenuPlanModel[]): MenuItem[] {
+    return root.map(planModel => ({
+      id: planModel.id as any,
+      label: planModel.name,
+      icon: 'app-icon plan-model',
+      styleClass: `planModel-${planModel.id} ${this.currentURL === `planModel?id=${planModel.id}` ? 'active' : ''}`,
+      items: planModel.workpackModels?.length ? this.buildMenuItemWorkpackModel(planModel.workpackModels) : undefined,
+      command: (e) => {
+        if (e.originalEvent?.target?.classList?.contains('p-menuitem-text')) {
+          this.router.navigate(['/strategies/strategy'], { queryParams:
+            { id: planModel.id, idOffice: this.currentIDOffice } });
+          this.closeAllMenus();
+        }
+      }
+    }));
+  }
+
+  buildMenuItemWorkpackModel(root: IMenuWorkpackModel[]) {
+    return root.map(workpackModel => ({
+      idPlanModel: workpackModel.idPlanModel,
+      id: workpackModel.id,
+      label: workpackModel.name,
+      icon: workpackModel.fontIcon,
+      styleClass: `workpackModel-${workpackModel.id} ${this.currentURL === `workpackModel?id=${workpackModel.id}` ? 'active' : ''}`,
+      items: workpackModel.children?.length ? this.buildMenuItemWorkpackModel(workpackModel.children) : undefined,
+      command: (e) => {
+        if (e.originalEvent?.target?.classList?.contains('p-menuitem-text')) {
+          this.router.navigate(['/workpack-model'], { queryParams:
+            { id: workpackModel.id, idStrategy: workpackModel.idPlanModel, idOffice: this.currentIDOffice } });
+          this.closeAllMenus();
+        }
+      }
+    }));
+  }
+
 
   buildMenuItemPortfolio(root: IMenuWorkpack[]) {
     return root.map(workpack => ({
