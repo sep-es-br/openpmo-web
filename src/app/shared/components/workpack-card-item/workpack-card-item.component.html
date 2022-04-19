@@ -329,9 +329,10 @@
           <div class="icons-container-list">
             <i [ngClass]=" ['concluded', 'lateConcluded'].includes(properties.statusItem) ?  [ 'app-icon', 'flag-check', 'grey-icon'] : ['app-icon', 'flag-unchecked', 'grey-icon']"
               [class.linked]="!!properties.linked || !!properties.shared" [ngStyle]="{ fontSize: '2rem' }"
-              [class.on-time]="milestoneStatusEnum[properties.statusItem] === 'ontime'" [class.late]="milestoneStatusEnum[properties.statusItem] === 'late'"
-              [class.concluded]="milestoneStatusEnum[properties.statusItem] === 'concluded'"
-              [class.late-concluded]="milestoneStatusEnum[properties.statusItem] === 'lateconcluded'"></i>
+              [class.on-time]="properties?.statusItem === 'ontime'" 
+              [class.late]="properties?.statusItem === 'late'"
+              [class.concluded]="properties?.statusItem === 'concluded'"
+              [class.late-concluded]="properties?.statusItem === 'lateconcluded'"></i>
             <i [ngClass]="['app-icon', 'link-to', 'grey-icon', 'linked']" *ngIf="!!properties.linked"></i>
             <i [ngClass]="['app-icon', 'sharing', 'grey-icon', 'linked']"
               *ngIf="!!properties.shared && !properties.linked"></i>
@@ -358,7 +359,7 @@
           </div>
         </p-header>
         <div class="card-item-footer" *ngIf="cardIdItem">
-          <span class="baline-icon">
+          <span class="baseline-icon">
             <i class="app-icon baseline grey-icon" *ngIf="!!properties?.hasBaseline"
               [pTooltip]="properties?.baselineName"></i>
           </span>

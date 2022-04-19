@@ -30,7 +30,7 @@ export class CardItemComponent implements OnInit {
   iconImg;
   responsive: boolean;
   showMenuNewModel = false;
-  language: string; 
+  language: string;
   $destroy = new Subject();
 
   constructor(
@@ -48,9 +48,9 @@ export class CardItemComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.setLanguage()
+    this.setLanguage();
     this.cardIdItem = this.properties.itemId || this.properties.itemId === 0 ?
-      `ID: ${this.properties.itemId < 10 && this.properties.itemId !== 0 ? '0' + this.properties.itemId : this.properties.itemId}` : '';
+      `${this.properties.itemId < 10 && this.properties.itemId !== 0 ? '0' + this.properties.itemId : this.properties.itemId}` : '';
   }
 
   navigateToPage(url: string, params?: { name: string; value: string | number }[]) {
@@ -74,8 +74,8 @@ export class CardItemComponent implements OnInit {
     const params = this.properties?.paramsUrlCard ? this.properties?.paramsUrlCard : [];
     if (this.properties?.itemId) {
       params.push({name: 'id', value: this.properties?.itemId});
-    } 
-    
+    }
+
     this.navigateToPage(this.properties.urlCard, params);
   }
 

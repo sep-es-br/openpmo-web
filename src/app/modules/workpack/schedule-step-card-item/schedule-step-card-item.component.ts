@@ -36,7 +36,7 @@ export class ScheduleStepCardItemComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.cardIdItem = this.properties.idStep ?
-      `ID: ${this.properties.idStep < 10 ? '0' + this.properties.idStep : this.properties.idStep}` : '';
+      `${this.properties.idStep < 10 ? '0' + this.properties.idStep : this.properties.idStep}` : '';
     this.setLanguage();
   }
 

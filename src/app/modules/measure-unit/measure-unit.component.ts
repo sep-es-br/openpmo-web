@@ -132,7 +132,7 @@ export class MeasureUnitComponent implements OnInit {
         index,
         id: measureUnit.id,
         itemId: measureUnit.id ?
-          `ID: ${measureUnit.id < 10 ? '0' + measureUnit.id : measureUnit.id}` : '',
+          `${measureUnit.id < 10 ? '0' + measureUnit.id : measureUnit.id}` : '',
         menuItems: [{
           label: 'Delete', icon: 'fas fa-trash-alt',
           command: () => this.deleteMeasureUnit(measureUnit),
@@ -193,7 +193,7 @@ export class MeasureUnitComponent implements OnInit {
 
   async handleOnSubmit() {
     const formItemsChanged = this.formsMeasureUnits.filter(item => item.form.dirty && item.form.valid);
-    formItemsChanged.forEach(async ({ form, id }) => {
+    formItemsChanged.forEach(async({ form, id }) => {
       const { success, data } = form.value.id
         ? await this.measureUnitSvr.put(form.value)
         : await this.measureUnitSvr.post({ ...form.value, idOffice: this.idOffice });
@@ -215,7 +215,7 @@ export class MeasureUnitComponent implements OnInit {
             nameCardItem: measureUnit.name,
             id: measureUnit.id,
             itemId: measureUnit.id ?
-              `ID: ${measureUnit.id < 10 ? '0' + measureUnit.id : measureUnit.id}` : '',
+              `${measureUnit.id < 10 ? '0' + measureUnit.id : measureUnit.id}` : '',
             menuItems: [{
               label: 'Delete', icon: 'fas fa-trash-alt',
               command: () => this.deleteMeasureUnit(measureUnit),
@@ -343,7 +343,7 @@ export class MeasureUnitComponent implements OnInit {
         label: prop.label,
         name: prop.apiValue,
         active: true,
-      }
+      };
       return property;
     });
     return filterPropertiesList;

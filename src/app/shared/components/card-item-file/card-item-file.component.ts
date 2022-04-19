@@ -29,7 +29,7 @@ export class CardItemFileComponent implements OnInit {
 
   ngOnInit(): void {
     this.cardIdItem = this.properties.itemId || this.properties.itemId === 0 ?
-      `ID: ${this.properties.itemId < 10 && this.properties.itemId !== 0 ? '0' + this.properties.itemId : this.properties.itemId}` : '';
+      `${this.properties.itemId < 10 && this.properties.itemId !== 0 ? '0' + this.properties.itemId : this.properties.itemId}` : '';
   }
 
   navigateToPage(url: string, params?: { name: string; value: string | number }[]) {

@@ -50,7 +50,7 @@ export class CostAssignmentCardItemComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.cardIdItem = this.properties.idCost ?
-      `ID: ${this.properties.idCost < 10 ? '0' + this.properties.idCost : this.properties.idCost}` : '';
+      `${this.properties.idCost < 10 ? '0' + this.properties.idCost : this.properties.idCost}` : '';
   }
 
   handleCostChange(event, field: string) {

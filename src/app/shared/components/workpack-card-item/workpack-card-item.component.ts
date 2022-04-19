@@ -54,7 +54,7 @@ export class WorkpackCardItemComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.cardIdItem = this.properties.itemId || this.properties.itemId === 0 ?
-      `ID: ${this.properties.itemId < 10 && this.properties.itemId !== 0 ? '0' + this.properties.itemId : this.properties.itemId}` : '';
+      `${this.properties.itemId < 10 && this.properties.itemId !== 0 ? '0' + this.properties.itemId : this.properties.itemId}` : '';
     switch (this.properties.typeCardItem) {
       case 'newCardItem':
         this.cardType = 'newCardItem';

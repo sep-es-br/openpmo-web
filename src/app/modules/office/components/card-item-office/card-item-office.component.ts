@@ -41,12 +41,12 @@ export class CardItemOfficeComponent implements OnInit {
     // const isUserAdmin = await this.authSrv.isUserAdmin();
     // this.editPermission = !!isUserAdmin;
     // if (!isUserAdmin) {
-    //   this.editPermission = this.properties?.office?.permissions.filter( permission => permission.level === 'EDIT').length > 0; 
+    //   this.editPermission = this.properties?.office?.permissions.filter( permission => permission.level === 'EDIT').length > 0;
     // }
     this.editPermission = this.properties?.editPermission;
     this.cardIdItem = this.properties.itemId || this.properties.itemId === 0 ?
-    `ID: ${ this.properties.itemId < 10 && this.properties.itemId !== 0 ? '0'+this.properties.itemId : this.properties.itemId}` : '';
-    if ( this.properties.office)  { this.officeSrv.nextIDOffice(this.properties.office.id)};
+    `${ this.properties.itemId < 10 && this.properties.itemId !== 0 ? '0'+this.properties.itemId : this.properties.itemId}` : '';
+    if ( this.properties.office)  { this.officeSrv.nextIDOffice(this.properties.office.id);};
   }
 
   navigateToPage(url: string, params?: {name: string; value: string | number}[]) {

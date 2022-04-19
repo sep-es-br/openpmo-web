@@ -216,6 +216,8 @@
           display: flex;
           flex-direction: column;
           width: 10%;
+          height: 100%;
+          justify-content: space-between;
         }
       }
     }
@@ -259,6 +261,7 @@
       align-items: center;
       .baseline {
         font-size: 0.7rem;
+        color: #888e96;
       }
       .card-item-id {
         color: #888e96;
@@ -498,15 +501,22 @@
         align-items: flex-end;
         justify-content: space-between;
         .card-item-footer {
-          .baline-icon {
-            margin-right: 1em;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          .baseline-icon {
+            //margin-right: 1em;
+            font-size: 0.7rem;
+          }
+          .card-item-id {
+            padding: 0.5em;
           }
         }
       }
       .card-item-content-list {
         display: flex;
         flex-direction: row;
-        justify-content: space-between;
+        // justify-content: space-between;
         align-items: center;
         color: #888e96;
         padding: 0.5em 1em !important;
@@ -539,6 +549,8 @@
         }
         .card-item-date {
           justify-self: flex-end;
+          margin-left: 1em;
+          font-size: 0.9rem;
         }
         .attention-milestone {
           color: #DFA11E;
@@ -609,6 +621,7 @@
       display: flex;
       flex-direction: row;
       justify-content: space-between;
+      align-items: flex-end;
       padding: 0.5em;
       .card-item-id {
         color: #888e96;
