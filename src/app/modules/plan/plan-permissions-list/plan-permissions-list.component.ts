@@ -35,7 +35,8 @@ export class PlanPermissionsListComponent implements OnInit {
     initialStateToggle: false,
     cardTitle: 'permissions',
     collapseble: true,
-    initialStateCollapse: false
+    initialStateCollapse: false,
+    showFilters: true
   };
   collapsePanelsStatus = true;
   displayModeAll = 'grid';
@@ -73,7 +74,7 @@ export class PlanPermissionsListComponent implements OnInit {
     this.collapsePanelsStatus = event.mode === 'collapse' ? true : false;
     this.cardPlanPermissions = Object.assign({}, {
       ...this.cardPlanPermissions,
-      initialStateCollapse: this.collapsePanelsStatus
+      initialStateCollapse: this.collapsePanelsStatus,
     });
   }
 
@@ -233,7 +234,7 @@ export class PlanPermissionsListComponent implements OnInit {
         name: prop.apiValue,
         active: true,
         possibleValues: prop.possibleValues
-      }
+      };
       return property;
     });
     return filterPropertiesList;

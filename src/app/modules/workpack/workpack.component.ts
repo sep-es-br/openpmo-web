@@ -1506,6 +1506,7 @@ export class WorkpackComponent implements OnDestroy {
       idWorkpackModelFrom: workpackCuted.model.id
     });
     if (result.success) {
+      this.workpackSrv.removeWorkpackCuted();
       await this.reloadSectionsWorkpackChildren();
     }
   }
