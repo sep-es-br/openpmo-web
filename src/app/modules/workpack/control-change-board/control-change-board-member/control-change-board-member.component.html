@@ -40,7 +40,7 @@
           </div>
           <div *ngIf="citizenSearchBy === 'NAME'" class="search-citizen-user-by-name">
             <div class="user-by-name-input-container">
-              <input #actualTarget class="app-input-text input-search-name" [class.responsive]="responsive"
+              <input class="app-input-text input-search-name" [class.responsive]="responsive"
                      (ngModelChange)="validateClearSearchUserName($event)" [(ngModel)]="searchedNameUser" pInputText/>
               <button pButton class="button-search" [label]="!responsive ? ('search'|translate) : ''"
                       (click)="searchCitizenUserByName()"
@@ -138,5 +138,5 @@
       </div>
     </app-card>
   </div>
-  <app-save-button #saveButton (save)="saveCcbMember()"></app-save-button>
+  <app-save-button (save)="saveCcbMember()"></app-save-button>
 </div>

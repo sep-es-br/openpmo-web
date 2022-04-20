@@ -1,4 +1,4 @@
-import { IPerson } from './IPerson';
+import {IPerson} from './IPerson';
 
 export interface IControlChangeBoard {
   idWorkpack?: number;
@@ -13,4 +13,4 @@ export interface IMemberAs {
   role: string;
   workLocation: string;
   active: boolean;
-};
+}

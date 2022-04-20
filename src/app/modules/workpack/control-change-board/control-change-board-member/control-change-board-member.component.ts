@@ -412,7 +412,11 @@ export class ControlChangeBoardMemberComponent implements OnInit, OnDestroy {
   }
 
   showSaveButton() {
-    this.saveButton.showButton();
+    if (this.ccbMember.memberAs.some(member => member.active)) {
+      this.saveButton.showButton();
+    } else {
+      this.saveButton.hideButton();
+    }
   }
 
   async saveCcbMember() {
