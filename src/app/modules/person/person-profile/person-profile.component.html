@@ -8,18 +8,18 @@
     <app-card [properties]="cardProperties" class="mt-0">
       <div class="content" [class.mobile]="responsive">
         <div class="container-left-info">
-          <app-avatar [edit]="true" [idPerson]="idPerson"> </app-avatar>
+          <app-avatar [edit]="true" [idPerson]="idPerson"></app-avatar>
           <span class="name">{{propertiesPerson?.fullName}}</span>
           <span class="administrator">{{'administrator'|translate}}</span>
           <form [formGroup]="formPerson" class="form">
             <span class="p-float-label property-input p-field">
               <input pInputText class="app-input-text" type="text" [class.responsive]="responsive"
-                formControlName="name">
+                     formControlName="name">
               <label class="app-input-label profile">{{ 'messages.labelNameProfile' | translate }} </label>
             </span>
             <span class="p-float-label property-input p-field">
               <input pInputText class="app-input-text" type="text" [class.responsive]="responsive"
-                formControlName="email" [readOnly]="true">
+                     formControlName="email" [readOnly]="true">
               <label class="app-input-label profile">{{ 'accessEmail' | translate }} </label>
             </span>
           </form>
@@ -27,8 +27,8 @@
         <div class="container-right-info" *ngIf="optionsOffices && optionsOffices.length > 0">
           <span class="p-float-label property-input p-field list-offices-container">
             <p-dropdown class="app-single-selection" [options]="optionsOffices" optionLabel="label" optionValue="value"
-              [required]="true" [class.responsive]="responsive" [(ngModel)]="idOffice"
-              (onChange)="handleChangeOffice($event)">
+                        [required]="true" [class.responsive]="responsive" [(ngModel)]="idOffice"
+                        (onChange)="handleChangeOffice($event)">
             </p-dropdown>
             <label class="app-input-label">{{ 'office' | translate }} </label>
           </span>
@@ -38,20 +38,21 @@
               <div class="p-fluid p-formgroup p-grid">
                 <span class="p-float-label property-input-text p-field p-col-12 p-md-4">
                   <input pInputText class="app-input-text" type="text" [class.responsive]="responsive"
-                    formControlName="contactEmail">
+                         formControlName="contactEmail">
                   <label class="app-input-label">{{ 'email' | translate }} </label>
                 </span>
                 <span class="p-float-label left property-input p-field p-col-12 p-md-2">
                   <input pInputText class="app-input-text" formControlName="phoneNumber" [class.responsive]="responsive"
-                    (blur)="setPhoneNumberMask()" [placeholder]="phoneNumberPlaceholder" (input)="setPhoneNumberPlaceholder()"
-                    (focus)="setPhoneNumberPlaceholder()" />
+                         (blur)="setPhoneNumberMask()" [placeholder]="phoneNumberPlaceholder"
+                         (input)="setPhoneNumberPlaceholder()" (focusin)="setPhoneNumberPlaceholder()"
+                         (focusout)="clearPhoneNumberPlaceholder()"/>
                   <label class="app-input-label">{{ 'phone' | translate }} </label>
                   <label class="app-input-label">{{ 'phone' | translate }} </label>
                 </span>
               </div>
               <span class="p-float-label property-input p-field">
                 <textarea pInputTextarea class="app-text-area" [class.responsive]="responsive" formControlName="address"
-                  [rows]="1"></textarea>
+                          [rows]="1"></textarea>
                 <label class="app-input-label">{{ 'address' | translate }} </label>
               </span>
             </form>
@@ -65,9 +66,9 @@
             <div class="container-permission">
               <div class="permission">
                 <span class="label">{{'officePermission' | translate}}</span>
-                <span class="value"
-                  *ngIf="['EDIT', 'READ'].includes(propertiesPerson?.officePermission?.accessLevel)">{{propertiesPerson?.officePermission?.accessLevel
-                  | translate}}</span>
+                <span class="value" *ngIf="['EDIT', 'READ'].includes(propertiesPerson?.officePermission?.accessLevel)">
+                  {{propertiesPerson?.officePermission?.accessLevel | translate}}
+                </span>
               </div>
             </div>
             <ng-container *ngFor="let cardPlan of cardsPlans; let i = index">
@@ -77,13 +78,13 @@
                     <div class="permission">
                       <span class="label">{{'planPermission' |translate}}</span>
                       <span class="value"
-                        *ngIf="['EDIT', 'READ'].includes(propertiesPerson?.officePermission?.planPermissions[i]?.accessLevel)">
+                            *ngIf="['EDIT', 'READ'].includes(propertiesPerson?.officePermission?.planPermissions[i]?.accessLevel)">
                         {{propertiesPerson?.officePermission?.planPermissions[i]?.accessLevel |translate}}</span>
                     </div>
                   </div>
                   <p-dataView [value]="cardPlan.cardItems" layout="grid" class="app-dataview"
-                    *ngIf="cardPlan?.cardItems?.length > 0"
-                    [emptyMessage]="(!cardPlan.cardItems ? 'loadingEllipsis' : 'noContent') | translate">
+                              *ngIf="cardPlan?.cardItems?.length > 0"
+                              [emptyMessage]="(!cardPlan.cardItems ? 'loadingEllipsis' : 'noContent') | translate">
                     <ng-template let-cardItem pTemplate="gridItem">
                       <div class="p-col-12 p-md-3 p-sm-12 card-item-container">
                         <app-card-item [properties]="cardItem"></app-card-item>

@@ -15,19 +15,21 @@
           <div class="search-container-non-user" *ngIf="!user">
             <div class="search-person-by">
               <p-radioButton class="search-by-radio" value="SEARCH" [(ngModel)]="personSearchBy"
-                [label]="'searchPerson'|translate">
+                             [label]="'searchPerson'|translate">
               </p-radioButton>
               <p-radioButton class="search-by-radio" value="NEW" [(ngModel)]="personSearchBy"
-                (ngModelChange)="resetPerson()" [label]="'newPerson' |translate"></p-radioButton>
+                             (ngModelChange)="resetPerson()" [label]="'newPerson' |translate"></p-radioButton>
             </div>
             <div class="search-existing-person-container" *ngIf="personSearchBy === 'SEARCH'"
-              [class.responsive]="responsive">
+                 [class.responsive]="responsive">
               <div class="name-person-container">
                 <span class="p-float-label">
                   <p-autoComplete class="app-autocomplete" [(ngModel)]="selectedPerson"
-                    [suggestions]="resultPersonsByName" [delay]="500" field="fullName" [forceSelection]="true"
-                    (completeMethod)="searchPersonByName($event)" (ngModelChange)="validateClearSearchPerson($event)"
-                    (onSelect)="handlePersonSelected()"></p-autoComplete>
+                                  [suggestions]="resultPersonsByName" [delay]="500" field="fullName"
+                                  [forceSelection]="true"
+                                  (completeMethod)="searchPersonByName($event)"
+                                  (ngModelChange)="validateClearSearchPerson($event)"
+                                  (onSelect)="handlePersonSelected()"></p-autoComplete>
                   <label class="app-input-label" for="float-search">{{ "fullName" | translate }}</label>
                 </span>
                 <i class="fas fa-search icon-search-input" *ngIf="!selectedPerson"></i>
@@ -39,12 +41,13 @@
           </div>
 
           <div class="search-container-non-user-citizen" *ngIf="user && !citizenAuthServer"
-            [class.responsive]="responsive">
+               [class.responsive]="responsive">
             <div class="name-person-container" [class.responsive]="responsive">
               <span class="p-float-label">
                 <input class="app-input-text input-search" [class.responsive]="responsive" id="float-search"
-                  (ngModelChange)="validateClearSearchUserByEmail($event)" [(ngModel)]="searchedEmailUser" pInputText
-                  (blur)="searchUserByEmail()" type="email" />
+                       (ngModelChange)="validateClearSearchUserByEmail($event)" [(ngModel)]="searchedEmailUser"
+                       pInputText
+                       (blur)="searchUserByEmail()" type="email"/>
                 <label class="app-input-label" for="float-search">{{ "searchByEmail" | translate }}</label>
               </span>
               <i class="fas fa-search icon-search-input"></i>
@@ -62,29 +65,30 @@
               <label>{{'searchBy'|translate}}:</label>
               <div class="radios-container">
                 <p-radioButton class="search-user-radio" value="CPF" [(ngModel)]="citizenSearchBy" [label]="'CPF'"
-                  (ngModelChange)="validateClearSearchByUser()">
+                               (ngModelChange)="validateClearSearchByUser()">
                 </p-radioButton>
                 <p-radioButton class="search-user-radio" value="NAME" [(ngModel)]="citizenSearchBy"
-                  (ngModelChange)="validateClearSearchByUser()" [label]="'nameOnlyPublicServers' |translate">
+                               (ngModelChange)="validateClearSearchByUser()"
+                               [label]="'nameOnlyPublicServers' |translate">
                 </p-radioButton>
               </div>
             </div>
             <div *ngIf="citizenSearchBy === 'NAME'" class="search-citizen-user-by-name">
               <div class="user-by-name-input-container">
-                <input #actualTarget class="app-input-text input-search-name" [class.responsive]="responsive"
-                  (ngModelChange)="validateClearSearchUserName($event)" [(ngModel)]="searchedNameUser" pInputText />
+                <input class="app-input-text input-search-name" [class.responsive]="responsive"
+                       (ngModelChange)="validateClearSearchUserName($event)" [(ngModel)]="searchedNameUser" pInputText/>
                 <button pButton class="button-search" [label]="!responsive ? ('search'|translate) : ''"
-                  (click)="searchCitizenUserByName()"
-                  [disabled]="!searchedNameUser || (searchedNameUser && searchedNameUser.length === 0) || isLoading"
-                  icon="fas fa-search" iconPos="left"></button>
+                        (click)="searchCitizenUserByName()"
+                        [disabled]="!searchedNameUser || (searchedNameUser && searchedNameUser.length === 0) || isLoading"
+                        icon="fas fa-search" iconPos="left"></button>
               </div>
               <pan class="input-message-error" *ngIf="showMessagePublicServerNotFoundByName">
                 {{'messages.publicServerNotFoundByName' |translate}}
               </pan>
               <div class="listbox-public-servers-container" [class.responsive]="responsive">
                 <p-listbox [options]="publicServersResult" *ngIf="showListBoxPublicServers" [multiple]="false"
-                  [listStyle]="{'max-height':'250px'}" (onClick)="handleSelectedPublicServer($event)"
-                  optionLabel="name">
+                           [listStyle]="{'max-height':'250px'}" (onClick)="handleSelectedPublicServer($event)"
+                           optionLabel="name">
                   <ng-template let-publicServer pTemplate="item">
                     <span>
                       {{publicServer.name}}
@@ -95,14 +99,15 @@
             </div>
             <div class="search-by-cpf-container" [class.responsive]="responsive">
               <div class="user-by-cpf-input-container" *ngIf="citizenSearchBy === 'CPF'"
-                [class.responsive]="responsive">
+                   [class.responsive]="responsive">
                 <p-inputMask [(ngModel)]="searchedCpfUser" mask="999.999.999-99" placeholder="000.000.000-00"
-                  (ngModelChange)="validateClearSearchByCpf($event)" [class.responsive]="responsive" unmask="true">
+                             (ngModelChange)="validateClearSearchByCpf($event)" [class.responsive]="responsive"
+                             unmask="true">
                 </p-inputMask>
                 <button pButton class="button-search" [label]="!responsive ? ('search'|translate) : ''"
-                  (click)="validateCpf()"
-                  [disabled]="!searchedCpfUser || (searchedCpfUser && searchedCpfUser.length === 0) || isLoading"
-                  icon="fas fa-search" iconPos="left"></button>
+                        (click)="validateCpf()"
+                        [disabled]="!searchedCpfUser || (searchedCpfUser && searchedCpfUser.length === 0) || isLoading"
+                        icon="fas fa-search" iconPos="left"></button>
               </div>
               <span *ngIf="!validCpf" class="input-message-error">
                 {{ 'messages.invalidCPF'|translate }}
@@ -125,7 +130,7 @@
             <div class="p-field" *ngIf="!user && (personSearchBy === 'NEW')">
               <span class="p-float-label">
                 <input class="app-input-text short-input" [class.responsive]="responsive" id="float-fullName"
-                  formControlName="fullName" type="text" (change)="handleShowSaveButton()" pInputText />
+                       formControlName="fullName" type="text" (change)="handleShowSaveButton()" pInputText/>
                 <label class="app-input-label" for="float-fullName">{{"fullName" | translate}}</label>
               </span>
               <app-input-message [form]="stakeholderForm" field="fullName"></app-input-message>
@@ -133,27 +138,26 @@
             <div class="p-field">
               <span class="p-float-label">
                 <textarea pInputTextarea class="app-text-area" id="float-address" formControlName="address" rows="1"
-                  [class.responsive]="responsive" (change)="handleShowSaveButton()" [autoResize]="true">
+                          [class.responsive]="responsive" (change)="handleShowSaveButton()" [autoResize]="true">
                 </textarea>
                 <label class="app-input-label" for="float-address">{{ "address" | translate }}</label>
               </span>
             </div>
             <div class="p-field">
               <span class="p-float-label">
-                <!-- <p-inputMask class="app-input-mask short-input" [class.responsive]="responsive" id="float-phoneNumber"
-                  name="phoneNumber" formControlName="phoneNumber" mask="(99) 99999-9999" [unmask]="true" (change)="handleShowSaveButton()"></p-inputMask> -->
-                <input pInputText class="app-input-text short-input" formControlName="phoneNumber" [class.responsive]="responsive"
-                  (blur)="setPhoneNumberMask()" [placeholder]="phoneNumberPlaceholder" [class.responsive]="responsive" id="float-phoneNumber"
-                  name="phoneNumber" (input)="setPhoneNumberPlaceholder()" (change)="handleShowSaveButton()" (focus)="setPhoneNumberPlaceholder()" />
-                <label class="app-input-label" for="float-phoneNumber">{{ "phoneNumber" | translate }}</label>
+                <input id="phone" pInputText class="app-input-text" formControlName="phoneNumber"
+                       [class.responsive]="responsive" [class.desktop]="!responsive" (blur)="setPhoneNumberMask()"
+                       [placeholder]="phoneNumberPlaceholder" (focusin)="setPhoneNumberPlaceholder()"
+                       (focusout)="clearPhoneNumberPlaceholder()" (input)="setPhoneNumberPlaceholder()"/>
+                <label class="app-input-label" for="phone">{{ "phoneNumber" | translate }}</label>
               </span>
               <app-input-message [form]="stakeholderForm" field="phoneNumber"></app-input-message>
             </div>
             <div class="p-field">
               <span class="p-float-label">
                 <input class="app-input-text short-input" [class.responsive]="responsive" id="float-contactEmail"
-                  name="contactEmail" formControlName="contactEmail" type="contactEmail"
-                  (change)="handleShowSaveButton()" pInputText />
+                       name="contactEmail" formControlName="contactEmail" type="contactEmail"
+                       (change)="handleShowSaveButton()" pInputText/>
                 <label class="app-input-label" for="float-contactEmail">{{"contactEmail" | translate}}</label>
               </span>
               <app-input-message [form]="stakeholderForm" field="contactEmail"></app-input-message>
@@ -167,11 +171,11 @@
     <app-card [properties]="cardRoles" *ngIf="cardRoles">
       <div class="card-item-roles-container">
         <p-dataView [value]="stakeholderRolesCardItems" layout="grid" styleClass="dataview-card-items"
-          [emptyMessage]="'loadingEllipsis' | translate">
+                    [emptyMessage]="'loadingEllipsis' | translate">
           <ng-template let-cardItem pTemplate="gridItem">
             <div class="p-col-12 p-md-3 p-sm-12 card-item-container" [class.responsive]="responsive">
               <app-stakeholder-role-card-item [properties]="cardItem" (newCardItemRole)="createNewCardItemRole()"
-                (roleChanged)="handleShowSaveButton()">
+                                              (roleChanged)="handleShowSaveButton()">
               </app-stakeholder-role-card-item>
             </div>
           </ng-template>
@@ -181,10 +185,10 @@
   </div>
   <div class="card-permissions">
     <app-card [properties]="cardPermissions"
-      *ngIf="cardPermissions && stakeholderPermissions && stakeholderPermissions.length > 0">
+              *ngIf="cardPermissions && stakeholderPermissions && stakeholderPermissions.length > 0">
       <div class="card-item-permissions-container">
         <p-dataView [value]="stakeholderPermissions" layout="grid" styleClass="dataview-card-items"
-          [emptyMessage]="'loadingEllipsis' | translate">
+                    [emptyMessage]="'loadingEllipsis' | translate">
           <ng-template let-cardItem pTemplate="gridItem">
             <div class="p-col-12 p-md-3 p-sm-12 card-item-container">
               <p-card class="app-card-item-permission" styleClass="editItem" *ngIf="!cardItem.inheritedFrom">
@@ -195,8 +199,8 @@
                 <div class="card-item-content">
                   <span class="p-float-label">
                     <p-dropdown id="level-dropdown" dropdownIcon="fas fa-caret-down" class="app-single-selection"
-                      [autoDisplayFirst]="false" (onChange)="handleShowSaveButton()"
-                      [options]="permissionLevelListOptions" [(ngModel)]="cardItem.level">
+                                [autoDisplayFirst]="false" (onChange)="handleShowSaveButton()"
+                                [options]="permissionLevelListOptions" [(ngModel)]="cardItem.level">
                     </p-dropdown>
                     <label class="app-input-label" for="level-dropdown">{{ "level" | translate }}</label>
                   </span>
