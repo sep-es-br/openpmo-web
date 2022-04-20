@@ -87,7 +87,8 @@
       </div>
     </app-card>
   </div>
-  <div class="actions-buttons-container" [class.actions-buttons-container-responsive]="responsive" *ngIf="!idBaseline || baseline?.status === 'DRAFT'">
+  <div class="actions-buttons-container" [class.actions-buttons-container-responsive]="responsive"
+       *ngIf="!idBaseline || baseline?.status === 'DRAFT'">
     <p-button class="action-button submit-button" [label]="'submit'|translate" (onClick)="saveDraftAndSubmitBaseline()">
     </p-button>
     <p-button class="action-button draft-button" [label]="'draft'|translate" (onClick)="handleSaveDraftBaseline()">
@@ -142,9 +143,7 @@
   <p-dialog [header]="'comment'|translate" [(visible)]="!!showCommentDialog"
             [style]="!responsive ? {width: '30vw'} : {width: '90vw'}" (onHide)="showCommentDialog=false">
     <div class="comment-container">
-      <span class="title">{{'comment'|translate}}</span>
       <textarea pInputTextarea class="app-text-area comment" rows="3" [disabled]="true">{{selectedComment}}</textarea>
     </div>
   </p-dialog>
-
 </div>
