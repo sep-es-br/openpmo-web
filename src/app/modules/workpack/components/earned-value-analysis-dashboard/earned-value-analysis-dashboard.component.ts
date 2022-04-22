@@ -53,6 +53,7 @@ export class EarnedValueAnalysisDashboardComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.setLanguage();
   }
 
   ngOnDestroy(): void {

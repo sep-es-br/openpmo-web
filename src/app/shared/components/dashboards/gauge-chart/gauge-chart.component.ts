@@ -20,6 +20,7 @@ export class GaugeChartComponent implements OnInit, OnDestroy, OnChanges {
   valueChartRight: number;
   data: ChartData;
   type = 'doughnut';
+  language: string;
   plugins: ChartPluginsOptions = [];
   options: ChartOptions = {
     plugins: {
@@ -47,6 +48,7 @@ export class GaugeChartComponent implements OnInit, OnDestroy, OnChanges {
         this.setConfigValuesChart();
         this.setPluginsChart();
         this.setDataChart();
+        this.setLanguage();
       }, 200);
     });
   }
@@ -64,8 +66,13 @@ export class GaugeChartComponent implements OnInit, OnDestroy, OnChanges {
       this.setConfigValuesChart();
       this.setPluginsChart();
       this.setDataChart();
+      this.setLanguage();
       this.progressBarRight = this.config?.valueProgressBar > 0;
     }
+  }
+
+  setLanguage() {
+    this.language = this.translateSrv.currentLang === 'pt-BR' ? 'pt' : 'en';
   }
 
   setConfigValuesChart() {

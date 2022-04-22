@@ -538,13 +538,14 @@
         }
         .description-container {
           display: flex;
-          flex-direction: column;
+          flex-direction: row;
           margin-left: 1em;
           .card-item-name {
             font-size: 18px;
           }
           .card-item-status {
             font-size: 16px;
+            margin-left: 0.5em;
           }
         }
         .card-item-date {

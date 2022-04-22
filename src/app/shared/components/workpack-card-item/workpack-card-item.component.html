@@ -341,14 +341,16 @@
             <span class="card-item-name" [pTooltip]="properties.fullNameCardItem"
               tooltipPosition="bottom">{{properties.nameCardItem}}</span>
             <span class="card-item-status" *ngIf="properties?.statusItem"
-              [class.on-time]="milestoneStatusEnum[properties.statusItem] === 'ontime'" [class.late]="milestoneStatusEnum[properties.statusItem] === 'late'"
-              [class.concluded]="milestoneStatusEnum[properties.statusItem] === 'concluded'"
-              [class.late-concluded]="milestoneStatusEnum[properties.statusItem] === 'lateconcluded'">{{milestoneStatusEnum[properties?.statusItem]|translate}}</span>
+              [class.on-time]="properties?.statusItem === 'ontime'" 
+              [class.late]="properties?.statusItem === 'late'"
+              [class.concluded]="properties?.statusItem === 'concluded'"
+              [class.late-concluded]="properties?.statusItem === 'lateconcluded'">
+              {{properties?.statusItem|translate}}</span>
           </div>
+          <div class="card-item-date" *ngIf="properties.subtitleCardItem" [class.attention-milestone]="!!attentionMilestone" >{{language === 'pt-BR' ?
+            (properties?.subtitleCardItem|date:'dd/MM/yyyy') :
+            (properties?.subtitleCardItem|date:'yyyy/MM/dd')}}</div>
         </div>
-        <span class="card-item-date" *ngIf="properties.subtitleCardItem" [class.attention-milestone]="!!attentionMilestone" >{{language === 'pt-BR' ?
-          (properties?.subtitleCardItem|date:'dd/MM/yyyy') :
-          (properties?.subtitleCardItem|date:'yyyy/MM/dd')}}</span>
       </div>
       <div class="right-side">
         <p-header *ngIf="properties.menuItems" class="card-item-header">
