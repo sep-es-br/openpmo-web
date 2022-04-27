@@ -1,6 +1,7 @@
 <div class="app-risk-response">
   <div class="app-content-header">
-    <span>{{ "newResponse" | translate }}</span>
+    <span *ngIf="!idRiskResponse" >{{ "newResponse" | translate }}</span>
+    <span *ngIf="!!idRiskResponse && riskResponse">{{ riskResponse.name }}</span>
   </div>
 
   <div class="card-properties-risk-response" *ngIf="cardRiskResponseProperties" [class.responsive]="responsive">
@@ -54,7 +55,7 @@
                 <p-dropdown class="app-single-selection" [options]="strategyOptions" formControlName="strategy"
                   dropdownIcon="fas fa-caret-down" [autoDisplayFirst]="false">
                 </p-dropdown>
-                <label class="app-input-label">{{'strategy'|translate}}</label>
+                <label class="app-input-label">{{'strategy'|translate}} * </label>
               </span>
               <app-input-message [form]="formRiskResponse" field="strategy"></app-input-message>
             </div>
@@ -63,7 +64,7 @@
                 <p-dropdown class="app-single-selection" [options]="statusOptions" formControlName="status"
                   dropdownIcon="fas fa-caret-down" [autoDisplayFirst]="false">
                 </p-dropdown>
-                <label class="app-input-label">{{'status'|translate}}</label>
+                <label class="app-input-label">{{'status'|translate}} *</label>
               </span>
               <app-input-message [form]="formRiskResponse" field="status"></app-input-message>
             </div>
@@ -90,7 +91,7 @@
                 <p-multiSelect class="app-multiple-selection" dropdownIcon="fas fa-caret-down"
                   formControlName="responsible" [options]="stakeholderOptions" optionLabel="label" optionValue="value">
                 </p-multiSelect>
-                <label class="app-input-label" for="float-label">{{'responsible' |translate}}</label>
+                <label class="app-input-label" for="float-label">{{'responsible' |translate}} *</label>
               </span>
               <app-input-message [form]="formRiskResponse" field="responsible"></app-input-message>
             </div>

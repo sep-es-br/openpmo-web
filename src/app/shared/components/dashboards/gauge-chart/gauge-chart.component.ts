@@ -129,7 +129,7 @@ export class GaugeChartComponent implements OnInit, OnDestroy, OnChanges {
     const ctx = chart.ctx;
     const xFillText = chart.width / 2;
     const yFillText = (chart.height / 2) + 35;
-    const label = this.config.value !== null ? (this.config.value === 0 ? '0' : this.config.value.toFixed(2)) : null;
+    const label = this.config.value !== null ? (this.config.value === 0 ? '0' : Number(this.config.value.toFixed(2)).toLocaleString(this.language === 'pt' ? 'pt-BR' : 'en-US')) : null;
     const labelBottom = this.translateSrv.instant(this.config.labelBottom);
 
     ctx.fillStyle = this.valueChart !== null ? (this.valueChart > 0 ? '#0081c1' : '#fa4c4f') : '#646464';

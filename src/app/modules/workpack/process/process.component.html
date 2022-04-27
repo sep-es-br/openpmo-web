@@ -1,6 +1,7 @@
 <div class="app-process">
   <div class="app-content-header">
-    <span>{{ "newProcess" | translate }}</span>
+    <span *ngIf="!idProcess">{{ "newProcess" | translate }}</span>
+    <span *ngIf="!!idProcess && !!process">{{ process.processNumber }}</span>
   </div>
 
   <div class="card-properties-process" *ngIf="cardProcessProperties" [class.responsive]="responsive">

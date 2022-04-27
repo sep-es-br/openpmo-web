@@ -1,6 +1,7 @@
 <div class="app-issue">
   <div class="app-content-header">
-    <span>{{ "newIssue" | translate }}</span>
+    <span *ngIf="!idIssue" >{{ "newIssue" | translate }}</span>
+    <span *ngIf="!!idIssue && issue">{{ issue.name }}</span>
   </div>
 
   <div class="card-properties-issue" *ngIf="cardIssueProperties" [class.responsive]="responsive">

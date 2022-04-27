@@ -1,3 +1,4 @@
+import { TranslateService } from '@ngx-translate/core';
 import { takeUntil } from 'rxjs/operators';
 import { ResponsiveService } from './../../../services/responsive.service';
 import { Subject } from 'rxjs';
@@ -30,11 +31,18 @@ export class ScopeConstraintComponent implements OnInit {
   marginLeftActual: number;
   $destroy = new Subject();
   responsive = false;
+  language: string;
 
   constructor(
-    private responsiveSrv: ResponsiveService
+    private responsiveSrv: ResponsiveService,
+    private translateSrv: TranslateService
   ) {
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.responsive = value);
+    this.translateSrv.onLangChange.pipe(takeUntil(this.$destroy)).subscribe(() =>
+      {
+        setTimeout(() => this.setLanguage(), 200);
+      }
+    );
    }
 
   async ngOnChanges(changes: SimpleChanges) {
@@ -48,11 +56,16 @@ export class ScopeConstraintComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.setLanguage();
   }
 
   ngOnDestroy(): void {
     this.$destroy.next();
     this.$destroy.complete();
+  }
+
+  setLanguage() {
+    this.language = this.translateSrv.currentLang === 'pt-BR' ? 'pt' : 'en';
   }
 
   loadMaxScopeValue() {

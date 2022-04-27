@@ -1,6 +1,7 @@
 <div class="app-risk">
   <div class="app-content-header">
-    <span>{{ "newRisk" | translate }}</span>
+    <span *ngIf="!idRisk">{{ "newRisk" | translate }}</span>
+    <span *ngIf="!!idRisk && risk">{{ risk.name }}</span>
   </div>
   <div class="card-properties-risk" *ngIf="cardRiskProperties" [class.responsive]="responsive">
     <app-card [properties]="cardRiskProperties" class="mt-0 inputs-float-label">
