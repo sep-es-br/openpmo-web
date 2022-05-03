@@ -54,6 +54,7 @@ export class GaugeChartComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   ngOnInit(): void {
+    
   }
 
   ngOnDestroy() {
@@ -80,12 +81,12 @@ export class GaugeChartComponent implements OnInit, OnDestroy, OnChanges {
     const middle = max / 2;
     const min = 0;
     if (this.config.value !== null) {
-      this.config.value = (this.config.value > max ?
+      const value = (this.config.value > max ?
         max :
         (this.config.value < min ?
           min :
           this.config.value));
-      this.valueChart = this.config.value - middle;
+      this.valueChart = value - middle;
       if (this.valueChart > min) {
         this.valueChartLeft = middle;
         this.valueChartRight = middle - this.valueChart;

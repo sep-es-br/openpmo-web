@@ -98,7 +98,7 @@ export class OfficeListComponent implements OnInit {
     if (user && user.email) {
       this.cookieSrv.put('cookiesPermission' + user.email, 'true', { expires: date });
       const language = localStorage.getItem(StoreKeys.defaultLanguage);
-      this.cookieSrv.put('cookiesDefaultLanguateUser' + user.email, language);
+      this.cookieSrv.put('cookiesDefaultLanguateUser' + user.email, language, { expires: date });
     }
     this.showCookiesPermissionMessage = false;
   }

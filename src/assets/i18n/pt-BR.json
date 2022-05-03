@@ -302,6 +302,13 @@
   "risksRequireAttention": "Ricos exigem atenção",
   "CPI": "IDC",
   "SPI": "IDP",
+  "EV": "VA",
+  "PV": "VP",
+  "EAC": "ENC",
+  "ETC": "EPC",
+  "CV": "VC",
+  "SV": "VP",
+  "AC": "CR",
   "decline": "Recusar",
   "messages": {
     "cookies-confirmation": "O OPEN PMO utiliza cookies para possibilitar uma forma de navegação personalizada. Ao clicar em aceitar você está concordando com o armazenamento de dados de navegação.",

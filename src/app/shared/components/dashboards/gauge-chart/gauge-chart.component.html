@@ -6,7 +6,7 @@
     <div class="progress-content" [class.direction-left]="!progressBarRight">
       <ng-container *ngIf="progressBarRight">
         <span class="value blue" *ngIf="config.valueProgressBar">
-          {{config.valueProgressBar | shortNumber:language}}</span>
+          {{config.valueProgressBar | shortNumber:language:2}}</span>
         <span class="dividing-line"></span>
       </ng-container>
       <progress class="progress" [class.blue]="!!progressBarRight" [class.red]="!progressBarRight"

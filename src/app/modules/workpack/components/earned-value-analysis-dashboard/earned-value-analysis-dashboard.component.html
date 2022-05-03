@@ -17,10 +17,10 @@
         </div>
       </div>
       <div class="progress-bar-container">
-        <label>EV ({{'earnedValue' | translate}})</label>
+        <label>{{'EV'|translate}} ({{'earnedValue' | translate}})</label>
         <div class="progress-bar-total-container"
           [ngStyle]="{width: '100%', background: 'rgba(230, 230, 230, 1)', height: '31px'}">
-          <div class="progress-bar"
+          <div class="progress-bar" [pTooltip]="earnedValueAnalysis?.performanceIndexes[0]?.earnedValue|number:'2.0-2':language"
             [ngStyle]="{width: (earnedValueAnalysis?.performanceIndexes[0]?.earnedValue/maxProgressBar)*85 + '%', background: 'rgba(68, 179, 155, 1)', height: '31px'}">
           </div>
           <label
@@ -28,10 +28,10 @@
         </div>
       </div>
       <div class="progress-bar-container">
-        <label>AC ({{'actualCost' | translate}})</label>
+        <label>{{'AC'|translate}} ({{'actualCost' | translate}})</label>
         <div class="progress-bar-total-container"
           [ngStyle]="{width: '100%', background: 'rgba(230, 230, 230, 1)', height: '31px'}">
-          <div class="progress-bar"
+          <div class="progress-bar" [pTooltip]="earnedValueAnalysis?.performanceIndexes[0]?.actualCost|number:'2.0-2':language"
             [ngStyle]="{width: (earnedValueAnalysis?.performanceIndexes[0]?.actualCost/maxProgressBar)*85 + '%', background: 'rgba(68, 179, 155, 1)', height: '31px'}">
           </div>
           <label
@@ -39,10 +39,10 @@
         </div>
       </div>
       <div class="progress-bar-container">
-        <label>PV ({{'plannedValue' | translate}})</label>
+        <label>{{'PV'|translate}} ({{'plannedValue' | translate}})</label>
         <div class="progress-bar-total-container"
           [ngStyle]="{width: '100%', background: 'rgba(230, 230, 230, 1)', height: '31px'}">
-          <div class="progress-bar"
+          <div class="progress-bar" [pTooltip]="earnedValueAnalysis?.performanceIndexes[0]?.plannedValue|number:'2.0-2':language"
             [ngStyle]="{width: (earnedValueAnalysis?.performanceIndexes[0]?.plannedValue/maxProgressBar)*85 + '%', background: 'rgba(68, 179, 155, 1)', height: '31px'}">
           </div>
           <label
@@ -50,10 +50,10 @@
         </div>
       </div>
       <div class="progress-bar-container">
-        <label>EAC ({{'estimatesAtCompletion' | translate}})</label>
+        <label>{{'EAC'|translate}} ({{'estimatesAtCompletion' | translate}})</label>
         <div class="progress-bar-total-container"
           [ngStyle]="{width: '100%', background: 'rgba(230, 230, 230, 1)', height: '31px'}">
-          <div class="progress-bar "
+          <div class="progress-bar " [pTooltip]="earnedValueAnalysis?.performanceIndexes[0]?.estimatesAtCompletion|number:'2.0-2':language"
             [ngStyle]="{width: (earnedValueAnalysis?.performanceIndexes[0]?.estimatesAtCompletion/maxProgressBar)*85 + '%', background: 'rgba(68, 179, 155, 1)', height: '31px'}">
           </div>
           <label
@@ -61,10 +61,10 @@
         </div>
       </div>
       <div class="progress-bar-container">
-        <label>ETC ({{'estimatesToComplete' | translate}})</label>
+        <label>{{'ETC'|translate}} ({{'estimatesToComplete' | translate}})</label>
         <div class="progress-bar-total-container"
           [ngStyle]="{width: '100%', background: 'rgba(230, 230, 230, 1)', height: '31px'}">
-          <div class="progress-bar"
+          <div class="progress-bar" [pTooltip]="earnedValueAnalysis?.performanceIndexes[0]?.estimateToComplete|number:'2.0-2':language"
             [ngStyle]="{width: (earnedValueAnalysis?.performanceIndexes[0]?.estimateToComplete/maxProgressBar)*85 + '%', background: 'rgba(68, 179, 155, 1)', height: '31px'}">
           </div>
           <label

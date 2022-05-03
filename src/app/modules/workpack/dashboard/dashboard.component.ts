@@ -180,7 +180,7 @@ export class DashboardComponent implements OnInit, OnChanges, OnDestroy {
               '#00b89c',
               '#fa4c4f',
               '#0081c1',
-              '#00aef7',
+              '#7C75B9',
             ],
           }]
       };

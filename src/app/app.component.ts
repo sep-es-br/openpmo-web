@@ -1,6 +1,3 @@
-import { TranslateChangeService } from 'src/app/shared/services/translate-change.service';
-import { AuthService } from 'src/app/shared/services/auth.service';
-import { CookieService } from 'ngx-cookie';
 import { Component, HostListener, OnInit } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import { filter } from 'rxjs/operators';

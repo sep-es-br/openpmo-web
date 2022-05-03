@@ -68,7 +68,7 @@ export class EarnedValueAnalysisDashboardComponent implements OnInit {
       labels: this.earnedValueAnalysis?.earnedValueByStep?.map(item => moment(item.date).format('MMM YYYY')),
       datasets: [
         {
-          label: 'PV',
+          label: this.translateSrv.instant('PV'),
           data: this.earnedValueAnalysis.earnedValueByStep?.map(item => item.plannedValue),
           fill: false,
           borderColor: '#b5b5b5',
@@ -76,7 +76,7 @@ export class EarnedValueAnalysisDashboardComponent implements OnInit {
           pointRadius: this.earnedValueAnalysis.earnedValueByStep?.map(item => item.plannedValue).length > 1 ? 0 : 4,
         },
         {
-          label: 'AC',
+          label:  this.translateSrv.instant('AC'),
           data: this.earnedValueAnalysis.earnedValueByStep?.filter( step => moment(step.date, 'yyyy-MM').isSameOrBefore(referenceMonth)).map(item => item.actualCost),
           fill: false,
           borderColor: '#0081c1',
@@ -84,7 +84,7 @@ export class EarnedValueAnalysisDashboardComponent implements OnInit {
           pointRadius: this.earnedValueAnalysis.earnedValueByStep?.filter( step => moment(step.date, 'yyyy-MM').isSameOrBefore(referenceMonth)).map(item => item.actualCost).length > 1 ? 0 : 4,
         },
         {
-          label: 'EV',
+          label: this.translateSrv.instant('EV'),
           data: this.earnedValueAnalysis.earnedValueByStep?.filter( step => moment(step.date, 'yyyy-MM').isSameOrBefore(referenceMonth) ).map(item => item.earnedValue),
           fill: false,
           borderColor: '#fa7800',
@@ -107,6 +107,12 @@ export class EarnedValueAnalysisDashboardComponent implements OnInit {
           }
         }]
       },
+      elements: {
+        point: {
+          pointStyle: 'circle',
+          radius: 4
+        },
+      }
     };
   }
 

@@ -5,6 +5,7 @@ import { Subject, Observable } from 'rxjs';
 import { StoreKeys } from '../constants';
 import { TranslateService } from '@ngx-translate/core';
 import { PrimeNGConfig } from 'primeng/api';
+import * as moment from 'moment';
 
 @Injectable({
   providedIn: 'root'
@@ -32,7 +33,8 @@ export class TranslateChangeService {
     if (user) {
       const cookiesPermission = this.cookieSrv.get('cookiesPermission'+ user.email);
       if (!!cookiesPermission) {
-        this.cookieSrv.put('cookiesDefaultLanguateUser' + user.email, lang);
+        const date = moment().add(60, 'days').calendar();
+        this.cookieSrv.put('cookiesDefaultLanguateUser' + user.email, lang, { expires: date });
       }
     }
     localStorage.setItem(StoreKeys.defaultLanguage, lang);
