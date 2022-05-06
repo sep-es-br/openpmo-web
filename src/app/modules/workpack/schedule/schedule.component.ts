@@ -1,3 +1,4 @@
+import { ScheduleStartChangeService } from './../../../shared/services/schedule-start-change.service';
 import { Component, OnDestroy, OnInit, ViewChild, ViewChildren } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -64,6 +65,8 @@ export class ScheduleComponent implements OnInit, OnDestroy {
   $destroy = new Subject();
   calendarFormat: string;
   yearRange: string;
+  actualValidationMessage: string;
+  scheduleStartDate: Date;
 
   constructor(
     private actRouter: ActivatedRoute,
@@ -77,7 +80,8 @@ export class ScheduleComponent implements OnInit, OnDestroy {
     private costAccountSrv: CostAccountService,
     private messageSrv: MessageService,
     private router: Router,
-    private planSrv: PlanService
+    private planSrv: PlanService,
+    private scheduleStartChangeSrv: ScheduleStartChangeService
   ) {
     this.actRouter.queryParams.subscribe(async queryParams => {
       this.idWorkpack = queryParams.idWorkpack;
@@ -111,7 +115,7 @@ export class ScheduleComponent implements OnInit, OnDestroy {
     this.calendarFormat = this.translateSrv.instant('dateFormat');
     const today = moment();
     const yearStart = today.year();
-    this.yearRange = (yearStart-1).toString() + ':'+ (yearStart+15).toString();
+    this.yearRange = (yearStart - 1).toString() + ':' + (yearStart + 15).toString();
     await this.loadPropertiesSchedule();
   }
 
@@ -128,30 +132,30 @@ export class ScheduleComponent implements OnInit, OnDestroy {
   }
 
   async getBreadcrumbs() {
-    const { success, data } = await this.breadcrumbSrv.getBreadcrumbWorkpack(this.idWorkpack, {'id-plan': this.idPlan});
+    const { success, data } = await this.breadcrumbSrv.getBreadcrumbWorkpack(this.idWorkpack, { 'id-plan': this.idPlan });
     const breadcrumbPlan = data.find(d => d.type === 'plan');
     if (breadcrumbPlan) {
       this.planSrv.nextIDPlan(breadcrumbPlan.id);
     }
     return success
       ? data.map(p => ({
-            key: p.type.toLowerCase(),
-            info: p.name,
-            tooltip: p.fullName,
-            routerLink: this.getRouterLinkFromType(p.type),
-            queryParams: { id: p.id, idWorkpackModelLinked: p.idWorkpackModelLinked }
-          }))
+        key: p.type.toLowerCase(),
+        info: p.name,
+        tooltip: p.fullName,
+        routerLink: this.getRouterLinkFromType(p.type),
+        queryParams: { id: p.id, idWorkpackModelLinked: p.idWorkpackModelLinked }
+      }))
       : [];
   }
 
   getRouterLinkFromType(type: string): string[] {
     switch (type) {
       case 'office':
-        return [ '/offices', 'office' ];
+        return ['/offices', 'office'];
       case 'plan':
-        return [ 'plan' ];
+        return ['plan'];
       default:
-        return [ '/workpack' ];
+        return ['/workpack'];
     }
   }
 
@@ -190,8 +194,8 @@ export class ScheduleComponent implements OnInit, OnDestroy {
       const workpacksIds = costAccounts.map(cost => cost.idWorkpack);
       const workpacksIdsNotRepeated = workpacksIds.filter((w, i) => workpacksIds.indexOf(w) === i);
 
-      this.menuItemsCostAccounts = await Promise.all(workpacksIdsNotRepeated.map(async(idWorkpack) => {
-        const workpack = await this.workpackSrv.GetWorkpackById(idWorkpack, {'id-plan': this.idPlan});
+      this.menuItemsCostAccounts = await Promise.all(workpacksIdsNotRepeated.map(async (idWorkpack) => {
+        const workpack = await this.workpackSrv.GetWorkpackById(idWorkpack, { 'id-plan': this.idPlan });
         if (workpack.success) {
           const workpackCostAccounts = costAccounts.filter(cost => cost.idWorkpack === idWorkpack);
           return {
@@ -219,11 +223,11 @@ export class ScheduleComponent implements OnInit, OnDestroy {
       return;
     }
     const costAssignmentsCardItemsList = this.costAssignmentsCardItems.filter(card => card.type === 'cost-card');
-    const costAccountsIds = costAssignmentsCardItemsList.map( cardItem => (cardItem.idCost));
+    const costAccountsIds = costAssignmentsCardItemsList.map(cardItem => (cardItem.idCost));
     this.menuItemsCostAccounts = Array.from(this.menuItemsCostAccounts.map(group => {
       const items = group.items.map(item => ({
         ...item,
-        disabled: costAccountsIds.includes( Number(item.id)) || Number(item.id) === idCost
+        disabled: costAccountsIds.includes(Number(item.id)) || Number(item.id) === idCost
       }));
       return {
         ...group,
@@ -273,7 +277,7 @@ export class ScheduleComponent implements OnInit, OnDestroy {
   }
 
   deleteCost(idCost: number) {
-    const menuItems = this.menuItemsCostAccounts.map( group => {
+    const menuItems = this.menuItemsCostAccounts.map(group => {
       const items = group.items.map(item => {
         if (Number(item.id) === idCost) {
           return {
@@ -292,9 +296,9 @@ export class ScheduleComponent implements OnInit, OnDestroy {
       };
     });
     this.costAssignmentsCardItems[this.costAssignmentsCardItems.length - 1] = {
-        type: 'new-cost-card',
-        menuItemsNewCost: Array.from(menuItems)
-      };
+      type: 'new-cost-card',
+      menuItemsNewCost: Array.from(menuItems)
+    };
     this.menuItemsCostAccounts = Array.from(menuItems);
     this.costAssignmentsCardItems = Array.from(this.costAssignmentsCardItems.filter(cost => cost.idCost !== idCost));
     this.reloadCostAssignmentTotals();
@@ -302,10 +306,49 @@ export class ScheduleComponent implements OnInit, OnDestroy {
 
   handleChangeValuesCardItems() {
     this.reloadCostAssignmentTotals();
-    if (this.formSchedule.valid) {
+    if (!this.actualValidationMessage && this.formSchedule.valid) {
       if (this.costAssignmentsCardItems && this.costAssignmentsCardItems.length > 0
-        && this.costAssignmentsCardItems.filter( item => item.type !== 'new-cost-card' && item.plannedWork && item.plannedWork > 0).length === this.costAssignmentsCardItems.length - 1) {
-        this.saveButton?.showButton();
+        && this.costAssignmentsCardItems.filter(item => item.type !== 'new-cost-card' &&
+          item.plannedWork && item.plannedWork > 0).length === this.costAssignmentsCardItems.length - 1) {
+        const startDate = moment(this.formSchedule.controls.start.value);
+        const today = moment();
+        if (today.isBefore(startDate, 'months') && this.costAssignmentsCardItems.filter(item => item.actualWork && item.actualWork > 0).length > 0) {
+          this.saveButton?.hideButton();
+        } else {
+          this.saveButton?.showButton();
+        }
+      } else {
+        
+      }
+    } else {
+      this.saveButton?.hideButton();
+    }
+  }
+
+  handleChangeValues() {
+    this.scheduleStartDate = this.formSchedule.controls.start.value;
+    if (this.formSchedule.controls.actualWork.value > 0 && this.formSchedule.controls.start.value) {
+      const startDate = moment(this.formSchedule.controls.start.value);
+      const today = moment();
+      if (today.isBefore(startDate, 'months')) {
+        this.actualValidationMessage = this.translateSrv.instant('messages.scheduleActualValueValidation');
+        this.saveButton.hideButton();
+      } else {
+        this.actualValidationMessage = null;
+      }
+    } else {
+      this.actualValidationMessage = null;
+    }
+    if (!this.actualValidationMessage && this.formSchedule.valid) {
+      if (this.costAssignmentsCardItems && this.costAssignmentsCardItems.length > 0
+        && this.costAssignmentsCardItems.filter(item => item.plannedWork && item.plannedWork > 0).length > 0) {
+        const startDate = moment(this.formSchedule.controls.start.value);
+        const today = moment();
+        if (today.isBefore(startDate, 'months') && this.costAssignmentsCardItems.filter(item => item.actualWork && item.actualWork > 0).length > 0) {
+          this.saveButton.hideButton();
+        } else {
+          this.saveButton?.showButton();
+        }
       } else {
         this.saveButton?.hideButton();
       }
@@ -314,11 +357,36 @@ export class ScheduleComponent implements OnInit, OnDestroy {
     }
   }
 
-  handleChangeValues() {
-    if (this.formSchedule.valid) {
-      if (this.costAssignmentsCardItems && this.costAssignmentsCardItems.length > 0 && this.costAssignmentsCardItems.filter( item => item.plannedWork && item.plannedWork > 0).length > 0) {
-        this.saveButton?.showButton();
-      }  else {
+  handleChangeScheduleStartDate() {
+    this.scheduleStartChangeSrv.next(true);
+  }
+
+  handleActualWorkChangeValues(event, eventType) {
+    if (this.formSchedule.controls.start.value && ((event && event.value && event.value !== null && event.value !== 0)
+      || (eventType === 'blur' && this.formSchedule.controls.actualWork.value > 0))) {
+      const startDate = moment(this.formSchedule.controls.start.value);
+      const today = moment();
+      if (today.isBefore(startDate, 'months')) {
+        this.actualValidationMessage = this.translateSrv.instant('messages.scheduleActualValueValidation');
+        this.saveButton.hideButton();
+      } else {
+        this.actualValidationMessage = null;
+      }
+    } else {
+      this.actualValidationMessage = null;
+    }
+
+    if (!this.actualValidationMessage && this.formSchedule.valid) {
+      if (this.costAssignmentsCardItems && this.costAssignmentsCardItems.length > 0 &&
+        this.costAssignmentsCardItems.filter(item => item.plannedWork && item.plannedWork > 0).length > 0) {
+          const startDate = moment(this.formSchedule.controls.start.value);
+          const today = moment();
+          if (today.isBefore(startDate, 'months') && this.costAssignmentsCardItems.filter(item => item.actualWork && item.actualWork > 0).length > 0) {
+            this.saveButton.hideButton();
+          } else {
+            this.saveButton?.showButton();
+          }
+      } else {
         this.saveButton?.hideButton();
       }
     } else {

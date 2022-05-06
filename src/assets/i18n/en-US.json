@@ -5,7 +5,7 @@
   "attention": "Attention",
   "selectedItems": "selected items",
   "dashboard": "Dashboard",
-  "concludedLate": "Concluded Late",
+  "lateConcluded": "Concluded Late",
   "concluded": "Concluded",
   "late": "Late",
   "ontime": "On Time",
@@ -312,6 +312,7 @@
   "AC": "AC",
   "decline": "Decline",
   "messages": {
+    "scheduleActualValueValidation": "Start step date is after actual month.",
     "cookies-confirmation": "The OPEN PMO uses cookies to enable a personalized navigation. By clicking accept you are agreeing to the storage of browsing data.",
     "startDateIsSameEndDate": "Start date can't to be same end date.",
     "startDateIsAfterEndDate": "End date can't to be before start date.",

@@ -1,5 +1,7 @@
+import { ScheduleStartChangeService } from './../../../../shared/services/schedule-start-change.service';
 import { Component, Input, OnInit, EventEmitter, Output, OnDestroy } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
+import * as moment from 'moment';
 import { MenuItem } from 'primeng/api';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -26,6 +28,7 @@ interface ICartItemCostAssignment {
 export class CostAssignmentCardItemComponent implements OnInit, OnDestroy {
 
   @Input() properties: ICartItemCostAssignment;
+  @Input() scheduleStartDate: Date;
   @Output() costChanged = new EventEmitter();
 
   iconsEnum = IconsEnum;
@@ -33,12 +36,19 @@ export class CostAssignmentCardItemComponent implements OnInit, OnDestroy {
   cardIdItem: string;
   currentLang: string;
   $destroy = new Subject();
+  actualWorkValidadeMessage: string;
 
   constructor(
     private responsiveSrv: ResponsiveService,
-    private translateSrv: TranslateService
+    private translateSrv: TranslateService,
+    private scheduleStartChangeSrv: ScheduleStartChangeService
   ) {
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.responsive = value);
+    this.scheduleStartChangeSrv.observable.pipe(takeUntil(this.$destroy)).subscribe( scheduleStartChanged => {
+      if (!!scheduleStartChanged) {
+        this.handleValidateActualCost();
+      }
+    });
     this.currentLang = this.translateSrv.getDefaultLang();
     this.translateSrv.onDefaultLangChange.pipe(takeUntil(this.$destroy)).subscribe(({ lang }) => this.currentLang = lang);
   }
@@ -58,6 +68,30 @@ export class CostAssignmentCardItemComponent implements OnInit, OnDestroy {
       this.properties[field] = event.value;
       this.costChanged.emit();
     }, 1);
+  }
+
+  handleActualCostChange(event, field: string) {
+    const startDate = moment(this.scheduleStartDate);
+    const today = moment();
+    if (today.isBefore(startDate, 'months') && event && event.value > 0) {
+      this.actualWorkValidadeMessage = this.translateSrv.instant('messages.scheduleActualValueValidation');
+    } else {
+      this.actualWorkValidadeMessage = null;
+    }
+    setTimeout(() => {
+      this.properties[field] = event.value;
+      this.costChanged.emit();
+    }, 1);
+  }
+
+  handleValidateActualCost() {
+    const startDate = moment(this.scheduleStartDate);
+    const today = moment();
+    if (today.isBefore(startDate, 'months') && this.properties.actualWork && this.properties.actualWork > 0) {
+      this.actualWorkValidadeMessage = this.translateSrv.instant('messages.scheduleActualValueValidation');
+    } else {
+      this.actualWorkValidadeMessage = null;
+    }
   }
 
 }

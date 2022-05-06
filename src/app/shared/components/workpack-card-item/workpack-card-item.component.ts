@@ -207,7 +207,7 @@ export class WorkpackCardItemComponent implements OnInit, OnDestroy {
           this.translateSrv.instant('ontime'),
           this.translateSrv.instant('late'),
           this.translateSrv.instant('concluded'),
-          this.translateSrv.instant('concludedLate'),
+          this.translateSrv.instant('lateConcluded'),
         ],
         datasets: [
           {

@@ -58,6 +58,11 @@
           font-family: v.$fontTitle !important;
           color: v.$fontInput;
         }
+        .actual-validation-message-container {
+          padding-bottom: 1em;
+          font-size: 0.8rem;
+          color: #EA5C5C;
+        }
         .cost-assignments-totals {
           display: grid;
           grid-template-columns: 1fr 1fr;

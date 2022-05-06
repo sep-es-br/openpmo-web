@@ -10,13 +10,9 @@
           <div class="p-formgroup-inline" [class.responsive]="responsive">
             <div class="p-field" [class.responsive]="responsive">
               <span class="p-float-label" [class.responsive]="responsive">
-                <p-calendar id="float-start" class="app-select-date" showIcon="true"
-                  [monthNavigator]="true"
-                  [yearNavigator]="true" formControlName="start"
-                  [yearRange]="yearRange"
-                  [class.responsive]="responsive"
-                  icon="fas fa-calendar-alt"
-                  (onSelect)="handleChangeValues()"
+                <p-calendar id="float-start" class="app-select-date" showIcon="true" [monthNavigator]="true"
+                  [yearNavigator]="true" formControlName="start" [yearRange]="yearRange" [class.responsive]="responsive"
+                  icon="fas fa-calendar-alt" (onSelect)="handleChangeValues(); handleChangeScheduleStartDate()"
                   [dateFormat]="calendarFormat">
                 </p-calendar>
                 <label class="app-input-label" for="float-start">{{ "start" | translate }}</label>
@@ -25,12 +21,8 @@
             <div class="p-field" [class.responsive]="responsive">
               <span class="p-float-label" [class.responsive]="responsive">
                 <p-calendar id="float-end" formControlName="end" class="app-select-date" showIcon="true"
-                  [monthNavigator]="true"
-                  [yearNavigator]="true"
-                  [yearRange]="yearRange" [class.responsive]="responsive"
-                  icon="fas fa-calendar-alt"
-                  (onSelect)="handleChangeValues()"
-                  [dateFormat]="calendarFormat">
+                  [monthNavigator]="true" [yearNavigator]="true" [yearRange]="yearRange" [class.responsive]="responsive"
+                  icon="fas fa-calendar-alt" (onSelect)="handleChangeValues()" [dateFormat]="calendarFormat">
                 </p-calendar>
                 <label class="app-input-label" class="properties-label" for="float-end">{{ "finish" |
                   translate}}</label>
@@ -43,23 +35,26 @@
               <div class="p-formgroup-inline" [class.responsive]="responsive">
                 <div class="p-field" [class.responsive]="responsive">
                   <span class="p-float-label" [class.responsive]="responsive">
-                    <p-inputNumber class="app-input-number" id="float-planned" formControlName="plannedWork" 
-                    (onInput)="handleChangeValues()" (onBlur)="handleChangeValues()"
-                      [class.responsive]="responsive">
+                    <p-inputNumber class="app-input-number" id="float-planned" formControlName="plannedWork"
+                      (onInput)="handleChangeValues()" (onBlur)="handleChangeValues()" [class.responsive]="responsive">
                     </p-inputNumber>
                     <label class="app-input-label" for="float-planned">{{unitMeasure}} {{ "planned" |translate
                       }} * </label>
                   </span>
+                  
                 </div>
                 <div class="p-field" [class.responsive]="responsive">
                   <span class="p-float-label" [class.responsive]="responsive">
                     <p-inputNumber class="app-input-number" id="float-actual" formControlName="actualWork"
-                    (onInput)="handleChangeValues()"  (onBlur)="handleChangeValues()"
-                      [class.responsive]="responsive">
+                      (onInput)="handleActualWorkChangeValues($event, 'input')"
+                      (onBlur)="handleActualWorkChangeValues($event, 'blur')" [class.responsive]="responsive">
                     </p-inputNumber>
                     <label class="app-input-label" for="float-actual">{{unitMeasure}} {{ "actual" |translate
                       }}</label>
                   </span>
+                  <div class="actual-validation-message-container" *ngIf="actualValidationMessage">
+                    <span>{{actualValidationMessage}}</span>
+                  </div>
                 </div>
               </div>
               <div class="cost-assignments-totals" [class.responsive]="responsive">
@@ -84,7 +79,9 @@
             [emptyMessage]="'loadingEllipsis' | translate">
             <ng-template let-cardItem let-index="rowIndex" pTemplate="gridItem">
               <div class="p-col-12 p-md-3 p-sm-12 card-item-container" [class.responsive]="responsive">
-                <app-cost-assignment-card-item [properties]="cardItem" (costChanged)="handleChangeValuesCardItems(index)">
+                <app-cost-assignment-card-item [properties]="cardItem" [scheduleStartDate]="scheduleStartDate"
+                  [changeScheduleStartDate]="hangeScheduleStartDate"
+                  (costChanged)="handleChangeValuesCardItems(index)">
                 </app-cost-assignment-card-item>
               </div>
             </ng-template>
