@@ -1,13 +1,12 @@
-import { ConfirmationService } from 'primeng/api';
-import { TranslateService } from '@ngx-translate/core';
-import { takeUntil } from 'rxjs/operators';
-import { BreadcrumbService } from './../../../shared/services/breadcrumb.service';
-import { ResponsiveService } from './../../../shared/services/responsive.service';
-import { BaselineService } from './../../../shared/services/baseline.service';
-import { ActivatedRoute, Router } from '@angular/router';
-import { Subject } from 'rxjs';
-import { IBaseline } from './../../../shared/interfaces/IBaseline';
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import {TranslateService} from '@ngx-translate/core';
+import {takeUntil} from 'rxjs/operators';
+import {BreadcrumbService} from '../../../shared/services/breadcrumb.service';
+import {ResponsiveService} from '../../../shared/services/responsive.service';
+import {BaselineService} from '../../../shared/services/baseline.service';
+import {ActivatedRoute, Router} from '@angular/router';
+import {Subject} from 'rxjs';
+import {IBaseline} from '../../../shared/interfaces/IBaseline';
+import {Component, ElementRef, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import * as moment from 'moment';
 
 @Component({
@@ -15,7 +14,7 @@ import * as moment from 'moment';
   templateUrl: './baseline-view.component.html',
   styleUrls: ['./baseline-view.component.scss']
 })
-export class BaselineViewComponent implements OnInit {
+export class BaselineViewComponent implements OnInit, OnDestroy {
 
   @ViewChild('buttonNo') buttonNo: ElementRef;
 
@@ -35,7 +34,7 @@ export class BaselineViewComponent implements OnInit {
   evaluateDecision: string;
   selectedComment = '';
   showCommentDialog = false;
-  
+
   constructor(
     private actRouter: ActivatedRoute,
     private baselineSrv: BaselineService,
@@ -43,16 +42,15 @@ export class BaselineViewComponent implements OnInit {
     private breadcrumbSrv: BreadcrumbService,
     private translateSrv: TranslateService,
     private router: Router,
-    private confirmationSrv: ConfirmationService
   ) {
     this.actRouter.queryParams
-      .subscribe(({ id }) => {
+      .subscribe(({id}) => {
         this.idBaseline = +id;
       });
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.responsive = value);
-    this.translateSrv.onLangChange.pipe(takeUntil(this.$destroy)).subscribe(() => {
+    this.translateSrv.onLangChange.pipe(takeUntil(this.$destroy)).subscribe(async() => {
       setTimeout(() => this.setLanguage(), 200);
-      this.ngOnInit();
+      await this.ngOnInit();
     });
   }
 
@@ -63,7 +61,7 @@ export class BaselineViewComponent implements OnInit {
 
   async ngOnInit() {
     this.setLanguage();
-    await this.loadPropertiesBaseline()
+    await this.loadPropertiesBaseline();
     await this.setBreadcrumb();
   }
 
@@ -74,11 +72,13 @@ export class BaselineViewComponent implements OnInit {
   async setBreadcrumb() {
     this.breadcrumbSrv.setMenu([
       {
+        key: 'changeControlBoard',
+        routerLink: ['/ccbmember-baselines-view'],
+        info: 'baselines'
+      },
+      {
         key: 'baseline',
-        routerLink: ['/ccbmember-baselines-view/baseline'],
-        queryParams: { id: this.idBaseline },
-        info: this.baseline?.name,
-        tooltip: this.baseline?.name
+        routerLink: ['/ccbmember-baselines-view/baseline']
       }
     ]);
   }
@@ -93,33 +93,25 @@ export class BaselineViewComponent implements OnInit {
   }
 
   checkEvaluation() {
-    this.baselineEvaluatedByUser = this.baseline.evaluations && this.baseline.evaluations.filter(evaluation => !!evaluation.myEvaluation && !!evaluation.decision).length > 0;
+    this.baselineEvaluatedByUser = this.baseline.evaluations
+      && this.baseline.evaluations.filter(evaluation => !!evaluation.myEvaluation && !!evaluation.decision).length > 0;
   }
 
   loadChartScheduleValues() {
     if (this.baseline && this.baseline.schedule) {
       const startDate = (this.baseline?.schedule?.currentStartDate && this.baseline?.schedule?.proposedStartDate) ? (moment(this.baseline?.schedule?.currentStartDate, 'yyyy-MM-DD').isBefore(moment(this.baseline.schedule.proposedStartDate, 'yyyy-MM-DD')) ?
-      moment(this.baseline?.schedule?.currentStartDate, 'yyyy-MM-DD') :
-      moment(this.baseline?.schedule?.proposedStartDate, 'yyyy-MM-DD')) : (this.baseline?.schedule?.currentStartDate ? moment(this.baseline?.schedule?.currentStartDate, 'yyyy-MM-DD') : moment(this.baseline?.schedule?.proposedStartDate, 'yyyy-MM-DD'));
-    const endDate = (this.baseline.schedule.currentEndDate && this.baseline.schedule.proposedEndDate) ? (moment(this.baseline.schedule.currentEndDate, 'yyyy-MM-DD').isAfter(moment(this.baseline.schedule.proposedEndDate, 'yyyy-MM-DD')) ?
-      moment(this.baseline?.schedule?.currentEndDate, 'yyyy-MM-DD') :
-      moment(this.baseline?.schedule?.proposedEndDate, 'yyyy-MM-DD')) : (this.baseline.schedule.currentEndDate ? moment(this.baseline.schedule.currentEndDate, 'yyyy-MM-DD') : moment(this.baseline.schedule.proposedEndDate, 'yyyy-MM-DD'));
-    this.baseline.schedule.monthsInPeriod = Number((endDate.diff(startDate, 'days') / 30).toFixed(1));
-    this.baseline.schedule.difStartCurrentDateAndStartProposedDate = Number((moment(this.baseline.schedule.currentStartDate, 'yyyy-MM-DD').diff(moment(this.baseline.schedule.proposedStartDate, 'yyyy-MM-DD'), 'days') / 30).toFixed(1));
-    this.baseline.schedule.difEndCurrentDateAndEndProposedDate = Number((moment(this.baseline.schedule.currentEndDate, 'yyyy-MM-DD').diff(moment(this.baseline.schedule.proposedEndDate, 'yyyy-MM-DD'), 'days') / 30).toFixed(1));
-    this.baseline.schedule.marginHightProposedBar = this.baseline.schedule.difEndCurrentDateAndEndProposedDate > 0 ?
-      (this.baseline.schedule.monthsInPeriod > 0 ? (100 / this.baseline.schedule.monthsInPeriod) * this.baseline.schedule.difEndCurrentDateAndEndProposedDate : 0) : 0;
-    this.baseline.schedule.marginLeftCurrentBar = this.baseline.schedule.difStartCurrentDateAndStartProposedDate > 0 ?
-      (this.baseline.schedule.monthsInPeriod > 0 ? (100 / this.baseline.schedule.monthsInPeriod) * this.baseline.schedule.difStartCurrentDateAndStartProposedDate : 0) : 0;
-    }
-  }
-
-  async handleEvaluateBaseline(decision: string) {
-    const result = await this.baselineSrv.evaluateBaseline(this.idBaseline, { decision, comment: this.comment });
-    if (result.success) {
-      this.router.navigate(
-        ['/ccbmember-baselines-view']
-      );
+        moment(this.baseline?.schedule?.currentStartDate, 'yyyy-MM-DD') :
+        moment(this.baseline?.schedule?.proposedStartDate, 'yyyy-MM-DD')) : (this.baseline?.schedule?.currentStartDate ? moment(this.baseline?.schedule?.currentStartDate, 'yyyy-MM-DD') : moment(this.baseline?.schedule?.proposedStartDate, 'yyyy-MM-DD'));
+      const endDate = (this.baseline.schedule.currentEndDate && this.baseline.schedule.proposedEndDate) ? (moment(this.baseline.schedule.currentEndDate, 'yyyy-MM-DD').isAfter(moment(this.baseline.schedule.proposedEndDate, 'yyyy-MM-DD')) ?
+        moment(this.baseline?.schedule?.currentEndDate, 'yyyy-MM-DD') :
+        moment(this.baseline?.schedule?.proposedEndDate, 'yyyy-MM-DD')) : (this.baseline.schedule.currentEndDate ? moment(this.baseline.schedule.currentEndDate, 'yyyy-MM-DD') : moment(this.baseline.schedule.proposedEndDate, 'yyyy-MM-DD'));
+      this.baseline.schedule.monthsInPeriod = Number((endDate.diff(startDate, 'days') / 30).toFixed(1));
+      this.baseline.schedule.difStartCurrentDateAndStartProposedDate = Number((moment(this.baseline.schedule.currentStartDate, 'yyyy-MM-DD').diff(moment(this.baseline.schedule.proposedStartDate, 'yyyy-MM-DD'), 'days') / 30).toFixed(1));
+      this.baseline.schedule.difEndCurrentDateAndEndProposedDate = Number((moment(this.baseline.schedule.currentEndDate, 'yyyy-MM-DD').diff(moment(this.baseline.schedule.proposedEndDate, 'yyyy-MM-DD'), 'days') / 30).toFixed(1));
+      this.baseline.schedule.marginHightProposedBar = this.baseline.schedule.difEndCurrentDateAndEndProposedDate > 0 ?
+        (this.baseline.schedule.monthsInPeriod > 0 ? (100 / this.baseline.schedule.monthsInPeriod) * this.baseline.schedule.difEndCurrentDateAndEndProposedDate : 0) : 0;
+      this.baseline.schedule.marginLeftCurrentBar = this.baseline.schedule.difStartCurrentDateAndStartProposedDate > 0 ?
+        (this.baseline.schedule.monthsInPeriod > 0 ? (100 / this.baseline.schedule.monthsInPeriod) * this.baseline.schedule.difStartCurrentDateAndStartProposedDate : 0) : 0;
     }
   }
 
@@ -175,9 +167,12 @@ export class BaselineViewComponent implements OnInit {
   async submitEvaluate() {
     this.showDialogConfirmation = false;
     this.messageDialog = null;
-    const result = await this.baselineSrv.evaluateBaseline(this.idBaseline, { decision: this.evaluateDecision, comment: this.evaluationComment });
+    const result = await this.baselineSrv.evaluateBaseline(this.idBaseline, {
+      decision: this.evaluateDecision,
+      comment: this.evaluationComment
+    });
     if (result.success) {
-      this.router.navigate(['ccbmember-baselines-view']);
+      await this.router.navigate(['ccbmember-baselines-view']);
     }
   }
 

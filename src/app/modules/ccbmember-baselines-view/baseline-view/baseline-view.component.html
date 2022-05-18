@@ -1,7 +1,7 @@
 <div class="app-baseline-view">
   <div class="header-container" [class.mobile]="responsive" *ngIf="baseline">
     <div class="app-content-header" [class.mobile]="responsive" *ngIf="!baseline?.cancelation">
-      <span> <span class="label">{{ 'baseline' | translate }}:</span> {{ baseline?.name }}</span>
+      <span>{{ baseline?.name }}</span>
     </div>
     <div class="app-content-header app-content-header-cancelation" [class.mobile]="responsive"
          *ngIf="!!baseline?.cancelation">

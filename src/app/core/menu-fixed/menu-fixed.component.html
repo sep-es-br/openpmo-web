@@ -30,9 +30,9 @@
         currentPlan?.name }}</div>
     </div>
     <div class="item" *ngIf="currentUserInfo?.isCcbMember" [routerLink]="['/ccbmember-baselines-view']"
-      [pTooltip]="'baselines' | translate">
+      [pTooltip]="'changeControlBoard' | translate">
       <i class="app-icon ccb-view" [ngStyle]="{ fontSize: '1.87rem' }"></i>
-      <div class="item-label" *ngIf="isMobileView" [routerLink]="['/ccbmember-baselines-view']">{{'baselines' |
+      <div class="item-label" *ngIf="isMobileView" [routerLink]="['/ccbmember-baselines-view']">{{'changeControlBoard' |
         translate}}</div>
     </div>
   </ng-template>
@@ -132,7 +132,7 @@
     </ng-template>
   </div>
 
-  <div class="app-menu-slide-fixed" #menuSliderPlanModel *ngIf="menus[2].isOpen" [class.mobile]="isMobileView"
+  <div class="app-menu-slide-fixed" *ngIf="menus[2].isOpen" [class.mobile]="isMobileView"
     [class.changing]="isChangingView">
     <ng-container *ngIf="isMobileView; else sliderPlanModel">
       <div class="top-bar">
