@@ -1,33 +1,33 @@
-import { cpfValidator } from 'src/app/shared/utils/cpfValidator';
-import { AuthServerService } from './../../../shared/services/auth-server.service';
-import { CitizenUserService } from './../../../shared/services/citizen-user.service';
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { TranslateService } from '@ngx-translate/core';
-import { Subject } from 'rxjs';
-import { debounceTime, takeUntil } from 'rxjs/operators';
-import { MessageService } from 'primeng/api';
+import {cpfValidator} from 'src/app/shared/utils/cpfValidator';
+import {AuthServerService} from '../../../shared/services/auth-server.service';
+import {CitizenUserService} from '../../../shared/services/citizen-user.service';
+import {Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {ActivatedRoute, Router} from '@angular/router';
+import {TranslateService} from '@ngx-translate/core';
+import {Subject} from 'rxjs';
+import {debounceTime, takeUntil} from 'rxjs/operators';
+import {MessageService} from 'primeng/api';
 
-import { IOfficePermission } from 'src/app/shared/interfaces/IOfficePermission';
-import { OfficePermissionService } from 'src/app/shared/services/office-permission.service';
-import { ResponsiveService } from 'src/app/shared/services/responsive.service';
-import { ICardItemPermission } from 'src/app/shared/interfaces/ICardItemPermission';
-import { ICard } from 'src/app/shared/interfaces/ICard';
-import { IPerson } from 'src/app/shared/interfaces/IPerson';
-import { PersonService } from 'src/app/shared/services/person.service';
-import { enterLeave } from '../../../shared/animations/enterLeave.animation';
-import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
-import { SaveButtonComponent } from 'src/app/shared/components/save-button/save-button.component';
-import { IOffice } from 'src/app/shared/interfaces/IOffice';
-import { OfficeService } from 'src/app/shared/services/office.service';
-import { AuthService } from 'src/app/shared/services/auth.service';
+import {IOfficePermission} from 'src/app/shared/interfaces/IOfficePermission';
+import {OfficePermissionService} from 'src/app/shared/services/office-permission.service';
+import {ResponsiveService} from 'src/app/shared/services/responsive.service';
+import {ICardItemPermission} from 'src/app/shared/interfaces/ICardItemPermission';
+import {ICard} from 'src/app/shared/interfaces/ICard';
+import {IPerson} from 'src/app/shared/interfaces/IPerson';
+import {PersonService} from 'src/app/shared/services/person.service';
+import {enterLeave} from '../../../shared/animations/enterLeave.animation';
+import {BreadcrumbService} from 'src/app/shared/services/breadcrumb.service';
+import {SaveButtonComponent} from 'src/app/shared/components/save-button/save-button.component';
+import {IOffice} from 'src/app/shared/interfaces/IOffice';
+import {OfficeService} from 'src/app/shared/services/office.service';
+import {AuthService} from 'src/app/shared/services/auth.service';
 
 @Component({
   selector: 'app-office-permissions',
   templateUrl: './office-permissions.component.html',
   styleUrls: ['./office-permissions.component.scss'],
   animations: [
-    enterLeave({ opacity: 0, pointerEvents: 'none' }, { opacity: 1, pointerEvents: 'all' }, 300)
+    enterLeave({opacity: 0, pointerEvents: 'none'}, {opacity: 1, pointerEvents: 'all'}, 300)
   ]
 })
 export class OfficePermissionsComponent implements OnInit, OnDestroy {
@@ -57,10 +57,8 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
   validCpf = true;
   publicServersResult: IPerson[];
   citizenUserNotFoundByCpf = false;
-  showMessageNotFoundUserByEmail = false;
   showListBoxPublicServers = false;
   showMessagePublicServerNotFoundByName = false;
-  showMessageInvalidEmail = false;
   isLoading = false;
 
   constructor(
@@ -81,15 +79,15 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
       this.idOffice = queryParams.idOffice;
       this.email = queryParams.email;
       if (!this.email) {
-        this.citizenUserSrv.loadCitizenUsers();
+        await this.citizenUserSrv.loadCitizenUsers();
       }
     });
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => {
       this.responsive = value;
     });
-    this.debounceSearch.pipe(debounceTime(500), takeUntil(this.$destroy)).subscribe(() => {
+    this.debounceSearch.pipe(debounceTime(500), takeUntil(this.$destroy)).subscribe(async() => {
       if (this.searchedEmailPerson.length > 5 && this.validateEmail()) {
-        this.searchPerson();
+        await this.searchPerson();
         this.invalidMailMessage = undefined;
       } else {
         this.invalidMailMessage = this.searchedEmailPerson.length > 0 ? this.translateSrv.instant('messages.invalidEmail') : '';
@@ -98,18 +96,18 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
     });
   }
 
-  ngOnDestroy(): void {
+  async ngOnDestroy(): Promise<void> {
     this.$destroy.next();
     this.$destroy.complete();
     if (!this.email) {
-      this.citizenUserSrv.unloadCitizenUsers();
+      await this.citizenUserSrv.unloadCitizenUsers();
     }
   }
 
   async ngOnInit() {
     const editPermission = await this.officePermissionsSrv.getPermissions(this.idOffice);
     if (!editPermission) {
-      this.router.navigate(['/offices']);
+      await this.router.navigate(['/offices']);
     }
     await this.getAuthServer();
     await this.loadPermission();
@@ -121,19 +119,19 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
         info: this.propertiesOffice?.name,
         tooltip: this.propertiesOffice?.fullName,
         routerLink: ['/configuration-office'],
-        queryParams: { idOffice: this.idOffice }
+        queryParams: {idOffice: this.idOffice}
       },
       {
         key: 'configuration',
         info: 'officePermissions',
         tooltip: this.translateSrv.instant('officePermissions'),
         routerLink: ['/offices', 'permission'],
-        queryParams: { idOffice: this.idOffice },
+        queryParams: {idOffice: this.idOffice},
       },
       {
         key: 'permissions',
         routerLink: ['/offices', 'permission', 'detail'],
-        queryParams: { idOffice: this.idOffice, email: this.email }
+        queryParams: {idOffice: this.idOffice, email: this.email}
       }
     ]);
     if (this.email) {
@@ -149,7 +147,7 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
   }
 
   async loadPropertiesOffice() {
-    const { success, data } = await this.officeSrv.GetById(this.idOffice);
+    const {success, data} = await this.officeSrv.GetById(this.idOffice);
     if (success) {
       this.propertiesOffice = data;
     }
@@ -158,11 +156,7 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
   validateEmail() {
     if (this.searchedEmailPerson.includes('@')) {
       const email = this.searchedEmailPerson.split('@');
-      if (email[1] !== '') {
-        return true;
-      } else {
-        return false;
-      }
+      return email[1] !== '';
     } else {
       return false;
     }
@@ -177,7 +171,7 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
       initialStateCollapse: false
     };
     if (this.email) {
-      const result = await this.officePermissionsSrv.GetAll({ email: this.email, 'id-office': this.idOffice });
+      const result = await this.officePermissionsSrv.GetAll({email: this.email, 'id-office': this.idOffice});
       if (result.success) {
         this.permission = result.data[0];
       }
@@ -187,7 +181,7 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
           name: this.permission.person.name,
           fullName: this.permission.person.fullName,
           email: this.permission.person.email,
-          roles: this.permission.permissions.map(p => ({ role: p.role })),
+          roles: this.permission.permissions.map(p => ({role: p.role})),
           guid: this.permission.person.guid
         };
       }
@@ -201,9 +195,9 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
         typeCardItem: 'editItem',
         titleCardItem: p.role,
         levelListOptions: [
-          { label: this.translateSrv.instant('read'), value: 'READ' },
-          { label: this.translateSrv.instant('edit'), value: 'EDIT' },
-          { label: this.translateSrv.instant('none'), value: 'NONE' }
+          {label: this.translateSrv.instant('read'), value: 'READ'},
+          {label: this.translateSrv.instant('edit'), value: 'EDIT'},
+          {label: this.translateSrv.instant('none'), value: 'NONE'}
         ],
         selectedOption: p.level,
         itemId: p.id
@@ -217,9 +211,9 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
               typeCardItem: 'editItem',
               titleCardItem: r.role,
               levelListOptions: [
-                { label: this.translateSrv.instant('read'), value: 'READ' },
-                { label: this.translateSrv.instant('edit'), value: 'EDIT' },
-                { label: this.translateSrv.instant('none'), value: 'NONE' }
+                {label: this.translateSrv.instant('read'), value: 'READ'},
+                {label: this.translateSrv.instant('edit'), value: 'EDIT'},
+                {label: this.translateSrv.instant('none'), value: 'NONE'}
               ]
             });
           } else {
@@ -227,13 +221,13 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
               typeCardItem: 'editItem',
               titleCardItem: r.role,
               levelListOptions: [
-                { label: this.translateSrv.instant('read'), value: 'READ' },
-                { label: this.translateSrv.instant('edit'), value: 'EDIT' },
-                { label: this.translateSrv.instant('none'), value: 'NONE' }
+                {label: this.translateSrv.instant('read'), value: 'READ'},
+                {label: this.translateSrv.instant('edit'), value: 'EDIT'},
+                {label: this.translateSrv.instant('none'), value: 'NONE'}
               ]
             }];
           }
-        })
+        });
       }
     } else {
       this.cardItemsOfficePermission = null;
@@ -251,18 +245,18 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
   async searchPerson() {
     this.saveButton?.hideButton();
     if (this.searchedEmailPerson) {
-      const { data } = await this.personSrv.GetByEmail(this.searchedEmailPerson);
+      const {data} = await this.personSrv.GetByEmail(this.searchedEmailPerson);
       if (data) {
         this.showSearchInputMessage = false;
         this.person = data;
-        this.person.email = this.searchedEmailPerson
+        this.person.email = this.searchedEmailPerson;
       } else {
         const email = this.searchedEmailPerson.split('@');
         const name = email[0];
         this.person = {
           name,
           email: this.searchedEmailPerson,
-          roles: [{ role: 'citizen' }]
+          roles: [{role: 'citizen'}]
         };
       }
     } else {
@@ -306,7 +300,8 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
       this.publicServersResult = result.data;
       this.showListBoxPublicServers = this.publicServersResult.length > 0;
     }
-    this.showMessagePublicServerNotFoundByName = !this.publicServersResult || (this.publicServersResult && this.publicServersResult.length === 0);
+    this.showMessagePublicServerNotFoundByName =
+      !this.publicServersResult || (this.publicServersResult && this.publicServersResult.length === 0);
   }
 
   validateClearSearchByCpf(event) {
@@ -343,7 +338,10 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
     this.showListBoxPublicServers = false;
     this.isLoading = true;
     const publicServer = event.value;
-    const result = await this.citizenUserSrv.GetPublicServer(publicServer.sub, { idOffice: this.idOffice, loadWorkLocation: false });
+    const result = await this.citizenUserSrv.GetPublicServer(publicServer.sub, {
+      idOffice: this.idOffice,
+      loadWorkLocation: false
+    });
     this.isLoading = false;
     if (result.success) {
       this.person = result.data;
@@ -357,8 +355,8 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
   loadNewPermission() {
     if (this.person) {
       const permissions = this.person.roles
-        ? this.person.roles.map(p => ({ role: p.role, level: 'NONE' }))
-        : [{ role: 'citizen', level: 'NONE' }];
+        ? this.person.roles.map(p => ({role: p.role, level: 'NONE'}))
+        : [{role: 'citizen', level: 'NONE'}];
       this.permission = {
         idOffice: this.idOffice,
         person: {
@@ -374,14 +372,14 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
 
   async savePermission() {
     this.saveButton?.hideButton();
-    this.permission.permissions = this.cardItemsOfficePermission.filter( p => p.selectedOption && p.selectedOption !== 'NONE')
+    this.permission.permissions = this.cardItemsOfficePermission
       .map(cardItem => (
-      {
-        id: cardItem.itemId,
-        role: cardItem.titleCardItem,
-        level: cardItem.selectedOption
-      }
-    ));
+        {
+          id: cardItem.itemId,
+          role: cardItem.titleCardItem,
+          level: cardItem.selectedOption
+        }
+      ));
 
     const permission: IOfficePermission = {
       idOffice: this.idOffice,
@@ -398,8 +396,7 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
         summary: this.translateSrv.instant('success'),
         detail: this.translateSrv.instant('messages.savedSuccessfully')
       });
-      this.router.navigate(['/offices', 'permission'], { queryParams: { idOffice: this.idOffice } });
+      await this.router.navigate(['/offices', 'permission'], {queryParams: {idOffice: this.idOffice}});
     }
   }
 }
-
