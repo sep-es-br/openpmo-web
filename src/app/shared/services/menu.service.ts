@@ -38,6 +38,7 @@ export class MenuService extends BaseService<any> {
     menus: [
       { label: 'office', isOpen: false },
       { label: 'portfolio', isOpen: false },
+      { label: 'planModel', isOpen: false },
       { label: 'user', isOpen: false },
       { label: 'more', isOpen: false }
     ],
