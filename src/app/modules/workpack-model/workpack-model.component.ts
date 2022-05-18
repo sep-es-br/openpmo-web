@@ -106,12 +106,13 @@ export class WorkpackModelComponent implements OnInit {
   propertiesOffice: IOffice;
   propertiesPlanModel: IPlanModel;
   reusableWorkpackModelsList: MenuItem[];
+  stakeholders = ['manager', 'teamMember', 'sponsor', 'partner', 'funder', 'client', 'competitor'];
   dashboardPanel = {
     dashboardShowEva: false,
     dashboardShowMilestones: false,
     dashboardShowRisks: false,
-    dashboardShowStakeholders: ['manager', 'teamMember', 'sponsor', 'partner', 'funder', 'client', 'competitor'].map( item => this.translateSrv.instant(item)),
-    dashboardStakeholderRolesOptions: ['manager', 'teamMember', 'sponsor', 'partner', 'funder', 'client', 'competitor'].map(item => ({ label: this.translateSrv.instant(item), value: this.translateSrv.instant(item) })),
+    dashboardShowStakeholders: this.stakeholders,
+    dashboardStakeholderRolesOptions: this.stakeholders.map(item => ({ label: this.translateSrv.instant(item), value: item })),
   };
   currentBreadcrumbItems: IBreadcrumb[];
   currentBreadcrumbSub: Subscription;
@@ -770,8 +771,7 @@ export class WorkpackModelComponent implements OnInit {
         dashboardStakeholderRolesOptions: ((data.organizationRoles && data.organizationRoles.length > 0)
           || (data.personRoles && data.personRoles.length > 0)) ?
           data.organizationRoles.concat(data.personRoles).map(item => ({ label: item, value: item })) :
-          ['manager', 'teamMember', 'sponsor', 'partner', 'funder', 'client', 'competitor']
-          .map(item => ({ label: this.translateSrv.instant(item), value: this.translateSrv.instant(item) })),
+          this.stakeholders.map(item => ({ label: this.translateSrv.instant(item), value: item })),
       };
       this.cardPropertiesRiskAndIssues.initialStateToggle = data.riskAndIssueManagementSessionActive;
       this.cardPropertiesProcesses.initialStateToggle = data.processesManagementSessionActive;
@@ -953,7 +953,7 @@ export class WorkpackModelComponent implements OnInit {
     if (this.dashboardPanel) {
       this.dashboardPanel.dashboardStakeholderRolesOptions = ((this.posibleRolesPerson && this.posibleRolesPerson.length > 0) || (this.posibleRolesOrg && this.posibleRolesOrg.length > 0)) ?
         this.posibleRolesPerson.concat(this.posibleRolesOrg).map(item => ({ label: item, value: item })) :
-        ['manager', 'teamMember', 'sponsor', 'partner', 'funder', 'client', 'competitor'].map(item => ({ label: this.translateSrv.instant(item), value: this.translateSrv.instant(item) }));
+        this.stakeholders.map(item => ({ label: this.translateSrv.instant(item), value: item }));
       this.dashboardPanel.dashboardShowStakeholders = this.dashboardPanel.dashboardShowStakeholders
         .filter(option => this.dashboardPanel.dashboardStakeholderRolesOptions.find(role => role.value === option));
     }
@@ -1259,8 +1259,8 @@ export class WorkpackModelComponent implements OnInit {
             dashboardShowEva: false,
             dashboardShowMilestones: false,
             dashboardShowRisks: false,
-            dashboardShowStakeholders: ['manager', 'teamMember', 'sponsor', 'partner', 'funder', 'client', 'competitor'].map( item => this.translateSrv.instant(item)),
-            dashboardStakeholderRolesOptions: ['manager', 'teamMember', 'sponsor', 'partner', 'funder', 'client', 'competitor'].map(item => ({ label: this.translateSrv.instant(item), value: this.translateSrv.instant(item) })),
+            dashboardShowStakeholders: this.stakeholders,
+            dashboardStakeholderRolesOptions: this.stakeholders.map(item => ({ label: this.translateSrv.instant(item), value: item })),
           };
         }
       } else {
@@ -1269,7 +1269,7 @@ export class WorkpackModelComponent implements OnInit {
           dashboardShowMilestones: false,
           dashboardShowRisks: false,
           dashboardShowStakeholders: [],
-          dashboardStakeholderRolesOptions: ['manager', 'teamMember', 'sponsor', 'partner', 'funder', 'client', 'competitor'].map(item => ({ label: this.translateSrv.instant(item), value: this.translateSrv.instant(item) })),
+          dashboardStakeholderRolesOptions: this.stakeholders.map(item => ({ label: this.translateSrv.instant(item), value: item })),
         };
       }
       this.checkProperties();
