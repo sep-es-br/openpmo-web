@@ -86,9 +86,9 @@ export class RiskResponseComponent implements OnInit {
       endDate: null,
       strategy: ['', Validators.required],
       status: ['', Validators.required],
-      trigger: ['', Validators.required],
-      plan: ['', Validators.required],
-      responsible: ['', Validators.required],
+      trigger: [''],
+      plan: [''],
+      responsible: [],
     });
     this.formRiskResponse.statusChanges
       .pipe(takeUntil(this.$destroy), filter(status => status === 'INVALID'))
