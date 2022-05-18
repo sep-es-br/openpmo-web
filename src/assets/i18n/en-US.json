@@ -480,6 +480,7 @@
   "addGroup": "Add Group",
   "label": "Label",
   "role": "Role",
+  "roles": "Roles",
   "sortIndex": "Sort index",
   "defaultValue": "Default value",
   "myDefault": "My default",
