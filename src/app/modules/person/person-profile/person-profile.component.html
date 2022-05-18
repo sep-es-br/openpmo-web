@@ -76,7 +76,9 @@
                 <app-card [properties]="cardPlan" class="mt-0">
                   <div class="container-permission">
                     <div class="permission">
-                      <span class="label">{{'planPermission' |translate}}</span>
+                      <span class="label"
+                            *ngIf="['EDIT', 'READ'].includes(propertiesPerson?.officePermission?.planPermissions[i]?.accessLevel)">
+                        {{'planPermission' |translate}}</span>
                       <span class="value"
                             *ngIf="['EDIT', 'READ'].includes(propertiesPerson?.officePermission?.planPermissions[i]?.accessLevel)">
                         {{propertiesPerson?.officePermission?.planPermissions[i]?.accessLevel |translate}}</span>

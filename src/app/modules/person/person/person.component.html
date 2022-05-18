@@ -8,24 +8,24 @@
     <app-card [properties]="cardProperties" class="mt-0">
       <div class="content">
         <div class="container-left-info">
-          <app-avatar [edit]="true" [idPerson]="idPerson"> </app-avatar>
+          <app-avatar [edit]="true" [idPerson]="idPerson"></app-avatar>
           <span class="name" *ngIf="propertiesPerson?.isUser">{{propertiesPerson?.fullName}}</span>
           <form [formGroup]="formPerson" class="form">
             <span class="name" *ngIf="!propertiesPerson?.isUser">
               <span class="p-float-label property-input p-field">
                 <input pInputText class="app-input-text" type="text" [class.responsive]="responsive"
-                  formControlName="fullname">
+                       formControlName="fullname">
                 <label class="app-input-label">{{ 'fullName' | translate }} </label>
               </span>
             </span>
             <span class="p-float-label property-input p-field">
               <input pInputText class="app-input-text" type="text" [class.responsive]="responsive"
-                formControlName="name">
+                     formControlName="name">
               <label class="app-input-label">{{ 'messages.labelNameProfile' | translate }} </label>
             </span>
             <span class="p-float-label property-input p-field" *ngIf="propertiesPerson?.email">
               <input pInputText class="app-input-text" type="text" [class.responsive]="responsive"
-                formControlName="email" [readOnly]="true">
+                     formControlName="email" [readOnly]="true">
               <label class="app-input-label">{{ 'accessEmail' | translate }} </label>
             </span>
           </form>
@@ -37,20 +37,22 @@
               <div class="p-fluid p-formgroup p-grid">
                 <span class="p-float-label property-input-text p-field p-col-12 p-md-4">
                   <input pInputText class="app-input-text" type="text" [class.responsive]="responsive"
-                    formControlName="contactEmail">
+                         formControlName="contactEmail">
                   <label class="app-input-label">{{ 'email' | translate }} </label>
                 </span>
                 <span class="p-float-label left property-input p-field p-col-12 p-md-2">
                   <!-- <p-inputMask [mask]="phoneNumberMask" [class.responsive]="responsive" [unmask]="true" [autoClear]="false"
                     formControlName="phoneNumber"></p-inputMask> -->
-                  <input pInputText class="app-input-text" formControlName="phoneNumber" [class.responsive]="responsive" (blur)="setPhoneNumberMask()"
-                  [placeholder]="phoneNumberPlaceholder"  (focus)="setPhoneNumberPlaceholder()"  (input)="setPhoneNumberPlaceholder()" />
+                  <input pInputText class="app-input-text" formControlName="phoneNumber" [class.responsive]="responsive"
+                         (blur)="setPhoneNumberMask()"
+                         [placeholder]="phoneNumberPlaceholder" (focus)="setPhoneNumberPlaceholder()"
+                         (input)="setPhoneNumberPlaceholder()"/>
                   <label class="app-input-label">{{ 'phone' | translate }} </label>
                 </span>
               </div>
               <span class="p-float-label property-input p-field">
                 <textarea pInputTextarea class="app-text-area" [class.responsive]="responsive" formControlName="address"
-                  [rows]="1"></textarea>
+                          [rows]="1"></textarea>
                 <label class="app-input-label">{{ 'address' | translate }} </label>
               </span>
             </form>
@@ -60,7 +62,7 @@
               <h3 class="subtitle">{{'rolesPermissions' | translate}}</h3>
               <div class="remove-permission" *ngIf="propertiesPerson?.isUser">
                 <button pButton icon="pi pi-times" iconPos="right" [label]="'labels.RemoveAllPermissions' | translate"
-                  (click)="handleDeleteAllPermissions($event)">
+                        (click)="handleDeleteAllPermissions($event)">
                 </button>
               </div>
             </div>
@@ -68,13 +70,13 @@
               <div class="permission">
                 <span class="label">{{'officePermission' | translate}}</span>
                 <span class="value"
-                  *ngIf="['EDIT', 'READ'].includes(propertiesPerson?.officePermission?.accessLevel)">{{propertiesPerson?.officePermission?.accessLevel
+                      *ngIf="['EDIT', 'READ'].includes(propertiesPerson?.officePermission?.accessLevel)">{{propertiesPerson?.officePermission?.accessLevel
                   | translate}}</span>
               </div>
               <div class="button-change"
-                *ngIf="['EDIT', 'READ'].includes(propertiesPerson?.officePermission?.accessLevel)">
+                   *ngIf="['EDIT', 'READ'].includes(propertiesPerson?.officePermission?.accessLevel)">
                 <button pButton [label]="'change' | translate"
-                  (click)="navigateToPage('offices/permission/detail', this.propertiesPerson.email, this.idOffice)">
+                        (click)="navigateToPage('offices/permission/detail', this.propertiesPerson.email, this.idOffice)">
                   <i class="fas fa-share"></i>
                 </button>
               </div>
@@ -85,23 +87,25 @@
                 <app-card [properties]="cardPlan" class="mt-0" class="panel-plan">
                   <div class="container-permission">
                     <div class="permission">
-                      <span class="label">{{'planPermission' | translate}}</span>
+                      <span class="label"
+                            *ngIf="['EDIT', 'READ'].includes(propertiesPerson?.officePermission?.planPermissions[i].accessLevel)">
+                        {{'planPermission' | translate}}</span>
                       <span class="value"
-                        *ngIf="['EDIT', 'READ'].includes(propertiesPerson?.officePermission?.planPermissions[i].accessLevel)">
+                            *ngIf="['EDIT', 'READ'].includes(propertiesPerson?.officePermission?.planPermissions[i].accessLevel)">
                         {{propertiesPerson?.officePermission?.planPermissions[i].accessLevel |translate}}</span>
                     </div>
                     <div class="button-change"
-                      *ngIf="['EDIT', 'READ'].includes(propertiesPerson?.officePermission?.planPermissions[i].accessLevel)">
+                         *ngIf="['EDIT', 'READ'].includes(propertiesPerson?.officePermission?.planPermissions[i].accessLevel)">
                       <button pButton [label]="'change' | translate"
-                        (click)="navigateToPage('plan/permission/detail',
+                              (click)="navigateToPage('plan/permission/detail',
                       this.propertiesPerson.email, undefined, propertiesPerson?.officePermission?.planPermissions[i].id)">
                         <i class="fas fa-share"></i>
                       </button>
                     </div>
                   </div>
                   <p-dataView [value]="cardPlan.cardItems" layout="grid" class="app-dataview"
-                    *ngIf="cardPlan?.cardItems?.length > 0"
-                    [emptyMessage]="(!cardPlan.cardItems ? 'loadingEllipsis' : 'noContent') | translate">
+                              *ngIf="cardPlan?.cardItems?.length > 0"
+                              [emptyMessage]="(!cardPlan.cardItems ? 'loadingEllipsis' : 'noContent') | translate">
                     <ng-template let-cardItem pTemplate="gridItem">
                       <div class="p-col-12 p-md-3 p-sm-12 card-item-container">
                         <app-card-item [properties]="cardItem"></app-card-item>
