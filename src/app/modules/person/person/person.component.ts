@@ -172,13 +172,13 @@ export class PersonComponent implements OnInit, OnDestroy {
       },
       {
         key: 'configuration',
-        info: 'person',
+        info: 'persons',
         tooltip: this.translateSrv.instant('measureUnits'),
         routerLink: ['/persons'],
         queryParams: { idOffice: this.idOffice }
       },
       {
-        key: 'people',
+        key: 'profile',
         routerLink: ['/configuration-office/persons/person'],
         queryParams: { idOffice: this.idOffice, idPerson: this.idPerson }
       },
@@ -197,7 +197,7 @@ export class PersonComponent implements OnInit, OnDestroy {
   }
 
   setCardsPlans(person: IPerson) {
-    this.cardsPlans = person?.officePermission?.planPermissions?.filter( planPermission => 
+    this.cardsPlans = person?.officePermission?.planPermissions?.filter( planPermission =>
       planPermission.accessLevel !== 'NONE' || (planPermission.accessLevel === 'NONE' && planPermission.workpacksPermission && planPermission.workpacksPermission.length > 0))
       .map(plan => ({
       toggleable: false,
@@ -211,7 +211,7 @@ export class PersonComponent implements OnInit, OnDestroy {
           typeCardItem: 'listItemPermissionWorkpack',
           itemId: workpack.id,
           urlCard: workpack.ccbMember ? `/workpack/change-control-board/member` : `/stakeholder/person`,
-          paramsUrlCard: workpack.ccbMember ? 
+          paramsUrlCard: workpack.ccbMember ?
           [
             { name: 'idProject',  value: workpack.id },
             { name: 'idPerson', value: this.propertiesPerson.id },
