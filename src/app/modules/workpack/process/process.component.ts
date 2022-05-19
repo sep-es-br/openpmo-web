@@ -12,7 +12,7 @@ import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {ICard} from 'src/app/shared/interfaces/ICard';
 import {Subject} from 'rxjs';
 import {SaveButtonComponent} from 'src/app/shared/components/save-button/save-button.component';
-import {Component, EventEmitter, OnInit, ViewChild} from '@angular/core';
+import {Component, EventEmitter, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import * as moment from 'moment';
 
 @Component({
@@ -20,7 +20,7 @@ import * as moment from 'moment';
   templateUrl: './process.component.html',
   styleUrls: ['./process.component.scss']
 })
-export class ProcessComponent implements OnInit {
+export class ProcessComponent implements OnInit, OnDestroy {
 
   @ViewChild(SaveButtonComponent) saveButton: SaveButtonComponent;
 

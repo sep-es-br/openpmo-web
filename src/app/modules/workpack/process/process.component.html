@@ -15,20 +15,20 @@
                 <span class="p-input-icon-right">
                   <i class="pi pi-search"></i>
                   <input type="text" pInputText class="app-input-text" formControlName="processNumber"
-                    (change)="debounceSearch.next($event)">
+                         (change)="debounceSearch.next($event)">
                 </span>
               </div>
             </div>
             <div class="p-field margin-top-responsive" *ngIf="process">
               <span class="p-float-label">
-                <input class="app-input-text" id="float-name" formControlName="name" type="text" pInputText />
+                <input class="app-input-text" id="float-name" formControlName="name" type="text" pInputText/>
                 <label class="app-input-label" for="float-name">{{ "name" | translate }} * </label>
                 <app-input-message [form]="formProcess" field="name"></app-input-message>
               </span>
             </div>
             <div class="p-field margin-top-responsive" *ngIf="process">
               <span class="p-float-label">
-                <input class="app-input-text" id="float-status" formControlName="status" type="text" pInputText />
+                <input class="app-input-text" id="float-status" formControlName="status" type="text" pInputText/>
                 <label class="app-input-label" for="float-status">{{ "status" | translate }} * </label>
               </span>
             </div>
@@ -40,7 +40,8 @@
           <div class="p-fluid" *ngIf="process">
             <div class="p-field">
               <span class="p-float-label">
-                <textarea pInputTextarea id="float-subject" formControlName="subject" class="app-text-area" [autoResize]="true" [rows]="1">
+                <textarea pInputTextarea id="float-subject" formControlName="subject" class="app-text-area"
+                          [autoResize]="true" [rows]="1">
                 </textarea>
                 <label class="app-input-label" for="float-subject">{{ "subject" | translate }} * </label>
               </span>
@@ -51,7 +52,7 @@
             <div class="p-field">
               <span class="p-float-label">
                 <input class="app-input-text" id="float-currentOrganization" formControlName="currentOrganization"
-                  type="text" pInputText />
+                       type="text" pInputText/>
                 <label class="app-input-label" for="float-currentOrganization">{{ "currentOrganization" | translate }} *
                 </label>
               </span>
@@ -60,7 +61,7 @@
             <div class="p-field margin-top-responsive">
               <span class="p-float-label">
                 <input class="app-input-text" id="float-lenghtOfStayOn" formControlName="lengthOfStayOn" type="text"
-                  pInputText />
+                       pInputText/>
                 <label class="app-input-label" for="float-lenghtOfStayOn">{{ "lenghtOfStayOn" | translate }}
                   {{formProcess?.controls?.currentOrganization?.value}} * </label>
               </span>
@@ -70,7 +71,8 @@
           <div class="p-fluid">
             <div class="p-field" *ngIf="process">
               <span class="p-float-label">
-                <textarea pInputTextarea id="float-note" formControlName="note" class="app-text-area" [autoResize]="true" [rows]="1">
+                <textarea pInputTextarea id="float-note" formControlName="note" class="app-text-area"
+                          [autoResize]="true" [rows]="1">
                 </textarea>
                 <label class="app-input-label" for="float-note">{{ "note" | translate }} </label>
               </span>
@@ -99,7 +101,10 @@
         <p-timeline [value]="process.history" align="right" *ngIf="!responsive">
           <ng-template pTemplate="content" let-item>
             <p-card *ngIf="item.left">
-              <span class="organization-name">{{item.organizationName}}</span>
+              <span class="organization-name">
+                {{item.organizationName}}
+                <span *ngIf="item.descricaoTipo">({{item.descricaoTipo}})</span>
+              </span>
               <span class="sector">{{item.sector}}</span>
               <div class="date-container">
                 <span>{{currentLang === 'pt-BR' ? (item?.date|date:'dd/MM/yyyy') :
@@ -110,8 +115,12 @@
           </ng-template>
           <ng-template pTemplate="opposite" let-item>
             <p-card *ngIf="item.right">
-              <span class="organization-name">{{item.organizationName}}</span>
-              <span class="sector">{{item.sector}}</span>
+              <span class="organization-name">
+                {{item.organizationName}}
+                <span *ngIf="item.descricaoTipo">({{item.descricaoTipo}})</span>
+              </span>
+              <span class="sector">{{item.sector}}
+              </span>
               <div class="date-container">
                 <span>{{currentLang === 'pt-BR' ? (item?.date|date:'dd/MM/yyyy') :
                   (item?.date|date:'yyyy/MM/dd')}}</span>
@@ -120,7 +129,7 @@
             </p-card>
           </ng-template>
         </p-timeline>
-        <p-timeline class="timeline-responsive" [value]="process.processHistory" align="left" *ngIf="!!responsive">
+        <p-timeline class="timeline-responsive" [value]="process.history" align="left" *ngIf="!!responsive">
           <ng-template pTemplate="content" let-item>
             <p-card>
               <span class="organization-name">{{item.organizationName}}</span>
