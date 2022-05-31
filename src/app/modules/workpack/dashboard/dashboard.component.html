@@ -43,7 +43,7 @@
       </div>
     </div>
     <p-divider layout="horizontal"></p-divider>
-    <div class="params-container">
+    <div class="params-container" *ngIf="startDate && endDate">
       <div class="param-item">
         <label class="param-label">{{'reference'|translate}}</label>
         <p-calendar class="app-select-date" [(ngModel)]="referenceMonth" view="month" [dateFormat]="calendarFormat"

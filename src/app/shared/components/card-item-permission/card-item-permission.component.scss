@@ -53,6 +53,19 @@
       text-overflow: ellipsis;
       flex: 1;
     }
+    .card-item-title-role {
+      font-size: 0.8rem;
+      font-family: v.$fontFamilyMedium;
+      color: v.$fontTitle;
+      padding: 0.7em;
+      flex: 1;
+      display: -webkit-box;
+      -webkit-line-clamp: 3; /** número de linhas que você quer exibir */
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      height: 60px;
+    }
     .card-item-title-shared {
       font-size: 1rem;
       font-family: v.$fontFamilyMedium;
@@ -70,7 +83,7 @@
   }
   .p-card-content {
     height: 100%;
-    min-height: 141px;
+    min-height: 100px;
     padding: 0;
     display: flex;
     flex-direction: column;

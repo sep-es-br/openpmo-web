@@ -149,7 +149,7 @@ export class ProcessComponent implements OnInit, OnDestroy {
       initialStateCollapse: false,
     };
 
-    const result = this.idProcess && await this.processSrv.GetById(this.idProcess);
+    const result = this.idProcess != undefined && await this.processSrv.GetById(this.idProcess);
     if (result && result.success) {
       this.process = result.data;
       await this.loadPermissions();
@@ -262,7 +262,7 @@ export class ProcessComponent implements OnInit, OnDestroy {
         detail: this.translateSrv.instant('messages.savedSuccessfully')
       });
       this.idProcess = result.data.id;
-      this.process = {...result.data};
+      await this.loadPropertiesProcess();
     }
   }
 
