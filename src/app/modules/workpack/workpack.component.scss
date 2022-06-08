@@ -60,11 +60,24 @@
   .p-dataview .p-paginator-bottom {
     border: none;
   }
+  .input-toggle-workpack-cancelled {
+    display: flex;
+    align-items: center;
+    padding: 0.5em 0;
+    margin-bottom: 1em;
+    .input-label {
+      font-size: 1rem;
+      color: v.$fontLabel;
+      margin-left: 5px;
+      font-family: v.$fontFamilyMedium;
+    }
+  }
   .card-stakeholders {
     .input-toggle-stakeholder {
       display: flex;
       align-items: center;
       padding: 0.5em 0;
+      margin-bottom: 1em;
       .input-label {
         font-size: 1rem;
         color: v.$fontLabel;
@@ -132,6 +145,7 @@
       display: flex;
       align-items: center;
       padding: 0.5em 0;
+      margin-bottom: 1em;
       .input-label {
         font-size: 1rem;
         color: v.$fontLabel;
@@ -145,6 +159,7 @@
       display: flex;
       align-items: center;
       padding: 0.5em 0;
+      margin-bottom: 1em;
       .input-label {
         font-size: 1rem;
         color: v.$fontLabel;
@@ -158,6 +173,7 @@
       display: flex;
       align-items: center;
       padding: 0.5em 0;
+      margin-bottom: 1em;
       .input-label {
         font-size: 1rem;
         color: v.$fontLabel;

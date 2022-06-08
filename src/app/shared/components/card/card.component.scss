@@ -118,12 +118,17 @@
       flex-direction: row;
       align-items: flex-end;
       justify-content: flex-end;
-      width: 20%;
+      width: 30%;
       .dataview-filters {
         margin-right: 1.5rem;
         display: flex;
-        flex-direction: column;
+        flex-direction: row;
+        align-items: center;
         flex: 1;
+        .options-container {
+          width: 90%;
+          margin-left: 1em;
+        }
         .filter-selection {
           .p-dropdown {
             background-color: transparent;

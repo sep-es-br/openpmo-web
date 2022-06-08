@@ -173,7 +173,7 @@ export class WorkpackModelComponent implements OnInit {
       this.currentBreadcrumbItems = data;
       this.setCurrentBreadcrumb();
     });
-    this.setFormProperties();
+    // this.setFormProperties();
     this.formProperties.statusChanges
       .pipe(takeUntil(this.$destroy), filter(status => status === 'INVALID'))
       .subscribe(() => this.saveButton?.hideButton());
@@ -688,7 +688,7 @@ export class WorkpackModelComponent implements OnInit {
         name: data.modelName,
         nameInPlural: data.modelNameInPlural || '',
         icon: data.fontIcon || '',
-        sortedBy: data.sortBy?.label || 'name'
+        sortedBy: data.sortBy?.name || 'name'
       });
       this.posibleRolesOrg = data.organizationRoles || [];
       this.posibleRolesPerson = data.personRoles || [];

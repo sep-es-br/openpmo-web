@@ -13,14 +13,12 @@
     <span class="text">{{workpackModel.modelName}}</span>
   </div>
 
-  <div class="card-dashboard" *ngIf="!!idWorkpack && !!workpack && !!workpackModel && !!workpackModel.dashboardSessionActive">
-    <app-dashboard [idWorkpack]="idWorkpack"
-      [workpackFullName]="workpackFullName"
+  <div class="card-dashboard"
+    *ngIf="!!idWorkpack && !!workpack && !!workpackModel && !!workpackModel.dashboardSessionActive">
+    <app-dashboard [idWorkpack]="idWorkpack" [workpackFullName]="workpackFullName"
       [dashboardShowStakeholders]="workpackModel?.dashboardShowStakeholders"
-      [dashboardShowRisks]="workpackModel?.dashboardShowRisks"
-      [dashboardShowEva]="workpackModel?.dashboardShowEva"
-      [workpackType]="workpack?.type"
-      [collapsePanelsStatus]="collapsePanelsStatus"
+      [dashboardShowRisks]="workpackModel?.dashboardShowRisks" [dashboardShowEva]="workpackModel?.dashboardShowEva"
+      [workpackType]="workpack?.type" [collapsePanelsStatus]="collapsePanelsStatus"
       [dashboardShowMilestones]="workpackModel?.dashboardShowMilestones"></app-dashboard>
   </div>
 
@@ -47,7 +45,8 @@
       (selectedFilter)="handleSelectedFilterCostAccount($event)" (createNewElement)="handleCreateNewCostAccount()">
       <div class="cost-account-list-container">
         <p-dataView [value]="sectionCostAccount.cardItemsSection" layout="grid" class="app-dataview"
-          [emptyMessage]="'loadingEllipsis' | translate" *ngIf="displayModeAll === 'grid' || (displayModeAll === 'list' && !!responsive)" [paginator]="true"
+          [emptyMessage]="'loadingEllipsis' | translate"
+          *ngIf="displayModeAll === 'grid' || (displayModeAll === 'list' && !!responsive)" [paginator]="true"
           [rows]="pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false"
           [totalRecords]="totalRecordsCostAccounts">
           <ng-template let-cardItem pTemplate="gridItem">
@@ -58,8 +57,8 @@
           </ng-template>
         </p-dataView>
         <p-dataView [value]="sectionCostAccount.cardItemsSection" layout="list" class="app-dataview app-dataview-list"
-          [emptyMessage]="'loadingEllipsis' | translate" *ngIf="displayModeAll === 'list' && !responsive" [paginator]="true"
-          [rows]="pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false"
+          [emptyMessage]="'loadingEllipsis' | translate" *ngIf="displayModeAll === 'list' && !responsive"
+          [paginator]="true" [rows]="pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false"
           [totalRecords]="totalRecordsCostAccounts">
           <ng-template let-cardItem pTemplate="listItem">
             <div class="p-col-12">
@@ -162,28 +161,36 @@
         (selectedFilter)="handleSelectedFilterWorkpackModel($event, workpackModel.idWorkpackModel)"
         (createNewElement)="handleCreateNewWorkpack(workpackModel.idWorkpackModel)"
         *ngIf="workpackModel.cardItemsSection && workpackModel.cardItemsSection.length > 0">
-        <p-dataView [value]="workpackModel.cardItemsSection" layout="grid" styleClass="dataview-card-items"
-          *ngIf="displayModeAll === 'grid' || (displayModeAll === 'list' && !!responsive)" [paginator]="true" [rows]="pageSize" [showJumpToPageDropdown]="true"
-          [showPageLinks]="false" [totalRecords]="totalRecordsWorkpacks ? totalRecordsWorkpacks[i] : 1"
-          [emptyMessage]="'loadingEllipsis' | translate">
-          <ng-template let-cardItem pTemplate="gridItem">
-            <div class="p-col-12 p-md-3 p-sm-12 card-item-container">
-              <app-workpack-card-item [properties]="cardItem"></app-workpack-card-item>
-            </div>
-          </ng-template>
-        </p-dataView>
-        <p-dataView [value]="workpackModel.cardItemsSection" layout="list" class="app-dataview app-dataview-list"
-          styleClass="dataview-card-items" *ngIf="displayModeAll === 'list' && !responsive" [paginator]="true" [rows]="pageSize"
-          [showJumpToPageDropdown]="true" [showPageLinks]="false"
-          [totalRecords]="totalRecordsWorkpacks ? totalRecordsWorkpacks[i] : 1"
-          [emptyMessage]="'loadingEllipsis' | translate">
-          <ng-template let-cardItem pTemplate="listItem">
-            <div class="p-col-12">
-              <app-workpack-card-item [properties]="cardItem" [displayModeCard]="displayModeAll">
-              </app-workpack-card-item>
-            </div>
-          </ng-template>
-        </p-dataView>
+        <div class="input-toggle-workpack-cancelled">
+          <p-inputSwitch class="app-toggle" [(ngModel)]="workpackModel.workpackShowCancelleds"
+            (onChange)="handleWorkpackCancelledToggle(i, $event)"></p-inputSwitch>
+          <label class="input-label">{{"showCanceled" | translate}}</label>
+        </div>
+        <div class="workpacks-list-container">
+          <p-dataView [value]="workpackModel.cardItemsSection" layout="grid" styleClass="dataview-card-items"
+            *ngIf="displayModeAll === 'grid' || (displayModeAll === 'list' && !!responsive)" [paginator]="true"
+            [rows]="pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false"
+            [totalRecords]="totalRecordsWorkpacks ? totalRecordsWorkpacks[i] : 1"
+            [emptyMessage]="'loadingEllipsis' | translate">
+            <ng-template let-cardItem pTemplate="gridItem">
+              <div class="p-col-12 p-md-3 p-sm-12 card-item-container">
+                <app-workpack-card-item [properties]="cardItem"></app-workpack-card-item>
+              </div>
+            </ng-template>
+          </p-dataView>
+          <p-dataView [value]="workpackModel.cardItemsSection" layout="list" class="app-dataview app-dataview-list"
+            styleClass="dataview-card-items" *ngIf="displayModeAll === 'list' && !responsive" [paginator]="true"
+            [rows]="pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false"
+            [totalRecords]="totalRecordsWorkpacks ? totalRecordsWorkpacks[i] : 1"
+            [emptyMessage]="'loadingEllipsis' | translate">
+            <ng-template let-cardItem pTemplate="listItem">
+              <div class="p-col-12">
+                <app-workpack-card-item [properties]="cardItem" [displayModeCard]="displayModeAll">
+                </app-workpack-card-item>
+              </div>
+            </ng-template>
+          </p-dataView>
+        </div>
         <div>
         </div>
       </app-card>
@@ -201,9 +208,9 @@
       </div>
       <div class="stakeholders-list-container">
         <p-dataView [value]="sectionStakeholder.cardItemsSection" layout="grid" styleClass="dataview-card-items"
-          *ngIf="displayModeAll === 'grid' || (displayModeAll === 'list' && !!responsive)" [paginator]="true" [rows]="pageSize" [showJumpToPageDropdown]="true"
-          [showPageLinks]="false" [totalRecords]="totalRecordsStakeholders"
-          [emptyMessage]="'loadingEllipsis' | translate">
+          *ngIf="displayModeAll === 'grid' || (displayModeAll === 'list' && !!responsive)" [paginator]="true"
+          [rows]="pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false"
+          [totalRecords]="totalRecordsStakeholders" [emptyMessage]="'loadingEllipsis' | translate">
           <ng-template let-cardItem pTemplate="gridItem">
             <div class="p-col-12 p-md-3 p-sm-12 card-item-container">
               <app-card-item [properties]="cardItem"></app-card-item>
@@ -211,9 +218,9 @@
           </ng-template>
         </p-dataView>
         <p-dataView [value]="sectionStakeholder.cardItemsSection" layout="list" styleClass="dataview-card-items"
-          class="app-dataview app-dataview-list" *ngIf="displayModeAll === 'list' && !responsive" [paginator]="true" [rows]="pageSize"
-          [showJumpToPageDropdown]="true" [showPageLinks]="false" [totalRecords]="totalRecordsStakeholders"
-          [emptyMessage]="'loadingEllipsis' | translate">
+          class="app-dataview app-dataview-list" *ngIf="displayModeAll === 'list' && !responsive" [paginator]="true"
+          [rows]="pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false"
+          [totalRecords]="totalRecordsStakeholders" [emptyMessage]="'loadingEllipsis' | translate">
           <ng-template let-cardItem pTemplate="listItem">
             <div class="p-col-12">
               <app-card-item [properties]="cardItem" [displayModeCard]="displayModeAll"></app-card-item>
@@ -235,7 +242,8 @@
       </div>
       <div class="baselines-list-container">
         <p-dataView [value]="sectionBaselines.cardItemsSection" layout="grid" class="app-dataview"
-          [emptyMessage]="'loadingEllipsis' | translate" *ngIf="displayModeAll === 'grid' || (displayModeAll === 'list' && !!responsive)">
+          [emptyMessage]="'loadingEllipsis' | translate"
+          *ngIf="displayModeAll === 'grid' || (displayModeAll === 'list' && !!responsive)">
           <ng-template let-cardItem pTemplate="gridItem">
             <div class="p-col-12 p-md-3 p-sm-12 card-item-container">
               <app-baseline-card-item [properties]="cardItem">
@@ -268,7 +276,8 @@
       </div>
       <div class="risk-list-container">
         <p-dataView [value]="sectionRisk.cardItemsSection" layout="grid" class="app-dataview"
-          [emptyMessage]="'loadingEllipsis' | translate" *ngIf="displayModeAll === 'grid' || (displayModeAll === 'list' && !!responsive)" [paginator]="true"
+          [emptyMessage]="'loadingEllipsis' | translate"
+          *ngIf="displayModeAll === 'grid' || (displayModeAll === 'list' && !!responsive)" [paginator]="true"
           [rows]="pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false" [totalRecords]="totalRecordsRisks">
           <ng-template let-cardItem pTemplate="gridItem">
             <div class="p-col-12 p-md-3 p-sm-12 card-item-container">
@@ -278,8 +287,9 @@
           </ng-template>
         </p-dataView>
         <p-dataView [value]="sectionRisk.cardItemsSection" layout="list" class="app-dataview app-dataview-list"
-          [emptyMessage]="'loadingEllipsis' | translate" *ngIf="displayModeAll === 'list' && !responsive" [paginator]="true"
-          [rows]="pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false" [totalRecords]="totalRecordsRisks">
+          [emptyMessage]="'loadingEllipsis' | translate" *ngIf="displayModeAll === 'list' && !responsive"
+          [paginator]="true" [rows]="pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false"
+          [totalRecords]="totalRecordsRisks">
           <ng-template let-cardItem pTemplate="listItem">
             <div class="p-col-12">
               <app-card-item [properties]="cardItem" [displayModeCard]="displayModeAll">
@@ -303,7 +313,8 @@
       </div>
       <div class="issue-list-container">
         <p-dataView [value]="sectionIssue.cardItemsSection" layout="grid" class="app-dataview"
-          [emptyMessage]="'loadingEllipsis' | translate" *ngIf="displayModeAll === 'grid' || (displayModeAll === 'list' && !!responsive)" [paginator]="true"
+          [emptyMessage]="'loadingEllipsis' | translate"
+          *ngIf="displayModeAll === 'grid' || (displayModeAll === 'list' && !!responsive)" [paginator]="true"
           [rows]="pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false" [totalRecords]="totalRecordsIssues">
           <ng-template let-cardItem pTemplate="gridItem">
             <div class="p-col-12 p-md-3 p-sm-12 card-item-container">
@@ -313,8 +324,9 @@
           </ng-template>
         </p-dataView>
         <p-dataView [value]="sectionIssue.cardItemsSection" layout="list" class="app-dataview app-dataview-list"
-          [emptyMessage]="'loadingEllipsis' | translate" *ngIf="displayModeAll === 'list' && !responsive" [paginator]="true"
-          [rows]="pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false" [totalRecords]="totalRecordsIssues">
+          [emptyMessage]="'loadingEllipsis' | translate" *ngIf="displayModeAll === 'list' && !responsive"
+          [paginator]="true" [rows]="pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false"
+          [totalRecords]="totalRecordsIssues">
           <ng-template let-cardItem pTemplate="listItem">
             <div class="p-col-12">
               <app-card-item [properties]="cardItem" [displayModeCard]="displayModeAll">
@@ -333,7 +345,8 @@
       (selectedFilter)="handleSelectedFilterProcess($event)" (createNewElement)="handleCreateNewProcess()">
       <div class="process-list-container">
         <p-dataView [value]="sectionProcess.cardItemsSection" layout="grid" class="app-dataview"
-          [emptyMessage]="'loadingEllipsis' | translate" *ngIf="displayModeAll === 'grid' || (displayModeAll === 'list' && !!responsive)" [paginator]="true"
+          [emptyMessage]="'loadingEllipsis' | translate"
+          *ngIf="displayModeAll === 'grid' || (displayModeAll === 'list' && !!responsive)" [paginator]="true"
           [rows]="pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false"
           [totalRecords]="totalRecordsProcesses">
           <ng-template let-cardItem pTemplate="gridItem">
@@ -344,8 +357,8 @@
           </ng-template>
         </p-dataView>
         <p-dataView [value]="sectionProcess.cardItemsSection" layout="list" class="app-dataview app-dataview-list"
-          [emptyMessage]="'loadingEllipsis' | translate" *ngIf="displayModeAll === 'list' && !responsive" [paginator]="true"
-          [rows]="pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false"
+          [emptyMessage]="'loadingEllipsis' | translate" *ngIf="displayModeAll === 'list' && !responsive"
+          [paginator]="true" [rows]="pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false"
           [totalRecords]="totalRecordsProcesses">
           <ng-template let-cardItem pTemplate="listItem">
             <div class="p-col-12">

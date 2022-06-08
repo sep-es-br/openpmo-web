@@ -69,6 +69,8 @@ interface ISectionWorkpacks {
   idWorkpackModel?: number;
   cardSection: ICard;
   cardItemsSection?: IWorkpackCardItem[];
+  workpackShowCancelleds?: boolean;
+  hasCancelleds?: boolean;
 }
 
 interface IScheduleSection {
@@ -188,7 +190,7 @@ export class WorkpackComponent implements OnDestroy {
     private baselineSrv: BaselineService,
     private confirmationSrv: ConfirmationService,
   ) {
-    this.actRouter.queryParams.subscribe(async({ id, idPlan, idWorkpackModel, idWorkpackParent, idWorkpackModelLinked }) => {
+    this.actRouter.queryParams.subscribe(async ({ id, idPlan, idWorkpackModel, idWorkpackParent, idWorkpackModelLinked }) => {
       this.idWorkpack = id && +id;
       this.idPlan = idPlan && +idPlan;
       this.idWorkpackModel = idWorkpackModel && +idWorkpackModel;
@@ -1072,7 +1074,7 @@ export class WorkpackComponent implements OnDestroy {
   }
 
   async loadSectionsWorkpackChildren() {
-    this.cardsWorkPackModelChildren = await Promise.all(this.workpackModel.children.map(async(workpackModel) => {
+    this.cardsWorkPackModelChildren = await Promise.all(this.workpackModel.children.map(async (workpackModel) => {
       const propertiesCard: ICard = {
         toggleable: false,
         initialStateToggle: false,
@@ -1088,7 +1090,7 @@ export class WorkpackComponent implements OnDestroy {
       }
       const idFilterSelected = propertiesCard.filters.find(defaultFilter => !!defaultFilter.favorite) ?
         propertiesCard.filters.find(defaultFilter => !!defaultFilter.favorite).id : undefined;
-      const workPackItemCardList = await this.loadWorkpacksFromWorkpackModel(this.workpack.plan.id, workpackModel.id, idFilterSelected);
+      const workPackItemCardList = await this.loadWorkpacksFromWorkpackModel(this.workpack.plan.id, workpackModel.id, idFilterSelected, false);
       return {
         idWorkpackModel: workpackModel.id,
         cardSection: propertiesCard,
@@ -1097,10 +1099,11 @@ export class WorkpackComponent implements OnDestroy {
     }));
     this.cardsWorkPackModelChildren.forEach((workpackModel, i) => {
       this.totalRecordsWorkpacks[i] = workpackModel.cardItemsSection ? workpackModel.cardItemsSection.length + 1 : 1;
+      workpackModel.hasCancelleds = workpackModel.cardItemsSection && workpackModel.cardItemsSection.filter( wp => !!wp.canceled ).length > 0
     });
   }
 
-  async loadWorkpacksFromWorkpackModel(idPlan: number, idWorkpackModel: number, idFilterSelected: number, idWorkpackModelLinked?: number) {
+  async loadWorkpacksFromWorkpackModel(idPlan: number, idWorkpackModel: number, idFilterSelected: number, showCancelled?: boolean, idWorkpackModelLinked?: number, ) {
     const result = await this.workpackSrv.GetWorkpacksByParent({
       'id-plan': idPlan,
       'id-workpack-model': idWorkpackModel,
@@ -1108,7 +1111,10 @@ export class WorkpackComponent implements OnDestroy {
       workpackLinked: idWorkpackModelLinked ? true : false,
       idFilter: idFilterSelected
     });
-    const workpacks = result.success && result.data;
+    let workpacks = result.success && result.data;
+    if (!showCancelled && workpacks) {
+      workpacks = workpacks.filter( wp => !wp.canceled );
+    }
     if (workpacks && workpacks.length > 0) {
       const workpackItemCardList: IWorkpackCardItem[] = workpacks.map(workpack => {
         const propertyNameWorkpackModel = workpack.model?.properties?.find(p => p.name === 'name' && p.session === 'PROPERTIES');
@@ -1267,16 +1273,6 @@ export class WorkpackComponent implements OnDestroy {
       const iconMenuItems: MenuItem[] = [
         { label: this.translateSrv.instant('new'), command: () => this.handleNewWorkpack(idPlan, idWorkpackModel, this.idWorkpack) }
       ];
-      // if (sharedWorkpackList && sharedWorkpackList.length > 0) {
-      //   iconMenuItems.push({
-      //     label: this.translateSrv.instant('linkTo'),
-      //     items: sharedWorkpackList.map(wp => ({
-      //       label: wp.name,
-      //       icon: `app-icon ${wp.icon}`,
-      //       command: () => this.handleLinkToWorkpack(wp.id, idWorkpackModel)
-      //     }))
-      //   });
-      // }
       if (this.editPermission && !idWorkpackModelLinked) {
         const sharedWorkpackList = await this.loadSharedWorkpackList(idWorkpackModel);
         if (sharedWorkpackList && sharedWorkpackList.length > 0) {
@@ -1486,7 +1482,7 @@ export class WorkpackComponent implements OnDestroy {
           key: 'pasteConfirm',
           acceptLabel: this.translateSrv.instant('yes'),
           rejectLabel: this.translateSrv.instant('no'),
-          accept: async() => {
+          accept: async () => {
             await this.pasteWorkpack(workpackCuted, idWorkpackModelTo, idPlanTo, idParentTo);
           },
           reject: () => { }
@@ -1512,7 +1508,7 @@ export class WorkpackComponent implements OnDestroy {
   }
 
   async loadSectionsWorkpackChildrenLinked() {
-    this.cardsWorkPackModelChildren = await Promise.all(this.workpack.modelLinked.children.map(async(workpackModel) => {
+    this.cardsWorkPackModelChildren = await Promise.all(this.workpack.modelLinked.children.map(async (workpackModel) => {
       const propertiesCard: ICard = {
         toggleable: false,
         initialStateToggle: false,
@@ -1529,7 +1525,7 @@ export class WorkpackComponent implements OnDestroy {
       const idFilterSelected = propertiesCard.filters.find(defaultFilter => !!defaultFilter.favorite) ?
         propertiesCard.filters.find(defaultFilter => !!defaultFilter.favorite).id : undefined;
       const workPackItemCardList = await this.loadWorkpacksFromWorkpackModel
-        (this.idPlan, workpackModel.idWorkpackModelOriginal, idFilterSelected, workpackModel.idWorkpackModelLinked);
+        (this.idPlan, workpackModel.idWorkpackModelOriginal, idFilterSelected, false, workpackModel.idWorkpackModelLinked);
       return {
         idWorkpackModel: workpackModel.idWorkpackModelLinked,
         cardSection: propertiesCard,
@@ -1751,6 +1747,19 @@ export class WorkpackComponent implements OnDestroy {
 
   async handleStakeholderInactiveToggle() {
     this.sectionStakeholder.cardItemsSection = await this.loadSectionStakeholderCards(this.stakeholderSectionShowInactives);
+  }
+
+  async handleWorkpackCancelledToggle(workpackModelIndex: number, event) {
+    
+    const idWorkpackModel = this.cardsWorkPackModelChildren[workpackModelIndex].idWorkpackModel;
+    const resultFilters = await this.filterSrv.getAllFilters(`workpackModels/${idWorkpackModel}/workpacks`);
+    const filters = resultFilters.success && resultFilters.data;
+    const idFilterSelected = filters.find(defaultFilter => !!defaultFilter.favorite) ?
+      filters.find(defaultFilter => !!defaultFilter.favorite).id : undefined;
+    const workPackItemCardList = await this.loadWorkpacksFromWorkpackModel(this.workpack.plan.id, idWorkpackModel, idFilterSelected, event.checked);
+    this.cardsWorkPackModelChildren[workpackModelIndex].cardItemsSection = workPackItemCardList;
+    this.cardsWorkPackModelChildren[workpackModelIndex].workpackShowCancelleds = event.checked;
+     
   }
 
   navigateToPageStakeholder(url) {
@@ -2144,7 +2153,7 @@ export class WorkpackComponent implements OnDestroy {
       .filter(cost => cost.idWorkpack != this.idWorkpack)
       .map(cost => cost.idWorkpack)
       .reduce((IdsWorkpack, idWorkpack) => IdsWorkpack.includes(idWorkpack) ? IdsWorkpack : [...IdsWorkpack, idWorkpack], [])
-      .map(async(idWorkpack) => {
+      .map(async (idWorkpack) => {
         const result = await this.workpackSrv.GetWorkpackById(idWorkpack, { 'id-plan': this.idPlan });
         if (result.success) {
           const workpack = result.data;
@@ -2527,7 +2536,7 @@ export class WorkpackComponent implements OnDestroy {
   }
 
   async reloadWorkpacksOfWorkpackModelSelectedFilter(idFilter: number, idWorkpackModel: number) {
-    const workpacksByFilter = await this.loadWorkpacksFromWorkpackModel(this.workpack.plan.id, idWorkpackModel, idFilter);
+    const workpacksByFilter = await this.loadWorkpacksFromWorkpackModel(this.workpack.plan.id, idWorkpackModel, idFilter, false);
     const workpackModelCardIndex = this.cardsWorkPackModelChildren.findIndex(card => card.idWorkpackModel === idWorkpackModel);
     if (workpackModelCardIndex > -1) {
       this.cardsWorkPackModelChildren[workpackModelCardIndex].cardItemsSection = Array.from(workpacksByFilter);

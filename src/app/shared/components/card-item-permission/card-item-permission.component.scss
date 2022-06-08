@@ -180,7 +180,7 @@
   }
 }
 
-::ng-deep .new-card-item {
+::ng-deep .new-card-item-permission {
   .p-card {
     background-color: transparent;
     cursor: pointer;
@@ -260,7 +260,7 @@
   }
 }
 
-::ng-deep .new-card-item.new-card-item-mobile {
+::ng-deep .new-card-item-permission.new-card-item-mobile {
   display: flex;
   justify-content: center;
   align-items: center;

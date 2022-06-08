@@ -61,8 +61,8 @@ export class BaselineComponent implements OnInit, OnDestroy {
     this.formBaseline = this.formBuilder.group({
       name: ['', [Validators.required, Validators.maxLength(50)]],
       proposer: null,
-      description: null,
-      message: null,
+      description: ['', [Validators.required]],
+      message: ['', [Validators.required]],
     });
   }
 
@@ -148,7 +148,7 @@ export class BaselineComponent implements OnInit, OnDestroy {
     this.cardBaselineUpdates = {
       toggleable: false,
       initialStateToggle: false,
-      cardTitle: 'updates',
+      cardTitle: this.translateSrv.instant('updates'),
       collapseble: true,
       initialStateCollapse: false
     };
@@ -189,6 +189,14 @@ export class BaselineComponent implements OnInit, OnDestroy {
   }
 
   async handleSaveDraftBaseline(showMessage = true) {
+    if (this.formBaseline.invalid) {
+      this.messageSrv.add({
+        severity: 'warn',
+        summary: this.translateSrv.instant('atention'),
+        detail: this.translateSrv.instant('messages.requiredInformationsMustBeFilled')
+      });
+      return;
+    }
     this.baseline = {
       ...this.baseline,
       name: this.formBaseline.controls.name.value,
@@ -253,7 +261,9 @@ export class BaselineComponent implements OnInit, OnDestroy {
     if (!this.idBaseline) {
       await this.handleSaveDraftBaseline(false);
     }
-    await this.handleSubmitBaseline();
+    if (this.idBaseline) {
+      await this.handleSubmitBaseline();
+    }
   }
 
 }

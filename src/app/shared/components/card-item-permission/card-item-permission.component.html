@@ -33,7 +33,7 @@
   </div>
 </p-card>
 
-<p-card *ngIf="properties.typeCardItem === 'newCardItem'" class="new-card-item"
+<p-card *ngIf="properties.typeCardItem === 'newCardItem'" class="new-card-item-permission"
   [class.cardList]="displayModeCard === 'list'" [class.new-card-item-mobile]="responsive"
   [class.card-link]="properties.urlCard" (click)="navigateToPage(properties.urlCard, properties.paramsUrlCard)">
   <div class="card-item-content">
@@ -59,7 +59,7 @@
   </div>
 </p-card>
 
-<p-card *ngIf="properties.typeCardItem === 'newCardItemShared'" class="new-card-item"
+<p-card *ngIf="properties.typeCardItem === 'newCardItemShared'" class="new-card-item-permission"
   [class.cardList]="displayModeCard === 'list'" [class.new-card-item-mobile]="responsive">
   <div class="card-item-content">
     <i [ngClass]="[ 'app-icon', newItemIcon, 'light-grey-icon' ]"

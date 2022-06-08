@@ -310,7 +310,10 @@
   "SV": "VP",
   "AC": "CR",
   "decline": "Recusar",
+  "updates": "Atualizações",
+  "showCanceled": "Exibir cancelado",
   "messages": {
+    "requiredInformationsMustBeFilled": "Informações obrigatórias devem ser preenchidas.",
     "scheduleActualValueValidation": "Data do passo inicial é maior que o mês atual.",
     "cookies-confirmation": "O OPEN PMO utiliza cookies para possibilitar uma forma de navegação personalizada. Ao clicar em aceitar você está concordando com o armazenamento de dados de navegação.",
     "startDateIsSameEndDate": "Data inicial não pode ser igual a data final",
