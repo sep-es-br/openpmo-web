@@ -666,11 +666,11 @@ export class WorkpackComponent implements OnDestroy {
     if (this.typePropertyModel[propertyModel.type] === TypePropertyModelEnum.LocalitySelectionModel) {
       const domain = await this.loadDomain(propertyModel.idDomain);
       const localityList = await this.loadDomainLocalities(domain.id);
-      const selectable = (this.editPermission && property.multipleSelection);
+      const selectable = (this.editPermission);
       const rootNode: TreeNode = {
         label: domain.localityRoot.name,
         data: domain.localityRoot.id,
-        children: this.loadLocality(localityList[0].children, selectable),
+        children: this.loadLocality(localityList[0].children, selectable, property.multipleSelection),
         selectable
       };
       property.idDomain = propertyModel.idDomain;
@@ -683,7 +683,6 @@ export class WorkpackComponent implements OnDestroy {
           defaultSelectedLocalities.unshift(propertyModel.idDomain);
         }
         const selectedLocalityList = this.loadSelectedLocality(defaultSelectedLocalities, property.localityList);
-        // selectedLocalityList.forEach(l => this.expandTreeToTreeNode(l));
         property.localitiesSelected = propertyModel.multipleSelection
           ? selectedLocalityList as TreeNode[]
           : selectedLocalityList[0] as TreeNode;
@@ -732,11 +731,11 @@ export class WorkpackComponent implements OnDestroy {
 
   loadSelectedLocality(seletectedIds: number[], list: TreeNode[]) {
     let result = [];
-    list.sort((a, b) => a.label < b.label && a.key < b.key ?
-      -1 :
-      a.label > b.label && a.key > b.key ?
-        1 :
-        0);
+    // list.sort((a, b) => a.label < b.label && a.key < b.key ?
+    //   -1 :
+    //   a.label > b.label && a.key > b.key ?
+    //     1 :
+    //     0);
     list.forEach(l => {
       if (seletectedIds.includes(l.data)) {
         result.push(l);
@@ -766,19 +765,20 @@ export class WorkpackComponent implements OnDestroy {
     return null;
   }
 
-  loadLocality(localityList: ILocalityList[], selectable: boolean) {
+  loadLocality(localityList: ILocalityList[], selectable: boolean, multipleSelection: boolean) {
     const list: TreeNode[] = localityList?.map(locality => {
       if (locality.children) {
         return {
           label: locality.name,
           data: locality.id,
-          children: this.loadLocality(locality.children, selectable),
+          children: this.loadLocality(locality.children, selectable, multipleSelection),
           selectable,
         };
       }
       return { label: locality.name, data: locality.id, selectable };
     });
-    if (selectable) {
+    list.sort( (a,b) => a.label < b.label ? -1 : 0)
+    if (selectable && multipleSelection) {
       this.addSelectAllNode(list, localityList, selectable);
     }
     return list;
@@ -790,6 +790,7 @@ export class WorkpackComponent implements OnDestroy {
       key: 'SELECTALL' + localityList[0]?.id,
       selectable,
       styleClass: 'green-node',
+      data: 'SELECTALL' + localityList[0]?.id
     });
   }
 

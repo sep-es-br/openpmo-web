@@ -173,7 +173,6 @@ export class WorkpackModelComponent implements OnInit {
       this.currentBreadcrumbItems = data;
       this.setCurrentBreadcrumb();
     });
-    // this.setFormProperties();
     this.formProperties.statusChanges
       .pipe(takeUntil(this.$destroy), filter(status => status === 'INVALID'))
       .subscribe(() => this.saveButton?.hideButton());
@@ -702,7 +701,7 @@ export class WorkpackModelComponent implements OnInit {
                 p.defaultValue = (p.defaultValue as string).split(',');
               }
               if (p.idDomain) {
-                p.extraList = await this.getListLocalities(p.idDomain);
+                p.extraList = await this.getListLocalities(p.idDomain, p.multipleSelection);
                 p.extraListDefaults = await this.getListLocalitiesDefaults(p);
                 const defaultsLocalities = p.defaults as number[];
                 if (defaultsLocalities && defaultsLocalities.length === 1) {
@@ -741,7 +740,7 @@ export class WorkpackModelComponent implements OnInit {
                     gp.defaultValue = (gp.defaultValue as string).split(',');
                   }
                   if (gp.idDomain) {
-                    gp.extraList = await this.getListLocalities(gp.idDomain);
+                    gp.extraList = await this.getListLocalities(gp.idDomain, gp.multipleSelection);
                     gp.extraListDefaults = await this.getListLocalitiesDefaults(gp);
                     const defaultsLocalities = gp.defaults as number[];
                     if (defaultsLocalities && defaultsLocalities.length === 1) {
@@ -917,8 +916,9 @@ export class WorkpackModelComponent implements OnInit {
   async propertyChanged(event) {
     if (event?.property && event.property?.idDomain && this.editPermission) {
       // Domain selection changed
+     
       if (!!event.domainChanged || !!event.multipleSelectedChanged) {
-        event.property.extraList = await this.getListLocalities(event.property?.idDomain);
+        event.property.extraList = await this.getListLocalities(event.property?.idDomain, event.property?.multipleSelection);
         event.property.extraListDefaults = await this.getListLocalitiesDefaults(event.property);
         event.property.selectedLocalities = this.translateSrv.instant('selectDefaultValue');
         event.property.showIconButtonSelectLocality = true;
@@ -931,9 +931,10 @@ export class WorkpackModelComponent implements OnInit {
         }
         if (event.property.multipleSelection) {
           const selectedLocality = event.property.extraListDefaults as TreeNode[];
-          event.property.defaults = selectedLocality.map(l => l.data);
+          event.property.defaults = selectedLocality.filter(local => local.data && !local.data.toString().includes('SELECTALL')).map(l => l.data);
           if (selectedLocality.length > 1) {
-            event.property.selectedLocalities = `${selectedLocality.length} ${this.translateSrv.instant('selectedsLocalities')}`;
+            event.property.selectedLocalities =
+              `${selectedLocality.filter(local => local.data && !local.data.toString().includes('SELECTALL')).length} ${this.translateSrv.instant('selectedsLocalities')}`;
             event.property.showIconButtonSelectLocality = false;
           } else {
             event.property.selectedLocalities = selectedLocality.length > 0 ?
@@ -1079,19 +1080,14 @@ export class WorkpackModelComponent implements OnInit {
     return this.listMeasureUnits;
   }
 
-  async getListLocalities(idDomain: number) {
-    // const result = await this.localitySrv.GetAll({ 'id-domain': idDomain });
-    // if (result.success) {
-    //   this.listLocalities = result.data.map(d => ({ label: d.name, value: d.id }));
-    // }
-    // return this.listLocalities;
+  async getListLocalities(idDomain: number, multipleSelection: boolean) {
     const localityList = await this.loadDomainLocalities(idDomain);
     const selectable = this.editPermission;
     const localityRoot = localityList[0];
     const rootNode: TreeNode = {
       label: localityRoot.name,
       data: localityRoot.id,
-      children: this.loadLocality(localityRoot.children, selectable),
+      children: this.loadLocality(localityRoot.children, selectable, multipleSelection),
       selectable
     };
     return [rootNode];
@@ -1109,7 +1105,6 @@ export class WorkpackModelComponent implements OnInit {
 
   loadSelectedLocality(seletectedIds: number[], list: TreeNode[]) {
     let result = [];
-    list.sort((a, b) => a.label < b.label ? -1 : a.label > b.label ? 1 : 0);
     list.forEach(l => {
       if (seletectedIds.includes(l.data)) {
         result.push(l);
@@ -1122,21 +1117,23 @@ export class WorkpackModelComponent implements OnInit {
     return result;
   }
 
-  loadLocality(localityList: ILocalityList[], selectable: boolean) {
+  loadLocality(localityList: ILocalityList[], selectable: boolean, multipleSelection: boolean) {
     const list: TreeNode[] = localityList?.map(locality => {
       if (locality.children) {
         return {
           label: locality.name,
           data: locality.id,
-          children: this.loadLocality(locality.children, selectable),
+          children: this.loadLocality(locality.children, selectable, multipleSelection),
           selectable,
         };
       }
       return {label: locality.name, data: locality.id, selectable};
     });
-    if (selectable) {
+    list.sort( (a,b) => a.label < b.label ? -1 : 0)
+    if (selectable && multipleSelection) {
       this.addSelectAllNode(list, localityList, selectable);
     }
+    
     return list;
   }
 
@@ -1146,6 +1143,7 @@ export class WorkpackModelComponent implements OnInit {
       key: 'SELECTALL' + localityList[0]?.id,
       selectable,
       styleClass: 'green-node',
+      data: 'SELECTALL' + localityList[0]?.id,
     });
   }
 
@@ -1491,18 +1489,6 @@ export class WorkpackModelComponent implements OnInit {
     if (this.idWorkpackModel) {
       await this.loadReusableWorkpackModels();
     }
-    // let hasParentProject = false;
-    // if (this.idWorkpackModel) {
-    //   const { success, data } = await this.workpackModelSrv.hasParentProject(this.idWorkpackModel);
-    //   if (success) {
-    //     hasParentProject = data;
-    //   } else {
-    //     this.messageSrv.add({
-    //       severity: 'error',
-    //       detail: this.translateSrv.instant('messages.error.couldNotCheckParentProject')
-    //     });
-    //   }
-    // }
     const itemsModels: ICardItem[] = this.editPermission
       ? [{
         typeCardItem: 'newCardItemModel',
@@ -1668,7 +1654,7 @@ export class WorkpackModelComponent implements OnInit {
             p.defaultValue = (p.defaultValue as string).split(',');
           }
           if (p.idDomain) {
-            p.extraList = await this.getListLocalities(p.idDomain);
+            p.extraList = await this.getListLocalities(p.idDomain, p.multipleSelection);
             p.extraListDefaults = await this.getListLocalitiesDefaults(p);
             const defaultsLocalities = p.defaults as number[];
             if (defaultsLocalities && defaultsLocalities.length === 1) {

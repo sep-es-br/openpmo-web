@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, EventEmitter, Input, OnDestroy, Output, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, EventEmitter, Input, OnDestroy, Output, ViewChild, SimpleChanges } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -36,7 +36,7 @@ export class WorkpackModelPropertyComponent implements OnDestroy, AfterViewInit 
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(responsive => this.responsive = responsive);
     const today = moment();
     const yearStart = today.year();
-    this.yearRange = (yearStart-1).toString() + ':'+ (yearStart+15).toString();
+    this.yearRange = (yearStart - 1).toString() + ':' + (yearStart + 15).toString();
   }
 
   ngAfterViewInit(): void {
@@ -51,18 +51,24 @@ export class WorkpackModelPropertyComponent implements OnDestroy, AfterViewInit 
     }
   }
 
+  ngOnChanges(changes: SimpleChanges): void {
+    if (this.property?.extraList && this.property?.multipleSelection) {
+      this.selectedSelectAllIfChildrenAllSelecteds(this.property.extraList[0]);
+    }
+  }
+
   ngOnDestroy(): void {
     this.$destroy.next();
     this.$destroy.complete();
   }
 
   checkDefaultValue() {
-    if ([ TypePropertyWorkpackModelEnum.LocalitySelectionModel, TypePropertyWorkpackModelEnum.OrganizationSelectionModel ]
+    if ([TypePropertyWorkpackModelEnum.LocalitySelectionModel, TypePropertyWorkpackModelEnum.OrganizationSelectionModel]
       .includes(TypePropertyWorkpackModelEnum[this.property.type])) {
       if (this.property?.defaults) {
         const isArray = this.property?.defaults instanceof Array;
         if (this.property.multipleSelection && !isArray) {
-          this.property.defaults = [ this.property.defaults as any ];
+          this.property.defaults = [this.property.defaults as any];
         }
         if (!this.property.multipleSelection && isArray) {
           this.property.defaults = (this.property.defaults as any[]).shift();
@@ -73,7 +79,7 @@ export class WorkpackModelPropertyComponent implements OnDestroy, AfterViewInit 
     } else {
       const isArray = this.property?.defaultValue instanceof Array;
       if (this.property.multipleSelection && !isArray) {
-        this.property.defaultValue = this.property.defaultValue ? [ this.property.defaultValue as any ] : [];
+        this.property.defaultValue = this.property.defaultValue ? [this.property.defaultValue as any] : [];
       }
       if (!this.property.multipleSelection && isArray) {
         this.property.defaultValue = (this.property.defaultValue as any[]).shift();
@@ -98,14 +104,20 @@ export class WorkpackModelPropertyComponent implements OnDestroy, AfterViewInit 
     this.property.isCollapsed = collapsed;
   }
 
-  handleNodeSelect(event) {
-    this.selectedOrUnselectAllChildren(event.node, true);
-    this.changed.emit(event);
+  handleNodeSelect(event, property) {
+    if (this.property.multipleSelection) {
+      this.selectedOrUnselectAllChildren(event.node, true);
+    }
+    this.changed.emit({property});
+    
   }
 
-  handleNodeUnselect(event) {
-    this.selectedOrUnselectAllChildren(event.node, false);
-    this.changed.emit(event);
+  handleNodeUnselect(event, property) {
+    if (this.property.multipleSelection) {
+      this.selectedOrUnselectAllChildren(event.node, false);
+    }
+    this.changed.emit({property});
+    
   }
 
   selectedSelectAllIfChildrenAllSelecteds(node: TreeNode) {
@@ -123,7 +135,7 @@ export class WorkpackModelPropertyComponent implements OnDestroy, AfterViewInit 
   }
 
   verifyAllChildrenSelected(node: TreeNode) {
-    return node.children?.every(child => this.nodeIsSelecteAll(child) ?
+    return node && node.children?.every(child => this.nodeIsSelecteAll(child) ?
       true :
       (this.property?.extraListDefaults as TreeNode[])?.includes(child));
   }
@@ -136,24 +148,32 @@ export class WorkpackModelPropertyComponent implements OnDestroy, AfterViewInit 
     if (this.nodeIsSelecteAll(node)) {
       if (node.parent) {
         node.parent.children.forEach((child: TreeNode) =>
-          selected ? this.selectedNode(child) : this.unselectNode(child));
+          selected ? this.selectedNode(child, selected) : this.unselectNode(child, selected));
       }
     }
   }
 
-  selectedNode(node: TreeNode) {
+  selectedNode(node: TreeNode, selected: boolean) {
     const localitiesSelected = this.property.extraListDefaults as TreeNode[];
     const nodeIsSelected = localitiesSelected.find(locality => locality.data === node.data);
-    if (!nodeIsSelected && !this.nodeIsSelecteAll(node)) {
+    if (!nodeIsSelected) {
       localitiesSelected.push(node);
+      if (node.children) {
+        node.children.forEach((child: TreeNode) =>
+          selected ? this.selectedNode(child, selected) : this.unselectNode(child, selected));
+      }
     }
   }
 
-  unselectNode(node: TreeNode) {
+  unselectNode(node: TreeNode, selected: boolean) {
     const localitiesSelected = this.property.extraListDefaults as TreeNode[];
     const indexNodeSelected = localitiesSelected.findIndex(locality => locality.data === node.data);
-    if (indexNodeSelected >= 0 && !this.nodeIsSelecteAll(node)) {
+    if (indexNodeSelected >= 0) {
       localitiesSelected.splice(indexNodeSelected, 1);
+      if (node.children) {
+        node.children.forEach((child: TreeNode) =>
+          selected ? this.selectedNode(child, selected) : this.unselectNode(child, selected));
+      }
     }
   }
 

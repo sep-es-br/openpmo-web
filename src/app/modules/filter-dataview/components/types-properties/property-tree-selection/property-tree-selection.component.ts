@@ -2,7 +2,7 @@ import { TreeNode } from 'primeng/api';
 import { IFilterProperty } from 'src/app/shared/interfaces/IFilterProperty';
 import { takeUntil } from 'rxjs/operators';
 import { TranslateService } from '@ngx-translate/core';
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, SimpleChanges } from '@angular/core';
 import { PropertyTemplateModel } from 'src/app/shared/models/PropertyTemplateModel';
 import { ResponsiveService } from 'src/app/shared/services/responsive.service';
 import { Subject } from 'rxjs';
@@ -30,16 +30,23 @@ export class PropertyTreeSelectionComponent implements OnInit, OnDestroy {
       this.responsive = value;
     });
     this.translateSrv.onLangChange.pipe(takeUntil(this.$destroy)).subscribe(() =>
-      setTimeout(() =>
-      {
+      setTimeout(() => {
         this.setLabelButton();
       }, 150)
     );
   }
 
   ngOnInit(): void {
-    this.setLabelButton();
-    this.selectedSelectAllIfChildrenAllSelecteds(this.property.localityList[0] as TreeNode);
+
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    if ((changes.property && changes.property.currentValue) || (changes.value && changes.value.currentValue)) {
+      this.setLabelButton();
+      if (this.property.multipleSelection) {
+        this.selectedSelectAllIfChildrenAllSelecteds(this.property.localityList[0] as TreeNode);
+      }
+    }
   }
 
   ngOnDestroy(): void {
@@ -48,36 +55,45 @@ export class PropertyTreeSelectionComponent implements OnInit, OnDestroy {
   }
 
   setLabelButton(event?) {
-    if (Array.isArray(this.value)) {
-      if (this.value && this.value.length === 1 ){
-        const selecteds = this.value as TreeNode[];
-        this.labelButtonLocalitySelected = selecteds[0].label;
-        this.showIconButton = false;
-      }
-      if (this.value && this.value.length > 1 ){
-        this.labelButtonLocalitySelected = `${this.value.filter(v => v.data)?.length} ${this.translateSrv.instant('selectedsLocalities')}`;
-        this.showIconButton = false;
-      }
-      if (!this.value || (this.value && this.value.length === 0) ){
-        this.labelButtonLocalitySelected = this.translateSrv.instant('select');
-        this.showIconButton = true;
-      }
+    if (!this.value) {
+      this.labelButtonLocalitySelected = this.translateSrv.instant('select');
+      this.showIconButton = true;
     } else {
-      const selected = this.value as TreeNode;
-      this.labelButtonLocalitySelected = selected?.label;
-      this.showIconButton = false;
+      if (Array.isArray(this.value)) {
+        if (this.value && this.value.length === 1) {
+          const selecteds = this.value as TreeNode[];
+          this.labelButtonLocalitySelected = selecteds[0].label;
+          this.showIconButton = false;
+        }
+        if (this.value && this.value.length > 1) {
+          this.labelButtonLocalitySelected = `${this.value.filter(v => v.data && !v.data.toString().includes('SELECTALL'))?.length} ${this.translateSrv.instant('selectedsLocalities')}`;
+          this.showIconButton = false;
+        }
+        if (this.value.length === 0) {
+          this.labelButtonLocalitySelected = this.translateSrv.instant('select');
+          this.showIconButton = true;
+        }
+      } else {
+        const selected = this.value as TreeNode;
+        this.labelButtonLocalitySelected = selected?.label;
+        this.showIconButton = false;
+      }
     }
   }
 
   handleNodeSelect(event) {
-    this.selectedOrUnselectAllChildren(event.node, true);
-    this.changed.emit({value: this.value});
+    if (this.property.multipleSelection) {
+      this.selectedOrUnselectAllChildren(event.node, true);
+    }
+    this.changed.emit({ value: this.value });
     this.setLabelButton(event);
   }
 
   handleNodeUnselect(event) {
-    this.selectedOrUnselectAllChildren(event.node, false);
-    this.changed.emit({value: this.value});
+    if (this.property.multipleSelection) {
+      this.selectedOrUnselectAllChildren(event.node, false);
+    }
+    this.changed.emit({ value: this.value });
     this.setLabelButton(event);
   }
 
@@ -109,24 +125,32 @@ export class PropertyTreeSelectionComponent implements OnInit, OnDestroy {
     if (this.nodeIsSelecteAll(node)) {
       if (node.parent) {
         node.parent.children.forEach((child: TreeNode) =>
-          selected ? this.selectedNode(child) : this.unselectNode(child));
+          selected ? this.selectedNode(child, selected) : this.unselectNode(child, selected));
       }
     }
   }
 
-  selectedNode(node: TreeNode) {
+  selectedNode(node: TreeNode, selected: boolean) {
     const localitiesSelected = this.value as TreeNode[];
     const nodeIsSelected = localitiesSelected.find(locality => locality.data === node.data);
-    if (!nodeIsSelected && !this.nodeIsSelecteAll(node)) {
+    if (!nodeIsSelected) {
       localitiesSelected.push(node);
+      if (node.children) {
+        node.children.forEach((child: TreeNode) =>
+          selected ? this.selectedNode(child, selected) : this.unselectNode(child, selected));
+      }
     }
   }
 
-  unselectNode(node: TreeNode) {
+  unselectNode(node: TreeNode, selected: boolean) {
     const localitiesSelected = this.value as TreeNode[];
     const indexNodeSelected = localitiesSelected.findIndex(locality => locality.data === node.data);
-    if (indexNodeSelected >= 0 && !this.nodeIsSelecteAll(node)) {
+    if (indexNodeSelected >= 0) {
       localitiesSelected.splice(indexNodeSelected, 1);
+      if (node.children) {
+        node.children.forEach((child: TreeNode) =>
+          selected ? this.selectedNode(child, selected) : this.unselectNode(child, selected));
+      }
     }
   }
 

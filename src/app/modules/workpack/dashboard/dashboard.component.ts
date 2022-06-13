@@ -152,13 +152,26 @@ export class DashboardComponent implements OnInit, OnChanges, OnDestroy {
           { 'id-workpack': this.idWorkpack, 'date-reference': referenceMonth, 'id-baseline': this.selectedBaseline });
       if (success) {
         this.dashboard = data;
+        this.validateDashboard();
       }
     } else {
       const { data, success } = await this.dashboardSrv.GetDashboardByWorkpack(
         { 'id-workpack': this.idWorkpack, 'date-reference': this.referenceMonth, 'id-baseline': this.selectedBaseline });
       if (success) {
         this.dashboard = data;
+        this.validateDashboard();
       }
+    }
+  }
+
+  validateDashboard() {
+    if (this.dashboard && (!this.dashboard.earnedValueAnalysis || this.dashboard.earnedValueAnalysis === null)
+    && (!this.dashboard.milestone || this.dashboard.milestone.quantity === 0)
+    && (!this.dashboard.risk || this.dashboard.risk.total === 0)
+    && (!this.dashboard.stakeholders || this.dashboard.stakeholders.length === 0)
+    && (!this.dashboard.tripleConstraint || this.dashboard.tripleConstraint === null)
+    && (!this.dashboard.workpacksByModel || this.dashboard.workpacksByModel.length === 0)) {
+      this.dashboard = undefined;
     }
   }
 

@@ -4,6 +4,10 @@
   display: inline-flex;
   width: auto;
   background-color: transparent;
+  .app-tree-selection {
+    max-height: 400px;
+    overflow-y: scroll;
+  }
 
   .workpack-model-property-header {
     display: flex;

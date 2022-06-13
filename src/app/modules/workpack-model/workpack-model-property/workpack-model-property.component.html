@@ -139,15 +139,15 @@
               <div class="app-tree-selection">
                 <p-tree [value]="property.extraList" selectionMode="checkbox"
                   [propagateSelectionUp]="false" [propagateSelectionDown]="false"
-                  [(selection)]="property.extraListDefaults" (onNodeSelect)="handleNodeSelect($event)"
-                  (onNodeUnselect)="handleNodeUnselect($event)"></p-tree>
+                  [(selection)]="property.extraListDefaults" (onNodeSelect)="handleNodeSelect($event, property)"
+                  (onNodeUnselect)="handleNodeUnselect($event, property)"></p-tree>
               </div>
             </ng-container>
             <ng-template #singleLocalitySelection>
               <div class="app-tree-selection">
                 <p-tree [value]="property.extraList" selectionMode="single" [(selection)]="property.extraListDefaults"
-                   (onNodeSelect)="handleNodeSelect($event)"
-                  (onNodeUnselect)="handleNodeUnselect($event)"></p-tree>
+                   (onNodeSelect)="handleNodeSelect($event, property)"
+                  (onNodeUnselect)="handleNodeUnselect($event, property)"></p-tree>
               </div>
             </ng-template>
           </ng-template>

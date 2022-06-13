@@ -338,7 +338,7 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
         }
         if (property.multipleSelection) {
           const selectedLocality = propValue as TreeNode[];
-          value = selectedLocality.filter(l => l.data).map(l => l.data).join(',');
+          value = selectedLocality.filter(l => l.data && !l.data.toString().includes('SELECTALL')).map(l => l.data).join(',');
         }
         break;
       case TypePropertyModelEnum.CurrencyModel:
@@ -476,11 +476,11 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
     if (this.typePropertyModel[propertyModel.type] === TypePropertyModelEnum.LocalitySelectionModel) {
       const domain = await this.loadDomain(propertyModel.idDomain);
       const localityList = await this.loadDomainLocalities(domain.id);
-      const selectable = property.multipleSelection;
+      const selectable = true;
       const rootNode: TreeNode = {
         label: domain.localityRoot.name,
         data: domain.localityRoot.id,
-        children: this.loadLocality(localityList[0].children, selectable),
+        children: this.loadLocality(localityList[0].children, selectable, property.multipleSelection),
         selectable
       };
       property.idDomain = propertyModel.idDomain;
@@ -522,19 +522,20 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
     return null;
   }
 
-  loadLocality(localityList: ILocalityList[], selectable: boolean) {
+  loadLocality(localityList: ILocalityList[], selectable: boolean, multipleSelection: boolean) {
     const list: TreeNode[] = localityList?.map(locality => {
       if (locality.children) {
         return {
           label: locality.name,
           data: locality.id,
-          children: this.loadLocality(locality.children, selectable),
+          children: this.loadLocality(locality.children, selectable, multipleSelection),
           selectable,
         };
       }
       return { label: locality.name, data: locality.id, selectable };
     });
-    if (selectable) {
+    list.sort( (a,b) => a.label < b.label ? -1 : 0)
+    if (multipleSelection) {
       this.addSelectAllNode(list, localityList, selectable);
     }
     return list;
@@ -546,6 +547,7 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
       key: 'SELECTALL' + localityList[0]?.id,
       selectable,
       styleClass: 'green-node',
+      data: 'SELECTALL' + localityList[0]?.id,
     });
   }
 

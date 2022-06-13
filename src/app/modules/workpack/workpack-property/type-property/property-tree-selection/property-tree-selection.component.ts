@@ -51,7 +51,7 @@ export class PropertyTreeSelectionComponent implements OnDestroy, OnChanges {
       }
       if (this.property.localitiesSelected && this.property.localitiesSelected.length > 1) {
         this.property.labelButtonLocalitySelected =
-          `${this.property.localitiesSelected.filter(l => l.data).length} ${this.translateSrv.instant('selectedsLocalities')}`;
+          `${this.property.localitiesSelected.filter(l => !l.data.toString().includes('SELECTALL')).length} ${this.translateSrv.instant('selectedsLocalities')}`;
         this.property.showIconButton = false;
       }
       if (!this.property.localitiesSelected || (this.property.localitiesSelected && this.property.localitiesSelected.length === 0)) {
@@ -65,13 +65,17 @@ export class PropertyTreeSelectionComponent implements OnDestroy, OnChanges {
   }
 
   handleNodeSelect(event) {
-    this.selectedOrUnselectAllChildren(event.node, true);
+    if (this.property.multipleSelection) {
+      this.selectedOrUnselectAllChildren(event.node, true);
+    }
     this.changed.emit(event);
     this.setLabelButton(event);
   }
 
   handleNodeUnselect(event) {
-    this.selectedOrUnselectAllChildren(event.node, false);
+    if (this.property.multipleSelection) {
+      this.selectedOrUnselectAllChildren(event.node, false);
+    }
     this.changed.emit(event);
     this.setLabelButton(event);
   }
@@ -101,27 +105,36 @@ export class PropertyTreeSelectionComponent implements OnDestroy, OnChanges {
   }
 
   selectedOrUnselectAllChildren(node: TreeNode, selected: boolean) {
+    debugger;
     if (this.nodeIsSelecteAll(node)) {
       if (node.parent) {
         node.parent.children.forEach((child: TreeNode) =>
-          selected ? this.selectedNode(child) : this.unselectNode(child));
+          selected ? this.selectedNode(child, selected) : this.unselectNode(child, selected));
       }
     }
   }
 
-  selectedNode(node: TreeNode) {
+  selectedNode(node: TreeNode, selected: boolean) {
     const localitiesSelected = this.property.localitiesSelected as TreeNode[];
     const nodeIsSelected = localitiesSelected.find(locality => locality.data === node.data);
-    if (!nodeIsSelected && !this.nodeIsSelecteAll(node)) {
+    if (!nodeIsSelected) {
       localitiesSelected.push(node);
+      if (node.children) {
+        node.children.forEach((child: TreeNode) =>
+        selected ? this.selectedNode(child, selected) : this.unselectNode(child, selected));
+      }
     }
   }
 
-  unselectNode(node: TreeNode) {
+  unselectNode(node: TreeNode, selected: boolean) {
     const localitiesSelected = this.property.localitiesSelected as TreeNode[];
     const indexNodeSelected = localitiesSelected.findIndex(locality => locality.data === node.data);
-    if (indexNodeSelected >= 0 && !this.nodeIsSelecteAll(node)) {
+    if (indexNodeSelected >= 0) {
       localitiesSelected.splice(indexNodeSelected, 1);
+      if (node.children) {
+        node.children.forEach((child: TreeNode) =>
+        selected ? this.selectedNode(child, selected) : this.unselectNode(child, selected));
+      }
     }
   }
 

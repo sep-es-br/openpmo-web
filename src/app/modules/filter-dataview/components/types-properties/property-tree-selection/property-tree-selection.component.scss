@@ -6,6 +6,10 @@
   label {
     font-size: 0.8rem;
   }
+  .app-tree-selection {
+    max-height: 400px;
+    overflow-y: scroll;
+  }
   .app-tree-selection.single-selection {
     .p-tree-container .p-treenode .p-treenode-content.p-highlight {
       background: transparent;
