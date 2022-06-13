@@ -1,23 +1,22 @@
-import { IFilterProperty } from 'src/app/shared/interfaces/IFilterProperty';
-import { TranslateService } from '@ngx-translate/core';
-import { PropertyTemplateModel } from './../../../shared/models/PropertyTemplateModel';
-import { FilterDataviewPropertiesEntity } from 'src/app/shared/constants/filterDataviewPropertiesEntity';
-import { FilterDataviewService } from './../../../shared/services/filter-dataview.service';
-import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { MenuItem } from 'primeng/api';
+import {IFilterProperty} from 'src/app/shared/interfaces/IFilterProperty';
+import {TranslateService} from '@ngx-translate/core';
+import {FilterDataviewPropertiesEntity} from 'src/app/shared/constants/filterDataviewPropertiesEntity';
+import {FilterDataviewService} from '../../../shared/services/filter-dataview.service';
+import {Component, OnInit} from '@angular/core';
+import {ActivatedRoute, Router} from '@angular/router';
+import {MenuItem} from 'primeng/api';
 
-import { IconsEnum } from 'src/app/shared/enums/IconsEnum';
-import { ICard } from 'src/app/shared/interfaces/ICard';
-import { ICardItem } from 'src/app/shared/interfaces/ICardItem';
-import { IOffice } from 'src/app/shared/interfaces/IOffice';
-import { IOrganization } from 'src/app/shared/interfaces/IOrganization';
-import { AuthService } from 'src/app/shared/services/auth.service';
-import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
-import { OfficePermissionService } from 'src/app/shared/services/office-permission.service';
-import { OfficeService } from 'src/app/shared/services/office.service';
-import { OrganizationService } from 'src/app/shared/services/organization.service';
-import { ResponsiveService } from 'src/app/shared/services/responsive.service';
+import {IconsEnum} from 'src/app/shared/enums/IconsEnum';
+import {ICard} from 'src/app/shared/interfaces/ICard';
+import {ICardItem} from 'src/app/shared/interfaces/ICardItem';
+import {IOffice} from 'src/app/shared/interfaces/IOffice';
+import {IOrganization} from 'src/app/shared/interfaces/IOrganization';
+import {AuthService} from 'src/app/shared/services/auth.service';
+import {BreadcrumbService} from 'src/app/shared/services/breadcrumb.service';
+import {OfficePermissionService} from 'src/app/shared/services/office-permission.service';
+import {OfficeService} from 'src/app/shared/services/office.service';
+import {OrganizationService} from 'src/app/shared/services/organization.service';
+import {ResponsiveService} from 'src/app/shared/services/responsive.service';
 
 @Component({
   selector: 'app-organization-list',
@@ -65,7 +64,7 @@ export class OrganizationListComponent implements OnInit {
     this.isUserAdmin = await this.authSrv.isUserAdmin();
     this.editPermission = await this.officePermissionSrv.getPermissions(this.idOffice);
     if (! this.isUserAdmin && !this.editPermission) {
-      this.router.navigate(['/offices']);
+      await this.router.navigate(['/offices']);
     }
     await this.loadFiltersOrganizations();
     await this.loadPropertiesOrganizations();
@@ -134,11 +133,11 @@ export class OrganizationListComponent implements OnInit {
     }
     this.cardItemsProperties = itemsProperties;
     this.totalRecords = this.cardItemsProperties && this.cardItemsProperties.length;
-    this.cardProperties.showCreateNemElementButton = this.editPermission ? true : false;
+    this.cardProperties.showCreateNemElementButton = this.editPermission;
   }
 
-  handleCreateNewOrganization() {
-    this.router.navigate(['/organizations/organization'], {
+  async handleCreateNewOrganization() {
+    await this.router.navigate(['/organizations/organization'], {
       queryParams: {
         idOffice: this.idOffice
       }
@@ -163,13 +162,13 @@ export class OrganizationListComponent implements OnInit {
     this.cardProperties.showFilters = true;
   }
 
-  handleEditFilter(event) {
+  async handleEditFilter(event) {
     const idFilter = event.filter;
     if (idFilter) {
       const filterProperties = this.loadFilterPropertiesList();
       this.filterSrv.setFilterProperties(filterProperties);
       this.setBreadcrumbStorage();
-      this.router.navigate(['/filter-dataview'], {
+      await this.router.navigate(['/filter-dataview'], {
         queryParams: {
           id: idFilter,
           entityName: 'organizations'
@@ -179,16 +178,15 @@ export class OrganizationListComponent implements OnInit {
   }
 
   async handleSelectedFilter(event) {
-    const idFilter = event.filter;
-    this.idFilterSelected = idFilter;
+    this.idFilterSelected = event.filter;
     await this.loadPropertiesOrganizations();
   }
 
-  handleNewFilter() {
+  async handleNewFilter() {
     const filterProperties = this.loadFilterPropertiesList();
     this.filterSrv.setFilterProperties(filterProperties);
     this.setBreadcrumbStorage();
-    this.router.navigate(['/filter-dataview'], {
+    await this.router.navigate(['/filter-dataview'], {
       queryParams: {
         entityName: 'organizations'
       }
@@ -197,17 +195,16 @@ export class OrganizationListComponent implements OnInit {
 
   loadFilterPropertiesList() {
     const listProperties = FilterDataviewPropertiesEntity.organizations;
-    const filterPropertiesList = listProperties.map(prop => {
+    return listProperties.map(prop => {
       const property: IFilterProperty = {
         type: prop.type,
         label: prop.label,
         name: prop.apiValue,
         active: true,
         possibleValues: prop.possibleValues
-      }
+      };
       return property;
     });
-    return filterPropertiesList;
   }
 
   setBreadcrumbStorage() {

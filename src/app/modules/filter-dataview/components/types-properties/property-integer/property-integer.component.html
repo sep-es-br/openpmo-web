@@ -3,18 +3,18 @@
     <ng-container [ngSwitch]="property.type">
       <p-inputNumber *ngSwitchCase="type.IntegerModel" class="app-input-number" 
         [(ngModel)]="value" [required]="property.required"
-        [min]="property.min" [max]="property.max" (ngModelChange)="handleChangedValue()" 
+        [min]="property.min" [max]="property.max" (onInput)="handleChangedValue($event)" 
         >
       </p-inputNumber>
       <p-inputNumber *ngSwitchCase="type.NumberModel" class="app-input-number"
         [(ngModel)]="value" [required]="property.required" mode="decimal"
         [min]="property.min" [max]="property.max" [minFractionDigits]="property.decimals ? property.decimals : 0"
-        [maxFractionDigits]="property.decimals ? property.decimals : 0" (ngModelChange)="handleChangedValue()"
+        [maxFractionDigits]="property.decimals ? property.decimals : 0" (onInput)="handleChangedValue($event)"
         >
       </p-inputNumber>
       <p-inputNumber *ngSwitchCase="type.CurrencyModel" class="app-input-number"
         [(ngModel)]="value" [required]="property.required" mode="decimal"
-        [minFractionDigits]="2" [maxFractionDigits]="2" (ngModelChange)="handleChangedValue()"
+        [minFractionDigits]="2" [maxFractionDigits]="2" (onInput)="handleChangedValue($event)"
         >
       </p-inputNumber>
     </ng-container>

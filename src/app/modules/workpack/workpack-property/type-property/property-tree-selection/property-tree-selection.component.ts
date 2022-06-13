@@ -55,7 +55,7 @@ export class PropertyTreeSelectionComponent implements OnDestroy, OnChanges {
         this.property.showIconButton = false;
       }
       if (!this.property.localitiesSelected || (this.property.localitiesSelected && this.property.localitiesSelected.length === 0)) {
-        this.property.labelButtonLocalitySelected = this.translateSrv.instant('selectDefaultValue');
+        this.property.labelButtonLocalitySelected = this.translateSrv.instant('select');
         this.property.showIconButton = true;
       }
     } else {

@@ -13,13 +13,13 @@
     <div class="card-item-content p-fluid">
       <span class="p-float-label">
         <p-dropdown class="app-single-selection" [options]="filterRuleCard.propertiesList" optionLabel="label" [required]="true"
-          [autoDisplayFirst]="false" [class.responsive]="responsive" [(ngModel)]="filterRuleCard.propertySelected"
+          [autoDisplayFirst]="false" [class.responsive]="responsive" [(ngModel)]="filterRuleCard.propertySelected.label"
           (onChange)="handlePropertySelected($event)"></p-dropdown>
         <label class="app-input-label" for="float-name">{{ "property" | translate }} * </label>
       </span>
       <span class="p-float-label">
         <p-dropdown class="app-single-selection" [class.responsive]="responsive" [options]="operatorsList" [required]="true"
-          [autoDisplayFirst]="false" [(ngModel)]="filterRuleCard.operator" (onChange)="handleChangeRoleCard()"></p-dropdown>
+          [autoDisplayFirst]="false" [(ngModel)]="filterRuleCard.operator" (onChange)="handleChangeRoleCard($event)"></p-dropdown>
         <label class="app-input-label" for="float-name">{{ "operator" | translate }} * </label>
       </span>
       <app-filter-rule-property [property]="propertySelected" [value]="filterRuleCard.value" (changed)="handleSetPropertyValue($event)">

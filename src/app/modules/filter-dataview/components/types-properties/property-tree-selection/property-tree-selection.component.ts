@@ -59,7 +59,7 @@ export class PropertyTreeSelectionComponent implements OnInit, OnDestroy {
         this.showIconButton = false;
       }
       if (!this.value || (this.value && this.value.length === 0) ){
-        this.labelButtonLocalitySelected = this.translateSrv.instant('selectDefaultValue');
+        this.labelButtonLocalitySelected = this.translateSrv.instant('select');
         this.showIconButton = true;
       }
     } else {

@@ -115,12 +115,6 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
     } else {
       this.filterUrl = this.entityName;
     }
-    this.translateSrv.onDefaultLangChange.pipe(takeUntil(this.$destroy)).subscribe(({ lang }) => {
-      setTimeout(() => {
-        this.loadPropertiesListOptions();
-      }, 250);
-
-    });
   }
 
   async ngOnInit() {
@@ -152,8 +146,7 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.$destroy.next();
     this.$destroy.complete();
-    if (!!this.filterPropertiesSub)
-      {this.filterPropertiesSub.unsubscribe();}
+    if (!!this.filterPropertiesSub) { this.filterPropertiesSub.unsubscribe(); }
   }
 
   loadFormFilter() {
@@ -220,7 +213,7 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
           propertySelected,
           propertiesList: this.filterPropertiesList,
           operator: rule.operator,
-          value: (!this.idWorkpackModel || (!!this.idWorkpackModel && this.workpackModelEntitiesOptions.includes(this.entityName))) ? rule.value : this.setValueProperty(propertySelected, rule.value),
+          value: this.setValueProperty(propertySelected, rule.value),
           logicalOperator: rule.logicOperator,
           menuItems: [{
             label: this.translateSrv.instant('delete'),
@@ -287,7 +280,7 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
 
   validadeRulesCards() {
     const invalidCard = this.ruleCards.filter(card => card.typeCard !== 'new-card' &&
-      (!card.propertySelected || !card.propertySelected.name || !card.operator || !card.value));
+      (!card.propertySelected || !card.propertySelected.name || !card.operator || (card.propertySelected.type !== 'Toggle' && !card.value)));
     if (invalidCard && invalidCard.length > 0) {
       return false;
     }
@@ -357,6 +350,9 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
       case TypePropertyModelEnum.IntegerModel:
         value = propValue as number;
         break;
+      case TypePropertyModelEnum.ToggleModel:
+        value = propValue ? propValue : false;
+        break;
       default:
         value = propValue as string;
         break;
@@ -399,6 +395,9 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
       case TypePropertyModelEnum.IntegerModel:
         value = propertyValue as number;
         break;
+      case TypePropertyModelEnum.ToggleModel:
+        value = propertyValue ? (propertyValue === 'true' ? true : false) : false;
+        break;
       default:
         value = propertyValue as string;
         break;
@@ -427,7 +426,7 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
     dataProperties.forEach(prop => {
       const property: IFilterProperty = {
         type: prop.type,
-        label: prop.label,
+        label: this.translateSrv.instant(prop.label),
         name: prop.name,
         possibleValues: prop.possibleValues
       };

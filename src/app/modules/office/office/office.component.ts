@@ -176,7 +176,7 @@ export class OfficeComponent implements OnDestroy {
   async loadPlans() {
     this.loadPlanModelsOfficeList();
     await this.loadFiltersPlans();
-    const result = await this.planSrv.GetAll({ 'id-office': this.idOffice, idFilter: this.idFilterSelected });
+    const result = await this.planSrv.GetAll({ 'id-office': this.idOffice, 'idFilter': this.idFilterSelected });
     if (result.success) {
       this.plans = result.data;
     }
@@ -338,7 +338,11 @@ export class OfficeComponent implements OnDestroy {
   async handleSelectedFilter(event) {
     const idFilter = event.filter;
     this.idFilterSelected = idFilter;
-    await this.loadPlans();
+    const result = await this.planSrv.GetAll({ 'id-office': this.idOffice, idFilter: this.idFilterSelected });
+    if (result.success) {
+      this.plans = result.data;
+    }
+    this.loadCardItemsPlans();
   }
 
   handleNewFilter() {

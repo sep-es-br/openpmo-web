@@ -700,7 +700,7 @@ export class WorkpackComponent implements OnDestroy {
         property.showIconButton = false;
       }
       if (!defaultSelectedLocalities || (defaultSelectedLocalities && defaultSelectedLocalities.length === 0)) {
-        property.labelButtonLocalitySelected = this.translateSrv.instant('selectDefaultValue');
+        property.labelButtonLocalitySelected = this.translateSrv.instant('select');
         property.showIconButton = true;
       }
     }

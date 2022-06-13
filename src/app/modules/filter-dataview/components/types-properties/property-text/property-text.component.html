@@ -1,7 +1,7 @@
 <div class="app-property-text">
   <span class="p-float-label">
     <input class="app-input-text" [id]="property.name" name="name" [(ngModel)]="value" type="text" pInputText
-      [defaultValue]="property.defaultValue" (ngModelChange)="handleChangedValue()"
+      [defaultValue]="property.defaultValue" (input)="handleChangedValue()"
       />
     <label class="app-input-label" for="float-name">{{ "value" | translate }} * </label>
   </span>

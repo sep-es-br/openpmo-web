@@ -28,7 +28,8 @@ export class PropertyIntegerComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  handleChangedValue() {
+  handleChangedValue(event) {
+    this.value = event.value;
     this.changed.next({value: this.value})
   }
 }

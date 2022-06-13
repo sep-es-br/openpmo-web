@@ -91,7 +91,8 @@ export class FilterRuleCardItemComponent implements OnInit {
     this.logicalOperatorsOptions = Array.from(FilterDataviewLogicalOperators.map(op => ({ label: this.translateSrv.instant(op), value: op })));
   }
 
-  handleChangeRoleCard() {
+  handleChangeRoleCard(event) {
+    this.filterRuleCard.operator = event.value;
     if (this.validatedCard()) {
       this.ruleChanged.emit();
     }
@@ -176,7 +177,7 @@ export class FilterRuleCardItemComponent implements OnInit {
     if (!this.filterRuleCard.logicalOperator) {
       return false;
     }
-    if (!this.propertySelected || !this.filterRuleCard.value) {
+    if (!this.propertySelected || (this.propertySelected.type !== 'Toggle' && !this.filterRuleCard.value)) {
       return false;
     }
     return true;

@@ -4,7 +4,7 @@
       <p-multiSelect class="app-multiple-selection" dropdownIcon="fas fa-caret-down"
         [options]="property.possibleValuesIds" [id]="property.name"
         [(ngModel)]="value" maxSelectedLabels="1"
-        (ngModelChange)="handleChangedValue()">
+        (onChange)="handleChangedValue()">
       </p-multiSelect>
       <label class="app-input-label" for="float-label">{{'value'| translate}}</label>
     </span>
@@ -13,7 +13,7 @@
     <span class="p-float-label">
       <p-dropdown class="app-single-selection" [id]="property.name" [options]="property.possibleValuesIds"
         [autoDisplayFirst]="false" [class.ng-invalid]="property?.invalid" [(ngModel)]="value"
-        dropdownIcon="fas fa-caret-down" (ngModelChange)="handleChangedValue()">
+        dropdownIcon="fas fa-caret-down" (onChange)="handleChangedValue()">
       </p-dropdown>
       <label class="app-input-label" [for]="property.name">{{'value'| translate}}</label>
     </span>
