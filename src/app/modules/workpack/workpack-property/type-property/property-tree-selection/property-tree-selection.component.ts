@@ -97,7 +97,7 @@ export class PropertyTreeSelectionComponent implements OnDestroy, OnChanges {
   verifyAllChildrenSelected(node: TreeNode) {
     return node.children?.every(child => this.nodeIsSelecteAll(child) ?
       true :
-      (this.property?.localitiesSelected as TreeNode[])?.includes(child));
+      this.property?.localitiesSelected && (this.property?.localitiesSelected as TreeNode[])?.includes(child));
   }
 
   findSelectAllNodeFromParent(node: TreeNode) {
