@@ -1,5 +1,4 @@
-import { TypePropertyModelEnum } from '../enums/TypePropertyModelEnum';
-
+import { TypePropertyModelEnum } from './../enums/TypePropertyModelEnum';
 export const FilterDataviewPropertiesEntity = {
   offices: [
     { label: 'name', apiValue: 'name', type: TypePropertyModelEnum.TextModel },
@@ -30,7 +29,7 @@ export const FilterDataviewPropertiesEntity = {
   organizations: [
     {
       label: 'sector', apiValue: 'sector', type: TypePropertyModelEnum.SelectionModel,
-      possibleValues: [{ label: 'public', value: 'PUBLIC' }, { label: 'private', value: 'PRIVATE' }, { label: 'third', value: 'THIRD' }]
+      possibleValues: [{ label: 'public', value: 'public' }, { label: 'private', value: 'private' }, { label: 'third', value: 'third' }]
     },
     { label: 'businessName', apiValue: 'name', type: TypePropertyModelEnum.TextModel },
     { label: 'socialName', apiValue: 'fullName', type: TypePropertyModelEnum.TextModel },
@@ -48,7 +47,7 @@ export const FilterDataviewPropertiesEntity = {
     { label: 'fullName', apiValue: 'fullName', type: TypePropertyModelEnum.TextModel },
     {
       label: 'sector', apiValue: 'sector', type: TypePropertyModelEnum.SelectionModel,
-      possibleValues: [{ label: 'public', value: 'PUBLIC' }, { label: 'private', value: 'PRIVATE' }, { label: 'third', value: 'THIRD' }]
+      possibleValues: [{ label: 'public', value: 'public' }, { label: 'private', value: 'private' }, { label: 'third', value: 'third' }]
     },
     { label: 'address', apiValue: 'address', type: TypePropertyModelEnum.TextModel },
     { label: 'contactEmail', apiValue: 'contactEmail', type: TypePropertyModelEnum.TextModel },

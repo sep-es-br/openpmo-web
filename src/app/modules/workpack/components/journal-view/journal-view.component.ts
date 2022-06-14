@@ -1,21 +1,20 @@
-import { Component, ElementRef, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { TranslateService } from '@ngx-translate/core';
+import {Component, ElementRef, Input, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {FormBuilder, FormGroup} from '@angular/forms';
+import {TranslateService} from '@ngx-translate/core';
 import * as moment from 'moment';
-import { SelectItem, TreeNode } from 'primeng/api';
-import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
-import { iconsJournal } from 'src/app/shared/constants/iconsJournal';
-import { IconsEnum } from 'src/app/shared/enums/IconsEnum';
-import { StatusJournalEnum } from 'src/app/shared/enums/StatusJournalEnum';
-import { TypeJournalEnum } from 'src/app/shared/enums/TypeJournalEnum';
-import { ICard } from 'src/app/shared/interfaces/ICard';
-import { ITreeViewScopePlan, ITreeViewScopeWorkpack } from 'src/app/shared/interfaces/ITreeScopePersons';
-import { IWorkpack } from 'src/app/shared/interfaces/IWorkpack';
-import { IJournal } from 'src/app/shared/interfaces/Journal';
-import { JournalService } from 'src/app/shared/services/journal.service';
-import { OfficeService } from 'src/app/shared/services/office.service';
-import { ResponsiveService } from 'src/app/shared/services/responsive.service';
+import {SelectItem, TreeNode} from 'primeng/api';
+import {Subject} from 'rxjs';
+import {takeUntil} from 'rxjs/operators';
+import {iconsJournal} from 'src/app/shared/constants/iconsJournal';
+import {StatusJournalEnum} from 'src/app/shared/enums/StatusJournalEnum';
+import {TypeJournalEnum} from 'src/app/shared/enums/TypeJournalEnum';
+import {ICard} from 'src/app/shared/interfaces/ICard';
+import {ITreeViewScopePlan, ITreeViewScopeWorkpack} from 'src/app/shared/interfaces/ITreeScopePersons';
+import {IWorkpack} from 'src/app/shared/interfaces/IWorkpack';
+import {IJournal} from 'src/app/shared/interfaces/Journal';
+import {JournalService} from 'src/app/shared/services/journal.service';
+import {OfficeService} from 'src/app/shared/services/office.service';
+import {ResponsiveService} from 'src/app/shared/services/responsive.service';
 
 @Component({
   selector: 'app-journal-view',
@@ -56,7 +55,7 @@ export class JournalViewComponent implements OnInit, OnDestroy {
     private responsiveSrv: ResponsiveService,
     private translateSrv: TranslateService,
     private officeSrv: OfficeService,
-    private journaçSrv: JournalService,
+    private journalSrv: JournalService,
   ) {
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.responsive = value);
     this.calendarFormat = this.translateSrv.instant('dateFormat');
@@ -87,8 +86,11 @@ export class JournalViewComponent implements OnInit, OnDestroy {
 
   async loadJournalData() {
     const type = this.formSearch.controls.type.value;
-    const { data, success } = await this.journaçSrv.GetAll({
-      ...this.formSearch.value,
+    console.log(this.formSearch.value);
+    const {data, success} = await this.journalSrv.GetAll({
+      scopeName: this.formSearch.controls.scopeName.value,
+      from: this.getFrom(),
+      to: this.getTo(),
       type: this.formSearch.controls.type.value ? type.join(',') : null,
       scope: this.selectedWorkpacks.map(node => node.data).join(','),
       page: this.page,
@@ -103,7 +105,7 @@ export class JournalViewComponent implements OnInit, OnDestroy {
     this.journalData = this.journalData.map(journal => {
       journal.evidences = journal.evidences?.map(evidence => {
         const isImg = evidence.mimeType.includes('image');
-        let icon = '';
+        let icon: string;
         switch (evidence.mimeType) {
           case 'application/pdf':
             icon = 'far fa-file-pdf';
@@ -134,17 +136,13 @@ export class JournalViewComponent implements OnInit, OnDestroy {
     });
 
   }
-  println(event) {
-    console.log(event);
-  }
 
   async loadTreeViewScope() {
-    const { data, success } = await this.officeSrv.GetTreeScopePersons(this.workpack.plan.idOffice);
+    const {data, success} = await this.officeSrv.GetTreeScopePersons(this.workpack.plan.idOffice);
     if (success) {
       const treePlan = data.plans.find(plan => plan.id === this.workpack.plan.id);
       const treeWorkpackCurrent = this.findTreeWorkpack(this.workpack.id, treePlan) as any;
-      const treeNode = this.loadTreeNodeWorkpacks([{ ...treeWorkpackCurrent }]);
-      this.treeViewScope = treeNode;
+      this.treeViewScope = this.loadTreeNodeWorkpacks([{...treeWorkpackCurrent}]);
       this.selectedWorkpacks = this.setSelectedNodes(this.treeViewScope);
       const selected = this.selectedWorkpacks && this.selectedWorkpacks.length > 1 ?
         this.selectedWorkpacks.length + ' ' + this.translateSrv.instant('selectedItems') :
@@ -187,27 +185,33 @@ export class JournalViewComponent implements OnInit, OnDestroy {
 
 
   loadTreeNodeWorkpacks(treeWorkpacks: ITreeViewScopeWorkpack[], parent?: TreeNode): TreeNode[] {
-    if (treeWorkpacks) {
-      const listTreeNode = treeWorkpacks.map(worckpack => {
-        if (worckpack.children) {
-          const node = {
-            label: worckpack.name,
-            icon: worckpack.icon,
-            data: worckpack.id,
-            children: undefined,
-            parent,
-            selectable: true,
-            type: 'workpack',
-            expanded: true
-          };
-          node.children = this.loadTreeNodeWorkpacks(worckpack.children, node);
-          return node;
-        }
-        return { label: worckpack.name, data: worckpack.id, children: undefined, parent, icon: worckpack.icon, selectable: true };
-      });
-      return listTreeNode;
+    if (!treeWorkpacks) {
+      return [];
     }
-    return [];
+    return treeWorkpacks.map(worckpack => {
+      if (worckpack.children) {
+        const node = {
+          label: worckpack.name,
+          icon: worckpack.icon,
+          data: worckpack.id,
+          children: undefined,
+          parent,
+          selectable: true,
+          type: 'workpack',
+          expanded: true
+        };
+        node.children = this.loadTreeNodeWorkpacks(worckpack.children, node);
+        return node;
+      }
+      return {
+        label: worckpack.name,
+        data: worckpack.id,
+        children: undefined,
+        parent,
+        icon: worckpack.icon,
+        selectable: true
+      };
+    });
   }
 
   handleDownload(dataurl: string, filename: string) {
@@ -222,7 +226,7 @@ export class JournalViewComponent implements OnInit, OnDestroy {
       .catch(console.error);
   }
 
-  async handleHideOverlayScope(event?) {
+  async handleHideOverlayScope(_event?) {
     const selected = this.selectedWorkpacks && this.selectedWorkpacks.length > 1 ?
       this.selectedWorkpacks.length + ' ' + this.translateSrv.instant('selectedItems') :
       this.selectedWorkpacks[0].label;
@@ -230,12 +234,12 @@ export class JournalViewComponent implements OnInit, OnDestroy {
     await this.handleFilter();
   }
 
-  async handleFilter(event?) {
+  async handleFilter(_event?) {
     this.clearPaginate();
     await this.loadJournalData();
   }
 
-  async handleViewMore(event) {
+  async handleViewMore(_event) {
     this.page++;
     await this.loadJournalData();
   }
@@ -251,6 +255,22 @@ export class JournalViewComponent implements OnInit, OnDestroy {
     this.page = 0;
     this.pageSize = 5;
     this.journalData = [];
+  }
+
+  private getFrom() {
+    const from = this.formSearch.controls.from.value;
+    if (from) {
+      return moment(from).format('DD/MM/YYYY');
+    }
+    return null;
+  }
+
+  private getTo() {
+    const to = this.formSearch.controls.to.value;
+    if (to) {
+      return moment(to).format('DD/MM/YYYY');
+    }
+    return null;
   }
 
 }

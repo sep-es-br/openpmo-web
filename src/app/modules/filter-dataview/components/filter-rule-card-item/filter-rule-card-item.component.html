@@ -13,7 +13,7 @@
     <div class="card-item-content p-fluid">
       <span class="p-float-label">
         <p-dropdown class="app-single-selection" [options]="filterRuleCard.propertiesList" optionLabel="label" [required]="true"
-          [autoDisplayFirst]="false" [class.responsive]="responsive" [(ngModel)]="filterRuleCard.propertySelected.label"
+          [autoDisplayFirst]="false" [class.responsive]="responsive" [(ngModel)]="filterRuleCard.propertySelected"
           (onChange)="handlePropertySelected($event)"></p-dropdown>
         <label class="app-input-label" for="float-name">{{ "property" | translate }} * </label>
       </span>

@@ -70,7 +70,6 @@ interface ISectionWorkpacks {
   cardSection: ICard;
   cardItemsSection?: IWorkpackCardItem[];
   workpackShowCancelleds?: boolean;
-  hasCancelleds?: boolean;
 }
 
 interface IScheduleSection {
@@ -1095,12 +1094,12 @@ export class WorkpackComponent implements OnDestroy {
       return {
         idWorkpackModel: workpackModel.id,
         cardSection: propertiesCard,
-        cardItemsSection: workPackItemCardList
+        cardItemsSection: workPackItemCardList,
+        workpackShowCancelleds: this.workpack.canceled ? true : false
       };
     }));
     this.cardsWorkPackModelChildren.forEach((workpackModel, i) => {
       this.totalRecordsWorkpacks[i] = workpackModel.cardItemsSection ? workpackModel.cardItemsSection.length + 1 : 1;
-      workpackModel.hasCancelleds = workpackModel.cardItemsSection && workpackModel.cardItemsSection.filter( wp => !!wp.canceled ).length > 0
     });
   }
 
@@ -1113,7 +1112,7 @@ export class WorkpackComponent implements OnDestroy {
       idFilter: idFilterSelected
     });
     let workpacks = result.success && result.data;
-    if (!showCancelled && workpacks) {
+    if (!showCancelled && workpacks && !this.workpack.canceled) {
       workpacks = workpacks.filter( wp => !wp.canceled );
     }
     if (workpacks && workpacks.length > 0) {
@@ -1123,7 +1122,7 @@ export class WorkpackComponent implements OnDestroy {
         const propertyFullnameWorkpackModel = workpack.model?.properties?.find(p => p.name === 'fullName' && p.session === 'PROPERTIES');
         const propertyFullnameWorkpack = workpack.properties?.find(p => p.idPropertyModel === propertyFullnameWorkpackModel.id);
         const menuItems: MenuItem[] = [];
-        if (workpack.canceled) {
+        if (workpack.canceled && workpack.type !== 'Project') {
           menuItems.push({
             label: this.translateSrv.instant('restore'),
             icon: 'fas fa-redo-alt',
@@ -1530,7 +1529,8 @@ export class WorkpackComponent implements OnDestroy {
       return {
         idWorkpackModel: workpackModel.idWorkpackModelLinked,
         cardSection: propertiesCard,
-        cardItemsSection: workPackItemCardList
+        cardItemsSection: workPackItemCardList,
+        workpackShowCancelleds: this.workpack.canceled ? true : false
       };
     }));
     this.cardsWorkPackModelChildren.forEach((workpackModel, i) => {
