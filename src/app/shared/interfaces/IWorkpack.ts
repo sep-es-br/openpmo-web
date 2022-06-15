@@ -73,6 +73,7 @@ export interface IWorkpack {
     canceled?: boolean;
     cancelable?: boolean;
     completed?: boolean;
+    canDeleted?: boolean;
     endManagementDate?: string;
     reason?: string;
     dashboard?: {

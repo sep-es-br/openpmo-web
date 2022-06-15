@@ -19,7 +19,7 @@ import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {ActivatedRoute, Router} from '@angular/router';
 import {Calendar} from 'primeng/calendar';
 import {SaveButtonComponent} from '../../../../shared/components/save-button/save-button.component';
-import {Component, OnInit, ViewChild, ViewChildren} from '@angular/core';
+import {Component, OnDestroy, OnInit, ViewChild, ViewChildren} from '@angular/core';
 import {Subject} from 'rxjs';
 import * as moment from 'moment';
 
@@ -28,7 +28,7 @@ import * as moment from 'moment';
   templateUrl: './risk.component.html',
   styleUrls: ['./risk.component.scss']
 })
-export class RiskComponent implements OnInit {
+export class RiskComponent implements OnInit, OnDestroy {
 
   @ViewChild(SaveButtonComponent) saveButton: SaveButtonComponent;
   @ViewChildren(Calendar) calendarComponents: Calendar[];
@@ -175,7 +175,7 @@ export class RiskComponent implements OnInit {
     const date = moment();
     const rangeYearStart = date.year();
     const rangeYearEnd = date.add(10, 'years').year();
-    this.yearRangeCalculated = `${rangeYearStart}:${rangeYearEnd};`
+    this.yearRangeCalculated = `${rangeYearStart}:${rangeYearEnd};`;
   }
 
   async setBreadcrumb() {
@@ -273,7 +273,7 @@ export class RiskComponent implements OnInit {
         cardTitle: 'responsePlan',
         collapseble: false,
         initialStateCollapse: false
-      }
+      };
     }
   }
 
@@ -285,14 +285,24 @@ export class RiskComponent implements OnInit {
   }
 
   async saveRisk() {
+    const likelyToHappenFrom = this.getLikelyToHappenFrom();
+    const likelyToHappenTo = this.getLikelyToHappenTo();
+    if (likelyToHappenFrom && likelyToHappenTo && moment(likelyToHappenFrom).isAfter(likelyToHappenTo)) {
+      this.messageSrv.add({
+        severity: 'warn',
+        summary: this.translateSrv.instant('warn'),
+        detail: this.translateSrv.instant('messages.startDateIsAfterEndDate')
+      });
+      return;
+    }
     const sender: IRisk = {
       id: this.idRisk,
       idWorkpack: this.idWorkpack,
       name: this.formRisk.controls.name.value,
       description: this.formRisk.controls.description.value,
       importance: this.formRisk.controls.importance.value,
-      likelyToHappenFrom: this.getLikelyToHappenFrom(),
-      likelyToHappenTo: this.getLikelyToHappenTo(),
+      likelyToHappenFrom,
+      likelyToHappenTo,
       happenedIn: this.formRisk.controls.happenedIn.value,
       nature: this.formRisk.controls.nature.value,
       status: this.formRisk.controls.status.value
@@ -335,18 +345,24 @@ export class RiskComponent implements OnInit {
           idWorkpackModelLinked: this.idWorkpackModelLinked,
           edit: this.editPermission
         }
-      })
+      });
     }
   }
 
   private getLikelyToHappenTo() {
-    let value = this.formRisk.controls.likelyToHappenTo.value;
-    return value ? moment(value).format('yyyy-MM-DD') : null;
+    const value = this.formRisk.controls.likelyToHappenTo.value;
+    if (value) {
+      return moment(value).format('yyyy-MM-DD');
+    }
+    return null;
   }
 
   private getLikelyToHappenFrom() {
-    let value = this.formRisk.controls.likelyToHappenFrom.value;
-    return value ? moment(value).format('yyyy-MM-DD') : null;
+    const value = this.formRisk.controls.likelyToHappenFrom.value;
+    if (value) {
+      return moment(value).format('yyyy-MM-DD');
+    }
+    return null;
   }
 
 }

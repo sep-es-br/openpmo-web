@@ -9,8 +9,9 @@
       <div class="content">
         <div class="container-left-info">
           <app-avatar [edit]="true" [idPerson]="idPerson"></app-avatar>
-          <span class="name" *ngIf="propertiesPerson?.isUser">{{propertiesPerson?.fullName}}</span>
-          <form [formGroup]="formPerson" class="form">
+          
+          <span class="name" *ngIf="propertiesPerson?.isUser && !loading" >{{propertiesPerson?.fullName}}</span>
+          <form [formGroup]="formPerson" class="form" *ngIf="!loading">
             <span class="name" *ngIf="!propertiesPerson?.isUser">
               <span class="p-float-label property-input p-field">
                 <input pInputText class="app-input-text" type="text" [class.responsive]="responsive"
@@ -30,8 +31,12 @@
             </span>
           </form>
         </div>
-        <div class="container-right-info">
-          <section class="section">
+        <div class="container-right-info" >
+          <div *ngIf="!!loading" class="loading-container">
+            <i class="fas fa-hourglass-half light-grey-icon"></i>
+            <span>{{'messages.loading'|translate}}...</span>
+          </div>
+          <section class="section" *ngIf="!loading">
             <span class="subtitle">{{'contactInformation' | translate}}</span>
             <form [formGroup]="formPerson" class="form">
               <div class="p-fluid p-formgroup p-grid">
@@ -57,7 +62,7 @@
               </span>
             </form>
           </section>
-          <section class="section">
+          <section class="section" *ngIf="!loading">
             <div class="section-header">
               <h3 class="subtitle">{{'rolesPermissions' | translate}}</h3>
               <div class="remove-permission" *ngIf="propertiesPerson?.isUser">

@@ -130,7 +130,7 @@
             <div class="p-field" *ngIf="!user && (personSearchBy === 'NEW')">
               <span class="p-float-label">
                 <input class="app-input-text short-input" [class.responsive]="responsive" id="float-fullName"
-                       formControlName="fullName" type="text" (change)="handleShowSaveButton()" pInputText/>
+                       formControlName="fullName" type="text" pInputText/>
                 <label class="app-input-label" for="float-fullName">{{"fullName" | translate}}</label>
               </span>
               <app-input-message [form]="stakeholderForm" field="fullName"></app-input-message>
@@ -138,7 +138,7 @@
             <div class="p-field">
               <span class="p-float-label">
                 <textarea pInputTextarea class="app-text-area" id="float-address" formControlName="address" rows="1"
-                          [class.responsive]="responsive" (change)="handleShowSaveButton()" [autoResize]="true">
+                          [class.responsive]="responsive" (input)="handleShowSaveButton()" [autoResize]="true">
                 </textarea>
                 <label class="app-input-label" for="float-address">{{ "address" | translate }}</label>
               </span>
@@ -148,7 +148,7 @@
                 <input id="phone" pInputText class="app-input-text" formControlName="phoneNumber"
                        [class.responsive]="responsive" [class.desktop]="!responsive" (blur)="setPhoneNumberMask()"
                        [placeholder]="phoneNumberPlaceholder" (focusin)="setPhoneNumberPlaceholder()"
-                       (focusout)="clearPhoneNumberPlaceholder()" (input)="setPhoneNumberPlaceholder()"/>
+                       (focusout)="clearPhoneNumberPlaceholder()" (input)="setPhoneNumberPlaceholder(); handleShowSaveButton()"/>
                 <label class="app-input-label" for="phone">{{ "phoneNumber" | translate }}</label>
               </span>
               <app-input-message [form]="stakeholderForm" field="phoneNumber"></app-input-message>
@@ -156,8 +156,8 @@
             <div class="p-field">
               <span class="p-float-label">
                 <input class="app-input-text short-input" [class.responsive]="responsive" id="float-contactEmail"
-                       name="contactEmail" formControlName="contactEmail" type="contactEmail"
-                       (change)="handleShowSaveButton()" pInputText/>
+                       name="contactEmail" formControlName="contactEmail" type="email"
+                       (input)="handleShowSaveButton()" pInputText/>
                 <label class="app-input-label" for="float-contactEmail">{{"contactEmail" | translate}}</label>
               </span>
               <app-input-message [form]="stakeholderForm" field="contactEmail"></app-input-message>
@@ -193,7 +193,7 @@
             <div class="p-col-12 p-md-3 p-sm-12 card-item-container">
               <p-card class="app-card-item-permission" styleClass="editItem" *ngIf="!cardItem.inheritedFrom">
                 <div class="card-item-header">
-                  <div class="card-item-title">{{cardItem.role === 'citizen' ? ('citizen' |translate) : cardItem.role}}
+                  <div class="card-item-title" [pTooltip]="cardItem.role">{{cardItem.role === 'citizen' ? ('citizen' |translate) : cardItem.role}}
                   </div>
                 </div>
                 <div class="card-item-content">
@@ -208,7 +208,7 @@
               </p-card>
               <p-card class="app-card-item-permission inherited" styleClass="editItem" *ngIf="!!cardItem.inheritedFrom">
                 <div class="card-item-header">
-                  <span class="card-item-title">{{cardItem.role === 'citizen' ? ('citizen' |translate) :
+                  <span class="card-item-title" [pTooltip]="cardItem.role">{{cardItem.role === 'citizen' ? ('citizen' |translate) :
                     cardItem.role}}</span>
                 </div>
                 <div class="card-item-content">

@@ -864,7 +864,8 @@ export class WorkpackComponent implements OnDestroy {
         iconSvg: !base.cancelation ? true : false,
         nameCardItem: base.name,
         baselineStatus: base.status.toLowerCase(),
-        baselineStatusDate: base.active ? base.activationDate : (base.status === 'PROPOSED' ? base.proposalDate : 'NONE'),
+        baselineStatusDate: base.active ? base.activationDate : (base.status === 'PROPOSED' ? base.proposalDate :
+          (base.status === 'APPROVED' ? base.activationDate : 'NONE')),
         baselineActive: base.active,
         itemId: base.id,
         menuItems: [{
@@ -1129,7 +1130,7 @@ export class WorkpackComponent implements OnDestroy {
             command: (event) => this.handleRestoreWorkpack(workpack.id),
           });
         } else {
-          if (workpack.type !== 'Project') {
+          if (workpack.type !== 'Project' && !!workpack.canDeleted) {
             menuItems.push({
               label: this.translateSrv.instant('delete'),
               icon: 'fas fa-trash-alt',

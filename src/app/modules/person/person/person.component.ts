@@ -1,3 +1,4 @@
+import { CitizenUserService } from './../../../shared/services/citizen-user.service';
 import { OfficePermissionService } from './../../../shared/services/office-permission.service';
 import { IOffice } from 'src/app/shared/interfaces/IOffice';
 import { OfficeService } from './../../../shared/services/office.service';
@@ -43,7 +44,7 @@ export class PersonComponent implements OnInit, OnDestroy {
   propertiesPerson: IPerson;
   formPerson: FormGroup;
   phoneNumberPlaceholder = '';
-
+  loading = false;
 
   constructor(
     private personSrv: PersonService,
@@ -57,13 +58,15 @@ export class PersonComponent implements OnInit, OnDestroy {
     private breadcrumbSrv: BreadcrumbService,
     private officeSrv: OfficeService,
     private location: Location,
-    private officePermissionSrv: OfficePermissionService
+    private officePermissionSrv: OfficePermissionService,
+    private citizenUserSrv: CitizenUserService
   ) {
     this.activeRoute.queryParams.subscribe(async ({ idOffice, idPerson }) => {
       this.idOffice = +idOffice;
       this.idPerson = +idPerson;
       await this.loads();
     });
+    this.citizenUserSrv.loadCitizenUsers();
     this.formPerson = this.formBuilder.group({
       name: ['', Validators.required],
       fullname: ['', Validators.required],
@@ -92,6 +95,7 @@ export class PersonComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.$destroy.next();
     this.$destroy.complete();
+    this.citizenUserSrv.unloadCitizenUsers();
   }
 
   setPhoneNumberMask(){
@@ -149,7 +153,9 @@ export class PersonComponent implements OnInit, OnDestroy {
   }
 
   async loadPerson() {
+    this.loading = true;
     const { success, data } = await this.personSrv.GetByIdAndOffice(this.idPerson, this.idOffice);
+    this.loading = false;
     if (success) {
       this.propertiesPerson = data;
       this.setFormPerson(data);

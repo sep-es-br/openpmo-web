@@ -60,7 +60,7 @@
       padding: 0.7em;
       flex: 1;
       display: -webkit-box;
-      -webkit-line-clamp: 3; /** número de linhas que você quer exibir */
+      -webkit-line-clamp: 3;
       -webkit-box-orient: vertical;
       overflow: hidden;
       text-overflow: ellipsis;

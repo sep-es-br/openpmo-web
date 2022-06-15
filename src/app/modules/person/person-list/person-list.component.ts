@@ -1,3 +1,4 @@
+import { CitizenUserService } from './../../../shared/services/citizen-user.service';
 import { OfficePermissionService } from './../../../shared/services/office-permission.service';
 import { AuthService } from './../../../shared/services/auth.service';
 import { IOffice } from 'src/app/shared/interfaces/IOffice';
@@ -65,12 +66,14 @@ export class PersonListComponent implements OnInit, OnDestroy {
     private formBuilder: FormBuilder,
     private breadcrumbSrv: BreadcrumbService,
     private authSrv: AuthService,
-    private officePermissionSrv: OfficePermissionService
+    private officePermissionSrv: OfficePermissionService,
+    private citizenUserSrv: CitizenUserService
   ) {
     this.activeRoute.queryParams.subscribe(async({ idOffice }) => {
       this.idOffice = +idOffice;
       await this.loads();
     });
+    this.citizenUserSrv.loadCitizenUsers();
     this.formSearch = this.formBuilder.group({
       scopeName: '',
       userStatus: [OptionsAccessEnum.All],

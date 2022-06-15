@@ -594,8 +594,9 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
       return this.validateStakeholder()
         ? this.saveButton?.showButton()
         : this.saveButton?.hideButton();
+    } else {
+      this.saveButton?.hideButton();
     }
-    return;
   }
 
   async saveStakeholder() {

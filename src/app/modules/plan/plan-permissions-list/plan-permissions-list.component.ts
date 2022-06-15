@@ -70,13 +70,6 @@ export class PlanPermissionsListComponent implements OnInit {
     await this.loadPropertiesOffice();
   }
 
-  handleChangeCollapseExpandPanel(event) {
-    this.collapsePanelsStatus = event.mode === 'collapse' ? true : false;
-    this.cardPlanPermissions = Object.assign({}, {
-      ...this.cardPlanPermissions,
-      initialStateCollapse: this.collapsePanelsStatus,
-    });
-  }
 
   handleChangeDisplayMode(event) {
     this.displayModeAll = event.displayMode;
