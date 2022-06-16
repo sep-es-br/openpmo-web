@@ -83,6 +83,7 @@ export class ControlChangeBoardMemberComponent implements OnInit, OnDestroy {
     private planSrv: PlanService,
     private ccbMemberSrv: ControlChangeBoardService
   ) {
+    this.citizenUserSrv.loadCitizenUsers();
     this.actRouter.queryParams.subscribe(async queryParams => {
       this.idPerson = +queryParams.idPerson;
       this.idProject = +queryParams.idProject;
@@ -108,7 +109,7 @@ export class ControlChangeBoardMemberComponent implements OnInit, OnDestroy {
   async ngOnDestroy(): Promise<void> {
     this.$destroy.next();
     this.$destroy.complete();
-    await this.citizenUserSrv.unloadCitizenUsers();
+    this.citizenUserSrv.unloadCitizenUsers();
   }
 
   async ngOnInit() {

@@ -16,6 +16,7 @@ import { Router } from '@angular/router';
   styleUrls: ['./administrator-list.component.scss']
 })
 export class AdministratorListComponent implements OnInit {
+
   responsive: boolean;
   administrators: IPerson[];
   cardItemsAdministrators: ICardItemPermission[] = [];
@@ -92,7 +93,7 @@ export class AdministratorListComponent implements OnInit {
     this.cardItemsAdministrators.push(
       {
         typeCardItem: 'newCardItem',
-        urlCard: '/persons/administrators/administrator',
+        urlCard: '/administrators/administrator',
       }
     );
     this.totalRecords = this.cardItemsAdministrators && this.cardItemsAdministrators.length;
@@ -103,7 +104,7 @@ export class AdministratorListComponent implements OnInit {
     this.breadcrumbSrv.setMenu([
       {
         key: 'administrators',
-        routerLink: [ '/persons/administrators' ],
+        routerLink: [ '/administrators' ],
       }
     ]);
   }
@@ -118,7 +119,7 @@ export class AdministratorListComponent implements OnInit {
 
 
   async handleCreateNewOfficePermission() {
-    await this.router.navigate(['/persons/administrators/administrator']);
+    await this.router.navigate(['/administrators/administrator']);
   }
 
   async deleteAdministrator(administrator: IPerson) {
@@ -141,7 +142,7 @@ export class AdministratorListComponent implements OnInit {
   }
 
   handleCreateNewAdministrator() {
-    this.router.navigate(['/persons/administrators/administrator'])
+    this.router.navigate(['/administrators/administrator'])
   }
 
   async handleSelectedFilter(event) {
@@ -156,7 +157,7 @@ export class AdministratorListComponent implements OnInit {
     this.breadcrumbSrv.setBreadcrumbStorage([
       {
         key: 'Administrators',
-        routerLink: [ '/persons/administrators' ],
+        routerLink: [ '/administrators' ],
       }
     ]);
   }

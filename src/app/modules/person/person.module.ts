@@ -9,12 +9,10 @@ import { PersonRoutingModule } from './person-routing.module';
 import {ScrollTopModule} from 'primeng/scrolltop';
 import { PersonComponent } from './person/person.component';
 import { PersonProfileComponent } from './person-profile/person-profile.component';
-import { AdministratorListComponent } from './administrator/administrator-list/administrator-list.component';
-import { AdministratorComponent } from './administrator/administrator/administrator.component';
 
 
 @NgModule({
-  declarations: [PersonListComponent, PersonComponent, PersonProfileComponent, AdministratorListComponent, AdministratorComponent],
+  declarations: [PersonListComponent, PersonComponent, PersonProfileComponent],
   imports: [
     CommonModule,
     PersonRoutingModule,

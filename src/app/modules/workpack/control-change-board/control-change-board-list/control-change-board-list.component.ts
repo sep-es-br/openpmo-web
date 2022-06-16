@@ -1,3 +1,4 @@
+import { CitizenUserService } from './../../../../shared/services/citizen-user.service';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Subject } from 'rxjs';
 import { ICard } from 'src/app/shared/interfaces/ICard';
@@ -59,7 +60,9 @@ export class ControlChangeBoardListComponent implements OnInit, OnDestroy {
     private router: Router,
     private workpackSrv: WorkpackService,
     private authSrv: AuthService,
+    private citizenUserSrv: CitizenUserService
   ) {
+    this.citizenUserSrv.loadCitizenUsers();
     this.activeRoute.queryParams.subscribe(params => {
       this.idProject = +params.idProject;
       this.idOffice = +params.idOffice;
@@ -86,6 +89,7 @@ export class ControlChangeBoardListComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.$destroy.next();
     this.$destroy.complete();
+    this.citizenUserSrv.unloadCitizenUsers();
   }
 
   async loadPropertiesProject() {

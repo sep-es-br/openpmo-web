@@ -80,6 +80,11 @@ const routes: Routes = [
     loadChildren: () => import('./modules/person/person.module').then(m => m.PersonModule)
   },
   {
+    path: 'administrators',
+    canActivate: [ AuthGuard ],
+    loadChildren: () => import('./modules/administrator/administrator.module').then(m => m.AdministratorModule)
+  },
+  {
     path: 'ccbmember-baselines-view',
     canActivate: [ AuthGuard ],
     loadChildren: () => import('./modules/ccbmember-baselines-view/ccbmember-baselines-view.module').then(m => m.CCBMemberBaselinesViewModule)

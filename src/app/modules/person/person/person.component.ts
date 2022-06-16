@@ -66,7 +66,6 @@ export class PersonComponent implements OnInit, OnDestroy {
       this.idPerson = +idPerson;
       await this.loads();
     });
-    this.citizenUserSrv.loadCitizenUsers();
     this.formPerson = this.formBuilder.group({
       name: ['', Validators.required],
       fullname: ['', Validators.required],

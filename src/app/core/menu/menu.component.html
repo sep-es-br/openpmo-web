@@ -232,7 +232,7 @@
   <div class="languages" *ngIf="!!isMobileView">
     <p-panelMenu [model]="itemsLanguages"></p-panelMenu>
   </div>
-  <div class="item" [routerLink]="['/persons/administrators']" *ngIf="!!isUserAdmin" (click)="closeAllMenus()">
+  <div class="item" [routerLink]="['/administrators']" *ngIf="!!isUserAdmin" (click)="closeAllMenus()">
     <i class="fas fa-users-cog" [ngStyle]="{ fontSize: '1.4rem' }"></i>
     <span>{{ 'administrators' | translate }}</span>
   </div>

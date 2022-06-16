@@ -1,3 +1,4 @@
+import { CitizenUserService } from './../../shared/services/citizen-user.service';
 import { DashboardService } from 'src/app/shared/services/dashboard.service';
 import { MilestoneStatusEnum } from './../../shared/enums/MilestoneStatusEnum';
 import { IFilterProperty } from 'src/app/shared/interfaces/IFilterProperty';
@@ -190,8 +191,10 @@ export class WorkpackComponent implements OnDestroy {
     private processSrv: ProcessService,
     private baselineSrv: BaselineService,
     private confirmationSrv: ConfirmationService,
-    private dashboardSrv: DashboardService
+    private dashboardSrv: DashboardService,
+    private citizenUserSrv: CitizenUserService
   ) {
+    this.citizenUserSrv.loadCitizenUsers();
     this.actRouter.queryParams.subscribe(async ({ id, idPlan, idWorkpackModel, idWorkpackParent, idWorkpackModelLinked }) => {
       this.idWorkpack = id && +id;
       this.idPlan = idPlan && +idPlan;
@@ -214,6 +217,7 @@ export class WorkpackComponent implements OnDestroy {
   ngOnDestroy(): void {
     this.$destroy.next();
     this.$destroy.complete();
+    this.citizenUserSrv.unloadCitizenUsers();
   }
 
   handleChangeCollapseExpandPanel(event) {

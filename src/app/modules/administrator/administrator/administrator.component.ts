@@ -1,5 +1,6 @@
-import { AuthService } from './../../../../shared/services/auth.service';
-import {AuthServerService} from '../../../../shared/services/auth-server.service';
+import { enterLeave } from './../../../shared/animations/enterLeave.animation';
+import { AuthService } from './../../../shared/services/auth.service';
+import { AuthServerService } from './../../../shared/services/auth-server.service';
 import {Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {Router} from '@angular/router';
 import {TranslateService} from '@ngx-translate/core';
@@ -11,11 +12,11 @@ import {ResponsiveService} from 'src/app/shared/services/responsive.service';
 import {ICard} from 'src/app/shared/interfaces/ICard';
 import {IPerson} from 'src/app/shared/interfaces/IPerson';
 import {PersonService} from 'src/app/shared/services/person.service';
-import {enterLeave} from '../../../../shared/animations/enterLeave.animation';
 import {BreadcrumbService} from 'src/app/shared/services/breadcrumb.service';
 import {SaveButtonComponent} from 'src/app/shared/components/save-button/save-button.component';
 import {cpfValidator} from 'src/app/shared/utils/cpfValidator';
 import {CitizenUserService} from 'src/app/shared/services/citizen-user.service';
+
 
 @Component({
   selector: 'app-administrator',
@@ -65,13 +66,13 @@ export class AdministratorComponent implements OnInit, OnDestroy {
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => {
       this.responsive = value;
     });
-    this.citizenUserSrv.loadCitizenUsers().then();
+    this.citizenUserSrv.loadCitizenUsers();
   }
 
   async ngOnDestroy(): Promise<void> {
     this.$destroy.next();
     this.$destroy.complete();
-    await this.citizenUserSrv.unloadCitizenUsers();
+    this.citizenUserSrv.unloadCitizenUsers();
   }
 
   async ngOnInit() {
@@ -95,11 +96,11 @@ export class AdministratorComponent implements OnInit, OnDestroy {
     this.breadcrumbSrv.setMenu([
       {
         key: 'administrators',
-        routerLink: ['/persons/administrators'],
+        routerLink: ['/administrators'],
       },
       {
         key: 'administrator',
-        routerLink: ['/persons/administrators/administrator'],
+        routerLink: ['/administrators/administrator'],
       },
     ]);
   }
@@ -268,7 +269,7 @@ export class AdministratorComponent implements OnInit, OnDestroy {
           detail: this.translateSrv.instant('messages.savedSuccessfully')
         });
         await this.router.navigate(
-          ['/persons/administrators'],
+          ['/administrators'],
         );
       }
     } else {
@@ -284,7 +285,7 @@ export class AdministratorComponent implements OnInit, OnDestroy {
           detail: this.translateSrv.instant('messages.savedSuccessfully')
         });
         await this.router.navigate(
-          ['/persons/administrators'],
+          ['/administrators'],
         );
       }
     }

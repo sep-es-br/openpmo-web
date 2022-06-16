@@ -105,7 +105,7 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
       this.idWorkpackModelLinked = queryParams.idWorkpackModelLinked && +queryParams.idWorkpackModelLinked;
       this.idPerson = queryParams.idPerson && +queryParams.idPerson;
       if (!this.idPerson) {
-        await this.citizenUserSrv.loadCitizenUsers();
+        this.citizenUserSrv.loadCitizenUsers();
       }
     });
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => {
@@ -123,7 +123,7 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
     this.$destroy.next();
     this.$destroy.complete();
     if (!this.idPerson) {
-      await this.citizenUserSrv.unloadCitizenUsers();
+      this.citizenUserSrv.unloadCitizenUsers();
     }
   }
 

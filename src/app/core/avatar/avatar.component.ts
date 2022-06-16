@@ -123,7 +123,7 @@ export class AvatarComponent implements OnInit {
     }
     this.resetImageAvatar();
     await this.setAvatarPerson();
-
+    window.location.reload();
   }
 
   DataURIToBlob(dataURI: string) {

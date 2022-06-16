@@ -79,7 +79,7 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
       this.idOffice = queryParams.idOffice;
       this.email = queryParams.email;
       if (!this.email) {
-        await this.citizenUserSrv.loadCitizenUsers();
+        this.citizenUserSrv.loadCitizenUsers();
       }
     });
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => {
@@ -99,9 +99,7 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
   async ngOnDestroy(): Promise<void> {
     this.$destroy.next();
     this.$destroy.complete();
-    if (!this.email) {
-      await this.citizenUserSrv.unloadCitizenUsers();
-    }
+    this.citizenUserSrv.unloadCitizenUsers();
   }
 
   async ngOnInit() {

@@ -1,3 +1,5 @@
+import { takeUntil } from 'rxjs/operators';
+import { CitizenUserService } from './../../../shared/services/citizen-user.service';
 import { IFilterProperty } from 'src/app/shared/interfaces/IFilterProperty';
 import { PropertyTemplateModel } from './../../../shared/models/PropertyTemplateModel';
 import { FilterDataviewPropertiesEntity } from 'src/app/shared/constants/filterDataviewPropertiesEntity';
@@ -15,6 +17,7 @@ import { ICard } from 'src/app/shared/interfaces/ICard';
 import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
 import { OfficeService } from 'src/app/shared/services/office.service';
 import { IOffice } from 'src/app/shared/interfaces/IOffice';
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'app-plan-permissions-list',
@@ -43,6 +46,7 @@ export class PlanPermissionsListComponent implements OnInit {
   pageSize = 5;
   totalRecords: number;
   idFilterSelected: number;
+  $destroy = new Subject();
 
   constructor(
     private actRouter: ActivatedRoute,
@@ -53,12 +57,14 @@ export class PlanPermissionsListComponent implements OnInit {
     private breadcrumbSrv: BreadcrumbService,
     private officeSrv: OfficeService,
     private filterSrv: FilterDataviewService,
-    private router: Router
+    private router: Router,
+    private citizenUserSrv: CitizenUserService
   ) {
+    this.citizenUserSrv.loadCitizenUsers();
     this.actRouter.queryParams.subscribe(async queryParams => {
       this.idPlan = queryParams.idPlan;
     });
-    this.responsiveSrv.observable.subscribe(value => {
+    this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => {
       this.responsive = value;
     });
     this.planSrv.nextIDPlan(this.idPlan);
@@ -254,5 +260,11 @@ export class PlanPermissionsListComponent implements OnInit {
         routerLink: ['filter-dataview'],
       }
     ]);
+  }
+
+  async ngOnDestroy(): Promise<void> {
+    this.$destroy.next();
+    this.$destroy.complete();
+    this.citizenUserSrv.unloadCitizenUsers();
   }
 }

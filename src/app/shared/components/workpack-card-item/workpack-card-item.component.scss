@@ -1,6 +1,9 @@
 @use "src/variables" as v;
 
 ::ng-deep .app-workpack-card-item {
+  .constraint-content {
+    min-width: 340px;
+  }
     .p-card {
     display: flex;
     flex-direction: column;
@@ -242,6 +245,7 @@
       border: none;
       outline: none;
       flex: 1;
+      
     }
     .triple-constraint-container {
       display: flex;

@@ -86,7 +86,6 @@ export class JournalViewComponent implements OnInit, OnDestroy {
 
   async loadJournalData() {
     const type = this.formSearch.controls.type.value;
-    console.log(this.formSearch.value);
     const {data, success} = await this.journalSrv.GetAll({
       scopeName: this.formSearch.controls.scopeName.value,
       from: this.getFrom(),

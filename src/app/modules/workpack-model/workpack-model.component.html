@@ -80,16 +80,16 @@
     <div class="card stakeholders">
       <app-card [properties]="cardPropertiesStakeholders" *ngIf="cardPropertiesStakeholders" class="inputs-float-label">
         <span class="p-float-label app-input-chips">
-          <p-chips [(ngModel)]="posibleRolesPerson" [required]="true" separator="," [allowDuplicate]="false"
-            [required]="true" (ngModelChange)="checkProperties()"
+          <p-chips [(ngModel)]="posibleRolesPerson" separator="," [allowDuplicate]="false"
+            (ngModelChange)="checkProperties()"
             [class.p-inputwrapper-filled]="posibleRolesPerson && !!posibleRolesPerson.length"
             [disabled]="!editPermission"></p-chips>
           <label class="app-input-label" for="float-label">{{ 'possibleRolesPerson' | translate }} *</label>
           <span class="under-label">{{ 'useCommaToSeparateValues' | translate }}</span>
         </span>
         <span class="p-float-label app-input-chips">
-          <p-chips [(ngModel)]="posibleRolesOrg" [required]="true" separator="," [allowDuplicate]="false"
-            [required]="true" (ngModelChange)="checkProperties()"
+          <p-chips [(ngModel)]="posibleRolesOrg" separator="," [allowDuplicate]="false"
+            (ngModelChange)="checkProperties()"
             [class.p-inputwrapper-filled]="posibleRolesOrg && !!posibleRolesOrg?.length" [disabled]="!editPermission">
           </p-chips>
           <label class="app-input-label" for="float-label">{{ 'possibleRolesOrg' | translate }} *</label>
@@ -141,7 +141,6 @@
             <p-button [label]="'addProperty' | translate" icon="fa fa-plus" iconPos="right"
               (click)="menuAddCostProperty.toggle($event)">
             </p-button>
-            <!-- <p-button [label]="'addGroup' | translate" icon="fa fa-plus" iconPos="right" (click)="addGroup('PROPERTIES')"></p-button> -->
           </div>
           <div class="workpack-model-addicional-properties">
             <app-workpack-model-property class="addicional-properties" *ngFor="let property of modelCostProperties"

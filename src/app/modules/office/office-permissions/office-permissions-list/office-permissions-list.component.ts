@@ -1,3 +1,5 @@
+import { takeUntil } from 'rxjs/operators';
+import { CitizenUserService } from './../../../../shared/services/citizen-user.service';
 import { IFilterProperty } from 'src/app/shared/interfaces/IFilterProperty';
 import { PropertyTemplateModel } from './../../../../shared/models/PropertyTemplateModel';
 import { Component, OnInit } from '@angular/core';
@@ -16,6 +18,7 @@ import { AuthService } from 'src/app/shared/services/auth.service';
 import { FilterService, MessageService } from 'primeng/api';
 import { FilterDataviewService } from 'src/app/shared/services/filter-dataview.service';
 import { FilterDataviewPropertiesEntity } from 'src/app/shared/constants/filterDataviewPropertiesEntity';
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'app-office-permissions-list',
@@ -41,6 +44,7 @@ export class OfficePermissionsListComponent implements OnInit {
   totalRecords: number;
   currentUserInfo: IPerson;
   idFilterSelected: number;
+  $destroy = new Subject();
 
   constructor(
     private actRouter: ActivatedRoute,
@@ -53,12 +57,14 @@ export class OfficePermissionsListComponent implements OnInit {
     private messageSrv: MessageService,
     private filterSrv: FilterDataviewService,
     private router: Router,
+    private citizenUserSrv: CitizenUserService
 
   ) {
+    this.citizenUserSrv.loadCitizenUsers();
     this.actRouter.queryParams.subscribe(async queryParams => {
       this.idOffice = queryParams.idOffice;
     });
-    this.responsiveSrv.observable.subscribe(value => {
+    this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => {
       this.responsive = value;
     });
   }
@@ -250,6 +256,12 @@ export class OfficePermissionsListComponent implements OnInit {
         routerLink: ['filter-dataview'],
       }
     ]);
+  }
+
+  async ngOnDestroy(): Promise<void> {
+    this.$destroy.next();
+    this.$destroy.complete();
+    this.citizenUserSrv.unloadCitizenUsers();
   }
 
 }
