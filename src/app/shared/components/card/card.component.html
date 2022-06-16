@@ -20,13 +20,13 @@
           (properties.headerDates?.endDate|date:'yyyy/MM/dd')}}</span>
       </div>
     </div>
-    <div class="header-title-check-completed" *ngIf="properties.showFullScreen && !properties.fullScreen"
+    <div class="header-title-check-completed" *ngIf="!properties.initialStateCollapse && properties.showFullScreen && !properties.fullScreen"
     [class.responsive]="responsive">
-      <i class="fas fa-expand-arrows-alt" (click)="handleChangeFullScreen()"></i>
+      <i class="fas fa-expand-arrows-alt" (click)="handleChangeFullScreen(true)"></i>
     </div>
     <div class="header-title-check-completed" *ngIf="properties.showFullScreen && properties.fullScreen"
     [class.responsive]="responsive">
-      <i class="fas fa-times" (click)="handleChangeFullScreen()"></i>
+      <i class="fas fa-times" (click)="handleChangeFullScreen(false)"></i>
     </div>
     <div class="header-title-check-completed" *ngIf="properties.showCheckCompleted" [class.responsive]="responsive">
       <label>{{label|translate}}</label>

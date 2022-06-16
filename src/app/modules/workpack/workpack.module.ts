@@ -13,12 +13,12 @@ import { PropertySelectionComponent } from './workpack-property/type-property/pr
 import { PropertyTextareaComponent } from './workpack-property/type-property/property-textarea/property-textarea.component';
 import {
   PropertyTreeSelectionComponent
-  } from './workpack-property/type-property/property-tree-selection/property-tree-selection.component';
+} from './workpack-property/type-property/property-tree-selection/property-tree-selection.component';
 import { PropertyIntegerComponent } from './workpack-property/type-property/property-integer/property-integer.component';
 import { CostAccountComponent } from './cost-account/cost-account.component';
 import {
   PropertyUnitSelectionComponent
-  } from './workpack-property/type-property/property-unit-selection/property-unit-selection.component';
+} from './workpack-property/type-property/property-unit-selection/property-unit-selection.component';
 import {
   PropertyOrganizationSelectionComponent
 } from './workpack-property/type-property/property-organization-selection/property-organization-selection.component';
@@ -34,7 +34,6 @@ import { JournalComponent } from './journal/journal.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { TripleConstraintDashboardComponent } from './components/triple-constraint-dashboard/triple-constraint-dashboard.component';
 import { EarnedValueAnalysisDashboardComponent } from './components/earned-value-analysis-dashboard/earned-value-analysis-dashboard.component';
-import { ExpandedDashboardComponent } from './expanded-dashboard/expanded-dashboard.component';
 
 @NgModule({
   declarations: [
@@ -61,15 +60,14 @@ import { ExpandedDashboardComponent } from './expanded-dashboard/expanded-dashbo
     JournalComponent,
     DashboardComponent,
     TripleConstraintDashboardComponent,
-    EarnedValueAnalysisDashboardComponent,
-    ExpandedDashboardComponent],
-  imports: [
-    CommonModule,
-    WorkpackRoutingModule,
-    CoreModule,
-    ComponentsModule,
-    FormsModule,
-    ReactiveFormsModule,
-  ],
+    EarnedValueAnalysisDashboardComponent],
+    imports: [
+      CommonModule,
+      WorkpackRoutingModule,
+      CoreModule,
+      ComponentsModule,
+      FormsModule,
+      ReactiveFormsModule,
+    ],
 })
 export class WorkpackModule { }

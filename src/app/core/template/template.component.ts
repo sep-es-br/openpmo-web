@@ -1,3 +1,4 @@
+import { DashboardService } from 'src/app/shared/services/dashboard.service';
 import { takeUntil } from 'rxjs/operators';
 import { MenuService } from 'src/app/shared/services/menu.service';
 import { Component, OnDestroy } from '@angular/core';
@@ -14,14 +15,17 @@ export class TemplateComponent implements OnDestroy {
 
   isMenuFixed = false;
   $destroy = new Subject();
+  fullScreenModeDashboard = false;
 
   constructor(
     public responsiveSrv: ResponsiveService,
-    public menuSrv: MenuService
+    public menuSrv: MenuService,
+    public dashboardSrv: DashboardService
   ) {
     this.menuSrv.getMenuState.pipe(takeUntil(this.$destroy)).subscribe(menuState => {
       this.isMenuFixed = menuState.isFixed;
     });
+    this.dashboardSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.fullScreenModeDashboard = value);
   }
 
   ngOnDestroy(): void {

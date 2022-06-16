@@ -33,6 +33,11 @@
       outline: none !important;
     }
   }
+  &.fullscreen-mode-dashboard {
+    .home {
+      z-index: 0;
+    }
+  }
   .crumbs {
     display: flex;
     flex-wrap: nowrap;

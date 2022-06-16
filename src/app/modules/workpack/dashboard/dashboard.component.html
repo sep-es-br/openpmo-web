@@ -1,5 +1,5 @@
-<div class="app-dashboard" [class.responsive]="!!responsive" *ngIf="dashboard">
-  <app-card [properties]="cardDashboardProperties"  (changeFullScreen)="handleOnFullScreen()">
+<div class="app-dashboard" [class.responsive]="!!responsive" *ngIf="dashboard" [class.expanded]="cardDashboardProperties.fullScreen">
+  <app-card [class.card-expanded]="cardDashboardProperties.fullScreen" [properties]="cardDashboardProperties"  (changeFullScreen)="handleOnFullScreen($event)">
     <span class="workpack-fullName">
       {{workpackFullName}}
     </span>

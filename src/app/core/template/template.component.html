@@ -1,4 +1,4 @@
-<div class="app-template" [class.mobile]="responsiveSrv.observable | async">
+<div class="app-template" [class.mobile]="responsiveSrv.observable | async" [class.fullScreenModeDashboard]="dashboardSrv.observable | async">
   <ng-container *ngIf="!isMenuFixed; else menuFixed">
     <ng-container *ngTemplateOutlet="menuFloat"></ng-container>
   </ng-container>

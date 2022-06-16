@@ -1,4 +1,4 @@
-<div class="app-breadcrumb" [class.mobile]="isMobileView">
+<div class="app-breadcrumb" [class.mobile]="isMobileView" [class.fullscreen-mode-dashboard]="fullScreenModeDashboard">
   <div class="crumbs" #crumbsEl>
     <div class="home" [class.adjust-padding]="isOverflowing">
       <span class="name" *ngIf="crumbOffice"> {{crumbOffice.info}}</span>

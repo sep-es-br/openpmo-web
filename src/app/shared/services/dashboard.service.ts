@@ -1,3 +1,4 @@
+import { BehaviorSubject } from 'rxjs';
 import { Inject, Injectable, Injector } from '@angular/core';
 import { BaseService } from '../base/base.service';
 import { IDashboard } from '../interfaces/IDashboard';
@@ -10,7 +11,7 @@ import { IDashboardData } from '../interfaces/IDashboardData';
   providedIn: 'root'
 })
 export class DashboardService extends BaseService<IDashboard> {
-  private dashboardData: IDashboardData = {} as IDashboardData;
+  private isExpandedMode = new BehaviorSubject<boolean>(false);
 
   constructor(
     @Inject(Injector) injector: Injector
@@ -32,16 +33,14 @@ export class DashboardService extends BaseService<IDashboard> {
     const result = await this.http.get(`${this.urlBase}/schedule-interval`, { params: PrepareHttpParams(options) }).toPromise();
     return result as IHttpResult<{ startDate: string; endDate: string }>;
   }
-  public GetDashboardData(): IDashboardData {
-    return this.dashboardData;
+   
+
+  get observable() {
+    return this.isExpandedMode.asObservable();
   }
 
-  public SetDashboardData(dashboardData: IDashboardData) {
-    this.dashboardData = dashboardData;
-  }
-
-  resetDashboardData() {
-    this.dashboardData = {} as IDashboardData;
+  next(nextValue: boolean) {
+    setTimeout(() => this.isExpandedMode.next(nextValue), 0);
   }
 
 }

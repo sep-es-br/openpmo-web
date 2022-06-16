@@ -235,23 +235,9 @@ export class DashboardComponent implements OnInit, OnChanges, OnDestroy {
     await this.getDashboardData();
   }
 
-  handleOnFullScreen() {
-    this.dashboardSrv.SetDashboardData({
-      dashboard: this.dashboard,
-      dashboardShowEVA: this.dashboardShowEva,
-      dashboardShowMilestones: this.dashboardShowMilestones,
-      dashboardShowRisks: this.dashboardShowRisks,
-      dashboardShowStakeholders: this.dashboardShowStakeholders,
-      idWorkpack: this.idWorkpack,
-      workpackType: this.workpackType,
-      workpackFullName: this.workpackFullName,
-      baselines: this.baselines,
-      endDate: this.endDate,
-      referenceMonth: this.referenceMonth,
-      startDate: this.startDate,
-      yearRange: this.yearRange,
-    });
-    this.router.navigate(['/workpack/expanded-dashboard']);
+  handleOnFullScreen(fullScreenMode: boolean) {
+    this.cardDashboardProperties.fullScreen = fullScreenMode;
+    this.dashboardSrv.next(fullScreenMode)
   }
 
 }

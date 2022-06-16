@@ -1,3 +1,4 @@
+import { DashboardService } from 'src/app/shared/services/dashboard.service';
 import { MilestoneStatusEnum } from './../../shared/enums/MilestoneStatusEnum';
 import { IFilterProperty } from 'src/app/shared/interfaces/IFilterProperty';
 import { takeUntil } from 'rxjs/operators';
@@ -159,6 +160,7 @@ export class WorkpackComponent implements OnDestroy {
   calendarFormat = '';
   $destroy = new Subject();
   language: string;
+  fullScreenModeDashboard = false;
 
   constructor(
     private actRouter: ActivatedRoute,
@@ -188,6 +190,7 @@ export class WorkpackComponent implements OnDestroy {
     private processSrv: ProcessService,
     private baselineSrv: BaselineService,
     private confirmationSrv: ConfirmationService,
+    private dashboardSrv: DashboardService
   ) {
     this.actRouter.queryParams.subscribe(async ({ id, idPlan, idWorkpackModel, idWorkpackParent, idWorkpackModelLinked }) => {
       this.idWorkpack = id && +id;
@@ -198,6 +201,7 @@ export class WorkpackComponent implements OnDestroy {
       this.planSrv.nextIDPlan(this.idPlan);
       await this.resetWorkpack();
     });
+    this.dashboardSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.fullScreenModeDashboard = value);
     this.translateSrv.onLangChange.pipe(takeUntil(this.$destroy)).subscribe(() => {
       setTimeout(() => this.language = this.translateSrv.currentLang, 200);
     }

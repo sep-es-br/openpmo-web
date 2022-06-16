@@ -122,8 +122,8 @@ export class CardComponent implements OnInit, OnDestroy, OnChanges {
     this.changeCheckCompleted.emit(event);
   }
 
-  handleChangeFullScreen() {
-    this.changeFullScreen.emit();
+  handleChangeFullScreen(fullScreenMode: boolean) {
+    this.changeFullScreen.emit(fullScreenMode);
   }
 
   get label(): string {

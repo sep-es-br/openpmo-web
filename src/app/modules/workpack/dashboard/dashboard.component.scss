@@ -4,6 +4,25 @@
   margin-bottom: 15px;
   display: flex;
   flex-direction: column;
+  &.expanded {
+    display: flex;
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    max-width: 100vw;
+    width: 100%;
+    .card-expanded {
+      display: flex;
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      max-width: 100vw;
+      width: 100%;
+      flex: 1;
+    }
+  }
   .workpack-fullName {
     font-size: 1rem;
     text-transform: none;

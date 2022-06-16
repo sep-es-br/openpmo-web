@@ -1,9 +1,12 @@
+import { DashboardService } from 'src/app/shared/services/dashboard.service';
+import { takeUntil } from 'rxjs/operators';
 import { Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 
 import { IBreadcrumb } from 'src/app/shared/interfaces/IBreadcrumb';
 import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
 import { ResponsiveService } from 'src/app/shared/services/responsive.service';
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'app-breadcrumb',
@@ -20,13 +23,17 @@ export class BreadcrumbComponent implements OnInit {
   addCrumbHidden = true;
   crumbOffice: IBreadcrumb;
   crumbPlan: IBreadcrumb;
+  $destroy = new Subject();
+  fullScreenModeDashboard = false;
 
   constructor(
     public breadcrumbSrv: BreadcrumbService,
     private responsiveSrv: ResponsiveService,
+    private dashboardSrv: DashboardService,
     private router: Router
   ) {
     this.responsiveSrv.observable.subscribe(isMobileView => this.isMobileView = isMobileView);
+    this.dashboardSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.fullScreenModeDashboard = value);
   }
 
   @HostListener('window:resize', ['$event'])
@@ -52,19 +59,7 @@ export class BreadcrumbComponent implements OnInit {
   async setCrumbs(crumbs: IBreadcrumb[]) {
     if(crumbs.length > 0) {
       this.crumbOffice = crumbs.find( crumb => crumb.key === 'office');
-      // if(crumbs[0]?.key === 'office') {
-      //   this.crumbOffice = crumbs[0];
-      //   // crumbs.shift();
-      // }
-      // if(crumbs[0]?.key === 'plan') {
-      //   this.crumbPlan = crumbs[0];
-      //   crumbs.shift();
-      //   this.showNameOffice = true;
-      // }
       this.crumbPlan = crumbs.find( crumb => crumb.key === 'plan');
-      // if(crumbs.length > 0 && this.showNameOffice) {
-      //   this.showNamePlan = true;
-      // }
     }
     this.crumbs = crumbs.filter( crumb => !['office','plan'].includes(crumb.key));
   }

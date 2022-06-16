@@ -3,6 +3,21 @@
 ::ng-deep .app-workpack {
   width: 100%;
 
+  &.fullscreenModeDashboard {
+    .card-properties-workpack,
+    .card-cost-account,
+    .card-schedule,
+    .workpackModels-cards-section,
+    .card-stakeholders,
+    .card-baselines,
+    .card-risks,
+    .card-issues,
+    .card-processes,
+    .card-journal {
+      display: none;
+    }    
+  }
+
   .header-container {
     display: flex;
     flex-direction: row;

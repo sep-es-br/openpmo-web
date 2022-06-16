@@ -1,4 +1,4 @@
-<div class="app-workpack" *ngIf="workpackModel">
+<div class="app-workpack" *ngIf="workpackModel" [class.fullscreenModeDashboard]="fullScreenModeDashboard">
   <div class="header-container" [class.mobile]="responsive" *ngIf="idWorkpack">
     <div class="app-content-header" [class.mobile]="responsive">
       <span class="label">{{workpackModel.modelName}}:</span>
