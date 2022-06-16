@@ -6,7 +6,7 @@
   background-color: transparent;
   .app-tree-selection {
     max-height: 400px;
-    overflow-y: scroll;
+    overflow-y: auto;
   }
 
   .workpack-model-property-header {

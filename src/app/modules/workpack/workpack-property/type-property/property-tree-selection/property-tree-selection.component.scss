@@ -2,7 +2,7 @@
 
 ::ng-deep .workpack-tree-selection {
   max-height: 400px;
-  overflow-y: scroll;
+  overflow-y: auto;
   .button-select-locality-container {
     display: flex;
     flex-direction: column;

@@ -33,7 +33,7 @@ export class PropertyTreeSelectionComponent implements OnDestroy, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (this.property?.localityList) {
+    if (this.property?.localityList && this.property?.multipleSelection) {
       this.selectedSelectAllIfChildrenAllSelecteds(this.property.localityList[0]);
     }
   }
