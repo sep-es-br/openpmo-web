@@ -133,7 +133,9 @@ export class BaselineComponent implements OnInit, OnDestroy {
         this.formBaseline.controls.message.setValue(this.baseline.message);
         if (this.baseline.status !== 'DRAFT') {
           this.formBaseline.disable();
-          this.baseline.updates.forEach(update => update.included = true);
+          if (this.baseline.updates) {
+            this.baseline.updates.forEach(update => update.included = true);
+          }
         }
       }
     } else {

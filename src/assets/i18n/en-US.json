@@ -266,6 +266,7 @@
   "cancelling": "Cancelling",
   "newBaseline": "New baseline",
   "plannedBaseline": "Planned (baseline)",
+  "forecast": "Forecast",
   "BASIC_READ": "Basic read",
   "NONE": "None",
   "messageFromBaselineProposer": "Message from baseline proposer",

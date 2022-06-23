@@ -98,6 +98,7 @@ export class JournalViewComponent implements OnInit, OnDestroy {
     if (success) {
       this.journalData = this.journalData.concat(data);
       this.hasMore = data.length > 0 && data.length === this.pageSize;
+      this.hasAll = true;
     }
 
 

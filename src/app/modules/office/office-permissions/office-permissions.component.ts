@@ -78,9 +78,6 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
     this.actRouter.queryParams.subscribe(async queryParams => {
       this.idOffice = queryParams.idOffice;
       this.email = queryParams.email;
-      if (!this.email) {
-        this.citizenUserSrv.loadCitizenUsers();
-      }
     });
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => {
       this.responsive = value;
@@ -97,9 +94,9 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
   }
 
   async ngOnDestroy(): Promise<void> {
+    this.citizenUserSrv.unloadCitizenUsers();
     this.$destroy.next();
     this.$destroy.complete();
-    this.citizenUserSrv.unloadCitizenUsers();
   }
 
   async ngOnInit() {
@@ -169,10 +166,12 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
       initialStateCollapse: false
     };
     if (this.email) {
+      this.isLoading = true;
       const result = await this.officePermissionsSrv.GetAll({email: this.email, 'id-office': this.idOffice});
       if (result.success) {
         this.permission = result.data[0];
       }
+      this.isLoading = false;
       if (this.permission) {
         this.person = {
           id: this.permission.person.id,

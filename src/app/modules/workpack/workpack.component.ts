@@ -217,7 +217,6 @@ export class WorkpackComponent implements OnDestroy {
   ngOnDestroy(): void {
     this.$destroy.next();
     this.$destroy.complete();
-    this.citizenUserSrv.unloadCitizenUsers();
   }
 
   handleChangeCollapseExpandPanel(event) {

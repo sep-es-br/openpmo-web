@@ -261,7 +261,6 @@ export class OfficePermissionsListComponent implements OnInit {
   async ngOnDestroy(): Promise<void> {
     this.$destroy.next();
     this.$destroy.complete();
-    this.citizenUserSrv.unloadCitizenUsers();
   }
 
 }

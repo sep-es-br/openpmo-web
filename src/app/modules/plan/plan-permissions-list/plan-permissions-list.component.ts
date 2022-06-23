@@ -265,6 +265,5 @@ export class PlanPermissionsListComponent implements OnInit {
   async ngOnDestroy(): Promise<void> {
     this.$destroy.next();
     this.$destroy.complete();
-    this.citizenUserSrv.unloadCitizenUsers();
   }
 }

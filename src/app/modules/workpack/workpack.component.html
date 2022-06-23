@@ -14,7 +14,7 @@
   </div>
 
   <div class="card-dashboard"
-    *ngIf="!!idWorkpack && !!workpack && !!workpackModel && !!workpackModel.dashboardSessionActive">
+    *ngIf="!!idWorkpack && !!workpack && !workpack.canceled && !!workpackModel && !!workpackModel.dashboardSessionActive">
     <app-dashboard [idWorkpack]="idWorkpack" [workpackFullName]="workpackFullName"
       [dashboardShowStakeholders]="workpackModel?.dashboardShowStakeholders"
       [dashboardShowRisks]="workpackModel?.dashboardShowRisks" [dashboardShowEva]="workpackModel?.dashboardShowEva"

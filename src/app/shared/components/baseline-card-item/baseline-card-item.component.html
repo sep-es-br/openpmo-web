@@ -29,7 +29,7 @@
         <span class="card-item-status"
           [ngStyle]="{ color: properties.baselineStatus !== 'proposed' ? '#009dd4' : '#888e96' }"
           *ngIf="properties.baselineStatus">{{properties.baselineStatus |translate}}</span>
-        <span class="card-item-status-date" *ngIf="properties.baselineStatusDate"
+        <span class="card-item-status-date"
           [class.date-none]="properties?.baselineStatusDate === 'NONE'">
           {{ properties?.baselineStatusDate !== 'NONE' ? (language === 'pt' ?
           (properties?.baselineStatusDate|date:'dd/MM/yyyy') :

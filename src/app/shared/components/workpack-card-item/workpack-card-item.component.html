@@ -116,18 +116,20 @@
         </div>
         <div class="right-content">
           <div class="indexes">
-            <span class="index" [ngStyle]="{color: cpiColor}" (mouseenter)="cpiPanel.show($event)"*ngIf="properties?.dashboard?.costPerformanceIndex"
-              (mouseleave)="cpiPanel.hide($event)">{{'CPI'|translate}}</span>
-            <span class="index" (mouseenter)="spiPanel.show($event)" (mouseleave)="spiPanel.hide($event)" *ngIf="properties?.dashboard?.schedulePerformanceIndex"
+            <span class="index" [ngStyle]="{color: cpiColor}" (mouseenter)="cpiPanel.show($event)"
+              (mouseleave)="cpiPanel.hide($event)"
+              *ngIf="properties?.dashboard?.costPerformanceIndex">{{'CPI'|translate}}</span>
+            <span class="index" (mouseenter)="spiPanel.show($event)" (mouseleave)="spiPanel.hide($event)"
+              *ngIf="properties?.dashboard?.schedulePerformanceIndex"
               [ngStyle]="{color: spiColor}">{{'SPI'|translate}}</span>
           </div>
           <p-overlayPanel #cpiPanel>
-            <div class="constraint-content">
+            <div class="index-content">
               <app-gauge-chart *ngIf="gaugeChartDataCPI" [config]="gaugeChartDataCPI"></app-gauge-chart>
             </div>
           </p-overlayPanel>
           <p-overlayPanel #spiPanel>
-            <div class="constraint-content">
+            <div class="index-content">
               <app-gauge-chart *ngIf="gaugeChartDataSPI" [config]="gaugeChartDataSPI"></app-gauge-chart>
             </div>
           </p-overlayPanel>
@@ -215,9 +217,11 @@
             </div>
           </p-overlayPanel>
           <div class="indexes">
-            <span class="index" [ngStyle]="{color: cpiColor}" (mouseenter)="cpiPanel.show($event)" *ngIf="properties?.dashboard?.costPerformanceIndex"
+            <span class="index" [ngStyle]="{color: cpiColor}" (mouseenter)="cpiPanel.show($event)"
+              *ngIf="properties?.dashboard?.costPerformanceIndex"
               (mouseleave)="cpiPanel.hide($event)">{{'CPI'|translate}}</span>
-            <span class="index" (mouseenter)="spiPanel.show($event)" (mouseleave)="spiPanel.hide($event)" *ngIf="properties?.dashboard?.schedulePerformanceIndex"
+            <span class="index" (mouseenter)="spiPanel.show($event)" (mouseleave)="spiPanel.hide($event)"
+              *ngIf="properties?.dashboard?.schedulePerformanceIndex"
               [ngStyle]="{color: spiColor}">{{'SPI'|translate}}</span>
           </div>
           <p-overlayPanel #cpiPanel>
@@ -295,7 +299,8 @@
         <div class="icons-container">
           <i [ngClass]=" ['concluded', 'lateConcluded'].includes(properties.statusItem) ?  [ 'app-icon', 'flag-check', 'grey-icon'] : ['app-icon', 'flag-unchecked', 'grey-icon']"
             [class.linked]="!!properties.linked || !!properties.shared" [ngStyle]="{ fontSize: '2.5rem' }"
-            [class.on-time]="properties?.statusItem === 'ontime' && !properties?.canceled" [class.late]="properties?.statusItem === 'late'"
+            [class.on-time]="properties?.statusItem === 'ontime' && !properties?.canceled"
+            [class.late]="properties?.statusItem === 'late'"
             [class.concluded]="properties?.statusItem === 'concluded' && !properties?.canceled"
             [class.late-concluded]="properties?.statusItem === 'lateConcluded' && !properties?.canceled"></i>
           <i [ngClass]="['app-icon', 'link-to', 'grey-icon', 'linked']" *ngIf="!!properties.linked"></i>
@@ -304,7 +309,8 @@
         </div>
         <span class="card-item-name" [pTooltip]="properties.fullNameCardItem"
           tooltipPosition="bottom">{{properties.nameCardItem}}</span>
-        <span class="card-item-date" *ngIf="properties.subtitleCardItem && !properties?.canceled">{{language === 'pt-BR' ?
+        <span class="card-item-date" *ngIf="properties.subtitleCardItem && !properties?.canceled">{{language === 'pt-BR'
+          ?
           (properties?.subtitleCardItem|date:'dd/MM/yyyy') :
           (properties?.subtitleCardItem|date:'yyyy/MM/dd')}}</span>
         <span class="card-item-status" *ngIf="properties?.statusItem && !properties?.canceled"
@@ -341,13 +347,13 @@
             <span class="card-item-name" [pTooltip]="properties.fullNameCardItem"
               tooltipPosition="bottom">{{properties.nameCardItem}}</span>
             <span class="card-item-status" *ngIf="properties?.statusItem && !properties?.canceled"
-              [class.on-time]="properties?.statusItem === 'ontime'"
-              [class.late]="properties?.statusItem === 'late'"
+              [class.on-time]="properties?.statusItem === 'ontime'" [class.late]="properties?.statusItem === 'late'"
               [class.concluded]="properties?.statusItem === 'concluded'"
               [class.late-concluded]="properties?.statusItem === 'lateConcluded'">
               {{properties?.statusItem|translate}}</span>
           </div>
-          <div class="card-item-date" *ngIf="properties.subtitleCardItem && !properties?.canceled" [class.attention-milestone]="!!attentionMilestone" >{{language === 'pt-BR' ?
+          <div class="card-item-date" *ngIf="properties.subtitleCardItem && !properties?.canceled"
+            [class.attention-milestone]="!!attentionMilestone">{{language === 'pt-BR' ?
             (properties?.subtitleCardItem|date:'dd/MM/yyyy') :
             (properties?.subtitleCardItem|date:'yyyy/MM/dd')}}</div>
         </div>

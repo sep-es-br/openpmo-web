@@ -2,7 +2,7 @@
   <div class="rule-logical-operator-card" [class.rule-logical-operator-card-responsive]="responsive" *ngIf="filterRuleCard.logicalOperator && indexCard > 0">
     <p-dropdown class="app-single-selection" [options]="logicalOperatorsOptions" [required]="true"
       [class.responsive]="responsive" [(ngModel)]="filterRuleCard.logicalOperator"
-      (onChange)="handleChangeRoleCard()"></p-dropdown>
+      (onChange)="handleChangeLogicalOperatorRoleCard($event)"></p-dropdown>
   </div>
 
   <p-card class="app-rule-card-item" [class.app-rule-card-item-responsive]="responsive" *ngIf="filterRuleCard.typeCard === 'rule-card' && !filterRuleCard.deleted">

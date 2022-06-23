@@ -83,7 +83,6 @@ export class ControlChangeBoardMemberComponent implements OnInit, OnDestroy {
     private planSrv: PlanService,
     private ccbMemberSrv: ControlChangeBoardService
   ) {
-    this.citizenUserSrv.loadCitizenUsers();
     this.actRouter.queryParams.subscribe(async queryParams => {
       this.idPerson = +queryParams.idPerson;
       this.idProject = +queryParams.idProject;

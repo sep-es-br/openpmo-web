@@ -98,6 +98,10 @@ export class FilterRuleCardItemComponent implements OnInit {
     }
   }
 
+  handleChangeLogicalOperatorRoleCard(event) {
+    this.ruleChanged.emit();
+  }
+
   handlePropertySelected(event) {
     this.propertySelected = this.filterRuleCard.propertySelected;
     if (this.filterRuleCard.propertySelected.possibleValues) {

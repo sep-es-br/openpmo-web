@@ -71,7 +71,15 @@ export class ProcessComponent implements OnInit, OnDestroy {
     this.formProcess.valueChanges
       .pipe(takeUntil(this.$destroy), filter(() => this.formProcess.dirty && this.formProcess.valid))
       .subscribe(() => this.saveButton.showButton());
-    this.debounceSearch.pipe(debounceTime(300), takeUntil(this.$destroy)).subscribe(() => this.searchProcessByNumber());
+    this.debounceSearch.pipe(debounceTime(300), takeUntil(this.$destroy)).subscribe(() => {
+      this.resetFormProcess();
+      this.process = undefined;
+      this.showProcessHistory = false;
+      this.cardProcessHistory = undefined;
+      if (this.formProcess.controls.processNumber.value && this.formProcess.controls.processNumber.value.length > 3) {
+        this.searchProcessByNumber();
+      }
+    });
     this.currentLang = this.translateSrv.currentLang;
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.responsive = value);
     this.currentLang = this.translateSrv.getDefaultLang();
@@ -79,6 +87,16 @@ export class ProcessComponent implements OnInit, OnDestroy {
         setTimeout(() => this.setLanguage(), 200);
       }
     );
+  }
+
+  resetFormProcess() {
+    this.formProcess.controls.name.setValue('');
+    this.formProcess.controls.subject.setValue('');
+    this.formProcess.controls.currentOrganization.setValue('');
+    this.formProcess.controls.lengthOfStayOn.setValue(null);
+    this.formProcess.controls.note.setValue('');
+    this.formProcess.controls.priority.setValue('');
+    this.formProcess.controls.status.setValue('');
   }
 
   ngOnDestroy(): void {
@@ -148,8 +166,9 @@ export class ProcessComponent implements OnInit, OnDestroy {
       collapseble: true,
       initialStateCollapse: false,
     };
-
+    this.isLoading = true;
     const result = this.idProcess && await this.processSrv.GetById(this.idProcess);
+    this.isLoading = false;
     if (result && result.success) {
       this.process = result.data;
       await this.loadPermissions();

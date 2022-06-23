@@ -4,6 +4,21 @@
   .constraint-content {
     min-width: 340px;
   }
+  .index-content {
+    min-width: 280px;
+    .gauge-chart {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      .chart-container {
+        width: 100%;
+      }
+      .container-progress {
+        width: 80%;
+      }
+    }
+  }
     .p-card {
     display: flex;
     flex-direction: column;

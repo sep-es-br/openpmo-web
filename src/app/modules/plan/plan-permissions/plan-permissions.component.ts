@@ -81,9 +81,6 @@ export class PlanPermissionsComponent implements OnInit, OnDestroy {
     this.actRouter.queryParams.subscribe(async queryParams => {
       this.idPlan = queryParams.idPlan;
       this.email = queryParams.email;
-      if (!this.email) {
-        this.citizenUserSrv.loadCitizenUsers();
-      }
     });
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => {
       this.responsive = value;
@@ -103,9 +100,7 @@ export class PlanPermissionsComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.$destroy.next();
     this.$destroy.complete();
-    if (!this.email) {
-      this.citizenUserSrv.unloadCitizenUsers();
-    }
+    this.citizenUserSrv.unloadCitizenUsers();
   }
 
   async ngOnInit() {

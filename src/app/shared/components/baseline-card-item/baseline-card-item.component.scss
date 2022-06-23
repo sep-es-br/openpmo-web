@@ -76,6 +76,12 @@
       outline: none;
       flex: 1;
     }
+    .display-mode-grid {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      flex: 1;
+    }
     .display-mode-list {
       display: flex;
       height: 100%;

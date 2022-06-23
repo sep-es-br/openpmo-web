@@ -104,9 +104,6 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
       this.idWorkpack = queryParams.idWorkpack && +queryParams.idWorkpack;
       this.idWorkpackModelLinked = queryParams.idWorkpackModelLinked && +queryParams.idWorkpackModelLinked;
       this.idPerson = queryParams.idPerson && +queryParams.idPerson;
-      if (!this.idPerson) {
-        this.citizenUserSrv.loadCitizenUsers();
-      }
     });
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => {
       this.responsive = value;

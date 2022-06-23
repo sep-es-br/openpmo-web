@@ -89,7 +89,6 @@ export class ControlChangeBoardListComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.$destroy.next();
     this.$destroy.complete();
-    this.citizenUserSrv.unloadCitizenUsers();
   }
 
   async loadPropertiesProject() {
