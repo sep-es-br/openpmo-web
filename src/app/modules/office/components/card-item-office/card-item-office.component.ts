@@ -38,11 +38,6 @@ export class CardItemOfficeComponent implements OnInit {
    }
 
   async ngOnInit() {
-    // const isUserAdmin = await this.authSrv.isUserAdmin();
-    // this.editPermission = !!isUserAdmin;
-    // if (!isUserAdmin) {
-    //   this.editPermission = this.properties?.office?.permissions.filter( permission => permission.level === 'EDIT').length > 0;
-    // }
     this.editPermission = this.properties?.editPermission;
     this.cardIdItem = this.properties.itemId || this.properties.itemId === 0 ?
     `${ this.properties.itemId < 10 && this.properties.itemId !== 0 ? '0'+this.properties.itemId : this.properties.itemId}` : '';

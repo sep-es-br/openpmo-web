@@ -134,7 +134,6 @@ export class StepComponent implements OnInit, OnDestroy {
   async ngOnInit() {
     this.calendarFormat = this.translateSrv.instant('dateFormat');
     await this.loadPropertiesStep();
-    // this.handleChangeValuesCardItems();
   }
 
   async loadPropertiesStep() {

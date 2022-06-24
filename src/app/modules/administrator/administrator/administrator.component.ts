@@ -207,7 +207,6 @@ export class AdministratorComponent implements OnInit, OnDestroy {
     }
     this.showMessagePublicServerNotFoundByName =
       !this.publicServersResult || (this.publicServersResult && this.publicServersResult.length === 0);
-    // this.saveButton.showButton();
   }
 
   validateClearSearchByCpf(event) {

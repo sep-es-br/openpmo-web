@@ -75,12 +75,6 @@ export class MenuComponent implements OnInit, OnDestroy {
     this.translateChangeSrv.getCurrentLang()
       .pipe(takeUntil(this.$destroy))
       .subscribe(() => this.handleChangeLanguage());
-    // this.menuSrv.isAdminMenu.pipe(takeUntil(this.$destroy)).subscribe(isAdminMenu => {
-    //   if (!this.isFixed) {
-    //     this.isAdminMenu = isAdminMenu;
-    //     this.updateMenuOfficeOnAdminChange();
-    //   }
-    // });
     this.officeSrv.observableIdOffice().pipe(takeUntil(this.$destroy)).subscribe(async id => {
       if (!this.isFixed) {
         this.currentIDOffice = id;
@@ -146,7 +140,6 @@ export class MenuComponent implements OnInit, OnDestroy {
         }
       }
     });
-    // this.getMenuModeUser();
   }
 
   refreshPortfolioMenu() {

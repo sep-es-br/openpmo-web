@@ -737,11 +737,6 @@ export class WorkpackComponent implements OnDestroy {
 
   loadSelectedLocality(seletectedIds: number[], list: TreeNode[]) {
     let result = [];
-    // list.sort((a, b) => a.label < b.label && a.key < b.key ?
-    //   -1 :
-    //   a.label > b.label && a.key > b.key ?
-    //     1 :
-    //     0);
     list.forEach(l => {
       if (seletectedIds.includes(l.data)) {
         result.push(l);
@@ -1137,7 +1132,7 @@ export class WorkpackComponent implements OnDestroy {
             command: (event) => this.handleRestoreWorkpack(workpack.id),
           });
         } else {
-          if (workpack.type !== 'Project' && !!workpack.canDeleted) {
+          if (workpack.type !== 'Project' && !!workpack.canDeleted && !workpack.canceled) {
             menuItems.push({
               label: this.translateSrv.instant('delete'),
               icon: 'fas fa-trash-alt',
@@ -1145,7 +1140,7 @@ export class WorkpackComponent implements OnDestroy {
               disabled: !this.editPermission
             });
           }
-          if (workpack.type === 'Deliverable' && (!workpack.endManagementDate || workpack.endManagementDate === null)) {
+          if (!workpack.canceled && workpack.type === 'Deliverable' && (!workpack.endManagementDate || workpack.endManagementDate === null)) {
             menuItems.push({
               label: this.translateSrv.instant('endManagement'),
               icon: 'far fa-stop-circle',
@@ -1153,7 +1148,7 @@ export class WorkpackComponent implements OnDestroy {
               disabled: !this.editPermission
             });
           }
-          if (workpack.type === 'Deliverable' && (!!workpack.endManagementDate && workpack.endManagementDate !== null)) {
+          if (!workpack.canceled && workpack.type === 'Deliverable' && (!!workpack.endManagementDate && workpack.endManagementDate !== null)) {
             menuItems.push({
               label: this.translateSrv.instant('resumeManagement'),
               icon: 'far fa-play-circle',
@@ -1190,14 +1185,14 @@ export class WorkpackComponent implements OnDestroy {
               });
             }
           }
-          if (this.editPermission) {
+          if (this.editPermission && !workpack.canceled) {
             menuItems.push({
               label: this.translateSrv.instant('cut'),
               icon: 'fas fa-cut',
               command: (event) => this.handleCutWorkpack(workpack),
             });
           }
-          if (workpack.model.id === idWorkpackModel && this.editPermission && !idWorkpackModelLinked) {
+          if (!workpack.canceled && workpack.model.id === idWorkpackModel && this.editPermission && !idWorkpackModelLinked) {
             menuItems.push({
               label: this.translateSrv.instant('sharing'),
               icon: 'app-icon share',
@@ -1445,7 +1440,7 @@ export class WorkpackComponent implements OnDestroy {
       {
         queryParams: {
           idProject,
-          idWorkpackModelLinked: this.idWorkpackModelLinked,
+          idWorkpackModelLinked: this.idWorkpackModelLinked ? this.idWorkpackModelLinked as Number : null,
           projectName
         }
       });

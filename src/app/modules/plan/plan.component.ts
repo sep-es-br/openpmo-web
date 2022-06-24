@@ -180,13 +180,6 @@ export class PlanComponent implements OnInit, OnDestroy {
         info: this.propertiesOffice?.name,
         tooltip: this.propertiesOffice?.fullName
       },
-      // {
-      //   key: 'plan',
-      //   routerLink: ['/plan'],
-      //   queryParams: { id: this.idPlan },
-      //   info: this.planData?.name,
-      //   tooltip: this.planData?.fullName
-      // }
     ]);
   }
 

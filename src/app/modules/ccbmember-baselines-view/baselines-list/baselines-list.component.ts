@@ -80,7 +80,7 @@ export class BaselinesListComponent implements OnInit, OnDestroy {
       nameCardItem: baselineItem.name,
       baselineStatus: baselineItem.status.toLowerCase(),
       baselineStatusDate: baselineItem.active ? baselineItem.activationDate :
-        (baselineItem.status === 'PROPOSED' ? baselineItem.proposalDate : (baselineItem.status === 'APPROVED' ? baselineItem.activationDate : 'NONE')),
+        (['PROPOSED', 'REJECTED'].includes(baselineItem.status) ? baselineItem.proposalDate : (baselineItem.status === 'APPROVED' ? baselineItem.activationDate : 'NONE')),
       baselineActive: baselineItem.active,
       itemId: baselineItem.id,
       urlCard: '/ccbmember-baselines-view/baseline',

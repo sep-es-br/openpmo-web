@@ -349,7 +349,6 @@ $mobileMenuHeight: 90px;
     }
   }
   &:not(.mobile) .p-panelmenu {
-    // width: 300px;
     height: calc(100% - 3.3rem);
     overflow-y: auto;
   }
