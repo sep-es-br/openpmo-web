@@ -2037,6 +2037,14 @@ export class WorkpackComponent implements OnDestroy {
     }
   }
 
+  handleCreateNewProcess() {
+    this.router.navigate(['/workpack/processes'], {
+      queryParams: {
+        idWorkpack: this.idWorkpack
+      }
+    })
+  }
+
   async deleteProcess(process: IProcess) {
     const result = await this.processSrv.delete(process, { useConfirm: true });
     if (result.success) {
