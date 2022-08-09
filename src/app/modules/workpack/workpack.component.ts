@@ -162,6 +162,7 @@ export class WorkpackComponent implements OnDestroy {
   $destroy = new Subject();
   language: string;
   fullScreenModeDashboard = false;
+  changedStatusCompleted = false;
 
   constructor(
     private actRouter: ActivatedRoute,
@@ -612,11 +613,9 @@ export class WorkpackComponent implements OnDestroy {
   }
 
   async handleChangeCheckCompleted(event) {
-    const completed = event;
-    const result = await this.workpackSrv.completeDeliverable(this.idWorkpack, completed);
-    if (result.success) {
-      this.workpack.completed = completed;
-    }
+    this.changedStatusCompleted = true;
+    this.workpack.completed = event;
+    this.saveButton.showButton();
   }
 
   async loadPermissionsOffice() {
@@ -2090,9 +2089,9 @@ export class WorkpackComponent implements OnDestroy {
             command: (event) => this.deleteCostAccount(cost),
             disabled: !this.editPermission
           }] as MenuItem[],
-          urlCard: costThisWorkpack ? '/workpack/cost-account' : '/workpack',
+          urlCard: '/workpack/cost-account',
           paramsUrlCard: [
-            { name: costThisWorkpack ? 'idWorkpack' : 'id', value: cost.idWorkpack },
+            { name: 'idWorkpack', value: cost.idWorkpack },
             { name: 'idWorkpackModelLinked', value: this.idWorkpackModelLinked }
           ],
           iconMenuItems: null
@@ -2447,6 +2446,9 @@ export class WorkpackComponent implements OnDestroy {
   }
 
   async saveWorkpack() {
+    if (this.changedStatusCompleted) {
+      await this.workpackSrv.completeDeliverable(this.idWorkpack, this.workpack.completed);
+    }
     this.workpackProperties = this.sectionPropertiesProperties.map(p => {
       if (p.type === TypePropertyModelEnum.GroupModel) {
         const groupedProperties = p.groupedProperties.map(groupProp => groupProp.getValues());

@@ -584,14 +584,6 @@ export class WorkpackModelComponent implements OnInit {
           },
           {
             active: true,
-            label: this.translateSrv.instant('statusCompleted'),
-            name: this.translateSrv.instant('statusCompleted'),
-            type: TypePropertyEnum.ToggleModel,
-            sortIndex: 3,
-            fullLine: true
-          },
-          {
-            active: true,
             label: this.translateSrv.instant('type'),
             name: this.translateSrv.instant('type'),
             type: TypePropertyEnum.SelectionModel,
