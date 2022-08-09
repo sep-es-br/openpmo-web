@@ -1,4 +1,5 @@
-import { Component, EventEmitter, Input, OnInit, Output, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, SimpleChanges, OnChanges } from '@angular/core';
+import { DomSanitizer } from '@angular/platform-browser';
 import { HexBase64BinaryEncoding } from 'crypto';
 import { ImageCroppedEvent, LoadedImage } from 'ngx-image-cropper';
 import { IFile } from 'src/app/shared/interfaces/IFile';
@@ -9,21 +10,26 @@ import { PersonService } from '../../shared/services/person.service';
   templateUrl: './avatar.component.html',
   styleUrls: ['./avatar.component.scss']
 })
-export class AvatarComponent implements OnInit {
+export class AvatarComponent implements OnInit, OnChanges {
 
   @Input() idPerson: number;
   @Input() edit = false;
   @Input() avatar: IFile;
   @Input() menu = false;
+  @Output() changeAvatar = new EventEmitter();
+  @Output() deleteAvatar = new EventEmitter();
+
   modalImgAvatarUpload = false;
   hasAvatar = false;
   avatarFile: IFile = {};
   resizableImgAvatar: boolean;
   imageChangedEvent: any;
   croppedImageAvatar: string;
+  urlViewDocument;
 
   constructor(
-    private personSrv: PersonService
+    private personSrv: PersonService,
+    private sanatize: DomSanitizer
   ) { }
 
   async ngOnInit() {
@@ -31,16 +37,16 @@ export class AvatarComponent implements OnInit {
   }
 
   async ngOnChanges(changes: SimpleChanges) {
-   if ((changes.idPerson && changes.idPerson.currentValue) || (changes.avatar && changes.avatar.currentValue)) {
-    await this.redirectSetAvatarStatus();
-   }
+    if ((changes.idPerson && changes.idPerson.currentValue) || (changes.avatar && changes.avatar.currentValue)) {
+      await this.redirectSetAvatarStatus();
+    }
   }
 
   async redirectSetAvatarStatus() {
     if (this.idPerson) {
       await this.setAvatarPerson();
     }
-    if(this.avatar){
+    if (this.avatar) {
       this.avatarFile = this.avatar;
       this.hasAvatar = true;
     }
@@ -84,11 +90,10 @@ export class AvatarComponent implements OnInit {
   }
 
   async handleDeleteAvatar() {
-    const result = await this.personSrv.deleteAvatar(this.idPerson);
-    if (result.success) {
-      this.hasAvatar = false;
-      await this.setAvatarPerson();
-    }
+    this.deleteAvatar.emit();
+    this.resizableImgAvatar = false;
+    this.modalImgAvatarUpload = false;
+    this.hasAvatar = false;
   }
 
   resetImageAvatar() {
@@ -107,23 +112,16 @@ export class AvatarComponent implements OnInit {
     const formData: FormData = new FormData();
     const fileBase64 = this.croppedImageAvatar;
     const fileBlob = this.DataURIToBlob(fileBase64);
+    const url = window.URL.createObjectURL(fileBlob);
+    this.urlViewDocument = this.sanatize.bypassSecurityTrustResourceUrl(url);
     formData.append('file', fileBlob, this.avatarFile.name);
-    if (this.hasAvatar) {
-      const result = await this.personSrv.putAvatar(formData, this.idPerson);
-      if (result.success) {
-        this.avatarFile = result.data;
-        this.hasAvatar = true;
-      }
-    } else {
-      const result = await this.personSrv.postAvatar(formData, this.idPerson);
-      if (result.success) {
-        this.avatarFile = result.data;
-        this.hasAvatar = true;
-      }
-    }
-    this.resetImageAvatar();
-    await this.setAvatarPerson();
-    window.location.reload();
+    this.changeAvatar.emit({
+      formData,
+      hasAvatar: this.hasAvatar
+    });
+    this.resizableImgAvatar = false;
+    this.modalImgAvatarUpload = false;
+    this.hasAvatar = true;
   }
 
   DataURIToBlob(dataURI: string) {

@@ -1084,7 +1084,7 @@ export class WorkpackComponent implements OnDestroy {
         collapseble: true,
         initialStateCollapse: this.collapsePanelsStatus,
         showFilters: true,
-        showCreateNemElementButton: this.editPermission ? true : false
+        showCreateNemElementButton: this.editPermission ? true : false,
       };
       const resultFilters = await this.filterSrv.getAllFilters(`workpackModels/${workpackModel.id}/workpacks`);
       if (resultFilters.success && resultFilters.data) {
@@ -1092,11 +1092,12 @@ export class WorkpackComponent implements OnDestroy {
       }
       const idFilterSelected = propertiesCard.filters.find(defaultFilter => !!defaultFilter.favorite) ?
         propertiesCard.filters.find(defaultFilter => !!defaultFilter.favorite).id : undefined;
-      const workPackItemCardList = await this.loadWorkpacksFromWorkpackModel(this.workpack.plan.id, workpackModel.id, idFilterSelected, false);
+      const { workpackItemCardList, iconMenuItems } = await this.loadWorkpacksFromWorkpackModel(this.workpack.plan.id, workpackModel.id, idFilterSelected, false);
+      propertiesCard.createNewElementMenuItems = iconMenuItems;
       return {
         idWorkpackModel: workpackModel.id,
         cardSection: propertiesCard,
-        cardItemsSection: workPackItemCardList,
+        cardItemsSection: workpackItemCardList,
         workpackShowCancelleds: this.workpack.canceled ? true : false
       };
     }));
@@ -1232,9 +1233,10 @@ export class WorkpackComponent implements OnDestroy {
           statusItem: workpack.type === 'Milestone' ? MilestoneStatusEnum[workpack.milestoneStatus] : ''
         };
       });
+      let iconMenuItems: MenuItem[];
       if (this.editPermission && !idWorkpackModelLinked) {
         const sharedWorkpackList = await this.loadSharedWorkpackList(idWorkpackModel);
-        const iconMenuItems: MenuItem[] = [
+        iconMenuItems = [
           { label: this.translateSrv.instant('new'), command: () => this.handleNewWorkpack(idPlan, idWorkpackModel, this.idWorkpack) }
         ];
         if (sharedWorkpackList && sharedWorkpackList.length > 0) {
@@ -1268,10 +1270,9 @@ export class WorkpackComponent implements OnDestroy {
           }
         );
       }
-      return workpackItemCardList;
+      return {workpackItemCardList, iconMenuItems};
     }
     if ((!workpacks || workpacks.length === 0) && this.editPermission) {
-      const sharedWorkpackList = await this.loadSharedWorkpackList(idWorkpackModel);
       const iconMenuItems: MenuItem[] = [
         { label: this.translateSrv.instant('new'), command: () => this.handleNewWorkpack(idPlan, idWorkpackModel, this.idWorkpack) }
       ];
@@ -1308,7 +1309,7 @@ export class WorkpackComponent implements OnDestroy {
           iconMenuItems
         }
       ];
-      return workpackItemCardList;
+      return {workpackItemCardList, iconMenuItems};
     }
   }
 
@@ -1526,12 +1527,12 @@ export class WorkpackComponent implements OnDestroy {
       }
       const idFilterSelected = propertiesCard.filters.find(defaultFilter => !!defaultFilter.favorite) ?
         propertiesCard.filters.find(defaultFilter => !!defaultFilter.favorite).id : undefined;
-      const workPackItemCardList = await this.loadWorkpacksFromWorkpackModel
+      const {workpackItemCardList} = await this.loadWorkpacksFromWorkpackModel
         (this.idPlan, workpackModel.idWorkpackModelOriginal, idFilterSelected, false, workpackModel.idWorkpackModelLinked);
       return {
         idWorkpackModel: workpackModel.idWorkpackModelLinked,
         cardSection: propertiesCard,
-        cardItemsSection: workPackItemCardList,
+        cardItemsSection: workpackItemCardList,
         workpackShowCancelleds: this.workpack.canceled ? true : false
       };
     }));
@@ -1759,8 +1760,9 @@ export class WorkpackComponent implements OnDestroy {
     const filters = resultFilters.success && resultFilters.data;
     const idFilterSelected = filters.find(defaultFilter => !!defaultFilter.favorite) ?
       filters.find(defaultFilter => !!defaultFilter.favorite).id : undefined;
-    const workPackItemCardList = await this.loadWorkpacksFromWorkpackModel(this.workpack.plan.id, idWorkpackModel, idFilterSelected, event.checked);
-    this.cardsWorkPackModelChildren[workpackModelIndex].cardItemsSection = workPackItemCardList;
+    const {workpackItemCardList, iconMenuItems} = await this.loadWorkpacksFromWorkpackModel(this.workpack.plan.id, idWorkpackModel, idFilterSelected, event.checked);
+    this.cardsWorkPackModelChildren[workpackModelIndex].cardItemsSection = workpackItemCardList;
+    this.cardsWorkPackModelChildren[workpackModelIndex].cardSection.createNewElementMenuItems = iconMenuItems;
     this.cardsWorkPackModelChildren[workpackModelIndex].workpackShowCancelleds = event.checked;
      
   }
@@ -2550,10 +2552,12 @@ export class WorkpackComponent implements OnDestroy {
   }
 
   async reloadWorkpacksOfWorkpackModelSelectedFilter(idFilter: number, idWorkpackModel: number) {
-    const workpacksByFilter = await this.loadWorkpacksFromWorkpackModel(this.workpack.plan.id, idWorkpackModel, idFilter, false);
+    const { workpackItemCardList, iconMenuItems } = await this.loadWorkpacksFromWorkpackModel(this.workpack.plan.id, idWorkpackModel, idFilter, false);
+    const workpacksByFilter = workpackItemCardList;
     const workpackModelCardIndex = this.cardsWorkPackModelChildren.findIndex(card => card.idWorkpackModel === idWorkpackModel);
     if (workpackModelCardIndex > -1) {
       this.cardsWorkPackModelChildren[workpackModelCardIndex].cardItemsSection = Array.from(workpacksByFilter);
+      this.cardsWorkPackModelChildren[workpackModelCardIndex].cardSection.createNewElementMenuItems = iconMenuItems;
       this.totalRecordsWorkpacks[workpackModelCardIndex] = workpacksByFilter && workpacksByFilter.length;
     }
   }

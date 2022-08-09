@@ -45,6 +45,9 @@ export class PersonComponent implements OnInit, OnDestroy {
   formPerson: FormGroup;
   phoneNumberPlaceholder = '';
   loading = false;
+  changedAvatar = false;
+  deletedAvatar = false;
+  avatarData;
 
   constructor(
     private personSrv: PersonService,
@@ -250,7 +253,28 @@ export class PersonComponent implements OnInit, OnDestroy {
     }
   }
 
+  handleChangeAvatar(event) {
+    this.avatarData = event;
+    this.changedAvatar = true;
+    if (this.formPerson.valid) {
+      this.saveButton.showButton();
+    }
+  }
+
+  async handleDeleteAvatar() {
+    this.deletedAvatar = true;
+    if (this.formPerson.valid) {
+      this.saveButton.showButton();
+    }
+  }
+
   async savePerson() {
+    if (this.changedAvatar) {
+      await this.updateAvatar();
+    }
+    if (this.deletedAvatar) {
+      await this.personSrv.deleteAvatar(this.idPerson);
+    }
     let phoneNumber = this.formPerson.controls.phoneNumber.value;
     if (phoneNumber) {
       phoneNumber = phoneNumber.replace(/[^0-9]+/g,'');
@@ -269,6 +293,18 @@ export class PersonComponent implements OnInit, OnDestroy {
         summary: this.translateSrv.instant('success'),
         detail: this.translateSrv.instant('messages.savedSuccessfully')
       });
+    }
+  }
+
+  async updateAvatar() {
+    const {
+      formData,
+      hasAvatar
+    } = this.avatarData;
+     if (hasAvatar) {
+      const result = await this.personSrv.putAvatar(formData, this.idPerson);
+    } else {
+      const result = await this.personSrv.postAvatar(formData, this.idPerson);
     }
   }
 
