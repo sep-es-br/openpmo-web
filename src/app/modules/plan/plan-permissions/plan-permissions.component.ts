@@ -40,7 +40,7 @@ export class PlanPermissionsComponent implements OnInit, OnDestroy {
   idOffice: number;
   propertiesOffice: IOffice;
   cardPersonPermission: ICard;
-  email: string;
+  key: string;
   responsive: boolean;
   searchedEmailPerson: string;
   permission: IPlanPermission;
@@ -80,7 +80,7 @@ export class PlanPermissionsComponent implements OnInit, OnDestroy {
   ) {
     this.actRouter.queryParams.subscribe(async queryParams => {
       this.idPlan = queryParams.idPlan;
-      this.email = queryParams.email;
+      this.key = queryParams.key;
     });
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => {
       this.responsive = value;
@@ -152,7 +152,7 @@ export class PlanPermissionsComponent implements OnInit, OnDestroy {
       {
         key: 'permission',
         routerLink: [ '/plan', 'permission', 'detail' ],
-        queryParams: { idPlan: this.idPlan, email: this.email },
+        queryParams: { idPlan: this.idPlan, key: this.key },
         info: this.person?.name,
         tooltip: this.person?.fullName
       }
@@ -263,8 +263,8 @@ export class PlanPermissionsComponent implements OnInit, OnDestroy {
       collapseble: true,
       initialStateCollapse: false
     };
-    if (this.email) {
-      const result = await this.planPermissionSrv.GetAll({email: this.email, 'id-plan': this.idPlan});
+    if (this.key) {
+      const result = await this.planPermissionSrv.GetAll({key: this.key, 'id-plan': this.idPlan});
       if (result.success) {
         this.permission = result.data[0];
       }
@@ -273,6 +273,7 @@ export class PlanPermissionsComponent implements OnInit, OnDestroy {
           name: this.permission.person.name,
           email: this.permission.person.email,
           guid: this.permission.person.guid,
+          key: this.permission.person.key,
           roles: this.permission.permissions.map(p => ({'role': p.role}))
         };
       }
@@ -327,7 +328,7 @@ export class PlanPermissionsComponent implements OnInit, OnDestroy {
   async searchPerson() {
     this.saveButton?.hideButton();
     if (this.searchedEmailPerson) {
-      const { data } = await this.personSrv.GetByEmail(this.searchedEmailPerson);
+      const { data } = await this.personSrv.GetByKey(this.searchedEmailPerson);
       if (data) {
         this.showSearchInputMessage = false;
         this.person = data;
@@ -373,11 +374,12 @@ export class PlanPermissionsComponent implements OnInit, OnDestroy {
     ));
     const permission: IPlanPermission = {
       idPlan: this.idPlan,
-      email: this.email ? this.email : this.person.email,
+      email: this.person.email,
+      key: this.key ? this.key : this.person.key,
       person: this.person,
       permissions: this.permission.permissions
     };
-    const { success } = this.email
+    const { success } = this.key
       ? await this.planPermissionSrv.put(permission)
       : await this.planPermissionSrv.post(permission);
     if (success) {

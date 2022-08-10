@@ -129,6 +129,7 @@ export class ControlChangeBoardMemberComponent implements OnInit, OnDestroy {
           routerLink: ['/workpack/change-control-board'],
           queryParams: {
             idProject: this.idProject,
+            idOffice: this.idOffice
           },
         },
         {
@@ -136,7 +137,8 @@ export class ControlChangeBoardMemberComponent implements OnInit, OnDestroy {
           routerLink: ['/workpack/change-control-board/member'],
           queryParams: {
             idProject: this.idProject,
-            idPerson: this.idPerson
+            idPerson: this.idPerson,
+            idOffice: this.idOffice
           },
         }
       ]
@@ -292,7 +294,7 @@ export class ControlChangeBoardMemberComponent implements OnInit, OnDestroy {
   async searchPerson() {
     this.saveButton?.hideButton();
     if (this.searchedEmailPerson) {
-      const {data} = await this.personSrv.GetByEmail(this.searchedEmailPerson);
+      const {data} = await this.personSrv.GetByKey(this.searchedEmailPerson);
       if (data) {
         this.showSearchInputMessage = false;
         this.ccbMember.person = data;

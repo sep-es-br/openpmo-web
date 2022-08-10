@@ -37,7 +37,7 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
   idOffice: number;
   propertiesOffice: IOffice;
   cardPersonPermission: ICard;
-  email: string;
+  key: string;
   responsive: boolean;
   searchedEmailPerson: string;
   permission: IOfficePermission;
@@ -77,7 +77,7 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
   ) {
     this.actRouter.queryParams.subscribe(async queryParams => {
       this.idOffice = queryParams.idOffice;
-      this.email = queryParams.email;
+      this.key = queryParams.key;
     });
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => {
       this.responsive = value;
@@ -126,10 +126,10 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
       {
         key: 'permissions',
         routerLink: ['/offices', 'permission', 'detail'],
-        queryParams: {idOffice: this.idOffice, email: this.email}
+        queryParams: {idOffice: this.idOffice, key: this.key}
       }
     ]);
-    if (this.email) {
+    if (this.key) {
       this.loadIsReadOnly();
     }
   }
@@ -165,9 +165,9 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
       collapseble: true,
       initialStateCollapse: false
     };
-    if (this.email) {
+    if (this.key) {
       this.isLoading = true;
-      const result = await this.officePermissionsSrv.GetAll({email: this.email, 'id-office': this.idOffice});
+      const result = await this.officePermissionsSrv.GetAll({key: this.key, 'id-office': this.idOffice});
       if (result.success) {
         this.permission = result.data[0];
       }
@@ -177,6 +177,7 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
           id: this.permission.person.id,
           name: this.permission.person.name,
           fullName: this.permission.person.fullName,
+          key: this.permission.person.key,
           email: this.permission.person.email,
           roles: this.permission.permissions.map(p => ({role: p.role})),
           guid: this.permission.person.guid
@@ -242,7 +243,7 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
   async searchPerson() {
     this.saveButton?.hideButton();
     if (this.searchedEmailPerson) {
-      const {data} = await this.personSrv.GetByEmail(this.searchedEmailPerson);
+      const {data} = await this.personSrv.GetByKey(this.searchedEmailPerson);
       if (data) {
         this.showSearchInputMessage = false;
         this.person = data;
@@ -380,11 +381,11 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
 
     const permission: IOfficePermission = {
       idOffice: this.idOffice,
-      email: this.email ? this.email : this.person.email,
+      key: this.key ? this.key : this.person.key,
       person: this.person,
       permissions: this.permission.permissions
     };
-    const result = this.email
+    const result = this.key
       ? await this.officePermissionsSrv.put(permission)
       : await this.officePermissionsSrv.post(permission);
     if (result.success) {

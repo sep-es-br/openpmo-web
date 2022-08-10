@@ -17,6 +17,7 @@ interface TokenPayload {
   email: string;
   administrator: boolean;
   exp: number;
+  key: string;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -106,7 +107,7 @@ export class AuthService {
     }
     const authenticated = await this.isAuthenticated();
     if (authenticated) {
-      const { success, data } = await this.personSrv.GetByEmail(this.getTokenPayload()?.email);
+      const { success, data } = await this.personSrv.GetByKey(this.getTokenPayload()?.key);
       if (success) {
         this.currentUserInfo = data;
         return data;

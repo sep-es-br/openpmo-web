@@ -395,7 +395,7 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
 
   async searchUserByEmail() {
     if (this.searchedEmailUser && this.searchedEmailUser.length > 5 && this.searchedEmailUser.split('@').length > 1) {
-      const {data} = await this.personSrv.GetByEmail(this.searchedEmailUser, {
+      const {data} = await this.personSrv.GetByKey(this.searchedEmailUser, {
         idOffice: this.idOffice,
       });
       if (data) {

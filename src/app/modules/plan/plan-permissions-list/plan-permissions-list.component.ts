@@ -149,7 +149,7 @@ export class PlanPermissionsListComponent implements OnInit {
         urlCard: 'plan/permission/detail',
         paramsUrlCard: [
           { name: 'idPlan', value: this.idPlan },
-          { name: 'email', value: p.person.email }
+          { name: 'key', value: p.person.key }
         ]
       };
     });
@@ -175,7 +175,7 @@ export class PlanPermissionsListComponent implements OnInit {
   }
 
   async deletePlanPermission(permission: IPlanPermission) {
-    const result = await this.planPermissionSrv.deletePermission({ email: permission.person.email, 'id-plan': permission.idPlan });
+    const result = await this.planPermissionSrv.deletePermission({ key: permission.person.key, 'id-plan': permission.idPlan });
     if (result.success) {
       this.cardItemsPlanPermissions = Array.from(this.cardItemsPlanPermissions.filter(p => p.itemId !== permission.person.id));
       this.totalRecords = this.cardItemsPlanPermissions && this.cardItemsPlanPermissions.length;

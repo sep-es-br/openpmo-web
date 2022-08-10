@@ -427,6 +427,7 @@ export class WorkpackComponent implements OnDestroy {
     this.sectionWorkpackModelChildren = undefined;
     this.cardsWorkPackModelChildren = [];
     this.editPermission = false;
+    this.changedStatusCompleted = false;
     this.idPlan = Number(localStorage.getItem('@currentPlan'));
     await this.loadProperties();
     await this.setBreadcrumb();
@@ -2448,9 +2449,10 @@ export class WorkpackComponent implements OnDestroy {
   }
 
   async saveWorkpack() {
-    if (this.changedStatusCompleted) {
-      await this.workpackSrv.completeDeliverable(this.idWorkpack, this.workpack.completed);
+    if (!!this.changedStatusCompleted) {
+      await this.workpackSrv.completeDeliverable(this.idWorkpack, this.workpack?.completed);
     }
+    this.changedStatusCompleted = false;
     this.workpackProperties = this.sectionPropertiesProperties.map(p => {
       if (p.type === TypePropertyModelEnum.GroupModel) {
         const groupedProperties = p.groupedProperties.map(groupProp => groupProp.getValues());

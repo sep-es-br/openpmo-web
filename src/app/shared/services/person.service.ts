@@ -28,7 +28,7 @@ export class PersonService extends BaseService<IPerson> {
     return result;
   }
 
-  public async GetByEmail(email: string, options?): Promise<IHttpResult<IPerson>> {
+  public async GetByKey(email: string, options?): Promise<IHttpResult<IPerson>> {
     const result = await this.http.get(`${this.urlBase}/${email}`,
     {
       params: PrepareHttpParams(options)

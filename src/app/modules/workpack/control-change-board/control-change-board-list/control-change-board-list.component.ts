@@ -81,6 +81,7 @@ export class ControlChangeBoardListComponent implements OnInit, OnDestroy {
         routerLink: ['/workpack/change-control-board'],
         queryParams: {
           idProject: this.idProject,
+          idOffice: this.idOffice
         },
       }]
     ]);
@@ -175,6 +176,7 @@ export class ControlChangeBoardListComponent implements OnInit, OnDestroy {
         paramsUrlCard: [
           { name: 'idProject', value: this.idProject },
           { name: 'idPerson', value: controlChangeBoard.person.id },
+          { name: 'idOffice', value: this.idOffice },
         ],
         active: controlChangeBoard.active
       } as ICardItem)));

@@ -11,7 +11,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    width: 90%;
+    width: 88%;
     .description {
       font-size: 1rem;
       margin: 0;
@@ -23,9 +23,11 @@
   }
   .versions {
     display: flex;
+    flex: 1;
     flex-direction: column;
     align-items: flex-end;
     font-weight: bold;
+    font-size: 14px;
   }
 }
 

@@ -150,7 +150,7 @@ export class OfficePermissionsListComponent implements OnInit {
           urlCard: '/offices/permission/detail',
           paramsUrlCard: [
             { name: 'idOffice', value: this.idOffice },
-            { name: 'email', value: p.person.email }
+            { name: 'key', value: p.person.key }
           ]
         };
       });
@@ -184,7 +184,7 @@ export class OfficePermissionsListComponent implements OnInit {
         detail: this.translateSrv.instant('messages.error.permission.delete.relationship.error')
       });
     }
-    const result = await this.officePermissionsSrv.deletePermission({ email: permission.person.email, 'id-office': permission.idOffice });
+    const result = await this.officePermissionsSrv.deletePermission({ key: permission.person.key, 'id-office': permission.idOffice });
     if (result.success) {
       const permissionIndex = this.cardItemsOfficePermissions.findIndex(p => p.itemId === permission.person.id);
       if (permissionIndex > -1) {

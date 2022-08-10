@@ -3,7 +3,8 @@ export interface IOfficePermission {
   idOffice: number;
   permissions: IPermission[];
   email?: string;
-  person?: IPerson
+  person?: IPerson;
+  key?: string;
 }
 
 interface IPermission {

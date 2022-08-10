@@ -5,6 +5,7 @@ export interface IPerson {
   name: string;
   fullName?: string;
   email?: string;
+  key?: string;
   guid?: string;
   contactEmail?: string;
   phoneNumber?: string;

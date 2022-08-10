@@ -1,14 +1,14 @@
 <div class="app-plan-permission-detail">
   <div class="app-content-header" [class.mobile]="responsive">
-    <span *ngIf="email; else newPermissionTitle">{{ person?.name }}</span>
+    <span *ngIf="key; else newPermissionTitle">{{ person?.name }}</span>
     <ng-template #newPermissionTitle>
       <span>{{ "newPermission" | translate }}</span>
     </ng-template>
   </div>
   <div class="card-permission">
-    <app-card [properties]="cardPersonPermission" class="mt-0" [class.inputs-float-label]="!email" *ngIf="cardPersonPermission">
+    <app-card [properties]="cardPersonPermission" class="mt-0" [class.inputs-float-label]="!key" *ngIf="cardPersonPermission">
       <div class="person-properties">
-        <div class="search-container" *ngIf="!email && !citizenAuthServer">
+        <div class="search-container" *ngIf="!key && !citizenAuthServer">
           <div class="search-email-container" [class.responsive]="responsive">
             <span class="p-float-label">
               <input class="app-input-text input-search" [class.responsive]="responsive" id="float-search"
@@ -22,7 +22,7 @@
             {{ invalidMailMessage }}
           </span>
         </div>
-        <div class="search-container-user-citizen" *ngIf="!email && !!citizenAuthServer">
+        <div class="search-container-user-citizen" *ngIf="!key && !!citizenAuthServer">
           <div class="search-user-by" [class.responsive]="responsive">
             <label>{{'searchBy'|translate}}:</label>
             <div class="radios-container">

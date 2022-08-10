@@ -170,7 +170,7 @@ export class AdministratorComponent implements OnInit, OnDestroy {
 
   async searchUserByEmail() {
     if (this.searchedEmailUser && this.searchedEmailUser.length > 5 && this.searchedEmailUser.split('@').length > 1) {
-      const {data} = await this.personSrv.GetByEmail(this.searchedEmailUser);
+      const {data} = await this.personSrv.GetByKey(this.searchedEmailUser);
       if (data) {
         this.person = data;
         this.showMessageNotFoundUserByEmail = false;

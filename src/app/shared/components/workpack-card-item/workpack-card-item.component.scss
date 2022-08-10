@@ -209,6 +209,10 @@
                 height: 12px;
                 background-color: #0083BB;
             }
+            .concluded-late {
+              height: 12px;
+              background-color: #7C75B9;
+            }
           }
           .indexes {
               display: flex;
@@ -317,6 +321,10 @@
           .concluded {
             width: 100%;
             background-color: #0083BB;
+          }
+          .concluded-late {
+            height: 12px;
+            background-color: #7C75B9;
           }
         }
       }
