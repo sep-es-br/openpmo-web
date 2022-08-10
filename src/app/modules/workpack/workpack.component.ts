@@ -1093,7 +1093,7 @@ export class WorkpackComponent implements OnDestroy {
       const idFilterSelected = propertiesCard.filters.find(defaultFilter => !!defaultFilter.favorite) ?
         propertiesCard.filters.find(defaultFilter => !!defaultFilter.favorite).id : undefined;
       const { workpackItemCardList, iconMenuItems } = await this.loadWorkpacksFromWorkpackModel(this.workpack.plan.id, workpackModel.id, idFilterSelected, false);
-      propertiesCard.createNewElementMenuItems = iconMenuItems;
+      propertiesCard.createNewElementMenuItemsWorkpack = iconMenuItems;
       return {
         idWorkpackModel: workpackModel.id,
         cardSection: propertiesCard,
@@ -1762,7 +1762,7 @@ export class WorkpackComponent implements OnDestroy {
       filters.find(defaultFilter => !!defaultFilter.favorite).id : undefined;
     const {workpackItemCardList, iconMenuItems} = await this.loadWorkpacksFromWorkpackModel(this.workpack.plan.id, idWorkpackModel, idFilterSelected, event.checked);
     this.cardsWorkPackModelChildren[workpackModelIndex].cardItemsSection = workpackItemCardList;
-    this.cardsWorkPackModelChildren[workpackModelIndex].cardSection.createNewElementMenuItems = iconMenuItems;
+    this.cardsWorkPackModelChildren[workpackModelIndex].cardSection.createNewElementMenuItemsWorkpack = iconMenuItems;
     this.cardsWorkPackModelChildren[workpackModelIndex].workpackShowCancelleds = event.checked;
      
   }
@@ -2557,7 +2557,7 @@ export class WorkpackComponent implements OnDestroy {
     const workpackModelCardIndex = this.cardsWorkPackModelChildren.findIndex(card => card.idWorkpackModel === idWorkpackModel);
     if (workpackModelCardIndex > -1) {
       this.cardsWorkPackModelChildren[workpackModelCardIndex].cardItemsSection = Array.from(workpacksByFilter);
-      this.cardsWorkPackModelChildren[workpackModelCardIndex].cardSection.createNewElementMenuItems = iconMenuItems;
+      this.cardsWorkPackModelChildren[workpackModelCardIndex].cardSection.createNewElementMenuItemsWorkpack = iconMenuItems;
       this.totalRecordsWorkpacks[workpackModelCardIndex] = workpacksByFilter && workpacksByFilter.length;
     }
   }

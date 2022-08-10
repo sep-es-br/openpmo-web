@@ -330,7 +330,7 @@ export class PlanComponent implements OnInit, OnDestroy {
         const idFilterSelected = propertiesCard.filters && propertiesCard.filters.find(defaultFilter => !!defaultFilter.favorite) ?
           propertiesCard.filters.find(defaultFilter => !!defaultFilter.favorite).id : undefined;
         const {workPackItemCardList, iconMenuItems} = await this.loadWorkpacksFromWorkpackModel(this.planData.id, workpackModel.id, idFilterSelected);
-        propertiesCard.createNewElementMenuItems = iconMenuItems;
+        propertiesCard.createNewElementMenuItemsWorkpack = iconMenuItems;
         return {
           idWorkpackModel: workpackModel.id,
           propertiesCard,
@@ -626,7 +626,7 @@ export class PlanComponent implements OnInit, OnDestroy {
     const workpackModelCardIndex = this.cardsPlanWorkPackModels.findIndex(card => card.idWorkpackModel === idWorkpackModel);
     if (workpackModelCardIndex > -1) {
       this.cardsPlanWorkPackModels[workpackModelCardIndex].workPackItemCardList = Array.from(workpacksByFilter);
-      this.cardsPlanWorkPackModels[workpackModelCardIndex].propertiesCard.createNewElementMenuItems = iconMenuItems;
+      this.cardsPlanWorkPackModels[workpackModelCardIndex].propertiesCard.createNewElementMenuItemsWorkpack = iconMenuItems;
       if (this.cardsPlanWorkPackModels[workpackModelCardIndex].workPackItemCardList.find(card => card.typeCardItem === 'newCardItem')) {
         this.cardsPlanWorkPackModels[workpackModelCardIndex].propertiesCard.showCreateNemElementButton = true;
       }

@@ -15,6 +15,7 @@ export interface ICard {
   filters?: IFilterDataview[];
   showCreateNemElementButton?: boolean;
   createNewElementMenuItems?: MenuItem[];
+  createNewElementMenuItemsWorkpack?: MenuItem[];
   headerDates?: {
     startDate: Date;
     endDate: Date;
