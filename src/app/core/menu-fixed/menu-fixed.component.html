@@ -137,7 +137,7 @@
     <ng-container *ngIf="isMobileView; else sliderPlanModel">
       <div class="top-bar">
         <div class="title" (click)="closeAllMenus()" [routerLink]="['/strategies']"
-          [queryParams]="{idOffice: currentIDOffice}">{{currentPlan?.name}}
+          [queryParams]="{idOffice: currentIDOffice}">{{'planModels'|translate}}
         </div>
       </div>
       <p-panelMenu [model]="itemsPlanModel"></p-panelMenu>
@@ -148,7 +148,7 @@
     <ng-template #sliderPlanModel>
       <div class="slide-wrapper">
         <div class="top-bar">
-          <div class="title" (click)="closeAllMenus()" [routerLink]="['/strategies']" [queryParams]="{idOffice: currentIDOffice}">{{currentPlan?.name}}
+          <div class="title" (click)="closeAllMenus()" [routerLink]="['/strategies']" [queryParams]="{idOffice: currentIDOffice}">{{'planModels'|translate}}
           </div>
           <div class="action" *ngIf="!isMobileView">
             <i [class]="isFixed ? 'app-icon pin-on' : 'app-icon pin-off'" [ngStyle]="{ fontSize: '1rem' }"

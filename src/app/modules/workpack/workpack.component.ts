@@ -1616,6 +1616,7 @@ export class WorkpackComponent implements OnDestroy {
           this.totalRecordsWorkpacks[workpackModelIndex] = this.cardsWorkPackModelChildren[workpackModelIndex].cardItemsSection.length;
         }
       }
+      this.menuSrv.reloadMenuPortfolio();
     }
   }
 

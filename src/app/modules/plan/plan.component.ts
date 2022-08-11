@@ -563,6 +563,7 @@ export class PlanComponent implements OnInit, OnDestroy {
           this.totalRecords[workpackModelIndex] = this.cardsPlanWorkPackModels[workpackModelIndex].workPackItemCardList.length;
         }
       }
+      this.menuSrv.reloadMenuPortfolio();
     }
   }
 

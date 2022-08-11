@@ -96,9 +96,7 @@ export class MenuFixedComponent implements OnInit, OnDestroy {
     });
     this.officeSrv.observableIdOffice().pipe(takeUntil(this.$destroy)).subscribe(async id => {
       this.currentIDOffice = id;
-      await this.loadPortfolioMenu();
       await this.loadPlanModelMenu();
-      this.refreshPortfolioMenu();
     });
     this.planSrv.observableIdPlan().pipe(takeUntil(this.$destroy)).subscribe(async id => {
       this.currentIDPlan = id;
@@ -106,10 +104,7 @@ export class MenuFixedComponent implements OnInit, OnDestroy {
         localStorage.setItem('@currentPlan', this.currentIDPlan.toString());
       }
       await this.loadPropertiesPlan();
-      await this.loadPlanModelMenu();
-      if (!this.itemsPorfolio.length) {
-        await this.loadPortfolioMenu();
-      }
+      await this.loadPortfolioMenu();
       this.refreshPortfolioMenu();
     });
     this.menuSrv.obsReloadMenuOffice().pipe(takeUntil(this.$destroy)).subscribe(() => this.loadOfficeMenu());
