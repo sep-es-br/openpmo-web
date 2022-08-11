@@ -62,12 +62,12 @@ export class PlanPermissionsListComponent implements OnInit {
   ) {
     this.citizenUserSrv.loadCitizenUsers();
     this.actRouter.queryParams.subscribe(async queryParams => {
-      this.idPlan = queryParams.idPlan;
+      this.idPlan = +queryParams.idPlan;
+      this.planSrv.nextIDPlan(this.idPlan);
     });
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => {
       this.responsive = value;
     });
-    this.planSrv.nextIDPlan(this.idPlan);
   }
 
   async ngOnInit() {

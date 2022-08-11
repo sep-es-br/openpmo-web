@@ -203,7 +203,6 @@ export class WorkpackComponent implements OnDestroy {
       this.idWorkpackModel = idWorkpackModel && +idWorkpackModel;
       this.idWorkpackParent = idWorkpackParent && +idWorkpackParent;
       this.idWorkpackModelLinked = idWorkpackModelLinked && +idWorkpackModelLinked;
-      this.planSrv.nextIDPlan(this.idPlan);
       await this.resetWorkpack();
     });
     this.dashboardSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.fullScreenModeDashboard = value);
@@ -548,7 +547,6 @@ export class WorkpackComponent implements OnDestroy {
       const propertyFullNameWorkpackModel = this.workpack.model.properties.find(p => p.name === 'fullName' && p.session === 'PROPERTIES');
       const propertyFullNameWorkpack = this.workpack.properties.find(p => p.idPropertyModel === propertyFullNameWorkpackModel.id);
       this.workpackFullName = propertyFullNameWorkpack.value as string;
-      this.planSrv.nextIDPlan(this.idPlan);
       if (this.workpack && (this.workpack.canceled || this.workpack.endManagementDate !== null)) {
         this.editPermission = false;
       } else if (!this.isUserAdmin && this.workpack) {
@@ -570,7 +568,6 @@ export class WorkpackComponent implements OnDestroy {
       const propertyFullNameWorkpackModel = this.workpack.model.properties.find(p => p.name === 'fullName' && p.session === 'PROPERTIES');
       const propertyFullNameWorkpack = this.workpack.properties.find(p => p.idPropertyModel === propertyFullNameWorkpackModel.id);
       this.workpackFullName = propertyFullNameWorkpack.value as string;
-      this.planSrv.nextIDPlan(this.idPlan);
       if (!this.isUserAdmin && this.workpack) {
         this.editPermission = !!this.workpack.permissions?.find(p => p.level === 'EDIT');
       }

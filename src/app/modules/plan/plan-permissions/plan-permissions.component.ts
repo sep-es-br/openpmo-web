@@ -79,7 +79,7 @@ export class PlanPermissionsComponent implements OnInit, OnDestroy {
     private authServerSrv: AuthServerService,
   ) {
     this.actRouter.queryParams.subscribe(async queryParams => {
-      this.idPlan = queryParams.idPlan;
+      this.idPlan = +queryParams.idPlan;
       this.key = queryParams.key;
     });
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => {
@@ -94,7 +94,6 @@ export class PlanPermissionsComponent implements OnInit, OnDestroy {
         this.person = null;
       }
     });
-    this.planSrv.nextIDPlan(this.idPlan);
   }
 
   ngOnDestroy(): void {

@@ -211,10 +211,6 @@ export class StepComponent implements OnInit, OnDestroy {
 
   async getBreadcrumbs() {
     const { success, data } = await this.breadcrumbSrv.getBreadcrumbWorkpack(this.schedule.idWorkpack, { 'id-plan': this.idPlan });
-    const breadcrumbPlan = data.find(d => d.type === 'plan');
-    if (breadcrumbPlan) {
-      this.planSrv.nextIDPlan(breadcrumbPlan.id);
-    }
     return success
       ? data.map(p => ({
         key: p.type.toLowerCase(),

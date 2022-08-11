@@ -141,7 +141,6 @@ export class CostAccountComponent implements OnInit {
       this.editPermission = !!this.workpack.permissions?.find( p => p.level === 'EDIT')
         || await this.authSrv.isUserAdmin();
       const plan = await this.planSrv.GetById(this.workpack.plan.id);
-      this.planSrv.nextIDPlan(plan.data.id);
       if (plan.success) {
         this.idOffice = plan.data.idOffice;
       }
