@@ -29,6 +29,7 @@ export class DashboardComponent implements OnInit, OnChanges, OnDestroy {
   @Input() workpackFullName: string;
   @Input() workpackType: string;
   @Input() collapsePanelsStatus: boolean;
+  @Input() reloadDashboard: boolean;
 
   dashboard: IDashboard;
   cardDashboardProperties: ICard;
@@ -86,7 +87,7 @@ export class DashboardComponent implements OnInit, OnChanges, OnDestroy {
 
   async ngOnChanges(changes: SimpleChanges) {
     if (
-      changes.idWorkpack && changes.idWorkpack.currentValue
+      (changes.idWorkpack && changes.idWorkpack.currentValue) || (changes.reloadDashboard)
     ) {
       if (this.workpackType === 'Project') {
         const result = await this.dashboardSrv.GetBaselines({ 'id-workpack': this.idWorkpack });
@@ -162,6 +163,7 @@ export class DashboardComponent implements OnInit, OnChanges, OnDestroy {
         this.validateDashboard();
       }
     }
+    this.reloadDashboard = false;
   }
 
   validateDashboard() {

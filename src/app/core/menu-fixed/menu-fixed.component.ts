@@ -278,7 +278,7 @@ export class MenuFixedComponent implements OnInit, OnDestroy {
 
   async loadPortfolioMenu() {
     if (this.currentIDOffice) {
-      const { success, data } = await this.menuSrv.getItemsPortfolio(this.currentIDOffice);
+      const { success, data } = await this.menuSrv.getItemsPortfolio(this.currentIDOffice, this.currentIDPlan);
       if (success) {
         this.itemsPorfolio = this.buildMenuItemPortfolio(data || []);
         this.refreshPortfolioMenu();

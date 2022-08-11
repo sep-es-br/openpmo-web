@@ -163,6 +163,7 @@ export class WorkpackComponent implements OnDestroy {
   language: string;
   fullScreenModeDashboard = false;
   changedStatusCompleted = false;
+  reloadDashboard = false;
 
   constructor(
     private actRouter: ActivatedRoute,
@@ -778,7 +779,7 @@ export class WorkpackComponent implements OnDestroy {
       }
       return { label: locality.name, data: locality.id, selectable };
     });
-    list.sort( (a,b) => a.label < b.label ? -1 : 0)
+    list.sort((a, b) => a.label < b.label ? -1 : 0)
     if (selectable && multipleSelection) {
       this.addSelectAllNode(list, localityList, selectable);
     }
@@ -1107,7 +1108,7 @@ export class WorkpackComponent implements OnDestroy {
     });
   }
 
-  async loadWorkpacksFromWorkpackModel(idPlan: number, idWorkpackModel: number, idFilterSelected: number, showCancelled?: boolean, idWorkpackModelLinked?: number, ) {
+  async loadWorkpacksFromWorkpackModel(idPlan: number, idWorkpackModel: number, idFilterSelected: number, showCancelled?: boolean, idWorkpackModelLinked?: number,) {
     const result = await this.workpackSrv.GetWorkpacksByParent({
       'id-plan': idPlan,
       'id-workpack-model': idWorkpackModel,
@@ -1117,7 +1118,7 @@ export class WorkpackComponent implements OnDestroy {
     });
     let workpacks = result.success && result.data;
     if (!showCancelled && workpacks && !this.workpack.canceled) {
-      workpacks = workpacks.filter( wp => !wp.canceled );
+      workpacks = workpacks.filter(wp => !wp.canceled);
     }
     if (workpacks && workpacks.length > 0) {
       const workpackItemCardList: IWorkpackCardItem[] = workpacks.map(workpack => {
@@ -1271,7 +1272,7 @@ export class WorkpackComponent implements OnDestroy {
           }
         );
       }
-      return {workpackItemCardList, iconMenuItems};
+      return { workpackItemCardList, iconMenuItems };
     }
     if ((!workpacks || workpacks.length === 0) && this.editPermission) {
       const iconMenuItems: MenuItem[] = [
@@ -1310,7 +1311,7 @@ export class WorkpackComponent implements OnDestroy {
           iconMenuItems
         }
       ];
-      return {workpackItemCardList, iconMenuItems};
+      return { workpackItemCardList, iconMenuItems };
     }
   }
 
@@ -1336,6 +1337,8 @@ export class WorkpackComponent implements OnDestroy {
           this.totalRecordsWorkpacks[workpackModelIndex] = this.cardsWorkPackModelChildren[workpackModelIndex].cardItemsSection.length;
         }
       }
+      this.menuSrv.reloadMenuPortfolio();
+      this.reloadDashboard = true;
     }
   }
 
@@ -1463,7 +1466,18 @@ export class WorkpackComponent implements OnDestroy {
 
   async handleCutWorkpack(workpack: IWorkpack) {
     this.workpackSrv.setWorkpackCuted({ ...workpack, idParent: this.idWorkpack });
-    await this.reloadSectionsWorkpackChildren();
+    const workpackModelIndex = this.cardsWorkPackModelChildren
+      .findIndex(workpackModel => workpackModel.idWorkpackModel === workpack.model.id);
+    if (workpackModelIndex > -1) {
+      const workpackIndex = this.cardsWorkPackModelChildren[workpackModelIndex].cardItemsSection
+        .findIndex(w => w.itemId === workpack.id);
+      if (workpackIndex > -1) {
+        this.cardsWorkPackModelChildren[workpackModelIndex].cardItemsSection.splice(workpackIndex, 1);
+        this.cardsWorkPackModelChildren[workpackModelIndex].cardItemsSection =
+          Array.from(this.cardsWorkPackModelChildren[workpackModelIndex].cardItemsSection);
+        this.totalRecordsWorkpacks[workpackModelIndex] = this.cardsWorkPackModelChildren[workpackModelIndex].cardItemsSection.length;
+      }
+    }
   }
 
   async checkPasteWorkpack(workpackCuted: IWorkpack, idWorkpackModelTo: number) {
@@ -1508,6 +1522,7 @@ export class WorkpackComponent implements OnDestroy {
     if (result.success) {
       this.workpackSrv.removeWorkpackCuted();
       await this.reloadSectionsWorkpackChildren();
+      this.menuSrv.reloadMenuPortfolio();
     }
   }
 
@@ -1528,7 +1543,7 @@ export class WorkpackComponent implements OnDestroy {
       }
       const idFilterSelected = propertiesCard.filters.find(defaultFilter => !!defaultFilter.favorite) ?
         propertiesCard.filters.find(defaultFilter => !!defaultFilter.favorite).id : undefined;
-      const {workpackItemCardList} = await this.loadWorkpacksFromWorkpackModel
+      const { workpackItemCardList } = await this.loadWorkpacksFromWorkpackModel
         (this.idPlan, workpackModel.idWorkpackModelOriginal, idFilterSelected, false, workpackModel.idWorkpackModelLinked);
       return {
         idWorkpackModel: workpackModel.idWorkpackModelLinked,
@@ -1617,6 +1632,7 @@ export class WorkpackComponent implements OnDestroy {
         }
       }
       this.menuSrv.reloadMenuPortfolio();
+      this.reloadDashboard = true;
     }
   }
 
@@ -1756,17 +1772,17 @@ export class WorkpackComponent implements OnDestroy {
   }
 
   async handleWorkpackCancelledToggle(workpackModelIndex: number, event) {
-    
+
     const idWorkpackModel = this.cardsWorkPackModelChildren[workpackModelIndex].idWorkpackModel;
     const resultFilters = await this.filterSrv.getAllFilters(`workpackModels/${idWorkpackModel}/workpacks`);
     const filters = resultFilters.success && resultFilters.data;
     const idFilterSelected = filters.find(defaultFilter => !!defaultFilter.favorite) ?
       filters.find(defaultFilter => !!defaultFilter.favorite).id : undefined;
-    const {workpackItemCardList, iconMenuItems} = await this.loadWorkpacksFromWorkpackModel(this.workpack.plan.id, idWorkpackModel, idFilterSelected, event.checked);
+    const { workpackItemCardList, iconMenuItems } = await this.loadWorkpacksFromWorkpackModel(this.workpack.plan.id, idWorkpackModel, idFilterSelected, event.checked);
     this.cardsWorkPackModelChildren[workpackModelIndex].cardItemsSection = workpackItemCardList;
     this.cardsWorkPackModelChildren[workpackModelIndex].cardSection.createNewElementMenuItemsWorkpack = iconMenuItems;
     this.cardsWorkPackModelChildren[workpackModelIndex].workpackShowCancelleds = event.checked;
-     
+
   }
 
   navigateToPageStakeholder(url) {

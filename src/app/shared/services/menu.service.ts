@@ -90,10 +90,13 @@ export class MenuService extends BaseService<any> {
     return this.http.get<IHttpResult<IMenuOffice[]>>(`${this.urlBase}/office`).toPromise();
   }
 
-  getItemsPortfolio(idOffice: number): Promise<IHttpResult<IMenuWorkpack[]>> {
+  getItemsPortfolio(idOffice: number, idPlan: number): Promise<IHttpResult<IMenuWorkpack[]>> {
     return this.http.get<IHttpResult<IMenuWorkpack[]>>(`${this.urlBase}/portfolio`,
       {
-        params: PrepareHttpParams({ 'id-office': idOffice })
+        params: PrepareHttpParams({ 
+          'id-office': idOffice,
+          'id-plan': idPlan
+       })
       }
     ).toPromise();
   }

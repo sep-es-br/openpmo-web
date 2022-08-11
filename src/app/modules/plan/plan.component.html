@@ -60,10 +60,10 @@
 
   <section *ngIf="idPlan" class="workpackModels-cards-section">
     <div class="card-workpack-model" *ngFor="let workpackModel of cardsPlanWorkPackModels; let i = index">
-      <app-card [properties]="workpackModel.propertiesCard" *ngIf="workpackModel.workPackItemCardList?.length > 0"
+      <app-card [properties]="workpackModel.propertiesCard" *ngIf="workpackModel.workpackItemCardList?.length > 0"
         (editFilter)="handleEditFilter($event, workpackModel.idWorkpackModel)" (newFilter)="handleNewFilter(workpackModel.idWorkpackModel)"
         (selectedFilter)="handleSelectedFilter($event, workpackModel.idWorkpackModel)" (createNewElement)="handleCreateNewWorkpack(workpackModel.idWorkpackModel)">
-        <p-dataView [value]="workpackModel.workPackItemCardList" layout="grid" class="app-dataview"
+        <p-dataView [value]="workpackModel.workpackItemCardList" layout="grid" class="app-dataview"
           *ngIf="displayModeAll === 'grid' || (displayModeAll === 'list' && !!responsive)" [paginator]="true" [rows]="pageSize" [showJumpToPageDropdown]="true"
           [showPageLinks]="false" [totalRecords]="totalRecords ? totalRecords[i] : 1"
           [emptyMessage]="'loadingEllipsis' | translate">
@@ -73,7 +73,7 @@
             </div>
           </ng-template>
         </p-dataView>
-        <p-dataView [value]="workpackModel.workPackItemCardList" layout="list" class="app-dataview app-dataview-list"
+        <p-dataView [value]="workpackModel.workpackItemCardList" layout="list" class="app-dataview app-dataview-list"
           *ngIf="displayModeAll === 'list' && !responsive" [paginator]="true" [rows]="pageSize" [showJumpToPageDropdown]="true"
           [showPageLinks]="false" [totalRecords]="totalRecords ? totalRecords[i] : 1"
           [emptyMessage]="'loadingEllipsis' | translate">
@@ -90,5 +90,31 @@
   </section>
 
   <app-save-button (save)="savePlan()"></app-save-button>
+
+  <p-dialog class="resume-management-dialog" [class.responsive]="!!responsive" [header]="'resumeManagement' |translate"
+    [(visible)]="showDialogResumeManagement" [style]="!responsive ? {width: '30vw'} : {width: '90vw'}" closable="false"
+    closeIcon="">
+    <div class="resume-management-content" *ngIf="endManagementWorkpack">
+      <span class="subtitle">
+        {{'messages.resumeManagementAlert' |translate}}
+      </span>
+      <div class="reasons-container">
+        <label class="app-input-label" for="reasons">{{'reasons'|translate}} {{'*'}}</label>
+        <textarea id="reasons" class="reasons-end" pInputTextarea [(ngModel)]="endManagementWorkpack.reason" cols="30"
+          [disabled]="true" rows="4"></textarea>
+      </div>
+      <div class="date-container">
+        <label class="app-input-label" for="end-date">{{'endedManagementIn'|translate}}:</label>
+        <span>{{language === 'pt-BR' ? (endManagementWorkpack?.endManagementDate|date:'dd/MM/yyyy') :
+          (endManagementWorkpack?.endManagementDate|date:'yyyy/MM/dd')}}</span>
+      </div>
+      <div class="buttons-container">
+        <button class="cancel-button" pButton [label]="'cancel'|translate"
+          (click)="handleCancelResumeManagement()"></button>
+        <button class="end-button" pButton [label]="'resume'|translate"
+          (click)="handleResumeManagementDeliverable()"></button>
+      </div>
+    </div>
+  </p-dialog>
 
 </div>

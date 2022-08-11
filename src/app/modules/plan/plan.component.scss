@@ -42,5 +42,114 @@
       }
     }
   }
+  .end-management-dialog, .resume-management-dialog {
+    .p-dialog-header {
+      padding: 2em 3em 0;
+      .p-dialog-title {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #333;
+        text-transform: uppercase;
+      }
+    }
+    .p-dialog-content {
+      padding: 1em 3em 2em;
+      overflow-y: visible;
+    }
+    .end-management-content, .resume-management-content {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      .reasons-container {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        margin-top: 1em;
+        .p-inputtextarea {
+          background-color: rgba(242, 242, 242, 1);
+          border: none;
+        }
+        .p-inputtext:enabled:focus {
+          border: none;
+          box-shadow: none;
+        }
+      }
+      .date-end-management-container {
+        margin-top: 1em;
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        p-calendar {
+          width: 30%;
+        }
+      }
+      .date-container {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        margin-top: 1.5em;
+        label {
+          margin-right: 5px;
+        }
+      }
+      .buttons-container {
+        margin-top: 1.5em;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        width: 100%;
+        .p-button {
+          flex: 1;
+          border-radius: 5px;
+          font-size: 18px;
+          font-weight: 700;
+          color: #ffffff;
+          border: none;
+        }
+        .cancel-button {
+          margin-right: 0.5em;
+          background-color: rgba(164, 164, 164, 1);
+        }
+        .end-button {
+          margin-left: 0.5em;
+          background-color: rgba(68, 179, 155, 1);
+        }
+      }
+    }
+  }
+  .end-management-dialog.responsive, .resume-management-dialog.responsive {
+    .p-dialog-header {
+      padding: 1em 1em 0;
+      .p-dialog-title {
+        font-size: 1.2rem;
+      }
+    }
+    .p-dialog-content {
+      padding: 1em;
+    }
+    .end-management-content, .resume-management-content {
+      .date-end-management-container {
+        p-calendar {
+          width: 100%;
+          .p-calendar {
+            width: 100%;
+          }
+        }
+      }
+      .buttons-container {
+        flex-direction: column;
+        .cancel-button {
+          width: 100%;
+          margin-right: 0;
+          margin-bottom: 0.5em;
+        }
+        .end-button {
+          width: 100%;
+          margin-left: 0;
+          margin-bottom: 0.5em;
+        }
+      }
+    }
+  }
 }
 
