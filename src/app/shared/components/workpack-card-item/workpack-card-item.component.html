@@ -88,15 +88,15 @@
           </div>
           <div class="triple-constraint-container" [ngStyle]="{'min-height': '21px'}">
             <i class="fas fa-dollar-sign" [ngStyle]="{color: iconCostColor}"
-              *ngIf="properties?.dashboard && properties?.dashboard?.tripleConstraint"
+              *ngIf="properties?.dashboard && properties?.dashboard?.tripleConstraint && properties?.dashboard?.tripleConstraint?.cost?.foreseenValue > 0"
               (mouseenter)="validateShowTripleConstraintCost() && costConstraintPanel.show($event)"
               (mouseleave)="costConstraintPanel.hide($event)"></i>
             <i class="far fa-clock" [ngStyle]="{color: iconScheduleColor}"
-              *ngIf="properties?.dashboard && properties?.dashboard?.tripleConstraint"
+              *ngIf="properties?.dashboard && properties?.dashboard?.tripleConstraint && properties?.dashboard?.tripleConstraint?.schedule?.foreseenStartDate !== null"
               (mouseenter)="validateShowTripleConstraintSchedule() && scheduleConstraintPanel.show($event)"
               (mouseleave)="scheduleConstraintPanel.hide($event)"></i>
             <i class="fas fa-boxes" [ngStyle]="{color: iconScopeColor}"
-              *ngIf="properties?.dashboard && properties?.dashboard?.tripleConstraint"
+              *ngIf="properties?.dashboard && properties?.dashboard?.tripleConstraint && properties?.dashboard?.tripleConstraint?.scope?.foreseenValue > 0"
               (mouseenter)="validateShowTripleConstraintScope() && scopeConstraintPanel.show($event)"
               (mouseleave)="scopeConstraintPanel.hide($event)"></i>
           </div>

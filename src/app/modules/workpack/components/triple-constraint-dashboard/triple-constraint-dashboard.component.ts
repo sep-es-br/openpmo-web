@@ -72,7 +72,7 @@ export class TripleConstraintDashboardComponent implements OnInit {
     if (this.tripleConstraint.cost.actualValue) {
       values.push(this.tripleConstraint.cost.actualValue);
     }
-    this.maxCostValue = values.reduce((a, b) => Math.max(a, b));
+    this.maxCostValue = values && values.length > 0 && values.reduce((a, b) => Math.max(a, b));
   }
 
   loadMaxScopeValue() {
@@ -86,7 +86,7 @@ export class TripleConstraintDashboardComponent implements OnInit {
     if (this.tripleConstraint.scope.actualVariationPercent) {
       values.push(this.tripleConstraint.scope.actualVariationPercent);
     }
-    this.maxScopeValue = values.reduce((a, b) => Math.max(a, b));
+    this.maxScopeValue = values && values.length > 0 && values.reduce((a, b) => Math.max(a, b));
   }
 
   loadChartScheduleValues() {

@@ -79,7 +79,8 @@ export class ScopeConstraintComponent implements OnInit {
     if (this.scope.actualVariationPercent) {
       values.push(this.scope.actualVariationPercent);
     }
-    this.maxScopeValue = values.reduce((a, b) => {
+    
+    this.maxScopeValue = values && values.length > 0 && values.reduce((a, b) => {
       return Math.max(a, b);
     });
   }

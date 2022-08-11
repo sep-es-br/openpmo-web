@@ -307,8 +307,7 @@ export class ScheduleComponent implements OnInit, OnDestroy {
     this.reloadCostAssignmentTotals();
     if (!this.actualValidationMessage && this.formSchedule.valid) {
       if (this.costAssignmentsCardItems && this.costAssignmentsCardItems.length > 0
-        && this.costAssignmentsCardItems.filter(item => item.type !== 'new-cost-card' &&
-          item.plannedWork && item.plannedWork > 0).length === this.costAssignmentsCardItems.length - 1) {
+        && this.costAssignmentsCardItems.filter(item => item.type !== 'new-cost-card').length === this.costAssignmentsCardItems.length - 1) {
         const startDate = moment(this.formSchedule.controls.start.value);
         const today = moment();
         if (today.isBefore(startDate, 'months') && this.costAssignmentsCardItems.filter(item => item.actualWork && item.actualWork > 0).length > 0) {

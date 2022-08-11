@@ -49,11 +49,13 @@ export class CardComponent implements OnInit, OnDestroy, OnChanges {
     if (
       changes.properties && changes.properties.currentValue && !!this.properties.showFilters
     ) {
+      this.properties.progressBarValues = this.properties.progressBarValues && this.properties.progressBarValues.filter( item => item.total !== 0 );
       this.loadFilterListOptions();
     }
   }
 
   ngOnInit() {
+    this.properties.progressBarValues = this.properties.progressBarValues && this.properties.progressBarValues.filter( item => item.total !== 0 );
     this.setLanguage();
     if (this.properties && !!this.properties.showFilters) {
       this.loadFilterListOptions();
