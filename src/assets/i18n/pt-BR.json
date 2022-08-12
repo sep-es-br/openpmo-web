@@ -369,6 +369,9 @@
     "loading": "Carregando",
     "atentionCancellingMessage": "Atenção. Esta ação não poderá ser desfeita",
     "textAtentionCancellingMessage": "Confirma envio desta proposta de cancelamento do projeto ao CCB?",
+    "costAccounts": {
+      "thereAreNotCostAccounts": "Não existem centros de custo"
+    },
     "error": {
       "generic": "Não foi possível processar sua solicitação",
       "unauthorized": "Você não possui permissão de acesso à essa funcionalidade",

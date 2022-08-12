@@ -173,12 +173,12 @@ export class WorkpackComponent implements OnDestroy {
     public translateSrv: TranslateService,
     private domainSrv: DomainService,
     private localitySrv: LocalityService,
-    private costAccountSrv: CostAccountService,
+    public costAccountSrv: CostAccountService,
     private organizationSrv: OrganizationService,
     private unitMeasureSrv: MeasureUnitService,
-    private stakeholderSrv: StakeholderService,
+    public stakeholderSrv: StakeholderService,
     private planSrv: PlanService,
-    private scheduleSrv: ScheduleService,
+    public scheduleSrv: ScheduleService,
     private router: Router,
     private breadcrumbSrv: BreadcrumbService,
     private officeSrv: OfficeService,
@@ -187,11 +187,11 @@ export class WorkpackComponent implements OnDestroy {
     private officePermissionSrv: OfficePermissionService,
     private messageSrv: MessageService,
     private menuSrv: MenuService,
-    private filterSrv: FilterDataviewService,
-    private riskSrv: RiskService,
-    private issueSrv: IssueService,
-    private processSrv: ProcessService,
-    private baselineSrv: BaselineService,
+    public filterSrv: FilterDataviewService,
+    public riskSrv: RiskService,
+    public issueSrv: IssueService,
+    public processSrv: ProcessService,
+    public baselineSrv: BaselineService,
     private confirmationSrv: ConfirmationService,
     private dashboardSrv: DashboardService,
     private citizenUserSrv: CitizenUserService
@@ -520,9 +520,8 @@ export class WorkpackComponent implements OnDestroy {
     this.sectionPropertiesProperties = await Promise.all(workpackModelActivesProperties.map(p => this.instanceProperty(p)));
     if (this.idWorkpack) {
       if (this.workpack.type === TypeWorkpackEnum.ProjectModel) {
-        await this.loadBaselinesSection();
+        this.loadBaselineSection(this.collapsePanelsStatus);
       }
-
       await this.loadSectionsWorkpackModel();
     }
   }
@@ -831,95 +830,6 @@ export class WorkpackComponent implements OnDestroy {
     }
   }
 
-  async loadBaselinesSection() {
-    this.sectionBaselines = {
-      cardSection: {
-        toggleable: false,
-        initialStateToggle: false,
-        cardTitle: 'baselines',
-        collapseble: true,
-        initialStateCollapse: this.collapsePanelsStatus,
-        showFilters: false,
-        showCreateNemElementButton: false,
-      },
-
-      cardItemsSection: await this.loadSectionBaselinesCards(this.baselinesSectionShowInactives)
-    };
-  }
-
-  async loadSectionBaselinesCards(showInactives: boolean) {
-    const resultBaselines = await this.baselineSrv.GetAll({ 'id-workpack': this.idWorkpack });
-    this.baselines = resultBaselines.success ? resultBaselines.data : [];
-    if (this.baselines && this.baselines.length > 0) {
-      const cardItems = this.baselines.filter(b => {
-        if (!showInactives) {
-          if (!!b.active) { return b; }
-        } else {
-          return b;
-        }
-      }).map(base => ({
-        typeCardItem: 'listItem',
-        icon: !!base.cancelation ? 'fas fa-times' : 'baseline',
-        iconColor: base.cancelation && '#FF7F81',
-        iconSvg: !base.cancelation ? true : false,
-        nameCardItem: base.name,
-        baselineStatus: base.status.toLowerCase(),
-        baselineStatusDate: base.active ? base.activationDate : (base.status === 'PROPOSED' ? base.proposalDate :
-          (base.status === 'APPROVED' ? base.activationDate : 'NONE')),
-        baselineActive: base.active,
-        itemId: base.id,
-        menuItems: [{
-          label: this.translateSrv.instant('delete'),
-          icon: 'fas fa-trash-alt',
-          disabled: !this.editPermission || base.status !== 'DRAFT',
-          command: (event) => this.deleteBaseline(base)
-        }],
-        urlCard: '/workpack/baseline',
-        paramsUrlCard: [
-          { name: 'idWorkpack', value: this.idWorkpack },
-          { name: 'idWorkpackModelLinked', value: this.idWorkpackModelLinked },
-          { name: 'id', value: base.id },
-        ]
-      }));
-      if (this.editPermission && !this.workpack.cancelPropose && !this.workpack.pendingBaseline) {
-        cardItems.push({
-          typeCardItem: 'newCardItem',
-          icon: IconsEnum.Plus,
-          iconColor: null,
-          iconSvg: true,
-          nameCardItem: null,
-          baselineStatus: undefined,
-          baselineStatusDate: undefined,
-          baselineActive: undefined,
-          itemId: null,
-          menuItems: [],
-          urlCard: '/workpack/baseline',
-          paramsUrlCard: [
-            { name: 'idWorkpack', value: this.idWorkpack },
-            { name: 'idWorkpackModelLinked', value: this.idWorkpackModelLinked },
-          ]
-        });
-      }
-      return cardItems;
-    } else {
-      const cardItem = (this.editPermission && !this.workpack.cancelPropose && !this.workpack.pendingBaseline) ?
-        [{
-          typeCardItem: 'newCardItem',
-          icon: IconsEnum.Plus,
-          iconColor: null,
-          iconSvg: true,
-          nameCardItem: null,
-          itemId: null,
-          urlCard: '/workpack/baseline',
-          paramsUrlCard: [
-            { name: 'idWorkpack', value: this.idWorkpack },
-            { name: 'idWorkpackModelLinked', value: this.idWorkpackModelLinked },
-          ]
-        }] : [];
-      return cardItem;
-    }
-  }
-
   async handleBaselineShowInactiveToggle(event) {
     this.sectionBaselines.cardItemsSection = await this.loadSectionBaselinesCards(event.checked);
   }
@@ -935,125 +845,19 @@ export class WorkpackComponent implements OnDestroy {
     if (!!this.workpackModel.stakeholderSessionActive
       && (((this.isUserAdmin || this.editPermissionOffice) && !this.idWorkpackModelLinked) ||
         (this.editPermission && !!this.idWorkpackModelLinked))) {
-      const resultFilters = await this.filterSrv.getAllFilters(`workpackModels/${this.workpack.model.id}/stakeholders`);
-      const filters = resultFilters.success && Array.isArray(resultFilters.data) ? resultFilters.data : [];
-      const idFilterSelected = filters.find(defaultFilter => !!defaultFilter.favorite) ?
-        filters.find(defaultFilter => !!defaultFilter.favorite).id : undefined;
-      await this.loadStakeholders(idFilterSelected);
-      this.sectionStakeholder = {
-        cardSection: {
-          toggleable: false,
-          initialStateToggle: false,
-          cardTitle: 'stakeholdersAndPermissions',
-          collapseble: true,
-          initialStateCollapse: this.collapsePanelsStatus,
-          showFilters: true,
-          filters,
-          showCreateNemElementButton: this.editPermission ? true : false,
-          createNewElementMenuItems: [
-            {
-              label: this.translateSrv.instant('person'),
-              icon: 'fas fa-user-circle',
-              command: (event) => this.navigateToPageStakeholder('person')
-            },
-            {
-              label: this.translateSrv.instant('organization'),
-              icon: 'fas fa-building',
-              command: (event) => this.navigateToPageStakeholder('organization')
-            }
-          ]
-        },
-        cardItemsSection: await this.loadSectionStakeholderCards(this.stakeholderSectionShowInactives)
-      };
-      this.totalRecordsStakeholders = this.sectionStakeholder.cardItemsSection && this.sectionStakeholder.cardItemsSection.length;
+      this.loadStakeholderSection();
     }
     if (this.workpackModel.costSessionActive) {
-      const resultFilters = await this.filterSrv.getAllFilters(`workpackModels/${this.workpack.model.id}/costAccounts`);
-      const filters = resultFilters.success && resultFilters.data ? resultFilters.data : [];
-      const idFilterSelected = filters.find(defaultFilter => !!defaultFilter.favorite) ?
-        filters.find(defaultFilter => !!defaultFilter.favorite).id : undefined;
-      this.sectionCostAccount = {
-        cardSection: {
-          toggleable: false,
-          initialStateToggle: false,
-          cardTitle: 'costAccounts',
-          collapseble: true,
-          initialStateCollapse: this.collapsePanelsStatus,
-          showFilters: true,
-          filters,
-          showCreateNemElementButton: this.editPermission ? true : false
-        },
-        cardItemsSection: await this.loadCardItemsCostSession(idFilterSelected)
-      };
-      this.totalRecordsCostAccounts = this.sectionCostAccount.cardItemsSection ? this.sectionCostAccount.cardItemsSection.length + 1 : 1;
+      this.loadCostAccountSection();
     }
-    if (this.workpackModel.scheduleSessionActive && this.costAccounts) {
-      await this.loadScheduleSession();
+    if (this.workpackModel.scheduleSessionActive) {
+      this.loadScheduleSession();
     }
     if (this.workpackModel.riskAndIssueManagementSessionActive) {
-      const resultFilters = await this.filterSrv.getAllFilters(`workpackModels/${this.workpack.model.id}/risks`);
-      const filters = resultFilters.success && Array.isArray(resultFilters.data) ? resultFilters.data : [];
-      const idFilterSelected = filters.find(defaultFilter => !!defaultFilter.favorite) ?
-        filters.find(defaultFilter => !!defaultFilter.favorite).id : undefined;
-
-      this.sectionRisk = {
-        cardSection: {
-          toggleable: false,
-          initialStateToggle: false,
-          cardTitle: 'risks',
-          collapseble: true,
-          initialStateCollapse: this.collapsePanelsStatus,
-          showFilters: true,
-          filters: filters && filters.length > 0 ? filters : [],
-          showCreateNemElementButton: this.editPermission ? true : false,
-        },
-
-        cardItemsSection: await this.loadSectionRisksCards(this.riskSectionShowClosed, idFilterSelected)
-      };
-      this.totalRecordsRisks = this.sectionRisk.cardItemsSection && this.sectionRisk.cardItemsSection.length;
-
-
-      const resultFiltersIssues = await this.filterSrv.getAllFilters(`workpackModels/${this.workpack.model.id}/issues`);
-      const filtersIssues = resultFiltersIssues.success && Array.isArray(resultFiltersIssues.data) ? resultFiltersIssues.data : [];
-      const idFilterIssueSelected = filtersIssues.find(defaultFilter => !!defaultFilter.favorite) ?
-        filters.find(defaultFilter => !!defaultFilter.favorite).id : undefined;
-      this.sectionIssue = {
-        cardSection: {
-          toggleable: false,
-          initialStateToggle: false,
-          cardTitle: 'issues',
-          collapseble: true,
-          initialStateCollapse: this.collapsePanelsStatus,
-          showFilters: true,
-          filters: filtersIssues && filtersIssues.length > 0 ? filtersIssues : [],
-          showCreateNemElementButton: this.editPermission ? true : false,
-        },
-
-        cardItemsSection: await this.loadSectionIssuesCards(this.issueSectionShowClosed, idFilterIssueSelected)
-      };
-      this.totalRecordsIssues = this.sectionIssue.cardItemsSection && this.sectionIssue.cardItemsSection.length;
+      this.loadRisKAndIssueSection();
     }
     if (this.workpackModel.processesManagementSessionActive) {
-      const resultFilters = await this.filterSrv.getAllFilters(`workpackModels/${this.workpack.model.id}/processes`);
-      const filters = resultFilters.success && Array.isArray(resultFilters.data) ? resultFilters.data : [];
-      const idFilterSelected = filters.find(defaultFilter => !!defaultFilter.favorite) ?
-        filters.find(defaultFilter => !!defaultFilter.favorite).id : undefined;
-
-      this.sectionProcess = {
-        cardSection: {
-          toggleable: false,
-          initialStateToggle: false,
-          cardTitle: 'processes',
-          collapseble: true,
-          initialStateCollapse: this.collapsePanelsStatus,
-          showFilters: true,
-          filters: filters && filters.length > 0 ? filters : [],
-          showCreateNemElementButton: this.editPermission ? true : false,
-        },
-
-        cardItemsSection: await this.loadSectionProcessesCards(idFilterSelected)
-      };
-      this.totalRecordsProcesses = this.sectionProcess.cardItemsSection && this.sectionProcess.cardItemsSection.length;
+      this.loadProcessSection();
     }
     if (this.workpackModel.journalManagementSessionActive) {
       this.cardJournalProperties = {
@@ -1640,99 +1444,7 @@ export class WorkpackComponent implements OnDestroy {
     }
   }
 
-  async loadSectionStakeholderCards(showInactives: boolean) {
-    if (this.stakeholders) {
-      const cardItems = this.stakeholders.filter(stake => {
-        if (!showInactives && stake.roles && stake.roles.length > 0) {
-          return stake.roles.find(r => r.active && (!r.to || r.to === null || moment(r.to, 'yyyy-MM-DD').isSameOrAfter(moment()))
-            && (!r.from || r.from === null || moment(r.from, 'yyyy-MM-DD').isSameOrBefore(moment())));
-        } else { return stake; }
-      }).map(stakeholder => {
-        const editPermission = stakeholder.permissions && stakeholder.permissions.filter(p => p.level === 'EDIT').length > 0;
-        const readPermission = stakeholder.permissions && stakeholder.permissions.filter(p => p.level === 'READ').length > 0;
-        const samePlan = (!stakeholder.permissions || stakeholder.permissions.length === 0) ||
-          (stakeholder.permissions && stakeholder.permissions.filter(p => p.idPlan === this.idPlan).length > 0);
-        return {
-          typeCardItem: 'listItemStakeholder',
-          icon: stakeholder.person ? (editPermission ? IconsEnum.UserEdit :
-            (readPermission ? IconsEnum.UserRead : IconsEnum.UserCircle)) : IconsEnum.Building,
-          iconSvg: true,
-          nameCardItem: stakeholder.person ? stakeholder.person.name : stakeholder.organization.name,
-          fullNameCardItem: stakeholder.person ? stakeholder.person.fullName : stakeholder.organization.fullName,
-          subtitleCardItem: stakeholder.roles && stakeholder.roles.filter(r => r.active && (!r.to || r.to === null ||
-            moment(r.to, 'yyyy-MM-DD').isSameOrAfter(moment()))
-            && (!r.from || r.from === null || moment(r.from, 'yyyy-MM-DD').isSameOrBefore(moment())))
-            .map(role => this.translateSrv.instant(role.role)).join(', '),
-          itemId: stakeholder.person ? stakeholder.person.id : stakeholder.organization.id,
-          menuItems: [{
-            label: this.translateSrv.instant('delete'),
-            icon: 'fas fa-trash-alt',
-            disabled: !samePlan,
-            command: (event) => this.deleteStakeholder(stakeholder)
-          }],
-          urlCard: !!samePlan ? (stakeholder.person ? '/stakeholder/person' : '/stakeholder/organization') : undefined,
-          paramsUrlCard: [
-            { name: 'idWorkpack', value: this.idWorkpack },
-            { name: 'idPlan', value: this.idPlan },
-            { name: 'idWorkpackModelLinked', value: this.idWorkpackModelLinked },
-            {
-              name: stakeholder.person ? 'idPerson' : 'idOrganization',
-              value: stakeholder.person ? stakeholder.person.id : stakeholder.organization.id
-            }
-          ],
-          iconMenuItems: null
-        };
-      });
-      cardItems.push({
-        typeCardItem: 'newCardItem',
-        icon: IconsEnum.Plus,
-        iconSvg: true,
-        nameCardItem: null,
-        fullNameCardItem: null,
-        subtitleCardItem: null,
-        itemId: null,
-        menuItems: null,
-        urlCard: null,
-        paramsUrlCard: null,
-        iconMenuItems: [
-          {
-            label: this.translateSrv.instant('person'),
-            icon: 'fas fa-user-circle',
-            command: (event) => this.navigateToPageStakeholder('person')
-          },
-          {
-            label: this.translateSrv.instant('organization'),
-            icon: 'fas fa-building',
-            command: (event) => this.navigateToPageStakeholder('organization')
-          }
-        ]
-      });
-      return cardItems;
-    } else {
-      const cardItem = [{
-        typeCardItem: 'newCardItem',
-        icon: IconsEnum.Plus,
-        iconSvg: true,
-        nameCardItem: null,
-        itemId: null,
-        menuItems: null,
-        urlCard: null,
-        iconMenuItems: [
-          {
-            label: this.translateSrv.instant('person'),
-            icon: 'fas fa-user-circle',
-            command: (event) => this.navigateToPageStakeholder('person')
-          },
-          {
-            label: this.translateSrv.instant('organization'),
-            icon: 'fas fa-building',
-            command: (event) => this.navigateToPageStakeholder('organization')
-          }
-        ]
-      }];
-      return cardItem;
-    }
-  }
+
 
   async deleteStakeholder(stakeholder: IStakeholder) {
     if (stakeholder.person) {
@@ -1795,87 +1507,6 @@ export class WorkpackComponent implements OnDestroy {
     );
   }
 
-  async loadSectionRisksCards(showClosed: boolean, idFilterSelected?: number) {
-    const resultRisks = await this.riskSrv.GetAll({ 'id-workpack': this.idWorkpack, idFilter: idFilterSelected });
-    this.risks = resultRisks.success ? resultRisks.data : [];
-    if (this.risks && this.risks.length > 0) {
-      const cardItems = !showClosed ? this.risks.filter(r => RisksPropertiesOptions.status[r.status].label === 'open').map(risk => ({
-        typeCardItem: 'listItem',
-        icon: RisksPropertiesOptions.status[risk.status].icon,
-        iconColor: RisksPropertiesOptions.importance[risk.importance].label,
-        iconSvg: false,
-        nameCardItem: risk.name,
-        itemId: risk.id,
-        menuItems: [{
-          label: this.translateSrv.instant('delete'),
-          icon: 'fas fa-trash-alt',
-          command: (event) => this.deleteRisk(risk),
-          disabled: !this.editPermission
-        }] as MenuItem[],
-        urlCard: '/workpack/risks',
-        paramsUrlCard: [
-          { name: 'idWorkpack', value: this.idWorkpack },
-          { name: 'idWorkpackModelLinked', value: this.idWorkpackModelLinked },
-          { name: 'id', value: risk.id },
-        ]
-      })) :
-        this.risks.map(risk => ({
-          typeCardItem: 'listItem',
-          icon: RisksPropertiesOptions.status[risk.status].icon,
-          iconColor: RisksPropertiesOptions.importance[risk.importance].label,
-          iconSvg: false,
-          nameCardItem: risk.name,
-          itemId: risk.id,
-          menuItems: [{
-            label: this.translateSrv.instant('delete'),
-            icon: 'fas fa-trash-alt',
-            command: (event) => this.deleteRisk(risk),
-            disabled: !this.editPermission
-          }] as MenuItem[],
-          urlCard: '/workpack/risks',
-          paramsUrlCard: [
-            { name: 'idWorkpack', value: this.idWorkpack },
-            { name: 'idWorkpackModelLinked', value: this.idWorkpackModelLinked },
-            { name: 'id', value: risk.id },
-          ]
-        }));
-      if (this.editPermission) {
-        cardItems.push({
-          typeCardItem: 'newCardItem',
-          icon: IconsEnum.Plus,
-          iconColor: null,
-          iconSvg: true,
-          nameCardItem: null,
-          itemId: null,
-          menuItems: null,
-          urlCard: '/workpack/risks',
-          paramsUrlCard: [
-            { name: 'idWorkpack', value: this.idWorkpack },
-            { name: 'idWorkpackModelLinked', value: this.idWorkpackModelLinked },
-          ]
-        });
-      }
-      return cardItems;
-    } else {
-      if (this.editPermission) {
-        const cardItem = [{
-          typeCardItem: 'newCardItem',
-          icon: IconsEnum.Plus,
-          iconSvg: true,
-          nameCardItem: null,
-          itemId: null,
-          menuItems: null,
-          urlCard: '/workpack/risks',
-          paramsUrlCard: [
-            { name: 'idWorkpack', value: this.idWorkpack },
-            { name: 'idWorkpackModelLinked', value: this.idWorkpackModelLinked },
-          ]
-        }];
-        return cardItem;
-      } else { return []; };
-    }
-  }
-
   handleCreateNewRisk() {
     this.router.navigate(['/workpack/risks'], {
       queryParams: {
@@ -1896,84 +1527,7 @@ export class WorkpackComponent implements OnDestroy {
     this.sectionRisk.cardItemsSection = await this.loadSectionRisksCards(this.riskSectionShowClosed);
   }
 
-  async loadSectionIssuesCards(showClosed: boolean, idFilterIssueSelected?: number) {
-    const resultIssues = await this.issueSrv.GetAll({ 'id-workpack': this.idWorkpack, idFilter: idFilterIssueSelected });
-    this.issues = resultIssues.success ? resultIssues.data : [];
-    if (this.issues && this.issues.length > 0) {
-      const cardItems = !showClosed ? this.issues.filter(r => IssuesPropertiesOptions.status[r.status].value === 'OPEN').map(issue => ({
-        typeCardItem: 'listItem',
-        icon: 'Issue',
-        iconColor: IssuesPropertiesOptions.importance[issue.importance].label,
-        iconSvg: true,
-        nameCardItem: issue.name,
-        itemId: issue.id,
-        menuItems: [{
-          label: this.translateSrv.instant('delete'),
-          icon: 'fas fa-trash-alt',
-          command: (event) => this.deleteIssue(issue),
-          disabled: !this.editPermission
-        }] as MenuItem[],
-        urlCard: '/workpack/issues',
-        paramsUrlCard: [
-          { name: 'idWorkpack', value: this.idWorkpack },
-          { name: 'idWorkpackModelLinked', value: this.idWorkpackModelLinked },
-          { name: 'id', value: issue.id },
-        ]
-      })) :
-        this.issues.map(issue => ({
-          typeCardItem: 'listItem',
-          icon: 'Issue',
-          iconColor: IssuesPropertiesOptions.importance[issue.importance].label,
-          iconSvg: true,
-          nameCardItem: issue.name,
-          itemId: issue.id,
-          menuItems: [{
-            label: this.translateSrv.instant('delete'),
-            icon: 'fas fa-trash-alt',
-            command: (event) => this.deleteIssue(issue),
-            disabled: !this.editPermission
-          }] as MenuItem[],
-          urlCard: '/workpack/issues',
-          paramsUrlCard: [
-            { name: 'idWorkpack', value: this.idWorkpack },
-            { name: 'idWorkpackModelLinked', value: this.idWorkpackModelLinked },
-            { name: 'id', value: issue.id },
-          ]
-        }));
-      if (this.editPermission) {
-        cardItems.push({
-          typeCardItem: 'newCardItem',
-          icon: IconsEnum.Plus,
-          iconColor: null,
-          iconSvg: true,
-          nameCardItem: null,
-          itemId: null,
-          menuItems: null,
-          urlCard: '/workpack/issues',
-          paramsUrlCard: [
-            { name: 'idWorkpack', value: this.idWorkpack },
-            { name: 'idWorkpackModelLinked', value: this.idWorkpackModelLinked },
-          ]
-        });
-      }
-      return cardItems;
-    } else {
-      const cardItem = this.editPermission ? [{
-        typeCardItem: 'newCardItem',
-        icon: IconsEnum.Plus,
-        iconSvg: true,
-        nameCardItem: null,
-        itemId: null,
-        menuItems: null,
-        urlCard: '/workpack/issues',
-        paramsUrlCard: [
-          { name: 'idWorkpack', value: this.idWorkpack },
-          { name: 'idWorkpackModelLinked', value: this.idWorkpackModelLinked },
-        ]
-      }] : [];
-      return cardItem;
-    }
-  }
+
 
   handleCreateNewIssue() {
     this.router.navigate(['/workpack/issues'], {
@@ -1995,63 +1549,7 @@ export class WorkpackComponent implements OnDestroy {
     this.sectionIssue.cardItemsSection = await this.loadSectionIssuesCards(this.issueSectionShowClosed);
   }
 
-  async loadSectionProcessesCards(idFilterSelected: number) {
-    const resultProcess = await this.processSrv.GetAll({ 'id-workpack': this.idWorkpack, idFilter: idFilterSelected });
-    this.processes = resultProcess.success ? resultProcess.data : [];
-    if (this.processes && this.processes.length > 0) {
-      const cardItems = this.processes.map(proc => ({
-        typeCardItem: 'listItemProcess',
-        icon: 'process',
-        iconSvg: true,
-        nameCardItem: proc.name,
-        subtitleCardItem: proc.processNumber,
-        organizationName: proc.currentOrganization,
-        itemId: proc.id,
-        priority: proc.priority,
-        menuItems: [{
-          label: this.translateSrv.instant('delete'),
-          icon: 'fas fa-trash-alt',
-          command: (event) => this.deleteProcess(proc),
-          disabled: !this.editPermission
-        }] as MenuItem[],
-        urlCard: '/workpack/processes',
-        paramsUrlCard: [
-          { name: 'idWorkpack', value: this.idWorkpack },
-          { name: 'id', value: proc.id },
-        ]
-      }));
-      cardItems.push({
-        typeCardItem: 'newCardItem',
-        icon: IconsEnum.Plus,
-        iconSvg: true,
-        nameCardItem: null,
-        subtitleCardItem: null,
-        organizationName: null,
-        itemId: null,
-        priority: false,
-        menuItems: null,
-        urlCard: '/workpack/processes',
-        paramsUrlCard: [
-          { name: 'idWorkpack', value: this.idWorkpack },
-        ]
-      });
-      return cardItems;
-    } else {
-      const cardItem = [{
-        typeCardItem: 'newCardItem',
-        icon: IconsEnum.Plus,
-        iconSvg: true,
-        nameCardItem: null,
-        itemId: null,
-        menuItems: null,
-        urlCard: '/workpack/processes',
-        paramsUrlCard: [
-          { name: 'idWorkpack', value: this.idWorkpack },
-        ]
-      }];
-      return cardItem;
-    }
-  }
+
 
   handleCreateNewProcess() {
     this.router.navigate(['/workpack/processes'], {
@@ -2066,94 +1564,6 @@ export class WorkpackComponent implements OnDestroy {
     if (result.success) {
       this.sectionProcess.cardItemsSection = Array.from(this.sectionProcess.cardItemsSection.filter(i => i.itemId !== process.id));
     }
-  }
-
-  async loadCardItemsCostSession(idFilter?: number) {
-    const result = await this.costAccountSrv.GetAll({ 'id-workpack': this.idWorkpack, idFilter });
-    if (result.success && result.data.length > 0) {
-      this.costAccounts = this.moveCostAccountOutherWorkpackToEnd(result.data);
-      const funders = (this.idOffice || this.idOfficeOwnerWorkpackLinked) &&
-        await this.loadOrganizationsOffice(this.idOfficeOwnerWorkpackLinked ? this.idOfficeOwnerWorkpackLinked : this.idOffice);
-      const namesWorckpack = await this.loadNameWorkpackCostAccount(result.data);
-      const cardItems = this.costAccounts.map(cost => {
-        const propertyName = cost.models.find(p => p.name === 'name');
-        const propertyNameValue = propertyName && cost.properties.find(p => p.idPropertyModel === propertyName.id);
-        const propertyfullName = cost.models.find(p => p.name === 'fullName');
-        const propertyFullnameValue = propertyfullName && cost.properties.find(p => p.idPropertyModel === propertyfullName.id);
-        const propertyNameWorkpack = namesWorckpack.find(names => names.idWorkpack === cost.idWorkpack);
-        const propertyLimit = cost.models.find(p => p.name.toLowerCase() === 'limit');
-        const propertyLimitValue = propertyLimit && cost.properties.find(p => p.idPropertyModel === propertyLimit.id);
-        const propertyFunder = cost.models.find(p => p.name.toLowerCase() === 'funder');
-        const propertyFunderValue = propertyFunder && cost.properties.find(p => p.idPropertyModel === propertyFunder.id);
-        const selectedFunder = propertyFunderValue && (funders
-          && funders.filter(org => org.value === propertyFunderValue.selectedValues[0]));
-        const costThisWorkpack = cost.idWorkpack === this.idWorkpack;
-        return {
-          typeCardItem: 'listItemCostAccount',
-          icon: 'fas fa-dollar-sign',
-          iconSvg: false,
-          nameCardItem: propertyNameValue && propertyNameValue.value as string,
-          fullNameCardItem: costThisWorkpack ?
-            propertyFullnameValue && propertyFullnameValue.value as string :
-            propertyNameWorkpack && propertyNameWorkpack.name as string,
-          subtitleCardItem: selectedFunder && selectedFunder[0]?.label,
-          costAccountsValue: propertyLimitValue?.value as number,
-          itemId: cost.id,
-          idWorkpack: cost.idWorkpack.toString(),
-          menuItems: [{
-            label: this.translateSrv.instant('delete'),
-            icon: 'fas fa-trash-alt',
-            command: (event) => this.deleteCostAccount(cost),
-            disabled: !this.editPermission
-          }] as MenuItem[],
-          urlCard: '/workpack/cost-account',
-          paramsUrlCard: [
-            { name: 'idWorkpack', value: cost.idWorkpack },
-            { name: 'idWorkpackModelLinked', value: this.idWorkpackModelLinked }
-          ],
-          iconMenuItems: null
-        };
-      });
-      if (this.editPermission) {
-        cardItems.push({
-          typeCardItem: 'newCardItem',
-          icon: IconsEnum.Plus,
-          iconSvg: true,
-          nameCardItem: null,
-          fullNameCardItem: null,
-          subtitleCardItem: null,
-          costAccountsValue: null,
-          itemId: null,
-          idWorkpack: this.idWorkpack.toString(),
-          menuItems: [],
-          urlCard: '/workpack/cost-account',
-          paramsUrlCard: [
-            { name: 'idWorkpack', value: this.idWorkpack },
-            { name: 'idWorkpackModelLinked', value: this.idWorkpackModelLinked }
-          ],
-          iconMenuItems: null
-        });
-      }
-      return cardItems;
-    }
-    const cardItemsNew = this.editPermission ? [{
-      typeCardItem: 'newCardItem',
-      icon: IconsEnum.Plus,
-      iconSvg: true,
-      nameCardItem: null,
-      subtitleCardItem: null,
-      costAccountsValue: null,
-      itemId: null,
-      idWorkpack: this.idWorkpack.toString(),
-      menuItems: [],
-      urlCard: '/workpack/cost-account',
-      paramsUrlCard: [
-        { name: 'idWorkpack', value: this.idWorkpack },
-        { name: 'idWorkpackModelLinked', value: this.idWorkpackModelLinked }
-      ],
-      iconMenuItems: null
-    }] : [];
-    return cardItemsNew;
   }
 
   handleCreateNewCostAccount() {
@@ -2204,182 +1614,15 @@ export class WorkpackComponent implements OnDestroy {
     }
   }
 
-  async loadScheduleSession() {
-    const result = await this.scheduleSrv.GetSchedule({ 'id-workpack': this.idWorkpack });
-    if (result.success && result.data && result.data.length > 0) {
-      this.schedule = result.data[0];
-      const unitMeasureWorkpack = this.sectionPropertiesProperties.find(prop => prop.type === this.typePropertyModel.UnitSelectionModel);
-      const unitMeasure = await this.unitMeasureSrv.GetById(unitMeasureWorkpack?.selectedValue as number);
-      this.unitMeansure = unitMeasure.success && unitMeasure.data;
-      if (this.unitMeansure && !this.unitMeansure.precision) {
-        this.unitMeansure.precision = 0;
-      }
-      const groupStep = this.schedule.groupStep.map((group, groupIndex, groupArray) => {
-        const cardItemSection = group.steps.map((step, stepIndex, stepArray) => ({
-          type: 'listStep',
-          stepName: new Date(step.periodFromStart + 'T00:00:00'),
-          menuItems: (groupIndex === 0 && stepIndex === 0) ? [{
-            label: this.translateSrv.instant('properties'),
-            icon: 'fas fa-edit',
-            command: () => this.editScheduleStep(step.id, this.unitMeansure.name, this.unitMeansure.precision, 'start')
-          }] : ((groupIndex === groupArray.length - 1 && stepIndex === stepArray.length - 1) ?
-            [{
-              label: this.translateSrv.instant('properties'),
-              icon: 'fas fa-edit',
-              command: () => this.editScheduleStep(step.id, this.unitMeansure.name, this.unitMeansure.precision, 'end')
-            }] : [{
-              label: this.translateSrv.instant('properties'),
-              icon: 'fas fa-edit',
-              command: () => this.editScheduleStep(step.id, this.unitMeansure.name, this.unitMeansure.precision, 'step')
-            }]),
-          stepOrder: (groupIndex === 0 && stepIndex === 0) ? 'start' :
-            ((groupIndex === groupArray.length - 1 && stepIndex === stepArray.length - 1) ? 'end' : 'step'),
-          unitPlanned: step.plannedWork ? step.plannedWork : 0,
-          unitActual: step.actualWork ? step.actualWork : 0,
-          unitBaseline: step.baselinePlannedWork ? step.baselinePlannedWork : 0,
-          unitProgressBar: {
-            total: step.plannedWork,
-            progress: step.actualWork,
-            color: '#FF8C00',
-          },
-          costPlanned: step.consumes?.reduce((total, v) => (total + (v.plannedCost ? v.plannedCost : 0)), 0),
-          costActual: step.consumes?.reduce((total, v) => (total + (v.actualCost ? v.actualCost : 0)), 0),
-          baselinePlannedCost: step.consumes?.reduce((total, v) => (total + (v.baselinePlannedCost ? v.baselinePlannedCost : 0)), 0),
-          costProgressBar: {
-            total: (step.consumes?.reduce((total, v) => (total + (v.plannedCost ? v.plannedCost : 0)), 0)),
-            progress: step.consumes?.reduce((total, v) => (total + (v.actualCost ? v.actualCost : 0)), 0),
-            color: '#44B39B'
-          },
-          unitName: this.unitMeansure && this.unitMeansure.name,
-          unitPrecision: this.unitMeansure && this.unitMeansure.precision,
-          idStep: step.id
-        }));
-        return {
-          year: group.year,
-          cardItemSection
-        };
-      });
-      const startDate = this.schedule && new Date(this.schedule.start + 'T00:00:00');
-      const endDate = this.schedule && new Date(this.schedule.end + 'T00:00:00');
-      const startScheduleStep = !!this.editPermission && {
-        type: 'newStart',
-        stepOrder: 'newStart',
-        unitName: this.unitMeansure.name,
-        unitPrecision: this.unitMeansure.precision,
-      };
-      const endScheduleStep = !!this.editPermission && {
-        type: 'newEnd',
-        stepOrder: 'newEnd',
-        unitName: this.unitMeansure.name,
-        unitPrecision: this.unitMeansure.precision,
-      };
-      const initialDatePlanned = moment(startDate);
-      const finalDatePlanned = moment(endDate);
-      const daysToPlanned = finalDatePlanned.diff(initialDatePlanned, 'days');
-      const dateActual = moment(new Date());
-      const daysToNow = dateActual.diff(initialDatePlanned, 'days');
-      const baselineStartDate = this.schedule && new Date(this.schedule.baselineStart + 'T00:00:00');
-      const baselineEndDate = this.schedule && new Date(this.schedule.baselineEnd + 'T00:00:00');
-      const baselineDaysPlanned = moment(baselineEndDate).diff(moment(baselineStartDate), 'days');
-      this.sectionSchedule = {
-        cardSection: {
-          toggleable: false,
-          initialStateToggle: false,
-          cardTitle: 'schedule',
-          collapseble: true,
-          initialStateCollapse: this.collapsePanelsStatus,
-          headerDates: this.schedule && {
-            startDate,
-            endDate
-          },
-          progressBarValues: [
-            {
-              total: Number(this.schedule.planed.toFixed(this.unitMeansure.precision)),
-              progress: Number(this.schedule.actual.toFixed(this.unitMeansure.precision)),
-              labelTotal: 'planned',
-              labelProgress: 'actual',
-              valueUnit: this.unitMeansure && this.unitMeansure.name,
-              color: '#ffa342',
-              barHeight: 17,
-              baselinePlanned: Number(this.schedule.baselinePlaned.toFixed(this.unitMeansure.precision)),
-            },
-            {
-              total: this.schedule.planedCost,
-              progress: this.schedule.actualCost,
-              labelTotal: 'planned',
-              labelProgress: 'actual',
-              valueUnit: 'currency',
-              color: '#6cd3bd',
-              barHeight: 17,
-              baselinePlanned: Number(this.schedule.baselineCost.toFixed(this.unitMeansure.precision)),
-            },
-            {
-              total: daysToPlanned,
-              progress: daysToNow < 0 ? 0 : daysToNow,
-              labelTotal: 'planned',
-              labelProgress: 'actual',
-              valueUnit: 'time',
-              color: '#659ee1',
-              barHeight: 17,
-              baselinePlanned: baselineDaysPlanned,
-              startDateBaseline: baselineStartDate,
-              endDateBaseline: baselineEndDate,
-              startDateTotal: startDate,
-              endDateTotal: endDate,
-            }
-          ],
-        },
-        startScheduleStep,
-        endScheduleStep,
-        groupStep
-      };
-      if (this.sectionSchedule.groupStep && this.sectionSchedule.groupStep[0].cardItemSection) {
-        this.sectionSchedule.groupStep[0].start = true;
-        const idStartStep = this.sectionSchedule.groupStep[0].cardItemSection[0].idStep;
-        if (!!this.editPermission) {
-          this.sectionSchedule.groupStep[0].cardItemSection[0].menuItems.push({
-            label: this.translateSrv.instant('delete'),
-            icon: 'fas fa-trash-alt',
-            command: (event) => this.deleteScheduleStep(idStartStep)
-          });
-        }
-        this.sectionSchedule.groupStep[0].cardItemSection[0].stepDay = startDate;
-        const groupStepItems: IScheduleStepCardItem[] = [startScheduleStep];
-        this.sectionSchedule.groupStep[0].cardItemSection.forEach(card => {
-          groupStepItems.push(card);
-        });
-        this.sectionSchedule.groupStep[0].cardItemSection = Array.from(groupStepItems);
-      }
-      const groupLenght = this.sectionSchedule.groupStep && this.sectionSchedule.groupStep.length;
-      if (this.sectionSchedule.groupStep && this.sectionSchedule.groupStep[groupLenght - 1].cardItemSection) {
-        this.sectionSchedule.groupStep[groupLenght - 1].end = true;
-        const cardItemSectionLenght = this.sectionSchedule.groupStep[groupLenght - 1].cardItemSection.length;
-        const idEndStep = this.sectionSchedule.groupStep[groupLenght - 1].cardItemSection[cardItemSectionLenght - 1].idStep;
-        if (!!this.editPermission) {
-          this.sectionSchedule.groupStep[groupLenght - 1].cardItemSection[cardItemSectionLenght - 1].menuItems.push({
-            label: this.translateSrv.instant('delete'),
-            icon: 'fas fa-trash-alt',
-            command: (event) =>
-              this.deleteScheduleStep(idEndStep)
-          });
-        }
-        this.sectionSchedule.groupStep[groupLenght - 1].cardItemSection[cardItemSectionLenght - 1].stepDay = endDate;
-        this.sectionSchedule.groupStep[groupLenght - 1].cardItemSection.push(endScheduleStep);
-      }
-      return;
-    }
-    this.sectionSchedule = {
-      cardSection: {
-        toggleable: false,
-        initialStateToggle: false,
-        cardTitle: 'schedule',
-        collapseble: true,
-        initialStateCollapse: this.collapsePanelsStatus,
-      }
-    };
-  }
-
   async handleNewSchedule() {
+    if (!this.costAccounts || this.costAccounts.length === 0) {
+      this.messageSrv.add({
+        detail: this.translateSrv.instant('messages.costAccounts.thereAreNotCostAccounts'),
+        summary: this.translateSrv.instant('atention'),
+        severity: 'warn'
+      });
+      return;
+    } 
     if (!this.unitMeansure) {
       const unitMeasureWorkpack = this.sectionPropertiesProperties.find(prop => prop.type === this.typePropertyModel.UnitSelectionModel);
       const unitMeasure = await this.unitMeasureSrv.GetById(unitMeasureWorkpack?.selectedValue as number);
@@ -2731,6 +1974,792 @@ export class WorkpackComponent implements OnDestroy {
         routerLink: ['/filter-dataview'],
       }]
     ]);
+  }
+
+  async loadBaselineSection(collapsePanelsStatus) {
+    this.sectionBaselines = {
+      cardSection: {
+        toggleable: false,
+        initialStateToggle: false,
+        cardTitle: 'baselines',
+        collapseble: true,
+        initialStateCollapse: collapsePanelsStatus,
+        showFilters: false,
+        showCreateNemElementButton: false,
+      },
+  
+      cardItemsSection: await this.loadSectionBaselinesCards(this.baselinesSectionShowInactives)
+    };
+  }
+  
+  async loadSectionBaselinesCards(showInactives: boolean) {
+    const resultBaselines = await this.baselineSrv.GetAll({ 'id-workpack': this.idWorkpack });
+    this.baselines = resultBaselines.success ? resultBaselines.data : [];
+    if (this.baselines && this.baselines.length > 0) {
+      const cardItems = this.baselines.filter(b => {
+        if (!showInactives) {
+          if (!!b.active) { return b; }
+        } else {
+          return b;
+        }
+      }).map(base => ({
+        typeCardItem: 'listItem',
+        icon: !!base.cancelation ? 'fas fa-times' : 'baseline',
+        iconColor: base.cancelation && '#FF7F81',
+        iconSvg: !base.cancelation ? true : false,
+        nameCardItem: base.name,
+        baselineStatus: base.status.toLowerCase(),
+        baselineStatusDate: base.active ? base.activationDate : (base.status === 'PROPOSED' ? base.proposalDate :
+          (base.status === 'APPROVED' ? base.activationDate : 'NONE')),
+        baselineActive: base.active,
+        itemId: base.id,
+        menuItems: [{
+          label: this.translateSrv.instant('delete'),
+          icon: 'fas fa-trash-alt',
+          disabled: !this.editPermission || base.status !== 'DRAFT',
+          command: (event) => this.deleteBaseline(base)
+        }],
+        urlCard: '/workpack/baseline',
+        paramsUrlCard: [
+          { name: 'idWorkpack', value: this.idWorkpack },
+          { name: 'idWorkpackModelLinked', value: this.idWorkpackModelLinked },
+          { name: 'id', value: base.id },
+        ]
+      }));
+      if (this.editPermission && !this.workpack.cancelPropose && !this.workpack.pendingBaseline) {
+        cardItems.push({
+          typeCardItem: 'newCardItem',
+          icon: IconsEnum.Plus,
+          iconColor: null,
+          iconSvg: true,
+          nameCardItem: null,
+          baselineStatus: undefined,
+          baselineStatusDate: undefined,
+          baselineActive: undefined,
+          itemId: null,
+          menuItems: [],
+          urlCard: '/workpack/baseline',
+          paramsUrlCard: [
+            { name: 'idWorkpack', value: this.idWorkpack },
+            { name: 'idWorkpackModelLinked', value: this.idWorkpackModelLinked },
+          ]
+        });
+      }
+      return cardItems;
+    } else {
+      const cardItem = (this.editPermission && !this.workpack.cancelPropose && !this.workpack.pendingBaseline) ?
+        [{
+          typeCardItem: 'newCardItem',
+          icon: IconsEnum.Plus,
+          iconColor: null,
+          iconSvg: true,
+          nameCardItem: null,
+          itemId: null,
+          urlCard: '/workpack/baseline',
+          paramsUrlCard: [
+            { name: 'idWorkpack', value: this.idWorkpack },
+            { name: 'idWorkpackModelLinked', value: this.idWorkpackModelLinked },
+          ]
+        }] : [];
+      return cardItem;
+    }
+  }
+
+  async loadCostAccountSection() {
+    const resultFilters = await this.filterSrv.getAllFilters(`workpackModels/${this.workpack.model.id}/costAccounts`);
+    const filters = resultFilters.success && resultFilters.data ? resultFilters.data : [];
+    const idFilterSelected = filters.find(defaultFilter => !!defaultFilter.favorite) ?
+      filters.find(defaultFilter => !!defaultFilter.favorite).id : undefined;
+    this.sectionCostAccount = {
+      cardSection: {
+        toggleable: false,
+        initialStateToggle: false,
+        cardTitle: 'costAccounts',
+        collapseble: true,
+        initialStateCollapse: this.collapsePanelsStatus,
+        showFilters: true,
+        filters,
+        showCreateNemElementButton: this.editPermission ? true : false
+      },
+      cardItemsSection: await this.loadCardItemsCostSession(idFilterSelected)
+    };
+    this.totalRecordsCostAccounts = this.sectionCostAccount.cardItemsSection ? this.sectionCostAccount.cardItemsSection.length + 1 : 1;
+  }
+  
+  async loadCardItemsCostSession(idFilter?: number) {
+    const result = await this.costAccountSrv.GetAll({ 'id-workpack': this.idWorkpack, idFilter });
+    if (result.success && result.data.length > 0) {
+      this.costAccounts = this.moveCostAccountOutherWorkpackToEnd(result.data);
+      const funders = (this.idOffice || this.idOfficeOwnerWorkpackLinked) &&
+        await this.loadOrganizationsOffice(this.idOfficeOwnerWorkpackLinked ? this.idOfficeOwnerWorkpackLinked : this.idOffice);
+      const namesWorckpack = await this.loadNameWorkpackCostAccount(result.data);
+      const cardItems = this.costAccounts.map(cost => {
+        const propertyName = cost.models.find(p => p.name === 'name');
+        const propertyNameValue = propertyName && cost.properties.find(p => p.idPropertyModel === propertyName.id);
+        const propertyfullName = cost.models.find(p => p.name === 'fullName');
+        const propertyFullnameValue = propertyfullName && cost.properties.find(p => p.idPropertyModel === propertyfullName.id);
+        const propertyNameWorkpack = namesWorckpack.find(names => names.idWorkpack === cost.idWorkpack);
+        const propertyLimit = cost.models.find(p => p.name.toLowerCase() === 'limit');
+        const propertyLimitValue = propertyLimit && cost.properties.find(p => p.idPropertyModel === propertyLimit.id);
+        const propertyFunder = cost.models.find(p => p.name.toLowerCase() === 'funder');
+        const propertyFunderValue = propertyFunder && cost.properties.find(p => p.idPropertyModel === propertyFunder.id);
+        const selectedFunder = propertyFunderValue && (funders
+          && funders.filter(org => org.value === propertyFunderValue.selectedValues[0]));
+        const costThisWorkpack = cost.idWorkpack === this.idWorkpack;
+        return {
+          typeCardItem: 'listItemCostAccount',
+          icon: 'fas fa-dollar-sign',
+          iconSvg: false,
+          nameCardItem: propertyNameValue && propertyNameValue.value as string,
+          fullNameCardItem: costThisWorkpack ?
+            propertyFullnameValue && propertyFullnameValue.value as string :
+            propertyNameWorkpack && propertyNameWorkpack.name as string,
+          subtitleCardItem: selectedFunder && selectedFunder[0]?.label,
+          costAccountsValue: propertyLimitValue?.value as number,
+          itemId: cost.id,
+          idWorkpack: cost.idWorkpack.toString(),
+          menuItems: [{
+            label: this.translateSrv.instant('delete'),
+            icon: 'fas fa-trash-alt',
+            command: (event) => this.deleteCostAccount(cost),
+            disabled: !this.editPermission
+          }] as MenuItem[],
+          urlCard: '/workpack/cost-account',
+          paramsUrlCard: [
+            { name: 'idWorkpack', value: cost.idWorkpack },
+            { name: 'idWorkpackModelLinked', value: this.idWorkpackModelLinked }
+          ],
+          iconMenuItems: null
+        };
+      });
+      if (this.editPermission) {
+        cardItems.push({
+          typeCardItem: 'newCardItem',
+          icon: IconsEnum.Plus,
+          iconSvg: true,
+          nameCardItem: null,
+          fullNameCardItem: null,
+          subtitleCardItem: null,
+          costAccountsValue: null,
+          itemId: null,
+          idWorkpack: this.idWorkpack.toString(),
+          menuItems: [],
+          urlCard: '/workpack/cost-account',
+          paramsUrlCard: [
+            { name: 'idWorkpack', value: this.idWorkpack },
+            { name: 'idWorkpackModelLinked', value: this.idWorkpackModelLinked }
+          ],
+          iconMenuItems: null
+        });
+      }
+      return cardItems;
+    }
+    const cardItemsNew = this.editPermission ? [{
+      typeCardItem: 'newCardItem',
+      icon: IconsEnum.Plus,
+      iconSvg: true,
+      nameCardItem: null,
+      subtitleCardItem: null,
+      costAccountsValue: null,
+      itemId: null,
+      idWorkpack: this.idWorkpack.toString(),
+      menuItems: [],
+      urlCard: '/workpack/cost-account',
+      paramsUrlCard: [
+        { name: 'idWorkpack', value: this.idWorkpack },
+        { name: 'idWorkpackModelLinked', value: this.idWorkpackModelLinked }
+      ],
+      iconMenuItems: null
+    }] : [];
+    return cardItemsNew;
+  }
+
+  async loadStakeholderSection() {
+    const resultFilters = await this.filterSrv.getAllFilters(`workpackModels/${this.workpack.model.id}/stakeholders`);
+    const filters = resultFilters.success && Array.isArray(resultFilters.data) ? resultFilters.data : [];
+    const idFilterSelected = filters.find(defaultFilter => !!defaultFilter.favorite) ?
+      filters.find(defaultFilter => !!defaultFilter.favorite).id : undefined;
+    await this.loadStakeholders(idFilterSelected);
+    this.sectionStakeholder = {
+      cardSection: {
+        toggleable: false,
+        initialStateToggle: false,
+        cardTitle: 'stakeholdersAndPermissions',
+        collapseble: true,
+        initialStateCollapse: this.collapsePanelsStatus,
+        showFilters: true,
+        filters,
+        showCreateNemElementButton: this.editPermission ? true : false,
+        createNewElementMenuItems: [
+          {
+            label: this.translateSrv.instant('person'),
+            icon: 'fas fa-user-circle',
+            command: (event) => this.navigateToPageStakeholder('person')
+          },
+          {
+            label: this.translateSrv.instant('organization'),
+            icon: 'fas fa-building',
+            command: (event) => this.navigateToPageStakeholder('organization')
+          }
+        ]
+      },
+      cardItemsSection: await this.loadSectionStakeholderCards(this.stakeholderSectionShowInactives)
+    };
+    this.totalRecordsStakeholders = this.sectionStakeholder.cardItemsSection && this.sectionStakeholder.cardItemsSection.length;
+  }
+  
+  async loadSectionStakeholderCards(showInactives: boolean) {
+    if (this.stakeholders) {
+      const cardItems = this.stakeholders.filter(stake => {
+        if (!showInactives && stake.roles && stake.roles.length > 0) {
+          return stake.roles.find(r => r.active && (!r.to || r.to === null || moment(r.to, 'yyyy-MM-DD').isSameOrAfter(moment()))
+            && (!r.from || r.from === null || moment(r.from, 'yyyy-MM-DD').isSameOrBefore(moment())));
+        } else { return stake; }
+      }).map(stakeholder => {
+        const editPermission = stakeholder.permissions && stakeholder.permissions.filter(p => p.level === 'EDIT').length > 0;
+        const readPermission = stakeholder.permissions && stakeholder.permissions.filter(p => p.level === 'READ').length > 0;
+        const samePlan = (!stakeholder.permissions || stakeholder.permissions.length === 0) ||
+          (stakeholder.permissions && stakeholder.permissions.filter(p => p.idPlan === this.idPlan).length > 0);
+        return {
+          typeCardItem: 'listItemStakeholder',
+          icon: stakeholder.person ? (editPermission ? IconsEnum.UserEdit :
+            (readPermission ? IconsEnum.UserRead : IconsEnum.UserCircle)) : IconsEnum.Building,
+          iconSvg: true,
+          nameCardItem: stakeholder.person ? stakeholder.person.name : stakeholder.organization.name,
+          fullNameCardItem: stakeholder.person ? stakeholder.person.fullName : stakeholder.organization.fullName,
+          subtitleCardItem: stakeholder.roles && stakeholder.roles.filter(r => r.active && (!r.to || r.to === null ||
+            moment(r.to, 'yyyy-MM-DD').isSameOrAfter(moment()))
+            && (!r.from || r.from === null || moment(r.from, 'yyyy-MM-DD').isSameOrBefore(moment())))
+            .map(role => this.translateSrv.instant(role.role)).join(', '),
+          itemId: stakeholder.person ? stakeholder.person.id : stakeholder.organization.id,
+          menuItems: [{
+            label: this.translateSrv.instant('delete'),
+            icon: 'fas fa-trash-alt',
+            disabled: !samePlan,
+            command: (event) => this.deleteStakeholder(stakeholder)
+          }],
+          urlCard: !!samePlan ? (stakeholder.person ? '/stakeholder/person' : '/stakeholder/organization') : undefined,
+          paramsUrlCard: [
+            { name: 'idWorkpack', value: this.idWorkpack },
+            { name: 'idPlan', value: this.idPlan },
+            { name: 'idWorkpackModelLinked', value: this.idWorkpackModelLinked },
+            {
+              name: stakeholder.person ? 'idPerson' : 'idOrganization',
+              value: stakeholder.person ? stakeholder.person.id : stakeholder.organization.id
+            }
+          ],
+          iconMenuItems: null
+        };
+      });
+      cardItems.push({
+        typeCardItem: 'newCardItem',
+        icon: IconsEnum.Plus,
+        iconSvg: true,
+        nameCardItem: null,
+        fullNameCardItem: null,
+        subtitleCardItem: null,
+        itemId: null,
+        menuItems: null,
+        urlCard: null,
+        paramsUrlCard: null,
+        iconMenuItems: [
+          {
+            label: this.translateSrv.instant('person'),
+            icon: 'fas fa-user-circle',
+            command: (event) => this.navigateToPageStakeholder('person')
+          },
+          {
+            label: this.translateSrv.instant('organization'),
+            icon: 'fas fa-building',
+            command: (event) => this.navigateToPageStakeholder('organization')
+          }
+        ]
+      });
+      return cardItems;
+    } else {
+      const cardItem = [{
+        typeCardItem: 'newCardItem',
+        icon: IconsEnum.Plus,
+        iconSvg: true,
+        nameCardItem: null,
+        itemId: null,
+        menuItems: null,
+        urlCard: null,
+        iconMenuItems: [
+          {
+            label: this.translateSrv.instant('person'),
+            icon: 'fas fa-user-circle',
+            command: (event) => this.navigateToPageStakeholder('person')
+          },
+          {
+            label: this.translateSrv.instant('organization'),
+            icon: 'fas fa-building',
+            command: (event) => this.navigateToPageStakeholder('organization')
+          }
+        ]
+      }];
+      return cardItem;
+    }
+  }
+
+ async loadProcessSection() {
+    const resultFilters = await this.filterSrv.getAllFilters(`workpackModels/${this.workpack.model.id}/processes`);
+        const filters = resultFilters.success && Array.isArray(resultFilters.data) ? resultFilters.data : [];
+        const idFilterSelected = filters.find(defaultFilter => !!defaultFilter.favorite) ?
+          filters.find(defaultFilter => !!defaultFilter.favorite).id : undefined;
+  
+        this.sectionProcess = {
+          cardSection: {
+            toggleable: false,
+            initialStateToggle: false,
+            cardTitle: 'processes',
+            collapseble: true,
+            initialStateCollapse: this.collapsePanelsStatus,
+            showFilters: true,
+            filters: filters && filters.length > 0 ? filters : [],
+            showCreateNemElementButton: this.editPermission ? true : false,
+          },
+  
+          cardItemsSection: await this.loadSectionProcessesCards(idFilterSelected)
+        };
+        this.totalRecordsProcesses = this.sectionProcess.cardItemsSection && this.sectionProcess.cardItemsSection.length;
+  }
+  
+  async loadSectionProcessesCards(idFilterSelected: number) {
+    const resultProcess = await this.processSrv.GetAll({ 'id-workpack': this.idWorkpack, idFilter: idFilterSelected });
+    this.processes = resultProcess.success ? resultProcess.data : [];
+    if (this.processes && this.processes.length > 0) {
+      const cardItems = this.processes.map(proc => ({
+        typeCardItem: 'listItemProcess',
+        icon: 'process',
+        iconSvg: true,
+        nameCardItem: proc.name,
+        subtitleCardItem: proc.processNumber,
+        organizationName: proc.currentOrganization,
+        itemId: proc.id,
+        priority: proc.priority,
+        menuItems: [{
+          label: this.translateSrv.instant('delete'),
+          icon: 'fas fa-trash-alt',
+          command: (event) => this.deleteProcess(proc),
+          disabled: !this.editPermission
+        }] as MenuItem[],
+        urlCard: '/workpack/processes',
+        paramsUrlCard: [
+          { name: 'idWorkpack', value: this.idWorkpack },
+          { name: 'id', value: proc.id },
+        ]
+      }));
+      cardItems.push({
+        typeCardItem: 'newCardItem',
+        icon: IconsEnum.Plus,
+        iconSvg: true,
+        nameCardItem: null,
+        subtitleCardItem: null,
+        organizationName: null,
+        itemId: null,
+        priority: false,
+        menuItems: null,
+        urlCard: '/workpack/processes',
+        paramsUrlCard: [
+          { name: 'idWorkpack', value: this.idWorkpack },
+        ]
+      });
+      return cardItems;
+    } else {
+      const cardItem = [{
+        typeCardItem: 'newCardItem',
+        icon: IconsEnum.Plus,
+        iconSvg: true,
+        nameCardItem: null,
+        itemId: null,
+        menuItems: null,
+        urlCard: '/workpack/processes',
+        paramsUrlCard: [
+          { name: 'idWorkpack', value: this.idWorkpack },
+        ]
+      }];
+      return cardItem;
+    }
+  }
+
+  async loadRisKAndIssueSection() {
+    const resultFilters = await this.filterSrv.getAllFilters(`workpackModels/${this.workpack.model.id}/risks`);
+        const filters = resultFilters.success && Array.isArray(resultFilters.data) ? resultFilters.data : [];
+        const idFilterSelected = filters.find(defaultFilter => !!defaultFilter.favorite) ?
+          filters.find(defaultFilter => !!defaultFilter.favorite).id : undefined;
+  
+        this.sectionRisk = {
+          cardSection: {
+            toggleable: false,
+            initialStateToggle: false,
+            cardTitle: 'risks',
+            collapseble: true,
+            initialStateCollapse: this.collapsePanelsStatus,
+            showFilters: true,
+            filters: filters && filters.length > 0 ? filters : [],
+            showCreateNemElementButton: this.editPermission ? true : false,
+          },
+  
+          cardItemsSection: await this.loadSectionRisksCards(this.riskSectionShowClosed, idFilterSelected)
+        };
+        this.totalRecordsRisks = this.sectionRisk.cardItemsSection && this.sectionRisk.cardItemsSection.length;
+  
+  
+        const resultFiltersIssues = await this.filterSrv.getAllFilters(`workpackModels/${this.workpack.model.id}/issues`);
+        const filtersIssues = resultFiltersIssues.success && Array.isArray(resultFiltersIssues.data) ? resultFiltersIssues.data : [];
+        const idFilterIssueSelected = filtersIssues.find(defaultFilter => !!defaultFilter.favorite) ?
+          filters.find(defaultFilter => !!defaultFilter.favorite).id : undefined;
+        this.sectionIssue = {
+          cardSection: {
+            toggleable: false,
+            initialStateToggle: false,
+            cardTitle: 'issues',
+            collapseble: true,
+            initialStateCollapse: this.collapsePanelsStatus,
+            showFilters: true,
+            filters: filtersIssues && filtersIssues.length > 0 ? filtersIssues : [],
+            showCreateNemElementButton: this.editPermission ? true : false,
+          },
+  
+          cardItemsSection: await this.loadSectionIssuesCards(this.issueSectionShowClosed, idFilterIssueSelected)
+        };
+        this.totalRecordsIssues = this.sectionIssue.cardItemsSection && this.sectionIssue.cardItemsSection.length;
+  }
+  
+  async loadSectionRisksCards(showClosed: boolean, idFilterSelected?: number) {
+    const resultRisks = await this.riskSrv.GetAll({ 'id-workpack': this.idWorkpack, idFilter: idFilterSelected });
+    this.risks = resultRisks.success ? resultRisks.data : [];
+    if (this.risks && this.risks.length > 0) {
+      const cardItems = !showClosed ? this.risks.filter(r => RisksPropertiesOptions.status[r.status].label === 'open').map(risk => ({
+        typeCardItem: 'listItem',
+        icon: RisksPropertiesOptions.status[risk.status].icon,
+        iconColor: RisksPropertiesOptions.importance[risk.importance].label,
+        iconSvg: false,
+        nameCardItem: risk.name,
+        itemId: risk.id,
+        menuItems: [{
+          label: this.translateSrv.instant('delete'),
+          icon: 'fas fa-trash-alt',
+          command: (event) => this.deleteRisk(risk),
+          disabled: !this.editPermission
+        }] as MenuItem[],
+        urlCard: '/workpack/risks',
+        paramsUrlCard: [
+          { name: 'idWorkpack', value: this.idWorkpack },
+          { name: 'idWorkpackModelLinked', value: this.idWorkpackModelLinked },
+          { name: 'id', value: risk.id },
+        ]
+      })) :
+        this.risks.map(risk => ({
+          typeCardItem: 'listItem',
+          icon: RisksPropertiesOptions.status[risk.status].icon,
+          iconColor: RisksPropertiesOptions.importance[risk.importance].label,
+          iconSvg: false,
+          nameCardItem: risk.name,
+          itemId: risk.id,
+          menuItems: [{
+            label: this.translateSrv.instant('delete'),
+            icon: 'fas fa-trash-alt',
+            command: (event) => this.deleteRisk(risk),
+            disabled: !this.editPermission
+          }] as MenuItem[],
+          urlCard: '/workpack/risks',
+          paramsUrlCard: [
+            { name: 'idWorkpack', value: this.idWorkpack },
+            { name: 'idWorkpackModelLinked', value: this.idWorkpackModelLinked },
+            { name: 'id', value: risk.id },
+          ]
+        }));
+      if (this.editPermission) {
+        cardItems.push({
+          typeCardItem: 'newCardItem',
+          icon: IconsEnum.Plus,
+          iconColor: null,
+          iconSvg: true,
+          nameCardItem: null,
+          itemId: null,
+          menuItems: null,
+          urlCard: '/workpack/risks',
+          paramsUrlCard: [
+            { name: 'idWorkpack', value: this.idWorkpack },
+            { name: 'idWorkpackModelLinked', value: this.idWorkpackModelLinked },
+          ]
+        });
+      }
+      return cardItems;
+    } else {
+      if (this.editPermission) {
+        const cardItem = [{
+          typeCardItem: 'newCardItem',
+          icon: IconsEnum.Plus,
+          iconSvg: true,
+          nameCardItem: null,
+          itemId: null,
+          menuItems: null,
+          urlCard: '/workpack/risks',
+          paramsUrlCard: [
+            { name: 'idWorkpack', value: this.idWorkpack },
+            { name: 'idWorkpackModelLinked', value: this.idWorkpackModelLinked },
+          ]
+        }];
+        return cardItem;
+      } else { return []; };
+    }
+  }
+  
+  async loadSectionIssuesCards(showClosed: boolean, idFilterIssueSelected?: number) {
+    const resultIssues = await this.issueSrv.GetAll({ 'id-workpack': this.idWorkpack, idFilter: idFilterIssueSelected });
+    this.issues = resultIssues.success ? resultIssues.data : [];
+    if (this.issues && this.issues.length > 0) {
+      const cardItems = !showClosed ? this.issues.filter(r => IssuesPropertiesOptions.status[r.status].value === 'OPEN').map(issue => ({
+        typeCardItem: 'listItem',
+        icon: 'Issue',
+        iconColor: IssuesPropertiesOptions.importance[issue.importance].label,
+        iconSvg: true,
+        nameCardItem: issue.name,
+        itemId: issue.id,
+        menuItems: [{
+          label: this.translateSrv.instant('delete'),
+          icon: 'fas fa-trash-alt',
+          command: (event) => this.deleteIssue(issue),
+          disabled: !this.editPermission
+        }] as MenuItem[],
+        urlCard: '/workpack/issues',
+        paramsUrlCard: [
+          { name: 'idWorkpack', value: this.idWorkpack },
+          { name: 'idWorkpackModelLinked', value: this.idWorkpackModelLinked },
+          { name: 'id', value: issue.id },
+        ]
+      })) :
+        this.issues.map(issue => ({
+          typeCardItem: 'listItem',
+          icon: 'Issue',
+          iconColor: IssuesPropertiesOptions.importance[issue.importance].label,
+          iconSvg: true,
+          nameCardItem: issue.name,
+          itemId: issue.id,
+          menuItems: [{
+            label: this.translateSrv.instant('delete'),
+            icon: 'fas fa-trash-alt',
+            command: (event) => this.deleteIssue(issue),
+            disabled: !this.editPermission
+          }] as MenuItem[],
+          urlCard: '/workpack/issues',
+          paramsUrlCard: [
+            { name: 'idWorkpack', value: this.idWorkpack },
+            { name: 'idWorkpackModelLinked', value: this.idWorkpackModelLinked },
+            { name: 'id', value: issue.id },
+          ]
+        }));
+      if (this.editPermission) {
+        cardItems.push({
+          typeCardItem: 'newCardItem',
+          icon: IconsEnum.Plus,
+          iconColor: null,
+          iconSvg: true,
+          nameCardItem: null,
+          itemId: null,
+          menuItems: null,
+          urlCard: '/workpack/issues',
+          paramsUrlCard: [
+            { name: 'idWorkpack', value: this.idWorkpack },
+            { name: 'idWorkpackModelLinked', value: this.idWorkpackModelLinked },
+          ]
+        });
+      }
+      return cardItems;
+    } else {
+      const cardItem = this.editPermission ? [{
+        typeCardItem: 'newCardItem',
+        icon: IconsEnum.Plus,
+        iconSvg: true,
+        nameCardItem: null,
+        itemId: null,
+        menuItems: null,
+        urlCard: '/workpack/issues',
+        paramsUrlCard: [
+          { name: 'idWorkpack', value: this.idWorkpack },
+          { name: 'idWorkpackModelLinked', value: this.idWorkpackModelLinked },
+        ]
+      }] : [];
+      return cardItem;
+    }
+  }
+
+  async loadScheduleSession() {
+    const result = await this.scheduleSrv.GetSchedule({ 'id-workpack': this.idWorkpack });
+    if (result.success && result.data && result.data.length > 0) {
+      this.schedule = result.data[0];
+      const unitMeasureWorkpack = this.sectionPropertiesProperties.find(prop => prop.type === this.typePropertyModel.UnitSelectionModel);
+      const unitMeasure = await this.unitMeasureSrv.GetById(unitMeasureWorkpack?.selectedValue as number);
+      this.unitMeansure = unitMeasure.success && unitMeasure.data;
+      if (this.unitMeansure && !this.unitMeansure.precision) {
+        this.unitMeansure.precision = 0;
+      }
+      const groupStep = this.schedule.groupStep.map((group, groupIndex, groupArray) => {
+        const cardItemSection = group.steps.map((step, stepIndex, stepArray) => ({
+          type: 'listStep',
+          stepName: new Date(step.periodFromStart + 'T00:00:00'),
+          menuItems: (groupIndex === 0 && stepIndex === 0) ? [{
+            label: this.translateSrv.instant('properties'),
+            icon: 'fas fa-edit',
+            command: () => this.editScheduleStep(step.id, this.unitMeansure.name, this.unitMeansure.precision, 'start')
+          }] : ((groupIndex === groupArray.length - 1 && stepIndex === stepArray.length - 1) ?
+            [{
+              label: this.translateSrv.instant('properties'),
+              icon: 'fas fa-edit',
+              command: () => this.editScheduleStep(step.id, this.unitMeansure.name, this.unitMeansure.precision, 'end')
+            }] : [{
+              label: this.translateSrv.instant('properties'),
+              icon: 'fas fa-edit',
+              command: () => this.editScheduleStep(step.id, this.unitMeansure.name, this.unitMeansure.precision, 'step')
+            }]),
+          stepOrder: (groupIndex === 0 && stepIndex === 0) ? 'start' :
+            ((groupIndex === groupArray.length - 1 && stepIndex === stepArray.length - 1) ? 'end' : 'step'),
+          unitPlanned: step.plannedWork ? step.plannedWork : 0,
+          unitActual: step.actualWork ? step.actualWork : 0,
+          unitBaseline: step.baselinePlannedWork ? step.baselinePlannedWork : 0,
+          unitProgressBar: {
+            total: step.plannedWork,
+            progress: step.actualWork,
+            color: '#FF8C00',
+          },
+          costPlanned: step.consumes?.reduce((total, v) => (total + (v.plannedCost ? v.plannedCost : 0)), 0),
+          costActual: step.consumes?.reduce((total, v) => (total + (v.actualCost ? v.actualCost : 0)), 0),
+          baselinePlannedCost: step.consumes?.reduce((total, v) => (total + (v.baselinePlannedCost ? v.baselinePlannedCost : 0)), 0),
+          costProgressBar: {
+            total: (step.consumes?.reduce((total, v) => (total + (v.plannedCost ? v.plannedCost : 0)), 0)),
+            progress: step.consumes?.reduce((total, v) => (total + (v.actualCost ? v.actualCost : 0)), 0),
+            color: '#44B39B'
+          },
+          unitName: this.unitMeansure && this.unitMeansure.name,
+          unitPrecision: this.unitMeansure && this.unitMeansure.precision,
+          idStep: step.id
+        }));
+        return {
+          year: group.year,
+          cardItemSection
+        };
+      });
+      const startDate = this.schedule && new Date(this.schedule.start + 'T00:00:00');
+      const endDate = this.schedule && new Date(this.schedule.end + 'T00:00:00');
+      const startScheduleStep = !!this.editPermission && {
+        type: 'newStart',
+        stepOrder: 'newStart',
+        unitName: this.unitMeansure.name,
+        unitPrecision: this.unitMeansure.precision,
+      };
+      const endScheduleStep = !!this.editPermission && {
+        type: 'newEnd',
+        stepOrder: 'newEnd',
+        unitName: this.unitMeansure.name,
+        unitPrecision: this.unitMeansure.precision,
+      };
+      const initialDatePlanned = moment(startDate);
+      const finalDatePlanned = moment(endDate);
+      const daysToPlanned = finalDatePlanned.diff(initialDatePlanned, 'days');
+      const dateActual = moment(new Date());
+      const daysToNow = dateActual.diff(initialDatePlanned, 'days');
+      const baselineStartDate = this.schedule && new Date(this.schedule.baselineStart + 'T00:00:00');
+      const baselineEndDate = this.schedule && new Date(this.schedule.baselineEnd + 'T00:00:00');
+      const baselineDaysPlanned = moment(baselineEndDate).diff(moment(baselineStartDate), 'days');
+      this.sectionSchedule = {
+        cardSection: {
+          toggleable: false,
+          initialStateToggle: false,
+          cardTitle: 'schedule',
+          collapseble: true,
+          initialStateCollapse: this.collapsePanelsStatus,
+          headerDates: this.schedule && {
+            startDate,
+            endDate
+          },
+          progressBarValues: [
+            {
+              total: Number(this.schedule.planed.toFixed(this.unitMeansure.precision)),
+              progress: Number(this.schedule.actual.toFixed(this.unitMeansure.precision)),
+              labelTotal: 'planned',
+              labelProgress: 'actual',
+              valueUnit: this.unitMeansure && this.unitMeansure.name,
+              color: '#ffa342',
+              barHeight: 17,
+              baselinePlanned: Number(this.schedule.baselinePlaned.toFixed(this.unitMeansure.precision)),
+            },
+            {
+              total: this.schedule.planedCost,
+              progress: this.schedule.actualCost,
+              labelTotal: 'planned',
+              labelProgress: 'actual',
+              valueUnit: 'currency',
+              color: '#6cd3bd',
+              barHeight: 17,
+              baselinePlanned: Number(this.schedule.baselineCost.toFixed(this.unitMeansure.precision)),
+            },
+            {
+              total: daysToPlanned,
+              progress: daysToNow < 0 ? 0 : daysToNow,
+              labelTotal: 'planned',
+              labelProgress: 'actual',
+              valueUnit: 'time',
+              color: '#659ee1',
+              barHeight: 17,
+              baselinePlanned: baselineDaysPlanned,
+              startDateBaseline: baselineStartDate,
+              endDateBaseline: baselineEndDate,
+              startDateTotal: startDate,
+              endDateTotal: endDate,
+            }
+          ],
+        },
+        startScheduleStep,
+        endScheduleStep,
+        groupStep
+      };
+      if (this.sectionSchedule.groupStep && this.sectionSchedule.groupStep[0].cardItemSection) {
+        this.sectionSchedule.groupStep[0].start = true;
+        const idStartStep = this.sectionSchedule.groupStep[0].cardItemSection[0].idStep;
+        if (!!this.editPermission) {
+          this.sectionSchedule.groupStep[0].cardItemSection[0].menuItems.push({
+            label: this.translateSrv.instant('delete'),
+            icon: 'fas fa-trash-alt',
+            command: (event) => this.deleteScheduleStep(idStartStep)
+          });
+        }
+        this.sectionSchedule.groupStep[0].cardItemSection[0].stepDay = startDate;
+        const groupStepItems: IScheduleStepCardItem[] = [startScheduleStep];
+        this.sectionSchedule.groupStep[0].cardItemSection.forEach(card => {
+          groupStepItems.push(card);
+        });
+        this.sectionSchedule.groupStep[0].cardItemSection = Array.from(groupStepItems);
+      }
+      const groupLenght = this.sectionSchedule.groupStep && this.sectionSchedule.groupStep.length;
+      if (this.sectionSchedule.groupStep && this.sectionSchedule.groupStep[groupLenght - 1].cardItemSection) {
+        this.sectionSchedule.groupStep[groupLenght - 1].end = true;
+        const cardItemSectionLenght = this.sectionSchedule.groupStep[groupLenght - 1].cardItemSection.length;
+        const idEndStep = this.sectionSchedule.groupStep[groupLenght - 1].cardItemSection[cardItemSectionLenght - 1].idStep;
+        if (!!this.editPermission) {
+          this.sectionSchedule.groupStep[groupLenght - 1].cardItemSection[cardItemSectionLenght - 1].menuItems.push({
+            label: this.translateSrv.instant('delete'),
+            icon: 'fas fa-trash-alt',
+            command: (event) =>
+              this.deleteScheduleStep(idEndStep)
+          });
+        }
+        this.sectionSchedule.groupStep[groupLenght - 1].cardItemSection[cardItemSectionLenght - 1].stepDay = endDate;
+        this.sectionSchedule.groupStep[groupLenght - 1].cardItemSection.push(endScheduleStep);
+      }
+      return;
+    }
+    this.sectionSchedule = {
+      cardSection: {
+        toggleable: false,
+        initialStateToggle: false,
+        cardTitle: 'schedule',
+        collapseble: true,
+        initialStateCollapse: this.collapsePanelsStatus,
+      }
+    };
   }
 
 }

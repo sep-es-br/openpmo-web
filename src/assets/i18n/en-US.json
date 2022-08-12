@@ -370,6 +370,9 @@
     "loading": "Loading",
     "atentionCancellingMessage": "Heads up. This action cannot be undone.",
     "textAtentionCancellingMessage": "Confirm sending this proposal to cancel the project to the CCB?",
+    "costAccounts": {
+      "thereAreNotCostAccounts": "There are not cost accounts"
+    },
     "error": {
       "generic": "We were unable to process your request",
       "unauthorized": "You do not have permission to access this functionality",
