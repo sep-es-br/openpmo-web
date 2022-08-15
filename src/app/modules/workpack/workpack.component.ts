@@ -194,9 +194,7 @@ export class WorkpackComponent implements OnDestroy {
     public baselineSrv: BaselineService,
     private confirmationSrv: ConfirmationService,
     private dashboardSrv: DashboardService,
-    private citizenUserSrv: CitizenUserService
   ) {
-    this.citizenUserSrv.loadCitizenUsers();
     this.actRouter.queryParams.subscribe(async ({ id, idPlan, idWorkpackModel, idWorkpackParent, idWorkpackModelLinked }) => {
       this.idWorkpack = id && +id;
       this.idPlan = idPlan && +idPlan;

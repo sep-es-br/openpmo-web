@@ -99,6 +99,7 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
     private authServerSrv: AuthServerService,
     private planSrv: PlanService
   ) {
+    this.citizenUserSrv.loadCitizenUsers();
     this.actRouter.queryParams.subscribe(async queryParams => {
       this.idPlan = queryParams.idPlan && +queryParams.idPlan;
       this.idWorkpack = queryParams.idWorkpack && +queryParams.idWorkpack;
