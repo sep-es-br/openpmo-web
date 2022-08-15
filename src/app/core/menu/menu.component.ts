@@ -84,7 +84,7 @@ export class MenuComponent implements OnInit, OnDestroy {
     this.planSrv.observableIdPlan().pipe(takeUntil(this.$destroy)).subscribe(async id => {
       if (!this.isFixed) {
         this.currentIDPlan = id;
-        if (this.currentIDPlan) {
+        if (this.currentIDPlan && this.currentIDPlan !== 0) {
           localStorage.setItem('@currentPlan', this.currentIDPlan.toString());
         }
         await this.loadPropertiesPlan();
@@ -220,11 +220,15 @@ export class MenuComponent implements OnInit, OnDestroy {
   }
 
   async loadPropertiesPlan() {
-    if (this.currentIDPlan) {
+    const currentPlan = !this.currentIDPlan || this.currentIDPlan === 0 ?
+      localStorage.getItem('@currentPlan') : this.currentIDPlan;
+    this.currentIDPlan = Number(currentPlan);
+    if (currentPlan) {
       const {data, success} = await this.planSrv.GetById(this.currentIDPlan);
       if(success) {
         this.currentPlan = data;
         if (this.currentPlan) {
+          this.currentIDOffice = this.currentPlan.idOffice;
           this.officeSrv.nextIDOffice(this.currentPlan.idOffice);
         }
       }
@@ -291,7 +295,7 @@ export class MenuComponent implements OnInit, OnDestroy {
     return queries ? Number((queries.split('id=')[1] || queries.split('idOffice=')[1])?.split('&')[0]) : 0;
   }
 
-  async loadPortfolioMenu() {
+  async loadPortfolioMenu() {    
     if (this.currentIDOffice) {
       const { success, data } = await this.menuSrv.getItemsPortfolio(this.currentIDOffice, this.currentIDPlan);
       if (success) {
@@ -307,7 +311,7 @@ export class MenuComponent implements OnInit, OnDestroy {
       const { success, data } = await this.menuSrv.getItemsPlanModel(this.currentIDOffice);
       if (success) {
         this.itemsPlanModel = this.buildMenuItemPlanModel(data || []);
-        this.refreshPortfolioMenu();
+        // this.refreshPortfolioMenu();
       }
     }
     return;

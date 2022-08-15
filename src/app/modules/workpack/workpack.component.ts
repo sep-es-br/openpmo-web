@@ -933,7 +933,7 @@ export class WorkpackComponent implements OnDestroy {
             command: (event) => this.handleRestoreWorkpack(workpack.id),
           });
         } else {
-          if (workpack.type !== 'Project' && !!workpack.canDeleted && !workpack.canceled) {
+          if (workpack.type !== 'Project' && !!workpack.canDeleted && !workpack.canceled && !workpack.linked) {
             menuItems.push({
               label: this.translateSrv.instant('delete'),
               icon: 'fas fa-trash-alt',
@@ -957,7 +957,7 @@ export class WorkpackComponent implements OnDestroy {
               disabled: !this.editPermission
             });
           }
-          if (workpack.cancelable && this.editPermission) {
+          if (workpack.cancelable && this.editPermission && !workpack.linked) {
             menuItems.push({
               label: this.translateSrv.instant('cancel'),
               icon: 'fas fa-times',
@@ -970,14 +970,14 @@ export class WorkpackComponent implements OnDestroy {
               icon: 'app-icon ccb-member',
               command: (event) => this.navigateToConfigCCB(workpack.id),
             });
-            if (!workpack.pendingBaseline && !workpack.cancelPropose && !!workpack.hasActiveBaseline) {
+            if (!workpack.pendingBaseline && !workpack.cancelPropose && !!workpack.hasActiveBaseline && !workpack.linked) {
               menuItems.push({
                 label: this.translateSrv.instant('cancel'),
                 icon: 'fas fa-times',
                 command: (event) => this.navigateToCancelProject(workpack.id, propertyNameWorkpack.value as string),
               });
             }
-            if (!workpack.pendingBaseline && !workpack.cancelPropose && !workpack.hasActiveBaseline) {
+            if (!workpack.pendingBaseline && !workpack.cancelPropose && !workpack.hasActiveBaseline && !workpack.linked) {
               menuItems.push({
                 label: this.translateSrv.instant('delete'),
                 icon: 'fas fa-trash-alt',
@@ -986,14 +986,14 @@ export class WorkpackComponent implements OnDestroy {
               });
             }
           }
-          if (this.editPermission && !workpack.canceled) {
+          if (this.editPermission && !workpack.canceled && !workpack.linked) {
             menuItems.push({
               label: this.translateSrv.instant('cut'),
               icon: 'fas fa-cut',
               command: (event) => this.handleCutWorkpack(workpack),
             });
           }
-          if (!workpack.canceled && workpack.model.id === idWorkpackModel && this.editPermission && !idWorkpackModelLinked) {
+          if (!workpack.canceled && workpack.model.id === idWorkpackModel && this.editPermission && !idWorkpackModelLinked && !workpack.linked) {
             menuItems.push({
               label: this.translateSrv.instant('sharing'),
               icon: 'app-icon share',

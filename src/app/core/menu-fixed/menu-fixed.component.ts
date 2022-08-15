@@ -240,6 +240,9 @@ export class MenuFixedComponent implements OnInit, OnDestroy {
   }
 
   async loadPropertiesPlan() {
+    const currentPlan = !this.currentIDPlan || this.currentIDPlan === 0 ?
+      localStorage.getItem('@currentPlan') : this.currentIDPlan;
+    this.currentIDPlan = Number(currentPlan);
     if (this.currentIDPlan) {
       const {data, success} = await this.planSrv.GetById(this.currentIDPlan);
       if(success) {
