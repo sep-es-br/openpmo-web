@@ -1616,7 +1616,7 @@ export class WorkpackComponent implements OnDestroy {
     if (!this.costAccounts || this.costAccounts.length === 0) {
       this.messageSrv.add({
         detail: this.translateSrv.instant('messages.costAccounts.thereAreNotCostAccounts'),
-        summary: this.translateSrv.instant('atention'),
+        summary: this.translateSrv.instant('attention'),
         severity: 'warn'
       });
       return;

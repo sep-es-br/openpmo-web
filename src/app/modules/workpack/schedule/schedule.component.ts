@@ -339,7 +339,7 @@ export class ScheduleComponent implements OnInit, OnDestroy {
     }
     if (!this.actualValidationMessage && this.formSchedule.valid) {
       if (this.costAssignmentsCardItems && this.costAssignmentsCardItems.length > 0
-        && this.costAssignmentsCardItems.filter(item => item.plannedWork && item.plannedWork > 0).length > 0) {
+        && this.costAssignmentsCardItems.filter(item => item.plannedWork >= 0).length > 0) {
         const startDate = moment(this.formSchedule.controls.start.value);
         const today = moment();
         if (today.isBefore(startDate, 'months') && this.costAssignmentsCardItems.filter(item => item.actualWork && item.actualWork > 0).length > 0) {
@@ -376,7 +376,7 @@ export class ScheduleComponent implements OnInit, OnDestroy {
 
     if (!this.actualValidationMessage && this.formSchedule.valid) {
       if (this.costAssignmentsCardItems && this.costAssignmentsCardItems.length > 0 &&
-        this.costAssignmentsCardItems.filter(item => item.plannedWork && item.plannedWork > 0).length > 0) {
+        this.costAssignmentsCardItems.filter(item => item.plannedWork >= 0).length > 0) {
           const startDate = moment(this.formSchedule.controls.start.value);
           const today = moment();
           if (today.isBefore(startDate, 'months') && this.costAssignmentsCardItems.filter(item => item.actualWork && item.actualWork > 0).length > 0) {
