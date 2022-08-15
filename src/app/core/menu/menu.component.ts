@@ -125,7 +125,7 @@ export class MenuComponent implements OnInit, OnDestroy {
         this.selectMenuActive(url.slice(2));
       }
     });
-    this.menuSrv.getMenuState.pipe(takeUntil(this.$destroy)).subscribe( async(menuState) => {
+    this.menuSrv.getMenuState.pipe(takeUntil(this.$destroy)).subscribe(async (menuState) => {
       this.isFixed = menuState.isFixed;
       if (!this.isFixed) {
         this.menus = menuState.menus;
@@ -157,7 +157,7 @@ export class MenuComponent implements OnInit, OnDestroy {
     this.getMenuModeUser();
   }
 
- async loadCurrentInfo() {
+  async loadCurrentInfo() {
     this.currentUserInfo = await this.authSrv.getInfoPerson();
   }
 
@@ -206,8 +206,8 @@ export class MenuComponent implements OnInit, OnDestroy {
           label: this.translateSrv.instant('currentLanguage'),
           icon: 'fas fa-flag',
           items: [
-            { label: 'Português', command: () => {this.changeLanguage('pt-BR'); this.closeAllMenus(); } },
-            { label: 'English', command: () => {this.changeLanguage('en-US'); this.closeAllMenus(); } }
+            { label: 'Português', command: () => { this.changeLanguage('pt-BR'); this.closeAllMenus(); } },
+            { label: 'English', command: () => { this.changeLanguage('en-US'); this.closeAllMenus(); } }
           ]
         }
       ]
@@ -224,12 +224,14 @@ export class MenuComponent implements OnInit, OnDestroy {
       localStorage.getItem('@currentPlan') : this.currentIDPlan;
     this.currentIDPlan = Number(currentPlan);
     if (currentPlan) {
-      const {data, success} = await this.planSrv.GetById(this.currentIDPlan);
-      if(success) {
-        this.currentPlan = data;
-        if (this.currentPlan) {
-          this.currentIDOffice = this.currentPlan.idOffice;
-          this.officeSrv.nextIDOffice(this.currentPlan.idOffice);
+      if (this.authSrv.getAccessToken()) {
+        const { data, success } = await this.planSrv.GetById(this.currentIDPlan);
+        if (success) {
+          this.currentPlan = data;
+          if (this.currentPlan) {
+            this.currentIDOffice = this.currentPlan.idOffice;
+            this.officeSrv.nextIDOffice(this.currentPlan.idOffice);
+          }
         }
       }
     }
@@ -295,7 +297,7 @@ export class MenuComponent implements OnInit, OnDestroy {
     return queries ? Number((queries.split('id=')[1] || queries.split('idOffice=')[1])?.split('&')[0]) : 0;
   }
 
-  async loadPortfolioMenu() {    
+  async loadPortfolioMenu() {
     if (this.currentIDOffice) {
       const { success, data } = await this.menuSrv.getItemsPortfolio(this.currentIDOffice, this.currentIDPlan);
       if (success) {
@@ -336,8 +338,10 @@ export class MenuComponent implements OnInit, OnDestroy {
       items: planModel.workpackModels?.length ? this.buildMenuItemWorkpackModel(planModel.workpackModels) : undefined,
       command: (e) => {
         if (e.originalEvent?.target?.classList?.contains('p-menuitem-text')) {
-          this.router.navigate(['/strategies/strategy'], { queryParams:
-            { id: planModel.id, idOffice: this.currentIDOffice } });
+          this.router.navigate(['/strategies/strategy'], {
+            queryParams:
+              { id: planModel.id, idOffice: this.currentIDOffice }
+          });
           this.closeAllMenus();
         }
       }
@@ -354,8 +358,10 @@ export class MenuComponent implements OnInit, OnDestroy {
       items: workpackModel.children?.length ? this.buildMenuItemWorkpackModel(workpackModel.children) : undefined,
       command: (e) => {
         if (e.originalEvent?.target?.classList?.contains('p-menuitem-text')) {
-          this.router.navigate(['/workpack-model'], { queryParams:
-            { id: workpackModel.id, idStrategy: workpackModel.idPlanModel, idOffice: this.currentIDOffice } });
+          this.router.navigate(['/workpack-model'], {
+            queryParams:
+              { id: workpackModel.id, idStrategy: workpackModel.idPlanModel, idOffice: this.currentIDOffice }
+          });
           this.closeAllMenus();
         }
       }
