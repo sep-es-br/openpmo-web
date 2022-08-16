@@ -198,7 +198,7 @@
   </section>
 
   <div class="card-stakeholders" *ngIf="sectionStakeholder">
-    <app-card [properties]="sectionStakeholder.cardSection"
+    <app-card [properties]="sectionStakeholder.cardSection" *ngIf="sectionStakeholder.cardSection  && sectionStakeholder.cardSection.length > 0"
       (editFilter)="handleEditFilterEntity($event, 'stakeholders')" (newFilter)="handleNewFilterEntity('stakeholders')"
       (selectedFilter)="handleSelectedFilterStakeholder($event)">
       <div class="input-toggle-stakeholder">
@@ -372,7 +372,7 @@
   </div>
 
   <div class="card-journal" *ngIf="workpackModel.journalManagementSessionActive">
-    <app-journal-view *ngIf="cardJournalProperties && !!workpack" [cardJournalProperties]="cardJournalProperties"
+    <app-journal-view *ngIf="cardJournalProperties && !!workpack" [cardJournalProperties]="cardJournalProperties" [editPermission]="editPermission" [workpackCanceled]="workpack.canceled"
       [idPlan]="workpack.plan.id" [idOffice]="workpack.plan.idOffice" [idWorkpack]="idWorkpack"></app-journal-view>
   </div>
 

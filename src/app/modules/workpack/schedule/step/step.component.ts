@@ -199,9 +199,9 @@ export class StepComponent implements OnInit, OnDestroy {
     const result = await this.workpackSrv.GetWorkpackById(this.schedule.idWorkpack, { 'id-plan': this.idPlan });
     if (result.success) {
       if (isUserAdmin) {
-        this.editPermission = true;
+        this.editPermission = !result.data.canceled;
       } else {
-        this.editPermission = result.data.permissions.filter(p => p.level === 'EDIT').length > 0;
+        this.editPermission = result.data.permissions.filter(p => p.level === 'EDIT').length > 0 && !result.data.canceled;
       }
       if (result.data.endManagementDate !== null) {
         this.editPermission = false;

@@ -1,7 +1,7 @@
 <div class="app-journal-view">
   <app-card [properties]="cardJournalProperties">
     <form class="filters" [formGroup]="formSearch">
-      <p-button class="app-button-green" [label]="'newInformation' | translate" (onClick)="handleNewInformation()"></p-button>
+      <p-button class="app-button-green" [label]="'newInformation' | translate" (onClick)="handleNewInformation()" [disabled]="!editPermission || workpackCanceled"></p-button>
       <span class="p-float-label property-input p-field">
         <p-calendar id="float-start" formControlName="from" class="app-select-date" showIcon="true"
           [monthNavigator]="true" [yearNavigator]="true" [yearRange]="yearRange" [class.responsive]="responsive"

@@ -29,8 +29,8 @@ export class OfficePermissionService extends BaseService<IOfficePermission> {
     if (hasSavedPermission) {
       return hasSavedPermission.permissions?.reduce((a, p) => a ? a : p.level === 'EDIT', false);
     } else {
-      const { email } = this.authSrv.getTokenPayload();
-      const { success, data } = await this.GetAll({ 'id-office': idOffice, email });
+      const { key } = this.authSrv.getTokenPayload();
+      const { success, data } = await this.GetAll({ 'id-office': idOffice, key });
       this.listOfficesPermissions.push(...data);
       return success
         ? data[0]?.permissions?.reduce((a, b) => a ? a : b.level === 'EDIT', false)

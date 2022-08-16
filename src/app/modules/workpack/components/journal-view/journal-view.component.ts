@@ -29,6 +29,8 @@ export class JournalViewComponent implements OnInit, OnDestroy {
   @Input() idWorkpack: number;
   @Input() idPlan: number;
   @Input() idOffice: number;
+  @Input() workpackCanceled: boolean;
+  @Input() editPermission: boolean;
 
   formSearch: FormGroup;
   calendarFormat: string;

@@ -138,8 +138,8 @@ export class CostAccountComponent implements OnInit {
           return;
         }
       }
-      this.editPermission = !!this.workpack.permissions?.find( p => p.level === 'EDIT')
-        || await this.authSrv.isUserAdmin();
+      this.editPermission = (!!this.workpack.permissions?.find( p => p.level === 'EDIT')
+        || await this.authSrv.isUserAdmin()) && !this.workpack.canceled;
       const plan = await this.planSrv.GetById(this.workpack.plan.id);
       if (plan.success) {
         this.idOffice = plan.data.idOffice;

@@ -1,18 +1,18 @@
-import {AuthService} from '../../../shared/services/auth.service';
-import {WorkpackService} from '../../../shared/services/workpack.service';
-import {debounceTime, filter, takeUntil} from 'rxjs/operators';
-import {ProcessService} from '../../../shared/services/process.service';
-import {MessageService} from 'primeng/api';
-import {BreadcrumbService} from 'src/app/shared/services/breadcrumb.service';
-import {TranslateService} from '@ngx-translate/core';
-import {ResponsiveService} from 'src/app/shared/services/responsive.service';
-import {ActivatedRoute} from '@angular/router';
-import {IProcess} from '../../../shared/interfaces/IProcess';
-import {FormBuilder, FormGroup, Validators} from '@angular/forms';
-import {ICard} from 'src/app/shared/interfaces/ICard';
-import {Subject} from 'rxjs';
-import {SaveButtonComponent} from 'src/app/shared/components/save-button/save-button.component';
-import {Component, EventEmitter, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import { AuthService } from '../../../shared/services/auth.service';
+import { WorkpackService } from '../../../shared/services/workpack.service';
+import { debounceTime, filter, takeUntil } from 'rxjs/operators';
+import { ProcessService } from '../../../shared/services/process.service';
+import { MessageService } from 'primeng/api';
+import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
+import { TranslateService } from '@ngx-translate/core';
+import { ResponsiveService } from 'src/app/shared/services/responsive.service';
+import { ActivatedRoute } from '@angular/router';
+import { IProcess } from '../../../shared/interfaces/IProcess';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ICard } from 'src/app/shared/interfaces/ICard';
+import { Subject } from 'rxjs';
+import { SaveButtonComponent } from 'src/app/shared/components/save-button/save-button.component';
+import { Component, EventEmitter, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import * as moment from 'moment';
 
 @Component({
@@ -84,8 +84,8 @@ export class ProcessComponent implements OnInit, OnDestroy {
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.responsive = value);
     this.currentLang = this.translateSrv.getDefaultLang();
     this.translateSrv.onLangChange.pipe(takeUntil(this.$destroy)).subscribe(() => {
-        setTimeout(() => this.setLanguage(), 200);
-      }
+      setTimeout(() => this.setLanguage(), 200);
+    }
     );
   }
 
@@ -120,7 +120,7 @@ export class ProcessComponent implements OnInit, OnDestroy {
 
   async searchProcessByNumber() {
     this.isLoading = true;
-    const result = await this.processSrv.GetProcessByNumber({'process-number': this.formProcess.controls.processNumber.value});
+    const result = await this.processSrv.GetProcessByNumber({ 'process-number': this.formProcess.controls.processNumber.value });
     this.isLoading = false;
     if (result.success && result.data) {
       this.process = result.data;
@@ -135,8 +135,8 @@ export class ProcessComponent implements OnInit, OnDestroy {
   }
 
   setFormProcess() {
-    const days = this.process.lengthOfStayOn === 1 ? this.process.lengthOfStayOn.toString() +' '+ this.translateSrv.instant('day') :
-      this.process.lengthOfStayOn.toString() +' '+ this.translateSrv.instant('days');
+    const days = this.process.lengthOfStayOn === 1 ? this.process.lengthOfStayOn.toString() + ' ' + this.translateSrv.instant('day') :
+      this.process.lengthOfStayOn.toString() + ' ' + this.translateSrv.instant('days');
     this.formProcess.controls.name.setValue(this.process.name);
     this.formProcess.controls.processNumber.setValue(this.process.processNumber);
     this.formProcess.controls.subject.setValue(this.process.subject);
@@ -178,18 +178,18 @@ export class ProcessComponent implements OnInit, OnDestroy {
 
   async loadPermissions() {
     const isUserAdmin = await this.authSrv.isUserAdmin();
-    if (isUserAdmin) {
-      this.editPermission = true;
-    } else {
-      const idWorkpack = this.idProcess ? this.process.idWorkpack : this.idWorkpack;
-      this.idPlan = Number(localStorage.getItem('@currentPlan'));
-      const result = await this.workpackSrv.GetWorkpackById(idWorkpack, {'id-plan': this.idPlan});
-      if (result.success) {
-        const workpack = result.data;
-        this.editPermission = workpack.permissions && workpack.permissions.filter(p => p.level === 'EDIT').length > 0;
+    const idWorkpack = this.idProcess ? this.process.idWorkpack : this.idWorkpack;
+    this.idPlan = Number(localStorage.getItem('@currentPlan'));
+    const result = await this.workpackSrv.GetWorkpackById(idWorkpack, { 'id-plan': this.idPlan });
+    if (result.success) {
+      const workpack = result.data;
+      if (isUserAdmin) {
+        this.editPermission = !workpack.canceled;
+      } else {
+        this.editPermission = workpack.permissions && workpack.permissions.filter(p => p.level === 'EDIT').length > 0 && !workpack.canceled;
       }
-    }
 
+    }
   }
 
   async setBreadcrumb() {
@@ -198,7 +198,7 @@ export class ProcessComponent implements OnInit, OnDestroy {
       {
         key: 'process',
         routerLink: ['/workpack/process'],
-        queryParams: {idWorkpack: this.idWorkpack, id: this.idProcess},
+        queryParams: { idWorkpack: this.idWorkpack, id: this.idProcess },
         info: this.process?.name,
         tooltip: this.process?.name
       }
@@ -207,14 +207,14 @@ export class ProcessComponent implements OnInit, OnDestroy {
 
   async getBreadcrumbs(idWorkpack: number) {
     this.idPlan = Number(localStorage.getItem('@currentPlan'));
-    const {success, data} = await this.breadcrumbSrv.getBreadcrumbWorkpack(idWorkpack, {'id-plan': this.idPlan});
+    const { success, data } = await this.breadcrumbSrv.getBreadcrumbWorkpack(idWorkpack, { 'id-plan': this.idPlan });
     return success
       ? data.map(p => ({
         key: !p.modelName ? p.type.toLowerCase() : p.modelName,
         info: p.name,
         tooltip: p.fullName,
         routerLink: this.getRouterLinkFromType(p.type),
-        queryParams: {id: p.id, idWorkpackModelLinked: p.idWorkpackModelLinked},
+        queryParams: { id: p.id, idWorkpackModelLinked: p.idWorkpackModelLinked },
         modelName: p.modelName
       }))
       : [];

@@ -108,7 +108,8 @@ export class SharingComponent implements OnInit {
     const result = await this.workpackSrv.GetWorkpackById(this.idWorkpack, {'id-plan': this.idPlan});
     if (result.success) {
       this.workpack = result.data;
-      this.editPermission = await this.authSrv.isUserAdmin() || this.workpack.permissions && this.workpack.permissions.filter( p => p.level === 'EDIT').length > 0;
+      this.editPermission = (await this.authSrv.isUserAdmin() || this.workpack.permissions && this.workpack.permissions.filter( p => p.level === 'EDIT').length > 0
+        && !this.workpack.canceled)
       const propertyNameWorkpackModel = this.workpack?.model.properties.find(p => p.name === 'name' && p.session === 'PROPERTIES');
       const propertyNameWorkpack = this.workpack.properties.find(p => p.idPropertyModel === propertyNameWorkpackModel.id);
       this.workpackName = propertyNameWorkpack.value as string;

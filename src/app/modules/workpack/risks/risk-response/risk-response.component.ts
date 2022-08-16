@@ -160,14 +160,13 @@ export class RiskResponseComponent implements OnInit {
 
   async loadPermissions() {
     const isUserAdmin = await this.authSrv.isUserAdmin();
-    if (isUserAdmin) {
-      this.editPermission = true;
-    } else {
-      this.idPlan = Number(localStorage.getItem('@currentPlan'));
-      const result = await this.workpackSrv.GetWorkpackById(this.idWorkpack, { 'id-plan': this.idPlan });
-      if (result.success) {
-        const workpack = result.data;
-        this.editPermission = workpack.permissions && workpack.permissions.filter(p => p.level === 'EDIT').length > 0;
+    const result = await this.workpackSrv.GetWorkpackById(this.idWorkpack, { 'id-plan': this.idPlan });
+    if (result.success) {
+      const workpack = result.data;
+      if (isUserAdmin) {
+        this.editPermission = !workpack.canceled;
+      } else {
+        this.editPermission = workpack.permissions && workpack.permissions.filter(p => p.level === 'EDIT').length > 0 && !workpack.canceled;
       }
     }
   }

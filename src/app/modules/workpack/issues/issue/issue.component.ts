@@ -132,14 +132,14 @@ export class IssueComponent implements OnInit {
 
   async loadPermissions() {
     const isUserAdmin = await this.authSrv.isUserAdmin();
-    if (isUserAdmin) {
-      this.editPermission = true;
-    } else {
-      const idWorkpack = this.idIssue ? this.issue.idWorkpack : this.idWorkpack;
-      const result = await this.workpackSrv.GetWorkpackById(idWorkpack, { 'id-plan': this.idPlan });
-      if (result.success) {
-        const workpack = result.data;
-        this.editPermission = workpack.permissions && workpack.permissions.filter(p => p.level === 'EDIT').length > 0;
+    const idWorkpack = this.idIssue ? this.issue.idWorkpack : this.idWorkpack;
+    const result = await this.workpackSrv.GetWorkpackById(idWorkpack, { 'id-plan': this.idPlan });
+    if (result.success) {
+      const workpack = result.data;
+      if (isUserAdmin) {
+        this.editPermission = !workpack.canceled;
+      } else {
+        this.editPermission = (workpack.permissions && workpack.permissions.filter(p => p.level === 'EDIT').length > 0) && !workpack.canceled;
       }
     }
 
@@ -164,14 +164,14 @@ export class IssueComponent implements OnInit {
   }
 
   async getBreadcrumbs(idWorkpack: number) {
-    const { success, data } = await this.breadcrumbSrv.getBreadcrumbWorkpack(idWorkpack, {'id-plan': this.idPlan});
+    const { success, data } = await this.breadcrumbSrv.getBreadcrumbWorkpack(idWorkpack, { 'id-plan': this.idPlan });
     return success
       ? data.map(p => ({
         key: !p.modelName ? p.type.toLowerCase() : p.modelName,
         info: p.name,
         tooltip: p.fullName,
         routerLink: this.getRouterLinkFromType(p.type),
-        queryParams: { id: p.id, idWorkpackModelLinked: p.idWorkpackModelLinked},
+        queryParams: { id: p.id, idWorkpackModelLinked: p.idWorkpackModelLinked },
         modelName: p.modelName
       }))
       : [];
@@ -207,7 +207,7 @@ export class IssueComponent implements OnInit {
         urlCard: '/workpack/issues/response',
         paramsUrlCard: [
           { name: 'id', value: resp.id },
-          { name: 'idIssue', value: this.idIssue},
+          { name: 'idIssue', value: this.idIssue },
           { name: 'issueName', value: this.issue.name },
           { name: 'edit', value: this.editPermission ? 'true' : 'false' },
           { name: 'idWorkpack', value: this.idWorkpack }
@@ -226,7 +226,7 @@ export class IssueComponent implements OnInit {
         menuItems: null,
         urlCard: '/workpack/issues/response',
         paramsUrlCard: [
-          { name: 'idIssue', value: this.idIssue},
+          { name: 'idIssue', value: this.idIssue },
           { name: 'issueName', value: this.issue.name },
           { name: 'edit', value: this.editPermission ? 'true' : 'false' },
           { name: 'idWorkpack', value: this.idWorkpack }

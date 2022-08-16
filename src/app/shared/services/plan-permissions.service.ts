@@ -30,8 +30,8 @@ export class PlanPermissionService extends BaseService<IPlanPermission> {
     if (hasSavedPermission) {
       return hasSavedPermission.permissions?.reduce((a, p) => a ? a : p.level === 'EDIT', false);
     } else {
-      const { email } = this.authSrv.getTokenPayload();
-      const { success, data } = await this.GetAll({ 'id-plan': idPlan, email });
+      const { key } = this.authSrv.getTokenPayload();
+      const { success, data } = await this.GetAll({ 'id-plan': idPlan, key });
       this.listPlanPermissions.push(...data);
       return success
         ? data[0]?.permissions?.reduce((a, b) => a ? a : b.level === 'EDIT', false)

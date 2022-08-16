@@ -28,6 +28,7 @@ export interface ICard {
   showFullScreen?: boolean;
   fullScreen?: boolean;
   workpackType?: string;
+  workpackCanceled?: boolean;
 }
 
 export interface progressBarValue {

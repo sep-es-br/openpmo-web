@@ -106,12 +106,12 @@ export class IssueResponseComponent implements OnInit {
   }
 
   setFormIssueResponse() {
-      this.formIssueResponse.controls.name.setValue(this.issueResponse.name);
-      this.formIssueResponse.controls.date.setValue(new Date
-        (moment(this.issueResponse.date, 'DD/MM/YYYY').format('YYYY-MM-DD') + 'T00:00:00'));
-      this.formIssueResponse.controls.status.setValue(this.issueResponse.status);
-      this.formIssueResponse.controls.plan.setValue(this.issueResponse.plan);
-      this.formIssueResponse.controls.responsible.setValue(this.issueResponse.responsible.map( resp => (resp.id)));
+    this.formIssueResponse.controls.name.setValue(this.issueResponse.name);
+    this.formIssueResponse.controls.date.setValue(new Date
+      (moment(this.issueResponse.date, 'DD/MM/YYYY').format('YYYY-MM-DD') + 'T00:00:00'));
+    this.formIssueResponse.controls.status.setValue(this.issueResponse.status);
+    this.formIssueResponse.controls.plan.setValue(this.issueResponse.plan);
+    this.formIssueResponse.controls.responsible.setValue(this.issueResponse.responsible.map(resp => (resp.id)));
   }
 
   async loadPropertiesIssueResponse() {
@@ -122,7 +122,7 @@ export class IssueResponseComponent implements OnInit {
       collapseble: true,
       initialStateCollapse: false
     };
-    this.statusOptions =  Object.keys(this.issueResponsePropertiesOptions.STATUS).map(key => ({
+    this.statusOptions = Object.keys(this.issueResponsePropertiesOptions.STATUS).map(key => ({
       label: this.translateSrv.instant(this.issueResponsePropertiesOptions.STATUS[key].label),
       value: this.issueResponsePropertiesOptions.STATUS[key].value
     }));
@@ -138,21 +138,23 @@ export class IssueResponseComponent implements OnInit {
 
   async loadPermissions() {
     const isUserAdmin = await this.authSrv.isUserAdmin();
-    if (isUserAdmin) {
-      this.editPermission = true;
-    } else {
-      const result = await this.workpackSrv.GetWorkpackById(this.idWorkpack, {'id-plan': this.idPlan});
-      if (result.success) {
-        const workpack = result.data;
-        this.editPermission = workpack.permissions && workpack.permissions.filter( p => p.level === 'EDIT').length > 0;
+    const result = await this.workpackSrv.GetWorkpackById(this.idWorkpack, { 'id-plan': this.idPlan });
+    if (result.success) {
+      const workpack = result.data;
+      if (isUserAdmin) {
+        this.editPermission = !workpack.canceled;
+      } else {
+        this.editPermission = workpack.permissions && workpack.permissions.filter(p => p.level === 'EDIT').length > 0 && !workpack.canceled;
       }
+
     }
+
   }
 
   async loadStakeholdersList() {
-    const result = await this.stakeholderSrv.GetResponsibles({ 'id-workpack': this.idWorkpack});
+    const result = await this.stakeholderSrv.GetResponsibles({ 'id-workpack': this.idWorkpack });
     if (result.success) {
-      this.stakeholderOptions = result.data.map( stake => ({
+      this.stakeholderOptions = result.data.map(stake => ({
         label: stake.name,
         value: stake.id
       }));
@@ -183,7 +185,8 @@ export class IssueResponseComponent implements OnInit {
           idWorkpack: this.idWorkpack,
           id: this.idIssueResponse,
           idIssue: this.idIssue,
-          issueName: this.issueName },
+          issueName: this.issueName
+        },
         info: this.issueResponse?.name,
         tooltip: this.issueResponse?.name
       }
@@ -191,16 +194,16 @@ export class IssueResponseComponent implements OnInit {
   }
 
   async getBreadcrumbs(idWorkpack: number) {
-    const { success, data } = await this.breadcrumbSrv.getBreadcrumbWorkpack(idWorkpack, {'id-plan': this.idPlan});
+    const { success, data } = await this.breadcrumbSrv.getBreadcrumbWorkpack(idWorkpack, { 'id-plan': this.idPlan });
     return success
       ? data.map(p => ({
-            key: !p.modelName ? p.type.toLowerCase() : p.modelName,
-            info: p.name,
-            tooltip: p.fullName,
-            routerLink: this.getRouterLinkFromType(p.type),
-            queryParams: { id: p.id, idWorkpackModelLinked: p.idWorkpackModelLinked },
-            modelName: p.modelName
-          }))
+        key: !p.modelName ? p.type.toLowerCase() : p.modelName,
+        info: p.name,
+        tooltip: p.fullName,
+        routerLink: this.getRouterLinkFromType(p.type),
+        queryParams: { id: p.id, idWorkpackModelLinked: p.idWorkpackModelLinked },
+        modelName: p.modelName
+      }))
       : [];
   }
 

@@ -75,6 +75,7 @@ export class OfficeComponent implements OnDestroy {
     this.activeRoute.queryParams.subscribe(async ({ id }) => {
       this.idOffice = +id;
       this.editPermission = await this.officePermissionSrv.getPermissions(this.idOffice);
+      console.log('editPermission', this.editPermission);
       await this.load();
     });
     this.formOffice = this.formBuilder.group({

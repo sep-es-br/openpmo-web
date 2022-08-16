@@ -605,6 +605,7 @@ export class WorkpackComponent implements OnDestroy {
       this.cardWorkpackProperties.showCheckCompleted = true;
       this.cardWorkpackProperties.workpackCompleted = this.workpack && this.workpack.completed;
       this.cardWorkpackProperties.workpackType = this.workpack && this.workpack.type;
+      this.cardWorkpackProperties.workpackCanceled = this.workpack && this.workpack.canceled;
     }
   }
 
@@ -2130,7 +2131,7 @@ export class WorkpackComponent implements OnDestroy {
           iconMenuItems: null
         };
       });
-      if (this.editPermission) {
+      if (this.editPermission && !this.workpack.canceled) {
         cardItems.push({
           typeCardItem: 'newCardItem',
           icon: IconsEnum.Plus,
@@ -2152,7 +2153,7 @@ export class WorkpackComponent implements OnDestroy {
       }
       return cardItems;
     }
-    const cardItemsNew = this.editPermission ? [{
+    const cardItemsNew = this.editPermission && !this.workpack.canceled ? [{
       typeCardItem: 'newCardItem',
       icon: IconsEnum.Plus,
       iconSvg: true,
@@ -2249,33 +2250,35 @@ export class WorkpackComponent implements OnDestroy {
           iconMenuItems: null
         };
       });
-      cardItems.push({
-        typeCardItem: 'newCardItem',
-        icon: IconsEnum.Plus,
-        iconSvg: true,
-        nameCardItem: null,
-        fullNameCardItem: null,
-        subtitleCardItem: null,
-        itemId: null,
-        menuItems: null,
-        urlCard: null,
-        paramsUrlCard: null,
-        iconMenuItems: [
-          {
-            label: this.translateSrv.instant('person'),
-            icon: 'fas fa-user-circle',
-            command: (event) => this.navigateToPageStakeholder('person')
-          },
-          {
-            label: this.translateSrv.instant('organization'),
-            icon: 'fas fa-building',
-            command: (event) => this.navigateToPageStakeholder('organization')
-          }
-        ]
-      });
+      if (this.editPermission && !this.workpack.canceled) {
+        cardItems.push({
+          typeCardItem: 'newCardItem',
+          icon: IconsEnum.Plus,
+          iconSvg: true,
+          nameCardItem: null,
+          fullNameCardItem: null,
+          subtitleCardItem: null,
+          itemId: null,
+          menuItems: null,
+          urlCard: null,
+          paramsUrlCard: null,
+          iconMenuItems: [
+            {
+              label: this.translateSrv.instant('person'),
+              icon: 'fas fa-user-circle',
+              command: (event) => this.navigateToPageStakeholder('person')
+            },
+            {
+              label: this.translateSrv.instant('organization'),
+              icon: 'fas fa-building',
+              command: (event) => this.navigateToPageStakeholder('organization')
+            }
+          ]
+        });
+      }
       return cardItems;
     } else {
-      const cardItem = [{
+      const cardItem = (this.editPermission && !this.workpack.canceled) ? [{
         typeCardItem: 'newCardItem',
         icon: IconsEnum.Plus,
         iconSvg: true,
@@ -2295,7 +2298,7 @@ export class WorkpackComponent implements OnDestroy {
             command: (event) => this.navigateToPageStakeholder('organization')
           }
         ]
-      }];
+      }] : [];
       return cardItem;
     }
   }
@@ -2348,24 +2351,26 @@ export class WorkpackComponent implements OnDestroy {
           { name: 'id', value: proc.id },
         ]
       }));
-      cardItems.push({
-        typeCardItem: 'newCardItem',
-        icon: IconsEnum.Plus,
-        iconSvg: true,
-        nameCardItem: null,
-        subtitleCardItem: null,
-        organizationName: null,
-        itemId: null,
-        priority: false,
-        menuItems: null,
-        urlCard: '/workpack/processes',
-        paramsUrlCard: [
-          { name: 'idWorkpack', value: this.idWorkpack },
-        ]
-      });
+      if (this.editPermission && !this.workpack.canceled) {
+        cardItems.push({
+          typeCardItem: 'newCardItem',
+          icon: IconsEnum.Plus,
+          iconSvg: true,
+          nameCardItem: null,
+          subtitleCardItem: null,
+          organizationName: null,
+          itemId: null,
+          priority: false,
+          menuItems: null,
+          urlCard: '/workpack/processes',
+          paramsUrlCard: [
+            { name: 'idWorkpack', value: this.idWorkpack },
+          ]
+        });
+      }
       return cardItems;
     } else {
-      const cardItem = [{
+      const cardItem = (this.editPermission && !this.workpack.canceled)  ? [{
         typeCardItem: 'newCardItem',
         icon: IconsEnum.Plus,
         iconSvg: true,
@@ -2376,7 +2381,7 @@ export class WorkpackComponent implements OnDestroy {
         paramsUrlCard: [
           { name: 'idWorkpack', value: this.idWorkpack },
         ]
-      }];
+      }] : [];
       return cardItem;
     }
   }
@@ -2469,7 +2474,7 @@ export class WorkpackComponent implements OnDestroy {
             { name: 'id', value: risk.id },
           ]
         }));
-      if (this.editPermission) {
+      if (this.editPermission && !this.workpack.canceled) {
         cardItems.push({
           typeCardItem: 'newCardItem',
           icon: IconsEnum.Plus,
@@ -2487,7 +2492,7 @@ export class WorkpackComponent implements OnDestroy {
       }
       return cardItems;
     } else {
-      if (this.editPermission) {
+      if (this.editPermission && !this.workpack.canceled) {
         const cardItem = [{
           typeCardItem: 'newCardItem',
           icon: IconsEnum.Plus,
@@ -2550,7 +2555,7 @@ export class WorkpackComponent implements OnDestroy {
             { name: 'id', value: issue.id },
           ]
         }));
-      if (this.editPermission) {
+      if (this.editPermission && !this.workpack.canceled) {
         cardItems.push({
           typeCardItem: 'newCardItem',
           icon: IconsEnum.Plus,
@@ -2568,7 +2573,7 @@ export class WorkpackComponent implements OnDestroy {
       }
       return cardItems;
     } else {
-      const cardItem = this.editPermission ? [{
+      const cardItem = this.editPermission && !this.workpack.canceled ? [{
         typeCardItem: 'newCardItem',
         icon: IconsEnum.Plus,
         iconSvg: true,

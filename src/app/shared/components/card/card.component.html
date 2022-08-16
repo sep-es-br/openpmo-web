@@ -33,7 +33,7 @@
     </div>
     <div class="header-title-check-completed" *ngIf="properties.showCheckCompleted" [class.responsive]="responsive">
       <label>{{label|translate}}</label>
-      <p-checkbox [(ngModel)]="properties.workpackCompleted" [binary]="true"
+      <p-checkbox [(ngModel)]="properties.workpackCompleted" [binary]="true" [disabled]="properties.workpackCanceled"
         (ngModelChange)="handleChangeCheckCompleted($event)"></p-checkbox>
     </div>
     <div class="header-values-cost-account" *ngIf="properties.progressBarValues" [class.responsive]="responsive">
