@@ -1755,11 +1755,11 @@ export class WorkpackComponent implements OnDestroy {
       const propertyNameWorkpackModel = (this.workpack?.model || this.workpackModel)
         .properties.find(p => p.name === 'name' && p.session === 'PROPERTIES');
       const propertyNameWorkpack = this.workpackProperties.find(p => p.idPropertyModel === propertyNameWorkpackModel.id);
-      this.workpackName = propertyNameWorkpack.value as string;
+      this.workpackName = propertyNameWorkpack && propertyNameWorkpack.value as string;
       const propertyFullNameWorkpackModel = (this.workpack?.model || this.workpackModel)
         .properties.find(p => p.name === 'fullName' && p.session === 'PROPERTIES');
       const propertyFullNameWorkpack = this.workpackProperties.find(p => p.idPropertyModel === propertyFullNameWorkpackModel.id);
-      this.workpackFullName = propertyFullNameWorkpack.value as string;
+      this.workpackFullName = propertyFullNameWorkpack && propertyFullNameWorkpack.value as string;
       this.breadcrumbSrv.updateLastCrumb({
         key: this.workpackModel?.type?.toLowerCase().replace('model', ''),
         info: this.workpackName,

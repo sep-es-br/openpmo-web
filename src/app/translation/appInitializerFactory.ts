@@ -11,7 +11,6 @@ export const appInitializerFactory = (translate: TranslateService,
   locationInitialized.then(() => {
     
     const defaultLang = localStorage.getItem(StoreKeys.defaultLanguage) || window.navigator.language;
-    console.log('defaultLang', defaultLang);
     translate.setDefaultLang(defaultLang);
     translate.use(defaultLang).subscribe(() => {
       console.log(`Successfully initialized '${defaultLang}' language.'`);

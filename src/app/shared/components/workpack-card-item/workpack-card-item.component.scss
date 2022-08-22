@@ -162,7 +162,12 @@
               font-weight: 500;
               font-style: normal;
               font-size: 20px;
-              color: #888E96;   
+              color: #888E96;
+              width: 210px;   
+              white-space: nowrap;
+              word-break: break-word;
+              overflow: hidden;
+              text-overflow: ellipsis;
             }
           }
           .workpack-container.card-link {
@@ -383,7 +388,7 @@
         }
       }
       .icon-card {
-        font-size: 2.5rem;
+        font-size: 2rem;
         color: #888e96;
       }
       .icon-new {
@@ -565,12 +570,20 @@
           display: flex;
           flex-direction: row;
           margin-left: 1em;
+             
+          
           .card-item-name {
             font-size: 18px;
+            width: 210px;
+            white-space: nowrap;
+            word-break: break-word;
+            overflow: hidden;
+            text-overflow: ellipsis;
           }
           .card-item-status {
+            width: 175px;
             font-size: 16px;
-            margin-left: 0.5em;
+            margin-left: 2em;
           }
         }
         .card-item-date {
@@ -614,6 +627,12 @@
       }
       .card-item-name {
         margin-top: 5px;
+        width: 210px;
+        white-space: nowrap;
+        word-break: break-word;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        text-align: center;
       }
       .card-item-date {
         font-size: 12px;
@@ -635,7 +654,7 @@
         color: #806AAD;
       }
       .icon-card {
-        font-size: 2.5rem;
+        font-size: 2rem;
         color: #888e96;
       }
       .icon-new {

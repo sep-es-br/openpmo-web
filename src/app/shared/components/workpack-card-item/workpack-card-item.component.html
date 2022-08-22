@@ -78,7 +78,7 @@
             [class.card-link]="properties.urlCard">
             <div class="icons-container">
               <i [ngClass]="properties.iconSvg ? [ 'app-icon', properties.icon, 'grey-icon'] : [ 'icon-card', properties.icon, 'grey-icon' ]"
-                [class.linked]="!!properties.linked || !!properties.shared" [ngStyle]="{ fontSize: '2.5rem' }"></i>
+                [class.linked]="!!properties.linked || !!properties.shared" [ngStyle]="{ fontSize: '2rem' }"></i>
               <i [ngClass]="['app-icon', 'link-to', 'grey-icon', 'linked']" *ngIf="!!properties.linked"></i>
               <i [ngClass]="['app-icon', 'sharing', 'grey-icon', 'linked']"
                 *ngIf="!!properties.shared && !properties.linked"></i>
@@ -151,7 +151,7 @@
           [class.card-link]="properties.urlCard">
           <div class="icons-container">
             <i [ngClass]="properties.iconSvg ? [ 'app-icon', properties.icon, 'grey-icon'] : [ 'icon-card', properties.icon, 'grey-icon' ]"
-              [class.linked]="!!properties.linked || !!properties.shared" [ngStyle]="{ fontSize: '2.5rem' }"></i>
+              [class.linked]="!!properties.linked || !!properties.shared" [ngStyle]="{ fontSize: '2rem' }"></i>
             <i [ngClass]="['app-icon', 'link-to', 'grey-icon', 'linked']" *ngIf="!!properties.linked"></i>
             <i [ngClass]="['app-icon', 'sharing', 'grey-icon', 'linked']"
               *ngIf="!!properties.shared && !properties.linked"></i>
@@ -304,7 +304,7 @@
         [class.cardList]="displayModeCard === 'list'" [queryParams]="getQueryParams()">
         <div class="icons-container">
           <i [ngClass]=" ['concluded', 'lateConcluded'].includes(properties.statusItem) ?  [ 'app-icon', 'flag-check', 'grey-icon'] : ['app-icon', 'flag-unchecked', 'grey-icon']"
-            [class.linked]="!!properties.linked || !!properties.shared" [ngStyle]="{ fontSize: '2.5rem' }"
+            [class.linked]="!!properties.linked || !!properties.shared" [ngStyle]="{ fontSize: '2rem' }"
             [class.on-time]="properties?.statusItem === 'ontime' && !properties?.canceled"
             [class.late]="properties?.statusItem === 'late'"
             [class.concluded]="properties?.statusItem === 'concluded' && !properties?.canceled"
