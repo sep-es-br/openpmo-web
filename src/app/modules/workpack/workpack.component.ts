@@ -2603,20 +2603,24 @@ export class WorkpackComponent implements OnDestroy {
       const groupStep = this.schedule.groupStep.map((group, groupIndex, groupArray) => {
         const cardItemSection = group.steps.map((step, stepIndex, stepArray) => ({
           type: 'listStep',
+          editPermission: !!this.editPermission && !this.workpack.canceled,
           stepName: new Date(step.periodFromStart + 'T00:00:00'),
           menuItems: (groupIndex === 0 && stepIndex === 0) ? [{
             label: this.translateSrv.instant('properties'),
             icon: 'fas fa-edit',
-            command: () => this.editScheduleStep(step.id, this.unitMeansure.name, this.unitMeansure.precision, 'start')
+            command: () => this.editScheduleStep(step.id, this.unitMeansure.name, this.unitMeansure.precision, 'start'),
+            disabled: !this.editPermission || !!this.workpack.canceled
           }] : ((groupIndex === groupArray.length - 1 && stepIndex === stepArray.length - 1) ?
             [{
               label: this.translateSrv.instant('properties'),
               icon: 'fas fa-edit',
-              command: () => this.editScheduleStep(step.id, this.unitMeansure.name, this.unitMeansure.precision, 'end')
+              command: () => this.editScheduleStep(step.id, this.unitMeansure.name, this.unitMeansure.precision, 'end'),
+              disabled: !this.editPermission || !!this.workpack.canceled
             }] : [{
               label: this.translateSrv.instant('properties'),
               icon: 'fas fa-edit',
-              command: () => this.editScheduleStep(step.id, this.unitMeansure.name, this.unitMeansure.precision, 'step')
+              command: () => this.editScheduleStep(step.id, this.unitMeansure.name, this.unitMeansure.precision, 'step'),
+              disabled: !this.editPermission || !!this.workpack.canceled
             }]),
           stepOrder: (groupIndex === 0 && stepIndex === 0) ? 'start' :
             ((groupIndex === groupArray.length - 1 && stepIndex === stepArray.length - 1) ? 'end' : 'step'),
@@ -2726,7 +2730,8 @@ export class WorkpackComponent implements OnDestroy {
           this.sectionSchedule.groupStep[0].cardItemSection[0].menuItems.push({
             label: this.translateSrv.instant('delete'),
             icon: 'fas fa-trash-alt',
-            command: (event) => this.deleteScheduleStep(idStartStep)
+            command: (event) => this.deleteScheduleStep(idStartStep),
+            disabled: !this.editPermission || !!this.workpack.canceled
           });
         }
         this.sectionSchedule.groupStep[0].cardItemSection[0].stepDay = startDate;
@@ -2746,7 +2751,8 @@ export class WorkpackComponent implements OnDestroy {
             label: this.translateSrv.instant('delete'),
             icon: 'fas fa-trash-alt',
             command: (event) =>
-              this.deleteScheduleStep(idEndStep)
+              this.deleteScheduleStep(idEndStep),
+            disabled: !this.editPermission || !!this.workpack.canceled
           });
         }
         this.sectionSchedule.groupStep[groupLenght - 1].cardItemSection[cardItemSectionLenght - 1].stepDay = endDate;
