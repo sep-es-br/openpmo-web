@@ -463,7 +463,8 @@ export class PlanComponent implements OnInit, OnDestroy {
           itemId: workpack.id,
           menuItems,
           urlCard: '/workpack',
-          paramsUrlCard: [{ name: 'idPlan', value: this.idPlan }],
+          paramsUrlCard: workpack.linked ?  [{ name: 'idPlan', value: this.idPlan }, { name: 'idWorkpackModelLinked', value: workpack.linkedModel }] :
+            [{ name: 'idPlan', value: this.idPlan }],
           linked: !!workpack.linked ? true : false,
           shared: workpack.sharedWith && workpack.sharedWith.length > 0 ? true : false,
           canceled: workpack.canceled,

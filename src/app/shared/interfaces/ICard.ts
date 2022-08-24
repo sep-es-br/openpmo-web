@@ -23,6 +23,7 @@ export interface ICard {
   progressBarValues?: progressBarValue[];
   onToggle?: EventEmitter<boolean>;
   cardItems?: ICardItem[];
+  canEditCheckCompleted?: boolean;
   showCheckCompleted?: boolean;
   workpackCompleted?: boolean;
   showFullScreen?: boolean;

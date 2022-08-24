@@ -75,6 +75,7 @@ export interface IWorkpack {
     completed?: boolean;
     canDeleted?: boolean;
     endManagementDate?: string;
+    hasScheduleSectionActive?: boolean;
     reason?: string;
     dashboard?: {
       risk?: {

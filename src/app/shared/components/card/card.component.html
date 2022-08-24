@@ -31,9 +31,10 @@
       [class.responsive]="responsive">
       <i class="fas fa-times" (click)="handleChangeFullScreen(false)"></i>
     </div>
-    <div class="header-title-check-completed" *ngIf="properties.showCheckCompleted" [class.responsive]="responsive">
+    <div class="header-title-check-completed" [class.responsive]="responsive" *ngIf="properties.showCheckCompleted">
       <label>{{label|translate}}</label>
-      <p-checkbox [(ngModel)]="properties.workpackCompleted" [binary]="true" [disabled]="properties.workpackCanceled"
+      <p-checkbox [(ngModel)]="properties.workpackCompleted" [binary]="true" 
+        [disabled]="properties.workpackCanceled || !properties.canEditCheckCompleted"
         (ngModelChange)="handleChangeCheckCompleted($event)"></p-checkbox>
     </div>
     <div class="header-values-cost-account" *ngIf="properties.progressBarValues" [class.responsive]="responsive">

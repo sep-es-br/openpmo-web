@@ -549,6 +549,7 @@ export class WorkpackComponent implements OnDestroy {
       } else if (!this.isUserAdmin && this.workpack) {
         await this.loadUserPermission();
       }
+      this.showCheckCompleted();
       await this.loadWorkpackModel(this.workpack.model.id);
     }
   }
@@ -585,7 +586,6 @@ export class WorkpackComponent implements OnDestroy {
     const result = await this.workpackModelSrv.GetById(idWorkpackModel);
     if (result.success) {
       this.workpackModel = result.data;
-      this.showCheckCompleted();
     }
     const plan = await this.planSrv.GetById(this.idPlan);
     if (plan.success) {
@@ -600,12 +600,13 @@ export class WorkpackComponent implements OnDestroy {
     }
   }
 
-  showCheckCompleted() {
-    if (!this.workpackModel.scheduleSessionActive && this.workpack && this.workpack.id) {
-      this.cardWorkpackProperties.showCheckCompleted = true;
-      this.cardWorkpackProperties.workpackCompleted = this.workpack && this.workpack.completed;
-      this.cardWorkpackProperties.workpackType = this.workpack && this.workpack.type;
-      this.cardWorkpackProperties.workpackCanceled = this.workpack && this.workpack.canceled;
+  showCheckCompleted() {   
+    this.cardWorkpackProperties.workpackCompleted = this.workpack && this.workpack.completed;
+    this.cardWorkpackProperties.workpackType = this.workpack && this.workpack.type;
+    this.cardWorkpackProperties.workpackCanceled = this.workpack && this.workpack.canceled;
+    this.cardWorkpackProperties.showCheckCompleted = true;
+    if (this.workpack && this.workpack.id && !this.workpack.hasScheduleSectionActive) {
+      this.cardWorkpackProperties.canEditCheckCompleted = true;
     }
   }
 
@@ -894,12 +895,12 @@ export class WorkpackComponent implements OnDestroy {
       }
       const idFilterSelected = propertiesCard.filters.find(defaultFilter => !!defaultFilter.favorite) ?
         propertiesCard.filters.find(defaultFilter => !!defaultFilter.favorite).id : undefined;
-      const { workpackItemCardList, iconMenuItems } = await this.loadWorkpacksFromWorkpackModel(this.workpack.plan.id, workpackModel.id, idFilterSelected, false);
-      propertiesCard.createNewElementMenuItemsWorkpack = iconMenuItems;
+      const resultItemsList = await this.loadWorkpacksFromWorkpackModel(this.workpack.plan.id, workpackModel.id, idFilterSelected, false);
+      propertiesCard.createNewElementMenuItemsWorkpack = resultItemsList && resultItemsList.iconMenuItems;
       return {
         idWorkpackModel: workpackModel.id,
         cardSection: propertiesCard,
-        cardItemsSection: workpackItemCardList,
+        cardItemsSection: resultItemsList && resultItemsList.workpackItemCardList,
         workpackShowCancelleds: this.workpack.canceled ? true : false
       };
     }));
@@ -1072,7 +1073,8 @@ export class WorkpackComponent implements OnDestroy {
           }
         );
       }
-      return { workpackItemCardList, iconMenuItems };
+      const resultItemsList = { workpackItemCardList, iconMenuItems }
+      return resultItemsList;
     }
     if ((!workpacks || workpacks.length === 0) && this.editPermission) {
       const iconMenuItems: MenuItem[] = [
@@ -1111,7 +1113,8 @@ export class WorkpackComponent implements OnDestroy {
           iconMenuItems
         }
       ];
-      return { workpackItemCardList, iconMenuItems };
+      const resultItemsList = { workpackItemCardList, iconMenuItems }
+      return resultItemsList;
     }
   }
 
@@ -1343,12 +1346,12 @@ export class WorkpackComponent implements OnDestroy {
       }
       const idFilterSelected = propertiesCard.filters.find(defaultFilter => !!defaultFilter.favorite) ?
         propertiesCard.filters.find(defaultFilter => !!defaultFilter.favorite).id : undefined;
-      const { workpackItemCardList } = await this.loadWorkpacksFromWorkpackModel
+      const resultItemsList = await this.loadWorkpacksFromWorkpackModel
         (this.idPlan, workpackModel.idWorkpackModelOriginal, idFilterSelected, false, workpackModel.idWorkpackModelLinked);
       return {
         idWorkpackModel: workpackModel.idWorkpackModelLinked,
         cardSection: propertiesCard,
-        cardItemsSection: workpackItemCardList,
+        cardItemsSection: resultItemsList && resultItemsList.workpackItemCardList,
         workpackShowCancelleds: this.workpack.canceled ? true : false
       };
     }));
@@ -1486,9 +1489,9 @@ export class WorkpackComponent implements OnDestroy {
     const filters = resultFilters.success && resultFilters.data;
     const idFilterSelected = filters.find(defaultFilter => !!defaultFilter.favorite) ?
       filters.find(defaultFilter => !!defaultFilter.favorite).id : undefined;
-    const { workpackItemCardList, iconMenuItems } = await this.loadWorkpacksFromWorkpackModel(this.workpack.plan.id, idWorkpackModel, idFilterSelected, event.checked);
-    this.cardsWorkPackModelChildren[workpackModelIndex].cardItemsSection = workpackItemCardList;
-    this.cardsWorkPackModelChildren[workpackModelIndex].cardSection.createNewElementMenuItemsWorkpack = iconMenuItems;
+    const resultItemsList = await this.loadWorkpacksFromWorkpackModel(this.workpack.plan.id, idWorkpackModel, idFilterSelected, event.checked);
+    this.cardsWorkPackModelChildren[workpackModelIndex].cardItemsSection = resultItemsList && resultItemsList.workpackItemCardList;
+    this.cardsWorkPackModelChildren[workpackModelIndex].cardSection.createNewElementMenuItemsWorkpack = resultItemsList && resultItemsList.iconMenuItems;
     this.cardsWorkPackModelChildren[workpackModelIndex].workpackShowCancelleds = event.checked;
 
   }
@@ -1621,7 +1624,7 @@ export class WorkpackComponent implements OnDestroy {
         severity: 'warn'
       });
       return;
-    } 
+    }
     if (!this.unitMeansure) {
       const unitMeasureWorkpack = this.sectionPropertiesProperties.find(prop => prop.type === this.typePropertyModel.UnitSelectionModel);
       const unitMeasure = await this.unitMeasureSrv.GetById(unitMeasureWorkpack?.selectedValue as number);
@@ -1647,6 +1650,8 @@ export class WorkpackComponent implements OnDestroy {
     if (result.success) {
       this.schedule = null;
       this.sectionSchedule.groupStep = null;
+      this.workpack.hasScheduleSectionActive = false;
+      this.cardWorkpackProperties.canEditCheckCompleted = true;
       await this.loadScheduleSession();
     }
   }
@@ -1810,12 +1815,12 @@ export class WorkpackComponent implements OnDestroy {
   }
 
   async reloadWorkpacksOfWorkpackModelSelectedFilter(idFilter: number, idWorkpackModel: number) {
-    const { workpackItemCardList, iconMenuItems } = await this.loadWorkpacksFromWorkpackModel(this.workpack.plan.id, idWorkpackModel, idFilter, false);
-    const workpacksByFilter = workpackItemCardList;
+    const resultItemsList = await this.loadWorkpacksFromWorkpackModel(this.workpack.plan.id, idWorkpackModel, idFilter, false);
+    const workpacksByFilter = resultItemsList && resultItemsList.workpackItemCardList;
     const workpackModelCardIndex = this.cardsWorkPackModelChildren.findIndex(card => card.idWorkpackModel === idWorkpackModel);
     if (workpackModelCardIndex > -1) {
       this.cardsWorkPackModelChildren[workpackModelCardIndex].cardItemsSection = Array.from(workpacksByFilter);
-      this.cardsWorkPackModelChildren[workpackModelCardIndex].cardSection.createNewElementMenuItemsWorkpack = iconMenuItems;
+      this.cardsWorkPackModelChildren[workpackModelCardIndex].cardSection.createNewElementMenuItemsWorkpack = resultItemsList && resultItemsList.iconMenuItems;
       this.totalRecordsWorkpacks[workpackModelCardIndex] = workpacksByFilter && workpacksByFilter.length;
     }
   }
@@ -1986,11 +1991,11 @@ export class WorkpackComponent implements OnDestroy {
         showFilters: false,
         showCreateNemElementButton: false,
       },
-  
+
       cardItemsSection: await this.loadSectionBaselinesCards(this.baselinesSectionShowInactives)
     };
   }
-  
+
   async loadSectionBaselinesCards(showInactives: boolean) {
     const resultBaselines = await this.baselineSrv.GetAll({ 'id-workpack': this.idWorkpack });
     this.baselines = resultBaselines.success ? resultBaselines.data : [];
@@ -2084,7 +2089,7 @@ export class WorkpackComponent implements OnDestroy {
     };
     this.totalRecordsCostAccounts = this.sectionCostAccount.cardItemsSection ? this.sectionCostAccount.cardItemsSection.length + 1 : 1;
   }
-  
+
   async loadCardItemsCostSession(idFilter?: number) {
     const result = await this.costAccountSrv.GetAll({ 'id-workpack': this.idWorkpack, idFilter });
     if (result.success && result.data.length > 0) {
@@ -2206,7 +2211,7 @@ export class WorkpackComponent implements OnDestroy {
     };
     this.totalRecordsStakeholders = this.sectionStakeholder.cardItemsSection && this.sectionStakeholder.cardItemsSection.length;
   }
-  
+
   async loadSectionStakeholderCards(showInactives: boolean) {
     if (this.stakeholders) {
       const cardItems = this.stakeholders.filter(stake => {
@@ -2303,29 +2308,29 @@ export class WorkpackComponent implements OnDestroy {
     }
   }
 
- async loadProcessSection() {
+  async loadProcessSection() {
     const resultFilters = await this.filterSrv.getAllFilters(`workpackModels/${this.workpack.model.id}/processes`);
-        const filters = resultFilters.success && Array.isArray(resultFilters.data) ? resultFilters.data : [];
-        const idFilterSelected = filters.find(defaultFilter => !!defaultFilter.favorite) ?
-          filters.find(defaultFilter => !!defaultFilter.favorite).id : undefined;
-  
-        this.sectionProcess = {
-          cardSection: {
-            toggleable: false,
-            initialStateToggle: false,
-            cardTitle: 'processes',
-            collapseble: true,
-            initialStateCollapse: this.collapsePanelsStatus,
-            showFilters: true,
-            filters: filters && filters.length > 0 ? filters : [],
-            showCreateNemElementButton: this.editPermission ? true : false,
-          },
-  
-          cardItemsSection: await this.loadSectionProcessesCards(idFilterSelected)
-        };
-        this.totalRecordsProcesses = this.sectionProcess.cardItemsSection && this.sectionProcess.cardItemsSection.length;
+    const filters = resultFilters.success && Array.isArray(resultFilters.data) ? resultFilters.data : [];
+    const idFilterSelected = filters.find(defaultFilter => !!defaultFilter.favorite) ?
+      filters.find(defaultFilter => !!defaultFilter.favorite).id : undefined;
+
+    this.sectionProcess = {
+      cardSection: {
+        toggleable: false,
+        initialStateToggle: false,
+        cardTitle: 'processes',
+        collapseble: true,
+        initialStateCollapse: this.collapsePanelsStatus,
+        showFilters: true,
+        filters: filters && filters.length > 0 ? filters : [],
+        showCreateNemElementButton: this.editPermission ? true : false,
+      },
+
+      cardItemsSection: await this.loadSectionProcessesCards(idFilterSelected)
+    };
+    this.totalRecordsProcesses = this.sectionProcess.cardItemsSection && this.sectionProcess.cardItemsSection.length;
   }
-  
+
   async loadSectionProcessesCards(idFilterSelected: number) {
     const resultProcess = await this.processSrv.GetAll({ 'id-workpack': this.idWorkpack, idFilter: idFilterSelected });
     this.processes = resultProcess.success ? resultProcess.data : [];
@@ -2370,7 +2375,7 @@ export class WorkpackComponent implements OnDestroy {
       }
       return cardItems;
     } else {
-      const cardItem = (this.editPermission && !this.workpack.canceled)  ? [{
+      const cardItem = (this.editPermission && !this.workpack.canceled) ? [{
         typeCardItem: 'newCardItem',
         icon: IconsEnum.Plus,
         iconSvg: true,
@@ -2388,48 +2393,48 @@ export class WorkpackComponent implements OnDestroy {
 
   async loadRisKAndIssueSection() {
     const resultFilters = await this.filterSrv.getAllFilters(`workpackModels/${this.workpack.model.id}/risks`);
-        const filters = resultFilters.success && Array.isArray(resultFilters.data) ? resultFilters.data : [];
-        const idFilterSelected = filters.find(defaultFilter => !!defaultFilter.favorite) ?
-          filters.find(defaultFilter => !!defaultFilter.favorite).id : undefined;
-  
-        this.sectionRisk = {
-          cardSection: {
-            toggleable: false,
-            initialStateToggle: false,
-            cardTitle: 'risks',
-            collapseble: true,
-            initialStateCollapse: this.collapsePanelsStatus,
-            showFilters: true,
-            filters: filters && filters.length > 0 ? filters : [],
-            showCreateNemElementButton: this.editPermission ? true : false,
-          },
-  
-          cardItemsSection: await this.loadSectionRisksCards(this.riskSectionShowClosed, idFilterSelected)
-        };
-        this.totalRecordsRisks = this.sectionRisk.cardItemsSection && this.sectionRisk.cardItemsSection.length;
-  
-  
-        const resultFiltersIssues = await this.filterSrv.getAllFilters(`workpackModels/${this.workpack.model.id}/issues`);
-        const filtersIssues = resultFiltersIssues.success && Array.isArray(resultFiltersIssues.data) ? resultFiltersIssues.data : [];
-        const idFilterIssueSelected = filtersIssues.find(defaultFilter => !!defaultFilter.favorite) ?
-          filters.find(defaultFilter => !!defaultFilter.favorite).id : undefined;
-        this.sectionIssue = {
-          cardSection: {
-            toggleable: false,
-            initialStateToggle: false,
-            cardTitle: 'issues',
-            collapseble: true,
-            initialStateCollapse: this.collapsePanelsStatus,
-            showFilters: true,
-            filters: filtersIssues && filtersIssues.length > 0 ? filtersIssues : [],
-            showCreateNemElementButton: this.editPermission ? true : false,
-          },
-  
-          cardItemsSection: await this.loadSectionIssuesCards(this.issueSectionShowClosed, idFilterIssueSelected)
-        };
-        this.totalRecordsIssues = this.sectionIssue.cardItemsSection && this.sectionIssue.cardItemsSection.length;
+    const filters = resultFilters.success && Array.isArray(resultFilters.data) ? resultFilters.data : [];
+    const idFilterSelected = filters.find(defaultFilter => !!defaultFilter.favorite) ?
+      filters.find(defaultFilter => !!defaultFilter.favorite).id : undefined;
+
+    this.sectionRisk = {
+      cardSection: {
+        toggleable: false,
+        initialStateToggle: false,
+        cardTitle: 'risks',
+        collapseble: true,
+        initialStateCollapse: this.collapsePanelsStatus,
+        showFilters: true,
+        filters: filters && filters.length > 0 ? filters : [],
+        showCreateNemElementButton: this.editPermission ? true : false,
+      },
+
+      cardItemsSection: await this.loadSectionRisksCards(this.riskSectionShowClosed, idFilterSelected)
+    };
+    this.totalRecordsRisks = this.sectionRisk.cardItemsSection && this.sectionRisk.cardItemsSection.length;
+
+
+    const resultFiltersIssues = await this.filterSrv.getAllFilters(`workpackModels/${this.workpack.model.id}/issues`);
+    const filtersIssues = resultFiltersIssues.success && Array.isArray(resultFiltersIssues.data) ? resultFiltersIssues.data : [];
+    const idFilterIssueSelected = filtersIssues.find(defaultFilter => !!defaultFilter.favorite) ?
+      filters.find(defaultFilter => !!defaultFilter.favorite).id : undefined;
+    this.sectionIssue = {
+      cardSection: {
+        toggleable: false,
+        initialStateToggle: false,
+        cardTitle: 'issues',
+        collapseble: true,
+        initialStateCollapse: this.collapsePanelsStatus,
+        showFilters: true,
+        filters: filtersIssues && filtersIssues.length > 0 ? filtersIssues : [],
+        showCreateNemElementButton: this.editPermission ? true : false,
+      },
+
+      cardItemsSection: await this.loadSectionIssuesCards(this.issueSectionShowClosed, idFilterIssueSelected)
+    };
+    this.totalRecordsIssues = this.sectionIssue.cardItemsSection && this.sectionIssue.cardItemsSection.length;
   }
-  
+
   async loadSectionRisksCards(showClosed: boolean, idFilterSelected?: number) {
     const resultRisks = await this.riskSrv.GetAll({ 'id-workpack': this.idWorkpack, idFilter: idFilterSelected });
     this.risks = resultRisks.success ? resultRisks.data : [];
@@ -2510,7 +2515,7 @@ export class WorkpackComponent implements OnDestroy {
       } else { return []; };
     }
   }
-  
+
   async loadSectionIssuesCards(showClosed: boolean, idFilterIssueSelected?: number) {
     const resultIssues = await this.issueSrv.GetAll({ 'id-workpack': this.idWorkpack, idFilter: idFilterIssueSelected });
     this.issues = resultIssues.success ? resultIssues.data : [];
