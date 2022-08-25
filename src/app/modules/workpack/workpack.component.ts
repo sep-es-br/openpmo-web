@@ -605,7 +605,10 @@ export class WorkpackComponent implements OnDestroy {
     this.cardWorkpackProperties.workpackType = this.workpack && this.workpack.type;
     this.cardWorkpackProperties.workpackCanceled = this.workpack && this.workpack.canceled;
     this.cardWorkpackProperties.showCheckCompleted = true;
-    if (this.workpack && this.workpack.id && !this.workpack.hasScheduleSectionActive) {
+    if (this.editPermission && this.workpack && this.workpack.id 
+        && !this.workpack.hasScheduleSectionActive 
+        && !this.workpack.canceled
+        && (!this.workpack.endManagementDate)) {
       this.cardWorkpackProperties.canEditCheckCompleted = true;
     }
   }
@@ -618,7 +621,7 @@ export class WorkpackComponent implements OnDestroy {
 
   async loadPermissionsOffice() {
     const payload = this.authSrv.getTokenPayload();
-    const result = await this.officePermissionSrv.GetAll({ 'id-office': this.idOffice, email: payload.email });
+    const result = await this.officePermissionSrv.GetAll({ 'id-office': this.idOffice, key: payload.key });
     if (result.success) {
       const permissions = result.data.filter(office => office.permissions.find(p => p.level === 'EDIT'));
       if (permissions && permissions.length > 0) {

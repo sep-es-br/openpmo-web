@@ -377,6 +377,7 @@ export class PlanComponent implements OnInit, OnDestroy {
             label: this.translateSrv.instant('restore'),
             icon: 'fas fa-redo-alt',
             command: (event) => this.handleRestoreWorkpack(workpack.id),
+            disabled: !this.editPermission
           });
         } else {
           if (workpack.type !== 'Project' && !!workpack.canDeleted && !workpack.canceled && !workpack.linked) {

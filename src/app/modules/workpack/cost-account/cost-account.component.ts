@@ -135,11 +135,10 @@ export class CostAccountComponent implements OnInit {
         this.setBreadcrumb();
         if (onlyBreadcrumb) {
           this.idCurrentWorkpack = this.workpack.id;
-          return;
         }
       }
       this.editPermission = (!!this.workpack.permissions?.find( p => p.level === 'EDIT')
-        || await this.authSrv.isUserAdmin()) && !this.workpack.canceled;
+        || await this.authSrv.isUserAdmin()) && !this.workpack.canceled && !this.workpack.endManagementDate;
       const plan = await this.planSrv.GetById(this.workpack.plan.id);
       if (plan.success) {
         this.idOffice = plan.data.idOffice;
@@ -160,7 +159,6 @@ export class CostAccountComponent implements OnInit {
     if (result.success) {
       this.costAccount = result.data;
       this.idWorkpack = this.costAccount.idWorkpack;
-      await this.loadWorkpack();
       const propertyNameWorkpackModel = this.workpack.model.properties.find(p => p.name === 'name' && p.session === 'COST');
       const propertyNameCostAccount = this.costAccount.properties.find(p => p.idPropertyModel === propertyNameWorkpackModel.id);
       this.costAccountName = propertyNameCostAccount.value as string;
