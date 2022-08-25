@@ -164,6 +164,7 @@ export class WorkpackComponent implements OnDestroy {
   fullScreenModeDashboard = false;
   changedStatusCompleted = false;
   reloadDashboard = false;
+  endManagementResumePermission = false;
 
   constructor(
     private actRouter: ActivatedRoute,
@@ -544,7 +545,7 @@ export class WorkpackComponent implements OnDestroy {
       const propertyFullNameWorkpackModel = this.workpack.model.properties.find(p => p.name === 'fullName' && p.session === 'PROPERTIES');
       const propertyFullNameWorkpack = this.workpack.properties.find(p => p.idPropertyModel === propertyFullNameWorkpackModel.id);
       this.workpackFullName = propertyFullNameWorkpack.value as string;
-      if (this.workpack && (this.workpack.canceled || this.workpack.endManagementDate !== null)) {
+      if (this.workpack && (this.workpack.canceled)) {
         this.editPermission = false;
       } else if (!this.isUserAdmin && this.workpack) {
         await this.loadUserPermission();
@@ -579,6 +580,12 @@ export class WorkpackComponent implements OnDestroy {
       this.editPermission = await this.planPermissionSrv.getPermissions(this.idPlan);
     } else {
       this.editPermission = editPermission;
+    }
+    if (this.workpack.endManagementDate !== null) {
+      if (this.editPermission) {
+        this.endManagementResumePermission = true;
+      }
+      this.editPermission = false;
     }
   }
 
@@ -959,7 +966,7 @@ export class WorkpackComponent implements OnDestroy {
               label: this.translateSrv.instant('resumeManagement'),
               icon: 'far fa-play-circle',
               command: (event) => this.resumeManagementOfDeliverable(workpack, idWorkpackModel),
-              disabled: !this.editPermission
+              disabled: !this.endManagementResumePermission && !this.editPermission
             });
           }
           if (workpack.cancelable && this.editPermission && !workpack.linked) {
