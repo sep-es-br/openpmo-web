@@ -180,7 +180,7 @@ export class ProcessComponent implements OnInit, OnDestroy {
     const isUserAdmin = await this.authSrv.isUserAdmin();
     const idWorkpack = this.idProcess ? this.process.idWorkpack : this.idWorkpack;
     this.idPlan = Number(localStorage.getItem('@currentPlan'));
-    const result = await this.workpackSrv.GetWorkpackById(idWorkpack, { 'id-plan': this.idPlan });
+    const result = await this.workpackSrv.GetWorkpackPermissions(idWorkpack, { 'id-plan': this.idPlan });
     if (result.success) {
       const workpack = result.data;
       if (isUserAdmin) {
@@ -214,7 +214,7 @@ export class ProcessComponent implements OnInit, OnDestroy {
         info: p.name,
         tooltip: p.fullName,
         routerLink: this.getRouterLinkFromType(p.type),
-        queryParams: { id: p.id, idWorkpackModelLinked: p.idWorkpackModelLinked },
+        queryParams: { id: p.id, idWorkpackModelLinked: p.idWorkpackModelLinked, idPlan: this.idPlan },
         modelName: p.modelName
       }))
       : [];

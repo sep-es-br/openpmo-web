@@ -17,6 +17,16 @@ export class WorkpackService extends BaseService<IWorkpack> {
     super('workpack', injector);
   }
 
+  public async GetWorkpackPermissions(idWorkpack: number, options?): Promise<IHttpResult<any>> {
+    const result = await this.http.get(`${this.urlBase}/${idWorkpack}/permissions`, { params: PrepareHttpParams(options) }).toPromise();
+    return result as IHttpResult<any>;
+  }
+
+  public async GetWorkpackName(idWorkpack: number, options?): Promise<IHttpResult<any>> {
+    const result = await this.http.get(`${this.urlBase}/${idWorkpack}/name`, { params: PrepareHttpParams(options) }).toPromise();
+    return result as IHttpResult<any>;
+  }
+
   public async GetWorkpacksByParent(options?): Promise<IHttpResult<IWorkpack[]>> {
     const result = await this.http.get(`${this.urlBase}/parent`, { params: PrepareHttpParams(options) }).toPromise();
     return result as IHttpResult<IWorkpack[]>;

@@ -92,7 +92,7 @@ export class StepComponent implements OnInit, OnDestroy {
     private planSrv: PlanService,
     private authSrv: AuthService
   ) {
-    this.actRouter.queryParams.subscribe(async({ idSchedule, idWorkpackModelLinked, stepType, id, unitName, unitPrecision }) => {
+    this.actRouter.queryParams.subscribe(async ({ idSchedule, idWorkpackModelLinked, stepType, id, unitName, unitPrecision }) => {
       this.idSchedule = idSchedule;
       this.idWorkpackModelLinked = idWorkpackModelLinked;
       this.stepType = stepType;
@@ -196,14 +196,14 @@ export class StepComponent implements OnInit, OnDestroy {
   async loadPermissions() {
     const isUserAdmin = await this.authSrv.isUserAdmin();
     this.idPlan = Number(localStorage.getItem('@currentPlan'));
-    const result = await this.workpackSrv.GetWorkpackById(this.schedule.idWorkpack, { 'id-plan': this.idPlan });
+    const result = await this.workpackSrv.GetWorkpackPermissions(this.schedule.idWorkpack, { 'id-plan': this.idPlan });
     if (result.success) {
       if (isUserAdmin) {
         this.editPermission = !result.data.canceled;
       } else {
         this.editPermission = result.data.permissions.filter(p => p.level === 'EDIT').length > 0 && !result.data.canceled;
       }
-      if (result.data.endManagementDate !== null) {
+      if (result.data.endManagementDate && result.data.endManagementDate !== null) {
         this.editPermission = false;
       }
     }
@@ -217,7 +217,7 @@ export class StepComponent implements OnInit, OnDestroy {
         info: p.name,
         tooltip: p.fullName,
         routerLink: this.getRouterLinkFromType(p.type),
-        queryParams: { id: p.id, idWorkpackModelLinked: p.idWorkpackModelLinked }
+        queryParams: { id: p.id, idWorkpackModelLinked: p.idWorkpackModelLinked, idPlan: this.idPlan }
       }))
       : [];
   }
@@ -340,25 +340,22 @@ export class StepComponent implements OnInit, OnDestroy {
       const workpacksIds = this.costAccounts.map(cost => cost.idWorkpack);
       const workpacksIdsNotRepeated = workpacksIds.filter((w, i) => workpacksIds.indexOf(w) === i);
 
-      this.menuItemsCostAccounts = await Promise.all(workpacksIdsNotRepeated.map(async(idWorkpack) => {
-        const workpack = await this.workpackSrv.GetWorkpackById(idWorkpack, { 'id-plan': this.idPlan });
-        if (workpack.success) {
-          const workpackCostAccounts = this.costAccounts.filter(cost => cost.idWorkpack === idWorkpack);
-          return {
-            label: workpack.data.model.modelName,
-            items: workpackCostAccounts.map(workpackCost => {
-              const propertyModelName = workpackCost.models.find(p => p.name === 'name');
-              const propertyName = workpackCost.properties.find(p => p.idPropertyModel === propertyModelName.id);
-              return {
-                label: propertyName.value as string,
-                id: workpackCost.id.toString(),
-                disabled: costAccountsIds.includes(workpackCost.id) || (!this.editPermission),
-                command: () => this.createNewCardItemCost(workpackCost.id, propertyName.value as string)
-              } as MenuItem;
-            })
-          };
-        }
-      }));
+      this.menuItemsCostAccounts = workpacksIdsNotRepeated.map(idWorkpack => {
+        const workpackCostAccounts = this.costAccounts.filter(cost => cost.idWorkpack === idWorkpack);
+        return {
+          label: workpackCostAccounts[0].workpackModelName,
+          items: workpackCostAccounts.map(workpackCost => {
+            const propertyModelName = workpackCost.models.find(p => p.name === 'name');
+            const propertyName = workpackCost.properties.find(p => p.idPropertyModel === propertyModelName.id);
+            return {
+              label: propertyName.value as string,
+              id: workpackCost.id.toString(),
+              disabled: costAccountsIds.includes(workpackCost.id) || (!this.editPermission),
+              command: () => this.createNewCardItemCost(workpackCost.id, propertyName.value as string)
+            } as MenuItem;
+          })
+        };
+      });
     }
   }
 

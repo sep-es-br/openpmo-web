@@ -4,6 +4,8 @@ import { IWorkpackProperty } from './IWorkpackProperty';
 export interface ICostAccount {
   id?: number;
   idWorkpack?: number;
+  workpackModelFullName?: string;
+  workpackModelName?: string;
   properties: IWorkpackProperty[];
   models?: IWorkpackModelProperty[];
 }

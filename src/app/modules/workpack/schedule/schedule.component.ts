@@ -142,7 +142,7 @@ export class ScheduleComponent implements OnInit, OnDestroy {
         info: p.name,
         tooltip: p.fullName,
         routerLink: this.getRouterLinkFromType(p.type),
-        queryParams: { id: p.id, idWorkpackModelLinked: p.idWorkpackModelLinked }
+        queryParams: { id: p.id, idWorkpackModelLinked: p.idWorkpackModelLinked, idPlan: this.idPlan }
       }))
       : [];
   }
@@ -167,7 +167,7 @@ export class ScheduleComponent implements OnInit, OnDestroy {
       initialStateCollapse: false
     };
     this.idPlan = Number(localStorage.getItem('@currentPlan'));
-    await this.setBreadcrumb();
+    this.setBreadcrumb();
     await this.loadMenuItemsCostAccounts();
     this.loadCostAssignmentSession();
   }
@@ -193,24 +193,21 @@ export class ScheduleComponent implements OnInit, OnDestroy {
       const workpacksIds = costAccounts.map(cost => cost.idWorkpack);
       const workpacksIdsNotRepeated = workpacksIds.filter((w, i) => workpacksIds.indexOf(w) === i);
 
-      this.menuItemsCostAccounts = await Promise.all(workpacksIdsNotRepeated.map(async (idWorkpack) => {
-        const workpack = await this.workpackSrv.GetWorkpackById(idWorkpack, { 'id-plan': this.idPlan });
-        if (workpack.success) {
-          const workpackCostAccounts = costAccounts.filter(cost => cost.idWorkpack === idWorkpack);
-          return {
-            label: workpack.data.model.modelName,
-            items: workpackCostAccounts.map(workpackCost => {
-              const propertyModelName = workpackCost.models.find(p => p.name === 'name');
-              const propertyName = workpackCost.properties.find(p => p.idPropertyModel === propertyModelName.id);
-              return {
-                label: propertyName.value as string,
-                id: workpackCost.id.toString(),
-                command: () => this.createNewCardItemCost(workpackCost.id, propertyName.value as string)
-              };
-            })
-          };
-        }
-      }));
+      this.menuItemsCostAccounts = workpacksIdsNotRepeated.map( (idWorkpack) => {
+        const workpackCostAccounts = costAccounts.filter(cost => cost.idWorkpack === idWorkpack);
+        return {
+          label: workpackCostAccounts[0].workpackModelName,
+          items: workpackCostAccounts.map(workpackCost => {
+            const propertyModelName = workpackCost.models.find(p => p.name === 'name');
+            const propertyName = workpackCost.properties.find(p => p.idPropertyModel === propertyModelName.id);
+            return {
+              label: propertyName.value as string,
+              id: workpackCost.id.toString(),
+              command: () => this.createNewCardItemCost(workpackCost.id, propertyName.value as string)
+            };
+          })
+        };
+      });
     }
   }
 
@@ -316,7 +313,7 @@ export class ScheduleComponent implements OnInit, OnDestroy {
           this.saveButton?.showButton();
         }
       } else {
-        
+
       }
     } else {
       this.saveButton?.hideButton();
@@ -377,13 +374,13 @@ export class ScheduleComponent implements OnInit, OnDestroy {
     if (!this.actualValidationMessage && this.formSchedule.valid) {
       if (this.costAssignmentsCardItems && this.costAssignmentsCardItems.length > 0 &&
         this.costAssignmentsCardItems.filter(item => item.plannedWork >= 0).length > 0) {
-          const startDate = moment(this.formSchedule.controls.start.value);
-          const today = moment();
-          if (today.isBefore(startDate, 'months') && this.costAssignmentsCardItems.filter(item => item.actualWork && item.actualWork > 0).length > 0) {
-            this.saveButton.hideButton();
-          } else {
-            this.saveButton?.showButton();
-          }
+        const startDate = moment(this.formSchedule.controls.start.value);
+        const today = moment();
+        if (today.isBefore(startDate, 'months') && this.costAssignmentsCardItems.filter(item => item.actualWork && item.actualWork > 0).length > 0) {
+          this.saveButton.hideButton();
+        } else {
+          this.saveButton?.showButton();
+        }
       } else {
         this.saveButton?.hideButton();
       }

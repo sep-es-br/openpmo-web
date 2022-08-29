@@ -95,15 +95,16 @@ export class ControlChangeBoardListComponent implements OnInit, OnDestroy {
   async loadPropertiesProject() {
     this.isUserAdmin = await this.authSrv.isUserAdmin();
     this.idPlan = Number(localStorage.getItem('@currentPlan'));
-    const { success, data } = await this.workpackSrv.GetWorkpackById(this.idProject, { 'id-plan': this.idPlan });
+    const { success, data } = await this.workpackSrv.GetWorkpackName(this.idProject, { 'id-plan': this.idPlan });
     if (success) {
-      const propertyNameWorkpackModel = data.model.properties.find(p => p.name === 'name' && p.session === 'PROPERTIES');
-      const propertyNameWorkpack = data.properties.find(p => p.idPropertyModel === propertyNameWorkpackModel.id);
-      this.projectName = propertyNameWorkpack.value as string;
+      const workpackName = data.name;
+      this.projectName = workpackName;
+      const resultPermissions = await this.workpackSrv.GetWorkpackPermissions(this.idProject, { 'id-plan': this.idPlan });
+      const permissionsList = resultPermissions.success && resultPermissions.data;
       if (this.isUserAdmin) {
         this.editPermission = true;
       } else {
-        this.editPermission = data.permissions && data.permissions.filter(p => p.level === 'EDIT').length > 0;
+        this.editPermission = permissionsList.permissions && permissionsList.permissions.filter(p => p.level === 'EDIT').length > 0;
       }
     }
   }
@@ -116,7 +117,7 @@ export class ControlChangeBoardListComponent implements OnInit, OnDestroy {
         info: p.name,
         tooltip: p.fullName,
         routerLink: this.getRouterLinkFromType(p.type),
-        queryParams: { id: p.id, idWorkpackModelLinked: p.idWorkpackModelLinked },
+        queryParams: { id: p.id, idWorkpackModelLinked: p.idWorkpackModelLinked, idPlan: this.idPlan },
         modelName: p.modelName
       }))
       : [];

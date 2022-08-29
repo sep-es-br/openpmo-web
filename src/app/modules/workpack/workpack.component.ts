@@ -480,7 +480,7 @@ export class WorkpackComponent implements OnDestroy {
         info: p.name,
         tooltip: p.fullName,
         routerLink: this.getRouterLinkFromType(p.type),
-        queryParams: { id: p.id, idWorkpackModelLinked: p.idWorkpackModelLinked },
+        queryParams: { id: p.id, idWorkpackModelLinked: p.idWorkpackModelLinked, idPlan: this.idPlan },
         modelName: p.modelName
       }))
       : [];
@@ -1598,24 +1598,6 @@ export class WorkpackComponent implements OnDestroy {
     return costAccounts;
   }
 
-  async loadNameWorkpackCostAccount(costAccounts: ICostAccount[]) {
-    const namesWorkpackCostAccount = await costAccounts
-      .filter(cost => cost.idWorkpack != this.idWorkpack)
-      .map(cost => cost.idWorkpack)
-      .reduce((IdsWorkpack, idWorkpack) => IdsWorkpack.includes(idWorkpack) ? IdsWorkpack : [...IdsWorkpack, idWorkpack], [])
-      .map(async (idWorkpack) => {
-        const result = await this.workpackSrv.GetWorkpackById(idWorkpack, { 'id-plan': this.idPlan });
-        if (result.success) {
-          const workpack = result.data;
-          const propertyNameWorkpackModel = this.workpack.model.properties.find(p => p.name === 'name' && p.session === 'PROPERTIES');
-          const propertyNameWorkpack = this.workpack.properties.find(p => p.idPropertyModel === propertyNameWorkpackModel.id);
-          this.workpackName = propertyNameWorkpack.value as string;
-          return { idWorkpack, name: `${workpack.model.modelName}: ${propertyNameWorkpack.value}` };
-        }
-      });
-    return Promise.all(await namesWorkpackCostAccount);
-  }
-
   async deleteCostAccount(cost: ICostAccount) {
     const result = await this.costAccountSrv.delete(cost);
     if (result.success) {
@@ -1829,7 +1811,7 @@ export class WorkpackComponent implements OnDestroy {
     const workpacksByFilter = resultItemsList && resultItemsList.workpackItemCardList;
     const workpackModelCardIndex = this.cardsWorkPackModelChildren.findIndex(card => card.idWorkpackModel === idWorkpackModel);
     if (workpackModelCardIndex > -1) {
-      this.cardsWorkPackModelChildren[workpackModelCardIndex].cardItemsSection = Array.from(workpacksByFilter);
+      this.cardsWorkPackModelChildren[workpackModelCardIndex].cardItemsSection = workpacksByFilter;
       this.cardsWorkPackModelChildren[workpackModelCardIndex].cardSection.createNewElementMenuItemsWorkpack = resultItemsList && resultItemsList.iconMenuItems;
       this.totalRecordsWorkpacks[workpackModelCardIndex] = workpacksByFilter && workpacksByFilter.length;
     }
@@ -2106,13 +2088,12 @@ export class WorkpackComponent implements OnDestroy {
       this.costAccounts = this.moveCostAccountOutherWorkpackToEnd(result.data);
       const funders = (this.idOffice || this.idOfficeOwnerWorkpackLinked) &&
         await this.loadOrganizationsOffice(this.idOfficeOwnerWorkpackLinked ? this.idOfficeOwnerWorkpackLinked : this.idOffice);
-      const namesWorckpack = await this.loadNameWorkpackCostAccount(result.data);
       const cardItems = this.costAccounts.map(cost => {
         const propertyName = cost.models.find(p => p.name === 'name');
         const propertyNameValue = propertyName && cost.properties.find(p => p.idPropertyModel === propertyName.id);
         const propertyfullName = cost.models.find(p => p.name === 'fullName');
         const propertyFullnameValue = propertyfullName && cost.properties.find(p => p.idPropertyModel === propertyfullName.id);
-        const propertyNameWorkpack = namesWorckpack.find(names => names.idWorkpack === cost.idWorkpack);
+        const propertyNameWorkpack =cost.workpackModelName;
         const propertyLimit = cost.models.find(p => p.name.toLowerCase() === 'limit');
         const propertyLimitValue = propertyLimit && cost.properties.find(p => p.idPropertyModel === propertyLimit.id);
         const propertyFunder = cost.models.find(p => p.name.toLowerCase() === 'funder');
@@ -2127,7 +2108,7 @@ export class WorkpackComponent implements OnDestroy {
           nameCardItem: propertyNameValue && propertyNameValue.value as string,
           fullNameCardItem: costThisWorkpack ?
             propertyFullnameValue && propertyFullnameValue.value as string :
-            propertyNameWorkpack && propertyNameWorkpack.name as string,
+            propertyNameWorkpack && propertyNameWorkpack as string,
           subtitleCardItem: selectedFunder && selectedFunder[0]?.label,
           costAccountsValue: propertyLimitValue?.value as number,
           itemId: cost.id,

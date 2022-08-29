@@ -1,3 +1,4 @@
+import { CitizenUserService } from './../../../shared/services/citizen-user.service';
 import { takeUntil } from 'rxjs/operators';
 import { ResponsiveService } from 'src/app/shared/services/responsive.service';
 import { IFilterProperty } from './../../../shared/interfaces/IFilterProperty';
@@ -60,9 +61,11 @@ export class OfficeListComponent implements OnInit {
     private filterSrv: FilterDataviewService,
     private breadcrumbSrv: BreadcrumbService,
     private cookieSrv: CookieService,
-    private responsiveSrv: ResponsiveService
+    private responsiveSrv: ResponsiveService,
+    private citizenSrv: CitizenUserService
   ) {
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.responsive = value);
+    this.citizenSrv.loadCitizenUsers();
    }
 
   async ngOnInit() {

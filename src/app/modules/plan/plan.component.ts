@@ -1,3 +1,4 @@
+import { CitizenUserService } from './../../shared/services/citizen-user.service';
 import { MilestoneStatusEnum } from './../../shared/enums/MilestoneStatusEnum';
 import { IWorkpackCardItem } from './../../shared/interfaces/IWorkpackCardItem';
 import { FilterDataviewService } from 'src/app/shared/services/filter-dataview.service';
@@ -94,7 +95,9 @@ export class PlanComponent implements OnInit, OnDestroy {
     private router: Router,
     private confirmationSrv: ConfirmationService,
     private cookieSrv: CookieService,
+    private citizenSrv: CitizenUserService
   ) {
+    this.citizenSrv.loadCitizenUsers();
     this.actRouter.queryParams
       .subscribe(({ id, idOffice, idPlanModel }) => {
         this.idOffice = +idOffice;

@@ -154,7 +154,7 @@ export class RiskComponent implements OnInit, OnDestroy {
 
   async loadPermissions() {
     const isUserAdmin = await this.authSrv.isUserAdmin();
-    const result = await this.workpackSrv.GetWorkpackById(this.idWorkpack, { 'id-plan': this.idPlan });
+    const result = await this.workpackSrv.GetWorkpackPermissions(this.idWorkpack, { 'id-plan': this.idPlan });
     if (result.success) {
       const workpack = result.data;
       if (isUserAdmin) {
@@ -198,7 +198,7 @@ export class RiskComponent implements OnInit, OnDestroy {
         info: p.name,
         tooltip: p.fullName,
         routerLink: this.getRouterLinkFromType(p.type),
-        queryParams: {id: p.id, idWorkpackModelLinked: p.idWorkpackModelLinked},
+        queryParams: {id: p.id, idWorkpackModelLinked: p.idWorkpackModelLinked, idPlan: this.idPlan},
         modelName: p.modelName
       }))
       : [];
