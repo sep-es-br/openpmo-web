@@ -105,7 +105,6 @@ export class PropertyTreeSelectionComponent implements OnDestroy, OnChanges {
   }
 
   selectedOrUnselectAllChildren(node: TreeNode, selected: boolean) {
-    debugger;
     if (this.nodeIsSelecteAll(node)) {
       if (node.parent) {
         node.parent.children.forEach((child: TreeNode) =>

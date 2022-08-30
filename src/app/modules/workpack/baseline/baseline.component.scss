@@ -150,15 +150,24 @@
       .p-button {
         background-color: rgba(68, 179, 155, 1);
       }
+      .p-button:hover {
+        background-color: rgba(68, 179, 155, 0.8);
+      }
     }
     .draft-button {
       .p-button {
         background-color: rgba(21, 147, 201, 0.75);
       }
+      .p-button:hover {
+        background-color: rgba(21, 147, 201, 0.6);
+      }
     }
     .cancel-button {
       .p-button {
         background-color: rgba(234, 92, 92, 1);
+      }
+      .p-button:hover {
+        background-color: rgba(234, 92, 92, 0.8);
       }
     }
   }
