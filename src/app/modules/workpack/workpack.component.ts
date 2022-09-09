@@ -2204,7 +2204,7 @@ export class WorkpackComponent implements OnDestroy {
   }
 
   async loadSectionStakeholderCards(showInactives: boolean) {
-    if (this.stakeholders) {
+    if (this.stakeholders && this.stakeholders.length > 0) {
       const cardItems = this.stakeholders.filter(stake => {
         if (!showInactives && stake.roles && stake.roles.length > 0) {
           return stake.roles.find(r => r.active && (!r.to || r.to === null || moment(r.to, 'yyyy-MM-DD').isSameOrAfter(moment()))

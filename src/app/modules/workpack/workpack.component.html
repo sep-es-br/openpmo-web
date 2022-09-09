@@ -198,7 +198,7 @@
   </section>
 
   <div class="card-stakeholders" *ngIf="sectionStakeholder">
-    <app-card [properties]="sectionStakeholder.cardSection" *ngIf="sectionStakeholder.cardSection  && sectionStakeholder.cardSection.length > 0"
+    <app-card [properties]="sectionStakeholder.cardSection" *ngIf="sectionStakeholder.cardItemsSection  && sectionStakeholder.cardItemsSection.length > 0"
       (editFilter)="handleEditFilterEntity($event, 'stakeholders')" (newFilter)="handleNewFilterEntity('stakeholders')"
       (selectedFilter)="handleSelectedFilterStakeholder($event)">
       <div class="input-toggle-stakeholder">
