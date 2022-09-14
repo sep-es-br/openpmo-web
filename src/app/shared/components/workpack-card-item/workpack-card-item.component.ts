@@ -64,7 +64,7 @@ export class WorkpackCardItemComponent implements OnInit, OnDestroy {
         if (this.properties.subtitleCardItem) {
           const expirationDate = moment(this.properties.subtitleCardItem, 'yyyy-MM-DD');
           const date = moment();
-          if (this.milestoneStatusEnum[this.properties.statusItem] === 'ontime' && expirationDate.isSameOrAfter(date) && expirationDate.diff(date, 'days') <= 7) {
+          if (this.properties.statusItem === 'ontime' && (expirationDate.diff(date, 'days') <= 7)) {
             this.attentionMilestone = true;
           }
         }

@@ -89,11 +89,11 @@
   </div>
   <div class="actions-buttons-container" [class.actions-buttons-container-responsive]="responsive"
        *ngIf="!idBaseline || baseline?.status === 'DRAFT'">
-    <p-button class="action-button submit-button" [label]="'submit'|translate" (onClick)="saveDraftAndSubmitBaseline()">
+    <p-button class="action-button submit-button" [label]="'submit'|translate" [disabled]="isLoading" (onClick)="saveDraftAndSubmitBaseline()">
     </p-button>
-    <p-button class="action-button draft-button" [label]="'draft'|translate" (onClick)="handleSaveDraftBaseline()">
+    <p-button class="action-button draft-button" [label]="'draft'|translate" [disabled]="isLoading" (onClick)="handleSaveDraftBaseline()">
     </p-button>
-    <p-button class="action-button cancel-button" [label]="'cancel'|translate" (onClick)="handleCancelChanges()">
+    <p-button class="action-button cancel-button" [label]="'cancel'|translate" [disabled]="isLoading" (onClick)="handleCancelChanges()">
     </p-button>
   </div>
 

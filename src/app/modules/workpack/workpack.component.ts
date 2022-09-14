@@ -928,7 +928,7 @@ export class WorkpackComponent implements OnDestroy {
       idFilter: idFilterSelected
     });
     let workpacks = result.success && result.data;
-    if (!showCancelled && workpacks && !this.workpack.canceled) {
+    if (!showCancelled && workpacks && !this.workpack?.canceled) {
       workpacks = workpacks.filter(wp => !wp.canceled);
     }
     if (workpacks && workpacks.length > 0) {
@@ -2098,7 +2098,7 @@ export class WorkpackComponent implements OnDestroy {
         const propertyLimitValue = propertyLimit && cost.properties.find(p => p.idPropertyModel === propertyLimit.id);
         const propertyFunder = cost.models.find(p => p.name.toLowerCase() === 'funder');
         const propertyFunderValue = propertyFunder && cost.properties.find(p => p.idPropertyModel === propertyFunder.id);
-        const selectedFunder = propertyFunderValue && (funders
+        const selectedFunder = propertyFunderValue && propertyFunderValue.selectedValues && (funders
           && funders.filter(org => org.value === propertyFunderValue.selectedValues[0]));
         const costThisWorkpack = cost.idWorkpack === this.idWorkpack;
         return {

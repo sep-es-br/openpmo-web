@@ -15,7 +15,7 @@
             <div class="p-field" [class.responsive]="responsive" *ngIf="(stepType === 'start' || (stepType === 'end' && !!onlyOneStep)) || stepType === 'newStart'">
               <span class="p-float-label" [class.responsive]="responsive">
                 <p-calendar id="float-start" class="app-select-date" showIcon="true" [minDate]="minStart"
-                  [maxDate]="maxStart" [defaultDate]="start" formControlName="start" (onSelect)="showSaveButton = true"
+                  [maxDate]="maxStart" [defaultDate]="start" formControlName="start" (onSelect)="handleChangeValuesCardItems()"
                   [class.responsive]="responsive" icon="fas fa-calendar-alt" [dateFormat]="calendarFormat">
                 </p-calendar>
                 <label class="app-input-label" for="float-start">{{ "start" | translate }}</label>
@@ -25,7 +25,7 @@
               <span class="p-float-label" [class.responsive]="responsive">
                 <p-calendar id="float-end" formControlName="end" class="app-select-date" showIcon="true"
                   [class.responsive]="responsive" icon="fas fa-calendar-alt" [minDate]="minEnd" [maxDate]="maxEnd"
-                  [defaultDate]="end" (onSelect)="showSaveButton = true" [dateFormat]="calendarFormat">
+                  [defaultDate]="end" (onSelect)="handleChangeValuesCardItems()" [dateFormat]="calendarFormat">
                 </p-calendar>
                 <label class="app-input-label" class="properties-label" for="float-end">{{ "finish" |
                   translate}}</label>

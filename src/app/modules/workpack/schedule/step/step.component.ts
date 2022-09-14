@@ -360,7 +360,7 @@ export class StepComponent implements OnInit, OnDestroy {
   }
 
   createNewCardItemCost(idCost: number, costName: string) {
-    if (!this.formStep.valid) {
+    if (!this.formStep.valid || this.formStep.controls.plannedWork.value === 0) {
       setTimeout(() => {
         this.messageSrv.add({ severity: 'warn', summary: 'Erro', detail: this.translateSrv.instant('messages.scheduleNotValid') });
       }, 500);
@@ -450,7 +450,7 @@ export class StepComponent implements OnInit, OnDestroy {
 
   handleChangeValuesCardItems() {
     this.reloadCostAssignmentTotals();
-    if (this.formStep.valid) {
+    if (this.formStep.valid && this.formStep.controls.plannedWork.value > 0) {
       if (this.costAssignmentsCardItems && this.costAssignmentsCardItems.length > 1) {
         this.reloadCostAssignmentTotals();
         this.showSaveButton = true;

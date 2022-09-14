@@ -38,6 +38,7 @@ export class BaselineComponent implements OnInit, OnDestroy {
   idPlan: number;
   showCommentDialog = false;
   selectedComment = '';
+  isLoading = false;
 
   constructor(
     private actRouter: ActivatedRoute,
@@ -207,9 +208,11 @@ export class BaselineComponent implements OnInit, OnDestroy {
       description: this.formBaseline.controls.description.value,
       message: this.formBaseline.controls.message.value
     };
+    this.isLoading = true;
     const result = this.idBaseline
       ? await this.baselineSrv.putBaseline(this.idBaseline, this.baseline)
       : await this.baselineSrv.post(this.baseline);
+    this.isLoading = false;
     if (result.success) {
       if (!this.idBaseline) {
         this.baseline.id = result.data.id;
@@ -226,7 +229,9 @@ export class BaselineComponent implements OnInit, OnDestroy {
   }
 
   async handleSubmitBaseline() {
+    this.isLoading = true;
     const result = await this.baselineSrv.submitBaseline(this.idBaseline, this.baseline.updates);
+    this.isLoading = false;
     if (result.success) {
       const idPlan = Number(localStorage.getItem('@currentPlan'));
       await this.router.navigate(

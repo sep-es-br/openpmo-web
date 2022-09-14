@@ -315,7 +315,9 @@
         </div>
         <span class="card-item-name" [pTooltip]="properties.fullNameCardItem"
           tooltipPosition="bottom">{{properties.nameCardItem}}</span>
-        <span class="card-item-date" *ngIf="properties.subtitleCardItem && !properties?.canceled">{{language === 'pt-BR'
+        <span class="card-item-date" *ngIf="properties.subtitleCardItem && !properties?.canceled"
+        [class.attention-milestone]="!!attentionMilestone"
+        >{{language === 'pt-BR'
           ?
           (properties?.subtitleCardItem|date:'dd/MM/yyyy') :
           (properties?.subtitleCardItem|date:'yyyy/MM/dd')}}</span>

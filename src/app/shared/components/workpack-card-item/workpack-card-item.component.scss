@@ -592,7 +592,7 @@
           font-size: 0.9rem;
         }
         .attention-milestone {
-          color: #DFA11E;
+          color: #DFA11E !important;
         }
       }
     }
@@ -660,6 +660,9 @@
       .icon-new {
         font-size: 3rem;
         color: rgba(147, 147, 147, 0.5);
+      }
+      .attention-milestone {
+        color: #DFA11E !important;
       }
     }
     .card-item-footer {
