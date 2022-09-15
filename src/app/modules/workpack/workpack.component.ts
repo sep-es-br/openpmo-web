@@ -135,7 +135,6 @@ export class WorkpackComponent implements OnDestroy {
   showDetails: boolean;
   isUserAdmin: boolean;
   editPermission = false;
-  editPermissionOffice = false;
   collapsePanelsStatus = true;
   displayModeAll = 'grid';
   pageSize = 5;
@@ -603,7 +602,6 @@ export class WorkpackComponent implements OnDestroy {
         this.propertiesOffice = office.data;
       }
       this.officeSrv.nextIDOffice(this.idOffice);
-      await this.loadPermissionsOffice();
     }
   }
 
@@ -624,17 +622,6 @@ export class WorkpackComponent implements OnDestroy {
     this.changedStatusCompleted = true;
     this.workpack.completed = event;
     this.saveButton.showButton();
-  }
-
-  async loadPermissionsOffice() {
-    const payload = this.authSrv.getTokenPayload();
-    const result = await this.officePermissionSrv.GetAll({ 'id-office': this.idOffice, key: payload.key });
-    if (result.success) {
-      const permissions = result.data.filter(office => office.permissions.find(p => p.level === 'EDIT'));
-      if (permissions && permissions.length > 0) {
-        this.editPermissionOffice = true;
-      }
-    }
   }
 
   async instanceProperty(propertyModel: IWorkpackModelProperty, group?: IWorkpackProperty): Promise<PropertyTemplateModel> {
@@ -853,8 +840,7 @@ export class WorkpackComponent implements OnDestroy {
 
   async loadSectionsWorkpackModel() {
     if (!!this.workpackModel.stakeholderSessionActive
-      && (((this.isUserAdmin || this.editPermissionOffice) && !this.idWorkpackModelLinked) ||
-        (this.editPermission && !!this.idWorkpackModelLinked))) {
+      && ((!this.idWorkpackModelLinked) || (this.editPermission && !!this.idWorkpackModelLinked))) {
       this.loadStakeholderSection();
     }
     if (this.workpackModel.costSessionActive) {
