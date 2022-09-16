@@ -30,9 +30,9 @@ export class PersonService extends BaseService<IPerson> {
 
   public async GetByKey(email: string, options?): Promise<IHttpResult<IPerson>> {
     const result = await this.http.get(`${this.urlBase}/${email}`,
-    {
-      params: PrepareHttpParams(options)
-    }).toPromise();
+      {
+        params: PrepareHttpParams(options)
+      }).toPromise();
     return result as IHttpResult<IPerson>;
   }
 
@@ -73,7 +73,7 @@ export class PersonService extends BaseService<IPerson> {
   }
 
   public async updateNameAdministradorPerson(idPerson: number, name: string) {
-    const result = await this.http.patch(`${this.urlBase}/${idPerson}`, {name}).toPromise();
+    const result = await this.http.patch(`${this.urlBase}/${idPerson}`, { name }).toPromise();
     return result as IHttpResult<any>;
   }
 
@@ -81,14 +81,14 @@ export class PersonService extends BaseService<IPerson> {
     const message = 'messages.deletePermissionsConfirmation';
     const useConfirm = true;
 
-    return new Promise(async(resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
       if (useConfirm) {
         this.confirmationSrv.confirm({
           message: this.translateSrv.instant(message) + `?`,
           key: 'deleteConfirm',
           acceptLabel: this.translateSrv.instant('yes'),
           rejectLabel: this.translateSrv.instant('no'),
-          accept: async() => {
+          accept: async () => {
             const result = await this.http.delete<IHttpResult<IPerson>>
               (`${this.urlBase}/${idPerson}/office/${idOffice}/permissions`).toPromise();
             if (result.success) {
@@ -119,24 +119,29 @@ export class PersonService extends BaseService<IPerson> {
     return result as IHttpResult<IFile>;
   }
 
-  async putAvatar(file: FormData, idPerson: number): Promise<IHttpResult<IFile>> {
+  async putAvatar(file: FormData, idPerson: number, options?): Promise<IHttpResult<IFile>> {
     const headers = new HttpHeaders({
       'Form-Data': 'true'
     });
-    const result = await this.http.put(`${this.urlBase}/${idPerson}/avatar`, file, { headers }).toPromise();
+    const result = await this.http.put(`${this.urlBase}/${idPerson}/avatar`,
+    file, { headers, params: PrepareHttpParams(options) }).toPromise();
     return result as IHttpResult<IFile>;
   }
 
-  async postAvatar(file: FormData, idPerson: number): Promise<IHttpResult<IFile>> {
+  async postAvatar(file: FormData, idPerson: number, options?): Promise<IHttpResult<IFile>> {
     const headers = new HttpHeaders({
       'Form-Data': 'true'
     });
-    const result = await this.http.post(`${this.urlBase}/${idPerson}/avatar`, file, { headers }).toPromise();
+    const result = await this.http.post(`${this.urlBase}/${idPerson}/avatar`, file, { headers, params: PrepareHttpParams(options) }).toPromise();
     return result as IHttpResult<IFile>;
   }
 
-  async deleteAvatar(idPerson: number): Promise<IHttpResult<IFile>> {
-    const result = await this.http.delete(`${this.urlBase}/${idPerson}/avatar`).toPromise();
+  async deleteAvatar(idPerson: number, options?): Promise<IHttpResult<IFile>> {
+    const result = await this.http.delete(`${this.urlBase}/${idPerson}/avatar`,
+      {
+        params: PrepareHttpParams(options)
+      }
+    ).toPromise();
     return result as IHttpResult<IFile>;
   }
 
@@ -154,14 +159,14 @@ export class PersonService extends BaseService<IPerson> {
     const message = 'messages.deleteConfirmation';
     const useConfirm = true;
 
-    return new Promise(async(resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
       if (useConfirm) {
         this.confirmationSrv.confirm({
           message: `${this.translateSrv.instant(message)} ${model.name} ?`,
           key: 'deleteConfirm',
           acceptLabel: this.translateSrv.instant('yes'),
           rejectLabel: this.translateSrv.instant('no'),
-          accept: async() => {
+          accept: async () => {
             const result = await this.http.delete<IHttpResult<IPerson>>
               (`${this.urlBase}/${idPerson}/administrators`).toPromise();
             if (result.success) {
@@ -193,7 +198,7 @@ export class PersonService extends BaseService<IPerson> {
   }
 
   async setPersonAdministrator(idPerson: number, administrator: boolean): Promise<IHttpResult<any>> {
-    return await this.http.patch<IHttpResult<any>>(`${this.urlBase}/administrator/${idPerson}`, {administrator}).toPromise();
+    return await this.http.patch<IHttpResult<any>>(`${this.urlBase}/administrator/${idPerson}`, { administrator }).toPromise();
   }
 
 }

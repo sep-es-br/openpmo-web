@@ -10,7 +10,7 @@ import { PersonService } from 'src/app/shared/services/person.service';
 import { ResponsiveService } from 'src/app/shared/services/responsive.service';
 import { filter, takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
-import { MessageService, SelectItem, TreeNode } from 'primeng/api';
+import { MessageService } from 'primeng/api';
 import { TranslateService } from '@ngx-translate/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { IPerson } from 'src/app/shared/interfaces/IPerson';
@@ -273,7 +273,7 @@ export class PersonComponent implements OnInit, OnDestroy {
       await this.updateAvatar();
     }
     if (this.deletedAvatar) {
-      await this.personSrv.deleteAvatar(this.idPerson);
+      await this.personSrv.deleteAvatar(this.idPerson, {'id-office': this.idOffice});
     }
     let phoneNumber = this.formPerson.controls.phoneNumber.value;
     if (phoneNumber) {
@@ -302,9 +302,9 @@ export class PersonComponent implements OnInit, OnDestroy {
       hasAvatar
     } = this.avatarData;
      if (hasAvatar) {
-      const result = await this.personSrv.putAvatar(formData, this.idPerson);
+      const result = await this.personSrv.putAvatar(formData, this.idPerson, {'id-office': this.idOffice});
     } else {
-      const result = await this.personSrv.postAvatar(formData, this.idPerson);
+      const result = await this.personSrv.postAvatar(formData, this.idPerson, {'id-office': this.idOffice});
     }
   }
 
