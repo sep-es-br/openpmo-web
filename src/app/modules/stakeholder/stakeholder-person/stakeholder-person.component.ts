@@ -1,3 +1,4 @@
+import { AuthService } from './../../../shared/services/auth.service';
 import {PlanService} from 'src/app/shared/services/plan.service';
 import {AuthServerService} from '../../../shared/services/auth-server.service';
 import {CitizenUserService} from '../../../shared/services/citizen-user.service';
@@ -25,6 +26,7 @@ import {cpfValidator} from 'src/app/shared/utils/cpfValidator';
 
 interface ICardItemRole {
   type: string;
+  readonly?: boolean;
   role?: IStakeholderRole;
   personRoleOptions?: { label: string; value: string }[];
 }
@@ -83,6 +85,8 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
   $destroy = new Subject();
   isLoading = false;
   phoneNumberPlaceholder = '';
+  editPermission = false;
+  isUserAdmin = false;
 
   constructor(
     private actRouter: ActivatedRoute,
@@ -97,7 +101,8 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
     private router: Router,
     private citizenUserSrv: CitizenUserService,
     private authServerSrv: AuthServerService,
-    private planSrv: PlanService
+    private planSrv: PlanService,
+    private authSrv: AuthService
   ) {
     this.citizenUserSrv.loadCitizenUsers();
     this.actRouter.queryParams.subscribe(async queryParams => {
@@ -181,6 +186,12 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
         label: role,
         value: role.toLowerCase()
       }));
+      const isUserAdmin = await this.authSrv.isUserAdmin();
+      if (isUserAdmin) {
+        this.editPermission = !this.workpack.canceled;
+      } else {
+        this.editPermission = (this.workpack.permissions && this.workpack.permissions.filter(p => p.level === 'EDIT').length > 0) && !this.workpack.canceled;
+      }
       const resultPlan = await this.planSrv.GetById(this.idPlan);
       if (resultPlan.success) {
         this.idOffice = resultPlan.data.idOffice;
@@ -366,6 +377,9 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
         from: new Date(role.from + 'T00:00:00'),
         to: role.to ? new Date(role.to + 'T00:00:00') : null
       }));
+      if (!this.editPermission) {
+        this.stakeholderForm.disable();
+      }
       this.setStakeholderPermissionsCards();
     }
     this.loadStakeholderRolesCardsItems();
@@ -545,16 +559,22 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
     if (this.stakeholderRoles) {
       this.stakeholderRolesCardItems = this.stakeholderRoles.map(role => ({
         type: 'role-card',
+        readOnly: !this.editPermission,
         role,
         personRoleOptions: this.personRolesOptions
       }));
-      this.stakeholderRolesCardItems.push({
-        type: 'new-role-card'
-      });
+      if (this.editPermission) {
+        this.stakeholderRolesCardItems.push({
+          type: 'new-role-card'
+        });
+      }
+     
     } else {
+     if (this.editPermission) {
       this.stakeholderRolesCardItems = [{
         type: 'new-role-card'
       }];
+     }
     }
   }
 

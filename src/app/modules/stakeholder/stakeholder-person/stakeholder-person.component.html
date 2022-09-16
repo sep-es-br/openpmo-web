@@ -199,7 +199,7 @@
                 <div class="card-item-content">
                   <span class="p-float-label">
                     <p-dropdown id="level-dropdown" dropdownIcon="fas fa-caret-down" class="app-single-selection"
-                                [autoDisplayFirst]="false" (onChange)="handleShowSaveButton()"
+                                [autoDisplayFirst]="false" (onChange)="handleShowSaveButton()" [disabled]="!editPermission"
                                 [options]="permissionLevelListOptions" [(ngModel)]="cardItem.level">
                     </p-dropdown>
                     <label class="app-input-label" for="level-dropdown">{{ "level" | translate }}</label>

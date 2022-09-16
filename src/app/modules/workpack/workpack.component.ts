@@ -2216,7 +2216,7 @@ export class WorkpackComponent implements OnDestroy {
           menuItems: [{
             label: this.translateSrv.instant('delete'),
             icon: 'fas fa-trash-alt',
-            disabled: !samePlan,
+            disabled: !samePlan || !this.editPermission,
             command: (event) => this.deleteStakeholder(stakeholder)
           }],
           urlCard: !!samePlan ? (stakeholder.person ? '/stakeholder/person' : '/stakeholder/organization') : undefined,

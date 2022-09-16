@@ -1,3 +1,4 @@
+import { AuthService } from './../../../shared/services/auth.service';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Location } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -19,6 +20,7 @@ import { SaveButtonComponent } from 'src/app/shared/components/save-button/save-
 
 interface ICardItemRole {
   type: string;
+  readOnly?: boolean;
   role?: IStakeholderRole;
   personRoleOptions?: { label: string; value: string }[];
 }
@@ -51,6 +53,7 @@ export class StakeholderOrganizationComponent implements OnInit {
   stakeholder: IStakeholder;
   stakeholderRoles: IStakeholderRole[];
   stakeholderRolesCardItems: ICardItemRole[];
+  editPermission = false;
 
   constructor(
     private actRouter: ActivatedRoute,
@@ -63,7 +66,8 @@ export class StakeholderOrganizationComponent implements OnInit {
     private location: Location,
     private messageSrv: MessageService,
     private breadcrumbSrv: BreadcrumbService,
-    private router: Router
+    private router: Router,
+    private authSrv: AuthService
   ) {
     this.actRouter.queryParams.subscribe(async queryParams => {
       this.idPlan = queryParams.idPlan;
@@ -130,6 +134,12 @@ export class StakeholderOrganizationComponent implements OnInit {
     if (result.success) {
       this.workpack = result.data;
       this.rolesOptions = this.workpack?.model?.organizationRoles?.map(role => ({ label: role, value: role }));
+      const isUserAdmin = await this.authSrv.isUserAdmin();
+      if (isUserAdmin) {
+        this.editPermission = !this.workpack.canceled;
+      } else {
+        this.editPermission = (this.workpack.permissions && this.workpack.permissions.filter(p => p.level === 'EDIT').length > 0) && !this.workpack.canceled;
+      }
     }
   }
 
@@ -210,17 +220,22 @@ export class StakeholderOrganizationComponent implements OnInit {
     if (this.stakeholderRoles) {
       this.stakeholderRolesCardItems = this.stakeholderRoles.map(role => ({
         type: 'role-card',
+        readOnly: !this.editPermission,
         role,
         personRoleOptions: this.rolesOptions
       }));
-      this.stakeholderRolesCardItems.push({
-        type: 'new-role-card'
-      });
+      if (this.editPermission) {
+        this.stakeholderRolesCardItems.push({
+          type: 'new-role-card'
+        });
+      }
     }
     if (!this.stakeholderRoles) {
-      this.stakeholderRolesCardItems = [{
-        type: 'new-role-card'
-      }];
+      if (this.editPermission) {
+        this.stakeholderRolesCardItems = [{
+          type: 'new-role-card'
+        }];
+      }
     }
   }
 
