@@ -21,7 +21,7 @@ export class ShortNumberPipe implements PipeTransform {
       let reduced = abs / powers[i].value;
       reduced = Math.round((reduced * rounder)) / rounder;
       if (reduced >= 1) {
-        abs = fractionSize === 2 ? Math.round(reduced) : reduced;
+        abs = Number(reduced.toFixed(fractionSize));
         key = powers[i].key;
         break;
       }

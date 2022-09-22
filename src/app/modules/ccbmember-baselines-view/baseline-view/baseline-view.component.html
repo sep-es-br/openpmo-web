@@ -135,8 +135,8 @@
                   <div
                     *ngIf="baseline?.schedule && baseline?.schedule?.variation && baseline?.schedule?.variation !== 0"
                     class="variation"
-                    [class.positive-variation]="baseline?.schedule?.variation > 0"
-                    [class.negative-variation]="baseline?.schedule?.variation < 0">
+                    [class.positive-variation]="baseline?.schedule?.variation < 0"
+                    [class.negative-variation]="baseline?.schedule?.variation > 0">
                     <i class="fas" [class.fa-arrow-left]="baseline?.schedule?.variation < 0"
                        [class.fa-arrow-right]="baseline?.schedule?.variation > 0"></i>
                     <span>{{baseline?.schedule?.variation < 0 ? baseline?.schedule?.variation * (-1) :
@@ -181,10 +181,10 @@
                   </div>
                   <div *ngIf="baseline?.scope && baseline?.scope?.variation && baseline?.scope?.variation !== 0"
                        class="variation"
-                       [class.positive-variation]="baseline?.scope?.variation < 0"
-                       [class.negative-variation]="baseline?.scope?.variation > 0">
-                    <i class="fas" [class.fa-arrow-up]="baseline?.scope?.variation < 0"
-                       [class.fa-arrow-down]="baseline?.scope?.variation >= 0"></i>
+                       [class.positive-variation]="baseline?.scope?.variation > 0"
+                       [class.negative-variation]="baseline?.scope?.variation < 0">
+                    <i class="fas" [class.fa-arrow-up]="baseline?.scope?.variation > 0"
+                       [class.fa-arrow-down]="baseline?.scope?.variation <= 0"></i>
                     <span>{{(baseline?.scope?.variation < 0 ? ((baseline?.scope?.variation * (-1))) :
                       baseline?.scope?.variation)}}%</span>
                   </div>
@@ -322,9 +322,9 @@
                         (item?.currentDate|date:'yyyy/MM/dd')}}</span>
                       <span>{{language === 'pt' ? (!item?.currentDate || (item?.currentDate && item?.currentDate !== item?.proposedDate) ? (item?.proposedDate|date:'dd/MM/yyyy') : '') :
                         (!item?.currentDate || (item?.currentDate && item?.currentDate !== item?.proposedDate) ? (item?.proposedDate|date:'yyyy/MM/dd') : '')}}</span>
-                      <div class="variation-container" [class.positive-variation]="item.variation > 0"
-                           [class.negative-variation]="item.variation < 0">
-                        <i class="fas" [class.fa-arrow-left]="item.variation < 0"
+                      <div class="variation-container" [class.positive-variation]="item.variation < 0"
+                           [class.negative-variation]="item.variation > 0">
+                        <i class="fas" *ngIf="item.variation" [class.fa-arrow-left]="item.variation < 0"
                            [class.fa-arrow-right]="item.variation >= 0"></i>
                         <span>{{item.variation ? (item.variation < 0 ? item.variation * (-1) + '%' : item.variation
                           + '%') : '' }}</span>
@@ -398,8 +398,8 @@
                       <div class="variation-container" [class.positive-variation]="item.variation > 0"
                            [class.negative-variation]="item.variation < 0">
                         <i *ngIf="item.variation > 0 || item.variation < 0" class="fas"
-                           [class.fa-arrow-up]="item.variation < 0"
-                           [class.fa-arrow-down]="item.variation >= 0"></i>
+                           [class.fa-arrow-up]="item.variation > 0"
+                           [class.fa-arrow-down]="item.variation <= 0"></i>
                         <span>{{item.variation ? (item.variation < 0 ? item.variation * (-1) + '%' : item.variation
                           + '%') : '' }}</span>
                       </div>
