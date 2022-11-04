@@ -23,7 +23,8 @@
             </div>
             <div class="p-field">
               <span class="p-float-label">
-                <textarea pInputTextarea id="float-fullName" formControlName="fullName" class="app-text-area" rows="1">
+                <textarea pInputTextarea id="float-fullName" formControlName="fullName" class="app-text-area" rows="3" 
+                [ngModel]="(formPlan.touched) ? formPlan.value.fullName : formPlan.value.name">
                 </textarea>
                 <label class="app-input-label" for="float-fullName">{{ "fullName" | translate }} * </label>
               </span>

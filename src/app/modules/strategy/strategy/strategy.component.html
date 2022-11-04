@@ -20,7 +20,8 @@
           </span>
           <app-input-message [form]="formStrategy" field="name"></app-input-message>
           <span class="p-float-label margin-top">
-            <textarea pInputTextarea formControlName="fullName" class="app-text-area" rows="1">
+            <textarea pInputTextarea formControlName="fullName" class="app-text-area" rows="3" 
+            [ngModel]="(formStrategy.touched) ? formStrategy.value.fullName : formStrategy.value.name">
               </textarea>
             <label for="float-input" class="app-input-label">{{'fullName' | translate}}<span
                 class="required-indicator">*</span></label>

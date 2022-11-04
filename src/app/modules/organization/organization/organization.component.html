@@ -27,7 +27,8 @@
             </span>
           </div>
           <span class="p-float-label">
-            <textarea id="socialName" pInputTextarea formControlName="fullName" class="app-text-area" rows="1">
+            <textarea id="socialName" pInputTextarea formControlName="fullName" class="app-text-area" rows="3" 
+            [ngModel]="(formOrganization.touched) ? formOrganization.value.fullName : formOrganization.value.name">
             </textarea>
             <label for="socialName" class="app-input-label">{{'socialName' | translate}}<span
               class="required-indicator">*</span></label>

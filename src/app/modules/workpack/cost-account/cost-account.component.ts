@@ -50,6 +50,7 @@ export class CostAccountComponent implements OnInit {
   typePropertyModel = TypePropertyModelEnum;
   idOffice: number;
   editPermission = false;
+  oldName: string = null;
 
   constructor(
     private actRouter: ActivatedRoute,
@@ -380,7 +381,23 @@ export class CostAccountComponent implements OnInit {
     }
   }
 
+  mirrorToFullName(nameProperty) {
+    let fullName = this.sectionCostAccountProperties.find((p) => (p.name === 'fullName'));
+    if ((nameProperty.value !== null) && (this.oldName === fullName.value)) {
+      this.sectionCostAccountProperties.forEach((prop) => {
+        if (prop.name === 'fullName') {
+          prop.value = nameProperty.value;
+        }
+      });
+    }
+    this.oldName = nameProperty.value;
+  }
+
+
   checkProperties(property: PropertyTemplateModel) {
+    if (property.name = "name") {
+      this.mirrorToFullName(property);
+    }
     const arePropertiesRequiredValid: boolean = this.sectionCostAccountProperties
       .filter(({ required }) => required)
       .map(( prop ) => {

@@ -60,6 +60,7 @@ import { IOffice } from 'src/app/shared/interfaces/IOffice';
 import { IPlan } from 'src/app/shared/interfaces/IPlan';
 import * as moment from 'moment';
 import { Subject } from 'rxjs';
+import { Console } from 'console';
 
 interface ISection {
   idWorkpackModel?: number;
@@ -164,6 +165,7 @@ export class WorkpackComponent implements OnDestroy {
   changedStatusCompleted = false;
   reloadDashboard = false;
   endManagementResumePermission = false;
+  oldName: string = null;
 
   constructor(
     private actRouter: ActivatedRoute,
@@ -296,10 +298,25 @@ export class WorkpackComponent implements OnDestroy {
     this.pageSize = event.pageSize;
   }
 
+  mirrorToFullName(nameProperty) {
+    let fullName = this.sectionPropertiesProperties.find((p) => (p.name === 'fullName'));
+    if ((nameProperty.value !== null) && (this.oldName === fullName.value)) {
+      this.sectionPropertiesProperties.forEach((prop) => {
+        if (prop.name === 'fullName') {
+          prop.value = nameProperty.value;
+        }
+      });
+    }
+    this.oldName = nameProperty.value;
+  }
+
   checkProperties(property: PropertyTemplateModel) {
     const arePropertiesRequiredValid: boolean = this.checkPropertiesRequiredValid(property);
     const arePropertiesStringValid: boolean = this.checkPropertiesStringValid(property);
     const arePropertiesNumberValid: boolean = this.checkPropertiesNumberValid(property);
+    if (property.name = "name") {
+      this.mirrorToFullName(property);
+    }
     return (arePropertiesRequiredValid && arePropertiesStringValid && arePropertiesNumberValid) ?
       this.saveButton?.showButton() : this.saveButton?.hideButton();
   }

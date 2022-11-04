@@ -14,13 +14,14 @@
         <form [formGroup]="formOffice">
           <span class="p-float-label first-label">
             <input formControlName="name" type="text" pInputText class="app-input-text" [class.mobile]="responsive"
-              [class.desktop]="!responsive">
+              [class.desktop]="!responsive" (focusout)="setProvisionalNames()">
             <label for="float-input" class="app-input-label">{{'name' | translate}}<span
                 class="required-indicator">*</span></label>
           </span>
           <app-input-message [form]="formOffice" field="name"></app-input-message>
           <span class="p-float-label margin-top">
-            <textarea pInputTextarea formControlName="fullName" class="app-text-area" rows="1">
+            <textarea pInputTextarea formControlName="fullName" class="app-text-area" rows="3" 
+              [ngModel]="(formOffice.touched) ? formOffice.value.fullName : formOffice.value.name">
               </textarea>
             <label for="float-input" class="app-input-label">{{'fullName' | translate}}<span
                 class="required-indicator">*</span></label>

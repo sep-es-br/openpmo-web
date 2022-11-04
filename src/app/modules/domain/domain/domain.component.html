@@ -20,7 +20,8 @@
           </span>
           <app-input-message [form]="formDomain" field="name"></app-input-message>
           <span class="p-float-label margin-top">
-            <textarea pInputTextarea formControlName="fullName" class="app-text-area" rows="1">
+            <textarea pInputTextarea formControlName="fullName" class="app-text-area" rows="3" 
+            [ngModel]="(formOffice.touched) ? formOffice.value.fullName : formOffice.value.name">
               </textarea>
             <label for="float-input" class="app-input-label">{{'fullName' | translate}}<span
                 class="required-indicator">*</span></label>
@@ -42,7 +43,8 @@
           </span>
           <app-input-message [form]="formLocalityRoot" field="name"></app-input-message>
           <span class="p-float-label">
-            <textarea pInputTextarea formControlName="fullName" class="app-text-area" rows="1">
+            <textarea pInputTextarea formControlName="fullName" class="app-text-area" rows="3" 
+            [ngModel]="(formOffice.touched) ? formOffice.value.fullName : formOffice.value.name">
               </textarea>
             <label for="float-input" class="app-input-label">{{'fullName' | translate}}<span
                 class="required-indicator">*</span></label>
