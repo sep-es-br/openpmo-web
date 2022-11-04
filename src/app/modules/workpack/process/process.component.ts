@@ -67,7 +67,7 @@ export class ProcessComponent implements OnInit, OnDestroy {
     });
     this.formProcess.statusChanges
       .pipe(takeUntil(this.$destroy), filter(status => status === 'INVALID'))
-      .subscribe(() => this.saveButton.hideButton());
+      .subscribe(() => this.saveButton?.hideButton());
     this.formProcess.valueChanges
       .pipe(takeUntil(this.$destroy), filter(() => this.formProcess.dirty && this.formProcess.valid))
       .subscribe(() => this.saveButton.showButton());

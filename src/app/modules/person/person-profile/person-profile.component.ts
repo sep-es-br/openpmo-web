@@ -63,7 +63,7 @@ export class PersonProfileComponent implements OnInit, OnDestroy {
     });
     this.formPerson.statusChanges
       .pipe(takeUntil(this.$destroy), filter(status => status === 'INVALID'))
-      .subscribe(() => this.saveButton.hideButton());
+      .subscribe(() => this.saveButton?.hideButton());
     this.formPerson.valueChanges
       .pipe(takeUntil(this.$destroy), filter(() => this.formPerson.dirty && this.formPerson.valid))
       .subscribe(() => this.saveButton.showButton());

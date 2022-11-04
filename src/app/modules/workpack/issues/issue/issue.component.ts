@@ -78,7 +78,7 @@ export class IssueComponent implements OnInit {
     });
     this.formIssue.statusChanges
       .pipe(takeUntil(this.$destroy), filter(status => status === 'INVALID'))
-      .subscribe(() => this.saveButton.hideButton());
+      .subscribe(() => this.saveButton?.hideButton());
     this.formIssue.valueChanges
       .pipe(takeUntil(this.$destroy), filter(() => this.formIssue.dirty && this.formIssue.valid))
       .subscribe(() => this.saveButton.showButton());

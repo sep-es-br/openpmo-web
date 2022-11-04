@@ -123,7 +123,7 @@ export class PlanComponent implements OnInit, OnDestroy {
     });
     this.formPlan.statusChanges
       .pipe(takeUntil(this.$destroy), filter(status => status === 'INVALID'))
-      .subscribe(() => this.saveButton.hideButton());
+      .subscribe(() => this.saveButton?.hideButton());
     this.formPlan.valueChanges
       .pipe(takeUntil(this.$destroy), filter(() => this.formPlan.dirty && this.formPlan.valid))
       .subscribe(() => this.saveButton.showButton());
@@ -295,7 +295,7 @@ export class PlanComponent implements OnInit, OnDestroy {
       });
       this.setBreacrumb();
       this.menuSrv.reloadMenuOffice();
-      this.saveButton.hideButton();
+      this.saveButton?.hideButton();
       return;
     };
   }

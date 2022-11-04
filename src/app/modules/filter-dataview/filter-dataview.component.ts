@@ -74,7 +74,7 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
     this.loadFormFilter();
     this.formFilter.statusChanges
       .pipe(takeUntil(this.$destroy), filter(status => status === 'INVALID'))
-      .subscribe(() => this.saveButton.hideButton());
+      .subscribe(() => this.saveButton?.hideButton());
     this.formFilter.valueChanges
       .pipe(takeUntil(this.$destroy), filter(() => this.formFilter.dirty))
       .subscribe(() => {
@@ -257,7 +257,7 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
     if (this.formFilter.valid && this.validadeRulesCards()) {
       this.saveButton.showButton();
     } else {
-      this.saveButton.hideButton();
+      this.saveButton?.hideButton();
     }
   }
 
@@ -266,7 +266,7 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
     if (this.formFilter.valid && this.validadeRulesCards()) {
       this.saveButton.showButton();
     } else {
-      this.saveButton.hideButton();
+      this.saveButton?.hideButton();
     }
   }
 
@@ -274,7 +274,7 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
     if (this.formFilter.valid && this.validadeRulesCards()) {
       this.saveButton.showButton();
     } else {
-      this.saveButton.hideButton();
+      this.saveButton?.hideButton();
     }
   }
 

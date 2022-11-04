@@ -91,10 +91,10 @@ export class DomainComponent implements OnInit, OnDestroy {
     });
     this.formDomain.statusChanges
       .pipe(takeUntil(this.$destroy), filter(status => status === 'INVALID'))
-      .subscribe(() => this.saveButton.hideButton());
+      .subscribe(() => this.saveButton?.hideButton());
     this.formLocalityRoot.statusChanges
       .pipe(takeUntil(this.$destroy), filter(status => status === 'INVALID'))
-      .subscribe(() => this.saveButton.hideButton());
+      .subscribe(() => this.saveButton?.hideButton());
     this.formDomain.valueChanges
       .pipe(takeUntil(this.$destroy), filter(() => this.formDomain.dirty && this.formDomain.valid &&
         (!this.propertiesDomain || !this.propertiesDomain.localityRoot ? this.formLocalityRoot.valid : true)))

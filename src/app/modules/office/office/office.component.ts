@@ -83,7 +83,7 @@ export class OfficeComponent implements OnDestroy {
     });
     this.formOffice.statusChanges
       .pipe(takeUntil(this.$destroy), filter(status => status === 'INVALID'))
-      .subscribe(() => this.saveButton.hideButton());
+      .subscribe(() => this.saveButton?.hideButton());
     this.formOffice.valueChanges
       .pipe(takeUntil(this.$destroy), filter(() => this.formOffice.dirty && this.formOffice.valid))
       .subscribe(() => this.saveButton.showButton());

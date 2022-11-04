@@ -494,7 +494,7 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
     this.showListBoxPublicServers = false;
     this.showMessagePublicServerNotFoundByName = false;
     this.showMessageInvalidEmail = false;
-    this.saveButton.hideButton();
+    this.saveButton?.hideButton();
     if (event === true) {
       this.cardPermissions = {
         toggleable: false,

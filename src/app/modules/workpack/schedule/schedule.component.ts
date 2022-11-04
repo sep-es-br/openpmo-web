@@ -327,7 +327,7 @@ export class ScheduleComponent implements OnInit, OnDestroy {
       const today = moment();
       if (today.isBefore(startDate, 'months')) {
         this.actualValidationMessage = this.translateSrv.instant('messages.scheduleActualValueValidation');
-        this.saveButton.hideButton();
+        this.saveButton?.hideButton();
       } else {
         this.actualValidationMessage = null;
       }
@@ -340,7 +340,7 @@ export class ScheduleComponent implements OnInit, OnDestroy {
         const startDate = moment(this.formSchedule.controls.start.value);
         const today = moment();
         if (today.isBefore(startDate, 'months') && this.costAssignmentsCardItems.filter(item => item.actualWork && item.actualWork > 0).length > 0) {
-          this.saveButton.hideButton();
+          this.saveButton?.hideButton();
         } else {
           this.saveButton?.showButton();
         }
@@ -363,7 +363,7 @@ export class ScheduleComponent implements OnInit, OnDestroy {
       const today = moment();
       if (today.isBefore(startDate, 'months')) {
         this.actualValidationMessage = this.translateSrv.instant('messages.scheduleActualValueValidation');
-        this.saveButton.hideButton();
+        this.saveButton?.hideButton();
       } else {
         this.actualValidationMessage = null;
       }
@@ -377,7 +377,7 @@ export class ScheduleComponent implements OnInit, OnDestroy {
         const startDate = moment(this.formSchedule.controls.start.value);
         const today = moment();
         if (today.isBefore(startDate, 'months') && this.costAssignmentsCardItems.filter(item => item.actualWork && item.actualWork > 0).length > 0) {
-          this.saveButton.hideButton();
+          this.saveButton?.hideButton();
         } else {
           this.saveButton?.showButton();
         }

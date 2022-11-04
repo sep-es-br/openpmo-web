@@ -259,7 +259,7 @@ export class SharingComponent implements OnInit {
     if (office.id === this.office.id) {
       this.handleShowSaveButton();
     } else {
-      this.saveButton.hideButton();
+      this.saveButton?.hideButton();
     }
     const selectedOffices = this.cardItemSharing.map(card => card.titleCardItem);
     this.cardItemSharing.push({
@@ -315,7 +315,7 @@ export class SharingComponent implements OnInit {
   }
 
   async saveWorkpackSharing() {
-    this.saveButton.hideButton();
+    this.saveButton?.hideButton();
     const sharedWithSender: IWorkpackShared[] = this.cardItemSharing.filter(card => card.typeCardItem === 'sharedItem').map(share => ({
       id: share.itemId,
       office: share.office,

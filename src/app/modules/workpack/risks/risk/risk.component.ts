@@ -90,7 +90,7 @@ export class RiskComponent implements OnInit, OnDestroy {
     });
     this.formRisk.statusChanges
       .pipe(takeUntil(this.$destroy), filter(status => status === 'INVALID'))
-      .subscribe(() => this.saveButton.hideButton());
+      .subscribe(() => this.saveButton?.hideButton());
     this.formRisk.valueChanges
       .pipe(takeUntil(this.$destroy), filter(() => this.formRisk.dirty && this.formRisk.valid))
       .subscribe(() => this.saveButton.showButton());

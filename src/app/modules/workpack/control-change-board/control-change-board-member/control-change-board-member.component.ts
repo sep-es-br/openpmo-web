@@ -339,7 +339,7 @@ export class ControlChangeBoardMemberComponent implements OnInit, OnDestroy {
   }
 
   async searchCitizenUserByName() {
-    this.saveButton.hideButton();
+    this.saveButton?.hideButton();
     this.publicServersResult = [];
     if (this.ccbMember.person) {
       this.ccbMember.person = undefined;
@@ -371,7 +371,7 @@ export class ControlChangeBoardMemberComponent implements OnInit, OnDestroy {
   }
 
   async validateCpf() {
-    this.saveButton.hideButton();
+    this.saveButton?.hideButton();
     this.citizenUserNotFoundByCpf = false;
     this.validCpf = cpfValidator(this.searchedCpfUser);
     if (this.validCpf) {
@@ -417,7 +417,7 @@ export class ControlChangeBoardMemberComponent implements OnInit, OnDestroy {
     if (this.ccbMember.memberAs.some(member => member.active)) {
       this.saveButton.showButton();
     } else {
-      this.saveButton.hideButton();
+      this.saveButton?.hideButton();
     }
   }
 

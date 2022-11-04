@@ -283,7 +283,7 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
   }
 
   async searchCitizenUserByName() {
-    this.saveButton.hideButton();
+    this.saveButton?.hideButton();
     this.publicServersResult = [];
     if (this.person) {
       this.person = undefined;
@@ -312,7 +312,7 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
   }
 
   async validateCpf() {
-    this.saveButton.hideButton();
+    this.saveButton?.hideButton();
     this.citizenUserNotFoundByCpf = false;
     this.validCpf = cpfValidator(this.searchedCpfUser);
     if (this.validCpf) {

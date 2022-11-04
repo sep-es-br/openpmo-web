@@ -119,7 +119,7 @@ export class AdministratorComponent implements OnInit, OnDestroy {
   validateClearSearchPerson(event) {
     if (!event || event.length === 0) {
       this.person = undefined;
-      this.saveButton.hideButton();
+      this.saveButton?.hideButton();
     }
   }
 
@@ -128,7 +128,7 @@ export class AdministratorComponent implements OnInit, OnDestroy {
       this.publicServersResult = [];
       this.showListBoxPublicServers = false;
       this.showMessagePublicServerNotFoundByName = false;
-      this.saveButton.hideButton();
+      this.saveButton?.hideButton();
     }
   }
 
@@ -137,7 +137,7 @@ export class AdministratorComponent implements OnInit, OnDestroy {
       this.person = undefined;
       this.showMessageInvalidEmail = false;
       this.showMessageNotFoundUserByEmail = false;
-      this.saveButton.hideButton();
+      this.saveButton?.hideButton();
     }
   }
 
@@ -150,7 +150,7 @@ export class AdministratorComponent implements OnInit, OnDestroy {
     this.validCpf = true;
     this.searchedCpfUser = null;
     this.searchedNameUser = null;
-    this.saveButton.hideButton();
+    this.saveButton?.hideButton();
   }
 
   resetPerson() {
@@ -231,7 +231,7 @@ export class AdministratorComponent implements OnInit, OnDestroy {
         this.saveButton.showButton();
       } else {
         this.citizenUserNotFoundByCpf = true;
-        this.saveButton.hideButton();
+        this.saveButton?.hideButton();
       }
     }
   }

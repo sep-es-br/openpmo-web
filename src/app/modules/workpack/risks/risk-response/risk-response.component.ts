@@ -92,7 +92,7 @@ export class RiskResponseComponent implements OnInit {
     });
     this.formRiskResponse.statusChanges
       .pipe(takeUntil(this.$destroy), filter(status => status === 'INVALID'))
-      .subscribe(() => this.saveButton.hideButton());
+      .subscribe(() => this.saveButton?.hideButton());
     this.formRiskResponse.valueChanges
       .pipe(takeUntil(this.$destroy), filter(() => this.formRiskResponse.dirty && this.formRiskResponse.valid))
       .subscribe(() => this.saveButton.showButton());

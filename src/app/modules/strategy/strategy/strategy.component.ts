@@ -75,7 +75,7 @@ export class StrategyComponent implements OnDestroy {
     });
     this.formStrategy.statusChanges
       .pipe(takeUntil(this.$destroy), filter(status => status === 'INVALID'))
-      .subscribe(() => this.saveButton.hideButton());
+      .subscribe(() => this.saveButton?.hideButton());
     this.formStrategy.valueChanges
       .pipe(takeUntil(this.$destroy), filter(() => this.formStrategy.dirty))
       .subscribe(() => this.saveButton.showButton());
