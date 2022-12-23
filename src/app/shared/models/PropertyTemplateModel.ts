@@ -37,6 +37,8 @@ export class PropertyTemplateModel implements IProperty {
   message?: string;
   groupedProperties?: PropertyTemplateModel[];
 
+  dirty = false;
+
   getValues() {
     const {
       id,
@@ -77,7 +79,10 @@ export class PropertyTemplateModel implements IProperty {
         }
         if (multipleSelection) {
           const selectedLocality = localitiesSelected as TreeNode[];
-          property.selectedValues = selectedLocality?.filter(locality => locality.data && locality.data !== idDomain && !locality.data.toString().includes('SELECTALL'))
+          property.selectedValues =
+            selectedLocality?.filter(locality =>
+              (locality.data && locality.data !== idDomain && !locality.data.toString().includes('SELECTALL'))
+            )
             .map(l => l.data);
         }
         break;

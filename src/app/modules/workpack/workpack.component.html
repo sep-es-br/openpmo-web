@@ -29,7 +29,7 @@
         <div class="property-container" *ngFor="let property of sectionPropertiesProperties"
           [class.not-fullLine]="!property.fullLine && property.type !== 'TextArea' && property.type !== 'Group'"
           [class.fullLine]="property.fullLine || property.type === 'TextArea' || property.type === 'Group'">
-          <app-workpack-property [property]="property" (changed)="checkProperties(property)"></app-workpack-property>
+          <app-workpack-property [property]="property" (changed)="checkProperties(property)" (input)="checkProperties(property)"></app-workpack-property>
           <span class="input-message-error" *ngIf="property.invalid && property.type !== 'Group'">
             {{ property.message }}
           </span>

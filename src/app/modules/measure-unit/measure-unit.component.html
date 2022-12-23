@@ -33,8 +33,7 @@
                   <app-input-message [form]="getFormById(cardItem.id || cardItem.newId)" field="name">
                   </app-input-message>
                   <span class="p-float-label p-field margin-top">
-                    <input formControlName="fullName" type="text" pInputText class="app-input-text" 
-                    [ngModel]="(formOffice.touched) ? formOffice.value.fullName : formOffice.value.name">
+                    <input formControlName="fullName" type="text" pInputText class="app-input-text">
                     <label for="float-input" class="app-input-label">{{'fullName' | translate}}<span
                         class="required-indicator">*</span></label>
                   </span>
@@ -83,7 +82,7 @@
                   <app-input-message [form]="getFormById(cardItem.id || cardItem.newId)" field="name">
                   </app-input-message>
                   <span class="p-float-label p-field margin-top fullName">
-                    <input formControlName="fullName" type="text" pInputText class="app-input-text" 
+                    <input formControlName="fullName" type="text" pInputText class="app-input-text"
                     [ngModel]="(formOffice.touched) ? formOffice.value.fullName : formOffice.value.name">
                     <label for="float-input" class="app-input-label">{{'fullName' | translate}}<span
                         class="required-indicator">*</span></label>

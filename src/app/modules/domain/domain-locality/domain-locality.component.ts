@@ -82,7 +82,7 @@ export class DomainLocalityComponent implements OnInit, OnDestroy {
     private domainSrv: DomainService,
     private filterSrv: FilterDataviewService
   ) {
-    this.activeRoute.queryParams.subscribe(async ({ id, idOffice, idDomain, type, idParent }) => {
+    this.activeRoute.queryParams.subscribe(async({ id, idOffice, idDomain, type, idParent }) => {
       this.idLocality = +id;
       this.idOffice = +idOffice;
       this.idDomain = +idDomain;
@@ -232,7 +232,11 @@ export class DomainLocalityComponent implements OnInit, OnDestroy {
         this.propertiesOffice = data;
       }
     }
-    this.idDomain = this.idDomain || (this.propertiesLocality?.domain ? this.propertiesLocality?.domain?.id : (this.propertiesLocality?.domainRoot && this.propertiesLocality?.domainRoot?.id));
+    this.idDomain = this.idDomain ||
+      (this.propertiesLocality?.domain
+        ? this.propertiesLocality?.domain?.id
+        : (this.propertiesLocality?.domainRoot && this.propertiesLocality?.domainRoot?.id));
+
     if (this.idDomain) {
       const { success, data } = await this.domainSrv.GetById(this.idDomain);
       if (success) {
@@ -241,6 +245,12 @@ export class DomainLocalityComponent implements OnInit, OnDestroy {
     }
     if (this.cardProperties) {
       this.cardProperties.initialStateCollapse = !!this.idLocality;
+    }
+  }
+
+  mirrorNameToFullname() {
+    if (!this.formLocality.controls.fullName.dirty) {
+      this.formLocality.controls.fullName.setValue(this.formLocality.controls.name.value);
     }
   }
 
@@ -287,7 +297,10 @@ export class DomainLocalityComponent implements OnInit, OnDestroy {
         ] : undefined,
         urlCard: this.propertiesLocality?.children ? '/domains/locality' : undefined,
         paramsUrlCard: [
-          { name: 'idDomain', value: (this.propertiesLocality?.domain ? this.propertiesLocality?.domain?.id : this.propertiesLocality?.domainRoot && this.propertiesLocality?.domainRoot?.id) },
+          { name: 'idDomain',
+            value: (this.propertiesLocality?.domain
+                    ? this.propertiesLocality?.domain?.id
+                    : this.propertiesLocality?.domainRoot && this.propertiesLocality?.domainRoot?.id) },
           { name: 'idParent', value: this.idLocality },
           { name: 'idOffice', value: this.idOffice },
           { name: 'type', value: this.propertiesLocality?.children ? this.propertiesLocality?.children[0]?.type : undefined }
@@ -316,7 +329,10 @@ export class DomainLocalityComponent implements OnInit, OnDestroy {
           ] as MenuItem[],
           urlCard: '/domains/locality',
           paramsUrlCard: [
-            { name: 'idDomain', value: (this.propertiesLocality?.domain ? this.propertiesLocality?.domain?.id : this.propertiesLocality?.domainRoot?.id) },
+            { name: 'idDomain',
+              value: (this.propertiesLocality?.domain
+                      ? this.propertiesLocality?.domain?.id
+                      : this.propertiesLocality?.domainRoot?.id) },
             { name: 'idParent', value: this.idLocality },
             { name: 'idOffice', value: this.idOffice },
             { name: 'type', value: this.propertiesLocality?.children ? this.propertiesLocality.children[0].type : undefined }
@@ -348,7 +364,9 @@ export class DomainLocalityComponent implements OnInit, OnDestroy {
   }
 
   async handleOnSubmit() {
-    const idDomain = this.propertiesLocality?.domain ? this.propertiesLocality?.domain?.id : (this.propertiesLocality?.domainRoot && this.propertiesLocality?.domainRoot?.id)
+    const idDomain = this.propertiesLocality?.domain
+                      ? this.propertiesLocality?.domain?.id
+                      : (this.propertiesLocality?.domainRoot && this.propertiesLocality?.domainRoot?.id);
     delete this.propertiesLocality?.domain;
     const { success, data } = this.propertiesLocality
       ? await this.localitySvr.put({ ...this.propertiesLocality, ...this.formLocality.value, idDomain })
@@ -430,7 +448,7 @@ export class DomainLocalityComponent implements OnInit, OnDestroy {
         name: prop.apiValue,
         active: true,
         possibleValues: prop.possibleValues
-      }
+      };
       return property;
     });
     return filterPropertiesList;

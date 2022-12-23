@@ -172,6 +172,18 @@ export class DomainComponent implements OnInit, OnDestroy {
     };
   }
 
+  mirrorDomainNameToFullname() {
+    if (!this.formDomain.controls.fullName.dirty) {
+      this.formDomain.controls.fullName.setValue(this.formDomain.controls.name.value);
+    }
+  }
+
+  mirrorLocRootNameToFullname() {
+    if (!this.formLocalityRoot.controls.fullName.dirty) {
+      this.formLocalityRoot.controls.fullName.setValue(this.formLocalityRoot.controls.name.value);
+    }
+  }
+
   async loadPropertiesDomain() {
     if (this.idDomain) {
       const { data, success } = await this.domainSvr.GetById(this.idDomain);

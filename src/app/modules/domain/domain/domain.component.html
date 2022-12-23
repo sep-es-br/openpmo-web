@@ -13,15 +13,14 @@
       <div>
         <form [formGroup]="formDomain">
           <span class="p-float-label">
-            <input formControlName="name" type="text" pInputText class="app-input-text" [class.mobile]="responsive"
+            <input formControlName="name" type="text" pInputText class="app-input-text" [class.mobile]="responsive" (input)="mirrorDomainNameToFullname()"
               [class.desktop]="!responsive">
             <label for="float-input" class="app-input-label">{{'name' | translate}}<span
                 class="required-indicator">*</span></label>
           </span>
           <app-input-message [form]="formDomain" field="name"></app-input-message>
           <span class="p-float-label margin-top">
-            <textarea pInputTextarea formControlName="fullName" class="app-text-area" rows="3" 
-            [ngModel]="(formOffice.touched) ? formOffice.value.fullName : formOffice.value.name">
+            <textarea pInputTextarea formControlName="fullName" class="app-text-area" rows="3">
               </textarea>
             <label for="float-input" class="app-input-label">{{'fullName' | translate}}<span
                 class="required-indicator">*</span></label>
@@ -36,15 +35,14 @@
       <div>
         <form [formGroup]="formLocalityRoot">
           <span class="p-float-label">
-            <input formControlName="name" type="text" pInputText class="app-input-text"
+            <input formControlName="name" type="text" pInputText class="app-input-text" (input)="mirrorLocRootNameToFullname()"
               [class.mobile]="responsive" [class.desktop]="!responsive">
             <label for="float-input" class="app-input-label">{{'name' | translate}}<span
                 class="required-indicator">*</span></label>
           </span>
           <app-input-message [form]="formLocalityRoot" field="name"></app-input-message>
           <span class="p-float-label">
-            <textarea pInputTextarea formControlName="fullName" class="app-text-area" rows="3" 
-            [ngModel]="(formOffice.touched) ? formOffice.value.fullName : formOffice.value.name">
+            <textarea pInputTextarea formControlName="fullName" class="app-text-area" rows="3">
               </textarea>
             <label for="float-input" class="app-input-label">{{'fullName' | translate}}<span
                 class="required-indicator">*</span></label>

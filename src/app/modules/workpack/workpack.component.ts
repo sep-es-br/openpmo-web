@@ -298,25 +298,30 @@ export class WorkpackComponent implements OnDestroy {
     this.pageSize = event.pageSize;
   }
 
-  mirrorToFullName(nameProperty) {
-    let fullName = this.sectionPropertiesProperties.find((p) => (p.name === 'fullName'));
-    if ((nameProperty?.value !== null) && (this.oldName === fullName?.value)) {
-      this.sectionPropertiesProperties.forEach((prop) => {
-        if (prop.name === 'fullName') {
-          prop.value = nameProperty.value;
-        }
-      });
+  mirrorToFullName(nameProperty: PropertyTemplateModel, fullNameProperty: PropertyTemplateModel) {
+
+    const fullNameIndex = this.sectionPropertiesProperties.findIndex((p) => (p.name === 'fullName'));
+    if (fullNameProperty && fullNameIndex >= 0 && !fullNameProperty.dirty) {
+      this.sectionPropertiesProperties[fullNameIndex].value = nameProperty.value;
     }
-    this.oldName = nameProperty.value;
   }
 
   checkProperties(property: PropertyTemplateModel) {
-    const arePropertiesRequiredValid: boolean = this.checkPropertiesRequiredValid(property);
-    const arePropertiesStringValid: boolean = this.checkPropertiesStringValid(property);
+    let arePropertiesRequiredValid: boolean = this.checkPropertiesRequiredValid(property);
+    let arePropertiesStringValid: boolean = this.checkPropertiesStringValid(property);
     const arePropertiesNumberValid: boolean = this.checkPropertiesNumberValid(property);
-    if (property.name = "name") {
-      this.mirrorToFullName(property);
+    if (property.name == 'name') {
+      const fullName = this.sectionPropertiesProperties.find((p) => (p.name === 'fullName'));
+      if (fullName) {
+        this.mirrorToFullName(property, fullName);
+        arePropertiesRequiredValid = this.checkPropertiesRequiredValid(fullName);
+        arePropertiesStringValid = this.checkPropertiesStringValid(fullName);
+      }
     }
+    if (property.name == 'fullName') {
+      property.dirty = true;
+    }
+
     return (arePropertiesRequiredValid && arePropertiesStringValid && arePropertiesNumberValid) ?
       this.saveButton?.showButton() : this.saveButton?.hideButton();
   }
@@ -622,13 +627,13 @@ export class WorkpackComponent implements OnDestroy {
     }
   }
 
-  showCheckCompleted() {   
+  showCheckCompleted() {
     this.cardWorkpackProperties.workpackCompleted = this.workpack && this.workpack.completed;
     this.cardWorkpackProperties.workpackType = this.workpack && this.workpack.type;
     this.cardWorkpackProperties.workpackCanceled = this.workpack && this.workpack.canceled;
     this.cardWorkpackProperties.showCheckCompleted = true;
-    if (this.editPermission && this.workpack && this.workpack.id 
-        && !this.workpack.hasScheduleSectionActive 
+    if (this.editPermission && this.workpack && this.workpack.id
+        && !this.workpack.hasScheduleSectionActive
         && !this.workpack.canceled
         && (!this.workpack.endManagementDate)) {
       this.cardWorkpackProperties.canEditCheckCompleted = true;
@@ -922,7 +927,13 @@ export class WorkpackComponent implements OnDestroy {
     });
   }
 
-  async loadWorkpacksFromWorkpackModel(idPlan: number, idWorkpackModel: number, idFilterSelected: number, showCancelled?: boolean, idWorkpackModelLinked?: number,) {
+  async loadWorkpacksFromWorkpackModel(
+      idPlan: number,
+      idWorkpackModel: number,
+      idFilterSelected: number,
+      showCancelled?: boolean,
+      idWorkpackModelLinked?: number)
+  {
     const result = await this.workpackSrv.GetWorkpacksByParent({
       'id-plan': idPlan,
       'id-workpack-model': idWorkpackModel,
@@ -956,7 +967,8 @@ export class WorkpackComponent implements OnDestroy {
               disabled: !this.editPermission
             });
           }
-          if (!workpack.canceled && workpack.type === 'Deliverable' && (!workpack.endManagementDate || workpack.endManagementDate === null)) {
+          if (!workpack.canceled && workpack.type === 'Deliverable' &&
+              (!workpack.endManagementDate || workpack.endManagementDate === null)) {
             menuItems.push({
               label: this.translateSrv.instant('endManagement'),
               icon: 'far fa-stop-circle',
@@ -964,7 +976,8 @@ export class WorkpackComponent implements OnDestroy {
               disabled: !this.editPermission
             });
           }
-          if (!workpack.canceled && workpack.type === 'Deliverable' && (!!workpack.endManagementDate && workpack.endManagementDate !== null)) {
+          if (!workpack.canceled && workpack.type === 'Deliverable' &&
+              (!!workpack.endManagementDate && workpack.endManagementDate !== null)) {
             menuItems.push({
               label: this.translateSrv.instant('resumeManagement'),
               icon: 'far fa-play-circle',
@@ -1008,7 +1021,8 @@ export class WorkpackComponent implements OnDestroy {
               command: (event) => this.handleCutWorkpack(workpack),
             });
           }
-          if (!workpack.canceled && workpack.model.id === idWorkpackModel && this.editPermission && !idWorkpackModelLinked && !workpack.linked) {
+          if (!workpack.canceled && workpack.model.id === idWorkpackModel
+              && this.editPermission && !idWorkpackModelLinked && !workpack.linked) {
             menuItems.push({
               label: this.translateSrv.instant('sharing'),
               icon: 'app-icon share',
