@@ -1,49 +1,193 @@
 .footer {
   border-top: 1px solid #e1e1e1;
   display: flex;
-  align-items: center;
-  padding: 1.3rem;
+  align-items: left;
+  padding: .6rem;
   color: #989fa2;
-
+  background-color: #f5f5f3;
 
   .descriptions{
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    width: 88%;
-    .description {
-      font-size: 1rem;
-      margin: 0;
-      margin-bottom: 5px;
-      &.principal {
-        font-weight: bold;
-      }
-    }
+    margin: auto;
+    margin-left: 0!important;
+    font-size: 12px;
   }
   .versions {
     display: flex;
-    flex: 1;
-    flex-direction: column;
+    flex: inherit;
     align-items: flex-end;
-    font-weight: bold;
-    font-size: 14px;
+    font-size: 12px;
+    margin: auto;
+    margin-right: 0!important;
+    cursor: pointer;
+
+    .about-label {
+      margin: auto;
+      margin-left: 20px!important;
+    }
+    .logo-openpmo {
+      margin-top: -25px;
+    }
+
+  }
+  .logo {
+    height: 43px;
+    margin-right: 10px!important;
+    margin-left: 0!important;
   }
 }
 
+
+
 @media (max-width: 768px) {
   .footer {
-    flex-direction: column;
-    .description {
-      margin-bottom: 10px !important;
-      text-align: center;
-      font-size: 0.8rem !important;
+    display: none;
+  }
+}
+
+
+.p-dialog-header {
+  padding: 5px 5px;
+}
+
+.about-modal-content {
+  text-align: center;
+  font-family: 'Montserrat', sans-serif;
+  color: #5B5B5B;
+
+  .top-content {
+    padding-bottom: 20px;
+
+    .horizontal-logo-row {
+      margin-bottom: 10px;
+
+      .horizontal-logo {
+        margin: auto;
+        width: 238px;
+      }
+
     }
-    .versions {
-      align-items: center;
-      text-align: center;
-      width: 100%;
-      font-size: 0.7rem;
+
+    .api {
+      margin-top: 15px;
+      margin-bottom: 10px;
+      font-size: 12px;
+
+      .label {
+        margin: auto;
+      }
+
+      .version {
+        margin: auto;
+        font-weight: bold;
+      }
+
+    }
+
+    .web-app {
+      font-size: 12px;
+
+      .label {
+        margin: auto;
+      }
+
+      .version {
+        margin: auto;
+        font-weight: bold;
+      }
+    }
+
+  }
+
+  .middle-content {
+    padding-top: 20px;
+    padding-bottom: 20px;
+    margin-left: 10px;
+    margin-right: 10px;
+    border-top: 1px;
+    border-left: 0;
+    border-right: 0;
+    border-bottom: 1px;
+    border-color: #e1e1e1;
+    border-style: solid;
+
+
+    .proudly {
+      font-size: 12px;
+      margin-bottom: 15px;
+    }
+
+    .logo-container {
+      margin: auto;
+
+      .vertical-logo {
+        width: 193px;
+      }
     }
   }
+
+  .bottom-content {
+    padding-top: 15px;
+    font-size: 10px;
+
+    .distributed {
+      margin: auto;
+    }
+
+    .license {
+      margin: auto;
+    }
+
+  }
+
+  .hide-credits {
+    visibility: hidden;
+  }
+  .show-credits {
+    visibility: visible;
+  }
+
+  .credits-container {
+    width: 135px;
+    background-color: #00a1dd;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 13px 0;
+    position: absolute;
+    z-index: 1;
+    bottom: 58%;
+    left: 53%;
+    margin-left: -80px;
+
+    .credit {
+      font-size: 10px;
+    }
+
+    .top {
+      padding-bottom: 5px;
+    }
+
+    .middle {
+      margin-left: 7px;
+      margin-right: 7px;
+      border-top: 1px;
+      border-bottom: 1px;
+      border-left: 0;
+      border-right: 0;
+      border-color: #fff;
+      border-style: solid;
+      padding-top: 5px;
+      padding-bottom: 5px;
+    }
+
+    .bottom {
+      padding-top: 5px;
+    }
+
+    .name {
+      font-weight: bold;
+    }
+
+  }
+
 }

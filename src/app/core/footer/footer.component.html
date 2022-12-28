@@ -1,11 +1,83 @@
 <footer class="footer">
+  <img class="logo" src="../../../assets/images/brasao_rodape.png">
   <div class="descriptions">
-    <p class="description">{{'messages.infoPmo' | translate}}</p>
-    <p class="description principal">Secretaria de Economia e Planejamento do Governo do Estado do Espirito Santo</p>
+   {{'messages.infoPmo' | translate}}<br/>
+   <strong>Secretaria de Economia e Planejamento do Governo do Estado do Espirito Santo</strong>
   </div>
 
-  <div class="versions">
+  <div class="versions" (click)="showAbout()">
+    <div class="about-label">About</div>
+    <img class="logo-openpmo" src="../../../assets/svg/LogoRodape.svg">
+  </div>
+
+  <!--div class="versions">
     <span>Web App: {{webAppVersion}}</span>
     <span>API: {{apiVersion}}</span>
-  </div>
+  </!--div-->
 </footer>
+
+
+<p-dialog header=" " [(visible)]="displayModalAbout" [modal]="true" [style]="{width: '378px'}"
+          [draggable]="false" [resizable]="false">
+  <div class="about-modal-content">
+
+    <div class="top-content">
+      <div class="row horizontal-logo-row">
+        <img class="horizontal-logo" src="../../../assets/images/logo-openpmo-horizontal.png">
+      </div>
+      <div class="api">
+        <div class="row label">
+          <span>Rest API:</span>
+        </div>
+        <div class="row version">
+          <span>{{apiVersion}}</span>
+        </div>
+      </div>
+      <div class="web-app">
+        <div class="row label">
+          <span>Web App:</span>
+        </div>
+        <div class="row version">
+          <span>{{webAppVersion}}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="middle-content">
+      <div class="credits-container" [ngClass]="mouseOverText ? 'show-credits' : 'hide-credits'" >
+        <div class="credit top">
+          <div class="function">Product Manager</div>
+          <div class="name">Vagner Cordeiro</div>
+        </div>
+        <div class="credit middle">
+          <div class="function">Product Analyst</div>
+          <div class="name">Marcos Santos</div>
+        </div>
+        <div class="credit bottom">
+          <div class="function">UI UX Designer</div>
+          <div class="name">Alan Rodrigo</div>
+        </div>
+      </div>
+      <div class="row proudly" (mouseover)="mouseOverText = true;" (mouseout)="mouseOverText = false;">
+        Proudly produced and maintained by:
+      </div>
+      <div class="logo-container">
+        <img class="vertical-logo" src="../../../assets/images/brasao-titulo-vertical.png">
+      </div>
+    </div>
+
+    <div class="bottom-content">
+      <div class="row distributed">
+        Distributed under the
+      </div>
+      <div class="row license">
+        <a href="https://www.gnu.org/licenses/gpl-3.0.en.html#top" target="blank">GNU General Public License Version 3</a>
+      </div>
+    </div>
+
+
+  </div>
+</p-dialog>
+
+
+
