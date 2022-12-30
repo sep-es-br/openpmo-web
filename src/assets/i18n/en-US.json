@@ -317,6 +317,10 @@
   "decline": "Decline",
   "updates": "Updates",
   "showCanceled": "Show canceled",
+  "about": "About",
+  "productManager": "Product Manager",
+  "productAnalyst": "Product Analyst",
+  "uiUxDesigner": "UI UX Designer",
   "messages": {
     "requiredInformationsMustBeFilled": "Required informations must be filled.",
     "scheduleActualValueValidation": "Start step date is after actual month.",
@@ -371,6 +375,10 @@
     "loading": "Loading",
     "atentionCancellingMessage": "Heads up. This action cannot be undone.",
     "textAtentionCancellingMessage": "Confirm sending this proposal to cancel the project to the CCB?",
+    "stateDepartmentFooterNotice": "State Department for Economy and Planning - Government of Espírito Santo",
+    "proudlyFooterNotice": "Proudly produced and maintained by:",
+    "licenseFooterNotice": "Distributed under the",
+    "gpl3": "GNU General Public License Version 3",
     "costAccounts": {
       "thereAreNotCostAccounts": "There are not cost accounts"
     },

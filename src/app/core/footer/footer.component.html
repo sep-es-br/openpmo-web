@@ -2,11 +2,11 @@
   <img class="logo" src="../../../assets/images/brasao_rodape.png">
   <div class="descriptions">
    {{'messages.infoPmo' | translate}}<br/>
-   <strong>Secretaria de Economia e Planejamento do Governo do Estado do Espirito Santo</strong>
+   <strong>{{ 'messages.stateDepartmentFooterNotice' | translate }}</strong>
   </div>
 
   <div class="versions" (click)="showAbout()">
-    <div class="about-label">About</div>
+    <div class="about-label">{{'about' | translate}}</div>
     <img class="logo-openpmo" src="../../../assets/svg/LogoRodape.svg">
   </div>
 
@@ -46,20 +46,20 @@
     <div class="middle-content">
       <div class="credits-container" [ngClass]="mouseOverText ? 'show-credits' : 'hide-credits'" >
         <div class="credit top">
-          <div class="function">Product Manager</div>
+          <div class="function">{{'productManager' | translate}}</div>
           <div class="name">Vagner Cordeiro</div>
         </div>
         <div class="credit middle">
-          <div class="function">Product Analyst</div>
+          <div class="function">{{'productAnalyst' | translate}}</div>
           <div class="name">Marcos Santos</div>
         </div>
         <div class="credit bottom">
-          <div class="function">UI UX Designer</div>
+          <div class="function">{{'uiUxDesigner' | translate}}</div>
           <div class="name">Alan Rodrigo</div>
         </div>
       </div>
       <div class="row proudly" (mouseover)="mouseOverText = true;" (mouseout)="mouseOverText = false;">
-        Proudly produced and maintained by:
+        {{'messages.proudlyFooterNotice' | translate }}
       </div>
       <div class="logo-container">
         <img class="vertical-logo" src="../../../assets/images/brasao-titulo-vertical.png">
@@ -68,7 +68,7 @@
 
     <div class="bottom-content">
       <div class="row distributed">
-        Distributed under the
+        {{'messages.licenseFooterNotice' | translate }}
       </div>
       <div class="row license">
         <a href="https://www.gnu.org/licenses/gpl-3.0.en.html#top" target="blank">GNU General Public License Version 3</a>

@@ -316,6 +316,10 @@
   "decline": "Recusar",
   "updates": "Atualizações",
   "showCanceled": "Exibir cancelado",
+  "about": "Sobre",
+  "productManager": "Gerente de Produto",
+  "productAnalyst": "Analista de Produto",
+  "uiUxDesigner": "Designer de UI UX",
   "messages": {
     "requiredInformationsMustBeFilled": "Informações obrigatórias devem ser preenchidas.",
     "scheduleActualValueValidation": "Data do passo inicial é maior que o mês atual.",
@@ -370,6 +374,10 @@
     "loading": "Carregando",
     "atentionCancellingMessage": "Atenção. Esta ação não poderá ser desfeita",
     "textAtentionCancellingMessage": "Confirma envio desta proposta de cancelamento do projeto ao CCB?",
+    "stateDepartmentFooterNotice": "Secretaria de Economia e Planejamento - Governo do Estado do Espírito Santo",
+    "proudlyFooterNotice": "Orgulhosamente produzido e mantido por:",
+    "licenseFooterNotice": "Distribuído sob a licença",
+    "gpl3": "GNU General Public License Versão 3",
     "costAccounts": {
       "thereAreNotCostAccounts": "Não existem centros de custo"
     },
