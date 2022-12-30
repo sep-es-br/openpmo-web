@@ -10,17 +10,19 @@
       <p-splitter [panelSizes]="[20,80]" [minSizes]="[20,20]" layout="horizontal">
         <ng-template>
           <div class="menu-fixed-container">
-            <app-menu-fixed></app-menu-fixed>
+            <app-menu-fixed (changeMenu)="toggleMenu($event)"></app-menu-fixed>
           </div>
         </ng-template>
         <ng-template>
           <div class="main-content">
-            <app-breadcrumb></app-breadcrumb>
+            <app-breadcrumb [isAdminMenu]="isAdminMenu"></app-breadcrumb>
             <div class="content">
               <div class="outlet fixed">
                 <router-outlet></router-outlet>
               </div>
-              <app-footer></app-footer>
+              <div class="footer-container">
+                <app-footer></app-footer>
+              </div>
             </div>
           </div>
         </ng-template>
@@ -30,14 +32,16 @@
 </ng-template>
 
 <ng-template #menuFloat>
-  <app-menu></app-menu>
+  <app-menu (changeMenu)="toggleMenu($event)"></app-menu>
   <main>
     <div class="main-content">
-      <app-breadcrumb></app-breadcrumb>
+      <app-breadcrumb [isAdminMenu]="isAdminMenu"></app-breadcrumb>
       <div class="outlet">
         <router-outlet></router-outlet>
       </div>
     </div>
-    <app-footer></app-footer>
+    <div class="footer-container">
+      <app-footer></app-footer>
+    </div>
   </main>
 </ng-template>

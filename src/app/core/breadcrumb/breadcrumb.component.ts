@@ -1,6 +1,6 @@
 import { DashboardService } from 'src/app/shared/services/dashboard.service';
 import { takeUntil } from 'rxjs/operators';
-import { Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, HostListener, Input, OnInit, SimpleChanges, ViewChild, OnChanges } from '@angular/core';
 import { Router } from '@angular/router';
 
 import { IBreadcrumb } from 'src/app/shared/interfaces/IBreadcrumb';
@@ -13,8 +13,8 @@ import { Subject } from 'rxjs';
   templateUrl: './breadcrumb.component.html',
   styleUrls: ['./breadcrumb.component.scss']
 })
-export class BreadcrumbComponent implements OnInit {
-
+export class BreadcrumbComponent implements OnInit, OnChanges {
+  @Input() isAdminMenu = false;
   @ViewChild('crumbsEl') crumbsEl: ElementRef;
   crumbs: IBreadcrumb[] = [];
   crumpsHide: IBreadcrumb[] = [];
@@ -25,6 +25,7 @@ export class BreadcrumbComponent implements OnInit {
   crumbPlan: IBreadcrumb;
   $destroy = new Subject();
   fullScreenModeDashboard = false;
+
 
   constructor(
     public breadcrumbSrv: BreadcrumbService,
@@ -43,11 +44,15 @@ export class BreadcrumbComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.breadcrumbSrv.observable.subscribe( async (menu) => {
+    this.breadcrumbSrv.observable.subscribe( async(menu) => {
       await this.resetAll();
       await this.setCrumbs(menu);
       this.detectOverflow();
     });
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    this.isAdminMenu = changes.isAdminMenu.currentValue;
   }
 
   async resetAll() {
@@ -69,7 +74,8 @@ export class BreadcrumbComponent implements OnInit {
       this.router.navigate([...this.crumbPlan.routerLink], {
         queryParams: this.crumbPlan.queryParams
       });
-    } else if((this.crumbPlan && this.crumbOffice && this.crumbs.length === 0) || (!this.crumbPlan && this.crumbOffice && this.crumbs.length === 0)) {
+    } else if((this.crumbPlan && this.crumbOffice && this.crumbs.length === 0)
+           || (!this.crumbPlan && this.crumbOffice && this.crumbs.length === 0)) {
       this.router.navigate([...this.crumbOffice.routerLink], {
         queryParams: this.crumbOffice.queryParams
       });

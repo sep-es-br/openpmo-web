@@ -1,5 +1,5 @@
 import { Location } from '@angular/common';
-import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import * as moment from 'moment';
@@ -25,9 +25,10 @@ import { TranslateChangeService } from 'src/app/shared/services/translate-change
   styleUrls: ['./menu.component.scss'],
 })
 export class MenuComponent implements OnInit, OnDestroy {
-
   @ViewChild('menuSliderOffices') menuOffices: ElementRef<HTMLDivElement>;
   @ViewChild('menuSliderPortfolio') menuPortfolio: ElementRef<HTMLDivElement>;
+
+  @Output() changeMenu = new EventEmitter<boolean>();
 
   menus: IMenu[] = [
     { label: 'office', isOpen: false },
@@ -36,7 +37,7 @@ export class MenuComponent implements OnInit, OnDestroy {
     { label: 'user', isOpen: false },
     { label: 'more', isOpen: false }
   ];
-  isAdminMenu = false;
+
   isMobileView = false;
   isChangingView = false;
   items: MenuItem[] = [];
@@ -58,6 +59,7 @@ export class MenuComponent implements OnInit, OnDestroy {
   currentIDPlan = 0;
   isFixed = false;
   menuStateChanged = false;
+  isAdminMenu = false;
 
   constructor(
     private menuSrv: MenuService,
@@ -98,6 +100,7 @@ export class MenuComponent implements OnInit, OnDestroy {
     this.menuSrv.isAdminMenu.pipe(takeUntil(this.$destroy)).subscribe(isAdminMenu => {
       if (!this.isFixed) {
         this.isAdminMenu = isAdminMenu;
+        this.changeMenu.emit(this.isAdminMenu);
         this.updateMenuOfficeOnAdminChange();
         if (isAdminMenu) {
           this.getOfficePermission();
@@ -125,7 +128,7 @@ export class MenuComponent implements OnInit, OnDestroy {
         this.selectMenuActive(url.slice(2));
       }
     });
-    this.menuSrv.getMenuState.pipe(takeUntil(this.$destroy)).subscribe(async (menuState) => {
+    this.menuSrv.getMenuState.pipe(takeUntil(this.$destroy)).subscribe(async(menuState) => {
       this.isFixed = menuState.isFixed;
       if (!this.isFixed) {
         this.menus = menuState.menus;
@@ -155,6 +158,7 @@ export class MenuComponent implements OnInit, OnDestroy {
       ? 'Admin'
       : (this.currentUserInfo.name?.split(' ').shift() || payload.email);
     this.getMenuModeUser();
+    this.changeMenu.emit(this.isAdminMenu);
   }
 
   async loadCurrentInfo() {

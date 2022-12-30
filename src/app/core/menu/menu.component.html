@@ -1,7 +1,7 @@
 <nav class="app-menu" [class.admin-menu]="isAdminMenu" [class.mobile]="isMobileView">
-  <div class="logo" *ngIf="!isMobileView">
+  <!--div class="logo" *ngIf="!isMobileView">
     <img src="assets/svg/LogoWhite.svg" alt="Logo">
-  </div>
+  </!--div-->
   <ng-container *ngIf="isAdminMenu; else menuGeneral">
     <ng-container *ngTemplateOutlet="menuAdmin"></ng-container>
   </ng-container>

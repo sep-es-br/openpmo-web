@@ -232,7 +232,7 @@ export class JournalViewComponent implements OnInit, OnDestroy {
   async handleHideOverlayScope(_event?) {
     const selected = this.selectedWorkpacks && this.selectedWorkpacks.length > 1 ?
       this.selectedWorkpacks.length + ' ' + this.translateSrv.instant('selectedItems') :
-      this.selectedWorkpacks[0].label;
+      this.selectedWorkpacks[0]?.label;
     this.formSearch.controls.scopeName.setValue(selected);
     await this.handleFilter();
   }

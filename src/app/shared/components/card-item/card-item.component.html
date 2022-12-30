@@ -16,7 +16,7 @@
           <i [ngClass]="properties.iconSvg ? [ 'app-icon', properties.icon, 'grey-icon'] : [ 'icon-card', properties.icon, 'grey-icon' ]"
             [class.risk-red]="properties.iconColor === 'high'" [class.risk-orange]="properties.iconColor === 'medium'"
             [class.linked]="!!properties.linked || !!properties.shared"
-            [class.risk-yellow]="properties.iconColor === 'low'" [ngStyle]="{ fontSize: '2.5rem' }"></i>
+            [class.risk-yellow]="properties.iconColor === 'low'" [ngStyle]="(displayModeCard === 'list') ? { fontSize: '1.5rem' } : { fontSize: '2.5rem' }"></i>
           <i [ngClass]="['app-icon', 'link-to', 'grey-icon', 'linked']" *ngIf="!!properties.linked"></i>
           <i [ngClass]="['app-icon', 'sharing', 'grey-icon', 'linked']"
             *ngIf="!!properties.shared && !properties.linked"></i>
@@ -41,7 +41,7 @@
           <i [ngClass]="properties.iconSvg ? [ 'app-icon', properties.icon, 'grey-icon'] : [ 'icon-card', properties.icon, 'grey-icon' ]"
             [class.risk-red]="properties.iconColor === 'high'" [class.risk-orange]="properties.iconColor === 'medium'"
             [class.linked]="!!properties.linked || !!properties.shared"
-            [class.risk-yellow]="properties.iconColor === 'low'" [ngStyle]="{ fontSize: '2.5rem' }"></i>
+            [class.risk-yellow]="properties.iconColor === 'low'" [ngStyle]="(displayModeCard === 'list') ? { fontSize: '1.5rem' } : { fontSize: '2.5rem' }"></i>
           <i [ngClass]="['app-icon', 'link-to', 'grey-icon', 'linked']" *ngIf="!!properties.linked"></i>
           <i [ngClass]="['app-icon', 'sharing', 'grey-icon', 'linked']"
             *ngIf="!!properties.shared && !properties.linked"></i>
@@ -100,7 +100,7 @@
       <div class="card-item-content" [class.card-link]="properties.urlCard" [routerLink]="properties.urlCard"
         [class.cardList]="displayModeCard === 'list'" [queryParams]="getQueryParams()">
         <i [ngClass]="properties.iconSvg ? [ 'app-icon', properties.icon, 'grey-icon'] : [ 'icon-card', properties.icon, 'grey-icon' ]"
-          [ngStyle]="{ fontSize: '2.5rem' }"></i>
+          [ngStyle]="{ fontSize: '1.5rem' }"></i>
         <span class="card-item-name" [pTooltip]="properties.fullNameCardItem"
           tooltipPosition="bottom">{{properties.nameCardItem}}</span>
         <span class="card-item-subtitle" *ngIf="properties.subtitleCardItem"
@@ -110,7 +110,7 @@
       </div>
       <div class="right-side">
         <p-header *ngIf="properties.menuItems" class="card-item-header">
-          <i [ngClass]="[ 'app-icon', 'process-selo']" [ngStyle]="{ fontSize: '2rem' }"></i>
+          <i [ngClass]="[ 'app-icon', 'process-selo']" [ngStyle]="{ fontSize: '1rem' }"></i>
           <p-menu #menu [popup]="true" [model]="properties.menuItems"></p-menu>
           <button type="button" pButton icon="pi pi-ellipsis-v" [class.hidden]="!properties.menuItems.length"
             (click)="menu.toggle($event)"></button>
@@ -151,7 +151,7 @@
         [class.cardList]="displayModeCard === 'list'"
         (click)="navigateToPage(properties.urlCard, properties.paramsUrlCard)">
         <i [ngClass]="properties.iconSvg ? [ 'app-icon', properties.icon, 'grey-icon'] : [ 'icon-card', properties.icon, 'grey-icon' ]"
-          [ngStyle]="{ fontSize: '2.5rem' }"></i>
+          [ngStyle]="{ fontSize: '1.5rem' }"></i>
         <span class="card-item-name" [pTooltip]="properties.fullNameCardItem"
           tooltipPosition="bottom">{{properties.nameCardItem}}</span>
         <span class="card-item-subtitle" *ngIf="properties.subtitleCardItem">{{properties.subtitleCardItem}}</span>
@@ -202,7 +202,7 @@
         [class.cardList]="displayModeCard === 'list'" [queryParams]="getQueryParams()"
         [pTooltip]="properties.fullNameCardItem" tooltipPosition="top">
         <i [ngClass]="properties.iconSvg ? [ 'app-icon', properties.icon, 'grey-icon'] : [ 'icon-card', properties.icon, 'grey-icon' ]"
-          [ngStyle]="{ fontSize: '2.5rem' }"></i>
+          [ngStyle]="{ fontSize: '1.5rem' }"></i>
         <span class="card-item-name">{{properties.nameCardItem}}</span>
         <span class="card-item-funder" *ngIf="properties.subtitleCardItem">{{properties.subtitleCardItem}}</span>
         <span class="card-item-costValue" *ngIf="properties.costAccountsValue">$ {{properties.costAccountsValue|shortNumber:language}}</span>
@@ -236,7 +236,7 @@
     <div class="card-item-content" [class.card-link]="properties.urlCard" [class.cardList]="displayModeCard === 'list'">
       <i [ngClass]="properties.iconSvg ? [ 'app-icon', properties.icon, 'grey-icon'] : [ 'icon-card', properties.icon, 'grey-icon' ]"
         [class.risk-red]="properties.iconColor === 'high'" [class.risk-orange]="properties.iconColor === 'medium'"
-        [class.risk-yellow]="properties.iconColor === 'low'" [ngStyle]="{ fontSize: '2.5rem' }"></i>
+        [class.risk-yellow]="properties.iconColor === 'low'" [ngStyle]="(displayModeCard === 'list') ? { fontSize: '1.5rem' } : { fontSize: '2.5rem' }"></i>
       <span class="card-item-name" [pTooltip]="properties.fullNameCardItem"
         tooltipPosition="bottom">{{properties.nameCardItem}}</span>
       <span class="card-item-subtitle" *ngIf="properties.subtitleCardItem"
@@ -324,7 +324,7 @@
           <i [ngClass]="properties.iconSvg ? [ 'app-icon', properties.icon, 'grey-icon'] : [ 'icon-card', properties.icon, 'grey-icon' ]"
             [class.risk-red]="properties.iconColor === 'high'" [class.risk-orange]="properties.iconColor === 'medium'"
             [class.linked]="!!properties.linked || !!properties.shared"
-            [class.risk-yellow]="properties.iconColor === 'low'" [ngStyle]="{ fontSize: '2.5rem' }"></i>
+            [class.risk-yellow]="properties.iconColor === 'low'" [ngStyle]="(displayModeCard === 'list') ? { fontSize: '1.5rem' } : { fontSize: '2.5rem' }"></i>
           <i [ngClass]="['app-icon', 'link-to', 'grey-icon', 'linked']" *ngIf="!!properties.linked"></i>
           <i [ngClass]="['app-icon', 'sharing', 'grey-icon', 'linked']"
             *ngIf="!!properties.shared && !properties.linked"></i>
@@ -353,7 +353,7 @@
           <i [ngClass]="properties.iconSvg ? [ 'app-icon', properties.icon, 'grey-icon'] : [ 'icon-card', properties.icon, 'grey-icon' ]"
             [class.risk-red]="properties.iconColor === 'high'" [class.risk-orange]="properties.iconColor === 'medium'"
             [class.linked]="!!properties.linked || !!properties.shared"
-            [class.risk-yellow]="properties.iconColor === 'low'" [ngStyle]="{ fontSize: '2.5rem' }"></i>
+            [class.risk-yellow]="properties.iconColor === 'low'" [ngStyle]="{ fontSize: '1.5rem' }"></i>
           <i [ngClass]="['app-icon', 'link-to', 'grey-icon', 'linked']" *ngIf="!!properties.linked"></i>
           <i [ngClass]="['app-icon', 'sharing', 'grey-icon', 'linked']"
             *ngIf="!!properties.shared && !properties.linked"></i>
@@ -388,7 +388,7 @@
         </div>
       </div>
     </div>
-    
+
   </p-card>
 
 </ng-container>

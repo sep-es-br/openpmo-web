@@ -91,3 +91,9 @@ $loadingBarHeight: .3rem;
     background: v.$borderDarkGrey;
   }
 }
+
+.footer-container {
+  position: sticky;
+  bottom: 0;
+  width: -webkit-fill-available;
+}

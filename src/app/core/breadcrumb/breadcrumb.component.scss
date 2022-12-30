@@ -1,29 +1,47 @@
 @use 'src/variables' as v;
 
+.admin {
+  border-color: #a7074b!important;
+}
+.management {
+  border-color: #023c55 !important
+}
 .app-breadcrumb {
   display: flex;
-  padding: 0 2em;
+  padding: 5px 20px 5px 20px;
+  background-color: white;
+  border-bottom: 1px;
+  border-top: 0;
+  border-left: 0;
+  border-right: 0;
+  border-style: solid;
+  flex-direction: column;
+
+  .labels {
+    font-size: 8px;
+    position: relative;
+    margin-top: 0px;
+    margin-bottom: 0px;
+    z-index: 550;
+  }
 
   .home {
     display: flex;
     flex-direction: column;
-    min-height: 70px;
-    padding: 1.2rem 0;
-    margin-top: -5px;
+    height: 50px;
     position: sticky;
-    top: 0;
-    left: 0;
-    background-color: #eaeae8;
+    max-width: 43px;
     z-index: 500;
     .name {
-      font-size: 12px;
+      font-size: 10px;
       font-family: v.$fontFamilyRegular;
       color: v.$fontBreadcrumbMobile;
       margin-left: 5px;
+      width: max-content;
     }
     i {
       cursor: pointer;
-      padding-top: 0.6rem;
+      margin-top: 0.3em!important;
     }
     &.adjust-padding {
       padding-bottom: 15px;
@@ -47,14 +65,15 @@
 
     i {
       color: v.$bgBreadcrumb;
-      margin: 0 .5rem;
+      margin: -5px 5px 0 0;
     }
 
     .crumb {
       display: flex;
       flex-direction: column;
       position: relative;
-      padding: 1.2rem 0;
+      margin-right: 0.3em;
+      margin-top: -10px;
       &.last-crumb {
         .link {
           cursor: auto;
@@ -77,10 +96,11 @@
         cursor: pointer;
         flex: 1;
         text-align: center;
+        font-size: 11px;
       }
       .info {
         max-width: 200px;
-        font-size: .8rem;
+        font-size: .6rem;
         white-space: nowrap;
         word-break: break-word;
         overflow: hidden;

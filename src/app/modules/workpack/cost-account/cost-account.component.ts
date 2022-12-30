@@ -382,8 +382,8 @@ export class CostAccountComponent implements OnInit {
   }
 
   mirrorToFullName(nameProperty) {
-    let fullName = this.sectionCostAccountProperties.find((p) => (p.name === 'fullName'));
-    if ((nameProperty.value !== null) && (this.oldName === fullName.value)) {
+    const fullName = this.sectionCostAccountProperties.find((p) => (p.name === 'fullName'));
+    if ((nameProperty?.value !== null) && (this.oldName === fullName?.value)) {
       this.sectionCostAccountProperties.forEach((prop) => {
         if (prop.name === 'fullName') {
           prop.value = nameProperty.value;

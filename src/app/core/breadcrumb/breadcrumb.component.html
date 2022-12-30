@@ -1,13 +1,19 @@
-<div class="app-breadcrumb" [class.mobile]="isMobileView" [class.fullscreen-mode-dashboard]="fullScreenModeDashboard">
-  <div class="crumbs" #crumbsEl>
+<div class="app-breadcrumb"
+    [class.mobile]="isMobileView"
+    [class.fullscreen-mode-dashboard]="fullScreenModeDashboard"
+    [class.admin]="isAdminMenu"
+    [class.management]="!isAdminMenu">
+  <div class="labels row">
+    <div class="name row" *ngIf="crumbOffice"> {{crumbOffice.info}}</div>
+    <div class="name row" *ngIf="crumbPlan"> {{crumbPlan.info}}</div>
+  </div>
+  <div class="crumbs row" #crumbsEl>
     <div class="home" [class.adjust-padding]="isOverflowing">
-      <span class="name" *ngIf="crumbOffice"> {{crumbOffice.info}}</span>
-      <span class="name" *ngIf="crumbPlan"> {{crumbPlan.info}}</span>
-      <i class="app-icon home" [ngStyle]="{ fontSize: isMobileView ? '1.5rem' : '2.5rem' }"
+      <i class="app-icon home" [ngStyle]="{ fontSize: isMobileView ? '1.5rem' : '1.7rem' }"
       (click)="handleNavigateBredcrumb()"></i>
     </div>
     <ng-container *ngFor="let crumb of crumbs; let i = index">
-      <i class="app-icon angle-right" [ngStyle]="{ fontSize: isMobileView ? '.65rem' : '.8rem' }"></i>
+      <i class="app-icon angle-right" [ngStyle]="{ fontSize: isMobileView ? '.45rem' : '.6rem' }"></i>
       <div class="crumb" [class.last-crumb]="i + 1 === crumbs.length">
         <div class="link" (click)="navigateTo(crumb, i)">{{ crumb.modelName ? crumb.modelName : (crumb.key | translate) }}</div>
         <div class="info" [pTooltip]="crumb.tooltip || crumb.info " *ngIf="(crumb.tooltip || crumb.info) && !isMobileView">

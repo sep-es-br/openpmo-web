@@ -245,7 +245,7 @@
     }
 
     .p-card-body .p-card-content .carditem-content {
-      padding: 2em;
+      padding: 0;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -255,7 +255,7 @@
         cursor: pointer;
       }
     }
-    
+
     .p-card-body .p-card-content .menu-model-container {
       padding: 0 2em;
       .menuNewModelContainer {
@@ -275,7 +275,7 @@
         display: none !important;
       }
     }
-    
+
   }
   &.cardList {
     .p-card {
@@ -316,5 +316,5 @@
       width: 100%;
     }
   }
-  
+
 }

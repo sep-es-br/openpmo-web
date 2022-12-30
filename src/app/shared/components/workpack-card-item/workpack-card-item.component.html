@@ -151,7 +151,7 @@
           [class.card-link]="properties.urlCard">
           <div class="icons-container">
             <i [ngClass]="properties.iconSvg ? [ 'app-icon', properties.icon, 'grey-icon'] : [ 'icon-card', properties.icon, 'grey-icon' ]"
-              [class.linked]="!!properties.linked || !!properties.shared" [ngStyle]="{ fontSize: '2rem' }"></i>
+              [class.linked]="!!properties.linked || !!properties.shared" [ngStyle]="{ fontSize: '1.5rem' }"></i>
             <i [ngClass]="['app-icon', 'link-to', 'grey-icon', 'linked']" *ngIf="!!properties.linked"></i>
             <i [ngClass]="['app-icon', 'sharing', 'grey-icon', 'linked']"
               *ngIf="!!properties.shared && !properties.linked"></i>
@@ -342,7 +342,7 @@
         <div class="left-side">
           <div class="icons-container-list">
             <i [ngClass]=" ['concluded', 'lateConcluded'].includes(properties.statusItem) ?  [ 'app-icon', 'flag-check', 'grey-icon'] : ['app-icon', 'flag-unchecked', 'grey-icon']"
-              [class.linked]="!!properties.linked || !!properties.shared" [ngStyle]="{ fontSize: '2rem' }"
+              [class.linked]="!!properties.linked || !!properties.shared" [ngStyle]="{ fontSize: '1.5rem' }"
               [class.on-time]="properties?.statusItem === 'ontime' && !properties?.canceled"
               [class.late]="properties?.statusItem === 'late' && !properties?.canceled"
               [class.concluded]="properties?.statusItem === 'concluded' && !properties?.canceled"

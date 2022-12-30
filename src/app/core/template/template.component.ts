@@ -16,6 +16,7 @@ export class TemplateComponent implements OnDestroy {
   isMenuFixed = false;
   $destroy = new Subject();
   fullScreenModeDashboard = false;
+  isAdminMenu = false;
 
   constructor(
     public responsiveSrv: ResponsiveService,
@@ -26,6 +27,10 @@ export class TemplateComponent implements OnDestroy {
       this.isMenuFixed = menuState.isFixed;
     });
     this.dashboardSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.fullScreenModeDashboard = value);
+  }
+
+  toggleMenu(isAdmin: boolean) {
+    this.isAdminMenu = isAdmin;
   }
 
   ngOnDestroy(): void {

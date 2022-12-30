@@ -43,9 +43,15 @@ $mobileMenuHeight: 90px;
       background-color: rgba(0, 0, 0, 0.1);
     }
   }
+
+  .offices {
+    color: #ffffff59!important;
+  }
+
   .app-icon {
     color: #ffffff;
   }
+
   &.admin-menu {
     background-color: v.$bgMenuAdmin;
     .item {
@@ -67,6 +73,7 @@ $mobileMenuHeight: 90px;
     .app-icon {
       color: v.$iconGrey;
     }
+
     &.admin-menu {
       .app-icon {
         color: v.$bgMenuAdmin;

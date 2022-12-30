@@ -1,6 +1,6 @@
 import { CookieService } from 'ngx-cookie';
 import { Location } from '@angular/common';
-import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { MenuItem } from 'primeng/api';
@@ -25,7 +25,7 @@ import * as moment from 'moment';
   styleUrls: ['./menu-fixed.component.scss'],
 })
 export class MenuFixedComponent implements OnInit, OnDestroy {
-
+  @Output() changeMenu = new EventEmitter<boolean>();
   @ViewChild('menuSliderOffices') menuOffices: ElementRef<HTMLDivElement>;
   @ViewChild('menuSliderPortfolio') menuPortfolio: ElementRef<HTMLDivElement>;
 
@@ -88,6 +88,7 @@ export class MenuFixedComponent implements OnInit, OnDestroy {
       .subscribe(() => this.handleChangeLanguage());
     this.menuSrv.isAdminMenu.pipe(takeUntil(this.$destroy)).subscribe(isAdminMenu => {
       this.isAdminMenu = isAdminMenu;
+      this.changeMenu.emit(this.isAdminMenu);
       if (!!this.isAdminMenu) {
         this.updateMenuOfficeOnAdminChange();
       } else {
@@ -112,6 +113,7 @@ export class MenuFixedComponent implements OnInit, OnDestroy {
     this.menuSrv.obsReloadMenuPlanModel().pipe(takeUntil(this.$destroy)).subscribe(() => !this.isFixed && this.loadPlanModelMenu());
     this.menuSrv.isAdminMenu.pipe(takeUntil(this.$destroy)).subscribe(isAdminMenu => {
       this.isAdminMenu = isAdminMenu;
+      this.changeMenu.emit(this.isAdminMenu);
       if (isAdminMenu) {
         this.getOfficePermission();
       }
@@ -151,6 +153,8 @@ export class MenuFixedComponent implements OnInit, OnDestroy {
     this.username = this.isUserAdmin
       ? 'Admin'
       : (this.currentUserInfo.name?.split(' ').shift() || payload.email);
+
+    this.changeMenu.emit(this.isAdminMenu);
   }
 
   handleChangeMenuMode() {
