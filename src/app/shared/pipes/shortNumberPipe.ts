@@ -12,11 +12,11 @@ export class ShortNumberPipe implements PipeTransform {
     const rounder = Math.pow(10, fractionSize);
     let key = '';
     const powers = [
-      { key: 'Q', value: Math.pow(10, 15) },
-      { key: 'T', value: Math.pow(10, 12) },
-      { key: 'B', value: Math.pow(10, 9) },
-      { key: 'M', value: Math.pow(10, 6) },
-      { key: (lang === 'pt' || lang === 'pt-BR') ? 'm' : 'k', value: 1000 }];
+      { key: 'Qtr', value: Math.pow(10, 15) },
+      { key: 'Tri', value: Math.pow(10, 12) },
+      { key: 'Bi', value: Math.pow(10, 9) },
+      { key: 'Mi', value: Math.pow(10, 6) },
+      { key: (lang === 'pt' || lang === 'pt-BR') ? 'mil' : 'k', value: 1000 }];
     for (let i = 0; i < powers.length; i++) {
       let reduced = abs / powers[i].value;
       reduced = Math.round((reduced * rounder)) / rounder;
