@@ -1,3 +1,4 @@
+import { HttpHeaders } from '@angular/common/http';
 import { Component, ElementRef, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { Route, Router } from '@angular/router';
@@ -13,6 +14,7 @@ import { ICard } from 'src/app/shared/interfaces/ICard';
 import { ITreeViewScopePlan, ITreeViewScopeWorkpack } from 'src/app/shared/interfaces/ITreeScopePersons';
 import { IWorkpack } from 'src/app/shared/interfaces/IWorkpack';
 import { IJournal } from 'src/app/shared/interfaces/Journal';
+import { AuthService } from 'src/app/shared/services/auth.service';
 import { JournalService } from 'src/app/shared/services/journal.service';
 import { OfficeService } from 'src/app/shared/services/office.service';
 import { ResponsiveService } from 'src/app/shared/services/responsive.service';
@@ -58,7 +60,8 @@ export class JournalViewComponent implements OnInit, OnDestroy {
     private translateSrv: TranslateService,
     private officeSrv: OfficeService,
     private journalSrv: JournalService,
-    private route: Router
+    private route: Router,
+    private authService: AuthService,
   ) {
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.responsive = value);
     this.calendarFormat = this.translateSrv.instant('dateFormat');
@@ -218,7 +221,16 @@ export class JournalViewComponent implements OnInit, OnDestroy {
   }
 
   handleDownload(dataurl: string, filename: string) {
-    fetch(dataurl)
+    const accessToken = this.authService.getAccessToken();
+    const header = {
+      method: 'GET',
+      headers: new Headers({
+          Authorization: 'Bearer ' + accessToken
+      })
+    };
+
+   // { headers: {Authorization: `Bearer ${accessToken}`} };
+    fetch(dataurl, header )
       .then(response => response.blob())
       .then(blob => {
         const link = document.createElement('a');
@@ -260,6 +272,14 @@ export class JournalViewComponent implements OnInit, OnDestroy {
     this.journalData = [];
   }
 
+  handleNewInformation() {
+    this.route.navigate(['workpack/journal'], {
+      queryParams: {
+        idWorkpack: this.idWorkpack
+      }
+    });
+  }
+
   private getFrom() {
     const from = this.formSearch.controls.from.value;
     if (from) {
@@ -274,14 +294,6 @@ export class JournalViewComponent implements OnInit, OnDestroy {
       return moment(to).format('DD/MM/YYYY');
     }
     return null;
-  }
-
-  handleNewInformation() {
-    this.route.navigate(['workpack/journal'], {
-      queryParams: {
-        idWorkpack: this.idWorkpack
-      }
-    })
   }
 
 }
