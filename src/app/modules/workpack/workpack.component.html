@@ -2,7 +2,7 @@
   <div class="header-container" [class.mobile]="responsive" *ngIf="idWorkpack">
     <div class="app-content-header" [class.mobile]="responsive">
       <span class="label">{{workpackModel.modelName}}:</span>
-      <span class="text">{{workpackName}}</span>
+      <span class="text">{{workpackFullName}}</span>
     </div>
     <app-config-data-view-panel (changeCollapsedExpand)="handleChangeCollapseExpandPanel($event)"
       (changeDisplayMode)="handleChangeDisplayMode($event)" (changePageSize)="handleChangePageSize($event)">

@@ -1,7 +1,7 @@
 <div class="app-plan">
   <div class="header-container" [class.mobile]="responsive">
     <div class="app-content-header" [class.mobile]="responsive">
-      <span *ngIf="idPlan"> <span class="label">{{ 'plan' | translate }}:</span> {{ planData?.name }}</span>
+      <span *ngIf="idPlan"> <span class="label">{{ 'plan' | translate }}:</span> {{ planData?.fullName }}</span>
       <span *ngIf="!idPlan">{{ 'newPlan' | translate }}</span>
     </div>
     <app-config-data-view-panel (changeCollapsedExpand)="handleChangeCollapseExpandPanel($event)"
