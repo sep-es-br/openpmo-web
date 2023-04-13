@@ -301,7 +301,7 @@ export class WorkpackComponent implements OnDestroy {
   mirrorToFullName(nameProperty: PropertyTemplateModel, fullNameProperty: PropertyTemplateModel) {
 
     const fullNameIndex = this.sectionPropertiesProperties.findIndex((p) => (p.name === 'fullName'));
-    if (fullNameProperty && fullNameIndex >= 0 && !fullNameProperty.dirty) {
+    if (isNaN(this.idWorkpack) && fullNameProperty && fullNameIndex >= 0 && !fullNameProperty.dirty) {
       this.sectionPropertiesProperties[fullNameIndex].value = nameProperty.value;
     }
   }

@@ -20,7 +20,8 @@
             <div class="p-field">
               <span class="p-float-label">
                 <textarea pInputTextarea formControlName="description" class="app-text-area"
-                          [rows]="1" id="float-description">
+                          [rows]="3" id="float-description"
+                          [ngModel]="(mirrorDescription()) ? formRisk.value.name : formRisk.value.description">
                 </textarea>
                 <label class="app-input-label" for="float-description">{{ "description" | translate }} *</label>
               </span>

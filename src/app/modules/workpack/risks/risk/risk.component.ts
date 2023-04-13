@@ -128,6 +128,10 @@ export class RiskComponent implements OnInit, OnDestroy {
     }
   }
 
+  mirrorDescription(): boolean {
+    return (isNaN(this.idRisk) && this.formRisk.get('description').pristine);
+  }
+
   async loadPropertiesRisk() {
     this.cardRiskProperties = {
       toggleable: false,

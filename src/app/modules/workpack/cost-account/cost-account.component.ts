@@ -383,7 +383,7 @@ export class CostAccountComponent implements OnInit {
 
   mirrorToFullName(nameProperty) {
     const fullName = this.sectionCostAccountProperties.find((p) => (p.name === 'fullName'));
-    if ((nameProperty?.value !== null) && (this.oldName === fullName?.value)) {
+    if (isNaN(this.idCostAccount) && (nameProperty?.value !== null) && (this.oldName === fullName?.value)) {
       this.sectionCostAccountProperties.forEach((prop) => {
         if (prop.name === 'fullName') {
           prop.value = nameProperty.value;
@@ -395,7 +395,7 @@ export class CostAccountComponent implements OnInit {
 
 
   checkProperties(property: PropertyTemplateModel) {
-    if (property.name = "name") {
+    if (property.name == 'name') {
       this.mirrorToFullName(property);
     }
     const arePropertiesRequiredValid: boolean = this.sectionCostAccountProperties

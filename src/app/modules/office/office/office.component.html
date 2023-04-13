@@ -1,7 +1,7 @@
 <div class="app-create-office">
   <div class="header-container" [class.mobile]="responsive">
     <div class="app-content-header" [class.mobile]="responsive">
-      <span *ngIf="idOffice">{{ propertiesOffice?.name }}</span>
+      <span *ngIf="idOffice">{{ propertiesOffice?.fullName }}</span>
       <span *ngIf="!idOffice">{{ 'new' | translate }} {{ 'office' | translate }}</span>
     </div>
     <app-config-data-view-panel (changeCollapsedExpand)="handleChangeCollapseExpandPanel($event)"
@@ -20,8 +20,8 @@
           </span>
           <app-input-message [form]="formOffice" field="name"></app-input-message>
           <span class="p-float-label margin-top">
-            <textarea pInputTextarea formControlName="fullName" class="app-text-area" rows="3" 
-              [ngModel]="(formOffice.touched) ? formOffice.value.fullName : formOffice.value.name">
+            <textarea pInputTextarea formControlName="fullName" class="app-text-area" rows="3"
+              [ngModel]="(mirrorFullName()) ? formOffice.value.name : formOffice.value.fullName">
               </textarea>
             <label for="float-input" class="app-input-label">{{'fullName' | translate}}<span
                 class="required-indicator">*</span></label>

@@ -11,7 +11,7 @@
           <div class="form-group-name-trigged-by">
             <div class="p-field">
               <span class="p-float-label">
-                <input class="app-input-text" id="float-name" formControlName="name" type="text" 
+                <input class="app-input-text" id="float-name" formControlName="name" type="text"
                   pInputText />
                 <label class="app-input-label" for="float-name">{{ "name" | translate }} * </label>
               </span>
@@ -20,7 +20,7 @@
             <div class="triggered-by-container" *ngIf="issue && issue.triggeredBy">
               <label class="label-triggered-by" for="float-triggeredBy">{{ "triggeredBy" | translate }}</label>
               <div class="triggered-by-name-container">
-                <i [ngClass]="[ 'app-icon', riskPropertiesOptions.status[issue?.triggeredBy?.status].icon, 
+                <i [ngClass]="[ 'app-icon', riskPropertiesOptions.status[issue?.triggeredBy?.status].icon,
                     riskPropertiesOptions.importance[issue?.triggeredBy?.importance].label]"></i>
                 <span class="risk-name">{{issue?.triggeredBy?.name}}</span>
               </div>
@@ -30,7 +30,8 @@
           <div class="p-fluid">
             <div class="p-field">
               <span class="p-float-label">
-                <textarea pInputTextarea inputId="float-description" formControlName="description" class="app-text-area" [rows]="1">
+                <textarea pInputTextarea inputId="float-description" formControlName="description" class="app-text-area"
+                  [rows]="3" [ngModel]="(mirrorDescription()) ? formIssue.value.name : formIssue.value.description">
                 </textarea>
                 <label class="app-input-label" for="float-description">{{ "description" | translate }} * </label>
               </span>
@@ -66,7 +67,7 @@
             </div>
           </div>
         </form>
-      </div>    
+      </div>
     </app-card>
   </div>
   <section>

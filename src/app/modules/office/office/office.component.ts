@@ -72,7 +72,7 @@ export class OfficeComponent implements OnDestroy {
     private menuSrv: MenuService,
     private filterSrv: FilterDataviewService,
   ) {
-    this.activeRoute.queryParams.subscribe(async ({ id }) => {
+    this.activeRoute.queryParams.subscribe(async({ id }) => {
       this.idOffice = +id;
       this.editPermission = await this.officePermissionSrv.getPermissions(this.idOffice);
       await this.load();
@@ -139,6 +139,10 @@ export class OfficeComponent implements OnDestroy {
       collapseble: true,
       initialStateCollapse: this.collapsePanelsStatus
     };
+  }
+
+  mirrorFullName(): boolean {
+    return (isNaN(this.idOffice) && this.formOffice.get('fullName').pristine);
   }
 
   async loadPropertiesOffice() {

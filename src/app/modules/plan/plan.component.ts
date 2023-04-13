@@ -205,6 +205,10 @@ export class PlanComponent implements OnInit, OnDestroy {
     await this.loadPropertiesPlan();
   }
 
+  mirrorFullName(): boolean {
+    return (isNaN(this.idPlan) && this.formPlan.controls.fullName.pristine);
+  }
+
   async loadPropertiesPlan() {
     this.cardPlanProperties = {
       toggleable: false,
@@ -391,7 +395,8 @@ export class PlanComponent implements OnInit, OnDestroy {
               disabled: !this.editPermission
             });
           }
-          if (!workpack.canceled && workpack.type === 'Deliverable' && (!workpack.endManagementDate || workpack.endManagementDate === null) && !workpack.linked) {
+          if (!workpack.canceled && workpack.type === 'Deliverable' &&
+          (!workpack.endManagementDate || workpack.endManagementDate === null) && !workpack.linked) {
             menuItems.push({
               label: this.translateSrv.instant('endManagement'),
               icon: 'far fa-stop-circle',
@@ -399,7 +404,8 @@ export class PlanComponent implements OnInit, OnDestroy {
               disabled: !this.editPermission
             });
           }
-          if (!workpack.canceled && workpack.type === 'Deliverable' && (!!workpack.endManagementDate && workpack.endManagementDate !== null) && !workpack.linked) {
+          if (!workpack.canceled && workpack.type === 'Deliverable' &&
+          (!!workpack.endManagementDate && workpack.endManagementDate !== null) && !workpack.linked) {
             menuItems.push({
               label: this.translateSrv.instant('resumeManagement'),
               icon: 'far fa-play-circle',
@@ -467,8 +473,12 @@ export class PlanComponent implements OnInit, OnDestroy {
           itemId: workpack.id,
           menuItems,
           urlCard: '/workpack',
-          paramsUrlCard: workpack.linked ?  [{ name: 'idPlan', value: this.idPlan }, { name: 'idWorkpackModelLinked', value: workpack.linkedModel }] :
-            [{ name: 'idPlan', value: this.idPlan }],
+          paramsUrlCard: workpack.linked
+            ? [ { name: 'idPlan', value: this.idPlan },
+                { name: 'idWorkpackModelLinked', value: workpack.linkedModel }
+              ]
+            : [ { name: 'idPlan', value: this.idPlan }
+              ],
           linked: !!workpack.linked ? true : false,
           shared: workpack.sharedWith && workpack.sharedWith.length > 0 ? true : false,
           canceled: workpack.canceled,

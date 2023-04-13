@@ -107,6 +107,10 @@ export class IssueComponent implements OnInit {
     this.formIssue.controls.triggeredBy.setValue(this.issue.triggeredBy);
   }
 
+  mirrorDescription(): boolean {
+    return (isNaN(this.idIssue) && this.formIssue.get('description').pristine);
+  }
+
   async loadPropertiesIssue() {
     this.cardIssueProperties = {
       toggleable: false,
