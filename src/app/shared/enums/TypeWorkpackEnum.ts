@@ -6,3 +6,13 @@ export enum TypeWorkpackEnum {
   ProjectModel = 'Project',
   MilestoneModel = 'Milestone'
 }
+
+
+export enum TypeWorkpackEnumWBS {
+  Portfolio = 'Portfolio',
+  Program = 'Program',
+  Organizer = 'Organizer',
+  Deliverable = 'Deliverable',
+  Project = 'Project',
+  Milestone = 'Milestone'
+}

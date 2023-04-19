@@ -1,11 +1,44 @@
-<span class="p-float-label" [class.workpack-date-mobile]="responsive" [class.workpack-date]="property.fullLine"
-  [class.workpack-date-not-fullLine]="!property.fullLine">
-  <p-calendar [id]="property.name" [(ngModel)]="property.value" class="app-select-date" showIcon="true"
-    icon="fas fa-calendar-alt" [dateFormat]="calendarFormat" [defaultDate]="defaultValue" [monthNavigator]="true"
-    [yearNavigator]="true" [yearRange]="yearRange" [required]="property.required" [minDate]="dateMin" [maxDate]="dateMax"
-    [disabled]="property.disabled" [class.ng-invalid]="property.invalid" (ngModelChange)="changed.emit($event)"
-    (onBlur)="changed.emit($event)"
-    >
-  </p-calendar>
-  <label class="app-input-label" [for]="property.name">{{ property.label}} {{ property.required ? '*' : ''}}</label>
-</span>
+<ng-container *ngIf="!property?.milestoneData; else milestoneDateContainer"
+  [ngTemplateOutlet]="dateContainer">
+</ng-container>
+
+<ng-template #dateContainer>
+  <div class="container-date-reasons">
+    <span class="p-float-label" [class.workpack-date-mobile]="responsive" [class.workpack-date]="property.fullLine"
+      [class.workpack-date-not-fullLine]="!property.fullLine">
+      <p-calendar [id]="property.name" [(ngModel)]="property.value" class="app-select-date" [showIcon]="true"
+        icon="fas fa-calendar-alt" [dateFormat]="calendarFormat" [defaultDate]="defaultValue" [monthNavigator]="true"
+        [yearNavigator]="true" [yearRange]="yearRange" [required]="property.required" [minDate]="dateMin" [maxDate]="dateMax"
+        [disabled]="property.disabled" [class.ng-invalid]="property.invalid" (ngModelChange)="changeDateValue($event)"
+        (onBlur)="changeDateValue($event)"
+        >
+      </p-calendar>
+      <label class="app-input-label" [for]="property.name">{{ property.label}} {{ property.required ? '*' : ''}}</label>
+    </span>
+
+    <span class="p-float-label" *ngIf="showReason" [class.workpack-date-mobile]="responsive" [class.workpack-date]="property.fullLine"
+      [class.workpack-date-not-fullLine]="!property.fullLine">
+      <textarea pInputTextarea id="justification" class="app-text-area" [(ngModel)]="property.reason"
+        [disabled]="property.disabled" [required]="true">
+      </textarea>
+      <label class="app-input-label" for="justification">{{ 'justification' | translate }} * </label>
+    </span>
+  </div>
+</ng-template>
+
+<ng-template #milestoneDateContainer>
+  <div class="date-container">
+    <ng-container [ngTemplateOutlet]="dateContainer"></ng-container>
+    <span class="milestone-date-delay"
+      *ngIf="property?.milestoneData?.delayInDays && property?.milestoneData?.delayInDays !== 0"
+      [class.ontime]="property?.milestoneData?.delayInDays < 0"
+      [class.late]="property?.milestoneData?.delayInDays > 0">
+      {{property?.milestoneData?.delayInDays > 0 ? '+' : ''}}{{ property?.milestoneData?.delayInDays }} {{ 'days' | translate }}
+  </span>
+  <div class="milestone-date-container"
+    *ngIf="property?.milestoneData && !!property?.milestoneData?.baselineDate">
+    <span class="milestone-date-label">Linha de Base</span>
+    <span class="milestone-date-baseline">{{property?.milestoneData?.baselineDate | date: 'dd/MM/yyyy'}}</span>
+  </div>
+  </div>
+</ng-template>

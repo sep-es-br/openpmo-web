@@ -28,4 +28,5 @@ export interface IScheduleStepCardItem {
   idStep?: number;
   urlCard?: string;
   urlParams?: {name: string; value: string | number}[];
+  editCosts?: boolean; // only screen
 }

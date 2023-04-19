@@ -6,8 +6,9 @@ import { ICardItem } from './ICardItem';
 export interface ICard {
   totalRecords?: number;
   collapseble: boolean;
-  initialStateCollapse: boolean;
+  initialStateCollapse?: boolean;
   cardTitle?: string;
+  tabTitle?: string;
   toggleable: boolean;
   toggleLabel?: string;
   initialStateToggle: boolean;
@@ -30,6 +31,7 @@ export interface ICard {
   fullScreen?: boolean;
   workpackType?: string;
   workpackCanceled?: boolean;
+  isLoading?: boolean;
 }
 
 export interface progressBarValue {
@@ -39,10 +41,11 @@ export interface progressBarValue {
   labelProgress?: string;
   valueUnit: string;
   color: string;
-  barHeight: number;
+  barHeight?: number;
   baselinePlanned?: number;
   startDateBaseline?: Date;
   endDateBaseline?: Date;
   startDateTotal?: Date;
   endDateTotal?: Date;
+  type?: string;
 }

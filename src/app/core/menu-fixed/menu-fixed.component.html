@@ -29,6 +29,11 @@
       <div class="item-label" *ngIf="isMobileView" [routerLink]="['/plan']" [queryParams]="{id: currentPlan?.id}">{{
         currentPlan?.name }}</div>
     </div>
+    <div class="item" (click)="toggleMenu('favorite')"
+        *ngIf="itemsFavorites?.length > 0 && !!currentIDOffice && !!currentIDPlan && isPlanMenu"
+        [pTooltip]="'myFavorites' | translate">
+      <i class="far fa-star" [ngStyle]="{ fontSize: '2.25rem' }"></i>
+    </div>
     <div class="item" *ngIf="currentUserInfo?.isCcbMember" [routerLink]="['/ccbmember-baselines-view']"
       [pTooltip]="'changeControlBoard' | translate">
       <i class="app-icon ccb-view" [ngStyle]="{ fontSize: '1.87rem' }"></i>
@@ -45,6 +50,11 @@
       <div class="item" (click)="toggleMenu('planModel')">
         <i class="app-icon plan-model" [ngStyle]="{ fontSize: '2.25rem' }"></i>
         <div class="item-label" *ngIf="isMobileView">{{ 'planModels' | translate }}</div>
+      </div>
+      <div class="item" (click)="toggleMenu('favorite')"
+        *ngIf="itemsFavorites?.length > 0 && !!currentIDOffice && !!currentIDPlan && isPlanMenu"
+        [pTooltip]="'myFavorites' | translate">
+        <i class="far fa-star" [ngStyle]="{ fontSize: '2.25rem' }"></i>
       </div>
       <div class="item" (click)="toggleMenu('more')">
         <i class="app-icon ellipsis-v" [ngStyle]="{ fontSize: '2.25rem' }"></i>
@@ -103,6 +113,64 @@
       </div>
     </ng-template>
   </div>
+  <div class="app-menu-slide-fixed" *ngIf="menus[3].isOpen" [class.open]="isMenuOpen('favorite')" [class.mobile]="isMobileView"
+    [class.changing]="isChangingView">
+    <ng-container *ngIf="isMobileView; else sliderFavorites">
+      <div class="top-bar">
+        <div class="title" (click)="closeAllMenus()">{{ (isAdminMenu ? 'favorites' : 'myFavorites') | translate }}
+        </div>
+      </div>
+      <!-- Custom Panel Menu -->
+      <div class="f-panelmenu">
+        <div class="f-panelmenu-item" [class]="item.styleClass" *ngFor="let item of itemsFavorites">
+          <div class="f-panelmenu-container" (click)="handleNavigateFavorite(item)">
+            <div class="f-panelmenu-icon">
+              <i [class]="item.icon"></i>
+            </div>
+            <div class="f-panelmenu-label">
+              <span>{{item.label}}</span>
+            </div>
+          </div>
+          <div class="f-panelmenu-trash">
+            <i class="fas fa-trash-alt" (click)="handleRemoveFavorite(item.id)"
+              [pTooltip]="'removeFavorite' | translate"></i>
+          </div>
+        </div>
+      </div>
+      <div class="action-mobile">
+        <i class="app-icon angle-down" [ngStyle]="{ fontSize: '1rem' }" (click)="closeAllMenus()"></i>
+      </div>
+    </ng-container>
+    <ng-template #sliderFavorites>
+      <div class="slide-wrapper">
+        <div class="top-bar">
+          <div class="title" (click)="closeAllMenus()">{{ (isAdminMenu ? 'favorites' : 'myFavorites') | translate
+            }}</div>
+          <div class="action" *ngIf="!isMobileView">
+            <i [class]="isFixed ? 'app-icon pin-on' : 'app-icon pin-off'" [ngStyle]="{ fontSize: '1rem' }"
+              (click)="handleChangeMenuMode()"></i>
+          </div>
+        </div>
+        <!-- Custom Panel Menu -->
+        <div class="f-panelmenu">
+          <div class="f-panelmenu-item" [class]="item.styleClass" *ngFor="let item of itemsFavorites">
+            <div class="f-panelmenu-container" (click)="handleNavigateFavorite(item)">
+              <div class="f-panelmenu-icon">
+                <i [class]="item.icon"></i>
+              </div>
+              <div class="f-panelmenu-label">
+                <span>{{item.label}}</span>
+              </div>
+            </div>
+            <div class="f-panelmenu-trash">
+              <i class="fas fa-trash-alt" (click)="handleRemoveFavorite(item.id)"
+                [pTooltip]="'removeFavorite' | translate"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+  </ng-template>
+  </div>
 
   <div class="app-menu-slide-fixed" #menuSliderPortfolio *ngIf="menus[1].isOpen">
     <ng-container *ngIf="isMobileView; else sliderPortfolio">
@@ -159,7 +227,7 @@
       </div>
     </ng-template>
   </div>
-
+  <p-confirmDialog [style]="{width: '50vw'}" [baseZIndex]="10000" rejectButtonStyleClass="p-button-text"></p-confirmDialog>
 
 
 

@@ -10,7 +10,7 @@ import { PropertyTemplateModel } from 'src/app/shared/models/PropertyTemplateMod
 export class PropertyToggleComponent implements OnInit {
 
   @Input() property: IFilterProperty;
-  @Input() value: boolean;
+  @Input() value;
   @Output() changed = new EventEmitter();
 
   constructor() { }

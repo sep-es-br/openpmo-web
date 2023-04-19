@@ -1,4 +1,8 @@
 ::ng-deep .app-journal-view {
+  .loading-container {
+    position: relative;
+    min-height: 150px;
+  }
   form.filters {
     display: flex;
     & > * {
@@ -156,5 +160,18 @@
     button {
       margin-right: 1rem;
     }
+  }
+
+  @media screen and (max-width: 900px) {
+   form.filters {
+      flex-direction: column;
+      & > * {
+        margin-right: 0;
+        margin-bottom: 1.6rem;
+      }
+      .property-input {
+        width: 100%;
+      }
+   }
   }
 }

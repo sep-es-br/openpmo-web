@@ -87,8 +87,9 @@ const routes: Routes = [
   {
     path: 'ccbmember-baselines-view',
     canActivate: [ AuthGuard ],
-    loadChildren: () => import('./modules/ccbmember-baselines-view/ccbmember-baselines-view.module').then(m => m.CCBMemberBaselinesViewModule)
-  },
+    loadChildren: () => import('./modules/ccbmember-baselines-view/ccbmember-baselines-view.module')
+      .then(m => m.CCBMemberBaselinesViewModule)
+  }
 ];
 
 @NgModule({

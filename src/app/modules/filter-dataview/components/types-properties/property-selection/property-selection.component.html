@@ -2,6 +2,7 @@
   <ng-container *ngIf="property?.multipleSelection; else singleSelection">
     <span class="p-float-label">
       <p-multiSelect class="app-multiple-selection" dropdownIcon="fas fa-caret-down" [options]="property.possibleValues"
+        [selectedItemsLabel]="language === 'pt-BR' ? '{0} itens selecionados' : '{0} items selected'"
         [(ngModel)]="value" [id]="property.name" optionLabel="label" optionValue="value"
         (onChange)="handleChangedValue()"></p-multiSelect>
       <label class="app-input-label" for="float-label">{{'value'| translate}}</label>

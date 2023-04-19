@@ -1,0 +1,109 @@
+.app-tabview-scrolled {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  background-color: transparent;
+  border-radius: 4px;
+  min-height: 200px;
+  padding: .5rem 1rem;
+
+  .wrapper {
+    position: relative;
+  }
+  .app-tabview-scrolled-header {
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-behavior: smooth;
+    -ms-scroll-chaining: contain auto;
+    overscroll-behavior: contain auto;
+    width: 100%;
+    height: fit-content;
+    &::-webkit-scrollbar {
+      display: none;
+    }
+
+    .app-tabview-scrolled-nav-content {
+      display: flex;
+      margin: 0;
+      padding: 0;
+      list-style-type: none;
+      background: transparent;
+      border: 1px solid #dee2e6;
+      border-width: 0 0 3px 0;
+      border-radius: 4px 4px 0 0;
+      .app-tabview-scrolled-header-item {
+        display: inline-block;
+        padding: 1rem 0;
+        color: #6c757d;
+        cursor: pointer;
+        white-space: nowrap;
+        transition: all 0.2s ease-in-out;
+
+        .header-link {
+          border: solid #dee2e6;
+          border-width: 0 0 3px 0;
+          border-color: transparent transparent #dee2e6 transparent;
+          color: #6c757d;
+          padding: 1rem;
+          font-weight: 400;
+          border-top-right-radius: 3px;
+          border-top-left-radius: 3px;
+          transition: box-shadow 0.2s;
+
+          &:hover {
+            border-color: #6c757d;
+          }
+          &.active {
+            color: #135460;
+            font-weight: bold;
+            border-color: #135460;
+          }
+        }
+      }
+    }
+  }
+
+  .button-scroll {
+    position: absolute;
+    top: 8px;
+    height: 2.9rem;
+    width: 2rem;
+    z-index: 1;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    border: none;
+    background: none;
+    outline: none;
+    transition: all .3s;
+    color: #135460;
+    background-color: #EAEAE8;
+
+    i {
+      font-size: 1.2rem;
+    }
+
+
+    &.nav-scroll-right {
+      right: 0;
+      box-shadow: -4px 0 5px -4px rgba(0, 0, 0, 0.2);
+    }
+
+    &.nav-scroll-left {
+      left: 0;
+      box-shadow: 4px 0 5px -4px rgba(0, 0, 0, 0.2);
+    }
+  }
+
+
+
+  .hidden {
+    display: none;
+  }
+
+  .app-tabview-scrolled-container {
+    width: 100%;
+    padding: 0;
+    background-color: transparent;
+    border-top: 0;
+  }
+}

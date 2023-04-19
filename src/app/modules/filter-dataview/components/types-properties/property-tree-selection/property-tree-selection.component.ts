@@ -3,7 +3,6 @@ import { IFilterProperty } from 'src/app/shared/interfaces/IFilterProperty';
 import { takeUntil } from 'rxjs/operators';
 import { TranslateService } from '@ngx-translate/core';
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, SimpleChanges } from '@angular/core';
-import { PropertyTemplateModel } from 'src/app/shared/models/PropertyTemplateModel';
 import { ResponsiveService } from 'src/app/shared/services/responsive.service';
 import { Subject } from 'rxjs';
 
@@ -15,7 +14,7 @@ import { Subject } from 'rxjs';
 export class PropertyTreeSelectionComponent implements OnInit, OnDestroy {
 
   @Input() property: IFilterProperty;
-  @Input() value: TreeNode | TreeNode[];
+  @Input() value;
   @Output() changed = new EventEmitter();
   responsive: boolean;
   $destroy = new Subject();

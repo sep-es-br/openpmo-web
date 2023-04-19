@@ -2,25 +2,18 @@
   [class.workpack-input-number]="property.fullLine" [class.workpack-input-number-not-fullLine]="!property.fullLine">
   <ng-container [ngSwitch]="property.type">
     <p-inputNumber *ngSwitchCase="type.IntegerModel" class="app-input-number" [class.ng-invalid]="property.invalid"
-      [id]="property.name" name="name" [(ngModel)]="property.value" [required]="property.required" [min]="property.min"
+      [id]="property.name" [(ngModel)]="property.value" [required]="property.required" [min]="property.min"
       [max]="property.max" (ngModelChange)="changed.emit($event)" [disabled]="property.disabled" [locale]="language"
       (onBlur)="changed.emit($event)">
     </p-inputNumber>
-    <!-- <p-inputNumber *ngSwitchCase="type.NumberModel" class="app-input-number" [class.ng-invalid]="property.invalid"
-      [id]="property.name" name="name" [(ngModel)]="property.value" [required]="property.required" mode="decimal"
-      [min]="property.min" [max]="property.max" [minFractionDigits]="1"
-      [maxFractionDigits]="5" (ngModelChange)="changed.emit($event)"
-      (onBlur)="changed.emit($event)" [disabled]="property.disabled">
-    </p-inputNumber> -->
     <app-input-unit-measure *ngSwitchCase="type.NumberModel" class="app-input-number" [id]="property.name"
-      [required]="property.required" [min]="property.min" [max]="property.max" [(model)]="property.value"
-      (onBlur)="changed.emit($event)"  (modelChange)="changed.emit($event)"></app-input-unit-measure>
+      [(model)]="property.value"
+      (onBlur)="changed.emit($event)" (modelChange)="changed.emit($event)"></app-input-unit-measure>
     <p-inputNumber *ngSwitchCase="type.CurrencyModel" class="app-input-number" [class.ng-invalid]="property.invalid"
-      [id]="property.name" name="name" [(ngModel)]="property.value" [required]="property.required" mode="decimal"
-      [minFractionDigits]="2" [maxFractionDigits]="2" (ngModelChange)="changed.emit($event)"  [locale]="language"
+      [id]="property.name" [(ngModel)]="property.value" [required]="property.required" mode="decimal"
+      [minFractionDigits]="2" [maxFractionDigits]="2" (ngModelChange)="changed.emit($event)" [locale]="language"
       (onBlur)="changed.emit($event)" [disabled]="property.disabled">
     </p-inputNumber>
   </ng-container>
   <label class="app-input-label" [for]="property.name">{{property.label}} {{ property.required ? '*' : ''}}</label>
 </span>
-

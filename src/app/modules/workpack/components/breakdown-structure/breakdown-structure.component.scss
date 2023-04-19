@@ -1,0 +1,280 @@
+@use "src/variables" as v;
+
+
+::ng-deep .app-wbs {
+  min-height: 200px;
+  .p-overlaypanel, .p-overlaypanel-content {
+    min-width: 300px;
+  }
+  .p-tree .p-tree-container .p-treenode .p-treenode-content:focus,
+  .p-tree .p-tree-container .p-treenode .p-treenode-content .p-tree-toggler:focus {
+    outline: 0 none;
+    outline-offset: 0;
+    box-shadow: none !important;
+  }
+
+  .container-custom-tree {
+    padding: 1rem;
+  }
+  .custom-padding {
+    padding: .5rem 1rem !important;
+  }
+  .container-workpackmodel {
+    background-color: #f8f9fb;
+    display: flex;
+    justify-content: space-between;
+
+    .tree-label {
+      font-weight: 700;
+      text-transform: uppercase;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .container-milestone {
+      color: #333;
+      display: flex;
+      text-align: center;
+      .milestone-column {
+        width: 120px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        margin-right: .5rem;
+      }
+    }
+  }
+
+  .container-workpack {
+    display: flex;
+    justify-content: space-between;
+
+    .tree-label {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .container-properties {
+      &.deliverable {
+        width: 60%;
+      }
+      .header-values-cost-account {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: flex-end;
+        width: 100%;
+        color: v.$fontTitle;
+        font-family: v.$fontFamilyMedium;
+        font-size: 1rem;
+        text-transform: uppercase;
+        padding-right: 2em;
+        .progress-bar-cost-container {
+          margin-right: 10px;
+          margin-left: 10px;
+          width: 100%;
+        }
+      }
+      .header-values-cost-account.responsive {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        padding-right: 0;
+      }
+      .container-milestone {
+        color: #333;
+        display: flex;
+        text-align: center;
+        .milestone-column {
+          width: 120px;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          margin-right: .5rem;
+          .icons-container {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            .linked {
+              margin-left: 0.5em;
+            }
+            .on-time {
+              color: #44B39B;
+            }
+            .late {
+              color: #EA5C5C;
+            }
+            .concluded {
+              color: #0083BB;
+            }
+            .late-concluded {
+              color: #806AAD;
+            }
+          }
+          .icon-card {
+            font-size: 2rem;
+            color: #888e96;
+          }
+          .icon-new {
+            font-size: 3rem;
+            color: rgba(147, 147, 147, 0.5);
+          }
+        }
+      }
+
+      .right-container {
+        display: flex;
+        flex-direction: row;
+        height: 100%;
+        .dashboard-items-container {
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          justify-content: space-between;
+          width: 90%;
+          height: 100%;
+          .status-container {
+            width: 25%;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+          }
+          .status-empty {
+            width: 18%;
+          }
+          .milestones-progressbar {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            width: 165px;
+            border-radius: 12px;
+            overflow: hidden;
+            background-color: #fff;
+            .ontime {
+                height: 12px;
+                background-color: #44B39B;
+            }
+            .late {
+                height: 12px;
+                background-color: #EA5C5C;
+            }
+            .concluded {
+                height: 12px;
+                background-color: #0083BB;
+            }
+            .concluded-late {
+              height: 12px;
+              background-color: #7C75B9;
+            }
+          }
+          .indexes {
+              display: flex;
+              flex-direction: row;
+              align-items: center;
+              justify-content: center;
+              width: 25%;
+              margin: 0 .4rem;
+            .index {
+                font-size: 12px;
+                font-weight: bold;
+                padding: 5px 1em 5px 0;
+                &:first-of-type {
+                  margin-left: 1rem;
+                }
+            }
+          }
+          .triple-constraint-container {
+            display: flex;
+            width: 100px;
+            justify-content: space-between;
+          }
+        }
+        .menu-and-id-container {
+          display: flex;
+          flex-direction: column;
+          width: 10%;
+          height: 100%;
+          justify-content: space-between;
+        }
+        .risk-red {
+          color: #C0504D;
+        }
+        .risk-orange {
+          color: #ED7D31;
+        }
+        .risk-yellow {
+          color: #FFC000;
+        }
+        .risk-overlay-panel {
+          .p-overlaypanel {
+            max-width: 200px;
+          }
+        }
+        .risk-panel-content {
+            display: flex;
+            flex-direction: column;
+            .title {
+              display: flex;
+              flex-direction: row;
+              align-items: center;
+              margin-bottom: 0.5em;
+              .total {
+                font-weight: bold;
+                font-size: 1.5rem;
+                margin-right: 5px;
+              }
+              .text {
+                font-size: 1rem;
+              }
+            }
+            .risks-container {
+              display: flex;
+              flex-direction: column;
+              .risk-importance-item {
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                padding: 5px 0;
+                i {
+                  margin-right: 0.5em;
+                }
+                span {
+                  margin-right: 5px;
+                }
+              }
+            }
+        }
+
+        .milestones-overlay-panel {
+          .chartjs-render-monitor {
+            width: 200px !important;
+            height: 193px !important;
+          }
+        }
+      }
+    }
+  }
+
+
+  .p-tree {
+
+    .p-treenode .p-treenode-content {
+      padding: 0;
+    }
+    .p-treenode-label {
+      width: 100%;
+    }
+  }
+}
+
+.app-wbs-loading {
+  position: relative;
+  min-height: 150px;
+}
+
+

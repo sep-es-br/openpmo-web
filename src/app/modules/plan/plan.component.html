@@ -4,13 +4,15 @@
       <span *ngIf="idPlan"> <span class="label">{{ 'plan' | translate }}:</span> {{ planData?.fullName }}</span>
       <span *ngIf="!idPlan">{{ 'newPlan' | translate }}</span>
     </div>
-    <app-config-data-view-panel (changeCollapsedExpand)="handleChangeCollapseExpandPanel($event)"
-      (changeDisplayMode)="handleChangeDisplayMode($event)" (changePageSize)="handleChangePageSize($event)">
+    <app-config-data-view-panel>
     </app-config-data-view-panel>
   </div>
   <div class="card-properties-plan">
     <app-card [properties]="cardPlanProperties" class="mt-0 inputs-float-label">
-      <div class="p-grid">
+      <div class="loading-container" *ngIf="cardPlanProperties.isLoading">
+        <app-card-loading [isCardLoading]="cardPlanProperties.isLoading"></app-card-loading>
+      </div>
+      <div class="p-grid" *ngIf="!cardPlanProperties.isLoading">
         <form [formGroup]="formPlan">
           <div class="p-fluid">
             <div class="p-field">
@@ -24,7 +26,7 @@
             <div class="p-field">
               <span class="p-float-label">
                 <textarea pInputTextarea id="float-fullName" formControlName="fullName" class="app-text-area" rows="3"
-                [ngModel]="(mirrorFullName()) ? formPlan.value.name : formPlan.value.fullName">
+                  [ngModel]="(mirrorFullName()) ? formPlan.value.name : formPlan.value.fullName">
                 </textarea>
                 <label class="app-input-label" for="float-fullName">{{ "fullName" | translate }} * </label>
               </span>
@@ -34,7 +36,7 @@
           <div class="p-formgroup-inline">
             <div class="p-field" [class.responsive]="responsive">
               <span class="p-float-label" [class.responsive]="responsive">
-                <p-calendar id="float-start" formControlName="start" class="app-select-date" showIcon="true"
+                <p-calendar id="float-start" formControlName="start" class="app-select-date" [showIcon]="true"
                   [monthNavigator]="true" [yearNavigator]="true" [yearRange]="yearRange" [class.responsive]="responsive"
                   icon="fas fa-calendar-alt" [dateFormat]="calendarFormat">
                 </p-calendar>
@@ -44,7 +46,7 @@
             </div>
             <div class="p-field" [class.responsive]="responsive">
               <span class="p-float-label" [class.responsive]="responsive">
-                <p-calendar id="float-finish" formControlName="finish" class="app-select-date" showIcon="true"
+                <p-calendar id="float-finish" formControlName="finish" class="app-select-date" [showIcon]="true"
                   [monthNavigator]="true" [yearNavigator]="true" [yearRange]="yearRange" [class.responsive]="responsive"
                   icon="fas fa-calendar-alt" [dateFormat]="calendarFormat">
                 </p-calendar>
@@ -61,13 +63,19 @@
 
   <section *ngIf="idPlan" class="workpackModels-cards-section">
     <div class="card-workpack-model" *ngFor="let workpackModel of cardsPlanWorkPackModels; let i = index">
-      <app-card [properties]="workpackModel.propertiesCard" *ngIf="workpackModel.workpackItemCardList?.length > 0"
-        (editFilter)="handleEditFilter($event, workpackModel.idWorkpackModel)" (newFilter)="handleNewFilter(workpackModel.idWorkpackModel)"
-        (selectedFilter)="handleSelectedFilter($event, workpackModel.idWorkpackModel)" (createNewElement)="handleCreateNewWorkpack(workpackModel.idWorkpackModel)">
+      <app-card [properties]="workpackModel.propertiesCard"
+        (editFilter)="handleEditFilter($event, workpackModel.idWorkpackModel)"
+        (newFilter)="handleNewFilter(workpackModel.idWorkpackModel)"
+        (selectedFilter)="handleSelectedFilter($event, workpackModel.idWorkpackModel)"
+        (createNewElement)="handleCreateNewWorkpack(workpackModel.idWorkpackModel)">
+        <div class="loading-container" *ngIf="workpackModel.propertiesCard.isLoading">
+          <app-card-loading [isCardLoading]="workpackModel.propertiesCard.isLoading"></app-card-loading>
+        </div>
         <p-dataView [value]="workpackModel.workpackItemCardList" layout="grid" class="app-dataview"
-          *ngIf="displayModeAll === 'grid' || (displayModeAll === 'list' && !!responsive)" [paginator]="true" [rows]="pageSize" [showJumpToPageDropdown]="true"
-          [showPageLinks]="false" [totalRecords]="totalRecords ? totalRecords[i] : 1"
-          [emptyMessage]="'loadingEllipsis' | translate">
+          *ngIf="(displayModeAll === 'grid' || (displayModeAll === 'list' && !!responsive)) && !workpackModel.propertiesCard.isLoading"
+          [paginator]="true" [rows]="pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false"
+          [totalRecords]="totalRecords ? totalRecords[i] : 1"
+          [emptyMessage]="'notFoundWorkpacksToThisModel' | translate">
           <ng-template let-cardItem pTemplate="gridItem">
             <div class="p-col-12 p-md-3 p-sm-12 card-item-container">
               <app-workpack-card-item [properties]="cardItem"></app-workpack-card-item>
@@ -75,12 +83,14 @@
           </ng-template>
         </p-dataView>
         <p-dataView [value]="workpackModel.workpackItemCardList" layout="list" class="app-dataview app-dataview-list"
-          *ngIf="displayModeAll === 'list' && !responsive" [paginator]="true" [rows]="pageSize" [showJumpToPageDropdown]="true"
-          [showPageLinks]="false" [totalRecords]="totalRecords ? totalRecords[i] : 1"
-          [emptyMessage]="'loadingEllipsis' | translate">
+          *ngIf="(displayModeAll === 'list' && !responsive) && !workpackModel.propertiesCard.isLoading"
+          [paginator]="true" [rows]="pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false"
+          [totalRecords]="totalRecords ? totalRecords[i] : 1"
+          [emptyMessage]="'notFoundWorkpacksToThisModel' | translate">
           <ng-template let-cardItem pTemplate="listItem">
             <div class="p-col-12">
-              <app-workpack-card-item [properties]="cardItem" [displayModeCard]="displayModeAll"></app-workpack-card-item>
+              <app-workpack-card-item [properties]="cardItem"
+                [displayModeCard]="displayModeAll"></app-workpack-card-item>
             </div>
           </ng-template>
         </p-dataView>
@@ -93,8 +103,8 @@
   <app-save-button (save)="savePlan()"></app-save-button>
 
   <p-dialog class="resume-management-dialog" [class.responsive]="!!responsive" [header]="'resumeManagement' |translate"
-    [(visible)]="showDialogResumeManagement" [style]="!responsive ? {width: '30vw'} : {width: '90vw'}" closable="false"
-    closeIcon="">
+    [(visible)]="showDialogResumeManagement" [style]="!responsive ? {width: '30vw'} : {width: '90vw'}"
+    [closable]="false" closeIcon="">
     <div class="resume-management-content" *ngIf="endManagementWorkpack">
       <span class="subtitle">
         {{'messages.resumeManagementAlert' |translate}}

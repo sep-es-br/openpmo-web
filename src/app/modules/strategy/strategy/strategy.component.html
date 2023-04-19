@@ -4,13 +4,15 @@
       <span *ngIf="idStrategy">{{ propertiesStrategy?.name }}</span>
       <span *ngIf="!idStrategy">{{ 'new' | translate }} {{ 'planModel' | translate }}</span>
     </div>
-    <app-config-data-view-panel (changeCollapsedExpand)="handleChangeCollapseExpandPanel($event)"
-      (changeDisplayMode)="handleChangeDisplayMode($event)" (changePageSize)="handleChangePageSize($event)">
+    <app-config-data-view-panel>
     </app-config-data-view-panel>
   </div>
   <div class="card-properties" *ngIf="cardProperties">
     <app-card [properties]="cardProperties">
-      <div>
+      <div class="loading-container" *ngIf="cardProperties.isLoading">
+        <app-card-loading [isCardLoading]="cardProperties.isLoading"></app-card-loading>
+      </div>
+      <div *ngIf="!cardProperties.isLoading">
         <form [formGroup]="formStrategy">
           <span class="p-float-label">
             <input formControlName="name" type="text" pInputText class="app-input-text" [class.mobile]="responsive"
@@ -20,8 +22,8 @@
           </span>
           <app-input-message [form]="formStrategy" field="name"></app-input-message>
           <span class="p-float-label margin-top">
-            <textarea pInputTextarea formControlName="fullName" class="app-text-area" rows="3" 
-            [ngModel]="(formStrategy.touched) ? formStrategy.value.fullName : formStrategy.value.name">
+            <textarea pInputTextarea formControlName="fullName" class="app-text-area" rows="3"
+              [ngModel]="(formStrategy.touched) ? formStrategy.value.fullName : formStrategy.value.name">
               </textarea>
             <label for="float-input" class="app-input-label">{{'fullName' | translate}}<span
                 class="required-indicator">*</span></label>
@@ -31,28 +33,32 @@
       </div>
     </app-card>
   </div>
-  <section *ngIf="propertiesStrategy" class="models-cards-section">
+  <section *ngIf="idStrategy" class="models-cards-section">
     <div class="card-plans">
-      <app-card [properties]="cardModels" *ngIf="cardItemsModels?.length > 0">
+      <app-card [properties]="cardModels">
+        <div class="loading-container" *ngIf="isLoading">
+          <app-card-loading [isCardLoading]="isLoading"></app-card-loading>
+        </div>
         <p-dataView [value]="cardItemsModels" class="app-dataview" layout="grid" styleClass="dataview-card-items"
-          *ngIf="displayModeAll === 'grid' || (displayModeAll === 'list' && !!responsive)" [paginator]="true" [rows]="pageSize" [showJumpToPageDropdown]="true"
-          [showPageLinks]="false" [totalRecords]="totalRecords" [emptyMessage]="'loadingEllipsis' | translate">
-          <ng-template let-cardItem pTemplate="gridItem">
-            <div class="p-col-12 p-md-3 p-sm-12 card-item-container">
-              <app-card-item [properties]="cardItem"></app-card-item>
-            </div>
-          </ng-template>
-        </p-dataView>
-        <p-dataView [value]="cardItemsModels" class="app-dataview app-dataview-list" layout="list"
-          styleClass="dataview-card-items" *ngIf="displayModeAll === 'list' && !responsive" [paginator]="true" [rows]="pageSize"
-          [showJumpToPageDropdown]="true" [showPageLinks]="false" [totalRecords]="totalRecords"
-          [emptyMessage]="'loadingEllipsis' | translate">
-          <ng-template let-cardItem pTemplate="listItem">
-            <div class="p-col-12">
-              <app-card-item [properties]="cardItem" [displayModeCard]="displayModeAll"></app-card-item>
-            </div>
-          </ng-template>
-        </p-dataView>
+            *ngIf="(displayModeAll === 'grid' || (displayModeAll === 'list' && !!responsive)) && !isLoading" [paginator]="true"
+            [rows]="pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false" [totalRecords]="totalRecords"
+            [emptyMessage]="'loadingEllipsis' | translate">
+            <ng-template let-cardItem pTemplate="gridItem">
+              <div class="p-col-12 p-md-3 p-sm-12 card-item-container">
+                <app-card-item [properties]="cardItem"></app-card-item>
+              </div>
+            </ng-template>
+          </p-dataView>
+          <p-dataView [value]="cardItemsModels" class="app-dataview app-dataview-list" layout="list"
+            styleClass="dataview-card-items" *ngIf="(displayModeAll === 'list' && !responsive) && !isLoading" [paginator]="true"
+            [rows]="pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false" [totalRecords]="totalRecords"
+            [emptyMessage]="'loadingEllipsis' | translate">
+            <ng-template let-cardItem pTemplate="listItem">
+              <div class="p-col-12">
+                <app-card-item [properties]="cardItem" [displayModeCard]="displayModeAll"></app-card-item>
+              </div>
+            </ng-template>
+          </p-dataView>
       </app-card>
     </div>
   </section>
@@ -60,9 +66,10 @@
     <div class="card-sharing">
       <app-card [properties]="sharingProperties">
         <span class="p-float-label offices-sharing-container" [class.responsive]="responsive">
-          <p-multiSelect class="app-multiple-selection" [options]="officeListOptionsSharing" [(ngModel)]="sharedWith" [disabled]="!editPermission"
-          [showToggleAll]="false"
-          display="chip" optionLabel="name" (onChange)="checkSelectAllOffices($event)"></p-multiSelect>
+          <p-multiSelect class="app-multiple-selection" [options]="officeListOptionsSharing" [(ngModel)]="sharedWith"
+            [disabled]="!editPermission" [showToggleAll]="false" display="chip" optionLabel="name"
+            [selectedItemsLabel]="language === 'pt-BR' ? '{0} itens selecionados' : '{0} items selected'"
+            (onChange)="checkSelectAllOffices($event)"></p-multiSelect>
           <label class="app-input-label" for="float-label">{{'offices'|translate}}</label>
         </span>
       </app-card>

@@ -19,7 +19,7 @@ export class InputUnitMeasureComponent implements OnInit, OnDestroy {
   @Output() onInput = new EventEmitter();
   @Output() onBlur = new EventEmitter();
   /* eslint-enable @angular-eslint/no-output-on-prefix */
-  @Input() model: string | number;
+  @Input() model;
   @Output() modelChange = new EventEmitter<string | number>();
   currentLang: string;
   valueInput = '';

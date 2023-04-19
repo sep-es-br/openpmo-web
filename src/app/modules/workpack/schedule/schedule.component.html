@@ -10,7 +10,7 @@
           <div class="p-formgroup-inline" [class.responsive]="responsive">
             <div class="p-field" [class.responsive]="responsive">
               <span class="p-float-label" [class.responsive]="responsive">
-                <p-calendar id="float-start" class="app-select-date" showIcon="true" [monthNavigator]="true"
+                <p-calendar id="float-start" class="app-select-date" [showIcon]="true" [monthNavigator]="true"
                   [yearNavigator]="true" formControlName="start" [yearRange]="yearRange" [class.responsive]="responsive"
                   icon="fas fa-calendar-alt" (onSelect)="handleChangeValues(); handleChangeScheduleStartDate()"
                   [dateFormat]="calendarFormat">
@@ -20,7 +20,7 @@
             </div>
             <div class="p-field" [class.responsive]="responsive">
               <span class="p-float-label" [class.responsive]="responsive">
-                <p-calendar id="float-end" formControlName="end" class="app-select-date" showIcon="true"
+                <p-calendar id="float-end" formControlName="end" class="app-select-date" [showIcon]="true"
                   [monthNavigator]="true" [yearNavigator]="true" [yearRange]="yearRange" [class.responsive]="responsive"
                   icon="fas fa-calendar-alt" (onSelect)="handleChangeValues()" [dateFormat]="calendarFormat">
                 </p-calendar>
@@ -80,8 +80,7 @@
             <ng-template let-cardItem let-index="rowIndex" pTemplate="gridItem">
               <div class="p-col-12 p-md-3 p-sm-12 card-item-container" [class.responsive]="responsive">
                 <app-cost-assignment-card-item [properties]="cardItem" [scheduleStartDate]="scheduleStartDate"
-                  [changeScheduleStartDate]="hangeScheduleStartDate"
-                  (costChanged)="handleChangeValuesCardItems(index)">
+                  (costChanged)="handleChangeValuesCardItems()">
                 </app-cost-assignment-card-item>
               </div>
             </ng-template>

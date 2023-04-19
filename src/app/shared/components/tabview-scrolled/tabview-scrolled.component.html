@@ -1,0 +1,38 @@
+<div class="app-tabview-scrolled">
+  <ng-container *ngIf="tabs && tabs.length > 0; else hasNoTabs">
+    <ng-template [ngIf]="selectedTab">
+      <ng-container *ngTemplateOutlet="hasTabs"></ng-container>
+    </ng-template>
+  </ng-container>
+
+  <ng-template #hasTabs>
+    <div class="wrapper">
+      <button class="button-scroll nav-scroll-left hidden" (click)="scrollLeft()">
+        <i class="fa fa-chevron-left"></i>
+      </button>
+      <div class="app-tabview-scrolled-header">
+        <ul class="app-tabview-scrolled-nav-content">
+          <li class="app-tabview-scrolled-header-item" *ngFor="let item of tabs">
+            <span class="header-link"
+              [class.active]="selectedTab?.key === item.key"
+              (click)="selectTab(item)">
+                {{item.menu | translate}}
+              </span>
+          </li>
+        </ul>
+      </div>
+      <button class="button-scroll nav-scroll-right hidden" (click)="scrollRight()">
+        <i class="fa fa-chevron-right"></i>
+      </button>
+    </div>
+    <div class="app-tabview-scrolled-container">
+      <div class="app-tabview-scrolled-content">
+        <ng-content select="[tabviewBody]"></ng-content>
+      </div>
+    </div>
+  </ng-template>
+
+  <ng-template #hasNoTabs>
+    {{'noRecordsFound' | translate}}
+  </ng-template>
+</div>

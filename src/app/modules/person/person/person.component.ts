@@ -157,7 +157,6 @@ export class PersonComponent implements OnInit, OnDestroy {
   async loadPerson() {
     this.loading = true;
     const { success, data } = await this.personSrv.GetByIdAndOffice(this.idPerson, this.idOffice);
-    this.loading = false;
     if (success) {
       this.propertiesPerson = data;
       this.setFormPerson(data);
@@ -236,6 +235,7 @@ export class PersonComponent implements OnInit, OnDestroy {
         return cardItem;
       }),
     }));
+    this.loading = false;
   }
 
   navigateToPage(url: string, email?: string, idOffice?: number, idPlan?: number) {

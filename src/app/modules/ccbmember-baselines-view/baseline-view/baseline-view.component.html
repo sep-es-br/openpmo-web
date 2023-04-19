@@ -522,4 +522,7 @@
                 [disabled]="true">{{selectedComment}}</textarea>
     </div>
   </p-dialog>
+  <div class="loading-container" *ngIf="isLoading">
+    <app-card-loading [isCardLoading]="isLoading" ></app-card-loading>
+  </div>
 </div>

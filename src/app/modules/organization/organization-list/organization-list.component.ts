@@ -1,12 +1,11 @@
+import { takeUntil } from 'rxjs/operators';
 import { IFilterProperty } from 'src/app/shared/interfaces/IFilterProperty';
 import { TranslateService } from '@ngx-translate/core';
-import { PropertyTemplateModel } from './../../../shared/models/PropertyTemplateModel';
 import { FilterDataviewPropertiesEntity } from 'src/app/shared/constants/filterDataviewPropertiesEntity';
 import { FilterDataviewService } from './../../../shared/services/filter-dataview.service';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MenuItem } from 'primeng/api';
-
 import { IconsEnum } from 'src/app/shared/enums/IconsEnum';
 import { ICard } from 'src/app/shared/interfaces/ICard';
 import { ICardItem } from 'src/app/shared/interfaces/ICardItem';
@@ -18,13 +17,15 @@ import { OfficePermissionService } from 'src/app/shared/services/office-permissi
 import { OfficeService } from 'src/app/shared/services/office.service';
 import { OrganizationService } from 'src/app/shared/services/organization.service';
 import { ResponsiveService } from 'src/app/shared/services/responsive.service';
+import { ConfigDataViewService } from 'src/app/shared/services/config-dataview.service';
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'app-organization-list',
   templateUrl: './organization-list.component.html',
   styleUrls: ['./organization-list.component.scss']
 })
-export class OrganizationListComponent implements OnInit {
+export class OrganizationListComponent implements OnInit, OnDestroy {
 
   cardProperties: ICard = {
     toggleable: false,
@@ -43,6 +44,8 @@ export class OrganizationListComponent implements OnInit {
   pageSize = 5;
   totalRecords: number;
   idFilterSelected: number;
+  $destroy = new Subject();
+  isLoading = false;
 
   constructor(
     private organizationSvr: OrganizationService,
@@ -54,14 +57,22 @@ export class OrganizationListComponent implements OnInit {
     private responsiveSrv: ResponsiveService,
     private filterSrv: FilterDataviewService,
     private router: Router,
-    private translateSrv: TranslateService
+    private translateSrv: TranslateService,
+    private configDataViewSrv: ConfigDataViewService
   ) {
+    this.configDataViewSrv.observableDisplayModeAll.pipe(takeUntil(this.$destroy)).subscribe(displayMode => {
+      this.displayModeAll = displayMode;
+    });
+    this.configDataViewSrv.observablePageSize.pipe(takeUntil(this.$destroy)).subscribe(pageSize => {
+      this.pageSize = pageSize;
+    });
     this.activeRoute.queryParams.subscribe(({ idOffice }) => this.idOffice = +idOffice);
-    this.responsiveSrv.observable.subscribe(value => this.responsive = value);
+    this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.responsive = value);
   }
 
 
   async ngOnInit() {
+    this.isLoading = true;
     this.isUserAdmin = await this.authSrv.isUserAdmin();
     this.editPermission = await this.officePermissionSrv.getPermissions(this.idOffice);
     if (! this.isUserAdmin && !this.editPermission) {
@@ -88,12 +99,9 @@ export class OrganizationListComponent implements OnInit {
     ]);
   }
 
-  handleChangeDisplayMode(event) {
-    this.displayModeAll = event.displayMode;
-  }
-
-  handleChangePageSize(event) {
-    this.pageSize = event.pageSize;
+  ngOnDestroy(): void {
+      this.$destroy.complete();
+      this.$destroy.unsubscribe();
   }
 
   async getOfficeById() {
@@ -104,6 +112,7 @@ export class OrganizationListComponent implements OnInit {
   }
 
   async loadPropertiesOrganizations() {
+    this.isLoading = true;
     const { success, data } = await this.organizationSvr.GetAll({ 'id-office': this.idOffice, idFilter: this.idFilterSelected });
     const itemsProperties = this.editPermission
       ? [{
@@ -131,6 +140,7 @@ export class OrganizationListComponent implements OnInit {
         paramsUrlCard: [{ name: 'idOffice', value: this.idOffice }],
       })
       ));
+      this.isLoading = false;
     }
     this.cardItemsProperties = itemsProperties;
     this.totalRecords = this.cardItemsProperties && this.cardItemsProperties.length;

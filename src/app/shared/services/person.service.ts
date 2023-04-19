@@ -81,7 +81,7 @@ export class PersonService extends BaseService<IPerson> {
     const message = 'messages.deletePermissionsConfirmation';
     const useConfirm = true;
 
-    return new Promise(async(resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
       if (useConfirm) {
         this.confirmationSrv.confirm({
           message: this.translateSrv.instant(message) + `?`,
@@ -115,8 +115,7 @@ export class PersonService extends BaseService<IPerson> {
   }
 
   async getAvatar(idPerson: number): Promise<IHttpResult<IFile>> {
-    const result = await this.http.get(`${this.urlBase}/${idPerson}/avatar`)
-                                  .toPromise();
+    const result = await this.http.get(`${this.urlBase}/${idPerson}/avatar`).toPromise();
     return result as IHttpResult<IFile>;
   }
 
@@ -133,10 +132,7 @@ export class PersonService extends BaseService<IPerson> {
     const headers = new HttpHeaders({
       'Form-Data': 'true'
     });
-    const result = await this.http.post(`${this.urlBase}/${idPerson}/avatar`,
-                                        file,
-                                        { headers, params: PrepareHttpParams(options) })
-                                  .toPromise();
+    const result = await this.http.post(`${this.urlBase}/${idPerson}/avatar`, file, { headers, params: PrepareHttpParams(options) }).toPromise();
     return result as IHttpResult<IFile>;
   }
 

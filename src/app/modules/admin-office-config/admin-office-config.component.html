@@ -1,15 +1,18 @@
 <div class="app-config">
   <div class="header-container" [class.mobile]="responsive">
-    <div class="app-content-header" >
+    <div class="app-content-header">
       <span>{{ propertiesOffice?.name }}</span>
     </div>
-    <app-config-data-view-panel [notShowCollapseOptions]="true"
-        (changeDisplayMode)="handleChangeDisplayMode($event)">
-      </app-config-data-view-panel>
+    <app-config-data-view-panel [notShowCollapseOptions]="true">
+    </app-config-data-view-panel>
   </div>
   <div class="card-container">
     <app-card [properties]="cardProperties" class="mt-0 admin-config">
-      <p-dataView [value]="cardItemsProperties" layout="grid" class="app-dataview" *ngIf="displayModeAll === 'grid'"
+      <div class="loading-container" *ngIf="isLoading">
+        <app-card-loading [isCardLoading]="isLoading"></app-card-loading>
+      </div>
+      <p-dataView [value]="cardItemsProperties" layout="grid" class="app-dataview"
+        *ngIf="displayModeAll === 'grid' && !isLoading"
         [emptyMessage]="(!cardItemsProperties ? 'loadingEllipsis' : 'noContent') | translate">
         <ng-template let-cardItem pTemplate="gridItem">
           <div class="p-col-12 p-md-3 p-sm-12 card-item-container">
@@ -17,8 +20,8 @@
           </div>
         </ng-template>
       </p-dataView>
-
-      <p-dataView [value]="cardItemsProperties" layout="list" class="app-dataview app-dataview-list" *ngIf="displayModeAll === 'list'"
+      <p-dataView [value]="cardItemsProperties" layout="list" class="app-dataview app-dataview-list"
+        *ngIf="displayModeAll === 'list' && !isLoading"
         [emptyMessage]="(!cardItemsProperties ? 'loadingEllipsis' : 'noContent') | translate">
         <ng-template let-cardItem pTemplate="listItem">
           <div class="p-col-12">

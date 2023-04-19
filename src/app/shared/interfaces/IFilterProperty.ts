@@ -8,8 +8,9 @@ export interface IFilterProperty {
   name: string;
   defaultValue?: number | string | boolean | string[] | number[] | Date;
   defaults?: number | number[];
-  min?: number | string;
-  max?: number | string;
+  min?: number;
+  max?: number;
+  decimals?: number;
   possibleValues?: {label: string; value: string}[];
   possibleValuesIds?: { label: string; value: number }[];
   multipleSelection?: boolean;
@@ -17,4 +18,5 @@ export interface IFilterProperty {
   localityList?: TreeNode[];
   localitiesSelected?: TreeNode | TreeNode[];
   active?: boolean;
+  invalid?: boolean;
 }

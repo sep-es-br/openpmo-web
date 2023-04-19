@@ -34,6 +34,16 @@ import { JournalComponent } from './journal/journal.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { TripleConstraintDashboardComponent } from './components/triple-constraint-dashboard/triple-constraint-dashboard.component';
 import { EarnedValueAnalysisDashboardComponent } from './components/earned-value-analysis-dashboard/earned-value-analysis-dashboard.component';
+import { ProgressBarScheduleYearComponent } from './components/progress-bar-schedule-year/progress-bar-schedule-year.component';
+import { BreakdownStructureComponent } from './components/breakdown-structure/breakdown-structure.component';
+import { WorkpackSectionPropertiesComponent } from './workpack-sections/workpack-section-properties/workpack-section-properties.component';
+import { WorkpackSectionCostAccountsComponent } from './workpack-sections/workpack-section-cost-accounts/workpack-section-cost-accounts.component';
+import { WorkpackSectionScheduleComponent } from './workpack-sections/workpack-section-schedule/workpack-section-schedule.component';
+import { WorkpackSectionStakeholdersComponent } from './workpack-sections/workpack-section-stakeholders/workpack-section-stakeholders.component';
+import { WorkpackSectionBaselinesComponent } from './workpack-sections/workpack-section-baselines/workpack-section-baselines.component';
+import { WorkpackSectionRisksComponent } from './workpack-sections/workpack-section-risks/workpack-section-risks.component';
+import { WorkpackSectionIssuesComponent } from './workpack-sections/workpack-section-issues/workpack-section-issues.component';
+import { WorkpackSectionProcessesComponent } from './workpack-sections/workpack-section-processes/workpack-section-processes.component';
 
 @NgModule({
   declarations: [
@@ -60,8 +70,19 @@ import { EarnedValueAnalysisDashboardComponent } from './components/earned-value
     JournalComponent,
     DashboardComponent,
     TripleConstraintDashboardComponent,
-    EarnedValueAnalysisDashboardComponent],
-    imports: [
+    EarnedValueAnalysisDashboardComponent,
+    ProgressBarScheduleYearComponent,
+    BreakdownStructureComponent,
+    WorkpackSectionPropertiesComponent,
+    WorkpackSectionCostAccountsComponent,
+    WorkpackSectionScheduleComponent,
+    WorkpackSectionStakeholdersComponent,
+    WorkpackSectionBaselinesComponent,
+    WorkpackSectionRisksComponent,
+    WorkpackSectionIssuesComponent,
+    WorkpackSectionProcessesComponent,
+  ],
+  imports: [
       CommonModule,
       WorkpackRoutingModule,
       CoreModule,

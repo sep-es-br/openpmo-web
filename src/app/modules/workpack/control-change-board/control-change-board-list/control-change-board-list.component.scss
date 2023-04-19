@@ -1,6 +1,10 @@
 @use "src/variables" as v;
 .app-ccb-list{
   width: 100%;
+  .loading-container {
+    position: relative;
+    min-height: 150px;
+  }
   .header-container {
     display: flex;
     flex-direction: row;

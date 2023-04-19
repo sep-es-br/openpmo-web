@@ -34,6 +34,7 @@ export class BaselineViewComponent implements OnInit, OnDestroy {
   evaluateDecision: string;
   selectedComment = '';
   showCommentDialog = false;
+  isLoading = false;
 
   constructor(
     private actRouter: ActivatedRoute,
@@ -84,11 +85,13 @@ export class BaselineViewComponent implements OnInit, OnDestroy {
   }
 
   async loadPropertiesBaseline() {
+    this.isLoading = true;
     const result = await this.baselineSrv.getBaselineView(this.idBaseline);
     if (result.success) {
       this.baseline = result.data;
       this.loadChartScheduleValues();
       this.checkEvaluation();
+      this.isLoading = false;
     }
   }
 

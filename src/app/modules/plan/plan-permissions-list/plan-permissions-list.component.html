@@ -3,13 +3,15 @@
     <div class="app-content-header" [class.mobile]="responsive">
       <span>{{ propertiesPlan?.fullName }}</span>
     </div>
-    <app-config-data-view-panel [notShowCollapseOptions]="true"
-      (changeDisplayMode)="handleChangeDisplayMode($event)" (changePageSize)="handleChangePageSize($event)">
+    <app-config-data-view-panel [notShowCollapseOptions]="true">
     </app-config-data-view-panel>
   </div>
   <div class="card-permissions" *ngIf="idPlan">
     <app-card [properties]="cardPlanPermissions" class="mt-0" (editFilter)="handleEditFilter($event)"
       (newFilter)="handleNewFilter()" (selectedFilter)="handleSelectedFilter($event)" (createNewElement)="handleCreateNewPlanPermission()">
+      <div class="loading-container" *ngIf="isLoading">
+        <app-card-loading [isCardLoading]="isLoading"></app-card-loading>
+      </div>
       <p-dataView [value]="cardItemsPlanPermissions" layout="grid" class="app-dataview"
         [emptyMessage]="'loadingEllipsis' | translate" *ngIf="displayModeAll === 'grid' || (displayModeAll === 'list' && !!responsive)" [paginator]="true"
         [rows]="pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false" [totalRecords]="totalRecords">

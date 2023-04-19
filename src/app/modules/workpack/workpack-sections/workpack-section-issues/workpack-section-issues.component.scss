@@ -1,0 +1,21 @@
+@use "src/variables" as v;
+
+.app-workpack-section-issues {
+  .input-toggle-issue {
+    display: flex;
+    align-items: center;
+    padding: 0.5em 0;
+    margin-bottom: 1em;
+    .input-label {
+      font-size: 1rem;
+      color: v.$fontLabel;
+      margin-left: 5px;
+      font-family: v.$fontFamilyMedium;
+    }
+  }
+
+  .loading-container {
+    position: relative;
+    min-height: 150px;
+  }
+}

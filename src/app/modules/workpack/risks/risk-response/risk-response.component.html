@@ -31,7 +31,7 @@
           <div class="form-group" *ngIf="formRiskResponse.controls.when.value === 'PRE_OCCURRENCE'">
             <div class="p-field">
               <span class="p-float-label">
-                <p-calendar id="float-start" class="app-select-date" showIcon="true" [monthNavigator]="true"
+                <p-calendar id="float-start" class="app-select-date" [showIcon]="true" [monthNavigator]="true"
                   [yearNavigator]="true" formControlName="startDate" [yearRange]="yearRangeCalculated"
                   icon="fas fa-calendar-alt" [dateFormat]="calendarFormat">
                 </p-calendar>
@@ -40,7 +40,7 @@
             </div>
             <div class="p-field end">
               <span class="p-float-label">
-                <p-calendar id="float-end" formControlName="endDate" class="app-select-date" showIcon="true"
+                <p-calendar id="float-end" formControlName="endDate" class="app-select-date" [showIcon]="true"
                   [monthNavigator]="true" [yearNavigator]="true" [yearRange]="yearRangeCalculated"
                   icon="fas fa-calendar-alt" [dateFormat]="calendarFormat">
                 </p-calendar>
@@ -89,6 +89,7 @@
             <div class="p-field">
               <span class="p-float-label">
                 <p-multiSelect class="app-multiple-selection" dropdownIcon="fas fa-caret-down"
+                [selectedItemsLabel]="language === 'pt-BR' ? '{0} itens selecionados' : '{0} items selected'"
                   formControlName="responsible" [options]="stakeholderOptions" optionLabel="label" optionValue="value">
                 </p-multiSelect>
                 <label class="app-input-label" for="float-label">{{'responsible' |translate}}</label>

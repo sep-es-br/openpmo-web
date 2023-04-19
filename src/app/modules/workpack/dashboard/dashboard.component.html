@@ -1,12 +1,15 @@
-<div class="app-dashboard" [class.responsive]="!!responsive" *ngIf="dashboard" [class.expanded]="cardDashboardProperties.fullScreen">
-  <app-card [class.card-expanded]="cardDashboardProperties.fullScreen" [properties]="cardDashboardProperties"  (changeFullScreen)="handleOnFullScreen($event)">
-    <span class="workpack-fullName">
+<div class="app-dashboard" [class.responsive]="!!responsive"
+  [class.expanded]="cardDashboardProperties.fullScreen">
+  <app-card [class.card-expanded]="cardDashboardProperties.fullScreen" [properties]="cardDashboardProperties"
+    [class.panel-tab-view]="showTabview" (changeFullScreen)="handleOnFullScreen($event)">
+    <div class="loading-container" *ngIf="isLoading">
+      <app-card-loading [isCardLoading]="isLoading"></app-card-loading>
+    </div>
+    <span class="workpack-fullName" *ngIf="!isLoading">
       {{workpackFullName}}
     </span>
-    <div class="cards-list-container" *ngIf="dashboard?.stakeholders
-        && dashboard?.stakeholders.length > 0
-        && dashboardShowStakeholders
-        && dashboardShowStakeholders.length > 0">
+    <div class="cards-list-container"
+      *ngIf="(dashboard?.stakeholders && dashboard?.stakeholders.length > 0 && dashboardShowStakeholders && dashboardShowStakeholders.length > 0) && !isLoading">
       <div class="card-container" *ngFor="let stakeholder of dashboard.stakeholders">
         <p-card>
           <div class="card-item">
@@ -23,11 +26,9 @@
         </p-card>
       </div>
     </div>
-    <p-divider layout="horizontal" *ngIf="dashboard?.stakeholders
-    && dashboard?.stakeholders.length > 0
-    && dashboardShowStakeholders
-    && dashboardShowStakeholders.length > 0"></p-divider>
-    <div class="cards-list-container" *ngIf="dashboard">
+    <p-divider layout="horizontal"
+      *ngIf="(dashboard?.stakeholders && dashboard?.stakeholders.length > 0 && dashboardShowStakeholders && dashboardShowStakeholders.length > 0) && !isLoading"></p-divider>
+    <div class="cards-list-container" *ngIf="dashboard && !isLoading">
       <div class="card-container" *ngFor="let workpackModel of dashboard?.workpacksByModel">
         <p-card>
           <div class="card-item">
@@ -42,38 +43,44 @@
         </p-card>
       </div>
     </div>
-    <p-divider layout="horizontal"></p-divider>
-    <div class="params-container" *ngIf="startDate && endDate">
+    <p-divider layout="horizontal" *ngIf="!isLoading"></p-divider>
+    <div class="params-container" *ngIf="startDate && endDate && !isLoading">
       <div class="param-item">
         <label class="param-label">{{'reference'|translate}}</label>
         <p-calendar class="app-select-date" [(ngModel)]="referenceMonth" view="month" [dateFormat]="calendarFormat"
-          [yearNavigator]="true" showIcon="true" icon="fas fa-calendar-alt" [yearRange]="yearRange" [minDate]="startDate" [maxDate]="endDate"
-          (ngModelChange)="handleSelectedReferenceMonth()" [readonlyInput]="true" inputId="monthpicker"></p-calendar>
+          [yearNavigator]="true" [showIcon]="true" icon="fas fa-calendar-alt" [yearRange]="yearRange"
+          [minDate]="startDate" [maxDate]="endDate" (ngModelChange)="handleSelectedReferenceMonth()"
+          [readonlyInput]="true" inputId="monthpicker"></p-calendar>
       </div>
       <div class="param-item" *ngIf="workpackType === 'Project' && !!baselines && baselines.length > 0">
         <label class="param-label">{{'baseline'|translate}}</label>
-        <p-dropdown class="app-single-selection" [options]="baselines" optionLabel="name" optionValue="id" [autoDisplayFirst]="false"
-          [(ngModel)]="selectedBaseline" optionLabel="name" (ngModelChange)="handleSeletedBaseline()"></p-dropdown>
+        <p-dropdown class="app-single-selection" [options]="baselines" optionLabel="name" optionValue="id"
+          [autoDisplayFirst]="false" [(ngModel)]="selectedBaseline" optionLabel="name"
+          (ngModelChange)="handleSeletedBaseline()"></p-dropdown>
       </div>
     </div>
-    <div class="charts-container">
+    <div class="charts-container" *ngIf="!isLoading">
       <div class="triple-constraint-container">
-        <app-triple-constraint-dashboard [tripleConstraint]="dashboard && dashboard?.tripleConstraint && dashboard?.tripleConstraint[0]">
+        <app-triple-constraint-dashboard
+          [tripleConstraint]="dashboard && dashboard?.tripleConstraint && dashboard?.tripleConstraint[0]">
         </app-triple-constraint-dashboard>
       </div>
       <div class="risk-milestone-charts-container">
         <div class="dashboard-item" *ngIf="!!dashboardShowMilestones">
-          <app-doughnut-chart [data]="dashboardMilestonesData" [middleText]="dashboard?.milestone?.quantity"
+          <app-doughnut-chart [data]="dashboardMilestonesData" [middleText]="dashboard?.milestone?.quantity?.toString()"
             [midleTextBottom]="midleTextMilestones"></app-doughnut-chart>
         </div>
         <div class="dashboard-item" *ngIf="dashboardRisksData && dashboardShowRisks">
-          <app-doughnut-chart [data]="dashboardRisksData" [middleText]="dashboard?.risk?.total" [midleTextBottom]="midleTextRisks">
+          <app-doughnut-chart [data]="dashboardRisksData" [middleText]="dashboard?.risk?.total?.toString()"
+            [midleTextBottom]="midleTextRisks">
           </app-doughnut-chart>
         </div>
       </div>
     </div>
-    <div class="earned-value-analysis-container" *ngIf="!!dashboardShowEva && dashboard.earnedValueAnalysis">
-      <app-earned-value-analysis-dashboard [earnedValueAnalysis]="dashboard.earnedValueAnalysis" [referenceMonth]="referenceMonth"></app-earned-value-analysis-dashboard>
+    <div class="earned-value-analysis-container"
+      *ngIf="!!dashboardShowEva && dashboard && dashboard.earnedValueAnalysis && !isLoading">
+      <app-earned-value-analysis-dashboard [earnedValueAnalysis]="dashboard.earnedValueAnalysis"
+        [referenceMonth]="referenceMonth"></app-earned-value-analysis-dashboard>
     </div>
   </app-card>
 </div>

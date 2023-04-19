@@ -264,3 +264,60 @@ $mobileMenuHeight: 72px;
     }
   }
 }
+
+.f-panelmenu {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  font-size: 1rem;
+  .f-panelmenu-item {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    width: 100%;
+    padding: 0 1rem;
+    color: #333333;
+    background-color: #00000019 !important;
+    .f-panelmenu-trash {
+      margin-left: auto;
+      cursor: pointer;
+      font-size: .7rem;
+      i {
+        padding: .25rem;
+        border-radius: 50%;
+        transition: all .3s;
+        &:hover {
+          background-color: #E3E3E3;
+        }
+      }
+    }
+    .f-panelmenu-container {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: flex-start;
+      width: 100%;
+      padding: 1rem 0;
+      cursor: pointer;
+      transition: all .3s;
+      &:first-of-type { border-radius: 3px 3px 0 0; }
+      &:last-of-type { border-radius: 0 0 3px 3px; }
+      &:hover {
+        color: #495057;
+      }
+      .f-panelmenu-icon i {
+          font-size: 1.3rem;
+          margin-right: 0.5em;
+      }
+      .f-panelmenu-label {
+        font-family: "Montserrat Medium", "Montserrat Regular", "Montserrat", sans-serif;
+        font-size: 1rem;
+        font-weight: 500;
+        max-width: 95%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    }
+  }
+}

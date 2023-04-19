@@ -20,6 +20,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
 import { not } from '@angular/compiler/src/output/output_ast';
+import { ConfigDataViewService } from 'src/app/shared/services/config-dataview.service';
 
 @Component({
   selector: 'app-person-list',
@@ -55,6 +56,7 @@ export class PersonListComponent implements OnInit, OnDestroy {
   selectedPlans: TreeNode[] = [];
   selectedWorkpacks: TreeNode[] = [];
   scopeNameOptions: string[];
+  isLoading = false;
 
   constructor(
     private personSrv: PersonService,
@@ -67,8 +69,15 @@ export class PersonListComponent implements OnInit, OnDestroy {
     private breadcrumbSrv: BreadcrumbService,
     private authSrv: AuthService,
     private officePermissionSrv: OfficePermissionService,
-    private citizenUserSrv: CitizenUserService
+    private citizenUserSrv: CitizenUserService,
+    private configDataViewSrv: ConfigDataViewService
   ) {
+    this.configDataViewSrv.observableDisplayModeAll.pipe(takeUntil(this.$destroy)).subscribe(displayMode => {
+      this.displayModeAll = displayMode;
+    });
+    this.configDataViewSrv.observablePageSize.pipe(takeUntil(this.$destroy)).subscribe(pageSize => {
+      this.pageSize = pageSize;
+    });
     this.activeRoute.queryParams.subscribe(async({ idOffice }) => {
       this.idOffice = +idOffice;
       await this.loads();
@@ -98,6 +107,7 @@ export class PersonListComponent implements OnInit, OnDestroy {
   }
 
   async loads() {
+    this.isLoading = true;
     await this.loadTreeViewScope();
     await this.loadPersons();
     this.loadOptions();
@@ -234,6 +244,7 @@ export class PersonListComponent implements OnInit, OnDestroy {
     const { success, data } = await this.officeSrv.GetById(this.idOffice);
     if (success) {
       this.propertiesOffice = data;
+      this.isLoading = false;
     }
   }
 

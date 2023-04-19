@@ -16,7 +16,6 @@
         <div class="unitInputs p-fluid">
           <span class="column-title">{{properties.unitName}}</span>
           <span class="p-float-label p-field">
-            <!-- <app-input-unit-measure [(model)]="properties.unitPlanned" (onBlur)="handleStepChange()"></app-input-unit-measure> -->
             <p-inputNumber class="app-input-number" id="float-unitPlanned"  (onBlur)="handleStepChange()" [disabled]="!properties.editPermission"
               [(ngModel)]="properties.unitPlanned" [minFractionDigits]="properties.unitPrecision" [maxFractionDigits]="properties.unitPrecision"
               [locale]="language === 'pt-BR' ? 'pt-BR' : 'en-US'"
@@ -30,7 +29,6 @@
               [locale]="language === 'pt-BR' ? 'pt-BR' : 'en-US'"
               >
             </p-inputNumber>
-            <!-- <app-input-unit-measure [(model)]="properties.unitActual" (onBlur)="handleStepChange()"></app-input-unit-measure> -->
             <label class="app-input-label" for="float-unitActual">{{ "actual" |translate }}</label>
           </span>
         </div>
@@ -44,7 +42,7 @@
         <div class="costInputs p-fluid">
           <span class="column-title"> $ </span>
           <span class="p-float-label p-field">
-            <p-inputNumber class="app-input-number" id="float-costPlanned" disabled="true"
+            <p-inputNumber class="app-input-number" id="float-costPlanned" [disabled]="!properties.editCosts" (onBlur)="handleStepCostChange()"
               [(ngModel)]="properties.costPlanned" [minFractionDigits]="2" [maxFractionDigits]="2"
               [locale]="language === 'pt-BR' ? 'pt-BR' : 'en-US'"
               >
@@ -52,7 +50,7 @@
             <label class="app-input-label" for="float-costPlanned">{{ "planned" |translate }}</label>
           </span>
           <span class="p-float-label p-field">
-            <p-inputNumber class="app-input-number" id="float-costActual" disabled="true"
+            <p-inputNumber class="app-input-number" id="float-costActual" [disabled]="!properties.editCosts" (onBlur)="handleStepCostChange()"
               [(ngModel)]="properties.costActual" [minFractionDigits]="2" [maxFractionDigits]="2"
               [locale]="language === 'pt-BR' ? 'pt-BR' : 'en-US'"
               >

@@ -11,7 +11,7 @@ import { DashboardService } from 'src/app/shared/services/dashboard.service';
 import * as moment from 'moment';
 import { Calendar } from 'primeng/calendar';
 import { Subject } from 'rxjs';
-import { Router } from '@angular/router';
+import { WorkpackShowTabviewService } from 'src/app/shared/services/workpack-show-tabview.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -53,19 +53,24 @@ export class DashboardComponent implements OnInit, OnChanges, OnDestroy {
   endDate: Date;
   midleTextMilestones: string;
   midleTextRisks: string;
+  showTabview = false;
+  isLoading = false;
 
   constructor(
     private dashboardSrv: DashboardService,
     private translateSrv: TranslateService,
     private responsiveSrv: ResponsiveService,
-    private router: Router
+    private workpackShowTabviewSrv: WorkpackShowTabviewService
   ) {
+    this.workpackShowTabviewSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => {
+      this.showTabview = value;
+    });
     this.cardDashboardProperties = {
       toggleable: false,
       initialStateToggle: false,
       collapseble: true,
       initialStateCollapse: this.collapsePanelsStatus,
-      cardTitle: 'dashboard',
+      cardTitle: this.showTabview ? '' : 'dashboard',
       showFullScreen: true,
       fullScreen: false
     };
@@ -89,6 +94,7 @@ export class DashboardComponent implements OnInit, OnChanges, OnDestroy {
     if (
       (changes.idWorkpack && changes.idWorkpack.currentValue) || (changes.reloadDashboard)
     ) {
+      this.isLoading = true;
       if (this.workpackType === 'Project') {
         const result = await this.dashboardSrv.GetBaselines({ 'id-workpack': this.idWorkpack });
         if (result.success) {
@@ -125,6 +131,7 @@ export class DashboardComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   async loadSheduleInterval() {
+    this.isLoading = true;
     const result = await this.dashboardSrv.GetDashboardScheduleInterval({ 'id-workpack': this.idWorkpack });
     if (result.success && result.data.startDate && result.data.startDate !== null && result.data.endDate && result.data.endDate !== null) {
       const startDate = moment(result.data.startDate, 'MM-yyyy').toDate();
@@ -154,6 +161,7 @@ export class DashboardComponent implements OnInit, OnChanges, OnDestroy {
       if (success) {
         this.dashboard = data;
         this.validateDashboard();
+        this.isLoading = false;
       }
     } else {
       const { data, success } = await this.dashboardSrv.GetDashboardByWorkpack(
@@ -161,6 +169,7 @@ export class DashboardComponent implements OnInit, OnChanges, OnDestroy {
       if (success) {
         this.dashboard = data;
         this.validateDashboard();
+        this.isLoading = false;
       }
     }
     this.reloadDashboard = false;

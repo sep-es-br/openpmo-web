@@ -5,7 +5,10 @@
   </div>
   <div class="card-person">
     <app-card [properties]="cardPerson" *ngIf="cardPerson">
-      <div class="person-properties">
+      <div class="loading-container" *ngIf="cardPerson.isLoading">
+        <app-card-loading [isCardLoading]="cardPerson.isLoading"></app-card-loading>
+      </div>
+      <div class="person-properties"  *ngIf="!cardPerson.isLoading">
         <div class="new-person-search" *ngIf="!idPerson">
           <div class="toggle-user-container">
             <p-inputSwitch class="app-toggle" [(ngModel)]="user" (ngModelChange)="handleToggleUser($event)">
@@ -52,9 +55,9 @@
               </span>
               <i class="fas fa-search icon-search-input"></i>
             </div>
-            <pan class="input-message-error" *ngIf="showMessageNotFoundUserByEmail">
+            <span class="input-message-error" *ngIf="showMessageNotFoundUserByEmail">
               {{'messages.userNotFoundByEmail' |translate}}
-            </pan>
+            </span>
             <span *ngIf="showMessageInvalidEmail" class="input-message-error">
               {{ 'messages.invalidEmail'|translate }}
             </span>
@@ -82,9 +85,9 @@
                         [disabled]="!searchedNameUser || (searchedNameUser && searchedNameUser.length === 0) || isLoading"
                         icon="fas fa-search" iconPos="left"></button>
               </div>
-              <pan class="input-message-error" *ngIf="showMessagePublicServerNotFoundByName">
+              <span class="input-message-error" *ngIf="showMessagePublicServerNotFoundByName">
                 {{'messages.publicServerNotFoundByName' |translate}}
-              </pan>
+              </span>
               <div class="listbox-public-servers-container" [class.responsive]="responsive">
                 <p-listbox [options]="publicServersResult" *ngIf="showListBoxPublicServers" [multiple]="false"
                            [listStyle]="{'max-height':'250px'}" (onClick)="handleSelectedPublicServer($event)"
@@ -102,7 +105,7 @@
                    [class.responsive]="responsive">
                 <p-inputMask [(ngModel)]="searchedCpfUser" mask="999.999.999-99" placeholder="000.000.000-00"
                              (ngModelChange)="validateClearSearchByCpf($event)" [class.responsive]="responsive"
-                             unmask="true">
+                             [unmask]="true">
                 </p-inputMask>
                 <button pButton class="button-search" [label]="!responsive ? ('search'|translate) : ''"
                         (click)="validateCpf()"
@@ -119,8 +122,7 @@
           </div>
         </div>
         <div class="loading-container" *ngIf="isLoading">
-          <i class="fas fa-hourglass-half"></i>
-          <label class="loading-label">{{'messages.loading'|translate}} ...</label>
+            <app-card-loading [isCardLoading]="isLoading"></app-card-loading>
         </div>
         <div class="fullName-person-container" *ngIf="showFullNamePerson()">
           <label class="fullName-person">{{person?.fullName ? person?.fullName : stakeholder?.person?.fullName}}</label>

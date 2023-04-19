@@ -32,3 +32,12 @@
     width: 100%;
   }
 }
+
+::ng-deep .p-multiselect.p-multiselect-chip .p-multiselect-token {
+  background-color: #e5e5e4 !important;
+}
+
+::ng-deep .p-multiselect-panel .p-multiselect-items .p-multiselect-item.p-highlight  {
+  background-color: rgba(68, 179, 155, 0.4) !important;
+}
+

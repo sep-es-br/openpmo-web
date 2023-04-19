@@ -99,8 +99,6 @@
       .card-item-content {
         width: 100%;
         .baseline-status-container {
-          align-self: flex-start;
-          margin-top: 0.5em;
           margin-right: 1em;
         }
       }
@@ -124,9 +122,15 @@
       .icon-card {
         font-size: 3.5rem;
         color: #EA5C5C;
+        &.list {
+          font-size: 1.5rem;
+        }
       }
       .app-icon {
         font-size: 2.5rem;
+        &.list {
+          font-size: 1.5rem;
+        }
       }
       .icon-new {
         font-size: 3rem;
@@ -185,7 +189,7 @@
     .p-card {
       max-width: 100%;
       width: 100%;
-      height: 80px;
+      height: 50px;
       .card-item-name {
         flex: none;
       }
@@ -207,7 +211,7 @@
   background: #6c757d !important;
 }
 
-::ng-deep .new-carditem {
+::ng-deep .baseline-new-carditem {
   .p-card {
     background-color: transparent;
     cursor: pointer;
@@ -281,6 +285,7 @@
     .p-card {
       max-width: 100%;
       width: 100%;
+      height: 50px !important;
       .p-card-content {
         padding: 0;
       }
@@ -288,7 +293,7 @@
   }
 }
 
-::ng-deep .new-carditem.new-card-item-mobile {
+::ng-deep .baseline-new-carditem.new-card-item-mobile {
   display: flex;
   justify-content: center;
   align-items: center;

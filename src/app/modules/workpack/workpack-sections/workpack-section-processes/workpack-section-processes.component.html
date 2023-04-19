@@ -1,0 +1,34 @@
+<div class="card-processes" *ngIf="sectionProcess">
+  <app-card [properties]="sectionProcess.cardSection" [class.panel-tab-view]="showTabview"
+    (editFilter)="handleEditFilterEntity($event, 'processes')" (newFilter)="handleNewFilterEntity('processes')"
+    (selectedFilter)="handleSelectedFilterProcess($event)" (createNewElement)="handleCreateNewProcess()">
+    <div class="process-list-container">
+      <div class="loading-container" *ngIf="sectionProcess.cardSection.isLoading">
+        <app-card-loading [isCardLoading]="sectionProcess.cardSection.isLoading" ></app-card-loading>
+      </div>
+      <p-dataView [value]="sectionProcess.cardItemsSection" layout="grid" class="app-dataview"
+        [emptyMessage]="'notFoundProcesses' | translate"
+        *ngIf="(displayModeAll === 'grid' || (displayModeAll === 'list' && !!responsive)) && !sectionProcess.cardSection.isLoading" [paginator]="true"
+        [rows]="pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false"
+        [totalRecords]="totalRecordsProcesses">
+        <ng-template let-cardItem pTemplate="gridItem">
+          <div class="p-col-12 p-md-3 p-sm-12 card-item-container">
+            <app-card-item [properties]="cardItem">
+            </app-card-item>
+          </div>
+        </ng-template>
+      </p-dataView>
+      <p-dataView [value]="sectionProcess.cardItemsSection" layout="list" class="app-dataview app-dataview-list"
+        [emptyMessage]="'notFoundProcesses' | translate" *ngIf="(displayModeAll === 'list' && !responsive) && !sectionProcess.cardSection.isLoading"
+        [paginator]="true" [rows]="pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false"
+        [totalRecords]="totalRecordsProcesses">
+        <ng-template let-cardItem pTemplate="listItem">
+          <div class="p-col-12">
+            <app-card-item [properties]="cardItem" [displayModeCard]="displayModeAll">
+            </app-card-item>
+          </div>
+        </ng-template>
+      </p-dataView>
+    </div>
+  </app-card>
+</div>

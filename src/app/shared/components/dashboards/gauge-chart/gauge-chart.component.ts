@@ -21,7 +21,7 @@ export class GaugeChartComponent implements OnInit, OnDestroy, OnChanges {
   data: ChartData;
   type = 'doughnut';
   language: string;
-  plugins: ChartPluginsOptions = [];
+  plugins;
   options: ChartOptions = {
     plugins: {
       datalabels: {

@@ -15,6 +15,7 @@ import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
 import { EvidenceService } from 'src/app/shared/services/evidence.service';
 import { JournalService } from 'src/app/shared/services/journal.service';
 import { ResponsiveService } from 'src/app/shared/services/responsive.service';
+import { WorkpackShowTabviewService } from 'src/app/shared/services/workpack-show-tabview.service';
 
 @Component({
   selector: 'app-journal',
@@ -35,6 +36,7 @@ export class JournalComponent implements OnInit {
   evidences: IFile[] = [];
   idWorkpack: number;
   idPlan: number;
+  showTabview = false;
 
   constructor(
     private responsiveSrv: ResponsiveService,
@@ -47,7 +49,11 @@ export class JournalComponent implements OnInit {
     private evidenceSrv: EvidenceService,
     private breadcrumbSrv: BreadcrumbService,
     private sanatizer: DomSanitizer,
+    private workpackShowTabviewSrv: WorkpackShowTabviewService
   ) {
+    this.workpackShowTabviewSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => {
+      this.showTabview = value;
+    });
     this.activeRoute.queryParams.subscribe(({ idWorkpack }) => {
       this.idWorkpack = +idWorkpack;
     });

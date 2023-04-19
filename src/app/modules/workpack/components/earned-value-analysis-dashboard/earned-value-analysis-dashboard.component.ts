@@ -17,7 +17,7 @@ import { ShortNumberPipe } from 'src/app/shared/pipes/shortNumberPipe';
 export class EarnedValueAnalysisDashboardComponent implements OnInit {
 
   @Input() earnedValueAnalysis: IEarnedValueAnalysisDashboard;
-  @Input() referenceMonth: string;
+  @Input() referenceMonth;
   lineChartData: ChartData;
   lineChartOptions: ChartOptions;
   gaugeChartDataCPI: IGaugeChartData;

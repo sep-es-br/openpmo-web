@@ -38,6 +38,7 @@ import { ILocalityList } from 'src/app/shared/interfaces/ILocality';
 import { OfficeService } from 'src/app/shared/services/office.service';
 import { IOffice } from 'src/app/shared/interfaces/IOffice';
 import { MenuService } from 'src/app/shared/services/menu.service';
+import { ConfigDataViewService } from 'src/app/shared/services/config-dataview.service';
 
 interface IIcon {
   name: string;
@@ -123,6 +124,8 @@ export class WorkpackModelComponent implements OnInit {
   };
   currentBreadcrumbItems: IBreadcrumb[];
   currentBreadcrumbSub: Subscription;
+  propertySessionEnum = PropertySessionEnum;
+  isLoading = false;
 
   constructor(
     private router: Router,
@@ -142,7 +145,45 @@ export class WorkpackModelComponent implements OnInit {
     private officeSrv: OfficeService,
     private planModelSrv: PlanModelService,
     private menuSrv: MenuService,
+    private configDataViewSrv: ConfigDataViewService
   ) {
+    this.configDataViewSrv.observableCollapsePanelsStatus.pipe(takeUntil(this.$destroy)).subscribe(collapsePanelStatus => {
+      this.collapsePanelsStatus = collapsePanelStatus === 'collapse' ? true : false;
+      this.cardProperties = Object.assign({}, {
+        ...this.cardProperties,
+        initialStateCollapse: this.collapsePanelsStatus
+      });
+      this.cardPropertiesStakeholders = Object.assign({}, {
+        ...this.cardPropertiesStakeholders,
+        initialStateCollapse: this.collapsePanelsStatus
+      });
+      this.cardPropertiesCostAccount = Object.assign({}, {
+        ...this.cardPropertiesCostAccount,
+        initialStateCollapse: this.collapsePanelsStatus
+      });
+      this.cardPropertiesJournal = Object.assign({}, {
+        ...this.cardPropertiesJournal,
+        initialStateCollapse: this.collapsePanelsStatus
+      });
+      this.cardPropertiesModels = Object.assign({}, {
+        ...this.cardPropertiesModels,
+        initialStateCollapse: this.collapsePanelsStatus
+      });
+      this.cardPropertiesSchedule = Object.assign({}, {
+        ...this.cardPropertiesSchedule,
+        initialStateCollapse: this.collapsePanelsStatus
+      });
+      this.cardPropertiesDashboard = Object.assign({}, {
+        ...this.cardPropertiesDashboard,
+        initialStateCollapse: this.collapsePanelsStatus
+      });
+    });
+    this.configDataViewSrv.observableDisplayModeAll.pipe(takeUntil(this.$destroy)).subscribe(displayMode => {
+      this.displayModeAll = displayMode;
+    });
+    this.configDataViewSrv.observablePageSize.pipe(takeUntil(this.$destroy)).subscribe(pageSize => {
+      this.pageSize = pageSize;
+    });
     this.activeRoute.queryParams.subscribe(async ({ idOffice, idStrategy, id, idParent, type }) => {
       if (id && this.idWorkpackModel === Number(id)) {
         // refresh on adding id to query
@@ -208,42 +249,6 @@ export class WorkpackModelComponent implements OnInit {
         { label: this.translateSrv.instant('name'), value: 'name' }
       ];
     }
-  }
-
-  handleChangeCollapseExpandPanel(event) {
-    this.collapsePanelsStatus = event.mode === 'collapse';
-    this.cardProperties = Object.assign({}, {
-      ...this.cardProperties,
-      initialStateCollapse: this.collapsePanelsStatus
-    });
-    this.cardPropertiesStakeholders = Object.assign({}, {
-      ...this.cardPropertiesStakeholders,
-      initialStateCollapse: this.collapsePanelsStatus
-    });
-    this.cardPropertiesCostAccount = Object.assign({}, {
-      ...this.cardPropertiesCostAccount,
-      initialStateCollapse: this.collapsePanelsStatus
-    });
-    this.cardPropertiesJournal = Object.assign({}, {
-      ...this.cardPropertiesJournal,
-      initialStateCollapse: this.collapsePanelsStatus
-    });
-    this.cardPropertiesModels = Object.assign({}, {
-      ...this.cardPropertiesModels,
-      initialStateCollapse: this.collapsePanelsStatus
-    });
-    this.cardPropertiesSchedule = Object.assign({}, {
-      ...this.cardPropertiesSchedule,
-      initialStateCollapse: this.collapsePanelsStatus
-    });
-  }
-
-  handleChangeDisplayMode(event) {
-    this.displayModeAll = event.displayMode;
-  }
-
-  handleChangePageSize(event) {
-    this.pageSize = event.pageSize;
   }
 
   getSortedByList() {
@@ -437,7 +442,7 @@ export class WorkpackModelComponent implements OnInit {
           name: this.translateSrv.instant('status'),
           type: TypePropertyEnum.SelectionModel,
           multipleSelection: false,
-          possibleValues: Object.values(this.translateSrv.instant(['finished', 'structuring', 'execution', 'suspended'])),
+          possibleValuesOptions: Object.values(this.translateSrv.instant(['finished', 'structuring', 'execution', 'suspended'])),
           sortIndex: 2,
           defaultValue: this.translateSrv.instant('structuring'),
           fullLine: false,
@@ -478,7 +483,7 @@ export class WorkpackModelComponent implements OnInit {
             name: this.translateSrv.instant('type'),
             type: TypePropertyEnum.SelectionModel,
             multipleSelection: false,
-            possibleValues: Object.values(this.translateSrv.instant(['construction', 'service', 'planStudySearch',
+            possibleValuesOptions: Object.values(this.translateSrv.instant(['construction', 'service', 'planStudySearch',
               'standard', 'equipment', 'others'])),
             sortIndex: 2,
             defaultValue: this.translateSrv.instant('construction'),
@@ -491,7 +496,7 @@ export class WorkpackModelComponent implements OnInit {
             name: this.translateSrv.instant('status'),
             type: TypePropertyEnum.SelectionModel,
             multipleSelection: false,
-            possibleValues: Object.values(this.translateSrv.instant(['preparatoryActions', 'projectElaboration', 'projectElaborated',
+            possibleValuesOptions: Object.values(this.translateSrv.instant(['preparatoryActions', 'projectElaboration', 'projectElaborated',
               'agreementSigned', 'publishedNotice', 'biddingFinished', 'signedContract', 'executationStarted', 'finished', 'blocked'])),
             defaultValue: this.translateSrv.instant('preparatoryActions'),
             sortIndex: 3,
@@ -528,7 +533,7 @@ export class WorkpackModelComponent implements OnInit {
             name: this.translateSrv.instant('status'),
             type: TypePropertyEnum.SelectionModel,
             multipleSelection: false,
-            possibleValues: Object.values(this.translateSrv.instant(['finished', 'structuring', 'execution', 'suspended'])),
+            possibleValuesOptions: Object.values(this.translateSrv.instant(['finished', 'structuring', 'execution', 'suspended'])),
             sortIndex: 2,
             defaultValue: this.translateSrv.instant('structuring'),
             fullLine: false,
@@ -588,7 +593,7 @@ export class WorkpackModelComponent implements OnInit {
             name: this.translateSrv.instant('type'),
             type: TypePropertyEnum.SelectionModel,
             multipleSelection: false,
-            possibleValues: Object.values(this.translateSrv.instant(['projectManagement', 'agreement', 'environmentalLicensing',
+            possibleValuesOptions: Object.values(this.translateSrv.instant(['projectManagement', 'agreement', 'environmentalLicensing',
               'standard', 'engineeringProject', 'construction', 'bidding', 'PPP', 'PMI', 'informationSystem'])),
             sortIndex: 4,
             defaultValue: this.translateSrv.instant('construction'),
@@ -657,7 +662,7 @@ export class WorkpackModelComponent implements OnInit {
         type: TypePropertyEnum.SelectionModel,
         sortIndex: 4,
         session: PropertySessionEnum.COST,
-        possibleValues: Object.values(this.translateSrv.instant(['capitalExpenses', 'currentExpenses'])) as string[],
+        possibleValuesOptions: Object.values(this.translateSrv.instant(['capitalExpenses', 'currentExpenses'])) as string[],
         defaultValue: this.translateSrv.instant('capitalExpenses'),
         multipleSelection: false,
         fullLine: false
@@ -669,7 +674,7 @@ export class WorkpackModelComponent implements OnInit {
         type: TypePropertyEnum.SelectionModel,
         sortIndex: 5,
         session: PropertySessionEnum.COST,
-        possibleValues: Object.values(this.translateSrv.instant(['nonBudgetary', 'cashResources',
+        possibleValuesOptions: Object.values(this.translateSrv.instant(['nonBudgetary', 'cashResources',
           'treasuryRelatedResources', 'ownResources'])) as string[],
         multipleSelection: false,
         defaultValue: this.translateSrv.instant('nonBudgetary'),
@@ -698,7 +703,7 @@ export class WorkpackModelComponent implements OnInit {
         const dataPropertiesAndIndex = (await Promise.all(data.properties
           .map(async (p, i) => {
             if (p.possibleValues) {
-              p.possibleValues = (p.possibleValues as string).split(',');
+              p.possibleValuesOptions = (p.possibleValues as string).split(',');
             }
             if (p.defaultValue && p.multipleSelection) {
               p.defaultValue = (p.defaultValue as string).split(',');
@@ -737,7 +742,7 @@ export class WorkpackModelComponent implements OnInit {
               p.menuModelProperties = this.loadMenuPropertyGroup(PropertySessionEnum.PROPERTIES, p);
               p.groupedProperties.forEach(async (gp) => {
                 if (gp.possibleValues) {
-                  gp.possibleValues = (gp.possibleValues as string).split(',');
+                  gp.possibleValuesOptions = (gp.possibleValues as string).split(',');
                 }
                 if (gp.defaultValue && gp.multipleSelection) {
                   gp.defaultValue = (gp.defaultValue as string).split(',');
@@ -809,6 +814,7 @@ export class WorkpackModelComponent implements OnInit {
       this.childrenModels = (data.children || []).sort((a, b) => a.id > b.id ? 1 : -1);
       this.totalRecords = data.children && data.children.length + 1;
       await this.loadCardItemsModels();
+      this.cardProperties.isLoading = false;
     }
   }
 
@@ -858,7 +864,7 @@ export class WorkpackModelComponent implements OnInit {
         list = await this.getListMeasureUnits();
         break;
       case TypePropertyEnum.SelectionModel:
-        requiredFields = requiredFields.concat(['possibleValues', 'multipleSelection']);
+        requiredFields = requiredFields.concat(['possibleValuesOptions', 'multipleSelection']);
         break;
       case TypePropertyEnum.GroupModel:
         requiredFields = ['name', 'sortIndex', 'session', 'groupedProperties'];
@@ -951,7 +957,6 @@ export class WorkpackModelComponent implements OnInit {
   }
 
   checkProperties() {
-    
     if (this.formProperties.invalid) {
       this.saveButton?.hideButton();
       return;
@@ -1217,6 +1222,7 @@ export class WorkpackModelComponent implements OnInit {
       initialStateToggle: false,
       cardTitle: 'properties',
       collapseble: true,
+      isLoading: this.idWorkpackModel ? true : false,
       initialStateCollapse: false
     };
     this.cardPropertiesStakeholders = {
@@ -1392,10 +1398,12 @@ export class WorkpackModelComponent implements OnInit {
     this.modelProperties.forEach(prop => {
       delete prop.extraList;
       delete prop.extraListDefaults;
+      prop.possibleValues = prop.possibleValuesOptions && prop.possibleValuesOptions.join(',');
     });
     this.modelCostProperties.forEach(prop => {
       delete prop.extraList;
       delete prop.extraListDefaults;
+      prop.possibleValues = prop.possibleValuesOptions && prop.possibleValuesOptions.join(',');
     });
     const propertiesClone: IWorkpackModelProperty[] =
       JSON.parse(JSON.stringify([...this.modelProperties.filter(prop => prop.type !== TypePropertyEnum.GroupModel),
@@ -1505,6 +1513,7 @@ export class WorkpackModelComponent implements OnInit {
   }
 
   async loadCardItemsModels() {
+    this.isLoading = true;
     if (this.idWorkpackModel) {
       await this.loadReusableWorkpackModels();
     }
@@ -1551,6 +1560,9 @@ export class WorkpackModelComponent implements OnInit {
       })));
     }
     this.cardItemsModels = itemsModels;
+    setTimeout( () => {
+    this.isLoading = false;
+    }, 300)
   }
 
   loadReuseListOptions(data: IReusableWorkpackModel[], parent?: TreeNode) {
@@ -1667,7 +1679,7 @@ export class WorkpackModelComponent implements OnInit {
     return (await Promise.all(properties
       .map(async (p, i) => {
         if (p.possibleValues) {
-          p.possibleValues = (p.possibleValues as string).split(',');
+          p.possibleValuesOptions = (p.possibleValues as string).split(',');
         }
         if (p.defaultValue && p.multipleSelection) {
           p.defaultValue = (p.defaultValue as string).split(',');

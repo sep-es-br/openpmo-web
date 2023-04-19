@@ -19,6 +19,7 @@ import { FilterService, MessageService } from 'primeng/api';
 import { FilterDataviewService } from 'src/app/shared/services/filter-dataview.service';
 import { FilterDataviewPropertiesEntity } from 'src/app/shared/constants/filterDataviewPropertiesEntity';
 import { Subject } from 'rxjs';
+import { ConfigDataViewService } from 'src/app/shared/services/config-dataview.service';
 
 @Component({
   selector: 'app-office-permissions-list',
@@ -45,6 +46,7 @@ export class OfficePermissionsListComponent implements OnInit {
   currentUserInfo: IPerson;
   idFilterSelected: number;
   $destroy = new Subject();
+  isLoading = false;
 
   constructor(
     private actRouter: ActivatedRoute,
@@ -57,9 +59,15 @@ export class OfficePermissionsListComponent implements OnInit {
     private messageSrv: MessageService,
     private filterSrv: FilterDataviewService,
     private router: Router,
-    private citizenUserSrv: CitizenUserService
-
+    private citizenUserSrv: CitizenUserService,
+    private configDataViewSrv: ConfigDataViewService
   ) {
+    this.configDataViewSrv.observableDisplayModeAll.pipe(takeUntil(this.$destroy)).subscribe(displayMode => {
+      this.displayModeAll = displayMode;
+    });
+    this.configDataViewSrv.observablePageSize.pipe(takeUntil(this.$destroy)).subscribe(pageSize => {
+      this.pageSize = pageSize;
+    });
     this.citizenUserSrv.loadCitizenUsers();
     this.actRouter.queryParams.subscribe(async queryParams => {
       this.idOffice = queryParams.idOffice;
@@ -70,6 +78,7 @@ export class OfficePermissionsListComponent implements OnInit {
   }
 
   async ngOnInit() {
+    this.isLoading = true;
     const editPermission = await this.officePermissionsSrv.getPermissions(this.idOffice);
     if (!editPermission) {
       this.router.navigate(['/offices']);
@@ -94,14 +103,6 @@ export class OfficePermissionsListComponent implements OnInit {
     ]);
   }
 
-  handleChangeDisplayMode(event) {
-    this.displayModeAll = event.displayMode;
-  }
-
-  handleChangePageSize(event) {
-    this.pageSize = event.pageSize;
-  }
-
   async loadPropertiesOffice() {
     if (this.idOffice) {
       const result = await this.officeSrv.GetById(this.idOffice);
@@ -116,6 +117,7 @@ export class OfficePermissionsListComponent implements OnInit {
     if (result.success) {
       this.officePermissions = result.data;
       this.loadCardItemsOfficePermissions();
+      this.isLoading = false;
     }
   }
 

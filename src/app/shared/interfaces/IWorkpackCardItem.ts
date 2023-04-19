@@ -7,7 +7,7 @@ export interface IWorkpackCardItem {
   iconColor?: string;
   nameCardItem?: string;
   fullNameCardItem?: string;
-  subtitleCardItem?: string;
+  subtitleCardItem?: any;
   statusItem?: string;
   itemId?: number;
   menuItems?: MenuItem[];
@@ -26,7 +26,7 @@ export interface IWorkpackCardItem {
       high: number,
       low: number,
       medium: number,
-      total: number 
+      total: number
     },
     milestone?: IMilestoneDashboard,
     tripleConstraint?: ITripleConstraintDashboard,

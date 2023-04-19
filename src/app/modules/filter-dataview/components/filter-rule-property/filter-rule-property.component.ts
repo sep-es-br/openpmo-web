@@ -11,7 +11,7 @@ import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 export class FilterRulePropertyComponent implements OnInit {
 
   @Input() property: IFilterProperty;
-  @Input() value: string | number | boolean | string[] | Date | number[];
+  @Input() value;
   @Output() changed = new EventEmitter();
 
   types = TypePropertyModelEnum;

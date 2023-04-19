@@ -14,7 +14,7 @@
           <div class="p-formgroup-inline" [class.responsive]="responsive">
             <div class="p-field" [class.responsive]="responsive" *ngIf="(stepType === 'start' || (stepType === 'end' && !!onlyOneStep)) || stepType === 'newStart'">
               <span class="p-float-label" [class.responsive]="responsive">
-                <p-calendar id="float-start" class="app-select-date" showIcon="true" [minDate]="minStart"
+                <p-calendar id="float-start" class="app-select-date" [showIcon]="true" [minDate]="minStart"
                   [maxDate]="maxStart" [defaultDate]="start" formControlName="start" (onSelect)="handleChangeValuesCardItems()"
                   [class.responsive]="responsive" icon="fas fa-calendar-alt" [dateFormat]="calendarFormat">
                 </p-calendar>
@@ -23,7 +23,7 @@
             </div>
             <div class="p-field" [class.responsive]="responsive" *ngIf="(stepType === 'end' || (stepType === 'start' && !!onlyOneStep)) || stepType === 'newEnd'">
               <span class="p-float-label" [class.responsive]="responsive">
-                <p-calendar id="float-end" formControlName="end" class="app-select-date" showIcon="true"
+                <p-calendar id="float-end" formControlName="end" class="app-select-date" [showIcon]="true"
                   [class.responsive]="responsive" icon="fas fa-calendar-alt" [minDate]="minEnd" [maxDate]="maxEnd"
                   [defaultDate]="end" (onSelect)="handleChangeValuesCardItems()" [dateFormat]="calendarFormat">
                 </p-calendar>
@@ -38,9 +38,8 @@
               <div class="p-formgroup-inline" [class.responsive]="responsive">
                 <div class="p-field" [class.responsive]="responsive">
                   <span class="p-float-label" [class.responsive]="responsive">
-                    <!-- <app-input-unit-measure [form]="formStep" controlName="plannedWork" (onInput)="handleChangeTotalsValues()"></app-input-unit-measure> -->
                     <p-inputNumber class="app-input-number" formControlName="plannedWork"
-                      (change)="handleChangeTotalsValues()" [minFractionDigits]="unitPrecision"
+                      (onInput)="handleChangeTotalsValues()" [minFractionDigits]="unitPrecision"
                       [maxFractionDigits]="unitPrecision" [locale]="currentLang === 'pt-BR' ? 'pt-BR' : 'en-US'">
                     </p-inputNumber>
                     <label class="app-input-label">{{unitName}} {{ "planned" |translate }} * </label>
@@ -48,10 +47,8 @@
                 </div>
                 <div class="p-field" [class.responsive]="responsive">
                   <span class="p-float-label" [class.responsive]="responsive">
-                    <!-- <app-input-unit-measure [form]="formStep" controlName="actualWork"
-                      (onInput)="handleChangeTotalsValues()"></app-input-unit-measure> -->
                     <p-inputNumber class="app-input-number" formControlName="actualWork"
-                      (change)="handleChangeTotalsValues()" [minFractionDigits]="unitPrecision"
+                      (onInput)="handleChangeTotalsValues()" [minFractionDigits]="unitPrecision"
                       [maxFractionDigits]="unitPrecision" [locale]="currentLang === 'pt-BR' ? 'pt-BR' : 'en-US'">
                     </p-inputNumber>
                     <label class="app-input-label" for="float-actual">{{unitName}} {{ "actual" |translate }}</label>
@@ -86,11 +83,11 @@
             </ng-template>
           </p-dataView>
         </div>
-        <div class="app-save-button-layout">
-          <div class="app-save-button-wrapper" *ngIf="!!showSaveButton" @enterLeave>
-            <span class="button-label" (click)="saveStep()">{{ 'save' | translate }}</span>
-          </div>
-        </div>
       </app-card>
+    </div>
+    <div class="app-save-button-layout">
+      <div class="app-save-button-wrapper" *ngIf="!!showSaveButton" @enterLeave>
+        <span class="button-label" (click)="saveStep()">{{ 'save' | translate }}</span>
+      </div>
     </div>
   </div>

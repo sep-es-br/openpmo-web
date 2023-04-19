@@ -25,6 +25,7 @@ import { SaveButtonComponent } from 'src/app/shared/components/save-button/save-
 import { AuthService } from 'src/app/shared/services/auth.service';
 import { OfficePermissionService } from 'src/app/shared/services/office-permission.service';
 import { MenuService } from 'src/app/shared/services/menu.service';
+import { ConfigDataViewService } from 'src/app/shared/services/config-dataview.service';
 
 @Component({
   selector: 'app-office',
@@ -41,8 +42,6 @@ export class OfficeComponent implements OnDestroy {
   idOffice: number;
   planModelsOfficeList: IPlanModel[];
   menuItemsNewPlan: MenuItem[];
-  cardProperties: ICard;
-  cardPlans: ICard;
   plans: IPlan[];
   cardItemsPlans: ICardItem[];
   cardItemPlanMenu: MenuItem[];
@@ -55,6 +54,20 @@ export class OfficeComponent implements OnDestroy {
   totalRecords: number;
   filterProperties: IFilterProperty[] = this.filterSrv.get;
   idFilterSelected: number;
+  isLoading = false;
+  cardProperties: ICard = {
+    toggleable: false,
+    initialStateToggle: false,
+    cardTitle: 'properties',
+    collapseble: true,
+  };
+  cardPlans: ICard = {
+    toggleable: false,
+    initialStateToggle: false,
+    cardTitle: 'plans',
+    collapseble: true,
+    initialStateCollapse: this.collapsePanelsStatus
+  };
 
   constructor(
     private formBuilder: FormBuilder,
@@ -71,12 +84,35 @@ export class OfficeComponent implements OnDestroy {
     private messageSrv: MessageService,
     private menuSrv: MenuService,
     private filterSrv: FilterDataviewService,
+    private configDataViewSrv: ConfigDataViewService
   ) {
-    this.activeRoute.queryParams.subscribe(async({ id }) => {
+    this.configDataViewSrv.observableCollapsePanelsStatus.pipe(takeUntil(this.$destroy)).subscribe(collapsePanelStatus => {
+      this.collapsePanelsStatus = collapsePanelStatus === 'collapse' ? true : false;
+      this.cardProperties = Object.assign({}, {
+        ...this.cardProperties,
+        initialStateCollapse: this.collapsePanelsStatus
+      });
+      this.cardPlans = Object.assign({}, {
+        ...this.cardPlans,
+        initialStateCollapse: this.collapsePanelsStatus
+      });
+    });
+    this.configDataViewSrv.observableDisplayModeAll.pipe(takeUntil(this.$destroy)).subscribe(displayMode => {
+      this.displayModeAll = displayMode;
+    });
+    this.configDataViewSrv.observablePageSize.pipe(takeUntil(this.$destroy)).subscribe(pageSize => {
+      this.pageSize = pageSize;
+    });
+    this.activeRoute.queryParams.subscribe(async ({ id }) => {
       this.idOffice = +id;
+      if (this.idOffice) {
+        this.isLoading = true;
+        this.cardProperties.isLoading = true;
+      }
       this.editPermission = await this.officePermissionSrv.getPermissions(this.idOffice);
       await this.load();
     });
+    this.loadCards();
     this.formOffice = this.formBuilder.group({
       name: ['', [Validators.required, Validators.maxLength(25)]],
       fullName: ['', [Validators.required]]
@@ -95,54 +131,21 @@ export class OfficeComponent implements OnDestroy {
     this.$destroy.complete();
   }
 
-  handleChangeCollapseExpandPanel(event) {
-    this.collapsePanelsStatus = event.mode === 'collapse' ? true : false;
-    this.cardProperties = Object.assign({}, {
-      ...this.cardProperties,
-      initialStateCollapse: this.collapsePanelsStatus
-    });
-    this.cardPlans = Object.assign({}, {
-      ...this.cardPlans,
-      initialStateCollapse: this.collapsePanelsStatus
-    });
-  }
-
-  handleChangeDisplayMode(event) {
-    this.displayModeAll = event.displayMode;
-  }
-
-  handleChangePageSize(event) {
-    this.pageSize = event.pageSize;
+  mirrorFullName(): boolean {
+    return (isNaN(this.idOffice) && this.formOffice.get('fullName').pristine);
   }
 
   async load() {
+    this.isLoading = true;
     this.isUserAdmin = await this.authSrv.isUserAdmin();
     await this.loadPropertiesOffice();
-    this.loadCards();
     if (this.idOffice) {
       await this.loadPlans();
     }
   }
 
   loadCards() {
-    this.cardProperties = {
-      toggleable: false,
-      initialStateToggle: false,
-      cardTitle: 'properties',
-      collapseble: true,
-      initialStateCollapse: this.idOffice ? this.collapsePanelsStatus : false
-    };
-    this.cardPlans = {
-      toggleable: false,
-      initialStateToggle: false,
-      cardTitle: 'plans',
-      collapseble: true,
-      initialStateCollapse: this.collapsePanelsStatus
-    };
-  }
-
-  mirrorFullName(): boolean {
-    return (isNaN(this.idOffice) && this.formOffice.get('fullName').pristine);
+    this.cardProperties.initialStateCollapse = this.idOffice ? this.collapsePanelsStatus : false
   }
 
   async loadPropertiesOffice() {
@@ -154,12 +157,14 @@ export class OfficeComponent implements OnDestroy {
         if (!this.editPermission) {
           this.formOffice.disable();
         }
+        this.cardProperties.isLoading = false;
       }
     }
     this.breadcrumbSrv.setMenu([]);
   }
 
   async loadPlanModelsOfficeList() {
+    this.isLoading = true;
     const { success, data } = await this.planModelSrv.GetAll({ 'id-office': this.idOffice });
     if (success) {
       this.planModelsOfficeList = data;
@@ -178,11 +183,13 @@ export class OfficeComponent implements OnDestroy {
   }
 
   async loadPlans() {
+    this.isLoading = true;
     this.loadPlanModelsOfficeList();
     await this.loadFiltersPlans();
     const result = await this.planSrv.GetAll({ 'id-office': this.idOffice, 'idFilter': this.idFilterSelected });
     if (result.success) {
       this.plans = result.data;
+      this.isLoading = false;
     }
     this.loadCardItemsPlans();
   }
@@ -229,6 +236,7 @@ export class OfficeComponent implements OnDestroy {
     this.totalRecords = this.cardItemsPlans && this.cardItemsPlans.length;
     this.cardPlans.showCreateNemElementButton = this.editPermission && this.menuItemsNewPlan?.length > 0 ? true : false;
     this.cardPlans.createNewElementMenuItems = this.menuItemsNewPlan;
+    
   }
 
   navigateToNewPlan(idPlanModel: number) {
@@ -271,22 +279,6 @@ export class OfficeComponent implements OnDestroy {
         await this.createOfficePermission(data.id);
       }
       await this.loadPropertiesOffice();
-      this.breadcrumbSrv.updateLastCrumb({
-        key: 'office',
-        routerLink: ['/offices', 'office'],
-        queryParams: { id: this.idOffice },
-        info: this.propertiesOffice?.name,
-        tooltip: this.propertiesOffice?.fullName
-      });
-      this.breadcrumbSrv.setBreadcrumbStorage([
-        {
-          key: 'office',
-          routerLink: ['/offices', 'office'],
-          queryParams: { id: this.idOffice },
-          info: this.propertiesOffice?.name,
-          tooltip: this.propertiesOffice?.fullName
-        }
-      ]);
       this.messageSrv.add({
         severity: 'success',
         summary: this.translateSrv.instant('success'),

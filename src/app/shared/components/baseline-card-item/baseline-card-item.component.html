@@ -29,8 +29,7 @@
         <span class="card-item-status"
           [ngStyle]="{ color: properties.baselineStatus !== 'proposed' ? '#009dd4' : '#888e96' }"
           *ngIf="properties.baselineStatus">{{properties.baselineStatus |translate}}</span>
-        <span class="card-item-status-date"
-          [class.date-none]="properties?.baselineStatusDate === 'NONE'">
+        <span class="card-item-status-date" [class.date-none]="properties?.baselineStatusDate === 'NONE'">
           {{ properties?.baselineStatusDate !== 'NONE' ? (language === 'pt' ?
           (properties?.baselineStatusDate|date:'dd/MM/yyyy') :
           (properties?.baselineStatusDate|date:'yyyy/MM/dd')) : ''}}</span>
@@ -55,7 +54,7 @@
         </div>
         <div class="icons-container">
           <i
-            [ngClass]="properties.iconSvg ? [ 'app-icon', properties.icon, 'grey-icon'] : [ 'icon-card', properties.icon, 'grey-icon' ]"></i>
+            [ngClass]="properties.iconSvg ? [ 'app-icon', properties.icon, 'grey-icon', displayModeCard] : [ 'icon-card', properties.icon, 'grey-icon', displayModeCard ]"></i>
         </div>
         <span class="card-item-name" [pTooltip]="properties.fullNameCardItem" *ngIf="properties.icon === 'baseline'"
           tooltipPosition="bottom">{{properties.nameCardItem}}</span>
@@ -88,13 +87,14 @@
 
   </p-card>
 
-  <p-card *ngSwitchCase="'newCardItem'" class="new-carditem" [class.card-link]="properties.urlCard"
+  <p-card *ngSwitchCase="'newCardItem'" class="baseline-new-carditem" [class.card-link]="properties.urlCard"
     [class.mobile]="responsive" [class.cardList]="displayModeCard === 'list'" [class.new-card-item-mobile]="responsive"
     (click)="properties.urlCard && navigateToPage(properties.urlCard, properties.paramsUrlCard)">
     <div class="carditem-content">
       <i [ngClass]="[ 'app-icon', properties.icon, 'light-grey-icon']"
         (click)=" properties.iconMenuItems && menuIcon.toggle($event)"
-        [ngStyle]="{ fontSize: (responsive ? 2 : 3) + 'rem' }" [class.card-link]="properties.iconMenuItems"></i>
+        [ngStyle]="{ fontSize: (responsive ? 2 : (displayModeCard === 'list') ? 2.5 : 3) + 'rem' }"
+        [class.card-link]="properties.iconMenuItems"></i>
       <p-tieredMenu #menuIcon [popup]="true" [model]="properties.iconMenuItems"></p-tieredMenu>
     </div>
   </p-card>

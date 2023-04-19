@@ -3,7 +3,10 @@ export interface IDashboard {
   milestone?: IMilestoneDashboard;
   risk?: IRiskDashboard;
   stakeholders?: IStakeholderDashboard[];
-  tripleConstraint: ITripleConstraintDashboard[];
+  tripleConstraint: ITripleConstraintDashboard[] | ITripleConstraintDashboard;
+  costPerformanceIndex?:     any;
+  schedulePerformanceIndex?: any;
+  earnedValue?:              number;
   workpacksByModel?: {
     quantity: number;
     modelName: string;

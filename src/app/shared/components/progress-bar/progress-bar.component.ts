@@ -27,6 +27,7 @@ export class ProgressBarComponent implements OnInit, OnDestroy {
   @Input() endDateBaseline: Date;
   @Input() startDateTotal: Date;
   @Input() endDateTotal: Date;
+  @Input() disableLabels = false;
 
   language: string;
   $destroy = new Subject();

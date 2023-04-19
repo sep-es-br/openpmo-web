@@ -257,7 +257,7 @@
     <div class="carditem-content">
       <i [ngClass]="[ 'app-icon', properties.icon, 'light-grey-icon']"
         (click)=" properties.iconMenuItems && menuIcon.toggle($event)"
-        [ngStyle]="{ fontSize: (responsive ? 2 : 3) + 'rem' }" [class.card-link]="properties.iconMenuItems"></i>
+        [ngStyle]="{ fontSize: (responsive ? 2 : (displayModeCard === 'list') ? 2.5 : 3) + 'rem' }" [class.card-link]="properties.iconMenuItems"></i>
       <p-tieredMenu #menuIcon [popup]="true" [model]="properties.iconMenuItems"></p-tieredMenu>
     </div>
   </p-card>
@@ -268,7 +268,7 @@
     (click)="properties.urlCard && navigateToPage(properties.urlCard, properties.paramsUrlCard)">
     <div class="carditem-content" *ngIf="!showMenuNewModel">
       <i [ngClass]="[ 'app-icon', properties.icon, 'light-grey-icon']" (click)="showMenuNewModel = true"
-        [ngStyle]="{ fontSize: (responsive ? 2 : 3) + 'rem' }" [class.card-link]="properties.iconMenuItems"></i>
+        [ngStyle]="{ fontSize: (responsive ? 2 : (displayModeCard === 'list') ? 2.5 : 3) + 'rem' }" [class.card-link]="properties.iconMenuItems"></i>
     </div>
     <div class="carditem-content menu-model-container" *ngIf="showMenuNewModel">
       <ul class="menuNewModelContainer">

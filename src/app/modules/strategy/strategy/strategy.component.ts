@@ -21,6 +21,7 @@ import { OfficeService } from 'src/app/shared/services/office.service';
 import { AuthService } from 'src/app/shared/services/auth.service';
 import { IOffice } from 'src/app/shared/interfaces/IOffice';
 import { OfficePermissionService } from 'src/app/shared/services/office-permission.service';
+import { ConfigDataViewService } from 'src/app/shared/services/config-dataview.service';
 
 @Component({
   selector: 'app-strategy',
@@ -37,7 +38,12 @@ export class StrategyComponent implements OnDestroy {
   idStrategy: number;
   idOffice: number;
   propertiesOffice: IOffice;
-  cardProperties: ICard;
+  cardProperties: ICard = {
+    toggleable: false,
+    initialStateToggle: false,
+    cardTitle: 'properties',
+    collapseble: true
+  };
   cardModels: ICard;
   models: IWorkpackModel[];
   cardItemsModels: ICardItem[];
@@ -54,6 +60,8 @@ export class StrategyComponent implements OnDestroy {
   sharedWith: IOffice[] = [];
   sharedWithAll = false;
   officeListOptionsSharing: IOffice[];
+  isLoading = false;
+  language: string;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -67,8 +75,33 @@ export class StrategyComponent implements OnDestroy {
     private officeSrv: OfficeService,
     private officePermissionSrv: OfficePermissionService,
     private authSrv: AuthService,
-    private messageSrv: MessageService
+    private messageSrv: MessageService,
+    private configDataViewSrv: ConfigDataViewService
   ) {
+    this.translateSrv.onLangChange.pipe(takeUntil(this.$destroy)).subscribe(() => {
+      setTimeout(() => this.setLanguage(), 200);
+    });
+    this.configDataViewSrv.observableCollapsePanelsStatus.pipe(takeUntil(this.$destroy)).subscribe(collapsePanelStatus => {
+      this.collapsePanelsStatus = collapsePanelStatus === 'collapse' ? true : false;
+      this.cardProperties = Object.assign({}, {
+        ...this.cardProperties,
+        initialStateCollapse: this.collapsePanelsStatus
+      });
+      this.cardModels = Object.assign({}, {
+        ...this.cardModels,
+        initialStateCollapse: this.collapsePanelsStatus
+      });
+      this.sharingProperties = Object.assign({}, {
+        ...this.sharingProperties,
+        initialStateCollapse: this.collapsePanelsStatus
+      });
+    });
+    this.configDataViewSrv.observableDisplayModeAll.pipe(takeUntil(this.$destroy)).subscribe(displayMode => {
+      this.displayModeAll = displayMode;
+    });
+    this.configDataViewSrv.observablePageSize.pipe(takeUntil(this.$destroy)).subscribe(pageSize => {
+      this.pageSize = pageSize;
+    });
     this.formStrategy = this.formBuilder.group({
       name: ['', [Validators.required, Validators.maxLength(25)]],
       fullName: ['', [Validators.required]]
@@ -83,6 +116,11 @@ export class StrategyComponent implements OnDestroy {
     this.activeRoute.queryParams.subscribe(async ({ id, idOffice }) => {
       this.idStrategy = +id;
       this.idOffice = +idOffice;
+      if (this.idStrategy) {
+        this.isLoading = true;
+        this.cardProperties.isLoading = true;
+      }
+      this.cardProperties.initialStateCollapse = this.idStrategy ? true : false;
       const resultOffice = await this.officeSrv.GetById(this.idOffice);
       if (resultOffice.success) {
         this.propertiesOffice = resultOffice.data;
@@ -98,7 +136,7 @@ export class StrategyComponent implements OnDestroy {
       if (this.idStrategy) {
         await this.loadModels();
       }
-      await this.loadOfficeListOptionsSharing();
+      this.loadOfficeListOptionsSharing();
       await this.loadPropertiesStrategy();
       this.breadcrumbSrv.setMenu([
         {
@@ -124,6 +162,7 @@ export class StrategyComponent implements OnDestroy {
         }
       ]);
     });
+    this.setLanguage();
   }
 
   ngOnDestroy(): void {
@@ -131,38 +170,11 @@ export class StrategyComponent implements OnDestroy {
     this.$destroy.complete();
   }
 
-  handleChangeCollapseExpandPanel(event) {
-    this.collapsePanelsStatus = event.mode === 'collapse' ? true : false;
-    this.cardProperties = Object.assign({}, {
-      ...this.cardProperties,
-      initialStateCollapse: this.collapsePanelsStatus
-    });
-    this.cardModels = Object.assign({}, {
-      ...this.cardModels,
-      initialStateCollapse: this.collapsePanelsStatus
-    });
-    this.sharingProperties = Object.assign({}, {
-      ...this.sharingProperties,
-      initialStateCollapse: this.collapsePanelsStatus
-    });
-  }
-
-  handleChangeDisplayMode(event) {
-    this.displayModeAll = event.displayMode;
-  }
-
-  handleChangePageSize(event) {
-    this.pageSize = event.pageSize;
+  setLanguage() {
+    this.language = this.translateSrv.currentLang;
   }
 
   loadCards() {
-    this.cardProperties = {
-      toggleable: false,
-      initialStateToggle: false,
-      cardTitle: 'properties',
-      collapseble: true,
-      initialStateCollapse: this.idStrategy ? true : false
-    };
     this.cardModels = {
       toggleable: false,
       initialStateToggle: false,
@@ -197,7 +209,10 @@ export class StrategyComponent implements OnDestroy {
         if (!this.editPermission) {
           this.formStrategy.disable();
         }
+        this.cardProperties.isLoading = false;
       }
+    } else {
+      this.cardProperties.isLoading = false;
     }
   }
 
@@ -227,6 +242,7 @@ export class StrategyComponent implements OnDestroy {
   }
 
   async loadModels() {
+    this.isLoading = true;
     const result = await this.workpackModelSvr.GetAll({ 'id-plan-model': this.idStrategy });
     if (result.success) {
       this.totalRecords = result.data.length ? result.data.length + 1 : 1;
@@ -302,6 +318,9 @@ export class StrategyComponent implements OnDestroy {
       )));
     }
     this.cardItemsModels = itemsModels;
+    setTimeout( () => {
+      this.isLoading = false;
+    }, 300);
   }
 
   async deleteWorkpackModel(worckpackModel: IWorkpackModel) {

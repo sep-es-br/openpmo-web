@@ -1,6 +1,6 @@
 <div class="app-stakeholder-organization">
   <div class="app-stakeholder-header" [class.app-stakeholder-header-mobile]="responsive">
-    <span class="header-text" *ngIf="!organization">{{ "newStakeholder" | translate }}</span>
+    <span class="header-text" *ngIf="!organization">{{ "newStakeholderAndPermissions" | translate }}</span>
     <span class="header-text" *ngIf="organization">{{ organization?.name }}</span>
   </div>
   <div class="card-organization" *ngIf="cardOrganization">

@@ -1,0 +1,44 @@
+<div class="app-progress-bar-schedule-year" *ngIf="total && total !== 0">
+  <div class="unit-container">
+    <span *ngIf="!['currency'].includes(valueUnit)" [ngStyle]="{color: color}">{{valueUnit}}</span>
+    <span *ngIf="valueUnit === 'currency'" [ngStyle]="{color: color}">$</span>
+    <i class="fas fa-calendar-alt" *ngIf="valueUnit === 'time'" [ngStyle]="{color: color}"></i>
+  </div>
+  <div class="progress-header-values-container" [class.responsive]="responsive">
+    <div class="progress-bar-header">
+      <div class="labels">
+        <span class="header-label" *ngIf="labelProgress" [ngStyle]="{color: color}">{{labelProgress | translate}}</span>
+        <span class="header-label" *ngIf="labelTotal" [ngStyle]="{color: '#004660'}">{{labelTotal | translate}}</span>
+      </div>
+      <div class="values">
+        <span class="value" [ngStyle]="{color: color}" *ngIf="valueUnit"
+          [pTooltip]="(valueUnit === 'currency' ? '$ ' : '') + ( language === 'pt' ?
+            (valueUnit === 'currency' ? (progress |number:'0.2-2':'pt') : (progress |number:'0.0-0':'pt')) 
+            : (valueUnit === 'currency' ? (progress |number:'0.2-2':'en') : (progress |number:'0.0-0':'en'))) + ' ' + (valueUnit === 'currency' ? '' : (valueUnit === 'time' ? ('days'|translate ) : valueUnit))">
+          {{ valueUnit !== 'time' ? (progress|shortNumber:language) : progress + 'd'}}
+        </span>
+        <span class="value" [ngStyle]="{color: '#004660'}" *ngIf="valueUnit"
+          [pTooltip]="(valueUnit === 'currency' ? '$ ' : '') + ( language === 'pt' ?
+          (valueUnit === 'currency' ? (total |number:'0.2-2':'pt') : (total |number:'0.0-0':'pt')) 
+          : (valueUnit === 'currency' ? (total |number:'0.2-2':'en') : (total |number:'0.0-0':'en'))) + ' ' + (valueUnit === 'currency' ? '' : (valueUnit === 'time' ? ('days'|translate ) : valueUnit))">
+          {{ valueUnit !== 'time' ? (total|shortNumber:language) : total + 'd'}}
+        </span>
+      </div>
+      <div class="total"></div>
+    </div>
+    <div class="progress-bar-total-container" [ngStyle]="{width: '100%', background: 'transparent'}">
+      <div class="progress-bar" *ngIf="total >= progress"
+        [ngStyle]="{width: (progress/total)*100 + '%', background: color, height: '3px'}">
+      </div>
+      <div class="progress-bar" *ngIf="total >= progress"
+        [ngStyle]="{width: '100%', background: '#004660', height: '3px'}">
+      </div>
+      <div class="progress-bar" *ngIf="total < progress"
+        [ngStyle]="{width: '100%', background: color, height: '3px'}">
+      </div>
+      <div class="progress-bar" *ngIf="total < progress"
+        [ngStyle]="{width: (total/progress)*100 + '%', background: '#004660', height: '3px'}">
+      </div>
+    </div>
+  </div>
+</div>

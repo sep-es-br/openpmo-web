@@ -52,4 +52,10 @@ export class ScheduleStepCardItemComponent implements OnInit, OnDestroy {
   handleStepChange() {
     this.stepChanged.next();
   }
+
+  handleStepCostChange() {
+    this.properties.costProgressBar.total = this.properties.costPlanned;
+    this.properties.costProgressBar.progress = this.properties.costActual;
+    this.stepChanged.next();
+  }
 }

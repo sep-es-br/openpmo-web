@@ -22,6 +22,11 @@
     align-items: flex-end;
     flex: 1;
   }
+
+  .loading-container {
+    position: relative;
+    min-height: 150px;
+  }
   .header-container.mobile {
     flex-direction: column;
   }

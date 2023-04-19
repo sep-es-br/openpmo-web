@@ -3,124 +3,127 @@
     <div class="app-content-header" [class.mobile]="responsive">
       <span>{{ 'measureUnits'|translate }}</span>
     </div>
-    <app-config-data-view-panel [notShowCollapseOptions]="true"
-      (changeDisplayMode)="handleChangeDisplayMode($event)" (changePageSize)="handleChangePageSize($event)">
+    <app-config-data-view-panel [notShowCollapseOptions]="true">
     </app-config-data-view-panel>
   </div>
   <div class="card-container" *ngIf="cardProperties">
     <app-card [properties]="cardProperties" class="mt-0" *ngIf="cardProperties.showFilters"
       (editFilter)="handleEditFilter($event)" (newFilter)="handleNewFilter()"
       (selectedFilter)="handleSelectedFilter($event)" (createNewElement)="handleAddCardItem()">
-      <p-dataView [value]="cardItemsProperties" layout="grid" class="app-dataview" *ngIf="displayModeAll === 'grid' || (displayModeAll === 'list' && !!responsive)"
-        [paginator]="true" [rows]="pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false"
-        [totalRecords]="totalRecords"
-        [emptyMessage]="((editPermission === undefined || editPermission) ? 'loadingEllipsis' : 'noContent') | translate">
-        <ng-template let-cardItem pTemplate="gridItem">
-          <div class="p-col-12 p-sm-12 p-md-4 p-lg-3 card-item-container">
-            <p-card *ngIf="cardItem.typeCardItem === 'listItem'" class="app-card-item listItem"
-              [class.mobile]="responsive">
+      <div class="loading-container" *ngIf="isLoading">
+        <app-card-loading [isCardLoading]="isLoading"></app-card-loading>
+      </div>
+      <p-dataView [value]="cardItemsProperties" layout="grid" class="app-dataview"
+      *ngIf="(displayModeAll === 'grid' || (displayModeAll === 'list' && !!responsive)) && !isLoading"
+      [paginator]="true" [rows]="pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false"
+      [totalRecords]="totalRecords"
+      [emptyMessage]="((editPermission === undefined || editPermission) ? 'loadingEllipsis' : 'noContent') | translate">
+      <ng-template let-cardItem pTemplate="gridItem">
+        <div class="p-col-12 p-sm-12 p-md-4 p-lg-3 card-item-container">
+          <p-card *ngIf="cardItem.typeCardItem === 'listItem'" class="unit-app-card-item listItem"
+            [class.mobile]="responsive">
+            <p-header *ngIf="cardItem.menuItems" class="card-item-header">
+              <p-menu #menu [popup]="true" [model]="cardItem.menuItems"></p-menu>
+              <button type="button" pButton icon="pi pi-ellipsis-v" (click)="menu.toggle($event)"></button>
+            </p-header>
+            <div class="card-item-content">
+              <form [formGroup]="getFormById(cardItem.id || cardItem.newId)" class="p-fluid">
+                <span class="p-float-label p-field">
+                  <input formControlName="name" type="text" pInputText class="app-input-text">
+                  <label for="float-input" class="app-input-label">{{'name' | translate}}<span
+                      class="required-indicator">*</span></label>
+                </span>
+                <app-input-message [form]="getFormById(cardItem.id || cardItem.newId)" field="name">
+                </app-input-message>
+                <span class="p-float-label p-field margin-top">
+                  <input formControlName="fullName" type="text" pInputText class="app-input-text">
+                  <label for="float-input" class="app-input-label">{{'fullName' | translate}}<span
+                      class="required-indicator">*</span></label>
+                </span>
+                <app-input-message [form]="getFormById(cardItem.id || cardItem.newId)" field="fullName">
+                </app-input-message>
+                <span class="p-float-label p-field margin-top">
+                  <p-inputNumber type="number" formControlName="precision" class="app-input-number" [min]="0"
+                    [max]="5"></p-inputNumber>
+                  <label for="float-input" class="app-input-label">{{'precision' | translate}}<span
+                      class="required-indicator">*</span></label>
+                </span>
+                <app-input-message [form]="getFormById(cardItem.id || cardItem.newId)" field="precision">
+                </app-input-message>
+              </form>
+            </div>
+            <div class="card-item-footer">
+              <span class="card-item-id">
+                {{cardItem.itemId}}
+              </span>
+            </div>
+          </p-card>
+          <p-card *ngIf="cardItem.typeCardItem === 'newCardItem'" class="new-card-item"
+            [class.new-card-item-mobile]="responsive" (click)="handleAddCardItem()">
+            <div class="card-item-content">
+              <i [ngClass]="[ 'app-icon', cardItem.icon, 'light-grey-icon' ]"
+                [ngStyle]="{ fontSize: responsive ? '2rem' : '3rem' }"></i>
+            </div>
+          </p-card>
+        </div>
+      </ng-template>
+    </p-dataView>
+    <p-dataView [value]="cardItemsProperties" layout="list"
+      *ngIf="(displayModeAll === 'list' && !responsive) && !isLoading" class="app-dataview app-dataview-list"
+      [paginator]="true" [rows]="pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false"
+      [totalRecords]="totalRecords"
+      [emptyMessage]="((editPermission === undefined || editPermission) ? 'loadingEllipsis' : 'noContent') | translate">
+      <ng-template let-cardItem pTemplate="listItem">
+        <div class="p-col-12">
+          <p-card *ngIf="cardItem.typeCardItem === 'listItem'" class="unit-app-card-item listItem list-mode">
+            <div class="card-item-content card-item-content-list">
+              <form [formGroup]="getFormById(cardItem.id || cardItem.newId)" class="p-fluid form-list-mode">
+                <span class="p-float-label p-field">
+                  <input formControlName="name" type="text" pInputText class="app-input-text">
+                  <label for="float-input" class="app-input-label">{{'name' | translate}}<span
+                      class="required-indicator">*</span></label>
+                </span>
+                <app-input-message [form]="getFormById(cardItem.id || cardItem.newId)" field="name">
+                </app-input-message>
+                <span class="p-float-label p-field margin-top fullName">
+                  <input formControlName="fullName" type="text" pInputText class="app-input-text">
+                  <label for="float-input" class="app-input-label">{{'fullName' | translate}}<span
+                      class="required-indicator">*</span></label>
+                </span>
+                <app-input-message [form]="getFormById(cardItem.id || cardItem.newId)" field="fullName">
+                </app-input-message>
+                <span class="p-float-label p-field margin-top">
+                  <p-inputNumber type="number" formControlName="precision" class="app-input-number" [min]="0"
+                    [max]="5"></p-inputNumber>
+                  <label for="float-input" class="app-input-label">{{'precision' | translate}}<span
+                      class="required-indicator">*</span></label>
+                </span>
+                <app-input-message [form]="getFormById(cardItem.id || cardItem.newId)" field="precision">
+                </app-input-message>
+              </form>
+            </div>
+            <div class="header-footer-container">
               <p-header *ngIf="cardItem.menuItems" class="card-item-header">
                 <p-menu #menu [popup]="true" [model]="cardItem.menuItems"></p-menu>
                 <button type="button" pButton icon="pi pi-ellipsis-v" (click)="menu.toggle($event)"></button>
               </p-header>
-              <div class="card-item-content">
-                <form [formGroup]="getFormById(cardItem.id || cardItem.newId)" class="p-fluid">
-                  <span class="p-float-label p-field">
-                    <input formControlName="name" type="text" pInputText class="app-input-text">
-                    <label for="float-input" class="app-input-label">{{'name' | translate}}<span
-                        class="required-indicator">*</span></label>
-                  </span>
-                  <app-input-message [form]="getFormById(cardItem.id || cardItem.newId)" field="name">
-                  </app-input-message>
-                  <span class="p-float-label p-field margin-top">
-                    <input formControlName="fullName" type="text" pInputText class="app-input-text">
-                    <label for="float-input" class="app-input-label">{{'fullName' | translate}}<span
-                        class="required-indicator">*</span></label>
-                  </span>
-                  <app-input-message [form]="getFormById(cardItem.id || cardItem.newId)" field="fullName">
-                  </app-input-message>
-                  <span class="p-float-label p-field margin-top">
-                    <p-inputNumber type="number" formControlName="precision" class="app-input-number" [min]="0"
-                      [max]="5"></p-inputNumber>
-                    <label for="float-input" class="app-input-label">{{'precision' | translate}}<span
-                        class="required-indicator">*</span></label>
-                  </span>
-                  <app-input-message [form]="getFormById(cardItem.id || cardItem.newId)" field="precision">
-                  </app-input-message>
-                </form>
-              </div>
               <div class="card-item-footer">
                 <span class="card-item-id">
                   {{cardItem.itemId}}
                 </span>
               </div>
-            </p-card>
-            <p-card *ngIf="cardItem.typeCardItem === 'newCardItem'" class="new-card-item"
-              [class.new-card-item-mobile]="responsive" (click)="handleAddCardItem()">
-              <div class="card-item-content">
-                <i [ngClass]="[ 'app-icon', cardItem.icon, 'light-grey-icon' ]"
-                  [ngStyle]="{ fontSize: responsive ? '2rem' : '3rem' }"></i>
-              </div>
-            </p-card>
-          </div>
-        </ng-template>
-      </p-dataView>
-      <p-dataView [value]="cardItemsProperties" layout="list" *ngIf="displayModeAll === 'list' && !responsive"
-        class="app-dataview app-dataview-list" [paginator]="true" [rows]="pageSize" [showJumpToPageDropdown]="true"
-        [showPageLinks]="false" [totalRecords]="totalRecords"
-        [emptyMessage]="((editPermission === undefined || editPermission) ? 'loadingEllipsis' : 'noContent') | translate">
-        <ng-template let-cardItem pTemplate="listItem">
-          <div class="p-col-12">
-            <p-card *ngIf="cardItem.typeCardItem === 'listItem'" class="app-card-item listItem list-mode">
-              <div class="card-item-content card-item-content-list">
-                <form [formGroup]="getFormById(cardItem.id || cardItem.newId)" class="p-fluid form-list-mode">
-                  <span class="p-float-label p-field">
-                    <input formControlName="name" type="text" pInputText class="app-input-text">
-                    <label for="float-input" class="app-input-label">{{'name' | translate}}<span
-                        class="required-indicator">*</span></label>
-                  </span>
-                  <app-input-message [form]="getFormById(cardItem.id || cardItem.newId)" field="name">
-                  </app-input-message>
-                  <span class="p-float-label p-field margin-top fullName">
-                    <input formControlName="fullName" type="text" pInputText class="app-input-text"
-                    [ngModel]="(formOffice.touched) ? formOffice.value.fullName : formOffice.value.name">
-                    <label for="float-input" class="app-input-label">{{'fullName' | translate}}<span
-                        class="required-indicator">*</span></label>
-                  </span>
-                  <app-input-message [form]="getFormById(cardItem.id || cardItem.newId)" field="fullName">
-                  </app-input-message>
-                  <span class="p-float-label p-field margin-top">
-                    <p-inputNumber type="number" formControlName="precision" class="app-input-number" [min]="0"
-                      [max]="5"></p-inputNumber>
-                    <label for="float-input" class="app-input-label">{{'precision' | translate}}<span
-                        class="required-indicator">*</span></label>
-                  </span>
-                  <app-input-message [form]="getFormById(cardItem.id || cardItem.newId)" field="precision">
-                  </app-input-message>
-                </form>
-              </div>
-              <div class="header-footer-container">
-                <p-header *ngIf="cardItem.menuItems" class="card-item-header">
-                  <p-menu #menu [popup]="true" [model]="cardItem.menuItems"></p-menu>
-                  <button type="button" pButton icon="pi pi-ellipsis-v" (click)="menu.toggle($event)"></button>
-                </p-header>
-                <div class="card-item-footer">
-                  <span class="card-item-id">
-                    {{cardItem.itemId}}
-                  </span>
-                </div>
-              </div>
-            </p-card>
-            <p-card *ngIf="cardItem.typeCardItem === 'newCardItem'" class="new-card-item list-mode"
-              [class.new-card-item-mobile]="responsive" (click)="handleAddCardItem()">
-              <div class="card-item-content">
-                <i [ngClass]="[ 'app-icon', cardItem.icon, 'light-grey-icon' ]"
-                  [ngStyle]="{ fontSize: responsive ? '2rem' : '3rem' }"></i>
-              </div>
-            </p-card>
-          </div>
-        </ng-template>
-      </p-dataView>
+            </div>
+          </p-card>
+          <p-card *ngIf="cardItem.typeCardItem === 'newCardItem'" class="new-card-item list-mode"
+            [class.new-card-item-mobile]="responsive" (click)="handleAddCardItem()">
+            <div class="card-item-content">
+              <i [ngClass]="[ 'app-icon', cardItem.icon, 'light-grey-icon' ]"
+                [ngStyle]="{ fontSize: responsive ? '2rem' : '3rem' }"></i>
+            </div>
+          </p-card>
+        </div>
+      </ng-template>
+    </p-dataView>
     </app-card>
     <app-save-button #saveButton (save)="handleOnSubmit()"></app-save-button>
   </div>

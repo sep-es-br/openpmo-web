@@ -21,7 +21,7 @@ export class AvatarComponent implements OnInit, OnChanges {
 
   modalImgAvatarUpload = false;
   hasAvatar = false;
-  avatarFile: IFile = {};
+  avatarFile;
   resizableImgAvatar: boolean;
   imageChangedEvent: any;
   croppedImageAvatar: string;

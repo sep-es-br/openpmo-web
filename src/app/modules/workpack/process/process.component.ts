@@ -178,7 +178,7 @@ export class ProcessComponent implements OnInit, OnDestroy {
 
   async loadPermissions() {
     const isUserAdmin = await this.authSrv.isUserAdmin();
-    const idWorkpack = this.idProcess ? this.process.idWorkpack : this.idWorkpack;
+    const idWorkpack = this.idWorkpack;
     this.idPlan = Number(localStorage.getItem('@currentPlan'));
     const result = await this.workpackSrv.GetWorkpackPermissions(idWorkpack, { 'id-plan': this.idPlan });
     if (result.success) {

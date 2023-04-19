@@ -3,6 +3,7 @@ import { NavigationEnd, Router } from '@angular/router';
 import { filter } from 'rxjs/operators';
 
 import { ResponsiveService } from './shared/services/responsive.service';
+import { WorkpackShowTabviewService } from './shared/services/workpack-show-tabview.service';
 
 @Component({
   selector: 'app-root',
@@ -16,6 +17,7 @@ export class AppComponent implements OnInit {
 
   constructor(
     private responsiveSrv: ResponsiveService,
+    private workpackShowTabViewSrv: WorkpackShowTabviewService,
     private router: Router,
   ){
     this.responsiveSrv.observable.subscribe(isMobileView => this.isMobileView = isMobileView);
@@ -45,6 +47,12 @@ export class AppComponent implements OnInit {
     }
     if (this.isMobileView && width > 768) {
       this.responsiveSrv.next(false);
+    }
+    if (width >= 900) {
+      this.workpackShowTabViewSrv.next(true);
+    }
+    if (width < 900) {
+      this.workpackShowTabViewSrv.next(false);
     }
   }
 }

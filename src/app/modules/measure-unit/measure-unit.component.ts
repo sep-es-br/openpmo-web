@@ -22,6 +22,7 @@ import { MeasureUnitService } from 'src/app/shared/services/measure-unit.service
 import { OfficePermissionService } from 'src/app/shared/services/office-permission.service';
 import { OfficeService } from 'src/app/shared/services/office.service';
 import { ResponsiveService } from 'src/app/shared/services/responsive.service';
+import { ConfigDataViewService } from 'src/app/shared/services/config-dataview.service';
 
 @Component({
   selector: 'app-measure-unit',
@@ -47,6 +48,7 @@ export class MeasureUnitComponent implements OnInit {
   totalRecords: number;
   idFilterSelected: number;
   cardProperties: ICard;
+  isLoading = false;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -61,8 +63,15 @@ export class MeasureUnitComponent implements OnInit {
     private messageSrv: MessageService,
     private translateSrv: TranslateService,
     private filterSrv: FilterDataviewService,
-    private router: Router
+    private router: Router,
+    private configDataViewSrv: ConfigDataViewService
   ) {
+    this.configDataViewSrv.observableDisplayModeAll.pipe(takeUntil(this.$destroy)).subscribe(displayMode => {
+      this.displayModeAll = displayMode;
+    });
+    this.configDataViewSrv.observablePageSize.pipe(takeUntil(this.$destroy)).subscribe(pageSize => {
+      this.pageSize = pageSize;
+    });
     this.activeRoute.queryParams.subscribe(params => this.idOffice = +params.idOffice);
     this.responsiveSrv.observable.subscribe(value => this.responsive = value);
   }
@@ -99,14 +108,6 @@ export class MeasureUnitComponent implements OnInit {
     ]);
   }
 
-  handleChangeDisplayMode(event) {
-    this.displayModeAll = event.displayMode;
-  }
-
-  handleChangePageSize(event) {
-    this.pageSize = event.pageSize;
-  }
-
   async getOfficeById() {
     const { success, data } = await this.officeSrv.GetById(this.idOffice);
     if (success) {
@@ -115,9 +116,11 @@ export class MeasureUnitComponent implements OnInit {
   }
 
   async loadMeasureUnitList() {
+    this.isLoading = true;
     const result = await this.measureUnitSvr.GetAll({ idOffice: this.idOffice, idFilter: this.idFilterSelected });
     if (result.success) {
       this.measureUnits = result.data;
+      this.isLoading = false;
     }
     this.loadCardItemsMeasureUnits();
     this.loadFormsMeasureUnits();
@@ -193,7 +196,7 @@ export class MeasureUnitComponent implements OnInit {
 
   async handleOnSubmit() {
     const formItemsChanged = this.formsMeasureUnits.filter(item => item.form.dirty && item.form.valid);
-    formItemsChanged.forEach(async({ form, id }) => {
+    formItemsChanged.forEach(async ({ form, id }) => {
       const { success, data } = form.value.id
         ? await this.measureUnitSvr.put(form.value)
         : await this.measureUnitSvr.post({ ...form.value, idOffice: this.idOffice });

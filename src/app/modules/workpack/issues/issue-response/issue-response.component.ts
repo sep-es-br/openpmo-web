@@ -44,6 +44,7 @@ export class IssueResponseComponent implements OnInit {
   statusOptions: SelectItem[];
   stakeholderOptions: SelectItem[];
   idPlan: number;
+  language: string;
 
   constructor(
     private actRouter: ActivatedRoute,
@@ -58,6 +59,9 @@ export class IssueResponseComponent implements OnInit {
     private authSrv: AuthService,
     private router: Router
   ) {
+    this.translateSrv.onLangChange.pipe(takeUntil(this.$destroy)).subscribe(() => {
+      setTimeout(() => this.setLanguage(), 200);
+    });
     this.actRouter.queryParams.subscribe(async queryParams => {
       this.idIssueResponse = queryParams.id && +queryParams.id;
       this.idIssue = queryParams.idIssue && +queryParams.idIssue;
@@ -94,6 +98,7 @@ export class IssueResponseComponent implements OnInit {
   }
 
   async ngOnInit() {
+    this.setLanguage()
     this.calendarFormat = this.translateSrv.instant('dateFormat');
     this.idPlan = Number(localStorage.getItem('@currentPlan'));
     await this.loadPropertiesIssueResponse();
@@ -103,6 +108,10 @@ export class IssueResponseComponent implements OnInit {
     } else {
       this.formIssueResponse.enable;
     }
+  }
+
+  setLanguage() {
+    this.language = this.translateSrv.currentLang;
   }
 
   setFormIssueResponse() {

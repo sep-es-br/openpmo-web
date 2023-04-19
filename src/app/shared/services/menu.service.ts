@@ -1,4 +1,4 @@
-import { IMenuPlanModel, PlanMenuItem } from './../interfaces/IMenu';
+import { IMenuFavorites, IMenuPlanModel, PlanMenuItem } from './../interfaces/IMenu';
 import { MenuItem } from 'primeng/api';
 import { Location } from '@angular/common';
 import { Inject, Injectable, Injector } from '@angular/core';
@@ -15,6 +15,7 @@ interface IMenuState {
   isFixed: boolean;
   menus: IMenu[];
   itemsOffice: MenuItem[];
+  itemsFavorites: IMenuFavorites[];
   itemsPorfolio: PlanMenuItem[];
 }
 
@@ -29,8 +30,10 @@ export class MenuService extends BaseService<any> {
   plansPath = [ 'plan', 'workpack' ];
 
   private $reloadMenuOffice = new Subject();
+  private $reloadMenuFavorite = new Subject();
   private $reloadMenuPortfolio = new Subject();
   private $reloadMenuPlanModel = new Subject();
+  private $removedFavorites = new Subject();
   private isAdminMenuObservable = new BehaviorSubject<boolean>(false);
   private isPlanMenuObservable = new BehaviorSubject<boolean>(false);
   private menuState = new BehaviorSubject<IMenuState>({
@@ -39,10 +42,12 @@ export class MenuService extends BaseService<any> {
       { label: 'office', isOpen: false },
       { label: 'portfolio', isOpen: false },
       { label: 'planModel', isOpen: false },
+      { label: 'favorite', isOpen: false },
       { label: 'user', isOpen: false },
       { label: 'more', isOpen: false }
     ],
     itemsOffice: [],
+    itemsFavorites: [],
     itemsPorfolio: []
   } as IMenuState);
 
@@ -70,6 +75,14 @@ export class MenuService extends BaseService<any> {
     return this.$reloadMenuOffice.asObservable();
   }
 
+  reloadMenuFavorite() {
+    this.$reloadMenuFavorite.next();
+  }
+
+  obsReloadMenuFavorite() {
+    return this.$reloadMenuFavorite.asObservable();
+  }
+
   reloadMenuPortfolio() {
     this.$reloadMenuPortfolio.next();
   }
@@ -93,7 +106,7 @@ export class MenuService extends BaseService<any> {
   getItemsPortfolio(idOffice: number, idPlan: number): Promise<IHttpResult<IMenuWorkpack[]>> {
     return this.http.get<IHttpResult<IMenuWorkpack[]>>(`${this.urlBase}/portfolio`,
       {
-        params: PrepareHttpParams({ 
+        params: PrepareHttpParams({
           'id-office': idOffice,
           'id-plan': idPlan
        })
@@ -125,12 +138,20 @@ export class MenuService extends BaseService<any> {
     return this.isPlanMenuObservable.asObservable();
   }
 
- get getMenuState() {
+  get getMenuState() {
     return this.menuState.asObservable();
  }
 
   nextMenuState(value: IMenuState) {
     this.menuState.next(value);
+  }
+
+  get getRemovedFavorites() {
+    return this.$removedFavorites.asObservable();
+ }
+
+  nextRemovedFavorited(idRemoved: number) {
+    this.$removedFavorites.next(idRemoved);
   }
 
   setCookiesModeMenu(isFixed: boolean , userInfo) {

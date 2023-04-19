@@ -1,27 +1,29 @@
 <div class="app-create-office">
   <div class="header-container" [class.mobile]="responsive">
     <div class="app-content-header" [class.mobile]="responsive">
-      <span *ngIf="idOffice">{{ propertiesOffice?.fullName }}</span>
+      <span *ngIf="idOffice">{{ propertiesOffice?.name }}</span>
       <span *ngIf="!idOffice">{{ 'new' | translate }} {{ 'office' | translate }}</span>
     </div>
-    <app-config-data-view-panel (changeCollapsedExpand)="handleChangeCollapseExpandPanel($event)"
-        (changeDisplayMode)="handleChangeDisplayMode($event)" (changePageSize)="handleChangePageSize($event)">
-      </app-config-data-view-panel>
+    <app-config-data-view-panel>
+    </app-config-data-view-panel>
   </div>
   <div class="card-properties" *ngIf="cardProperties">
     <app-card [properties]="cardProperties" class="mt-0 inputs-float-label">
-      <div>
+      <div class="loading-container" *ngIf="cardProperties.isLoading">
+        <app-card-loading [isCardLoading]="cardProperties.isLoading"></app-card-loading>
+      </div>
+      <div *ngIf="!cardProperties.isLoading">
         <form [formGroup]="formOffice">
           <span class="p-float-label first-label">
             <input formControlName="name" type="text" pInputText class="app-input-text" [class.mobile]="responsive"
-              [class.desktop]="!responsive" (focusout)="setProvisionalNames()">
+              [class.desktop]="!responsive">
             <label for="float-input" class="app-input-label">{{'name' | translate}}<span
                 class="required-indicator">*</span></label>
           </span>
           <app-input-message [form]="formOffice" field="name"></app-input-message>
           <span class="p-float-label margin-top">
             <textarea pInputTextarea formControlName="fullName" class="app-text-area" rows="3"
-              [ngModel]="(mirrorFullName()) ? formOffice.value.name : formOffice.value.fullName">
+            [ngModel]="(mirrorFullName()) ? formOffice.value.name : formOffice.value.fullName">
               </textarea>
             <label for="float-input" class="app-input-label">{{'fullName' | translate}}<span
                 class="required-indicator">*</span></label>
@@ -31,30 +33,34 @@
       </div>
     </app-card>
   </div>
-  <section *ngIf="idOffice" class="plans-cards-section">
+  <section class="plans-cards-section" *ngIf="idOffice && (isLoading || (!isLoading && planModelsOfficeList && planModelsOfficeList.length > 0))">
     <div class="card-plans">
-      <app-card [properties]="cardPlans" *ngIf="cardItemsPlans && cardItemsPlans.length > 0"
-        (editFilter)="handleEditFilter($event)" (newFilter)="handleNewFilter()"
+      <app-card [properties]="cardPlans" (editFilter)="handleEditFilter($event)" (newFilter)="handleNewFilter()"
         (selectedFilter)="handleSelectedFilter($event)">
-        <p-dataView [value]="cardItemsPlans" layout="grid" class="app-dataview" *ngIf="displayModeAll === 'grid' || (displayModeAll === 'list' && !!responsive)"
-          [paginator]="true" [rows]="pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false"
-          [totalRecords]="totalRecords" [emptyMessage]="'loadingEllipsis' | translate">
-          <ng-template let-cardItem pTemplate="gridItem">
-            <div class="p-col-12 p-md-3 p-sm-12 card-item-container">
-              <app-card-item [properties]="cardItem"></app-card-item>
-            </div>
-          </ng-template>
-        </p-dataView>
+        <div class="loading-container" *ngIf="isLoading">
+          <app-card-loading [isCardLoading]="isLoading"></app-card-loading>
+        </div>
+        <p-dataView [value]="cardItemsPlans" layout="grid" class="app-dataview"
+            *ngIf="(displayModeAll === 'grid' || (displayModeAll === 'list' && !!responsive)) && !isLoading"
+            [paginator]="true" [rows]="pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false"
+            [totalRecords]="totalRecords" [emptyMessage]="'notFoundPlansToThisOffice' | translate">
+            <ng-template let-cardItem pTemplate="gridItem">
+              <div class="p-col-12 p-md-3 p-sm-12 card-item-container">
+                <app-card-item [properties]="cardItem"></app-card-item>
+              </div>
+            </ng-template>
+          </p-dataView>
 
-        <p-dataView [value]="cardItemsPlans" layout="list" class="app-dataview app-dataview-list"
-          *ngIf="displayModeAll === 'list' && !responsive" [paginator]="true" [rows]="pageSize" [showJumpToPageDropdown]="true"
-          [showPageLinks]="false" [totalRecords]="totalRecords" [emptyMessage]="'loadingEllipsis' | translate">
-          <ng-template let-cardItem pTemplate="listItem">
-            <div class="p-col-12">
-              <app-card-item [properties]="cardItem" [displayModeCard]="displayModeAll"></app-card-item>
-            </div>
-          </ng-template>
-        </p-dataView>
+          <p-dataView [value]="cardItemsPlans" layout="list" class="app-dataview app-dataview-list"
+            *ngIf="(displayModeAll === 'list' && !responsive) && !isLoading" [paginator]="true" [rows]="pageSize"
+            [showJumpToPageDropdown]="true" [showPageLinks]="false" [totalRecords]="totalRecords"
+            [emptyMessage]="'notFoundPlansToThisOffice' | translate">
+            <ng-template let-cardItem pTemplate="listItem">
+              <div class="p-col-12">
+                <app-card-item [properties]="cardItem" [displayModeCard]="displayModeAll"></app-card-item>
+              </div>
+            </ng-template>
+          </p-dataView>
       </app-card>
     </div>
   </section>

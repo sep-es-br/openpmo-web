@@ -3,13 +3,15 @@
     <div class="app-content-header" [class.mobile]="responsive">
       <span class="label">{{ 'baselines' | translate }} </span>
     </div>
-    <app-config-data-view-panel (changeCollapsedExpand)="handleChangeCollapseExpandPanel($event)"
-      (changeDisplayMode)="handleChangeDisplayMode($event)" (changePageSize)="handleChangePageSize($event)">
+    <app-config-data-view-panel>
     </app-config-data-view-panel>
   </div>
   <ng-container *ngFor="let cardBaseline of cardsBaselines; let i = index">
     <div class="card-container">
       <app-card [properties]="cardBaseline" class="mt-0">
+        <div class="loading-container" *ngIf="isLoading">
+          <app-card-loading [isCardLoading]="isLoading" ></app-card-loading>
+        </div>
         <p-dataView [value]="cardBaseline.cardItems" layout="grid" class="app-dataview"
           *ngIf="displayModeAll === 'grid' || (displayModeAll === 'list' && !!responsive)" [paginator]="true" [rows]="pageSize" [showJumpToPageDropdown]="true"
           [showPageLinks]="false" [totalRecords]="cardBaseline.totalRecords"
@@ -34,4 +36,5 @@
       </app-card>
     </div>
   </ng-container>
+  <app-card-loading [isCardLoading]="isLoading" ></app-card-loading>
 </div>

@@ -49,6 +49,7 @@ export class RiskResponseComponent implements OnInit {
   statusOptions: SelectItem[];
   stakeholderOptions: SelectItem[];
   idPlan: number;
+  language: string;
 
   constructor(
     private actRouter: ActivatedRoute,
@@ -63,6 +64,9 @@ export class RiskResponseComponent implements OnInit {
     private authSrv: AuthService,
     private router: Router
   ) {
+    this.translateSrv.onLangChange.pipe(takeUntil(this.$destroy)).subscribe(() => {
+      setTimeout(() => this.setLanguage(), 200);
+    });
     this.actRouter.queryParams.subscribe(async queryParams => {
       this.idRiskResponse = queryParams.id && +queryParams.id;
       this.idRisk = queryParams.idRisk && +queryParams.idRisk;
@@ -104,6 +108,7 @@ export class RiskResponseComponent implements OnInit {
   }
 
   async ngOnInit() {
+    this.setLanguage();
     this.calendarFormat = this.translateSrv.instant('dateFormat');
     this.idPlan = Number(localStorage.getItem('@currentPlan'));
     await this.loadPropertiesRiskResponse();
@@ -113,6 +118,10 @@ export class RiskResponseComponent implements OnInit {
     } else {
       this.formRiskResponse.enable;
     }
+  }
+
+  setLanguage() {
+    this.language = this.translateSrv.currentLang;
   }
 
   setFormRiskResponse() {

@@ -10,15 +10,11 @@ import { takeUntil } from 'rxjs/operators';
 import { IconsEnum } from 'src/app/shared/enums/IconsEnum';
 import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
 import { ResponsiveService } from 'src/app/shared/services/responsive.service';
-import { FilterDataviewService } from 'src/app/shared/services/filter-dataview.service';
-import { PropertyTemplateModel } from 'src/app/shared/models/PropertyTemplateModel';
-import { FilterDataviewPropertiesEntity } from 'src/app/shared/constants/filterDataviewPropertiesEntity';
 import { ControlChangeBoardService } from 'src/app/shared/services/control-change-board.service';
 import { IControlChangeBoard } from 'src/app/shared/interfaces/IControlChangeBoard';
 import { WorkpackService } from 'src/app/shared/services/workpack.service';
 import { AuthService } from 'src/app/shared/services/auth.service';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { IPerson } from 'src/app/shared/interfaces/IPerson';
+import { ConfigDataViewService } from 'src/app/shared/services/config-dataview.service';
 
 @Component({
   selector: 'app-control-change-board-list',
@@ -49,6 +45,7 @@ export class ControlChangeBoardListComponent implements OnInit, OnDestroy {
   idProject: number;
   showInactive = false;
   idPlan: number;
+  isLoading = false;
 
   constructor(
     private controlChangeBoardSvr: ControlChangeBoardService,
@@ -56,12 +53,18 @@ export class ControlChangeBoardListComponent implements OnInit, OnDestroy {
     private activeRoute: ActivatedRoute,
     private breadcrumbSrv: BreadcrumbService,
     private responsiveSrv: ResponsiveService,
-    private filterSrv: FilterDataviewService,
     private router: Router,
     private workpackSrv: WorkpackService,
     private authSrv: AuthService,
-    private citizenUserSrv: CitizenUserService
+    private citizenUserSrv: CitizenUserService,
+    private configDataViewSrv: ConfigDataViewService
   ) {
+    this.configDataViewSrv.observableDisplayModeAll.pipe(takeUntil(this.$destroy)).subscribe(displayMode => {
+      this.displayModeAll = displayMode;
+    });
+    this.configDataViewSrv.observablePageSize.pipe(takeUntil(this.$destroy)).subscribe(pageSize => {
+      this.pageSize = pageSize;
+    });
     this.citizenUserSrv.loadCitizenUsers();
     this.activeRoute.queryParams.subscribe(params => {
       this.idProject = +params.idProject;
@@ -71,6 +74,7 @@ export class ControlChangeBoardListComponent implements OnInit, OnDestroy {
   }
 
   async ngOnInit() {
+    this.isLoading = true;
     await this.loadPropertiesProject();
     await this.loadControlChangeBoard();
     this.breadcrumbSrv.setMenu([
@@ -181,6 +185,9 @@ export class ControlChangeBoardListComponent implements OnInit, OnDestroy {
         ],
         active: controlChangeBoard.active
       } as ICardItem)));
+      this.isLoading = false;
+    } else {
+      this.isLoading = false;
     }
     this.cardItemsProperties = itemsProperties;
     this.totalRecords = this.cardItemsProperties && this.cardItemsProperties.length;

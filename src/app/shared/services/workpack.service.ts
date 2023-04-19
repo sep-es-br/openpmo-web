@@ -1,3 +1,8 @@
+import { IMeasureUnit } from './../interfaces/IMeasureUnit';
+import { IWorkpackData, IWorkpackParams } from './../interfaces/IWorkpackDataParams';
+import { IWorkpackModel } from './../interfaces/IWorkpackModel';
+import { IOffice } from './../interfaces/IOffice';
+import { IPlan } from './../interfaces/IPlan';
 import { Injectable, Inject, Injector } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { BaseService } from '../base/base.service';
@@ -6,15 +11,110 @@ import { ICheckPasteWorkpack } from '../interfaces/ICheckPasteWorkpack';
 import { IHttpResult } from '../interfaces/IHttpResult';
 import { IWorkpack } from '../interfaces/IWorkpack';
 import { PrepareHttpParams } from '../utils/query.util';
+import { IWorkpackFavorite } from '../interfaces/IWorkpackFavorite';
 
 @Injectable({ providedIn: 'root' })
 export class WorkpackService extends BaseService<IWorkpack> {
+
   private workpackCuted: IWorkpack;
+  private resetWorkpack = new BehaviorSubject<boolean>(false);
+  private canEditCheckCompleted = new BehaviorSubject<boolean>(false);
+  private checkCompletedChanged = new BehaviorSubject<boolean>(false);
+  private reloadProperties = new BehaviorSubject<boolean>(false);
+  private workpackData: IWorkpackData;
+  private workpackParams: IWorkpackParams;
+  private editPermission: boolean;
+  private unitMeansure: IMeasureUnit;
+
 
   constructor(
     @Inject(Injector) injector: Injector
   ) {
     super('workpack', injector);
+  }
+
+  get observableResetWorkpack() {
+    return this.resetWorkpack.asObservable();
+  }
+
+  nextResetWorkpack(nextValue: boolean) {
+    this.resetWorkpack.next(nextValue)
+  }
+
+  get observableCanEditCheckCompleted() {
+    return this.canEditCheckCompleted.asObservable();
+  }
+
+  nextCanEditCheckCompleted(nextValue: boolean) {
+    this.canEditCheckCompleted.next(nextValue)
+  }
+
+  get observableCheckCompletedChanged() {
+    return this.checkCompletedChanged.asObservable();
+  }
+
+  nextCheckCompletedChanged(nextValue: boolean) {
+    this.checkCompletedChanged.next(nextValue)
+  }
+
+  get observableReloadProperties() {
+    return this.reloadProperties.asObservable();
+  }
+
+  nextReloadProperties(nextValue: boolean) {
+    this.reloadProperties.next(nextValue)
+  }
+
+  public setWorkpackData(workpackData) {
+    this.workpackData = {
+      ...workpackData
+    };
+  }
+
+  public getWorkpackData() {
+    return this.workpackData;
+  }
+
+  public setEditPermission(edit: boolean) {
+    this.editPermission = edit;
+  }
+
+  public getEditPermission() {
+    return this.editPermission;
+  }
+
+  public setWorkpackParams(params) {
+    this.workpackParams = {
+      ...params
+    };
+  }
+
+  public getWorkpackParams() {
+    return this.workpackParams;
+  }
+
+  public getNameWorkpack() {
+    const propertyNameWorkpackModel = this.workpackData.workpack?.model?.properties?.find(p => p.name === 'name' && p.session === 'PROPERTIES');
+    const propertyNameWorkpack = this.workpackData.workpack?.properties?.find(p => p.idPropertyModel === propertyNameWorkpackModel.id);
+    const propertyFullNameWorkpackModel = this.workpackData.workpack?.model?.properties?.find(p => p.name === 'fullName' && p.session === 'PROPERTIES');
+    const propertyFullNameWorkpack = this.workpackData.workpack?.properties?.find(p => p.idPropertyModel === propertyFullNameWorkpackModel.id);
+    return {
+      name: propertyNameWorkpack?.value as string,
+      fullName: propertyFullNameWorkpack?.value as string
+    };
+  }
+
+  public setUnitMeansure(unit: IMeasureUnit) {
+    this.unitMeansure = unit;
+  }
+
+  public getUnitMeansure() {
+    return this.unitMeansure;
+  }
+
+  public async GetWorkpackDataById(idWorkpack: number, options?): Promise<IHttpResult<IWorkpack>> {
+    const result = await this.http.get<IHttpResult<IWorkpack>>(`${this.urlBase}/${idWorkpack}`, { params: PrepareHttpParams(options) }).toPromise();
+    return result as IHttpResult<IWorkpack>;
   }
 
   public async GetWorkpackPermissions(idWorkpack: number, options?): Promise<IHttpResult<any>> {
@@ -84,6 +184,13 @@ export class WorkpackService extends BaseService<IWorkpack> {
     return result as IHttpResult<ICheckPasteWorkpack>;
   }
 
+  public async getItemsFavorites(idPlan: number): Promise<IHttpResult<IWorkpackFavorite[]>> {
+    return await this.http.get<IHttpResult<any>>(`${this.urlBase}/favorites?id-plan=${idPlan}`).toPromise();
+  }
+
+  public async patchToggleWorkpackFavorite(idWorkpack: number, idPlan: number): Promise<IHttpResult<any>> {
+    return await this.http.patch<IHttpResult<any>>(`${this.urlBase}/${idWorkpack}/favorite`, { idPlan }).toPromise();
+  }
 
 
   setWorkpackCuted(workpack: IWorkpack) {
@@ -99,15 +206,25 @@ export class WorkpackService extends BaseService<IWorkpack> {
     localStorage.removeItem(StoreKeys.WORKPACK_CUTED);
   }
 
-  public async endManagementDeliverable(endManagementWorkpack: { idWorkpack: number; reason: string; endManagementDate: string }): Promise<IHttpResult<any>> {
-    const result = await this.http.patch(`${this.urlBase}/end-deliverable-management/${endManagementWorkpack.idWorkpack}`, 
+  public async endManagementDeliverable(
+    endManagementWorkpack: { idWorkpack: number; reason: string; endManagementDate: string }): Promise<IHttpResult<any>> {
+    const result = await this.http.patch(`${this.urlBase}/end-deliverable-management/${endManagementWorkpack.idWorkpack}`,
       { endManagementDate: endManagementWorkpack.endManagementDate, reason: endManagementWorkpack.reason }).toPromise();
     return result as IHttpResult<any>;
   }
 
-  public async completeDeliverable(idWorkpack: number, completed): Promise<IHttpResult<any>> {
-    const result = await this.http.patch(`${this.urlBase}/complete-deliverable/${idWorkpack}`, 
-      { completed }).toPromise();
+  public async completeDeliverable(idWorkpack: number, completed, date?: string): Promise<IHttpResult<any>> {
+    const result = await this.http.patch(`${this.urlBase}/complete-deliverable/${idWorkpack}`,
+      { completed, date }).toPromise();
     return result as IHttpResult<any>;
   }
+
+  async patchMilestoneReason(idMilestone: number, dateReason: { date: string; reason: string }): Promise<IHttpResult<any>> {
+    const result = await this.http.patch(`${this.urlBase}/milestone/${idMilestone}`, {
+      date: dateReason.date,
+      reason: dateReason.reason
+    }).toPromise();
+    return result as IHttpResult<any>;
+  }
+
 }

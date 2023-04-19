@@ -1,0 +1,46 @@
+@use "src/variables" as v;
+
+::ng-deep .app-workpack-section-stakeholders {
+    .input-toggle-stakeholder {
+      display: flex;
+      align-items: center;
+      padding: 0.5em 0;
+      margin-bottom: 1em;
+      .input-label {
+        font-size: 1rem;
+        color: v.$fontLabel;
+        margin-left: 5px;
+        font-family: v.$fontFamilyMedium;
+      }
+    }
+    .dataview-card-items {
+      position: static !important;
+      background-color: transparent;
+      .p-dataview-content, .p-grid {
+        background-color: transparent;
+      }
+      .card-item-container {
+        padding: 0.5em;
+      }
+      .p-paginator {
+        background: transparent;
+        .p-dropdown:not(.disabled).p-focus {
+          box-shadow: none;
+          border-color: #6c757d;
+        }
+        .p-dropdown:not(.disabled):hover {
+          border-color: #6c757d;
+        }
+        .p-dropdown-panel .p-dropdown-items .p-dropdown-item.p-highlight {
+          background: #e9ecef;
+        }
+      }
+      .p-dataview .p-paginator-bottom {
+        border: none;
+      }
+    }
+    .loading-container {
+      position: relative;
+      min-height: 150px;
+    }
+}

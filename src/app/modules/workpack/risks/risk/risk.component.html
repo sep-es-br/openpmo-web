@@ -11,17 +11,16 @@
             <div class="p-field">
               <span class="p-float-label">
                 <input class="app-input-text" id="float-name" formControlName="name" type="text"
-                       [class.responsive]="responsive"
-                       [ngStyle]="{'width': '30%'}" pInputText/>
+                  [class.responsive]="responsive" [ngStyle]="{'width': '30%'}" pInputText />
                 <label class="app-input-label" for="float-name">{{ "name" | translate }} * </label>
               </span>
               <app-input-message [form]="formRisk" field="name"></app-input-message>
             </div>
             <div class="p-field">
               <span class="p-float-label">
-                <textarea pInputTextarea formControlName="description" class="app-text-area"
-                          [rows]="3" id="float-description"
-                          [ngModel]="(mirrorDescription()) ? formRisk.value.name : formRisk.value.description">
+                <textarea pInputTextarea formControlName="description" class="app-text-area" [rows]="3"
+                  id="float-description"
+                  [ngModel]="(mirrorDescription()) ? formRisk.value.name : formRisk.value.description">
                 </textarea>
                 <label class="app-input-label" for="float-description">{{ "description" | translate }} *</label>
               </span>
@@ -32,20 +31,17 @@
             <div class="p-field">
               <span class="p-float-label">
                 <p-dropdown class="app-single-selection" [options]="importanceOptions" formControlName="importance"
-                            [class.responsive]="responsive"
-                            dropdownIcon="fas fa-caret-down" [autoDisplayFirst]="false">
+                  [class.responsive]="responsive" dropdownIcon="fas fa-caret-down" [autoDisplayFirst]="false">
                 </p-dropdown>
                 <label class="app-input-label">{{'importance'|translate}}</label>
               </span>
               <app-input-message [form]="formRisk" field="importance"></app-input-message>
             </div>
             <div class="p-field nature-container">
-              <p-radioButton class="nature-radio" value="THREAT" formControlName="nature"
-                             [label]="'threat' |translate">
+              <p-radioButton class="nature-radio" value="THREAT" formControlName="nature" [label]="'threat' |translate">
               </p-radioButton>
-              <p-radioButton class="nature-radio opportunity" value="OPPORTUNITY"
-                             formControlName="nature"
-                             [label]="'opportunity' |translate"></p-radioButton>
+              <p-radioButton class="nature-radio opportunity" value="OPPORTUNITY" formControlName="nature"
+                [label]="'opportunity' |translate"></p-radioButton>
             </div>
           </div>
           <label class="status-title">{{'status' |translate}}</label>
@@ -54,9 +50,9 @@
               <p-radioButton class="status-radio" value="OPEN" formControlName="status" [label]="'open' |translate">
               </p-radioButton>
               <p-radioButton class="status-radio" value="NOT_GONNA_HAPPEN" formControlName="status"
-                             [label]="'notGonnaHappen' |translate"></p-radioButton>
+                [label]="'notGonnaHappen' |translate"></p-radioButton>
               <p-radioButton class="status-radio" value="HAPPENED" formControlName="status"
-                             [label]="'happened' |translate"></p-radioButton>
+                [label]="'happened' |translate"></p-radioButton>
             </div>
           </div>
           <div class="likely-to-happen" *ngIf="formRisk.controls.status.value === 'OPEN'">
@@ -65,19 +61,18 @@
           <div class="formgroup-dates">
             <div class="p-field" *ngIf="formRisk.controls.status.value === 'OPEN'">
               <span class="p-float-label">
-                <p-calendar id="float-start" class="app-select-date" showIcon="true" [monthNavigator]="true"
-                            [yearNavigator]="true" formControlName="likelyToHappenFrom"
-                            [yearRange]="yearRangeCalculated"
-                            icon="fas fa-calendar-alt" [dateFormat]="calendarFormat">
+                <p-calendar id="float-start" class="app-select-date" [showIcon]="true" [monthNavigator]="true"
+                  [yearNavigator]="true" formControlName="likelyToHappenFrom" [yearRange]="yearRangeCalculated"
+                  icon="fas fa-calendar-alt" [dateFormat]="calendarFormat">
                 </p-calendar>
                 <label class="app-input-label" for="float-start">{{ "fromNoDateEqualAny" | translate }}</label>
               </span>
             </div>
             <div class="p-field end-date" *ngIf="formRisk.controls.status.value === 'OPEN'">
               <span class="p-float-label">
-                <p-calendar id="float-end" formControlName="likelyToHappenTo" class="app-select-date" showIcon="true"
-                            [monthNavigator]="true" [yearNavigator]="true" [yearRange]="yearRangeCalculated"
-                            icon="fas fa-calendar-alt" [dateFormat]="calendarFormat">
+                <p-calendar id="float-end" formControlName="likelyToHappenTo" class="app-select-date" [showIcon]="true"
+                  [monthNavigator]="true" [yearNavigator]="true" [yearRange]="yearRangeCalculated"
+                  icon="fas fa-calendar-alt" [dateFormat]="calendarFormat">
                 </p-calendar>
                 <label class="app-input-label properties-label" for="float-end">{{ "toNoDateEqualAny" |
                   translate}}</label>
@@ -85,9 +80,9 @@
             </div>
             <div class="p-field" *ngIf="formRisk.controls.status.value === 'HAPPENED'">
               <span class="p-float-label">
-                <p-calendar class="app-select-date" showIcon="true" [monthNavigator]="true"
-                            [yearNavigator]="true" formControlName="happenedIn" [yearRange]="yearRangeCalculated"
-                            icon="fas fa-calendar-alt" [dateFormat]="calendarFormat">
+                <p-calendar class="app-select-date" [showIcon]="true" [monthNavigator]="true" [yearNavigator]="true"
+                  formControlName="happenedIn" [yearRange]="yearRangeCalculated" icon="fas fa-calendar-alt"
+                  [dateFormat]="calendarFormat">
                 </p-calendar>
                 <label class="app-input-label" for="float-start">{{ "in" | translate }}</label>
               </span>
@@ -99,10 +94,10 @@
   </div>
   <section>
     <app-card [properties]="cardRiskResponsesProperties" *ngIf="cardRiskResponsesProperties"
-              class="mt-0 inputs-float-label response-card">
+      class="mt-0 inputs-float-label response-card">
       <div class="card-item-responses-container">
         <p-dataView [value]="riskResponseCardItems" layout="grid" styleClass="dataview-card-items-risk"
-                    [emptyMessage]="'loadingEllipsis' | translate">
+          [emptyMessage]="'loadingEllipsis' | translate">
           <ng-template let-cardItem pTemplate="gridItem">
             <div class="p-col-12 p-md-3 p-sm-12 card-item-container" [class.responsive]="responsive">
               <app-card-item [properties]="cardItem"></app-card-item>

@@ -26,6 +26,7 @@ export class PropertyDateComponent implements OnInit, OnDestroy {
   $destroy = new Subject();
   calendarFormat: string;
   yearRange: string;
+  showReason: boolean;
 
   constructor(
     private responsiveSrv: ResponsiveService,
@@ -40,6 +41,35 @@ export class PropertyDateComponent implements OnInit, OnDestroy {
         this.calendarComponent.updateInputfield();
       }, 150)
     );
+  }
+
+  changeDateValue(event?: any) {
+    if (event?.type === 'blur') {
+      this.changed.emit(event);
+      return;
+    }
+
+    const momentDate = moment(event);
+    const defaultValueDiffNewDate = this.property?.defaultValue?.toString().split('T')[0] === momentDate.format('YYYY-MM-DD');
+    if (!momentDate || !this.property?.milestoneData || isNaN(event) || defaultValueDiffNewDate) {
+      this.emitChanges(event, false);
+      return;
+    }
+    const formatedDate = moment().format('YYYY-MM-DD');
+    const dateNow = new Date(formatedDate + 'T00:00:00');
+    const baselineDate = new Date(this.property.milestoneData.baselineDate+ 'T00:00:00');
+    if (momentDate.diff(moment(dateNow)) && momentDate.diff(moment(baselineDate))) {
+      this.emitChanges(event, true);
+      return;
+    }
+
+    this.emitChanges(event, false);
+  }
+
+  emitChanges(event: any, reason: boolean) {
+    this.showReason = reason;
+    this.property.needReason = reason;
+    this.changed.emit(event);
   }
 
   ngOnDestroy(): void {

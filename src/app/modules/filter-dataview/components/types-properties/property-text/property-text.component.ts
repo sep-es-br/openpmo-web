@@ -12,7 +12,7 @@ import { ResponsiveService } from 'src/app/shared/services/responsive.service';
 export class PropertyTextComponent implements OnInit {
 
   @Input() property: IFilterProperty;
-  @Input() value: string;
+  @Input() value;
   @Output() changed = new EventEmitter();
   responsive: boolean;
 

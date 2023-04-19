@@ -7,7 +7,10 @@
   </div>
   <div class="card-permission" *ngIf="cardPersonPermission">
     <app-card [properties]="cardPersonPermission" class="mt-0" [class.inputs-float-label]="!key">
-      <div class="person-properties">
+      <div class="loading-container" *ngIf="isLoading">
+        <app-card-loading [isCardLoading]="isLoading"></app-card-loading>
+      </div>
+      <div class="person-properties" *ngIf="!isLoading">
         <div class="search-container" *ngIf="!key && !citizenAuthServer">
           <div class="search-email-container" [class.responsive]="responsive">
             <span class="p-float-label">
@@ -40,7 +43,7 @@
                 (ngModelChange)="validateClearSearchUserName($event)" [(ngModel)]="searchedNameUser" pInputText />
               <button pButton class="button-search" [label]="!responsive ? ('search'|translate) : ''"
                 (click)="searchCitizenUserByName()"
-                [disabled]="!searchedNameUser || (searchedNameUser && searchedNameUser.length === 0) || isLoading"
+                [disabled]="!searchedNameUser || (searchedNameUser && searchedNameUser.length === 0) || isLoadingCitizen"
                 icon="fas fa-search" iconPos="left"></button>
             </div>
             <span class="input-message-error" *ngIf="showMessagePublicServerNotFoundByName">
@@ -62,12 +65,12 @@
             <div class="user-by-cpf-input-container" *ngIf="citizenSearchBy === 'CPF'">
               <div  class="cpf-container">
                 <p-inputMask [(ngModel)]="searchedCpfUser" mask="999.999.999-99" placeholder="000.000.000-00"
-                  (ngModelChange)="validateClearSearchByCpf($event)" unmask="true">
+                  (ngModelChange)="validateClearSearchByCpf($event)" [unmask]="true">
                 </p-inputMask>
               </div>
               <button pButton class="button-search" [label]="!responsive ? ('search'|translate) : ''"
                 (click)="validateCpf()"
-                [disabled]="!searchedCpfUser || (searchedCpfUser && searchedCpfUser.length === 0) || isLoading"
+                [disabled]="!searchedCpfUser || (searchedCpfUser && searchedCpfUser.length === 0) || isLoadingCitizen"
                 icon="fas fa-search" iconPos="left"></button>
             </div>
             <span *ngIf="!validCpf" class="input-message-error">
@@ -78,16 +81,15 @@
             </span>
           </div>
         </div>
-        <div class="loading-container" *ngIf="isLoading">
-          <i class="fas fa-hourglass-half"></i>
-          <label class="loading-label">{{'messages.loading'|translate}} ...</label>
+        <div class="loading-container" *ngIf="isLoadingCitizen">
+          <app-card-loading [isCardLoading]="isLoadingCitizen"></app-card-loading>
         </div>
         <p-card class="card-person" *ngIf="person" [class.responsive]="responsive">
           <span class="person-name">{{person.name}}</span>
           <span class="person-email">{{person.email}}</span>
         </p-card>
       </div>
-      <div class="data-view-containter" *ngIf="person">
+      <div class="data-view-containter" *ngIf="person && !isLoading">
         <p-dataView [value]="cardItemsOfficePermission" layout="grid" class="app-dataview"
           [emptyMessage]="'loadingEllipsis' | translate">
           <ng-template let-cardItem pTemplate="gridItem">

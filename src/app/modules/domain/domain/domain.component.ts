@@ -27,6 +27,7 @@ import { FilterDataviewService } from 'src/app/shared/services/filter-dataview.s
 import { FilterDataviewPropertiesEntity } from 'src/app/shared/constants/filterDataviewPropertiesEntity';
 import { PropertyTemplateModel } from 'src/app/shared/models/PropertyTemplateModel';
 import { ThrowStmt } from '@angular/compiler';
+import { ConfigDataViewService } from 'src/app/shared/services/config-dataview.service';
 
 @Component({
   selector: 'app-domain',
@@ -58,11 +59,11 @@ export class DomainComponent implements OnInit, OnDestroy {
   pageSize = 5;
   totalRecords: number;
   idFilterSelected: number;
+  isLoading = false;
 
   constructor(
     private formBuilder: FormBuilder,
     private domainSvr: DomainService,
-    private localitySvr: LocalityService,
     private translateSrv: TranslateService,
     private activeRoute: ActivatedRoute,
     private router: Router,
@@ -72,8 +73,14 @@ export class DomainComponent implements OnInit, OnDestroy {
     private authSrv: AuthService,
     private officePermissionSrv: OfficePermissionService,
     private messageSrv: MessageService,
-    private filterSrv: FilterDataviewService
+    private configDataViewSrv: ConfigDataViewService
   ) {
+    this.configDataViewSrv.observableDisplayModeAll.pipe(takeUntil(this.$destroy)).subscribe(displayMode => {
+      this.displayModeAll = displayMode;
+    });
+    this.configDataViewSrv.observablePageSize.pipe(takeUntil(this.$destroy)).subscribe(pageSize => {
+      this.pageSize = pageSize;
+    });
     this.activeRoute.queryParams.subscribe(({ id, idOffice }) => {
       this.idDomain = +id;
       this.idOffice = +idOffice;
@@ -112,6 +119,7 @@ export class DomainComponent implements OnInit, OnDestroy {
   }
 
   async ngOnInit() {
+    this.isLoading = true;
     this.isUserAdmin = await this.authSrv.isUserAdmin();
     this.editPermission = await this.officePermissionSrv.getPermissions(this.idOffice);
     if (!this.isUserAdmin && !this.editPermission) {
@@ -143,14 +151,6 @@ export class DomainComponent implements OnInit, OnDestroy {
         queryParams: { id: this.idDomain, idOffice: this.idOffice }
       }
     ]);
-  }
-
-  handleChangeDisplayMode(event) {
-    this.displayModeAll = event.displayMode;
-  }
-
-  handleChangePageSize(event) {
-    this.pageSize = event.pageSize;
   }
 
   async loadCards() {
@@ -186,6 +186,7 @@ export class DomainComponent implements OnInit, OnDestroy {
 
   async loadPropertiesDomain() {
     if (this.idDomain) {
+      this.isLoading = true;
       const { data, success } = await this.domainSvr.GetById(this.idDomain);
       if (success) {
         this.propertiesDomain = data;
@@ -216,6 +217,7 @@ export class DomainComponent implements OnInit, OnDestroy {
       localities.push(this.propertiesDomain.localityRoot);
     }
     this.localities = localities;
+    this.isLoading = false;
     this.loadCardItemsLocalities();
   }
 

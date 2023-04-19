@@ -3,7 +3,7 @@
     <span>{{ "newInformation" | translate }}</span>
   </div>
   <div class="card-properties-journal" *ngIf="cardJournalProperties" [class.responsive]="responsive">
-    <app-card [properties]="cardJournalProperties">
+    <app-card [properties]="cardJournalProperties" [class.panel-tab-view]="showTabview">
       <form [formGroup]="formJournal" class="form">
         <span class="p-float-label">
           <textarea pInputTextarea [rows]="3" class="app-text-area" id="float-name"

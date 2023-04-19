@@ -10,7 +10,7 @@
             [class.negative-variation]="scope?.variation < 0">
             <i class="fas" [class.fa-arrow-down]="scope?.variation < 0"
               [class.fa-arrow-up]="scope?.variation >= 0"></i>
-            <span>{{(scope?.variation < 0 ? (scope?.variation * (-1)|number:'1.0-1':laguage) :
+            <span>{{(scope?.variation < 0 ? (scope?.variation * (-1)|number:'1.0-1':language) :
                 scope?.variation)|number:'1.0-1':language}}%</span>
           </div>
         </div>

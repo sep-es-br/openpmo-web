@@ -1,10 +1,9 @@
 import { takeUntil } from 'rxjs/operators';
 import { CitizenUserService } from './../../../shared/services/citizen-user.service';
 import { IFilterProperty } from 'src/app/shared/interfaces/IFilterProperty';
-import { PropertyTemplateModel } from './../../../shared/models/PropertyTemplateModel';
 import { FilterDataviewPropertiesEntity } from 'src/app/shared/constants/filterDataviewPropertiesEntity';
 import { FilterDataviewService } from './../../../shared/services/filter-dataview.service';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { IPlan } from 'src/app/shared/interfaces/IPlan';
 import { IPlanPermission } from 'src/app/shared/interfaces/IPlanPermission';
@@ -18,13 +17,14 @@ import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
 import { OfficeService } from 'src/app/shared/services/office.service';
 import { IOffice } from 'src/app/shared/interfaces/IOffice';
 import { Subject } from 'rxjs';
+import { ConfigDataViewService } from 'src/app/shared/services/config-dataview.service';
 
 @Component({
   selector: 'app-plan-permissions-list',
   templateUrl: './plan-permissions-list.component.html',
   styleUrls: ['./plan-permissions-list.component.scss']
 })
-export class PlanPermissionsListComponent implements OnInit {
+export class PlanPermissionsListComponent implements OnInit, OnDestroy {
 
   idPlan: number;
   idOffice: number;
@@ -47,6 +47,7 @@ export class PlanPermissionsListComponent implements OnInit {
   totalRecords: number;
   idFilterSelected: number;
   $destroy = new Subject();
+  isLoading = false;
 
   constructor(
     private actRouter: ActivatedRoute,
@@ -58,8 +59,15 @@ export class PlanPermissionsListComponent implements OnInit {
     private officeSrv: OfficeService,
     private filterSrv: FilterDataviewService,
     private router: Router,
-    private citizenUserSrv: CitizenUserService
+    private citizenUserSrv: CitizenUserService,
+    private configDataViewSrv: ConfigDataViewService
   ) {
+    this.configDataViewSrv.observableDisplayModeAll.pipe(takeUntil(this.$destroy)).subscribe(displayMode => {
+      this.displayModeAll = displayMode;
+    });
+    this.configDataViewSrv.observablePageSize.pipe(takeUntil(this.$destroy)).subscribe(pageSize => {
+      this.pageSize = pageSize;
+    });
     this.citizenUserSrv.loadCitizenUsers();
     this.actRouter.queryParams.subscribe(async queryParams => {
       this.idPlan = +queryParams.idPlan;
@@ -71,6 +79,7 @@ export class PlanPermissionsListComponent implements OnInit {
   }
 
   async ngOnInit() {
+    this.isLoading = true;
     await this.loadPlanPermissionsFilters();
     await this.loadPropertiesPlan();
     await this.loadPropertiesOffice();
@@ -98,6 +107,7 @@ export class PlanPermissionsListComponent implements OnInit {
     if (result.success) {
       this.planPermissions = result.data;
       this.loadCardItemsPlanPermissions();
+      this.isLoading = false;
     }
   }
 

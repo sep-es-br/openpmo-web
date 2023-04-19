@@ -15,7 +15,7 @@
             *ngIf="(!properties.endManagementDate || properties.endManagementDate === null) && !properties.completed && properties?.dashboard?.risk?.total > 0">
             <i class="app-icon risk" [ngStyle]="{ fontSize: '1.5rem' }" [class.risk-red]="riskImportance === 'high'"
               [class.risk-yellow]="riskImportance === 'low'" [class.risk-orange]="riskImportance === 'medium'"
-              (mouseenter)="riskPanel.show($event)" (mouseleave)="riskPanel.hide($event)"></i>
+              (mouseenter)="riskPanel.show($event)" (mouseleave)="riskPanel.hide()"></i>
           </div>
           <p-overlayPanel #riskPanel class="risk-overlay-panel">
             <div class="risk-panel-content">
@@ -51,7 +51,7 @@
         <div class="left-content">
           <div class="milestones-progressbar" *ngIf="properties.dashboard?.milestone?.quantity > 0"
             [ngStyle]="{ height: '80px'}" (mouseenter)="milestonePanel.show($event)"
-            (mouseleave)="milestonePanel.hide($event)">
+            (mouseleave)="milestonePanel.hide()">
             <div class="concluded"
               [ngStyle]="{ height: ((properties.dashboard?.milestone?.concluded / (properties.dashboard?.milestone?.quantity))*100)  + '%'}">
             </div>
@@ -69,7 +69,7 @@
         <p-overlayPanel #milestonePanel class="milestones-overlay-panel">
           <div class="milestone-panel-content">
             <app-doughnut-chart [data]="dashboardMilestonesData"
-              [middleText]="properties?.dashboard?.milestone?.quantity" midleTextBottom="MILESTONES">
+              [middleText]="properties?.dashboard?.milestone?.quantity?.toString()" midleTextBottom="MILESTONES">
             </app-doughnut-chart>
           </div>
         </p-overlayPanel>
@@ -88,17 +88,17 @@
           </div>
           <div class="triple-constraint-container" [ngStyle]="{'min-height': '21px'}">
             <i class="fas fa-dollar-sign" [ngStyle]="{color: iconCostColor}"
-              *ngIf="properties?.dashboard && properties?.dashboard?.tripleConstraint && properties?.dashboard?.tripleConstraint?.cost?.foreseenValue > 0"
+              *ngIf="properties?.dashboard && properties?.dashboard?.tripleConstraint"
               (mouseenter)="validateShowTripleConstraintCost() && costConstraintPanel.show($event)"
-              (mouseleave)="costConstraintPanel.hide($event)"></i>
+              (mouseleave)="costConstraintPanel.hide()"></i>
             <i class="far fa-clock" [ngStyle]="{color: iconScheduleColor}"
-              *ngIf="properties?.dashboard && properties?.dashboard?.tripleConstraint && properties?.dashboard?.tripleConstraint?.schedule?.foreseenStartDate !== null"
+              *ngIf="properties?.dashboard && properties?.dashboard?.tripleConstraint"
               (mouseenter)="validateShowTripleConstraintSchedule() && scheduleConstraintPanel.show($event)"
-              (mouseleave)="scheduleConstraintPanel.hide($event)"></i>
+              (mouseleave)="scheduleConstraintPanel.hide()"></i>
             <i class="fas fa-boxes" [ngStyle]="{color: iconScopeColor}"
-              *ngIf="properties?.dashboard && properties?.dashboard?.tripleConstraint && properties?.dashboard?.tripleConstraint?.scope?.foreseenValue > 0"
+              *ngIf="properties?.dashboard && properties?.dashboard?.tripleConstraint"
               (mouseenter)="validateShowTripleConstraintScope() && scopeConstraintPanel.show($event)"
-              (mouseleave)="scopeConstraintPanel.hide($event)"></i>
+              (mouseleave)="scopeConstraintPanel.hide()"></i>
           </div>
           <p-overlayPanel #costConstraintPanel>
             <div class="constraint-content" *ngIf="properties?.dashboard">
@@ -120,9 +120,9 @@
         <div class="right-content">
           <div class="indexes">
             <span class="index" [ngStyle]="{color: cpiColor}" (mouseenter)="cpiPanel.show($event)"
-              (mouseleave)="cpiPanel.hide($event)"
+              (mouseleave)="cpiPanel.hide()"
               *ngIf="properties?.dashboard?.costPerformanceIndex">{{'CPI'|translate}}</span>
-            <span class="index" (mouseenter)="spiPanel.show($event)" (mouseleave)="spiPanel.hide($event)"
+            <span class="index" (mouseenter)="spiPanel.show($event)" (mouseleave)="spiPanel.hide()"
               *ngIf="properties?.dashboard?.schedulePerformanceIndex"
               [ngStyle]="{color: spiColor}">{{'SPI'|translate}}</span>
           </div>
@@ -162,18 +162,16 @@
       </div>
       <div class="right-container">
         <div class="dashboard-items-container">
-          <div class="status-container"
-            *ngIf="(!properties.endManagementDate || properties.endManagementDate === null) && !properties.completed && properties?.dashboard?.risk?.total > 0">
-            <i class="app-icon risk" [ngStyle]="{ fontSize: '1.5rem' }" [class.risk-red]="riskImportance === 'high'"
+          <div class="status-container">
+            <i class="app-icon risk" [ngStyle]="{ fontSize: '1.5rem' }" [class.risk-red]="riskImportance === 'high'" *ngIf="showRiskIndex()"
               [class.risk-yellow]="riskImportance === 'low'" [class.risk-orange]="riskImportance === 'medium'"
-              (mouseenter)="riskPanel.show($event)" (mouseleave)="riskPanel.hide($event)"></i>
+              (mouseenter)="riskPanel.show($event)" (mouseleave)="riskPanel.hide()"></i>
           </div>
-          <div class="status-container"
-            *ngIf="(!!properties.endManagementDate && properties.endManagementDate !== null) || !!properties.completed">
+          <div class="status-container">
             <i class="far fa-stop-circle"
-              *ngIf="!!properties.endManagementDate && properties.endManagementDate !== null"
+              *ngIf="showEndManagementIndex() && !!properties.endManagementDate && properties.endManagementDate !== null"
               [pTooltip]="'managementEnded'|translate"></i>
-            <i class="far fa-check-square" *ngIf="!!properties.completed" [pTooltip]="label|translate"></i>
+            <i class="far fa-check-square" *ngIf="showEndManagementIndex() && !!properties.completed" [pTooltip]="label|translate"></i>
           </div>
           <p-overlayPanel #riskPanel class="risk-overlay-panel">
             <div class="risk-panel-content">
@@ -200,33 +198,35 @@
               </div>
             </div>
           </p-overlayPanel>
-          <div class="milestones-progressbar" *ngIf="properties.dashboard?.milestone?.quantity > 0"
-            (mouseenter)="milestonePanel.show($event)" (mouseleave)="milestonePanel.hide($event)">
-            <div class="ontime"
-              [ngStyle]="{ width: ((properties.dashboard?.milestone?.onTime / (properties.dashboard?.milestone?.quantity))*100)  + '%'}">
-            </div>
-            <div class="late"
-              [ngStyle]="{ width: ((properties.dashboard?.milestone?.late / (properties.dashboard?.milestone?.quantity))*100) + '%'} ">
-            </div>
-            <div class="concluded"
-              [ngStyle]="{ width: ((properties.dashboard?.milestone?.concluded / (properties.dashboard?.milestone?.quantity))*100)  + '%'}">
-            </div>
-            <div class="concluded-late"
-              [ngStyle]="{ width: ((properties.dashboard?.milestone?.lateConcluded / (properties.dashboard?.milestone?.quantity))*100)  + '%'}">
+          <div class="milestones-progressbar-container">
+            <div class="milestones-progressbar" *ngIf="properties.dashboard?.milestone?.quantity > 0"
+              (mouseenter)="milestonePanel.show($event)" (mouseleave)="milestonePanel.hide()">
+              <div class="ontime"
+                [ngStyle]="{ width: ((properties.dashboard?.milestone?.onTime / (properties.dashboard?.milestone?.quantity))*100)  + '%'}">
+              </div>
+              <div class="late"
+                [ngStyle]="{ width: ((properties.dashboard?.milestone?.late / (properties.dashboard?.milestone?.quantity))*100) + '%'} ">
+              </div>
+              <div class="concluded"
+                [ngStyle]="{ width: ((properties.dashboard?.milestone?.concluded / (properties.dashboard?.milestone?.quantity))*100)  + '%'}">
+              </div>
+              <div class="concluded-late"
+                [ngStyle]="{ width: ((properties.dashboard?.milestone?.lateConcluded / (properties.dashboard?.milestone?.quantity))*100)  + '%'}">
+              </div>
             </div>
           </div>
           <p-overlayPanel #milestonePanel class="milestones-overlay-panel">
             <div class="milestone-panel-content">
               <app-doughnut-chart [data]="dashboardMilestonesData"
-                [middleText]="properties?.dashboard?.milestone?.quantity" midleTextBottom="MILESTONES">
+                [middleText]="properties?.dashboard?.milestone?.quantity?.toString()" midleTextBottom="MILESTONES">
               </app-doughnut-chart>
             </div>
           </p-overlayPanel>
           <div class="indexes">
             <span class="index" [ngStyle]="{color: cpiColor}" (mouseenter)="cpiPanel.show($event)"
               *ngIf="properties?.dashboard?.costPerformanceIndex"
-              (mouseleave)="cpiPanel.hide($event)">{{'CPI'|translate}}</span>
-            <span class="index" (mouseenter)="spiPanel.show($event)" (mouseleave)="spiPanel.hide($event)"
+              (mouseleave)="cpiPanel.hide()">{{'CPI'|translate}}</span>
+            <span class="index" (mouseenter)="spiPanel.show($event)" (mouseleave)="spiPanel.hide()"
               *ngIf="properties?.dashboard?.schedulePerformanceIndex"
               [ngStyle]="{color: spiColor}">{{'SPI'|translate}}</span>
           </div>
@@ -244,15 +244,15 @@
             <i class="fas fa-dollar-sign" [ngStyle]="{color: iconCostColor}"
               *ngIf="properties?.dashboard && properties?.dashboard?.tripleConstraint"
               (mouseenter)="validateShowTripleConstraintCost() && costConstraintPanel.show($event)"
-              (mouseleave)="costConstraintPanel.hide($event)"></i>
+              (mouseleave)="costConstraintPanel.hide()"></i>
             <i class="far fa-clock" [ngStyle]="{color: iconScheduleColor}"
               *ngIf="properties?.dashboard && properties?.dashboard?.tripleConstraint"
               (mouseenter)="validateShowTripleConstraintSchedule() && scheduleConstraintPanel.show($event)"
-              (mouseleave)="scheduleConstraintPanel.hide($event)"></i>
+              (mouseleave)="scheduleConstraintPanel.hide()"></i>
             <i class="fas fa-boxes" [ngStyle]="{color: iconScopeColor}"
               *ngIf="properties?.dashboard && properties?.dashboard?.tripleConstraint"
               (mouseenter)="validateShowTripleConstraintScope() && scopeConstraintPanel.show($event)"
-              (mouseleave)="scopeConstraintPanel.hide($event)"></i>
+              (mouseleave)="scopeConstraintPanel.hide()"></i>
           </div>
           <p-overlayPanel #costConstraintPanel>
             <div class="constraint-content" *ngIf="properties?.dashboard">
@@ -300,34 +300,54 @@
             (click)="menu.toggle($event)"></button>
         </div>
       </p-header>
-      <div class="card-item-content" [class.card-link]="properties.urlCard" [routerLink]="properties.urlCard"
-        [class.cardList]="displayModeCard === 'list'" [queryParams]="getQueryParams()">
-        <div class="icons-container">
-          <i [ngClass]=" ['concluded', 'lateConcluded'].includes(properties.statusItem) ?  [ 'app-icon', 'flag-check', 'grey-icon'] : ['app-icon', 'flag-unchecked', 'grey-icon']"
-            [class.linked]="!!properties.linked || !!properties.shared" [ngStyle]="{ fontSize: '2rem' }"
-            [class.on-time]="properties?.statusItem === 'ontime' && !properties?.canceled"
-            [class.late]="properties?.statusItem === 'late'"
-            [class.concluded]="properties?.statusItem === 'concluded' && !properties?.canceled"
-            [class.late-concluded]="properties?.statusItem === 'lateConcluded' && !properties?.canceled"></i>
-          <i [ngClass]="['app-icon', 'link-to', 'grey-icon', 'linked']" *ngIf="!!properties.linked"></i>
-          <i [ngClass]="['app-icon', 'sharing', 'grey-icon', 'linked']"
-            *ngIf="!!properties.shared && !properties.linked"></i>
-        </div>
-        <span class="card-item-name" [pTooltip]="properties.fullNameCardItem"
-          tooltipPosition="bottom">{{properties.nameCardItem}}</span>
-        <span class="card-item-date" *ngIf="properties.subtitleCardItem && !properties?.canceled"
-        [class.attention-milestone]="!!attentionMilestone"
-        >{{language === 'pt-BR'
-          ?
-          (properties?.subtitleCardItem|date:'dd/MM/yyyy') :
-          (properties?.subtitleCardItem|date:'yyyy/MM/dd')}}</span>
-        <span class="card-item-status" *ngIf="properties?.statusItem && !properties?.canceled"
-          [class.on-time]="properties?.statusItem === 'ontime'" [class.late]="properties?.statusItem === 'late'"
-          [class.concluded]="properties?.statusItem === 'concluded'"
-          [class.late-concluded]="properties?.statusItem === 'lateConcluded'">{{properties?.statusItem|translate}}</span>
+      <div class="card-item-content" [class.card-link]="properties.urlCard"
+        [class.cardList]="displayModeCard === 'list'" >
+        <ng-container *ngIf="!showReasonModal; else reasonContainer">
+          <div class="icons-container">
+            <i [ngClass]=" ['concluded', 'lateConcluded'].includes(properties.statusItem) ?  [ 'app-icon', 'flag-check', 'grey-icon'] : ['app-icon', 'flag-unchecked', 'grey-icon']"
+              [class.linked]="!!properties.linked || !!properties.shared" [ngStyle]="{ fontSize: '2rem' }"
+              [class.on-time]="properties?.statusItem === 'ontime' && !properties?.canceled"
+              [class.late]="properties?.statusItem === 'late'"
+              [class.concluded]="properties?.statusItem === 'concluded' && !properties?.canceled"
+              [class.late-concluded]="properties?.statusItem === 'lateConcluded' && !properties?.canceled"></i>
+            <i [ngClass]="['app-icon', 'link-to', 'grey-icon', 'linked']" *ngIf="!!properties.linked"></i>
+            <i [ngClass]="['app-icon', 'sharing', 'grey-icon', 'linked']"
+              *ngIf="!!properties.shared && !properties.linked"></i>
+          </div>
+          <span class="card-item-name" [routerLink]="properties.urlCard"
+            [queryParams]="getQueryParams()" [pTooltip]="properties.fullNameCardItem"
+            tooltipPosition="bottom">{{properties.nameCardItem}}</span>
+            <span class="card-item-date" *ngIf="properties.subtitleCardItem && !properties?.canceled && !properties?.editPermission"
+              [class.attention-milestone]="!!attentionMilestone">
+              {{
+                language === 'pt-BR' ?
+                (properties?.subtitleCardItem|date:'dd/MM/yyyy') :
+                (properties?.subtitleCardItem|date:'yyyy/MM/dd')
+              }}
+            </span>
+            <p-calendar [(ngModel)]="milestoneDate" *ngIf="properties?.editPermission"
+              [dateFormat]="language === 'pt-BR' ? 'dd/mm/yy' : 'yy/mm/dd'"
+              (ngModelChange)="changeMilestoneDate($event)"
+              [showIcon]="true" inputId="icon">
+            </p-calendar>
+            <span class="card-item-status" *ngIf="properties?.statusItem && !properties?.canceled"
+              [class.on-time]="properties?.statusItem === 'ontime'" [class.late]="properties?.statusItem === 'late'"
+              [class.concluded]="properties?.statusItem === 'concluded'"
+              [class.late-concluded]="properties?.statusItem === 'lateConcluded'">{{properties?.statusItem|translate}}</span>
+        </ng-container>
+        <ng-template #reasonContainer>
+          <span class="p-float-label">
+            <textarea pInputTextarea id="reasonText" class="app-text-area" [(ngModel)]="reasonValue"></textarea>
+            <label class="app-input-label" for="reasonText">{{ 'justification' | translate }}</label>
+          </span>
+          <div class="reason-buttons">
+            <button type="button" pButton class="app-button"  class="p-button-sm" [label]="'cancel' | translate" (click)="cancelReason()"></button>
+            <button type="button" pButton class="app-button" [disabled]="!reasonValue?.trim()" class="p-button-sm" [label]="'save' | translate" (click)="saveReason()"></button>
+          </div>
+        </ng-template>
       </div>
       <div class="card-item-footer" *ngIf="cardIdItem">
-        <span class="baline-icon">
+        <span class="baseline-icon">
           <i class="app-icon baseline grey-icon" *ngIf="!!properties?.hasBaseline"
             [pTooltip]="properties?.baselineName"></i>
         </span>
@@ -337,33 +357,56 @@
       </div>
     </div>
     <div class="display-mode-list" *ngIf="displayModeCard === 'list'">
-      <div class="card-item-content-list" [class.card-link]="properties.urlCard" [routerLink]="properties.urlCard"
-        [class.cardList]="displayModeCard === 'list'" [queryParams]="getQueryParams()">
+      <div class="card-item-content-list" [class.card-link]="properties.urlCard"
+        [class.cardList]="displayModeCard === 'list'" >
         <div class="left-side">
-          <div class="icons-container-list">
-            <i [ngClass]=" ['concluded', 'lateConcluded'].includes(properties.statusItem) ?  [ 'app-icon', 'flag-check', 'grey-icon'] : ['app-icon', 'flag-unchecked', 'grey-icon']"
-              [class.linked]="!!properties.linked || !!properties.shared" [ngStyle]="{ fontSize: '1.5rem' }"
-              [class.on-time]="properties?.statusItem === 'ontime' && !properties?.canceled"
-              [class.late]="properties?.statusItem === 'late' && !properties?.canceled"
-              [class.concluded]="properties?.statusItem === 'concluded' && !properties?.canceled"
-              [class.late-concluded]="properties?.statusItem === 'lateConcluded' && !properties?.canceled"></i>
-            <i [ngClass]="['app-icon', 'link-to', 'grey-icon', 'linked']" *ngIf="!!properties.linked"></i>
-            <i [ngClass]="['app-icon', 'sharing', 'grey-icon', 'linked']"
-              *ngIf="!!properties.shared && !properties.linked"></i>
-          </div>
-          <div class="description-container">
-            <span class="card-item-name" [pTooltip]="properties.fullNameCardItem"
-              tooltipPosition="bottom">{{properties.nameCardItem}}</span>
-            <span class="card-item-status" *ngIf="properties?.statusItem && !properties?.canceled"
-              [class.on-time]="properties?.statusItem === 'ontime'" [class.late]="properties?.statusItem === 'late'"
-              [class.concluded]="properties?.statusItem === 'concluded'"
-              [class.late-concluded]="properties?.statusItem === 'lateConcluded'">
-              {{properties?.statusItem|translate}}</span>
-          </div>
-          <div class="card-item-date" *ngIf="properties.subtitleCardItem && !properties?.canceled"
-            [class.attention-milestone]="!!attentionMilestone">{{language === 'pt-BR' ?
-            (properties?.subtitleCardItem|date:'dd/MM/yyyy') :
-            (properties?.subtitleCardItem|date:'yyyy/MM/dd')}}</div>
+          <ng-container *ngIf="!showReasonModal; else reasonContainer">
+
+            <div class="icons-container-list">
+              <i [ngClass]=" ['concluded', 'lateConcluded'].includes(properties.statusItem) ?  [ 'app-icon', 'flag-check', 'grey-icon'] : ['app-icon', 'flag-unchecked', 'grey-icon']"
+                [class.linked]="!!properties.linked || !!properties.shared" [ngStyle]="{ fontSize: '1.5rem' }"
+                [class.on-time]="properties?.statusItem === 'ontime' && !properties?.canceled"
+                [class.late]="properties?.statusItem === 'late' && !properties?.canceled"
+                [class.concluded]="properties?.statusItem === 'concluded' && !properties?.canceled"
+                [class.late-concluded]="properties?.statusItem === 'lateConcluded' && !properties?.canceled"></i>
+              <i [ngClass]="['app-icon', 'link-to', 'grey-icon', 'linked']" *ngIf="!!properties.linked"></i>
+              <i [ngClass]="['app-icon', 'sharing', 'grey-icon', 'linked']"
+                *ngIf="!!properties.shared && !properties.linked"></i>
+            </div>
+            <div class="description-container">
+              <span class="card-item-name"  [routerLink]="properties.urlCard"
+                [queryParams]="getQueryParams()" [pTooltip]="properties.fullNameCardItem"
+                tooltipPosition="bottom">{{properties.nameCardItem}}</span>
+              <span class="card-item-status" *ngIf="properties?.statusItem && !properties?.canceled"
+                [class.on-time]="properties?.statusItem === 'ontime'" [class.late]="properties?.statusItem === 'late'"
+                [class.concluded]="properties?.statusItem === 'concluded'"
+                [class.late-concluded]="properties?.statusItem === 'lateConcluded'">
+                {{properties?.statusItem|translate}}</span>
+            </div>
+            <div class="card-item-date" *ngIf="properties.subtitleCardItem && !properties?.canceled && !properties?.editPermission"
+              [class.attention-milestone]="!!attentionMilestone">
+              {{
+                language === 'pt-BR' ?
+                  (properties?.subtitleCardItem|date:'dd/MM/yyyy') :
+                  (properties?.subtitleCardItem|date:'yyyy/MM/dd')
+              }}
+              <p-calendar [(ngModel)]="milestoneDate" *ngIf="properties?.editPermission"
+                [dateFormat]="language === 'pt-BR' ? 'dd/mm/yy' : 'yy/mm/dd'"
+                (ngModelChange)="changeMilestoneDate($event)"
+                [showIcon]="true" inputId="icon">
+              </p-calendar>
+            </div>
+          </ng-container>
+          <ng-template #reasonContainer>
+            <span class="p-float-label">
+              <textarea pInputTextarea id="reasonText" class="app-text-area" [(ngModel)]="reasonValue"></textarea>
+              <label class="app-input-label" for="reasonText">{{ 'justification' | translate }}</label>
+            </span>
+            <div class="reason-buttons">
+              <button type="button" pButton class="app-button"  class="p-button-sm" [label]="'cancel' | translate" (click)="cancelReason()"></button>
+              <button type="button" pButton class="app-button" [disabled]="!reasonValue?.trim()" class="p-button-sm" [label]="'save' | translate" (click)="saveReason()"></button>
+            </div>
+          </ng-template>
         </div>
       </div>
       <div class="right-side">
@@ -387,14 +430,14 @@
     </div>
   </p-card>
 
-  <p-card *ngSwitchCase="'newCardItem'" class="new-carditem" [class.card-link]="properties.urlCard"
+  <p-card *ngSwitchCase="'newCardItem'" class="workpack-new-carditem" [class.card-link]="properties.urlCard"
     [class.mobile]="responsive" [class.cardList]="(displayModeCard === 'list')"
     [class.new-card-item-mobile]="responsive"
     (click)="properties.urlCard && navigateToPage(properties.urlCard, properties.paramsUrlCard)">
     <div class="carditem-content">
       <i [ngClass]="[ 'app-icon', properties.icon, 'light-grey-icon']"
         (click)=" properties.iconMenuItems && menuIcon.toggle($event)"
-        [ngStyle]="{ fontSize: (responsive ? 2 : 3) + 'rem' }" [class.card-link]="properties.iconMenuItems"></i>
+        [ngStyle]="{ fontSize: (responsive ? 2 : (displayModeCard === 'list') ? 2.5 : 3) + 'rem' }" [class.card-link]="properties.iconMenuItems"></i>
       <p-tieredMenu #menuIcon [popup]="true" [model]="properties.iconMenuItems"></p-tieredMenu>
     </div>
   </p-card>

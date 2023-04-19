@@ -1,16 +1,20 @@
 <div class="app-journal-view">
   <app-card [properties]="cardJournalProperties">
-    <form class="filters" [formGroup]="formSearch">
-      <p-button class="app-button-green" [label]="'newInformation' | translate" (onClick)="handleNewInformation()" [disabled]="!editPermission || workpackCanceled"></p-button>
+    <div class="loading-container" *ngIf="isLoading">
+      <app-card-loading [isCardLoading]="isLoading"></app-card-loading>
+    </div>
+    <form class="filters" [formGroup]="formSearch" *ngIf="!isLoading">
+      <p-button class="app-button-green" [label]="'newInformation' | translate" (onClick)="handleNewInformation()"
+        [disabled]="!editPermission || workpackCanceled"></p-button>
       <span class="p-float-label property-input p-field">
-        <p-calendar id="float-start" formControlName="from" class="app-select-date" showIcon="true"
+        <p-calendar id="float-start" formControlName="from" class="app-select-date" [showIcon]="true"
           [monthNavigator]="true" [yearNavigator]="true" [yearRange]="yearRange" [class.responsive]="responsive"
           icon="fas fa-calendar-alt" [dateFormat]="calendarFormat" (onClose)="handleFilter()">
         </p-calendar>
         <label class="app-input-label" for="float-name">{{ "from" | translate }} </label>
       </span>
       <span class="p-float-label property-input p-field">
-        <p-calendar id="float-start" formControlName="to" class="app-select-date" showIcon="true"
+        <p-calendar id="float-start" formControlName="to" class="app-select-date" [showIcon]="true"
           [monthNavigator]="true" [yearNavigator]="true" [yearRange]="yearRange" [class.responsive]="responsive"
           icon="fas fa-calendar-alt" [dateFormat]="calendarFormat" (onClose)="handleFilter()">
         </p-calendar>
@@ -19,7 +23,8 @@
       <span class="p-float-label property-input p-field">
         <p-multiSelect class="app-multiple-selection" [filter]="false" optionLabel="label" optionValue="value"
           [showToggleAll]="false" [showHeader]="false" [options]="optionsType" formControlName="type"
-          [class.responsive]="responsive" (onChange)="handleFilter()"></p-multiSelect>
+          [selectedItemsLabel]="language === 'pt-BR' ? '{0} itens selecionados' : '{0} items selected'"
+          [class.responsive]="responsive" (onChange)="handleFilter($event)"></p-multiSelect>
         <label class="app-input-label" for="float-name">{{ "type" | translate }} </label>
       </span>
       <span class="p-float-label property-input p-field">
@@ -40,7 +45,7 @@
         </p-scrollPanel>
       </p-overlayPanel>
     </form>
-    <div class="journal-content" #journal>
+    <div class="journal-content" #journal *ngIf="!isLoading">
       <p-timeline [value]="journalData" [align]="responsive ? 'right' : 'alternate'">
         <ng-template pTemplate="marker" let-event>
           <span class="custom-marker" [style.color]="event.color" [style.backgroundColor]="event.background"
@@ -86,12 +91,12 @@
         </ng-template>
       </p-timeline>
     </div>
-    <div class="buttons-actions">
-      <p-button *ngIf="hasMore" type="button" icon="fas fa-plus" (onClick)="handleViewMore($event)" label="{{ 'viewMore' | translate }}"
-        class="app-button-green">
+    <div class="buttons-actions" *ngIf="!isLoading">
+      <p-button *ngIf="hasMore" type="button" icon="fas fa-plus" (onClick)="handleViewMore($event)"
+        label="{{ 'viewMore' | translate }}" class="app-button-green">
       </p-button>
-      <p-button *ngIf="hasAll && hasMore" type="button" icon="fas fa-eye" (onClick)="handleViewAll($event)" label="{{ 'viewAll' | translate }}"
-        class="app-button-green">
+      <p-button *ngIf="hasAll && hasMore" type="button" icon="fas fa-eye" (onClick)="handleViewAll()"
+        label="{{ 'viewAll' | translate }}" class="app-button-green">
       </p-button>
     </div>
   </app-card>

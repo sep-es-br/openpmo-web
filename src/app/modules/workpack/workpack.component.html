@@ -4,382 +4,222 @@
       <span class="label">{{workpackModel.modelName}}:</span>
       <span class="text">{{workpackFullName}}</span>
     </div>
-    <app-config-data-view-panel (changeCollapsedExpand)="handleChangeCollapseExpandPanel($event)"
-      (changeDisplayMode)="handleChangeDisplayMode($event)" (changePageSize)="handleChangePageSize($event)">
-    </app-config-data-view-panel>
+    <i [pTooltip]="(workpack?.favoritedBy ? 'removeFavorite' : 'addFavorite') | translate" (click)="handleFavorite()"
+      [class]="(workpack?.favoritedBy ? 'fas icon-favorite-checked ' : 'far ') + 'fa-star icon-favorite'">
+    </i>
+    <app-config-data-view-panel> </app-config-data-view-panel>
   </div>
   <div class="app-content-header" *ngIf="!idWorkpack" [class.mobile]="responsive">
     <span class="label">{{'new' | translate}}</span>
     <span class="text">{{workpackModel.modelName}}</span>
   </div>
 
-  <div class="card-dashboard"
-    *ngIf="!!idWorkpack && !!workpack && !workpack.canceled && !!workpackModel && !!workpackModel.dashboardSessionActive">
-    <app-dashboard [idWorkpack]="idWorkpack" [workpackFullName]="workpackFullName"
-      [dashboardShowStakeholders]="workpackModel?.dashboardShowStakeholders"
-      [dashboardShowRisks]="workpackModel?.dashboardShowRisks" [dashboardShowEva]="workpackModel?.dashboardShowEva"
-      [workpackType]="workpack?.type" [collapsePanelsStatus]="collapsePanelsStatus" [reloadDashboard]="reloadDashboard"
-      [dashboardShowMilestones]="workpackModel?.dashboardShowMilestones"></app-dashboard>
-  </div>
-
-  <div class="card-properties-workpack">
-    <app-card [properties]="cardWorkpackProperties" [workpack]="workpack" class="mt-0 inputs-float-label"
-      (changeCheckCompleted)="handleChangeCheckCompleted($event)">
-      <div class="properties-container" [class.responsive]="responsive">
-        <div class="property-container" *ngFor="let property of sectionPropertiesProperties"
-          [class.not-fullLine]="!property.fullLine && property.type !== 'TextArea' && property.type !== 'Group'"
-          [class.fullLine]="property.fullLine || property.type === 'TextArea' || property.type === 'Group'">
-          <app-workpack-property [property]="property" (changed)="checkProperties(property)" (input)="checkProperties(property)"></app-workpack-property>
-          <span class="input-message-error" *ngIf="property.invalid && property.type !== 'Group'">
-            {{ property.message }}
-          </span>
+  <div class="tabview-container" *ngIf="showTabview">
+    <app-tabview-scrolled [tabs]="tabs" (selectedTabChange)="changeTab($event)">
+      <div tabviewBody *ngIf="selectedTab?.key === 'WBS'">
+        <div class="card-WBS">
+          <app-breakdown-structure [idWorkpack]="idWorkpack"
+            (onHasWBS)="handleOnHasWBS($event)"></app-breakdown-structure>
         </div>
       </div>
-    </app-card>
-  </div>
-
-  <div class="card-cost-account" *ngIf="sectionCostAccount">
-    <app-card [properties]="sectionCostAccount.cardSection"
-      *ngIf="sectionCostAccount.cardItemsSection && sectionCostAccount.cardItemsSection.length > 0"
-      (editFilter)="handleEditFilterCostAccount($event)" (newFilter)="handleNewFilterCostAccount()"
-      (selectedFilter)="handleSelectedFilterCostAccount($event)" (createNewElement)="handleCreateNewCostAccount()">
-      <div class="cost-account-list-container">
-        <p-dataView [value]="sectionCostAccount.cardItemsSection" layout="grid" class="app-dataview"
-          [emptyMessage]="'loadingEllipsis' | translate"
-          *ngIf="displayModeAll === 'grid' || (displayModeAll === 'list' && !!responsive)" [paginator]="true"
-          [rows]="pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false"
-          [totalRecords]="totalRecordsCostAccounts">
-          <ng-template let-cardItem pTemplate="gridItem">
-            <div class="p-col-12 p-md-3 p-sm-12 card-item-container">
-              <app-card-item [properties]="cardItem" [class.inherited]="cardItem.idWorkpack !== idWorkpack.toString()">
-              </app-card-item>
-            </div>
-          </ng-template>
-        </p-dataView>
-        <p-dataView [value]="sectionCostAccount.cardItemsSection" layout="list" class="app-dataview app-dataview-list"
-          [emptyMessage]="'loadingEllipsis' | translate" *ngIf="displayModeAll === 'list' && !responsive"
-          [paginator]="true" [rows]="pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false"
-          [totalRecords]="totalRecordsCostAccounts">
-          <ng-template let-cardItem pTemplate="listItem">
-            <div class="p-col-12">
-              <app-card-item [properties]="cardItem" [class.inherited]="cardItem.idWorkpack !== idWorkpack"
-                [displayModeCard]="displayModeAll">
-              </app-card-item>
-            </div>
-          </ng-template>
-        </p-dataView>
+      <div tabviewBody *ngIf="selectedTab?.key === 'dashboard'">
+        <div class="card-dashboard">
+          <app-dashboard [idWorkpack]="idWorkpack" [workpackFullName]="workpackFullName"
+            [dashboardShowStakeholders]="workpackModel?.dashboardShowStakeholders"
+            [dashboardShowRisks]="workpackModel?.dashboardShowRisks"
+            [dashboardShowEva]="workpackModel?.dashboardShowEva" [workpackType]="workpack?.type"
+            [collapsePanelsStatus]="collapsePanelsStatus" [reloadDashboard]="reloadDashboard"
+            [dashboardShowMilestones]="workpackModel?.dashboardShowMilestones"></app-dashboard>
+        </div>
       </div>
-    </app-card>
-  </div>
-
-  <div class="card-schedule" *ngIf="sectionSchedule">
-    <app-card [properties]="sectionSchedule.cardSection">
-      <button type="button" class="p-button-text button-new-schedule" *ngIf="!schedule && !!editPermission"
-        (click)="handleNewSchedule()" pButton icon="pi pi-plus" iconPos="left"
-        [label]="translateSrv.instant('newSchedule')" [disabled]="!editPermission">
-      </button>
-      <div class="schedule-buttons" *ngIf="schedule" [class.schedule-buttons-mobile]="responsive">
-        <button type="button" class="p-button-text button-details" (click)="handleShowDetails()" pButton
-          [icon]="showDetails ? 'far fa-eye-slash' : 'far fa-eye'" iconPos="left"
-          [label]="showDetails ? translateSrv.instant('hideDetails') : translateSrv.instant('showDetails')">
-        </button>
-        <button type="button" class="p-button-text button-delete" (click)="handleDeleteSchedule()" pButton
-          [disabled]="!editPermission" icon="fas fa-trash-alt" iconPos="left"
-          [label]="translateSrv.instant('deleteSchedule')">
-        </button>
+      <div tabviewBody *ngIf="selectedTab?.key === 'properties'">
+        <div class="card-properties-workpack">
+          <app-workpack-section-properties (onGetProperties)="saveWorkpack($event)"></app-workpack-section-properties>
+        </div>
       </div>
-      <div class="schedule-steps-section" *ngIf="sectionSchedule && sectionSchedule.groupStep">
-        <div class="schedule-steps-container" *ngFor="let groupStep of sectionSchedule.groupStep"
-          [class.schedule-steps-container-mobile]="responsive">
-          <div class="data-view-steps-container">
-            <span class="group-step-year">{{groupStep.year}}</span>
-            <p-dataView [value]="groupStep.cardItemSection" layout="grid" styleClass="dataview-step-card-items"
-              *ngIf="showDetails; else showResumed" [emptyMessage]="'loadingEllipsis' | translate">
-              <ng-template let-step pTemplate="gridItem">
-                <div class="card-item-container show-details" *ngIf="['newStart', 'newEnd'].includes(step.type)"
-                  [class.new-card-item]="['newStart', 'newEnd'].includes(step.type)" [class.mobile]="responsive"
-                  [routerLink]="['/workpack' , 'schedule', 'step' ]" [queryParams]="{
-                    idSchedule: schedule.id,
-                    idWorkpackModelLinked: idWorkpackModelLinked,
-                    stepType: step.type,
-                    unitName: step.unitName,
-                    unitPrecision: step.unitPrecision
-                  }">
-                  <app-schedule-step-card-item [properties]="step" [type]="'listStep'"
-                    (stepChanged)="saveStepChanged(groupStep.year, step.idStep)"></app-schedule-step-card-item>
-                </div>
-                <div class="card-item-container show-details" *ngIf="step.type === 'listStep'"
-                  [class.new-card-item]="['newStart', 'newEnd'].includes(step.type)" [class.mobile]="responsive">
-                  <app-schedule-step-card-item [properties]="step" [type]="'listStep'"
-                    (stepChanged)="saveStepChanged(groupStep.year, step.idStep)"></app-schedule-step-card-item>
-                </div>
-              </ng-template>
-            </p-dataView>
-            <ng-template #showResumed>
-              <p-dataView [value]="groupStep.cardItemSection" layout="grid" styleClass="dataview-step-card-items"
-                [emptyMessage]="'loadingEllipsis' | translate">
-                <ng-template let-step pTemplate="gridItem">
-                  <div class="card-item-container show-resumed clickable" *ngIf="step.type === 'listStep'"
-                    [class.new-card-item]="['newStart', 'newEnd'].includes(step.type)" [class.mobile]="responsive"
-                    [routerLink]="['/workpack' , 'schedule', 'step' ]" [queryParams]="{
-                        id: step.idStep,
-                        idWorkpackModelLinked: idWorkpackModelLinked,
-                        stepType: step.stepOrder,
-                        unitName: step.unitName,
-                        unitPrecision: step.unitPrecision
-                      }">
-                    <app-schedule-step-card-item [properties]="step" [type]="'listStepResumed'">
-                    </app-schedule-step-card-item>
-                  </div>
-                  <div class="card-item-container show-resumed clickable"
-                    *ngIf="['newStart', 'newEnd'].includes(step.type)"
-                    [class.new-card-item]="['newStart', 'newEnd'].includes(step.type)" [class.mobile]="responsive"
-                    [routerLink]="['/workpack' , 'schedule', 'step' ]" [queryParams]="{
-                        idSchedule: schedule.id,
-                        idWorkpackModelLinked: idWorkpackModelLinked,
-                        stepType: step.stepOrder,
-                        unitName: step.unitName,
-                        unitPrecision: step.unitPrecision
-                      }">
-                    <app-schedule-step-card-item [properties]="step" [type]="'listStepResumed'">
-                    </app-schedule-step-card-item>
+      <div tabviewBody *ngIf="selectedTab?.key === 'costAccounts'">
+        <div class="card-cost-accounts">
+          <app-workpack-section-cost-accounts></app-workpack-section-cost-accounts>
+        </div>
+      </div>
+      <div tabviewBody *ngIf="selectedTab?.key === 'schedule'">
+        <div class="card-schedule">
+          <app-workpack-section-schedule></app-workpack-section-schedule>
+        </div>
+      </div>
+      <div tabviewBody>
+        <div class="card-workpack-model" *ngFor="let workpackModel of cardsWorkPackModelChildren; let i = index">
+          <app-card [properties]="workpackModel.cardSection" [class.panel-tab-view]="showTabview"
+            (editFilter)="handleEditFilterWorkpackModel($event, workpackModel.idWorkpackModel)"
+            (newFilter)="handleNewFilterWorkpackModel(workpackModel.idWorkpackModel)"
+            (selectedFilter)="handleSelectedFilterWorkpackModel($event, workpackModel.idWorkpackModel)"
+            (createNewElement)="handleCreateNewWorkpack(workpackModel.idWorkpackModel)"
+            *ngIf="(selectedTab?.key === workpackModel.cardSection.tabTitle)">
+            <div class="input-toggle-workpack-cancelled">
+              <p-inputSwitch class="app-toggle" [(ngModel)]="workpackModel.workpackShowCancelleds"
+                (onChange)="handleWorkpackCancelledToggle(i, $event)"></p-inputSwitch>
+              <label class="input-label">{{"showCanceled" | translate}}</label>
+            </div>
+            <div class="workpacks-list-container">
+              <div class="loading-container" *ngIf="workpackModel.cardSection.isLoading">
+                <app-card-loading [isCardLoading]="workpackModel.cardSection.isLoading"></app-card-loading>
+              </div>
+              <p-dataView [value]="workpackModel.cardItemsSection" layout="grid" styleClass="dataview-card-items"
+                *ngIf="(displayModeAll === 'grid' || (displayModeAll === 'list' && !!responsive)) && !workpackModel?.cardSection?.isLoading"
+                [paginator]="true" [rows]="pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false"
+                [totalRecords]="totalRecordsWorkpacks ? totalRecordsWorkpacks[i] : 1"
+                [emptyMessage]="'notFoundWorkpacksToThisModel' | translate">
+                <ng-template let-cardItem pTemplate="gridItem">
+                  <div class="p-col-12 p-md-3 p-sm-12 card-item-container">
+                    <app-workpack-card-item [properties]="cardItem"></app-workpack-card-item>
                   </div>
                 </ng-template>
               </p-dataView>
-            </ng-template>
-          </div>
+              <p-dataView [value]="workpackModel.cardItemsSection" layout="list" class="app-dataview app-dataview-list"
+                styleClass="dataview-card-items"
+                *ngIf="(displayModeAll === 'list' && !responsive)  && !workpackModel?.cardSection?.isLoading"
+                [paginator]="true" [rows]="pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false"
+                [totalRecords]="totalRecordsWorkpacks ? totalRecordsWorkpacks[i] : 1"
+                [emptyMessage]="'notFoundWorkpacksToThisModel' | translate">
+                <ng-template let-cardItem pTemplate="listItem">
+                  <div class="p-col-12">
+                    <app-workpack-card-item [properties]="cardItem" [displayModeCard]="displayModeAll">
+                    </app-workpack-card-item>
+                  </div>
+                </ng-template>
+              </p-dataView>
+            </div>
+            <div>
+            </div>
+          </app-card>
         </div>
       </div>
-    </app-card>
+      <div tabviewBody *ngIf="selectedTab?.key === 'stakeholdersAndPermissions'">
+        <div class="card-stakeholders">
+          <app-workpack-section-stakeholders></app-workpack-section-stakeholders>
+        </div>
+      </div>
+      <div tabviewBody *ngIf="selectedTab?.key === 'baselines'">
+        <div class="card-baselines">
+          <app-workpack-section-baselines></app-workpack-section-baselines>
+        </div>
+      </div>
+      <div tabviewBody *ngIf="selectedTab?.key === 'risks'">
+        <div class="card-risks">
+          <app-workpack-section-risks></app-workpack-section-risks>
+        </div>
+      </div>
+      <div tabviewBody *ngIf="selectedTab?.key === 'issues'">
+        <div class="card-issues">
+          <app-workpack-section-issues></app-workpack-section-issues>
+        </div>
+      </div>
+      <div tabviewBody *ngIf="selectedTab?.key === 'processes'">
+        <div class="card-processes">
+          <app-workpack-section-processes></app-workpack-section-processes>
+        </div>
+      </div>
+      <div tabviewBody *ngIf="selectedTab?.key === 'journal'">
+        <div class="card-journal">
+          <app-journal-view *ngIf="cardJournalProperties && !!workpack" [cardJournalProperties]="cardJournalProperties"
+            [editPermission]="getEditPermission()" [workpackCanceled]="workpack.canceled" [idPlan]="workpack.plan.id"
+            [idOffice]="workpack.plan.idOffice" [idWorkpack]="idWorkpack"></app-journal-view>
+        </div>
+      </div>
+    </app-tabview-scrolled>
   </div>
 
-  <section *ngIf="sectionWorkpackModelChildren" class="workpackModels-cards-section">
-    <div class="card-workpack-model" *ngFor="let workpackModel of cardsWorkPackModelChildren; let i = index">
-      <app-card [properties]="workpackModel.cardSection"
-        (editFilter)="handleEditFilterWorkpackModel($event, workpackModel.idWorkpackModel)"
-        (newFilter)="handleNewFilterWorkpackModel(workpackModel.idWorkpackModel)"
-        (selectedFilter)="handleSelectedFilterWorkpackModel($event, workpackModel.idWorkpackModel)"
-        (createNewElement)="handleCreateNewWorkpack(workpackModel.idWorkpackModel)"
-        *ngIf="workpackModel.cardItemsSection && workpackModel.cardItemsSection.length > 0">
-        <div class="input-toggle-workpack-cancelled">
-          <p-inputSwitch class="app-toggle" [(ngModel)]="workpackModel.workpackShowCancelleds"
-            (onChange)="handleWorkpackCancelledToggle(i, $event)"></p-inputSwitch>
-          <label class="input-label">{{"showCanceled" | translate}}</label>
-        </div>
-        <div class="workpacks-list-container">
-          <p-dataView [value]="workpackModel.cardItemsSection" layout="grid" styleClass="dataview-card-items"
-            *ngIf="displayModeAll === 'grid' || (displayModeAll === 'list' && !!responsive)" [paginator]="true"
-            [rows]="pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false"
-            [totalRecords]="totalRecordsWorkpacks ? totalRecordsWorkpacks[i] : 1"
-            [emptyMessage]="'loadingEllipsis' | translate">
-            <ng-template let-cardItem pTemplate="gridItem">
-              <div class="p-col-12 p-md-3 p-sm-12 card-item-container">
-                <app-workpack-card-item [properties]="cardItem"></app-workpack-card-item>
-              </div>
-            </ng-template>
-          </p-dataView>
-          <p-dataView [value]="workpackModel.cardItemsSection" layout="list" class="app-dataview app-dataview-list"
-            styleClass="dataview-card-items" *ngIf="displayModeAll === 'list' && !responsive" [paginator]="true"
-            [rows]="pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false"
-            [totalRecords]="totalRecordsWorkpacks ? totalRecordsWorkpacks[i] : 1"
-            [emptyMessage]="'loadingEllipsis' | translate">
-            <ng-template let-cardItem pTemplate="listItem">
-              <div class="p-col-12">
-                <app-workpack-card-item [properties]="cardItem" [displayModeCard]="displayModeAll">
-                </app-workpack-card-item>
-              </div>
-            </ng-template>
-          </p-dataView>
-        </div>
-        <div>
-        </div>
-      </app-card>
+  <div class="panels-container" *ngIf="!showTabview">
+    <div class="card-dashboard"
+      *ngIf="!!idWorkpack && !!workpack && !workpack.canceled && !!workpackModel && !!workpackModel.dashboardSessionActive">
+      <app-dashboard [idWorkpack]="idWorkpack" [workpackFullName]="workpackFullName"
+        [dashboardShowStakeholders]="workpackModel?.dashboardShowStakeholders"
+        [dashboardShowRisks]="workpackModel?.dashboardShowRisks" [dashboardShowEva]="workpackModel?.dashboardShowEva"
+        [workpackType]="workpack?.type" [collapsePanelsStatus]="collapsePanelsStatus"
+        [reloadDashboard]="reloadDashboard"
+        [dashboardShowMilestones]="workpackModel?.dashboardShowMilestones"></app-dashboard>
     </div>
-  </section>
-
-  <div class="card-stakeholders" *ngIf="sectionStakeholder">
-    <app-card [properties]="sectionStakeholder.cardSection" *ngIf="sectionStakeholder.cardItemsSection  && sectionStakeholder.cardItemsSection.length > 0"
-      (editFilter)="handleEditFilterEntity($event, 'stakeholders')" (newFilter)="handleNewFilterEntity('stakeholders')"
-      (selectedFilter)="handleSelectedFilterStakeholder($event)">
-      <div class="input-toggle-stakeholder">
-        <p-inputSwitch class="app-toggle" [(ngModel)]="stakeholderSectionShowInactives"
-          (onChange)="handleStakeholderInactiveToggle()"></p-inputSwitch>
-        <label class="input-label">{{"showInactive" | translate}}</label>
-      </div>
-      <div class="stakeholders-list-container">
-        <p-dataView [value]="sectionStakeholder.cardItemsSection" layout="grid" styleClass="dataview-card-items"
-          *ngIf="displayModeAll === 'grid' || (displayModeAll === 'list' && !!responsive)" [paginator]="true"
-          [rows]="pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false"
-          [totalRecords]="totalRecordsStakeholders" [emptyMessage]="'loadingEllipsis' | translate">
-          <ng-template let-cardItem pTemplate="gridItem">
-            <div class="p-col-12 p-md-3 p-sm-12 card-item-container">
-              <app-card-item [properties]="cardItem"></app-card-item>
+    <div class="card-properties-workpack">
+      <app-workpack-section-properties (onGetProperties)="saveWorkpack($event)"></app-workpack-section-properties>
+    </div>
+    <div class="card-cost-accounts">
+      <app-workpack-section-cost-accounts></app-workpack-section-cost-accounts>
+    </div>
+    <div class="card-schedule">
+      <app-workpack-section-schedule></app-workpack-section-schedule>
+    </div>
+    <section *ngIf="sectionWorkpackModelChildren" class="workpackModels-cards-section">
+      <div class="card-workpack-model" *ngFor="let workpackModel of cardsWorkPackModelChildren; let i = index">
+        <app-card [properties]="workpackModel.cardSection"
+          (editFilter)="handleEditFilterWorkpackModel($event, workpackModel.idWorkpackModel)"
+          (newFilter)="handleNewFilterWorkpackModel(workpackModel.idWorkpackModel)"
+          (selectedFilter)="handleSelectedFilterWorkpackModel($event, workpackModel.idWorkpackModel)"
+          (createNewElement)="handleCreateNewWorkpack(workpackModel.idWorkpackModel)">
+          <div class="input-toggle-workpack-cancelled">
+            <p-inputSwitch class="app-toggle" [(ngModel)]="workpackModel.workpackShowCancelleds"
+              (onChange)="handleWorkpackCancelledToggle(i, $event)"></p-inputSwitch>
+            <label class="input-label">{{"showCanceled" | translate}}</label>
+          </div>
+          <div class="workpacks-list-container">
+            <div class="loading-container" *ngIf="workpackModel.cardSection.isLoading">
+              <app-card-loading [isCardLoading]="workpackModel.cardSection.isLoading"></app-card-loading>
             </div>
-          </ng-template>
-        </p-dataView>
-        <p-dataView [value]="sectionStakeholder.cardItemsSection" layout="list" styleClass="dataview-card-items"
-          class="app-dataview app-dataview-list" *ngIf="displayModeAll === 'list' && !responsive" [paginator]="true"
-          [rows]="pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false"
-          [totalRecords]="totalRecordsStakeholders" [emptyMessage]="'loadingEllipsis' | translate">
-          <ng-template let-cardItem pTemplate="listItem">
-            <div class="p-col-12">
-              <app-card-item [properties]="cardItem" [displayModeCard]="displayModeAll"></app-card-item>
-            </div>
-          </ng-template>
-        </p-dataView>
+            <p-dataView [value]="workpackModel.cardItemsSection" layout="grid" styleClass="dataview-card-items"
+              *ngIf="(displayModeAll === 'grid' || (displayModeAll === 'list' && !!responsive)) && !workpackModel.cardSection.isLoading"
+              [paginator]="true" [rows]="pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false"
+              [totalRecords]="totalRecordsWorkpacks ? totalRecordsWorkpacks[i] : 1"
+              [emptyMessage]="'notFoundWorkpacksToThisModel' | translate">
+              <ng-template let-cardItem pTemplate="gridItem">
+                <div class="p-col-12 p-md-3 p-sm-12 card-item-container">
+                  <app-workpack-card-item [properties]="cardItem"></app-workpack-card-item>
+                </div>
+              </ng-template>
+            </p-dataView>
+            <p-dataView [value]="workpackModel.cardItemsSection" layout="list" class="app-dataview app-dataview-list"
+              styleClass="dataview-card-items"
+              *ngIf="(displayModeAll === 'list' && !responsive) && !workpackModel.cardSection.isLoading"
+              [paginator]="true" [rows]="pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false"
+              [totalRecords]="totalRecordsWorkpacks ? totalRecordsWorkpacks[i] : 1"
+              [emptyMessage]="'notFoundWorkpacksToThisModel' | translate">
+              <ng-template let-cardItem pTemplate="listItem">
+                <div class="p-col-12">
+                  <app-workpack-card-item [properties]="cardItem" [displayModeCard]="displayModeAll">
+                  </app-workpack-card-item>
+                </div>
+              </ng-template>
+            </p-dataView>
+          </div>
+          <div>
+          </div>
+        </app-card>
       </div>
-    </app-card>
+    </section>
+    <div class="card-stakeholders">
+      <app-workpack-section-stakeholders></app-workpack-section-stakeholders>
+    </div>
+    <div class="card-baselines">
+      <app-workpack-section-baselines></app-workpack-section-baselines>
+    </div>
+    <div class="card-risks">
+      <app-workpack-section-risks></app-workpack-section-risks>
+    </div>
+    <div class="card-issues">
+      <app-workpack-section-issues></app-workpack-section-issues>
+    </div>
+    <div class="card-processes">
+      <app-workpack-section-processes></app-workpack-section-processes>
+    </div>
+    <div class="card-journal" *ngIf="workpackModel.journalManagementSessionActive">
+      <app-journal-view *ngIf="cardJournalProperties && !!workpack" [cardJournalProperties]="cardJournalProperties"
+        [editPermission]="getEditPermission()" [workpackCanceled]="workpack.canceled" [idPlan]="workpack.plan.id"
+        [idOffice]="workpack.plan.idOffice" [idWorkpack]="idWorkpack"></app-journal-view>
+    </div>
   </div>
 
-  <div class="card-baselines" *ngIf="sectionBaselines">
-    <app-card [properties]="sectionBaselines.cardSection"
-      *ngIf="sectionBaselines.cardItemsSection && sectionBaselines.cardItemsSection.length > 0">
-      <div class="input-toggle-baseline">
-        <p-inputSwitch class="app-toggle" [(ngModel)]="baselinesSectionShowInactives"
-          (ngOnChange)="handleBaselineShowInactiveToggle($event)">
-        </p-inputSwitch>
-        <label class="input-label">{{"showInactive" | translate}}</label>
-      </div>
-      <div class="baselines-list-container">
-        <p-dataView [value]="sectionBaselines.cardItemsSection" layout="grid" class="app-dataview"
-          [emptyMessage]="'loadingEllipsis' | translate"
-          *ngIf="displayModeAll === 'grid' || (displayModeAll === 'list' && !!responsive)">
-          <ng-template let-cardItem pTemplate="gridItem">
-            <div class="p-col-12 p-md-3 p-sm-12 card-item-container">
-              <app-baseline-card-item [properties]="cardItem">
-              </app-baseline-card-item>
-            </div>
-          </ng-template>
-        </p-dataView>
-        <p-dataView [value]="sectionBaselines.cardItemsSection" layout="list" class="app-dataview app-dataview-list"
-          [emptyMessage]="'loadingEllipsis' | translate" *ngIf="displayModeAll === 'list' && !responsive">
-          <ng-template let-cardItem pTemplate="listItem">
-            <div class="p-col-12">
-              <app-baseline-card-item [properties]="cardItem" [displayModeCard]="displayModeAll">
-              </app-baseline-card-item>
-            </div>
-          </ng-template>
-        </p-dataView>
-      </div>
-    </app-card>
-  </div>
-
-  <div class="card-risks" *ngIf="sectionRisk">
-    <app-card [properties]="sectionRisk.cardSection"
-      *ngIf="sectionRisk.cardItemsSection && sectionRisk.cardItemsSection.length > 0"
-      (editFilter)="handleEditFilterEntity($event, 'risks')" (newFilter)="handleNewFilterEntity('risks')"
-      (selectedFilter)="handleSelectedFilterRisk($event)" (createNewElement)="handleCreateNewRisk()">
-      <div class="input-toggle-risk">
-        <p-inputSwitch class="app-toggle" [(ngModel)]="riskSectionShowClosed" (onChange)="handleRiskShowClosedToggle()">
-        </p-inputSwitch>
-        <label class="input-label">{{"showClosed" | translate}}</label>
-      </div>
-      <div class="risk-list-container">
-        <p-dataView [value]="sectionRisk.cardItemsSection" layout="grid" class="app-dataview"
-          [emptyMessage]="'loadingEllipsis' | translate"
-          *ngIf="displayModeAll === 'grid' || (displayModeAll === 'list' && !!responsive)" [paginator]="true"
-          [rows]="pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false" [totalRecords]="totalRecordsRisks">
-          <ng-template let-cardItem pTemplate="gridItem">
-            <div class="p-col-12 p-md-3 p-sm-12 card-item-container">
-              <app-card-item [properties]="cardItem">
-              </app-card-item>
-            </div>
-          </ng-template>
-        </p-dataView>
-        <p-dataView [value]="sectionRisk.cardItemsSection" layout="list" class="app-dataview app-dataview-list"
-          [emptyMessage]="'loadingEllipsis' | translate" *ngIf="displayModeAll === 'list' && !responsive"
-          [paginator]="true" [rows]="pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false"
-          [totalRecords]="totalRecordsRisks">
-          <ng-template let-cardItem pTemplate="listItem">
-            <div class="p-col-12">
-              <app-card-item [properties]="cardItem" [displayModeCard]="displayModeAll">
-              </app-card-item>
-            </div>
-          </ng-template>
-        </p-dataView>
-      </div>
-    </app-card>
-  </div>
-
-  <div class="card-issues" *ngIf="sectionIssue">
-    <app-card [properties]="sectionIssue.cardSection"
-      *ngIf="sectionIssue.cardItemsSection && sectionIssue.cardItemsSection.length > 0"
-      (editFilter)="handleEditFilterEntity($event, 'issues')" (newFilter)="handleNewFilterEntity('issues')"
-      (selectedFilter)="handleSelectedFilterIssue($event)" (createNewElement)="handleCreateNewIssue()">
-      <div class="input-toggle-issue">
-        <p-inputSwitch class="app-toggle" [(ngModel)]="issueSectionShowClosed"
-          (onChange)="handleIssueShowClosedToggle()"></p-inputSwitch>
-        <label class="input-label">{{"showClosed" | translate}}</label>
-      </div>
-      <div class="issue-list-container">
-        <p-dataView [value]="sectionIssue.cardItemsSection" layout="grid" class="app-dataview"
-          [emptyMessage]="'loadingEllipsis' | translate"
-          *ngIf="displayModeAll === 'grid' || (displayModeAll === 'list' && !!responsive)" [paginator]="true"
-          [rows]="pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false" [totalRecords]="totalRecordsIssues">
-          <ng-template let-cardItem pTemplate="gridItem">
-            <div class="p-col-12 p-md-3 p-sm-12 card-item-container">
-              <app-card-item [properties]="cardItem">
-              </app-card-item>
-            </div>
-          </ng-template>
-        </p-dataView>
-        <p-dataView [value]="sectionIssue.cardItemsSection" layout="list" class="app-dataview app-dataview-list"
-          [emptyMessage]="'loadingEllipsis' | translate" *ngIf="displayModeAll === 'list' && !responsive"
-          [paginator]="true" [rows]="pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false"
-          [totalRecords]="totalRecordsIssues">
-          <ng-template let-cardItem pTemplate="listItem">
-            <div class="p-col-12">
-              <app-card-item [properties]="cardItem" [displayModeCard]="displayModeAll">
-              </app-card-item>
-            </div>
-          </ng-template>
-        </p-dataView>
-      </div>
-    </app-card>
-  </div>
-
-  <div class="card-processes" *ngIf="sectionProcess">
-    <app-card [properties]="sectionProcess.cardSection"
-      *ngIf="sectionProcess.cardItemsSection && sectionProcess.cardItemsSection.length > 0"
-      (editFilter)="handleEditFilterEntity($event, 'processes')" (newFilter)="handleNewFilterEntity('processes')"
-      (selectedFilter)="handleSelectedFilterProcess($event)" (createNewElement)="handleCreateNewProcess()">
-      <div class="process-list-container">
-        <p-dataView [value]="sectionProcess.cardItemsSection" layout="grid" class="app-dataview"
-          [emptyMessage]="'loadingEllipsis' | translate"
-          *ngIf="displayModeAll === 'grid' || (displayModeAll === 'list' && !!responsive)" [paginator]="true"
-          [rows]="pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false"
-          [totalRecords]="totalRecordsProcesses">
-          <ng-template let-cardItem pTemplate="gridItem">
-            <div class="p-col-12 p-md-3 p-sm-12 card-item-container">
-              <app-card-item [properties]="cardItem">
-              </app-card-item>
-            </div>
-          </ng-template>
-        </p-dataView>
-        <p-dataView [value]="sectionProcess.cardItemsSection" layout="list" class="app-dataview app-dataview-list"
-          [emptyMessage]="'loadingEllipsis' | translate" *ngIf="displayModeAll === 'list' && !responsive"
-          [paginator]="true" [rows]="pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false"
-          [totalRecords]="totalRecordsProcesses">
-          <ng-template let-cardItem pTemplate="listItem">
-            <div class="p-col-12">
-              <app-card-item [properties]="cardItem" [displayModeCard]="displayModeAll">
-              </app-card-item>
-            </div>
-          </ng-template>
-        </p-dataView>
-      </div>
-    </app-card>
-  </div>
-
-  <div class="card-journal" *ngIf="workpackModel.journalManagementSessionActive">
-    <app-journal-view *ngIf="cardJournalProperties && !!workpack" [cardJournalProperties]="cardJournalProperties" [editPermission]="editPermission" [workpackCanceled]="workpack.canceled"
-      [idPlan]="workpack.plan.id" [idOffice]="workpack.plan.idOffice" [idWorkpack]="idWorkpack"></app-journal-view>
-  </div>
-
-  <app-save-button #saveButton (save)="saveWorkpack()"></app-save-button>
+  <app-save-button #saveButton (save)="onSaveButtonClicked()"></app-save-button>
 
   <p-dialog class="end-management-dialog" [class.responsive]="!!responsive" [header]="'endManagement' |translate"
-    [(visible)]="showDialogEndManagement" [style]="!responsive ? {width: '30vw'} : {width: '90vw'}" closable="false"
+    [(visible)]="showDialogEndManagement" [style]="!responsive ? {width: '30vw'} : {width: '90vw'}" [closable]="false"
     closeIcon="">
     <div class="end-management-content" *ngIf="endManagementWorkpack">
       <span class="subtitle">
@@ -393,7 +233,7 @@
       <div class="date-end-management-container">
         <label class="app-input-label" for="end-date">{{'endedManagementIn'|translate}} {{'*'}}</label>
         <p-calendar [(ngModel)]="endManagementWorkpack.endManagementDate" id="end-date" class="app-select-date"
-          showIcon="true" icon="fas fa-calendar-alt" [dateFormat]="calendarFormat">
+          [showIcon]="true" icon="fas fa-calendar-alt" [dateFormat]="calendarFormat">
         </p-calendar>
       </div>
       <div class="buttons-container">
@@ -406,8 +246,8 @@
   </p-dialog>
 
   <p-dialog class="resume-management-dialog" [class.responsive]="!!responsive" [header]="'resumeManagement' |translate"
-    [(visible)]="showDialogResumeManagement" [style]="!responsive ? {width: '30vw'} : {width: '90vw'}" closable="false"
-    closeIcon="">
+    [(visible)]="showDialogResumeManagement" [style]="!responsive ? {width: '30vw'} : {width: '90vw'}"
+    [closable]="false" closeIcon="">
     <div class="resume-management-content" *ngIf="endManagementWorkpack">
       <span class="subtitle">
         {{'messages.resumeManagementAlert' |translate}}

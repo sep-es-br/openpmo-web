@@ -6,6 +6,10 @@
   justify-content: space-between;
   .app-office-list {
     width: 100%;
+    .office-list-items-container {
+      position: relative;
+      min-height: 150px;
+    }
   }
   .user-cookies-confirmation {
     width: 40%;

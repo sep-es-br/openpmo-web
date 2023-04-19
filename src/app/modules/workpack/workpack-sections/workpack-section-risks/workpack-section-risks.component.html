@@ -1,0 +1,39 @@
+<div class="app-workpack-section-risks" *ngIf="sectionRisk">
+  <app-card [properties]="sectionRisk?.cardSection" [class.panel-tab-view]="showTabview"
+    (editFilter)="handleEditFilterEntity($event, 'risks')" (newFilter)="handleNewFilterEntity('risks')"
+    (selectedFilter)="handleSelectedFilterRisk($event)" (createNewElement)="handleCreateNewRisk()">
+    <div class="input-toggle-risk">
+      <p-inputSwitch class="app-toggle" [(ngModel)]="riskSectionShowClosed" (onChange)="handleRiskShowClosedToggle()">
+      </p-inputSwitch>
+      <label class="input-label">{{"showClosed" | translate}}</label>
+    </div>
+    <div class="risk-list-container">
+     <div class="loading-container" *ngIf="sectionRisk?.cardSection?.isLoading">
+      <app-card-loading [isCardLoading]="sectionRisk?.cardSection?.isLoading"></app-card-loading>
+     </div>
+      <p-dataView [value]="sectionRisk.cardItemsSection" layout="grid" class="app-dataview"
+        [emptyMessage]="'notFoundRisks' | translate"
+        *ngIf="(displayModeAll === 'grid' || (displayModeAll === 'list' && !!responsive)) && !sectionRisk?.cardSection?.isLoading"
+        [paginator]="true" [rows]="pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false"
+        [totalRecords]="totalRecordsRisks">
+        <ng-template let-cardItem pTemplate="gridItem">
+          <div class="p-col-12 p-md-3 p-sm-12 card-item-container">
+            <app-card-item [properties]="cardItem">
+            </app-card-item>
+          </div>
+        </ng-template>
+      </p-dataView>
+      <p-dataView [value]="sectionRisk.cardItemsSection" layout="list" class="app-dataview app-dataview-list"
+        [emptyMessage]="'notFoundRisks' | translate"
+        *ngIf="(displayModeAll === 'list' && !responsive) && !sectionRisk?.cardSection?.isLoading" [paginator]="true"
+        [rows]="pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false" [totalRecords]="totalRecordsRisks">
+        <ng-template let-cardItem pTemplate="listItem">
+          <div class="p-col-12">
+            <app-card-item [properties]="cardItem" [displayModeCard]="displayModeAll">
+            </app-card-item>
+          </div>
+        </ng-template>
+      </p-dataView>
+    </div>
+  </app-card>
+</div>

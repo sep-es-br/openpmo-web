@@ -63,7 +63,7 @@
               <div class="user-by-cpf-input-container" *ngIf="citizenSearchBy === 'CPF'">
                 <div class="cpf-container">
                   <p-inputMask [(ngModel)]="searchedCpfUser" mask="999.999.999-99" placeholder="000.000.000-00"
-                               (ngModelChange)="validateClearSearchByCpf($event)" unmask="true">
+                               (ngModelChange)="validateClearSearchByCpf($event)" [unmask]="true">
                   </p-inputMask>
                 </div>
                 <button pButton class="button-search" [label]="!responsive ? ('search'|translate) : ''"
@@ -92,6 +92,7 @@
       </div>
     </app-card>
   </div>
+  <app-card-loading [isCardLoading]="isLoading" ></app-card-loading>
 </div>
 <app-save-button (save)="savePersonToAdministrator()"></app-save-button>
 

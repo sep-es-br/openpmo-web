@@ -1,4 +1,3 @@
-import { HttpHeaders } from '@angular/common/http';
 import { Component, ElementRef, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { Route, Router } from '@angular/router';
@@ -12,7 +11,6 @@ import { StatusJournalEnum } from 'src/app/shared/enums/StatusJournalEnum';
 import { TypeJournalEnum } from 'src/app/shared/enums/TypeJournalEnum';
 import { ICard } from 'src/app/shared/interfaces/ICard';
 import { ITreeViewScopePlan, ITreeViewScopeWorkpack } from 'src/app/shared/interfaces/ITreeScopePersons';
-import { IWorkpack } from 'src/app/shared/interfaces/IWorkpack';
 import { IJournal } from 'src/app/shared/interfaces/Journal';
 import { AuthService } from 'src/app/shared/services/auth.service';
 import { JournalService } from 'src/app/shared/services/journal.service';
@@ -53,6 +51,8 @@ export class JournalViewComponent implements OnInit, OnDestroy {
   page = 0;
   pageSize = 5;
   yearRange: string;
+  isLoading = false;
+  language: string;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -61,7 +61,7 @@ export class JournalViewComponent implements OnInit, OnDestroy {
     private officeSrv: OfficeService,
     private journalSrv: JournalService,
     private route: Router,
-    private authService: AuthService,
+    private authService: AuthService
   ) {
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.responsive = value);
     this.calendarFormat = this.translateSrv.instant('dateFormat');
@@ -75,19 +75,29 @@ export class JournalViewComponent implements OnInit, OnDestroy {
       label: this.translateSrv.instant(TypeJournalEnum[key]),
       value: key
     }));
+    this.translateSrv.onLangChange.pipe(takeUntil(this.$destroy)).subscribe(() => {
+      setTimeout(() => this.setLanguage(), 200);
+    });
   }
 
   async ngOnInit(): Promise<void> {
+    this.setLanguage();
+    this.isLoading = true;
     await this.loadTreeViewScope();
     await this.loadJournalData();
     const today = moment();
     const yearStart = today.year();
     this.yearRange = (yearStart - 1).toString() + ':' + (yearStart + 15).toString();
+
   }
 
   ngOnDestroy(): void {
     this.$destroy.next();
     this.$destroy.complete();
+  }
+
+  setLanguage() {
+    this.language = this.translateSrv.currentLang;
   }
 
   async loadJournalData() {
@@ -105,6 +115,7 @@ export class JournalViewComponent implements OnInit, OnDestroy {
       this.journalData = this.journalData.concat(data);
       this.hasMore = data.length > 0 && data.length === this.pageSize;
       this.hasAll = true;
+      this.isLoading = false;
     }
 
 
@@ -135,12 +146,24 @@ export class JournalViewComponent implements OnInit, OnDestroy {
       });
       return {
         ...journal,
+        information: this.typeJounalEnum[journal.type] === this.typeJounalEnum.DATE_CHANGED ? {
+          title: this.formatTitle(journal.information),
+          description: `${this.translateSrv.instant('justification')}: ${journal.information.reason}`
+        } : { ...journal.information },
         icon: iconsJournal[journal.type].icon,
         color: iconsJournal[journal.type].color,
         background: iconsJournal[journal.type].background,
       };
     });
 
+  }
+
+  formatTitle(information) {
+    const previousDate = this.language === 'pt-BR' ? moment(information.previousDate, 'yyyy-MM-DD').format('DD/MM/yyyy') :
+      moment(information.previousDate, 'yyyy-MM-DD').format('yyyy/MM/DD')
+    const newDate = this.language === 'pt-BR' ? moment(information.newDate, 'yyyy-MM-DD').format('DD/MM/yyyy') :
+      moment(information.newDate, 'yyyy-MM-DD').format('yyyy/MM/DD')
+    return `${this.translateSrv.instant('previousDate')}: ${previousDate} - ${this.translateSrv.instant('newDate')}: ${newDate}`;
   }
 
   async loadTreeViewScope() {
@@ -228,9 +251,7 @@ export class JournalViewComponent implements OnInit, OnDestroy {
           Authorization: 'Bearer ' + accessToken
       })
     };
-
-   // { headers: {Authorization: `Bearer ${accessToken}`} };
-    fetch(dataurl, header )
+    fetch(dataurl, header)
       .then(response => response.blob())
       .then(blob => {
         const link = document.createElement('a');
@@ -249,8 +270,15 @@ export class JournalViewComponent implements OnInit, OnDestroy {
     await this.handleFilter();
   }
 
-  async handleFilter(_event?) {
+  async handleFilter(event?) {
     this.clearPaginate();
+    let selectedTypes = event.value;
+    if (event.itemValue === 'ALL' && event.value.find( value => value === 'ALL')) {
+      selectedTypes = selectedTypes.filter(op => op === 'ALL');
+    } else {
+      selectedTypes = selectedTypes.filter(op => op !== 'ALL');
+    }
+    this.formSearch.controls.type.setValue(Array.from(selectedTypes));
     await this.loadJournalData();
   }
 
@@ -272,14 +300,6 @@ export class JournalViewComponent implements OnInit, OnDestroy {
     this.journalData = [];
   }
 
-  handleNewInformation() {
-    this.route.navigate(['workpack/journal'], {
-      queryParams: {
-        idWorkpack: this.idWorkpack
-      }
-    });
-  }
-
   private getFrom() {
     const from = this.formSearch.controls.from.value;
     if (from) {
@@ -294,6 +314,14 @@ export class JournalViewComponent implements OnInit, OnDestroy {
       return moment(to).format('DD/MM/YYYY');
     }
     return null;
+  }
+
+  handleNewInformation() {
+    this.route.navigate(['workpack/journal'], {
+      queryParams: {
+        idWorkpack: this.idWorkpack
+      }
+    })
   }
 
 }

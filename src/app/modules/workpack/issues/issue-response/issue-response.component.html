@@ -18,7 +18,7 @@
             </div>
             <div class="p-field">
               <span class="p-float-label">
-                <p-calendar id="float-start" class="app-select-date" showIcon="true" [monthNavigator]="true"
+                <p-calendar id="float-start" class="app-select-date" [showIcon]="true" [monthNavigator]="true"
                   [yearNavigator]="true" formControlName="date" [yearRange]="yearRangeCalculated"
                   icon="fas fa-calendar-alt" [dateFormat]="calendarFormat">
                 </p-calendar>
@@ -45,6 +45,7 @@
             <div class="p-field">
               <span class="p-float-label">
                 <p-multiSelect class="app-multiple-selection" dropdownIcon="fas fa-caret-down" formControlName="responsible"
+                [selectedItemsLabel]="language === 'pt-BR' ? '{0} itens selecionados' : '{0} items selected'"
                   [options]="stakeholderOptions" optionLabel="label"optionValue="value" ></p-multiSelect>
                 <label class="app-input-label" for="float-label" >{{'responsible' |translate}} *</label>
               </span>

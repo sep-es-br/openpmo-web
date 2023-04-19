@@ -5,8 +5,11 @@
     </div>
   </div>
   <div class="card-permissions" *ngIf="workpackSharingCard">
-    <app-card [properties]="workpackSharingCard" *ngIf="cardItemSharing && cardItemSharing.length > 0" class="mt-0">
-      <p-dataView [value]="cardItemSharing" layout="grid" class="app-dataview"
+    <app-card [properties]="workpackSharingCard" class="mt-0">
+      <div class="loading-container" *ngIf="isLoading">
+        <app-card-loading [isCardLoading]="isLoading" ></app-card-loading>
+      </div>
+      <p-dataView [value]="cardItemSharing" layout="grid" class="app-dataview" *ngIf="!isLoading"
         [emptyMessage]="'loadingEllipsis' | translate">
         <ng-template let-cardItem pTemplate="gridItem">
           <div class="p-col-12 p-md-3 p-sm-12 card-item-container">

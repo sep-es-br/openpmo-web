@@ -98,6 +98,10 @@ export class IssueComponent implements OnInit {
     }
   }
 
+  mirrorDescription(): boolean {
+    return (isNaN(this.idIssue) && this.formIssue.get('description').pristine);
+  }
+
   setFormIssue() {
     this.formIssue.controls.name.setValue(this.issue.name);
     this.formIssue.controls.description.setValue(this.issue.description);
@@ -105,10 +109,6 @@ export class IssueComponent implements OnInit {
     this.formIssue.controls.nature.setValue(this.issue.nature);
     this.formIssue.controls.status.setValue(this.issue.status);
     this.formIssue.controls.triggeredBy.setValue(this.issue.triggeredBy);
-  }
-
-  mirrorDescription(): boolean {
-    return (isNaN(this.idIssue) && this.formIssue.get('description').pristine);
   }
 
   async loadPropertiesIssue() {

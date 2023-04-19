@@ -19,6 +19,7 @@ import * as moment from 'moment';
 import { enterLeave } from '../../../shared/animations/enterLeave.animation';
 import { Subject } from 'rxjs';
 import { StoreKeys } from 'src/app/shared/constants';
+import { ConfigDataViewService } from 'src/app/shared/services/config-dataview.service';
 
 @Component({
   selector: 'app-office-list',
@@ -53,6 +54,7 @@ export class OfficeListComponent implements OnInit {
   showCookiesPermissionMessage = false;
   responsive = false;
   $destroy = new Subject();
+  isLoading = false;
 
   constructor(
     private officeSvr: OfficeService,
@@ -62,8 +64,15 @@ export class OfficeListComponent implements OnInit {
     private breadcrumbSrv: BreadcrumbService,
     private cookieSrv: CookieService,
     private responsiveSrv: ResponsiveService,
-    private citizenSrv: CitizenUserService
+    private citizenSrv: CitizenUserService,
+    private configDataViewSrv: ConfigDataViewService
   ) {
+    this.configDataViewSrv.observableDisplayModeAll.pipe(takeUntil(this.$destroy)).subscribe(displayMode => {
+      this.displayModeAll = displayMode;
+    });
+    this.configDataViewSrv.observablePageSize.pipe(takeUntil(this.$destroy)).subscribe(pageSize => {
+      this.pageSize = pageSize;
+    });
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.responsive = value);
     this.citizenSrv.loadCitizenUsers();
    }
@@ -114,15 +123,8 @@ export class OfficeListComponent implements OnInit {
     this.showCookiesPermissionMessage = false;
   }
 
-  handleChangeDisplayMode(event) {
-    this.displayModeAll = event.displayMode;
-  }
-
-  handleChangePageSize(event) {
-    this.pageSize = event.pageSize;
-  }
-
   async loadPropertiesOffice() {
+    this.isLoading = true;
     const { success, data } = await this.officeSvr.GetAll({
       idFilter: this.idFilterSelected
     });
@@ -166,6 +168,7 @@ export class OfficeListComponent implements OnInit {
         };
         return officeCardItem;
       }));
+      this.isLoading = false;
     }
 
     this.cardItemsProperties = itemsProperties;

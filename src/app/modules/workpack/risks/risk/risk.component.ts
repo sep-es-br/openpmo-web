@@ -111,6 +111,10 @@ export class RiskComponent implements OnInit, OnDestroy {
     }
   }
 
+  mirrorDescription(): boolean {
+    return (isNaN(this.idRisk) && this.formRisk.get('description').pristine);
+  }
+
   setFormRisk() {
     this.formRisk.controls.name.setValue(this.risk.name);
     this.formRisk.controls.description.setValue(this.risk.description);
@@ -126,10 +130,6 @@ export class RiskComponent implements OnInit, OnDestroy {
     if (this.risk.happenedIn) {
       this.formRisk.controls.happenedIn.setValue(new Date(this.risk.happenedIn + 'T00:00:00'));
     }
-  }
-
-  mirrorDescription(): boolean {
-    return (isNaN(this.idRisk) && this.formRisk.get('description').pristine);
   }
 
   async loadPropertiesRisk() {

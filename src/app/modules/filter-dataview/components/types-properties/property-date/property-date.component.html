@@ -1,6 +1,6 @@
 <div class="app-property-date">
   <span class="p-float-label">
-    <p-calendar [id]="property.name" [(ngModel)]="value" class="app-select-date" showIcon="true"
+    <p-calendar [id]="property.name" [(ngModel)]="value" class="app-select-date" [showIcon]="true"
       icon="fas fa-calendar-alt" [dateFormat]="calendarFormat" [defaultDate]="defaultValue" [monthNavigator]="true"
       [yearNavigator]="true" [yearRange]="yearRange" [minDate]="dateMin"
       [maxDate]="dateMax" (onSelect)="handleChangedValue()">

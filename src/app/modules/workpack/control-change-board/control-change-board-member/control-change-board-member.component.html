@@ -66,7 +66,7 @@
             <div class="user-by-cpf-input-container" *ngIf="citizenSearchBy === 'CPF'">
               <div class="cpf-container">
                 <p-inputMask [(ngModel)]="searchedCpfUser" mask="999.999.999-99" placeholder="000.000.000-00"
-                             (ngModelChange)="validateClearSearchByCpf($event)" unmask="true">
+                             (ngModelChange)="validateClearSearchByCpf($event)"[unmask]="true">
                 </p-inputMask>
               </div>
               <button pButton class="button-search" [label]="!responsive ? ('search'|translate) : ''"
@@ -83,12 +83,11 @@
           </div>
         </div>
         <div class="loading-container" *ngIf="isLoading">
-          <i class="fas fa-hourglass-half"></i>
-          <label class="loading-label">{{'messages.loading'|translate}} ...</label>
+          <app-card-loading [isCardLoading]="isLoading"></app-card-loading>
         </div>
-        <form [formGroup]="formPerson" *ngIf="ccbMember.person && formPerson" class="form">
+        <form [formGroup]="formPerson" *ngIf="ccbMember?.person && formPerson && !isLoading" class="form">
           <div class="person-name-container">
-            <span class="person-name" *ngIf="ccbMember.person">{{ccbMember.person.name}}</span>
+            <span class="person-name" *ngIf="ccbMember?.person">{{ccbMember?.person?.name}}</span>
           </div>
           <div class="p-grid">
             <span class="p-col-12 p-float-label">
@@ -120,7 +119,7 @@
     </app-card>
   </div>
   <div class="card-memberAs" *ngIf="cardMemberAs">
-    <app-card [properties]="cardMemberAs" *ngIf="ccbMember?.memberAs && ccbMember?.memberAs.length > 0"
+    <app-card [properties]="cardMemberAs" *ngIf="ccbMember && ccbMember?.memberAs && ccbMember?.memberAs.length > 0"
               class="mt-0 inputs-float-label">
       <div class="cards-memberAs">
         <ng-container *ngFor="let memberAs of ccbMember.memberAs; let i = index">

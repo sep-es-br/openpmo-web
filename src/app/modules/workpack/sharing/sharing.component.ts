@@ -50,6 +50,7 @@ export class SharingComponent implements OnInit {
   };
   officeListOptionsSharing: IOffice[];
   editPermission = false;
+  isLoading = false;
 
   constructor(
     private breadcrumbSrv: BreadcrumbService,
@@ -73,6 +74,7 @@ export class SharingComponent implements OnInit {
   }
 
   async ngOnInit() {
+    this.isLoading = true;
     this.workpackSharedSrv.setParamsFromUrl(
       [':idWorkpack'],
       [this.idWorkpack]
@@ -193,6 +195,7 @@ export class SharingComponent implements OnInit {
     }
     await this.loadOfficeListForShare();
     this.loadSharedCardItems();
+
   }
 
   async loadOfficeListForShare() {
@@ -236,6 +239,7 @@ export class SharingComponent implements OnInit {
         }
       );
     }
+    this.isLoading = false;
   }
 
   handleCreateNewShared(office: IOffice) {

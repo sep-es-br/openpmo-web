@@ -215,6 +215,7 @@ export class ControlChangeBoardMemberComponent implements OnInit, OnDestroy {
   async loadCcbMember() {
     if (this.idPerson && this.idProject) {
       this.idPlan = Number(localStorage.getItem('@currentPlan'));
+      this.isLoading = true;
       const {data, success} = await this.ccbMemberSrv.getCcbMember(
         {
           'id-person': this.idPerson,
@@ -223,10 +224,13 @@ export class ControlChangeBoardMemberComponent implements OnInit, OnDestroy {
         });
       if (success) {
         this.ccbMember = data;
-        this.setFormPerson(this.ccbMember.person);
-        if (!this.ccbMember.memberAs) {
-          this.setMemberAsCcbMember(this.ccbMember.person);
+        if (this.ccbMember) {
+          this.setFormPerson(this.ccbMember.person);
+          if (!this.ccbMember.memberAs) {
+            this.setMemberAsCcbMember(this.ccbMember.person);
+          }
         }
+        this.isLoading = false;
       }
     }
   }

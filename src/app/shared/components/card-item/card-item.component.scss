@@ -275,6 +275,13 @@
   &.cardList.listPerson {
     .p-card-body {
       padding-top: 5px !important;
+      .app-avatar .avatar .p-avatar-xl {
+        width: 40px;
+        height: 40px;
+        .p-avatar-icon {
+          font-size: 1.8rem;
+        }
+      }
     }
   }
 }
@@ -396,6 +403,13 @@
       height: 50px;
       .p-card-content {
         padding: 0;
+      }
+      .p-card-body {
+        .p-card-content {
+          .carditem-content {
+            padding: 0 !important;
+          }
+        }
       }
     }
   }

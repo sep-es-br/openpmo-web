@@ -62,6 +62,7 @@ export class PlanPermissionsComponent implements OnInit, OnDestroy {
   showListBoxPublicServers = false;
   showMessagePublicServerNotFoundByName = false;
   showMessageInvalidEmail = false;
+  isLoadingCitizen = false;
   isLoading = false;
 
   constructor(
@@ -103,6 +104,7 @@ export class PlanPermissionsComponent implements OnInit, OnDestroy {
   }
 
   async ngOnInit() {
+    this.isLoading = true;
     await this.getAuthServer();
     await this.loadPermission();
     await this.loadPropertiesPlan();
@@ -196,12 +198,12 @@ export class PlanPermissionsComponent implements OnInit, OnDestroy {
     if (this.person) {
       this.person = undefined;
     }
-    this.isLoading = true;
+    this.isLoadingCitizen = true;
     const result = await this.citizenUserSrv.GetPublicServersByName({
       name: this.searchedNameUser,
       idOffice: this.idOffice
     });
-    this.isLoading = false;
+    this.isLoadingCitizen = false;
     if (result.success) {
       this.publicServersResult = result.data;
       this.showListBoxPublicServers = this.publicServersResult.length > 0;
@@ -223,13 +225,13 @@ export class PlanPermissionsComponent implements OnInit, OnDestroy {
     this.citizenUserNotFoundByCpf = false;
     this.validCpf = cpfValidator(this.searchedCpfUser);
     if (this.validCpf) {
-      this.isLoading = true;
+      this.isLoadingCitizen = true;
       const result = await this.citizenUserSrv.GetCitizenUserByCpf({
         cpf: this.searchedCpfUser,
         idOffice: this.idOffice,
         loadWorkLocation: false
       });
-      this.isLoading = false;
+      this.isLoadingCitizen = false;
       if (result.success) {
         this.person = result.data;
         this.loadNewPermission();
@@ -241,10 +243,10 @@ export class PlanPermissionsComponent implements OnInit, OnDestroy {
 
   async handleSelectedPublicServer(event) {
     this.showListBoxPublicServers = false;
-    this.isLoading = true;
+    this.isLoadingCitizen = true;
     const publicServer = event.value;
     const result = await this.citizenUserSrv.GetPublicServer(publicServer.sub, { idOffice: this.idOffice, loadWorkLocation: false });
-    this.isLoading = false;
+    this.isLoadingCitizen = false;
     if (result.success) {
       this.person = result.data;
       this.searchedNameUser = '';
@@ -277,6 +279,9 @@ export class PlanPermissionsComponent implements OnInit, OnDestroy {
         };
       }
       this.loadCardItemsPersonPermissions();
+      this.isLoading = false;
+    } else {
+      this.isLoading = false;
     }
   }
 

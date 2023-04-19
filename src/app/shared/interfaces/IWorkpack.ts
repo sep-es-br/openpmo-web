@@ -46,6 +46,8 @@ export interface IWorkpack {
       name: string;
       idOffice?: number;
     };
+    delayInDays?: number;
+    baselineDate?: Date;
     idParent?: number;
     idPlan?: number;
     type: TypeWorkpackEnum;
@@ -75,6 +77,7 @@ export interface IWorkpack {
     completed?: boolean;
     canDeleted?: boolean;
     endManagementDate?: string;
+    favoritedBy?: boolean;
     hasScheduleSectionActive?: boolean;
     reason?: string;
     dashboard?: {
@@ -82,7 +85,7 @@ export interface IWorkpack {
         high: number,
         low: number,
         medium: number,
-        total: number 
+        total: number
       },
       milestone?: IMilestoneDashboard,
       tripleConstraint?: ITripleConstraintDashboard,

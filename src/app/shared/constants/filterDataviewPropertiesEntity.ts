@@ -92,22 +92,22 @@ export const FilterDataviewPropertiesEntity = {
     {
       label: 'importance', apiValue: 'importance', type: TypePropertyModelEnum.SelectionModel,
       possibleValues: [
-        { label: 'high', value: 'high' },
-        { label: 'medium', value: 'medium' },
-        { label: 'low', value: 'low' }]
+        { label: 'high', value: 'HIGH' },
+        { label: 'medium', value: 'MEDIUM' },
+        { label: 'low', value: 'LOW' }]
     },
     {
       label: 'nature', apiValue: 'nature', type: TypePropertyModelEnum.SelectionModel,
       possibleValues: [
-        { label: 'threat', value: 'threat' },
-        { label: 'opportunity', value: 'opportunity' }]
+        { label: 'threat', value: 'THREAT' },
+        { label: 'opportunity', value: 'OPPORTUNITY' }]
     },
     {
       label: 'status', apiValue: 'status', type: TypePropertyModelEnum.SelectionModel,
       possibleValues: [
-        { label: 'open', value: 'open' },
-        { label: 'happened', value: 'happened' },
-        { label: 'notGonnaHappen', value: 'notGonnaHappen' }]
+        { label: 'open', value: 'OPEN' },
+        { label: 'happened', value: 'HAPPENED' },
+        { label: 'notGonnaHappen', value: 'NOT_GONNA_HAPPEN' }]
     },
     { label: 'likelyToHappenFrom', apiValue: 'likelyToHappenFrom', type: TypePropertyModelEnum.DateModel },
     { label: 'likelyToHappenTo', apiValue: 'likelyToHappenTo', type: TypePropertyModelEnum.DateModel },
@@ -118,21 +118,21 @@ export const FilterDataviewPropertiesEntity = {
     {
       label: 'importance', apiValue: 'importance', type: TypePropertyModelEnum.SelectionModel,
       possibleValues: [
-        { label: 'high', value: 'high' },
-        { label: 'medium', value: 'medium' },
-        { label: 'low', value: 'low' }]
+        { label: 'high', value: 'HIGH' },
+        { label: 'medium', value: 'MEDIUM' },
+        { label: 'low', value: 'LOW' }]
     },
     {
       label: 'nature', apiValue: 'nature', type: TypePropertyModelEnum.SelectionModel,
       possibleValues: [
-        { label: 'problem', value: 'problem' },
-        { label: 'benefit', value: 'benefit' }]
+        { label: 'problem', value: 'PROBLEM' },
+        { label: 'benefit', value: 'BENEFIT' }]
     },
     {
       label: 'status', apiValue: 'status', type: TypePropertyModelEnum.SelectionModel,
       possibleValues: [
-        { label: 'open', value: 'open' },
-        { label: 'closed', value: 'closed' }]
+        { label: 'open', value: 'OPEN' },
+        { label: 'closed', value: 'CLOSED' }]
     },
   ],
   processes: [

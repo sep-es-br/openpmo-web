@@ -1,23 +1,19 @@
-import { CitizenUserService } from './../../shared/services/citizen-user.service';
+import { SaveButtonService } from './../../shared/services/save-button.service';
+import { WorkpackBreadcrumbStorageService } from './../../shared/services/workpack-breadcrumb-storage.service';
+import { ISectionWorkpacks } from './../../shared/interfaces/ISectionWorkpack';
 import { DashboardService } from 'src/app/shared/services/dashboard.service';
 import { MilestoneStatusEnum } from './../../shared/enums/MilestoneStatusEnum';
 import { IFilterProperty } from 'src/app/shared/interfaces/IFilterProperty';
 import { takeUntil } from 'rxjs/operators';
 import { IWorkpackCardItem } from './../../shared/interfaces/IWorkpackCardItem';
-import { IBaseline } from './../../shared/interfaces/IBaseline';
 import { BaselineService } from './../../shared/services/baseline.service';
 import { ProcessService } from './../../shared/services/process.service';
-import { IProcess } from './../../shared/interfaces/IProcess';
-import { IssuesPropertiesOptions } from './../../shared/constants/issuesPropertiesOptions';
-import { IIssue } from './../../shared/interfaces/IIssue';
 import { IssueService } from './../../shared/services/issue.service';
-import { RisksPropertiesOptions } from './../../shared/constants/risksPropertiesOptions';
-import { IRisk } from './../../shared/interfaces/IRisk';
 import { RiskService } from './../../shared/services/risk.service';
 import { TypePropertyModelEnum } from './../../shared/enums/TypePropertyModelEnum';
 import { FilterDataviewPropertiesEntity } from 'src/app/shared/constants/filterDataviewPropertiesEntity';
 import { FilterDataviewService } from 'src/app/shared/services/filter-dataview.service';
-import { Component, OnDestroy, ViewChild } from '@angular/core';
+import { Component, OnDestroy, ViewChild, DebugElement } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { ConfirmationService, MenuItem, MessageService, TreeNode } from 'primeng/api';
@@ -26,33 +22,20 @@ import { ResponsiveService } from 'src/app/shared/services/responsive.service';
 import { WorkpackModelService } from 'src/app/shared/services/workpack-model.service';
 import { WorkpackService } from 'src/app/shared/services/workpack.service';
 import { IWorkpack } from 'src/app/shared/interfaces/IWorkpack';
-import { IWorkpackModelProperty } from 'src/app/shared/interfaces/IWorkpackModelProperty';
 import { IWorkpackModel } from 'src/app/shared/interfaces/IWorkpackModel';
-import { PropertyTemplateModel } from 'src/app/shared/models/PropertyTemplateModel';
 import { IWorkpackProperty } from 'src/app/shared/interfaces/IWorkpackProperty';
-import { LocalityService } from 'src/app/shared/services/locality.service';
-import { ILocalityList } from 'src/app/shared/interfaces/ILocality';
-import { DomainService } from 'src/app/shared/services/domain.service';
-import { IDomain } from 'src/app/shared/interfaces/IDomain';
 import { OrganizationService } from 'src/app/shared/services/organization.service';
 import { StakeholderService } from 'src/app/shared/services/stakeholder.service';
-import { ICardItem } from 'src/app/shared/interfaces/ICardItem';
 import { IconsEnum } from 'src/app/shared/enums/IconsEnum';
 import { IOrganization } from 'src/app/shared/interfaces/IOrganization';
 import { IMeasureUnit } from 'src/app/shared/interfaces/IMeasureUnit';
-import { IStakeholder } from 'src/app/shared/interfaces/IStakeholder';
 import { PlanService } from 'src/app/shared/services/plan.service';
 import { TypeWorkpackEnum } from 'src/app/shared/enums/TypeWorkpackEnum';
-import { CostAccountService } from 'src/app/shared/services/cost-account.service';
-import { ICostAccount } from 'src/app/shared/interfaces/ICostAccount';
 import { MeasureUnitService } from 'src/app/shared/services/measure-unit.service';
 import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
 import { ScheduleService } from 'src/app/shared/services/schedule.service';
-import { IScheduleDetail } from 'src/app/shared/interfaces/ISchedule';
-import { IScheduleStepCardItem } from 'src/app/shared/interfaces/IScheduleStepCardItem';
 import { OfficeService } from 'src/app/shared/services/office.service';
 import { AuthService } from 'src/app/shared/services/auth.service';
-import { OfficePermissionService } from 'src/app/shared/services/office-permission.service';
 import { PlanPermissionService } from 'src/app/shared/services/plan-permissions.service';
 import { SaveButtonComponent } from 'src/app/shared/components/save-button/save-button.component';
 import { MenuService } from 'src/app/shared/services/menu.service';
@@ -60,33 +43,9 @@ import { IOffice } from 'src/app/shared/interfaces/IOffice';
 import { IPlan } from 'src/app/shared/interfaces/IPlan';
 import * as moment from 'moment';
 import { Subject } from 'rxjs';
-import { Console } from 'console';
-
-interface ISection {
-  idWorkpackModel?: number;
-  cardSection: ICard;
-  cardItemsSection?: ICardItem[];
-}
-
-interface ISectionWorkpacks {
-  idWorkpackModel?: number;
-  cardSection: ICard;
-  cardItemsSection?: IWorkpackCardItem[];
-  workpackShowCancelleds?: boolean;
-}
-
-interface IScheduleSection {
-  cardSection: ICard;
-  startScheduleStep?: IScheduleStepCardItem;
-  endScheduleStep?: IScheduleStepCardItem;
-  groupStep?: {
-    year: number;
-    cardItemSection?: IScheduleStepCardItem[];
-    start?: boolean;
-    end?: boolean;
-  }[];
-}
-
+import { WorkpackShowTabviewService } from 'src/app/shared/services/workpack-show-tabview.service';
+import { ConfigDataViewService } from 'src/app/shared/services/config-dataview.service';
+import { ITabViewScrolled } from 'src/app/shared/components/tabview-scrolled/tabview-scrolled.component';
 
 @Component({
   selector: 'app-workpack',
@@ -107,49 +66,21 @@ export class WorkpackComponent implements OnDestroy {
   idWorkpackParent: number;
   idWorkpackModelLinked: number;
   workpackModel: IWorkpackModel;
-  cardWorkpackProperties: ICard;
+  typePropertyModel = TypePropertyModelEnum;
   cardJournalProperties: ICard;
   workpack: IWorkpack;
   workpackName: string;
   workpackFullName: string;
-  sectionPropertiesProperties: PropertyTemplateModel[];
   workpackProperties: IWorkpackProperty[];
-  sectionStakeholder: ISection;
-  sectionRisk: ISection;
-  sectionIssue: ISection;
-  sectionProcess: ISection;
-  stakeholders: IStakeholder[];
-  sectionCostAccount: ISection;
-  sectionSchedule: IScheduleSection;
   sectionWorkpackModelChildren: boolean;
-  stakeholderSectionShowInactives = false;
-  riskSectionShowClosed = false;
-  issueSectionShowClosed = false;
-  baselinesSectionShowInactives = true;
-  sectionBaselines: ISection;
   organizationsOffice: IOrganization[];
   unitMeasuresOffice: IMeasureUnit[];
   cardsWorkPackModelChildren: ISectionWorkpacks[];
-  typePropertyModel = TypePropertyModelEnum;
-  costAccounts: ICostAccount[];
-  schedule: IScheduleDetail;
-  showDetails: boolean;
   isUserAdmin: boolean;
-  editPermission = false;
   collapsePanelsStatus = true;
   displayModeAll = 'grid';
   pageSize = 5;
   totalRecordsWorkpacks: number[] = [];
-  totalRecordsStakeholders: number;
-  totalRecordsCostAccounts: number;
-  totalRecordsRisks: number;
-  totalRecordsIssues: number;
-  totalRecordsProcesses: number;
-  risks: IRisk[];
-  issues: IIssue[];
-  processes: IProcess[];
-  baselines: IBaseline[];
-  unitMeansure: IMeasureUnit;
   showDialogEndManagement = false;
   showDialogResumeManagement = false;
   endManagementWorkpack: {
@@ -166,6 +97,10 @@ export class WorkpackComponent implements OnDestroy {
   reloadDashboard = false;
   endManagementResumePermission = false;
   oldName: string = null;
+  showTabview = false;
+  hasWBS = false;
+  selectedTab: ITabViewScrolled;
+  tabs: ITabViewScrolled[];
 
   constructor(
     private actRouter: ActivatedRoute,
@@ -173,20 +108,14 @@ export class WorkpackComponent implements OnDestroy {
     private workpackSrv: WorkpackService,
     private responsiveSrv: ResponsiveService,
     public translateSrv: TranslateService,
-    private domainSrv: DomainService,
-    private localitySrv: LocalityService,
-    public costAccountSrv: CostAccountService,
-    private organizationSrv: OrganizationService,
     private unitMeasureSrv: MeasureUnitService,
     public stakeholderSrv: StakeholderService,
     private planSrv: PlanService,
     public scheduleSrv: ScheduleService,
     private router: Router,
-    private breadcrumbSrv: BreadcrumbService,
     private officeSrv: OfficeService,
     private authSrv: AuthService,
     private planPermissionSrv: PlanPermissionService,
-    private officePermissionSrv: OfficePermissionService,
     private messageSrv: MessageService,
     private menuSrv: MenuService,
     public filterSrv: FilterDataviewService,
@@ -196,23 +125,68 @@ export class WorkpackComponent implements OnDestroy {
     public baselineSrv: BaselineService,
     private confirmationSrv: ConfirmationService,
     private dashboardSrv: DashboardService,
+    private saveButtonSrv: SaveButtonService,
+    private workpackBreadcrumbStorageSrv: WorkpackBreadcrumbStorageService,
+    private workpackShowTabviewSrv: WorkpackShowTabviewService,
+    private configDataViewSrv: ConfigDataViewService
   ) {
+
     this.actRouter.queryParams.subscribe(async ({ id, idPlan, idWorkpackModel, idWorkpackParent, idWorkpackModelLinked }) => {
       this.idWorkpack = id && +id;
       this.idPlan = idPlan && +idPlan;
       this.idWorkpackModel = idWorkpackModel && +idWorkpackModel;
       this.idWorkpackParent = idWorkpackParent && +idWorkpackParent;
       this.idWorkpackModelLinked = idWorkpackModelLinked && +idWorkpackModelLinked;
+      this.workpackSrv.setWorkpackParams({
+        idWorkpack: id && +id,
+        idPlan: idPlan && +idPlan,
+        idWorkpackModel: idWorkpackModel && +idWorkpackModel,
+        idWorkpackParent: idWorkpackParent && +idWorkpackParent,
+        idWorkpackModelLinked: idWorkpackModelLinked && +idWorkpackModelLinked
+      });
       await this.resetWorkpack();
+    });
+    this.menuSrv.getRemovedFavorites.pipe(takeUntil(this.$destroy)).subscribe((idRemoved) => {
+      if (+this.idWorkpack === +idRemoved) {
+        this.workpack.favoritedBy = !this.workpack.favoritedBy;
+      }
     });
     this.dashboardSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.fullScreenModeDashboard = value);
     this.translateSrv.onLangChange.pipe(takeUntil(this.$destroy)).subscribe(() => {
       setTimeout(() => this.language = this.translateSrv.currentLang, 200);
     }
     );
-    this.responsiveSrv.observable.subscribe(value => {
+    this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => {
       this.responsive = value;
     });
+    this.workpackShowTabviewSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => {
+      this.showTabview = value;
+    });
+    this.saveButtonSrv.observableShowSaveButton.pipe(takeUntil(this.$destroy)).subscribe(showButton => {
+      if (showButton && this.saveButton) {
+        this.saveButton.showButton();
+      } else {
+        if (this.saveButton) {
+          this.saveButton.hideButton();
+        }
+      }
+    });
+    this.configDataViewSrv.observableCollapsePanelsStatus.pipe(takeUntil(this.$destroy)).subscribe(collapsePanelStatus => {
+      this.collapsePanelsStatus = collapsePanelStatus === 'collapse' ? true : false;
+      this.handleChangeCollapseExpandPanel();
+    });
+    this.configDataViewSrv.observableDisplayModeAll.pipe(takeUntil(this.$destroy)).subscribe(displayMode => {
+      this.displayModeAll = displayMode;
+    });
+    this.configDataViewSrv.observablePageSize.pipe(takeUntil(this.$destroy)).subscribe(pageSize => {
+      this.pageSize = pageSize;
+    });
+    this.workpackSrv.observableCheckCompletedChanged.pipe(takeUntil(this.$destroy)).subscribe( checkCompleted => {
+      if (this.workpack) {
+        this.changedStatusCompleted = true;
+        this.workpack.completed = checkCompleted;
+      }
+    })
   }
 
   ngOnDestroy(): void {
@@ -220,64 +194,10 @@ export class WorkpackComponent implements OnDestroy {
     this.$destroy.complete();
   }
 
-  handleChangeCollapseExpandPanel(event) {
-    this.collapsePanelsStatus = event.mode === 'collapse' ? true : false;
-    this.cardWorkpackProperties = Object.assign({}, {
-      ...this.cardWorkpackProperties,
-      initialStateCollapse: this.collapsePanelsStatus
-    });
+  handleChangeCollapseExpandPanel() {
     this.cardJournalProperties = Object.assign({}, {
       ...this.cardJournalProperties,
       initialStateCollapse: this.collapsePanelsStatus
-    });
-    this.sectionCostAccount = this.sectionCostAccount && Object.assign({}, {
-      ...this.sectionCostAccount,
-      cardSection: {
-        ...this.sectionCostAccount.cardSection,
-        initialStateCollapse: this.collapsePanelsStatus
-      }
-    });
-    this.sectionSchedule = this.sectionSchedule && Object.assign({}, {
-      ...this.sectionSchedule,
-      cardSection: {
-        ...this.sectionSchedule.cardSection,
-        initialStateCollapse: this.collapsePanelsStatus
-      }
-    });
-    this.sectionStakeholder = this.sectionStakeholder && Object.assign({}, {
-      ...this.sectionStakeholder,
-      cardSection: {
-        ...this.sectionStakeholder.cardSection,
-        initialStateCollapse: this.collapsePanelsStatus
-      }
-    });
-    this.sectionBaselines = this.sectionBaselines && Object.assign({}, {
-      ...this.sectionBaselines,
-      cardSection: {
-        ...this.sectionBaselines.cardSection,
-        initialStateCollapse: this.collapsePanelsStatus
-      }
-    });
-    this.sectionRisk = this.sectionRisk && Object.assign({}, {
-      ...this.sectionRisk,
-      cardSection: {
-        ...this.sectionRisk.cardSection,
-        initialStateCollapse: this.collapsePanelsStatus
-      }
-    });
-    this.sectionIssue = this.sectionIssue && Object.assign({}, {
-      ...this.sectionIssue,
-      cardSection: {
-        ...this.sectionIssue.cardSection,
-        initialStateCollapse: this.collapsePanelsStatus
-      }
-    });
-    this.sectionProcess = this.sectionProcess && Object.assign({}, {
-      ...this.sectionProcess,
-      cardSection: {
-        ...this.sectionProcess.cardSection,
-        initialStateCollapse: this.collapsePanelsStatus
-      }
     });
     this.cardsWorkPackModelChildren = this.cardsWorkPackModelChildren && this.cardsWorkPackModelChildren.map(card => (
       Object.assign({}, {
@@ -298,233 +218,36 @@ export class WorkpackComponent implements OnDestroy {
     this.pageSize = event.pageSize;
   }
 
-  mirrorToFullName(nameProperty: PropertyTemplateModel, fullNameProperty: PropertyTemplateModel) {
-
-    const fullNameIndex = this.sectionPropertiesProperties.findIndex((p) => (p.name === 'fullName'));
-    if (isNaN(this.idWorkpack) && fullNameProperty && fullNameIndex >= 0 && !fullNameProperty.dirty) {
-      this.sectionPropertiesProperties[fullNameIndex].value = nameProperty.value;
-    }
-  }
-
-  checkProperties(property: PropertyTemplateModel) {
-    let arePropertiesRequiredValid: boolean = this.checkPropertiesRequiredValid(property);
-    let arePropertiesStringValid: boolean = this.checkPropertiesStringValid(property);
-    const arePropertiesNumberValid: boolean = this.checkPropertiesNumberValid(property);
-    if (property.name == 'name') {
-      const fullName = this.sectionPropertiesProperties.find((p) => (p.name === 'fullName'));
-      if (fullName) {
-        this.mirrorToFullName(property, fullName);
-        arePropertiesRequiredValid = this.checkPropertiesRequiredValid(fullName);
-        arePropertiesStringValid = this.checkPropertiesStringValid(fullName);
-      }
-    }
-    if (property.name == 'fullName') {
-      property.dirty = true;
-    }
-
-    return (arePropertiesRequiredValid && arePropertiesStringValid && arePropertiesNumberValid) ?
-      this.saveButton?.showButton() : this.saveButton?.hideButton();
-  }
-
-  checkPropertiesRequiredValid(property: PropertyTemplateModel, groupedProperties?: PropertyTemplateModel[]) {
-    const properties = !groupedProperties ? this.sectionPropertiesProperties : groupedProperties;
-    const validated = properties
-      .filter(propReq => !!propReq.required || (propReq.type === 'Group' && propReq.groupedProperties
-        .filter(gp => !!gp.required).length > 0))
-      .map((prop) => {
-        let valid = (prop.value instanceof Array
-          ? (prop.value.length > 0)
-          : typeof prop.value == 'boolean' || typeof prop.value == 'number'
-          || !!prop.value || (prop.value !== null && prop.value !== undefined && prop.value !== ''));
-        if (['OrganizationSelection', 'UnitSelection', 'LocalitySelection'].includes(prop.type)) {
-          if (prop.type === 'LocalitySelection') {
-            if (!prop.multipleSelection) {
-              const selectedLocality = prop.localitiesSelected as TreeNode;
-              prop.selectedValues = [selectedLocality.data];
-            }
-            if (prop.multipleSelection) {
-              const selectedLocality = prop.localitiesSelected as TreeNode[];
-              prop.selectedValues = selectedLocality.filter(locality => locality.data !== prop.idDomain)
-                .map(l => l.data);
-            }
-          }
-          valid = (typeof prop.selectedValue === 'number' || (prop.selectedValues instanceof Array ?
-            prop.selectedValues.length > 0 : typeof prop.selectedValues == 'number'));
-        }
-        const groupedPropertiesValid = prop.type === 'Group' ? this.checkPropertiesRequiredValid(property, prop.groupedProperties) : true;
-        if (prop.type === 'Group') {
-          valid = groupedPropertiesValid;
-        }
-        if (property.idPropertyModel === prop.idPropertyModel) {
-          prop.invalid = !valid;
-          prop.message = valid ? '' : this.translateSrv.instant('required');
-        }
-        return valid;
-      })
-      .reduce((a, b) => a ? b : a, true);
-    return validated;
-  }
-
-  checkPropertiesStringValid(property: PropertyTemplateModel, groupedProperties?: PropertyTemplateModel[]) {
-    const properties = !groupedProperties ? this.sectionPropertiesProperties : groupedProperties;
-    return properties
-      .filter(p => (((p.min || p.max) && (typeof p.value == 'string' && p.type !== 'Num')) || (p.type === 'Group' &&
-        p.groupedProperties.filter(gp => ((gp.min || gp.max) && (typeof gp.value == 'string' && gp.type !== 'Number'))).length > 0)))
-      .map((prop) => {
-        let valid = true;
-        valid = prop.min ? String(prop.value).length >= prop.min : true;
-        if (property.idPropertyModel === prop.idPropertyModel) {
-          prop.invalid = !valid;
-          prop.message = !valid ? prop.message = this.translateSrv.instant('minLenght') : '';
-        }
-        if (valid) {
-          valid = prop.max ? (!prop.required ? String(prop.value).length <= prop.max
-            : String(prop.value).length <= prop.max && String(prop.value).length > 0) : true;
-          if (property.idPropertyModel === prop.idPropertyModel) {
-            prop.invalid = !valid;
-            prop.message = !valid ? (String(prop.value).length > 0 ? prop.message = this.translateSrv.instant('maxLenght')
-              : prop.message = this.translateSrv.instant('required')) : '';
-          }
-        }
-        const groupedPropertiesValid = prop.type === 'Group' ? this.checkPropertiesStringValid(property, prop.groupedProperties) : true;
-        if (prop.type === 'Group') {
-          valid = groupedPropertiesValid;
-        }
-        return valid;
-      })
-      .reduce((a, b) => a ? b : a, true);
-  }
-
-  checkPropertiesNumberValid(property: PropertyTemplateModel, groupedProperties?: PropertyTemplateModel[]) {
-    const properties = !groupedProperties ? this.sectionPropertiesProperties : groupedProperties;
-    return properties
-      .filter(p => (((p.min || p.max) && (p.type === 'Num')) || (p.type === 'Group' &&
-        p.groupedProperties.filter(gp => ((gp.min || gp.max) && (gp.type === 'Num'))).length > 0)))
-      .map((prop) => {
-        let valid = true;
-        valid = prop.min ? Number(prop.value) >= prop.min : true;
-        if (property.idPropertyModel === prop.idPropertyModel) {
-          prop.invalid = !valid;
-          prop.message = !valid ? prop.message = this.translateSrv.instant('minValue') : '';
-        }
-        if (valid) {
-          valid = prop.max ? (!prop.required ? Number(prop.value) <= prop.max
-            : Number(prop.value) <= prop.max && Number(prop.value) > 0) : true;
-          if (property.idPropertyModel === prop.idPropertyModel) {
-            prop.invalid = !valid;
-            prop.message = !valid ? (Number(prop.value) > 0 ? prop.message = this.translateSrv.instant('maxValue')
-              : prop.message = this.translateSrv.instant('required')) : '';
-          }
-        }
-        const groupedPropertiesValid = prop.type === 'Group' ? this.checkPropertiesStringValid(property, prop.groupedProperties) : true;
-        if (prop.type === 'Group') {
-          valid = groupedPropertiesValid;
-        }
-        return valid;
-      })
-      .reduce((a, b) => a ? b : a, true);
-  }
-
   async resetWorkpack() {
     this.workpackModel = undefined;
-    this.cardWorkpackProperties = undefined;
     this.cardJournalProperties = undefined;
     this.workpack = undefined;
     this.workpackName = undefined;
     this.workpackFullName = undefined;
-    this.sectionPropertiesProperties = [];
     this.workpackProperties = [];
-    this.sectionStakeholder = undefined;
-    this.stakeholders = undefined;
-    this.sectionRisk = undefined;
-    this.sectionIssue = undefined;
-    this.sectionProcess = undefined;
-    this.sectionCostAccount = undefined;
-    this.sectionBaselines = undefined;
-    this.costAccounts = undefined;
-    this.sectionSchedule = undefined;
-    this.schedule = undefined;
     this.sectionWorkpackModelChildren = undefined;
     this.cardsWorkPackModelChildren = [];
-    this.editPermission = false;
     this.changedStatusCompleted = false;
+    this.workpackSrv.setEditPermission(false);
+    this.workpackSrv.setUnitMeansure(undefined);
+    this.workpackSrv.setWorkpackData(undefined);
     this.idPlan = Number(localStorage.getItem('@currentPlan'));
-    await this.loadProperties();
-    await this.setBreadcrumb();
+    await this.loadWorkpackData();
+    this.workpackBreadcrumbStorageSrv.setBreadcrumb();
     this.calendarFormat = this.translateSrv.instant('dateFormat');
   }
 
-  async setBreadcrumb() {
-    this.breadcrumbSrv.setMenu([
-      ... await this.getBreadcrumbs(),
-      ... this.idWorkpack
-        ? []
-        : [{
-          key: this.workpackModel?.type?.toLowerCase().replace('model', ''),
-          info: this.workpackName,
-          tooltip: this.workpackFullName,
-          routerLink: ['/workpack'],
-          queryParams: {
-            idPlan: this.idPlan,
-            idWorkpackModel: this.idWorkpackModel,
-            idWorkpackParent: this.idWorkpackParent
-          },
-          modelName: this.workpackModel?.modelName
-        }]
-    ]);
-  }
-
-  async getBreadcrumbs() {
-    const id = this.idWorkpack || this.idWorkpackParent;
-    if (!id) {
-      return [
-        {
-          key: 'office',
-          info: this.propertiesOffice.name,
-          tooltip: this.propertiesOffice.fullName,
-          routerLink: ['/offices', 'office'],
-          queryParams: { id: this.idOffice },
-        },
-        {
-          key: 'plan',
-          info: this.propertiesPlan.name,
-          tooltip: this.propertiesPlan.fullName,
-          routerLink: ['/plan'],
-          queryParams: { id: this.propertiesPlan.id },
-        }
-      ];
-    }
-    const { success, data } = await this.breadcrumbSrv.getBreadcrumbWorkpack(id, { 'id-plan': this.idPlan });
-    return success
-      ? data.map(p => ({
-        key: !p.modelName ? p.type.toLowerCase() : p.modelName,
-        info: p.name,
-        tooltip: p.fullName,
-        routerLink: this.getRouterLinkFromType(p.type),
-        queryParams: { id: p.id, idWorkpackModelLinked: p.idWorkpackModelLinked, idPlan: this.idPlan },
-        modelName: p.modelName
-      }))
-      : [];
-  }
-
-  getRouterLinkFromType(type: string): string[] {
-    switch (type) {
-      case 'office':
-        return ['/offices', 'office'];
-      case 'plan':
-        return ['plan'];
-      default:
-        return ['/workpack'];
-    }
-  }
-
-  async loadProperties() {
+  async loadWorkpackData() {
     this.isUserAdmin = await this.authSrv.isUserAdmin();
     if (this.isUserAdmin || !this.idWorkpack) {
-      this.editPermission = true;
+      this.workpackSrv.setEditPermission(true);
     }
-    this.idPlan = Number(localStorage.getItem('@currentPlan'));
-    this.loadCardWorkpackProperties();
+    const idPlan = Number(localStorage.getItem('@currentPlan'));
+    const params = this.workpackSrv.getWorkpackParams();
+    this.workpackSrv.setWorkpackParams({
+      ...params,
+      idPlan
+    });
     if (this.idWorkpack) {
       if (!this.idWorkpackModelLinked) {
         await this.loadWorkpack();
@@ -534,32 +257,28 @@ export class WorkpackComponent implements OnDestroy {
     } else {
       await this.loadWorkpackModel(this.idWorkpackModel);
     }
-    const workpackModelActivesProperties = (!!this.idWorkpackModelLinked && !!this.idWorkpack) ?
-      this.workpack.model?.properties?.filter(w => w.active && w.session === 'PROPERTIES') :
-      this.workpackModel?.properties?.filter(w => w.active && w.session === 'PROPERTIES');
-    this.sectionPropertiesProperties = await Promise.all(workpackModelActivesProperties.map(p => this.instanceProperty(p)));
+    this.workpackSrv.nextResetWorkpack(true);
     if (this.idWorkpack) {
-      if (this.workpack.type === TypeWorkpackEnum.ProjectModel) {
-        this.loadBaselineSection(this.collapsePanelsStatus);
-      }
       await this.loadSectionsWorkpackModel();
     }
   }
 
-  loadCardWorkpackProperties() {
-    this.cardWorkpackProperties = {
-      toggleable: false,
-      initialStateToggle: false,
-      cardTitle: 'properties',
-      collapseble: true,
-      initialStateCollapse: this.idWorkpack ? true : false
-    };
+  async handleFavorite() {
+    if (!this.workpack || !this.idPlan) {
+      return;
+    }
+    const { success } = await this.workpackSrv.patchToggleWorkpackFavorite(this.idWorkpack, this.idPlan);
+    if (success) {
+      this.workpack.favoritedBy = !this.workpack.favoritedBy;
+      this.menuSrv.reloadMenuFavorite();
+    }
   }
 
   async loadWorkpack() {
-    const result = await this.workpackSrv.GetWorkpackById(this.idWorkpack, { 'id-plan': this.idPlan });
+    const result = await this.workpackSrv.GetWorkpackDataById(this.idWorkpack, { 'id-plan': this.idPlan });
     if (result.success) {
       this.workpack = result.data;
+      this.setUnitMeansure();
       const propertyNameWorkpackModel = this.workpack.model.properties.find(p => p.name === 'name' && p.session === 'PROPERTIES');
       const propertyNameWorkpack = this.workpack.properties.find(p => p.idPropertyModel === propertyNameWorkpackModel.id);
       this.workpackName = propertyNameWorkpack.value as string;
@@ -567,12 +286,26 @@ export class WorkpackComponent implements OnDestroy {
       const propertyFullNameWorkpack = this.workpack.properties.find(p => p.idPropertyModel === propertyFullNameWorkpackModel.id);
       this.workpackFullName = propertyFullNameWorkpack.value as string;
       if (this.workpack && (this.workpack.canceled)) {
-        this.editPermission = false;
+        this.workpackSrv.setEditPermission(false);
       } else if (!this.isUserAdmin && this.workpack) {
         await this.loadUserPermission();
       }
-      this.showCheckCompleted();
+      this.workpackSrv.setWorkpackData({ workpack: this.workpack });
       await this.loadWorkpackModel(this.workpack.model.id);
+    }
+  }
+
+  getEditPermission() {
+    return this.workpackSrv.getEditPermission();
+  }
+
+  async setUnitMeansure() {
+    const unitMeasureWorkpack = this.workpack.properties.find(prop => prop.type === this.typePropertyModel.UnitSelectionModel);
+    if (unitMeasureWorkpack) {
+      const unitMeasure = await this.unitMeasureSrv.GetById(unitMeasureWorkpack?.selectedValue as number);
+      if (unitMeasure.success) {
+        this.workpackSrv.setUnitMeansure(unitMeasure.data);
+      }
     }
   }
 
@@ -581,7 +314,9 @@ export class WorkpackComponent implements OnDestroy {
       { 'id-workpack-model': this.idWorkpackModelLinked, 'id-plan': this.idPlan });
     if (result.success) {
       this.workpack = result.data;
-      this.idOfficeOwnerWorkpackLinked = this.workpack.plan.idOffice;
+      const workpackParams = this.workpackSrv.getWorkpackParams();
+      workpackParams.idOfficeOwnerWorkpackLinked = this.workpack.plan.idOffice;
+      this.workpackSrv.setWorkpackParams({ ...workpackParams })
       const propertyNameWorkpackModel = this.workpack.model.properties.find(p => p.name === 'name' && p.session === 'PROPERTIES');
       const propertyNameWorkpack = this.workpack.properties.find(p => p.idPropertyModel === propertyNameWorkpackModel.id);
       this.workpackName = propertyNameWorkpack.value as string;
@@ -589,299 +324,68 @@ export class WorkpackComponent implements OnDestroy {
       const propertyFullNameWorkpack = this.workpack.properties.find(p => p.idPropertyModel === propertyFullNameWorkpackModel.id);
       this.workpackFullName = propertyFullNameWorkpack.value as string;
       if (!this.isUserAdmin && this.workpack) {
-        this.editPermission = !!this.workpack.permissions?.find(p => p.level === 'EDIT');
+        const editPermission = !!this.workpack.permissions?.find(p => p.level === 'EDIT');
+        this.workpackSrv.setEditPermission(editPermission);
       }
+      this.workpackSrv.setWorkpackData({ workpack: this.workpack });
       await this.loadWorkpackModel(this.workpack.model.id);
     }
   }
 
   async loadUserPermission() {
-    const editPermission = !!this.workpack.permissions?.find(p => p.level === 'EDIT');
+    let editPermission = !!this.workpack.permissions?.find(p => p.level === 'EDIT');
     if (!editPermission && !this.idWorkpackModelLinked) {
-      this.editPermission = await this.planPermissionSrv.getPermissions(this.idPlan);
+      editPermission = await this.planPermissionSrv.getPermissions(this.idPlan);
     } else {
-      this.editPermission = editPermission;
+      editPermission = editPermission;
     }
     if (this.workpack.endManagementDate !== null) {
-      if (this.editPermission) {
+      if (this.workpackSrv.getEditPermission()) {
         this.endManagementResumePermission = true;
       }
-      this.editPermission = false;
+      editPermission = false;
     }
+    this.workpackSrv.setEditPermission(editPermission);
   }
 
   async loadWorkpackModel(idWorkpackModel) {
     const result = await this.workpackModelSrv.GetById(idWorkpackModel);
     if (result.success) {
       this.workpackModel = result.data;
+      const workpackData = this.workpackSrv.getWorkpackData();
+      this.workpackSrv.setWorkpackData({
+        ...workpackData,
+        workpackModel: this.workpackModel
+      });
     }
-    const plan = await this.planSrv.GetById(this.idPlan);
+    if (this.showTabview) {
+      this.loadWorkpackTabs();
+    }
+    const workpackParams = this.workpackSrv.getWorkpackParams();
+    const plan = await this.planSrv.GetById(workpackParams.idPlan);
     if (plan.success) {
-      this.propertiesPlan = plan.data;
-      this.idOffice = plan.data.idOffice;
-      const office = await this.officeSrv.GetById(this.idOffice);
+      const office = await this.officeSrv.GetById(plan.data.idOffice);
       if (office.success) {
         this.propertiesOffice = office.data;
+        this.idOffice = office.data.id;
       }
-      this.officeSrv.nextIDOffice(this.idOffice);
-    }
-  }
-
-  showCheckCompleted() {
-    this.cardWorkpackProperties.workpackCompleted = this.workpack && this.workpack.completed;
-    this.cardWorkpackProperties.workpackType = this.workpack && this.workpack.type;
-    this.cardWorkpackProperties.workpackCanceled = this.workpack && this.workpack.canceled;
-    this.cardWorkpackProperties.showCheckCompleted = true;
-    if (this.editPermission && this.workpack && this.workpack.id
-        && !this.workpack.hasScheduleSectionActive
-        && !this.workpack.canceled
-        && (!this.workpack.endManagementDate)) {
-      this.cardWorkpackProperties.canEditCheckCompleted = true;
-    }
-  }
-
-  async handleChangeCheckCompleted(event) {
-    this.changedStatusCompleted = true;
-    this.workpack.completed = event;
-    this.saveButton.showButton();
-  }
-
-  async instanceProperty(propertyModel: IWorkpackModelProperty, group?: IWorkpackProperty): Promise<PropertyTemplateModel> {
-    const property = new PropertyTemplateModel();
-    const propertyWorkpack = !group ? this.workpack && this.workpack.properties.find(wp => wp.idPropertyModel === propertyModel.id) :
-      group.groupedProperties.find(gp => gp.idPropertyModel === propertyModel.id);
-
-    property.id = propertyWorkpack && propertyWorkpack.id;
-    property.idPropertyModel = propertyModel.id;
-    property.type = TypePropertyModelEnum[propertyModel.type];
-    property.active = propertyModel.active;
-    property.fullLine = propertyModel.fullLine;
-    property.label = propertyModel.label;
-    property.name = propertyModel.name;
-    property.required = propertyModel.required;
-    property.disabled = !this.editPermission;
-    property.session = propertyModel.session;
-    property.sortIndex = propertyModel.sortIndex;
-    property.multipleSelection = propertyModel.multipleSelection;
-    property.rows = propertyModel.rows ? propertyModel.rows : 1;
-    property.decimals = propertyModel.decimals;
-    property.value = propertyWorkpack?.value ? propertyWorkpack?.value : propertyModel.defaultValue;
-    property.defaultValue = propertyWorkpack?.value ? propertyWorkpack?.value : propertyModel.defaultValue;
-    property.min = propertyModel.min;
-    property.max = propertyModel.max;
-    if (this.typePropertyModel[propertyModel.type] === TypePropertyModelEnum.DateModel) {
-      const dateValue = propertyWorkpack?.value ? propertyWorkpack?.value.toLocaleString()
-        : (propertyModel.defaultValue && propertyModel.defaultValue.toLocaleString());
-      property.value = dateValue ? new Date(dateValue) : null;
-    }
-    if (this.typePropertyModel[propertyModel.type] === TypePropertyModelEnum.SelectionModel && propertyModel.multipleSelection) {
-      const listValues = propertyWorkpack?.value ? propertyWorkpack?.value as string : propertyModel.defaultValue as string;
-      property.defaultValue = listValues.split(',');
-      property.value = listValues.split(',');
-    }
-
-    if (this.typePropertyModel[propertyModel.type] === TypePropertyModelEnum.SelectionModel) {
-      const listOptions = (propertyModel.possibleValues as string).split(',');
-      property.possibleValues = listOptions.map(op => ({ label: op, value: op }));
-    }
-
-    if (this.typePropertyModel[propertyModel.type] === TypePropertyModelEnum.LocalitySelectionModel) {
-      const domain = await this.loadDomain(propertyModel.idDomain);
-      const localityList = await this.loadDomainLocalities(domain.id);
-      const selectable = (this.editPermission);
-      const rootNode: TreeNode = {
-        label: domain.localityRoot.name,
-        data: domain.localityRoot.id,
-        children: this.loadLocality(localityList[0].children, selectable, property.multipleSelection),
-        selectable
-      };
-      property.idDomain = propertyModel.idDomain;
-      property.localityList = [rootNode];
-      const defaultSelectedLocalities = propertyWorkpack?.selectedValues ?
-        propertyWorkpack?.selectedValues as number[] : (propertyModel.defaults ? propertyModel.defaults as number[] : undefined);
-      if (defaultSelectedLocalities?.length > 0) {
-        const totalLocalities = this.countLocalities(localityList);
-        if (defaultSelectedLocalities.length === totalLocalities) {
-          defaultSelectedLocalities.unshift(propertyModel.idDomain);
-        }
-        const selectedLocalityList = this.loadSelectedLocality(defaultSelectedLocalities, property.localityList);
-        property.localitiesSelected = propertyModel.multipleSelection
-          ? selectedLocalityList as TreeNode[]
-          : selectedLocalityList[0] as TreeNode;
-      }
-      if (defaultSelectedLocalities && defaultSelectedLocalities.length === 1) {
-        const resultLocality = await this.localitySrv.GetById(defaultSelectedLocalities[0]);
-        if (resultLocality.success) {
-          property.labelButtonLocalitySelected = resultLocality.data.name;
-          property.showIconButton = false;
-        }
-      }
-      if (defaultSelectedLocalities && defaultSelectedLocalities.length > 1) {
-        property.labelButtonLocalitySelected = `${defaultSelectedLocalities.length} ${this.translateSrv.instant('selectedsLocalities')}`;
-        property.showIconButton = false;
-      }
-      if (!defaultSelectedLocalities || (defaultSelectedLocalities && defaultSelectedLocalities.length === 0)) {
-        property.labelButtonLocalitySelected = this.translateSrv.instant('select');
-        property.showIconButton = true;
-      }
-    }
-
-    if (this.typePropertyModel[propertyModel.type] === TypePropertyModelEnum.OrganizationSelectionModel) {
-      property.possibleValuesIds = await this.loadOrganizationsOffice
-        (this.idOfficeOwnerWorkpackLinked ? this.idOfficeOwnerWorkpackLinked : this.idOffice);
-      if (propertyModel.multipleSelection) {
-        property.selectedValues = propertyWorkpack?.selectedValues ? propertyWorkpack?.selectedValues : propertyModel.defaults as number[];
-      }
-      if (!propertyModel.multipleSelection) {
-        const defaults = propertyModel.defaults && propertyModel.defaults as number[];
-        const defaultsValue = defaults && defaults[0];
-        property.selectedValues = propertyWorkpack?.selectedValues ? propertyWorkpack?.selectedValues[0] : (defaultsValue && defaultsValue);
-      }
-    }
-    if (this.typePropertyModel[propertyModel.type] === TypePropertyModelEnum.UnitSelectionModel) {
-      property.possibleValuesIds = await this.loadUnitMeasuresOffice
-        (!!this.idOfficeOwnerWorkpackLinked ? this.idOfficeOwnerWorkpackLinked : this.idOffice);
-      property.selectedValue = propertyWorkpack?.selectedValue ? propertyWorkpack?.selectedValue : propertyModel.defaults as number;
-      property.defaults = propertyModel.defaults as number;
-    }
-    if (this.typePropertyModel[propertyModel.type] === TypePropertyModelEnum.GroupModel && propertyModel.groupedProperties) {
-      property.groupedProperties = await Promise.all(propertyModel.groupedProperties.map
-        (prop => this.instanceProperty(prop, propertyWorkpack)));
-    }
-    return property;
-  }
-
-  loadSelectedLocality(seletectedIds: number[], list: TreeNode[]) {
-    let result = [];
-    list.forEach(l => {
-      if (seletectedIds.includes(l.data)) {
-        result.push(l);
-      };
-      if (l.children && l.children.length > 0) {
-        const resultChildren = this.loadSelectedLocality(seletectedIds, l.children);
-        result = result.concat(resultChildren);
-      }
-    });
-    return result;
-  }
-
-  expandTreeToTreeNode(treeNode: TreeNode) {
-    if (treeNode.parent) {
-      treeNode.parent.expanded = true;
-      if (treeNode.parent.parent) {
-        this.expandTreeToTreeNode(treeNode.parent);
-      }
-    }
-  }
-
-  async loadDomain(idDomain: number) {
-    const result = await this.domainSrv.GetById(idDomain);
-    if (result.success) {
-      return result.data as IDomain;
-    }
-    return null;
-  }
-
-  loadLocality(localityList: ILocalityList[], selectable: boolean, multipleSelection: boolean) {
-    const list: TreeNode[] = localityList?.map(locality => {
-      if (locality.children) {
-        return {
-          label: locality.name,
-          data: locality.id,
-          children: this.loadLocality(locality.children, selectable, multipleSelection),
-          selectable,
-        };
-      }
-      return { label: locality.name, data: locality.id, selectable };
-    });
-    list.sort((a, b) => a.label < b.label ? -1 : 0)
-    if (selectable && multipleSelection) {
-      this.addSelectAllNode(list, localityList, selectable);
-    }
-    return list;
-  }
-
-  addSelectAllNode(list: TreeNode[], localityList: ILocalityList[], selectable: boolean) {
-    list?.unshift({
-      label: this.translateSrv.instant('selectAll'),
-      key: 'SELECTALL' + localityList[0]?.id,
-      selectable,
-      styleClass: 'green-node',
-      data: 'SELECTALL' + localityList[0]?.id
-    });
-  }
-
-  countLocalities(list: ILocalityList[]) {
-    return list.reduce((total, item) => {
-      if (item.children) {
-        return total + 1 + this.countLocalities(item.children);
-      }
-      return total + 1;
-    }, 0);
-  }
-
-  async loadDomainLocalities(idDomain: number) {
-    const result = await this.localitySrv.getLocalitiesTreeFromDomain({ 'id-domain': idDomain });
-    if (result) {
-      return result as ILocalityList[];
-    }
-  }
-
-  async loadOrganizationsOffice(idOffice) {
-    const result = await this.organizationSrv.GetAll({ 'id-office': idOffice });
-    if (result.success) {
-      const organizationsOffice = result.data;
-      return organizationsOffice.map(org => ({
-        label: org.name,
-        value: org.id
-      }));
-    }
-  }
-
-  async loadUnitMeasuresOffice(idOffice) {
-    const result = await this.unitMeasureSrv.GetAll({ idOffice });
-    if (result.success) {
-      const units = result.data;
-      return units.map(org => ({
-        label: org.name,
-        value: org.id
-      }));
-    }
-  }
-
-  async handleBaselineShowInactiveToggle(event) {
-    this.sectionBaselines.cardItemsSection = await this.loadSectionBaselinesCards(event.checked);
-  }
-
-  async deleteBaseline(base: IBaseline) {
-    const result = await this.baselineSrv.delete(base, { useConfirm: true });
-    if (result.success) {
-      this.sectionBaselines.cardItemsSection = Array.from(this.sectionBaselines.cardItemsSection.filter(item => item.itemId !== base.id));
+      this.propertiesPlan = plan.data;
+      this.workpackSrv.setWorkpackParams({
+        ...workpackParams,
+        propertiesPlan: plan.data,
+        idOffice: plan.data.idOffice,
+        propertiesOffice: office.data
+      })
+      this.officeSrv.nextIDOffice(plan.data.idOffice);
     }
   }
 
   async loadSectionsWorkpackModel() {
-    if (!!this.workpackModel.stakeholderSessionActive
-      && ((!this.idWorkpackModelLinked) || (this.editPermission && !!this.idWorkpackModelLinked))) {
-      this.loadStakeholderSection();
-    }
-    if (this.workpackModel.costSessionActive) {
-      this.loadCostAccountSection();
-    }
-    if (this.workpackModel.scheduleSessionActive) {
-      this.loadScheduleSession();
-    }
-    if (this.workpackModel.riskAndIssueManagementSessionActive) {
-      this.loadRisKAndIssueSection();
-    }
-    if (this.workpackModel.processesManagementSessionActive) {
-      this.loadProcessSection();
-    }
     if (this.workpackModel.journalManagementSessionActive) {
       this.cardJournalProperties = {
         toggleable: false,
         initialStateToggle: false,
-        cardTitle: 'journal',
+        cardTitle: this.showTabview ? '' : 'journal',
         collapseble: true,
         initialStateCollapse: this.collapsePanelsStatus,
       };
@@ -897,43 +401,56 @@ export class WorkpackComponent implements OnDestroy {
   }
 
   async loadSectionsWorkpackChildren() {
-    this.cardsWorkPackModelChildren = await Promise.all(this.workpackModel.children.map(async (workpackModel) => {
+    this.cardsWorkPackModelChildren = this.workpackModel.children.map( workpackModel => {
       const propertiesCard: ICard = {
         toggleable: false,
         initialStateToggle: false,
-        cardTitle: workpackModel.modelNameInPlural,
+        cardTitle: this.showTabview ? '' : workpackModel.modelNameInPlural,
+        tabTitle: workpackModel.modelNameInPlural,
         collapseble: true,
         initialStateCollapse: this.collapsePanelsStatus,
         showFilters: true,
-        showCreateNemElementButton: this.editPermission ? true : false,
+        showCreateNemElementButton: this.workpackSrv.getEditPermission() ? true : false,
       };
-      const resultFilters = await this.filterSrv.getAllFilters(`workpackModels/${workpackModel.id}/workpacks`);
-      if (resultFilters.success && resultFilters.data) {
-        propertiesCard.filters = resultFilters.data;
-      }
-      const idFilterSelected = propertiesCard.filters.find(defaultFilter => !!defaultFilter.favorite) ?
-        propertiesCard.filters.find(defaultFilter => !!defaultFilter.favorite).id : undefined;
-      const resultItemsList = await this.loadWorkpacksFromWorkpackModel(this.workpack.plan.id, workpackModel.id, idFilterSelected, false);
-      propertiesCard.createNewElementMenuItemsWorkpack = resultItemsList && resultItemsList.iconMenuItems;
       return {
         idWorkpackModel: workpackModel.id,
         cardSection: propertiesCard,
-        cardItemsSection: resultItemsList && resultItemsList.workpackItemCardList,
         workpackShowCancelleds: this.workpack.canceled ? true : false
       };
-    }));
+    })
+    this.workpackModel.children.forEach( async(workpackModel, index) => {
+      this.cardsWorkPackModelChildren[index].cardSection.isLoading = true;
+      const resultFilters = await this.filterSrv.getAllFilters(`workpackModels/${workpackModel.id}/workpacks`);
+      if (resultFilters.success && resultFilters.data) {
+        this.cardsWorkPackModelChildren[index].cardSection.filters = resultFilters.data;
+      }
+      const idFilterSelected = resultFilters.data.find(defaultFilter => !!defaultFilter.favorite) ?
+        resultFilters.data.find(defaultFilter => !!defaultFilter.favorite).id : undefined;
+      const resultItemsList = await this.loadWorkpacksFromWorkpackModel(this.workpack.plan.id, workpackModel.id, idFilterSelected, false);
+      this.cardsWorkPackModelChildren[index].cardSection.createNewElementMenuItemsWorkpack = resultItemsList && resultItemsList.iconMenuItems;
+      this.cardsWorkPackModelChildren[index].cardItemsSection = resultItemsList && resultItemsList.workpackItemCardList;
+      this.cardsWorkPackModelChildren[index].cardSection.isLoading = false;
+    });
     this.cardsWorkPackModelChildren.forEach((workpackModel, i) => {
       this.totalRecordsWorkpacks[i] = workpackModel.cardItemsSection ? workpackModel.cardItemsSection.length + 1 : 1;
     });
   }
 
+  getShowStakeHolderSection() {
+    return this.idWorkpack && this.workpackModel && this.workpackModel.stakeholderSessionActive &&
+        !this.idWorkpackModelLinked || (this.workpackSrv.getEditPermission() && !!this.idWorkpackModelLinked)
+  }
+
+  getShowBaselineSection() {
+    return this.idWorkpack && this.workpack && this.workpack.type === TypeWorkpackEnum.ProjectModel
+  }
+
   async loadWorkpacksFromWorkpackModel(
-      idPlan: number,
-      idWorkpackModel: number,
-      idFilterSelected: number,
-      showCancelled?: boolean,
-      idWorkpackModelLinked?: number)
-  {
+    idPlan: number,
+    idWorkpackModel: number,
+    idFilterSelected: number,
+    showCancelled?: boolean,
+    idWorkpackModelLinked?: number) {
     const result = await this.workpackSrv.GetWorkpacksByParent({
       'id-plan': idPlan,
       'id-workpack-model': idWorkpackModel,
@@ -964,35 +481,35 @@ export class WorkpackComponent implements OnDestroy {
               label: this.translateSrv.instant('delete'),
               icon: 'fas fa-trash-alt',
               command: (event) => this.deleteWorkpackChildren(workpack),
-              disabled: !this.editPermission
+              disabled: !this.workpackSrv.getEditPermission()
             });
           }
           if (!workpack.canceled && workpack.type === 'Deliverable' &&
-              (!workpack.endManagementDate || workpack.endManagementDate === null)) {
+            (!workpack.endManagementDate || workpack.endManagementDate === null)) {
             menuItems.push({
               label: this.translateSrv.instant('endManagement'),
               icon: 'far fa-stop-circle',
               command: (event) => this.endManagementOfDeliverable(workpack, idWorkpackModel),
-              disabled: !this.editPermission
+              disabled: !this.workpackSrv.getEditPermission()
             });
           }
           if (!workpack.canceled && workpack.type === 'Deliverable' &&
-              (!!workpack.endManagementDate && workpack.endManagementDate !== null)) {
+            (!!workpack.endManagementDate && workpack.endManagementDate !== null)) {
             menuItems.push({
               label: this.translateSrv.instant('resumeManagement'),
               icon: 'far fa-play-circle',
               command: (event) => this.resumeManagementOfDeliverable(workpack, idWorkpackModel),
-              disabled: !this.endManagementResumePermission && !this.editPermission
+              disabled: !this.endManagementResumePermission && !this.workpackSrv.getEditPermission()
             });
           }
-          if (workpack.cancelable && this.editPermission && !workpack.linked) {
+          if (workpack.cancelable && this.workpackSrv.getEditPermission() && !workpack.linked) {
             menuItems.push({
               label: this.translateSrv.instant('cancel'),
               icon: 'fas fa-times',
               command: (event) => this.handleCancelWorkpack(workpack.id),
             });
           }
-          if (workpack.type === 'Project' && this.editPermission) {
+          if (workpack.type === 'Project' && this.workpackSrv.getEditPermission()) {
             menuItems.push({
               label: this.translateSrv.instant('changeControlBoard'),
               icon: 'app-icon ccb-member',
@@ -1010,11 +527,11 @@ export class WorkpackComponent implements OnDestroy {
                 label: this.translateSrv.instant('delete'),
                 icon: 'fas fa-trash-alt',
                 command: (event) => this.deleteWorkpackChildren(workpack),
-                disabled: !this.editPermission
+                disabled: !this.workpackSrv.getEditPermission()
               });
             }
           }
-          if (this.editPermission && !workpack.canceled && !workpack.linked) {
+          if (this.workpackSrv.getEditPermission() && !workpack.canceled && !workpack.linked) {
             menuItems.push({
               label: this.translateSrv.instant('cut'),
               icon: 'fas fa-cut',
@@ -1022,7 +539,7 @@ export class WorkpackComponent implements OnDestroy {
             });
           }
           if (!workpack.canceled && workpack.model.id === idWorkpackModel
-              && this.editPermission && !idWorkpackModelLinked && !workpack.linked) {
+            && this.workpackSrv.getEditPermission() && !idWorkpackModelLinked && !workpack.linked) {
             menuItems.push({
               label: this.translateSrv.instant('sharing'),
               icon: 'app-icon share',
@@ -1060,11 +577,12 @@ export class WorkpackComponent implements OnDestroy {
           hasBaseline: workpack.hasActiveBaseline,
           baselineName: workpack.activeBaselineName,
           subtitleCardItem: workpack.type === 'Milestone' ? workpack.milestoneDate : '',
-          statusItem: workpack.type === 'Milestone' ? MilestoneStatusEnum[workpack.milestoneStatus] : ''
+          statusItem: workpack.type === 'Milestone' ? MilestoneStatusEnum[workpack.milestoneStatus] : '',
+          editPermission: this.getEditPermission()
         };
       });
       let iconMenuItems: MenuItem[];
-      if (this.editPermission && !idWorkpackModelLinked) {
+      if (this.workpackSrv.getEditPermission() && !idWorkpackModelLinked) {
         const sharedWorkpackList = await this.loadSharedWorkpackList(idWorkpackModel);
         iconMenuItems = [
           { label: this.translateSrv.instant('new'), command: () => this.handleNewWorkpack(idPlan, idWorkpackModel, this.idWorkpack) }
@@ -1103,11 +621,11 @@ export class WorkpackComponent implements OnDestroy {
       const resultItemsList = { workpackItemCardList, iconMenuItems }
       return resultItemsList;
     }
-    if ((!workpacks || workpacks.length === 0) && this.editPermission) {
+    if ((!workpacks || workpacks.length === 0) && this.workpackSrv.getEditPermission()) {
       const iconMenuItems: MenuItem[] = [
         { label: this.translateSrv.instant('new'), command: () => this.handleNewWorkpack(idPlan, idWorkpackModel, this.idWorkpack) }
       ];
-      if (this.editPermission && !idWorkpackModelLinked) {
+      if (this.workpackSrv.getEditPermission() && !idWorkpackModelLinked) {
         const sharedWorkpackList = await this.loadSharedWorkpackList(idWorkpackModel);
         if (sharedWorkpackList && sharedWorkpackList.length > 0) {
           iconMenuItems.push({
@@ -1234,6 +752,13 @@ export class WorkpackComponent implements OnDestroy {
     this.endManagementWorkpack = undefined;
   }
 
+  handleOnHasWBS(event) {
+    this.hasWBS = event;
+    if (this.showTabview && !this.hasWBS) {
+      this.tabs = this.tabs.filter( tab => tab.key !== 'WBS');
+    }
+  }
+
   async handleResumeManagementDeliverable() {
     const result = await this.workpackSrv.endManagementDeliverable({
       endManagementDate: null,
@@ -1357,34 +882,40 @@ export class WorkpackComponent implements OnDestroy {
   }
 
   async loadSectionsWorkpackChildrenLinked() {
-    this.cardsWorkPackModelChildren = await Promise.all(this.workpack.modelLinked.children.map(async (workpackModel) => {
+    this.cardsWorkPackModelChildren = this.workpack.modelLinked.children.map((workpackModel) => {
       const propertiesCard: ICard = {
         toggleable: false,
         initialStateToggle: false,
-        cardTitle: workpackModel.nameInPluralWorkpackModelLinked,
+        cardTitle: this.showTabview ? '' : workpackModel.nameInPluralWorkpackModelLinked,
+        tabTitle: workpackModel.nameInPluralWorkpackModelLinked,
         collapseble: true,
         initialStateCollapse: this.collapsePanelsStatus,
         showFilters: true,
         showCreateNemElementButton: false
       };
-      const resultFilters = await this.filterSrv.getAllFilters(`workpackModels/${workpackModel.idWorkpackModelLinked}/workpacks`);
-      if (resultFilters.success && resultFilters.data) {
-        propertiesCard.filters = resultFilters.data;
-      }
-      const idFilterSelected = propertiesCard.filters.find(defaultFilter => !!defaultFilter.favorite) ?
-        propertiesCard.filters.find(defaultFilter => !!defaultFilter.favorite).id : undefined;
-      const resultItemsList = await this.loadWorkpacksFromWorkpackModel
-        (this.idPlan, workpackModel.idWorkpackModelOriginal, idFilterSelected, false, workpackModel.idWorkpackModelLinked);
       return {
         idWorkpackModel: workpackModel.idWorkpackModelLinked,
         cardSection: propertiesCard,
-        cardItemsSection: resultItemsList && resultItemsList.workpackItemCardList,
         workpackShowCancelleds: this.workpack.canceled ? true : false
       };
-    }));
+    });
+    this.workpack.modelLinked.children.forEach(async (workpackModel, index) => {
+      this.cardsWorkPackModelChildren[index].cardSection.isLoading = true;
+      const resultFilters = await this.filterSrv.getAllFilters(`workpackModels/${workpackModel.idWorkpackModelLinked}/workpacks`);
+      if (resultFilters.success && resultFilters.data) {
+        this.cardsWorkPackModelChildren[index].cardSection.filters = resultFilters.data;
+      }
+      const idFilterSelected = this.cardsWorkPackModelChildren[index].cardSection.filters.find(defaultFilter => !!defaultFilter.favorite) ?
+      this.cardsWorkPackModelChildren[index].cardSection.filters.find(defaultFilter => !!defaultFilter.favorite).id : undefined;
+      const resultItemsList = await this.loadWorkpacksFromWorkpackModel
+        (this.idPlan, workpackModel.idWorkpackModelOriginal, idFilterSelected, false, workpackModel.idWorkpackModelLinked);
+      this.cardsWorkPackModelChildren[index].cardItemsSection = resultItemsList && resultItemsList.workpackItemCardList;
+      this.cardsWorkPackModelChildren[index].cardSection.isLoading = false;
+    });
     this.cardsWorkPackModelChildren.forEach((workpackModel, i) => {
       this.totalRecordsWorkpacks[i] = workpackModel.cardItemsSection ? workpackModel.cardItemsSection.length + 1 : 1;
     });
+
   }
 
   async reloadSectionsWorkpackChildren() {
@@ -1466,51 +997,7 @@ export class WorkpackComponent implements OnDestroy {
     }
   }
 
-  async loadStakeholders(idFilter?: number) {
-    const result = await this.stakeholderSrv.GetAll({ 'id-workpack': this.idWorkpack, idFilter });
-    if (result.success) {
-      this.stakeholders = result.data;
-    }
-  }
-
-
-
-  async deleteStakeholder(stakeholder: IStakeholder) {
-    if (stakeholder.person) {
-      const result = await this.stakeholderSrv.deleteStakeholderPerson({
-        'id-workpack': stakeholder.idWorkpack,
-        'id-person': stakeholder.person.id,
-        'id-plan': this.idPlan
-      }, { useConfirm: true });
-      if (result.success) {
-        const stakeholderIndex = this.sectionStakeholder.cardItemsSection.findIndex(stake => stake.itemId === stakeholder.person.id);
-        if (stakeholderIndex > -1) {
-          this.sectionStakeholder.cardItemsSection.splice(stakeholderIndex, 1);
-          this.sectionStakeholder.cardItemsSection = Array.from(this.sectionStakeholder.cardItemsSection);
-        }
-      }
-    } else {
-      const result = await this.stakeholderSrv.deleteStakeholderOrganization({
-        'id-workpack': stakeholder.idWorkpack,
-        'id-organization': stakeholder.organization.id
-      }, { useConfirm: true });
-      if (result.success) {
-        const stakeholderIndex = this.sectionStakeholder.cardItemsSection.findIndex(stake => stake.itemId === stakeholder.organization.id);
-        if (stakeholderIndex > -1) {
-          this.sectionStakeholder.cardItemsSection.splice(stakeholderIndex, 1);
-          this.sectionStakeholder.cardItemsSection = Array.from(this.sectionStakeholder.cardItemsSection);
-          this.totalRecordsStakeholders = this.sectionStakeholder.cardItemsSection.length;
-        }
-      }
-    }
-  }
-
-  async handleStakeholderInactiveToggle() {
-    this.sectionStakeholder.cardItemsSection = await this.loadSectionStakeholderCards(this.stakeholderSectionShowInactives);
-  }
-
   async handleWorkpackCancelledToggle(workpackModelIndex: number, event) {
-
     const idWorkpackModel = this.cardsWorkPackModelChildren[workpackModelIndex].idWorkpackModel;
     const resultFilters = await this.filterSrv.getAllFilters(`workpackModels/${idWorkpackModel}/workpacks`);
     const filters = resultFilters.success && resultFilters.data;
@@ -1520,217 +1007,50 @@ export class WorkpackComponent implements OnDestroy {
     this.cardsWorkPackModelChildren[workpackModelIndex].cardItemsSection = resultItemsList && resultItemsList.workpackItemCardList;
     this.cardsWorkPackModelChildren[workpackModelIndex].cardSection.createNewElementMenuItemsWorkpack = resultItemsList && resultItemsList.iconMenuItems;
     this.cardsWorkPackModelChildren[workpackModelIndex].workpackShowCancelleds = event.checked;
-
-  }
-
-  navigateToPageStakeholder(url) {
-    this.router.navigate(
-      [`stakeholder/${url}`],
-      {
-        queryParams: {
-          idWorkpack: this.idWorkpack,
-          idPlan: this.idPlan,
-          idWorkpackModelLinked: this.idWorkpackModelLinked
-        }
-      }
-    );
-  }
-
-  handleCreateNewRisk() {
-    this.router.navigate(['/workpack/risks'], {
-      queryParams: {
-        idWorkpack: this.idWorkpack,
-        edit: this.editPermission,
-      }
-    });
-  }
-
-  async deleteRisk(risk: IRisk) {
-    const result = await this.riskSrv.delete(risk, { useConfirm: true });
-    if (result.success) {
-      this.sectionRisk.cardItemsSection = Array.from(this.sectionRisk.cardItemsSection.filter(r => r.itemId !== risk.id));
-    }
-  }
-
-  async handleRiskShowClosedToggle() {
-    this.sectionRisk.cardItemsSection = await this.loadSectionRisksCards(this.riskSectionShowClosed);
-  }
-
-
-
-  handleCreateNewIssue() {
-    this.router.navigate(['/workpack/issues'], {
-      queryParams: {
-        idWorkpack: this.idWorkpack,
-        edit: this.editPermission,
-      }
-    });
-  }
-
-  async deleteIssue(issue: IIssue) {
-    const result = await this.issueSrv.delete(issue, { useConfirm: true });
-    if (result.success) {
-      this.sectionIssue.cardItemsSection = Array.from(this.sectionIssue.cardItemsSection.filter(i => i.itemId !== issue.id));
-    }
-  }
-
-  async handleIssueShowClosedToggle() {
-    this.sectionIssue.cardItemsSection = await this.loadSectionIssuesCards(this.issueSectionShowClosed);
-  }
-
-
-
-  handleCreateNewProcess() {
-    this.router.navigate(['/workpack/processes'], {
-      queryParams: {
-        idWorkpack: this.idWorkpack
-      }
-    })
-  }
-
-  async deleteProcess(process: IProcess) {
-    const result = await this.processSrv.delete(process, { useConfirm: true });
-    if (result.success) {
-      this.sectionProcess.cardItemsSection = Array.from(this.sectionProcess.cardItemsSection.filter(i => i.itemId !== process.id));
-    }
-  }
-
-  handleCreateNewCostAccount() {
-    this.router.navigate(['/workpack/cost-account'], {
-      queryParams: {
-        idWorkpack: this.idWorkpack,
-        idWorkpackModelLinked: this.idWorkpackModelLinked
-      }
-    });
-  }
-
-  moveCostAccountOutherWorkpackToEnd(costAccounts: ICostAccount[]) {
-    costAccounts.sort((a, b) => {
-      if (a.idWorkpack != this.idWorkpack) {
-        return -1;
-      }
-      return 0;
-    });
-    costAccounts.reverse();
-    return costAccounts;
-  }
-
-  async deleteCostAccount(cost: ICostAccount) {
-    const result = await this.costAccountSrv.delete(cost);
-    if (result.success) {
-      this.sectionCostAccount.cardItemsSection =
-        Array.from(this.sectionCostAccount.cardItemsSection.filter(item => item.itemId !== cost.id));
-      this.totalRecordsCostAccounts = this.sectionCostAccount.cardItemsSection.length;
-      return;
-    }
-  }
-
-  async handleNewSchedule() {
-    if (!this.costAccounts || this.costAccounts.length === 0) {
-      this.messageSrv.add({
-        detail: this.translateSrv.instant('messages.costAccounts.thereAreNotCostAccounts'),
-        summary: this.translateSrv.instant('attention'),
-        severity: 'warn'
-      });
-      return;
-    }
-    if (!this.unitMeansure) {
-      const unitMeasureWorkpack = this.sectionPropertiesProperties.find(prop => prop.type === this.typePropertyModel.UnitSelectionModel);
-      const unitMeasure = await this.unitMeasureSrv.GetById(unitMeasureWorkpack?.selectedValue as number);
-      this.unitMeansure = unitMeasure.success && unitMeasure.data;
-    }
-    this.router.navigate(
-      ['workpack/schedule'],
-      {
-        queryParams: {
-          idWorkpack: this.idWorkpack,
-          unitMeansureName: this.unitMeansure?.name
-        }
-      }
-    );
-  }
-
-  handleShowDetails() {
-    this.showDetails = !this.showDetails;
-  }
-
-  async handleDeleteSchedule() {
-    const result = await this.scheduleSrv.DeleteSchedule(this.schedule.id, { useConfirm: true });
-    if (result.success) {
-      this.schedule = null;
-      this.sectionSchedule.groupStep = null;
-      this.workpack.hasScheduleSectionActive = false;
-      this.cardWorkpackProperties.canEditCheckCompleted = true;
-      await this.loadScheduleSession();
-    }
-  }
-
-  editScheduleStep(idStep: number, unitName: string, unitPrecision: number, stepType: string) {
-    this.router.navigate(
-      ['workpack/schedule/step'],
-      {
-        queryParams: {
-          id: idStep,
-          stepType,
-          unitName,
-          unitPrecision
-        }
-      }
-    );
-  }
-
-  async deleteScheduleStep(idStep: number) {
-    const result = await this.scheduleSrv.DeleteScheduleStep(idStep);
-    if (result.success) {
-      await this.loadScheduleSession();
-    }
-  }
-
-  async saveStepChanged(groupYear: number, idStep: number) {
-    const stepGroup = this.schedule.groupStep.find(group => group.year === groupYear);
-    const step = stepGroup.steps.find(s => s.id === idStep);
-    const stepChanged = this.sectionSchedule.groupStep.find(group => group.year === groupYear)
-      .cardItemSection.find(s => s.idStep === idStep);
-    const result = await this.scheduleSrv.putScheduleStep({
-      id: step.id,
-      plannedWork: stepChanged.unitPlanned,
-      actualWork: stepChanged.unitActual,
-      consumes: step.consumes?.map(consume => ({
-        actualCost: consume.actualCost,
-        plannedCost: consume.plannedCost,
-        idCostAccount: consume.costAccount.id,
-        id: consume.id
-      }))
-    });
-    if (result.success) {
-      const scheduleChanged = await this.scheduleSrv.GetScheduleById(this.schedule.id);
-      if (scheduleChanged.success) {
-        const scheduleValues = scheduleChanged.data;
-        this.sectionSchedule.cardSection.progressBarValues[0].total = scheduleValues.planed;
-        this.sectionSchedule.cardSection.progressBarValues[0].progress = scheduleValues.actual;
-        this.sectionSchedule.cardSection.progressBarValues[1].total = scheduleValues.planedCost;
-        this.sectionSchedule.cardSection.progressBarValues[1].progress = scheduleValues.actualCost;
-      }
-    }
   }
 
   scrollTop() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  async saveWorkpack() {
+  onSaveButtonClicked() {
+    this.saveButtonSrv.nextSaveButtonClicked(true);
+  }
+
+  async saveWorkpack(event) {
+    const properties = event.properties;
+    let updateSuccess = true;
     if (!!this.changedStatusCompleted) {
-      await this.workpackSrv.completeDeliverable(this.idWorkpack, this.workpack?.completed);
+      if (this.workpack.type === TypeWorkpackEnum.MilestoneModel) {
+        const dateProperty = properties.find( p => p.type === TypePropertyModelEnum.DateModel);
+        if (dateProperty) {
+          const date = dateProperty.value ? moment(dateProperty.value).format('yyyy-MM-DD') : null;
+          try {
+            const result = await this.workpackSrv.completeDeliverable(this.idWorkpack, this.workpack?.completed, date);
+            updateSuccess = result.success;
+          } catch (error) {
+            return;
+          }
+        }
+      } else {
+        try {
+          const result = await this.workpackSrv.completeDeliverable(this.idWorkpack, this.workpack?.completed);
+          updateSuccess = result.success;
+        } catch (error) {
+          return;
+        }
+      }
     }
+    if (!updateSuccess) return;
     this.changedStatusCompleted = false;
-    this.workpackProperties = this.sectionPropertiesProperties.map(p => {
+    this.workpackProperties = properties.map(p => {
       if (p.type === TypePropertyModelEnum.GroupModel) {
         const groupedProperties = p.groupedProperties.map(groupProp => groupProp.getValues());
         return { ...p.getValues(), groupedProperties };
       }
       return p.getValues();
     });
-    if (this.sectionPropertiesProperties.filter(p => p.invalid).length > 0) {
+    if (properties.filter(p => p.invalid).length > 0) {
       this.messageSrv.add({
         severity: 'warn',
         summary: this.translateSrv.instant('messages.invalidField'),
@@ -1763,26 +1083,14 @@ export class WorkpackComponent implements OnDestroy {
 
     if (success) {
       if (!isPut) {
+        const workpackParams = this.workpackSrv.getWorkpackParams();
+        this.workpackSrv.setWorkpackParams({
+          ...workpackParams,
+          idWorkpack: data.id
+        });
         this.idWorkpack = data.id;
-        await this.loadProperties();
+       this.resetWorkpack();
       }
-      const propertyNameWorkpackModel = (this.workpack?.model || this.workpackModel)
-        .properties.find(p => p.name === 'name' && p.session === 'PROPERTIES');
-      const propertyNameWorkpack = this.workpackProperties.find(p => p.idPropertyModel === propertyNameWorkpackModel.id);
-      this.workpackName = propertyNameWorkpack && propertyNameWorkpack.value as string;
-      const propertyFullNameWorkpackModel = (this.workpack?.model || this.workpackModel)
-        .properties.find(p => p.name === 'fullName' && p.session === 'PROPERTIES');
-      const propertyFullNameWorkpack = this.workpackProperties.find(p => p.idPropertyModel === propertyFullNameWorkpackModel.id);
-      this.workpackFullName = propertyFullNameWorkpack && propertyFullNameWorkpack.value as string;
-      this.breadcrumbSrv.updateLastCrumb({
-        key: this.workpackModel?.type?.toLowerCase().replace('model', ''),
-        info: this.workpackName,
-        tooltip: this.workpackFullName,
-        routerLink: ['/workpack'],
-        queryParams: {
-          id: this.idWorkpack
-        }
-      });
       this.messageSrv.add({
         severity: 'success',
         summary: this.translateSrv.instant('success'),
@@ -1795,7 +1103,7 @@ export class WorkpackComponent implements OnDestroy {
   async handleEditFilterWorkpackModel(event, idWorkpackModel: number) {
     const idFilter = event.filter;
     if (idFilter) {
-      await this.setBreadcrumbStorage();
+      await this.workpackBreadcrumbStorageSrv.setBreadcrumbStorage();
       this.router.navigate(['/filter-dataview'], {
         queryParams: {
           id: idFilter,
@@ -1813,7 +1121,7 @@ export class WorkpackComponent implements OnDestroy {
   }
 
   async handleNewFilterWorkpackModel(idWorkpackModel: number) {
-    await this.setBreadcrumbStorage();
+    await this.workpackBreadcrumbStorageSrv.setBreadcrumbStorage();
     this.router.navigate(['/filter-dataview'], {
       queryParams: {
         entityName: `workpacks`,
@@ -1834,47 +1142,12 @@ export class WorkpackComponent implements OnDestroy {
     }
   }
 
-  async handleEditFilterCostAccount(event) {
-    const idFilter = event.filter;
-    if (idFilter) {
-      await this.setBreadcrumbStorage();
-      this.router.navigate(['/filter-dataview'], {
-        queryParams: {
-          id: idFilter,
-          entityName: `costAccounts`,
-          idWorkpackModel: this.workpack.model.id,
-          idOffice: this.idOffice
-        }
-      });
-    }
-  }
-
-  async handleSelectedFilterCostAccount(event) {
-    const idFilter = event.filter;
-    this.sectionCostAccount = Object.assign({}, {
-      ...this.sectionCostAccount,
-      cardItemsSection: await this.loadCardItemsCostSession(idFilter)
-    });
-    this.totalRecordsCostAccounts = this.sectionCostAccount.cardItemsSection && this.sectionCostAccount.cardItemsSection.length;
-  }
-
-  async handleNewFilterCostAccount() {
-    await this.setBreadcrumbStorage();
-    this.router.navigate(['/filter-dataview'], {
-      queryParams: {
-        entityName: `costAccounts`,
-        idWorkpackModel: this.workpack.model.id,
-        idOffice: this.idOffice
-      }
-    });
-  }
-
   async handleEditFilterEntity(event, entityName: string) {
     const idFilter = event.filter;
     if (idFilter) {
       const filterProperties = this.loadFilterPropertiesList(entityName);
       this.filterSrv.setFilterProperties(filterProperties);
-      await this.setBreadcrumbStorage();
+      await this.workpackBreadcrumbStorageSrv.setBreadcrumbStorage();
       this.router.navigate(['/filter-dataview'], {
         queryParams: {
           id: idFilter,
@@ -1886,18 +1159,8 @@ export class WorkpackComponent implements OnDestroy {
     }
   }
 
-  async handleSelectedFilterStakeholder(event) {
-    const idFilter = event.filter;
-    await this.loadStakeholders(idFilter);
-    this.sectionStakeholder = Object.assign({}, {
-      ...this.sectionStakeholder,
-      cardItemsSection: await this.loadSectionStakeholderCards(this.stakeholderSectionShowInactives)
-    });
-    this.totalRecordsStakeholders = this.sectionStakeholder.cardItemsSection && this.sectionStakeholder.cardItemsSection.length;
-  }
-
   async handleNewFilterEntity(entityName: string) {
-    await this.setBreadcrumbStorage();
+    await this.workpackBreadcrumbStorageSrv.setBreadcrumbStorage();
     const filterProperties = this.loadFilterPropertiesList(entityName);
     this.filterSrv.setFilterProperties(filterProperties);
     this.router.navigate(['/filter-dataview'], {
@@ -1907,33 +1170,6 @@ export class WorkpackComponent implements OnDestroy {
         idOffice: this.idOffice
       }
     });
-  }
-
-  async handleSelectedFilterRisk(event) {
-    const idFilter = event.filter;
-    this.sectionRisk = Object.assign({}, {
-      ...this.sectionRisk,
-      cardItemsSection: await this.loadSectionRisksCards(this.riskSectionShowClosed, idFilter)
-    });
-    this.totalRecordsRisks = this.sectionRisk.cardItemsSection && this.sectionRisk.cardItemsSection.length;
-  }
-
-  async handleSelectedFilterIssue(event) {
-    const idFilter = event.filter;
-    this.sectionIssue = Object.assign({}, {
-      ...this.sectionIssue,
-      cardItemsSection: await this.loadSectionIssuesCards(this.issueSectionShowClosed, idFilter)
-    });
-    this.totalRecordsIssues = this.sectionIssue.cardItemsSection && this.sectionIssue.cardItemsSection.length;
-  }
-
-  async handleSelectedFilterProcess(event) {
-    const idFilter = event.filter;
-    this.sectionProcess = Object.assign({}, {
-      ...this.sectionProcess,
-      cardItemsSection: await this.loadSectionProcessesCards(idFilter)
-    });
-    this.totalRecordsIssues = this.sectionProcess.cardItemsSection && this.sectionProcess.cardItemsSection.length;
   }
 
   loadFilterPropertiesList(entityName: string) {
@@ -1964,824 +1200,90 @@ export class WorkpackComponent implements OnDestroy {
     return filterPropertiesList;
   }
 
-  async setBreadcrumbStorage() {
-    this.breadcrumbSrv.setBreadcrumbStorage([
-      ... await this.getBreadcrumbs(),
-      ... this.idWorkpack
-        ? []
-        : [{
-          key: this.workpackModel?.type?.toLowerCase().replace('model', ''),
-          info: this.workpackName,
-          tooltip: this.workpackFullName,
-          routerLink: ['/workpack'],
-          queryParams: {
-            idPlan: this.idPlan,
-            idWorkpackModel: this.idWorkpackModel,
-            idWorkpackParent: this.idWorkpackParent,
-            idWorkpackModelLinked: this.idWorkpackModelLinked
-          },
-          modelName: this.workpackModel?.modelName
-        }],
-      ...[{
-        key: 'filter',
-        routerLink: ['/filter-dataview'],
-      }]
-    ]);
+  changeTab($event: ITabViewScrolled) {
+    this.selectedTab = $event;
   }
 
-  async loadBaselineSection(collapsePanelsStatus) {
-    this.sectionBaselines = {
-      cardSection: {
-        toggleable: false,
-        initialStateToggle: false,
-        cardTitle: 'baselines',
-        collapseble: true,
-        initialStateCollapse: collapsePanelsStatus,
-        showFilters: false,
-        showCreateNemElementButton: false,
-      },
-
-      cardItemsSection: await this.loadSectionBaselinesCards(this.baselinesSectionShowInactives)
-    };
-  }
-
-  async loadSectionBaselinesCards(showInactives: boolean) {
-    const resultBaselines = await this.baselineSrv.GetAll({ 'id-workpack': this.idWorkpack });
-    this.baselines = resultBaselines.success ? resultBaselines.data : [];
-    if (this.baselines && this.baselines.length > 0) {
-      const cardItems = this.baselines.filter(b => {
-        if (!showInactives) {
-          if (!!b.active) { return b; }
-        } else {
-          return b;
-        }
-      }).map(base => ({
-        typeCardItem: 'listItem',
-        icon: !!base.cancelation ? 'fas fa-times' : 'baseline',
-        iconColor: base.cancelation && '#FF7F81',
-        iconSvg: !base.cancelation ? true : false,
-        nameCardItem: base.name,
-        baselineStatus: base.status.toLowerCase(),
-        baselineStatusDate: base.active ? base.activationDate : (base.status === 'PROPOSED' ? base.proposalDate :
-          (base.status === 'APPROVED' ? base.activationDate : 'NONE')),
-        baselineActive: base.active,
-        itemId: base.id,
-        menuItems: [{
-          label: this.translateSrv.instant('delete'),
-          icon: 'fas fa-trash-alt',
-          disabled: !this.editPermission || base.status !== 'DRAFT',
-          command: (event) => this.deleteBaseline(base)
-        }],
-        urlCard: '/workpack/baseline',
-        paramsUrlCard: [
-          { name: 'idWorkpack', value: this.idWorkpack },
-          { name: 'idWorkpackModelLinked', value: this.idWorkpackModelLinked },
-          { name: 'id', value: base.id },
-        ]
-      }));
-      if (this.editPermission && !this.workpack.cancelPropose && !this.workpack.pendingBaseline) {
-        cardItems.push({
-          typeCardItem: 'newCardItem',
-          icon: IconsEnum.Plus,
-          iconColor: null,
-          iconSvg: true,
-          nameCardItem: null,
-          baselineStatus: undefined,
-          baselineStatusDate: undefined,
-          baselineActive: undefined,
-          itemId: null,
-          menuItems: [],
-          urlCard: '/workpack/baseline',
-          paramsUrlCard: [
-            { name: 'idWorkpack', value: this.idWorkpack },
-            { name: 'idWorkpackModelLinked', value: this.idWorkpackModelLinked },
-          ]
-        });
-      }
-      return cardItems;
-    } else {
-      const cardItem = (this.editPermission && !this.workpack.cancelPropose && !this.workpack.pendingBaseline) ?
-        [{
-          typeCardItem: 'newCardItem',
-          icon: IconsEnum.Plus,
-          iconColor: null,
-          iconSvg: true,
-          nameCardItem: null,
-          itemId: null,
-          urlCard: '/workpack/baseline',
-          paramsUrlCard: [
-            { name: 'idWorkpack', value: this.idWorkpack },
-            { name: 'idWorkpackModelLinked', value: this.idWorkpackModelLinked },
-          ]
-        }] : [];
-      return cardItem;
-    }
-  }
-
-  async loadCostAccountSection() {
-    const resultFilters = await this.filterSrv.getAllFilters(`workpackModels/${this.workpack.model.id}/costAccounts`);
-    const filters = resultFilters.success && resultFilters.data ? resultFilters.data : [];
-    const idFilterSelected = filters.find(defaultFilter => !!defaultFilter.favorite) ?
-      filters.find(defaultFilter => !!defaultFilter.favorite).id : undefined;
-    this.sectionCostAccount = {
-      cardSection: {
-        toggleable: false,
-        initialStateToggle: false,
-        cardTitle: 'costAccounts',
-        collapseble: true,
-        initialStateCollapse: this.collapsePanelsStatus,
-        showFilters: true,
-        filters,
-        showCreateNemElementButton: this.editPermission ? true : false
-      },
-      cardItemsSection: await this.loadCardItemsCostSession(idFilterSelected)
-    };
-    this.totalRecordsCostAccounts = this.sectionCostAccount.cardItemsSection ? this.sectionCostAccount.cardItemsSection.length + 1 : 1;
-  }
-
-  async loadCardItemsCostSession(idFilter?: number) {
-    const result = await this.costAccountSrv.GetAll({ 'id-workpack': this.idWorkpack, idFilter });
-    if (result.success && result.data.length > 0) {
-      this.costAccounts = this.moveCostAccountOutherWorkpackToEnd(result.data);
-      const funders = (this.idOffice || this.idOfficeOwnerWorkpackLinked) &&
-        await this.loadOrganizationsOffice(this.idOfficeOwnerWorkpackLinked ? this.idOfficeOwnerWorkpackLinked : this.idOffice);
-      const cardItems = this.costAccounts.map(cost => {
-        const propertyName = cost.models.find(p => p.name === 'name');
-        const propertyNameValue = propertyName && cost.properties.find(p => p.idPropertyModel === propertyName.id);
-        const propertyfullName = cost.models.find(p => p.name === 'fullName');
-        const propertyFullnameValue = propertyfullName && cost.properties.find(p => p.idPropertyModel === propertyfullName.id);
-        const propertyNameWorkpack =cost.workpackModelName;
-        const propertyLimit = cost.models.find(p => p.name.toLowerCase() === 'limit');
-        const propertyLimitValue = propertyLimit && cost.properties.find(p => p.idPropertyModel === propertyLimit.id);
-        const propertyFunder = cost.models.find(p => p.name.toLowerCase() === 'funder');
-        const propertyFunderValue = propertyFunder && cost.properties.find(p => p.idPropertyModel === propertyFunder.id);
-        const selectedFunder = propertyFunderValue && propertyFunderValue.selectedValues && (funders
-          && funders.filter(org => org.value === propertyFunderValue.selectedValues[0]));
-        const costThisWorkpack = cost.idWorkpack === this.idWorkpack;
-        return {
-          typeCardItem: 'listItemCostAccount',
-          icon: 'fas fa-dollar-sign',
-          iconSvg: false,
-          nameCardItem: propertyNameValue && propertyNameValue.value as string,
-          fullNameCardItem: costThisWorkpack ?
-            propertyFullnameValue && propertyFullnameValue.value as string :
-            propertyNameWorkpack && propertyNameWorkpack as string,
-          subtitleCardItem: selectedFunder && selectedFunder[0]?.label,
-          costAccountsValue: propertyLimitValue?.value as number,
-          itemId: cost.id,
-          idWorkpack: cost.idWorkpack.toString(),
-          menuItems: [{
-            label: this.translateSrv.instant('delete'),
-            icon: 'fas fa-trash-alt',
-            command: (event) => this.deleteCostAccount(cost),
-            disabled: !this.editPermission
-          }] as MenuItem[],
-          urlCard: '/workpack/cost-account',
-          paramsUrlCard: [
-            { name: 'idWorkpack', value: cost.idWorkpack },
-            { name: 'idWorkpackModelLinked', value: this.idWorkpackModelLinked }
-          ],
-          iconMenuItems: null
-        };
+  loadWorkpackTabs() {
+    this.tabs = [];
+    if (this.idWorkpack) {
+      this.tabs.push({
+        menu: 'WBS',
+        key: 'WBS'
       });
-      if (this.editPermission && !this.workpack.canceled) {
-        cardItems.push({
-          typeCardItem: 'newCardItem',
-          icon: IconsEnum.Plus,
-          iconSvg: true,
-          nameCardItem: null,
-          fullNameCardItem: null,
-          subtitleCardItem: null,
-          costAccountsValue: null,
-          itemId: null,
-          idWorkpack: this.idWorkpack.toString(),
-          menuItems: [],
-          urlCard: '/workpack/cost-account',
-          paramsUrlCard: [
-            { name: 'idWorkpack', value: this.idWorkpack },
-            { name: 'idWorkpackModelLinked', value: this.idWorkpackModelLinked }
-          ],
-          iconMenuItems: null
+      if (!!this.idWorkpack && !!this.workpack && !this.workpack.canceled && !!this.workpackModel && !!this.workpackModel.dashboardSessionActive) {
+        this.tabs.push({
+          menu: 'dashboard',
+          key: 'dashboard'
         });
       }
-      return cardItems;
-    }
-    const cardItemsNew = this.editPermission && !this.workpack.canceled ? [{
-      typeCardItem: 'newCardItem',
-      icon: IconsEnum.Plus,
-      iconSvg: true,
-      nameCardItem: null,
-      subtitleCardItem: null,
-      costAccountsValue: null,
-      itemId: null,
-      idWorkpack: this.idWorkpack.toString(),
-      menuItems: [],
-      urlCard: '/workpack/cost-account',
-      paramsUrlCard: [
-        { name: 'idWorkpack', value: this.idWorkpack },
-        { name: 'idWorkpackModelLinked', value: this.idWorkpackModelLinked }
-      ],
-      iconMenuItems: null
-    }] : [];
-    return cardItemsNew;
-  }
-
-  async loadStakeholderSection() {
-    const resultFilters = await this.filterSrv.getAllFilters(`workpackModels/${this.workpack.model.id}/stakeholders`);
-    const filters = resultFilters.success && Array.isArray(resultFilters.data) ? resultFilters.data : [];
-    const idFilterSelected = filters.find(defaultFilter => !!defaultFilter.favorite) ?
-      filters.find(defaultFilter => !!defaultFilter.favorite).id : undefined;
-    await this.loadStakeholders(idFilterSelected);
-    this.sectionStakeholder = {
-      cardSection: {
-        toggleable: false,
-        initialStateToggle: false,
-        cardTitle: 'stakeholdersAndPermissions',
-        collapseble: true,
-        initialStateCollapse: this.collapsePanelsStatus,
-        showFilters: true,
-        filters,
-        showCreateNemElementButton: this.editPermission ? true : false,
-        createNewElementMenuItems: [
-          {
-            label: this.translateSrv.instant('person'),
-            icon: 'fas fa-user-circle',
-            command: (event) => this.navigateToPageStakeholder('person')
-          },
-          {
-            label: this.translateSrv.instant('organization'),
-            icon: 'fas fa-building',
-            command: (event) => this.navigateToPageStakeholder('organization')
-          }
-        ]
-      },
-      cardItemsSection: await this.loadSectionStakeholderCards(this.stakeholderSectionShowInactives)
-    };
-    this.totalRecordsStakeholders = this.sectionStakeholder.cardItemsSection && this.sectionStakeholder.cardItemsSection.length;
-  }
-
-  async loadSectionStakeholderCards(showInactives: boolean) {
-    if (this.stakeholders && this.stakeholders.length > 0) {
-      const cardItems = this.stakeholders.filter(stake => {
-        if (!showInactives && stake.roles && stake.roles.length > 0) {
-          return stake.roles.find(r => r.active && (!r.to || r.to === null || moment(r.to, 'yyyy-MM-DD').isSameOrAfter(moment()))
-            && (!r.from || r.from === null || moment(r.from, 'yyyy-MM-DD').isSameOrBefore(moment())));
-        } else { return stake; }
-      }).map(stakeholder => {
-        const editPermission = stakeholder.permissions && stakeholder.permissions.filter(p => p.level === 'EDIT').length > 0;
-        const readPermission = stakeholder.permissions && stakeholder.permissions.filter(p => p.level === 'READ').length > 0;
-        const samePlan = (!stakeholder.permissions || stakeholder.permissions.length === 0) ||
-          (stakeholder.permissions && stakeholder.permissions.filter(p => p.idPlan === this.idPlan).length > 0);
-        return {
-          typeCardItem: 'listItemStakeholder',
-          icon: stakeholder.person ? (editPermission ? IconsEnum.UserEdit :
-            (readPermission ? IconsEnum.UserRead : IconsEnum.UserCircle)) : IconsEnum.Building,
-          iconSvg: true,
-          nameCardItem: stakeholder.person ? stakeholder.person.name : stakeholder.organization.name,
-          fullNameCardItem: stakeholder.person ? stakeholder.person.fullName : stakeholder.organization.fullName,
-          subtitleCardItem: stakeholder.roles && stakeholder.roles.filter(r => r.active && (!r.to || r.to === null ||
-            moment(r.to, 'yyyy-MM-DD').isSameOrAfter(moment()))
-            && (!r.from || r.from === null || moment(r.from, 'yyyy-MM-DD').isSameOrBefore(moment())))
-            .map(role => this.translateSrv.instant(role.role)).join(', '),
-          itemId: stakeholder.person ? stakeholder.person.id : stakeholder.organization.id,
-          menuItems: [{
-            label: this.translateSrv.instant('delete'),
-            icon: 'fas fa-trash-alt',
-            disabled: !samePlan || !this.editPermission,
-            command: (event) => this.deleteStakeholder(stakeholder)
-          }],
-          urlCard: !!samePlan ? (stakeholder.person ? '/stakeholder/person' : '/stakeholder/organization') : undefined,
-          paramsUrlCard: [
-            { name: 'idWorkpack', value: this.idWorkpack },
-            { name: 'idPlan', value: this.idPlan },
-            { name: 'idWorkpackModelLinked', value: this.idWorkpackModelLinked },
-            {
-              name: stakeholder.person ? 'idPerson' : 'idOrganization',
-              value: stakeholder.person ? stakeholder.person.id : stakeholder.organization.id
-            }
-          ],
-          iconMenuItems: null
-        };
+      this.tabs.push({
+        menu: 'properties',
+        key: 'properties'
       });
-      if (this.editPermission && !this.workpack.canceled) {
-        cardItems.push({
-          typeCardItem: 'newCardItem',
-          icon: IconsEnum.Plus,
-          iconSvg: true,
-          nameCardItem: null,
-          fullNameCardItem: null,
-          subtitleCardItem: null,
-          itemId: null,
-          menuItems: null,
-          urlCard: null,
-          paramsUrlCard: null,
-          iconMenuItems: [
-            {
-              label: this.translateSrv.instant('person'),
-              icon: 'fas fa-user-circle',
-              command: (event) => this.navigateToPageStakeholder('person')
-            },
-            {
-              label: this.translateSrv.instant('organization'),
-              icon: 'fas fa-building',
-              command: (event) => this.navigateToPageStakeholder('organization')
-            }
-          ]
+      if (this.idWorkpack && this.workpackModel && this.workpackModel.costSessionActive) {
+        this.tabs.push({
+          menu: 'costAccounts',
+          key: 'costAccounts'
         });
       }
-      return cardItems;
-    } else {
-      const cardItem = (this.editPermission && !this.workpack.canceled) ? [{
-        typeCardItem: 'newCardItem',
-        icon: IconsEnum.Plus,
-        iconSvg: true,
-        nameCardItem: null,
-        itemId: null,
-        menuItems: null,
-        urlCard: null,
-        iconMenuItems: [
-          {
-            label: this.translateSrv.instant('person'),
-            icon: 'fas fa-user-circle',
-            command: (event) => this.navigateToPageStakeholder('person')
-          },
-          {
-            label: this.translateSrv.instant('organization'),
-            icon: 'fas fa-building',
-            command: (event) => this.navigateToPageStakeholder('organization')
-          }
-        ]
-      }] : [];
-      return cardItem;
-    }
-  }
-
-  async loadProcessSection() {
-    const resultFilters = await this.filterSrv.getAllFilters(`workpackModels/${this.workpack.model.id}/processes`);
-    const filters = resultFilters.success && Array.isArray(resultFilters.data) ? resultFilters.data : [];
-    const idFilterSelected = filters.find(defaultFilter => !!defaultFilter.favorite) ?
-      filters.find(defaultFilter => !!defaultFilter.favorite).id : undefined;
-
-    this.sectionProcess = {
-      cardSection: {
-        toggleable: false,
-        initialStateToggle: false,
-        cardTitle: 'processes',
-        collapseble: true,
-        initialStateCollapse: this.collapsePanelsStatus,
-        showFilters: true,
-        filters: filters && filters.length > 0 ? filters : [],
-        showCreateNemElementButton: this.editPermission ? true : false,
-      },
-
-      cardItemsSection: await this.loadSectionProcessesCards(idFilterSelected)
-    };
-    this.totalRecordsProcesses = this.sectionProcess.cardItemsSection && this.sectionProcess.cardItemsSection.length;
-  }
-
-  async loadSectionProcessesCards(idFilterSelected: number) {
-    const resultProcess = await this.processSrv.GetAll({ 'id-workpack': this.idWorkpack, idFilter: idFilterSelected });
-    this.processes = resultProcess.success ? resultProcess.data : [];
-    if (this.processes && this.processes.length > 0) {
-      const cardItems = this.processes.map(proc => ({
-        typeCardItem: 'listItemProcess',
-        icon: 'process',
-        iconSvg: true,
-        nameCardItem: proc.name,
-        subtitleCardItem: proc.processNumber,
-        organizationName: proc.currentOrganization,
-        itemId: proc.id,
-        priority: proc.priority,
-        menuItems: [{
-          label: this.translateSrv.instant('delete'),
-          icon: 'fas fa-trash-alt',
-          command: (event) => this.deleteProcess(proc),
-          disabled: !this.editPermission
-        }] as MenuItem[],
-        urlCard: '/workpack/processes',
-        paramsUrlCard: [
-          { name: 'idWorkpack', value: this.idWorkpack },
-          { name: 'id', value: proc.id },
-        ]
-      }));
-      if (this.editPermission && !this.workpack.canceled) {
-        cardItems.push({
-          typeCardItem: 'newCardItem',
-          icon: IconsEnum.Plus,
-          iconSvg: true,
-          nameCardItem: null,
-          subtitleCardItem: null,
-          organizationName: null,
-          itemId: null,
-          priority: false,
-          menuItems: null,
-          urlCard: '/workpack/processes',
-          paramsUrlCard: [
-            { name: 'idWorkpack', value: this.idWorkpack },
-          ]
+      if (this.idWorkpack && this.workpackModel && this.workpackModel.scheduleSessionActive) {
+        this.tabs.push({
+          menu: 'schedule',
+          key: 'schedule'
         });
       }
-      return cardItems;
-    } else {
-      const cardItem = (this.editPermission && !this.workpack.canceled) ? [{
-        typeCardItem: 'newCardItem',
-        icon: IconsEnum.Plus,
-        iconSvg: true,
-        nameCardItem: null,
-        itemId: null,
-        menuItems: null,
-        urlCard: '/workpack/processes',
-        paramsUrlCard: [
-          { name: 'idWorkpack', value: this.idWorkpack },
-        ]
-      }] : [];
-      return cardItem;
-    }
-  }
-
-  async loadRisKAndIssueSection() {
-    const resultFilters = await this.filterSrv.getAllFilters(`workpackModels/${this.workpack.model.id}/risks`);
-    const filters = resultFilters.success && Array.isArray(resultFilters.data) ? resultFilters.data : [];
-    const idFilterSelected = filters.find(defaultFilter => !!defaultFilter.favorite) ?
-      filters.find(defaultFilter => !!defaultFilter.favorite).id : undefined;
-
-    this.sectionRisk = {
-      cardSection: {
-        toggleable: false,
-        initialStateToggle: false,
-        cardTitle: 'risks',
-        collapseble: true,
-        initialStateCollapse: this.collapsePanelsStatus,
-        showFilters: true,
-        filters: filters && filters.length > 0 ? filters : [],
-        showCreateNemElementButton: this.editPermission ? true : false,
-      },
-
-      cardItemsSection: await this.loadSectionRisksCards(this.riskSectionShowClosed, idFilterSelected)
-    };
-    this.totalRecordsRisks = this.sectionRisk.cardItemsSection && this.sectionRisk.cardItemsSection.length;
-
-
-    const resultFiltersIssues = await this.filterSrv.getAllFilters(`workpackModels/${this.workpack.model.id}/issues`);
-    const filtersIssues = resultFiltersIssues.success && Array.isArray(resultFiltersIssues.data) ? resultFiltersIssues.data : [];
-    const idFilterIssueSelected = filtersIssues.find(defaultFilter => !!defaultFilter.favorite) ?
-      filters.find(defaultFilter => !!defaultFilter.favorite).id : undefined;
-    this.sectionIssue = {
-      cardSection: {
-        toggleable: false,
-        initialStateToggle: false,
-        cardTitle: 'issues',
-        collapseble: true,
-        initialStateCollapse: this.collapsePanelsStatus,
-        showFilters: true,
-        filters: filtersIssues && filtersIssues.length > 0 ? filtersIssues : [],
-        showCreateNemElementButton: this.editPermission ? true : false,
-      },
-
-      cardItemsSection: await this.loadSectionIssuesCards(this.issueSectionShowClosed, idFilterIssueSelected)
-    };
-    this.totalRecordsIssues = this.sectionIssue.cardItemsSection && this.sectionIssue.cardItemsSection.length;
-  }
-
-  async loadSectionRisksCards(showClosed: boolean, idFilterSelected?: number) {
-    const resultRisks = await this.riskSrv.GetAll({ 'id-workpack': this.idWorkpack, idFilter: idFilterSelected });
-    this.risks = resultRisks.success ? resultRisks.data : [];
-    if (this.risks && this.risks.length > 0) {
-      const cardItems = !showClosed ? this.risks.filter(r => RisksPropertiesOptions.status[r.status].label === 'open').map(risk => ({
-        typeCardItem: 'listItem',
-        icon: RisksPropertiesOptions.status[risk.status].icon,
-        iconColor: RisksPropertiesOptions.importance[risk.importance].label,
-        iconSvg: false,
-        nameCardItem: risk.name,
-        itemId: risk.id,
-        menuItems: [{
-          label: this.translateSrv.instant('delete'),
-          icon: 'fas fa-trash-alt',
-          command: (event) => this.deleteRisk(risk),
-          disabled: !this.editPermission
-        }] as MenuItem[],
-        urlCard: '/workpack/risks',
-        paramsUrlCard: [
-          { name: 'idWorkpack', value: this.idWorkpack },
-          { name: 'idWorkpackModelLinked', value: this.idWorkpackModelLinked },
-          { name: 'id', value: risk.id },
-        ]
-      })) :
-        this.risks.map(risk => ({
-          typeCardItem: 'listItem',
-          icon: RisksPropertiesOptions.status[risk.status].icon,
-          iconColor: RisksPropertiesOptions.importance[risk.importance].label,
-          iconSvg: false,
-          nameCardItem: risk.name,
-          itemId: risk.id,
-          menuItems: [{
-            label: this.translateSrv.instant('delete'),
-            icon: 'fas fa-trash-alt',
-            command: (event) => this.deleteRisk(risk),
-            disabled: !this.editPermission
-          }] as MenuItem[],
-          urlCard: '/workpack/risks',
-          paramsUrlCard: [
-            { name: 'idWorkpack', value: this.idWorkpack },
-            { name: 'idWorkpackModelLinked', value: this.idWorkpackModelLinked },
-            { name: 'id', value: risk.id },
-          ]
-        }));
-      if (this.editPermission && !this.workpack.canceled) {
-        cardItems.push({
-          typeCardItem: 'newCardItem',
-          icon: IconsEnum.Plus,
-          iconColor: null,
-          iconSvg: true,
-          nameCardItem: null,
-          itemId: null,
-          menuItems: null,
-          urlCard: '/workpack/risks',
-          paramsUrlCard: [
-            { name: 'idWorkpack', value: this.idWorkpack },
-            { name: 'idWorkpackModelLinked', value: this.idWorkpackModelLinked },
-          ]
+      if (this.idWorkpack && this.workpackModel.childWorkpackModelSessionActive && this.workpackModel.children) {
+        this.tabs.push(
+          ...this.workpackModel.children.map( workpackModel => ({
+            menu:workpackModel.modelNameInPlural,
+            key:workpackModel.modelNameInPlural
+          }))
+        );
+      }
+      if (this.getShowStakeHolderSection()) {
+        this.tabs.push({
+          menu: 'stakeholdersAndPermissions',
+          key: 'stakeholdersAndPermissions'
         });
       }
-      return cardItems;
-    } else {
-      if (this.editPermission && !this.workpack.canceled) {
-        const cardItem = [{
-          typeCardItem: 'newCardItem',
-          icon: IconsEnum.Plus,
-          iconSvg: true,
-          nameCardItem: null,
-          itemId: null,
-          menuItems: null,
-          urlCard: '/workpack/risks',
-          paramsUrlCard: [
-            { name: 'idWorkpack', value: this.idWorkpack },
-            { name: 'idWorkpackModelLinked', value: this.idWorkpackModelLinked },
-          ]
-        }];
-        return cardItem;
-      } else { return []; };
-    }
-  }
-
-  async loadSectionIssuesCards(showClosed: boolean, idFilterIssueSelected?: number) {
-    const resultIssues = await this.issueSrv.GetAll({ 'id-workpack': this.idWorkpack, idFilter: idFilterIssueSelected });
-    this.issues = resultIssues.success ? resultIssues.data : [];
-    if (this.issues && this.issues.length > 0) {
-      const cardItems = !showClosed ? this.issues.filter(r => IssuesPropertiesOptions.status[r.status].value === 'OPEN').map(issue => ({
-        typeCardItem: 'listItem',
-        icon: 'Issue',
-        iconColor: IssuesPropertiesOptions.importance[issue.importance].label,
-        iconSvg: true,
-        nameCardItem: issue.name,
-        itemId: issue.id,
-        menuItems: [{
-          label: this.translateSrv.instant('delete'),
-          icon: 'fas fa-trash-alt',
-          command: (event) => this.deleteIssue(issue),
-          disabled: !this.editPermission
-        }] as MenuItem[],
-        urlCard: '/workpack/issues',
-        paramsUrlCard: [
-          { name: 'idWorkpack', value: this.idWorkpack },
-          { name: 'idWorkpackModelLinked', value: this.idWorkpackModelLinked },
-          { name: 'id', value: issue.id },
-        ]
-      })) :
-        this.issues.map(issue => ({
-          typeCardItem: 'listItem',
-          icon: 'Issue',
-          iconColor: IssuesPropertiesOptions.importance[issue.importance].label,
-          iconSvg: true,
-          nameCardItem: issue.name,
-          itemId: issue.id,
-          menuItems: [{
-            label: this.translateSrv.instant('delete'),
-            icon: 'fas fa-trash-alt',
-            command: (event) => this.deleteIssue(issue),
-            disabled: !this.editPermission
-          }] as MenuItem[],
-          urlCard: '/workpack/issues',
-          paramsUrlCard: [
-            { name: 'idWorkpack', value: this.idWorkpack },
-            { name: 'idWorkpackModelLinked', value: this.idWorkpackModelLinked },
-            { name: 'id', value: issue.id },
-          ]
-        }));
-      if (this.editPermission && !this.workpack.canceled) {
-        cardItems.push({
-          typeCardItem: 'newCardItem',
-          icon: IconsEnum.Plus,
-          iconColor: null,
-          iconSvg: true,
-          nameCardItem: null,
-          itemId: null,
-          menuItems: null,
-          urlCard: '/workpack/issues',
-          paramsUrlCard: [
-            { name: 'idWorkpack', value: this.idWorkpack },
-            { name: 'idWorkpackModelLinked', value: this.idWorkpackModelLinked },
-          ]
+      if (this.getShowBaselineSection()) {
+        this.tabs.push({
+          menu: 'baselines',
+          key: 'baselines'
         });
       }
-      return cardItems;
-    } else {
-      const cardItem = this.editPermission && !this.workpack.canceled ? [{
-        typeCardItem: 'newCardItem',
-        icon: IconsEnum.Plus,
-        iconSvg: true,
-        nameCardItem: null,
-        itemId: null,
-        menuItems: null,
-        urlCard: '/workpack/issues',
-        paramsUrlCard: [
-          { name: 'idWorkpack', value: this.idWorkpack },
-          { name: 'idWorkpackModelLinked', value: this.idWorkpackModelLinked },
-        ]
-      }] : [];
-      return cardItem;
-    }
-  }
-
-  async loadScheduleSession() {
-    const result = await this.scheduleSrv.GetSchedule({ 'id-workpack': this.idWorkpack });
-    if (result.success && result.data && result.data.length > 0) {
-      this.schedule = result.data[0];
-      const unitMeasureWorkpack = this.sectionPropertiesProperties.find(prop => prop.type === this.typePropertyModel.UnitSelectionModel);
-      const unitMeasure = await this.unitMeasureSrv.GetById(unitMeasureWorkpack?.selectedValue as number);
-      this.unitMeansure = unitMeasure.success && unitMeasure.data;
-      if (this.unitMeansure && !this.unitMeansure.precision) {
-        this.unitMeansure.precision = 0;
+      if (this.idWorkpack && this.workpackModel && this.workpackModel.riskAndIssueManagementSessionActive) {
+        this.tabs.push({
+          menu: 'risks',
+          key: 'risks'
+        });
       }
-      const groupStep = this.schedule.groupStep.map((group, groupIndex, groupArray) => {
-        const cardItemSection = group.steps.map((step, stepIndex, stepArray) => ({
-          type: 'listStep',
-          editPermission: !!this.editPermission && !this.workpack.canceled,
-          stepName: new Date(step.periodFromStart + 'T00:00:00'),
-          menuItems: (groupIndex === 0 && stepIndex === 0) ? [{
-            label: this.translateSrv.instant('properties'),
-            icon: 'fas fa-edit',
-            command: () => this.editScheduleStep(step.id, this.unitMeansure.name, this.unitMeansure.precision, 'start'),
-            disabled: !this.editPermission || !!this.workpack.canceled
-          }] : ((groupIndex === groupArray.length - 1 && stepIndex === stepArray.length - 1) ?
-            [{
-              label: this.translateSrv.instant('properties'),
-              icon: 'fas fa-edit',
-              command: () => this.editScheduleStep(step.id, this.unitMeansure.name, this.unitMeansure.precision, 'end'),
-              disabled: !this.editPermission || !!this.workpack.canceled
-            }] : [{
-              label: this.translateSrv.instant('properties'),
-              icon: 'fas fa-edit',
-              command: () => this.editScheduleStep(step.id, this.unitMeansure.name, this.unitMeansure.precision, 'step'),
-              disabled: !this.editPermission || !!this.workpack.canceled
-            }]),
-          stepOrder: (groupIndex === 0 && stepIndex === 0) ? 'start' :
-            ((groupIndex === groupArray.length - 1 && stepIndex === stepArray.length - 1) ? 'end' : 'step'),
-          unitPlanned: step.plannedWork ? step.plannedWork : 0,
-          unitActual: step.actualWork ? step.actualWork : 0,
-          unitBaseline: step.baselinePlannedWork ? step.baselinePlannedWork : 0,
-          unitProgressBar: {
-            total: step.plannedWork,
-            progress: step.actualWork,
-            color: '#FF8C00',
-          },
-          costPlanned: step.consumes?.reduce((total, v) => (total + (v.plannedCost ? v.plannedCost : 0)), 0),
-          costActual: step.consumes?.reduce((total, v) => (total + (v.actualCost ? v.actualCost : 0)), 0),
-          baselinePlannedCost: step.consumes?.reduce((total, v) => (total + (v.baselinePlannedCost ? v.baselinePlannedCost : 0)), 0),
-          costProgressBar: {
-            total: (step.consumes?.reduce((total, v) => (total + (v.plannedCost ? v.plannedCost : 0)), 0)),
-            progress: step.consumes?.reduce((total, v) => (total + (v.actualCost ? v.actualCost : 0)), 0),
-            color: '#44B39B'
-          },
-          unitName: this.unitMeansure && this.unitMeansure.name,
-          unitPrecision: this.unitMeansure && this.unitMeansure.precision,
-          idStep: step.id
-        }));
-        return {
-          year: group.year,
-          cardItemSection
-        };
+      if (this.idWorkpack && this.workpackModel && this.workpackModel.riskAndIssueManagementSessionActive) {
+        this.tabs.push({
+          menu: 'issues',
+          key: 'issues'
+        });
+      }
+      if (this.idWorkpack && this.workpackModel && this.workpackModel.processesManagementSessionActive) {
+        this.tabs.push({
+          menu: 'processes',
+          key: 'processes'
+        });
+      }
+      if (this.idWorkpack && this.workpackModel && this.workpackModel.journalManagementSessionActive) {
+        this.tabs.push({
+          menu: 'journal',
+          key: 'journal'
+        });
+      }
+    }
+    if (!this.idWorkpack) {
+      this.tabs.push({
+        menu: 'properties',
+        key: 'properties'
       });
-      const startDate = this.schedule && new Date(this.schedule.start + 'T00:00:00');
-      const endDate = this.schedule && new Date(this.schedule.end + 'T00:00:00');
-      const startScheduleStep = !!this.editPermission && {
-        type: 'newStart',
-        stepOrder: 'newStart',
-        unitName: this.unitMeansure.name,
-        unitPrecision: this.unitMeansure.precision,
-      };
-      const endScheduleStep = !!this.editPermission && {
-        type: 'newEnd',
-        stepOrder: 'newEnd',
-        unitName: this.unitMeansure.name,
-        unitPrecision: this.unitMeansure.precision,
-      };
-      const initialDatePlanned = moment(startDate);
-      const finalDatePlanned = moment(endDate);
-      const daysToPlanned = finalDatePlanned.diff(initialDatePlanned, 'days');
-      const dateActual = moment(new Date());
-      const daysToNow = dateActual.diff(initialDatePlanned, 'days');
-      const baselineStartDate = this.schedule && new Date(this.schedule.baselineStart + 'T00:00:00');
-      const baselineEndDate = this.schedule && new Date(this.schedule.baselineEnd + 'T00:00:00');
-      const baselineDaysPlanned = moment(baselineEndDate).diff(moment(baselineStartDate), 'days');
-      this.sectionSchedule = {
-        cardSection: {
-          toggleable: false,
-          initialStateToggle: false,
-          cardTitle: 'schedule',
-          collapseble: true,
-          initialStateCollapse: this.collapsePanelsStatus,
-          headerDates: this.schedule && {
-            startDate,
-            endDate
-          },
-          progressBarValues: [
-            {
-              total: Number(this.schedule.planed.toFixed(this.unitMeansure.precision)),
-              progress: Number(this.schedule.actual.toFixed(this.unitMeansure.precision)),
-              labelTotal: 'planned',
-              labelProgress: 'actual',
-              valueUnit: this.unitMeansure && this.unitMeansure.name,
-              color: '#ffa342',
-              barHeight: 17,
-              baselinePlanned: Number(this.schedule.baselinePlaned.toFixed(this.unitMeansure.precision)),
-            },
-            {
-              total: this.schedule.planedCost,
-              progress: this.schedule.actualCost,
-              labelTotal: 'planned',
-              labelProgress: 'actual',
-              valueUnit: 'currency',
-              color: '#6cd3bd',
-              barHeight: 17,
-              baselinePlanned: Number(this.schedule.baselineCost.toFixed(this.unitMeansure.precision)),
-            },
-            {
-              total: daysToPlanned,
-              progress: daysToNow < 0 ? 0 : daysToNow,
-              labelTotal: 'planned',
-              labelProgress: 'actual',
-              valueUnit: 'time',
-              color: '#659ee1',
-              barHeight: 17,
-              baselinePlanned: baselineDaysPlanned,
-              startDateBaseline: baselineStartDate,
-              endDateBaseline: baselineEndDate,
-              startDateTotal: startDate,
-              endDateTotal: endDate,
-            }
-          ],
-        },
-        startScheduleStep,
-        endScheduleStep,
-        groupStep
-      };
-      if (this.sectionSchedule.groupStep && this.sectionSchedule.groupStep[0].cardItemSection) {
-        this.sectionSchedule.groupStep[0].start = true;
-        const idStartStep = this.sectionSchedule.groupStep[0].cardItemSection[0].idStep;
-        if (!!this.editPermission) {
-          this.sectionSchedule.groupStep[0].cardItemSection[0].menuItems.push({
-            label: this.translateSrv.instant('delete'),
-            icon: 'fas fa-trash-alt',
-            command: (event) => this.deleteScheduleStep(idStartStep),
-            disabled: !this.editPermission || !!this.workpack.canceled
-          });
-        }
-        this.sectionSchedule.groupStep[0].cardItemSection[0].stepDay = startDate;
-        const groupStepItems: IScheduleStepCardItem[] = [startScheduleStep];
-        this.sectionSchedule.groupStep[0].cardItemSection.forEach(card => {
-          groupStepItems.push(card);
-        });
-        this.sectionSchedule.groupStep[0].cardItemSection = Array.from(groupStepItems);
-      }
-      const groupLenght = this.sectionSchedule.groupStep && this.sectionSchedule.groupStep.length;
-      if (this.sectionSchedule.groupStep && this.sectionSchedule.groupStep[groupLenght - 1].cardItemSection) {
-        this.sectionSchedule.groupStep[groupLenght - 1].end = true;
-        const cardItemSectionLenght = this.sectionSchedule.groupStep[groupLenght - 1].cardItemSection.length;
-        const idEndStep = this.sectionSchedule.groupStep[groupLenght - 1].cardItemSection[cardItemSectionLenght - 1].idStep;
-        if (!!this.editPermission) {
-          this.sectionSchedule.groupStep[groupLenght - 1].cardItemSection[cardItemSectionLenght - 1].menuItems.push({
-            label: this.translateSrv.instant('delete'),
-            icon: 'fas fa-trash-alt',
-            command: (event) =>
-              this.deleteScheduleStep(idEndStep),
-            disabled: !this.editPermission || !!this.workpack.canceled
-          });
-        }
-        this.sectionSchedule.groupStep[groupLenght - 1].cardItemSection[cardItemSectionLenght - 1].stepDay = endDate;
-        this.sectionSchedule.groupStep[groupLenght - 1].cardItemSection.push(endScheduleStep);
-      }
-      return;
     }
-    this.sectionSchedule = {
-      cardSection: {
-        toggleable: false,
-        initialStateToggle: false,
-        cardTitle: 'schedule',
-        collapseble: true,
-        initialStateCollapse: this.collapsePanelsStatus,
-      }
-    };
   }
 
 }

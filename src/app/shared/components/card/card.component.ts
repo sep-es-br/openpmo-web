@@ -1,3 +1,4 @@
+import { WorkpackService } from 'src/app/shared/services/workpack.service';
 import { Component, Input, OnDestroy, Output, SimpleChanges, EventEmitter, OnInit, OnChanges } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { Subject, Subscription } from 'rxjs';
@@ -7,6 +8,7 @@ import { ICard } from '../../interfaces/ICard';
 import { ResponsiveService } from '../../services/responsive.service';
 import { SelectItem } from 'primeng/api';
 import {IWorkpack} from '../../interfaces/IWorkpack';
+import { WorkpackShowTabviewService } from '../../services/workpack-show-tabview.service';
 
 @Component({
   selector: 'app-card',
@@ -29,11 +31,18 @@ export class CardComponent implements OnInit, OnDestroy, OnChanges {
   $destroy = new Subject();
   filterListOptions: SelectItem[];
   filterSelected: number;
+  canEditCheckCompleted: boolean;
+  showTabview = false;
 
   constructor(
     private responsiveSrv: ResponsiveService,
-    private translateSrv: TranslateService
+    private translateSrv: TranslateService,
+    private workpackSrv: WorkpackService,
+    private workpackShowTabviewSrv: WorkpackShowTabviewService
   ) {
+    this.workpackShowTabviewSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => {
+      this.showTabview = value;
+    });
     this.subResponsive = this.responsiveSrv.observable.subscribe(value => this.responsive = value);
     this.translateSrv.onLangChange.pipe(takeUntil(this.$destroy)).subscribe(() =>
       {
@@ -43,14 +52,23 @@ export class CardComponent implements OnInit, OnDestroy, OnChanges {
     if (this.properties && !!this.properties.showFilters) {
       this.loadFilterListOptions();
     }
+    this.workpackSrv.observableCanEditCheckCompleted.pipe(takeUntil(this.$destroy)).subscribe( canEdit => {
+      if (canEdit) {
+        this.canEditCheckCompleted = true;
+      }
+    })
   }
 
   ngOnChanges(changes: SimpleChanges) {
     if (
-      changes.properties && changes.properties.currentValue && !!this.properties.showFilters
+      changes.properties && changes.properties.currentValue
     ) {
       this.properties.progressBarValues = this.properties.progressBarValues && this.properties.progressBarValues.filter( item => item.total !== 0 );
-      this.loadFilterListOptions();
+      this.canEditCheckCompleted = this.properties.canEditCheckCompleted;
+      if (!!this.properties.showFilters) {
+        this.loadFilterListOptions();
+      }
+      
     }
   }
 

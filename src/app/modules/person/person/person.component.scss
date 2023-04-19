@@ -1,9 +1,7 @@
 ::ng-deep .app-person {
   .loading-container {
-    color: #d4d4d4;
-    span {
-      margin-left: 0.5em;
-    }
+    position: relative;
+    min-height: 150px;
   }
   .card-container {
     .content {

@@ -27,11 +27,15 @@ export class WorkpackModelPropertyComponent implements OnDestroy, AfterViewInit 
   $destroy = new Subject();
   calendarFormat: string;
   yearRange: string;
+  language: string;
 
   constructor(
     private translateSrv: TranslateService,
     private responsiveSrv: ResponsiveService
   ) {
+    this.translateSrv.onLangChange.pipe(takeUntil(this.$destroy)).subscribe(() => {
+      setTimeout(() => this.setLanguage(), 200);
+    });
     this.calendarFormat = this.translateSrv.instant('dateFormat');
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(responsive => this.responsive = responsive);
     const today = moment();
@@ -40,6 +44,7 @@ export class WorkpackModelPropertyComponent implements OnDestroy, AfterViewInit 
   }
 
   ngAfterViewInit(): void {
+    this.setLanguage()
     if (this.property?.type === TypePropertyWorkpackModelEnum.DateModel) {
       this.translateSrv.onLangChange.pipe(takeUntil(this.$destroy)).subscribe(() =>
         setTimeout(() => {
@@ -60,6 +65,10 @@ export class WorkpackModelPropertyComponent implements OnDestroy, AfterViewInit 
   ngOnDestroy(): void {
     this.$destroy.next();
     this.$destroy.complete();
+  }
+
+  setLanguage() {
+    this.language = this.translateSrv.currentLang;
   }
 
   checkDefaultValue() {

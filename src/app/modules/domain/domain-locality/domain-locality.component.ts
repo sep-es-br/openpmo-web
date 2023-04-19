@@ -26,6 +26,7 @@ import { DomainService } from 'src/app/shared/services/domain.service';
 import { FilterDataviewService } from 'src/app/shared/services/filter-dataview.service';
 import { FilterDataviewPropertiesEntity } from 'src/app/shared/constants/filterDataviewPropertiesEntity';
 import { PropertyTemplateModel } from 'src/app/shared/models/PropertyTemplateModel';
+import { ConfigDataViewService } from 'src/app/shared/services/config-dataview.service';
 
 @Component({
   selector: 'app-domain-locality',
@@ -66,6 +67,7 @@ export class DomainLocalityComponent implements OnInit, OnDestroy {
   pageSize = 5;
   totalRecords: number;
   idFilterSelected: number;
+  isLoading = false;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -80,8 +82,26 @@ export class DomainLocalityComponent implements OnInit, OnDestroy {
     private messageSrv: MessageService,
     private officeSrv: OfficeService,
     private domainSrv: DomainService,
-    private filterSrv: FilterDataviewService
+    private filterSrv: FilterDataviewService,
+    private configDataViewSrv: ConfigDataViewService
   ) {
+    this.configDataViewSrv.observableCollapsePanelsStatus.pipe(takeUntil(this.$destroy)).subscribe(collapsePanelStatus => {
+      this.collapsePanelsStatus = collapsePanelStatus === 'collapse' ? true : false;
+      this.cardProperties = Object.assign({}, {
+        ...this.cardProperties,
+        initialStateCollapse: this.collapsePanelsStatus
+      });
+      this.cardLocalities = Object.assign({}, {
+        ...this.cardLocalities,
+        initialStateCollapse: this.collapsePanelsStatus
+      });
+    });
+    this.configDataViewSrv.observableDisplayModeAll.pipe(takeUntil(this.$destroy)).subscribe(displayMode => {
+      this.displayModeAll = displayMode;
+    });
+    this.configDataViewSrv.observablePageSize.pipe(takeUntil(this.$destroy)).subscribe(pageSize => {
+      this.pageSize = pageSize;
+    });
     this.activeRoute.queryParams.subscribe(async({ id, idOffice, idDomain, type, idParent }) => {
       this.idLocality = +id;
       this.idOffice = +idOffice;
@@ -177,26 +197,6 @@ export class DomainLocalityComponent implements OnInit, OnDestroy {
     await this.loadCards();
   }
 
-  handleChangeCollapseExpandPanel(event) {
-    this.collapsePanelsStatus = event.mode === 'collapse' ? true : false;
-    this.cardProperties = Object.assign({}, {
-      ...this.cardProperties,
-      initialStateCollapse: this.collapsePanelsStatus
-    });
-    this.cardLocalities = Object.assign({}, {
-      ...this.cardLocalities,
-      initialStateCollapse: this.collapsePanelsStatus
-    });
-  }
-
-  handleChangeDisplayMode(event) {
-    this.displayModeAll = event.displayMode;
-  }
-
-  handleChangePageSize(event) {
-    this.pageSize = event.pageSize;
-  }
-
   async loadCards() {
     this.cardProperties = {
       toggleable: false,
@@ -212,6 +212,7 @@ export class DomainLocalityComponent implements OnInit, OnDestroy {
       await this.loadFiltersLocalities();
     }
     if (this.idLocality) {
+      this.isLoading = true;
       const { success, data } =
         await this.localitySvr.getLocalityById(this.idLocality, { idFilter: this.idFilterSelected });
       if (success) {
@@ -246,6 +247,7 @@ export class DomainLocalityComponent implements OnInit, OnDestroy {
     if (this.cardProperties) {
       this.cardProperties.initialStateCollapse = !!this.idLocality;
     }
+    this.isLoading = false;
   }
 
   mirrorNameToFullname() {

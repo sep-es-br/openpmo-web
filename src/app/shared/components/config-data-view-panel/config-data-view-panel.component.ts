@@ -1,3 +1,4 @@
+import { ConfigDataViewService } from './../../services/config-dataview.service';
 import { takeUntil } from 'rxjs/operators';
 import { ResponsiveService } from './../../services/responsive.service';
 import { TranslateService } from '@ngx-translate/core';
@@ -15,13 +16,10 @@ import { Subject } from 'rxjs';
 })
 export class ConfigDataViewPanelComponent implements OnInit, OnDestroy {
 
-  @Output() changeDisplayMode = new EventEmitter();
-  @Output() changeCollapsedExpand = new EventEmitter();
-  @Output() changePageSize = new EventEmitter();
   @Input() notShowCollapseOptions: boolean = false;
 
   collapsed = true;
-  displayMode = 'grid';
+  displayMode = 'list';
   user;
   pageSizeOptions: SelectItem[] = [
     { label: '5', value: 5 },
@@ -36,9 +34,8 @@ export class ConfigDataViewPanelComponent implements OnInit, OnDestroy {
   constructor(
     private cookieSrv: CookieService,
     private authSrv: AuthService,
-    private confirmationSrv: ConfirmationService,
-    private translateSrv: TranslateService,
-    private responsiveSrv: ResponsiveService
+    private responsiveSrv: ResponsiveService,
+    private configDataSrv: ConfigDataViewService
   ) {
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.responsive = value);
   }
@@ -89,7 +86,7 @@ export class ConfigDataViewPanelComponent implements OnInit, OnDestroy {
     if (!!this.cookiesPermission) {
       this.setCookiesCollapseExpandMode(collapseAll);
     }
-    this.changeCollapsedExpand.emit({ mode });
+    this.configDataSrv.nextCollapsePanelsStatus(mode);
   }
 
   handleChangeDisplayMode(displayMode: string) {
@@ -97,14 +94,14 @@ export class ConfigDataViewPanelComponent implements OnInit, OnDestroy {
     if (!!this.cookiesPermission) {
       this.setCookiesDisplayMode(displayMode);
     }
-    this.changeDisplayMode.emit({ displayMode });
+    this.configDataSrv.nextDisplayModeAll(displayMode );
   }
 
   handleChangePageSize() {
     if (!!this.cookiesPermission) {
       this.setCookiesPageSize(this.selectedPageSize);
     }
-    this.changePageSize.emit({ pageSize: this.selectedPageSize });
+    this.configDataSrv.nextPageSize(this.selectedPageSize );
   }
 
   setCookiesDisplayMode(displayMode: string) {

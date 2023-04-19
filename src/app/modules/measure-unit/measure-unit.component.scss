@@ -18,9 +18,13 @@
   .header-container.mobile {
     flex-direction: column;
   }
+  .loading-container {
+    position: relative;
+    min-height: 150px;
+  }
 }
 
-::ng-deep .app-unit-measure .app-card-item .p-card {
+::ng-deep .app-unit-measure .unit-app-card-item .p-card {
   height: 100%;
   .p-card-header {
     display: flex;
@@ -98,7 +102,11 @@
   }
 }
 
-::ng-deep .app-unit-measure .app-card-item.list-mode {
+::ng-deep .app-unit-measure .unit-app-card-item.list-mode {
+  .p-card {
+    width: 100%;
+    max-width: 100%;
+  }
   .p-card-content {
     display: flex;
     flex-direction: row;
@@ -128,7 +136,7 @@
   }
 } 
 
-::ng-deep .app-unit-measure .app-card-item.mobile .p-card {
+::ng-deep .app-unit-measure .unit-app-card-item.mobile .p-card {
   .p-fluid {
     width: 80%;
   }

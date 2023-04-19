@@ -1,0 +1,39 @@
+@use "src/variables" as v;
+
+::ng-deep .app-workpack-section-properties {
+  .loading-container {
+    position: relative;
+    min-height: 150px;
+  }
+    .properties-container {
+      display: flex;
+      flex-wrap: wrap;
+      .property-container {
+        margin-right: 1em;
+      }
+      .fullLine {
+        width: 100%;
+      }
+      .not-fullLine {
+        width: 20%;
+      }
+    }
+    .properties-container.responsive {
+      display: flex;
+      flex-direction: column;
+      .property-container {
+        margin-right: 0;
+        width: 100%;
+      }
+    }
+    .input-message-error {
+      color: #f44336;
+      background: transparent;
+      padding: 0 8px 4px 0;
+      display: inline-flex;
+      border-radius: 5px;
+      font-size: 0.7rem;
+      font-family: v.$fontFamilyMedium;
+    }
+  
+}

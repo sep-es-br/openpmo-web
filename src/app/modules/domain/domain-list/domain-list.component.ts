@@ -20,6 +20,7 @@ import { DomainService } from 'src/app/shared/services/domain.service';
 import { OfficePermissionService } from 'src/app/shared/services/office-permission.service';
 import { OfficeService } from 'src/app/shared/services/office.service';
 import { ResponsiveService } from 'src/app/shared/services/responsive.service';
+import { ConfigDataViewService } from 'src/app/shared/services/config-dataview.service';
 
 @Component({
   selector: 'app-domain-list',
@@ -46,6 +47,7 @@ export class DomainListComponent implements OnInit, OnDestroy {
   pageSize = 5;
   totalRecords: number;
   idFilterSelected: number;
+  isLoading = false;
 
   constructor(
     private domainSvr: DomainService,
@@ -58,8 +60,15 @@ export class DomainListComponent implements OnInit, OnDestroy {
     private responsiveSrv: ResponsiveService,
     private filterSrv: FilterDataviewService,
     private router: Router,
-    private translateSrv: TranslateService
+    private translateSrv: TranslateService,
+    private configDataViewSrv: ConfigDataViewService
   ) {
+    this.configDataViewSrv.observableDisplayModeAll.pipe(takeUntil(this.$destroy)).subscribe(displayMode => {
+      this.displayModeAll = displayMode;
+    });
+    this.configDataViewSrv.observablePageSize.pipe(takeUntil(this.$destroy)).subscribe(pageSize => {
+      this.pageSize = pageSize;
+    });
     this.activeRoute.queryParams.subscribe(params => {
       this.idOffice = +params.idOffice;
     });
@@ -72,6 +81,7 @@ export class DomainListComponent implements OnInit, OnDestroy {
     if (!this.editPermission) {
       this.router.navigate(['/offices']);
     }
+    this.isLoading = true;
     await this.loadFiltersDomains();
     await this.loadPropertiesDomains();
     await this.getOfficeById();
@@ -98,14 +108,6 @@ export class DomainListComponent implements OnInit, OnDestroy {
     this.$destroy.complete();
   }
 
-  handleChangeDisplayMode(event) {
-    this.displayModeAll = event.displayMode;
-  }
-
-  handleChangePageSize(event) {
-    this.pageSize = event.pageSize;
-  }
-
   async getOfficeById() {
     const { success, data } = await this.officeSrv.GetById(this.idOffice);
     if (success) {
@@ -114,6 +116,7 @@ export class DomainListComponent implements OnInit, OnDestroy {
   }
 
   async loadPropertiesDomains() {
+    this.isLoading = true;
     const { success, data } = await this.domainSvr.GetAll({ 'id-office': this.idOffice, idFilter: this.idFilterSelected });
     const itemsProperties: ICardItem[] = this.editPermission ? [
       {
@@ -143,6 +146,7 @@ export class DomainListComponent implements OnInit, OnDestroy {
         paramsUrlCard: [{ name: 'idOffice', value: this.idOffice }]
       })));
     }
+    this.isLoading = false;
     this.cardItemsProperties = itemsProperties;
     this.totalRecords = this.cardItemsProperties && this.cardItemsProperties.length;
 

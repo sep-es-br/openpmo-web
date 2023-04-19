@@ -18,3 +18,37 @@
   }
 }
 
+::ng-deep .milestone-text-container {
+  display: flex;
+  justify-content: space-between;
+  .p-float-label .p-inputtext  {
+    width: 100%;
+  }
+  .milestone-status {
+    display: flex;
+    color: #EA5C5C;
+    width: 14rem;
+    span {
+      margin: 1.3rem 0.5rem;
+    }
+    .icons-container {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+      .late {
+        color: #EA5C5C;
+      }
+    }
+  }
+
+  @media screen and (max-width: 900px) {
+    flex-direction: column-reverse;
+    .milestone-status {
+      width: 100%;
+      display: flex;
+      justify-content: end;
+    }
+  }
+}
+

@@ -1,10 +1,14 @@
 @use "src/variables" as v;
 
 ::ng-deep .app-dashboard {
-  margin-bottom: 15px;
+  padding-bottom: 15px;
   display: flex;
   flex-direction: column;
   width: 100%;
+  .loading-container {
+    position: relative;
+    min-height: 150px;
+  }
   &.expanded {
     display: flex;
     position: absolute;
@@ -92,7 +96,7 @@
           font-weight: 700;
           font-style: normal;
           font-size: 13px;
-          color: #888E96; 
+          color: #888E96;
         }
         .role, .type {
           font-family: 'Montserrat', sans-serif;

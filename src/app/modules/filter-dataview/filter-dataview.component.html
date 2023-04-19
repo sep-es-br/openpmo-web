@@ -19,7 +19,7 @@
               <app-input-message [form]="formFilter" field="name"></app-input-message>
             </div>
             <div class="p-field my-default" [class.my-default-responsive]="responsive">
-              <p-checkbox [formControl]="formFilter.controls['favorite']" [binary]="true"
+              <p-checkbox formControlName="favorite" [binary]="true"
                 [label]="'myDefault'|translate"></p-checkbox>
             </div>
           </div>

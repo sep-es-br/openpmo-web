@@ -3,8 +3,7 @@
     <div class="app-content-header" [class.mobile]="responsive">
       <span>{{ 'people' | translate }}</span>
     </div>
-    <app-config-data-view-panel [notShowCollapseOptions]="true" (changeDisplayMode)="handleChangeDisplayMode($event)"
-      (changePageSize)="handleChangePageSize($event)">
+    <app-config-data-view-panel [notShowCollapseOptions]="true">
     </app-config-data-view-panel>
   </div>
   <div class="card-container">
@@ -12,9 +11,6 @@
       <div class="card-person-container">
         <form [formGroup]="formSearch" class="form-search" [class.responsive]="!!responsive">
           <span class="p-float-label property-input p-field">
-            <!-- <p-dropdown class="app-single-selection" [options]="allSelected" optionLabel="label" optionValue="label" 
-              (click)="treeViewScopeOverlay.toggle($event)" formControlName="scopeName"
-              [class.responsive]="responsive"></p-dropdown> -->
             <input pInputText class="app-input-text scope" [class.responsive]="responsive"
               (click)="treeViewScopeOverlay.toggle($event)" formControlName="scopeName" [readonly]="true" />
             <label class="app-input-label">{{ 'scopeLabel' | translate }} </label>
@@ -54,27 +50,29 @@
             </p-scrollPanel>
           </p-overlayPanel>
         </form>
+        <div class="loading-container" *ngIf="isLoading">
+          <app-card-loading [isCardLoading]="isLoading"></app-card-loading>
+        </div>
         <p-dataView [value]="cardItemsProperties" layout="grid" class="app-dataview"
-          *ngIf="displayModeAll === 'grid' || (displayModeAll === 'list' && !!responsive)" [paginator]="true"
-          [rows]="pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false" [totalRecords]="totalRecords"
-          [emptyMessage]="(!cardItemsProperties ? 'loadingEllipsis' : 'noContent') | translate">
-          <ng-template let-cardItem pTemplate="gridItem">
-            <div class="p-col-12 p-md-3 p-sm-12 card-item-container">
-              <app-card-item [properties]="cardItem"></app-card-item>
-            </div>
-          </ng-template>
-        </p-dataView>
-
-        <p-dataView [value]="cardItemsProperties" layout="list" class="app-dataview app-dataview-list"
-          *ngIf="displayModeAll === 'list' && !responsive" [paginator]="true" [rows]="pageSize"
-          [showJumpToPageDropdown]="true" [showPageLinks]="false" [totalRecords]="totalRecords"
-          [emptyMessage]="(!cardItemsProperties ? 'loadingEllipsis' : 'noContent') | translate">
-          <ng-template let-cardItem pTemplate="listItem">
-            <div class="p-col-12">
-              <app-card-item [properties]="cardItem" [displayModeCard]="displayModeAll"></app-card-item>
-            </div>
-          </ng-template>
-        </p-dataView>
+            *ngIf="(displayModeAll === 'grid' || (displayModeAll === 'list' && !!responsive)) && !isLoading" [paginator]="true"
+            [rows]="pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false" [totalRecords]="totalRecords"
+            [emptyMessage]="(!cardItemsProperties ? 'loadingEllipsis' : 'noContent') | translate">
+            <ng-template let-cardItem pTemplate="gridItem">
+              <div class="p-col-12 p-md-3 p-sm-12 card-item-container">
+                <app-card-item [properties]="cardItem"></app-card-item>
+              </div>
+            </ng-template>
+          </p-dataView>
+          <p-dataView [value]="cardItemsProperties" layout="list" class="app-dataview app-dataview-list"
+            *ngIf="(displayModeAll === 'list' && !responsive && !isLoading)" [paginator]="true" [rows]="pageSize"
+            [showJumpToPageDropdown]="true" [showPageLinks]="false" [totalRecords]="totalRecords"
+            [emptyMessage]="(!cardItemsProperties ? 'loadingEllipsis' : 'noContent') | translate">
+            <ng-template let-cardItem pTemplate="listItem">
+              <div class="p-col-12">
+                <app-card-item [properties]="cardItem" [displayModeCard]="displayModeAll"></app-card-item>
+              </div>
+            </ng-template>
+          </p-dataView>
       </div>
     </app-card>
   </div>

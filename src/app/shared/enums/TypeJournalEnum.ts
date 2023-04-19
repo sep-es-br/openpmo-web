@@ -1,5 +1,6 @@
 export enum TypeJournalEnum {
   INFORMATION = 'information',
+  DATE_CHANGED = 'dateChanged', 
   EDITION = 'edition',
   FAIL = 'failure',
   BASELINE = 'baseline',

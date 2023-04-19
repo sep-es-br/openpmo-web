@@ -1,12 +1,13 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
-import {Subject} from 'rxjs';
-import {takeUntil} from 'rxjs/operators';
-import {ICard} from 'src/app/shared/interfaces/ICard';
-import {IWorkpackBaselines} from 'src/app/shared/interfaces/IWorkpackBaselines';
-import {BaselineService} from 'src/app/shared/services/baseline.service';
-import {BreadcrumbService} from 'src/app/shared/services/breadcrumb.service';
-import {ResponsiveService} from 'src/app/shared/services/responsive.service';
-import {IBaseline} from '../../../shared/interfaces/IBaseline';
+import { ConfigDataViewService } from './../../../shared/services/config-dataview.service';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+import { ICard } from 'src/app/shared/interfaces/ICard';
+import { IWorkpackBaselines } from 'src/app/shared/interfaces/IWorkpackBaselines';
+import { BaselineService } from 'src/app/shared/services/baseline.service';
+import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
+import { ResponsiveService } from 'src/app/shared/services/responsive.service';
+import { IBaseline } from '../../../shared/interfaces/IBaseline';
 
 
 @Component({
@@ -23,13 +24,28 @@ export class BaselinesListComponent implements OnInit, OnDestroy {
   displayModeAll = 'grid';
   collapsePanelsStatus = true;
   pageSize = 5;
+  isLoading = false;
 
   constructor(
     private responsiveSrv: ResponsiveService,
     private breadcrumbSrv: BreadcrumbService,
-    private baselineSrv: BaselineService
+    private baselineSrv: BaselineService,
+    private configDataViewSrv: ConfigDataViewService
   ) {
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.responsive = value);
+    this.configDataViewSrv.observableCollapsePanelsStatus.pipe(takeUntil(this.$destroy)).subscribe(collapsePanelStatus => {
+      this.collapsePanelsStatus = collapsePanelStatus === 'collapse' ? true : false;
+      this.cardsBaselines = this.cardsBaselines.map(card => ({
+        ...card,
+        initialStateCollapse: this.collapsePanelsStatus,
+      }));
+    });
+    this.configDataViewSrv.observableDisplayModeAll.pipe(takeUntil(this.$destroy)).subscribe(displayMode => {
+      this.displayModeAll = displayMode;
+    });
+    this.configDataViewSrv.observablePageSize.pipe(takeUntil(this.$destroy)).subscribe(pageSize => {
+      this.pageSize = pageSize;
+    });
   }
 
   async ngOnInit(): Promise<void> {
@@ -53,9 +69,11 @@ export class BaselinesListComponent implements OnInit, OnDestroy {
   }
 
   async loadBaselines() {
-    const {data, success} = await this.baselineSrv.getBaselinesFromCcbMember();
+    this.isLoading = true;
+    const { data, success } = await this.baselineSrv.getBaselinesFromCcbMember();
     if (success) {
       this.baselines = data;
+      this.isLoading = false;
     }
   }
 
@@ -85,26 +103,10 @@ export class BaselinesListComponent implements OnInit, OnDestroy {
       itemId: baselineItem.id,
       urlCard: '/ccbmember-baselines-view/baseline',
       paramsUrlCard: [
-        {name: 'id', value: baselineItem.id},
+        { name: 'id', value: baselineItem.id },
       ]
     });
     return baseline.baselines.map(getCardItem);
-  }
-
-  handleChangeCollapseExpandPanel(event) {
-    this.collapsePanelsStatus = event.mode === 'collapse';
-    this.cardsBaselines = this.cardsBaselines.map(card => ({
-      ...card,
-      initialStateCollapse: this.collapsePanelsStatus,
-    }));
-  }
-
-  handleChangeDisplayMode(event) {
-    this.displayModeAll = event.displayMode;
-  }
-
-  handleChangePageSize(event) {
-    this.pageSize = event.pageSize;
   }
 
 }

@@ -1,6 +1,6 @@
 <div class="app-issue">
   <div class="app-content-header">
-    <span *ngIf="!idIssue" >{{ "newIssue" | translate }}</span>
+    <span *ngIf="!idIssue">{{ "newIssue" | translate }}</span>
     <span *ngIf="!!idIssue && issue">{{ issue.name }}</span>
   </div>
 
@@ -11,8 +11,7 @@
           <div class="form-group-name-trigged-by">
             <div class="p-field">
               <span class="p-float-label">
-                <input class="app-input-text" id="float-name" formControlName="name" type="text"
-                  pInputText />
+                <input class="app-input-text" id="float-name" formControlName="name" type="text" pInputText />
                 <label class="app-input-label" for="float-name">{{ "name" | translate }} * </label>
               </span>
               <app-input-message [form]="formIssue" field="name"></app-input-message>
@@ -20,7 +19,7 @@
             <div class="triggered-by-container" *ngIf="issue && issue.triggeredBy">
               <label class="label-triggered-by" for="float-triggeredBy">{{ "triggeredBy" | translate }}</label>
               <div class="triggered-by-name-container">
-                <i [ngClass]="[ 'app-icon', riskPropertiesOptions.status[issue?.triggeredBy?.status].icon,
+                <i [ngClass]="[ 'app-icon', riskPropertiesOptions.status[issue?.triggeredBy?.status].icon, 
                     riskPropertiesOptions.importance[issue?.triggeredBy?.importance].label]"></i>
                 <span class="risk-name">{{issue?.triggeredBy?.name}}</span>
               </div>
@@ -40,7 +39,8 @@
           </div>
           <div class="p-fluid">
             <div class="p-field nature-container">
-              <p-radioButton class="nature-radio" value="PROBLEM" formControlName="nature" [label]="'problem' |translate" groupname="nature-group">
+              <p-radioButton class="nature-radio" value="PROBLEM" formControlName="nature"
+                [label]="'problem' |translate" groupname="nature-group">
               </p-radioButton>
               <p-radioButton class="nature-radio" value="BENEFIT" formControlName="nature"
                 [label]="'benefit' |translate" groupname="nature-group"></p-radioButton>
@@ -59,10 +59,11 @@
             <div class="status-container">
               <label class="status-label">{{'status' |translate}}</label>
               <div class="p-field status-radios-container">
-                <p-radioButton class="status-radio" groupname="status-group" value="OPEN" formControlName="status" [label]="'open' |translate">
+                <p-radioButton class="status-radio" groupname="status-group" value="OPEN" formControlName="status"
+                  [label]="'open' |translate">
                 </p-radioButton>
-                <p-radioButton class="status-radio opportunity" groupname="status-group" value="CLOSED" formControlName="status"
-                  [label]="'closed' |translate"></p-radioButton>
+                <p-radioButton class="status-radio opportunity" groupname="status-group" value="CLOSED"
+                  formControlName="status" [label]="'closed' |translate"></p-radioButton>
               </div>
             </div>
           </div>
@@ -71,7 +72,8 @@
     </app-card>
   </div>
   <section>
-    <app-card [properties]="cardIssueResponsesProperties" *ngIf="cardIssueResponsesProperties" class="mt-0 inputs-float-label response-card">
+    <app-card [properties]="cardIssueResponsesProperties" *ngIf="cardIssueResponsesProperties"
+      class="mt-0 inputs-float-label response-card">
       <div class="card-item-responses-container">
         <p-dataView [value]="issueResponseCardItems" layout="grid" styleClass="dataview-card-items-issue"
           [emptyMessage]="'loadingEllipsis' | translate">
@@ -86,4 +88,3 @@
   </section>
   <app-save-button #saveButton (save)="saveIssue()"></app-save-button>
 </div>
-

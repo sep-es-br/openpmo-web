@@ -12,6 +12,7 @@ import { ResponsiveService } from 'src/app/shared/services/responsive.service';
 interface ICardItemRole {
   type: string;
   role?: IStakeholderRole;
+  readOnly?: boolean;
   personRoleOptions?: { label: string; value: string }[];
 }
 

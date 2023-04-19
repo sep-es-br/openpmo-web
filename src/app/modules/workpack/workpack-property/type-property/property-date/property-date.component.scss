@@ -1,5 +1,69 @@
 @use "src/variables" as v;
 
+::ng-deep .date-container {
+  display: flex;
+  flex-direction: row;
+  position: relative;
+  padding: .5rem 0;
+  width: 100%;
+  .p-float-label.workpack-date .app-select-date .p-calendar {
+    width: 100%;
+  }
+  .p-float-label.workpack-date {
+    width: 20% !important;
+  }
+  .milestone-date-delay {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    font-size: .8rem;
+    color: #333;
+
+    &.late { color: #EE6C6C; }
+    &.ontime { color: #309115; }
+
+  }
+  .milestone-date-container {
+    margin-left: 1.5rem;
+    margin-top: 1rem;
+    display: flex;
+    flex-direction: column;
+    .milestone-date-label {
+      font-size: 0.75rem;
+      color: #333;
+      font-style: italic;
+    }
+    .milestone-date-baseline {
+      font-size: 1rem;
+      color: #333;
+    }
+  }
+
+  @media screen and (max-width: 900px) {
+    flex-direction: column;
+    align-items: left;
+    .p-float-label.workpack-date .app-select-date .p-calendar {
+      width: 100%;
+    }
+    .p-float-label.workpack-date {
+      width: 100% !important;
+    }
+    .milestone-date-container {
+      margin-left: 0;
+      margin-top: 1rem;
+    }
+    .milestone-date-delay {
+      bottom: 3rem;
+    }
+  }
+}
+
+.container-date-reasons {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+}
+
 ::ng-deep .p-float-label.workpack-date {
   width: 100%;
   .app-select-date .p-calendar {

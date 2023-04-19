@@ -16,6 +16,11 @@
   }
 }
 
+.loading-container {
+  position: relative;
+  min-height: 150px;
+}
+
 .header-container.mobile {
   flex-direction: column;
   .app-content-header {
@@ -31,3 +36,9 @@
 ::ng-deep .admin-config .app-card-item .p-card .p-card-body {
   padding: 2rem 0 !important;
 }
+
+::ng-deep .admin-config .app-dataview-list .app-card-item .p-card .p-card-body {
+  padding: 0 !important;
+}
+
+

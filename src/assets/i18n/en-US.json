@@ -1,4 +1,18 @@
 {
+  "notFoundPlansToThisOffice": "This office has not plan models to create plans",
+  "newDate": "New date",
+  "previousDate": "Previous date",
+  "dateChanged": "Date Change",
+  "notFoundStakeholdersAndPermissions": "Not found stakeholder and permissions to this workpack",
+  "notFoundProcesses": "Not found processes to this workpack",
+  "notFoundIssues": "Not found issues to this workpack",
+  "notFoundRisks": "Not found risks to this workpack",
+  "notFoundCostAccounts": "Not found cost accounts to this workpack",
+  "notFoundWorkpacksToThisModel": "Not found workpacks to this model",
+  "noBaselines": "Not exists baselines in this project",
+  "noActiveBaselines": "Not exists baselines actives in this project",
+  "WBS": "WBS",
+  "noRecordsFound": "No records found",
   "viewMore": "View More",
   "back": "Back",
   "viewAll": "View All",
@@ -33,6 +47,11 @@
   "finish": "Finish",
   "office": "Office",
   "offices": "Offices",
+  "favorite": "Favorite",
+  "favorites": "Favorites",
+  "myFavorites": "My Favorites",
+  "addFavorite": "Add Favorite",
+  "removeFavorite": "Remove Favorite",
   "configurations": "Configurations",
   "portfolio": "Portfolio",
   "portfolios": "Portfolios",
@@ -379,10 +398,18 @@
     "proudlyFooterNotice": "Proudly produced and maintained by:",
     "licenseFooterNotice": "Distributed under the",
     "gpl3": "GNU General Public License Version 3",
+    "favoriteCantAccess": "Access denied. Remove from favorites?",
     "costAccounts": {
       "thereAreNotCostAccounts": "There are not cost accounts"
     },
     "error": {
+      "date": {
+        "is": {
+          "in": {
+            "future": "To complete a milestone, its date can't be in future "
+          }
+        }
+      },
       "generic": "We were unable to process your request",
       "unauthorized": "You do not have permission to access this functionality",
       "unauthorizedApplication": "You do not have permission to access this application.",

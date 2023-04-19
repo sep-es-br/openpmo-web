@@ -395,7 +395,7 @@ export class CostAccountComponent implements OnInit {
 
 
   checkProperties(property: PropertyTemplateModel) {
-    if (property.name == 'name') {
+    if (property.name === "name") {
       this.mirrorToFullName(property);
     }
     const arePropertiesRequiredValid: boolean = this.sectionCostAccountProperties

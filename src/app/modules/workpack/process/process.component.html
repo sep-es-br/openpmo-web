@@ -15,7 +15,7 @@
                 <span class="p-input-icon-right">
                   <i class="pi pi-search" *ngIf="!idProcess"></i>
                   <input type="text" pInputText class="app-input-text" formControlName="processNumber"
-                         (change)="debounceSearch.next($event)">
+                         (change)="debounceSearch.next()">
                 </span>
               </div>
             </div>

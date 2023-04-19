@@ -4,15 +4,17 @@
       <span class="text">{{ formProperties.controls.name.value }} </span>
       <span class="label">({{ ('labels.' + workpackModelType) | translate }})</span>
     </div>
-    <app-config-data-view-panel (changeCollapsedExpand)="handleChangeCollapseExpandPanel($event)"
-      (changeDisplayMode)="handleChangeDisplayMode($event)" (changePageSize)="handleChangePageSize($event)">
+    <app-config-data-view-panel>
     </app-config-data-view-panel>
   </div>
   <div class="app-content-header" *ngIf="!idWorkpackModel" [class.mobile]="isMobileView">
     <span class="label">{{ 'new' | translate }}</span>
     <span class="text">{{ ('labels.' + workpackModelType) | translate }}</span>
   </div>
-  <div class="card-properties card workpack-model">
+  <div class="loading-container" *ngIf="cardProperties?.isLoading">
+    <app-card-loading [isCardLoading]="cardProperties?.isLoading"></app-card-loading>
+  </div>
+  <div class="card-properties card workpack-model" *ngIf="!cardProperties?.isLoading">
     <app-card [properties]="cardProperties" *ngIf="cardProperties" class="mt-0 inputs-float-label">
       <div class="workpack-model-properties p-fluid" [formGroup]="formProperties">
         <span class="p-float-label property-input p-field">
@@ -44,8 +46,9 @@
           <label class="app-input-label" for="input-icon">{{ 'icon' | translate }} *</label>
         </span>
         <span class="p-float-label property-input p-field">
-          <p-dropdown class="app-single-selection" inputId="input-sort-by" (onClick)="getSortedByList()" (onChange)="propertyChanged($event);"
-            [autoDisplayFirst]="true" [options]="sortedByList" formControlName="sortedBy">
+          <p-dropdown class="app-single-selection" inputId="input-sort-by" (onClick)="getSortedByList()"
+            (onChange)="propertyChanged($event);" [autoDisplayFirst]="true" [options]="sortedByList"
+            formControlName="sortedBy">
           </p-dropdown>
           <label class="app-input-label" for="input-sort-by">{{ 'sortedBy' | translate }} *</label>
         </span>
@@ -56,7 +59,7 @@
           (click)="menuAddProperty.toggle($event)">
         </p-button>
         <p-button [label]="'addGroup' | translate" icon="fa fa-plus" iconPos="right" class="button-add-group"
-          (click)="addGroup('PROPERTIES')">
+          (click)="addGroup(propertySessionEnum.PROPERTIES)">
         </p-button>
       </div>
       <div class="workpack-model-addicional-properties">
@@ -102,6 +105,7 @@
         <div class="dashboard-show-options app-input-chips">
           <label class="app-input-label">{{'showStakeholders'|translate}}</label>
           <p-multiSelect [options]="dashboardPanel.dashboardStakeholderRolesOptions" optionLabel="label"
+            [selectedItemsLabel]="currentLang === 'pt-BR' ? '{0} itens selecionados' : '{0} items selected'"
             (ngModelChange)="checkProperties()" optionValue="value"
             [(ngModel)]="dashboardPanel.dashboardShowStakeholders" display="chip">
           </p-multiSelect>
@@ -166,10 +170,13 @@
   </ng-container>
 
   <div class="card models">
-    <app-card [properties]="cardPropertiesModels"
-      *ngIf="cardPropertiesModels && (editPermission || !!cardItemsModels.length)">
+    <app-card [properties]="cardPropertiesModels" *ngIf="cardPropertiesModels && idWorkpackModel">
+      <div class="loading-container" *ngIf="isLoading">
+        <app-card-loading [isCardLoading]="isLoading"></app-card-loading>
+      </div>
       <p-dataView [value]="cardItemsModels" layout="grid" class="app-dataview"
-        [emptyMessage]="'loadingEllipsis' | translate" *ngIf="idWorkpackModel && displayModeAll === 'grid' || (displayModeAll === 'list' && !!responsive)"
+        [emptyMessage]="'loadingEllipsis' | translate"
+        *ngIf="(idWorkpackModel && displayModeAll === 'grid' || (displayModeAll === 'list' && !!isMobileView)) && !isLoading"
         [paginator]="true" [rows]="pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false"
         [totalRecords]="totalRecords">
         <ng-template let-cardItem pTemplate="gridItem">
@@ -180,8 +187,8 @@
         </ng-template>
       </p-dataView>
       <p-dataView [value]="cardItemsModels" layout="list" class="app-dataview app-dataview-list"
-        *ngIf="idWorkpackModel && displayModeAll === 'list' && !responsive" [paginator]="true" [rows]="pageSize"
-        [showJumpToPageDropdown]="true" [showPageLinks]="false" [totalRecords]="totalRecords"
+        *ngIf="(idWorkpackModel && displayModeAll === 'list' && !isMobileView) && !isLoading" [paginator]="true"
+        [rows]="pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false" [totalRecords]="totalRecords"
         [emptyMessage]="'loadingEllipsis' | translate">
         <ng-template let-cardItem pTemplate="listItem">
           <div class="p-col-12">

@@ -33,6 +33,10 @@ export interface IScheduleDetail {
 export interface IGroupStep {
   year: number;
   steps: IStep[];
+  actual?: number;
+  actualCost?: number;
+  planed?: number;
+  planedCost?: number;
 }
 
 export interface IStep {

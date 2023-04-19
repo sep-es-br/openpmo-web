@@ -3,7 +3,7 @@ import { Location } from '@angular/common';
 import { Component, ElementRef, EventEmitter, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import { MenuItem } from 'primeng/api';
+import { ConfirmationService, MenuItem } from 'primeng/api';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
@@ -18,6 +18,8 @@ import { PlanService } from 'src/app/shared/services/plan.service';
 import { ResponsiveService } from 'src/app/shared/services/responsive.service';
 import { TranslateChangeService } from 'src/app/shared/services/translate-change.service';
 import * as moment from 'moment';
+import { WorkpackService } from 'src/app/shared/services/workpack.service';
+import { IMenuFavorites } from '../../shared/interfaces/IMenu';
 
 @Component({
   selector: 'app-menu-fixed',
@@ -33,6 +35,7 @@ export class MenuFixedComponent implements OnInit, OnDestroy {
     { label: 'office', isOpen: false },
     { label: 'portfolio', isOpen: false },
     { label: 'planModel', isOpen: false },
+    { label: 'favorite', isOpen: false },
     { label: 'user', isOpen: false },
     { label: 'more', isOpen: false }
   ];
@@ -42,6 +45,7 @@ export class MenuFixedComponent implements OnInit, OnDestroy {
   items: MenuItem[] = [];
   itemsOfficeUnchanged: MenuItem[] = [];
   itemsOffice: MenuItem[] = [];
+  itemsFavorites: IMenuFavorites[] = [];
   itemsPlanModel: MenuItem[] = [];
   itemsPorfolio: PlanMenuItem[] = [];
   itemsPorfolioFiltered: PlanMenuItem[] = [];
@@ -69,7 +73,9 @@ export class MenuFixedComponent implements OnInit, OnDestroy {
     private officeSrv: OfficeService,
     private officePermissionSrv: OfficePermissionService,
     private planSrv: PlanService,
-    private cookieSrv: CookieService
+    private cookieSrv: CookieService,
+    private workpackSrv: WorkpackService,
+    private confirmationSrv: ConfirmationService
   ) {
     this.menuSrv.getMenuState.pipe(takeUntil(this.$destroy)).subscribe(menuState => {
       this.isFixed = menuState.isFixed;
@@ -81,6 +87,9 @@ export class MenuFixedComponent implements OnInit, OnDestroy {
       if (this.menus[1].isOpen) {
         this.itemsPorfolio = [...menuState.itemsPorfolio];
         this.refreshPortfolioMenu();
+      }
+      if (this.menus[3].isOpen) {
+        this.itemsFavorites = [...menuState.itemsFavorites];
       }
     });
     this.translateChangeSrv.getCurrentLang()
@@ -95,6 +104,18 @@ export class MenuFixedComponent implements OnInit, OnDestroy {
         this.loadOfficeMenu();
       }
     });
+
+    this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(responsive => {
+      this.isChangingView = true;
+      this.isMobileView = responsive;
+      if (responsive) {
+        this.handleChangeMenuMode();
+      }
+      setTimeout(() => {
+        this.isChangingView = false;
+      }, 250);
+    });
+
     this.officeSrv.observableIdOffice().pipe(takeUntil(this.$destroy)).subscribe(async id => {
       this.currentIDOffice = id;
       await this.loadPlanModelMenu();
@@ -106,10 +127,12 @@ export class MenuFixedComponent implements OnInit, OnDestroy {
       }
       await this.loadPropertiesPlan();
       await this.loadPortfolioMenu();
+      await this.loadFavoritesMenu();
       this.refreshPortfolioMenu();
     });
     this.menuSrv.obsReloadMenuOffice().pipe(takeUntil(this.$destroy)).subscribe(() => this.loadOfficeMenu());
     this.menuSrv.obsReloadMenuPortfolio().pipe(takeUntil(this.$destroy)).subscribe(() => this.loadPortfolioMenu());
+    this.menuSrv.obsReloadMenuFavorite().pipe(takeUntil(this.$destroy)).subscribe(() => this.loadFavoritesMenu());
     this.menuSrv.obsReloadMenuPlanModel().pipe(takeUntil(this.$destroy)).subscribe(() => !this.isFixed && this.loadPlanModelMenu());
     this.menuSrv.isAdminMenu.pipe(takeUntil(this.$destroy)).subscribe(isAdminMenu => {
       this.isAdminMenu = isAdminMenu;
@@ -121,13 +144,6 @@ export class MenuFixedComponent implements OnInit, OnDestroy {
     this.menuSrv.isPlanMenu.pipe(takeUntil(this.$destroy)).subscribe(isPlanMenu => {
       this.isPlanMenu = isPlanMenu;
       this.refreshPortfolioMenu();
-    });
-    this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(responsive => {
-      this.isChangingView = true;
-      this.isMobileView = responsive;
-      setTimeout(() => {
-        this.isChangingView = false;
-      }, 250);
     });
     this.locationSrv.onUrlChange(url => {
       if (!!this.isFixed) {
@@ -162,7 +178,10 @@ export class MenuFixedComponent implements OnInit, OnDestroy {
     this.setCookieMenuMode();
     const itemsOffice = this.menus[0].isOpen ? this.itemsOffice : [];
     const itemsPortfolio = this.menus[1].isOpen ? this.itemsPorfolio : [];
-    this.menuSrv.nextMenuState({ isFixed: this.isFixed, menus: this.menus, itemsOffice, itemsPorfolio: itemsPortfolio });
+    const itemsFavorites = this.menus[3].isOpen ? this.itemsFavorites : [];
+    this.menuSrv.nextMenuState(
+      { isFixed: this.isFixed, menus: this.menus, itemsOffice, itemsPorfolio: itemsPortfolio, itemsFavorites }
+      );
     this.ngOnDestroy();
   }
 
@@ -282,6 +301,54 @@ export class MenuFixedComponent implements OnInit, OnDestroy {
     const [path, queries] = url.split('?');
     return queries ? Number((queries.split('id=')[1] || queries.split('idOffice=')[1])?.split('&')[0]) : 0;
   }
+
+  async loadFavoritesMenu() {
+    if (this.currentIDPlan) {
+      const { success, data } = await this.workpackSrv.getItemsFavorites(this.currentIDPlan);
+      if (success) {
+        this.itemsFavorites = data.map(item => ({
+          label: item.name,
+          icon: item.icon,
+          styleClass: `workpack-${item.id} ${this.currentURL === `workpack?id=${item.id}` ? 'active' : ''}`,
+          routerLink: { path: 'workpack', queryParams: { id: item.id, idPlan: this.currentIDPlan }},
+          id: item.id,
+          idPlan: this.currentIDPlan,
+          canAccess: item.canAccess,
+        }));
+      }
+    }
+    return;
+  }
+
+  handleNavigateFavorite(item: IMenuFavorites) {
+    if (!item.canAccess) {
+      this.confirmationSrv.confirm({
+        message: this.translateSrv.instant('messages.favoriteCantAccess'),
+        header: this.translateSrv.instant('attention'),
+        icon: 'pi pi-exclamation-triangle',
+        acceptLabel: this.translateSrv.instant('primeng.accept'),
+        rejectLabel: this.translateSrv.instant('primeng.reject'),
+        accept: () => {
+          this.handleRemoveFavorite(item.id);
+        }
+      });
+      return;
+    }
+
+    this.router.navigate([item.routerLink?.path], { queryParams: item.routerLink?.queryParams });
+    this.closeAllMenus();
+  }
+  async handleRemoveFavorite(id: number) {
+    if (!id || !this.currentIDPlan) {
+      return;
+    }
+    const { success } = await this.workpackSrv.patchToggleWorkpackFavorite(id, this.currentIDPlan);
+    if (success) {
+      await this.loadFavoritesMenu();
+      this.menuSrv.nextRemovedFavorited(id);
+    }
+  }
+
 
   async loadPortfolioMenu() {
     if (this.currentIDOffice) {

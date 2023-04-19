@@ -47,7 +47,8 @@
         ],
         "no-shadow": "off",
         "eqeqeq": "off",
-        "no-debugger": "off"
+        "no-debugger": "off",
+        "@angular-eslint/no-output-on-prefix": "off"
       }
     },
     {

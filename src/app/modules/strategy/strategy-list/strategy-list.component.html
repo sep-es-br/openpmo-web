@@ -3,33 +3,36 @@
     <div class="app-content-header" [class.mobile]="responsive">
       <span>{{ 'planModels'|translate }}</span>
     </div>
-    <app-config-data-view-panel [notShowCollapseOptions]="true"
-      (changeDisplayMode)="handleChangeDisplayMode($event)" (changePageSize)="handleChangePageSize($event)">
+    <app-config-data-view-panel [notShowCollapseOptions]="true">
     </app-config-data-view-panel>
   </div>
   <div class="card-container" *ngIf="cardProperties">
     <app-card [properties]="cardProperties" class="mt-0" (editFilter)="handleEditFilter($event)"
-      (newFilter)="handleNewFilter()" (selectedFilter)="handleSelectedFilter($event)" (createNewElement)="handleCreateNewEstrategy()">
-      <p-dataView [value]="cardItemsProperties" layout="grid" class="app-dataview" *ngIf="displayModeAll === 'grid' || (displayModeAll === 'list' && !!responsive)"
-        [paginator]="true" [rows]="pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false"
-        [totalRecords]="totalRecords"
-        [emptyMessage]="(editPermission !== false ? 'loadingEllipsis' : 'noContent') | translate">
-        <ng-template let-cardItem pTemplate="gridItem">
-          <div class="p-col-12 p-sm-12 p-md-4 p-lg-3 card-item-container">
-            <app-card-item [properties]="cardItem"></app-card-item>
-          </div>
-        </ng-template>
-      </p-dataView>
-      <p-dataView [value]="cardItemsProperties" layout="list" class="app-dataview app-dataview-list"
-        *ngIf="displayModeAll === 'list' && !responsive" [paginator]="true" [rows]="pageSize" [showJumpToPageDropdown]="true"
-        [showPageLinks]="false" [totalRecords]="totalRecords"
-        [emptyMessage]="(editPermission !== false ? 'loadingEllipsis' : 'noContent') | translate">
-        <ng-template let-cardItem pTemplate="listItem">
-          <div class="p-col-12">
-            <app-card-item [properties]="cardItem" [displayModeCard]="displayModeAll"></app-card-item>
-          </div>
-        </ng-template>
-      </p-dataView>
+      (newFilter)="handleNewFilter()" (selectedFilter)="handleSelectedFilter($event)"
+      (createNewElement)="handleCreateNewEstrategy()">
+      <div class="loading-container" *ngIf="isLoading">
+        <app-card-loading [isCardLoading]="isLoading"></app-card-loading>
+      </div>
+      <p-dataView [value]="cardItemsProperties" layout="grid" class="app-dataview"
+          *ngIf="(displayModeAll === 'grid' || (displayModeAll === 'list' && !!responsive)) && !isLoading" [paginator]="true"
+          [rows]="pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false" [totalRecords]="totalRecords"
+          [emptyMessage]="(editPermission !== false ? 'loadingEllipsis' : 'noContent') | translate">
+          <ng-template let-cardItem pTemplate="gridItem">
+            <div class="p-col-12 p-sm-12 p-md-4 p-lg-3 card-item-container">
+              <app-card-item [properties]="cardItem"></app-card-item>
+            </div>
+          </ng-template>
+        </p-dataView>
+        <p-dataView [value]="cardItemsProperties" layout="list" class="app-dataview app-dataview-list"
+          *ngIf="displayModeAll === 'list' && !responsive && !isLoading" [paginator]="true" [rows]="pageSize"
+          [showJumpToPageDropdown]="true" [showPageLinks]="false" [totalRecords]="totalRecords"
+          [emptyMessage]="(editPermission !== false ? 'loadingEllipsis' : 'noContent') | translate">
+          <ng-template let-cardItem pTemplate="listItem">
+            <div class="p-col-12">
+              <app-card-item [properties]="cardItem" [displayModeCard]="displayModeAll"></app-card-item>
+            </div>
+          </ng-template>
+        </p-dataView>
     </app-card>
   </div>
 </div>

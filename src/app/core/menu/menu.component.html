@@ -31,6 +31,12 @@
         <div class="item-label" [routerLink]="['/plan']" [queryParams]="{id: currentPlan?.id}">{{
           currentPlan?.name }}</div>
       </div>
+      <div class="item" (click)="toggleMenu('favorite')"
+        *ngIf="itemsFavorites?.length > 0 && !!currentIDOffice && !!currentIDPlan && isPlanMenu"
+        [pTooltip]="'myFavorites' | translate">
+        <i class="far fa-star" [ngStyle]="{ fontSize: '2.25rem' }"></i>
+        <div class="item-label">{{ 'myFavorites' | translate }}</div>
+      </div>
       <div class="item" *ngIf="currentUserInfo?.isCcbMember" [routerLink]="['/ccbmember-baselines-view']"
         [pTooltip]="'changeControlBoard' | translate">
         <i class="app-icon ccb-view" [ngStyle]="{ fontSize: '2.25rem' }"></i>
@@ -50,6 +56,11 @@
       <i class="app-icon briefcase" [ngStyle]="{ fontSize: '1.5rem' }"></i>
       <div class="item-label" *ngIf="isMobileView" [routerLink]="['/plan']" [queryParams]="{id: currentPlan?.id}">{{
         currentPlan?.name }}</div>
+    </div>
+       <div class="item" (click)="toggleMenu('favorite')"
+       *ngIf="itemsFavorites?.length > 0 && !!currentIDOffice && !!currentIDPlan && isPlanMenu"
+      [pTooltip]="'myFavorites' | translate">
+      <i class="far fa-star" [ngStyle]="{ fontSize: '2.25rem' }"></i>
     </div>
     <div class="item" *ngIf="currentUserInfo?.isCcbMember" [routerLink]="['/ccbmember-baselines-view']"
       [pTooltip]="'changeControlBoard' | translate">
@@ -138,6 +149,70 @@
             </div>
           </div>
           <p-panelMenu [model]="itemsOffice"></p-panelMenu>
+        </div>
+      </ng-template>
+      <ng-template>
+        <div class="menu-layout-splitter" (click)="closeAllMenus()"></div>
+      </ng-template>
+    </p-splitter>
+  </ng-template>
+</div>
+<div class="app-menu-slide" [class.open]="isMenuOpen('favorite')" [class.mobile]="isMobileView"
+  [class.changing]="isChangingView">
+  <ng-container *ngIf="isMobileView; else sliderFavorites">
+    <div class="top-bar">
+      <div class="title" (click)="closeAllMenus()">{{ (isAdminMenu ? 'favorites' : 'myFavorites') | translate }}
+      </div>
+    </div>
+    <div class="f-panelmenu">
+      <div class="f-panelmenu-item" [class]="item.styleClass" *ngFor="let item of itemsFavorites">
+        <div class="f-panelmenu-container" (click)="handleNavigateFavorite(item)">
+          <div class="f-panelmenu-icon">
+            <i [class]="item.icon"></i>
+          </div>
+          <div class="f-panelmenu-label">
+            <span>{{item.label}}</span>
+          </div>
+        </div>
+        <div class="f-panelmenu-trash">
+          <i class="fas fa-trash-alt" (click)="handleRemoveFavorite(item.id)"
+            [pTooltip]="'removeFavorite' | translate"></i>
+        </div>
+      </div>
+    </div>
+    <div class="action-mobile">
+      <i class="app-icon angle-down" [ngStyle]="{ fontSize: '1rem' }" (click)="closeAllMenus()"></i>
+    </div>
+  </ng-container>
+  <ng-template #sliderFavorites>
+    <p-splitter [panelSizes]="[20,80]" [minSizes]="[20, 0]">
+      <ng-template>
+        <div class="slide-wrapper">
+          <div class="top-bar">
+            <div class="title" (click)="closeAllMenus()">{{ (isAdminMenu ? 'favorites' : 'myFavorites') | translate
+              }}</div>
+            <div class="action" *ngIf="!isMobileView">
+              <i [class]="isFixed ? 'app-icon pin-on' : 'app-icon pin-off'" [ngStyle]="{ fontSize: '1rem' }"
+                (click)="handleChangeMenuMode()"></i>
+            </div>
+          </div>
+          <!-- Custom Panel Menu -->
+          <div class="f-panelmenu">
+            <div class="f-panelmenu-item" [class]="item.styleClass" *ngFor="let item of itemsFavorites">
+              <div class="f-panelmenu-container" (click)="handleNavigateFavorite(item)">
+              <div class="f-panelmenu-icon">
+                  <i [class]="item.icon"></i>
+                </div>
+                <div class="f-panelmenu-label">
+                  <span>{{item.label}}</span>
+                </div>
+              </div>
+              <div class="f-panelmenu-trash">
+                <i class="fas fa-trash-alt" (click)="handleRemoveFavorite(item.id)"
+                  [pTooltip]="'removeFavorite' | translate"></i>
+              </div>
+            </div>
+          </div>
         </div>
       </ng-template>
       <ng-template>
@@ -279,3 +354,5 @@
     <i class="app-icon angle-down" [ngStyle]="{ fontSize: '1rem' }" (click)="toggleMenu('more')"></i>
   </div>
 </div>
+
+<p-confirmDialog [style]="{width: '50vw'}" [baseZIndex]="10000" rejectButtonStyleClass="p-button-text"></p-confirmDialog>

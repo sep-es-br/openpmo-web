@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { takeUntil } from 'rxjs/operators';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ResponsiveService } from 'src/app/shared/services/responsive.service';
 import { ICardItemPermission } from 'src/app/shared/interfaces/ICardItemPermission';
 import { TranslateService } from '@ngx-translate/core';
@@ -9,13 +10,15 @@ import { AuthService } from 'src/app/shared/services/auth.service';
 import { MessageService } from 'primeng/api';
 import { PersonService } from 'src/app/shared/services/person.service';
 import { Router } from '@angular/router';
+import { ConfigDataViewService } from 'src/app/shared/services/config-dataview.service';
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'app-administrator-list',
   templateUrl: './administrator-list.component.html',
   styleUrls: ['./administrator-list.component.scss']
 })
-export class AdministratorListComponent implements OnInit {
+export class AdministratorListComponent implements OnInit, OnDestroy {
 
   responsive: boolean;
   administrators: IPerson[];
@@ -33,6 +36,8 @@ export class AdministratorListComponent implements OnInit {
   currentUserInfo: IPerson;
   idFilterSelected: number;
   idCurrentPerson: number;
+  isLoading = false;
+  $destroy = new Subject();
 
   constructor(
     private responsiveSrv: ResponsiveService,
@@ -42,10 +47,16 @@ export class AdministratorListComponent implements OnInit {
     private personSrv: PersonService,
     private messageSrv: MessageService,
     private router: Router,
-
+    private configDataViewSrv: ConfigDataViewService
   ) {
-    this.responsiveSrv.observable.subscribe(value => {
+    this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => {
       this.responsive = value;
+    });
+    this.configDataViewSrv.observableDisplayModeAll.pipe(takeUntil(this.$destroy)).subscribe(displayMode => {
+      this.displayModeAll = displayMode;
+    });
+    this.configDataViewSrv.observablePageSize.pipe(takeUntil(this.$destroy)).subscribe(pageSize => {
+      this.pageSize = pageSize;
     });
   }
 
@@ -59,16 +70,23 @@ export class AdministratorListComponent implements OnInit {
     this.loadBreadcrump();
   }
 
+  ngOnDestroy(): void {
+      this.$destroy.complete();
+      this.$destroy.unsubscribe();
+  }
+
   async loadCurrentUserInfo() {
     this.idCurrentPerson = Number(this.authSrv.getIdPerson());
   }
 
 
   async loadAdministrators() {
+    this.isLoading = true;
     const result = await this.personSrv.getPersonsAdministrators();
     if (result.success) {
       this.administrators = result.data;
       this.loadCardItemsAdministrators();
+      this.isLoading = false;
     }
   }
 
@@ -108,15 +126,6 @@ export class AdministratorListComponent implements OnInit {
       }
     ]);
   }
-
-  handleChangeDisplayMode(event) {
-    this.displayModeAll = event.displayMode;
-  }
-
-  handleChangePageSize(event) {
-    this.pageSize = event.pageSize;
-  }
-
 
   async handleCreateNewOfficePermission() {
     await this.router.navigate(['/administrators/administrator']);

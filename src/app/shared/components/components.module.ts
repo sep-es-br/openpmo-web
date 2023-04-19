@@ -19,6 +19,8 @@ import { WorkpackCardItemComponent } from './workpack-card-item/workpack-card-it
 import { CostConstraintComponent } from './dashboards/cost-constraint/cost-constraint.component';
 import { ScheduleConstraintComponent } from './dashboards/schedule-constraint/schedule-constraint.component';
 import { ScopeConstraintComponent } from './dashboards/scope-constraint/scope-constraint.component';
+import { TabviewScrolledComponent } from './tabview-scrolled/tabview-scrolled.component';
+import { CardLoadingComponent } from './card-loading/card-loading.component';
 
 @NgModule({
   declarations: [
@@ -38,6 +40,8 @@ import { ScopeConstraintComponent } from './dashboards/scope-constraint/scope-co
     CostConstraintComponent,
     ScheduleConstraintComponent,
     ScopeConstraintComponent,
+    TabviewScrolledComponent,
+    CardLoadingComponent,
   ],
   imports: [
     CommonModule,
@@ -62,7 +66,9 @@ import { ScopeConstraintComponent } from './dashboards/scope-constraint/scope-co
     WorkpackCardItemComponent,
     CostConstraintComponent,
     ScheduleConstraintComponent,
-    ScopeConstraintComponent
+    ScopeConstraintComponent,
+    TabviewScrolledComponent,
+    CardLoadingComponent
   ]
 })
 export class ComponentsModule { }

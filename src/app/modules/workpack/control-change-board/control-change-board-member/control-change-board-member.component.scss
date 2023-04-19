@@ -2,8 +2,9 @@
 
 .app-control-change-board-member {
   width: 100%;
-  .app-content-header {
-
+  .loading-container {
+    position: relative;
+    min-height: 150px;
   }
   .card-person {
     width: 100%;
@@ -201,15 +202,6 @@
       .responsive {
         width: 100%;
       }
-      .loading-container {
-        padding: 1em 0;
-        .fa-hourglass-half {
-          font-size: 1.3rem;
-          color: #9ea4a5;
-          margin-right: 0.5em;
-        }
-      }
-
       .form {
         padding: 1em 0;
         .person-name-container {

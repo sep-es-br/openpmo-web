@@ -1,37 +1,42 @@
 <div class="app-office-list-container">
   <div class="app-office-list">
-    <app-config-data-view-panel
-      (changeDisplayMode)="handleChangeDisplayMode($event)" (changePageSize)="handleChangePageSize($event)" [notShowCollapseOptions]="true">
+    <app-config-data-view-panel [notShowCollapseOptions]="true">
     </app-config-data-view-panel>
     <div class="card-container">
-      <app-card [properties]="cardProperties" class="mt-0" (editFilter)="handleEditFilter($event)" *ngIf="cardProperties.showFilters"
-        (newFilter)="handleNewFilter()" (selectedFilter)="handleSelectedFilter($event)"
-        (createNewElement)="handleCreateNewOffice()">
-        <p-dataView [value]="cardItemsProperties" layout="grid" class="app-dataview" *ngIf="displayModeAll === 'grid' || (displayModeAll === 'list' && !!responsive)"
-          [paginator]="true" [rows]="pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false"
-          [totalRecords]="totalRecords"
-          [emptyMessage]="(!cardItemsProperties ? 'loadingEllipsis' : 'noContent') | translate">
-          <ng-template let-cardItem pTemplate="gridItem">
-            <div class="p-col-12 p-md-3 p-sm-12 card-item-container">
-              <app-card-item-office [properties]="cardItem" (deleteOffice)="deleteOffice($event)"></app-card-item-office>
-            </div>
-          </ng-template>
-        </p-dataView>
-  
-        <p-dataView [value]="cardItemsProperties" layout="list" class="app-dataview app-dataview-list"
-          *ngIf="displayModeAll === 'list' && !responsive" [paginator]="true" [rows]="pageSize" [showJumpToPageDropdown]="true"
-          [showPageLinks]="false" [totalRecords]="totalRecords"
-          [emptyMessage]="(!cardItemsProperties ? 'loadingEllipsis' : 'noContent') | translate">
-          <ng-template let-cardItem pTemplate="listItem">
-            <div class="p-col-12">
-              <app-card-item-office [properties]="cardItem" [displayModeCard]="displayModeAll" (deleteOffice)="deleteOffice($event)"></app-card-item-office>
-            </div>
-          </ng-template>
-        </p-dataView>
+      <app-card [properties]="cardProperties" class="mt-0" (editFilter)="handleEditFilter($event)"
+        *ngIf="cardProperties.showFilters" (newFilter)="handleNewFilter()"
+        (selectedFilter)="handleSelectedFilter($event)" (createNewElement)="handleCreateNewOffice()">
+        <div class="office-list-items-container">
+          <app-card-loading [isCardLoading]="isLoading"></app-card-loading>
+          <p-dataView [value]="cardItemsProperties" layout="grid" class="app-dataview"
+            *ngIf="(displayModeAll === 'grid' || (displayModeAll === 'list' && !!responsive)) && !isLoading"
+            [paginator]="true" [rows]="pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false"
+            [totalRecords]="totalRecords"
+            [emptyMessage]="(!cardItemsProperties ? 'loadingEllipsis' : 'noContent') | translate">
+            <ng-template let-cardItem pTemplate="gridItem">
+              <div class="p-col-12 p-md-3 p-sm-12 card-item-container">
+                <app-card-item-office [properties]="cardItem"
+                  (deleteOffice)="deleteOffice($event)"></app-card-item-office>
+              </div>
+            </ng-template>
+          </p-dataView>
+          <p-dataView [value]="cardItemsProperties" layout="list" class="app-dataview app-dataview-list"
+            *ngIf="(displayModeAll === 'list' && !responsive) && !isLoading" [paginator]="true" [rows]="pageSize"
+            [showJumpToPageDropdown]="true" [showPageLinks]="false" [totalRecords]="totalRecords"
+            [emptyMessage]="(!cardItemsProperties ? 'loadingEllipsis' : 'noContent') | translate">
+            <ng-template let-cardItem pTemplate="listItem">
+              <div class="p-col-12">
+                <app-card-item-office [properties]="cardItem" [displayModeCard]="displayModeAll"
+                  (deleteOffice)="deleteOffice($event)"></app-card-item-office>
+              </div>
+            </ng-template>
+          </p-dataView>
+        </div>
       </app-card>
     </div>
   </div>
-  <div class="user-cookies-confirmation" *ngIf="!!showCookiesPermissionMessage" @enterLeave [class.responsive]="responsive">
+  <div class="user-cookies-confirmation" *ngIf="!!showCookiesPermissionMessage" @enterLeave
+    [class.responsive]="responsive">
     <p>{{'messages.cookies-confirmation'|translate}}</p>
     <div class="cookies-buttons-actions">
       <p-button class="accept-button" [label]="'accept'|translate" (click)="handleSetCookiesPermission()"></p-button>

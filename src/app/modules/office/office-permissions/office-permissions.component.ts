@@ -59,6 +59,7 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
   citizenUserNotFoundByCpf = false;
   showListBoxPublicServers = false;
   showMessagePublicServerNotFoundByName = false;
+  isLoadingCitizen = false;
   isLoading = false;
 
   constructor(
@@ -170,8 +171,8 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
       const result = await this.officePermissionsSrv.GetAll({key: this.key, 'id-office': this.idOffice});
       if (result.success) {
         this.permission = result.data[0];
+        this.isLoading = false;
       }
-      this.isLoading = false;
       if (this.permission) {
         this.person = {
           id: this.permission.person.id,
@@ -288,12 +289,12 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
     if (this.person) {
       this.person = undefined;
     }
-    this.isLoading = true;
+    this.isLoadingCitizen = true;
     const result = await this.citizenUserSrv.GetPublicServersByName({
       name: this.searchedNameUser,
       idOffice: this.idOffice
     });
-    this.isLoading = false;
+    this.isLoadingCitizen = false;
     if (result.success) {
       this.publicServersResult = result.data;
       this.showListBoxPublicServers = this.publicServersResult.length > 0;
@@ -316,13 +317,13 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
     this.citizenUserNotFoundByCpf = false;
     this.validCpf = cpfValidator(this.searchedCpfUser);
     if (this.validCpf) {
-      this.isLoading = true;
+      this.isLoadingCitizen = true;
       const result = await this.citizenUserSrv.GetCitizenUserByCpf({
         cpf: this.searchedCpfUser,
         idOffice: this.idOffice,
         loadWorkLocation: false
       });
-      this.isLoading = false;
+      this.isLoadingCitizen = false;
       if (result.success) {
         this.person = result.data;
         this.loadNewPermission();
@@ -334,13 +335,13 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
 
   async handleSelectedPublicServer(event) {
     this.showListBoxPublicServers = false;
-    this.isLoading = true;
+    this.isLoadingCitizen = true;
     const publicServer = event.value;
     const result = await this.citizenUserSrv.GetPublicServer(publicServer.sub, {
       idOffice: this.idOffice,
       loadWorkLocation: false
     });
-    this.isLoading = false;
+    this.isLoadingCitizen = false;
     if (result.success) {
       this.person = result.data;
       this.searchedNameUser = '';

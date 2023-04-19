@@ -31,10 +31,10 @@
       [class.responsive]="responsive">
       <i class="fas fa-times" (click)="handleChangeFullScreen(false)"></i>
     </div>
-    <div class="header-title-check-completed" [class.responsive]="responsive" *ngIf="properties.showCheckCompleted">
+    <div class="header-title-check-completed" [class.responsive]="responsive" *ngIf="!!properties.showCheckCompleted">
       <label>{{label|translate}}</label>
       <p-checkbox [(ngModel)]="properties.workpackCompleted" [binary]="true" 
-        [disabled]="properties.workpackCanceled || !properties.canEditCheckCompleted"
+        [disabled]="properties.workpackCanceled || !canEditCheckCompleted"
         (ngModelChange)="handleChangeCheckCompleted($event)"></p-checkbox>
     </div>
     <div class="header-values-cost-account" *ngIf="properties.progressBarValues" [class.responsive]="responsive">
@@ -66,8 +66,8 @@
                 </div>
               </div>
               <div class="new-filter" *ngIf="filter.value === -1 && filter.label !== 'divider'"
-                (onClick)="handleNewFilter(filter.value)">
-                <div class="label-new-filter" (click)="handleNewFilter(filter.value)">{{filter.label}}</div>
+                (onClick)="handleNewFilter()">
+                <div class="label-new-filter" (click)="handleNewFilter()">{{filter.label}}</div>
               </div>
             </ng-template>
           </p-dropdown>

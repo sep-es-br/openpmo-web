@@ -1,0 +1,94 @@
+<div class="app-workpack-section-schedule" *ngIf="sectionSchedule">
+  <app-card [properties]="sectionSchedule.cardSection" [class.panel-tab-view]="showTabview">
+    <button type="button" class="p-button-text button-new-schedule" *ngIf="!schedule && !!editPermission && !sectionSchedule.cardSection.isLoading"
+      (click)="handleNewSchedule()" pButton icon="pi pi-plus" iconPos="left"
+      [label]="translateSrv.instant('newSchedule')" [disabled]="!editPermission">
+    </button>
+    <div class="schedule-buttons" *ngIf="schedule && !sectionSchedule.cardSection.isLoading" [class.schedule-buttons-mobile]="responsive">
+      <button type="button" class="p-button-text button-details" (click)="handleShowDetails()" pButton
+        [icon]="showDetails ? 'far fa-eye-slash' : 'far fa-eye'" iconPos="left"
+        [label]="showDetails ? translateSrv.instant('hideDetails') : translateSrv.instant('showDetails')">
+      </button>
+      <button type="button" class="p-button-text button-delete" (click)="handleDeleteSchedule()" pButton
+        [disabled]="!editPermission" icon="fas fa-trash-alt" iconPos="left"
+        [label]="translateSrv.instant('deleteSchedule')">
+      </button>
+    </div>
+    <div class="loading-container" *ngIf="sectionSchedule.cardSection.isLoading">
+      <app-card-loading [isCardLoading]="sectionSchedule.cardSection.isLoading" ></app-card-loading>
+    </div>
+    <div class="schedule-steps-section" *ngIf="sectionSchedule && sectionSchedule.groupStep">
+      <div class="schedule-steps-container" *ngFor="let groupStep of sectionSchedule.groupStep"
+        [class.schedule-steps-container-mobile]="responsive">
+        <div class="data-view-steps-container">
+          <div class="group-header-container">
+            <span class="group-step-year">{{groupStep.year}}</span>
+            <div class="group-progress-bar-container">
+              <div class="progress-bar-container" *ngFor="let progressBar of groupStep.groupProgressBar">
+                <app-progress-bar-schedule-year [class.progress-bar-mobile]="responsive" [total]="progressBar.total"
+                  [progress]="progressBar.progress" [labelTotal]="progressBar.labelTotal"
+                  [labelProgress]="progressBar.labelProgress" [valueUnit]="progressBar.valueUnit"
+                  [color]="progressBar.color">
+                </app-progress-bar-schedule-year>
+              </div>
+            </div>
+          </div>
+          <p-dataView [value]="groupStep.cardItemSection" layout="grid" styleClass="dataview-step-card-items"
+            *ngIf="showDetails; else showResumed" [emptyMessage]="'loadingEllipsis' | translate">
+            <ng-template let-step pTemplate="gridItem">
+              <div class="card-item-container show-details" *ngIf="['newStart', 'newEnd'].includes(step.type)"
+                [class.new-card-item]="['newStart', 'newEnd'].includes(step.type)" [class.mobile]="responsive"
+                [routerLink]="['/workpack' , 'schedule', 'step' ]" [queryParams]="{
+                  idSchedule: schedule.id,
+                  idWorkpackModelLinked: workpackParams.idWorkpackModelLinked,
+                  stepType: step.type,
+                  unitName: step.unitName,
+                  unitPrecision: step.unitPrecision
+                }">
+                <app-schedule-step-card-item [properties]="step" [type]="'listStep'"
+                  (stepChanged)="saveStepChanged(groupStep.year, step.idStep)"></app-schedule-step-card-item>
+              </div>
+              <div class="card-item-container show-details" *ngIf="step.type === 'listStep'"
+                [class.new-card-item]="['newStart', 'newEnd'].includes(step.type)" [class.mobile]="responsive">
+                <app-schedule-step-card-item [properties]="step" [type]="'listStep'"
+                  (stepChanged)="saveStepChanged(groupStep.year, step.idStep)"></app-schedule-step-card-item>
+              </div>
+            </ng-template>
+          </p-dataView>
+          <ng-template #showResumed>
+            <p-dataView [value]="groupStep.cardItemSection" layout="grid" styleClass="dataview-step-card-items"
+              [emptyMessage]="'loadingEllipsis' | translate">
+              <ng-template let-step pTemplate="gridItem">
+                <div class="card-item-container show-resumed clickable" *ngIf="step.type === 'listStep'"
+                  [class.new-card-item]="['newStart', 'newEnd'].includes(step.type)" [class.mobile]="responsive"
+                  [routerLink]="['/workpack' , 'schedule', 'step' ]" [queryParams]="{
+                      id: step.idStep,
+                      idWorkpackModelLinked: workpackParams.idWorkpackModelLinked,
+                      stepType: step.stepOrder,
+                      unitName: step.unitName,
+                      unitPrecision: step.unitPrecision
+                    }">
+                  <app-schedule-step-card-item [properties]="step" [type]="'listStepResumed'">
+                  </app-schedule-step-card-item>
+                </div>
+                <div class="card-item-container show-resumed clickable"
+                  *ngIf="['newStart', 'newEnd'].includes(step.type)"
+                  [class.new-card-item]="['newStart', 'newEnd'].includes(step.type)" [class.mobile]="responsive"
+                  [routerLink]="['/workpack' , 'schedule', 'step' ]" [queryParams]="{
+                      idSchedule: schedule.id,
+                      idWorkpackModelLinked: workpackParams.idWorkpackModelLinked,
+                      stepType: step.stepOrder,
+                      unitName: step.unitName,
+                      unitPrecision: step.unitPrecision
+                    }">
+                  <app-schedule-step-card-item [properties]="step" [type]="'listStepResumed'">
+                  </app-schedule-step-card-item>
+                </div>
+              </ng-template>
+            </p-dataView>
+          </ng-template>
+        </div>
+      </div>
+    </div>
+  </app-card>
+</div>

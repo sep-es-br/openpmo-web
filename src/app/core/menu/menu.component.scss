@@ -23,6 +23,13 @@ $mobileMenuHeight: 90px;
       height: 2rem;
     }
   }
+  .icon-delete-favorite {
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-color: red;
+  }
+
   .item {
     color: #eeeeee;
     font-size: 1.5rem;
@@ -37,6 +44,7 @@ $mobileMenuHeight: 90px;
       font-size: 1rem;
       max-width: 95%;
       overflow: hidden;
+      white-space: nowrap;
       text-overflow: ellipsis;
     }
     &:hover {
@@ -45,10 +53,10 @@ $mobileMenuHeight: 90px;
   }
 
   .offices {
-    color: #ffffff59!important;
+  color: #ffffff59!important;
   }
 
-  .app-icon {
+  .app-icon, .far.fa-star {
     color: #ffffff;
   }
 
@@ -471,6 +479,63 @@ $mobileMenuHeight: 90px;
     &.admin-menu {
       app-icon svg {
         fill: v.$bgMenuAdmin;
+      }
+    }
+  }
+}
+
+.f-panelmenu {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  font-size: 1rem;
+  .f-panelmenu-item {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    width: 100%;
+    padding: 0 1rem;
+    color: #333333;
+    background-color: #00000019 !important;
+    .f-panelmenu-trash {
+      margin-left: auto;
+      cursor: pointer;
+      font-size: .7rem;
+      i {
+        padding: .25rem;
+        border-radius: 50%;
+        transition: all .3s;
+        &:hover {
+          background-color: #E3E3E3;
+        }
+      }
+    }
+    .f-panelmenu-container {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: flex-start;
+      width: 100%;
+      padding: 1rem 0;
+      cursor: pointer;
+      transition: all .3s;
+      &:first-of-type { border-radius: 3px 3px 0 0; }
+      &:last-of-type { border-radius: 0 0 3px 3px; }
+      &:hover {
+        color: #495057;
+      }
+      .f-panelmenu-icon i {
+          font-size: 1.3rem;
+          margin-right: 0.5em;
+      }
+      .f-panelmenu-label {
+        font-family: "Montserrat Medium", "Montserrat Regular", "Montserrat", sans-serif;
+        font-size: 1rem;
+        font-weight: 500;
+        max-width: 95%;
+        overflow: hidden;
+        text-overflow: ellipsis;
       }
     }
   }

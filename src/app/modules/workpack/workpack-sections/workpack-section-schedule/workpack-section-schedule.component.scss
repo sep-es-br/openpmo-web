@@ -1,0 +1,155 @@
+@use "src/variables" as v;
+
+::ng-deep .app-workpack-section-schedule {
+  .loading-container {
+    position: relative;
+    min-height: 150px;
+  }
+    .p-panel-content {
+      padding-bottom: 15px !important;
+    }
+    .button-new-schedule {
+      background: #44B39B;
+      color: #ffffff;
+      font-size: 0.8rem;
+      font-family: v.$fontFamilyMedium;
+      margin-bottom: 1em;
+      &:hover {
+        background: #13bc75 !important;
+        color: #ffffff !important;
+      }
+    }
+    .schedule-buttons {
+      display: flex;
+      flex-direction: row;
+      .button-details {
+        margin-right: 2em;
+        width: 180px;
+        background: rgba(22, 155, 213, 0.9);
+        color: #ffffff;
+        font-size: 0.8rem;
+        font-family: v.$fontFamilyMedium;
+        &:hover {
+          background: rgba(22, 155, 213, 1);
+        }
+      }
+      .button-delete {
+        width: 180px;
+        background: rgba(255,106,106, 0.9);
+        color: #ffffff;
+        font-size: 0.8rem;
+        font-family: v.$fontFamilyMedium;
+        &:hover {
+          background: rgba(255,106,106, 1);
+        }
+      }
+    }
+    .schedule-buttons.schedule-buttons-mobile {
+      flex-direction: column;
+      width: 100%;
+      .p-button-text {
+        width: 100%;
+        font-size: 0.6rem ;
+        margin-top: 0.5em;
+      }
+      .button-delete {
+        margin-top: 1em;
+      }
+    }
+    .schedule-steps-section {
+      padding-top: 1em;
+    }
+    .schedule-steps-container {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      margin-top: 1em;
+      padding: 1em;
+      background-color: #FFFFFF;
+      .new-start-step-container, .new-end-step-container {
+        width: 5%;
+        margin-top: 0.5em;
+      }
+      .new-start-step-container {
+        margin-top: 1.5625em;
+      }
+      .new-end-step-container {
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        padding-bottom: 1em;
+      }
+      .data-view-steps-container {
+        width: 100%;
+        .group-header-container {
+          width: 100%;
+          display: flex;
+          flex-direction: row;
+          justify-content: space-between;
+          .group-progress-bar-container {
+            display: flex;
+            flex-direction: row;
+            justify-content: flex-end;
+            .progress-bar-container {
+              margin-left: 1.5em;
+            }
+          }
+        }
+        .group-step-year {
+          font-size: 1.25rem;
+          font-family: v.$fontFamilyMedium;
+          color: v.$fontInput;
+        }
+      }
+      .dataview-step-card-items {
+        padding-top: 1em;
+        position: static !important;
+        background-color: transparent;
+        .p-dataview-content, .p-grid {
+          background-color: transparent;
+        }
+        .card-item-container {
+          padding: 0.5em;
+        }
+      }
+    }
+    .schedule-steps-container-mobile {
+      display: flex;
+      align-items: center;
+      flex-direction: column;
+      .new-start-step-container, .new-end-step-container {
+        width: 20%;
+        margin-top: 0.5em;
+      }
+      .new-end-step-container {
+        display: flex;
+        width: 20%;
+        flex-direction: row;
+        justify-content: center;
+        padding-bottom: 1em;
+        .new-end-card-mobile {
+          width: 100%;
+        }
+      }
+      .data-view-steps-container {
+        width: 100%;
+        .group-step-year {
+          font-size: 1.25rem;
+          font-family: v.$fontFamilyMedium;
+          color: v.$fontInput;
+        }
+        .group-header-container {
+          flex-direction: column;
+          .group-progress-bar-container {
+            flex-direction: column;
+            margin-top: 0.5em;
+            .progress-bar-container {
+              margin-left: 0;
+              margin-top: 0.5em;
+            }
+          }
+        }
+      }
+      
+    }
+}

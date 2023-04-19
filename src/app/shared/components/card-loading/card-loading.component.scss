@@ -1,0 +1,51 @@
+@use "src/variables" as v;
+
+::ng-deep .app-card-loading {
+  position: absolute;
+  background: v.$bgCard;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: -webkit-fill-available;
+  width: -webkit-fill-available;
+  left: 0;
+  top: 0;
+  text-align: center;
+
+  .custom-spinner .p-progress-spinner-circle {
+    animation: custom-progress-spinner-dash 1.5s ease-in-out infinite, custom-progress-spinner-color 6s ease-in-out infinite;
+  }
+}
+
+
+@keyframes custom-progress-spinner-color {
+  100%,
+  0% {
+      stroke: rgba(0, 70, 96, 1);
+  }
+  40% {
+      stroke: #489FB5;
+  }
+  66% {
+      stroke: #82C0CC;
+  }
+  80%,
+  90% {
+      stroke: #FFA62B;
+  }
+}
+
+@keyframes custom-progress-spinner-dash {
+  0% {
+      stroke-dasharray: 1, 200;
+      stroke-dashoffset: 0;
+  }
+  50% {
+      stroke-dasharray: 89, 200;
+      stroke-dashoffset: -35px;
+  }
+  100% {
+      stroke-dasharray: 89, 200;
+      stroke-dashoffset: -124px;
+  }
+}

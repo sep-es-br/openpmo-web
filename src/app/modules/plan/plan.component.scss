@@ -10,6 +10,11 @@
     }
   }
 
+  .loading-container {
+    position: relative;
+    min-height: 150px;
+  }
+
   .header-container {
     display: flex;
     flex-direction: row;

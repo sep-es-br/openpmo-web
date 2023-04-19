@@ -245,6 +245,7 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
   }
 
   async loadStakeholder() {
+    this.loadCards();
     if (this.idPerson) {
       const result = await this.stakeholderSrv.GetStakeholderPerson({
         'id-workpack': this.idWorkpack,
@@ -254,10 +255,12 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
       if (result.success) {
         this.stakeholder = result.data;
         this.person = this.stakeholder?.person;
+        this.cardPerson.isLoading = false;
         this.loadCardPermissions();
       }
+    } else {
+      this.cardPerson.isLoading = false;
     }
-    this.loadCards();
     this.setStakeholderForm();
   }
 
@@ -340,12 +343,14 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
       initialStateToggle: false,
       cardTitle: 'person',
       collapseble: true,
+      isLoading: true,
       initialStateCollapse: false
     };
     this.cardRoles = {
       toggleable: false,
       initialStateToggle: false,
       cardTitle: 'roles',
+      isLoading: true,
       collapseble: true,
       initialStateCollapse: false
     };

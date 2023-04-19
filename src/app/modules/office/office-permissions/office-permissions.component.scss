@@ -3,6 +3,11 @@
 .app-office-permission-detail {
   width: 100%;
 
+  .loading-container {
+    position: relative;
+    min-height: 150px;
+  }
+
   .card-permission {
     width: 100%;
     .person-properties {

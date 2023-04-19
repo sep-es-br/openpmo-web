@@ -108,7 +108,7 @@ export class FilterRuleCardItemComponent implements OnInit {
       this.propertySelected.possibleValues = (!this.idWorkpackModel || (!!this.idWorkpackModel && this.workpackModelEntitiesOptions.includes(this.entityName))) ?
         this.filterRuleCard.propertySelected.possibleValues.map(item => ({
           ...item,
-          label: this.translateSrv.instant(item.value)
+          label: this.translateSrv.instant(item.label)
         })) : this.filterRuleCard.propertySelected.possibleValues;
     }
     this.setDefaultValue();

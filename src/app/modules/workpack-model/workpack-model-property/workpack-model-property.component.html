@@ -35,15 +35,16 @@
         <label class="input-label">{{ 'sortIndex' | translate }}</label>
       </span>
       <span class="p-float-label property-input app-input-chips p-field" *ngIf="property.type === 'SelectionModel'">
-        <p-chips inputStyleClass="app-input-text" [(ngModel)]="property.possibleValues" [required]="true"
+        <p-chips inputStyleClass="app-input-text" [(ngModel)]="property.possibleValuesOptions" [required]="true"
           [allowDuplicate]="false" (ngModelChange)="changed.emit($event)" [disabled]="property.viewOnly" separator=","
           (onRemove)="checkIfRemovedValueIsDefault($event)"
-          [class.p-inputwrapper-filled]="property.possibleValues && property.possibleValues.length > 0"></p-chips>
+          [class.p-inputwrapper-filled]="property.possibleValuesOptions && property.possibleValuesOptions.length > 0"></p-chips>
         <label class="input-label">{{ 'possibleValues' | translate }} *</label>
       </span>
       <span class="p-float-label workpack-selection p-field" *ngIf="property.type === 'LocalitySelectionModel'">
         <ng-container *ngIf="false; else singleDomainSelection">
           <p-multiSelect class="app-multiple-selection" dropdownIcon="fas fa-caret-down" [options]="property.list"
+            [selectedItemsLabel]="language === 'pt-BR' ? '{0} itens selecionados' : '{0} items selected'"
             [(ngModel)]="property.idDomain" optionLabel="label" [required]="true" [disabled]="property.viewOnly"
             (ngModelChange)="changed.emit({ property: property })"></p-multiSelect>
         </ng-container>
@@ -91,14 +92,15 @@
         <span *ngSwitchCase="'SelectionModel'" class="p-float-label property-input p-field">
           <ng-container *ngIf="property.multipleSelection; else singleSelectionDefault">
             <p-multiSelect class="app-multiple-selection" dropdownIcon="fas fa-caret-down"
-              [options]="property.possibleValues | toSelectItem" [(ngModel)]="property.defaultValue"
-              [disabled]="!property.possibleValues?.length || property.viewOnly" [required]="true"
+              [options]="property.possibleValuesOptions | toSelectItem" [(ngModel)]="property.defaultValue"
+              [selectedItemsLabel]="language === 'pt-BR' ? '{0} itens selecionados' : '{0} items selected'"
+              [disabled]="!property.possibleValuesOptions?.length || property.viewOnly" [required]="true"
               (ngModelChange)="changed.emit($event)"></p-multiSelect>
           </ng-container>
           <ng-template #singleSelectionDefault>
-            <p-dropdown class="app-single-selection" [options]="property.possibleValues | toSelectItem"
+            <p-dropdown class="app-single-selection" [options]="property.possibleValuesOptions | toSelectItem"
               [(ngModel)]="property.defaultValue" dropdownIcon="fas fa-caret-down"
-              [disabled]="!property.possibleValues?.length || property.viewOnly" [autoDisplayFirst]="false"
+              [disabled]="!property.possibleValuesOptions?.length || property.viewOnly" [autoDisplayFirst]="false"
               [required]="true" (ngModelChange)="changed.emit($event)"></p-dropdown>
           </ng-template>
           <label class="input-label">{{ 'defaultValue' | translate }}</label>
@@ -117,6 +119,7 @@
         <span *ngSwitchCase="'OrganizationSelectionModel'" class="p-float-label property-input p-field">
           <ng-container *ngIf="property.multipleSelection; else singleOrganizationDefault">
             <p-multiSelect class="app-multiple-selection" dropdownIcon="fas fa-caret-down" [options]="property.list"
+              [selectedItemsLabel]="language === 'pt-BR' ? '{0} itens selecionados' : '{0} items selected'"
               [(ngModel)]="property.defaults" [disabled]="property.viewOnly" [required]="true"
               (ngModelChange)="changed.emit($event)"></p-multiSelect>
           </ng-container>
@@ -137,43 +140,44 @@
           <ng-template pTemplate>
             <ng-container *ngIf="property.multipleSelection; else singleLocalitySelection">
               <div class="app-tree-selection">
-                <p-tree [value]="property.extraList" selectionMode="checkbox"
-                  [propagateSelectionUp]="false" [propagateSelectionDown]="false"
-                  [(selection)]="property.extraListDefaults" (onNodeSelect)="handleNodeSelect($event, property)"
+                <p-tree [value]="property.extraList" selectionMode="checkbox" [propagateSelectionUp]="false"
+                  [propagateSelectionDown]="false" [(selection)]="property.extraListDefaults"
+                  (onNodeSelect)="handleNodeSelect($event, property)"
                   (onNodeUnselect)="handleNodeUnselect($event, property)"></p-tree>
               </div>
             </ng-container>
             <ng-template #singleLocalitySelection>
               <div class="app-tree-selection">
                 <p-tree [value]="property.extraList" selectionMode="single" [(selection)]="property.extraListDefaults"
-                   (onNodeSelect)="handleNodeSelect($event, property)"
+                  (onNodeSelect)="handleNodeSelect($event, property)"
                   (onNodeUnselect)="handleNodeUnselect($event, property)"></p-tree>
               </div>
             </ng-template>
           </ng-template>
         </p-overlayPanel>
         <span *ngSwitchCase="'DateModel'" class="p-float-label property-input p-field input-date-default-value">
-          <p-calendar [(ngModel)]="property.defaultValue" class="app-select-date" showIcon="true"
+          <p-calendar [(ngModel)]="property.defaultValue" class="app-select-date" [showIcon]="true"
             [disabled]="property.viewOnly" icon="fas fa-calendar-alt" [dateFormat]="calendarFormat"
-            [monthNavigator]="true" [yearNavigator]="true" [yearRange]="yearRange" (ngModelChange)="changed.emit($event)">
+            [monthNavigator]="true" [yearNavigator]="true" [yearRange]="yearRange"
+            (ngModelChange)="changed.emit($event)">
           </p-calendar>
           <label class="input-label">{{ 'defaultValue' | translate }}</label>
         </span>
       </ng-container>
       <!-- /Default Value -->
       <span class="property-checkbox p-field-checkbox">
-        <p-checkbox class="app-checkbox" [(ngModel)]="property.fullLine" binary="true"
+        <p-checkbox class="app-checkbox" [(ngModel)]="property.fullLine" [binary]="true"
           (ngModelChange)="changed.emit($event)" [disabled]="property.viewOnly"></p-checkbox>
         <label class="input-label">{{ 'fullLine' | translate }}</label>
       </span>
       <span class="property-checkbox p-field-checkbox" *ngIf="property.type !== 'ToggleModel'">
-        <p-checkbox class="app-checkbox" [(ngModel)]="property.required" binary="true"
+        <p-checkbox class="app-checkbox" [(ngModel)]="property.required" [binary]="true"
           (ngModelChange)="changed.emit($event)" [disabled]="property.viewOnly || property.obligatory"></p-checkbox>
         <label class="input-label">{{ 'required' | translate }}</label>
       </span>
       <span class="property-checkbox p-field-checkbox"
         *ngIf="[ 'SelectionModel', 'LocalitySelectionModel', 'OrganizationSelectionModel' ].includes(property.type)">
-        <p-checkbox class="app-checkbox" [(ngModel)]="property.multipleSelection" binary="true"
+        <p-checkbox class="app-checkbox" [(ngModel)]="property.multipleSelection" [binary]="true"
           [disabled]="property.viewOnly" [required]="true"
           (ngModelChange)="changed.emit({property: property, multipleSelectedChanged: true}); checkDefaultValue();">
         </p-checkbox>

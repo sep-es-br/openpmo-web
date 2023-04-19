@@ -3,6 +3,11 @@
 ::ng-deep .app-stakeholder-person {
   width: 100%;
 
+  .loading-container {
+    position: relative;
+    min-height: 150px;
+  }
+
   .app-stakeholder-header {
     padding: 0.5em 0;
     font-size: 0.9rem;
@@ -302,16 +307,6 @@
           font-family: v.$fontFamilyMedium;
           font-weight: bold;
         }
-      }
-    }
-
-    .loading-container {
-      padding: 1em 0;
-
-      .fa-hourglass-half {
-        font-size: 1.3rem;
-        color: #9ea4a5;
-        margin-right: 0.5em;
       }
     }
 

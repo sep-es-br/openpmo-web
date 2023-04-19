@@ -39,6 +39,11 @@ export const iconsJournal = {
     background: '#44b39b',
     color: '#fff'
   },
+  DATE_CHANGED: {
+    icon: 'fas fa-calendar-alt',
+    background: '#44b39b',
+    color: '#fff'
+  },
 }
 
 

@@ -3,6 +3,7 @@ import { TreeNode } from 'primeng/api';
 import { TypePropertyModelEnum } from '../enums/TypePropertyModelEnum';
 import { IProperty } from '../interfaces/IProperty';
 import { IWorkpackProperty } from '../interfaces/IWorkpackProperty';
+import { IMilestonePropertyData } from '../interfaces/IMilestonePropertyData';
 
 export class PropertyTemplateModel implements IProperty {
   id?: number;
@@ -18,8 +19,8 @@ export class PropertyTemplateModel implements IProperty {
   sortIndex?: number;
   defaultValue?: number | string | boolean | string[] | number[] | Date;
   defaults?: number | number[];
-  min?: number | string;
-  max?: number | string;
+  min?: number;
+  max?: number;
   possibleValues?: { label: string; value: string }[];
   possibleValuesIds?: { label: string; value: number }[];
   multipleSelection?: boolean;
@@ -36,6 +37,9 @@ export class PropertyTemplateModel implements IProperty {
   invalid?: boolean;
   message?: string;
   groupedProperties?: PropertyTemplateModel[];
+  milestoneData?: IMilestonePropertyData;
+  reason?: string;
+  needReason?: boolean;
 
   dirty = false;
 
@@ -49,7 +53,8 @@ export class PropertyTemplateModel implements IProperty {
       selectedValues,
       multipleSelection,
       localitiesSelected,
-      idDomain
+      idDomain,
+      reason
     } = this;
     const property: IWorkpackProperty = {
       id,
@@ -59,6 +64,7 @@ export class PropertyTemplateModel implements IProperty {
     switch (this.type) {
       case TypePropertyModelEnum.DateModel:
         property.value = value as Date;
+        property.reason = reason;
         break;
       case TypePropertyModelEnum.SelectionModel:
         const selectedOptions = multipleSelection && value as string[];

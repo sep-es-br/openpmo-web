@@ -59,7 +59,7 @@ export class ScheduleComponent implements OnInit, OnDestroy {
   schedule: ISchedule;
   costs: ICost[];
   cardCostAssignmentsProperties: ICard;
-  costAssignmentsCardItems: ICartItemCostAssignment[];
+  costAssignmentsCardItems: ICartItemCostAssignment[] = [];
   menuItemsCostAccounts: MenuItem[];
   costAssignmentsTotals = { plannedTotal: 0, actualTotal: 0 };
   $destroy = new Subject();
@@ -173,6 +173,10 @@ export class ScheduleComponent implements OnInit, OnDestroy {
   }
 
   loadCostAssignmentSession() {
+    if (!this.menuItemsCostAccounts || this.menuItemsCostAccounts.length === 0) {
+      this.costAssignmentsCardItems = [];
+      return;
+    }
     this.cardCostAssignmentsProperties = {
       toggleable: false,
       initialStateToggle: false,
@@ -313,7 +317,6 @@ export class ScheduleComponent implements OnInit, OnDestroy {
           this.saveButton?.showButton();
         }
       } else {
-
       }
     } else {
       this.saveButton?.hideButton();
@@ -345,7 +348,7 @@ export class ScheduleComponent implements OnInit, OnDestroy {
           this.saveButton?.showButton();
         }
       } else {
-        this.saveButton?.hideButton();
+        this.saveButton?.showButton();
       }
     } else {
       this.saveButton?.hideButton();
@@ -382,7 +385,7 @@ export class ScheduleComponent implements OnInit, OnDestroy {
           this.saveButton?.showButton();
         }
       } else {
-        this.saveButton?.hideButton();
+        this.saveButton?.showButton();
       }
     } else {
       this.saveButton?.hideButton();

@@ -45,3 +45,16 @@ export interface IMenuPlanModel {
   fullName: string;
   workpackModels: IMenuWorkpackModel[];
 }
+
+export interface IMenuFavorites {
+  id: number;
+  label: string;
+  icon: string;
+  routerLink?: {
+    path: string;
+    queryParams?: any;
+  };
+  canAccess: boolean;
+  idPlan?: number;
+  styleClass?: string;
+}

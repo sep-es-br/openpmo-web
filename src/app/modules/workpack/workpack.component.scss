@@ -15,7 +15,22 @@
     .card-processes,
     .card-journal {
       display: none;
-    }    
+    }
+  }
+
+  .loading-container {
+    position: relative;
+    min-height: 150px;
+  }
+
+
+  .tabview-container {
+    background-color: transparent;
+    .panel-tab-view {
+      .p-panel {
+        margin-top: 0 !important;
+      }
+    }
   }
 
   .header-container {
@@ -35,29 +50,18 @@
     width: 100%;
   }
 
+  .icon-favorite {
+    color: #959595;
+    font-size: 1.5rem;
+    margin-top: 3px;
+    cursor: pointer;
+    &.icon-favorite-checked {
+      color: #ffa000;
+    }
+  }
+
   .card-properties-workpack{
     width: 100%;
-    .properties-container {
-      display: flex;
-      flex-wrap: wrap;
-      .property-container {
-        margin-right: 1em;
-      }
-      .fullLine {
-        width: 100%;
-      }
-      .not-fullLine {
-        width: 20%;
-      }
-    }
-    .properties-container.responsive {
-      display: flex;
-      flex-direction: column;
-      .property-container {
-        margin-right: 0;
-        width: 100%;
-      }
-    }
   }
   .p-paginator {
     background: transparent;
@@ -87,46 +91,7 @@
       font-family: v.$fontFamilyMedium;
     }
   }
-  .card-stakeholders {
-    .input-toggle-stakeholder {
-      display: flex;
-      align-items: center;
-      padding: 0.5em 0;
-      margin-bottom: 1em;
-      .input-label {
-        font-size: 1rem;
-        color: v.$fontLabel;
-        margin-left: 5px;
-        font-family: v.$fontFamilyMedium;
-      }
-    }
-    .dataview-card-items {
-      position: static !important;
-      background-color: transparent;
-      .p-dataview-content, .p-grid {
-        background-color: transparent;
-      }
-      .card-item-container {
-        padding: 0.5em;
-      }
-      .p-paginator {
-        background: transparent;
-        .p-dropdown:not(.disabled).p-focus {
-          box-shadow: none;
-          border-color: #6c757d;
-        }
-        .p-dropdown:not(.disabled):hover {
-          border-color: #6c757d;
-        }
-        .p-dropdown-panel .p-dropdown-items .p-dropdown-item.p-highlight {
-          background: #e9ecef;
-        }
-      }
-      .p-dataview .p-paginator-bottom {
-        border: none;
-      }
-    }
-  }
+
   .card-workpack-model {
     .dataview-card-items {
       position: static !important;
@@ -155,177 +120,7 @@
       }
     }
   }
-  .card-baselines {
-    .input-toggle-baseline {
-      display: flex;
-      align-items: center;
-      padding: 0.5em 0;
-      margin-bottom: 1em;
-      .input-label {
-        font-size: 1rem;
-        color: v.$fontLabel;
-        margin-left: 5px;
-        font-family: v.$fontFamilyMedium;
-      }
-    }
-  }
-  .card-risks {
-    .input-toggle-risk {
-      display: flex;
-      align-items: center;
-      padding: 0.5em 0;
-      margin-bottom: 1em;
-      .input-label {
-        font-size: 1rem;
-        color: v.$fontLabel;
-        margin-left: 5px;
-        font-family: v.$fontFamilyMedium;
-      }
-    }
-  }
-  .card-issues {
-    .input-toggle-issue {
-      display: flex;
-      align-items: center;
-      padding: 0.5em 0;
-      margin-bottom: 1em;
-      .input-label {
-        font-size: 1rem;
-        color: v.$fontLabel;
-        margin-left: 5px;
-        font-family: v.$fontFamilyMedium;
-      }
-    }
-  }
-  .card-cost-account .card-item-container app-card-item.inherited {
-    .p-card {
-      background-color: transparent !important;
-     .card-item-header .p-button {
-        visibility: hidden;
-      }
-    }
-  }
-
-  .card-schedule {
-    .p-panel-content {
-      padding-bottom: 15px !important;
-    }
-    .button-new-schedule {
-      background: #44B39B;
-      color: #ffffff;
-      font-size: 0.8rem;
-      font-family: v.$fontFamilyMedium;
-      &:hover {
-        background: #13bc75;
-        color: #ffffff;
-      }
-    }
-    .schedule-buttons {
-      display: flex;
-      flex-direction: row;
-      .button-details {
-        margin-right: 2em;
-        width: 180px;
-        background: rgba(22, 155, 213, 0.9);
-        color: #ffffff;
-        font-size: 0.8rem;
-        font-family: v.$fontFamilyMedium;
-        &:hover {
-          background: rgba(22, 155, 213, 1);
-        }
-      }
-      .button-delete {
-        width: 180px;
-        background: rgba(255,106,106, 0.9);
-        color: #ffffff;
-        font-size: 0.8rem;
-        font-family: v.$fontFamilyMedium;
-        &:hover {
-          background: rgba(255,106,106, 1);
-        }
-      }
-    }
-    .schedule-buttons.schedule-buttons-mobile {
-      flex-direction: column;
-      width: 100%;
-      .p-button-text {
-        width: 100%;
-        font-size: 0.6rem ;
-        margin-top: 0.5em;
-      }
-      .button-delete {
-        margin-top: 1em;
-      }
-    }
-    .schedule-steps-section {
-      padding-top: 1em;
-    }
-    .schedule-steps-container {
-      width: 100%;
-      height: 100%;
-      display: flex;
-      margin-top: 1em;
-      .new-start-step-container, .new-end-step-container {
-        width: 5%;
-        margin-top: 0.5em;
-      }
-      .new-start-step-container {
-        margin-top: 1.5625em;
-      }
-      .new-end-step-container {
-        display: flex;
-        flex-direction: column;
-        justify-content: flex-end;
-        padding-bottom: 1em;
-      }
-      .data-view-steps-container {
-        width: 100%;
-        .group-step-year {
-          font-size: 1.25rem;
-          font-family: v.$fontFamilyMedium;
-          color: v.$fontInput;
-        }
-      }
-      .dataview-step-card-items {
-        padding-top: 1em;
-        position: static !important;
-        background-color: transparent;
-        .p-dataview-content, .p-grid {
-          background-color: transparent;
-        }
-        .card-item-container {
-          padding: 0.5em;
-        }
-      }
-    }
-    .schedule-steps-container-mobile {
-      display: flex;
-      align-items: center;
-      flex-direction: column;
-      .new-start-step-container, .new-end-step-container {
-        width: 20%;
-        margin-top: 0.5em;
-      }
-      .new-end-step-container {
-        display: flex;
-        width: 20%;
-        flex-direction: row;
-        justify-content: center;
-        padding-bottom: 1em;
-        .new-end-card-mobile {
-          width: 100%;
-        }
-      }
-      .data-view-steps-container {
-        width: 100%;
-        .group-step-year {
-          font-size: 1.25rem;
-          font-family: v.$fontFamilyMedium;
-          color: v.$fontInput;
-        }
-      }
-    }
-  }
+  
 }
 
 ::ng-deep .app-workpack {
@@ -482,13 +277,4 @@
   }
 }
 
-.input-message-error {
-  color: white;
-  background: #f44336;
-  padding: 4px 8px;
-  display: inline-flex;
-  margin-top: 2px;
-  border-radius: 5px;
-  font-size: 0.7rem;
-  font-family: v.$fontFamilyMedium;
-}
+

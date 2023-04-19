@@ -68,7 +68,7 @@ export class StepComponent implements OnInit, OnDestroy {
   costs: ICost[];
   cardCostAssignmentsProperties: ICard;
   costAccounts: ICostAccount[];
-  costAssignmentsCardItems: ICartItemCostAssignment[];
+  costAssignmentsCardItems: ICartItemCostAssignment[] = [];
   showSaveButton = false;
   menuItemsCostAccounts: MenuItem[];
   costAssignmentsTotals = { plannedTotal: 0, actualTotal: 0 };
@@ -288,6 +288,9 @@ export class StepComponent implements OnInit, OnDestroy {
   }
 
   loadCostAssignmentSession() {
+    if (!this.menuItemsCostAccounts || this.menuItemsCostAccounts.length === 0) {
+      return;
+    }
     this.cardCostAssignmentsProperties = {
       toggleable: false,
       initialStateToggle: false,
@@ -329,6 +332,9 @@ export class StepComponent implements OnInit, OnDestroy {
         type: 'new-cost-card',
         menuItemsNewCost: this.menuItemsCostAccounts
       }];
+    }
+    if (!this.menuItemsCostAccounts ||  this.menuItemsCostAccounts.length === 0) {
+      this.cardCostAssignmentsProperties = undefined;
     }
   }
 
@@ -455,6 +461,7 @@ export class StepComponent implements OnInit, OnDestroy {
         this.reloadCostAssignmentTotals();
         this.showSaveButton = true;
       }
+      this.showSaveButton = true;
     }
   }
 
@@ -464,6 +471,7 @@ export class StepComponent implements OnInit, OnDestroy {
         this.reloadCostAssignmentTotals();
         this.showSaveButton = true;
       }
+      this.showSaveButton = true;
     }
   }
 
@@ -494,7 +502,7 @@ export class StepComponent implements OnInit, OnDestroy {
         (this.onlyOneStep && this.step && this.step?.id ? end : null),
       scheduleStart: (this.stepType === 'start' || this.stepType === 'newStart') ? start :
         (this.onlyOneStep && this.step && this.step?.id ? start : null),
-      consumes: this.costAssignmentsCardItems.filter(card => card.type === 'cost-card').map(cost => ({
+      consumes: this.costAssignmentsCardItems && this.costAssignmentsCardItems.filter(card => card.type === 'cost-card').map(cost => ({
         id: cost.idCostAssignment && cost.idCostAssignment,
         idCostAccount: cost.idCost,
         plannedCost: cost.plannedWork,

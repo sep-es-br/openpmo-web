@@ -1,7 +1,8 @@
+import { takeUntil } from 'rxjs/operators';
 import { IFilterProperty } from 'src/app/shared/interfaces/IFilterProperty';
 import { PropertyTemplateModel } from './../../../shared/models/PropertyTemplateModel';
 import { FilterDataviewPropertiesEntity } from 'src/app/shared/constants/filterDataviewPropertiesEntity';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { MenuItem } from 'primeng/api';
@@ -18,13 +19,15 @@ import { OfficePermissionService } from 'src/app/shared/services/office-permissi
 import { OfficeService } from 'src/app/shared/services/office.service';
 import { PlanModelService } from 'src/app/shared/services/plan-model.service';
 import { ResponsiveService } from 'src/app/shared/services/responsive.service';
+import { ConfigDataViewService } from 'src/app/shared/services/config-dataview.service';
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'app-strategy-list',
   templateUrl: './strategy-list.component.html',
   styleUrls: ['./strategy-list.component.scss']
 })
-export class StrategyListComponent implements OnInit {
+export class StrategyListComponent implements OnInit, OnDestroy {
 
   cardProperties: ICard = {
     toggleable: false,
@@ -45,6 +48,8 @@ export class StrategyListComponent implements OnInit {
   totalRecords: number;
   idFilterSelected: number;
   sharedPlanModels: IPlanModel[];
+  $destroy = new Subject();
+  isLoading = false;
 
   constructor(
     private planModelSvr: PlanModelService,
@@ -56,19 +61,27 @@ export class StrategyListComponent implements OnInit {
     private officePermissionSrv: OfficePermissionService,
     private responsiveSrv: ResponsiveService,
     private filterSrv: FilterDataviewService,
-    private router: Router
+    private router: Router,
+    private configDataViewSrv: ConfigDataViewService
   ) {
+    this.configDataViewSrv.observableDisplayModeAll.pipe(takeUntil(this.$destroy)).subscribe(displayMode => {
+      this.displayModeAll = displayMode;
+    });
+    this.configDataViewSrv.observablePageSize.pipe(takeUntil(this.$destroy)).subscribe(pageSize => {
+      this.pageSize = pageSize;
+    });
     this.activeRoute.queryParams.subscribe(async ({ idOffice }) => {
       this.idOffice = +idOffice;
       await this.getOfficeById()
       this.setBreadcrumb()
     });
-    this.responsiveSrv.observable.subscribe(value => {
+    this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => {
       this.responsive = value;
     });
   }
 
   async ngOnInit() {
+    this.isLoading = true;
     this.isUserAdmin = await this.authSrv.isUserAdmin();
     this.editPermission = await this.officePermissionSrv.getPermissions(this.idOffice);
     if (!this.isUserAdmin && !this.editPermission) {
@@ -78,6 +91,11 @@ export class StrategyListComponent implements OnInit {
     this.setBreadcrumb()
     await this.loadFiltersStrategies();
     await this.loadPropertiesStrategies();
+  }
+
+  ngOnDestroy() {
+    this.$destroy.complete();
+    this.$destroy.unsubscribe();
   }
 
   setBreadcrumb() {
@@ -99,14 +117,6 @@ export class StrategyListComponent implements OnInit {
     ]);
   }
 
-  handleChangeDisplayMode(event) {
-    this.displayModeAll = event.displayMode;
-  }
-
-  handleChangePageSize(event) {
-    this.pageSize = event.pageSize;
-  }
-
   async getOfficeById() {
     const { data, success } = await this.officeSrv.GetById(this.idOffice);
     if (success) {
@@ -115,6 +125,7 @@ export class StrategyListComponent implements OnInit {
   }
 
   async loadPropertiesStrategies() {
+    this.isLoading = true;
     const { success, data } = await this.planModelSvr.GetAll({ 'id-office': this.idOffice, idFilter: this.idFilterSelected });
     
     if (this.editPermission) {
@@ -162,6 +173,7 @@ export class StrategyListComponent implements OnInit {
         urlCard: 'strategies/strategy',
         paramsUrlCard: [{ name: 'idOffice', value: this.idOffice }]
       })));
+      this.isLoading = false;
     }
     this.cardItemsProperties = itemsProperties;
     this.totalRecords = this.cardItemsProperties && this.cardItemsProperties.length;

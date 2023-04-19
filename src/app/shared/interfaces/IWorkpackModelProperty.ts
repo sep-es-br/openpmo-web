@@ -13,9 +13,10 @@ export interface IWorkpackModelProperty {
   sortIndex?: number;
   defaultValue?: number | number[] | string | string[] | boolean | Date;
   defaults?: number | number[];
-  min?: number | string;
-  max?: number | string;
-  possibleValues?: string[] | string;
+  min?: number;
+  max?: number;
+  possibleValues?: string;
+  possibleValuesOptions?: string[];
   multipleSelection?: boolean;
   rows?: number;
   decimals?: number;
