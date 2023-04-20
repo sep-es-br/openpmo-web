@@ -78,7 +78,7 @@ $mobileMenuHeight: 90px;
     padding: 0.5em;
     font-size: .688rem;
 
-    .app-icon {
+    .app-icon, .favorite-icon {
       color: v.$iconGrey;
     }
 
@@ -158,6 +158,10 @@ $mobileMenuHeight: 90px;
       .item {
         width: 25%;
         padding: 0.5em 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        height: 90%;
         .item-label {
           color: #888E96;
           font-size: 11px;
@@ -168,10 +172,11 @@ $mobileMenuHeight: 90px;
         display: flex;
         flex-direction: column;
         align-items: center;
-        justify-content: flex-start;
+        justify-content: space-between;
         padding: 12px 0;
-        height: 100%;
+        height: 91%;
         color: v.$fontLabel;
+
         .item-label {
           color: #888E96;
           font-size: 11px;
@@ -189,7 +194,7 @@ $mobileMenuHeight: 90px;
             width: 100%;
             color: #888E96;
             .p-avatar-xl .p-avatar-icon {
-              font-size: 2.25rem;
+              font-size: 1.9rem;
             }
           }
           .p-avatar {
@@ -287,7 +292,7 @@ $mobileMenuHeight: 90px;
     height: auto !important;
     transform: translateY(100%);
     transform-origin: bottom;
-    overflow-y: hidden;
+    overflow: hidden;
     background-color: rgba(251, 254, 255, 0.980392156862745);
     border-color: rgba(227, 227, 227, 1);
     &.open {

@@ -405,7 +405,7 @@
       "date": {
         "is": {
           "in": {
-            "future": "Para concluir um milestone a data do mesmo não pode estar no futuro"
+            "future": "Para concluir um marco histórico a data do mesmo não pode ser maior que a data atual"
           }
         }
       },

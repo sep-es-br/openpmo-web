@@ -32,7 +32,7 @@
     <div class="item" (click)="toggleMenu('favorite')"
         *ngIf="itemsFavorites?.length > 0 && !!currentIDOffice && !!currentIDPlan && isPlanMenu"
         [pTooltip]="'myFavorites' | translate">
-      <i class="far fa-star" [ngStyle]="{ fontSize: '2.25rem' }"></i>
+      <i class="far fa-star" [ngStyle]="{ fontSize: '1.9rem' }"></i>
     </div>
     <div class="item" *ngIf="currentUserInfo?.isCcbMember" [routerLink]="['/ccbmember-baselines-view']"
       [pTooltip]="'changeControlBoard' | translate">
@@ -54,7 +54,7 @@
       <div class="item" (click)="toggleMenu('favorite')"
         *ngIf="itemsFavorites?.length > 0 && !!currentIDOffice && !!currentIDPlan && isPlanMenu"
         [pTooltip]="'myFavorites' | translate">
-        <i class="far fa-star" [ngStyle]="{ fontSize: '2.25rem' }"></i>
+        <i class="far fa-star" [ngStyle]="{ fontSize: '1.9rem' }"></i>
       </div>
       <div class="item" (click)="toggleMenu('more')">
         <i class="app-icon ellipsis-v" [ngStyle]="{ fontSize: '2.25rem' }"></i>

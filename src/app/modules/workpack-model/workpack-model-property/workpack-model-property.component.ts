@@ -33,6 +33,7 @@ export class WorkpackModelPropertyComponent implements OnDestroy, AfterViewInit 
     private translateSrv: TranslateService,
     private responsiveSrv: ResponsiveService
   ) {
+    this.setLanguage();
     this.translateSrv.onLangChange.pipe(takeUntil(this.$destroy)).subscribe(() => {
       setTimeout(() => this.setLanguage(), 200);
     });
@@ -44,7 +45,6 @@ export class WorkpackModelPropertyComponent implements OnDestroy, AfterViewInit 
   }
 
   ngAfterViewInit(): void {
-    this.setLanguage()
     if (this.property?.type === TypePropertyWorkpackModelEnum.DateModel) {
       this.translateSrv.onLangChange.pipe(takeUntil(this.$destroy)).subscribe(() =>
         setTimeout(() => {

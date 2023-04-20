@@ -11,6 +11,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { takeUntil } from 'rxjs/operators';
 import * as moment from 'moment';
 import { BreakdownStructureService } from 'src/app/shared/services/breakdown-structure.service';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-breakdown-structure',
@@ -30,11 +31,17 @@ export class BreakdownStructureComponent implements OnChanges, OnDestroy {
   milestoneStatusEnum = MilestoneStatusEnum;
   label;
   isLoading = false;
+  idPlan: number;
 
   constructor(
     private breakdownStructureSrv: BreakdownStructureService,
-    private translateSrv: TranslateService
+    private translateSrv: TranslateService,
+    private actRouter: ActivatedRoute,
+    private route: Router
   ) {
+    this.actRouter.queryParams.subscribe(async ({ idPlan }) => {
+      this.idPlan = idPlan && +idPlan;
+    });
     this.translateSrv.onLangChange.pipe(takeUntil(this.$destroy)).subscribe(() => {
       setTimeout(() => this.setLanguage(), 200);
     });
@@ -55,9 +62,11 @@ export class BreakdownStructureComponent implements OnChanges, OnDestroy {
     this.isLoading = true;
     const { success, data } = await this.breakdownStructureSrv.getByWorkpackId(idWorkpack);
     if (success) {
-      const hasWBS = data;
+      const hasWBS = data && data !== null ? data : undefined;
       this.onHasWBS.next(hasWBS);
-      this.mapTreeNodes(data);
+      if (data && data !== null) {
+        this.mapTreeNodes(data);
+      }
     }
   }
 
@@ -157,17 +166,6 @@ export class BreakdownStructureComponent implements OnChanges, OnDestroy {
     const baselineDaysPlanned = moment(baselineEndDate).diff(moment(baselineStartDate), 'days');
     const progressBarValues = [
       {
-        total: Number(data?.planed?.toFixed(data?.unitMeasure?.precision)),
-        progress: Number(data?.actual?.toFixed(data?.unitMeasure?.precision)),
-        labelTotal: 'planned',
-        labelProgress: 'actual',
-        valueUnit: data?.unitMeasure && data?.unitMeasure?.name,
-        color: '#ffa342',
-        barHeight: 17,
-        baselinePlanned: Number(data?.baselinePlanned?.toFixed(data?.unitMeasure?.precision)),
-        type: 'scope'
-      },
-      {
         total: data?.planedCost,
         progress: data?.actualCost,
         labelTotal: 'planned',
@@ -177,6 +175,17 @@ export class BreakdownStructureComponent implements OnChanges, OnDestroy {
         barHeight: 17,
         baselinePlanned: Number(data?.baselineCost?.toFixed(data?.unitMeasure?.precision)),
         type: 'cost'
+      },
+      {
+        total: Number(data?.planed?.toFixed(data?.unitMeasure?.precision)),
+        progress: Number(data?.actual?.toFixed(data?.unitMeasure?.precision)),
+        labelTotal: 'planned',
+        labelProgress: 'actual',
+        valueUnit: data?.unitMeasure && data?.unitMeasure?.name,
+        color: '#ffa342',
+        barHeight: 17,
+        baselinePlanned: Number(data?.baselinePlanned?.toFixed(data?.unitMeasure?.precision)),
+        type: 'scope'
       },
       {
         total: daysToPlanned,
@@ -389,6 +398,15 @@ export class BreakdownStructureComponent implements OnChanges, OnDestroy {
           }]
       };
     }
+  }
+
+  navigateToWorkpack(idWorkpack) {
+    this.route.navigate(['/workpack'], {
+      queryParams: {
+        id: idWorkpack,
+        idPlan: this.idPlan
+      }
+    });
   }
 
 }

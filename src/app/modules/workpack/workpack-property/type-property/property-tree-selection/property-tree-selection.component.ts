@@ -35,6 +35,9 @@ export class PropertyTreeSelectionComponent implements OnDestroy, OnChanges {
   ngOnChanges(changes: SimpleChanges): void {
     if (this.property?.localityList && this.property?.multipleSelection) {
       this.selectedSelectAllIfChildrenAllSelecteds(this.property.localityList[0]);
+      if (!this.property.labelButtonLocalitySelected) {
+        this.property.labelButtonLocalitySelected = [];
+      }
     }
   }
 
@@ -46,20 +49,19 @@ export class PropertyTreeSelectionComponent implements OnDestroy, OnChanges {
   setLabelButton(event?) {
     if (Array.isArray(this.property.localitiesSelected)) {
       if (this.property.localitiesSelected && this.property.localitiesSelected.length === 1) {
-        this.property.labelButtonLocalitySelected = this.property.localitiesSelected[0].label;
+        this.property.labelButtonLocalitySelected = [this.property.localitiesSelected[0].label];
         this.property.showIconButton = false;
       }
       if (this.property.localitiesSelected && this.property.localitiesSelected.length > 1) {
-        this.property.labelButtonLocalitySelected =
-          `${this.property.localitiesSelected.filter(l => !l.data.toString().includes('SELECTALL')).length} ${this.translateSrv.instant('selectedsLocalities')}`;
+        this.property.labelButtonLocalitySelected = this.property.localitiesSelected.filter(l => !l.data.toString().includes('SELECTALL')).map(loc => loc.label);
         this.property.showIconButton = false;
       }
       if (!this.property.localitiesSelected || (this.property.localitiesSelected && this.property.localitiesSelected.length === 0)) {
-        this.property.labelButtonLocalitySelected = this.translateSrv.instant('select');
+        this.property.labelButtonLocalitySelected = [];
         this.property.showIconButton = true;
       }
     } else {
-      this.property.labelButtonLocalitySelected = this.property.localitiesSelected?.label;
+      this.property.labelButtonLocalitySelected = [this.property.localitiesSelected?.label];
       this.property.showIconButton = false;
     }
   }
@@ -120,7 +122,7 @@ export class PropertyTreeSelectionComponent implements OnDestroy, OnChanges {
       localitiesSelected.push(node);
       if (node.children) {
         node.children.forEach((child: TreeNode) =>
-        selected ? this.selectedNode(child, selected) : this.unselectNode(child, selected));
+          selected ? this.selectedNode(child, selected) : this.unselectNode(child, selected));
       }
     }
   }
@@ -132,7 +134,7 @@ export class PropertyTreeSelectionComponent implements OnDestroy, OnChanges {
       localitiesSelected.splice(indexNodeSelected, 1);
       if (node.children) {
         node.children.forEach((child: TreeNode) =>
-        selected ? this.selectedNode(child, selected) : this.unselectNode(child, selected));
+          selected ? this.selectedNode(child, selected) : this.unselectNode(child, selected));
       }
     }
   }

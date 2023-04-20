@@ -1,8 +1,13 @@
 <div class="workpack-tree-selection">
-  <span class="button-select-locality-container">
+  <span class="select-locality-container">
     <label class="app-input-label">{{property?.label}} {{ property.required ? '*' : ''}}</label>
-    <p-button class="button-select-locality" [icon]="!property.showIconButton ? '' : 'fa fa-search'" iconPos="left"
-      (onClick)="opLocalityDefault.toggle($event)" [label]="property.labelButtonLocalitySelected"></p-button>
+    <div class="value-selected-container" (click)="opLocalityDefault.toggle($event)">
+      <p-chips [(ngModel)]="property.labelButtonLocalitySelected" *ngIf="property.multipleSelection"
+        [disabled]="true"></p-chips>
+      <input class="app-input-text" [(ngModel)]="property.labelButtonLocalitySelected[0]" type="text" pInputText
+        *ngIf="!property.multipleSelection" [disabled]="true" />
+      <i class="fas fa-search" *ngIf="property.showIconButton"></i>
+    </div>
   </span>
   <p-overlayPanel #opLocalityDefault>
     <ng-template pTemplate>
@@ -11,8 +16,7 @@
           [class.workpack-tree-selection]="property.fullLine"
           [class.workpack-tree-selection-not-fullLine]="!property.fullLine" *ngIf="property?.multipleSelection">
           <p-tree [value]="property?.localityList" selectionMode="checkbox" [(selection)]="property.localitiesSelected"
-            [propagateSelectionUp]="false" [propagateSelectionDown]="false"
-            (onNodeSelect)="handleNodeSelect($event)"
+            [propagateSelectionUp]="false" [propagateSelectionDown]="false" (onNodeSelect)="handleNodeSelect($event)"
             (onNodeUnselect)="handleNodeUnselect($event)"></p-tree>
         </div>
       </ng-container>
@@ -21,8 +25,7 @@
           [class.workpack-tree-selection]="property.fullLine" [class.ng-invalid]="property.invalid"
           [class.workpack-tree-selection-not-fullLine]="!property.fullLine" *ngIf="!property.multipleSelection">
           <p-tree [value]="property.localityList" selectionMode="single" [(selection)]="property.localitiesSelected"
-          (onNodeSelect)="handleNodeSelect($event)"
-          (onNodeUnselect)="handleNodeUnselect($event)"></p-tree>
+            (onNodeSelect)="handleNodeSelect($event)" (onNodeUnselect)="handleNodeUnselect($event)"></p-tree>
         </div>
       </ng-template>
     </ng-template>

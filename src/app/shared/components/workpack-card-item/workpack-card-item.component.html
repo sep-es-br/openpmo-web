@@ -152,8 +152,8 @@
           <div class="icons-container">
             <i [ngClass]="properties.iconSvg ? [ 'app-icon', properties.icon, 'grey-icon'] : [ 'icon-card', properties.icon, 'grey-icon' ]"
               [class.linked]="!!properties.linked || !!properties.shared" [ngStyle]="{ fontSize: '1.5rem' }"></i>
-            <i [ngClass]="['app-icon', 'link-to', 'grey-icon', 'linked']" *ngIf="!!properties.linked"></i>
-            <i [ngClass]="['app-icon', 'sharing', 'grey-icon', 'linked']"
+            <i [ngClass]="['app-icon', 'link-to', 'grey-icon', 'linked']" *ngIf="!!properties.linked" [ngStyle]="{ marginLeft: '5px' }"></i>
+            <i [ngClass]="['app-icon', 'sharing', 'grey-icon', 'linked']" [ngStyle]="{ marginLeft: '5px' }"
               *ngIf="!!properties.shared && !properties.linked"></i>
           </div>
           <span class="card-item-name" [pTooltip]="properties.fullNameCardItem"
@@ -163,15 +163,17 @@
       <div class="right-container">
         <div class="dashboard-items-container">
           <div class="status-container">
-            <i class="app-icon risk" [ngStyle]="{ fontSize: '1.5rem' }" [class.risk-red]="riskImportance === 'high'" *ngIf="showRiskIndex()"
-              [class.risk-yellow]="riskImportance === 'low'" [class.risk-orange]="riskImportance === 'medium'"
-              (mouseenter)="riskPanel.show($event)" (mouseleave)="riskPanel.hide()"></i>
+            <i class="app-icon risk" [ngStyle]="{ fontSize: '1.5rem' }" [class.risk-red]="riskImportance === 'high'"
+              *ngIf="showRiskIndex()" [class.risk-yellow]="riskImportance === 'low'"
+              [class.risk-orange]="riskImportance === 'medium'" (mouseenter)="riskPanel.show($event)"
+              (mouseleave)="riskPanel.hide()"></i>
           </div>
           <div class="status-container">
             <i class="far fa-stop-circle"
               *ngIf="showEndManagementIndex() && !!properties.endManagementDate && properties.endManagementDate !== null"
               [pTooltip]="'managementEnded'|translate"></i>
-            <i class="far fa-check-square" *ngIf="showEndManagementIndex() && !!properties.completed" [pTooltip]="label|translate"></i>
+            <i class="far fa-check-square" *ngIf="showEndManagementIndex() && !!properties.completed"
+              [pTooltip]="label|translate"></i>
           </div>
           <p-overlayPanel #riskPanel class="risk-overlay-panel">
             <div class="risk-panel-content">
@@ -301,9 +303,9 @@
         </div>
       </p-header>
       <div class="card-item-content" [class.card-link]="properties.urlCard"
-        [class.cardList]="displayModeCard === 'list'" >
+        [class.cardList]="displayModeCard === 'list'">
         <ng-container *ngIf="!showReasonModal; else reasonContainer">
-          <div class="icons-container">
+          <div class="icons-container" [routerLink]="properties.urlCard" [queryParams]="getQueryParams()">
             <i [ngClass]=" ['concluded', 'lateConcluded'].includes(properties.statusItem) ?  [ 'app-icon', 'flag-check', 'grey-icon'] : ['app-icon', 'flag-unchecked', 'grey-icon']"
               [class.linked]="!!properties.linked || !!properties.shared" [ngStyle]="{ fontSize: '2rem' }"
               [class.on-time]="properties?.statusItem === 'ontime' && !properties?.canceled"
@@ -314,35 +316,36 @@
             <i [ngClass]="['app-icon', 'sharing', 'grey-icon', 'linked']"
               *ngIf="!!properties.shared && !properties.linked"></i>
           </div>
-          <span class="card-item-name" [routerLink]="properties.urlCard"
-            [queryParams]="getQueryParams()" [pTooltip]="properties.fullNameCardItem"
-            tooltipPosition="bottom">{{properties.nameCardItem}}</span>
-            <span class="card-item-date" *ngIf="properties.subtitleCardItem && !properties?.canceled && !properties?.editPermission"
-              [class.attention-milestone]="!!attentionMilestone">
-              {{
-                language === 'pt-BR' ?
-                (properties?.subtitleCardItem|date:'dd/MM/yyyy') :
-                (properties?.subtitleCardItem|date:'yyyy/MM/dd')
-              }}
-            </span>
-            <p-calendar [(ngModel)]="milestoneDate" *ngIf="properties?.editPermission"
-              [dateFormat]="language === 'pt-BR' ? 'dd/mm/yy' : 'yy/mm/dd'"
-              (ngModelChange)="changeMilestoneDate($event)"
-              [showIcon]="true" inputId="icon">
-            </p-calendar>
-            <span class="card-item-status" *ngIf="properties?.statusItem && !properties?.canceled"
-              [class.on-time]="properties?.statusItem === 'ontime'" [class.late]="properties?.statusItem === 'late'"
-              [class.concluded]="properties?.statusItem === 'concluded'"
-              [class.late-concluded]="properties?.statusItem === 'lateConcluded'">{{properties?.statusItem|translate}}</span>
+          <span class="card-item-name" [routerLink]="properties.urlCard" [queryParams]="getQueryParams()"
+            [pTooltip]="properties.fullNameCardItem" tooltipPosition="bottom">{{properties.nameCardItem}}</span>
+          <span class="card-item-date"
+            *ngIf="properties.subtitleCardItem && !properties?.canceled && !properties?.editPermission"
+            [class.attention-milestone]="!!attentionMilestone">
+            {{
+            language === 'pt-BR' ?
+            (properties?.subtitleCardItem|date:'dd/MM/yyyy') :
+            (properties?.subtitleCardItem|date:'yyyy/MM/dd')
+            }}
+          </span>
+          <p-calendar [(ngModel)]="milestoneDate" *ngIf="properties?.editPermission"
+            [dateFormat]="language === 'pt-BR' ? 'dd/mm/yy' : 'yy/mm/dd'" (ngModelChange)="changeMilestoneDate($event)"
+            [showIcon]="true" inputId="icon">
+          </p-calendar>
+          <span class="card-item-status" *ngIf="properties?.statusItem && !properties?.canceled"
+            [class.on-time]="properties?.statusItem === 'ontime'" [class.late]="properties?.statusItem === 'late'"
+            [class.concluded]="properties?.statusItem === 'concluded'"
+            [class.late-concluded]="properties?.statusItem === 'lateConcluded'">{{properties?.statusItem|translate}}</span>
         </ng-container>
         <ng-template #reasonContainer>
-          <span class="p-float-label">
-            <textarea pInputTextarea id="reasonText" class="app-text-area" [(ngModel)]="reasonValue"></textarea>
-            <label class="app-input-label" for="reasonText">{{ 'justification' | translate }}</label>
-          </span>
+          <div class="reason-container">
+            <label class="reason-label" for="reasonText">{{ 'justification' | translate }}</label>
+            <textarea pInputTextarea id="reasonText" autofocus rows="2" class="app-text-area" [(ngModel)]="reasonValue"></textarea>
+          </div>
           <div class="reason-buttons">
-            <button type="button" pButton class="app-button"  class="p-button-sm" [label]="'cancel' | translate" (click)="cancelReason()"></button>
-            <button type="button" pButton class="app-button" [disabled]="!reasonValue?.trim()" class="p-button-sm" [label]="'save' | translate" (click)="saveReason()"></button>
+            <button type="button" pButton class="app-button" class="p-button-sm" [label]="'cancel' | translate"
+              (click)="cancelReason()"></button>
+            <button type="button" pButton class="app-button" [disabled]="!reasonValue?.trim()" class="p-button-sm"
+              [label]="'save' | translate" (click)="saveReason()"></button>
           </div>
         </ng-template>
       </div>
@@ -357,74 +360,81 @@
       </div>
     </div>
     <div class="display-mode-list" *ngIf="displayModeCard === 'list'">
-      <div class="card-item-content-list" [class.card-link]="properties.urlCard"
-        [class.cardList]="displayModeCard === 'list'" >
+      <div class="card-item-content-list custom-card-content-list" [class.card-link]="properties.urlCard"
+        [class.cardList]="displayModeCard === 'list'">
         <div class="left-side">
+          <div class="icons-container-list" [routerLink]="properties.urlCard" [queryParams]="getQueryParams()">
+            <i [ngClass]=" ['concluded', 'lateConcluded'].includes(properties.statusItem) ?  [ 'app-icon', 'flag-check', 'grey-icon'] : ['app-icon', 'flag-unchecked', 'grey-icon']"
+              [class.linked]="!!properties.linked || !!properties.shared" [ngStyle]="{ fontSize: '1.5rem' }"
+              [class.on-time]="properties?.statusItem === 'ontime' && !properties?.canceled"
+              [class.late]="properties?.statusItem === 'late' && !properties?.canceled"
+              [class.concluded]="properties?.statusItem === 'concluded' && !properties?.canceled"
+              [class.late-concluded]="properties?.statusItem === 'lateConcluded' && !properties?.canceled"></i>
+            <i [ngClass]="['app-icon', 'link-to', 'grey-icon', 'linked']" *ngIf="!!properties.linked"></i>
+            <i [ngClass]="['app-icon', 'sharing', 'grey-icon', 'linked']"
+              *ngIf="!!properties.shared && !properties.linked"></i>
+          </div>
+          <div class="description-container" [routerLink]="properties.urlCard" [queryParams]="getQueryParams()">
+            <span class="card-item-name" [pTooltip]="properties.fullNameCardItem"
+              tooltipPosition="bottom">{{properties.nameCardItem}}</span>
+          </div>
+        </div>
+      </div>
+      <div class="right-side">
+        <div class="date-container">
+          <span class="card-item-date"
+            *ngIf="properties.subtitleCardItem && !properties?.canceled && !properties?.editPermission"
+            [class.attention-milestone]="!!attentionMilestone">
+            {{
+            language === 'pt-BR' ?
+            (properties?.subtitleCardItem|date:'dd/MM/yyyy') :
+            (properties?.subtitleCardItem|date:'yyyy/MM/dd')
+            }}
+          </span>
           <ng-container *ngIf="!showReasonModal; else reasonContainer">
+            <p-calendar [(ngModel)]="milestoneDate" *ngIf="properties?.editPermission"
+              [dateFormat]="language === 'pt-BR' ? 'dd/mm/yy' : 'yy/mm/dd'"
+              (ngModelChange)="changeMilestoneDate($event)" [showIcon]="true" inputId="icon">
+            </p-calendar>
 
-            <div class="icons-container-list">
-              <i [ngClass]=" ['concluded', 'lateConcluded'].includes(properties.statusItem) ?  [ 'app-icon', 'flag-check', 'grey-icon'] : ['app-icon', 'flag-unchecked', 'grey-icon']"
-                [class.linked]="!!properties.linked || !!properties.shared" [ngStyle]="{ fontSize: '1.5rem' }"
-                [class.on-time]="properties?.statusItem === 'ontime' && !properties?.canceled"
-                [class.late]="properties?.statusItem === 'late' && !properties?.canceled"
-                [class.concluded]="properties?.statusItem === 'concluded' && !properties?.canceled"
-                [class.late-concluded]="properties?.statusItem === 'lateConcluded' && !properties?.canceled"></i>
-              <i [ngClass]="['app-icon', 'link-to', 'grey-icon', 'linked']" *ngIf="!!properties.linked"></i>
-              <i [ngClass]="['app-icon', 'sharing', 'grey-icon', 'linked']"
-                *ngIf="!!properties.shared && !properties.linked"></i>
-            </div>
-            <div class="description-container">
-              <span class="card-item-name"  [routerLink]="properties.urlCard"
-                [queryParams]="getQueryParams()" [pTooltip]="properties.fullNameCardItem"
-                tooltipPosition="bottom">{{properties.nameCardItem}}</span>
+            <div class="description-container" [routerLink]="properties.urlCard" [queryParams]="getQueryParams()">
               <span class="card-item-status" *ngIf="properties?.statusItem && !properties?.canceled"
                 [class.on-time]="properties?.statusItem === 'ontime'" [class.late]="properties?.statusItem === 'late'"
                 [class.concluded]="properties?.statusItem === 'concluded'"
                 [class.late-concluded]="properties?.statusItem === 'lateConcluded'">
                 {{properties?.statusItem|translate}}</span>
             </div>
-            <div class="card-item-date" *ngIf="properties.subtitleCardItem && !properties?.canceled && !properties?.editPermission"
-              [class.attention-milestone]="!!attentionMilestone">
-              {{
-                language === 'pt-BR' ?
-                  (properties?.subtitleCardItem|date:'dd/MM/yyyy') :
-                  (properties?.subtitleCardItem|date:'yyyy/MM/dd')
-              }}
-              <p-calendar [(ngModel)]="milestoneDate" *ngIf="properties?.editPermission"
-                [dateFormat]="language === 'pt-BR' ? 'dd/mm/yy' : 'yy/mm/dd'"
-                (ngModelChange)="changeMilestoneDate($event)"
-                [showIcon]="true" inputId="icon">
-              </p-calendar>
-            </div>
           </ng-container>
           <ng-template #reasonContainer>
-            <span class="p-float-label">
-              <textarea pInputTextarea id="reasonText" class="app-text-area" [(ngModel)]="reasonValue"></textarea>
-              <label class="app-input-label" for="reasonText">{{ 'justification' | translate }}</label>
-            </span>
-            <div class="reason-buttons">
-              <button type="button" pButton class="app-button"  class="p-button-sm" [label]="'cancel' | translate" (click)="cancelReason()"></button>
-              <button type="button" pButton class="app-button" [disabled]="!reasonValue?.trim()" class="p-button-sm" [label]="'save' | translate" (click)="saveReason()"></button>
+            <div class="reason-line">
+              <label class="reason-label" for="reasonText">{{ 'justification' | translate }}</label>
+              <input pInputText id="reasonText" autofocus class="app-input-text" [(ngModel)]="reasonValue" />
+              <div class="reason-buttons">
+                <button type="button" pButton class="app-button" class="p-button-sm" [label]="'cancel' | translate"
+                  (click)="cancelReason()"></button>
+                <button type="button" pButton class="app-button" [disabled]="!reasonValue?.trim()" class="p-button-sm"
+                  [label]="'save' | translate" (click)="saveReason()"></button>
+              </div>
             </div>
           </ng-template>
         </div>
-      </div>
-      <div class="right-side">
-        <p-header *ngIf="properties.menuItems" class="card-item-header">
-          <div class="header-content">
-            <p-menu #menu [popup]="true" [model]="properties.menuItems"></p-menu>
-            <button type="button" pButton icon="pi pi-ellipsis-v" [class.hidden]="!properties.menuItems.length"
-              (click)="menu.toggle($event)"></button>
+        <div class="header-container">
+          <p-header *ngIf="properties.menuItems" class="card-item-header">
+            <div class="header-content">
+              <p-menu #menu [popup]="true" [model]="properties.menuItems"></p-menu>
+              <button type="button" pButton icon="pi pi-ellipsis-v" [class.hidden]="!properties.menuItems.length"
+                (click)="menu.toggle($event)"></button>
+            </div>
+          </p-header>
+          <div class="card-item-footer" *ngIf="cardIdItem">
+            <span class="baseline-icon">
+              <i class="app-icon baseline grey-icon" *ngIf="!!properties?.hasBaseline"
+                [pTooltip]="properties?.baselineName"></i>
+            </span>
+            <span class="card-item-id">
+              {{cardIdItem}}
+            </span>
           </div>
-        </p-header>
-        <div class="card-item-footer" *ngIf="cardIdItem">
-          <span class="baseline-icon">
-            <i class="app-icon baseline grey-icon" *ngIf="!!properties?.hasBaseline"
-              [pTooltip]="properties?.baselineName"></i>
-          </span>
-          <span class="card-item-id">
-            {{cardIdItem}}
-          </span>
         </div>
       </div>
     </div>
@@ -437,7 +447,8 @@
     <div class="carditem-content">
       <i [ngClass]="[ 'app-icon', properties.icon, 'light-grey-icon']"
         (click)=" properties.iconMenuItems && menuIcon.toggle($event)"
-        [ngStyle]="{ fontSize: (responsive ? 2 : (displayModeCard === 'list') ? 2.5 : 3) + 'rem' }" [class.card-link]="properties.iconMenuItems"></i>
+        [ngStyle]="{ fontSize: (responsive ? 2 : (displayModeCard === 'list') ? 2.5 : 3) + 'rem' }"
+        [class.card-link]="properties.iconMenuItems"></i>
       <p-tieredMenu #menuIcon [popup]="true" [model]="properties.iconMenuItems"></p-tieredMenu>
     </div>
   </p-card>

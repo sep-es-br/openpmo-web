@@ -17,7 +17,7 @@
       <!-- CHILDREN -->
       <ng-template #workpackModels>
         <div class="container-custom-tree container-workpack">
-          <div class="tree-label">{{ node.workpackName }}</div>
+          <div class="tree-label link" (click)="navigateToWorkpack(node.idWorkpack)">{{ node.workpackName }}</div>
           <div class="container-properties" [class.deliverable]="node?.workpackType === typeWorkpackEnum.Deliverable">
             <ng-container *ngIf="node?.workpackType !== typeWorkpackEnum.Deliverable; else schedule">
               <ng-container *ngIf="node?.workpackType !== typeWorkpackEnum.Milestone; else milestoneData"

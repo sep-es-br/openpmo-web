@@ -16,30 +16,40 @@
 <ng-template #menuGeneral>
   <ng-container *ngIf="isMobileView; else generalWebView">
     <div class="menugeneral-icons-mobileview-container">
-      <div class="item-avatar" (click)="toggleMenu('user')">
+      <div class="item-avatar"
+        [ngStyle]="{width: itemsFavorites?.length > 0 && !!currentIDOffice && !!currentIDPlan && isPlanMenu ? '20%' : '25%'}"
+        (click)="toggleMenu('user')">
         <app-avatar [idPerson]="currentUserInfo?.id" [menu]="true"></app-avatar>
         <div class="item-label">{{username}}</div>
       </div>
-      <div class="item" (click)="toggleMenu('office')" *ngIf="itemsOffice?.length > 0"
+      <div class="item"
+        [ngStyle]="{width: itemsFavorites?.length > 0 && !!currentIDOffice && !!currentIDPlan && isPlanMenu ? '20%' : '25%'}"
+        (click)="toggleMenu('office')" *ngIf="itemsOffice?.length > 0"
         [pTooltip]="'officesAndPlans' | translate">
-        <i class="app-icon offices" [ngStyle]="{ fontSize: '2.25rem' }"></i>
+        <i class="app-icon offices" [ngStyle]="{ fontSize: '1.9rem' }"></i>
         <div class="item-label">{{ 'offices' | translate }}</div>
       </div>
-      <div class="item" (click)="toggleMenu('portfolio')" [pTooltip]="currentPlan?.name"
+      <div class="item"
+        [ngStyle]="{width: itemsFavorites?.length > 0 && !!currentIDOffice && !!currentIDPlan && isPlanMenu ? '20%' : '25%'}"
+        (click)="toggleMenu('portfolio')" [pTooltip]="currentPlan?.name"
         *ngIf="!!currentIDOffice && !!currentIDPlan && isPlanMenu">
-        <i class="app-icon briefcase" [ngStyle]="{ fontSize: '2.25rem' }"></i>
+        <i class="app-icon briefcase" [ngStyle]="{ fontSize: '1.9rem' }"></i>
         <div class="item-label" [routerLink]="['/plan']" [queryParams]="{id: currentPlan?.id}">{{
           currentPlan?.name }}</div>
       </div>
-      <div class="item" (click)="toggleMenu('favorite')"
+      <div class="item"
+        [ngStyle]="{width: '20%'}"
+        (click)="toggleMenu('favorite')"
         *ngIf="itemsFavorites?.length > 0 && !!currentIDOffice && !!currentIDPlan && isPlanMenu"
         [pTooltip]="'myFavorites' | translate">
-        <i class="far fa-star" [ngStyle]="{ fontSize: '2.25rem' }"></i>
+        <i class="favorite-icon far fa-star" [ngStyle]="{ fontSize: '1.9rem' }"></i>
         <div class="item-label">{{ 'myFavorites' | translate }}</div>
       </div>
-      <div class="item" *ngIf="currentUserInfo?.isCcbMember" [routerLink]="['/ccbmember-baselines-view']"
+      <div class="item"
+        [ngStyle]="{width: itemsFavorites?.length > 0 && !!currentIDOffice && !!currentIDPlan && isPlanMenu ? '20%' : '25%'}"
+        *ngIf="currentUserInfo?.isCcbMember" [routerLink]="['/ccbmember-baselines-view']"
         [pTooltip]="'changeControlBoard' | translate">
-        <i class="app-icon ccb-view" [ngStyle]="{ fontSize: '2.25rem' }"></i>
+        <i class="app-icon ccb-view" [ngStyle]="{ fontSize: '1.9rem' }"></i>
         <div class="item-label" [routerLink]="['/ccbmember-baselines-view']">{{'changeControlBoard' |
           translate}}</div>
       </div>
@@ -60,7 +70,7 @@
        <div class="item" (click)="toggleMenu('favorite')"
        *ngIf="itemsFavorites?.length > 0 && !!currentIDOffice && !!currentIDPlan && isPlanMenu"
       [pTooltip]="'myFavorites' | translate">
-      <i class="far fa-star" [ngStyle]="{ fontSize: '2.25rem' }"></i>
+      <i class="favorite-icon far fa-star" [ngStyle]="{ fontSize: '1.9rem' }"></i>
     </div>
     <div class="item" *ngIf="currentUserInfo?.isCcbMember" [routerLink]="['/ccbmember-baselines-view']"
       [pTooltip]="'changeControlBoard' | translate">

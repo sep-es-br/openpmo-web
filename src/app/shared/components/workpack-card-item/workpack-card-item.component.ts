@@ -62,8 +62,7 @@ export class WorkpackCardItemComponent implements OnInit, OnDestroy {
     this.cardIdItem = this.properties.itemId || this.properties.itemId === 0 ?
       `${this.properties.itemId < 10 && this.properties.itemId !== 0 ? '0' + this.properties.itemId : this.properties.itemId}` : '';
     if (this.properties.subtitleCardItem) {
-      const date = this.properties.subtitleCardItem.split('-');
-      this.milestoneDate = new Date(date[0], date[1] - 1, date[2]);
+      this.setMilestoneDateProperty();
     }
     switch (this.properties.typeCardItem) {
       case 'newCardItem':
@@ -106,6 +105,7 @@ export class WorkpackCardItemComponent implements OnInit, OnDestroy {
     const diffEventProp = moment(momentEvent).diff(momentProp, 'days');
     if (diffEventProp !== 0) {
       this.showReasonModal = true;
+      this.reasonValue = '';
       this.milestoneDate = event;
     }
   }
@@ -121,13 +121,18 @@ export class WorkpackCardItemComponent implements OnInit, OnDestroy {
     if (success) {
       this.properties.subtitleCardItem = moment(this.milestoneDate).format('yyyy-MM-DD');
     } else {
-      const date = this.properties.subtitleCardItem.split('-');
-      this.milestoneDate = new Date(date[0], date[1] - 1, date[2]);
+      this.setMilestoneDateProperty();
     }
   }
   cancelReason() {
     this.showReasonModal = false;
+    this.setMilestoneDateProperty();
     this.reasonValue = '';
+  }
+
+  setMilestoneDateProperty() {
+    const date = this.properties.subtitleCardItem.split('-');
+    this.milestoneDate = new Date(date[0], date[1] - 1, date[2]);
   }
 
   ngOnDestroy() {

@@ -2,7 +2,24 @@
 
 ::ng-deep .workpack-selection {
   .p-multiselect {
-    width: 20%;
+    width: 30%;
+  }
+}
+
+::ng-deep .app-multiple-selection {
+  .p-multiselect-label-container {
+    color: v.$fontInput;
+    font-size: 1rem;
+    font-family: v.$fontFamilyMedium;
+    .p-multiselect-label {
+      display: block;
+      overflow: auto;
+      text-overflow: unset;
+      white-space: break-spaces;
+      .p-multiselect-token {
+        margin-top: 5px !important;
+      }
+    }
   }
 }
 

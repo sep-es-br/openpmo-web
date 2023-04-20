@@ -50,13 +50,17 @@
     width: 100%;
   }
 
-  .icon-favorite {
-    color: #959595;
-    font-size: 1.5rem;
-    margin-top: 3px;
-    cursor: pointer;
-    &.icon-favorite-checked {
-      color: #ffa000;
+  .container-actions {
+    display: flex;
+    justify-content: flex-end;
+    .icon-favorite {
+      color: #959595;
+      font-size: 1.5rem;
+      margin-top: 3px;
+      cursor: pointer;
+      &.icon-favorite-checked {
+        color: #ffa000;
+      }
     }
   }
 
@@ -120,7 +124,12 @@
       }
     }
   }
-  
+
+  @media (max-width: 768px) {
+    .container-actions .icon-favorite {
+      margin-top: .75rem;
+    }
+  }
 }
 
 ::ng-deep .app-workpack {

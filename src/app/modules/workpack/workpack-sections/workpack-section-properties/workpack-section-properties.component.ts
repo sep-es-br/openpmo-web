@@ -17,10 +17,11 @@ import { IWorkpackModelProperty } from '../../../../shared/interfaces/IWorkpackM
 import { Subject } from 'rxjs';
 import { WorkpackService } from 'src/app/shared/services/workpack.service';
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
-import { SelectItem, TreeNode } from 'primeng/api';
+import { MessageService, SelectItem, TreeNode } from 'primeng/api';
 import { ConfigDataViewService } from 'src/app/shared/services/config-dataview.service';
 import { WorkpackShowTabviewService } from 'src/app/shared/services/workpack-show-tabview.service';
 import { TypeWorkpackEnum } from 'src/app/shared/enums/TypeWorkpackEnum';
+import * as moment from 'moment';
 
 @Component({
   selector: 'app-workpack-section-properties',
@@ -51,7 +52,8 @@ export class WorkpackSectionPropertiesComponent implements OnInit {
     private saveButtonSrv: SaveButtonService,
     private responsiveSrv: ResponsiveService,
     private configDataViewSrv: ConfigDataViewService,
-    private workpackShowTabviewSrv: WorkpackShowTabviewService
+    private workpackShowTabviewSrv: WorkpackShowTabviewService,
+    private messageSrv: MessageService
   ) {
     this.workpackShowTabviewSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => {
       this.showTabview = value;
@@ -192,16 +194,21 @@ export class WorkpackSectionPropertiesComponent implements OnInit {
       if (defaultSelectedLocalities && defaultSelectedLocalities.length === 1) {
         const resultLocality = await this.localitySrv.GetById(defaultSelectedLocalities[0]);
         if (resultLocality.success) {
-          property.labelButtonLocalitySelected = resultLocality.data.name;
+          property.labelButtonLocalitySelected = [resultLocality.data.name];
           property.showIconButton = false;
         }
       }
       if (defaultSelectedLocalities && defaultSelectedLocalities.length > 1) {
-        property.labelButtonLocalitySelected = `${defaultSelectedLocalities.length} ${this.translateSrv.instant('selectedsLocalities')}`;
+        property.labelButtonLocalitySelected = await Promise.all(defaultSelectedLocalities.map( async ( loc ) => {
+          const result = await this.localitySrv.GetById(loc);
+          if (result.success) {
+            return result.data.name
+          }
+        }));
         property.showIconButton = false;
       }
       if (!defaultSelectedLocalities || (defaultSelectedLocalities && defaultSelectedLocalities.length === 0)) {
-        property.labelButtonLocalitySelected = this.translateSrv.instant('select');
+        property.labelButtonLocalitySelected = [];
         property.showIconButton = true;
       }
     }
@@ -352,6 +359,22 @@ export class WorkpackSectionPropertiesComponent implements OnInit {
   }
 
   async handleChangeCheckCompleted(event) {
+    if (this.workpackData.workpack.type === TypeWorkpackEnum.MilestoneModel) {
+      const dateProperty = this.sectionPropertiesProperties.find( p => p.type === TypePropertyModelEnum.DateModel);
+      if (dateProperty) {
+        const today = moment();
+        const date = dateProperty.value ? dateProperty.value as Date : undefined;
+        if (date && moment(date).isAfter(today)) {
+          this.messageSrv.add({
+            detail: this.translateSrv.instant('messages.error.date.is.in.future'),
+            severity: 'warn',
+            life: 10000
+          });
+          this.cardWorkpackProperties.workpackCompleted = false;
+          return;
+        }
+      }
+    }
     this.workpackSrv.nextCheckCompletedChanged(event);
     this.saveButtonSrv.nextShowSaveButton(true);
   }

@@ -406,7 +406,7 @@
       "date": {
         "is": {
           "in": {
-            "future": "To complete a milestone, its date can't be in future "
+            "future": "To complete a milestone, its date can't be in future"
           }
         }
       },

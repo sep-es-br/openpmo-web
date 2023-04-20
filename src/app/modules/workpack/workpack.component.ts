@@ -101,6 +101,7 @@ export class WorkpackComponent implements OnDestroy {
   hasWBS = false;
   selectedTab: ITabViewScrolled;
   tabs: ITabViewScrolled[];
+  isLoading = false;
 
   constructor(
     private actRouter: ActivatedRoute,
@@ -130,7 +131,6 @@ export class WorkpackComponent implements OnDestroy {
     private workpackShowTabviewSrv: WorkpackShowTabviewService,
     private configDataViewSrv: ConfigDataViewService
   ) {
-
     this.actRouter.queryParams.subscribe(async ({ id, idPlan, idWorkpackModel, idWorkpackParent, idWorkpackModelLinked }) => {
       this.idWorkpack = id && +id;
       this.idPlan = idPlan && +idPlan;
@@ -219,6 +219,7 @@ export class WorkpackComponent implements OnDestroy {
   }
 
   async resetWorkpack() {
+    this.isLoading = true;
     this.workpackModel = undefined;
     this.cardJournalProperties = undefined;
     this.workpack = undefined;
@@ -1284,6 +1285,7 @@ export class WorkpackComponent implements OnDestroy {
         key: 'properties'
       });
     }
+    this.isLoading = false;
   }
 
 }

@@ -13,6 +13,10 @@
     box-shadow: none !important;
   }
 
+  .link {
+    cursor: pointer;
+  }
+
   .container-custom-tree {
     padding: 1rem;
   }
@@ -49,6 +53,7 @@
   .container-workpack {
     display: flex;
     justify-content: space-between;
+    border-bottom: 1px solid #dee2e6;
 
     .tree-label {
       display: flex;

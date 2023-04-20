@@ -3,19 +3,53 @@
 ::ng-deep .workpack-tree-selection {
   max-height: 400px;
   overflow-y: auto;
-  .button-select-locality-container {
+  .select-locality-container {
     display: flex;
     flex-direction: column;
-    width: 250px;
-    .p-button {
-      background-color: #44B39B;
-      border: none !important;
-      margin: 0.5em 0;
+    width: 30%;
+    .app-input-label {
+      font-size: 12px;
+      margin-top: 15px;
+    }
+  }
+  .value-selected-container {
+    background-color: transparent;
+    cursor: pointer;
+    .app-input-text {
+      cursor: pointer;
       width: 100%;
-      color: #ffffff;
-      .p-button-label {
-        text-align: left;
+    }
+    p-chips {
+      flex: 1;
+    }
+    .p-chips {
+      width: 100%;
+      background-color: transparent !important;
+      .p-chips-multiple-container {
+        width: 100%;
+        background-color: transparent !important;
+        .p-chips-token {
+          color: #495057;
+          margin-top: 5px;
+        }
+        &.p-inputtext {
+          border: none;
+          border-bottom: 1px solid #b6c8cd !important;
+        }
       }
+    }
+  }
+  .value-selected-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    width: 100%;
+    .fa-search {
+      padding: 5px;
+      margin-left: -1.5em;
+      color: #004660;
+      font-size: 1rem;
+      cursor: pointer;
     }
   }
   .p-treenode.green-node {

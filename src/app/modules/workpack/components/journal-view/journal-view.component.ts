@@ -68,7 +68,7 @@ export class JournalViewComponent implements OnInit, OnDestroy {
     this.formSearch = this.formBuilder.group({
       from: [''],
       to: [''],
-      type: [['ALL']],
+      type: [['INFORMATION']],
       scopeName: ''
     });
     this.optionsType = Object.keys(TypeJournalEnum).map(key => ({

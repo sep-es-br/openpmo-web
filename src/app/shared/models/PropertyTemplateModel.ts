@@ -29,7 +29,7 @@ export class PropertyTemplateModel implements IProperty {
   localityList?: TreeNode[];
   idDomain?: number;
   localitiesSelected?: TreeNode | TreeNode[];
-  labelButtonLocalitySelected?: string;
+  labelButtonLocalitySelected?: string[];
   showIconButton?: boolean;
   value?: string | number | boolean | string[] | Date | number[];
   selectedValues?: number[] | number;

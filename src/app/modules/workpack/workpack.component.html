@@ -1,13 +1,18 @@
+<div class="loading-container" *ngIf="isLoading">
+  <app-card-loading [isCardLoading]="isLoading"></app-card-loading>
+</div>
 <div class="app-workpack" *ngIf="workpackModel" [class.fullscreenModeDashboard]="fullScreenModeDashboard">
   <div class="header-container" [class.mobile]="responsive" *ngIf="idWorkpack">
     <div class="app-content-header" [class.mobile]="responsive">
       <span class="label">{{workpackModel.modelName}}:</span>
       <span class="text">{{workpackFullName}}</span>
     </div>
-    <i [pTooltip]="(workpack?.favoritedBy ? 'removeFavorite' : 'addFavorite') | translate" (click)="handleFavorite()"
-      [class]="(workpack?.favoritedBy ? 'fas icon-favorite-checked ' : 'far ') + 'fa-star icon-favorite'">
-    </i>
-    <app-config-data-view-panel> </app-config-data-view-panel>
+    <div class="container-actions">
+      <i [pTooltip]="(workpack?.favoritedBy ? 'removeFavorite' : 'addFavorite') | translate" (click)="handleFavorite()"
+        [class]="(workpack?.favoritedBy ? 'fas icon-favorite-checked ' : 'far ') + 'fa-star icon-favorite'">
+      </i>
+      <app-config-data-view-panel></app-config-data-view-panel>
+    </div>
   </div>
   <div class="app-content-header" *ngIf="!idWorkpack" [class.mobile]="responsive">
     <span class="label">{{'new' | translate}}</span>
