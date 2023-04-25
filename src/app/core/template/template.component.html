@@ -7,7 +7,7 @@
 <ng-template #menuFixed>
   <main>
     <div class="splitter-container" *ngIf="!!isMenuFixed">
-      <p-splitter [panelSizes]="[20,80]" [minSizes]="[20,20]" layout="horizontal">
+      <p-splitter [panelSizes]="[20,80]" (onResizeEnd)="onResizeEnd($event)" [minSizes]="[20,20]" layout="horizontal">
         <ng-template>
           <div class="menu-fixed-container">
             <app-menu-fixed (changeMenu)="toggleMenu($event)"></app-menu-fixed>

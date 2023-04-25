@@ -8,7 +8,7 @@
       [class.card-collapseble]="properties.collapseble">
       <div class="header-title-text">
         <span class="card-title" [class.card-title-mobile]="responsive" *ngIf="properties.cardTitle">{{
-          properties.cardTitle | translate }}</span>
+          properties.notShowCardTitle ? '' : (properties.cardTitle | translate) }}</span>
         <p-inputSwitch class="app-toggle" *ngIf="properties.toggleable" [(ngModel)]="properties.initialStateToggle"
           (ngModelChange)="properties.onToggle?.emit($event)">
         </p-inputSwitch>
@@ -22,7 +22,7 @@
           (properties.headerDates?.endDate|date:'yyyy/MM/dd')}}</span>
       </div>
     </div>
-    <div class="header-title-check-completed"
+    <div class="header-title-check-completed" [class.mr-0]="!properties.initialStateCollapse && !properties.collapseble"
       *ngIf="!properties.initialStateCollapse && properties.showFullScreen && !properties.fullScreen"
       [class.responsive]="responsive">
       <i class="fas fa-expand-arrows-alt" (click)="handleChangeFullScreen(true)"></i>

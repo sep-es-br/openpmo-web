@@ -103,7 +103,7 @@ export class WorkpackCardItemComponent implements OnInit, OnDestroy {
     const momentEvent = moment(event).format('yyyy-MM-DD');
     const momentProp = moment(this.properties.subtitleCardItem, 'yyyy-MM-DD');
     const diffEventProp = moment(momentEvent).diff(momentProp, 'days');
-    if (diffEventProp !== 0) {
+    if (!isNaN(diffEventProp) && diffEventProp !== 0) {
       this.showReasonModal = true;
       this.reasonValue = '';
       this.milestoneDate = event;

@@ -194,6 +194,25 @@
   }
 }
 
+.app-triple-constraint-dashboard.width-1450 {
+  .cards {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    .card-constraint-container {
+      width: 100%;
+      margin-right: 0;
+      margin-top: 0.5em;
+    }
+    .card {
+      width: 100%;
+      min-width: 100%;
+      margin-right: 0;
+      margin-top: 1em
+    }
+  }
+}
+
 @media screen and (max-width: 1216px) {
   .app-triple-constraint-dashboard {
     .cards {

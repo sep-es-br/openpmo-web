@@ -4,6 +4,7 @@ import { filter } from 'rxjs/operators';
 
 import { ResponsiveService } from './shared/services/responsive.service';
 import { WorkpackShowTabviewService } from './shared/services/workpack-show-tabview.service';
+import { MobileViewService } from './shared/services/mobile-view.service';
 
 @Component({
   selector: 'app-root',
@@ -17,6 +18,7 @@ export class AppComponent implements OnInit {
 
   constructor(
     private responsiveSrv: ResponsiveService,
+    private mobileViewSrv: MobileViewService,
     private workpackShowTabViewSrv: WorkpackShowTabviewService,
     private router: Router,
   ){
@@ -44,9 +46,11 @@ export class AppComponent implements OnInit {
   detectViewMode(width: number) {
     if (!this.isMobileView && width <= 768) {
       this.responsiveSrv.next(true);
+      this.mobileViewSrv.next(true);
     }
     if (this.isMobileView && width > 768) {
       this.responsiveSrv.next(false);
+      this.mobileViewSrv.next(true);
     }
     if (width >= 900) {
       this.workpackShowTabViewSrv.next(true);

@@ -78,6 +78,9 @@
       i {
         cursor: pointer;
       }
+      &.mr-0 {
+        margin-right: 0 !important;
+      }
     }
     .header-title-check-completed.responsive {
       flex: 1;

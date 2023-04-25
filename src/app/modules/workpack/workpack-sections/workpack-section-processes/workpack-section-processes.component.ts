@@ -70,7 +70,7 @@ export class WorkpackSectionProcessesComponent implements OnInit {
         ...this.sectionProcess,
         cardSection: {
           ...this.sectionProcess.cardSection,
-          initialStateCollapse: this.collapsePanelsStatus
+          initialStateCollapse: this.showTabview ? false : this.collapsePanelsStatus
         }
       });
     });
@@ -120,8 +120,8 @@ export class WorkpackSectionProcessesComponent implements OnInit {
         toggleable: false,
         initialStateToggle: false,
         cardTitle: this.showTabview ? '' : 'processes',
-        collapseble: true,
-        initialStateCollapse: this.collapsePanelsStatus,
+        collapseble: this.showTabview ? false : true,
+        initialStateCollapse: this.showTabview ? false : this.collapsePanelsStatus,
         showFilters: true,
         isLoading: true,
         filters: filters && filters.length > 0 ? filters : [],

@@ -328,7 +328,9 @@
             }}
           </span>
           <p-calendar [(ngModel)]="milestoneDate" *ngIf="properties?.editPermission"
-            [dateFormat]="language === 'pt-BR' ? 'dd/mm/yy' : 'yy/mm/dd'" (ngModelChange)="changeMilestoneDate($event)"
+            [dateFormat]="language === 'pt-BR' ? 'dd/mm/yy' : 'yy/mm/dd'"
+            [showOnFocus]="false"
+            (ngModelChange)="changeMilestoneDate($event)"
             [showIcon]="true" inputId="icon">
           </p-calendar>
           <span class="card-item-status" *ngIf="properties?.statusItem && !properties?.canceled"
@@ -394,6 +396,7 @@
           <ng-container *ngIf="!showReasonModal; else reasonContainer">
             <p-calendar [(ngModel)]="milestoneDate" *ngIf="properties?.editPermission"
               [dateFormat]="language === 'pt-BR' ? 'dd/mm/yy' : 'yy/mm/dd'"
+              [showOnFocus]="false"
               (ngModelChange)="changeMilestoneDate($event)" [showIcon]="true" inputId="icon">
             </p-calendar>
 

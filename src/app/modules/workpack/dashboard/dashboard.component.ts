@@ -55,6 +55,7 @@ export class DashboardComponent implements OnInit, OnChanges, OnDestroy {
   midleTextRisks: string;
   showTabview = false;
   isLoading = false;
+  mediaScreen1700: boolean;
 
   constructor(
     private dashboardSrv: DashboardService,
@@ -65,11 +66,14 @@ export class DashboardComponent implements OnInit, OnChanges, OnDestroy {
     this.workpackShowTabviewSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => {
       this.showTabview = value;
     });
+    this.responsiveSrv.resizeEvent.subscribe((value) => {
+      this.mediaScreen1700 = value.width <= 1700;
+    });
     this.cardDashboardProperties = {
       toggleable: false,
       initialStateToggle: false,
-      collapseble: true,
-      initialStateCollapse: this.collapsePanelsStatus,
+      collapseble: this.showTabview ? false : true,
+      initialStateCollapse: this.showTabview ? false : this.collapsePanelsStatus,
       cardTitle: this.showTabview ? '' : 'dashboard',
       showFullScreen: true,
       fullScreen: false

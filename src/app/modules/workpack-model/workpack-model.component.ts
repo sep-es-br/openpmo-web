@@ -1430,6 +1430,7 @@ export class WorkpackModelComponent implements OnInit {
       propGroup.groupedProperties.forEach(p => {
         delete p.extraList;
         delete p.extraListDefaults;
+        p.possibleValues = p.possibleValuesOptions && p.possibleValuesOptions.join(',');
       });
       propGroup.label = propGroup.name;
       propGroup.groupedProperties = JSON.parse(JSON.stringify([...propGroup.groupedProperties]));

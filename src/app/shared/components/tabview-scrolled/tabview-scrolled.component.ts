@@ -1,5 +1,8 @@
+import { takeUntil } from 'rxjs/operators';
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { ResponsiveService } from '../../services/responsive.service';
+import { WorkpackShowTabviewService } from '../../services/workpack-show-tabview.service';
+import { Subject } from 'rxjs';
 
 export interface ITabViewScrolled {
   menu: string;
@@ -16,8 +19,29 @@ export class TabviewScrolledComponent implements OnChanges {
   @Input() tabs: ITabViewScrolled[] = [];
   selectedTab: ITabViewScrolled;
   tabBody: string;
+  showTabview: boolean;
+  $destroy = new Subject();
 
-  constructor() {
+  constructor(
+    private responsiveSrv: ResponsiveService,
+    public workpackShowTabViewSrv: WorkpackShowTabviewService,
+  ) {
+    this.responsiveSrv.resizeEvent.subscribe(() => {
+      setTimeout(() => {
+        this.prepareScrolls();
+      });
+    });
+    this.workpackShowTabViewSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => {
+      this.showTabview = value;
+      setTimeout(() => {
+        this.prepareScrolls();
+      });
+    });
+  }
+
+  ngOnDestroy() {
+    this.$destroy.complete();
+    this.$destroy.unsubscribe();
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -25,6 +49,7 @@ export class TabviewScrolledComponent implements OnChanges {
       this.selectTab(this.tabs[0]);
       setTimeout(() => {
         this.prepareScrolls();
+
       });
     }
   }
@@ -36,14 +61,19 @@ export class TabviewScrolledComponent implements OnChanges {
   }
 
   prepareScrolls() {
+    if (!this.showTabview) {
+      return;
+    }
     const tabs = document.querySelectorAll('.app-tabview-scrolled-header-item');
     const tabsContainer = document.querySelector('.app-tabview-scrolled-header');
-    const tabsContainerWidth = tabsContainer.clientWidth;
-    const tabsWidth = Array.from(tabs).reduce((acc, tab) => acc + tab.clientWidth, 0);
-    const scrollWidth = tabsWidth - tabsContainerWidth;
-    if (scrollWidth > 0) {
-      const scrollRight = document.querySelector('.nav-scroll-right');
-      scrollRight.classList.remove('hidden');
+    if (tabs && tabsContainer) {
+      const tabsContainerWidth = tabsContainer.clientWidth;
+      const tabsWidth = Array.from(tabs).reduce((acc, tab) => acc + tab.clientWidth, 0);
+      const scrollWidth = tabsWidth - tabsContainerWidth;
+      if (scrollWidth > 0) {
+        const scrollRight = document.querySelector('.nav-scroll-right');
+        scrollRight.classList.remove('hidden');
+      }
     }
   }
 

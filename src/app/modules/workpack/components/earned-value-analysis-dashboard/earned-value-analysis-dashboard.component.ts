@@ -26,6 +26,7 @@ export class EarnedValueAnalysisDashboardComponent implements OnInit {
   language: string;
   $destroy = new Subject();
   responsive = false;
+  mediaScreen1500: boolean;
 
   constructor(
     private shortNumberPipe: ShortNumberPipe,
@@ -33,6 +34,9 @@ export class EarnedValueAnalysisDashboardComponent implements OnInit {
     private responsiveSrv: ResponsiveService
   ) {
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.responsive = value);
+    this.responsiveSrv.resizeEvent.subscribe((value) => {
+      this.mediaScreen1500 = value.width <= 1500;
+    });
     this.translateSrv.onLangChange.pipe(takeUntil(this.$destroy)).subscribe(() =>
       setTimeout(() => {
         this.setLanguage();

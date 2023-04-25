@@ -6,10 +6,13 @@
   .select-locality-container {
     display: flex;
     flex-direction: column;
-    width: 30%;
+    width: 100%;
     .app-input-label {
       font-size: 12px;
       margin-top: 15px;
+    }
+    &.fullLine {
+      width: 100%;
     }
   }
   .value-selected-container {

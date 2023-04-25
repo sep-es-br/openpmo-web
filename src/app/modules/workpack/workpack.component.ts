@@ -24,7 +24,6 @@ import { WorkpackService } from 'src/app/shared/services/workpack.service';
 import { IWorkpack } from 'src/app/shared/interfaces/IWorkpack';
 import { IWorkpackModel } from 'src/app/shared/interfaces/IWorkpackModel';
 import { IWorkpackProperty } from 'src/app/shared/interfaces/IWorkpackProperty';
-import { OrganizationService } from 'src/app/shared/services/organization.service';
 import { StakeholderService } from 'src/app/shared/services/stakeholder.service';
 import { IconsEnum } from 'src/app/shared/enums/IconsEnum';
 import { IOrganization } from 'src/app/shared/interfaces/IOrganization';
@@ -32,7 +31,6 @@ import { IMeasureUnit } from 'src/app/shared/interfaces/IMeasureUnit';
 import { PlanService } from 'src/app/shared/services/plan.service';
 import { TypeWorkpackEnum } from 'src/app/shared/enums/TypeWorkpackEnum';
 import { MeasureUnitService } from 'src/app/shared/services/measure-unit.service';
-import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
 import { ScheduleService } from 'src/app/shared/services/schedule.service';
 import { OfficeService } from 'src/app/shared/services/office.service';
 import { AuthService } from 'src/app/shared/services/auth.service';
@@ -161,6 +159,10 @@ export class WorkpackComponent implements OnDestroy {
     });
     this.workpackShowTabviewSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => {
       this.showTabview = value;
+      const panelStatus = this.configDataViewSrv.getPanelStatus();
+      this.collapsePanelsStatus = this.showTabview ? false : (panelStatus === 'collapse' ? true : false);
+      this.handleChangeShowTabview();
+      this.handleChangeCollapseExpandPanel();
     });
     this.saveButtonSrv.observableShowSaveButton.pipe(takeUntil(this.$destroy)).subscribe(showButton => {
       if (showButton && this.saveButton) {
@@ -172,7 +174,7 @@ export class WorkpackComponent implements OnDestroy {
       }
     });
     this.configDataViewSrv.observableCollapsePanelsStatus.pipe(takeUntil(this.$destroy)).subscribe(collapsePanelStatus => {
-      this.collapsePanelsStatus = collapsePanelStatus === 'collapse' ? true : false;
+      this.collapsePanelsStatus = this.showTabview ? false : (collapsePanelStatus === 'collapse' ? true : false);
       this.handleChangeCollapseExpandPanel();
     });
     this.configDataViewSrv.observableDisplayModeAll.pipe(takeUntil(this.$destroy)).subscribe(displayMode => {
@@ -197,6 +199,7 @@ export class WorkpackComponent implements OnDestroy {
   handleChangeCollapseExpandPanel() {
     this.cardJournalProperties = Object.assign({}, {
       ...this.cardJournalProperties,
+      collapseble: this.showTabview ? false : true,
       initialStateCollapse: this.collapsePanelsStatus
     });
     this.cardsWorkPackModelChildren = this.cardsWorkPackModelChildren && this.cardsWorkPackModelChildren.map(card => (
@@ -204,7 +207,24 @@ export class WorkpackComponent implements OnDestroy {
         ...card,
         cardSection: {
           ...card.cardSection,
-          initialStateCollapse: this.collapsePanelsStatus
+          collapseble: this.showTabview ? false : true,
+          initialStateCollapse: this.showTabview ? false : this.collapsePanelsStatus
+        }
+      })
+    ));
+  }
+
+  handleChangeShowTabview() {
+    this.cardJournalProperties = Object.assign({}, {
+      ...this.cardJournalProperties,
+      notShowCardTitle: this.showTabview ? true : false
+    });
+    this.cardsWorkPackModelChildren = this.cardsWorkPackModelChildren && this.cardsWorkPackModelChildren.map(card => (
+      Object.assign({}, {
+        ...card,
+        cardSection: {
+          ...card.cardSection,
+          notShowCardTitle: this.showTabview ? true : false
         }
       })
     ));
@@ -361,6 +381,8 @@ export class WorkpackComponent implements OnDestroy {
     }
     if (this.showTabview) {
       this.loadWorkpackTabs();
+    } else {
+      this.isLoading = false;
     }
     const workpackParams = this.workpackSrv.getWorkpackParams();
     const plan = await this.planSrv.GetById(workpackParams.idPlan);
@@ -386,8 +408,9 @@ export class WorkpackComponent implements OnDestroy {
       this.cardJournalProperties = {
         toggleable: false,
         initialStateToggle: false,
-        cardTitle: this.showTabview ? '' : 'journal',
-        collapseble: true,
+        notShowCardTitle: this.showTabview ? true : false,
+        cardTitle: 'journal',
+        collapseble:  this.showTabview ? false : true,
         initialStateCollapse: this.collapsePanelsStatus,
       };
     }
@@ -406,9 +429,10 @@ export class WorkpackComponent implements OnDestroy {
       const propertiesCard: ICard = {
         toggleable: false,
         initialStateToggle: false,
-        cardTitle: this.showTabview ? '' : workpackModel.modelNameInPlural,
+        notShowCardTitle: this.showTabview ? true : false,
+        cardTitle: workpackModel.modelNameInPlural,
         tabTitle: workpackModel.modelNameInPlural,
-        collapseble: true,
+        collapseble:  this.showTabview ? false : true,
         initialStateCollapse: this.collapsePanelsStatus,
         showFilters: true,
         showCreateNemElementButton: this.workpackSrv.getEditPermission() ? true : false,
@@ -887,10 +911,11 @@ export class WorkpackComponent implements OnDestroy {
       const propertiesCard: ICard = {
         toggleable: false,
         initialStateToggle: false,
-        cardTitle: this.showTabview ? '' : workpackModel.nameInPluralWorkpackModelLinked,
+        notShowCardTitle: this.showTabview ? true : false,
+        cardTitle: workpackModel.nameInPluralWorkpackModelLinked,
         tabTitle: workpackModel.nameInPluralWorkpackModelLinked,
-        collapseble: true,
-        initialStateCollapse: this.collapsePanelsStatus,
+        collapseble: this.showTabview ? false : true,
+        initialStateCollapse:  this.showTabview ? false : this.collapsePanelsStatus,
         showFilters: true,
         showCreateNemElementButton: false
       };

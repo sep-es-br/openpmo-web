@@ -1,5 +1,5 @@
 <div class="workpack-tree-selection">
-  <span class="select-locality-container">
+  <span class="select-locality-container" [class.fullLine]="property.fullLine && property.multipleSelection">
     <label class="app-input-label">{{property?.label}} {{ property.required ? '*' : ''}}</label>
     <div class="value-selected-container" (click)="opLocalityDefault.toggle($event)">
       <p-chips [(ngModel)]="property.labelButtonLocalitySelected" *ngIf="property.multipleSelection"

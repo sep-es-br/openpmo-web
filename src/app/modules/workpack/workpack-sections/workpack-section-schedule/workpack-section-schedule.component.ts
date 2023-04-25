@@ -62,7 +62,7 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
         ...this.sectionSchedule,
         cardSection: {
           ...this.sectionSchedule.cardSection,
-          initialStateCollapse: this.collapsePanelsStatus
+          initialStateCollapse: this.showTabview ? false : this.collapsePanelsStatus
         }
       });
     });
@@ -77,9 +77,9 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
         toggleable: false,
         initialStateToggle: false,
         cardTitle: 'schedule',
-        collapseble: true,
+        collapseble: this.showTabview ? false : true,
         isLoading: true,
-        initialStateCollapse: this.collapsePanelsStatus,
+        initialStateCollapse: this.showTabview ? false : this.collapsePanelsStatus,
       }
     };
     this.editPermission = this.workpackSrv.getEditPermission();
@@ -190,8 +190,8 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
           toggleable: false,
           initialStateToggle: false,
           cardTitle: this.showTabview ? '' : 'schedule',
-          collapseble: true,
-          initialStateCollapse: this.collapsePanelsStatus,
+          collapseble: this.showTabview ? false : true,
+          initialStateCollapse: this.showTabview ? false : this.collapsePanelsStatus,
           headerDates: this.schedule && {
             startDate,
             endDate
@@ -284,9 +284,9 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
         toggleable: false,
         initialStateToggle: false,
         cardTitle: 'schedule',
-        collapseble: true,
+        collapseble: this.showTabview ? false : true,
         isLoading: false,
-        initialStateCollapse: this.collapsePanelsStatus,
+        initialStateCollapse: this.showTabview ? false : this.collapsePanelsStatus,
       }
     };
   }

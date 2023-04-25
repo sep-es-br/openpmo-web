@@ -30,11 +30,15 @@ export class TripleConstraintDashboardComponent implements OnInit {
   marginLeftActual: number;
   $destroy = new Subject();
   responsive = false;
+  mediaScreen1450: boolean;
 
   constructor(
     private responsiveSrv: ResponsiveService
   ) {
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.responsive = value);
+    this.responsiveSrv.resizeEvent.subscribe((value) => {
+      this.mediaScreen1450 = value.width <= 1216;
+    });
   }
 
   async ngOnChanges(changes: SimpleChanges) {

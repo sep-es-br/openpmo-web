@@ -72,7 +72,7 @@ export class WorkpackSectionRisksComponent implements OnInit, OnDestroy {
         ...this.sectionRisk,
         cardSection: {
           ...this.sectionRisk.cardSection,
-          initialStateCollapse: this.collapsePanelsStatus
+          initialStateCollapse: this.showTabview ? false : this.collapsePanelsStatus
         }
       });
     });
@@ -127,8 +127,8 @@ export class WorkpackSectionRisksComponent implements OnInit, OnDestroy {
         toggleable: false,
         initialStateToggle: false,
         cardTitle: this.showTabview ? '' : 'risks',
-        collapseble: true,
-        initialStateCollapse: this.collapsePanelsStatus,
+        collapseble: this.showTabview ? false : true,
+        initialStateCollapse: this.showTabview ? false : this.collapsePanelsStatus,
         showFilters: true,
         isLoading: true,
         filters: filters && filters.length > 0 ? filters : [],

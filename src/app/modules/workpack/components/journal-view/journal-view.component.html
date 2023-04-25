@@ -3,7 +3,7 @@
     <div class="loading-container" *ngIf="isLoading">
       <app-card-loading [isCardLoading]="isLoading"></app-card-loading>
     </div>
-    <form class="filters" [formGroup]="formSearch" *ngIf="!isLoading">
+    <form class="filters" [formGroup]="formSearch" *ngIf="!isLoading" [class.responsive]="responsive">
       <p-button class="app-button-green" [label]="'newInformation' | translate" (onClick)="handleNewInformation()"
         [disabled]="!editPermission || workpackCanceled"></p-button>
       <span class="p-float-label property-input p-field">
@@ -46,7 +46,7 @@
       </p-overlayPanel>
     </form>
     <div class="journal-content" #journal *ngIf="!isLoading">
-      <p-timeline [value]="journalData" [align]="responsive ? 'right' : 'alternate'">
+      <p-timeline [value]="journalData" [align]="responsive ? 'right' : 'alternate'" [class.responsive]="responsive">
         <ng-template pTemplate="marker" let-event>
           <span class="custom-marker" [style.color]="event.color" [style.backgroundColor]="event.background"
             [class.icon]="event.type !== 'INFORMATION'">
@@ -72,7 +72,7 @@
                 {{event.workpack.workpackModelName}}: {{event.workpack.name}}(ID: {{event.workpack.id}})
               </strong>
               <strong class="title"> {{event.information?.title}} </strong>
-              <p class="description"> {{event.information?.description}}</p>
+              <textarea class="description-info" pInputTextarea [(ngModel)]="event.information.description" [autoResize]="true" [readOnly]="true"></textarea>
               <div class="evidences" *ngIf="event.evidences && event.evidences.length > 0">
                 <figure>
                   <ng-container *ngFor="let evidence of event.evidences; let i = index">

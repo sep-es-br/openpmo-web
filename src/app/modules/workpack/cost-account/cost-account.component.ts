@@ -241,7 +241,7 @@ export class CostAccountComponent implements OnInit {
     }
 
     if (this.typePropertyModel[propertyModel.type] === TypePropertyModelEnum.SelectionModel) {
-      const listOptions = (propertyModel.possibleValues as string).split(',');
+      const listOptions = propertyModel.possibleValues ? (propertyModel.possibleValues as string).split(',') : [];
       property.possibleValues = listOptions.map(op => ({ label: op, value: op }));
     }
 

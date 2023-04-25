@@ -248,7 +248,7 @@ export class JournalViewComponent implements OnInit, OnDestroy {
     const header = {
       method: 'GET',
       headers: new Headers({
-          Authorization: 'Bearer ' + accessToken
+        Authorization: 'Bearer ' + accessToken
       })
     };
     fetch(dataurl, header)
@@ -272,13 +272,15 @@ export class JournalViewComponent implements OnInit, OnDestroy {
 
   async handleFilter(event?) {
     this.clearPaginate();
-    let selectedTypes = event.value;
-    if (event.itemValue === 'ALL' && event.value.find( value => value === 'ALL')) {
-      selectedTypes = selectedTypes.filter(op => op === 'ALL');
-    } else {
-      selectedTypes = selectedTypes.filter(op => op !== 'ALL');
+    if (event) {
+      let selectedTypes = event.value;
+      if (event.itemValue === 'ALL' && event.value.find(value => value === 'ALL')) {
+        selectedTypes = selectedTypes.filter(op => op === 'ALL');
+      } else {
+        selectedTypes = selectedTypes.filter(op => op !== 'ALL');
+      }
+      this.formSearch.controls.type.setValue(Array.from(selectedTypes));
     }
-    this.formSearch.controls.type.setValue(Array.from(selectedTypes));
     await this.loadJournalData();
   }
 

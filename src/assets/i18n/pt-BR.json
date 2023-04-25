@@ -436,7 +436,7 @@
       "plan": {
         "delete": {
           "relationship": {
-            "error": "Exclusion is not possible as it has related work packages."
+            "error": "Não é possível a exclusão pois o plano possui pacotes de trabalho."
           }
         }
       },

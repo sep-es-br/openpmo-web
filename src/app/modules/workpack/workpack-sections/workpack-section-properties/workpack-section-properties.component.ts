@@ -74,7 +74,7 @@ export class WorkpackSectionPropertiesComponent implements OnInit {
     this.configDataViewSrv.observableCollapsePanelsStatus.pipe(takeUntil(this.$destroy)).subscribe(collapsePanelStatus => {
       this.cardWorkpackProperties = Object.assign({}, {
         ...this.cardWorkpackProperties,
-        initialStateCollapse: collapsePanelStatus === 'collapse' ? true : false
+        initialStateCollapse: this.showTabview ? false : collapsePanelStatus === 'collapse' ? true : false
       });
     });
     this.saveButtonSrv.observableSaveButtonClicked.pipe(takeUntil(this.$destroy)).subscribe(clicked => {
@@ -113,7 +113,7 @@ export class WorkpackSectionPropertiesComponent implements OnInit {
       toggleable: false,
       initialStateToggle: false,
       cardTitle: this.showTabview ? '' : 'properties',
-      collapseble: true,
+      collapseble: this.showTabview ? false : true,
       initialStateCollapse: this.workpackParams.idWorkpack && !this.showTabview ? true : false
     };
   }
@@ -153,7 +153,7 @@ export class WorkpackSectionPropertiesComponent implements OnInit {
     }
 
     if (this.typePropertyModel[propertyModel.type] === TypePropertyModelEnum.SelectionModel) {
-      const listOptions = (propertyModel.possibleValues as string).split(',');
+      const listOptions = propertyModel.possibleValues ? (propertyModel.possibleValues as string).split(',') : [];
       property.possibleValues = listOptions.map(op => ({ label: op, value: op }));
     }
 
@@ -333,6 +333,9 @@ export class WorkpackSectionPropertiesComponent implements OnInit {
   }
 
   async loadUnitMeasuresOffice(idOffice) {
+    if (!idOffice) {
+      return [];
+    }
     const result = await this.unitMeasureSrv.GetAll({ idOffice });
     if (result.success) {
       const units = result.data;

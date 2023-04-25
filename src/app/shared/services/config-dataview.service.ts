@@ -9,13 +9,19 @@ export class ConfigDataViewService {
   private collapsePanelsStatus = new BehaviorSubject<string>('collapse');
   private displayModeAll = new BehaviorSubject<string>('list');
   private pageSize = new BehaviorSubject<number>(5);
+  private panelStatus = 'collapse';
 
   get observableCollapsePanelsStatus() {
     return this.collapsePanelsStatus.asObservable();
   }
 
   nextCollapsePanelsStatus(nextValue: string) {
-    this.collapsePanelsStatus.next(nextValue)
+    this.panelStatus = nextValue;
+    this.collapsePanelsStatus.next(nextValue);
+  }
+
+  getPanelStatus() {
+    return this.panelStatus;
   }
 
   get observableDisplayModeAll() {

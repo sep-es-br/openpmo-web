@@ -75,6 +75,23 @@
       padding-left: 1rem;
     }
   }
+  form.filters.responsive {
+    flex-direction: column;
+    & > * {
+      margin-right: 0;
+      margin-bottom: 1.6rem;
+    }
+    .property-input {
+      width: 100%;
+    }
+  }
+  p-timeline.responsive {
+    .p-timeline .p-timeline-event {
+      .p-timeline-event-opposite {
+        display: none;
+      }
+    }
+  }
   .journal-content {
     margin-top: 2rem;
     margin-bottom: 2rem;
@@ -88,6 +105,14 @@
         display: flex;
         justify-content: center;
         align-items: center;
+      }
+      .fa-info-circle {
+        width: 45px;
+        height: 45px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 2.8rem;
       }
     }
     .p-card {
@@ -116,9 +141,11 @@
           font-size: 0.84rem;
           margin-top: 1rem;
         }
-        .description {
+        .description-info {
           font-size: 0.8rem;
+          line-height: 1.2rem;
           text-align: justify;
+          border: none;
         }
         .evidences {
           display: flex;
@@ -160,18 +187,5 @@
     button {
       margin-right: 1rem;
     }
-  }
-
-  @media screen and (max-width: 900px) {
-   form.filters {
-      flex-direction: column;
-      & > * {
-        margin-right: 0;
-        margin-bottom: 1.6rem;
-      }
-      .property-input {
-        width: 100%;
-      }
-   }
   }
 }

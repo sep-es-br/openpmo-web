@@ -1,4 +1,4 @@
-<div class="app-dashboard" [class.responsive]="!!responsive"
+<div class="app-dashboard" [class.responsive]="!!responsive" [class.width-1700]="mediaScreen1700"
   [class.expanded]="cardDashboardProperties.fullScreen">
   <app-card [class.card-expanded]="cardDashboardProperties.fullScreen" [properties]="cardDashboardProperties"
     [class.panel-tab-view]="showTabview" (changeFullScreen)="handleOnFullScreen($event)">

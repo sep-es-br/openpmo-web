@@ -53,13 +53,18 @@
   .container-actions {
     display: flex;
     justify-content: flex-end;
+    align-items: center;
     .icon-favorite {
       color: #959595;
       font-size: 1.5rem;
-      margin-top: 3px;
+      padding-bottom: 5px;
       cursor: pointer;
       &.icon-favorite-checked {
         color: #ffa000;
+      }
+      &.responsive {
+        padding-bottom: 0;
+        padding-top: 5px;
       }
     }
   }
@@ -125,11 +130,6 @@
     }
   }
 
-  @media (max-width: 768px) {
-    .container-actions .icon-favorite {
-      margin-top: .75rem;
-    }
-  }
 }
 
 ::ng-deep .app-workpack {

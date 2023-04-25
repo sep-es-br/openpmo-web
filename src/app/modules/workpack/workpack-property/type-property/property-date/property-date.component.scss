@@ -5,17 +5,16 @@
   flex-direction: row;
   position: relative;
   padding: .5rem 0;
-  width: 100%;
   .p-float-label.workpack-date .app-select-date .p-calendar {
     width: 100%;
   }
   .p-float-label.workpack-date {
-    width: 20% !important;
+    width: 100%;
   }
   .milestone-date-delay {
     position: absolute;
     left: 0;
-    bottom: 0;
+    top: 4rem;
     font-size: .8rem;
     color: #333;
 
@@ -60,7 +59,6 @@
 
 .container-date-reasons {
   display: flex;
-  width: 100%;
   flex-direction: column;
 }
 

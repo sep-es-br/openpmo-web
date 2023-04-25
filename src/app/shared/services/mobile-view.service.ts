@@ -4,10 +4,9 @@ import { BehaviorSubject, Subject } from 'rxjs';
 @Injectable({
   providedIn: 'root'
 })
-export class ResponsiveService {
+export class MobileViewService {
 
   private isMobileView = new BehaviorSubject<boolean>(false);
-  private resizeEventSub = new Subject<any>();
 
   get observable() {
     return this.isMobileView.asObservable();
@@ -17,11 +16,4 @@ export class ResponsiveService {
     setTimeout(() => this.isMobileView.next(nextValue), 0);
   }
 
-  get resizeEvent() {
-    return this.resizeEventSub.asObservable();
-  }
-
-  nextResizeEvent(nextValue: any) {
-    this.resizeEventSub.next(nextValue);
-  }
 }

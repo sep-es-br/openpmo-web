@@ -20,6 +20,7 @@ import { ResponsiveService } from 'src/app/shared/services/responsive.service';
 import { TranslateChangeService } from 'src/app/shared/services/translate-change.service';
 import { WorkpackService } from 'src/app/shared/services/workpack.service';
 import { IMenuFavorites } from '../../shared/interfaces/IMenu';
+import { MobileViewService } from 'src/app/shared/services/mobile-view.service';
 
 @Component({
   selector: 'app-menu',
@@ -70,7 +71,7 @@ export class MenuComponent implements OnInit, OnDestroy {
     private translateChangeSrv: TranslateChangeService,
     private translateSrv: TranslateService,
     public authSrv: AuthService,
-    private responsiveSrv: ResponsiveService,
+    private mobileViewSrv: MobileViewService,
     private router: Router,
     private locationSrv: Location,
     private officeSrv: OfficeService,
@@ -121,7 +122,7 @@ export class MenuComponent implements OnInit, OnDestroy {
         this.refreshPortfolioMenu();
       }
     });
-    this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(responsive => {
+    this.mobileViewSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(responsive => {
       if (!this.isFixed) {
         this.isChangingView = true;
         this.isMobileView = responsive;

@@ -7,6 +7,7 @@ export interface ICard {
   totalRecords?: number;
   collapseble: boolean;
   initialStateCollapse?: boolean;
+  notShowCardTitle?: boolean;
   cardTitle?: string;
   tabTitle?: string;
   toggleable: boolean;

@@ -1,8 +1,5 @@
 <div class="app-menu-fixed">
   <nav class="app-menu-fixed-nav" [class.admin-menu]="isAdminMenu" [class.mobile]="isMobileView">
-    <!--div class="logo" *ngIf="!isMobileView">
-      <img src="assets/svg/LogoWhite.svg" alt="Logo">
-    </!--div-->
     <div class="item" *ngIf="isMobileView" (click)="toggleMenu('user')">
       <i class="app-icon user-circle" [ngStyle]="{ fontSize: '2.25rem' }"></i>
       <div class="item-label">{{ username }}</div>

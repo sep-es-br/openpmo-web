@@ -48,17 +48,18 @@ export class WorkpackSectionBaselinesComponent implements OnInit, OnDestroy {
         this.workpackData = this.workpackSrv.getWorkpackData();
         this.workpackParams = this.workpackSrv.getWorkpackParams();
         if (this.workpackParams.idWorkpack && this.workpackData.workpack.type === TypeWorkpackEnum.ProjectModel) {
-          this.loadBaselineSection(this.collapsePanelsStatus);
+          this.collapsePanelsStatus = this.configDataViewSrv.getPanelStatus() === 'collapse' ? true : false;
+          this.loadBaselineSection();
         }
       }
     });
     this.configDataViewSrv.observableCollapsePanelsStatus.pipe(takeUntil(this.$destroy)).subscribe(collapsePanelStatus => {
-      this.collapsePanelsStatus = collapsePanelStatus === 'collapse' ? true : false;
+      this.collapsePanelsStatus = this.showTabview ? false : collapsePanelStatus === 'collapse' ? true : false;
       this.sectionBaselines = this.sectionBaselines && Object.assign({}, {
         ...this.sectionBaselines,
         cardSection: {
           ...this.sectionBaselines.cardSection,
-          initialStateCollapse: this.collapsePanelsStatus
+          initialStateCollapse: this.showTabview ? false : this.collapsePanelsStatus
         }
       });
     });
@@ -75,14 +76,14 @@ export class WorkpackSectionBaselinesComponent implements OnInit, OnDestroy {
     this.$destroy.unsubscribe();
   }
 
-  async loadBaselineSection(collapsePanelsStatus) {
+  async loadBaselineSection() {
     this.sectionBaselines = {
       cardSection: {
         toggleable: false,
         initialStateToggle: false,
         cardTitle: !this.showTabview ? 'baselines' : '',
-        collapseble: true,
-        initialStateCollapse: collapsePanelsStatus,
+        collapseble: this.showTabview ? false : true,
+        initialStateCollapse: this.showTabview ? false : this.collapsePanelsStatus,
         showFilters: false,
         isLoading: true,
         showCreateNemElementButton: false,

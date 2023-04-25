@@ -142,7 +142,7 @@
           width: 90%;
           height: 100%;
           .status-container {
-            width: 25%;
+            width: 60px;
             display: flex;
             flex-direction: row;
             align-items: center;
@@ -151,30 +151,33 @@
           .status-empty {
             width: 18%;
           }
-          .milestones-progressbar {
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            justify-content: center;
+          .milestones-progressbar-container {
             width: 165px;
-            border-radius: 12px;
-            overflow: hidden;
-            background-color: #fff;
-            .ontime {
+            .milestones-progressbar {
+              display: flex;
+              flex-direction: row;
+              align-items: center;
+              justify-content: center;
+              width: 100%;
+              border-radius: 12px;
+              overflow: hidden;
+              background-color: #fff;
+              .ontime {
+                  height: 12px;
+                  background-color: #44B39B;
+              }
+              .late {
+                  height: 12px;
+                  background-color: #EA5C5C;
+              }
+              .concluded {
+                  height: 12px;
+                  background-color: #0083BB;
+              }
+              .concluded-late {
                 height: 12px;
-                background-color: #44B39B;
-            }
-            .late {
-                height: 12px;
-                background-color: #EA5C5C;
-            }
-            .concluded {
-                height: 12px;
-                background-color: #0083BB;
-            }
-            .concluded-late {
-              height: 12px;
-              background-color: #7C75B9;
+                background-color: #7C75B9;
+              }
             }
           }
           .indexes {
@@ -182,7 +185,7 @@
               flex-direction: row;
               align-items: center;
               justify-content: center;
-              width: 25%;
+              width: 100px;
               margin: 0 .4rem;
             .index {
                 font-size: 12px;
