@@ -16,7 +16,7 @@
       <label class="app-input-label" [for]="property.name">{{ property.label}} {{ property.required ? '*' : ''}}</label>
     </span>
 
-    <span class="p-float-label" *ngIf="showReason" [class.workpack-date-mobile]="responsive" [class.workpack-date]="property.fullLine"
+    <span class="p-float-label" style="margin-top: 1.7rem;" *ngIf="showReason" [class.workpack-date-mobile]="responsive" [class.workpack-date]="property.fullLine"
       [class.workpack-date-not-fullLine]="!property.fullLine">
       <textarea pInputTextarea id="justification" class="app-text-area" [(ngModel)]="property.reason"
         [disabled]="property.disabled" [required]="true">

@@ -1,5 +1,5 @@
 import { takeUntil } from 'rxjs/operators';
-import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges } from '@angular/core';
 import { ResponsiveService } from '../../services/responsive.service';
 import { WorkpackShowTabviewService } from '../../services/workpack-show-tabview.service';
 import { Subject } from 'rxjs';
@@ -13,11 +13,11 @@ export interface ITabViewScrolled {
   templateUrl: './tabview-scrolled.component.html',
   styleUrls: ['./tabview-scrolled.component.scss']
 })
-export class TabviewScrolledComponent implements OnChanges {
+export class TabviewScrolledComponent implements OnChanges, OnDestroy {
 
   @Output() selectedTabChange = new EventEmitter<ITabViewScrolled>();
   @Input() tabs: ITabViewScrolled[] = [];
-  selectedTab: ITabViewScrolled;
+  @Input() selectedTab: ITabViewScrolled;
   tabBody: string;
   showTabview: boolean;
   $destroy = new Subject();
@@ -46,10 +46,11 @@ export class TabviewScrolledComponent implements OnChanges {
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes.tabs && changes.tabs.currentValue) {
-      this.selectTab(this.tabs[0]);
       setTimeout(() => {
+        if (!this.selectedTab || !this.tabs.some(tab => tab.key === this.selectedTab.key)) {
+          this.selectTab(this.tabs[0]);
+        }
         this.prepareScrolls();
-
       });
     }
   }

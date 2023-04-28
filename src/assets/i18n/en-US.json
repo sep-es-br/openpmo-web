@@ -510,6 +510,15 @@
           "subtitle": "You have no access permission to any resource in Open PMO",
           "solution": "To request for access, please contact the manager of the resource"
         }
+      },
+      "step": {
+        "planned-work": {
+          "cannot": {
+            "be": {
+              "null-or-zero": "Planned work can not be null or zero"
+            }
+          }
+        }
       }
     }
   },

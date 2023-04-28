@@ -402,6 +402,15 @@
       "thereAreNotCostAccounts": "Não existem centros de custo"
     },
     "error": {
+      "step": {
+        "planned-work": {
+          "cannot": {
+            "be": {
+              "null-or-zero": "Estimado físico não pode ser nulo ou zero"
+            }
+          }
+        }
+      },
       "date": {
         "is": {
           "in": {

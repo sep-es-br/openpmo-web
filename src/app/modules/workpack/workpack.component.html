@@ -20,7 +20,7 @@
   </div>
 
   <div class="tabview-container" *ngIf="showTabview">
-    <app-tabview-scrolled [tabs]="tabs" (selectedTabChange)="changeTab($event)">
+    <app-tabview-scrolled [tabs]="tabs" (selectedTabChange)="changeTab($event)" [selectedTab]="selectedTab">
       <div tabviewBody *ngIf="selectedTab?.key === 'WBS'">
         <div class="card-WBS">
           <app-breakdown-structure [idWorkpack]="idWorkpack"
@@ -67,7 +67,7 @@
             </div>
             <div class="workpacks-list-container">
               <div class="loading-container" *ngIf="workpackModel.cardSection.isLoading">
-                <app-card-loading [isCardLoading]="workpackModel.cardSection.isLoading"></app-card-loading>
+                <app-card-loading [isCardLoading]="true"></app-card-loading>
               </div>
               <p-dataView [value]="workpackModel.cardItemsSection" layout="grid" styleClass="dataview-card-items"
                 *ngIf="(displayModeAll === 'grid' || (displayModeAll === 'list' && !!responsive)) && !workpackModel?.cardSection?.isLoading"

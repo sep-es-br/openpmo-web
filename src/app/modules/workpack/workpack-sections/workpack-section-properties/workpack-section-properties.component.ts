@@ -182,10 +182,6 @@ export class WorkpackSectionPropertiesComponent implements OnInit {
       const defaultSelectedLocalities = propertyWorkpack?.selectedValues ?
         propertyWorkpack?.selectedValues as number[] : (propertyModel.defaults ? propertyModel.defaults as number[] : undefined);
       if (defaultSelectedLocalities?.length > 0) {
-        const totalLocalities = this.countLocalities(localityList);
-        if (defaultSelectedLocalities.length === totalLocalities) {
-          defaultSelectedLocalities.unshift(propertyModel.idDomain);
-        }
         const selectedLocalityList = this.loadSelectedLocality(defaultSelectedLocalities, property.localityList);
         property.localitiesSelected = propertyModel.multipleSelection
           ? selectedLocalityList as TreeNode[]
@@ -302,15 +298,6 @@ export class WorkpackSectionPropertiesComponent implements OnInit {
       styleClass: 'green-node',
       data: 'SELECTALL' + localityList[0]?.id
     });
-  }
-
-  countLocalities(list: ILocalityList[]) {
-    return list.reduce((total, item) => {
-      if (item.children) {
-        return total + 1 + this.countLocalities(item.children);
-      }
-      return total + 1;
-    }, 0);
   }
 
   async loadDomainLocalities(idDomain: number) {

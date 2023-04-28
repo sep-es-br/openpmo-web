@@ -128,14 +128,10 @@ export class WorkpackSectionCostAccountsComponent implements OnInit, OnDestroy {
   }
 
   moveCostAccountOutherWorkpackToEnd(costAccounts: ICostAccount[]) {
-    costAccounts.sort((a, b) => {
-      if (a.idWorkpack != this.workpackParams.idWorkpack) {
-        return -1;
-      }
-      return 0;
-    });
-    costAccounts.reverse();
-    return costAccounts;
+    const costAccountsOfWorkpack = Array.from(costAccounts.filter( cost => cost.idWorkpack === this.workpackParams.idWorkpack));
+    const costAccountsOtherWorkpacks = Array.from(costAccounts.filter( cost => cost.idWorkpack !== this.workpackParams.idWorkpack))
+    const reorderedCostAccounts = [...costAccountsOfWorkpack, ...costAccountsOtherWorkpacks];
+    return reorderedCostAccounts;
   }
 
   async deleteCostAccount(cost: ICostAccount) {

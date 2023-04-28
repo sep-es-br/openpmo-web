@@ -14,7 +14,7 @@ import { TypePropertyModelEnum } from './../../shared/enums/TypePropertyModelEnu
 import { FilterDataviewPropertiesEntity } from 'src/app/shared/constants/filterDataviewPropertiesEntity';
 import { FilterDataviewService } from 'src/app/shared/services/filter-dataview.service';
 import { Component, OnDestroy, ViewChild, DebugElement } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, NavigationEnd, Router, RouterEvent } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { ConfirmationService, MenuItem, MessageService, TreeNode } from 'primeng/api';
 import { ICard } from 'src/app/shared/interfaces/ICard';
@@ -100,6 +100,7 @@ export class WorkpackComponent implements OnDestroy {
   selectedTab: ITabViewScrolled;
   tabs: ITabViewScrolled[];
   isLoading = false;
+  tabViewStorage = 'open-pmo:WORKPACK_TABVIEW';
 
   constructor(
     private actRouter: ActivatedRoute,
@@ -142,6 +143,7 @@ export class WorkpackComponent implements OnDestroy {
         idWorkpackParent: idWorkpackParent && +idWorkpackParent,
         idWorkpackModelLinked: idWorkpackModelLinked && +idWorkpackModelLinked
       });
+      this.selectedTab = null;
       await this.resetWorkpack();
     });
     this.menuSrv.getRemovedFavorites.pipe(takeUntil(this.$destroy)).subscribe((idRemoved) => {
@@ -1228,6 +1230,11 @@ export class WorkpackComponent implements OnDestroy {
 
   changeTab($event: ITabViewScrolled) {
     this.selectedTab = $event;
+    const tabview = {
+      idWorkpack: this.idWorkpack,
+      tab: this.selectedTab
+    };
+    localStorage.setItem(this.tabViewStorage, JSON.stringify(tabview));
   }
 
   loadWorkpackTabs() {
@@ -1310,6 +1317,13 @@ export class WorkpackComponent implements OnDestroy {
         key: 'properties'
       });
     }
+    const selectedTab = JSON.parse(localStorage.getItem(this.tabViewStorage));
+    if (selectedTab &&
+        this.tabs?.some(tab => tab.key === selectedTab.tab.key) &&
+        selectedTab.idWorkpack === this.idWorkpack) {
+        this.selectedTab = selectedTab.tab;
+    }
+    localStorage.removeItem(this.tabViewStorage);
     this.isLoading = false;
   }
 

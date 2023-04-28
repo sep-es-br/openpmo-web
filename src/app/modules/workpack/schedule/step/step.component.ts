@@ -455,6 +455,10 @@ export class StepComponent implements OnInit, OnDestroy {
   }
 
   handleChangeValuesCardItems() {
+    if (!this.formStep.controls.plannedWork.value || this.formStep.controls.plannedWork.value <= 0) {
+      this.showSaveButton = false;
+      return;
+    }
     this.reloadCostAssignmentTotals();
     if (this.formStep.valid && this.formStep.controls.plannedWork.value > 0) {
       if (this.costAssignmentsCardItems && this.costAssignmentsCardItems.length > 1) {
@@ -466,6 +470,10 @@ export class StepComponent implements OnInit, OnDestroy {
   }
 
   handleChangeTotalsValues() {
+    if (!this.formStep.controls.plannedWork.value || this.formStep.controls.plannedWork.value <= 0) {
+      this.showSaveButton = false;
+      return;
+    }
     if (this.formStep.valid) {
       if (this.costAssignmentsCardItems && this.costAssignmentsCardItems.length > 1) {
         this.reloadCostAssignmentTotals();

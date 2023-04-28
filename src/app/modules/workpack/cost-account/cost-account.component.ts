@@ -207,7 +207,7 @@ export class CostAccountComponent implements OnInit {
     }
   }
 
-  instanceProperty(propertyModel: IWorkpackModelProperty): PropertyTemplateModel {
+  async instanceProperty(propertyModel: IWorkpackModelProperty): Promise<PropertyTemplateModel> {
     const property = new PropertyTemplateModel();
     const propertyCostAccount = this.costAccount && this.costAccount.properties.find( cost => cost.idPropertyModel === propertyModel.id);
 
@@ -236,8 +236,8 @@ export class CostAccountComponent implements OnInit {
     }
     if (this.typePropertyModel[propertyModel.type] === TypePropertyModelEnum.SelectionModel && propertyModel.multipleSelection) {
       const listValues = propertyCostAccount?.value ?  propertyCostAccount?.value as string : propertyModel.defaultValue as string;
-      property.defaultValue = listValues.split(',');
-      property.value = listValues.split(',');
+      property.defaultValue = listValues.length > 0 ? listValues.split(',') : null;
+      property.value = listValues.length > 0 ? listValues.split(',') : null;
     }
 
     if (this.typePropertyModel[propertyModel.type] === TypePropertyModelEnum.SelectionModel) {
@@ -246,22 +246,45 @@ export class CostAccountComponent implements OnInit {
     }
 
     if (this.typePropertyModel[propertyModel.type] === TypePropertyModelEnum.LocalitySelectionModel) {
-      this.loadDomain(propertyModel.idDomain).then((domain) => {
-        this.loadDomainLocalities(domain.id).then((localityList) => {
-          property.localityList = [{
-            label: domain.name,
-            data: domain.id,
-            children: this.loadLocality(localityList, property.multipleSelection)
-          }];
-          const defaultSelectedLocalities = propertyCostAccount?.selectedValues  ?
-            propertyCostAccount?.selectedValues as number[] : propertyModel.defaults as number[];
-          if (defaultSelectedLocalities?.length > 0) {
-            const selectedLocalityList = defaultSelectedLocalities.map( selectedId => this.loadSelectedLocality( selectedId, localityList));
-            const selectedTreeNodeList = selectedLocalityList.map( l => this.loadSelectedTreeNode(l));
-            property.localitiesSelected = propertyModel.multipleSelection ? selectedTreeNodeList : selectedTreeNodeList[0];
+      const domain = await this.loadDomain(propertyModel.idDomain);
+      const localityList = await this.loadDomainLocalities(domain.id);
+      const selectable = (this.workpackSrv.getEditPermission());
+      const rootNode: TreeNode = {
+        label: domain.localityRoot.name,
+        data: domain.localityRoot.id,
+        children: this.loadLocality(localityList[0].children, selectable, property.multipleSelection),
+        selectable
+      };
+      property.idDomain = propertyModel.idDomain;
+      property.localityList = [rootNode];
+      const defaultSelectedLocalities = propertyCostAccount?.selectedValues ?
+        propertyCostAccount?.selectedValues as number[] : (propertyModel.defaults ? propertyModel.defaults as number[] : undefined);
+      if (defaultSelectedLocalities?.length > 0) {
+        const selectedLocalityList = this.loadSelectedLocality(defaultSelectedLocalities, property.localityList);
+        property.localitiesSelected = propertyModel.multipleSelection
+          ? selectedLocalityList as TreeNode[]
+          : selectedLocalityList[0] as TreeNode;
+      }
+      if (defaultSelectedLocalities && defaultSelectedLocalities.length === 1) {
+        const resultLocality = await this.localitySrv.GetById(defaultSelectedLocalities[0]);
+        if (resultLocality.success) {
+          property.labelButtonLocalitySelected = [resultLocality.data.name];
+          property.showIconButton = false;
+        }
+      }
+      if (defaultSelectedLocalities && defaultSelectedLocalities.length > 1) {
+        property.labelButtonLocalitySelected = await Promise.all(defaultSelectedLocalities.map( async ( loc ) => {
+          const result = await this.localitySrv.GetById(loc);
+          if (result.success) {
+            return result.data.name
           }
-        });
-      });
+        }));
+        property.showIconButton = false;
+      }
+      if (!defaultSelectedLocalities || (defaultSelectedLocalities && defaultSelectedLocalities.length === 0)) {
+        property.labelButtonLocalitySelected = [];
+        property.showIconButton = true;
+      }
     }
 
     if (this.typePropertyModel[propertyModel.type] === TypePropertyModelEnum.OrganizationSelectionModel) {
@@ -297,50 +320,61 @@ export class CostAccountComponent implements OnInit {
     return null;
   }
 
-  loadLocality(localityList: ILocalityList[], showSelectAll: boolean) {
-    const list: TreeNode[] = localityList.map(locality => {
+  loadLocality(localityList: ILocalityList[], selectable: boolean, multipleSelection: boolean) {
+    const list: TreeNode[] = localityList?.map(locality => {
       if (locality.children) {
         return {
           label: locality.name,
           data: locality.id,
-          children: this.loadLocality(locality.children, showSelectAll)
+          children: this.loadLocality(locality.children, selectable, multipleSelection),
+          selectable,
         };
       }
-      return { label: locality.name, data: locality.id };
+      return { label: locality.name, data: locality.id, selectable };
     });
-    if(showSelectAll) {
-      this.addSelectAllNode(list, localityList);
+    list.sort((a, b) => a.label < b.label ? -1 : 0)
+    if (selectable && multipleSelection) {
+      this.addSelectAllNode(list, localityList, selectable);
     }
     return list;
   }
 
-  addSelectAllNode(list: TreeNode[], localityList: ILocalityList[]) {
+  addSelectAllNode(list: TreeNode[], localityList: ILocalityList[], selectable: boolean) {
     list?.unshift({
       label: this.translateSrv.instant('selectAll'),
       key: 'SELECTALL' + localityList[0]?.id,
+      selectable,
       styleClass: 'green-node',
+      data: 'SELECTALL' + localityList[0]?.id
     });
   }
 
   async loadDomainLocalities(idDomain: number) {
-    const result = await this.localitySrv.getLocalitiesTreeFromDomain({'id-domain': idDomain});
+    const result = await this.localitySrv.getLocalitiesTreeFromDomain({ 'id-domain': idDomain });
     if (result) {
       return result as ILocalityList[];
     }
   }
 
-  loadSelectedLocality(selectedId: number, localityList: ILocalityList[]): ILocalityList {
-    if (localityList) {
-      const locality = localityList.find(l => l.id === selectedId);
-      if (locality) {
-        return locality;
+  loadSelectedLocality(seletectedIds: number[], list: TreeNode[]) {
+    let result = [];
+    list.forEach(l => {
+      if (seletectedIds.includes(l.data)) {
+        result.push(l);
+      };
+      if (l.children && l.children.length > 0) {
+        const resultChildren = this.loadSelectedLocality(seletectedIds, l.children);
+        result = result.concat(resultChildren);
       }
-      let i = 0;
-      while (!locality || i < localityList.length) {
-        if (localityList[i].children) {
-          return this.loadSelectedLocality(selectedId, localityList[i].children);
-        }
-        i++;
+    });
+    return result;
+  }
+
+  expandTreeToTreeNode(treeNode: TreeNode) {
+    if (treeNode.parent) {
+      treeNode.parent.expanded = true;
+      if (treeNode.parent.parent) {
+        this.expandTreeToTreeNode(treeNode.parent);
       }
     }
   }
