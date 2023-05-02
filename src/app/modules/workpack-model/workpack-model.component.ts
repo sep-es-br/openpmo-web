@@ -111,7 +111,7 @@ export class WorkpackModelComponent implements OnInit {
   propertiesOffice: IOffice;
   propertiesPlanModel: IPlanModel;
   reusableWorkpackModelsList: MenuItem[];
-  stakeholders = ['manager', 'teamMember', 'sponsor', 'partner', 'funder', 'client', 'competitor'].map( item => this.translateSrv.instant(item));
+  stakeholders = ['manager', 'teamMember', 'sponsor', 'partner', 'funder', 'client', 'competitor'].map(item => this.translateSrv.instant(item));
   dashboardPanel = {
     dashboardShowEva: false,
     dashboardShowMilestones: false,
@@ -270,7 +270,7 @@ export class WorkpackModelComponent implements OnInit {
         { label: this.translateSrv.instant('name'), value: 'name' }
       ];
     }
-    this.stakeholders = ['manager', 'teamMember', 'sponsor', 'partner', 'funder', 'client', 'competitor'].map( item => this.translateSrv.instant(item));
+    this.stakeholders = ['manager', 'teamMember', 'sponsor', 'partner', 'funder', 'client', 'competitor'].map(item => this.translateSrv.instant(item));
     this.dashboardPanel = {
       dashboardShowEva: false,
       dashboardShowMilestones: false,
@@ -989,7 +989,7 @@ export class WorkpackModelComponent implements OnInit {
       this.dashboardPanel.dashboardStakeholderRolesOptions = ((this.posibleRolesPerson && this.posibleRolesPerson.length > 0) || (this.posibleRolesOrg && this.posibleRolesOrg.length > 0)) ?
         this.posibleRolesPerson.concat(this.posibleRolesOrg).map(item => ({ label: item, value: item })) :
         this.stakeholders.map(item => ({ label: this.translateSrv.instant(item), value: this.translateSrv.instant(item) }));
-      
+
       this.dashboardPanel.dashboardShowStakeholders = this.dashboardPanel.dashboardShowStakeholders
         .filter(option => this.dashboardPanel.dashboardStakeholderRolesOptions.find(role => role.value === option));
     }
@@ -1274,9 +1274,9 @@ export class WorkpackModelComponent implements OnInit {
         this.dashboardPanel.dashboardShowStakeholders = this.posibleRolesPerson && this.posibleRolesOrg ? this.posibleRolesPerson.concat(this.posibleRolesOrg) : [];
         this.dashboardPanel.dashboardStakeholderRolesOptions = this.posibleRolesPerson && this.posibleRolesOrg ?
           this.posibleRolesPerson.concat(this.posibleRolesOrg).map(item => ({
-          label: item,
-          value: item
-        })) : [];
+            label: item,
+            value: item
+          })) : [];
       } else {
         this.posibleRolesPerson = [];
         this.posibleRolesOrg = [];
@@ -1314,7 +1314,6 @@ export class WorkpackModelComponent implements OnInit {
           };
         }
       } else {
-        
         this.dashboardPanel = {
           dashboardShowEva: false,
           dashboardShowMilestones: false,
@@ -1337,21 +1336,13 @@ export class WorkpackModelComponent implements OnInit {
       onToggle: new EventEmitter<boolean>()
     };
     this.cardPropertiesCostAccount.onToggle.pipe(takeUntil(this.$destroy)).subscribe(toggleOn => {
-      if (!toggleOn && this.cardPropertiesSchedule?.initialStateToggle) {
-        this.messageSrv.add({
-          severity: 'warn',
-          summary: this.translateSrv.instant('warn'),
-          detail: this.translateSrv.instant('messages.cantRemoveCostAccountWithScheduleOn')
-        });
-        setTimeout(() => this.cardPropertiesCostAccount.initialStateToggle = true, 0);
+      if (toggleOn) {
+        this.loadDefaultPropertiesCostAccount();
       } else {
-        if (toggleOn) {
-          this.loadDefaultPropertiesCostAccount();
-        } else {
-          this.modelCostProperties = [];
-        }
-        setTimeout(() => this.checkProperties(), 150);
+        this.modelCostProperties = [];
       }
+      setTimeout(() => this.checkProperties(), 150);
+
     });
     this.cardPropertiesJournal = {
       toggleable: this.editPermission,
@@ -1561,8 +1552,8 @@ export class WorkpackModelComponent implements OnInit {
       })));
     }
     this.cardItemsModels = itemsModels;
-    setTimeout( () => {
-    this.isLoading = false;
+    setTimeout(() => {
+      this.isLoading = false;
     }, 300)
   }
 
