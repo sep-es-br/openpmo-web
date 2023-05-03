@@ -163,7 +163,7 @@
       <div class="right-container">
         <div class="dashboard-items-container">
           <div class="status-container">
-            <i class="app-icon risk" [ngStyle]="{ fontSize: '1.5rem' }" [class.risk-red]="riskImportance === 'high'"
+            <i class="app-icon risk" [ngStyle]="{ fontSize: '1.2rem' }" [class.risk-red]="riskImportance === 'high'"
               *ngIf="showRiskIndex()" [class.risk-yellow]="riskImportance === 'low'"
               [class.risk-orange]="riskImportance === 'medium'" (mouseenter)="riskPanel.show($event)"
               (mouseleave)="riskPanel.hide()"></i>

@@ -24,7 +24,7 @@
   "administrator": "Administrador",
   "administrators": "Administradores",
   "dashboard": "Painel de Controle",
-  "lateConcluded": "Concluido com atraso",
+  "lateConcluded": "Concluído com atraso",
   "concluded": "Concluído",
   "late": "Atrasado",
   "ontime": "No prazo",
@@ -414,7 +414,7 @@
       "date": {
         "is": {
           "in": {
-            "future": "Para concluir um marco histórico a data do mesmo não pode ser maior que a data atual"
+            "future": "Não é possível marcar como concluído com data futura."
           }
         }
       },

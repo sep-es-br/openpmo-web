@@ -1254,12 +1254,6 @@ export class WorkpackComponent implements OnDestroy {
         menu: 'properties',
         key: 'properties'
       });
-      if (this.idWorkpack && this.workpackModel && this.workpackModel.costSessionActive) {
-        this.tabs.push({
-          menu: 'costAccounts',
-          key: 'costAccounts'
-        });
-      }
       if (this.idWorkpack && this.workpackModel && this.workpackModel.scheduleSessionActive) {
         this.tabs.push({
           menu: 'schedule',
@@ -1278,6 +1272,12 @@ export class WorkpackComponent implements OnDestroy {
         this.tabs.push({
           menu: 'stakeholdersAndPermissions',
           key: 'stakeholdersAndPermissions'
+        });
+      }
+      if (this.idWorkpack && this.workpackModel && this.workpackModel.costSessionActive) {
+        this.tabs.push({
+          menu: 'costAccounts',
+          key: 'costAccounts'
         });
       }
       if (this.getShowBaselineSection()) {

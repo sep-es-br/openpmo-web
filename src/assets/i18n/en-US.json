@@ -406,7 +406,7 @@
       "date": {
         "is": {
           "in": {
-            "future": "To complete a milestone, its date can't be in future"
+            "future": "It is not possible check like concluded with future date."
           }
         }
       },

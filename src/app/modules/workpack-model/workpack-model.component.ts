@@ -436,18 +436,7 @@ export class WorkpackModelComponent implements OnInit {
     ];
     switch (this.workpackModelType) {
       case TypeWorkpackModelEnum.ProgramModel:
-        defaultProperties.push({
-          active: true,
-          label: this.translateSrv.instant('status'),
-          name: this.translateSrv.instant('status'),
-          type: TypePropertyEnum.SelectionModel,
-          multipleSelection: false,
-          possibleValuesOptions: Object.values(this.translateSrv.instant(['finished', 'structuring', 'execution', 'suspended'])),
-          sortIndex: 2,
-          defaultValue: this.translateSrv.instant('structuring'),
-          fullLine: false,
-          required: true
-        },
+        defaultProperties.push(
           {
             active: true,
             label: this.translateSrv.instant('programObjective'),
@@ -497,7 +486,7 @@ export class WorkpackModelComponent implements OnInit {
             type: TypePropertyEnum.SelectionModel,
             multipleSelection: false,
             possibleValuesOptions: Object.values(this.translateSrv.instant(['preparatoryActions', 'projectElaboration', 'projectElaborated',
-              'agreementSigned', 'publishedNotice', 'biddingFinished', 'signedContract', 'executationStarted', 'finished', 'blocked'])),
+              'agreementSigned', 'publishedNotice', 'biddingFinished', 'signedContract', 'executationStarted', 'blocked'])),
             defaultValue: this.translateSrv.instant('preparatoryActions'),
             sortIndex: 3,
             fullLine: false,
@@ -527,18 +516,6 @@ export class WorkpackModelComponent implements OnInit {
         break;
       case TypeWorkpackModelEnum.ProjectModel:
         defaultProperties.push(
-          {
-            active: true,
-            label: this.translateSrv.instant('status'),
-            name: this.translateSrv.instant('status'),
-            type: TypePropertyEnum.SelectionModel,
-            multipleSelection: false,
-            possibleValuesOptions: Object.values(this.translateSrv.instant(['finished', 'structuring', 'execution', 'suspended'])),
-            sortIndex: 2,
-            defaultValue: this.translateSrv.instant('structuring'),
-            fullLine: false,
-            required: true
-          },
           {
             active: true,
             label: this.translateSrv.instant('justification'),

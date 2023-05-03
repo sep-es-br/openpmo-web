@@ -42,11 +42,6 @@
           <app-workpack-section-properties (onGetProperties)="saveWorkpack($event)"></app-workpack-section-properties>
         </div>
       </div>
-      <div tabviewBody *ngIf="selectedTab?.key === 'costAccounts'">
-        <div class="card-cost-accounts">
-          <app-workpack-section-cost-accounts></app-workpack-section-cost-accounts>
-        </div>
-      </div>
       <div tabviewBody *ngIf="selectedTab?.key === 'schedule'">
         <div class="card-schedule">
           <app-workpack-section-schedule></app-workpack-section-schedule>
@@ -104,6 +99,11 @@
           <app-workpack-section-stakeholders></app-workpack-section-stakeholders>
         </div>
       </div>
+      <div tabviewBody *ngIf="selectedTab?.key === 'costAccounts'">
+        <div class="card-cost-accounts">
+          <app-workpack-section-cost-accounts></app-workpack-section-cost-accounts>
+        </div>
+      </div>
       <div tabviewBody *ngIf="selectedTab?.key === 'baselines'">
         <div class="card-baselines">
           <app-workpack-section-baselines></app-workpack-section-baselines>
@@ -146,9 +146,6 @@
     </div>
     <div class="card-properties-workpack">
       <app-workpack-section-properties (onGetProperties)="saveWorkpack($event)"></app-workpack-section-properties>
-    </div>
-    <div class="card-cost-accounts">
-      <app-workpack-section-cost-accounts></app-workpack-section-cost-accounts>
     </div>
     <div class="card-schedule">
       <app-workpack-section-schedule></app-workpack-section-schedule>
@@ -201,6 +198,9 @@
     </section>
     <div class="card-stakeholders">
       <app-workpack-section-stakeholders></app-workpack-section-stakeholders>
+    </div>
+    <div class="card-cost-accounts">
+      <app-workpack-section-cost-accounts></app-workpack-section-cost-accounts>
     </div>
     <div class="card-baselines">
       <app-workpack-section-baselines></app-workpack-section-baselines>
