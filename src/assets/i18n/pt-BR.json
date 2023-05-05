@@ -1,4 +1,5 @@
 {
+  "confirmClearPendingChanges": "Alterações pendentes",
   "notFoundPlansToThisOffice": "Este office não possui modelos de plano cadastrados para criar planos",
   "newDate": "Nova data",
   "previousDate": "Data anterior",
@@ -340,6 +341,7 @@
   "productAnalyst": "Analista de Produto",
   "uiUxDesigner": "Designer de UI UX",
   "messages": {
+    "confirmClearPendingChanges": "Existem alterações não salvas que serão perdidas com a mudança da página. Deseja continuar?",
     "requiredInformationsMustBeFilled": "Informações obrigatórias devem ser preenchidas.",
     "scheduleActualValueValidation": "Data do passo inicial é maior que o mês atual.",
     "cookies-confirmation": "O OPEN PMO utiliza cookies para possibilitar uma forma de navegação personalizada. Ao clicar em aceitar você está concordando com o armazenamento de dados de navegação.",

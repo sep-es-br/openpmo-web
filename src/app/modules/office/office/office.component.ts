@@ -66,6 +66,7 @@ export class OfficeComponent implements OnDestroy {
     initialStateToggle: false,
     cardTitle: 'plans',
     collapseble: true,
+    showFilters: true,
     initialStateCollapse: this.collapsePanelsStatus
   };
 
@@ -185,7 +186,7 @@ export class OfficeComponent implements OnDestroy {
   async loadPlans() {
     this.isLoading = true;
     this.loadPlanModelsOfficeList();
-    await this.loadFiltersPlans();
+    
     const result = await this.planSrv.GetAll({ 'id-office': this.idOffice, 'idFilter': this.idFilterSelected });
     if (result.success) {
       this.plans = result.data;
@@ -194,7 +195,7 @@ export class OfficeComponent implements OnDestroy {
     this.loadCardItemsPlans();
   }
 
-  loadCardItemsPlans() {
+  async loadCardItemsPlans() {
     const itemsPlans: ICardItem[] = (this.editPermission && this.menuItemsNewPlan?.length > 0) ? [
       {
         typeCardItem: 'newCardItem',
@@ -234,8 +235,13 @@ export class OfficeComponent implements OnDestroy {
     }
     this.cardItemsPlans = itemsPlans;
     this.totalRecords = this.cardItemsPlans && this.cardItemsPlans.length;
-    this.cardPlans.showCreateNemElementButton = this.editPermission && this.menuItemsNewPlan?.length > 0 ? true : false;
-    this.cardPlans.createNewElementMenuItems = this.menuItemsNewPlan;
+    const filters = await this.loadFiltersPlans();
+    this.cardPlans = {
+      ...this.cardPlans,
+      showCreateNemElementButton:  this.editPermission && this.menuItemsNewPlan?.length > 0 ? true : false,
+      createNewElementMenuItems: this.menuItemsNewPlan,
+      filters
+    }
     
   }
 
@@ -311,9 +317,9 @@ export class OfficeComponent implements OnDestroy {
     if (result.success && result.data.length > 0) {
       const filterDefault = result.data.find(defaultFilter => !!defaultFilter.favorite);
       this.idFilterSelected = filterDefault ? filterDefault.id : undefined;
-      this.cardPlans.filters = result.data;
+      return result.data;
     }
-    this.cardPlans.showFilters = true;
+    
   }
 
   handleEditFilter(event) {

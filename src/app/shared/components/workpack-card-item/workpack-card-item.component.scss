@@ -28,20 +28,32 @@
   .reason-container {
     display: flex;
     flex-direction: column;
-    padding: 1rem;
+    padding: 0 0.5rem 0.5rem;
+    width: 100%;
   }
   .reason-buttons {
     display: flex;
+    width: 100%;
+    justify-content: flex-end;
+    padding-bottom: 0.5rem;
+    padding-right: 0.5em;
+    padding-top: 5px;
     .p-button {
       background-color: #44b39b !important;
       border: none;
       margin-left: .5rem;
     }
+    .p-button.p-button-sm {
+      padding: 0.3rem;
+    }
+    .p-button.p-button-sm .p-button-icon {
+      font-size: 1rem;
+    }
   }
   .reason-line {
     display: flex;
     height: fit-content;
-    padding: .3rem 0;
+    padding: .3rem 0 0.5rem;
     .reason-label {
       margin-top: .5rem;
     }
@@ -592,6 +604,12 @@
       height: 100%;
       width: 100%;
       justify-content: space-between;
+      .calendar-container {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        align-items: center;
+      }
     }
     .display-mode-list {
       display: flex;
@@ -625,6 +643,15 @@
               width: 175px;
               font-size: 16px;
               margin-left: 2em;
+            }
+          }
+          .calendar-container {
+            display: flex;
+            flex-direction: row;
+            width: 100%;
+            justify-content: flex-end;
+            .reason-buttons {
+              width: auto;
             }
           }
         }
@@ -740,6 +767,12 @@
         overflow: hidden;
         text-overflow: ellipsis;
         text-align: center;
+      }   
+      .p-calendar {
+        border-bottom: 1px solid #ced4da;
+        .p-inputtext {
+          border: none;
+        }
       }
       .card-item-date {
         font-size: 12px;

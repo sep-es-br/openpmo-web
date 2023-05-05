@@ -32,7 +32,8 @@
               <div class="milestone-column">{{ node?.expirationDate }}</div>
                 <div class="milestone-column">
                   <div class="icons-container">
-                    <i [ngClass]=" ['concluded', 'lateConcluded'].includes(node?.milestoneStatus) ?  [ 'app-icon', 'flag-check', 'grey-icon'] : ['app-icon', 'flag-unchecked', 'grey-icon']"
+                    <i [ngClass]=" [milestoneStatusEnum.CONCLUDED, milestoneStatusEnum.LATE_CONCLUDED].includes(milestoneStatusEnum[node?.milestoneStatus]) ? 
+                    [ 'app-icon', 'flag-check', 'grey-icon'] : ['app-icon', 'flag-unchecked', 'grey-icon']"
                       [ngStyle]="{ fontSize: '1.2rem' }"
                       [class.on-time]="milestoneStatusEnum[node?.milestoneStatus] === milestoneStatusEnum.ON_TIME && !node?.canceled"
                       [class.late]="milestoneStatusEnum[node?.milestoneStatus] === milestoneStatusEnum.LATE"

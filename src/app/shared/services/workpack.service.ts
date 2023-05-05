@@ -21,6 +21,7 @@ export class WorkpackService extends BaseService<IWorkpack> {
   private canEditCheckCompleted = new BehaviorSubject<boolean>(false);
   private checkCompletedChanged = new BehaviorSubject<boolean>(false);
   private reloadProperties = new BehaviorSubject<boolean>(false);
+  private pendingChanges = new BehaviorSubject<boolean>(false);
   private workpackData: IWorkpackData;
   private workpackParams: IWorkpackParams;
   private editPermission: boolean;
@@ -39,6 +40,14 @@ export class WorkpackService extends BaseService<IWorkpack> {
 
   nextResetWorkpack(nextValue: boolean) {
     this.resetWorkpack.next(nextValue)
+  }
+
+  get observablePendingChanges() {
+    return this.pendingChanges.asObservable();
+  }
+
+  nextPendingChanges(nextValue: boolean) {
+    this.pendingChanges.next(nextValue)
   }
 
   get observableCanEditCheckCompleted() {
@@ -219,7 +228,7 @@ export class WorkpackService extends BaseService<IWorkpack> {
     return result as IHttpResult<any>;
   }
 
-  async patchMilestoneReason(idMilestone: number, dateReason: { date: string; reason: string }): Promise<IHttpResult<any>> {
+  async patchMilestoneReason(idMilestone: number, dateReason: { date: string; reason?: string }): Promise<IHttpResult<any>> {
     const result = await this.http.patch(`${this.urlBase}/milestone/${idMilestone}`, {
       date: dateReason.date,
       reason: dateReason.reason

@@ -169,9 +169,11 @@ export class WorkpackComponent implements OnDestroy {
     this.saveButtonSrv.observableShowSaveButton.pipe(takeUntil(this.$destroy)).subscribe(showButton => {
       if (showButton && this.saveButton) {
         this.saveButton.showButton();
+        this.workpackSrv.nextPendingChanges(true);
       } else {
         if (this.saveButton) {
           this.saveButton.hideButton();
+          this.workpackSrv.nextPendingChanges(false);
         }
       }
     });
@@ -185,7 +187,7 @@ export class WorkpackComponent implements OnDestroy {
     this.configDataViewSrv.observablePageSize.pipe(takeUntil(this.$destroy)).subscribe(pageSize => {
       this.pageSize = pageSize;
     });
-    this.workpackSrv.observableCheckCompletedChanged.pipe(takeUntil(this.$destroy)).subscribe( checkCompleted => {
+    this.workpackSrv.observableCheckCompletedChanged.pipe(takeUntil(this.$destroy)).subscribe(checkCompleted => {
       if (this.workpack) {
         this.changedStatusCompleted = true;
         this.workpack.completed = checkCompleted;
@@ -241,6 +243,7 @@ export class WorkpackComponent implements OnDestroy {
   }
 
   async resetWorkpack() {
+    this.workpackSrv.nextPendingChanges(false);
     this.isLoading = true;
     this.workpackModel = undefined;
     this.cardJournalProperties = undefined;
@@ -297,7 +300,7 @@ export class WorkpackComponent implements OnDestroy {
     }
   }
 
-  async loadWorkpack() {
+  async loadWorkpack(reloadOnlyProperties = false) {
     const result = await this.workpackSrv.GetWorkpackDataById(this.idWorkpack, { 'id-plan': this.idPlan });
     if (result.success) {
       this.workpack = result.data;
@@ -313,8 +316,18 @@ export class WorkpackComponent implements OnDestroy {
       } else if (!this.isUserAdmin && this.workpack) {
         await this.loadUserPermission();
       }
-      this.workpackSrv.setWorkpackData({ workpack: this.workpack });
-      await this.loadWorkpackModel(this.workpack.model.id);
+      
+      if (reloadOnlyProperties) {
+        const workpackData = this.workpackSrv.getWorkpackData();
+        this.workpackSrv.setWorkpackData({ 
+          ...workpackData,
+          workpack: this.workpack });
+        this.workpackSrv.nextReloadProperties(true);
+      }
+      if (!reloadOnlyProperties) {
+        this.workpackSrv.setWorkpackData({ workpack: this.workpack });
+        await this.loadWorkpackModel(this.workpack.model.id);
+      }
     }
   }
 
@@ -332,7 +345,7 @@ export class WorkpackComponent implements OnDestroy {
     }
   }
 
-  async loadWorkpackLinked() {
+  async loadWorkpackLinked(reloadOnlyProperties = false) {
     const result = await this.workpackSrv.GetWorkpackLinked(this.idWorkpack,
       { 'id-workpack-model': this.idWorkpackModelLinked, 'id-plan': this.idPlan });
     if (result.success) {
@@ -350,8 +363,17 @@ export class WorkpackComponent implements OnDestroy {
         const editPermission = !!this.workpack.permissions?.find(p => p.level === 'EDIT');
         this.workpackSrv.setEditPermission(editPermission);
       }
-      this.workpackSrv.setWorkpackData({ workpack: this.workpack });
-      await this.loadWorkpackModel(this.workpack.model.id);
+      if (reloadOnlyProperties) {
+        const workpackData = this.workpackSrv.getWorkpackData();
+        this.workpackSrv.setWorkpackData({ 
+          ...workpackData,
+          workpack: this.workpack });
+        this.workpackSrv.nextReloadProperties(true);
+      }
+      if (!reloadOnlyProperties) {
+        this.workpackSrv.setWorkpackData({ workpack: this.workpack });
+        await this.loadWorkpackModel(this.workpack.model.id);
+      }
     }
   }
 
@@ -412,7 +434,7 @@ export class WorkpackComponent implements OnDestroy {
         initialStateToggle: false,
         notShowCardTitle: this.showTabview ? true : false,
         cardTitle: 'journal',
-        collapseble:  this.showTabview ? false : true,
+        collapseble: this.showTabview ? false : true,
         initialStateCollapse: this.collapsePanelsStatus,
       };
     }
@@ -427,14 +449,14 @@ export class WorkpackComponent implements OnDestroy {
   }
 
   async loadSectionsWorkpackChildren() {
-    this.cardsWorkPackModelChildren = this.workpackModel.children.map( workpackModel => {
+    this.cardsWorkPackModelChildren = this.workpackModel.children.map(workpackModel => {
       const propertiesCard: ICard = {
         toggleable: false,
         initialStateToggle: false,
         notShowCardTitle: this.showTabview ? true : false,
         cardTitle: workpackModel.modelNameInPlural,
         tabTitle: workpackModel.modelNameInPlural,
-        collapseble:  this.showTabview ? false : true,
+        collapseble: this.showTabview ? false : true,
         initialStateCollapse: this.collapsePanelsStatus,
         showFilters: true,
         showCreateNemElementButton: this.workpackSrv.getEditPermission() ? true : false,
@@ -445,7 +467,7 @@ export class WorkpackComponent implements OnDestroy {
         workpackShowCancelleds: this.workpack.canceled ? true : false
       };
     })
-    this.workpackModel.children.forEach( async(workpackModel, index) => {
+    this.workpackModel.children.forEach(async (workpackModel, index) => {
       this.cardsWorkPackModelChildren[index].cardSection.isLoading = true;
       const resultFilters = await this.filterSrv.getAllFilters(`workpackModels/${workpackModel.id}/workpacks`);
       if (resultFilters.success && resultFilters.data) {
@@ -465,7 +487,7 @@ export class WorkpackComponent implements OnDestroy {
 
   getShowStakeHolderSection() {
     return this.idWorkpack && this.workpackModel && this.workpackModel.stakeholderSessionActive &&
-        !this.idWorkpackModelLinked || (this.workpackSrv.getEditPermission() && !!this.idWorkpackModelLinked)
+      !this.idWorkpackModelLinked || (this.workpackSrv.getEditPermission() && !!this.idWorkpackModelLinked)
   }
 
   getShowBaselineSection() {
@@ -782,7 +804,7 @@ export class WorkpackComponent implements OnDestroy {
   handleOnHasWBS(event) {
     this.hasWBS = event;
     if (this.showTabview && !this.hasWBS) {
-      this.tabs = this.tabs.filter( tab => tab.key !== 'WBS');
+      this.tabs = this.tabs.filter(tab => tab.key !== 'WBS');
     }
   }
 
@@ -917,7 +939,7 @@ export class WorkpackComponent implements OnDestroy {
         cardTitle: workpackModel.nameInPluralWorkpackModelLinked,
         tabTitle: workpackModel.nameInPluralWorkpackModelLinked,
         collapseble: this.showTabview ? false : true,
-        initialStateCollapse:  this.showTabview ? false : this.collapsePanelsStatus,
+        initialStateCollapse: this.showTabview ? false : this.collapsePanelsStatus,
         showFilters: true,
         showCreateNemElementButton: false
       };
@@ -934,7 +956,7 @@ export class WorkpackComponent implements OnDestroy {
         this.cardsWorkPackModelChildren[index].cardSection.filters = resultFilters.data;
       }
       const idFilterSelected = this.cardsWorkPackModelChildren[index].cardSection.filters.find(defaultFilter => !!defaultFilter.favorite) ?
-      this.cardsWorkPackModelChildren[index].cardSection.filters.find(defaultFilter => !!defaultFilter.favorite).id : undefined;
+        this.cardsWorkPackModelChildren[index].cardSection.filters.find(defaultFilter => !!defaultFilter.favorite).id : undefined;
       const resultItemsList = await this.loadWorkpacksFromWorkpackModel
         (this.idPlan, workpackModel.idWorkpackModelOriginal, idFilterSelected, false, workpackModel.idWorkpackModelLinked);
       this.cardsWorkPackModelChildren[index].cardItemsSection = resultItemsList && resultItemsList.workpackItemCardList;
@@ -1042,6 +1064,7 @@ export class WorkpackComponent implements OnDestroy {
   }
 
   onSaveButtonClicked() {
+    this.workpackSrv.nextPendingChanges(false);
     this.saveButtonSrv.nextSaveButtonClicked(true);
   }
 
@@ -1050,7 +1073,7 @@ export class WorkpackComponent implements OnDestroy {
     let updateSuccess = true;
     if (!!this.changedStatusCompleted) {
       if (this.workpack.type === TypeWorkpackEnum.MilestoneModel) {
-        const dateProperty = properties.find( p => p.type === TypePropertyModelEnum.DateModel);
+        const dateProperty = properties.find(p => p.type === TypePropertyModelEnum.DateModel);
         if (dateProperty) {
           const date = dateProperty.value ? moment(dateProperty.value).format('yyyy-MM-DD') : null;
           try {
@@ -1117,7 +1140,15 @@ export class WorkpackComponent implements OnDestroy {
           idWorkpack: data.id
         });
         this.idWorkpack = data.id;
-       this.resetWorkpack();
+        this.resetWorkpack();
+      } else {
+        if (this.idWorkpack) {
+          if (!this.idWorkpackModelLinked) {
+            await this.loadWorkpack(true);
+          } else {
+            await this.loadWorkpackLinked(true);
+          }
+        }
       }
       this.messageSrv.add({
         severity: 'success',
@@ -1262,9 +1293,9 @@ export class WorkpackComponent implements OnDestroy {
       }
       if (this.idWorkpack && this.workpackModel.childWorkpackModelSessionActive && this.workpackModel.children) {
         this.tabs.push(
-          ...this.workpackModel.children.map( workpackModel => ({
-            menu:workpackModel.modelNameInPlural,
-            key:workpackModel.modelNameInPlural
+          ...this.workpackModel.children.map(workpackModel => ({
+            menu: workpackModel.modelNameInPlural,
+            key: workpackModel.modelNameInPlural
           }))
         );
       }
@@ -1319,9 +1350,9 @@ export class WorkpackComponent implements OnDestroy {
     }
     const selectedTab = JSON.parse(localStorage.getItem(this.tabViewStorage));
     if (selectedTab &&
-        this.tabs?.some(tab => tab.key === selectedTab.tab.key) &&
-        selectedTab.idWorkpack === this.idWorkpack) {
-        this.selectedTab = selectedTab.tab;
+      this.tabs?.some(tab => tab.key === selectedTab.tab.key) &&
+      selectedTab.idWorkpack === this.idWorkpack) {
+      this.selectedTab = selectedTab.tab;
     }
     localStorage.removeItem(this.tabViewStorage);
     this.isLoading = false;

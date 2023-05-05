@@ -10,6 +10,7 @@ import { ChartData } from 'chart.js';
 import { Subject } from 'rxjs';
 import * as moment from 'moment';
 import { WorkpackService } from '../../services/workpack.service';
+import { MessageService } from 'primeng/api';
 
 @Component({
   selector: 'app-workpack-card-item',
@@ -45,12 +46,14 @@ export class WorkpackCardItemComponent implements OnInit, OnDestroy {
   milestoneDate: Date;
   showReasonModal: boolean;
   reasonValue: string;
+  showReasonButtons = false;
 
   constructor(
     private router: Router,
     private responsiveSrv: ResponsiveService,
     private translateSrv: TranslateService,
-    private workpackSrv: WorkpackService
+    private workpackSrv: WorkpackService,
+    private messageSrv: MessageService
   ) {
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.responsive = value);
     this.translateSrv.onLangChange.pipe(takeUntil(this.$destroy)).subscribe(() => {
@@ -100,19 +103,26 @@ export class WorkpackCardItemComponent implements OnInit, OnDestroy {
   }
 
   changeMilestoneDate(event: any) {
+    this.workpackSrv.nextPendingChanges(true);
     const momentEvent = moment(event).format('yyyy-MM-DD');
     const momentProp = moment(this.properties.subtitleCardItem, 'yyyy-MM-DD');
     const diffEventProp = moment(momentEvent).diff(momentProp, 'days');
     if (!isNaN(diffEventProp) && diffEventProp !== 0) {
-      this.showReasonModal = true;
-      this.reasonValue = '';
+      if (!!this.properties.hasBaseline) {
+        this.showReasonModal = true;
+        this.showReasonButtons = false;
+        this.reasonValue = '';
+      } else {
+        this.showReasonButtons = true;
+        this.showReasonModal = false;
+      }
       this.milestoneDate = event;
     }
   }
 
   async saveReason() {
     this.showReasonModal = false;
-
+    this.workpackSrv.nextPendingChanges(false);
     const dateReason = {
       date: moment(this.milestoneDate).format('yyyy-MM-DD'),
       reason: this.reasonValue
@@ -123,11 +133,43 @@ export class WorkpackCardItemComponent implements OnInit, OnDestroy {
     } else {
       this.setMilestoneDateProperty();
     }
+    this.messageSrv.add({
+      severity: 'success',
+      summary: this.translateSrv.instant('success'),
+      detail: this.translateSrv.instant('messages.savedSuccessfully')
+    });
   }
+
+  async saveDate() {
+    this.showReasonButtons = false;
+    this.workpackSrv.nextPendingChanges(false);
+    const dateReason = {
+      date: moment(this.milestoneDate).format('yyyy-MM-DD'),
+    };
+    const { success } = await this.workpackSrv.patchMilestoneReason(this.properties.itemId, dateReason);
+    if (success) {
+      this.properties.subtitleCardItem = moment(this.milestoneDate).format('yyyy-MM-DD');
+    } else {
+      this.setMilestoneDateProperty();
+    }
+    this.messageSrv.add({
+      severity: 'success',
+      summary: this.translateSrv.instant('success'),
+      detail: this.translateSrv.instant('messages.savedSuccessfully')
+    });
+  }
+
   cancelReason() {
+    this.workpackSrv.nextPendingChanges(false);
     this.showReasonModal = false;
     this.setMilestoneDateProperty();
     this.reasonValue = '';
+  }
+
+  cancelDateChange() {
+    this.workpackSrv.nextPendingChanges(false);
+    this.showReasonButtons = false;
+    this.setMilestoneDateProperty();
   }
 
   setMilestoneDateProperty() {

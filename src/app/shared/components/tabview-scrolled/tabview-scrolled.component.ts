@@ -3,6 +3,10 @@ import { Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleCha
 import { ResponsiveService } from '../../services/responsive.service';
 import { WorkpackShowTabviewService } from '../../services/workpack-show-tabview.service';
 import { Subject } from 'rxjs';
+import { WorkpackService } from '../../services/workpack.service';
+import { ConfirmationService } from 'primeng/api';
+import { TranslateService } from '@ngx-translate/core';
+import { SaveButtonService } from '../../services/save-button.service';
 
 export interface ITabViewScrolled {
   menu: string;
@@ -21,10 +25,15 @@ export class TabviewScrolledComponent implements OnChanges, OnDestroy {
   tabBody: string;
   showTabview: boolean;
   $destroy = new Subject();
+  pendingChanges = false;
 
   constructor(
     private responsiveSrv: ResponsiveService,
     public workpackShowTabViewSrv: WorkpackShowTabviewService,
+    private workpackSrv: WorkpackService,
+    private confirmationSrv: ConfirmationService,
+    private translateSrv: TranslateService,
+    private saveButtonSrv: SaveButtonService
   ) {
     this.responsiveSrv.resizeEvent.subscribe(() => {
       setTimeout(() => {
@@ -36,6 +45,9 @@ export class TabviewScrolledComponent implements OnChanges, OnDestroy {
       setTimeout(() => {
         this.prepareScrolls();
       });
+    });
+    this.workpackSrv.observablePendingChanges.pipe(takeUntil(this.$destroy)).subscribe(value => {
+      this.pendingChanges = value;
     });
   }
 
@@ -56,9 +68,27 @@ export class TabviewScrolledComponent implements OnChanges, OnDestroy {
   }
 
   selectTab(item: ITabViewScrolled) {
-    this.selectedTab = item;
-    this.tabBody = `${item.key}`;
-    this.selectedTabChange.emit(this.selectedTab);
+    if (this.pendingChanges) {
+      this.confirmationSrv.confirm({
+        message: this.translateSrv.instant('messages.confirmClearPendingChanges'),
+        key: 'clearPendingChangesConfirm',
+        acceptLabel: this.translateSrv.instant('yes'),
+        rejectLabel: this.translateSrv.instant('no'),
+        accept: async () => {
+          this.selectedTab = item;
+          this.tabBody = `${item.key}`;
+          this.workpackSrv.nextPendingChanges(false);
+          this.selectedTabChange.emit(this.selectedTab);
+          this.saveButtonSrv.nextShowSaveButton(false);
+        },
+        reject: () => {
+        }
+      });
+    } else {
+      this.selectedTab = item;
+      this.tabBody = `${item.key}`;
+      this.selectedTabChange.emit(this.selectedTab);
+    }
   }
 
   prepareScrolls() {

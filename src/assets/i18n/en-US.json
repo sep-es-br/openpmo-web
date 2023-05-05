@@ -1,4 +1,5 @@
 {
+  "confirmClearPendingChanges": "Pending changes",
   "notFoundPlansToThisOffice": "This office has not plan models to create plans",
   "newDate": "New date",
   "previousDate": "Previous date",
@@ -341,6 +342,7 @@
   "productAnalyst": "Product Analyst",
   "uiUxDesigner": "UI UX Designer",
   "messages": {
+    "confirmClearPendingChanges": "There are unsaved changes that will be lost with the page change. Do you wish to continue?",
     "requiredInformationsMustBeFilled": "Required informations must be filled.",
     "scheduleActualValueValidation": "Start step date is after actual month.",
     "cookies-confirmation": "The OPEN PMO uses cookies to enable a personalized navigation. By clicking accept you are agreeing to the storage of browsing data.",

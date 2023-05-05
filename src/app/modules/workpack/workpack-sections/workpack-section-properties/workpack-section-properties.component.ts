@@ -67,7 +67,7 @@ export class WorkpackSectionPropertiesComponent implements OnInit {
     this.workpackSrv.observableReloadProperties.pipe(takeUntil(this.$destroy)).subscribe(reload => {
       if (reload) {
         this.workpackData = this.workpackSrv.getWorkpackData();
-        this.loadProperties();
+        this.reloadProperties();
       }
     });
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(responsive => this.responsive = responsive);
@@ -106,6 +106,13 @@ export class WorkpackSectionPropertiesComponent implements OnInit {
       this.workpackData.workpackModel?.properties?.filter(w => w.active && w.session === 'PROPERTIES');
     this.sectionPropertiesProperties = await Promise.all(workpackModelActivesProperties.map(p => this.instanceProperty(p)));
     this.showCheckCompleted();
+  }
+
+  async reloadProperties() {
+    const workpackModelActivesProperties = (!!this.workpackParams.idWorkpackModelLinked && !!this.workpackParams.idWorkpack) ?
+      this.workpackData.workpack.model?.properties?.filter(w => w.active && w.session === 'PROPERTIES') :
+      this.workpackData.workpackModel?.properties?.filter(w => w.active && w.session === 'PROPERTIES');
+    this.sectionPropertiesProperties = await Promise.all(workpackModelActivesProperties.map(p => this.instanceProperty(p)));
   }
 
   loadCardWorkpackProperties() {
