@@ -319,6 +319,7 @@ export class StepComponent implements OnInit, OnDestroy {
           readonly: !this.editPermission
         };
       });
+      this.reloadCostAssignmentTotals();
       if (!!this.editPermission) {
         this.costAssignmentsCardItems.push({
           type: 'new-cost-card',
