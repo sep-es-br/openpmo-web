@@ -71,6 +71,8 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
     private organizationSrv: OrganizationService,
     private unitMeasureSrv: MeasureUnitService,
   ) {
+    localStorage.removeItem('@currentPlan');
+    localStorage.removeItem('@pmo/propertiesCurrentPlan');
     this.loadFormFilter();
     this.formFilter.statusChanges
       .pipe(takeUntil(this.$destroy), filter(status => status === 'INVALID'))

@@ -1,7 +1,7 @@
 import { DashboardService } from 'src/app/shared/services/dashboard.service';
 import { takeUntil } from 'rxjs/operators';
 import { MenuService } from 'src/app/shared/services/menu.service';
-import { Component, OnDestroy } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 
 import { ResponsiveService } from 'src/app/shared/services/responsive.service';
 import { Subject } from 'rxjs';
@@ -12,7 +12,7 @@ import { WorkpackShowTabviewService } from 'src/app/shared/services/workpack-sho
   templateUrl: './template.component.html',
   styleUrls: ['./template.component.scss']
 })
-export class TemplateComponent implements OnDestroy {
+export class TemplateComponent implements OnDestroy, OnInit {
 
   isMenuFixed = false;
   $destroy = new Subject();
@@ -26,10 +26,19 @@ export class TemplateComponent implements OnDestroy {
     public dashboardSrv: DashboardService,
     public workpackShowTabViewSrv: WorkpackShowTabviewService,
   ) {
+    this.dashboardSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.fullScreenModeDashboard = value);
+  }
+
+  ngOnInit(): void {
     this.menuSrv.getMenuState.pipe(takeUntil(this.$destroy)).subscribe(menuState => {
       this.isMenuFixed = menuState.isFixed;
+      if (menuState.isFixed) {
+        setTimeout(() => {
+          this.onResizeEnd(null);
+          this.prepareLineSplitter();
+        });
+      }
     });
-    this.dashboardSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.fullScreenModeDashboard = value);
   }
 
   toggleMenu(isAdmin: boolean) {
@@ -39,6 +48,29 @@ export class TemplateComponent implements OnDestroy {
   ngOnDestroy(): void {
     this.$destroy.next();
     this.$destroy.complete();
+  }
+
+  prepareLineSplitter() {
+    const splitter = document.querySelector('.p-splitter-gutter');
+    const appTemplateWidth = document.querySelector('.app-template').clientWidth;
+    const maxWidth = appTemplateWidth * 0.8;
+    const minWidth = appTemplateWidth * 0.2;
+    if (splitter) {
+      splitter.addEventListener('mousedown', () => {
+        document.onmousemove = (event) => {
+          splitter.classList.add('splitter-moveevent');
+          if (event.clientX > minWidth && event.clientX < maxWidth) {
+            splitter.setAttribute('style', `left: ${event.clientX}px`);
+          }
+        };
+        document.onmouseup = () => {
+          document.onmousemove = null;
+          document.onmouseup = null;
+          splitter.classList.remove('splitter-moveevent');
+          splitter.setAttribute('style', 'width: 4px;');
+        };
+      });
+    }
   }
 
   onResizeEnd(event) {

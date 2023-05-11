@@ -1,6 +1,3 @@
-<div class="loading-container" *ngIf="isLoading">
-  <app-card-loading [isCardLoading]="isLoading"></app-card-loading>
-</div>
 <div class="app-workpack" *ngIf="workpackModel" [class.fullscreenModeDashboard]="fullScreenModeDashboard">
   <div class="header-container" [class.mobile]="responsive" *ngIf="idWorkpack">
     <div class="app-content-header" [class.mobile]="responsive">
@@ -55,6 +52,7 @@
             (selectedFilter)="handleSelectedFilterWorkpackModel($event, workpackModel.idWorkpackModel)"
             (createNewElement)="handleCreateNewWorkpack(workpackModel.idWorkpackModel)"
             *ngIf="(selectedTab?.key === workpackModel.cardSection.tabTitle)">
+
             <div class="input-toggle-workpack-cancelled">
               <p-inputSwitch class="app-toggle" [(ngModel)]="workpackModel.workpackShowCancelleds"
                 (onChange)="handleWorkpackCancelledToggle(i, $event)"></p-inputSwitch>

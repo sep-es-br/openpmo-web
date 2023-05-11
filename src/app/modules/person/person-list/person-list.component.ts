@@ -72,6 +72,8 @@ export class PersonListComponent implements OnInit, OnDestroy {
     private citizenUserSrv: CitizenUserService,
     private configDataViewSrv: ConfigDataViewService
   ) {
+    localStorage.removeItem('@currentPlan');
+    localStorage.removeItem('@pmo/propertiesCurrentPlan');
     this.configDataViewSrv.observableDisplayModeAll.pipe(takeUntil(this.$destroy)).subscribe(displayMode => {
       this.displayModeAll = displayMode;
     });

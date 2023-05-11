@@ -41,7 +41,7 @@ export class WorkpackModelPropertyComponent implements OnDestroy, AfterViewInit 
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(responsive => this.responsive = responsive);
     const today = moment();
     const yearStart = today.year();
-    this.yearRange = (yearStart - 1).toString() + ':' + (yearStart + 15).toString();
+    this.yearRange = (yearStart - 10).toString() + ':' + (yearStart + 10).toString();
   }
 
   ngAfterViewInit(): void {

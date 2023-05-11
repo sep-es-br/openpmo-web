@@ -30,6 +30,7 @@ import { MobileViewService } from 'src/app/shared/services/mobile-view.service';
 export class MenuComponent implements OnInit, OnDestroy {
   @ViewChild('menuSliderOffices') menuOffices: ElementRef<HTMLDivElement>;
   @ViewChild('menuSliderPortfolio') menuPortfolio: ElementRef<HTMLDivElement>;
+  @ViewChild('menuSliderPlanModel') menuPlanModel: ElementRef<HTMLDivElement>;
 
   @Output() changeMenu = new EventEmitter<boolean>();
 
@@ -45,12 +46,11 @@ export class MenuComponent implements OnInit, OnDestroy {
   isMobileView = false;
   isChangingView = false;
   items: MenuItem[] = [];
-  itemsOfficeUnchanged: MenuItem[] = [];
-  itemsOffice: MenuItem[] = [];
+  itemsOfficeUnchanged = [];
+  itemsOffice = [];
   itemsPlanModel: MenuItem[] = [];
   itemsFavorites: IMenuFavorites[] = [];
-  itemsPorfolio: PlanMenuItem[] = [];
-  itemsPorfolioFiltered: PlanMenuItem[] = [];
+  itemsPortfolio = [];
   itemsLanguages: MenuItem[] = [];
   username = '';
   currentIDOffice = 0;
@@ -65,6 +65,8 @@ export class MenuComponent implements OnInit, OnDestroy {
   isFixed = false;
   menuStateChanged = false;
   isAdminMenu = false;
+  parentsWorkpack = [];
+  changedUrl = false;
 
   constructor(
     private menuSrv: MenuService,
@@ -92,14 +94,15 @@ export class MenuComponent implements OnInit, OnDestroy {
     });
     this.planSrv.observableIdPlan().pipe(takeUntil(this.$destroy)).subscribe(async id => {
       if (!this.isFixed) {
-        this.currentIDPlan = id;
-        if (this.currentIDPlan && this.currentIDPlan !== 0) {
-          localStorage.setItem('@currentPlan', this.currentIDPlan.toString());
+        if (!this.currentIDPlan || this.currentIDPlan !== id) {
+          this.currentIDPlan = id
+          if (this.currentIDPlan && this.currentIDPlan !== 0) {
+            localStorage.setItem('@currentPlan', this.currentIDPlan.toString());
+          }
+          await this.loadPropertiesPlan();
+          await this.loadPortfolioMenu();
+          await this.loadFavoritesMenu();
         }
-        await this.loadPropertiesPlan();
-        await this.loadPortfolioMenu();
-        await this.loadFavoritesMenu();
-        this.refreshPortfolioMenu();
       }
     });
     this.menuSrv.obsReloadMenuOffice().pipe(takeUntil(this.$destroy)).subscribe(() => !this.isFixed && this.loadOfficeMenu());
@@ -119,7 +122,6 @@ export class MenuComponent implements OnInit, OnDestroy {
     this.menuSrv.isPlanMenu.pipe(takeUntil(this.$destroy)).subscribe(isPlanMenu => {
       if (!this.isFixed) {
         this.isPlanMenu = isPlanMenu;
-        this.refreshPortfolioMenu();
       }
     });
     this.mobileViewSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(responsive => {
@@ -133,11 +135,12 @@ export class MenuComponent implements OnInit, OnDestroy {
     });
     this.locationSrv.onUrlChange(url => {
       if (!this.isFixed) {
+        this.changedUrl = true;
         this.currentURL = url.slice(2);
         this.selectMenuActive(url.slice(2));
       }
     });
-    this.menuSrv.getMenuState.pipe(takeUntil(this.$destroy)).subscribe(async(menuState) => {
+    this.menuSrv.getMenuState.pipe(takeUntil(this.$destroy)).subscribe(async (menuState) => {
       this.isFixed = menuState.isFixed;
       if (!this.isFixed) {
         this.menus = menuState.menus;
@@ -147,10 +150,6 @@ export class MenuComponent implements OnInit, OnDestroy {
         }
       }
     });
-  }
-
-  refreshPortfolioMenu() {
-    this.itemsPorfolioFiltered = Array.from(this.itemsPorfolio.filter(p => p.idPlan === this.currentIDPlan));
   }
 
   ngOnDestroy(): void {
@@ -187,9 +186,17 @@ export class MenuComponent implements OnInit, OnDestroy {
     this.isFixed = true;
     this.setCookieMenuMode();
     const itemsOffice = this.menus[0].isOpen ? this.itemsOffice : [];
-    const itemsPortfolio = this.menus[1].isOpen ? this.itemsPorfolio : [];
+    const itemsPortfolio = this.menus[1].isOpen ? this.itemsPortfolio : [];
     const itemsFavorites = this.menus[3].isOpen ? this.itemsFavorites : [];
-    this.menuSrv.nextMenuState({ isFixed: this.isFixed, menus: this.menus, itemsOffice, itemsPorfolio: itemsPortfolio, itemsFavorites });
+    const itemsPlanModel = this.menus[2].isOpen ? this.itemsPlanModel : [];
+    this.menuSrv.nextMenuState({
+      isFixed: this.isFixed,
+      menus: this.menus,
+      itemsOffice,
+      itemsPortfolio,
+      itemsFavorites,
+      itemsPlanModel
+    });
   }
 
   setCookieMenuMode() {
@@ -255,6 +262,7 @@ export class MenuComponent implements OnInit, OnDestroy {
     const { success, data: itemsOffice } = await this.menuSrv.getItemsOffice();
     if (success) {
       this.itemsOfficeUnchanged = itemsOffice && itemsOffice.map(office => ({
+        id: office.id,
         label: office.name,
         icon: 'app-icon building',
         styleClass: `office-${office.id} ${this.currentURL === `offices/office?id=${office.id}` ? 'active' : ''}`,
@@ -286,29 +294,117 @@ export class MenuComponent implements OnInit, OnDestroy {
     }
   }
 
-  selectMenuActive(url: string) {
+  async selectMenuActive(url: string) {
+    if (!this.menuOffices || !this.menuPortfolio) {
+      return;
+    }
     const els = [
-      ...Array.from(this.menuOffices?.nativeElement.getElementsByClassName('p-panelmenu-header active')),
-      ...Array.from(this.menuPortfolio?.nativeElement.getElementsByClassName('p-panelmenu-header active')),
-      ...Array.from(this.menuOffices?.nativeElement.getElementsByClassName('p-menuitem active')),
-      ...Array.from(this.menuPortfolio?.nativeElement.getElementsByClassName('p-menuitem active'))
+      ...Array.from(this.menuOffices ? this.menuOffices.nativeElement.getElementsByClassName('p-panelmenu-header active') : []),
+      ...Array.from(this.menuPortfolio ? this.menuPortfolio.nativeElement.getElementsByClassName('p-panelmenu-header active') : []),
+      ...Array.from(this.menuOffices ? this.menuOffices?.nativeElement.getElementsByClassName('p-menuitem active') : []),
+      ...Array.from(this.menuPortfolio ? this.menuPortfolio.nativeElement.getElementsByClassName('p-menuitem active') : []),
+      ...Array.from(this.menuPlanModel ? this.menuPlanModel?.nativeElement.getElementsByClassName('p-menuitem active') : []),
+      ...Array.from(this.menuPlanModel ? this.menuPlanModel?.nativeElement.getElementsByClassName('p-panelmenu-header active') : [])
     ];
     for (const el of els) {
       el.classList.remove('active');
     }
     const id = this.getIdFromURL(url);
+    if (url.startsWith('strategies') && (isNaN(id) || !id)) {
+      this.itemsPlanModel = this.itemsPlanModel ? [...this.expandedMenuSelectedItem(this.itemsPlanModel, [], 0)] : undefined;
+    }
+    if (url.startsWith('offices') && (isNaN(id) || !id)) {
+      this.itemsOffice = this.itemsOffice ? [...this.collapseMenuItems(this.itemsOffice)] : undefined;
+    }
+    if (!id || isNaN(id)) {
+      return;
+    }
     if (url.startsWith('offices/office')) {
       this.menuOffices?.nativeElement.querySelector('.office-' + id)?.classList.add('active');
-    } else if (url.startsWith('plan')) {
+      this.itemsOffice = this.itemsOffice ? [...this.expandMenuOffice()] : undefined;
+
+    } else if (url.startsWith('strategies/strategy')) {
+      this.menuPlanModel?.nativeElement.querySelector('.planModel-' + id)?.classList.add('active');
+      this.itemsPlanModel = this.itemsPlanModel ? [...this.expandedMenuSelectedItem(this.itemsPlanModel, [], id)] : undefined;
+
+    } else if (url.startsWith('workpack-model')) {
+      const result = await this.menuSrv.getParentsItemsWorkpackModel(id);
+      if (result.success) {
+        const parents = result.data.parents;
+        this.itemsPlanModel = this.itemsPlanModel ? [...this.expandedMenuSelectedItem(this.itemsPlanModel, parents, id)] : undefined;
+      }
+      this.menuPlanModel?.nativeElement.querySelector('.workpackModel-' + id)?.classList.add('active');
+
+    }
+    else if (url.startsWith('plan')) {
       this.menuOffices?.nativeElement.querySelector('.plan-' + id)?.classList.add('active');
+      this.itemsOffice = this.itemsOffice ? [...this.expandMenuOffice()] : undefined;
+      const itemsMenu = this.itemsPortfolio ? [...Array.from(this.itemsPortfolio)] : undefined;
+      this.itemsPortfolio = itemsMenu ? [...this.collapseMenuItems(itemsMenu)] : undefined;
+
     } else if (url.startsWith('workpack')) {
+      this.itemsOffice = this.itemsOffice ? [...this.expandMenuOffice()] : undefined;
+      if (this.currentIDPlan) {
+        this.menuOffices?.nativeElement.querySelector('.plan-' + this.currentIDPlan)?.classList.add('active');
+      } else {
+        this.menuOffices?.nativeElement.querySelector('.office-' + this.currentIDOffice)?.classList.add('active');
+      }
+      const itemsMenu = this.itemsPortfolio ? [...Array.from(this.itemsPortfolio)] : undefined;
+      const result = await this.menuSrv.getParentsItemsPortfolio(id, this.currentIDPlan);
+      if (result.success) {
+        const parents = result.data.parents;
+        this.itemsPortfolio = itemsMenu ? [...this.expandedMenuSelectedItem(itemsMenu, parents, id)] : undefined;
+      }
       this.menuPortfolio?.nativeElement.querySelector('.workpack-' + id)?.classList.add('active');
+    }
+    if (!this.currentIDOffice || this.currentIDOffice === 0) {
+      this.itemsOffice = [...this.itemsOffice.map(item => ({ ...item, expanded: false }))];
+    }
+  }
+
+  expandMenuOffice() {
+    const officeIndex = this.itemsOffice.findIndex(item => item.id === this.currentIDOffice);
+    if (officeIndex > -1) {
+      this.itemsOffice[officeIndex].expanded = true;
+      return this.itemsOffice;
+    }
+    return [];
+  }
+
+  collapseMenuItems(list) {
+    list.forEach(item => {
+      item.expanded = false;
+      if (item.items && item.items.length > 0) {
+        item.items = this.collapseMenuItems(item.items);
+      }
+    });
+    return list;
+  }
+
+  expandedMenuSelectedItem(list: MenuItem[], parents, id) {
+    const itemIndex = list.findIndex(item => parents.includes(item.id) || item.id === id);
+    if (itemIndex > -1) {
+      list[itemIndex].expanded = true;
+      if (list[itemIndex].items && list[itemIndex].items.length > 0) {
+        list[itemIndex].items = this.expandedMenuSelectedItem(list[itemIndex].items, parents, id);
+        return list;
+      } else {
+        return list;
+      }
+    } else {
+      list.forEach( item => {
+        item.expanded = false;
+        if (item.items && item.items.length > 0) {
+          item.items = this.expandedMenuSelectedItem(item.items, parents, id);
+        }
+      })
+      return list;
     }
   }
 
   getIdFromURL(url: string) {
     const [path, queries] = url.split('?');
-    return queries ? Number((queries.split('id=')[1] || queries.split('idOffice=')[1])?.split('&')[0]) : 0;
+    return queries ? Number((queries.split('id=')[1])?.split('&')[0]) : 0;
   }
 
   async loadFavoritesMenu() {
@@ -319,7 +415,7 @@ export class MenuComponent implements OnInit, OnDestroy {
           label: item.name,
           icon: item.icon,
           styleClass: `workpack-${item.id} ${this.currentURL === `workpack?id=${item.id}` ? 'active' : ''}`,
-          routerLink: { path: 'workpack', queryParams: { id: item.id, idPlan: this.currentIDPlan }},
+          routerLink: { path: 'workpack', queryParams: { id: item.id, idPlan: this.currentIDPlan } },
           id: item.id,
           idPlan: this.currentIDPlan,
           canAccess: item.canAccess,
@@ -366,8 +462,10 @@ export class MenuComponent implements OnInit, OnDestroy {
     if (this.currentIDOffice) {
       const { success, data } = await this.menuSrv.getItemsPortfolio(this.currentIDOffice, this.currentIDPlan);
       if (success) {
-        this.itemsPorfolio = this.buildMenuItemPortfolio(data || []);
-        this.refreshPortfolioMenu();
+        this.itemsPortfolio = this.buildMenuItemPortfolio(data || []);
+        if (!this.isFixed && !this.changedUrl) {
+          this.selectMenuActive(this.router.url.slice(1))
+        }
       }
     }
     return;
@@ -378,7 +476,7 @@ export class MenuComponent implements OnInit, OnDestroy {
       const { success, data } = await this.menuSrv.getItemsPlanModel(this.currentIDOffice);
       if (success) {
         this.itemsPlanModel = this.buildMenuItemPlanModel(data || []);
-        // this.refreshPortfolioMenu();
+        this.selectMenuActive(this.router.url.slice(1));
       }
     }
     return;
@@ -438,6 +536,8 @@ export class MenuComponent implements OnInit, OnDestroy {
       label: workpack.name,
       icon: workpack.fontIcon,
       idPlan: workpack.idPlan,
+      id: workpack.id,
+      expanded: false,
       styleClass: `workpack-${workpack.id} ${this.currentURL === `workpack?id=${workpack.id}` ? 'active' : ''}`,
       items: workpack.children?.length ? this.buildMenuItemPortfolio(workpack.children) : undefined,
       command: (e) => {

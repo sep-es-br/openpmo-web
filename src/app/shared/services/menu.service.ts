@@ -16,7 +16,8 @@ interface IMenuState {
   menus: IMenu[];
   itemsOffice: MenuItem[];
   itemsFavorites: IMenuFavorites[];
-  itemsPorfolio: PlanMenuItem[];
+  itemsPortfolio: PlanMenuItem[];
+  itemsPlanModel: any[];
 }
 
 @Injectable({
@@ -48,7 +49,8 @@ export class MenuService extends BaseService<any> {
     ],
     itemsOffice: [],
     itemsFavorites: [],
-    itemsPorfolio: []
+    itemsPortfolio: [],
+    itemsPlanModel: []
   } as IMenuState);
 
   constructor(
@@ -109,6 +111,27 @@ export class MenuService extends BaseService<any> {
         params: PrepareHttpParams({
           'id-office': idOffice,
           'id-plan': idPlan
+       })
+      }
+    ).toPromise();
+  }
+
+  getParentsItemsPortfolio(idWorkpack: number, idPlan: number): Promise<IHttpResult<{parents: number[]}>> {
+    return this.http.get<IHttpResult<{parents: number[]}>>(`${this.urlBase}/portfolios/parents`,
+      {
+        params: PrepareHttpParams({
+          'id-workpack': idWorkpack,
+          'id-plan': idPlan
+       })
+      }
+    ).toPromise();
+  }
+
+  getParentsItemsWorkpackModel(idWorkpackModel: number): Promise<IHttpResult<{parents: number[]}>> {
+    return this.http.get<IHttpResult<{parents: number[]}>>(`${this.urlBase}/planModels/parents`,
+      {
+        params: PrepareHttpParams({
+          'id-workpack-model': idWorkpackModel,
        })
       }
     ).toPromise();

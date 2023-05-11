@@ -67,6 +67,9 @@ export class OfficeListComponent implements OnInit {
     private citizenSrv: CitizenUserService,
     private configDataViewSrv: ConfigDataViewService
   ) {
+    this.officeSvr.nextIDOffice(0);
+    localStorage.removeItem('@currentPlan');
+    localStorage.removeItem('@pmo/propertiesCurrentPlan');
     this.configDataViewSrv.observableDisplayModeAll.pipe(takeUntil(this.$destroy)).subscribe(displayMode => {
       this.displayModeAll = displayMode;
     });
@@ -75,6 +78,7 @@ export class OfficeListComponent implements OnInit {
     });
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.responsive = value);
     this.citizenSrv.loadCitizenUsers();
+    localStorage.removeItem('open-pmo:WORKPACK_TABVIEW');
    }
 
   async ngOnInit() {

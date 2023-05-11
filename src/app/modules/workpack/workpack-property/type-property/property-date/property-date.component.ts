@@ -92,7 +92,7 @@ export class PropertyDateComponent implements OnInit, OnDestroy {
     this.calendarFormat = this.translateSrv.instant('dateFormat');
     const today = moment();
     const yearStart = today.year();
-    this.yearRange = (yearStart-1).toString() + ':'+ (yearStart+15).toString();
+    this.yearRange = (yearStart-10).toString() + ':'+ (yearStart+10).toString();
     this.loadDates();
   }
 

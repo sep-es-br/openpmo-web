@@ -360,7 +360,7 @@ export class WorkpackCardItemComponent implements OnInit, OnDestroy {
     if (this.properties.paramsUrlCard) {
       params = {
         ...params,
-        ... this.properties.paramsUrlCard.reduce((obj, item) => ((obj[item.name] = item.value), obj), {})
+        ... this.properties.paramsUrlCard.reduce((obj, item) => ((obj[item.name] = item.value), obj), {}),
       };
     }
     return params;

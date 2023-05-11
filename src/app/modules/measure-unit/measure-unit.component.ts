@@ -66,6 +66,8 @@ export class MeasureUnitComponent implements OnInit {
     private router: Router,
     private configDataViewSrv: ConfigDataViewService
   ) {
+    localStorage.removeItem('@currentPlan');
+    localStorage.removeItem('@pmo/propertiesCurrentPlan');
     this.configDataViewSrv.observableDisplayModeAll.pipe(takeUntil(this.$destroy)).subscribe(displayMode => {
       this.displayModeAll = displayMode;
     });

@@ -154,6 +154,8 @@ export class PlanComponent implements OnInit, OnDestroy {
     this.formPlan.valueChanges
       .pipe(takeUntil(this.$destroy), filter(() => this.formPlan.dirty && this.formPlan.valid))
       .subscribe(() => this.saveButton.showButton());
+
+    localStorage.removeItem('open-pmo:WORKPACK_TABVIEW');
   }
 
   ngOnDestroy(): void {
@@ -169,7 +171,7 @@ export class PlanComponent implements OnInit, OnDestroy {
     this.isUserAdmin = await this.authSrv.isUserAdmin();
     const today = moment();
     const yearStart = today.year();
-    this.yearRange = (yearStart - 1).toString() + ':' + (yearStart + 15).toString();
+    this.yearRange = (yearStart - 10).toString() + ':' + (yearStart + 10).toString();
     this.calendarFormat = this.translateSrv.instant('dateFormat');
   }
 

@@ -240,7 +240,7 @@
         <i class="app-icon arrow-left" [ngStyle]="{ fontSize: '1rem' }" (click)="closeAllMenus()"></i>
       </div>
     </div>
-    <p-panelMenu [model]="itemsPorfolioFiltered"></p-panelMenu>
+    <p-panelMenu [model]="itemsPortfolio"></p-panelMenu>
     <div class="action-mobile" *ngIf="isMobileView">
       <i class="app-icon angle-down" [ngStyle]="{ fontSize: '1rem' }" (click)="toggleMenu('portfolio')"></i>
     </div>
@@ -257,7 +257,7 @@
                 (click)="handleChangeMenuMode()"></i>
             </div>
           </div>
-          <p-panelMenu [model]="itemsPorfolioFiltered"></p-panelMenu>
+          <p-panelMenu [model]="itemsPortfolio"></p-panelMenu>
         </div>
       </ng-template>
       <ng-template>
@@ -266,7 +266,7 @@
     </p-splitter>
   </ng-template>
 </div>
-<div class="app-menu-slide" [class.open]="isMenuOpen('planModel')" [class.mobile]="isMobileView"
+<div class="app-menu-slide" #menuSliderPlanModel [class.open]="isMenuOpen('planModel')" [class.mobile]="isMobileView"
   [class.changing]="isChangingView">
   <ng-container *ngIf="isMobileView; else sliderPlanModel">
     <div class="top-bar">

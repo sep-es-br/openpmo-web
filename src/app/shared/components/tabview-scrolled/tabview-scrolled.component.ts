@@ -1,5 +1,5 @@
 import { takeUntil } from 'rxjs/operators';
-import { Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges } from '@angular/core';
 import { ResponsiveService } from '../../services/responsive.service';
 import { WorkpackShowTabviewService } from '../../services/workpack-show-tabview.service';
 import { Subject } from 'rxjs';
@@ -63,7 +63,7 @@ export class TabviewScrolledComponent implements OnChanges, OnDestroy {
           this.selectTab(this.tabs[0]);
         }
         this.prepareScrolls();
-      });
+      }, 500);
     }
   }
 
@@ -74,7 +74,7 @@ export class TabviewScrolledComponent implements OnChanges, OnDestroy {
         key: 'clearPendingChangesConfirm',
         acceptLabel: this.translateSrv.instant('yes'),
         rejectLabel: this.translateSrv.instant('no'),
-        accept: async () => {
+        accept: async() => {
           this.selectedTab = item;
           this.tabBody = `${item.key}`;
           this.workpackSrv.nextPendingChanges(false);
@@ -101,10 +101,25 @@ export class TabviewScrolledComponent implements OnChanges, OnDestroy {
       const tabsContainerWidth = tabsContainer.clientWidth;
       const tabsWidth = Array.from(tabs).reduce((acc, tab) => acc + tab.clientWidth, 0);
       const scrollWidth = tabsWidth - tabsContainerWidth;
+
+      const tabActive = document.querySelector('.app-tabview-scrolled-header-item .header-link.active');
+      if (tabActive) {
+        const tabActiveLeft = tabActive.getBoundingClientRect().left;
+        const tabsContainerLeft = tabsContainer.getBoundingClientRect().left;
+        const tabsContainerCenter = tabsContainerLeft + tabsContainerWidth / 2;
+        if (tabActiveLeft < tabsContainerCenter) {
+          tabsContainer.scrollLeft = 0;
+        } else if (tabActiveLeft > tabsContainerCenter) {
+          tabsContainer.scrollLeft = scrollWidth;
+        }
+      }
+
       if (scrollWidth > 0) {
         const scrollRight = document.querySelector('.nav-scroll-right');
         scrollRight.classList.remove('hidden');
       }
+      const scrollLeft = document.querySelector('.nav-scroll-left');
+      scrollLeft.classList[tabsContainer.scrollLeft === 0 ? 'add' : 'remove']('hidden');
     }
   }
 

@@ -125,6 +125,7 @@ export class OfficeComponent implements OnDestroy {
       .pipe(takeUntil(this.$destroy), filter(() => this.formOffice.dirty && this.formOffice.valid))
       .subscribe(() => this.saveButton.showButton());
     this.responsiveSvr.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.responsive = value);
+    localStorage.removeItem('open-pmo:WORKPACK_TABVIEW');
   }
 
   ngOnDestroy(): void {

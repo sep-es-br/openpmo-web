@@ -32,6 +32,8 @@ export class BaselinesListComponent implements OnInit, OnDestroy {
     private baselineSrv: BaselineService,
     private configDataViewSrv: ConfigDataViewService
   ) {
+    localStorage.removeItem('@currentPlan');
+    localStorage.removeItem('@pmo/propertiesCurrentPlan');
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.responsive = value);
     this.configDataViewSrv.observableCollapsePanelsStatus.pipe(takeUntil(this.$destroy)).subscribe(collapsePanelStatus => {
       this.collapsePanelsStatus = collapsePanelStatus === 'collapse' ? true : false;

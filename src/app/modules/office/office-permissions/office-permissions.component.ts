@@ -76,6 +76,8 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
     private citizenUserSrv: CitizenUserService,
     private authServerSrv: AuthServerService,
   ) {
+    localStorage.removeItem('@currentPlan');
+    localStorage.removeItem('@pmo/propertiesCurrentPlan');
     this.actRouter.queryParams.subscribe(async queryParams => {
       this.idOffice = queryParams.idOffice;
       this.key = queryParams.key;

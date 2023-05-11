@@ -41,7 +41,7 @@ export class CardItemOfficeComponent implements OnInit {
     this.editPermission = this.properties?.editPermission;
     this.cardIdItem = this.properties.itemId || this.properties.itemId === 0 ?
     `${ this.properties.itemId < 10 && this.properties.itemId !== 0 ? '0'+this.properties.itemId : this.properties.itemId}` : '';
-    if ( this.properties.office)  { this.officeSrv.nextIDOffice(this.properties.office.id);};
+    // if ( this.properties.office)  { this.officeSrv.nextIDOffice(this.properties.office.id);};
   }
 
   navigateToPage(url: string, params?: {name: string; value: string | number}[]) {

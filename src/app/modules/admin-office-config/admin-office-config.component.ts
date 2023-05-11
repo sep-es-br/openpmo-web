@@ -50,6 +50,8 @@ export class AdminOfficeConfigComponent implements OnInit {
     private officePermissionSrv: OfficePermissionService,
     private configDataViewSrv: ConfigDataViewService
   ) {
+    localStorage.removeItem('@currentPlan');
+    localStorage.removeItem('@pmo/propertiesCurrentPlan');
     this.configDataViewSrv.observableDisplayModeAll.pipe(takeUntil(this.$destroy)).subscribe(displayMode => {
       this.displayModeAll = displayMode;
     });

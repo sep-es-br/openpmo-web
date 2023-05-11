@@ -33,6 +33,7 @@ export interface IMenuWorkpack {
   idPlan?: number;
   fontIcon: string;
   children: IMenuWorkpack[];
+  expanded?: boolean;
 }
 
 export interface PlanMenuItem extends MenuItem {
