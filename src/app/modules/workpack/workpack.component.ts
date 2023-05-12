@@ -1165,7 +1165,7 @@ export class WorkpackComponent implements OnDestroy {
         summary: this.translateSrv.instant('success'),
         detail: this.translateSrv.instant('messages.savedSuccessfully')
       });
-      this.menuSrv.reloadMenuPortfolio();
+      this.menuSrv.reloadMenuPortfolio(!isPut ? this.idWorkpack : undefined);
     }
   }
 

@@ -306,10 +306,6 @@ export class ScheduleComponent implements OnInit, OnDestroy {
 
   handleChangeValuesCardItems() {
     this.reloadCostAssignmentTotals();
-    if (!this.formSchedule.controls.plannedWork.value || this.formSchedule.controls.plannedWork.value <= 0) {
-      this.saveButton?.hideButton();
-      return;
-    }
     if (!this.actualValidationMessage && this.formSchedule.valid) {
       if (this.costAssignmentsCardItems && this.costAssignmentsCardItems.length > 0
         && this.costAssignmentsCardItems.filter(item => item.type !== 'new-cost-card').length === this.costAssignmentsCardItems.length - 1) {
@@ -328,10 +324,6 @@ export class ScheduleComponent implements OnInit, OnDestroy {
   }
 
   handleChangeValues() {
-    if (!this.formSchedule.controls.plannedWork.value || this.formSchedule.controls.plannedWork.value <= 0) {
-      this.saveButton?.hideButton();
-      return;
-    }
     this.scheduleStartDate = this.formSchedule.controls.start.value;
     if (this.formSchedule.controls.actualWork.value > 0 && this.formSchedule.controls.start.value) {
       const startDate = moment(this.formSchedule.controls.start.value);
@@ -368,10 +360,6 @@ export class ScheduleComponent implements OnInit, OnDestroy {
   }
 
   handleActualWorkChangeValues(event, eventType) {
-    if (!this.formSchedule.controls.plannedWork.value || this.formSchedule.controls.plannedWork.value <= 0) {
-      this.saveButton?.hideButton();
-      return;
-    }
     if (this.formSchedule.controls.start.value && ((event && event.value && event.value !== null && event.value !== 0)
       || (eventType === 'blur' && this.formSchedule.controls.actualWork.value > 0))) {
       const startDate = moment(this.formSchedule.controls.start.value);

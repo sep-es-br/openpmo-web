@@ -1,5 +1,4 @@
 import { AuthService } from './../../../../shared/services/auth.service';
-import { Location } from '@angular/common';
 import { Component, OnDestroy, OnInit, ViewChildren } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -367,7 +366,7 @@ export class StepComponent implements OnInit, OnDestroy {
   }
 
   createNewCardItemCost(idCost: number, costName: string) {
-    if (!this.formStep.valid || this.formStep.controls.plannedWork.value === 0) {
+    if (!this.formStep.valid) {
       setTimeout(() => {
         this.messageSrv.add({ severity: 'warn', summary: 'Erro', detail: this.translateSrv.instant('messages.scheduleNotValid') });
       }, 500);
@@ -456,12 +455,8 @@ export class StepComponent implements OnInit, OnDestroy {
   }
 
   handleChangeValuesCardItems() {
-    if (!this.formStep.controls.plannedWork.value || this.formStep.controls.plannedWork.value <= 0) {
-      this.showSaveButton = false;
-      return;
-    }
     this.reloadCostAssignmentTotals();
-    if (this.formStep.valid && this.formStep.controls.plannedWork.value > 0) {
+    if (this.formStep.valid) {
       if (this.costAssignmentsCardItems && this.costAssignmentsCardItems.length > 1) {
         this.reloadCostAssignmentTotals();
         this.showSaveButton = true;
@@ -471,10 +466,6 @@ export class StepComponent implements OnInit, OnDestroy {
   }
 
   handleChangeTotalsValues() {
-    if (!this.formStep.controls.plannedWork.value || this.formStep.controls.plannedWork.value <= 0) {
-      this.showSaveButton = false;
-      return;
-    }
     if (this.formStep.valid) {
       if (this.costAssignmentsCardItems && this.costAssignmentsCardItems.length > 1) {
         this.reloadCostAssignmentTotals();

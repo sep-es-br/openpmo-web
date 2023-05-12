@@ -28,7 +28,8 @@ export class MenuService extends BaseService<any> {
 
   adminsPath = [ 'strategies', 'organizations', 'domains',
     'measure-units', 'offices/permission', 'workpack-model', 'configuration-office', 'persons' ];
-  plansPath = [ 'plan', 'workpack' ];
+  plansPath = [ 'plan', 'workpack', 'stakeholder' ];
+  idNewWorkpack: number;
 
   private $reloadMenuOffice = new Subject();
   private $reloadMenuFavorite = new Subject();
@@ -85,8 +86,13 @@ export class MenuService extends BaseService<any> {
     return this.$reloadMenuFavorite.asObservable();
   }
 
-  reloadMenuPortfolio() {
+  reloadMenuPortfolio(idWorkpack?: number) {
+    this.idNewWorkpack = idWorkpack;
     this.$reloadMenuPortfolio.next();
+  }
+
+  getIdNewWorkpack() {
+    return this.idNewWorkpack;
   }
 
   obsReloadMenuPortfolio() {

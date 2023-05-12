@@ -137,9 +137,15 @@ export class MenuFixedComponent implements OnInit, OnDestroy {
     });
 
     this.menuSrv.obsReloadMenuOffice().pipe(takeUntil(this.$destroy)).subscribe(() => { { this.loadOfficeMenu(); } });
-    this.menuSrv.obsReloadMenuPortfolio().pipe(takeUntil(this.$destroy)).subscribe(() => { this.loadPortfolioMenu(); });
+    this.menuSrv.obsReloadMenuPortfolio().pipe(takeUntil(this.$destroy)).subscribe(() => {
+      const idNewWorkpack = this.menuSrv.getIdNewWorkpack();
+      this.changedUrl = false;
+      this.loadPortfolioMenu(idNewWorkpack);
+    });
     this.menuSrv.obsReloadMenuFavorite().pipe(takeUntil(this.$destroy)).subscribe(() => { this.loadFavoritesMenu(); });
-    this.menuSrv.obsReloadMenuPlanModel().pipe(takeUntil(this.$destroy)).subscribe(() => { !this.isFixed && this.loadPlanModelMenu(); });
+    this.menuSrv.obsReloadMenuPlanModel().pipe(takeUntil(this.$destroy)).subscribe(() => { 
+      !this.isFixed && this.loadPlanModelMenu();
+    });
 
     this.menuSrv.isAdminMenu.pipe(takeUntil(this.$destroy)).subscribe(isAdminMenu => {
       this.isAdminMenu = isAdminMenu;
@@ -283,7 +289,7 @@ export class MenuFixedComponent implements OnInit, OnDestroy {
     }
   }
 
-  async selectMenuActive(url: string) {
+  async selectMenuActive(url: string, idNewWorkpack?: number) {
     const els = [
       ...Array.from(this.menuOffices ? this.menuOffices.nativeElement.getElementsByClassName('p-panelmenu-header active') : []),
       ...Array.from(this.menuPortfolio ? this.menuPortfolio.nativeElement.getElementsByClassName('p-panelmenu-header active') : []),
@@ -295,7 +301,7 @@ export class MenuFixedComponent implements OnInit, OnDestroy {
     for (const el of els) {
       el.classList.remove('active');
     }
-    const id = this.getIdFromURL(url);
+    const id = idNewWorkpack ? idNewWorkpack : this.getIdFromURL(url);
     if (url.startsWith('strategies') && (isNaN(id) || !id)) {
       this.itemsPlanModel = this.itemsPlanModel ? [...this.expandedMenuSelectedItem(this.itemsPlanModel, [], 0)] : undefined;
     }
@@ -331,13 +337,14 @@ export class MenuFixedComponent implements OnInit, OnDestroy {
         this.menuOffices?.nativeElement.querySelector('.office-' + this.currentIDOffice)?.classList.add('active');
       }
 
-      this.menuPortfolio?.nativeElement.querySelector('.workpack-' + id)?.classList.add('active');
+      
       const itemsMenu = this.itemsPortfolio ? [...Array.from(this.itemsPortfolio)] : undefined;
       const result = await this.menuSrv.getParentsItemsPortfolio(id, this.currentIDPlan);
       if (result.success) {
         const parents = result.data.parents;
         this.itemsPortfolio = itemsMenu ? [...this.expandedMenuSelectedItem(itemsMenu, parents, id)] : undefined;
       }
+      this.menuPortfolio?.nativeElement.querySelector('.workpack-' + id)?.classList.add('active');
     }
     if (!this.currentIDOffice || this.currentIDOffice === 0) {
       this.itemsOffice = [...this.itemsOffice.map(item => ({ ...item, expanded: false }))];
@@ -435,13 +442,13 @@ export class MenuFixedComponent implements OnInit, OnDestroy {
     }
   }
 
-  async loadPortfolioMenu() {
+  async loadPortfolioMenu(idNewWorkpack?: number) {
     if (this.currentIDOffice) {
       const { success, data } = await this.menuSrv.getItemsPortfolio(this.currentIDOffice, this.currentIDPlan);
       if (success) {
         this.itemsPortfolio = this.buildMenuItemPortfolio(data || []);
         if (!!this.isFixed && !this.changedUrl) {
-          this.selectMenuActive(this.router.url.slice(1));
+          this.selectMenuActive(this.router.url.slice(1), idNewWorkpack);
         }
       }
     }

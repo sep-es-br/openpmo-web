@@ -15,6 +15,7 @@ import { Subject } from 'rxjs';
 import * as moment from 'moment';
 import { WorkpackShowTabviewService } from 'src/app/shared/services/workpack-show-tabview.service';
 import { SaveButtonComponent } from 'src/app/shared/components/save-button/save-button.component';
+import { MessageService } from 'primeng/api';
 
 @Component({
   selector: 'app-workpack-section-schedule',
@@ -47,7 +48,8 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
     private configDataViewSrv: ConfigDataViewService,
     private responsiveSrv: ResponsiveService,
     private scheduleSrv: ScheduleService,
-    private workpackShowTabviewSrv: WorkpackShowTabviewService
+    private workpackShowTabviewSrv: WorkpackShowTabviewService,
+    private messageSrv: MessageService
   ) {
     this.workpackShowTabviewSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => {
       this.showTabview = value;
@@ -364,31 +366,41 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
         const step = stepGroup.steps.find(s => s.id === stepToSave.changedIdStep);
         const stepChanged = this.sectionSchedule.groupStep.find(group => group.year === stepToSave.changedGroupYear)
           .cardItemSection.find(s => s.idStep === stepToSave.changedIdStep);
-        const result = await this.scheduleSrv.putScheduleStep({
-          id: step.id,
-          plannedWork: stepChanged.unitPlanned,
-          actualWork: stepChanged.unitActual,
-          consumes: step.consumes && step.consumes.length === 1 ?
-            step.consumes?.map(consume => ({
-              actualCost: stepChanged.costActual,
-              plannedCost: stepChanged.costPlanned,
-              idCostAccount: consume.costAccount.id,
-              id: consume.id
-            })) :
-            step.consumes?.map(consume => ({
-              actualCost: consume.actualCost,
-              plannedCost: consume.plannedCost,
-              idCostAccount: consume.costAccount.id,
-              id: consume.id
-            }))
-        });
-        if (result.success) {
-          return stepToSave.changedIdStep;
+        try {
+          const result = await this.scheduleSrv.putScheduleStep({
+            id: step.id,
+            plannedWork: stepChanged.unitPlanned,
+            actualWork: stepChanged.unitActual,
+            consumes: step.consumes && step.consumes.length === 1 ?
+              step.consumes?.map(consume => ({
+                actualCost: stepChanged.costActual,
+                plannedCost: stepChanged.costPlanned,
+                idCostAccount: consume.costAccount.id,
+                id: consume.id
+              })) :
+              step.consumes?.map(consume => ({
+                actualCost: consume.actualCost,
+                plannedCost: consume.plannedCost,
+                idCostAccount: consume.costAccount.id,
+                id: consume.id
+              }))
+          });
+          if (result.success) {
+            return stepToSave.changedIdStep;
+          }
+        } catch (error) {
+          return;
         }
+        
       }));
       if (this.changedSteps.length === stepsSaved.length) {
         this.changedSteps = [];
         this.workpackSrv.nextPendingChanges(false);
+        this.messageSrv.add({
+          severity: 'success',
+          summary: this.translateSrv.instant('success'),
+          detail: this.translateSrv.instant('messages.savedSuccessfully')
+        });
         const scheduleChanged = await this.scheduleSrv.GetScheduleById(this.schedule.id);
         if (scheduleChanged.success) {
           const scheduleValues = scheduleChanged.data;
