@@ -144,7 +144,12 @@ export class WorkpackSectionPropertiesComponent implements OnInit {
     property.multipleSelection = propertyModel.multipleSelection;
     property.rows = propertyModel.rows ? propertyModel.rows : 1;
     property.decimals = propertyModel.decimals;
-    property.value = propertyWorkpack?.value ? propertyWorkpack?.value : propertyModel.defaultValue;
+    if (this.typePropertyModel[propertyModel.type] === TypePropertyModelEnum.ToggleModel) {
+      property.value = propertyWorkpack && (propertyWorkpack?.value !== null && propertyWorkpack?.value !== undefined) ?
+      propertyWorkpack?.value : propertyModel.defaultValue;
+    } else {
+      property.value = propertyWorkpack?.value ? propertyWorkpack?.value : propertyModel.defaultValue;
+    }
     property.defaultValue = propertyWorkpack?.value ? propertyWorkpack?.value : propertyModel.defaultValue;
     property.min = Number(propertyModel.min);
     property.max = Number(propertyModel.max);

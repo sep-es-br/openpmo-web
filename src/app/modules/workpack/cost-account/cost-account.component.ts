@@ -225,6 +225,12 @@ export class CostAccountComponent implements OnInit {
     property.multipleSelection = propertyModel.multipleSelection;
     property.rows = propertyModel.rows;
     property.decimals = propertyModel.decimals;
+    if (this.typePropertyModel[propertyModel.type] === TypePropertyModelEnum.ToggleModel) {
+      property.value = propertyCostAccount && (propertyCostAccount?.value !== null && propertyCostAccount?.value !== undefined) ?
+      propertyCostAccount?.value : propertyModel.defaultValue;
+    } else {
+      property.value = propertyCostAccount?.value ? propertyCostAccount?.value : propertyModel.defaultValue;
+    }
     property.value = propertyCostAccount?.value ? propertyCostAccount?.value : propertyModel.defaultValue;
     property.defaultValue = propertyCostAccount?.value ? propertyCostAccount?.value : propertyModel.defaultValue;
     property.min = propertyModel.min;
