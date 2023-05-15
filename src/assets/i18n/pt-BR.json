@@ -422,6 +422,7 @@
       },
       "generic": "Não foi possível processar sua solicitação",
       "unauthorized": "Você não possui permissão de acesso à essa funcionalidade",
+      "expired": "Sua sessão expirou. Por favor, entre novamente.",
       "unauthorizedApplication": "Você não possui permissão para acessar esta aplicação.",
       "couldNotCheckParentProject": "Não foi possível verificar se possui parente Projeto",
       "ccb-member": {

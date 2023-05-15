@@ -414,6 +414,7 @@
       },
       "generic": "We were unable to process your request",
       "unauthorized": "You do not have permission to access this functionality",
+      "expired": "Your session is expired. Please login again.",
       "unauthorizedApplication": "You do not have permission to access this application.",
       "couldNotCheckParentProject": "Could not check if contains parent project",
       "ccb-member": {
