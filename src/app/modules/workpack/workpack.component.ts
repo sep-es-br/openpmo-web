@@ -44,6 +44,7 @@ import { Subject } from 'rxjs';
 import { WorkpackShowTabviewService } from 'src/app/shared/services/workpack-show-tabview.service';
 import { ConfigDataViewService } from 'src/app/shared/services/config-dataview.service';
 import { ITabViewScrolled } from 'src/app/shared/components/tabview-scrolled/tabview-scrolled.component';
+import { BreakdownStructureService } from 'src/app/shared/services/breakdown-structure.service';
 
 @Component({
   selector: 'app-workpack',
@@ -128,7 +129,8 @@ export class WorkpackComponent implements OnDestroy {
     private saveButtonSrv: SaveButtonService,
     private workpackBreadcrumbStorageSrv: WorkpackBreadcrumbStorageService,
     private workpackShowTabviewSrv: WorkpackShowTabviewService,
-    private configDataViewSrv: ConfigDataViewService
+    private configDataViewSrv: ConfigDataViewService,
+    private breakdownStructureSrv: BreakdownStructureService
   ) {
     this.actRouter.queryParams.subscribe(async({ id, idPlan, idWorkpackModel, idWorkpackParent, idWorkpackModelLinked }) => {
       this.idWorkpack = id && +id;
@@ -404,6 +406,9 @@ export class WorkpackComponent implements OnDestroy {
       });
     }
     if (this.showTabview) {
+      if (this.idWorkpack) {
+        await this.loadBreakdownStructure();
+      }
       this.loadWorkpackTabs();
     } else {
       this.isLoading = false;
@@ -424,6 +429,14 @@ export class WorkpackComponent implements OnDestroy {
         propertiesOffice: office.data
       });
       this.officeSrv.nextIDOffice(plan.data.idOffice);
+    }
+  }
+
+  async loadBreakdownStructure() {
+    this.isLoading = true;
+    const { success, data } = await this.breakdownStructureSrv.getByWorkpackId(this.idWorkpack);
+    if (success) {
+      this.hasWBS = data && data !== null;
     }
   }
 
@@ -1280,10 +1293,12 @@ export class WorkpackComponent implements OnDestroy {
   loadWorkpackTabs() {
     this.tabs = [];
     if (this.idWorkpack) {
-      this.tabs.push({
-        menu: 'WBS',
-        key: 'WBS'
-      });
+      if (this.hasWBS) {
+        this.tabs.push({
+          menu: 'WBS',
+          key: 'WBS'
+        });
+      }
       if (!!this.idWorkpack && !!this.workpack &&
           !this.workpack.canceled && !!this.workpackModel &&
           !!this.workpackModel.dashboardSessionActive) {

@@ -788,7 +788,7 @@ export class WorkpackModelComponent implements OnInit {
       if (this.workpackModelType === TypeWorkpackModelEnum.DeliverableModel) {
         this.cardPropertiesSchedule.initialStateToggle = data.scheduleSessionActive;
       }
-      this.childrenModels = (data.children || []).sort((a, b) => a.id > b.id ? 1 : -1);
+      this.childrenModels = (data.children || []);
       this.totalRecords = data.children && data.children.length + 1;
       await this.loadCardItemsModels();
       this.cardProperties.isLoading = false;
