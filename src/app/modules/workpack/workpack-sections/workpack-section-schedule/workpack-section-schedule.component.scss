@@ -30,7 +30,8 @@
         font-size: 0.8rem;
         font-family: v.$fontFamilyMedium;
         &:hover {
-          background: rgba(22, 155, 213, 1);
+          background: rgba(22, 155, 213, 0.9);
+          color: #ffffff;
         }
       }
       .button-delete {
@@ -41,6 +42,7 @@
         font-family: v.$fontFamilyMedium;
         &:hover {
           background: rgba(255,106,106, 1);
+          color: #ffffff;
         }
       }
     }

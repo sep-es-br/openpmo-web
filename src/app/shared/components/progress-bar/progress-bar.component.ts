@@ -37,6 +37,12 @@ export class ProgressBarComponent implements OnInit, OnDestroy {
   responsive: boolean;
   marginRightTotal: string = '0';
   marginLeftTotal: string = '0';
+  marginLeftBaseline: string = '0';
+  marginRightBaseline: string = '0';
+  totalDate;
+  progressDate;
+  baselineDate;
+  daysOfPeriod;
 
   constructor(
     private translateSrv: TranslateService,
@@ -55,15 +61,36 @@ export class ProgressBarComponent implements OnInit, OnDestroy {
     this.setLanguage();
     if (!this.baselineTotal) {
       this.baselineTotal = 0;
+      this.totalDate = this.total >= this.progress ? 100 : (this.total / this.progress) * 100;
+      this.progressDate = this.total >= this.progress ? (this.progress / this.total) * 100 : 100;
+      this.baselineDate = 0;
     } else {
       if (this.valueUnit === 'time') {
-        const startTotal = moment(this.startDateTotal);
-        const startBaseline = moment(this.startDateBaseline);
-        const daysPeriod = moment(this.endDateBaseline).diff(startTotal, 'days');
-        if (startTotal.isBefore(startBaseline)) {
-          this.marginRightTotal = this.total >= this.progress ? (100 - ((this.total / daysPeriod)*100)).toFixed(0) : (100 - ((this.progress / daysPeriod)*100)).toFixed(0);
-        } else if (startTotal.isAfter(startBaseline)) {
-          this.marginLeftTotal = this.total > this.progress ? (100 - ((this.total / daysPeriod)*100)).toFixed(0) : (100 - ((this.progress / daysPeriod)*100)).toFixed(0);
+        const startGeneral = moment(this.startDateTotal).isBefore(moment(this.startDateBaseline)) ? moment(this.startDateTotal) : moment(this.startDateBaseline);
+        const endGeneral = moment(this.endDateTotal).isBefore(moment(this.endDateBaseline)) ? moment(this.endDateBaseline) : moment(this.endDateTotal);
+        this.daysOfPeriod = moment(endGeneral).diff(startGeneral, 'days');
+        this.totalDate = (this.total / this.daysOfPeriod) * 100;
+        this.progressDate = (this.progress / this.daysOfPeriod) * 100;
+        this.baselineDate = (this.baselineTotal / this.daysOfPeriod) * 100;
+        if (moment(this.startDateTotal).isBefore(moment(this.startDateBaseline))) {
+          const diffStartDates = moment(this.startDateBaseline).diff(moment(this.startDateTotal), 'days');
+          this.marginLeftBaseline = ((diffStartDates / this.daysOfPeriod)*100).toFixed(0);
+          this.marginLeftTotal = '0';
+        }
+        if (moment(this.startDateTotal).isAfter(moment(this.startDateBaseline))) {
+          const diffStartDates = moment(this.startDateTotal).diff(moment(this.startDateBaseline), 'days');
+          this.marginLeftBaseline = '0';
+          this.marginLeftTotal =  ((diffStartDates / this.daysOfPeriod)*100).toFixed(0);
+        }
+        if (moment(this.endDateTotal).isBefore(moment(this.endDateBaseline))) {
+          const diffStartDates = moment(this.endDateBaseline).diff(moment(this.endDateTotal), 'days');
+          this.marginRightBaseline = ((diffStartDates / this.daysOfPeriod)*100).toFixed(0);
+          this.marginRightTotal = '0';
+        }
+        if (moment(this.endDateTotal).isAfter(moment(this.endDateBaseline))) {
+          const diffStartDates = moment(this.endDateTotal).diff(moment(this.endDateBaseline), 'days');
+          this.marginRightBaseline = ((diffStartDates / this.daysOfPeriod)*100).toFixed(0);
+          this.marginRightTotal = '0';
         }
       }
     }

@@ -130,7 +130,6 @@ export class WorkpackComponent implements OnDestroy {
     private workpackBreadcrumbStorageSrv: WorkpackBreadcrumbStorageService,
     private workpackShowTabviewSrv: WorkpackShowTabviewService,
     private configDataViewSrv: ConfigDataViewService,
-    private breakdownStructureSrv: BreakdownStructureService
   ) {
     this.actRouter.queryParams.subscribe(async({ id, idPlan, idWorkpackModel, idWorkpackParent, idWorkpackModelLinked }) => {
       this.idWorkpack = id && +id;
@@ -407,7 +406,7 @@ export class WorkpackComponent implements OnDestroy {
     }
     if (this.showTabview) {
       if (this.idWorkpack) {
-        await this.loadBreakdownStructure();
+        await this.checkWorkpackHasEap();
       }
       this.loadWorkpackTabs();
     } else {
@@ -432,11 +431,11 @@ export class WorkpackComponent implements OnDestroy {
     }
   }
 
-  async loadBreakdownStructure() {
+  async checkWorkpackHasEap() {
     this.isLoading = true;
-    const { success, data } = await this.breakdownStructureSrv.getByWorkpackId(this.idWorkpack);
+    const { success, data } = await this.workpackSrv.checkWorkpackHasChildren(this.idWorkpack);
     if (success) {
-      this.hasWBS = data && data !== null;
+      this.hasWBS = data && data.hasChildren;
     }
   }
 

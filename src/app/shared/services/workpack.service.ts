@@ -146,6 +146,11 @@ export class WorkpackService extends BaseService<IWorkpack> {
     return result as IHttpResult<IWorkpack>;
   }
 
+  public async checkWorkpackHasChildren(idWorkpack: number): Promise<IHttpResult<{hasChildren: boolean}>> {
+    const result = await this.http.get(`${this.urlBase}/${idWorkpack}/has-children`).toPromise();
+    return result as IHttpResult<{hasChildren: boolean}>;
+  }
+
   public async GetWorkpackLinked(idWorkpack, options?): Promise<IHttpResult<IWorkpack>> {
     const result = await this.http.get(`${this.urlBase}/linked/${idWorkpack}`, { params: PrepareHttpParams(options) }).toPromise();
     return result as IHttpResult<IWorkpack>;
