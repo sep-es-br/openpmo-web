@@ -21,6 +21,8 @@ import * as moment from 'moment';
 import { WorkpackService } from 'src/app/shared/services/workpack.service';
 import { IMenuFavorites } from '../../shared/interfaces/IMenu';
 import { MobileViewService } from 'src/app/shared/services/mobile-view.service';
+import { IOffice } from 'src/app/shared/interfaces/IOffice';
+import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
 
 @Component({
   selector: 'app-menu-fixed',
@@ -63,6 +65,9 @@ export class MenuFixedComponent implements OnInit, OnDestroy {
   currentIDPlan = 0;
   isFixed = false;
   changedUrl = false;
+  itemsBreadcrumb = [];
+  propertiesOffice: IOffice;
+  storageBreadcrumbsItems = [];
 
   constructor(
     private menuSrv: MenuService,
@@ -77,7 +82,8 @@ export class MenuFixedComponent implements OnInit, OnDestroy {
     private planSrv: PlanService,
     private cookieSrv: CookieService,
     private workpackSrv: WorkpackService,
-    private confirmationSrv: ConfirmationService
+    private confirmationSrv: ConfirmationService,
+    private breadcrumbSrv: BreadcrumbService
   ) {
     this.menuSrv.getMenuState.pipe(takeUntil(this.$destroy)).subscribe(menuState => {
       this.isFixed = menuState.isFixed;
@@ -121,6 +127,7 @@ export class MenuFixedComponent implements OnInit, OnDestroy {
 
     this.officeSrv.observableIdOffice().pipe(takeUntil(this.$destroy)).subscribe(async id => {
       this.currentIDOffice = id;
+      this.getPropertiesOffice(this.currentIDOffice);
       await this.loadPlanModelMenu();
     });
 
@@ -195,6 +202,15 @@ export class MenuFixedComponent implements OnInit, OnDestroy {
       { isFixed: this.isFixed, menus: this.menus, itemsOffice, itemsPortfolio, itemsFavorites, itemsPlanModel }
     );
     this.ngOnDestroy();
+  }
+
+  async getPropertiesOffice(idOffice) {
+    if (idOffice) {
+      const result = await this.officeSrv.GetById(idOffice);
+      if (result.success) {
+        this.propertiesOffice = result.data;
+      }
+    }
   }
 
   setCookieMenuMode() {
@@ -319,10 +335,11 @@ export class MenuFixedComponent implements OnInit, OnDestroy {
       this.itemsPlanModel = this.itemsPlanModel ? [...this.expandedMenuSelectedItem(this.itemsPlanModel, [], id)] : undefined;
 
     } else if (url.startsWith('workpack-model')) {
+      this.storageBreadcrumbsItems = this.breadcrumbSrv.get;
       const result = await this.menuSrv.getParentsItemsWorkpackModel(id);
       if (result.success) {
         const parents = result.data.parents;
-        this.itemsPlanModel = this.itemsPlanModel ? [...this.expandedMenuSelectedItem(this.itemsPlanModel, parents, id)] : undefined;
+        this.itemsPlanModel = this.itemsPlanModel ? [...this.expandedMenuModelSelectedItem(this.itemsPlanModel, parents, id)] : undefined;
       }
       this.menuPlanModel?.nativeElement.querySelector('.workpackModel-' + id)?.classList.add('active');
     }
@@ -385,6 +402,28 @@ export class MenuFixedComponent implements OnInit, OnDestroy {
         item.expanded = false;
         if (item.items && item.items.length > 0) {
           item.items = this.expandedMenuSelectedItem(item.items, parents, id);
+        }
+      })
+      return list;
+    }
+  }
+
+  expandedMenuModelSelectedItem(list: MenuItem[], parents, id) {
+    const itemIndex = list.findIndex(item => (parents.includes(item.id) && this.storageBreadcrumbsItems.find(item => item.queryParams?.id === item.id))
+      || item.id === id);
+    if (itemIndex > -1) {
+      list[itemIndex].expanded = true;
+      if (list[itemIndex].items && list[itemIndex].items.length > 0) {
+        list[itemIndex].items = this.expandedMenuModelSelectedItem(list[itemIndex].items, parents, id);
+        return list;
+      } else {
+        return list;
+      }
+    } else {
+      list.forEach(item => {
+        item.expanded = false;
+        if (item.items && item.items.length > 0) {
+          item.items = this.expandedMenuModelSelectedItem(item.items, parents, id);
         }
       })
       return list;
@@ -481,37 +520,107 @@ export class MenuFixedComponent implements OnInit, OnDestroy {
       label: planModel.name,
       icon: 'app-icon plan-model',
       styleClass: `planModel-${planModel.id} ${this.currentURL === `planModel?id=${planModel.id}` ? 'active' : ''}`,
-      items: planModel.workpackModels?.length ? this.buildMenuItemWorkpackModel(planModel.workpackModels) : undefined,
+      items: planModel.workpackModels?.length ? this.buildMenuItemWorkpackModel(planModel.workpackModels, this.currentIDOffice, planModel) : undefined,
       command: (e) => {
         if (e.originalEvent?.target?.classList?.contains('p-menuitem-text')) {
           this.router.navigate(['/strategies/strategy'], {
             queryParams:
               { id: planModel.id, idOffice: this.currentIDOffice }
           });
+          this.closeAllMenus();
         }
       }
     }));
   }
 
-  buildMenuItemWorkpackModel(root: IMenuWorkpackModel[]) {
+  buildMenuItemWorkpackModel(root: IMenuWorkpackModel[], idOffice, planModel) {
     return root.map(workpackModel => ({
       idPlanModel: workpackModel.idPlanModel,
       id: workpackModel.id,
       label: workpackModel.name,
       icon: workpackModel.fontIcon,
+      nameInPlural: workpackModel.nameInPlural,
+      type: workpackModel.type,
       styleClass: `workpackModel-${workpackModel.id} ${this.currentURL === `workpackModel?id=${workpackModel.id}` ? 'active' : ''}`,
-      items: workpackModel.children?.length ? this.buildMenuItemWorkpackModel(workpackModel.children) : undefined,
+      items: workpackModel.children?.length ? this.buildMenuItemWorkpackModel(workpackModel.children, idOffice, planModel) : undefined,
       command: (e) => {
         if (e.originalEvent?.target?.classList?.contains('p-menuitem-text')) {
           this.router.navigate(['/workpack-model'], {
             queryParams:
-              { id: workpackModel.id, idStrategy: workpackModel.idPlanModel, idOffice: this.currentIDOffice }
+              { id: workpackModel.id, idStrategy: workpackModel.idPlanModel, idOffice: this.currentIDOffice, type: workpackModel.type }
           });
+          this.setBreadcrumbStorage(this.currentIDOffice, planModel, workpackModel);
+          this.closeAllMenus();
         }
       }
     }));
   }
 
+  async setBreadcrumbStorage(idOffice, planModel, workpackModel) {
+    this.itemsBreadcrumb = [
+      {
+        key: 'administration',
+        info: this.propertiesOffice?.name,
+        tooltip: this.propertiesOffice?.fullName,
+        routerLink: ['/configuration-office'],
+        queryParams: { idOffice: idOffice }
+      },
+      {
+        key: 'configuration',
+        info: this.translateSrv.instant('planModels'),
+        tooltip: 'planModels',
+        routerLink: ['/strategies'],
+        queryParams: { idOffice: idOffice }
+      },
+      {
+        key: 'planModel',
+        info: planModel?.name,
+        tooltip: planModel?.fullName,
+        routerLink: ['/strategies', 'strategy'],
+        queryParams: { id: planModel.id, idOffice: idOffice }
+      },
+    ];
+    const result = await this.menuSrv.getParentsItemsWorkpackModel(workpackModel.id);
+    let parents = [];
+    if (result.success) {
+      parents = result.data.parents;
+    }
+    const currentPlanModel = this.itemsPlanModel.find( planModel => planModel.id === planModel.id);
+    const list = currentPlanModel && currentPlanModel.items ? currentPlanModel.items : [];
+    await this.loadBreadCrumbItems(list, parents, workpackModel.id, idOffice );
+    this.breadcrumbSrv.setBreadcrumbStorage(this.itemsBreadcrumb);
+  }
+
+  async loadBreadCrumbItems(list, parents, idWorkpackModel, idOffice) {
+    const itemIndex = list.findIndex(item => parents.includes(item.id) && !!item.expanded);
+    if (itemIndex > -1) {
+      this.itemsBreadcrumb.push(
+        {
+          key: 'workpackModel',
+          info: list[itemIndex].label,
+          tooltip: list[itemIndex].nameInPlural,
+          routerLink: ['/workpack-model'],
+          queryParams: { idStrategy: list[itemIndex].idPlanModel, id: list[itemIndex].id, type: list[itemIndex].type, idOffice }
+        }
+      );
+      if (list[itemIndex].items && list[itemIndex].items.length > 0) {
+        this.loadBreadCrumbItems(list[itemIndex].items, parents, idWorkpackModel, idOffice);
+      }
+    } else {
+      const itemIndex = list.findIndex(item => item.id === idWorkpackModel);
+      if (itemIndex > -1) {
+        this.itemsBreadcrumb.push(
+          {
+            key: 'workpackModel',
+            info: list[itemIndex].label,
+            tooltip: list[itemIndex].nameInPlural,
+            routerLink: ['/workpack-model'],
+            queryParams: { idStrategy: list[itemIndex].idPlanModel, id: list[itemIndex].id, type: list[itemIndex].type, idOffice }
+          }
+        );
+      }
+    }
+  }
 
   buildMenuItemPortfolio(root: IMenuWorkpack[]) {
     return root.map(workpack => ({
