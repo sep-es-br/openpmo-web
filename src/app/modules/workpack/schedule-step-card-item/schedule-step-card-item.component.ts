@@ -49,13 +49,18 @@ export class ScheduleStepCardItemComponent implements OnInit, OnDestroy {
     this.language = this.translateSrv.currentLang;
   }
 
-  handleStepChange() {
+  handleStepChange(event, item) {
+    this.properties[item] = event.value;
+    this.properties.unitProgressBar.total = this.properties.unitPlanned;
+    this.properties.unitProgressBar.progress = this.properties.unitActual;
     this.stepChanged.next();
   }
 
-  handleStepCostChange() {
+  handleStepCostChange(event, item) {
+    this.properties[item] = event.value;
     this.properties.costProgressBar.total = this.properties.costPlanned;
     this.properties.costProgressBar.progress = this.properties.costActual;
     this.stepChanged.next();
   }
+
 }

@@ -16,7 +16,7 @@
         <div class="unitInputs p-fluid">
           <span class="column-title">{{properties.unitName}}</span>
           <span class="p-float-label p-field">
-            <p-inputNumber class="app-input-number" id="float-unitPlanned"  (onInput)="handleStepChange()" [disabled]="!properties.editPermission"
+            <p-inputNumber class="app-input-number" id="float-unitPlanned"  (onInput)="handleStepChange($event, 'unitPlanned')" [disabled]="!properties.editPermission"
               [(ngModel)]="properties.unitPlanned" [minFractionDigits]="properties.unitPrecision" [maxFractionDigits]="properties.unitPrecision"
               [locale]="language === 'pt-BR' ? 'pt-BR' : 'en-US'"
               >
@@ -24,7 +24,7 @@
             <label class="app-input-label" for="float-unitPlanned">{{ "planned" |translate }}</label>
           </span>
           <span class="p-float-label p-field">
-            <p-inputNumber class="app-input-number" id="float-unitPlanned"  (onInput)="handleStepChange()" [disabled]="!properties.editPermission"
+            <p-inputNumber class="app-input-number" id="float-unitPlanned"  (onInput)="handleStepChange($event, 'unitActual')" [disabled]="!properties.editPermission"
               [(ngModel)]="properties.unitActual" [minFractionDigits]="properties.unitPrecision" [maxFractionDigits]="properties.unitPrecision"
               [locale]="language === 'pt-BR' ? 'pt-BR' : 'en-US'"
               >
@@ -42,7 +42,7 @@
         <div class="costInputs p-fluid">
           <span class="column-title"> $ </span>
           <span class="p-float-label p-field">
-            <p-inputNumber class="app-input-number" id="float-costPlanned" [disabled]="!properties.editCosts" (onInput)="handleStepCostChange()"
+            <p-inputNumber class="app-input-number" id="float-costPlanned" [disabled]="!properties.editCosts" (onInput)="handleStepCostChange($event, 'costPlanned')"
               [(ngModel)]="properties.costPlanned" [minFractionDigits]="2" [maxFractionDigits]="2"
               [locale]="language === 'pt-BR' ? 'pt-BR' : 'en-US'"
               >
@@ -50,7 +50,7 @@
             <label class="app-input-label" for="float-costPlanned">{{ "planned" |translate }}</label>
           </span>
           <span class="p-float-label p-field">
-            <p-inputNumber class="app-input-number" id="float-costActual" [disabled]="!properties.editCosts" (onInput)="handleStepCostChange()"
+            <p-inputNumber class="app-input-number" id="float-costActual" [disabled]="!properties.editCosts" (onInput)="handleStepCostChange($event, 'costActual')"
               [(ngModel)]="properties.costActual" [minFractionDigits]="2" [maxFractionDigits]="2"
               [locale]="language === 'pt-BR' ? 'pt-BR' : 'en-US'"
               >

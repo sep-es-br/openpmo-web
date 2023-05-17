@@ -357,43 +357,87 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
     }
     this.workpackSrv.nextPendingChanges(true);
     this.saveButton.showButton();
+    const groupIndex = this.sectionSchedule.groupStep.findIndex(group => group.cardItemSection.filter(item => item.idStep === idStep).length > 0);
+    if (groupIndex > -1) {
+      // atualizando a progressBar de custo do ano
+      this.sectionSchedule.groupStep[groupIndex].groupProgressBar.forEach(group => {
+        if (group.valueUnit === 'currency') {
+          const groupTotalCost = this.sectionSchedule.groupStep[groupIndex].cardItemSection.filter(card => card.type === 'listStep')
+            .reduce((total, step) => {
+              return total + (step.costPlanned ? step.costPlanned : 0)
+            }, 0);
+          group.total = groupTotalCost;
+          const groupProgressCost = this.sectionSchedule.groupStep[groupIndex].cardItemSection.filter(card => card.type === 'listStep')
+            .reduce((total, step) => {
+              return total + (step.costActual ? step.costActual : 0)
+            }, 0);
+          group.progress = groupProgressCost;
+        }
+        if (group.valueUnit !== 'currency' && group.valueUnit !== 'time') {
+          const groupTotalUnit = this.sectionSchedule.groupStep[groupIndex].cardItemSection.filter(card => card.type === 'listStep')
+            .reduce((total, step) => {
+              return total + (step.unitPlanned ? step.unitPlanned : 0)
+            }, 0);
+          group.total = groupTotalUnit;
+          const groupProgressUnit = this.sectionSchedule.groupStep[groupIndex].cardItemSection.filter(card => card.type === 'listStep')
+            .reduce((total, step) => {
+              return total + (step.unitActual ? step.unitActual : 0)
+            }, 0);
+          group.progress = groupProgressUnit;
+        }
+      });
+    }
+    // atualizando a progressBar de custo do schedule geral
+    this.sectionSchedule.cardSection.progressBarValues.filter(progress => progress.valueUnit === 'currency').forEach((section, index) => {
+      section.total = this.sectionSchedule.groupStep.reduce((total, group) => {
+        const progressBarCost = group.groupProgressBar.find(progressBar => progressBar.valueUnit === 'currency');
+        return total + (progressBarCost ? progressBarCost.total : 0);
+      }, 0);
+      section.progress = this.sectionSchedule.groupStep.reduce((total, group) => {
+        const progressBarCost = group.groupProgressBar.find(progressBar => progressBar.valueUnit === 'currency');
+        return total + (progressBarCost ? progressBarCost.progress : 0);
+      }, 0);
+    });
+    this.sectionSchedule.cardSection.progressBarValues.filter(progress => progress.valueUnit !== 'currency' && progress.valueUnit !== 'time').forEach((section, index) => {
+      section.total = this.sectionSchedule.groupStep.reduce((total, group) => {
+        const progressBarUnit = group.groupProgressBar.find(progressBar => progressBar.valueUnit !== 'currency' && progressBar.valueUnit !== 'time');
+        return total + (progressBarUnit ? progressBarUnit.total : 0);
+      }, 0);
+      section.progress = this.sectionSchedule.groupStep.reduce((total, group) => {
+        const progressBarUnit = group.groupProgressBar.find(progressBar => progressBar.valueUnit !== 'currency' && progressBar.valueUnit !== 'time');
+        return total + (progressBarUnit ? progressBarUnit.progress : 0);
+      }, 0);
+    });
   }
 
   async onSaveButtonClicked() {
     if (this.changedSteps && this.changedSteps.length > 0) {
-      const stepsSaved = await Promise.all(this.changedSteps.map(async (stepToSave) => {
+      const stepsToSave = this.changedSteps.map((stepToSave) => {
         const stepGroup = this.schedule.groupStep.find(group => group.year === stepToSave.changedGroupYear);
         const step = stepGroup.steps.find(s => s.id === stepToSave.changedIdStep);
         const stepChanged = this.sectionSchedule.groupStep.find(group => group.year === stepToSave.changedGroupYear)
           .cardItemSection.find(s => s.idStep === stepToSave.changedIdStep);
-        try {
-          const result = await this.scheduleSrv.putScheduleStep({
-            id: step.id,
-            plannedWork: stepChanged.unitPlanned,
-            actualWork: stepChanged.unitActual,
-            consumes: step.consumes && step.consumes.length === 1 ?
-              step.consumes?.map(consume => ({
-                actualCost: stepChanged.costActual,
-                plannedCost: stepChanged.costPlanned,
-                idCostAccount: consume.costAccount.id,
-                id: consume.id
-              })) :
-              step.consumes?.map(consume => ({
-                actualCost: consume.actualCost,
-                plannedCost: consume.plannedCost,
-                idCostAccount: consume.costAccount.id,
-                id: consume.id
-              }))
-          });
-          if (result.success) {
-            return stepToSave.changedIdStep;
-          }
-        } catch (error) {
-          return;
+        return {
+          id: step.id,
+          plannedWork: stepChanged.unitPlanned,
+          actualWork: stepChanged.unitActual,
+          consumes: step.consumes && step.consumes.length === 1 ?
+            step.consumes?.map(consume => ({
+              actualCost: stepChanged.costActual,
+              plannedCost: stepChanged.costPlanned,
+              idCostAccount: consume.costAccount.id,
+              id: consume.id
+            })) :
+            step.consumes?.map(consume => ({
+              actualCost: consume.actualCost,
+              plannedCost: consume.plannedCost,
+              idCostAccount: consume.costAccount.id,
+              id: consume.id
+            }))
         }
-        
-      }));
-      if (this.changedSteps.length === stepsSaved.length) {
+      });
+      const result = await this.scheduleSrv.putScheduleStepBatch(stepsToSave);
+      if (result.success) {
         this.changedSteps = [];
         this.workpackSrv.nextPendingChanges(false);
         this.messageSrv.add({
