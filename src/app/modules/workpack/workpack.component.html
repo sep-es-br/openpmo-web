@@ -5,7 +5,7 @@
       <span class="text">{{workpackFullName}}</span>
     </div>
     <div class="container-actions">
-      <i [pTooltip]="(workpack?.favoritedBy ? 'removeFavorite' : 'addFavorite') | translate" (click)="handleFavorite()" [class.responsive]="responsive"
+      <i [pTooltip]="(workpack?.favoritedBy ? 'removeFavorite' : 'addFavorite') | translate" (click)="!favoriteProcessing && handleFavorite()" [class.responsive]="responsive"
         [class]="(workpack?.favoritedBy ? 'fas icon-favorite-checked ' : 'far ') + 'fa-star icon-favorite'">
       </i>
       <app-config-data-view-panel></app-config-data-view-panel>

@@ -102,6 +102,7 @@ export class WorkpackComponent implements OnDestroy {
   tabs: ITabViewScrolled[];
   isLoading = false;
   tabViewStorage = 'open-pmo:WORKPACK_TABVIEW';
+  favoriteProcessing = false;
 
   constructor(
     private actRouter: ActivatedRoute,
@@ -294,8 +295,10 @@ export class WorkpackComponent implements OnDestroy {
     if (!this.workpack || !this.idPlan) {
       return;
     }
+    this.favoriteProcessing = true;
     const { success } = await this.workpackSrv.patchToggleWorkpackFavorite(this.idWorkpack, this.idPlan);
     if (success) {
+      this.favoriteProcessing = false;
       this.workpack.favoritedBy = !this.workpack.favoritedBy;
       this.menuSrv.reloadMenuFavorite();
     }

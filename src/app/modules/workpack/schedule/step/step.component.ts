@@ -452,6 +452,7 @@ export class StepComponent implements OnInit, OnDestroy {
     this.menuItemsCostAccounts = Array.from(menuItems);
     this.costAssignmentsCardItems = Array.from(this.costAssignmentsCardItems.filter(cost => cost.idCost !== idCost));
     this.reloadCostAssignmentTotals();
+    this.showSaveButton = true;
   }
 
   handleChangeValuesCardItems() {
