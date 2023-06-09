@@ -19,20 +19,7 @@ import { CostAccountService } from 'src/app/shared/services/cost-account.service
 import { enterLeave } from 'src/app/shared/animations/enterLeave.animation';
 import { ICostAccount } from 'src/app/shared/interfaces/ICostAccount';
 import { PlanService } from 'src/app/shared/services/plan.service';
-
-interface ICartItemCostAssignment {
-  type: string;
-  unitMeasureName?: string;
-  unitMeasurePrecision?: number;
-  idCost?: number;
-  idCostAssignment?: number;
-  costAccountName?: string;
-  plannedWork?: number;
-  actualWork?: number;
-  menuItemsCost?: MenuItem[];
-  menuItemsNewCost?: MenuItem[];
-  readonly?: boolean;
-}
+import { ICartItemCostAssignment } from 'src/app/shared/interfaces/ICartItemCostAssignment';
 
 @Component({
   selector: 'app-step',
@@ -71,6 +58,7 @@ export class StepComponent implements OnInit, OnDestroy {
   showSaveButton = false;
   menuItemsCostAccounts: MenuItem[];
   costAssignmentsTotals = { plannedTotal: 0, actualTotal: 0 };
+  baselinePlannedTotals: {plannedCost: number; plannedWork: number};
   $destroy = new Subject();
   calendarFormat: string;
   currentLang = '';
@@ -158,6 +146,10 @@ export class StepComponent implements OnInit, OnDestroy {
             idCostAccount: consume.costAccount.id,
             id: consume.id
           }))
+        };
+        this.baselinePlannedTotals = {
+          plannedCost: this.stepDetail.baselinePlannedCost,
+          plannedWork: this.stepDetail.baselinePlannedWork
         };
       }
     }
@@ -298,6 +290,9 @@ export class StepComponent implements OnInit, OnDestroy {
       initialStateCollapse: false
     };
     if (this.step && this.step.consumes) {
+      const actualDate = moment();
+      const stepDate = moment(this.step.periodFromStart, 'yyy-MM-DD');
+      const showReplicateButton = stepDate.isSameOrBefore(actualDate) ? true : false;
       this.costAssignmentsCardItems = this.step.consumes.map(consume => {
         const costAccount = this.costAccounts.find(cost => cost.id === consume.idCostAccount);
         const propertyModelName = costAccount.models.find(p => p.name === 'name');
@@ -307,6 +302,7 @@ export class StepComponent implements OnInit, OnDestroy {
           unitMeasureName: '$',
           idCost: consume.idCostAccount,
           idCostAssignment: consume.id,
+          showReplicateButton,
           costAccountName: propertyName.value as string,
           plannedWork: consume.plannedCost,
           actualWork: consume.actualCost,
@@ -315,7 +311,12 @@ export class StepComponent implements OnInit, OnDestroy {
             icon: 'fas fa-trash-alt',
             command: (event) => this.deleteCost(consume.idCostAccount)
           }],
-          readonly: !this.editPermission
+          readonly: !this.editPermission,
+          costAccountAllocation: costAccount.costAccountAllocation && {
+            limit: costAccount.costAccountAllocation.limit,
+            planed: costAccount.costAccountAllocation.planed - consume.plannedCost,
+            actual: costAccount.costAccountAllocation.actual - consume.actualCost,
+          }
         };
       });
       this.reloadCostAssignmentTotals();
@@ -372,6 +373,7 @@ export class StepComponent implements OnInit, OnDestroy {
       }, 500);
       return;
     }
+    const costAccountSelected = this.costAccounts.find( cost => cost.id === idCost);
     const costAssignmentsCardItemsList = this.costAssignmentsCardItems.filter(card => card.type === 'cost-card');
     const costAccountsIds = costAssignmentsCardItemsList.map(cardItem => (cardItem.idCost));
     this.menuItemsCostAccounts = Array.from(this.menuItemsCostAccounts.map(group => {
@@ -398,6 +400,7 @@ export class StepComponent implements OnInit, OnDestroy {
           icon: 'fas fa-trash-alt',
           command: (event) => this.deleteCost(idCost)
         }],
+        costAccountAllocation: costAccountSelected.costAccountAllocation
       });
       this.costAssignmentsCardItems.push({
         type: 'new-cost-card',
@@ -418,6 +421,7 @@ export class StepComponent implements OnInit, OnDestroy {
           icon: 'fas fa-trash-alt',
           command: (event) => this.deleteCost(idCost)
         }],
+        costAccountAllocation: costAccountSelected.costAccountAllocation
       }
     ];
     this.costAssignmentsCardItems.push({

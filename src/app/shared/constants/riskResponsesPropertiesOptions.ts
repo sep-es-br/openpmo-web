@@ -5,10 +5,12 @@ export const RiskResponsesPropertiesOptions = {
   },
   STRATEGY: {
     NEGATIVE: {
-      AVOIDANCE_ELIMINATION: {label: 'avoidanceElimination', value: 'AVOIDANCE_ELIMINATION'},
+      MITIGATE: {label: 'mitigate', value: 'MITIGATE'},
       TRANSFER: {label: 'transfer', value: 'TRANSFER'},
-      MITIGATION: {label: 'mitigation', value: 'MITIGATION'},
-      ACCEPTANCE: {label: 'acceptance', value: 'ACCEPTANCE'}
+      ACCEPT: {label: 'accept', value: 'ACCEPT'},
+      ELIMINATE: {label: 'eliminate', value: 'ELIMINATE'},
+      SCALE: {label: 'scale', value: 'SCALE'}
+
     },
     POSITIVE: {
       EXPLOIT: {label: 'exploite', value: 'EXPLOIT'},

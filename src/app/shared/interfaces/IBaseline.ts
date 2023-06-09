@@ -17,6 +17,7 @@ export interface IBaseline {
   schedule?: IScheduleBaseline;
   scope?: IScopeBaseline;
   default?: boolean;
+  projectFullName?: string;
 }
 
 export interface IBaselineUpdates {

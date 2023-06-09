@@ -114,6 +114,20 @@
           padding: 0.5em;
         }
       }
+      .panel-content {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        padding: 0.5em 0;
+        > i {
+          padding: 0.5em;
+          font-size: 1.5rem;
+          color: #939393;
+          cursor: pointer;
+        }
+      }.card-cost-assignments {
+        width: 220px;
+      }
     }
     .schedule-steps-container-mobile {
       display: flex;

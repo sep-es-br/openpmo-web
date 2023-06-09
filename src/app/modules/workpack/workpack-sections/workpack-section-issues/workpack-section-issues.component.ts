@@ -38,6 +38,8 @@ export class WorkpackSectionIssuesComponent implements OnInit, OnDestroy {
   pageSize: number;
   responsive = false;
   showTabview = false;
+  idFilterSelected: number;
+  term = '';
 
   constructor(
     private filterSrv: FilterDataviewService,
@@ -96,7 +98,7 @@ export class WorkpackSectionIssuesComponent implements OnInit, OnDestroy {
   async loadIssueSection() {
     const resultFiltersIssues = await this.filterSrv.getAllFilters(`workpackModels/${this.workpackData.workpack.model.id}/issues`);
     const filtersIssues = resultFiltersIssues.success && Array.isArray(resultFiltersIssues.data) ? resultFiltersIssues.data : [];
-    const idFilterIssueSelected = filtersIssues.find(defaultFilter => !!defaultFilter.favorite) ?
+   this.idFilterSelected = filtersIssues.find(defaultFilter => !!defaultFilter.favorite) ?
       filtersIssues.find(defaultFilter => !!defaultFilter.favorite).id : undefined;
     this.sectionIssue = {
       cardSection: {
@@ -117,13 +119,13 @@ export class WorkpackSectionIssuesComponent implements OnInit, OnDestroy {
         ...this.sectionIssue.cardSection,
         isLoading: false,
       },
-      cardItemsSection: await this.loadSectionIssuesCards(this.issueSectionShowClosed, idFilterIssueSelected)
+      cardItemsSection: await this.loadSectionIssuesCards(this.issueSectionShowClosed)
     }
     this.totalRecordsIssues = this.sectionIssue.cardItemsSection && this.sectionIssue.cardItemsSection.length;
   }
 
-  async loadSectionIssuesCards(showClosed: boolean, idFilterIssueSelected?: number) {
-    const resultIssues = await this.issueSrv.GetAll({ 'id-workpack': this.workpackParams.idWorkpack, idFilter: idFilterIssueSelected });
+  async loadSectionIssuesCards(showClosed: boolean) {
+    const resultIssues = await this.issueSrv.GetAll({ 'id-workpack': this.workpackParams.idWorkpack, idFilter: this.idFilterSelected, term: this.term });
     this.issues = resultIssues.success ? resultIssues.data : [];
     if (this.issues && this.issues.length > 0) {
       const cardItems = !showClosed ? this.issues.filter(r => IssuesPropertiesOptions.status[r.status].value === 'OPEN').map(issue => ({
@@ -270,10 +272,19 @@ export class WorkpackSectionIssuesComponent implements OnInit, OnDestroy {
   }
 
   async handleSelectedFilterIssue(event) {
-    const idFilter = event.filter;
+    this.idFilterSelected = event.filter;
     this.sectionIssue = Object.assign({}, {
       ...this.sectionIssue,
-      cardItemsSection: await this.loadSectionIssuesCards(this.issueSectionShowClosed, idFilter)
+      cardItemsSection: await this.loadSectionIssuesCards(this.issueSectionShowClosed)
+    });
+    this.totalRecordsIssues = this.sectionIssue.cardItemsSection && this.sectionIssue.cardItemsSection.length;
+  }
+
+  async handleSearchText(event) {
+    this.term = event.term;
+    this.sectionIssue = Object.assign({}, {
+      ...this.sectionIssue,
+      cardItemsSection: await this.loadSectionIssuesCards(this.issueSectionShowClosed)
     });
     this.totalRecordsIssues = this.sectionIssue.cardItemsSection && this.sectionIssue.cardItemsSection.length;
   }

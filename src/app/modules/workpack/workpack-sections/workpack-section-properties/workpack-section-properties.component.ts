@@ -74,7 +74,7 @@ export class WorkpackSectionPropertiesComponent implements OnInit {
     this.configDataViewSrv.observableCollapsePanelsStatus.pipe(takeUntil(this.$destroy)).subscribe(collapsePanelStatus => {
       this.cardWorkpackProperties = Object.assign({}, {
         ...this.cardWorkpackProperties,
-        initialStateCollapse: this.showTabview ? false : collapsePanelStatus === 'collapse' ? true : false
+        initialStateCollapse: this.showTabview ? false : collapsePanelStatus === 'collapse'
       });
     });
     this.saveButtonSrv.observableSaveButtonClicked.pipe(takeUntil(this.$destroy)).subscribe(clicked => {
@@ -151,8 +151,9 @@ export class WorkpackSectionPropertiesComponent implements OnInit {
       property.value = propertyWorkpack?.value ? propertyWorkpack?.value : propertyModel.defaultValue;
     }
     property.defaultValue = propertyWorkpack?.value ? propertyWorkpack?.value : propertyModel.defaultValue;
-    property.min = Number(propertyModel.min);
-    property.max = Number(propertyModel.max);
+    property.min = propertyModel.min && propertyModel.min !== null ? Number(propertyModel.min) : propertyModel.min;
+    property.max = propertyModel.max && propertyModel.max !== null ? Number(propertyModel.max) : propertyModel.max;
+    property.precision = propertyModel.precision;
     if (this.typePropertyModel[propertyModel.type] === TypePropertyModelEnum.DateModel) {
       const dateValue = propertyWorkpack?.value ? propertyWorkpack?.value.toLocaleString()
         : (propertyModel.defaultValue && propertyModel.defaultValue.toLocaleString());

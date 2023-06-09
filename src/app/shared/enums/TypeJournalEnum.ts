@@ -8,5 +8,8 @@ export enum TypeJournalEnum {
   ISSUE_RESPONSE = 'issueResponse',
   RISK = 'risk',
   RISK_RESPONSE = 'riskResponse',
-  ALL = 'all'
+  OFFICE_PERMISSION = 'officePermission',
+  PLAN_PERMISSION =  'planPermission',
+  WORKPACK_PERMISSION = 'workpackPermission',
+  ALL = 'all',
 }

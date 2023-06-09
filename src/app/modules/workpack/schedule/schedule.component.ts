@@ -23,17 +23,8 @@ import { SaveButtonComponent } from 'src/app/shared/components/save-button/save-
 import { IWorkpack } from 'src/app/shared/interfaces/IWorkpack';
 import { PlanService } from 'src/app/shared/services/plan.service';
 import * as moment from 'moment';
-
-interface ICartItemCostAssignment {
-  type: string;
-  unitMeasureName?: string;
-  idCost?: number;
-  costAccountName?: string;
-  plannedWork?: number;
-  actualWork?: number;
-  menuItemsCost?: MenuItem[];
-  menuItemsNewCost?: MenuItem[];
-}
+import { ICartItemCostAssignment } from 'src/app/shared/interfaces/ICartItemCostAssignment';
+import { ICostAccount } from 'src/app/shared/interfaces/ICostAccount';
 
 @Component({
   selector: 'app-schedule',
@@ -67,6 +58,8 @@ export class ScheduleComponent implements OnInit, OnDestroy {
   yearRange: string;
   actualValidationMessage: string;
   scheduleStartDate: Date;
+  costAccounts: ICostAccount[];
+  currentLang = ''; 
 
   constructor(
     private actRouter: ActivatedRoute,
@@ -88,8 +81,11 @@ export class ScheduleComponent implements OnInit, OnDestroy {
       this.idWorkpackModelLinked = queryParams.idWorkpackModelLinked;
       this.unitMeasure = queryParams.unitMeansureName;
     });
+    this.currentLang = this.translateSrv.currentLang;
+    this.currentLang = this.translateSrv.getDefaultLang();
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.responsive = value);
-    this.translateSrv.onLangChange.pipe(takeUntil(this.$destroy)).subscribe(() => {
+    this.translateSrv.onLangChange.pipe(takeUntil(this.$destroy)).subscribe(({lang}) => {
+      this.currentLang = lang;
       setTimeout(() => this.calendarComponents?.map(calendar => {
         calendar.ngOnInit();
         calendar.dateFormat = this.translateSrv.instant('dateFormat');
@@ -193,12 +189,12 @@ export class ScheduleComponent implements OnInit, OnDestroy {
   async loadMenuItemsCostAccounts() {
     const result = await this.costAccountSrv.GetAll({ 'id-workpack': this.idWorkpack });
     if (result.success) {
-      const costAccounts = result.data;
-      const workpacksIds = costAccounts.map(cost => cost.idWorkpack);
+      this.costAccounts = result.data;
+      const workpacksIds = this.costAccounts.map(cost => cost.idWorkpack);
       const workpacksIdsNotRepeated = workpacksIds.filter((w, i) => workpacksIds.indexOf(w) === i);
 
       this.menuItemsCostAccounts = workpacksIdsNotRepeated.map( (idWorkpack) => {
-        const workpackCostAccounts = costAccounts.filter(cost => cost.idWorkpack === idWorkpack);
+        const workpackCostAccounts = this.costAccounts.filter(cost => cost.idWorkpack === idWorkpack);
         return {
           label: workpackCostAccounts[0].workpackModelName,
           items: workpackCostAccounts.map(workpackCost => {
@@ -222,6 +218,7 @@ export class ScheduleComponent implements OnInit, OnDestroy {
       }, 500);
       return;
     }
+    const costAccountSelected = this.costAccounts.find( cost => cost.id === idCost);
     const costAssignmentsCardItemsList = this.costAssignmentsCardItems.filter(card => card.type === 'cost-card');
     const costAccountsIds = costAssignmentsCardItemsList.map(cardItem => (cardItem.idCost));
     this.menuItemsCostAccounts = Array.from(this.menuItemsCostAccounts.map(group => {
@@ -248,6 +245,7 @@ export class ScheduleComponent implements OnInit, OnDestroy {
           icon: 'fas fa-trash-alt',
           command: (event) => this.deleteCost(idCost)
         }],
+        costAccountAllocation: costAccountSelected && costAccountSelected.costAccountAllocation
       });
       this.costAssignmentsCardItems.push({
         type: 'new-cost-card',
@@ -268,6 +266,7 @@ export class ScheduleComponent implements OnInit, OnDestroy {
           icon: 'fas fa-trash-alt',
           command: (event) => this.deleteCost(idCost)
         }],
+        costAccountAllocation: costAccountSelected && costAccountSelected.costAccountAllocation
       }
     ];
     this.costAssignmentsCardItems.push({

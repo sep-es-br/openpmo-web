@@ -130,6 +130,17 @@ export class BreadcrumbComponent implements OnInit, OnChanges {
   }
 
   navigateTo(crumb: IBreadcrumb, index: number) {
+    if (crumb.key === 'workpackModel') {
+      const currentBreadcrumbItemsStoraged = localStorage.getItem('@pmo/current-breadcrumb');
+      if (currentBreadcrumbItemsStoraged) {
+        const currentBreadcrumbItems = JSON.parse(currentBreadcrumbItemsStoraged);
+        const breadcrumbIndex = currentBreadcrumbItems.findIndex(item => item.queryParams?.id === crumb.queryParams.id);
+        if (breadcrumbIndex > -1) {
+          const breadcrumb = currentBreadcrumbItems.slice(0, breadcrumbIndex + 1);
+          localStorage.setItem('@pmo/current-breadcrumb', JSON.stringify(breadcrumb));
+        }
+      }
+    }
     this.router.navigate(crumb.routerLink, { queryParams: crumb.queryParams });
   }
 }

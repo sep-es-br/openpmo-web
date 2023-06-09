@@ -1,10 +1,12 @@
 <div class="app-workpack-section-schedule" *ngIf="sectionSchedule">
   <app-card [properties]="sectionSchedule.cardSection" [class.panel-tab-view]="showTabview">
-    <button type="button" class="p-button-text button-new-schedule" *ngIf="!schedule && !!editPermission && !sectionSchedule.cardSection.isLoading"
-      (click)="handleNewSchedule()" pButton icon="pi pi-plus" iconPos="left"
-      [label]="translateSrv.instant('newSchedule')" [disabled]="!editPermission">
+    <button type="button" class="p-button-text button-new-schedule"
+      *ngIf="!schedule && !!editPermission && !sectionSchedule.cardSection.isLoading" (click)="handleNewSchedule()"
+      pButton icon="pi pi-plus" iconPos="left" [label]="translateSrv.instant('newSchedule')"
+      [disabled]="!editPermission">
     </button>
-    <div class="schedule-buttons" *ngIf="schedule && !sectionSchedule.cardSection.isLoading" [class.schedule-buttons-mobile]="responsive">
+    <div class="schedule-buttons" *ngIf="schedule && !sectionSchedule.cardSection.isLoading"
+      [class.schedule-buttons-mobile]="responsive">
       <button type="button" class="p-button-text button-details" (click)="handleShowDetails()" pButton
         [icon]="showDetails ? 'far fa-eye-slash' : 'far fa-eye'" iconPos="left"
         [label]="showDetails ? translateSrv.instant('hideDetails') : translateSrv.instant('showDetails')">
@@ -15,7 +17,7 @@
       </button>
     </div>
     <div class="loading-container" *ngIf="sectionSchedule.cardSection.isLoading">
-      <app-card-loading [isCardLoading]="sectionSchedule.cardSection.isLoading" ></app-card-loading>
+      <app-card-loading [isCardLoading]="sectionSchedule.cardSection.isLoading"></app-card-loading>
     </div>
     <div class="schedule-steps-section" *ngIf="sectionSchedule && sectionSchedule.groupStep">
       <div class="schedule-steps-container" *ngFor="let groupStep of sectionSchedule.groupStep"
@@ -45,14 +47,29 @@
                   unitName: step.unitName,
                   unitPrecision: step.unitPrecision
                 }">
-                <app-schedule-step-card-item [properties]="step" [type]="'listStep'"
+                <app-schedule-step-card-item [properties]="step" [type]="'listStep'" (spreadDifference)="handleSpreadDifference($event)"
                   (stepChanged)="saveStepChanged(groupStep.year, step.idStep)"></app-schedule-step-card-item>
               </div>
               <div class="card-item-container show-details" *ngIf="step.type === 'listStep'"
                 [class.new-card-item]="['newStart', 'newEnd'].includes(step.type)" [class.mobile]="responsive">
                 <app-schedule-step-card-item [properties]="step" [type]="'listStep'"
+                  (editCost)="handleShowEditCost($event, groupStep.year)" (spreadDifference)="handleSpreadDifference($event)"
                   (stepChanged)="saveStepChanged(groupStep.year, step.idStep)"></app-schedule-step-card-item>
               </div>
+              <p-overlayPanel #cardCostEditPanel [dismissable]="true">
+                <ng-template pTemplate>
+                  <div class="panel-content"
+                    *ngIf="costAssignmentsCardItemsEdited && costAssignmentsCardItemsEdited.length > 0">
+                    <i class="fas fa-chevron-left" (click)="decrementIndex()"></i>
+                    <div class="card-cost-assignments">
+                      <app-cost-assignment-card-item [properties]="costAssignmentsCardItemsEdited[indexCardEdited]"
+                        (costChanged)="handleChangeValuesCardItem()">
+                      </app-cost-assignment-card-item>
+                    </div>
+                    <i class="fas fa-chevron-right" (click)="incrementIndex()"></i>
+                  </div>
+                </ng-template>
+              </p-overlayPanel>
             </ng-template>
           </p-dataView>
           <ng-template #showResumed>
@@ -93,3 +110,5 @@
   </app-card>
   <app-save-button #saveButton (save)="onSaveButtonClicked()"></app-save-button>
 </div>
+<p-confirmDialog [header]="'confirmSpreadDifference' | translate" icon="pi pi-exclamation-triangle" key="spreadDifferenceConfirm">
+</p-confirmDialog>

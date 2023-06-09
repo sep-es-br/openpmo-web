@@ -89,7 +89,17 @@ const routes: Routes = [
     canActivate: [ AuthGuard ],
     loadChildren: () => import('./modules/ccbmember-baselines-view/ccbmember-baselines-view.module')
       .then(m => m.CCBMemberBaselinesViewModule)
-  }
+  },
+  {
+    path: 'report-models',
+    canActivate: [ AuthGuard ],
+    loadChildren: () => import('./modules/report-model/report-model.module').then(m => m.ReportModelModule)
+  },
+  {
+    path: 'reports',
+    canActivate: [ AuthGuard ],
+    loadChildren: () => import('./modules/report/report.module').then(m => m.ReportModule)
+  },
 ];
 
 @NgModule({

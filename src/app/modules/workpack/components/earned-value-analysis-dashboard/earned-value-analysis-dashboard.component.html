@@ -10,9 +10,11 @@
     <div class="performance-indexes-container">
       <div class="gauges-container">
         <div class="gauge-container gauge-chart">
+          <span style="font-size: .8rem; white-space: pre-wrap;">{{ 'CPIdescription' | translate }}</span>
           <app-gauge-chart *ngIf="gaugeChartDataCPI" [config]="gaugeChartDataCPI"></app-gauge-chart>
         </div>
         <div class="gauge-container gauge-chart">
+          <span style="font-size: .8rem; white-space: pre-wrap;">{{ 'SPIdescription' | translate }}</span>
           <app-gauge-chart *ngIf="gaugeChartDataSPI" [config]="gaugeChartDataSPI"></app-gauge-chart>
         </div>
       </div>

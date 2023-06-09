@@ -1,6 +1,3 @@
-import { OfficeService } from './../../../../shared/services/office.service';
-import { AuthService } from './../../../../shared/services/auth.service';
-import { AuthServerService } from './../../../../shared/services/auth-server.service';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Router } from '@angular/router';
 import localePt from '@angular/common/locales/pt';
@@ -29,8 +26,6 @@ export class CardItemOfficeComponent implements OnInit {
   constructor(
     private router: Router,
     private responsiveSrv: ResponsiveService,
-    private authSrv: AuthService,
-    private officeSrv: OfficeService
   ) {
     this.responsiveSrv.observable.subscribe(value => {
       this.responsive = value;

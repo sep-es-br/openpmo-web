@@ -18,6 +18,7 @@ export interface IWorkpackBreakdownStructure {
   actualCost?: number;
   start?: string;
   workpackType?: TypeWorkpackEnumWBS;
+  hasChildren?: boolean;
 
   expirationDate?: string;
   milestoneDate?: string;

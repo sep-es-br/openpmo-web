@@ -5,25 +5,7 @@ import { WorkpackRoutingModule } from './workpack-routing.module';
 import { CoreModule } from 'src/app/core/core.module';
 import { ComponentsModule } from 'src/app/shared/components/components.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { WorkpackPropertyComponent } from './workpack-property/workpack-property.component';
-import { PropertyTextComponent } from './workpack-property/type-property/property-text/property-text.component';
-import { PropertyDateComponent } from './workpack-property/type-property/property-date/property-date.component';
-import { PropertyToggleComponent } from './workpack-property/type-property/property-toggle/property-toggle.component';
-import { PropertySelectionComponent } from './workpack-property/type-property/property-selection/property-selection.component';
-import { PropertyTextareaComponent } from './workpack-property/type-property/property-textarea/property-textarea.component';
-import {
-  PropertyTreeSelectionComponent
-} from './workpack-property/type-property/property-tree-selection/property-tree-selection.component';
-import { PropertyIntegerComponent } from './workpack-property/type-property/property-integer/property-integer.component';
-import { CostAccountComponent } from './cost-account/cost-account.component';
-import {
-  PropertyUnitSelectionComponent
-} from './workpack-property/type-property/property-unit-selection/property-unit-selection.component';
-import {
-  PropertyOrganizationSelectionComponent
-} from './workpack-property/type-property/property-organization-selection/property-organization-selection.component';
 import { ScheduleStepCardItemComponent } from './schedule-step-card-item/schedule-step-card-item.component';
-import { PropertyGroupComponent } from './workpack-property/type-property/property-group/property-group.component';
 import { ProcessComponent } from './process/process.component';
 import { ProgressBarCardStepComponent } from './components/progress-bar-card-step/progress-bar-card-step.component';
 import { SharingComponent } from './sharing/sharing.component';
@@ -44,23 +26,15 @@ import { WorkpackSectionBaselinesComponent } from './workpack-sections/workpack-
 import { WorkpackSectionRisksComponent } from './workpack-sections/workpack-section-risks/workpack-section-risks.component';
 import { WorkpackSectionIssuesComponent } from './workpack-sections/workpack-section-issues/workpack-section-issues.component';
 import { WorkpackSectionProcessesComponent } from './workpack-sections/workpack-section-processes/workpack-section-processes.component';
+import { CostAccountComponent } from './cost-account/cost-account.component';
+import { CostAccountCardComponent } from './components/cost-account-card/cost-account-card.component';
+import { ProgressBarCostAccountComponent } from './components/progress-bar-cost-account/progress-bar-cost-account.component';
 
 @NgModule({
   declarations: [
     WorkpackComponent,
-    WorkpackPropertyComponent,
-    PropertyIntegerComponent,
-    PropertyTextComponent,
-    PropertyDateComponent,
-    PropertyToggleComponent,
-    PropertySelectionComponent,
-    PropertyTextareaComponent,
-    PropertyTreeSelectionComponent,
     CostAccountComponent,
-    PropertyUnitSelectionComponent,
-    PropertyOrganizationSelectionComponent,
     ScheduleStepCardItemComponent,
-    PropertyGroupComponent,
     ProcessComponent,
     ProgressBarCardStepComponent,
     SharingComponent,
@@ -81,6 +55,8 @@ import { WorkpackSectionProcessesComponent } from './workpack-sections/workpack-
     WorkpackSectionRisksComponent,
     WorkpackSectionIssuesComponent,
     WorkpackSectionProcessesComponent,
+    CostAccountCardComponent,
+    ProgressBarCostAccountComponent,
   ],
   imports: [
       CommonModule,

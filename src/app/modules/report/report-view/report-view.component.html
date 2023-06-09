@@ -1,0 +1,46 @@
+<div class="app-report-view">
+  <div class="header-container" [class.mobile]="responsive">
+    <div class="app-content-header" [class.mobile]="responsive">
+      <span>{{ reportModel?.name | translate }}</span>
+    </div>
+  </div>
+  <div class="loading-container" *ngIf="isLoading">
+    <app-card-loading [isCardLoading]="isLoading"></app-card-loading>
+  </div>
+  <app-card [properties]="reportViewProperties" class="mt-0 inputs-float-label" *ngIf="reportViewProperties">
+    <div class="loading-container" *ngIf="reportViewProperties.isLoading">
+      <app-card-loading [isCardLoading]=" reportViewProperties.isLoading"></app-card-loading>
+    </div>
+    <div class="properties-container" *ngIf="!reportViewProperties.isLoading" [class.responsive]="responsive">
+      <div class="property-container" *ngFor="let property of reportProperties"
+        [class.not-fullLine]="!property.fullLine && property.type !== 'TextArea' && property.type !== 'Group'"
+        [class.fullLine]="property.fullLine || property.type === 'TextArea' || property.type === 'Group'">
+        <app-property [property]="property"></app-property>
+        <span class="input-message-error" *ngIf="property.invalid && property.type !== 'Group'">
+          {{ property.message }}
+        </span>
+      </div>
+    </div>
+    <div class="scope-container" *ngIf="!reportViewProperties.isLoading">
+      <label class="scope-label">{{'scopeLabel' |translate}}</label>
+      <div class="app-tree-selection">
+        <p-tree [value]="reportScope" selectionMode="checkbox" [(selection)]="selectedWorkpacks">
+        </p-tree>
+      </div>
+    </div>
+    <div class="button-format-container" *ngIf="!reportViewProperties.isLoading">
+      <p-dropdown class="select-format" [options]="formatOptions" [(ngModel)]="reportFormat" [readonly]="isGenerating"
+        dropdownIcon="fas fa-caret-down" [autoDisplayFirst]="false">
+        <ng-template pTemplate="selectedItem">
+          <div class="format-selected-item" *ngIf="reportFormat">
+            <i class="app-icon downloadFile" (click)="handleGenerateReport()" *ngIf="!isGenerating"></i>
+            <p-progressSpinner [style]="{width: '20px', height: '20px'}" *ngIf="isGenerating" styleClass="download-spinner" strokeWidth="8"
+              fill="#EEEEEE" animationDuration=".5s">
+            </p-progressSpinner>
+            <div>{{reportFormat}}</div>
+          </div>
+        </ng-template>
+      </p-dropdown>
+    </div>
+  </app-card>
+</div>

@@ -37,5 +37,6 @@ export interface ICardItem {
   breadcrumbWorkpackModel?: IBreadcrumb[];
   profileView?: boolean;
   priority?: boolean;
+  main?: boolean;
 }
 

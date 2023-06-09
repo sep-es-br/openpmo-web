@@ -43,7 +43,7 @@
   </div>
   <section *ngIf="propertiesLocality" class="localities-cards-section">
     <div class="card-localities" *ngIf="cardLocalities">
-      <app-card [properties]="cardLocalities" (editFilter)="handleEditFilter($event)" (newFilter)="handleNewFilter()"
+      <app-card [properties]="cardLocalities" (editFilter)="handleEditFilter($event)" (newFilter)="handleNewFilter()" (searchText)="handleSearchText($event)"
         (selectedFilter)="handleSelectedFilter($event)" (createNewElement)="createNewLocality()">
         <div class="loading-container" *ngIf="isLoading">
           <app-card-loading [isCardLoading]="isLoading"></app-card-loading>

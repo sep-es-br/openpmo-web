@@ -10,7 +10,7 @@ import { Subject, Subscription } from 'rxjs';
 import { ConfirmationService, MenuItem, MessageService, SelectItem, TreeNode } from 'primeng/api';
 
 import { IconPropertyWorkpackModelEnum as IconPropertyEnum } from 'src/app/shared/enums/IconPropertyWorkpackModelEnum';
-import { TypePropertyWorkpackModelEnum as TypePropertyEnum } from 'src/app/shared/enums/TypePropertyWorkpackModelEnum';
+import { TypePropertyModelEnum as TypePropertyEnum } from 'src/app/shared/enums/TypePropertModelEnum';
 import { TypeWorkpackModelEnum } from 'src/app/shared/enums/TypeWorkpackModelEnum';
 import {
   IconsRegularEng,
@@ -197,7 +197,7 @@ export class WorkpackModelComponent implements OnInit {
       this.posibleRolesOrg = this.rolesOrgOptions.map(role => this.translateSrv.instant(role));
       this.posibleRolesPerson = this.rolesPersonOptions.map(role => this.translateSrv.instant(role));
       this.resetValues();
-      this.setFormProperties();
+      await this.setFormProperties();
       this.scrollTop();
       this.editPermission = await this.officePermissionSrv.getPermissions(idOffice);
       if (!this.editPermission) {
@@ -214,12 +214,6 @@ export class WorkpackModelComponent implements OnInit {
       this.currentBreadcrumbItems = data;
       this.setCurrentBreadcrumb();
     });
-    this.formProperties.statusChanges
-      .pipe(takeUntil(this.$destroy), filter(status => status === 'INVALID'))
-      .subscribe(() => this.saveButton?.hideButton());
-    this.formProperties.valueChanges
-      .pipe(takeUntil(this.$destroy), filter(() => this.formProperties.dirty && this.formProperties.valid))
-      .subscribe(() => this.checkProperties());
     this.translateSrv.onLangChange
       .pipe(takeUntil(this.$destroy)).subscribe(({ lang }) => {
         this.currentLang = lang;
@@ -235,12 +229,23 @@ export class WorkpackModelComponent implements OnInit {
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(r => this.isMobileView = r);
   }
 
-  setFormProperties() {
+  async setFormProperties() {
+    let nextPosition;
+    if (!this.idWorkpackModel) {
+      const result = await this.workpackModelSrv.getNextPosition({
+        'id-workpack-model': Number(this.idParentWorkpack) ? this.idParentWorkpack : undefined,
+        'id-plan-model': this.idStrategy
+      });
+      if (result.success) {
+        nextPosition = result.data.nextPosition;
+      }
+    }
     this.formProperties = this.fb.group({
       name: ['', Validators.required],
       nameInPlural: ['', Validators.required],
       icon: this.workpackModelType ? [IconsTypeWorkpackModelEnum[this.workpackModelType], Validators.required] :
         [undefined, Validators.required],
+      position: [nextPosition || 1, Validators.required],
       sortedBy: 'name'
     });
     this.getSortedByList();
@@ -249,6 +254,12 @@ export class WorkpackModelComponent implements OnInit {
         { label: this.translateSrv.instant('name'), value: 'name' }
       ];
     }
+    this.formProperties.statusChanges
+      .pipe(takeUntil(this.$destroy), filter(status => status === 'INVALID'))
+      .subscribe(() => this.saveButton?.hideButton());
+    this.formProperties.valueChanges
+      .pipe(takeUntil(this.$destroy), filter(() => this.formProperties.dirty && this.formProperties.valid))
+      .subscribe(() => this.checkProperties());
   }
 
   getSortedByList() {
@@ -297,6 +308,7 @@ export class WorkpackModelComponent implements OnInit {
     this.cardPropertiesJournal = null;
     this.cardPropertiesModels = null;
     this.cardPropertiesSchedule = null;
+    this.setCurrentBreadcrumb();
   }
 
   ngOnInit(): void {
@@ -372,7 +384,7 @@ export class WorkpackModelComponent implements OnInit {
         : [{
           key: 'workpackModel',
           routerLink: ['/workpack-model'],
-          queryParams: { idStrategy, type, idOffice }
+          queryParams: { idStrategy, type, idOffice, idParent: this.idParentWorkpack }
         }]
     ];
   }
@@ -395,7 +407,7 @@ export class WorkpackModelComponent implements OnInit {
             info: this.modelName,
             tooltip: this.modelNamePlural,
             routerLink: ['/workpack-model'],
-            queryParams: { idStrategy, id: this.idWorkpackModel, type, idOffice }
+            queryParams: { idStrategy, id: this.idWorkpackModel, type, idOffice, idParent: this.idParentWorkpack }
           }]
           ];
         } else {
@@ -459,7 +471,7 @@ export class WorkpackModelComponent implements OnInit {
           active: true,
           label: this.translateSrv.instant('orderNumber'),
           name: this.translateSrv.instant('orderNumber'),
-          type: TypePropertyEnum.NumberModel,
+          type: TypePropertyEnum.IntegerModel,
           sortIndex: 2,
           fullLine: true
         });
@@ -520,41 +532,64 @@ export class WorkpackModelComponent implements OnInit {
             active: true,
             label: this.translateSrv.instant('justification'),
             name: this.translateSrv.instant('justification'),
-            type: TypePropertyEnum.TextModel,
-            sortIndex: 3,
-            fullLine: true
-          },
-          {
-            active: true,
-            label: this.translateSrv.instant('targetAudience'),
-            name: this.translateSrv.instant('targetAudience'),
-            type: TypePropertyEnum.TextModel,
-            sortIndex: 4,
-            fullLine: true
+            type: TypePropertyEnum.TextAreaModel,
+            sortIndex: 2,
+            fullLine: true,
+            required: true,
+            rows: 3,
+            max: 500
           },
           {
             active: true,
             label: this.translateSrv.instant('projectObjective'),
             name: this.translateSrv.instant('projectObjective'),
-            type: TypePropertyEnum.TextModel,
-            sortIndex: 5,
-            fullLine: true
+            type: TypePropertyEnum.TextAreaModel,
+            sortIndex: 3,
+            fullLine: true,
+            required: true,
+            rows: 3,
+            max: 500
           },
           {
             active: true, label: this.translateSrv.instant('scope'), name: this.translateSrv.instant('scope'),
-            type: TypePropertyEnum.TextModel, sortIndex: 6, fullLine: true
+            type: TypePropertyEnum.TextAreaModel,
+            sortIndex: 4,
+            fullLine: true,
+            required: true,
+            rows: 3,
+            max: 500
           },
           {
+            active: true,
+            label: this.translateSrv.instant('targetAudience'),
+            name: this.translateSrv.instant('targetAudience'),
+            type: TypePropertyEnum.TextAreaModel,
+            sortIndex: 5,
+            fullLine: true,
+            required: true,
+            rows: 3,
+            max: 500
+          },
+         
+          {
             active: true, label: this.translateSrv.instant('premises'), name: this.translateSrv.instant('premises'),
-            type: TypePropertyEnum.TextModel, sortIndex: 7, fullLine: true
+            type: TypePropertyEnum.TextAreaModel,
+            sortIndex: 6,
+            fullLine: true,
+            required: true,
+            rows: 3,
+            max: 500
           },
           {
             active: true,
             label: this.translateSrv.instant('restrictions'),
             name: this.translateSrv.instant('restrictions'),
-            type: TypePropertyEnum.TextModel,
-            sortIndex: 8,
-            fullLine: true
+            type: TypePropertyEnum.TextAreaModel,
+            sortIndex: 7,
+            fullLine: true,
+            required: true,
+            rows: 3,
+            max: 500
           }
         );
         break;
@@ -672,6 +707,7 @@ export class WorkpackModelComponent implements OnInit {
         name: data.modelName,
         nameInPlural: data.modelNameInPlural || '',
         icon: data.fontIcon || '',
+        position: data.position || 1,
         sortedBy: data.sortBy?.name || 'name'
       });
       this.posibleRolesOrg = data.organizationRoles || [];
@@ -845,6 +881,12 @@ export class WorkpackModelComponent implements OnInit {
         break;
       case TypePropertyEnum.GroupModel:
         requiredFields = ['name', 'sortIndex', 'session', 'groupedProperties'];
+        break;
+      case TypePropertyEnum.NumberModel:
+        requiredFields = requiredFields.concat(['precision']);
+        property.precision = 3;
+        break;
+      default:
         break;
     }
     property.isCollapsed = property.isCollapsed === undefined || property.isCollapsed;
@@ -1419,7 +1461,7 @@ export class WorkpackModelComponent implements OnInit {
         delete propGrouped.obligatory;
       });
     });
-    const { name: modelName, nameInPlural: modelNameInPlural, icon, sortedBy: sortBy } = this.formProperties.value;
+    const { name: modelName, nameInPlural: modelNameInPlural, icon, sortedBy: sortBy, position } = this.formProperties.value;
     const form: IWorkpackModel = {
       childWorkpackModelSessionActive: !!this.cardPropertiesModels?.initialStateToggle,
       scheduleSessionActive: !!this.cardPropertiesSchedule?.initialStateToggle,
@@ -1438,6 +1480,7 @@ export class WorkpackModelComponent implements OnInit {
       idPlanModel: this.idStrategy,
       modelName,
       modelNameInPlural,
+      position,
       sortBy,
       organizationRoles: !!this.cardPropertiesStakeholders?.initialStateToggle ? this.posibleRolesOrg : [],
       personRoles: !!this.cardPropertiesStakeholders?.initialStateToggle ? this.posibleRolesPerson : [],
@@ -1458,8 +1501,8 @@ export class WorkpackModelComponent implements OnInit {
       if (!isPut) {
         this.idWorkpackModel = data.id;
         this.modelName = this.formProperties.controls.name.value;
-        this.modelNamePlural = this.formProperties.controls.nameInPlural.value,
-          await this.loadCardItemsModels();
+        this.modelNamePlural = this.formProperties.controls.nameInPlural.value;
+        await this.loadCardItemsModels();
         await this.router.navigate([], {
           queryParams: {
             type: this.workpackModelType,
@@ -1579,18 +1622,8 @@ export class WorkpackModelComponent implements OnInit {
     const idReusableWorkpackModelSelected = event.idModel;
     const result = await this.workpackModelSrv.reuseWorkpackModel(idReusableWorkpackModelSelected, this.idWorkpackModel);
     if (result.success) {
-      const workpackModel = result.data;
-      const breadcrumb = this.getCurrentBreadcrumb();
-      this.breadcrumbSrv.setBreadcrumbStorage(breadcrumb);
-      await this.router.navigate(['/workpack-model'], {
-        queryParams: {
-          id: workpackModel.id,
-          type: TypeWorkpackModelEnum[workpackModel.type],
-          idStrategy: this.idStrategy,
-          idOffice: this.idOffice,
-          idParent: this.idWorkpackModel
-        }
-      });
+      this.childrenModels.push({ ...result.data });
+      this.loadCardItemsModels();
     }
   }
 

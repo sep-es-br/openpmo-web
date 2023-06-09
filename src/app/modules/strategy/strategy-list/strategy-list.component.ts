@@ -50,6 +50,7 @@ export class StrategyListComponent implements OnInit, OnDestroy {
   sharedPlanModels: IPlanModel[];
   $destroy = new Subject();
   isLoading = false;
+  term = '';
 
   constructor(
     private planModelSvr: PlanModelService,
@@ -128,7 +129,11 @@ export class StrategyListComponent implements OnInit, OnDestroy {
 
   async loadPropertiesStrategies() {
     this.isLoading = true;
-    const { success, data } = await this.planModelSvr.GetAll({ 'id-office': this.idOffice, idFilter: this.idFilterSelected });
+    const { success, data } = await this.planModelSvr.GetAll({ 
+      'id-office': this.idOffice,
+      idFilter: this.idFilterSelected,
+      term: this.term
+    });
     
     if (this.editPermission) {
       const resultSharedPlanModels = await this.planModelSvr.getSharedPlanModels({ 'id-office': this.idOffice });
@@ -240,6 +245,11 @@ export class StrategyListComponent implements OnInit, OnDestroy {
   async handleSelectedFilter(event) {
     const idFilter = event.filter;
     this.idFilterSelected = idFilter;
+    await this.loadPropertiesStrategies();
+  }
+
+  async handleSearchText(event) {
+    this.term = event.term;
     await this.loadPropertiesStrategies();
   }
 

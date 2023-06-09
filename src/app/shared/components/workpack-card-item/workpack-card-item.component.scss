@@ -73,6 +73,7 @@
     min-width: 340px;
   }
   .index-content {
+    text-align: center;
     min-width: 280px;
     .gauge-chart {
       display: flex;
@@ -225,7 +226,7 @@
             align-items: center;
             flex: 1;
             max-width: 100%;
-            
+
             .card-item-name {
               margin-left: 1em;
               font-weight: 500;
@@ -719,7 +720,7 @@
             }
           }
         }
-        
+
         .card-item-date {
           justify-self: flex-end;
           margin-left: 1em;
@@ -767,7 +768,7 @@
         overflow: hidden;
         text-overflow: ellipsis;
         text-align: center;
-      }   
+      }
       .p-calendar {
         border-bottom: 1px solid #ced4da;
         .p-inputtext {

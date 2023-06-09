@@ -24,6 +24,8 @@ export class CardComponent implements OnInit, OnDestroy, OnChanges {
   @Output() createNewElement = new EventEmitter();
   @Output() changeCheckCompleted = new EventEmitter();
   @Output() changeFullScreen = new EventEmitter();
+  @Output() searchText = new EventEmitter();
+  searchTextAux = undefined;
 
   responsive: boolean;
   subResponsive: Subscription;
@@ -33,10 +35,11 @@ export class CardComponent implements OnInit, OnDestroy, OnChanges {
   filterSelected: number;
   canEditCheckCompleted: boolean;
   showTabview = false;
+  showAnimationSearch = false;
 
   constructor(
     private responsiveSrv: ResponsiveService,
-    private translateSrv: TranslateService,
+    public translateSrv: TranslateService,
     private workpackSrv: WorkpackService,
     private workpackShowTabviewSrv: WorkpackShowTabviewService
   ) {
@@ -56,24 +59,26 @@ export class CardComponent implements OnInit, OnDestroy, OnChanges {
       if (canEdit) {
         this.canEditCheckCompleted = true;
       }
-    })
+    });
   }
 
   ngOnChanges(changes: SimpleChanges) {
     if (
       changes.properties && changes.properties.currentValue
     ) {
-      this.properties.progressBarValues = this.properties.progressBarValues && this.properties.progressBarValues.filter( item => item.total !== 0 );
+      this.properties.progressBarValues = this.properties.progressBarValues &&
+        this.properties.progressBarValues.filter( item => item.total !== 0 );
       this.canEditCheckCompleted = this.properties.canEditCheckCompleted;
       if (!!this.properties.showFilters) {
         this.loadFilterListOptions();
       }
-      
+
     }
   }
 
   ngOnInit() {
-    this.properties.progressBarValues = this.properties.progressBarValues && this.properties.progressBarValues.filter( item => item.total !== 0 );
+    this.properties.progressBarValues = this.properties.progressBarValues &&
+      this.properties.progressBarValues.filter( item => item.total !== 0 );
     this.setLanguage();
     if (this.properties && !!this.properties.showFilters) {
       this.loadFilterListOptions();
@@ -98,8 +103,12 @@ export class CardComponent implements OnInit, OnDestroy, OnChanges {
           label: filter.name,
           value: filter.id
         });
-        if (!!filter.favorite) {
-          this.filterSelected = filter.id;
+        if (this.properties.idFilterSelected) {
+          this.filterSelected = this.properties.idFilterSelected;
+        } else {
+          if (!!filter.favorite) {
+            this.filterSelected = filter.id;
+          }
         }
       });
     }
@@ -144,6 +153,19 @@ export class CardComponent implements OnInit, OnDestroy, OnChanges {
 
   handleChangeFullScreen(fullScreenMode: boolean) {
     this.changeFullScreen.emit(fullScreenMode);
+  }
+
+  handleSearchText() {
+    const inputtext = document.getElementById('id-app-inputtext');
+    inputtext.focus();
+    const value = this.properties.searchTerm;
+    if (value !== this.searchTextAux) {
+      this.searchText.emit({term: value});
+      this.searchTextAux = value;
+    }
+    if (value === '') {
+      this.showAnimationSearch = false;
+    }
   }
 
   get label(): string {

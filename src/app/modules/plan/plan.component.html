@@ -67,6 +67,7 @@
         (editFilter)="handleEditFilter($event, workpackModel.idWorkpackModel)"
         (newFilter)="handleNewFilter(workpackModel.idWorkpackModel)"
         (selectedFilter)="handleSelectedFilter($event, workpackModel.idWorkpackModel)"
+        (searchText)="handleSearchText($event, workpackModel.idWorkpackModel)"
         (createNewElement)="handleCreateNewWorkpack(workpackModel.idWorkpackModel)">
         <div class="loading-container" *ngIf="workpackModel.propertiesCard.isLoading">
           <app-card-loading [isCardLoading]="workpackModel.propertiesCard.isLoading"></app-card-loading>

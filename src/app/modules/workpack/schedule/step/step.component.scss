@@ -11,9 +11,9 @@
     form {
       width: 100%;
       .p-formgroup-inline {
-        width: 40%;
+        width: 60%;
         display: grid;
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: 1fr 1fr 1fr;
         column-gap: 1em;
         .p-field {
           margin-right: 0;
@@ -63,15 +63,30 @@
           font-family: v.$fontTitle !important;
           color: v.$fontInput;
         }
+        .planned-baseline {
+          display: flex;
+          flex-direction: column;
+          .label {
+            font-size: 0.9rem;
+            font-style: italic;
+            color: v.$fontLabel;
+          }
+          .value {
+            font-family: v.$fontFamilyMedium;
+            font-size: 1rem;
+            color: v.$fontInput;
+            padding: 0.5em 0;
+          }
+        }
         .cost-assignments-totals {
           display: grid;
-          grid-template-columns: 1fr 1fr;
+          grid-template-columns: 1fr 1fr 1fr;
           column-gap: 1em;
           align-items: center;
-          width: 40%;
+          width: 60%;
           margin-top: 15px;
 
-          .planned-total, .actual-total {
+          .planned-total, .actual-total, .planned-baseline {
             display: flex;
             flex-direction: column;
             .label {
@@ -87,16 +102,23 @@
             }
           }
         }
+        .responsive.planned-baseline {
+          width: 100%;
+          .value {
+            border-bottom: solid 1px #b6c8cd;
+          }
+          margin-top: 15px;
+        }
         .cost-assignments-totals.responsive {
           display: flex;
           flex-direction: column;
-          .planned-total, .actual-total {
+          .planned-total, .actual-total, .planned-baseline {
             width: 100%;
             .value {
               border-bottom: solid 1px #b6c8cd;
             }
           }
-          .actual-total {
+          .actual-total, .planned-baseline {
             margin-top: 15px;
           }
         }

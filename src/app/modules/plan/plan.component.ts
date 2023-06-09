@@ -153,7 +153,9 @@ export class PlanComponent implements OnInit, OnDestroy {
       .subscribe(() => this.saveButton?.hideButton());
     this.formPlan.valueChanges
       .pipe(takeUntil(this.$destroy), filter(() => this.formPlan.dirty && this.formPlan.valid))
-      .subscribe(() => this.saveButton.showButton());
+      .subscribe(() => {
+        this.saveButton.showButton()
+      });
 
     localStorage.removeItem('open-pmo:WORKPACK_TABVIEW');
   }
@@ -197,7 +199,7 @@ export class PlanComponent implements OnInit, OnDestroy {
       {
         key: 'office',
         routerLink: ['/offices', 'office'],
-        queryParams: { id: this.idOffice },
+        queryParams: { id: this.propertiesOffice.id },
         info: this.propertiesOffice?.name,
         tooltip: this.propertiesOffice?.fullName
       },
@@ -226,24 +228,33 @@ export class PlanComponent implements OnInit, OnDestroy {
       const result = await this.planSrv.GetById(this.idPlan);
       this.planData = result.data;
       if (this.planData) {
+        localStorage.setItem('@pmo/propertiesCurrentPlan', JSON.stringify(this.planData));
         this.officeSrv.nextIDOffice(this.planData.idOffice);
         this.idPlanModel = this.planData.idPlanModel;
         this.loadWorkPackModels();
-        this.formPlan.controls.name.setValue(this.planData.name);
-        this.formPlan.controls.fullName.setValue(this.planData.fullName);
-        this.formPlan.controls.start.setValue(new Date(this.planData.start + 'T00:00:00'));
-        this.formPlan.controls.finish.setValue(new Date(this.planData.finish + 'T00:00:00'));
+        this.formPlan.reset({
+          name: this.planData.name,
+          fullName: this.planData.fullName,
+          start: new Date(this.planData.start + 'T00:00:00'),
+          finish: new Date(this.planData.finish + 'T00:00:00') 
+        });
         this.cardPlanProperties.isLoading = false;
       }
-    } 
+    }
     await this.loadPropertiesOffice();
   }
 
   async loadPropertiesOffice() {
-    this.idOffice = this.planData?.idOffice || this.idOffice;
-    const { success, data } = await this.officeSrv.GetById(this.idOffice);
-    if (success) {
-      this.propertiesOffice = data;
+    const storedCurrentOffice = localStorage.getItem('@pmo/propertiesCurrentOffice');
+    if (storedCurrentOffice) {
+      this.propertiesOffice = JSON.parse(storedCurrentOffice);
+      this.idOffice = this.propertiesOffice.id;
+    } else {
+      this.idOffice = this.planData?.idOffice || this.idOffice;
+      const { success, data } = await this.officeSrv.GetById(this.idOffice);
+      if (success) {
+        this.propertiesOffice = data;
+      }
     }
     this.setBreacrumb();
   }
@@ -259,6 +270,7 @@ export class PlanComponent implements OnInit, OnDestroy {
   }
 
   async savePlan() {
+    this.saveButton?.hideButton();
     this.planData = {
       id: this.idPlan,
       idOffice: this.idOffice,
@@ -302,7 +314,6 @@ export class PlanComponent implements OnInit, OnDestroy {
       });
       this.setBreacrumb();
       this.menuSrv.reloadMenuOffice();
-      this.saveButton?.hideButton();
       return;
     };
   }
@@ -378,12 +389,13 @@ export class PlanComponent implements OnInit, OnDestroy {
     }
   }
 
-  async loadWorkpacksFromWorkpackModel(idPlan: number, workpackModelId: number, idFilterSelected: number) {
+  async loadWorkpacksFromWorkpackModel(idPlan: number, workpackModelId: number, idFilterSelected: number, term?: string) {
     const result = await this.workpackSrv.GetAll({
       'id-plan': idPlan,
       'id-plan-model': this.idPlanModel,
       'id-workpack-model': workpackModelId,
       idFilter: idFilterSelected,
+      term,
       noLoading: true
     });
     const workpacks = result.success && result.data;
@@ -816,7 +828,16 @@ export class PlanComponent implements OnInit, OnDestroy {
 
   async handleSelectedFilter(event, idWorkpackModel: number) {
     const idFilter = event.filter;
-    await this.reloadWorkpacksOfWorkpackModelSelectedFilter(idFilter, idWorkpackModel);
+    const workpackModelCardIndex = this.cardsPlanWorkPackModels.findIndex(card => card.idWorkpackModel === idWorkpackModel);
+    this.cardsPlanWorkPackModels[workpackModelCardIndex].propertiesCard.idFilterSelected = idFilter;
+    await this.reloadWorkpacksOfWorkpackModelSelectedFilter(idWorkpackModel);
+  }
+
+  async handleSearchText(event, idWorkpackModel: number) {
+    const term = event.term;
+    const workpackModelCardIndex = this.cardsPlanWorkPackModels.findIndex(card => card.idWorkpackModel === idWorkpackModel);
+    this.cardsPlanWorkPackModels[workpackModelCardIndex].propertiesCard.searchTerm = term;
+    await this.reloadWorkpacksOfWorkpackModelSelectedFilter(idWorkpackModel);
   }
 
   setBreadcrumbStorage() {
@@ -853,11 +874,13 @@ export class PlanComponent implements OnInit, OnDestroy {
     });
   }
 
-  async reloadWorkpacksOfWorkpackModelSelectedFilter(idFilter: number, idWorkpackModel: number) {
-    const { workpackItemCardList, iconMenuItems } = await this.loadWorkpacksFromWorkpackModel(this.planData.id, idWorkpackModel, idFilter);
-    const workpacksByFilter = workpackItemCardList;
+  async reloadWorkpacksOfWorkpackModelSelectedFilter(idWorkpackModel: number) {
     const workpackModelCardIndex = this.cardsPlanWorkPackModels.findIndex(card => card.idWorkpackModel === idWorkpackModel);
     if (workpackModelCardIndex > -1) {
+      const idFilter = this.cardsPlanWorkPackModels[workpackModelCardIndex].propertiesCard.idFilterSelected;
+      const term = this.cardsPlanWorkPackModels[workpackModelCardIndex].propertiesCard.searchTerm;
+      const { workpackItemCardList, iconMenuItems } = await this.loadWorkpacksFromWorkpackModel(this.planData.id, idWorkpackModel, idFilter, term);
+      const workpacksByFilter = workpackItemCardList;
       this.cardsPlanWorkPackModels[workpackModelCardIndex].workpackItemCardList = Array.from(workpacksByFilter);
       this.cardsPlanWorkPackModels[workpackModelCardIndex].propertiesCard.createNewElementMenuItemsWorkpack = iconMenuItems;
       if (this.cardsPlanWorkPackModels[workpackModelCardIndex].workpackItemCardList.find(card => card.typeCardItem === 'newCardItem')) {

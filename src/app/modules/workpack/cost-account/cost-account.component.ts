@@ -3,7 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { TreeNode } from 'primeng/api';
 
-import { ICard } from 'src/app/shared/interfaces/ICard';
+import { ICard, progressBarValue } from 'src/app/shared/interfaces/ICard';
 import { ResponsiveService } from 'src/app/shared/services/responsive.service';
 import { WorkpackModelService } from 'src/app/shared/services/workpack-model.service';
 import { WorkpackService } from 'src/app/shared/services/workpack.service';
@@ -51,6 +51,7 @@ export class CostAccountComponent implements OnInit {
   idOffice: number;
   editPermission = false;
   oldName: string = null;
+  costAccountLimit: number;
 
   constructor(
     private actRouter: ActivatedRoute,
@@ -77,14 +78,21 @@ export class CostAccountComponent implements OnInit {
   }
 
   async ngOnInit() {
+    this.cardCostAccountProperties = {
+      toggleable: false,
+      initialStateToggle: false,
+      cardTitle: 'properties',
+      collapseble: true,
+      initialStateCollapse: false,
+      isLoading: true
+    };
     await this.loadProperties();
   }
 
   async loadProperties() {
     this.idPlan = Number(localStorage.getItem('@currentPlan'));
     if (this.idWorkpack && !this.idCostAccount) {
-      await this.loadWorkpack();
-      this.loadCardCostAccountProperties();
+      await this.loadWorkpack();     
     }
     if (this.idCostAccount) {
       await this.loadWorkpack(true);
@@ -92,6 +100,7 @@ export class CostAccountComponent implements OnInit {
     }
     const workpackModelActivesProperties = this.workpackModel.properties.filter(w => w.active && w.session === 'COST');
     this.sectionCostAccountProperties = await Promise.all(workpackModelActivesProperties.map(p => this.instanceProperty(p)));
+    this.loadCardCostAccountProperties();
   }
 
   async loadCardCostAccountProperties() {
@@ -100,14 +109,11 @@ export class CostAccountComponent implements OnInit {
         await this.costAccountSrv.GetCostsByWorkpack({id: this.costAccount.id, 'id-workpack': this.costAccount.idWorkpack});
       if (costAccountTotalValues.success) {
         this.cardCostAccountProperties = {
-          toggleable: false,
-          initialStateToggle: false,
-          cardTitle: 'properties',
-          collapseble: true,
-          initialStateCollapse: false,
+          ...this.cardCostAccountProperties,
           progressBarValues: [{
             total: costAccountTotalValues.data.planed,
-            progress: costAccountTotalValues.data.atual,
+            progress: costAccountTotalValues.data.actual,
+            limit: this.costAccountLimit,
             labelProgress: this.translateSrv.instant('actual'),
             labelTotal: this.translateSrv.instant('planned'),
             color: '#44B39B',
@@ -115,15 +121,16 @@ export class CostAccountComponent implements OnInit {
             barHeight: 17
           }]
         };
+        this.cardCostAccountProperties = {
+          ...this.cardCostAccountProperties,
+          isLoading: false
+        };
         return;
       }
     }
     this.cardCostAccountProperties = {
-      toggleable: false,
-      initialStateToggle: false,
-      cardTitle: 'properties',
-      collapseble: true,
-      initialStateCollapse: false
+      ...this.cardCostAccountProperties,
+      isLoading: false
     };
   }
 
@@ -163,7 +170,6 @@ export class CostAccountComponent implements OnInit {
       const propertyNameWorkpackModel = this.workpack.model.properties.find(p => p.name === 'name' && p.session === 'COST');
       const propertyNameCostAccount = this.costAccount.properties.find(p => p.idPropertyModel === propertyNameWorkpackModel.id);
       this.costAccountName = propertyNameCostAccount.value as string;
-      await this.loadCardCostAccountProperties();
     }
   }
 
@@ -235,6 +241,7 @@ export class CostAccountComponent implements OnInit {
     property.defaultValue = propertyCostAccount?.value ? propertyCostAccount?.value : propertyModel.defaultValue;
     property.min = propertyModel.min;
     property.max = propertyModel.max;
+    property.precision = propertyModel.precision;
     if (this.typePropertyModel[propertyModel.type] === TypePropertyModelEnum.DateModel) {
       const dateValue = propertyCostAccount?.value ?
         propertyCostAccount?.value.toLocaleString() : propertyModel.defaultValue.toLocaleString();
@@ -314,6 +321,9 @@ export class CostAccountComponent implements OnInit {
       });
       property.selectedValue = propertyCostAccount?.selectedValue ? propertyCostAccount?.selectedValue : propertyModel.defaults as number;
       property.defaults = propertyModel.defaults as number;
+    }
+    if (property.name.toLowerCase() === 'limit') {
+      this.costAccountLimit = property.value && Number(property.value) ? Number(property.value) : 0;
     }
     return property;
   }
@@ -435,8 +445,19 @@ export class CostAccountComponent implements OnInit {
 
 
   checkProperties(property: PropertyTemplateModel) {
-    if (property.name === "name") {
+    if (property.name === 'name') {
       this.mirrorToFullName(property);
+    }
+    if (property.name === 'limit') {
+      this.cardCostAccountProperties = this.cardCostAccountProperties.progressBarValues ?  {
+        ...this.cardCostAccountProperties,
+        progressBarValues: [{
+          ...this.cardCostAccountProperties.progressBarValues[0],
+          limit: property.value && Number(property.value) ? Number(property.value) : 0
+        }]
+      } : {
+        ...this.cardCostAccountProperties
+      };
     }
     const arePropertiesRequiredValid: boolean = this.sectionCostAccountProperties
       .filter(({ required }) => required)

@@ -1,0 +1,25 @@
+<ng-container *ngIf="property.multipleSelection; else singleSelection">
+  <span class="p-float-label" [class.workpack-selection]="property.fullLine"
+    [class.workpack-selection-not-fullLine]="!property.fullLine" [class.workpack-selection-mobile]="responsive">
+    <p-multiSelect class="app-multiple-selection" dropdownIcon="fas fa-caret-down" [options]="property.possibleValues"
+      [selectedItemsLabel]="language === 'pt-BR' ? '{0} itens selecionados' : '{0} items selected'"
+      [(ngModel)]="property.value" [id]="property.name" [required]="property.required" [disabled]="property.disabled"
+      display="chip" [maxSelectedLabels]="2" [class.ng-invalid]="property.invalid" (onBlur)="changed.emit($event)"
+      (ngModelChange)="changed.emit($event)"></p-multiSelect>
+    <label class="app-input-label" for="float-label">{{property.label}} {{ property.required ? '*' : ''}}</label>
+  </span>
+</ng-container>
+<ng-template #singleSelection>
+  <span class="p-float-label" [class.workpack-selection-mobile]="responsive"
+    [class.workpack-selection]="property.fullLine" [class.workpack-selection-not-fullLine]="!property.fullLine">
+    <p-dropdown class="app-single-selection" [id]="property.name" [options]="property.possibleValues"
+      [readonly]="property.disabled" [(ngModel)]="property.value" dropdownIcon="fas fa-caret-down"
+      [autoDisplayFirst]="false" [disabled]="property.disabled" [required]="property.required"
+      [class.ng-invalid]="property.invalid" (onBlur)="changed.emit($event)" (ngModelChange)="changed.emit($event)">
+    </p-dropdown>
+    <label class="app-input-label" [for]="property.name">{{property.label}} {{ property.required ? '*' : ''}}</label>
+  </span>
+</ng-template>
+<span class="input-message-error" *ngIf="property.invalid">
+  {{ property.message }}
+</span>

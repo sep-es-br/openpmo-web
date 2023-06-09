@@ -68,6 +68,7 @@ export class DomainLocalityComponent implements OnInit, OnDestroy {
   totalRecords: number;
   idFilterSelected: number;
   isLoading = false;
+  term = '';
 
   constructor(
     private formBuilder: FormBuilder,
@@ -208,13 +209,16 @@ export class DomainLocalityComponent implements OnInit, OnDestroy {
   }
 
   async loadPropertiesLocality(filterSelected?: boolean) {
-    if (!filterSelected) {
+    if (!filterSelected && !this.idFilterSelected) {
       await this.loadFiltersLocalities();
     }
     if (this.idLocality) {
       this.isLoading = true;
       const { success, data } =
-        await this.localitySvr.getLocalityById(this.idLocality, { idFilter: this.idFilterSelected });
+        await this.localitySvr.getLocalityById(this.idLocality, {
+          idFilter: this.idFilterSelected,
+          term: this.term
+        });
       if (success) {
         this.propertiesLocality = data as ILocalityList;
         this.formLocality.reset(Object.keys(this.formLocality.controls).reduce((a, key) => (a[key] = data[key] || '', a), {}));
@@ -428,6 +432,11 @@ export class DomainLocalityComponent implements OnInit, OnDestroy {
     this.idFilterSelected = idFilter;
     const filterSelected = idFilter !== null;
     await this.loadPropertiesLocality(filterSelected);
+  }
+
+  async handleSearchText(event) {
+    this.term = event.term;
+    await this.loadPropertiesLocality();
   }
 
   async handleNewFilter() {

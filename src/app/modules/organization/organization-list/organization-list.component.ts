@@ -46,6 +46,7 @@ export class OrganizationListComponent implements OnInit, OnDestroy {
   idFilterSelected: number;
   $destroy = new Subject();
   isLoading = false;
+  term = '';
 
   constructor(
     private organizationSvr: OrganizationService,
@@ -115,7 +116,10 @@ export class OrganizationListComponent implements OnInit, OnDestroy {
 
   async loadPropertiesOrganizations() {
     this.isLoading = true;
-    const { success, data } = await this.organizationSvr.GetAll({ 'id-office': this.idOffice, idFilter: this.idFilterSelected });
+    const { success, data } = await this.organizationSvr.GetAll({ 'id-office': this.idOffice,
+      idFilter: this.idFilterSelected,
+      term: this.term
+    });
     const itemsProperties = this.editPermission
       ? [{
         typeCardItem: 'newCardItem',
@@ -193,6 +197,11 @@ export class OrganizationListComponent implements OnInit, OnDestroy {
   async handleSelectedFilter(event) {
     const idFilter = event.filter;
     this.idFilterSelected = idFilter;
+    await this.loadPropertiesOrganizations();
+  }
+
+  async handleSearchText(event) {
+    this.term = event.term;
     await this.loadPropertiesOrganizations();
   }
 

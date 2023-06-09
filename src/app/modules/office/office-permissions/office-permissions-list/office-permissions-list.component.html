@@ -7,7 +7,7 @@
     </app-config-data-view-panel>
   </div>
   <div class="card-permissions" *ngIf="idOffice">
-    <app-card [properties]="cardOfficePermissions" class="mt-0" (editFilter)="handleEditFilter($event)"
+    <app-card [properties]="cardOfficePermissions" class="mt-0" (editFilter)="handleEditFilter($event)" (searchText)="handleSearchText($event)"
       (newFilter)="handleNewFilter()" (selectedFilter)="handleSelectedFilter($event)"
       (createNewElement)="handleCreateNewOfficePermission()">
       <div class="loading-container" *ngIf="isLoading">

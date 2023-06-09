@@ -102,6 +102,7 @@ export class JournalViewComponent implements OnInit, OnDestroy {
 
   async loadJournalData() {
     const type = this.formSearch.controls.type.value;
+    this.isLoading = true;
     const { data, success } = await this.journalSrv.GetAll({
       scopeName: this.formSearch.controls.scopeName.value,
       from: this.getFrom(),
@@ -117,7 +118,6 @@ export class JournalViewComponent implements OnInit, OnDestroy {
       this.hasAll = true;
       this.isLoading = false;
     }
-
 
     this.journalData = this.journalData.map(journal => {
       journal.evidences = journal.evidences?.map(evidence => {

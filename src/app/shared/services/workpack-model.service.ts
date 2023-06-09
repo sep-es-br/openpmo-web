@@ -26,6 +26,10 @@ export class WorkpackModelService extends BaseService<IWorkpackModel> {
       { params: PrepareHttpParams(options) }).toPromise();
   }
 
+  getNextPosition(options) {
+    return this.http.get<IHttpResult<any>>(`${this.urlBase}/next-position`, { params: PrepareHttpParams(options) }).toPromise();
+  }
+
   reuseWorkpackModel(idWorkpackModel: number, idWorkpackModelParent) {
     return this.http.get<IHttpResult<IWorkpackModel>>(`${this.urlBase}/${idWorkpackModelParent}/reuse/${idWorkpackModel}`).toPromise();
   }

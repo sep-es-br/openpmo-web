@@ -1,0 +1,158 @@
+@use "src/variables" as v;
+
+::ng-deep .app-model-property.p-panel {
+  display: inline-flex;
+  width: auto;
+  background-color: transparent;
+  .app-tree-selection {
+    max-height: 400px;
+    overflow-y: auto;
+  }
+
+  .model-property-header {
+    display: flex;
+    flex: 1;
+    justify-content: space-between;
+
+    .left-side {
+      display: flex;
+      align-items: center;
+
+      i {
+        border: 1px solid v.$borderLightGrey;
+        border-radius: 2px;
+        margin-right: .5rem;
+        padding: 5px 7.5px;
+        font-size: 1.25rem;
+        color: v.$iconGrey;
+        &.app-icon {
+          font-size: 1rem;
+        }
+      }
+    }
+    .right-side {
+      display: flex;
+      align-items: center;
+      .app-icon {
+        display: flex;
+        cursor: pointer;
+      }
+
+      .app-toggle {
+        display: inline-flex;
+        margin-left: .5rem !important;
+      }
+    }
+  }
+  .p-panel-header {
+    display: inline-flex;
+    min-width: 200px;
+    min-height: 65px;
+    background-color: rgba(250, 250, 249, 1);
+    border-color: v.$borderLightGrey;;
+    padding: .5em;
+    .p-panel-icons {
+      margin-left: .5rem;
+      span.pi {
+        font-size: 1rem !important;
+      }
+    }
+  }
+  .button-select-locality-container {
+    display: flex;
+    flex-direction: column;
+    min-width: 250px;
+    .p-button {
+      margin: 0;
+      .p-button-label {
+        text-align: left;
+      }
+    }
+    label {
+      margin-bottom: 5px;
+    }
+  }
+  .p-toggleable-content  .p-panel-content {
+    background-color: rgba(250, 250, 249, 1);
+    border-color: v.$borderLightGrey;;
+    border-top: none !important;
+    padding-bottom: 5px;
+
+    .model-property {
+      display: inline-flex;
+      flex-wrap: wrap;
+      width: 100%;
+
+      .input-label {
+        font-size: 12px;
+        font-style: italic;
+        color: v.$fontLabel;
+        font-family: v.$fontFamilyRegular;
+
+        .required-indicator {
+          margin-left: 5px;
+        }
+      }
+
+      > span:not(:last-of-type) {
+        margin-right: 1em;
+      }
+    }
+  }
+  .p-toggleable-content {
+    display: none;
+  }
+  .input-number-scroll,
+  .input-date-default-value {
+    .p-datepicker-trigger,
+    .p-button {
+      background-color: transparent;
+      margin-left: 0;
+
+      .p-button-icon {
+        color: v.$fontLabel;
+      }
+    }
+  }
+  &.open {
+    display: block;
+
+    .p-toggleable-content {
+      display: block;
+    }
+
+    .p-panel-header {
+      display: flex;
+      border-bottom: none !important;
+    }
+  }
+  .mw-200 {
+    min-width: 200px;
+  }
+  &.mobile {
+    .model-property-header .left-side {
+      display: flex;
+      align-items: center;
+    }
+    .property-input {
+      width: 100%;
+      margin-right: 0;
+    }
+    .property-checkbox {
+      width: 100%;
+    }
+  }
+  .p-treenode.green-node {
+    .p-treenode-content .p-treenode-label {
+      color: #44B39B !important ;
+      font-weight: bold;
+    }
+   }
+}
+
+::ng-deep .mobile .model-property {
+    span {
+      margin-right: 0 !important;
+    }
+
+}

@@ -1,0 +1,125 @@
+@use "src/variables" as v;
+
+::ng-deep .app-cost-account-card {
+  background-color: v.$bgCard;
+  width: 100%;
+  margin: 0 auto;
+  .p-panel {
+    width: 100%;
+    background-color: v.$bgCard;
+    .p-panel-icons {
+      align-self: flex-start;
+    }
+  }
+  p-header.card-header {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    .header-title {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      .header-title-text {
+        display: flex;
+        align-items: center;
+      }
+    }
+    .card-title {
+      color: v.$fontTitle;
+      font-family: v.$fontFamilyMedium;
+      font-size: 1rem;
+      text-transform: uppercase;
+    }
+    .card-title-mobile {
+      font-size: 0.75rem;
+    }
+    .header-values-cost-account {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: flex-end;
+      width: 50%;
+      color: v.$fontTitle;
+      font-family: v.$fontFamilyMedium;
+      font-size: 1rem;
+      text-transform: uppercase;
+      padding-right: 2em;
+      .progress-bar-cost-container {
+        width: 245px;
+        margin-right: 10px;
+        margin-left: 10px;
+      }
+      &.not-collapseble {
+        padding-right: 0;
+        .progress-bar-cost-container {
+          margin-right: 0;
+        }
+      }
+    }
+    .header-values-cost-account.responsive {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      padding-right: 0;
+    }
+
+  }
+
+  .card-collapseble {
+    cursor: pointer;
+  }
+
+  p-header.card-header-mobile {
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    .header-values-cost-account {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      color: v.$fontTitle;
+      font-family: v.$fontFamilyMedium;
+      font-size: 1rem;
+      text-transform: uppercase;
+      .progress-bar-cost-container {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        margin-top: 1em;
+        .progress-bar-mobile {
+          width: 100%;
+        }
+      }
+    }
+
+  }
+  .p-panel .p-panel-header .p-panel-icons .p-panel-header-icon:focus {
+    box-shadow: none !important;
+  }
+  .p-panel .p-panel-header .p-panel-icons .p-panel-header-icon:enabled:hover {
+    background: transparent !important;
+  }
+  .p-panel .p-panel-header {
+    background-color: v.$bgCard;
+    border-color: v.$bgCard;
+  }
+  p-panel .p-toggleable-content {
+    background-color: v.$bgCard;
+    border-color: v.$bgCard;
+  }
+  .p-panel .p-toggleable-content .p-panel-content {
+    background-color: v.$bgCard;
+    border-color: v.$bgCard;
+  }
+  &.mobile {
+    .p-panel .p-toggleable-content .p-panel-content {
+      padding: 0 7.5px 7.5px 7.5px !important;
+    }
+    .p-panel-header {
+      padding: 15px 7.5px !important;
+    }
+  }
+}

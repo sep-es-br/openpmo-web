@@ -56,7 +56,7 @@ $mobileMenuHeight: 90px;
   color: #ffffff59!important;
   }
 
-  .app-icon, .far.fa-star {
+  .app-icon, .far.fa-star, .fa-file-alt {
     color: #ffffff;
   }
 
@@ -78,7 +78,7 @@ $mobileMenuHeight: 90px;
     padding: 0.5em;
     font-size: .688rem;
 
-    .app-icon, .favorite-icon {
+    .app-icon, .favorite-icon, .fa-file-alt {
       color: v.$iconGrey;
     }
 

@@ -8,7 +8,7 @@
   </div>
   <div class="card-container">
     <app-card [properties]="cardProperties" *ngIf="cardProperties.showFilters" class="mt-0"
-      (editFilter)="handleEditFilter($event)" (newFilter)="handleNewFilter()"
+      (editFilter)="handleEditFilter($event)" (newFilter)="handleNewFilter()" (searchText)="handleSearchText($event)"
       (selectedFilter)="handleSelectedFilter($event)" (createNewElement)="createNewDomain()">
       <div class="loading-container" *ngIf="isLoading">
         <app-card-loading [isCardLoading]="isLoading"></app-card-loading>

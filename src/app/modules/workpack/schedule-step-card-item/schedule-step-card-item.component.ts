@@ -1,10 +1,13 @@
-import { Component, Input, OnInit, EventEmitter, Output, OnDestroy } from '@angular/core';
+import { InputTextModule } from 'primeng/inputtext';
+import { Component, Input, OnInit, EventEmitter, Output, OnDestroy, ViewChild, ElementRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { IconsEnum } from 'src/app/shared/enums/IconsEnum';
 import { IScheduleStepCardItem } from 'src/app/shared/interfaces/IScheduleStepCardItem';
+import * as moment from 'moment';
+import { ConfirmationService } from 'primeng/api';
 
 @Component({
   selector: 'app-schedule-step-card-item',
@@ -16,15 +19,21 @@ export class ScheduleStepCardItemComponent implements OnInit, OnDestroy {
   @Input() properties: IScheduleStepCardItem;
   @Input() type: string;
   @Output() stepChanged = new EventEmitter();
+  @Output() editCost = new EventEmitter();
+  @Output() spreadDifference = new EventEmitter();
 
   cardIdItem: string;
   iconEnum = IconsEnum;
   language: string;
   $destroy = new Subject();
+  showReplicateButton = false;
+  item;
+  difference;
 
   constructor(
     private router: Router,
-    private translateSrv: TranslateService
+    private translateSrv: TranslateService,
+    private confirmationSrv: ConfirmationService
   ) {
     this.translateSrv.onLangChange.pipe(takeUntil(this.$destroy)).subscribe(() =>
       {
@@ -38,6 +47,15 @@ export class ScheduleStepCardItemComponent implements OnInit, OnDestroy {
     this.cardIdItem = this.properties.idStep ?
       `${this.properties.idStep < 10 ? '0' + this.properties.idStep : this.properties.idStep}` : '';
     this.setLanguage();
+    if (this.properties.stepName)  {
+      const dateStep = moment(this.properties.stepName);
+      const dateActual = moment();
+      if (dateStep.isSameOrBefore(dateActual)) {
+        this.showReplicateButton = true;
+      } else {
+        this.showReplicateButton = false;
+      }
+    }
   }
 
   ngOnDestroy(): void {
@@ -61,6 +79,66 @@ export class ScheduleStepCardItemComponent implements OnInit, OnDestroy {
     this.properties.costProgressBar.total = this.properties.costPlanned;
     this.properties.costProgressBar.progress = this.properties.costActual;
     this.stepChanged.next();
+  }
+
+  handleEditCosts(event) {
+    this.editCost.emit({idStep: this.properties.idStep, clickEvent: event});
+  }
+
+  confirmReplicateValueDif(item) {
+    this.item = item;
+    if (item === 'unitActual') {
+      this.difference = this.properties.unitPlanned - this.properties.unitActual
+    } else {
+      this.difference = this.properties.costPlanned - this.properties.costActual
+    }
+    if ( this.difference === 0) {
+      this.handleReplicateValue();
+      return;
+    }
+    this.confirmationSrv.confirm({
+      message: this.translateSrv.instant('messages.confirmRedistributeSchedule') + this.difference.toLocaleString(this.language) + 
+        this.translateSrv.instant('messages.overTheRemainingMonths'),
+      key: 'spreadDifferenceConfirm',
+      acceptLabel: this.translateSrv.instant('yes'),
+      rejectLabel: this.translateSrv.instant('no'),
+      accept: async() => {
+        this.handleReplicateValue();
+        this.handleSpreadDifference();
+      },
+      reject: () => {
+        this.handleReplicateValue();
+       }
+    });
+  }
+
+  handleReplicateValue() {
+    let valueChanged;
+    if (this.item === 'unitActual') {
+      this.properties.unitPlanned = this.properties.unitActual;
+      this.properties.unitProgressBar.total = this.properties.unitPlanned;
+      valueChanged = document.querySelector(`.unitPlanned-${this.properties.idStep}`);
+    } else {
+      this.properties.costPlanned = this.properties.costActual;
+      this.properties.costProgressBar.total = this.properties.costPlanned;
+      valueChanged = document.querySelector(`.costPlanned-${this.properties.idStep}`);
+    }
+    if (valueChanged) {
+      valueChanged.classList.add('changed');
+      setTimeout( () => {
+        valueChanged.classList.remove('changed');
+      }, 1000)
+    }
+    this.stepChanged.next();
+  }
+
+  handleSpreadDifference() {
+    this.spreadDifference.next({
+      difference: this.difference,
+      stepDate: this.properties.stepName,
+      idStep: this.properties.idStep,
+      type: this.item
+    });
   }
 
 }

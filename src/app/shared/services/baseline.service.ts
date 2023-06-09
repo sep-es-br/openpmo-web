@@ -16,8 +16,8 @@ export class BaselineService extends BaseService<IBaseline> {
     super('baselines', injector);
   }
 
-  public async getBaselinesFromCcbMember(): Promise<IHttpResult<IWorkpackBaselines[]>> {
-    return this.http.get<IHttpResult<IWorkpackBaselines[]>>(`${this.urlBase}/ccb-member`).toPromise();
+  public async getBaselinesFromCcbMember(options?): Promise<IHttpResult<IBaseline[]>> {
+    return this.http.get<IHttpResult<IBaseline[]>>(`${this.urlBase}/ccb-member`, { params: PrepareHttpParams(options) }).toPromise();
   }
 
   public async getUpdates(options): Promise<IBaselineUpdates[]> {

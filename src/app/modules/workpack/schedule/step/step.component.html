@@ -54,6 +54,10 @@
                     <label class="app-input-label" for="float-actual">{{unitName}} {{ "actual" |translate }}</label>
                   </span>
                 </div>
+                <div class="p-field planned-baseline" [class.responsive]="responsive"  *ngIf="baselinePlannedTotals && baselinePlannedTotals.plannedWork">
+                  <span class="label"> {{unitName}} {{ "plannedBaseline" |translate }}</span>
+                  <span class="value">{{ baselinePlannedTotals.plannedWork | number : '0.2' : currentLang }}</span>
+                </div>
               </div>
               <div class="cost-assignments-totals" [class.responsive]="responsive">
                 <div class="planned-total">
@@ -63,6 +67,10 @@
                 <div class="actual-total">
                   <span class="label"> $ {{ "actual" |translate }}</span>
                   <span class="value">{{ costAssignmentsTotals.actualTotal | number : '0.2' : currentLang }}</span>
+                </div>
+                <div class="planned-baseline" [class.responsive]="responsive" *ngIf="baselinePlannedTotals && baselinePlannedTotals.plannedCost">
+                  <span class="label"> $ {{ "plannedBaseline" |translate }}</span>
+                  <span class="value">{{ baselinePlannedTotals.plannedCost | number : '0.2' : currentLang }}</span>
                 </div>
               </div>
             </div>

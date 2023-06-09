@@ -38,6 +38,8 @@ export class WorkpackSectionRisksComponent implements OnInit, OnDestroy {
   totalRecordsRisks: number;
   risks: IRisk[];
   showTabview = false;
+  idFilterSelected: number;
+  term = '';
 
   constructor(
     private filterSrv: FilterDataviewService,
@@ -108,10 +110,19 @@ export class WorkpackSectionRisksComponent implements OnInit, OnDestroy {
   }
 
   async handleSelectedFilterRisk(event) {
-    const idFilter = event.filter;
+    this.idFilterSelected = event.filter;
     this.sectionRisk = Object.assign({}, {
       ...this.sectionRisk,
-      cardItemsSection: await this.loadSectionRisksCards(this.riskSectionShowClosed, idFilter)
+      cardItemsSection: await this.loadSectionRisksCards(this.riskSectionShowClosed)
+    });
+    this.totalRecordsRisks = this.sectionRisk.cardItemsSection && this.sectionRisk.cardItemsSection.length;
+  }
+
+  async handleSearchText(event) {
+    this.term = event.term;
+    this.sectionRisk = Object.assign({}, {
+      ...this.sectionRisk,
+      cardItemsSection: await this.loadSectionRisksCards(this.riskSectionShowClosed)
     });
     this.totalRecordsRisks = this.sectionRisk.cardItemsSection && this.sectionRisk.cardItemsSection.length;
   }
@@ -119,7 +130,7 @@ export class WorkpackSectionRisksComponent implements OnInit, OnDestroy {
   async loadRiskSection() {
     const resultFilters = await this.filterSrv.getAllFilters(`workpackModels/${this.workpackData.workpack.model.id}/risks`);
     const filters = resultFilters.success && Array.isArray(resultFilters.data) ? resultFilters.data : [];
-    const idFilterSelected = filters.find(defaultFilter => !!defaultFilter.favorite) ?
+    this.idFilterSelected = filters.find(defaultFilter => !!defaultFilter.favorite) ?
       filters.find(defaultFilter => !!defaultFilter.favorite).id : undefined;
 
     this.sectionRisk = {
@@ -141,13 +152,13 @@ export class WorkpackSectionRisksComponent implements OnInit, OnDestroy {
         ...this.sectionRisk.cardSection,
         isLoading: false,
       },
-      cardItemsSection: await this.loadSectionRisksCards(this.riskSectionShowClosed, idFilterSelected)
+      cardItemsSection: await this.loadSectionRisksCards(this.riskSectionShowClosed)
     }
     this.totalRecordsRisks = this.sectionRisk.cardItemsSection && this.sectionRisk.cardItemsSection.length;
   }
 
-  async loadSectionRisksCards(showClosed: boolean, idFilterSelected?: number) {
-    const resultRisks = await this.riskSrv.GetAll({ 'id-workpack': this.workpackParams.idWorkpack, idFilter: idFilterSelected });
+  async loadSectionRisksCards(showClosed: boolean) {
+    const resultRisks = await this.riskSrv.GetAll({ 'id-workpack': this.workpackParams.idWorkpack, idFilter: this.idFilterSelected, term: this.term });
     this.risks = resultRisks.success ? resultRisks.data : [];
     if (this.risks && this.risks.length > 0) {
       const cardItems = !showClosed ? this.risks.filter(r => RisksPropertiesOptions.status[r.status].label === 'open').map(risk => ({

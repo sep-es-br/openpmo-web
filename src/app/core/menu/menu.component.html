@@ -24,8 +24,7 @@
       </div>
       <div class="item"
         [ngStyle]="{width: itemsFavorites?.length > 0 && !!currentIDOffice && !!currentIDPlan && isPlanMenu ? '20%' : '25%'}"
-        (click)="toggleMenu('office')" *ngIf="itemsOffice?.length > 0"
-        [pTooltip]="'officesAndPlans' | translate">
+        (click)="toggleMenu('office')" *ngIf="itemsOffice?.length > 0" [pTooltip]="'officesAndPlans' | translate">
         <i class="app-icon offices" [ngStyle]="{ fontSize: '1.9rem' }"></i>
         <div class="item-label">{{ 'offices' | translate }}</div>
       </div>
@@ -37,9 +36,7 @@
         <div class="item-label" [routerLink]="['/plan']" [queryParams]="{id: currentPlan?.id}">{{
           currentPlan?.name }}</div>
       </div>
-      <div class="item"
-        [ngStyle]="{width: '20%'}"
-        (click)="toggleMenu('favorite')"
+      <div class="item" [ngStyle]="{width: '20%'}" (click)="toggleMenu('favorite')"
         *ngIf="itemsFavorites?.length > 0 && !!currentIDOffice && !!currentIDPlan && isPlanMenu"
         [pTooltip]="'myFavorites' | translate">
         <i class="favorite-icon far fa-star" [ngStyle]="{ fontSize: '1.9rem' }"></i>
@@ -51,6 +48,12 @@
         [pTooltip]="'changeControlBoard' | translate">
         <i class="app-icon ccb-view" [ngStyle]="{ fontSize: '1.9rem' }"></i>
         <div class="item-label" [routerLink]="['/ccbmember-baselines-view']">{{'changeControlBoard' |
+          translate}}</div>
+      </div>
+      <div class="item" [ngStyle]="{width: '20%'}" (click)="toggleMenu('reportModel')"
+        [pTooltip]="'reportModels' | translate" *ngIf="!!currentIDOffice && !!currentIDPlan && isPlanMenu && hasReports">
+        <i class="far fa-file-alt" [ngStyle]="{ fontSize: '1.7rem' }"></i>
+        <div class="item-label" [routerLink]="['/reports']" [queryParams]="{idPlan: currentPlan?.id}">{{'reportModels' |
           translate}}</div>
       </div>
     </div>
@@ -67,8 +70,8 @@
       <div class="item-label" *ngIf="isMobileView" [routerLink]="['/plan']" [queryParams]="{id: currentPlan?.id}">{{
         currentPlan?.name }}</div>
     </div>
-       <div class="item" (click)="toggleMenu('favorite')"
-       *ngIf="itemsFavorites?.length > 0 && !!currentIDOffice && !!currentIDPlan && isPlanMenu"
+    <div class="item" (click)="toggleMenu('favorite')"
+      *ngIf="itemsFavorites?.length > 0 && !!currentIDOffice && !!currentIDPlan && isPlanMenu"
       [pTooltip]="'myFavorites' | translate">
       <i class="favorite-icon far fa-star" [ngStyle]="{ fontSize: '1.9rem' }"></i>
     </div>
@@ -77,6 +80,10 @@
       <i class="app-icon ccb-view" [ngStyle]="{ fontSize: '1.87rem' }"></i>
       <div class="item-label" *ngIf="isMobileView" [routerLink]="['/ccbmember-baselines-view']">{{'changeControlBoard' |
         translate}}</div>
+    </div>
+    <div class="item" *ngIf="!!currentIDOffice && !!currentIDPlan && isPlanMenu && hasReports" [routerLink]="['/reports']"
+      [queryParams]="{idPlan: currentPlan?.id}" [pTooltip]="'reportModels' | translate">
+      <i class="far fa-file-alt" [ngStyle]="{ fontSize: '1.7rem' }"></i>
     </div>
   </ng-template>
 </ng-template>
@@ -107,8 +114,7 @@
     <div class="item" (click)="toggleMenu('office')" [pTooltip]="'offices' | translate" *ngIf="isUserAdmin">
       <i class="app-icon offices" [ngStyle]="{ fontSize: '1.8rem' }"></i>
     </div>
-    <div class="item" (click)="toggleMenu('planModel')"
-      [pTooltip]="'planModels' | translate">
+    <div class="item" (click)="toggleMenu('planModel')" [pTooltip]="'planModels' | translate">
       <i class="app-icon plan-model" [ngStyle]="{ fontSize: '1.5rem' }"></i>
     </div>
     <div class="item" [routerLink]="['/organizations']" [queryParams]="{ idOffice: currentIDOffice }"
@@ -138,7 +144,8 @@
   [class.changing]="isChangingView">
   <ng-container *ngIf="isMobileView; else sliderOffice">
     <div class="top-bar">
-      <div class="title" (click)="closeAllMenus()" [routerLink]="['/offices']">{{ (isAdminMenu ? 'offices' : 'officesAndPlans') | translate }}
+      <div class="title" (click)="closeAllMenus()" [routerLink]="['/offices']">{{ (isAdminMenu ? 'offices' :
+        'officesAndPlans') | translate }}
       </div>
     </div>
     <p-panelMenu [model]="itemsOffice"></p-panelMenu>
@@ -151,7 +158,8 @@
       <ng-template>
         <div class="slide-wrapper">
           <div class="top-bar">
-            <div class="title" (click)="closeAllMenus()" [routerLink]="['/offices']">{{ (isAdminMenu ? 'offices' : 'officesAndPlans') | translate
+            <div class="title" (click)="closeAllMenus()" [routerLink]="['/offices']">{{ (isAdminMenu ? 'offices' :
+              'officesAndPlans') | translate
               }}</div>
             <div class="action" *ngIf="!isMobileView">
               <i [class]="isFixed ? 'app-icon pin-on' : 'app-icon pin-off'" [ngStyle]="{ fontSize: '1rem' }"
@@ -210,7 +218,7 @@
           <div class="f-panelmenu">
             <div class="f-panelmenu-item" [class]="item.styleClass" *ngFor="let item of itemsFavorites">
               <div class="f-panelmenu-container" (click)="handleNavigateFavorite(item)">
-              <div class="f-panelmenu-icon">
+                <div class="f-panelmenu-icon">
                   <i [class]="item.icon"></i>
                 </div>
                 <div class="f-panelmenu-label">
@@ -235,7 +243,8 @@
   [class.changing]="isChangingView">
   <ng-container *ngIf="isMobileView; else sliderPortfolio">
     <div class="top-bar">
-      <div class="title" (click)="closeAllMenus()" [routerLink]="['/plan']" [queryParams]="{id: currentPlan?.id}">{{currentPlan?.name}}</div>
+      <div class="title" (click)="closeAllMenus()" [routerLink]="['/plan']" [queryParams]="{id: currentPlan?.id}">
+        {{currentPlan?.name}}</div>
       <div class="action" *ngIf="!isMobileView">
         <i class="app-icon arrow-left" [ngStyle]="{ fontSize: '1rem' }" (click)="closeAllMenus()"></i>
       </div>
@@ -250,7 +259,8 @@
       <ng-template>
         <div class="slide-wrapper">
           <div class="top-bar">
-            <div class="title" (click)="closeAllMenus()" [routerLink]="['/plan']" [queryParams]="{id: currentPlan?.id}">{{currentPlan?.name}}
+            <div class="title" (click)="closeAllMenus()" [routerLink]="['/plan']" [queryParams]="{id: currentPlan?.id}">
+              {{currentPlan?.name}}
             </div>
             <div class="action" *ngIf="!isMobileView">
               <i [class]="isFixed ? 'app-icon pin-on' : 'app-icon pin-off'" [ngStyle]="{ fontSize: '1rem' }"
@@ -270,7 +280,8 @@
   [class.changing]="isChangingView">
   <ng-container *ngIf="isMobileView; else sliderPlanModel">
     <div class="top-bar">
-      <div class="title" (click)="closeAllMenus()" [routerLink]="['/strategies']" [queryParams]="{idOffice: currentIDOffice}">{{'planModels'|translate}}</div>
+      <div class="title" (click)="closeAllMenus()" [routerLink]="['/strategies']"
+        [queryParams]="{idOffice: currentIDOffice}">{{'planModels'|translate}}</div>
       <div class="action" *ngIf="!isMobileView">
         <i class="app-icon arrow-left" [ngStyle]="{ fontSize: '1rem' }" (click)="closeAllMenus()"></i>
       </div>
@@ -285,7 +296,8 @@
       <ng-template>
         <div class="slide-wrapper">
           <div class="top-bar">
-            <div class="title" (click)="closeAllMenus()" [routerLink]="['/strategies']" [queryParams]="{idOffice: currentIDOffice}">{{'planModels'|translate}}
+            <div class="title" (click)="closeAllMenus()" [routerLink]="['/strategies']"
+              [queryParams]="{idOffice: currentIDOffice}">{{'planModels'|translate}}
             </div>
             <div class="action" *ngIf="!isMobileView">
               <i [class]="isFixed ? 'app-icon pin-on' : 'app-icon pin-off'" [ngStyle]="{ fontSize: '1rem' }"
@@ -329,31 +341,36 @@
 <div class="app-menu-slide mobile" *ngIf="isMobileView" [class.open]="isMenuOpen('more')"
   [class.changing]="isChangingView">
   <div class="more-menu">
-    <div class="item" (click)="closeAllMenus()" [routerLink]="['/organizations']" [queryParams]="{ idOffice: currentIDOffice }">
+    <div class="item" (click)="closeAllMenus()" [routerLink]="['/organizations']"
+      [queryParams]="{ idOffice: currentIDOffice }">
       <span class="icon-wrapper">
         <i class="app-icon building" [ngStyle]="{ fontSize: '1.8rem' }"></i>
       </span>
       <span class="menu-label">{{ 'organizations' | translate }}</span>
     </div>
-    <div class="item" (click)="closeAllMenus()" [routerLink]="['/domains']" [queryParams]="{ idOffice: currentIDOffice }">
+    <div class="item" (click)="closeAllMenus()" [routerLink]="['/domains']"
+      [queryParams]="{ idOffice: currentIDOffice }">
       <span class="icon-wrapper">
         <i class="app-icon map-marked" [ngStyle]="{ fontSize: '1.7rem' }"></i>
       </span>
       <span class="menu-label">{{ 'domains' | translate }}</span>
     </div>
-    <div class="item" (click)="closeAllMenus()" [routerLink]="['/measure-units']" [queryParams]="{ idOffice: currentIDOffice }">
+    <div class="item" (click)="closeAllMenus()" [routerLink]="['/measure-units']"
+      [queryParams]="{ idOffice: currentIDOffice }">
       <span class="icon-wrapper">
         <i class="app-icon unit-selection-alt" [ngStyle]="{ fontSize: '1rem' }"></i>
       </span>
       <span class="menu-label">{{ 'measureUnits' | translate }}</span>
     </div>
-    <div class="item" (click)="closeAllMenus()" [routerLink]="['/offices/permission']" [queryParams]="{ idOffice: currentIDOffice }">
+    <div class="item" (click)="closeAllMenus()" [routerLink]="['/offices/permission']"
+      [queryParams]="{ idOffice: currentIDOffice }">
       <span class="icon-wrapper">
         <i class="app-icon permission2" [ngStyle]="{ fontSize: '1.5rem' }"></i>
       </span>
       <span class="menu-label">{{ 'officePermissions' | translate }}</span>
     </div>
-    <div class="item" (click)="closeAllMenus()" [routerLink]="['/persons']" [queryParams]="{ idOffice: currentIDOffice }">
+    <div class="item" (click)="closeAllMenus()" [routerLink]="['/persons']"
+      [queryParams]="{ idOffice: currentIDOffice }">
       <span class="icon-wrapper">
         <i class="app-icon users" [ngStyle]="{ fontSize: '1.5rem' }"></i>
       </span>
@@ -365,4 +382,5 @@
   </div>
 </div>
 
-<p-confirmDialog [style]="{width: '50vw'}" [baseZIndex]="10000" rejectButtonStyleClass="p-button-text"></p-confirmDialog>
+<p-confirmDialog [style]="{width: '50vw'}" [baseZIndex]="10000"
+  rejectButtonStyleClass="p-button-text"></p-confirmDialog>

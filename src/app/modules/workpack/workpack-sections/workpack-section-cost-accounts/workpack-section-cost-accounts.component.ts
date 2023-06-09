@@ -35,6 +35,8 @@ export class WorkpackSectionCostAccountsComponent implements OnInit, OnDestroy {
   pageSize: number;
   responsive = false;
   showTabview = false;
+  idFilterSelected: number;
+  term = '';
 
   constructor(
     private costAccountSrv: CostAccountService,
@@ -92,7 +94,7 @@ export class WorkpackSectionCostAccountsComponent implements OnInit, OnDestroy {
   async loadCostAccountSection() {
     const resultFilters = await this.filterSrv.getAllFilters(`workpackModels/${this.workpackData.workpack.model.id}/costAccounts`);
     const filters = resultFilters.success && resultFilters.data ? resultFilters.data : [];
-    const idFilterSelected = filters.find(defaultFilter => !!defaultFilter.favorite) ?
+    this.idFilterSelected = filters.find(defaultFilter => !!defaultFilter.favorite) ?
       filters.find(defaultFilter => !!defaultFilter.favorite).id : undefined;
     this.sectionCostAccount = {
       cardSection: {
@@ -113,7 +115,7 @@ export class WorkpackSectionCostAccountsComponent implements OnInit, OnDestroy {
         ...this.sectionCostAccount.cardSection,
         isLoading: false,
       },
-      cardItemsSection: await this.loadCardItemsCostSession(idFilterSelected)
+      cardItemsSection: await this.loadCardItemsCostSession()
     }
     this.totalRecordsCostAccounts = this.sectionCostAccount.cardItemsSection ? this.sectionCostAccount.cardItemsSection.length + 1 : 1;
   }
@@ -160,10 +162,19 @@ export class WorkpackSectionCostAccountsComponent implements OnInit, OnDestroy {
   }
 
   async handleSelectedFilterCostAccount(event) {
-    const idFilter = event.filter;
+    this.idFilterSelected = event.filter;
     this.sectionCostAccount = Object.assign({}, {
       ...this.sectionCostAccount,
-      cardItemsSection: await this.loadCardItemsCostSession(idFilter)
+      cardItemsSection: await this.loadCardItemsCostSession()
+    });
+    this.totalRecordsCostAccounts = this.sectionCostAccount.cardItemsSection && this.sectionCostAccount.cardItemsSection.length;
+  }
+
+  async handleSearchText(event) {
+    this.term = event.term;
+    this.sectionCostAccount = Object.assign({}, {
+      ...this.sectionCostAccount,
+      cardItemsSection: await this.loadCardItemsCostSession()
     });
     this.totalRecordsCostAccounts = this.sectionCostAccount.cardItemsSection && this.sectionCostAccount.cardItemsSection.length;
   }
@@ -179,8 +190,8 @@ export class WorkpackSectionCostAccountsComponent implements OnInit, OnDestroy {
     });
   }
 
-  async loadCardItemsCostSession(idFilter?: number) {
-    const result = await this.costAccountSrv.GetAll({ 'id-workpack': this.workpackParams.idWorkpack, idFilter });
+  async loadCardItemsCostSession() {
+    const result = await this.costAccountSrv.GetAll({ 'id-workpack': this.workpackParams.idWorkpack, idFilter: this.idFilterSelected, term: this.term });
     if (result.success && result.data.length > 0) {
       this.costAccounts = this.moveCostAccountOutherWorkpackToEnd(result.data);
       const funders = (this.workpackParams.idOffice || this.workpackParams.idOfficeOwnerWorkpackLinked) &&

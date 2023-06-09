@@ -42,6 +42,10 @@ export class ScheduleService extends BaseService<any> {
     return this.http.post(`${this.urlBase}/step`, step).toPromise() as Promise<IHttpResult<IStepPost>>;
   }
 
+  public putScheduleStepConsume(idStep: number, idCostAccount: number, cost): Promise<IHttpResult<any>> {
+    return this.http.patch(`${this.urlBase}/step/${idStep}/cost-account/${idCostAccount}`, cost).toPromise()  as Promise<IHttpResult<any>>;
+  }
+
   public async DeleteScheduleStep(id: number, options?: { message?: string; useConfirm?: boolean }): Promise<IHttpResult<IStep>> {
     const message = options?.message;
     const useConfirm: boolean = options?.useConfirm || true;

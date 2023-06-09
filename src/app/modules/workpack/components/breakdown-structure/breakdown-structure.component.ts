@@ -1,17 +1,18 @@
-import { Component, Input, OnChanges, SimpleChanges, OnDestroy, Output, EventEmitter } from '@angular/core';
+import {Component, Input, OnChanges, SimpleChanges, OnDestroy, Output, EventEmitter} from '@angular/core';
 import {
-    IWorkpackBreakdownStructure, IWorkpackBreakdownStructureWorkpackModel,
-  } from 'src/app/shared/interfaces/IWorkpackBreakdownStructure';
-import { TreeNode } from 'primeng/api';
-import { TypeWorkpackEnumWBS } from 'src/app/shared/enums/TypeWorkpackEnum';
-import { TypeWorkpackModelEnum } from 'src/app/shared/enums/TypeWorkpackModelEnum';
-import { Subject } from 'rxjs';
-import { MilestoneStatusEnum } from 'src/app/shared/enums/MilestoneStatusEnum';
-import { TranslateService } from '@ngx-translate/core';
-import { takeUntil } from 'rxjs/operators';
+  IWorkpackBreakdownStructure, IWorkpackBreakdownStructureWorkpackModel,
+} from 'src/app/shared/interfaces/IWorkpackBreakdownStructure';
+import {TreeNode} from 'primeng/api';
+import {TypeWorkpackEnumWBS} from 'src/app/shared/enums/TypeWorkpackEnum';
+import {TypeWorkpackModelEnum} from 'src/app/shared/enums/TypeWorkpackModelEnum';
+import {Subject} from 'rxjs';
+import {MilestoneStatusEnum} from 'src/app/shared/enums/MilestoneStatusEnum';
+import {TranslateService} from '@ngx-translate/core';
+import {takeUntil} from 'rxjs/operators';
 import * as moment from 'moment';
-import { BreakdownStructureService } from 'src/app/shared/services/breakdown-structure.service';
-import { ActivatedRoute, Router } from '@angular/router';
+import {BreakdownStructureService} from 'src/app/shared/services/breakdown-structure.service';
+import {ActivatedRoute, Router} from '@angular/router';
+import {ConfigDataViewService} from '../../../../shared/services/config-dataview.service';
 
 @Component({
   selector: 'app-breakdown-structure',
@@ -22,24 +23,27 @@ export class BreakdownStructureComponent implements OnChanges, OnDestroy {
 
   @Input() idWorkpack;
   @Output() onHasWBS = new EventEmitter();
+  wbs: IWorkpackBreakdownStructure;
   typeWorkpackEnum = TypeWorkpackEnumWBS;
   typeWorkpackModelEnum = TypeWorkpackModelEnum;
-  wbsTree: TreeNode[] = [];
+  wbsTree: any = [];
   language: string;
   $destroy = new Subject();
   attentionMilestone = false;
   milestoneStatusEnum = MilestoneStatusEnum;
   label;
   isLoading = false;
+  expanded = false;
   idPlan: number;
 
   constructor(
     private breakdownStructureSrv: BreakdownStructureService,
     private translateSrv: TranslateService,
     private actRouter: ActivatedRoute,
-    private route: Router
+    private route: Router,
+    private configDataSrv: ConfigDataViewService
   ) {
-    this.actRouter.queryParams.subscribe(async ({ idPlan }) => {
+    this.actRouter.queryParams.subscribe(async({idPlan}) => {
       this.idPlan = idPlan && +idPlan;
     });
     this.translateSrv.onLangChange.pipe(takeUntil(this.$destroy)).subscribe(() => {
@@ -48,25 +52,52 @@ export class BreakdownStructureComponent implements OnChanges, OnDestroy {
   }
 
   ngOnDestroy(): void {
-      this.$destroy.complete();
-      this.$destroy.unsubscribe();
+    this.$destroy.complete();
+    this.$destroy.unsubscribe();
   }
 
   async ngOnChanges(changes: SimpleChanges) {
-    if (changes.idWorkpack && changes.idWorkpack.currentValue) {
-      await this.loadBreakdownStructure(this.idWorkpack);
+    this.configDataSrv.observableCollapsePanelsStatus
+      .pipe(takeUntil(this.$destroy))
+      .subscribe(async panelStatus => {
+        this.wbsTree = [];
+          if (changes.idWorkpack && changes.idWorkpack.currentValue) {
+            this.expanded = panelStatus === 'expand';
+            await this.loadBreakdownStructure(this.idWorkpack, false);
+          }
+          if (this.wbs) {
+            this.mapTreeNodes(this.wbs, false);
+          }
+      });
+  }
+
+  async loadBreakdownStructure(idWorkpack: number, isLazyLoading: boolean = false) {
+    this.isLoading = true;
+    const {success, data} =
+      await this.breakdownStructureSrv.getByWorkpackId(idWorkpack, this.expanded && !isLazyLoading);
+    if (success) {
+      this.wbs = data;
+
+      if (!isLazyLoading) {
+        const hasWBS = data ? data : undefined;
+        this.onHasWBS.next(hasWBS);
+      }
+      if (data) {
+        if (isLazyLoading) {
+          this.expanded = false;
+          return this.mapTreeNodes(data, true);
+        }
+        this.mapTreeNodes(data, false);
+      }
     }
   }
 
-  async loadBreakdownStructure(idWorkpack: number) {
-    this.isLoading = true;
-    const { success, data } = await this.breakdownStructureSrv.getByWorkpackId(idWorkpack);
-    if (success) {
-      const hasWBS = data && data !== null ? data : undefined;
-      this.onHasWBS.next(hasWBS);
-      if (data && data !== null) {
-        this.mapTreeNodes(data);
-      }
+  async nodeExpand(event) {
+    const idWorkpack = event.node?.idWorkpack;
+    if (idWorkpack && event.node?.children?.length === 0) {
+      const children = await this.loadBreakdownStructure(idWorkpack, true);
+      event.node.children = children && children.length > 0 ? children[0].children : [];
+      this.isLoading = false;
     }
   }
 
@@ -74,30 +105,33 @@ export class BreakdownStructureComponent implements OnChanges, OnDestroy {
     this.language = this.translateSrv.currentLang;
   }
 
-  mapTreeNodes(data: IWorkpackBreakdownStructure) {
+  mapTreeNodes(data: IWorkpackBreakdownStructure, isLazyLoading: boolean = false) {
+    const expanded = this.expanded;
     const tree = [{
       ...data,
       label: data.workpackName,
       properties: this.buildProperties(data),
-      expanded: true,
-      children: data.workpackModels.map(item => ({
-        ...item,
-        expanded: true,
-        label: item.workpackModelName,
-        children: this.mapTreeNodesChildren(item.workpacks, true)
-      }))
+      expanded,
+      leaf: !data.hasChildren,
+      children: this.mapTreeNodesChildren(data.workpackModels, false)
     }];
+    if (isLazyLoading) {
+      return tree;
+    }
     this.wbsTree = tree;
     this.isLoading = false;
   }
 
-  mapTreeNodesChildren(data: IWorkpackBreakdownStructure[] | IWorkpackBreakdownStructureWorkpackModel[], isWorkpack: boolean): TreeNode[] {
+  mapTreeNodesChildren(data: IWorkpackBreakdownStructure[] | IWorkpackBreakdownStructureWorkpackModel[],
+                       isWorkpack: boolean): TreeNode[] {
     const tree = [];
+    const expanded = this.expanded;
     data.forEach(item => {
-      const workpackOrWorkpackModels = isWorkpack ? item.workpackModels :item.workpacks;
+      const workpackOrWorkpackModels = isWorkpack ? item.workpackModels : item.workpacks;
       const node: any = {
-        ... item,
-        expanded: true,
+        ...item,
+        expanded,
+        leaf: isWorkpack ? !item.hasChildren : false,
         label: isWorkpack ? item.workpackName : item.workpackModelName,
         properties: this.buildProperties(item),
         children: this.mapTreeNodesChildren(workpackOrWorkpackModels, !isWorkpack)
@@ -108,7 +142,7 @@ export class BreakdownStructureComponent implements OnChanges, OnDestroy {
   }
 
   buildProperties(item: IWorkpackBreakdownStructure) {
-    if (!item?.dashboard && ![this.typeWorkpackEnum.Deliverable, this.typeWorkpackEnum.Milestone].includes(item?.workpackType) ) {
+    if (!item?.dashboard && ![this.typeWorkpackEnum.Deliverable, this.typeWorkpackEnum.Milestone].includes(item?.workpackType)) {
       return null;
     }
     const properties = {
@@ -125,20 +159,20 @@ export class BreakdownStructureComponent implements OnChanges, OnDestroy {
     };
     if (item?.dashboard?.risk && item?.dashboard?.risk?.total > 0) {
       properties.riskImportance = item.dashboard?.risk?.high > 0 ?
-      'high' :
-      (item.dashboard?.risk?.medium > 0 ? 'medium' : 'low');
+        'high' :
+        (item.dashboard?.risk?.medium > 0 ? 'medium' : 'low');
     }
     if (item.dashboard?.milestone && item.dashboard?.milestone?.quantity > 0) {
       properties.dashboardMilestonesData = this.setDashboardMilestonesData(item);
     }
     if (item.dashboard?.tripleConstraint) {
-      const { iconCostColor, iconScheduleColor, iconScopeColor } = this.loadTripleConstraintSettings(item);
+      const {iconCostColor, iconScheduleColor, iconScopeColor} = this.loadTripleConstraintSettings(item);
       properties.iconCostColor = iconCostColor;
       properties.iconScheduleColor = iconScheduleColor;
       properties.iconScopeColor = iconScopeColor;
 
     }
-    const { cpiColor, spiColor, gaugeChartDataCPI, gaugeChartDataSPI } = this.loadPerformanceIndexes(item);
+    const {cpiColor, spiColor, gaugeChartDataCPI, gaugeChartDataSPI} = this.loadPerformanceIndexes(item);
     properties.cpiColor = cpiColor;
     properties.spiColor = spiColor;
     properties.gaugeChartDataCPI = gaugeChartDataCPI;
@@ -182,7 +216,7 @@ export class BreakdownStructureComponent implements OnChanges, OnDestroy {
         labelTotal: 'planned',
         labelProgress: 'actual',
         valueUnit: data?.unitMeasure && data?.unitMeasure?.name,
-        color: '#ffa342',
+        color: 'rgba(236, 125, 49, 1)',
         barHeight: 17,
         baselinePlanned: Number(data?.baselinePlanned?.toFixed(data?.unitMeasure?.precision)),
         type: 'scope'
@@ -208,7 +242,7 @@ export class BreakdownStructureComponent implements OnChanges, OnDestroy {
 
   validateShowTripleConstraintCost(properties: IWorkpackBreakdownStructure) {
     if (properties?.dashboard?.tripleConstraint?.cost &&
-        properties?.dashboard?.tripleConstraint?.cost?.foreseenValue > 0) {
+      properties?.dashboard?.tripleConstraint?.cost?.foreseenValue > 0) {
       return true;
     }
     return false;
@@ -216,7 +250,7 @@ export class BreakdownStructureComponent implements OnChanges, OnDestroy {
 
   validateShowTripleConstraintSchedule(properties: IWorkpackBreakdownStructure) {
     if (properties?.dashboard?.tripleConstraint?.schedule &&
-        properties?.dashboard?.tripleConstraint?.schedule?.foreseenStartDate !== null) {
+      properties?.dashboard?.tripleConstraint?.schedule?.foreseenStartDate !== null) {
       return true;
     }
     return false;
@@ -224,7 +258,7 @@ export class BreakdownStructureComponent implements OnChanges, OnDestroy {
 
   validateShowTripleConstraintScope(properties: IWorkpackBreakdownStructure) {
     if (properties?.dashboard?.tripleConstraint?.scope &&
-        properties?.dashboard?.tripleConstraint?.scope?.foreseenValue > 0) {
+      properties?.dashboard?.tripleConstraint?.scope?.foreseenValue > 0) {
       return true;
     }
     return false;
@@ -233,8 +267,8 @@ export class BreakdownStructureComponent implements OnChanges, OnDestroy {
   setGaugeChartData(properties: IWorkpackBreakdownStructure) {
     const gaugeChartDataCPI = {
       value: properties.dashboard?.costPerformanceIndex !== null ?
-      (properties.dashboard?.costPerformanceIndex?.indexValue !== null ?
-        properties.dashboard?.costPerformanceIndex?. indexValue : 0) :
+        (properties.dashboard?.costPerformanceIndex?.indexValue !== null ?
+          properties.dashboard?.costPerformanceIndex?.indexValue : 0) :
         null,
       labelBottom: 'CPI',
       classIconLabelBottom: 'fas fa-dollar-sign',
@@ -259,7 +293,7 @@ export class BreakdownStructureComponent implements OnChanges, OnDestroy {
       labelBottomProgressBar: 'SV',
     };
 
-    return { gaugeChartDataCPI, gaugeChartDataSPI };
+    return {gaugeChartDataCPI, gaugeChartDataSPI};
   }
 
   loadPerformanceIndexes(properties: IWorkpackBreakdownStructure) {
@@ -284,8 +318,8 @@ export class BreakdownStructureComponent implements OnChanges, OnDestroy {
       spiColor = '#646464';
     }
 
-    const { gaugeChartDataCPI, gaugeChartDataSPI } = this.setGaugeChartData(properties);
-    return { cpiColor, spiColor, gaugeChartDataCPI, gaugeChartDataSPI };
+    const {gaugeChartDataCPI, gaugeChartDataSPI} = this.setGaugeChartData(properties);
+    return {cpiColor, spiColor, gaugeChartDataCPI, gaugeChartDataSPI};
   }
 
   loadTripleConstraintSettings(properties: IWorkpackBreakdownStructure) {
@@ -295,7 +329,7 @@ export class BreakdownStructureComponent implements OnChanges, OnDestroy {
 
     if (properties.dashboard &&
       (!properties.dashboard?.tripleConstraint?.cost ||
-        properties.dashboard?.tripleConstraint?.cost?.foreseenValue === 0) ) {
+        properties.dashboard?.tripleConstraint?.cost?.foreseenValue === 0)) {
       iconCostColor = '#f5f5f5';
     } else {
       if (properties.dashboard && properties.dashboard?.tripleConstraint?.cost?.plannedValue > 0) {
@@ -320,7 +354,7 @@ export class BreakdownStructureComponent implements OnChanges, OnDestroy {
     }
 
     if (properties.dashboard && (!properties.dashboard?.tripleConstraint?.schedule ||
-      properties?.dashboard?.tripleConstraint?.schedule?.foreseenStartDate === null) ) {
+      properties?.dashboard?.tripleConstraint?.schedule?.foreseenStartDate === null)) {
       iconScheduleColor = '#f5f5f5';
     } else {
       if (properties.dashboard && properties.dashboard.tripleConstraint?.schedule?.plannedValue > 0) {
@@ -345,7 +379,7 @@ export class BreakdownStructureComponent implements OnChanges, OnDestroy {
     }
 
     if (properties.dashboard && (!properties.dashboard?.tripleConstraint?.cost ||
-      properties?.dashboard?.tripleConstraint?.scope?.foreseenValue === 0) ) {
+      properties?.dashboard?.tripleConstraint?.scope?.foreseenValue === 0)) {
       iconScopeColor = '#f5f5f5';
     } else {
       if (properties.dashboard && properties.dashboard?.tripleConstraint?.scope?.plannedVariationPercent > 0) {
@@ -369,7 +403,7 @@ export class BreakdownStructureComponent implements OnChanges, OnDestroy {
       }
     }
 
-    return { iconCostColor, iconScheduleColor, iconScopeColor };
+    return {iconCostColor, iconScheduleColor, iconScopeColor};
   }
 
   setDashboardMilestonesData(properties: IWorkpackBreakdownStructure) {
@@ -385,10 +419,10 @@ export class BreakdownStructureComponent implements OnChanges, OnDestroy {
         ],
         datasets: [
           {
-            data: [milestone.onTime ? milestone.onTime : 0 ,
-                  milestone.late ? milestone.late : 0,
-                  milestone.concluded ? milestone.concluded : 0,
-                  milestone.lateConcluded ?  milestone.lateConcluded : 0],
+            data: [milestone.onTime ? milestone.onTime : 0,
+              milestone.late ? milestone.late : 0,
+              milestone.concluded ? milestone.concluded : 0,
+              milestone.lateConcluded ? milestone.lateConcluded : 0],
             backgroundColor: [
               '#00b89c',
               '#fa4c4f',

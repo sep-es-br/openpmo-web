@@ -49,5 +49,11 @@ export enum IconsEnum {
   UserEdit = 'user-edit',
   UserRead = 'user-view',
   PlanModel = 'plan-model',
-  CCBMember = 'ccb-member'
+  CCBMember = 'ccb-member',
+  OtherFiles = 'other_files',
+  Jrxml = 'jrxml',
+  ArrowUp = 'arrowUp',
+  ArrowDown = 'arrowDown',
+  Main = 'main',
+  FileDownload = 'fileDownload'
 }

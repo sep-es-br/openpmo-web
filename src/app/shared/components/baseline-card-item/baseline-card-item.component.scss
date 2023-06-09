@@ -164,8 +164,16 @@
       }
       &.cardList {
         flex-direction: row;
-        justify-content: flex-start;
+        justify-content: space-between;
         margin-left: 1em;
+        .left-content, .right-content {
+          flex-direction: row;
+          display: flex;
+          align-items: center;
+        }
+        .card-item-status-date {
+          width: 85px;
+        }
       }
     }
     .card-item-footer {

@@ -1,0 +1,176 @@
+@use "src/variables" as v;
+
+::ng-deep p-card.app-card-item-cost .p-card {
+  height: 100%;
+  padding: 0 0.5em 0.5em 1em;
+
+  .p-card-body {
+    height: 100%;
+    padding: 0;
+  }
+  .p-card-header {
+    display: flex;
+    justify-content: space-between;
+    .card-item-header {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .card-item-title {
+      font-size: 1rem;
+      font-family: v.$fontTitle !important;
+      color: v.$fontInput;
+    }
+    .card-item-header p-menu {
+      .p-menu-overlay .p-menu-list .p-menuitem .p-menuitem-link {
+        .p-menuitem-icon {
+          font-size: 0.8rem;
+          color: #939393;
+        }
+        .p-menuitem-text {
+          font-size: 0.9rem;
+          font-family: v.$fontFamilyMedium;
+          color: #939393;
+        }
+      }
+    }
+    .card-item-header .p-button {
+      background-color: transparent;
+      border: none !important;
+      box-shadow: none !important;
+      .p-button-icon {
+        font-size: 0.8rem;
+        color: #939393;
+      }
+    }
+  }
+  .validate-actualwork-message {
+    font-size: 0.8rem;
+    color: #EA5C5C;
+  }
+  .p-button-icon-only {
+    justify-content: flex-end !important;
+  }
+  .p-card-content {
+    height: 100%;
+    padding: 0;
+    .cost-button-replicate-container {
+      width: 100%;
+      text-align: center;
+      > i {
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: #888e96;
+      }
+      i.disabled {
+        cursor: auto;
+        color: #b6c8cd;
+      }
+    }
+    .card-item-values {
+      display: flex;
+      flex-direction: column;
+      .cost-account-allocation {
+        font-family: 'Montserrat', sans-serif;
+        font-weight: 400;
+        font-style: normal;
+        font-size: 12px;
+        color: #004660;
+        height: 15px;
+        .allocation-label {
+          margin-right: 5px;
+        }
+        &.red-balance {
+          color: #EA5C5C;
+        }
+      }
+      .p-float-label {
+        width: 100%;
+      }
+      .float-label-container {
+        margin-top: 10px;
+      }
+      .p-float-label.responsive {
+        width: 100%;
+        .p-inputnumber {
+          width: 80%;
+        }
+      }
+      .changed {
+        .p-inputnumber-input {
+          font-weight: bold;
+          text-shadow: #b6c8cd  0.2em 0.1em 0.2em;
+          transition: font-weight, text-shadow 1s;
+        }
+      }
+    }
+  }
+  .card-item-footer {
+    display: flex;
+    justify-content: flex-end;
+    padding: 0.5em;
+    .card-item-id {
+      color: #888e96;
+        font-size: 0.6rem;
+        font-family: v.$fontFamilyMedium;
+    }
+  }
+}
+::ng-deep p-card.new-card-item-cost {
+  .p-card {
+    background-color: transparent;
+    box-shadow: none;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    cursor: pointer;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    .p-card-content {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .p-card-body .p-card-content p-menu {
+      .p-menu-overlay .p-menu-list {
+        max-width: 20em;
+        .p-menuitem .p-menuitem-link {
+          .p-menuitem-icon {
+            font-size: 0.8rem;
+            color: #939393;
+          }
+          .p-menuitem-text {
+            font-size: 0.9rem;
+            font-family: v.$fontFamilyMedium;
+            color: #939393;
+          }
+        }
+      }
+    }
+  }
+}
+
+::ng-deep .new-card-item-cost.new-card-item-cost-mobile {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  padding: 1em;
+  .p-card {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 30%;
+    height: 60%;
+    padding: 1em 0;
+    .p-card-body .p-card-content .carditem-content {
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      height: 100%;
+      width: 100%;
+    }
+  }
+}

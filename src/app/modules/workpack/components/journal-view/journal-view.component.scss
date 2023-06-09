@@ -9,37 +9,24 @@
       margin-right: 1.6rem;
     }
     .property-input {
-      width: 240px;
+      min-width: 240px;
     }
     .p-calendar {
       width: 100%;
       background-color: #fff;
-      //padding-left: 1rem;
       height: 100%;
-      .p-inputtext.p-component,
-      .p-datepicker-trigger {
-        //border: none;
-      }
     }
     .p-multiselect {
       width: 100%;
       background-color: #fff;
-      //border: none;
     }
     .p-multiselect:enabled:hover {
-      //border: none;
       box-shadow: none;
     }
     .p-multiselect:not(.p-disabled):hover {
-      //border: none;
       box-shadow: none;
     }
     .p-float-label {
-    //  margin-top: 0px;
-     // border-style: solid;
-    //  border-width: 1px;
-     // border-color: #44b39b52;
-      //padding: 5px;
       height: 100%;
       label {
         top: 40%;
@@ -129,6 +116,20 @@
         span {
           font-size: 0.8rem;
           margin-bottom: 0.5rem;
+        }
+        .author, .level, .target {
+          margin-top: 0.5em;
+          > label {
+            margin-right: 0.5em;
+            font-size: 0.8rem;
+            font-weight: bold;
+          }
+          > span {
+            font-size: 0.9rem;
+          }
+        }
+        .target {
+          margin-bottom: 0.5em;
         }
       }
       .p-card-content {

@@ -128,11 +128,13 @@
           </div>
           <p-overlayPanel #cpiPanel>
             <div class="index-content">
+              <span style="font-size: .8rem; white-space: pre-wrap;">{{ 'CPIdescription' | translate }}</span>
               <app-gauge-chart *ngIf="gaugeChartDataCPI" [config]="gaugeChartDataCPI"></app-gauge-chart>
             </div>
           </p-overlayPanel>
           <p-overlayPanel #spiPanel>
             <div class="index-content">
+              <span style="font-size: .8rem; white-space: pre-wrap;">{{ 'SPIdescription' | translate }}</span>
               <app-gauge-chart *ngIf="gaugeChartDataSPI" [config]="gaugeChartDataSPI"></app-gauge-chart>
             </div>
           </p-overlayPanel>

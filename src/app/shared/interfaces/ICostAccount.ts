@@ -8,10 +8,15 @@ export interface ICostAccount {
   workpackModelName?: string;
   properties: IWorkpackProperty[];
   models?: IWorkpackModelProperty[];
+  costAccountAllocation?: {
+    actual: number;
+    limit: number;
+    planed: number;
+  } 
 }
 
 export interface ICostByWorkpack {
   idWorkpack: number;
-  atual: number;
+  actual: number;
   planed: number;
 }

@@ -1,9 +1,6 @@
 <div class="app-journal-view">
   <app-card [properties]="cardJournalProperties">
-    <div class="loading-container" *ngIf="isLoading">
-      <app-card-loading [isCardLoading]="isLoading"></app-card-loading>
-    </div>
-    <form class="filters" [formGroup]="formSearch" *ngIf="!isLoading" [class.responsive]="responsive">
+    <form class="filters" [formGroup]="formSearch" [class.responsive]="responsive">
       <p-button class="app-button-green" [label]="'newInformation' | translate" (onClick)="handleNewInformation()"
         [disabled]="!editPermission || workpackCanceled"></p-button>
       <span class="p-float-label property-input p-field">
@@ -45,6 +42,9 @@
         </p-scrollPanel>
       </p-overlayPanel>
     </form>
+    <div class="loading-container" *ngIf="isLoading">
+      <app-card-loading [isCardLoading]="isLoading"></app-card-loading>
+    </div>
     <div class="journal-content" #journal *ngIf="!isLoading">
       <p-timeline [value]="journalData" [align]="responsive ? 'right' : 'alternate'" [class.responsive]="responsive">
         <ng-template pTemplate="marker" let-event>
@@ -63,11 +63,37 @@
                 </span>
               </strong>
             </ng-template>
-            <ng-template pTemplate="subtitle">
+
+            <ng-template pTemplate="subtitle" *ngIf="['OFFICE_PERMISSION', 'PLAN_PERMISSION', 'WORKPACK_PERMISSION'].includes(event.type)">
+              <strong class="item-info" *ngIf="event.workpack">
+                {{event.workpack.name}}(ID: {{event.workpack.id}})
+              </strong>
+              <strong class="item-info" *ngIf="event.office">
+                {{event.office.name}}(ID: {{event.office.id}})
+              </strong>
+              <strong class="item-info" *ngIf="event.plan">
+                {{event.plan.name}}(ID: {{event.plan.id}})
+              </strong>
+              <div class="author">
+                <label>{{'author'|translate}}:</label>
+                <span>{{event.author?.name}}(ID: {{event.author?.id}})</span>
+              </div>
+              <div class="level">
+                <label>{{'level'|translate}}:</label>
+                <span>{{event.level |translate}}</span>
+              </div>
+              <div class="target">
+                <label>{{'targetUser'|translate}}:</label>
+                <span>{{event.target?.name}}(ID: {{event.target?.id}})</span>
+              </div>
               <span> {{ event.date }} </span>
-              <span> {{event.person.name}}(ID: {{event.person.id}})</span>
             </ng-template>
-            <ng-template pTemplate="content">
+
+            <ng-template pTemplate="subtitle" *ngIf="!['OFFICE_PERMISSION', 'PLAN_PERMISSION', 'WORKPACK_PERMISSION'].includes(event.type)">
+              <span> {{ event.date }} </span>
+              <span> {{event.author?.name}}(ID: {{event.author?.id}})</span>
+            </ng-template>
+            <ng-template pTemplate="content" *ngIf="!['OFFICE_PERMISSION', 'PLAN_PERMISSION', 'WORKPACK_PERMISSION'].includes(event.type)">
               <strong class="workpack-info" *ngIf="event.workpack">
                 {{event.workpack.workpackModelName}}: {{event.workpack.name}}(ID: {{event.workpack.id}})
               </strong>

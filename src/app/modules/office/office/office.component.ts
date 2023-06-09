@@ -155,6 +155,7 @@ export class OfficeComponent implements OnDestroy {
       const { data, success } = await this.officeSrv.GetById(this.idOffice);
       if (success) {
         this.propertiesOffice = data;
+        localStorage.setItem('@pmo/propertiesCurrentOffice', JSON.stringify(this.propertiesOffice));
         this.formOffice.reset({ name: data.name, fullName: data.fullName });
         if (!this.editPermission) {
           this.formOffice.disable();
@@ -186,7 +187,7 @@ export class OfficeComponent implements OnDestroy {
 
   async loadPlans() {
     this.isLoading = true;
-    this.loadPlanModelsOfficeList();
+    await this.loadPlanModelsOfficeList();
     
     const result = await this.planSrv.GetAll({ 'id-office': this.idOffice, 'idFilter': this.idFilterSelected });
     if (result.success) {
@@ -342,6 +343,18 @@ export class OfficeComponent implements OnDestroy {
     const idFilter = event.filter;
     this.idFilterSelected = idFilter;
     const result = await this.planSrv.GetAll({ 'id-office': this.idOffice, idFilter: this.idFilterSelected });
+    if (result.success) {
+      this.plans = result.data;
+    }
+    this.loadCardItemsPlans();
+  }
+
+  async handleSearchText(event) {
+    const term = event.term;
+    const result = await this.planSrv.GetAll({ 'id-office': this.idOffice,
+      idFilter: this.idFilterSelected,
+      term
+    });
     if (result.success) {
       this.plans = result.data;
     }

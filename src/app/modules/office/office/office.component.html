@@ -33,34 +33,35 @@
       </div>
     </app-card>
   </div>
-  <section class="plans-cards-section" *ngIf="idOffice && (isLoading || (!isLoading && planModelsOfficeList && planModelsOfficeList.length > 0))">
+  <section class="plans-cards-section"
+    *ngIf="idOffice && (isLoading || (!isLoading && planModelsOfficeList && planModelsOfficeList.length > 0))">
     <div class="card-plans">
       <app-card [properties]="cardPlans" (editFilter)="handleEditFilter($event)" (newFilter)="handleNewFilter()"
-        (selectedFilter)="handleSelectedFilter($event)">
+        (searchText)="handleSearchText($event)" (selectedFilter)="handleSelectedFilter($event)">
         <div class="loading-container" *ngIf="isLoading">
           <app-card-loading [isCardLoading]="isLoading"></app-card-loading>
         </div>
         <p-dataView [value]="cardItemsPlans" layout="grid" class="app-dataview"
-            *ngIf="(displayModeAll === 'grid' || (displayModeAll === 'list' && !!responsive)) && !isLoading"
-            [paginator]="true" [rows]="pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false"
-            [totalRecords]="totalRecords" [emptyMessage]="'notFoundPlansToThisOffice' | translate">
-            <ng-template let-cardItem pTemplate="gridItem">
-              <div class="p-col-12 p-md-3 p-sm-12 card-item-container">
-                <app-card-item [properties]="cardItem"></app-card-item>
-              </div>
-            </ng-template>
-          </p-dataView>
+          *ngIf="(displayModeAll === 'grid' || (displayModeAll === 'list' && !!responsive)) && !isLoading"
+          [paginator]="true" [rows]="pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false"
+          [totalRecords]="totalRecords" [emptyMessage]="'notFoundPlansToThisOffice' | translate">
+          <ng-template let-cardItem pTemplate="gridItem">
+            <div class="p-col-12 p-md-3 p-sm-12 card-item-container">
+              <app-card-item [properties]="cardItem"></app-card-item>
+            </div>
+          </ng-template>
+        </p-dataView>
 
-          <p-dataView [value]="cardItemsPlans" layout="list" class="app-dataview app-dataview-list"
-            *ngIf="(displayModeAll === 'list' && !responsive) && !isLoading" [paginator]="true" [rows]="pageSize"
-            [showJumpToPageDropdown]="true" [showPageLinks]="false" [totalRecords]="totalRecords"
-            [emptyMessage]="'notFoundPlansToThisOffice' | translate">
-            <ng-template let-cardItem pTemplate="listItem">
-              <div class="p-col-12">
-                <app-card-item [properties]="cardItem" [displayModeCard]="displayModeAll"></app-card-item>
-              </div>
-            </ng-template>
-          </p-dataView>
+        <p-dataView [value]="cardItemsPlans" layout="list" class="app-dataview app-dataview-list"
+          *ngIf="(displayModeAll === 'list' && !responsive) && !isLoading" [paginator]="true" [rows]="pageSize"
+          [showJumpToPageDropdown]="true" [showPageLinks]="false" [totalRecords]="totalRecords"
+          [emptyMessage]="'notFoundPlansToThisOffice' | translate">
+          <ng-template let-cardItem pTemplate="listItem">
+            <div class="p-col-12">
+              <app-card-item [properties]="cardItem" [displayModeCard]="displayModeAll"></app-card-item>
+            </div>
+          </ng-template>
+        </p-dataView>
       </app-card>
     </div>
   </section>

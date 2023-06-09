@@ -7,7 +7,7 @@
     </app-config-data-view-panel>
   </div>
   <div class="card-permissions" *ngIf="idPlan">
-    <app-card [properties]="cardPlanPermissions" class="mt-0" (editFilter)="handleEditFilter($event)"
+    <app-card [properties]="cardPlanPermissions" class="mt-0" (editFilter)="handleEditFilter($event)" (searchText)="handleSearchText($event)"
       (newFilter)="handleNewFilter()" (selectedFilter)="handleSelectedFilter($event)" (createNewElement)="handleCreateNewPlanPermission()">
       <div class="loading-container" *ngIf="isLoading">
         <app-card-loading [isCardLoading]="isLoading"></app-card-loading>

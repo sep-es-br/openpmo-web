@@ -1,0 +1,94 @@
+@use "src/variables" as v;
+
+.app-progress {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  .unit-container {
+    flex: 1;
+    margin-right: 10px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    margin-top: 0.5em;
+    span {
+      text-transform: none;
+      font-weight: bold;
+    }
+  }
+
+  .progress-header-values-container {
+    display: flex;
+    flex-direction: column;
+    .progress-bar-header {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      .labels {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        .header-label {
+          text-transform: none;
+          font-size: 0.625rem;
+          font-family: v.$fontFamilyItalic !important;
+        }
+      }
+      .values {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        .value {
+          text-transform: none;
+          font-size: 0.875rem;
+          font-family: v.$fontFamilyBold;
+          font-weight: 700;
+        }
+      }
+    }
+
+    .progress-dif-container {
+      display: flex;
+      flex-direction: row;
+    }
+    .progress-bar-total-container {
+      border: 1px solid #004660;
+      display: flex;
+      flex-direction: row;
+    }
+
+    .progress-bar-progress-container {
+      border: none;
+      display: flex;
+      flex-direction: row;
+    }
+
+    .progress-bar {
+      height: 100%;
+    }
+
+    .total-bar {
+      border: 1px solid #004660;
+      height: 100%;
+    }
+  }
+  .progress-header-values-container.responsive {
+    width: 90%;
+  }
+  .limit-indicator-container {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    > i {
+      font-size: 1.2rem;
+      color: #EA5C5C;
+    }
+  }
+}
+
+

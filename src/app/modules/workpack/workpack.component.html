@@ -50,6 +50,7 @@
             (editFilter)="handleEditFilterWorkpackModel($event, workpackModel.idWorkpackModel)"
             (newFilter)="handleNewFilterWorkpackModel(workpackModel.idWorkpackModel)"
             (selectedFilter)="handleSelectedFilterWorkpackModel($event, workpackModel.idWorkpackModel)"
+            (searchText)="handleSearchTextWorkpackModel($event, workpackModel.idWorkpackModel)"
             (createNewElement)="handleCreateNewWorkpack(workpackModel.idWorkpackModel)"
             *ngIf="(selectedTab?.key === workpackModel.cardSection.tabTitle)">
 
@@ -154,6 +155,7 @@
           (editFilter)="handleEditFilterWorkpackModel($event, workpackModel.idWorkpackModel)"
           (newFilter)="handleNewFilterWorkpackModel(workpackModel.idWorkpackModel)"
           (selectedFilter)="handleSelectedFilterWorkpackModel($event, workpackModel.idWorkpackModel)"
+          (searchText)="handleSearchTextWorkpackModel($event, workpackModel.idWorkpackModel)"
           (createNewElement)="handleCreateNewWorkpack(workpackModel.idWorkpackModel)">
           <div class="input-toggle-workpack-cancelled">
             <p-inputSwitch class="app-toggle" [(ngModel)]="workpackModel.workpackShowCancelleds"

@@ -21,6 +21,7 @@ export class PropertyTemplateModel implements IProperty {
   defaults?: number | number[];
   min?: number;
   max?: number;
+  precision?: number;
   possibleValues?: { label: string; value: string }[];
   possibleValuesIds?: { label: string; value: number }[];
   multipleSelection?: boolean;

@@ -34,6 +34,12 @@
         </p-inputNumber>
         <label class="input-label">{{ 'sortIndex' | translate }}</label>
       </span>
+      <span class="p-float-label property-input p-field input-number-scroll" *ngIf="property.type === 'NumberModel'">
+        <p-inputNumber inputStyleClass="app-input-text" [(ngModel)]="property.precision" [showButtons]="true" [min]="1" [max]="6"
+          (ngModelChange)="changed.emit($event)" [disabled]="property.viewOnly">
+        </p-inputNumber>
+        <label class="input-label">{{ 'precision' | translate }}</label>
+      </span>
       <span class="p-float-label property-input app-input-chips p-field" *ngIf="property.type === 'SelectionModel'">
         <p-chips inputStyleClass="app-input-text" [(ngModel)]="property.possibleValuesOptions" [required]="true"
           [allowDuplicate]="false" (ngModelChange)="changed.emit($event)" [disabled]="property.viewOnly" separator=","

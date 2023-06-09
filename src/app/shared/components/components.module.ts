@@ -21,6 +21,20 @@ import { ScheduleConstraintComponent } from './dashboards/schedule-constraint/sc
 import { ScopeConstraintComponent } from './dashboards/scope-constraint/scope-constraint.component';
 import { TabviewScrolledComponent } from './tabview-scrolled/tabview-scrolled.component';
 import { CardLoadingComponent } from './card-loading/card-loading.component';
+import { CostAssignmentCardItemComponent } from './cost-assignment-card-item/cost-assignment-card-item.component';
+import { CardItemReportModelComponent } from './card-item-report-model/card-item-report-model.component';
+import { PropertyModelComponent } from './property-model/property-model.component';
+import { PropertyComponent } from './properties/property/property.component';
+import { PropertyDateComponent } from './properties/type-property/property-date/property-date.component';
+import { PropertyIntegerComponent } from './properties/type-property/property-integer/property-integer.component';
+import { PropertyOrganizationSelectionComponent } from './properties/type-property/property-organization-selection/property-organization-selection.component';
+import { PropertySelectionComponent } from './properties/type-property/property-selection/property-selection.component';
+import { PropertyTextComponent } from './properties/type-property/property-text/property-text.component';
+import { PropertyTextareaComponent } from './properties/type-property/property-textarea/property-textarea.component';
+import { PropertyToggleComponent } from './properties/type-property/property-toggle/property-toggle.component';
+import { PropertyTreeSelectionComponent } from './properties/type-property/property-tree-selection/property-tree-selection.component';
+import { PropertyUnitSelectionComponent } from './properties/type-property/property-unit-selection/property-unit-selection.component';
+import { PropertyGroupComponent } from './properties/type-property/property-group/property-group.component';
 
 @NgModule({
   declarations: [
@@ -42,6 +56,20 @@ import { CardLoadingComponent } from './card-loading/card-loading.component';
     ScopeConstraintComponent,
     TabviewScrolledComponent,
     CardLoadingComponent,
+    CostAssignmentCardItemComponent,
+    CardItemReportModelComponent,
+    PropertyModelComponent,
+    PropertyComponent,
+    PropertyDateComponent,
+    PropertyIntegerComponent,
+    PropertyOrganizationSelectionComponent,
+    PropertySelectionComponent,
+    PropertyTextComponent,
+    PropertyTextareaComponent,
+    PropertyToggleComponent,
+    PropertyTreeSelectionComponent,
+    PropertyUnitSelectionComponent,
+    PropertyGroupComponent,
   ],
   imports: [
     CommonModule,
@@ -68,7 +96,11 @@ import { CardLoadingComponent } from './card-loading/card-loading.component';
     ScheduleConstraintComponent,
     ScopeConstraintComponent,
     TabviewScrolledComponent,
-    CardLoadingComponent
+    CardLoadingComponent,
+    CostAssignmentCardItemComponent,
+    CardItemReportModelComponent,
+    PropertyModelComponent,
+    PropertyComponent
   ]
 })
 export class ComponentsModule { }

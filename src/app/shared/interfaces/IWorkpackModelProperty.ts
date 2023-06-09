@@ -20,6 +20,7 @@ export interface IWorkpackModelProperty {
   multipleSelection?: boolean;
   rows?: number;
   decimals?: number;
+  precision?: number;
   idDomain?: number;
   list?: SelectItem[];
   extraList?: TreeNode[];

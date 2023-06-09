@@ -969,4 +969,19 @@ app-root p-toast .p-toast {
   &.flag-unchecked:before {
     content: "\e95a";
   }
+  &.main:before {
+    content: "\e95b";
+  }
+  &.arrowUp:before {
+    content: "\e95c";
+  }
+  &.arrowDown:before {
+    content: "\e95d";
+  }
+  &.downloadFile:before {
+    content: "\e95e";
+  }
+  &.jrxml:before {
+    content: "\e95f";
+  }
 }

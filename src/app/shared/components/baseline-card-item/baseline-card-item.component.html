@@ -43,31 +43,36 @@
     <div class="display-mode-list" *ngIf="displayModeCard === 'list'">
       <div class="card-item-content" [class.card-link]="properties.urlCard" [routerLink]="properties.urlCard"
         [class.cardList]="displayModeCard === 'list'" [queryParams]="getQueryParams()">
-        <div class="baseline-status-container">
-          <i *ngIf="properties.baselineStatus === 'proposed'" [ngClass]="[ 'app-icon', 'action-required', 'grey-icon']"
-            [ngStyle]="{ fontSize: '1.5rem', color: '#ED7D31' }"></i>
-          <i *ngIf="!!properties.baselineActive" [ngClass]="[ 'app-icon', 'check-circle', 'grey-icon']"
-            [ngStyle]="{ fontSize: '1.5rem', color: '#44B39B' }"></i>
-          <i *ngIf="properties.baselineStatus !== 'proposed' && !properties.baselineActive"
-            [ngClass]="[ 'app-icon', 'user-circle', 'grey-icon']"
-            [ngStyle]="{ fontSize: '1.5rem', color: '#ffffff' }"></i>
+        <div class="left-content">
+          <div class="baseline-status-container">
+            <i *ngIf="properties.baselineStatus === 'proposed'"
+              [ngClass]="[ 'app-icon', 'action-required', 'grey-icon']"
+              [ngStyle]="{ fontSize: '1.5rem', color: '#ED7D31' }"></i>
+            <i *ngIf="!!properties.baselineActive" [ngClass]="[ 'app-icon', 'check-circle', 'grey-icon']"
+              [ngStyle]="{ fontSize: '1.5rem', color: '#44B39B' }"></i>
+            <i *ngIf="properties.baselineStatus !== 'proposed' && !properties.baselineActive"
+              [ngClass]="[ 'app-icon', 'user-circle', 'grey-icon']"
+              [ngStyle]="{ fontSize: '1.5rem', color: '#ffffff' }"></i>
+          </div>
+          <div class="icons-container">
+            <i
+              [ngClass]="properties.iconSvg ? [ 'app-icon', properties.icon, 'grey-icon', displayModeCard] : [ 'icon-card', properties.icon, 'grey-icon', displayModeCard ]"></i>
+          </div>
+          <span class="card-item-name" [pTooltip]="properties.fullNameCardItem" *ngIf="properties.icon === 'baseline'"
+            tooltipPosition="bottom">{{properties.nameCardItem}}</span>
+          <span class="card-item-name cancelling" [pTooltip]="properties.fullNameCardItem"
+            *ngIf="properties.icon === 'fas fa-times'" tooltipPosition="bottom">{{'cancelling'|translate}}</span>
         </div>
-        <div class="icons-container">
-          <i
-            [ngClass]="properties.iconSvg ? [ 'app-icon', properties.icon, 'grey-icon', displayModeCard] : [ 'icon-card', properties.icon, 'grey-icon', displayModeCard ]"></i>
+        <div class="right-content">
+          <span class="card-item-status"
+            [ngStyle]="{ color: properties.baselineStatus !== 'proposed' ? '#009dd4' : '#888e96' }"
+            *ngIf="properties.baselineStatus">{{properties.baselineStatus |translate}}</span>
+          <span class="card-item-status-date" *ngIf="properties.baselineStatusDate"
+            [class.date-none]="properties?.baselineStatusDate === 'NONE'">
+            {{ properties?.baselineStatusDate !== 'NONE' ? (language === 'pt' ?
+            (properties?.baselineStatusDate|date:'dd/MM/yyyy') :
+            (properties?.baselineStatusDate|date:'yyyy/MM/dd')) : ''}}</span>
         </div>
-        <span class="card-item-name" [pTooltip]="properties.fullNameCardItem" *ngIf="properties.icon === 'baseline'"
-          tooltipPosition="bottom">{{properties.nameCardItem}}</span>
-        <span class="card-item-name cancelling" [pTooltip]="properties.fullNameCardItem"
-          *ngIf="properties.icon === 'fas fa-times'" tooltipPosition="bottom">{{'cancelling'|translate}}</span>
-        <span class="card-item-status"
-          [ngStyle]="{ color: properties.baselineStatus !== 'proposed' ? '#009dd4' : '#888e96' }"
-          *ngIf="properties.baselineStatus">{{properties.baselineStatus |translate}}</span>
-        <span class="card-item-status-date" *ngIf="properties.baselineStatusDate"
-          [class.date-none]="properties?.baselineStatusDate === 'NONE'">
-          {{ properties?.baselineStatusDate !== 'NONE' ? (language === 'pt' ?
-          (properties?.baselineStatusDate|date:'dd/MM/yyyy') :
-          (properties?.baselineStatusDate|date:'yyyy/MM/dd')) : ''}}</span>
       </div>
       <div class="right-side">
         <p-header class="card-item-header">

@@ -44,6 +44,21 @@ export const iconsJournal = {
     background: '#44b39b',
     color: '#fff'
   },
+  OFFICE_PERMISSION: {
+    icon: 'fas fa-user-lock',
+    background: '#44b39b',
+    color: '#fff'
+  },
+  PLAN_PERMISSION : {
+    icon: 'fas fa-user-lock',
+    background: '#44b39b',
+    color: '#fff'
+  },
+  WORKPACK_PERMISSION: {
+    icon: 'fas fa-user-lock',
+    background: '#44b39b',
+    color: '#fff'
+  }
 }
 
 

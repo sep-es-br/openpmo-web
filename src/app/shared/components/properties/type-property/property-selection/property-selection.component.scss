@@ -1,0 +1,66 @@
+@use "src/variables" as v;
+
+::ng-deep .workpack-selection {
+  .p-multiselect {
+    width: 100%;
+  }
+}
+
+::ng-deep .property-selection {
+  .p-multiselect {
+    width: 100%;
+  }
+}
+
+::ng-deep .app-multiple-selection {
+  .p-multiselect-label-container {
+    color: v.$fontInput;
+    font-size: 1rem;
+    font-family: v.$fontFamilyMedium;
+    .p-multiselect-label {
+      display: block;
+      overflow: auto;
+      text-overflow: unset;
+      white-space: break-spaces;
+      .p-multiselect-token {
+        margin-top: 5px !important;
+      }
+    }
+  }
+}
+
+::ng-deep .workpack-selection-not-fullLine {
+  .p-multiselect {
+    width: 100%;
+  }
+}
+
+::ng-deep .workpack-selection {
+  .app-single-selection .p-dropdown {
+    width: 20%;
+  }
+}
+
+::ng-deep .workpack-selection-not-fullLine {
+  .app-single-selection .p-dropdown {
+    width: 100%;
+  }
+}
+
+::ng-deep .workpack-selection-mobile {
+  .p-multiselect {
+    width: 100%;
+  }
+  .app-single-selection .p-dropdown {
+    width: 100%;
+  }
+}
+
+
+::ng-deep .p-multiselect.p-multiselect-chip .p-multiselect-token {
+  background-color: #e5e5e4 !important;
+}
+
+::ng-deep .p-multiselect-panel .p-multiselect-items .p-multiselect-item.p-highlight  {
+  background-color: rgba(68, 179, 155, 0.4) !important;
+}

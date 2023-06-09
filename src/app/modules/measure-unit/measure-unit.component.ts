@@ -49,6 +49,7 @@ export class MeasureUnitComponent implements OnInit {
   idFilterSelected: number;
   cardProperties: ICard;
   isLoading = false;
+  term = '';
 
   constructor(
     private formBuilder: FormBuilder,
@@ -119,7 +120,10 @@ export class MeasureUnitComponent implements OnInit {
 
   async loadMeasureUnitList() {
     this.isLoading = true;
-    const result = await this.measureUnitSvr.GetAll({ idOffice: this.idOffice, idFilter: this.idFilterSelected });
+    const result = await this.measureUnitSvr.GetAll({ idOffice: this.idOffice,
+      idFilter: this.idFilterSelected,
+      term: this.term
+    });
     if (result.success) {
       this.measureUnits = result.data;
       this.isLoading = false;
@@ -326,6 +330,11 @@ export class MeasureUnitComponent implements OnInit {
   async handleSelectedFilter(event) {
     const idFilter = event.filter;
     this.idFilterSelected = idFilter;
+    await this.loadMeasureUnitList();
+  }
+
+  async handleSearchText(event) {
+    this.term = event.term;
     await this.loadMeasureUnitList();
   }
 

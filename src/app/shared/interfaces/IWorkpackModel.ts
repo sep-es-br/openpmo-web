@@ -8,6 +8,7 @@ export interface IWorkpackModel {
   type: TypeWorkpackModelEnum;
   modelName: string;
   modelNameInPlural?: string;
+  position?: number;
   fontIcon: string;
   childWorkpackModelSessionActive?: boolean;
   children?: IWorkpackModel[];

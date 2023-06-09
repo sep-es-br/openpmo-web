@@ -1,7 +1,7 @@
 <div class="app-workpack-section-stakeholders" *ngIf="sectionStakeholder">
   <app-card [properties]="sectionStakeholder.cardSection" [class.panel-tab-view]="showTabview"
-    (editFilter)="handleEditFilterEntity($event, 'stakeholders')" (newFilter)="handleNewFilterEntity('stakeholders')"
-    (selectedFilter)="handleSelectedFilterStakeholder($event)">
+    (searchText)="handleSearchText($event)" (editFilter)="handleEditFilterEntity($event, 'stakeholders')"
+    (newFilter)="handleNewFilterEntity('stakeholders')" (selectedFilter)="handleSelectedFilterStakeholder($event)">
     <div class="input-toggle-stakeholder">
       <p-inputSwitch class="app-toggle" [(ngModel)]="stakeholderSectionShowInactives"
         (onChange)="handleStakeholderInactiveToggle()"></p-inputSwitch>
@@ -9,12 +9,12 @@
     </div>
     <div class="stakeholders-list-container">
       <div class="loading-container" *ngIf="sectionStakeholder.cardSection.isLoading">
-        <app-card-loading [isCardLoading]="sectionStakeholder.cardSection.isLoading" ></app-card-loading>
+        <app-card-loading [isCardLoading]="sectionStakeholder.cardSection.isLoading"></app-card-loading>
       </div>
       <p-dataView [value]="sectionStakeholder.cardItemsSection" layout="grid" styleClass="dataview-card-items"
-      *ngIf="(displayModeAll === 'grid' || (displayModeAll === 'list' && !!responsive)) && !sectionStakeholder?.cardSection?.isLoading" [paginator]="true"
-      [rows]="pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false"
-      [totalRecords]="totalRecordsStakeholders" [emptyMessage]="'notFoundStakeholdersAndPermissions' | translate">
+        *ngIf="(displayModeAll === 'grid' || (displayModeAll === 'list' && !!responsive)) && !sectionStakeholder?.cardSection?.isLoading"
+        [paginator]="true" [rows]="pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false"
+        [totalRecords]="totalRecordsStakeholders" [emptyMessage]="'notFoundStakeholdersAndPermissions' | translate">
         <ng-template let-cardItem pTemplate="gridItem">
           <div class="p-col-12 p-md-3 p-sm-12 card-item-container">
             <app-card-item [properties]="cardItem"></app-card-item>
@@ -22,8 +22,9 @@
         </ng-template>
       </p-dataView>
       <p-dataView [value]="sectionStakeholder.cardItemsSection" layout="list" styleClass="dataview-card-items"
-        class="app-dataview app-dataview-list" *ngIf="(displayModeAll === 'list' && !responsive) && !sectionStakeholder?.cardSection?.isLoading" [paginator]="true"
-        [rows]="pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false"
+        class="app-dataview app-dataview-list"
+        *ngIf="(displayModeAll === 'list' && !responsive) && !sectionStakeholder?.cardSection?.isLoading"
+        [paginator]="true" [rows]="pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false"
         [totalRecords]="totalRecordsStakeholders" [emptyMessage]="'notFoundStakeholdersAndPermissions' | translate">
         <ng-template let-cardItem pTemplate="listItem">
           <div class="p-col-12">

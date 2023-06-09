@@ -1,0 +1,28 @@
+<ng-container *ngIf="!property?.milestoneData; else milestoneTextContainer"
+  [ngTemplateOutlet]="textContainer">
+</ng-container>
+
+<ng-template #textContainer>
+  <span class="p-float-label" [class.workpack-input-text]="property.fullLine"
+  [class.workpack-input-text-not-fullLine]="!property.fullLine" [class.workpack-input-text-mobile]="responsive">
+    <input class="app-input-text" [id]="property.name" name="name" [(ngModel)]="property.value" type="text" pInputText
+      [disabled]="property.disabled" [defaultValue]="property.defaultValue" [required]="property.required"
+      (blur)="changed.emit($event)" (ngModelChange)="changed.emit($event)"
+      [class.ng-invalid]="property.invalid" />
+    <label class="app-input-label" [for]="property.name">{{property.label}} {{ property.required ? '*' : ''}}</label>
+  </span>
+</ng-template>
+
+
+<ng-template #milestoneTextContainer>
+  <div class="milestone-text-container">
+    <ng-container [ngTemplateOutlet]="textContainer"></ng-container>
+    <div class="milestone-status" *ngIf="property.milestoneData?.delayInDays > 0">
+      <span>{{ 'late' | translate }} {{ property.milestoneData?.delayInDays }} {{ 'days' | translate }}</span>
+      <div class="icons-container">
+        <i class="app-icon grey-icon late flag-unchecked"
+          [ngStyle]="{ fontSize: '2rem' }"></i>
+      </div>
+    </div>
+  </div>
+</ng-template>

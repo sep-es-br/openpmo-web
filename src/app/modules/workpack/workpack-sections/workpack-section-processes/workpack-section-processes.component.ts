@@ -36,6 +36,8 @@ export class WorkpackSectionProcessesComponent implements OnInit {
   pageSize: number;
   responsive = false;
   showTabview = false;
+  idFilterSelected: number;
+  term = '';
 
   constructor(
     private filterSrv: FilterDataviewService,
@@ -101,10 +103,19 @@ export class WorkpackSectionProcessesComponent implements OnInit {
   }
 
   async handleSelectedFilterProcess(event) {
-    const idFilter = event.filter;
+    this.idFilterSelected = event.filter;
     this.sectionProcess = Object.assign({}, {
       ...this.sectionProcess,
-      cardItemsSection: await this.loadSectionProcessesCards(idFilter)
+      cardItemsSection: await this.loadSectionProcessesCards()
+    });
+    this.totalRecordsProcesses = this.sectionProcess.cardItemsSection && this.sectionProcess.cardItemsSection.length;
+  }
+
+  async handleSearchText(event) {
+    this.term = event.term;
+    this.sectionProcess = Object.assign({}, {
+      ...this.sectionProcess,
+      cardItemsSection: await this.loadSectionProcessesCards()
     });
     this.totalRecordsProcesses = this.sectionProcess.cardItemsSection && this.sectionProcess.cardItemsSection.length;
   }
@@ -112,7 +123,7 @@ export class WorkpackSectionProcessesComponent implements OnInit {
   async loadProcessSection() {
     const resultFilters = await this.filterSrv.getAllFilters(`workpackModels/${this.workpackData.workpack.model.id}/processes`);
     const filters = resultFilters.success && Array.isArray(resultFilters.data) ? resultFilters.data : [];
-    const idFilterSelected = filters.find(defaultFilter => !!defaultFilter.favorite) ?
+    this.idFilterSelected = filters.find(defaultFilter => !!defaultFilter.favorite) ?
       filters.find(defaultFilter => !!defaultFilter.favorite).id : undefined;
 
     this.sectionProcess = {
@@ -134,13 +145,13 @@ export class WorkpackSectionProcessesComponent implements OnInit {
         ...this.sectionProcess.cardSection,
         isLoading: false
       },
-      cardItemsSection: await this.loadSectionProcessesCards(idFilterSelected)
+      cardItemsSection: await this.loadSectionProcessesCards()
     }
     this.totalRecordsProcesses = this.sectionProcess.cardItemsSection && this.sectionProcess.cardItemsSection.length;
   }
 
-  async loadSectionProcessesCards(idFilterSelected: number) {
-    const resultProcess = await this.processSrv.GetAll({ 'id-workpack': this.workpackParams.idWorkpack, idFilter: idFilterSelected });
+  async loadSectionProcessesCards() {
+    const resultProcess = await this.processSrv.GetAll({ 'id-workpack': this.workpackParams.idWorkpack, idFilter: this.idFilterSelected, term: this.term });
     this.processes = resultProcess.success ? resultProcess.data : [];
     if (this.processes && this.processes.length > 0) {
       const cardItems = this.processes.map(proc => ({

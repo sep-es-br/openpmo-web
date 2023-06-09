@@ -1,0 +1,27 @@
+.app-report-list {
+  width: 100%;
+
+  .loading-container {
+    position: relative;
+    min-height: 150px;
+  }
+
+  .header-container {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-end;
+  }
+  .app-content-header {
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-end;
+    flex: 1;
+    padding-bottom: 0;
+  }
+  .header-container.mobile {
+    flex-direction: column;
+  }
+  .mobile {
+    width: 100%;
+  }
+}

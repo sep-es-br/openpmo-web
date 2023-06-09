@@ -7,7 +7,7 @@ import { Calendar } from 'primeng/calendar';
 import { IconPropertyWorkpackModelEnum } from 'src/app/shared/enums/IconPropertyWorkpackModelEnum';
 import { IWorkpackModelProperty } from 'src/app/shared/interfaces/IWorkpackModelProperty';
 import { ResponsiveService } from 'src/app/shared/services/responsive.service';
-import { TypePropertyWorkpackModelEnum } from 'src/app/shared/enums/TypePropertyWorkpackModelEnum';
+import { TypePropertyModelEnum } from 'src/app/shared/enums/TypePropertModelEnum';
 import * as moment from 'moment';
 import { TreeNode } from 'primeng/api';
 
@@ -45,7 +45,7 @@ export class WorkpackModelPropertyComponent implements OnDestroy, AfterViewInit 
   }
 
   ngAfterViewInit(): void {
-    if (this.property?.type === TypePropertyWorkpackModelEnum.DateModel) {
+    if (this.property?.type === TypePropertyModelEnum.DateModel) {
       this.translateSrv.onLangChange.pipe(takeUntil(this.$destroy)).subscribe(() =>
         setTimeout(() => {
           this.calendarComponent?.ngOnInit();
@@ -72,8 +72,8 @@ export class WorkpackModelPropertyComponent implements OnDestroy, AfterViewInit 
   }
 
   checkDefaultValue() {
-    if ([TypePropertyWorkpackModelEnum.LocalitySelectionModel, TypePropertyWorkpackModelEnum.OrganizationSelectionModel]
-      .includes(TypePropertyWorkpackModelEnum[this.property.type])) {
+    if ([TypePropertyModelEnum.LocalitySelectionModel, TypePropertyModelEnum.OrganizationSelectionModel]
+      .includes(TypePropertyModelEnum[this.property.type])) {
       if (this.property?.defaults) {
         const isArray = this.property?.defaults instanceof Array;
         if (this.property.multipleSelection && !isArray) {

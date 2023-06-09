@@ -1,16 +1,17 @@
 <div class="app-workpack-section-risks" *ngIf="sectionRisk">
   <app-card [properties]="sectionRisk?.cardSection" [class.panel-tab-view]="showTabview"
     (editFilter)="handleEditFilterEntity($event, 'risks')" (newFilter)="handleNewFilterEntity('risks')"
-    (selectedFilter)="handleSelectedFilterRisk($event)" (createNewElement)="handleCreateNewRisk()">
+    (searchText)="handleSearchText($event)" (selectedFilter)="handleSelectedFilterRisk($event)"
+    (createNewElement)="handleCreateNewRisk()">
     <div class="input-toggle-risk">
       <p-inputSwitch class="app-toggle" [(ngModel)]="riskSectionShowClosed" (onChange)="handleRiskShowClosedToggle()">
       </p-inputSwitch>
       <label class="input-label">{{"showClosed" | translate}}</label>
     </div>
     <div class="risk-list-container">
-     <div class="loading-container" *ngIf="sectionRisk?.cardSection?.isLoading">
-      <app-card-loading [isCardLoading]="sectionRisk?.cardSection?.isLoading"></app-card-loading>
-     </div>
+      <div class="loading-container" *ngIf="sectionRisk?.cardSection?.isLoading">
+        <app-card-loading [isCardLoading]="sectionRisk?.cardSection?.isLoading"></app-card-loading>
+      </div>
       <p-dataView [value]="sectionRisk.cardItemsSection" layout="grid" class="app-dataview"
         [emptyMessage]="'notFoundRisks' | translate"
         *ngIf="(displayModeAll === 'grid' || (displayModeAll === 'list' && !!responsive)) && !sectionRisk?.cardSection?.isLoading"

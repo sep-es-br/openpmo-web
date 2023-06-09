@@ -94,7 +94,7 @@
     .header-values-cost-account {
       display: flex;
       flex-direction: row;
-      align-items: center;
+      align-items: flex-start;
       justify-content: flex-end;
       width: 50%;
       color: v.$fontTitle;
@@ -106,6 +106,12 @@
         width: 30%;
         margin-right: 10px;
         margin-left: 10px;
+      }
+      &.not-collapseble {
+        padding-right: 0;
+        .progress-bar-cost-container {
+          margin-right: 0;
+        }
       }
     }
     .header-values-cost-account.responsive {
@@ -120,6 +126,58 @@
       align-items: flex-end;
       justify-content: flex-end;
       width: 30%;
+      .dataview-filters-text {
+        margin-right: 2em;
+        width: 11rem;
+        height: 2rem;
+        display: flex;
+        justify-content: flex-end;
+        position: relative;
+
+        .app-input-text.p-inputtext {
+          font-size: 14px !important;
+          width: 0 !important;
+          border-bottom: none !important;
+          transition: width .3s;
+          &.animation-input {
+            width: 100% !important;
+            border-bottom: 1px solid #b6c8cd !important;
+          }
+        }
+        .fa-search {
+          position: absolute;
+          cursor: pointer;
+          transition: all .3s;
+          left: 90%;
+
+          &.no-animation {
+            padding: 0.45rem;
+            background: #44B39B;
+            color: #FFF;
+            top: 0;
+            border-radius: 4px;
+          }
+          &.animation-input {
+            top: .4rem;
+            padding: 0;
+          }
+        }
+        .fa-close {
+          position: absolute;
+          cursor: pointer;
+          transition: all 0.3s;
+          font-size: .6rem;
+          top: 0.7rem;
+          padding: 0;
+          &.no-animation { left: 92%; }
+          &.animation-input {
+            left: 80%;
+            &:hover {
+              font-size: .8rem;
+            }
+          }
+        }
+      }
       .dataview-filters {
         margin-right: 1.5rem;
         display: flex;
@@ -129,6 +187,9 @@
         .options-container {
           width: 90%;
           margin-left: 1em;
+        }
+        label {
+          font-size: 14px;
         }
         .filter-selection {
           .p-dropdown {
@@ -149,7 +210,7 @@
           }
           .p-dropdown .p-inputtext {
             color: v.$fontInput;
-            font-size: 1rem;
+            font-size: 14px;
             font-family: v.$fontFamilyMedium;
             padding-left: 0;
           }
@@ -244,16 +305,30 @@
     }
     .dataview-filters-container {
       width: 100%;
+      flex-direction: column;
+      .dataview-filters-text {
+        width: 5rem;
+        margin-right: 0;
+        .p-inputtext {
+          width: 100% !important;
+        }
+      }
       .new-element-button-container {
         margin-right: 0 !important;
       }
     }
     .dataview-filters {
-      margin-right: 1rem;
+      margin-right: 0 !important;
       margin-top: 1rem;
-      width: 75%;
+      width: 100%;
+      flex-direction: column !important;
+      align-items: flex-start !important;
       label {
         font-size: 13px;
+      }
+      .options-container {
+        margin-left: 0 !important;
+        width: 100% !important;
       }
       .filter-selection {
         width: 100%;

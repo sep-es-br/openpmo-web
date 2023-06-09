@@ -22,6 +22,8 @@ import { AuthService } from 'src/app/shared/services/auth.service';
 import { IOffice } from 'src/app/shared/interfaces/IOffice';
 import { OfficePermissionService } from 'src/app/shared/services/office-permission.service';
 import { ConfigDataViewService } from 'src/app/shared/services/config-dataview.service';
+import { ReportModelService } from 'src/app/shared/services/report-model.service';
+import { IReportModel } from 'src/app/shared/interfaces/IReportModel';
 
 @Component({
   selector: 'app-strategy',
@@ -62,6 +64,9 @@ export class StrategyComponent implements OnDestroy {
   officeListOptionsSharing: IOffice[];
   isLoading = false;
   language: string;
+  reportModelsProperties: ICard;
+  cardItemsReportModels: ICardItem[];
+  reports: IReportModel[];
 
   constructor(
     private formBuilder: FormBuilder,
@@ -76,7 +81,8 @@ export class StrategyComponent implements OnDestroy {
     private officePermissionSrv: OfficePermissionService,
     private authSrv: AuthService,
     private messageSrv: MessageService,
-    private configDataViewSrv: ConfigDataViewService
+    private configDataViewSrv: ConfigDataViewService,
+    private reportModelSrv: ReportModelService
   ) {
     this.translateSrv.onLangChange.pipe(takeUntil(this.$destroy)).subscribe(() => {
       setTimeout(() => this.setLanguage(), 200);
@@ -93,6 +99,10 @@ export class StrategyComponent implements OnDestroy {
       });
       this.sharingProperties = Object.assign({}, {
         ...this.sharingProperties,
+        initialStateCollapse: this.collapsePanelsStatus
+      });
+      this.reportModelsProperties = Object.assign({}, {
+        ...this.reportModelsProperties,
         initialStateCollapse: this.collapsePanelsStatus
       });
     });
@@ -134,10 +144,11 @@ export class StrategyComponent implements OnDestroy {
       }
       this.loadCards();
       if (this.idStrategy) {
+        await this.loadPropertiesStrategy();
         await this.loadModels();
+        this.loadReportModels();
       }
       this.loadOfficeListOptionsSharing();
-      await this.loadPropertiesStrategy();
       this.breadcrumbSrv.setMenu([
         {
           key: 'administration',
@@ -189,6 +200,14 @@ export class StrategyComponent implements OnDestroy {
       collapseble: true,
       initialStateCollapse: false
     };
+    this.reportModelsProperties = {
+      toggleable: false,
+      initialStateToggle: false,
+      cardTitle: 'reportModels',
+      collapseble: true,
+      isLoading: true,
+      initialStateCollapse: false
+    };
   }
 
   async loadPropertiesStrategy() {
@@ -219,7 +238,7 @@ export class StrategyComponent implements OnDestroy {
   async loadOfficeListOptionsSharing() {
     const result = await this.officeSrv.GetAll();
     if (result.success) {
-      this.officeListOptionsSharing = result.data && result.data.filter( office => office.id !== this.idOffice);
+      this.officeListOptionsSharing = result.data && result.data.filter(office => office.id !== this.idOffice);
       this.officeListOptionsSharing.unshift({
         id: null,
         name: 'All',
@@ -313,14 +332,87 @@ export class StrategyComponent implements OnDestroy {
             { name: 'type', value: TypeWorkpackModelEnum[workpackModel.type] },
             { name: 'idStrategy', value: this.idStrategy },
             { name: 'idOffice', value: this.idOffice }
-          ]
+          ],
+          breadcrumbWorkpackModel: this.getCurrentBreadcrumb(workpackModel)
         }
       )));
     }
     this.cardItemsModels = itemsModels;
-    setTimeout( () => {
+    setTimeout(() => {
       this.isLoading = false;
     }, 300);
+  }
+
+  async loadReportModels() {
+    const result = await this.reportModelSrv.GetAll({
+      idPlanModel: this.idStrategy
+    });
+    if (result.success) {
+      this.reports = result.data;
+      const cardItems: ICardItem[] = this.editPermission ? [
+        {
+          typeCardItem: 'newCardItem',
+          iconSvg: true,
+          icon: IconsEnum.Plus,
+          urlCard: '/report-models/report-model',
+          paramsUrlCard: [{ name: 'idStrategy', value: this.idStrategy }, { name: 'idOffice', value: this.idOffice },]
+        }
+      ] : [];
+      if (this.reports) {
+        cardItems.unshift(...this.reports.map(report => (
+          {
+            typeCardItem: 'listItem',
+            icon: 'fas fa-file-invoice',
+            iconColor: report.active ? '#44B39B' : '#888e96',
+            nameCardItem: report.name,
+            itemId: report.id,
+            urlCard: '/report-models/report-model',
+            paramsUrlCard: [
+              { name: 'id', value: report.id },
+              { name: 'idStrategy', value: this.idStrategy },
+              { name: 'idOffice', value: this.idOffice },
+            ],
+            editPermission: this.editPermission
+          }
+        )));
+      }
+      this.cardItemsReportModels = cardItems;
+      this.reportModelsProperties.isLoading = false;
+    }
+  }
+
+  getCurrentBreadcrumb(workpackModel) {
+    const breadcrumb =  [
+      {
+        key: 'administration',
+        info: this.propertiesOffice?.name,
+        tooltip: this.propertiesOffice?.fullName,
+        routerLink: ['/configuration-office'],
+        queryParams: { idOffice: this.idOffice }
+      },
+      {
+        key: 'configuration',
+        info: 'planModels',
+        tooltip: this.translateSrv.instant('planModels'),
+        routerLink: ['/strategies'],
+        queryParams: { idOffice: this.idOffice }
+      },
+      {
+        key: 'planModel',
+        info: this.propertiesStrategy?.name,
+        tooltip: this.propertiesStrategy?.fullName,
+        routerLink: ['/strategies', 'strategy'],
+        queryParams: { id: this.idStrategy, idOffice: this.idOffice }
+      },
+      {
+        key: 'workpackModel',
+        info: workpackModel.modelName,
+        tooltip: workpackModel.modelNamePlural,
+        routerLink: ['/workpack-model'],
+        queryParams: { idStrategy: this.idStrategy, id: workpackModel.id, type: workpackModel.type, idOffice: this.idOffice }
+      }
+    ];
+    return breadcrumb;
   }
 
   async deleteWorkpackModel(worckpackModel: IWorkpackModel) {
@@ -372,6 +464,17 @@ export class StrategyComponent implements OnDestroy {
       } else {
         await this.loadPropertiesStrategy();
       }
+    }
+  }
+
+  async handleDeleteReport(event) {
+    const deletedReport = this.reports.find( report => report.id === event.idReport);
+    const result = await this.reportModelSrv.delete(deletedReport, {
+      field: 'name'
+    });
+    if (result.success) {
+      this.reports = this.reports.filter( report => report.id !== deletedReport.id)
+      this.cardItemsReportModels = this.cardItemsReportModels.filter( report => report.itemId !== deletedReport.id);
     }
   }
 

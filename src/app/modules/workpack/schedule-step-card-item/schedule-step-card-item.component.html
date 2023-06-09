@@ -1,116 +1,128 @@
-  <p-card *ngIf="type === 'listStep' && properties.type === 'listStep'" class="app-step-card-item">
-    <p-header *ngIf="properties.menuItems" class="card-item-header">
-      <div class="header-title">
-        <span class="title-month">
-          {{ language === 'pt-BR' ? (properties.stepName|date:'MMMM':'IST':'pt'|titlecase) : (properties.stepName|date:'MMMM')}}
-        </span>
-        <span class="title-day">
-          {{properties.stepDay ? (properties.stepDay|date:'d') : ''}}
-        </span>
-      </div>
-      <p-menu #menu [popup]="true" [model]="properties.menuItems"></p-menu>
-      <button type="button" pButton icon="pi pi-ellipsis-v" (click)="menu.toggle($event)"></button>
-    </p-header>
-    <div class="card-item-content">
-      <div class="unitValues">
-        <div class="unitInputs p-fluid">
-          <span class="column-title">{{properties.unitName}}</span>
-          <span class="p-float-label p-field">
-            <p-inputNumber class="app-input-number" id="float-unitPlanned"  (onInput)="handleStepChange($event, 'unitPlanned')" [disabled]="!properties.editPermission"
-              [(ngModel)]="properties.unitPlanned" [minFractionDigits]="properties.unitPrecision" [maxFractionDigits]="properties.unitPrecision"
-              [locale]="language === 'pt-BR' ? 'pt-BR' : 'en-US'"
-              >
-            </p-inputNumber>
-            <label class="app-input-label" for="float-unitPlanned">{{ "planned" |translate }}</label>
-          </span>
-          <span class="p-float-label p-field">
-            <p-inputNumber class="app-input-number" id="float-unitPlanned"  (onInput)="handleStepChange($event, 'unitActual')" [disabled]="!properties.editPermission"
-              [(ngModel)]="properties.unitActual" [minFractionDigits]="properties.unitPrecision" [maxFractionDigits]="properties.unitPrecision"
-              [locale]="language === 'pt-BR' ? 'pt-BR' : 'en-US'"
-              >
-            </p-inputNumber>
-            <label class="app-input-label" for="float-unitActual">{{ "actual" |translate }}</label>
-          </span>
-        </div>
-        <div class="progress-bar-unit-container">
-          <app-progress-bar-card-step [total]="properties.unitPlanned" [progress]="properties.unitActual" [baseline]="properties.unitBaseline"
-            [color]="properties.unitProgressBar.color" [barHeight]="13">
-          </app-progress-bar-card-step>
-        </div>
-      </div>
-      <div class="costValues">
-        <div class="costInputs p-fluid">
-          <span class="column-title"> $ </span>
-          <span class="p-float-label p-field">
-            <p-inputNumber class="app-input-number" id="float-costPlanned" [disabled]="!properties.editCosts" (onInput)="handleStepCostChange($event, 'costPlanned')"
-              [(ngModel)]="properties.costPlanned" [minFractionDigits]="2" [maxFractionDigits]="2"
-              [locale]="language === 'pt-BR' ? 'pt-BR' : 'en-US'"
-              >
-            </p-inputNumber>
-            <label class="app-input-label" for="float-costPlanned">{{ "planned" |translate }}</label>
-          </span>
-          <span class="p-float-label p-field">
-            <p-inputNumber class="app-input-number" id="float-costActual" [disabled]="!properties.editCosts" (onInput)="handleStepCostChange($event, 'costActual')"
-              [(ngModel)]="properties.costActual" [minFractionDigits]="2" [maxFractionDigits]="2"
-              [locale]="language === 'pt-BR' ? 'pt-BR' : 'en-US'"
-              >
-            </p-inputNumber>
-            <label class="app-input-label" for="float-costActual">{{ "actual" |translate }}</label>
-          </span>
-        </div>
-        <div class="progress-bar-cost-container">
-          <app-progress-bar-card-step [total]="properties.costProgressBar.total" [progress]="properties.costProgressBar.progress" [baseline]="properties.baselinePlannedCost"
-            [color]="properties.costProgressBar.color" [barHeight]="13">
-          </app-progress-bar-card-step>
-        </div>
-      </div>
-    </div>
-    <div class="card-item-footer" *ngIf="cardIdItem">
-      <span class="card-item-id">
-        {{cardIdItem}}
+<p-card *ngIf="type === 'listStep' && properties.type === 'listStep'" class="app-step-card-item">
+  <p-header *ngIf="properties.menuItems" class="card-item-header">
+    <div class="header-title">
+      <span class="title-month">
+        {{ language === 'pt-BR' ? (properties.stepName|date:'MMMM':'IST':'pt'|titlecase) :
+        (properties.stepName|date:'MMMM')}}
+      </span>
+      <span class="title-day">
+        {{properties.stepDay ? (properties.stepDay|date:'d') : ''}}
       </span>
     </div>
-  </p-card>
-
-  <p-card *ngIf="type === 'listStepResumed' && properties.type === 'listStep'" class="app-step-card-item-resume">
-    <p-header *ngIf="properties.menuItems" class="card-item-header">
-      <div class="header-title">
-        <span class="title-month">
-          {{ language === 'pt-BR' ? (properties.stepName|date:'MMMM':'IST':'pt'|titlecase) : (properties.stepName|date:'MMMM')}}
+    <p-menu #menu [popup]="true" [model]="properties.menuItems"></p-menu>
+    <button type="button" pButton icon="pi pi-ellipsis-v" (click)="menu.toggle($event)"></button>
+  </p-header>
+  <div class="card-item-content">
+    <div class="unitValues">
+      <div class="unitInputs p-fluid">
+        <span class="column-title">{{properties.unitName}}</span>
+        <span class="p-float-label p-field">
+          <p-inputNumber [class]="'app-input-number '+'unitPlanned '+'unitPlanned-'+ properties.idStep" id="float-unitPlanned" (onInput)="handleStepChange($event, 'unitPlanned')"
+            [disabled]="!properties.editPermission" [(ngModel)]="properties.unitPlanned"
+            [minFractionDigits]="properties.unitPrecision" [maxFractionDigits]="properties.unitPrecision"
+            [locale]="language === 'pt-BR' ? 'pt-BR' : 'en-US'">
+          </p-inputNumber>
+          <label class="app-input-label" for="float-unitPlanned">{{ "planned" |translate }}</label>
         </span>
-        <span class="title-day">
-          {{properties.stepDay ? (properties.stepDay|date:'d') : ''}}
+        <div class="replicate-button-container">
+          <i class="fas fa-caret-up" [class.disabled]="!properties.editPermission || !showReplicateButton" [class.replicate-hide]="!showReplicateButton"
+            (click)="properties.editPermission && showReplicateButton && confirmReplicateValueDif('unitActual')"></i>
+        </div>
+        <span class="p-float-label p-field">
+          <p-inputNumber class="app-input-number" id="float-unitActual" (onInput)="handleStepChange($event, 'unitActual')"
+            [disabled]="!properties.editPermission" [(ngModel)]="properties.unitActual"
+            [minFractionDigits]="properties.unitPrecision" [maxFractionDigits]="properties.unitPrecision"
+            [locale]="language === 'pt-BR' ? 'pt-BR' : 'en-US'">
+          </p-inputNumber>
+          <label class="app-input-label" for="float-unitActual">{{ "actual" |translate }}</label>
         </span>
       </div>
-    </p-header>
-    <div class="card-item-content">
-      <div class="progress-values-container">
-        <div class="progress-bar-unit-container">
-          <app-progress-bar-card-step [total]="properties.unitPlanned" [progress]="properties.unitActual"
-            [color]="properties.unitProgressBar.color" [barHeight]="7">
-          </app-progress-bar-card-step>
-        </div>
-        <span class="progress-bar-unit">{{properties.unitName}}</span>
-      </div>
-      <div class="progress-values-container">
-        <div class="progress-bar-cost-container">
-          <app-progress-bar-card-step [total]="properties.costProgressBar.total" [progress]="properties.costProgressBar.progress"
-            [color]="properties.costProgressBar.color" [barHeight]="7">
-          </app-progress-bar-card-step>
-        </div>
-        <span class="progress-bar-unit"> $ </span>
+      <div class="progress-bar-unit-container">
+        <app-progress-bar-card-step [total]="properties.unitPlanned" [progress]="properties.unitActual"
+          [baseline]="properties.unitBaseline" [color]="properties.unitProgressBar.color" [barHeight]="13">
+        </app-progress-bar-card-step>
       </div>
     </div>
-  </p-card>
-
-  <p-card *ngIf="properties.type === 'newStart'" class="app-new-step-card-item">
-    <div class="card-item-content">
-      <i [ngClass]="[ 'app-icon', iconEnum.Plus, 'light-grey-icon' ]" [ngStyle]="{ fontSize: '2rem' }"></i>
+    <div class="costValues">
+      <div class="costInputs p-fluid" [class.card-link]="properties.editPermission && !properties.editCosts" (click)="properties.multipleCosts && handleEditCosts($event)">
+        <span class="column-title"> $ </span>
+        <span class="p-float-label p-field">
+          <p-inputNumber [class]="'app-input-number '+'costPlanned-'+properties.idStep" id="float-costPlanned"
+            [disabled]="!properties.editCosts || !properties.editPermission" (onInput)="handleStepCostChange($event, 'costPlanned')"
+            [(ngModel)]="properties.costPlanned" [minFractionDigits]="2" [maxFractionDigits]="2"
+            [locale]="language === 'pt-BR' ? 'pt-BR' : 'en-US'">
+          </p-inputNumber>
+          <label class="app-input-label" for="float-costPlanned">{{ "planned" |translate }}</label>
+        </span>
+        <div class="replicate-button-container">
+          <i class="fas fa-caret-up" [class.disabled]="!properties.editCosts || !properties.editPermission || !showReplicateButton"
+            [class.replicate-hide]="!showReplicateButton"
+            (click)="(properties.editCosts && properties.editPermission && showReplicateButton) && confirmReplicateValueDif('costActual')"></i>
+        </div>
+        <span class="p-float-label p-field">
+          <p-inputNumber class="app-input-number" id="float-costActual"
+            [disabled]="!properties.editCosts || !properties.editPermission" (onInput)="handleStepCostChange($event, 'costActual')"
+            [(ngModel)]="properties.costActual" [minFractionDigits]="2" [maxFractionDigits]="2"
+            [locale]="language === 'pt-BR' ? 'pt-BR' : 'en-US'">
+          </p-inputNumber>
+          <label class="app-input-label" for="float-costActual">{{ "actual" |translate }}</label>
+        </span>
+      </div>
+      <div class="progress-bar-cost-container">
+        <app-progress-bar-card-step [total]="properties.costProgressBar.total"
+          [progress]="properties.costProgressBar.progress" [baseline]="properties.baselinePlannedCost"
+          [color]="properties.costProgressBar.color" [barHeight]="13">
+        </app-progress-bar-card-step>
+      </div>
     </div>
-  </p-card>
+  </div>
+  <div class="card-item-footer" *ngIf="cardIdItem">
+    <span class="card-item-id">
+      {{cardIdItem}}
+    </span>
+  </div>
+</p-card>
 
-  <p-card *ngIf="properties.type === 'newEnd'" class="app-new-step-card-item">
-    <div class="card-item-content">
-      <i [ngClass]="[ 'app-icon', iconEnum.Plus, 'light-grey-icon' ]" [ngStyle]="{ fontSize: '2rem' }"></i>
+<p-card *ngIf="type === 'listStepResumed' && properties.type === 'listStep'" class="app-step-card-item-resume">
+  <p-header *ngIf="properties.menuItems" class="card-item-header">
+    <div class="header-title">
+      <span class="title-month">
+        {{ language === 'pt-BR' ? (properties.stepName|date:'MMMM':'IST':'pt'|titlecase) :
+        (properties.stepName|date:'MMMM')}}
+      </span>
+      <span class="title-day">
+        {{properties.stepDay ? (properties.stepDay|date:'d') : ''}}
+      </span>
     </div>
-  </p-card>
+  </p-header>
+  <div class="card-item-content">
+    <div class="progress-values-container">
+      <div class="progress-bar-unit-container">
+        <app-progress-bar-card-step [total]="properties.unitPlanned" [progress]="properties.unitActual"
+          [color]="properties.unitProgressBar.color" [barHeight]="7">
+        </app-progress-bar-card-step>
+      </div>
+      <span class="progress-bar-unit">{{properties.unitName}}</span>
+    </div>
+    <div class="progress-values-container">
+      <div class="progress-bar-cost-container">
+        <app-progress-bar-card-step [total]="properties.costProgressBar.total"
+          [progress]="properties.costProgressBar.progress" [color]="properties.costProgressBar.color" [barHeight]="7">
+        </app-progress-bar-card-step>
+      </div>
+      <span class="progress-bar-unit"> $ </span>
+    </div>
+  </div>
+</p-card>
+
+<p-card *ngIf="properties.type === 'newStart'" class="app-new-step-card-item">
+  <div class="card-item-content">
+    <i [ngClass]="[ 'app-icon', iconEnum.Plus, 'light-grey-icon' ]" [ngStyle]="{ fontSize: '2rem' }"></i>
+  </div>
+</p-card>
+
+<p-card *ngIf="properties.type === 'newEnd'" class="app-new-step-card-item">
+  <div class="card-item-content">
+    <i [ngClass]="[ 'app-icon', iconEnum.Plus, 'light-grey-icon' ]" [ngStyle]="{ fontSize: '2rem' }"></i>
+  </div>
+</p-card>

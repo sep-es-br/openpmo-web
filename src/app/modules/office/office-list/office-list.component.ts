@@ -55,6 +55,7 @@ export class OfficeListComponent implements OnInit {
   responsive = false;
   $destroy = new Subject();
   isLoading = false;
+  term = '';
 
   constructor(
     private officeSvr: OfficeService,
@@ -130,7 +131,8 @@ export class OfficeListComponent implements OnInit {
   async loadPropertiesOffice() {
     this.isLoading = true;
     const { success, data } = await this.officeSvr.GetAll({
-      idFilter: this.idFilterSelected
+      idFilter: this.idFilterSelected,
+      term: this.term
     });
     this.isUserAdmin = await this.authSrv.isUserAdmin();
     const itemsProperties: ICardItemOffice[] = this.isUserAdmin ? [
@@ -224,6 +226,11 @@ export class OfficeListComponent implements OnInit {
   async handleSelectedFilter(event) {
     const idFilter = event.filter;
     this.idFilterSelected = idFilter;
+    await this.loadPropertiesOffice();
+  }
+
+  async handleSearchText(event) {
+    this.term = event.term;
     await this.loadPropertiesOffice();
   }
 

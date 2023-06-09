@@ -142,4 +142,9 @@ export const FilterDataviewPropertiesEntity = {
     { label: 'note', apiValue: 'note', type: TypePropertyModelEnum.TextModel },
     { label: 'priority', apiValue: 'priority', type: TypePropertyModelEnum.ToggleModel },
   ],
+  baselines: [
+    { label: 'name', apiValue: 'name', type: TypePropertyModelEnum.TextModel },
+    { label: 'description', apiValue: 'description', type: TypePropertyModelEnum.TextModel },
+    { label: 'message', apiValue: 'message', type: TypePropertyModelEnum.TextModel },
+  ],
 };

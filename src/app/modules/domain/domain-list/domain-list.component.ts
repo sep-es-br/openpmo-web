@@ -48,6 +48,7 @@ export class DomainListComponent implements OnInit, OnDestroy {
   totalRecords: number;
   idFilterSelected: number;
   isLoading = false;
+  term = '';
 
   constructor(
     private domainSvr: DomainService,
@@ -119,7 +120,10 @@ export class DomainListComponent implements OnInit, OnDestroy {
 
   async loadPropertiesDomains() {
     this.isLoading = true;
-    const { success, data } = await this.domainSvr.GetAll({ 'id-office': this.idOffice, idFilter: this.idFilterSelected });
+    const { success, data } = await this.domainSvr.GetAll({ 'id-office': this.idOffice,
+      idFilter: this.idFilterSelected,
+      term: this.term
+    });
     const itemsProperties: ICardItem[] = this.editPermission ? [
       {
         typeCardItem: 'newCardItem',
@@ -190,6 +194,11 @@ export class DomainListComponent implements OnInit, OnDestroy {
   async handleSelectedFilter(event) {
     const idFilter = event.filter;
     this.idFilterSelected = idFilter;
+    await this.loadPropertiesDomains();
+  }
+
+  async handleSearchText(event) {
+    this.term = event.term;
     await this.loadPropertiesDomains();
   }
 

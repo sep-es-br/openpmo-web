@@ -47,6 +47,7 @@ export class OfficePermissionsListComponent implements OnInit {
   idFilterSelected: number;
   $destroy = new Subject();
   isLoading = false;
+  term = '';
 
   constructor(
     private actRouter: ActivatedRoute,
@@ -113,7 +114,10 @@ export class OfficePermissionsListComponent implements OnInit {
   }
 
   async loadOfficePermissions() {
-    const result = await this.officePermissionsSrv.GetAll({ 'id-office': this.idOffice, idFilter: this.idFilterSelected });
+    const result = await this.officePermissionsSrv.GetAll({ 'id-office': this.idOffice,
+      idFilter: this.idFilterSelected,
+      term: this.term
+    });
     if (result.success) {
       this.officePermissions = result.data;
       this.loadCardItemsOfficePermissions();
@@ -215,6 +219,11 @@ export class OfficePermissionsListComponent implements OnInit {
   async handleSelectedFilter(event) {
     const idFilter = event.filter;
     this.idFilterSelected = idFilter;
+    await this.loadOfficePermissions();
+  }
+
+  async handleSearchText(event) {
+    this.term = event;
     await this.loadOfficePermissions();
   }
 

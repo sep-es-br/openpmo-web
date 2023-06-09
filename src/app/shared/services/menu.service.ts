@@ -27,8 +27,8 @@ interface IMenuState {
 export class MenuService extends BaseService<any> {
 
   adminsPath = [ 'strategies', 'organizations', 'domains',
-    'measure-units', 'offices/permission', 'workpack-model', 'configuration-office', 'persons' ];
-  plansPath = [ 'plan', 'workpack', 'stakeholder' ];
+    'measure-units', 'offices/permission', 'workpack-model', 'configuration-office', 'persons', 'reports/report-model' ];
+  plansPath = [ 'plan', 'workpack', 'stakeholder', 'reports' ];
   idNewWorkpack: number;
 
   private $reloadMenuOffice = new Subject();

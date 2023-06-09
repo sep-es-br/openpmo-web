@@ -1,0 +1,36 @@
+<p-panel class="app-property-group" [toggleable]="true" expandIcon="" collapseIcon="" [collapsed]="collapsed" [class.responsive]="responsive">
+  <ng-template pTemplate="icons">
+    <p-button (onClick)="collapsed = !collapsed" [icon]="collapsed ? 'pi pi-angle-down' : 'pi pi-angle-up'" [label]="groupProperty.name">
+    </p-button>
+  </ng-template>
+  <div class="property-group-container" *ngFor="let groupedProp of groupProperty.groupedProperties">
+    <ng-container [ngSwitch]="groupedProp.type">
+      <app-property-text *ngSwitchCase="types.TextModel" [property]="groupedProp" (changed)="changed.emit($event)">
+      </app-property-text>
+      <app-property-date *ngSwitchCase="types.DateModel" [property]="groupedProp" (changed)="changed.emit($event)">
+      </app-property-date>
+      <app-property-integer *ngSwitchCase="types.IntegerModel" [property]="groupedProp"
+        (changed)="changed.emit($event)">
+      </app-property-integer>
+      <app-property-integer *ngSwitchCase="types.NumberModel" [property]="groupedProp" (changed)="changed.emit($event)">
+      </app-property-integer>
+      <app-property-integer *ngSwitchCase="types.CurrencyModel" [property]="groupedProp"
+        (changed)="changed.emit($event)">
+      </app-property-integer>
+      <app-property-selection *ngSwitchCase="types.SelectionModel" [property]="groupedProp"
+        (changed)="changed.emit($event)">
+      </app-property-selection>
+      <app-property-textarea *ngSwitchCase="types.TextAreaModel" [property]="groupedProp"
+        (changed)="changed.emit($event)">
+      </app-property-textarea>
+      <app-property-toggle *ngSwitchCase="types.ToggleModel" [property]="groupedProp" (changed)="changed.emit($event)">
+      </app-property-toggle>
+      <app-property-tree-selection *ngSwitchCase="types.LocalitySelectionModel" [property]="groupedProp"
+        (changed)="changed.emit($event)"></app-property-tree-selection>
+      <app-property-organization-selection *ngSwitchCase="types.OrganizationSelectionModel" [property]="groupedProp"
+        (changed)="changed.emit($event)"></app-property-organization-selection>
+      <app-property-unit-selection *ngSwitchCase="types.UnitSelectionModel" [property]="groupedProp"
+        (changed)="changed.emit($event)"></app-property-unit-selection>
+    </ng-container>
+  </div>
+</p-panel>

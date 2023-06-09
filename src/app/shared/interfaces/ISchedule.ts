@@ -46,6 +46,7 @@ export interface IStep {
   scheduleEnd?: Date;
   plannedWork: number;
   baselinePlannedWork?: number;
+  baselinePlannedCost?: number;
   actualWork: number;
   periodFromStart?: Date;
   consumes?: IConsume[];
@@ -58,6 +59,7 @@ export interface IConsume {
   baselinePlannedCost?: number;
   costAccount: {
     id: number;
+    name?: string;
   };
 }
 
@@ -70,11 +72,15 @@ export interface IStepPost {
   actualWork: number;
   endStep?: boolean;
   periodFromStart?: Date;
+  showReplicateButton?: boolean;
   consumes: {
     actualCost: number;
     plannedCost: number;
     idCostAccount: number;
+    nameCostAccount?: string;
     id: number;
   }[];
+
+  group?: number; // only screen
 }
 

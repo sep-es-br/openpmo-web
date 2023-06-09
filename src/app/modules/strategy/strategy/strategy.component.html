@@ -40,25 +40,25 @@
           <app-card-loading [isCardLoading]="isLoading"></app-card-loading>
         </div>
         <p-dataView [value]="cardItemsModels" class="app-dataview" layout="grid" styleClass="dataview-card-items"
-            *ngIf="(displayModeAll === 'grid' || (displayModeAll === 'list' && !!responsive)) && !isLoading" [paginator]="true"
-            [rows]="pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false" [totalRecords]="totalRecords"
-            [emptyMessage]="'loadingEllipsis' | translate">
-            <ng-template let-cardItem pTemplate="gridItem">
-              <div class="p-col-12 p-md-3 p-sm-12 card-item-container">
-                <app-card-item [properties]="cardItem"></app-card-item>
-              </div>
-            </ng-template>
-          </p-dataView>
-          <p-dataView [value]="cardItemsModels" class="app-dataview app-dataview-list" layout="list"
-            styleClass="dataview-card-items" *ngIf="(displayModeAll === 'list' && !responsive) && !isLoading" [paginator]="true"
-            [rows]="pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false" [totalRecords]="totalRecords"
-            [emptyMessage]="'loadingEllipsis' | translate">
-            <ng-template let-cardItem pTemplate="listItem">
-              <div class="p-col-12">
-                <app-card-item [properties]="cardItem" [displayModeCard]="displayModeAll"></app-card-item>
-              </div>
-            </ng-template>
-          </p-dataView>
+          *ngIf="(displayModeAll === 'grid' || (displayModeAll === 'list' && !!responsive)) && !isLoading"
+          [paginator]="true" [rows]="pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false"
+          [totalRecords]="totalRecords" [emptyMessage]="'loadingEllipsis' | translate">
+          <ng-template let-cardItem pTemplate="gridItem">
+            <div class="p-col-12 p-md-3 p-sm-12 card-item-container">
+              <app-card-item [properties]="cardItem"></app-card-item>
+            </div>
+          </ng-template>
+        </p-dataView>
+        <p-dataView [value]="cardItemsModels" class="app-dataview app-dataview-list" layout="list"
+          styleClass="dataview-card-items" *ngIf="(displayModeAll === 'list' && !responsive) && !isLoading"
+          [paginator]="true" [rows]="pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false"
+          [totalRecords]="totalRecords" [emptyMessage]="'loadingEllipsis' | translate">
+          <ng-template let-cardItem pTemplate="listItem">
+            <div class="p-col-12">
+              <app-card-item [properties]="cardItem" [displayModeCard]="displayModeAll"></app-card-item>
+            </div>
+          </ng-template>
+        </p-dataView>
       </app-card>
     </div>
   </section>
@@ -72,6 +72,38 @@
             (onChange)="checkSelectAllOffices($event)"></p-multiSelect>
           <label class="app-input-label" for="float-label">{{'offices'|translate}}</label>
         </span>
+      </app-card>
+    </div>
+  </section>
+  <section *ngIf="idStrategy" class="models-cards-section">
+    <div class="card-models">
+      <app-card [properties]="reportModelsProperties">
+        <div class="loading-container" *ngIf="reportModelsProperties.isLoading">
+          <app-card-loading [isCardLoading]="reportModelsProperties.isLoading"></app-card-loading>
+        </div>
+        <p-dataView [value]="cardItemsReportModels" class="app-dataview" layout="grid" styleClass="dataview-card-items"
+          *ngIf="(displayModeAll === 'grid' || (displayModeAll === 'list' && !!responsive)) && !reportModelsProperties.isLoading"
+          [paginator]="true" [rows]="pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false"
+          [totalRecords]="totalRecords" [emptyMessage]="'loadingEllipsis' | translate">
+          <ng-template let-cardItem pTemplate="gridItem">
+            <div class="p-col-12 p-md-3 p-sm-12 card-item-container">
+              <app-card-item-report-model [properties]="cardItem"
+                (deleteReport)="handleDeleteReport($event)"></app-card-item-report-model>
+            </div>
+          </ng-template>
+        </p-dataView>
+        <p-dataView [value]="cardItemsReportModels" class="app-dataview app-dataview-list" layout="list"
+          styleClass="dataview-card-items"
+          *ngIf="(displayModeAll === 'list' && !responsive) && !reportModelsProperties.isLoading" [paginator]="true"
+          [rows]="pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false" [totalRecords]="totalRecords"
+          [emptyMessage]="'loadingEllipsis' | translate">
+          <ng-template let-cardItem pTemplate="listItem">
+            <div class="p-col-12">
+              <app-card-item-report-model [properties]="cardItem" (deleteReport)="handleDeleteReport($event)"
+                [displayModeCard]="displayModeAll"></app-card-item-report-model>
+            </div>
+          </ng-template>
+        </p-dataView>
       </app-card>
     </div>
   </section>

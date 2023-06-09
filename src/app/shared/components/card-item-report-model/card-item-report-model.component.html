@@ -1,0 +1,53 @@
+<ng-container [ngSwitch]="properties.typeCardItem">
+  <p-card *ngSwitchCase="'listItem'" class="app-card-item-report listItem" [class.mobile]="responsive"
+    [class.cardList]="displayModeCard === 'list'">
+    <div class="display-mode-grid" *ngIf="displayModeCard !== 'list'">
+      <p-header class="card-item-header">
+        <i class="fas fa-trash" *ngIf="editPermission" (click)="handleDeleteReport(properties.itemId)"></i>
+      </p-header>
+      <div class="card-item-content" [class.card-link]="properties.urlCard" [routerLink]="properties.urlCard"
+        [class.cardList]="displayModeCard === 'list'" [queryParams]="getQueryParams()">
+        <i [ngClass]="[ 'icon-card', properties.icon, 'grey-icon' ]"
+          [ngStyle]="{ fontSize: '2.5rem', color: properties.iconColor }"></i>
+        <span class="card-item-name">{{properties.nameCardItem}}</span>
+        <span class="card-item-fullName" *ngIf="properties.fullNameCardItem" [pTooltip]="properties.fullNameCardItem" >{{properties.fullNameCardItem}}</span>
+      </div>
+      <div class="card-item-footer" *ngIf="cardIdItem">
+        <span class="card-item-id">
+          {{cardIdItem}}
+        </span>
+      </div>
+    </div>
+    <div class="display-mode-list" *ngIf="displayModeCard === 'list'">
+      <div class="card-item-content" [class.card-link]="properties.urlCard" [routerLink]="properties.urlCard"
+        [class.cardList]="displayModeCard === 'list'" [queryParams]="getQueryParams()">
+        <i [ngClass]="properties.iconSvg ? [ 'app-icon', properties.icon, 'grey-icon'] : [ 'icon-card', properties.icon, 'grey-icon' ]"
+          [ngStyle]="{ fontSize: displayModeCard === 'list' ? '1.5rem' : '2.5rem' }"></i>
+        <span class="card-item-name">{{properties.nameCardItem}}</span>
+        <span class="card-item-fullName" *ngIf="properties.fullNameCardItem" [pTooltip]="properties.fullNameCardItem">{{properties.fullNameCardItem}}</span>
+      </div>
+      <div class="right-side">
+        <p-header class="card-item-header">
+          <i class="fas fa-trash" *ngIf="editPermission" (click)="handleDeleteReport(properties.itemId)"></i>
+        </p-header>
+        <div class="card-item-footer" *ngIf="cardIdItem">
+          <span class="card-item-id">
+            {{cardIdItem}}
+          </span>
+        </div>
+      </div>
+    </div>
+  </p-card>
+
+  <p-card *ngSwitchCase="'newCardItem'" class="new-carditem-report" [class.card-link]="properties.urlCard"
+    [class.mobile]="responsive" [class.cardList]="displayModeCard === 'list'" [class.new-card-item-mobile]="responsive"
+    (click)="properties.urlCard && navigateToPage(properties.urlCard, properties.paramsUrlCard)">
+    <div class="carditem-content">
+      <i [ngClass]="[ 'app-icon', properties.icon, 'light-grey-icon']"
+        (click)=" properties.iconMenuItems && menuIcon.toggle($event)"
+        [ngStyle]="{ fontSize: displayModeCard === 'list' ? '2.5rem' : (responsive ? 2 : 3) + 'rem' }"
+        [class.card-link]="properties.iconMenuItems"></i>
+      <p-menu #menuIcon [popup]="true" [model]="properties.iconMenuItems"></p-menu>
+    </div>
+  </p-card>
+</ng-container>

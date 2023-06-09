@@ -14,8 +14,9 @@ export class BreakdownStructureService extends BaseService<IWorkpackBreakdownStr
     super('eap', injector);
   }
 
-  async getByWorkpackId(idWorkpack: number): Promise<IHttpResult<IWorkpackBreakdownStructure>> {
-    return await this.http.get<IHttpResult<IWorkpackBreakdownStructure>>(`${this.urlBase}/${idWorkpack}`).toPromise();
+  async getByWorkpackId(idWorkpack: number, allLevels: boolean): Promise<IHttpResult<IWorkpackBreakdownStructure>> {
+    return await this.http.get<IHttpResult<IWorkpackBreakdownStructure>>
+      (`${this.urlBase}/${idWorkpack}?allLevels=${allLevels}`).toPromise();
   }
 
 }

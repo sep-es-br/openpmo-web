@@ -60,11 +60,11 @@
               <div class="cost-assignments-totals" [class.responsive]="responsive">
                 <div class="planned-total">
                   <span class="label"> $ {{ "planned" |translate }}</span>
-                  <span class="value">{{costAssignmentsTotals.plannedTotal|number:'0.2-2':'pt'}}</span>
+                  <span class="value">{{costAssignmentsTotals.plannedTotal|number:'0.2-2': currentLang}}</span>
                 </div>
                 <div class="actual-total">
                   <span class="label"> $ {{ "actual" |translate }}</span>
-                  <span class="value">{{costAssignmentsTotals.actualTotal|number:'0.2-2':'pt'}}</span>
+                  <span class="value">{{costAssignmentsTotals.actualTotal|number:'0.2-2': currentLang}}</span>
                 </div>
               </div>
             </div>

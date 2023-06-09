@@ -48,6 +48,7 @@ export class PlanPermissionsListComponent implements OnInit, OnDestroy {
   idFilterSelected: number;
   $destroy = new Subject();
   isLoading = false;
+  term = '';
 
   constructor(
     private actRouter: ActivatedRoute,
@@ -103,7 +104,10 @@ export class PlanPermissionsListComponent implements OnInit, OnDestroy {
   }
 
   async loadPlanPermissions() {
-    const result = await this.planPermissionSrv.GetAll({ 'id-plan': this.idPlan, idFilter: this.idFilterSelected });
+    const result = await this.planPermissionSrv.GetAll({ 'id-plan': this.idPlan,
+      idFilter: this.idFilterSelected,
+      term: this.term
+    });
     if (result.success) {
       this.planPermissions = result.data;
       this.loadCardItemsPlanPermissions();
@@ -220,6 +224,11 @@ export class PlanPermissionsListComponent implements OnInit, OnDestroy {
   async handleSelectedFilter(event) {
     const idFilter = event.filter;
     this.idFilterSelected = idFilter;
+    await this.loadPlanPermissions();
+  }
+  
+  async handleSearchText(event) {
+    this.term = event.term;
     await this.loadPlanPermissions();
   }
 

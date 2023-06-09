@@ -54,6 +54,9 @@
       }
     }
   }
+  .card-link {
+    cursor: pointer;
+  }
   .p-card-body {
     width: 100%;
     padding: 0;
@@ -83,7 +86,7 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
     column-gap: 0.5em;
-    align-items: center;
+    align-items: flex-start;
     color: #888e96;
     .unitValues,
     .costValues {
@@ -96,6 +99,29 @@
       .progress-bar-cost-container {
         flex: 1;
         margin-top: 0.2em;
+      }
+      .replicate-button-container {
+        width: 100%;
+        text-align: center;
+        > i {
+          font-size: 1.3rem;
+          cursor: pointer;
+          color: #888e96;
+        }
+        i.disabled {
+          cursor: auto;
+          color: #b6c8cd;
+        }
+        i.replicate-hide {
+          color: transparent;
+        }
+      }
+      .changed {
+        .p-inputnumber-input {
+          font-weight: bold;
+          text-shadow: #b6c8cd  0.2em 0.1em 0.2em;
+          transition: font-weight, text-shadow 1s;
+        }
       }
     }
     .unitValues .unitInputs {

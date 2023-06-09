@@ -13,7 +13,6 @@ import { SelectItem, TreeNode } from 'primeng/api';
 import { TranslateService } from '@ngx-translate/core';
 import { ICardItemFilterRules } from './../../shared/interfaces/ICardItemFilterRules';
 import { FilterDataviewService } from './../../shared/services/filter-dataview.service';
-import { PropertyTemplateModel } from './../../shared/models/PropertyTemplateModel';
 import { IFilterDataview } from './../../shared/interfaces/IFilterDataview';
 import { ActivatedRoute } from '@angular/router';
 import { SaveButtonComponent } from './../../shared/components/save-button/save-button.component';
@@ -72,7 +71,7 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
     private unitMeasureSrv: MeasureUnitService,
   ) {
     localStorage.removeItem('@currentPlan');
-    localStorage.removeItem('@pmo/propertiesCurrentPlan');
+    // localStorage.removeItem('@pmo/propertiesCurrentPlan');
     this.loadFormFilter();
     this.formFilter.statusChanges
       .pipe(takeUntil(this.$destroy), filter(status => status === 'INVALID'))

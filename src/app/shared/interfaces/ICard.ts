@@ -33,11 +33,14 @@ export interface ICard {
   workpackType?: string;
   workpackCanceled?: boolean;
   isLoading?: boolean;
+  idFilterSelected?: number;
+  searchTerm?: string;
 }
 
 export interface progressBarValue {
   total: number;
   progress?: number;
+  limit?: number;
   labelTotal: string;
   labelProgress?: string;
   valueUnit: string;

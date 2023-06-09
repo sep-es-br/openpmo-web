@@ -28,7 +28,8 @@ export class AdministratorListComponent implements OnInit, OnDestroy {
     initialStateToggle: false,
     cardTitle: 'administrators',
     collapseble: true,
-    initialStateCollapse: false
+    initialStateCollapse: false,
+  
   };
   displayModeAll = 'grid';
   pageSize = 5;

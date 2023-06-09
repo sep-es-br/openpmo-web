@@ -33,11 +33,11 @@
     </div>
     <div class="header-title-check-completed" [class.responsive]="responsive" *ngIf="!!properties.showCheckCompleted">
       <label>{{label|translate}}</label>
-      <p-checkbox [(ngModel)]="properties.workpackCompleted" [binary]="true" 
+      <p-checkbox [(ngModel)]="properties.workpackCompleted" [binary]="true"
         [disabled]="properties.workpackCanceled || !canEditCheckCompleted"
         (ngModelChange)="handleChangeCheckCompleted($event)"></p-checkbox>
     </div>
-    <div class="header-values-cost-account" *ngIf="properties.progressBarValues" [class.responsive]="responsive">
+    <div class="header-values-cost-account" *ngIf="properties.progressBarValues" [class.not-collapseble]="!properties.collapseble" [class.responsive]="responsive">
       <div class="progress-bar-cost-container" *ngFor="let progressBar of properties.progressBarValues">
         <app-progress-bar [total]="progressBar.total" [class.progress-bar-mobile]="responsive"
           [progress]="progressBar.progress" [labelTotal]="progressBar.labelTotal"
@@ -50,6 +50,29 @@
       </div>
     </div>
     <div class="dataview-filters-container" *ngIf="properties.showFilters || properties.showCreateNemElementButton">
+      <div class="dataview-filters-text" *ngIf="!properties.initialStateCollapse && properties.showFilters">
+        <input pInputText id="id-app-inputtext" class="app-input-text"
+               [class.animation-input]="showAnimationSearch"
+               [(ngModel)]="properties.searchTerm"
+               [placeholder]="translateSrv.instant('search')"
+        />
+<!--        <i class="fas fa-close"-->
+<!--           [class.animation-input]="showAnimationSearch"-->
+<!--           [class.no-animation]="!showAnimationSearch"-->
+<!--           *ngIf="properties?.searchTerm?.length > 0"-->
+<!--           (click)="handleClearSearchText()"></i>-->
+        <i class="fas fa-search"
+           *ngIf="!showAnimationSearch"
+           [class.animation-input]="showAnimationSearch"
+           [class.no-animation]="!showAnimationSearch"
+           (click)="showAnimationSearch = true"></i>
+
+        <i class="fas fa-search"
+           *ngIf="showAnimationSearch"
+           [class.animation-input]="showAnimationSearch"
+           [class.no-animation]="!showAnimationSearch"
+           (click)="handleSearchText()"></i>
+      </div>
       <div class="dataview-filters" *ngIf="!properties.initialStateCollapse && properties.showFilters">
         <label>{{'show'|translate}}</label>
         <div class="options-container">

@@ -1,0 +1,87 @@
+<div class="app-progress" *ngIf="total && total !== 0">
+  <div class="unit-container">
+    <span [ngStyle]="{color: color}">$</span>
+  </div>
+  <div class="progress-header-values-container" [ngStyle]="{width: barHeight === 17 ? '85%' : '100%'}"
+    [class.responsive]="responsive">
+    <div class="progress-bar-header">
+      <div class="labels">
+        <ng-container>
+          <span class="header-label" *ngIf="labelProgress" [ngStyle]="{color: color}">{{labelProgress |
+            translate}}</span>
+          <span class="header-label" *ngIf="labelTotal" [ngStyle]="{color: '#004660'}">{{labelTotal | translate}}</span>
+        </ng-container>
+      </div>
+      <div class="values">
+        <ng-container>
+          <span class="value" [ngStyle]="{color: color}" *ngIf="valueUnit"
+            [pTooltip]="'$ ' + language === 'pt' ? (progress |number:'0.2-2':'pt') : (progress |number:'0.2-2':'en')">
+            {{ (progress|shortNumber:language)}}
+          </span>
+          <span class="value" [ngStyle]="{color: '#004660'}" *ngIf="valueUnit"
+            [pTooltip]="('$ ') + language === 'pt' ?  (total |number:'0.2-2':'pt') : (total |number:'0.2-2':'en')">
+            {{ total|shortNumber:language}}
+          </span>
+        </ng-container>
+      </div>
+      <div class="total"></div>
+    </div>
+    <div class="progress-bar-total-container" *ngIf="total >= progress && (!limit || total > limit)"
+      [ngStyle]="{width: '100%', background: barHeight === 7 ? 'rgba(0, 70, 96, 0.19)' : '#ffffff'}">
+      <div class="progress-bar"
+        [ngStyle]="{width: (progress/total)*100 + '%', background: color, height: barHeight + 'px'}">
+      </div>
+      <div class="dif-limit-bar"
+        [ngStyle]="{width: (difLimit/total)*100 + '%', background: '#EA5C5C', height: barHeight + 'px'}">
+      </div>
+    </div>
+
+
+    <div class="progress-dif-container" [ngStyle]="{width:  '100%'}"
+      *ngIf="progress > total && (!!limit && (total > limit && progress > limit))">
+      <div class="progress-bar-total-container"
+        [ngStyle]="{width:  (total/progress)*100 + '%', background: color, height: barHeight + 'px'}">
+        
+        <div class="progress-bar" [ngStyle]="{width: (limit/total)*100 + '%', background: 'transparent'}">
+        </div>
+        <div class="dif-limit-bar"
+          [ngStyle]="{width: ((total-limit)/total)*100 + '%', background: '#EA5C5C', height: '100%'}">
+        </div>
+
+      </div>
+      <div class="dif-limit-bar"
+        [ngStyle]="{width: ((progress - total) / progress) * 100 + '%', background: '#EA5C5C', height: barHeight + 'px'}">
+      </div>
+    </div>
+
+    <div class="progress-dif-container" [ngStyle]="{width:  '100%'}"
+      *ngIf="progress > total && (!limit || (total < limit && progress > limit))">
+      <div class="progress-bar-progress-container"
+        [ngStyle]="{width:  (limit/progress)*100 + '%', background: color, height: barHeight + 'px'}">
+        <div class="total-bar" [ngStyle]="{width: (total/limit)*100 + '%', background: 'transparent'}">
+        </div>
+      </div>
+      <div class="dif-limit-bar"
+        [ngStyle]="{width: (difLimit/progress)*100 + '%', background: '#EA5C5C', height: barHeight + 'px'}">
+      </div>
+    </div>
+
+
+    <div class="progress-bar-total-container" *ngIf="total >= progress && (!!limit && limit > total)"
+      [ngStyle]="{width: (total/limit)*100 + '%', background: barHeight === 7 ? 'rgba(0, 70, 96, 0.19)' : '#ffffff'}">
+      <div class="progress-bar"
+        [ngStyle]="{width: (progress/limit)*100 + '%', background: color, height: barHeight + 'px'}">
+      </div>
+    </div>
+    <div class="progress-bar-progress-container" *ngIf="progress > total && (!!limit && limit > progress)"
+      [ngStyle]="{width: (progress/limit)*100 + '%', background: color, height: barHeight + 'px'}">
+      <div class="total-bar" [ngStyle]="{width: (total/limit)*100 + '%', background: 'transparent'}">
+      </div>
+    </div>
+    <div class="limit-indicator-container" *ngIf="limit && limit > 0">
+      <i class="fas fa-caret-up"
+        [pTooltip]="('$ ') + language === 'pt' ?  (limit |number:'0.2-2':'pt') : (limit |number:'0.2-2':'en')"
+        [ngStyle]="{'margin-right': 'calc(' + indicatorLimit + '% - 6px)'}"></i>
+    </div>
+  </div>
+</div>

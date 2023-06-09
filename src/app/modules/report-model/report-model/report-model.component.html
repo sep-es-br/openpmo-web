@@ -1,0 +1,107 @@
+<div class="app-report-model" [class.mobile]="responsive">
+  <div class="header-container" [class.mobile]="responsive">
+    <div class="app-content-header" [class.mobile]="responsive">
+      <span *ngIf="idReport">{{ report?.name }}</span>
+      <span *ngIf="!idReport">{{ 'new' | translate }} {{ 'report' | translate }}</span>
+    </div>
+    <app-config-data-view-panel [notShowpageSizeOptions]="true" >
+    </app-config-data-view-panel>
+  </div>
+  <div class="card-properties" *ngIf="cardProperties">
+    <app-card [properties]="cardProperties">
+      <div class="loading-container" *ngIf="cardProperties.isLoading">
+        <app-card-loading [isCardLoading]="cardProperties.isLoading"></app-card-loading>
+      </div>
+      <div *ngIf="!cardProperties.isLoading">
+        <form [formGroup]="formReport">
+          <div class="form-inputs-container">
+            <div class="formfield width-20" [class.mobile]="responsive" [class.desktop]="!responsive">
+              <span class="p-float-label">
+                <input formControlName="name" type="text" pInputText class="app-input-text">
+                <label for="float-input" class="app-input-label">{{'name' | translate}}<span
+                    class="required-indicator">*</span></label>
+              </span>
+              <app-input-message [form]="formReport" field="name"></app-input-message>
+            </div>
+            <div class="formField width-10" [class.mobile]="responsive" [class.desktop]="!responsive">
+              <span class="p-float-label">
+                <p-dropdown class="app-single-selection" [options]="preferredFormatOptions"
+                  formControlName="preferredOutputFormat" dropdownIcon="fas fa-caret-down" [autoDisplayFirst]="false">
+                </p-dropdown>
+                <label class="app-input-label">{{'preferredFormat'|translate}}</label>
+              </span>
+              <app-input-message [form]="formReport" field="preferredOutputFormat"></app-input-message>
+            </div>
+          </div>
+          <span class="p-float-label margin-top">
+            <textarea pInputTextarea formControlName="fullName" class="app-text-area" rows="1"
+              [ngModel]="(formReport.touched) ? formReport.value.fullName : formReport.value.name">
+              </textarea>
+            <label for="float-input" class="app-input-label">{{'fullName' | translate}}<span
+                class="required-indicator">*</span></label>
+          </span>
+          <app-input-message [form]="formReport" field="fullName"></app-input-message>
+        </form>
+      </div>
+    </app-card>
+  </div>
+  <div class="card-parameters">
+    <app-card [properties]="cardParameters" *ngIf="cardParameters" class="mt-0 inputs-float-label">
+      <div class="loading-container" *ngIf="cardParameters.isLoading">
+        <app-card-loading [isCardLoading]="cardParameters.isLoading"></app-card-loading>
+      </div>
+      <div class="report-model-addicional-properties add-actions" *ngIf="editPermission">
+        <p-menu #menuAddProperty [popup]="true" [model]="menuModelProperties"></p-menu>
+        <p-button [label]="'addParameter' | translate" icon="fa fa-plus" iconPos="right" class="button-add-property"
+          (click)="menuAddProperty.toggle($event)">
+        </p-button>
+      </div>
+      <div class="report-model-addicional-properties" *ngIf="!cardParameters.isLoading">
+        <div *ngFor="let property of modelProperties" [class.addicional-properties-container]="property.isCollapsed"
+          [class.open]="!property.isCollapsed">
+          <app-property-model class="addicional-properties" [property]="property" [class.open]="!property.isCollapsed"
+            (delete)="deleteProperty($event)" (changed)="propertyChanged($event);">
+          </app-property-model>
+        </div>
+      </div>
+    </app-card>
+  </div>
+  <div class="card-files">
+    <app-card [properties]="cardFiles">
+      <div class="loading-container" *ngIf="cardFiles.isLoading">
+        <app-card-loading [isCardLoading]="cardFiles.isLoading"></app-card-loading>
+      </div>
+      <p-dataView [value]="cardItemsFiles" class="app-dataview" layout="grid" styleClass="dataview-card-items"
+        *ngIf="(displayModeAll === 'grid' || (displayModeAll === 'list' && !!responsive)) && !cardFiles.isLoading"
+        [emptyMessage]="'loadingEllipsis' | translate">
+        <ng-template let-cardItem pTemplate="gridItem">
+          <div class="p-col-12 p-md-3 p-sm-12 card-item-container">
+            <app-card-item-source-file [properties]="cardItem"
+              (uploadFile)="handleUploadSourceFiles($event)"></app-card-item-source-file>
+          </div>
+        </ng-template>
+      </p-dataView>
+      <p-dataView [value]="cardItemsFiles" class="app-dataview app-dataview-list" layout="list"
+        styleClass="dataview-card-items" *ngIf="(displayModeAll === 'list' && !responsive) && !cardFiles.isLoading"
+        [emptyMessage]="'loadingEllipsis' | translate">
+        <ng-template let-cardItem pTemplate="listItem">
+          <div class="p-col-12">
+            <app-card-item-source-file [properties]="cardItem" (uploadFile)="handleUploadSourceFiles($event)"
+              [displayModeCard]="displayModeAll"></app-card-item-source-file>
+          </div>
+        </ng-template>
+      </p-dataView>
+      <div class="compile-section-container" *ngIf="showButtonCompile()">
+        <p-button [label]="'compile' | translate" icon="fa fa-cog" iconPos="right" class="button-add"
+          (click)="handleCompileModel()">
+        </p-button>
+        <div class="input-toggle">
+          <p-inputSwitch class="app-toggle" [(ngModel)]="report.active"
+            [disabled]="!hasCompiledFiles" (ngModelChange)="changedActiveStatus($event)"></p-inputSwitch>
+          <label class="input-label">{{'active'|translate}}</label>
+        </div>
+      </div>
+    </app-card>
+  </div>
+  <app-save-button (save)="handleOnSubmit()"></app-save-button>
+</div>
