@@ -96,26 +96,26 @@
       *ngIf="totalDate >= progressDate && totalDate >= baselineDate && this.valueUnit === 'time'"
       [ngStyle]="{width: totalDate + '%', background: barHeight === 7 ? 'rgba(0, 70, 96, 0.19)' : '#ffffff', 'margin-right': marginRightTotal + '%', 'margin-left': marginLeftTotal + '%'}">
       <div class="progress-bar"
-        [ngStyle]="{width: progressDate + '%', background: color, height: barHeight + 'px'}">
+        [ngStyle]="{width: percProgress + '%', background: color, height: barHeight + 'px'}">
       </div>
     </div>
     <div class="progress-bar-total-container"
       *ngIf="totalDate >= progressDate && totalDate < baselineDate  && this.valueUnit === 'time'"
       [ngStyle]="{width: totalDate + '%', background: barHeight === 7 ? 'rgba(0, 70, 96, 0.19)' : '#ffffff', 'margin-right': marginRightTotal + '%', 'margin-left': marginLeftTotal + '%'}">
       <div class="progress-bar"
-        [ngStyle]="{width: progressDate + '%', background: color, height: barHeight + 'px'}">
+        [ngStyle]="{width: percProgress + '%', background: color, height: barHeight + 'px'}">
       </div>
     </div>
     <div class="progress-bar-progress-container"
       *ngIf="progressDate > totalDate && progressDate > baselineDate  && this.valueUnit === 'time'"
       [ngStyle]="{width: progressDate + '%', background: color, height: barHeight + 'px', 'margin-right': marginRightTotal + '%', 'margin-left': marginLeftTotal + '%'}">
-      <div class="total-bar" [ngStyle]="{width: totalDate + '%', background: 'transparent'}">
+      <div class="total-bar" [ngStyle]="{width: percTotal + '%', background: 'transparent'}">
       </div>
     </div>
     <div class="progress-bar-progress-container"
       *ngIf="progressDate > totalDate && progressDate < baselineDate  && this.valueUnit === 'time'"
       [ngStyle]="{width: progressDate + '%', background: color, height: barHeight + 'px', 'margin-right': marginRightTotal + '%', 'margin-left': marginLeftTotal + '%'}">
-      <div class="total-bar" [ngStyle]="{width: totalDate + '%', background: 'transparent'}">
+      <div class="total-bar" [ngStyle]="{width: percTotal + '%', background: 'transparent'}">
       </div>
     </div>
     <div class="baseline-bar-progress-container"

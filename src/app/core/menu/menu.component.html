@@ -51,7 +51,7 @@
           translate}}</div>
       </div>
       <div class="item" [ngStyle]="{width: '20%'}" (click)="toggleMenu('reportModel')"
-        [pTooltip]="'reportModels' | translate" *ngIf="!!currentIDOffice && !!currentIDPlan && isPlanMenu && hasReports">
+        [pTooltip]="'reports' | translate" *ngIf="!!currentIDOffice && !!currentIDPlan && isPlanMenu && hasReports">
         <i class="far fa-file-alt" [ngStyle]="{ fontSize: '1.7rem' }"></i>
         <div class="item-label" [routerLink]="['/reports']" [queryParams]="{idPlan: currentPlan?.id}">{{'reportModels' |
           translate}}</div>
@@ -82,7 +82,7 @@
         translate}}</div>
     </div>
     <div class="item" *ngIf="!!currentIDOffice && !!currentIDPlan && isPlanMenu && hasReports" [routerLink]="['/reports']"
-      [queryParams]="{idPlan: currentPlan?.id}" [pTooltip]="'reportModels' | translate">
+      [queryParams]="{idPlan: currentPlan?.id}" [pTooltip]="'reports' | translate">
       <i class="far fa-file-alt" [ngStyle]="{ fontSize: '1.7rem' }"></i>
     </div>
   </ng-template>

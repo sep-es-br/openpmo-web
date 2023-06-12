@@ -379,8 +379,8 @@ export class ReportViewComponent implements OnInit {
           key: 'action',
           routerLink: ['/reports'],
           queryParams: { idPlan: propertiesPlan.id },
-          info: 'reporting',
-          tooltip: 'reporting'
+          info: 'reports',
+          tooltip: 'reports'
         },
         {
           key: 'generateReport',

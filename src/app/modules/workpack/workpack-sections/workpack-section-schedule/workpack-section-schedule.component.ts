@@ -199,7 +199,7 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
       const finalDatePlanned = moment(endDate);
       const daysToPlanned = finalDatePlanned.diff(initialDatePlanned, 'days');
       const dateActual = moment(new Date());
-      const daysToNow = dateActual.diff(initialDatePlanned, 'days');
+      const daysToNow = finalDatePlanned.isSameOrBefore(dateActual) ? finalDatePlanned.diff(initialDatePlanned, 'days') : dateActual.diff(initialDatePlanned, 'days');
       const baselineStartDate = this.schedule && new Date(this.schedule.baselineStart + 'T00:00:00');
       const baselineEndDate = this.schedule && new Date(this.schedule.baselineEnd + 'T00:00:00');
       const baselineDaysPlanned = moment(baselineEndDate).diff(moment(baselineStartDate), 'days');

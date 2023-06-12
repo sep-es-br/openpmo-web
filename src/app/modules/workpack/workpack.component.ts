@@ -104,6 +104,7 @@ export class WorkpackComponent implements OnDestroy {
   tabViewStorage = 'open-pmo:WORKPACK_TABVIEW';
   favoriteProcessing = false;
 
+
   constructor(
     private actRouter: ActivatedRoute,
     private workpackModelSrv: WorkpackModelService,

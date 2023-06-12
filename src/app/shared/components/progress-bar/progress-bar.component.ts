@@ -43,6 +43,8 @@ export class ProgressBarComponent implements OnInit, OnDestroy {
   progressDate;
   baselineDate;
   daysOfPeriod;
+  percProgress;
+  percTotal;
 
   constructor(
     private translateSrv: TranslateService,
@@ -63,6 +65,8 @@ export class ProgressBarComponent implements OnInit, OnDestroy {
       this.baselineTotal = 0;
       this.totalDate = this.total >= this.progress ? 100 : (this.total / this.progress) * 100;
       this.progressDate = this.total >= this.progress ? (this.progress / this.total) * 100 : 100;
+      this.percTotal = this.total >= this.progress ? 100 : (this.total / this.progress) * 100;
+      this.percProgress =this.total >= this.progress ? (this.progress / this.total) * 100 : 100;
       this.baselineDate = 0;
     } else {
       if (this.valueUnit === 'time') {
@@ -70,7 +74,9 @@ export class ProgressBarComponent implements OnInit, OnDestroy {
         const endGeneral = moment(this.endDateTotal).isBefore(moment(this.endDateBaseline)) ? moment(this.endDateBaseline) : moment(this.endDateTotal);
         this.daysOfPeriod = moment(endGeneral).diff(startGeneral, 'days');
         this.totalDate = (this.total / this.daysOfPeriod) * 100;
-        this.progressDate = (this.progress / this.daysOfPeriod) * 100;
+        this.progressDate = (this.progress / this.daysOfPeriod) * 100 ;
+        this.percTotal = this.total >= this.progress ? (this.total / this.daysOfPeriod) * 100 : (this.total / this.progress) * 100;
+        this.percProgress = this.progress > this.total ? (this.progress / this.daysOfPeriod) * 100 : (this.progress / this.total) * 100;
         this.baselineDate = (this.baselineTotal / this.daysOfPeriod) * 100;
         if (moment(this.startDateTotal).isBefore(moment(this.startDateBaseline))) {
           const diffStartDates = moment(this.startDateBaseline).diff(moment(this.startDateTotal), 'days');

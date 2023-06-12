@@ -38,7 +38,7 @@
         translate}}</div>
     </div>
     <div class="item" *ngIf="!!currentIDOffice && !!currentIDPlan && isPlanMenu && hasReports" [routerLink]="['/reports']"
-      [queryParams]="{idPlan: currentPlan?.id}" [pTooltip]="'reportModels' | translate">
+      [queryParams]="{idPlan: currentPlan?.id}" [pTooltip]="'reports' | translate">
       <i class="far fa-file-alt" [ngStyle]="{ fontSize: '1.7rem' }"></i>
     </div>
   </ng-template>
