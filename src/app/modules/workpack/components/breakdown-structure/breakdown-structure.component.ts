@@ -35,6 +35,7 @@ export class BreakdownStructureComponent implements OnChanges, OnDestroy {
   isLoading = false;
   expanded = false;
   idPlan: number;
+  expandedFirst = false;
 
   constructor(
     private breakdownStructureSrv: BreakdownStructureService,
@@ -62,7 +63,12 @@ export class BreakdownStructureComponent implements OnChanges, OnDestroy {
       .subscribe(async panelStatus => {
         this.wbsTree = [];
           if (changes.idWorkpack && changes.idWorkpack.currentValue) {
-            this.expanded = panelStatus === 'expand';
+            if (!this.expandedFirst) {
+              this.expandedFirst = true;
+              this.expanded = false;
+            } else {
+              this.expanded = panelStatus === 'expand';
+            }
             await this.loadBreakdownStructure(this.idWorkpack, false);
           }
           if (this.wbs) {
@@ -111,9 +117,9 @@ export class BreakdownStructureComponent implements OnChanges, OnDestroy {
       ...data,
       label: data.workpackName,
       properties: this.buildProperties(data),
-      expanded,
+      expanded: true,
       leaf: !data.hasChildren,
-      children: this.mapTreeNodesChildren(data.workpackModels, false)
+      children: this.mapTreeNodesChildren(data.workpackModels, false, 1)
     }];
     if (isLazyLoading) {
       return tree;
@@ -123,9 +129,9 @@ export class BreakdownStructureComponent implements OnChanges, OnDestroy {
   }
 
   mapTreeNodesChildren(data: IWorkpackBreakdownStructure[] | IWorkpackBreakdownStructureWorkpackModel[],
-                       isWorkpack: boolean): TreeNode[] {
+                       isWorkpack: boolean, level: number): TreeNode[] {
     const tree = [];
-    const expanded = this.expanded;
+    const expanded = level <= 2;
     data.forEach(item => {
       const workpackOrWorkpackModels = isWorkpack ? item.workpackModels : item.workpacks;
       const node: any = {
@@ -134,7 +140,7 @@ export class BreakdownStructureComponent implements OnChanges, OnDestroy {
         leaf: isWorkpack ? !item.hasChildren : false,
         label: isWorkpack ? item.workpackName : item.workpackModelName,
         properties: this.buildProperties(item),
-        children: this.mapTreeNodesChildren(workpackOrWorkpackModels, !isWorkpack)
+        children: this.mapTreeNodesChildren(workpackOrWorkpackModels, !isWorkpack, level + 1)
       };
       tree.push(node);
     });
