@@ -131,7 +131,7 @@ export class BreakdownStructureComponent implements OnChanges, OnDestroy {
   mapTreeNodesChildren(data: IWorkpackBreakdownStructure[] | IWorkpackBreakdownStructureWorkpackModel[],
                        isWorkpack: boolean, level: number): TreeNode[] {
     const tree = [];
-    const expanded = level <= 2;
+    const expanded = level <= 1;
     data.forEach(item => {
       const workpackOrWorkpackModels = isWorkpack ? item.workpackModels : item.workpacks;
       const node: any = {
