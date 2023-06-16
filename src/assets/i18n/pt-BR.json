@@ -16,6 +16,8 @@
   "parameters": "Parâmetros",
   "preferredFormat": "Formato preferencial",
   "reportModels": "Modelos de relatórios",
+  "reports": "Relatórios",
+  "generateReport":"Gerar Relatório",
   "notFoundBaselineOnStatus": "Não foram encontradas baselines nesta situação",
   "WAITING_MY_EVALUATION": "Aguardando minha avaliação",
   "WAITING_OTHERS_EVALUATIONS": "Aguardando demais avaliações",
@@ -366,6 +368,7 @@
   "difference": "Diferença",
   "confirmSpreadDifference": "Confirmar distribuição da diferença",
   "messages": {
+    "validateGenerateReport": "Os parâmetros obrigatórios devem ser preenchidos e o escopo selecionado.",
     "confirmRedistributeSchedule": "Deseja distribuir a diferença ",
     "overTheRemainingMonths": " nos meses restantes?",
     "deleteScheduleConfirmation": "Tem certeza que deseja excluir o cronograma?",
@@ -437,6 +440,15 @@
       "thereAreNotCostAccounts": "Não existem centros de custo"
     },
     "error": {
+      "report-design": {
+        "generate": {
+          "scope": {
+            "parameter": {
+              "invalid": "Parâmetro escopo contém itens inválidos."
+            }
+          }
+        }
+      },
       "step": {
         "planned-work": {
           "cannot": {

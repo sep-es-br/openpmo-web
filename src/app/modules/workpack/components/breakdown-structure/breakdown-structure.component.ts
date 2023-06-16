@@ -36,6 +36,7 @@ export class BreakdownStructureComponent implements OnChanges, OnDestroy {
   expanded = false;
   idPlan: number;
   expandedFirst = false;
+  topPosLoading = 128;
 
   constructor(
     private breakdownStructureSrv: BreakdownStructureService,
@@ -99,11 +100,19 @@ export class BreakdownStructureComponent implements OnChanges, OnDestroy {
   }
 
   async nodeExpand(event) {
+    this.getTopPosLoading();
     const idWorkpack = event.node?.idWorkpack;
     if (idWorkpack && event.node?.children?.length === 0) {
       const children = await this.loadBreakdownStructure(idWorkpack, true);
       event.node.children = children && children.length > 0 ? children[0].children : [];
       this.isLoading = false;
+    }
+  }
+
+  getTopPosLoading() {
+    const appWbs = document.querySelector('.app-wbs');
+    if (appWbs && appWbs.clientHeight > 300) {
+      this.topPosLoading = appWbs?.clientHeight / 2;
     }
   }
 

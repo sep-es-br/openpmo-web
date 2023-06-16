@@ -11,7 +11,7 @@ import { PropertyTemplateModel } from 'src/app/shared/models/PropertyTemplateMod
 import { IWorkpackModelProperty } from 'src/app/shared/interfaces/IWorkpackModelProperty';
 import { IWorkpackProperty } from 'src/app/shared/interfaces/IWorkpackProperty';
 import { TypePropertyModelEnum } from 'src/app/shared/enums/TypePropertyModelEnum';
-import { SelectItem, TreeNode } from 'primeng/api';
+import { MessageService, SelectItem, TreeNode } from 'primeng/api';
 import { ILocalityList } from 'src/app/shared/interfaces/ILocality';
 import { OrganizationService } from 'src/app/shared/services/organization.service';
 import { DomainService } from 'src/app/shared/services/domain.service';
@@ -49,6 +49,7 @@ export class ReportViewComponent implements OnInit {
   reportFormat: string;
   formatOptions: SelectItem[];
   isGenerating = false;
+  generateReportEnabled = false;
 
   constructor(
     private responsiveSvr: ResponsiveService,
@@ -60,7 +61,8 @@ export class ReportViewComponent implements OnInit {
     private translateSrv: TranslateService,
     private organizationSrv: OrganizationService,
     private unitMeasureSrv: MeasureUnitService,
-    private reportSrv: ReportService
+    private reportSrv: ReportService,
+    private messageSrv: MessageService
   ) {
     this.setPreferredFormatOptions();
     const plan = localStorage.getItem('@currentPlan');
@@ -125,7 +127,7 @@ export class ReportViewComponent implements OnInit {
           data: scopeData.idPlan,
           children: this.loadTreeNodeScope(scopeData.children),
           parent: undefined,
-          selectable: true,
+          selectable: scopeData.hasPermission,
           type: 'plan',
           expanded: true
         }
@@ -138,7 +140,7 @@ export class ReportViewComponent implements OnInit {
     if (!children) {
       return [];
     }
-    return children.map(workpack => {
+    return children.map((workpack) => {
       if (workpack.children) {
         const node = {
           label: workpack.name,
@@ -148,7 +150,7 @@ export class ReportViewComponent implements OnInit {
           parent,
           selectable: workpack.hasPermission,
           type: 'workpack',
-          expanded: true
+          expanded: false
         };
         node.children = this.loadTreeNodeScope(workpack.children, node);
         return node;
@@ -405,10 +407,19 @@ export class ReportViewComponent implements OnInit {
   }
 
   async handleGenerateReport() {
+    if (!this.generateReportEnabled) {
+      this.messageSrv.add({
+        detail: this.translateSrv.instant('messages.validateGenerateReport'),
+        severity: 'warn',
+        summary: this.translateSrv.instant('atention')
+      });
+      return;
+    }
     this.isGenerating = true;
     const reportParams = this.reportProperties.map(p => p.getValues());
     const sender: IReportGenerate = {
       idReportModel: this.idReportModel,
+      idPlan: this.idPlan,
       params: reportParams,
       scope: this.selectedWorkpacks.map(node => node.data),
       format: this.reportFormat
@@ -430,6 +441,102 @@ export class ReportViewComponent implements OnInit {
       a.remove();
       this.isGenerating = false;
     }
+  }
+
+  checkProperties(property?: PropertyTemplateModel) {
+    if (!this.reportProperties || this.reportProperties.length === 0) {
+      this.generateReportEnabled = this.selectedWorkpacks && this.selectedWorkpacks.length > 0;
+      return;
+    }
+    let arePropertiesRequiredValid: boolean = this.checkPropertiesRequiredValid(property);
+    let arePropertiesStringValid: boolean = this.checkPropertiesStringValid(property);
+    const arePropertiesNumberValid: boolean = this.checkPropertiesNumberValid(property);
+    this.generateReportEnabled = arePropertiesRequiredValid && arePropertiesStringValid && arePropertiesNumberValid
+      && this.selectedWorkpacks && this.selectedWorkpacks.length > 0;
+  }
+
+  checkPropertiesRequiredValid(property?: PropertyTemplateModel) {
+    const properties = this.reportProperties;
+    const validated = properties
+      .filter(propReq => !!propReq.required)
+      .map((prop) => {
+        let valid = (prop.value instanceof Array
+          ? (prop.value.length > 0)
+          : typeof prop.value == 'boolean' || typeof prop.value == 'number'
+          || !!prop.value || (prop.value !== null && prop.value !== undefined && prop.value !== ''));
+        if (['OrganizationSelection', 'UnitSelection', 'LocalitySelection'].includes(prop.type)) {
+          if (prop.type === 'LocalitySelection') {
+            if (!prop.multipleSelection) {
+              const selectedLocality = prop.localitiesSelected as TreeNode;
+              prop.selectedValues = [selectedLocality.data];
+            }
+            if (prop.multipleSelection) {
+              const selectedLocality = prop.localitiesSelected as TreeNode[];
+              prop.selectedValues = selectedLocality.filter(locality => locality.data !== prop.idDomain)
+                .map(l => l.data);
+            }
+          }
+          valid = (typeof prop.selectedValue === 'number' || (prop.selectedValues instanceof Array ?
+            prop.selectedValues.length > 0 : typeof prop.selectedValues == 'number'));
+        }
+        if (property && property.idPropertyModel === prop.idPropertyModel) {
+          prop.invalid = !valid;
+          prop.message = valid ? '' : this.translateSrv.instant('required');
+        }
+        return valid;
+      })
+      .reduce((a, b) => a ? b : a, true);
+    return validated;
+  }
+
+  checkPropertiesStringValid(property?: PropertyTemplateModel) {
+    const properties = this.reportProperties;
+    return properties
+      .filter(p => ((p.min || p.max) && (typeof p.value == 'string' && p.type !== 'Num')))
+      .map((prop) => {
+        let valid = true;
+        valid = prop.min ? String(prop.value).length >= Number(prop.min) : true;
+        if (property && property.idPropertyModel === prop.idPropertyModel) {
+          prop.invalid = !valid;
+          prop.message = !valid ? prop.message = this.translateSrv.instant('minLenght') : '';
+        }
+        if (valid) {
+          valid = prop.max ? (!prop.required ? String(prop.value).length <= Number(prop.max)
+            : String(prop.value).length <= Number(prop.max) && String(prop.value).length > 0) : true;
+          if (property && property.idPropertyModel === prop.idPropertyModel) {
+            prop.invalid = !valid;
+            prop.message = !valid ? (String(prop.value).length > 0 ? prop.message = this.translateSrv.instant('maxLenght')
+              : prop.message = this.translateSrv.instant('required')) : '';
+          }
+        }
+        return valid;
+      })
+      .reduce((a, b) => a ? b : a, true);
+  }
+
+  checkPropertiesNumberValid(property?: PropertyTemplateModel) {
+    const properties = this.reportProperties;
+    return properties
+      .filter(p => ((p.min || p.max) && (p.type === 'Num')))
+      .map((prop) => {
+        let valid = true;
+        valid = prop.min ? Number(prop.value) >= Number(prop.min) : true;
+        if (property && property.idPropertyModel === prop.idPropertyModel) {
+          prop.invalid = !valid;
+          prop.message = !valid ? prop.message = this.translateSrv.instant('minValue') : '';
+        }
+        if (valid) {
+          valid = prop.max ? (!prop.required ? Number(prop.value) <= Number(prop.max)
+            : Number(prop.value) <= Number(prop.max) && Number(prop.value) > 0) : true;
+          if (property && property.idPropertyModel === prop.idPropertyModel) {
+            prop.invalid = !valid;
+            prop.message = !valid ? (Number(prop.value) > 0 ? prop.message = this.translateSrv.instant('maxValue')
+              : prop.message = this.translateSrv.instant('required')) : '';
+          }
+        }
+        return valid;
+      })
+      .reduce((a, b) => a ? b : a, true);
   }
 
 }

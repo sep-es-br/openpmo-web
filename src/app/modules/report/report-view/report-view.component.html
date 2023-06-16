@@ -15,7 +15,7 @@
       <div class="property-container" *ngFor="let property of reportProperties"
         [class.not-fullLine]="!property.fullLine && property.type !== 'TextArea' && property.type !== 'Group'"
         [class.fullLine]="property.fullLine || property.type === 'TextArea' || property.type === 'Group'">
-        <app-property [property]="property"></app-property>
+        <app-property [property]="property" (changed)="checkProperties(property)" ></app-property>
         <span class="input-message-error" *ngIf="property.invalid && property.type !== 'Group'">
           {{ property.message }}
         </span>
@@ -24,7 +24,7 @@
     <div class="scope-container" *ngIf="!reportViewProperties.isLoading">
       <label class="scope-label">{{'scopeLabel' |translate}}</label>
       <div class="app-tree-selection">
-        <p-tree [value]="reportScope" selectionMode="checkbox" [(selection)]="selectedWorkpacks">
+        <p-tree [value]="reportScope" selectionMode="checkbox" [(selection)]="selectedWorkpacks" (onNodeSelect)="checkProperties()" (onNodeUnselect)="checkProperties()">
         </p-tree>
       </div>
     </div>

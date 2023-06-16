@@ -9,6 +9,7 @@
   "active": "Active",
   "compile": "Compile",
   "reportModel": "Report Model",
+  "reports": "Reports",
   "download": "Download",
   "setAsMain": "Set as main",
   "jrxmlSourceFiles": "JRXML source files",
@@ -16,6 +17,7 @@
   "parameters": "Parameters",
   "preferredFormat": "Preferred format",
   "reportModels": "Report Models",
+  "generateReport":"Generate Report",
   "notFoundBaselineOnStatus": "Not found baselines on this status",
   "WAITING_MY_EVALUATION": "Waiting my evaluation",
   "WAITING_OTHERS_EVALUATIONS": "Waiting others evaluation",
@@ -367,6 +369,7 @@
   "difference": "Difference",
   "confirmSpreadDifference": "Confirm spread difference",
   "messages": {
+    "validateGenerateReport": "Required parameters must be filled in and the scope selected.",
     "confirmRedistributeSchedule": "Do you want to spread the difference of ",
     "overTheRemainingMonths": " over the remaining months?",
     "deleteScheduleConfirmation": "Are you sure you want to delete this schedule?",
@@ -438,6 +441,15 @@
       "thereAreNotCostAccounts": "There are not cost accounts"
     },
     "error": {
+      "report-design": {
+        "generate": {
+          "scope": {
+            "parameter": {
+              "invalid": "Scope parameter has invalid items."
+            }
+          }
+        }
+      },
       "date": {
         "is": {
           "in": {

@@ -1,4 +1,7 @@
 <div class="app-wbs" >
+  <div class="card-loading" [ngStyle]="{'top': topPosLoading + 'px'}">
+    <app-card-loading [isCardLoading]="isLoading"></app-card-loading>
+  </div>
   <p-tree [value]="wbsTree" (onNodeExpand)="nodeExpand($event)" [loading]="isLoading" [emptyMessage]="null">
     <ng-template let-node styleClass="teste" pTemplate="default">
       <!-- DATA -->
@@ -201,7 +204,6 @@
       </div>
     </div>
   </ng-template>
-
 </div>
 
 

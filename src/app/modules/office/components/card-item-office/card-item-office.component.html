@@ -10,8 +10,7 @@
       <div class="card-item-content" [class.card-link]="properties.urlCard" [routerLink]="properties.urlCard"
         [class.cardList]="displayModeCard === 'list'" [queryParams]="getQueryParams()">
         <i [ngClass]="properties.iconSvg ? [ 'app-icon', properties.icon, 'grey-icon'] : [ 'icon-card', properties.icon, 'grey-icon' ]"
-          [class.risk-red]="properties.iconColor === 'high'" [class.risk-orange]="properties.iconColor === 'medium'"
-          [class.risk-yellow]="properties.iconColor === 'low'" [ngStyle]="{ fontSize: '2.5rem' }"></i>
+           [ngStyle]="{ fontSize: '2.5rem' }"></i>
         <span class="card-item-name" [pTooltip]="properties.fullNameCardItem"
           tooltipPosition="bottom">{{properties.nameCardItem}}</span>
       </div>
@@ -25,8 +24,7 @@
       <div class="card-item-content" [class.card-link]="properties.urlCard" [routerLink]="properties.urlCard"
         [class.cardList]="displayModeCard === 'list'" [queryParams]="getQueryParams()">
         <i [ngClass]="properties.iconSvg ? [ 'app-icon', properties.icon, 'grey-icon'] : [ 'icon-card', properties.icon, 'grey-icon' ]"
-          [class.risk-red]="properties.iconColor === 'high'" [class.risk-orange]="properties.iconColor === 'medium'"
-          [class.risk-yellow]="properties.iconColor === 'low'" [ngStyle]="{ fontSize: '2.5rem' }"></i>
+          [ngStyle]="{ fontSize: '2rem' }"></i>
         <span class="card-item-name" [pTooltip]="properties.fullNameCardItem"
           tooltipPosition="bottom">{{properties.nameCardItem}}</span>
       </div>
