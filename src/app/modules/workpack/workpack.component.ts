@@ -146,8 +146,9 @@ export class WorkpackComponent implements OnDestroy {
         idWorkpackParent: idWorkpackParent && +idWorkpackParent,
         idWorkpackModelLinked: idWorkpackModelLinked && +idWorkpackModelLinked
       });
-      localStorage.setItem('@currentPlan', this.idPlan.toString());
-
+      if (this.idPlan) {
+        localStorage.setItem('@currentPlan', this.idPlan.toString());
+      }
       this.selectedTab = null;
       await this.resetWorkpack();
     });

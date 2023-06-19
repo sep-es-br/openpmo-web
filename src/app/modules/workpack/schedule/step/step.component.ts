@@ -521,6 +521,7 @@ export class StepComponent implements OnInit, OnDestroy {
           {
             queryParams: {
               id: this.schedule.idWorkpack,
+              idPlan: this.idPlan,
               idWorkpackModelLinked: this.idWorkpackModelLinked
             }
           }
@@ -534,6 +535,7 @@ export class StepComponent implements OnInit, OnDestroy {
           {
             queryParams: {
               id: this.schedule.idWorkpack,
+              idPlan: this.idPlan,
               idWorkpackModelLinked: this.idWorkpackModelLinked
             }
           }

@@ -429,6 +429,7 @@ export class ScheduleComponent implements OnInit, OnDestroy {
         {
           queryParams: {
             id: this.idWorkpack,
+            idPlan: this.idPlan,
             idWorkpackModelLinked: this.idWorkpackModelLinked
           }
         }
