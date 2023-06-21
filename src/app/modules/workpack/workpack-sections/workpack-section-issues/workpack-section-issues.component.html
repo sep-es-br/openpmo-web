@@ -1,5 +1,6 @@
 <div class="app-workpack-section-issues" *ngIf="sectionIssue">
   <app-card [properties]="sectionIssue.cardSection" [class.panel-tab-view]="showTabview"
+  [loading]="sectionIssue?.cardSection?.isLoading"
     (searchText)="handleSearchText($event)" (editFilter)="handleEditFilterEntity($event, 'issues')"
     (newFilter)="handleNewFilterEntity('issues')" (selectedFilter)="handleSelectedFilterIssue($event)"
     (createNewElement)="handleCreateNewIssue()">

@@ -87,6 +87,12 @@
       }
       .p-float-label {
         width: 100%;
+        .app-input-number.red {
+          .p-inputnumber .p-inputtext {
+            color: #EA5C5C !important;
+          }
+          
+        }
       }
       .float-label-container {
         margin-top: 10px;

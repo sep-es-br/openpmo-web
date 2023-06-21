@@ -35,7 +35,8 @@
         <label class="input-label">{{ 'sortIndex' | translate }}</label>
       </span>
       <span class="p-float-label property-input p-field input-number-scroll" *ngIf="property.type === 'NumberModel'">
-        <p-inputNumber inputStyleClass="app-input-text" [(ngModel)]="property.precision" [showButtons]="true" [min]="1" [max]="6"
+        <p-inputNumber inputStyleClass="app-input-text" [(ngModel)]="property.precision"
+                       [showButtons]="true" [min]="1" [max]="6"
           (ngModelChange)="changed.emit($event)" [disabled]="property.viewOnly">
         </p-inputNumber>
         <label class="input-label">{{ 'precision' | translate }}</label>
@@ -73,7 +74,7 @@
         </span>
         <span *ngSwitchCase="'NumberModel'" class="p-float-label property-input p-field input-number-scroll">
           <p-inputNumber class="app-input-number" [(ngModel)]="property.defaultValue" [disabled]="property.viewOnly"
-            mode="decimal" [min]="property.min" [max]="property.max" [minFractionDigits]="0" [maxFractionDigits]="20"
+            mode="decimal" [min]="property.min" [max]="property.max" [minFractionDigits]="property.precision"
             (ngModelChange)="changed.emit($event)" [showButtons]="true">
           </p-inputNumber>
           <label class="input-label">{{ 'defaultValue' | translate }}</label>
@@ -190,15 +191,30 @@
         <label class="input-label">{{ 'multipleSelection' | translate }}</label>
       </span>
       <span class="p-float-label property-input p-field input-number-scroll"
-        *ngIf="[ 'IntegerModel', 'TextModel', 'TextAreaModel', 'NumberModel' ].includes(property.type)">
+            *ngIf="[ 'IntegerModel', 'TextModel', 'TextAreaModel'].includes(property.type)">
         <p-inputNumber inputStyleClass="app-input-text" [(ngModel)]="property.min" [showButtons]="true"
-          (ngModelChange)="changed.emit($event)" [disabled]="property.viewOnly"></p-inputNumber>
+                       (ngModelChange)="changed.emit($event)" [disabled]="property.viewOnly"></p-inputNumber>
         <label class="input-label">{{ 'minimum' | translate }}</label>
       </span>
       <span class="p-float-label property-input p-field input-number-scroll"
-        *ngIf="[ 'IntegerModel', 'TextModel', 'TextAreaModel', 'NumberModel' ].includes(property.type)">
+            *ngIf="['NumberModel'].includes(property.type)">
+        <p-inputNumber inputStyleClass="app-input-text" [(ngModel)]="property.min" [minFractionDigits]="property.precision"
+                       [showButtons]="true"
+                       (ngModelChange)="changed.emit($event)" [disabled]="property.viewOnly"></p-inputNumber>
+        <label class="input-label">{{ 'minimum' | translate }}</label>
+      </span>
+
+      <span class="p-float-label property-input p-field input-number-scroll"
+            *ngIf="[ 'IntegerModel', 'TextModel', 'TextAreaModel' ].includes(property.type)">
         <p-inputNumber inputStyleClass="app-input-text" [(ngModel)]="property.max" [showButtons]="true"
-          (ngModelChange)="changed.emit($event)" [disabled]="property.viewOnly"></p-inputNumber>
+                       (ngModelChange)="changed.emit($event)" [disabled]="property.viewOnly"></p-inputNumber>
+        <label class="input-label">{{ 'maximum' | translate }}</label>
+      </span>
+      <span class="p-float-label property-input p-field input-number-scroll"
+            *ngIf="['NumberModel'].includes(property.type)">
+        <p-inputNumber inputStyleClass="app-input-text" [(ngModel)]="property.max" [showButtons]="true"
+                       [minFractionDigits]="property.precision"
+                       (ngModelChange)="changed.emit($event)" [disabled]="property.viewOnly"></p-inputNumber>
         <label class="input-label">{{ 'maximum' | translate }}</label>
       </span>
       <span class="p-float-label property-input p-field input-number-scroll" *ngIf="property.type === 'TextAreaModel'">

@@ -497,6 +497,18 @@ export class StepComponent implements OnInit, OnDestroy {
   async saveStep() {
     const end = moment(this.formStep.controls.end.value).format('yyyy-MM-DD');
     const start = moment(this.formStep.controls.start.value).format('yyyy-MM-DD');
+    const hasNegativeValues = this.formStep.controls.plannedWork.value < 0 || this.formStep.controls.actualWork.value < 0 ||
+      (this.costAssignmentsCardItems && this.costAssignmentsCardItems.filter( item => item.type === 'cost-card' &&
+        (item.plannedWork < 0 || item.actualWork < 0)).length > 0 );
+    if (hasNegativeValues) {
+      this.messageSrv.add({
+        detail: this.translateSrv.instant('messages.scheduleCantHasNegativeValues'),
+        severity: 'warn',
+        summary: this.translateSrv.instant('atention')
+      });
+      this.showSaveButton = false;
+      return;
+    }
     this.step = {
       id: this.step && this.step.id,
       idSchedule: this.step ? this.step.idSchedule : this.idSchedule,

@@ -8,9 +8,11 @@
   <div class="card-item-values p-fluid">
     <div class="float-label-container">
       <span class="p-float-label" [class.responsive]="responsive">
-        <p-inputNumber [class]="'app-input-number costPlanned-'+properties.idCost " id="unit-planned" [(ngModel)]="properties.plannedWork"
+        <p-inputNumber [class]="'app-input-number costPlanned-'+properties.idCost " id="unit-planned"
+          [(ngModel)]="properties.plannedWork"
+          [class.red]="properties.plannedWork < 0"
           (onInput)="handleCostChange($event,'plannedWork'); checkCostAccountBalance($event, 'plannedWork')"
-          mode="decimal" [locale]="currentLang" [minFractionDigits]="2" [maxFractionDigits]="2"
+           mode="decimal" [locale]="currentLang" [minFractionDigits]="2" [maxFractionDigits]="2"
           [disabled]="!!properties.readonly">
         </p-inputNumber>
         <label class="app-input-label" for="unit-planned">{{properties.unitMeasureName}} {{ "planned" |translate
@@ -34,6 +36,7 @@
       <span class="p-float-label" [class.responsive]="responsive">
         <p-inputNumber class="app-input-number" id="float-planned" [(ngModel)]="properties.actualWork"
           [disabled]="!!properties.readonly"
+          [class.red]="properties.actualWork < 0"
           (onInput)="handleActualCostChange($event,'actualWork'); checkCostAccountBalance($event, 'actualWork')" mode="decimal" [locale]="currentLang"
           [minFractionDigits]="2" [maxFractionDigits]="2">
         </p-inputNumber>

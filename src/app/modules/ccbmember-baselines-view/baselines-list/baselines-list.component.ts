@@ -12,7 +12,6 @@ import { Router } from '@angular/router';
 import { FilterDataviewPropertiesEntity } from 'src/app/shared/constants/filterDataviewPropertiesEntity';
 import { IFilterProperty } from 'src/app/shared/interfaces/IFilterProperty';
 import { BaselinesPanelsEnum } from 'src/app/shared/enums/BaselinesPanelsEnum';
-import { TranslateService } from '@ngx-translate/core';
 
 
 @Component({

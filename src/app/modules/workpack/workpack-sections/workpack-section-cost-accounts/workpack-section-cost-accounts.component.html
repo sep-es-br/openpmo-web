@@ -1,5 +1,6 @@
 <div class="app-workpack-section-cost-accounts" *ngIf="sectionCostAccount">
   <app-card [properties]="sectionCostAccount.cardSection" [class.panel-tab-view]="showTabview"
+  [loading]="sectionCostAccount?.cardSection?.isLoading"
     (searchText)="handleSearchText($event)" (editFilter)="handleEditFilterCostAccount($event)"
     (newFilter)="handleNewFilterCostAccount()" (selectedFilter)="handleSelectedFilterCostAccount($event)"
     (createNewElement)="handleCreateNewCostAccount()">

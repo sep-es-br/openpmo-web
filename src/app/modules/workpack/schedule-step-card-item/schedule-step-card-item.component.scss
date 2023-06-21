@@ -55,7 +55,16 @@
     }
   }
   .card-link {
-    cursor: pointer;
+    cursor: pointer !important;
+    .p-disabled, .p-component:disabled {
+      opacity: 1 !important;
+    }
+    .p-inputnumber-input {
+      cursor: pointer !important;
+    }
+    .replicate-button-container {
+      cursor: pointer;
+    }
   }
   .p-card-body {
     width: 100%;
@@ -99,6 +108,12 @@
       .progress-bar-cost-container {
         flex: 1;
         margin-top: 0.2em;
+      }
+      .app-input-number.red {
+        .p-inputnumber .p-inputtext {
+          color: #EA5C5C !important;
+        }
+        
       }
       .replicate-button-container {
         width: 100%;

@@ -371,7 +371,16 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
     this.workpackSrv.nextPendingChanges(true);
     this.saveButton.showButton();
     // atualizando a progressBar de custo do ano
-
+    const hasNegativeValues = this.checkNegativeValues();
+    if (hasNegativeValues) {
+      this.messageSrv.add({
+        detail: this.translateSrv.instant('messages.scheduleCantHasNegativeValues'),
+        severity: 'warn',
+        summary: this.translateSrv.instant('atention')
+      });
+      this.saveButton.hideButton();
+      return;
+    }
     const groupIndex = this.sectionSchedule.groupStep.findIndex(group => group.cardItemSection.filter(item => item.idStep === idStep).length > 0);
     if (groupIndex > -1) {
       // atualizando a progressBar de custo do ano
@@ -425,6 +434,12 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
     });
   }
 
+  checkNegativeValues() {
+    const negativeValues = this.sectionSchedule.groupStep.filter(group => group.cardItemSection
+      .filter(item => item.unitActual < 0 || item.unitPlanned < 0 || item.costActual < 0 || item.costPlanned < 0).length > 0);
+    return negativeValues && negativeValues.length > 0;
+  }
+
   handleSpreadDifference(event) {
     let difference = event.difference;
     const stepDate = event.stepDate;
@@ -432,11 +447,11 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
     const type = event.type;
     const groupIndex = this.sectionSchedule.groupStep.findIndex(group => group.cardItemSection.filter(item => item.idStep === idStep).length > 0);
     if (groupIndex > -1) {
-      const stepsList = this.sectionSchedule.groupStep[groupIndex].cardItemSection.filter( step => moment(step.stepName).isAfter(moment(stepDate)) &&
+      const stepsList = this.sectionSchedule.groupStep[groupIndex].cardItemSection.filter(step => moment(step.stepName).isAfter(moment(stepDate)) &&
         step.type === 'listStep');
       if (this.sectionSchedule.groupStep.length - (groupIndex + 1) > 0) {
         for (let i = groupIndex + 1; i < this.sectionSchedule.groupStep.length; i++) {
-          this.sectionSchedule.groupStep[i].cardItemSection.filter(listStep =>  listStep.type === 'listStep').forEach( step => {
+          this.sectionSchedule.groupStep[i].cardItemSection.filter(listStep => listStep.type === 'listStep').forEach(step => {
             stepsList.push(step);
           })
         }
@@ -454,17 +469,17 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
           stepIndex++;
         }
       }
-      stepsList.forEach( step => {
+      stepsList.forEach(step => {
         const groupIndex = this.sectionSchedule.groupStep.findIndex(group => group.cardItemSection.filter(item => item.idStep === step.idStep).length > 0);
         if (groupIndex > -1) {
-          const stepIndex = this.sectionSchedule.groupStep[groupIndex].cardItemSection.findIndex( selectedStep => selectedStep.idStep === step.idStep);
+          const stepIndex = this.sectionSchedule.groupStep[groupIndex].cardItemSection.findIndex(selectedStep => selectedStep.idStep === step.idStep);
           if (stepIndex > -1) {
-            this.sectionSchedule.groupStep[groupIndex].cardItemSection[stepIndex] = {...step};
+            this.sectionSchedule.groupStep[groupIndex].cardItemSection[stepIndex] = { ...step };
             this.saveStepChanged(this.sectionSchedule.groupStep[groupIndex].year, step.idStep);
           }
         }
       });
-     
+
     }
   }
 
@@ -516,23 +531,16 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
   }
 
   decrementIndex() {
-    if (this.indexCardEdited === 0) {
-      this.indexCardEdited = this.costAssignmentsCardItemsEdited.length - 1;
-    } else {
-      this.indexCardEdited--;
-    }
+    this.indexCardEdited--;
   }
 
   incrementIndex() {
-    if (this.indexCardEdited === this.costAssignmentsCardItemsEdited.length - 1) {
-      this.indexCardEdited = 0;
-    } else {
-      this.indexCardEdited++;
-    }
+    this.indexCardEdited++;
   }
 
   async handleChangeValuesCardItem() {
     const cardChanged = this.costAssignmentsCardItemsEdited[this.indexCardEdited];
+
     if (!cardChanged.actualWork || cardChanged.actualWork === null) {
       cardChanged.actualWork = 0;
       this.costAssignmentsCardItemsEdited[this.indexCardEdited].actualWork = 0;
@@ -593,6 +601,16 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
           group.progress = this.sectionSchedule.groupStep[groupIndex].cardItemSection.filter(itemStep => itemStep.type === 'listStep').reduce((total, step) => { return total + step.costActual }, 0);
         }
       })
+    }
+    const hasNegativeValues = this.checkNegativeValues();
+    if (hasNegativeValues) {
+      this.messageSrv.add({
+        detail: this.translateSrv.instant('messages.scheduleCantHasNegativeValues'),
+        severity: 'warn',
+        summary: this.translateSrv.instant('atention')
+      });
+      this.saveButton.hideButton();
+      return;
     }
     // atualizando a progressBar de custo do schedule geral
     this.sectionSchedule.cardSection.progressBarValues.filter(progress => progress.valueUnit === 'currency').forEach((section, index) => {
@@ -660,7 +678,7 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
 
   async onSaveButtonClicked() {
     if (this.changedSteps && this.changedSteps.length > 0) {
-      const stepsToSave = this.changedSteps.map( stepToSave => {
+      const stepsToSave = this.changedSteps.map(stepToSave => {
         const stepGroup = this.schedule.groupStep.find(group => group.year === stepToSave.changedGroupYear);
         const step = stepGroup.steps.find(s => s.id === stepToSave.changedIdStep);
         const stepChanged = this.sectionSchedule.groupStep.find(group => group.year === stepToSave.changedGroupYear)
@@ -684,6 +702,17 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
             }))
         }
       });
+      const hasNegativeValues = stepsToSave.filter(step => step.plannedWork < 0 || step.actualWork < 0 ||
+        (step.consumes && step.consumes.filter(consume => consume.actualCost < 0 || consume.plannedCost < 0).length > 0)).length > 0;
+      if (hasNegativeValues) {
+        this.messageSrv.add({
+          detail: this.translateSrv.instant('messages.scheduleCantHasNegativeValues'),
+          severity: 'warn',
+          summary: this.translateSrv.instant('atention')
+        });
+        this.saveButton.hideButton();
+        return;
+      }
       const result = await this.scheduleSrv.putScheduleStepBatch(stepsToSave);
       if (result.success) {
         this.changedSteps = [];

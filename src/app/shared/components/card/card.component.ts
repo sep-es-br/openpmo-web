@@ -18,6 +18,7 @@ import { WorkpackShowTabviewService } from '../../services/workpack-show-tabview
 export class CardComponent implements OnInit, OnDestroy, OnChanges {
 
   @Input() properties: ICard;
+  @Input() loading: boolean;
   @Output() selectedFilter = new EventEmitter();
   @Output() editFilter = new EventEmitter();
   @Output() newFilter = new EventEmitter();
@@ -64,7 +65,7 @@ export class CardComponent implements OnInit, OnDestroy, OnChanges {
 
   ngOnChanges(changes: SimpleChanges) {
     if (
-      changes.properties && changes.properties.currentValue
+      (changes.properties && changes.properties.currentValue) || changes.loading
     ) {
       this.properties.progressBarValues = this.properties.progressBarValues &&
         this.properties.progressBarValues.filter( item => item.total !== 0 );

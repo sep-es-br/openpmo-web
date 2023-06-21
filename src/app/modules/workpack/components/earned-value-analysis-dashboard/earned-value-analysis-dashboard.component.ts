@@ -1,13 +1,13 @@
-import { ResponsiveService } from './../../../../shared/services/responsive.service';
-import { takeUntil } from 'rxjs/operators';
-import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
-import { TranslateService } from '@ngx-translate/core';
-import { ChartData, ChartOptions } from 'chart.js';
+import {ResponsiveService} from './../../../../shared/services/responsive.service';
+import {takeUntil} from 'rxjs/operators';
+import {Component, Input, OnInit, SimpleChanges} from '@angular/core';
+import {TranslateService} from '@ngx-translate/core';
+import {ChartData, ChartOptions} from 'chart.js';
 import * as moment from 'moment';
-import { pipe, Subject } from 'rxjs';
-import { IEarnedValueAnalysisDashboard } from 'src/app/shared/interfaces/IDashboard';
-import { IGaugeChartData } from 'src/app/shared/interfaces/IGaugeChartData';
-import { ShortNumberPipe } from 'src/app/shared/pipes/shortNumberPipe';
+import {Subject} from 'rxjs';
+import {IEarnedValueAnalysisDashboard} from 'src/app/shared/interfaces/IDashboard';
+import {IGaugeChartData} from 'src/app/shared/interfaces/IGaugeChartData';
+import {ShortNumberPipe} from 'src/app/shared/pipes/shortNumberPipe';
 
 @Component({
   selector: 'app-earned-value-analysis-dashboard',
@@ -47,10 +47,10 @@ export class EarnedValueAnalysisDashboardComponent implements OnInit {
   ngOnChanges(changes: SimpleChanges): void {
     if (changes.earnedValueAnalysis && changes.earnedValueAnalysis.currentValue) {
       this.setGaugeChartData();
-      if(this.earnedValueAnalysis && this.earnedValueAnalysis?.earnedValueByStep && this.earnedValueAnalysis?.earnedValueByStep.length > 0) {
+      if (this.earnedValueAnalysis && this.earnedValueAnalysis?.earnedValueByStep && this.earnedValueAnalysis?.earnedValueByStep.length > 0) {
         this.setLineChart();
       }
-      if(this.earnedValueAnalysis) {
+      if (this.earnedValueAnalysis) {
         this.loadMaxProgressBar();
       }
     }
@@ -80,20 +80,20 @@ export class EarnedValueAnalysisDashboardComponent implements OnInit {
           pointRadius: this.earnedValueAnalysis.earnedValueByStep?.map(item => item.plannedValue).length > 1 ? 4 : 0,
         },
         {
-          label:  this.translateSrv.instant('AC'),
-          data: this.earnedValueAnalysis.earnedValueByStep?.filter( step => moment(step.date, 'yyyy-MM').isSameOrBefore(referenceMonth)).map(item => item.actualCost),
+          label: this.translateSrv.instant('AC'),
+          data: this.earnedValueAnalysis.earnedValueByStep?.filter(step => moment(step.date, 'yyyy-MM').isSameOrBefore(referenceMonth)).map(item => item.actualCost),
           fill: false,
           borderColor: '#0081c1',
-          pointBorderWidth: this.earnedValueAnalysis.earnedValueByStep?.filter( step => moment(step.date, 'yyyy-MM').isSameOrBefore(referenceMonth)).map(item => item.actualCost).length > 1 ? 1 : 0,
-          pointRadius: this.earnedValueAnalysis.earnedValueByStep?.filter( step => moment(step.date, 'yyyy-MM').isSameOrBefore(referenceMonth)).map(item => item.actualCost).length > 1 ? 4 : 0,
+          pointBorderWidth: this.earnedValueAnalysis.earnedValueByStep?.filter(step => moment(step.date, 'yyyy-MM').isSameOrBefore(referenceMonth)).map(item => item.actualCost).length > 1 ? 1 : 0,
+          pointRadius: this.earnedValueAnalysis.earnedValueByStep?.filter(step => moment(step.date, 'yyyy-MM').isSameOrBefore(referenceMonth)).map(item => item.actualCost).length > 1 ? 4 : 0,
         },
         {
           label: this.translateSrv.instant('EV'),
-          data: this.earnedValueAnalysis.earnedValueByStep?.filter( step => moment(step.date, 'yyyy-MM').isSameOrBefore(referenceMonth) ).map(item => item.earnedValue),
+          data: this.earnedValueAnalysis.earnedValueByStep?.filter(step => moment(step.date, 'yyyy-MM').isSameOrBefore(referenceMonth)).map(item => item.earnedValue),
           fill: false,
           borderColor: '#fa7800',
-          pointBorderWidth: this.earnedValueAnalysis.earnedValueByStep?.filter( step => moment(step.date, 'yyyy-MM').isSameOrBefore(referenceMonth) ).map(item => item.earnedValue).length > 1 ? 1 : 0,
-          pointRadius: this.earnedValueAnalysis.earnedValueByStep?.filter( step => moment(step.date, 'yyyy-MM').isSameOrBefore(referenceMonth) ).map(item => item.earnedValue).length > 1 ? 4 : 0,
+          pointBorderWidth: this.earnedValueAnalysis.earnedValueByStep?.filter(step => moment(step.date, 'yyyy-MM').isSameOrBefore(referenceMonth)).map(item => item.earnedValue).length > 1 ? 1 : 0,
+          pointRadius: this.earnedValueAnalysis.earnedValueByStep?.filter(step => moment(step.date, 'yyyy-MM').isSameOrBefore(referenceMonth)).map(item => item.earnedValue).length > 1 ? 4 : 0,
         },
       ]
     };
@@ -116,6 +116,15 @@ export class EarnedValueAnalysisDashboardComponent implements OnInit {
           pointStyle: 'circle',
           radius: 4
         },
+      },
+      tooltips: {
+        callbacks: {
+          label: (tooltipItem, data) => {
+            const PTBR = this.translateSrv.currentLang === 'pt-BR';
+            return tooltipItem.yLabel.toString().replace(/\B(?=(\d{3})+(?!\d))/g, PTBR ? '.' : ',')
+              + (PTBR ? ',00' : '.00');
+          }
+        }
       }
     };
   }
@@ -131,14 +140,14 @@ export class EarnedValueAnalysisDashboardComponent implements OnInit {
         : (null),
       labelBottom: 'CPI',
       classIconLabelBottom: 'fas fa-dollar-sign',
-      valueProgressBar:  this.earnedValueAnalysis?.performanceIndexes[0]?.costPerformanceIndex ? this.earnedValueAnalysis?.performanceIndexes[0]?.costPerformanceIndex?.costVariation : null,
+      valueProgressBar: this.earnedValueAnalysis?.performanceIndexes[0]?.costPerformanceIndex ? this.earnedValueAnalysis?.performanceIndexes[0]?.costPerformanceIndex?.costVariation : null,
       maxProgressBar: this.earnedValueAnalysis?.performanceIndexes[0]?.earnedValue,
       labelBottomProgressBar: 'CV',
     };
     this.gaugeChartDataSPI = {
       value: this.earnedValueAnalysis?.performanceIndexes[0]?.schedulePerformanceIndex ?
-       ( this.earnedValueAnalysis?.performanceIndexes[0]?.schedulePerformanceIndex?.indexValue === null ? 0 : this.earnedValueAnalysis?.performanceIndexes[0]?.schedulePerformanceIndex?.indexValue)
-       : null,
+        (this.earnedValueAnalysis?.performanceIndexes[0]?.schedulePerformanceIndex?.indexValue === null ? 0 : this.earnedValueAnalysis?.performanceIndexes[0]?.schedulePerformanceIndex?.indexValue)
+        : null,
       labelBottom: 'SPI',
       classIconLabelBottom: 'fas fa-clock',
       valueProgressBar: this.earnedValueAnalysis?.performanceIndexes[0]?.schedulePerformanceIndex ?
@@ -149,7 +158,13 @@ export class EarnedValueAnalysisDashboardComponent implements OnInit {
   }
 
   loadMaxProgressBar() {
-    const { earnedValue, actualCost, plannedValue, estimatesAtCompletion, estimateToComplete } = this.earnedValueAnalysis.performanceIndexes[0];
+    const {
+      earnedValue,
+      actualCost,
+      plannedValue,
+      estimatesAtCompletion,
+      estimateToComplete
+    } = this.earnedValueAnalysis.performanceIndexes[0];
     const values = [
       earnedValue === null ? 0 : earnedValue,
       actualCost === null ? 0 : actualCost,

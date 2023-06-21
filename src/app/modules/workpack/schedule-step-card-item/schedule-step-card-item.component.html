@@ -19,6 +19,7 @@
         <span class="p-float-label p-field">
           <p-inputNumber [class]="'app-input-number '+'unitPlanned '+'unitPlanned-'+ properties.idStep" id="float-unitPlanned" (onInput)="handleStepChange($event, 'unitPlanned')"
             [disabled]="!properties.editPermission" [(ngModel)]="properties.unitPlanned"
+            [class.red]="properties.unitPlanned < 0"
             [minFractionDigits]="properties.unitPrecision" [maxFractionDigits]="properties.unitPrecision"
             [locale]="language === 'pt-BR' ? 'pt-BR' : 'en-US'">
           </p-inputNumber>
@@ -31,6 +32,7 @@
         <span class="p-float-label p-field">
           <p-inputNumber class="app-input-number" id="float-unitActual" (onInput)="handleStepChange($event, 'unitActual')"
             [disabled]="!properties.editPermission" [(ngModel)]="properties.unitActual"
+            [class.red]="properties.unitActual < 0"
             [minFractionDigits]="properties.unitPrecision" [maxFractionDigits]="properties.unitPrecision"
             [locale]="language === 'pt-BR' ? 'pt-BR' : 'en-US'">
           </p-inputNumber>
@@ -44,11 +46,13 @@
       </div>
     </div>
     <div class="costValues">
-      <div class="costInputs p-fluid" [class.card-link]="properties.editPermission && !properties.editCosts" (click)="properties.multipleCosts && handleEditCosts($event)">
+      <div class="costInputs p-fluid" [class.card-link]="properties.editPermission && !properties.editCosts" 
+        (click)="properties.multipleCosts && handleEditCosts($event)">
         <span class="column-title"> $ </span>
         <span class="p-float-label p-field">
           <p-inputNumber [class]="'app-input-number '+'costPlanned-'+properties.idStep" id="float-costPlanned"
             [disabled]="!properties.editCosts || !properties.editPermission" (onInput)="handleStepCostChange($event, 'costPlanned')"
+            [class.red]="properties.costPlanned < 0"
             [(ngModel)]="properties.costPlanned" [minFractionDigits]="2" [maxFractionDigits]="2"
             [locale]="language === 'pt-BR' ? 'pt-BR' : 'en-US'">
           </p-inputNumber>
@@ -62,6 +66,7 @@
         <span class="p-float-label p-field">
           <p-inputNumber class="app-input-number" id="float-costActual"
             [disabled]="!properties.editCosts || !properties.editPermission" (onInput)="handleStepCostChange($event, 'costActual')"
+            [class.red]="properties.costActual < 0"
             [(ngModel)]="properties.costActual" [minFractionDigits]="2" [maxFractionDigits]="2"
             [locale]="language === 'pt-BR' ? 'pt-BR' : 'en-US'">
           </p-inputNumber>

@@ -37,6 +37,12 @@
               width: 100% !important;
             }
           }
+          &.red {
+            .p-inputnumber .p-inputtext {
+              color: #EA5C5C !important;
+            }
+            
+          }
         }
       }
       .p-formgroup-inline.responsive {
@@ -99,6 +105,9 @@
               font-size: 1rem;
               color: v.$fontInput;
               padding: 0.5em 0;
+              &.red {
+                color: #EA5C5C !important;
+              }
             }
           }
         }

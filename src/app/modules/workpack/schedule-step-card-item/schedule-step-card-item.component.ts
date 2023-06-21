@@ -7,7 +7,7 @@ import { takeUntil } from 'rxjs/operators';
 import { IconsEnum } from 'src/app/shared/enums/IconsEnum';
 import { IScheduleStepCardItem } from 'src/app/shared/interfaces/IScheduleStepCardItem';
 import * as moment from 'moment';
-import { ConfirmationService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
 
 @Component({
   selector: 'app-schedule-step-card-item',
@@ -31,7 +31,7 @@ export class ScheduleStepCardItemComponent implements OnInit, OnDestroy {
   difference;
 
   constructor(
-    private router: Router,
+    private messageSrv: MessageService,
     private translateSrv: TranslateService,
     private confirmationSrv: ConfirmationService
   ) {
@@ -68,6 +68,9 @@ export class ScheduleStepCardItemComponent implements OnInit, OnDestroy {
   }
 
   handleStepChange(event, item) {
+    if (!Number(event.value) && event.value !== 0) {
+      return;
+    }
     this.properties[item] = event.value;
     this.properties.unitProgressBar.total = this.properties.unitPlanned;
     this.properties.unitProgressBar.progress = this.properties.unitActual;
@@ -75,6 +78,9 @@ export class ScheduleStepCardItemComponent implements OnInit, OnDestroy {
   }
 
   handleStepCostChange(event, item) {
+    if (!Number(event.value) && event.value !== 0) {
+      return;
+    }
     this.properties[item] = event.value;
     this.properties.costProgressBar.total = this.properties.costPlanned;
     this.properties.costProgressBar.progress = this.properties.costActual;

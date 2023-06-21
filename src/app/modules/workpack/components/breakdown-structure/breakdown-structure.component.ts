@@ -62,14 +62,21 @@ export class BreakdownStructureComponent implements OnChanges, OnDestroy {
     this.configDataSrv.observableCollapsePanelsStatus
       .pipe(takeUntil(this.$destroy))
       .subscribe(async panelStatus => {
-        this.wbsTree = [];
           if (changes.idWorkpack && changes.idWorkpack.currentValue) {
             if (!this.expandedFirst) {
               this.expandedFirst = true;
               this.expanded = false;
             } else {
               this.expanded = panelStatus === 'expand';
+              if (!this.expanded) {
+                this.wbsTree = [{
+                  ...this.wbsTree[0],
+                  children: this.nodeCollapse(this.wbsTree[0].children, 0)
+                }];
+                return;
+              }
             }
+            
             await this.loadBreakdownStructure(this.idWorkpack, false);
           }
           if (this.wbs) {
@@ -99,6 +106,15 @@ export class BreakdownStructureComponent implements OnChanges, OnDestroy {
     }
   }
 
+  nodeCollapse(nodeList, level) {
+    level++;
+    return nodeList ? nodeList.map( node => ({
+      ...node,
+      expanded: level <= 1,
+      children: node.children ? this.nodeCollapse(node.children, level) : []
+    })) : [];
+  }
+
   async nodeExpand(event) {
     this.getTopPosLoading();
     const idWorkpack = event.node?.idWorkpack;
@@ -121,7 +137,6 @@ export class BreakdownStructureComponent implements OnChanges, OnDestroy {
   }
 
   mapTreeNodes(data: IWorkpackBreakdownStructure, isLazyLoading: boolean = false) {
-    const expanded = this.expanded;
     const tree = [{
       ...data,
       label: data.workpackName,
@@ -140,7 +155,7 @@ export class BreakdownStructureComponent implements OnChanges, OnDestroy {
   mapTreeNodesChildren(data: IWorkpackBreakdownStructure[] | IWorkpackBreakdownStructureWorkpackModel[],
                        isWorkpack: boolean, level: number): TreeNode[] {
     const tree = [];
-    const expanded = level <= 1;
+    const expanded = !this.expanded ? level <= 1 : true;
     data.forEach(item => {
       const workpackOrWorkpackModels = isWorkpack ? item.workpackModels : item.workpacks;
       const node: any = {

@@ -10,7 +10,7 @@
     margin-bottom: 10px;
     margin-top: 15px;
     .app-input-label {
-      font-size: 12px;
+      font-size: 0.9rem;
     }
     &.fullLine {
       width: 100%;
@@ -19,6 +19,9 @@
   .value-selected-container {
     background-color: transparent;
     cursor: pointer;
+    .p-float-label {
+      width: 100%;
+    }
     .app-input-text {
       cursor: pointer;
       width: 100%;

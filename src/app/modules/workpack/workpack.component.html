@@ -52,6 +52,7 @@
             (selectedFilter)="handleSelectedFilterWorkpackModel($event, workpackModel.idWorkpackModel)"
             (searchText)="handleSearchTextWorkpackModel($event, workpackModel.idWorkpackModel)"
             (createNewElement)="handleCreateNewWorkpack(workpackModel.idWorkpackModel)"
+            [loading]="workpackModel.cardSection.isLoading"
             *ngIf="(selectedTab?.key === workpackModel.cardSection.tabTitle)">
 
             <div class="input-toggle-workpack-cancelled">

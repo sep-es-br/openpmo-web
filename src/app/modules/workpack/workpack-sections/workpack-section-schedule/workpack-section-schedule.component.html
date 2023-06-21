@@ -60,13 +60,14 @@
                 <ng-template pTemplate>
                   <div class="panel-content"
                     *ngIf="costAssignmentsCardItemsEdited && costAssignmentsCardItemsEdited.length > 0">
-                    <i class="fas fa-chevron-left" (click)="decrementIndex()"></i>
+                    <i class="fas fa-chevron-left" [class.disabled]="indexCardEdited === 0" (click)="indexCardEdited > 0 && decrementIndex()"></i>
                     <div class="card-cost-assignments">
                       <app-cost-assignment-card-item [properties]="costAssignmentsCardItemsEdited[indexCardEdited]"
                         (costChanged)="handleChangeValuesCardItem()">
                       </app-cost-assignment-card-item>
                     </div>
-                    <i class="fas fa-chevron-right" (click)="incrementIndex()"></i>
+                    <i class="fas fa-chevron-right"[class.disabled]="indexCardEdited === costAssignmentsCardItemsEdited.length - 1"
+                      (click)="indexCardEdited < costAssignmentsCardItemsEdited.length - 1 && incrementIndex()"></i>
                   </div>
                 </ng-template>
               </p-overlayPanel>

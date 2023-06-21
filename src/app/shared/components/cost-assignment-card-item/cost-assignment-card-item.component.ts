@@ -54,6 +54,9 @@ export class CostAssignmentCardItemComponent implements OnInit, OnDestroy {
   }
 
   handleCostChange(event, field: string) {
+    if (!Number(event.value) && event.value !== 0) {
+      return;
+    }
     setTimeout(() => {
       this.properties[field] = event.value;
       this.costChanged.emit();
@@ -61,6 +64,9 @@ export class CostAssignmentCardItemComponent implements OnInit, OnDestroy {
   }
 
   handleActualCostChange(event, field: string) {
+    if (!Number(event.value) && event.value !== 0) {
+      return;
+    }
     const startDate = moment(this.scheduleStartDate);
     const today = moment();
     if (today.isBefore(startDate, 'months') && event && event.value > 0) {
@@ -87,6 +93,9 @@ export class CostAssignmentCardItemComponent implements OnInit, OnDestroy {
   }
 
   checkCostAccountBalance(event, field: string) {
+    if (!Number(event.value)) {
+      return;
+    }
     if (this.properties.costAccountAllocation && this.properties.costAccountAllocation.limit) {
       if (this.properties.costAccountAllocation.limit -
           ( field === 'plannedWork' ? this.properties.costAccountAllocation.planed :  this.properties.costAccountAllocation.actual) - event.value < 0) {

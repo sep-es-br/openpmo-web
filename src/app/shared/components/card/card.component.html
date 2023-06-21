@@ -56,11 +56,6 @@
                [(ngModel)]="properties.searchTerm"
                [placeholder]="translateSrv.instant('search')"
         />
-<!--        <i class="fas fa-close"-->
-<!--           [class.animation-input]="showAnimationSearch"-->
-<!--           [class.no-animation]="!showAnimationSearch"-->
-<!--           *ngIf="properties?.searchTerm?.length > 0"-->
-<!--           (click)="handleClearSearchText()"></i>-->
         <i class="fas fa-search"
            *ngIf="!showAnimationSearch"
            [class.animation-input]="showAnimationSearch"
@@ -76,7 +71,7 @@
       <div class="dataview-filters" *ngIf="!properties.initialStateCollapse && properties.showFilters">
         <label>{{'show'|translate}}</label>
         <div class="options-container">
-          <p-dropdown class="filter-selection" [options]="filterListOptions" dropdownIcon="fas fa-caret-down"
+          <p-dropdown class="filter-selection" [disabled]="loading" [options]="filterListOptions" dropdownIcon="fas fa-caret-down"
             scrollHeight="300px" [(ngModel)]="filterSelected">
             <ng-template let-filter pTemplate="item">
               <div class="filter-item" *ngIf="filter.value !== -1">

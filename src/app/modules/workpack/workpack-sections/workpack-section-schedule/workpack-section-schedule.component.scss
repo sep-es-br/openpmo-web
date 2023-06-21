@@ -124,6 +124,10 @@
           font-size: 1.5rem;
           color: #939393;
           cursor: pointer;
+          &.disabled {
+            color: #e9ecef;
+            cursor: auto;
+          }
         }
       }.card-cost-assignments {
         width: 220px;

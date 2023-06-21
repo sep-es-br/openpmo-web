@@ -1,9 +1,7 @@
 <div class="workpack-tree-selection">
-  <span class="select-locality-container" [class.fullLine]="property.fullLine && property.multipleSelection">
-    <label class="app-input-label" *ngIf="search">{{property?.label}} {{ property.required ? '*' : ''}}</label>
+  <span class="select-locality-container" [class.fullLine]="property.fullLine && property.multipleSelection" *ngIf="!property.multipleSelection">
+    <label class="app-input-label" *ngIf="search || property.labelButtonLocalitySelected.length > 0">{{property?.label}} {{ property.required ? '*' : ''}}</label>
     <div class="value-selected-container" (click)="opLocalityDefault.toggle($event)">
-      <p-chips [(ngModel)]="property.labelButtonLocalitySelected" *ngIf="property.multipleSelection"
-        [disabled]="true"></p-chips>
       <input class="app-input-text" [(ngModel)]="property.labelButtonLocalitySelected[0]" type="text" pInputText
       [class.float-label]="!search && (!property.labelButtonLocalitySelected || property.labelButtonLocalitySelected.length === 0)"
         [placeholder]="!search && (!property.labelButtonLocalitySelected || property.labelButtonLocalitySelected.length === 0) ? (property?.label) : ''"
@@ -11,7 +9,17 @@
       <i class="fas fa-search" *ngIf="property.showIconButton && search"></i>
     </div>
   </span>
-  <p-overlayPanel #opLocalityDefault>
+  <span class="select-locality-container" [class.fullLine]="property.fullLine && property.multipleSelection" *ngIf="property.multipleSelection">
+    <label class="app-input-label" *ngIf="search || property.labelButtonLocalitySelected.length > 0">{{property?.label}} {{ property.required ? '*' : ''}}</label>
+    <div class="value-selected-container" (click)="opLocalityDefault.toggle($event)">
+      <span class="p-float-label">
+        <p-chips [id]="property.name" (click)="handleInputClick()"  [(ngModel)]="property.labelButtonLocalitySelected" *ngIf="property.multipleSelection"
+        [disabled]="true"></p-chips>
+        <label class="app-input-label" *ngIf="!search && property.labelButtonLocalitySelected.length === 0" [for]="property.name">{{property?.label}} {{ property.required ? '*' : ''}}</label>
+      </span>
+    </div>
+  </span>
+  <p-overlayPanel #opLocalityDefault (onHide)="search = false" >
     <ng-template pTemplate>
       <ng-container *ngIf="property.multipleSelection; else singleLocalitySelection">
         <div class="app-tree-selection" [class.workpack-tree-selection-mobile]="responsive"

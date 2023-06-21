@@ -39,6 +39,7 @@
                 <div class="p-field" [class.responsive]="responsive">
                   <span class="p-float-label" [class.responsive]="responsive">
                     <p-inputNumber class="app-input-number" formControlName="plannedWork"
+                      [class.red]="formStep && formStep.controls.plannedWork.value < 0"
                       (onInput)="handleChangeTotalsValues()" [minFractionDigits]="unitPrecision"
                       [maxFractionDigits]="unitPrecision" [locale]="currentLang === 'pt-BR' ? 'pt-BR' : 'en-US'">
                     </p-inputNumber>
@@ -48,6 +49,7 @@
                 <div class="p-field" [class.responsive]="responsive">
                   <span class="p-float-label" [class.responsive]="responsive">
                     <p-inputNumber class="app-input-number" formControlName="actualWork"
+                    [class.red]="formStep && formStep.controls.actualWork.value < 0"
                       (onInput)="handleChangeTotalsValues()" [minFractionDigits]="unitPrecision"
                       [maxFractionDigits]="unitPrecision" [locale]="currentLang === 'pt-BR' ? 'pt-BR' : 'en-US'">
                     </p-inputNumber>
@@ -62,11 +64,11 @@
               <div class="cost-assignments-totals" [class.responsive]="responsive">
                 <div class="planned-total">
                   <span class="label"> $ {{ "planned" |translate }}</span>
-                  <span class="value">{{ costAssignmentsTotals.plannedTotal | number : '0.2' : currentLang }}</span>
+                  <span class="value" [class.red]="costAssignmentsTotals.plannedTotal < 0">{{ costAssignmentsTotals.plannedTotal | number : '0.2' : currentLang }}</span>
                 </div>
                 <div class="actual-total">
                   <span class="label"> $ {{ "actual" |translate }}</span>
-                  <span class="value">{{ costAssignmentsTotals.actualTotal | number : '0.2' : currentLang }}</span>
+                  <span class="value" [class.red]="costAssignmentsTotals.actualTotal < 0">{{ costAssignmentsTotals.actualTotal | number : '0.2' : currentLang }}</span>
                 </div>
                 <div class="planned-baseline" [class.responsive]="responsive" *ngIf="baselinePlannedTotals && baselinePlannedTotals.plannedCost">
                   <span class="label"> $ {{ "plannedBaseline" |translate }}</span>

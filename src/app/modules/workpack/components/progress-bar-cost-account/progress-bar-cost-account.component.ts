@@ -59,8 +59,12 @@ export class ProgressBarCostAccountComponent implements OnInit {
     if (!this.limit || this.limit === 0) {
       return;
     }
-    this.indicatorLimit = this.progress && this.progress > 0  && this.progress > this.total ? ((this.progress - this.limit)/ this.progress) * 100 :
+    this.indicatorLimit = this.progress && this.progress > 0  && this.progress > this.total
+      ?
+      this.progress > this.limit ? ((this.progress - this.limit)/ this.progress) * 100 : 0
+      :
       this.total > this.limit ? ((this.total - this.limit) / this.total) * 100 : 0;
+
     if (this.progress && this.progress > this.limit) {
       this.difLimit = this.progress - this.limit;
       this.progressDifLimit = this.progress - this.difLimit;

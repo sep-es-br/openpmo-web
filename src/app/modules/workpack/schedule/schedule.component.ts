@@ -409,6 +409,18 @@ export class ScheduleComponent implements OnInit, OnDestroy {
       this.messageSrv.add({ severity: 'warn', summary: 'Erro', detail: this.translateSrv.instant('messages.startDateIsAfterEndDate') });
       return;
     }
+    const hasNegativeValues = this.formSchedule.controls.plannedWork.value < 0 || this.formSchedule.controls.actualWork.value < 0 ||
+      (this.costAssignmentsCardItems && this.costAssignmentsCardItems.filter( item => item.type === 'cost-card' &&
+        (item.plannedWork < 0 || item.actualWork < 0)).length > 0 );
+    if (hasNegativeValues) {
+      this.messageSrv.add({
+        detail: this.translateSrv.instant('messages.scheduleCantHasNegativeValues'),
+        severity: 'warn',
+        summary: this.translateSrv.instant('atention')
+      });
+      this.saveButton.hideButton();
+      return;
+    }
     this.schedule = {
       idWorkpack: this.idWorkpack,
       start: this.formSchedule.controls.start.value,

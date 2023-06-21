@@ -1,5 +1,6 @@
 <div class="app-workpack-section-risks" *ngIf="sectionRisk">
   <app-card [properties]="sectionRisk?.cardSection" [class.panel-tab-view]="showTabview"
+  [loading]="sectionRisk?.cardSection?.isLoading"
     (editFilter)="handleEditFilterEntity($event, 'risks')" (newFilter)="handleNewFilterEntity('risks')"
     (searchText)="handleSearchText($event)" (selectedFilter)="handleSelectedFilterRisk($event)"
     (createNewElement)="handleCreateNewRisk()">
