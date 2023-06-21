@@ -68,12 +68,9 @@ export class ReportViewComponent implements OnInit {
     const plan = localStorage.getItem('@currentPlan');
     this.idPlan = plan ? Number(plan) : undefined;
     this.loadPropertiesOffice();
-    this.activeRoute.queryParams.subscribe(async ({ idStrategy, id, idOffice }) => {
+    this.activeRoute.queryParams.subscribe(async ({ id }) => {
       this.idReportModel = +id;
-      if (this.idReportModel) {
-        this.loadReportModel();
-        this.loadScope();
-      }
+      this.loadReportModel();
     });
     this.responsiveSvr.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.responsive = value);
   }
