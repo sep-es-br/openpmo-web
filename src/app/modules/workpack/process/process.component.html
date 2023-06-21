@@ -8,7 +8,7 @@
     <app-card [properties]="cardProcessProperties" class="mt-0 inputs-float-label">
       <div class="p-grid">
         <form [formGroup]="formProcess">
-          <div class="form-group">
+          <div class="form-group" *ngIf="(!idProcess) || (idProcess && !isLoading)">
             <div class="p-field">
               <div class="input-container">
                 <label class="app-input-label" for="float-processNumber">{{ "processNumber" | translate }} * </label>
@@ -109,7 +109,7 @@
               <div class="date-container">
                 <span>{{currentLang === 'pt-BR' ? (item?.date|date:'dd/MM/yyyy') :
                   (item?.date|date:'yyyy/MM/dd')}}</span>
-                <span>{{item.daysDuration}} {{"days" |translate}}</span>
+                <span *ngIf="item.daysDuration !== null">{{item.daysDuration}} {{"days" |translate}}</span>
               </div>
             </p-card>
           </ng-template>
