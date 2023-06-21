@@ -37,6 +37,7 @@ export class BreakdownStructureComponent implements OnChanges, OnDestroy {
   idPlan: number;
   expandedFirst = false;
   topPosLoading = 128;
+  expandedAllDone = false;
 
   constructor(
     private breakdownStructureSrv: BreakdownStructureService,
@@ -68,6 +69,16 @@ export class BreakdownStructureComponent implements OnChanges, OnDestroy {
               this.expanded = false;
             } else {
               this.expanded = panelStatus === 'expand';
+              if (!!this.expandedAllDone && !!this.expanded) {
+                this.wbsTree = [{
+                  ...this.wbsTree[0],
+                  children: this.nodeExpandAll(this.wbsTree[0].children)
+                }];
+                return;
+              }
+              if (panelStatus === 'expand') {
+                this.expandedAllDone = true;
+              }
               if (!this.expanded) {
                 this.wbsTree = [{
                   ...this.wbsTree[0],
@@ -112,6 +123,14 @@ export class BreakdownStructureComponent implements OnChanges, OnDestroy {
       ...node,
       expanded: level <= 1,
       children: node.children ? this.nodeCollapse(node.children, level) : []
+    })) : [];
+  }
+
+  nodeExpandAll(nodeList) {
+    return nodeList ? nodeList.map( node => ({
+      ...node,
+      expanded: true,
+      children: node.children ? this.nodeExpandAll(node.children) : []
     })) : [];
   }
 

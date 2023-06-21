@@ -113,7 +113,7 @@ export class GaugeChartComponent implements OnInit, OnDestroy, OnChanges {
         data: [this.valueChartLeft, Math.abs(this.valueChart), this.valueChartRight],
         backgroundColor: [
           '#d9d9d9',
-          this.valueChart > 0 ? '#0081c1' : '#fa4c4f',
+          this.valueChart >= 0 ? '#0081c1' : '#fa4c4f',
           '#d9d9d9',
         ]
       }]
@@ -133,7 +133,7 @@ export class GaugeChartComponent implements OnInit, OnDestroy, OnChanges {
     const label = this.config.value !== null ? (this.config.value === 0 ? '0' : Number(this.config.value.toFixed(2)).toLocaleString(this.language === 'pt' ? 'pt-BR' : 'en-US')) : null;
     const labelBottom = this.translateSrv.instant(this.config.labelBottom);
 
-    ctx.fillStyle = this.valueChart !== null ? (this.valueChart > 0 ? '#0081c1' : '#fa4c4f') : '#646464';
+    ctx.fillStyle = this.valueChart !== null ? (this.valueChart >= 0 ? '#0081c1' : '#fa4c4f') : '#646464';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'bottom';
     ctx.font = Chart.helpers.fontString(
