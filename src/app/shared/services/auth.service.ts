@@ -89,6 +89,10 @@ export class AuthService {
     localStorage.removeItem(StoreKeys.REFRESH_TOKE);
   }
 
+  clearStorage() {
+    localStorage.clear();
+  }
+
   getAccessToken() {
     return localStorage.getItem(StoreKeys.ACCESS_TOKEN);
   }

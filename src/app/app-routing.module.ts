@@ -75,6 +75,11 @@ const routes: Routes = [
     loadChildren: () => import('./modules/filter-dataview/filter-dataview.module').then(m => m.FilterDataviewModule)
   },
   {
+    path: 'config/filter-dataview',
+    canActivate: [ AuthGuard ],
+    loadChildren: () => import('./modules/filter-dataview/filter-dataview.module').then(m => m.FilterDataviewModule)
+  },
+  {
     path: 'persons',
     canActivate: [ AuthGuard ],
     loadChildren: () => import('./modules/person/person.module').then(m => m.PersonModule)

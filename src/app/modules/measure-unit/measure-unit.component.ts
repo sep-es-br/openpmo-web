@@ -120,7 +120,8 @@ export class MeasureUnitComponent implements OnInit {
 
   async loadMeasureUnitList() {
     this.isLoading = true;
-    const result = await this.measureUnitSvr.GetAll({ idOffice: this.idOffice,
+    const result = await this.measureUnitSvr.GetAll({
+      idOffice: this.idOffice,
       idFilter: this.idFilterSelected,
       term: this.term
     });
@@ -317,11 +318,12 @@ export class MeasureUnitComponent implements OnInit {
     if (idFilter) {
       const filterProperties = this.loadFilterPropertiesList();
       this.filterSrv.setFilterProperties(filterProperties);
-      this.setBreadcrumbStorage();
-      this.router.navigate(['/filter-dataview'], {
+      this.setBreadcrumbStorage(idFilter);
+      this.router.navigate(['/config/filter-dataview'], {
         queryParams: {
           id: idFilter,
-          entityName: 'unitMeasures'
+          entityName: 'unitMeasures',
+          idOffice: this.idOffice
         }
       });
     }
@@ -342,9 +344,10 @@ export class MeasureUnitComponent implements OnInit {
     const filterProperties = this.loadFilterPropertiesList();
     this.filterSrv.setFilterProperties(filterProperties);
     this.setBreadcrumbStorage();
-    this.router.navigate(['/filter-dataview'], {
+    this.router.navigate(['/config/filter-dataview'], {
       queryParams: {
-        entityName: 'unitMeasures'
+        entityName: 'unitMeasures',
+        idOffice: this.idOffice
       }
     });
   }
@@ -363,24 +366,45 @@ export class MeasureUnitComponent implements OnInit {
     return filterPropertiesList;
   }
 
-  setBreadcrumbStorage() {
-    this.breadcrumbSrv.setBreadcrumbStorage([{
-      key: 'administration',
-      info: this.propertiesOffice?.name,
-      tooltip: this.propertiesOffice?.fullName,
-      routerLink: ['/configuration-office'],
-      queryParams: { idOffice: this.idOffice }
-    },
-    {
-      key: 'configuration',
-      info: 'measureUnits',
-      tooltip: this.translateSrv.instant('measureUnits'),
-      routerLink: ['/measure-units'],
-      queryParams: { idOffice: this.idOffice }
-    }, {
-      key: 'filter',
-      routerLink: ['filter-dataview']
-    }]);
+  setBreadcrumbStorage(idFilter?) {
+    const breadcrumb = idFilter ?
+      [{
+        key: 'administration',
+        info: this.propertiesOffice?.name,
+        tooltip: this.propertiesOffice?.fullName,
+        routerLink: ['/configuration-office'],
+        queryParams: { idOffice: this.idOffice }
+      },
+      {
+        key: 'configuration',
+        info: 'measureUnits',
+        tooltip: this.translateSrv.instant('measureUnits'),
+        routerLink: ['/measure-units'],
+        queryParams: { idOffice: this.idOffice }
+      }, {
+        key: 'filter',
+        routerLink: ['/config/filter-dataview'],
+        queryParams: { id: idFilter, entityName: 'unitMeasures', idOffice: this.idOffice }
+      }] :
+      [{
+        key: 'administration',
+        info: this.propertiesOffice?.name,
+        tooltip: this.propertiesOffice?.fullName,
+        routerLink: ['/configuration-office'],
+        queryParams: { idOffice: this.idOffice }
+      },
+      {
+        key: 'configuration',
+        info: 'measureUnits',
+        tooltip: this.translateSrv.instant('measureUnits'),
+        routerLink: ['/measure-units'],
+        queryParams: { idOffice: this.idOffice }
+      }, {
+        key: 'filter',
+        routerLink: ['/config/filter-dataview'],
+        queryParams: { entityName: 'unitMeasures', idOffice: this.idOffice }
+      }]
+    this.breadcrumbSrv.setBreadcrumbStorage(breadcrumb);
   }
 
 }

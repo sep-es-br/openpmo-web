@@ -120,7 +120,8 @@ export class DomainListComponent implements OnInit, OnDestroy {
 
   async loadPropertiesDomains() {
     this.isLoading = true;
-    const { success, data } = await this.domainSvr.GetAll({ 'id-office': this.idOffice,
+    const { success, data } = await this.domainSvr.GetAll({
+      'id-office': this.idOffice,
       idFilter: this.idFilterSelected,
       term: this.term
     });
@@ -181,11 +182,12 @@ export class DomainListComponent implements OnInit, OnDestroy {
     if (idFilter) {
       const filterProperties = this.loadFilterPropertiesList();
       this.filterSrv.setFilterProperties(filterProperties);
-      this.setBreadcrumbStorage();
-      this.router.navigate(['/filter-dataview'], {
+      this.setBreadcrumbStorage(idFilter);
+      this.router.navigate(['/config/filter-dataview'], {
         queryParams: {
           id: idFilter,
-          entityName: 'domains'
+          entityName: 'domains',
+          idOffice: this.idOffice
         }
       });
     }
@@ -206,9 +208,10 @@ export class DomainListComponent implements OnInit, OnDestroy {
     const filterProperties = this.loadFilterPropertiesList();
     this.filterSrv.setFilterProperties(filterProperties);
     this.setBreadcrumbStorage();
-    this.router.navigate(['/filter-dataview'], {
+    this.router.navigate(['/config/filter-dataview'], {
       queryParams: {
-        entityName: 'domains'
+        entityName: 'domains',
+        idOffice: this.idOffice
       }
     });
   }
@@ -227,24 +230,45 @@ export class DomainListComponent implements OnInit, OnDestroy {
     return filterPropertiesList;
   }
 
-  setBreadcrumbStorage() {
-    this.breadcrumbSrv.setBreadcrumbStorage([{
-      key: 'administration',
-      info: this.propertiesOffice?.name,
-      tooltip: this.propertiesOffice?.fullName,
-      routerLink: ['/configuration-office'],
-      queryParams: { idOffice: this.idOffice }
-    },
-    {
-      key: 'configuration',
-      info: 'domains',
-      tooltip: this.translateSrv.instant('domains'),
-      routerLink: ['/domains'],
-      queryParams: { idOffice: this.idOffice }
-    }, {
-      key: 'filter',
-      routerLink: ['filter-dataview']
-    }]);
+  setBreadcrumbStorage(idFilter?) {
+    const breadcrumb = idFilter ?
+      [{
+        key: 'administration',
+        info: this.propertiesOffice?.name,
+        tooltip: this.propertiesOffice?.fullName,
+        routerLink: ['/configuration-office'],
+        queryParams: { idOffice: this.idOffice }
+      },
+      {
+        key: 'configuration',
+        info: 'domains',
+        tooltip: this.translateSrv.instant('domains'),
+        routerLink: ['/domains'],
+        queryParams: { idOffice: this.idOffice }
+      }, {
+        key: 'filter',
+        routerLink: ['/config/filter-dataview'],
+        queryParams: { id: idFilter, entityName: 'domains', idOffice: this.idOffice}
+      }] :
+      [{
+        key: 'administration',
+        info: this.propertiesOffice?.name,
+        tooltip: this.propertiesOffice?.fullName,
+        routerLink: ['/configuration-office'],
+        queryParams: { idOffice: this.idOffice }
+      },
+      {
+        key: 'configuration',
+        info: 'domains',
+        tooltip: this.translateSrv.instant('domains'),
+        routerLink: ['/domains'],
+        queryParams: { idOffice: this.idOffice }
+      }, {
+        key: 'filter',
+        routerLink: ['/config/filter-dataview'],
+        queryParams: { entityName: 'domains', idOffice: this.idOffice}
+      }];
+    this.breadcrumbSrv.setBreadcrumbStorage(breadcrumb);
   }
 
   createNewDomain() {

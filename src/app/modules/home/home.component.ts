@@ -44,6 +44,7 @@ export class HomeComponent implements OnInit {
           this.router.navigate(['/login']);
         } else {
           const userInfo = JSON.parse(atob(dto)) as ISocialLoginResult;
+          this.authSrv.clearStorage();
           this.authSrv.saveToken(userInfo);
           this.authSrv.nextIsLoginDenied(false);
           const user = this.authSrv.getTokenPayload();

@@ -1,13 +1,13 @@
-import {ResponsiveService} from './../../../../shared/services/responsive.service';
-import {takeUntil} from 'rxjs/operators';
-import {Component, Input, OnInit, SimpleChanges} from '@angular/core';
-import {TranslateService} from '@ngx-translate/core';
-import {ChartData, ChartOptions} from 'chart.js';
+import { ResponsiveService } from './../../../../shared/services/responsive.service';
+import { takeUntil } from 'rxjs/operators';
+import { Component, Input, OnInit, SimpleChanges } from '@angular/core';
+import { TranslateService } from '@ngx-translate/core';
+import { ChartData, ChartOptions } from 'chart.js';
 import * as moment from 'moment';
-import {Subject} from 'rxjs';
-import {IEarnedValueAnalysisDashboard} from 'src/app/shared/interfaces/IDashboard';
-import {IGaugeChartData} from 'src/app/shared/interfaces/IGaugeChartData';
-import {ShortNumberPipe} from 'src/app/shared/pipes/shortNumberPipe';
+import { Subject } from 'rxjs';
+import { IEarnedValueAnalysisDashboard } from 'src/app/shared/interfaces/IDashboard';
+import { IGaugeChartData } from 'src/app/shared/interfaces/IGaugeChartData';
+import { ShortNumberPipe } from 'src/app/shared/pipes/shortNumberPipe';
 
 @Component({
   selector: 'app-earned-value-analysis-dashboard',
@@ -135,7 +135,11 @@ export class EarnedValueAnalysisDashboardComponent implements OnInit {
 
   setGaugeChartData() {
     this.gaugeChartDataCPI = {
-      value: this.earnedValueAnalysis?.performanceIndexes[0]?.costPerformanceIndex ?
+      value: this.earnedValueAnalysis?.performanceIndexes[0]?.costPerformanceIndex &&
+        (this.earnedValueAnalysis.performanceIndexes[0].actualCost !== 0 &&
+          this.earnedValueAnalysis.performanceIndexes[0].actualCost !== null &&
+          this.earnedValueAnalysis.performanceIndexes[0].actualCost !== undefined)
+        ?
         (this.earnedValueAnalysis?.performanceIndexes[0]?.costPerformanceIndex?.indexValue === null ? 0 : this.earnedValueAnalysis?.performanceIndexes[0]?.costPerformanceIndex?.indexValue)
         : (null),
       labelBottom: 'CPI',
@@ -145,7 +149,11 @@ export class EarnedValueAnalysisDashboardComponent implements OnInit {
       labelBottomProgressBar: 'CV',
     };
     this.gaugeChartDataSPI = {
-      value: this.earnedValueAnalysis?.performanceIndexes[0]?.schedulePerformanceIndex ?
+      value: this.earnedValueAnalysis?.performanceIndexes[0]?.schedulePerformanceIndex &&
+        (this.earnedValueAnalysis.performanceIndexes[0].plannedValue !== 0 &&
+          this.earnedValueAnalysis.performanceIndexes[0].plannedValue !== null &&
+          this.earnedValueAnalysis.performanceIndexes[0].plannedValue !== undefined)
+        ?
         (this.earnedValueAnalysis?.performanceIndexes[0]?.schedulePerformanceIndex?.indexValue === null ? 0 : this.earnedValueAnalysis?.performanceIndexes[0]?.schedulePerformanceIndex?.indexValue)
         : null,
       labelBottom: 'SPI',

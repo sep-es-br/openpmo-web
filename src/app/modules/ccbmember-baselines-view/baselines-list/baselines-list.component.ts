@@ -134,7 +134,7 @@ export class BaselinesListComponent implements OnInit, OnDestroy {
       iconColor: baselineItem.cancelation && '#FF7F81',
       iconSvg: !baselineItem.cancelation,
       nameCardItem: baselineItem.name,
-      baselineStatus: baselineItem.status.toLowerCase(),
+      baselineStatus: baselineItem.projectName,
       baselineStatusDate: baselineItem.active ? baselineItem.activationDate :
         (['PROPOSED', 'REJECTED'].includes(baselineItem.status) ? baselineItem.proposalDate : (baselineItem.status === 'APPROVED' ? baselineItem.activationDate : 'NONE')),
       baselineActive: baselineItem.active,

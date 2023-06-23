@@ -38,7 +38,8 @@ export class OfficePermissionsListComponent implements OnInit {
     initialStateToggle: false,
     cardTitle: '',
     collapseble: true,
-    initialStateCollapse: false
+    initialStateCollapse: false,
+    showFilters: true
   };
   displayModeAll = 'grid';
   pageSize = 5;
@@ -114,7 +115,8 @@ export class OfficePermissionsListComponent implements OnInit {
   }
 
   async loadOfficePermissions() {
-    const result = await this.officePermissionsSrv.GetAll({ 'id-office': this.idOffice,
+    const result = await this.officePermissionsSrv.GetAll({
+      'id-office': this.idOffice,
       idFilter: this.idFilterSelected,
       term: this.term
     });
@@ -130,9 +132,11 @@ export class OfficePermissionsListComponent implements OnInit {
     if (result.success && result.data.length > 0) {
       const filterDefault = result.data.find(filter => !!filter.favorite);
       this.idFilterSelected = filterDefault ? filterDefault.id : undefined;
-      this.cardOfficePermissions.filters = result.data;
+      this.cardOfficePermissions = {
+        ...this.cardOfficePermissions,
+        filters: result.data
+      }
     }
-    this.cardOfficePermissions.showFilters = true;
   }
 
   loadCardItemsOfficePermissions() {
@@ -204,13 +208,14 @@ export class OfficePermissionsListComponent implements OnInit {
   handleEditFilter(event) {
     const idFilter = event.filter;
     if (idFilter) {
-      this.setBreadcrumbStorage();
+      this.setBreadcrumbStorage(idFilter);
       const filterProperties = this.loadFilterPropertiesList();
       this.filterSrv.setFilterProperties(filterProperties);
-      this.router.navigate(['/filter-dataview'], {
+      this.router.navigate(['/config/filter-dataview'], {
         queryParams: {
           id: idFilter,
-          entityName: 'office-permissions'
+          entityName: 'office-permissions',
+          idOffice: this.idOffice
         }
       });
     }
@@ -231,9 +236,10 @@ export class OfficePermissionsListComponent implements OnInit {
     const filterProperties = this.loadFilterPropertiesList();
     this.filterSrv.setFilterProperties(filterProperties);
     this.setBreadcrumbStorage();
-    this.router.navigate(['/filter-dataview'], {
+    this.router.navigate(['/config/filter-dataview'], {
       queryParams: {
-        entityName: 'office-permissions'
+        entityName: 'office-permissions',
+        idOffice: this.idOffice
       }
     });
   }
@@ -253,20 +259,51 @@ export class OfficePermissionsListComponent implements OnInit {
     return filterPropertiesList;
   }
 
-  setBreadcrumbStorage() {
-    this.breadcrumbSrv.setBreadcrumbStorage([
-      {
-        key: 'officePermissions',
-        routerLink: ['/offices', 'permission'],
-        queryParams: { idOffice: this.idOffice },
-        info: this.propertiesOffice?.name,
-        tooltip: this.propertiesOffice?.fullName
-      },
-      {
-        key: 'filter',
-        routerLink: ['filter-dataview'],
-      }
-    ]);
+  setBreadcrumbStorage(idFilter?) {
+    const breadcrumb = idFilter ?
+      [
+        {
+          key: 'administration',
+          info: this.propertiesOffice?.name,
+          tooltip: this.propertiesOffice?.fullName,
+          routerLink: ['/configuration-office'],
+          queryParams: { idOffice: this.idOffice }
+        },
+        {
+          key: 'configuration',
+          info: 'officePermissions',
+          tooltip: this.translateSrv.instant('officePermissions'),
+          routerLink: ['/offices', 'permission'],
+          queryParams: { idOffice: this.idOffice },
+        },
+        {
+          key: 'filter',
+          routerLink: ['/config/filter-dataview'],
+          queryParams: { id: idFilter, entityName: 'office-permissions', idOffice: this.idOffice}
+        }
+      ] :
+      [
+        {
+          key: 'administration',
+          info: this.propertiesOffice?.name,
+          tooltip: this.propertiesOffice?.fullName,
+          routerLink: ['/configuration-office'],
+          queryParams: { idOffice: this.idOffice }
+        },
+        {
+          key: 'configuration',
+          info: 'officePermissions',
+          tooltip: this.translateSrv.instant('officePermissions'),
+          routerLink: ['/offices', 'permission'],
+          queryParams: { idOffice: this.idOffice },
+        },
+        {
+          key: 'filter',
+          routerLink: ['/config/filter-dataview'],
+          queryParams: { entityName: 'office-permissions', idOffice: this.idOffice}
+        }
+      ];
+    this.breadcrumbSrv.setBreadcrumbStorage(breadcrumb);
   }
 
   async ngOnDestroy(): Promise<void> {

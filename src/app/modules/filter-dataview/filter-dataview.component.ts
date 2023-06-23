@@ -14,7 +14,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { ICardItemFilterRules } from './../../shared/interfaces/ICardItemFilterRules';
 import { FilterDataviewService } from './../../shared/services/filter-dataview.service';
 import { IFilterDataview } from './../../shared/interfaces/IFilterDataview';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { SaveButtonComponent } from './../../shared/components/save-button/save-button.component';
 import { takeUntil, filter } from 'rxjs/operators';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
@@ -26,6 +26,8 @@ import { FilterLogicalOperatorsEnum } from 'src/app/shared/enums/FilterLogicalOp
 import { Location } from '@angular/common';
 import * as moment from 'moment';
 import { IFilterProperty } from 'src/app/shared/interfaces/IFilterProperty';
+import { AuthService } from 'src/app/shared/services/auth.service';
+import { OfficePermissionService } from 'src/app/shared/services/office-permission.service';
 
 @Component({
   selector: 'app-filter-dataview',
@@ -69,9 +71,12 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
     private localitySrv: LocalityService,
     private organizationSrv: OrganizationService,
     private unitMeasureSrv: MeasureUnitService,
+    private locationSrv: Location,
+    private authSrv: AuthService,
+    private officePermissionSrv: OfficePermissionService,
+    private router: Router
   ) {
     localStorage.removeItem('@currentPlan');
-    // localStorage.removeItem('@pmo/propertiesCurrentPlan');
     this.loadFormFilter();
     this.formFilter.statusChanges
       .pipe(takeUntil(this.$destroy), filter(status => status === 'INVALID'))
@@ -89,6 +94,7 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
       this.entityName = entityName;
       this.idWorkpackModel = idWorkpackModel ? +idWorkpackModel : undefined;
       this.idOffice = +idOffice;
+      this.checkURL(`#${this.locationSrv.path()}`);
     });
     if (!!this.idWorkpackModel) {
       switch (this.entityName) {
@@ -116,6 +122,20 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
     } else {
       this.filterUrl = this.entityName;
     }
+  }
+
+  async checkURL(url: string) {
+    const [ path ] = url.slice(2).split('?');
+    if (path.startsWith('config/filter-dataview')) {
+      const isAdmin = await this.authSrv.isUserAdmin();
+      if (!isAdmin) {
+        const editPermission = this.idOffice ? await this.officePermissionSrv.getPermissions(this.idOffice) : false;
+        if (!editPermission) {
+          this.router.navigate(['/offices']);
+        }
+      }
+    }
+    
   }
 
   async ngOnInit() {
@@ -223,6 +243,7 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
           }]
         };
       });
+      
       this.ruleCards.push({
         typeCard: 'new-card'
       });

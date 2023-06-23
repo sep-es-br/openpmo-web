@@ -54,7 +54,8 @@ export class DomainLocalityComponent implements OnInit, OnDestroy {
     initialStateToggle: false,
     cardTitle: 'localities',
     collapseble: true,
-    initialStateCollapse: false
+    initialStateCollapse: false,
+    searchTerm: ''
   };
   childrenLocalities: ILocality[];
   cardItemsChildrenLocalities: ICardItem[];
@@ -103,7 +104,7 @@ export class DomainLocalityComponent implements OnInit, OnDestroy {
     this.configDataViewSrv.observablePageSize.pipe(takeUntil(this.$destroy)).subscribe(pageSize => {
       this.pageSize = pageSize;
     });
-    this.activeRoute.queryParams.subscribe(async({ id, idOffice, idDomain, type, idParent }) => {
+    this.activeRoute.queryParams.subscribe(async ({ id, idOffice, idDomain, type, idParent }) => {
       this.idLocality = +id;
       this.idOffice = +idOffice;
       this.idDomain = +idDomain;
@@ -111,6 +112,10 @@ export class DomainLocalityComponent implements OnInit, OnDestroy {
       this.idParent = +idParent;
       this.saveButton?.hideButton();
       this.editPermission = await this.officePermissionSrv.getPermissions(this.idOffice);
+      this.cardLocalities = {
+        ...this.cardLocalities,
+        searchTerm: ''
+      };
       await this.loadPropertiesLocality();
       this.breadcrumbSrv.setMenu([
         {
@@ -303,10 +308,12 @@ export class DomainLocalityComponent implements OnInit, OnDestroy {
         ] : undefined,
         urlCard: this.propertiesLocality?.children ? '/domains/locality' : undefined,
         paramsUrlCard: [
-          { name: 'idDomain',
+          {
+            name: 'idDomain',
             value: (this.propertiesLocality?.domain
-                    ? this.propertiesLocality?.domain?.id
-                    : this.propertiesLocality?.domainRoot && this.propertiesLocality?.domainRoot?.id) },
+              ? this.propertiesLocality?.domain?.id
+              : this.propertiesLocality?.domainRoot && this.propertiesLocality?.domainRoot?.id)
+          },
           { name: 'idParent', value: this.idLocality },
           { name: 'idOffice', value: this.idOffice },
           { name: 'type', value: this.propertiesLocality?.children ? this.propertiesLocality?.children[0]?.type : undefined }
@@ -335,10 +342,12 @@ export class DomainLocalityComponent implements OnInit, OnDestroy {
           ] as MenuItem[],
           urlCard: '/domains/locality',
           paramsUrlCard: [
-            { name: 'idDomain',
+            {
+              name: 'idDomain',
               value: (this.propertiesLocality?.domain
-                      ? this.propertiesLocality?.domain?.id
-                      : this.propertiesLocality?.domainRoot?.id) },
+                ? this.propertiesLocality?.domain?.id
+                : this.propertiesLocality?.domainRoot?.id)
+            },
             { name: 'idParent', value: this.idLocality },
             { name: 'idOffice', value: this.idOffice },
             { name: 'type', value: this.propertiesLocality?.children ? this.propertiesLocality.children[0].type : undefined }
@@ -371,8 +380,8 @@ export class DomainLocalityComponent implements OnInit, OnDestroy {
 
   async handleOnSubmit() {
     const idDomain = this.propertiesLocality?.domain
-                      ? this.propertiesLocality?.domain?.id
-                      : (this.propertiesLocality?.domainRoot && this.propertiesLocality?.domainRoot?.id);
+      ? this.propertiesLocality?.domain?.id
+      : (this.propertiesLocality?.domainRoot && this.propertiesLocality?.domainRoot?.id);
     delete this.propertiesLocality?.domain;
     const { success, data } = this.propertiesLocality
       ? await this.localitySvr.put({ ...this.propertiesLocality, ...this.formLocality.value, idDomain })
@@ -417,11 +426,12 @@ export class DomainLocalityComponent implements OnInit, OnDestroy {
     if (idFilter) {
       const filterProperties = this.loadFilterPropertiesList();
       this.filterSrv.setFilterProperties(filterProperties);
-      await this.setBreadcrumbStorage();
-      this.router.navigate(['/filter-dataview'], {
+      await this.setBreadcrumbStorage(idFilter);
+      this.router.navigate(['/config/filter-dataview'], {
         queryParams: {
           id: idFilter,
-          entityName: 'localities'
+          entityName: 'localities',
+          idOffice: this.idOffice
         }
       });
     }
@@ -443,9 +453,10 @@ export class DomainLocalityComponent implements OnInit, OnDestroy {
     const filterProperties = this.loadFilterPropertiesList();
     this.filterSrv.setFilterProperties(filterProperties);
     await this.setBreadcrumbStorage();
-    this.router.navigate(['/filter-dataview'], {
+    this.router.navigate(['/config/filter-dataview'], {
       queryParams: {
-        entityName: 'localities'
+        entityName: 'localities',
+        idOffice: this.idOffice
       }
     });
   }
@@ -465,35 +476,67 @@ export class DomainLocalityComponent implements OnInit, OnDestroy {
     return filterPropertiesList;
   }
 
-  async setBreadcrumbStorage() {
-    this.breadcrumbSrv.setBreadcrumbStorage([
-      {
-        key: 'administration',
-        info: this.propertiesOffice?.name,
-        tooltip: this.propertiesOffice?.fullName,
-        routerLink: ['/configuration-office'],
-        queryParams: { idOffice: this.idOffice }
-      },
-      {
-        key: 'configuration',
-        info: 'domains',
-        tooltip: this.translateSrv.instant('domains'),
-        routerLink: ['/domains'],
-        queryParams: { idOffice: this.idOffice }
-      },
-      {
-        key: 'domain',
-        info: this.propertiesDomain?.name,
-        tooltip: this.propertiesDomain?.fullName,
-        routerLink: ['/domains', 'detail'],
-        queryParams: { id: this.idDomain, idOffice: this.idOffice }
-      },
-      ... await this.getBreadcrumbs(),
-      ...[{
-        key: 'filter',
-        routerLink: ['/filter-dataview']
-      }]
-    ]);
+  async setBreadcrumbStorage(idFilter?) {
+    const breadcrumb = idFilter ?
+      [
+        {
+          key: 'administration',
+          info: this.propertiesOffice?.name,
+          tooltip: this.propertiesOffice?.fullName,
+          routerLink: ['/configuration-office'],
+          queryParams: { idOffice: this.idOffice }
+        },
+        {
+          key: 'configuration',
+          info: 'domains',
+          tooltip: this.translateSrv.instant('domains'),
+          routerLink: ['/domains'],
+          queryParams: { idOffice: this.idOffice }
+        },
+        {
+          key: 'domain',
+          info: this.propertiesDomain?.name,
+          tooltip: this.propertiesDomain?.fullName,
+          routerLink: ['/domains', 'detail'],
+          queryParams: { id: this.idDomain, idOffice: this.idOffice }
+        },
+        ... await this.getBreadcrumbs(),
+        ...[{
+          key: 'filter',
+          routerLink: ['/config/filter-dataview'],
+          queryParams: { id: idFilter, entityName: 'localities', idOffice: this.idOffice }
+        }]
+      ] :
+      [
+        {
+          key: 'administration',
+          info: this.propertiesOffice?.name,
+          tooltip: this.propertiesOffice?.fullName,
+          routerLink: ['/configuration-office'],
+          queryParams: { idOffice: this.idOffice }
+        },
+        {
+          key: 'configuration',
+          info: 'domains',
+          tooltip: this.translateSrv.instant('domains'),
+          routerLink: ['/domains'],
+          queryParams: { idOffice: this.idOffice }
+        },
+        {
+          key: 'domain',
+          info: this.propertiesDomain?.name,
+          tooltip: this.propertiesDomain?.fullName,
+          routerLink: ['/domains', 'detail'],
+          queryParams: { id: this.idDomain, idOffice: this.idOffice }
+        },
+        ... await this.getBreadcrumbs(),
+        ...[{
+          key: 'filter',
+          routerLink: ['/config/filter-dataview'],
+          queryParams: { entityName: 'localities', idOffice: this.idOffice }
+        }]
+      ]
+    this.breadcrumbSrv.setBreadcrumbStorage(breadcrumb);
   }
 
 

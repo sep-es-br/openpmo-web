@@ -8,7 +8,7 @@
       <label class="app-input-label" for="level-dropdown">{{ "role" | translate }}</label>
     </span>
     <div class="card-header-toggle">
-      <p-inputSwitch class="app-toggle" [(ngModel)]="properties.role.active" (onChange)="handleRoleChange()" [disabled]="!properties.role.active || properties.readOnly">
+      <p-inputSwitch class="app-toggle" [(ngModel)]="properties.role.active" (onChange)="handleRoleChange()" [disabled]="properties.readOnly">
       </p-inputSwitch>
     </div>
   </div>

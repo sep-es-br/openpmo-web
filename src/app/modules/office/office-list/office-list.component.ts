@@ -156,8 +156,8 @@ export class OfficeListComponent implements OnInit {
         }
       }
       itemsProperties.unshift(...data.map(office => {
-        const editPermissions = (!this.isUserAdmin && office.permissions) && office.permissions.filter(p => p.level === 'EDIT');
-        const editPermission = this.isUserAdmin ? true : (editPermissions && editPermissions.length > 0 ? true : false);
+        const editPermissions = (!this.isUserAdmin && office.permissions) && office.permissions.filter(p => p.level === 'EDIT').length > 0;
+        const editPermission = this.isUserAdmin ? true : editPermissions;
         const officeCardItem = {
           typeCardItem: 'listItem',
           iconSvg: true,

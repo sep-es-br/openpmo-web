@@ -75,6 +75,13 @@ export class FilterRuleCardItemComponent implements OnInit {
       && this.filterRuleCard.typeCard !== 'new-card' && this.filterRuleCard && this.filterRuleCard.propertiesList) {
       this.translatePropertiesListOptions()
     };
+    if (this.propertySelected && this.propertySelected.possibleValues &&
+      (!this.idWorkpackModel || (!!this.idWorkpackModel && this.workpackModelEntitiesOptions.includes(this.entityName)))) {
+      this.propertySelected.possibleValues = this.filterRuleCard.propertySelected.possibleValues.map(item => ({
+        ...item,
+        label: this.translateSrv.instant(item.value)
+      }));
+    }
     this.filterRuleCard.menuItems = [{
       label: this.translateSrv.instant('delete'),
       icon: 'fas fa-trash-alt',
@@ -84,6 +91,17 @@ export class FilterRuleCardItemComponent implements OnInit {
     this.operatorsList = operators;
     if (this.filterRuleCard.propertySelected) {
       this.propertySelected = this.filterRuleCard.propertySelected;
+      if (this.propertySelected && this.propertySelected.possibleValues &&
+        (!this.idWorkpackModel || (!!this.idWorkpackModel && this.workpackModelEntitiesOptions.includes(this.entityName)))) {
+        this.propertySelected = {
+          ...this.propertySelected,
+          possibleValues: this.filterRuleCard.propertySelected.possibleValues.map(item => ({
+            ...item,
+            label: this.translateSrv.instant(item.label)
+          }))
+        };
+      }
+
     }
   }
 

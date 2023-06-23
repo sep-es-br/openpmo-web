@@ -228,15 +228,16 @@ export class StrategyListComponent implements OnInit, OnDestroy {
   }
 
   handleEditFilter(event) {
-    this.setBreadcrumbStorage();
     const idFilter = event.filter;
+    this.setBreadcrumbStorage(idFilter);
     if (idFilter) {
       const filterProperties = this.loadFilterPropertiesList();
       this.filterSrv.setFilterProperties(filterProperties);
-      this.router.navigate(['/filter-dataview'], {
+      this.router.navigate(['/config/filter-dataview'], {
         queryParams: {
           id: idFilter,
-          entityName: 'plan-models'
+          entityName: 'plan-models',
+          idOffice: this.idOffice
         }
       });
     }
@@ -257,9 +258,10 @@ export class StrategyListComponent implements OnInit, OnDestroy {
     this.setBreadcrumbStorage();
     const filterProperties = this.loadFilterPropertiesList();
     this.filterSrv.setFilterProperties(filterProperties);
-    this.router.navigate(['/filter-dataview'], {
+    this.router.navigate(['/config/filter-dataview'], {
       queryParams: {
-        entityName: 'plan-models'
+        entityName: 'plan-models',
+        idOffice: this.idOffice
       }
     });
   }
@@ -278,8 +280,9 @@ export class StrategyListComponent implements OnInit, OnDestroy {
     return filterPropertiesList;
   }
 
-  setBreadcrumbStorage() {
-    this.breadcrumbSrv.setBreadcrumbStorage([{
+  setBreadcrumbStorage(idFilter?) {
+    const breadcrumb = idFilter ?
+    [{
       key: 'administration',
       info: this.propertiesOffice?.name,
       tooltip: this.propertiesOffice?.fullName,
@@ -294,8 +297,28 @@ export class StrategyListComponent implements OnInit, OnDestroy {
       queryParams: { idOffice: this.idOffice }
     }, {
       key: 'filter',
-      routerLink: ['filter-dataview']
-    }]);
+      routerLink: ['config/filter-dataview'],
+      queryParams: { id: idFilter, entityName: 'plan-models', idOffice: this.idOffice}
+    }] : 
+    [{
+      key: 'administration',
+      info: this.propertiesOffice?.name,
+      tooltip: this.propertiesOffice?.fullName,
+      routerLink: ['/configuration-office'],
+      queryParams: { idOffice: this.idOffice }
+    },
+    {
+      key: 'configuration',
+      info: 'planModels',
+      tooltip: this.translateSrv.instant('planModels'),
+      routerLink: ['/strategies'],
+      queryParams: { idOffice: this.idOffice }
+    }, {
+      key: 'filter',
+      routerLink: ['config/filter-dataview'],
+      queryParams: { entityName: 'plan-models', idOffice: this.idOffice}
+    }]
+    this.breadcrumbSrv.setBreadcrumbStorage(breadcrumb);
   }
 
 

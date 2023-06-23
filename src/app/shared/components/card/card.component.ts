@@ -67,6 +67,7 @@ export class CardComponent implements OnInit, OnDestroy, OnChanges {
     if (
       (changes.properties && changes.properties.currentValue) || changes.loading
     ) {
+      this.showAnimationSearch = !this.properties.searchTerm || this.properties.searchTerm === '' ? false : true;
       this.properties.progressBarValues = this.properties.progressBarValues &&
         this.properties.progressBarValues.filter( item => item.total !== 0 );
       this.canEditCheckCompleted = this.properties.canEditCheckCompleted;
@@ -157,7 +158,7 @@ export class CardComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   handleSearchText() {
-    const inputtext = document.getElementById('id-app-inputtext');
+    const inputtext = document.getElementById('id-app-inputtext'+this.properties.cardTitle);
     inputtext.focus();
     const value = this.properties.searchTerm;
     if (value !== this.searchTextAux) {

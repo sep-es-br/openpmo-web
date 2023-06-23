@@ -237,6 +237,10 @@
             align-items: center;
             .filter-item-label {
               flex: 1;
+              font-size: 0.8rem;
+            }
+            > i {
+              margin-left: 5px;
             }
           }
           .new-filter {

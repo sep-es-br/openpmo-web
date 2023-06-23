@@ -51,7 +51,7 @@
     </div>
     <div class="dataview-filters-container" *ngIf="properties.showFilters || properties.showCreateNemElementButton">
       <div class="dataview-filters-text" *ngIf="!properties.initialStateCollapse && properties.showFilters">
-        <input pInputText id="id-app-inputtext" class="app-input-text"
+        <input pInputText [id]="'id-app-inputtext' + properties.cardTitle" class="app-input-text"
                [class.animation-input]="showAnimationSearch"
                [(ngModel)]="properties.searchTerm"
                [placeholder]="translateSrv.instant('search')"

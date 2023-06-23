@@ -32,7 +32,8 @@ export class OrganizationListComponent implements OnInit, OnDestroy {
     initialStateToggle: false,
     cardTitle: '',
     collapseble: true,
-    initialStateCollapse: false
+    initialStateCollapse: false,
+    showFilters: true
   };
   propertiesOffice: IOffice;
   idOffice: number;
@@ -78,7 +79,7 @@ export class OrganizationListComponent implements OnInit, OnDestroy {
     this.isLoading = true;
     this.isUserAdmin = await this.authSrv.isUserAdmin();
     this.editPermission = await this.officePermissionSrv.getPermissions(this.idOffice);
-    if (! this.isUserAdmin && !this.editPermission) {
+    if (!this.isUserAdmin && !this.editPermission) {
       this.router.navigate(['/offices']);
     }
     await this.loadFiltersOrganizations();
@@ -103,8 +104,8 @@ export class OrganizationListComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-      this.$destroy.complete();
-      this.$destroy.unsubscribe();
+    this.$destroy.complete();
+    this.$destroy.unsubscribe();
   }
 
   async getOfficeById() {
@@ -116,7 +117,8 @@ export class OrganizationListComponent implements OnInit, OnDestroy {
 
   async loadPropertiesOrganizations() {
     this.isLoading = true;
-    const { success, data } = await this.organizationSvr.GetAll({ 'id-office': this.idOffice,
+    const { success, data } = await this.organizationSvr.GetAll({
+      'id-office': this.idOffice,
       idFilter: this.idFilterSelected,
       term: this.term
     });
@@ -150,7 +152,10 @@ export class OrganizationListComponent implements OnInit, OnDestroy {
     }
     this.cardItemsProperties = itemsProperties;
     this.totalRecords = this.cardItemsProperties && this.cardItemsProperties.length;
-    this.cardProperties.showCreateNemElementButton = this.editPermission ? true : false;
+    this.cardProperties = {
+      ...this.cardProperties,
+      showCreateNemElementButton: this.editPermission ? true : false
+    }
   }
 
   handleCreateNewOrganization() {
@@ -174,9 +179,11 @@ export class OrganizationListComponent implements OnInit, OnDestroy {
     if (result.success && result.data.length > 0) {
       const filterDefault = result.data.find(filter => !!filter.favorite);
       this.idFilterSelected = filterDefault ? filterDefault.id : undefined;
-      this.cardProperties.filters = result.data;
+      this.cardProperties = {
+        ...this.cardProperties,
+        filters: result.data
+      }
     }
-    this.cardProperties.showFilters = true;
   }
 
   handleEditFilter(event) {
@@ -184,11 +191,12 @@ export class OrganizationListComponent implements OnInit, OnDestroy {
     if (idFilter) {
       const filterProperties = this.loadFilterPropertiesList();
       this.filterSrv.setFilterProperties(filterProperties);
-      this.setBreadcrumbStorage();
-      this.router.navigate(['/filter-dataview'], {
+      this.setBreadcrumbStorage(idFilter);
+      this.router.navigate(['/config/filter-dataview'], {
         queryParams: {
           id: idFilter,
-          entityName: 'organizations'
+          entityName: 'organizations',
+          idOffice: this.idOffice
         }
       });
     }
@@ -209,9 +217,10 @@ export class OrganizationListComponent implements OnInit, OnDestroy {
     const filterProperties = this.loadFilterPropertiesList();
     this.filterSrv.setFilterProperties(filterProperties);
     this.setBreadcrumbStorage();
-    this.router.navigate(['/filter-dataview'], {
+    this.router.navigate(['/config/filter-dataview'], {
       queryParams: {
-        entityName: 'organizations'
+        entityName: 'organizations',
+        idOffice: this.idOffice
       }
     });
   }
@@ -231,8 +240,8 @@ export class OrganizationListComponent implements OnInit, OnDestroy {
     return filterPropertiesList;
   }
 
-  setBreadcrumbStorage() {
-    this.breadcrumbSrv.setBreadcrumbStorage([{
+  setBreadcrumbStorage(idFilter?) {
+    const breadCrumb = idFilter ? [{
       key: 'administration',
       info: this.propertiesOffice?.name,
       tooltip: this.propertiesOffice?.fullName,
@@ -248,7 +257,29 @@ export class OrganizationListComponent implements OnInit, OnDestroy {
     },
     {
       key: 'filter',
-      routerLink: ['/filter-dataview'],
-    }]);
+      routerLink: ['/config/filter-dataview'],
+      queryParams: { id: idFilter, entityName: 'organizations', idOffice: this.idOffice}
+    }] :
+    [{
+      key: 'administration',
+      info: this.propertiesOffice?.name,
+      tooltip: this.propertiesOffice?.fullName,
+      routerLink: ['/configuration-office'],
+      queryParams: { idOffice: this.idOffice }
+    },
+    {
+      key: 'configuration',
+      info: 'organizations',
+      tooltip: this.translateSrv.instant('organizations'),
+      routerLink: ['/organizations'],
+      queryParams: { idOffice: this.idOffice }
+    },
+    {
+      key: 'filter',
+      routerLink: ['/config/filter-dataview'],
+      queryParams: { entityName: 'organizations', idOffice: this.idOffice}
+    }] 
+
+    this.breadcrumbSrv.setBreadcrumbStorage(breadCrumb);
   }
 }
