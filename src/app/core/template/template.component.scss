@@ -105,3 +105,8 @@ $loadingBarHeight: .3rem;
   bottom: 0;
   width: -webkit-fill-available;
 }
+
+.footer-container-fixed {
+  position: sticky;
+  width: -webkit-fill-available;
+}
