@@ -879,10 +879,10 @@ export class PlanComponent implements OnInit, OnDestroy {
     if (workpackModelCardIndex > -1) {
       const idFilter = this.cardsPlanWorkPackModels[workpackModelCardIndex].propertiesCard.idFilterSelected;
       const term = this.cardsPlanWorkPackModels[workpackModelCardIndex].propertiesCard.searchTerm;
-      const { workpackItemCardList, iconMenuItems } = await this.loadWorkpacksFromWorkpackModel(this.planData.id, idWorkpackModel, idFilter, term);
-      const workpacksByFilter = workpackItemCardList;
+      const result = await this.loadWorkpacksFromWorkpackModel(this.planData.id, idWorkpackModel, idFilter, term);
+      const workpacksByFilter = result ? result.workpackItemCardList : [];
       this.cardsPlanWorkPackModels[workpackModelCardIndex].workpackItemCardList = Array.from(workpacksByFilter);
-      this.cardsPlanWorkPackModels[workpackModelCardIndex].propertiesCard.createNewElementMenuItemsWorkpack = iconMenuItems;
+      this.cardsPlanWorkPackModels[workpackModelCardIndex].propertiesCard.createNewElementMenuItemsWorkpack = result ? result.iconMenuItems : [];
       if (this.cardsPlanWorkPackModels[workpackModelCardIndex].workpackItemCardList.find(card => card.typeCardItem === 'newCardItem')) {
         this.cardsPlanWorkPackModels[workpackModelCardIndex].propertiesCard.showCreateNemElementButton = true;
       }

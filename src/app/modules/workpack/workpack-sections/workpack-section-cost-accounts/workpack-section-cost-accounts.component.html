@@ -10,7 +10,7 @@
       </div>
       <p-dataView [value]="sectionCostAccount?.cardItemsSection" layout="grid" class="app-dataview"
         [emptyMessage]="'notFoundCostAccounts' | translate" *ngIf="(displayModeAll === 'grid' || (displayModeAll === 'list' && !!responsive)) &&
-          sectionCostAccount.cardItemsSection && sectionCostAccount.cardItemsSection.length > 0" [paginator]="true"
+          !sectionCostAccount.cardSection.isLoading" [paginator]="true"
         [rows]="pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false"
         [totalRecords]="totalRecordsCostAccounts">
         <ng-template let-cardItem pTemplate="gridItem">
@@ -23,7 +23,7 @@
       </p-dataView>
       <p-dataView [value]="sectionCostAccount.cardItemsSection" layout="list" class="app-dataview app-dataview-list"
         [emptyMessage]="'notFoundCostAccounts' | translate"
-        *ngIf="(displayModeAll === 'list' && !responsive) && sectionCostAccount.cardItemsSection && sectionCostAccount.cardItemsSection.length > 0"
+        *ngIf="(displayModeAll === 'list' && !responsive) && !sectionCostAccount.cardSection.isLoading"
         [paginator]="true" [rows]="pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false"
         [totalRecords]="totalRecordsCostAccounts">
         <ng-template let-cardItem pTemplate="listItem">
