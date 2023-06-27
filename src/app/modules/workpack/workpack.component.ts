@@ -1095,8 +1095,9 @@ export class WorkpackComponent implements OnDestroy {
     const filters = resultFilters.success && resultFilters.data;
     const idFilterSelected = filters.find(defaultFilter => !!defaultFilter.favorite) ?
       filters.find(defaultFilter => !!defaultFilter.favorite).id : undefined;
+    const term = this.cardsWorkPackModelChildren[workpackModelIndex].cardSection.searchTerm;
     const resultItemsList = await
-      this.loadWorkpacksFromWorkpackModel(this.workpack.plan.id, idWorkpackModel, idFilterSelected, event.checked);
+      this.loadWorkpacksFromWorkpackModel(this.workpack.plan.id, idWorkpackModel, idFilterSelected, term, event.checked);
     this.cardsWorkPackModelChildren[workpackModelIndex].cardItemsSection = resultItemsList && resultItemsList.workpackItemCardList;
     this.cardsWorkPackModelChildren[workpackModelIndex].cardSection.createNewElementMenuItemsWorkpack =
       resultItemsList && resultItemsList.iconMenuItems;
