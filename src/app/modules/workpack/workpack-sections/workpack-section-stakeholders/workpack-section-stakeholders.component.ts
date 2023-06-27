@@ -151,7 +151,7 @@ export class WorkpackSectionStakeholdersComponent implements OnInit, OnDestroy {
           icon: stakeholder.person ? (editPermission ? IconsEnum.UserEdit :
             (readPermission ? IconsEnum.UserRead : IconsEnum.UserCircle)) : IconsEnum.Building,
           iconSvg: true,
-          nameCardItem: stakeholder.person ? stakeholder.person.fullName : stakeholder.organization.fullName,
+          nameCardItem: stakeholder.person ? stakeholder.person.name : stakeholder.organization.name,
           fullNameCardItem: stakeholder.person ? stakeholder.person.fullName : stakeholder.organization.fullName,
           subtitleCardItem: stakeholder.roles && stakeholder.roles.filter(r => r.active && (!r.to || r.to === null ||
             moment(r.to, 'yyyy-MM-DD').isSameOrAfter(moment()))

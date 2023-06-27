@@ -79,7 +79,7 @@
               <div class="button-change"
                 *ngIf="['EDIT', 'READ'].includes(propertiesPerson?.officePermission?.accessLevel)">
                 <button pButton [label]="'change' | translate"
-                  (click)="navigateToPage('offices/permission/detail', this.propertiesPerson.email, this.idOffice)">
+                  (click)="navigateToPage('offices/permission/detail', this.propertiesPerson.key, this.idOffice)">
                   <i class="fas fa-share"></i>
                 </button>
               </div>
@@ -101,7 +101,7 @@
                       *ngIf="['EDIT', 'READ'].includes(propertiesPerson?.officePermission?.planPermissions[i].accessLevel)">
                       <button pButton [label]="'change' | translate"
                         (click)="navigateToPage('plan/permission/detail',
-                      this.propertiesPerson.email, undefined, propertiesPerson?.officePermission?.planPermissions[i].id)">
+                      this.propertiesPerson.key, undefined, propertiesPerson?.officePermission?.planPermissions[i].id)">
                         <i class="fas fa-share"></i>
                       </button>
                     </div>

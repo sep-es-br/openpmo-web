@@ -211,7 +211,8 @@ export class PersonProfileComponent implements OnInit, OnDestroy {
           urlCard: `/stakeholder/person`,
           paramsUrlCard: [
             {name: 'idWorkpack', value: workpack.id},
-            {name: 'emailPerson', value: this.propertiesPerson.email}
+            {name: 'idPerson', value: this.propertiesPerson.id},
+            { name: 'idPlan', value: plan.id}
           ],
           nameCardItem: workpack.name,
           subtitleCardItem: workpack?.roles?.join(', '),

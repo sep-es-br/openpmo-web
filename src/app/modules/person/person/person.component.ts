@@ -238,9 +238,9 @@ export class PersonComponent implements OnInit, OnDestroy {
     this.loading = false;
   }
 
-  navigateToPage(url: string, email?: string, idOffice?: number, idPlan?: number) {
+  navigateToPage(url: string, key: string, idOffice?: number, idPlan?: number) {
     this.router.navigate([`${url}`]);
-    this.router.navigate([url], { queryParams: { idPlan, email, idOffice } });
+    this.router.navigate([url], { queryParams: { idPlan, key, idOffice } });
   }
 
   async handleDeleteAllPermissions(event) {
