@@ -135,16 +135,14 @@ export class MenuFixedComponent implements OnInit, OnDestroy {
     });
 
     this.planSrv.observableIdPlan().pipe(takeUntil(this.$destroy)).subscribe(async id => {
-      if (!this.currentIDPlan || this.currentIDPlan !== id) {
-        this.currentIDPlan = id;
-        if (this.currentIDPlan) {
-          localStorage.setItem('@currentPlan', this.currentIDPlan.toString());
-        }
-        await this.loadPropertiesPlan();
-        await this.loadPortfolioMenu();
-        await this.loadFavoritesMenu();
-        await this.loadReportsMenu();
+      this.currentIDPlan = id;
+      if (this.currentIDPlan && this.currentIDPlan !== 0) {
+        localStorage.setItem('@currentPlan', this.currentIDPlan.toString());
       }
+      await this.loadPropertiesPlan();
+      await this.loadPortfolioMenu();
+      await this.loadFavoritesMenu();
+      await this.loadReportsMenu();
     });
 
     this.menuSrv.obsReloadMenuOffice().pipe(takeUntil(this.$destroy)).subscribe(() => { { this.loadOfficeMenu(); } });
@@ -154,7 +152,7 @@ export class MenuFixedComponent implements OnInit, OnDestroy {
       this.loadPortfolioMenu(idNewWorkpack);
     });
     this.menuSrv.obsReloadMenuFavorite().pipe(takeUntil(this.$destroy)).subscribe(() => { this.loadFavoritesMenu(); });
-    this.menuSrv.obsReloadMenuPlanModel().pipe(takeUntil(this.$destroy)).subscribe(() => { 
+    this.menuSrv.obsReloadMenuPlanModel().pipe(takeUntil(this.$destroy)).subscribe(() => {
       !this.isFixed && this.loadPlanModelMenu();
     });
 
@@ -209,7 +207,7 @@ export class MenuFixedComponent implements OnInit, OnDestroy {
   }
 
   async loadReportsMenu() {
-    const result = await this.reportSrv.checkHasActiveReports({'id-plan': this.currentIDPlan});
+    const result = await this.reportSrv.checkHasActiveReports({ 'id-plan': this.currentIDPlan });
     if (result.success) {
       this.hasReports = result.data;
     }
@@ -385,7 +383,7 @@ export class MenuFixedComponent implements OnInit, OnDestroy {
   }
 
   parentsFromBreadcrumb() {
-    const parents = this.storageBreadcrumbsItems.filter( item => ['workpackModel', 'planModel'].includes(item.key)).map( item => item.queryParams.id);
+    const parents = this.storageBreadcrumbsItems.filter(item => ['workpackModel', 'planModel'].includes(item.key)).map(item => item.queryParams.id);
     return parents;
   }
 
@@ -419,7 +417,7 @@ export class MenuFixedComponent implements OnInit, OnDestroy {
         return list;
       }
     } else {
-      list.forEach( item => {
+      list.forEach(item => {
         item.expanded = false;
         if (item.items && item.items.length > 0) {
           item.items = this.expandedMenuSelectedItem(item.items, parents, id);
@@ -584,7 +582,7 @@ export class MenuFixedComponent implements OnInit, OnDestroy {
       type: workpackModel.type,
       parents: [...parents, parent],
       styleClass: parent ? `workpackModel-${workpackModel.id}-${[...parents, parent].join('-')}  ${this.currentURL === `workpackModel?id=${workpackModel.id}` ? 'active' : ''}` :
-      `workpackModel-${workpackModel.id}  ${this.currentURL === `workpackModel?id=${workpackModel.id}` ? 'active' : ''}`,
+        `workpackModel-${workpackModel.id}  ${this.currentURL === `workpackModel?id=${workpackModel.id}` ? 'active' : ''}`,
       items: workpackModel.children?.length ? this.buildMenuItemWorkpackModel(workpackModel.children, idOffice, planModel, (parent ? [...parents, parent] : [...parents]), workpackModel.id) : undefined,
       command: (e) => {
         if (e.originalEvent?.target?.classList?.contains('p-menuitem-text')) {
@@ -642,7 +640,7 @@ export class MenuFixedComponent implements OnInit, OnDestroy {
           tooltip: list[itemIndex].nameInPlural,
           routerLink: ['/workpack-model'],
           queryParams: parent ? { idStrategy: list[itemIndex].idPlanModel, id: list[itemIndex].id, type: list[itemIndex].type, idOffice, idParent: parent } :
-          { idStrategy: list[itemIndex].idPlanModel, id: list[itemIndex].id, type: list[itemIndex].type, idOffice }
+            { idStrategy: list[itemIndex].idPlanModel, id: list[itemIndex].id, type: list[itemIndex].type, idOffice }
         }
       );
       if (list[itemIndex].items && list[itemIndex].items.length > 0) {

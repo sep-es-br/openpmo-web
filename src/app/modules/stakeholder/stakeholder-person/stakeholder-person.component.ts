@@ -725,8 +725,7 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
     }
     // user should have permissions
     return !(((this.user && !this.stakeholder) || (this.stakeholder && this.stakeholder.person.isUser && !this.idPerson))
-      && (!this.stakeholderPermissions || (this.stakeholderPermissions && (this.stakeholderPermissions.length === 0
-          || this.stakeholderPermissions.filter(permission => permission.level.toLowerCase() !== 'none').length === 0))
+      && (!this.stakeholderPermissions || (this.stakeholderPermissions && (this.stakeholderPermissions.length === 0))
       ));
   }
 }

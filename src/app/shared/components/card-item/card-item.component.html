@@ -239,10 +239,8 @@
         [class.risk-yellow]="properties.iconColor === 'low'" [ngStyle]="(displayModeCard === 'list') ? { fontSize: '1.5rem' } : { fontSize: '2.5rem' }"></i>
       <span class="card-item-name" [pTooltip]="properties.fullNameCardItem"
         tooltipPosition="bottom">{{properties.nameCardItem}}</span>
-      <span class="card-item-subtitle" *ngIf="properties.subtitleCardItem"
-        [class.subtitle-card-risk]="properties.statusItem">{{properties.subtitleCardItem}}</span>
-      <span class="card-item-subtitle" *ngIf="properties.statusItem"
-        [class.subtitle-card-risk]="properties.statusItem">{{properties.statusItem|translate}}</span>
+      <span class="card-item-subtitle permission" *ngIf="properties.subtitleCardItem">{{properties.subtitleCardItem}}</span>
+      <span class="card-item-subtitle permission" *ngIf="properties.statusItem">{{properties.statusItem|translate}}</span>
     </div>
     <div class="card-item-footer" *ngIf="cardIdItem">
       <span class="card-item-id">

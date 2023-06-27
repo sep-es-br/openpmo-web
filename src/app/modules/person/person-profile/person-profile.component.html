@@ -11,7 +11,7 @@
           <app-avatar [edit]="true" [idPerson]="idPerson" (changeAvatar)="handleChangeAvatar($event)"
             (deleteAvatar)="handleDeleteAvatar()"></app-avatar>
           <span class="name">{{propertiesPerson?.fullName}}</span>
-          <span class="administrator">{{'administrator'|translate}}</span>
+          <span class="administrator" *ngIf="isUserAdmin">{{'administrator'|translate}}</span>
           <form [formGroup]="formPerson" class="form">
             <span class="p-float-label property-input p-field">
               <input pInputText class="app-input-text" type="text" [class.responsive]="responsive"

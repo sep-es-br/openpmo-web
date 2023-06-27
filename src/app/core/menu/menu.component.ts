@@ -104,8 +104,7 @@ export class MenuComponent implements OnInit, OnDestroy {
     });
     this.planSrv.observableIdPlan().pipe(takeUntil(this.$destroy)).subscribe(async id => {
       if (!this.isFixed) {
-        if (!this.currentIDPlan || this.currentIDPlan !== id) {
-          this.currentIDPlan = id
+        this.currentIDPlan = id
           if (this.currentIDPlan && this.currentIDPlan !== 0) {
             localStorage.setItem('@currentPlan', this.currentIDPlan.toString());
           }
@@ -113,7 +112,6 @@ export class MenuComponent implements OnInit, OnDestroy {
           await this.loadPortfolioMenu();
           await this.loadFavoritesMenu();
           await this.loadReportsMenu();
-        }
       }
     });
     this.menuSrv.obsReloadMenuOffice().pipe(takeUntil(this.$destroy)).subscribe(() => !this.isFixed && this.loadOfficeMenu());

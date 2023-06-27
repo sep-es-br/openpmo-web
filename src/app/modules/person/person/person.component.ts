@@ -230,7 +230,7 @@ export class PersonComponent implements OnInit, OnDestroy {
           ],
           nameCardItem: workpack.name,
           subtitleCardItem: workpack?.roles?.map( role => this.translateSrv.instant(role)).join(', '),
-          statusItem: workpack.ccbMember ? 'ccbMember' : workpack.accessLevel,
+          statusItem: workpack.ccbMember ? 'ccbMember' : workpack.accessLevel !== 'NONE' ? workpack.accessLevel : null,
         };
         return cardItem;
       }),
