@@ -443,6 +443,16 @@
       "thereAreNotCostAccounts": "Não existem centros de custo"
     },
     "error": {
+      "file": {
+        "upload": {
+          "maxsize": {
+            "exceeded": "O tamanho do arquivo excede o tamanho limite."
+          },
+          "save": {
+            "error": "Problemas ao tentar salvar o arquivo."
+          }
+        }
+      },
       "report-design": {
         "generate": {
           "scope": {

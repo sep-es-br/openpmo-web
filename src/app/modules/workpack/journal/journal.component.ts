@@ -1,5 +1,5 @@
 import { Location } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { ActivatedRoute } from '@angular/router';
@@ -7,6 +7,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { MenuItem, MessageService } from 'primeng/api';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { SaveButtonComponent } from 'src/app/shared/components/save-button/save-button.component';
 import { IconsEnum } from 'src/app/shared/enums/IconsEnum';
 import { ICard } from 'src/app/shared/interfaces/ICard';
 import { ICardItem } from 'src/app/shared/interfaces/ICardItem';
@@ -23,6 +24,8 @@ import { WorkpackShowTabviewService } from 'src/app/shared/services/workpack-sho
   styleUrls: ['./journal.component.scss']
 })
 export class JournalComponent implements OnInit {
+
+  @ViewChild(SaveButtonComponent) saveButton: SaveButtonComponent;
   cardJournalProperties: ICard = {
     toggleable: false,
     initialStateToggle: false,
@@ -157,6 +160,9 @@ export class JournalComponent implements OnInit {
   deleteEvidence(evidence: IFile) {
     this.evidences = this.evidences.filter(item => item !== evidence);
     this.setCardItemsEvidences(this.evidences);
+    if (this.formJournal.valid) {
+      this.saveButton.showButton();
+    }
   }
 
   handleUploadEvidence(files) {
@@ -184,13 +190,16 @@ export class JournalComponent implements OnInit {
     const { data, success } = await this.journalSrv.post(sender);
     if (success) {
       this.setGivenNameFromCardToEvidence();
-      this.uploadEvidencesAll(data);
+      const results = await this.uploadEvidencesAll(data);
       this.messageSrv.add({
         severity: 'success',
         summary: this.translateSvr.instant('success'),
         detail: this.translateSvr.instant('messages.savedSuccessfully')
       });
-      this.location.back();
+      setTimeout( () => {
+        this.location.back();
+      }, 1000)
+      
     }
 
   }
@@ -202,14 +211,24 @@ export class JournalComponent implements OnInit {
     }));
   }
 
-  uploadEvidencesAll(data) {
-    this.evidences.forEach(async(evidence: any) => {
+  async uploadEvidencesAll(data) {
+    const results = await Promise.all(this.evidences.map( async (evidence: any) => {
+      if (evidence.id) {
+        return {
+          success: true
+        };
+      }
       const file = await fetch(evidence.url.changingThisBreaksApplicationSecurity);
       const formData: FormData = new FormData();
       const blob = await file.blob();
       formData.append('file', blob, evidence.name);
-      await this.evidenceSrv.uploadEvidence(formData, data.id);
-    });
+      const result =  await this.evidenceSrv.uploadEvidence(formData, data.id);
+      if (result.success) {
+        evidence.id = result.data.id
+      }
+      return result;
+    }));
+    return results;
   }
 
 }

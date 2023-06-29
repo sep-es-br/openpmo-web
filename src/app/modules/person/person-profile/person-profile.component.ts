@@ -1,18 +1,18 @@
-import {Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import {ActivatedRoute, Router} from '@angular/router';
-import {ICard} from 'src/app/shared/interfaces/ICard';
-import {ICardItem} from 'src/app/shared/interfaces/ICardItem';
-import {PersonService} from 'src/app/shared/services/person.service';
-import {ResponsiveService} from 'src/app/shared/services/responsive.service';
-import {filter, takeUntil} from 'rxjs/operators';
-import {Subject} from 'rxjs';
-import {MessageService, SelectItem} from 'primeng/api';
-import {TranslateService} from '@ngx-translate/core';
-import {FormBuilder, FormGroup, Validators} from '@angular/forms';
-import {IPerson} from 'src/app/shared/interfaces/IPerson';
-import {SaveButtonComponent} from 'src/app/shared/components/save-button/save-button.component';
-import {AuthService} from 'src/app/shared/services/auth.service';
-import {BreadcrumbService} from 'src/app/shared/services/breadcrumb.service';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { ICard } from 'src/app/shared/interfaces/ICard';
+import { ICardItem } from 'src/app/shared/interfaces/ICardItem';
+import { PersonService } from 'src/app/shared/services/person.service';
+import { ResponsiveService } from 'src/app/shared/services/responsive.service';
+import { filter, takeUntil } from 'rxjs/operators';
+import { Subject } from 'rxjs';
+import { MessageService, SelectItem } from 'primeng/api';
+import { TranslateService } from '@ngx-translate/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { IPerson } from 'src/app/shared/interfaces/IPerson';
+import { SaveButtonComponent } from 'src/app/shared/components/save-button/save-button.component';
+import { AuthService } from 'src/app/shared/services/auth.service';
+import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
 
 @Component({
   selector: 'app-person-profile',
@@ -137,16 +137,16 @@ export class PersonProfileComponent implements OnInit, OnDestroy {
   }
 
   async loadOptionsOffices() {
-    const {success, data} = await this.personSrv.getOfficesByPerson(this.idPerson);
+    const { success, data } = await this.personSrv.getOfficesByPerson(this.idPerson);
     if (success && data) {
-      this.optionsOffices = data.map(office => ({label: office.name, value: office.id}));
+      this.optionsOffices = data.map(office => ({ label: office.name, value: office.id }));
       this.idOffice = this.optionsOffices[0]?.value;
     }
   }
 
   async loadPerson() {
     if (this.idOffice && !this.isUserAdmin) {
-      const {success, data} = await this.personSrv.GetByIdAndOffice(this.idPerson, this.idOffice);
+      const { success, data } = await this.personSrv.GetByIdAndOffice(this.idPerson, this.idOffice);
       if (success) {
         this.propertiesPerson = data;
         this.setFormPerson(data);
@@ -180,7 +180,7 @@ export class PersonProfileComponent implements OnInit, OnDestroy {
       {
         key: 'profile',
         routerLink: ['/persons/profile'],
-        queryParams: {idOffice: this.idOffice, idPerson: this.idPerson}
+        queryParams: { idOffice: this.idOffice, idPerson: this.idPerson }
       },
     ]);
   }
@@ -210,9 +210,9 @@ export class PersonProfileComponent implements OnInit, OnDestroy {
           itemId: workpack.id,
           urlCard: `/stakeholder/person`,
           paramsUrlCard: [
-            {name: 'idWorkpack', value: workpack.id},
-            {name: 'idPerson', value: this.propertiesPerson.id},
-            { name: 'idPlan', value: plan.id}
+            { name: 'idWorkpack', value: workpack.id },
+            { name: 'idPerson', value: this.propertiesPerson.id },
+            { name: 'idPlan', value: plan.id }
           ],
           nameCardItem: workpack.name,
           subtitleCardItem: workpack?.roles?.join(', '),
@@ -226,7 +226,7 @@ export class PersonProfileComponent implements OnInit, OnDestroy {
 
   async navigateToPage(url: string, email?: string, idOffice?: number, idPlan?: number) {
     await this.router.navigate([`${url}`]);
-    await this.router.navigate([url], {queryParams: {idPlan, email, idOffice}});
+    await this.router.navigate([url], { queryParams: { idPlan, email, idOffice } });
   }
 
   async handleChangeOffice(event) {
@@ -235,7 +235,7 @@ export class PersonProfileComponent implements OnInit, OnDestroy {
   }
 
   handleUnifyOfficesContacts(_event) {
-    this.formPerson.patchValue({unify: true});
+    this.formPerson.patchValue({ unify: true });
     this.saveButton.showButton();
     this.messageSrv.add({
       severity: 'success',
@@ -265,6 +265,8 @@ export class PersonProfileComponent implements OnInit, OnDestroy {
     }
     if (this.deletedAvatar) {
       await this.personSrv.deleteAvatar(this.idPerson);
+      this.deletedAvatar = false;
+      this.personSrv.avatarChangedNext(true);
     }
     let phoneNumber = this.formPerson.controls.phoneNumber.value;
     if (phoneNumber) {
@@ -280,7 +282,7 @@ export class PersonProfileComponent implements OnInit, OnDestroy {
       name: this.formPerson.controls.name.value
     };
     if (this.idOffice) {
-      const {success} = await this.personSrv.PutWithContactOffice({
+      const { success } = await this.personSrv.PutWithContactOffice({
         ...sender
       });
       if (success) {
@@ -292,7 +294,7 @@ export class PersonProfileComponent implements OnInit, OnDestroy {
         });
       }
     } else {
-      const {success} = await this.personSrv.updateNameAdministradorPerson(this.idPerson, sender.name);
+      const { success } = await this.personSrv.updateNameAdministradorPerson(this.idPerson, sender.name);
       if (success) {
         this.messageSrv.add({
           severity: 'success',
@@ -301,7 +303,6 @@ export class PersonProfileComponent implements OnInit, OnDestroy {
         });
       }
     }
-    window.location.reload();
   }
 
   async updateAvatar() {
@@ -309,10 +310,15 @@ export class PersonProfileComponent implements OnInit, OnDestroy {
       formData,
       hasAvatar
     } = this.avatarData;
-     if (hasAvatar) {
-      const result = await this.personSrv.putAvatar(formData, this.idPerson);
+    let result;
+    if (hasAvatar) {
+      result = await this.personSrv.putAvatar(formData, this.idPerson);
     } else {
-      const result = await this.personSrv.postAvatar(formData, this.idPerson);
+      result = await this.personSrv.postAvatar(formData, this.idPerson);
+    }
+    if (result.success) {
+      this.changedAvatar = false;
+      this.personSrv.avatarChangedNext(true);
     }
   }
 }

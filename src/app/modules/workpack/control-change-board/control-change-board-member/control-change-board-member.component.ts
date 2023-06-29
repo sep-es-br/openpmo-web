@@ -87,6 +87,9 @@ export class ControlChangeBoardMemberComponent implements OnInit, OnDestroy {
       this.idPerson = +queryParams.idPerson;
       this.idProject = +queryParams.idProject;
       this.idOffice = +queryParams.idOffice;
+      if (queryParams.idPlan) {
+        localStorage.setItem('@currentPlan', queryParams.idPlan);
+      }
       await this.loadCcbMember();
     });
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => {

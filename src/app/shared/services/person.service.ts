@@ -7,15 +7,28 @@ import { IOffice } from '../interfaces/IOffice';
 import { IPerson } from '../interfaces/IPerson';
 import { IPersonProfile } from '../interfaces/IPersonProfile';
 import { PrepareHttpParams } from '../utils/query.util';
+import { BehaviorSubject } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class PersonService extends BaseService<IPerson> {
+
+  private avatarChanged = new BehaviorSubject<boolean>(false); 
 
   constructor(
     @Inject(Injector) injector: Injector
   ) {
     super('persons', injector);
   }
+
+  get avatarChangedObservable() {
+    return this.avatarChanged.asObservable();
+  }
+
+  avatarChangedNext(nextValue: boolean) {
+    this.avatarChanged.next(nextValue)
+  }
+
+
   public async GetAllPersons(idOffice: number, options?): Promise<IHttpResult<IPerson[]>> {
     const result = await this.http.get<IHttpResult<IPerson[]>>(`${this.urlBase}/office/${idOffice}`,
       {

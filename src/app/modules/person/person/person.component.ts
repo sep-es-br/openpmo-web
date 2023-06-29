@@ -222,6 +222,9 @@ export class PersonComponent implements OnInit, OnDestroy {
           [
             { name: 'idProject',  value: workpack.id },
             { name: 'idPerson', value: this.propertiesPerson.id },
+            { name: 'id', value: this.propertiesPerson.id },
+            { name: 'idOffice',  value: this.idOffice },
+            { name: 'idPlan', value: plan.id}
           ]
             : [
             { name: 'idWorkpack', value: workpack.id },
@@ -274,6 +277,7 @@ export class PersonComponent implements OnInit, OnDestroy {
     }
     if (this.deletedAvatar) {
       await this.personSrv.deleteAvatar(this.idPerson, {'id-office': this.idOffice});
+      this.deletedAvatar = false;
     }
     let phoneNumber = this.formPerson.controls.phoneNumber.value;
     if (phoneNumber) {
@@ -301,10 +305,14 @@ export class PersonComponent implements OnInit, OnDestroy {
       formData,
       hasAvatar
     } = this.avatarData;
+    let result;
      if (hasAvatar) {
-      const result = await this.personSrv.putAvatar(formData, this.idPerson, {'id-office': this.idOffice});
+      result = await this.personSrv.putAvatar(formData, this.idPerson, {'id-office': this.idOffice});
     } else {
-      const result = await this.personSrv.postAvatar(formData, this.idPerson, {'id-office': this.idOffice});
+      result = await this.personSrv.postAvatar(formData, this.idPerson, {'id-office': this.idOffice});
+    }
+    if (result.success) {
+      this.changedAvatar = false;
     }
   }
 

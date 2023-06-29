@@ -444,7 +444,17 @@
       "thereAreNotCostAccounts": "There are not cost accounts"
     },
     "error": {
-      "report-design": {
+      "file": {
+        "upload": {
+          "maxsize": {
+            "exceeded": "The file size exceeds the established size limit."
+          },
+          "save": {
+            "error": "Problems trying to save the file."
+          }
+        }
+      }
+     , "report-design": {
         "generate": {
           "scope": {
             "parameter": {

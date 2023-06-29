@@ -128,7 +128,7 @@
         <div class="card-journal">
           <app-journal-view *ngIf="cardJournalProperties && !!workpack" [cardJournalProperties]="cardJournalProperties"
             [editPermission]="getEditPermission()" [workpackCanceled]="workpack.canceled" [idPlan]="workpack.plan.id"
-            [idOffice]="workpack.plan.idOffice" [idWorkpack]="idWorkpack"></app-journal-view>
+            [idOffice]="workpack.plan.idOffice" [idWorkpack]="workpack.id"></app-journal-view>
         </div>
       </div>
     </app-tabview-scrolled>

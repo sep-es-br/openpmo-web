@@ -24,6 +24,7 @@ import { MobileViewService } from 'src/app/shared/services/mobile-view.service';
 import { IOffice } from 'src/app/shared/interfaces/IOffice';
 import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
 import { ReportService } from 'src/app/shared/services/report.service';
+import { PersonService } from 'src/app/shared/services/person.service';
 
 @Component({
   selector: 'app-menu',
@@ -90,7 +91,7 @@ export class MenuComponent implements OnInit, OnDestroy {
     private cookieSrv: CookieService,
     private confirmationSrv: ConfirmationService,
     private breadcrumbSrv: BreadcrumbService,
-    private reportSrv: ReportService
+    private reportSrv: ReportService,
   ) {
     this.translateChangeSrv.getCurrentLang()
       .pipe(takeUntil(this.$destroy))

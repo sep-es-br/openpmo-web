@@ -1,5 +1,5 @@
 <ng-container [ngSwitch]="properties.typeCardItem">
-  <p-card *ngSwitchCase="'listItem'" class="app-card-item listItem" [class.mobile]="responsive"
+  <p-card *ngSwitchCase="'listItem'" class="app-card-item-file listItem" [class.mobile]="responsive"
     [class.cardList]="displayModeCard === 'list'" [class.canceled]="properties.canceled">
     <p-header *ngIf="properties.menuItems" class="card-item-header">
       <p-menu #menu [popup]="true" [model]="properties.menuItems"></p-menu>

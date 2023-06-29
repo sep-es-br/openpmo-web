@@ -1,16 +1,18 @@
-import { Component, EventEmitter, Input, OnInit, Output, SimpleChanges, OnChanges } from '@angular/core';
+import { takeUntil } from 'rxjs/operators';
+import { Component, EventEmitter, Input, OnInit, Output, SimpleChanges, OnChanges, OnDestroy } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import { HexBase64BinaryEncoding } from 'crypto';
 import { ImageCroppedEvent, LoadedImage } from 'ngx-image-cropper';
 import { IFile } from 'src/app/shared/interfaces/IFile';
 import { PersonService } from '../../shared/services/person.service';
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'app-avatar',
   templateUrl: './avatar.component.html',
   styleUrls: ['./avatar.component.scss']
 })
-export class AvatarComponent implements OnInit, OnChanges {
+export class AvatarComponent implements OnInit, OnChanges, OnDestroy {
 
   @Input() idPerson: number;
   @Input() edit = false;
@@ -26,14 +28,26 @@ export class AvatarComponent implements OnInit, OnChanges {
   imageChangedEvent: any;
   croppedImageAvatar: string;
   urlViewDocument;
+  $destroy = new Subject();
 
   constructor(
     private personSrv: PersonService,
     private sanatize: DomSanitizer
-  ) { }
+  ) {
+    this.personSrv.avatarChangedObservable.pipe(takeUntil(this.$destroy)).subscribe((changed) => {
+      if (changed) {
+        this.setAvatarPerson();
+      }
+    });
+   }
 
   async ngOnInit() {
     await this.redirectSetAvatarStatus();
+  }
+
+  ngOnDestroy() {
+    this.$destroy.next();
+    this.$destroy.complete();
   }
 
   async ngOnChanges(changes: SimpleChanges) {
@@ -55,11 +69,17 @@ export class AvatarComponent implements OnInit, OnChanges {
   async setAvatarPerson() {
     if (this.idPerson) {
       const result = await this.personSrv.getAvatar(this.idPerson);
-      if (result.success && result.data) {
-        if (Object.keys(result.data).length > 0) {
-          this.avatarFile = result.data;
-          this.hasAvatar = true;
+      if (result.success ) {
+        if (result.data && result.data !== null) {
+          if (Object.keys(result.data).length > 0) {
+            this.avatarFile = result.data;
+            this.hasAvatar = true;
+          }
+        } else {
+          this.avatarFile = undefined;
+          this.hasAvatar = false;
         }
+        
       }
     }
   }
