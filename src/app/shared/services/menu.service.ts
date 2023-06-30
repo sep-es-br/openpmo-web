@@ -28,7 +28,7 @@ export class MenuService extends BaseService<any> {
 
   adminsPath = [ 'strategies', 'organizations', 'domains', 'config/filter-dataview',
     'measure-units', 'offices/permission', 'workpack-model', 'configuration-office', 'persons', 'reports/report-model' ];
-  plansPath = [ 'plan', 'workpack', 'stakeholder', 'reports', 'ccbmember-baselines-view', 'filter-dataview'];
+  plansPath = [ 'plan', 'workpack', 'stakeholder', 'reports', 'ccbmember-baselines-view', 'filter-dataview', 'persons/profile'];
   idNewWorkpack: number;
 
   private $reloadMenuOffice = new Subject();

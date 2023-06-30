@@ -336,6 +336,8 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
       this.workpackData.workpack.hasScheduleSectionActive = false;
       this.workpackSrv.nextCanEditCheckCompleted(true);
       await this.loadScheduleSession();
+      this.workpackSrv.nextPendingChanges(false);
+      this.saveButton.hideButton();
     }
   }
 
@@ -459,7 +461,8 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
       if (stepsList.length > 0) {
         let stepIndex = 0;
         for (let month = stepsList.length; month > 0; month--) {
-          const value = Math.trunc(difference / month);
+          const resultValue = difference / month;
+          const value = type === 'unitActual' ?  +(resultValue.toFixed(this.unitMeansure.precision)) : Math.trunc(difference / month);
           difference = difference - value;
           if (type === 'unitActual') {
             stepsList[stepIndex].unitPlanned = stepsList[stepIndex].unitPlanned + value;

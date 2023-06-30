@@ -16,7 +16,6 @@ import { MenuService } from 'src/app/shared/services/menu.service';
 import { OfficePermissionService } from 'src/app/shared/services/office-permission.service';
 import { OfficeService } from 'src/app/shared/services/office.service';
 import { PlanService } from 'src/app/shared/services/plan.service';
-import { ResponsiveService } from 'src/app/shared/services/responsive.service';
 import { TranslateChangeService } from 'src/app/shared/services/translate-change.service';
 import { WorkpackService } from 'src/app/shared/services/workpack.service';
 import { IMenuFavorites } from '../../shared/interfaces/IMenu';

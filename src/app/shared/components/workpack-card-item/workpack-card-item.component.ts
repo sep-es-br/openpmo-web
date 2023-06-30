@@ -47,6 +47,7 @@ export class WorkpackCardItemComponent implements OnInit, OnDestroy {
   showReasonModal: boolean;
   reasonValue: string;
   showReasonButtons = false;
+  milestoneMidleTextBottom: string;
 
   constructor(
     private router: Router,
@@ -222,7 +223,7 @@ export class WorkpackCardItemComponent implements OnInit, OnDestroy {
       if (this.properties?.dashboard?.costPerformanceIndex?.indexValue < 1) {
         this.cpiColor = '#EA5C5C';
       } else {
-        this.cpiColor = '#44B39B';
+        this.cpiColor = '#0081c1';
       }
     } else {
       this.cpiColor = '#646464';
@@ -231,7 +232,7 @@ export class WorkpackCardItemComponent implements OnInit, OnDestroy {
       if (this.properties?.dashboard?.schedulePerformanceIndex?.indexValue < 1) {
         this.spiColor = '#EA5C5C';
       } else {
-        this.spiColor = '#44B39B';
+        this.spiColor = '#0081c1';
       }
     } else {
       this.spiColor = '#646464';
@@ -320,6 +321,7 @@ export class WorkpackCardItemComponent implements OnInit, OnDestroy {
   setDashboardMilestonesData() {
     const milestone = this.properties.dashboard?.milestone;
     const data = milestone && [milestone.onTime, milestone.late, milestone.concluded, milestone.lateConcluded];
+    this.milestoneMidleTextBottom = this.translateSrv.instant('milestonesLabelChart');
     if (data.filter(item => item > 0).length > 0) {
       this.dashboardMilestonesData = {
         labels: [
