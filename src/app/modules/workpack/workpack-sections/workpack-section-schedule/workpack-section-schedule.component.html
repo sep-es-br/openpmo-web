@@ -62,7 +62,7 @@
                     *ngIf="costAssignmentsCardItemsEdited && costAssignmentsCardItemsEdited.length > 0">
                     <i class="fas fa-chevron-left" [class.disabled]="indexCardEdited === 0" (click)="indexCardEdited > 0 && decrementIndex()"></i>
                     <div class="card-cost-assignments">
-                      <app-cost-assignment-card-item [properties]="costAssignmentsCardItemsEdited[indexCardEdited]"
+                      <app-cost-assignment-card-item [properties]="costAssignmentsCardItemsEdited[indexCardEdited]" (spreadDifference)="handleSpreadDifferenceMultiCost($event)"
                         (costChanged)="handleChangeValuesCardItem()">
                       </app-cost-assignment-card-item>
                     </div>

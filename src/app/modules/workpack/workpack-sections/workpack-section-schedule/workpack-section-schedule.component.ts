@@ -462,7 +462,7 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
         let stepIndex = 0;
         for (let month = stepsList.length; month > 0; month--) {
           const resultValue = difference / month;
-          const value = type === 'unitActual' ?  +(resultValue.toFixed(this.unitMeansure.precision)) : Math.trunc(difference / month);
+          const value = type === 'unitActual' ? +(resultValue.toFixed(this.unitMeansure.precision)) : +(resultValue.toFixed(2));
           difference = difference - value;
           if (type === 'unitActual') {
             stepsList[stepIndex].unitPlanned = stepsList[stepIndex].unitPlanned + value;
@@ -494,43 +494,47 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
   async handleShowEditCost(event, group) {
     this.indexCardEdited = 0;
     const idStep = event.idStep;
-    const result = await this.scheduleSrv.GetScheduleStepById(idStep);
-    if (result.success) {
-      const step = result.data;
-      const actualDate = moment();
-      const stepDate = moment(step.periodFromStart, 'yyyy-MM-DD');
-      const showReplicateButton = stepDate.isSameOrBefore(actualDate) ? true : false;
-      this.stepShow = {
-        id: step.id,
-        plannedWork: step.plannedWork,
-        actualWork: step.actualWork,
-        showReplicateButton,
-        consumes: step.consumes && step.consumes.map(consume => ({
-          actualCost: consume.actualCost,
-          plannedCost: consume.plannedCost,
-          idCostAccount: consume.costAccount.id,
-          nameCostAccount: consume.costAccount.name,
-          id: consume.id
-        })),
-        group
-      };
-    }
-    if (this.stepShow && this.stepShow.consumes) {
-      this.costAssignmentsCardItemsEdited = this.stepShow.consumes.map(consume => {
-        return {
-          type: 'cost-card',
-          unitMeasureName: '$',
-          idCost: consume.idCostAccount,
-          idCostAssignment: consume.id,
-          costAccountName: consume.nameCostAccount,
-          plannedWork: consume.plannedCost,
-          actualWork: consume.actualCost,
-          readonly: !this.editPermission,
-          showReplicateButton: this.stepShow.showReplicateButton
+    const groupIndex = this.schedule.groupStep.findIndex(group => group.steps.filter(step => step.id === idStep).length > 0);
+    if (groupIndex > -1) {
+      const stepIndex = this.schedule.groupStep[groupIndex].steps.findIndex(step => step.id === idStep);
+      if (stepIndex > -1) {
+        const step =this.schedule.groupStep[groupIndex].steps[stepIndex];
+        const actualDate = moment();
+        const stepDate = moment(step.periodFromStart, 'yyyy-MM-DD');
+        const showReplicateButton = stepDate.isSameOrBefore(actualDate) ? true : false;
+        this.stepShow = {
+          id: step.id,
+          plannedWork: step.plannedWork,
+          actualWork: step.actualWork,
+          showReplicateButton,
+          periodFromStart: step.periodFromStart,
+          consumes: step.consumes && step.consumes.map(consume => ({
+            actualCost: consume.actualCost,
+            plannedCost: consume.plannedCost,
+            idCostAccount: consume.costAccount.id,
+            nameCostAccount: consume.costAccount.name,
+            id: consume.id
+          })),
+          group
         };
-      });
-      this.cardCostEditPanel.show(event.clickEvent);
-    }
+        if (this.stepShow && this.stepShow.consumes) {
+          this.costAssignmentsCardItemsEdited = this.stepShow.consumes.map(consume => {
+            return {
+              type: 'cost-card',
+              unitMeasureName: '$',
+              idCost: consume.idCostAccount,
+              idCostAssignment: consume.id,
+              costAccountName: consume.nameCostAccount,
+              plannedWork: consume.plannedCost,
+              actualWork: consume.actualCost,
+              readonly: !this.editPermission,
+              showReplicateButton: this.stepShow.showReplicateButton
+            };
+          });
+          this.cardCostEditPanel.show(event.clickEvent);
+        }
+      }
+    }    
   }
 
   decrementIndex() {
@@ -626,6 +630,82 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
         return total + (progressBarCost ? progressBarCost.progress : 0);
       }, 0);
     });
+  }
+
+  // TO DO
+  handleSpreadDifferenceMultiCost(event) {
+    let difference = event.difference;
+    const cardChanged = this.costAssignmentsCardItemsEdited[this.indexCardEdited];
+    const stepDate = this.stepShow.periodFromStart;
+    const idStep = this.stepShow.id;
+    this.handleChangeValuesCardItem();
+    const groupIndex = this.sectionSchedule.groupStep.findIndex(group => group.cardItemSection.filter(item => item.idStep === idStep).length > 0);
+    if (groupIndex > -1) {
+      const stepsList = this.sectionSchedule.groupStep[groupIndex].cardItemSection.filter(step => moment(step.stepName).isAfter(moment(stepDate)) &&
+        step.type === 'listStep');
+      if (this.sectionSchedule.groupStep.length - (groupIndex + 1) > 0) {
+        for (let i = groupIndex + 1; i < this.sectionSchedule.groupStep.length; i++) {
+          this.sectionSchedule.groupStep[i].cardItemSection.filter(listStep => listStep.type === 'listStep').forEach(step => {
+            stepsList.push(step);
+          });
+        }
+      }
+      if (stepsList.length > 0) {
+        let stepIndex = 0;
+        for (let month = stepsList.length; month > 0; month--) {
+          const resultValue = difference / month;
+          const value = +(resultValue.toFixed(2));
+          difference = difference - value;
+          // stepsList[stepIndex].costPlanned = stepsList[stepIndex].costPlanned + value;
+          this.replicateCostAccountValues(stepsList[stepIndex].idStep, cardChanged.idCost, value);
+          stepIndex++;
+        }
+      }
+    }
+  }
+
+  replicateCostAccountValues(idStep, idCost, value) {
+    const groupIndex = this.schedule.groupStep.findIndex(group => group.steps.filter(step => step.id === idStep).length > 0);
+    if (groupIndex > -1) {
+      const stepIndex = this.schedule.groupStep[groupIndex].steps.findIndex(step => step.id === idStep);
+      if (stepIndex > -1) {
+        this.schedule.groupStep[groupIndex].steps[stepIndex].consumes.forEach(consume => {
+          if (consume.costAccount.id === idCost) {
+            consume.plannedCost = consume.plannedCost + value;
+          }
+        });
+        this.stepShow = {
+          id: this.schedule.groupStep[groupIndex].steps[stepIndex].id,
+          plannedWork: this.schedule.groupStep[groupIndex].steps[stepIndex].plannedWork,
+          actualWork: this.schedule.groupStep[groupIndex].steps[stepIndex].actualWork,
+          periodFromStart: this.schedule.groupStep[groupIndex].steps[stepIndex].periodFromStart,
+          consumes: this.schedule.groupStep[groupIndex].steps[stepIndex].consumes && this.schedule.groupStep[groupIndex].steps[stepIndex].consumes.map(consume => ({
+            actualCost: consume.actualCost,
+            plannedCost: consume.plannedCost,
+            idCostAccount: consume.costAccount.id,
+            nameCostAccount: consume.costAccount.name,
+            id: consume.id
+          })),
+          group: this.schedule.groupStep[groupIndex].year
+        };
+        if (this.stepShow && this.stepShow.consumes) {
+          this.costAssignmentsCardItemsEdited = this.stepShow.consumes.map(consume => {
+            return {
+              type: 'cost-card',
+              unitMeasureName: '$',
+              idCost: consume.idCostAccount,
+              idCostAssignment: consume.id,
+              costAccountName: consume.nameCostAccount,
+              plannedWork: consume.plannedCost,
+              actualWork: consume.actualCost,
+              readonly: !this.editPermission,
+              showReplicateButton: this.stepShow.showReplicateButton
+            };
+          });
+        }
+        this.handleChangeValuesCardItem();
+      }
+    }
   }
 
   async refreshScheduleProgressBar() {

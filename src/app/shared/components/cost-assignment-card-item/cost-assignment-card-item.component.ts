@@ -1,7 +1,7 @@
 import { takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
 import { Component, OnInit, Input, Output, OnDestroy, EventEmitter } from '@angular/core';
-import { MenuItem, MessageService } from 'primeng/api';
+import { ConfirmationService, MenuItem, MessageService } from 'primeng/api';
 import { IconsEnum } from 'src/app/shared/enums/IconsEnum';
 import { ResponsiveService } from 'src/app/shared/services/responsive.service';
 import { TranslateService } from '@ngx-translate/core';
@@ -19,6 +19,7 @@ export class CostAssignmentCardItemComponent implements OnInit, OnDestroy {
   @Input() properties: ICartItemCostAssignment;
   @Input() scheduleStartDate: Date;
   @Output() costChanged = new EventEmitter();
+  @Output() spreadDifference = new EventEmitter();
 
   iconsEnum = IconsEnum;
   responsive: boolean;
@@ -26,12 +27,14 @@ export class CostAssignmentCardItemComponent implements OnInit, OnDestroy {
   currentLang: string;
   $destroy = new Subject();
   actualWorkValidadeMessage: string;
+  difference: number;
 
   constructor(
     private responsiveSrv: ResponsiveService,
     private translateSrv: TranslateService,
     private scheduleStartChangeSrv: ScheduleStartChangeService,
-    private messageSrv: MessageService
+    private messageSrv: MessageService,
+    private confirmationSrv: ConfirmationService
   ) {
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.responsive = value);
     this.scheduleStartChangeSrv.observable.pipe(takeUntil(this.$destroy)).subscribe( scheduleStartChanged => {
@@ -80,7 +83,35 @@ export class CostAssignmentCardItemComponent implements OnInit, OnDestroy {
     }, 1);
   }
 
-  handleReplicateValue() {
+  confirmReplicateValueDif() {
+    this.difference = this.properties.plannedWork - this.properties.actualWork
+    if ( this.difference === 0) {
+      this.handleReplicateValue();
+      return;
+    }
+    this.confirmationSrv.confirm({
+      message: this.translateSrv.instant('messages.confirmRedistributeSchedule') + this.difference.toLocaleString(this.currentLang) + 
+        this.translateSrv.instant('messages.overTheRemainingMonths'),
+      key: 'spreadDifferenceConfirm',
+      acceptLabel: this.translateSrv.instant('yes'),
+      rejectLabel: this.translateSrv.instant('no'),
+      accept: async() => {
+        this.handleReplicateValue(true);
+        this.handleSpreadDifference();
+      },
+      reject: () => {
+        this.handleReplicateValue();
+       }
+    });
+  }
+
+  handleSpreadDifference() {
+    this.spreadDifference.next({
+      difference: this.difference
+    });
+  }
+
+  handleReplicateValue(spread?) {
     this.properties.plannedWork = this.properties.actualWork;
     const valueChanged = document.querySelector(`.costPlanned-${this.properties.idCost}`);
     if (valueChanged) {
@@ -89,7 +120,10 @@ export class CostAssignmentCardItemComponent implements OnInit, OnDestroy {
         valueChanged.classList.remove('changed');
       }, 1000)
     }
-    this.costChanged.emit();
+    if (!spread) {
+      this.costChanged.emit();
+    }
+    
   }
 
   checkCostAccountBalance(event, field: string) {

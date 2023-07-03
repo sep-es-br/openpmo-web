@@ -30,7 +30,7 @@
     </div>
     <div class="cost-button-replicate-container" *ngIf="properties.showReplicateButton">
       <i class="fas fa-caret-up" [class.disabled]="!!properties.readonly"
-      (click)="!properties.readonly && handleReplicateValue()"></i>
+      (click)="!properties.readonly && confirmReplicateValueDif()"></i>
     </div>
     <div class="float-label-container">
       <span class="p-float-label" [class.responsive]="responsive">
