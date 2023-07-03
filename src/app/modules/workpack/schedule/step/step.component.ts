@@ -367,12 +367,6 @@ export class StepComponent implements OnInit, OnDestroy {
   }
 
   createNewCardItemCost(idCost: number, costName: string) {
-    if (!this.formStep.valid) {
-      setTimeout(() => {
-        this.messageSrv.add({ severity: 'warn', summary: 'Erro', detail: this.translateSrv.instant('messages.scheduleNotValid') });
-      }, 500);
-      return;
-    }
     const costAccountSelected = this.costAccounts.find( cost => cost.id === idCost);
     const costAssignmentsCardItemsList = this.costAssignmentsCardItems.filter(card => card.type === 'cost-card');
     const costAccountsIds = costAssignmentsCardItemsList.map(cardItem => (cardItem.idCost));
