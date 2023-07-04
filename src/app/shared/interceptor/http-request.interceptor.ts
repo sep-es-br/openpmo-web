@@ -60,6 +60,7 @@ export class HttpRequestInterceptor implements HttpInterceptor {
         return event;
       }),
       catchError((error: HttpErrorResponse, restart) => {
+        this.messageSrv.clear();
         if ([422, 404, 400].includes(error.status)) {
           const message = error?.error?.message || error?.error?.erro
             || error?.message || this.translateSrv.instant('messages.error.generic');

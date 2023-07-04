@@ -1,5 +1,5 @@
 import { takeUntil } from 'rxjs/operators';
-import { Component, OnInit } from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import { Subject } from 'rxjs';
 import { ICard } from 'src/app/shared/interfaces/ICard';
 import { IReportModel } from 'src/app/shared/interfaces/IReportModel';
@@ -11,7 +11,7 @@ import { PropertyTemplateModel } from 'src/app/shared/models/PropertyTemplateMod
 import { IWorkpackModelProperty } from 'src/app/shared/interfaces/IWorkpackModelProperty';
 import { IWorkpackProperty } from 'src/app/shared/interfaces/IWorkpackProperty';
 import { TypePropertyModelEnum } from 'src/app/shared/enums/TypePropertyModelEnum';
-import { MessageService, SelectItem, TreeNode } from 'primeng/api';
+import {MenuItem, MessageService, SelectItem, TreeNode} from 'primeng/api';
 import { ILocalityList } from 'src/app/shared/interfaces/ILocality';
 import { OrganizationService } from 'src/app/shared/services/organization.service';
 import { DomainService } from 'src/app/shared/services/domain.service';
@@ -31,7 +31,7 @@ import { IReportGenerate } from 'src/app/shared/interfaces/IReportGenerate';
   templateUrl: './report-view.component.html',
   styleUrls: ['./report-view.component.scss']
 })
-export class ReportViewComponent implements OnInit {
+export class ReportViewComponent implements OnInit, OnDestroy {
 
   reportViewProperties: ICard;
   $destroy = new Subject();
@@ -47,7 +47,7 @@ export class ReportViewComponent implements OnInit {
   reportScope: TreeNode[];
   selectedWorkpacks: TreeNode[] = [];
   reportFormat: string;
-  formatOptions: SelectItem[];
+  formatOptions: MenuItem[];
   isGenerating = false;
   generateReportEnabled = false;
 
@@ -68,7 +68,7 @@ export class ReportViewComponent implements OnInit {
     const plan = localStorage.getItem('@currentPlan');
     this.idPlan = plan ? Number(plan) : undefined;
     this.loadPropertiesOffice();
-    this.activeRoute.queryParams.subscribe(async ({ id }) => {
+    this.activeRoute.queryParams.subscribe(async({ id }) => {
       this.idReportModel = +id;
       this.loadReportModel();
     });
@@ -85,12 +85,17 @@ export class ReportViewComponent implements OnInit {
   }
 
   setPreferredFormatOptions() {
-    this.formatOptions = Object.keys(ReportPreferredFormatEnum).map(key => {
-      return {
+    this.formatOptions = Object.keys(ReportPreferredFormatEnum).map(key => ({
         label: key,
-        value: key
-      };
-    });
+        command: (event) => this.biddingReport(event)
+      }));
+    this.formatOptions[0].styleClass = 'selected-format';
+  }
+
+  biddingReport(event: any) {
+    this.formatOptions.forEach(item => item.styleClass = '');
+    this.formatOptions[this.formatOptions.findIndex(item => item.label === event.item.label)].styleClass = 'selected-format';
+    this.reportFormat = event.item.label;
   }
 
   async loadPropertiesOffice() {
@@ -231,10 +236,10 @@ export class ReportViewComponent implements OnInit {
         }
       }
       if (defaultSelectedLocalities && defaultSelectedLocalities.length > 1) {
-        property.labelButtonLocalitySelected = await Promise.all(defaultSelectedLocalities.map(async (loc) => {
+        property.labelButtonLocalitySelected = await Promise.all(defaultSelectedLocalities.map(async(loc) => {
           const result = await this.localitySrv.GetById(loc);
           if (result.success) {
-            return result.data.name
+            return result.data.name;
           }
         }));
         property.showIconButton = false;
@@ -305,7 +310,7 @@ export class ReportViewComponent implements OnInit {
       }
       return { label: locality.name, data: locality.id };
     });
-    list.sort((a, b) => a.label < b.label ? -1 : 0)
+    list.sort((a, b) => a.label < b.label ? -1 : 0);
     if (multipleSelection) {
       this.addSelectAllNode(list, localityList, true);
     }
@@ -445,8 +450,8 @@ export class ReportViewComponent implements OnInit {
       this.generateReportEnabled = this.selectedWorkpacks && this.selectedWorkpacks.length > 0;
       return;
     }
-    let arePropertiesRequiredValid: boolean = this.checkPropertiesRequiredValid(property);
-    let arePropertiesStringValid: boolean = this.checkPropertiesStringValid(property);
+    const arePropertiesRequiredValid: boolean = this.checkPropertiesRequiredValid(property);
+    const arePropertiesStringValid: boolean = this.checkPropertiesStringValid(property);
     const arePropertiesNumberValid: boolean = this.checkPropertiesNumberValid(property);
     this.generateReportEnabled = arePropertiesRequiredValid && arePropertiesStringValid && arePropertiesNumberValid
       && this.selectedWorkpacks && this.selectedWorkpacks.length > 0;

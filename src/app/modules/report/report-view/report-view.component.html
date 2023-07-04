@@ -29,18 +29,19 @@
       </div>
     </div>
     <div class="button-format-container" *ngIf="!reportViewProperties.isLoading">
-      <p-dropdown class="select-format" [options]="formatOptions" [(ngModel)]="reportFormat" [readonly]="isGenerating"
-        dropdownIcon="fas fa-caret-down" [autoDisplayFirst]="false">
-        <ng-template pTemplate="selectedItem">
-          <div class="format-selected-item" *ngIf="reportFormat">
-            <i class="app-icon downloadFile" (click)="handleGenerateReport()" *ngIf="!isGenerating"></i>
-            <p-progressSpinner [style]="{width: '20px', height: '20px'}" *ngIf="isGenerating" styleClass="download-spinner" strokeWidth="8"
-              fill="#EEEEEE" animationDuration=".5s">
-            </p-progressSpinner>
-            <div>{{reportFormat}}</div>
-          </div>
-        </ng-template>
-      </p-dropdown>
+      <p-splitButton [label]="reportFormat" [icon]="isGenerating ? 'pi pi-spin pi-spinner' : 'app-icon downloadFile'" (onClick)="handleGenerateReport()" [model]="formatOptions"></p-splitButton>
+<!--      <p-dropdown class="select-format" [options]="formatOptions" [(ngModel)]="reportFormat" [readonly]="isGenerating"-->
+<!--        dropdownIcon="fas fa-caret-down" [autoDisplayFirst]="false">-->
+<!--        <ng-template pTemplate="selectedItem">-->
+<!--          <div class="format-selected-item" *ngIf="reportFormat">-->
+<!--            <i class="app-icon downloadFile" (click)="handleGenerateReport()" *ngIf="!isGenerating"></i>-->
+<!--            <p-progressSpinner [style]="{width: '20px', height: '20px'}" *ngIf="isGenerating" styleClass="download-spinner" strokeWidth="8"-->
+<!--              fill="#EEEEEE" animationDuration=".5s">-->
+<!--            </p-progressSpinner>-->
+<!--            <div>{{reportFormat}}</div>-->
+<!--          </div>-->
+<!--        </ng-template>-->
+<!--      </p-dropdown>-->
     </div>
   </app-card>
 </div>

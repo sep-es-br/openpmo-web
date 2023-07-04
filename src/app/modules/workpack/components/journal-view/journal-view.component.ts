@@ -127,12 +127,19 @@ export class JournalViewComponent implements OnInit, OnDestroy {
           case 'application/pdf':
             icon = 'far fa-file-pdf';
             break;
+          case 'text/csv':
+            icon = 'fas fa-file-csv';
+            break;
           case 'application/msword':
             icon = 'far fa-file-word';
             break;
           case 'application/vnd.ms-excel':
           case 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
             icon = 'far fa-file-excel';
+            break;
+          case 'application/vnd.openxmlformats-officedocument.presentationml.presentation':
+          case 'application/vnd.ms-powerpoint':
+            icon = 'far fa-file-powerpoint';
             break;
           default:
             icon = 'far fa-file';

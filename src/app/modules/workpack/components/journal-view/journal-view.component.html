@@ -102,7 +102,7 @@
               <div class="evidences" *ngIf="event.evidences && event.evidences.length > 0">
                 <figure>
                   <ng-container *ngFor="let evidence of event.evidences; let i = index">
-                    <div class="evidence">
+                    <div class="evidence" [pTooltip]="evidence.name">
                       <img class="image" *ngIf="evidence.isImg" [src]="evidence.url" [alt]="evidence.name" width="65"
                         (click)="handleDownload(evidence.url, evidence.name)">
                       <i class="icon" *ngIf="!evidence.isImg" [class]="evidence.icon"

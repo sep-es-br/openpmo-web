@@ -1,4 +1,12 @@
-.gauge-chart {
+::ng-deep .gauge-chart {
+  p-chart {
+    display: flex;
+    justify-content: center;
+    .chartjs-render-monitor {
+      width: 160px !important;
+      height: 160px !important;
+    }
+  }
   .container-progress {
     display: flex;
     flex-direction: column;

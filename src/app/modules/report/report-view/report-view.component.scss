@@ -54,6 +54,39 @@
       }
     }
   }
+  .p-splitbutton {
+    width: 100%;
+    .p-splitbutton-defaultbutton, .p-button:focus {
+      background-color: transparent;
+      border: none;
+      box-shadow: none !important;
+    }
+    .p-splitbutton-menubutton {
+      background-color: #3a9a88 !important;
+      border: none;
+      box-shadow: none !important;
+    }
+    .p-menu {
+      max-height: 200px;
+      max-width: 90% !important;
+      overflow-y: auto;
+      .p-menu-list .p-menuitem {
+
+        &.selected-format .p-menuitem-link {
+          background-color: #44B39B !important;
+          .p-menuitem-text {
+            color: #ffffff !important;
+          }
+          &:hover {
+            background-color: #44B39B !important;
+            .p-menuitem-text {
+              color: #ffffff !important;
+            }
+          }
+        }
+      }
+    }
+  }
   .button-format-container {
     margin-top: 1em;
     width: 186px;
@@ -138,7 +171,7 @@
           stroke: rgba(0, 70, 96, 1);;
       }
     }
-    
+
     @keyframes download-progress-spinner-dash {
       0% {
           stroke-dasharray: 1, 200;
@@ -153,6 +186,6 @@
           stroke-dashoffset: -124px;
       }
     }
-    
+
   }
 }
