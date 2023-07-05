@@ -69,7 +69,7 @@
         <p-overlayPanel #milestonePanel class="milestones-overlay-panel">
           <div class="milestone-panel-content">
             <app-doughnut-chart [data]="dashboardMilestonesData"
-              [middleText]="properties?.dashboard?.milestone?.quantity?.toString()" midleTextBottom="MILESTONES">
+              [middleText]="properties?.dashboard?.milestone?.quantity?.toString()" [midleTextBottom]="milestoneMidleTextBottom">
             </app-doughnut-chart>
           </div>
         </p-overlayPanel>

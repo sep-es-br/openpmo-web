@@ -352,7 +352,7 @@ export class BreakdownStructureComponent implements OnChanges, OnDestroy {
       if (properties?.dashboard?.costPerformanceIndex?.indexValue < 1) {
         cpiColor = '#EA5C5C';
       } else {
-        cpiColor = '#44B39B';
+        cpiColor = '#0081c1';
       }
     } else {
       cpiColor = '#646464';
@@ -361,7 +361,7 @@ export class BreakdownStructureComponent implements OnChanges, OnDestroy {
       if (properties?.dashboard?.schedulePerformanceIndex?.indexValue < 1) {
         spiColor = '#EA5C5C';
       } else {
-        spiColor = '#44B39B';
+        spiColor = '#0081c1';
       }
     } else {
       spiColor = '#646464';
