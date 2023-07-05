@@ -1,30 +1,30 @@
 <div class="app-journal-view">
   <app-card [properties]="cardJournalProperties">
-    <form class="filters" [formGroup]="formSearch" [class.responsive]="responsive">
-      <p-button class="app-button-green" [label]="'newInformation' | translate" (onClick)="handleNewInformation()"
+    <form class="filters p-grid p-fluid" [formGroup]="formSearch" [class.responsive]="responsive">
+      <p-button class="app-button-green" style="width: 150px  " [label]="'newInformation' | translate" (onClick)="handleNewInformation()"
         [disabled]="!editPermission || workpackCanceled"></p-button>
-      <span class="p-float-label property-input p-field">
+      <span class="p-float-label property-input p-field p-col">
         <p-calendar id="float-start" formControlName="from" class="app-select-date" [showIcon]="true"
           [monthNavigator]="true" [yearNavigator]="true" [yearRange]="yearRange" [class.responsive]="responsive"
           icon="fas fa-calendar-alt" [dateFormat]="calendarFormat" (onClose)="handleFilter()">
         </p-calendar>
         <label class="app-input-label" for="float-name">{{ "from" | translate }} </label>
       </span>
-      <span class="p-float-label property-input p-field">
+      <span class="p-float-label property-input p-field p-col">
         <p-calendar id="float-start" formControlName="to" class="app-select-date" [showIcon]="true"
           [monthNavigator]="true" [yearNavigator]="true" [yearRange]="yearRange" [class.responsive]="responsive"
           icon="fas fa-calendar-alt" [dateFormat]="calendarFormat" (onClose)="handleFilter()">
         </p-calendar>
         <label class="app-input-label" for="float-name">{{ "to" | translate }} </label>
       </span>
-      <span class="p-float-label property-input p-field">
+      <span class="p-float-label property-input p-field p-col">
         <p-multiSelect class="app-multiple-selection" [filter]="false" optionLabel="label" optionValue="value"
           [showToggleAll]="false" [showHeader]="false" [options]="optionsType" formControlName="type"
           [selectedItemsLabel]="language === 'pt-BR' ? '{0} itens selecionados' : '{0} items selected'"
           [class.responsive]="responsive" (onChange)="handleFilter($event)"></p-multiSelect>
         <label class="app-input-label" for="float-name">{{ "type" | translate }} </label>
       </span>
-      <span class="p-float-label property-input p-field">
+      <span class="p-float-label property-input p-field p-col" style="margin-right: 0 !important">
         <input pInputText class="app-input-text scope" (click)="treeViewScopeOverlay.toggle($event)"
           [class.responsive]="responsive" formControlName="scopeName" [readonly]="true" />
         <label class="app-input-label">{{ 'scopeLabel' | translate }} </label>

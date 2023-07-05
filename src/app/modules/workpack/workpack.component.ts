@@ -1,50 +1,49 @@
-import { SaveButtonService } from './../../shared/services/save-button.service';
-import { WorkpackBreadcrumbStorageService } from './../../shared/services/workpack-breadcrumb-storage.service';
-import { ISectionWorkpacks } from './../../shared/interfaces/ISectionWorkpack';
-import { DashboardService } from 'src/app/shared/services/dashboard.service';
-import { MilestoneStatusEnum } from './../../shared/enums/MilestoneStatusEnum';
-import { IFilterProperty } from 'src/app/shared/interfaces/IFilterProperty';
-import { takeUntil } from 'rxjs/operators';
-import { IWorkpackCardItem } from './../../shared/interfaces/IWorkpackCardItem';
-import { BaselineService } from './../../shared/services/baseline.service';
-import { ProcessService } from './../../shared/services/process.service';
-import { IssueService } from './../../shared/services/issue.service';
-import { RiskService } from './../../shared/services/risk.service';
-import { TypePropertyModelEnum } from './../../shared/enums/TypePropertyModelEnum';
-import { FilterDataviewPropertiesEntity } from 'src/app/shared/constants/filterDataviewPropertiesEntity';
-import { FilterDataviewService } from 'src/app/shared/services/filter-dataview.service';
-import { Component, OnDestroy, ViewChild, DebugElement } from '@angular/core';
-import { ActivatedRoute, NavigationEnd, Router, RouterEvent } from '@angular/router';
-import { TranslateService } from '@ngx-translate/core';
-import { ConfirmationService, MenuItem, MessageService, TreeNode } from 'primeng/api';
-import { ICard } from 'src/app/shared/interfaces/ICard';
-import { ResponsiveService } from 'src/app/shared/services/responsive.service';
-import { WorkpackModelService } from 'src/app/shared/services/workpack-model.service';
-import { WorkpackService } from 'src/app/shared/services/workpack.service';
-import { IWorkpack } from 'src/app/shared/interfaces/IWorkpack';
-import { IWorkpackModel } from 'src/app/shared/interfaces/IWorkpackModel';
-import { IWorkpackProperty } from 'src/app/shared/interfaces/IWorkpackProperty';
-import { StakeholderService } from 'src/app/shared/services/stakeholder.service';
-import { IconsEnum } from 'src/app/shared/enums/IconsEnum';
-import { IOrganization } from 'src/app/shared/interfaces/IOrganization';
-import { IMeasureUnit } from 'src/app/shared/interfaces/IMeasureUnit';
-import { PlanService } from 'src/app/shared/services/plan.service';
-import { TypeWorkpackEnum } from 'src/app/shared/enums/TypeWorkpackEnum';
-import { MeasureUnitService } from 'src/app/shared/services/measure-unit.service';
-import { ScheduleService } from 'src/app/shared/services/schedule.service';
-import { OfficeService } from 'src/app/shared/services/office.service';
-import { AuthService } from 'src/app/shared/services/auth.service';
-import { PlanPermissionService } from 'src/app/shared/services/plan-permissions.service';
-import { SaveButtonComponent } from 'src/app/shared/components/save-button/save-button.component';
-import { MenuService } from 'src/app/shared/services/menu.service';
-import { IOffice } from 'src/app/shared/interfaces/IOffice';
-import { IPlan } from 'src/app/shared/interfaces/IPlan';
+import {SaveButtonService} from './../../shared/services/save-button.service';
+import {WorkpackBreadcrumbStorageService} from './../../shared/services/workpack-breadcrumb-storage.service';
+import {ISectionWorkpacks} from './../../shared/interfaces/ISectionWorkpack';
+import {DashboardService} from 'src/app/shared/services/dashboard.service';
+import {MilestoneStatusEnum} from './../../shared/enums/MilestoneStatusEnum';
+import {IFilterProperty} from 'src/app/shared/interfaces/IFilterProperty';
+import {takeUntil} from 'rxjs/operators';
+import {IWorkpackCardItem} from './../../shared/interfaces/IWorkpackCardItem';
+import {BaselineService} from './../../shared/services/baseline.service';
+import {ProcessService} from './../../shared/services/process.service';
+import {IssueService} from './../../shared/services/issue.service';
+import {RiskService} from './../../shared/services/risk.service';
+import {TypePropertyModelEnum} from './../../shared/enums/TypePropertyModelEnum';
+import {FilterDataviewPropertiesEntity} from 'src/app/shared/constants/filterDataviewPropertiesEntity';
+import {FilterDataviewService} from 'src/app/shared/services/filter-dataview.service';
+import {Component, OnDestroy, ViewChild} from '@angular/core';
+import {ActivatedRoute, Router} from '@angular/router';
+import {TranslateService} from '@ngx-translate/core';
+import {ConfirmationService, MenuItem, MessageService} from 'primeng/api';
+import {ICard} from 'src/app/shared/interfaces/ICard';
+import {ResponsiveService} from 'src/app/shared/services/responsive.service';
+import {WorkpackModelService} from 'src/app/shared/services/workpack-model.service';
+import {WorkpackService} from 'src/app/shared/services/workpack.service';
+import {IWorkpack} from 'src/app/shared/interfaces/IWorkpack';
+import {IWorkpackModel} from 'src/app/shared/interfaces/IWorkpackModel';
+import {IWorkpackProperty} from 'src/app/shared/interfaces/IWorkpackProperty';
+import {StakeholderService} from 'src/app/shared/services/stakeholder.service';
+import {IconsEnum} from 'src/app/shared/enums/IconsEnum';
+import {IOrganization} from 'src/app/shared/interfaces/IOrganization';
+import {IMeasureUnit} from 'src/app/shared/interfaces/IMeasureUnit';
+import {PlanService} from 'src/app/shared/services/plan.service';
+import {TypeWorkpackEnum} from 'src/app/shared/enums/TypeWorkpackEnum';
+import {MeasureUnitService} from 'src/app/shared/services/measure-unit.service';
+import {ScheduleService} from 'src/app/shared/services/schedule.service';
+import {OfficeService} from 'src/app/shared/services/office.service';
+import {AuthService} from 'src/app/shared/services/auth.service';
+import {PlanPermissionService} from 'src/app/shared/services/plan-permissions.service';
+import {SaveButtonComponent} from 'src/app/shared/components/save-button/save-button.component';
+import {MenuService} from 'src/app/shared/services/menu.service';
+import {IOffice} from 'src/app/shared/interfaces/IOffice';
+import {IPlan} from 'src/app/shared/interfaces/IPlan';
 import * as moment from 'moment';
-import { Subject } from 'rxjs';
-import { WorkpackShowTabviewService } from 'src/app/shared/services/workpack-show-tabview.service';
-import { ConfigDataViewService } from 'src/app/shared/services/config-dataview.service';
-import { ITabViewScrolled } from 'src/app/shared/components/tabview-scrolled/tabview-scrolled.component';
-import { BreakdownStructureService } from 'src/app/shared/services/breakdown-structure.service';
+import {Subject} from 'rxjs';
+import {WorkpackShowTabviewService} from 'src/app/shared/services/workpack-show-tabview.service';
+import {ConfigDataViewService} from 'src/app/shared/services/config-dataview.service';
+import {ITabViewScrolled} from 'src/app/shared/components/tabview-scrolled/tabview-scrolled.component';
 
 @Component({
   selector: 'app-workpack',
@@ -133,7 +132,13 @@ export class WorkpackComponent implements OnDestroy {
     private workpackShowTabviewSrv: WorkpackShowTabviewService,
     private configDataViewSrv: ConfigDataViewService,
   ) {
-    this.actRouter.queryParams.subscribe(async ({ id, idPlan, idWorkpackModel, idWorkpackParent, idWorkpackModelLinked }) => {
+    this.actRouter.queryParams.subscribe(async ({
+                                                  id,
+                                                  idPlan,
+                                                  idWorkpackModel,
+                                                  idWorkpackParent,
+                                                  idWorkpackModelLinked
+                                                }) => {
       this.idWorkpack = id && +id;
       this.idPlan = idPlan && +idPlan;
       this.idWorkpackModel = idWorkpackModel && +idWorkpackModel;
@@ -159,8 +164,8 @@ export class WorkpackComponent implements OnDestroy {
     });
     this.dashboardSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.fullScreenModeDashboard = value);
     this.translateSrv.onLangChange.pipe(takeUntil(this.$destroy)).subscribe(() => {
-      setTimeout(() => this.language = this.translateSrv.currentLang, 200);
-    }
+        setTimeout(() => this.language = this.translateSrv.currentLang, 200);
+      }
     );
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => {
       this.responsive = value;
@@ -300,7 +305,7 @@ export class WorkpackComponent implements OnDestroy {
       return;
     }
     this.favoriteProcessing = true;
-    const { success } = await this.workpackSrv.patchToggleWorkpackFavorite(this.idWorkpack, this.idPlan);
+    const {success} = await this.workpackSrv.patchToggleWorkpackFavorite(this.idWorkpack, this.idPlan);
     if (success) {
       this.favoriteProcessing = false;
       this.workpack.favoritedBy = !this.workpack.favoritedBy;
@@ -309,13 +314,13 @@ export class WorkpackComponent implements OnDestroy {
   }
 
   async loadWorkpack(reloadOnlyProperties = false) {
-    const result = await this.workpackSrv.GetWorkpackDataById(this.idWorkpack, { 'id-plan': this.idPlan });
+    const result = await this.workpackSrv.GetWorkpackDataById(this.idWorkpack, {'id-plan': this.idPlan});
     if (result.success) {
       this.workpack = result.data;
       this.setUnitMeansure();
       const propertyNameWorkpackModel = this.workpack.model.properties.find(p => p.name === 'name' && p.session === 'PROPERTIES');
       const propertyNameWorkpack = this.workpack.properties.find(p => p.idPropertyModel === propertyNameWorkpackModel.id);
-      this.workpackName = propertyNameWorkpack.value as string;
+      this.workpackName = propertyNameWorkpack?.value as string;
       const propertyFullNameWorkpackModel = this.workpack.model.properties.find(p => p.name === 'fullName' && p.session === 'PROPERTIES');
       const propertyFullNameWorkpack = this.workpack.properties.find(p => p.idPropertyModel === propertyFullNameWorkpackModel.id);
       this.workpackFullName = propertyFullNameWorkpack.value as string;
@@ -334,7 +339,7 @@ export class WorkpackComponent implements OnDestroy {
         this.workpackSrv.nextReloadProperties(true);
       }
       if (!reloadOnlyProperties) {
-        this.workpackSrv.setWorkpackData({ workpack: this.workpack });
+        this.workpackSrv.setWorkpackData({workpack: this.workpack});
         await this.loadWorkpackModel(this.workpack.model.id);
       }
     }
@@ -356,12 +361,12 @@ export class WorkpackComponent implements OnDestroy {
 
   async loadWorkpackLinked(reloadOnlyProperties = false) {
     const result = await this.workpackSrv.GetWorkpackLinked(this.idWorkpack,
-      { 'id-workpack-model': this.idWorkpackModelLinked, 'id-plan': this.idPlan });
+      {'id-workpack-model': this.idWorkpackModelLinked, 'id-plan': this.idPlan});
     if (result.success) {
       this.workpack = result.data;
       const workpackParams = this.workpackSrv.getWorkpackParams();
       workpackParams.idOfficeOwnerWorkpackLinked = this.workpack.plan.idOffice;
-      this.workpackSrv.setWorkpackParams({ ...workpackParams });
+      this.workpackSrv.setWorkpackParams({...workpackParams});
       const propertyNameWorkpackModel = this.workpack.model.properties.find(p => p.name === 'name' && p.session === 'PROPERTIES');
       const propertyNameWorkpack = this.workpack.properties.find(p => p.idPropertyModel === propertyNameWorkpackModel.id);
       this.workpackName = propertyNameWorkpack.value as string;
@@ -381,7 +386,7 @@ export class WorkpackComponent implements OnDestroy {
         this.workpackSrv.nextReloadProperties(true);
       }
       if (!reloadOnlyProperties) {
-        this.workpackSrv.setWorkpackData({ workpack: this.workpack });
+        this.workpackSrv.setWorkpackData({workpack: this.workpack});
         await this.loadWorkpackModel(this.workpack.model.id);
       }
     }
@@ -455,7 +460,7 @@ export class WorkpackComponent implements OnDestroy {
 
   async checkWorkpackHasEap() {
     this.isLoading = true;
-    const { success, data } = await this.workpackSrv.checkWorkpackHasChildren(this.idWorkpack);
+    const {success, data} = await this.workpackSrv.checkWorkpackHasChildren(this.idWorkpack);
     if (success) {
       this.hasWBS = data && data.hasChildren;
     }
@@ -472,7 +477,7 @@ export class WorkpackComponent implements OnDestroy {
         initialStateCollapse: this.collapsePanelsStatus,
       };
     }
-    if (this.workpackModel.childWorkpackModelSessionActive && this.workpackModel.children) {
+    if (this.workpackModel.childWorkpackModelSessionActive && this.workpackModel?.children) {
       this.sectionWorkpackModelChildren = true;
       if (!this.idWorkpackModelLinked) {
         await this.loadSectionsWorkpackChildren();
@@ -483,7 +488,7 @@ export class WorkpackComponent implements OnDestroy {
   }
 
   async loadSectionsWorkpackChildren() {
-    this.cardsWorkPackModelChildren = this.workpackModel.children ? this.workpackModel.children.map(workpackModel => {
+    this.cardsWorkPackModelChildren = this.workpackModel?.children ? this.workpackModel?.children?.map(workpackModel => {
       const propertiesCard: ICard = {
         toggleable: false,
         initialStateToggle: false,
@@ -503,8 +508,8 @@ export class WorkpackComponent implements OnDestroy {
         workpackShowCancelleds: this.workpack && this.workpack.canceled ? true : false
       };
     }) : [];
-    if (this.workpackModel.children && this.cardsWorkPackModelChildren && this.cardsWorkPackModelChildren.length > 0) {
-      this.workpackModel.children.forEach(async (workpackModel, index) => {
+    if (this.workpackModel?.children && this.cardsWorkPackModelChildren && this.cardsWorkPackModelChildren.length > 0) {
+      this.workpackModel?.children?.forEach(async (workpackModel, index) => {
         if (this.cardsWorkPackModelChildren[index].cardSection) {
           this.cardsWorkPackModelChildren[index].cardSection.isLoading = true;
           const resultFilters = await this.filterSrv.getAllFilters(`workpackModels/${workpackModel.id}/workpacks`);
@@ -512,7 +517,7 @@ export class WorkpackComponent implements OnDestroy {
             this.cardsWorkPackModelChildren[index].cardSection.filters = resultFilters.data;
           }
           const idFilterSelected = resultFilters.data.find(defaultFilter => !!defaultFilter.favorite) ?
-          resultFilters.data.find(defaultFilter => !!defaultFilter.favorite).id : undefined;
+            resultFilters.data.find(defaultFilter => !!defaultFilter.favorite).id : undefined;
           const resultItemsList = await this.loadWorkpacksFromWorkpackModel(this.workpack.plan.id, workpackModel.id, idFilterSelected, false);
           this.cardsWorkPackModelChildren[index].cardSection.createNewElementMenuItemsWorkpack =
             resultItemsList && resultItemsList.iconMenuItems;
@@ -659,14 +664,14 @@ export class WorkpackComponent implements OnDestroy {
           menuItems,
           urlCard: '/workpack',
           paramsUrlCard: workpack.model.id !== idWorkpackModel ? [
-            { name: 'idWorkpackModelLinked', value: idWorkpackModel },
-            { name: 'idPlan', value: this.idPlan },
+            {name: 'idWorkpackModelLinked', value: idWorkpackModel},
+            {name: 'idPlan', value: this.idPlan},
           ] : (idWorkpackModelLinked ?
             [
-              { name: 'idWorkpackModelLinked', value: idWorkpackModelLinked },
-              { name: 'idPlan', value: this.idPlan },
+              {name: 'idWorkpackModelLinked', value: idWorkpackModelLinked},
+              {name: 'idPlan', value: this.idPlan},
             ] : [
-              { name: 'idPlan', value: this.idPlan },
+              {name: 'idPlan', value: this.idPlan},
             ]),
           linked: !!idWorkpackModelLinked ? true : (!!workpack.linked ? true : false),
           shared: workpack.sharedWith && workpack.sharedWith.length > 0 ? true : false,
@@ -685,7 +690,10 @@ export class WorkpackComponent implements OnDestroy {
       if (this.workpackSrv.getEditPermission() && !idWorkpackModelLinked) {
         const sharedWorkpackList = await this.loadSharedWorkpackList(idWorkpackModel);
         iconMenuItems = [
-          { label: this.translateSrv.instant('new'), command: () => this.handleNewWorkpack(idPlan, idWorkpackModel, this.idWorkpack) }
+          {
+            label: this.translateSrv.instant('new'),
+            command: () => this.handleNewWorkpack(idPlan, idWorkpackModel, this.idWorkpack)
+          }
         ];
         if (sharedWorkpackList && sharedWorkpackList.length > 0) {
           iconMenuItems.push({
@@ -699,7 +707,7 @@ export class WorkpackComponent implements OnDestroy {
         }
         const workpackCuted = this.workpackSrv.getWorkpackCuted();
         if (workpackCuted) {
-          const { canPaste, incompatiblesProperties } = await this.checkPasteWorkpack(workpackCuted, idWorkpackModel);
+          const {canPaste, incompatiblesProperties} = await this.checkPasteWorkpack(workpackCuted, idWorkpackModel);
           const validPasteOutherOffice = workpackCuted.plan.idOffice === this.idOffice ? true : this.isUserAdmin;
           if (canPaste && validPasteOutherOffice) {
             iconMenuItems.push({
@@ -718,12 +726,15 @@ export class WorkpackComponent implements OnDestroy {
           }
         );
       }
-      const resultItemsList = { workpackItemCardList, iconMenuItems };
+      const resultItemsList = {workpackItemCardList, iconMenuItems};
       return resultItemsList;
     }
     if ((!workpacks || workpacks.length === 0) && this.workpackSrv.getEditPermission()) {
       const iconMenuItems: MenuItem[] = [
-        { label: this.translateSrv.instant('new'), command: () => this.handleNewWorkpack(idPlan, idWorkpackModel, this.idWorkpack) }
+        {
+          label: this.translateSrv.instant('new'),
+          command: () => this.handleNewWorkpack(idPlan, idWorkpackModel, this.idWorkpack)
+        }
       ];
       if (this.workpackSrv.getEditPermission() && !idWorkpackModelLinked) {
         const sharedWorkpackList = await this.loadSharedWorkpackList(idWorkpackModel);
@@ -739,7 +750,7 @@ export class WorkpackComponent implements OnDestroy {
         }
         const workpackCuted = this.workpackSrv.getWorkpackCuted();
         if (workpackCuted) {
-          const { canPaste, incompatiblesProperties } = await this.checkPasteWorkpack(workpackCuted, idWorkpackModel);
+          const {canPaste, incompatiblesProperties} = await this.checkPasteWorkpack(workpackCuted, idWorkpackModel);
           const validPasteOutherOffice = workpackCuted.plan.idOffice === this.idOffice ? true : this.isUserAdmin;
           if (canPaste && validPasteOutherOffice) {
             iconMenuItems.push({
@@ -758,7 +769,7 @@ export class WorkpackComponent implements OnDestroy {
           iconMenuItems
         }
       ];
-      const resultItemsList = { workpackItemCardList, iconMenuItems };
+      const resultItemsList = {workpackItemCardList, iconMenuItems};
       return resultItemsList;
     }
   }
@@ -771,7 +782,7 @@ export class WorkpackComponent implements OnDestroy {
 
   async unlinkedWorkpack(idWorkpackLinked, idWorkpackModel) {
     const result = await this.workpackSrv.unlinkWorkpack(idWorkpackLinked, idWorkpackModel,
-      { 'id-workpack-parent': this.idWorkpack, 'id-plan': this.idPlan });
+      {'id-workpack-parent': this.idWorkpack, 'id-plan': this.idPlan});
     if (result.success) {
       const workpackModelIndex = this.cardsWorkPackModelChildren
         .findIndex(workpackModel => workpackModel.idWorkpackModel === idWorkpackModel);
@@ -920,7 +931,7 @@ export class WorkpackComponent implements OnDestroy {
   }
 
   async handleCutWorkpack(workpack: IWorkpack) {
-    this.workpackSrv.setWorkpackCuted({ ...workpack, idParent: this.idWorkpack });
+    this.workpackSrv.setWorkpackCuted({...workpack, idParent: this.idWorkpack});
     const workpackModelIndex = this.cardsWorkPackModelChildren
       .findIndex(workpackModel => workpackModel.idWorkpackModel === workpack.model.id);
     if (workpackModelIndex > -1) {
@@ -958,7 +969,8 @@ export class WorkpackComponent implements OnDestroy {
           accept: async () => {
             await this.pasteWorkpack(workpackCuted, idWorkpackModelTo, idPlanTo, idParentTo);
           },
-          reject: () => { }
+          reject: () => {
+          }
         });
       } else {
         await this.pasteWorkpack(workpackCuted, idWorkpackModelTo, idPlanTo, idParentTo);
@@ -982,7 +994,7 @@ export class WorkpackComponent implements OnDestroy {
   }
 
   async loadSectionsWorkpackChildrenLinked() {
-    this.cardsWorkPackModelChildren = this.workpack.modelLinked.children.map((workpackModel) => {
+    this.cardsWorkPackModelChildren = this.workpack.modelLinked?.children?.map((workpackModel) => {
       const propertiesCard: ICard = {
         toggleable: false,
         initialStateToggle: false,
@@ -1000,7 +1012,7 @@ export class WorkpackComponent implements OnDestroy {
         workpackShowCancelleds: this.workpack.canceled ? true : false
       };
     });
-    this.workpack.modelLinked.children.forEach(async (workpackModel, index) => {
+    this.workpack.modelLinked?.children.forEach(async (workpackModel, index) => {
       this.cardsWorkPackModelChildren[index].cardSection.isLoading = true;
       const resultFilters = await this.filterSrv.getAllFilters(`workpackModels/${workpackModel.idWorkpackModelLinked}/workpacks`);
       if (resultFilters.success && resultFilters.data) {
@@ -1009,7 +1021,7 @@ export class WorkpackComponent implements OnDestroy {
       const idFilterSelected = this.cardsWorkPackModelChildren[index].cardSection.filters.find(defaultFilter => !!defaultFilter.favorite) ?
         this.cardsWorkPackModelChildren[index].cardSection.filters.find(defaultFilter => !!defaultFilter.favorite).id : undefined;
       const resultItemsList = await this.loadWorkpacksFromWorkpackModel
-        (this.idPlan, workpackModel.idWorkpackModelOriginal, idFilterSelected, '', false, workpackModel.idWorkpackModelLinked);
+      (this.idPlan, workpackModel.idWorkpackModelOriginal, idFilterSelected, '', false, workpackModel.idWorkpackModelLinked);
       this.cardsWorkPackModelChildren[index].cardItemsSection = resultItemsList && resultItemsList.workpackItemCardList;
       this.cardsWorkPackModelChildren[index].cardSection.isLoading = false;
     });
@@ -1038,7 +1050,10 @@ export class WorkpackComponent implements OnDestroy {
   }
 
   async loadSharedWorkpackList(idWorkpackModel: number) {
-    const result = await this.workpackSrv.GetSharedWorkpacks({ 'id-workpack-model': idWorkpackModel, 'id-plan': this.idPlan });
+    const result = await this.workpackSrv.GetSharedWorkpacks({
+      'id-workpack-model': idWorkpackModel,
+      'id-plan': this.idPlan
+    });
     if (result.success) {
       return result.data;
     }
@@ -1047,7 +1062,7 @@ export class WorkpackComponent implements OnDestroy {
 
   async handleLinkToWorkpack(idWorkpack: number, idWorkpackModel: number) {
     const result = await this.workpackSrv.linkWorkpack(idWorkpack, idWorkpackModel,
-      { 'id-parent': this.idWorkpack, 'id-plan': this.idPlan });
+      {'id-parent': this.idWorkpack, 'id-plan': this.idPlan});
     if (result.success) {
       this.router.navigate(['/workpack'], {
         queryParams: {
@@ -1114,7 +1129,7 @@ export class WorkpackComponent implements OnDestroy {
   }
 
   scrollTop() {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({top: 0, behavior: 'smooth'});
   }
 
   onSaveButtonClicked() {
@@ -1153,7 +1168,7 @@ export class WorkpackComponent implements OnDestroy {
     this.workpackProperties = properties.map(p => {
       if (p.type === TypePropertyModelEnum.GroupModel) {
         const groupedProperties = p.groupedProperties.map(groupProp => groupProp.getValues());
-        return { ...p.getValues(), groupedProperties };
+        return {...p.getValues(), groupedProperties};
       }
       return p.getValues();
     });
@@ -1184,7 +1199,7 @@ export class WorkpackComponent implements OnDestroy {
         type: TypeWorkpackEnum[this.workpackModel.type],
         properties: this.workpackProperties,
       };
-    const { success, data } = isPut
+    const {success, data} = isPut
       ? await this.workpackSrv.put(workpack)
       : await this.workpackSrv.post(workpack);
 
@@ -1361,9 +1376,9 @@ export class WorkpackComponent implements OnDestroy {
           key: 'schedule'
         });
       }
-      if (this.idWorkpack && this.workpackModel && this.workpackModel.childWorkpackModelSessionActive && this.workpackModel.children) {
+      if (this.idWorkpack && this.workpackModel && this.workpackModel.childWorkpackModelSessionActive && this.workpackModel?.children) {
         this.tabs.push(
-          ...this.workpackModel.children.map(workpackModel => ({
+          ...this.workpackModel?.children?.map(workpackModel => ({
             menu: workpackModel.modelNameInPlural,
             key: workpackModel.modelNameInPlural
           }))

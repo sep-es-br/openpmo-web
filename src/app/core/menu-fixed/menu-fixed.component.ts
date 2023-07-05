@@ -273,7 +273,9 @@ export class MenuFixedComponent implements OnInit, OnDestroy {
         icon: 'app-icon building',
         styleClass: `office-${office.id} ${this.currentURL === `offices/office?id=${office.id}` ? 'active' : ''}`,
         command: (e) => {
-          if (e.originalEvent?.target?.classList?.contains('p-menuitem-text')) {
+          const classList = Array.from(e.originalEvent?.target?.classList) || [];
+          if (classList.some((className: string) => ['p-menuitem-text', 'fas', 'app-icon'].includes(className))) {
+            e.item.expanded = false;
             if (this.isAdminMenu) {
               this.router.navigate(['/configuration-office'], { queryParams: { idOffice: office.id } });
             } else {
@@ -549,7 +551,9 @@ export class MenuFixedComponent implements OnInit, OnDestroy {
       styleClass: `planModel-${planModel.id} ${this.currentURL === `planModel?id=${planModel.id}` ? 'active' : ''}`,
       items: planModel.workpackModels?.length ? this.buildMenuItemWorkpackModel(planModel.workpackModels, this.currentIDOffice, planModel, [planModel.id]) : undefined,
       command: (e) => {
-        if (e.originalEvent?.target?.classList?.contains('p-menuitem-text')) {
+        const classList = Array.from(e.originalEvent?.target?.classList) || [];
+        if (classList.some((className: string) => ['p-menuitem-text', 'fas', 'app-icon'].includes(className))) {
+          e.item.expanded = false;
           this.clearActiveClass();
           e.originalEvent?.target?.classList?.add('active');
           this.router.navigate(['/strategies/strategy'], {
@@ -585,7 +589,9 @@ export class MenuFixedComponent implements OnInit, OnDestroy {
         `workpackModel-${workpackModel.id}  ${this.currentURL === `workpackModel?id=${workpackModel.id}` ? 'active' : ''}`,
       items: workpackModel.children?.length ? this.buildMenuItemWorkpackModel(workpackModel.children, idOffice, planModel, (parent ? [...parents, parent] : [...parents]), workpackModel.id) : undefined,
       command: (e) => {
-        if (e.originalEvent?.target?.classList?.contains('p-menuitem-text')) {
+        const classList = Array.from(e.originalEvent?.target?.classList) || [];
+        if (classList.some((className: string) => ['p-menuitem-text', 'fas', 'app-icon'].includes(className))) {
+          e.item.expanded = false;
           this.clearActiveClass();
           e.originalEvent?.target?.classList?.add('active');
           this.setBreadcrumbStorage(this.currentIDOffice, planModel, workpackModel, (parent ? [...parents, parent] : [...parents]), parent);
@@ -659,7 +665,9 @@ export class MenuFixedComponent implements OnInit, OnDestroy {
       styleClass: `workpack-${workpack.id} ${this.currentURL === `workpack?id=${workpack.id}` ? 'active' : ''}`,
       items: workpack.children?.length ? this.buildMenuItemPortfolio(workpack.children) : undefined,
       command: (e) => {
-        if (e.originalEvent?.target?.classList?.contains('p-menuitem-text')) {
+        const classList = Array.from(e.originalEvent?.target?.classList) || [];
+        if (classList.some((className: string) => ['p-menuitem-text', 'fas', 'app-icon'].includes(className))) {
+          e.item.expanded = false;
           this.router.navigate(['/workpack'], { queryParams: { id: workpack.id, idWorkpackModelLinked: workpack.idWorkpackModelLinked, idPlan: this.currentIDPlan } });
         }
       }

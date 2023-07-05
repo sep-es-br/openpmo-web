@@ -147,7 +147,7 @@
         <p-overlayPanel #milestonePanel class="milestones-overlay-panel">
           <div class="milestone-panel-content">
             <app-doughnut-chart [data]="properties?.properties?.dashboardMilestonesData"
-              [middleText]="properties?.dashboard?.milestone?.quantity" midleTextBottom="MILESTONES">
+              [middleText]="properties?.dashboard?.milestone?.quantity" [midleTextBottom]="'milestonesLabelChart' | translate">
             </app-doughnut-chart>
           </div>
         </p-overlayPanel>

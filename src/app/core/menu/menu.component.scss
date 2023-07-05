@@ -545,3 +545,10 @@ $mobileMenuHeight: 90px;
     }
   }
 }
+
+
+::ng-deep {
+  .p-menuitem-text {
+    width: 80%;
+  }
+}
