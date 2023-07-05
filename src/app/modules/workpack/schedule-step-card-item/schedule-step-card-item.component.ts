@@ -48,8 +48,11 @@ export class ScheduleStepCardItemComponent implements OnInit, OnDestroy {
       `${this.properties.idStep < 10 ? '0' + this.properties.idStep : this.properties.idStep}` : '';
     this.setLanguage();
     if (this.properties.stepName)  {
-      const dateStep = moment(this.properties.stepName);
-      const dateActual = moment();
+      let dateStep = moment(this.properties.stepName);
+      const monthStep = dateStep.month();
+      const yearStep = dateStep.year();
+      dateStep = moment(`${yearStep}-${monthStep}-1`, 'yyyy-MM-DD');
+      const dateActual = moment()
       if (dateStep.isSameOrBefore(dateActual)) {
         this.showReplicateButton = true;
       } else {
@@ -88,7 +91,7 @@ export class ScheduleStepCardItemComponent implements OnInit, OnDestroy {
   }
 
   handleEditCosts(event) {
-    this.editCost.emit({idStep: this.properties.idStep, clickEvent: event});
+    this.editCost.emit({idStep: this.properties.idStep, stepOrder: this.properties.stepOrder, clickEvent: event});
   }
 
   confirmReplicateValueDif(item) {
@@ -98,7 +101,7 @@ export class ScheduleStepCardItemComponent implements OnInit, OnDestroy {
     } else {
       this.difference = this.properties.costPlanned - this.properties.costActual
     }
-    if ( this.difference === 0) {
+    if ( this.difference === 0 || this.properties.stepOrder === 'end') {
       this.handleReplicateValue();
       return;
     }

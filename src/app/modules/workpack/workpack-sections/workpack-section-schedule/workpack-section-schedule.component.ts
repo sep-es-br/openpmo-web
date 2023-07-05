@@ -467,7 +467,8 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
           if (type === 'unitActual') {
             stepsList[stepIndex].unitPlanned = stepsList[stepIndex].unitPlanned + value;
           } else {
-            stepsList[stepIndex].costPlanned = stepsList[stepIndex].costPlanned + value;
+            const idCost = this.getCostAccountStepChanged(idStep);
+            this.replicateCostAccountValues(stepsList[stepIndex].idStep, idCost, value);
           }
           stepIndex++;
         }
@@ -486,6 +487,17 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
     }
   }
 
+  getCostAccountStepChanged(idStep) {
+    const groupIndex = this.schedule.groupStep.findIndex(group => group.steps.filter(step => step.id === idStep).length > 0);
+    if (groupIndex > -1) {
+      const stepIndex = this.schedule.groupStep[groupIndex].steps.findIndex(step => step.id === idStep);
+      if (stepIndex > -1) {
+        const stepCost = this.schedule.groupStep[groupIndex].steps[stepIndex].consumes[0];
+        return stepCost.costAccount.id
+      }
+    }
+  }
+
   ngOnDestroy(): void {
     this.$destroy.complete();
     this.$destroy.unsubscribe();
@@ -494,6 +506,7 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
   async handleShowEditCost(event, group) {
     this.indexCardEdited = 0;
     const idStep = event.idStep;
+    const stepOrder = event.stepOrder;
     const groupIndex = this.schedule.groupStep.findIndex(group => group.steps.filter(step => step.id === idStep).length > 0);
     if (groupIndex > -1) {
       const stepIndex = this.schedule.groupStep[groupIndex].steps.findIndex(step => step.id === idStep);
@@ -528,7 +541,8 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
               plannedWork: consume.plannedCost,
               actualWork: consume.actualCost,
               readonly: !this.editPermission,
-              showReplicateButton: this.stepShow.showReplicateButton
+              showReplicateButton: this.stepShow.showReplicateButton,
+              endStep: stepOrder === 'end'
             };
           });
           this.cardCostEditPanel.show(event.clickEvent);
@@ -656,7 +670,6 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
           const resultValue = difference / month;
           const value = +(resultValue.toFixed(2));
           difference = difference - value;
-          // stepsList[stepIndex].costPlanned = stepsList[stepIndex].costPlanned + value;
           this.replicateCostAccountValues(stepsList[stepIndex].idStep, cardChanged.idCost, value);
           stepIndex++;
         }
@@ -669,11 +682,20 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
     if (groupIndex > -1) {
       const stepIndex = this.schedule.groupStep[groupIndex].steps.findIndex(step => step.id === idStep);
       if (stepIndex > -1) {
-        this.schedule.groupStep[groupIndex].steps[stepIndex].consumes.forEach(consume => {
-          if (consume.costAccount.id === idCost) {
-            consume.plannedCost = consume.plannedCost + value;
-          }
-        });
+        const stepsCost = this.schedule.groupStep[groupIndex].steps[stepIndex].consumes.filter( consume => consume.costAccount.id === idCost);
+        if (stepsCost && stepsCost.length > 0) {
+          this.schedule.groupStep[groupIndex].steps[stepIndex].consumes.forEach(consume => {
+            if (consume.costAccount.id === idCost) {
+              consume.plannedCost = consume.plannedCost + value;
+            }
+          });
+        } else {
+          const totalPlannedCostAccounts =  this.schedule.groupStep[groupIndex].steps[stepIndex].consumes.reduce( (total, consume) => total + consume.plannedCost, 0);
+          this.schedule.groupStep[groupIndex].steps[stepIndex].consumes.forEach(consume => {
+            const plannedProp = totalPlannedCostAccounts ?  (consume.plannedCost / totalPlannedCostAccounts) * value : value;
+            consume.plannedCost = consume.plannedCost + plannedProp;
+          });
+        }
         this.stepShow = {
           id: this.schedule.groupStep[groupIndex].steps[stepIndex].id,
           plannedWork: this.schedule.groupStep[groupIndex].steps[stepIndex].plannedWork,

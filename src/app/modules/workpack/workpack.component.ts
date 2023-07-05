@@ -290,7 +290,7 @@ export class WorkpackComponent implements OnDestroy {
       await this.loadWorkpackModel(this.idWorkpackModel);
     }
     this.workpackSrv.nextResetWorkpack(true);
-    if (this.idWorkpack) {
+    if (this.idWorkpack && this.workpackModel) {
       await this.loadSectionsWorkpackModel();
     }
   }
@@ -483,7 +483,7 @@ export class WorkpackComponent implements OnDestroy {
   }
 
   async loadSectionsWorkpackChildren() {
-    this.cardsWorkPackModelChildren = this.workpackModel.children.map(workpackModel => {
+    this.cardsWorkPackModelChildren = this.workpackModel.children ? this.workpackModel.children.map(workpackModel => {
       const propertiesCard: ICard = {
         toggleable: false,
         initialStateToggle: false,
@@ -494,30 +494,39 @@ export class WorkpackComponent implements OnDestroy {
         initialStateCollapse: this.collapsePanelsStatus,
         showFilters: true,
         showCreateNemElementButton: this.workpackSrv.getEditPermission() ? true : false,
+        createNewElementMenuItemsWorkpack: [],
+        filters: []
       };
       return {
         idWorkpackModel: workpackModel.id,
         cardSection: propertiesCard,
-        workpackShowCancelleds: this.workpack.canceled ? true : false
+        workpackShowCancelleds: this.workpack && this.workpack.canceled ? true : false
       };
-    });
-    this.workpackModel.children.forEach(async (workpackModel, index) => {
-      this.cardsWorkPackModelChildren[index].cardSection.isLoading = true;
-      const resultFilters = await this.filterSrv.getAllFilters(`workpackModels/${workpackModel.id}/workpacks`);
-      if (resultFilters.success && resultFilters.data) {
-        this.cardsWorkPackModelChildren[index].cardSection.filters = resultFilters.data;
-      }
-      const idFilterSelected = resultFilters.data.find(defaultFilter => !!defaultFilter.favorite) ?
-        resultFilters.data.find(defaultFilter => !!defaultFilter.favorite).id : undefined;
-      const resultItemsList = await this.loadWorkpacksFromWorkpackModel(this.workpack.plan.id, workpackModel.id, idFilterSelected, false);
-      this.cardsWorkPackModelChildren[index].cardSection.createNewElementMenuItemsWorkpack =
-        resultItemsList && resultItemsList.iconMenuItems;
-      this.cardsWorkPackModelChildren[index].cardItemsSection = resultItemsList && resultItemsList.workpackItemCardList;
-      this.cardsWorkPackModelChildren[index].cardSection.isLoading = false;
-    });
-    this.cardsWorkPackModelChildren.forEach((workpackModel, i) => {
-      this.totalRecordsWorkpacks[i] = workpackModel.cardItemsSection ? workpackModel.cardItemsSection.length + 1 : 1;
-    });
+    }) : [];
+    if (this.workpackModel.children && this.cardsWorkPackModelChildren && this.cardsWorkPackModelChildren.length > 0) {
+      this.workpackModel.children.forEach(async (workpackModel, index) => {
+        if (this.cardsWorkPackModelChildren[index].cardSection) {
+          this.cardsWorkPackModelChildren[index].cardSection.isLoading = true;
+          const resultFilters = await this.filterSrv.getAllFilters(`workpackModels/${workpackModel.id}/workpacks`);
+          if (resultFilters.success && resultFilters.data) {
+            this.cardsWorkPackModelChildren[index].cardSection.filters = resultFilters.data;
+          }
+          const idFilterSelected = resultFilters.data.find(defaultFilter => !!defaultFilter.favorite) ?
+          resultFilters.data.find(defaultFilter => !!defaultFilter.favorite).id : undefined;
+          const resultItemsList = await this.loadWorkpacksFromWorkpackModel(this.workpack.plan.id, workpackModel.id, idFilterSelected, false);
+          this.cardsWorkPackModelChildren[index].cardSection.createNewElementMenuItemsWorkpack =
+            resultItemsList && resultItemsList.iconMenuItems;
+          this.cardsWorkPackModelChildren[index].cardItemsSection = resultItemsList && resultItemsList.workpackItemCardList;
+          this.cardsWorkPackModelChildren[index].cardSection.isLoading = false;
+        }
+      });
+    }
+    if (this.cardsWorkPackModelChildren) {
+      this.cardsWorkPackModelChildren.forEach((workpackModel, i) => {
+        this.totalRecordsWorkpacks[i] = workpackModel.cardItemsSection ? workpackModel.cardItemsSection.length + 1 : 1;
+      });
+    }
+
   }
 
   getShowStakeHolderSection() {
@@ -1352,7 +1361,7 @@ export class WorkpackComponent implements OnDestroy {
           key: 'schedule'
         });
       }
-      if (this.idWorkpack && this.workpackModel.childWorkpackModelSessionActive && this.workpackModel.children) {
+      if (this.idWorkpack && this.workpackModel && this.workpackModel.childWorkpackModelSessionActive && this.workpackModel.children) {
         this.tabs.push(
           ...this.workpackModel.children.map(workpackModel => ({
             menu: workpackModel.modelNameInPlural,

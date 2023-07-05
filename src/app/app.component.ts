@@ -50,7 +50,7 @@ export class AppComponent implements OnInit {
     }
     if (this.isMobileView && width > 768) {
       this.responsiveSrv.next(false);
-      this.mobileViewSrv.next(true);
+      this.mobileViewSrv.next(false);
     }
     if (width >= 900) {
       this.workpackShowTabViewSrv.next(true);

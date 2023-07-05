@@ -85,7 +85,7 @@ export class CostAssignmentCardItemComponent implements OnInit, OnDestroy {
 
   confirmReplicateValueDif() {
     this.difference = this.properties.plannedWork - this.properties.actualWork
-    if ( this.difference === 0) {
+    if ( this.difference === 0 || this.properties.endStep) {
       this.handleReplicateValue();
       return;
     }

@@ -104,7 +104,7 @@ export class WorkpackSectionPropertiesComponent implements OnInit {
     const workpackModelActivesProperties = (!!this.workpackParams.idWorkpackModelLinked && !!this.workpackParams.idWorkpack) ?
       this.workpackData.workpack.model?.properties?.filter(w => w.active && w.session === 'PROPERTIES') :
       this.workpackData.workpackModel?.properties?.filter(w => w.active && w.session === 'PROPERTIES');
-    this.sectionPropertiesProperties = await Promise.all(workpackModelActivesProperties.map(p => this.instanceProperty(p)));
+    this.sectionPropertiesProperties = workpackModelActivesProperties ? await Promise.all(workpackModelActivesProperties.map(p => this.instanceProperty(p))) : undefined;
     this.showCheckCompleted();
   }
 
@@ -112,7 +112,7 @@ export class WorkpackSectionPropertiesComponent implements OnInit {
     const workpackModelActivesProperties = (!!this.workpackParams.idWorkpackModelLinked && !!this.workpackParams.idWorkpack) ?
       this.workpackData.workpack.model?.properties?.filter(w => w.active && w.session === 'PROPERTIES') :
       this.workpackData.workpackModel?.properties?.filter(w => w.active && w.session === 'PROPERTIES');
-    this.sectionPropertiesProperties = await Promise.all(workpackModelActivesProperties.map(p => this.instanceProperty(p)));
+    this.sectionPropertiesProperties = workpackModelActivesProperties ? await Promise.all(workpackModelActivesProperties.map(p => this.instanceProperty(p))) : undefined;
   }
 
   loadCardWorkpackProperties() {

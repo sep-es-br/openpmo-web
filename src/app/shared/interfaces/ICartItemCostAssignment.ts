@@ -17,5 +17,6 @@ export interface ICartItemCostAssignment {
     actual: number;
     limit: number;
     planed: number;
-  } 
+  },
+  endStep?: boolean;
 }
