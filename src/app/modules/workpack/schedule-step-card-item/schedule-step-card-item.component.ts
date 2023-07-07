@@ -51,8 +51,8 @@ export class ScheduleStepCardItemComponent implements OnInit, OnDestroy {
       let dateStep = moment(this.properties.stepName);
       const monthStep = dateStep.month();
       const yearStep = dateStep.year();
-      dateStep = moment(`${yearStep}-${monthStep}-1`, 'yyyy-MM-DD');
-      const dateActual = moment()
+      dateStep = moment(`${yearStep}-${monthStep + 1}-1`, 'yyyy-MM-DD');
+      const dateActual = moment();
       if (dateStep.isSameOrBefore(dateActual)) {
         this.showReplicateButton = true;
       } else {
@@ -106,7 +106,7 @@ export class ScheduleStepCardItemComponent implements OnInit, OnDestroy {
       return;
     }
     this.confirmationSrv.confirm({
-      message: this.translateSrv.instant('messages.confirmRedistributeSchedule') + this.difference.toLocaleString(this.language) + 
+      message: this.translateSrv.instant('messages.confirmRedistributeSchedule') + this.difference.toLocaleString(this.language) +
         this.translateSrv.instant('messages.overTheRemainingMonths'),
       key: 'spreadDifferenceConfirm',
       acceptLabel: this.translateSrv.instant('yes'),
