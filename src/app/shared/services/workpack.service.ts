@@ -159,7 +159,7 @@ export class WorkpackService extends BaseService<IWorkpack> {
 
   public async checkWorkpackHasChildren(idWorkpack: number): Promise<IHttpResult<{ hasChildren: boolean; hasOnlyBasicRead: boolean }>> {
     const result = await this.http.get(`${this.urlBase}/${idWorkpack}/has-children`).toPromise();
-    return result as IHttpResult<{ hasChildren: boolean }>;
+    return result as IHttpResult<{ hasChildren: boolean; hasOnlyBasicRead: boolean }>;
   }
 
   public async GetWorkpackLinked(idWorkpack, options?): Promise<IHttpResult<IWorkpack>> {
