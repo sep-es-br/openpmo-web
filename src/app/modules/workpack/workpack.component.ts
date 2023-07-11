@@ -468,7 +468,7 @@ export class WorkpackComponent implements OnDestroy {
     this.isLoading = true;
     const {success, data} = await this.workpackSrv.checkWorkpackHasChildren(this.idWorkpack);
     if (success) {
-      this.hasWBS = data && data.hasChildren;
+      this.hasWBS = data && data.hasChildren && !data.hasOnlyBasicRead;
     }
   }
 
