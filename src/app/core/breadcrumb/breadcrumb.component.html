@@ -8,13 +8,13 @@
     <div class="name row" *ngIf="crumbPlan"> {{crumbPlan.info}}</div>
   </div>
   <div class="crumbs row" #crumbsEl>
-    <div class="home" [class.adjust-padding]="isOverflowing">
+    <div class="home" [class.adjust-padding]="isOverflowing" [class.cursor-loading]="loadingWorkpack">
       <i class="app-icon home" [ngStyle]="{ fontSize: isMobileView ? '1.5rem' : '1.7rem' }"
       (click)="handleNavigateBredcrumb()"></i>
     </div>
     <ng-container *ngFor="let crumb of crumbs; let i = index">
       <i class="app-icon angle-right" [ngStyle]="{ fontSize: isMobileView ? '.45rem' : '.6rem' }"></i>
-      <div class="crumb" [class.last-crumb]="i + 1 === crumbs.length">
+      <div class="crumb" [class.last-crumb]="i + 1 === crumbs.length" [class.cursor-loading]="loadingWorkpack">
         <div class="link" (click)="navigateTo(crumb, i)">{{ crumb.modelName ? crumb.modelName : (crumb.key | translate) }}</div>
         <div class="info" [pTooltip]="crumb.tooltip || crumb.info " *ngIf="(crumb.tooltip || crumb.info) && !isMobileView">
           {{ (crumb.info || crumb.tooltip)|translate }}

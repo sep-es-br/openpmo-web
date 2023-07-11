@@ -1,6 +1,10 @@
 @use 'src/variables' as v;
 $mobileMenuHeight: 72px;
 
+::ng-deep .cursor-wait {
+  cursor: wait !important;
+}
+
 .app-menu-fixed {
   display: flex;
   flex-direction: row;

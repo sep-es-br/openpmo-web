@@ -1,4 +1,4 @@
-<div class="app-menu-fixed">
+<div class="app-menu-fixed" [class.cursor-wait]="loadingWorkpack">
   <nav class="app-menu-fixed-nav" [class.admin-menu]="isAdminMenu" [class.mobile]="isMobileView">
     <div class="item" *ngIf="isMobileView" (click)="toggleMenu('user')">
       <i class="app-icon user-circle" [ngStyle]="{ fontSize: '2.25rem' }"></i>

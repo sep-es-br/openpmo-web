@@ -7,6 +7,7 @@ import { IBreadcrumb } from 'src/app/shared/interfaces/IBreadcrumb';
 import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
 import { ResponsiveService } from 'src/app/shared/services/responsive.service';
 import { Subject } from 'rxjs';
+import {WorkpackService} from "../../shared/services/workpack.service";
 
 @Component({
   selector: 'app-breadcrumb',
@@ -25,15 +26,18 @@ export class BreadcrumbComponent implements OnInit, OnChanges {
   crumbPlan: IBreadcrumb;
   $destroy = new Subject();
   fullScreenModeDashboard = false;
+  loadingWorkpack = false;
 
 
   constructor(
     public breadcrumbSrv: BreadcrumbService,
     private responsiveSrv: ResponsiveService,
     private dashboardSrv: DashboardService,
+    private workpackSrv: WorkpackService,
     private router: Router
   ) {
     this.responsiveSrv.observable.subscribe(isMobileView => this.isMobileView = isMobileView);
+    this.workpackSrv.observableLoadingWorkpack.subscribe(isLoading => this.loadingWorkpack = isLoading);
     this.dashboardSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.fullScreenModeDashboard = value);
   }
 
@@ -70,6 +74,9 @@ export class BreadcrumbComponent implements OnInit, OnChanges {
   }
 
   handleNavigateBredcrumb() {
+    if (this.loadingWorkpack) {
+      return;
+    }
     if (this.crumbPlan && this.crumbOffice && this.crumbs.length > 0) {
       this.router.navigate([...this.crumbPlan.routerLink], {
         queryParams: this.crumbPlan.queryParams
@@ -130,6 +137,9 @@ export class BreadcrumbComponent implements OnInit, OnChanges {
   }
 
   navigateTo(crumb: IBreadcrumb, index: number) {
+    if (this.loadingWorkpack) {
+      return;
+    }
     if (crumb.key === 'workpackModel') {
       const currentBreadcrumbItemsStoraged = localStorage.getItem('@pmo/current-breadcrumb');
       if (currentBreadcrumbItemsStoraged) {

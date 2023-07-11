@@ -314,6 +314,7 @@ export class WorkpackComponent implements OnDestroy {
   }
 
   async loadWorkpack(reloadOnlyProperties = false) {
+    this.workpackSrv.nextLoadingWorkpack(true);
     const result = await this.workpackSrv.GetWorkpackDataById(this.idWorkpack, {'id-plan': this.idPlan});
     if (result.success) {
       this.workpack = result.data;
@@ -323,7 +324,7 @@ export class WorkpackComponent implements OnDestroy {
       this.workpackName = propertyNameWorkpack?.value as string;
       const propertyFullNameWorkpackModel = this.workpack.model.properties.find(p => p.name === 'fullName' && p.session === 'PROPERTIES');
       const propertyFullNameWorkpack = this.workpack.properties.find(p => p.idPropertyModel === propertyFullNameWorkpackModel.id);
-      this.workpackFullName = propertyFullNameWorkpack.value as string;
+      this.workpackFullName = propertyFullNameWorkpack?.value as string;
       if (this.workpack && (this.workpack.canceled)) {
         this.workpackSrv.setEditPermission(false);
       } else if (!this.isUserAdmin && this.workpack) {
@@ -343,6 +344,7 @@ export class WorkpackComponent implements OnDestroy {
         await this.loadWorkpackModel(this.workpack.model.id);
       }
     }
+    setTimeout(() => this.workpackSrv.nextLoadingWorkpack(false), 1000);
   }
 
   getEditPermission() {
@@ -360,6 +362,7 @@ export class WorkpackComponent implements OnDestroy {
   }
 
   async loadWorkpackLinked(reloadOnlyProperties = false) {
+    this.workpackSrv.nextLoadingWorkpack(true);
     const result = await this.workpackSrv.GetWorkpackLinked(this.idWorkpack,
       {'id-workpack-model': this.idWorkpackModelLinked, 'id-plan': this.idPlan});
     if (result.success) {
@@ -390,6 +393,7 @@ export class WorkpackComponent implements OnDestroy {
         await this.loadWorkpackModel(this.workpack.model.id);
       }
     }
+    setTimeout(() => this.workpackSrv.nextLoadingWorkpack(false), 1000);
   }
 
   async loadUserPermission() {
@@ -409,6 +413,7 @@ export class WorkpackComponent implements OnDestroy {
   }
 
   async loadWorkpackModel(idWorkpackModel) {
+    this.workpackSrv.nextLoadingWorkpack(true);
     const result = await this.workpackModelSrv.GetById(idWorkpackModel);
     if (result.success) {
       this.workpackModel = result.data;
@@ -456,6 +461,7 @@ export class WorkpackComponent implements OnDestroy {
       });
       this.officeSrv.nextIDOffice(this.propertiesPlan.idOffice);
     }
+    setTimeout(() => this.workpackSrv.nextLoadingWorkpack(false), 1000);
   }
 
   async checkWorkpackHasEap() {
@@ -519,6 +525,9 @@ export class WorkpackComponent implements OnDestroy {
           const idFilterSelected = resultFilters.data.find(defaultFilter => !!defaultFilter.favorite) ?
             resultFilters.data.find(defaultFilter => !!defaultFilter.favorite).id : undefined;
           const resultItemsList = await this.loadWorkpacksFromWorkpackModel(this.workpack.plan.id, workpackModel.id, idFilterSelected, false);
+          if (!this.cardsWorkPackModelChildren[index]?.cardSection?.createNewElementMenuItemsWorkpack) {
+            return;
+          }
           this.cardsWorkPackModelChildren[index].cardSection.createNewElementMenuItemsWorkpack =
             resultItemsList && resultItemsList.iconMenuItems;
           this.cardsWorkPackModelChildren[index].cardItemsSection = resultItemsList && resultItemsList.workpackItemCardList;
@@ -564,10 +573,10 @@ export class WorkpackComponent implements OnDestroy {
     }
     if (workpacks && workpacks.length > 0) {
       const workpackItemCardList: IWorkpackCardItem[] = workpacks.map(workpack => {
-        const propertyNameWorkpackModel = workpack.model?.properties?.find(p => p.name === 'name' && p.session === 'PROPERTIES');
-        const propertyNameWorkpack = workpack.properties?.find(p => p.idPropertyModel === propertyNameWorkpackModel.id);
+        const propertyNameWorkpackModel = workpack.model?.properties?.find(p => p?.name === 'name' && p.session === 'PROPERTIES');
+        const propertyNameWorkpack = workpack.properties?.find(p => p?.idPropertyModel === propertyNameWorkpackModel.id);
         const propertyFullnameWorkpackModel = workpack.model?.properties?.find(p => p.name === 'fullName' && p.session === 'PROPERTIES');
-        const propertyFullnameWorkpack = workpack.properties?.find(p => p.idPropertyModel === propertyFullnameWorkpackModel.id);
+        const propertyFullnameWorkpack = workpack.properties?.find(p => p?.idPropertyModel === propertyFullnameWorkpackModel.id);
         const menuItems: MenuItem[] = [];
         if (workpack.canceled && workpack.type !== 'Project') {
           menuItems.push({
