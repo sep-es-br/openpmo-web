@@ -74,6 +74,13 @@ export class PersonListComponent implements OnInit, OnDestroy {
   ) {
     localStorage.removeItem('@currentPlan');
     localStorage.removeItem('@pmo/propertiesCurrentPlan');
+    this.formSearch = this.formBuilder.group({
+      scopeName: '',
+      userStatus: [OptionsAccessEnum.All],
+      stakeholderStatus: [OptionsStakeholderEnum.All],
+      ccbMemberStatus: 'ALL',
+      name: ['']
+    });
     this.configDataViewSrv.observableDisplayModeAll.pipe(takeUntil(this.$destroy)).subscribe(displayMode => {
       this.displayModeAll = displayMode;
     });
@@ -85,13 +92,7 @@ export class PersonListComponent implements OnInit, OnDestroy {
       await this.loads();
     });
     this.citizenUserSrv.loadCitizenUsers();
-    this.formSearch = this.formBuilder.group({
-      scopeName: '',
-      userStatus: [OptionsAccessEnum.All],
-      stakeholderStatus: [OptionsStakeholderEnum.All],
-      ccbMemberStatus: 'ALL',
-      name: ['']
-    });
+   
     this.responsiveSvr.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.responsive = value);
   }
 
@@ -110,8 +111,8 @@ export class PersonListComponent implements OnInit, OnDestroy {
 
   async loads() {
     this.isLoading = true;
-    await this.loadTreeViewScope();
-    await this.loadPersons();
+    this.loadTreeViewScope();
+    this.loadPersons();
     this.loadOptions();
     await this.getOfficeById();
     this.setBreadcrumb();
@@ -120,9 +121,9 @@ export class PersonListComponent implements OnInit, OnDestroy {
   async loadPersons() {
     const { success, data } = await this.personSrv.GetAllPersons(this.idOffice, {
       ...this.formSearch?.value,
-      officeScope: this.selectedOffices.map(office => office.data).join(','),
-      planScope: this.selectedPlans.map(plan => plan.data).join(','),
-      workpackScope: this.selectedWorkpacks.map(workpack => workpack.data).join(','),
+      officeScope: this.selectedOffices && this.selectedOffices.length > 0? this.selectedOffices.map(office => office.data).join(',') : undefined,
+      planScope: this.selectedPlans && this.selectedPlans.length > 0 ? this.selectedPlans.map(plan => plan.data).join(',') : undefined,
+      workpackScope: this.selectedWorkpacks && this.selectedWorkpacks.length > 0 ? this.selectedWorkpacks.map(workpack => workpack.data).join(',') : undefined,
     });
     const itemsProperties: ICardItemOffice[] = [];
     this.cardProperties.showCreateNemElementButton = false;

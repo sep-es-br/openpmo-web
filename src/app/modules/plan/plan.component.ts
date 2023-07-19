@@ -207,7 +207,11 @@ export class PlanComponent implements OnInit, OnDestroy {
   }
 
   async resetPlan() {
-    this.planSrv.nextIDPlan(this.idPlan);
+    if (this.idPlan) {
+      this.planSrv.nextIDPlan(this.idPlan);
+    } else {
+      this.planSrv.nextNewPlan(true);
+    }
     this.cardPlanProperties = undefined;
     this.cardsPlanWorkPackModels = undefined;
     this.planData = undefined;
@@ -305,6 +309,7 @@ export class PlanComponent implements OnInit, OnDestroy {
         if (!this.isUserAdmin) {
           await this.createPlanPermission(data.id);
         }
+        this.planSrv.nextIDPlan(this.idPlan);
         await this.loadPropertiesPlan();
       }
       this.messageSrv.add({

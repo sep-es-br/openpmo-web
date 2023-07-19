@@ -10,6 +10,7 @@ import { BaseService } from '../base/base.service';
 export class PlanService extends BaseService<IPlan> {
 
   private currentIDPlan = new BehaviorSubject<number>(0);
+  private newPlan = new BehaviorSubject<boolean>(false);
 
   constructor(
     @Inject(Injector) injector: Injector
@@ -24,4 +25,15 @@ export class PlanService extends BaseService<IPlan> {
   nextIDPlan(idPlan: number) {
     this.currentIDPlan.next(idPlan);
   }
+
+  observableNewPlan() {
+    return this.newPlan.asObservable();
+  }
+
+  nextNewPlan(value) {
+    this.newPlan.next(value);
+  }
+
+
+
 }

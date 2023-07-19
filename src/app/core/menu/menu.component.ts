@@ -74,6 +74,7 @@ export class MenuComponent implements OnInit, OnDestroy {
   itemsBreadcrumb = [];
   storageBreadcrumbsItems = [];
   hasReports = false;
+  linkEvent = false;
 
   constructor(
     private menuSrv: MenuService,
@@ -114,6 +115,15 @@ export class MenuComponent implements OnInit, OnDestroy {
         await this.loadReportsMenu();
       }
     });
+    this.planSrv.observableNewPlan().pipe(takeUntil(this.$destroy)).subscribe( value => {
+      if (!!value) {
+        if (!this.isFixed) {
+        this.currentPlan = undefined;
+        this.itemsPortfolio = [];
+        this.itemsFavorites = [];
+       }
+      }
+    });
     this.menuSrv.obsReloadMenuOffice().pipe(takeUntil(this.$destroy)).subscribe(() => !this.isFixed && this.loadOfficeMenu());
     this.menuSrv.obsReloadMenuFavorite().pipe(takeUntil(this.$destroy)).subscribe(() => !this.isFixed && this.loadFavoritesMenu());
     this.menuSrv.obsReloadMenuPortfolio().pipe(takeUntil(this.$destroy)).subscribe(() => {
@@ -151,7 +161,8 @@ export class MenuComponent implements OnInit, OnDestroy {
       if (!this.isFixed) {
         this.changedUrl = true;
         this.currentURL = url.slice(2);
-        this.selectMenuActive(url.slice(2));
+        this.linkEvent = this.currentURL.includes('linkEvent');
+        if (!this.linkEvent) this.selectMenuActive(url.slice(2));
       }
     });
     this.menuSrv.getMenuState.pipe(takeUntil(this.$destroy)).subscribe(async (menuState) => {
@@ -545,7 +556,7 @@ export class MenuComponent implements OnInit, OnDestroy {
       const {success, data} = await this.menuSrv.getItemsPortfolio(this.currentIDOffice, this.currentIDPlan);
       if (success) {
         this.itemsPortfolio = this.buildMenuItemPortfolio(data || []);
-        if (!this.isFixed && !this.changedUrl) {
+        if (!this.isFixed && (!this.changedUrl || this.linkEvent)) {
           this.selectMenuActive(this.router.url.slice(1), idNewWorkpack)
         }
       }

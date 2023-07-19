@@ -165,7 +165,7 @@ export class CardComponent implements OnInit, OnDestroy, OnChanges {
       this.searchText.emit({term: value});
       this.searchTextAux = value;
     }
-    if (value === '') {
+    if (value === '' || !value) {
       this.showAnimationSearch = false;
     }
   }

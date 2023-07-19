@@ -57,7 +57,7 @@ export class WorkpackService extends BaseService<IWorkpack> {
 
 
   nextPendingChanges(nextValue: boolean) {
-    this.workpackData = {} as IWorkpackData;
+    // this.workpackData = {} as IWorkpackData;
     this.pendingChanges.next(nextValue);
   }
 

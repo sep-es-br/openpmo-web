@@ -176,10 +176,12 @@
   <div class="app-menu-slide-fixed" #menuSliderPortfolio *ngIf="menus[1].isOpen">
     <ng-container *ngIf="isMobileView; else sliderPortfolio">
       <div class="top-bar">
-        <div class="title" [routerLink]="['/plan']" [queryParams]="{id: currentPlan?.id}">{{ currentPlan?.name }}</div>
-        <div class="action" *ngIf="!isMobileView">
+        <div *ngIf="currentPlan" class="title" [routerLink]="['/plan']" [queryParams]="{id: currentPlan?.id}">{{ currentPlan?.name }}</div>
+        <div class="action" *ngIf="!isMobileView && currentPlan">
           <i class="app-icon arrow-left" [ngStyle]="{ fontSize: '1rem' }" (click)="closeAllMenus()"></i>
         </div>
+        <div *ngIf="!currentPlan" class="title">
+          {{'newPlan'|translate}}</div>
       </div>
       <p-panelMenu [model]="itemsPortfolio"></p-panelMenu>
       <div class="action-mobile" *ngIf="isMobileView">
@@ -189,12 +191,14 @@
     <ng-template #sliderPortfolio>
       <div class="slide-wrapper">
         <div class="top-bar">
-          <div class="title" [routerLink]="['/plan']" [queryParams]="{id: currentPlan?.id}">{{ currentPlan?.name }}
+          <div *ngIf="currentPlan" class="title" [routerLink]="['/plan']" [queryParams]="{id: currentPlan?.id}">{{ currentPlan?.name }}
           </div>
-          <div class="action" *ngIf="!isMobileView">
+          <div class="action" *ngIf="!isMobileView && currentPlan">
             <i [class]="isFixed ? 'app-icon pin-on' : 'app-icon pin-off'" [ngStyle]="{ fontSize: '1rem' }"
               (click)="handleChangeMenuMode()"></i>
           </div>
+          <div *ngIf="!currentPlan" class="title">
+            {{'newPlan'|translate}}</div>
         </div>
         <p-panelMenu [model]="itemsPortfolio"></p-panelMenu>
       </div>

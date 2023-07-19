@@ -1,7 +1,4 @@
 <nav class="app-menu" [class.admin-menu]="isAdminMenu" [class.mobile]="isMobileView">
-  <!--div class="logo" *ngIf="!isMobileView">
-    <img src="assets/svg/LogoWhite.svg" alt="Logo">
-  </!--div-->
   <ng-container *ngIf="isAdminMenu; else menuGeneral">
     <ng-container *ngTemplateOutlet="menuAdmin"></ng-container>
   </ng-container>
@@ -243,11 +240,13 @@
   [class.changing]="isChangingView">
   <ng-container *ngIf="isMobileView; else sliderPortfolio">
     <div class="top-bar">
-      <div class="title" (click)="closeAllMenus()" [routerLink]="['/plan']" [queryParams]="{id: currentPlan?.id}">
+      <div *ngIf="currentPlan" class="title" (click)="closeAllMenus()" [routerLink]="['/plan']" [queryParams]="{id: currentPlan?.id}">
         {{currentPlan?.name}}</div>
-      <div class="action" *ngIf="!isMobileView">
+      <div class="action" *ngIf="!isMobileView && currentPlan">
         <i class="app-icon arrow-left" [ngStyle]="{ fontSize: '1rem' }" (click)="closeAllMenus()"></i>
       </div>
+      <div *ngIf="!currentPlan" class="title">
+        {{'newPlan'|translate}}</div>
     </div>
     <p-panelMenu [model]="itemsPortfolio"></p-panelMenu>
     <div class="action-mobile" *ngIf="isMobileView">
@@ -259,13 +258,15 @@
       <ng-template>
         <div class="slide-wrapper">
           <div class="top-bar">
-            <div class="title" (click)="closeAllMenus()" [routerLink]="['/plan']" [queryParams]="{id: currentPlan?.id}">
+            <div *ngIf="currentPlan" class="title" (click)="closeAllMenus()" [routerLink]="['/plan']" [queryParams]="{id: currentPlan?.id}">
               {{currentPlan?.name}}
             </div>
-            <div class="action" *ngIf="!isMobileView">
+            <div class="action" *ngIf="!isMobileView && currentPlan">
               <i [class]="isFixed ? 'app-icon pin-on' : 'app-icon pin-off'" [ngStyle]="{ fontSize: '1rem' }"
                 (click)="handleChangeMenuMode()"></i>
             </div>
+            <div *ngIf="!currentPlan" class="title">
+              {{'newPlan'|translate}}</div>
           </div>
           <p-panelMenu [model]="itemsPortfolio"></p-panelMenu>
         </div>

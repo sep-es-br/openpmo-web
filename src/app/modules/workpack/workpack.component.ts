@@ -545,7 +545,7 @@ export class WorkpackComponent implements OnDestroy {
 
   getShowStakeHolderSection() {
     return this.idWorkpack && this.workpackModel && this.workpackModel.stakeholderSessionActive &&
-      !this.idWorkpackModelLinked || (this.workpackSrv.getEditPermission() && !!this.idWorkpackModelLinked);
+      !this.idWorkpackModelLinked || (this.workpackSrv.getEditPermission() && !!this.idWorkpackModelLinked && this.workpackModel.stakeholderSessionActive );
   }
 
   getShowBaselineSection() {
@@ -1073,10 +1073,13 @@ export class WorkpackComponent implements OnDestroy {
     const result = await this.workpackSrv.linkWorkpack(idWorkpack, idWorkpackModel,
       {'id-parent': this.idWorkpack, 'id-plan': this.idPlan});
     if (result.success) {
+      this.menuSrv.reloadMenuPortfolio();
       this.router.navigate(['/workpack'], {
         queryParams: {
           id: idWorkpack,
-          idWorkpackModelLinked: idWorkpackModel
+          idWorkpackModelLinked: idWorkpackModel,
+          idPlan: this.idPlan,
+          linkEvent: true
         }
       });
     }
