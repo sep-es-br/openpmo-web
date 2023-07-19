@@ -353,12 +353,18 @@ export class MenuFixedComponent implements OnInit, OnDestroy {
       this.itemsPlanModel = this.itemsPlanModel ? [...this.expandedMenuSelectedItem(this.itemsPlanModel, [], 0)] : undefined;
     }
     if (url.startsWith('offices') && (isNaN(id) || !id)) {
+      // setando para ocultar o menu de portfolio
+      this.menus.forEach( itemMenu => itemMenu.isOpen = false)
+      this.menus[0].isOpen = true;
       this.itemsOffice = this.itemsOffice ? [...this.collapseMenuItems(this.itemsOffice)] : undefined;
     }
     if (!id || isNaN(id)) {
       return;
     }
     if (url.startsWith('offices/office')) {
+      // setando para ocultar o menu de portfolio
+      this.menus.forEach( itemMenu => itemMenu.isOpen = false)
+      this.menus[0].isOpen = true;
       this.menuOffices?.nativeElement.querySelector('.office-' + id)?.classList.add('active');
       this.itemsOffice = this.itemsOffice ? [...this.expandMenuOffice()] : undefined;
 

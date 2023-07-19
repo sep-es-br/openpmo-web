@@ -99,11 +99,14 @@ export class WorkpackSectionPropertiesComponent implements OnInit {
   async loadProperties() {
     this.isLoading = true;
     this.workpackParams = this.workpackSrv.getWorkpackParams();
-    await this.loadOrganizationsOffice(this.workpackParams.idOfficeOwnerWorkpackLinked ? this.workpackParams.idOfficeOwnerWorkpackLinked : this.workpackParams.idOffice);
+    
     this.loadCardWorkpackProperties();
     const workpackModelActivesProperties = (!!this.workpackParams.idWorkpackModelLinked && !!this.workpackParams.idWorkpack) ?
       this.workpackData.workpack.model?.properties?.filter(w => w.active && w.session === 'PROPERTIES') :
       this.workpackData.workpackModel?.properties?.filter(w => w.active && w.session === 'PROPERTIES');
+    if (workpackModelActivesProperties && workpackModelActivesProperties.filter( prop => this.typePropertyModel[prop.type] === TypePropertyModelEnum.OrganizationSelectionModel).length > 0) {
+      await this.loadOrganizationsOffice(this.workpackParams.idOfficeOwnerWorkpackLinked ? this.workpackParams.idOfficeOwnerWorkpackLinked : this.workpackParams.idOffice);
+    }
     this.sectionPropertiesProperties = workpackModelActivesProperties ? await Promise.all(workpackModelActivesProperties.map(p => this.instanceProperty(p))) : undefined;
     this.showCheckCompleted();
   }
