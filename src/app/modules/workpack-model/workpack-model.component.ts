@@ -1653,6 +1653,7 @@ export class WorkpackModelComponent implements OnInit {
     if (success) {
       this.childrenModels = Array.from(this.childrenModels.filter(c => c.id !== workpackModel.id));
       this.cardItemsModels = Array.from(this.cardItemsModels.filter(m => m.itemId !== workpackModel.id));
+      this.menuSrv.reloadMenuPlanModel();
     }
   }
 

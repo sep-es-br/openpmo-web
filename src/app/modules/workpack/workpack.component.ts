@@ -367,6 +367,7 @@ export class WorkpackComponent implements OnDestroy {
       { 'id-workpack-model': this.idWorkpackModelLinked, 'id-plan': this.idPlan });
     if (result.success) {
       this.workpack = result.data;
+      this.setUnitMeansure();
       const workpackParams = this.workpackSrv.getWorkpackParams();
       workpackParams.idOfficeOwnerWorkpackLinked = this.workpack.plan.idOffice;
       this.workpackSrv.setWorkpackParams({ ...workpackParams });

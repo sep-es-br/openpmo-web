@@ -119,7 +119,7 @@ export class MenuFixedComponent implements OnInit, OnDestroy {
       if (!!this.isAdminMenu) {
         this.updateMenuOfficeOnAdminChange();
       } else {
-        this.loadOfficeMenu();
+        if (!!this.isFixed) this.loadOfficeMenu();
       }
     });
 
@@ -137,7 +137,7 @@ export class MenuFixedComponent implements OnInit, OnDestroy {
     this.officeSrv.observableIdOffice().pipe(takeUntil(this.$destroy)).subscribe(async id => {
       this.currentIDOffice = id;
       this.getPropertiesOffice(this.currentIDOffice);
-      await this.loadPlanModelMenu();
+      if (!!this.isFixed) await this.loadPlanModelMenu();
     });
 
     this.planSrv.observableIdPlan().pipe(takeUntil(this.$destroy)).subscribe(async id => {
@@ -145,31 +145,33 @@ export class MenuFixedComponent implements OnInit, OnDestroy {
       if (this.currentIDPlan && this.currentIDPlan !== 0) {
         localStorage.setItem('@currentPlan', this.currentIDPlan.toString());
       }
-      await this.loadPropertiesPlan();
-      await this.loadPortfolioMenu();
-      await this.loadFavoritesMenu();
-      await this.loadReportsMenu();
-    });
-
-    this.planSrv.observableNewPlan().pipe(takeUntil(this.$destroy)).subscribe( value => {
-      if (!!value) {
-        if (!!this.isFixed) {
-        this.currentPlan = undefined;
-        this.itemsPortfolio = [];
-        this.itemsFavorites = [];
-       }
+      if (!!this.isFixed) {
+        await this.loadPropertiesPlan();
+        await this.loadPortfolioMenu();
+        await this.loadFavoritesMenu();
+        await this.loadReportsMenu();
       }
     });
 
-    this.menuSrv.obsReloadMenuOffice().pipe(takeUntil(this.$destroy)).subscribe(() => { { this.loadOfficeMenu(); } });
+    this.planSrv.observableNewPlan().pipe(takeUntil(this.$destroy)).subscribe(value => {
+      if (!!value) {
+        if (!!this.isFixed) {
+          this.currentPlan = undefined;
+          this.itemsPortfolio = [];
+          this.itemsFavorites = [];
+        }
+      }
+    });
+
+    this.menuSrv.obsReloadMenuOffice().pipe(takeUntil(this.$destroy)).subscribe(() => { { if (!!this.isFixed) this.loadOfficeMenu(); } });
     this.menuSrv.obsReloadMenuPortfolio().pipe(takeUntil(this.$destroy)).subscribe(() => {
       const idNewWorkpack = this.menuSrv.getIdNewWorkpack();
       this.changedUrl = false;
-      this.loadPortfolioMenu(idNewWorkpack);
+      if (!!this.isFixed) this.loadPortfolioMenu(idNewWorkpack);
     });
-    this.menuSrv.obsReloadMenuFavorite().pipe(takeUntil(this.$destroy)).subscribe(() => { this.loadFavoritesMenu(); });
+    this.menuSrv.obsReloadMenuFavorite().pipe(takeUntil(this.$destroy)).subscribe(() => { if (!!this.isFixed) this.loadFavoritesMenu(); });
     this.menuSrv.obsReloadMenuPlanModel().pipe(takeUntil(this.$destroy)).subscribe(() => {
-      !this.isFixed && this.loadPlanModelMenu();
+      if (!!this.isFixed) this.loadPlanModelMenu();
     });
 
     this.menuSrv.isAdminMenu.pipe(takeUntil(this.$destroy)).subscribe(isAdminMenu => {
@@ -354,7 +356,7 @@ export class MenuFixedComponent implements OnInit, OnDestroy {
     }
     if (url.startsWith('offices') && (isNaN(id) || !id)) {
       // setando para ocultar o menu de portfolio
-      this.menus.forEach( itemMenu => itemMenu.isOpen = false)
+      this.menus.forEach(itemMenu => itemMenu.isOpen = false)
       this.menus[0].isOpen = true;
       this.itemsOffice = this.itemsOffice ? [...this.collapseMenuItems(this.itemsOffice)] : undefined;
     }
@@ -363,7 +365,7 @@ export class MenuFixedComponent implements OnInit, OnDestroy {
     }
     if (url.startsWith('offices/office')) {
       // setando para ocultar o menu de portfolio
-      this.menus.forEach( itemMenu => itemMenu.isOpen = false)
+      this.menus.forEach(itemMenu => itemMenu.isOpen = false)
       this.menus[0].isOpen = true;
       this.menuOffices?.nativeElement.querySelector('.office-' + id)?.classList.add('active');
       this.itemsOffice = this.itemsOffice ? [...this.expandMenuOffice()] : undefined;

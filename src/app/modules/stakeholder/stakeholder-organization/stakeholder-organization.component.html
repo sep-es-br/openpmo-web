@@ -17,28 +17,28 @@
         </div>
         <div class="organization-header" *ngIf="organization">
           <div class="organization-property">
-            <label class="property-label">Business name</label>
+            <label class="property-label">{{'businessName' | translate}}</label>
             <span class="property-value">{{organization?.name}}</span>
           </div>
           <div class="organization-property property-sector">
-            <label class="property-label">Sector</label>
-            <span class="property-value">{{organization?.sector}}</span>
+            <label class="property-label">{{'sector' | translate}}</label>
+            <span class="property-value">{{organization?.sector | translate}}</span>
           </div>
         </div>
         <div class="organization-property" *ngIf="organization">
-          <label class="property-label">Social name</label>
+          <label class="property-label">{{'socialName' | translate}}</label>
           <span class="property-value">{{organization?.fullName}}</span>
         </div>
         <div class="organization-property" *ngIf="organization?.address">
-          <label class="property-label">address</label>
+          <label class="property-label">{{'address' | translate}}</label>
           <span class="property-value">{{organization?.address}}</span>
         </div>
         <div class="organization-property" *ngIf="organization?.phoneNumber">
-          <label class="property-label">Phone</label>
+          <label class="property-label">{{'phone' | translate}}</label>
           <span class="property-value">{{organization?.phoneNumber}}</span>
         </div>
         <div class="organization-property" *ngIf="organization?.contactEmail">
-          <label class="property-label">Contact e-mail</label>
+          <label class="property-label">{{'contactEmail' | translate}}</label>
           <span class="property-value">{{organization?.contactEmail}}</span>
         </div>
         <div class="organization-property" *ngIf="organization?.website">

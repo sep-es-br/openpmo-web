@@ -24,6 +24,7 @@ import { OfficePermissionService } from 'src/app/shared/services/office-permissi
 import { ConfigDataViewService } from 'src/app/shared/services/config-dataview.service';
 import { ReportModelService } from 'src/app/shared/services/report-model.service';
 import { IReportModel } from 'src/app/shared/interfaces/IReportModel';
+import { MenuService } from 'src/app/shared/services/menu.service';
 
 @Component({
   selector: 'app-strategy',
@@ -82,7 +83,8 @@ export class StrategyComponent implements OnDestroy {
     private authSrv: AuthService,
     private messageSrv: MessageService,
     private configDataViewSrv: ConfigDataViewService,
-    private reportModelSrv: ReportModelService
+    private reportModelSrv: ReportModelService,
+    private menuSrv: MenuService
   ) {
     this.translateSrv.onLangChange.pipe(takeUntil(this.$destroy)).subscribe(() => {
       setTimeout(() => this.setLanguage(), 200);
@@ -419,6 +421,7 @@ export class StrategyComponent implements OnDestroy {
     const result = await this.workpackModelSvr.delete(worckpackModel, { field: 'modelName' });
     if (result.success) {
       await this.loadModels();
+      this.menuSrv.reloadMenuPlanModel();
     }
   }
 
