@@ -228,7 +228,7 @@ export class OfficePermissionsListComponent implements OnInit {
   }
 
   async handleSearchText(event) {
-    this.term = event;
+    this.term = event.term;
     await this.loadOfficePermissions();
   }
 
