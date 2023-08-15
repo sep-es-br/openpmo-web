@@ -104,6 +104,7 @@ export class JournalViewComponent implements OnInit, OnDestroy {
     const type = this.formSearch.controls.type.value;
     this.isLoading = true;
     const { data, success } = await this.journalSrv.GetAll({
+      idWorkpack: this.idWorkpack,
       scopeName: this.formSearch.controls.scopeName.value,
       from: this.getFrom(),
       to: this.getTo(),
