@@ -12,7 +12,7 @@ import { BehaviorSubject } from 'rxjs';
 @Injectable({ providedIn: 'root' })
 export class PersonService extends BaseService<IPerson> {
 
-  private avatarChanged = new BehaviorSubject<boolean>(false); 
+  private avatarChanged = new BehaviorSubject<boolean>(false);
 
   constructor(
     @Inject(Injector) injector: Injector
@@ -30,11 +30,7 @@ export class PersonService extends BaseService<IPerson> {
 
 
   public async GetAllPersons(idOffice: number, options?): Promise<IHttpResult<IPerson[]>> {
-    const result = await this.http.get<IHttpResult<IPerson[]>>(`${this.urlBase}/office/${idOffice}`,
-      {
-        params: PrepareHttpParams(options)
-      }
-    ).toPromise();
+    const result = await this.http.post<IHttpResult<IPerson[]>>(`${this.urlBase}/office/${idOffice}`, options).toPromise();
     if (!result.data?.length) {
       result.data = [];
     }

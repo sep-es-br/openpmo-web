@@ -1,26 +1,26 @@
-import { CitizenUserService } from './../../../shared/services/citizen-user.service';
-import { OfficePermissionService } from './../../../shared/services/office-permission.service';
-import { AuthService } from './../../../shared/services/auth.service';
-import { IOffice } from 'src/app/shared/interfaces/IOffice';
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { IconsEnum } from 'src/app/shared/enums/IconsEnum';
-import { ICard } from 'src/app/shared/interfaces/ICard';
-import { ICardItemOffice } from 'src/app/shared/interfaces/ICardItemOffice';
-import { ICardItem } from 'src/app/shared/interfaces/ICardItem';
-import { PersonService } from 'src/app/shared/services/person.service';
-import { OfficeService } from 'src/app/shared/services/office.service';
-import { ResponsiveService } from 'src/app/shared/services/responsive.service';
-import { takeUntil } from 'rxjs/operators';
-import { Subject } from 'rxjs';
-import { SelectItem, TreeNode } from 'primeng/api';
-import { ITreeViewScopeWorkpack } from 'src/app/shared/interfaces/ITreeScopePersons';
-import { OptionsAccessEnum, OptionsStakeholderEnum } from 'src/app/shared/enums/OptionsSelectItemEnuns';
-import { TranslateService } from '@ngx-translate/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
-import { not } from '@angular/compiler/src/output/output_ast';
-import { ConfigDataViewService } from 'src/app/shared/services/config-dataview.service';
+import {CitizenUserService} from './../../../shared/services/citizen-user.service';
+import {OfficePermissionService} from './../../../shared/services/office-permission.service';
+import {AuthService} from './../../../shared/services/auth.service';
+import {IOffice} from 'src/app/shared/interfaces/IOffice';
+import {Component, OnDestroy, OnInit} from '@angular/core';
+import {ActivatedRoute, Router} from '@angular/router';
+import {IconsEnum} from 'src/app/shared/enums/IconsEnum';
+import {ICard} from 'src/app/shared/interfaces/ICard';
+import {ICardItemOffice} from 'src/app/shared/interfaces/ICardItemOffice';
+import {ICardItem} from 'src/app/shared/interfaces/ICardItem';
+import {PersonService} from 'src/app/shared/services/person.service';
+import {OfficeService} from 'src/app/shared/services/office.service';
+import {ResponsiveService} from 'src/app/shared/services/responsive.service';
+import {takeUntil} from 'rxjs/operators';
+import {Subject} from 'rxjs';
+import {SelectItem, TreeNode} from 'primeng/api';
+import {ITreeViewScopeWorkpack} from 'src/app/shared/interfaces/ITreeScopePersons';
+import {OptionsAccessEnum, OptionsStakeholderEnum} from 'src/app/shared/enums/OptionsSelectItemEnuns';
+import {TranslateService} from '@ngx-translate/core';
+import {FormBuilder, FormGroup, Validators} from '@angular/forms';
+import {BreadcrumbService} from 'src/app/shared/services/breadcrumb.service';
+import {not} from '@angular/compiler/src/output/output_ast';
+import {ConfigDataViewService} from 'src/app/shared/services/config-dataview.service';
 
 @Component({
   selector: 'app-person-list',
@@ -119,11 +119,12 @@ export class PersonListComponent implements OnInit, OnDestroy {
   }
 
   async loadPersons() {
-    const { success, data } = await this.personSrv.GetAllPersons(this.idOffice, {
-      ...this.formSearch?.value,
-      officeScope: this.selectedOffices && this.selectedOffices.length > 0? this.selectedOffices.map(office => office.data).join(',') : undefined,
-      planScope: this.selectedPlans && this.selectedPlans.length > 0 ? this.selectedPlans.map(plan => plan.data).join(',') : undefined,
-      workpackScope: this.selectedWorkpacks && this.selectedWorkpacks.length > 0 ? this.selectedWorkpacks.map(workpack => workpack.data).join(',') : undefined,
+    const {success, data} = await this.personSrv.GetAllPersons(this.idOffice, {
+      ... this.formSearch?.value,
+      officeScope: this.selectedOffices && this.selectedOffices.length > 0 ? this.selectedOffices.map(office => office.data) : undefined,
+      planScope: this.selectedPlans && this.selectedPlans.length > 0 ? this.selectedPlans.map(plan => plan.data) : undefined,
+      workpackScope: this.selectedWorkpacks && this.selectedWorkpacks.length > 0 ?
+        this.selectedWorkpacks.map(workpack => workpack.data) : undefined,
     });
     const itemsProperties: ICardItemOffice[] = [];
     this.cardProperties.showCreateNemElementButton = false;
