@@ -93,9 +93,15 @@ export class OrganizationComponent implements OnInit, OnDestroy {
     }
     this.loadCard();
     await this.loadPropertiesOrganization();
-    const resultOffice = await this.officeSrv.GetById(this.idOffice);
-    if (resultOffice.success) {
-      this.propertiesOffice = resultOffice.data;
+    const propertiesOfficeItem = localStorage.getItem('@pmo/propertiesCurrentOffice');
+    if (propertiesOfficeItem && (JSON.parse(propertiesOfficeItem)).id === this.idOffice) {
+      this.propertiesOffice = JSON.parse(propertiesOfficeItem);
+    } else {
+      const { success, data } = await this.officeSrv.GetById(this.idOffice);
+      if (success) {
+        this.propertiesOffice = data;
+        localStorage.setItem('@pmo/propertiesCurrentOffice', JSON.stringify(this.propertiesOffice));
+      }
     }
     this.breadcrumbSrv.setMenu([
       {

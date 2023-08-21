@@ -98,19 +98,25 @@ export class SharingComponent implements OnInit {
     const result = await this.planSrv.GetById(this.idPlan);
     if (result.success) {
       this.plan = result.data;
-      const resultOffice = await this.officeSrv.GetById(this.plan.idOffice);
-      if (resultOffice.success) {
-        this.office = resultOffice.data;
+      const propertiesOfficeItem = localStorage.getItem('@pmo/propertiesCurrentOffice');
+      if (propertiesOfficeItem && (JSON.parse(propertiesOfficeItem)).id === this.plan.idOffice) {
+        this.office = JSON.parse(propertiesOfficeItem);
+      } else {
+        const { success, data } = await this.officeSrv.GetById(this.plan.idOffice);
+        if (success) {
+          this.office = data;
+          localStorage.setItem('@pmo/propertiesCurrentOffice', JSON.stringify(this.office));
+        }
       }
       this.setBreacrumbFromPlan();
     }
   }
 
   async loadWorkpackProperties() {
-    const result = await this.workpackSrv.GetWorkpackById(this.idWorkpack, {'id-plan': this.idPlan});
+    const result = await this.workpackSrv.GetWorkpackById(this.idWorkpack, { 'id-plan': this.idPlan });
     if (result.success) {
       this.workpack = result.data;
-      this.editPermission = (await this.authSrv.isUserAdmin() || this.workpack.permissions && this.workpack.permissions.filter( p => p.level === 'EDIT').length > 0
+      this.editPermission = (await this.authSrv.isUserAdmin() || this.workpack.permissions && this.workpack.permissions.filter(p => p.level === 'EDIT').length > 0
         && !this.workpack.canceled)
       const propertyNameWorkpackModel = this.workpack?.model.properties.find(p => p.name === 'name' && p.session === 'PROPERTIES');
       const propertyNameWorkpack = this.workpack.properties.find(p => p.idPropertyModel === propertyNameWorkpackModel.id);
@@ -165,7 +171,7 @@ export class SharingComponent implements OnInit {
   }
 
   async getBreadcrumbs() {
-    const { success, data } = await this.breadcrumbSrv.getBreadcrumbWorkpack(this.idWorkpackParent, {'id-plan': this.idPlan});
+    const { success, data } = await this.breadcrumbSrv.getBreadcrumbWorkpack(this.idWorkpackParent, { 'id-plan': this.idPlan });
     return success
       ? data.map(p => ({
         key: p.type.toLowerCase(),
@@ -227,7 +233,7 @@ export class SharingComponent implements OnInit {
         readOnly: !this.editPermission
       }));
     }
-    if (!!this.editPermission) { 
+    if (!!this.editPermission) {
       this.cardItemSharing.push(
         {
           typeCardItem: 'newCardItemShared',
@@ -281,8 +287,8 @@ export class SharingComponent implements OnInit {
   async deleteWorkpackShared(event) {
     if (event.id) {
       const workpackShared = this.workpackSharing.find(shared => shared.id === event.id);
-      const result = await this.workpackSharedSrv.deleteShareWorkpack({'id-shared-with': workpackShared.id !== this.idWorkpack ? workpackShared.id : undefined},
-        {field: workpackShared.office.name, useConfirm: true});
+      const result = await this.workpackSharedSrv.deleteShareWorkpack({ 'id-shared-with': workpackShared.id !== this.idWorkpack ? workpackShared.id : undefined },
+        { field: workpackShared.office.name, useConfirm: true });
       if (result.success) {
         this.cardItemSharing = Array.from(this.cardItemSharing.filter(card => card.itemId !== event.id));
       }

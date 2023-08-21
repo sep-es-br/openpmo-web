@@ -1,26 +1,24 @@
-import {CitizenUserService} from './../../../shared/services/citizen-user.service';
-import {OfficePermissionService} from './../../../shared/services/office-permission.service';
-import {AuthService} from './../../../shared/services/auth.service';
-import {IOffice} from 'src/app/shared/interfaces/IOffice';
-import {Component, OnDestroy, OnInit} from '@angular/core';
-import {ActivatedRoute, Router} from '@angular/router';
-import {IconsEnum} from 'src/app/shared/enums/IconsEnum';
-import {ICard} from 'src/app/shared/interfaces/ICard';
-import {ICardItemOffice} from 'src/app/shared/interfaces/ICardItemOffice';
-import {ICardItem} from 'src/app/shared/interfaces/ICardItem';
-import {PersonService} from 'src/app/shared/services/person.service';
-import {OfficeService} from 'src/app/shared/services/office.service';
-import {ResponsiveService} from 'src/app/shared/services/responsive.service';
-import {takeUntil} from 'rxjs/operators';
-import {Subject} from 'rxjs';
-import {SelectItem, TreeNode} from 'primeng/api';
-import {ITreeViewScopeWorkpack} from 'src/app/shared/interfaces/ITreeScopePersons';
-import {OptionsAccessEnum, OptionsStakeholderEnum} from 'src/app/shared/enums/OptionsSelectItemEnuns';
-import {TranslateService} from '@ngx-translate/core';
-import {FormBuilder, FormGroup, Validators} from '@angular/forms';
-import {BreadcrumbService} from 'src/app/shared/services/breadcrumb.service';
-import {not} from '@angular/compiler/src/output/output_ast';
-import {ConfigDataViewService} from 'src/app/shared/services/config-dataview.service';
+import { OfficePermissionService } from './../../../shared/services/office-permission.service';
+import { AuthService } from './../../../shared/services/auth.service';
+import { IOffice } from 'src/app/shared/interfaces/IOffice';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { IconsEnum } from 'src/app/shared/enums/IconsEnum';
+import { ICard } from 'src/app/shared/interfaces/ICard';
+import { ICardItemOffice } from 'src/app/shared/interfaces/ICardItemOffice';
+import { ICardItem } from 'src/app/shared/interfaces/ICardItem';
+import { PersonService } from 'src/app/shared/services/person.service';
+import { OfficeService } from 'src/app/shared/services/office.service';
+import { ResponsiveService } from 'src/app/shared/services/responsive.service';
+import { takeUntil } from 'rxjs/operators';
+import { Subject } from 'rxjs';
+import { SelectItem, TreeNode } from 'primeng/api';
+import { ITreeViewScopeWorkpack } from 'src/app/shared/interfaces/ITreeScopePersons';
+import { OptionsAccessEnum, OptionsStakeholderEnum } from 'src/app/shared/enums/OptionsSelectItemEnuns';
+import { TranslateService } from '@ngx-translate/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
+import { ConfigDataViewService } from 'src/app/shared/services/config-dataview.service';
 
 @Component({
   selector: 'app-person-list',
@@ -38,6 +36,7 @@ export class PersonListComponent implements OnInit, OnDestroy {
   isListEmpty = false;
   displayModeAll = 'grid';
   pageSize = 5;
+  page = 0;
   totalRecords: number;
 
   idOffice: number;
@@ -69,7 +68,6 @@ export class PersonListComponent implements OnInit, OnDestroy {
     private breadcrumbSrv: BreadcrumbService,
     private authSrv: AuthService,
     private officePermissionSrv: OfficePermissionService,
-    private citizenUserSrv: CitizenUserService,
     private configDataViewSrv: ConfigDataViewService
   ) {
     localStorage.removeItem('@currentPlan');
@@ -87,12 +85,11 @@ export class PersonListComponent implements OnInit, OnDestroy {
     this.configDataViewSrv.observablePageSize.pipe(takeUntil(this.$destroy)).subscribe(pageSize => {
       this.pageSize = pageSize;
     });
-    this.activeRoute.queryParams.subscribe(async({ idOffice }) => {
+    this.activeRoute.queryParams.subscribe(async ({ idOffice }) => {
       this.idOffice = +idOffice;
       await this.loads();
     });
-    this.citizenUserSrv.loadCitizenUsers();
-   
+
     this.responsiveSvr.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.responsive = value);
   }
 
@@ -110,16 +107,26 @@ export class PersonListComponent implements OnInit, OnDestroy {
   }
 
   async loads() {
-    this.isLoading = true;
-    this.loadTreeViewScope();
-    this.loadPersons();
-    this.loadOptions();
-    await this.getOfficeById();
-    this.setBreadcrumb();
+    if (this.idOffice) {
+      this.isLoading = true;
+      this.loadTreeViewScope();
+      this.loadOptions();
+      await this.getOfficeById();
+      this.setBreadcrumb();
+    }
   }
 
-  async loadPersons() {
-    const {success, data} = await this.personSrv.GetAllPersons(this.idOffice, {
+  async loadPersons(event?) {
+    if (!this.idOffice) return;
+    if (event) {
+      this.page = event.first / this.pageSize;
+    }
+    const { success, data, pagination } = await this.personSrv.GetAllPersons(this.idOffice,
+      {
+        page: this.page,
+        size: this.pageSize
+      },
+      {
       ... this.formSearch?.value,
       officeScope: this.selectedOffices && this.selectedOffices.length > 0 ? this.selectedOffices.map(office => office.data) : undefined,
       planScope: this.selectedPlans && this.selectedPlans.length > 0 ? this.selectedPlans.map(plan => plan.data) : undefined,
@@ -153,10 +160,10 @@ export class PersonListComponent implements OnInit, OnDestroy {
         } as ICardItem;
         return personCardItem;
       }));
+      this.totalRecords = pagination.totalRecords;
     }
 
     this.cardItemsProperties = itemsProperties;
-    this.totalRecords = this.cardItemsProperties && this.cardItemsProperties.length;
   }
 
   async loadTreeViewScope() {
@@ -186,7 +193,7 @@ export class PersonListComponent implements OnInit, OnDestroy {
       this.treeViewScope = [{ ...node }];
       this.allSelected = this.setSelectedNodes(this.treeViewScope);
       this.getSelectedsNode();
-      
+
     }
   }
 
@@ -219,7 +226,14 @@ export class PersonListComponent implements OnInit, OnDestroy {
           node.children = this.loadTreeChildrens(worckpack.children, node);
           return node;
         }
-        return { label: worckpack.name, data: worckpack.id, children: undefined, parent, icon: worckpack.icon, selectable: true };
+        return {
+          label: worckpack.name,
+          data: worckpack.id,
+          children: undefined,
+          parent,
+          icon: worckpack.icon,
+          selectable: true
+        };
       });
       return list;
     }
@@ -245,11 +259,19 @@ export class PersonListComponent implements OnInit, OnDestroy {
   }
 
   async getOfficeById() {
-    const { success, data } = await this.officeSrv.GetById(this.idOffice);
-    if (success) {
-      this.propertiesOffice = data;
+    const propertiesOfficeItem = localStorage.getItem('@pmo/propertiesCurrentOffice');
+    if (propertiesOfficeItem && (JSON.parse(propertiesOfficeItem)).id === this.idOffice) {
+      this.propertiesOffice = JSON.parse(propertiesOfficeItem);
       this.isLoading = false;
+    } else {
+      const { success, data } = await this.officeSrv.GetById(this.idOffice);
+      if (success) {
+        this.propertiesOffice = data;
+        localStorage.setItem('@pmo/propertiesCurrentOffice', JSON.stringify(this.propertiesOffice));
+        this.isLoading = false;
+      }
     }
+
   }
 
   setBreadcrumb() {

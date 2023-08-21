@@ -112,10 +112,16 @@ export class MeasureUnitComponent implements OnInit {
   }
 
   async getOfficeById() {
-    const { success, data } = await this.officeSrv.GetById(this.idOffice);
-    if (success) {
-      this.propertiesOffice = data;
-    }
+    const propertiesOfficeItem = localStorage.getItem('@pmo/propertiesCurrentOffice');
+      if (propertiesOfficeItem && (JSON.parse(propertiesOfficeItem)).id === this.idOffice) {
+        this.propertiesOffice = JSON.parse(propertiesOfficeItem);
+      } else {
+        const { success, data } = await this.officeSrv.GetById(this.idOffice);
+        if (success) {
+          this.propertiesOffice = data;
+          localStorage.setItem('@pmo/propertiesCurrentOffice', JSON.stringify(this.propertiesOffice));
+        }
+      }
   }
 
   async loadMeasureUnitList() {

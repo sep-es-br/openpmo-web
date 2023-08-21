@@ -53,6 +53,7 @@ export class HttpRequestInterceptor implements HttpInterceptor {
             body: {
               success: true,
               data: body?.data === undefined ? body : body?.data,
+              pagination: body?.pagination,
               message: body?.message || body?.error || ''
             }
           });

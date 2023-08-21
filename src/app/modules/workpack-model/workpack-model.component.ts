@@ -332,9 +332,16 @@ export class WorkpackModelComponent implements OnInit {
   }
 
   async getOfficeById() {
-    const { data, success } = await this.officeSrv.GetById(this.idOffice);
-    if (success) {
-      this.propertiesOffice = data;
+    const propertiesOfficeItem = localStorage.getItem('@pmo/propertiesCurrentOffice');
+    if (propertiesOfficeItem && (JSON.parse(propertiesOfficeItem)).id === this.idOffice) {
+      this.propertiesOffice = JSON.parse(propertiesOfficeItem);
+    } else {
+      const { success, data } = await this.officeSrv.GetById(this.idOffice);
+      if (success) {
+        this.propertiesOffice = data;
+        this.idOffice = data.id;
+        localStorage.setItem('@pmo/propertiesCurrentOffice', JSON.stringify(this.propertiesOffice));
+      }
     }
   }
 
@@ -570,7 +577,7 @@ export class WorkpackModelComponent implements OnInit {
             rows: 3,
             max: 500
           },
-         
+
           {
             active: true, label: this.translateSrv.instant('premises'), name: this.translateSrv.instant('premises'),
             type: TypePropertyEnum.TextAreaModel,

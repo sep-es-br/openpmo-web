@@ -56,6 +56,7 @@
         <p-dataView [value]="cardItemsProperties" layout="grid" class="app-dataview"
             *ngIf="(displayModeAll === 'grid' || (displayModeAll === 'list' && !!responsive)) && !isLoading" [paginator]="true"
             [rows]="pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false" [totalRecords]="totalRecords"
+            [lazy]="true" (onLazyLoad)="loadPersons($event)"
             [emptyMessage]="(!cardItemsProperties ? 'loadingEllipsis' : 'noContent') | translate">
             <ng-template let-cardItem pTemplate="gridItem">
               <div class="p-col-12 p-md-3 p-sm-12 card-item-container">
@@ -66,6 +67,7 @@
           <p-dataView [value]="cardItemsProperties" layout="list" class="app-dataview app-dataview-list"
             *ngIf="(displayModeAll === 'list' && !responsive && !isLoading)" [paginator]="true" [rows]="pageSize"
             [showJumpToPageDropdown]="true" [showPageLinks]="false" [totalRecords]="totalRecords"
+            [lazy]="true" (onLazyLoad)="loadPersons($event)"
             [emptyMessage]="(!cardItemsProperties ? 'loadingEllipsis' : 'noContent') | translate">
             <ng-template let-cardItem pTemplate="listItem">
               <div class="p-col-12">

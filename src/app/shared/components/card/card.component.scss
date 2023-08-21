@@ -125,7 +125,7 @@
       flex-direction: row;
       align-items: flex-end;
       justify-content: flex-end;
-      width: 30%;
+      width: 40%;
       .dataview-filters-text {
         margin-right: 2em;
         width: 11rem;
@@ -373,6 +373,12 @@
     }
     .p-panel-header {
       padding: 15px 7.5px !important;
+    }
+  }
+
+  @media (max-width: 990px) {
+    .dataview-filters-container {
+      width: 60% !important;
     }
   }
 }

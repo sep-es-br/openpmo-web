@@ -70,7 +70,6 @@ export class OfficePermissionsListComponent implements OnInit {
     this.configDataViewSrv.observablePageSize.pipe(takeUntil(this.$destroy)).subscribe(pageSize => {
       this.pageSize = pageSize;
     });
-    this.citizenUserSrv.loadCitizenUsers();
     this.actRouter.queryParams.subscribe(async queryParams => {
       this.idOffice = queryParams.idOffice;
     });
@@ -107,8 +106,16 @@ export class OfficePermissionsListComponent implements OnInit {
 
   async loadPropertiesOffice() {
     if (this.idOffice) {
-      const result = await this.officeSrv.GetById(this.idOffice);
-      this.propertiesOffice = result.data;
+      const propertiesOfficeItem = localStorage.getItem('@pmo/propertiesCurrentOffice');
+      if (propertiesOfficeItem && (JSON.parse(propertiesOfficeItem)).id === this.idOffice) {
+        this.propertiesOffice = JSON.parse(propertiesOfficeItem);
+      } else {
+        const { success, data } = await this.officeSrv.GetById(this.idOffice);
+        if (success) {
+          this.propertiesOffice = data;
+          localStorage.setItem('@pmo/propertiesCurrentOffice', JSON.stringify(this.propertiesOffice));
+        }
+      }
       await this.loadOfficePermissionsFilters();
       await this.loadOfficePermissions();
     }
@@ -279,7 +286,7 @@ export class OfficePermissionsListComponent implements OnInit {
         {
           key: 'filter',
           routerLink: ['/config/filter-dataview'],
-          queryParams: { id: idFilter, entityName: 'office-permissions', idOffice: this.idOffice}
+          queryParams: { id: idFilter, entityName: 'office-permissions', idOffice: this.idOffice }
         }
       ] :
       [
@@ -300,7 +307,7 @@ export class OfficePermissionsListComponent implements OnInit {
         {
           key: 'filter',
           routerLink: ['/config/filter-dataview'],
-          queryParams: { entityName: 'office-permissions', idOffice: this.idOffice}
+          queryParams: { entityName: 'office-permissions', idOffice: this.idOffice }
         }
       ];
     this.breadcrumbSrv.setBreadcrumbStorage(breadcrumb);

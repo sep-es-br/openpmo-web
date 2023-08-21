@@ -17,7 +17,7 @@
   </div>
 
   <div class="tabview-container" *ngIf="showTabview">
-    <app-tabview-scrolled [tabs]="tabs" (selectedTabChange)="changeTab($event)" [selectedTab]="selectedTab">
+    <app-tabview-scrolled [tabs]="tabs" (selectedTabChange)="changeTab($event)" [idWorkpack]="idWorkpack" [selectedTab]="selectedTab">
       <div tabviewBody *ngIf="selectedTab?.key === 'WBS'">
         <div class="card-WBS">
           <app-breakdown-structure [idWorkpack]="idWorkpack"

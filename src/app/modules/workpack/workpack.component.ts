@@ -448,10 +448,17 @@ export class WorkpackComponent implements OnDestroy {
         this.propertiesOffice = JSON.parse(storedOffice);
         this.idOffice = this.propertiesOffice.id;
       } else {
-        const result = await this.officeSrv.GetById(this.propertiesPlan.idOffice);
-        if (result.success) {
-          this.propertiesOffice = result.data;
-          this.idOffice = result.data.id;
+
+        const propertiesOfficeItem = localStorage.getItem('@pmo/propertiesCurrentOffice');
+        if (propertiesOfficeItem && (JSON.parse(propertiesOfficeItem)).id === this.propertiesPlan.idOffice) {
+          this.propertiesOffice = JSON.parse(propertiesOfficeItem);
+        } else {
+          const { success, data } = await this.officeSrv.GetById(this.propertiesPlan.idOffice);
+          if (success) {
+            this.propertiesOffice = data;
+            this.idOffice = data.id;
+            localStorage.setItem('@pmo/propertiesCurrentOffice', JSON.stringify(this.propertiesOffice));
+          }
         }
       }
       this.workpackSrv.setWorkpackParams({

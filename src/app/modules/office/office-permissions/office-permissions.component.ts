@@ -1,33 +1,33 @@
-import {cpfValidator} from 'src/app/shared/utils/cpfValidator';
-import {AuthServerService} from '../../../shared/services/auth-server.service';
-import {CitizenUserService} from '../../../shared/services/citizen-user.service';
-import {Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import {ActivatedRoute, Router} from '@angular/router';
-import {TranslateService} from '@ngx-translate/core';
-import {Subject} from 'rxjs';
-import {debounceTime, takeUntil} from 'rxjs/operators';
-import {MessageService} from 'primeng/api';
+import { cpfValidator } from 'src/app/shared/utils/cpfValidator';
+import { AuthServerService } from '../../../shared/services/auth-server.service';
+import { CitizenUserService } from '../../../shared/services/citizen-user.service';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { TranslateService } from '@ngx-translate/core';
+import { Subject } from 'rxjs';
+import { debounceTime, takeUntil } from 'rxjs/operators';
+import { MessageService } from 'primeng/api';
 
-import {IOfficePermission} from 'src/app/shared/interfaces/IOfficePermission';
-import {OfficePermissionService} from 'src/app/shared/services/office-permission.service';
-import {ResponsiveService} from 'src/app/shared/services/responsive.service';
-import {ICardItemPermission} from 'src/app/shared/interfaces/ICardItemPermission';
-import {ICard} from 'src/app/shared/interfaces/ICard';
-import {IPerson} from 'src/app/shared/interfaces/IPerson';
-import {PersonService} from 'src/app/shared/services/person.service';
-import {enterLeave} from '../../../shared/animations/enterLeave.animation';
-import {BreadcrumbService} from 'src/app/shared/services/breadcrumb.service';
-import {SaveButtonComponent} from 'src/app/shared/components/save-button/save-button.component';
-import {IOffice} from 'src/app/shared/interfaces/IOffice';
-import {OfficeService} from 'src/app/shared/services/office.service';
-import {AuthService} from 'src/app/shared/services/auth.service';
+import { IOfficePermission } from 'src/app/shared/interfaces/IOfficePermission';
+import { OfficePermissionService } from 'src/app/shared/services/office-permission.service';
+import { ResponsiveService } from 'src/app/shared/services/responsive.service';
+import { ICardItemPermission } from 'src/app/shared/interfaces/ICardItemPermission';
+import { ICard } from 'src/app/shared/interfaces/ICard';
+import { IPerson } from 'src/app/shared/interfaces/IPerson';
+import { PersonService } from 'src/app/shared/services/person.service';
+import { enterLeave } from '../../../shared/animations/enterLeave.animation';
+import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
+import { SaveButtonComponent } from 'src/app/shared/components/save-button/save-button.component';
+import { IOffice } from 'src/app/shared/interfaces/IOffice';
+import { OfficeService } from 'src/app/shared/services/office.service';
+import { AuthService } from 'src/app/shared/services/auth.service';
 
 @Component({
   selector: 'app-office-permissions',
   templateUrl: './office-permissions.component.html',
   styleUrls: ['./office-permissions.component.scss'],
   animations: [
-    enterLeave({opacity: 0, pointerEvents: 'none'}, {opacity: 1, pointerEvents: 'all'}, 300)
+    enterLeave({ opacity: 0, pointerEvents: 'none' }, { opacity: 1, pointerEvents: 'all' }, 300)
   ]
 })
 export class OfficePermissionsComponent implements OnInit, OnDestroy {
@@ -85,7 +85,7 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => {
       this.responsive = value;
     });
-    this.debounceSearch.pipe(debounceTime(500), takeUntil(this.$destroy)).subscribe(async() => {
+    this.debounceSearch.pipe(debounceTime(500), takeUntil(this.$destroy)).subscribe(async () => {
       if (this.searchedEmailPerson.length > 5 && this.validateEmail()) {
         await this.searchPerson();
         this.invalidMailMessage = undefined;
@@ -97,7 +97,6 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
   }
 
   async ngOnDestroy(): Promise<void> {
-    this.citizenUserSrv.unloadCitizenUsers();
     this.$destroy.next();
     this.$destroy.complete();
   }
@@ -117,19 +116,19 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
         info: this.propertiesOffice?.name,
         tooltip: this.propertiesOffice?.fullName,
         routerLink: ['/configuration-office'],
-        queryParams: {idOffice: this.idOffice}
+        queryParams: { idOffice: this.idOffice }
       },
       {
         key: 'configuration',
         info: 'officePermissions',
         tooltip: this.translateSrv.instant('officePermissions'),
         routerLink: ['/offices', 'permission'],
-        queryParams: {idOffice: this.idOffice},
+        queryParams: { idOffice: this.idOffice },
       },
       {
         key: 'permissions',
         routerLink: ['/offices', 'permission', 'detail'],
-        queryParams: {idOffice: this.idOffice, key: this.key}
+        queryParams: { idOffice: this.idOffice, key: this.key }
       }
     ]);
     if (this.key) {
@@ -145,9 +144,15 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
   }
 
   async loadPropertiesOffice() {
-    const {success, data} = await this.officeSrv.GetById(this.idOffice);
-    if (success) {
-      this.propertiesOffice = data;
+    const propertiesOfficeItem = localStorage.getItem('@pmo/propertiesCurrentOffice');
+    if (propertiesOfficeItem && (JSON.parse(propertiesOfficeItem)).id === this.idOffice) {
+      this.propertiesOffice = JSON.parse(propertiesOfficeItem);
+    } else {
+      const { success, data } = await this.officeSrv.GetById(this.idOffice);
+      if (success) {
+        this.propertiesOffice = data;
+        localStorage.setItem('@pmo/propertiesCurrentOffice', JSON.stringify(this.propertiesOffice));
+      }
     }
   }
 
@@ -170,7 +175,7 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
     };
     if (this.key) {
       this.isLoading = true;
-      const result = await this.officePermissionsSrv.GetAll({key: this.key, 'id-office': this.idOffice});
+      const result = await this.officePermissionsSrv.GetAll({ key: this.key, 'id-office': this.idOffice });
       if (result.success) {
         this.permission = result.data[0];
         this.isLoading = false;
@@ -182,7 +187,7 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
           fullName: this.permission.person.fullName,
           key: this.permission.person.key,
           email: this.permission.person.email,
-          roles: this.permission.permissions.map(p => ({role: p.role})),
+          roles: this.permission.permissions.map(p => ({ role: p.role })),
           guid: this.permission.person.guid
         };
       }
@@ -196,9 +201,9 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
         typeCardItem: 'editItem',
         titleCardItem: p.role,
         levelListOptions: [
-          {label: this.translateSrv.instant('read'), value: 'READ'},
-          {label: this.translateSrv.instant('edit'), value: 'EDIT'},
-          {label: this.translateSrv.instant('none'), value: 'NONE'}
+          { label: this.translateSrv.instant('read'), value: 'READ' },
+          { label: this.translateSrv.instant('edit'), value: 'EDIT' },
+          { label: this.translateSrv.instant('none'), value: 'NONE' }
         ],
         selectedOption: p.level,
         itemId: p.id
@@ -212,9 +217,9 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
               typeCardItem: 'editItem',
               titleCardItem: r.role,
               levelListOptions: [
-                {label: this.translateSrv.instant('read'), value: 'READ'},
-                {label: this.translateSrv.instant('edit'), value: 'EDIT'},
-                {label: this.translateSrv.instant('none'), value: 'NONE'}
+                { label: this.translateSrv.instant('read'), value: 'READ' },
+                { label: this.translateSrv.instant('edit'), value: 'EDIT' },
+                { label: this.translateSrv.instant('none'), value: 'NONE' }
               ]
             });
           } else {
@@ -222,9 +227,9 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
               typeCardItem: 'editItem',
               titleCardItem: r.role,
               levelListOptions: [
-                {label: this.translateSrv.instant('read'), value: 'READ'},
-                {label: this.translateSrv.instant('edit'), value: 'EDIT'},
-                {label: this.translateSrv.instant('none'), value: 'NONE'}
+                { label: this.translateSrv.instant('read'), value: 'READ' },
+                { label: this.translateSrv.instant('edit'), value: 'EDIT' },
+                { label: this.translateSrv.instant('none'), value: 'NONE' }
               ]
             }];
           }
@@ -246,7 +251,7 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
   async searchPerson() {
     this.saveButton?.hideButton();
     if (this.searchedEmailPerson) {
-      const {data} = await this.personSrv.GetByKey(this.searchedEmailPerson);
+      const { data } = await this.personSrv.GetByKey(this.searchedEmailPerson);
       if (data) {
         this.showSearchInputMessage = false;
         this.person = data;
@@ -257,7 +262,7 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
         this.person = {
           name,
           email: this.searchedEmailPerson,
-          roles: [{role: 'citizen'}]
+          roles: [{ role: 'citizen' }]
         };
       }
     } else {
@@ -356,8 +361,8 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
   loadNewPermission() {
     if (this.person) {
       const permissions = this.person.roles
-        ? this.person.roles.map(p => ({role: p.role, level: 'NONE'}))
-        : [{role: 'citizen', level: 'NONE'}];
+        ? this.person.roles.map(p => ({ role: p.role, level: 'NONE' }))
+        : [{ role: 'citizen', level: 'NONE' }];
       this.permission = {
         idOffice: this.idOffice,
         person: {
@@ -397,7 +402,7 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
         summary: this.translateSrv.instant('success'),
         detail: this.translateSrv.instant('messages.savedSuccessfully')
       });
-      await this.router.navigate(['/offices', 'permission'], {queryParams: {idOffice: this.idOffice}});
+      await this.router.navigate(['/offices', 'permission'], { queryParams: { idOffice: this.idOffice } });
     }
   }
 }

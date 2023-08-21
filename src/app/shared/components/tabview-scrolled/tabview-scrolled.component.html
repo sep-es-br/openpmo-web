@@ -1,5 +1,5 @@
 <div class="app-tabview-scrolled">
-  <ng-container *ngIf="tabs && tabs.length > 0; else hasNoTabs">
+  <ng-container *ngIf="tabs && tabs.length > 0 ; else hasNoTabs">
     <ng-template [ngIf]="selectedTab">
       <ng-container *ngTemplateOutlet="hasTabs"></ng-container>
     </ng-template>
@@ -33,6 +33,8 @@
   </ng-template>
 
   <ng-template #hasNoTabs>
-    {{'noRecordsFound' | translate}}
+    <ng-container *ngIf="showMessageNotFound">
+      {{'noRecordsFound' | translate}}
+    </ng-container>
   </ng-template>
 </div>

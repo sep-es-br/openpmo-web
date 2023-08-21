@@ -97,7 +97,6 @@ export class PersonComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.$destroy.next();
     this.$destroy.complete();
-    this.citizenUserSrv.unloadCitizenUsers();
   }
 
   setPhoneNumberMask(){
@@ -148,9 +147,15 @@ export class PersonComponent implements OnInit, OnDestroy {
   }
 
   async loadOffice() {
-    const result = await this.officeSrv.GetById(this.idOffice);
-    if (result.success) {
-      this.office = result.data;
+    const propertiesOfficeItem = localStorage.getItem('@pmo/propertiesCurrentOffice');
+    if (propertiesOfficeItem && (JSON.parse(propertiesOfficeItem)).id === this.idOffice) {
+      this.office = JSON.parse(propertiesOfficeItem);
+    } else {
+      const { success, data } = await this.officeSrv.GetById(this.idOffice);
+      if (success) {
+        this.office = data;
+        localStorage.setItem('@pmo/propertiesCurrentOffice', JSON.stringify(this.office));
+      }
     }
   }
 

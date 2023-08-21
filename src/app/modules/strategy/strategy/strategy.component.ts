@@ -133,9 +133,15 @@ export class StrategyComponent implements OnDestroy {
         this.cardProperties.isLoading = true;
       }
       this.cardProperties.initialStateCollapse = this.idStrategy ? true : false;
-      const resultOffice = await this.officeSrv.GetById(this.idOffice);
-      if (resultOffice.success) {
-        this.propertiesOffice = resultOffice.data;
+      const propertiesOfficeItem = localStorage.getItem('@pmo/propertiesCurrentOffice');
+      if (propertiesOfficeItem && (JSON.parse(propertiesOfficeItem)).id === this.idOffice) {
+        this.propertiesOffice = JSON.parse(propertiesOfficeItem);
+      } else {
+        const { success, data } = await this.officeSrv.GetById(this.idOffice);
+        if (success) {
+          this.propertiesOffice = data;
+          localStorage.setItem('@pmo/propertiesCurrentOffice', JSON.stringify(this.propertiesOffice));
+        }
       }
       this.editPermission = await this.officePermissionSrv.getPermissions(this.idOffice);
       if (this.isUserAdmin === undefined) {
@@ -384,7 +390,7 @@ export class StrategyComponent implements OnDestroy {
   }
 
   getCurrentBreadcrumb(workpackModel) {
-    const breadcrumb =  [
+    const breadcrumb = [
       {
         key: 'administration',
         info: this.propertiesOffice?.name,
@@ -471,13 +477,13 @@ export class StrategyComponent implements OnDestroy {
   }
 
   async handleDeleteReport(event) {
-    const deletedReport = this.reports.find( report => report.id === event.idReport);
+    const deletedReport = this.reports.find(report => report.id === event.idReport);
     const result = await this.reportModelSrv.delete(deletedReport, {
       field: 'name'
     });
     if (result.success) {
-      this.reports = this.reports.filter( report => report.id !== deletedReport.id)
-      this.cardItemsReportModels = this.cardItemsReportModels.filter( report => report.itemId !== deletedReport.id);
+      this.reports = this.reports.filter(report => report.id !== deletedReport.id)
+      this.cardItemsReportModels = this.cardItemsReportModels.filter(report => report.itemId !== deletedReport.id);
     }
   }
 

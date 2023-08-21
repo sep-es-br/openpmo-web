@@ -74,6 +74,7 @@ export class MenuFixedComponent implements OnInit, OnDestroy {
   linkEvent = false;
 
   constructor(
+    private responsiveSrv: ResponsiveService,
     private menuSrv: MenuService,
     private translateChangeSrv: TranslateChangeService,
     private translateSrv: TranslateService,
@@ -222,6 +223,7 @@ export class MenuFixedComponent implements OnInit, OnDestroy {
     this.menuSrv.nextMenuState(
       { isFixed: this.isFixed, menus: this.menus, itemsOffice, itemsPortfolio, itemsFavorites, itemsPlanModel }
     );
+    this.responsiveSrv.next(false);
     this.ngOnDestroy();
   }
 
@@ -234,9 +236,15 @@ export class MenuFixedComponent implements OnInit, OnDestroy {
 
   async getPropertiesOffice(idOffice) {
     if (idOffice) {
-      const result = await this.officeSrv.GetById(idOffice);
-      if (result.success) {
-        this.propertiesOffice = result.data;
+      const propertiesOfficeItem = localStorage.getItem('@pmo/propertiesCurrentOffice');
+      if (propertiesOfficeItem && (JSON.parse(propertiesOfficeItem)).id === idOffice) {
+        this.propertiesOffice = JSON.parse(propertiesOfficeItem);
+      } else {
+        const { success, data } = await this.officeSrv.GetById(idOffice);
+        if (success) {
+          this.propertiesOffice = data;
+          localStorage.setItem('@pmo/propertiesCurrentOffice', JSON.stringify(this.propertiesOffice));
+        }
       }
     }
   }

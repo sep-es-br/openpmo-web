@@ -29,8 +29,8 @@ export class PersonService extends BaseService<IPerson> {
   }
 
 
-  public async GetAllPersons(idOffice: number, options?): Promise<IHttpResult<IPerson[]>> {
-    const result = await this.http.post<IHttpResult<IPerson[]>>(`${this.urlBase}/office/${idOffice}`, options).toPromise();
+  public async GetAllPersons(idOffice: number, options, paramsBody? ): Promise<IHttpResult<IPerson[]>> {
+    const result = await this.http.post<IHttpResult<IPerson[]>>(`${this.urlBase}/office/${idOffice}?${PrepareHttpParams(options)}`, paramsBody).toPromise();
     if (!result.data?.length) {
       result.data = [];
     }
