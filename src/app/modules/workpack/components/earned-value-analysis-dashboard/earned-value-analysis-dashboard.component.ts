@@ -120,9 +120,7 @@ export class EarnedValueAnalysisDashboardComponent implements OnInit {
       tooltips: {
         callbacks: {
           label: (tooltipItem, data) => {
-            const PTBR = this.translateSrv.currentLang === 'pt-BR';
-            return tooltipItem.yLabel.toString().replace(/\B(?=(\d{3})+(?!\d))/g, PTBR ? '.' : ',')
-              + (PTBR ? ',00' : '.00');
+            return tooltipItem.yLabel.toLocaleString(this.language)
           }
         }
       }
