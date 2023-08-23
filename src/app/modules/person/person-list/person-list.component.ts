@@ -56,6 +56,7 @@ export class PersonListComponent implements OnInit, OnDestroy {
   selectedWorkpacks: TreeNode[] = [];
   scopeNameOptions: string[];
   isLoading = false;
+  first = 0;
 
   constructor(
     private personSrv: PersonService,
@@ -83,7 +84,12 @@ export class PersonListComponent implements OnInit, OnDestroy {
       this.displayModeAll = displayMode;
     });
     this.configDataViewSrv.observablePageSize.pipe(takeUntil(this.$destroy)).subscribe(pageSize => {
-      this.pageSize = pageSize;
+      if (this.pageSize !== pageSize) {
+        this.pageSize = pageSize;
+        this.page = 0;
+        this.first = 0;
+        this.loadPersons();
+      }
     });
     this.activeRoute.queryParams.subscribe(async ({ idOffice }) => {
       this.idOffice = +idOffice;
@@ -108,7 +114,6 @@ export class PersonListComponent implements OnInit, OnDestroy {
 
   async loads() {
     if (this.idOffice) {
-      this.isLoading = true;
       this.loadTreeViewScope();
       this.loadOptions();
       await this.getOfficeById();
@@ -120,7 +125,10 @@ export class PersonListComponent implements OnInit, OnDestroy {
     if (!this.idOffice) return;
     if (event) {
       this.page = event.first / this.pageSize;
+      this.first = event.first;
     }
+    this.isLoading = true;
+    this.cardItemsProperties = [];
     const { success, data, pagination } = await this.personSrv.GetAllPersons(this.idOffice,
       {
         page: this.page,
@@ -161,9 +169,10 @@ export class PersonListComponent implements OnInit, OnDestroy {
         return personCardItem;
       }));
       this.totalRecords = pagination.totalRecords;
+      
     }
-
     this.cardItemsProperties = itemsProperties;
+    this.isLoading = false;
   }
 
   async loadTreeViewScope() {
