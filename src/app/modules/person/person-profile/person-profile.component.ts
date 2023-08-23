@@ -13,6 +13,7 @@ import { IPerson } from 'src/app/shared/interfaces/IPerson';
 import { SaveButtonComponent } from 'src/app/shared/components/save-button/save-button.component';
 import { AuthService } from 'src/app/shared/services/auth.service';
 import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
+import { MinLengthTextCustomValidator } from 'src/app/shared/utils/minLengthTextValidator';
 
 @Component({
   selector: 'app-person-profile',
@@ -54,7 +55,7 @@ export class PersonProfileComponent implements OnInit, OnDestroy {
     private breadcrumbSrv: BreadcrumbService,
   ) {
     this.formPerson = this.formBuilder.group({
-      name: ['', Validators.required],
+      name: ['', [Validators.required, MinLengthTextCustomValidator.minLengthText]],
       email: [''],
       contactEmail: ['', Validators.email],
       phoneNumber: [''],

@@ -1,4 +1,3 @@
-import { CitizenUserService } from './../../../shared/services/citizen-user.service';
 import { OfficePermissionService } from './../../../shared/services/office-permission.service';
 import { IOffice } from 'src/app/shared/interfaces/IOffice';
 import { OfficeService } from './../../../shared/services/office.service';
@@ -18,6 +17,7 @@ import { SaveButtonComponent } from 'src/app/shared/components/save-button/save-
 import { AuthService } from 'src/app/shared/services/auth.service';
 import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
 import { Location } from '@angular/common';
+import { MinLengthTextCustomValidator } from 'src/app/shared/utils/minLengthTextValidator';
 
 @Component({
   selector: 'app-person',
@@ -62,7 +62,6 @@ export class PersonComponent implements OnInit, OnDestroy {
     private officeSrv: OfficeService,
     private location: Location,
     private officePermissionSrv: OfficePermissionService,
-    private citizenUserSrv: CitizenUserService
   ) {
     this.activeRoute.queryParams.subscribe(async ({ idOffice, idPerson }) => {
       this.idOffice = +idOffice;
@@ -70,8 +69,8 @@ export class PersonComponent implements OnInit, OnDestroy {
       await this.loads();
     });
     this.formPerson = this.formBuilder.group({
-      name: ['', Validators.required],
-      fullname: ['', Validators.required],
+      name: ['', [Validators.required, MinLengthTextCustomValidator.minLengthText]],
+      fullname: ['', [Validators.required,  MinLengthTextCustomValidator.minLengthText]],
       email: [''],
       contactEmail: ['', [Validators.email]],
       phoneNumber: [''],

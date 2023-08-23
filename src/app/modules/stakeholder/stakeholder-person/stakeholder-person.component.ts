@@ -23,6 +23,7 @@ import {formatDateToString} from 'src/app/shared/utils/formatDateToString';
 import {BreadcrumbService} from 'src/app/shared/services/breadcrumb.service';
 import {SaveButtonComponent} from 'src/app/shared/components/save-button/save-button.component';
 import {cpfValidator} from 'src/app/shared/utils/cpfValidator';
+import { MinLengthTextCustomValidator } from 'src/app/shared/utils/minLengthTextValidator';
 
 interface ICardItemRole {
   type: string;
@@ -115,7 +116,7 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
       this.responsive = value;
     });
     this.stakeholderForm = this.formBuilder.group({
-      fullName: ['', [Validators.required]],
+      fullName: ['', [Validators.required, MinLengthTextCustomValidator.minLengthText]],
       address: [''],
       phoneNumber: [''],
       contactEmail: ['', [Validators.email]],
@@ -613,7 +614,7 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
   }
 
   handleShowSaveButton() {
-    if (this.stakeholderForm.valid && this.stakeholderForm.controls.fullName.value.trim().length > 0) {
+    if (this.stakeholderForm.valid) {
       return this.validateStakeholder()
         ? this.saveButton?.showButton()
         : this.saveButton?.hideButton();
@@ -623,7 +624,7 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
   }
 
   async saveStakeholder() {
-    if (!this.stakeholderForm.valid || this.stakeholderForm.controls.fullName.value.trim().length === 0) {
+    if (!this.stakeholderForm.valid) {
       return;
     }
     const validated = this.validateStakeholder();

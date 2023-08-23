@@ -237,7 +237,7 @@
       <i [ngClass]="properties.iconSvg ? [ 'app-icon', properties.icon, 'grey-icon'] : [ 'icon-card', properties.icon, 'grey-icon' ]"
         [class.risk-red]="properties.iconColor === 'high'" [class.risk-orange]="properties.iconColor === 'medium'"
         [class.risk-yellow]="properties.iconColor === 'low'" [ngStyle]="(displayModeCard === 'list') ? { fontSize: '1.5rem' } : { fontSize: '2.5rem' }"></i>
-      <span class="card-item-name" [pTooltip]="properties.fullNameCardItem"
+      <span class="card-item-name" [pTooltip]="properties?.fullNameCardItem"
         tooltipPosition="bottom">{{properties.nameCardItem}}</span>
       <span class="card-item-subtitle permission" *ngIf="properties.subtitleCardItem">{{properties.subtitleCardItem}}</span>
       <span class="card-item-subtitle permission" *ngIf="properties.statusItem">{{properties.statusItem|translate}}</span>
