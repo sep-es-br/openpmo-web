@@ -132,7 +132,7 @@
             <div class="p-field" *ngIf="!user && (personSearchBy === 'NEW')">
               <span class="p-float-label">
                 <input class="app-input-text short-input" [class.responsive]="responsive" id="float-fullName"
-                       formControlName="fullName" type="text" pInputText/>
+                       formControlName="fullName" type="text" pInputText (input)="handleShowSaveButton()"/>
                 <label class="app-input-label" for="float-fullName">{{"fullName" | translate}}</label>
               </span>
               <app-input-message [form]="stakeholderForm" field="fullName"></app-input-message>

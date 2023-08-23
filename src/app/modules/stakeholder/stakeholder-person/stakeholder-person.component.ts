@@ -613,7 +613,7 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
   }
 
   handleShowSaveButton() {
-    if (this.stakeholderForm.valid) {
+    if (this.stakeholderForm.valid && this.stakeholderForm.controls.fullName.value.trim().length > 0) {
       return this.validateStakeholder()
         ? this.saveButton?.showButton()
         : this.saveButton?.hideButton();
@@ -623,7 +623,7 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
   }
 
   async saveStakeholder() {
-    if (!this.stakeholderForm.valid) {
+    if (!this.stakeholderForm.valid || this.stakeholderForm.controls.fullName.value.trim().length === 0) {
       return;
     }
     const validated = this.validateStakeholder();

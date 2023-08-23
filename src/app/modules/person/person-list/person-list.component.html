@@ -65,7 +65,7 @@
             </ng-template>
           </p-dataView>
           <p-dataView [value]="cardItemsProperties" layout="list" class="app-dataview app-dataview-list"
-            *ngIf="idOffice && (displayModeAll === 'list' && !responsive)" [paginator]="true" [rows]="pageSize"
+            *ngIf="idOffice && (displayModeAll === 'list' && !responsive)" [paginator]="true" [rows]="pageSize" [first]="first"
             [showJumpToPageDropdown]="true" [showPageLinks]="false" [totalRecords]="totalRecords"
             [lazy]="true" (onLazyLoad)="loadPersons($event)"
             [emptyMessage]="(!cardItemsProperties || isLoading ? '' : 'noContent') | translate">
