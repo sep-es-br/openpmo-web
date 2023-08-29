@@ -4,7 +4,7 @@
     <p-menu #menu [popup]="true" [model]="itemsLanguages"></p-menu>
   </header>
   <div class="card-login" [class.mobile]="responsiveSrv.observable | async" [class.login-denied]="isLoginDenied">
-    <img src="assets/svg/LogoOpenPMOHorizontal.svg" alt="Logo">
+    <img src="assets/images/logo-openpmo-horizontal.png" alt="Logo">
     <div class="action">
       <div class="button" (click)="signIn()">
         <ng-container *ngIf="authButtonIcon; else defaultIcon">
