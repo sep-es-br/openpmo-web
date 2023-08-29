@@ -2,15 +2,17 @@
 </p-confirmDialog>
 <p-confirmDialog [header]="'pasteQuestion' | translate" icon="pi pi-exclamation-triangle" key="pasteConfirm">
 </p-confirmDialog>
-<p-confirmDialog [header]="'confirmClearPendingChanges' | translate" icon="pi pi-exclamation-triangle" key="clearPendingChangesConfirm">
+<p-confirmDialog [header]="'confirmClearPendingChanges' | translate" icon="pi pi-exclamation-triangle"
+                 key="clearPendingChangesConfirm">
 </p-confirmDialog>
 <p-toast position="top-right"></p-toast>
 <ng-container *ngIf="showTemplate !== undefined">
-  <ng-container *ngIf="environment.hom || environment.training">
-    <div class="ambient-square-top" [ngClass]="{train: environment.training, hom: environment.hom}"></div>
-    <div class="ambient-square-bottom" [ngClass]="{train: environment.training, hom: environment.hom}">
+  <ng-container *ngIf="environment.env !== envEnum.PRODUCTION">
+    <div class="ambient-square-top"
+         [ngClass]="{train: environment.env === envEnum.TRAINNING, hom: environment.env === envEnum.HOMOLOGATION}"></div>
+    <div class="ambient-square-bottom" [ngClass]="{train: environment.env === envEnum.TRAINNING, hom: environment.env === envEnum.HOMOLOGATION}">
       <div class="tag">
-        <div class="tag-text">{{environment.training ? 'TREINAMENTO' : 'HOMOLOGAÇÃO'}}</div>
+        <div class="tag-text">{{environment.env === envEnum.TRAINNING ? 'TREINAMENTO' : 'HOMOLOGAÇÃO'}}</div>
         <img src="./assets/images/logo_openpmo_black.png" alt="Logotipo Brasão ES">
       </div>
     </div>

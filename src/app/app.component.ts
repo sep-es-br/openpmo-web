@@ -6,6 +6,7 @@ import { ResponsiveService } from './shared/services/responsive.service';
 import { WorkpackShowTabviewService } from './shared/services/workpack-show-tabview.service';
 import { MobileViewService } from './shared/services/mobile-view.service';
 import {environment} from '../environments/environment';
+import {EnvEnum} from './shared/enums/EnvEnum';
 
 @Component({
   selector: 'app-root',
@@ -17,6 +18,7 @@ export class AppComponent implements OnInit {
   isMobileView = false;
   showTemplate: boolean;
   environment = environment;
+  envEnum = EnvEnum;
 
   constructor(
     private responsiveSrv: ResponsiveService,
