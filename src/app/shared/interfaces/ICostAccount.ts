@@ -3,6 +3,7 @@ import { IWorkpackProperty } from './IWorkpackProperty';
 
 export interface ICostAccount {
   id?: number;
+  idCostAccountModel?: number;
   idWorkpack?: number;
   workpackModelFullName?: string;
   workpackModelName?: string;

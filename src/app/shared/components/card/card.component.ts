@@ -33,7 +33,6 @@ export class CardComponent implements OnInit, OnDestroy, OnChanges {
   language: string;
   $destroy = new Subject();
   filterListOptions: SelectItem[];
-  filterSelected: number;
   canEditCheckCompleted: boolean;
   showTabview = false;
   showAnimationSearch = false;
@@ -79,7 +78,7 @@ export class CardComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   ngOnInit() {
-    this.properties.progressBarValues = this.properties.progressBarValues &&
+    this.properties.progressBarValues = this.properties?.progressBarValues &&
       this.properties.progressBarValues.filter( item => item.total !== 0 );
     this.setLanguage();
     if (this.properties && !!this.properties.showFilters) {
@@ -106,10 +105,10 @@ export class CardComponent implements OnInit, OnDestroy, OnChanges {
           value: filter.id
         });
         if (this.properties.idFilterSelected) {
-          this.filterSelected = this.properties.idFilterSelected;
+          this.properties.idFilterSelected = this.properties.idFilterSelected;
         } else {
           if (!!filter.favorite) {
-            this.filterSelected = filter.id;
+            this.properties.idFilterSelected = filter.id;
           }
         }
       });

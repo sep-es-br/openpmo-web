@@ -140,6 +140,9 @@ export class BreadcrumbComponent implements OnInit, OnChanges {
     if (this.loadingWorkpack) {
       return;
     }
+    if (!crumb.routerLink) {
+      return;
+    }
     if (crumb.key === 'workpackModel') {
       const currentBreadcrumbItemsStoraged = localStorage.getItem('@pmo/current-breadcrumb');
       if (currentBreadcrumbItemsStoraged) {

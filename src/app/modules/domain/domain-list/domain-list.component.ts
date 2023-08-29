@@ -112,16 +112,7 @@ export class DomainListComponent implements OnInit, OnDestroy {
   }
 
   async getOfficeById() {
-    const propertiesOfficeItem = localStorage.getItem('@pmo/propertiesCurrentOffice');
-      if (propertiesOfficeItem && (JSON.parse(propertiesOfficeItem)).id === this.idOffice) {
-        this.propertiesOffice = JSON.parse(propertiesOfficeItem);
-      } else {
-        const { success, data } = await this.officeSrv.GetById(this.idOffice);
-        if (success) {
-          this.propertiesOffice = data;
-          localStorage.setItem('@pmo/propertiesCurrentOffice', JSON.stringify(this.propertiesOffice));
-        }
-      }
+    this.propertiesOffice = await this.officeSrv.getCurrentOffice(this.idOffice);
   }
 
   async loadPropertiesDomains() {
@@ -251,10 +242,6 @@ export class DomainListComponent implements OnInit, OnDestroy {
         tooltip: this.translateSrv.instant('domains'),
         routerLink: ['/domains'],
         queryParams: { idOffice: this.idOffice }
-      }, {
-        key: 'filter',
-        routerLink: ['/config/filter-dataview'],
-        queryParams: { id: idFilter, entityName: 'domains', idOffice: this.idOffice}
       }] :
       [{
         key: 'administration',
@@ -269,10 +256,6 @@ export class DomainListComponent implements OnInit, OnDestroy {
         tooltip: this.translateSrv.instant('domains'),
         routerLink: ['/domains'],
         queryParams: { idOffice: this.idOffice }
-      }, {
-        key: 'filter',
-        routerLink: ['/config/filter-dataview'],
-        queryParams: { entityName: 'domains', idOffice: this.idOffice}
       }];
     this.breadcrumbSrv.setBreadcrumbStorage(breadcrumb);
   }

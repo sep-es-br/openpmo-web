@@ -14,7 +14,7 @@ import { WorkpackService } from 'src/app/shared/services/workpack.service';
 import { Router } from '@angular/router';
 import { FilterDataviewService } from '../../../../shared/services/filter-dataview.service';
 import { ISection } from '../../../../shared/interfaces/ISectionWorkpack';
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 import * as moment from 'moment';
 import { WorkpackShowTabviewService } from 'src/app/shared/services/workpack-show-tabview.service';
 
@@ -39,6 +39,7 @@ export class WorkpackSectionStakeholdersComponent implements OnInit, OnDestroy {
   showTabview = false;
   idFilterSelected: number;
   term = '';
+  filters;
 
   constructor(
     private filterSrv: FilterDataviewService,
@@ -49,23 +50,13 @@ export class WorkpackSectionStakeholdersComponent implements OnInit, OnDestroy {
     private workpackBreadcrumbStorageSrv: WorkpackBreadcrumbStorageService,
     private stakeholderSrv: StakeholderService,
     private responsiveSrv: ResponsiveService,
-    private workpackShowTabviewSrv: WorkpackShowTabviewService
+    private workpackShowTabviewSrv: WorkpackShowTabviewService,
   ) {
+    
     this.workpackShowTabviewSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => {
       this.showTabview = value;
     });
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(responsive => this.responsive = responsive);
-    this.workpackSrv.observableResetWorkpack.pipe(takeUntil(this.$destroy)).subscribe(reset => {
-      if (reset) {
-        this.workpackData = this.workpackSrv.getWorkpackData();
-        this.workpackParams = this.workpackSrv.getWorkpackParams();
-        if (this.workpackData && this.workpackData?.workpack?.id && this.workpackData?.workpackModel && this.workpackData.workpackModel.stakeholderSessionActive) {
-          if (!this.workpackParams.idWorkpackModelLinked || (this.workpackSrv.getEditPermission() && !!this.workpackParams.idWorkpackModelLinked)) {
-            this.loadStakeholderSection();
-          }
-        }
-      }
-    });
     this.configDataViewSrv.observableCollapsePanelsStatus.pipe(takeUntil(this.$destroy)).subscribe(collapsePanelStatus => {
       this.collapsePanelsStatus = collapsePanelStatus === 'collapse' ? true : false;
       this.sectionStakeholder = this.sectionStakeholder && Object.assign({}, {
@@ -82,21 +73,6 @@ export class WorkpackSectionStakeholdersComponent implements OnInit, OnDestroy {
     this.configDataViewSrv.observablePageSize.pipe(takeUntil(this.$destroy)).subscribe(pageSize => {
       this.pageSize = pageSize;
     });
-  }
-
-  ngOnInit(): void {
-  }
-
-  ngOnDestroy(): void {
-    this.$destroy.complete();
-    this.$destroy.unsubscribe();
-  }
-
-  async loadStakeholderSection() {
-    const resultFilters = await this.filterSrv.getAllFilters(`workpackModels/${this.workpackData.workpack.model.id}/stakeholders`);
-    const filters = resultFilters.success && Array.isArray(resultFilters.data) ? resultFilters.data : [];
-    this.idFilterSelected = filters.find(defaultFilter => !!defaultFilter.favorite) ?
-      filters.find(defaultFilter => !!defaultFilter.favorite).id : undefined;
     this.sectionStakeholder = {
       cardSection: {
         toggleable: false,
@@ -106,7 +82,7 @@ export class WorkpackSectionStakeholdersComponent implements OnInit, OnDestroy {
         initialStateCollapse: this.showTabview ? false : this.collapsePanelsStatus,
         showFilters: true,
         isLoading: true,
-        filters,
+        filters: this.filters,
         showCreateNemElementButton: this.workpackSrv.getEditPermission() ? true : false,
         createNewElementMenuItems: [
           {
@@ -122,12 +98,50 @@ export class WorkpackSectionStakeholdersComponent implements OnInit, OnDestroy {
         ]
       }
     };
-    await this.loadStakeholders();
+    this.stakeholderSrv.observableResetStakeholder.pipe(takeUntil(this.$destroy)).subscribe(reset => {
+      if (reset) {
+        this.loadStakeholdersData();
+      }
+    });
+  }
+
+  ngOnInit(): void {
+  }
+
+  ngOnDestroy(): void {
+    this.$destroy.complete();
+    this.$destroy.unsubscribe();
+  }
+
+  loadStakeholdersData() {
+    const {
+      workpackData,
+      workpackParams,
+      filters,
+      stakeholders,
+      term,
+      idFilterSelected,
+      loading
+    } = this.stakeholderSrv.getStakeholdersData();
+    this.workpackData = workpackData;
+    this.workpackParams = workpackParams;
+    this.filters = filters;
+    this.stakeholders = stakeholders;
+    this.idFilterSelected = idFilterSelected;
+    this.term = term;
+    if (!loading) this.loadStakeholderSection();
+  }
+
+  async loadStakeholderSection() {
     this.sectionStakeholder = {
       ...this.sectionStakeholder,
       cardSection: {
         ...this.sectionStakeholder.cardSection,
         isLoading: false,
+        filters: this.filters,
+        idFilterSelected: this.idFilterSelected,
+        searchTerm: this.term,
+        showCreateNemElementButton: this.workpackSrv.getEditPermission() ? true : false,
       },
       cardItemsSection: await this.loadSectionStakeholderCards(this.stakeholderSectionShowInactives)
     }
@@ -232,32 +246,13 @@ export class WorkpackSectionStakeholdersComponent implements OnInit, OnDestroy {
 
   async handleSelectedFilterStakeholder(event) {
     this.idFilterSelected = event.filter;
-    await this.loadStakeholders();
-    this.sectionStakeholder = Object.assign({}, {
-      ...this.sectionStakeholder,
-      cardItemsSection: await this.loadSectionStakeholderCards(this.stakeholderSectionShowInactives)
-    });
-    this.totalRecordsStakeholders = this.sectionStakeholder.cardItemsSection && this.sectionStakeholder.cardItemsSection.length;
+    this.stakeholderSrv.loadStakeholders({idFilterSelected: this.idFilterSelected, term: this.term});
   }
 
   async handleSearchText(event) {
     this.term = event.term;
-    await this.loadStakeholders();
-    this.sectionStakeholder = Object.assign({}, {
-      ...this.sectionStakeholder,
-      cardItemsSection: await this.loadSectionStakeholderCards(this.stakeholderSectionShowInactives)
-    });
-    this.totalRecordsStakeholders = this.sectionStakeholder.cardItemsSection && this.sectionStakeholder.cardItemsSection.length;
+    this.stakeholderSrv.loadStakeholders({idFilterSelected: this.idFilterSelected, term: this.term});
   }
-
-  async loadStakeholders() {
-    const result = await this.stakeholderSrv.GetAll({ 'id-workpack': this.workpackParams.idWorkpack, idFilter: this.idFilterSelected, term: this.term });
-    if (result.success) {
-      this.stakeholders = result.data;
-    }
-  }
-
-
 
   async deleteStakeholder(stakeholder: IStakeholder) {
     if (stakeholder.person) {
@@ -271,6 +266,7 @@ export class WorkpackSectionStakeholdersComponent implements OnInit, OnDestroy {
         if (stakeholderIndex > -1) {
           this.sectionStakeholder.cardItemsSection.splice(stakeholderIndex, 1);
           this.sectionStakeholder.cardItemsSection = Array.from(this.sectionStakeholder.cardItemsSection);
+          this.stakeholderSrv.deleteStakeholderFromData(stakeholder);
         }
       }
     } else {
@@ -283,6 +279,7 @@ export class WorkpackSectionStakeholdersComponent implements OnInit, OnDestroy {
         if (stakeholderIndex > -1) {
           this.sectionStakeholder.cardItemsSection.splice(stakeholderIndex, 1);
           this.sectionStakeholder.cardItemsSection = Array.from(this.sectionStakeholder.cardItemsSection);
+          this.stakeholderSrv.deleteStakeholderFromData(stakeholder);
           this.totalRecordsStakeholders = this.sectionStakeholder.cardItemsSection.length;
         }
       }

@@ -24,8 +24,7 @@
                   [monthNavigator]="true" [yearNavigator]="true" [yearRange]="yearRange" [class.responsive]="responsive"
                   icon="fas fa-calendar-alt" (onSelect)="handleChangeValues()" [dateFormat]="calendarFormat">
                 </p-calendar>
-                <label class="app-input-label" class="properties-label" for="float-end">{{ "finish" |
-                  translate}}</label>
+                <label class="app-input-label" class="properties-label" for="float-end">{{ "finish" |translate}}</label>
               </span>
             </div>
           </div>
@@ -69,6 +68,15 @@
                   <span class="value"  [class.red]="costAssignmentsTotals.actualTotal < 0">{{costAssignmentsTotals.actualTotal|number:'0.2-2': currentLang}}</span>
                 </div>
               </div>
+            </div>
+          </div>
+          <div class="p-field distribution-container" [class.responsive]="responsive">
+            <label class="app-input-label" class="properties-label" for="float-end">{{ "distribution" |translate}}</label>
+            <div class="radios-container">
+              <p-radioButton class="distribution-radio" value="SIGMOIDAL" formControlName="distribution" [label]="'sigmoidal'| translate">
+              </p-radioButton>
+              <p-radioButton class="distribution-radio" value="LINEAR" formControlName="distribution"
+                  [label]="'linear' | translate"></p-radioButton>
             </div>
           </div>
         </form>

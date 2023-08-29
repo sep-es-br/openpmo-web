@@ -78,8 +78,8 @@
             [class.card-link]="properties.urlCard">
             <div class="icons-container">
               <i [ngClass]="properties.iconSvg ? [ 'app-icon', properties.icon, 'grey-icon'] : [ 'icon-card', properties.icon, 'grey-icon' ]"
-                [class.linked]="!!properties.linked || !!properties.shared" [ngStyle]="{ fontSize: '2rem' }"></i>
-              <i [ngClass]="['app-icon', 'link-to', 'grey-icon', 'linked']" *ngIf="!!properties.linked"></i>
+                [class.linked]="!!properties?.linked || !!properties.shared" [ngStyle]="{ fontSize: '2rem' }"></i>
+              <i [ngClass]="['app-icon', 'link-to', 'grey-icon', 'linked']" *ngIf="!!properties?.linked"></i>
               <i [ngClass]="['app-icon', 'sharing', 'grey-icon', 'linked']"
                 *ngIf="!!properties.shared && !properties.linked"></i>
             </div>
@@ -102,17 +102,20 @@
           </div>
           <p-overlayPanel #costConstraintPanel>
             <div class="constraint-content" *ngIf="properties?.dashboard">
+              <ng-container *ngTemplateOutlet="legend"></ng-container>
               <app-cost-constraint [cost]="properties.dashboard?.tripleConstraint?.cost"></app-cost-constraint>
             </div>
           </p-overlayPanel>
           <p-overlayPanel #scheduleConstraintPanel>
             <div class="constraint-content">
+              <ng-container *ngTemplateOutlet="legend"></ng-container>
               <app-schedule-constraint [schedule]="properties.dashboard?.tripleConstraint?.schedule">
               </app-schedule-constraint>
             </div>
           </p-overlayPanel>
           <p-overlayPanel #scopeConstraintPanel>
             <div class="constraint-content">
+              <ng-container *ngTemplateOutlet="legend"></ng-container>
               <app-scope-constraint [scope]="properties.dashboard?.tripleConstraint?.scope"></app-scope-constraint>
             </div>
           </p-overlayPanel>
@@ -261,17 +264,20 @@
           </div>
           <p-overlayPanel #costConstraintPanel>
             <div class="constraint-content" *ngIf="properties?.dashboard">
+              <ng-container *ngTemplateOutlet="legend"></ng-container>
               <app-cost-constraint [cost]="properties.dashboard?.tripleConstraint?.cost"></app-cost-constraint>
             </div>
           </p-overlayPanel>
           <p-overlayPanel #scheduleConstraintPanel>
-            <div class="constraint-content">
+            <div class="constraint-content" *ngIf="properties?.dashboard">
+              <ng-container *ngTemplateOutlet="legend"></ng-container>
               <app-schedule-constraint [schedule]="properties.dashboard?.tripleConstraint?.schedule">
               </app-schedule-constraint>
             </div>
           </p-overlayPanel>
           <p-overlayPanel #scopeConstraintPanel>
-            <div class="constraint-content">
+            <div class="constraint-content" *ngIf="properties?.dashboard">
+              <ng-container *ngTemplateOutlet="legend"></ng-container>
               <app-scope-constraint [scope]="properties.dashboard?.tripleConstraint?.scope"></app-scope-constraint>
             </div>
           </p-overlayPanel>
@@ -459,6 +465,25 @@
       </div>
     </div>
   </p-card>
+
+  <ng-template #legend>
+      <div class="constraint-content-cards" *ngIf="properties?.dashboard">
+        <div class="subtitles-container">
+          <div class="subtitle-item">
+            <div class="subtitle-box subtitle-box-planned"></div>
+            <label class="subtitle-label-planned">{{'plannedBaseline'|translate}}</label>
+          </div>
+          <div class="subtitle-item">
+            <div class="subtitle-box subtitle-box-foreseen"></div>
+            <label class="subtitle-label-foreseen">{{'foreseen'|translate}}</label>
+          </div>
+          <div class="subtitle-item">
+            <div class="subtitle-box subtitle-box-actual"></div>
+            <label class="subtitle-label-actual">{{'actual'|translate}}</label>
+          </div>
+        </div>
+    </div>
+  </ng-template>
 
   <p-card *ngSwitchCase="'newCardItem'" class="workpack-new-carditem" [class.card-link]="properties.urlCard"
     [class.mobile]="responsive" [class.cardList]="(displayModeCard === 'list')"

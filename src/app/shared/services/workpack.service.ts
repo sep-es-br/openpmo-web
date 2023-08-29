@@ -114,9 +114,9 @@ export class WorkpackService extends BaseService<IWorkpack> {
   }
 
   public getNameWorkpack() {
-    const propertyNameWorkpackModel = this.workpackData.workpack?.model?.properties?.find(p => p.name === 'name' && p.session === 'PROPERTIES');
+    const propertyNameWorkpackModel = this.workpackData.workpack?.model?.properties?.find(p => p.name === 'name');
     const propertyNameWorkpack = this.workpackData.workpack?.properties?.find(p => p.idPropertyModel === propertyNameWorkpackModel.id);
-    const propertyFullNameWorkpackModel = this.workpackData.workpack?.model?.properties?.find(p => p.name === 'fullName' && p.session === 'PROPERTIES');
+    const propertyFullNameWorkpackModel = this.workpackData.workpack?.model?.properties?.find(p => p.name === 'fullName');
     const propertyFullNameWorkpack = this.workpackData.workpack?.properties?.find(p => p.idPropertyModel === propertyFullNameWorkpackModel.id);
     return {
       name: propertyNameWorkpack?.value as string,

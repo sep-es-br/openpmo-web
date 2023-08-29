@@ -64,7 +64,7 @@
           (click)="menuAddProperty.toggle($event)">
         </p-button>
         <p-button [label]="'addGroup' | translate" icon="fa fa-plus" iconPos="right" class="button-add-group"
-          (click)="addGroup(propertySessionEnum.PROPERTIES)">
+          (click)="addGroup()">
         </p-button>
       </div>
       <div class="workpack-model-addicional-properties">
@@ -89,7 +89,7 @@
       <app-card [properties]="cardPropertiesStakeholders" *ngIf="cardPropertiesStakeholders" class="inputs-float-label">
         <span class="p-float-label app-input-chips">
           <p-chips [(ngModel)]="posibleRolesPerson" separator="," [allowDuplicate]="false"
-            (ngModelChange)="checkProperties()"
+            (ngModelChange)="checkProperties(true)"
             [class.p-inputwrapper-filled]="posibleRolesPerson && !!posibleRolesPerson.length"
             [disabled]="!editPermission"></p-chips>
           <label class="app-input-label" for="float-label">{{ 'possibleRolesPerson' | translate }} *</label>
@@ -97,7 +97,7 @@
         </span>
         <span class="p-float-label app-input-chips">
           <p-chips [(ngModel)]="posibleRolesOrg" separator="," [allowDuplicate]="false"
-            (ngModelChange)="checkProperties()"
+            (ngModelChange)="checkProperties(true)"
             [class.p-inputwrapper-filled]="posibleRolesOrg && !!posibleRolesOrg?.length" [disabled]="!editPermission">
           </p-chips>
           <label class="app-input-label" for="float-label">{{ 'possibleRolesOrg' | translate }} *</label>
@@ -111,7 +111,7 @@
           <label class="app-input-label">{{'showStakeholders'|translate}}</label>
           <p-multiSelect [options]="dashboardPanel.dashboardStakeholderRolesOptions" optionLabel="label"
             [selectedItemsLabel]="currentLang === 'pt-BR' ? '{0} itens selecionados' : '{0} items selected'"
-            (ngModelChange)="checkProperties()" optionValue="value"
+            (onChange)="checkProperties()" optionValue="value"
             [(ngModel)]="dashboardPanel.dashboardShowStakeholders" display="chip">
           </p-multiSelect>
         </div>
@@ -144,20 +144,6 @@
     </div>
     <div class="card cost-accounts">
       <app-card [properties]="cardPropertiesCostAccount" *ngIf="cardPropertiesCostAccount">
-        <div class="cost-accounts-card-content">
-          <div class="workpack-model-addicional-properties add-actions" *ngIf="editPermission">
-            <p-menu #menuAddCostProperty [popup]="true" [model]="menuCostProperties"></p-menu>
-            <p-button [label]="'addProperty' | translate" icon="fa fa-plus" iconPos="right"
-              (click)="menuAddCostProperty.toggle($event)">
-            </p-button>
-          </div>
-          <div class="workpack-model-addicional-properties">
-            <app-property-model class="addicional-properties" *ngFor="let property of modelCostProperties"
-              [property]="property" [class.open]="!property.isCollapsed" (delete)="deleteProperty($event)"
-              (changed)="propertyChanged($event);">
-            </app-property-model>
-          </div>
-        </div>
       </app-card>
     </div>
     <div class="card schedule" *ngIf="workpackModelType === 'DeliverableModel'">
@@ -204,9 +190,9 @@
       </p-dataView>
     </app-card>
   </div>
-
-
-
+  <div class="id-container" *ngIf="idWorkpackModel">
+    <span>{{idWorkpackModel}}</span>
+  </div>
   <app-save-button *ngIf="editPermission" #saveButton (save)="handleSubmit()"></app-save-button>
 </div>
 

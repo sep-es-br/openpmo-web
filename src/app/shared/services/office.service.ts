@@ -54,4 +54,19 @@ export class OfficeService extends BaseService<IOffice> {
     const result = await this.http.get(`${this.urlBase}/${idOffice}/tree-view`).toPromise();
     return result as IHttpResult<ITreeViewScopeOffice>;
   }
+
+  async getCurrentOffice(idOffice) {
+    const propertiesOfficeItem = localStorage.getItem('@pmo/propertiesCurrentOffice');
+    if (propertiesOfficeItem && (JSON.parse(propertiesOfficeItem)).id === idOffice) {
+       return JSON.parse(propertiesOfficeItem);
+    } else {
+      const {success, data} = await this.GetById(idOffice);
+      if (success) {
+        const propertiesOffice = data;
+        localStorage.setItem('@pmo/propertiesCurrentOffice', JSON.stringify(propertiesOffice));
+        return propertiesOffice;
+      }
+    }
+  }
+
 }

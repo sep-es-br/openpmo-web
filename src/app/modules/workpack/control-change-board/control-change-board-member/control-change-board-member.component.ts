@@ -123,8 +123,12 @@ export class ControlChangeBoardMemberComponent implements OnInit, OnDestroy {
   }
 
   async loadBreadcrumb() {
+    let breadcrumbItems = this.breadcrumbSrv.get;
+    if (!breadcrumbItems || breadcrumbItems.length === 0) {
+      breadcrumbItems = await this.breadcrumbSrv.loadWorkpackBreadcrumbs(this.idProject, this.idPlan)
+    }
     this.breadcrumbSrv.setMenu([
-      ...await this.getBreadcrumbs(this.idProject),
+      ...breadcrumbItems,
       ...[
         {
           key: 'changeControlBoard',
@@ -209,10 +213,7 @@ export class ControlChangeBoardMemberComponent implements OnInit, OnDestroy {
 
   async loadPropertiesPlan() {
     this.idPlan = Number(localStorage.getItem('@currentPlan'));
-    const {data, success} = await this.planSrv.GetById(this.idPlan);
-    if (success) {
-      this.plan = data;
-    }
+    this.plan = await this.planSrv.getCurrentPlan(this.idPlan);
   }
 
   async loadCcbMember() {

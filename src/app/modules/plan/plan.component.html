@@ -100,7 +100,9 @@
       </app-card>
     </div>
   </section>
-
+  <div class="id-container" *ngIf="idPlan && cardPlanProperties">
+    <span>{{idPlan}}</span>
+  </div>
   <app-save-button (save)="savePlan()"></app-save-button>
 
   <p-dialog class="resume-management-dialog" [class.responsive]="!!responsive" [header]="'resumeManagement' |translate"

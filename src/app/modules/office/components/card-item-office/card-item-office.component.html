@@ -43,7 +43,7 @@
     </div>
   </p-card>
 
-  <p-card *ngSwitchCase="'newCardItem'" class="new-carditem" [class.card-link]="properties.urlCard"
+  <p-card *ngSwitchCase="'newCardItem'" class="new-carditem-office" [class.card-link]="properties.urlCard"
     [class.mobile]="responsive" [class.cardList]="displayModeCard === 'list'" [class.new-card-item-mobile]="responsive"
     (click)="properties.urlCard && navigateToPage(properties.urlCard, properties.paramsUrlCard)">
     <div class="carditem-content">

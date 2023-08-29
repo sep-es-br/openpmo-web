@@ -10,8 +10,6 @@ import { ICardItem } from '../../interfaces/ICardItem';
 import localePt from '@angular/common/locales/pt';
 import { registerLocaleData } from '@angular/common';
 import { ResponsiveService } from '../../services/responsive.service';
-import { Menu } from 'primeng/menu';
-import { Icon } from '@fortawesome/fontawesome-svg-core';
 import { Subject } from 'rxjs';
 registerLocaleData(localePt);
 

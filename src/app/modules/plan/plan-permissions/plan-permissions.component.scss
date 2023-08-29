@@ -26,7 +26,7 @@
             padding-bottom: 14px;
             margin-left: -1em;
             font-size: 1.2em;
-            color: #8c8c8c;
+            color: v.$iconGrey;
           }
         }
         .search-email-container.responsive {
@@ -38,44 +38,44 @@
       }
       ::ng-deep .search-container-user-citizen {
         .p-radiobutton .p-radiobutton-box {
-          background-color: white !important;
-          border-color: #868181;
+          background-color: v.$bgWhite !important;
+          border-color: v.$borderRadioButton;
           display: flex;
           align-items: center;
           justify-content: center;
           &:hover {
-            border-color: #868181;
+            border-color: v.$borderRadioButton;
           }
         }
         .p-radiobutton .p-radiobutton-box.p-highlight {
-          background-color: white !important;
-          border-color: #868181;
+          background-color: v.$bgWhite !important;
+          border-color: v.$borderRadioButton;
           &:hover {
-            border-color: #868181;
-            background: white !important;
+            border-color: v.$borderRadioButton;
+            background: v.$bgWhite !important;
           }
           .p-radiobutton-icon {
-            background-color: #868181;
+            background-color: v.$borderRadioButton;
           }
         }
         p-radiobutton .p-radiobutton .p-radiobutton-box.p-highlight {
-          border-color: #868181 !important;
-          background: white !important;
+          border-color: v.$borderRadioButton !important;
+          background: v.$bgWhite !important;
           box-shadow: none;
         }
         p-radiobutton .p-radiobutton .p-radiobutton-box.p-focus {
-          border-color: #868181 !important;
-          background: white !important;
+          border-color: v.$borderRadioButton !important;
+          background: v.$bgWhite !important;
           box-shadow: none;
         }
         .p-radiobutton.p-radiobutton-focused.p-radiobutton-checked {
-          background-color: white !important;
-          border-color: #868181;
+          background-color: v.$bgWhite !important;
+          border-color: v.$borderRadioButton;
           box-shadow: none;
         }
         .p-radiobutton .p-radiobutton-box {
           .p-radiobutton-icon {
-            background-color: #868181;
+            background-color: v.$borderRadioButton;
           }
         }
         .search-user-by {
@@ -83,7 +83,7 @@
           flex-direction: row;
           align-items: flex-end;
           padding-bottom: 2em;
-          color: #004660;
+          color: v.$fontInput;
           .radios-container {
             display: flex;
             flex-direction: row;
@@ -129,7 +129,7 @@
           }
           .button-search {
             background-color: v.$bgButtonGreen;
-            color: #ffffff;
+            color: v.$fontWhite;
             text-align: center;
             border-radius: 5px;
             border: none;
@@ -162,7 +162,7 @@
               padding-bottom: 5px;
               margin-left: -1em;
               font-size: 1.2em;
-              color: #8c8c8c;
+              color: v.$iconGrey;
             }
           }
           p-inputmask {
@@ -177,7 +177,7 @@
           }
           .button-search {
             background-color: v.$bgButtonGreen;
-            color: #ffffff;
+            color: v.$fontWhite;
             text-align: center;
             border-radius: 5px;
             border: none;
@@ -226,7 +226,7 @@
     display: flex;
     height: 100%;
     max-width: 100%;
-    border: 1px solid #D4D4D4;
+    border: 1px solid v.$borderCard;
     box-shadow: none;
   }
 
@@ -261,7 +261,7 @@
   max-width: 100%;
 }
 .input-message-error {
-  color: #f44336;
+  color: v.$fontErrorMessage;
   background: transparent;
   padding: 4px 8px;
   display: inline-flex;

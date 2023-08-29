@@ -97,8 +97,7 @@ export class PlanPermissionsListComponent implements OnInit, OnDestroy {
 
   async loadPropertiesPlan() {
     if (this.idPlan) {
-      const result = await this.planSrv.GetById(this.idPlan);
-      this.propertiesPlan = result.data;
+      this.propertiesPlan = await this.planSrv.getCurrentPlan(this.idPlan);
       this.loadPlanPermissions();
     }
   }
@@ -117,16 +116,7 @@ export class PlanPermissionsListComponent implements OnInit, OnDestroy {
 
   async loadPropertiesOffice() {
     this.idOffice = this.propertiesPlan?.idOffice;
-    const propertiesOfficeItem = localStorage.getItem('@pmo/propertiesCurrentOffice');
-    if (propertiesOfficeItem && (JSON.parse(propertiesOfficeItem)).id === this.idOffice) {
-      this.propertiesOffice = JSON.parse(propertiesOfficeItem);
-    } else {
-      const { success, data } = await this.officeSrv.GetById(this.idOffice);
-      if (success) {
-        this.propertiesOffice = data;
-        localStorage.setItem('@pmo/propertiesCurrentOffice', JSON.stringify(this.propertiesOffice));
-      }
-    }
+    this.propertiesOffice = await this.officeSrv.getCurrentOffice(this.idOffice);
     this.setBreacrumb();
   }
 
@@ -279,10 +269,6 @@ export class PlanPermissionsListComponent implements OnInit, OnDestroy {
         queryParams: { idPlan: this.idPlan },
         info: this.propertiesPlan?.name,
         tooltip: this.propertiesPlan?.fullName
-      },
-      {
-        key: 'filter',
-        routerLink: ['filter-dataview'],
       }
     ]);
   }

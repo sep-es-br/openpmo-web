@@ -56,5 +56,8 @@
       </div>
     </app-card>
   </div>
+  <div class="id-container" *ngIf="idIssueResponse && cardIssueResponseProperties">
+    <span>{{idIssueResponse}}</span>
+  </div>
 </div>
 <app-save-button #saveButton (save)="saveIssueResponse()"></app-save-button>

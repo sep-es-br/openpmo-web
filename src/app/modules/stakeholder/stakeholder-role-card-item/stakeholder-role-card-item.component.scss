@@ -1,3 +1,5 @@
+@use "src/variables" as v;
+
 ::ng-deep p-card.app-card-item-role .p-card {
   height: 100%;
   padding: 1em 0.5em;
@@ -53,7 +55,7 @@
   .p-card {
     background-color: transparent;
     box-shadow: none;
-    border: 1px solid rgba(0, 0, 0, 0.15);
+    border: 1px solid v.$borderCard;
     cursor: pointer;
     height: 100%;
     display: flex;

@@ -1,6 +1,9 @@
 @use "src/variables" as v;
 
 ::ng-deep .app-workpack-section-schedule {
+  .app-save-button-layout {
+    height: auto !important;
+  }
   .loading-container {
     position: relative;
     min-height: 150px;
@@ -172,4 +175,77 @@
       }
       
     }
+}
+
+::ng-deep .type-distribution-dialog {
+  .p-button {
+    background: transparent !important;
+    border: 1px solid transparent;
+    color: #333333 !important;
+    &:hover {
+      background: transparent !important;
+      border: 1px solid transparent;
+      color: #333333 !important;
+    }
+  }
+  .buttons-container {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    flex-direction: row;
+    justify-content: flex-end;
+  }
+  .distribution-container {
+    margin-bottom: 0.5em;
+  }
+  .radios-container {
+    margin-top: 0.5em;
+    .distribution-radio {
+      margin-right: 1em;
+    }
+    .p-radiobutton .p-radiobutton-box {
+      background-color: white !important;
+      border-color: #868181;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      &:hover {
+        border-color: #868181;
+      }
+    }
+    .p-radiobutton-label {
+      color: #004660;
+    }
+    .p-radiobutton .p-radiobutton-box.p-highlight {
+      background-color: white !important;
+      border-color: #868181;
+      &:hover {
+        border-color: #868181;
+        background: white !important;
+      }
+      .p-radiobutton-icon {
+        background-color: #868181;
+      }
+    }
+    p-radiobutton .p-radiobutton .p-radiobutton-box.p-highlight {
+      border-color: #868181 !important;
+      background: white !important;
+      box-shadow: none;
+    }
+    p-radiobutton .p-radiobutton .p-radiobutton-box.p-focus {
+      border-color: #868181 !important;
+      background: white !important;
+      box-shadow: none;
+    }
+    .p-radiobutton.p-radiobutton-focused.p-radiobutton-checked {
+      background-color: white !important;
+      border-color: #868181;
+      box-shadow: none;
+    }
+    .p-radiobutton .p-radiobutton-box {
+      .p-radiobutton-icon {
+        background-color: #868181;
+      }
+    }
+  }
 }

@@ -25,6 +25,7 @@ import { ConfigDataViewService } from 'src/app/shared/services/config-dataview.s
 import { ReportModelService } from 'src/app/shared/services/report-model.service';
 import { IReportModel } from 'src/app/shared/interfaces/IReportModel';
 import { MenuService } from 'src/app/shared/services/menu.service';
+import { CostAccountModelService } from 'src/app/shared/services/cost-account-model.service';
 
 @Component({
   selector: 'app-strategy',
@@ -48,6 +49,7 @@ export class StrategyComponent implements OnDestroy {
     collapseble: true
   };
   cardModels: ICard;
+  cardCostAccountModel: ICard;
   models: IWorkpackModel[];
   cardItemsModels: ICardItem[];
   cardItemPlanMenu: MenuItem[];
@@ -68,6 +70,7 @@ export class StrategyComponent implements OnDestroy {
   reportModelsProperties: ICard;
   cardItemsReportModels: ICardItem[];
   reports: IReportModel[];
+  costAccountModelCardItem: ICardItem[];
 
   constructor(
     private formBuilder: FormBuilder,
@@ -84,7 +87,8 @@ export class StrategyComponent implements OnDestroy {
     private messageSrv: MessageService,
     private configDataViewSrv: ConfigDataViewService,
     private reportModelSrv: ReportModelService,
-    private menuSrv: MenuService
+    private menuSrv: MenuService,
+    private costAccountModelSrv: CostAccountModelService
   ) {
     this.translateSrv.onLangChange.pipe(takeUntil(this.$destroy)).subscribe(() => {
       setTimeout(() => this.setLanguage(), 200);
@@ -105,6 +109,10 @@ export class StrategyComponent implements OnDestroy {
       });
       this.reportModelsProperties = Object.assign({}, {
         ...this.reportModelsProperties,
+        initialStateCollapse: this.collapsePanelsStatus
+      });
+      this.cardCostAccountModel = Object.assign({}, {
+        ...this.cardCostAccountModel,
         initialStateCollapse: this.collapsePanelsStatus
       });
     });
@@ -133,20 +141,9 @@ export class StrategyComponent implements OnDestroy {
         this.cardProperties.isLoading = true;
       }
       this.cardProperties.initialStateCollapse = this.idStrategy ? true : false;
-      const propertiesOfficeItem = localStorage.getItem('@pmo/propertiesCurrentOffice');
-      if (propertiesOfficeItem && (JSON.parse(propertiesOfficeItem)).id === this.idOffice) {
-        this.propertiesOffice = JSON.parse(propertiesOfficeItem);
-      } else {
-        const { success, data } = await this.officeSrv.GetById(this.idOffice);
-        if (success) {
-          this.propertiesOffice = data;
-          localStorage.setItem('@pmo/propertiesCurrentOffice', JSON.stringify(this.propertiesOffice));
-        }
-      }
+      this.propertiesOffice = await this.officeSrv.getCurrentOffice(this.idOffice);
       this.editPermission = await this.officePermissionSrv.getPermissions(this.idOffice);
-      if (this.isUserAdmin === undefined) {
-        this.isUserAdmin = await this.authSrv.isUserAdmin();
-      }
+      this.isUserAdmin = await this.authSrv.isUserAdmin();
       if (!this.isUserAdmin && !this.editPermission) {
         this.router.navigate(['/offices']);
       }
@@ -154,6 +151,7 @@ export class StrategyComponent implements OnDestroy {
       if (this.idStrategy) {
         await this.loadPropertiesStrategy();
         await this.loadModels();
+        await this.loadCostAccountModel();
         this.loadReportModels();
       }
       this.loadOfficeListOptionsSharing();
@@ -199,6 +197,14 @@ export class StrategyComponent implements OnDestroy {
       initialStateToggle: false,
       cardTitle: 'models',
       collapseble: true,
+      initialStateCollapse: false
+    };
+    this.cardCostAccountModel = {
+      toggleable: false,
+      initialStateToggle: false,
+      cardTitle: 'costAccountModel',
+      collapseble: true,
+      isLoading: true,
       initialStateCollapse: false
     };
     this.sharingProperties = {
@@ -266,6 +272,46 @@ export class StrategyComponent implements OnDestroy {
     if (this.formStrategy.valid) {
       this.saveButton.showButton();
     }
+  }
+
+  async loadCostAccountModel() {
+    if (this.propertiesStrategy && this.propertiesStrategy.idCostAccountModel) {
+      this.costAccountModelCardItem = [
+        {
+          typeCardItem: 'listItem',
+          icon: 'fas fa-dollar-sign',
+          nameCardItem: this.translateSrv.instant('model'),
+          itemId:this.propertiesStrategy.idCostAccountModel,
+          menuItems: [
+            {
+              label: this.translateSrv.instant('delete'),
+              icon: 'fas fa-trash-alt',
+              command: () => this.deleteCostAccountModel(this.propertiesStrategy.idCostAccountModel),
+              disabled: !this.editPermission
+            },
+          ] as MenuItem[],
+          urlCard: '/strategies/strategy/cost-account-model',
+          paramsUrlCard: [
+            { name: 'id', value: this.propertiesStrategy.idCostAccountModel },
+            { name: 'idStrategy', value: this.idStrategy },
+            { name: 'idOffice', value: this.idOffice }
+          ]
+        }
+      ];
+      this.cardCostAccountModel.isLoading = false;
+    } else {
+      this.costAccountModelCardItem = this.editPermission ? [
+        {
+          typeCardItem: 'newCardItem',
+          iconSvg: true,
+          icon: IconsEnum.Plus,
+          urlCard: '/strategies/strategy/cost-account-model',
+          paramsUrlCard: [{ name: 'idStrategy', value: this.idStrategy }, { name: 'idOffice', value: this.idOffice }]
+        }
+      ] : [];
+      this.cardCostAccountModel.isLoading = false;
+    }
+    
   }
 
   async loadModels() {
@@ -357,7 +403,7 @@ export class StrategyComponent implements OnDestroy {
     });
     if (result.success) {
       this.reports = result.data;
-      const cardItems: ICardItem[] = this.editPermission ? [
+      const cardItems: ICardItem[] = this.isUserAdmin ? [
         {
           typeCardItem: 'newCardItem',
           iconSvg: true,
@@ -380,7 +426,7 @@ export class StrategyComponent implements OnDestroy {
               { name: 'idStrategy', value: this.idStrategy },
               { name: 'idOffice', value: this.idOffice },
             ],
-            editPermission: this.editPermission
+            editPermission: this.isUserAdmin
           }
         )));
       }
@@ -428,6 +474,14 @@ export class StrategyComponent implements OnDestroy {
     if (result.success) {
       await this.loadModels();
       this.menuSrv.reloadMenuPlanModel();
+    }
+  }
+
+  async deleteCostAccountModel(idCostAccountModel) {
+    const result = await this.costAccountModelSrv.delete({id: idCostAccountModel}, {message: this.translateSrv.instant('messages.deleteCostAccountModelConfirmation')});
+    if (result.success) {
+      this.propertiesStrategy.idCostAccountModel = undefined;
+      this.loadCostAccountModel();
     }
   }
 

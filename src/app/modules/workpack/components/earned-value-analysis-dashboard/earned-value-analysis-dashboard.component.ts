@@ -1,6 +1,6 @@
 import { ResponsiveService } from './../../../../shared/services/responsive.service';
 import { takeUntil } from 'rxjs/operators';
-import { Component, Input, OnInit, SimpleChanges } from '@angular/core';
+import {Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges} from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { ChartData, ChartOptions } from 'chart.js';
 import * as moment from 'moment';
@@ -14,7 +14,7 @@ import { ShortNumberPipe } from 'src/app/shared/pipes/shortNumberPipe';
   templateUrl: './earned-value-analysis-dashboard.component.html',
   styleUrls: ['./earned-value-analysis-dashboard.component.scss']
 })
-export class EarnedValueAnalysisDashboardComponent implements OnInit {
+export class EarnedValueAnalysisDashboardComponent implements OnInit, OnChanges, OnDestroy {
 
   @Input() earnedValueAnalysis: IEarnedValueAnalysisDashboard;
   @Input() referenceMonth;
@@ -72,12 +72,12 @@ export class EarnedValueAnalysisDashboardComponent implements OnInit {
       labels: this.earnedValueAnalysis?.earnedValueByStep?.map(item => moment(item.date).format('MMM YYYY')),
       datasets: [
         {
-          label: this.translateSrv.instant('PV'),
-          data: this.earnedValueAnalysis.earnedValueByStep?.map(item => item.plannedValue),
+          label: this.translateSrv.instant('EV'),
+          data: this.earnedValueAnalysis.earnedValueByStep?.filter(step => moment(step.date, 'yyyy-MM').isSameOrBefore(referenceMonth)).map(item => item.earnedValue),
           fill: false,
-          borderColor: '#b5b5b5',
-          pointBorderWidth: this.earnedValueAnalysis.earnedValueByStep?.map(item => item.plannedValue).length > 1 ? 1 : 0,
-          pointRadius: this.earnedValueAnalysis.earnedValueByStep?.map(item => item.plannedValue).length > 1 ? 4 : 0,
+          borderColor: '#fa7800',
+          pointBorderWidth: this.earnedValueAnalysis.earnedValueByStep?.filter(step => moment(step.date, 'yyyy-MM').isSameOrBefore(referenceMonth)).map(item => item.earnedValue).length > 1 ? 1 : 0,
+          pointRadius: this.earnedValueAnalysis.earnedValueByStep?.filter(step => moment(step.date, 'yyyy-MM').isSameOrBefore(referenceMonth)).map(item => item.earnedValue).length > 1 ? 4 : 0,
         },
         {
           label: this.translateSrv.instant('AC'),
@@ -88,13 +88,21 @@ export class EarnedValueAnalysisDashboardComponent implements OnInit {
           pointRadius: this.earnedValueAnalysis.earnedValueByStep?.filter(step => moment(step.date, 'yyyy-MM').isSameOrBefore(referenceMonth)).map(item => item.actualCost).length > 1 ? 4 : 0,
         },
         {
-          label: this.translateSrv.instant('EV'),
-          data: this.earnedValueAnalysis.earnedValueByStep?.filter(step => moment(step.date, 'yyyy-MM').isSameOrBefore(referenceMonth)).map(item => item.earnedValue),
+          label: this.translateSrv.instant('PV'),
+          data: this.earnedValueAnalysis.earnedValueByStep?.map(item => item.plannedValue),
           fill: false,
-          borderColor: '#fa7800',
-          pointBorderWidth: this.earnedValueAnalysis.earnedValueByStep?.filter(step => moment(step.date, 'yyyy-MM').isSameOrBefore(referenceMonth)).map(item => item.earnedValue).length > 1 ? 1 : 0,
-          pointRadius: this.earnedValueAnalysis.earnedValueByStep?.filter(step => moment(step.date, 'yyyy-MM').isSameOrBefore(referenceMonth)).map(item => item.earnedValue).length > 1 ? 4 : 0,
+          borderColor: '#b5b5b5',
+          pointBorderWidth: this.earnedValueAnalysis.earnedValueByStep?.map(item => item.plannedValue).length > 1 ? 1 : 0,
+          pointRadius: this.earnedValueAnalysis.earnedValueByStep?.map(item => item.plannedValue).length > 1 ? 4 : 0,
         },
+        {
+          label: this.translateSrv.instant('EC'),
+          data: this.earnedValueAnalysis.earnedValueByStep?.filter(step => moment(step.date, 'yyyy-MM').isSameOrBefore(referenceMonth)).map(item => item.estimatedCost),
+          fill: false,
+          borderColor: '#44b39b',
+          pointBorderWidth: this.earnedValueAnalysis.earnedValueByStep?.filter(step => moment(step.date, 'yyyy-MM').isSameOrBefore(referenceMonth)).map(item => item.estimatedCost).length > 1 ? 1 : 0,
+          pointRadius: this.earnedValueAnalysis.earnedValueByStep?.filter(step => moment(step.date, 'yyyy-MM').isSameOrBefore(referenceMonth)).map(item => item.estimatedCost).length > 1 ? 4 : 0,
+        }
       ]
     };
 
@@ -120,7 +128,7 @@ export class EarnedValueAnalysisDashboardComponent implements OnInit {
       tooltips: {
         callbacks: {
           label: (tooltipItem, data) => {
-            return tooltipItem.yLabel.toLocaleString(this.language)
+            return tooltipItem.yLabel.toLocaleString(this.language);
           }
         }
       }

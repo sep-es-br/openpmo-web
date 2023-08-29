@@ -65,7 +65,6 @@ export class OfficeListComponent implements OnInit {
     private breadcrumbSrv: BreadcrumbService,
     private cookieSrv: CookieService,
     private responsiveSrv: ResponsiveService,
-    private citizenSrv: CitizenUserService,
     private configDataViewSrv: ConfigDataViewService
   ) {
     this.officeSvr.nextIDOffice(0);
@@ -78,7 +77,6 @@ export class OfficeListComponent implements OnInit {
       this.pageSize = pageSize;
     });
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.responsive = value);
-    this.citizenSrv.loadCitizenUsers();
     localStorage.removeItem('open-pmo:WORKPACK_TABVIEW');
    }
 
@@ -209,7 +207,6 @@ export class OfficeListComponent implements OnInit {
   }
 
   handleEditFilter(event) {
-    this.setBreadcrumbStorage();
     const idFilter = event.filter;
     if (idFilter) {
       const filterProperties = this.loadFilterPropertiesList();
@@ -235,7 +232,6 @@ export class OfficeListComponent implements OnInit {
   }
 
   handleNewFilter() {
-    this.setBreadcrumbStorage();
     const filterProperties = this.loadFilterPropertiesList();
     this.filterSrv.setFilterProperties(filterProperties);
     this.router.navigate(['/filter-dataview'], {
@@ -259,11 +255,5 @@ export class OfficeListComponent implements OnInit {
     return filterPropertiesList;
   }
 
-  setBreadcrumbStorage() {
-    this.breadcrumbSrv.setBreadcrumbStorage([{
-      key: 'filter',
-      routerLink: ['/filter-dataview']
-    }]);
-  }
 
 }

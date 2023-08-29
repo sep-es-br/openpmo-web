@@ -16,7 +16,7 @@ import { Router } from '@angular/router';
 import { FilterDataviewService } from '../../../../shared/services/filter-dataview.service';
 import { Subject } from 'rxjs';
 import { IWorkpackData, IWorkpackParams } from '../../../../shared/interfaces/IWorkpackDataParams';
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 import { WorkpackShowTabviewService } from 'src/app/shared/services/workpack-show-tabview.service';
 
 @Component({
@@ -40,6 +40,7 @@ export class WorkpackSectionIssuesComponent implements OnInit, OnDestroy {
   showTabview = false;
   idFilterSelected: number;
   term = '';
+  filters;
 
   constructor(
     private filterSrv: FilterDataviewService,
@@ -52,22 +53,11 @@ export class WorkpackSectionIssuesComponent implements OnInit, OnDestroy {
     private issueSrv: IssueService,
     private workpackShowTabviewSrv: WorkpackShowTabviewService
   ) {
+    
     this.workpackShowTabviewSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => {
       this.showTabview = value;
     });
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(responsive => this.responsive = responsive);
-    this.workpackSrv.observableResetWorkpack.pipe(takeUntil(this.$destroy)).subscribe(reset => {
-      if (reset) {
-        this.workpackData = this.workpackSrv.getWorkpackData();
-        this.workpackParams = this.workpackSrv.getWorkpackParams();
-        if (this.workpackData && this.workpackData?.workpack?.id && this.workpackData?.workpackModel &&
-          this.workpackData.workpackModel.riskAndIssueManagementSessionActive) {
-          if (!this.workpackParams.idWorkpackModelLinked || (this.workpackSrv.getEditPermission() && !!this.workpackParams.idWorkpackModelLinked)) {
-            this.loadIssueSection();
-          }
-        }
-      }
-    });
     this.configDataViewSrv.observableCollapsePanelsStatus.pipe(takeUntil(this.$destroy)).subscribe(collapsePanelStatus => {
       this.collapsePanelsStatus = collapsePanelStatus === 'collapse' ? true : false;
       this.sectionIssue = this.sectionIssue && Object.assign({}, {
@@ -84,6 +74,24 @@ export class WorkpackSectionIssuesComponent implements OnInit, OnDestroy {
     this.configDataViewSrv.observablePageSize.pipe(takeUntil(this.$destroy)).subscribe(pageSize => {
       this.pageSize = pageSize;
     });
+    this.sectionIssue = {
+      cardSection: {
+        toggleable: false,
+        initialStateToggle: false,
+        cardTitle: !this.showTabview ? 'issues' : '',
+        collapseble: this.showTabview ? false : true,
+        initialStateCollapse: this.showTabview ? false : this.collapsePanelsStatus,
+        showFilters: true,
+        isLoading: true,
+        filters: this.filters && this.filters.length > 0 ? this.filters : [],
+        showCreateNemElementButton: this.workpackSrv.getEditPermission() ? true : false,
+      }
+    };
+    this.issueSrv.observableResetIssue.pipe(takeUntil(this.$destroy)).subscribe(reset => {
+      if (reset) {
+        this.loadIssueData();
+      }
+    });
 
   }
 
@@ -95,29 +103,40 @@ export class WorkpackSectionIssuesComponent implements OnInit, OnDestroy {
     this.$destroy.unsubscribe();
   }
 
+
+  loadIssueData() {
+    const {
+      workpackData,
+      workpackParams,
+      filters,
+      term,
+      issues,
+      idFilterSelected,
+      loading
+    } = this.issueSrv.getIssuesData();
+    this.workpackData = workpackData;
+    this.workpackParams = workpackParams;
+    this.filters = filters;
+    this.issues = issues;
+    this.idFilterSelected = idFilterSelected;
+    this.term = term;
+    if (!loading) this.loadIssueSection();
+  }
+
+  async getIssues() {
+    this.issueSrv.loadIssues({idFilterSelected: this.idFilterSelected, term: this.term})
+  }
+
   async loadIssueSection() {
-    const resultFiltersIssues = await this.filterSrv.getAllFilters(`workpackModels/${this.workpackData.workpack.model.id}/issues`);
-    const filtersIssues = resultFiltersIssues.success && Array.isArray(resultFiltersIssues.data) ? resultFiltersIssues.data : [];
-   this.idFilterSelected = filtersIssues.find(defaultFilter => !!defaultFilter.favorite) ?
-      filtersIssues.find(defaultFilter => !!defaultFilter.favorite).id : undefined;
-    this.sectionIssue = {
-      cardSection: {
-        toggleable: false,
-        initialStateToggle: false,
-        cardTitle: !this.showTabview ? 'issues' : '',
-        collapseble: this.showTabview ? false : true,
-        initialStateCollapse: this.showTabview ? false : this.collapsePanelsStatus,
-        showFilters: true,
-        isLoading: true,
-        filters: filtersIssues && filtersIssues.length > 0 ? filtersIssues : [],
-        showCreateNemElementButton: this.workpackSrv.getEditPermission() ? true : false,
-      }
-    };
     this.sectionIssue = {
       ...this.sectionIssue,
       cardSection: {
         ...this.sectionIssue.cardSection,
         isLoading: false,
+        filters: this.filters && this.filters.length > 0 ? this.filters : [],
+        idFilterSelected: this.idFilterSelected,
+        searchTerm: this.term,
+        showCreateNemElementButton: this.workpackSrv.getEditPermission() ? true : false,
       },
       cardItemsSection: await this.loadSectionIssuesCards(this.issueSectionShowClosed)
     }
@@ -125,8 +144,6 @@ export class WorkpackSectionIssuesComponent implements OnInit, OnDestroy {
   }
 
   async loadSectionIssuesCards(showClosed: boolean) {
-    const resultIssues = await this.issueSrv.GetAll({ 'id-workpack': this.workpackParams.idWorkpack, idFilter: this.idFilterSelected, term: this.term });
-    this.issues = resultIssues.success ? resultIssues.data : [];
     if (this.issues && this.issues.length > 0) {
       const cardItems = !showClosed ? this.issues.filter(r => IssuesPropertiesOptions.status[r.status].value === 'OPEN').map(issue => ({
         typeCardItem: 'listItem',
@@ -264,6 +281,7 @@ export class WorkpackSectionIssuesComponent implements OnInit, OnDestroy {
     const result = await this.issueSrv.delete(issue, { useConfirm: true });
     if (result.success) {
       this.sectionIssue.cardItemsSection = Array.from(this.sectionIssue.cardItemsSection.filter(i => i.itemId !== issue.id));
+      this.issueSrv.deleteIssueFromData(issue.id);
     }
   }
 
@@ -273,20 +291,12 @@ export class WorkpackSectionIssuesComponent implements OnInit, OnDestroy {
 
   async handleSelectedFilterIssue(event) {
     this.idFilterSelected = event.filter;
-    this.sectionIssue = Object.assign({}, {
-      ...this.sectionIssue,
-      cardItemsSection: await this.loadSectionIssuesCards(this.issueSectionShowClosed)
-    });
-    this.totalRecordsIssues = this.sectionIssue.cardItemsSection && this.sectionIssue.cardItemsSection.length;
+    await this.getIssues();
   }
 
   async handleSearchText(event) {
     this.term = event.term;
-    this.sectionIssue = Object.assign({}, {
-      ...this.sectionIssue,
-      cardItemsSection: await this.loadSectionIssuesCards(this.issueSectionShowClosed)
-    });
-    this.totalRecordsIssues = this.sectionIssue.cardItemsSection && this.sectionIssue.cardItemsSection.length;
+    await this.getIssues();
   }
 
 }

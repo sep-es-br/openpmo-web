@@ -13,7 +13,6 @@ import { BaselineComponent } from './baseline/baseline.component';
 import { BaselineCancellingComponent } from './baseline-cancelling/baseline-cancelling.component';
 import { JournalViewComponent } from './components/journal-view/journal-view.component';
 import { JournalComponent } from './journal/journal.component';
-import { DashboardComponent } from './dashboard/dashboard.component';
 import { TripleConstraintDashboardComponent } from './components/triple-constraint-dashboard/triple-constraint-dashboard.component';
 import { EarnedValueAnalysisDashboardComponent } from './components/earned-value-analysis-dashboard/earned-value-analysis-dashboard.component';
 import { ProgressBarScheduleYearComponent } from './components/progress-bar-schedule-year/progress-bar-schedule-year.component';
@@ -29,6 +28,9 @@ import { WorkpackSectionProcessesComponent } from './workpack-sections/workpack-
 import { CostAccountComponent } from './cost-account/cost-account.component';
 import { CostAccountCardComponent } from './components/cost-account-card/cost-account-card.component';
 import { ProgressBarCostAccountComponent } from './components/progress-bar-cost-account/progress-bar-cost-account.component';
+import { WorkpackSectionDashboardComponent } from './workpack-sections/workpack-section-dashboard/workpack-section-dashboard.component';
+import { WorkpackSectionJournalComponent } from './workpack-sections/workpack-section-journal/workpack-section-journal.component';
+import { WorkpackSectionWBSComponent } from './workpack-sections/workpack-section-wbs/workpack-section-wbs.component';
 
 @NgModule({
   declarations: [
@@ -42,7 +44,6 @@ import { ProgressBarCostAccountComponent } from './components/progress-bar-cost-
     BaselineCancellingComponent,
     JournalViewComponent,
     JournalComponent,
-    DashboardComponent,
     TripleConstraintDashboardComponent,
     EarnedValueAnalysisDashboardComponent,
     ProgressBarScheduleYearComponent,
@@ -57,6 +58,9 @@ import { ProgressBarCostAccountComponent } from './components/progress-bar-cost-
     WorkpackSectionProcessesComponent,
     CostAccountCardComponent,
     ProgressBarCostAccountComponent,
+    WorkpackSectionDashboardComponent,
+    WorkpackSectionJournalComponent,
+    WorkpackSectionWBSComponent,
   ],
   imports: [
       CommonModule,

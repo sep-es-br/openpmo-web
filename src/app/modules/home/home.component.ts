@@ -8,6 +8,8 @@ import { IPerson } from 'src/app/shared/interfaces/IPerson';
 import { ISocialLoginResult } from 'src/app/shared/interfaces/ISocialLoginResult';
 import { AuthService } from 'src/app/shared/services/auth.service';
 import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
+import { OfficeService } from 'src/app/shared/services/office.service';
+import { PlanService } from 'src/app/shared/services/plan.service';
 import { TranslateChangeService } from 'src/app/shared/services/translate-change.service';
 
 @Component({
@@ -18,6 +20,7 @@ import { TranslateChangeService } from 'src/app/shared/services/translate-change
 export class HomeComponent implements OnInit {
 
   routerPlanWork = false;
+  infoPerson: IPerson;
 
   constructor(
     private authSrv: AuthService,
@@ -25,7 +28,9 @@ export class HomeComponent implements OnInit {
     private activatedRoute: ActivatedRoute,
     private breadcrumbSrv: BreadcrumbService,
     private translateChangeSrv: TranslateChangeService,
-    private cookieSrv: CookieService
+    private cookieSrv: CookieService,
+    private planSrv: PlanService,
+    private officeSrv: OfficeService
   ) {
     this.breadcrumbSrv.setMenu([]);
     this.activatedRoute.queryParams
@@ -36,7 +41,7 @@ export class HomeComponent implements OnInit {
             : AcessoDto
         ),
         filter((dto) => !!dto)
-      ).subscribe((dto) => {
+      ).subscribe(async (dto) => {
         if (dto === 'error.unauthorized') {
           const lang = window.navigator.language;
           this.translateChangeSrv.changeLangDefault(lang);
@@ -48,18 +53,14 @@ export class HomeComponent implements OnInit {
           this.authSrv.saveToken(userInfo);
           this.authSrv.nextIsLoginDenied(false);
           const user = this.authSrv.getTokenPayload();
+          await this.authSrv.setInfoPerson()
           const language = user ? this.cookieSrv.get('cookiesDefaultLanguateUser' + user.email) : null;
           if (language) {
             this.translateChangeSrv.changeLangDefault(language);
           }
-          const workPlanUser = this.cookieSrv.get('planWorkUser' + user.email);
-          if (workPlanUser) {
-            this.routerPlanWork = true;
-            this.router.navigate(['plan'], {
-              queryParams: {
-                id: Number(workPlanUser)
-              }
-            });
+          this.infoPerson = await this.authSrv.getInfoPerson();
+          if (this.infoPerson?.workLocal) {
+            this.navigateWorkPerson();
           } else {
             this.router.navigate(['/home']);
           }
@@ -68,7 +69,7 @@ export class HomeComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    setTimeout( () => {
+    setTimeout(async () => {
       if (!this.authSrv.isAuthenticated()) {
         setTimeout(async () => {
           const routeLink = '/offices'
@@ -80,22 +81,63 @@ export class HomeComponent implements OnInit {
         if (language) {
           this.translateChangeSrv.changeLangDefault(language);
         }
-        const workPlanUser = user ? this.cookieSrv.get('planWorkUser' + user.email) : null;
-        if ((!this.routerPlanWork && !workPlanUser) ) {
+        this.infoPerson = await this.authSrv.getInfoPerson();
+        if (this.infoPerson?.workLocal) {
+          this.navigateWorkPerson();
+        } else {
           setTimeout(async () => {
             const routeLink = '/offices'
             this.router.navigate([routeLink]);
           }, 0);
-        } else {
-          this.router.navigate(['plan'], {
-            queryParams: {
-              id: workPlanUser
-            }
-          });
         }
       }
-    },300)
-    
+    }, 300)
+
+  }
+
+  async navigateWorkPerson() {
+    if (this.infoPerson?.workLocal) {
+      const workLocal = this.infoPerson.workLocal;
+      if (workLocal.idWorkpackModelLinked && workLocal.idWorkpack) {
+        this.officeSrv.nextIDOffice(workLocal.idOffice);
+        this.planSrv.nextIDPlan(workLocal.idPlan);
+        this.router.navigate(['workpack'], {
+          queryParams: {
+            id: Number(workLocal.idWorkpack),
+            idPlan: Number(workLocal.idPlan),
+            idWorkpackModelLinked: Number(workLocal.idWorkpackModelLinked)
+          }
+        });
+        return;
+      }
+      if (!workLocal.idWorkpackModelLinked && workLocal.idWorkpack) {
+        this.officeSrv.nextIDOffice(workLocal.idOffice);
+        this.planSrv.nextIDPlan(workLocal.idPlan);
+        this.router.navigate(['workpack'], {
+          queryParams: {
+            id: Number(workLocal.idWorkpack),
+            idPlan: Number(workLocal.idPlan),
+          }
+        });
+        return;
+      }
+      if (workLocal.idPlan && !workLocal.idWorkpack) {
+        this.router.navigate(['plan'], {
+          queryParams: {
+            id: Number(workLocal.idPlan),
+          }
+        });
+        return;
+      }
+      if (!workLocal.idPlan && workLocal.idOffice) {
+        this.router.navigate(['offices/office'], {
+          queryParams: {
+            id: Number(workLocal.idOffice),
+          }
+        });
+        return;
+      }    
+    }
   }
 
 }

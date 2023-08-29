@@ -140,6 +140,9 @@
       </div>
     </p-panel>
   </div>
+  <div class="id-container" *ngIf="idBaseline && cardBaselineProperties">
+    <span>{{idBaseline}}</span>
+  </div>
   <p-dialog [header]="'comment'|translate" [(visible)]="!!showCommentDialog"
             [style]="!responsive ? {width: '30vw'} : {width: '90vw'}" (onHide)="showCommentDialog=false">
     <div class="comment-container">

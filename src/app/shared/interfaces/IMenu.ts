@@ -15,6 +15,7 @@ export interface IMenuOffice {
 export interface IMenuPlan {
   id: string;
   name: string;
+  fullName?: string;
 }
 
 export interface IMenuWorkpackModel {
@@ -23,6 +24,7 @@ export interface IMenuWorkpackModel {
   modelName?: string;
   name?: string;
   nameInPlural?: string;
+  fullName?: string;
   type?: string;
   fontIcon: string;
   children: IMenuWorkpackModel[];
@@ -31,6 +33,7 @@ export interface IMenuWorkpackModel {
 export interface IMenuWorkpack {
   id: string;
   idWorkpackModelLinked?: string;
+  fullName?: string;
   name: string;
   idPlan?: number;
   fontIcon: string;
@@ -40,6 +43,7 @@ export interface IMenuWorkpack {
 
 export interface PlanMenuItem extends MenuItem {
   idPlan?: number;
+  fullName?: string;
 }
 
 export interface IMenuPlanModel {
@@ -53,6 +57,7 @@ export interface IMenuFavorites {
   id: number;
   label: string;
   icon: string;
+  title?: string;
   routerLink?: {
     path: string;
     queryParams?: any;

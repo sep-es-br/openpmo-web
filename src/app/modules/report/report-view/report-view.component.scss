@@ -43,7 +43,7 @@
       font-weight: 400;
       font-style: italic;
       font-size: 14px;
-      color: #939393;
+      color: v.$fontLabel;
     }
     .app-tree-selection {
       margin-top: 0.5em;
@@ -62,7 +62,7 @@
       box-shadow: none !important;
     }
     .p-splitbutton-menubutton {
-      background-color: #3a9a88 !important;
+      background-color: v.$bgButtonGreen !important;
       border: none;
       box-shadow: none !important;
     }
@@ -73,14 +73,14 @@
       .p-menu-list .p-menuitem {
 
         &.selected-format .p-menuitem-link {
-          background-color: #44B39B !important;
+          background-color: v.$bgButtonGreen !important;
           .p-menuitem-text {
-            color: #ffffff !important;
+            color: v.$fontWhite !important;
           }
           &:hover {
-            background-color: #44B39B !important;
+            background-color: v.$bgButtonGreen !important;
             .p-menuitem-text {
-              color: #ffffff !important;
+              color: v.$fontWhite !important;
             }
           }
         }
@@ -90,24 +90,24 @@
   .button-format-container {
     margin-top: 1em;
     width: 186px;
-    background-color: rgba(68, 179, 155, 1);
+    background-color: v.$bgButtonGreen;
     padding-left: 0.5em;
     border-radius: 5px;
     margin-bottom: 2em;
     .select-format .p-dropdown {
       width: 100%;
       background-color: transparent;
-      color: #fff;
+      color: v.$fontWhite;
       border: none;
       .p-dropdown-trigger {
-        color: #fff;
-        background-color: rgba(58, 154, 136, 1);
+        color: v.$fontWhite;
+        background-color: v.$bgButtonGreen;
         justify-content: center;
         width: 2rem;
       }
     }
     .p-dropdown-trigger-icon {
-      color: #fff;
+      color: v.$fontWhite;
       font-size: 1.3rem;
     }
     .format-selected-item {
@@ -118,10 +118,10 @@
       > i {
         margin-right: 1em;
         font-size: 1.3rem;
-        color: #fff;
+        color: v.$fontWhite;
       }
       > div {
-        color: #fff;
+        color: v.$fontWhite;
       }
       .download-spinner {
         margin-right: 1em;
@@ -146,8 +146,8 @@
         font-family: v.$fontFamilyMedium;
         color: v.$fontInput;
         .p-dropdown-item.p-highlight {
-          background-color: #44B39B;
-          color: #ffffff;
+          background-color: v.$bgButtonGreen;
+          color: v.$fontWhite;
         }
       }
     }
@@ -158,17 +158,17 @@
     @keyframes download-progress-spinner-color {
       100%,
       0% {
-          stroke: rgba(0, 70, 96, 1);
+          stroke: v.$loadingColorDarkBlue;
       }
       40% {
-          stroke: #489FB5;
+          stroke: v.$loadingColorBlue;
       }
       66% {
-          stroke: rgba(0, 70, 96, 1);
+          stroke: v.$loadingColorDarkBlue;
       }
       80%,
       90% {
-          stroke: rgba(0, 70, 96, 1);;
+          stroke: v.$loadingColorDarkBlue;;
       }
     }
 

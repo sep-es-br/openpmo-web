@@ -44,6 +44,13 @@ import { Subject } from 'rxjs';
 import { WorkpackShowTabviewService } from 'src/app/shared/services/workpack-show-tabview.service';
 import { ConfigDataViewService } from 'src/app/shared/services/config-dataview.service';
 import { ITabViewScrolled } from 'src/app/shared/components/tabview-scrolled/tabview-scrolled.component';
+import { CostAccountService } from 'src/app/shared/services/cost-account.service';
+import { JournalService } from 'src/app/shared/services/journal.service';
+import { WorkpackPropertyService } from 'src/app/shared/services/workpack-property.service';
+import { BreakdownStructureService } from 'src/app/shared/services/breakdown-structure.service';
+import { PersonService } from 'src/app/shared/services/person.service';
+import { IBreadcrumb } from 'src/app/shared/interfaces/IBreadcrumb';
+import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
 
 @Component({
   selector: 'app-workpack',
@@ -65,7 +72,6 @@ export class WorkpackComponent implements OnDestroy {
   idWorkpackModelLinked: number;
   workpackModel: IWorkpackModel;
   typePropertyModel = TypePropertyModelEnum;
-  cardJournalProperties: ICard;
   workpack: IWorkpack;
   workpackName: string;
   workpackFullName: string;
@@ -92,7 +98,6 @@ export class WorkpackComponent implements OnDestroy {
   language: string;
   fullScreenModeDashboard = false;
   changedStatusCompleted = false;
-  reloadDashboard = false;
   endManagementResumePermission = false;
   oldName: string = null;
   showTabview = false;
@@ -102,12 +107,13 @@ export class WorkpackComponent implements OnDestroy {
   isLoading = false;
   tabViewStorage = 'open-pmo:WORKPACK_TABVIEW';
   favoriteProcessing = false;
+  currentBreadcrumbItems: IBreadcrumb[];
 
 
   constructor(
     private actRouter: ActivatedRoute,
     private workpackModelSrv: WorkpackModelService,
-    public workpackSrv: WorkpackService,
+    private workpackSrv: WorkpackService,
     private responsiveSrv: ResponsiveService,
     public translateSrv: TranslateService,
     private unitMeasureSrv: MeasureUnitService,
@@ -131,9 +137,14 @@ export class WorkpackComponent implements OnDestroy {
     private workpackBreadcrumbStorageSrv: WorkpackBreadcrumbStorageService,
     private workpackShowTabviewSrv: WorkpackShowTabviewService,
     private configDataViewSrv: ConfigDataViewService,
+    private costAccountSrv: CostAccountService,
+    private journalSrv: JournalService,
+    private propertySrv: WorkpackPropertyService,
+    private breakdownStructureSrv: BreakdownStructureService,
+    private personSrv: PersonService,
+    private breadcrumbSrv: BreadcrumbService
   ) {
-    this.actRouter.queryParams.subscribe(({id}) => this.idWorkpack = id && +id);
-    this.actRouter.queryParams.subscribe(async({
+    this.actRouter.queryParams.subscribe(async ({
       id,
       idPlan,
       idWorkpackModel,
@@ -152,11 +163,11 @@ export class WorkpackComponent implements OnDestroy {
         idWorkpackParent: idWorkpackParent && +idWorkpackParent,
         idWorkpackModelLinked: idWorkpackModelLinked && +idWorkpackModelLinked
       });
-      if (this.idPlan) {
-        localStorage.setItem('@currentPlan', this.idPlan.toString());
-      }
       this.selectedTab = null;
       await this.resetWorkpack();
+    });
+    this.breadcrumbSrv.ready.pipe(takeUntil(this.$destroy)).subscribe(data => {
+      this.workpackBreadcrumbStorageSrv.setBreadcrumb();
     });
     this.menuSrv.getRemovedFavorites.pipe(takeUntil(this.$destroy)).subscribe((idRemoved) => {
       if (+this.idWorkpack === +idRemoved) {
@@ -212,12 +223,16 @@ export class WorkpackComponent implements OnDestroy {
     this.$destroy.complete();
   }
 
-  handleChangeCollapseExpandPanel() {
-    this.cardJournalProperties = Object.assign({}, {
-      ...this.cardJournalProperties,
-      collapseble: this.showTabview ? false : true,
-      initialStateCollapse: this.collapsePanelsStatus
+  setWorkWorkpack() {
+    this.personSrv.setPersonWorkLocal({
+      idOffice: this.idOffice,
+      idPlan: this.idPlan,
+      idWorkpack: this.idWorkpack ? this.idWorkpack : null,
+      idWorkpackModelLinked: this.idWorkpackModelLinked ? this.idWorkpackModelLinked : null
     });
+  }
+
+  handleChangeCollapseExpandPanel() {
     this.cardsWorkPackModelChildren = this.cardsWorkPackModelChildren && this.cardsWorkPackModelChildren.map(card => (
       Object.assign({}, {
         ...card,
@@ -231,10 +246,6 @@ export class WorkpackComponent implements OnDestroy {
   }
 
   handleChangeShowTabview() {
-    this.cardJournalProperties = Object.assign({}, {
-      ...this.cardJournalProperties,
-      notShowCardTitle: this.showTabview ? true : false
-    });
     this.cardsWorkPackModelChildren = this.cardsWorkPackModelChildren && this.cardsWorkPackModelChildren.map(card => (
       Object.assign({}, {
         ...card,
@@ -257,8 +268,8 @@ export class WorkpackComponent implements OnDestroy {
   async resetWorkpack() {
     this.workpackSrv.nextPendingChanges(false);
     this.isLoading = true;
+    this.hasWBS = false;
     this.workpackModel = undefined;
-    this.cardJournalProperties = undefined;
     this.workpack = undefined;
     this.workpackName = undefined;
     this.workpackFullName = undefined;
@@ -268,11 +279,26 @@ export class WorkpackComponent implements OnDestroy {
     this.changedStatusCompleted = false;
     this.workpackSrv.setEditPermission(false);
     this.workpackSrv.setUnitMeansure(undefined);
-    this.workpackSrv.setWorkpackData(undefined);
+    this.workpackSrv.setWorkpackData(undefined, true);
+    await this.resetWorkpackSections();
     this.idPlan = Number(localStorage.getItem('@currentPlan'));
     await this.loadWorkpackData();
     this.workpackBreadcrumbStorageSrv.setBreadcrumb();
     this.calendarFormat = this.translateSrv.instant('dateFormat');
+  }
+
+  async resetWorkpackSections() {
+    this.propertySrv.resetPropertiesData();
+    this.breakdownStructureSrv.resetBreakdownStructureData();
+    this.dashboardSrv.resetDashboardData();
+    this.costAccountSrv.resetCostAccountsData();
+    this.stakeholderSrv.resetStakeholdersData();
+    this.riskSrv.resetRisksData();
+    this.issueSrv.resetIssuesData();
+    this.baselineSrv.resetBaselinesData();
+    this.processSrv.resetProcessesData();
+    this.journalSrv.resetJournalData();
+    this.scheduleSrv.resetScheduleData();
   }
 
   async loadWorkpackData() {
@@ -295,6 +321,19 @@ export class WorkpackComponent implements OnDestroy {
     } else {
       await this.loadWorkpackModel(this.idWorkpackModel);
     }
+    this.propertySrv.loadProperties();
+    this.breakdownStructureSrv.loadBreakdownStructure(true, this.idWorkpack);
+    const linked = this.idWorkpackModelLinked ? true : false;
+    this.dashboardSrv.loadDashboard(linked);
+    this.costAccountSrv.loadCostAccounts();
+    this.stakeholderSrv.loadStakeholders();
+    this.riskSrv.loadRisks();
+    this.issueSrv.loadIssues();
+    this.baselineSrv.loadBaselines();
+    this.processSrv.loadProcesses();
+    this.journalSrv.loadJournal();
+    this.journalSrv.loadScope();
+    this.scheduleSrv.loadSchedule();
     this.workpackSrv.nextResetWorkpack(true);
     if (this.idWorkpack && this.workpackModel) {
       await this.loadSectionsWorkpackModel();
@@ -317,13 +356,13 @@ export class WorkpackComponent implements OnDestroy {
   async loadWorkpack(reloadOnlyProperties = false) {
     this.workpackSrv.nextLoadingWorkpack(true);
     const result = await this.workpackSrv.GetWorkpackDataById(this.idWorkpack, { 'id-plan': this.idPlan });
-    if (result.success) {
+    if (result.success && result.data) {
       this.workpack = result.data;
       this.setUnitMeansure();
-      const propertyNameWorkpackModel = this.workpack.model.properties.find(p => p.name === 'name' && p.session === 'PROPERTIES');
+      const propertyNameWorkpackModel = this.workpack.model.properties.find(p => p.name === 'name' && p.session !== 'COST');
       const propertyNameWorkpack = this.workpack.properties.find(p => p.idPropertyModel === propertyNameWorkpackModel.id);
       this.workpackName = propertyNameWorkpack?.value as string;
-      const propertyFullNameWorkpackModel = this.workpack.model.properties.find(p => p.name === 'fullName' && p.session === 'PROPERTIES');
+      const propertyFullNameWorkpackModel = this.workpack.model.properties.find(p => p.name === 'fullName' && p.session !== 'COST');
       const propertyFullNameWorkpack = this.workpack.properties.find(p => p.idPropertyModel === propertyFullNameWorkpackModel.id);
       this.workpackFullName = propertyFullNameWorkpack?.value as string;
       if (this.workpack && (this.workpack.canceled)) {
@@ -338,12 +377,19 @@ export class WorkpackComponent implements OnDestroy {
           ...workpackData,
           workpack: this.workpack
         });
-        this.workpackSrv.nextReloadProperties(true);
+        this.propertySrv.loadProperties();
       }
       if (!reloadOnlyProperties) {
         this.workpackSrv.setWorkpackData({ workpack: this.workpack });
         await this.loadWorkpackModel(this.workpack.model.id);
       }
+    } else {
+      this.router.navigate(['/plan'], {
+        queryParams: {
+          id: this.idPlan
+        }
+      });
+      return;
     }
     setTimeout(() => this.workpackSrv.nextLoadingWorkpack(false), 1000);
   }
@@ -353,7 +399,7 @@ export class WorkpackComponent implements OnDestroy {
   }
 
   async setUnitMeansure() {
-    const unitMeasureWorkpack = this.workpack.properties.find(prop => prop.type === this.typePropertyModel.UnitSelectionModel);
+    const unitMeasureWorkpack = this.workpack.properties.find(prop => prop.type && prop.type === this.typePropertyModel.UnitSelectionModel);
     if (unitMeasureWorkpack) {
       const unitMeasure = await this.unitMeasureSrv.GetById(unitMeasureWorkpack?.selectedValue as number);
       if (unitMeasure.success) {
@@ -366,16 +412,16 @@ export class WorkpackComponent implements OnDestroy {
     this.workpackSrv.nextLoadingWorkpack(true);
     const result = await this.workpackSrv.GetWorkpackLinked(this.idWorkpack,
       { 'id-workpack-model': this.idWorkpackModelLinked, 'id-plan': this.idPlan });
-    if (result.success) {
+    if (result.success && result.data) {
       this.workpack = result.data;
       this.setUnitMeansure();
       const workpackParams = this.workpackSrv.getWorkpackParams();
       workpackParams.idOfficeOwnerWorkpackLinked = this.workpack.plan.idOffice;
       this.workpackSrv.setWorkpackParams({ ...workpackParams });
-      const propertyNameWorkpackModel = this.workpack.model.properties.find(p => p.name === 'name' && p.session === 'PROPERTIES');
+      const propertyNameWorkpackModel = this.workpack.model.properties.find(p => p.name === 'name' && p.session !== 'COST');
       const propertyNameWorkpack = this.workpack.properties.find(p => p.idPropertyModel === propertyNameWorkpackModel.id);
       this.workpackName = propertyNameWorkpack.value as string;
-      const propertyFullNameWorkpackModel = this.workpack.model.properties.find(p => p.name === 'fullName' && p.session === 'PROPERTIES');
+      const propertyFullNameWorkpackModel = this.workpack.model.properties.find(p => p.name === 'fullName' && p.session !== 'COST');
       const propertyFullNameWorkpack = this.workpack.properties.find(p => p.idPropertyModel === propertyFullNameWorkpackModel.id);
       this.workpackFullName = propertyFullNameWorkpack.value as string;
       if (!this.isUserAdmin && this.workpack) {
@@ -392,8 +438,15 @@ export class WorkpackComponent implements OnDestroy {
       }
       if (!reloadOnlyProperties) {
         this.workpackSrv.setWorkpackData({ workpack: this.workpack });
-        await this.loadWorkpackModel(this.workpack.model.id);
+        await this.loadWorkpackModel(this.workpack.idWorkpackModel);
       }
+    } else {
+      this.router.navigate(['/plan'], {
+        queryParams: {
+          id: this.idPlan
+        }
+      });
+      return;
     }
     setTimeout(() => this.workpackSrv.nextLoadingWorkpack(false), 1000);
   }
@@ -434,34 +487,11 @@ export class WorkpackComponent implements OnDestroy {
       this.isLoading = false;
     }
     const workpackParams = this.workpackSrv.getWorkpackParams();
-    const storedCurrentPlan = localStorage.getItem('@pmo/propertiesCurrentPlan');
-    if (storedCurrentPlan) {
-      this.propertiesPlan = JSON.parse(storedCurrentPlan);
-    } else {
-      const result = await this.planSrv.GetById(workpackParams.idPlan);
-      if (result.success) {
-        this.propertiesPlan = result.data;
-      }
-    }
+    this.propertiesPlan = await this.planSrv.getCurrentPlan(workpackParams.idPlan);
+    if (this.propertiesPlan.id) this.planSrv.nextIDPlan(this.propertiesPlan.id)
     if (this.propertiesPlan) {
-      const storedOffice = localStorage.getItem('@pmo/propertiesCurrentOffice');
-      if (storedOffice) {
-        this.propertiesOffice = JSON.parse(storedOffice);
-        this.idOffice = this.propertiesOffice.id;
-      } else {
-
-        const propertiesOfficeItem = localStorage.getItem('@pmo/propertiesCurrentOffice');
-        if (propertiesOfficeItem && (JSON.parse(propertiesOfficeItem)).id === this.propertiesPlan.idOffice) {
-          this.propertiesOffice = JSON.parse(propertiesOfficeItem);
-        } else {
-          const { success, data } = await this.officeSrv.GetById(this.propertiesPlan.idOffice);
-          if (success) {
-            this.propertiesOffice = data;
-            this.idOffice = data.id;
-            localStorage.setItem('@pmo/propertiesCurrentOffice', JSON.stringify(this.propertiesOffice));
-          }
-        }
-      }
+      this.propertiesOffice = await this.officeSrv.getCurrentOffice(this.propertiesPlan.idOffice);
+      this.idOffice = this.propertiesOffice.id;
       this.workpackSrv.setWorkpackParams({
         ...workpackParams,
         propertiesPlan: this.propertiesPlan,
@@ -469,28 +499,25 @@ export class WorkpackComponent implements OnDestroy {
         propertiesOffice: this.propertiesOffice
       });
       this.officeSrv.nextIDOffice(this.propertiesPlan.idOffice);
+      this.setWorkWorkpack();
     }
     setTimeout(() => this.workpackSrv.nextLoadingWorkpack(false), 1000);
   }
 
   async checkWorkpackHasEap() {
     this.isLoading = true;
-    const { success, data } = await this.workpackSrv.checkWorkpackHasChildren(this.idWorkpack);
-    if (success) {
-      this.hasWBS = data && data.hasChildren && !data.hasOnlyBasicRead;
-    }
+    this.hasWBS = (!!this.isUserAdmin || (!!this.workpack.permissions && this.workpack.permissions.length > 0)) && this.workpack.hasChildren;
+    this.workpack.hasWBS = this.hasWBS;
+      const workpackData = this.workpackSrv.getWorkpackData();
+      this.workpackSrv.setWorkpackData({
+        ...workpackData,
+        workpack: this.workpack
+      });
   }
 
   async loadSectionsWorkpackModel() {
     if (this.workpackModel.journalManagementSessionActive) {
-      this.cardJournalProperties = {
-        toggleable: false,
-        initialStateToggle: false,
-        notShowCardTitle: this.showTabview ? true : false,
-        cardTitle: 'journal',
-        collapseble: this.showTabview ? false : true,
-        initialStateCollapse: this.collapsePanelsStatus,
-      };
+
     }
     if (this.workpackModel.childWorkpackModelSessionActive && this.workpackModel?.children) {
       this.sectionWorkpackModelChildren = true;
@@ -582,10 +609,8 @@ export class WorkpackComponent implements OnDestroy {
     }
     if (workpacks && workpacks.length > 0) {
       const workpackItemCardList: IWorkpackCardItem[] = workpacks.map(workpack => {
-        const propertyNameWorkpackModel = workpack.model?.properties?.find(p => p?.name === 'name' && p.session === 'PROPERTIES');
-        const propertyNameWorkpack = workpack.properties?.find(p => p?.idPropertyModel === propertyNameWorkpackModel.id);
-        const propertyFullnameWorkpackModel = workpack.model?.properties?.find(p => p.name === 'fullName' && p.session === 'PROPERTIES');
-        const propertyFullnameWorkpack = workpack.properties?.find(p => p?.idPropertyModel === propertyFullnameWorkpackModel.id);
+        const propertyNameWorkpack = workpack.name;
+        const propertyFullnameWorkpack = workpack.fullName;
         const menuItems: MenuItem[] = [];
         if (workpack.canceled && workpack.type !== 'Project') {
           menuItems.push({
@@ -637,7 +662,7 @@ export class WorkpackComponent implements OnDestroy {
               menuItems.push({
                 label: this.translateSrv.instant('cancel'),
                 icon: 'fas fa-times',
-                command: (event) => this.navigateToCancelProject(workpack.id, propertyNameWorkpack.value as string),
+                command: (event) => this.navigateToCancelProject(workpack.id, propertyNameWorkpack as string),
               });
             }
             if (!workpack.pendingBaseline && !workpack.cancelPropose && !workpack.hasActiveBaseline && !workpack.linked) {
@@ -656,7 +681,7 @@ export class WorkpackComponent implements OnDestroy {
               command: (event) => this.handleCutWorkpack(workpack),
             });
           }
-          if (!workpack.canceled && workpack.model.id === idWorkpackModel
+          if (!workpack.canceled && workpack.idWorkpackModel === idWorkpackModel
             && this.workpackSrv.getEditPermission() && !idWorkpackModelLinked && !workpack.linked) {
             menuItems.push({
               label: this.translateSrv.instant('sharing'),
@@ -674,14 +699,14 @@ export class WorkpackComponent implements OnDestroy {
         }
         return {
           typeCardItem: workpack.type,
-          icon: workpack.model.fontIcon,
+          icon: workpack.fontIcon,
           iconSvg: false,
-          nameCardItem: propertyNameWorkpack?.value as string,
-          fullNameCardItem: propertyFullnameWorkpack?.value as string,
+          nameCardItem: propertyNameWorkpack,
+          fullNameCardItem: propertyFullnameWorkpack,
           itemId: workpack.id,
           menuItems,
           urlCard: '/workpack',
-          paramsUrlCard: workpack.model.id !== idWorkpackModel ? [
+          paramsUrlCard: workpack.idWorkpackModel !== idWorkpackModel ? [
             { name: 'idWorkpackModelLinked', value: idWorkpackModel },
             { name: 'idPlan', value: this.idPlan },
           ] : (idWorkpackModelLinked ?
@@ -692,7 +717,7 @@ export class WorkpackComponent implements OnDestroy {
               { name: 'idPlan', value: this.idPlan },
             ]),
           linked: !!idWorkpackModelLinked ? true : (!!workpack.linked ? true : false),
-          shared: workpack.sharedWith && workpack.sharedWith.length > 0 ? true : false,
+          shared: workpack.sharedWith,
           canceled: workpack.canceled,
           completed: workpack.completed,
           endManagementDate: workpack.endManagementDate,
@@ -729,7 +754,7 @@ export class WorkpackComponent implements OnDestroy {
           const validPasteOutherOffice = workpackCuted.plan.idOffice === this.idOffice ? true : this.isUserAdmin;
           if (canPaste && validPasteOutherOffice) {
             iconMenuItems.push({
-              label: `${this.translateSrv.instant('paste')} ${this.getNameWorkpack(workpackCuted)}`,
+              label: `${this.translateSrv.instant('paste')} ${workpackCuted.name}`,
               icon: 'fas fa-paste',
               command: (event) => this.handlePasteWorkpack(idPlan, idWorkpackModel, this.idWorkpack, incompatiblesProperties)
             });
@@ -772,7 +797,7 @@ export class WorkpackComponent implements OnDestroy {
           const validPasteOutherOffice = workpackCuted.plan.idOffice === this.idOffice ? true : this.isUserAdmin;
           if (canPaste && validPasteOutherOffice) {
             iconMenuItems.push({
-              label: `${this.translateSrv.instant('paste')} ${this.getNameWorkpack(workpackCuted)}`,
+              label: `${this.translateSrv.instant('paste')} ${workpackCuted.name}`,
               icon: 'fas fa-paste',
               command: (event) => this.handlePasteWorkpack(idPlan, idWorkpackModel, this.idWorkpack, incompatiblesProperties)
             });
@@ -792,12 +817,6 @@ export class WorkpackComponent implements OnDestroy {
     }
   }
 
-  getNameWorkpack(workpack: IWorkpack): string {
-    const propertyNameWorkpackModel = workpack.model?.properties?.find(p => p.name === 'name' && p.session === 'PROPERTIES');
-    const propertyNameWorkpack = workpack.properties?.find(p => p.idPropertyModel === propertyNameWorkpackModel.id);
-    return propertyNameWorkpack?.value as string;
-  }
-
   async unlinkedWorkpack(idWorkpackLinked, idWorkpackModel) {
     const result = await this.workpackSrv.unlinkWorkpack(idWorkpackLinked, idWorkpackModel,
       { 'id-workpack-parent': this.idWorkpack, 'id-plan': this.idPlan });
@@ -815,7 +834,7 @@ export class WorkpackComponent implements OnDestroy {
         }
       }
       this.menuSrv.reloadMenuPortfolio();
-      this.reloadDashboard = true;
+      this.dashboardSrv.loadDashboard();
     }
   }
 
@@ -951,7 +970,7 @@ export class WorkpackComponent implements OnDestroy {
   async handleCutWorkpack(workpack: IWorkpack) {
     this.workpackSrv.setWorkpackCuted({ ...workpack, idParent: this.idWorkpack });
     const workpackModelIndex = this.cardsWorkPackModelChildren
-      .findIndex(workpackModel => workpackModel.idWorkpackModel === workpack.model.id);
+      .findIndex(workpackModel => workpackModel.idWorkpackModel === workpack.idWorkpackModel);
     if (workpackModelIndex > -1) {
       const workpackIndex = this.cardsWorkPackModelChildren[workpackModelIndex].cardItemsSection
         .findIndex(w => w.itemId === workpack.id);
@@ -1118,7 +1137,7 @@ export class WorkpackComponent implements OnDestroy {
     const result = await this.workpackSrv.delete(workpack);
     if (result.success) {
       const workpackModelIndex = this.cardsWorkPackModelChildren
-        .findIndex(workpackModel => workpackModel.idWorkpackModel === workpack.model.id);
+        .findIndex(workpackModel => workpackModel.idWorkpackModel === workpack.idWorkpackModel);
       if (workpackModelIndex > -1) {
         const workpackIndex = this.cardsWorkPackModelChildren[workpackModelIndex].cardItemsSection
           .findIndex(w => w.itemId === workpack.id);
@@ -1130,7 +1149,7 @@ export class WorkpackComponent implements OnDestroy {
         }
       }
       this.menuSrv.reloadMenuPortfolio();
-      this.reloadDashboard = true;
+      this.dashboardSrv.loadDashboard();
     }
   }
 
@@ -1232,6 +1251,12 @@ export class WorkpackComponent implements OnDestroy {
           idWorkpack: data.id
         });
         this.idWorkpack = data.id;
+        this.personSrv.setPersonWorkLocal({
+          idOffice: this.idOffice,
+          idPlan: this.idPlan,
+          idWorkpack: data.id,
+          idWorkpackModelLinked: null
+        });
         this.resetWorkpack();
       } else {
         if (this.idWorkpack) {
@@ -1363,10 +1388,10 @@ export class WorkpackComponent implements OnDestroy {
     return filterPropertiesList;
   }
 
-  changeTab(event: { tabs: ITabViewScrolled; setStorage: boolean }) {
-    this.selectedTab = event.tabs;
+  changeTab(event: ITabViewScrolled) {
+    this.selectedTab = event;
     setTimeout(() => {
-      this.setStorageTab(event.setStorage);
+      this.setStorageTab();
     });
   }
 
@@ -1468,10 +1493,7 @@ export class WorkpackComponent implements OnDestroy {
     this.isLoading = false;
   }
 
-  setStorageTab(setStorage?: boolean) {
-    if (!setStorage) {
-      return;
-    }
+  setStorageTab() {
     const tabview = {
       idWorkpack: this.idWorkpack,
       tab: this.selectedTab,

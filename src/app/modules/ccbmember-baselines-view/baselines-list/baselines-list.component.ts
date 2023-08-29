@@ -39,8 +39,6 @@ export class BaselinesListComponent implements OnInit, OnDestroy {
     private filterSrv: FilterDataviewService,
     private router: Router,
   ) {
-    // localStorage.removeItem('@currentPlan');
-    // localStorage.removeItem('@pmo/propertiesCurrentPlan');
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.responsive = value);
     this.configDataViewSrv.observableCollapsePanelsStatus.pipe(takeUntil(this.$destroy)).subscribe(collapsePanelStatus => {
       this.collapsePanelsStatus = collapsePanelStatus === 'collapse' ? true : false;
@@ -203,10 +201,6 @@ export class BaselinesListComponent implements OnInit, OnDestroy {
       {
         key: 'changeControlBoard',
         routerLink: ['/ccbmember-baselines-view'],
-      },
-      {
-        key: 'filter',
-        routerLink: ['/filter-dataview']
       }]);
   }
 

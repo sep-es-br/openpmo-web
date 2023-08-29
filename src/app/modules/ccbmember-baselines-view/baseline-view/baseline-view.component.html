@@ -35,7 +35,7 @@
             </div>
           </div>
           <div class="evaluations-section" *ngIf="!!responsive">
-            <div class="evaluation" *ngIf="!baselineEvaluatedByUser">
+            <div class="evaluation" *ngIf="!baselineEvaluatedByUser && baseline?.status !== 'APPROVED'">
               <span class="evaluation-header">
                 {{'evaluation'|translate}}
               </span>
@@ -51,7 +51,7 @@
                 </div>
               </div>
             </div>
-            <div class="evaluations" *ngIf="!!baselineEvaluatedByUser">
+            <div class="evaluations" *ngIf="!!baselineEvaluatedByUser || baseline?.status === 'APPROVED'">
               <div class="evaluations-header">
                 <span class="title">{{'evaluations'|translate}}</span>
                 <span class="baseline-status" [class.approved]="baseline.status === 'APPROVED'"
@@ -432,7 +432,7 @@
           </div>
         </div>
         <div class="evaluations-section" *ngIf="!responsive">
-          <div class="evaluation" *ngIf="!baselineEvaluatedByUser">
+          <div class="evaluation" *ngIf="!baselineEvaluatedByUser && baseline?.status !== 'APPROVED'">
             <span class="evaluation-header">
               {{'evaluation'|translate}}
             </span>
@@ -448,7 +448,7 @@
               </div>
             </div>
           </div>
-          <div class="evaluations" *ngIf="!!baselineEvaluatedByUser">
+          <div class="evaluations" *ngIf="!!baselineEvaluatedByUser || baseline?.status === 'APPROVED'">
             <div class="evaluations-header">
               <span class="title">{{'evaluations'|translate}}</span>
               <span class="baseline-status" [class.approved]="baseline.status === 'APPROVED'"

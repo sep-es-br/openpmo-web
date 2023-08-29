@@ -28,52 +28,52 @@
       margin-top: 1em;
 
       .p-radiobutton .p-radiobutton-box {
-        background-color: white !important;
-        border-color: #868181;
+        background-color: v.$bgRadioButton !important;
+        border-color: v.$borderRadioButton;
         display: flex;
         align-items: center;
         justify-content: center;
 
         &:hover {
-          border-color: #868181;
+          border-color: v.$borderRadioButton;
         }
       }
 
       .p-radiobutton .p-radiobutton-box.p-highlight {
-        background-color: white !important;
-        border-color: #868181;
+        background-color: v.$bgRadioButton !important;
+        border-color: v.$borderRadioButton;
 
         &:hover {
-          border-color: #868181;
-          background: white !important;
+          border-color: v.$borderRadioButton;
+          background: v.$bgRadioButton !important;
         }
 
         .p-radiobutton-icon {
-          background-color: #868181;
+          background-color: v.$borderRadioButton;
         }
       }
 
       p-radiobutton .p-radiobutton .p-radiobutton-box.p-highlight {
-        border-color: #868181 !important;
-        background: white !important;
+        border-color: v.$borderRadioButton !important;
+        background: v.$bgRadioButton !important;
         box-shadow: none;
       }
 
       p-radiobutton .p-radiobutton .p-radiobutton-box.p-focus {
-        border-color: #868181 !important;
-        background: white !important;
+        border-color: v.$borderRadioButton !important;
+        background: v.$bgRadioButton !important;
         box-shadow: none;
       }
 
       .p-radiobutton.p-radiobutton-focused.p-radiobutton-checked {
-        background-color: white !important;
-        border-color: #868181;
+        background-color: v.$bgRadioButton !important;
+        border-color: v.$borderRadioButton;
         box-shadow: none;
       }
 
       .p-radiobutton .p-radiobutton-box {
         .p-radiobutton-icon {
-          background-color: #868181;
+          background-color: v.$borderRadioButton;
         }
       }
 
@@ -159,7 +159,7 @@
             padding-bottom: 1em;
             margin-left: -1em;
             font-size: 1.2em;
-            color: #8c8c8c;
+            color: v.$iconGrey;
           }
         }
 
@@ -169,7 +169,7 @@
             flex-direction: row;
             align-items: flex-end;
             padding-bottom: 2em;
-            color: #004660;
+            color: v.$fontInput;
 
             .radios-container {
               display: flex;
@@ -228,7 +228,7 @@
 
             .button-search {
               background-color: v.$bgButtonGreen;
-              color: #ffffff;
+              color: v.$fontWhite;
               text-align: center;
               border-radius: 5px;
               border: none;
@@ -268,7 +268,7 @@
 
             .button-search {
               background-color: v.$bgButtonGreen;
-              color: #ffffff;
+              color: v.$fontWhite;
               text-align: center;
               border-radius: 5px;
               border: none;
@@ -297,7 +297,7 @@
         }
 
         .input-message-error {
-          color: #f44336;
+          color: v.$fontErrorMessage;
           background: transparent;
           padding: 4px 8px;
           display: inline-flex;
@@ -425,7 +425,7 @@
 
     .button-label {
       background-color: v.$bgButtonGreen;
-      color: #ffffff;
+      color: v.$fontWhite;
       font-size: 1.25rem;
       padding: .5em 1.5em;
       text-align: center;
@@ -524,7 +524,7 @@
         background-color: transparent !important;
 
         .card-item-title {
-          color: #828282 !important;
+          color: v.$fontGray !important;
         }
 
         .card-item-content {

@@ -112,16 +112,7 @@ export class MeasureUnitComponent implements OnInit {
   }
 
   async getOfficeById() {
-    const propertiesOfficeItem = localStorage.getItem('@pmo/propertiesCurrentOffice');
-      if (propertiesOfficeItem && (JSON.parse(propertiesOfficeItem)).id === this.idOffice) {
-        this.propertiesOffice = JSON.parse(propertiesOfficeItem);
-      } else {
-        const { success, data } = await this.officeSrv.GetById(this.idOffice);
-        if (success) {
-          this.propertiesOffice = data;
-          localStorage.setItem('@pmo/propertiesCurrentOffice', JSON.stringify(this.propertiesOffice));
-        }
-      }
+    this.propertiesOffice = await this.officeSrv.getCurrentOffice(this.idOffice);
   }
 
   async loadMeasureUnitList() {
@@ -387,10 +378,6 @@ export class MeasureUnitComponent implements OnInit {
         tooltip: this.translateSrv.instant('measureUnits'),
         routerLink: ['/measure-units'],
         queryParams: { idOffice: this.idOffice }
-      }, {
-        key: 'filter',
-        routerLink: ['/config/filter-dataview'],
-        queryParams: { id: idFilter, entityName: 'unitMeasures', idOffice: this.idOffice }
       }] :
       [{
         key: 'administration',
@@ -405,10 +392,6 @@ export class MeasureUnitComponent implements OnInit {
         tooltip: this.translateSrv.instant('measureUnits'),
         routerLink: ['/measure-units'],
         queryParams: { idOffice: this.idOffice }
-      }, {
-        key: 'filter',
-        routerLink: ['/config/filter-dataview'],
-        queryParams: { entityName: 'unitMeasures', idOffice: this.idOffice }
       }]
     this.breadcrumbSrv.setBreadcrumbStorage(breadcrumb);
   }

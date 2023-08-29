@@ -1,3 +1,5 @@
+@use "src/variables" as v;
+
 ::ng-deep .app-office-list-container {
   width: 100%;
   flex: 1;
@@ -16,10 +18,10 @@
     position: fixed;
     bottom: 100px;
     box-shadow: 0 -1px 3px #eaf0f6;
-    background-color: #fcfafa;
+    background-color: v.$bgCardItem;
     height: auto;
     z-index: 100000000 !important;
-    color: #5b5e61;
+    color: v.$fontDarkLight;
     font-size: 14px;
     padding: 1em;
     border-radius: 5px;
@@ -29,23 +31,23 @@
       .accept-button {
         margin-right: 0.5em;
         .p-button {
-          background-color: #888e96;
-          border-color: #888e96;
+          background-color: v.$fontGray;
+          border-color: v.$fontGray;
         }
       }
       .decline-button {
         .p-button {
-          color: #888e96;
-          background-color: #fff;
-          border-color: #888e96;
+          color: v.$fontGray;
+          background-color: v.$bgWhite;
+          border-color: v.$fontGray;
         }
       }
     }
   }
   .user-cookies-confirmation.responsive {
     width: 100%;
-    background-color: #44B39B;
-    color: #fff;
+    background-color: v.$bgButtonGreen;
+    color: v.$fontWhite;
     left: 0;
     .cookies-buttons-actions {
       width: 100%;

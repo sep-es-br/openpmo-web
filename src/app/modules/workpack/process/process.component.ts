@@ -193,8 +193,12 @@ export class ProcessComponent implements OnInit, OnDestroy {
   }
 
   async setBreadcrumb() {
+    let breadcrumbItems = this.breadcrumbSrv.get;
+    if (!breadcrumbItems || breadcrumbItems.length === 0) {
+      breadcrumbItems = await this.breadcrumbSrv.loadWorkpackBreadcrumbs(this.idWorkpack, this.idPlan)
+    }
     this.breadcrumbSrv.setMenu([
-      ...await this.getBreadcrumbs(this.idWorkpack),
+      ... breadcrumbItems,
       {
         key: 'process',
         routerLink: ['/workpack/process'],
@@ -203,32 +207,6 @@ export class ProcessComponent implements OnInit, OnDestroy {
         tooltip: this.process?.name
       }
     ]);
-  }
-
-  async getBreadcrumbs(idWorkpack: number) {
-    this.idPlan = Number(localStorage.getItem('@currentPlan'));
-    const { success, data } = await this.breadcrumbSrv.getBreadcrumbWorkpack(idWorkpack, { 'id-plan': this.idPlan });
-    return success
-      ? data.map(p => ({
-        key: !p.modelName ? p.type.toLowerCase() : p.modelName,
-        info: p.name,
-        tooltip: p.fullName,
-        routerLink: this.getRouterLinkFromType(p.type),
-        queryParams: { id: p.id, idWorkpackModelLinked: p.idWorkpackModelLinked, idPlan: this.idPlan },
-        modelName: p.modelName
-      }))
-      : [];
-  }
-
-  getRouterLinkFromType(type: string): string[] {
-    switch (type) {
-      case 'office':
-        return ['/offices', 'office'];
-      case 'plan':
-        return ['plan'];
-      default:
-        return ['/workpack'];
-    }
   }
 
   loadCardProcessHistory() {

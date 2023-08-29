@@ -1,0 +1,193 @@
+::ng-deep .app-journal-view {
+  .loading-container {
+    position: relative;
+    min-height: 150px;
+  }
+  form.filters {
+    display: flex;
+    & > * {
+      margin-right: 1.6rem;
+    }
+    .property-input {
+      min-width: 220px;
+    }
+    .p-calendar {
+      width: 100%;
+      background-color: #fff;
+      height: 100%;
+    }
+    .p-multiselect {
+      width: 100%;
+      background-color: #fff;
+    }
+    .p-multiselect:enabled:hover {
+      box-shadow: none;
+    }
+    .p-multiselect:not(.p-disabled):hover {
+      box-shadow: none;
+    }
+    .p-float-label {
+      height: 100%;
+      label {
+        top: 40%;
+        margin-left: 0.5rem;
+      }
+      & input:focus ~ label,
+      & input.p-filled ~ label,
+      & textarea:focus ~ label,
+      & textarea.p-filled ~ label,
+      & .p-inputwrapper-focus ~ label,
+      & .p-inputwrapper-filled ~ label {
+        top: -8px !important;
+      }
+    }
+    .scope {
+      white-space: nowrap;
+      word-break: break-word;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .p-dropdown.p-component {
+      width: 100%;
+      background-color: #fff;
+     // border: none !important;
+      padding-right: 5px;
+      padding-left: 5px;
+    }
+    .p-inputtext {
+      width: 100%;
+      background-color: #fff;
+      //border: none !important;
+      padding-right: 1rem;
+      padding-left: 1rem;
+    }
+  }
+  form.filters.responsive {
+    flex-direction: column;
+    & > * {
+      margin-right: 0;
+      margin-bottom: 1.6rem;
+    }
+    .property-input {
+      width: 100%;
+    }
+  }
+  p-timeline.responsive {
+    .p-timeline .p-timeline-event {
+      .p-timeline-event-opposite {
+        display: none;
+      }
+    }
+  }
+  .journal-content {
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+    .custom-marker {
+      font-size: 2rem;
+      &.icon {
+        font-size: 1rem;
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      .fa-info-circle {
+        width: 45px;
+        height: 45px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 2.8rem;
+      }
+    }
+    .p-card {
+      .p-card-body {
+        padding-left: 1.5rem;
+        padding-right: 1.5rem;
+      }
+      .p-card-header {
+        padding: 2rem 1.5rem 0 1.5rem;
+      }
+      .p-card-subtitle {
+        display: flex;
+        flex-direction: column;
+        span {
+          font-size: 0.8rem;
+          margin-bottom: 0.5rem;
+        }
+        .author, .level, .target {
+          margin-top: 0.5em;
+          > label {
+            margin-right: 0.5em;
+            font-size: 0.8rem;
+            font-weight: bold;
+          }
+          > span {
+            font-size: 0.9rem;
+          }
+        }
+        .target {
+          margin-bottom: 0.5em;
+        }
+      }
+      .p-card-content {
+        display: flex;
+        flex-direction: column;
+        .workpack-info {
+          font-size: 0.85rem;
+        }
+        .title {
+          font-size: 0.84rem;
+          margin-top: 1rem;
+        }
+        .description-info {
+          font-size: 0.8rem;
+          line-height: 1.2rem;
+          text-align: justify;
+          border: none;
+        }
+        .evidences {
+          display: flex;
+          flex-direction: column;
+          margin-top: 1rem;
+          figure {
+            margin: 0;
+            display: flex;
+            flex-wrap: wrap;
+            .evidence {
+              margin-right: 1.6rem;
+              margin-bottom: 1.6rem;
+              max-width: 80px;
+              .image {
+                width: 100%;
+                cursor: pointer;
+              }
+              .icon {
+                cursor: pointer;
+                font-size: 3rem;
+              }
+              .legend {
+                font-size: 0.65rem;
+                white-space: nowrap;
+                word-break: break-word;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                margin-top: 5px;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  .buttons-actions {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 2rem;
+    button {
+      margin-right: 1rem;
+    }
+  }
+}

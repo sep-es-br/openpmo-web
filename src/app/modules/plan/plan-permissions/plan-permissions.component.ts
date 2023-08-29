@@ -119,24 +119,12 @@ export class PlanPermissionsComponent implements OnInit, OnDestroy {
   }
 
   async loadPropertiesPlan() {
-    const { success, data } = await this.planSrv.GetById(this.idPlan);
-    if (success) {
-      this.propertiesPlan = data;
-    }
+    this.propertiesPlan = await this.planSrv.getCurrentPlan(this.idPlan);
   }
 
   async loadPropertiesOffice() {
     this.idOffice = this.propertiesPlan?.idOffice;
-    const propertiesOfficeItem = localStorage.getItem('@pmo/propertiesCurrentOffice');
-    if (propertiesOfficeItem && (JSON.parse(propertiesOfficeItem)).id === this.idOffice) {
-      this.propertiesOffice = JSON.parse(propertiesOfficeItem);
-    } else {
-      const { success, data } = await this.officeSrv.GetById(this.idOffice);
-      if (success) {
-        this.propertiesOffice = data;
-        localStorage.setItem('@pmo/propertiesCurrentOffice', JSON.stringify(this.propertiesOffice));
-      }
-    }
+    this.propertiesOffice = await this.officeSrv.getCurrentOffice(this.idOffice);
     this.setBreacrumb();
   }
 

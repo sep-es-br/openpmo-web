@@ -90,7 +90,6 @@ export class StrategyListComponent implements OnInit, OnDestroy {
     if (!this.isUserAdmin && !this.editPermission) {
       this.router.navigate(['/offices']);
     }
-    await this.getOfficeById();
     this.setBreadcrumb()
     await this.loadFiltersStrategies();
     await this.loadPropertiesStrategies();
@@ -121,16 +120,7 @@ export class StrategyListComponent implements OnInit, OnDestroy {
   }
 
   async getOfficeById() {
-    const propertiesOfficeItem = localStorage.getItem('@pmo/propertiesCurrentOffice');
-    if (propertiesOfficeItem && (JSON.parse(propertiesOfficeItem)).id === this.idOffice) {
-      this.propertiesOffice = JSON.parse(propertiesOfficeItem);
-    } else {
-      const { success, data } = await this.officeSrv.GetById(this.idOffice);
-      if (success) {
-        this.propertiesOffice = data;
-        localStorage.setItem('@pmo/propertiesCurrentOffice', JSON.stringify(this.propertiesOffice));
-      }
-    }
+    this.propertiesOffice = await this.officeSrv.getCurrentOffice(this.idOffice);
   }
 
   async loadPropertiesStrategies() {
@@ -301,10 +291,6 @@ export class StrategyListComponent implements OnInit, OnDestroy {
       tooltip: this.translateSrv.instant('planModels'),
       routerLink: ['/strategies'],
       queryParams: { idOffice: this.idOffice }
-    }, {
-      key: 'filter',
-      routerLink: ['config/filter-dataview'],
-      queryParams: { id: idFilter, entityName: 'plan-models', idOffice: this.idOffice}
     }] : 
     [{
       key: 'administration',
@@ -319,10 +305,6 @@ export class StrategyListComponent implements OnInit, OnDestroy {
       tooltip: this.translateSrv.instant('planModels'),
       routerLink: ['/strategies'],
       queryParams: { idOffice: this.idOffice }
-    }, {
-      key: 'filter',
-      routerLink: ['config/filter-dataview'],
-      queryParams: { entityName: 'plan-models', idOffice: this.idOffice}
     }]
     this.breadcrumbSrv.setBreadcrumbStorage(breadcrumb);
   }

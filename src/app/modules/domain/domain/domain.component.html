@@ -95,5 +95,8 @@
       </app-card>
     </div>
   </section>
+  <div class="id-container" *ngIf="idDomain && cardProperties">
+    <span>{{idDomain}}</span>
+  </div>
   <app-save-button (save)="handleOnSubmit()"></app-save-button>
 </div>

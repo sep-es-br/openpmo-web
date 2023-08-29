@@ -106,16 +106,7 @@ export class OfficePermissionsListComponent implements OnInit {
 
   async loadPropertiesOffice() {
     if (this.idOffice) {
-      const propertiesOfficeItem = localStorage.getItem('@pmo/propertiesCurrentOffice');
-      if (propertiesOfficeItem && (JSON.parse(propertiesOfficeItem)).id === this.idOffice) {
-        this.propertiesOffice = JSON.parse(propertiesOfficeItem);
-      } else {
-        const { success, data } = await this.officeSrv.GetById(this.idOffice);
-        if (success) {
-          this.propertiesOffice = data;
-          localStorage.setItem('@pmo/propertiesCurrentOffice', JSON.stringify(this.propertiesOffice));
-        }
-      }
+      this.propertiesOffice = await this.officeSrv.getCurrentOffice(this.idOffice);
       await this.loadOfficePermissionsFilters();
       await this.loadOfficePermissions();
     }
@@ -282,13 +273,7 @@ export class OfficePermissionsListComponent implements OnInit {
           tooltip: this.translateSrv.instant('officePermissions'),
           routerLink: ['/offices', 'permission'],
           queryParams: { idOffice: this.idOffice },
-        },
-        {
-          key: 'filter',
-          routerLink: ['/config/filter-dataview'],
-          queryParams: { id: idFilter, entityName: 'office-permissions', idOffice: this.idOffice }
-        }
-      ] :
+        }] :
       [
         {
           key: 'administration',
@@ -303,13 +288,7 @@ export class OfficePermissionsListComponent implements OnInit {
           tooltip: this.translateSrv.instant('officePermissions'),
           routerLink: ['/offices', 'permission'],
           queryParams: { idOffice: this.idOffice },
-        },
-        {
-          key: 'filter',
-          routerLink: ['/config/filter-dataview'],
-          queryParams: { entityName: 'office-permissions', idOffice: this.idOffice }
-        }
-      ];
+        }];
     this.breadcrumbSrv.setBreadcrumbStorage(breadcrumb);
   }
 

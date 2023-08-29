@@ -1,22 +1,24 @@
 import { SelectItem, MenuItem, TreeNode } from 'primeng/api';
-import { TypePropertyEnum } from '../enums/TypePropertyWorkpackEnum';
 
 export interface IWorkpackModelProperty {
   id?: number;
   type: string;
+  session?: string;
   active: boolean;
   fullLine?: boolean;
   label: string;
   name: string;
   required?: boolean;
-  session?: string;
   sortIndex?: number;
   defaultValue?: number | number[] | string | string[] | boolean | Date;
   defaults?: number | number[];
+  defaultsDetails?: {id: number; name: string; fullName: string}[];
   min?: number;
   max?: number;
   possibleValues?: string;
   possibleValuesOptions?: string[];
+  sectorsList?: string[];
+  sectors?: string;
   multipleSelection?: boolean;
   rows?: number;
   decimals?: number;

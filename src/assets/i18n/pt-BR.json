@@ -1,4 +1,8 @@
 {
+  "distribution": "Distribuição",
+  "sigmoidal": "Sigmoidal (Curva S)",
+  "linear": "Linear",
+  "costAccountModel": "Modelo de Centro de Custo",
   "author": "Autor",
   "targetUser": "Usuário alvo",
   "position": "Posição",
@@ -357,6 +361,7 @@
   "SPI": "IDP",
   "SPIdescription": "Índice de Desempenho de Prazo",
   "EV": "VA",
+  "EC": "CE",
   "PV": "VP",
   "EAC": "ENC",
   "ETC": "EPC",
@@ -378,6 +383,7 @@
     "confirmRedistributeSchedule": "Deseja distribuir a diferença ",
     "overTheRemainingMonths": " nos meses restantes?",
     "deleteScheduleConfirmation": "Tem certeza que deseja excluir o cronograma?",
+    "deleteCostAccountModelConfirmation": "Tem certeza que deseja excluir o modelo de centro de custo?",
     "costAccountBalanceValidation": "O valor limite do centro de custo foi ultrapassado.",
     "confirmClearPendingChanges": "Existem alterações não salvas que serão perdidas com a mudança da página. Deseja continuar?",
     "activedSuccessfully": "Modelo de relatório ativado com sucesso.",
@@ -551,6 +557,13 @@
         "delete": {
           "relationship": {
             "error": "Não é possível a exclusão pois o mesmo possui modelos relacionados."
+          }
+        }
+      },
+      "costAccountModel": {
+        "delete": {
+          "relationship": {
+            "error": "Não é possível a exclusão pois o mesmo possui centros de custo relacionados."
           }
         }
       },

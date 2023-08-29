@@ -12,7 +12,7 @@
       <div class="loading-container" *ngIf="cardProperties.isLoading">
         <app-card-loading [isCardLoading]="cardProperties.isLoading"></app-card-loading>
       </div>
-      <div *ngIf="!cardProperties.isLoading">
+      <div *ngIf="!cardProperties.isLoading && formReport">
         <form [formGroup]="formReport">
           <div class="form-inputs-container">
             <div class="formfield width-20" [class.mobile]="responsive" [class.desktop]="!responsive">
@@ -21,7 +21,7 @@
                 <label for="float-input" class="app-input-label">{{'name' | translate}}<span
                     class="required-indicator">*</span></label>
               </span>
-              <app-input-message [form]="formReport" field="name"></app-input-message>
+              <app-input-message [form]="formReport" field="name" *ngIf="isUserAdmin"></app-input-message>
             </div>
             <div class="formField width-10" [class.mobile]="responsive" [class.desktop]="!responsive">
               <span class="p-float-label">
@@ -30,7 +30,7 @@
                 </p-dropdown>
                 <label class="app-input-label">{{'preferredFormat'|translate}}</label>
               </span>
-              <app-input-message [form]="formReport" field="preferredOutputFormat"></app-input-message>
+              <app-input-message [form]="formReport" *ngIf="isUserAdmin" field="preferredOutputFormat"></app-input-message>
             </div>
           </div>
           <span class="p-float-label margin-top">
@@ -40,7 +40,7 @@
             <label for="float-input" class="app-input-label">{{'fullName' | translate}}<span
                 class="required-indicator">*</span></label>
           </span>
-          <app-input-message [form]="formReport" field="fullName"></app-input-message>
+          <app-input-message [form]="formReport" *ngIf="isUserAdmin" field="fullName"></app-input-message>
         </form>
       </div>
     </app-card>
@@ -50,7 +50,7 @@
       <div class="loading-container" *ngIf="cardParameters.isLoading">
         <app-card-loading [isCardLoading]="cardParameters.isLoading"></app-card-loading>
       </div>
-      <div class="report-model-addicional-properties add-actions" *ngIf="editPermission">
+      <div class="report-model-addicional-properties add-actions" *ngIf="isUserAdmin">
         <p-menu #menuAddProperty [popup]="true" [model]="menuModelProperties"></p-menu>
         <p-button [label]="'addParameter' | translate" icon="fa fa-plus" iconPos="right" class="button-add-property"
           (click)="menuAddProperty.toggle($event)">
@@ -91,17 +91,20 @@
           </div>
         </ng-template>
       </p-dataView>
-      <div class="compile-section-container" *ngIf="showButtonCompile()">
+      <div class="compile-section-container" *ngIf="showButtonCompile() && isUserAdmin">
         <p-button [label]="'compile' | translate" icon="fa fa-cog" iconPos="right" class="button-add"
           (click)="handleCompileModel()">
         </p-button>
         <div class="input-toggle">
           <p-inputSwitch class="app-toggle" [(ngModel)]="report.active"
-            [disabled]="!hasCompiledFiles" (ngModelChange)="changedActiveStatus($event)"></p-inputSwitch>
+            [disabled]="!hasCompiledFiles || !isUserAdmin" (ngModelChange)="changedActiveStatus($event)"></p-inputSwitch>
           <label class="input-label">{{'active'|translate}}</label>
         </div>
       </div>
     </app-card>
   </div>
-  <app-save-button (save)="handleOnSubmit()"></app-save-button>
+  <div class="id-container" *ngIf="idReport">
+    <span>{{idReport}}</span>
+  </div>
+  <app-save-button (save)="handleOnSubmit()" *ngIf="isUserAdmin"></app-save-button>
 </div>

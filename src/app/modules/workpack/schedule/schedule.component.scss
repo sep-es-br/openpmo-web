@@ -56,6 +56,65 @@
           }
         }
       }
+      .distribution-container {
+        margin-top: 1.5em;
+        padding-bottom: 1em;
+        > label {
+          font-size: 12px;
+          font-style: italic;
+          color: #6c757d;
+        }
+      }
+      .radios-container {
+        margin-top: 0.5em;
+        .distribution-radio {
+          margin-right: 1em;
+        }
+        .p-radiobutton .p-radiobutton-box {
+          background-color: white !important;
+          border-color: #868181;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          &:hover {
+            border-color: #868181;
+          }
+        }
+        .p-radiobutton-label {
+          color: #004660;
+        }
+        .p-radiobutton .p-radiobutton-box.p-highlight {
+          background-color: white !important;
+          border-color: #868181;
+          &:hover {
+            border-color: #868181;
+            background: white !important;
+          }
+          .p-radiobutton-icon {
+            background-color: #868181;
+          }
+        }
+        p-radiobutton .p-radiobutton .p-radiobutton-box.p-highlight {
+          border-color: #868181 !important;
+          background: white !important;
+          box-shadow: none;
+        }
+        p-radiobutton .p-radiobutton .p-radiobutton-box.p-focus {
+          border-color: #868181 !important;
+          background: white !important;
+          box-shadow: none;
+        }
+        .p-radiobutton.p-radiobutton-focused.p-radiobutton-checked {
+          background-color: white !important;
+          border-color: #868181;
+          box-shadow: none;
+        }
+        .p-radiobutton .p-radiobutton-box {
+          .p-radiobutton-icon {
+            background-color: #868181;
+          }
+        }
+      }
       .schedule-totals {
         margin-top: 15px;
         .totals-title {

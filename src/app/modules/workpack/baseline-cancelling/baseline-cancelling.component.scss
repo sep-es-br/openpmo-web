@@ -18,7 +18,7 @@
     justify-content: flex-start;
     align-items: flex-end;
     flex: 1;
-    color: #EA5C5C;
+    color: v.$fontRed;
     font-weight: bold;
     .fa-times {
       font-size: 1.5rem;
@@ -38,11 +38,11 @@
     margin-top: 2em;
     max-width: 23%;
     .title {
-      color: #EA5C5C;
+      color: v.$fontRed;
       font-weight: bold;
     }
     .text {
-      color: #5B5B5B;
+      color: v.$fontDarkLight;
     }
   }
   .attention-message-responsive {
@@ -72,12 +72,12 @@
     }
     .no-button {
       .p-button {
-        background-color: rgba(157, 157, 157, 1);
+        background-color: v.$bgButtonGray;
       }
     }
     .yes-button {
       .p-button {
-        background-color: rgba(234, 92, 92, 1);
+        background-color: v.$bgButtonCancel;
       }
     }
 

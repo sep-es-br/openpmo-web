@@ -65,5 +65,8 @@
       </app-card>
     </div>
   </section>
+  <div class="id-container" *ngIf="idOffice && cardProperties">
+    <span>{{idOffice}}</span>
+  </div>
   <app-save-button (save)="handleOnSubmit()"></app-save-button>
 </div>

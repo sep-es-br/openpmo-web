@@ -97,8 +97,12 @@ export class JournalComponent implements OnInit {
   }
 
   async setBreadcrumb() {
+    let breadcrumbItems = this.breadcrumbSrv.get;
+    if (!breadcrumbItems || breadcrumbItems.length === 0) {
+      breadcrumbItems = await this.breadcrumbSrv.loadWorkpackBreadcrumbs(this.idWorkpack, this.idPlan)
+    }
     this.breadcrumbSrv.setMenu([
-      ... await this.getBreadcrumbs(),
+      ... breadcrumbItems,
       ...[{
         key: this.translateSvr.instant('information'),
         info: this.translateSvr.instant('information'),
@@ -125,35 +129,6 @@ export class JournalComponent implements OnInit {
         return 'far fa-file-excel';
       default:
         return 'far fa-file';
-    }
-  }
-
-  async getBreadcrumbs() {
-    const id = this.idWorkpack;
-    if (!id) {
-      return [];
-    }
-    const { success, data } = await this.breadcrumbSrv.getBreadcrumbWorkpack(id, { 'id-plan': this.idPlan });
-    return success
-      ? data.map(p => ({
-        key: !p.modelName ? p.type.toLowerCase() : p.modelName,
-        info: p.name,
-        tooltip: p.fullName,
-        routerLink: this.getRouterLinkFromType(p.type),
-        queryParams: { id: p.id, idWorkpackModelLinked: p.idWorkpackModelLinked, idPlan: this.idPlan },
-        modelName: p.modelName
-      }))
-      : [];
-  }
-
-  getRouterLinkFromType(type: string): string[] {
-    switch (type) {
-      case 'office':
-        return ['/offices', 'office'];
-      case 'plan':
-        return ['plan'];
-      default:
-        return ['/workpack'];
     }
   }
 

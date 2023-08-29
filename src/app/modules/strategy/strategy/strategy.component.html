@@ -33,7 +33,7 @@
       </div>
     </app-card>
   </div>
-  <section *ngIf="idStrategy" class="models-cards-section">
+  <section *ngIf="idStrategy && cardModels" class="models-cards-section">
     <div class="card-plans">
       <app-card [properties]="cardModels">
         <div class="loading-container" *ngIf="isLoading">
@@ -53,6 +53,33 @@
           styleClass="dataview-card-items" *ngIf="(displayModeAll === 'list' && !responsive) && !isLoading"
           [paginator]="true" [rows]="pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false"
           [totalRecords]="totalRecords" [emptyMessage]="'loadingEllipsis' | translate">
+          <ng-template let-cardItem pTemplate="listItem">
+            <div class="p-col-12">
+              <app-card-item [properties]="cardItem" [displayModeCard]="displayModeAll"></app-card-item>
+            </div>
+          </ng-template>
+        </p-dataView>
+      </app-card>
+    </div>
+  </section>
+  <section *ngIf="idStrategy && cardCostAccountModel" class="models-cards-section">
+    <div class="card-cost-account-model">
+      <app-card [properties]="cardCostAccountModel">
+        <div class="loading-container" *ngIf="cardCostAccountModel?.isLoading">
+          <app-card-loading [isCardLoading]="cardCostAccountModel?.isLoading"></app-card-loading>
+        </div>
+        <p-dataView [value]="costAccountModelCardItem" class="app-dataview" layout="grid" styleClass="dataview-card-items"
+          *ngIf="(displayModeAll === 'grid' || (displayModeAll === 'list' && !!responsive)) && !cardCostAccountModel?.isLoading"
+           [emptyMessage]="'loadingEllipsis' | translate">
+          <ng-template let-cardItem pTemplate="gridItem">
+            <div class="p-col-12 p-md-3 p-sm-12 card-item-container">
+              <app-card-item [properties]="cardItem"></app-card-item>
+            </div>
+          </ng-template>
+        </p-dataView>
+        <p-dataView [value]="costAccountModelCardItem" class="app-dataview app-dataview-list" layout="list"
+          styleClass="dataview-card-items" *ngIf="(displayModeAll === 'list' && !responsive) && !cardCostAccountModel?.isLoading"
+           [emptyMessage]="'loadingEllipsis' | translate">
           <ng-template let-cardItem pTemplate="listItem">
             <div class="p-col-12">
               <app-card-item [properties]="cardItem" [displayModeCard]="displayModeAll"></app-card-item>
@@ -107,5 +134,8 @@
       </app-card>
     </div>
   </section>
+  <div class="id-container" *ngIf="idStrategy && cardProperties">
+    <span>{{idStrategy}}</span>
+  </div>
   <app-save-button (save)="handleOnSubmit()"></app-save-button>
 </div>

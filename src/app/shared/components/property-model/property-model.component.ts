@@ -9,7 +9,8 @@ import { IWorkpackModelProperty } from 'src/app/shared/interfaces/IWorkpackModel
 import { ResponsiveService } from 'src/app/shared/services/responsive.service';
 import { TypePropertyModelEnum } from 'src/app/shared/enums/TypePropertModelEnum';
 import * as moment from 'moment';
-import { TreeNode } from 'primeng/api';
+import { SelectItem, TreeNode } from 'primeng/api';
+import { TypeOrganization } from '../../enums/TypeOrganization';
 
 @Component({
   selector: 'app-property-model',
@@ -28,6 +29,9 @@ export class PropertyModelComponent implements OnDestroy, OnChanges, AfterViewIn
   calendarFormat: string;
   yearRange: string;
   language: string;
+  optionsSector: SelectItem[];
+  typeOrganizationEnum = TypeOrganization;
+
 
   constructor(
     private translateSrv: TranslateService,
@@ -35,13 +39,17 @@ export class PropertyModelComponent implements OnDestroy, OnChanges, AfterViewIn
   ) {
     this.setLanguage();
     this.translateSrv.onLangChange.pipe(takeUntil(this.$destroy)).subscribe(() => {
-      setTimeout(() => this.setLanguage(), 200);
+      setTimeout(() => {
+        this.setLanguage();
+        this.loadSectorOptions();
+      }, 200);
     });
     this.calendarFormat = this.translateSrv.instant('dateFormat');
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(responsive => this.responsive = responsive);
     const today = moment();
     const yearStart = today.year();
     this.yearRange = (yearStart - 1).toString() + ':' + (yearStart + 15).toString();
+    this.loadSectorOptions();
   }
 
   ngAfterViewInit(): void {
@@ -67,8 +75,17 @@ export class PropertyModelComponent implements OnDestroy, OnChanges, AfterViewIn
     this.$destroy.complete();
   }
 
+  loadSectorOptions() {
+    this.optionsSector = [
+      {label: this.translateSrv.instant(this.typeOrganizationEnum.Private), value: this.typeOrganizationEnum.Private.toLocaleUpperCase()},
+      {label: this.translateSrv.instant(this.typeOrganizationEnum.Public), value: this.typeOrganizationEnum.Public.toLocaleUpperCase()},
+      {label: this.translateSrv.instant(this.typeOrganizationEnum.Third), value: this.typeOrganizationEnum.Third.toLocaleUpperCase()}
+    ];
+  }
+
   setLanguage() {
     this.language = this.translateSrv.currentLang;
+   
   }
 
   checkDefaultValue() {

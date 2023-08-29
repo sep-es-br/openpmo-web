@@ -83,8 +83,10 @@ export class AdminOfficeConfigComponent implements OnInit {
   async resetConfigProperties() {
     this.isLoading = true;
     this.propertiesOffice = undefined;
-    await this.getOfficeById();
-    await this.verifyIsAdminOrEditPermission();
+    setTimeout( () => {
+      this.getOfficeById();
+    }, 1000)
+    this.verifyIsAdminOrEditPermission();
     this.loadCardItemsProperties();
     this.setBreadcrumb();
   }
@@ -161,17 +163,7 @@ export class AdminOfficeConfigComponent implements OnInit {
   }
 
   async getOfficeById() {
-    const propertiesOfficeItem = localStorage.getItem('@pmo/propertiesCurrentOffice');
-    const propertiesOffice = propertiesOfficeItem && JSON.parse(propertiesOfficeItem);
-    if (propertiesOffice && propertiesOffice.id === this.idOffice) {
-      this.propertiesOffice = propertiesOffice;
-    } else {
-      const { data, success } = await this.officeSrv.GetById(this.idOffice);
-      if (success) {
-        this.propertiesOffice = data;
-        localStorage.setItem('@pmo/propertiesCurrentOffice', JSON.stringify(this.propertiesOffice));
-      }
-    }
+    this.propertiesOffice = await this.officeSrv.getCurrentOffice(this.idOffice);
   }
 
   setBreadcrumb() {

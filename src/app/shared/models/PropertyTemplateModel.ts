@@ -15,7 +15,6 @@ export class PropertyTemplateModel implements IProperty {
   name: string;
   required?: boolean;
   disabled?: boolean;
-  session?: string;
   sortIndex?: number;
   defaultValue?: number | string | boolean | string[] | number[] | Date;
   defaults?: number | number[];

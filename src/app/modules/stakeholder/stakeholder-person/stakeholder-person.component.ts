@@ -135,8 +135,14 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
     await this.loadWorkpack();
     await this.loadStakeholder();
     await this.getAuthServer();
+    let breadcrumbItems = this.breadcrumbSrv.get;
+    if (!breadcrumbItems || breadcrumbItems.length === 0 ||
+        breadcrumbItems.filter( bread => !['office', 'plan'].includes(bread.key) && bread.queryParams.id === this.idWorkpack).length === 0) {
+      breadcrumbItems = await this.breadcrumbSrv.loadWorkpackBreadcrumbs(this.idWorkpack, this.idPlan);
+      this.breadcrumbSrv.storageBreadcrumb(breadcrumbItems);
+    }
     this.breadcrumbSrv.setMenu([
-      ...await this.getBreadcrumbs(this.idWorkpack),
+      ...breadcrumbItems,
       {
         key: 'stakeholder',
         routerLink: ['/stakeholder/person'],
@@ -153,32 +159,7 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
       this.citizenAuthServer = result.data;
     }
   }
-
-  async getBreadcrumbs(idWorkpack: number) {
-    const {success, data} = await this.breadcrumbSrv.getBreadcrumbWorkpack(idWorkpack, {'id-plan': this.idPlan});
-    return success
-      ? data.map(p => ({
-        key: !p.modelName ? p.type.toLowerCase() : p.modelName,
-        info: p.name,
-        tooltip: p.fullName,
-        routerLink: this.getRouterLinkFromType(p.type),
-        queryParams: {id: p.id, idWorkpackModelLinked: p.idWorkpackModelLinked, idPlan: this.idPlan},
-        modelName: p.modelName
-      }))
-      : [];
-  }
-
-  getRouterLinkFromType(type: string): string[] {
-    switch (type) {
-      case 'office':
-        return ['/offices', 'office'];
-      case 'plan':
-        return ['plan'];
-      default:
-        return ['/workpack'];
-    }
-  }
-
+  
   async loadWorkpack() {
     const result = await this.workpackSrv.GetWorkpackById(this.idWorkpack, {'id-plan': this.idPlan});
     if (result.success) {
@@ -193,9 +174,9 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
       } else {
         this.editPermission = (this.workpack.permissions && this.workpack.permissions.filter(p => p.level === 'EDIT').length > 0) && !this.workpack.canceled;
       }
-      const resultPlan = await this.planSrv.GetById(this.idPlan);
-      if (resultPlan.success) {
-        this.idOffice = resultPlan.data.idOffice;
+      const resultPlan = await this.planSrv.getCurrentPlan(this.idPlan);
+      if (resultPlan) {
+        this.idOffice = resultPlan.idOffice;
       }
     }
   }
@@ -614,7 +595,7 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
   }
 
   handleShowSaveButton() {
-    if (this.stakeholderForm.valid) {
+    if (this.stakeholderForm.valid && this.stakeholderForm.controls.fullName.value.trim().length > 0) {
       return this.validateStakeholder()
         ? this.saveButton?.showButton()
         : this.saveButton?.hideButton();
@@ -624,7 +605,7 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
   }
 
   async saveStakeholder() {
-    if (!this.stakeholderForm.valid) {
+    if (!this.stakeholderForm.valid || !this.stakeholderForm.controls.fullName.value || this.stakeholderForm.controls.fullName.value.trim().length === 0) {
       return;
     }
     const validated = this.validateStakeholder();

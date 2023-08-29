@@ -15,7 +15,7 @@ import { Subject } from 'rxjs';
 import { IWorkpackData, IWorkpackParams } from '../../../../shared/interfaces/IWorkpackDataParams';
 import { ISection } from '../../../../shared/interfaces/ISectionWorkpack';
 import { IProcess } from '../../../../shared/interfaces/IProcess';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import { WorkpackShowTabviewService } from 'src/app/shared/services/workpack-show-tabview.service';
 
 @Component({
@@ -38,6 +38,7 @@ export class WorkpackSectionProcessesComponent implements OnInit {
   showTabview = false;
   idFilterSelected: number;
   term = '';
+  filters;
 
   constructor(
     private filterSrv: FilterDataviewService,
@@ -50,22 +51,11 @@ export class WorkpackSectionProcessesComponent implements OnInit {
     private processSrv: ProcessService,
     private workpackShowTabviewSrv: WorkpackShowTabviewService
   ) {
+    
     this.workpackShowTabviewSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => {
       this.showTabview = value;
     });
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(responsive => this.responsive = responsive);
-    this.workpackSrv.observableResetWorkpack.pipe(takeUntil(this.$destroy)).subscribe(reset => {
-      if (reset) {
-        this.workpackData = this.workpackSrv.getWorkpackData();
-        this.workpackParams = this.workpackSrv.getWorkpackParams();
-        if (this.workpackData && this.workpackData?.workpack?.id && this.workpackData?.workpackModel &&
-          this.workpackData.workpackModel.processesManagementSessionActive) {
-          if (!this.workpackParams.idWorkpackModelLinked || (this.workpackSrv.getEditPermission() && !!this.workpackParams.idWorkpackModelLinked)) {
-            this.loadProcessSection();
-          }
-        }
-      }
-    });
     this.configDataViewSrv.observableCollapsePanelsStatus.pipe(takeUntil(this.$destroy)).subscribe(collapsePanelStatus => {
       this.collapsePanelsStatus = collapsePanelStatus === 'collapse' ? true : false;
       this.sectionProcess = this.sectionProcess && Object.assign({}, {
@@ -82,9 +72,50 @@ export class WorkpackSectionProcessesComponent implements OnInit {
     this.configDataViewSrv.observablePageSize.pipe(takeUntil(this.$destroy)).subscribe(pageSize => {
       this.pageSize = pageSize;
     });
+    this.sectionProcess = {
+      cardSection: {
+        toggleable: false,
+        initialStateToggle: false,
+        cardTitle: this.showTabview ? '' : 'processes',
+        collapseble: this.showTabview ? false : true,
+        initialStateCollapse: this.showTabview ? false : this.collapsePanelsStatus,
+        showFilters: true,
+        isLoading: true,
+        filters: this.filters && this.filters.length > 0 ? this.filters : [],
+        showCreateNemElementButton: this.workpackSrv.getEditPermission() ? true : false,
+      }
+    };
+    this.processSrv.observableResetProcess.pipe(takeUntil(this.$destroy)).subscribe(reset => {
+      if (reset) {
+        this.loadProcessesData();
+      }
+    });
   }
 
   ngOnInit(): void {
+  }
+
+  loadProcessesData() {
+    const {
+      workpackData,
+      workpackParams,
+      filters,
+      processes,
+      term,
+      idFilterSelected,
+      loading
+    } = this.processSrv.getProcessesData();
+    this.workpackData = workpackData;
+    this.workpackParams = workpackParams;
+    this.filters = filters;
+    this.processes = processes;
+    this.idFilterSelected = idFilterSelected;
+    this.term = term;
+    if (!loading) this.loadProcessSection();
+  }
+
+  async getProcesses() {
+    this.processSrv.loadProcesses({ idFilterSelected: this.idFilterSelected, term: this.term })
   }
 
   handleCreateNewProcess() {
@@ -99,50 +130,29 @@ export class WorkpackSectionProcessesComponent implements OnInit {
     const result = await this.processSrv.delete(process, { useConfirm: true });
     if (result.success) {
       this.sectionProcess.cardItemsSection = Array.from(this.sectionProcess.cardItemsSection.filter(i => i.itemId !== process.id));
+      this.processSrv.deleteProcessFromData(process.id);
     }
   }
 
   async handleSelectedFilterProcess(event) {
     this.idFilterSelected = event.filter;
-    this.sectionProcess = Object.assign({}, {
-      ...this.sectionProcess,
-      cardItemsSection: await this.loadSectionProcessesCards()
-    });
-    this.totalRecordsProcesses = this.sectionProcess.cardItemsSection && this.sectionProcess.cardItemsSection.length;
+    this.getProcesses();
   }
 
   async handleSearchText(event) {
     this.term = event.term;
-    this.sectionProcess = Object.assign({}, {
-      ...this.sectionProcess,
-      cardItemsSection: await this.loadSectionProcessesCards()
-    });
-    this.totalRecordsProcesses = this.sectionProcess.cardItemsSection && this.sectionProcess.cardItemsSection.length;
+    this.getProcesses();
   }
 
   async loadProcessSection() {
-    const resultFilters = await this.filterSrv.getAllFilters(`workpackModels/${this.workpackData.workpack.model.id}/processes`);
-    const filters = resultFilters.success && Array.isArray(resultFilters.data) ? resultFilters.data : [];
-    this.idFilterSelected = filters.find(defaultFilter => !!defaultFilter.favorite) ?
-      filters.find(defaultFilter => !!defaultFilter.favorite).id : undefined;
-
-    this.sectionProcess = {
-      cardSection: {
-        toggleable: false,
-        initialStateToggle: false,
-        cardTitle: this.showTabview ? '' : 'processes',
-        collapseble: this.showTabview ? false : true,
-        initialStateCollapse: this.showTabview ? false : this.collapsePanelsStatus,
-        showFilters: true,
-        isLoading: true,
-        filters: filters && filters.length > 0 ? filters : [],
-        showCreateNemElementButton: this.workpackSrv.getEditPermission() ? true : false,
-      }
-    };
     this.sectionProcess = {
       ...this.sectionProcess,
       cardSection: {
         ...this.sectionProcess.cardSection,
+        filters: this.filters && this.filters.length > 0 ? this.filters : [],
+        showCreateNemElementButton: this.workpackSrv.getEditPermission() ? true : false,
+        idFilterSelected: this.idFilterSelected,
+        searchTerm: this.term,
         isLoading: false
       },
       cardItemsSection: await this.loadSectionProcessesCards()
@@ -151,8 +161,7 @@ export class WorkpackSectionProcessesComponent implements OnInit {
   }
 
   async loadSectionProcessesCards() {
-    const resultProcess = await this.processSrv.GetAll({ 'id-workpack': this.workpackParams.idWorkpack, idFilter: this.idFilterSelected, term: this.term });
-    this.processes = resultProcess.success ? resultProcess.data : [];
+    
     if (this.processes && this.processes.length > 0) {
       const cardItems = this.processes.map(proc => ({
         typeCardItem: 'listItemProcess',

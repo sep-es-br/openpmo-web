@@ -29,7 +29,7 @@
     justify-content: flex-start;
     align-items: flex-end;
     flex: 1;
-    color: #EA5C5C;
+    color: v.$fontRed;
     font-weight: bold;
     .fa-times {
       font-size: 1.5rem;
@@ -61,11 +61,11 @@
   .card-list-item {
     margin-bottom: 0.5em;
     .p-card {
-      background-color: rgba(250, 250, 249, 1);
+      background-color: v.$bgCard;
       box-sizing: border-box;
       border-width: 1px;
       border-style: solid;
-      border-color: rgba(229, 229, 228, 1);
+      border-color: v.$borderCard;
       border-radius: 5px;
       box-shadow: none;
       .p-card-body {
@@ -148,26 +148,26 @@
     }
     .submit-button {
       .p-button {
-        background-color: rgba(68, 179, 155, 1);
+        background-color: v.$bgButtonSubmit;
       }
       .p-button:hover {
-        background-color: rgba(68, 179, 155, 0.8);
+        background-color: v.$bgButtonSubmitHover
       }
     }
     .draft-button {
       .p-button {
-        background-color: rgba(21, 147, 201, 0.75);
+        background-color: v.$bgButtonDraft;
       }
       .p-button:hover {
-        background-color: rgba(21, 147, 201, 0.6);
+        background-color: v.$bgButtonDraftHover;
       }
     }
     .cancel-button {
       .p-button {
-        background-color: rgba(234, 92, 92, 1);
+        background-color: v.$bgButtonCancel;
       }
       .p-button:hover {
-        background-color: rgba(234, 92, 92, 0.8);
+        background-color: v.$bgButtonCancelHover;
       }
     }
   }
@@ -210,14 +210,14 @@
             text-transform: uppercase;
           }
           .header-title-status {
-            color: gray;
+            color: v.$fontGray;
             font-family: v.$fontFamilyMedium;
             font-size: 1rem;
             .approved {
-              color: #44B39B;
+              color: v.$fontApproved;
             }
             .rejected {
-              color: #EA5C5C;
+              color: v.$fontReject;
             }
           }
         }

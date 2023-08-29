@@ -3,17 +3,66 @@ import { IBaseline, IBaselineUpdates } from './../interfaces/IBaseline';
 import { IHttpResult } from './../interfaces/IHttpResult';
 import { Inject, Injectable, Injector } from '@angular/core';
 import { BaseService } from '../base/base.service';
+import { BehaviorSubject } from 'rxjs';
 import { IWorkpackBaselines } from '../interfaces/IWorkpackBaselines';
+import { IWorkpackData, IWorkpackParams } from '../interfaces/IWorkpackDataParams';
+import { WorkpackService } from './workpack.service';
+import { TypeWorkpackEnum } from '../enums/TypeWorkpackEnum';
 
 @Injectable({
   providedIn: 'root'
 })
 export class BaselineService extends BaseService<IBaseline> {
 
+  private resetBaselines = new BehaviorSubject<boolean>(false);
+  workpackData: IWorkpackData;
+  workpackParams: IWorkpackParams;
+  baselines;
+  loading;
+
   constructor(
     @Inject(Injector) injector: Injector,
+    private workpackSrv: WorkpackService
   ) {
     super('baselines', injector);
+  }
+
+  resetBaselinesData() {
+    this.baselines = [];
+    this.loading = true;
+    this.nextResetBaselines(true);
+  }
+
+  nextResetBaselines(nextValue: boolean) {
+    this.resetBaselines.next(nextValue);
+  }
+
+  get observableResetBaselines() {
+    return this.resetBaselines.asObservable();
+  }
+
+  async loadBaselines() {
+    this.workpackData = this.workpackSrv.getWorkpackData();
+    this.workpackParams = this.workpackSrv.getWorkpackParams();
+    if (this.workpackParams.idWorkpack && this.workpackData.workpack.type === TypeWorkpackEnum.ProjectModel) {
+      const resultBaselines = await this.GetAll({ 'id-workpack': this.workpackParams.idWorkpack });
+      this.baselines = resultBaselines.success ? resultBaselines.data : [];
+      this.loading = false;
+      this.nextResetBaselines(true);
+    }
+  }
+
+  getBaselinesData() {
+    return {
+      workpackData: this.workpackData,
+      workpackParams: this.workpackParams,
+      baselines: this.baselines,
+      loading: this.loading
+    }
+  }
+
+  deleteBaselineFromData(id) {
+    this.baselines = this.baselines.filter( baseline => baseline.id !== id );
   }
 
   public async getBaselinesFromCcbMember(options?): Promise<IHttpResult<IBaseline[]>> {
@@ -31,7 +80,7 @@ export class BaselineService extends BaseService<IBaseline> {
   }
 
   public async submitBaseline(idBaseline: number, updates: IBaselineUpdates[]): Promise<IHttpResult<IBaseline>> {
-    return this.http.put<IHttpResult<IBaseline>>(`${this.urlBase}/${idBaseline}/submit`, {updates}).toPromise();
+    return this.http.put<IHttpResult<IBaseline>>(`${this.urlBase}/${idBaseline}/submit`, { updates }).toPromise();
   }
 
   public async submitBaselineCancelling(baseline: IBaseline): Promise<IHttpResult<IBaseline>> {
@@ -42,7 +91,7 @@ export class BaselineService extends BaseService<IBaseline> {
     return this.http.get<IHttpResult<IBaseline>>(`${this.urlBase}/${idBaseline}/ccb-member-view`).toPromise();
   }
 
-  public async evaluateBaseline(idBaseline: number, model: {decision: string; comment: string}): Promise<IHttpResult<IBaseline>> {
+  public async evaluateBaseline(idBaseline: number, model: { decision: string; comment: string }): Promise<IHttpResult<IBaseline>> {
     return this.http.put<IHttpResult<IBaseline>>(`${this.urlBase}/${idBaseline}/evaluate`, model).toPromise();
   }
 }

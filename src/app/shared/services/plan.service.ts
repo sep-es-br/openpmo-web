@@ -34,6 +34,20 @@ export class PlanService extends BaseService<IPlan> {
     this.newPlan.next(value);
   }
 
-
+  async getCurrentPlan(idPlan) {
+    const storedPlan = localStorage.getItem('@pmo/propertiesCurrentPlan');
+    let plan = storedPlan ? JSON.parse(storedPlan) : undefined;
+    if (plan && plan.id === idPlan) {
+     return plan;
+    } else {
+      const result = await this.GetById(idPlan);
+      if (result.success) {
+        plan = result.data;
+        localStorage.setItem('@pmo/propertiesCurrentPlan', JSON.stringify(plan));
+        localStorage.setItem('@currentPlan', plan.id.toString());
+        return plan;
+      }
+    }
+  }
 
 }

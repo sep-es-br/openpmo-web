@@ -64,5 +64,8 @@
       </div>
     </app-card>
   </div>
+  <div class="id-container" *ngIf="idFilter">
+    <span>{{idFilter}}</span>
+  </div>
   <app-save-button (save)="handleOnSubmit()"></app-save-button>
 </div>

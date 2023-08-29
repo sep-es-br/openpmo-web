@@ -1,18 +1,16 @@
 <div class="app-workpack-section-cost-accounts" *ngIf="sectionCostAccount">
   <app-card [properties]="sectionCostAccount.cardSection" [class.panel-tab-view]="showTabview"
-  [loading]="sectionCostAccount?.cardSection?.isLoading"
-    (searchText)="handleSearchText($event)" (editFilter)="handleEditFilterCostAccount($event)"
-    (newFilter)="handleNewFilterCostAccount()" (selectedFilter)="handleSelectedFilterCostAccount($event)"
-    (createNewElement)="handleCreateNewCostAccount()">
+    [loading]="sectionCostAccount?.cardSection?.isLoading" (searchText)="handleSearchText($event)"
+    (editFilter)="handleEditFilterCostAccount($event)" (newFilter)="handleNewFilterCostAccount()"
+    (selectedFilter)="handleSelectedFilterCostAccount($event)" (createNewElement)="handleCreateNewCostAccount()">
     <div class="cost-account-list-container">
       <div class="loading-container" *ngIf="sectionCostAccount?.cardSection?.isLoading">
         <app-card-loading [isCardLoading]="sectionCostAccount?.cardSection?.isLoading"></app-card-loading>
       </div>
       <p-dataView [value]="sectionCostAccount?.cardItemsSection" layout="grid" class="app-dataview"
         [emptyMessage]="'notFoundCostAccounts' | translate" *ngIf="(displayModeAll === 'grid' || (displayModeAll === 'list' && !!responsive)) &&
-          !sectionCostAccount.cardSection.isLoading" [paginator]="true"
-        [rows]="pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false"
-        [totalRecords]="totalRecordsCostAccounts">
+              !sectionCostAccount.cardSection.isLoading" [paginator]="true" [rows]="pageSize"
+        [showJumpToPageDropdown]="true" [showPageLinks]="false" [totalRecords]="totalRecordsCostAccounts">
         <ng-template let-cardItem pTemplate="gridItem">
           <div class="p-col-12 p-md-3 p-sm-12 card-item-container">
             <app-card-item [properties]="cardItem"

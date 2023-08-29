@@ -237,16 +237,7 @@ export class DomainLocalityComponent implements OnInit, OnDestroy {
       this.formLocality?.reset();
     }
     if (this.idOffice) {
-      const propertiesOfficeItem = localStorage.getItem('@pmo/propertiesCurrentOffice');
-      if (propertiesOfficeItem && (JSON.parse(propertiesOfficeItem)).id === this.idOffice) {
-        this.propertiesOffice = JSON.parse(propertiesOfficeItem);
-      } else {
-        const { success, data } = await this.officeSrv.GetById(this.idOffice);
-        if (success) {
-          this.propertiesOffice = data;
-          localStorage.setItem('@pmo/propertiesCurrentOffice', JSON.stringify(this.propertiesOffice));
-        }
-      }
+      this.propertiesOffice = await this.officeSrv.getCurrentOffice(this.idOffice);
     }
     this.idDomain = this.idDomain ||
       (this.propertiesLocality?.domain
@@ -507,11 +498,6 @@ export class DomainLocalityComponent implements OnInit, OnDestroy {
           queryParams: { id: this.idDomain, idOffice: this.idOffice }
         },
         ... await this.getBreadcrumbs(),
-        ...[{
-          key: 'filter',
-          routerLink: ['/config/filter-dataview'],
-          queryParams: { id: idFilter, entityName: 'localities', idOffice: this.idOffice }
-        }]
       ] :
       [
         {
@@ -536,11 +522,6 @@ export class DomainLocalityComponent implements OnInit, OnDestroy {
           queryParams: { id: this.idDomain, idOffice: this.idOffice }
         },
         ... await this.getBreadcrumbs(),
-        ...[{
-          key: 'filter',
-          routerLink: ['/config/filter-dataview'],
-          queryParams: { entityName: 'localities', idOffice: this.idOffice }
-        }]
       ]
     this.breadcrumbSrv.setBreadcrumbStorage(breadcrumb);
   }

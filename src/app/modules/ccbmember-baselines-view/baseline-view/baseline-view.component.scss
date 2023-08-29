@@ -30,7 +30,7 @@
     justify-content: flex-start;
     align-items: flex-end;
     flex: 1;
-    color: #EA5C5C;
+    color: v.$fontRed;
     font-weight: bold;
     .fa-times {
       font-size: 1.5rem;
@@ -107,7 +107,7 @@
           display: flex;
           flex-direction: column;
           flex: 1;
-          border-right: solid 1px #e5e5e4;
+          border-right: solid 1px v.$borderLightGrey;
           padding-right: 4em;
           .baseline-description-container {
             .description-text {
@@ -115,19 +115,19 @@
               flex-direction: column;
               padding-bottom: 1.5em;
               > label {
-                font-family: 'Montserrat Italic', 'Montserrat Regular', 'Montserrat', sans-serif;
+                font-family: v.$fontFamilyItalic;
                 font-weight: 400;
                 font-style: italic;
                 font-size: 0.9rem;
-                color: #939393;
+                color: v.$fontLabel;
               }
               > span {
                 padding-top: 5px;
-                font-family: 'Montserrat', sans-serif;
+                font-family: v.$fontFamilyRegular;
                 font-weight: 400;
                 font-style: normal;
                 font-size: 1rem;
-                color: #004660;
+                color: v.$fontInput;
               }
             }
             .description-texts-container {
@@ -145,30 +145,30 @@
               display: flex;
               flex-direction: row;
               align-items: center;
-              font-family: 'Montserrat Bold', 'Montserrat Regular', 'Montserrat', sans-serif;
+              font-family: v.$fontFamilyBold;
               font-weight: 700;
               font-style: normal;
               font-size: 0.8rem;
               .subtitle-box-current {
                 width: 2.5em;
                 height: 0.9em;
-                background-color: #B5B5B5;
+                background-color: v.$fontLabel;
                 border-radius: 3px;
                 margin-right: 0.5em;
               }
               .subtitle-box-proposed {
                 width: 2.5em;
                 height: 0.9em;
-                background-color: #0083BB;
+                background-color: v.$fontBlue;
                 border-radius: 3px;
                 margin-right: 0.5em;
               }
               .subtitle-label-current {
-                color: #B5B5B5;
+                color: v.$fontLabel;
                 margin-right: 1em;
               }
               .subtitle-label-proposed {
-                color: #0083BB;
+                color: v.$fontBlue;
               }
             }
             .charts {
@@ -184,11 +184,11 @@
                 min-height: 180px;
                 padding: 0.5em;
                 margin-right: 1.5em;
-                background-color: rgba(250, 250, 249, 1);
+                background-color: v.$bgWhite;
                 box-sizing: border-box;
                 border-width: 1px;
                 border-style: solid;
-                border-color: rgba(229, 229, 228, 1);
+                border-color: v.$borderCard;
                 border-radius: 5px;
                 box-shadow: none;
                 cursor: pointer;
@@ -205,7 +205,7 @@
                     font-weight: 700;
                     font-style: normal;
                     font-size: 1rem;
-                    color: #004660;
+                    color: v.$fontInput;
                     > i {
                       font-size: 1.5rem;
                     }
@@ -223,10 +223,10 @@
                     font-size: 0.8rem;
                   }
                   .negative-variation {
-                    color: #EA5C5C;
+                    color: v.$fontRed;
                   }
                   .positive-variation {
-                    color: #44B39B;
+                    color: v.$bgButtonGreen;
                   }
                 }
                 .content-card {
@@ -244,7 +244,7 @@
                       font-weight: 700;
                       font-style: normal;
                       font-size: 12px;
-                      color: #B5B5B5;
+                      color: v.$fontLabel;
                     }
                     .date-labels {
                       display: flex;
@@ -256,7 +256,7 @@
                         font-weight: 700;
                         font-style: normal;
                         font-size: 12px;
-                        color: #B5B5B5;
+                        color: v.$fontLabel;
                       }
                     }
                     > div {
@@ -271,13 +271,13 @@
                       font-weight: 700;
                       font-style: normal;
                       font-size: 0.8rem;
-                      color: #FFFFFF;
+                      color: v.$bgWhite;
                     }
                   }
                   .proposed {
                     margin-top: 0.5em;
                     label {
-                      color: #0083BB !important;
+                      color: v.$fontBlue !important;
                     }
                   }
                   .content-card-item-schedule {
@@ -290,11 +290,11 @@
           .details-panels {
             margin-top: 1em;
             padding: 0.5em 0.5em 2em 0.5em;
-            background-color: #fafaf9;
+            background-color: v.$bgCardItem;
             box-sizing: border-box;
             border-width: 1px;
             border-style: solid;
-            border-color: #e5e5e4;
+            border-color: v.$borderLightGrey;
             border-radius: 5px;
             box-shadow: none;
             .details-panel-header {
@@ -308,24 +308,24 @@
                 font-weight: 400;
                 font-style: normal;
                 font-size: 1rem;
-                color: #004660;
+                color: v.$fontInput;
                 text-transform: uppercase;
               }
               > i {
                 margin-right: 0.5em;
                 font-size: 1.5rem;
-                color: rgba(181, 181, 181, 1);
+                color: v.$iconLightGrey;
                 cursor: pointer;
               }
             }
             .card-list-item {
               margin-bottom: 0.5em;
               .p-card {
-                background-color: rgba(250, 250, 249, 1);
+                background-color:  v.$bgCard;
                 box-sizing: border-box;
                 border-width: 1px;
                 border-style: solid;
-                border-color: rgba(229, 229, 228, 1);
+                border-color: v.$borderCard;
                 border-radius: 0;
                 box-shadow: none;
                 border-left: none;
@@ -355,7 +355,7 @@
                   flex-direction: row;
                   align-items: center;
                   justify-content: space-between;
-                  color: #004660;
+                  color: v.$fontTitle;
                   font-size: 15px;
                   font-family: v.$fontFamily;
                   > span {
@@ -377,10 +377,10 @@
                     }
                   }
                   .negative-variation {
-                    color: #EA5C5C;
+                    color: v.$fontRed;
                   }
                   .positive-variation {
-                    color: #44B39B;
+                    color: v.$bgButtonGreen;
                   }
               }
               .item-values.header {
@@ -401,11 +401,11 @@
                   font-family: v.$fontFamily;
                   font-weight: 400;
                   font-size: 15px;
-                  color: #004660;
+                  color: v.$fontTitle;
                 }
                 .item-description.header {
                   margin-left: 0;
-                  color: #004660;
+                  color: v.$fontTitle;
                   font-weight: 700;
                   font-size: 15px;
                   font-family: v.$fontFamilyBold;
@@ -425,7 +425,7 @@
               }
             }
             .card-list-item.header .p-card {
-              background-color: #f5f5f5;
+              background-color: v.$bgWhiteLight;
             }
           }
         }
@@ -440,12 +440,12 @@
               font-weight: 500;
               font-style: normal;
               font-size: 1rem;
-              color: #004660;
+              color: v.$fontTitle;
             }
             .evaluation-content {
               padding: 1em;
               margin-top: 0.5em;
-              background-color: rgba(255, 255, 255, 1);
+              background-color: v.$bgWhite;
               border-radius: 4px;
               display: flex;
               flex-direction: column;
@@ -454,22 +454,22 @@
                 font-weight: 400;
                 font-style: italic;
                 font-size: 14px;
-                color: #939393;
+                color: v.$fontLabel;
                 padding-bottom: 5px;
               }
               > textarea {
-                background-color: rgba(251, 251, 251, 1);
+                background-color: v.$bgWhite;
                 box-sizing: border-box;
                 border-width: 1px;
                 border-style: solid;
-                border-color: rgba(68, 179, 155, 1);
+                border-color: v.$bgButtonGreenHover;
                 border-radius: 3px;
                 box-shadow: none;
                 font-family: v.$fontFamily;
                 font-weight: 400;
                 font-style: normal;
                 font-size: 12px;
-                color: #9D9D9D;
+                color: v.$fontLabel;
               }
               .actions-buttons {
                 padding: 0.5em 0;
@@ -487,27 +487,27 @@
                   box-shadow: none;
                   background-color: transparent;
                   .p-button-label {
-                    font-family: 'Montserrat SemiBold', 'Montserrat Regular', 'Montserrat', sans-serif;
+                    font-family: v.$fontFamilySemiBold;
                     font-weight: 600;
                     font-style: normal;
                     font-size: 14px;
                   }
                 }
                 .approve {
-                  border-color: rgba(68, 179, 155, 1);
-                  color: #44B39B;
+                  border-color: v.$bgButtonGreenHover;
+                  color: v.$bgButtonGreen;
                 }
                 .approve:hover {
-                  background-color: #44B39B;
-                  color: #FFFFFF;
+                  background-color: v.$bgButtonGreen;
+                  color: v.$bgWhite;
                 }
                 .reject {
-                  border-color: rgba(234, 92, 92, 1);
-                  color: #EA5C5C;
+                  border-color: v.$iconRed;
+                  color: v.$fontRed;
                 }
                 .reject:hover {
-                  background-color: #EA5C5C;
-                  color: #FFFFFF;
+                  background-color: v.$fontRed;
+                  color:  v.$bgWhite;
                 }
               }
             }
@@ -520,33 +520,33 @@
               justify-content: space-between;
               padding-bottom: 1em;
               .title {
-                font-family: 'Montserrat Medium', 'Montserrat Regular', 'Montserrat', sans-serif;
+                font-family: v.$fontFamilyMedium;
                 font-weight: 500;
                 font-style: normal;
                 font-size: 1rem;
-                color: #004660;
+                color: v.$fontTitle;
               }
               .baseline-status {
-                font-family: 'Montserrat Bold', 'Montserrat Regular', 'Montserrat', sans-serif;
+                font-family: v.$fontFamilyBold;
                 font-weight: 700;
                 font-style: normal;
-                color: gray;
+                color: v.$fontLabel;
               }
               .rejected {
-                color: #EA5C5C;
+                color: v.$fontRed;
               }
               .approved {
-                color: #44B39B;
+                color: v.$bgButtonGreen;
               }
             }
             .card-list-item {
               margin-bottom: 0.5em;
               .p-card {
-                background-color: rgba(250, 250, 249, 1);
+                background-color: v.$bgWhite;
                 box-sizing: border-box;
                 border-width: 1px;
                 border-style: solid;
-                border-color: rgba(229, 229, 228, 1);
+                border-color: v.$borderCard;
                 border-radius: 5px;
                 box-shadow: none;
                 .p-card-body {
@@ -644,7 +644,7 @@
                       flex-direction: column;
                       align-items: flex-start;
                       justify-content: flex-start;
-                      color: #004660;
+                      color: v.$fontTitle;
                       font-size: 15px;
                       font-family: v.$fontFamily;
                       > span {
@@ -674,10 +674,10 @@
                       }
                     }
                     .negative-variation {
-                      color: #EA5C5C;
+                      color: v.$fontRed;
                     }
                     .positive-variation {
-                      color: #44B39B;
+                      color: v.$bgButtonGreen;
                     }
 
                   }
@@ -711,7 +711,7 @@
   .p-dialog {
     .p-dialog-header {
       padding: 1em;
-      background-color: rgba(245, 245, 243, 1);
+      background-color: v.$bgGray;
       font-weight: bold;
       .title {
         display: flex;
@@ -719,7 +719,7 @@
         align-items: flex-end;
         > i {
           font-size: 1.5rem;
-          color: orange;
+          color: v.$iconAlert;
         }
         > span {
           margin-left: 1em;
@@ -759,27 +759,27 @@
           box-shadow: none;
           background-color: transparent;
           .p-button-label {
-            font-family: 'Montserrat SemiBold', 'Montserrat Regular', 'Montserrat', sans-serif;
+            font-family: v.$fontFamilySemiBold;
             font-weight: 600;
             font-style: normal;
             font-size: 14px;
           }
         }
         .yes {
-          border-color: rgba(68, 179, 155, 1);
-          color: #44B39B;
+          border-color: v.$bgButtonGreenHover;
+          color: v.$bgButtonGreen;
         }
         .yes:hover {
-          background-color: #44B39B;
-          color: #FFFFFF;
+          background-color: v.$bgButtonGreen;
+          color: v.$fontWhite;
         }
         .no {
-          border-color: rgba(234, 92, 92, 1);
-          color: #EA5C5C;
+          border-color: v.$fontRed;
+          color: v.$fontRed;
         }
         .no:hover {
-          background-color: #EA5C5C;
-          color: #FFFFFF;
+          background-color: v.$fontRed;
+          color: v.$fontWhite;
         }
       }
       .buttons-container-responsive {

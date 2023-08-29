@@ -1,0 +1,30 @@
+<div class="app-cost-account-model" [class.mobile]="responsive">
+  <div class="header-container" [class.mobile]="responsive">
+    <div class="app-content-header" [class.mobile]="responsive">
+      <span *ngIf="idModel">{{ 'costAccountModel'| translate }}</span>
+      <span *ngIf="!idModel">{{ 'new' | translate }} {{ 'costAccountModel' | translate }}</span>
+    </div>
+  </div>
+  <div class="card-properties">
+    <app-card [properties]="cardProperties" *ngIf="cardProperties" class="mt-0 inputs-float-label">
+      <div class="loading-container" *ngIf="cardProperties.isLoading">
+        <app-card-loading [isCardLoading]="cardProperties.isLoading"></app-card-loading>
+      </div>
+      <div class="cost-account-model-addicional-properties add-actions" *ngIf="editPermission && !cardProperties.isLoading">
+        <p-menu #menuAddProperty [popup]="true" [model]="menuModelProperties"></p-menu>
+        <p-button [label]="'addProperty' | translate" icon="fa fa-plus" iconPos="right" class="button-add-property"
+          (click)="menuAddProperty.toggle($event)">
+        </p-button>
+      </div>
+      <div class="cost-account-model-addicional-properties" *ngIf="!cardProperties.isLoading">
+        <div *ngFor="let property of modelProperties" [class.addicional-properties-container]="property.isCollapsed"
+          [class.open]="!property.isCollapsed">
+          <app-property-model class="addicional-properties" [property]="property" [class.open]="!property.isCollapsed"
+            (delete)="deleteProperty($event)" (changed)="propertyChanged($event);">
+          </app-property-model>
+        </div>
+      </div>
+    </app-card>
+  </div>
+  <app-save-button (save)="handleOnSubmit()"></app-save-button>
+</div>

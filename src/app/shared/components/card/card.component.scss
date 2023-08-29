@@ -311,7 +311,8 @@
       width: 100%;
       flex-direction: column;
       .dataview-filters-text {
-        width: 5rem;
+        // width: 5rem;
+        margin-top: 0.5em;
         margin-right: 0;
         .p-inputtext {
           width: 100% !important;

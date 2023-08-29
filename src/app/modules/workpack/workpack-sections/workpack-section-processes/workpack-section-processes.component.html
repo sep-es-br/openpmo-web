@@ -1,9 +1,8 @@
 <div class="card-processes" *ngIf="sectionProcess">
   <app-card [properties]="sectionProcess.cardSection" [class.panel-tab-view]="showTabview"
-  [loading]="sectionProcess.cardSection.isLoading"
-    (searchText)="handleSearchText($event)" (editFilter)="handleEditFilterEntity($event, 'processes')"
-    (newFilter)="handleNewFilterEntity('processes')" (selectedFilter)="handleSelectedFilterProcess($event)"
-    (createNewElement)="handleCreateNewProcess()">
+    [loading]="sectionProcess.cardSection.isLoading" (searchText)="handleSearchText($event)"
+    (editFilter)="handleEditFilterEntity($event, 'processes')" (newFilter)="handleNewFilterEntity('processes')"
+    (selectedFilter)="handleSelectedFilterProcess($event)" (createNewElement)="handleCreateNewProcess()">
     <div class="process-list-container">
       <div class="loading-container" *ngIf="sectionProcess.cardSection.isLoading">
         <app-card-loading [isCardLoading]="sectionProcess.cardSection.isLoading"></app-card-loading>

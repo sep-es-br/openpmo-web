@@ -82,14 +82,18 @@ export class StakeholderOrganizationComponent implements OnInit {
 
   async ngOnInit() {
     await this.loadStakeholder();
-    const propertyNameWorkpackModel = this.workpack.model.properties.find(p => p.name === 'name' && p.session === 'PROPERTIES');
+    const propertyNameWorkpackModel = this.workpack.model.properties.find(p => p.name === 'name');
     const propertyNameWorkpack = this.workpack.properties.find(p => p.idPropertyModel === propertyNameWorkpackModel.id);
     const workpackName = propertyNameWorkpack.value as string;
-    const propertyFullNameWorkpackModel = this.workpack.model.properties.find(p => p.name === 'fullName' && p.session === 'PROPERTIES');
+    const propertyFullNameWorkpackModel = this.workpack.model.properties.find(p => p.name === 'fullName');
     const propertyFullNameWorkpack = this.workpack.properties.find(p => p.idPropertyModel === propertyFullNameWorkpackModel.id);
     const workpackFullName = propertyFullNameWorkpack.value as string;
+    let breadcrumbItems = this.breadcrumbSrv.get;
+    if (!breadcrumbItems || breadcrumbItems.length === 0) {
+      breadcrumbItems = await this.breadcrumbSrv.loadWorkpackBreadcrumbs(this.idWorkpack, this.idPlan)
+    }
     this.breadcrumbSrv.setMenu([
-      ... await this.getBreadcrumbs(this.idWorkpack),
+      ...breadcrumbItems,
       {
         key: 'stakeholder',
         routerLink: ['/stakeholder/organization'],
@@ -143,31 +147,6 @@ export class StakeholderOrganizationComponent implements OnInit {
     }
   }
 
-  async getBreadcrumbs(idWorkpack: number) {
-    const { success, data } = await this.breadcrumbSrv.getBreadcrumbWorkpack(idWorkpack,  {'id-plan': this.idPlan});
-    return success
-      ? data.map(p => ({
-            key: !p.modelName ? p.type.toLowerCase() : p.modelName,
-            info: p.name,
-            tooltip: p.fullName,
-            routerLink: this.getRouterLinkFromType(p.type),
-            queryParams: { id: p.id, idWorkpackModelLinked: p.idWorkpackModelLinked, idPlan: this.idPlan },
-            modelName: p.modelName
-          }))
-      : [];
-  }
-
-  getRouterLinkFromType(type: string): string[] {
-    switch (type) {
-      case 'office':
-        return [ '/offices', 'office' ];
-      case 'plan':
-        return [ 'plan' ];
-      default:
-        return [ '/workpack' ];
-    }
-  }
-
   async loadOrganizationStakeholder() {
     const result = await this.organizationSrv.GetById(this.stakeholder.organization.id);
     if (result.success) {
@@ -177,9 +156,9 @@ export class StakeholderOrganizationComponent implements OnInit {
 
   async loadOrganizationsList() {
     if (this.workpack) {
-      const plan = await this.planSrv.GetById(this.workpack.plan.id);
-      if (plan.success) {
-        const result = await this.organizationSrv.GetAll({ 'id-office': plan.data.idOffice });
+      const plan = await this.planSrv.getCurrentPlan(this.workpack.plan.id);
+      if (plan) {
+        const result = await this.organizationSrv.GetAll({ 'id-office': plan.idOffice });
         if (result.success) {
           this.organizationsOffice = result.data;
           this.organizationListOptions = this.organizationsOffice.map(org => ({ label: org.name, value: org.id.toString() }));

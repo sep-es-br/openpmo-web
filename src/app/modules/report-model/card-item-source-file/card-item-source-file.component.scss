@@ -8,7 +8,7 @@
     height: 100%;
     max-width: 280px;
     width: 280px;
-    border: 1px solid #D4D4D4;
+    border: 1px solid v.$borderCard;
     box-shadow: none;
     display: flex;
     .display-mode-grid, .display-mode-list {
@@ -21,12 +21,12 @@
         cursor: pointer;
         .main-status {
           font-size: 1.1rem;
-          color: #44b39b;
+          color: v.$bgButtonGreen;
           padding: 0.5rem;
         }
         .fa-trash {
           font-size: 1.1rem;
-          color: #939393;
+          color: v.$iconGrey;
         }
       }
     }
@@ -47,8 +47,7 @@
       .p-menu-overlay .p-menu-list .p-menuitem .p-menuitem-link {
         .p-menuitem-icon {
           font-size: 0.8rem;
-          color: #939393;
-        }
+          color: v.$iconGrey        }
         .p-menuitem-icon.main {
           font-size: 0.6rem;
         }
@@ -58,8 +57,7 @@
         .p-menuitem-text {
           font-size: 0.9rem;
           font-family: v.$fontFamilyMedium;
-          color: #939393;
-        }
+          color: v.$iconGrey        }
       }
     }
     .card-item-header .p-button {
@@ -72,8 +70,7 @@
       }
       .p-button-icon {
         font-size: 0.9rem;
-        color: #939393;
-      }
+        color: v.$iconGrey      }
     }
 
     .display-mode-list {
@@ -121,13 +118,12 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      color: #888e96;
+      color: v.$iconGrey;
       padding: 0 !important;
-
       
       .icon-new {
         font-size: 3rem;
-        color: rgba(147, 147, 147, 0.5);
+        color: v.$iconLightGrey;
       }
       .card-item-name {
         font-size: 0.9rem;
@@ -153,7 +149,7 @@
       justify-content: flex-end;
       padding: 0.5em;
       .card-item-id {
-        color: #888e96;
+        color: v.$fontGray;
         font-size: 0.6rem;
         font-family: v.$fontFamilyMedium;
       }
@@ -187,7 +183,7 @@
     height: 100%;
     max-width: 280px;
     width: 280px;
-    border: 1px solid #D4D4D4;
+    border: 1px solid v.$borderCard;
     box-shadow: none;
     .p-card-body {
       padding: 0;
@@ -200,13 +196,11 @@
           .p-menuitem .p-menuitem-link {
             .p-menuitem-icon {
               font-size: 0.8rem;
-              color: #939393;
-            }
+              color: v.$iconGrey            }
             .p-menuitem-text {
               font-size: 0.9rem;
               font-family: v.$fontFamilyMedium;
-              color: #939393;
-            }
+              color: v.$iconGrey            }
           }
         }
       }
@@ -233,7 +227,7 @@
             border: none;
             font-size: 3rem;
             padding: 0;
-            color: #93939380;
+            color: v.$iconGrey;
             margin: 0;
             text-decoration: none;
             &:focus {

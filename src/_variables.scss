@@ -2,16 +2,23 @@
 $fontTitle: #004660;
 $fontLabel: #939393;
 $fontDark: #333333;
-$fontLogout: #EA5C5C;
+$fontDarkLight: #4a4a4a;
+$fontRed: #EA5C5C;
+$fontErrorMessage: #f44336;
 $fontInput: #004660;
+$fontWhite: #ffffff;
 $fontBreadcrumb: #13546C;
+$fontBlue: #0083BB;
 $fontBreadcrumbMobile: #888E96;
+$fontGray: #888E96;
 $fontFamilySemiBold: 'Montserrat SemiBold', 'Montserrat Regular', 'Montserrat', sans-serif;
 $fontFamilyBold: 'Montserrat Bold', 'Montserrat Regular', 'Montserrat', sans-serif;
 $fontFamilyMedium: 'Montserrat Medium', 'Montserrat Regular', 'Montserrat', sans-serif;
 $fontFamilyRegular: 'Montserrat Regular', 'Montserrat', sans-serif;
 $fontFamilyItalic: 'Montserrat Italic', 'Montserrat', sans-serif;
 $fontFamily: 'Montserrat', sans-serif;
+$fontApproved: #44B39B;
+$fontReject: #EA5C5C;
 
 /* BACKGROUND */
 $bg: #eaeae8;
@@ -22,9 +29,25 @@ $bgMenuAdmin: rgba(167, 7, 75, 1);
 $bgMenuUser: rgba(2, 60, 85, 1);
 $bgButtonGreen: #44B39B;
 $bgButtonGreenHover: rgba(68, 179, 155, 0.9);
+$bgButtonSubmit: #44B39B;
+$bgButtonSubmitHover: rgba(68, 179, 155, 0.9);
+$bgButtonDraft: rgba(21, 147, 201, 0.75);
+$bgButtonDraftHover: rgba(21, 147, 201, 0.6);
+$bgButtonCancel: rgba(234, 92, 92, 1);
+$bgButtonCancelHover: rgba(234, 92, 92, 0.8);
+$bgButtonGray: rgba(164, 164, 164, 1);
 $borderInput: #b6c8cd;
 $borderInputHover: #5c6163;
+$borderCard: rgba(229, 229, 228, 1);
 $bgBreadcrumb: #d0d8d9;
+$bgWhite: #ffffff;
+$bgWhiteLight: #f5f5f5;
+$bgDark: #ea5c5c17;
+$borderRadioButton: #868181;
+$bgRadioButton: #ffffff;
+$borderCheckBox: #3b3636;
+$borderCard: #D4D4D4;
+$bgGray: rgba(245, 245, 243, 1);
 
 /* BORDER */
 $borderLightGrey: #e5e5e4;
@@ -36,3 +59,7 @@ $iconLightGrey: #d4d4d4;
 $iconLightBlue: #70a7bf;
 $iconRed: #EA5C5C;
 $iconDarkGrey: #373435;
+$iconAlert: orange;
+
+$loadingColorDarkBlue: rgba(0, 70, 96, 1);
+$loadingColorBlue: #489FB5;

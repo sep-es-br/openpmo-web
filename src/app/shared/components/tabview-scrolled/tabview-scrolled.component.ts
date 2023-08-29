@@ -20,7 +20,7 @@ export interface ITabViewScrolled {
 })
 export class TabviewScrolledComponent implements OnChanges, OnDestroy {
 
-  @Output() selectedTabChange = new EventEmitter<{ tabs: ITabViewScrolled; setStorage: boolean }>();
+  @Output() selectedTabChange = new EventEmitter<ITabViewScrolled>();
   @Input() tabs: ITabViewScrolled[] = [];
   @Input() selectedTab: ITabViewScrolled;
   @Input() idWorkpack: number;
@@ -81,11 +81,12 @@ export class TabviewScrolledComponent implements OnChanges, OnDestroy {
   }
 
   ngOnChanges(changes: SimpleChanges) {
+
     if (changes.tabs && changes.tabs.currentValue) {
       setTimeout(() => {
         if (!this.selectedTab || !this.tabs.some(tab => tab.key === this.selectedTab.key)) {
           const index = this.existsWorkpackTabStorage() ? this.findIndexTabStorage() : 0;
-          this.selectTab(this.tabs[index], this.existsWorkpackTabStorage() && index !== 0);
+          this.selectTab(this.tabs[index]);
         }
         this.prepareScrolls();
         if (!this.tabs.length) {
@@ -95,18 +96,18 @@ export class TabviewScrolledComponent implements OnChanges, OnDestroy {
     }
   }
 
-  selectTab(item: ITabViewScrolled, setStorage: boolean) {
+  selectTab(item: ITabViewScrolled) {
     if (this.pendingChanges) {
       this.confirmationSrv.confirm({
         message: this.translateSrv.instant('messages.confirmClearPendingChanges'),
         key: 'clearPendingChangesConfirm',
         acceptLabel: this.translateSrv.instant('yes'),
         rejectLabel: this.translateSrv.instant('no'),
-        accept: async() => {
+        accept: async () => {
           this.selectedTab = item;
           this.tabBody = `${item.key}`;
           this.workpackSrv.nextPendingChanges(false);
-          this.selectedTabChange.emit({ tabs: this.selectedTab, setStorage });
+          this.selectedTabChange.emit(this.selectedTab);
           this.saveButtonSrv.nextShowSaveButton(false);
         },
         reject: () => {
@@ -115,7 +116,7 @@ export class TabviewScrolledComponent implements OnChanges, OnDestroy {
     } else {
       this.selectedTab = item;
       this.tabBody = `${item.key}`;
-      this.selectedTabChange.emit({ tabs: this.selectedTab, setStorage });
+      this.selectedTabChange.emit(this.selectedTab);
     }
   }
 

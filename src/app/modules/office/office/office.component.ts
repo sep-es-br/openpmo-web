@@ -26,6 +26,7 @@ import { AuthService } from 'src/app/shared/services/auth.service';
 import { OfficePermissionService } from 'src/app/shared/services/office-permission.service';
 import { MenuService } from 'src/app/shared/services/menu.service';
 import { ConfigDataViewService } from 'src/app/shared/services/config-dataview.service';
+import { PersonService } from 'src/app/shared/services/person.service';
 
 @Component({
   selector: 'app-office',
@@ -85,7 +86,8 @@ export class OfficeComponent implements OnDestroy {
     private messageSrv: MessageService,
     private menuSrv: MenuService,
     private filterSrv: FilterDataviewService,
-    private configDataViewSrv: ConfigDataViewService
+    private configDataViewSrv: ConfigDataViewService,
+    private personSrv: PersonService
   ) {
     this.configDataViewSrv.observableCollapsePanelsStatus.pipe(takeUntil(this.$destroy)).subscribe(collapsePanelStatus => {
       this.collapsePanelsStatus = collapsePanelStatus === 'collapse' ? true : false;
@@ -109,6 +111,7 @@ export class OfficeComponent implements OnDestroy {
       if (this.idOffice) {
         this.isLoading = true;
         this.cardProperties.isLoading = true;
+        this.setWorkOffice();
       }
       this.editPermission = await this.officePermissionSrv.getPermissions(this.idOffice);
       await this.load();
@@ -137,6 +140,15 @@ export class OfficeComponent implements OnDestroy {
     return (isNaN(this.idOffice) && this.formOffice.get('fullName').pristine);
   }
 
+  setWorkOffice() {
+    this.personSrv.setPersonWorkLocal({
+      idOffice: this.idOffice,
+      idPlan: null,
+      idWorkpack: null,
+      idWorkpackModelLinked: null
+    });
+  }
+
   async load() {
     this.isLoading = true;
     this.isUserAdmin = await this.authSrv.isUserAdmin();
@@ -153,7 +165,7 @@ export class OfficeComponent implements OnDestroy {
   async loadPropertiesOffice() {
     if (this.idOffice) {
       const { data, success } = await this.officeSrv.GetById(this.idOffice);
-      if (success) {
+      if (success && data) {
         this.propertiesOffice = data;
         localStorage.setItem('@pmo/propertiesCurrentOffice', JSON.stringify(this.propertiesOffice));
         this.formOffice.reset({ name: data.name, fullName: data.fullName });
@@ -161,6 +173,9 @@ export class OfficeComponent implements OnDestroy {
           this.formOffice.disable();
         }
         this.cardProperties.isLoading = false;
+      } else {
+        this.router.navigate(['offices']);
+        return;
       }
     }
     this.breadcrumbSrv.setMenu([]);
@@ -294,6 +309,12 @@ export class OfficeComponent implements OnDestroy {
       });
       if (!isPut) {
         this.loadPlans();
+        this.personSrv.setPersonWorkLocal({
+          idOffice: this.idOffice,
+          idPlan: null,
+          idWorkpack: null,
+          idWorkpackModelLinked: null
+        });
         this.router.navigate([], { queryParams: { id: this.idOffice } });
       }
       this.menuSrv.reloadMenuOffice();
@@ -394,9 +415,6 @@ export class OfficeComponent implements OnDestroy {
       queryParams: { id: this.idOffice },
       info: this.propertiesOffice?.name,
       tooltip: this.propertiesOffice?.fullName
-    }, {
-      key: 'filter',
-      routerLink: ['/filter-dataview']
     }]);
   }
 

@@ -145,5 +145,8 @@
       </div>
     </app-card>
   </div>
+  <div class="id-container" *ngIf="idProcess && cardProcessProperties">
+    <span>{{idProcess}}</span>
+  </div>
 </div>
 <app-save-button #saveButton (save)="saveProcess()"></app-save-button>

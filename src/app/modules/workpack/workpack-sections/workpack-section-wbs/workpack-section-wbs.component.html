@@ -1,0 +1,229 @@
+<div class="app-wbs">
+  <div class="card-loading" [ngStyle]="{'top': topPosLoading + 'px'}">
+    <app-card-loading [isCardLoading]="isLoading"></app-card-loading>
+  </div>
+  <p-tree [value]="wbsTree" (onNodeExpand)="nodeExpand($event)" [loading]="isLoading" [emptyMessage]="null">
+    <ng-template let-node styleClass="teste" pTemplate="default">
+      <!-- DATA -->
+      <div class="container-custom-tree container-workpackmodel"
+        [class.custom-padding]="node?.workpackModelType === typeWorkpackModelEnum.MilestoneModel"
+        *ngIf="node.workpacks; else workpackModels">
+        <div class="tree-label">{{ node.workpackModelName }}</div>
+        <div class="container-milestone" *ngIf="node?.workpackModelType === typeWorkpackModelEnum.MilestoneModel">
+          <div class="milestone-column">Planejado (linha de base)</div>
+          <div class="milestone-column">Estimado/ Concluído</div>
+          <div class="milestone-column">Status</div>
+        </div>
+      </div>
+
+      <!-- CHILDREN -->
+      <ng-template #workpackModels>
+        <div class="container-custom-tree container-workpack">
+          <div class="tree-label link" (click)="navigateToWorkpack(node.idWorkpack)">{{ node.workpackName }}</div>
+          <div class="container-properties" [class.deliverable]="node?.workpackType === typeWorkpackEnum.Deliverable">
+            <ng-container *ngIf="node?.workpackType !== typeWorkpackEnum.Deliverable; else schedule">
+              <ng-container *ngIf="node?.workpackType !== typeWorkpackEnum.Milestone; else milestoneData"
+                [ngTemplateOutlet]="rightContent" [ngTemplateOutletContext]="{ node: node }">
+              </ng-container>
+            </ng-container>
+
+            <ng-template #milestoneData>
+              <div class="container-milestone">
+                <div class="milestone-column">{{ node?.milestoneDate }}</div>
+                <div class="milestone-column">{{ node?.expirationDate }}</div>
+                <div class="milestone-column">
+                  <div class="icons-container">
+                    <i [ngClass]=" [milestoneStatusEnum.CONCLUDED, milestoneStatusEnum.LATE_CONCLUDED].includes(milestoneStatusEnum[node?.milestoneStatus]) ?
+                        [ 'app-icon', 'flag-check', 'grey-icon'] : ['app-icon', 'flag-unchecked', 'grey-icon']"
+                      [ngStyle]="{ fontSize: '1.2rem' }"
+                      [class.on-time]="milestoneStatusEnum[node?.milestoneStatus] === milestoneStatusEnum.ON_TIME && !node?.canceled"
+                      [class.late]="milestoneStatusEnum[node?.milestoneStatus] === milestoneStatusEnum.LATE"
+                      [class.concluded]="milestoneStatusEnum[node?.milestoneStatus] === milestoneStatusEnum.CONCLUDED && !node?.canceled"
+                      [class.late-concluded]="milestoneStatusEnum[node?.milestoneStatus] === milestoneStatusEnum.LATE_CONCLUDED && !node?.canceled"></i>
+                    <i [ngClass]="['app-icon', 'link-to', 'grey-icon', 'linked']" *ngIf="!!node.linked"></i>
+                    <i [ngClass]="['app-icon', 'sharing', 'grey-icon', 'linked']"
+                      *ngIf="!!node.shared && !node.linked"></i>
+                  </div>
+                </div>
+              </div>
+            </ng-template>
+            <ng-template #schedule>
+              <div class="header-values-cost-account" *ngIf="node?.properties?.progressBars">
+                <div class="progress-bar-cost-container" (mouseenter)="progressBarPanel.show($event)"
+                  (mouseleave)="progressBarPanel.hide()" *ngFor="let progressBar of node.properties.progressBars">
+                  <app-progress-bar [total]="progressBar.total" [progress]="progressBar.progress"
+                    [labelTotal]="progressBar.labelTotal" [labelProgress]="progressBar.labelProgress"
+                    [valueUnit]="progressBar.valueUnit" [baselineTotal]="progressBar.baselinePlanned"
+                    [color]="progressBar.color" [startDateBaseline]="progressBar.startDateBaseline"
+                    [endDateBaseline]="progressBar.endDateBaseline" [startDateTotal]="progressBar.startDateTotal"
+                    [endDateTotal]="progressBar.endDateTotal" [barHeight]="progressBar.barHeight"
+                    [disableLabels]="true">
+                  </app-progress-bar>
+                  <p-overlayPanel #progressBarPanel class="progressbar-overlay-panel">
+                    <app-progress-bar [total]="progressBar.total" [progress]="progressBar.progress"
+                      [labelTotal]="progressBar.labelTotal" [labelProgress]="progressBar.labelProgress"
+                      [valueUnit]="progressBar.valueUnit" [baselineTotal]="progressBar.baselinePlanned"
+                      [color]="progressBar.color" [startDateBaseline]="progressBar.startDateBaseline"
+                      [endDateBaseline]="progressBar.endDateBaseline" [startDateTotal]="progressBar.startDateTotal"
+                      [endDateTotal]="progressBar.endDateTotal" [barHeight]="progressBar.barHeight">
+                    </app-progress-bar>
+                  </p-overlayPanel>
+                </div>
+              </div>
+            </ng-template>
+          </div>
+
+        </div>
+      </ng-template>
+    </ng-template>
+  </p-tree>
+
+  <ng-template #rightContent let-properties="node">
+    <div class="right-container">
+      <div class="dashboard-items-container">
+        <div class="status-container" *ngIf="(!properties?.endManagementDate || properties?.endManagementDate === null) &&
+                !properties?.completed && properties?.dashboard?.risk?.total > 0; else statusEmpty">
+          <i class="app-icon risk" [ngStyle]="{ fontSize: '1.2rem' }"
+            [class.risk-red]="properties?.properties?.riskImportance === 'high'"
+            [class.risk-yellow]="properties?.properties?.riskImportance === 'low'"
+            [class.risk-orange]="properties?.properties?.riskImportance === 'medium'"
+            (mouseenter)="riskPanel.show($event)" (mouseleave)="riskPanel.hide()"></i>
+        </div>
+        <div class="status-container"
+          *ngIf="(!!properties?.endManagementDate && properties?.endManagementDate !== null) || !!properties?.completed">
+          <i class="far fa-stop-circle"
+            *ngIf="!!properties?.endManagementDate && properties?.endManagementDate !== null"
+            [pTooltip]="'managementEnded'|translate"></i>
+          <i class="far fa-check-square" *ngIf="!!properties?.completed" [pTooltip]="label | translate"></i>
+        </div>
+        <ng-template #statusEmpty>
+          <div class="status-empty"></div>
+        </ng-template>
+        <p-overlayPanel #riskPanel class="risk-overlay-panel">
+          <div class="risk-panel-content">
+            <div class="title">
+              <span class="total">{{properties?.dashboard?.risk?.total}}</span>
+              <span class="text">{{'risksRequireAttention'|translate}}</span>
+            </div>
+            <div class="risks-container">
+              <div class="risk-importance-item" *ngIf="properties?.dashboard?.risk?.high > 0">
+                <i class="app-icon risk risk-red" [ngStyle]="{ fontSize: '1.5rem' }"></i>
+                <span>{{properties?.dashboard?.risk?.high}}</span>
+                <label>{{'high'|translate}}</label>
+              </div>
+              <div class="risk-importance-item" *ngIf="properties?.dashboard?.risk?.medium > 0">
+                <i class="app-icon risk risk-orange" [ngStyle]="{ fontSize: '1.5rem' }"></i>
+                <span>{{properties?.dashboard?.risk?.medium}}</span>
+                <label>{{'medium'|translate}}</label>
+              </div>
+              <div class="risk-importance-item" *ngIf="properties?.dashboard?.risk?.low > 0">
+                <i class="app-icon risk risk-yellow" [ngStyle]="{ fontSize: '1.5rem' }"></i>
+                <span>{{properties?.dashboard?.risk?.low}}</span>
+                <label>{{'low'|translate}}</label>
+              </div>
+            </div>
+          </div>
+        </p-overlayPanel>
+        <div class="milestones-progressbar-container">
+          <div class="milestones-progressbar" *ngIf="properties?.dashboard?.milestone?.quantity > 0"
+            (mouseenter)="milestonePanel.show($event)" (mouseleave)="milestonePanel.hide()">
+            <div class="ontime"
+              [ngStyle]="{ width: ((properties.dashboard?.milestone?.onTime / (properties.dashboard?.milestone?.quantity))*100)  + '%'}">
+            </div>
+            <div class="late"
+              [ngStyle]="{ width: ((properties.dashboard?.milestone?.late / (properties.dashboard?.milestone?.quantity))*100) + '%'} ">
+            </div>
+            <div class="concluded"
+              [ngStyle]="{ width: ((properties.dashboard?.milestone?.concluded / (properties.dashboard?.milestone?.quantity))*100)  + '%'}">
+            </div>
+            <div class="concluded-late"
+              [ngStyle]="{ width: ((properties.dashboard?.milestone?.lateConcluded / (properties.dashboard?.milestone?.quantity))*100)  + '%'}">
+            </div>
+          </div>
+        </div>
+        <p-overlayPanel #milestonePanel class="milestones-overlay-panel">
+          <div class="milestone-panel-content">
+            <app-doughnut-chart [data]="properties?.properties?.dashboardMilestonesData"
+              [middleText]="properties?.dashboard?.milestone?.quantity"
+              [midleTextBottom]="'milestonesLabelChart' | translate">
+            </app-doughnut-chart>
+          </div>
+        </p-overlayPanel>
+        <div class="indexes">
+          <span class="index" [ngStyle]="{color: properties?.properties?.cpiColor}" (mouseenter)="cpiPanel.show($event)"
+            *ngIf="properties?.dashboard?.costPerformanceIndex"
+            (mouseleave)="cpiPanel.hide()">{{'CPI'|translate}}</span>
+          <span class="index" (mouseenter)="spiPanel.show($event)" (mouseleave)="spiPanel.hide()"
+            *ngIf="properties?.dashboard?.schedulePerformanceIndex"
+            [ngStyle]="{color: properties?.properties?.spiColor}">{{'SPI'|translate}}</span>
+        </div>
+        <p-overlayPanel #cpiPanel>
+          <div class="constraint-content">
+            <span>{{ 'CPIdescription' | translate }}</span>
+            <app-gauge-chart *ngIf="properties?.properties?.gaugeChartDataCPI"
+              [config]="properties?.properties?.gaugeChartDataCPI"></app-gauge-chart>
+          </div>
+        </p-overlayPanel>
+        <p-overlayPanel #spiPanel>
+          <div class="constraint-content">
+            <span>{{ 'SPIdescription' | translate }}</span>
+            <app-gauge-chart *ngIf="properties?.properties?.gaugeChartDataSPI"
+              [config]="properties?.properties?.gaugeChartDataSPI"></app-gauge-chart>
+          </div>
+        </p-overlayPanel>
+        <div class="triple-constraint-container" [ngStyle]="{'min-height': '21px'}">
+          <i class="fas fa-dollar-sign" [ngStyle]="{color: properties?.properties?.iconCostColor}"
+            *ngIf="properties?.dashboard && properties?.dashboard?.tripleConstraint"
+            (mouseenter)="validateShowTripleConstraintCost(properties) && costConstraintPanel.show($event)"
+            (mouseleave)="costConstraintPanel.hide()"></i>
+          <i class="far fa-clock" [ngStyle]="{color: properties?.properties?.iconScheduleColor}"
+            *ngIf="properties?.dashboard && properties?.dashboard?.tripleConstraint"
+            (mouseenter)="validateShowTripleConstraintSchedule(properties) && scheduleConstraintPanel.show($event)"
+            (mouseleave)="scheduleConstraintPanel.hide()"></i>
+          <i class="fas fa-boxes" [ngStyle]="{color: properties?.properties?.iconScopeColor}"
+            *ngIf="properties?.dashboard && properties?.dashboard?.tripleConstraint"
+            (mouseenter)="validateShowTripleConstraintScope(properties) && scopeConstraintPanel.show($event)"
+            (mouseleave)="scopeConstraintPanel.hide()"></i>
+        </div>
+        <p-overlayPanel #costConstraintPanel>
+          <div class="constraint-content" *ngIf="properties?.dashboard">
+            <ng-container *ngTemplateOutlet="legend"></ng-container>
+            <app-cost-constraint [cost]="properties.dashboard?.tripleConstraint?.cost"></app-cost-constraint>
+          </div>
+        </p-overlayPanel>
+        <p-overlayPanel #scheduleConstraintPanel>
+          <div class="constraint-content">
+            <ng-container *ngTemplateOutlet="legend"></ng-container>
+            <app-schedule-constraint [schedule]="properties?.dashboard?.tripleConstraint?.schedule">
+            </app-schedule-constraint>
+          </div>
+        </p-overlayPanel>
+        <p-overlayPanel #scopeConstraintPanel>
+          <div class="constraint-content">
+            <ng-container *ngTemplateOutlet="legend"></ng-container>
+            <app-scope-constraint [scope]="properties?.dashboard?.tripleConstraint?.scope"></app-scope-constraint>
+          </div>
+        </p-overlayPanel>
+      </div>
+    </div>
+
+    <ng-template #legend>
+      <div class="constraint-content-cards" *ngIf="properties?.dashboard">
+        <div class="subtitles-container">
+          <div class="subtitle-item">
+            <div class="subtitle-box subtitle-box-planned"></div>
+            <label class="subtitle-label-planned">{{'plannedBaseline'|translate}}</label>
+          </div>
+          <div class="subtitle-item">
+            <div class="subtitle-box subtitle-box-foreseen"></div>
+            <label class="subtitle-label-foreseen">{{'foreseen'|translate}}</label>
+          </div>
+          <div class="subtitle-item">
+            <div class="subtitle-box subtitle-box-actual"></div>
+            <label class="subtitle-label-actual">{{'actual'|translate}}</label>
+          </div>
+        </div>
+      </div>
+    </ng-template>
+  </ng-template>
+</div>

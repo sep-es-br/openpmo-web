@@ -71,5 +71,8 @@
       </app-card>
     </div>
   </section>
+  <div class="id-container" *ngIf="idLocality && cardProperties">
+    <span>{{idLocality}}</span>
+  </div>
   <app-save-button [form]="formLocality" (save)="handleOnSubmit()"></app-save-button>
 </div>

@@ -61,12 +61,12 @@
       .p-menu-overlay .p-menu-list .p-menuitem .p-menuitem-link {
         .p-menuitem-icon {
           font-size: 0.8rem;
-          color: #939393;
+          color: v.$fontLabel;
         }
         .p-menuitem-text {
           font-size: 0.9rem;
           font-family: v.$fontFamilyMedium;
-          color: #939393;
+          color: v.$fontLabel;
         }
       }
     }
@@ -76,7 +76,7 @@
       box-shadow: none !important;
       .p-button-icon {
         font-size: 0.9rem;
-        color: #939393;
+        color: v.$fontLabel;
       }
     }
   }
@@ -103,7 +103,7 @@
     justify-content: flex-end;
     padding: 0.5em;
     .card-item-id {
-      color: #888e96;
+      color: v.$fontGray;
         font-size: 0.6rem;
         font-family: v.$fontFamilyMedium;
     }
@@ -116,7 +116,7 @@
   .p-card {
     background-color: transparent;
     box-shadow: none;
-    border: 1px solid rgba(0, 0, 0, 0.15);
+    border: 1px solid v.$borderCard;
     cursor: pointer;
     height: 100%;
     display: flex;
@@ -133,12 +133,12 @@
         .p-menuitem .p-menuitem-link {
           .p-menuitem-icon {
             font-size: 0.8rem;
-            color: #939393;
+            color: v.$fontLabel;
           }
           .p-menuitem-text {
             font-size: 0.9rem;
             font-family: v.$fontFamilyMedium;
-            color: #939393;
+            color: v.$fontLabel;
           }
         }
       }

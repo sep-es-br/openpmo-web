@@ -4,10 +4,12 @@ import { TypeWorkpackModelEnum } from '../enums/TypeWorkpackModelEnum';
 import { IWorkpackModel } from './IWorkpackModel';
 import { IWorkpackModelProperty } from './IWorkpackModelProperty';
 import { IWorkpackProperty } from './IWorkpackProperty';
-import { IWorkpackShared } from './IWorkpackShared';
 
 export interface IWorkpack {
     id?: number;
+    name?: string;
+    fullName?: string;
+    fontIcon?: string;
     model?: {
       type: string;
       childWorkpackModelSessionActive?: boolean;
@@ -67,7 +69,7 @@ export interface IWorkpack {
     linked?: boolean;
     linkedModel?: number;
     permissions?: IPermission[];
-    sharedWith?: IWorkpackShared[];
+    sharedWith?: boolean;
     pendingBaseline?: boolean;
     cancelPropose?: boolean;
     hasActiveBaseline?: boolean;
@@ -101,6 +103,8 @@ export interface IWorkpack {
     },
     milestoneStatus?: string;
     milestoneDate?: string;
+    hasWBS?: boolean;
+    hasChildren?: boolean;
 }
 
 interface IPermission {

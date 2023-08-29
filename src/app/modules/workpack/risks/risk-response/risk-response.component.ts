@@ -198,8 +198,12 @@ export class RiskResponseComponent implements OnInit {
   }
 
   async setBreadcrumb() {
+    let breadcrumbItems = this.breadcrumbSrv.get;
+    if (!breadcrumbItems || breadcrumbItems.length === 0) {
+      breadcrumbItems = await this.breadcrumbSrv.loadWorkpackBreadcrumbs(this.idWorkpack, this.idPlan)
+    }
     this.breadcrumbSrv.setMenu([
-      ... await this.getBreadcrumbs(this.idWorkpack),
+      ... breadcrumbItems,
       {
         key: 'risk',
         routerLink: ['/workpack/risks'],
@@ -221,31 +225,6 @@ export class RiskResponseComponent implements OnInit {
         tooltip: this.riskResponse?.name
       }
     ]);
-  }
-
-  async getBreadcrumbs(idWorkpack: number) {
-    const { success, data } = await this.breadcrumbSrv.getBreadcrumbWorkpack(idWorkpack, { 'id-plan': this.idPlan });
-    return success
-      ? data.map(p => ({
-        key: !p.modelName ? p.type.toLowerCase() : p.modelName,
-        info: p.name,
-        tooltip: p.fullName,
-        routerLink: this.getRouterLinkFromType(p.type),
-        queryParams: { id: p.id, idWorkpackModelLinked: p.idWorkpackModelLinked, idPlan: this.idPlan },
-        modelName: p.modelName
-      }))
-      : [];
-  }
-
-  getRouterLinkFromType(type: string): string[] {
-    switch (type) {
-      case 'office':
-        return ['/offices', 'office'];
-      case 'plan':
-        return ['plan'];
-      default:
-        return ['/workpack'];
-    }
   }
 
   async saveRiskResponse() {

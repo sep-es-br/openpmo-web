@@ -4,7 +4,7 @@ import { BaseService } from '../base/base.service';
 import { IFile } from '../interfaces/IFile';
 import { IHttpResult } from '../interfaces/IHttpResult';
 import { IOffice } from '../interfaces/IOffice';
-import { IPerson } from '../interfaces/IPerson';
+import { IPerson, IWorkLocal } from '../interfaces/IPerson';
 import { IPersonProfile } from '../interfaces/IPersonProfile';
 import { PrepareHttpParams } from '../utils/query.util';
 import { BehaviorSubject } from 'rxjs';
@@ -208,6 +208,10 @@ export class PersonService extends BaseService<IPerson> {
 
   async setPersonAdministrator(idPerson: number, administrator: boolean): Promise<IHttpResult<any>> {
     return await this.http.patch<IHttpResult<any>>(`${this.urlBase}/administrator/${idPerson}`, { administrator }).toPromise();
+  }
+
+  async setPersonWorkLocal(workLocal: IWorkLocal): Promise<IHttpResult<any>> {
+    return await this.http.patch<IHttpResult<any>>(`${this.urlBase}/work-local`, workLocal).toPromise();
   }
 
 }

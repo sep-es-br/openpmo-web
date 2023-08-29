@@ -1,9 +1,4 @@
-
-<div class="workpack-loading-tabs">
-  <app-card-loading [isCardLoading]="workpackSrv.observableLoadingWorkpack | async"></app-card-loading>
-</div>
 <div class="app-workpack" *ngIf="workpackModel" [class.fullscreenModeDashboard]="fullScreenModeDashboard">
-
   <div class="header-container" [class.mobile]="responsive" *ngIf="idWorkpack">
     <div class="app-content-header" [class.mobile]="responsive">
       <span class="label">{{workpackModel.modelName}}:</span>
@@ -25,18 +20,18 @@
     <app-tabview-scrolled [tabs]="tabs" (selectedTabChange)="changeTab($event)" [idWorkpack]="idWorkpack" [selectedTab]="selectedTab">
       <div tabviewBody *ngIf="selectedTab?.key === 'WBS'">
         <div class="card-WBS">
-          <app-breakdown-structure [idWorkpack]="idWorkpack"
-            (onHasWBS)="handleOnHasWBS($event)"></app-breakdown-structure>
+          <app-workpack-section-wbs
+            (onHasWBS)="handleOnHasWBS($event)"></app-workpack-section-wbs>
         </div>
       </div>
       <div tabviewBody *ngIf="selectedTab?.key === 'dashboard'">
         <div class="card-dashboard">
-          <app-dashboard [idWorkpack]="idWorkpack" [workpackFullName]="workpackFullName"
+          <app-workpack-section-dashboard [idWorkpack]="idWorkpack" [workpackFullName]="workpackFullName"
             [dashboardShowStakeholders]="workpackModel?.dashboardShowStakeholders"
             [dashboardShowRisks]="workpackModel?.dashboardShowRisks"
             [dashboardShowEva]="workpackModel?.dashboardShowEva" [workpackType]="workpack?.type"
-            [collapsePanelsStatus]="collapsePanelsStatus" [reloadDashboard]="reloadDashboard"
-            [dashboardShowMilestones]="workpackModel?.dashboardShowMilestones"></app-dashboard>
+            [collapsePanelsStatus]="collapsePanelsStatus"
+            [dashboardShowMilestones]="workpackModel?.dashboardShowMilestones"></app-workpack-section-dashboard>
         </div>
       </div>
       <div tabviewBody *ngIf="selectedTab?.key === 'properties'">
@@ -129,11 +124,9 @@
           <app-workpack-section-processes></app-workpack-section-processes>
         </div>
       </div>
-      <div tabviewBody *ngIf="selectedTab?.key === 'journal' && (idWorkpack || workpack?.id)">
+      <div tabviewBody *ngIf="selectedTab?.key === 'journal'">
         <div class="card-journal">
-          <app-journal-view *ngIf="cardJournalProperties && !!workpack" [cardJournalProperties]="cardJournalProperties"
-            [editPermission]="getEditPermission()" [workpackCanceled]="workpack.canceled" [idPlan]="workpack.plan.id"
-            [idOffice]="workpack.plan.idOffice" [idWorkpack]="idWorkpack || workpack?.id"></app-journal-view>
+          <app-workpack-section-journal></app-workpack-section-journal >
         </div>
       </div>
     </app-tabview-scrolled>
@@ -142,12 +135,11 @@
   <div class="panels-container" *ngIf="!showTabview">
     <div class="card-dashboard"
       *ngIf="!!idWorkpack && !!workpack && !workpack.canceled && !!workpackModel && !!workpackModel.dashboardSessionActive">
-      <app-dashboard [idWorkpack]="idWorkpack" [workpackFullName]="workpackFullName"
+      <app-workpack-section-dashboard [idWorkpack]="idWorkpack" [workpackFullName]="workpackFullName"
         [dashboardShowStakeholders]="workpackModel?.dashboardShowStakeholders"
         [dashboardShowRisks]="workpackModel?.dashboardShowRisks" [dashboardShowEva]="workpackModel?.dashboardShowEva"
         [workpackType]="workpack?.type" [collapsePanelsStatus]="collapsePanelsStatus"
-        [reloadDashboard]="reloadDashboard"
-        [dashboardShowMilestones]="workpackModel?.dashboardShowMilestones"></app-dashboard>
+        [dashboardShowMilestones]="workpackModel?.dashboardShowMilestones"></app-workpack-section-dashboard>
     </div>
     <div class="card-properties-workpack">
       <app-workpack-section-properties (onGetProperties)="saveWorkpack($event)"></app-workpack-section-properties>
@@ -220,11 +212,13 @@
     <div class="card-processes">
       <app-workpack-section-processes></app-workpack-section-processes>
     </div>
-    <div class="card-journal" *ngIf="workpackModel.journalManagementSessionActive && (idWorkpack || workpack?.id)">
-      <app-journal-view *ngIf="cardJournalProperties && !!workpack" [cardJournalProperties]="cardJournalProperties"
-        [editPermission]="getEditPermission()" [workpackCanceled]="workpack.canceled" [idPlan]="workpack.plan.id"
-        [idOffice]="workpack.plan.idOffice" [idWorkpack]="idWorkpack || workpack?.id"></app-journal-view>
+    <div class="card-journal" *ngIf="workpackModel.journalManagementSessionActive">
+      <app-workpack-section-journal ></app-workpack-section-journal >
     </div>
+  </div>
+
+  <div class="id-container" *ngIf="idWorkpack">
+    <span>{{idWorkpack}}</span>
   </div>
 
   <app-save-button #saveButton (save)="onSaveButtonClicked()"></app-save-button>

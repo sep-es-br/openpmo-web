@@ -12,7 +12,7 @@
     max-width: min(50vw, 500px);
     width: 100%;
     height: 100%;
-    background-color: #fefefe;
+    background-color: v.$bgCard;
     padding: 2em 3em;
     display: flex;
     flex-direction: column;
@@ -54,7 +54,7 @@
     &.mobile {
       max-width: 100%;
       max-height: 100%;
-      background-color: #eaeae8;
+      background-color: v.$bgWhite;
       padding: 3em 1.5em;
 
       img {
@@ -63,10 +63,10 @@
       }
     }
     .info-denied-container {
-      background-color: #ea5c5c17;
+      background-color: v.$bgDark;
       text-align: center;
       padding: 1em;
-      color: #ea5c5c;
+      color: v.$fontRed;
       margin: 1.7rem 0;
       border-radius: 10px;
       .title {
@@ -81,7 +81,7 @@
       .description {
         font-size: 0.95rem;
         font-weight: 500;
-        color:  #4a4a4a;
+        color:  v.$fontDarkLight;
       }
     }
     .button-logout-container {
@@ -96,8 +96,8 @@
         padding: .5em 1.5em;
         border-radius: 89px;
         border: none;
-        background-color: #ea5c5c;
-        color: #fefefe;
+        background-color: v.$fontRed;
+        color: v.$fontWhite;
         img, app-icon, i {
           float: left;
           max-height: 2rem;
@@ -124,7 +124,7 @@
     .p-button {
       background-color: transparent;
       border: none;
-      color: #a9abae;
+      color: v.$fontLabel;
       font-size: 1.3rem;
       font-weight: 700;
       outline: none;
@@ -132,7 +132,7 @@
       &:hover {
         background-color: transparent;
         border: none;
-        color: #a9abae;
+        color: v.$fontLabel;
       }
       &:focus {
         box-shadow: none;
@@ -141,7 +141,7 @@
     .p-menu.p-menu-overlay {
       top: auto !important;
       left: 10px !important;
-      color:  #5b5b5b;
+      color:  v.$fontGray;
       font-size: 1.2rem;
     }
   }

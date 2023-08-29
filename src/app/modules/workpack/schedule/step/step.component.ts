@@ -76,7 +76,6 @@ export class StepComponent implements OnInit, OnDestroy {
     private costAccountSrv: CostAccountService,
     private router: Router,
     private messageSrv: MessageService,
-    private planSrv: PlanService,
     private authSrv: AuthService
   ) {
     this.actRouter.queryParams.subscribe(async ({ idSchedule, idWorkpackModelLinked, stepType, id, unitName, unitPrecision }) => {
@@ -102,7 +101,8 @@ export class StepComponent implements OnInit, OnDestroy {
       start: null,
       end: null,
       plannedWork: [null, Validators.required],
-      actualWork: null
+      actualWork: null,
+      distribution: 'SIGMOIDAL'
     });
     this.idPlan = Number(localStorage.getItem('@currentPlan'));
     this.formStep.statusChanges
@@ -173,8 +173,12 @@ export class StepComponent implements OnInit, OnDestroy {
   }
 
   async setBreadcrumb() {
+    let breadcrumbItems = this.breadcrumbSrv.get;
+    if (!breadcrumbItems || breadcrumbItems.length === 0) {
+      breadcrumbItems = await this.breadcrumbSrv.loadWorkpackBreadcrumbs(this.schedule.idWorkpack, this.idPlan)
+    }
     this.breadcrumbSrv.setMenu([
-      ... await this.getBreadcrumbs(),
+      ... breadcrumbItems,
       {
         key: 'step',
         routerLink: ['/workpack/schedule/step'],
@@ -197,30 +201,6 @@ export class StepComponent implements OnInit, OnDestroy {
       if (result.data.endManagementDate && result.data.endManagementDate !== null) {
         this.editPermission = false;
       }
-    }
-  }
-
-  async getBreadcrumbs() {
-    const { success, data } = await this.breadcrumbSrv.getBreadcrumbWorkpack(this.schedule.idWorkpack, { 'id-plan': this.idPlan });
-    return success
-      ? data.map(p => ({
-        key: p.type.toLowerCase(),
-        info: p.name,
-        tooltip: p.fullName,
-        routerLink: this.getRouterLinkFromType(p.type),
-        queryParams: { id: p.id, idWorkpackModelLinked: p.idWorkpackModelLinked, idPlan: this.idPlan }
-      }))
-      : [];
-  }
-
-  getRouterLinkFromType(type: string): string[] {
-    switch (type) {
-      case 'office':
-        return ['/offices', 'office'];
-      case 'plan':
-        return ['plan'];
-      default:
-        return ['/workpack'];
     }
   }
 
@@ -506,6 +486,7 @@ export class StepComponent implements OnInit, OnDestroy {
     this.step = {
       id: this.step && this.step.id,
       idSchedule: this.step ? this.step.idSchedule : this.idSchedule,
+      distribution: this.formStep.controls.distribution.value,
       plannedWork: this.formStep.controls.plannedWork.value,
       actualWork: this.formStep.controls.actualWork.value,
       endStep: (this.stepType === 'end' || this.stepType === 'newEnd') ? true : false,

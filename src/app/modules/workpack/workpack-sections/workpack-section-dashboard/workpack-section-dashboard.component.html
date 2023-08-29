@@ -1,0 +1,89 @@
+<div class="app-dashboard" [class.responsive]="!!responsive" [class.width-1700]="mediaScreen1700"
+  [class.expanded]="cardDashboardProperties.fullScreen">
+  <app-card [class.card-expanded]="cardDashboardProperties.fullScreen" [properties]="cardDashboardProperties"
+    [class.panel-tab-view]="showTabview" (changeFullScreen)="handleOnFullScreen($event)">
+    <div class="loading-container" *ngIf="isLoading">
+      <app-card-loading [isCardLoading]="isLoading"></app-card-loading>
+    </div>
+    <span class="workpack-fullName" *ngIf="!isLoading">
+      {{workpackFullName}}
+    </span>
+    <div class="cards-list-container"
+      *ngIf="(dashboard?.stakeholders && dashboard?.stakeholders.length > 0 && dashboardShowStakeholders && dashboardShowStakeholders.length > 0) && !isLoading">
+      <div class="card-container" *ngFor="let stakeholder of dashboard.stakeholders">
+        <p-card>
+          <div class="card-item">
+            <div class="card-avatar-container">
+              <i class="app-icon building" *ngIf="!!stakeholder?.actor.organization"></i>
+              <app-avatar [edit]="false" *ngIf="!stakeholder?.actor.organization" [avatar]="stakeholder?.actor?.avatar">
+              </app-avatar>
+            </div>
+            <div class="card-details" [class.person-details]="!stakeholder?.actor.organization">
+              <span class="name">{{stakeholder?.actor?.name}}</span>
+              <span class="role">{{stakeholder?.role}}</span>
+            </div>
+          </div>
+        </p-card>
+      </div>
+    </div>
+    <p-divider layout="horizontal"
+      *ngIf="(dashboard?.stakeholders && dashboard?.stakeholders.length > 0 && dashboardShowStakeholders && dashboardShowStakeholders.length > 0) && !isLoading"></p-divider>
+    <div class="cards-list-container" *ngIf="dashboard && !isLoading">
+      <div class="card-container" *ngFor="let workpackModel of dashboard?.workpacksByModel">
+        <p-card>
+          <div class="card-item" [class.card-link]="workpackModel?.menuItems && workpackModel?.menuItems.length > 0"
+              (click)="workpackModel?.menuItems && workpackModel?.menuItems.length > 0 && menuModel.toggle($event)">
+            <div class="card-avatar-container">
+              <i [class]="workpackModel.icon"></i>
+            </div>
+            <div class="card-details">
+              <span class="quantity">{{workpackModel.quantity}}</span>
+              <span class="type">{{workpackModel.modelName}}</span>
+            </div>
+          </div>
+          <p-tieredMenu #menuModel [popup]="true" [model]="workpackModel?.menuItems" class="menu-model">
+          </p-tieredMenu>
+        </p-card>
+      </div>
+    </div>
+    <p-divider layout="horizontal" *ngIf="!isLoading"></p-divider>
+    <div class="params-container" *ngIf="startDate && endDate && !isLoading">
+      <div class="param-item">
+        <label class="param-label">{{'reference'|translate}}</label>
+        <p-calendar class="app-select-date" [(ngModel)]="referenceMonth" view="month" [dateFormat]="calendarFormat"
+          [yearNavigator]="true" [showIcon]="true" icon="fas fa-calendar-alt" [yearRange]="yearRange"
+          [minDate]="startDate" [maxDate]="endDate" (ngModelChange)="handleSelectedReferenceMonth()"
+          [readonlyInput]="true" inputId="monthpicker"></p-calendar>
+      </div>
+      <div class="param-item" *ngIf="workpackType === 'Project' && !!baselines && baselines.length > 0">
+        <label class="param-label">{{'baseline'|translate}}</label>
+        <p-dropdown class="app-single-selection" [options]="baselines" optionLabel="name" optionValue="id"
+          [autoDisplayFirst]="false" [(ngModel)]="selectedBaseline" optionLabel="name"
+          (ngModelChange)="handleSeletedBaseline()"></p-dropdown>
+      </div>
+    </div>
+    <div class="charts-container" *ngIf="!isLoading">
+      <div class="triple-constraint-container">
+        <app-triple-constraint-dashboard
+          [tripleConstraint]="dashboard && dashboard?.tripleConstraint && dashboard?.tripleConstraint[0]">
+        </app-triple-constraint-dashboard>
+      </div>
+      <div class="risk-milestone-charts-container">
+        <div class="dashboard-item" *ngIf="!!dashboardShowMilestones && dashboardMilestonesData">
+          <app-doughnut-chart [data]="dashboardMilestonesData" [middleText]="dashboard?.milestone?.quantity?.toString()"
+            [midleTextBottom]="midleTextMilestones"></app-doughnut-chart>
+        </div>
+        <div class="dashboard-item" *ngIf="dashboardRisksData && !!dashboardShowRisks">
+          <app-doughnut-chart [data]="dashboardRisksData" [middleText]="dashboard?.risk?.total?.toString()"
+            [midleTextBottom]="midleTextRisks">
+          </app-doughnut-chart>
+        </div>
+      </div>
+    </div>
+    <div class="earned-value-analysis-container"
+      *ngIf="!!dashboardShowEva && dashboard && dashboard?.earnedValueAnalysis &&  dashboard?.earnedValueAnalysis?.earnedValueByStep.length > 0 && !isLoading">
+      <app-earned-value-analysis-dashboard [earnedValueAnalysis]="dashboard.earnedValueAnalysis"
+        [referenceMonth]="referenceMonth"></app-earned-value-analysis-dashboard>
+    </div>
+  </app-card>
+</div>

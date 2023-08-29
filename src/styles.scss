@@ -55,6 +55,15 @@ body {
   cursor: pointer;
 }
 
+.id-container {
+  width: 100%;
+  text-align: end;
+  padding: 0.5em;
+  font-size: 0.9rem;
+  font-family: "Montserrat Medium", "Montserrat Regular", "Montserrat", sans-serif !important;
+  color: #004660;
+}
+
 app-card {
   .p-panel {
     margin-top: 15px;

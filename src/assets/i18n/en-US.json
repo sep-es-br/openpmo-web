@@ -1,4 +1,8 @@
 {
+  "distribution": "Distribution",
+  "sigmoidal": "Sigmoidal (S Curve)",
+  "linear": "Linear",
+  "costAccountModel": "Cost Account Model",
   "author": "Author",
   "targetUser": "Target user",
   "position": "Position",
@@ -379,6 +383,7 @@
     "confirmRedistributeSchedule": "Do you want to spread the difference of ",
     "overTheRemainingMonths": " over the remaining months?",
     "deleteScheduleConfirmation": "Are you sure you want to delete this schedule?",
+    "deleteCostAccountModelConfirmation": "Are you sure you want to delete this cost account model?",
     "costAccountBalanceValidation": "The limit value of the cost account has been exceeded.",
     "confirmClearPendingChanges": "There are unsaved changes that will be lost with the page change. Do you wish to continue?",
     "activedSuccessfully": "Report model actived successfully",
@@ -544,6 +549,13 @@
         "delete": {
           "relationship": {
             "error": "Exclusion is not possible as it has related models."
+          }
+        }
+      },
+      "costAccountModel": {
+        "delete": {
+          "relationship": {
+            "error": "Exclusion is not possible as it has related cost accounts."
           }
         }
       },

@@ -6,4 +6,5 @@ export interface IPlanModel {
   fullName: string;
   sharedWithAll?: boolean;
   sharedWith?: IOffice[];
+  idCostAccountModel?: number;
 }

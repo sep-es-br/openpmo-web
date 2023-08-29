@@ -28,6 +28,7 @@ import * as moment from 'moment';
 import { IFilterProperty } from 'src/app/shared/interfaces/IFilterProperty';
 import { AuthService } from 'src/app/shared/services/auth.service';
 import { OfficePermissionService } from 'src/app/shared/services/office-permission.service';
+import { IOrganization } from 'src/app/shared/interfaces/IOrganization';
 
 @Component({
   selector: 'app-filter-dataview',
@@ -57,6 +58,7 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
   idOffice: number;
   workpackModelEntitiesOptions = ['stakeholders', 'risks', 'issues', 'processes'];
   localityList;
+  organizations: IOrganization[] = [];
 
   constructor(
     private responsiveSrv: ResponsiveService,
@@ -76,7 +78,6 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
     private officePermissionSrv: OfficePermissionService,
     private router: Router
   ) {
-    localStorage.removeItem('@currentPlan');
     this.loadFormFilter();
     this.formFilter.statusChanges
       .pipe(takeUntil(this.$destroy), filter(status => status === 'INVALID'))
@@ -135,7 +136,6 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
         }
       }
     }
-    
   }
 
   async ngOnInit() {
@@ -181,7 +181,11 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
 
   setCurrentBreadcrumb() {
     if (this.currentBreadcrumbItems && this.currentBreadcrumbItems.length > 0) {
-      this.breadcrumbSrv.setMenu([...this.currentBreadcrumbItems]);
+      this.breadcrumbSrv.setMenu([...this.currentBreadcrumbItems,
+        ...[{
+          key: 'filter',
+        }]
+      ]);
     }
   }
 
@@ -330,8 +334,20 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
     const result = this.idFilter ? await this.filterSrv.putFilter(this.filterUrl, sender) :
       await this.filterSrv.postFilter(this.filterUrl, sender);
     if (result.success) {
-      this.location.back();
+      this.navigateToBack();
     }
+  }
+
+  navigateToBack() {
+    this.currentBreadcrumbItems = this.breadcrumbSrv.get;
+      if (this.currentBreadcrumbItems && this.currentBreadcrumbItems.length > 0) {
+        const lastItem = this.currentBreadcrumbItems[this.currentBreadcrumbItems.length - 1];
+        this.router.navigate([...lastItem.routerLink], {
+          queryParams: {
+            ...lastItem.queryParams
+          }
+        });
+      }
   }
 
   getValueProperty(property: IFilterProperty, propValue) {
@@ -432,7 +448,7 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
   async handleDeleteFilter() {
     const result = await this.filterSrv.deleteFilter(this.filterUrl, this.idFilter);
     if (result.success) {
-      this.location.back();
+      this.navigateToBack();
     }
   }
 
@@ -459,7 +475,7 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
   async loadWorkpackFilterPropertiesList() {
     const resultWorkpackModel = await this.workpackModelSrv.GetById(this.idWorkpackModel);
     const workpackModel = resultWorkpackModel.success && resultWorkpackModel.data;
-    const workpackModelActivesProperties = workpackModel.properties.filter(w => w.active && w.session === 'PROPERTIES');
+    const workpackModelActivesProperties = workpackModel.properties.filter(w => w.active);
     const workpackModelPropertiesList = await Promise.all(workpackModelActivesProperties.map(p => this.instanceProperty(p)));
     this.filterPropertiesList = workpackModelPropertiesList;
   }
@@ -467,7 +483,11 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
   async loadCostAccountFilterPropertiesList() {
     const resultWorkpackModel = await this.workpackModelSrv.GetById(this.idWorkpackModel);
     const workpackModel = resultWorkpackModel.success && resultWorkpackModel.data;
-    const workpackModelActivesProperties = workpackModel.properties.filter(w => w.active && w.session === 'COST');
+    const workpackModelActivesProperties = workpackModel.properties.filter(w => w.active);
+    if (workpackModelActivesProperties && workpackModelActivesProperties
+      .filter(prop => this.typePropertyModel[prop.type] === TypePropertyModelEnum.OrganizationSelectionModel).length > 0) {
+      await this.loadOrganizationsOffice();
+    }
     const costAccountPropertiesList = await Promise.all(workpackModelActivesProperties.map(p => this.instanceProperty(p)));
     this.filterPropertiesList = costAccountPropertiesList;
   }
@@ -491,7 +511,7 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
     }
 
     if (this.typePropertyModel[propertyModel.type] === TypePropertyModelEnum.SelectionModel) {
-      const listOptions = (propertyModel.possibleValues as string).split(',');
+      const listOptions = (propertyModel.possibleValues as string).split(',').sort( (a, b) => a.localeCompare(b));
       property.possibleValues = listOptions.map(op => ({ label: op, value: op }));
     }
 
@@ -523,7 +543,8 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
     }
 
     if (this.typePropertyModel[propertyModel.type] === TypePropertyModelEnum.OrganizationSelectionModel) {
-      property.possibleValuesIds = await this.loadOrganizationsOffice();
+      property.possibleValuesIds = this.organizations.filter( org => propertyModel.sectors.includes(org.sector))
+        .map(d => ({ label: d.name, value: d.id }));
       if (!propertyModel.multipleSelection) {
         const defaults = propertyModel.defaults && propertyModel.defaults as number[];
         const defaultsValue = defaults && defaults[0];
@@ -556,7 +577,7 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
       }
       return { label: locality.name, data: locality.id, selectable };
     });
-    list.sort( (a,b) => a.label < b.label ? -1 : 0)
+    list.sort( (a,b) => a.label.localeCompare(b.label));
     if (multipleSelection) {
       this.addSelectAllNode(list, localityList, selectable);
     }
@@ -596,7 +617,7 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
       return organizationsOffice.map(org => ({
         label: org.name,
         value: org.id
-      }));
+      })).sort( (a, b) => a.label.localeCompare(b.label));
     }
   }
 
@@ -607,7 +628,7 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
       return units.map(org => ({
         label: org.name,
         value: org.id
-      }));
+      })).sort( (a, b) => a.label.localeCompare(b.label));
     }
   }
 

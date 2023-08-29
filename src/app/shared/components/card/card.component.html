@@ -72,7 +72,7 @@
         <label>{{'show'|translate}}</label>
         <div class="options-container">
           <p-dropdown class="filter-selection" [disabled]="loading" [options]="filterListOptions" dropdownIcon="fas fa-caret-down"
-            scrollHeight="300px" [(ngModel)]="filterSelected">
+            scrollHeight="300px" [(ngModel)]="properties.idFilterSelected">
             <ng-template let-filter pTemplate="item">
               <div class="filter-item" *ngIf="filter.value !== -1">
                 <div class="filter-item-label" (click)="handleFilterSelected(filter.value)">{{filter.label}}</div>

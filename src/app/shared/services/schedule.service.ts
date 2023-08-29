@@ -1,17 +1,71 @@
+import { BehaviorSubject } from 'rxjs';
 import { Injectable, Inject, Injector } from '@angular/core';
 import { BaseService } from '../base/base.service';
 import { IHttpResult } from '../interfaces/IHttpResult';
 import { ISchedule, IScheduleDetail, IStep, IStepPost } from '../interfaces/ISchedule';
 import { PrepareHttpParams } from '../utils/query.util';
+import { WorkpackService } from './workpack.service';
+import { IWorkpackData, IWorkpackParams } from '../interfaces/IWorkpackDataParams';
 
 @Injectable({ providedIn: 'root' })
 export class ScheduleService extends BaseService<any> {
 
+  private resetSchedule = new BehaviorSubject<boolean>(false);
+  workpackParams: IWorkpackParams;
+  workpackData: IWorkpackData;
+  schedule;
+  loading;
+
   constructor(
-    @Inject(Injector) injector: Injector
+    @Inject(Injector) injector: Injector,
+    private workpackSrv: WorkpackService
   ) {
     super('schedules', injector);
   }
+
+  resetScheduleData() {
+    this.schedule = undefined;
+    this.loading = true;
+    this.nextResetSchedule(true);
+  }
+
+
+  async loadSchedule() {
+    this.workpackParams = this.workpackSrv.getWorkpackParams();
+    this.workpackData = this.workpackSrv.getWorkpackData();
+    if (this.workpackData && this.workpackData?.workpack?.id && this.workpackData?.workpackModel &&
+      this.workpackData.workpackModel.scheduleSessionActive) {
+        const result = await this.GetSchedule({ 'id-workpack': this.workpackParams.idWorkpack });
+        if (result.success) {
+          this.schedule = result.data && result.data.length > 0 ? result.data[0] : undefined;
+          this.loading = false;
+          this.nextResetSchedule(true);
+        }
+      }
+    
+  }
+
+  setScheduleChanged(schedule) {
+    this.schedule = schedule;
+  }
+
+  getScheduleData() {
+    return {
+      workpackParams: this.workpackParams,
+      workpackData: this.workpackData,
+      schedule: this.schedule,
+      loading: this.loading
+    }
+  }
+
+  nextResetSchedule(nextValue: boolean) {
+    this.resetSchedule.next(nextValue);
+  }
+
+  get observableResetSchedule() {
+    return this.resetSchedule.asObservable();
+  }
+
 
   public async GetSchedule(options?): Promise<IHttpResult<IScheduleDetail[]>> {
     const result = await this.http.get(`${this.urlBase}`, { params: PrepareHttpParams(options) }).toPromise();

@@ -32,6 +32,8 @@ import { IconsEnum } from 'src/app/shared/enums/IconsEnum';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { ReportModelFileService } from 'src/app/shared/services/report-model-file.service';
 import { MinLengthTextCustomValidator } from 'src/app/shared/utils/minLengthTextValidator';
+import { TypeOrganization } from 'src/app/shared/enums/TypeOrganization';
+import { IOrganization } from 'src/app/shared/interfaces/IOrganization';
 
 @Component({
   selector: 'app-report-model',
@@ -80,7 +82,7 @@ export class ReportModelComponent implements OnInit {
   menuModelProperties: MenuItem[] = [];
   currentLang: string;
   listDomains: SelectItem[] = [];
-  listOrganizations: SelectItem[] = [];
+  listOrganizations: IOrganization[] = [];
   listMeasureUnits: SelectItem[] = [];
   files: IReportModelFile[] = [];
   hasCompiledFiles = false;
@@ -110,6 +112,8 @@ export class ReportModelComponent implements OnInit {
     this.translateSrv.onLangChange.pipe(takeUntil(this.$destroy)).subscribe(() => {
       setTimeout(() => this.setLanguage(), 200);
     });
+    this.setLanguage();
+    this.setPreferredFormatOptions();
     this.configDataViewSrv.observableCollapsePanelsStatus.pipe(takeUntil(this.$destroy)).subscribe(collapsePanelStatus => {
       this.collapsePanelsStatus = collapsePanelStatus === 'collapse' ? true : false;
       this.cardProperties = Object.assign({}, {
@@ -164,8 +168,7 @@ export class ReportModelComponent implements OnInit {
       }
       this.cardProperties.initialStateCollapse = this.idReport ? true : false;
     });
-    this.setLanguage();
-    this.setPreferredFormatOptions();
+    
   }
 
   ngOnInit(): void {
@@ -193,25 +196,14 @@ export class ReportModelComponent implements OnInit {
 
   async checkPermissions() {
     this.editPermission = await this.officePermissionSrv.getPermissions(this.idOffice);
-    if (this.isUserAdmin === undefined) {
-      this.isUserAdmin = await this.authSrv.isUserAdmin();
-    }
+    this.isUserAdmin = await this.authSrv.isUserAdmin();
     if (!this.isUserAdmin && !this.editPermission) {
       this.router.navigate(['/offices']);
     }
   }
 
   async loadPropertiesOffice() {
-    const propertiesOfficeItem = localStorage.getItem('@pmo/propertiesCurrentOffice');
-    if (propertiesOfficeItem && (JSON.parse(propertiesOfficeItem)).id === this.idOffice) {
-      this.propertiesOffice = JSON.parse(propertiesOfficeItem);
-    } else {
-      const { success, data } = await this.officeSrv.GetById(this.idOffice);
-      if (success) {
-        this.propertiesOffice = data;
-        localStorage.setItem('@pmo/propertiesCurrentOffice', JSON.stringify(this.propertiesOffice));
-      }
-    }
+    this.propertiesOffice = await this.officeSrv.getCurrentOffice(this.idOffice);
   }
 
   async loadPropertiesStrategy() {
@@ -293,7 +285,7 @@ export class ReportModelComponent implements OnInit {
           label: this.translateSrv.instant('delete'),
           icon: 'fas fa-trash-alt',
           command: () => this.handleDeleteFile(file.id),
-          disabled: !this.editPermission
+          disabled: !this.isUserAdmin
         }
       ] : [];
       if (!file.main && !!file.id) {
@@ -301,7 +293,7 @@ export class ReportModelComponent implements OnInit {
           label: this.translateSrv.instant('setAsMain'),
           icon: 'app-icon main',
           command: () => this.handleSetAsMain(file.id),
-          disabled: !this.editPermission
+          disabled: !this.isUserAdmin
         });
       }
       return {
@@ -316,7 +308,7 @@ export class ReportModelComponent implements OnInit {
       }
     });
 
-    if (this.editPermission) {
+    if (this.isUserAdmin) {
       this.cardItemsFiles.push({
         typeCardItem: 'newCardItem',
         iconSvg: true,
@@ -388,6 +380,9 @@ export class ReportModelComponent implements OnInit {
     this.formReport.controls.name.setValue(this.report.name);
     this.formReport.controls.fullName.setValue(this.report.fullName);
     this.formReport.controls.preferredOutputFormat.setValue(this.report.preferredOutputFormat);
+    if (!this.isUserAdmin) {
+      this.formReport.disable();
+    }
   }
 
   async loadPropertiesParams() {
@@ -426,6 +421,9 @@ export class ReportModelComponent implements OnInit {
             p.defaults = (p.defaults as any[]).shift();
           }
         }
+        if (p.sectors) {
+          p.sectorsList = p.sectors.split(',').map( sector => sector.toUpperCase());
+        }
         if (p.type === TypePropertyEnum.DateModel) {
           const value = p.defaultValue && p.defaultValue.toLocaleString();
           p.defaultValue = value && new Date(value);
@@ -461,7 +459,7 @@ export class ReportModelComponent implements OnInit {
       this.saveButton?.hideButton();
       return;
     }
-    const separationForDuplicateCheck = properties.map(prop => [prop.name + prop.session, prop.label + prop.session])
+    const separationForDuplicateCheck = properties.map(prop => [prop.name, prop.label])
       .reduce((a, b) => ((a[0].push(b[0])), a[1].push(b[1]), a), [[], []]);
     // Duplicated name check
     if (new Set(separationForDuplicateCheck[0]).size !== properties.length) {
@@ -482,15 +480,16 @@ export class ReportModelComponent implements OnInit {
 
   async checkProperty(property: IWorkpackModelProperty) {
     let list = [];
-    let requiredFields = ['name', 'label', 'sortIndex', 'session'];
+    let requiredFields = ['name', 'label', 'sortIndex'];
     switch (property.type) {
       case TypePropertyEnum.LocalitySelectionModel:
         requiredFields = requiredFields.concat(['idDomain', 'multipleSelection']);
         list = await this.getListDomains();
         break;
       case TypePropertyEnum.OrganizationSelectionModel:
-        requiredFields = requiredFields.concat(['multipleSelection']);
-        list = await this.getListOrganizations();
+        requiredFields = requiredFields.concat(['multipleSelection', 'sectors']);
+        property.sectors = property.sectorsList.map(sec => sec.toLowerCase()).join(',');
+        list = await this.getListOrganizations(property.sectorsList);
         break;
       case TypePropertyEnum.UnitSelectionModel:
         list = await this.getListMeasureUnits();
@@ -499,7 +498,7 @@ export class ReportModelComponent implements OnInit {
         requiredFields = requiredFields.concat(['possibleValuesOptions', 'multipleSelection']);
         break;
       case TypePropertyEnum.GroupModel:
-        requiredFields = ['name', 'sortIndex', 'session', 'groupedProperties'];
+        requiredFields = ['name', 'sortIndex', 'groupedProperties'];
         break;
       case TypePropertyEnum.NumberModel:
         requiredFields = requiredFields.concat(['precision']);
@@ -510,9 +509,8 @@ export class ReportModelComponent implements OnInit {
     }
     property.isCollapsed = property.isCollapsed === undefined || property.isCollapsed;
     property.list = list;
-    property.session = 'PROPERTIES';
     property.requiredFields = requiredFields;
-    property.viewOnly = !this.editPermission;
+    property.viewOnly = !this.isUserAdmin;
     property.obligatory = !!property.obligatory;
   }
 
@@ -543,14 +541,14 @@ export class ReportModelComponent implements OnInit {
     return this.listDomains;
   }
 
-  async getListOrganizations() {
+  async getListOrganizations(sectors: string[]) {
     if (!this.listOrganizations.length) {
       const result = await this.organizationSrv.GetAll({ 'id-office': this.idOffice });
       if (result.success) {
-        this.listOrganizations = result.data.map(d => ({ label: d.name, value: d.id }));
+        this.listOrganizations = result.data;
       }
     }
-    return this.listOrganizations;
+    return this.listOrganizations.filter( org => sectors.includes(org.sector)).map(d => ({ label: d.name, value: d.id }));
   }
 
   async getListMeasureUnits() {
@@ -590,6 +588,13 @@ export class ReportModelComponent implements OnInit {
             event.property.showIconButtonSelectLocality = selectedLocality.length <= 0;
           }
         }
+      }
+    }
+    if (event?.property && event.property?.sectors && this.editPermission) {
+      if(!!event.sectorChanged) {
+        event.property.sectors = event.property?.sectorsList.map( sec => sec.toLowerCase()).join(',');
+        event.property.list = await this.getListOrganizations(event.property.sectorsList);
+        event.property.defaults = [];
       }
     }
     this.checkProperties();
@@ -689,11 +694,12 @@ export class ReportModelComponent implements OnInit {
       active: true,
       label: '',
       name: '',
-      session: 'PROPERTY',
       sortIndex: this.modelProperties.length,
       fullLine: true,
       required: false,
       multipleSelection: false,
+      sectorsList: type === TypePropertyEnum.OrganizationSelectionModel ?
+      [TypeOrganization.Private.toUpperCase(), TypeOrganization.Public.toUpperCase(), TypeOrganization.Third.toUpperCase()] : [],
       selectedLocalities: type === TypePropertyEnum.LocalitySelectionModel && this.translateSrv.instant('selectDefaultValue'),
       showIconButtonSelectLocality: type === TypePropertyEnum.LocalitySelectionModel
     };

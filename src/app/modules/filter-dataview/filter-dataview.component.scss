@@ -39,7 +39,7 @@
       justify-content: flex-end;
     }
     .p-dropdown-trigger-icon {
-      color: #004660;
+      color: v.$fontInput;
       font-size: 1rem;
     }
   }
@@ -62,12 +62,12 @@
         }
         .p-radiobutton .p-radiobutton-box {
           background-color: white !important;
-          border-color: #868181;
+          border-color: v.$borderRadioButton;
           display: flex;
           align-items: center;
           justify-content: center;
           &:hover {
-            border-color: #868181;
+            border-color: v.$borderRadioButton;
           }
           .p-radiobutton-icon {
             width: 10px;
@@ -76,33 +76,33 @@
         }
         .p-radiobutton .p-radiobutton-box.p-highlight {
           background-color: white !important;
-          border-color: #868181;
+          border-color: v.$borderRadioButton;
           &:hover {
-            border-color: #868181;
+            border-color: v.$borderRadioButton;
             background: white !important;
           }
           .p-radiobutton-icon {
-            background-color: #868181;
+            background-color: v.$borderRadioButton;
           }
         }
         p-radiobutton .p-radiobutton .p-radiobutton-box.p-highlight {
-          border-color: #868181 !important;
+          border-color: v.$borderRadioButton !important;
           background: white !important;
           box-shadow: none;
         }
         p-radiobutton .p-radiobutton .p-radiobutton-box.p-focus {
-          border-color: #868181 !important;
+          border-color: v.$borderRadioButton !important;
           background: white !important;
           box-shadow: none;
         }
         .p-radiobutton.p-radiobutton-focused.p-radiobutton-checked {
           background-color: white !important;
-          border-color: #868181;
+          border-color: v.$borderRadioButton;
           box-shadow: none;
         }
         .p-radiobutton .p-radiobutton-box {
           .p-radiobutton-icon {
-            background-color: #868181;
+            background-color: v.$borderRadioButton;
           }
         }
       }
@@ -112,31 +112,31 @@
         margin-left: 2em;
         p-checkbox {
           .p-checkbox .p-checkbox-box {
-            border: 2px solid #797979;
+            border: 2px solid v.$borderRadioButton;
             background: transparent;
             width: 20px;
             height: 20px;
-            color: #797979;
+            color: v.$borderRadioButton;
             border-radius: 3px;
             transition: background-color 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s;
           }
           .p-checkbox .p-checkbox-box.p-highlight {
-            border-color: #3b3636;
+            border-color: v.$borderCheckBox;
             background: transparent;
           }
           .p-checkbox .p-checkbox-box.p-highlight:hover {
-            border-color: #797979;
+            border-color: v.$borderRadioButton;
             background: transparent;
           }
           .p-checkbox .p-checkbox-box:hover {
-            border-color: #797979;
+            border-color: v.$borderRadioButton;
           }
           .p-checkbox .p-checkbox-box.p-focus {
-            border-color: #797979; // TODO: FIND BRIGHTER COLOR
+            border-color: v.$borderRadioButton; // TODO: FIND BRIGHTER COLOR
             box-shadow: none;
           }
           .p-checkbox .p-checkbox-box .p-checkbox-icon {
-            color: #797979;
+            color: v.$borderRadioButton;
             font-weight: bold;
           }
         }
@@ -161,7 +161,7 @@
           .p-checkbox .p-checkbox-box {
             width: 15px;
             height: 15px;
-            color: #797979;
+            color: v.$borderRadioButton;
           }
           .p-checkbox-label {
             font-size: 0.9rem;
@@ -195,7 +195,7 @@
     .rules-container {
       margin-top: 2em;
       .rules-title {
-        color: #004660;
+        color: v.$fontTitle;
         font-family: "Montserrat Medium", "Montserrat Regular", "Montserrat", sans-serif;
         font-size: 1rem;
         text-transform: uppercase;
@@ -258,7 +258,7 @@
     background-color: transparent;
     border: none;
     box-shadow: none;
-    color: #ea5c5c;
+    color: v.$fontRed;
     font-size: 1rem;
     padding-left: 0;
 
@@ -270,7 +270,7 @@
       background-color: transparent;
       border: none;
       box-shadow: none;
-      color: #ea5c5c;
+      color: v.$fontRed;
     }
   }
 }

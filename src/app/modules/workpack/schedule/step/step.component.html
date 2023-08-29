@@ -61,6 +61,7 @@
                   <span class="value">{{ baselinePlannedTotals.plannedWork | number : '0.2' : currentLang }}</span>
                 </div>
               </div>
+              
               <div class="cost-assignments-totals" [class.responsive]="responsive">
                 <div class="planned-total">
                   <span class="label"> $ {{ "planned" |translate }}</span>
@@ -73,6 +74,15 @@
                 <div class="planned-baseline" [class.responsive]="responsive" *ngIf="baselinePlannedTotals && baselinePlannedTotals.plannedCost">
                   <span class="label"> $ {{ "plannedBaseline" |translate }}</span>
                   <span class="value">{{ baselinePlannedTotals.plannedCost | number : '0.2' : currentLang }}</span>
+                </div>
+              </div>
+              <div class="p-field distribution-container" [class.responsive]="responsive" *ngIf="!idStep">
+                <label class="app-input-label" class="properties-label" for="float-end">{{ "distribution" |translate}}</label>
+                <div class="radios-container">
+                  <p-radioButton class="distribution-radio" value="SIGMOIDAL" formControlName="distribution" [label]="'sigmoidal'| translate">
+                  </p-radioButton>
+                  <p-radioButton class="distribution-radio" value="LINEAR" formControlName="distribution"
+                      [label]="'linear' | translate"></p-radioButton>
                 </div>
               </div>
             </div>
@@ -95,9 +105,13 @@
         </div>
       </app-card>
     </div>
-    <div class="app-save-button-layout">
-      <div class="app-save-button-wrapper" *ngIf="!!showSaveButton" @enterLeave>
-        <span class="button-label" (click)="saveStep()">{{ 'save' | translate }}</span>
-      </div>
+  </div>
+  <div class="id-container" *ngIf="idStep && cardStepProperties">
+    <span>{{idStep}}</span>
+  </div>
+  <div class="app-save-button-layout">
+    <div class="app-save-button-wrapper" *ngIf="!!showSaveButton" @enterLeave>
+      <span class="button-label" (click)="saveStep()">{{ 'save' | translate }}</span>
     </div>
   </div>
+  

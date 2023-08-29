@@ -107,5 +107,8 @@
       </div>
     </app-card>
   </section>
+  <div class="id-container" *ngIf="idRisk && cardRiskProperties">
+    <span>{{idRisk}}</span>
+  </div>
   <app-save-button (save)="saveRisk()"></app-save-button>
 </div>

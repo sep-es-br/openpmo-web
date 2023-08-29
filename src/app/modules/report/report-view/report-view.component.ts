@@ -21,7 +21,7 @@ import { MeasureUnitService } from 'src/app/shared/services/measure-unit.service
 import { IOffice } from 'src/app/shared/interfaces/IOffice';
 import { IDomain } from 'src/app/shared/interfaces/IDomain';
 import { ReportService } from 'src/app/shared/services/report.service';
-import { IReportScope, ITreeViewScope } from 'src/app/shared/interfaces/IReportScope';
+import { ITreeViewScope } from 'src/app/shared/interfaces/IReportScope';
 import { IconsEnum } from 'src/app/shared/enums/IconsEnum';
 import { ReportPreferredFormatEnum } from 'src/app/shared/enums/ReportPreferredFormatEnum';
 import { IReportGenerate } from 'src/app/shared/interfaces/IReportGenerate';
@@ -169,7 +169,10 @@ export class ReportViewComponent implements OnInit, OnDestroy {
   }
 
   async instancePropertiesModel() {
-    await this.loadOrganizationsOffice();
+    if (this.reportModel.paramModels && this.reportModel.paramModels
+      .filter(prop => this.typePropertyModel[prop.type] === TypePropertyModelEnum.OrganizationSelectionModel).length > 0) {
+      await this.loadOrganizationsOffice();
+    }
     this.reportProperties = await Promise.all(this.reportModel.paramModels.map(p => this.instanceProperty(p)));
   }
 
@@ -182,7 +185,6 @@ export class ReportViewComponent implements OnInit, OnDestroy {
     property.label = propertyModel.label;
     property.name = propertyModel.name;
     property.required = propertyModel.required;
-    property.session = propertyModel.session;
     property.sortIndex = propertyModel.sortIndex;
     property.multipleSelection = propertyModel.multipleSelection;
     property.rows = propertyModel.rows ? propertyModel.rows : 1;
@@ -207,7 +209,7 @@ export class ReportViewComponent implements OnInit, OnDestroy {
     }
 
     if (this.typePropertyModel[propertyModel.type] === TypePropertyModelEnum.SelectionModel) {
-      const listOptions = propertyModel.possibleValues ? (propertyModel.possibleValues as string).split(',') : [];
+      const listOptions = propertyModel.possibleValues ? (propertyModel.possibleValues as string).split(',').sort( (a, b) => a.localeCompare(b)) : [];
       property.possibleValues = listOptions.map(op => ({ label: op, value: op }));
     }
 
@@ -250,7 +252,9 @@ export class ReportViewComponent implements OnInit, OnDestroy {
       }
     }
     if (this.typePropertyModel[propertyModel.type] === TypePropertyModelEnum.OrganizationSelectionModel) {
-      property.possibleValuesIds = this.organizationsOffice;
+      property.possibleValuesIds = this.organizationsOffice
+        .filter( org => propertyModel.sectors && propertyModel.sectors.includes(org.sector.toLowerCase()))
+        .map(d => ({ label: d.name, value: d.id }));
       if (propertyModel.multipleSelection) {
         property.selectedValues = propertyModel.defaults as number[];
       }
@@ -310,7 +314,7 @@ export class ReportViewComponent implements OnInit, OnDestroy {
       }
       return { label: locality.name, data: locality.id };
     });
-    list.sort((a, b) => a.label < b.label ? -1 : 0);
+    list.sort((a, b) => a.label.localeCompare(b.label));
     if (multipleSelection) {
       this.addSelectAllNode(list, localityList, true);
     }
@@ -337,10 +341,8 @@ export class ReportViewComponent implements OnInit, OnDestroy {
   async loadOrganizationsOffice() {
     const result = await this.organizationSrv.GetAll({ 'id-office': this.propertiesOffice.id });
     if (result.success) {
-      this.organizationsOffice = result.data.map(org => ({
-        label: org.name,
-        value: org.id
-      }));
+      this.organizationsOffice = result.data;
+      this.organizationsOffice = this.organizationsOffice.sort((a, b) => a.name.localeCompare(b.name))
     }
   }
 
@@ -354,7 +356,7 @@ export class ReportViewComponent implements OnInit, OnDestroy {
       return units.map(org => ({
         label: org.name,
         value: org.id
-      }));
+      })).sort( (a, b) => a.label.localeCompare(b.label));
     }
   }
 

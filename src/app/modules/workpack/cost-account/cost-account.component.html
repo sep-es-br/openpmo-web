@@ -21,5 +21,8 @@
       </div>
     </app-cost-account-card>
   </div>
+  <div class="id-container" *ngIf="idCostAccount && sectionCostAccountProperties">
+    <span>{{idCostAccount}}</span>
+  </div>
   <app-save-button (save)="saveCostAccount()"></app-save-button>
 </div>

@@ -5,6 +5,7 @@ import { filter } from 'rxjs/operators';
 import { ResponsiveService } from './shared/services/responsive.service';
 import { WorkpackShowTabviewService } from './shared/services/workpack-show-tabview.service';
 import { MobileViewService } from './shared/services/mobile-view.service';
+import {environment} from '../environments/environment';
 
 @Component({
   selector: 'app-root',
@@ -15,6 +16,7 @@ export class AppComponent implements OnInit {
 
   isMobileView = false;
   showTemplate: boolean;
+  environment = environment;
 
   constructor(
     private responsiveSrv: ResponsiveService,
@@ -59,4 +61,5 @@ export class AppComponent implements OnInit {
       this.workpackShowTabViewSrv.next(false);
     }
   }
+
 }

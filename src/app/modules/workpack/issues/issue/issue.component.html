@@ -86,5 +86,8 @@
       </div>
     </app-card>
   </section>
+  <div class="id-container" *ngIf="idIssue && cardIssueProperties">
+    <span>{{idIssue}}</span>
+  </div>
   <app-save-button #saveButton (save)="saveIssue()"></app-save-button>
 </div>

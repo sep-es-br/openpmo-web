@@ -1,7 +1,6 @@
 import { IWorkpackData, IWorkpackParams } from '../../../../shared/interfaces/IWorkpackDataParams';
 import { IconsEnum } from '../../../../shared/enums/IconsEnum';
 import { BaselineService } from '../../../../shared/services/baseline.service';
-import { TypeWorkpackEnum } from '../../../../shared/enums/TypeWorkpackEnum';
 import { takeUntil } from 'rxjs/operators';
 import { ResponsiveService } from '../../../../shared/services/responsive.service';
 import { ConfigDataViewService } from 'src/app/shared/services/config-dataview.service';
@@ -10,7 +9,7 @@ import { WorkpackService } from 'src/app/shared/services/workpack.service';
 import { Subject } from 'rxjs';
 import { IBaseline } from '../../../../shared/interfaces/IBaseline';
 import { ISection } from '../../../../shared/interfaces/ISectionWorkpack';
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 import { WorkpackShowTabviewService } from 'src/app/shared/services/workpack-show-tabview.service';
 
 @Component({
@@ -39,20 +38,22 @@ export class WorkpackSectionBaselinesComponent implements OnInit, OnDestroy {
     private baselineSrv: BaselineService,
     private workpackShowTabviewSrv: WorkpackShowTabviewService
   ) {
+    this.sectionBaselines = {
+      cardSection: {
+        toggleable: false,
+        initialStateToggle: false,
+        cardTitle: !this.showTabview ? 'baselines' : '',
+        collapseble: this.showTabview ? false : true,
+        initialStateCollapse: this.showTabview ? false : this.collapsePanelsStatus,
+        showFilters: false,
+        isLoading: true,
+        showCreateNemElementButton: false,
+      }
+    };
     this.workpackShowTabviewSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => {
       this.showTabview = value;
     });
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(responsive => this.responsive = responsive);
-    this.workpackSrv.observableResetWorkpack.pipe(takeUntil(this.$destroy)).subscribe(reset => {
-      if (reset) {
-        this.workpackData = this.workpackSrv.getWorkpackData();
-        this.workpackParams = this.workpackSrv.getWorkpackParams();
-        if (this.workpackParams.idWorkpack && this.workpackData.workpack.type === TypeWorkpackEnum.ProjectModel) {
-          this.collapsePanelsStatus = this.configDataViewSrv.getPanelStatus() === 'collapse' ? true : false;
-          this.loadBaselineSection();
-        }
-      }
-    });
     this.configDataViewSrv.observableCollapsePanelsStatus.pipe(takeUntil(this.$destroy)).subscribe(collapsePanelStatus => {
       this.collapsePanelsStatus = this.showTabview ? false : collapsePanelStatus === 'collapse' ? true : false;
       this.sectionBaselines = this.sectionBaselines && Object.assign({}, {
@@ -66,9 +67,16 @@ export class WorkpackSectionBaselinesComponent implements OnInit, OnDestroy {
     this.configDataViewSrv.observableDisplayModeAll.pipe(takeUntil(this.$destroy)).subscribe(displayMode => {
       this.displayModeAll = displayMode;
     });
+    this.baselineSrv.observableResetBaselines.pipe(takeUntil(this.$destroy)).subscribe(reset => {
+      if (reset) {
+        this.collapsePanelsStatus = this.configDataViewSrv.getPanelStatus() === 'collapse' ? true : false;
+        this.loadBaselinesData();
+      }
+    });
   }
 
   ngOnInit(): void {
+    
   }
 
   ngOnDestroy(): void {
@@ -76,23 +84,24 @@ export class WorkpackSectionBaselinesComponent implements OnInit, OnDestroy {
     this.$destroy.unsubscribe();
   }
 
+  loadBaselinesData() {
+    const {
+      workpackData,
+      workpackParams,
+      baselines,
+      loading
+    } = this.baselineSrv.getBaselinesData();
+    this.workpackData = workpackData;
+    this.workpackParams = workpackParams;
+    this.baselines = baselines;
+    if (!loading ) this.loadBaselineSection();
+  }
+
   async loadBaselineSection() {
-    this.sectionBaselines = {
-      cardSection: {
-        toggleable: false,
-        initialStateToggle: false,
-        cardTitle: !this.showTabview ? 'baselines' : '',
-        collapseble: this.showTabview ? false : true,
-        initialStateCollapse: this.showTabview ? false : this.collapsePanelsStatus,
-        showFilters: false,
-        isLoading: true,
-        showCreateNemElementButton: false,
-      }
-    };
     this.sectionBaselines = {
       ...this.sectionBaselines,
       cardSection: {
-        ...this.sectionBaselines.cardSection,
+        ...this.sectionBaselines?.cardSection,
         isLoading: false
       },
       cardItemsSection: await this.loadSectionBaselinesCards(this.baselinesSectionShowInactives)
@@ -100,8 +109,6 @@ export class WorkpackSectionBaselinesComponent implements OnInit, OnDestroy {
   }
 
   async loadSectionBaselinesCards(showInactives: boolean) {
-    const resultBaselines = await this.baselineSrv.GetAll({ 'id-workpack': this.workpackParams.idWorkpack });
-    this.baselines = resultBaselines.success ? resultBaselines.data : [];
     if (this.baselines && this.baselines.length > 0) {
       const cardItems = this.baselines.filter(b => {
         if (!showInactives) {
@@ -184,6 +191,7 @@ export class WorkpackSectionBaselinesComponent implements OnInit, OnDestroy {
     const result = await this.baselineSrv.delete(base, { useConfirm: true });
     if (result.success) {
       this.sectionBaselines.cardItemsSection = Array.from(this.sectionBaselines.cardItemsSection.filter(item => item.itemId !== base.id));
+      this.baselineSrv.deleteBaselineFromData(base.id);
     }
   }
 

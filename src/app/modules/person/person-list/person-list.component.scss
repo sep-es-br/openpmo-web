@@ -1,3 +1,5 @@
+@use "src/variables" as v;
+
 ::ng-deep .app-person-list {
   .header-container {
     display: flex;
@@ -29,7 +31,7 @@
       width: 80%;
       margin-bottom: 2.5rem;
       .p-overlaypanel .p-overlaypanel-close {
-        background-color: #44B39B;
+        background-color: v.$bgButtonGreen;
       }
       .scope {
         cursor: pointer;
@@ -39,15 +41,15 @@
         text-overflow: ellipsis;
       }
       .property-input {
-        background-color: #fff;
+        background-color: v.$bgWhite;
         width: 70%;
         margin: 0 2rem 0 0;
-        border: 1px solid #eeeeed;
+        border: 1px solid v.$borderInput;
         padding-bottom: 0;
         &.search {
            display: flex;
            .p-button {
-            background-color: #44B39B;
+            background-color: v.$bgButtonGreen;
             padding: 0.5rem 1.5rem;
             .pi {
               font-size: 1.2rem;

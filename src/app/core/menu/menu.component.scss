@@ -10,7 +10,7 @@ $mobileMenuHeight: 90px;
   justify-content: center;
   height: 100%;
   position: relative;
-  z-index: 10001;
+  z-index: 1000;
   max-height: 100vh;
   position: sticky;
   top: 0;
@@ -337,7 +337,7 @@ $mobileMenuHeight: 90px;
   .logout {
     padding: 1em;
     display: flex;
-    color: v.$fontLogout;
+    color: v.$fontRed;
     font-family: v.$fontFamilyBold;
     cursor: pointer;
 

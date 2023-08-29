@@ -26,6 +26,31 @@ export class BreadcrumbService extends BaseService<any> {
       { params: PrepareHttpParams(options) }).toPromise();
   }
 
+  async loadWorkpackBreadcrumbs(idWorkpack: number, idPlan: number) {
+    const { success, data } = await this.getBreadcrumbWorkpack(idWorkpack, { 'id-plan': idPlan });
+    return success
+      ? data.map(p => ({
+        key: !p.modelName ? p.type.toLowerCase() : p.modelName,
+        info: p.name,
+        tooltip: p.fullName,
+        routerLink: this.getRouterLinkFromType(p.type),
+        queryParams: { id: p.id, idWorkpackModelLinked: p.idWorkpackModelLinked, idPlan: idPlan },
+        modelName: p.modelName
+      }))
+      : [];
+  }
+
+  getRouterLinkFromType(type: string): string[] {
+    switch (type) {
+      case 'office':
+        return ['/offices', 'office'];
+      case 'plan':
+        return ['plan'];
+      default:
+        return ['/workpack'];
+    }
+  }
+
   getBreadcrumbWorkpackModel(idWorkpackModel: number) {
     return this.http.get<IHttpResult<IResultBreadcrumb[]>>(`${this.urlBase}/model/${idWorkpackModel}`).toPromise();
   }
@@ -52,6 +77,10 @@ export class BreadcrumbService extends BaseService<any> {
   setBreadcrumbStorage(breadcrumbs: IBreadcrumb[]) {
     localStorage.setItem(this.key, JSON.stringify(breadcrumbs));
     this.currentBreadcrumb.next(breadcrumbs);
+  }
+
+  storageBreadcrumb(breadcrumbs: IBreadcrumb[]) {
+    localStorage.setItem(this.key, JSON.stringify(breadcrumbs));
   }
 
   get get(): IBreadcrumb[] {

@@ -61,8 +61,12 @@ export class BaselineCancellingComponent implements OnInit {
   }
 
   async setBreadcrumb() {
+    let breadcrumbItems = this.breadcrumbSrv.get;
+    if (!breadcrumbItems || breadcrumbItems.length === 0) {
+      breadcrumbItems = await this.breadcrumbSrv.loadWorkpackBreadcrumbs(this.idWorkpack, this.idPlan)
+    }
     this.breadcrumbSrv.setMenu([
-      ... await this.getBreadcrumbs(this.idWorkpack),
+      ... breadcrumbItems,
       {
         key: 'baseline',
         routerLink: ['/workpack/cancelling'],

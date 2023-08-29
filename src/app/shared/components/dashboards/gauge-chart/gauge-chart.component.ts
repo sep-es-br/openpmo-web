@@ -137,7 +137,7 @@ export class GaugeChartComponent implements OnInit, OnDestroy, OnChanges {
     ctx.textAlign = 'center';
     ctx.textBaseline = 'bottom';
     ctx.font = Chart.helpers.fontString(
-      32,
+      22,
       'bold',
       'Montserrat'
     );

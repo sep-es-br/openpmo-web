@@ -39,6 +39,8 @@ import { OfficeService } from 'src/app/shared/services/office.service';
 import { IOffice } from 'src/app/shared/interfaces/IOffice';
 import { MenuService } from 'src/app/shared/services/menu.service';
 import { ConfigDataViewService } from 'src/app/shared/services/config-dataview.service';
+import { TypeOrganization } from 'src/app/shared/enums/TypeOrganization';
+import { IOrganization } from 'src/app/shared/interfaces/IOrganization';
 
 interface IIcon {
   name: string;
@@ -50,11 +52,6 @@ interface IGroup {
   properties: IWorkpackModelProperty[];
   groups: IGroup[];
   menuProperties: MenuItem[];
-}
-
-enum PropertySessionEnum {
-  PROPERTIES = 'PROPERTIES',
-  COST = 'COST'
 }
 
 @Component({
@@ -90,10 +87,9 @@ export class WorkpackModelComponent implements OnInit {
   icons: IIcon[];
   modelProperties: IWorkpackModelProperty[] = [];
   menuModelProperties: MenuItem[] = [];
-  modelCostProperties: IWorkpackModelProperty[] = [];
   menuCostProperties: MenuItem[] = [];
   listDomains: SelectItem[] = [];
-  listOrganizations: SelectItem[] = [];
+  listOrganizations: IOrganization[] = [];
   listMeasureUnits: SelectItem[] = [];
   groups: IGroup[] = [];
   currentLang: string;
@@ -124,7 +120,6 @@ export class WorkpackModelComponent implements OnInit {
   };
   currentBreadcrumbItems: IBreadcrumb[];
   currentBreadcrumbSub: Subscription;
-  propertySessionEnum = PropertySessionEnum;
   isLoading = false;
 
   constructor(
@@ -219,10 +214,9 @@ export class WorkpackModelComponent implements OnInit {
         this.currentLang = lang;
         this.loadIcons();
         setTimeout(() => {
-          this.loadMenuProperty(PropertySessionEnum.PROPERTIES);
-          this.loadMenuProperty(PropertySessionEnum.COST);
+          this.loadMenuProperty();
           this.modelProperties.filter(prop => prop.type === TypePropertyEnum.GroupModel).forEach(group => {
-            group.menuModelProperties = this.loadMenuPropertyGroup(PropertySessionEnum.PROPERTIES, group);
+            group.menuModelProperties = this.loadMenuPropertyGroup(group);
           });
         }, 250);
       });
@@ -295,7 +289,6 @@ export class WorkpackModelComponent implements OnInit {
     this.posibleRolesPerson = this.rolesPersonOptions.map(role => this.translateSrv.instant(role));
     this.posibleRolesOrg = this.rolesOrgOptions.map(role => this.translateSrv.instant(role));
     this.modelProperties = [];
-    this.modelCostProperties = [];
     this.childrenModels = [];
     this.cardItemsModels = [];
     this.cardProperties = null;
@@ -304,7 +297,6 @@ export class WorkpackModelComponent implements OnInit {
     this.cardPropertiesRiskAndIssues = null;
     this.cardPropertiesCostAccount = null;
     this.cardPropertiesProcesses = null;
-    this.cardPropertiesCostAccount = null;
     this.cardPropertiesJournal = null;
     this.cardPropertiesModels = null;
     this.cardPropertiesSchedule = null;
@@ -314,8 +306,7 @@ export class WorkpackModelComponent implements OnInit {
   ngOnInit(): void {
     this.currentLang = this.translateSrv.getDefaultLang();
     this.loadIcons();
-    this.loadMenuProperty(PropertySessionEnum.PROPERTIES);
-    this.loadMenuProperty(PropertySessionEnum.COST);
+    this.loadMenuProperty();
   }
 
   async loadDetails() {
@@ -332,17 +323,8 @@ export class WorkpackModelComponent implements OnInit {
   }
 
   async getOfficeById() {
-    const propertiesOfficeItem = localStorage.getItem('@pmo/propertiesCurrentOffice');
-    if (propertiesOfficeItem && (JSON.parse(propertiesOfficeItem)).id === this.idOffice) {
-      this.propertiesOffice = JSON.parse(propertiesOfficeItem);
-    } else {
-      const { success, data } = await this.officeSrv.GetById(this.idOffice);
-      if (success) {
-        this.propertiesOffice = data;
-        this.idOffice = data.id;
-        localStorage.setItem('@pmo/propertiesCurrentOffice', JSON.stringify(this.propertiesOffice));
-      }
-    }
+    this.propertiesOffice = await this.officeSrv.getCurrentOffice(this.idOffice);
+    this.idOffice = this.propertiesOffice.id;
   }
 
   async getPlanModelById() {
@@ -531,7 +513,6 @@ export class WorkpackModelComponent implements OnInit {
             fullLine: false,
           }
         );
-        this.loadDefaultPropertiesCostAccount();
         break;
       case TypeWorkpackModelEnum.ProjectModel:
         defaultProperties.push(
@@ -626,84 +607,6 @@ export class WorkpackModelComponent implements OnInit {
     this.modelProperties = defaultProperties;
   }
 
-  loadDefaultPropertiesCostAccount() {
-    const modelCostProperties: IWorkpackModelProperty[] = [
-      {
-        active: true,
-        label: this.translateSrv.instant('name'),
-        name: 'name',
-        type: TypePropertyEnum.TextModel,
-        obligatory: true,
-        max: 25,
-        sortIndex: 0,
-        session: PropertySessionEnum.COST,
-        fullLine: false,
-        required: true
-      },
-      {
-        active: true,
-        label: this.translateSrv.instant('fullName'),
-        name: 'fullName',
-        type: TypePropertyEnum.TextAreaModel,
-        sortIndex: 1,
-        obligatory: true,
-        session: PropertySessionEnum.COST,
-        fullLine: true,
-        required: true,
-        rows: 3
-      },
-      {
-        active: true,
-        label: this.translateSrv.instant('limit'),
-        name: 'limit',
-        type: TypePropertyEnum.CurrencyModel,
-        sortIndex: 2,
-        obligatory: true,
-        session: PropertySessionEnum.COST,
-        fullLine: false
-      },
-      {
-        active: true,
-        label: this.translateSrv.instant('funder'),
-        name: 'funder',
-        type: TypePropertyEnum.OrganizationSelectionModel,
-        sortIndex: 3,
-        obligatory: true,
-        session: PropertySessionEnum.COST,
-        required: true,
-        multipleSelection: false,
-        fullLine: true
-      },
-      {
-        active: true,
-        label: this.translateSrv.instant('economicCategory'),
-        name: this.translateSrv.instant('economicCategory'),
-        type: TypePropertyEnum.SelectionModel,
-        sortIndex: 4,
-        session: PropertySessionEnum.COST,
-        possibleValuesOptions: Object.values(this.translateSrv.instant(['capitalExpenses', 'currentExpenses'])) as string[],
-        defaultValue: this.translateSrv.instant('capitalExpenses'),
-        multipleSelection: false,
-        fullLine: false
-      },
-      {
-        active: true,
-        label: this.translateSrv.instant('source'),
-        name: this.translateSrv.instant('source'),
-        type: TypePropertyEnum.SelectionModel,
-        sortIndex: 5,
-        session: PropertySessionEnum.COST,
-        possibleValuesOptions: Object.values(this.translateSrv.instant(['nonBudgetary', 'cashResources',
-          'treasuryRelatedResources', 'ownResources'])) as string[],
-        multipleSelection: false,
-        defaultValue: this.translateSrv.instant('nonBudgetary'),
-        fullLine: false
-      }
-    ];
-    modelCostProperties.map(prop => this.checkProperty(prop));
-    this.modelCostProperties = modelCostProperties;
-  }
-
   async loadWorkpackModel() {
     const { data, success } = await this.workpackModelSrv.GetById(this.idWorkpackModel);
     if (success) {
@@ -720,7 +623,7 @@ export class WorkpackModelComponent implements OnInit {
       this.posibleRolesOrg = data.organizationRoles || [];
       this.posibleRolesPerson = data.personRoles || [];
       if (data.properties) {
-        const dataPropertiesAndIndex = (await Promise.all(data.properties
+        const dataPropertiesAndIndex = (await Promise.all(data.properties.filter(property => property.session !== 'COST')
           .map(async (p, i) => {
             if (p.possibleValues) {
               p.possibleValuesOptions = (p.possibleValues as string).split(',');
@@ -748,6 +651,9 @@ export class WorkpackModelComponent implements OnInit {
                 p.showIconButtonSelectLocality = true;
               }
             }
+            if (p.sectors) {
+              p.sectorsList = p.sectors.split(',').map( sector => sector.toUpperCase());
+            }
             if (p.defaults) {
               const isArray = p.defaults instanceof Array;
               if (!p.multipleSelection && isArray) {
@@ -759,13 +665,16 @@ export class WorkpackModelComponent implements OnInit {
               p.defaultValue = value && new Date(value);
             }
             if (p.type === TypePropertyEnum.GroupModel) {
-              p.menuModelProperties = this.loadMenuPropertyGroup(PropertySessionEnum.PROPERTIES, p);
+              p.menuModelProperties = this.loadMenuPropertyGroup(p);
               p.groupedProperties.forEach(async (gp) => {
                 if (gp.possibleValues) {
                   gp.possibleValuesOptions = (gp.possibleValues as string).split(',');
                 }
                 if (gp.defaultValue && gp.multipleSelection) {
                   gp.defaultValue = (gp.defaultValue as string).split(',');
+                }
+                if (gp.sectors) {
+                  gp.sectorsList = gp.sectors.split(',').map( sector => sector.toUpperCase());
                 }
                 if (gp.idDomain) {
                   gp.extraList = await this.getListLocalities(gp.idDomain, gp.multipleSelection);
@@ -807,8 +716,7 @@ export class WorkpackModelComponent implements OnInit {
         const dataProperties = dataPropertiesAndIndex
           .sort((a, b) => a[1] > b[1] ? 1 : -1)
           .map(prop => prop[0] as IWorkpackModelProperty);
-        this.modelProperties = dataProperties.filter(p => !p.session || p.session === PropertySessionEnum.PROPERTIES);
-        this.modelCostProperties = dataProperties.filter(p => p.session === PropertySessionEnum.COST);
+        this.modelProperties = dataProperties;
       }
       this.getSortedByList();
       this.cardPropertiesCostAccount.initialStateToggle = data.costSessionActive;
@@ -838,19 +746,18 @@ export class WorkpackModelComponent implements OnInit {
     }
   }
 
-  async addProperty(type: TypePropertyEnum, session: PropertySessionEnum, groupProperty?: IWorkpackModelProperty) {
+  async addProperty(type: TypePropertyEnum, groupProperty?: IWorkpackModelProperty) {
     const newProperty: IWorkpackModelProperty = {
       type,
       active: true,
       label: '',
       name: '',
-      session,
-      sortIndex: !groupProperty ? (session === PropertySessionEnum.PROPERTIES
-        ? this.modelProperties.length
-        : this.modelCostProperties.length) : groupProperty.groupedProperties.length,
+      sortIndex: !groupProperty ? this.modelProperties.length : groupProperty.groupedProperties.length,
       fullLine: true,
       required: false,
       multipleSelection: false,
+      sectorsList: type === TypePropertyEnum.OrganizationSelectionModel ?
+      [TypeOrganization.Private.toUpperCase(), TypeOrganization.Public.toUpperCase(), TypeOrganization.Third.toUpperCase()] : [],
       selectedLocalities: type === TypePropertyEnum.LocalitySelectionModel && this.translateSrv.instant('selectDefaultValue'),
       showIconButtonSelectLocality: type === TypePropertyEnum.LocalitySelectionModel
     };
@@ -859,26 +766,25 @@ export class WorkpackModelComponent implements OnInit {
     this.saveButton?.hideButton();
     if (type === TypePropertyEnum.GroupModel) {
       newProperty.groupedProperties = [];
-      newProperty.menuModelProperties = this.loadMenuPropertyGroup(session, newProperty);
+      newProperty.menuModelProperties = this.loadMenuPropertyGroup(newProperty);
     }
     return groupProperty
       ? groupProperty.groupedProperties.push(newProperty)
-      : session === PropertySessionEnum.PROPERTIES
-        ? this.modelProperties.push(newProperty)
-        : this.modelCostProperties.push(newProperty);
+      : this.modelProperties.push(newProperty);
   }
 
   async checkProperty(property: IWorkpackModelProperty) {
     let list = [];
-    let requiredFields = ['name', 'label', 'sortIndex', 'session'];
+    let requiredFields = ['name', 'label', 'sortIndex'];
     switch (property.type) {
       case TypePropertyEnum.LocalitySelectionModel:
         requiredFields = requiredFields.concat(['idDomain', 'multipleSelection']);
         list = await this.getListDomains();
         break;
       case TypePropertyEnum.OrganizationSelectionModel:
-        requiredFields = requiredFields.concat(['multipleSelection']);
-        list = await this.getListOrganizations();
+        requiredFields = requiredFields.concat(['multipleSelection', 'sectors']);
+        property.sectors = property.sectorsList.map(sec => sec.toLowerCase()).join(',');
+        list = await this.getListOrganizations(property.sectorsList);
         break;
       case TypePropertyEnum.UnitSelectionModel:
         list = await this.getListMeasureUnits();
@@ -887,7 +793,7 @@ export class WorkpackModelComponent implements OnInit {
         requiredFields = requiredFields.concat(['possibleValuesOptions', 'multipleSelection']);
         break;
       case TypePropertyEnum.GroupModel:
-        requiredFields = ['name', 'sortIndex', 'session', 'groupedProperties'];
+        requiredFields = ['name', 'sortIndex','groupedProperties'];
         break;
       case TypePropertyEnum.NumberModel:
         requiredFields = requiredFields.concat(['precision']);
@@ -898,7 +804,6 @@ export class WorkpackModelComponent implements OnInit {
     }
     property.isCollapsed = property.isCollapsed === undefined || property.isCollapsed;
     property.list = list;
-    property.session = property.session || PropertySessionEnum.PROPERTIES;
     property.requiredFields = requiredFields;
     property.viewOnly = !this.editPermission;
     property.obligatory = !!property.obligatory
@@ -928,18 +833,10 @@ export class WorkpackModelComponent implements OnInit {
       acceptLabel: this.translateSrv.instant('yes'),
       rejectLabel: this.translateSrv.instant('no'),
       accept: () => {
-        if (property.session === PropertySessionEnum.COST) {
-          if (group) {
-            group.groupedProperties = group.groupedProperties.filter(prop => prop !== property);
-          } else {
-            this.modelCostProperties = this.modelCostProperties.filter(p => p !== property);
-          }
+        if (group) {
+          group.groupedProperties = group.groupedProperties.filter(prop => prop !== property);
         } else {
-          if (group) {
-            group.groupedProperties = group.groupedProperties.filter(prop => prop !== property);
-          } else {
-            this.modelProperties = this.modelProperties.filter(p => p !== property);
-          }
+          this.modelProperties = this.modelProperties.filter(p => p !== property);
         }
         if (property.id) {
           this.saveButton?.showButton();
@@ -979,15 +876,22 @@ export class WorkpackModelComponent implements OnInit {
         }
       }
     }
+    if (event?.property && event.property?.sectorsList && this.editPermission) {
+      if(!!event.sectorChanged) {
+        event.property.sectors = event.property?.sectorsList.map( sec => sec.toLowerCase()).join(',');
+        event.property.list = await this.getListOrganizations(event.property.sectorsList);
+        event.property.defaults = [];
+      }
+    }
     this.checkProperties();
   }
 
-  checkProperties() {
+  checkProperties(changeStakeholderRoles = false) {
     if (this.formProperties.invalid) {
       this.saveButton?.hideButton();
       return;
     }
-    const properties: IWorkpackModelProperty[] = [...this.modelProperties, ...this.modelCostProperties];
+    const properties: IWorkpackModelProperty[] = [...this.modelProperties];
     // Value check
     const propertiesChecks: { valid: boolean; invalidKeys: string[]; prop: IWorkpackModelProperty }[] = properties.map(p => ({
       valid: p.requiredFields
@@ -1011,7 +915,7 @@ export class WorkpackModelComponent implements OnInit {
       this.saveButton?.hideButton();
       return;
     }
-    if (this.dashboardPanel) {
+    if (this.dashboardPanel && !!changeStakeholderRoles) {
       this.dashboardPanel.dashboardStakeholderRolesOptions = ((this.posibleRolesPerson && this.posibleRolesPerson.length > 0) || (this.posibleRolesOrg && this.posibleRolesOrg.length > 0)) ?
         this.posibleRolesPerson.concat(this.posibleRolesOrg).map(item => ({ label: item, value: item })) :
         this.stakeholders.map(item => ({ label: this.translateSrv.instant(item), value: this.translateSrv.instant(item) }));
@@ -1019,7 +923,7 @@ export class WorkpackModelComponent implements OnInit {
       this.dashboardPanel.dashboardShowStakeholders = this.dashboardPanel.dashboardShowStakeholders
         .filter(option => this.dashboardPanel.dashboardStakeholderRolesOptions.find(role => role.value === option));
     }
-    const separationForDuplicateCheck = properties.map(prop => [prop.name + prop.session, prop.label + prop.session])
+    const separationForDuplicateCheck = properties.map(prop => [prop.name, prop.label])
       .reduce((a, b) => ((a[0].push(b[0])), a[1].push(b[1]), a), [[], []]);
     // Duplicated name check
     if (new Set(separationForDuplicateCheck[0]).size !== properties.length) {
@@ -1070,7 +974,7 @@ export class WorkpackModelComponent implements OnInit {
     if (this.formProperties.invalid || !arePropertiesValid || !arePossiblesValuesValid) {
       return false;
     }
-    const separationForDuplicateCheck = properties.map(prop => [prop.name + prop.session, prop.label + prop.session])
+    const separationForDuplicateCheck = properties.map(prop => [prop.name, prop.label])
       .reduce((a, b) => ((a[0].push(b[0])), a[1].push(b[1]), a), [[], []]);
     // Duplicated name check
     if (new Set(separationForDuplicateCheck[0]).size !== properties.length) {
@@ -1080,8 +984,8 @@ export class WorkpackModelComponent implements OnInit {
     return new Set(separationForDuplicateCheck[1]).size === properties.length;
   }
 
-  addGroup(session: PropertySessionEnum, groupProperty?: IWorkpackModelProperty) {
-    return this.addProperty(TypePropertyEnum.GroupModel, session, groupProperty);
+  addGroup(groupProperty?: IWorkpackModelProperty) {
+    return this.addProperty(TypePropertyEnum.GroupModel, groupProperty);
   }
 
   async getListDomains() {
@@ -1096,14 +1000,14 @@ export class WorkpackModelComponent implements OnInit {
     return this.listDomains;
   }
 
-  async getListOrganizations() {
+  async getListOrganizations(sectors: string[]) {
     if (!this.listOrganizations.length) {
       const result = await this.organizationSrv.GetAll({ 'id-office': this.idOffice });
       if (result.success) {
-        this.listOrganizations = result.data.map(d => ({ label: d.name, value: d.id }));
+        this.listOrganizations = result.data;
       }
     }
-    return this.listOrganizations;
+    return this.listOrganizations.filter( org => sectors && sectors.includes(org.sector)).map(d => ({ label: d.name, value: d.id }));
   }
 
   async getListMeasureUnits() {
@@ -1191,7 +1095,7 @@ export class WorkpackModelComponent implements OnInit {
   }
 
 
-  loadMenuProperty(session: PropertySessionEnum) {
+  loadMenuProperty() {
     if (this.currentLang && !['pt-BR', 'en-US'].includes(this.currentLang)) {
       return;
     }
@@ -1199,16 +1103,12 @@ export class WorkpackModelComponent implements OnInit {
       .map(type => ({
         label: this.translateSrv.instant(`labels.${TypePropertyEnum[type]}`),
         icon: IconPropertyEnum[TypePropertyEnum[type]],
-        command: () => this.addProperty(TypePropertyEnum[type], session)
+        command: () => this.addProperty(TypePropertyEnum[type])
       }));
-    if (session === PropertySessionEnum.COST) {
-      this.menuCostProperties = menu;
-    } else {
       this.menuModelProperties = menu;
-    }
   }
 
-  loadMenuPropertyGroup(session: PropertySessionEnum, groupProperty?: IWorkpackModelProperty) {
+  loadMenuPropertyGroup(groupProperty?: IWorkpackModelProperty) {
     if (this.currentLang && !['pt-BR', 'en-US'].includes(this.currentLang)) {
       return;
     }
@@ -1217,7 +1117,7 @@ export class WorkpackModelComponent implements OnInit {
         .map(type => ({
           label: this.translateSrv.instant(`labels.${TypePropertyEnum[type]}`),
           icon: IconPropertyEnum[TypePropertyEnum[type]],
-          command: () => this.addProperty(TypePropertyEnum[type], session, groupProperty)
+          command: () => this.addProperty(TypePropertyEnum[type], groupProperty)
         }));
     }
   }
@@ -1357,19 +1257,11 @@ export class WorkpackModelComponent implements OnInit {
       toggleable: this.editPermission,
       initialStateToggle: this.workpackModelType === TypeWorkpackModelEnum.DeliverableModel,
       cardTitle: 'costAccounts',
-      collapseble: true,
+      collapseble: false,
       initialStateCollapse: false,
       onToggle: new EventEmitter<boolean>()
     };
-    this.cardPropertiesCostAccount.onToggle.pipe(takeUntil(this.$destroy)).subscribe(toggleOn => {
-      if (toggleOn) {
-        this.loadDefaultPropertiesCostAccount();
-      } else {
-        this.modelCostProperties = [];
-      }
-      setTimeout(() => this.checkProperties(), 150);
-
-    });
+    this.cardPropertiesCostAccount.onToggle.pipe(takeUntil(this.$destroy)).subscribe(() => this.checkProperties())
     this.cardPropertiesJournal = {
       toggleable: this.editPermission,
       initialStateToggle: false,
@@ -1417,14 +1309,8 @@ export class WorkpackModelComponent implements OnInit {
       delete prop.extraListDefaults;
       prop.possibleValues = prop.possibleValuesOptions && prop.possibleValuesOptions.join(',');
     });
-    this.modelCostProperties.forEach(prop => {
-      delete prop.extraList;
-      delete prop.extraListDefaults;
-      prop.possibleValues = prop.possibleValuesOptions && prop.possibleValuesOptions.join(',');
-    });
     const propertiesClone: IWorkpackModelProperty[] =
-      JSON.parse(JSON.stringify([...this.modelProperties.filter(prop => prop.type !== TypePropertyEnum.GroupModel),
-      ...this.modelCostProperties.filter(costProp => costProp.type !== TypePropertyEnum.GroupModel)]));
+      JSON.parse(JSON.stringify([...this.modelProperties.filter(prop => prop.type !== TypePropertyEnum.GroupModel)]));
     propertiesClone.map(prop => {
       Object.keys(prop).map(key => {
         if (prop[key] && prop[key] instanceof Array && key !== 'defaults') {
@@ -1441,8 +1327,7 @@ export class WorkpackModelComponent implements OnInit {
       delete prop.viewOnly;
       delete prop.obligatory;
     });
-    const propertiesGroupClone = [...this.modelProperties.filter(prop => prop.type === TypePropertyEnum.GroupModel),
-    ...this.modelCostProperties.filter(costProp => costProp.type === TypePropertyEnum.GroupModel)];
+    const propertiesGroupClone = [...this.modelProperties.filter(prop => prop.type === TypePropertyEnum.GroupModel)];
     propertiesGroupClone.forEach(propGroup => {
       propGroup.groupedProperties.forEach(p => {
         delete p.extraList;
@@ -1676,10 +1561,9 @@ export class WorkpackModelComponent implements OnInit {
         const dataProperties = dataPropertiesAndIndex
           .sort((a, b) => a[1] > b[1] ? 1 : -1)
           .map(prop => prop[0] as IWorkpackModelProperty);
-        this.modelProperties = dataProperties.filter(p => !p.session || p.session === PropertySessionEnum.PROPERTIES);
-        this.modelCostProperties = dataProperties.filter(p => p.session === PropertySessionEnum.COST);
+        this.modelProperties = dataProperties;
         this.modelProperties.filter(prop => prop.type === TypePropertyEnum.GroupModel).forEach(group => {
-          group.menuModelProperties = this.loadMenuPropertyGroup(PropertySessionEnum.PROPERTIES, group);
+          group.menuModelProperties = this.loadMenuPropertyGroup(group);
         });
       }
     }
@@ -1713,7 +1597,9 @@ export class WorkpackModelComponent implements OnInit {
             p.selectedLocalities = this.translateSrv.instant('selectDefaultValue');
             p.showIconButtonSelectLocality = true;
           }
-
+        }
+        if (p.sectors) {
+          p.sectorsList = p.sectors.split(',').map( sector => sector.toUpperCase());
         }
         if (p.defaults) {
           const isArray = p.defaults instanceof Array;

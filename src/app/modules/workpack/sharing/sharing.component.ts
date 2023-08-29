@@ -95,21 +95,13 @@ export class SharingComponent implements OnInit {
   }
 
   async loadPlanProperties() {
-    const result = await this.planSrv.GetById(this.idPlan);
-    if (result.success) {
-      this.plan = result.data;
-      const propertiesOfficeItem = localStorage.getItem('@pmo/propertiesCurrentOffice');
-      if (propertiesOfficeItem && (JSON.parse(propertiesOfficeItem)).id === this.plan.idOffice) {
-        this.office = JSON.parse(propertiesOfficeItem);
-      } else {
-        const { success, data } = await this.officeSrv.GetById(this.plan.idOffice);
-        if (success) {
-          this.office = data;
-          localStorage.setItem('@pmo/propertiesCurrentOffice', JSON.stringify(this.office));
-        }
-      }
-      this.setBreacrumbFromPlan();
+    const storedPlan = localStorage.getItem('@pmo/propertiesCurrentPlan');
+    this.plan = storedPlan ? JSON.parse(storedPlan) : undefined;
+    if (!this.plan) {
+      this.plan = await this.planSrv.getCurrentPlan(this.idPlan);
     }
+    this.office = await this.officeSrv.getCurrentOffice(this.plan.idOffice);
+    this.setBreacrumbFromPlan();
   }
 
   async loadWorkpackProperties() {
@@ -118,10 +110,10 @@ export class SharingComponent implements OnInit {
       this.workpack = result.data;
       this.editPermission = (await this.authSrv.isUserAdmin() || this.workpack.permissions && this.workpack.permissions.filter(p => p.level === 'EDIT').length > 0
         && !this.workpack.canceled)
-      const propertyNameWorkpackModel = this.workpack?.model.properties.find(p => p.name === 'name' && p.session === 'PROPERTIES');
+      const propertyNameWorkpackModel = this.workpack?.model.properties.find(p => p.name === 'name');
       const propertyNameWorkpack = this.workpack.properties.find(p => p.idPropertyModel === propertyNameWorkpackModel.id);
       this.workpackName = propertyNameWorkpack.value as string;
-      const propertyFullNameWorkpackModel = this.workpack?.model.properties.find(p => p.name === 'fullName' && p.session === 'PROPERTIES');
+      const propertyFullNameWorkpackModel = this.workpack?.model.properties.find(p => p.name === 'fullName');
       const propertyFullNameWorkpack = this.workpack.properties.find(p => p.idPropertyModel === propertyFullNameWorkpackModel.id);
       this.workpackFullName = propertyFullNameWorkpack.value as string;
       if (!this.idPlan) {
@@ -158,8 +150,12 @@ export class SharingComponent implements OnInit {
   }
 
   async setBreadcrumbFromWorkpack() {
+    let breadcrumbItems = this.breadcrumbSrv.get;
+    if (!breadcrumbItems || breadcrumbItems.length === 0) {
+      breadcrumbItems = await this.breadcrumbSrv.loadWorkpackBreadcrumbs(this.idWorkpack, this.idPlan)
+    }
     this.breadcrumbSrv.setMenu([
-      ... await this.getBreadcrumbs(),
+      ... breadcrumbItems,
       {
         key: 'sharing',
         routerLink: ['/workpack/sharing'],
@@ -168,30 +164,6 @@ export class SharingComponent implements OnInit {
         tooltip: 'sharing'
       }
     ]);
-  }
-
-  async getBreadcrumbs() {
-    const { success, data } = await this.breadcrumbSrv.getBreadcrumbWorkpack(this.idWorkpackParent, { 'id-plan': this.idPlan });
-    return success
-      ? data.map(p => ({
-        key: p.type.toLowerCase(),
-        info: p.name,
-        tooltip: p.fullName,
-        routerLink: this.getRouterLinkFromType(p.type),
-        queryParams: { id: p.id, idWorkpackModelLinked: p.idWorkpackModelLinked, idPlan: this.idPlan }
-      }))
-      : [];
-  }
-
-  getRouterLinkFromType(type: string): string[] {
-    switch (type) {
-      case 'office':
-        return ['/offices', 'office'];
-      case 'plan':
-        return ['plan'];
-      default:
-        return ['/workpack'];
-    }
   }
 
   async loadWorkpackSharing() {

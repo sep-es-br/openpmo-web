@@ -71,7 +71,7 @@ export class ConfigDataViewPanelComponent implements OnInit, OnDestroy {
       this.collapsed = preferencesCollapsedExpandMode ? (preferencesCollapsedExpandMode === 'collapseAll' ? true : false) : true;
       this.handleCollapseAll(this.collapsed);
       const preferencesDisplayMode = this.cookieSrv.get('displayModeDataView' + this.user.email);
-      this.displayMode = preferencesDisplayMode ? preferencesDisplayMode : 'grid';
+      this.displayMode = preferencesDisplayMode ? preferencesDisplayMode : 'list';
       this.handleChangeDisplayMode(this.displayMode);
       const preferencePageSize = this.cookieSrv.get('pageSizeDataView' + this.user.email);
       this.selectedPageSize = preferencePageSize ? Number(preferencePageSize) : 5;

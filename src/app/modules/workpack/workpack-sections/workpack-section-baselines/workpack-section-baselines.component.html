@@ -8,7 +8,7 @@
     </div>
     <div class="baselines-list-container">
       <div class="loading-container" *ngIf="sectionBaselines?.cardSection?.isLoading">
-        <app-card-loading [isCardLoading]="sectionBaselines?.cardSection?.isLoading" ></app-card-loading>
+        <app-card-loading [isCardLoading]="sectionBaselines?.cardSection?.isLoading"></app-card-loading>
       </div>
       <p-dataView [value]="sectionBaselines.cardItemsSection" layout="grid" class="app-dataview"
         [emptyMessage]="(baselinesSectionShowInactives ? 'noBaselines' : 'noActiveBaselines') | translate"

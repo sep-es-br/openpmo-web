@@ -8,20 +8,15 @@ import { takeUntil } from 'rxjs/operators';
 import { Calendar } from 'primeng/calendar';
 import { MenuItem, MessageService } from 'primeng/api';
 
-import { TypePropertyModelEnum } from 'src/app/shared/enums/TypePropertyModelEnum';
 import { ICard } from 'src/app/shared/interfaces/ICard';
 import { ISchedule, ICost } from 'src/app/shared/interfaces/ISchedule';
-import { IMeasureUnit } from 'src/app/shared/interfaces/IMeasureUnit';
 import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
-import { MeasureUnitService } from 'src/app/shared/services/measure-unit.service';
 import { ResponsiveService } from 'src/app/shared/services/responsive.service';
 import { ScheduleService } from 'src/app/shared/services/schedule.service';
-import { WorkpackService } from 'src/app/shared/services/workpack.service';
 import { CostAccountService } from 'src/app/shared/services/cost-account.service';
 import { enterLeave } from 'src/app/shared/animations/enterLeave.animation';
 import { SaveButtonComponent } from 'src/app/shared/components/save-button/save-button.component';
 import { IWorkpack } from 'src/app/shared/interfaces/IWorkpack';
-import { PlanService } from 'src/app/shared/services/plan.service';
 import * as moment from 'moment';
 import { ICartItemCostAssignment } from 'src/app/shared/interfaces/ICartItemCostAssignment';
 import { ICostAccount } from 'src/app/shared/interfaces/ICostAccount';
@@ -68,12 +63,9 @@ export class ScheduleComponent implements OnInit, OnDestroy {
     private responsiveSrv: ResponsiveService,
     private translateSrv: TranslateService,
     private breadcrumbSrv: BreadcrumbService,
-    private unitMeasureSrv: MeasureUnitService,
-    private workpackSrv: WorkpackService,
     private costAccountSrv: CostAccountService,
     private messageSrv: MessageService,
     private router: Router,
-    private planSrv: PlanService,
     private scheduleStartChangeSrv: ScheduleStartChangeService
   ) {
     this.actRouter.queryParams.subscribe(async queryParams => {
@@ -98,7 +90,8 @@ export class ScheduleComponent implements OnInit, OnDestroy {
       start: [newDate.toDate(), Validators.required],
       end: [newDate.add(1, 'days').toDate(), Validators.required],
       plannedWork: [null, Validators.required],
-      actualWork: null
+      actualWork: null,
+      distribution: ['SIGMOIDAL', Validators.required]
     });
   }
 
@@ -116,8 +109,12 @@ export class ScheduleComponent implements OnInit, OnDestroy {
   }
 
   async setBreadcrumb() {
+    let breadcrumbItems = this.breadcrumbSrv.get;
+    if (!breadcrumbItems || breadcrumbItems.length === 0) {
+      breadcrumbItems = await this.breadcrumbSrv.loadWorkpackBreadcrumbs(this.idWorkpack, this.idPlan)
+    }
     this.breadcrumbSrv.setMenu([
-      ... await this.getBreadcrumbs(),
+      ... breadcrumbItems,
       {
         key: 'schedule',
         routerLink: ['/workpack/schedule'],
@@ -125,33 +122,6 @@ export class ScheduleComponent implements OnInit, OnDestroy {
         info: ''
       }
     ]);
-  }
-
-  async getBreadcrumbs() {
-    const { success, data } = await this.breadcrumbSrv.getBreadcrumbWorkpack(this.idWorkpack, { 'id-plan': this.idPlan });
-    const breadcrumbPlan = data.find(d => d.type === 'plan');
-    if (breadcrumbPlan) {
-    }
-    return success
-      ? data.map(p => ({
-        key: p.type.toLowerCase(),
-        info: p.name,
-        tooltip: p.fullName,
-        routerLink: this.getRouterLinkFromType(p.type),
-        queryParams: { id: p.id, idWorkpackModelLinked: p.idWorkpackModelLinked, idPlan: this.idPlan }
-      }))
-      : [];
-  }
-
-  getRouterLinkFromType(type: string): string[] {
-    switch (type) {
-      case 'office':
-        return ['/offices', 'office'];
-      case 'plan':
-        return ['plan'];
-      default:
-        return ['/workpack'];
-    }
   }
 
   async loadPropertiesSchedule() {
@@ -421,6 +391,7 @@ export class ScheduleComponent implements OnInit, OnDestroy {
       end: this.formSchedule.controls.end.value,
       plannedWork: this.formSchedule.controls.plannedWork.value,
       actualWork: this.formSchedule.controls.actualWork.value,
+      distribution: this.formSchedule.controls.distribution.value,
       costs: this.costAssignmentsCardItems.filter(card => card.type === 'cost-card').map(cost => ({
         id: cost.idCost,
         plannedCost: cost.plannedWork,

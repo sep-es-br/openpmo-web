@@ -9,7 +9,7 @@
     height: 100%;
     max-width: 280px;
     width: 280px;
-    border: 1px solid #D4D4D4;
+    border: 1px solid v.$borderCard;
     box-shadow: none;
     display: flex;
     .display-mode-grid, .display-mode-list {
@@ -24,11 +24,11 @@
         .fa-tools {
           font-size: 1.1rem;
           transform: rotate(30deg);
-          color: #939393;
+          color: v.$iconGrey;
         }
         .fa-trash {
           font-size: 1.1rem;
-          color: #939393;
+          color: v.$iconGrey;
         }
       }
     }
@@ -78,25 +78,16 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      color: #888e96;
+      color: v.$iconGrey;
       padding: 0 !important;
 
       .icon-card {
         font-size: 2.5rem;
-        color: #888e96;
-      }
-      .risk-red {
-        color: #C0504D;
-      }
-      .risk-orange {
-        color: #ED7D31;
-      }
-      .risk-yellow {
-        color: #FFC000;
+        color: v.$iconGrey;
       }
       .icon-new {
         font-size: 3rem;
-        color: rgba(147, 147, 147, 0.5);
+        color: v.$iconLightGrey;
       }
       .card-item-name {
         font-size: 1.2rem;
@@ -106,16 +97,6 @@
         flex: 1;
         align-items: center;
         text-align: center;
-      }
-      .card-item-subtitle {
-        font-size: 0.8rem;
-        font-family: v.$fontFamilyMedium;
-        color: #009dd4;
-      }
-      .subtitle-card-risk {
-        font-size: 0.8rem;
-        font-family: v.$fontFamilyMedium;
-        color:  #9f9f9f;
       }
       &.cardList {
         flex-direction: row;
@@ -128,7 +109,7 @@
       justify-content: flex-end;
       padding: 0.5em;
       .card-item-id {
-        color: #888e96;
+        color: v.$fontGray;
         font-size: 0.6rem;
         font-family: v.$fontFamilyMedium;
       }
@@ -152,7 +133,7 @@
   }
 }
 
-::ng-deep .new-carditem {
+::ng-deep .new-carditem-office {
   .p-card {
     background-color: transparent;
     cursor: pointer;
@@ -161,7 +142,7 @@
     height: 100%;
     max-width: 280px;
     width: 280px;
-    border: 1px solid #D4D4D4;
+    border: 1px solid v.$borderCard;
     box-shadow: none;
     .p-card-body {
       padding: 0;
@@ -174,12 +155,12 @@
           .p-menuitem .p-menuitem-link {
             .p-menuitem-icon {
               font-size: 0.8rem;
-              color: #939393;
+              color: v.$fontLabel;
             }
             .p-menuitem-text {
               font-size: 0.9rem;
               font-family: v.$fontFamilyMedium;
-              color: #939393;
+              color: v.$fontLabel;
             }
           }
         }
@@ -212,7 +193,7 @@
   }
 }
 
-::ng-deep .new-carditem.new-card-item-mobile {
+::ng-deep .new-carditem-office.new-card-item-mobile {
   display: flex;
   justify-content: center;
   align-items: center;

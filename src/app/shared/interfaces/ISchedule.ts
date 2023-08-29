@@ -5,6 +5,7 @@ export interface ISchedule {
   actualWork: number;
   start: Date;
   end: Date;
+  distribution: string;
   costs: ICost[];
 }
 
@@ -66,6 +67,7 @@ export interface IConsume {
 export interface IStepPost {
   id?: number;
   idSchedule?: number;
+  distribution?: string;
   scheduleStart?: string;
   scheduleEnd?: string;
   plannedWork: number;

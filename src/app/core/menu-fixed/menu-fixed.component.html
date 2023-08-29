@@ -124,7 +124,7 @@
       <!-- Custom Panel Menu -->
       <div class="f-panelmenu">
         <div class="f-panelmenu-item" [class]="item.styleClass" *ngFor="let item of itemsFavorites">
-          <div class="f-panelmenu-container" (click)="handleNavigateFavorite(item)">
+          <div class="f-panelmenu-container" [title]="item.title" (click)="handleNavigateFavorite(item)">
             <div class="f-panelmenu-icon">
               <i [class]="item.icon"></i>
             </div>
@@ -155,7 +155,7 @@
         <!-- Custom Panel Menu -->
         <div class="f-panelmenu">
           <div class="f-panelmenu-item" [class]="item.styleClass" *ngFor="let item of itemsFavorites">
-            <div class="f-panelmenu-container" (click)="handleNavigateFavorite(item)">
+            <div class="f-panelmenu-container" [title]="item.title" (click)="handleNavigateFavorite(item)">
               <div class="f-panelmenu-icon">
                 <i [class]="item.icon"></i>
               </div>

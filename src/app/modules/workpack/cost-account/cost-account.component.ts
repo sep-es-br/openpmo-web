@@ -3,7 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { TreeNode } from 'primeng/api';
 
-import { ICard, progressBarValue } from 'src/app/shared/interfaces/ICard';
+import { ICard } from 'src/app/shared/interfaces/ICard';
 import { ResponsiveService } from 'src/app/shared/services/responsive.service';
 import { WorkpackModelService } from 'src/app/shared/services/workpack-model.service';
 import { WorkpackService } from 'src/app/shared/services/workpack.service';
@@ -24,6 +24,9 @@ import { PlanService } from 'src/app/shared/services/plan.service';
 import { MeasureUnitService } from 'src/app/shared/services/measure-unit.service';
 import { SaveButtonComponent } from 'src/app/shared/components/save-button/save-button.component';
 import { AuthService } from 'src/app/shared/services/auth.service';
+import { CostAccountModelService } from 'src/app/shared/services/cost-account-model.service';
+import { ICostAccountModel } from 'src/app/shared/interfaces/ICostAccountModel';
+import { IOrganization } from 'src/app/shared/interfaces/IOrganization';
 
 @Component({
   selector: 'app-cost-account',
@@ -38,8 +41,7 @@ export class CostAccountComponent implements OnInit {
   idWorkpack: number;
   idWorkpackModelLinked: number;
   idPlan: number;
-  idCurrentWorkpack: number;
-  workpackModel: IWorkpackModel;
+  costAccountModel: ICostAccountModel;
   workpack: IWorkpack;
   idCostAccount: number;
   costAccount: ICostAccount;
@@ -52,11 +54,12 @@ export class CostAccountComponent implements OnInit {
   editPermission = false;
   oldName: string = null;
   costAccountLimit: number;
+  idPlanModel: number;
+  organizations: IOrganization[] = [];
 
   constructor(
     private actRouter: ActivatedRoute,
     private authSrv: AuthService,
-    private workpackModelSrv: WorkpackModelService,
     private workpackSrv: WorkpackService,
     private responsiveSrv: ResponsiveService,
     private costAccountSrv: CostAccountService,
@@ -67,7 +70,8 @@ export class CostAccountComponent implements OnInit {
     private localitySrv: LocalityService,
     private planSrv: PlanService,
     private unitMeasureSrv: MeasureUnitService,
-    private router: Router
+    private router: Router,
+    private costAccountModelSrv: CostAccountModelService
   ) {
     this.actRouter.queryParams.subscribe(async queryParams => {
       this.idCostAccount = queryParams.id;
@@ -91,22 +95,25 @@ export class CostAccountComponent implements OnInit {
 
   async loadProperties() {
     this.idPlan = Number(localStorage.getItem('@currentPlan'));
-    if (this.idWorkpack && !this.idCostAccount) {
-      await this.loadWorkpack();     
+    if (this.idWorkpack) {
+      await this.loadWorkpack();
     }
     if (this.idCostAccount) {
-      await this.loadWorkpack(true);
       await this.loadCostAccount();
     }
-    const workpackModelActivesProperties = this.workpackModel.properties.filter(w => w.active && w.session === 'COST');
-    this.sectionCostAccountProperties = await Promise.all(workpackModelActivesProperties.map(p => this.instanceProperty(p)));
+    const costAccountModelActiveProperties = this.costAccountModel.properties.filter(w => w.active);
+    if (costAccountModelActiveProperties && costAccountModelActiveProperties
+      .filter(prop => this.typePropertyModel[prop.type] === TypePropertyModelEnum.OrganizationSelectionModel).length > 0) {
+      await this.loadOrganizationsOffice();
+    }
+    this.sectionCostAccountProperties = await Promise.all(costAccountModelActiveProperties.map(p => this.instanceProperty(p)));
     this.loadCardCostAccountProperties();
   }
 
   async loadCardCostAccountProperties() {
-    if( this.costAccount ){
+    if (this.costAccount) {
       const costAccountTotalValues =
-        await this.costAccountSrv.GetCostsByWorkpack({id: this.costAccount.id, 'id-workpack': this.costAccount.idWorkpack});
+        await this.costAccountSrv.GetCostsByWorkpack({ id: this.costAccount.id, 'id-workpack': this.costAccount.idWorkpack });
       if (costAccountTotalValues.success) {
         this.cardCostAccountProperties = {
           ...this.cardCostAccountProperties,
@@ -135,30 +142,25 @@ export class CostAccountComponent implements OnInit {
   }
 
   async loadWorkpack(onlyBreadcrumb: boolean = false) {
-    const result = await this.workpackSrv.GetWorkpackById(this.idWorkpack, {'id-plan': this.idPlan});
+    const result = await this.workpackSrv.GetWorkpackById(this.idWorkpack, { 'id-plan': this.idPlan });
     if (result.success) {
-      const isWorkpackLoaded = !!this.workpack;
       this.workpack = result.data;
-      if (!isWorkpackLoaded) {
-        this.setBreadcrumb();
-        if (onlyBreadcrumb) {
-          this.idCurrentWorkpack = this.workpack.id;
-        }
-      }
-      this.editPermission = (!!this.workpack.permissions?.find( p => p.level === 'EDIT')
+      this.setBreadcrumb();
+      this.editPermission = (!!this.workpack.permissions?.find(p => p.level === 'EDIT')
         || await this.authSrv.isUserAdmin()) && !this.workpack.canceled && !this.workpack.endManagementDate;
-      const plan = await this.planSrv.GetById(this.workpack.plan.id);
-      if (plan.success) {
-        this.idOffice = plan.data.idOffice;
+      const plan = await this.planSrv.getCurrentPlan(this.workpack.plan.id);
+      if (plan) {
+        this.idOffice = plan.idOffice;
+        this.idPlanModel = plan.idPlanModel;
       }
     }
-    await this.loadWorkpackModel(this.workpack.model.id);
+    await this.loadCostAccountModel();
   }
 
-  async loadWorkpackModel(idWorkpackModel) {
-    const result = await this.workpackModelSrv.GetById(idWorkpackModel);
-    if (result.success) {
-      this.workpackModel = result.data;
+  async loadCostAccountModel() {
+    const result = await this.costAccountModelSrv.GetCostAccountModelByPlanModel({ 'id-plan-model': this.idPlanModel });
+    if (result.success && result.data) {
+      this.costAccountModel = result.data;
     }
   }
 
@@ -167,55 +169,57 @@ export class CostAccountComponent implements OnInit {
     if (result.success) {
       this.costAccount = result.data;
       this.idWorkpack = this.costAccount.idWorkpack;
-      const propertyNameWorkpackModel = this.workpack.model.properties.find(p => p.name === 'name' && p.session === 'COST');
-      const propertyNameCostAccount = this.costAccount.properties.find(p => p.idPropertyModel === propertyNameWorkpackModel.id);
+      const propertyNameModel = this.costAccount.models.find(p => p.name === 'name');
+      const propertyNameCostAccount = this.costAccount.properties.find(p => p.idPropertyModel === propertyNameModel.id);
       this.costAccountName = propertyNameCostAccount.value as string;
     }
   }
 
   async setBreadcrumb() {
+    const breadcrumbItems =  await this.getBreadcrumbs();
     this.breadcrumbSrv.setMenu([
-      ... await this.getBreadcrumbs(),
+      ...breadcrumbItems,
       {
         key: 'account',
         info: this.costAccountName,
-        routerLink: [ '/cost-account' ],
+        routerLink: ['/cost-account'],
         queryParams: {
           id: this.idCostAccount
         }
       }
     ]);
+    this.breadcrumbSrv.setBreadcrumbStorage(breadcrumbItems);
   }
 
   async getBreadcrumbs() {
     const { success, data } = await this.breadcrumbSrv.getBreadcrumbWorkpack
-    (this.idCurrentWorkpack || this.idWorkpack, {'id-plan': this.idPlan});
+      (this.idWorkpack, { 'id-plan': this.idPlan });
     return success
       ? data.map(p => ({
-            key: !p.modelName ? p.type.toLowerCase() : p.modelName,
-            info: p.name,
-            tooltip: p.fullName,
-            routerLink: this.getRouterLinkFromType(p.type),
-            queryParams: { id: p.id, idWorkpackModelLinked: p.idWorkpackModelLinked, idPlan: this.idPlan },
-            modelName: p.modelName
-          }))
+        key: !p.modelName ? p.type.toLowerCase() : p.modelName,
+        info: p.name,
+        tooltip: p.fullName,
+        routerLink: this.getRouterLinkFromType(p.type),
+        queryParams: { id: p.id, idWorkpackModelLinked: p.idWorkpackModelLinked, idPlan: this.idPlan },
+        modelName: p.modelName
+      }))
       : [];
   }
 
   getRouterLinkFromType(type: string): string[] {
     switch (type) {
       case 'office':
-        return [ '/offices', 'office' ];
+        return ['/offices', 'office'];
       case 'plan':
-        return [ 'plan' ];
+        return ['plan'];
       default:
-        return [ '/workpack' ];
+        return ['/workpack'];
     }
   }
 
   async instanceProperty(propertyModel: IWorkpackModelProperty): Promise<PropertyTemplateModel> {
     const property = new PropertyTemplateModel();
-    const propertyCostAccount = this.costAccount && this.costAccount.properties.find( cost => cost.idPropertyModel === propertyModel.id);
+    const propertyCostAccount = this.costAccount && this.costAccount.properties.find(cost => cost.idPropertyModel === propertyModel.id);
 
     property.id = propertyCostAccount && propertyCostAccount.id;
     property.idPropertyModel = propertyModel.id;
@@ -226,14 +230,13 @@ export class CostAccountComponent implements OnInit {
     property.name = propertyModel.name;
     property.required = propertyModel.required;
     property.disabled = !this.editPermission;
-    property.session = propertyModel.session;
     property.sortIndex = propertyModel.sortIndex;
     property.multipleSelection = propertyModel.multipleSelection;
     property.rows = propertyModel.rows;
     property.decimals = propertyModel.decimals;
     if (this.typePropertyModel[propertyModel.type] === TypePropertyModelEnum.ToggleModel) {
       property.value = propertyCostAccount && (propertyCostAccount?.value !== null && propertyCostAccount?.value !== undefined) ?
-      propertyCostAccount?.value : propertyModel.defaultValue;
+        propertyCostAccount?.value : propertyModel.defaultValue;
     } else {
       property.value = propertyCostAccount?.value ? propertyCostAccount?.value : propertyModel.defaultValue;
     }
@@ -248,13 +251,13 @@ export class CostAccountComponent implements OnInit {
       property.value = new Date(dateValue);
     }
     if (this.typePropertyModel[propertyModel.type] === TypePropertyModelEnum.SelectionModel && propertyModel.multipleSelection) {
-      const listValues = propertyCostAccount?.value ?  propertyCostAccount?.value as string : propertyModel.defaultValue as string;
+      const listValues = propertyCostAccount?.value ? propertyCostAccount?.value as string : propertyModel.defaultValue as string;
       property.defaultValue = listValues.length > 0 ? listValues.split(',') : null;
       property.value = listValues.length > 0 ? listValues.split(',') : null;
     }
 
     if (this.typePropertyModel[propertyModel.type] === TypePropertyModelEnum.SelectionModel) {
-      const listOptions = propertyModel.possibleValues ? (propertyModel.possibleValues as string).split(',') : [];
+      const listOptions = propertyModel.possibleValues ? (propertyModel.possibleValues as string).split(',').sort( (a, b) => a.localeCompare(b)) : [];
       property.possibleValues = listOptions.map(op => ({ label: op, value: op }));
     }
 
@@ -286,7 +289,7 @@ export class CostAccountComponent implements OnInit {
         }
       }
       if (defaultSelectedLocalities && defaultSelectedLocalities.length > 1) {
-        property.labelButtonLocalitySelected = await Promise.all(defaultSelectedLocalities.map( async ( loc ) => {
+        property.labelButtonLocalitySelected = await Promise.all(defaultSelectedLocalities.map(async (loc) => {
           const result = await this.localitySrv.GetById(loc);
           if (result.success) {
             return result.data.name
@@ -301,9 +304,8 @@ export class CostAccountComponent implements OnInit {
     }
 
     if (this.typePropertyModel[propertyModel.type] === TypePropertyModelEnum.OrganizationSelectionModel) {
-      this.loadOrganizationsOffice().then( organizationsOffice => {
-        property.possibleValuesIds = organizationsOffice;
-      });
+      property.possibleValuesIds = this.organizations.filter( org => propertyModel.sectors && propertyModel.sectors.includes(org.sector.toLowerCase()))
+      .map(d => ({ label: d.name, value: d.id }));
       if (propertyModel.multipleSelection) {
         property.selectedValues = propertyCostAccount?.selectedValues ?
           propertyCostAccount?.selectedValues : propertyModel.defaults as number[];
@@ -316,7 +318,7 @@ export class CostAccountComponent implements OnInit {
       }
     }
     if (this.typePropertyModel[propertyModel.type] === TypePropertyModelEnum.UnitSelectionModel) {
-      this.loadUnitMeasuresOffice().then( unitMeasures => {
+      this.loadUnitMeasuresOffice().then(unitMeasures => {
         property.possibleValuesIds = unitMeasures;
       });
       property.selectedValue = propertyCostAccount?.selectedValue ? propertyCostAccount?.selectedValue : propertyModel.defaults as number;
@@ -400,7 +402,7 @@ export class CostAccountComponent implements OnInit {
       return {
         label: locality.name,
         data: locality.id,
-        children: locality.children.map( c => this.loadSelectedTreeNode(c))
+        children: locality.children.map(c => this.loadSelectedTreeNode(c))
       };
     }
     return {
@@ -410,24 +412,23 @@ export class CostAccountComponent implements OnInit {
   }
 
   async loadOrganizationsOffice() {
-    const result = await this.organizationSrv.GetAll({ 'id-office': this.idOffice });
-    if (result.success ) {
-      const organizationsOffice = result.data;
-      return organizationsOffice.map(org => ({
-        label: org.name,
-        value: org.id
-      }));
+    if (this.idOffice) {
+      const result = await this.organizationSrv.GetAll({ 'id-office': this.idOffice });
+      if (result.success) {
+        this.organizations = result.data;
+        this.organizations = this.organizations.sort( (a, b) => a.name.localeCompare(b.name))
+      }
     }
   }
 
   async loadUnitMeasuresOffice() {
-    const result = await this.unitMeasureSrv.GetAll({idOffice: this.idOffice});
+    const result = await this.unitMeasureSrv.GetAll({ idOffice: this.idOffice });
     if (result.success) {
       const units = result.data;
       return units.map(org => ({
         label: org.name,
         value: org.id
-      }));
+      })).sort( (a, b) => a.label.localeCompare(b.label));
     }
   }
 
@@ -449,7 +450,7 @@ export class CostAccountComponent implements OnInit {
       this.mirrorToFullName(property);
     }
     if (property.name === 'limit') {
-      this.cardCostAccountProperties = this.cardCostAccountProperties.progressBarValues ?  {
+      this.cardCostAccountProperties = this.cardCostAccountProperties.progressBarValues ? {
         ...this.cardCostAccountProperties,
         progressBarValues: [{
           ...this.cardCostAccountProperties.progressBarValues[0],
@@ -461,12 +462,12 @@ export class CostAccountComponent implements OnInit {
     }
     const arePropertiesRequiredValid: boolean = this.sectionCostAccountProperties
       .filter(({ required }) => required)
-      .map(( prop ) => {
+      .map((prop) => {
         let valid = (prop.value instanceof Array
-          ? (prop.value.length > 0 )
+          ? (prop.value.length > 0)
           : typeof prop.value == 'boolean' || typeof prop.value == 'number'
-            || !!prop.value || (prop.value !== null && prop.value !== undefined));
-        if (['OrganizationSelection','UnitSelection', 'LocalitySelection'].includes(prop.type)) {
+          || !!prop.value || (prop.value !== null && prop.value !== undefined));
+        if (['OrganizationSelection', 'UnitSelection', 'LocalitySelection'].includes(prop.type)) {
           if (prop.type === 'LocalitySelection') {
             if (!prop.multipleSelection) {
               const selectedLocality = prop.localitiesSelected as TreeNode;
@@ -478,7 +479,7 @@ export class CostAccountComponent implements OnInit {
                 .map(l => l.data);
             }
           }
-          valid = ( typeof prop.selectedValue === 'number' || ( prop.selectedValues instanceof Array ?
+          valid = (typeof prop.selectedValue === 'number' || (prop.selectedValues instanceof Array ?
             prop.selectedValues.length > 0 : typeof prop.selectedValues == 'number'));
         }
         if (property.idPropertyModel === prop.idPropertyModel) {
@@ -490,8 +491,8 @@ export class CostAccountComponent implements OnInit {
       .reduce((a, b) => a ? b : a, true);
 
     const arePropertiesStringValid: boolean = this.sectionCostAccountProperties
-      .filter(({min, max, value}) => ( (min || max) && typeof value == 'string'))
-      .map(( prop ) => {
+      .filter(({ min, max, value }) => ((min || max) && typeof value == 'string'))
+      .map((prop) => {
         let valid = true;
         valid = prop.min ? String(prop.value).length >= prop.min : true;
         if (property.idPropertyModel === prop.idPropertyModel) {
@@ -499,37 +500,38 @@ export class CostAccountComponent implements OnInit {
           prop.message = !valid ? prop.message = this.translateSrv.instant('minLenght') : '';
         }
         if (valid) {
-          valid = prop.max ? ( !prop.required ? String(prop.value).length <= prop.max
-          : String(prop.value).length <= prop.max && String(prop.value).length > 0) : true;
+          valid = prop.max ? (!prop.required ? String(prop.value).length <= prop.max
+            : String(prop.value).length <= prop.max && String(prop.value).length > 0) : true;
           if (property.idPropertyModel === prop.idPropertyModel) {
             prop.invalid = !valid;
-            prop.message = !valid ? ( String(prop.value).length > 0 ? prop.message = this.translateSrv.instant('maxLenght')
+            prop.message = !valid ? (String(prop.value).length > 0 ? prop.message = this.translateSrv.instant('maxLenght')
               : prop.message = this.translateSrv.instant('required')) : '';
           }
         }
         return valid;
       })
       .reduce((a, b) => a ? b : a, true);
-    return ( arePropertiesRequiredValid && arePropertiesStringValid ) ? this.saveButton?.showButton() : this.saveButton?.hideButton();
+    return (arePropertiesRequiredValid && arePropertiesStringValid) ? this.saveButton?.showButton() : this.saveButton?.hideButton();
   }
 
   async saveCostAccount() {
     this.costAccountProperties = this.sectionCostAccountProperties.map(p => p.getValues());
-    if (this.sectionCostAccountProperties.filter( p => p.invalid).length > 0) {
+    if (this.sectionCostAccountProperties.filter(p => p.invalid).length > 0) {
       return;
     }
     if (this.idCostAccount) {
       const costAccount = {
         id: this.idCostAccount,
         idWorkpack: this.costAccount.idWorkpack,
+        idCostAccountModel: this.costAccount.idCostAccountModel,
         properties: this.costAccountProperties,
       };
       const result = await this.costAccountSrv.put(costAccount);
       if (result.success) {
-        this.router.navigate([ '/workpack' ],
+        this.router.navigate(['/workpack'],
           {
             queryParams: {
-              id: this.idCurrentWorkpack || this.idWorkpack,
+              id: this.idWorkpack,
               idWorkpackModelLinked: this.idWorkpackModelLinked
             }
           }
@@ -539,11 +541,12 @@ export class CostAccountComponent implements OnInit {
     if (!this.idCostAccount) {
       const costAccount = {
         idWorkpack: this.idWorkpack,
+        idCostAccountModel: this.costAccountModel.id,
         properties: this.costAccountProperties,
       };
       const result = await this.costAccountSrv.post(costAccount);
       if (result.success) {
-        this.router.navigate([ '/workpack' ],
+        this.router.navigate(['/workpack'],
           {
             queryParams: {
               id: this.idWorkpack,

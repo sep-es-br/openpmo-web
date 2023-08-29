@@ -6,6 +6,15 @@
 </p-confirmDialog>
 <p-toast position="top-right"></p-toast>
 <ng-container *ngIf="showTemplate !== undefined">
+  <ng-container *ngIf="environment.hom || environment.training">
+    <div class="ambient-square-top" [ngClass]="{train: environment.training, hom: environment.hom}"></div>
+    <div class="ambient-square-bottom" [ngClass]="{train: environment.training, hom: environment.hom}">
+      <div class="tag">
+        <div class="tag-text">{{environment.training ? 'TREINAMENTO' : 'HOMOLOGAÇÃO'}}</div>
+        <img src="./assets/images/logo_openpmo_black.png" alt="Logotipo Brasão ES">
+      </div>
+    </div>
+  </ng-container>
   <app-template *ngIf="showTemplate; else elseTemplate"></app-template>
   <ng-template #elseTemplate>
     <router-outlet></router-outlet>

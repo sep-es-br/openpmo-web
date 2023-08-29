@@ -6,11 +6,12 @@ import { ComponentsModule } from 'src/app/shared/components/components.module';
 import { CoreModule } from 'src/app/core/core.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { StrategyComponent } from './strategy/strategy.component';
+import { CostAccountModelComponent } from './components/cost-account-model/cost-account-model.component';
 
 
 
 @NgModule({
-  declarations: [StrategyListComponent, StrategyComponent],
+  declarations: [StrategyListComponent, StrategyComponent, CostAccountModelComponent],
   imports: [
     CommonModule,
     StrategynRoutingModule,

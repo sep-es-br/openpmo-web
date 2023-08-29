@@ -16,7 +16,7 @@ import { FilterDataviewService } from '../../../../shared/services/filter-datavi
 import { takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
 import { ISection } from '../../../../shared/interfaces/ISectionWorkpack';
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 import { WorkpackShowTabviewService } from 'src/app/shared/services/workpack-show-tabview.service';
 
 @Component({
@@ -40,6 +40,7 @@ export class WorkpackSectionRisksComponent implements OnInit, OnDestroy {
   showTabview = false;
   idFilterSelected: number;
   term = '';
+  filters;
 
   constructor(
     private filterSrv: FilterDataviewService,
@@ -56,18 +57,6 @@ export class WorkpackSectionRisksComponent implements OnInit, OnDestroy {
       this.showTabview = value;
     });
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(responsive => this.responsive = responsive);
-    this.workpackSrv.observableResetWorkpack.pipe(takeUntil(this.$destroy)).subscribe(reset => {
-      if (reset) {
-        this.workpackData = this.workpackSrv.getWorkpackData();
-        this.workpackParams = this.workpackSrv.getWorkpackParams();
-        if (this.workpackData && this.workpackData?.workpack?.id && this.workpackData?.workpackModel &&
-          this.workpackData.workpackModel.riskAndIssueManagementSessionActive) {
-          if (!this.workpackParams.idWorkpackModelLinked || (this.workpackSrv.getEditPermission() && !!this.workpackParams.idWorkpackModelLinked)) {
-            this.loadRiskSection();
-          }
-        }
-      }
-    });
     this.configDataViewSrv.observableCollapsePanelsStatus.pipe(takeUntil(this.$destroy)).subscribe(collapsePanelStatus => {
       this.collapsePanelsStatus = collapsePanelStatus === 'collapse' ? true : false;
       this.sectionRisk = this.sectionRisk && Object.assign({}, {
@@ -84,9 +73,28 @@ export class WorkpackSectionRisksComponent implements OnInit, OnDestroy {
     this.configDataViewSrv.observablePageSize.pipe(takeUntil(this.$destroy)).subscribe(pageSize => {
       this.pageSize = pageSize;
     });
+    this.sectionRisk = {
+      cardSection: {
+        toggleable: false,
+        initialStateToggle: false,
+        cardTitle: this.showTabview ? '' : 'risks',
+        collapseble: this.showTabview ? false : true,
+        initialStateCollapse: this.showTabview ? false : this.collapsePanelsStatus,
+        showFilters: true,
+        isLoading: true,
+        filters: this.filters && this.filters.length > 0 ? this.filters : [],
+        showCreateNemElementButton: this.workpackSrv.getEditPermission() ? true : false,
+      }
+    };
+    this.riskSrv.observableResetRisk.pipe(takeUntil(this.$destroy)).subscribe(reset => {
+      if (reset) {
+        this.loadRiskData();
+      }
+    });
   }
 
   ngOnInit(): void {
+
   }
 
   handleCreateNewRisk() {
@@ -102,6 +110,7 @@ export class WorkpackSectionRisksComponent implements OnInit, OnDestroy {
     const result = await this.riskSrv.delete(risk, { useConfirm: true });
     if (result.success) {
       this.sectionRisk.cardItemsSection = Array.from(this.sectionRisk.cardItemsSection.filter(r => r.itemId !== risk.id));
+      this.riskSrv.deleteRiskFromData(risk.id);
     }
   }
 
@@ -111,46 +120,47 @@ export class WorkpackSectionRisksComponent implements OnInit, OnDestroy {
 
   async handleSelectedFilterRisk(event) {
     this.idFilterSelected = event.filter;
-    this.sectionRisk = Object.assign({}, {
-      ...this.sectionRisk,
-      cardItemsSection: await this.loadSectionRisksCards(this.riskSectionShowClosed)
-    });
-    this.totalRecordsRisks = this.sectionRisk.cardItemsSection && this.sectionRisk.cardItemsSection.length;
+    await this.getRisks();
   }
 
   async handleSearchText(event) {
     this.term = event.term;
-    this.sectionRisk = Object.assign({}, {
-      ...this.sectionRisk,
-      cardItemsSection: await this.loadSectionRisksCards(this.riskSectionShowClosed)
-    });
-    this.totalRecordsRisks = this.sectionRisk.cardItemsSection && this.sectionRisk.cardItemsSection.length;
+    await this.getRisks();
+  }
+
+  loadRiskData() {
+    const {
+      workpackData,
+      workpackParams,
+      filters,
+      risks,
+      term,
+      idFilterSelected,
+      loading
+    } = this.riskSrv.getRisksData();
+    this.workpackData = workpackData;
+    this.workpackParams = workpackParams;
+    this.filters = filters;
+    this.risks = risks;
+    this.idFilterSelected = idFilterSelected;
+    this.term = term;
+    if (!loading) this.loadRiskSection();
+  }
+
+  async getRisks() {
+    this.riskSrv.loadRisks({ idFilterSelected: this.idFilterSelected, term: this.term })
   }
 
   async loadRiskSection() {
-    const resultFilters = await this.filterSrv.getAllFilters(`workpackModels/${this.workpackData.workpack.model.id}/risks`);
-    const filters = resultFilters.success && Array.isArray(resultFilters.data) ? resultFilters.data : [];
-    this.idFilterSelected = filters.find(defaultFilter => !!defaultFilter.favorite) ?
-      filters.find(defaultFilter => !!defaultFilter.favorite).id : undefined;
-
-    this.sectionRisk = {
-      cardSection: {
-        toggleable: false,
-        initialStateToggle: false,
-        cardTitle: this.showTabview ? '' : 'risks',
-        collapseble: this.showTabview ? false : true,
-        initialStateCollapse: this.showTabview ? false : this.collapsePanelsStatus,
-        showFilters: true,
-        isLoading: true,
-        filters: filters && filters.length > 0 ? filters : [],
-        showCreateNemElementButton: this.workpackSrv.getEditPermission() ? true : false,
-      }
-    };
     this.sectionRisk = {
       ...this.sectionRisk,
       cardSection: {
-        ...this.sectionRisk.cardSection,
+        ...this.sectionRisk?.cardSection,
         isLoading: false,
+        filters: this.filters && this.filters.length > 0 ? this.filters : [],
+        idFilterSelected: this.idFilterSelected,
+        searchTerm: this.term,
+        showCreateNemElementButton: this.workpackSrv.getEditPermission() ? true : false,
       },
       cardItemsSection: await this.loadSectionRisksCards(this.riskSectionShowClosed)
     }
@@ -158,8 +168,6 @@ export class WorkpackSectionRisksComponent implements OnInit, OnDestroy {
   }
 
   async loadSectionRisksCards(showClosed: boolean) {
-    const resultRisks = await this.riskSrv.GetAll({ 'id-workpack': this.workpackParams.idWorkpack, idFilter: this.idFilterSelected, term: this.term });
-    this.risks = resultRisks.success ? resultRisks.data : [];
     if (this.risks && this.risks.length > 0) {
       const cardItems = !showClosed ? this.risks.filter(r => RisksPropertiesOptions.status[r.status].label === 'open').map(risk => ({
         typeCardItem: 'listItem',
@@ -217,7 +225,6 @@ export class WorkpackSectionRisksComponent implements OnInit, OnDestroy {
           ]
         });
       }
-      this.sectionRisk.cardSection.isLoading = false;
       return cardItems;
     } else {
       if (this.workpackSrv.getEditPermission() && !this.workpackData.workpack.canceled) {
@@ -234,10 +241,8 @@ export class WorkpackSectionRisksComponent implements OnInit, OnDestroy {
             { name: 'idWorkpackModelLinked', value: this.workpackParams.idWorkpackModelLinked },
           ]
         }];
-        this.sectionRisk.cardSection.isLoading = false;
         return cardItem;
-      } else { 
-        this.sectionRisk.cardSection.isLoading = false;
+      } else {
         return [];
       };
     }
@@ -281,7 +286,7 @@ export class WorkpackSectionRisksComponent implements OnInit, OnDestroy {
         label: prop.label,
         name: prop.apiValue,
         active: true,
-        possibleValues: prop.possibleValues && prop.possibleValues.map( option => ({
+        possibleValues: prop.possibleValues && prop.possibleValues.map(option => ({
           ...option,
           label: this.translateSrv.instant(option.label)
         }))

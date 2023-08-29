@@ -9,7 +9,6 @@ export interface IProperty {
   label: string;
   name: string;
   required?: boolean;
-  session?: string;
   disabled?: boolean;
   sortIndex?: number;
   defaultValue?: number | string | boolean | string[] | number[] | Date;

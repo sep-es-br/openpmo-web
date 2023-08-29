@@ -19,6 +19,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
 import { ConfigDataViewService } from 'src/app/shared/services/config-dataview.service';
+import { CitizenUserService } from 'src/app/shared/services/citizen-user.service';
 
 @Component({
   selector: 'app-person-list',
@@ -69,17 +70,9 @@ export class PersonListComponent implements OnInit, OnDestroy {
     private breadcrumbSrv: BreadcrumbService,
     private authSrv: AuthService,
     private officePermissionSrv: OfficePermissionService,
-    private configDataViewSrv: ConfigDataViewService
+    private configDataViewSrv: ConfigDataViewService,
+    private citizenUserSrv: CitizenUserService
   ) {
-    localStorage.removeItem('@currentPlan');
-    localStorage.removeItem('@pmo/propertiesCurrentPlan');
-    this.formSearch = this.formBuilder.group({
-      scopeName: '',
-      userStatus: [OptionsAccessEnum.All],
-      stakeholderStatus: [OptionsStakeholderEnum.All],
-      ccbMemberStatus: 'ALL',
-      name: ['']
-    });
     this.configDataViewSrv.observableDisplayModeAll.pipe(takeUntil(this.$destroy)).subscribe(displayMode => {
       this.displayModeAll = displayMode;
     });
@@ -90,6 +83,17 @@ export class PersonListComponent implements OnInit, OnDestroy {
         this.first = 0;
         this.loadPersons();
       }
+      
+    });
+    this.citizenUserSrv.loadCitizenUsers();
+    localStorage.removeItem('@currentPlan');
+    localStorage.removeItem('@pmo/propertiesCurrentPlan');
+    this.formSearch = this.formBuilder.group({
+      scopeName: '',
+      userStatus: [OptionsAccessEnum.All],
+      stakeholderStatus: [OptionsStakeholderEnum.All],
+      ccbMemberStatus: 'ALL',
+      name: ['']
     });
     this.activeRoute.queryParams.subscribe(async ({ idOffice }) => {
       this.idOffice = +idOffice;
@@ -169,10 +173,10 @@ export class PersonListComponent implements OnInit, OnDestroy {
         return personCardItem;
       }));
       this.totalRecords = pagination.totalRecords;
-      
+      this.isLoading = false;
     }
+
     this.cardItemsProperties = itemsProperties;
-    this.isLoading = false;
   }
 
   async loadTreeViewScope() {
@@ -268,19 +272,7 @@ export class PersonListComponent implements OnInit, OnDestroy {
   }
 
   async getOfficeById() {
-    const propertiesOfficeItem = localStorage.getItem('@pmo/propertiesCurrentOffice');
-    if (propertiesOfficeItem && (JSON.parse(propertiesOfficeItem)).id === this.idOffice) {
-      this.propertiesOffice = JSON.parse(propertiesOfficeItem);
-      this.isLoading = false;
-    } else {
-      const { success, data } = await this.officeSrv.GetById(this.idOffice);
-      if (success) {
-        this.propertiesOffice = data;
-        localStorage.setItem('@pmo/propertiesCurrentOffice', JSON.stringify(this.propertiesOffice));
-        this.isLoading = false;
-      }
-    }
-
+    this.propertiesOffice = await this.officeSrv.getCurrentOffice(this.idOffice);
   }
 
   setBreadcrumb() {

@@ -69,8 +69,8 @@ export class PersonComponent implements OnInit, OnDestroy {
       await this.loads();
     });
     this.formPerson = this.formBuilder.group({
-      name: ['', [Validators.required, MinLengthTextCustomValidator.minLengthText]],
-      fullname: ['', [Validators.required,  MinLengthTextCustomValidator.minLengthText]],
+      name: ['',[ Validators.required, MinLengthTextCustomValidator.minLengthText]],
+      fullname: ['',[ Validators.required, MinLengthTextCustomValidator.minLengthText]],
       email: [''],
       contactEmail: ['', [Validators.email]],
       phoneNumber: [''],
@@ -146,16 +146,7 @@ export class PersonComponent implements OnInit, OnDestroy {
   }
 
   async loadOffice() {
-    const propertiesOfficeItem = localStorage.getItem('@pmo/propertiesCurrentOffice');
-    if (propertiesOfficeItem && (JSON.parse(propertiesOfficeItem)).id === this.idOffice) {
-      this.office = JSON.parse(propertiesOfficeItem);
-    } else {
-      const { success, data } = await this.officeSrv.GetById(this.idOffice);
-      if (success) {
-        this.office = data;
-        localStorage.setItem('@pmo/propertiesCurrentOffice', JSON.stringify(this.office));
-      }
-    }
+    this.office = await this.officeSrv.getCurrentOffice(this.idOffice);
   }
 
   async loadPerson() {

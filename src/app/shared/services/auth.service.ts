@@ -77,16 +77,12 @@ export class AuthService {
 
   saveToken(data: any) {
     localStorage.setItem(StoreKeys.ACCESS_TOKEN, data.token);
-    localStorage.setItem(StoreKeys.REFRESH_TOKE, data.refreshToken);
-  }
-
-  saveUserInfo(data: IPerson) {
-    localStorage.setItem(StoreKeys.USER_INFO, JSON.stringify(data));
+    localStorage.setItem(StoreKeys.REFRESH_TOKEN, data.refreshToken);
   }
 
   clearTokens() {
     localStorage.removeItem(StoreKeys.ACCESS_TOKEN);
-    localStorage.removeItem(StoreKeys.REFRESH_TOKE);
+    localStorage.removeItem(StoreKeys.REFRESH_TOKEN);
   }
 
   clearStorage() {
@@ -98,24 +94,28 @@ export class AuthService {
   }
 
   getRefreshToken() {
-    return localStorage.getItem(StoreKeys.REFRESH_TOKE);
+    return localStorage.getItem(StoreKeys.REFRESH_TOKEN);
   }
 
   getTokenPayload(): TokenPayload {
     return this.getAccessToken() ? jwtDecode(this.getAccessToken()) : undefined;
   }
 
-  async getInfoPerson() {
-    if (this.currentUserInfo) {
-      return this.currentUserInfo;
-    }
+  async setInfoPerson() {
     const authenticated = await this.isAuthenticated();
     if (authenticated) {
       const { success, data } = await this.personSrv.GetByKey(this.getTokenPayload()?.key);
       if (success) {
         this.currentUserInfo = data;
-        return data;
+        localStorage.setItem('@PMO/infoPerson', JSON.stringify(this.currentUserInfo));
       }
+    }
+  }
+
+  async getInfoPerson() {
+    const infoPersonItem = localStorage.getItem('@PMO/infoPerson');
+    if (infoPersonItem) {
+      return JSON.parse(infoPersonItem);
     }
   }
 

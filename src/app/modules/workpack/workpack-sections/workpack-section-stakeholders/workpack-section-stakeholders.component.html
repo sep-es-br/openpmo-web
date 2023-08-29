@@ -1,8 +1,8 @@
 <div class="app-workpack-section-stakeholders" *ngIf="sectionStakeholder">
   <app-card [properties]="sectionStakeholder.cardSection" [class.panel-tab-view]="showTabview"
-  [loading]="sectionStakeholder.cardSection.isLoading"
-    (searchText)="handleSearchText($event)" (editFilter)="handleEditFilterEntity($event, 'stakeholders')"
-    (newFilter)="handleNewFilterEntity('stakeholders')" (selectedFilter)="handleSelectedFilterStakeholder($event)">
+    [loading]="sectionStakeholder.cardSection.isLoading" (searchText)="handleSearchText($event)"
+    (editFilter)="handleEditFilterEntity($event, 'stakeholders')" (newFilter)="handleNewFilterEntity('stakeholders')"
+    (selectedFilter)="handleSelectedFilterStakeholder($event)">
     <div class="input-toggle-stakeholder">
       <p-inputSwitch class="app-toggle" [(ngModel)]="stakeholderSectionShowInactives"
         (onChange)="handleStakeholderInactiveToggle()"></p-inputSwitch>

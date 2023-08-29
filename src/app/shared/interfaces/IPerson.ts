@@ -17,6 +17,14 @@ export interface IPerson {
   administrator?: boolean;
   avatar?: IFile;
   isCcbMember?: boolean;
+  workLocal?: IWorkLocal;
+}
+
+export interface IWorkLocal {
+  idOffice: number;
+  idPlan: number;
+  idWorkpack: number;
+  idWorkpackModelLinked: number;
 }
 
 export interface IPersonOfficePermission {

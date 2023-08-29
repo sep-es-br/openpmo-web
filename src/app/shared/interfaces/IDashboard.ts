@@ -1,3 +1,5 @@
+import { MenuItem } from "primeng/api";
+
 export interface IDashboard {
   earnedValueAnalysis: IEarnedValueAnalysisDashboard;
   milestone?: IMilestoneDashboard;
@@ -11,7 +13,18 @@ export interface IDashboard {
     quantity: number;
     modelName: string;
     icon: string;
+    menuItems?: MenuItem[];
+    workpacks?: IWorkpackByModel[];
   }[];
+}
+
+interface IWorkpackByModel {
+  id: number;
+  idWorkpackModel: number;
+  name: string;
+  icon: string;
+  linked?: boolean;
+  workpacks?: IWorkpackByModel[];
 }
 
 export interface IEarnedValueAnalysisDashboard {
@@ -35,6 +48,7 @@ export interface IEarnedValueAnalysisDashboard {
     actualCost: number;
     plannedValue: number;
     earnedValue: number;
+    estimatedCost: number;
     date: string;
   }[];
 }
