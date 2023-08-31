@@ -113,7 +113,7 @@ export class WorkpackComponent implements OnDestroy {
   constructor(
     private actRouter: ActivatedRoute,
     private workpackModelSrv: WorkpackModelService,
-    private workpackSrv: WorkpackService,
+    public workpackSrv: WorkpackService,
     private responsiveSrv: ResponsiveService,
     public translateSrv: TranslateService,
     private unitMeasureSrv: MeasureUnitService,
@@ -144,6 +144,7 @@ export class WorkpackComponent implements OnDestroy {
     private personSrv: PersonService,
     private breadcrumbSrv: BreadcrumbService
   ) {
+    this.actRouter.queryParams.subscribe(({id}) => this.idWorkpack = id && +id);
     this.actRouter.queryParams.subscribe(async ({
       id,
       idPlan,
@@ -1388,10 +1389,10 @@ export class WorkpackComponent implements OnDestroy {
     return filterPropertiesList;
   }
 
-  changeTab(event: ITabViewScrolled) {
-    this.selectedTab = event;
+  changeTab(event: { tabs: ITabViewScrolled; setStorage: boolean }) {
+    this.selectedTab = event.tabs;
     setTimeout(() => {
-      this.setStorageTab();
+      this.setStorageTab(event.setStorage);
     });
   }
 
@@ -1493,7 +1494,10 @@ export class WorkpackComponent implements OnDestroy {
     this.isLoading = false;
   }
 
-  setStorageTab() {
+  setStorageTab(setStorage?: boolean) {
+    if (!setStorage) {
+      return;
+    }
     const tabview = {
       idWorkpack: this.idWorkpack,
       tab: this.selectedTab,

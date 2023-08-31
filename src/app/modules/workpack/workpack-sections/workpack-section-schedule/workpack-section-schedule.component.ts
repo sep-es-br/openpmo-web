@@ -19,6 +19,7 @@ import { MenuItem, MessageService } from 'primeng/api';
 import { OverlayPanel } from 'primeng/overlaypanel';
 import { SaveButtonComponent } from 'src/app/shared/components/save-button/save-button.component';
 import { ICartItemCostAssignment } from 'src/app/shared/interfaces/ICartItemCostAssignment';
+import { DashboardService } from 'src/app/shared/services/dashboard.service';
 
 @Component({
   selector: 'app-workpack-section-schedule',
@@ -57,12 +58,13 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
   constructor(
     private router: Router,
     private workpackSrv: WorkpackService,
-    public translateSrv: TranslateService,
+    public  translateSrv: TranslateService,
     private configDataViewSrv: ConfigDataViewService,
     private responsiveSrv: ResponsiveService,
     private scheduleSrv: ScheduleService,
     private workpackShowTabviewSrv: WorkpackShowTabviewService,
-    private messageSrv: MessageService
+    private messageSrv: MessageService,
+    private dashboardSrv: DashboardService
   ) {
     
     this.workpackShowTabviewSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => {
@@ -589,6 +591,7 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
               endStep: stepOrder === 'end'
             };
           });
+          console.log('event', event.clickEvent)
           this.cardCostEditPanel.show(event.clickEvent);
         }
       }
@@ -882,13 +885,18 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
       }
       const result = await this.scheduleSrv.putScheduleStepBatch(stepsToSave);
       if (result.success) {
+        this.dashboardSrv.resetDashboardData();
         this.changedSteps = [];
         this.messageSrv.add({
           severity: 'success',
           summary: this.translateSrv.instant('success'),
           detail: this.translateSrv.instant('messages.savedSuccessfully')
         });
-        this.refreshScheduleProgressBar()
+        this.refreshScheduleProgressBar();
+        setTimeout( () => {
+          const linked = this.workpackParams.idWorkpackModelLinked ? true : false;
+          this.dashboardSrv.loadDashboard(linked);
+        }, 1000)
       }
     }
 

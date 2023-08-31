@@ -40,7 +40,7 @@
   .app-content-header {
     display: flex;
     justify-content: flex-start;
-    align-items: flex-end;
+    align-items: flex-start;
     flex: 1;
   }
   .header-container.mobile {
@@ -286,4 +286,6 @@
   }
 }
 
-
+::ng-deep .workpack-loading-tabs .app-card-loading {
+  z-index: 10000 !important;
+}

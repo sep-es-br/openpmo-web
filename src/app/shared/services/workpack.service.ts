@@ -1,8 +1,5 @@
 import {IMeasureUnit} from './../interfaces/IMeasureUnit';
 import {IWorkpackData, IWorkpackParams} from './../interfaces/IWorkpackDataParams';
-import {IWorkpackModel} from './../interfaces/IWorkpackModel';
-import {IOffice} from './../interfaces/IOffice';
-import {IPlan} from './../interfaces/IPlan';
 import {Injectable, Inject, Injector} from '@angular/core';
 import {BehaviorSubject, Observable} from 'rxjs';
 import {BaseService} from '../base/base.service';
@@ -57,7 +54,6 @@ export class WorkpackService extends BaseService<IWorkpack> {
 
 
   nextPendingChanges(nextValue: boolean) {
-    // this.workpackData = {} as IWorkpackData;
     this.pendingChanges.next(nextValue);
   }
 
