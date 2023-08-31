@@ -1,8 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { TranslateService } from '@ngx-translate/core';
 import { CookieService } from 'ngx-cookie';
-import { MessageService } from 'primeng/api';
 import { filter, map } from 'rxjs/operators';
 import { IPerson } from 'src/app/shared/interfaces/IPerson';
 import { ISocialLoginResult } from 'src/app/shared/interfaces/ISocialLoginResult';
@@ -82,7 +80,7 @@ export class HomeComponent implements OnInit {
           this.translateChangeSrv.changeLangDefault(language);
         }
         this.infoPerson = await this.authSrv.getInfoPerson();
-        if (this.infoPerson?.workLocal) {
+        if (this.infoPerson?.workLocal && this.infoPerson.workLocal.idOffice) {
           this.navigateWorkPerson();
         } else {
           setTimeout(async () => {
@@ -136,7 +134,9 @@ export class HomeComponent implements OnInit {
           }
         });
         return;
-      }    
+      }
+      const routeLink = '/offices'
+      this.router.navigate([routeLink]); 
     }
   }
 
