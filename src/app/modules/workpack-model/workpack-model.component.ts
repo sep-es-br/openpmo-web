@@ -201,7 +201,6 @@ export class WorkpackModelComponent implements OnInit {
       await this.getOfficeById();
       await this.getPlanModelById();
       await this.loadDetails();
-      await this.loadCardItemsModels();
     });
     this.currentBreadcrumbItems = [];
     this.currentBreadcrumbItems = this.breadcrumbSrv.get;
@@ -318,6 +317,7 @@ export class WorkpackModelComponent implements OnInit {
       await this.loadWorkpackModel();
     } else if (this.editPermission) {
       this.loadDefaultProperties();
+      await this.loadCardItemsModels();
     }
     this.setCurrentBreadcrumb();
   }

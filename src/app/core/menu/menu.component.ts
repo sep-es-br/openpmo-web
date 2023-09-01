@@ -76,6 +76,8 @@ export class MenuComponent implements OnInit, OnDestroy {
   hasReports = false;
   linkEvent = false;
   idOfficeItemsPlanModel: number;
+  idPlanMenu: number;
+  loadingMenuPortfolio = false;
 
   constructor(
     private menuSrv: MenuService,
@@ -95,28 +97,44 @@ export class MenuComponent implements OnInit, OnDestroy {
     private workpackBreadcrumbStorageSrv: WorkpackBreadcrumbStorageService,
     private reportSrv: ReportService,
   ) {
+    this.menuSrv.getMenuState.pipe(takeUntil(this.$destroy)).subscribe(async (menuState) => {
+      this.isFixed = menuState.isFixed;
+      if (!this.isFixed) {
+        this.menus = menuState.menus;
+        this.idPlanMenu = menuState.idPlanMenu;
+        this.idOfficeItemsPlanModel = menuState.idOfficeItemsPlanModel;
+        this.itemsOffice = [...menuState.itemsOffice];
+        this.itemsOfficeUnchanged = [...menuState.itemsOffice];
+        this.selectMenuActive(this.router.url.slice(1));
+        this.itemsPortfolio = [...menuState.itemsPortfolio];
+        this.itemsFavorites = [...menuState.itemsFavorites];
+        this.itemsPlanModel = [...menuState.itemsPlanModel];
+      }
+    });
     this.translateChangeSrv.getCurrentLang()
       .pipe(takeUntil(this.$destroy))
       .subscribe(() => this.handleChangeLanguage());
+    
     this.officeSrv.observableIdOffice().pipe(takeUntil(this.$destroy)).subscribe(async id => {
       if (!this.isFixed) {
         this.currentIDOffice = id;
         const idOffice = localStorage.getItem('@currentOffice') && Number(localStorage.getItem('@currentOffice'));
-        if ((!idOffice || idOffice !== id) && id !== 0)
-        localStorage.setItem('@currentOffice', this.currentIDOffice.toString());
-        this.getPropertiesOffice(this.currentIDOffice);
+        if ((!idOffice || idOffice !== id) && id !== 0) {
+          this.getPropertiesOffice(this.currentIDOffice);
+          this.loadPlanModelMenu();
+        }
       }
     });
     this.planSrv.observableIdPlan().pipe(takeUntil(this.$destroy)).subscribe(async id => {
       if (!this.isFixed) {
         this.currentIDPlan = id;
-        const idPlan = localStorage.getItem('@currentPlan') && Number(localStorage.getItem('@currentPlan'));
-        if ((!idPlan || idPlan !== id || !this.itemsPortfolio || this.itemsPortfolio.length === 0) && id !== 0) {
-          localStorage.setItem('@currentPlan', this.currentIDPlan.toString());
+        if ((!this.itemsPortfolio || this.itemsPortfolio.length === 0 || (this.itemsPortfolio && this.itemsPortfolio.length > 0 && this.idPlanMenu !== id) ) && id !== 0) {
           await this.loadPropertiesPlan();
-          await this.loadPortfolioMenu();
-          await this.loadFavoritesMenu();
-          await this.loadReportsMenu();
+          this.loadPortfolioMenu();
+          this.loadFavoritesMenu();
+          this.loadReportsMenu();
+        } else {
+          this.loadPropertiesPlan();
         }
       }
     });
@@ -124,6 +142,7 @@ export class MenuComponent implements OnInit, OnDestroy {
       if (!!value) {
         if (!this.isFixed) {
           this.currentPlan = undefined;
+          this.currentIDPlan = undefined;
           this.itemsPortfolio = [];
           this.itemsFavorites = [];
         }
@@ -146,7 +165,6 @@ export class MenuComponent implements OnInit, OnDestroy {
         this.changeMenu.emit(this.isAdminMenu);
         this.updateMenuOfficeOnAdminChange();
         if (isAdminMenu) {
-          this.loadPlanModelMenu();
           this.getOfficePermission();
         }
       }
@@ -173,12 +191,7 @@ export class MenuComponent implements OnInit, OnDestroy {
         if (!this.linkEvent) this.selectMenuActive(url.slice(2));
       }
     });
-    this.menuSrv.getMenuState.pipe(takeUntil(this.$destroy)).subscribe(async (menuState) => {
-      this.isFixed = menuState.isFixed;
-      if (!this.isFixed) {
-        this.menus = menuState.menus;
-      }
-    });
+    
   }
 
   ngOnDestroy(): void {
@@ -220,12 +233,15 @@ export class MenuComponent implements OnInit, OnDestroy {
   handleChangeMenuMode() {
     this.isFixed = true;
     this.setCookieMenuMode();
-    const itemsOffice = this.menus[0].isOpen ? this.itemsOffice : [];
-    const itemsPortfolio = this.menus[1].isOpen ? this.itemsPortfolio : [];
-    const itemsFavorites = this.menus[3].isOpen ? this.itemsFavorites : [];
-    const itemsPlanModel = this.menus[2].isOpen ? this.itemsPlanModel : [];
+    const itemsOffice = this.itemsOffice;
+    const itemsPortfolio = this.itemsPortfolio;
+    const itemsFavorites = this.itemsFavorites;
+    const itemsPlanModel = this.itemsPlanModel;
+    const idPlanMenu = this.currentIDPlan;
     this.menuSrv.nextMenuState({
       isFixed: this.isFixed,
+      idPlanMenu,
+      idOfficeItemsPlanModel: this.idOfficeItemsPlanModel,
       menus: this.menus,
       itemsOffice,
       itemsPortfolio,
@@ -242,10 +258,11 @@ export class MenuComponent implements OnInit, OnDestroy {
   }
 
   setCookieMenuMode() {
-    const date = moment().add(60, 'days').calendar();
     const user = this.authSrv.getTokenPayload();
-    if (user && user.email) {
-      this.cookieSrv.put('menuMode' + user.email, 'true', {expires: date});
+    const cookiesPermission = this.cookieSrv.get('cookiesPermission' + user.email);
+    if (!!cookiesPermission && user && user.email) {
+      const date = moment().add(60, 'days').calendar();
+      this.cookieSrv.put('menuMode' + user.email, 'false', { expires: date });
     }
   }
 
@@ -537,7 +554,6 @@ export class MenuComponent implements OnInit, OnDestroy {
   }
 
   async handleRemoveFavorite(id: number) {
-
     if (!id || !this.currentIDPlan) {
       return;
     }
@@ -552,10 +568,14 @@ export class MenuComponent implements OnInit, OnDestroy {
   }
 
   async loadPortfolioMenu(idNewWorkpack?: number) {
-    if (this.currentIDOffice) {
+    if (this.currentIDOffice && this.currentIDPlan) {
+      this.loadingMenuPortfolio = true;
+
       const {success, data} = await this.menuSrv.getItemsPortfolio(this.currentIDOffice, this.currentIDPlan);
       if (success) {
         this.itemsPortfolio = this.buildMenuItemPortfolio(data || []);
+        this.idPlanMenu = this.currentIDPlan;
+        this.loadingMenuPortfolio = false;
         if (!this.isFixed && (!this.changedUrl || this.linkEvent)) {
           this.selectMenuActive(this.router.url.slice(1), idNewWorkpack)
         }

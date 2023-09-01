@@ -147,6 +147,7 @@ export class StrategyComponent implements OnDestroy {
       if (!this.isUserAdmin && !this.editPermission) {
         this.router.navigate(['/offices']);
       }
+      await this.loadOfficeListOptionsSharing();
       this.loadCards();
       if (this.idStrategy) {
         await this.loadPropertiesStrategy();
@@ -154,7 +155,6 @@ export class StrategyComponent implements OnDestroy {
         await this.loadCostAccountModel();
         this.loadReportModels();
       }
-      this.loadOfficeListOptionsSharing();
       this.breadcrumbSrv.setMenu([
         {
           key: 'administration',

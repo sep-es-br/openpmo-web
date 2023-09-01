@@ -591,7 +591,6 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
               endStep: stepOrder === 'end'
             };
           });
-          console.log('event', event.clickEvent)
           this.cardCostEditPanel.show(event.clickEvent);
         }
       }

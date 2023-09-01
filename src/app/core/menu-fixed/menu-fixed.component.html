@@ -193,14 +193,15 @@
         <div class="top-bar">
           <div *ngIf="currentPlan" class="title" [routerLink]="['/plan']" [queryParams]="{id: currentPlan?.id}">{{ currentPlan?.name }}
           </div>
-          <div class="action" *ngIf="!isMobileView && currentPlan">
+          <div *ngIf="!currentPlan" class="title">
+            {{'newPlan'|translate}}</div>
+          <div class="action" *ngIf="!isMobileView">
             <i [class]="isFixed ? 'app-icon pin-on' : 'app-icon pin-off'" [ngStyle]="{ fontSize: '1rem' }"
               (click)="handleChangeMenuMode()"></i>
           </div>
-          <div *ngIf="!currentPlan" class="title">
-            {{'newPlan'|translate}}</div>
         </div>
-        <p-panelMenu [model]="itemsPortfolio"></p-panelMenu>
+        <span *ngIf="loadingMenuPortfolio" style="padding: 1em">{{'loadingEllipsis'|translate}}</span>
+        <p-panelMenu *ngIf="!loadingMenuPortfolio" [model]="itemsPortfolio"></p-panelMenu>
       </div>
     </ng-template>
   </div>

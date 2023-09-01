@@ -47,7 +47,10 @@ export class OfficeService extends BaseService<IOffice> {
   }
 
   nextIDOffice(idOffice: number) {
-    this.currentIDOffice.next(idOffice);
+    this.getCurrentOffice(idOffice);
+    setTimeout( () => {
+      this.currentIDOffice.next(idOffice);
+    }, 500);
   }
 
   public async GetTreeScopePersons(idOffice: number): Promise<IHttpResult<ITreeViewScopeOffice>> {
@@ -56,6 +59,11 @@ export class OfficeService extends BaseService<IOffice> {
   }
 
   async getCurrentOffice(idOffice) {
+    if (!idOffice || idOffice === 0) {
+      localStorage.removeItem('@pmo/propertiesCurrentOffice');
+      localStorage.removeItem('@currentOffice');
+      return;
+    }
     const propertiesOfficeItem = localStorage.getItem('@pmo/propertiesCurrentOffice');
     if (propertiesOfficeItem && (JSON.parse(propertiesOfficeItem)).id === idOffice) {
        return JSON.parse(propertiesOfficeItem);
@@ -63,6 +71,7 @@ export class OfficeService extends BaseService<IOffice> {
       const {success, data} = await this.GetById(idOffice);
       if (success) {
         const propertiesOffice = data;
+        localStorage.setItem('@currentOffice', data.id.toString());
         localStorage.setItem('@pmo/propertiesCurrentOffice', JSON.stringify(propertiesOffice));
         return propertiesOffice;
       }

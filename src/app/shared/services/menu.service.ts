@@ -13,6 +13,8 @@ import { PrepareHttpParams } from '../utils/query.util';
 
 interface IMenuState {
   isFixed: boolean;
+  idPlanMenu?: number;
+  idOfficeItemsPlanModel?: number;
   menus: IMenu[];
   itemsOffice: MenuItem[];
   itemsFavorites: IMenuFavorites[];

@@ -74,6 +74,8 @@ export class MenuFixedComponent implements OnInit, OnDestroy {
   loadingWorkpack = false;
   linkEvent = false;
   idOfficeItemsPlanModel: number;
+  idPlanMenu: number;
+  loadingMenuPortfolio = false;
 
   constructor(
     private responsiveSrv: ResponsiveService,
@@ -96,18 +98,15 @@ export class MenuFixedComponent implements OnInit, OnDestroy {
   ) {
     this.menuSrv.getMenuState.pipe(takeUntil(this.$destroy)).subscribe(menuState => {
       this.isFixed = menuState.isFixed;
+      this.idPlanMenu = menuState.idPlanMenu;
+      this.idOfficeItemsPlanModel = menuState.idOfficeItemsPlanModel;
       this.menus = menuState.menus;
-      if (this.menus[0].isOpen) {
-        this.itemsOffice = [...menuState.itemsOffice];
-        this.itemsOfficeUnchanged = [...menuState.itemsOffice];
-        this.selectMenuActive(this.router.url.slice(1));
-      }
-      if (this.menus[1].isOpen) {
-        this.itemsPortfolio = [...menuState.itemsPortfolio];
-      }
-      if (this.menus[3].isOpen) {
-        this.itemsFavorites = [...menuState.itemsFavorites];
-      }
+      this.itemsOffice = [...menuState.itemsOffice];
+      this.itemsOfficeUnchanged = [...menuState.itemsOffice];
+      this.selectMenuActive(this.router.url.slice(1));
+      this.itemsPortfolio = [...menuState.itemsPortfolio];
+      this.itemsFavorites = [...menuState.itemsFavorites];
+      this.itemsPlanModel = [...menuState.itemsPlanModel];
     });
 
     this.workpackSrv.observableLoadingWorkpack
@@ -122,7 +121,6 @@ export class MenuFixedComponent implements OnInit, OnDestroy {
       this.changeMenu.emit(this.isAdminMenu);
       if (!!this.isAdminMenu && this.isFixed) {
         this.updateMenuOfficeOnAdminChange();
-        this.loadPlanModelMenu();
       } else {
         if (!!this.isFixed) this.loadOfficeMenu();
       }
@@ -141,23 +139,23 @@ export class MenuFixedComponent implements OnInit, OnDestroy {
 
     this.officeSrv.observableIdOffice().pipe(takeUntil(this.$destroy)).subscribe(async id => {
       this.currentIDOffice = id;
-      this.currentIDOffice = id;
-        const idOffice = localStorage.getItem('@currentOffice') && Number(localStorage.getItem('@currentOffice'));
-        if ((!idOffice || idOffice !== id ) && id !== 0)
-        localStorage.setItem('@currentOffice', this.currentIDOffice.toString());
+      const idOffice = localStorage.getItem('@currentOffice') && Number(localStorage.getItem('@currentOffice'));
+      if ((!idOffice || idOffice !== id) && id !== 0) {
         this.getPropertiesOffice(this.currentIDOffice);
+        this.loadPlanModelMenu();
+      }
     });
 
     this.planSrv.observableIdPlan().pipe(takeUntil(this.$destroy)).subscribe(async id => {
       if (!!this.isFixed) {
         this.currentIDPlan = id;
-        const idPlan = localStorage.getItem('@currentPlan') && Number(localStorage.getItem('@currentPlan'));
-        if ((!idPlan || idPlan !== id || !this.itemsPortfolio || this.itemsPortfolio.length === 0) && id !== 0) {
-          localStorage.setItem('@currentPlan', this.currentIDPlan.toString());
+        if ((!this.itemsPortfolio || this.itemsPortfolio.length === 0 || (this.itemsPortfolio && this.itemsPortfolio.length > 0 && this.idPlanMenu !== id) ) && id !== 0) {
           await this.loadPropertiesPlan();
-          await this.loadPortfolioMenu();
-          await this.loadFavoritesMenu();
-          await this.loadReportsMenu();
+          this.loadPortfolioMenu();
+          this.loadFavoritesMenu();
+          this.loadReportsMenu();
+        } else {
+          this.loadPropertiesPlan();
         }
       }
     });
@@ -166,6 +164,9 @@ export class MenuFixedComponent implements OnInit, OnDestroy {
       if (!!value) {
         if (!!this.isFixed) {
           this.currentPlan = undefined;
+          this.currentIDPlan = undefined;
+          localStorage.removeItem('@currentPlan');
+          localStorage.removeItem('@pmo/propertiesCurrentPlan');
           this.itemsPortfolio = [];
           this.itemsFavorites = [];
         }
@@ -224,12 +225,20 @@ export class MenuFixedComponent implements OnInit, OnDestroy {
   handleChangeMenuMode() {
     this.isFixed = false;
     this.setCookieMenuMode();
-    const itemsOffice = this.menus[0].isOpen ? this.itemsOffice : [];
-    const itemsPortfolio = this.menus[1].isOpen ? this.itemsPortfolio : [];
-    const itemsFavorites = this.menus[3].isOpen ? this.itemsFavorites : [];
-    const itemsPlanModel = this.menus[2].isOpen ? this.itemsPlanModel : [];
+    const itemsOffice = this.itemsOffice;
+    const itemsPortfolio = this.itemsPortfolio;
+    const itemsFavorites = this.itemsFavorites;
+    const itemsPlanModel = this.itemsPlanModel;
+    const idPlanMenu = this.currentIDPlan;
     this.menuSrv.nextMenuState(
-      { isFixed: this.isFixed, menus: this.menus, itemsOffice, itemsPortfolio, itemsFavorites, itemsPlanModel }
+      { isFixed: this.isFixed,
+        idPlanMenu,
+        idOfficeItemsPlanModel: this.idOfficeItemsPlanModel,
+        menus: this.menus,
+        itemsOffice,
+        itemsPortfolio,
+        itemsFavorites,
+        itemsPlanModel }
     );
     this.responsiveSrv.next(false);
     this.ngOnDestroy();
@@ -336,14 +345,12 @@ export class MenuFixedComponent implements OnInit, OnDestroy {
       localStorage.getItem('@currentPlan') : this.currentIDPlan;
     this.currentIDPlan = Number(currentPlan);
     if (currentPlan) {
-      if (currentPlan) {
-        if (this.authSrv.getAccessToken()) {
-          this.currentPlan = await this.planSrv.getCurrentPlan(this.currentIDPlan);
-          if (this.currentPlan) {
-            if (this.currentIDOffice !== this.currentPlan.idOffice) {
-              this.currentIDOffice = this.currentPlan.idOffice;
-              this.officeSrv.nextIDOffice(this.currentPlan.idOffice);
-            }
+      if (this.authSrv.getAccessToken()) {
+        this.currentPlan = await this.planSrv.getCurrentPlan(this.currentIDPlan);
+        if (this.currentPlan) {
+          if (this.currentIDOffice !== this.currentPlan.idOffice) {
+            this.currentIDOffice = this.currentPlan.idOffice;
+            this.officeSrv.nextIDOffice(this.currentPlan.idOffice);
           }
         }
       }
@@ -551,10 +558,13 @@ export class MenuFixedComponent implements OnInit, OnDestroy {
   }
 
   async loadPortfolioMenu(idNewWorkpack?: number) {
-    if (this.currentIDOffice) {
+    if (this.currentIDOffice && this.currentIDPlan) {
+      this.loadingMenuPortfolio = true;
       const { success, data } = await this.menuSrv.getItemsPortfolio(this.currentIDOffice, this.currentIDPlan);
       if (success) {
         this.itemsPortfolio = this.buildMenuItemPortfolio(data || []);
+        this.idPlanMenu = this.currentIDPlan;
+        this.loadingMenuPortfolio = false;
         if (!!this.isFixed && (!this.changedUrl || this.linkEvent)) {
           this.selectMenuActive(this.router.url.slice(1), idNewWorkpack);
         }

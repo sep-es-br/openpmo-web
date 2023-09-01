@@ -23,7 +23,10 @@ export class PlanService extends BaseService<IPlan> {
   }
 
   nextIDPlan(idPlan: number) {
-    this.currentIDPlan.next(idPlan);
+    this.getCurrentPlan(idPlan);
+    setTimeout( () => {
+      this.currentIDPlan.next(idPlan);
+    }, 500)
   }
 
   observableNewPlan() {
@@ -31,10 +34,19 @@ export class PlanService extends BaseService<IPlan> {
   }
 
   nextNewPlan(value) {
+    if (!!value) {
+      localStorage.removeItem('@currentPlan');
+      localStorage.removeItem('@pmo/propertiesCurrentPlan');
+    }
     this.newPlan.next(value);
   }
 
   async getCurrentPlan(idPlan) {
+    if (!idPlan || idPlan === 0) {
+      localStorage.removeItem('@pmo/propertiesCurrentPlan');
+      localStorage.removeItem('@currentPlan');
+      return;
+    }
     const storedPlan = localStorage.getItem('@pmo/propertiesCurrentPlan');
     let plan = storedPlan ? JSON.parse(storedPlan) : undefined;
     if (plan && plan.id === idPlan) {
