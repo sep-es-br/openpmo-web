@@ -195,7 +195,7 @@
           </div>
           <div *ngIf="!currentPlan" class="title">
             {{'newPlan'|translate}}</div>
-          <div class="action" *ngIf="!isMobileView">
+          <div class="action" *ngIf="!isMobileView && !loadingMenuPortfolio">
             <i [class]="isFixed ? 'app-icon pin-on' : 'app-icon pin-off'" [ngStyle]="{ fontSize: '1rem' }"
               (click)="handleChangeMenuMode()"></i>
           </div>
