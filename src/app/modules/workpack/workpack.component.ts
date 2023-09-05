@@ -392,7 +392,7 @@ export class WorkpackComponent implements OnDestroy {
       });
       return;
     }
-    setTimeout(() => this.workpackSrv.nextLoadingWorkpack(false), 1000);
+    setTimeout(() => this.workpackSrv.nextLoadingWorkpack(false), 500);
   }
 
   getEditPermission() {
@@ -449,7 +449,7 @@ export class WorkpackComponent implements OnDestroy {
       });
       return;
     }
-    setTimeout(() => this.workpackSrv.nextLoadingWorkpack(false), 1000);
+    setTimeout(() => this.workpackSrv.nextLoadingWorkpack(false), 500);
   }
 
   async loadUserPermission() {
@@ -502,7 +502,7 @@ export class WorkpackComponent implements OnDestroy {
       this.officeSrv.nextIDOffice(this.propertiesPlan.idOffice);
       this.setWorkWorkpack();
     }
-    setTimeout(() => this.workpackSrv.nextLoadingWorkpack(false), 1000);
+    setTimeout(() => this.workpackSrv.nextLoadingWorkpack(false), 500);
   }
 
   async checkWorkpackHasEap() {

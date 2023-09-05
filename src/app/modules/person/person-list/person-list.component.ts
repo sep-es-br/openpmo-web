@@ -50,11 +50,11 @@ export class PersonListComponent implements OnInit, OnDestroy {
   optionsStakeholder: SelectItem[] = [];
   optionsCCBMember: SelectItem[] = [];
   formSearch: FormGroup;
-
+  selectedOffices;
+  selectedPlans;
+  selectedWorkpacks;
   allSelected: TreeNode[] = [];
-  selectedOffices: TreeNode[] = [];
-  selectedPlans: TreeNode[] = [];
-  selectedWorkpacks: TreeNode[] = [];
+  scope = [];
   scopeNameOptions: string[];
   isLoading = false;
   first = 0;
@@ -83,7 +83,7 @@ export class PersonListComponent implements OnInit, OnDestroy {
         this.first = 0;
         this.loadPersons();
       }
-      
+
     });
     this.citizenUserSrv.loadCitizenUsers();
     localStorage.removeItem('@currentPlan');
@@ -97,6 +97,7 @@ export class PersonListComponent implements OnInit, OnDestroy {
     });
     this.activeRoute.queryParams.subscribe(async ({ idOffice }) => {
       this.idOffice = +idOffice;
+      this.scope = [this.idOffice];
       await this.loads();
     });
 
@@ -139,12 +140,9 @@ export class PersonListComponent implements OnInit, OnDestroy {
         size: this.pageSize
       },
       {
-      ... this.formSearch?.value,
-      officeScope: this.selectedOffices && this.selectedOffices.length > 0 ? this.selectedOffices.map(office => office.data) : undefined,
-      planScope: this.selectedPlans && this.selectedPlans.length > 0 ? this.selectedPlans.map(plan => plan.data) : undefined,
-      workpackScope: this.selectedWorkpacks && this.selectedWorkpacks.length > 0 ?
-        this.selectedWorkpacks.map(workpack => workpack.data) : undefined,
-    });
+        ... this.formSearch?.value,
+        scope: this.scope
+      });
     const itemsProperties: ICardItemOffice[] = [];
     this.cardProperties.showCreateNemElementButton = false;
     if (success) {
@@ -205,8 +203,10 @@ export class PersonListComponent implements OnInit, OnDestroy {
       }) as TreeNode);
       this.treeViewScope = [{ ...node }];
       this.allSelected = this.setSelectedNodes(this.treeViewScope);
-      this.getSelectedsNode();
-
+      this.selectedOffices = this.allSelected.filter(node => node.type === 'office');
+      if (this.selectedOffices && this.selectedOffices.length > 0) {
+        this.formSearch.controls.scopeName.setValue(this.selectedOffices[0].label);
+      }
     }
   }
 
@@ -325,5 +325,14 @@ export class PersonListComponent implements OnInit, OnDestroy {
     } else {
       this.formSearch.controls.scopeName.setValue('');
     }
+    this.scope = [...this.selectedOffices, ...this.selectedPlans, ...this.selectedWorkpacks];
+    const scopeSelected = [...this.scope];
+    scopeSelected.forEach(item => {
+      if (item.children) {
+        const children = item.children.map(child => child.data);
+        this.scope = this.scope.filter(itemScope => !children.includes(itemScope.data));
+      }
+    });
+    this.scope = this.scope.map(item => item.data);
   }
 }

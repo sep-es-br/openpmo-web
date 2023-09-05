@@ -287,5 +287,6 @@
 }
 
 ::ng-deep .workpack-loading-tabs .app-card-loading {
-  z-index: 10000 !important;
+  position: relative !important;
+  min-height: 250px;
 }

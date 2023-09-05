@@ -1,6 +1,4 @@
-<div class="workpack-loading-tabs">
-  <app-card-loading [isCardLoading]="workpackSrv.observableLoadingWorkpack | async"></app-card-loading>
-</div>
+
 
 <div class="app-workpack" *ngIf="workpackModel" [class.fullscreenModeDashboard]="fullScreenModeDashboard">
   <div class="header-container" [class.mobile]="responsive" *ngIf="idWorkpack">
@@ -18,6 +16,9 @@
   <div class="app-content-header" *ngIf="!idWorkpack" [class.mobile]="responsive">
     <span class="label">{{'new' | translate}}</span>
     <span class="text">{{workpackModel.modelName}}</span>
+  </div>
+  <div class="workpack-loading-tabs">
+    <app-card-loading [isCardLoading]="workpackSrv.observableLoadingWorkpack | async"></app-card-loading>
   </div>
 
   <div class="tabview-container" *ngIf="showTabview">

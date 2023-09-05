@@ -103,10 +103,10 @@ export class MenuFixedComponent implements OnInit, OnDestroy {
       this.menus = menuState.menus;
       this.itemsOffice = [...menuState.itemsOffice];
       this.itemsOfficeUnchanged = [...menuState.itemsOffice];
-      this.selectMenuActive(this.router.url.slice(1));
       this.itemsPortfolio = [...menuState.itemsPortfolio];
       this.itemsFavorites = [...menuState.itemsFavorites];
       this.itemsPlanModel = [...menuState.itemsPlanModel];
+      this.selectMenuActive(this.router.url.slice(1));
     });
 
     this.workpackSrv.observableLoadingWorkpack
