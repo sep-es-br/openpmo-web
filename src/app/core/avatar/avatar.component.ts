@@ -42,7 +42,6 @@ export class AvatarComponent implements OnInit, OnChanges, OnDestroy {
    }
 
   async ngOnInit() {
-    await this.redirectSetAvatarStatus();
   }
 
   ngOnDestroy() {

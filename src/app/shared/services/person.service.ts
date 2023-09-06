@@ -13,6 +13,7 @@ import { BehaviorSubject } from 'rxjs';
 export class PersonService extends BaseService<IPerson> {
 
   private avatarChanged = new BehaviorSubject<boolean>(false);
+  avatarFile: IFile;
 
   constructor(
     @Inject(Injector) injector: Injector
@@ -124,7 +125,14 @@ export class PersonService extends BaseService<IPerson> {
   }
 
   async getAvatar(idPerson: number): Promise<IHttpResult<IFile>> {
-    const result = await this.http.get(`${this.urlBase}/${idPerson}/avatar`).toPromise();
+    if (this.avatarFile && this.avatarFile.file) {
+      return {
+        success: true,
+        data: this.avatarFile
+      };
+    } 
+    const result = await this.http.get(`${this.urlBase}/${idPerson}/avatar`).toPromise() as IHttpResult<IFile>;
+    this.avatarFile = result.data as IFile;
     return result as IHttpResult<IFile>;
   }
 

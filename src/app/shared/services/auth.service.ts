@@ -65,7 +65,7 @@ export class AuthService {
   }
 
   async signOut() {
-    this.clearTokens();
+    this.clearStorage();
     this.userLogout.next(true);
     this.currentUserInfo = undefined;
     window.location.href = 'https://acessocidadao.es.gov.br/is/logout';

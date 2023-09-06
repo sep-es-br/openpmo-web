@@ -69,10 +69,8 @@ export class HomeComponent implements OnInit {
   ngOnInit(): void {
     setTimeout(async () => {
       if (!this.authSrv.isAuthenticated()) {
-        setTimeout(async () => {
-          const routeLink = '/offices'
-          this.router.navigate([routeLink]);
-        }, 0);
+        const routeLink = '/offices'
+        this.router.navigate([routeLink]);
       } else {
         const user = this.authSrv.getTokenPayload();
         const language = user ? this.cookieSrv.get('cookiesDefaultLanguateUser' + user.email) : null;
@@ -83,10 +81,8 @@ export class HomeComponent implements OnInit {
         if (this.infoPerson?.workLocal && this.infoPerson.workLocal.idOffice) {
           this.navigateWorkPerson();
         } else {
-          setTimeout(async () => {
-            const routeLink = '/offices'
-            this.router.navigate([routeLink]);
-          }, 0);
+          const routeLink = '/offices'
+          this.router.navigate([routeLink]);
         }
       }
     }, 300)
@@ -120,6 +116,8 @@ export class HomeComponent implements OnInit {
         return;
       }
       if (workLocal.idPlan && !workLocal.idWorkpack) {
+        this.officeSrv.nextIDOffice(workLocal.idOffice);
+        this.planSrv.nextIDPlan(workLocal.idPlan);
         this.router.navigate(['plan'], {
           queryParams: {
             id: Number(workLocal.idPlan),

@@ -47,7 +47,6 @@ export class PersonProfileComponent implements OnInit, OnDestroy {
     private personSrv: PersonService,
     private router: Router,
     private authSrv: AuthService,
-    private activeRoute: ActivatedRoute,
     private responsiveSvr: ResponsiveService,
     private formBuilder: FormBuilder,
     private translateSrv: TranslateService,
