@@ -36,7 +36,7 @@ export class WorkpackBreadcrumbStorageService {
         info: p.name,
         tooltip: p.fullName,
         routerLink: this.getRouterLinkFromType(p.type),
-        queryParams: { id: p.id, idWorkpackModelLinked: p.idWorkpackModelLinked, idPlan: this.workpackParams.idPlan },
+        queryParams: { id: p.id, idWorkpackModelLinked: p.idWorkpackModelLinked, idPlan: idPlan },
         modelName: p.modelName
       }))
       : [];

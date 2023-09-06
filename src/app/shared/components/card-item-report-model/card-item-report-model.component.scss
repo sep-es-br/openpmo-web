@@ -114,6 +114,9 @@
         flex-direction: row;
         justify-content: flex-start;
         margin-left: 2em;
+        .card-item-name {
+          padding: 0 5px 0;
+        }
       }
     }
     .card-item-footer {

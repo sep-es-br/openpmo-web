@@ -33,7 +33,7 @@ export class PersonListComponent implements OnInit, OnDestroy {
     collapseble: false,
     initialStateCollapse: false
   };
-  cardItemsProperties: ICardItem[];
+  cardItemsProperties: ICardItem[] = [];
   isListEmpty = false;
   displayModeAll = 'grid';
   pageSize = 5;
@@ -56,7 +56,7 @@ export class PersonListComponent implements OnInit, OnDestroy {
   allSelected: TreeNode[] = [];
   scope = [];
   scopeNameOptions: string[];
-  isLoading = false;
+  isLoading = true;
   first = 0;
 
   constructor(
@@ -134,6 +134,7 @@ export class PersonListComponent implements OnInit, OnDestroy {
     }
     this.isLoading = true;
     this.cardItemsProperties = [];
+    
     const { success, data, pagination } = await this.personSrv.GetAllPersons(this.idOffice,
       {
         page: this.page,
@@ -172,6 +173,7 @@ export class PersonListComponent implements OnInit, OnDestroy {
       }));
       this.totalRecords = pagination.totalRecords;
       this.isLoading = false;
+      
     }
 
     this.cardItemsProperties = itemsProperties;

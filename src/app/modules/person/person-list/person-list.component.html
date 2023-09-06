@@ -7,7 +7,7 @@
     </app-config-data-view-panel>
   </div>
   <div class="card-container">
-    <app-card [properties]="cardProperties" class="mt-0">
+    <app-card [properties]="cardProperties" class="mt-0" *ngIf="cardProperties">
       <div class="card-person-container">
         <form [formGroup]="formSearch" class="form-search" [class.responsive]="!!responsive">
           <span class="p-float-label property-input p-field">
