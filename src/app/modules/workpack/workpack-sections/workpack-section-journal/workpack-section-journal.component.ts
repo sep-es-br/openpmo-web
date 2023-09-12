@@ -325,9 +325,11 @@ export class WorkpackSectionJournalComponent implements OnInit, OnDestroy {
   }
 
   handleNewInformation() {
+    this.workpackParams = this.workpackSrv.getWorkpackParams();
+    this.workpackData = this.workpackSrv.getWorkpackData();
     this.route.navigate(['workpack/journal'], {
       queryParams: {
-        idWorkpack: this.workpackData.workpack.id
+        idWorkpack: this.workpackData.workpack.id || this.workpackParams.idWorkpack
       }
     })
   }
