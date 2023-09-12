@@ -181,6 +181,7 @@ export class WorkpackSectionCostAccountsComponent implements OnInit, OnDestroy {
           urlCard: '/workpack/cost-account',
           paramsUrlCard: [
             { name: 'idWorkpack', value: cost.idWorkpack },
+            { name: 'idPlan', value: this.workpackParams.idPlan },
             { name: 'idWorkpackModelLinked', value: this.workpackParams.idWorkpackModelLinked }
           ],
           iconMenuItems: null
@@ -201,6 +202,7 @@ export class WorkpackSectionCostAccountsComponent implements OnInit, OnDestroy {
           urlCard: '/workpack/cost-account',
           paramsUrlCard: [
             { name: 'idWorkpack', value: this.workpackParams.idWorkpack },
+            { name: 'idPlan', value: this.workpackParams.idPlan },
             { name: 'idWorkpackModelLinked', value: this.workpackParams.idWorkpackModelLinked }
           ],
           iconMenuItems: null

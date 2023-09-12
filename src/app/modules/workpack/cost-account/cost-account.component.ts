@@ -76,6 +76,7 @@ export class CostAccountComponent implements OnInit {
     this.actRouter.queryParams.subscribe(async queryParams => {
       this.idCostAccount = queryParams.id;
       this.idWorkpack = queryParams.idWorkpack;
+      this.idPlan = queryParams.idPlan;
       this.idWorkpackModelLinked = queryParams.idWorkpackModelLinked;
     });
     this.responsiveSrv.observable.subscribe(value => this.responsive = value);
@@ -532,7 +533,8 @@ export class CostAccountComponent implements OnInit {
           {
             queryParams: {
               id: this.idWorkpack,
-              idWorkpackModelLinked: this.idWorkpackModelLinked
+              idWorkpackModelLinked: this.idWorkpackModelLinked,
+              idPlan: this.idPlan
             }
           }
         );
@@ -550,7 +552,8 @@ export class CostAccountComponent implements OnInit {
           {
             queryParams: {
               id: this.idWorkpack,
-              idWorkpackModelLinked: this.idWorkpackModelLinked
+              idWorkpackModelLinked: this.idWorkpackModelLinked,
+              idPlan: this.idPlan
             }
           }
         );

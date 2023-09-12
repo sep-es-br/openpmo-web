@@ -2,7 +2,7 @@ import { Location } from '@angular/common';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { MenuItem, MessageService } from 'primeng/api';
 import { Subject } from 'rxjs';
@@ -52,6 +52,7 @@ export class JournalComponent implements OnInit {
     private evidenceSrv: EvidenceService,
     private breadcrumbSrv: BreadcrumbService,
     private sanatizer: DomSanitizer,
+    private route: Router,
     private workpackShowTabviewSrv: WorkpackShowTabviewService
   ) {
     this.workpackShowTabviewSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => {
@@ -172,7 +173,12 @@ export class JournalComponent implements OnInit {
         detail: this.translateSvr.instant('messages.savedSuccessfully')
       });
       setTimeout( () => {
-        this.location.back();
+        this.route.navigate(['workpack'], {
+          queryParams: {
+            id: this.idWorkpack,
+            idPlan: this.idPlan
+          }
+        })
       }, 1000)
       
     }

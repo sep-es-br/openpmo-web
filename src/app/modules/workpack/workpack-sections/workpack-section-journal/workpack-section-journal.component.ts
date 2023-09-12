@@ -65,19 +65,15 @@ export class WorkpackSectionJournalComponent implements OnInit, OnDestroy {
     private configDataViewSrv: ConfigDataViewService,
     private workpackSrv: WorkpackService
   ) {
+    this.workpackShowTabviewSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => {
+      this.showTabview = value;
+    });
     this.configDataViewSrv.observableCollapsePanelsStatus.pipe(takeUntil(this.$destroy)).subscribe(collapsePanelStatus => {
       this.collapsePanelsStatus = collapsePanelStatus === 'collapse' ? true : false;
       this.cardJournalProperties = Object.assign({}, {
         ...this.cardJournalProperties,
-        collapseble: this.showTabview ? false : true,
-        initialStateCollapse: this.collapsePanelsStatus
+        initialStateCollapse: this.showTabview ? false : this.collapsePanelsStatus
       });
-    });
-    this.workpackShowTabviewSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => {
-      this.showTabview = value;
-      const panelStatus = this.configDataViewSrv.getPanelStatus();
-      this.collapsePanelsStatus = this.showTabview ? false : (panelStatus === 'collapse' ? true : false);
-      this.handleChangeShowTabview();
     });
     this.cardJournalProperties = {
       toggleable: false,
