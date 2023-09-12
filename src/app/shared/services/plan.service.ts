@@ -26,7 +26,7 @@ export class PlanService extends BaseService<IPlan> {
     this.getCurrentPlan(idPlan);
     setTimeout( () => {
       this.currentIDPlan.next(idPlan);
-    }, 500)
+    }, 300)
   }
 
   observableNewPlan() {

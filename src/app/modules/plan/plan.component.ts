@@ -164,9 +164,9 @@ export class PlanComponent implements OnInit, OnDestroy {
   }
 
   async ngOnInit() {
-    if (this.idPlan) {
-      this.setCurrentPlanStorage();
-    }
+    // if (this.idPlan) {
+    //   this.setCurrentPlanStorage();
+    // }
     this.isUserAdmin = await this.authSrv.isUserAdmin();
     const today = moment();
     const yearStart = today.year();
@@ -178,14 +178,14 @@ export class PlanComponent implements OnInit, OnDestroy {
     return (isNaN(this.idPlan) && this.formPlan.controls.fullName.pristine);
   }
 
-  setCurrentPlanStorage() {
-    localStorage.setItem('@currentPlan', this.idPlan.toString());
-  }
+  // setCurrentPlanStorage() {
+  //   localStorage.setItem('@currentPlan', this.idPlan.toString());
+  // }
 
   setWorkPlanUser() {
     this.personSrv.setPersonWorkLocal({
       idOffice: this.planData?.idOffice || this.idOffice,
-      idPlan: this.idPlan,
+      idPlan: this.idPlan ? this.idPlan : null,
       idWorkpack: null,
       idWorkpackModelLinked: null
     });
@@ -298,7 +298,7 @@ export class PlanComponent implements OnInit, OnDestroy {
     if (success) {
       if (!isPut) {
         this.idPlan = data.id;
-        this.setCurrentPlanStorage();
+        // this.setCurrentPlanStorage();
         this.personSrv.setPersonWorkLocal({
           idOffice: this.idOffice,
           idPlan: this.idPlan,

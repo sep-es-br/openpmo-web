@@ -57,12 +57,11 @@ export class HomeComponent implements OnInit {
             this.translateChangeSrv.changeLangDefault(language);
           }
           this.infoPerson = await this.authSrv.getInfoPerson();
-          this.router.navigate(['/offices']);
-          // if (!!this.infoPerson && this.infoPerson.workLocal && this.infoPerson.workLocal.idOffice) {
-          //   this.navigateWorkPerson();
-          // } else {
-          //   this.router.navigate(['/offices']);
-          // }
+          if (!!this.infoPerson && this.infoPerson.workLocal && this.infoPerson.workLocal.idOffice) {
+            this.navigateWorkPerson();
+          } else {
+            this.router.navigate(['/offices']);
+          }
         }
       });
   }
@@ -78,13 +77,12 @@ export class HomeComponent implements OnInit {
         this.translateChangeSrv.changeLangDefault(language);
       }
       this.infoPerson = await this.authSrv.getInfoPerson();
-      this.router.navigate(['/offices']);
-      // if (!!this.infoPerson && this.infoPerson.workLocal && this.infoPerson.workLocal.idOffice) {
-      //   this.navigateWorkPerson();
-      // } else {
-      //   const routeLink = '/offices'
-      //   this.router.navigate([routeLink]);
-      // }
+      if (!!this.infoPerson && this.infoPerson.workLocal && this.infoPerson.workLocal.idOffice) {
+        this.navigateWorkPerson();
+      } else {
+        const routeLink = '/offices'
+        this.router.navigate([routeLink]);
+      }
     }
 
   }
@@ -104,8 +102,8 @@ export class HomeComponent implements OnInit {
         return;
       }
       if (workLocal.idWorkpack && workLocal.idPlan && workLocal.idOffice) {
-        // this.officeSrv.nextIDOffice(workLocal.idOffice);
-        // this.planSrv.nextIDPlan(workLocal.idPlan);
+        this.officeSrv.nextIDOffice(workLocal.idOffice);
+        this.planSrv.nextIDPlan(workLocal.idPlan);
         this.router.navigate(['workpack'], {
           queryParams: {
             id: Number(workLocal.idWorkpack),
@@ -115,7 +113,6 @@ export class HomeComponent implements OnInit {
         return;
       }
       if (workLocal.idPlan && workLocal.idOffice) {
-        console.log('entrou no idplan', workLocal);
         this.officeSrv.nextIDOffice(workLocal.idOffice);
         this.planSrv.nextIDPlan(workLocal.idPlan);
         this.router.navigate(['plan'], {

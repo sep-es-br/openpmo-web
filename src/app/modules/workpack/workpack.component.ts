@@ -282,7 +282,6 @@ export class WorkpackComponent implements OnDestroy {
     this.workpackSrv.setUnitMeansure(undefined);
     this.workpackSrv.setWorkpackData(undefined, true);
     await this.resetWorkpackSections();
-    this.idPlan = Number(localStorage.getItem('@currentPlan'));
     await this.loadWorkpackData();
     this.workpackBreadcrumbStorageSrv.setBreadcrumb();
     this.calendarFormat = this.translateSrv.instant('dateFormat');
@@ -307,11 +306,10 @@ export class WorkpackComponent implements OnDestroy {
     if (this.isUserAdmin || !this.idWorkpack) {
       this.workpackSrv.setEditPermission(true);
     }
-    const idPlan = Number(localStorage.getItem('@currentPlan'));
     const params = this.workpackSrv.getWorkpackParams();
     this.workpackSrv.setWorkpackParams({
       ...params,
-      idPlan
+      idPlan: this.idPlan
     });
     if (this.idWorkpack) {
       if (!this.idWorkpackModelLinked) {
@@ -439,7 +437,7 @@ export class WorkpackComponent implements OnDestroy {
       }
       if (!reloadOnlyProperties) {
         this.workpackSrv.setWorkpackData({ workpack: this.workpack });
-        await this.loadWorkpackModel(this.workpack.idWorkpackModel);
+        await this.loadWorkpackModel(this.workpack.model.id);
       }
     } else {
       this.router.navigate(['/plan'], {

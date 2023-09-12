@@ -42,7 +42,7 @@ export class WorkpackBreadcrumbStorageService {
       : [];
   }
 
-  getCurrentBreadcrumb() {
+  async getCurrentBreadcrumb() {
     this.workpackData = this.workpackSrv.getWorkpackData();
     this.workpackName = this.workpackSrv.getNameWorkpack();
     this.workpackParams = this.workpackSrv.getWorkpackParams();
@@ -94,7 +94,7 @@ export class WorkpackBreadcrumbStorageService {
       }
       return breadcrumb;
     } else {
-      breadcrumb = this.startNewBreadcrumb();
+      breadcrumb = !this.idParent ? this.startNewBreadcrumb() : await this.getBreadcrumbs(idWorkpack, idPlan);
       return breadcrumb;
     }
   }

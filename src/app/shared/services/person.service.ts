@@ -219,6 +219,12 @@ export class PersonService extends BaseService<IPerson> {
   }
 
   async setPersonWorkLocal(workLocal: IWorkLocal): Promise<IHttpResult<any>> {
+    const infoPerson = localStorage.getItem('@PMO/infoPerson');
+    if (infoPerson) {
+      const person = JSON.parse(infoPerson);
+      person.workLocal = workLocal;
+      localStorage.setItem('@PMO/infoPerson', JSON.stringify(person));
+    }
     return await this.http.patch<IHttpResult<any>>(`${this.urlBase}/work-local`, workLocal).toPromise();
   }
 

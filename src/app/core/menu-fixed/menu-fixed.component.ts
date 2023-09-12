@@ -99,6 +99,7 @@ export class MenuFixedComponent implements OnInit, OnDestroy {
     this.menuSrv.getMenuState.pipe(takeUntil(this.$destroy)).subscribe(menuState => {
       this.isFixed = menuState.isFixed;
       this.idPlanMenu = menuState.idPlanMenu;
+      this.hasReports = menuState.hasReports;
       this.idOfficeItemsPlanModel = menuState.idOfficeItemsPlanModel;
       this.menus = menuState.menus;
       this.itemsOffice = [...menuState.itemsOffice];
@@ -233,6 +234,7 @@ export class MenuFixedComponent implements OnInit, OnDestroy {
     this.menuSrv.nextMenuState(
       { isFixed: this.isFixed,
         idPlanMenu,
+        hasReports: this.hasReports,
         idOfficeItemsPlanModel: this.idOfficeItemsPlanModel,
         menus: this.menus,
         itemsOffice,
@@ -343,8 +345,8 @@ export class MenuFixedComponent implements OnInit, OnDestroy {
   async loadPropertiesPlan() {
     const currentPlan = !this.currentIDPlan || this.currentIDPlan === 0 ?
       localStorage.getItem('@currentPlan') : this.currentIDPlan;
-    this.currentIDPlan = Number(currentPlan);
-    if (currentPlan) {
+    this.currentIDPlan = Number(currentPlan) !== 0 ? Number(currentPlan) : undefined;
+    if (this.currentIDPlan) {
       if (this.authSrv.getAccessToken()) {
         this.currentPlan = await this.planSrv.getCurrentPlan(this.currentIDPlan);
         if (this.currentPlan) {
@@ -419,7 +421,8 @@ export class MenuFixedComponent implements OnInit, OnDestroy {
         this.menuOffices?.nativeElement.querySelector('.office-' + this.currentIDOffice)?.classList.add('active');
       }
       const itemsMenu = this.itemsPortfolio ? [...Array.from(this.itemsPortfolio)] : undefined;
-      const result = await this.menuSrv.getParentsItemsPortfolio(id, this.currentIDPlan);
+      const idPlan = this.currentIDPlan && this.currentIDPlan !== 0 ? this.currentIDPlan : this.getIdPlanFromURL(url);
+      const result = itemsMenu && await this.menuSrv.getParentsItemsPortfolio(id, idPlan);
       if (result.success) {
         const parents = result.data.parents;
         this.itemsPortfolio = itemsMenu ? [...this.expandedMenuSelectedItem(itemsMenu, parents, id)] : undefined;
@@ -443,6 +446,11 @@ export class MenuFixedComponent implements OnInit, OnDestroy {
       return this.itemsOffice;
     }
     return [];
+  }
+
+  getIdPlanFromURL(url: string) {
+    const [path, queries] = url.split('?');
+    return queries ? Number((queries.split('idPlan=')[1])?.split('&')[0]) : 0;
   }
 
   collapseMenuItems(list) {
