@@ -57,42 +57,41 @@ export class HomeComponent implements OnInit {
             this.translateChangeSrv.changeLangDefault(language);
           }
           this.infoPerson = await this.authSrv.getInfoPerson();
-          if (this.infoPerson?.workLocal) {
-            this.navigateWorkPerson();
-          } else {
-            this.router.navigate(['/home']);
-          }
+          this.router.navigate(['/offices']);
+          // if (!!this.infoPerson && this.infoPerson.workLocal && this.infoPerson.workLocal.idOffice) {
+          //   this.navigateWorkPerson();
+          // } else {
+          //   this.router.navigate(['/offices']);
+          // }
         }
       });
   }
 
-  ngOnInit(): void {
-    setTimeout(async () => {
-      if (!this.authSrv.isAuthenticated()) {
-        const routeLink = '/offices'
-        this.router.navigate([routeLink]);
-      } else {
-        const user = this.authSrv.getTokenPayload();
-        const language = user ? this.cookieSrv.get('cookiesDefaultLanguateUser' + user.email) : null;
-        if (language) {
-          this.translateChangeSrv.changeLangDefault(language);
-        }
-        this.infoPerson = await this.authSrv.getInfoPerson();
-        if (this.infoPerson?.workLocal && this.infoPerson.workLocal.idOffice) {
-          this.navigateWorkPerson();
-        } else {
-          const routeLink = '/offices'
-          this.router.navigate([routeLink]);
-        }
+  async ngOnInit() {
+    if (!this.authSrv.isAuthenticated()) {
+      const routeLink = '/login'
+      this.router.navigate([routeLink]);
+    } else {
+      const user = this.authSrv.getTokenPayload();
+      const language = user ? this.cookieSrv.get('cookiesDefaultLanguateUser' + user.email) : null;
+      if (language) {
+        this.translateChangeSrv.changeLangDefault(language);
       }
-    }, 300)
+      this.infoPerson = await this.authSrv.getInfoPerson();
+      this.router.navigate(['/offices']);
+      // if (!!this.infoPerson && this.infoPerson.workLocal && this.infoPerson.workLocal.idOffice) {
+      //   this.navigateWorkPerson();
+      // } else {
+      //   const routeLink = '/offices'
+      //   this.router.navigate([routeLink]);
+      // }
+    }
 
   }
 
   async navigateWorkPerson() {
-    if (this.infoPerson?.workLocal) {
-      const workLocal = this.infoPerson.workLocal;
-      if (workLocal.idWorkpackModelLinked && workLocal.idWorkpack) {
+    const workLocal = this.infoPerson.workLocal;
+      if (workLocal.idWorkpackModelLinked && workLocal.idWorkpack && workLocal.idPlan && workLocal.idOffice) {
         this.officeSrv.nextIDOffice(workLocal.idOffice);
         this.planSrv.nextIDPlan(workLocal.idPlan);
         this.router.navigate(['workpack'], {
@@ -104,9 +103,9 @@ export class HomeComponent implements OnInit {
         });
         return;
       }
-      if (!workLocal.idWorkpackModelLinked && workLocal.idWorkpack) {
-        this.officeSrv.nextIDOffice(workLocal.idOffice);
-        this.planSrv.nextIDPlan(workLocal.idPlan);
+      if (workLocal.idWorkpack && workLocal.idPlan && workLocal.idOffice) {
+        // this.officeSrv.nextIDOffice(workLocal.idOffice);
+        // this.planSrv.nextIDPlan(workLocal.idPlan);
         this.router.navigate(['workpack'], {
           queryParams: {
             id: Number(workLocal.idWorkpack),
@@ -115,7 +114,8 @@ export class HomeComponent implements OnInit {
         });
         return;
       }
-      if (workLocal.idPlan && !workLocal.idWorkpack) {
+      if (workLocal.idPlan && workLocal.idOffice) {
+        console.log('entrou no idplan', workLocal);
         this.officeSrv.nextIDOffice(workLocal.idOffice);
         this.planSrv.nextIDPlan(workLocal.idPlan);
         this.router.navigate(['plan'], {
@@ -125,7 +125,7 @@ export class HomeComponent implements OnInit {
         });
         return;
       }
-      if (!workLocal.idPlan && workLocal.idOffice) {
+      if (workLocal.idOffice) {
         this.router.navigate(['offices/office'], {
           queryParams: {
             id: Number(workLocal.idOffice),
@@ -133,9 +133,6 @@ export class HomeComponent implements OnInit {
         });
         return;
       }
-      const routeLink = '/offices'
-      this.router.navigate([routeLink]); 
-    }
   }
 
 }
