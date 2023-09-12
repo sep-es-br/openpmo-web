@@ -17,10 +17,6 @@
     <span class="label">{{'new' | translate}}</span>
     <span class="text">{{workpackModel.modelName}}</span>
   </div>
-  <div class="workpack-loading-tabs">
-    <app-card-loading [isCardLoading]="workpackSrv.observableLoadingWorkpack | async"></app-card-loading>
-  </div>
-
   <div class="tabview-container" *ngIf="showTabview">
     <app-tabview-scrolled [tabs]="tabs" (selectedTabChange)="changeTab($event)" [idWorkpack]="idWorkpack" [selectedTab]="selectedTab">
       <div tabviewBody *ngIf="selectedTab?.key === 'WBS'">
