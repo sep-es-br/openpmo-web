@@ -1,5 +1,5 @@
 <div class="app-office-permission-detail">
-  <div class="app-content-header" [class.mobile]="responsive">
+  <div class="app-content-header" [class.mobile]="responsive" *ngIf="!isLoading">
     <span *ngIf="key && person; else newPermissionTitle">{{ person.name }}</span>
     <ng-template #newPermissionTitle>
       <span>{{ "newPermission" | translate }}</span>

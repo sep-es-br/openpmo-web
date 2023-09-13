@@ -414,12 +414,12 @@ export class MenuComponent implements OnInit, OnDestroy {
       }
     } else if (url.startsWith('plan')) {
       this.menuOffices?.nativeElement.querySelector('.plan-' + id)?.classList.add('active');
-      this.itemsOffice = this.itemsOffice ? [...this.expandMenuOffice()] : undefined;
+      this.itemsOffice = this.itemsOffice ? [...this.expandMenuOffice()] : this.itemsOffice;
       const itemsMenu = this.itemsPortfolio ? [...Array.from(this.itemsPortfolio)] : undefined;
       this.itemsPortfolio = itemsMenu ? [...this.collapseMenuItems(itemsMenu)] : undefined;
 
     } else if (url.startsWith('workpack')) {
-      this.itemsOffice = this.itemsOffice ? [...this.expandMenuOffice()] : undefined;
+      this.itemsOffice = this.itemsOffice ? [...this.expandMenuOffice()] : this.itemsOffice;
       if (this.currentIDPlan) {
         this.menuOffices?.nativeElement.querySelector('.plan-' + this.currentIDPlan)?.classList.add('active');
       } else {
@@ -427,7 +427,7 @@ export class MenuComponent implements OnInit, OnDestroy {
       }
       const itemsMenu = this.itemsPortfolio ? [...Array.from(this.itemsPortfolio)] : undefined;
       const idPlan = this.currentIDPlan && this.currentIDPlan !== 0 ? this.currentIDPlan : this.getIdPlanFromURL(url);
-      const result = itemsMenu && await this.menuSrv.getParentsItemsPortfolio(id, idPlan);
+      const result = itemsMenu && itemsMenu.length > 0 && await this.menuSrv.getParentsItemsPortfolio(id, idPlan);
       if (result.success) {
         const parents = result.data.parents;
         this.itemsPortfolio = itemsMenu ? [...this.expandedMenuSelectedItem(itemsMenu, parents, id)] : undefined;
@@ -448,9 +448,8 @@ export class MenuComponent implements OnInit, OnDestroy {
     const officeIndex = this.itemsOffice.findIndex(item => item.id === this.currentIDOffice);
     if (officeIndex > -1) {
       this.itemsOffice[officeIndex].expanded = true;
-      return this.itemsOffice;
     }
-    return [];
+    return this.itemsOffice;
   }
 
   collapseMenuItems(list) {

@@ -108,7 +108,7 @@ export class WorkpackComponent implements OnDestroy {
   tabViewStorage = 'open-pmo:WORKPACK_TABVIEW';
   favoriteProcessing = false;
   currentBreadcrumbItems: IBreadcrumb[];
-
+  workpackLoading = true;
 
   constructor(
     private actRouter: ActivatedRoute,
@@ -183,6 +183,7 @@ export class WorkpackComponent implements OnDestroy {
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => {
       this.responsive = value;
     });
+    this.workpackSrv.observableLoadingWorkpack.pipe(takeUntil(this.$destroy)).subscribe( value => this.workpackLoading = value);
     this.workpackShowTabviewSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => {
       this.showTabview = value;
       const panelStatus = this.configDataViewSrv.getPanelStatus();
@@ -381,6 +382,8 @@ export class WorkpackComponent implements OnDestroy {
       if (!reloadOnlyProperties) {
         this.workpackSrv.setWorkpackData({ workpack: this.workpack });
         await this.loadWorkpackModel(this.workpack.model.id);
+      } else {
+        this.workpackSrv.nextLoadingWorkpack(false)
       }
     } else {
       this.router.navigate(['/plan'], {
@@ -390,7 +393,6 @@ export class WorkpackComponent implements OnDestroy {
       });
       return;
     }
-    setTimeout(() => this.workpackSrv.nextLoadingWorkpack(false), 500);
   }
 
   getEditPermission() {
@@ -438,6 +440,8 @@ export class WorkpackComponent implements OnDestroy {
       if (!reloadOnlyProperties) {
         this.workpackSrv.setWorkpackData({ workpack: this.workpack });
         await this.loadWorkpackModel(this.workpack.model.id);
+      } else {
+        this.workpackSrv.nextLoadingWorkpack(false)
       }
     } else {
       this.router.navigate(['/plan'], {
@@ -447,7 +451,6 @@ export class WorkpackComponent implements OnDestroy {
       });
       return;
     }
-    setTimeout(() => this.workpackSrv.nextLoadingWorkpack(false), 500);
   }
 
   async loadUserPermission() {
@@ -486,6 +489,7 @@ export class WorkpackComponent implements OnDestroy {
       this.isLoading = false;
     }
     const workpackParams = this.workpackSrv.getWorkpackParams();
+    setTimeout( () => {this.workpackSrv.nextLoadingWorkpack(false)}, 300)
     this.propertiesPlan = await this.planSrv.getCurrentPlan(workpackParams.idPlan);
     if (this.propertiesPlan.id) this.planSrv.nextIDPlan(this.propertiesPlan.id)
     if (this.propertiesPlan) {
@@ -500,7 +504,6 @@ export class WorkpackComponent implements OnDestroy {
       this.officeSrv.nextIDOffice(this.propertiesPlan.idOffice);
       this.setWorkWorkpack();
     }
-    setTimeout(() => this.workpackSrv.nextLoadingWorkpack(false), 500);
   }
 
   async checkWorkpackHasEap() {

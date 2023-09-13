@@ -288,5 +288,6 @@
 
 ::ng-deep .workpack-loading-tabs .app-card-loading {
   position: relative !important;
-  min-height: 250px;
+  min-height: 500px;
+  flex: 1;
 }

@@ -238,6 +238,8 @@ export class StepComponent implements OnInit, OnDestroy {
       this.start.setDate(1);
       this.start.setMonth(this.start.getMonth() - 1);
       this.minStart = null;
+      this.formStep.controls.start.setValue(this.start);
+      this.formStep.controls.start.setValidators(Validators.required);
       const numDays = moment(this.start).daysInMonth();
       this.maxStart = new Date(this.start);
       this.maxStart.setDate(numDays);
@@ -246,6 +248,8 @@ export class StepComponent implements OnInit, OnDestroy {
       this.end = new Date(this.schedule.end + 'T00:00:00');
       this.end.setDate(1);
       this.end.setMonth(this.end.getMonth() + 1);
+      this.formStep.controls.end.setValue(this.end);
+      this.formStep.controls.end.setValidators(Validators.required);
       this.minEnd = new Date(this.end);
       this.maxEnd = null;
     }
@@ -438,19 +442,22 @@ export class StepComponent implements OnInit, OnDestroy {
     if (this.formStep.valid) {
       if (this.costAssignmentsCardItems && this.costAssignmentsCardItems.length > 1) {
         this.reloadCostAssignmentTotals();
-        this.showSaveButton = true;
       }
       this.showSaveButton = true;
+    } else {
+      this.showSaveButton = false;
     }
+    
   }
 
   handleChangeTotalsValues() {
     if (this.formStep.valid) {
       if (this.costAssignmentsCardItems && this.costAssignmentsCardItems.length > 1) {
         this.reloadCostAssignmentTotals();
-        this.showSaveButton = true;
       }
       this.showSaveButton = true;
+    } else {
+      this.showSaveButton = false;
     }
   }
 

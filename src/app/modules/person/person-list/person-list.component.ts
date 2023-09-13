@@ -189,7 +189,7 @@ export class PersonListComponent implements OnInit, OnDestroy {
         parent: undefined,
         children: undefined,
         selectable: true,
-        expanded: true,
+        expanded: false,
         type: 'office'
       };
       node.children = data.plans.map(plan => ({
@@ -197,7 +197,7 @@ export class PersonListComponent implements OnInit, OnDestroy {
         data: plan.id,
         icon: `app-icon ${IconsEnum.Plan}`,
         parent: node,
-        expanded: true,
+        expanded: false,
         children: this.loadTreeChildrens(plan.workpacks),
         selectable: true,
         type: 'plan'
@@ -235,7 +235,7 @@ export class PersonListComponent implements OnInit, OnDestroy {
             children: undefined,
             parent,
             selectable: true,
-            expanded: true,
+            expanded: false,
             type: 'workpack'
           };
           node.children = this.loadTreeChildrens(worckpack.children, node);
