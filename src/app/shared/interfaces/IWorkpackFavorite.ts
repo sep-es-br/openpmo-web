@@ -2,6 +2,6 @@ export interface IWorkpackFavorite {
   id: number;
   name: string;
   icon: string;
-  fullname?: string;
+  fullName?: string;
   canAccess: boolean;
 }

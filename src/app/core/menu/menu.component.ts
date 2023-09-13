@@ -529,7 +529,7 @@ export class MenuComponent implements OnInit, OnDestroy {
         this.itemsFavorites = data.map(item => ({
           label: item.name,
           icon: item.icon,
-          title: item.fullname,
+          title: item.fullName,
           styleClass: `workpack-${item.id} ${this.currentURL === `workpack?id=${item.id}` ? 'active' : ''}`,
           routerLink: {path: 'workpack', queryParams: {id: item.id, idPlan: this.currentIDPlan}},
           id: item.id,
@@ -555,7 +555,7 @@ export class MenuComponent implements OnInit, OnDestroy {
       });
       return;
     }
-
+    this.setWorkpackBreadcrumbStorage(item.id, this.currentIDPlan);
     this.router.navigate([item.routerLink?.path], {queryParams: item.routerLink?.queryParams});
     this.closeAllMenus();
   }
