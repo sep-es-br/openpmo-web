@@ -487,6 +487,11 @@
           }
         }
       },
+      "already": {
+        "exists": {
+          "permission": "Já existe permissão para esta pessoa neste elemento!"
+        }
+      },
       "date": {
         "is": {
           "in": {

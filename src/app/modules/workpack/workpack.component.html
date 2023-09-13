@@ -4,9 +4,9 @@
   <div class="workpack-loading-tabs">
     <app-card-loading [isCardLoading]="workpackLoading"></app-card-loading>
   </div>
-  <div class="header-container" [class.mobile]="responsive" *ngIf="idWorkpack && !workpackLoading">
+  <div class="header-container" [class.mobile]="responsive" *ngIf="workpackModel && idWorkpack && !workpackLoading">
     <div class="app-content-header" [class.mobile]="responsive">
-      <span class="label">{{workpackModel.modelName}}:</span>
+      <span class="label">{{workpackModel?.modelName}}:</span>
       <span class="text">{{workpackFullName}}</span>
     </div>
     <div class="container-actions">
@@ -16,9 +16,9 @@
       <app-config-data-view-panel></app-config-data-view-panel>
     </div>
   </div>
-  <div class="app-content-header" *ngIf="!idWorkpack && !workpackLoading" [class.mobile]="responsive">
+  <div class="app-content-header" *ngIf="workpackModel && !idWorkpack && !workpackLoading" [class.mobile]="responsive">
     <span class="label">{{'new' | translate}}</span>
-    <span class="text">{{workpackModel.modelName}}</span>
+    <span class="text">{{workpackModel?.modelName}}</span>
   </div>
   <div class="tabview-container" *ngIf="showTabview && !workpackLoading">
     <app-tabview-scrolled [tabs]="tabs" (selectedTabChange)="changeTab($event)" [idWorkpack]="idWorkpack" [selectedTab]="selectedTab">

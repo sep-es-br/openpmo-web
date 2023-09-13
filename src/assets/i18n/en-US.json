@@ -471,6 +471,11 @@
           }
         }
       },
+      "already": {
+        "exists": {
+          "permission": "Already exists permission to this person in this element!"
+        }
+      },
       "date": {
         "is": {
           "in": {
