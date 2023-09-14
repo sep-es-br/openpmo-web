@@ -601,7 +601,6 @@ export class MenuFixedComponent implements OnInit, OnDestroy {
       this.menus.forEach(m => m.isOpen = false);
       return setTimeout(() => menuFound.isOpen = true, 250);
     }
-    return menuFound.isOpen = !menuFound.isOpen;
   }
 
   buildMenuItemPlanModel(root: IMenuPlanModel[]): MenuItem[] {

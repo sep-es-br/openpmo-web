@@ -81,7 +81,7 @@ export class WorkpackSectionJournalComponent implements OnInit, OnDestroy {
       notShowCardTitle: this.showTabview ? true : false,
       cardTitle: 'journal',
       collapseble: this.showTabview ? false : true,
-      initialStateCollapse: this.collapsePanelsStatus,
+      initialStateCollapse: this.showTabview ? false : this.collapsePanelsStatus
     };
     this.setLanguage();
     const today = moment();
