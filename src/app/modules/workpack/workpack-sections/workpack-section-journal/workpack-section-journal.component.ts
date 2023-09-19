@@ -53,6 +53,7 @@ export class WorkpackSectionJournalComponent implements OnInit, OnDestroy {
   cardJournalProperties: ICard;
   collapsePanelsStatus: boolean;
   editPermission: boolean;
+  sectionActive = false;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -150,6 +151,8 @@ export class WorkpackSectionJournalComponent implements OnInit, OnDestroy {
     this.workpackData = workpackData;
     this.workpackParams = workpackParams;
     this.journalData = journalData;
+    this.sectionActive = !!this.workpackData.workpack && !!this.workpackData.workpack.id  && !!this.workpackData.workpackModel &&
+      !!this.workpackData.workpackModel.journalManagementSessionActive;
     this.editPermission = this.workpackSrv.getEditPermission() ? true : false;
     this.formSearch.reset({
       ...searchParams

@@ -320,6 +320,7 @@
       }
       .new-element-button-container {
         margin-right: 0 !important;
+        margin-top: 0.5em;
       }
     }
     .dataview-filters {
@@ -379,7 +380,10 @@
 
   @media (max-width: 990px) {
     .dataview-filters-container {
-      width: 60% !important;
+      width: 100% !important;
+      .dataview-filters-text {
+        width: 100% !important;
+      }
     }
   }
 }

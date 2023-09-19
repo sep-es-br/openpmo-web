@@ -45,7 +45,7 @@ export class WorkpackSectionPropertiesComponent implements OnInit {
     private messageSrv: MessageService,
     private propertySrv: WorkpackPropertyService
   ) {
-    
+
     this.workpackShowTabviewSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => {
       this.showTabview = value;
     });
@@ -98,7 +98,9 @@ export class WorkpackSectionPropertiesComponent implements OnInit {
     this.workpackParams = workpackParams;
     this.workpackData = workpackData;
     this.sectionPropertiesProperties = properties;
-    this.cardWorkpackProperties.initialStateCollapse = this.workpackParams.idWorkpack && !this.showTabview ? true : false;
+    if (this.cardWorkpackProperties) {
+      this.cardWorkpackProperties.initialStateCollapse = this.workpackParams?.idWorkpack && !this.showTabview;
+    }
     if (!loading) this.showCheckCompleted();
   }
 
@@ -173,10 +175,10 @@ export class WorkpackSectionPropertiesComponent implements OnInit {
           if (prop.type === 'LocalitySelection') {
             if (!prop.multipleSelection) {
               const selectedLocality = prop.localitiesSelected as TreeNode;
-              prop.selectedValues = [selectedLocality.data];
+              prop.selectedValues = selectedLocality ? [selectedLocality.data] : [];
             }
             if (prop.multipleSelection) {
-              const selectedLocality = prop.localitiesSelected as TreeNode[];
+              const selectedLocality = prop.localitiesSelected && prop.localitiesSelected !== null ? prop.localitiesSelected as TreeNode[] : [];
               prop.selectedValues = selectedLocality.filter(locality => locality.data !== prop.idDomain)
                 .map(l => l.data);
             }

@@ -62,6 +62,9 @@ export class CostAccountService extends BaseService<ICostAccount> {
         this.loading = false;
         this.nextResetCostAccount(true);
       }
+    } else {
+      this.loading = false;
+      this.nextResetCostAccount(true);
     }
   }
 

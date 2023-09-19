@@ -90,6 +90,9 @@ export class DashboardService extends BaseService<IDashboard> {
         }
       await this.getScheduleInterval();
       await this.getDashboard({referenceMonth: this.referenceMonth, selectedBaseline: this.selectedBaseline});
+    } else {
+      this.loading = false;
+      this.nextResetDashboard(true);
     }
 
   }

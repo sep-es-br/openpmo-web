@@ -115,6 +115,9 @@ export class JournalService extends BaseService<IJournal> {
         this.loading = false;
         this.nextResetJournal(true);
       }
+    } else {
+      this.loading = false;
+      this.nextResetJournal(true);
     }
 
   }

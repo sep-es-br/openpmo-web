@@ -83,6 +83,9 @@ export class StakeholderService extends BaseService<IStakeholder> {
           this.nextResetStakeholder(true);
         }
       }
+    } else {
+      this.loading = false;
+      this.nextResetStakeholder(true);
     }
   }
 

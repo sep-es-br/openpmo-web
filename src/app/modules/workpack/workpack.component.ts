@@ -144,7 +144,7 @@ export class WorkpackComponent implements OnDestroy {
     private personSrv: PersonService,
     private breadcrumbSrv: BreadcrumbService
   ) {
-    this.actRouter.queryParams.subscribe(({id}) => this.idWorkpack = id && +id);
+    this.actRouter.queryParams.subscribe(({ id }) => this.idWorkpack = id && +id);
     this.actRouter.queryParams.subscribe(async ({
       id,
       idPlan,
@@ -183,7 +183,7 @@ export class WorkpackComponent implements OnDestroy {
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => {
       this.responsive = value;
     });
-    this.workpackSrv.observableLoadingWorkpack.pipe(takeUntil(this.$destroy)).subscribe( value => this.workpackLoading = value);
+    this.workpackSrv.observableLoadingWorkpack.pipe(takeUntil(this.$destroy)).subscribe(value => this.workpackLoading = value);
     this.workpackShowTabviewSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => {
       this.showTabview = value;
       const panelStatus = this.configDataViewSrv.getPanelStatus();
@@ -489,7 +489,7 @@ export class WorkpackComponent implements OnDestroy {
       this.isLoading = false;
     }
     const workpackParams = this.workpackSrv.getWorkpackParams();
-    setTimeout( () => {this.workpackSrv.nextLoadingWorkpack(false)}, 300)
+    setTimeout(() => { this.workpackSrv.nextLoadingWorkpack(false) }, 300)
     this.propertiesPlan = await this.planSrv.getCurrentPlan(workpackParams.idPlan);
     if (this.propertiesPlan.id) this.planSrv.nextIDPlan(this.propertiesPlan.id)
     if (this.propertiesPlan) {
@@ -510,11 +510,11 @@ export class WorkpackComponent implements OnDestroy {
     this.isLoading = true;
     this.hasWBS = (!!this.isUserAdmin || (!!this.workpack.permissions && this.workpack.permissions.length > 0)) && this.workpack.hasChildren;
     this.workpack.hasWBS = this.hasWBS;
-      const workpackData = this.workpackSrv.getWorkpackData();
-      this.workpackSrv.setWorkpackData({
-        ...workpackData,
-        workpack: this.workpack
-      });
+    const workpackData = this.workpackSrv.getWorkpackData();
+    this.workpackSrv.setWorkpackData({
+      ...workpackData,
+      workpack: this.workpack
+    });
   }
 
   async loadSectionsWorkpackModel() {
@@ -1474,24 +1474,25 @@ export class WorkpackComponent implements OnDestroy {
           key: 'journal'
         });
       }
+      const selectedTabsStorage = localStorage.getItem(this.tabViewStorage);
+      if (!selectedTabsStorage || selectedTabsStorage == 'undefined') {
+        this.isLoading = false;
+        return;
+      }
+      const selectedTabs = JSON.parse(selectedTabsStorage);
+      const findIndex = selectedTabs?.findIndex(tab => tab.idWorkpack === this.idWorkpack);
+      if (findIndex !== -1) {
+        this.selectedTab = selectedTabs[findIndex].tab;
+      }
+      this.setStorageTab();
     }
     if (!this.idWorkpack) {
       this.tabs.push({
         menu: 'properties',
         key: 'properties'
       });
+      this.selectedTab = this.tabs[0];
     }
-    const tabs = localStorage.getItem(this.tabViewStorage);
-    if (!tabs || tabs == 'undefined') {
-      this.isLoading = false;
-      return;
-    }
-    const selectedTab = JSON.parse(tabs);
-    const findIndex = selectedTab?.findIndex(tab => tab.idWorkpack === this.idWorkpack);
-    if (findIndex !== -1) {
-      this.selectedTab = selectedTab[findIndex].tab;
-    }
-    this.setStorageTab();
     this.isLoading = false;
   }
 

@@ -59,6 +59,9 @@ export class ProcessService extends BaseService<IProcess> {
         this.loading = false;
         this.nextResetProcess(true);
       }
+    } else {
+      this.loading = false;
+      this.nextResetProcess(true);
     }
   }
 

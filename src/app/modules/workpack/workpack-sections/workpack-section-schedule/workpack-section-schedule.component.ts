@@ -53,6 +53,7 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
   }[] = [];
   spreadEvent;
   spreadMulticost = false;
+  sectionActive = false;
 
 
   constructor(
@@ -111,10 +112,13 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
     this.workpackParams = workpackParams;
     this.workpackData = workpackData;
     this.schedule = schedule;
+    this.sectionActive = workpackData && !!workpackData.workpack && !!workpackData.workpack.id  &&
+      workpackData.workpackModel && workpackData.workpackModel.scheduleSessionActive;
     if (!loading) this.loadScheduleSession();
   }
 
   async loadScheduleSession() {
+    if (!this.sectionActive) return;
     this.editPermission = this.workpackSrv.getEditPermission();
     this.unitMeansure = this.workpackSrv.getUnitMeansure();
     if (this.schedule) {

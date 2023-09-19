@@ -60,9 +60,6 @@ $loadingBarHeight: .3rem;
   &.mobile {
     flex-direction: column-reverse;
 
-    main {
-      padding-bottom: 72px;
-    }
     .outlet {
       padding: 0 7.5px;
     }

@@ -61,6 +61,7 @@ export class WorkpackSectionDashboardComponent implements OnInit, OnChanges, OnD
   mediaScreen1700: boolean;
   scheduleInterval;
   workpackParams: IWorkpackParams;
+  sectionActive = false;
 
   constructor(
     private dashboardSrv: DashboardService,
@@ -121,6 +122,7 @@ export class WorkpackSectionDashboardComponent implements OnInit, OnChanges, OnD
 
   loadDashboardData() {
     const {
+      workpackData,
       workpackParams,
       scheduleInterval,
       referenceMonth,
@@ -143,7 +145,10 @@ export class WorkpackSectionDashboardComponent implements OnInit, OnChanges, OnD
     this.endDate = endDate;
     this.dashboardMilestonesData = undefined;
     this.dashboardRisksData = undefined;
-    if (this.dashboard && !loading) {
+    this.sectionActive = !!workpackData.workpack && !!workpackData.workpack.id &&
+      !workpackData.workpack.canceled && !!workpackData.workpackModel &&
+      !!workpackData.workpackModel.dashboardSessionActive
+    if (this.dashboard && !loading && this.sectionActive) {
       this.setDashboardMilestonesData();
       this.setDashboardRisksData();
       this.setMenuItemWorkpacksByModel();

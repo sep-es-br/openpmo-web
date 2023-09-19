@@ -11,6 +11,7 @@ import { IBaseline } from '../../../../shared/interfaces/IBaseline';
 import { ISection } from '../../../../shared/interfaces/ISectionWorkpack';
 import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 import { WorkpackShowTabviewService } from 'src/app/shared/services/workpack-show-tabview.service';
+import { TypeWorkpackEnum } from 'src/app/shared/enums/TypeWorkpackEnum';
 
 @Component({
   selector: 'app-workpack-section-baselines',
@@ -29,6 +30,7 @@ export class WorkpackSectionBaselinesComponent implements OnInit, OnDestroy {
   displayModeAll: string;
   responsive = false;
   showTabview = false;
+  sectionActive = false;
 
   constructor(
     private workpackSrv: WorkpackService,
@@ -94,10 +96,12 @@ export class WorkpackSectionBaselinesComponent implements OnInit, OnDestroy {
     this.workpackData = workpackData;
     this.workpackParams = workpackParams;
     this.baselines = baselines;
-    if (!loading ) this.loadBaselineSection();
+    this.sectionActive = workpackData && workpackData.workpack && workpackData.workpack.id && workpackData.workpack.type === TypeWorkpackEnum.ProjectModel;
+    if (!loading) this.loadBaselineSection();
   }
 
   async loadBaselineSection() {
+    if (!this.sectionActive ) return;
     this.sectionBaselines = {
       ...this.sectionBaselines,
       cardSection: {

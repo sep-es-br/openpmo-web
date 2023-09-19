@@ -41,6 +41,7 @@ export class WorkpackSectionIssuesComponent implements OnInit, OnDestroy {
   idFilterSelected: number;
   term = '';
   filters;
+  sectionActive = false;
 
   constructor(
     private filterSrv: FilterDataviewService,
@@ -120,6 +121,8 @@ export class WorkpackSectionIssuesComponent implements OnInit, OnDestroy {
     this.issues = issues;
     this.idFilterSelected = idFilterSelected;
     this.term = term;
+    this.sectionActive = this.workpackData && this.workpackData?.workpack?.id && this.workpackData?.workpackModel &&
+      this.workpackData.workpackModel.riskAndIssueManagementSessionActive;
     if (!loading) this.loadIssueSection();
   }
 
@@ -128,6 +131,7 @@ export class WorkpackSectionIssuesComponent implements OnInit, OnDestroy {
   }
 
   async loadIssueSection() {
+    if (!this.sectionActive )  return;
     this.sectionIssue = {
       ...this.sectionIssue,
       cardSection: {

@@ -37,6 +37,7 @@ export class WorkpackSectionCostAccountsComponent implements OnInit, OnDestroy {
   term = '';
   filters;
   funders;
+  sectionActive = false;
 
   constructor(
     private costAccountSrv: CostAccountService,
@@ -116,6 +117,8 @@ export class WorkpackSectionCostAccountsComponent implements OnInit, OnDestroy {
     this.idFilterSelected = idFilterSelected;
     this.funders = funders;
     this.term = term;
+    this.sectionActive = workpackData && workpackData.workpack && workpackData.workpack.id &&
+      this.workpackData?.workpackModel && this.workpackData.workpackModel.costSessionActive;
     if (!loading) {
       this.loadCostAccountSection();
     } else {
@@ -129,6 +132,7 @@ export class WorkpackSectionCostAccountsComponent implements OnInit, OnDestroy {
   }
 
   async loadCostAccountSection() {
+    if (!this.sectionActive ) return;
     this.sectionCostAccount = {
       ...this.sectionCostAccount,
       cardSection: {

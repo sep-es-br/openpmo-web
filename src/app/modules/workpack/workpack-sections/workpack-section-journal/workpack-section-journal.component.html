@@ -1,5 +1,5 @@
 <div class="app-journal-view">
-  <app-card [properties]="cardJournalProperties">
+  <app-card [properties]="cardJournalProperties" *ngIf="sectionActive">
     <form class="filters p-grid p-fluid" [formGroup]="formSearch" [class.responsive]="responsive">
       <p-button class="app-button-green" [label]="'newInformation' | translate" (onClick)="handleNewInformation()"
         [disabled]="!editPermission || workpackData?.workpack?.canceled"></p-button>

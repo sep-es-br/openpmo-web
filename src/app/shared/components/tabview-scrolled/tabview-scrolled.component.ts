@@ -22,8 +22,9 @@ export class TabviewScrolledComponent implements OnChanges, OnDestroy {
 
   @Output() selectedTabChange = new EventEmitter<{ tabs: ITabViewScrolled; setStorage: boolean }>();
   @Input() tabs: ITabViewScrolled[] = [];
-  @Input() selectedTab: ITabViewScrolled;
+  @Input() workpackSelectedTab: ITabViewScrolled;
   @Input() idWorkpack: number;
+  selectedTab: ITabViewScrolled;
   tabBody: string;
   showTabview: boolean;
   $destroy = new Subject();
@@ -83,16 +84,16 @@ export class TabviewScrolledComponent implements OnChanges, OnDestroy {
   ngOnChanges(changes: SimpleChanges) {
 
     if (changes.tabs && changes.tabs.currentValue) {
-      setTimeout(() => {
-        if (!this.selectedTab || !this.tabs.some(tab => tab.key === this.selectedTab.key)) {
+        if (!this.workpackSelectedTab || !this.tabs.some(tab => tab.key === this.workpackSelectedTab.key)) {
           const index = this.existsWorkpackTabStorage() ? this.findIndexTabStorage() : 0;
           this.selectTab(this.tabs[index], this.existsWorkpackTabStorage() && index !== 0);
+        } else {
+          this.selectedTab = this.workpackSelectedTab;
         }
         this.prepareScrolls();
         if (!this.tabs.length) {
           this.showMessageNotFound = true;
         }
-      }, 1000);
     }
   }
 

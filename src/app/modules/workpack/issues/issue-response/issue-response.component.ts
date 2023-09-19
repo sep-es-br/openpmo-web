@@ -209,7 +209,8 @@ export class IssueResponseComponent implements OnInit {
       id: this.idIssueResponse,
       idIssue: this.idIssue,
       name: this.formIssueResponse.controls.name.value,
-      date: moment(this.formIssueResponse.controls.date.value).format('yyyy-MM-DD'),
+      date: this.formIssueResponse.controls.date.value && this.formIssueResponse.controls.date.value !== null ?
+        moment(this.formIssueResponse.controls.date.value).format('yyyy-MM-DD') : undefined,
       status: this.formIssueResponse.controls.status.value,
       plan: this.formIssueResponse.controls.plan.value,
       responsible: this.formIssueResponse.controls.responsible.value

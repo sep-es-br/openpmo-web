@@ -63,6 +63,9 @@ export class IssueService extends BaseService<IIssue> {
           this.nextResetIssue(true);
         }
       }
+    } else {
+      this.loading = false;
+      this.nextResetIssue(true);
     }
   }
 

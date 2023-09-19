@@ -20,8 +20,8 @@
     <span class="label">{{'new' | translate}}</span>
     <span class="text">{{workpackModel?.modelName}}</span>
   </div>
-  <div class="tabview-container" *ngIf="showTabview && !workpackLoading">
-    <app-tabview-scrolled [tabs]="tabs" (selectedTabChange)="changeTab($event)" [idWorkpack]="idWorkpack" [selectedTab]="selectedTab">
+  <div class="tabview-container" *ngIf="showTabview && tabs && tabs.length > 0 && !workpackLoading">
+    <app-tabview-scrolled [tabs]="tabs" (selectedTabChange)="changeTab($event)" [idWorkpack]="idWorkpack" [workpackSelectedTab]="selectedTab">
       <div tabviewBody *ngIf="selectedTab?.key === 'WBS'">
         <div class="card-WBS">
           <app-workpack-section-wbs
@@ -216,7 +216,7 @@
     <div class="card-processes">
       <app-workpack-section-processes></app-workpack-section-processes>
     </div>
-    <div class="card-journal" *ngIf="workpackModel.journalManagementSessionActive">
+    <div class="card-journal" *ngIf="workpackModel && workpackModel.journalManagementSessionActive">
       <app-workpack-section-journal ></app-workpack-section-journal >
     </div>
   </div>

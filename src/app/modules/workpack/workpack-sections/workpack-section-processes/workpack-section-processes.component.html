@@ -1,4 +1,4 @@
-<div class="card-processes" *ngIf="sectionProcess">
+<div class="card-processes" *ngIf="sectionProcess && sectionActive">
   <app-card [properties]="sectionProcess.cardSection" [class.panel-tab-view]="showTabview"
     [loading]="sectionProcess.cardSection.isLoading" (searchText)="handleSearchText($event)"
     (editFilter)="handleEditFilterEntity($event, 'processes')" (newFilter)="handleNewFilterEntity('processes')"

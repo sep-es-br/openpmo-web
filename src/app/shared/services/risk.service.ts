@@ -61,6 +61,9 @@ export class RiskService extends BaseService<IRisk> {
           this.nextResetRisk(true);
         }
       }
+    } else {
+      this.loading = false;
+      this.nextResetRisk(true);
     }
   }
 

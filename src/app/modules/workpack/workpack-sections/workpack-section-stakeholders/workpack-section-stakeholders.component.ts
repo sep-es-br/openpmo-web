@@ -40,6 +40,7 @@ export class WorkpackSectionStakeholdersComponent implements OnInit, OnDestroy {
   idFilterSelected: number;
   term = '';
   filters;
+  activeSection = false;
 
   constructor(
     private filterSrv: FilterDataviewService,
@@ -129,10 +130,13 @@ export class WorkpackSectionStakeholdersComponent implements OnInit, OnDestroy {
     this.stakeholders = stakeholders;
     this.idFilterSelected = idFilterSelected;
     this.term = term;
+    this.activeSection = this.workpackData && this.workpackData?.workpack?.id && this.workpackData?.workpackModel
+      && this.workpackData.workpackModel.stakeholderSessionActive;
     if (!loading) this.loadStakeholderSection();
   }
 
   async loadStakeholderSection() {
+    if (!this.activeSection) return;
     this.sectionStakeholder = {
       ...this.sectionStakeholder,
       cardSection: {

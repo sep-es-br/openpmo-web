@@ -233,8 +233,10 @@ export class RiskResponseComponent implements OnInit {
       idRisk: this.idRisk,
       name: this.formRiskResponse.controls.name.value,
       when: this.formRiskResponse.controls.when.value,
-      startDate: this.formRiskResponse.controls.when.value === 'PRE_OCCURRENCE' ? moment(this.formRiskResponse.controls.startDate.value).format('yyyy-MM-DD') : undefined,
-      endDate: this.formRiskResponse.controls.when.value === 'PRE_OCCURRENCE' ? moment(this.formRiskResponse.controls.endDate.value).format('yyyy-MM-DD') : undefined,
+      startDate: this.formRiskResponse.controls.when.value === 'PRE_OCCURRENCE' && (this.formRiskResponse.controls.startDate.value && this.formRiskResponse.controls.startDate.value !== null)
+        ? moment(this.formRiskResponse.controls.startDate.value).format('yyyy-MM-DD') : undefined,
+      endDate: this.formRiskResponse.controls.when.value === 'PRE_OCCURRENCE' && (this.formRiskResponse.controls.endDate.value && this.formRiskResponse.controls.endDate.value !== null)
+        ? moment(this.formRiskResponse.controls.endDate.value).format('yyyy-MM-DD') : undefined,
       strategy: this.formRiskResponse.controls.strategy.value,
       status: this.formRiskResponse.controls.status.value,
       trigger: this.formRiskResponse.controls.trigger.value,

@@ -41,7 +41,10 @@ export class ScheduleService extends BaseService<any> {
           this.loading = false;
           this.nextResetSchedule(true);
         }
-      }
+    } else {
+      this.loading = false;
+      this.nextResetSchedule(true);
+    }
     
   }
 

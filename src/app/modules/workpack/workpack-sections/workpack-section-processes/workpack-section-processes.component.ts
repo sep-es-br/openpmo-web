@@ -39,6 +39,7 @@ export class WorkpackSectionProcessesComponent implements OnInit {
   idFilterSelected: number;
   term = '';
   filters;
+  sectionActive = false;
 
   constructor(
     private filterSrv: FilterDataviewService,
@@ -111,6 +112,8 @@ export class WorkpackSectionProcessesComponent implements OnInit {
     this.processes = processes;
     this.idFilterSelected = idFilterSelected;
     this.term = term;
+    this.sectionActive = this.workpackData && this.workpackData?.workpack?.id && this.workpackData?.workpackModel &&
+      this.workpackData.workpackModel.processesManagementSessionActive;
     if (!loading) this.loadProcessSection();
   }
 
@@ -145,6 +148,7 @@ export class WorkpackSectionProcessesComponent implements OnInit {
   }
 
   async loadProcessSection() {
+    if (!this.sectionActive )  return;
     this.sectionProcess = {
       ...this.sectionProcess,
       cardSection: {
@@ -161,7 +165,6 @@ export class WorkpackSectionProcessesComponent implements OnInit {
   }
 
   async loadSectionProcessesCards() {
-    
     if (this.processes && this.processes.length > 0) {
       const cardItems = this.processes.map(proc => ({
         typeCardItem: 'listItemProcess',

@@ -49,6 +49,9 @@ export class BaselineService extends BaseService<IBaseline> {
       this.baselines = resultBaselines.success ? resultBaselines.data : [];
       this.loading = false;
       this.nextResetBaselines(true);
+    } else {
+      this.loading = false;
+      this.nextResetBaselines(true);
     }
   }
 

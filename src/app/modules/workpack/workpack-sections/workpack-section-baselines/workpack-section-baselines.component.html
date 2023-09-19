@@ -1,4 +1,4 @@
-<div class="app-workpack-section-baselines" *ngIf="sectionBaselines">
+<div class="app-workpack-section-baselines" *ngIf="sectionBaselines && sectionActive">
   <app-card [properties]="sectionBaselines.cardSection" [class.panel-tab-view]="showTabview">
     <div class="input-toggle-baseline">
       <p-inputSwitch class="app-toggle" [(ngModel)]="baselinesSectionShowInactives"

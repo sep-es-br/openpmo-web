@@ -51,7 +51,9 @@
         <span class="column-title"> $ </span>
         <span class="p-float-label p-field">
           <p-inputNumber [class]="'app-input-number '+'costPlanned-'+properties.idStep" id="float-costPlanned"
-            [disabled]="!properties.editCosts || !properties.editPermission" (onInput)="handleStepCostChange($event, 'costPlanned')"
+            (click)="properties.multipleCosts && handleEditCosts($event); properties.multipleCosts && disable()"
+            (mouseout)="multiCostsEdited = false"
+            [disabled]="multiCostsEdited || !properties.editPermission" (onInput)="handleStepCostChange($event, 'costPlanned')"
             [class.red]="properties.costPlanned < 0"
             [(ngModel)]="properties.costPlanned" [minFractionDigits]="2" [maxFractionDigits]="2"
             [locale]="language === 'pt-BR' ? 'pt-BR' : 'en-US'">
@@ -65,7 +67,9 @@
         </div>
         <span class="p-float-label p-field">
           <p-inputNumber class="app-input-number" id="float-costActual"
-            [disabled]="!properties.editCosts || !properties.editPermission" (onInput)="handleStepCostChange($event, 'costActual')"
+            (click)="properties.multipleCosts && handleEditCosts($event); properties.multipleCosts && disable()"
+            (mouseout)="multiCostsEdited = false"
+            [disabled]="multiCostsEdited || !properties.editPermission" (onInput)="handleStepCostChange($event, 'costActual')"
             [class.red]="properties.costActual < 0"
             [(ngModel)]="properties.costActual" [minFractionDigits]="2" [maxFractionDigits]="2"
             [locale]="language === 'pt-BR' ? 'pt-BR' : 'en-US'">

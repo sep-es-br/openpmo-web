@@ -29,6 +29,7 @@ export class ScheduleStepCardItemComponent implements OnInit, OnDestroy {
   showReplicateButton = false;
   item;
   difference;
+  multiCostsEdited = false;
 
   constructor(
     private messageSrv: MessageService,
@@ -148,6 +149,10 @@ export class ScheduleStepCardItemComponent implements OnInit, OnDestroy {
       idStep: this.properties.idStep,
       type: this.item
     });
+  }
+
+  disable() {
+    this.multiCostsEdited = !this.properties.editCosts ? true : false;
   }
 
 }
