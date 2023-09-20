@@ -1,15 +1,11 @@
 import { takeUntil } from 'rxjs/operators';
 import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
-import { MenuComponent } from './../../../core/menu/menu.component';
-import { OverlayPanel } from 'primeng/overlaypanel';
 import { TranslateService } from '@ngx-translate/core';
-import { MenuItem } from 'primeng/api';
 import { Component, Input, OnInit, ViewChild, ElementRef, AfterContentInit, Output, EventEmitter } from '@angular/core';
 import { Router } from '@angular/router';
 import { ICardItem } from '../../interfaces/ICardItem';
 import localePt from '@angular/common/locales/pt';
 import { registerLocaleData } from '@angular/common';
-import { ResponsiveService } from '../../services/responsive.service';
 import { Subject } from 'rxjs';
 import { MobileViewService } from '../../services/mobile-view.service';
 registerLocaleData(localePt);
