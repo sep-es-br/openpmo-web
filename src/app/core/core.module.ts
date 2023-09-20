@@ -68,14 +68,12 @@ import { TreeTableModule } from 'primeng/treetable';
 import { VirtualScrollerModule } from 'primeng/virtualscroller';
 import { DragDropModule } from 'primeng/dragdrop';
 import { TemplateComponent } from './template/template.component';
-import { MenuComponent } from './menu/menu.component';
 import { TranslateModule } from '@ngx-translate/core';
 import { KeyFilterModule } from 'primeng/keyfilter';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { BreadcrumbComponent } from './breadcrumb/breadcrumb.component';
 import { DividerModule } from 'primeng/divider';
-import { MenuFixedComponent } from './menu-fixed/menu-fixed.component';
 import { FooterComponent } from './footer/footer.component';
 import { TimelineModule } from 'primeng/timeline';
 import { AvatarComponent } from './avatar/avatar.component';
@@ -249,8 +247,6 @@ import { MobileMenuComponent } from './mobile-menu/mobile-menu.component';
   providers: [],
   declarations: [
     TemplateComponent,
-    MenuComponent,
-    MenuFixedComponent,
     BreadcrumbComponent,
     FooterComponent,
     AvatarComponent,
