@@ -1,6 +1,5 @@
 import { RouterModule } from '@angular/router';
 import { NgModule } from '@angular/core';
-
 import { AccordionModule } from 'primeng/accordion';
 import { AutoCompleteModule } from 'primeng/autocomplete';
 import { BreadcrumbModule } from 'primeng/breadcrumb';
