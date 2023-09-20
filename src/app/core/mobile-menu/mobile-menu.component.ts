@@ -26,11 +26,12 @@ import { ReportService } from 'src/app/shared/services/report.service';
 import { WorkpackBreadcrumbStorageService } from 'src/app/shared/services/workpack-breadcrumb-storage.service';
 
 @Component({
-  selector: 'app-menu',
-  templateUrl: './menu.component.html',
-  styleUrls: ['./menu.component.scss'],
+  selector: 'app-mobile-menu',
+  templateUrl: './mobile-menu.component.html',
+  styleUrls: ['./mobile-menu.component.scss']
 })
-export class MenuComponent implements OnInit, OnDestroy {
+export class MobileMenuComponent implements OnInit {
+
   @ViewChild('menuSliderOffices') menuOffices: ElementRef<HTMLDivElement>;
   @ViewChild('menuSliderPortfolio') menuPortfolio: ElementRef<HTMLDivElement>;
   @ViewChild('menuSliderPlanModel') menuPlanModel: ElementRef<HTMLDivElement>;
@@ -757,3 +758,4 @@ export class MenuComponent implements OnInit, OnDestroy {
     this.menus.forEach(menu => menu.isOpen = false);
   }
 }
+

@@ -4,6 +4,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { IconsEnum } from '../../enums/IconsEnum';
 import { ICardItemPermission } from '../../interfaces/ICardItemPermission';
 import { ResponsiveService } from '../../services/responsive.service';
+import { MobileViewService } from '../../services/mobile-view.service';
 
 @Component({
   selector: 'app-card-item-permission',
@@ -24,7 +25,7 @@ export class CardItemPermissionComponent implements OnInit {
 
   constructor(
     private router: Router,
-    private responsiveSrv: ResponsiveService
+    private responsiveSrv: MobileViewService
   ) {
     this.responsiveSrv.observable.subscribe(value => {
       this.responsive = value;

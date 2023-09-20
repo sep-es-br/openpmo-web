@@ -16,11 +16,11 @@ interface IMenuState {
   idPlanMenu?: number;
   hasReports?: boolean;
   idOfficeItemsPlanModel?: number;
-  menus: IMenu[];
-  itemsOffice: MenuItem[];
-  itemsFavorites: IMenuFavorites[];
-  itemsPortfolio: PlanMenuItem[];
-  itemsPlanModel: any[];
+  menus?: IMenu[];
+  itemsOffice?: MenuItem[];
+  itemsFavorites?: IMenuFavorites[];
+  itemsPortfolio?: PlanMenuItem[];
+  itemsPlanModel?: any[];
 }
 
 @Injectable({
@@ -41,6 +41,11 @@ export class MenuService extends BaseService<any> {
   private $removedFavorites = new Subject();
   private isAdminMenuObservable = new BehaviorSubject<boolean>(false);
   private isPlanMenuObservable = new BehaviorSubject<boolean>(false);
+  private closeAllMenus = new BehaviorSubject<boolean>(false);
+  private closeMenuUser = new BehaviorSubject<boolean>(false);
+  private toggleMenu = new BehaviorSubject<string>('');
+  private hasFavoriteItemsObservable = new BehaviorSubject<boolean>(false);
+
   private menuState = new BehaviorSubject<IMenuState>({
     isFixed: false,
     menus: [
@@ -71,6 +76,30 @@ export class MenuService extends BaseService<any> {
     const [ path ] = url.slice(2).split('?');
     this.isAdminMenuObservable.next(!!this.adminsPath.find(p => path.startsWith(p)) && path !== 'persons/profile');
     this.isPlanMenuObservable.next(!!this.plansPath.find(p => path.startsWith(p)));
+  }
+
+  nextCloseAllMenus(value) {
+    this.closeAllMenus.next(value);
+  }
+
+  get obsCloseAllMenus() {
+    return this.closeAllMenus.asObservable();
+  }
+
+  nextCloseMenuUser(value) {
+    this.closeMenuUser.next(value);
+  }
+
+  get obsCloseMenuUser() {
+    return this.closeMenuUser.asObservable();
+  }
+
+  nextToggleMenu(value) {
+    this.toggleMenu.next(value);
+  }
+
+  get obsToggleMenu() {
+    return this.toggleMenu.asObservable();
   }
 
   reloadMenuOffice() {
@@ -168,6 +197,14 @@ export class MenuService extends BaseService<any> {
 
   get isPlanMenu() {
     return this.isPlanMenuObservable.asObservable();
+  }
+
+  nextHasFavoriteItems(value: boolean) {
+    this.hasFavoriteItemsObservable.next(value);
+  }
+
+  get hasFavoriteItems() {
+    return this.hasFavoriteItemsObservable.asObservable();
   }
 
   get getMenuState() {

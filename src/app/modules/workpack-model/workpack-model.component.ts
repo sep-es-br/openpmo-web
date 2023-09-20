@@ -199,7 +199,7 @@ export class WorkpackModelComponent implements OnInit {
         await this.router.navigate(['offices']);
       }
       await this.getOfficeById();
-      await this.getPlanModelById();
+      if (!this.idParentWorkpack) await this.getPlanModelById();
       await this.loadDetails();
     });
     this.currentBreadcrumbItems = [];

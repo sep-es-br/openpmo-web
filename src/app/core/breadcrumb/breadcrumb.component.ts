@@ -1,3 +1,4 @@
+import { MobileViewService } from './../../shared/services/mobile-view.service';
 import { DashboardService } from 'src/app/shared/services/dashboard.service';
 import { takeUntil } from 'rxjs/operators';
 import { Component, ElementRef, HostListener, Input, OnInit, SimpleChanges, ViewChild, OnChanges } from '@angular/core';
@@ -28,15 +29,14 @@ export class BreadcrumbComponent implements OnInit, OnChanges {
   fullScreenModeDashboard = false;
   loadingWorkpack = false;
 
-
   constructor(
     public breadcrumbSrv: BreadcrumbService,
-    private responsiveSrv: ResponsiveService,
+    private mobileViewSrv: MobileViewService,
     private dashboardSrv: DashboardService,
     private workpackSrv: WorkpackService,
     private router: Router
   ) {
-    this.responsiveSrv.observable.subscribe(isMobileView => this.isMobileView = isMobileView);
+    this.mobileViewSrv.observable.subscribe(isMobileView => this.isMobileView = isMobileView);
     this.workpackSrv.observableLoadingWorkpack.subscribe(isLoading => this.loadingWorkpack = isLoading);
     this.dashboardSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.fullScreenModeDashboard = value);
   }

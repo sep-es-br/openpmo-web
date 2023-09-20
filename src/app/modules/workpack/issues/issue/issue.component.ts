@@ -252,7 +252,9 @@ export class IssueComponent implements OnInit {
         detail: this.translateSrv.instant('messages.savedSuccessfully')
       });
       this.idIssue = result.data.id;
-      this.issue = { ...sender };
+      this.issue = {
+        ...this.issue,
+        ...sender };
       this.loadIssueResponseCardItems();
     }
   }

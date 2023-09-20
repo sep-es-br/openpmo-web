@@ -1,20 +1,36 @@
-<div class="app-template" [class.mobile]="responsiveSrv.observable | async" [class.fullScreenModeDashboard]="dashboardSrv.observable | async">
-  <ng-container *ngIf="!isMenuFixed; else menuFixed">
+<div class="app-template" [class.mobile]="mobileViewSrv.observable | async" [class.fullScreenModeDashboard]="dashboardSrv.observable | async">
+  <ng-container *ngIf="mobileViewSrv.observable | async; else menuFixed">
     <ng-container *ngTemplateOutlet="menuFloat"></ng-container>
   </ng-container>
 </div>
 
-<ng-template #menuFixed>
+<ng-template #menuFloat>
+  <app-mobile-menu (changeMenu)="toggleMenu($event)"></app-mobile-menu>
   <main>
-    <div class="splitter-container" *ngIf="!!isMenuFixed">
-      <p-splitter [panelSizes]="[20,80]" (onResizeEnd)="onResizeEnd($event)" [minSizes]="[20,20]" layout="horizontal">
+    <div class="main-content">
+      <app-breadcrumb [isAdminMenu]="isAdminMenu"></app-breadcrumb>
+      <div class="outlet">
+        <router-outlet></router-outlet>
+      </div>
+    </div>
+    <div class="footer-container">
+      <app-footer></app-footer>
+    </div>
+  </main>
+</ng-template>
+
+<ng-template #menuFixed>
+  <app-nav-menu></app-nav-menu>
+  <main>
+    <div class="splitter-container">
+      <p-splitter [panelSizes]="[menuWidth, mainWidth]" (onResizeEnd)="onResizeEnd($event)" [minSizes]="[0.01, 50]" layout="horizontal">
         <ng-template>
           <div class="menu-fixed-container">
-            <app-menu-fixed (changeMenu)="toggleMenu($event)"></app-menu-fixed>
+            <app-panel-menu></app-panel-menu>
           </div>
         </ng-template>
         <ng-template>
-          <div class="main-content">
+          <div class="main-content" (click)="!isMenuFixed && closeAllMenus()">
             <app-breadcrumb [isAdminMenu]="isAdminMenu"></app-breadcrumb>
             <div class="content">
               <div class="outlet fixed">
@@ -31,17 +47,3 @@
   </main>
 </ng-template>
 
-<ng-template #menuFloat>
-  <app-menu (changeMenu)="toggleMenu($event)"></app-menu>
-  <main>
-    <div class="main-content">
-      <app-breadcrumb [isAdminMenu]="isAdminMenu"></app-breadcrumb>
-      <div class="outlet">
-        <router-outlet></router-outlet>
-      </div>
-    </div>
-    <div class="footer-container">
-      <app-footer></app-footer>
-    </div>
-  </main>
-</ng-template>

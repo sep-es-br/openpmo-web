@@ -82,6 +82,10 @@ import { AvatarComponent } from './avatar/avatar.component';
 import { AvatarModule } from 'primeng/avatar';
 import { ImageCropperModule } from 'ngx-image-cropper';
 import { ChartModule } from 'primeng/chart';
+import { NavMenuComponent } from './nav-menu/nav-menu.component';
+import { PanelMenuComponent } from './panel-menu/panel-menu.component';
+import { UserSlideMenuComponent } from './user-slide-menu/user-slide-menu.component';
+import { MobileMenuComponent } from './mobile-menu/mobile-menu.component';
 
 @NgModule({
   imports: [
@@ -249,7 +253,11 @@ import { ChartModule } from 'primeng/chart';
     MenuFixedComponent,
     BreadcrumbComponent,
     FooterComponent,
-    AvatarComponent
+    AvatarComponent,
+    NavMenuComponent,
+    PanelMenuComponent,
+    UserSlideMenuComponent,
+    MobileMenuComponent
   ]
 })
 export class CoreModule { }

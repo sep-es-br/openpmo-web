@@ -562,7 +562,7 @@ export class WorkpackComponent implements OnDestroy {
           }
           const idFilterSelected = resultFilters.data.find(defaultFilter => !!defaultFilter.favorite) ?
             resultFilters.data.find(defaultFilter => !!defaultFilter.favorite).id : undefined;
-          const resultItemsList = await this.loadWorkpacksFromWorkpackModel(this.workpack.plan.id, workpackModel.id, idFilterSelected, false);
+          const resultItemsList = await this.loadWorkpacksFromWorkpackModel(this.workpack.plan.id, workpackModel.id, idFilterSelected, '', false);
           if (!this.cardsWorkPackModelChildren[index]?.cardSection?.createNewElementMenuItemsWorkpack) {
             return;
           }
@@ -987,7 +987,7 @@ export class WorkpackComponent implements OnDestroy {
 
   async checkPasteWorkpack(workpackCuted: IWorkpack, idWorkpackModelTo: number) {
     const result = await this.workpackSrv.checkPasteWorkpack(workpackCuted.id, idWorkpackModelTo, {
-      idWorkpackModelFrom: workpackCuted.model.id,
+      idWorkpackModelFrom: workpackCuted.idWorkpackModel,
     });
     if (result.success) {
       return result.data;
@@ -1023,7 +1023,7 @@ export class WorkpackComponent implements OnDestroy {
       idParentFrom: workpackCuted.idParent,
       idPlanTo,
       idParentTo,
-      idWorkpackModelFrom: workpackCuted.model.id
+      idWorkpackModelFrom: workpackCuted.idWorkpackModel
     });
     if (result.success) {
       this.workpackSrv.removeWorkpackCuted();

@@ -2,6 +2,7 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Router } from '@angular/router';
 import { ResponsiveService } from 'src/app/shared/services/responsive.service';
 import { ICardItem } from '../../interfaces/ICardItem';
+import { MobileViewService } from '../../services/mobile-view.service';
 
 @Component({
   selector: 'app-card-item-report-model',
@@ -21,7 +22,7 @@ export class CardItemReportModelComponent implements OnInit {
 
   constructor(
     private router: Router,
-    private responsiveSrv: ResponsiveService,
+    private responsiveSrv: MobileViewService,
   ) {
     this.responsiveSrv.observable.subscribe(value => {
       this.responsive = value;

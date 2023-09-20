@@ -715,7 +715,7 @@ export class PlanComponent implements OnInit, OnDestroy {
       idParentFrom: workpackCuted.idParent,
       idPlanTo,
       idParentTo,
-      idWorkpackModelFrom: workpackCuted.model.id
+      idWorkpackModelFrom: workpackCuted.idWorkpackModel
     });
     if (result.success) {
       this.menuSrv.reloadMenuPortfolio();
@@ -726,7 +726,7 @@ export class PlanComponent implements OnInit, OnDestroy {
 
   async checkPasteWorkpack(workpackCuted: IWorkpack, idWorkpackModelTo: number) {
     const result = await this.workpackSrv.checkPasteWorkpack(workpackCuted.id, idWorkpackModelTo, {
-      idWorkpackModelFrom: workpackCuted.model.id,
+      idWorkpackModelFrom: workpackCuted.idWorkpackModel,
     });
     if (result.success) {
       return result.data;

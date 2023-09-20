@@ -19,18 +19,18 @@ import { PlanService } from 'src/app/shared/services/plan.service';
 import { TranslateChangeService } from 'src/app/shared/services/translate-change.service';
 import { WorkpackService } from 'src/app/shared/services/workpack.service';
 import { IMenuFavorites } from '../../shared/interfaces/IMenu';
-import { MobileViewService } from 'src/app/shared/services/mobile-view.service';
 import { IOffice } from 'src/app/shared/interfaces/IOffice';
 import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
 import { ReportService } from 'src/app/shared/services/report.service';
 import { WorkpackBreadcrumbStorageService } from 'src/app/shared/services/workpack-breadcrumb-storage.service';
 
 @Component({
-  selector: 'app-menu',
-  templateUrl: './menu.component.html',
-  styleUrls: ['./menu.component.scss'],
+  selector: 'app-panel-menu',
+  templateUrl: './panel-menu.component.html',
+  styleUrls: ['./panel-menu.component.scss']
 })
-export class MenuComponent implements OnInit, OnDestroy {
+export class PanelMenuComponent implements OnInit {
+
   @ViewChild('menuSliderOffices') menuOffices: ElementRef<HTMLDivElement>;
   @ViewChild('menuSliderPortfolio') menuPortfolio: ElementRef<HTMLDivElement>;
   @ViewChild('menuSliderPlanModel') menuPlanModel: ElementRef<HTMLDivElement>;
@@ -46,8 +46,6 @@ export class MenuComponent implements OnInit, OnDestroy {
     { label: 'more', isOpen: false }
   ];
 
-  isMobileView = false;
-  isChangingView = false;
   items: MenuItem[] = [];
   itemsOfficeUnchanged = [];
   itemsOffice = [];
@@ -57,7 +55,6 @@ export class MenuComponent implements OnInit, OnDestroy {
   itemsLanguages: MenuItem[] = [];
   username = '';
   currentIDOffice = 0;
-  isUserAdmin = false;
   currentURL = '';
   currentUserInfo: IPerson;
   $destroy = new Subject();
@@ -65,6 +62,7 @@ export class MenuComponent implements OnInit, OnDestroy {
   isPlanMenu = false;
   currentPlan: IPlan;
   currentIDPlan = 0;
+  isFixed = false;
   menuStateChanged = false;
   isAdminMenu = false;
   parentsWorkpack = [];
@@ -83,7 +81,6 @@ export class MenuComponent implements OnInit, OnDestroy {
     private translateChangeSrv: TranslateChangeService,
     private translateSrv: TranslateService,
     public authSrv: AuthService,
-    private mobileViewSrv: MobileViewService,
     private router: Router,
     private locationSrv: Location,
     private officeSrv: OfficeService,
@@ -96,6 +93,9 @@ export class MenuComponent implements OnInit, OnDestroy {
     private workpackBreadcrumbStorageSrv: WorkpackBreadcrumbStorageService,
     private reportSrv: ReportService,
   ) {
+    this.menuSrv.getMenuState.pipe(takeUntil(this.$destroy)).subscribe(async (menuState) => {
+      this.isFixed = menuState.isFixed;
+    });
     this.translateChangeSrv.getCurrentLang()
       .pipe(takeUntil(this.$destroy))
       .subscribe(() => this.handleChangeLanguage());
@@ -103,18 +103,21 @@ export class MenuComponent implements OnInit, OnDestroy {
     this.officeSrv.observableIdOffice().pipe(takeUntil(this.$destroy)).subscribe(async id => {
       this.currentIDOffice = id;
       const idOffice = localStorage.getItem('@currentOffice') && Number(localStorage.getItem('@currentOffice'));
-      if ((!idOffice || idOffice !== id) && id !== 0) {
+      if ((!idOffice || idOffice !== id || !this.itemsPlanModel || this.itemsPlanModel.length === 0) && id !== 0) {
         this.getPropertiesOffice(this.currentIDOffice);
         this.loadPlanModelMenu();
       }
     });
     this.planSrv.observableIdPlan().pipe(takeUntil(this.$destroy)).subscribe(async id => {
-      this.currentIDPlan = id;
-      if ((!this.itemsPortfolio || this.itemsPortfolio.length === 0 || (this.itemsPortfolio && this.itemsPortfolio.length > 0 && this.idPlanMenu !== id)) && id !== 0) {
+      if (id === 0) {
+        await this.loadPropertiesPlan();
+      } else {
+        this.currentIDPlan = id;
+      }
+      if ((!this.itemsPortfolio || this.itemsPortfolio.length === 0 || (this.itemsPortfolio && this.itemsPortfolio.length > 0 && this.idPlanMenu !== this.currentIDPlan)) && this.currentIDPlan !== 0) {
         await this.loadPropertiesPlan();
         this.loadPortfolioMenu();
         this.loadFavoritesMenu();
-        this.loadReportsMenu();
       } else {
         this.loadPropertiesPlan();
       }
@@ -140,27 +143,31 @@ export class MenuComponent implements OnInit, OnDestroy {
     this.menuSrv.obsReloadMenuPlanModel().pipe(takeUntil(this.$destroy)).subscribe(() => this.loadPlanModelMenu());
     this.menuSrv.isAdminMenu.pipe(takeUntil(this.$destroy)).subscribe(isAdminMenu => {
       this.isAdminMenu = isAdminMenu;
-      this.changeMenu.emit(this.isAdminMenu);
       this.updateMenuOfficeOnAdminChange();
-      if (isAdminMenu) {
+      if (!isAdminMenu) {
+        const planModelMenuIsOpen = this.menus.find( item => item.label === 'planModel' && item.isOpen === true);
+        if (planModelMenuIsOpen) {
+          this.toggleMenu('office');
+        }
+      }
+      if (isAdminMenu) {      
         this.getOfficePermission();
       }
     });
     this.menuSrv.isPlanMenu.pipe(takeUntil(this.$destroy)).subscribe(isPlanMenu => {
       this.isPlanMenu = isPlanMenu;
     });
-    this.mobileViewSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(responsive => {
-      this.isChangingView = true;
-      this.isMobileView = responsive;
-      setTimeout(() => {
-        this.isChangingView = false;
-      }, 250);
-    });
     this.locationSrv.onUrlChange(url => {
       this.changedUrl = true;
       this.currentURL = url.slice(2);
       this.linkEvent = this.currentURL.includes('linkEvent');
       if (!this.linkEvent) this.selectMenuActive(url.slice(2));
+    });
+    this.menuSrv.obsCloseAllMenus.pipe(takeUntil(this.$destroy)).subscribe( closeAllMenus => {
+      if (closeAllMenus) this.setCloseAllMenus();
+    });
+    this.menuSrv.obsToggleMenu.pipe(takeUntil(this.$destroy)).subscribe( value => {
+      this.toggleMenu(value);
     });
 
   }
@@ -171,19 +178,8 @@ export class MenuComponent implements OnInit, OnDestroy {
   }
 
   async ngOnInit() {
-    this.isUserAdmin = await this.authSrv.isUserAdmin();
-    const payload = this.authSrv.getTokenPayload();
     await this.loadOfficeMenu();
-    await this.loadCurrentInfo();
-    this.username = this.isUserAdmin
-      ? 'Admin'
-      : (this.currentUserInfo.name?.split(' ').shift() || payload.email);
     this.getMenuModeUser();
-    this.changeMenu.emit(this.isAdminMenu);
-  }
-
-  async loadCurrentInfo() {
-    this.currentUserInfo = await this.authSrv.getInfoPerson();
   }
 
   async getPropertiesOffice(idOffice) {
@@ -197,15 +193,17 @@ export class MenuComponent implements OnInit, OnDestroy {
     const isFixed = this.cookieSrv.get('menuMode' + user.email) === 'true' ? true : false;
     if (!!isFixed) {
       this.toggleMenu('office');
+      this.handleChangeMenuMode();
     }
   }
 
-  async loadReportsMenu() {
-    const result = await this.reportSrv.checkHasActiveReports({ 'id-plan': this.currentIDPlan });
-    if (result.success) {
-      this.hasReports = result.data;
-    }
+  handleChangeMenuMode() {
+    this.isFixed = !this.isFixed;
+    this.menuSrv.nextMenuState({
+      isFixed: this.isFixed
+    });
   }
+
 
   setCookieMenuMode() {
     const user = this.authSrv.getTokenPayload();
@@ -484,7 +482,11 @@ export class MenuComponent implements OnInit, OnDestroy {
           idPlan: this.currentIDPlan,
           canAccess: item.canAccess,
         }));
-
+        if (this.itemsFavorites && this.itemsFavorites.length > 0) {
+          this.menuSrv.nextHasFavoriteItems(true);
+        } else {
+          this.menuSrv.nextHasFavoriteItems(false);
+        }
       }
     }
     return;
@@ -553,13 +555,9 @@ export class MenuComponent implements OnInit, OnDestroy {
   }
 
   toggleMenu(menu: string) {
-    const aDifferentMenuIsOpen = this.menus.filter(m => m.label !== menu && m.isOpen).length > 0;
-    const menuFound = this.menus.find(m => m.label === menu);
-    if (aDifferentMenuIsOpen) {
-      this.menus.forEach(m => m.isOpen = false);
-      return setTimeout(() => menuFound.isOpen = true, 250);
-    }
-    return menuFound.isOpen = !menuFound.isOpen;
+    this.menus.forEach(m => {
+      m.isOpen = m.label === menu ? true : false
+    });
   }
 
   buildMenuItemPlanModel(root: IMenuPlanModel[]): MenuItem[] {
@@ -753,7 +751,14 @@ export class MenuComponent implements OnInit, OnDestroy {
       : this.menus.reduce((a, b) => a ? a : b.isOpen, false);
   }
 
-  closeAllMenus() {
+  setCloseAllMenus() {
     this.menus.forEach(menu => menu.isOpen = false);
+    
   }
+
+  closeAllMenus() {
+    this.menuSrv.nextCloseAllMenus(true);
+  }
+
 }
+

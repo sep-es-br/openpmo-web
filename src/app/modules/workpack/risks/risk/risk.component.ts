@@ -298,6 +298,7 @@ export class RiskComponent implements OnInit, OnDestroy {
       });
       this.idRisk = result.data.id;
       this.risk = {
+        ...this.risk,
         ...sender,
         id: result.data.id
       };

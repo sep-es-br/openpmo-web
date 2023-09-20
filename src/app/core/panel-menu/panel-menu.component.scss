@@ -1,0 +1,169 @@
+@use 'src/variables' as v;
+$mobileMenuHeight: 90px;
+
+::ng-deep .app-panel-menu {
+  .app-menu-slide-fixed {
+    min-height: 100vh;
+    max-height: 100vh;
+    height: 100vh;
+    width: 100%;
+    background-color: transparent;
+    .slide-wrapper {
+      background-color: rgba(251, 254, 255, 0.980392156862745);
+      border-color: rgba(227, 227, 227, 1);
+      height: 100%;
+    }
+    .top-bar {
+      padding: 1em;
+      display: flex;
+      justify-content: space-between;
+      color: v.$fontTitle;
+  
+      .title {
+        font-size: 1rem;
+        font-weight: 700;
+        cursor: pointer;
+      }
+      .action .app-icon {
+        cursor: pointer;
+      }
+    }
+    .action-mobile {
+      margin: 1.5em 0;
+      display: flex;
+      justify-content: center;
+  
+      .app-icon {
+        color: rgba(251, 254, 255, 0.980392156862745);
+        cursor: pointer;
+        background-color: v.$bgMenuItem;
+        padding: 10px 5px 8px;
+        border-radius: 46px;
+      }
+    }
+    .menu-layout-splitter {
+      height: 100%;
+      width: 100%;
+    } 
+
+    .p-splitter {
+      height: 100%;
+      width: 100%;
+      background-color: transparent;
+  
+      .p-splitter-panel-nested {
+        flex-direction: column;
+      }
+    }
+
+    .p-panelmenu .p-panelmenu-header > a {
+      font-weight: 500;
+      font-family: 'Montserrat Medium', 'Montserrat Regular', 'Montserrat', sans-serif;
+      color: v.$fontDark;
+      .p-panelmenu-icon {
+        font-size: .7rem;
+        font-weight: bold;
+        order: 2;
+        right: 10px;
+        position: absolute;
+      }
+      .p-menuitem-icon.app-icon {
+        font-size: 1.3rem;
+      }
+      &:focus {
+        box-shadow: none !important;
+      }
+    }
+    .p-panelmenu .p-panelmenu-content .p-menuitem .p-menuitem-link {
+      position: relative;
+      .p-panelmenu-icon {
+        order: 2;
+        margin-left: 0.6rem;
+        right: 10px;
+        position: absolute;
+      }
+    }
+    .p-panelmenu .p-panelmenu-content .p-menuitem .p-menuitem-link:focus {
+      box-shadow: none !important;
+    }
+    .p-panelmenu-header-link,
+    .p-panelmenu-content {
+      border: none !important;
+    }
+    .p-panelmenu-header-link {
+      background-color: v.$bgMenuItem !important;
+    }
+    .more-menu .item .app-icon {
+      color: v.$iconDarkGrey;
+    }
+    .p-panelmenu-header.active .p-menuitem-text,
+    .p-menuitem.active > .p-menuitem-link > .p-menuitem-text {
+      font-weight: bold;
+    }
+    .p-menuitem-text.active {
+      font-weight: bold;
+    }
+    &.hidden {
+      display: none;
+    }
+  }
+
+  .f-panelmenu {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    font-size: 1rem;
+    .f-panelmenu-item {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: flex-start;
+      width: 100%;
+      padding: 0 1rem;
+      color: #333333;
+      background-color: #00000019 !important;
+      .f-panelmenu-trash {
+        margin-left: auto;
+        cursor: pointer;
+        font-size: .7rem;
+        i {
+          padding: .25rem;
+          border-radius: 50%;
+          transition: all .3s;
+          &:hover {
+            background-color: #E3E3E3;
+          }
+        }
+      }
+      .f-panelmenu-container {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: flex-start;
+        width: 100%;
+        padding: 1rem 0;
+        cursor: pointer;
+        transition: all .3s;
+        &:first-of-type { border-radius: 3px 3px 0 0; }
+        &:last-of-type { border-radius: 0 0 3px 3px; }
+        &:hover {
+          color: #495057;
+        }
+        .f-panelmenu-icon i {
+            font-size: 1.3rem;
+            margin-right: 0.5em;
+        }
+        .f-panelmenu-label {
+          font-family: "Montserrat Medium", "Montserrat Regular", "Montserrat", sans-serif;
+          font-size: 1rem;
+          font-weight: 500;
+          max-width: 95%;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+      }
+    }
+  }
+  
+
+}

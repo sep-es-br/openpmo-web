@@ -6,8 +6,8 @@
       <button type="button" pButton icon="pi pi-ellipsis-v" [class.hidden]="!properties.menuItems.length"
         (click)="menu.toggle($event)"></button>
     </p-header>
-    <div class="card-item-content" [class.card-link]="properties.urlCard" [routerLink]="properties.urlCard"
-      [class.cardList]="displayModeCard === 'list'" [queryParams]="getQueryParams()">
+    <div class="card-item-content" 
+      [class.cardList]="displayModeCard === 'list'">
       <span class="card-item-name" [pTooltip]="properties.fullNameCardItem"
         tooltipPosition="bottom">{{properties.nameCardItem}}
       </span>
@@ -30,8 +30,7 @@
     </div>
   </p-card>
   <p-card *ngSwitchCase="'newCardItem'" class="new-carditem" [class.card-link]="properties.urlCard"
-    [class.mobile]="responsive" [class.cardList]="displayModeCard === 'list'" [class.new-card-item-mobile]="responsive"
-    (click)="properties.urlCard && navigateToPage(properties.urlCard, properties.paramsUrlCard)">
+    [class.mobile]="responsive" [class.cardList]="displayModeCard === 'list'" [class.new-card-item-mobile]="responsive">
     <div class="carditem-content">
       <p-fileUpload #uploader name="upload" [customUpload]="true" [auto]="true"
         (uploadHandler)="handleUpload($event, uploader)" mode="advanced"

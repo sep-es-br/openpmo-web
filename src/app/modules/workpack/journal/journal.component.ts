@@ -26,6 +26,7 @@ import { WorkpackShowTabviewService } from 'src/app/shared/services/workpack-sho
 export class JournalComponent implements OnInit {
 
   @ViewChild(SaveButtonComponent) saveButton: SaveButtonComponent;
+  
   cardJournalProperties: ICard = {
     toggleable: false,
     initialStateToggle: false,
@@ -36,7 +37,6 @@ export class JournalComponent implements OnInit {
   responsive: boolean;
   $destroy = new Subject();
   formJournal: FormGroup;
-  evidences: IFile[] = [];
   idWorkpack: number;
   idPlan: number;
   showTabview = false;
@@ -71,25 +71,11 @@ export class JournalComponent implements OnInit {
 
   async ngOnInit(): Promise<void> {
     this.idPlan = Number(localStorage.getItem('@currentPlan'));
-    this.setCardItemsEvidences(this.evidences);
+    this.setCardItemsEvidences();
     await this.setBreadcrumb();
   }
 
-  setCardItemsEvidences(evidences: IFile[]) {
-    this.cardItemsEvidences = evidences.map((evidence) => ({
-      typeCardItem: 'listItem',
-      urlImg: evidence.url,
-      nameCardItem: evidence.name,
-      icon: this.getIconFromMimeTypeFile(evidence.mimeType),
-      givenName: evidence.givenName,
-      menuItems: [
-        {
-          label: this.translateSvr.instant('delete'),
-          icon: 'fas fa-trash-alt',
-          command: () => this.deleteEvidence(evidence),
-        }
-      ] as MenuItem[],
-    }));
+  setCardItemsEvidences() {
     this.cardItemsEvidences.push({
       typeCardItem: 'newCardItem',
       iconSvg: true,
@@ -133,25 +119,47 @@ export class JournalComponent implements OnInit {
     }
   }
 
-  deleteEvidence(evidence: IFile) {
-    this.evidences = this.evidences.filter(item => item !== evidence);
-    this.setCardItemsEvidences(this.evidences);
+  deleteEvidence(urlImg) {
+    this.cardItemsEvidences = this.cardItemsEvidences.filter(item => item.urlImg !== urlImg);
     if (this.formJournal.valid) {
       this.saveButton.showButton();
     }
   }
 
   handleUploadEvidence(files) {
+    if (files) this.cardItemsEvidences.pop();
     files.map(file => {
       const url = file.objectURL || this.createObjectUrl(file);
-      this.evidences.push({
+      const newFile = {
         url,
         mimeType: file.type,
         name: file.name,
         givenName: file.name.split('.')[0],
+      };
+      this.cardItemsEvidences.push({
+        typeCardItem: 'listItem',
+        urlImg: newFile.url,
+        nameCardItem: newFile.name,
+        icon: this.getIconFromMimeTypeFile(newFile.mimeType),
+        givenName: newFile.givenName,
+        menuItems: [
+          {
+            label: this.translateSvr.instant('delete'),
+            icon: 'fas fa-trash-alt',
+            command: () => this.deleteEvidence(newFile.url),
+          }
+        ] as MenuItem[],
       });
     });
-    this.setCardItemsEvidences(this.evidences);
+     this.cardItemsEvidences.push({
+      typeCardItem: 'newCardItem',
+      iconSvg: true,
+      icon: IconsEnum.Plus,
+    });
+  }
+
+  updateCardItemsEvidences(newFile) {
+    
   }
 
   createObjectUrl(file: File): SafeResourceUrl {
@@ -165,7 +173,6 @@ export class JournalComponent implements OnInit {
     };
     const { data, success } = await this.journalSrv.post(sender);
     if (success) {
-      this.setGivenNameFromCardToEvidence();
       const results = await this.uploadEvidencesAll(data);
       this.messageSrv.add({
         severity: 'success',
@@ -185,27 +192,20 @@ export class JournalComponent implements OnInit {
 
   }
 
-  setGivenNameFromCardToEvidence() {
-    this.evidences = this.evidences.map((evidence, index) => ({
-      ...evidence,
-      givenName: this.cardItemsEvidences[index].givenName,
-    }));
-  }
-
   async uploadEvidencesAll(data) {
-    const results = await Promise.all(this.evidences.map( async (evidence: any) => {
-      if (evidence.id) {
+    const results = await Promise.all(this.cardItemsEvidences.filter(card => card.typeCardItem !== 'newCardItem').map( async (evidence: any) => {
+      if (evidence.itemId) {
         return {
           success: true
         };
       }
-      const file = await fetch(evidence.url.changingThisBreaksApplicationSecurity);
+      const file = await fetch(evidence.urlImg.changingThisBreaksApplicationSecurity);
       const formData: FormData = new FormData();
       const blob = await file.blob();
-      formData.append('file', blob, evidence.name);
+      formData.append('file', blob, evidence.givenName);
       const result =  await this.evidenceSrv.uploadEvidence(formData, data.id);
       if (result.success) {
-        evidence.id = result.data.id
+        evidence.itemId = result.data.id
       }
       return result;
     }));

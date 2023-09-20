@@ -1,0 +1,105 @@
+@use 'src/variables' as v;
+
+.app-menu-slide-user {
+  position: fixed;
+  bottom: 0;
+  left: 64px;
+  z-index: 998;
+
+}
+
+::ng-deep .user-slide {
+  font-size: 1.25rem;
+  font-weight: 700;
+  background-color: rgba(251, 254, 255, 0.980392156862745);
+  border-color: rgba(227, 227, 227, 1);
+  width: auto;
+
+  .top-bar {
+    padding: 1em;
+    display: flex;
+    justify-content: space-between;
+    color: v.$fontTitle;
+    .title {
+      font-size: 1.25rem;
+      max-width: 90%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+  .item {
+    padding: 1em;
+    display: flex;
+    color: v.$fontDark;
+    cursor: pointer;
+
+    span {
+      padding-left: .5em;
+    }
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.05);
+    }
+  }
+  .logout {
+    padding: 1em;
+    display: flex;
+    color: v.$fontRed;
+    font-family: v.$fontFamilyBold;
+    cursor: pointer;
+
+    span {
+      padding-left: .5em;
+    }
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.05);
+    }
+  }
+  .p-tieredmenu, .p-panelmenu {
+    border: none !important;
+    padding: 0 !important;
+    .p-menuitem-link {
+      padding: 1em;
+      &:focus {
+        box-shadow: none;
+      }
+    }
+    .p-submenu-list {
+      padding: 0 !important;
+    }
+  }
+  .p-menuitem-link {
+    background-color: rgba(251, 254, 255, 0.980392156862745);
+  }
+  .p-menuitem {
+    font-size: 1.25rem;
+
+    .p-submenu-icon {
+      font-size: 1.25rem;
+    }
+    .p-menuitem-icon,
+    .p-submenu-icon,
+    .p-menuitem-text {
+      color: v.$fontDark !important;
+
+    }
+    .p-menuitem-text {
+      font-family: v.$fontFamilyBold;
+      font-weight: 700;
+    }
+  }
+  .p-panelmenu .p-panelmenu-panel:first-child .p-panelmenu-header > a {
+    font-size: 1.25rem;
+    padding: 20px;
+    .p-menuitem-text {
+      font-family: v.$fontFamilyBold;
+      font-weight: 700;
+    }
+  }
+  .p-panelmenu-header-link {
+    background-color: #ffffff !important;
+  }
+}
+
+::ng-deep .p-tooltip.p-tooltip-right {
+  z-index: 10000;
+}

@@ -106,30 +106,6 @@
       .card-item-description {
         padding: 0.5em;
       }
-      .role {
-        width: 100%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        color: #009dd4;
-      }
-      .card-item-subtitle {
-        font-size: 0.8rem;
-        font-family: v.$fontFamilyMedium;
-        color: #009dd4;
-        &.role {
-          text-align: center;
-          width: 80%;
-          display: inline-block;
-          white-space: nowrap;
-          overflow: hidden !important;
-        }
-      }
-      .subtitle-card-risk {
-        font-size: 0.8rem;
-        font-family: v.$fontFamilyMedium;
-        color:  #9f9f9f;
-      }
       &.cardList {
         flex-direction: row;
         justify-content: flex-start;
@@ -230,23 +206,6 @@
         }
       }
 
-
-      p-tieredmenu {
-        .p-tieredmenu-overlay ul {
-          max-width: 20em;
-          .p-menuitem .p-menuitem-link {
-            .p-menuitem-icon {
-              font-size: 0.8rem;
-              color: #939393;
-            }
-            .p-menuitem-text {
-              font-size: 0.9rem;
-              font-family: v.$fontFamilyMedium;
-              color: #939393;
-            }
-          }
-        }
-      }
     }
 
     .p-card-body .p-card-content .carditem-content {

@@ -11,6 +11,7 @@ import localePt from '@angular/common/locales/pt';
 import { registerLocaleData } from '@angular/common';
 import { ResponsiveService } from '../../services/responsive.service';
 import { Subject } from 'rxjs';
+import { MobileViewService } from '../../services/mobile-view.service';
 registerLocaleData(localePt);
 
 @Component({
@@ -33,7 +34,7 @@ export class CardItemComponent implements OnInit {
 
   constructor(
     private router: Router,
-    private responsiveSrv: ResponsiveService,
+    private responsiveSrv: MobileViewService,
     private translateSrv: TranslateService,
     private breadcrumbSrv: BreadcrumbService
   ) {

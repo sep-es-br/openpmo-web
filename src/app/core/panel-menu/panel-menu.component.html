@@ -1,0 +1,77 @@
+<div class="app-panel-menu">
+  <div class="app-menu-slide-fixed" #menuSliderOffices [class.hidden]="!menus[0].isOpen">
+    <div class="slide-wrapper">
+      <div class="top-bar">
+        <div class="title" [routerLink]="['/offices']">{{ (isAdminMenu ? 'offices' : 'officesAndPlans') | translate }}
+        </div>
+        <div class="action">
+          <i [class]="isFixed ? 'app-icon pin-on' : 'app-icon pin-off'" [ngStyle]="{ fontSize: '1rem' }"
+            (click)="handleChangeMenuMode()"></i>
+        </div>
+      </div>
+      <p-panelMenu [model]="itemsOffice"></p-panelMenu>
+    </div>
+  </div>
+
+  <div class="app-menu-slide-fixed" [class.hidden]="!menus[3].isOpen" [class.open]="isMenuOpen('favorite')">
+    <div class="slide-wrapper">
+      <div class="top-bar">
+        <div class="title" (click)="closeAllMenus()">{{ (isAdminMenu ? 'favorites' : 'myFavorites') | translate
+          }}</div>
+        <div class="action">
+          <i [class]="isFixed ? 'app-icon pin-on' : 'app-icon pin-off'" [ngStyle]="{ fontSize: '1rem' }"
+            (click)="handleChangeMenuMode()"></i>
+        </div>
+      </div>
+      <div class="f-panelmenu">
+        <div class="f-panelmenu-item" [class]="item.styleClass" *ngFor="let item of itemsFavorites">
+          <div class="f-panelmenu-container" [title]="item.title" (click)="handleNavigateFavorite(item)">
+            <div class="f-panelmenu-icon">
+              <i [class]="item.icon"></i>
+            </div>
+            <div class="f-panelmenu-label">
+              <span>{{item.label}}</span>
+            </div>
+          </div>
+          <div class="f-panelmenu-trash">
+            <i class="fas fa-trash-alt" (click)="handleRemoveFavorite(item.id)"
+              [pTooltip]="'removeFavorite' | translate"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="app-menu-slide-fixed" #menuSliderPortfolio [class.hidden]="!menus[1].isOpen">
+    <div class="slide-wrapper">
+      <div class="top-bar">
+        <div *ngIf="currentPlan" class="title" [routerLink]="['/plan']" [queryParams]="{id: currentPlan?.id}">{{ currentPlan?.name }}
+        </div>
+        <div *ngIf="!currentPlan" class="title">
+          {{'newPlan'|translate}}</div>
+        <div class="action" *ngIf="!loadingMenuPortfolio">
+          <i [class]="isFixed ? 'app-icon pin-on' : 'app-icon pin-off'" [ngStyle]="{ fontSize: '1rem' }"
+            (click)="handleChangeMenuMode()"></i>
+        </div>
+      </div>
+      <span *ngIf="loadingMenuPortfolio" style="padding: 1em">{{'loadingEllipsis'|translate}}</span>
+      <p-panelMenu *ngIf="!loadingMenuPortfolio" [model]="itemsPortfolio"></p-panelMenu>
+    </div>
+  </div>
+
+  <div class="app-menu-slide-fixed" #menuSliderPlanModel [class.hidden]="!menus[2].isOpen">
+    <div class="slide-wrapper">
+      <div class="top-bar">
+        <div class="title" (click)="closeAllMenus()" [routerLink]="['/strategies']" [queryParams]="{idOffice: currentIDOffice}">{{'planModels'|translate}}
+        </div>
+        <div class="action">
+          <i [class]="isFixed ? 'app-icon pin-on' : 'app-icon pin-off'" [ngStyle]="{ fontSize: '1rem' }"
+            (click)="handleChangeMenuMode()"></i>
+        </div>
+      </div>
+      <p-panelMenu [model]="itemsPlanModel"></p-panelMenu>
+    </div>
+  </div>
+
+  <p-confirmDialog [style]="{width: '50vw'}" [baseZIndex]="10000" rejectButtonStyleClass="p-button-text"></p-confirmDialog>
+</div>

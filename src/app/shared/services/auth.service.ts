@@ -112,7 +112,7 @@ export class AuthService {
     }
   }
 
-  async getInfoPerson() {
+  getInfoPerson() {
     const infoPersonItem = localStorage.getItem('@PMO/infoPerson');
     if (infoPersonItem) {
       return JSON.parse(infoPersonItem);
