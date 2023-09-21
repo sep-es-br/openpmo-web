@@ -1,7 +1,7 @@
 import { BehaviorSubject } from 'rxjs';
 import { Inject, Injectable, Injector } from '@angular/core';
 import { BaseService } from '../base/base.service';
-import { IDashboard } from '../interfaces/IDashboard';
+import { IDashboard, IWorkpackByModel } from '../interfaces/IDashboard';
 import { IBaseline } from '../interfaces/IBaseline';
 import { IHttpResult } from '../interfaces/IHttpResult';
 import { PrepareHttpParams } from '../utils/query.util';
@@ -181,6 +181,11 @@ export class DashboardService extends BaseService<IDashboard> {
   public async GetDashboardByWorkpack(options?): Promise<IHttpResult<IDashboard>> {
     const result = await this.http.get(`${this.urlBase}`, { params: PrepareHttpParams(options) }).toPromise();
     return result as IHttpResult<IDashboard>;
+  }
+
+  public async GetMenuItemsByWorkpackModel(options?): Promise<IHttpResult<IWorkpackByModel[]>> {
+    const result = await this.http.get(`${this.urlBase}/workpack-model/menu`, { params: PrepareHttpParams(options) }).toPromise();
+    return result as IHttpResult<IWorkpackByModel[]>;
   }
 
   public async GetDashboardScheduleInterval(options?): Promise<IHttpResult<{ startDate: string; endDate: string }>> {

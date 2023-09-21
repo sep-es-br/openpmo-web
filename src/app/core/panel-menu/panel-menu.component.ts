@@ -91,7 +91,6 @@ export class PanelMenuComponent implements OnInit {
     private confirmationSrv: ConfirmationService,
     private breadcrumbSrv: BreadcrumbService,
     private workpackBreadcrumbStorageSrv: WorkpackBreadcrumbStorageService,
-    private reportSrv: ReportService,
   ) {
     this.menuSrv.getMenuState.pipe(takeUntil(this.$destroy)).subscribe(async (menuState) => {
       this.isFixed = menuState.isFixed;
@@ -178,7 +177,8 @@ export class PanelMenuComponent implements OnInit {
   }
 
   async ngOnInit() {
-    await this.loadOfficeMenu();
+    const token = this.authSrv.getAccessToken();
+    if (token) await this.loadOfficeMenu();
     this.getMenuModeUser();
   }
 
@@ -189,10 +189,10 @@ export class PanelMenuComponent implements OnInit {
   }
 
   getMenuModeUser() {
+    this.toggleMenu('office');
     const user = this.authSrv.getTokenPayload();
     const isFixed = this.cookieSrv.get('menuMode' + user.email) === 'true' ? true : false;
     if (!!isFixed) {
-      this.toggleMenu('office');
       this.handleChangeMenuMode();
     }
   }

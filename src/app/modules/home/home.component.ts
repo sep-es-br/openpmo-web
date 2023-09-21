@@ -6,6 +6,7 @@ import { IPerson } from 'src/app/shared/interfaces/IPerson';
 import { ISocialLoginResult } from 'src/app/shared/interfaces/ISocialLoginResult';
 import { AuthService } from 'src/app/shared/services/auth.service';
 import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
+import { MenuService } from 'src/app/shared/services/menu.service';
 import { OfficeService } from 'src/app/shared/services/office.service';
 import { PlanService } from 'src/app/shared/services/plan.service';
 import { TranslateChangeService } from 'src/app/shared/services/translate-change.service';
@@ -28,7 +29,8 @@ export class HomeComponent implements OnInit {
     private translateChangeSrv: TranslateChangeService,
     private cookieSrv: CookieService,
     private planSrv: PlanService,
-    private officeSrv: OfficeService
+    private officeSrv: OfficeService,
+    private menuSrv: MenuService
   ) {
     this.breadcrumbSrv.setMenu([]);
     this.activatedRoute.queryParams
@@ -60,7 +62,7 @@ export class HomeComponent implements OnInit {
           if (!!this.infoPerson && this.infoPerson.workLocal && this.infoPerson.workLocal.idOffice) {
             this.navigateWorkPerson();
           } else {
-            this.router.navigate(['/offices']);
+            this.menuSrv.reloadMenuOffice();
           }
         }
       });
@@ -71,6 +73,7 @@ export class HomeComponent implements OnInit {
       const routeLink = '/login'
       this.router.navigate([routeLink]);
     } else {
+      this.router.navigate(['/offices']);
       const user = this.authSrv.getTokenPayload();
       const language = user ? this.cookieSrv.get('cookiesDefaultLanguateUser' + user.email) : null;
       if (language) {
@@ -80,6 +83,7 @@ export class HomeComponent implements OnInit {
       if (!!this.infoPerson && this.infoPerson.workLocal && this.infoPerson.workLocal.idOffice) {
         this.navigateWorkPerson();
       } else {
+        this.menuSrv.reloadMenuOffice();
         const routeLink = '/offices'
         this.router.navigate([routeLink]);
       }

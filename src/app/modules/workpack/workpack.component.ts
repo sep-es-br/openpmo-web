@@ -105,7 +105,6 @@ export class WorkpackComponent implements OnDestroy {
   selectedTab: ITabViewScrolled;
   tabs: ITabViewScrolled[];
   isLoading = false;
-  tabViewStorage = 'open-pmo:WORKPACK_TABVIEW';
   favoriteProcessing = false;
   currentBreadcrumbItems: IBreadcrumb[];
   workpackLoading = true;
@@ -1390,11 +1389,8 @@ export class WorkpackComponent implements OnDestroy {
     return filterPropertiesList;
   }
 
-  changeTab(event: { tabs: ITabViewScrolled; setStorage: boolean }) {
+  changeTab(event: { tabs: ITabViewScrolled }) {
     this.selectedTab = event.tabs;
-    setTimeout(() => {
-      this.setStorageTab(event.setStorage);
-    });
   }
 
   loadWorkpackTabs() {
@@ -1474,53 +1470,15 @@ export class WorkpackComponent implements OnDestroy {
           key: 'journal'
         });
       }
-      const selectedTabsStorage = localStorage.getItem(this.tabViewStorage);
-      if (!selectedTabsStorage || selectedTabsStorage == 'undefined') {
-        this.isLoading = false;
-        return;
-      }
-      const selectedTabs = JSON.parse(selectedTabsStorage);
-      const findIndex = selectedTabs?.findIndex(tab => tab.idWorkpack === this.idWorkpack);
-      if (findIndex !== -1) {
-        this.selectedTab = selectedTabs[findIndex].tab;
-      }
-      this.setStorageTab();
     }
     if (!this.idWorkpack) {
       this.tabs.push({
         menu: 'properties',
         key: 'properties'
       });
-      this.selectedTab = this.tabs[0];
     }
     this.isLoading = false;
   }
 
-  setStorageTab(setStorage?: boolean) {
-    if (!setStorage) {
-      return;
-    }
-    const tabview = {
-      idWorkpack: this.idWorkpack,
-      tab: this.selectedTab,
-    };
-    const tabs = localStorage.getItem(this.tabViewStorage);
-    if (!tabs || tabs == 'undefined') {
-      localStorage.setItem(this.tabViewStorage, JSON.stringify([tabview]));
-      return;
-    }
-    const storageTab = JSON.parse(tabs);
-    if (!storageTab && storageTab !== undefined) {
-      localStorage.setItem(this.tabViewStorage, JSON.stringify([tabview]));
-      return;
-    }
-    const findIndex = storageTab?.findIndex(tab => tab.idWorkpack === this.idWorkpack);
-    if (findIndex !== -1) {
-      storageTab[findIndex] = tabview;
-    } else {
-      storageTab?.push(tabview);
-    }
-    localStorage.setItem(this.tabViewStorage, JSON.stringify(storageTab));
-  }
 
 }

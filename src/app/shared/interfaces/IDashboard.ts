@@ -10,6 +10,8 @@ export interface IDashboard {
   schedulePerformanceIndex?: any;
   earnedValue?:              number;
   workpacksByModel?: {
+    idWorkpackModel: number;
+    level: number;
     quantity: number;
     modelName: string;
     icon: string;
@@ -18,7 +20,7 @@ export interface IDashboard {
   }[];
 }
 
-interface IWorkpackByModel {
+export interface IWorkpackByModel {
   id: number;
   idWorkpackModel: number;
   name: string;

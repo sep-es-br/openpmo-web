@@ -86,6 +86,11 @@ export class TemplateComponent implements OnDestroy, OnInit {
     const splitterPanels = document.querySelectorAll('.p-splitter-panel-nested');
     if (splitterPanels.length > 1) {
       const maxWidth = splitterPanels[1].getAttribute('style').split(';')[0].split(':')[1].trim();
+      const perc = maxWidth.split('(')[1];
+      const mainWidthPerc = perc && perc.split('%')[0];
+      this.mainWidth = Number(mainWidthPerc);
+      const menuWidthPerc = (100 - this.mainWidth).toFixed(2);
+      this.menuWidth = Number(menuWidthPerc);
       splitterPanels[1].setAttribute('style', `flex-basis: ${maxWidth}; max-width: ${maxWidth};`);
     }
     const mainContent = document.querySelector('.main-content');
@@ -104,7 +109,6 @@ export class TemplateComponent implements OnDestroy, OnInit {
   }
 
   closeAllMenus() {
-    // this.menuSrv.nextCloseAllMenus(true);
     this.closeSlideMenu()
     this.menuSrv.nextCloseMenuUser(true);
   }

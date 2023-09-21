@@ -163,17 +163,25 @@ export class WorkpackSectionDashboardComponent implements OnInit, OnChanges, OnD
   }
 
   setMenuItemWorkpacksByModel() {
-    this.dashboard.workpacksByModel.forEach( model => {
-      model.menuItems = model.workpacks && model.workpacks.length > 0 ? model.workpacks.map( wp => ({
-        label: wp.name,
-        icon: wp.icon,
-        command: () => this.navigateToWorkpackItem(wp, this.workpackParams.idPlan),
-        items: wp.workpacks && wp.workpacks.length > 0 ? wp.workpacks.map( child => ({
-          label: child.name,
-          icon: child.icon,
-          command: () => this.navigateToWorkpackItem(child, this.workpackParams.idPlan)
-        })) : undefined
-      })) : undefined;
+    this.dashboard.workpacksByModel.filter(wm => wm.level <= 2).forEach( async (model) => {
+      const result = await this.dashboardSrv.GetMenuItemsByWorkpackModel({
+        idWorkpackActul: this.workpackParams.idWorkpack,
+        idWorkpackModel: model.idWorkpackModel,
+        level: model.level
+      });
+      if (result.success) {
+        model.menuItems = result.data && result.data.length > 0 ? result.data.map( wp => ({
+          label: wp.name,
+          icon: wp.icon,
+          command: () => this.navigateToWorkpackItem(wp, this.workpackParams.idPlan),
+          items: wp.workpacks && wp.workpacks.length > 0 ? wp.workpacks.map( child => ({
+            label: child.name,
+            icon: child.icon,
+            command: () => this.navigateToWorkpackItem(child, this.workpackParams.idPlan)
+          })) : undefined
+        })) : undefined;
+      }
+      
     });
   }
 

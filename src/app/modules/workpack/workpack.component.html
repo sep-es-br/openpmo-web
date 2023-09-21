@@ -21,7 +21,7 @@
     <span class="text">{{workpackModel?.modelName}}</span>
   </div>
   <div class="tabview-container" *ngIf="showTabview && tabs && tabs.length > 0 && !workpackLoading">
-    <app-tabview-scrolled [tabs]="tabs" (selectedTabChange)="changeTab($event)" [idWorkpack]="idWorkpack" [workpackSelectedTab]="selectedTab">
+    <app-tabview-scrolled [tabs]="tabs" (selectedTabChange)="changeTab($event)" [idWorkpack]="idWorkpack">
       <div tabviewBody *ngIf="selectedTab?.key === 'WBS'">
         <div class="card-WBS">
           <app-workpack-section-wbs

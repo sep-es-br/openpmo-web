@@ -15,7 +15,7 @@
           <li class="app-tabview-scrolled-header-item" *ngFor="let item of tabs">
             <span class="header-link"
               [class.active]="selectedTab?.key === item.key"
-              (click)="selectTab(item, true)">
+              (click)="selectTab(item)">
                 {{item.menu | translate}}
               </span>
           </li>
