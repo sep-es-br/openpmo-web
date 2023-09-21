@@ -163,7 +163,7 @@ export class WorkpackSectionDashboardComponent implements OnInit, OnChanges, OnD
   }
 
   setMenuItemWorkpacksByModel() {
-    this.dashboard.workpacksByModel.filter(wm => wm.level <= 2).forEach( async (model) => {
+    this.dashboard.workpacksByModel.filter(wm => wm.level && wm.level <= 2).forEach( async (model) => {
       const result = await this.dashboardSrv.GetMenuItemsByWorkpackModel({
         idWorkpackActul: this.workpackParams.idWorkpack,
         idWorkpackModel: model.idWorkpackModel,

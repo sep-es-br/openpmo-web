@@ -46,14 +46,16 @@
       </div>
     </div>
     <div class="costValues">
-      <div class="costInputs p-fluid" [class.card-link]="properties.editPermission && !properties.editCosts" 
+      <div class="costInputs p-fluid" [class.card-link]="properties.editPermission && !properties.editCosts && properties.multipleCosts"
         (click)="properties.multipleCosts && handleEditCosts($event)">
         <span class="column-title"> $ </span>
         <span class="p-float-label p-field">
           <p-inputNumber [class]="'app-input-number '+'costPlanned-'+properties.idStep" id="float-costPlanned"
             (click)="properties.multipleCosts && handleEditCosts($event); properties.multipleCosts && disable()"
+            (onFocus)="properties.multipleCosts && handleEditCosts($event); properties.multipleCosts && disable()"
             (mouseout)="multiCostsEdited = false"
-            [disabled]="multiCostsEdited || !properties.editPermission" (onInput)="handleStepCostChange($event, 'costPlanned')"
+            [disabled]="(properties.multipleCosts && multiCostsEdited) || !properties.editPermission || (!properties.multipleCosts && !properties.editCosts)"
+            (onInput)="handleStepCostChange($event, 'costPlanned')"
             [class.red]="properties.costPlanned < 0"
             [(ngModel)]="properties.costPlanned" [minFractionDigits]="2" [maxFractionDigits]="2"
             [locale]="language === 'pt-BR' ? 'pt-BR' : 'en-US'">
@@ -68,8 +70,10 @@
         <span class="p-float-label p-field">
           <p-inputNumber class="app-input-number" id="float-costActual"
             (click)="properties.multipleCosts && handleEditCosts($event); properties.multipleCosts && disable()"
+            (onFocus)="properties.multipleCosts && handleEditCosts($event); properties.multipleCosts && disable()"
             (mouseout)="multiCostsEdited = false"
-            [disabled]="multiCostsEdited || !properties.editPermission" (onInput)="handleStepCostChange($event, 'costActual')"
+            [disabled]="(properties.multipleCosts && multiCostsEdited) || !properties.editPermission || (!properties.multipleCosts && !properties.editCosts)"
+            (onInput)="handleStepCostChange($event, 'costActual')"
             [class.red]="properties.costActual < 0"
             [(ngModel)]="properties.costActual" [minFractionDigits]="2" [maxFractionDigits]="2"
             [locale]="language === 'pt-BR' ? 'pt-BR' : 'en-US'">
@@ -124,13 +128,13 @@
   </div>
 </p-card>
 
-<p-card *ngIf="properties.type === 'newStart'" class="app-new-step-card-item">
+<p-card *ngIf="properties.type === 'newStart'" class="app-new-step-card-item" (click)="onCreateNewStep.next()">
   <div class="card-item-content">
     <i [ngClass]="[ 'app-icon', iconEnum.Plus, 'light-grey-icon' ]" [ngStyle]="{ fontSize: '2rem' }"></i>
   </div>
 </p-card>
 
-<p-card *ngIf="properties.type === 'newEnd'" class="app-new-step-card-item">
+<p-card *ngIf="properties.type === 'newEnd'" class="app-new-step-card-item" (click)="onCreateNewStep.next()">
   <div class="card-item-content">
     <i [ngClass]="[ 'app-icon', iconEnum.Plus, 'light-grey-icon' ]" [ngStyle]="{ fontSize: '2rem' }"></i>
   </div>

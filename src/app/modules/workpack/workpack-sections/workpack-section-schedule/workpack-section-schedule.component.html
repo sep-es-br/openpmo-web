@@ -19,7 +19,8 @@
     <div class="loading-container" *ngIf="sectionSchedule.cardSection.isLoading">
       <app-card-loading [isCardLoading]="sectionSchedule.cardSection.isLoading"></app-card-loading>
     </div>
-    <div class="schedule-steps-section" *ngIf="sectionSchedule && sectionSchedule.groupStep && !sectionSchedule.cardSection.isLoading">
+    <div class="schedule-steps-section"
+      *ngIf="sectionSchedule && sectionSchedule.groupStep && !sectionSchedule.cardSection.isLoading">
       <div class="schedule-steps-container" *ngFor="let groupStep of sectionSchedule.groupStep"
         [class.schedule-steps-container-mobile]="responsive">
         <div class="data-view-steps-container">
@@ -39,15 +40,13 @@
             *ngIf="showDetails; else showResumed" [emptyMessage]="'loadingEllipsis' | translate">
             <ng-template let-step pTemplate="gridItem">
               <div class="card-item-container show-details" *ngIf="['newStart', 'newEnd'].includes(step.type)"
-                [class.new-card-item]="['newStart', 'newEnd'].includes(step.type)" [class.mobile]="responsive"
-                [routerLink]="['/workpack' , 'schedule', 'step' ]" [queryParams]="{
-                      idSchedule: schedule.id,
-                      idWorkpackModelLinked: workpackParams.idWorkpackModelLinked,
-                      stepType: step.type,
-                      unitName: step.unitName,
-                      unitPrecision: step.unitPrecision
-                    }">
-                <app-schedule-step-card-item [properties]="step" [type]="'listStep'"
+                [class.new-card-item]="['newStart', 'newEnd'].includes(step.type)" [class.mobile]="responsive">
+                <app-schedule-step-card-item [properties]="step" [type]="'listStep'" (onCreateNewStep)="handleCreateNewStep({
+                  idSchedule: schedule.id,
+                  idWorkpackModelLinked: workpackParams.idWorkpackModelLinked,
+                  stepType: step.type,
+                  unitName: step.unitName,
+                  unitPrecision: step.unitPrecision})" 
                   (spreadDifference)="requestTypeDistributionInformation($event, false)"
                   (stepChanged)="saveStepChanged(groupStep.year, step.idStep)"></app-schedule-step-card-item>
               </div>
@@ -121,19 +120,20 @@
 </p-confirmDialog>
 
 <p-dialog class="type-distribution-dialog" [class.responsive]="!!responsive" [header]="'distribution' |translate"
-    [(visible)]="showTypeDistributionDialog" [style]="{width: '20vw'}"   [closable]="false" closeIcon="">
-    <div class="type-distribution-content">
-      <div class="p-field distribution-container" [class.responsive]="responsive">
-        <div class="radios-container">
-          <p-radioButton class="distribution-radio" value="SIGMOIDAL" [(ngModel)]="typeDistribution" [label]="'sigmoidal'| translate">
-          </p-radioButton>
-          <p-radioButton class="distribution-radio" value="LINEAR" [(ngModel)]="typeDistribution"
-              [label]="'linear' | translate"></p-radioButton>
-        </div>
-      </div>
-      <div class="buttons-container" style="margin-top: 1em">
-        <button class="end-button" pButton label="Ok" icon="pi pi-check" iconPos="left"
-          (click)="!spreadMulticost ? handleSpreadDifference(spreadEvent) : handleSpreadDifferenceMultiCost(spreadEvent); showTypeDistributionDialog=false"></button>
+  [(visible)]="showTypeDistributionDialog" [style]="{width: '20vw'}" [closable]="false" closeIcon="">
+  <div class="type-distribution-content">
+    <div class="p-field distribution-container" [class.responsive]="responsive">
+      <div class="radios-container">
+        <p-radioButton class="distribution-radio" value="SIGMOIDAL" [(ngModel)]="typeDistribution"
+          [label]="'sigmoidal'| translate">
+        </p-radioButton>
+        <p-radioButton class="distribution-radio" value="LINEAR" [(ngModel)]="typeDistribution"
+          [label]="'linear' | translate"></p-radioButton>
       </div>
     </div>
-  </p-dialog>
+    <div class="buttons-container" style="margin-top: 1em">
+      <button class="end-button" pButton label="Ok" icon="pi pi-check" iconPos="left"
+        (click)="!spreadMulticost ? handleSpreadDifference(spreadEvent) : handleSpreadDifferenceMultiCost(spreadEvent); showTypeDistributionDialog=false"></button>
+    </div>
+  </div>
+</p-dialog>

@@ -21,6 +21,7 @@ export class ScheduleStepCardItemComponent implements OnInit, OnDestroy {
   @Output() stepChanged = new EventEmitter();
   @Output() editCost = new EventEmitter();
   @Output() spreadDifference = new EventEmitter();
+  @Output() onCreateNewStep = new EventEmitter();
 
   cardIdItem: string;
   iconEnum = IconsEnum;

@@ -343,6 +343,14 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
     );
   }
 
+  handleCreateNewStep(params) {
+    this.router.navigate(['/workpack' , 'schedule', 'step' ], {
+      queryParams: {
+        ...params
+      }
+    });
+  }
+
   handleShowDetails() {
     this.showDetails = !this.showDetails;
   }
