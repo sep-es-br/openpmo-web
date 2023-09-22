@@ -223,10 +223,5 @@ export class MenuService extends BaseService<any> {
     this.$removedFavorites.next(idRemoved);
   }
 
-  setCookiesModeMenu(isFixed: boolean , userInfo) {
-    const date = moment().add(30, 'days').calendar();
-    if (userInfo && userInfo.email) {
-      this.cookieSrv.put('menuMode'+userInfo.email, isFixed ? 'fixed' : 'floating', { expires: date} );
-    }
-  }
+  
 }

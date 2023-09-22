@@ -75,6 +75,7 @@ export class PanelMenuComponent implements OnInit {
   idOfficeItemsPlanModel: number;
   idPlanMenu: number;
   loadingMenuPortfolio = false;
+  user;
 
   constructor(
     private menuSrv: MenuService,
@@ -129,7 +130,10 @@ export class PanelMenuComponent implements OnInit {
         this.itemsFavorites = [];
       }
     });
-    this.menuSrv.obsReloadMenuOffice().pipe(takeUntil(this.$destroy)).subscribe(() => this.loadOfficeMenu());
+    this.menuSrv.obsReloadMenuOffice().pipe(takeUntil(this.$destroy)).subscribe(async () => {
+      await this.loadOfficeMenu();
+      this.getMenuModeUser();
+    });
     this.menuSrv.obsReloadMenuFavorite().pipe(takeUntil(this.$destroy)).subscribe(() => {
       this.loadFavoritesMenu();
     });
@@ -163,7 +167,7 @@ export class PanelMenuComponent implements OnInit {
       if (!this.linkEvent) this.selectMenuActive(url.slice(2));
     });
     this.menuSrv.obsCloseAllMenus.pipe(takeUntil(this.$destroy)).subscribe( closeAllMenus => {
-      if (closeAllMenus) this.setCloseAllMenus();
+      if (closeAllMenus && !this.isFixed) this.setCloseAllMenus();
     });
     this.menuSrv.obsToggleMenu.pipe(takeUntil(this.$destroy)).subscribe( value => {
       this.toggleMenu(value);
@@ -178,8 +182,10 @@ export class PanelMenuComponent implements OnInit {
 
   async ngOnInit() {
     const token = this.authSrv.getAccessToken();
-    if (token) await this.loadOfficeMenu();
-    this.getMenuModeUser();
+    if (token) {
+      await this.loadOfficeMenu();
+      this.getMenuModeUser();
+    };
   }
 
   async getPropertiesOffice(idOffice) {
@@ -189,28 +195,31 @@ export class PanelMenuComponent implements OnInit {
   }
 
   getMenuModeUser() {
-    this.toggleMenu('office');
+    if (this.menus.filter( item => item.isOpen).length === 0) this.toggleMenu('office');
     const user = this.authSrv.getTokenPayload();
-    const isFixed = this.cookieSrv.get('menuMode' + user.email) === 'true' ? true : false;
+    const isFixed = this.cookieSrv.get('menuMode' + user?.email) === 'true' ? true : false;
     if (!!isFixed) {
+      this.menuSrv.nextToggleMenu('office');
       this.handleChangeMenuMode();
+      
     }
   }
 
   handleChangeMenuMode() {
     this.isFixed = !this.isFixed;
+    this.setCookieMenuMode();
     this.menuSrv.nextMenuState({
       isFixed: this.isFixed
     });
+    
   }
-
 
   setCookieMenuMode() {
     const user = this.authSrv.getTokenPayload();
     const cookiesPermission = this.cookieSrv.get('cookiesPermission' + user.email);
     if (!!cookiesPermission && user && user.email) {
       const date = moment().add(60, 'days').calendar();
-      this.cookieSrv.put('menuMode' + user.email, 'false', { expires: date });
+      this.cookieSrv.put('menuMode' + user?.email, this.isFixed ? 'true' : 'false', { expires: date });
     }
   }
 

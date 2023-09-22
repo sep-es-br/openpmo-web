@@ -22,8 +22,8 @@ export class PlanService extends BaseService<IPlan> {
     return this.currentIDPlan.pipe(distinctUntilChanged());
   }
 
-  nextIDPlan(idPlan: number) {
-    this.getCurrentPlan(idPlan);
+  async nextIDPlan(idPlan: number) {
+    await this.getCurrentPlan(idPlan);
     setTimeout( () => {
       this.currentIDPlan.next(idPlan);
     }, 300)

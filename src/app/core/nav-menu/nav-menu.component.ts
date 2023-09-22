@@ -50,13 +50,9 @@ export class NavMenuComponent implements OnInit {
 
   constructor(
     private menuSrv: MenuService,
-    private translateChangeSrv: TranslateChangeService,
-    private translateSrv: TranslateService,
     public authSrv: AuthService,
-    private mobileViewSrv: MobileViewService,
     private locationSrv: Location,
     private officeSrv: OfficeService,
-    private officePermissionSrv: OfficePermissionService,
     private planSrv: PlanService,
     private cookieSrv: CookieService,
     private reportSrv: ReportService,
@@ -122,16 +118,6 @@ export class NavMenuComponent implements OnInit {
       }
     }
   }
-
-  setCookieMenuMode() {
-    const user = this.authSrv.getTokenPayload();
-    const cookiesPermission = this.cookieSrv.get('cookiesPermission' + user.email);
-    if (!!cookiesPermission && user && user.email) {
-      const date = moment().add(60, 'days').calendar();
-      this.cookieSrv.put('menuMode' + user.email, 'false', { expires: date });
-    }
-  }
-
 
   toggleMenu(menu: string) {
     this.menus.forEach(m => {
