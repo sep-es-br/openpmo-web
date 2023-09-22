@@ -9,6 +9,9 @@ import { IDashboardData } from '../interfaces/IDashboardData';
 import { IWorkpackData, IWorkpackParams } from '../interfaces/IWorkpackDataParams';
 import { WorkpackService } from './workpack.service';
 import * as moment from 'moment';
+import { Router } from '@angular/router';
+import { WorkpackBreadcrumbStorageService } from './workpack-breadcrumb-storage.service';
+import { BreadcrumbService } from './breadcrumb.service';
 
 @Injectable({
   providedIn: 'root'
@@ -31,7 +34,10 @@ export class DashboardService extends BaseService<IDashboard> {
 
   constructor(
     @Inject(Injector) injector: Injector,
-    private workpackSrv: WorkpackService
+    private workpackSrv: WorkpackService,
+    private route: Router,
+    private workpackBreadcrumbStorageSrv: WorkpackBreadcrumbStorageService,
+    private breadcrumbSrv: BreadcrumbService
   ) {
     super('dashboards', injector);
   }
@@ -149,8 +155,59 @@ export class DashboardService extends BaseService<IDashboard> {
     && (!this.dashboard.workpacksByModel || this.dashboard.workpacksByModel.length === 0)) {
       this.dashboard = undefined;
     }
+    // if (this.dashboard) {
+    //   this.setMenuItemWorkpacksByModel();
+    // }
     this.loading = false;
     this.nextResetDashboard(true);
+  }
+
+  setMenuItemWorkpacksByModel() {
+    this.dashboard.workpacksByModel.filter(wm => wm.level && wm.level <= 2).forEach( async (model) => {
+      const result = await this.GetMenuItemsByWorkpackModel({
+        idWorkpackActul: this.workpackParams.idWorkpack,
+        idWorkpackModel: model.idWorkpackModel,
+        level: model.level
+      });
+      if (result.success) {
+        model.menuItems = result.data && result.data.length > 0 ? result.data.map( wp => ({
+          label: wp.name,
+          icon: wp.icon,
+          command: () => this.navigateToWorkpackItem(wp, this.workpackParams.idPlan),
+          items: wp.workpacks && wp.workpacks.length > 0 ? wp.workpacks.map( child => ({
+            label: child.name,
+            icon: child.icon,
+            command: () => this.navigateToWorkpackItem(child, this.workpackParams.idPlan)
+          })) : undefined
+        })) : undefined;
+      }
+      
+    });
+  }
+
+  navigateToWorkpackItem(wp, idPlan) {
+    this.setWorkpackBreadcrumbStorage(wp.id, idPlan);
+    if (wp.linked) {
+      this.route.navigate(['workpack'], {
+        queryParams: {
+          id: wp.id,
+          idWorkpackModelLinked: wp.idWorkpackModel,
+          idPlan: idPlan
+        }
+      });
+    } else {
+      this.route.navigate(['workpack'], {
+        queryParams: {
+          id: wp.id,
+          idPlan: idPlan
+        }
+      });
+    }
+  }
+
+  async setWorkpackBreadcrumbStorage(idWorkpack, idPlan) {
+    const breadcrumbItems = await this.workpackBreadcrumbStorageSrv.getBreadcrumbs(idWorkpack, idPlan);
+    this.breadcrumbSrv.setBreadcrumbStorage(breadcrumbItems);
   }
 
   calculateReferenceMonth() {

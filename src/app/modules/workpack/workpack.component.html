@@ -13,14 +13,14 @@
       <i [pTooltip]="(workpack?.favoritedBy ? 'removeFavorite' : 'addFavorite') | translate" (click)="!favoriteProcessing && handleFavorite()" [class.responsive]="responsive"
         [class]="(workpack?.favoritedBy ? 'fas icon-favorite-checked ' : 'far ') + 'fa-star icon-favorite'">
       </i>
-      <app-config-data-view-panel></app-config-data-view-panel>
+      <app-config-data-view-panel  [notShowCollapseOptions]="showTabview"></app-config-data-view-panel>
     </div>
   </div>
   <div class="app-content-header" *ngIf="workpackModel && !idWorkpack && !workpackLoading" [class.mobile]="responsive">
     <span class="label">{{'new' | translate}}</span>
     <span class="text">{{workpackModel?.modelName}}</span>
   </div>
-  <div class="tabview-container" *ngIf="showTabview && tabs && tabs.length > 0 && !workpackLoading">
+  <div class="tabview-container" *ngIf="showTabview && !workpackLoading">
     <app-tabview-scrolled [tabs]="tabs" (selectedTabChange)="changeTab($event)" [idWorkpack]="idWorkpack">
       <div tabviewBody *ngIf="selectedTab?.key === 'WBS'">
         <div class="card-WBS">

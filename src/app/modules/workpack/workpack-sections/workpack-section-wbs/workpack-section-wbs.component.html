@@ -2,6 +2,14 @@
   <div class="card-loading" [ngStyle]="{'top': topPosLoading + 'px'}">
     <app-card-loading [isCardLoading]="isLoading"></app-card-loading>
   </div>
+  <div class="expanded-buttons-container">
+    <div class="button-container">
+      <i class="fas fa-angle-double-down" [pTooltip]="'expandAll'|translate" [class.selected]="!collapsed" (click)="handleCollapseAll(false)"></i>
+    </div>
+    <div class="button-container">
+      <i class="fas fa-angle-double-up"[class.selected]="collapsed" [pTooltip]="'collapseAll'|translate" (click)="handleCollapseAll(true)"></i>
+    </div>
+  </div>
   <p-tree [value]="wbsTree" (onNodeExpand)="nodeExpand($event)" [loading]="isLoading" [emptyMessage]="null">
     <ng-template let-node styleClass="teste" pTemplate="default">
       <!-- DATA -->

@@ -1259,21 +1259,21 @@ export class WorkpackComponent implements OnDestroy {
           idWorkpackModelLinked: null
         });
         this.resetWorkpack();
+        this.menuSrv.reloadMenuPortfolio(!isPut ? this.idWorkpack : undefined);
       } else {
-        if (this.idWorkpack) {
-          if (!this.idWorkpackModelLinked) {
-            await this.loadWorkpack(true);
-          } else {
-            await this.loadWorkpackLinked(true);
-          }
-        }
+        // if (this.idWorkpack) {
+        //   if (!this.idWorkpackModelLinked) {
+        //     await this.loadWorkpack(true);
+        //   } else {
+        //     await this.loadWorkpackLinked(true);
+        //   }
+        // }
       }
       this.messageSrv.add({
         severity: 'success',
         summary: this.translateSrv.instant('success'),
         detail: this.translateSrv.instant('messages.savedSuccessfully')
       });
-      this.menuSrv.reloadMenuPortfolio(!isPut ? this.idWorkpack : undefined);
     }
   }
 

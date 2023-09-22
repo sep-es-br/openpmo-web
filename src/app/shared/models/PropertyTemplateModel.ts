@@ -40,7 +40,7 @@ export class PropertyTemplateModel implements IProperty {
   milestoneData?: IMilestonePropertyData;
   reason?: string;
   needReason?: boolean;
-
+  collapsed?: boolean;
   dirty = false;
 
   getValues() {

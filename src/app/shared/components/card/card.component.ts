@@ -19,6 +19,7 @@ export class CardComponent implements OnInit, OnDestroy, OnChanges {
 
   @Input() properties: ICard;
   @Input() loading: boolean;
+  @Input() showExpandedCollapseButtons: boolean;
   @Output() selectedFilter = new EventEmitter();
   @Output() editFilter = new EventEmitter();
   @Output() newFilter = new EventEmitter();
@@ -26,8 +27,9 @@ export class CardComponent implements OnInit, OnDestroy, OnChanges {
   @Output() changeCheckCompleted = new EventEmitter();
   @Output() changeFullScreen = new EventEmitter();
   @Output() searchText = new EventEmitter();
+  @Output() collapseAllPropertiesGroups = new EventEmitter();
   searchTextAux = undefined;
-
+  collapsed = true;
   responsive: boolean;
   subResponsive: Subscription;
   language: string;

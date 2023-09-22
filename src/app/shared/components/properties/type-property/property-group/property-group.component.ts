@@ -17,23 +17,16 @@ export class PropertyGroupComponent implements OnInit {
   @Output() changed = new EventEmitter();
 
   types = TypePropertyModelEnum;
-  collapsed = true;
   responsive: boolean;
   $destroy = new Subject();
 
   constructor(
     private responsiveSrv: ResponsiveService,
-    private configDataSrv: ConfigDataViewService
   ) {
     this.responsiveSrv.observable.subscribe(value => {
       this.responsive = value;
     });
 
-    this.configDataSrv.observableCollapsePanelsStatus
-      .pipe(takeUntil(this.$destroy))
-      .subscribe(panelStatus => {
-        this.collapsed = panelStatus === 'collapse';
-      });
   }
 
   ngOnInit(): void {

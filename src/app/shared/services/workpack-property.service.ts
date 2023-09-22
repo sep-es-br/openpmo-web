@@ -190,6 +190,7 @@ export class WorkpackPropertyService {
       property.defaults = propertyModel.defaults as number;
     }
     if (this.typePropertyModel[propertyModel.type] === TypePropertyModelEnum.GroupModel && propertyModel.groupedProperties) {
+      property.collapsed = true;
       property.groupedProperties = await Promise.all(propertyModel.groupedProperties.map
         (prop => this.instanceProperty(prop, propertyWorkpack)));
     }

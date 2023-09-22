@@ -1,6 +1,7 @@
 <div class="app-workpack-section-properties">
   <app-card [properties]="cardWorkpackProperties" class="mt-0 inputs-float-label" [class.panel-tab-view]="showTabview"
-    (changeCheckCompleted)="handleChangeCheckCompleted($event)">
+    (changeCheckCompleted)="handleChangeCheckCompleted($event)" [showExpandedCollapseButtons]="showExpandedCollapseButtons"
+      (collapseAllPropertiesGroups)="handleCollapseAllProperties($event)" >
     <div class="loading-container" *ngIf="isLoading">
       <app-card-loading [isCardLoading]=" isLoading"></app-card-loading>
     </div>

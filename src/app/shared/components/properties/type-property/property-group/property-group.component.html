@@ -1,6 +1,7 @@
-<p-panel class="app-property-group" [toggleable]="true" expandIcon="" collapseIcon="" [collapsed]="collapsed" [class.responsive]="responsive">
+<p-panel class="app-property-group" [toggleable]="true" expandIcon="" collapseIcon="" [collapsed]="groupProperty.collapsed" [class.responsive]="responsive">
   <ng-template pTemplate="icons">
-    <p-button (onClick)="collapsed = !collapsed" [icon]="collapsed ? 'pi pi-angle-down' : 'pi pi-angle-up'" [label]="groupProperty.name">
+    <p-button (onClick)="groupProperty.collapsed = !groupProperty.collapsed "
+      [icon]="groupProperty.collapsed  ? 'pi pi-angle-down' : 'pi pi-angle-up'" [label]="groupProperty.name">
     </p-button>
   </ng-template>
   <div class="property-group-container" *ngFor="let groupedProp of groupProperty.groupedProperties">

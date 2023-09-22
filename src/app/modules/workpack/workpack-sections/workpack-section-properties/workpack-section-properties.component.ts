@@ -34,6 +34,7 @@ export class WorkpackSectionPropertiesComponent implements OnInit {
   showTabview = false;
   isLoading = false;
   organizationsOffice;
+  showExpandedCollapseButtons = false;
 
   constructor(
     private workpackSrv: WorkpackService,
@@ -100,6 +101,7 @@ export class WorkpackSectionPropertiesComponent implements OnInit {
     this.sectionPropertiesProperties = properties;
     if (this.cardWorkpackProperties) {
       this.cardWorkpackProperties.initialStateCollapse = this.workpackParams?.idWorkpack && !this.showTabview;
+      this.showExpandedCollapseButtons = this.sectionPropertiesProperties.filter( prop => prop.type === TypePropertyModelEnum.GroupModel).length > 0;
     }
     if (!loading) this.showCheckCompleted();
   }
@@ -265,6 +267,10 @@ export class WorkpackSectionPropertiesComponent implements OnInit {
     if (isNaN(this.workpackParams.idWorkpack) && fullNameProperty && fullNameIndex >= 0 && !fullNameProperty.dirty) {
       this.sectionPropertiesProperties[fullNameIndex].value = nameProperty.value;
     }
+  }
+
+  handleCollapseAllProperties(event) {
+    this.sectionPropertiesProperties.filter( prop => prop.type === TypePropertyModelEnum.GroupModel).forEach( gp => gp.collapsed = event);
   }
 
 }

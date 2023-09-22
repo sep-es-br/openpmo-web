@@ -35,7 +35,7 @@ export class WorkpackSectionWBSComponent implements OnDestroy {
   isLoading = false;
   idPlan: number;
   topPosLoading = 128;
-  collapsePanelsStatus: boolean = true;
+  collapsed: boolean = true;
   workpackParams: IWorkpackParams;
 
   constructor(
@@ -49,25 +49,6 @@ export class WorkpackSectionWBSComponent implements OnDestroy {
     private breadcrumbSrv: BreadcrumbService
   ) {
     this.isLoading = true;
-    this.configDataSrv.observableCollapsePanelsStatus.pipe(takeUntil(this.$destroy)).subscribe(async panelStatus => {
-      if (!this.wbsTree || this.wbsTree.length === 0) {
-        return;
-      } else {
-        const collapse = panelStatus === 'collapse' ? true : false;
-        if (collapse) {
-          this.collapsePanelsStatus = collapse;
-          this.breakdownStructureSrv.collapseAll();
-        } else {
-          if (this.collapsePanelsStatus !== collapse) {
-            this.collapsePanelsStatus = collapse;
-            if (!this.isLoading) {
-              this.isLoading = true;
-              this.breakdownStructureSrv.loadBWSExpandedAll(this.workpackParams.idWorkpack);
-            }
-          }
-        }
-      }
-    });
     this.actRouter.queryParams.subscribe(async ({ idPlan }) => {
       this.idPlan = idPlan && +idPlan;
     });
@@ -84,6 +65,16 @@ export class WorkpackSectionWBSComponent implements OnDestroy {
   ngOnDestroy(): void {
     this.$destroy.complete();
     this.$destroy.unsubscribe();
+  }
+
+  async handleCollapseAll(collapsed: boolean) {
+    this.collapsed = collapsed;
+    if (collapsed) {
+      this.breakdownStructureSrv.collapseAll();
+    } else {
+      this.isLoading = true;
+      this.breakdownStructureSrv.loadBWSExpandedAll(this.workpackParams.idWorkpack);
+    }
   }
 
   loadBreakdownStructureData() {

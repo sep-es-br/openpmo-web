@@ -28,5 +28,6 @@ export interface IProperty {
   selectedValue?: number;
   invalid?: boolean;
   message?: string;
+  collapsed?: boolean;
   getValues();
 }

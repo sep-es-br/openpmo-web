@@ -9,6 +9,39 @@
     z-index: 99999;
     position: relative;
   }
+  .expanded-buttons-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    border: 1px solid #dee2e6;
+    background: #ffffff;
+    color: #495057;
+    padding: 0.5rem;
+    border-radius: 3px;
+
+    .button-container {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+    }
+    i {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 25px;
+      height: 25px;
+      border: none;
+      color: #959595;
+      margin-left: 0.5em;
+      font-size: 1.2rem;
+      cursor: pointer;
+      padding-top: 3px;
+    }
+    .selected {
+      border-color: rgba(68, 179, 155, 1);
+      color: #44B39B;
+    }
+  }
   .constraint-content-cards{
     max-width: 340px;
     margin-bottom: 1rem;
