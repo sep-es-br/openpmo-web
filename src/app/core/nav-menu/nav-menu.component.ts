@@ -89,6 +89,7 @@ export class NavMenuComponent implements OnInit {
 
   async ngOnInit() {
     this.isUserAdmin = await this.authSrv.isUserAdmin();
+    this.loadCurrentInfo();
   }
 
   async loadCurrentInfo() {
