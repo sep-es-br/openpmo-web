@@ -73,7 +73,6 @@ export class PanelMenuComponent implements OnInit {
   hasReports = false;
   linkEvent = false;
   idOfficeItemsPlanModel: number;
-  idPlanMenu: number;
   loadingMenuPortfolio = false;
   user;
 
@@ -111,15 +110,12 @@ export class PanelMenuComponent implements OnInit {
     this.planSrv.observableIdPlan().pipe(takeUntil(this.$destroy)).subscribe(async id => {
       if (id === 0) {
         await this.loadPropertiesPlan();
-      } else {
-        this.currentIDPlan = id;
       }
-      if ((!this.itemsPortfolio || this.itemsPortfolio.length === 0 || (this.itemsPortfolio && this.itemsPortfolio.length > 0 && this.idPlanMenu !== this.currentIDPlan)) && this.currentIDPlan !== 0) {
+      if (this.currentIDPlan !== 0 && this.currentIDPlan !== id) {
+        this.currentIDPlan = id;
         await this.loadPropertiesPlan();
         this.loadPortfolioMenu();
         this.loadFavoritesMenu();
-      } else {
-        this.loadPropertiesPlan();
       }
     });
     this.planSrv.observableNewPlan().pipe(takeUntil(this.$destroy)).subscribe(value => {
@@ -541,7 +537,6 @@ export class PanelMenuComponent implements OnInit {
       const { success, data } = await this.menuSrv.getItemsPortfolio(this.currentIDOffice, this.currentIDPlan);
       if (success) {
         this.itemsPortfolio = this.buildMenuItemPortfolio(data || []);
-        this.idPlanMenu = this.currentIDPlan;
         this.loadingMenuPortfolio = false;
         if (!this.changedUrl || this.linkEvent) {
           this.selectMenuActive(this.router.url.slice(1), idNewWorkpack)
