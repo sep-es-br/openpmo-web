@@ -50,6 +50,7 @@ export class ReportViewComponent implements OnInit, OnDestroy {
   formatOptions: MenuItem[];
   isGenerating = false;
   generateReportEnabled = false;
+  scope = [];
 
   constructor(
     private responsiveSvr: ResponsiveService,
@@ -419,13 +420,14 @@ export class ReportViewComponent implements OnInit, OnDestroy {
       });
       return;
     }
+    this.prepareScope();
     this.isGenerating = true;
     const reportParams = this.reportProperties.map(p => p.getValues());
     const sender: IReportGenerate = {
       idReportModel: this.idReportModel,
       idPlan: this.idPlan,
       params: reportParams,
-      scope: this.selectedWorkpacks.map(node => node.data),
+      scope: this.scope,
       format: this.reportFormat
     };
     const result = await this.reportSrv.generateReport(sender);
@@ -445,6 +447,18 @@ export class ReportViewComponent implements OnInit, OnDestroy {
       a.remove();
       this.isGenerating = false;
     }
+  }
+
+  prepareScope() {
+    this.scope = [...this.selectedWorkpacks];
+    const scopeSelected = [...this.scope];
+    scopeSelected.forEach(item => {
+      if (item.children) {
+        const children = item.children.map(child => child.data);
+        this.scope = this.scope.filter(itemScope => !children.includes(itemScope.data));
+      }
+    });
+    this.scope = this.scope.map(item => item.data);
   }
 
   checkProperties(property?: PropertyTemplateModel) {
