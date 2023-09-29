@@ -108,6 +108,7 @@
   "more": "More",
   "properties": "Properties",
   "level": "Level",
+  "permissionLevel": "Level",
   "newPlan": "New plan",
   "newPermission": "New permission",
   "none": "None",

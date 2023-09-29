@@ -1,4 +1,7 @@
 <div class="app-workpack-model" [class.mobile]="isMobileView">
+  <div class="loading-form-container" *ngIf="formIsSaving">
+    <app-card-loading [isCardLoading]="formIsSaving"></app-card-loading>
+  </div>
   <div class="header-container" [class.mobile]="isMobileView" *ngIf="idWorkpackModel">
     <div class="app-content-header has-model" [class.mobile]="isMobileView">
       <span class="text">{{ formProperties.controls.name.value }} </span>
@@ -11,187 +14,190 @@
     <span class="label">{{ 'new' | translate }}</span>
     <span class="text">{{ ('labels.' + workpackModelType) | translate }}</span>
   </div>
-  <div class="loading-container" *ngIf="cardProperties?.isLoading">
+  <div class="loading-container" *ngIf="!formIsSaving && cardProperties?.isLoading">
     <app-card-loading [isCardLoading]="cardProperties?.isLoading"></app-card-loading>
   </div>
-  <div class="card-properties card workpack-model" *ngIf="!cardProperties?.isLoading">
-    <app-card [properties]="cardProperties" *ngIf="cardProperties" class="mt-0 inputs-float-label">
-      <div class="workpack-model-properties p-fluid" [formGroup]="formProperties">
-        <span class="p-float-label property-input p-field">
-          <input class="app-input-text" id="input-name" type="text" pInputText formControlName="name"
-            (change)="propertyChanged($event);" />
-          <label class="app-input-label" for="input-name">{{ 'modelName' | translate }} *</label>
-        </span>
-        <span class="p-float-label property-input p-field">
-          <input class="app-input-text" id="input-name-plural" type="text" pInputText formControlName="nameInPlural"
-            (change)="propertyChanged($event);" />
-          <label class="app-input-label" for="input-name-plural">{{ 'modelNameInPlural' | translate }} *</label>
-        </span>
-        <span class="p-float-label property-input p-field">
-          <p-inputNumber class="app-input-number" id="input-position" formControlName="position" [min]="1" [step]="1"
-            (onInput)="propertyChanged($event);"></p-inputNumber>
-          <label class="app-input-label" for="input-position">{{ 'position' | translate }} *</label>
-        </span>
-        <span class="p-float-label property-input p-field">
-          <p-dropdown class="app-single-selection" inputId="input-icon" [options]="icons" formControlName="icon"
-            [autoDisplayFirst]="false" [filter]="true" filterBy="label" [showClear]="true" [virtualScroll]="true"
-            [itemSize]="50" optionValue="name" (onChange)="propertyChanged($event);">
-            <ng-template pTemplate="selectedItem">
-              <div class="icon-item-selected" *ngIf="formProperties.controls.icon.value">
-                <i [ngClass]="formProperties.controls.icon.value"></i>
-              </div>
-            </ng-template>
-            <ng-template let-icon pTemplate="item">
-              <div class="icon-item">
-                <i [ngClass]="icon.name"></i>
-                <div>{{ icon.label }}</div>
-              </div>
-            </ng-template>
-          </p-dropdown>
-          <label class="app-input-label" for="input-icon">{{ 'icon' | translate }} *</label>
-        </span>
-        <span class="p-float-label property-input p-field">
-          <p-dropdown class="app-single-selection" inputId="input-sort-by" (onClick)="getSortedByList()"
-            (onChange)="propertyChanged($event);" [autoDisplayFirst]="true" [options]="sortedByList"
-            formControlName="sortedBy">
-          </p-dropdown>
-          <label class="app-input-label" for="input-sort-by">{{ 'sortedBy' | translate }} *</label>
-        </span>
-      </div>
-      <div class="workpack-model-addicional-properties add-actions" *ngIf="editPermission">
-        <p-menu #menuAddProperty [popup]="true" [model]="menuModelProperties"></p-menu>
-        <p-button [label]="'addProperty' | translate" icon="fa fa-plus" iconPos="right" class="button-add-property"
-          (click)="menuAddProperty.toggle($event)">
-        </p-button>
-        <p-button [label]="'addGroup' | translate" icon="fa fa-plus" iconPos="right" class="button-add-group"
-          (click)="addGroup()">
-        </p-button>
-      </div>
-      <div class="workpack-model-addicional-properties">
-        <div *ngFor="let property of modelProperties" [class.addicional-properties-container]="property.isCollapsed"
-          [class.addicional-properties-group-container]="property.type === typePropertyEnum.GroupModel"
-          [class.open]="!property.isCollapsed">
-          <app-property-model class="addicional-properties"
-            *ngIf="property.type !== typePropertyEnum.GroupModel" [property]="property"
-            [class.open]="!property.isCollapsed" (delete)="deleteProperty($event)" (changed)="propertyChanged($event);">
-          </app-property-model>
-          <div class="workpack-model-groups" *ngIf="property.type === typePropertyEnum.GroupModel">
-            <ng-container *ngTemplateOutlet="groupProperty; context: { $implicit: property }">
-            </ng-container>
-          </div>
+  
+  <div class="app-workpack-model-main-content">
+    <div class="card-properties card workpack-model" *ngIf="!cardProperties?.isLoading">
+      <app-card [properties]="cardProperties" *ngIf="cardProperties" class="mt-0 inputs-float-label">
+        <div class="workpack-model-properties p-fluid" [formGroup]="formProperties">
+          <span class="p-float-label property-input p-field">
+            <input class="app-input-text" id="input-name" type="text" pInputText formControlName="name"
+              (change)="propertyChanged($event);" />
+            <label class="app-input-label" for="input-name">{{ 'modelName' | translate }} *</label>
+          </span>
+          <span class="p-float-label property-input p-field">
+            <input class="app-input-text" id="input-name-plural" type="text" pInputText formControlName="nameInPlural"
+              (change)="propertyChanged($event);" />
+            <label class="app-input-label" for="input-name-plural">{{ 'modelNameInPlural' | translate }} *</label>
+          </span>
+          <span class="p-float-label property-input p-field">
+            <p-inputNumber class="app-input-number" id="input-position" formControlName="position" [min]="1" [step]="1"
+              (onInput)="propertyChanged($event);"></p-inputNumber>
+            <label class="app-input-label" for="input-position">{{ 'position' | translate }} *</label>
+          </span>
+          <span class="p-float-label property-input p-field">
+            <p-dropdown class="app-single-selection" inputId="input-icon" [options]="icons" formControlName="icon"
+              [autoDisplayFirst]="false" [filter]="true" filterBy="label" [showClear]="true" [virtualScroll]="true"
+              [itemSize]="50" optionValue="name" (onChange)="propertyChanged($event);">
+              <ng-template pTemplate="selectedItem">
+                <div class="icon-item-selected" *ngIf="formProperties.controls.icon.value">
+                  <i [ngClass]="formProperties.controls.icon.value"></i>
+                </div>
+              </ng-template>
+              <ng-template let-icon pTemplate="item">
+                <div class="icon-item">
+                  <i [ngClass]="icon.name"></i>
+                  <div>{{ icon.label }}</div>
+                </div>
+              </ng-template>
+            </p-dropdown>
+            <label class="app-input-label" for="input-icon">{{ 'icon' | translate }} *</label>
+          </span>
+          <span class="p-float-label property-input p-field">
+            <p-dropdown class="app-single-selection" inputId="input-sort-by" (onClick)="getSortedByList()"
+              (onChange)="propertyChanged($event);" [autoDisplayFirst]="true" [options]="sortedByList"
+              formControlName="sortedBy">
+            </p-dropdown>
+            <label class="app-input-label" for="input-sort-by">{{ 'sortedBy' | translate }} *</label>
+          </span>
         </div>
-      </div>
-    </app-card>
-  </div>
-
-  <ng-container *ngIf="workpackModelType !== 'MilestoneModel'">
-    <div class="card stakeholders">
-      <app-card [properties]="cardPropertiesStakeholders" *ngIf="cardPropertiesStakeholders" class="inputs-float-label">
-        <span class="p-float-label app-input-chips">
-          <p-chips [(ngModel)]="posibleRolesPerson" separator="," [allowDuplicate]="false"
-            (ngModelChange)="checkProperties(true)"
-            [class.p-inputwrapper-filled]="posibleRolesPerson && !!posibleRolesPerson.length"
-            [disabled]="!editPermission"></p-chips>
-          <label class="app-input-label" for="float-label">{{ 'possibleRolesPerson' | translate }} *</label>
-          <span class="under-label">{{ 'useCommaToSeparateValues' | translate }}</span>
-        </span>
-        <span class="p-float-label app-input-chips">
-          <p-chips [(ngModel)]="posibleRolesOrg" separator="," [allowDuplicate]="false"
-            (ngModelChange)="checkProperties(true)"
-            [class.p-inputwrapper-filled]="posibleRolesOrg && !!posibleRolesOrg?.length" [disabled]="!editPermission">
-          </p-chips>
-          <label class="app-input-label" for="float-label">{{ 'possibleRolesOrg' | translate }} *</label>
-          <span class="under-label">{{ 'useCommaToSeparateValues' | translate }}</span>
-        </span>
-      </app-card>
-    </div>
-    <div class="card dashboard" *ngIf="dashboardPanel">
-      <app-card [properties]="cardPropertiesDashboard" *ngIf="cardPropertiesDashboard" class="inputs-float-label">
-        <div class="dashboard-show-options app-input-chips">
-          <label class="app-input-label">{{'showStakeholders'|translate}}</label>
-          <p-multiSelect [options]="dashboardPanel.dashboardStakeholderRolesOptions" optionLabel="label"
-            [selectedItemsLabel]="currentLang === 'pt-BR' ? '{0} itens selecionados' : '{0} items selected'"
-            (onChange)="checkProperties()" optionValue="value"
-            [(ngModel)]="dashboardPanel.dashboardShowStakeholders" display="chip">
-          </p-multiSelect>
+        <div class="workpack-model-addicional-properties add-actions" *ngIf="editPermission">
+          <p-menu #menuAddProperty [popup]="true" [model]="menuModelProperties"></p-menu>
+          <p-button [label]="'addProperty' | translate" icon="fa fa-plus" iconPos="right" class="button-add-property"
+            (click)="menuAddProperty.toggle($event)">
+          </p-button>
+          <p-button [label]="'addGroup' | translate" icon="fa fa-plus" iconPos="right" class="button-add-group"
+            (click)="addGroup()">
+          </p-button>
         </div>
-        <div class="toggles-container">
-          <div class="toggle-item">
-            <label class="label-toggle">{{'milestone'|translate}}</label>
-            <p-inputSwitch class="app-toggle" [(ngModel)]="dashboardPanel.dashboardShowMilestones"
-              (ngModelChange)="checkProperties()">
-            </p-inputSwitch>
-          </div>
-          <div class="toggle-item">
-            <label class="label-toggle">EVA</label>
-            <p-inputSwitch class="app-toggle" [(ngModel)]="dashboardPanel.dashboardShowEva"
-              (ngModelChange)="checkProperties()">
-            </p-inputSwitch>
-          </div>
-          <div class="toggle-item">
-            <label class="label-toggle">{{'risk'|translate}}</label>
-            <p-inputSwitch class="app-toggle" [(ngModel)]="dashboardPanel.dashboardShowRisks"
-              (ngModelChange)="checkProperties()">
-            </p-inputSwitch>
+        <div class="workpack-model-addicional-properties">
+          <div *ngFor="let property of modelProperties" [class.addicional-properties-container]="property.isCollapsed"
+            [class.addicional-properties-group-container]="property.type === typePropertyEnum.GroupModel"
+            [class.open]="!property.isCollapsed">
+            <app-property-model class="addicional-properties"
+              *ngIf="property.type !== typePropertyEnum.GroupModel" [property]="property"
+              [class.open]="!property.isCollapsed" (delete)="deleteProperty($event)" (changed)="propertyChanged($event);">
+            </app-property-model>
+            <div class="workpack-model-groups" *ngIf="property.type === typePropertyEnum.GroupModel">
+              <ng-container *ngTemplateOutlet="groupProperty; context: { $implicit: property }">
+              </ng-container>
+            </div>
           </div>
         </div>
       </app-card>
     </div>
-    <div class="card risk-and-issues">
-      <app-card [properties]="cardPropertiesRiskAndIssues" *ngIf="cardPropertiesRiskAndIssues"
-        class="inputs-float-label">
-      </app-card>
-    </div>
-    <div class="card cost-accounts">
-      <app-card [properties]="cardPropertiesCostAccount" *ngIf="cardPropertiesCostAccount">
-      </app-card>
-    </div>
-    <div class="card schedule" *ngIf="workpackModelType === 'DeliverableModel'">
-      <app-card [properties]="cardPropertiesSchedule" *ngIf="cardPropertiesSchedule">
-      </app-card>
-    </div>
-    <div class="card processes">
-      <app-card [properties]="cardPropertiesProcesses" *ngIf="cardPropertiesProcesses" class="inputs-float-label">
-      </app-card>
-    </div>
-    <div class="card journal">
-      <app-card [properties]="cardPropertiesJournal" *ngIf="cardPropertiesJournal">
-      </app-card>
-    </div>
-  </ng-container>
-
-  <div class="card models">
-    <app-card [properties]="cardPropertiesModels" *ngIf="cardPropertiesModels && idWorkpackModel">
-      <div class="loading-container" *ngIf="isLoading">
-        <app-card-loading [isCardLoading]="isLoading"></app-card-loading>
+  
+    <ng-container *ngIf="workpackModelType !== 'MilestoneModel' && !cardProperties?.isLoading" >
+      <div class="card stakeholders">
+        <app-card [properties]="cardPropertiesStakeholders" *ngIf="cardPropertiesStakeholders" class="inputs-float-label">
+          <span class="p-float-label app-input-chips">
+            <p-chips [(ngModel)]="posibleRolesPerson" separator="," [allowDuplicate]="false"
+              (ngModelChange)="checkProperties(true)"
+              [class.p-inputwrapper-filled]="posibleRolesPerson && !!posibleRolesPerson.length"
+              [disabled]="!editPermission"></p-chips>
+            <label class="app-input-label" for="float-label">{{ 'possibleRolesPerson' | translate }} *</label>
+            <span class="under-label">{{ 'useCommaToSeparateValues' | translate }}</span>
+          </span>
+          <span class="p-float-label app-input-chips">
+            <p-chips [(ngModel)]="posibleRolesOrg" separator="," [allowDuplicate]="false"
+              (ngModelChange)="checkProperties(true)"
+              [class.p-inputwrapper-filled]="posibleRolesOrg && !!posibleRolesOrg?.length" [disabled]="!editPermission">
+            </p-chips>
+            <label class="app-input-label" for="float-label">{{ 'possibleRolesOrg' | translate }} *</label>
+            <span class="under-label">{{ 'useCommaToSeparateValues' | translate }}</span>
+          </span>
+        </app-card>
       </div>
-      <p-dataView [value]="cardItemsModels" layout="grid" class="app-dataview"
-        [emptyMessage]="'loadingEllipsis' | translate"
-        *ngIf="(idWorkpackModel && displayModeAll === 'grid' || (displayModeAll === 'list' && !!isMobileView)) && !isLoading"
-        [paginator]="true" [rows]="pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false"
-        [totalRecords]="totalRecords">
-        <ng-template let-cardItem pTemplate="gridItem">
-          <div class="p-col-12 p-md-3 p-sm-12 card-item-container">
-            <app-card-item [properties]="cardItem" (reuseModelSelected)="handleReuseWorkpackModel($event)">
-            </app-card-item>
+      <div class="card dashboard" *ngIf="dashboardPanel">
+        <app-card [properties]="cardPropertiesDashboard" *ngIf="cardPropertiesDashboard" class="inputs-float-label">
+          <div class="dashboard-show-options app-input-chips">
+            <label class="app-input-label">{{'showStakeholders'|translate}}</label>
+            <p-multiSelect [options]="dashboardPanel.dashboardStakeholderRolesOptions" optionLabel="label"
+              [selectedItemsLabel]="currentLang === 'pt-BR' ? '{0} itens selecionados' : '{0} items selected'"
+              (onChange)="checkProperties()" optionValue="value"
+              [(ngModel)]="dashboardPanel.dashboardShowStakeholders" display="chip">
+            </p-multiSelect>
           </div>
-        </ng-template>
-      </p-dataView>
-      <p-dataView [value]="cardItemsModels" layout="list" class="app-dataview app-dataview-list"
-        *ngIf="(idWorkpackModel && displayModeAll === 'list' && !isMobileView) && !isLoading" [paginator]="true"
-        [rows]="pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false" [totalRecords]="totalRecords"
-        [emptyMessage]="'loadingEllipsis' | translate">
-        <ng-template let-cardItem pTemplate="listItem">
-          <div class="p-col-12">
-            <app-card-item [properties]="cardItem" [displayModeCard]="displayModeAll"
-              (reuseModelSelected)="handleReuseWorkpackModel($event)"></app-card-item>
+          <div class="toggles-container">
+            <div class="toggle-item">
+              <label class="label-toggle">{{'milestone'|translate}}</label>
+              <p-inputSwitch class="app-toggle" [(ngModel)]="dashboardPanel.dashboardShowMilestones"
+                (ngModelChange)="checkProperties()">
+              </p-inputSwitch>
+            </div>
+            <div class="toggle-item">
+              <label class="label-toggle">EVA</label>
+              <p-inputSwitch class="app-toggle" [(ngModel)]="dashboardPanel.dashboardShowEva"
+                (ngModelChange)="checkProperties()">
+              </p-inputSwitch>
+            </div>
+            <div class="toggle-item">
+              <label class="label-toggle">{{'risk'|translate}}</label>
+              <p-inputSwitch class="app-toggle" [(ngModel)]="dashboardPanel.dashboardShowRisks"
+                (ngModelChange)="checkProperties()">
+              </p-inputSwitch>
+            </div>
           </div>
-        </ng-template>
-      </p-dataView>
-    </app-card>
-  </div>
-  <div class="id-container" *ngIf="idWorkpackModel">
-    <span>{{idWorkpackModel}}</span>
+        </app-card>
+      </div>
+      <div class="card risk-and-issues">
+        <app-card [properties]="cardPropertiesRiskAndIssues" *ngIf="cardPropertiesRiskAndIssues"
+          class="inputs-float-label">
+        </app-card>
+      </div>
+      <div class="card cost-accounts">
+        <app-card [properties]="cardPropertiesCostAccount" *ngIf="cardPropertiesCostAccount">
+        </app-card>
+      </div>
+      <div class="card schedule" *ngIf="workpackModelType === 'DeliverableModel'">
+        <app-card [properties]="cardPropertiesSchedule" *ngIf="cardPropertiesSchedule">
+        </app-card>
+      </div>
+      <div class="card processes">
+        <app-card [properties]="cardPropertiesProcesses" *ngIf="cardPropertiesProcesses" class="inputs-float-label">
+        </app-card>
+      </div>
+      <div class="card journal">
+        <app-card [properties]="cardPropertiesJournal" *ngIf="cardPropertiesJournal">
+        </app-card>
+      </div>
+    </ng-container>
+  
+    <div class="card models">
+      <app-card [properties]="cardPropertiesModels" *ngIf="cardPropertiesModels && idWorkpackModel">
+        <div class="loading-container" *ngIf="isLoading">
+          <app-card-loading [isCardLoading]="isLoading"></app-card-loading>
+        </div>
+        <p-dataView [value]="cardItemsModels" layout="grid" class="app-dataview"
+          [emptyMessage]="'loadingEllipsis' | translate"
+          *ngIf="(idWorkpackModel && displayModeAll === 'grid' || (displayModeAll === 'list' && !!isMobileView)) && !isLoading"
+          [paginator]="true" [rows]="pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false"
+          [totalRecords]="totalRecords">
+          <ng-template let-cardItem pTemplate="gridItem">
+            <div class="p-col-12 p-md-3 p-sm-12 card-item-container">
+              <app-card-item [properties]="cardItem" (reuseModelSelected)="handleReuseWorkpackModel($event)">
+              </app-card-item>
+            </div>
+          </ng-template>
+        </p-dataView>
+        <p-dataView [value]="cardItemsModels" layout="list" class="app-dataview app-dataview-list"
+          *ngIf="(idWorkpackModel && displayModeAll === 'list' && !isMobileView) && !isLoading" [paginator]="true"
+          [rows]="pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false" [totalRecords]="totalRecords"
+          [emptyMessage]="'loadingEllipsis' | translate">
+          <ng-template let-cardItem pTemplate="listItem">
+            <div class="p-col-12">
+              <app-card-item [properties]="cardItem" [displayModeCard]="displayModeAll"
+                (reuseModelSelected)="handleReuseWorkpackModel($event)"></app-card-item>
+            </div>
+          </ng-template>
+        </p-dataView>
+      </app-card>
+    </div>
+    <div class="id-container" *ngIf="idWorkpackModel">
+      <span>{{idWorkpackModel}}</span>
+    </div>
   </div>
   <app-save-button *ngIf="editPermission" #saveButton (save)="handleSubmit()"></app-save-button>
 </div>

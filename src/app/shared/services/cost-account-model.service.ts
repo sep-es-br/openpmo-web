@@ -8,7 +8,7 @@ import { PrepareHttpParams } from '../utils/query.util';
 @Injectable({
   providedIn: 'root'
 })
-export class CostAccountModelService extends BaseService<any> {
+export class CostAccountModelService extends BaseService<ICostAccountModel> {
 
   constructor(
     @Inject(Injector) injector: Injector,

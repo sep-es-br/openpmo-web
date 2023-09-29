@@ -51,6 +51,7 @@ export class StrategyListComponent implements OnInit, OnDestroy {
   $destroy = new Subject();
   isLoading = false;
   term = '';
+  isCloning = false;
 
   constructor(
     private planModelSvr: PlanModelService,
@@ -192,7 +193,9 @@ export class StrategyListComponent implements OnInit, OnDestroy {
   }
 
   async handleCreateNewEstrategyFromShared(idPlanModel) {
+    this.isCloning = true;
     const result = await this.planModelSvr.createPlanModelFromShared(this.idOffice, idPlanModel);
+    this.isCloning = false;
     if (result.success) {
       this.router.navigate(['strategies/strategy'], {
         queryParams: {

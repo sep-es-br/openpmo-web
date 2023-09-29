@@ -211,6 +211,7 @@ export class OfficeListComponent implements OnInit {
     if (idFilter) {
       const filterProperties = this.loadFilterPropertiesList();
       this.filterSrv.setFilterProperties(filterProperties);
+      localStorage.removeItem('@pmo/current-breadcrumb');
       this.router.navigate(['/filter-dataview'], {
         queryParams: {
           id: idFilter,
@@ -234,6 +235,7 @@ export class OfficeListComponent implements OnInit {
   handleNewFilter() {
     const filterProperties = this.loadFilterPropertiesList();
     this.filterSrv.setFilterProperties(filterProperties);
+    localStorage.removeItem('@pmo/current-breadcrumb');
     this.router.navigate(['/filter-dataview'], {
       queryParams: {
         entityName: 'offices'

@@ -4,9 +4,31 @@
     display: flex;
     flex-direction: row;
   }
+  ::ng-deep .card-properties {
+    .p-toggleable-content {
+      position: relative;
+    }
+  }
   .loading-container {
     position: relative;
     min-height: 150px;
+  }
+  .loading-form-container {
+    position: absolute;
+    min-height: 150px;
+    z-index: 10000;
+    display: flex;
+    width: 100%;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    background-color: #d0d8d9;
+    opacity: 0.4;
+    left: 0;
+    .app-card-loading {
+      background-color: #d0d8d9;
+      opacity: 0.4;
+    }
   }
   .app-content-header {
     display: flex;

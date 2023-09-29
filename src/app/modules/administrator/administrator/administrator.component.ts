@@ -51,6 +51,7 @@ export class AdministratorComponent implements OnInit, OnDestroy {
   showMessageInvalidEmail = false;
   $destroy = new Subject();
   isLoading = false;
+  formIsSaving = false;
 
   constructor(
     private responsiveSrv: ResponsiveService,
@@ -258,6 +259,7 @@ export class AdministratorComponent implements OnInit, OnDestroy {
       return;
     }
     if (this.person && this.person.id) {
+      this.formIsSaving = true;
       const result = await this.personSrv.setPersonAdministrator(this.person.id, true);
       if (result.success) {
         this.messageSrv.add({
@@ -265,11 +267,13 @@ export class AdministratorComponent implements OnInit, OnDestroy {
           summary: this.translateSrv.instant('success'),
           detail: this.translateSrv.instant('messages.savedSuccessfully')
         });
+        this.formIsSaving = false;
         await this.router.navigate(
           ['/administrators'],
         );
       }
     } else {
+      this.formIsSaving = true;
       const result = await this.personSrv.post({
         ...this.person,
         administrator: true,
@@ -281,6 +285,7 @@ export class AdministratorComponent implements OnInit, OnDestroy {
           summary: this.translateSrv.instant('success'),
           detail: this.translateSrv.instant('messages.savedSuccessfully')
         });
+        this.formIsSaving = false;
         await this.router.navigate(
           ['/administrators'],
         );

@@ -42,6 +42,8 @@ export class PersonProfileComponent implements OnInit, OnDestroy {
   changedAvatar = false;
   deletedAvatar = false;
   avatarData;
+  isLoading = false;
+  formIsSaving = false;
 
   constructor(
     private personSrv: PersonService,
@@ -80,10 +82,12 @@ export class PersonProfileComponent implements OnInit, OnDestroy {
   }
 
   async loads() {
+    this.isLoading = true;
     this.loadIdPerson();
     await this.loadUserAdmin();
     await this.loadOptionsOffices();
     await this.loadPerson();
+    this.isLoading = false;
     this.setBreadcrumb();
   }
 
@@ -260,6 +264,7 @@ export class PersonProfileComponent implements OnInit, OnDestroy {
   }
 
   async savePerson() {
+    this.formIsSaving = true;
     if (this.changedAvatar) {
       await this.updateAvatar();
     }
@@ -292,6 +297,7 @@ export class PersonProfileComponent implements OnInit, OnDestroy {
           summary: this.translateSrv.instant('success'),
           detail: this.translateSrv.instant('messages.savedSuccessfully')
         });
+        this.formIsSaving = false;
       }
     } else {
       const { success } = await this.personSrv.updateNameAdministradorPerson(this.idPerson, sender.name);
@@ -301,6 +307,7 @@ export class PersonProfileComponent implements OnInit, OnDestroy {
           summary: this.translateSrv.instant('success'),
           detail: this.translateSrv.instant('messages.savedSuccessfully')
         });
+        this.formIsSaving = false;
       }
     }
   }

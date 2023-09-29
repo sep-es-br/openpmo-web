@@ -2,6 +2,10 @@
 
 .app-workpack-model {
   width: 100%;
+  
+  .app-workpack-model-content-main {
+    position: relative;
+  }
 
   .app-workpack-model-header {
     padding: 0.5em 0 0 0;
@@ -14,6 +18,24 @@
   .loading-container {
     position: relative;
     min-height: 150px;
+  }
+  .loading-form-container {
+    position: absolute;
+    min-height: 150px;
+    z-index: 10000;
+    display: flex;
+    width: 100%;
+    height: 100%;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    background-color: #d0d8d9;
+    opacity: 0.4;
+    left: 0;
+    .app-card-loading {
+      background-color: #d0d8d9;
+      opacity: 0.4;
+    }
   }
 
   .header-container {

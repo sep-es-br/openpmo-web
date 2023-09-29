@@ -121,6 +121,7 @@ export class WorkpackModelComponent implements OnInit {
   currentBreadcrumbItems: IBreadcrumb[];
   currentBreadcrumbSub: Subscription;
   isLoading = false;
+  formIsSaving = false;
 
   constructor(
     private router: Router,
@@ -1304,6 +1305,7 @@ export class WorkpackModelComponent implements OnInit {
   }
 
   async handleSubmit() {
+    this.formIsSaving = true;
     this.modelProperties.forEach(prop => {
       delete prop.extraList;
       delete prop.extraListDefaults;
@@ -1404,6 +1406,7 @@ export class WorkpackModelComponent implements OnInit {
             ...this.idParentWorkpack ? { idParent: this.idParentWorkpack } : {}
           }
         });
+        this.formIsSaving = false;
       }
       await this.refreshPropertiesLists();
       this.setCurrentBreadcrumb();
@@ -1412,6 +1415,7 @@ export class WorkpackModelComponent implements OnInit {
         summary: this.translateSrv.instant('success'),
         detail: this.translateSrv.instant('messages.savedSuccessfully')
       });
+      this.formIsSaving = false;
       this.menuSrv.reloadMenuPlanModel();
     }
   }
@@ -1512,6 +1516,7 @@ export class WorkpackModelComponent implements OnInit {
 
   async handleReuseWorkpackModel(event) {
     const idReusableWorkpackModelSelected = event.idModel;
+    this.isLoading = true;
     const result = await this.workpackModelSrv.reuseWorkpackModel(idReusableWorkpackModelSelected, this.idWorkpackModel);
     if (result.success) {
       this.childrenModels.push({ ...result.data });

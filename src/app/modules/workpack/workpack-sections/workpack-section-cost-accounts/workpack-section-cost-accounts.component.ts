@@ -14,6 +14,8 @@ import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 import { Router } from '@angular/router';
 import { Subject } from 'rxjs';
 import { WorkpackShowTabviewService } from 'src/app/shared/services/workpack-show-tabview.service';
+import { PlanService } from 'src/app/shared/services/plan.service';
+import { CostAccountModelService } from 'src/app/shared/services/cost-account-model.service';
 
 @Component({
   selector: 'app-workpack-section-cost-accounts',
@@ -38,6 +40,7 @@ export class WorkpackSectionCostAccountsComponent implements OnInit, OnDestroy {
   filters;
   funders;
   sectionActive = false;
+  idCostAccountModel: number;
 
   constructor(
     private costAccountSrv: CostAccountService,
@@ -47,7 +50,9 @@ export class WorkpackSectionCostAccountsComponent implements OnInit, OnDestroy {
     private configDataViewSrv: ConfigDataViewService,
     private workpackBreadcrumbStorageSrv: WorkpackBreadcrumbStorageService,
     private responsiveSrv: ResponsiveService,
-    private workpackShowTabviewSrv: WorkpackShowTabviewService
+    private workpackShowTabviewSrv: WorkpackShowTabviewService,
+    private planSrv: PlanService,
+    private costAccountModelSrv: CostAccountModelService
   ) {
     this.workpackShowTabviewSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => {
       this.showTabview = value;
@@ -105,6 +110,7 @@ export class WorkpackSectionCostAccountsComponent implements OnInit, OnDestroy {
       workpackParams,
       filters,
       costAccounts,
+      idCostAccountModel,
       idFilterSelected,
       term,
       funders,
@@ -114,6 +120,7 @@ export class WorkpackSectionCostAccountsComponent implements OnInit, OnDestroy {
     this.workpackParams = workpackParams;
     this.filters = filters;
     this.costAccounts = costAccounts;
+    this.idCostAccountModel = idCostAccountModel;
     this.idFilterSelected = idFilterSelected;
     this.funders = funders;
     this.term = term;
@@ -124,7 +131,6 @@ export class WorkpackSectionCostAccountsComponent implements OnInit, OnDestroy {
     } else {
       this.sectionCostAccount.cardSection.isLoading = true;
     }
-    
   }
 
   async getCostAccounts() {
@@ -269,6 +275,7 @@ export class WorkpackSectionCostAccountsComponent implements OnInit, OnDestroy {
         queryParams: {
           id: idFilter,
           entityName: `costAccounts`,
+          idCostAccountModel: this.idCostAccountModel,
           idWorkpackModel: this.workpackData.workpack.model.id,
           idOffice: this.workpackParams.idOffice
         }
@@ -291,6 +298,7 @@ export class WorkpackSectionCostAccountsComponent implements OnInit, OnDestroy {
     this.router.navigate(['/filter-dataview'], {
       queryParams: {
         entityName: `costAccounts`,
+        idCostAccountModel: this.idCostAccountModel,
         idWorkpackModel: this.workpackData.workpack.model.id,
         idOffice: this.workpackParams.idOffice
       }

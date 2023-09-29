@@ -12,10 +12,12 @@ import { Subject } from 'rxjs';
 import { WorkpackShowTabviewService } from 'src/app/shared/services/workpack-show-tabview.service';
 import { IconsTypeWorkpackEnum } from 'src/app/shared/enums/IconsTypeWorkpackModelEnum';
 import { IBaseline } from 'src/app/shared/interfaces/IBaseline';
-import { Router } from '@angular/router';
+import { Route, Router } from '@angular/router';
 import { IWorkpackParams } from 'src/app/shared/interfaces/IWorkpackDataParams';
 import { WorkpackBreadcrumbStorageService } from 'src/app/shared/services/workpack-breadcrumb-storage.service';
 import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
+import { Menu } from 'primeng/menu';
+import { TieredMenu } from 'primeng/tieredmenu';
 
 @Component({
   selector: 'app-workpack-section-dashboard',
@@ -62,12 +64,16 @@ export class WorkpackSectionDashboardComponent implements OnInit, OnChanges, OnD
   scheduleInterval;
   workpackParams: IWorkpackParams;
   sectionActive = false;
+  idMenuLoading: number;
 
   constructor(
     private dashboardSrv: DashboardService,
     private translateSrv: TranslateService,
     private responsiveSrv: ResponsiveService,
     private workpackShowTabviewSrv: WorkpackShowTabviewService,
+    private route: Router,
+    private workpackBreadcrumbStorageSrv: WorkpackBreadcrumbStorageService,
+    private breadcrumbSrv: BreadcrumbService
   ) {
     this.isLoading = true;
     this.workpackShowTabviewSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => {
@@ -137,6 +143,7 @@ export class WorkpackSectionDashboardComponent implements OnInit, OnChanges, OnD
     this.baselines = baselines;
     this.selectedBaseline = selectedBaseline;
     this.dashboard = dashboard;
+    if (this.dashboard && this.dashboard.workpacksByModel) this.dashboard.workpacksByModel.sort( (a, b) => a.level - b.level);
     this.yearRange = yearRange;
     this.startDate = startDate;
     this.endDate = endDate;
@@ -177,6 +184,67 @@ export class WorkpackSectionDashboardComponent implements OnInit, OnChanges, OnD
     && (!this.dashboard.workpacksByModel || this.dashboard.workpacksByModel.length === 0)) {
       this.dashboard = undefined;
     }
+  }
+
+  async loadWorkpackModelMenu(idWorkpackModel, level, index, event) {
+    if (this.dashboard.workpacksByModel[index].menuItems) {
+      return;
+    }
+    this.idMenuLoading = idWorkpackModel;
+    const result = await this.dashboardSrv.GetMenuItemsByWorkpackModel({
+      idWorkpackActual: this.workpackParams.idWorkpack,
+      idWorkpackModel: idWorkpackModel,
+      menuLevel: level
+    });
+    if (result.success) {
+      this.dashboard.workpacksByModel[index].menuItems = result.data && result.data.length > 0 ? result.data.map( wp => ({
+        label: wp.name,
+        icon: wp.icon,
+        command: (e) => {
+          const classList = Array.from(e.originalEvent?.target?.classList) || [];
+          if (classList.some((className: string) => ['p-menuitem-text', 'fas'].includes(className))) {
+            e.item.expanded = false;
+            this.navigateToWorkpackItem(wp, this.workpackParams.idPlan)
+          }
+        },
+        items: wp.workpacks && wp.workpacks.length > 0 ? wp.workpacks.map( child => ({
+          label: child.name,
+          icon: child.icon,
+          command: () => this.navigateToWorkpackItem(child, this.workpackParams.idPlan)
+        })) : undefined
+      })) : undefined;
+      this.idMenuLoading = undefined;
+    }
+  }
+
+  closeItemsMenu(index) {
+    this.dashboard.workpacksByModel[index].menuItems = this.dashboard.workpacksByModel[index].menuItems &&
+      this.dashboard.workpacksByModel[index].menuItems.map( item => ({...item, expanded: false}));
+  }
+
+  navigateToWorkpackItem(wp, idPlan) {
+    this.setWorkpackBreadcrumbStorage(wp.id, idPlan);
+    if (wp.linked) {
+      this.route.navigate(['workpack'], {
+        queryParams: {
+          id: wp.id,
+          idWorkpackModelLinked: wp.idWorkpackModel,
+          idPlan: idPlan
+        }
+      });
+    } else {
+      this.route.navigate(['workpack'], {
+        queryParams: {
+          id: wp.id,
+          idPlan: idPlan
+        }
+      });
+    }
+  }
+
+  async setWorkpackBreadcrumbStorage(idWorkpack, idPlan) {
+    const breadcrumbItems = await this.workpackBreadcrumbStorageSrv.getBreadcrumbs(idWorkpack, idPlan);
+    this.breadcrumbSrv.setBreadcrumbStorage(breadcrumbItems);
   }
 
   setDashboardMilestonesData() {

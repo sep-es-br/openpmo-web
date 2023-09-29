@@ -61,6 +61,7 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
   showMessagePublicServerNotFoundByName = false;
   isLoadingCitizen = false;
   isLoading = false;
+  formIsSaving = false;
 
   constructor(
     private actRouter: ActivatedRoute,
@@ -102,6 +103,7 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
   }
 
   async ngOnInit() {
+    this.isLoading = true;
     const editPermission = await this.officePermissionsSrv.getPermissions(this.idOffice);
     if (!editPermission) {
       await this.router.navigate(['/offices']);
@@ -183,6 +185,8 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
         };
       }
       this.loadCardItemsPersonPermissions();
+    } else {
+      this.isLoading = false;
     }
   }
 
@@ -368,7 +372,7 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
   }
 
   async savePermission() {
-    this.saveButton?.hideButton();
+    this.formIsSaving = true;
     this.permission.permissions = this.cardItemsOfficePermission
       .map(cardItem => (
         {
@@ -393,6 +397,7 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
         summary: this.translateSrv.instant('success'),
         detail: this.translateSrv.instant('messages.savedSuccessfully')
       });
+      this.formIsSaving = false;
       await this.router.navigate(['/offices', 'permission'], { queryParams: { idOffice: this.idOffice } });
     }
   }

@@ -29,6 +29,7 @@ import { IFilterProperty } from 'src/app/shared/interfaces/IFilterProperty';
 import { AuthService } from 'src/app/shared/services/auth.service';
 import { OfficePermissionService } from 'src/app/shared/services/office-permission.service';
 import { IOrganization } from 'src/app/shared/interfaces/IOrganization';
+import { CostAccountModelService } from 'src/app/shared/services/cost-account-model.service';
 
 @Component({
   selector: 'app-filter-dataview',
@@ -59,6 +60,7 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
   workpackModelEntitiesOptions = ['stakeholders', 'risks', 'issues', 'processes'];
   localityList;
   organizations: IOrganization[] = [];
+  idCostAccountModel: number;
 
   constructor(
     private responsiveSrv: ResponsiveService,
@@ -76,7 +78,8 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
     private locationSrv: Location,
     private authSrv: AuthService,
     private officePermissionSrv: OfficePermissionService,
-    private router: Router
+    private router: Router,
+    private costAccountModelSrv: CostAccountModelService
   ) {
     this.loadFormFilter();
     this.formFilter.statusChanges
@@ -90,10 +93,11 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
         }
       });
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.responsive = value);
-    this.activeRoute.queryParams.subscribe(({ id, entityName, idWorkpackModel, idOffice }) => {
+    this.activeRoute.queryParams.subscribe(({ id, entityName, idWorkpackModel, idOffice, idCostAccountModel }) => {
       this.idFilter = id ? +id : undefined;
       this.entityName = entityName;
       this.idWorkpackModel = idWorkpackModel ? +idWorkpackModel : undefined;
+      this.idCostAccountModel = idCostAccountModel ? +idCostAccountModel : undefined;
       this.idOffice = +idOffice;
       this.checkURL(`#${this.locationSrv.path()}`);
     });
@@ -347,6 +351,8 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
             ...lastItem.queryParams
           }
         });
+      } else {
+        this.router.navigate(['/offices']);
       }
   }
 
@@ -481,14 +487,14 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
   }
 
   async loadCostAccountFilterPropertiesList() {
-    const resultWorkpackModel = await this.workpackModelSrv.GetById(this.idWorkpackModel);
-    const workpackModel = resultWorkpackModel.success && resultWorkpackModel.data;
-    const workpackModelActivesProperties = workpackModel.properties.filter(w => w.active);
-    if (workpackModelActivesProperties && workpackModelActivesProperties
+    const resultCostAccountModel = await this.costAccountModelSrv.GetById(this.idCostAccountModel);
+    const costAccountModel = resultCostAccountModel.success && resultCostAccountModel.data;
+    const costAccountModelActivesProperties = costAccountModel.properties.filter(w => w.active);
+    if (costAccountModelActivesProperties && costAccountModelActivesProperties
       .filter(prop => this.typePropertyModel[prop.type] === TypePropertyModelEnum.OrganizationSelectionModel).length > 0) {
       await this.loadOrganizationsOffice();
     }
-    const costAccountPropertiesList = await Promise.all(workpackModelActivesProperties.map(p => this.instanceProperty(p)));
+    const costAccountPropertiesList = await Promise.all(costAccountModelActivesProperties.map( p => this.instanceProperty(p)));
     this.filterPropertiesList = costAccountPropertiesList;
   }
 
@@ -543,12 +549,8 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
     }
 
     if (this.typePropertyModel[propertyModel.type] === TypePropertyModelEnum.OrganizationSelectionModel) {
-      property.possibleValuesIds = this.organizations.filter( org => propertyModel.sectors.includes(org.sector))
+      property.possibleValuesIds = this.organizations.filter( org => propertyModel.sectors.includes(org.sector.toLowerCase()))
         .map(d => ({ label: d.name, value: d.id }));
-      if (!propertyModel.multipleSelection) {
-        const defaults = propertyModel.defaults && propertyModel.defaults as number[];
-        const defaultsValue = defaults && defaults[0];
-      }
     }
     if (this.typePropertyModel[propertyModel.type] === TypePropertyModelEnum.UnitSelectionModel) {
       property.possibleValuesIds = await this.loadUnitMeasuresOffice();
@@ -613,11 +615,7 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
   async loadOrganizationsOffice() {
     const result = await this.organizationSrv.GetAll({ 'id-office': this.idOffice });
     if (result.success) {
-      const organizationsOffice = result.data;
-      return organizationsOffice.map(org => ({
-        label: org.name,
-        value: org.id
-      })).sort( (a, b) => a.label.localeCompare(b.label));
+      this.organizations = result.data && result.data.sort( (a, b) => a.name.localeCompare(b.name));
     }
   }
 

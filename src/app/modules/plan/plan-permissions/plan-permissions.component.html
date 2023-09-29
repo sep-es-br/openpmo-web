@@ -7,6 +7,9 @@
   </div>
   <div class="card-permission">
     <app-card [properties]="cardPersonPermission" class="mt-0" [class.inputs-float-label]="!key" *ngIf="cardPersonPermission">
+      <div class="loading-form-container" *ngIf="formIsSaving">
+        <app-card-loading [isCardLoading]="formIsSaving"></app-card-loading>
+      </div>
       <div class="loading-container" *ngIf="isLoading">
         <app-card-loading [isCardLoading]="isLoading"></app-card-loading>
       </div>

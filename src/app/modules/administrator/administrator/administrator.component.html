@@ -84,6 +84,9 @@
           <i class="fas fa-hourglass-half"></i>
           <label class="loading-label">{{'messages.loading'|translate}} ...</label>
         </div>
+        <div class="loading-form-container" *ngIf="formIsSaving">
+          <app-card-loading [isCardLoading]="formIsSaving"></app-card-loading>
+        </div>
         <div class="person-container" *ngIf="person">
           <span class="fullName-person">{{person?.fullName}}</span>
           <span class="item-person">{{person?.email}}</span>
@@ -92,7 +95,6 @@
       </div>
     </app-card>
   </div>
-  <app-card-loading [isCardLoading]="isLoading" ></app-card-loading>
 </div>
 <app-save-button (save)="savePersonToAdministrator()"></app-save-button>
 

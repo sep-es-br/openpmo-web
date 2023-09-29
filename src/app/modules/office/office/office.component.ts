@@ -70,6 +70,7 @@ export class OfficeComponent implements OnDestroy {
     showFilters: true,
     initialStateCollapse: this.collapsePanelsStatus
   };
+  formIsSaving = false;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -113,7 +114,6 @@ export class OfficeComponent implements OnDestroy {
         this.cardProperties.isLoading = true;
         this.setWorkOffice();
       }
-      this.editPermission = await this.officePermissionSrv.getPermissions(this.idOffice);
       await this.load();
     });
     this.loadCards();
@@ -126,7 +126,8 @@ export class OfficeComponent implements OnDestroy {
       .subscribe(() => this.saveButton?.hideButton());
     this.formOffice.valueChanges
       .pipe(takeUntil(this.$destroy), filter(() => this.formOffice.dirty && this.formOffice.valid))
-      .subscribe(() => this.saveButton.showButton());
+      .subscribe(() => {
+        this.saveButton.showButton()});
     this.responsiveSvr.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.responsive = value);
     localStorage.removeItem('open-pmo:WORKPACK_TABVIEW');
   }
@@ -152,6 +153,7 @@ export class OfficeComponent implements OnDestroy {
   async load() {
     this.isLoading = true;
     this.isUserAdmin = await this.authSrv.isUserAdmin();
+    this.editPermission = await this.officePermissionSrv.getPermissions(this.idOffice);
     await this.loadPropertiesOffice();
     if (this.idOffice) {
       await this.loadPlans();
@@ -164,11 +166,9 @@ export class OfficeComponent implements OnDestroy {
 
   async loadPropertiesOffice() {
     if (this.idOffice) {
-      const { data, success } = await this.officeSrv.GetById(this.idOffice);
-      if (success && data) {
-        this.propertiesOffice = data;
-        localStorage.setItem('@pmo/propertiesCurrentOffice', JSON.stringify(this.propertiesOffice));
-        this.formOffice.reset({ name: data.name, fullName: data.fullName });
+      this.propertiesOffice = await this.officeSrv.getCurrentOffice(this.idOffice);
+      if (this.propertiesOffice) {
+        this.formOffice.reset({ name: this.propertiesOffice.name, fullName: this.propertiesOffice.fullName });
         if (!this.editPermission) {
           this.formOffice.disable();
         }
@@ -203,7 +203,11 @@ export class OfficeComponent implements OnDestroy {
   async loadPlans() {
     this.isLoading = true;
     await this.loadPlanModelsOfficeList();
-    
+    const filters = await this.loadFiltersPlans();
+    this.cardPlans = {
+      ...this.cardPlans,
+      filters
+    }
     const result = await this.planSrv.GetAll({ 'id-office': this.idOffice, 'idFilter': this.idFilterSelected });
     if (result.success) {
       this.plans = result.data;
@@ -252,12 +256,10 @@ export class OfficeComponent implements OnDestroy {
     }
     this.cardItemsPlans = itemsPlans;
     this.totalRecords = this.cardItemsPlans && this.cardItemsPlans.length;
-    const filters = await this.loadFiltersPlans();
     this.cardPlans = {
       ...this.cardPlans,
       showCreateNemElementButton:  this.editPermission && this.menuItemsNewPlan?.length > 0 ? true : false,
-      createNewElementMenuItems: this.menuItemsNewPlan,
-      filters
+      createNewElementMenuItems: this.menuItemsNewPlan
     }
     
   }
@@ -292,31 +294,36 @@ export class OfficeComponent implements OnDestroy {
   }
 
   async handleOnSubmit() {
-    const isPut = !!this.propertiesOffice;
+    const isPut = !!this.idOffice;
+    this.formIsSaving = true;
     const { success, data } = isPut
       ? await this.officeSrv.put({ ...this.formOffice.value, id: this.idOffice })
       : await this.officeSrv.post(this.formOffice.value);
-    if (success) {
+    if (success) {                     
       this.idOffice = data.id;
       if (!this.isUserAdmin && !isPut) {
-        await this.createOfficePermission(data.id);
+        this.createOfficePermission(data.id);
       }
-      await this.loadPropertiesOffice();
       this.messageSrv.add({
         severity: 'success',
         summary: this.translateSrv.instant('success'),
         detail: this.translateSrv.instant('messages.savedSuccessfully')
       });
       if (!isPut) {
-        this.loadPlans();
         this.personSrv.setPersonWorkLocal({
           idOffice: this.idOffice,
           idPlan: null,
           idWorkpack: null,
           idWorkpackModelLinked: null
         });
-        this.router.navigate([], { queryParams: { id: this.idOffice } });
+        this.propertiesOffice = {
+          ...this.formOffice.value
+        };
+        localStorage.setItem('@pmo/propertiesCurrentOffice', JSON.stringify(this.propertiesOffice));
+        localStorage.setItem('@pmo/propertiesCurrentOffice', this.idOffice.toString());
+        this.officeSrv.nextIDOffice(this.idOffice);
       }
+      this.formIsSaving = false;
       this.menuSrv.reloadMenuOffice();
     }
   }
@@ -342,7 +349,6 @@ export class OfficeComponent implements OnDestroy {
       this.idFilterSelected = filterDefault ? filterDefault.id : undefined;
       return result.data;
     }
-    
   }
 
   handleEditFilter(event) {

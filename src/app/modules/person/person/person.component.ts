@@ -48,6 +48,8 @@ export class PersonComponent implements OnInit, OnDestroy {
   changedAvatar = false;
   deletedAvatar = false;
   avatarData;
+  isLoading = false;
+  formIsSaving = false;
 
   constructor(
     private personSrv: PersonService,
@@ -139,9 +141,11 @@ export class PersonComponent implements OnInit, OnDestroy {
 
 
   async loads() {
+    this.isLoading = true;
     await this.loadOffice();
     await this.loadPerson();
     await this.loadUserAdmin();
+    this.isLoading = false;
     this.setBreadcrumb();
   }
 
@@ -150,7 +154,7 @@ export class PersonComponent implements OnInit, OnDestroy {
   }
 
   async loadPerson() {
-    this.loading = true;
+    this.loading = this.formIsSaving ? false : true;
     const { success, data } = await this.personSrv.GetByIdAndOffice(this.idPerson, this.idOffice);
     if (success) {
       this.propertiesPerson = data;
@@ -242,11 +246,13 @@ export class PersonComponent implements OnInit, OnDestroy {
   }
 
   async handleDeleteAllPermissions(event) {
+    this.isLoading = true;
     const result = await this.personSrv.DeleteAllPermissions({
       ...this.propertiesPerson,
       ...this.formPerson.value,
     }, this.propertiesPerson.id, this.idOffice);
     if (result) {
+      this.isLoading = false;
       this.location.back();
     }
   }
@@ -267,6 +273,7 @@ export class PersonComponent implements OnInit, OnDestroy {
   }
 
   async savePerson() {
+    this.formIsSaving = true;
     if (this.changedAvatar) {
       await this.updateAvatar();
     }
@@ -292,6 +299,7 @@ export class PersonComponent implements OnInit, OnDestroy {
         summary: this.translateSrv.instant('success'),
         detail: this.translateSrv.instant('messages.savedSuccessfully')
       });
+      this.formIsSaving = false;
     }
   }
 

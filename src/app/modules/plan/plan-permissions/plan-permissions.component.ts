@@ -64,6 +64,7 @@ export class PlanPermissionsComponent implements OnInit, OnDestroy {
   showMessageInvalidEmail = false;
   isLoadingCitizen = false;
   isLoading = false;
+  formIsSaving = false;
 
   constructor(
     private actRouter: ActivatedRoute,
@@ -363,6 +364,7 @@ export class PlanPermissionsComponent implements OnInit, OnDestroy {
   }
 
   async savePermission() {
+    this.formIsSaving = true;
     this.permission.permissions = this.cardItemsPlanPermission.filter( p => p.selectedOption && p.selectedOption !== 'NONE').map(cardItem => (
       {
         id: cardItem.itemId,
@@ -381,6 +383,7 @@ export class PlanPermissionsComponent implements OnInit, OnDestroy {
       ? await this.planPermissionSrv.put(permission)
       : await this.planPermissionSrv.post(permission);
     if (success) {
+      this.formIsSaving = false;
       this.messageSrv.add({
         severity: 'success',
         summary: this.translateSrv.instant('success'),

@@ -12,6 +12,9 @@
       <div class="loading-container" *ngIf="cardPlanProperties.isLoading">
         <app-card-loading [isCardLoading]="cardPlanProperties.isLoading"></app-card-loading>
       </div>
+      <div class="loading-form-container" *ngIf="formIsSaving">
+        <app-card-loading [isCardLoading]="formIsSaving"></app-card-loading>
+      </div>
       <div class="p-grid" *ngIf="!cardPlanProperties.isLoading">
         <form [formGroup]="formPlan">
           <div class="p-fluid">

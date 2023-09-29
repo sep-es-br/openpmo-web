@@ -8,6 +8,8 @@ import { IWorkpackData, IWorkpackParams } from '../interfaces/IWorkpackDataParam
 import { FilterDataviewService } from './filter-dataview.service';
 import { WorkpackService } from './workpack.service';
 import { OrganizationService } from './organization.service';
+import { PlanService } from './plan.service';
+import { CostAccountModelService } from './cost-account-model.service';
 
 @Injectable({ providedIn: 'root' })
 export class CostAccountService extends BaseService<ICostAccount> {
@@ -21,12 +23,15 @@ export class CostAccountService extends BaseService<ICostAccount> {
   funders;
   term = '';
   loading;
+  idCostAccountModel: number;
 
   constructor(
     @Inject(Injector) injector: Injector,
     private workpackSrv: WorkpackService,
     private filterSrv: FilterDataviewService,
-    private organizationSrv: OrganizationService
+    private organizationSrv: OrganizationService,
+    private planSrv: PlanService,
+    private costAccountModelSrv: CostAccountModelService
   ) {
     super('cost-accounts', injector);
   }
@@ -59,12 +64,22 @@ export class CostAccountService extends BaseService<ICostAccount> {
       const result = await this.GetAll({ 'id-workpack': this.workpackParams.idWorkpack, idFilter: this.idFilterSelected, term: this.term });
       if (result.success) {
         this.costAccounts = result.data;
+        await this.loadIdCostAccountModel();
         this.loading = false;
         this.nextResetCostAccount(true);
       }
     } else {
+      await this.loadIdCostAccountModel();
       this.loading = false;
       this.nextResetCostAccount(true);
+    }
+  }
+
+  async loadIdCostAccountModel() {
+    const propertiesPlan = await this.planSrv.getCurrentPlan(this.workpackParams.idPlan);
+    const result = await this.costAccountModelSrv.GetCostAccountModelByPlanModel({'id-plan-model': propertiesPlan.idPlanModel});
+    if (result.success) {
+      this.idCostAccountModel = result.data.id;
     }
   }
 
@@ -89,6 +104,7 @@ export class CostAccountService extends BaseService<ICostAccount> {
       workpackParams: this.workpackParams,
       filters: this.filters,
       costAccounts: this.costAccounts,
+      idCostAccountModel:this.idCostAccountModel,
       idFilterSelected: this.idFilterSelected,
       term: this.term,
       funders: this.funders,

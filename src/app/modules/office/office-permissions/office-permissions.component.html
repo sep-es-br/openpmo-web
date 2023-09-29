@@ -10,6 +10,9 @@
       <div class="loading-container" *ngIf="isLoading">
         <app-card-loading [isCardLoading]="isLoading"></app-card-loading>
       </div>
+      <div class="loading-form-container" *ngIf="formIsSaving">
+        <app-card-loading [isCardLoading]="formIsSaving"></app-card-loading>
+      </div>
       <div class="person-properties" *ngIf="!isLoading">
         <div class="search-container" *ngIf="!key && !citizenAuthServer">
           <div class="search-email-container" [class.responsive]="responsive">
@@ -81,7 +84,7 @@
             </span>
           </div>
         </div>
-        <div class="loading-container" *ngIf="isLoadingCitizen">
+        <div class="loading-citizen-container" *ngIf="isLoadingCitizen">
           <app-card-loading [isCardLoading]="isLoadingCitizen"></app-card-loading>
         </div>
         <p-card class="card-person" *ngIf="person" [class.responsive]="responsive">

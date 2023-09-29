@@ -197,9 +197,11 @@ export class PlanPermissionsListComponent implements OnInit, OnDestroy {
     if (result.success && result.data.length > 0) {
       const filterDefault = result.data.find(filter => !!filter.favorite);
       this.idFilterSelected = filterDefault ? filterDefault.id : undefined;
-      this.cardPlanPermissions.filters = result.data;
+      this.cardPlanPermissions = {
+        ...this.cardPlanPermissions,
+        filters: result.data
+      };
     }
-    this.cardPlanPermissions.showFilters = true;
   }
 
   handleEditFilter(event) {

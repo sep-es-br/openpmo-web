@@ -71,6 +71,7 @@ export class StrategyComponent implements OnDestroy {
   cardItemsReportModels: ICardItem[];
   reports: IReportModel[];
   costAccountModelCardItem: ICardItem[];
+  formIsSaving = false;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -486,20 +487,21 @@ export class StrategyComponent implements OnDestroy {
   }
 
   async handleOnSubmit() {
-    const isPut = !!this.propertiesStrategy;
+    const isPut = !!this.idStrategy;
+    this.formIsSaving = true;
+    this.propertiesStrategy = {
+      ...this.formStrategy.value,
+      id: this.idStrategy,
+      idOffice: this.idOffice,
+      sharedWith: this.sharedWith,
+      sharedWithAll: this.sharedWithAll
+    };
     const { success, data } = isPut
       ? await this.planModelSvr.put({
-        ...this.formStrategy.value,
-        id: this.idStrategy,
-        idOffice: this.propertiesStrategy.idOffice,
-        sharedWith: this.sharedWith,
-        sharedWithAll: this.sharedWithAll
+        ...this.propertiesStrategy
       })
       : await this.planModelSvr.post({
-        ...this.formStrategy.value,
-        idOffice: this.idOffice,
-        sharedWith: this.sharedWith,
-        sharedWithAll: this.sharedWithAll
+        ...this.propertiesStrategy
       });
 
     if (success) {
@@ -518,14 +520,12 @@ export class StrategyComponent implements OnDestroy {
       });
       this.formStrategy.reset(this.formStrategy.value);
       if (!isPut) {
-        this.router.navigate([], {
-          queryParams: {
-            id: this.idStrategy,
-            idOffice: this.idOffice
-          }
-        });
+        this.formIsSaving = false;
+        await this.loadModels();
+        await this.loadCostAccountModel();
+        this.loadReportModels();
       } else {
-        await this.loadPropertiesStrategy();
+        this.formIsSaving = false;
       }
     }
   }

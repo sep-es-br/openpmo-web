@@ -39,6 +39,8 @@ export class OrganizationComponent implements OnInit, OnDestroy {
   isUserAdmin: boolean;
   editPermission: boolean;
   phoneNumberPlaceholder = '';
+  isLoading = false;
+  formIsSaving = false;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -86,6 +88,7 @@ export class OrganizationComponent implements OnInit, OnDestroy {
   }
 
   async ngOnInit() {
+    this.isLoading = true;
     this.isUserAdmin = await this.authSrv.isUserAdmin();
     this.editPermission = await this.officePermissionSrv.getPermissions(this.idOffice);
     if (!this.isUserAdmin && !this.editPermission) {
@@ -131,6 +134,7 @@ export class OrganizationComponent implements OnInit, OnDestroy {
 
   async loadPropertiesOrganization() {
     if (this.idOrganization) {
+      this.isLoading = true;
       const {data, success} = await this.organizationSvr.GetById(this.idOrganization);
       if (success) {
         this.propertiesOrganization = data;
@@ -141,7 +145,10 @@ export class OrganizationComponent implements OnInit, OnDestroy {
         if (!this.editPermission) {
           this.formOrganization.disable();
         }
+        this.isLoading = false;
       }
+    } else {
+      this.isLoading = false;
     }
   }
 
@@ -187,10 +194,12 @@ export class OrganizationComponent implements OnInit, OnDestroy {
   }
 
   async handleOnSubmit() {
+    this.formIsSaving = true;
     let phoneNumber = this.formOrganization.controls.phoneNumber.value;
     if (phoneNumber) {
       phoneNumber = phoneNumber.replace(/\D+/g, '');
     }
+    this.formIsSaving = true;
     const {success} = this.propertiesOrganization
       ? await this.organizationSvr.put({...this.formOrganization.value, id: this.idOrganization})
       : await this.organizationSvr.post({
@@ -204,6 +213,7 @@ export class OrganizationComponent implements OnInit, OnDestroy {
         summary: this.translateSrv.instant('success'),
         detail: this.translateSrv.instant('messages.savedSuccessfully')
       });
+      this.formIsSaving = false;
       await this.router.navigate(['/organizations'], {queryParams: {idOffice: this.idOffice}});
     }
   }

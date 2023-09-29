@@ -10,8 +10,11 @@
     <app-card [properties]="cardProperties" class="mt-0" (editFilter)="handleEditFilter($event)"
       (newFilter)="handleNewFilter()" (selectedFilter)="handleSelectedFilter($event)" (searchText)="handleSearchText($event)"
       (createNewElement)="handleCreateNewEstrategy()">
-      <div class="loading-container" *ngIf="isLoading">
+      <div class="loading-container" *ngIf="!isCloning && isLoading">
         <app-card-loading [isCardLoading]="isLoading"></app-card-loading>
+      </div>
+      <div class="loading-form-container" *ngIf="isCloning">
+        <app-card-loading [isCardLoading]="isCloning"></app-card-loading>
       </div>
       <p-dataView [value]="cardItemsProperties" layout="grid" class="app-dataview"
           *ngIf="(displayModeAll === 'grid' || (displayModeAll === 'list' && !!responsive)) && !isLoading" [paginator]="true"

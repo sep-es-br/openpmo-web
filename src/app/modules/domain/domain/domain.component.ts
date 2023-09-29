@@ -60,6 +60,7 @@ export class DomainComponent implements OnInit, OnDestroy {
   totalRecords: number;
   idFilterSelected: number;
   isLoading = false;
+  formIsSaving = false
 
   constructor(
     private formBuilder: FormBuilder,
@@ -186,7 +187,6 @@ export class DomainComponent implements OnInit, OnDestroy {
 
   async loadPropertiesDomain() {
     if (this.idDomain) {
-      this.isLoading = true;
       const { data, success } = await this.domainSvr.GetById(this.idDomain);
       if (success) {
         this.propertiesDomain = data;
@@ -199,6 +199,8 @@ export class DomainComponent implements OnInit, OnDestroy {
         }
         await this.loadLocalities();
       }
+    } else {
+      this.isLoading = false;
     }
   }
 
@@ -243,15 +245,23 @@ export class DomainComponent implements OnInit, OnDestroy {
   }
 
   async handleOnSubmit() {
+    this.formIsSaving = true;
     const { success, data } = this.propertiesDomain
       ? await this.domainSvr.put({
         ...this.formDomain.value, id: this.idDomain,
         localityRoot: this.propertiesDomain.localityRoot ? this.propertiesDomain.localityRoot : this.formLocalityRoot.value
       })
       : await this.domainSvr.post({ ...this.formDomain.value, idOffice: this.idOffice, localityRoot: this.formLocalityRoot.value });
+    
     if (success) {
-      this.idDomain = data.id;
-      await this.loadPropertiesDomain();
+      this.formIsSaving = false;
+      if (!this.idDomain) {
+        this.idDomain = data.id;
+        this.propertiesDomain = {
+          ...this.formDomain.value, idOffice: this.idOffice, localityRoot: this.formLocalityRoot.value
+        };
+        await this.loadLocalities();
+      }
       this.messageSrv.add({
         severity: 'success',
         summary: this.translateSrv.instant('success'),
@@ -264,6 +274,7 @@ export class DomainComponent implements OnInit, OnDestroy {
         info: this.propertiesDomain?.name,
         tooltip: this.propertiesDomain?.fullName
       });
+      
     }
   }
 

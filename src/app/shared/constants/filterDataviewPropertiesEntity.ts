@@ -14,7 +14,7 @@ export const FilterDataviewPropertiesEntity = {
     { label: 'name', apiValue: 'name', type: TypePropertyModelEnum.TextModel },
     { label: 'email', apiValue: 'email', type: TypePropertyModelEnum.TextModel },
     {
-      label: 'level', apiValue: 'level', type: TypePropertyModelEnum.SelectionModel,
+      label: 'level', apiValue: 'permissionLevel', type: TypePropertyModelEnum.SelectionModel,
       possibleValues: [{ label: 'edit', value: 'EDIT' }, { label: 'read', value: 'READ' }]
     }
   ],
@@ -22,7 +22,7 @@ export const FilterDataviewPropertiesEntity = {
     { label: 'name', apiValue: 'name', type: TypePropertyModelEnum.TextModel },
     { label: 'email', apiValue: 'email', type: TypePropertyModelEnum.TextModel },
     {
-      label: 'level', apiValue: 'level', type: TypePropertyModelEnum.SelectionModel,
+      label: 'level', apiValue: 'permissionLevel', type: TypePropertyModelEnum.SelectionModel,
       possibleValues: [{ label: 'edit', value: 'EDIT' }, { label: 'read', value: 'READ' }]
     }
   ],
@@ -54,8 +54,8 @@ export const FilterDataviewPropertiesEntity = {
     { label: 'phoneNumber', apiValue: 'phoneNumber', type: TypePropertyModelEnum.TextModel },
     { label: 'administrator', apiValue: 'administrator', type: TypePropertyModelEnum.ToggleModel },
     {
-      label: 'level', apiValue: 'level', type: TypePropertyModelEnum.SelectionModel,
-      possibleValues: [{ label: 'edit', value: 'edit' }, { label: 'read', value: 'read' }],
+      label: 'level', apiValue: 'permissionLevel', type: TypePropertyModelEnum.SelectionModel,
+      possibleValues: [{ label: 'edit', value: 'EDIT' }, { label: 'read', value: 'READ' }],
     },
     {
       label: 'role', apiValue: 'role', type: TypePropertyModelEnum.SelectionModel

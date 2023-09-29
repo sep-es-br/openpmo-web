@@ -70,6 +70,7 @@ export class DomainLocalityComponent implements OnInit, OnDestroy {
   idFilterSelected: number;
   isLoading = false;
   term = '';
+  formIsSaving = false;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -380,6 +381,7 @@ export class DomainLocalityComponent implements OnInit, OnDestroy {
       ? this.propertiesLocality?.domain?.id
       : (this.propertiesLocality?.domainRoot && this.propertiesLocality?.domainRoot?.id);
     delete this.propertiesLocality?.domain;
+    this.formIsSaving = true;
     const { success, data } = this.propertiesLocality
       ? await this.localitySvr.put({ ...this.propertiesLocality, ...this.formLocality.value, idDomain })
       : await this.localitySvr.post(
@@ -392,6 +394,7 @@ export class DomainLocalityComponent implements OnInit, OnDestroy {
       );
     if (success) {
       this.idLocality = data.id;
+      this.formIsSaving = false;
       await this.loadPropertiesLocality();
       this.messageSrv.add({
         severity: 'success',

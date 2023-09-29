@@ -9,6 +9,9 @@
   </div>
   <div class="card-properties" *ngIf="cardProperties">
     <app-card [properties]="cardProperties" class="mt-0 inputs-float-label">
+      <div class="loading-form-container" *ngIf="formIsSaving">
+        <app-card-loading [isCardLoading]="formIsSaving"></app-card-loading>
+      </div>
       <div>
         <form [formGroup]="formLocality">
           <span class="p-float-label">
