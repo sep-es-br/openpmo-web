@@ -38,6 +38,7 @@ export class ProcessComponent implements OnInit, OnDestroy {
   currentLang = '';
   isLoading = false;
   idPlan: number;
+  formIsSaving = false;
 
   constructor(
     private actRouter: ActivatedRoute,
@@ -121,7 +122,6 @@ export class ProcessComponent implements OnInit, OnDestroy {
   async searchProcessByNumber() {
     this.isLoading = true;
     const result = await this.processSrv.GetProcessByNumber({ 'process-number': this.formProcess.controls.processNumber.value });
-    this.isLoading = false;
     if (result.success && result.data) {
       this.process = result.data;
       this.setFormProcess();
@@ -155,7 +155,10 @@ export class ProcessComponent implements OnInit, OnDestroy {
     }
     if (this.process.history && this.process.history.length > 0) {
       this.loadCardProcessHistory();
+    } else {
+      this.isLoading = false;
     }
+    
   }
 
   async loadPropertiesProcess() {
@@ -166,9 +169,8 @@ export class ProcessComponent implements OnInit, OnDestroy {
       collapseble: true,
       initialStateCollapse: false,
     };
-    this.isLoading = true;
+    this.isLoading = this.idProcess ? true : false;
     const result = this.idProcess && await this.processSrv.GetById(this.idProcess);
-    this.isLoading = false;
     if (result && result.success) {
       this.process = result.data;
       await this.loadPermissions();
@@ -236,9 +238,11 @@ export class ProcessComponent implements OnInit, OnDestroy {
         }
       }
     });
+    this.isLoading = false;
   }
 
   async saveProcess() {
+    this.formIsSaving = true;
     const sender: IProcess = {
       id: this.idProcess,
       idWorkpack: this.idWorkpack,
@@ -252,6 +256,7 @@ export class ProcessComponent implements OnInit, OnDestroy {
       status: this.formProcess.controls.status.value
     };
     const result = this.idProcess ? await this.processSrv.put(sender) : await this.processSrv.post(sender);
+    
     if (result.success) {
       this.messageSrv.add({
         severity: 'success',
@@ -259,7 +264,7 @@ export class ProcessComponent implements OnInit, OnDestroy {
         detail: this.translateSrv.instant('messages.savedSuccessfully')
       });
       this.idProcess = result.data.id;
-      await this.loadPropertiesProcess();
+      this.formIsSaving = false;
     }
   }
 

@@ -10,9 +10,15 @@
       <span>{{ 'cancellationProposal' | translate }}</span>
     </div>
   </div>
+  <div class="loading-form-container" *ngIf="formIsSaving">
+    <app-card-loading [isCardLoading]="formIsSaving"></app-card-loading>
+  </div>
   <div class="card-properties-baseline">
     <app-card [properties]="cardBaselineProperties" class="mt-0 inputs-float-label">
-      <div class="p-grid">
+      <div class="loading-container" *ngIf="cardBaselineProperties.isLoading">
+        <app-card-loading [isCardLoading]="cardBaselineProperties.isLoading"></app-card-loading>
+      </div>
+      <div class="p-grid" *ngIf="!cardBaselineProperties.isLoading">
         <form [formGroup]="formBaseline">
           <div class="p-fluid">
             <div class="p-field">
@@ -59,12 +65,15 @@
 
   <div class="card-updates-baseline" *ngIf="cardBaselineUpdates && baseline?.updates && baseline?.updates.length > 0">
     <app-card [properties]="cardBaselineUpdates" class="mt-0 inputs-float-label">
-      <div class="app-toggle-container">
+      <div class="loading-container" *ngIf="cardBaselineUpdates.isLoading">
+        <app-card-loading [isCardLoading]="cardBaselineUpdates.isLoading"></app-card-loading>
+      </div>
+      <div class="app-toggle-container" *ngIf="!cardBaselineUpdates.isLoading">
         <p-inputSwitch class="app-toggle toggle-all" [(ngModel)]="includeAllUpdates"
                        (onChange)="handleSetAllTogglesUpdates($event)" [disabled]="togglesReadOnly">
         </p-inputSwitch>
       </div>
-      <div class="updates-container">
+      <div class="updates-container" *ngIf="!cardBaselineUpdates.isLoading">
         <p-card *ngFor="let item of baseline?.updates" class="card-list-item">
           <div class="card-item-content">
             <div class="item-description">
@@ -89,11 +98,11 @@
   </div>
   <div class="actions-buttons-container" [class.actions-buttons-container-responsive]="responsive"
        *ngIf="!idBaseline || baseline?.status === 'DRAFT'">
-    <p-button class="action-button submit-button" [label]="'submit'|translate" [disabled]="isLoading" (onClick)="saveDraftAndSubmitBaseline()">
+    <p-button class="action-button submit-button" [label]="'submit'|translate" [disabled]="formIsSaving" (onClick)="saveDraftAndSubmitBaseline()">
     </p-button>
-    <p-button class="action-button draft-button" [label]="'draft'|translate" [disabled]="isLoading" (onClick)="handleSaveDraftBaseline()">
+    <p-button class="action-button draft-button" [label]="'draft'|translate" [disabled]="formIsSaving" (onClick)="handleSaveDraftBaseline()">
     </p-button>
-    <p-button class="action-button cancel-button" [label]="'cancel'|translate" [disabled]="isLoading" (onClick)="handleCancelChanges()">
+    <p-button class="action-button cancel-button" [label]="'cancel'|translate" [disabled]="formIsSaving" (onClick)="handleCancelChanges()">
     </p-button>
   </div>
 

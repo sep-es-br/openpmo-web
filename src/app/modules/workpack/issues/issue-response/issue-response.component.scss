@@ -2,6 +2,34 @@
 
 ::ng-deep .app-issue-response {
   width: 100%;
+  .loading-container {
+    position: relative;
+    min-height: 150px;
+  }
+  ::ng-deep .card-properties-issue-response {
+    .p-panel-toggleable {
+      position: relative;
+    }
+  }
+  .loading-form-container {
+    position: absolute;
+    min-height: 150px;
+    z-index: 10000;
+    display: flex;
+    width: 100%;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    background-color: #d0d8d9;
+    opacity: 0.4;
+    left: 0;
+    top: 0;
+    height: 100%;
+    .app-card-loading {
+      background-color: #d0d8d9;
+      opacity: 0.4;
+    }
+  }
   .card-properties-issue-response {
     width: 100%;
     form {

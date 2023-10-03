@@ -40,6 +40,9 @@
       </div>
       <div tabviewBody *ngIf="selectedTab?.key === 'properties'">
         <div class="card-properties-workpack">
+          <div class="loading-form-container" *ngIf="formIsSaving">
+            <app-card-loading [isCardLoading]="formIsSaving"></app-card-loading>
+          </div>
           <app-workpack-section-properties (onGetProperties)="saveWorkpack($event)"></app-workpack-section-properties>
         </div>
       </div>
@@ -67,6 +70,9 @@
             <div class="workpacks-list-container">
               <div class="loading-container" *ngIf="workpackModel.cardSection.isLoading">
                 <app-card-loading [isCardLoading]="true"></app-card-loading>
+              </div>
+              <div class="loading-form-container" *ngIf="workpackChildChanging">
+                <app-card-loading [isCardLoading]="workpackChildChanging"></app-card-loading>
               </div>
               <p-dataView [value]="workpackModel.cardItemsSection" layout="grid" styleClass="dataview-card-items"
                 *ngIf="(displayModeAll === 'grid' || (displayModeAll === 'list' && !!responsive)) && !workpackModel?.cardSection?.isLoading"
@@ -146,6 +152,9 @@
         [dashboardShowMilestones]="workpackModel?.dashboardShowMilestones"></app-workpack-section-dashboard>
     </div>
     <div class="card-properties-workpack">
+      <div class="loading-form-container" *ngIf="formIsSaving">
+        <app-card-loading [isCardLoading]="formIsSaving"></app-card-loading>
+      </div>
       <app-workpack-section-properties (onGetProperties)="saveWorkpack($event)"></app-workpack-section-properties>
     </div>
     <div class="card-schedule">

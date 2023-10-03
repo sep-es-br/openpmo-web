@@ -10,10 +10,15 @@
       <span class="text">{{ 'account' | translate }}</span>
     </div>
   </ng-template>
-
+  <div class="loading-container" *ngIf="cardCostAccountProperties.isLoading">
+    <app-card-loading [isCardLoading]="cardCostAccountProperties.isLoading"></app-card-loading>
+  </div>
   <div class="card-properties-cost-account" *ngIf="sectionCostAccountProperties">
     <app-cost-account-card [properties]="cardCostAccountProperties" class="mt-0 inputs-float-label">
-      <div class="properties-container">
+      <div class="loading-form-container" *ngIf="formIsSaving">
+        <app-card-loading [isCardLoading]="formIsSaving"></app-card-loading>
+      </div>
+      <div class="properties-container" *ngIf="!cardCostAccountProperties.isLoading">
         <div class="property-container" *ngFor="let property of sectionCostAccountProperties" [class.fullLine]="property.fullLine">
           <app-property [property]="property" (changed)="checkProperties(property)">
           </app-property>

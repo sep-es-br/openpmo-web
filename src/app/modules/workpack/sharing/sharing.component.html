@@ -9,6 +9,9 @@
       <div class="loading-container" *ngIf="isLoading">
         <app-card-loading [isCardLoading]="isLoading" ></app-card-loading>
       </div>
+      <div class="loading-form-container" *ngIf="formIsSaving">
+        <app-card-loading [isCardLoading]="formIsSaving"></app-card-loading>
+      </div>
       <p-dataView [value]="cardItemSharing" layout="grid" class="app-dataview" *ngIf="!isLoading"
         [emptyMessage]="'loadingEllipsis' | translate">
         <ng-template let-cardItem pTemplate="gridItem">

@@ -16,7 +16,6 @@ import { JournalComponent } from './journal/journal.component';
 import { TripleConstraintDashboardComponent } from './components/triple-constraint-dashboard/triple-constraint-dashboard.component';
 import { EarnedValueAnalysisDashboardComponent } from './components/earned-value-analysis-dashboard/earned-value-analysis-dashboard.component';
 import { ProgressBarScheduleYearComponent } from './components/progress-bar-schedule-year/progress-bar-schedule-year.component';
-import { BreakdownStructureComponent } from './components/breakdown-structure/breakdown-structure.component';
 import { WorkpackSectionPropertiesComponent } from './workpack-sections/workpack-section-properties/workpack-section-properties.component';
 import { WorkpackSectionCostAccountsComponent } from './workpack-sections/workpack-section-cost-accounts/workpack-section-cost-accounts.component';
 import { WorkpackSectionScheduleComponent } from './workpack-sections/workpack-section-schedule/workpack-section-schedule.component';
@@ -47,7 +46,6 @@ import { WorkpackSectionWBSComponent } from './workpack-sections/workpack-sectio
     TripleConstraintDashboardComponent,
     EarnedValueAnalysisDashboardComponent,
     ProgressBarScheduleYearComponent,
-    BreakdownStructureComponent,
     WorkpackSectionPropertiesComponent,
     WorkpackSectionCostAccountsComponent,
     WorkpackSectionScheduleComponent,

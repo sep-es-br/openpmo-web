@@ -39,6 +39,7 @@ export class BaselineComponent implements OnInit, OnDestroy {
   showCommentDialog = false;
   selectedComment = '';
   isLoading = false;
+  formIsSaving = false;
 
   constructor(
     private actRouter: ActivatedRoute,
@@ -125,11 +126,21 @@ export class BaselineComponent implements OnInit, OnDestroy {
       initialStateToggle: false,
       cardTitle: 'properties',
       collapseble: true,
-      initialStateCollapse: false
+      initialStateCollapse: false,
+      isLoading: this.idBaseline ? true : false
+    };
+    this.cardBaselineUpdates = {
+      toggleable: false,
+      initialStateToggle: false,
+      cardTitle: this.translateSrv.instant('updates'),
+      collapseble: true,
+      initialStateCollapse: false,
+      isLoading: true
     };
     if (this.idBaseline) {
       const result = await this.baselineSrv.GetById(this.idBaseline);
       this.baseline = result.data;
+      this.cardBaselineProperties.isLoading = false;
       if (this.baseline) {
         this.idWorkpack = this.baseline.idWorkpack;
         this.formBaseline.controls.name.setValue(this.baseline.name);
@@ -152,13 +163,7 @@ export class BaselineComponent implements OnInit, OnDestroy {
       };
     }
     await this.loadPermissions();
-    this.cardBaselineUpdates = {
-      toggleable: false,
-      initialStateToggle: false,
-      cardTitle: this.translateSrv.instant('updates'),
-      collapseble: true,
-      initialStateCollapse: false
-    };
+    this.cardBaselineUpdates.isLoading = !this.idBaseline || this.baseline.status === 'DRAFT';
     if (!this.idBaseline || this.baseline.status === 'DRAFT') {
       await this.loadUpdates();
     }
@@ -186,6 +191,7 @@ export class BaselineComponent implements OnInit, OnDestroy {
 
   async loadUpdates() {
     this.baseline.updates = await this.baselineSrv.getUpdates({'id-workpack': this.idWorkpack});
+    this.cardBaselineUpdates.isLoading = false;
     if (this.baseline.updates.length > 0) {
       this.baseline.updates.forEach(updates => updates.included = true);
       this.includeAllUpdates = true;
@@ -212,11 +218,11 @@ export class BaselineComponent implements OnInit, OnDestroy {
       description: this.formBaseline.controls.description.value,
       message: this.formBaseline.controls.message.value
     };
-    this.isLoading = true;
+    this.formIsSaving = true;
     const result = this.idBaseline
       ? await this.baselineSrv.putBaseline(this.idBaseline, this.baseline)
       : await this.baselineSrv.post(this.baseline);
-    this.isLoading = false;
+    this.formIsSaving = false;
     if (result.success) {
       if (!this.idBaseline) {
         this.baseline.id = result.data.id;
@@ -233,18 +239,21 @@ export class BaselineComponent implements OnInit, OnDestroy {
   }
 
   async handleSubmitBaseline() {
-    this.isLoading = true;
+    this.formIsSaving = true;
     const result = await this.baselineSrv.submitBaseline(this.idBaseline, this.baseline.updates);
-    this.isLoading = false;
+    this.formIsSaving = false;
     if (result.success) {
       const idPlan = Number(localStorage.getItem('@currentPlan'));
       await this.router.navigate(
         ['/workpack'],
         {
-          queryParams: {
+          queryParams: this.idWorkpackModelLinked ? {
             id: this.idWorkpack,
             idPlan,
             idWorkpackModelLinked: this.idWorkpackModelLinked
+          } : {
+            id: this.idWorkpack,
+            idPlan,
           }
         }
       );
@@ -256,10 +265,13 @@ export class BaselineComponent implements OnInit, OnDestroy {
     await this.router.navigate(
       ['/workpack'],
       {
-        queryParams: {
+        queryParams: this.idWorkpackModelLinked ? {
           id: this.idWorkpack,
           idPlan,
           idWorkpackModelLinked: this.idWorkpackModelLinked
+        } : {
+          id: this.idWorkpack,
+          idPlan,
         }
       }
     );

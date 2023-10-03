@@ -54,7 +54,7 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
   spreadEvent;
   spreadMulticost = false;
   sectionActive = false;
-
+  formIsSaving = false;
 
   constructor(
     private router: Router,
@@ -858,6 +858,7 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
   }
 
   async onSaveButtonClicked() {
+    this.formIsSaving = true;
     if (this.changedSteps && this.changedSteps.length > 0) {
       const stepsToSave = this.changedSteps.map(stepToSave => {
         const stepGroup = this.schedule.groupStep.find(group => group.year === stepToSave.changedGroupYear);
@@ -903,7 +904,9 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
           summary: this.translateSrv.instant('success'),
           detail: this.translateSrv.instant('messages.savedSuccessfully')
         });
+        
         this.refreshScheduleProgressBar();
+        this.formIsSaving = false;
         setTimeout( () => {
           const linked = this.workpackParams.idWorkpackModelLinked ? true : false;
           this.dashboardSrv.loadDashboard(linked);

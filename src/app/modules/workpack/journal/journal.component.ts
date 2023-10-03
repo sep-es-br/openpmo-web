@@ -40,13 +40,13 @@ export class JournalComponent implements OnInit {
   idWorkpack: number;
   idPlan: number;
   showTabview = false;
+  formIsSaving = false;
 
   constructor(
     private responsiveSrv: ResponsiveService,
     private formBuilder: FormBuilder,
     private translateSvr: TranslateService,
     private journalSrv: JournalService,
-    private location: Location,
     private messageSrv: MessageService,
     private activeRoute: ActivatedRoute,
     private evidenceSrv: EvidenceService,
@@ -167,6 +167,7 @@ export class JournalComponent implements OnInit {
   }
 
   async handleOnSubmit() {
+    this.formIsSaving = true;
     const sender = {
       ...this.formJournal.value,
       workpackId: this.idWorkpack
@@ -180,6 +181,7 @@ export class JournalComponent implements OnInit {
         detail: this.translateSvr.instant('messages.savedSuccessfully')
       });
       setTimeout( () => {
+        this.formIsSaving = false;
         this.route.navigate(['workpack'], {
           queryParams: {
             id: this.idWorkpack,

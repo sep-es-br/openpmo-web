@@ -3,6 +3,9 @@
     <span class="header-text" *ngIf="!stakeholder">{{ "newStakeholderAndPermissions" | translate}}</span>
     <span class="header-text" *ngIf="stakeholder">{{"editStakeholderAndPermissions" | translate}}</span>
   </div>
+  <div class="loading-form-container" *ngIf="formIsSaving">
+    <app-card-loading [isCardLoading]="formIsSaving"></app-card-loading>
+  </div>
   <div class="card-person">
     <app-card [properties]="cardPerson" *ngIf="cardPerson">
       <div class="loading-container" *ngIf="cardPerson.isLoading">

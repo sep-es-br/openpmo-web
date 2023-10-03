@@ -3,10 +3,15 @@
     <span *ngIf="!idIssue">{{ "newIssue" | translate }}</span>
     <span *ngIf="!!idIssue && issue">{{ issue.name }}</span>
   </div>
-
+  <div class="loading-form-container" *ngIf="formIsSaving">
+    <app-card-loading [isCardLoading]="formIsSaving"></app-card-loading>
+  </div>
   <div class="card-properties-issue" *ngIf="cardIssueProperties" [class.responsive]="responsive">
     <app-card [properties]="cardIssueProperties" class="mt-0 inputs-float-label">
-      <div class="p-grid">
+      <div class="loading-container" *ngIf="cardIssueProperties.isLoading">
+        <app-card-loading [isCardLoading]="cardIssueProperties.isLoading"></app-card-loading>
+      </div>
+      <div class="p-grid" *ngIf="!cardIssueProperties.isLoading">
         <form [formGroup]="formIssue">
           <div class="form-group-name-trigged-by">
             <div class="p-field">

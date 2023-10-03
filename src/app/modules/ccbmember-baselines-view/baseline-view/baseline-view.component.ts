@@ -35,6 +35,7 @@ export class BaselineViewComponent implements OnInit, OnDestroy {
   selectedComment = '';
   showCommentDialog = false;
   isLoading = false;
+  formIsSaving = false;
 
   constructor(
     private actRouter: ActivatedRoute,
@@ -168,12 +169,14 @@ export class BaselineViewComponent implements OnInit, OnDestroy {
   }
 
   async submitEvaluate() {
+    this.formIsSaving = true;
     this.showDialogConfirmation = false;
     this.messageDialog = null;
     const result = await this.baselineSrv.evaluateBaseline(this.idBaseline, {
       decision: this.evaluateDecision,
       comment: this.evaluationComment
     });
+    this.formIsSaving = false;
     if (result.success) {
       await this.router.navigate(['ccbmember-baselines-view']);
     }

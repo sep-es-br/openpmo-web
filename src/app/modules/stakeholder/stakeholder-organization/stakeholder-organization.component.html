@@ -1,9 +1,16 @@
 <div class="app-stakeholder-organization">
   <div class="app-stakeholder-header" [class.app-stakeholder-header-mobile]="responsive">
-    <span class="header-text" *ngIf="!organization">{{ "newStakeholderAndPermissions" | translate }}</span>
-    <span class="header-text" *ngIf="organization">{{ organization?.name }}</span>
+    <span class="header-text" *ngIf="!organization && !isLoading">{{ "newStakeholderAndPermissions" | translate }}</span>
+    <span class="header-text" *ngIf="isLoading">{{ "stakeholderAndPermission" | translate }}</span>
+    <span class="header-text" *ngIf="organization && !isLoading">{{ organization?.name }}</span>
   </div>
-  <div class="card-organization" *ngIf="cardOrganization">
+  <div class="loading-form-container" *ngIf="formIsSaving">
+    <app-card-loading [isCardLoading]="formIsSaving"></app-card-loading>
+  </div>
+  <div class="loading-container" *ngIf="isLoading">
+    <app-card-loading [isCardLoading]="isLoading"></app-card-loading>
+  </div>
+  <div class="card-organization" *ngIf="cardOrganization && !isLoading">
     <app-card [properties]="cardOrganization">
       <div class="organization-properties">
         <div class="search-container" *ngIf="!idOrganization">
@@ -48,7 +55,7 @@
       </div>
     </app-card>
   </div>
-  <div class="card-roles" *ngIf="organization">
+  <div class="card-roles" *ngIf="organization && !isLoading">
     <app-card [properties]="cardRoles">
       <div class="card-item-roles-container">
         <p-dataView [value]="stakeholderRolesCardItems" layout="grid" styleClass="dataview-card-items" [emptyMessage]="'loadingEllipsis' | translate">

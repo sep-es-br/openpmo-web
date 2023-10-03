@@ -108,6 +108,8 @@ export class WorkpackComponent implements OnDestroy {
   favoriteProcessing = false;
   currentBreadcrumbItems: IBreadcrumb[];
   workpackLoading = true;
+  formIsSaving = false;
+  workpackChildChanging = false;
 
   constructor(
     private actRouter: ActivatedRoute,
@@ -344,6 +346,7 @@ export class WorkpackComponent implements OnDestroy {
       return;
     }
     this.favoriteProcessing = true;
+
     const { success } = await this.workpackSrv.patchToggleWorkpackFavorite(this.idWorkpack, this.idPlan);
     if (success) {
       this.favoriteProcessing = false;
@@ -819,8 +822,10 @@ export class WorkpackComponent implements OnDestroy {
   }
 
   async unlinkedWorkpack(idWorkpackLinked, idWorkpackModel) {
+    this.workpackChildChanging = true;
     const result = await this.workpackSrv.unlinkWorkpack(idWorkpackLinked, idWorkpackModel,
       { 'id-workpack-parent': this.idWorkpack, 'id-plan': this.idPlan });
+    this.workpackChildChanging = false;
     if (result.success) {
       const workpackModelIndex = this.cardsWorkPackModelChildren
         .findIndex(workpackModel => workpackModel.idWorkpackModel === idWorkpackModel);
@@ -852,11 +857,13 @@ export class WorkpackComponent implements OnDestroy {
   async handleEndManagementDeliverable() {
     if (this.endManagementWorkpack && this.endManagementWorkpack.reason.length > 0
       && this.endManagementWorkpack.endManagementDate !== null) {
+        this.workpackChildChanging = true;
       const result = await this.workpackSrv.endManagementDeliverable({
         idWorkpack: this.endManagementWorkpack.idWorkpack,
         endManagementDate: moment(this.endManagementWorkpack.endManagementDate).format('yyyy-MM-DD'),
         reason: this.endManagementWorkpack.reason
       });
+      this.workpackChildChanging = false;
       if (result.success) {
         this.messageSrv.add({
           severity: 'success',
@@ -870,7 +877,7 @@ export class WorkpackComponent implements OnDestroy {
         } else {
           await this.loadSectionsWorkpackChildrenLinked();
         }
-      }
+      } 
     } else {
       this.messageSrv.add({
         severity: 'warn',
@@ -909,11 +916,13 @@ export class WorkpackComponent implements OnDestroy {
   }
 
   async handleResumeManagementDeliverable() {
+    this.workpackChildChanging = true;
     const result = await this.workpackSrv.endManagementDeliverable({
       endManagementDate: null,
       reason: this.endManagementWorkpack.reason,
       idWorkpack: this.endManagementWorkpack.idWorkpack
     });
+    this.workpackChildChanging = false;
     if (result.success) {
       this.handleCancelResumeManagement();
       this.messageSrv.add({
@@ -945,24 +954,34 @@ export class WorkpackComponent implements OnDestroy {
   navigateToCancelProject(idProject: number, projectName: string) {
     this.router.navigate(
       ['/workpack/baseline-cancelling'],
+      this.idWorkpackModelLinked ? 
       {
         queryParams: {
           idProject,
           idWorkpackModelLinked: this.idWorkpackModelLinked ? this.idWorkpackModelLinked as number : null,
           projectName
         }
+      } : {
+        queryParams: {
+          idProject,
+          projectName
+        }
       });
   }
 
   async handleCancelWorkpack(idWorkpack: number) {
+    this.workpackChildChanging = true;
     const result = await this.workpackSrv.cancelWorkpack(idWorkpack);
+    this.workpackChildChanging = false;
     if (result.success) {
       await this.reloadSectionsWorkpackChildren();
     }
   }
 
   async handleRestoreWorkpack(idWorkpack: number) {
+    this.workpackChildChanging = true;
     const result = await this.workpackSrv.restoreWorkpack(idWorkpack);
+    this.workpackChildChanging = false;
     if (result.success) {
       await this.reloadSectionsWorkpackChildren();
     }
@@ -984,7 +1003,7 @@ export class WorkpackComponent implements OnDestroy {
     }
   }
 
-  async checkPasteWorkpack(workpackCuted: IWorkpack, idWorkpackModelTo: number) {
+  async checkPasteWorkpack(workpackCuted: IWorkpack, idWorkpackModelTo: number) {   
     const result = await this.workpackSrv.checkPasteWorkpack(workpackCuted.id, idWorkpackModelTo, {
       idWorkpackModelFrom: workpackCuted.idWorkpackModel,
     });
@@ -1017,6 +1036,7 @@ export class WorkpackComponent implements OnDestroy {
   }
 
   async pasteWorkpack(workpackCuted: IWorkpack, idWorkpackModelTo: number, idPlanTo: number, idParentTo: number) {
+    this.workpackChildChanging = true;
     const result = await this.workpackSrv.pasteWorkpack(workpackCuted.id, idWorkpackModelTo, {
       idPlanFrom: workpackCuted.plan.id,
       idParentFrom: workpackCuted.idParent,
@@ -1024,6 +1044,7 @@ export class WorkpackComponent implements OnDestroy {
       idParentTo,
       idWorkpackModelFrom: workpackCuted.idWorkpackModel
     });
+    this.workpackChildChanging = false;
     if (result.success) {
       this.workpackSrv.removeWorkpackCuted();
       await this.reloadSectionsWorkpackChildren();
@@ -1099,8 +1120,10 @@ export class WorkpackComponent implements OnDestroy {
   }
 
   async handleLinkToWorkpack(idWorkpack: number, idWorkpackModel: number) {
+    this.workpackChildChanging = true;
     const result = await this.workpackSrv.linkWorkpack(idWorkpack, idWorkpackModel,
       { 'id-parent': this.idWorkpack, 'id-plan': this.idPlan });
+    this.workpackChildChanging = false;
     if (result.success) {
       this.menuSrv.reloadMenuPortfolio();
       this.router.navigate(['/workpack'], {
@@ -1135,7 +1158,9 @@ export class WorkpackComponent implements OnDestroy {
   }
 
   async deleteWorkpackChildren(workpack) {
+    this.workpackChildChanging = true;
     const result = await this.workpackSrv.delete(workpack);
+    this.workpackChildChanging = false;
     if (result.success) {
       const workpackModelIndex = this.cardsWorkPackModelChildren
         .findIndex(workpackModel => workpackModel.idWorkpackModel === workpack.idWorkpackModel);
@@ -1240,6 +1265,7 @@ export class WorkpackComponent implements OnDestroy {
         type: TypeWorkpackEnum[this.workpackModel.type],
         properties: this.workpackProperties,
       };
+    this.formIsSaving = true;
     const { success, data } = isPut
       ? await this.workpackSrv.put(workpack)
       : await this.workpackSrv.post(workpack);
@@ -1260,15 +1286,8 @@ export class WorkpackComponent implements OnDestroy {
         });
         this.resetWorkpack();
         this.menuSrv.reloadMenuPortfolio(!isPut ? this.idWorkpack : undefined);
-      } else {
-        // if (this.idWorkpack) {
-        //   if (!this.idWorkpackModelLinked) {
-        //     await this.loadWorkpack(true);
-        //   } else {
-        //     await this.loadWorkpackLinked(true);
-        //   }
-        // }
       }
+      this.formIsSaving = false;
       this.messageSrv.add({
         severity: 'success',
         summary: this.translateSrv.instant('success'),
@@ -1296,7 +1315,9 @@ export class WorkpackComponent implements OnDestroy {
     const idFilter = event.filter;
     const workpackModelCardIndex = this.cardsWorkPackModelChildren.findIndex(card => card.idWorkpackModel === idWorkpackModel);
     this.cardsWorkPackModelChildren[workpackModelCardIndex].cardSection.idFilterSelected = idFilter;
+    this.cardsWorkPackModelChildren[workpackModelCardIndex].cardSection.isLoading = true;
     await this.reloadWorkpacksOfWorkpackModelSelectedFilter(idWorkpackModel);
+    this.cardsWorkPackModelChildren[workpackModelCardIndex].cardSection.isLoading = false;
   }
 
   async handleSearchTextWorkpackModel(event, idWorkpackModel: number) {

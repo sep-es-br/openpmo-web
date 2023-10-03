@@ -3,7 +3,9 @@
     <span *ngIf="!idProcess">{{ "newProcess" | translate }}</span>
     <span *ngIf="!!idProcess && !!process">{{ process.processNumber }}</span>
   </div>
-
+  <div class="loading-form-container" *ngIf="formIsSaving">
+    <app-card-loading [isCardLoading]="formIsSaving"></app-card-loading>
+  </div>
   <div class="card-properties-process" *ngIf="cardProcessProperties" [class.responsive]="responsive">
     <app-card [properties]="cardProcessProperties" class="mt-0 inputs-float-label">
       <div class="p-grid">
@@ -34,10 +36,9 @@
             </div>
           </div>
           <div class="loading-container" *ngIf="isLoading">
-            <i class="fas fa-hourglass-half"></i>
-            <label class="loading-label">{{'messages.loading'|translate}} ...</label>
+            <app-card-loading [isCardLoading]="isLoading"></app-card-loading>
           </div>
-          <div class="p-fluid" *ngIf="process">
+          <div class="p-fluid" *ngIf="process && !isLoading">
             <div class="p-field">
               <span class="p-float-label">
                 <textarea pInputTextarea id="float-subject" formControlName="subject" class="app-text-area"
@@ -48,7 +49,7 @@
               <app-input-message [form]="formProcess" field="subject"></app-input-message>
             </div>
           </div>
-          <div class="form-group" *ngIf="process">
+          <div class="form-group" *ngIf="process && !isLoading">
             <div class="p-field">
               <span class="p-float-label">
                 <input class="app-input-text" id="float-currentOrganization" formControlName="currentOrganization"
@@ -69,7 +70,7 @@
             </div>
           </div>
           <div class="p-fluid">
-            <div class="p-field" *ngIf="process">
+            <div class="p-field" *ngIf="process && !isLoading">
               <span class="p-float-label">
                 <textarea pInputTextarea id="float-note" formControlName="note" class="app-text-area"
                           [rows]="1">
@@ -79,7 +80,7 @@
               <app-input-message [form]="formProcess" field="note"></app-input-message>
             </div>
           </div>
-          <div class="p-fluid" *ngIf="process">
+          <div class="p-fluid" *ngIf="process && !isLoading">
             <div class="priority-container">
               <div class="label-container priority" *ngIf="!!process.priority">
                 <i class="app-icon process-selo"></i>
@@ -95,7 +96,7 @@
       </div>
     </app-card>
   </div>
-  <div class="process-history-container" *ngIf="cardProcessHistory" [class.responsive]="responsive">
+  <div class="process-history-container" *ngIf="cardProcessHistory && !isLoading" [class.responsive]="responsive">
     <app-card [properties]="cardProcessHistory" class="mt-0 inputs-float-label">
       <div class="history-container" *ngIf="showProcessHistory">
         <p-timeline [value]="process.history" align="right" *ngIf="!responsive">
@@ -145,7 +146,7 @@
       </div>
     </app-card>
   </div>
-  <div class="id-container" *ngIf="idProcess && cardProcessProperties">
+  <div class="id-container" *ngIf="idProcess && cardProcessProperties && !isLoading">
     <span>{{idProcess}}</span>
   </div>
 </div>

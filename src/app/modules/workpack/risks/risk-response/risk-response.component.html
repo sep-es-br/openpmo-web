@@ -6,7 +6,13 @@
 
   <div class="card-properties-risk-response" *ngIf="cardRiskResponseProperties" [class.responsive]="responsive">
     <app-card [properties]="cardRiskResponseProperties" class="mt-0 inputs-float-label">
-      <div class="p-grid">
+      <div class="loading-container" *ngIf="cardRiskResponseProperties.isLoading">
+        <app-card-loading [isCardLoading]="cardRiskResponseProperties.isLoading"></app-card-loading>
+      </div>
+      <div class="loading-form-container" *ngIf="formIsSaving">
+        <app-card-loading [isCardLoading]="formIsSaving"></app-card-loading>
+      </div>
+      <div class="p-grid" *ngIf="!cardRiskResponseProperties.isLoading">
         <form [formGroup]="formRiskResponse">
           <div class="form-group">
             <div class="p-field">

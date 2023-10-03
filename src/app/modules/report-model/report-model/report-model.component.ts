@@ -86,6 +86,7 @@ export class ReportModelComponent implements OnInit {
   listMeasureUnits: SelectItem[] = [];
   files: IReportModelFile[] = [];
   hasCompiledFiles = false;
+  formIsSaving = false;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -158,6 +159,7 @@ export class ReportModelComponent implements OnInit {
       this.idStrategy = +idStrategy;
       this.idReport = +id;
       this.idOffice = +idOffice;
+      this.cardFiles.isLoading = true;
       await this.checkPermissions();
       if (this.idReport) {
         this.cardProperties.isLoading = true;
@@ -251,7 +253,6 @@ export class ReportModelComponent implements OnInit {
 
   async loadReport(dontSetFormReport = false) {
     this.cardParameters.isLoading = true;
-    this.cardFiles.isLoading = true;
     const result = await this.reportModelSrv.GetById(this.idReport);
     if (result.success) {
       this.cardProperties.isLoading = false;
@@ -272,6 +273,7 @@ export class ReportModelComponent implements OnInit {
   }
 
   loadCardItemsFiles() {
+    this.cardFiles.isLoading = true;
     this.cardItemsFiles = [];
     this.cardItemsFiles = this.files.map(file => {
       const menuItems = !!file.id ? [
@@ -732,7 +734,7 @@ export class ReportModelComponent implements OnInit {
   }
 
   async handleOnSubmit() {
-    this.saveButton.hideButton();
+    this.formIsSaving = true;
     if (this.files && this.files.length > 0) {
       await this.sendUploadedFiles();
     } else {
@@ -778,6 +780,7 @@ export class ReportModelComponent implements OnInit {
       sender.files[0].main = true;
     }
     const result = this.idReport ? await this.reportModelSrv.put(sender) : await this.reportModelSrv.post(sender);
+    this.formIsSaving = false;
     if (result.success) {
       this.messageSrv.add({
         severity: 'success',

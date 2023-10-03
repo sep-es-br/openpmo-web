@@ -56,6 +56,7 @@ export class CostAccountComponent implements OnInit {
   costAccountLimit: number;
   idPlanModel: number;
   organizations: IOrganization[] = [];
+  formIsSaving = false;
 
   constructor(
     private actRouter: ActivatedRoute,
@@ -101,6 +102,8 @@ export class CostAccountComponent implements OnInit {
     }
     if (this.idCostAccount) {
       await this.loadCostAccount();
+    } else {
+      this.cardCostAccountProperties.isLoading = false;
     }
     const costAccountModelActiveProperties = this.costAccountModel.properties.filter(w => w.active);
     if (costAccountModelActiveProperties && costAccountModelActiveProperties
@@ -108,7 +111,6 @@ export class CostAccountComponent implements OnInit {
       await this.loadOrganizationsOffice();
     }
     this.sectionCostAccountProperties = await Promise.all(costAccountModelActiveProperties.map(p => this.instanceProperty(p)));
-    this.loadCardCostAccountProperties();
   }
 
   async loadCardCostAccountProperties() {
@@ -173,6 +175,7 @@ export class CostAccountComponent implements OnInit {
       const propertyNameModel = this.costAccount.models.find(p => p.name === 'name');
       const propertyNameCostAccount = this.costAccount.properties.find(p => p.idPropertyModel === propertyNameModel.id);
       this.costAccountName = propertyNameCostAccount.value as string;
+      await this.loadCardCostAccountProperties();
     }
   }
 
@@ -520,6 +523,7 @@ export class CostAccountComponent implements OnInit {
     if (this.sectionCostAccountProperties.filter(p => p.invalid).length > 0) {
       return;
     }
+    this.formIsSaving = true;
     if (this.idCostAccount) {
       const costAccount = {
         id: this.idCostAccount,
@@ -528,6 +532,7 @@ export class CostAccountComponent implements OnInit {
         properties: this.costAccountProperties,
       };
       const result = await this.costAccountSrv.put(costAccount);
+      this.formIsSaving = false;
       if (result.success) {
         this.router.navigate(['/workpack'],
           {
@@ -547,6 +552,7 @@ export class CostAccountComponent implements OnInit {
         properties: this.costAccountProperties,
       };
       const result = await this.costAccountSrv.post(costAccount);
+      this.formIsSaving = false;
       if (result.success) {
         this.router.navigate(['/workpack'],
           {

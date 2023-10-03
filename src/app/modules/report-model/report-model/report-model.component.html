@@ -9,6 +9,9 @@
   </div>
   <div class="card-properties" *ngIf="cardProperties">
     <app-card [properties]="cardProperties">
+      <div class="loading-form-container" *ngIf="formIsSaving">
+        <app-card-loading [isCardLoading]="formIsSaving"></app-card-loading>
+      </div>
       <div class="loading-container" *ngIf="cardProperties.isLoading">
         <app-card-loading [isCardLoading]="cardProperties.isLoading"></app-card-loading>
       </div>

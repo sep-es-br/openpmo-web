@@ -1,4 +1,7 @@
 <div class="app-baseline-cancelling">
+  <div class="loading-form-container" *ngIf="formIsSaving">
+    <app-card-loading [isCardLoading]="formIsSaving"></app-card-loading>
+  </div>
   <div class="header-container" [class.mobile]="responsive">
     <div class="app-content-header" [class.mobile]="responsive">
       <i class="fas fa-times"></i>

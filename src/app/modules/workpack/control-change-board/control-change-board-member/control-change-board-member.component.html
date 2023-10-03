@@ -137,5 +137,8 @@
       </div>
     </app-card>
   </div>
+  <div class="loading-form-container" *ngIf="formIsSaving">
+    <app-card-loading [isCardLoading]="formIsSaving"></app-card-loading>
+  </div>
   <app-save-button (save)="saveCcbMember()"></app-save-button>
 </div>

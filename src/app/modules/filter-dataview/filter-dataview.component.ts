@@ -61,6 +61,8 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
   localityList;
   organizations: IOrganization[] = [];
   idCostAccountModel: number;
+  isLoading = false;
+  formIsSaving = false;
 
   constructor(
     private responsiveSrv: ResponsiveService,
@@ -68,7 +70,6 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
     private activeRoute: ActivatedRoute,
     private formBuilder: FormBuilder,
     private filterSrv: FilterDataviewService,
-    private location: Location,
     private breadcrumbSrv: BreadcrumbService,
     private workpackModelSrv: WorkpackModelService,
     private domainSrv: DomainService,
@@ -143,6 +144,7 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
   }
 
   async ngOnInit() {
+    this.isLoading = true;
     this.loadPropertiesCardFilter();
     this.filterPropertiesSub = this.filterSrv.ready.subscribe(data => {
       if (!this.idWorkpackModel || (!!this.idWorkpackModel && this.workpackModelEntitiesOptions.includes(this.entityName))) {
@@ -166,6 +168,7 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
       await this.loadFilterData();
     }
     await this.loadRuleCards();
+    this.isLoading = false;
   }
 
   ngOnDestroy(): void {
@@ -335,8 +338,10 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
         logicOperator: card.logicalOperator
       }))
     };
+    this.formIsSaving = true;
     const result = this.idFilter ? await this.filterSrv.putFilter(this.filterUrl, sender) :
       await this.filterSrv.postFilter(this.filterUrl, sender);
+    this.formIsSaving = false;
     if (result.success) {
       this.navigateToBack();
     }

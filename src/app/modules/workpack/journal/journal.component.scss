@@ -6,6 +6,30 @@
       margin-bottom: 1.5rem;
     }
   }
+  ::ng-deep .card-properties-journal {
+    .p-panel-toggleable {
+      position: relative;
+    }
+  }
+  .loading-form-container {
+    position: absolute;
+    min-height: 150px;
+    z-index: 10000;
+    display: flex;
+    width: 100%;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    background-color: #d0d8d9;
+    opacity: 0.4;
+    left: 0;
+    top: 0;
+    height: 100%;
+    .app-card-loading {
+      background-color: #d0d8d9;
+      opacity: 0.4;
+    }
+  }
   .evidences-container {
     .title {
       color: v.$fontTitle;

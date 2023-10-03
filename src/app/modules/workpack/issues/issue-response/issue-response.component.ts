@@ -45,6 +45,7 @@ export class IssueResponseComponent implements OnInit {
   stakeholderOptions: SelectItem[];
   idPlan: number;
   language: string;
+  formIsSaving = false;
 
   constructor(
     private actRouter: ActivatedRoute,
@@ -121,6 +122,7 @@ export class IssueResponseComponent implements OnInit {
     this.formIssueResponse.controls.status.setValue(this.issueResponse.status);
     this.formIssueResponse.controls.plan.setValue(this.issueResponse.plan);
     this.formIssueResponse.controls.responsible.setValue(this.issueResponse.responsible.map(resp => (resp.id)));
+    this.cardIssueResponseProperties.isLoading = false;
   }
 
   async loadPropertiesIssueResponse() {
@@ -129,7 +131,8 @@ export class IssueResponseComponent implements OnInit {
       initialStateToggle: false,
       cardTitle: 'properties',
       collapseble: true,
-      initialStateCollapse: false
+      initialStateCollapse: false,
+      isLoading: this.idIssueResponse ? true : false
     };
     this.statusOptions = Object.keys(this.issueResponsePropertiesOptions.STATUS).map(key => ({
       label: this.translateSrv.instant(this.issueResponsePropertiesOptions.STATUS[key].label),
@@ -205,6 +208,7 @@ export class IssueResponseComponent implements OnInit {
   }
 
   async saveIssueResponse() {
+    this.formIsSaving = true;
     const sender: IIssueResponse = {
       id: this.idIssueResponse,
       idIssue: this.idIssue,
@@ -216,6 +220,7 @@ export class IssueResponseComponent implements OnInit {
       responsible: this.formIssueResponse.controls.responsible.value
     };
     const result = this.idIssueResponse ? await this.issueResponseSrv.put(sender) : await this.issueResponseSrv.post(sender);
+    this.formIsSaving = false;
     if (result.success) {
       this.messageSrv.add({
         severity: 'success',

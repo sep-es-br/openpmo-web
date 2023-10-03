@@ -258,10 +258,11 @@ export class OfficeComponent implements OnDestroy {
     this.totalRecords = this.cardItemsPlans && this.cardItemsPlans.length;
     this.cardPlans = {
       ...this.cardPlans,
+      idFilterSelected: this.idFilterSelected,
       showCreateNemElementButton:  this.editPermission && this.menuItemsNewPlan?.length > 0 ? true : false,
       createNewElementMenuItems: this.menuItemsNewPlan
     }
-    
+    this.isLoading = false;
   }
 
   navigateToNewPlan(idPlanModel: number) {
@@ -367,6 +368,7 @@ export class OfficeComponent implements OnDestroy {
   }
 
   async handleSelectedFilter(event) {
+    this.isLoading = true;
     const idFilter = event.filter;
     this.idFilterSelected = idFilter;
     const result = await this.planSrv.GetAll({ 'id-office': this.idOffice, idFilter: this.idFilterSelected });

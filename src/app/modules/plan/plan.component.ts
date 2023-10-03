@@ -668,7 +668,9 @@ export class PlanComponent implements OnInit, OnDestroy {
 
   async handleCancelWorkpack(idWorkpack: number, modelCardIndex: number) {
     this.cardsPlanWorkPackModels[modelCardIndex].propertiesCard.isLoading = true;
+    this.formIsSaving = true;
     const result = await this.workpackSrv.cancelWorkpack(idWorkpack);
+    this.formIsSaving = false;
     this.cardsPlanWorkPackModels[modelCardIndex].propertiesCard.isLoading = false;
   }
 
@@ -720,6 +722,7 @@ export class PlanComponent implements OnInit, OnDestroy {
   }
 
   async pasteWorkpack(workpackCuted: IWorkpack, idWorkpackModelTo: number, idPlanTo: number, idParentTo?: number) {
+    this.formIsSaving = true;
     const result = await this.workpackSrv.pasteWorkpack(workpackCuted.id, idWorkpackModelTo, {
       idPlanFrom: workpackCuted.plan.id,
       idParentFrom: workpackCuted.idParent,
@@ -730,6 +733,7 @@ export class PlanComponent implements OnInit, OnDestroy {
     if (result.success) {
       this.menuSrv.reloadMenuPortfolio();
       await this.loadWorkPackModels();
+      this.formIsSaving = false;
       this.workpackSrv.removeWorkpackCuted();
     }
   }
@@ -755,7 +759,9 @@ export class PlanComponent implements OnInit, OnDestroy {
 
   async handleLinkToWorkpack(idWorkpack: number, idWorkpackModel: number, modelCardIndex: number) {
     this.cardsPlanWorkPackModels[modelCardIndex].propertiesCard.isLoading = true;
+    this.formIsSaving = true;
     const result = await this.workpackSrv.linkWorkpack(idWorkpack, idWorkpackModel, { 'id-plan': this.idPlan });
+    this.formIsSaving = false;
     if (result.success) {
       this.cardsPlanWorkPackModels[modelCardIndex].propertiesCard.isLoading = false;
       this.router.navigate(['/workpack'], {
@@ -897,11 +903,13 @@ export class PlanComponent implements OnInit, OnDestroy {
   }
 
   async handleResumeManagementDeliverable() {
+    this.formIsSaving = true;
     const result = await this.workpackSrv.endManagementDeliverable({
       endManagementDate: null,
       reason: this.endManagementWorkpack.reason,
       idWorkpack: this.endManagementWorkpack.idWorkpack
     });
+    this.formIsSaving = false;
     if (result.success) {
       this.handleCancelResumeManagement();
       this.messageSrv.add({
@@ -917,11 +925,13 @@ export class PlanComponent implements OnInit, OnDestroy {
   async handleEndManagementDeliverable() {
     if (this.endManagementWorkpack && this.endManagementWorkpack.reason.length > 0
       && this.endManagementWorkpack.endManagementDate !== null) {
+      this.formIsSaving = true;
       const result = await this.workpackSrv.endManagementDeliverable({
         idWorkpack: this.endManagementWorkpack.idWorkpack,
         endManagementDate: moment(this.endManagementWorkpack.endManagementDate).format('yyyy-MM-DD'),
         reason: this.endManagementWorkpack.reason
       });
+      this.formIsSaving = false;
       if (result.success) {
         this.messageSrv.add({
           severity: 'success',

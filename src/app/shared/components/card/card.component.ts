@@ -106,7 +106,7 @@ export class CardComponent implements OnInit, OnDestroy, OnChanges {
           label: filter.name,
           value: filter.id
         });
-        if (this.properties.idFilterSelected) {
+        if (this.properties.idFilterSelected || this.properties.idFilterSelected === null) {
           this.properties.idFilterSelected = this.properties.idFilterSelected;
         } else {
           if (!!filter.favorite) {

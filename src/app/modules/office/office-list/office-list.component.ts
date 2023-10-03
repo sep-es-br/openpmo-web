@@ -40,7 +40,8 @@ export class OfficeListComponent implements OnInit {
     initialStateToggle: false,
     cardTitle: 'offices',
     collapseble: true,
-    initialStateCollapse: false
+    initialStateCollapse: false,
+    showFilters: true
   };
   cardItemsProperties: ICardItemOffice[];
   isUserAdmin: boolean;
@@ -201,9 +202,11 @@ export class OfficeListComponent implements OnInit {
     if (result.success && result.data.length > 0) {
       const filterDefault = result.data.find(filter => !!filter.favorite);
       this.idFilterSelected = filterDefault ? filterDefault.id : undefined;
-      this.cardProperties.filters = result.data;
+      this.cardProperties = {
+        ...this.cardProperties,
+        filters: result.data
+      }
     }
-    this.cardProperties.showFilters = true;
   }
 
   handleEditFilter(event) {

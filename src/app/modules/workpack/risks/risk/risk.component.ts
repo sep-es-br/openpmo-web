@@ -50,6 +50,8 @@ export class RiskComponent implements OnInit, OnDestroy {
   importanceOptions: SelectItem[];
   yearRangeCalculated: string;
   idPlan: number;
+  formIsSaving = false;
+  isLoadingResponseItems = false;
 
   constructor(
     private actRouter: ActivatedRoute,
@@ -130,6 +132,7 @@ export class RiskComponent implements OnInit, OnDestroy {
     if (this.risk.happenedIn) {
       this.formRisk.controls.happenedIn.setValue(new Date(this.risk.happenedIn + 'T00:00:00'));
     }
+    this.cardRiskProperties.isLoading = false;
   }
 
   async loadPropertiesRisk() {
@@ -138,7 +141,8 @@ export class RiskComponent implements OnInit, OnDestroy {
       initialStateToggle: false,
       cardTitle: 'properties',
       collapseble: true,
-      initialStateCollapse: false
+      initialStateCollapse: false,
+      isLoading: true
     };
     this.importanceOptions = Object.keys(this.riskPropertiesOptions.importance).map(key => ({
       label: this.translateSrv.instant(this.riskPropertiesOptions.importance[key].label),
@@ -199,6 +203,7 @@ export class RiskComponent implements OnInit, OnDestroy {
   }
 
   loadRiskResponseCardItems() {
+    this.isLoadingResponseItems = true;
     this.riskResponseCardItems = [];
     if (this.risk && this.risk.responsePlans && this.risk.responsePlans.length > 0) {
       this.riskResponseCardItems = this.risk.responsePlans.map(resp => ({
@@ -227,6 +232,7 @@ export class RiskComponent implements OnInit, OnDestroy {
           {name: 'idWorkpack', value: this.idWorkpack},
         ]
       }));
+      this.isLoadingResponseItems = false;
     }
     if (this.editPermission) {
       this.riskResponseCardItems.push({
@@ -247,6 +253,9 @@ export class RiskComponent implements OnInit, OnDestroy {
           {name: 'idWorkpack', value: this.idWorkpack},
         ]
       });
+      this.isLoadingResponseItems = false;
+    } else {
+      this.isLoadingResponseItems = false;
     }
     if (this.riskResponseCardItems && this.riskResponseCardItems.length > 0) {
       this.cardRiskResponsesProperties = {
@@ -277,6 +286,7 @@ export class RiskComponent implements OnInit, OnDestroy {
       });
       return;
     }
+    this.formIsSaving = true;
     const sender: IRisk = {
       id: this.idRisk,
       idWorkpack: this.idWorkpack,
@@ -290,6 +300,7 @@ export class RiskComponent implements OnInit, OnDestroy {
       status: this.formRisk.controls.status.value
     };
     const result = this.idRisk ? await this.riskSrv.put(sender) : await this.riskSrv.post(sender);
+    this.formIsSaving = false;
     if (result.success) {
       this.messageSrv.add({
         severity: 'success',

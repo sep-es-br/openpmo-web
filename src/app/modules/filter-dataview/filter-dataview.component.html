@@ -7,7 +7,13 @@
   </div>
   <div class="card-properties-filter">
     <app-card [properties]="cardPropertiesFilter" class="mt-0 inputs-float-label">
-      <div class="p-grid properties-container">
+      <div class="loading-form-container" *ngIf="formIsSaving">
+        <app-card-loading [isCardLoading]="formIsSaving"></app-card-loading>
+      </div>
+      <div class="loading-container" *ngIf="isLoading">
+        <app-card-loading [isCardLoading]="isLoading"></app-card-loading>
+      </div>
+      <div class="p-grid properties-container" *ngIf="!isLoading">
         <form [formGroup]="formFilter">
           <div class="p-fluid formgroup" [class.formgroup-responsive]="responsive">
             <div class="p-field" [class.p-field-responsive]="responsive">
@@ -41,7 +47,7 @@
           </div>
         </form>
       </div>
-      <div class="rules-container">
+      <div class="rules-container" *ngIf="!isLoading">
         <div class="rules-container-header">
           <span class="rules-title" [class.rules-title-responsive]="responsive">{{'rules'|translate}}</span>
         </div>
@@ -59,7 +65,7 @@
           </p-dataView>
         </div>
       </div>
-      <div class="delete-filter-button-container" *ngIf="idFilter">
+      <div class="delete-filter-button-container" *ngIf="idFilter && !isLoading">
         <button pButton iconPos="left" icon="pi pi-times" [label]="'deleteFilter' |translate" (click)="handleDeleteFilter()"></button>
       </div>
     </app-card>

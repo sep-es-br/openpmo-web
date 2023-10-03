@@ -3,9 +3,15 @@
     <span *ngIf="!idRisk">{{ "newRisk" | translate }}</span>
     <span *ngIf="!!idRisk && risk">{{ risk.name }}</span>
   </div>
+  <div class="loading-form-container" *ngIf="formIsSaving">
+    <app-card-loading [isCardLoading]="formIsSaving"></app-card-loading>
+  </div>
   <div class="card-properties-risk" *ngIf="cardRiskProperties" [class.responsive]="responsive">
     <app-card [properties]="cardRiskProperties" class="mt-0 inputs-float-label">
-      <div class="p-grid">
+      <div class="loading-container" *ngIf="cardRiskProperties.isLoading">
+        <app-card-loading [isCardLoading]="cardRiskProperties.isLoading"></app-card-loading>
+      </div>
+      <div class="p-grid" *ngIf="!cardRiskProperties.isLoading">
         <form [formGroup]="formRisk">
           <div class="p-fluid">
             <div class="p-field">
@@ -93,9 +99,12 @@
     </app-card>
   </div>
   <section>
-    <app-card [properties]="cardRiskResponsesProperties" *ngIf="cardRiskResponsesProperties"
+    <div class="loading-container" *ngIf="isLoadingResponseItems">
+      <app-card-loading [isCardLoading]="isLoadingResponseItems"></app-card-loading>
+    </div>
+    <app-card [properties]="cardRiskResponsesProperties" *ngIf="cardRiskResponsesProperties && !isLoadingResponseItems"
       class="mt-0 inputs-float-label response-card">
-      <div class="card-item-responses-container">
+      <div class="card-item-responses-container" *ngIf="!isLoadingResponseItems">
         <p-dataView [value]="riskResponseCardItems" layout="grid" styleClass="dataview-card-items-risk"
           [emptyMessage]="'loadingEllipsis' | translate">
           <ng-template let-cardItem pTemplate="gridItem">

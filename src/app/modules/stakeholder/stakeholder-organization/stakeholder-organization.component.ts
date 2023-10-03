@@ -54,6 +54,8 @@ export class StakeholderOrganizationComponent implements OnInit {
   stakeholderRoles: IStakeholderRole[];
   stakeholderRolesCardItems: ICardItemRole[];
   editPermission = false;
+  isLoading = false;
+  formIsSaving = false;
 
   constructor(
     private actRouter: ActivatedRoute,
@@ -105,6 +107,7 @@ export class StakeholderOrganizationComponent implements OnInit {
   }
 
   async loadStakeholder() {
+    this.isLoading = true;
     if (this.idOrganization) {
       const result = await this.stakeholderSrv.GetStakeholderOrganization({'id-workpack': this.idWorkpack,
       'id-organization': this.idOrganization});
@@ -168,6 +171,7 @@ export class StakeholderOrganizationComponent implements OnInit {
   }
 
   loadCards() {
+    this.isLoading = false;
     this.cardOrganization = {
       toggleable: false,
       initialStateToggle: false,
@@ -274,6 +278,7 @@ export class StakeholderOrganizationComponent implements OnInit {
   }
 
   async saveStakeholder() {
+    this.formIsSaving = true;
     const stakeholderModel = {
       idWorkpack: this.idWorkpack,
       idOrganization: this.organization.id,
@@ -285,6 +290,7 @@ export class StakeholderOrganizationComponent implements OnInit {
     };
     if (this.idOrganization) {
       const result = await this.stakeholderSrv.putStakeholderOrganization(stakeholderModel);
+      this.formIsSaving = false;
       if (result.success) {
         this.messageSrv.add({
           severity: 'success',
@@ -305,6 +311,7 @@ export class StakeholderOrganizationComponent implements OnInit {
     }
     if (!this.idOrganization) {
       const result = await this.stakeholderSrv.postStakeholderOrganization(stakeholderModel);
+      this.formIsSaving = false;
       if (result.success) {
         this.messageSrv.add({
           severity: 'success',

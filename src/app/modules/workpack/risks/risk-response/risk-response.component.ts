@@ -4,16 +4,13 @@ import { StakeholderService } from './../../../../shared/services/stakeholder.se
 import { IRiskResponse } from './../../../../shared/interfaces/IRiskResponse';
 import { takeUntil, filter } from 'rxjs/operators';
 import { RiskResponseService } from './../../../../shared/services/risk-response.service';
-import { RiskService } from './../../../../shared/services/risk.service';
 import { BreadcrumbService } from './../../../../shared/services/breadcrumb.service';
 import { TranslateService } from '@ngx-translate/core';
 import { ResponsiveService } from './../../../../shared/services/responsive.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SelectItem, MessageService } from 'primeng/api';
 import { RiskResponsesPropertiesOptions } from './../../../../shared/constants/riskResponsesPropertiesOptions';
-import { IRisk } from './../../../../shared/interfaces/IRisk';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { ICardItem } from 'src/app/shared/interfaces/ICardItem';
 import { ICard } from './../../../../shared/interfaces/ICard';
 import { Subject } from 'rxjs';
 import { Calendar } from 'primeng/calendar';
@@ -50,6 +47,7 @@ export class RiskResponseComponent implements OnInit {
   stakeholderOptions: SelectItem[];
   idPlan: number;
   language: string;
+  formIsSaving = false;
 
   constructor(
     private actRouter: ActivatedRoute,
@@ -136,6 +134,7 @@ export class RiskResponseComponent implements OnInit {
     if (this.riskResponse.responsible && this.riskResponse.responsible.length > 0) {
       this.formRiskResponse.controls.responsible.setValue(this.riskResponse.responsible.map(resp => resp.id));
     }
+    this.cardRiskResponseProperties.isLoading = false;
   }
 
   async loadPropertiesRiskResponse() {
@@ -144,7 +143,8 @@ export class RiskResponseComponent implements OnInit {
       initialStateToggle: false,
       cardTitle: 'properties',
       collapseble: true,
-      initialStateCollapse: false
+      initialStateCollapse: false,
+      isLoading: true
     };
     this.strategyOptions = this.riskNature === 'OPPORTUNITY' ? Object.keys(this.riskResponsePropertiesOptions.STRATEGY.POSITIVE).map(key => ({
       label: this.translateSrv.instant(this.riskResponsePropertiesOptions.STRATEGY.POSITIVE[key].label),
@@ -159,6 +159,7 @@ export class RiskResponseComponent implements OnInit {
     }));
     await this.loadStakeholdersList();
     this.calculateYearRange();
+    if (!this.idRiskResponse) this.cardRiskResponseProperties.isLoading = false;
     const result = this.idRiskResponse && await this.riskResponseSrv.GetById(this.idRiskResponse);
     if (result && result.success) {
       this.riskResponse = result.data;
@@ -228,6 +229,7 @@ export class RiskResponseComponent implements OnInit {
   }
 
   async saveRiskResponse() {
+    this.formIsSaving = true;
     const sender: IRiskResponse = {
       id: this.idRiskResponse,
       idRisk: this.idRisk,
@@ -244,6 +246,7 @@ export class RiskResponseComponent implements OnInit {
       responsible: this.formRiskResponse.controls.responsible.value
     };
     const result = this.idRiskResponse ? await this.riskResponseSrv.put(sender) : await this.riskResponseSrv.post(sender);
+    this.formIsSaving = false;
     if (result.success) {
       this.messageSrv.add({
         severity: 'success',

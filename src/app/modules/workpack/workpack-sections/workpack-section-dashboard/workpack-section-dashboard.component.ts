@@ -143,7 +143,18 @@ export class WorkpackSectionDashboardComponent implements OnInit, OnChanges, OnD
     this.baselines = baselines;
     this.selectedBaseline = selectedBaseline;
     this.dashboard = dashboard;
-    if (this.dashboard && this.dashboard.workpacksByModel) this.dashboard.workpacksByModel.sort( (a, b) => a.level - b.level);
+    if (this.dashboard && this.dashboard.workpacksByModel) {
+      const cards = Array.from(this.dashboard.workpacksByModel);
+      cards.forEach( (card) => {
+        const cardModelIndex = this.dashboard.workpacksByModel.findIndex( c => c.idWorkpackModel === card.idWorkpackModel && c.level < card.level );
+        if (cardModelIndex > -1) {
+          this.dashboard.workpacksByModel[cardModelIndex].quantity = this.dashboard.workpacksByModel[cardModelIndex].quantity + card.quantity;
+          const cardIndex = this.dashboard.workpacksByModel.findIndex( c => c === card);
+          this.dashboard.workpacksByModel.splice(cardIndex, 1);
+        }
+      });
+      this.dashboard.workpacksByModel.sort( (a, b) => a.level - b.level);
+    };
     this.yearRange = yearRange;
     this.startDate = startDate;
     this.endDate = endDate;
@@ -173,17 +184,6 @@ export class WorkpackSectionDashboardComponent implements OnInit, OnChanges, OnD
   async getDashboard() {
     this.isLoading = true;
     this.dashboardSrv.getDashboard({referenceMonth: this.referenceMonth, selectedBaseline: this.selectedBaseline});
-  }
-
-  validateDashboard() {
-    if (this.dashboard && (!this.dashboard.earnedValueAnalysis || this.dashboard.earnedValueAnalysis === null)
-    && (!this.dashboard.milestone || this.dashboard.milestone.quantity === 0)
-    && (!this.dashboard.risk || this.dashboard.risk.total === 0)
-    && (!this.dashboard.stakeholders || this.dashboard.stakeholders.length === 0)
-    && (!this.dashboard.tripleConstraint || this.dashboard.tripleConstraint === null)
-    && (!this.dashboard.workpacksByModel || this.dashboard.workpacksByModel.length === 0)) {
-      this.dashboard = undefined;
-    }
   }
 
   async loadWorkpackModelMenu(idWorkpackModel, level, index, event) {

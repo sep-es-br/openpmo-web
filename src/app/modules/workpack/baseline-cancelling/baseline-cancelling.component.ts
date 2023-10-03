@@ -26,6 +26,7 @@ export class BaselineCancellingComponent implements OnInit {
   $destroy = new Subject();
   idPlan: number;
   projectName: string;
+  formIsSaving = false;
 
   constructor(
     private actRouter: ActivatedRoute,
@@ -66,7 +67,7 @@ export class BaselineCancellingComponent implements OnInit {
       breadcrumbItems = await this.breadcrumbSrv.loadWorkpackBreadcrumbs(this.idWorkpack, this.idPlan)
     }
     this.breadcrumbSrv.setMenu([
-      ... breadcrumbItems,
+      ...breadcrumbItems,
       {
         key: 'baseline',
         routerLink: ['/workpack/cancelling'],
@@ -112,7 +113,7 @@ export class BaselineCancellingComponent implements OnInit {
     this.idPlan = Number(localStorage.getItem('@currentPlan'));
     this.baseline = {
       idWorkpack: this.idWorkpack,
-      status:  'PROPOSED',
+      status: 'PROPOSED',
       name: this.projectName,
       description: '',
       cancelation: true
@@ -121,6 +122,7 @@ export class BaselineCancellingComponent implements OnInit {
   }
 
   async handleSubmitBaselineCancelling() {
+    this.formIsSaving = true;
     this.baseline = {
       ...this.baseline,
       name: this.formBaseline.controls.name.value,
@@ -128,13 +130,19 @@ export class BaselineCancellingComponent implements OnInit {
       message: this.formBaseline.controls.message.value
     };
     const result = await this.baselineSrv.submitBaselineCancelling(this.baseline);
+    this.formIsSaving = false;
     if (result.success) {
-      this.router.navigate(
+      const idPlan = Number(localStorage.getItem('@currentPlan'));
+      await this.router.navigate(
         ['/workpack'],
         {
-          queryParams: {
+          queryParams: this.idWorkpackModelLinked ? {
             id: this.idWorkpack,
+            idPlan,
             idWorkpackModelLinked: this.idWorkpackModelLinked
+          } : {
+            id: this.idWorkpack,
+            idPlan,
           }
         }
       );
@@ -142,14 +150,19 @@ export class BaselineCancellingComponent implements OnInit {
   }
 
   handleCancelChanges() {
+    const idPlan = Number(localStorage.getItem('@currentPlan'));
     this.router.navigate(
       ['/workpack'],
-      {
-        queryParams: {
-          id: this.idWorkpack,
-          idWorkpackModelLinked: this.idWorkpackModelLinked
+        {
+          queryParams: this.idWorkpackModelLinked ? {
+            id: this.idWorkpack,
+            idPlan,
+            idWorkpackModelLinked: this.idWorkpackModelLinked
+          } : {
+            id: this.idWorkpack,
+            idPlan,
+          }
         }
-      }
     );
   }
 

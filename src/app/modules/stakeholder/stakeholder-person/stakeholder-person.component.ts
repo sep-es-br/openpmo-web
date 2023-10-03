@@ -88,6 +88,7 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
   phoneNumberPlaceholder = '';
   editPermission = false;
   isUserAdmin = false;
+  formIsSaving = false;
 
   constructor(
     private actRouter: ActivatedRoute,
@@ -132,6 +133,7 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
   }
 
   async ngOnInit() {
+    this.loadCards();
     await this.loadWorkpack();
     await this.loadStakeholder();
     await this.getAuthServer();
@@ -227,7 +229,6 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
   }
 
   async loadStakeholder() {
-    this.loadCards();
     if (this.idPerson) {
       const result = await this.stakeholderSrv.GetStakeholderPerson({
         'id-workpack': this.idWorkpack,
@@ -248,12 +249,15 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
 
   // consulta para person que não são users
   async searchPersonByName(event) {
+    this.isLoading = true;
     const result = await this.personSrv.GetPersonByFullName({
       idWorkpack: this.idWorkpack,
       fullName: event.query.toString()
     });
+    this.isLoading = false;
     if (result.success && result.data.length > 0) {
       this.resultPersonsByName = result.data;
+      this.notFoundPerson = false;
     } else {
       this.notFoundPerson = true;
     }
@@ -325,7 +329,7 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
       initialStateToggle: false,
       cardTitle: 'person',
       collapseble: true,
-      isLoading: true,
+      isLoading: this.idPerson ? true : false,
       initialStateCollapse: false
     };
     this.cardRoles = {
@@ -397,9 +401,11 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
 
   async searchUserByEmail() {
     if (this.searchedEmailUser && this.searchedEmailUser.length > 5 && this.searchedEmailUser.split('@').length > 1) {
+      this.isLoading = true;
       const {data} = await this.personSrv.GetByKey(this.searchedEmailUser, {
         idOffice: this.idOffice,
       });
+      this.isLoading = false;
       if (data) {
         this.person = data;
         this.showMessageNotFoundUserByEmail = false;
@@ -612,6 +618,7 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
     if (!validated) {
       return;
     }
+    this.formIsSaving = true;
     const permissions = this.stakeholderPermissions?.filter(permission =>
       !permission.inheritedFrom && permission.level && permission.level !== 'None');
     const stakeholderModel = ((!this.user && !this.stakeholder) || (this.stakeholder && !this.stakeholder.person.isUser)) ? {
@@ -653,6 +660,7 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
     };
     if (this.idPerson) {
       const result = await this.stakeholderSrv.putStakeholderPerson(stakeholderModel);
+      this.formIsSaving = false;
       if (result.success) {
         this.messageSrv.add({
           severity: 'success',
@@ -672,6 +680,7 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
       }
     } else {
       const result = await this.stakeholderSrv.postStakeholderPerson(stakeholderModel);
+      this.formIsSaving = false;
       if (result.success) {
         this.messageSrv.add({
           severity: 'success',

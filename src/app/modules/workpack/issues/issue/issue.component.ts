@@ -48,6 +48,7 @@ export class IssueComponent implements OnInit {
   issueResponsePropertiesOptions = IssueResponsesPropertiesOptions;
   importanceOptions: SelectItem[];
   idPlan: number;
+  formIsSaving = false;
 
   constructor(
     private actRouter: ActivatedRoute,
@@ -117,7 +118,8 @@ export class IssueComponent implements OnInit {
       initialStateToggle: false,
       cardTitle: 'properties',
       collapseble: true,
-      initialStateCollapse: false
+      initialStateCollapse: false,
+      isLoading: this.idIssue ? true : false
     };
     this.importanceOptions = Object.keys(this.issuePropertiesOptions.importance).map(key => ({
       label: this.translateSrv.instant(this.issuePropertiesOptions.importance[key].label),
@@ -215,6 +217,9 @@ export class IssueComponent implements OnInit {
           { name: 'idWorkpack', value: this.idWorkpack }
         ]
       });
+      this.cardIssueProperties.isLoading = false;
+    } else {
+      this.cardIssueProperties.isLoading = false;
     }
     if (this.issueResponseCardItems && this.issueResponseCardItems.length > 0) {
       this.cardIssueResponsesProperties = {
@@ -235,6 +240,7 @@ export class IssueComponent implements OnInit {
   }
 
   async saveIssue() {
+    this.formIsSaving = true;
     const sender: IIssue = {
       id: this.idIssue,
       idWorkpack: this.idWorkpack,
@@ -245,6 +251,7 @@ export class IssueComponent implements OnInit {
       status: this.formIssue.controls.status.value
     };
     const result = this.idIssue ? await this.issueSrv.put(sender) : await this.issueSrv.post(sender);
+    this.formIsSaving = false;
     if (result.success) {
       this.messageSrv.add({
         severity: 'success',

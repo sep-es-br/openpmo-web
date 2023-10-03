@@ -51,6 +51,7 @@ export class SharingComponent implements OnInit {
   officeListOptionsSharing: IOffice[];
   editPermission = false;
   isLoading = false;
+  formIsSaving = false;
 
   constructor(
     private breadcrumbSrv: BreadcrumbService,
@@ -298,12 +299,14 @@ export class SharingComponent implements OnInit {
 
   async saveWorkpackSharing() {
     this.saveButton?.hideButton();
+    this.formIsSaving = true;
     const sharedWithSender: IWorkpackShared[] = this.cardItemSharing.filter(card => card.typeCardItem === 'sharedItem').map(share => ({
       id: share.itemId,
       office: share.office,
       level: share.selectedOption
     }));
     const result = await this.workpackSharedSrv.shareWorkpack(sharedWithSender);
+    this.formIsSaving = false;
     if (result.success) {
       await this.loadWorkpackSharing();
       this.messageSrv.add({

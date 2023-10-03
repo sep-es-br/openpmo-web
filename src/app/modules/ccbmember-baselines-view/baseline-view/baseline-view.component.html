@@ -431,7 +431,7 @@
             </div>
           </div>
         </div>
-        <div class="evaluations-section" *ngIf="!responsive">
+        <div class="evaluations-section" *ngIf="!responsive && !isLoading" >
           <div class="evaluation" *ngIf="!baselineEvaluatedByUser && baseline?.status !== 'APPROVED'">
             <span class="evaluation-header">
               {{'evaluation'|translate}}
@@ -525,5 +525,8 @@
   </p-dialog>
   <div class="loading-container" *ngIf="isLoading">
     <app-card-loading [isCardLoading]="isLoading" ></app-card-loading>
+  </div>
+  <div class="loading-form-container" *ngIf="formIsSaving">
+    <app-card-loading [isCardLoading]="formIsSaving"></app-card-loading>
   </div>
 </div>

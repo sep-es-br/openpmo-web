@@ -67,6 +67,7 @@ export class ControlChangeBoardMemberComponent implements OnInit, OnDestroy {
   ccbMember: IControlChangeBoard = {} as IControlChangeBoard;
   isUser = true;
   phoneNumberPlaceholder = '';
+  formIsSaving = false;
 
   constructor(
     private actRouter: ActivatedRoute,
@@ -441,11 +442,13 @@ export class ControlChangeBoardMemberComponent implements OnInit, OnDestroy {
         isUser: this.isUser
       }
     } as IControlChangeBoard;
+    this.formIsSaving = true;
     if (this.idPerson) {
       await this.ccbMemberSrv.Put(sender);
     } else {
       await this.ccbMemberSrv.post(sender);
     }
+    this.formIsSaving = false;
     this.messageSrv.add({
       severity: 'success',
       summary: this.translateSrv.instant('success'),
