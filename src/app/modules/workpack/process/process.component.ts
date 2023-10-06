@@ -122,10 +122,12 @@ export class ProcessComponent implements OnInit, OnDestroy {
   async searchProcessByNumber() {
     this.isLoading = true;
     const result = await this.processSrv.GetProcessByNumber({ 'process-number': this.formProcess.controls.processNumber.value });
+    this.isLoading = true;
     if (result.success && result.data) {
       this.process = result.data;
       this.setFormProcess();
     } else {
+      this.isLoading = false;
       this.messageSrv.add({
         severity: 'warn',
         summary: this.translateSrv.instant('attention'),

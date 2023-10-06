@@ -533,7 +533,7 @@
           }
         },
         "paste": {
-          "error": "This workpack has already been trimmed and cannot be trimmed"
+          "error": "Problemas to paste this workpack."
         }
       },
       "permission": {

@@ -1004,6 +1004,9 @@ export class WorkpackComponent implements OnDestroy {
   }
 
   async checkPasteWorkpack(workpackCuted: IWorkpack, idWorkpackModelTo: number) {   
+    if (idWorkpackModelTo === workpackCuted.idWorkpackModel) {
+      return {canPaste: true, incompatiblesProperties: false}
+    }
     const result = await this.workpackSrv.checkPasteWorkpack(workpackCuted.id, idWorkpackModelTo, {
       idWorkpackModelFrom: workpackCuted.idWorkpackModel,
     });
@@ -1158,9 +1161,7 @@ export class WorkpackComponent implements OnDestroy {
   }
 
   async deleteWorkpackChildren(workpack) {
-    this.workpackChildChanging = true;
     const result = await this.workpackSrv.delete(workpack);
-    this.workpackChildChanging = false;
     if (result.success) {
       const workpackModelIndex = this.cardsWorkPackModelChildren
         .findIndex(workpackModel => workpackModel.idWorkpackModel === workpack.idWorkpackModel);

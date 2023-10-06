@@ -542,7 +542,7 @@
           }
         },
         "paste": {
-          "error": "Esse workpack já foi recortado e não poderá ser recortado"
+          "error": "Problemas ao tentar colar o pacote de trabalho."
         }
       },
       "permission": {

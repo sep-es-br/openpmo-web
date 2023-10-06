@@ -157,6 +157,8 @@ export class RiskComponent implements OnInit, OnDestroy {
     }
     if (this.idRisk) {
       this.loadRiskResponseCardItems();
+    } else {
+      this.cardRiskProperties.isLoading = false;
     }
   }
 

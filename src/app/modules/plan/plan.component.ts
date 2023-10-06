@@ -774,7 +774,6 @@ export class PlanComponent implements OnInit, OnDestroy {
   }
 
   async deleteWorkpack(workpack: IWorkpack, modelCardIndex: number) {
-    this.cardsPlanWorkPackModels[modelCardIndex].propertiesCard.isLoading = true;
     const result = await this.workpackSrv.delete(workpack, { useConfirm: true });
     if (result.success) {
       const workpackModelIndex = this.cardsPlanWorkPackModels
@@ -789,7 +788,6 @@ export class PlanComponent implements OnInit, OnDestroy {
           this.totalRecords[workpackModelIndex] = this.cardsPlanWorkPackModels[workpackModelIndex].workpackItemCardList.length;
         }
       }
-      this.cardsPlanWorkPackModels[modelCardIndex].propertiesCard.isLoading = false;
       this.menuSrv.reloadMenuPortfolio();
     }
   }
