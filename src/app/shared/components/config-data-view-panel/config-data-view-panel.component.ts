@@ -1,9 +1,8 @@
 import { ConfigDataViewService } from './../../services/config-dataview.service';
 import { takeUntil } from 'rxjs/operators';
 import { ResponsiveService } from './../../services/responsive.service';
-import { TranslateService } from '@ngx-translate/core';
-import { ConfirmationService, SelectItem } from 'primeng/api';
-import { Component, Input, OnInit, Output, EventEmitter, OnDestroy } from '@angular/core';
+import { SelectItem } from 'primeng/api';
+import { Component, Input, OnInit, OnDestroy } from '@angular/core';
 import { CookieService } from 'ngx-cookie';
 import { AuthService } from '../../services/auth.service';
 import * as moment from 'moment';
@@ -27,10 +26,12 @@ export class ConfigDataViewPanelComponent implements OnInit, OnDestroy {
     { label: '15', value: 15 },
     { label: '30', value: 30 }
   ];
-  selectedPageSize: number;
+  selectedPageSize = 5;
   cookiesPermission: boolean;
   responsive: boolean;
   $destroy = new Subject();
+  collapsePanelsStatus: boolean;
+  displayModeAll
 
   constructor(
     private cookieSrv: CookieService,
@@ -39,6 +40,15 @@ export class ConfigDataViewPanelComponent implements OnInit, OnDestroy {
     private configDataSrv: ConfigDataViewService
   ) {
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.responsive = value);
+    this.configDataSrv.observableCollapsePanelsStatus.pipe(takeUntil(this.$destroy)).subscribe(collapsePanelStatus => {
+      this.collapsed = collapsePanelStatus === 'collapse' ? true : false;
+    });
+    this.configDataSrv.observableDisplayModeAll.pipe(takeUntil(this.$destroy)).subscribe(displayMode => {
+      this.displayMode = displayMode;
+    });
+    this.configDataSrv.observablePageSize.pipe(takeUntil(this.$destroy)).subscribe(pageSize => {
+      this.selectedPageSize = pageSize;
+    });
   }
 
   async ngOnInit() {
@@ -68,13 +78,13 @@ export class ConfigDataViewPanelComponent implements OnInit, OnDestroy {
   getCookiesKeys() {
     if (this.user) {
       const preferencesCollapsedExpandMode = this.cookieSrv.get('collapsedAllDataView' + this.user.email);
-      this.collapsed = preferencesCollapsedExpandMode ? (preferencesCollapsedExpandMode === 'collapseAll' ? true : false) : true;
+      this.collapsed = preferencesCollapsedExpandMode ? (preferencesCollapsedExpandMode === 'collapseAll' ? true : false) : this.collapsed;
       this.handleCollapseAll(this.collapsed);
       const preferencesDisplayMode = this.cookieSrv.get('displayModeDataView' + this.user.email);
-      this.displayMode = preferencesDisplayMode ? preferencesDisplayMode : 'list';
+      this.displayMode = preferencesDisplayMode ? preferencesDisplayMode : this.displayMode;
       this.handleChangeDisplayMode(this.displayMode);
       const preferencePageSize = this.cookieSrv.get('pageSizeDataView' + this.user.email);
-      this.selectedPageSize = preferencePageSize ? Number(preferencePageSize) : 5;
+      this.selectedPageSize = preferencePageSize ? Number(preferencePageSize) : this.selectedPageSize;
       this.handleChangePageSize();
     }
 

@@ -56,6 +56,10 @@ $mobileMenuHeight: 90px;
       }
     }
 
+    .p-menuitem-text {
+      width: calc(100% - 50px) !important;
+    } 
+
     .p-panelmenu .p-panelmenu-header > a {
       font-weight: 500;
       font-family: 'Montserrat Medium', 'Montserrat Regular', 'Montserrat', sans-serif;

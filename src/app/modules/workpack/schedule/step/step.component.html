@@ -6,9 +6,14 @@
       <span>{{ "newMonth" | translate }}</span>
     </ng-template>
   </div>
-
+  <div class="loading-form-container" *ngIf="formIsSaving">
+    <app-card-loading [isCardLoading]="formIsSaving"></app-card-loading>
+  </div>
   <div class="card-properties-step" *ngIf="cardStepProperties">
-    <app-card [properties]="cardStepProperties" class="mt-0 inputs-float-label">
+    <div class="loading-container" *ngIf="isLoading">
+      <app-card-loading [isCardLoading]="isLoading"></app-card-loading>
+    </div>
+    <app-card [properties]="cardStepProperties" class="mt-0 inputs-float-label" *ngIf="!isLoading">
       <div class="p-grid">
         <form [formGroup]="formStep">
           <div class="p-formgroup-inline" [class.responsive]="responsive">
@@ -90,7 +95,7 @@
         </form>
       </div>
     </app-card>
-    <div class="card-cost-assignments" *ngIf="cardCostAssignmentsProperties">
+    <div class="card-cost-assignments" *ngIf="cardCostAssignmentsProperties && !isLoading">
       <app-card [properties]="cardCostAssignmentsProperties">
         <div class="card-item-costs-container">
           <p-dataView [value]="costAssignmentsCardItems" layout="grid" styleClass="dataview-card-items-cost"
@@ -106,7 +111,7 @@
       </app-card>
     </div>
   </div>
-  <div class="id-container" *ngIf="idStep && cardStepProperties">
+  <div class="id-container" *ngIf="idStep && cardStepProperties && !isLoading">
     <span>{{idStep}}</span>
   </div>
   <div class="app-save-button-layout">

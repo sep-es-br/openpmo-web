@@ -242,7 +242,8 @@ export class WorkpackCardItemComponent implements OnInit, OnDestroy {
 
   loadTripleConstraintSettings() {
     if (this.properties.dashboard &&
-      (!this.properties.dashboard?.tripleConstraint?.cost || this.properties.dashboard?.tripleConstraint?.cost?.foreseenValue === 0)) {
+      (!this.properties.dashboard?.tripleConstraint?.cost || this.properties.dashboard?.tripleConstraint?.cost?.foreseenValue === 0
+        || this.properties.dashboard?.tripleConstraint?.cost?.foreseenValue === null)) {
       this.iconCostColor = '#f5f5f5';
     } else {
       if (this.properties.dashboard && this.properties.dashboard?.tripleConstraint?.cost?.plannedValue > 0) {
@@ -292,7 +293,8 @@ export class WorkpackCardItemComponent implements OnInit, OnDestroy {
     }
 
     if (this.properties.dashboard && (!this.properties.dashboard?.tripleConstraint?.cost ||
-      this.properties?.dashboard?.tripleConstraint?.scope?.foreseenValue === 0)) {
+      this.properties?.dashboard?.tripleConstraint?.scope?.foreseenValue === 0 ||
+      this.properties?.dashboard?.tripleConstraint?.scope?.foreseenValue === null)) {
       this.iconScopeColor = '#f5f5f5';
     } else {
       if (this.properties.dashboard && this.properties.dashboard?.tripleConstraint?.scope?.plannedVariationPercent > 0) {
@@ -307,7 +309,8 @@ export class WorkpackCardItemComponent implements OnInit, OnDestroy {
           this.iconScopeColor = '#EA5C5C';
         }
       } else {
-        if (this.properties.dashboard?.tripleConstraint?.scope?.foreseenValue >=
+        if (this.properties.dashboard?.tripleConstraint?.scope?.foreseenValue !== null &&
+          this.properties.dashboard?.tripleConstraint?.scope?.foreseenValue >=
           this.properties.dashboard?.tripleConstraint?.scope?.actualValue) {
           this.iconScopeColor = '#EA5C5C';
         } else {

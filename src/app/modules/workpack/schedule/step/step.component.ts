@@ -64,6 +64,8 @@ export class StepComponent implements OnInit, OnDestroy {
   currentLang = '';
   editPermission = false;
   onlyOneStep = false;
+  isLoading = false;
+  formIsSaving = false;
 
   constructor(
     private actRouter: ActivatedRoute,
@@ -120,7 +122,9 @@ export class StepComponent implements OnInit, OnDestroy {
 
   async ngOnInit() {
     this.calendarFormat = this.translateSrv.instant('dateFormat');
+    this.isLoading = true;
     await this.loadPropertiesStep();
+    this.isLoading = false;
   }
 
   async loadPropertiesStep() {
@@ -509,7 +513,9 @@ export class StepComponent implements OnInit, OnDestroy {
       }))
     };
     if (this.step.id) {
+      this.formIsSaving = true;
       const result = await this.scheduleSrv.putScheduleStep(this.step);
+      this.formIsSaving = false;
       if (result.success) {
         this.router.navigate(['/workpack'],
           {
@@ -523,7 +529,9 @@ export class StepComponent implements OnInit, OnDestroy {
       }
     }
     if (!this.step.id) {
+      this.formIsSaving = true;
       const result = await this.scheduleSrv.postScheduleStep(this.step);
+      this.formIsSaving = false;
       if (result.success) {
         this.router.navigate(['/workpack'],
           {

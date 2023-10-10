@@ -54,7 +54,9 @@ export class ScheduleComponent implements OnInit, OnDestroy {
   actualValidationMessage: string;
   scheduleStartDate: Date;
   costAccounts: ICostAccount[];
-  currentLang = ''; 
+  currentLang = '';
+  isLoading = false;
+  formIsSaving = false;
 
   constructor(
     private actRouter: ActivatedRoute,
@@ -105,7 +107,9 @@ export class ScheduleComponent implements OnInit, OnDestroy {
     const today = moment();
     const yearStart = today.year();
     this.yearRange = (yearStart - 10).toString() + ':' + (yearStart + 10).toString();
+    this.isLoading = true;
     await this.loadPropertiesSchedule();
+    this.isLoading = false;
   }
 
   async setBreadcrumb() {
@@ -398,8 +402,9 @@ export class ScheduleComponent implements OnInit, OnDestroy {
         actualCost: cost.actualWork
       }))
     };
-
+    this.formIsSaving = true;
     const result = await this.scheduleSrv.postSchedule(this.schedule);
+    this.formIsSaving = false;
     if (result.success) {
       this.router.navigate(
         ['/workpack'],

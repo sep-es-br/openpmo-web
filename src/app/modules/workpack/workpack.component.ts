@@ -260,10 +260,6 @@ export class WorkpackComponent implements OnDestroy {
     ));
   }
 
-  handleChangeDisplayMode(event) {
-    this.displayModeAll = event.displayMode;
-  }
-
   handleChangePageSize(event) {
     this.pageSize = event.pageSize;
   }
