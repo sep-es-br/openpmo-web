@@ -4,12 +4,21 @@ import { IMeasureUnit } from './IMeasureUnit';
 export interface IWorkpackBreakdownStructure {
   idWorkpack:     number;
   workpackName:   string;
-  dashboard:      IDashboard;
-
+  dashboard?:     IDashboardData;
+  milestones?: {
+      completed: boolean,
+      milestoneDate: string;
+      snapshotDate: string;
+  } [];
+  risks?: {
+      importance: string;
+      status: string;
+  } [];
+  dashboardData?: IDashboard;
   baselineCost?: number;
-  baselineEnd?: number;
+  baselineEnd?: string;
   baselinePlanned?: number;
-  baselineStart?: number;
+  baselineStart?: string;
   unitMeasure?: IMeasureUnit;
   end?: string;
   planed?: number;
@@ -35,44 +44,12 @@ export interface IWorkpackBreakdownStructureWorkpackModel {
 }
 
 interface IDashboard {
-  earnedValueAnalysis: IEarnedValueAnalysisDashboard;
   milestone?: IMilestoneDashboard;
   risk?: IRiskDashboard;
-  stakeholders?: IStakeholderDashboard[];
   tripleConstraint: ITripleConstraintDashboard;
   costPerformanceIndex?:     any;
   schedulePerformanceIndex?: any;
-  earnedValue?:              number;
-  workpacksByModel?: {
-    quantity: number;
-    modelName: string;
-    icon: string;
-  }[];
-}
-
-interface IEarnedValueAnalysisDashboard {
-  performanceIndexes: {
-    actualCost: number;
-    costPerformanceIndex: {
-      costVariation: number;
-      indexValue: number;
-    };
-    earnedValue: number;
-    estimateToComplete: number;
-    estimatesAtCompletion: number;
-    plannedValue: number;
-    schedulePerformanceIndex: {
-      indexValue: number;
-      scheduleVariation: number;
-    };
-  }[];
-  earnedValueByStep:
-  {
-    actualCost: number;
-    plannedValue: number;
-    earnedValue: number;
-    date: string;
-  }[];
+  earnedValue?: number;
 }
 
 interface IMilestoneDashboard {
@@ -91,21 +68,6 @@ interface IRiskDashboard {
   total: number;
 }
 
-interface IStakeholderDashboard {
-  actor: {
-    avatar?: {
-      id: number;
-      mimeType: string;
-      name: string;
-      url: string;
-    };
-    fullName: string;
-    id: number;
-    name: string;
-    organization?: boolean;
-  };
-  role: string;
-}
 
 interface ITripleConstraintDashboard {
   idBaseline?: number;
@@ -136,4 +98,38 @@ interface ITripleConstraintDashboard {
     actualValue?: number;
     variation: number;
   };
+
+}
+
+interface IDashboardData {
+  tripleConstraint: {
+    costVariation: number;
+    costPlannedValue: number;
+    costForeseenValue: number;
+    costActualValue: number;
+    schedulePlannedStartDate: string;
+    schedulePlannedEndDate: string;
+    scheduleForeseenStartDate: string;
+    scheduleForeseenEndDate: string;
+    scheduleActualStartDate: string;
+    scheduleActualEndDate: string;
+    scheduleVariation: number;
+    schedulePlannedValue: number;
+    scheduleForeseenValue: number;
+    scheduleActualValue: number;
+    scopeVariation: number;
+    scopePlannedVariationPercent: number;
+    scopeForeseenVariationPercent: number;
+    scopeActualVariationPercent: number;
+    scopePlannedValue: number;
+    scopeForeseenValue: number;
+    scopeActualValue: number;
+  };
+  performanceIndex: {
+    costPerformanceIndexValue: number;
+    costPerformanceIndexVariation: number;
+    schedulePerformanceIndexValue: number;
+    schedulePerformanceIndexVariation: number
+  };
+  earnedValue?: number;
 }

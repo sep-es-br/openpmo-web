@@ -37,7 +37,9 @@
   <div class="milestone-date-container"
     *ngIf="property?.milestoneData && !!property?.milestoneData?.baselineDate">
     <span class="milestone-date-label">Linha de Base</span>
-    <span class="milestone-date-baseline">{{property?.milestoneData?.baselineDate | date: 'dd/MM/yyyy'}}</span>
+    <span class="milestone-date-baseline">
+      {{ language === 'pt' ? (property?.milestoneData?.baselineDate|date:'dd/MM/yyyy') :
+                  (property?.milestoneData?.baselineDate|date:'yyyy/MM/dd') }}</span>
   </div>
   </div>
 </ng-template>

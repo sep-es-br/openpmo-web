@@ -115,10 +115,10 @@
             </div>
           </p-card>
           <p-card *ngIf="cardItem.typeCardItem === 'newCardItem'" class="new-card-item list-mode"
-            [class.new-card-item-mobile]="responsive" (click)="handleAddCardItem()">
+            [class.new-card-item-mobile]="responsive">
             <div class="card-item-content">
-              <i [ngClass]="[ 'app-icon', cardItem.icon, 'light-grey-icon' ]"
-                [ngStyle]="{ fontSize: responsive ? '2rem' : '3rem' }"></i>
+              <i [ngClass]="[ 'app-icon', cardItem.icon, 'light-grey-icon' ]" (click)="handleAddCardItem()"
+                [ngStyle]="{ fontSize: responsive ? '2rem' : '3rem', cursor: 'pointer' }"></i>
             </div>
           </p-card>
         </div>

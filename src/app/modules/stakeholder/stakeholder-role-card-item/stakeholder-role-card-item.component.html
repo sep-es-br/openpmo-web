@@ -33,10 +33,12 @@
   </div>
 </p-card>
 
-<p-card class="new-card-item-role" (click)="handleNewCardItemRole()"
+<p-card class="new-card-item-role" 
   [class.new-card-item-role-mobile]="responsive"
   *ngIf="properties.type === 'new-role-card'">
   <div class="card-item-content">
-    <i [ngClass]="[ 'app-icon', iconsEnum.Plus, 'light-grey-icon' ]" [ngStyle]="{ fontSize: responsive ? '2rem' : '3em' }"></i>
+    <i [ngClass]="[ 'app-icon', iconsEnum.Plus, 'light-grey-icon' ]"
+    (click)="handleNewCardItemRole()"
+    [ngStyle]="{ fontSize: responsive ? '2rem' : '3em', cursor: 'pointer' }"></i>
   </div>
 </p-card>

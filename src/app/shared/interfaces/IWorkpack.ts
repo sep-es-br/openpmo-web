@@ -82,7 +82,7 @@ export interface IWorkpack {
     favoritedBy?: boolean;
     hasScheduleSectionActive?: boolean;
     reason?: string;
-    dashboard?: {
+    dashboardData?: {
       risk?: {
         high: number,
         low: number,
@@ -105,6 +105,48 @@ export interface IWorkpack {
     milestoneDate?: string;
     hasWBS?: boolean;
     hasChildren?: boolean;
+    dashboard?: IWorkpackDashboard;
+    milestones?: {
+      completed: boolean,
+      milestoneDate: string;
+      snapshotDate: string;
+    } [];
+    risks?: {
+      importance: string;
+      status: string;
+    } [];
+}
+
+interface IWorkpackDashboard {
+  tripleConstraint: {
+    costVariation: number;
+    costPlannedValue: number;
+    costForeseenValue: number;
+    costActualValue: number;
+    schedulePlannedStartDate: string;
+    schedulePlannedEndDate: string;
+    scheduleForeseenStartDate: string;
+    scheduleForeseenEndDate: string;
+    scheduleActualStartDate: string;
+    scheduleActualEndDate: string;
+    scheduleVariation: number;
+    schedulePlannedValue: number;
+    scheduleForeseenValue: number;
+    scheduleActualValue: number;
+    scopeVariation: number;
+    scopePlannedVariationPercent: number;
+    scopeForeseenVariationPercent: number;
+    scopeActualVariationPercent: number;
+    scopePlannedValue: number;
+    scopeForeseenValue: number
+  };
+  performanceIndex: {
+    costPerformanceIndexValue: number;
+    costPerformanceIndexVariation: number;
+    schedulePerformanceIndexValue: number;
+    schedulePerformanceIndexVariation: number
+  };
+  earnedValue?: number;
 }
 
 interface IPermission {

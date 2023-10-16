@@ -117,24 +117,24 @@ export class WorkpackSectionWBSComponent implements OnDestroy {
   }
 
   validateShowTripleConstraintCost(properties: IWorkpackBreakdownStructure) {
-    if (properties?.dashboard?.tripleConstraint?.cost &&
-      properties?.dashboard?.tripleConstraint?.cost?.foreseenValue > 0) {
+    if (properties?.dashboardData?.tripleConstraint?.cost &&
+      properties?.dashboardData?.tripleConstraint?.cost?.foreseenValue > 0) {
       return true;
     }
     return false;
   }
 
   validateShowTripleConstraintSchedule(properties: IWorkpackBreakdownStructure) {
-    if (properties?.dashboard?.tripleConstraint?.schedule &&
-      properties?.dashboard?.tripleConstraint?.schedule?.foreseenStartDate !== null) {
+    if (properties?.dashboardData?.tripleConstraint?.schedule &&
+      properties?.dashboardData?.tripleConstraint?.schedule?.foreseenStartDate !== null) {
       return true;
     }
     return false;
   }
 
   validateShowTripleConstraintScope(properties: IWorkpackBreakdownStructure) {
-    if (properties?.dashboard?.tripleConstraint?.scope &&
-      properties?.dashboard?.tripleConstraint?.scope?.foreseenValue > 0) {
+    if (properties?.dashboardData?.tripleConstraint?.scope &&
+      properties?.dashboardData?.tripleConstraint?.scope?.foreseenValue > 0) {
       return true;
     }
     return false;

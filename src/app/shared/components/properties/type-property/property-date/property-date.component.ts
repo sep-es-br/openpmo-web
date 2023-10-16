@@ -27,6 +27,7 @@ export class PropertyDateComponent implements OnInit {
   calendarFormat: string;
   yearRange: string;
   showReason: boolean;
+  language: string;
 
   constructor(
     private responsiveSrv: ResponsiveService,
@@ -40,6 +41,7 @@ export class PropertyDateComponent implements OnInit {
         this.calendarComponent?.ngOnInit();
         this.calendarComponent.dateFormat = this.translateSrv.instant('dateFormat');
         this.calendarComponent.updateInputfield();
+        this.setLanguage()
       }, 150)
     );
   }
@@ -74,6 +76,10 @@ export class PropertyDateComponent implements OnInit {
       }
     }
     this.emitChanges(event, false);
+  }
+
+  setLanguage() {
+    this.language = this.translateSrv.currentLang;
   }
 
   emitChanges(event: any, reason: boolean) {

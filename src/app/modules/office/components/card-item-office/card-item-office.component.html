@@ -43,12 +43,11 @@
     </div>
   </p-card>
 
-  <p-card *ngSwitchCase="'newCardItem'" class="new-carditem-office" [class.card-link]="properties.urlCard"
-    [class.mobile]="responsive" [class.cardList]="displayModeCard === 'list'" [class.new-card-item-mobile]="responsive"
-    (click)="properties.urlCard && navigateToPage(properties.urlCard, properties.paramsUrlCard)">
+  <p-card *ngSwitchCase="'newCardItem'" class="new-carditem-office"
+    [class.mobile]="responsive" [class.cardList]="displayModeCard === 'list'" [class.new-card-item-mobile]="responsive">
     <div class="carditem-content">
       <i [ngClass]="[ 'app-icon', properties.icon, 'light-grey-icon']"
-        (click)=" properties.iconMenuItems && menuIcon.toggle($event)"
+        (click)="properties.urlCard && navigateToPage(properties.urlCard, properties.paramsUrlCard)"
         [ngStyle]="{ fontSize: (responsive ? 2 : displayModeCard === 'list' ? 2.5 : 3) + 'rem' }" [class.card-link]="properties.iconMenuItems"></i>
       <p-menu #menuIcon [popup]="true" [model]="properties.iconMenuItems"></p-menu>
     </div>

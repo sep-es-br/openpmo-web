@@ -142,6 +142,10 @@ export class BreakdownStructureService extends BaseService<IWorkpackBreakdownStr
   }
 
   mapTreeNodes(data: IWorkpackBreakdownStructure) {
+    const dashboardData = data.dashboard && this.loadDashboardData(data.dashboard, data.milestones, data.risks);
+    if (dashboardData) {
+      data.dashboardData = dashboardData;
+    }
     const tree = [{
       ...data,
       label: data.workpackName,
@@ -159,8 +163,15 @@ export class BreakdownStructureService extends BaseService<IWorkpackBreakdownStr
     const expanded = !this.expandedAll ? level <= 1 : true;
     data.forEach(item => {
       const workpackOrWorkpackModels = isWorkpack ? item.workpackModels : item.workpacks;
+
+      const dashboardData = item.dashboard && this.loadDashboardData(item.dashboard, item.milestones, item.risks);
+      if (dashboardData) {
+        item.dashboardData = dashboardData;
+      }
+
+      const workpackItem = [this.typeWorkpackEnum.Milestone].includes(item.workpackType) ? this.setMilestoneStatus(item) : item;
       const node: any = {
-        ...item,
+        ...workpackItem,
         expanded,
         leaf: isWorkpack ? !item.hasChildren : false,
         label: isWorkpack ? item.workpackName : item.workpackModelName,
@@ -172,8 +183,38 @@ export class BreakdownStructureService extends BaseService<IWorkpackBreakdownStr
     return tree;
   }
 
+  setMilestoneStatus(milestone) {
+    milestone.expirationDate = milestone.milestoneDate;
+    if (milestone.completed) {
+        if (!milestone.snapshotDate) {
+          milestone.milestoneStatus = 'CONCLUDED';
+          return milestone;
+        } else {
+          const milestoneDate = moment(milestone.milestoneDate, 'yyyy-MM-DD');
+          const snapshotDate = moment(milestone.snapshotDate, 'yyyy-MM-DD');
+          if (milestoneDate.isSameOrBefore(snapshotDate)) {
+            milestone.milestoneStatus = 'CONCLUDED';
+            return milestone;
+          } else {
+            milestone.milestoneStatus = 'LATE_CONCLUDED';
+            return milestone;
+          }
+        }
+      } else {
+        const today = moment();
+        const milestoneDate = moment(milestone.milestoneDate, 'yyyy-MM-DD');
+        if (milestoneDate.isBefore(today)) {
+          milestone.milestoneStatus = 'LATE';
+          return milestone;
+        } else {
+          milestone.milestoneStatus = 'LATE';
+          return milestone;
+        }
+      }
+  }
+
   buildProperties(item: IWorkpackBreakdownStructure) {
-    if (!item?.dashboard && ![this.typeWorkpackEnum.Deliverable, this.typeWorkpackEnum.Milestone].includes(item?.workpackType)) {
+    if (!item?.dashboard && ![this.typeWorkpackEnum.Milestone].includes(item?.workpackType)) {
       return null;
     }
     const properties = {
@@ -188,15 +229,15 @@ export class BreakdownStructureService extends BaseService<IWorkpackBreakdownStr
       gaugeChartDataSPI: null,
       progressBars: null,
     };
-    if (item?.dashboard?.risk && item?.dashboard?.risk?.total > 0) {
-      properties.riskImportance = item.dashboard?.risk?.high > 0 ?
+    if (item?.dashboardData?.risk && item?.dashboardData?.risk?.total > 0) {
+      properties.riskImportance = item.dashboardData?.risk?.high > 0 ?
         'high' :
-        (item.dashboard?.risk?.medium > 0 ? 'medium' : 'low');
+        (item.dashboardData?.risk?.medium > 0 ? 'medium' : 'low');
     }
-    if (item.dashboard?.milestone && item.dashboard?.milestone?.quantity > 0) {
+    if (item.dashboardData?.milestone && item.dashboardData?.milestone?.quantity > 0) {
       properties.dashboardMilestonesData = this.setDashboardMilestonesData(item);
     }
-    if (item.dashboard?.tripleConstraint) {
+    if (item.dashboardData?.tripleConstraint) {
       const { iconCostColor, iconScheduleColor, iconScopeColor } = this.loadTripleConstraintSettings(item);
       properties.iconCostColor = iconCostColor;
       properties.iconScheduleColor = iconScheduleColor;
@@ -212,10 +253,129 @@ export class BreakdownStructureService extends BaseService<IWorkpackBreakdownStr
     return properties;
   }
 
+  loadDashboardData(dashboard?, milestones?, risks?) {
+    const dashboardData =  {
+      tripleConstraint: dashboard && dashboard.tripleConstraint && {
+        idBaseline: dashboard.tripleConstraint.idBaseline,
+        cost: {
+          actualValue: dashboard.tripleConstraint.costActualValue,
+          foreseenValue: dashboard.tripleConstraint.costForeseenValue,
+          plannedValue: dashboard.tripleConstraint.costPlannedValue,
+          variation: dashboard.tripleConstraint.costVariation,
+        },
+        schedule: {
+          actualEndDate: dashboard.tripleConstraint.scheduleActualEndDate,
+          actualStartDate: dashboard.tripleConstraint.scheduleActualStartDate,
+          actualValue: dashboard.tripleConstraint.scheduleActualValue,
+          foreseenEndDate: dashboard.tripleConstraint.scheduleForeseenEndDate,
+          foreseenStartDate: dashboard.tripleConstraint.scheduleForeseenStartDate,
+          foreseenValue: dashboard.tripleConstraint.scheduleForeseenValue,
+          plannedEndDate: dashboard.tripleConstraint.schedulePlannedEndDate,
+          plannedStartDate: dashboard.tripleConstraint.schedulePlannedStartDate,
+          plannedValue: dashboard.tripleConstraint.schedulePlannedValue,
+          variation: dashboard.tripleConstraint.scheduleVariation
+        },
+        scope: {
+          actualVariationPercent: dashboard.tripleConstraint.scopeActualVariationPercent,
+          foreseenVariationPercent: dashboard.tripleConstraint.scopeForeseenVariationPercent,
+          plannedVariationPercent: dashboard.tripleConstraint.scopePlannedVariationPercent,
+          foreseenValue: dashboard.tripleConstraint.scopeForeseenValue,
+          actualValue: dashboard.tripleConstraint.scopeActualValue,
+          plannedValue: dashboard.tripleConstraint.scopePlannedValue,
+          variation: dashboard.tripleConstraint.scopeVariation
+        }
+      },
+      earnedValue: dashboard && dashboard.performanceIndex && dashboard.performanceIndex.earnedValue,
+      costPerformanceIndex: dashboard && dashboard.performanceIndex ? {
+        costVariation: dashboard.performanceIndex.costPerformanceIndexVariation,
+        indexValue: dashboard.performanceIndex.costPerformanceIndexValue
+      } : null,
+      schedulePerformanceIndex: dashboard && dashboard.performanceIndex ? {
+        indexValue: dashboard.performanceIndex.schedulePerformanceIndexValue,
+        scheduleVariation: dashboard.performanceIndex.schedulePerformanceIndexVariation
+      } : null,
+      risk: risks && {high: 0, low: 0, medium: 0, closed: 0, total: 0},
+      milestone: milestones && {concluded: 0, late: 0, lateConcluded: 0, onTime: 0, quantity: 0}
+    };
+    const totalRisk = risks && risks.reduce( ( totalRisk: {high: number; low: number; medium: number; closed: number; total: number}, risk) => {
+      switch (risk.importance) {
+        case 'HIGH':
+          totalRisk.high++;
+          break;
+        case 'LOW':
+          totalRisk.low++;
+          break;
+        case 'MEDIUM':
+          totalRisk.medium++;
+          break;
+      }
+      if (risk.status !== 'OPEN') totalRisk.closed++;
+      totalRisk.total++
+      return totalRisk;
+    }, {high: 0, low: 0, medium: 0, closed: 0, total: 0});
+
+    const totalMilestones = milestones && milestones.reduce( ( totalMilestones: {
+        concluded: number;
+        late: number;
+        lateConcluded: number;
+        onTime: number;
+        quantity: number
+      }, milestone) => {
+      
+      if (milestone.completed) {
+        if (!milestone.snapshotDate) {
+          totalMilestones.concluded++;
+          totalMilestones.quantity++;
+          return totalMilestones;
+        } else {
+          const milestoneDate = moment(milestone.milestoneDate, 'yyyy-MM-DD');
+          const snapshotDate = moment(milestone.snapshotDate, 'yyyy-MM-DD');
+          if (milestoneDate.isSameOrBefore(snapshotDate)) {
+            totalMilestones.concluded++;
+            totalMilestones.quantity++;
+            return totalMilestones;
+          } else {
+            totalMilestones.lateConcluded++;
+            totalMilestones.quantity++;
+            return totalMilestones;
+          }
+        }
+      } else {
+        const today = moment();
+        const milestoneDate = moment(milestone.milestoneDate, 'yyyy-MM-DD');
+        if (milestoneDate.isBefore(today)) {
+          totalMilestones.late++;
+          totalMilestones.quantity++;
+          return totalMilestones;
+        } else {
+          totalMilestones.onTime++;
+          totalMilestones.quantity++;
+          return totalMilestones;
+        }
+      }
+    }, {concluded: 0, late: 0, lateConcluded: 0, onTime: 0, quantity: 0});
+    dashboardData.risk = totalRisk;
+    dashboardData.milestone = totalMilestones;
+    return dashboardData;
+  }
+
   buildSchedules(data: IWorkpackBreakdownStructure) {
     if (data.workpackType !== this.typeWorkpackEnum.Deliverable) {
       return null;
     }
+
+    data.baselineCost = data.dashboard.tripleConstraint.costPlannedValue;
+    data.planedCost = data.dashboard.tripleConstraint.costForeseenValue;
+    data.actualCost = data.dashboard.tripleConstraint.costActualValue;
+    data.start = data.dashboard.tripleConstraint.scheduleForeseenStartDate;
+    data.end = data.dashboard.tripleConstraint.scheduleForeseenEndDate;
+    data.baselineStart = data.dashboard.tripleConstraint.schedulePlannedStartDate;
+    data.baselineEnd = data.dashboard.tripleConstraint.schedulePlannedEndDate;
+    data.baselinePlanned = data.dashboard.tripleConstraint.scopePlannedValue;
+    data.unitMeasure = data.unitMeasure;
+    data.planed = data.dashboard.tripleConstraint.scopeForeseenValue;
+    data.actual = data.dashboard.tripleConstraint.scopeActualValue;
+
     const startDate = data && new Date(data.start + 'T00:00:00');
     const endDate = data && new Date(data.end + 'T00:00:00');
     if (!startDate || !endDate) {
@@ -275,8 +435,8 @@ export class BreakdownStructureService extends BaseService<IWorkpackBreakdownStr
   loadPerformanceIndexes(properties: IWorkpackBreakdownStructure) {
     let cpiColor = '#f5f5f5';
     let spiColor = '#f5f5f5';
-    if (properties?.dashboard?.costPerformanceIndex) {
-      if (properties?.dashboard?.costPerformanceIndex?.indexValue < 1) {
+    if (properties?.dashboardData && properties?.dashboardData?.costPerformanceIndex) {
+      if (properties?.dashboardData?.costPerformanceIndex?.indexValue < 1) {
         cpiColor = '#EA5C5C';
       } else {
         cpiColor = '#0081c1';
@@ -284,8 +444,8 @@ export class BreakdownStructureService extends BaseService<IWorkpackBreakdownStr
     } else {
       cpiColor = '#646464';
     }
-    if (properties?.dashboard?.schedulePerformanceIndex) {
-      if (properties?.dashboard?.schedulePerformanceIndex?.indexValue < 1) {
+    if (properties?.dashboardData && properties?.dashboardData?.schedulePerformanceIndex) {
+      if (properties?.dashboardData?.schedulePerformanceIndex?.indexValue < 1) {
         spiColor = '#EA5C5C';
       } else {
         spiColor = '#0081c1';
@@ -303,15 +463,15 @@ export class BreakdownStructureService extends BaseService<IWorkpackBreakdownStr
     let iconScheduleColor = '#f5f5f5';
     let iconScopeColor = '#f5f5f5';
 
-    if (properties.dashboard &&
-      (!properties.dashboard?.tripleConstraint?.cost ||
-        properties.dashboard?.tripleConstraint?.cost?.foreseenValue === 0)) {
+    if (properties.dashboardData &&
+      (!properties.dashboardData?.tripleConstraint?.cost ||
+        properties.dashboardData?.tripleConstraint?.cost?.foreseenValue === 0)) {
       iconCostColor = '#f5f5f5';
     } else {
-      if (properties.dashboard && properties.dashboard?.tripleConstraint?.cost?.plannedValue > 0) {
-        if (!!properties.dashboard.tripleConstraint?.cost?.variation &&
-          properties.dashboard?.tripleConstraint?.cost?.variation !== 0) {
-          if (properties.dashboard.tripleConstraint?.cost?.variation > 0) {
+      if (properties.dashboardData && properties.dashboardData?.tripleConstraint?.cost?.plannedValue > 0) {
+        if (!!properties.dashboardData.tripleConstraint?.cost?.variation &&
+          properties.dashboardData?.tripleConstraint?.cost?.variation !== 0) {
+          if (properties.dashboardData.tripleConstraint?.cost?.variation > 0) {
             iconCostColor = '#44B39B';
           } else {
             iconCostColor = '#EA5C5C';
@@ -320,8 +480,8 @@ export class BreakdownStructureService extends BaseService<IWorkpackBreakdownStr
           iconCostColor = '#44B39B';
         }
       } else {
-        if (properties.dashboard.tripleConstraint?.cost?.foreseenValue >=
-          properties.dashboard?.tripleConstraint?.cost?.actualValue) {
+        if (properties.dashboardData.tripleConstraint?.cost?.foreseenValue >=
+          properties.dashboardData?.tripleConstraint?.cost?.actualValue) {
           iconCostColor = '#888E96';
         } else {
           iconCostColor = '#EA5C5C';
@@ -329,14 +489,14 @@ export class BreakdownStructureService extends BaseService<IWorkpackBreakdownStr
       }
     }
 
-    if (properties.dashboard && (!properties.dashboard?.tripleConstraint?.schedule ||
-      properties?.dashboard?.tripleConstraint?.schedule?.foreseenStartDate === null)) {
+    if (properties.dashboardData && (!properties.dashboardData?.tripleConstraint?.schedule ||
+      properties?.dashboardData?.tripleConstraint?.schedule?.foreseenStartDate === null)) {
       iconScheduleColor = '#f5f5f5';
     } else {
-      if (properties.dashboard && properties.dashboard.tripleConstraint?.schedule?.plannedValue > 0) {
-        if (!!properties.dashboard.tripleConstraint?.schedule?.variation &&
-          properties?.dashboard?.tripleConstraint?.schedule?.variation !== 0) {
-          if (properties.dashboard.tripleConstraint?.schedule?.variation > 0) {
+      if (properties.dashboardData && properties.dashboardData.tripleConstraint?.schedule?.plannedValue > 0) {
+        if (!!properties.dashboardData.tripleConstraint?.schedule?.variation &&
+          properties?.dashboardData?.tripleConstraint?.schedule?.variation !== 0) {
+          if (properties.dashboardData.tripleConstraint?.schedule?.variation > 0) {
             iconScheduleColor = '#44B39B';
           } else {
             iconScheduleColor = '#EA5C5C';
@@ -345,8 +505,8 @@ export class BreakdownStructureService extends BaseService<IWorkpackBreakdownStr
           iconScheduleColor = '#44B39B';
         }
       } else {
-        if (properties.dashboard?.tripleConstraint?.schedule?.foreseenValue >=
-          properties.dashboard?.tripleConstraint?.schedule?.actualValue) {
+        if (properties.dashboardData?.tripleConstraint?.schedule?.foreseenValue >=
+          properties.dashboardData?.tripleConstraint?.schedule?.actualValue) {
           iconScheduleColor = '#888E96';
         } else {
           iconScheduleColor = '#EA5C5C';
@@ -354,14 +514,14 @@ export class BreakdownStructureService extends BaseService<IWorkpackBreakdownStr
       }
     }
 
-    if (properties.dashboard && (!properties.dashboard?.tripleConstraint?.cost ||
-      properties?.dashboard?.tripleConstraint?.scope?.foreseenValue === 0)) {
+    if (properties.dashboardData && (!properties.dashboardData?.tripleConstraint?.cost ||
+      properties?.dashboardData?.tripleConstraint?.scope?.foreseenValue === 0)) {
       iconScopeColor = '#f5f5f5';
     } else {
-      if (properties.dashboard && properties.dashboard?.tripleConstraint?.scope?.plannedVariationPercent > 0) {
-        if (!!properties.dashboard?.tripleConstraint?.scope?.variation &&
-          properties.dashboard?.tripleConstraint?.scope?.variation !== 0) {
-          if (properties.dashboard?.tripleConstraint?.scope?.variation < 0) {
+      if (properties.dashboardData && properties.dashboardData?.tripleConstraint?.scope?.plannedVariationPercent > 0) {
+        if (!!properties.dashboardData?.tripleConstraint?.scope?.variation &&
+          properties.dashboardData?.tripleConstraint?.scope?.variation !== 0) {
+          if (properties.dashboardData?.tripleConstraint?.scope?.variation < 0) {
             iconScopeColor = '#44B39B';
           } else {
             iconScopeColor = '#EA5C5C';
@@ -370,8 +530,8 @@ export class BreakdownStructureService extends BaseService<IWorkpackBreakdownStr
           iconScopeColor = '#EA5C5C';
         }
       } else {
-        if (properties.dashboard?.tripleConstraint?.scope?.foreseenValue >=
-          properties.dashboard?.tripleConstraint?.scope?.actualValue) {
+        if (properties.dashboardData?.tripleConstraint?.scope?.foreseenValue >=
+          properties.dashboardData?.tripleConstraint?.scope?.actualValue) {
           iconScopeColor = '#EA5C5C';
         } else {
           iconScopeColor = '#44B39B';
@@ -383,7 +543,7 @@ export class BreakdownStructureService extends BaseService<IWorkpackBreakdownStr
   }
 
   setDashboardMilestonesData(properties: IWorkpackBreakdownStructure) {
-    const milestone = properties.dashboard?.milestone;
+    const milestone = properties.dashboardData?.milestone;
     const data = milestone && [milestone.onTime, milestone.late, milestone.concluded, milestone.lateConcluded];
     if (data.filter(item => item > 0).length > 0) {
       return {
@@ -411,31 +571,31 @@ export class BreakdownStructureService extends BaseService<IWorkpackBreakdownStr
   }
 
   setGaugeChartData(properties: IWorkpackBreakdownStructure) {
-    const gaugeChartDataCPI = {
-      value: properties.dashboard?.costPerformanceIndex !== null ?
-        (properties.dashboard?.costPerformanceIndex?.indexValue !== null ?
-          properties.dashboard?.costPerformanceIndex?.indexValue : 0) :
+    const gaugeChartDataCPI = (properties.dashboardData && properties.dashboardData.costPerformanceIndex) && {
+      value: properties.dashboardData?.costPerformanceIndex !== null ?
+        (properties.dashboardData?.costPerformanceIndex?.indexValue !== null ?
+          properties.dashboardData?.costPerformanceIndex?.indexValue : 0) :
         null,
       labelBottom: 'CPI',
       classIconLabelBottom: 'fas fa-dollar-sign',
-      valueProgressBar: properties.dashboard?.costPerformanceIndex !== null ?
-        properties.dashboard?.costPerformanceIndex?.costVariation :
+      valueProgressBar: properties.dashboardData?.costPerformanceIndex !== null ?
+        properties.dashboardData?.costPerformanceIndex?.costVariation :
         null,
-      maxProgressBar: properties.dashboard?.earnedValue,
+      maxProgressBar: properties.dashboardData?.earnedValue,
       labelBottomProgressBar: 'CV',
     };
 
-    const gaugeChartDataSPI = {
-      value: properties.dashboard?.schedulePerformanceIndex !== null ?
-        (properties.dashboard?.schedulePerformanceIndex?.indexValue !== null ?
-          properties.dashboard?.schedulePerformanceIndex?.indexValue :
+    const gaugeChartDataSPI = (properties.dashboardData && properties.dashboardData.schedulePerformanceIndex) && {
+      value: properties.dashboardData?.schedulePerformanceIndex !== null ?
+        (properties.dashboardData?.schedulePerformanceIndex?.indexValue !== null ?
+          properties.dashboardData?.schedulePerformanceIndex?.indexValue :
           0) : null,
       labelBottom: 'SPI',
       classIconLabelBottom: 'fas fa-clock',
-      valueProgressBar: properties.dashboard?.schedulePerformanceIndex !== null ?
-        properties.dashboard?.schedulePerformanceIndex?.scheduleVariation :
+      valueProgressBar: properties.dashboardData?.schedulePerformanceIndex !== null ?
+        properties.dashboardData?.schedulePerformanceIndex?.scheduleVariation :
         null,
-      maxProgressBar: properties.dashboard?.earnedValue,
+      maxProgressBar: properties.dashboardData?.earnedValue,
       labelBottomProgressBar: 'SV',
     };
 

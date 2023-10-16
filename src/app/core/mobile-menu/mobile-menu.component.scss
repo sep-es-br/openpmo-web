@@ -379,6 +379,9 @@ $mobileMenuHeight: 90px;
     max-height: calc(100vh - 72px - 4.5rem - 3rem);
     overflow-y: auto;
   }
+  .p-menuitem-text {
+    width: calc(100% - 50px) !important;
+  } 
   .p-panelmenu .p-panelmenu-header > a {
     font-weight: 500;
     font-family: 'Montserrat Medium', 'Montserrat Regular', 'Montserrat', sans-serif;

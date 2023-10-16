@@ -92,14 +92,12 @@
 
   </p-card>
 
-  <p-card *ngSwitchCase="'newCardItem'" class="baseline-new-carditem" [class.card-link]="properties.urlCard"
-    [class.mobile]="responsive" [class.cardList]="displayModeCard === 'list'" [class.new-card-item-mobile]="responsive"
-    (click)="properties.urlCard && navigateToPage(properties.urlCard, properties.paramsUrlCard)">
+  <p-card *ngSwitchCase="'newCardItem'" class="baseline-new-carditem"
+    [class.mobile]="responsive" [class.cardList]="displayModeCard === 'list'" [class.new-card-item-mobile]="responsive">
     <div class="carditem-content">
       <i [ngClass]="[ 'app-icon', properties.icon, 'light-grey-icon']"
-        (click)=" properties.iconMenuItems && menuIcon.toggle($event)"
-        [ngStyle]="{ fontSize: (responsive ? 2 : (displayModeCard === 'list') ? 2.5 : 3) + 'rem' }"
-        [class.card-link]="properties.iconMenuItems"></i>
+        (click)="properties.urlCard && navigateToPage(properties.urlCard, properties.paramsUrlCard)"
+        [ngStyle]="{ fontSize: (responsive ? 2 : (displayModeCard === 'list') ? 2.5 : 3) + 'rem', cursor: 'pointer' }"></i>
       <p-tieredMenu #menuIcon [popup]="true" [model]="properties.iconMenuItems"></p-tieredMenu>
     </div>
   </p-card>

@@ -10,7 +10,8 @@
   <div class="card-item-content" (click)="navigateToPage(properties.urlCard, properties.paramsUrlCard)">
     <span class="card-item-role-description">{{properties.roleDescription}}</span>
   </div>
-  <div class="card-item-footer" *ngIf="cardIdItem" (click)="navigateToPage(properties.urlCard, properties.paramsUrlCard)">
+  <div class="card-item-footer" *ngIf="cardIdItem"
+    (click)="navigateToPage(properties.urlCard, properties.paramsUrlCard)">
     <span class="card-item-id">
       {{cardIdItem}}
     </span>
@@ -19,7 +20,8 @@
 
 <p-card *ngIf="properties.typeCardItem === 'editItem'" class="app-card-item-permission" styleClass="editItem">
   <p-header class="card-item-header">
-    <div class="card-item-title-role" [pTooltip]="properties.titleCardItem">{{properties.titleCardItem === 'citizen' ? ('citizen' |translate) :
+    <div class="card-item-title-role" [pTooltip]="properties.titleCardItem">{{properties.titleCardItem === 'citizen' ?
+      ('citizen' |translate) :
       properties.titleCardItem}}</div>
   </p-header>
   <div class="card-item-content">
@@ -34,11 +36,11 @@
 </p-card>
 
 <p-card *ngIf="properties.typeCardItem === 'newCardItem'" class="new-card-item-permission"
-  [class.cardList]="displayModeCard === 'list'" [class.new-card-item-mobile]="responsive"
-  [class.card-link]="properties.urlCard" (click)="navigateToPage(properties.urlCard, properties.paramsUrlCard)">
+  [class.cardList]="displayModeCard === 'list'" [class.new-card-item-mobile]="responsive">
   <div class="card-item-content">
     <i [ngClass]="[ 'app-icon', newItemIcon, 'light-grey-icon' ]"
-      [ngStyle]="{ fontSize: !responsive ? '3rem' : '2rem' }"></i>
+      (click)="navigateToPage(properties.urlCard, properties.paramsUrlCard)"
+      [ngStyle]="{ fontSize: !responsive ? '3rem' : '2rem', cursor: 'pointer' }"></i>
   </div>
 </p-card>
 
@@ -64,7 +66,7 @@
   <div class="card-item-content">
     <i [ngClass]="[ 'app-icon', newItemIcon, 'light-grey-icon' ]"
       (click)=" properties.iconMenuItems && menuIcon.toggle($event)"
-      [ngStyle]="{ fontSize: (responsive ? 2 : 3) + 'rem' }" [class.card-link]="properties.iconMenuItems"></i>
+      [ngStyle]="{ fontSize: (responsive ? 2 : 3) + 'rem', cursor: 'pointer' }" [class.card-link]="properties.iconMenuItems"></i>
     <p-tieredMenu #menuIcon [popup]="true" [model]="properties.iconMenuItems"></p-tieredMenu>
   </div>
 </p-card>

@@ -8,7 +8,7 @@ export interface IDashboard {
   tripleConstraint: ITripleConstraintDashboard[] | ITripleConstraintDashboard;
   costPerformanceIndex?:     any;
   schedulePerformanceIndex?: any;
-  earnedValue?:              number;
+  earnedValue?: number;
   workpacksByModel?: {
     idWorkpackModel: number;
     level: number;

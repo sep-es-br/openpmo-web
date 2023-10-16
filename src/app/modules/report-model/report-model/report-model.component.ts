@@ -819,7 +819,9 @@ export class ReportModelComponent implements OnInit {
 
   async handleCompileModel() {
     try {
+      this.formIsSaving = true;
       const result = await this.reportModelSrv.compileModel(this.idReport);
+      this.formIsSaving = false;
       if (result.success) {
         this.hasCompiledFiles = true;
         this.files.forEach(file => file.compiled = true);
@@ -843,7 +845,9 @@ export class ReportModelComponent implements OnInit {
 
   async changedActiveStatus(event) {
     const active = event.checked;
+    this.formIsSaving = true;
     const result = await this.reportModelSrv.activeModel(this.idReport, active);
+    this.formIsSaving = false;
     if (result.success) {
       this.messageSrv.add({
         severity: 'success',
