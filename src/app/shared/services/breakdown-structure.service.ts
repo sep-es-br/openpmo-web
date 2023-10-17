@@ -207,7 +207,7 @@ export class BreakdownStructureService extends BaseService<IWorkpackBreakdownStr
           milestone.milestoneStatus = 'LATE';
           return milestone;
         } else {
-          milestone.milestoneStatus = 'LATE';
+          milestone.milestoneStatus = 'ON_TIME';
           return milestone;
         }
       }

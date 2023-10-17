@@ -1,5 +1,5 @@
 <div class="gauge-chart">
-  <div class="chart-container flex p-justify-center">
+  <div class="chart-container flex p-justify-center" *ngIf="config && config.value !== null">
     <p-chart [type]="type" [data]="data" [plugins]="plugins" [options]="options"></p-chart>
   </div>
   <div class="container-progress">
