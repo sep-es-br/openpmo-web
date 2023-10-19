@@ -185,7 +185,7 @@ export class BreakdownStructureService extends BaseService<IWorkpackBreakdownStr
 
   setMilestoneStatus(milestone) {
     milestone.expirationDate = milestone.milestoneDate;
-    if (milestone.completed) {
+      if (milestone.completed) {
         if (!milestone.snapshotDate) {
           milestone.milestoneStatus = 'CONCLUDED';
           return milestone;

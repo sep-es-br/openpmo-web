@@ -51,7 +51,17 @@
         background: transparent;
         border: none;
         padding: 0;
-      }
+        .node-disabled.p-treenode .p-treenode-content {
+          .p-treenode-label, .p-treenode-icon {
+            color: #989fa2;
+          }
+        }
+        .node-enabled.p-treenode .p-treenode-content {
+          .p-treenode-label, .p-treenode-icon {
+            color: #004660;
+          }
+        }
+     }
     }
   }
   .p-splitbutton {

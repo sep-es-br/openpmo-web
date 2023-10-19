@@ -123,19 +123,25 @@ export class ReportViewComponent implements OnInit, OnDestroy {
     const result = await this.reportSrv.getScopeReport({'id-plan': this.idPlan});
     if (result.success) {
       const scopeData = result.data;
+      const rootNode = {
+        label: scopeData.name,
+        icon: IconsEnum.Plan,
+        data: scopeData.idPlan,
+        children: this.loadTreeNodeScope(scopeData.children),
+        parent: undefined,
+        selectable: scopeData.hasPermission,
+        type: 'plan',
+        expanded: true,
+        styleClass: scopeData.hasPermission ? 'node-enabled' : 'node-disabled'
+      };
       this.reportScope = [
-        {
-          label: scopeData.name,
-          icon: IconsEnum.Plan,
-          data: scopeData.idPlan,
-          children: this.loadTreeNodeScope(scopeData.children),
-          parent: undefined,
-          selectable: scopeData.hasPermission,
-          type: 'plan',
-          expanded: true
-        }
+        rootNode
       ];
+      if (scopeData.hasPermission) {
+        this.selectedWorkpacks.push(rootNode)
+      }
       this.reportViewProperties.isLoading = false;
+      this.checkProperties();
     }
   }
 
@@ -153,8 +159,10 @@ export class ReportViewComponent implements OnInit, OnDestroy {
           parent,
           selectable: workpack.hasPermission,
           type: 'workpack',
-          expanded: false
+          expanded: false,
+          styleClass: workpack.hasPermission ? 'node-enabled' : 'node-disabled'
         };
+        if (workpack.hasPermission) this.selectedWorkpacks.push(node);
         node.children = this.loadTreeNodeScope(workpack.children, node);
         return node;
       }
