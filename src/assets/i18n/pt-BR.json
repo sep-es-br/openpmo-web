@@ -600,7 +600,7 @@
       "costAccount": {
         "delete": {
           "relationship": {
-            "error": "Centro de Custo já vinculado ao schedule. Não pode ser excluído."
+            "error": "Centro de Custo já vinculado ao cronograma. Não pode ser excluído."
           }
         }
       },

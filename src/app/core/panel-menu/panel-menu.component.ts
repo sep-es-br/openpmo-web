@@ -533,9 +533,10 @@ export class PanelMenuComponent implements OnInit {
   async loadPortfolioMenu(idNewWorkpack?: number) {
     if (this.currentIDOffice && this.currentIDPlan) {
       this.loadingMenuPortfolio = true;
-
       const { success, data } = await this.menuSrv.getItemsPortfolio(this.currentIDOffice, this.currentIDPlan);
       if (success) {
+        const menuPortfolioData = data || [];
+        this.menuSrv.nextMenuPortfolioItems(menuPortfolioData);
         this.itemsPortfolio = this.buildMenuItemPortfolio(data || []);
         this.loadingMenuPortfolio = false;
         if (!this.changedUrl || this.linkEvent) {

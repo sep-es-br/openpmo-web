@@ -530,6 +530,8 @@ export class MobileMenuComponent implements OnInit {
 
       const { success, data } = await this.menuSrv.getItemsPortfolio(this.currentIDOffice, this.currentIDPlan);
       if (success) {
+        const menuPortfolioData = data || [];
+        this.menuSrv.nextMenuPortfolioItems(menuPortfolioData);
         this.itemsPortfolio = this.buildMenuItemPortfolio(data || []);
         this.loadingMenuPortfolio = false;
         if (!this.changedUrl || this.linkEvent) {

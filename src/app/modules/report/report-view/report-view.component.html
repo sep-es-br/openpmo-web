@@ -8,10 +8,10 @@
     <app-card-loading [isCardLoading]="isLoading"></app-card-loading>
   </div>
   <app-card [properties]="reportViewProperties" class="mt-0 inputs-float-label" *ngIf="reportViewProperties">
-    <div class="loading-container" *ngIf="reportViewProperties.isLoading">
-      <app-card-loading [isCardLoading]=" reportViewProperties.isLoading"></app-card-loading>
+    <div class="loading-container" *ngIf="reportViewProperties.isLoading || (!reportScope || reportScope.length === 0 )">
+      <app-card-loading [isCardLoading]=" reportViewProperties.isLoading || (!reportScope || reportScope.length === 0 )"></app-card-loading>
     </div>
-    <div class="properties-container" *ngIf="!reportViewProperties.isLoading" [class.responsive]="responsive">
+    <div class="properties-container" *ngIf="!reportViewProperties.isLoading && reportScope && reportScope.length > 0 " [class.responsive]="responsive">
       <div class="property-container" *ngFor="let property of reportProperties"
         [class.not-fullLine]="!property.fullLine && property.type !== 'TextArea' && property.type !== 'Group'"
         [class.fullLine]="property.fullLine || property.type === 'TextArea' || property.type === 'Group'">
@@ -21,14 +21,14 @@
         </span>
       </div>
     </div>
-    <div class="scope-container" *ngIf="!reportViewProperties.isLoading">
+    <div class="scope-container" *ngIf="!reportViewProperties.isLoading && reportScope && reportScope.length > 0 ">
       <label class="scope-label">{{'scopeLabel' |translate}}</label>
       <div class="app-tree-selection">
         <p-tree [value]="reportScope" selectionMode="checkbox" [(selection)]="selectedWorkpacks" (onNodeSelect)="checkProperties()" (onNodeUnselect)="checkProperties()">
         </p-tree>
       </div>
     </div>
-    <div class="button-format-container" *ngIf="!reportViewProperties.isLoading">
+    <div class="button-format-container" *ngIf="!reportViewProperties.isLoading && reportScope && reportScope.length > 0">
       <p-splitButton [label]="reportFormat" [icon]="isGenerating ? 'pi pi-spin pi-spinner' : 'app-icon downloadFile'" (onClick)="handleGenerateReport()" [model]="formatOptions"></p-splitButton>
     </div>
   </app-card>

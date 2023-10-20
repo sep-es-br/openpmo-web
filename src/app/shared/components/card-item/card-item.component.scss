@@ -128,7 +128,7 @@
         }
 
         .card-item-costValue {
-          padding: 0.5rem 0.5rem 0;
+          // padding: 0.5rem 0.5rem 0;
           margin-left: 0.5em;
         }
 
@@ -207,6 +207,9 @@
         justify-content: center;
         align-items: center;
         color: #009dd4;
+        .ocult {
+          padding-bottom: 5px;
+        }
       }
 
       .card-item-subtitle {
@@ -308,7 +311,10 @@
       }
 
       .card-item-subtitle {
-        padding: 0.5rem 0.5rem 0 !important;
+        padding: 0 0.5rem 0 !important;
+        &.role {
+          width: auto !important;
+        }
       }
 
       .organization-name {
@@ -320,7 +326,12 @@
 
         .card-item-content {
           max-width: 100%;
-
+          .role-list {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: flex-start;
+          }
         }
 
         .app-avatar .avatar {

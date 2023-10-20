@@ -45,6 +45,7 @@ export class MenuService extends BaseService<any> {
   private closeMenuUser = new BehaviorSubject<boolean>(false);
   private toggleMenu = new BehaviorSubject<string>('');
   private hasFavoriteItemsObservable = new BehaviorSubject<boolean>(false);
+  private menuPortfolioItems = new BehaviorSubject<IMenuWorkpack[]>([]);
 
   private menuState = new BehaviorSubject<IMenuState>({
     isFixed: false,
@@ -76,6 +77,14 @@ export class MenuService extends BaseService<any> {
     const [ path ] = url.slice(2).split('?');
     this.isAdminMenuObservable.next(!!this.adminsPath.find(p => path.startsWith(p)) && path !== 'persons/profile');
     this.isPlanMenuObservable.next(!!this.plansPath.find(p => path.startsWith(p)));
+  }
+
+  nextMenuPortfolioItems(value) {
+    this.menuPortfolioItems.next(value);
+  }
+
+  get obsMenuPortfolioItems() {
+    return this.menuPortfolioItems.asObservable();
   }
 
   nextCloseAllMenus(value) {

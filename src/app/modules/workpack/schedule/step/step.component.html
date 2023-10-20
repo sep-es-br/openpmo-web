@@ -6,12 +6,13 @@
       <span>{{ "newMonth" | translate }}</span>
     </ng-template>
   </div>
-  <div class="loading-form-container" *ngIf="formIsSaving">
-    <app-card-loading [isCardLoading]="formIsSaving"></app-card-loading>
-  </div>
+  
   <div class="card-properties-step" *ngIf="cardStepProperties">
     <div class="loading-container" *ngIf="isLoading">
       <app-card-loading [isCardLoading]="isLoading"></app-card-loading>
+    </div>
+    <div class="loading-form-container" *ngIf="formIsSaving">
+      <app-card-loading [isCardLoading]="formIsSaving"></app-card-loading>
     </div>
     <app-card [properties]="cardStepProperties" class="mt-0 inputs-float-label" *ngIf="!isLoading">
       <div class="p-grid">

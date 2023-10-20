@@ -1,5 +1,5 @@
 import { takeUntil } from 'rxjs/operators';
-import {Component, OnDestroy, OnInit} from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Subject } from 'rxjs';
 import { ICard } from 'src/app/shared/interfaces/ICard';
 import { IReportModel } from 'src/app/shared/interfaces/IReportModel';
@@ -11,7 +11,7 @@ import { PropertyTemplateModel } from 'src/app/shared/models/PropertyTemplateMod
 import { IWorkpackModelProperty } from 'src/app/shared/interfaces/IWorkpackModelProperty';
 import { IWorkpackProperty } from 'src/app/shared/interfaces/IWorkpackProperty';
 import { TypePropertyModelEnum } from 'src/app/shared/enums/TypePropertyModelEnum';
-import {MenuItem, MessageService, SelectItem, TreeNode} from 'primeng/api';
+import { MenuItem, MessageService, SelectItem, TreeNode } from 'primeng/api';
 import { ILocalityList } from 'src/app/shared/interfaces/ILocality';
 import { OrganizationService } from 'src/app/shared/services/organization.service';
 import { DomainService } from 'src/app/shared/services/domain.service';
@@ -25,6 +25,8 @@ import { ITreeViewScope } from 'src/app/shared/interfaces/IReportScope';
 import { IconsEnum } from 'src/app/shared/enums/IconsEnum';
 import { ReportPreferredFormatEnum } from 'src/app/shared/enums/ReportPreferredFormatEnum';
 import { IReportGenerate } from 'src/app/shared/interfaces/IReportGenerate';
+import { MenuService } from 'src/app/shared/services/menu.service';
+import { IMenuWorkpack } from 'src/app/shared/interfaces/IMenu';
 
 @Component({
   selector: 'app-report-view',
@@ -63,17 +65,21 @@ export class ReportViewComponent implements OnInit, OnDestroy {
     private organizationSrv: OrganizationService,
     private unitMeasureSrv: MeasureUnitService,
     private reportSrv: ReportService,
-    private messageSrv: MessageService
+    private messageSrv: MessageService,
+    private menuSrv: MenuService
   ) {
     this.setPreferredFormatOptions();
     const plan = localStorage.getItem('@currentPlan');
     this.idPlan = plan ? Number(plan) : undefined;
     this.loadPropertiesOffice();
-    this.activeRoute.queryParams.subscribe(async({ id }) => {
+    this.activeRoute.queryParams.subscribe(async ({ id }) => {
       this.idReportModel = +id;
       this.loadReportModel();
     });
     this.responsiveSvr.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.responsive = value);
+    this.menuSrv.obsMenuPortfolioItems.pipe(takeUntil(this.$destroy)).subscribe(menuItems => {
+      if (menuItems && menuItems.length > 0 ) this.loadScope(menuItems);
+    });
   }
 
   ngOnInit(): void {
@@ -87,9 +93,9 @@ export class ReportViewComponent implements OnInit, OnDestroy {
 
   setPreferredFormatOptions() {
     this.formatOptions = Object.keys(ReportPreferredFormatEnum).map(key => ({
-        label: key,
-        command: (event) => this.biddingReport(event)
-      }));
+      label: key,
+      command: (event) => this.biddingReport(event)
+    }));
     this.formatOptions[0].styleClass = 'selected-format';
   }
 
@@ -109,43 +115,39 @@ export class ReportViewComponent implements OnInit, OnDestroy {
   async loadReportModel() {
     this.isLoading = true;
     const result = await this.reportModelSrv.GetById(this.idReportModel);
+    this.isLoading = false;
     if (result.success) {
-      this.isLoading = false;
       this.reportModel = result.data;
       this.reportFormat = this.reportModel.preferredOutputFormat;
       this.loadCardProperties();
       this.instancePropertiesModel();
-      this.loadScope();
-    }
-  }
-
-  async loadScope() {
-    const result = await this.reportSrv.getScopeReport({'id-plan': this.idPlan});
-    if (result.success) {
-      const scopeData = result.data;
-      const rootNode = {
-        label: scopeData.name,
-        icon: IconsEnum.Plan,
-        data: scopeData.idPlan,
-        children: this.loadTreeNodeScope(scopeData.children),
-        parent: undefined,
-        selectable: scopeData.hasPermission,
-        type: 'plan',
-        expanded: true,
-        styleClass: scopeData.hasPermission ? 'node-enabled' : 'node-disabled'
-      };
-      this.reportScope = [
-        rootNode
-      ];
-      if (scopeData.hasPermission) {
-        this.selectedWorkpacks.push(rootNode)
-      }
-      this.reportViewProperties.isLoading = false;
       this.checkProperties();
     }
   }
 
-  loadTreeNodeScope(children: ITreeViewScope[], parent?: TreeNode): TreeNode[] {
+  async loadScope(menuItems: IMenuWorkpack[]) {
+    if (this.reportViewProperties) this.reportViewProperties.isLoading = true;
+    const planStorage = localStorage.getItem('@pmo/propertiesCurrentPlan');
+    const planProperties = JSON.parse(planStorage);
+    const scopeData = menuItems;
+    const rootNode = {
+      label: planProperties && planProperties.name,
+      icon: IconsEnum.Plan,
+      data: planProperties && planProperties.id,
+      children: this.loadTreeNodeScope(scopeData),
+      parent: undefined,
+      type: 'plan',
+      expanded: true,
+    };
+    this.reportScope = [
+      rootNode
+    ];
+    this.selectedWorkpacks.push(rootNode);
+    if (this.reportViewProperties) this.reportViewProperties.isLoading = false;
+    this.checkProperties();
+  }
+
+  loadTreeNodeScope(children: IMenuWorkpack[], parent?: TreeNode): TreeNode[] {
     if (!children) {
       return [];
     }
@@ -153,16 +155,14 @@ export class ReportViewComponent implements OnInit, OnDestroy {
       if (workpack.children) {
         const node = {
           label: workpack.name,
-          icon: workpack.icon,
+          icon: workpack.fontIcon,
           data: workpack.id,
           children: undefined,
           parent,
-          selectable: workpack.hasPermission,
           type: 'workpack',
           expanded: false,
-          styleClass: workpack.hasPermission ? 'node-enabled' : 'node-disabled'
         };
-        if (workpack.hasPermission) this.selectedWorkpacks.push(node);
+        this.selectedWorkpacks.push(node);
         node.children = this.loadTreeNodeScope(workpack.children, node);
         return node;
       }
@@ -171,8 +171,7 @@ export class ReportViewComponent implements OnInit, OnDestroy {
         data: workpack.id,
         children: undefined,
         parent,
-        icon: workpack.icon,
-        selectable: workpack.hasPermission
+        icon: workpack.fontIcon,
       };
     });
   }
@@ -183,6 +182,7 @@ export class ReportViewComponent implements OnInit, OnDestroy {
       await this.loadOrganizationsOffice();
     }
     this.reportProperties = await Promise.all(this.reportModel.paramModels.map(p => this.instanceProperty(p)));
+    this.reportViewProperties.isLoading = false;
   }
 
   async instanceProperty(propertyModel: IWorkpackModelProperty, group?: IWorkpackProperty): Promise<PropertyTemplateModel> {
@@ -218,7 +218,7 @@ export class ReportViewComponent implements OnInit, OnDestroy {
     }
 
     if (this.typePropertyModel[propertyModel.type] === TypePropertyModelEnum.SelectionModel) {
-      const listOptions = propertyModel.possibleValues ? (propertyModel.possibleValues as string).split(',').sort( (a, b) => a.localeCompare(b)) : [];
+      const listOptions = propertyModel.possibleValues ? (propertyModel.possibleValues as string).split(',').sort((a, b) => a.localeCompare(b)) : [];
       property.possibleValues = listOptions.map(op => ({ label: op, value: op }));
     }
 
@@ -247,7 +247,7 @@ export class ReportViewComponent implements OnInit, OnDestroy {
         }
       }
       if (defaultSelectedLocalities && defaultSelectedLocalities.length > 1) {
-        property.labelButtonLocalitySelected = await Promise.all(defaultSelectedLocalities.map(async(loc) => {
+        property.labelButtonLocalitySelected = await Promise.all(defaultSelectedLocalities.map(async (loc) => {
           const result = await this.localitySrv.GetById(loc);
           if (result.success) {
             return result.data.name;
@@ -262,7 +262,7 @@ export class ReportViewComponent implements OnInit, OnDestroy {
     }
     if (this.typePropertyModel[propertyModel.type] === TypePropertyModelEnum.OrganizationSelectionModel) {
       property.possibleValuesIds = this.organizationsOffice
-        .filter( org => propertyModel.sectors && propertyModel.sectors.includes(org.sector.toLowerCase()))
+        .filter(org => propertyModel.sectors && propertyModel.sectors.includes(org.sector.toLowerCase()))
         .map(d => ({ label: d.name, value: d.id }));
       if (propertyModel.multipleSelection) {
         property.selectedValues = propertyModel.defaults as number[];
@@ -365,7 +365,7 @@ export class ReportViewComponent implements OnInit, OnDestroy {
       return units.map(org => ({
         label: org.name,
         value: org.id
-      })).sort( (a, b) => a.label.localeCompare(b.label));
+      })).sort((a, b) => a.label.localeCompare(b.label));
     }
   }
 
