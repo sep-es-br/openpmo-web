@@ -190,16 +190,25 @@ export class PanelMenuComponent implements OnInit {
     }
   }
 
-  getMenuModeUser() {
+  async getMenuModeUser() {
     if (this.menus.filter( item => item.isOpen).length === 0) this.toggleMenu('office');
     const user = this.authSrv.getTokenPayload();
     const isFixed = this.cookieSrv.get('menuMode' + user?.email) === 'true' ? true : false;
     if (!!isFixed) {
-      this.menuSrv.nextToggleMenu('office');
+      const infoPerson = await this.authSrv.getInfoPerson();
+      if (infoPerson && infoPerson.workLocal) {
+        if (infoPerson.workLocal.idWorkpackModelLinked || infoPerson.workLocal.idWorkpack || infoPerson.workLocal.idPlan) {
+          this.menuSrv.nextToggleMenu('portfolio');
+        } else {
+          this.menuSrv.nextToggleMenu('office');
+        }
+      } else {
+        this.menuSrv.nextToggleMenu('office');
+      }
       this.handleChangeMenuMode();
-      
     }
   }
+
 
   handleChangeMenuMode() {
     this.isFixed = !this.isFixed;

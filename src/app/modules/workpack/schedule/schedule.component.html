@@ -2,12 +2,13 @@
   <div class="app-content-header" [class.mobile]="responsive">
     <span>{{ "newSchedule" | translate }}</span>
   </div>
-  <div class="loading-form-container" *ngIf="formIsSaving">
-    <app-card-loading [isCardLoading]="formIsSaving"></app-card-loading>
-  </div>
+  
   <div class="card-properties-schedule" *ngIf="unitMeasure && cardScheduleProperties">
     <div class="loading-container" *ngIf="isLoading">
       <app-card-loading [isCardLoading]="isLoading"></app-card-loading>
+    </div>
+    <div class="loading-form-container" *ngIf="formIsSaving">
+      <app-card-loading [isCardLoading]="formIsSaving"></app-card-loading>
     </div>
     <app-card [properties]="cardScheduleProperties" class="mt-0 inputs-float-label" *ngIf="!isLoading">
       <div class="p-grid" >

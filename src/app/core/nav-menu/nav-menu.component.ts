@@ -1,9 +1,6 @@
 import {Location} from '@angular/common';
 import {Component, EventEmitter, OnInit, Output} from '@angular/core';
-import {TranslateService} from '@ngx-translate/core';
-import * as moment from 'moment';
 import {CookieService} from 'ngx-cookie';
-import {MenuItem} from 'primeng/api';
 import {Subject} from 'rxjs';
 import {takeUntil} from 'rxjs/operators';
 import {IMenu} from 'src/app/shared/interfaces/IMenu';
@@ -11,11 +8,8 @@ import {IPerson} from 'src/app/shared/interfaces/IPerson';
 import {IPlan} from 'src/app/shared/interfaces/IPlan';
 import {AuthService} from 'src/app/shared/services/auth.service';
 import {MenuService} from 'src/app/shared/services/menu.service';
-import {OfficePermissionService} from 'src/app/shared/services/office-permission.service';
 import {OfficeService} from 'src/app/shared/services/office.service';
 import {PlanService} from 'src/app/shared/services/plan.service';
-import {TranslateChangeService} from 'src/app/shared/services/translate-change.service';
-import {MobileViewService} from 'src/app/shared/services/mobile-view.service';
 import {ReportService} from 'src/app/shared/services/report.service';
 
 @Component({

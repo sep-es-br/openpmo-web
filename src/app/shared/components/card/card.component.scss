@@ -181,7 +181,6 @@
           position: absolute;
           cursor: pointer;
           transition: all .3s;
-          // left: 90%;
 
           &.no-animation {
             padding: 0.45rem;
@@ -344,7 +343,6 @@
       width: 100%;
       flex-direction: column;
       .dataview-filters-text {
-        // width: 5rem;
         margin-top: 0.5em;
         margin-right: 0;
         .p-inputtext {

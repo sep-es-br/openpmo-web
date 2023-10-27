@@ -236,7 +236,7 @@ export class StrategyComponent implements OnDestroy {
         });
         this.sharedWith = data.sharedWithAll ? [{
           id: null,
-          name: 'All',
+          name: this.translateSrv.instant('All'),
           fullName: 'All'
         }] : data.sharedWith;
         this.sharedWithAll = data.sharedWithAll;
@@ -256,18 +256,18 @@ export class StrategyComponent implements OnDestroy {
       this.officeListOptionsSharing = result.data && result.data.filter(office => office.id !== this.idOffice);
       this.officeListOptionsSharing.unshift({
         id: null,
-        name: 'All',
+        name: this.translateSrv.instant('All'),
         fullName: 'All'
       });
     }
   }
 
   checkSelectAllOffices(event) {
-    if (event.itemValue && event.itemValue.name === 'All') {
-      this.sharedWith = Array.from(this.sharedWith.filter(op => op.name === 'All'));
+    if (event.itemValue && event.itemValue.fullName === 'All') {
+      this.sharedWith = Array.from(this.sharedWith.filter(op => op.fullName === 'All'));
       this.sharedWithAll = true;
     } else {
-      this.sharedWith = Array.from(this.sharedWith.filter(op => op.name !== 'All'));
+      this.sharedWith = Array.from(this.sharedWith.filter(op => op.fullName !== 'All'));
       this.sharedWithAll = false;
     }
     if (this.formStrategy.valid) {
