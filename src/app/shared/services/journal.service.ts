@@ -39,8 +39,17 @@ export class JournalService extends BaseService<IJournal> {
   }
 
   resetJournalData() {
+    this.selectedWorkpacks = [];
     this.journalData = [];
     this.loading = true;
+    this.from = '';
+    this.to = '';
+    this.type = ['INFORMATION'];
+    this.scopeName = '';
+    this.page = 0;
+    this.pageSize = 5;
+    this.hasMore = true;
+    this.hasAll = true;
     this.nextResetJournal(true);
   }
 

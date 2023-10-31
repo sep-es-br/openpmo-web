@@ -549,7 +549,9 @@ export class PanelMenuComponent implements OnInit {
         this.itemsPortfolio = this.buildMenuItemPortfolio(data || []);
         this.loadingMenuPortfolio = false;
         if (!this.changedUrl || this.linkEvent) {
-          this.selectMenuActive(this.router.url.slice(1), idNewWorkpack)
+          this.selectMenuActive(this.router.url.slice(1), idNewWorkpack);
+        } else {
+          this.selectMenuActive(this.router.url.slice(1));
         }
       }
     }
