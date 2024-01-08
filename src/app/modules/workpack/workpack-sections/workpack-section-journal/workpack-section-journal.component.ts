@@ -220,7 +220,8 @@ export class WorkpackSectionJournalComponent implements OnInit, OnDestroy {
         return {
           ...evidence,
           isImg,
-          icon
+          icon,
+          mimeType: evidence.mimeType
         };
       });
       return {
@@ -231,9 +232,11 @@ export class WorkpackSectionJournalComponent implements OnInit, OnDestroy {
         } : { ...journal.information },
         icon: iconsJournal[journal.type].icon,
         color: iconsJournal[journal.type].color,
-        background: iconsJournal[journal.type].background,
+        background: iconsJournal[journal.type].background
+        
       };
     });
+    console.log('journalData', this.journalData);
     this.isLoading = false;
   }
 
@@ -252,7 +255,8 @@ export class WorkpackSectionJournalComponent implements OnInit, OnDestroy {
       this.formSearch.controls.scopeName.setValue(selected);
   }
 
-  handleDownload(dataurl: string, filename: string) {
+  handleDownload(dataurl: string, filename: string, mimeType) {
+    debugger;
     const accessToken = this.authService.getAccessToken();
     const header = {
       method: 'GET',
@@ -263,8 +267,9 @@ export class WorkpackSectionJournalComponent implements OnInit, OnDestroy {
     fetch(dataurl, header)
       .then(response => response.blob())
       .then(blob => {
+        const fileBlob = new Blob([blob], {type: mimeType})
         const link = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
+        link.href = URL.createObjectURL(fileBlob);
         link.download = filename;
         link.click();
       })

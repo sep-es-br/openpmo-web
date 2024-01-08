@@ -30,7 +30,7 @@
           </div>
         </ng-template>
         <ng-template>
-          <div class="main-content" (click)="!isMenuFixed && closeAllMenus()">
+          <div class="main-content" (click)="handleCloseMenu()">
             <app-breadcrumb [isAdminMenu]="isAdminMenu"></app-breadcrumb>
             <div class="content">
               <div class="outlet fixed">

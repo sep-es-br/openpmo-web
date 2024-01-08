@@ -138,4 +138,8 @@ export class TemplateComponent implements OnDestroy, OnInit {
     this.onResizeEnd(null);
   }
 
+  handleCloseMenu() {
+    if (!this.isMenuFixed) this.closeAllMenus();
+  }
+
 }

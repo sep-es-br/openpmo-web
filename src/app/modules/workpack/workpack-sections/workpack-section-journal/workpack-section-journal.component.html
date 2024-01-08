@@ -108,9 +108,9 @@
                   <ng-container *ngFor="let evidence of event.evidences; let i = index">
                     <div class="evidence" [pTooltip]="evidence.name">
                       <img class="image" *ngIf="evidence.isImg" [src]="evidence.url" [alt]="evidence.name" width="65"
-                        (click)="handleDownload(evidence.url, evidence.name)">
+                        (click)="handleDownload(evidence.url, evidence.name, evidence.mimeType)">
                       <i class="icon" *ngIf="!evidence.isImg" [class]="evidence.icon"
-                        (click)="handleDownload(evidence.url, evidence.name)"> </i>
+                        (click)="handleDownload(evidence.url, evidence.name, evidence.mimeType)"> </i>
                       <figcaption class="legend">{{evidence.name}}</figcaption>
                     </div>
                   </ng-container>

@@ -1,7 +1,6 @@
 import { takeUntil } from 'rxjs/operators';
 import { Component, EventEmitter, Input, OnInit, Output, SimpleChanges, OnChanges, OnDestroy } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
-import { HexBase64BinaryEncoding } from 'crypto';
 import { ImageCroppedEvent, LoadedImage } from 'ngx-image-cropper';
 import { IFile } from 'src/app/shared/interfaces/IFile';
 import { PersonService } from '../../shared/services/person.service';
