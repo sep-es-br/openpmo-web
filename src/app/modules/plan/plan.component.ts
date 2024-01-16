@@ -224,7 +224,7 @@ export class PlanComponent implements OnInit, OnDestroy {
       this.planData = await this.planSrv.getCurrentPlan(this.idPlan);
       if (this.planData) {
         this.officeSrv.nextIDOffice(this.planData.idOffice);
-        this.idPlanModel = this.planData.idPlanModel;
+        this.idPlanModel = this.planData.planModel.id;
         this.planSrv.nextIDPlan(this.idPlan);
         this.loadWorkPackModels();
         this.formPlan.reset({
@@ -291,7 +291,7 @@ export class PlanComponent implements OnInit, OnDestroy {
       })
       : await this.planSrv.post({
         idOffice: this.planData.idOffice,
-        idPlanModel: this.planData.idPlanModel,
+        idPlanModel: this.planData.planModel.id,
         name: this.planData.name,
         fullName: this.planData.fullName,
         start: this.planData.start,

@@ -1,7 +1,10 @@
+import { IPlanModel } from "./IPlanModel";
+
 export interface IPlan {
   id?: number;
   idOffice?: number;
   idPlanModel?: number;
+  planModel?: IPlanModel;
   name: string;
   fullName: string;
   start: string;

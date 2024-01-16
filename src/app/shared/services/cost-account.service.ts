@@ -77,7 +77,7 @@ export class CostAccountService extends BaseService<ICostAccount> {
 
   async loadIdCostAccountModel() {
     const propertiesPlan = await this.planSrv.getCurrentPlan(this.workpackParams.idPlan);
-    const result = await this.costAccountModelSrv.GetCostAccountModelByPlanModel({'id-plan-model': propertiesPlan.idPlanModel});
+    const result = await this.costAccountModelSrv.GetCostAccountModelByPlanModel({'id-plan-model': propertiesPlan.planModel.id});
     if (result.success) {
       this.idCostAccountModel = result.data.id;
     }

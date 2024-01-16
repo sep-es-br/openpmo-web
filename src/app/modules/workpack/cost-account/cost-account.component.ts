@@ -154,7 +154,7 @@ export class CostAccountComponent implements OnInit {
       const plan = await this.planSrv.getCurrentPlan(this.workpack.plan.id);
       if (plan) {
         this.idOffice = plan.idOffice;
-        this.idPlanModel = plan.idPlanModel;
+        this.idPlanModel = plan.planModel.id;
       }
     }
     await this.loadCostAccountModel();

@@ -96,7 +96,7 @@ export class ReportListComponent implements OnInit {
 
   async loadReportModels() {
     const result = await this.reportModelSrv.getActiveReports({
-      idPlanModel: this.propertiesPlan.idPlanModel
+      idPlanModel: this.propertiesPlan.planModel.id
     });
     if (result.success) {
       this.reports = result.data;

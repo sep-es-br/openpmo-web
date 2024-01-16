@@ -386,7 +386,8 @@ export class WorkpackComponent implements OnDestroy {
     } else {
       this.router.navigate(['/plan'], {
         queryParams: {
-          id: this.idPlan
+          id: this.idPlan,
+          idOffice: this.idOffice
         }
       });
       return;

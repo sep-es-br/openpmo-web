@@ -122,6 +122,7 @@ export class HomeComponent implements OnInit {
         this.router.navigate(['plan'], {
           queryParams: {
             id: Number(workLocal.idPlan),
+            idOffice: Number(workLocal.idOffice)
           }
         });
         return;

@@ -250,7 +250,8 @@ export class OfficeComponent implements OnDestroy {
               disabled: !planEditPermission
             },
           ],
-          urlCard: '/plan'
+          urlCard: '/plan',
+          paramsUrlCard: [{name: 'idOffice', value: this.idOffice}]
         };
       }));
     }
