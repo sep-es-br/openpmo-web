@@ -291,7 +291,7 @@ export class PlanComponent implements OnInit, OnDestroy {
       })
       : await this.planSrv.post({
         idOffice: this.planData.idOffice,
-        idPlanModel: this.planData.planModel.id,
+        idPlanModel: this.idPlanModel,
         name: this.planData.name,
         fullName: this.planData.fullName,
         start: this.planData.start,

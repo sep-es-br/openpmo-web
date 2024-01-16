@@ -157,6 +157,35 @@
     .p-inputtext {
       width: 100%;
     }
+    .p-chips .p-chips-multiple-container .p-chips-token {
+      margin-top: 5px;
+    }
+    .p-multiselect {
+      border: none;
+      border-bottom: 1px solid #b6c8cd;
+      border-radius: 0;
+      background-color: transparent;
+      color: #004660;
+    }
+      .p-multiselect-label-container {
+        color: v.$fontInput;
+        font-size: 1rem;
+        font-family: v.$fontFamilyMedium;
+        .p-multiselect-label {
+          display: block;
+          overflow: wrap;
+          text-overflow: unset;
+          white-space: break-spaces;
+          .p-multiselect-token {
+            margin-top: 5px !important;
+          }
+        }
+      }
+    
+  }
+  .p-chips-multiple-container {
+    padding: 0.5em !important;
+
   }
   .dashboard-show-options {
     padding-top: 0.5em;
