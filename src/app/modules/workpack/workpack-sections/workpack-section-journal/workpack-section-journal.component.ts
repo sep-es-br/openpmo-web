@@ -236,7 +236,6 @@ export class WorkpackSectionJournalComponent implements OnInit, OnDestroy {
         
       };
     });
-    console.log('journalData', this.journalData);
     this.isLoading = false;
   }
 
@@ -256,7 +255,6 @@ export class WorkpackSectionJournalComponent implements OnInit, OnDestroy {
   }
 
   handleDownload(dataurl: string, filename: string, mimeType) {
-    debugger;
     const accessToken = this.authService.getAccessToken();
     const header = {
       method: 'GET',
