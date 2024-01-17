@@ -5,8 +5,13 @@
   }
   form.filters {
     display: flex;
+    flex-direction: row;
+    align-items: flex-end;
     & > * {
       margin-right: 1.6rem;
+    }
+    .app-button-green {
+      margin-bottom: 0.5em;
     }
     .property-input {
       min-width: 220px;
