@@ -256,43 +256,43 @@ export class BreakdownStructureService extends BaseService<IWorkpackBreakdownStr
   loadDashboardData(dashboard?, milestones?, risks?) {
     const dashboardData =  {
       tripleConstraint: dashboard && dashboard.tripleConstraint && {
-        idBaseline: dashboard.tripleConstraint.idBaseline,
+        idBaseline: dashboard.tripleConstraint?.idBaseline,
         cost: {
-          actualValue: dashboard.tripleConstraint.costActualValue,
-          foreseenValue: dashboard.tripleConstraint.costForeseenValue,
-          plannedValue: dashboard.tripleConstraint.costPlannedValue,
-          variation: dashboard.tripleConstraint.costVariation,
+          actualValue: dashboard.tripleConstraint?.costActualValue,
+          foreseenValue: dashboard.tripleConstraint?.costForeseenValue,
+          plannedValue: dashboard.tripleConstraint?.costPlannedValue,
+          variation: dashboard.tripleConstraint?.costVariation,
         },
         schedule: {
-          actualEndDate: dashboard.tripleConstraint.scheduleActualEndDate,
-          actualStartDate: dashboard.tripleConstraint.scheduleActualStartDate,
-          actualValue: dashboard.tripleConstraint.scheduleActualValue,
-          foreseenEndDate: dashboard.tripleConstraint.scheduleForeseenEndDate,
-          foreseenStartDate: dashboard.tripleConstraint.scheduleForeseenStartDate,
-          foreseenValue: dashboard.tripleConstraint.scheduleForeseenValue,
-          plannedEndDate: dashboard.tripleConstraint.schedulePlannedEndDate,
-          plannedStartDate: dashboard.tripleConstraint.schedulePlannedStartDate,
-          plannedValue: dashboard.tripleConstraint.schedulePlannedValue,
-          variation: dashboard.tripleConstraint.scheduleVariation
+          actualEndDate: dashboard.tripleConstraint?.scheduleActualEndDate,
+          actualStartDate: dashboard.tripleConstraint?.scheduleActualStartDate,
+          actualValue: dashboard.tripleConstraint?.scheduleActualValue,
+          foreseenEndDate: dashboard.tripleConstraint?.scheduleForeseenEndDate,
+          foreseenStartDate: dashboard.tripleConstraint?.scheduleForeseenStartDate,
+          foreseenValue: dashboard.tripleConstraint?.scheduleForeseenValue,
+          plannedEndDate: dashboard.tripleConstraint?.schedulePlannedEndDate,
+          plannedStartDate: dashboard.tripleConstraint?.schedulePlannedStartDate,
+          plannedValue: dashboard.tripleConstraint?.schedulePlannedValue,
+          variation: dashboard.tripleConstraint?.scheduleVariation
         },
         scope: {
-          actualVariationPercent: dashboard.tripleConstraint.scopeActualVariationPercent,
-          foreseenVariationPercent: dashboard.tripleConstraint.scopeForeseenVariationPercent,
-          plannedVariationPercent: dashboard.tripleConstraint.scopePlannedVariationPercent,
-          foreseenValue: dashboard.tripleConstraint.scopeForeseenValue,
-          actualValue: dashboard.tripleConstraint.scopeActualValue,
-          plannedValue: dashboard.tripleConstraint.scopePlannedValue,
-          variation: dashboard.tripleConstraint.scopeVariation
+          actualVariationPercent: dashboard.tripleConstraint?.scopeActualVariationPercent,
+          foreseenVariationPercent: dashboard.tripleConstraint?.scopeForeseenVariationPercent,
+          plannedVariationPercent: dashboard.tripleConstraint?.scopePlannedVariationPercent,
+          foreseenValue: dashboard.tripleConstraint?.scopeForeseenValue,
+          actualValue: dashboard.tripleConstraint?.scopeActualValue,
+          plannedValue: dashboard.tripleConstraint?.scopePlannedValue,
+          variation: dashboard.tripleConstraint?.scopeVariation
         }
       },
-      earnedValue: dashboard && dashboard.performanceIndex && dashboard.performanceIndex.earnedValue,
+      earnedValue: dashboard && dashboard.performanceIndex && dashboard.performanceIndex?.earnedValue,
       costPerformanceIndex: dashboard && dashboard.performanceIndex ? {
-        costVariation: dashboard.performanceIndex.costPerformanceIndexVariation,
-        indexValue: dashboard.performanceIndex.costPerformanceIndexValue
+        costVariation: dashboard.performanceIndex?.costPerformanceIndexVariation,
+        indexValue: dashboard.performanceIndex?.costPerformanceIndexValue
       } : null,
       schedulePerformanceIndex: dashboard && dashboard.performanceIndex ? {
-        indexValue: dashboard.performanceIndex.schedulePerformanceIndexValue,
-        scheduleVariation: dashboard.performanceIndex.schedulePerformanceIndexVariation
+        indexValue: dashboard.performanceIndex?.schedulePerformanceIndexValue,
+        scheduleVariation: dashboard.performanceIndex?.schedulePerformanceIndexVariation
       } : null,
       risk: risks && {high: 0, low: 0, medium: 0, closed: 0, total: 0},
       milestone: milestones && {concluded: 0, late: 0, lateConcluded: 0, onTime: 0, quantity: 0}
@@ -364,17 +364,17 @@ export class BreakdownStructureService extends BaseService<IWorkpackBreakdownStr
       return null;
     }
 
-    data.baselineCost = data.dashboard.tripleConstraint.costPlannedValue;
-    data.planedCost = data.dashboard.tripleConstraint.costForeseenValue;
-    data.actualCost = data.dashboard.tripleConstraint.costActualValue;
-    data.start = data.dashboard.tripleConstraint.scheduleForeseenStartDate;
-    data.end = data.dashboard.tripleConstraint.scheduleForeseenEndDate;
-    data.baselineStart = data.dashboard.tripleConstraint.schedulePlannedStartDate;
-    data.baselineEnd = data.dashboard.tripleConstraint.schedulePlannedEndDate;
-    data.baselinePlanned = data.dashboard.tripleConstraint.scopePlannedValue;
+    data.baselineCost = data.dashboard.tripleConstraint?.costPlannedValue;
+    data.planedCost = data.dashboard.tripleConstraint?.costForeseenValue;
+    data.actualCost = data.dashboard.tripleConstraint?.costActualValue;
+    data.start = data.dashboard.tripleConstraint?.scheduleForeseenStartDate;
+    data.end = data.dashboard.tripleConstraint?.scheduleForeseenEndDate;
+    data.baselineStart = data.dashboard.tripleConstraint?.schedulePlannedStartDate;
+    data.baselineEnd = data.dashboard.tripleConstraint?.schedulePlannedEndDate;
+    data.baselinePlanned = data.dashboard.tripleConstraint?.scopePlannedValue;
     data.unitMeasure = data.unitMeasure;
-    data.planed = data.dashboard.tripleConstraint.scopeForeseenValue;
-    data.actual = data.dashboard.tripleConstraint.scopeActualValue;
+    data.planed = data.dashboard.tripleConstraint?.scopeForeseenValue;
+    data.actual = data.dashboard.tripleConstraint?.scopeActualValue;
 
     const startDate = data && new Date(data.start + 'T00:00:00');
     const endDate = data && new Date(data.end + 'T00:00:00');
