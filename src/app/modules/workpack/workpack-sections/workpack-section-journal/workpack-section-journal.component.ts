@@ -250,7 +250,7 @@ export class WorkpackSectionJournalComponent implements OnInit, OnDestroy {
   async loadTreeViewScope() {
     const selected = this.selectedWorkpacks && this.selectedWorkpacks.length > 1 ?
         this.selectedWorkpacks.length + ' ' + this.translateSrv.instant('selectedItems') :
-        this.selectedWorkpacks[0].label;
+        this.selectedWorkpacks && this.selectedWorkpacks.length === 1 ? this.selectedWorkpacks[0].label : '';
       this.formSearch.controls.scopeName.setValue(selected);
   }
 
