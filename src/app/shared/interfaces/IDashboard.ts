@@ -1,8 +1,10 @@
 import { MenuItem } from "primeng/api";
+import { IMilestonePropertyData } from "./IMilestonePropertyData";
 
 export interface IDashboard {
   earnedValueAnalysis: IEarnedValueAnalysisDashboard;
   milestone?: IMilestoneDashboard;
+  milestones?: IMilestonePropertyData[];
   risk?: IRiskDashboard;
   stakeholders?: IStakeholderDashboard[];
   tripleConstraint: ITripleConstraintDashboard[] | ITripleConstraintDashboard;

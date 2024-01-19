@@ -144,6 +144,7 @@ export class DashboardService extends BaseService<IDashboard> {
   }
 
   validateDashboard() {
+    this.loadMilestoneResults();
     if (this.dashboard && (!this.dashboard.earnedValueAnalysis || this.dashboard.earnedValueAnalysis === null)
     && (!this.dashboard.milestone || this.dashboard.milestone.quantity === 0)
     && (!this.dashboard.risk || this.dashboard.risk.total === 0)
@@ -154,6 +155,54 @@ export class DashboardService extends BaseService<IDashboard> {
     }
     this.loading = false;
     this.nextResetDashboard(true);
+  }
+
+  loadMilestoneResults() {
+    const lastDayOfMonth = moment(this.referenceMonth).daysInMonth().toString();
+    const referenceMonth = moment(this.referenceMonth).format('MM-yyyy');
+    const dashboardRefDate = moment(lastDayOfMonth + '-' + referenceMonth, 'DD-MM-yyyy');
+    const today = moment();
+    const refDate = today.isBefore(dashboardRefDate) ? today : dashboardRefDate;
+    const totalMilestones = this.dashboard.milestones && this.dashboard.milestones.reduce( ( totalMilestones: {
+      concluded: number;
+      late: number;
+      lateConcluded: number;
+      onTime: number;
+      quantity: number
+    }, milestone) => {
+    
+      if (milestone.completed) {
+        if (!milestone.snapshotDate) {
+          totalMilestones.concluded++;
+          totalMilestones.quantity++;
+          return totalMilestones;
+        } else {
+          const milestoneDate = moment(milestone.milestoneDate, 'yyyy-MM-DD');
+          const snapshotDate = moment(milestone.snapshotDate, 'yyyy-MM-DD');
+          if (milestoneDate.isSameOrBefore(snapshotDate)) {
+            totalMilestones.concluded++;
+            totalMilestones.quantity++;
+            return totalMilestones;
+          } else {
+            totalMilestones.lateConcluded++;
+            totalMilestones.quantity++;
+            return totalMilestones;
+          }
+        }
+      } else {
+        const milestoneDate = moment(milestone.milestoneDate, 'yyyy-MM-DD');
+        if (milestoneDate.isBefore(refDate)) {
+          totalMilestones.late++;
+          totalMilestones.quantity++;
+          return totalMilestones;
+        } else {
+          totalMilestones.onTime++;
+          totalMilestones.quantity++;
+          return totalMilestones;
+        }
+      }
+    }, {concluded: 0, late: 0, lateConcluded: 0, onTime: 0, quantity: 0});
+    this.dashboard.milestone = totalMilestones;
   }
 
   
