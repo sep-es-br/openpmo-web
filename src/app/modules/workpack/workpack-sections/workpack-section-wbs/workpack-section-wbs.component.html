@@ -20,9 +20,9 @@
         *ngIf="node.workpacks; else workpackModels">
         <div class="tree-label">{{ node.workpackModelName }}</div>
         <div class="container-milestone" *ngIf="node?.workpackModelType === typeWorkpackModelEnum.MilestoneModel">
-          <div class="milestone-column">Planejado (linha de base)</div>
-          <div class="milestone-column">Estimado/ Concluído</div>
-          <div class="milestone-column">Status</div>
+          <div class="milestone-column">{{"baselinePlanned" |translate}}</div>
+          <div class="milestone-column">{{"estimatedConcluded" | translate}}</div>
+          <div class="milestone-column">{{"status" |translate}}</div>
         </div>
       </div>
 

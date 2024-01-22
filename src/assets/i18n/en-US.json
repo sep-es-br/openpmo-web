@@ -1,4 +1,6 @@
 {
+  "baselinePlanned": "Planned (baseline)",
+  "estimatedConcluded": "Estimated / Concluded",
   "All": "All",
   "distribution": "Distribution",
   "sigmoidal": "Sigmoidal (S Curve)",

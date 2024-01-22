@@ -1,4 +1,6 @@
 {
+  "baselinePlanned": "Planejado (linha de base)",
+  "estimatedConcluded": "Estimado/ Concluído",
   "All": "Todos",
   "distribution": "Distribuição",
   "sigmoidal": "Sigmoidal (Curva S)",

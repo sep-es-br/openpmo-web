@@ -53,7 +53,7 @@ export class WorkpackSectionWBSComponent implements OnDestroy {
       this.idPlan = idPlan && +idPlan;
     });
     this.translateSrv.onLangChange.pipe(takeUntil(this.$destroy)).subscribe(() => {
-      setTimeout(() => this.setLanguage(), 200);
+      setTimeout(() => this.setLanguage(), 500);
     });
     this.breakdownStructureSrv.observableResetBreakdownStructure.pipe(takeUntil(this.$destroy)).subscribe(reset => {
       if (reset) {
@@ -78,6 +78,7 @@ export class WorkpackSectionWBSComponent implements OnDestroy {
   }
 
   loadBreakdownStructureData() {
+    this.setLanguage();
     this.workpackParams = this.workpackSrv.getWorkpackParams();
     const { wbsTree, loading } = this.breakdownStructureSrv.getWBSTree();
     this.wbsTree = wbsTree;
@@ -113,7 +114,7 @@ export class WorkpackSectionWBSComponent implements OnDestroy {
   }
 
   setLanguage() {
-    this.language = this.translateSrv.currentLang;
+    this.language = this.translateSrv.currentLang === 'pt-BR' ? 'pt' : 'en';
   }
 
   validateShowTripleConstraintCost(properties: IWorkpackBreakdownStructure) {

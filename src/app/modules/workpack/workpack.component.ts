@@ -363,7 +363,7 @@ export class WorkpackComponent implements OnDestroy {
       const propertyFullNameWorkpackModel = this.workpack.model.properties.find(p => p.name === 'fullName' && p.session !== 'COST');
       const propertyFullNameWorkpack = this.workpack.properties.find(p => p.idPropertyModel === propertyFullNameWorkpackModel.id);
       this.workpackFullName = propertyFullNameWorkpack?.value as string;
-      if (this.workpack && (this.workpack.canceled)) {
+      if (this.workpack && this.workpack.canceled) {
         this.workpackSrv.setEditPermission(false);
       } else if (!this.isUserAdmin && this.workpack) {
         await this.loadUserPermission();
@@ -727,7 +727,7 @@ export class WorkpackComponent implements OnDestroy {
           baselineName: workpack.activeBaselineName,
           subtitleCardItem: workpack.type === 'Milestone' ? workpack.milestoneDate : '',
           statusItem: workpack.type === 'Milestone' ? MilestoneStatusEnum[workpack.milestoneStatus] : '',
-          editPermission: this.getEditPermission()
+          editPermission: workpack.completed && workpack.type === 'Milestone' ? false : this.getEditPermission()
         };
       });
       let iconMenuItems: MenuItem[];

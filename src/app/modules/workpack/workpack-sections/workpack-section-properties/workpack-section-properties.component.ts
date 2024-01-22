@@ -122,7 +122,13 @@ export class WorkpackSectionPropertiesComponent implements OnInit {
   }
 
   async handleChangeCheckCompleted(event) {
-    if (this.workpackData.workpack.type === TypeWorkpackEnum.MilestoneModel) {
+    if (!event && this.workpackData.workpack.type === TypeWorkpackEnum.MilestoneModel) {
+      const propertyDateIndex = this.sectionPropertiesProperties.findIndex( prop => prop.type === 'Date');
+      if (propertyDateIndex > -1) {
+        this.sectionPropertiesProperties[propertyDateIndex].milestoneData.completed = false;
+      }
+    }
+    if (!!event && this.workpackData.workpack.type === TypeWorkpackEnum.MilestoneModel) {
       const dateProperty = this.sectionPropertiesProperties.find( p => p.type === TypePropertyModelEnum.DateModel);
       if (dateProperty) {
         const today = moment();

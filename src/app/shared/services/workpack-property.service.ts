@@ -129,6 +129,7 @@ export class WorkpackPropertyService {
         baselineDate: this.workpackData.workpack.baselineDate,
         milestoneStatus: this.workpackData.workpack.milestoneStatus,
         delayInDays: this.workpackData.workpack.delayInDays,
+        completed: this.workpackData.workpack.completed
       };
       property.milestoneData = milestoneData;
     }

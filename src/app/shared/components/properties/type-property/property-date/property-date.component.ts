@@ -54,23 +54,24 @@ export class PropertyDateComponent implements OnInit {
 
     const formatedDate = moment().format('YYYY-MM-DD');
     const actualDate = moment(formatedDate, 'YYYY-MM-DD');
-    const momentDate = moment(event);
+    const newDate = moment(event);
     const baselineDate = this.property.milestoneData && this.property.milestoneData.baselineDate ?
       new Date(this.property.milestoneData.baselineDate+ 'T00:00:00') : undefined;
     if (baselineDate) {
-      this.property.milestoneData.delayInDays = actualDate.isBefore(moment(baselineDate)) ? moment(momentDate).diff(baselineDate, 'days') :
-      ( moment(momentDate).isBefore(actualDate) ?  moment(actualDate).diff(baselineDate, 'days') :  moment(momentDate).diff(baselineDate, 'days')) ;
+      this.property.milestoneData.delayInDays = actualDate.isBefore(moment(baselineDate)) ? moment(newDate).diff(baselineDate, 'days') :
+      ( moment(newDate).isBefore(actualDate) ?  moment(actualDate).diff(baselineDate, 'days') :  moment(newDate).diff(baselineDate, 'days')) ;
       this.milestoneChangeDateSrv.next(this.property.milestoneData.delayInDays);
     }
-    const defaultValueDiffNewDate = this.property?.defaultValue?.toString().split('T')[0] === momentDate.format('YYYY-MM-DD');
-    if (!momentDate || !this.property?.milestoneData || isNaN(event) || defaultValueDiffNewDate) {
-      this.emitChanges(event, false);
+    const defaultValueDiffNewDate = this.property?.defaultValue?.toString().split('T')[0] !== newDate.format('YYYY-MM-DD');
+    if (!newDate || !this.property?.milestoneData || isNaN(event) || !defaultValueDiffNewDate) {
+      this.showReason = false;
+      this.property.needReason = false;
+      this.property.reason = null;
       return;
     }
     
-    const dateNow = new Date(formatedDate + 'T00:00:00');
     if (baselineDate) {
-      if (momentDate.diff(moment(dateNow)) && momentDate.diff(moment(baselineDate))) {
+      if (defaultValueDiffNewDate && newDate.diff(moment(baselineDate))) {
         this.emitChanges(event, true);
         return;
       }
@@ -94,6 +95,7 @@ export class PropertyDateComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.setLanguage();
     this.calendarFormat = this.translateSrv.instant('dateFormat');
     const today = moment();
     const yearStart = today.year();
