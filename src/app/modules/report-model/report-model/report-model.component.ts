@@ -20,7 +20,7 @@ import { IPlanModel } from 'src/app/shared/interfaces/IPlanModel';
 import { IReportModel, IReportModelFile } from 'src/app/shared/interfaces/IReportModel';
 import { ReportPreferredFormatEnum } from 'src/app/shared/enums/ReportPreferredFormatEnum';
 import { LocalityService } from 'src/app/shared/services/locality.service';
-import { TypePropertyModelEnum as TypePropertyEnum } from 'src/app/shared/enums/TypePropertModelEnum';
+import { TypePropertModelEnum as TypePropertyEnum } from 'src/app/shared/enums/TypePropertModelEnum';
 import { IWorkpackModelProperty } from 'src/app/shared/interfaces/IWorkpackModelProperty';
 import { ILocalityList } from 'src/app/shared/interfaces/ILocality';
 import { IconPropertyWorkpackModelEnum } from 'src/app/shared/enums/IconPropertyWorkpackModelEnum';

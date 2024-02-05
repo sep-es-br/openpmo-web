@@ -24,6 +24,8 @@ import {BreadcrumbService} from 'src/app/shared/services/breadcrumb.service';
 import {SaveButtonComponent} from 'src/app/shared/components/save-button/save-button.component';
 import {cpfValidator} from 'src/app/shared/utils/cpfValidator';
 import { MinLengthTextCustomValidator } from 'src/app/shared/utils/minLengthTextValidator';
+import { IWorkpackModel } from 'src/app/shared/interfaces/IWorkpackModel';
+import { WorkpackModelService } from 'src/app/shared/services/workpack-model.service';
 
 interface ICardItemRole {
   type: string;
@@ -104,7 +106,8 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
     private citizenUserSrv: CitizenUserService,
     private authServerSrv: AuthServerService,
     private planSrv: PlanService,
-    private authSrv: AuthService
+    private authSrv: AuthService,
+    private workpackModelSrv: WorkpackModelService
   ) {
     this.citizenUserSrv.loadCitizenUsers();
     this.actRouter.queryParams.subscribe(async queryParams => {
@@ -147,8 +150,6 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
       ...breadcrumbItems,
       {
         key: 'stakeholder',
-        routerLink: ['/stakeholder/person'],
-        queryParams: {idWorkpack: this.idWorkpack, idPerson: this.idPerson},
         info: this.stakeholder?.person?.name,
         tooltip: this.stakeholder?.person.fullName
       }
@@ -163,24 +164,38 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
   }
   
   async loadWorkpack() {
-    const result = await this.workpackSrv.GetWorkpackById(this.idWorkpack, {'id-plan': this.idPlan});
-    if (result.success) {
-      this.workpack = result.data;
-      this.personRolesOptions = this.workpack?.model?.personRoles?.map(role => ({
+    const workpackData = this.workpackSrv.getWorkpackData();
+    if (workpackData && workpackData.workpack && workpackData.workpackModel) {
+      this.workpack = workpackData.workpack;
+      this.personRolesOptions = workpackData.workpackModel.personRoles?.map(role => ({
         label: role,
         value: role.toLowerCase()
       }));
-      const isUserAdmin = await this.authSrv.isUserAdmin();
-      if (isUserAdmin) {
-        this.editPermission = !this.workpack.canceled;
-      } else {
-        this.editPermission = (this.workpack.permissions && this.workpack.permissions.filter(p => p.level === 'EDIT').length > 0) && !this.workpack.canceled;
+     
+    } else {
+      const result = await this.workpackSrv.GetWorkpackById(this.idWorkpack);
+      if (result.success) {
+        this.workpack = result.data;
       }
-      const resultPlan = await this.planSrv.getCurrentPlan(this.idPlan);
-      if (resultPlan) {
-        this.idOffice = resultPlan.idOffice;
+      const resultModel = await this.workpackModelSrv.GetById(this.workpack.idWorkpackModel);
+      if (resultModel.success) {
+        this.personRolesOptions = resultModel.data.personRoles.map(role => ({
+          label: role,
+          value: role.toLowerCase()
+        }));
       }
     }
+    const isUserAdmin = await this.authSrv.isUserAdmin();
+    if (isUserAdmin) {
+      this.editPermission = !this.workpack.canceled;
+    } else {
+      this.editPermission = (this.workpack.permissions && this.workpack.permissions.filter(p => p.level === 'EDIT').length > 0) && !this.workpack.canceled;
+    }
+    const resultPlan = await this.planSrv.getCurrentPlan(this.idPlan);
+    if (resultPlan) {
+      this.idOffice = resultPlan.idOffice;
+    }
+    
   }
 
   setPhoneNumberMask() {

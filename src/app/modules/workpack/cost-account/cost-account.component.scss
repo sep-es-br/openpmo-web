@@ -35,11 +35,15 @@
     .properties-container {
       display: flex;
       flex-wrap: wrap;
+      width: 100%;
       .property-container {
         margin-right: 1em;
       }
       .fullLine {
         width: 100%;
+      }
+      .not-fullLine {
+        width: 20%;
       }
     }
   }

@@ -61,7 +61,7 @@ export class NavMenuComponent implements OnInit {
       if (id !== 0) {
         this.currentIDPlan = id;
       } 
-      this.loadPropertiesPlan();
+      await this.loadPropertiesPlan();
       if (this.currentIDPlan && this.currentIDPlan !== 0) this.loadReportsMenu();
     });
     this.locationSrv.onUrlChange(url => {

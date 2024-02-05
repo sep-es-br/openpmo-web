@@ -71,7 +71,7 @@ export class StakeholderService extends BaseService<IStakeholder> {
           this.idFilterSelected = params.idFilterSelected;
           this.term = params.term;
         } else {
-          const resultFilters = await this.filterSrv.getAllFilters(`workpackModels/${this.workpackData.workpack.model.id}/stakeholders`);
+          const resultFilters = await this.filterSrv.getAllFilters(`workpackModels/${this.workpackData.workpackModel.id}/stakeholders`);
           this.filters = resultFilters.success && Array.isArray(resultFilters.data) ? resultFilters.data : [];
           this.idFilterSelected = this.filters.find(defaultFilter => !!defaultFilter.favorite) ?
             this.filters.find(defaultFilter => !!defaultFilter.favorite).id : undefined;

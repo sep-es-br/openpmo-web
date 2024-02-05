@@ -490,10 +490,10 @@
     [class.mobile]="responsive" [class.cardList]="(displayModeCard === 'list')"
     [class.new-card-item-mobile]="responsive">
     <div class="carditem-content">
-      <i [ngClass]="[ 'app-icon', properties.icon, 'light-grey-icon']"
-        (click)=" properties.iconMenuItems && menuIcon.toggle($event)"
+      <i #newItemIcon [ngClass]="[ 'card-link app-icon', properties.icon, 'light-grey-icon']"
+        (click)="enable && properties.iconMenuItems && menuIcon.toggle($event); (enable && !properties.iconMenuItems || properties.iconMenuItems.length === 0) && handleLoadMenu()"
         [ngStyle]="{ fontSize: (responsive ? 2 : (displayModeCard === 'list') ? 2.5 : 3) + 'rem', cursor: 'pointer' }"
-        [class.card-link]="properties.iconMenuItems"></i>
+        ></i>
       <p-tieredMenu #menuIcon [popup]="true" [model]="properties.iconMenuItems"></p-tieredMenu>
     </div>
   </p-card>

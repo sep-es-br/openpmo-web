@@ -7,7 +7,7 @@ import { Calendar } from 'primeng/calendar';
 import { IconPropertyWorkpackModelEnum } from 'src/app/shared/enums/IconPropertyWorkpackModelEnum';
 import { IWorkpackModelProperty } from 'src/app/shared/interfaces/IWorkpackModelProperty';
 import { ResponsiveService } from 'src/app/shared/services/responsive.service';
-import { TypePropertyModelEnum } from 'src/app/shared/enums/TypePropertModelEnum';
+import { TypePropertModelEnum as TypePropertyModelEnum}  from 'src/app/shared/enums/TypePropertModelEnum';
 import * as moment from 'moment';
 import { SelectItem, TreeNode } from 'primeng/api';
 import { TypeOrganization } from '../../enums/TypeOrganization';

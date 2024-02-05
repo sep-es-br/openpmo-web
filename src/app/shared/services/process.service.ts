@@ -49,7 +49,7 @@ export class ProcessService extends BaseService<IProcess> {
           this.idFilterSelected = params.idFilterSelected;
           this.term = params.term
         } else {
-          const resultFilters = await this.filterSrv.getAllFilters(`workpackModels/${this.workpackData.workpack.model.id}/processes`);
+          const resultFilters = await this.filterSrv.getAllFilters(`workpackModels/${this.workpackData.workpackModel.id}/processes`);
           this.filters = resultFilters.success && Array.isArray(resultFilters.data) ? resultFilters.data : [];
           this.idFilterSelected = this.filters.find(defaultFilter => !!defaultFilter.favorite) ?
             this.filters.find(defaultFilter => !!defaultFilter.favorite).id : undefined;

@@ -49,7 +49,7 @@ export class IssueService extends BaseService<IIssue> {
           this.idFilterSelected = params.idFilterSelected;
           this.term = params.term;
         } else {
-          const resultFilter = await this.filterSrv.getAllFilters(`workpackModels/${this.workpackData.workpack.model.id}/issues`);
+          const resultFilter = await this.filterSrv.getAllFilters(`workpackModels/${this.workpackData.workpackModel.id}/issues`);
           if (resultFilter.success) {
             this.filters = resultFilter.data;
             this.idFilterSelected = this.filters && this.filters.find(defaultFilter => !!defaultFilter.favorite) ?

@@ -103,18 +103,27 @@ export class ControlChangeBoardListComponent implements OnInit, OnDestroy {
   async loadPropertiesProject() {
     this.isUserAdmin = await this.authSrv.isUserAdmin();
     this.idPlan = Number(localStorage.getItem('@currentPlan'));
-    const { success, data } = await this.workpackSrv.GetWorkpackName(this.idProject, { 'id-plan': this.idPlan });
-    if (success) {
-      const workpackName = data.name;
-      this.projectName = workpackName;
-      const resultPermissions = await this.workpackSrv.GetWorkpackPermissions(this.idProject, { 'id-plan': this.idPlan });
-      const permissionsList = resultPermissions.success && resultPermissions.data;
+    const workpackData = this.workpackSrv.getWorkpackData();
+    if (workpackData && workpackData.workpack) {
+      this.projectName = workpackData.workpack.name;
       if (this.isUserAdmin) {
         this.editPermission = true;
       } else {
-        this.editPermission = permissionsList.permissions && permissionsList.permissions.filter(p => p.level === 'EDIT').length > 0;
+        this.editPermission = workpackData.workpack.permissions && workpackData.workpack.permissions.filter(p => p.level === 'EDIT').length > 0;
+      }
+    } else {
+      const { success, data } = await this.workpackSrv.GetWorkpackById(this.idProject, { 'id-plan': this.idPlan });
+      if (success) {
+        this.projectName = data.name;
+        const permissionsList = data.permissions;
+        if (this.isUserAdmin) {
+          this.editPermission = true;
+        } else {
+          this.editPermission = permissionsList && permissionsList.filter(p => p.level === 'EDIT').length > 0;
+        }
       }
     }
+    
   }
 
   handleChangeDisplayMode(event) {

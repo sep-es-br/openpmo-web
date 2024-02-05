@@ -895,7 +895,7 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
         this.saveButton.hideButton();
         return;
       }
-      const result = await this.scheduleSrv.putScheduleStepBatch(stepsToSave);
+      const result = await this.scheduleSrv.putScheduleStepBatch(stepsToSave, this.schedule.id);
       if (result.success) {
         this.dashboardSrv.resetDashboardData();
         this.changedSteps = [];

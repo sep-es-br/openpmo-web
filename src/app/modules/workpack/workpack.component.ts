@@ -16,12 +16,12 @@ import { FilterDataviewService } from 'src/app/shared/services/filter-dataview.s
 import { Component, OnDestroy, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import { ConfirmationService, MenuItem, MessageService } from 'primeng/api';
+import { ConfirmationService, MenuItem, MessageService, SelectItem } from 'primeng/api';
 import { ICard } from 'src/app/shared/interfaces/ICard';
 import { ResponsiveService } from 'src/app/shared/services/responsive.service';
 import { WorkpackModelService } from 'src/app/shared/services/workpack-model.service';
 import { WorkpackService } from 'src/app/shared/services/workpack.service';
-import { IWorkpack } from 'src/app/shared/interfaces/IWorkpack';
+import { IWorkpack, IWorkpackListCard } from 'src/app/shared/interfaces/IWorkpack';
 import { IWorkpackModel } from 'src/app/shared/interfaces/IWorkpackModel';
 import { IWorkpackProperty } from 'src/app/shared/interfaces/IWorkpackProperty';
 import { StakeholderService } from 'src/app/shared/services/stakeholder.service';
@@ -34,7 +34,6 @@ import { MeasureUnitService } from 'src/app/shared/services/measure-unit.service
 import { ScheduleService } from 'src/app/shared/services/schedule.service';
 import { OfficeService } from 'src/app/shared/services/office.service';
 import { AuthService } from 'src/app/shared/services/auth.service';
-import { PlanPermissionService } from 'src/app/shared/services/plan-permissions.service';
 import { SaveButtonComponent } from 'src/app/shared/components/save-button/save-button.component';
 import { MenuService } from 'src/app/shared/services/menu.service';
 import { IOffice } from 'src/app/shared/interfaces/IOffice';
@@ -51,6 +50,7 @@ import { BreakdownStructureService } from 'src/app/shared/services/breakdown-str
 import { PersonService } from 'src/app/shared/services/person.service';
 import { IBreadcrumb } from 'src/app/shared/interfaces/IBreadcrumb';
 import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
+import { TypeWorkpackModelEnum } from 'src/app/shared/enums/TypeWorkpackModelEnum';
 
 @Component({
   selector: 'app-workpack',
@@ -124,7 +124,6 @@ export class WorkpackComponent implements OnDestroy {
     private router: Router,
     private officeSrv: OfficeService,
     private authSrv: AuthService,
-    private planPermissionSrv: PlanPermissionService,
     private messageSrv: MessageService,
     private menuSrv: MenuService,
     public filterSrv: FilterDataviewService,
@@ -319,7 +318,6 @@ export class WorkpackComponent implements OnDestroy {
       await this.loadWorkpackModel(this.idWorkpackModel);
     }
     this.propertySrv.loadProperties();
-    this.breakdownStructureSrv.loadBreakdownStructure(true, this.idWorkpack);
     const linked = this.idWorkpackModelLinked ? true : false;
     this.dashboardSrv.loadDashboard(linked);
     this.costAccountSrv.loadCostAccounts();
@@ -357,12 +355,6 @@ export class WorkpackComponent implements OnDestroy {
     if (result.success && result.data) {
       this.workpack = result.data;
       this.setUnitMeansure();
-      const propertyNameWorkpackModel = this.workpack.model.properties.find(p => p.name === 'name' && p.session !== 'COST');
-      const propertyNameWorkpack = this.workpack.properties.find(p => p.idPropertyModel === propertyNameWorkpackModel.id);
-      this.workpackName = propertyNameWorkpack?.value as string;
-      const propertyFullNameWorkpackModel = this.workpack.model.properties.find(p => p.name === 'fullName' && p.session !== 'COST');
-      const propertyFullNameWorkpack = this.workpack.properties.find(p => p.idPropertyModel === propertyFullNameWorkpackModel.id);
-      this.workpackFullName = propertyFullNameWorkpack?.value as string;
       if (this.workpack && this.workpack.canceled) {
         this.workpackSrv.setEditPermission(false);
       } else if (!this.isUserAdmin && this.workpack) {
@@ -379,7 +371,7 @@ export class WorkpackComponent implements OnDestroy {
       }
       if (!reloadOnlyProperties) {
         this.workpackSrv.setWorkpackData({ workpack: this.workpack });
-        await this.loadWorkpackModel(this.workpack.model.id);
+        await this.loadWorkpackModel(this.workpack.idWorkpackModel);
       } else {
         this.workpackSrv.nextLoadingWorkpack(false)
       }
@@ -399,7 +391,7 @@ export class WorkpackComponent implements OnDestroy {
   }
 
   async setUnitMeansure() {
-    const unitMeasureWorkpack = this.workpack.properties.find(prop => prop.type && prop.type === this.typePropertyModel.UnitSelectionModel);
+    const unitMeasureWorkpack = this.workpack.properties && this.workpack.properties.find(prop => prop.type && prop.type === this.typePropertyModel.UnitSelectionModel);
     if (unitMeasureWorkpack) {
       const unitMeasure = await this.unitMeasureSrv.GetById(unitMeasureWorkpack?.selectedValue as number);
       if (unitMeasure.success) {
@@ -418,12 +410,8 @@ export class WorkpackComponent implements OnDestroy {
       const workpackParams = this.workpackSrv.getWorkpackParams();
       workpackParams.idOfficeOwnerWorkpackLinked = this.workpack.plan.idOffice;
       this.workpackSrv.setWorkpackParams({ ...workpackParams });
-      const propertyNameWorkpackModel = this.workpack.model.properties.find(p => p.name === 'name' && p.session !== 'COST');
-      const propertyNameWorkpack = this.workpack.properties.find(p => p.idPropertyModel === propertyNameWorkpackModel.id);
-      this.workpackName = propertyNameWorkpack.value as string;
-      const propertyFullNameWorkpackModel = this.workpack.model.properties.find(p => p.name === 'fullName' && p.session !== 'COST');
-      const propertyFullNameWorkpack = this.workpack.properties.find(p => p.idPropertyModel === propertyFullNameWorkpackModel.id);
-      this.workpackFullName = propertyFullNameWorkpack.value as string;
+      this.workpackName = this.workpack.name;
+      this.workpackFullName = this.workpack.fullName;
       if (!this.isUserAdmin && this.workpack) {
         const editPermission = !!this.workpack.permissions?.find(p => p.level === 'EDIT');
         this.workpackSrv.setEditPermission(editPermission);
@@ -438,7 +426,7 @@ export class WorkpackComponent implements OnDestroy {
       }
       if (!reloadOnlyProperties) {
         this.workpackSrv.setWorkpackData({ workpack: this.workpack });
-        await this.loadWorkpackModel(this.workpack.model.id);
+        await this.loadWorkpackModel(this.workpack.idWorkpackModel);
       } else {
         this.workpackSrv.nextLoadingWorkpack(false)
       }
@@ -454,11 +442,6 @@ export class WorkpackComponent implements OnDestroy {
 
   async loadUserPermission() {
     let editPermission = !!this.workpack.permissions?.find(p => p.level === 'EDIT');
-    if (!editPermission && !this.idWorkpackModelLinked) {
-      editPermission = await this.planPermissionSrv.getPermissions(this.idPlan);
-    } else {
-      editPermission = editPermission;
-    }
     if (this.workpack.endManagementDate !== null) {
       if (this.workpackSrv.getEditPermission()) {
         this.endManagementResumePermission = true;
@@ -507,8 +490,11 @@ export class WorkpackComponent implements OnDestroy {
 
   async checkWorkpackHasEap() {
     this.isLoading = true;
-    this.hasWBS = (!!this.isUserAdmin || (!!this.workpack.permissions && this.workpack.permissions.length > 0)) && this.workpack.hasChildren;
+    this.hasWBS = (!!this.isUserAdmin || (!!this.workpack.permissions && this.workpack.permissions.filter( p => p.level !== 'BASIC_READ').length > 0)) && this.workpack.hasChildren;
     this.workpack.hasWBS = this.hasWBS;
+    if (this.hasWBS) {
+      this.breakdownStructureSrv.loadBreakdownStructure(true, this.idWorkpack);
+    }
     const workpackData = this.workpackSrv.getWorkpackData();
     this.workpackSrv.setWorkpackData({
       ...workpackData,
@@ -541,7 +527,7 @@ export class WorkpackComponent implements OnDestroy {
         collapseble: this.showTabview ? false : true,
         initialStateCollapse: this.collapsePanelsStatus,
         showFilters: true,
-        showCreateNemElementButton: this.workpackSrv.getEditPermission() ? true : false,
+        showCreateNemElementButtonWorkpack: this.workpackSrv.getEditPermission() ? true : false,
         createNewElementMenuItemsWorkpack: [],
         filters: []
       };
@@ -565,8 +551,8 @@ export class WorkpackComponent implements OnDestroy {
           if (!this.cardsWorkPackModelChildren[index]?.cardSection?.createNewElementMenuItemsWorkpack) {
             return;
           }
-          this.cardsWorkPackModelChildren[index].cardSection.createNewElementMenuItemsWorkpack =
-            resultItemsList && resultItemsList.iconMenuItems;
+          this.cardsWorkPackModelChildren[index].cardSection.showCreateNemElementButtonWorkpack = this.workpackSrv.getEditPermission();
+          this.cardsWorkPackModelChildren[index].cardSection.onNewItem = () => this.loadNewItemMenu(this.workpack.plan.id, workpackModel.id)
           this.cardsWorkPackModelChildren[index].cardItemsSection = resultItemsList && resultItemsList.workpackItemCardList;
           this.cardsWorkPackModelChildren[index].cardSection.isLoading = false;
         }
@@ -613,6 +599,9 @@ export class WorkpackComponent implements OnDestroy {
         const propertyNameWorkpack = workpack.name;
         const propertyFullnameWorkpack = workpack.fullName;
         const menuItems: MenuItem[] = [];
+        workpack.idPlan = idPlan;
+        workpack.idWorkpackModel = idWorkpackModel;
+        workpack.idParent = this.idWorkpack;
         if (workpack.canceled && workpack.type !== 'Project') {
           menuItems.push({
             label: this.translateSrv.instant('restore'),
@@ -694,7 +683,7 @@ export class WorkpackComponent implements OnDestroy {
             menuItems.push({
               label: this.translateSrv.instant('unlink'),
               icon: 'app-icon unlink',
-              command: (event) => this.unlinkedWorkpack(workpack.id, workpack.linkedModel),
+              command: (event) => this.unlinkedWorkpack(workpack.id, idWorkpackModel),
             });
           }
         }
@@ -725,101 +714,81 @@ export class WorkpackComponent implements OnDestroy {
           dashboardData: this.loadDashboardData(workpack.dashboard, workpack.milestones, workpack.risks),
           hasBaseline: workpack.hasActiveBaseline,
           baselineName: workpack.activeBaselineName,
-          subtitleCardItem: workpack.type === 'Milestone' ? workpack.milestoneDate : '',
+          subtitleCardItem: workpack.type === 'Milestone' ? (workpack.date ? workpack.date.split('T')[0] : null) : '',
           statusItem: workpack.type === 'Milestone' ? MilestoneStatusEnum[workpack.milestoneStatus] : '',
           editPermission: workpack.completed && workpack.type === 'Milestone' ? false : this.getEditPermission()
         };
       });
-      let iconMenuItems: MenuItem[];
       if (this.workpackSrv.getEditPermission() && !idWorkpackModelLinked) {
-        const sharedWorkpackList = await this.loadSharedWorkpackList(idWorkpackModel);
-        iconMenuItems = [
-          {
-            label: this.translateSrv.instant('new'),
-            command: () => this.handleNewWorkpack(idPlan, idWorkpackModel, this.idWorkpack)
-          }
-        ];
-        if (sharedWorkpackList && sharedWorkpackList.length > 0) {
-          iconMenuItems.push({
-            label: this.translateSrv.instant('linkTo'),
-            items: sharedWorkpackList.map(wp => ({
-              label: wp.name,
-              icon: `app-icon ${wp.icon}`,
-              command: () => this.handleLinkToWorkpack(wp.id, idWorkpackModel)
-            }))
-          });
-        }
-        const workpackCuted = this.workpackSrv.getWorkpackCuted();
-        if (workpackCuted) {
-          const { canPaste, incompatiblesProperties } = await this.checkPasteWorkpack(workpackCuted, idWorkpackModel);
-          const validPasteOutherOffice = workpackCuted.plan.idOffice === this.idOffice ? true : this.isUserAdmin;
-          if (canPaste && validPasteOutherOffice) {
-            iconMenuItems.push({
-              label: `${this.translateSrv.instant('paste')} ${workpackCuted.name}`,
-              icon: 'fas fa-paste',
-              command: (event) => this.handlePasteWorkpack(idPlan, idWorkpackModel, this.idWorkpack, incompatiblesProperties)
-            });
-          }
-        }
         workpackItemCardList.push(
           {
             typeCardItem: 'newCardItem',
             icon: IconsEnum.Plus,
             iconSvg: true,
-            iconMenuItems
+            onNewItem: () => this.loadNewItemMenu(idPlan, idWorkpackModel)
           }
         );
       }
-      const resultItemsList = { workpackItemCardList, iconMenuItems };
+      const resultItemsList = { workpackItemCardList };
       return resultItemsList;
     }
-    if ((!workpacks || workpacks.length === 0) && this.workpackSrv.getEditPermission()) {
-      const iconMenuItems: MenuItem[] = [
-        {
-          label: this.translateSrv.instant('new'),
-          command: () => this.handleNewWorkpack(idPlan, idWorkpackModel, this.idWorkpack)
-        }
-      ];
-      if (this.workpackSrv.getEditPermission() && !idWorkpackModelLinked) {
-        const sharedWorkpackList = await this.loadSharedWorkpackList(idWorkpackModel);
-        if (sharedWorkpackList && sharedWorkpackList.length > 0) {
-          iconMenuItems.push({
-            label: this.translateSrv.instant('linkTo'),
-            items: sharedWorkpackList.map(wp => ({
-              label: wp.name,
-              icon: `app-icon ${wp.icon}`,
-              command: () => this.handleLinkToWorkpack(wp.id, idWorkpackModel)
-            }))
-          });
-        }
-        const workpackCuted = this.workpackSrv.getWorkpackCuted();
-        if (workpackCuted) {
-          const { canPaste, incompatiblesProperties } = await this.checkPasteWorkpack(workpackCuted, idWorkpackModel);
-          const validPasteOutherOffice = workpackCuted.plan.idOffice === this.idOffice ? true : this.isUserAdmin;
-          if (canPaste && validPasteOutherOffice) {
-            iconMenuItems.push({
-              label: `${this.translateSrv.instant('paste')} ${workpackCuted.name}`,
-              icon: 'fas fa-paste',
-              command: (event) => this.handlePasteWorkpack(idPlan, idWorkpackModel, this.idWorkpack, incompatiblesProperties)
-            });
-          }
-        }
-      }
+    if ((!workpacks || workpacks.length === 0) && this.workpackSrv.getEditPermission() && !idWorkpackModelLinked) {
       const workpackItemCardList = [
         {
           typeCardItem: 'newCardItem',
           icon: IconsEnum.Plus,
           iconSvg: true,
-          iconMenuItems
+          onNewItem: () => this.loadNewItemMenu(idPlan, idWorkpackModel)
         }
       ];
-      const resultItemsList = { workpackItemCardList, iconMenuItems };
+      const resultItemsList = { workpackItemCardList };
       return resultItemsList;
     }
   }
 
+  async loadNewItemMenu(idPlan, idWorkpackModel) {
+    const sharedWorkpackList = await this.loadSharedWorkpackList(idWorkpackModel);
+    const iconMenuItems: MenuItem[] = [
+      {
+        label: this.translateSrv.instant('new'),
+        command: () => this.handleNewWorkpack(idPlan, idWorkpackModel, this.idWorkpack)
+      }
+    ];
+    if (sharedWorkpackList && sharedWorkpackList.length > 0) {
+      iconMenuItems.push({
+        label: this.translateSrv.instant('linkTo'),
+        items: sharedWorkpackList.map(wp => ({
+          label: wp.name,
+          icon: `app-icon ${wp.icon}`,
+          command: () => this.handleLinkToWorkpack(wp.id, idWorkpackModel)
+        }))
+      });
+    }
+    const workpackCuted = this.workpackSrv.getWorkpackCuted();
+    if (workpackCuted) {
+      const { canPaste, incompatiblesProperties } = await this.checkPasteWorkpack(workpackCuted, idWorkpackModel);
+      const validPasteOutherOffice = workpackCuted.idOffice === this.idOffice ? true : this.isUserAdmin;
+      if (canPaste && validPasteOutherOffice) {
+        iconMenuItems.push({
+          label: `${this.translateSrv.instant('paste')} ${workpackCuted.name}`,
+          icon: 'fas fa-paste',
+          command: (event) => this.handlePasteWorkpack(idPlan, idWorkpackModel, this.idWorkpack, incompatiblesProperties)
+        });
+      }
+    }
+    const workpackModelCardIndex = this.cardsWorkPackModelChildren.findIndex(card => card.idWorkpackModel === idWorkpackModel);
+    if (workpackModelCardIndex > -1) {
+      this.cardsWorkPackModelChildren[workpackModelCardIndex].cardSection.createNewElementMenuItemsWorkpack = iconMenuItems;
+      const newWorkpackCardIndex = this.cardsWorkPackModelChildren[workpackModelCardIndex].cardItemsSection.findIndex( card => card.typeCardItem === 'newCardItem' );
+      if (newWorkpackCardIndex > -1) {
+        this.cardsWorkPackModelChildren[workpackModelCardIndex].cardItemsSection[newWorkpackCardIndex].iconMenuItems = iconMenuItems;
+      }
+    }
+
+  }
+
   loadDashboardData(dashboard?, milestones?, risks?) {
-    const dashboardData =  {
+    const dashboardData = {
       tripleConstraint: dashboard && dashboard.tripleConstraint && {
         idBaseline: dashboard.tripleConstraint.idBaseline,
         cost: {
@@ -859,10 +828,10 @@ export class WorkpackComponent implements OnDestroy {
         indexValue: dashboard.performanceIndex.schedulePerformanceIndexValue,
         scheduleVariation: dashboard.performanceIndex.schedulePerformanceIndexVariation
       } : null,
-      risk: risks && {high: 0, low: 0, medium: 0, closed: 0, total: 0},
-      milestone: milestones && {concluded: 0, late: 0, lateConcluded: 0, onTime: 0, quantity: 0}
+      risk: risks && { high: 0, low: 0, medium: 0, closed: 0, total: 0 },
+      milestone: milestones && { concluded: 0, late: 0, lateConcluded: 0, onTime: 0, quantity: 0 }
     };
-    const totalRisk = risks && risks.reduce( ( totalRisk: {high: number; low: number; medium: number; closed: number; total: number}, risk) => {
+    const totalRisk = risks && risks.reduce((totalRisk: { high: number; low: number; medium: number; closed: number; total: number }, risk) => {
       switch (risk.importance) {
         case 'HIGH':
           totalRisk.high++;
@@ -877,16 +846,16 @@ export class WorkpackComponent implements OnDestroy {
       if (risk.status !== 'OPEN') totalRisk.closed++;
       totalRisk.total++
       return totalRisk;
-    }, {high: 0, low: 0, medium: 0, closed: 0, total: 0});
+    }, { high: 0, low: 0, medium: 0, closed: 0, total: 0 });
 
-    const totalMilestones = milestones && milestones.reduce( ( totalMilestones: {
-        concluded: number;
-        late: number;
-        lateConcluded: number;
-        onTime: number;
-        quantity: number
-      }, milestone) => {
-      
+    const totalMilestones = milestones && milestones.reduce((totalMilestones: {
+      concluded: number;
+      late: number;
+      lateConcluded: number;
+      onTime: number;
+      quantity: number
+    }, milestone) => {
+
       if (milestone.completed) {
         if (!milestone.snapshotDate) {
           totalMilestones.concluded++;
@@ -918,7 +887,7 @@ export class WorkpackComponent implements OnDestroy {
           return totalMilestones;
         }
       }
-    }, {concluded: 0, late: 0, lateConcluded: 0, onTime: 0, quantity: 0});
+    }, { concluded: 0, late: 0, lateConcluded: 0, onTime: 0, quantity: 0 });
     dashboardData.risk = totalRisk;
     dashboardData.milestone = totalMilestones;
     return dashboardData;
@@ -947,7 +916,7 @@ export class WorkpackComponent implements OnDestroy {
     }
   }
 
-  endManagementOfDeliverable(workpack: IWorkpack, idWorkpackModel) {
+  endManagementOfDeliverable(workpack: IWorkpackListCard, idWorkpackModel) {
     this.showDialogEndManagement = true;
     this.endManagementWorkpack = {
       idWorkpackModel,
@@ -960,7 +929,7 @@ export class WorkpackComponent implements OnDestroy {
   async handleEndManagementDeliverable() {
     if (this.endManagementWorkpack && this.endManagementWorkpack.reason.length > 0
       && this.endManagementWorkpack.endManagementDate !== null) {
-        this.workpackChildChanging = true;
+      this.workpackChildChanging = true;
       const result = await this.workpackSrv.endManagementDeliverable({
         idWorkpack: this.endManagementWorkpack.idWorkpack,
         endManagementDate: moment(this.endManagementWorkpack.endManagementDate).format('yyyy-MM-DD'),
@@ -980,7 +949,7 @@ export class WorkpackComponent implements OnDestroy {
         } else {
           await this.loadSectionsWorkpackChildrenLinked();
         }
-      } 
+      }
     } else {
       this.messageSrv.add({
         severity: 'warn',
@@ -996,7 +965,7 @@ export class WorkpackComponent implements OnDestroy {
     this.endManagementWorkpack = undefined;
   }
 
-  resumeManagementOfDeliverable(workpack: IWorkpack, idWorkpackModel) {
+  resumeManagementOfDeliverable(workpack: IWorkpackListCard, idWorkpackModel) {
     this.showDialogResumeManagement = true;
     this.endManagementWorkpack = {
       idWorkpackModel,
@@ -1057,19 +1026,19 @@ export class WorkpackComponent implements OnDestroy {
   navigateToCancelProject(idProject: number, projectName: string) {
     this.router.navigate(
       ['/workpack/baseline-cancelling'],
-      this.idWorkpackModelLinked ? 
-      {
-        queryParams: {
-          idProject,
-          idWorkpackModelLinked: this.idWorkpackModelLinked ? this.idWorkpackModelLinked as number : null,
-          projectName
-        }
-      } : {
-        queryParams: {
-          idProject,
-          projectName
-        }
-      });
+      this.idWorkpackModelLinked ?
+        {
+          queryParams: {
+            idProject,
+            idWorkpackModelLinked: this.idWorkpackModelLinked ? this.idWorkpackModelLinked as number : null,
+            projectName
+          }
+        } : {
+          queryParams: {
+            idProject,
+            projectName
+          }
+        });
   }
 
   async handleCancelWorkpack(idWorkpack: number) {
@@ -1090,7 +1059,7 @@ export class WorkpackComponent implements OnDestroy {
     }
   }
 
-  async handleCutWorkpack(workpack: IWorkpack) {
+  async handleCutWorkpack(workpack: IWorkpackListCard) {
     this.workpackSrv.setWorkpackCuted({ ...workpack, idParent: this.idWorkpack });
     const workpackModelIndex = this.cardsWorkPackModelChildren
       .findIndex(workpackModel => workpackModel.idWorkpackModel === workpack.idWorkpackModel);
@@ -1106,9 +1075,9 @@ export class WorkpackComponent implements OnDestroy {
     }
   }
 
-  async checkPasteWorkpack(workpackCuted: IWorkpack, idWorkpackModelTo: number) {   
+  async checkPasteWorkpack(workpackCuted: IWorkpackListCard, idWorkpackModelTo: number) {
     if (idWorkpackModelTo === workpackCuted.idWorkpackModel) {
-      return {canPaste: true, incompatiblesProperties: false}
+      return { canPaste: true, incompatiblesProperties: false }
     }
     const result = await this.workpackSrv.checkPasteWorkpack(workpackCuted.id, idWorkpackModelTo, {
       idWorkpackModelFrom: workpackCuted.idWorkpackModel,
@@ -1141,10 +1110,10 @@ export class WorkpackComponent implements OnDestroy {
     }
   }
 
-  async pasteWorkpack(workpackCuted: IWorkpack, idWorkpackModelTo: number, idPlanTo: number, idParentTo: number) {
+  async pasteWorkpack(workpackCuted: IWorkpackListCard, idWorkpackModelTo: number, idPlanTo: number, idParentTo: number) {
     this.workpackChildChanging = true;
     const result = await this.workpackSrv.pasteWorkpack(workpackCuted.id, idWorkpackModelTo, {
-      idPlanFrom: workpackCuted.plan.id,
+      idPlanFrom: workpackCuted.idPlan,
       idParentFrom: workpackCuted.idParent,
       idPlanTo,
       idParentTo,
@@ -1169,7 +1138,7 @@ export class WorkpackComponent implements OnDestroy {
         collapseble: this.showTabview ? false : true,
         initialStateCollapse: this.showTabview ? false : this.collapsePanelsStatus,
         showFilters: true,
-        showCreateNemElementButton: false
+        showCreateNemElementButtonWorkpack: false
       };
       return {
         idWorkpackModel: workpackModel.idWorkpackModelLinked,
@@ -1293,8 +1262,6 @@ export class WorkpackComponent implements OnDestroy {
     const resultItemsList = await
       this.loadWorkpacksFromWorkpackModel(this.workpack.plan.id, idWorkpackModel, idFilterSelected, term, event.checked);
     this.cardsWorkPackModelChildren[workpackModelIndex].cardItemsSection = resultItemsList && resultItemsList.workpackItemCardList;
-    this.cardsWorkPackModelChildren[workpackModelIndex].cardSection.createNewElementMenuItemsWorkpack =
-      resultItemsList && resultItemsList.iconMenuItems;
     this.cardsWorkPackModelChildren[workpackModelIndex].workpackShowCancelleds = event.checked;
   }
 
@@ -1305,6 +1272,10 @@ export class WorkpackComponent implements OnDestroy {
   onSaveButtonClicked() {
     this.workpackSrv.nextPendingChanges(false);
     this.saveButtonSrv.nextSaveButtonClicked(true);
+  }
+
+  get checkHasPermission() {
+    return this.isUserAdmin || (this.workpack && this.workpack.permissions && this.workpack.permissions.filter( p => p.level !== 'BASIC_READ').length > 0)
   }
 
   async saveWorkpack(event) {
@@ -1352,14 +1323,28 @@ export class WorkpackComponent implements OnDestroy {
       this.scrollTop();
       return;
     }
+    const workpackName = (this.workpackProperties.find(prop => prop.name === 'name')).value as string;
+    const workpackFullName = (this.workpackProperties.find(prop => prop.name === 'fullName')).value as string;
+    let milestoneDate;
+    let milestoneChangeDateReason;
+    if (this.workpackModel.type === TypeWorkpackModelEnum.MilestoneModel) {
+      const propertyDate = this.workpackProperties.find(prop => prop.name === 'date');
+      milestoneDate = propertyDate.value;
+      milestoneChangeDateReason = propertyDate.reason;
+    }
+    this.workpackProperties = this.workpackProperties.filter(prop => !['name', 'fullName', 'date'].includes(prop.name))
     const isPut = !!this.idWorkpack;
     const workpack = isPut
       ? {
         id: this.idWorkpack,
         idParent: this.workpack.idParent,
         idPlan: this.workpack.plan.id,
-        idWorkpackModel: this.workpack.model.id,
+        idWorkpackModel: this.workpack.idWorkpackModel,
         type: this.workpack.type,
+        name: workpackName,
+        fullName: workpackFullName,
+        date: milestoneDate,
+        reason: milestoneChangeDateReason,
         properties: this.workpackProperties,
       }
       : {
@@ -1367,6 +1352,9 @@ export class WorkpackComponent implements OnDestroy {
         idWorkpackModel: this.idWorkpackModel,
         idParent: this.idWorkpackParent,
         type: TypeWorkpackEnum[this.workpackModel.type],
+        name: workpackName,
+        fullName: workpackFullName,
+        date: milestoneDate,
         properties: this.workpackProperties,
       };
     this.formIsSaving = true;
@@ -1450,8 +1438,6 @@ export class WorkpackComponent implements OnDestroy {
       const resultItemsList = await this.loadWorkpacksFromWorkpackModel(this.workpack.plan.id, idWorkpackModel, idFilter, term, false);
       const workpacksByFilter = resultItemsList && resultItemsList.workpackItemCardList;
       this.cardsWorkPackModelChildren[workpackModelCardIndex].cardItemsSection = workpacksByFilter;
-      this.cardsWorkPackModelChildren[workpackModelCardIndex].cardSection.createNewElementMenuItemsWorkpack =
-        resultItemsList && resultItemsList.iconMenuItems;
       this.totalRecordsWorkpacks[workpackModelCardIndex] = workpacksByFilter && workpacksByFilter.length;
     }
   }
@@ -1466,7 +1452,7 @@ export class WorkpackComponent implements OnDestroy {
         queryParams: {
           id: idFilter,
           entityName,
-          idWorkpackModel: this.workpack.model.id,
+          idWorkpackModel: this.workpack.idWorkpackModel,
           idOffice: this.idOffice
         }
       });
@@ -1480,7 +1466,7 @@ export class WorkpackComponent implements OnDestroy {
     this.router.navigate(['/filter-dataview'], {
       queryParams: {
         entityName,
-        idWorkpackModel: this.workpack.model.id,
+        idWorkpackModel: this.workpack.idWorkpackModel,
         idOffice: this.idOffice
       }
     });

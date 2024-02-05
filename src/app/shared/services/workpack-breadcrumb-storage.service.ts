@@ -4,6 +4,8 @@ import { BreadcrumbService } from './breadcrumb.service';
 import { Injectable } from '@angular/core';
 import { IWorkpackParams } from '../interfaces/IWorkpackDataParams';
 import { IBreadcrumb } from '../interfaces/IBreadcrumb';
+import { PlanService } from './plan.service';
+import { OfficeService } from './office.service';
 
 @Injectable({
   providedIn: 'root'
@@ -12,14 +14,14 @@ export class WorkpackBreadcrumbStorageService {
 
   private workpackParams: IWorkpackParams;
   private workpackData: IWorkpackData;
-  private workpackName: { name: string; fullName: string };
   currentBreadcrumbItems: IBreadcrumb[];
   idParent: number;
   private key = '@pmo/current-breadcrumb';
 
   constructor(
     private breadcrumbSrv: BreadcrumbService,
-    private workpackSrv: WorkpackService
+    private workpackSrv: WorkpackService,
+    private planSrv: PlanService,
   ) {
   }
 
@@ -30,21 +32,40 @@ export class WorkpackBreadcrumbStorageService {
 
   public async getBreadcrumbs(idWorkpack, idPlan) {
     const { success, data } = await this.breadcrumbSrv.getBreadcrumbWorkpack(idWorkpack, { 'id-plan': idPlan });
-    return success
-      ? data.map(p => ({
+    if (success) {
+      const propertiesPlan = await this.planSrv.getCurrentPlan(idPlan);
+      const breadcrumbInit = [
+        {
+          key: 'office',
+          info: propertiesPlan.office.name,
+          tooltip: propertiesPlan.office.fullName,
+          routerLink: ['/offices', 'office'],
+          queryParams: { id: propertiesPlan.office.id },
+        },
+        {
+          key: 'plan',
+          info: propertiesPlan.name,
+          tooltip: propertiesPlan.fullName,
+          routerLink: ['/plan'],
+          queryParams: { id: propertiesPlan.id },
+        },
+      ];
+      const breadcrumbItemsWorkpack = data.map(p => ({
         key: !p.modelName ? p.type.toLowerCase() : p.modelName,
         info: p.name,
         tooltip: p.fullName,
         routerLink: this.getRouterLinkFromType(p.type),
         queryParams: { id: p.id, idWorkpackModelLinked: p.idWorkpackModelLinked, idPlan: idPlan },
         modelName: p.modelName
-      }))
-      : [];
+      }));
+      return [...breadcrumbInit, ...breadcrumbItemsWorkpack]
+    }
+
+    return [];
   }
 
   async getCurrentBreadcrumb() {
     this.workpackData = this.workpackSrv.getWorkpackData();
-    this.workpackName = this.workpackSrv.getNameWorkpack();
     this.workpackParams = this.workpackSrv.getWorkpackParams();
     this.idParent = this.workpackData?.workpack?.idParent || this.workpackParams.idWorkpackParent;
     this.currentBreadcrumbItems = this.breadcrumbSrv.get;
@@ -64,12 +85,12 @@ export class WorkpackBreadcrumbStorageService {
             ? [
               {
                 key: this.workpackData.workpackModel?.type?.toLowerCase().replace('model', ''),
-                info: this.workpackName.name,
-                tooltip: this.workpackName.fullName,
+                info: this.workpackData?.workpack?.name,
+                tooltip: this.workpackData?.workpack?.fullName,
                 routerLink: ['/workpack'],
                 queryParams: {
-                  id: this.workpackParams.idWorkpack,
-                  idPlan: this.workpackParams.idPlan,
+                  id: this.workpackParams?.idWorkpack,
+                  idPlan: this.workpackParams?.idPlan,
                   idWorkpackModelLinked: this.workpackParams.idWorkpackModelLinked
                 },
                 modelName: this.workpackData.workpackModel?.modelName
@@ -77,8 +98,8 @@ export class WorkpackBreadcrumbStorageService {
             ]
             : [{
               key: this.workpackData.workpackModel?.type?.toLowerCase().replace('model', ''),
-              info: this.workpackName.name,
-              tooltip: this.workpackName.fullName,
+              info: this.workpackData?.workpack?.name,
+              tooltip: this.workpackData?.workpack?.fullName,
               routerLink: ['/workpack'],
               queryParams: {
                 idPlan: this.workpackParams.idPlan,
@@ -100,7 +121,7 @@ export class WorkpackBreadcrumbStorageService {
   }
 
   startNewBreadcrumb() {
-    return [
+    const bread =  [
       {
         key: 'office',
         info: this.workpackParams.propertiesOffice.name,
@@ -119,8 +140,8 @@ export class WorkpackBreadcrumbStorageService {
         ? [
           {
             key: this.workpackData.workpackModel?.type?.toLowerCase().replace('model', ''),
-            info: this.workpackName.name,
-            tooltip: this.workpackName.fullName,
+            info: this.workpackData?.workpack?.name,
+            tooltip: this.workpackData?.workpack?.fullName,
             routerLink: ['/workpack'],
             queryParams: {
               id: this.workpackParams.idWorkpack,
@@ -132,8 +153,8 @@ export class WorkpackBreadcrumbStorageService {
         ]
         : [{
           key: this.workpackData.workpackModel?.type?.toLowerCase().replace('model', ''),
-          info: this.workpackName.name,
-          tooltip: this.workpackName.fullName,
+          info: this.workpackData?.workpack?.name,
+          tooltip: this.workpackData?.workpack?.fullName,
           routerLink: ['/workpack'],
           queryParams: {
             idPlan: this.workpackParams.idPlan,
@@ -143,6 +164,7 @@ export class WorkpackBreadcrumbStorageService {
           modelName: this.workpackData.workpackModel?.modelName
         }]
     ]
+    return bread;
   }
 
 

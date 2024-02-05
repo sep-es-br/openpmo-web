@@ -246,9 +246,8 @@
       width: 100%;
       display: flex;
       flex-direction: column;
-      align-items: center;
-      max-width: 43px;
-      margin-bottom: 5px;
+      align-items: flex-end;
+      padding: 5px;
 
       .card-item-id {
         color: #888e96;

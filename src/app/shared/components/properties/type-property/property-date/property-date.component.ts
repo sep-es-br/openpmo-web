@@ -36,8 +36,7 @@ export class PropertyDateComponent implements OnInit {
   ) {
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.responsive = value);
     this.translateSrv.onLangChange.pipe(takeUntil(this.$destroy)).subscribe(() =>
-      setTimeout(() =>
-      {
+      setTimeout(() => {
         this.calendarComponent?.ngOnInit();
         this.calendarComponent.dateFormat = this.translateSrv.instant('dateFormat');
         this.calendarComponent.updateInputfield();
@@ -52,28 +51,30 @@ export class PropertyDateComponent implements OnInit {
       return;
     }
 
-    const formatedDate = moment().format('YYYY-MM-DD');
-    const actualDate = moment(formatedDate, 'YYYY-MM-DD');
-    const newDate = moment(event);
-    const baselineDate = this.property.milestoneData && this.property.milestoneData.baselineDate ?
-      new Date(this.property.milestoneData.baselineDate+ 'T00:00:00') : undefined;
-    if (baselineDate) {
-      this.property.milestoneData.delayInDays = actualDate.isBefore(moment(baselineDate)) ? moment(newDate).diff(baselineDate, 'days') :
-      ( moment(newDate).isBefore(actualDate) ?  moment(actualDate).diff(baselineDate, 'days') :  moment(newDate).diff(baselineDate, 'days')) ;
-      this.milestoneChangeDateSrv.next(this.property.milestoneData.delayInDays);
-    }
-    const defaultValueDiffNewDate = this.property?.defaultValue?.toString().split('T')[0] !== newDate.format('YYYY-MM-DD');
-    if (!newDate || !this.property?.milestoneData || isNaN(event) || !defaultValueDiffNewDate) {
-      this.showReason = false;
-      this.property.needReason = false;
-      this.property.reason = null;
-      return;
-    }
-    
-    if (baselineDate) {
-      if (defaultValueDiffNewDate && newDate.diff(moment(baselineDate))) {
-        this.emitChanges(event, true);
+    if (this.property.milestoneData) {
+      const formatedDate = moment().format('YYYY-MM-DD');
+      const actualDate = moment(formatedDate, 'YYYY-MM-DD');
+      const newDate = moment(event);
+      const baselineDate = this.property.milestoneData && this.property.milestoneData.baselineDate ?
+        new Date(this.property.milestoneData.baselineDate + 'T00:00:00') : undefined;
+      if (baselineDate) {
+        this.property.milestoneData.delayInDays = actualDate.isBefore(moment(baselineDate)) ? moment(newDate).diff(baselineDate, 'days') :
+          (moment(newDate).isBefore(actualDate) ? moment(actualDate).diff(baselineDate, 'days') : moment(newDate).diff(baselineDate, 'days'));
+        this.milestoneChangeDateSrv.next(this.property.milestoneData.delayInDays);
+      }
+      const defaultValueDiffNewDate = this.property?.defaultValue?.toString().split('T')[0] !== newDate.format('YYYY-MM-DD');
+      if (!newDate || !this.property?.milestoneData || isNaN(event) || !defaultValueDiffNewDate) {
+        this.showReason = false;
+        this.property.needReason = false;
+        this.property.reason = null;
         return;
+      }
+
+      if (baselineDate) {
+        if (defaultValueDiffNewDate && newDate.diff(moment(baselineDate))) {
+          this.emitChanges(event, true);
+          return;
+        }
       }
     }
     this.emitChanges(event, false);
@@ -99,7 +100,7 @@ export class PropertyDateComponent implements OnInit {
     this.calendarFormat = this.translateSrv.instant('dateFormat');
     const today = moment();
     const yearStart = today.year();
-    this.yearRange = (yearStart-10).toString() + ':'+ (yearStart+10).toString();
+    this.yearRange = (yearStart - 10).toString() + ':' + (yearStart + 10).toString();
     this.loadDates();
   }
 

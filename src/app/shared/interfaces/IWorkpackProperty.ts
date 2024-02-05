@@ -1,6 +1,7 @@
 export interface IWorkpackProperty {
   id?: number;
   type: string;
+  name?: string;
   session?: string;
   idPropertyModel: number;
   value?: string | number | boolean | string[] | number[] | Date;

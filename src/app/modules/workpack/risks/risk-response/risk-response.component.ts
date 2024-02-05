@@ -125,8 +125,8 @@ export class RiskResponseComponent implements OnInit {
   setFormRiskResponse() {
     this.formRiskResponse.controls.name.setValue(this.riskResponse.name);
     this.formRiskResponse.controls.when.setValue(this.riskResponse.when);
-    this.formRiskResponse.controls.startDate.setValue(new Date(this.riskResponse.startDate + 'T00:00:00'));
-    this.formRiskResponse.controls.endDate.setValue(new Date(this.riskResponse.endDate + 'T00:00:00'));
+    if (this.riskResponse.startDate) this.formRiskResponse.controls.startDate.setValue(new Date(this.riskResponse.startDate + 'T00:00:00'));
+    if (this.riskResponse.endDate) this.formRiskResponse.controls.endDate.setValue(new Date(this.riskResponse.endDate + 'T00:00:00'));
     this.formRiskResponse.controls.strategy.setValue(this.riskResponse.strategy);
     this.formRiskResponse.controls.status.setValue(this.riskResponse.status);
     this.formRiskResponse.controls.trigger.setValue(this.riskResponse.trigger);

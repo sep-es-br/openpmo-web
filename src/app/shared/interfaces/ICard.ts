@@ -15,6 +15,7 @@ export interface ICard {
   initialStateToggle: boolean;
   showFilters?: boolean;
   filters?: IFilterDataview[];
+  showCreateNemElementButtonWorkpack?: boolean;
   showCreateNemElementButton?: boolean;
   createNewElementMenuItems?: MenuItem[];
   createNewElementMenuItemsWorkpack?: MenuItem[];
@@ -22,6 +23,7 @@ export interface ICard {
     startDate: Date;
     endDate: Date;
   };
+  onNewItem?;
   progressBarValues?: progressBarValue[];
   onToggle?: EventEmitter<boolean>;
   cardItems?: ICardItem[];

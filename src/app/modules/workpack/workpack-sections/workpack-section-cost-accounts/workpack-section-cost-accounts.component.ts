@@ -40,7 +40,6 @@ export class WorkpackSectionCostAccountsComponent implements OnInit, OnDestroy {
   filters;
   funders;
   sectionActive = false;
-  idCostAccountModel: number;
 
   constructor(
     private costAccountSrv: CostAccountService,
@@ -110,7 +109,6 @@ export class WorkpackSectionCostAccountsComponent implements OnInit, OnDestroy {
       workpackParams,
       filters,
       costAccounts,
-      idCostAccountModel,
       idFilterSelected,
       term,
       funders,
@@ -120,7 +118,6 @@ export class WorkpackSectionCostAccountsComponent implements OnInit, OnDestroy {
     this.workpackParams = workpackParams;
     this.filters = filters;
     this.costAccounts = costAccounts;
-    this.idCostAccountModel = idCostAccountModel;
     this.idFilterSelected = idFilterSelected;
     this.funders = funders;
     this.term = term;
@@ -275,8 +272,7 @@ export class WorkpackSectionCostAccountsComponent implements OnInit, OnDestroy {
         queryParams: {
           id: idFilter,
           entityName: `costAccounts`,
-          idCostAccountModel: this.idCostAccountModel,
-          idWorkpackModel: this.workpackData.workpack.model.id,
+          idWorkpackModel: this.workpackData.workpackModel.id,
           idOffice: this.workpackParams.idOffice
         }
       });
@@ -298,8 +294,7 @@ export class WorkpackSectionCostAccountsComponent implements OnInit, OnDestroy {
     this.router.navigate(['/filter-dataview'], {
       queryParams: {
         entityName: `costAccounts`,
-        idCostAccountModel: this.idCostAccountModel,
-        idWorkpackModel: this.workpackData.workpack.model.id,
+        idWorkpackModel: this.workpackData.workpackModel.id,
         idOffice: this.workpackParams.idOffice
       }
     });

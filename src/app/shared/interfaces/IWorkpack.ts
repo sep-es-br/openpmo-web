@@ -1,60 +1,34 @@
 import { IMilestoneDashboard, ITripleConstraintDashboard } from './IDashboard';
 import { TypeWorkpackEnum } from '../enums/TypeWorkpackEnum';
-import { TypeWorkpackModelEnum } from '../enums/TypeWorkpackModelEnum';
-import { IWorkpackModel } from './IWorkpackModel';
-import { IWorkpackModelProperty } from './IWorkpackModelProperty';
 import { IWorkpackProperty } from './IWorkpackProperty';
+import { IPlan } from './IPlan';
+import { IWorkpackModel } from './IWorkpackModel';
 
 export interface IWorkpack {
     id?: number;
     name?: string;
     fullName?: string;
-    fontIcon?: string;
-    model?: {
-      type: string;
-      childWorkpackModelSessionActive?: boolean;
-      children?: IWorkpackModel[];
-      costSessionActive?: boolean;
-      fontIcon: string;
-      id: number;
-      modelName: string;
-      modelNameInPlural: string;
-      organizationRoles?: string[];
-      parent?: {
-        fontIcon: string;
-        id: number;
-        modelName: string;
-        type: TypeWorkpackModelEnum;
-      };
-      personRoles?: string[];
-      planModel: {
-        fullName: string;
-        id: number;
-        name: string;
-      };
-      properties: IWorkpackModelProperty[];
-      stakeholderSessionActive?: boolean;
-      riskAndIssueManagementSessionActive?: boolean;
-      processesManagementSessionActive?: boolean;
-      dashboardSessionActive?: boolean;
-      dashboardShowEva?: boolean;
-      dashboardShowMilestones?: boolean;
-      dashboardShowRisks?: boolean;
-      dashboardShowStakeholders?: string[];
-    };
-    plan?: {
-      fullName: string;
-      id: number;
-      name: string;
-      idOffice?: number;
-    };
-    delayInDays?: number;
-    baselineDate?: Date;
+    date?: string; // date do workpack milestone
     idParent?: number;
     idPlan?: number;
     type: TypeWorkpackEnum;
     idWorkpackModel?: number;
     properties: IWorkpackProperty[];
+    canceled?: boolean;
+    completed?: boolean;
+    favoritedBy?: boolean;
+    endManagementDate?: string;
+    delayInDays?: number;
+    baselineDate?: Date;
+    cancelPropose?: boolean;
+    pendingBaseline?: boolean;
+    permissions?: IPermission[];
+    hasScheduleSectionActive?: boolean;
+    hasChildren?: boolean;
+    milestoneStatus?: string;
+
+    hasWBS?: boolean; //only screen
+    // only workpacks linked
     modelLinked?: {
       id: number;
       name: string;
@@ -66,8 +40,18 @@ export interface IWorkpack {
         idWorkpackModelOriginal: number;
       }[];
     };
+    plan?: IPlan; // only getByIdworkpackLinked
+    model?: IWorkpackModel; // only getByIdWorkpackLinked
+}
+
+export interface IWorkpackListCard {
+    id: number;
+    name: string;
+    fullName: string;
+    fontIcon: string;
+    date?: string; // somente milestone
+    type: TypeWorkpackEnum;
     linked?: boolean;
-    linkedModel?: number;
     permissions?: IPermission[];
     sharedWith?: boolean;
     pendingBaseline?: boolean;
@@ -79,9 +63,23 @@ export interface IWorkpack {
     completed?: boolean;
     canDeleted?: boolean;
     endManagementDate?: string;
-    favoritedBy?: boolean;
-    hasScheduleSectionActive?: boolean;
-    reason?: string;
+    milestoneStatus?: string;
+    dashboard?: IWorkpackDashboard;
+    milestones?: {
+      completed: boolean,
+      milestoneDate: string;
+      snapshotDate: string;
+    } [];
+    risks?: {
+      importance: string;
+      status: string;
+    } [];
+    idWorkpackModel?: number; // only screen
+    idParent?: number; // only screen
+    idPlan?: number; //only screen
+    idOffice?: number; //only screen
+    reason?: string; // only to screen
+    // dashboardData is only screen
     dashboardData?: {
       risk?: {
         high: number,
@@ -101,20 +99,6 @@ export interface IWorkpack {
       },
       earnedValue?: number;
     },
-    milestoneStatus?: string;
-    milestoneDate?: string;
-    hasWBS?: boolean;
-    hasChildren?: boolean;
-    dashboard?: IWorkpackDashboard;
-    milestones?: {
-      completed: boolean,
-      milestoneDate: string;
-      snapshotDate: string;
-    } [];
-    risks?: {
-      importance: string;
-      status: string;
-    } [];
 }
 
 interface IWorkpackDashboard {

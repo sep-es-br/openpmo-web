@@ -185,8 +185,6 @@ export class StepComponent implements OnInit, OnDestroy {
       ... breadcrumbItems,
       {
         key: 'step',
-        routerLink: ['/workpack/schedule/step'],
-        queryParams: { id: this.idStep },
         info: ''
       }
     ]);

@@ -17,6 +17,7 @@ import { PlanService } from 'src/app/shared/services/plan.service';
 import { formatDateToString } from 'src/app/shared/utils/formatDateToString';
 import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
 import { SaveButtonComponent } from 'src/app/shared/components/save-button/save-button.component';
+import { WorkpackModelService } from 'src/app/shared/services/workpack-model.service';
 
 interface ICardItemRole {
   type: string;
@@ -69,7 +70,8 @@ export class StakeholderOrganizationComponent implements OnInit {
     private messageSrv: MessageService,
     private breadcrumbSrv: BreadcrumbService,
     private router: Router,
-    private authSrv: AuthService
+    private authSrv: AuthService,
+    private workpackModelSrv: WorkpackModelService
   ) {
     this.actRouter.queryParams.subscribe(async queryParams => {
       this.idPlan = queryParams.idPlan;
@@ -84,12 +86,6 @@ export class StakeholderOrganizationComponent implements OnInit {
 
   async ngOnInit() {
     await this.loadStakeholder();
-    const propertyNameWorkpackModel = this.workpack.model.properties.find(p => p.name === 'name');
-    const propertyNameWorkpack = this.workpack.properties.find(p => p.idPropertyModel === propertyNameWorkpackModel.id);
-    const workpackName = propertyNameWorkpack.value as string;
-    const propertyFullNameWorkpackModel = this.workpack.model.properties.find(p => p.name === 'fullName');
-    const propertyFullNameWorkpack = this.workpack.properties.find(p => p.idPropertyModel === propertyFullNameWorkpackModel.id);
-    const workpackFullName = propertyFullNameWorkpack.value as string;
     let breadcrumbItems = this.breadcrumbSrv.get;
     if (!breadcrumbItems || breadcrumbItems.length === 0) {
       breadcrumbItems = await this.breadcrumbSrv.loadWorkpackBreadcrumbs(this.idWorkpack, this.idPlan)
@@ -98,8 +94,6 @@ export class StakeholderOrganizationComponent implements OnInit {
       ...breadcrumbItems,
       {
         key: 'stakeholder',
-        routerLink: ['/stakeholder/organization'],
-        queryParams: { idWorkpack: this.idWorkpack, idOrganization: this.idOrganization },
         info: this.stakeholder?.organization?.name,
         tooltip: this.stakeholder?.organization?.fullName
       }
@@ -109,11 +103,13 @@ export class StakeholderOrganizationComponent implements OnInit {
   async loadStakeholder() {
     this.isLoading = true;
     if (this.idOrganization) {
-      const result = await this.stakeholderSrv.GetStakeholderOrganization({'id-workpack': this.idWorkpack,
-      'id-organization': this.idOrganization});
+      const result = await this.stakeholderSrv.GetStakeholderOrganization({
+        'id-workpack': this.idWorkpack,
+        'id-organization': this.idOrganization
+      });
       if (result.success) {
         this.stakeholder = result.data;
-        this.stakeholderRoles = this.stakeholder.roles && this.stakeholder.roles.map( role => ({
+        this.stakeholderRoles = this.stakeholder.roles && this.stakeholder.roles.map(role => ({
           id: role.id,
           active: role.active,
           role: role.role,
@@ -137,16 +133,29 @@ export class StakeholderOrganizationComponent implements OnInit {
   }
 
   async loadWorkpack() {
-    const result = await this.workpackSrv.GetWorkpackById(this.idWorkpack, {'id-plan': this.idPlan});
-    if (result.success) {
-      this.workpack = result.data;
-      this.rolesOptions = this.workpack?.model?.organizationRoles?.map(role => ({ label: role, value: role }));
-      const isUserAdmin = await this.authSrv.isUserAdmin();
-      if (isUserAdmin) {
-        this.editPermission = !this.workpack.canceled;
-      } else {
-        this.editPermission = (this.workpack.permissions && this.workpack.permissions.filter(p => p.level === 'EDIT').length > 0) && !this.workpack.canceled;
+    const workpackData = this.workpackSrv.getWorkpackData();
+    if (workpackData && workpackData.workpack && workpackData.workpackModel) {
+      this.workpack = workpackData.workpack;
+      this.rolesOptions = workpackData.workpackModel.organizationRoles?.map(role => ({ label: role, value: role }));
+
+    } else {
+      const result = await this.workpackSrv.GetWorkpackById(this.idWorkpack);
+      if (result.success) {
+        this.workpack = result.data;
       }
+      const resultModel = await this.workpackModelSrv.GetById(this.workpack.idWorkpackModel);
+      if (resultModel.success) {
+        this.rolesOptions = resultModel.data.organizationRoles.map(role => ({
+          label: role,
+          value: role.toLowerCase()
+        }));
+      }
+    }
+    const isUserAdmin = await this.authSrv.isUserAdmin();
+    if (isUserAdmin) {
+      this.editPermission = !this.workpack.canceled;
+    } else {
+      this.editPermission = (this.workpack.permissions && this.workpack.permissions.filter(p => p.level === 'EDIT').length > 0) && !this.workpack.canceled;
     }
   }
 
@@ -258,11 +267,11 @@ export class StakeholderOrganizationComponent implements OnInit {
   }
 
   validateStakeholder() {
-    if(!this.stakeholderRoles) {
+    if (!this.stakeholderRoles) {
       return false;
     }
-    const roleNotOk = this.stakeholderRoles.filter( r => {
-      if( !r.role) {
+    const roleNotOk = this.stakeholderRoles.filter(r => {
+      if (!r.role) {
         return r;
       }
       if (r.to !== null) {
@@ -271,7 +280,7 @@ export class StakeholderOrganizationComponent implements OnInit {
         }
       }
     });
-    if(roleNotOk && roleNotOk.length > 0) {
+    if (roleNotOk && roleNotOk.length > 0) {
       return false;
     }
     return true;
@@ -282,7 +291,7 @@ export class StakeholderOrganizationComponent implements OnInit {
     const stakeholderModel = {
       idWorkpack: this.idWorkpack,
       idOrganization: this.organization.id,
-      roles: this.stakeholderRoles.map( r => ({
+      roles: this.stakeholderRoles.map(r => ({
         ...r,
         to: r.to !== null ? formatDateToString(r.to as Date, true) : null,
         from: formatDateToString(r.from as Date, true)

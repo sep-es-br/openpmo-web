@@ -142,7 +142,7 @@ export class BreakdownStructureService extends BaseService<IWorkpackBreakdownStr
   }
 
   mapTreeNodes(data: IWorkpackBreakdownStructure) {
-    const dashboardData = data.dashboard && this.loadDashboardData(data.dashboard, data.milestones, data.risks);
+    const dashboardData = (data.dashboard || data.milestones || data.risks) && this.loadDashboardData(data.dashboard, data.milestones, data.risks);
     if (dashboardData) {
       data.dashboardData = dashboardData;
     }
@@ -163,8 +163,7 @@ export class BreakdownStructureService extends BaseService<IWorkpackBreakdownStr
     const expanded = !this.expandedAll ? level <= 1 : true;
     data.forEach(item => {
       const workpackOrWorkpackModels = isWorkpack ? item.workpackModels : item.workpacks;
-
-      const dashboardData = item.dashboard && this.loadDashboardData(item.dashboard, item.milestones, item.risks);
+      const dashboardData = (item.dashboard || item.risks || item.milestones) && this.loadDashboardData(item.dashboard, item.milestones, item.risks);
       if (dashboardData) {
         item.dashboardData = dashboardData;
       }
@@ -214,7 +213,7 @@ export class BreakdownStructureService extends BaseService<IWorkpackBreakdownStr
   }
 
   buildProperties(item: IWorkpackBreakdownStructure) {
-    if (!item?.dashboard && ![this.typeWorkpackEnum.Milestone].includes(item?.workpackType)) {
+    if (!item?.dashboardData && ![this.typeWorkpackEnum.Milestone].includes(item?.workpackType)) {
       return null;
     }
     const properties = {
@@ -294,68 +293,10 @@ export class BreakdownStructureService extends BaseService<IWorkpackBreakdownStr
         indexValue: dashboard.performanceIndex?.schedulePerformanceIndexValue,
         scheduleVariation: dashboard.performanceIndex?.schedulePerformanceIndexVariation
       } : null,
-      risk: risks && {high: 0, low: 0, medium: 0, closed: 0, total: 0},
-      milestone: milestones && {concluded: 0, late: 0, lateConcluded: 0, onTime: 0, quantity: 0}
+      risk: risks,
+      milestone: milestones
     };
-    const totalRisk = risks && risks.reduce( ( totalRisk: {high: number; low: number; medium: number; closed: number; total: number}, risk) => {
-      switch (risk.importance) {
-        case 'HIGH':
-          totalRisk.high++;
-          break;
-        case 'LOW':
-          totalRisk.low++;
-          break;
-        case 'MEDIUM':
-          totalRisk.medium++;
-          break;
-      }
-      if (risk.status !== 'OPEN') totalRisk.closed++;
-      totalRisk.total++
-      return totalRisk;
-    }, {high: 0, low: 0, medium: 0, closed: 0, total: 0});
-
-    const totalMilestones = milestones && milestones.reduce( ( totalMilestones: {
-        concluded: number;
-        late: number;
-        lateConcluded: number;
-        onTime: number;
-        quantity: number
-      }, milestone) => {
-      
-      if (milestone.completed) {
-        if (!milestone.snapshotDate) {
-          totalMilestones.concluded++;
-          totalMilestones.quantity++;
-          return totalMilestones;
-        } else {
-          const milestoneDate = moment(milestone.milestoneDate, 'yyyy-MM-DD');
-          const snapshotDate = moment(milestone.snapshotDate, 'yyyy-MM-DD');
-          if (milestoneDate.isSameOrBefore(snapshotDate)) {
-            totalMilestones.concluded++;
-            totalMilestones.quantity++;
-            return totalMilestones;
-          } else {
-            totalMilestones.lateConcluded++;
-            totalMilestones.quantity++;
-            return totalMilestones;
-          }
-        }
-      } else {
-        const today = moment();
-        const milestoneDate = moment(milestone.milestoneDate, 'yyyy-MM-DD');
-        if (milestoneDate.isBefore(today)) {
-          totalMilestones.late++;
-          totalMilestones.quantity++;
-          return totalMilestones;
-        } else {
-          totalMilestones.onTime++;
-          totalMilestones.quantity++;
-          return totalMilestones;
-        }
-      }
-    }, {concluded: 0, late: 0, lateConcluded: 0, onTime: 0, quantity: 0});
-    dashboardData.risk = totalRisk;
-    dashboardData.milestone = totalMilestones;
+   
     return dashboardData;
   }
 
@@ -364,17 +305,17 @@ export class BreakdownStructureService extends BaseService<IWorkpackBreakdownStr
       return null;
     }
 
-    data.baselineCost = data.dashboard.tripleConstraint?.costPlannedValue;
-    data.planedCost = data.dashboard.tripleConstraint?.costForeseenValue;
-    data.actualCost = data.dashboard.tripleConstraint?.costActualValue;
-    data.start = data.dashboard.tripleConstraint?.scheduleForeseenStartDate;
-    data.end = data.dashboard.tripleConstraint?.scheduleForeseenEndDate;
-    data.baselineStart = data.dashboard.tripleConstraint?.schedulePlannedStartDate;
-    data.baselineEnd = data.dashboard.tripleConstraint?.schedulePlannedEndDate;
-    data.baselinePlanned = data.dashboard.tripleConstraint?.scopePlannedValue;
+    data.baselineCost = data?.dashboard?.tripleConstraint?.costPlannedValue;
+    data.planedCost = data?.dashboard?.tripleConstraint?.costForeseenValue;
+    data.actualCost = data?.dashboard?.tripleConstraint?.costActualValue;
+    data.start = data?.dashboard?.tripleConstraint?.scheduleForeseenStartDate;
+    data.end = data?.dashboard?.tripleConstraint?.scheduleForeseenEndDate;
+    data.baselineStart = data?.dashboard?.tripleConstraint?.schedulePlannedStartDate;
+    data.baselineEnd = data?.dashboard?.tripleConstraint?.schedulePlannedEndDate;
+    data.baselinePlanned = data?.dashboard?.tripleConstraint?.scopePlannedValue;
     data.unitMeasure = data.unitMeasure;
-    data.planed = data.dashboard.tripleConstraint?.scopeForeseenValue;
-    data.actual = data.dashboard.tripleConstraint?.scopeActualValue;
+    data.planed = data?.dashboard?.tripleConstraint?.scopeForeseenValue;
+    data.actual = data?.dashboard?.tripleConstraint?.scopeActualValue;
 
     const startDate = data && new Date(data.start + 'T00:00:00');
     const endDate = data && new Date(data.end + 'T00:00:00');

@@ -87,8 +87,6 @@ export class BaselineComponent implements OnInit, OnDestroy {
       ...breadcrumbItems,
       {
         key: 'baseline',
-        routerLink: ['/workpack/baseline'],
-        queryParams: {idWorkpack: this.idWorkpack, id: this.idBaseline},
         info: this.baseline?.name,
         tooltip: this.baseline?.name
       }

@@ -43,7 +43,6 @@ export class WorkpackSectionWBSComponent implements OnDestroy {
     private translateSrv: TranslateService,
     private actRouter: ActivatedRoute,
     private route: Router,
-    private configDataSrv: ConfigDataViewService,
     private workpackSrv: WorkpackService,
     private workpackBreadcrumbStorageSrv: WorkpackBreadcrumbStorageService,
     private breadcrumbSrv: BreadcrumbService
@@ -82,11 +81,6 @@ export class WorkpackSectionWBSComponent implements OnDestroy {
     this.workpackParams = this.workpackSrv.getWorkpackParams();
     const { wbsTree, loading } = this.breakdownStructureSrv.getWBSTree();
     this.wbsTree = wbsTree;
-    if (!this.wbsTree) {
-      this.onHasWBS.next(false);
-    } else {
-      this.onHasWBS.next(true);
-    }
     this.isLoading = loading;
   }
 

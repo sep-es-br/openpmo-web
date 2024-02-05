@@ -5,7 +5,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { ResponsiveService } from './../../services/responsive.service';
 import { Router } from '@angular/router';
 import { IWorkpackCardItem } from './../../interfaces/IWorkpackCardItem';
-import { Component, OnInit, Input, OnDestroy } from '@angular/core';
+import { Component, OnInit, Input, OnDestroy, ViewChild, ElementRef } from '@angular/core';
 import { ChartData } from 'chart.js';
 import { Subject } from 'rxjs';
 import * as moment from 'moment';
@@ -18,6 +18,8 @@ import { MessageService } from 'primeng/api';
   styleUrls: ['./workpack-card-item.component.scss']
 })
 export class WorkpackCardItemComponent implements OnInit, OnDestroy {
+
+  @ViewChild('newItemIcon') newItemIcon: ElementRef;
 
   @Input() properties: IWorkpackCardItem;
   @Input() displayModeCard: string;
@@ -48,6 +50,7 @@ export class WorkpackCardItemComponent implements OnInit, OnDestroy {
   reasonValue: string;
   showReasonButtons = false;
   milestoneMidleTextBottom: string;
+  enable = true;
 
   constructor(
     private router: Router,
@@ -404,6 +407,13 @@ export class WorkpackCardItemComponent implements OnInit, OnDestroy {
 
   showEndManagementIndex() {
     return (!!this.properties.endManagementDate && this.properties.endManagementDate !== null) || !!this.properties.completed;
+  }
+
+  async handleLoadMenu() {
+    this.enable = false;
+    await this.properties.onNewItem();
+    this.enable = true;
+    this.newItemIcon.nativeElement.click();
   }
 }
 

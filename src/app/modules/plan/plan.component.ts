@@ -15,7 +15,7 @@ import { IconsEnum } from 'src/app/shared/enums/IconsEnum';
 import { ResponsiveService } from 'src/app/shared/services/responsive.service';
 import { WorkpackModelService } from 'src/app/shared/services/workpack-model.service';
 import { WorkpackService } from 'src/app/shared/services/workpack.service';
-import { IWorkpack } from 'src/app/shared/interfaces/IWorkpack';
+import { IWorkpack, IWorkpackListCard } from 'src/app/shared/interfaces/IWorkpack';
 import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
 import { AuthService } from 'src/app/shared/services/auth.service';
 import { ConfirmationService, MenuItem, MessageService } from 'primeng/api';
@@ -163,7 +163,7 @@ export class PlanComponent implements OnInit, OnDestroy {
   }
 
   async ngOnInit() {
-    this.isUserAdmin = await this.authSrv.isUserAdmin();
+    
     const today = moment();
     const yearStart = today.year();
     this.yearRange = (yearStart - 10).toString() + ':' + (yearStart + 10).toString();
@@ -215,17 +215,20 @@ export class PlanComponent implements OnInit, OnDestroy {
       isLoading: this.idPlan ? true : false,
       initialStateCollapse: !!this.idPlan
     };
-    if (!this.isUserAdmin) {
-      await this.loadPermissions();
-    } else {
-      this.editPermission = true;
-    }
+        
     if (this.idPlan) {
       this.planData = await this.planSrv.getCurrentPlan(this.idPlan);
       if (this.planData) {
         this.officeSrv.nextIDOffice(this.planData.idOffice);
+        this.idOffice = this.planData.idOffice;
         this.idPlanModel = this.planData.planModel.id;
         this.planSrv.nextIDPlan(this.idPlan);
+        this.isUserAdmin = await this.authSrv.isUserAdmin();
+        if (!this.isUserAdmin) {
+          await this.loadPermissions();
+        } else {
+          this.editPermission = true;
+        }
         this.loadWorkPackModels();
         this.formPlan.reset({
           name: this.planData.name,
@@ -244,12 +247,20 @@ export class PlanComponent implements OnInit, OnDestroy {
         });
         return;
       }
+      
     } else {
+      this.isUserAdmin = await this.authSrv.isUserAdmin();
+      if (!this.isUserAdmin) {
+        await this.loadPermissions();
+      } else {
+        this.editPermission = true;
+      }
       if (!this.editPermission) {
         this.router.navigate(['/offices']);
         return;
       }
     }
+    
     this.setWorkPlanUser();
     await this.loadPropertiesOffice();
   }
@@ -260,8 +271,11 @@ export class PlanComponent implements OnInit, OnDestroy {
   }
 
   async loadPermissions() {
+    if ((!this.planData || !this.planData?.idOffice) && !this.idOffice) {
+      return;
+    }
     const officePermission = await this.officePermissionSrv.getPermissions(this.planData?.idOffice || this.idOffice);
-    this.editPermission = officePermission || await this.planPermissionSrv.getPermissions(this.idPlan);
+    this.editPermission = officePermission || (this.idPlan && await this.planPermissionSrv.getPermissions(this.idPlan));
     if (this.editPermission) {
       this.formPlan.enable();
     } else {
@@ -378,37 +392,38 @@ export class PlanComponent implements OnInit, OnDestroy {
           this.cardsPlanWorkPackModels[index].propertiesCard.filters.find(defaultFilter => !!defaultFilter.favorite) ?
           this.cardsPlanWorkPackModels[index].propertiesCard.filters.find(defaultFilter => !!defaultFilter.favorite).id : undefined;
         const cardListResult = await this.loadWorkpacksFromWorkpackModel(this.planData.id, workpackModel.id, index, idFilterSelected);
-        this.cardsPlanWorkPackModels[index].propertiesCard.createNewElementMenuItemsWorkpack = cardListResult && cardListResult.iconMenuItems;
+        this.cardsPlanWorkPackModels[index].propertiesCard.showCreateNemElementButtonWorkpack = this.editPermission;
+
         this.cardsPlanWorkPackModels[index] = {
           ...this.cardsPlanWorkPackModels[index],
           workpackItemCardList: cardListResult && cardListResult.workpackItemCardList,
           propertiesCard: {
             ...this.cardsPlanWorkPackModels[index].propertiesCard,
-            isLoading: false
+            isLoading: false,
+            onNewItem: () => this.loadNewItemMenu(this.planData.id, workpackModel.id, index),
           }
         };
       });
       this.cardsPlanWorkPackModels.forEach((workpackModel, i) => {
         this.totalRecords[i] = workpackModel.workpackItemCardList && workpackModel.workpackItemCardList.length;
-        if (workpackModel.workpackItemCardList && workpackModel.workpackItemCardList.find(card => card.typeCardItem === 'newCardItem')) {
-          workpackModel.propertiesCard.showCreateNemElementButton = true;
-        }
       });
     }
   }
 
   async loadWorkpacksFromWorkpackModel(idPlan: number, workpackModelId: number, index: number, idFilterSelected: number, term?: string) {
-    const result = await this.workpackSrv.GetAll({
+    const result = await this.workpackSrv.GetWorkpackListCards({
       'id-plan': idPlan,
       'id-plan-model': this.idPlanModel,
       'id-workpack-model': workpackModelId,
       idFilter: idFilterSelected,
       term,
-      noLoading: true
     });
     const workpacks = result.success && result.data;
     if (workpacks && workpacks.length > 0) {
       const workpackItemCardList: IWorkpackCardItem[] = workpacks.map(workpack => {
+        workpack.idWorkpackModel = workpackModelId;
+        workpack.idPlan = idPlan;
+        workpack.idOffice = this.idOffice;
         const propertyNameWorkpack = workpack.name;
         const propertyFullnameWorkpack = workpack.fullName;
         const menuItems: MenuItem[] = [];
@@ -491,7 +506,7 @@ export class PlanComponent implements OnInit, OnDestroy {
             menuItems.push({
               label: this.translateSrv.instant('unlink'),
               icon: 'app-icon unlink',
-              command: (event) => this.unlinkedWorkpack(workpack.id, workpack.linkedModel, index),
+              command: (event) => this.unlinkedWorkpack(workpack.id, workpackModelId, index),
             });
           }
         }
@@ -504,7 +519,7 @@ export class PlanComponent implements OnInit, OnDestroy {
           itemId: workpack.id,
           menuItems,
           urlCard: '/workpack',
-          paramsUrlCard: workpack.linked ? [{ name: 'idPlan', value: this.idPlan }, { name: 'idWorkpackModelLinked', value: workpack.linkedModel }] :
+          paramsUrlCard: workpack.linked ? [{ name: 'idPlan', value: this.idPlan }, { name: 'idWorkpackModelLinked', value: workpackModelId }] :
             [{ name: 'idPlan', value: this.idPlan }],
           linked: !!workpack.linked ? true : false,
           shared: workpack.sharedWith,
@@ -514,88 +529,74 @@ export class PlanComponent implements OnInit, OnDestroy {
           dashboardData: this.loadDashboardData(workpack.dashboard, workpack.milestones, workpack.risks),
           hasBaseline: workpack.hasActiveBaseline,
           baselineName: workpack.activeBaselineName,
-          subtitleCardItem: workpack.type === 'Milestone' ? workpack.milestoneDate : '',
+          subtitleCardItem: workpack.type === 'Milestone' ? workpack.date : '',
           statusItem: workpack.type === 'Milestone' ? MilestoneStatusEnum[workpack.milestoneStatus] : ''
         };
       });
-      let iconMenuItems: MenuItem[];
       if (this.editPermission) {
-        const sharedWorkpackList = await this.loadSharedWorkpackList(workpackModelId);
-        iconMenuItems = [
-          { label: this.translateSrv.instant('new'), command: () => this.handleNewWorkpack(idPlan, workpackModelId) }
-        ];
-        if (sharedWorkpackList && sharedWorkpackList.length > 0) {
-          iconMenuItems.push({
-            label: this.translateSrv.instant('linkTo'),
-            items: sharedWorkpackList.map(wp => ({
-              label: wp.name,
-              icon: `app-icon ${wp.icon}`,
-              command: () => this.handleLinkToWorkpack(wp.id, workpackModelId, index)
-            }))
-          });
-        }
-        const workpackCuted = this.workpackSrv.getWorkpackCuted();
-        if (workpackCuted) {
-          const { canPaste, incompatiblesProperties } = await this.checkPasteWorkpack(workpackCuted, workpackModelId);
-          const validPasteOutherOffice = workpackCuted.plan.idOffice === this.idOffice ? true : this.isUserAdmin;
-          if (canPaste && validPasteOutherOffice) {
-            iconMenuItems.push({
-              label: `${this.translateSrv.instant('paste')} ${workpackCuted.name}`,
-              icon: 'fas fa-paste',
-              command: (event) => this.handlePasteWorkpack(idPlan, workpackModelId, incompatiblesProperties)
-            });
-          }
-        }
         workpackItemCardList.push(
           {
             typeCardItem: 'newCardItem',
             icon: IconsEnum.Plus,
             iconSvg: true,
-            iconMenuItems
+            onNewItem: () => this.loadNewItemMenu(idPlan, workpackModelId, index)
           }
         );
       }
-      return { workpackItemCardList, iconMenuItems };
+      return { workpackItemCardList };
     }
     if ((!workpacks || workpacks.length === 0) && this.editPermission) {
-      const iconMenuItems: MenuItem[] = [
-        { label: this.translateSrv.instant('new'), command: () => this.handleNewWorkpack(idPlan, workpackModelId) }
-      ];
-      if (this.editPermission) {
-        const sharedWorkpackList = await this.loadSharedWorkpackList(workpackModelId);
-        if (sharedWorkpackList && sharedWorkpackList.length > 0) {
-          iconMenuItems.push({
-            label: this.translateSrv.instant('linkTo'),
-            items: sharedWorkpackList.map(wp => ({
-              label: wp.name,
-              icon: `app-icon ${wp.icon}`,
-              command: () => this.handleLinkToWorkpack(wp.id, workpackModelId, index)
-            }))
-          });
-        }
-        const workpackCuted = this.workpackSrv.getWorkpackCuted();
-        if (workpackCuted) {
-          const { canPaste, incompatiblesProperties } = await this.checkPasteWorkpack(workpackCuted, workpackModelId);
-          const validPasteOutherOffice = workpackCuted.plan.idOffice === this.idOffice ? true : this.isUserAdmin;
-          if (canPaste && validPasteOutherOffice) {
-            iconMenuItems.push({
-              label: `${this.translateSrv.instant('paste')} ${workpackCuted.name}`,
-              icon: 'fas fa-paste',
-              command: (event) => this.handlePasteWorkpack(idPlan, workpackModelId, incompatiblesProperties)
-            });
-          }
-        }
-      }
       const workpackItemCardList = [
         {
           typeCardItem: 'newCardItem',
           icon: IconsEnum.Plus,
           iconSvg: true,
-          iconMenuItems
+          onNewItem: () => this.loadNewItemMenu(idPlan, workpackModelId, index)
         }
       ];
-      return { workpackItemCardList, iconMenuItems };
+      return { workpackItemCardList };
     }
+  }
+
+  async loadNewItemMenu(idPlan, idWorkpackModel, index) {
+    const sharedWorkpackList = await this.loadSharedWorkpackList(idWorkpackModel);
+    const iconMenuItems: MenuItem[] = [
+      {
+        label: this.translateSrv.instant('new'),
+        command: () => this.handleNewWorkpack(idPlan, idWorkpackModel)
+      }
+    ];
+    if (sharedWorkpackList && sharedWorkpackList.length > 0) {
+      iconMenuItems.push({
+        label: this.translateSrv.instant('linkTo'),
+        items: sharedWorkpackList.map(wp => ({
+          label: wp.name,
+          icon: `app-icon ${wp.icon}`,
+          command: () => this.handleLinkToWorkpack(wp.id, idWorkpackModel, index)
+        }))
+      });
+    }
+    const workpackCuted = this.workpackSrv.getWorkpackCuted();
+    if (workpackCuted) {
+      const { canPaste, incompatiblesProperties } = await this.checkPasteWorkpack(workpackCuted, idWorkpackModel);
+      const validPasteOutherOffice = workpackCuted.idOffice === this.idOffice ? true : this.isUserAdmin;
+      if (canPaste && validPasteOutherOffice) {
+        iconMenuItems.push({
+          label: `${this.translateSrv.instant('paste')} ${workpackCuted.name}`,
+          icon: 'fas fa-paste',
+          command: (event) => this.handlePasteWorkpack(idPlan, idWorkpackModel, incompatiblesProperties)
+        });
+      }
+    }
+    const workpackModelCardIndex = this.cardsPlanWorkPackModels.findIndex(card => card.idWorkpackModel === idWorkpackModel);
+    if (workpackModelCardIndex > -1) {
+      this.cardsPlanWorkPackModels[workpackModelCardIndex].propertiesCard.createNewElementMenuItemsWorkpack = iconMenuItems;
+      const newWorkpackCardIndex = this.cardsPlanWorkPackModels[workpackModelCardIndex].workpackItemCardList.findIndex( card => card.typeCardItem === 'newCardItem' );
+      if (newWorkpackCardIndex > -1) {
+        this.cardsPlanWorkPackModels[workpackModelCardIndex].workpackItemCardList[newWorkpackCardIndex].iconMenuItems = iconMenuItems;
+      }
+    }
+
   }
 
   loadDashboardData(dashboard?, milestones?, risks?) {
@@ -789,7 +790,7 @@ export class PlanComponent implements OnInit, OnDestroy {
     });
   }
 
-  async handleCutWorkpack(workpack: IWorkpack) {
+  async handleCutWorkpack(workpack: IWorkpackListCard) {
     this.workpackSrv.setWorkpackCuted({ ...workpack });
     const workpackModelIndex = this.cardsPlanWorkPackModels
       .findIndex(workpackModel => workpackModel.idWorkpackModel === workpack.idWorkpackModel);
@@ -827,11 +828,11 @@ export class PlanComponent implements OnInit, OnDestroy {
     }
   }
 
-  async pasteWorkpack(workpackCuted: IWorkpack, idWorkpackModelTo: number, idPlanTo: number, idParentTo?: number) {
+  async pasteWorkpack(workpackCuted: IWorkpackListCard, idWorkpackModelTo: number, idPlanTo: number, idParentTo?: number) {
     this.formIsSaving = true;
     const result = await this.workpackSrv.pasteWorkpack(workpackCuted.id, idWorkpackModelTo, {
-      idPlanFrom: workpackCuted.plan.id,
-      idParentFrom: workpackCuted.idParent,
+      idPlanFrom: workpackCuted.idPlan,
+      idParentFrom: undefined,
       idPlanTo,
       idParentTo,
       idWorkpackModelFrom: workpackCuted.idWorkpackModel
@@ -844,7 +845,7 @@ export class PlanComponent implements OnInit, OnDestroy {
     }
   }
 
-  async checkPasteWorkpack(workpackCuted: IWorkpack, idWorkpackModelTo: number) {
+  async checkPasteWorkpack(workpackCuted: IWorkpackListCard, idWorkpackModelTo: number) {
     const result = await this.workpackSrv.checkPasteWorkpack(workpackCuted.id, idWorkpackModelTo, {
       idWorkpackModelFrom: workpackCuted.idWorkpackModel,
     });
@@ -879,8 +880,8 @@ export class PlanComponent implements OnInit, OnDestroy {
     }
   }
 
-  async deleteWorkpack(workpack: IWorkpack, modelCardIndex: number) {
-    const result = await this.workpackSrv.delete(workpack, { useConfirm: true });
+  async deleteWorkpack(workpack: IWorkpackListCard, modelCardIndex: number) {
+    const result = await this.workpackSrv.deleteWorkpackCard(workpack, { useConfirm: true });
     if (result.success) {
       const workpackModelIndex = this.cardsPlanWorkPackModels
         .findIndex(workpackModel => workpackModel.idWorkpackModel === workpack.idWorkpackModel);
@@ -898,7 +899,7 @@ export class PlanComponent implements OnInit, OnDestroy {
     }
   }
 
-  endManagementOfDeliverable(workpack: IWorkpack, idWorkpackModel) {
+  endManagementOfDeliverable(workpack: IWorkpackListCard, idWorkpackModel) {
     this.showDialogEndManagement = true;
     this.endManagementWorkpack = {
       idWorkpackModel,
@@ -913,7 +914,7 @@ export class PlanComponent implements OnInit, OnDestroy {
     this.endManagementWorkpack = undefined;
   }
 
-  resumeManagementOfDeliverable(workpack: IWorkpack, idWorkpackModel) {
+  resumeManagementOfDeliverable(workpack: IWorkpackListCard, idWorkpackModel) {
     this.showDialogResumeManagement = true;
     this.endManagementWorkpack = {
       idWorkpackModel,
@@ -997,9 +998,8 @@ export class PlanComponent implements OnInit, OnDestroy {
       const result = await this.loadWorkpacksFromWorkpackModel(this.planData.id, idWorkpackModel, workpackModelCardIndex, idFilter, term);
       const workpacksByFilter = result ? result.workpackItemCardList : [];
       this.cardsPlanWorkPackModels[workpackModelCardIndex].workpackItemCardList = Array.from(workpacksByFilter);
-      this.cardsPlanWorkPackModels[workpackModelCardIndex].propertiesCard.createNewElementMenuItemsWorkpack = result ? result.iconMenuItems : [];
       if (this.cardsPlanWorkPackModels[workpackModelCardIndex].workpackItemCardList.find(card => card.typeCardItem === 'newCardItem')) {
-        this.cardsPlanWorkPackModels[workpackModelCardIndex].propertiesCard.showCreateNemElementButton = true;
+        this.cardsPlanWorkPackModels[workpackModelCardIndex].propertiesCard.showCreateNemElementButtonWorkpack = true;
       }
       this.totalRecords[workpackModelCardIndex] = workpacksByFilter && workpacksByFilter.length;
       this.cardsPlanWorkPackModels[workpackModelCardIndex].propertiesCard.isLoading = false;

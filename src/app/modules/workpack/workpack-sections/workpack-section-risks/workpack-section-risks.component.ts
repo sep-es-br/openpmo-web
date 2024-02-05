@@ -262,7 +262,7 @@ export class WorkpackSectionRisksComponent implements OnInit, OnDestroy {
         queryParams: {
           id: idFilter,
           entityName,
-          idWorkpackModel: this.workpackData.workpack.model.id,
+          idWorkpackModel: this.workpackData.workpackModel.id,
           idOffice: this.workpackParams.idOffice
         }
       });
@@ -276,7 +276,7 @@ export class WorkpackSectionRisksComponent implements OnInit, OnDestroy {
     this.router.navigate(['/filter-dataview'], {
       queryParams: {
         entityName,
-        idWorkpackModel: this.workpackData.workpack.model.id,
+        idWorkpackModel: this.workpackData.workpackModel.id,
         idOffice: this.workpackParams.idOffice
       }
     });

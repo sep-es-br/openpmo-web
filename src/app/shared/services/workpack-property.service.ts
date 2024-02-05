@@ -15,6 +15,7 @@ import { TreeNode } from 'primeng/api';
 import { IDomain } from '../interfaces/IDomain';
 import { ILocalityList } from '../interfaces/ILocality';
 import { TranslateService } from '@ngx-translate/core';
+import { TypeWorkpackModelEnum } from '../enums/TypeWorkpackModelEnum';
 
 @Injectable({
   providedIn: 'root'
@@ -50,14 +51,22 @@ export class WorkpackPropertyService {
   async loadProperties() {
     this.workpackData = this.workpackSrv.getWorkpackData();
     this.workpackParams = this.workpackSrv.getWorkpackParams();
-    const workpackModelActivesProperties = (!!this.workpackParams.idWorkpackModelLinked && !!this.workpackParams.idWorkpack) ?
+    const workpackModelActivesProperties = (!!this.workpackParams.idWorkpackModelLinked) ?
       this.workpackData.workpack.model?.properties?.filter(w => w.active) :
       this.workpackData.workpackModel?.properties?.filter(w => w.active);
     if (workpackModelActivesProperties && workpackModelActivesProperties
       .filter(prop => this.typePropertyModel[prop.type] === TypePropertyModelEnum.OrganizationSelectionModel).length > 0) {
       await this.loadOrganizationsOffice(this.workpackParams.idOfficeOwnerWorkpackLinked ? this.workpackParams.idOfficeOwnerWorkpackLinked : this.workpackParams.idOffice);
     }
-    this.properties = workpackModelActivesProperties ? await Promise.all(workpackModelActivesProperties.filter(prop => prop.session !== 'COST').map(p => this.instanceProperty(p))) : undefined;
+    this.properties = [this.loadProperty('name', TypePropertyModelEnum.TextModel), this.loadProperty('fullName', TypePropertyModelEnum.TextAreaModel)];
+    if (this.workpackData.workpackModel.type === TypeWorkpackModelEnum.MilestoneModel) {
+      this.properties.push(this.loadProperty('date', TypePropertyModelEnum.DateModel));
+    }
+    if (workpackModelActivesProperties && workpackModelActivesProperties.length > 0) {
+      const propertiesByModel = await Promise.all(workpackModelActivesProperties.filter(prop => prop.session !== 'COST').map(p => this.instanceProperty(p)));
+      propertiesByModel.sort((a, b) => a.sortIndex < b.sortIndex ? -1 : 0);
+      this.properties = [...this.properties, ...propertiesByModel];
+    }
     this.loading = false;
     this.nextResetWorkpackProperties(true);
   }
@@ -79,9 +88,40 @@ export class WorkpackPropertyService {
     return this.resetWorkpackProperties.asObservable();
   }
 
+  loadProperty(name: string, type: string) {
+    const property = new PropertyTemplateModel();
+    property.type = type;
+    property.active = true;
+    property.fullLine = true;
+    property.label = this.translateSrv.instant(name);
+    property.name = name;
+    property.required = true;
+    property.disabled = !this.workpackSrv.getEditPermission();
+    property.sortIndex = 0;
+    property.rows = name === 'fullName' ? 3 : 1;
+    if (name === 'date') {
+      const dateValue = this.workpackData?.workpack?.date ? this.workpackData?.workpack?.date.toLocaleString()
+        : undefined;
+      property.value = dateValue ? new Date(dateValue) : null;
+    } else {
+      property.value = this.workpackData.workpack && this.workpackData.workpack[name];
+    }
+    // load properties milestone reference baseline
+    if ((name === 'date' || name === 'name') && this.workpackData.workpack && this.workpackData.workpack.type === TypeWorkpackEnum.MilestoneModel) {
+      const milestoneData = {
+        baselineDate: this.workpackData?.workpack.baselineDate,
+        milestoneStatus: this.workpackData?.workpack.milestoneStatus,
+        delayInDays: this.workpackData?.workpack.delayInDays,
+        completed: this.workpackData.workpack.completed
+      };
+      property.milestoneData = milestoneData;
+    }
+    return property;
+  }
+
   async instanceProperty(propertyModel: IWorkpackModelProperty, group?: IWorkpackProperty): Promise<PropertyTemplateModel> {
     const property = new PropertyTemplateModel();
-    const propertyWorkpack = !group ? this.workpackData.workpack && this.workpackData.workpack.properties.find(wp => wp.idPropertyModel === propertyModel.id) :
+    const propertyWorkpack = !group ? this.workpackData.workpack && this.workpackData.workpack?.properties && this.workpackData.workpack.properties.find(wp => wp.idPropertyModel === propertyModel.id) :
       group.groupedProperties.find(gp => gp.idPropertyModel === propertyModel.id);
 
     property.id = propertyWorkpack && propertyWorkpack.id;
@@ -123,17 +163,6 @@ export class WorkpackPropertyService {
       property.possibleValues = listOptions.map(op => ({ label: op, value: op }));
     }
 
-    if ((this.typePropertyModel[propertyModel.type] === TypePropertyModelEnum.DateModel ||
-      propertyModel.name === 'name') && this.workpackData.workpack && this.workpackData.workpack.type === TypeWorkpackEnum.MilestoneModel) {
-      const milestoneData = {
-        baselineDate: this.workpackData.workpack.baselineDate,
-        milestoneStatus: this.workpackData.workpack.milestoneStatus,
-        delayInDays: this.workpackData.workpack.delayInDays,
-        completed: this.workpackData.workpack.completed
-      };
-      property.milestoneData = milestoneData;
-    }
-
     if (this.typePropertyModel[propertyModel.type] === TypePropertyModelEnum.LocalitySelectionModel) {
       const domain = await this.loadDomain(propertyModel.idDomain);
       const localityList = await this.loadDomainLocalities(domain.id);
@@ -159,10 +188,10 @@ export class WorkpackPropertyService {
       if (defaultSelectedLocalities && defaultSelectedLocalities.length === 1) {
         const resultLocality = defaultDetailSelectedLocalities && defaultDetailSelectedLocalities[0];
         property.labelButtonLocalitySelected = [resultLocality.name];
-          property.showIconButton = false;
+        property.showIconButton = false;
       }
       if (defaultSelectedLocalities && defaultSelectedLocalities.length > 1) {
-        property.labelButtonLocalitySelected = defaultDetailSelectedLocalities && defaultDetailSelectedLocalities.map( det => det.name);
+        property.labelButtonLocalitySelected = defaultDetailSelectedLocalities && defaultDetailSelectedLocalities.map(det => det.name);
         property.showIconButton = false;
       }
       if (!defaultSelectedLocalities || (defaultSelectedLocalities && defaultSelectedLocalities.length === 0)) {

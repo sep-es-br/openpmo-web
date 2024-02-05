@@ -9,7 +9,8 @@
       <p-calendar [id]="property.name" [(ngModel)]="property.value" class="app-select-date" [showIcon]="true"
         icon="fas fa-calendar-alt" [dateFormat]="calendarFormat" [defaultDate]="defaultValue" [monthNavigator]="true"
         [yearNavigator]="true" [yearRange]="yearRange" [required]="property.required" [minDate]="dateMin" [maxDate]="dateMax"
-        [disabled]="property.disabled || (property.milestoneData && property.milestoneData.completed)" [class.ng-invalid]="property.invalid" (ngModelChange)="changeDateValue($event)"     
+        [disabled]="property.disabled || (property.milestoneData && property.milestoneData.completed)" [class.ng-invalid]="property.invalid" 
+        (ngModelChange)="changeDateValue($event)"     
         >
       </p-calendar>
       <label class="app-input-label" [for]="property.name">{{ property.label}} {{ property.required ? '*' : ''}}</label>

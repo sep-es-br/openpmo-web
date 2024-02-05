@@ -10,7 +10,7 @@ import { Subject, Subscription } from 'rxjs';
 import { ConfirmationService, MenuItem, MessageService, SelectItem, TreeNode } from 'primeng/api';
 
 import { IconPropertyWorkpackModelEnum as IconPropertyEnum } from 'src/app/shared/enums/IconPropertyWorkpackModelEnum';
-import { TypePropertyModelEnum as TypePropertyEnum } from 'src/app/shared/enums/TypePropertModelEnum';
+import { TypePropertModelEnum as TypePropertyEnum } from 'src/app/shared/enums/TypePropertModelEnum';
 import { TypeWorkpackModelEnum } from 'src/app/shared/enums/TypeWorkpackModelEnum';
 import {
   IconsRegularEng,
@@ -245,8 +245,14 @@ export class WorkpackModelComponent implements OnInit {
     this.getSortedByList();
     if (this.sortedByList.length === 0) {
       this.sortedByList = [
-        { label: this.translateSrv.instant('name'), value: 'name' }
+        { label: this.translateSrv.instant('name'), value: 'name' },
+        { label: this.translateSrv.instant('fullName'), value: "fullName" }
       ];
+    if (this.workpackModelType === TypeWorkpackModelEnum.MilestoneModel) {
+        this.sortedByList.push({
+          label: this.translateSrv.instant('date'), value: 'date'
+        });
+      }
     }
     this.formProperties.statusChanges
       .pipe(takeUntil(this.$destroy), filter(status => status === 'INVALID'))
@@ -262,6 +268,30 @@ export class WorkpackModelComponent implements OnInit {
       .filter(p => p.label !== undefined && p.label.length > 0)
       .filter(p => p.name !== undefined && p.name.length > 0)
       .map(p => ({ label: p.label, value: p.name }));
+    if (this.sortedByList.length > 0) {
+      this.sortedByList.unshift(
+        ...[
+          { label: this.translateSrv.instant('name'), value: 'name' },
+          { label: this.translateSrv.instant('fullName'), value: "fullName" }
+        ]
+      );
+      if (this.workpackModelType === TypeWorkpackModelEnum.MilestoneModel) {
+        this.sortedByList.push({
+          label: this.translateSrv.instant('date'), value: 'date'
+        });
+      }
+    } else {
+      this.sortedByList =[
+          { label: this.translateSrv.instant('name'), value: 'name' },
+          { label: this.translateSrv.instant('fullName'), value: "fullName" }
+      ];
+      if (this.workpackModelType === TypeWorkpackModelEnum.MilestoneModel) {
+        this.sortedByList.push({
+          label: this.translateSrv.instant('date'), value: 'date'
+        });
+      }
+    }
+    
   }
 
   resetValues() {
@@ -412,30 +442,7 @@ export class WorkpackModelComponent implements OnInit {
   }
 
   loadDefaultProperties() {
-    const defaultProperties: IWorkpackModelProperty[] = [
-      {
-        active: true,
-        label: this.translateSrv.instant('name'),
-        name: 'name',
-        type: TypePropertyEnum.TextModel,
-        obligatory: true,
-        max: 25,
-        sortIndex: 0,
-        fullLine: true,
-        required: true
-      },
-      {
-        active: true,
-        label: this.translateSrv.instant('fullName'),
-        name: 'fullName',
-        type: TypePropertyEnum.TextAreaModel,
-        sortIndex: 1,
-        obligatory: true,
-        fullLine: true,
-        required: true,
-        rows: 3
-      }
-    ];
+    const defaultProperties: IWorkpackModelProperty[] = [];
     switch (this.workpackModelType) {
       case TypeWorkpackModelEnum.ProgramModel:
         defaultProperties.push(
@@ -510,7 +517,7 @@ export class WorkpackModelComponent implements OnInit {
             multipleSelection: false,
             obligatory: true,
             required: true,
-            sortIndex: 6,
+            sortIndex: 5,
             fullLine: false,
           }
         );
@@ -585,10 +592,6 @@ export class WorkpackModelComponent implements OnInit {
       case TypeWorkpackModelEnum.MilestoneModel:
         defaultProperties.push(
           {
-            active: true, label: this.translateSrv.instant('date'), name: this.translateSrv.instant('date'),
-            type: TypePropertyEnum.DateModel, sortIndex: 2, fullLine: true, required: true
-          },
-          {
             active: true,
             label: this.translateSrv.instant('type'),
             name: this.translateSrv.instant('type'),
@@ -619,7 +622,7 @@ export class WorkpackModelComponent implements OnInit {
         nameInPlural: data.modelNameInPlural || '',
         icon: data.fontIcon || '',
         position: data.position || 1,
-        sortedBy: data.sortBy?.name || 'name'
+        sortedBy: data.sortBy ? data.sortBy.name : (data.sortByField || 'name' ) 
       });
       this.posibleRolesOrg = data.organizationRoles || [];
       this.posibleRolesPerson = data.personRoles || [];
@@ -653,7 +656,7 @@ export class WorkpackModelComponent implements OnInit {
               }
             }
             if (p.sectors) {
-              p.sectorsList = p.sectors.split(',').map( sector => sector.toUpperCase());
+              p.sectorsList = p.sectors.split(',').map(sector => sector.toUpperCase());
             }
             if (p.defaults) {
               const isArray = p.defaults instanceof Array;
@@ -675,7 +678,7 @@ export class WorkpackModelComponent implements OnInit {
                   gp.defaultValue = (gp.defaultValue as string).split(',');
                 }
                 if (gp.sectors) {
-                  gp.sectorsList = gp.sectors.split(',').map( sector => sector.toUpperCase());
+                  gp.sectorsList = gp.sectors.split(',').map(sector => sector.toUpperCase());
                 }
                 if (gp.idDomain) {
                   gp.extraList = await this.getListLocalities(gp.idDomain, gp.multipleSelection);
@@ -707,9 +710,11 @@ export class WorkpackModelComponent implements OnInit {
                   const value = gp.defaultValue && gp.defaultValue.toLocaleString();
                   gp.defaultValue = value && new Date(value);
                 }
+                delete gp.defaultsDetails;
                 await this.checkProperty(gp);
               });
             }
+            delete p.defaultsDetails;
             await this.checkProperty(p);
             return [p, i];
           }))
@@ -758,7 +763,7 @@ export class WorkpackModelComponent implements OnInit {
       required: false,
       multipleSelection: false,
       sectorsList: type === TypePropertyEnum.OrganizationSelectionModel ?
-      [TypeOrganization.Private.toUpperCase(), TypeOrganization.Public.toUpperCase(), TypeOrganization.Third.toUpperCase()] : [],
+        [TypeOrganization.Private.toUpperCase(), TypeOrganization.Public.toUpperCase(), TypeOrganization.Third.toUpperCase()] : [],
       selectedLocalities: type === TypePropertyEnum.LocalitySelectionModel && this.translateSrv.instant('selectDefaultValue'),
       showIconButtonSelectLocality: type === TypePropertyEnum.LocalitySelectionModel
     };
@@ -794,7 +799,7 @@ export class WorkpackModelComponent implements OnInit {
         requiredFields = requiredFields.concat(['possibleValuesOptions', 'multipleSelection']);
         break;
       case TypePropertyEnum.GroupModel:
-        requiredFields = ['name', 'sortIndex','groupedProperties'];
+        requiredFields = ['name', 'sortIndex', 'groupedProperties'];
         break;
       case TypePropertyEnum.NumberModel:
         requiredFields = requiredFields.concat(['precision']);
@@ -808,8 +813,7 @@ export class WorkpackModelComponent implements OnInit {
     property.requiredFields = requiredFields;
     property.viewOnly = !this.editPermission;
     property.obligatory = !!property.obligatory
-      || ['name', 'fullName',
-        ...this.workpackModelType === TypeWorkpackModelEnum.DeliverableModel
+      || [...this.workpackModelType === TypeWorkpackModelEnum.DeliverableModel
           ? ['Measure Unit', 'Unidade de Medida']
           : []
       ].includes(property.name);
@@ -878,8 +882,8 @@ export class WorkpackModelComponent implements OnInit {
       }
     }
     if (event?.property && event.property?.sectorsList && this.editPermission) {
-      if(!!event.sectorChanged) {
-        event.property.sectors = event.property?.sectorsList.map( sec => sec.toLowerCase()).join(',');
+      if (!!event.sectorChanged) {
+        event.property.sectors = event.property?.sectorsList.map(sec => sec.toLowerCase()).join(',');
         event.property.list = await this.getListOrganizations(event.property.sectorsList);
         event.property.defaults = [];
       }
@@ -1008,7 +1012,7 @@ export class WorkpackModelComponent implements OnInit {
         this.listOrganizations = result.data;
       }
     }
-    return this.listOrganizations.filter( org => sectors && sectors.includes(org.sector)).map(d => ({ label: d.name, value: d.id }));
+    return this.listOrganizations.filter(org => sectors && sectors.includes(org.sector)).map(d => ({ label: d.name, value: d.id }));
   }
 
   async getListMeasureUnits() {
@@ -1106,7 +1110,7 @@ export class WorkpackModelComponent implements OnInit {
         icon: IconPropertyEnum[TypePropertyEnum[type]],
         command: () => this.addProperty(TypePropertyEnum[type])
       }));
-      this.menuModelProperties = menu;
+    this.menuModelProperties = menu;
   }
 
   loadMenuPropertyGroup(groupProperty?: IWorkpackModelProperty) {
@@ -1328,6 +1332,7 @@ export class WorkpackModelComponent implements OnInit {
       delete prop.isCollapsed;
       delete prop.viewOnly;
       delete prop.obligatory;
+      delete prop.defaultsDetails;
     });
     const propertiesGroupClone = [...this.modelProperties.filter(prop => prop.type === TypePropertyEnum.GroupModel)];
     propertiesGroupClone.forEach(propGroup => {
@@ -1604,7 +1609,7 @@ export class WorkpackModelComponent implements OnInit {
           }
         }
         if (p.sectors) {
-          p.sectorsList = p.sectors.split(',').map( sector => sector.toUpperCase());
+          p.sectorsList = p.sectors.split(',').map(sector => sector.toUpperCase());
         }
         if (p.defaults) {
           const isArray = p.defaults instanceof Array;

@@ -5,11 +5,9 @@ import { TreeNode } from 'primeng/api';
 
 import { ICard } from 'src/app/shared/interfaces/ICard';
 import { ResponsiveService } from 'src/app/shared/services/responsive.service';
-import { WorkpackModelService } from 'src/app/shared/services/workpack-model.service';
 import { WorkpackService } from 'src/app/shared/services/workpack.service';
 import { IWorkpack } from 'src/app/shared/interfaces/IWorkpack';
 import { IWorkpackModelProperty } from 'src/app/shared/interfaces/IWorkpackModelProperty';
-import { IWorkpackModel } from 'src/app/shared/interfaces/IWorkpackModel';
 import { PropertyTemplateModel } from 'src/app/shared/models/PropertyTemplateModel';
 import { IWorkpackProperty } from 'src/app/shared/interfaces/IWorkpackProperty';
 import { TypePropertyModelEnum } from 'src/app/shared/enums/TypePropertyModelEnum';
@@ -145,18 +143,24 @@ export class CostAccountComponent implements OnInit {
   }
 
   async loadWorkpack(onlyBreadcrumb: boolean = false) {
-    const result = await this.workpackSrv.GetWorkpackById(this.idWorkpack, { 'id-plan': this.idPlan });
-    if (result.success) {
-      this.workpack = result.data;
-      this.setBreadcrumb();
-      this.editPermission = (!!this.workpack.permissions?.find(p => p.level === 'EDIT')
-        || await this.authSrv.isUserAdmin()) && !this.workpack.canceled && !this.workpack.endManagementDate;
-      const plan = await this.planSrv.getCurrentPlan(this.workpack.plan.id);
-      if (plan) {
-        this.idOffice = plan.idOffice;
-        this.idPlanModel = plan.planModel.id;
+    const workpackData = this.workpackSrv.getWorkpackData();
+    if (workpackData && workpackData.workpack) {
+      this.workpack = workpackData.workpack;
+    } else {
+      const result = await this.workpackSrv.GetWorkpackById(this.idWorkpack, { 'id-plan': this.idPlan });
+      if (result.success) {
+        this.workpack = result.data;
       }
     }
+    this.setBreadcrumb();
+    this.editPermission = (!!this.workpack.permissions?.find(p => p.level === 'EDIT')
+      || await this.authSrv.isUserAdmin()) && !this.workpack.canceled && !this.workpack.endManagementDate;
+    const plan = await this.planSrv.getCurrentPlan(this.workpack.plan.id);
+    if (plan) {
+      this.idOffice = plan.idOffice;
+      this.idPlanModel = plan.planModel.id;
+    }
+
     await this.loadCostAccountModel();
   }
 
@@ -180,16 +184,12 @@ export class CostAccountComponent implements OnInit {
   }
 
   async setBreadcrumb() {
-    const breadcrumbItems =  await this.getBreadcrumbs();
+    const breadcrumbItems = await this.getBreadcrumbs();
     this.breadcrumbSrv.setMenu([
       ...breadcrumbItems,
       {
         key: 'account',
         info: this.costAccountName,
-        routerLink: ['/cost-account'],
-        queryParams: {
-          id: this.idCostAccount
-        }
       }
     ]);
     this.breadcrumbSrv.setBreadcrumbStorage(breadcrumbItems);
@@ -261,7 +261,7 @@ export class CostAccountComponent implements OnInit {
     }
 
     if (this.typePropertyModel[propertyModel.type] === TypePropertyModelEnum.SelectionModel) {
-      const listOptions = propertyModel.possibleValues ? (propertyModel.possibleValues as string).split(',').sort( (a, b) => a.localeCompare(b)) : [];
+      const listOptions = propertyModel.possibleValues ? (propertyModel.possibleValues as string).split(',').sort((a, b) => a.localeCompare(b)) : [];
       property.possibleValues = listOptions.map(op => ({ label: op, value: op }));
     }
 
@@ -308,8 +308,8 @@ export class CostAccountComponent implements OnInit {
     }
 
     if (this.typePropertyModel[propertyModel.type] === TypePropertyModelEnum.OrganizationSelectionModel) {
-      property.possibleValuesIds = this.organizations.filter( org => propertyModel.sectors && propertyModel.sectors.includes(org.sector.toLowerCase()))
-      .map(d => ({ label: d.name, value: d.id }));
+      property.possibleValuesIds = this.organizations.filter(org => propertyModel.sectors && propertyModel.sectors.includes(org.sector.toLowerCase()))
+        .map(d => ({ label: d.name, value: d.id }));
       if (propertyModel.multipleSelection) {
         property.selectedValues = propertyCostAccount?.selectedValues ?
           propertyCostAccount?.selectedValues : propertyModel.defaults as number[];
@@ -420,7 +420,7 @@ export class CostAccountComponent implements OnInit {
       const result = await this.organizationSrv.GetAll({ 'id-office': this.idOffice });
       if (result.success) {
         this.organizations = result.data;
-        this.organizations = this.organizations.sort( (a, b) => a.name.localeCompare(b.name))
+        this.organizations = this.organizations.sort((a, b) => a.name.localeCompare(b.name))
       }
     }
   }
@@ -432,7 +432,7 @@ export class CostAccountComponent implements OnInit {
       return units.map(org => ({
         label: org.name,
         value: org.id
-      })).sort( (a, b) => a.label.localeCompare(b.label));
+      })).sort((a, b) => a.label.localeCompare(b.label));
     }
   }
 

@@ -151,7 +151,10 @@ export class JournalService extends BaseService<IJournal> {
 
 
   async loadTreeViewScope() {
-    const { data, success } = await this.officeSrv.GetTreeScopePersons(this.workpackParams.idOffice);
+    const { data, success } = await this.officeSrv.GetTreeScopePersons(this.workpackParams.idOffice, {
+      'id-plan': this.workpackParams.idPlan,
+      'id-workpack': this.workpackParams.idWorkpack
+    });
     if (success) {
       const treePlan = data.plans.find(plan => plan.id === this.workpackParams.idPlan);
       const treeWorkpackCurrent = this.findTreeWorkpack(this.workpackData.workpack.id, treePlan) as any;

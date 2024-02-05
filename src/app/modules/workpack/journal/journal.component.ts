@@ -93,10 +93,6 @@ export class JournalComponent implements OnInit {
       ...[{
         key: this.translateSvr.instant('information'),
         info: this.translateSvr.instant('information'),
-        routerLink: ['/workpack/journal'],
-        queryParams: {
-          idWorkpack: this.idWorkpack,
-        },
       }]
     ]);
   }

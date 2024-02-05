@@ -15,7 +15,7 @@ import { OfficeService } from 'src/app/shared/services/office.service';
 import { PlanModelService } from 'src/app/shared/services/plan-model.service';
 import { IPlanModel } from 'src/app/shared/interfaces/IPlanModel';
 import { LocalityService } from 'src/app/shared/services/locality.service';
-import { TypePropertyModelEnum as TypePropertyEnum } from 'src/app/shared/enums/TypePropertModelEnum';
+import { TypePropertModelEnum as TypePropertyEnum } from 'src/app/shared/enums/TypePropertModelEnum';
 import { IWorkpackModelProperty } from 'src/app/shared/interfaces/IWorkpackModelProperty';
 import { ILocalityList } from 'src/app/shared/interfaces/ILocality';
 import { IconPropertyWorkpackModelEnum } from 'src/app/shared/enums/IconPropertyWorkpackModelEnum';

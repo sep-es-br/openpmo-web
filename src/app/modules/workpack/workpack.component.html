@@ -7,10 +7,12 @@
   <div class="header-container" [class.mobile]="responsive" *ngIf="workpackModel && idWorkpack && !workpackLoading">
     <div class="app-content-header" [class.mobile]="responsive">
       <span class="label">{{workpackModel?.modelName}}:</span>
-      <span class="text">{{workpackFullName}}</span>
+      <span class="text">{{workpack?.fullName}}</span>
     </div>
     <div class="container-actions">
-      <i [pTooltip]="(workpack?.favoritedBy ? 'removeFavorite' : 'addFavorite') | translate" (click)="!favoriteProcessing && handleFavorite()" [class.responsive]="responsive"
+      <i 
+        *ngIf="checkHasPermission"
+        [pTooltip]="(workpack?.favoritedBy ? 'removeFavorite' : 'addFavorite') | translate" (click)="!favoriteProcessing && handleFavorite()" [class.responsive]="responsive"
         [class]="(workpack?.favoritedBy ? 'fas icon-favorite-checked ' : 'far ') + 'fa-star icon-favorite'">
       </i>
       <app-config-data-view-panel  [notShowCollapseOptions]="showTabview"></app-config-data-view-panel>
@@ -30,7 +32,7 @@
       </div>
       <div tabviewBody *ngIf="selectedTab?.key === 'dashboard'">
         <div class="card-dashboard">
-          <app-workpack-section-dashboard [idWorkpack]="idWorkpack" [workpackFullName]="workpackFullName"
+          <app-workpack-section-dashboard [idWorkpack]="idWorkpack" [workpackFullName]="workpack?.fullName"
             [dashboardShowStakeholders]="workpackModel?.dashboardShowStakeholders"
             [dashboardShowRisks]="workpackModel?.dashboardShowRisks"
             [dashboardShowEva]="workpackModel?.dashboardShowEva" [workpackType]="workpack?.type"
@@ -145,7 +147,7 @@
   <div class="panels-container" *ngIf="!showTabview  && !workpackLoading">
     <div class="card-dashboard"
       *ngIf="!!idWorkpack && !!workpack && !workpack.canceled && !!workpackModel && !!workpackModel.dashboardSessionActive">
-      <app-workpack-section-dashboard [idWorkpack]="idWorkpack" [workpackFullName]="workpackFullName"
+      <app-workpack-section-dashboard [idWorkpack]="idWorkpack" [workpackFullName]="workpack?.fullName"
         [dashboardShowStakeholders]="workpackModel?.dashboardShowStakeholders"
         [dashboardShowRisks]="workpackModel?.dashboardShowRisks" [dashboardShowEva]="workpackModel?.dashboardShowEva"
         [workpackType]="workpack?.type" [collapsePanelsStatus]="collapsePanelsStatus"

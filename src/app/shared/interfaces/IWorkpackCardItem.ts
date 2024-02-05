@@ -21,6 +21,7 @@ export interface IWorkpackCardItem {
   canceled?: boolean;
   endManagementDate?: string;
   completed?: boolean;
+  onNewItem?;
   dashboardData?: {
     risk?: {
       high: number,

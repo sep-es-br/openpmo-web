@@ -6,6 +6,10 @@
   }
 }
 
+.text-w30 {
+  width: 30%;
+}
+
 ::ng-deep .workpack-input-text-not-fullLine {
   .p-inputtext {
     width: 100%;
@@ -19,10 +23,14 @@
 }
 
 ::ng-deep .milestone-text-container {
+  width: 100%;
   display: flex;
   justify-content: space-between;
   .p-float-label .p-inputtext  {
     width: 100%;
+  }
+  .workpack-input-text {
+    width: 30%;
   }
   .milestone-status {
     display: flex;
