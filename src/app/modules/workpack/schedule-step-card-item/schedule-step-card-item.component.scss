@@ -4,6 +4,9 @@
   background: #ffffff7f;
   border: 1px solid #d4d4d4;
   box-shadow: none;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 
   .p-card-header {
     width: 100%;
