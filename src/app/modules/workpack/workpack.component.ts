@@ -788,6 +788,12 @@ export class WorkpackComponent implements OnDestroy {
   }
 
   loadDashboardData(dashboard?, milestone?, risk?) {
+    if (!dashboard) {
+      return {
+        risk: risk,
+        milestone: milestone
+      };
+    }
     const dashboardData = {
       tripleConstraint: dashboard && dashboard.tripleConstraint && {
         idBaseline: dashboard.tripleConstraint.idBaseline,

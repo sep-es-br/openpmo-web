@@ -127,7 +127,7 @@ export class DashboardService extends BaseService<IDashboard> {
           'linked': this.linked });
       if (success) {
         this.dashboard = this.setDashboardData(data);
-        this.scheduleInterval = data.scheduleInterval;
+        this.scheduleInterval = data?.scheduleInterval;
         this.calculateReferenceMonth();
         this.validateDashboard();
       }
@@ -135,6 +135,9 @@ export class DashboardService extends BaseService<IDashboard> {
   }
 
   setDashboardData(data: IDashboard) {
+    if (!data) {
+      return undefined;
+    }
     const dashboard = {
       ...data,
       tripleConstraint: {
@@ -182,7 +185,7 @@ export class DashboardService extends BaseService<IDashboard> {
             scheduleVariation: data?.performanceIndex?.schedulePerformanceIndexVariation
           },
         },
-        earnedValueByStep: data.earnedValueByStep
+        earnedValueByStep: data?.earnedValueByStep
       }
     }
     
@@ -204,8 +207,8 @@ export class DashboardService extends BaseService<IDashboard> {
 
 
   calculateReferenceMonth() {
-    const startDate = moment(this.scheduleInterval.initialDate).toDate();
-    const endDate = moment(this.scheduleInterval.endDate).toDate();
+    const startDate = this.scheduleInterval && moment(this.scheduleInterval?.initialDate).toDate();
+    const endDate = this.scheduleInterval && moment(this.scheduleInterval?.endDate).toDate();
     const todayMonthFormat = moment().format('MM-yyyy');
     const today = moment(todayMonthFormat, 'MM-yyyy').toDate();
 

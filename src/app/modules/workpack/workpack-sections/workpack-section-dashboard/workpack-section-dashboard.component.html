@@ -78,9 +78,9 @@
       </div>
     </div>
     <div class="charts-container" *ngIf="!isLoading">
-      <div class="triple-constraint-container">
+      <div class="triple-constraint-container" *ngIf="dashboard && dashboard?.tripleConstraint">
         <app-triple-constraint-dashboard
-          [tripleConstraint]="dashboard && dashboard?.tripleConstraint && dashboard?.tripleConstraint">
+          [tripleConstraint]="dashboard && dashboard?.tripleConstraint">
         </app-triple-constraint-dashboard>
       </div>
       <div class="risk-milestone-charts-container">
@@ -96,7 +96,8 @@
       </div>
     </div>
     <div class="earned-value-analysis-container"
-      *ngIf="!!dashboardShowEva && dashboard && dashboard?.earnedValueAnalysis &&  dashboard?.earnedValueAnalysis?.earnedValueByStep.length > 0 && !isLoading">
+      *ngIf="!!dashboardShowEva && dashboard && dashboard?.earnedValueAnalysis &&  
+      dashboard?.earnedValueAnalysis?.earnedValueByStep && dashboard?.earnedValueAnalysis?.earnedValueByStep.length > 0 && !isLoading">
       <app-earned-value-analysis-dashboard [earnedValueAnalysis]="dashboard.earnedValueAnalysis"
         [referenceMonth]="referenceMonth"></app-earned-value-analysis-dashboard>
     </div>

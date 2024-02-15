@@ -67,7 +67,7 @@ export class TripleConstraintDashboardComponent implements OnInit {
 
   loadMaxCostValue() {
     const values = [];
-    if (this.tripleConstraint.cost.plannedValue) {
+    if (this.tripleConstraint?.cost?.plannedValue) {
       values.push(this.tripleConstraint.cost.plannedValue);
     }
     if (this.tripleConstraint.cost.foreseenValue) {
@@ -94,7 +94,7 @@ export class TripleConstraintDashboardComponent implements OnInit {
   }
 
   loadChartScheduleValues() {
-    if (this && this.tripleConstraint && this.tripleConstraint.schedule) {
+    if (this.tripleConstraint && this.tripleConstraint.schedule) {
       const startDates = [];
       if (this.tripleConstraint.schedule.plannedStartDate) {
         startDates.push(this.tripleConstraint.schedule.plannedStartDate);
