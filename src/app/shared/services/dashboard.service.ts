@@ -148,7 +148,7 @@ export class DashboardService extends BaseService<IDashboard> {
           actualEndDate: data?.tripleConstraint?.scheduleActualEndDate,
           actualStartDate: data?.tripleConstraint?.scheduleActualStartDate,
           actualValue: data?.tripleConstraint?.scheduleActualValue,
-          foreseenEndDate: data?.tripleConstraint?.scheduleForeseenStartDate,
+          foreseenEndDate: data?.tripleConstraint?.scheduleForeseenEndDate,
           foreseenStartDate: data?.tripleConstraint?.scheduleForeseenStartDate,
           foreseenValue: data?.tripleConstraint?.scheduleForeseenValue,
           plannedEndDate: data?.tripleConstraint?.schedulePlannedEndDate,
