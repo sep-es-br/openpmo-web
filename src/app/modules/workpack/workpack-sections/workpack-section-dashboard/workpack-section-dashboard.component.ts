@@ -4,20 +4,17 @@ import { Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges, ViewChil
 import { TranslateService } from '@ngx-translate/core';
 import { ChartData } from 'chart.js';
 import { ICard } from 'src/app/shared/interfaces/ICard';
-import { IDashboard } from 'src/app/shared/interfaces/IDashboard';
+import { IDashboard, IDashboardData } from 'src/app/shared/interfaces/IDashboard';
 import { DashboardService } from 'src/app/shared/services/dashboard.service';
-import * as moment from 'moment';
 import { Calendar } from 'primeng/calendar';
 import { Subject } from 'rxjs';
 import { WorkpackShowTabviewService } from 'src/app/shared/services/workpack-show-tabview.service';
 import { IconsTypeWorkpackEnum } from 'src/app/shared/enums/IconsTypeWorkpackModelEnum';
 import { IBaseline } from 'src/app/shared/interfaces/IBaseline';
-import { Route, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { IWorkpackParams } from 'src/app/shared/interfaces/IWorkpackDataParams';
 import { WorkpackBreadcrumbStorageService } from 'src/app/shared/services/workpack-breadcrumb-storage.service';
 import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
-import { Menu } from 'primeng/menu';
-import { TieredMenu } from 'primeng/tieredmenu';
 
 @Component({
   selector: 'app-workpack-section-dashboard',
@@ -36,7 +33,7 @@ export class WorkpackSectionDashboardComponent implements OnInit, OnChanges, OnD
   @Input() workpackType: string;
   @Input() collapsePanelsStatus: boolean;
 
-  dashboard: IDashboard;
+  dashboard: IDashboardData;
   cardDashboardProperties: ICard;
   dashboardMilestonesData: ChartData = {
     labels: [],

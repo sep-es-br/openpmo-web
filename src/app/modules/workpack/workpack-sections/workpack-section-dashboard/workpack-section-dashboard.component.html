@@ -80,7 +80,7 @@
     <div class="charts-container" *ngIf="!isLoading">
       <div class="triple-constraint-container">
         <app-triple-constraint-dashboard
-          [tripleConstraint]="dashboard && dashboard?.tripleConstraint && dashboard?.tripleConstraint[0]">
+          [tripleConstraint]="dashboard && dashboard?.tripleConstraint && dashboard?.tripleConstraint">
         </app-triple-constraint-dashboard>
       </div>
       <div class="risk-milestone-charts-container">

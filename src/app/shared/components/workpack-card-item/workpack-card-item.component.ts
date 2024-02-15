@@ -45,9 +45,9 @@ export class WorkpackCardItemComponent implements OnInit, OnDestroy {
   attentionMilestone = false;
   milestoneStatusEnum = MilestoneStatusEnum;
 
-  milestoneDate: Date;
+  milestoneDate: Date = null;
   showReasonModal: boolean;
-  reasonValue: string;
+  reasonValue: string = '';
   showReasonButtons = false;
   milestoneMidleTextBottom: string;
   enable = true;
@@ -309,11 +309,11 @@ export class WorkpackCardItemComponent implements OnInit, OnDestroy {
             this.iconScopeColor = '#EA5C5C';
           }
         } else {
-          this.iconScopeColor = '#EA5C5C';
+          this.iconScopeColor = '#44B39B';
         }
       } else {
-        if (this.properties.dashboardData?.tripleConstraint?.scope?.foreseenValue !== null &&
-          this.properties.dashboardData?.tripleConstraint?.scope?.foreseenValue >=
+        if (this.properties.dashboardData?.tripleConstraint?.scope?.foreseenWorkRefMonth !== null &&
+          this.properties.dashboardData?.tripleConstraint?.scope?.foreseenWorkRefMonth >=
           this.properties.dashboardData?.tripleConstraint?.scope?.actualValue) {
           this.iconScopeColor = '#EA5C5C';
         } else {

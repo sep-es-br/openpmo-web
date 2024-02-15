@@ -526,7 +526,7 @@ export class PlanComponent implements OnInit, OnDestroy {
           canceled: workpack.canceled,
           completed: workpack.completed,
           endManagementDate: workpack.endManagementDate,
-          dashboardData: this.loadDashboardData(workpack.dashboard, workpack.milestones, workpack.risks),
+          dashboardData: this.loadDashboardData(workpack.dashboard, workpack.milestone, workpack.risk),
           hasBaseline: workpack.hasActiveBaseline,
           baselineName: workpack.activeBaselineName,
           subtitleCardItem: workpack.type === 'Milestone' ? workpack.date : '',
@@ -599,7 +599,7 @@ export class PlanComponent implements OnInit, OnDestroy {
 
   }
 
-  loadDashboardData(dashboard?, milestones?, risks?) {
+  loadDashboardData(dashboard?, milestone?, risk?) {
     const dashboardData =  {
       tripleConstraint: dashboard && dashboard.tripleConstraint && {
         idBaseline: dashboard.tripleConstraint.idBaseline,
@@ -628,7 +628,8 @@ export class PlanComponent implements OnInit, OnDestroy {
           foreseenValue: dashboard.tripleConstraint.scopeForeseenValue,
           actualValue: dashboard.tripleConstraint.scopeActualValue,
           plannedValue: dashboard.tripleConstraint.scopePlannedValue,
-          variation: dashboard.tripleConstraint.scopeVariation
+          variation: dashboard.tripleConstraint.scopeVariation,
+          foreseenWorkRefMonth: dashboard.tripleConstraint.scopeForeseenWorkRefMonth
         }
       },
       earnedValue: dashboard && dashboard.performanceIndex && dashboard.performanceIndex.earnedValue,
@@ -640,68 +641,9 @@ export class PlanComponent implements OnInit, OnDestroy {
         indexValue: dashboard.performanceIndex.schedulePerformanceIndexValue,
         scheduleVariation: dashboard.performanceIndex.schedulePerformanceIndexVariation
       } : null,
-      risk: risks && {high: 0, low: 0, medium: 0, closed: 0, total: 0},
-      milestone: milestones && {concluded: 0, late: 0, lateConcluded: 0, onTime: 0, quantity: 0}
+      risk: risk,
+      milestone: milestone
     };
-    const totalRisk = risks && risks.reduce( ( totalRisk: {high: number; low: number; medium: number; closed: number; total: number}, risk) => {
-      switch (risk.importance) {
-        case 'HIGH':
-          totalRisk.high++;
-          break;
-        case 'LOW':
-          totalRisk.low++;
-          break;
-        case 'MEDIUM':
-          totalRisk.medium++;
-          break;
-      }
-      if (risk.status !== 'OPEN') totalRisk.closed++;
-      totalRisk.total++
-      return totalRisk;
-    }, {high: 0, low: 0, medium: 0, closed: 0, total: 0});
-
-    const totalMilestones = milestones && milestones.reduce( ( totalMilestones: {
-        concluded: number;
-        late: number;
-        lateConcluded: number;
-        onTime: number;
-        quantity: number
-      }, milestone) => {
-      
-      if (milestone.completed) {
-        if (!milestone.snapshotDate) {
-          totalMilestones.concluded++;
-          totalMilestones.quantity++;
-          return totalMilestones;
-        } else {
-          const milestoneDate = moment(milestone.milestoneDate, 'yyyy-MM-DD');
-          const snapshotDate = moment(milestone.snapshotDate, 'yyyy-MM-DD');
-          if (milestoneDate.isSameOrBefore(snapshotDate)) {
-            totalMilestones.concluded++;
-            totalMilestones.quantity++;
-            return totalMilestones;
-          } else {
-            totalMilestones.lateConcluded++;
-            totalMilestones.quantity++;
-            return totalMilestones;
-          }
-        }
-      } else {
-        const today = moment();
-        const milestoneDate = moment(milestone.milestoneDate, 'yyyy-MM-DD');
-        if (milestoneDate.isBefore(today)) {
-          totalMilestones.late++;
-          totalMilestones.quantity++;
-          return totalMilestones;
-        } else {
-          totalMilestones.onTime++;
-          totalMilestones.quantity++;
-          return totalMilestones;
-        }
-      }
-    }, {concluded: 0, late: 0, lateConcluded: 0, onTime: 0, quantity: 0});
-    dashboardData.risk = totalRisk;
-    dashboardData.milestone = totalMilestones;
     return dashboardData;
   }
   

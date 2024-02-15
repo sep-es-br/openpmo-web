@@ -89,11 +89,11 @@ export class EarnedValueAnalysisDashboardComponent implements OnInit, OnChanges,
         },
         {
           label: this.translateSrv.instant('PV'),
-          data: this.earnedValueAnalysis.earnedValueByStep?.map(item => item.plannedValue),
+          data: this.earnedValueAnalysis.earnedValueByStep?.map(item => item.plannedCost),
           fill: false,
           borderColor: '#b5b5b5',
-          pointBorderWidth: this.earnedValueAnalysis.earnedValueByStep?.map(item => item.plannedValue).length > 1 ? 1 : 0,
-          pointRadius: this.earnedValueAnalysis.earnedValueByStep?.map(item => item.plannedValue).length > 1 ? 4 : 0,
+          pointBorderWidth: this.earnedValueAnalysis.earnedValueByStep?.map(item => item.plannedCost).length > 1 ? 1 : 0,
+          pointRadius: this.earnedValueAnalysis.earnedValueByStep?.map(item => item.plannedCost).length > 1 ? 4 : 0,
         },
         {
           label: this.translateSrv.instant('EC'),
@@ -141,32 +141,32 @@ export class EarnedValueAnalysisDashboardComponent implements OnInit, OnChanges,
 
   setGaugeChartData() {
     this.gaugeChartDataCPI = {
-      value: this.earnedValueAnalysis?.performanceIndexes[0]?.costPerformanceIndex &&
-        (this.earnedValueAnalysis.performanceIndexes[0].actualCost !== 0 &&
-          this.earnedValueAnalysis.performanceIndexes[0].actualCost !== null &&
-          this.earnedValueAnalysis.performanceIndexes[0].actualCost !== undefined)
+      value: this.earnedValueAnalysis?.performanceIndexes?.costPerformanceIndex &&
+        (this.earnedValueAnalysis.performanceIndexes?.actualCost !== 0 &&
+          this.earnedValueAnalysis.performanceIndexes.actualCost !== null &&
+          this.earnedValueAnalysis.performanceIndexes.actualCost !== undefined)
         ?
-        (this.earnedValueAnalysis?.performanceIndexes[0]?.costPerformanceIndex?.indexValue === null ? 0 : this.earnedValueAnalysis?.performanceIndexes[0]?.costPerformanceIndex?.indexValue)
+        (this.earnedValueAnalysis?.performanceIndexes?.costPerformanceIndex?.indexValue === null ? 0 : this.earnedValueAnalysis?.performanceIndexes?.costPerformanceIndex?.indexValue)
         : (null),
       labelBottom: 'CPI',
       classIconLabelBottom: 'fas fa-dollar-sign',
-      valueProgressBar: this.earnedValueAnalysis?.performanceIndexes[0]?.costPerformanceIndex ? this.earnedValueAnalysis?.performanceIndexes[0]?.costPerformanceIndex?.costVariation : null,
-      maxProgressBar: this.earnedValueAnalysis?.performanceIndexes[0]?.earnedValue,
+      valueProgressBar: this.earnedValueAnalysis?.performanceIndexes?.costPerformanceIndex ? this.earnedValueAnalysis?.performanceIndexes?.costPerformanceIndex?.costVariation : null,
+      maxProgressBar: this.earnedValueAnalysis?.performanceIndexes?.earnedValue,
       labelBottomProgressBar: 'CV',
     };
     this.gaugeChartDataSPI = {
-      value: this.earnedValueAnalysis?.performanceIndexes[0]?.schedulePerformanceIndex &&
-        (this.earnedValueAnalysis.performanceIndexes[0].plannedValue !== 0 &&
-          this.earnedValueAnalysis.performanceIndexes[0].plannedValue !== null &&
-          this.earnedValueAnalysis.performanceIndexes[0].plannedValue !== undefined)
+      value: this.earnedValueAnalysis?.performanceIndexes?.schedulePerformanceIndex &&
+        (this.earnedValueAnalysis.performanceIndexes.plannedValue !== 0 &&
+          this.earnedValueAnalysis.performanceIndexes.plannedValue !== null &&
+          this.earnedValueAnalysis.performanceIndexes.plannedValue !== undefined)
         ?
-        (this.earnedValueAnalysis?.performanceIndexes[0]?.schedulePerformanceIndex?.indexValue === null ? 0 : this.earnedValueAnalysis?.performanceIndexes[0]?.schedulePerformanceIndex?.indexValue)
+        (this.earnedValueAnalysis?.performanceIndexes?.schedulePerformanceIndex?.indexValue === null ? 0 : this.earnedValueAnalysis?.performanceIndexes?.schedulePerformanceIndex?.indexValue)
         : null,
       labelBottom: 'SPI',
       classIconLabelBottom: 'fas fa-clock',
-      valueProgressBar: this.earnedValueAnalysis?.performanceIndexes[0]?.schedulePerformanceIndex ?
-        this.earnedValueAnalysis?.performanceIndexes[0]?.schedulePerformanceIndex?.scheduleVariation : null,
-      maxProgressBar: this.earnedValueAnalysis?.performanceIndexes[0]?.earnedValue,
+      valueProgressBar: this.earnedValueAnalysis?.performanceIndexes?.schedulePerformanceIndex ?
+        this.earnedValueAnalysis?.performanceIndexes?.schedulePerformanceIndex?.scheduleVariation : null,
+      maxProgressBar: this.earnedValueAnalysis?.performanceIndexes?.earnedValue,
       labelBottomProgressBar: 'SV',
     };
   }
@@ -178,7 +178,7 @@ export class EarnedValueAnalysisDashboardComponent implements OnInit, OnChanges,
       plannedValue,
       estimatesAtCompletion,
       estimateToComplete
-    } = this.earnedValueAnalysis.performanceIndexes[0];
+    } = this.earnedValueAnalysis.performanceIndexes;
     const values = [
       earnedValue === null ? 0 : earnedValue,
       actualCost === null ? 0 : actualCost,

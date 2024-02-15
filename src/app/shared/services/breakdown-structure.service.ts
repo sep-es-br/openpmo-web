@@ -281,15 +281,16 @@ export class BreakdownStructureService extends BaseService<IWorkpackBreakdownStr
           foreseenValue: dashboard.tripleConstraint?.scopeForeseenValue,
           actualValue: dashboard.tripleConstraint?.scopeActualValue,
           plannedValue: dashboard.tripleConstraint?.scopePlannedValue,
-          variation: dashboard.tripleConstraint?.scopeVariation
+          variation: dashboard.tripleConstraint?.scopeVariation,
+          foreseenWorkRefMonth: dashboard.tripleConstraint?.scopeForeseenWorkRefMonth
         }
       },
       earnedValue: dashboard && dashboard.performanceIndex && dashboard.performanceIndex?.earnedValue,
-      costPerformanceIndex: dashboard && dashboard.performanceIndex ? {
+      costPerformanceIndex: dashboard && dashboard.performanceIndex && dashboard.performanceIndex?.costPerformanceIndexValue ? {
         costVariation: dashboard.performanceIndex?.costPerformanceIndexVariation,
         indexValue: dashboard.performanceIndex?.costPerformanceIndexValue
       } : null,
-      schedulePerformanceIndex: dashboard && dashboard.performanceIndex ? {
+      schedulePerformanceIndex: dashboard && dashboard.performanceIndex && dashboard.performanceIndex?.schedulePerformanceIndexValue ? {
         indexValue: dashboard.performanceIndex?.schedulePerformanceIndexValue,
         scheduleVariation: dashboard.performanceIndex?.schedulePerformanceIndexVariation
       } : null,
@@ -468,10 +469,11 @@ export class BreakdownStructureService extends BaseService<IWorkpackBreakdownStr
             iconScopeColor = '#EA5C5C';
           }
         } else {
-          iconScopeColor = '#EA5C5C';
+          iconScopeColor = '#44B39B';
         }
       } else {
-        if (properties.dashboardData?.tripleConstraint?.scope?.foreseenValue >=
+        if (properties.dashboardData?.tripleConstraint?.scope?.foreseenWorkRefMonth && 
+            properties.dashboardData?.tripleConstraint?.scope?.foreseenWorkRefMonth >=
           properties.dashboardData?.tripleConstraint?.scope?.actualValue) {
           iconScopeColor = '#EA5C5C';
         } else {

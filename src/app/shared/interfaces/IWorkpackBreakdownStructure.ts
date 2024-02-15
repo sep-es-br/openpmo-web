@@ -97,6 +97,7 @@ interface ITripleConstraintDashboard {
     foreseenValue?: number;
     actualValue?: number;
     variation: number;
+    foreseenWorkRefMonth?: number;
   };
 
 }

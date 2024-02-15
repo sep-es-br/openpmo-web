@@ -1,17 +1,13 @@
 import { BehaviorSubject } from 'rxjs';
 import { Inject, Injectable, Injector } from '@angular/core';
 import { BaseService } from '../base/base.service';
-import { IDashboard, IWorkpackByModel } from '../interfaces/IDashboard';
+import { IDashboard, IDashboardData, IWorkpackByModel } from '../interfaces/IDashboard';
 import { IBaseline } from '../interfaces/IBaseline';
 import { IHttpResult } from '../interfaces/IHttpResult';
 import { PrepareHttpParams } from '../utils/query.util';
-import { IDashboardData } from '../interfaces/IDashboardData';
 import { IWorkpackData, IWorkpackParams } from '../interfaces/IWorkpackDataParams';
 import { WorkpackService } from './workpack.service';
 import * as moment from 'moment';
-import { Router } from '@angular/router';
-import { WorkpackBreadcrumbStorageService } from './workpack-breadcrumb-storage.service';
-import { BreadcrumbService } from './breadcrumb.service';
 
 @Injectable({
   providedIn: 'root'
@@ -25,7 +21,7 @@ export class DashboardService extends BaseService<IDashboard> {
   referenceMonth;
   baselines;
   selectedBaseline;
-  dashboard;
+  dashboard: IDashboardData;
   yearRange;
   startDate;
   endDate;
@@ -91,21 +87,12 @@ export class DashboardService extends BaseService<IDashboard> {
             this.selectedBaseline = result.data.length > 0 ? this.baselines.find(baseline => !!baseline.default).id : null;
           }
         }
-      await this.getScheduleInterval();
       await this.getDashboard({referenceMonth: this.referenceMonth, selectedBaseline: this.selectedBaseline});
     } else {
       this.loading = false;
       this.nextResetDashboard(true);
     }
 
-  }
-
-  async getScheduleInterval() {
-    const result = await this.GetDashboardScheduleInterval({ 'id-workpack': this.workpackData.workpack.id });
-    if (result.success && result.data.startDate && result.data.startDate !== null && result.data.endDate && result.data.endDate !== null) {
-      this.scheduleInterval = result.data;
-      this.calculateReferenceMonth();
-    }
   }
 
   async getDashboard(params?) {
@@ -125,7 +112,9 @@ export class DashboardService extends BaseService<IDashboard> {
             'linked': this.linked
           });
       if (success) {
-        this.dashboard = data;
+        this.dashboard = this.setDashboardData(data);
+        this.scheduleInterval = data.scheduleInterval;
+        this.calculateReferenceMonth();
         this.validateDashboard();
       }
     } else {
@@ -137,14 +126,70 @@ export class DashboardService extends BaseService<IDashboard> {
           'id-workpack-model-linked': this.workpackParams.idWorkpackModelLinked,
           'linked': this.linked });
       if (success) {
-        this.dashboard = data;
+        this.dashboard = this.setDashboardData(data);
+        this.scheduleInterval = data.scheduleInterval;
+        this.calculateReferenceMonth();
         this.validateDashboard();
       }
     }
   }
 
+  setDashboardData(data: IDashboard) {
+    const dashboard = {
+      ...data,
+      tripleConstraint: {
+        cost: {
+          actualValue:data?.tripleConstraint?.costActualValue,
+          foreseenValue: data?.tripleConstraint?.costForeseenValue,
+          plannedValue: data?.tripleConstraint?.costPlannedValue,
+          variation: data?.tripleConstraint?.costVariation
+        },
+        schedule: {
+          actualEndDate: data?.tripleConstraint?.scheduleActualEndDate,
+          actualStartDate: data?.tripleConstraint?.scheduleActualStartDate,
+          actualValue: data?.tripleConstraint?.scheduleActualValue,
+          foreseenEndDate: data?.tripleConstraint?.scheduleForeseenStartDate,
+          foreseenStartDate: data?.tripleConstraint?.scheduleForeseenStartDate,
+          foreseenValue: data?.tripleConstraint?.scheduleForeseenValue,
+          plannedEndDate: data?.tripleConstraint?.schedulePlannedEndDate,
+          plannedStartDate: data?.tripleConstraint?.schedulePlannedStartDate,
+          plannedValue: data?.tripleConstraint?.schedulePlannedValue,
+          variation: data?.tripleConstraint?.scheduleVariation
+        },
+        scope: {
+          actualVariationPercent: data?.tripleConstraint?.scopeActualVariationPercent,
+          foreseenVariationPercent: data?.tripleConstraint?.scopeForeseenVariationPercent,
+          plannedVariationPercent: data?.tripleConstraint?.scopePlannedVariationPercent,
+          foreseenValue: data?.tripleConstraint?.scopeForeseenValue,
+          plannedValue: data?.tripleConstraint?.scopePlannedValue,
+          actualValue:data?.tripleConstraint?.scopeActualValue,
+          variation: data?.tripleConstraint?.scopeVariation
+        }
+      },
+      earnedValueAnalysis: {
+        performanceIndexes: {
+          actualCost: data?.performanceIndex?.actualCost,
+          costPerformanceIndex: {
+            costVariation: data?.performanceIndex?.costPerformanceIndexVariation,
+            indexValue: data?.performanceIndex?.costPerformanceIndexValue
+          },
+          earnedValue: data?.performanceIndex?.earnedValue,
+          estimateToComplete: data?.performanceIndex?.estimateToComplete,
+          estimatesAtCompletion: data?.performanceIndex?.estimatesAtCompletion,
+          plannedValue: data?.performanceIndex?.plannedValue,
+          schedulePerformanceIndex: {
+            indexValue: data?.performanceIndex?.schedulePerformanceIndexValue,
+            scheduleVariation: data?.performanceIndex?.schedulePerformanceIndexVariation
+          },
+        },
+        earnedValueByStep: data.earnedValueByStep
+      }
+    }
+    
+    return dashboard;
+  }
+
   validateDashboard() {
-    this.loadMilestoneResults();
     if (this.dashboard && (!this.dashboard.earnedValueAnalysis || this.dashboard.earnedValueAnalysis === null)
     && (!this.dashboard.milestone || this.dashboard.milestone.quantity === 0)
     && (!this.dashboard.risk || this.dashboard.risk.total === 0)
@@ -157,59 +202,10 @@ export class DashboardService extends BaseService<IDashboard> {
     this.nextResetDashboard(true);
   }
 
-  loadMilestoneResults() {
-    const lastDayOfMonth = moment(this.referenceMonth).daysInMonth().toString();
-    const referenceMonth = moment(this.referenceMonth).format('MM-yyyy');
-    const dashboardRefDate = moment(lastDayOfMonth + '-' + referenceMonth, 'DD-MM-yyyy');
-    const today = moment();
-    const refDate = today.isBefore(dashboardRefDate) ? today : dashboardRefDate;
-    const totalMilestones = this.dashboard.milestones && this.dashboard.milestones.reduce( ( totalMilestones: {
-      concluded: number;
-      late: number;
-      lateConcluded: number;
-      onTime: number;
-      quantity: number
-    }, milestone) => {
-    
-      if (milestone.completed) {
-        if (!milestone.snapshotDate) {
-          totalMilestones.concluded++;
-          totalMilestones.quantity++;
-          return totalMilestones;
-        } else {
-          const milestoneDate = moment(milestone.milestoneDate, 'yyyy-MM-DD');
-          const snapshotDate = moment(milestone.snapshotDate, 'yyyy-MM-DD');
-          if (milestoneDate.isSameOrBefore(snapshotDate)) {
-            totalMilestones.concluded++;
-            totalMilestones.quantity++;
-            return totalMilestones;
-          } else {
-            totalMilestones.lateConcluded++;
-            totalMilestones.quantity++;
-            return totalMilestones;
-          }
-        }
-      } else {
-        const milestoneDate = moment(milestone.milestoneDate, 'yyyy-MM-DD');
-        if (milestoneDate.isBefore(refDate)) {
-          totalMilestones.late++;
-          totalMilestones.quantity++;
-          return totalMilestones;
-        } else {
-          totalMilestones.onTime++;
-          totalMilestones.quantity++;
-          return totalMilestones;
-        }
-      }
-    }, {concluded: 0, late: 0, lateConcluded: 0, onTime: 0, quantity: 0});
-    this.dashboard.milestone = totalMilestones;
-  }
-
-  
 
   calculateReferenceMonth() {
-    const startDate = moment(this.scheduleInterval.startDate, 'MM-yyyy').toDate();
-    const endDate = moment(this.scheduleInterval.endDate, 'MM-yyyy').toDate();
+    const startDate = moment(this.scheduleInterval.initialDate).toDate();
+    const endDate = moment(this.scheduleInterval.endDate).toDate();
     const todayMonthFormat = moment().format('MM-yyyy');
     const today = moment(todayMonthFormat, 'MM-yyyy').toDate();
 
@@ -224,8 +220,6 @@ export class DashboardService extends BaseService<IDashboard> {
     this.startDate = moment(startDate).toDate();
     this.endDate = moment(endDate).toDate();
   }
-
-
 
   public async GetBaselines(options?): Promise<IHttpResult<IBaseline[]>> {
     const result = await this.http.get(`${this.urlBase}/baselines`, { params: PrepareHttpParams(options) }).toPromise();

@@ -65,15 +65,13 @@ export interface IWorkpackListCard {
     endManagementDate?: string;
     milestoneStatus?: string;
     dashboard?: IWorkpackDashboard;
-    milestones?: {
-      completed: boolean,
-      milestoneDate: string;
-      snapshotDate: string;
-    } [];
-    risks?: {
-      importance: string;
-      status: string;
-    } [];
+    risk?: {
+      high: number,
+      low: number,
+      medium: number,
+      total: number
+    },
+    milestone?: IMilestoneDashboard,
     idWorkpackModel?: number; // only screen
     idParent?: number; // only screen
     idPlan?: number; //only screen
@@ -122,7 +120,8 @@ interface IWorkpackDashboard {
     scopeForeseenVariationPercent: number;
     scopeActualVariationPercent: number;
     scopePlannedValue: number;
-    scopeForeseenValue: number
+    scopeForeseenValue: number;
+    scopeForeseenWorkRefMonth: number;
   };
   performanceIndex: {
     costPerformanceIndexValue: number;
