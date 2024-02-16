@@ -179,7 +179,7 @@ export class DashboardService extends BaseService<IDashboard> {
           earnedValue: data?.performanceIndex?.earnedValue,
           estimateToComplete: data?.performanceIndex?.estimateToComplete,
           estimatesAtCompletion: data?.performanceIndex?.estimatesAtCompletion,
-          plannedValue: data?.performanceIndex?.plannedValue,
+          plannedValue: data?.performanceIndex?.plannedValueRefMonth,
           schedulePerformanceIndex: {
             indexValue: data?.performanceIndex?.schedulePerformanceIndexValue,
             scheduleVariation: data?.performanceIndex?.schedulePerformanceIndexVariation

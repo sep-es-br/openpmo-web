@@ -35,6 +35,7 @@ export interface IDashboard {
     estimateToComplete: number;
     estimatesAtCompletion: number;
     plannedValue: number;
+    plannedValueRefMonth?: number;
   };
   earnedValueByStep: IEarnedValueByStep[]; 
   scheduleInterval: { initialDate: string; endDate: string };
