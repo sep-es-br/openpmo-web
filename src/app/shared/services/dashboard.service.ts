@@ -113,7 +113,7 @@ export class DashboardService extends BaseService<IDashboard> {
           });
       if (success) {
         this.dashboard = this.setDashboardData(data);
-        this.scheduleInterval = data.scheduleInterval;
+        this.scheduleInterval = data?.scheduleInterval;
         this.calculateReferenceMonth();
         this.validateDashboard();
       }
