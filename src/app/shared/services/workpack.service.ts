@@ -196,12 +196,6 @@ export class WorkpackService extends BaseService<IWorkpack> {
     return result as IHttpResult<any>;
   }
 
-  public async checkPasteWorkpack(idWorkpack: number, idWorkpackModelTo: number, options?): Promise<IHttpResult<ICheckPasteWorkpack>> {
-    const result = await this.http.get(`${this.urlBase}/${idWorkpack}/check-paste/${idWorkpackModelTo}`,
-      {params: PrepareHttpParams(options)}).toPromise();
-    return result as IHttpResult<ICheckPasteWorkpack>;
-  }
-
   public async getItemsFavorites(idPlan: number): Promise<IHttpResult<IWorkpackFavorite[]>> {
     return await this.http.get<IHttpResult<any>>(`${this.urlBase}/favorites?id-plan=${idPlan}`).toPromise();
   }

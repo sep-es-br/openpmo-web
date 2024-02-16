@@ -794,14 +794,10 @@ export class PlanComponent implements OnInit, OnDestroy {
   }
 
   async checkPasteWorkpack(workpackCuted: IWorkpackListCard, idWorkpackModelTo: number) {
-    const result = await this.workpackSrv.checkPasteWorkpack(workpackCuted.id, idWorkpackModelTo, {
-      idWorkpackModelFrom: workpackCuted.idWorkpackModel,
-    });
-    if (result.success) {
-      return result.data;
-    } else {
-      return {} as any;
+    if (idWorkpackModelTo === workpackCuted.idWorkpackModel) {
+      return { canPaste: true, incompatiblesProperties: false };
     }
+    return { canPaste: false, incompatiblesProperties: true };
   }
 
   async loadSharedWorkpackList(idWorkpackModel: number) {

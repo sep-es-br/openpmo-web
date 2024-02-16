@@ -376,6 +376,7 @@ export class WorkpackComponent implements OnDestroy {
         this.workpackSrv.nextLoadingWorkpack(false)
       }
     } else {
+      this.workpackSrv.nextLoadingWorkpack(false)
       this.router.navigate(['/plan'], {
         queryParams: {
           id: this.idPlan,
@@ -1026,16 +1027,9 @@ export class WorkpackComponent implements OnDestroy {
 
   async checkPasteWorkpack(workpackCuted: IWorkpackListCard, idWorkpackModelTo: number) {
     if (idWorkpackModelTo === workpackCuted.idWorkpackModel) {
-      return { canPaste: true, incompatiblesProperties: false }
+      return { canPaste: true, incompatiblesProperties: false };
     }
-    const result = await this.workpackSrv.checkPasteWorkpack(workpackCuted.id, idWorkpackModelTo, {
-      idWorkpackModelFrom: workpackCuted.idWorkpackModel,
-    });
-    if (result.success) {
-      return result.data;
-    } else {
-      return {} as any;
-    }
+    return { canPaste: false, incompatiblesProperties: true };
   }
 
   async handlePasteWorkpack(idPlanTo: number, idWorkpackModelTo: number, idParentTo: number, incompatiblesProperties: boolean) {
