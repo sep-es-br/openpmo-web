@@ -3,14 +3,12 @@ import {
   IWorkpackBreakdownStructure,
 } from 'src/app/shared/interfaces/IWorkpackBreakdownStructure';
 import { TypeWorkpackEnumWBS } from 'src/app/shared/enums/TypeWorkpackEnum';
-import { TypeWorkpackModelEnum } from 'src/app/shared/enums/TypeWorkpackModelEnum';
 import { Subject } from 'rxjs';
 import { MilestoneStatusEnum } from 'src/app/shared/enums/MilestoneStatusEnum';
 import { TranslateService } from '@ngx-translate/core';
 import { takeUntil } from 'rxjs/operators';
 import { BreakdownStructureService } from 'src/app/shared/services/breakdown-structure.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ConfigDataViewService } from '../../../../shared/services/config-dataview.service';
 import { IWorkpackParams } from 'src/app/shared/interfaces/IWorkpackDataParams';
 import { WorkpackService } from 'src/app/shared/services/workpack.service';
 import { WorkpackBreadcrumbStorageService } from 'src/app/shared/services/workpack-breadcrumb-storage.service';
@@ -25,7 +23,6 @@ export class WorkpackSectionWBSComponent implements OnDestroy {
 
   @Output() onHasWBS = new EventEmitter();
   typeWorkpackEnum = TypeWorkpackEnumWBS;
-  typeWorkpackModelEnum = TypeWorkpackModelEnum;
   wbsTree: any = [];
   language: string;
   $destroy = new Subject();
