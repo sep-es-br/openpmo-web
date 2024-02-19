@@ -267,6 +267,7 @@ export class WorkpackModelComponent implements OnInit {
       .filter(p => p.type !== TypePropertyEnum.GroupModel)
       .filter(p => p.label !== undefined && p.label.length > 0)
       .filter(p => p.name !== undefined && p.name.length > 0)
+      .filter(p => p.active)
       .map(p => ({ label: p.label, value: p.name }));
     if (this.sortedByList.length > 0) {
       this.sortedByList.unshift(
