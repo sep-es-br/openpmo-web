@@ -49,6 +49,7 @@ export class WorkpackPropertyService {
   }
 
   async loadProperties() {
+    this.properties = [];
     this.workpackData = this.workpackSrv.getWorkpackData();
     this.workpackParams = this.workpackSrv.getWorkpackParams();
     const workpackModelActivesProperties = (!!this.workpackParams.idWorkpackModelLinked) ?
@@ -58,14 +59,17 @@ export class WorkpackPropertyService {
       .filter(prop => this.typePropertyModel[prop.type] === TypePropertyModelEnum.OrganizationSelectionModel).length > 0) {
       await this.loadOrganizationsOffice(this.workpackParams.idOfficeOwnerWorkpackLinked ? this.workpackParams.idOfficeOwnerWorkpackLinked : this.workpackParams.idOffice);
     }
-    this.properties = [this.loadProperty('name', TypePropertyModelEnum.TextModel), this.loadProperty('fullName', TypePropertyModelEnum.TextAreaModel)];
+    const propertiesEntity = [this.loadProperty('name', TypePropertyModelEnum.TextModel), this.loadProperty('fullName', TypePropertyModelEnum.TextAreaModel)];
     if (this.workpackData.workpackModel.type === TypeWorkpackModelEnum.MilestoneModel) {
-      this.properties.push(this.loadProperty('date', TypePropertyModelEnum.DateModel));
+      propertiesEntity.push(this.loadProperty('date', TypePropertyModelEnum.DateModel));
     }
     if (workpackModelActivesProperties && workpackModelActivesProperties.length > 0) {
       const propertiesByModel = await Promise.all(workpackModelActivesProperties.filter(prop => prop.session !== 'COST').map(p => this.instanceProperty(p)));
       propertiesByModel.sort((a, b) => a.sortIndex < b.sortIndex ? -1 : 0);
-      this.properties = [...this.properties, ...propertiesByModel];
+      const propertiesList = [...this.properties, ...propertiesByModel];
+      this.properties = [...propertiesEntity, ...propertiesList];
+    } else {
+      this.properties = [...propertiesEntity];
     }
     this.loading = false;
     this.nextResetWorkpackProperties(true);

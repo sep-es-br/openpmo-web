@@ -24,7 +24,7 @@ import * as moment from 'moment';
 export class WorkpackSectionPropertiesComponent implements OnInit {
 
   @Output() onGetProperties = new EventEmitter();
-  sectionPropertiesProperties: PropertyTemplateModel[];
+  sectionPropertiesProperties: PropertyTemplateModel[] = [];
   typePropertyModel = TypePropertyModelEnum;
   cardWorkpackProperties: ICard;
   responsive: boolean;
