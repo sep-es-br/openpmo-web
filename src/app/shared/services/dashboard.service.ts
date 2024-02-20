@@ -113,8 +113,10 @@ export class DashboardService extends BaseService<IDashboard> {
           });
       if (success) {
         this.dashboard = this.setDashboardData(data);
-        this.scheduleInterval = data?.scheduleInterval;
-        this.calculateReferenceMonth();
+        if (!params || !params.referenceMonth) {
+          this.setScheduleInterval(data);
+          this.calculateReferenceMonth();
+        }
         this.validateDashboard();
       }
     } else {
@@ -127,11 +129,31 @@ export class DashboardService extends BaseService<IDashboard> {
           'linked': this.linked });
       if (success) {
         this.dashboard = this.setDashboardData(data);
-        this.scheduleInterval = data?.scheduleInterval;
+        this.setScheduleInterval(data);
         this.calculateReferenceMonth();
         this.validateDashboard();
       }
     }
+  }
+
+  setScheduleInterval(data: IDashboard) {
+    let endDate;
+    let initialDate;
+    const plannedStartDate = data && data.tripleConstraint && data.tripleConstraint?.schedulePlannedStartDate;
+    const foreseenStartDate = data && data.tripleConstraint && data.tripleConstraint?.scheduleForeseenStartDate;
+    if (plannedStartDate && foreseenStartDate && moment(plannedStartDate, 'yyyy-MM-DD').isBefore(moment(foreseenStartDate, 'yyyy-MM-DD'))) {
+      initialDate = plannedStartDate;
+    } else if (foreseenStartDate) {
+      initialDate = foreseenStartDate;
+    }
+    const plannedEndDate = data && data.tripleConstraint && data.tripleConstraint?.schedulePlannedEndDate;
+    const foreseenEndDate = data && data.tripleConstraint && data.tripleConstraint?.scheduleForeseenEndDate;
+    if (plannedEndDate && foreseenEndDate && moment(plannedEndDate, 'yyyy-MM-DD').isAfter(moment(foreseenEndDate, 'yyyy-MM-DD'))) {
+      endDate = plannedEndDate;
+    } else if (foreseenEndDate) {
+      endDate = foreseenEndDate;
+    }
+    this.scheduleInterval = {initialDate, endDate};
   }
 
   setDashboardData(data: IDashboard) {
@@ -207,8 +229,10 @@ export class DashboardService extends BaseService<IDashboard> {
 
 
   calculateReferenceMonth() {
-    const startDate = this.scheduleInterval && moment(this.scheduleInterval?.initialDate).toDate();
-    const endDate = this.scheduleInterval && moment(this.scheduleInterval?.endDate).toDate();
+    const startDateMonthFormat = this.scheduleInterval && moment(this.scheduleInterval?.initialDate, 'yyyy-MM-DD').format('MM-yyyy');
+    const startDate = moment(startDateMonthFormat, 'MM-yyyy').toDate();
+    
+    const endDate = this.scheduleInterval && moment(this.scheduleInterval?.endDate, 'yyyy-MM-DD').toDate();
     const todayMonthFormat = moment().format('MM-yyyy');
     const today = moment(todayMonthFormat, 'MM-yyyy').toDate();
 
