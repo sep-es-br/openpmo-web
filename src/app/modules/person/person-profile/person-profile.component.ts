@@ -14,6 +14,7 @@ import { SaveButtonComponent } from 'src/app/shared/components/save-button/save-
 import { AuthService } from 'src/app/shared/services/auth.service';
 import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
 import { MinLengthTextCustomValidator } from 'src/app/shared/utils/minLengthTextValidator';
+import { SetConfigWorkpackService } from 'src/app/shared/services/set-config-workpack.service';
 
 @Component({
   selector: 'app-person-profile',
@@ -54,6 +55,7 @@ export class PersonProfileComponent implements OnInit, OnDestroy {
     private translateSrv: TranslateService,
     private messageSrv: MessageService,
     private breadcrumbSrv: BreadcrumbService,
+    private setConfigWorkpackSrv: SetConfigWorkpackService
   ) {
     this.formPerson = this.formBuilder.group({
       name: ['', [Validators.required, MinLengthTextCustomValidator.minLengthText]],
@@ -212,25 +214,14 @@ export class PersonProfileComponent implements OnInit, OnDestroy {
           icon: workpack.icon,
           typeCardItem: 'listItemPermissionWorkpack',
           itemId: workpack.id,
-          urlCard: `/stakeholder/person`,
-          paramsUrlCard: [
-            { name: 'idWorkpack', value: workpack.id },
-            { name: 'idPerson', value: this.propertiesPerson.id },
-            { name: 'idPlan', value: plan.id }
-          ],
           nameCardItem: workpack.name,
           subtitleCardItem: workpack?.roles?.join(', '),
           statusItem: workpack.ccbMember ? 'ccbMember' : workpack.accessLevel,
-          profileView: true
+          profileView: true,
         };
         return cardItem;
       }),
     }));
-  }
-
-  async navigateToPage(url: string, email?: string, idOffice?: number, idPlan?: number) {
-    await this.router.navigate([`${url}`]);
-    await this.router.navigate([url], { queryParams: { idPlan, email, idOffice } });
   }
 
   async handleChangeOffice(event) {

@@ -141,11 +141,6 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
     await this.loadStakeholder();
     await this.getAuthServer();
     let breadcrumbItems = this.breadcrumbSrv.get;
-    if (!breadcrumbItems || breadcrumbItems.length === 0 ||
-        breadcrumbItems.filter( bread => !['office', 'plan'].includes(bread.key) && bread.queryParams.id === this.idWorkpack).length === 0) {
-      breadcrumbItems = await this.breadcrumbSrv.loadWorkpackBreadcrumbs(this.idWorkpack, this.idPlan);
-      this.breadcrumbSrv.storageBreadcrumb(breadcrumbItems);
-    }
     this.breadcrumbSrv.setMenu([
       ...breadcrumbItems,
       {

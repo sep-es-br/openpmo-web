@@ -4,11 +4,11 @@ import {Injectable, Inject, Injector} from '@angular/core';
 import {BehaviorSubject, Observable} from 'rxjs';
 import {BaseService} from '../base/base.service';
 import {StoreKeys} from '../constants';
-import {ICheckPasteWorkpack} from '../interfaces/ICheckPasteWorkpack';
 import {IHttpResult} from '../interfaces/IHttpResult';
 import {IWorkpack, IWorkpackListCard} from '../interfaces/IWorkpack';
 import {PrepareHttpParams} from '../utils/query.util';
 import {IWorkpackFavorite} from '../interfaces/IWorkpackFavorite';
+
 
 @Injectable({providedIn: 'root'})
 export class WorkpackService extends BaseService<IWorkpack> {
@@ -24,10 +24,11 @@ export class WorkpackService extends BaseService<IWorkpack> {
   private workpackParams: IWorkpackParams;
   private editPermission: boolean;
   private unitMeansure: IMeasureUnit;
-
+  
 
   constructor(
-    @Inject(Injector) injector: Injector
+    @Inject(Injector) injector: Injector,
+   
   ) {
     super('workpack', injector);
   }
@@ -282,5 +283,9 @@ export class WorkpackService extends BaseService<IWorkpack> {
     });
   }
   /* eslint-enable @typescript-eslint/dot-notation */
+
+
+  
+
 }
 

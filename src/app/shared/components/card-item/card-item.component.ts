@@ -88,4 +88,8 @@ export class CardItemComponent implements OnInit {
   handleModelSelected(event) {
     this.reuseModelSelected.next({idModel: event.node.data});
   }
+
+  async handleLoadPermission() {
+    await this.properties.onClick();
+  }
 }

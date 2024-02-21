@@ -78,9 +78,6 @@ export class ControlChangeBoardListComponent implements OnInit, OnDestroy {
     await this.loadPropertiesProject();
     await this.loadControlChangeBoard();
     let breadcrumbItems = this.breadcrumbSrv.get;
-    if (!breadcrumbItems || breadcrumbItems.length === 0) {
-      breadcrumbItems = await this.breadcrumbSrv.loadWorkpackBreadcrumbs(this.idProject, this.idPlan)
-    }
     this.breadcrumbSrv.setMenu([
       ...breadcrumbItems,
       ...[{

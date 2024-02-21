@@ -28,6 +28,7 @@ import { OfficePermissionService } from 'src/app/shared/services/office-permissi
 import * as moment from 'moment';
 import { ConfigDataViewService } from 'src/app/shared/services/config-dataview.service';
 import { PersonService } from 'src/app/shared/services/person.service';
+import { SetConfigWorkpackService } from 'src/app/shared/services/set-config-workpack.service';
 
 
 interface IWorkpackModelCard {
@@ -95,7 +96,8 @@ export class PlanComponent implements OnInit, OnDestroy {
     private router: Router,
     private confirmationSrv: ConfirmationService,
     private configDataViewSrv: ConfigDataViewService,
-    private personSrv: PersonService
+    private personSrv: PersonService,
+    private setConfigWorkpackSrv: SetConfigWorkpackService
   ) {
     this.configDataViewSrv.observableCollapsePanelsStatus.pipe(takeUntil(this.$destroy)).subscribe(collapsePanelStatus => {
       this.collapsePanelsStatus = collapsePanelStatus === 'collapse' ? true : false;
@@ -470,7 +472,7 @@ export class PlanComponent implements OnInit, OnDestroy {
             menuItems.push({
               label: this.translateSrv.instant('changeControlBoard'),
               icon: 'app-icon ccb-member',
-              command: (event) => this.navigateToConfigCCB(workpack.id),
+              command: async (event) => await this.navigateToConfigCCB(workpack.id),
             });
             if (!workpack.pendingBaseline && !workpack.cancelPropose && !!workpack.hasActiveBaseline && !workpack.linked) {
               menuItems.push({
@@ -668,7 +670,8 @@ export class PlanComponent implements OnInit, OnDestroy {
     });
   }
 
-  navigateToConfigCCB(idProject: number) {
+  async navigateToConfigCCB(idProject: number) {
+    await this.setConfigWorkpackSrv.setWorkpackConfig(this.idPlan, idProject);
     this.router.navigate(
       ['/workpack/change-control-board'],
       {

@@ -51,6 +51,7 @@ import { PersonService } from 'src/app/shared/services/person.service';
 import { IBreadcrumb } from 'src/app/shared/interfaces/IBreadcrumb';
 import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
 import { TypeWorkpackModelEnum } from 'src/app/shared/enums/TypeWorkpackModelEnum';
+import { SetConfigWorkpackService } from 'src/app/shared/services/set-config-workpack.service';
 
 @Component({
   selector: 'app-workpack',
@@ -142,7 +143,8 @@ export class WorkpackComponent implements OnDestroy {
     private propertySrv: WorkpackPropertyService,
     private breakdownStructureSrv: BreakdownStructureService,
     private personSrv: PersonService,
-    private breadcrumbSrv: BreadcrumbService
+    private breadcrumbSrv: BreadcrumbService,
+    private setConfigWorkpackSrv: SetConfigWorkpackService
   ) {
     this.actRouter.queryParams.subscribe(({ id }) => this.idWorkpack = id && +id);
     this.actRouter.queryParams.subscribe(async ({
@@ -647,7 +649,7 @@ export class WorkpackComponent implements OnDestroy {
             menuItems.push({
               label: this.translateSrv.instant('changeControlBoard'),
               icon: 'app-icon ccb-member',
-              command: (event) => this.navigateToConfigCCB(workpack.id),
+              command: async (event) =>  await this.navigateToConfigCCB(workpack.id),
             });
             if (!workpack.pendingBaseline && !workpack.cancelPropose && !!workpack.hasActiveBaseline && !workpack.linked) {
               menuItems.push({
@@ -961,7 +963,8 @@ export class WorkpackComponent implements OnDestroy {
     }
   }
 
-  navigateToConfigCCB(idProject: number) {
+  async navigateToConfigCCB(idProject: number) {
+    await this.setConfigWorkpackSrv.setWorkpackConfig(this.idPlan, idProject);
     this.router.navigate(
       ['/workpack/change-control-board'],
       {

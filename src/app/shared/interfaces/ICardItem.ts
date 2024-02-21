@@ -38,5 +38,6 @@ export interface ICardItem {
   profileView?: boolean;
   priority?: boolean;
   main?: boolean;
+  onClick?;
 }
 

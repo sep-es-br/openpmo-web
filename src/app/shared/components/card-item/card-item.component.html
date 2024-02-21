@@ -228,8 +228,8 @@
   <p-card *ngSwitchCase="'listItemPermissionWorkpack'" class="app-card-item listItem" [class.mobile]="responsive"
     [class.cardList]="displayModeCard === 'list'">
     <p-header class="card-item-header" [class.header-fixed]="!!properties.profileView">
-      <button class="button-change" pButton [label]="' ' | translate" [routerLink]="properties.urlCard"
-        *ngIf="!properties.profileView" [queryParams]="getQueryParams()">
+      <button class="button-change" pButton [label]="' ' | translate"
+        *ngIf="!properties.profileView" (click)="handleLoadPermission()">
         <i class="fas fa-share"></i>
       </button>
     </p-header>

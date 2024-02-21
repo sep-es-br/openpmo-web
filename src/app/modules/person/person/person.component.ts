@@ -18,6 +18,8 @@ import { AuthService } from 'src/app/shared/services/auth.service';
 import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
 import { Location } from '@angular/common';
 import { MinLengthTextCustomValidator } from 'src/app/shared/utils/minLengthTextValidator';
+import { WorkpackService } from 'src/app/shared/services/workpack.service';
+import { SetConfigWorkpackService } from 'src/app/shared/services/set-config-workpack.service';
 
 @Component({
   selector: 'app-person',
@@ -64,6 +66,7 @@ export class PersonComponent implements OnInit, OnDestroy {
     private officeSrv: OfficeService,
     private location: Location,
     private officePermissionSrv: OfficePermissionService,
+    private setConfigWorkpackSrv: SetConfigWorkpackService
   ) {
     this.activeRoute.queryParams.subscribe(async ({ idOffice, idPerson }) => {
       this.idOffice = +idOffice;
@@ -71,8 +74,8 @@ export class PersonComponent implements OnInit, OnDestroy {
       await this.loads();
     });
     this.formPerson = this.formBuilder.group({
-      name: ['',[ Validators.required, MinLengthTextCustomValidator.minLengthText]],
-      fullname: ['',[ Validators.required, MinLengthTextCustomValidator.minLengthText]],
+      name: ['', [Validators.required, MinLengthTextCustomValidator.minLengthText]],
+      fullname: ['', [Validators.required, MinLengthTextCustomValidator.minLengthText]],
       email: [''],
       contactEmail: ['', [Validators.email]],
       phoneNumber: [''],
@@ -100,7 +103,7 @@ export class PersonComponent implements OnInit, OnDestroy {
     this.$destroy.complete();
   }
 
-  setPhoneNumberMask(){
+  setPhoneNumberMask() {
     const valor = this.formPerson.controls.phoneNumber.value;
     if (!valor || valor.length === 0) {
       this.phoneNumberPlaceholder = '';
@@ -203,41 +206,49 @@ export class PersonComponent implements OnInit, OnDestroy {
   }
 
   setCardsPlans(person: IPerson) {
-    this.cardsPlans = person?.officePermission?.planPermissions?.filter( planPermission =>
+    this.cardsPlans = person?.officePermission?.planPermissions?.filter(planPermission =>
       planPermission.accessLevel !== 'NONE' || (planPermission.accessLevel === 'NONE' && planPermission.workpacksPermission && planPermission.workpacksPermission.length > 0))
       .map(plan => ({
-      toggleable: false,
-      initialStateToggle: false,
-      collapseble: true,
-      initialStateCollapse: false,
-      cardTitle: plan.name,
-      cardItems: plan.workpacksPermission.map(workpack => {
-        const cardItem: ICardItem = {
-          icon: workpack.icon,
-          typeCardItem: 'listItemPermissionWorkpack',
-          itemId: workpack.id,
-          urlCard: workpack.ccbMember ? `/workpack/change-control-board/member` : `/stakeholder/person`,
-          paramsUrlCard: workpack.ccbMember ?
-          [
-            { name: 'idProject',  value: workpack.id },
-            { name: 'idPerson', value: this.propertiesPerson.id },
-            { name: 'id', value: this.propertiesPerson.id },
-            { name: 'idOffice',  value: this.idOffice },
-            { name: 'idPlan', value: plan.id}
-          ]
-            : [
-            { name: 'idWorkpack', value: workpack.id },
-            { name: 'idPerson', value: this.propertiesPerson.id },
-            { name: 'idPlan', value: plan.id}
-          ],
-          nameCardItem: workpack.name,
-          subtitleCardItem: workpack?.roles?.map( role => this.translateSrv.instant(role)).join(', '),
-          statusItem: workpack.ccbMember ? 'ccbMember' : workpack.accessLevel !== 'NONE' ? workpack.accessLevel : null,
-        };
-        return cardItem;
-      }),
-    }));
+        toggleable: false,
+        initialStateToggle: false,
+        collapseble: true,
+        initialStateCollapse: false,
+        cardTitle: plan.name,
+        cardItems: plan.workpacksPermission.map(workpack => {
+          const urlCard = workpack.ccbMember ? `/workpack/change-control-board/member` : `/stakeholder/person`;
+          const queryParams = workpack.ccbMember ?
+            {
+              idProject: workpack.id,
+              idPerson: this.propertiesPerson.id,
+              id: this.propertiesPerson.id,
+              idOffice: this.idOffice,
+              idPlan: plan.id
+            } :
+            {
+              idWorkpack: workpack.id,
+              idPerson: this.propertiesPerson.id,
+              idPlan: plan.id
+            }
+          const cardItem: ICardItem = {
+            icon: workpack.icon,
+            typeCardItem: 'listItemPermissionWorkpack',
+            itemId: workpack.id,
+            nameCardItem: workpack.name,
+            subtitleCardItem: workpack?.roles?.map(role => this.translateSrv.instant(role)).join(', '),
+            statusItem: workpack.ccbMember ? 'ccbMember' : workpack.accessLevel !== 'NONE' ? workpack.accessLevel : null,
+            onClick: async () => await this.loadWorkpackConfig(plan.id, workpack.id, urlCard, queryParams)
+          };
+          return cardItem;
+        }),
+      }));
     this.loading = false;
+  }
+
+  async loadWorkpackConfig(idPlan, idWorkpack, url, queryParams) {
+    await this.setConfigWorkpackSrv.setWorkpackConfig(idPlan, idWorkpack);
+    this.router.navigate([url], {
+      queryParams
+    });
   }
 
   navigateToPage(url: string, key: string, idOffice?: number, idPlan?: number) {
@@ -278,12 +289,12 @@ export class PersonComponent implements OnInit, OnDestroy {
       await this.updateAvatar();
     }
     if (this.deletedAvatar) {
-      await this.personSrv.deleteAvatar(this.idPerson, {'id-office': this.idOffice});
+      await this.personSrv.deleteAvatar(this.idPerson, { 'id-office': this.idOffice });
       this.deletedAvatar = false;
     }
     let phoneNumber = this.formPerson.controls.phoneNumber.value;
     if (phoneNumber) {
-      phoneNumber = phoneNumber.replace(/[^0-9]+/g,'');
+      phoneNumber = phoneNumber.replace(/[^0-9]+/g, '');
     }
     const { success, data } = await this.personSrv.PutWithContactOffice({
       ...this.propertiesPerson,
@@ -309,10 +320,10 @@ export class PersonComponent implements OnInit, OnDestroy {
       hasAvatar
     } = this.avatarData;
     let result;
-     if (hasAvatar) {
-      result = await this.personSrv.putAvatar(formData, this.idPerson, {'id-office': this.idOffice});
+    if (hasAvatar) {
+      result = await this.personSrv.putAvatar(formData, this.idPerson, { 'id-office': this.idOffice });
     } else {
-      result = await this.personSrv.postAvatar(formData, this.idPerson, {'id-office': this.idOffice});
+      result = await this.personSrv.postAvatar(formData, this.idPerson, { 'id-office': this.idOffice });
     }
     if (result.success) {
       this.changedAvatar = false;
