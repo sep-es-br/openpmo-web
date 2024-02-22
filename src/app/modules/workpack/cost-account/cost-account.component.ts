@@ -144,7 +144,7 @@ export class CostAccountComponent implements OnInit {
 
   async loadWorkpack(onlyBreadcrumb: boolean = false) {
     const workpackData = this.workpackSrv.getWorkpackData();
-    if (workpackData && workpackData.workpack) {
+    if (workpackData && workpackData.workpack && workpackData.workpack.id === this.idWorkpack) {
       this.workpack = workpackData.workpack;
     } else {
       const result = await this.workpackSrv.GetWorkpackById(this.idWorkpack, { 'id-plan': this.idPlan });

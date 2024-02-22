@@ -134,7 +134,7 @@ export class StakeholderOrganizationComponent implements OnInit {
 
   async loadWorkpack() {
     const workpackData = this.workpackSrv.getWorkpackData();
-    if (workpackData && workpackData.workpack && workpackData.workpackModel) {
+    if (workpackData && workpackData.workpack && workpackData.workpack.id === this.idWorkpack && workpackData.workpackModel) {
       this.workpack = workpackData.workpack;
       this.rolesOptions = workpackData.workpackModel.organizationRoles?.map(role => ({ label: role, value: role }));
 

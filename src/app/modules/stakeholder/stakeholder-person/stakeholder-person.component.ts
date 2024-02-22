@@ -160,7 +160,7 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
   
   async loadWorkpack() {
     const workpackData = this.workpackSrv.getWorkpackData();
-    if (workpackData && workpackData.workpack && workpackData.workpackModel) {
+    if (workpackData && workpackData.workpack && workpackData.workpack.id === this.idWorkpack && workpackData.workpackModel) {
       this.workpack = workpackData.workpack;
       this.personRolesOptions = workpackData.workpackModel.personRoles?.map(role => ({
         label: role,

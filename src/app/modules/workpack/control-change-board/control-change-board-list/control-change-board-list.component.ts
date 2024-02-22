@@ -101,7 +101,7 @@ export class ControlChangeBoardListComponent implements OnInit, OnDestroy {
     this.isUserAdmin = await this.authSrv.isUserAdmin();
     this.idPlan = Number(localStorage.getItem('@currentPlan'));
     const workpackData = this.workpackSrv.getWorkpackData();
-    if (workpackData && workpackData.workpack) {
+    if (workpackData && workpackData.workpack && workpackData.workpack.id === this.idProject) {
       this.projectName = workpackData.workpack.name;
       if (this.isUserAdmin) {
         this.editPermission = true;
