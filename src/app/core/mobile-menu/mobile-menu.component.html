@@ -25,7 +25,7 @@
       (click)="toggleMenu('portfolio')" [pTooltip]="currentPlan?.name"
       *ngIf="!!currentIDOffice && !!currentIDPlan && isPlanMenu">
       <i class="app-icon briefcase" [ngStyle]="{ fontSize: '1.9rem' }"></i>
-      <div class="item-label" [routerLink]="['/plan']" [queryParams]="{id: currentPlan?.id}">{{
+      <div class="item-label">{{
         currentPlan?.name }}</div>
     </div>
     <div class="item" [ngStyle]="{width: '20%'}" (click)="toggleMenu('favorite')"

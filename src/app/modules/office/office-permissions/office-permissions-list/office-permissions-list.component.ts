@@ -139,7 +139,7 @@ export class OfficePermissionsListComponent implements OnInit {
 
   loadCardItemsOfficePermissions() {
     if (this.officePermissions) {
-      this.cardItemsOfficePermissions = this.officePermissions.map(p => {
+      this.cardItemsOfficePermissions = this.officePermissions.filter(p => p.permissions && p.permissions.filter( a => a.level !== 'NONE').length > 0).map(p => {
         const fullName = p.person.name.split(' ');
         const name = fullName.length > 1 ? fullName[0] + ' ' + fullName[1] : fullName[0];
         return {
