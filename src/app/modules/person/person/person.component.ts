@@ -215,7 +215,7 @@ export class PersonComponent implements OnInit, OnDestroy {
         initialStateCollapse: false,
         cardTitle: plan.name,
         cardItems: plan.workpacksPermission.map(workpack => {
-          const urlCard = workpack.ccbMember ? `/workpack/change-control-board/member` : `/stakeholder/person`;
+          const urlCard = workpack.ccbMember === true ? `/workpack/change-control-board/member` : `/stakeholder/person`;
           const queryParams = workpack.ccbMember ?
             {
               idProject: workpack.id,
@@ -235,7 +235,7 @@ export class PersonComponent implements OnInit, OnDestroy {
             itemId: workpack.id,
             nameCardItem: workpack.name,
             subtitleCardItem: workpack?.roles?.map(role => this.translateSrv.instant(role)).join(', '),
-            statusItem: workpack.ccbMember ? 'ccbMember' : workpack.accessLevel !== 'NONE' ? workpack.accessLevel : null,
+            statusItem: workpack.ccbMember === true ? 'ccbMember' : workpack.accessLevel !== 'NONE' ? workpack.accessLevel : null,
             onClick: async () => await this.loadWorkpackConfig(plan.id, workpack.id, urlCard, queryParams)
           };
           return cardItem;
