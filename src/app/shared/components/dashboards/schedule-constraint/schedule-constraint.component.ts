@@ -106,7 +106,7 @@ export class ScheduleConstraintComponent implements OnInit {
         if (moment(a).isAfter(moment(b))) {return a;}
         else {return b;}
       });
-      this.monthsInPeriod = Number((moment(endDate, 'yyyy-MM-DD').diff(moment(startDate, 'yyyy-MM-DD'), 'days') / 30).toFixed(1));
+      this.monthsInPeriod = Number((moment(endDate, 'yyyy-MM-DD').diff(moment(startDate, 'yyyy-MM-DD'), 'months') + 1).toFixed(1));
       if (this.monthsInPeriod < 1) this.monthsInPeriod = 1;
       this.difPlannedStartDateToMinStartDate = Number((moment(this.schedule.plannedStartDate, 'yyyy-MM-DD').diff(moment(startDate, 'yyyy-MM-DD'), 'days') / 30).toFixed(1));
       this.difForeseenStartDateToMinStartDate = Number((moment(this.schedule.foreseenStartDate, 'yyyy-MM-DD').diff(moment(startDate, 'yyyy-MM-DD'), 'days') / 30).toFixed(1));
