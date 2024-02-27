@@ -108,16 +108,16 @@ export class ScheduleConstraintComponent implements OnInit {
       });
       this.monthsInPeriod = Number((moment(endDate, 'yyyy-MM-DD').diff(moment(startDate, 'yyyy-MM-DD'), 'months') + 1).toFixed(1));
       if (this.monthsInPeriod < 1) this.monthsInPeriod = 1;
-      this.difPlannedStartDateToMinStartDate = Number((moment(this.schedule.plannedStartDate, 'yyyy-MM-DD').diff(moment(startDate, 'yyyy-MM-DD'), 'days') / 30).toFixed(1));
-      this.difForeseenStartDateToMinStartDate = Number((moment(this.schedule.foreseenStartDate, 'yyyy-MM-DD').diff(moment(startDate, 'yyyy-MM-DD'), 'days') / 30).toFixed(1));
-      this.difActualStartDateToMinStartDate = Number((moment(this.schedule.actualStartDate, 'yyyy-MM-DD').diff(moment(startDate, 'yyyy-MM-DD'), 'days') / 30).toFixed(1));
+      this.difPlannedStartDateToMinStartDate = Number((moment(this.schedule.plannedStartDate, 'yyyy-MM-DD').diff(moment(startDate, 'yyyy-MM-DD'), 'months') ).toFixed(1));
+      this.difForeseenStartDateToMinStartDate = Number((moment(this.schedule.foreseenStartDate, 'yyyy-MM-DD').diff(moment(startDate, 'yyyy-MM-DD'), 'months') ).toFixed(1));
+      this.difActualStartDateToMinStartDate = Number((moment(this.schedule.actualStartDate, 'yyyy-MM-DD').diff(moment(startDate, 'yyyy-MM-DD'), 'months') ).toFixed(1));
       this.marginLeftPlanned = this.monthsInPeriod > 0 ? (100 / this.monthsInPeriod) * this.difPlannedStartDateToMinStartDate : 0;
       this.marginLeftForeseen = this.monthsInPeriod > 0 ? (100 / this.monthsInPeriod) * this.difForeseenStartDateToMinStartDate : 0;
       this.marginLeftActual = this.monthsInPeriod > 0 ? (100 / this.monthsInPeriod) * this.difActualStartDateToMinStartDate : 0;
 
-      this.difPlannedEndDateToMaxEndDate = Number((moment(endDate, 'yyyy-MM-DD').diff(moment(this.schedule.plannedEndDate, 'yyyy-MM-DD'), 'days') / 30).toFixed(1));
-      this.difForeseenEndDateToMaxEndDate = Number((moment(endDate, 'yyyy-MM-DD').diff(moment(this.schedule.foreseenEndDate, 'yyyy-MM-DD'), 'days') / 30).toFixed(1));
-      this.difActualEndDateToMaxEndDate = Number((moment(endDate, 'yyyy-MM-DD').diff(moment(this.schedule.actualEndDate, 'yyyy-MM-DD'), 'days') / 30).toFixed(1));
+      this.difPlannedEndDateToMaxEndDate = Number((moment(endDate, 'yyyy-MM-DD').diff(moment(this.schedule.plannedEndDate, 'yyyy-MM-DD'), 'months') ).toFixed(1));
+      this.difForeseenEndDateToMaxEndDate = Number((moment(endDate, 'yyyy-MM-DD').diff(moment(this.schedule.foreseenEndDate, 'yyyy-MM-DD'), 'months') ).toFixed(1));
+      this.difActualEndDateToMaxEndDate = Number((moment(endDate, 'yyyy-MM-DD').diff(moment(this.schedule.actualEndDate, 'yyyy-MM-DD'), 'months') ).toFixed(1));
 
       this.marginRightPlanned = this.monthsInPeriod > 0 ? (100 / this.monthsInPeriod) * this.difPlannedEndDateToMaxEndDate : 0;
       this.marginRightForeseen = this.monthsInPeriod > 0 ? (100 / this.monthsInPeriod) * this.difForeseenEndDateToMaxEndDate : 0;
