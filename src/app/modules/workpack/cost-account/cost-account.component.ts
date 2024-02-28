@@ -25,6 +25,7 @@ import { AuthService } from 'src/app/shared/services/auth.service';
 import { CostAccountModelService } from 'src/app/shared/services/cost-account-model.service';
 import { ICostAccountModel } from 'src/app/shared/interfaces/ICostAccountModel';
 import { IOrganization } from 'src/app/shared/interfaces/IOrganization';
+import { CancelButtonComponent } from 'src/app/shared/components/cancel-button/cancel-button.component';
 
 @Component({
   selector: 'app-cost-account',
@@ -34,6 +35,7 @@ import { IOrganization } from 'src/app/shared/interfaces/IOrganization';
 export class CostAccountComponent implements OnInit {
 
   @ViewChild(SaveButtonComponent) saveButton: SaveButtonComponent;
+  @ViewChild(CancelButtonComponent) cancelButton: CancelButtonComponent;
 
   responsive: boolean;
   idWorkpack: number;
@@ -55,6 +57,7 @@ export class CostAccountComponent implements OnInit {
   idPlanModel: number;
   organizations: IOrganization[] = [];
   formIsSaving = false;
+  backupProperties;
 
   constructor(
     private actRouter: ActivatedRoute,
@@ -73,7 +76,7 @@ export class CostAccountComponent implements OnInit {
     private costAccountModelSrv: CostAccountModelService
   ) {
     this.actRouter.queryParams.subscribe(async queryParams => {
-      this.idCostAccount = queryParams.id;
+      this.idCostAccount = queryParams.idCostAccount;
       this.idWorkpack = queryParams.idWorkpack;
       this.idPlan = queryParams.idPlan;
       this.idWorkpackModelLinked = queryParams.idWorkpackModelLinked;
@@ -109,6 +112,7 @@ export class CostAccountComponent implements OnInit {
       await this.loadOrganizationsOffice();
     }
     this.sectionCostAccountProperties = await Promise.all(costAccountModelActiveProperties.map(p => this.instanceProperty(p)));
+    this.backupProperties = this.sectionCostAccountProperties.map( prop => this.instanceBackupProperty(prop));
   }
 
   async loadCardCostAccountProperties() {
@@ -238,6 +242,7 @@ export class CostAccountComponent implements OnInit {
     property.multipleSelection = propertyModel.multipleSelection;
     property.rows = propertyModel.rows;
     property.decimals = propertyModel.decimals;
+    property.helpText = propertyModel.helpText;
     if (this.typePropertyModel[propertyModel.type] === TypePropertyModelEnum.ToggleModel) {
       property.value = propertyCostAccount && (propertyCostAccount?.value !== null && propertyCostAccount?.value !== undefined) ?
         propertyCostAccount?.value : propertyModel.defaultValue;
@@ -331,6 +336,48 @@ export class CostAccountComponent implements OnInit {
     if (property.name.toLowerCase() === 'limit') {
       this.costAccountLimit = property.value && Number(property.value) ? Number(property.value) : 0;
     }
+    return property;
+  }
+
+  instanceBackupProperty(pro: PropertyTemplateModel) {
+    const property = new PropertyTemplateModel();
+    property.active = pro.active;
+    property.id = pro.id;
+    property.type = pro.type;
+    property.idPropertyModel = pro.idPropertyModel;
+    property.fullLine = pro.fullLine;
+    property.label = pro.label;
+    property.name = pro.name;
+    property.required = pro.required;
+    property.disabled = pro.disabled;
+    property.sortIndex = pro.sortIndex;
+    property.defaultValue = pro.defaultValue;
+    property.defaults = pro.defaults;
+    property.min = pro.min;
+    property.max = pro.max;
+    property.precision = pro.precision;
+    property.possibleValues = pro.possibleValues;
+    property.possibleValuesIds = pro.possibleValuesIds;
+    property.multipleSelection = pro.multipleSelection;
+    property.rows = pro.rows;
+    property.decimals = pro.decimals;
+    property.localityList = pro.localityList;
+    property.idDomain = pro.idDomain;
+    property.localitiesSelected = pro.localitiesSelected;
+    property.labelButtonLocalitySelected = pro.labelButtonLocalitySelected;
+    property.showIconButton = pro.showIconButton;
+    property.value = pro.value;
+    property.selectedValues = pro.selectedValues;
+    property.selectedValue = pro.selectedValue;
+    property.invalid = pro.invalid;
+    property.message = pro.message;
+    property.groupedProperties = pro.groupedProperties;
+    property.milestoneData = pro.milestoneData;
+    property.reason = pro.reason;
+    property.needReason = pro.needReason;
+    property.collapsed = pro.collapsed;
+    property.dirty = pro.dirty;
+    property.helpText = pro.helpText;
     return property;
   }
 
@@ -450,6 +497,7 @@ export class CostAccountComponent implements OnInit {
 
 
   checkProperties(property: PropertyTemplateModel) {
+    this.cancelButton.showButton();
     if (property.name === 'name') {
       this.mirrorToFullName(property);
     }
@@ -498,7 +546,7 @@ export class CostAccountComponent implements OnInit {
       .filter(({ min, max, value }) => ((min || max) && typeof value == 'string'))
       .map((prop) => {
         let valid = true;
-        valid = prop.min ? String(prop.value).length >= prop.min : true;
+        valid = (prop.min && prop.required) || (prop.min && prop.value && String(prop.value).length > 0)  ? String(prop.value).length >= prop.min : true;
         if (property.idPropertyModel === prop.idPropertyModel) {
           prop.invalid = !valid;
           prop.message = !valid ? prop.message = this.translateSrv.instant('minLenght') : '';
@@ -519,10 +567,12 @@ export class CostAccountComponent implements OnInit {
   }
 
   async saveCostAccount() {
+    this.cancelButton.hideButton();
     this.costAccountProperties = this.sectionCostAccountProperties.map(p => p.getValues());
     if (this.sectionCostAccountProperties.filter(p => p.invalid).length > 0) {
       return;
     }
+
     this.formIsSaving = true;
     if (this.idCostAccount) {
       const costAccount = {
@@ -566,4 +616,10 @@ export class CostAccountComponent implements OnInit {
       }
     }
   }
+
+  handleOnCancel() {
+    this.saveButton.hideButton();
+    this.sectionCostAccountProperties = this.backupProperties.map( prop => this.instanceBackupProperty(prop));
+  }
+
 }

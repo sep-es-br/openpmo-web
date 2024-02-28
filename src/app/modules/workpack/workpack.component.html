@@ -7,7 +7,7 @@
   <div class="header-container" [class.mobile]="responsive" *ngIf="workpackModel && idWorkpack && !workpackLoading">
     <div class="app-content-header" [class.mobile]="responsive">
       <span class="label">{{workpackModel?.modelName}}:</span>
-      <span class="text">{{workpack?.fullName}}</span>
+      <span class="text actual-element">{{workpack?.fullName}}</span>
     </div>
     <div class="container-actions">
       <i 
@@ -232,11 +232,14 @@
     </div>
   </div>
 
-  <div class="id-container" *ngIf="idWorkpack  && !workpackLoading && workpackModel">
+  <div class="id-container" *ngIf="idWorkpack  && !workpackLoading && workpackModel && (!showTabview || (!showTabview && selectedTab && selectedTab.key !== 'schedule'))">
     <span>{{idWorkpack}}</span>
   </div>
 
-  <app-save-button #saveButton (save)="onSaveButtonClicked()"></app-save-button>
+  <app-buttons-container>
+    <app-save-button #saveButton (save)="onSaveButtonClicked()"></app-save-button>
+    <app-cancel-button (cancel)="handleOnCancel()"></app-cancel-button>
+  </app-buttons-container>
 
   <p-dialog class="end-management-dialog" [class.responsive]="!!responsive" [header]="'endManagement' |translate"
     [(visible)]="showDialogEndManagement" [style]="!responsive ? {width: '30vw'} : {width: '90vw'}" [closable]="false"

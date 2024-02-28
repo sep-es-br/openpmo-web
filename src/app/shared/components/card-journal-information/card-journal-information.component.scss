@@ -1,0 +1,89 @@
+::ng-deep .app-card-journal-information {
+  .p-card {
+    width: 100% !important;
+    height: 100% !important;
+    max-height: 100% !important;
+    .p-card-body {
+      padding: 0.5rem !important;
+    }
+    .p-card-header {
+      padding: 0.5rem;
+    }
+    .p-card-subtitle {
+      display: flex;
+      flex-direction: column;
+      span {
+        font-size: 0.8rem;
+        margin-bottom: 0.5rem;
+      }
+      .author, .level, .target {
+        margin-top: 0.5em;
+        > label {
+          margin-right: 0.5em;
+          font-size: 0.8rem;
+          font-weight: bold;
+        }
+        > span {
+          font-size: 0.9rem;
+        }
+      }
+      .target {
+        margin-bottom: 0.5em;
+      }
+    }
+    .p-card-content {
+      display: flex;
+      flex-direction: column;
+      padding: 0.5rem 0;
+      max-width: 300px !important;
+      .workpack-info {
+        font-size: 0.8rem;
+      }
+      .title {
+        font-size: 0.8rem;
+        margin-top: 1rem;
+      }
+      .description-info {
+        font-size: 0.7rem;
+        line-height: 1.2rem;
+        text-align: justify;
+        border: none;
+        height: auto !important;
+        overflow: auto !important;
+        text-wrap: wrap;
+        max-width: 100%;
+      }
+      .evidences {
+        display: flex;
+        flex-direction: column;
+        margin-top: 1rem;
+        figure {
+          margin: 0;
+          display: flex;
+          flex-wrap: wrap;
+          .evidence {
+            margin-right: 1.6rem;
+            margin-bottom: 1.6rem;
+            max-width: 80px;
+            .image {
+              width: 100%;
+              cursor: pointer;
+            }
+            .icon {
+              cursor: pointer;
+              font-size: 3rem;
+            }
+            .legend {
+              font-size: 0.65rem;
+              white-space: nowrap;
+              word-break: break-word;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              margin-top: 5px;
+            }
+          }
+        }
+      }
+    }
+  }
+}

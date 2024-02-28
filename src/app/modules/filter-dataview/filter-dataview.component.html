@@ -20,7 +20,9 @@
               <span class="p-float-label">
                 <input class="app-input-text" [class.responsive]="responsive" formControlName="name" type="text"
                   pInputText />
-                <label class="app-input-label" for="float-name">{{ "name" | translate }} * </label>
+                <label class="app-input-label" for="float-name">{{ "name" | translate }} * 
+                  <i class="far fa-question-circle" [pTooltip]="'help.filter.name' | translate"></i>
+                </label>
               </span>
               <app-input-message [form]="formFilter" field="name"></app-input-message>
             </div>
@@ -34,7 +36,9 @@
               <span class="p-float-label">
                 <p-dropdown class="app-single-selection" [class.responsive]="responsive" [autoDisplayFirst]="false"
                   [options]="propertiesListOptions" formControlName="sortBy"></p-dropdown>
-                <label class="app-input-label" for="float-name">{{ "sortBy" | translate }} * </label>
+                <label class="app-input-label" for="float-name">{{ "sortBy" | translate }} *
+                  <i class="far fa-question-circle" [pTooltip]="'help.filter.sortBy' | translate"></i>
+                </label>
               </span>
               <app-input-message [form]="formFilter" field="sortBy"></app-input-message>
             </div>
@@ -73,5 +77,8 @@
   <div class="id-container" *ngIf="idFilter">
     <span>{{idFilter}}</span>
   </div>
-  <app-save-button (save)="handleOnSubmit()"></app-save-button>
+  <app-buttons-container>
+    <app-save-button (save)="handleOnSubmit()"></app-save-button>
+    <app-cancel-button (cancel)="handleOnCancel()"></app-cancel-button>
+  </app-buttons-container>
 </div>

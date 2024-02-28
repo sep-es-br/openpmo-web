@@ -30,7 +30,9 @@
         [readonly]="isReadOnly" [autoDisplayFirst]="false" (onChange)="handleSelect()"
         [options]="properties.levelListOptions" [(ngModel)]="properties.selectedOption">
       </p-dropdown>
-      <label class="app-input-label" for="level-dropdown">{{ "level" | translate }}</label>
+      <label class="app-input-label" for="level-dropdown">{{ "level" | translate }}
+        <i class="far fa-question-circle" [pTooltip]="'help.permission.level' | translate"></i>
+      </label>
     </span>
   </div>
 </p-card>
@@ -40,7 +42,7 @@
   <div class="card-item-content">
     <i [ngClass]="[ 'app-icon', newItemIcon, 'light-grey-icon' ]"
       (click)="navigateToPage(properties.urlCard, properties.paramsUrlCard)"
-      [ngStyle]="{ fontSize: !responsive ? '3rem' : '2rem', cursor: 'pointer' }"></i>
+      [ngStyle]="{ fontSize: !responsive ? '2.2rem' : '2rem', cursor: 'pointer' }"></i>
   </div>
 </p-card>
 
@@ -56,7 +58,9 @@
         [readonly]="isReadOnly || properties.readOnly" [autoDisplayFirst]="false" (onChange)="handleSelect()"
         [options]="properties.levelListOptions" [(ngModel)]="properties.selectedOption">
       </p-dropdown>
-      <label class="app-input-label" for="level-dropdown">{{ "level" | translate }}</label>
+      <label class="app-input-label" for="level-dropdown">{{ "level" | translate }}
+        <i class="far fa-question-circle" [pTooltip]="'help.permission.level' | translate"></i>
+      </label>
     </span>
   </div>
 </p-card>
@@ -66,7 +70,7 @@
   <div class="card-item-content">
     <i [ngClass]="[ 'app-icon', newItemIcon, 'light-grey-icon' ]"
       (click)=" properties.iconMenuItems && menuIcon.toggle($event)"
-      [ngStyle]="{ fontSize: (responsive ? 2 : 3) + 'rem', cursor: 'pointer' }" [class.card-link]="properties.iconMenuItems"></i>
+      [ngStyle]="{ fontSize: (responsive ? 2 : 2.2) + 'rem', cursor: 'pointer' }" [class.card-link]="properties.iconMenuItems"></i>
     <p-tieredMenu #menuIcon [popup]="true" [model]="properties.iconMenuItems"></p-tieredMenu>
   </div>
 </p-card>

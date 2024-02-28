@@ -21,7 +21,9 @@
                   icon="fas fa-calendar-alt" (onSelect)="handleChangeValues(); handleChangeScheduleStartDate()"
                   [dateFormat]="calendarFormat">
                 </p-calendar>
-                <label class="app-input-label" for="float-start">{{ "start" | translate }}</label>
+                <label class="app-input-label" for="float-start">{{ "start" | translate }} *
+                  <i class="far fa-question-circle" [pTooltip]="'help.schedule.start' | translate"></i>
+                </label>
               </span>
             </div>
             <div class="p-field" [class.responsive]="responsive">
@@ -30,7 +32,9 @@
                   [monthNavigator]="true" [yearNavigator]="true" [yearRange]="yearRange" [class.responsive]="responsive"
                   icon="fas fa-calendar-alt" (onSelect)="handleChangeValues()" [dateFormat]="calendarFormat">
                 </p-calendar>
-                <label class="app-input-label" class="properties-label" for="float-end">{{ "finish" |translate}}</label>
+                <label class="app-input-label" class="properties-label" for="float-end">{{ "finish" |translate}} *
+                  <i class="far fa-question-circle" [pTooltip]="'help.schedule.finish' | translate"></i>
+                </label>
               </span>
             </div>
           </div>
@@ -44,8 +48,9 @@
                     [class.red]="formSchedule && formSchedule.controls.plannedWork.value < 0"
                       (onInput)="handleChangeValues()" (onBlur)="handleChangeValues()" [class.responsive]="responsive">
                     </p-inputNumber>
-                    <label class="app-input-label" for="float-planned">{{unitMeasure}} {{ "planned" |translate
-                      }} * </label>
+                    <label class="app-input-label" for="float-planned">{{unitMeasure}} {{ "planned" |translate}} * 
+                    <i class="far fa-question-circle" [pTooltip]="'help.schedule.estimatedPhysical' | translate"></i>  
+                    </label>
                   </span>
                   
                 </div>
@@ -56,8 +61,9 @@
                       (onInput)="handleActualWorkChangeValues($event, 'input')"
                       (onBlur)="handleActualWorkChangeValues($event, 'blur')" [class.responsive]="responsive">
                     </p-inputNumber>
-                    <label class="app-input-label" for="float-actual">{{unitMeasure}} {{ "actual" |translate
-                      }}</label>
+                    <label class="app-input-label" for="float-actual">{{unitMeasure}} {{ "actual" |translate}}
+                      <i class="far fa-question-circle" [pTooltip]="'help.schedule.actualPhysical' | translate"></i>
+                    </label>
                   </span>
                   <div class="actual-validation-message-container" *ngIf="actualValidationMessage">
                     <span>{{actualValidationMessage}}</span>
@@ -66,18 +72,24 @@
               </div>
               <div class="cost-assignments-totals" [class.responsive]="responsive">
                 <div class="planned-total">
-                  <span class="label"> $ {{ "planned" |translate }}</span>
+                  <span class="label"> $ {{ "planned" |translate }}
+                    <i class="far fa-question-circle" [pTooltip]="'help.schedule.estimatedCostTotal' | translate"></i>
+                  </span>
                   <span class="value" [class.red]="costAssignmentsTotals.plannedTotal < 0" >{{costAssignmentsTotals.plannedTotal|number:'0.2-2': currentLang}}</span>
                 </div>
                 <div class="actual-total">
-                  <span class="label"> $ {{ "actual" |translate }}</span>
+                  <span class="label"> $ {{ "actual" |translate }}
+                    <i class="far fa-question-circle" [pTooltip]="'help.schedule.actualCostTotal' | translate"></i>
+                  </span>
                   <span class="value"  [class.red]="costAssignmentsTotals.actualTotal < 0">{{costAssignmentsTotals.actualTotal|number:'0.2-2': currentLang}}</span>
                 </div>
               </div>
             </div>
           </div>
           <div class="p-field distribution-container" [class.responsive]="responsive">
-            <label class="app-input-label" class="properties-label" for="float-end">{{ "distribution" |translate}}</label>
+            <label class="app-input-label" class="properties-label" for="float-end">{{ "distribution" |translate}}
+              <i class="far fa-question-circle" [pTooltip]="'help.schedule.distribution' | translate"></i>
+            </label>
             <div class="radios-container">
               <p-radioButton class="distribution-radio" value="SIGMOIDAL" formControlName="distribution" [label]="'sigmoidal'| translate">
               </p-radioButton>
@@ -106,4 +118,7 @@
     </div>
   </div>
 </div>
-<app-save-button (save)="saveSchedule()"></app-save-button>
+<app-buttons-container>
+  <app-save-button (save)="saveSchedule()"></app-save-button>
+  <app-cancel-button (cancel)="handleOnCancel()"></app-cancel-button>
+</app-buttons-container>

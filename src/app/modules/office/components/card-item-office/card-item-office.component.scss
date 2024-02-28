@@ -7,8 +7,8 @@
     flex-direction: column;
     flex: 1;
     height: 100%;
-    max-width: 280px;
-    width: 280px;
+    max-width: 260px;
+    width: 260px;
     border: 1px solid v.$borderCard;
     box-shadow: none;
     display: flex;
@@ -22,12 +22,12 @@
         min-height: 37px;
         cursor: pointer;
         .fa-tools {
-          font-size: 1.1rem;
+          font-size: 1rem;
           transform: rotate(30deg);
           color: v.$iconGrey;
         }
         .fa-trash {
-          font-size: 1.1rem;
+          font-size: 1rem;
           color: v.$iconGrey;
         }
       }
@@ -90,24 +90,27 @@
         color: v.$iconLightGrey;
       }
       .card-item-name {
-        font-size: 1.2rem;
+        font-size: 0.9rem;
         font-family: v.$fontFamilyMedium;
         padding: 0.5em;
         display: flex;
         flex: 1;
         align-items: center;
         text-align: center;
+        max-width: 100%;
+        white-space: wrap;
+        word-break: break-word;
       }
       &.cardList {
         flex-direction: row;
         justify-content: flex-start;
-        margin-left: 2em;
+        margin-left: 1.5em;
       }
     }
     .card-item-footer {
       display: flex;
       justify-content: flex-end;
-      padding: 0.5em;
+      padding: 0.5em 0.5em 3px 0;
       .card-item-id {
         color: v.$fontGray;
         font-size: 0.6rem;
@@ -127,6 +130,7 @@
       height: 50px;
       width: 100%;
       .card-item-name {
+        width: max-content;
         flex: none;
       }
     }
@@ -139,8 +143,8 @@
     display: flex;
     justify-content: center;
     height: 100%;
-    max-width: 280px;
-    width: 280px;
+    max-width: 260px;
+    width: 260px;
     border: 1px solid v.$borderCard;
     box-shadow: none;
     .p-card-body {

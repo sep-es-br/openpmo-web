@@ -25,17 +25,23 @@
           <span class="p-float-label property-input p-field">
             <input class="app-input-text" id="input-name" type="text" pInputText formControlName="name"
               (change)="propertyChanged($event);" />
-            <label class="app-input-label" for="input-name">{{ 'modelName' | translate }} *</label>
+            <label class="app-input-label" for="input-name">{{ 'modelName' | translate }} *
+              <i class="far fa-question-circle" [pTooltip]="'help.workpackModel.modelName' | translate"></i>
+            </label>
           </span>
-          <span class="p-float-label property-input p-field">
+          <span class="p-float-label property-input p-field" [class.desktop-width]="!isMobileView">
             <input class="app-input-text" id="input-name-plural" type="text" pInputText formControlName="nameInPlural"
               (change)="propertyChanged($event);" />
-            <label class="app-input-label" for="input-name-plural">{{ 'modelNameInPlural' | translate }} *</label>
+            <label class="app-input-label" for="input-name-plural">{{ 'modelNameInPlural' | translate }} *
+              <i class="far fa-question-circle" [pTooltip]="'help.workpackModel.modelNameInPlural' | translate"></i>
+            </label>
           </span>
           <span class="p-float-label property-input p-field">
             <p-inputNumber class="app-input-number" id="input-position" formControlName="position" [min]="1" [step]="1"
               (onInput)="propertyChanged($event);"></p-inputNumber>
-            <label class="app-input-label" for="input-position">{{ 'position' | translate }} *</label>
+            <label class="app-input-label" for="input-position">{{ 'position' | translate }} *
+              <i class="far fa-question-circle" [pTooltip]="'help.workpackModel.position' | translate"></i>
+            </label>
           </span>
           <span class="p-float-label property-input p-field">
             <p-dropdown class="app-single-selection" inputId="input-icon" [options]="icons" formControlName="icon"
@@ -48,27 +54,31 @@
               </ng-template>
               <ng-template let-icon pTemplate="item">
                 <div class="icon-item">
-                  <i [ngClass]="icon.name"></i>
-                  <div>{{ icon.label }}</div>
+                  <div style="width: 40px;"><i [ngClass]="icon.name"></i></div>
+                  <div class="icon-description">{{ icon.label }}</div>
                 </div>
               </ng-template>
             </p-dropdown>
-            <label class="app-input-label" for="input-icon">{{ 'icon' | translate }} *</label>
+            <label class="app-input-label" for="input-icon">{{ 'icon' | translate }} *
+              <i class="far fa-question-circle" [pTooltip]="'help.workpackModel.icon' | translate"></i>
+            </label>
           </span>
           <span class="p-float-label property-input p-field">
             <p-dropdown class="app-single-selection" inputId="input-sort-by" (onClick)="getSortedByList()"
               (onChange)="propertyChanged($event);" [autoDisplayFirst]="true" [options]="sortedByList"
               formControlName="sortedBy">
             </p-dropdown>
-            <label class="app-input-label" for="input-sort-by">{{ 'sortedBy' | translate }} *</label>
+            <label class="app-input-label" for="input-sort-by">{{ 'sortedBy' | translate }} *
+              <i class="far fa-question-circle" [pTooltip]="'help.workpackModel.sortedBy' | translate"></i>
+            </label>
           </span>
         </div>
         <div class="workpack-model-addicional-properties add-actions" *ngIf="editPermission">
-          <p-menu #menuAddProperty [popup]="true" [model]="menuModelProperties"></p-menu>
-          <p-button [label]="'addProperty' | translate" icon="fa fa-plus" iconPos="right" class="button-add-property"
+          <p-menu class="menu-addicional-properties" #menuAddProperty [popup]="true" [model]="menuModelProperties"></p-menu>
+          <p-button [label]="'addProperty' | translate" icon="fa fa-plus" iconPos="right" class="button-add-property button-default-w8"
             (click)="menuAddProperty.toggle($event)">
           </p-button>
-          <p-button [label]="'addGroup' | translate" icon="fa fa-plus" iconPos="right" class="button-add-group"
+          <p-button [label]="'addGroup' | translate" icon="fa fa-plus" iconPos="right" class="button-add-group button-default-w8"
             (click)="addGroup()">
           </p-button>
         </div>
@@ -97,7 +107,9 @@
               (ngModelChange)="checkProperties(true)"
               [class.p-inputwrapper-filled]="posibleRolesPerson && !!posibleRolesPerson.length"
               [disabled]="!editPermission"></p-chips>
-            <label class="app-input-label" for="float-label">{{ 'possibleRolesPerson' | translate }} *</label>
+            <label class="app-input-label" for="float-label">{{ 'possibleRolesPerson' | translate }} *
+              <i class="far fa-question-circle" [pTooltip]="'help.workpackModel.stakeholdersPossibleRolesPerson' | translate"></i>
+            </label>
             <span class="under-label">{{ 'useCommaToSeparateValues' | translate }}</span>
           </span>
           <span class="p-float-label app-input-chips">
@@ -105,15 +117,19 @@
               (ngModelChange)="checkProperties(true)"
               [class.p-inputwrapper-filled]="posibleRolesOrg && !!posibleRolesOrg?.length" [disabled]="!editPermission">
             </p-chips>
-            <label class="app-input-label" for="float-label">{{ 'possibleRolesOrg' | translate }} *</label>
+            <label class="app-input-label" for="float-label">{{ 'possibleRolesOrg' | translate }} *
+              <i class="far fa-question-circle" [pTooltip]="'help.workpackModel.stakeholdersPossibleRolesOrganization' | translate"></i>
+            </label>
             <span class="under-label">{{ 'useCommaToSeparateValues' | translate }}</span>
           </span>
         </app-card>
       </div>
       <div class="card dashboard" *ngIf="dashboardPanel">
         <app-card [properties]="cardPropertiesDashboard" *ngIf="cardPropertiesDashboard" class="inputs-float-label">
-          <div class="dashboard-show-options app-input-chips">
-            <label class="app-input-label">{{'showStakeholders'|translate}}</label>
+          <div class="dashboard-show-options app-input-chips app-multiple-selection">
+            <label class="app-input-label">{{'showStakeholders'|translate}}
+              <i class="far fa-question-circle" [pTooltip]="'help.workpackModel.dashboardShowStakeholders' | translate"></i>
+            </label>
             <p-multiSelect [options]="dashboardPanel.dashboardStakeholderRolesOptions" optionLabel="label"
               [selectedItemsLabel]="currentLang === 'pt-BR' ? '{0} itens selecionados' : '{0} items selected'"
               (onChange)="checkProperties()" optionValue="value"
@@ -199,7 +215,10 @@
       <span>{{idWorkpackModel}}</span>
     </div>
   </div>
-  <app-save-button *ngIf="editPermission" #saveButton (save)="handleSubmit()"></app-save-button>
+  <app-buttons-container>
+    <app-save-button *ngIf="editPermission" #saveButton (save)="handleSubmit()"></app-save-button>
+    <app-cancel-button (cancel)="handleOnCancel()"></app-cancel-button>
+  </app-buttons-container>
 </div>
 
 <ng-template let-group #groupProperty>
@@ -224,8 +243,8 @@
       </div>
     </div>
     <div class="workpack-model-addicional-properties add-actions" *ngIf="editPermission">
-      <p-menu #menuAddPropertyGroup [popup]="true" [model]="group.menuModelProperties"></p-menu>
-      <p-button [label]="'addProperty' | translate" icon="fa fa-plus" iconPos="right"
+      <p-menu class="menu-addicional-properties" #menuAddPropertyGroup [popup]="true" [model]="group.menuModelProperties"></p-menu>
+      <p-button class="button-default-w8" [label]="'addProperty' | translate" icon="fa fa-plus" iconPos="right"
         (click)="menuAddPropertyGroup.toggle($event)">
       </p-button>
     </div>

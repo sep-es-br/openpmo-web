@@ -3,6 +3,7 @@ import { TypeWorkpackEnum } from '../enums/TypeWorkpackEnum';
 import { IWorkpackProperty } from './IWorkpackProperty';
 import { IPlan } from './IPlan';
 import { IWorkpackModel } from './IWorkpackModel';
+import { IWorkpackJournalInformation } from './IJournal';
 
 export interface IWorkpack {
     id?: number;
@@ -97,6 +98,7 @@ export interface IWorkpackListCard {
       },
       earnedValue?: number;
     },
+    journalInformation?: IWorkpackJournalInformation;
 }
 
 interface IWorkpackDashboard {

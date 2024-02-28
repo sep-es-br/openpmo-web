@@ -10,9 +10,8 @@ import { iconsJournal } from 'src/app/shared/constants/iconsJournal';
 import { StatusJournalEnum } from 'src/app/shared/enums/StatusJournalEnum';
 import { TypeJournalEnum } from 'src/app/shared/enums/TypeJournalEnum';
 import { ICard } from 'src/app/shared/interfaces/ICard';
-import { ITreeViewScopePlan, ITreeViewScopeWorkpack } from 'src/app/shared/interfaces/ITreeScopePersons';
+import { IJournal } from 'src/app/shared/interfaces/IJournal';
 import { IWorkpackData, IWorkpackParams } from 'src/app/shared/interfaces/IWorkpackDataParams';
-import { IJournal } from 'src/app/shared/interfaces/Journal';
 import { AuthService } from 'src/app/shared/services/auth.service';
 import { ConfigDataViewService } from 'src/app/shared/services/config-dataview.service';
 import { JournalService } from 'src/app/shared/services/journal.service';
@@ -237,6 +236,7 @@ export class WorkpackSectionJournalComponent implements OnInit, OnDestroy {
       };
     });
     this.isLoading = false;
+    console.log('journal', this.journalData);
   }
 
   formatTitle(information) {
@@ -248,8 +248,10 @@ export class WorkpackSectionJournalComponent implements OnInit, OnDestroy {
   }
 
   async loadTreeViewScope() {
-    const selected = this.selectedWorkpacks && this.selectedWorkpacks.length > 1 ?
+    const selected = this.selectedWorkpacks && (this.selectedWorkpacks.length > 1 ?
         this.selectedWorkpacks.length + ' ' + this.translateSrv.instant('selectedItems') :
+        this.selectedWorkpacks[0].label);
+    if (selected)  this.formSearch.controls.scopeName.setValue(selected);
         this.selectedWorkpacks && this.selectedWorkpacks.length === 1 ? this.selectedWorkpacks[0].label : '';
       this.formSearch.controls.scopeName.setValue(selected);
   }

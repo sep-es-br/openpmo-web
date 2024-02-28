@@ -26,6 +26,7 @@ import { ReportModelService } from 'src/app/shared/services/report-model.service
 import { IReportModel } from 'src/app/shared/interfaces/IReportModel';
 import { MenuService } from 'src/app/shared/services/menu.service';
 import { CostAccountModelService } from 'src/app/shared/services/cost-account-model.service';
+import { CancelButtonComponent } from 'src/app/shared/components/cancel-button/cancel-button.component';
 
 @Component({
   selector: 'app-strategy',
@@ -35,6 +36,7 @@ import { CostAccountModelService } from 'src/app/shared/services/cost-account-mo
 export class StrategyComponent implements OnDestroy {
 
   @ViewChild(SaveButtonComponent) saveButton: SaveButtonComponent;
+  @ViewChild(CancelButtonComponent) cancelButton: CancelButtonComponent;
 
   propertiesStrategy: IPlanModel;
   responsive = false;
@@ -132,7 +134,7 @@ export class StrategyComponent implements OnDestroy {
       .subscribe(() => this.saveButton?.hideButton());
     this.formStrategy.valueChanges
       .pipe(takeUntil(this.$destroy), filter(() => this.formStrategy.dirty))
-      .subscribe(() => this.saveButton.showButton());
+      .subscribe(() => {this.saveButton.showButton(); this.cancelButton.showButton() });
     this.responsiveSvr.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.responsive = value);
     this.activeRoute.queryParams.subscribe(async ({ id, idOffice }) => {
       this.idStrategy = +id;
@@ -270,6 +272,7 @@ export class StrategyComponent implements OnDestroy {
       this.sharedWith = Array.from(this.sharedWith.filter(op => op.fullName !== 'All'));
       this.sharedWithAll = false;
     }
+    this.cancelButton.showButton();
     if (this.formStrategy.valid) {
       this.saveButton.showButton();
     }
@@ -487,6 +490,7 @@ export class StrategyComponent implements OnDestroy {
   }
 
   async handleOnSubmit() {
+    this.cancelButton.hideButton();
     const isPut = !!this.idStrategy;
     this.formIsSaving = true;
     this.propertiesStrategy = {
@@ -538,6 +542,23 @@ export class StrategyComponent implements OnDestroy {
     if (result.success) {
       this.reports = this.reports.filter(report => report.id !== deletedReport.id)
       this.cardItemsReportModels = this.cardItemsReportModels.filter(report => report.itemId !== deletedReport.id);
+    }
+  }
+
+  handleOnCancel() {
+    this.saveButton.hideButton();
+    if (this.idStrategy) {
+      this.formStrategy.reset({ name: this.propertiesStrategy.name, fullName: this.propertiesStrategy.fullName });
+      this.sharedWith = this.propertiesStrategy.sharedWithAll ? [{
+        id: null,
+        name: this.translateSrv.instant('All'),
+        fullName: 'All'
+      }] : this.propertiesStrategy.sharedWith;
+      this.sharedWithAll = this.propertiesStrategy.sharedWithAll;
+    } else {
+      this.formStrategy.reset();
+      this.sharedWith = [];
+      this.sharedWithAll = false;
     }
   }
 

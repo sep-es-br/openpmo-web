@@ -54,10 +54,10 @@ export class BaselineComponent implements OnInit, OnDestroy {
     private translateSrv: TranslateService
   ) {
     this.actRouter.queryParams
-      .subscribe(({id, idWorkpack, idWorkpackModelLinked}) => {
+      .subscribe(({idBaseline, idWorkpack, idWorkpackModelLinked}) => {
         this.idWorkpack = idWorkpack && +idWorkpack;
         this.idWorkpackModelLinked = idWorkpackModelLinked && +idWorkpackModelLinked;
-        this.idBaseline = id && +id;
+        this.idBaseline = idBaseline && +idBaseline;
       });
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.responsive = value);
     this.formBaseline = this.formBuilder.group({

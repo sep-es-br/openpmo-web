@@ -15,11 +15,12 @@ import { Component, OnInit, OnDestroy, ViewChild, ElementRef , Input} from '@ang
 import { Subject } from 'rxjs';
 import * as moment from 'moment';
 import { WorkpackShowTabviewService } from 'src/app/shared/services/workpack-show-tabview.service';
-import { MenuItem, MessageService } from 'primeng/api';
+import { MessageService } from 'primeng/api';
 import { OverlayPanel } from 'primeng/overlaypanel';
 import { SaveButtonComponent } from 'src/app/shared/components/save-button/save-button.component';
 import { ICartItemCostAssignment } from 'src/app/shared/interfaces/ICartItemCostAssignment';
 import { DashboardService } from 'src/app/shared/services/dashboard.service';
+import { CancelButtonComponent } from 'src/app/shared/components/cancel-button/cancel-button.component';
 
 @Component({
   selector: 'app-workpack-section-schedule',
@@ -30,6 +31,8 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
 
   @ViewChild('cardCostEditPanel') cardCostEditPanel: OverlayPanel;
   @ViewChild(SaveButtonComponent) saveButton: SaveButtonComponent;
+  @ViewChild(CancelButtonComponent) cancelButton: SaveButtonComponent;
+
   workpackParams: IWorkpackParams;
   workpackData: IWorkpackData;
   $destroy = new Subject();
@@ -111,7 +114,16 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
     } = this.scheduleSrv.getScheduleData();
     this.workpackParams = workpackParams;
     this.workpackData = workpackData;
-    this.schedule = schedule;
+    this.schedule = Object.assign({
+      ...schedule,
+      groupedSteps: schedule &&  schedule.groupedSteps && schedule.groupedSteps.map( group => ({
+        ...group,
+        steps: group.steps && group.steps.map( step => ({
+          ...step,
+          consumes: step.consumes && step.consumes.map( c => ({...c}))
+        }))
+      }))
+    });
     this.sectionActive = workpackData && !!workpackData.workpack && !!workpackData.workpack.id  &&
       workpackData.workpackModel && workpackData.workpackModel.scheduleSessionActive;
     if (!loading) this.loadScheduleSession();
@@ -121,12 +133,12 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
     if (!this.sectionActive) return;
     this.editPermission = this.workpackSrv.getEditPermission();
     this.unitMeansure = this.workpackSrv.getUnitMeansure();
-    if (this.schedule) {
+    if (this.schedule && this.schedule.groupStep) {
       if (this.unitMeansure && !this.unitMeansure.precision) {
         this.unitMeansure.precision = 0;
       }
-      const groupStep = this.schedule.groupStep.map((group, groupIndex, groupArray) => {
-        const cardItemSection = group.steps.map((step, stepIndex, stepArray) => ({
+      const groupStep = this.schedule.groupStep && this.schedule.groupStep.map((group, groupIndex, groupArray) => {
+        const cardItemSection = group.steps && group.steps.map((step, stepIndex, stepArray) => ({
           type: 'listStep',
           editPermission: !!this.editPermission && !this.workpackData.workpack.canceled,
           stepName: new Date(step.periodFromStart + 'T00:00:00'),
@@ -372,7 +384,7 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
       ['workpack/schedule/step'],
       {
         queryParams: {
-          id: idStep,
+          idStep: idStep,
           stepType,
           unitName,
           unitPrecision
@@ -398,6 +410,7 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
     }
     this.workpackSrv.nextPendingChanges(true);
     this.saveButton.showButton();
+    this.cancelButton.showButton();
     // atualizando a progressBar de custo do ano
     const hasNegativeValues = this.checkNegativeValues();
     if (hasNegativeValues) {
@@ -652,6 +665,7 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
     }
     this.workpackSrv.nextPendingChanges(true);
     this.saveButton.showButton();
+    this.cancelButton.showButton();
     const groupIndex = this.sectionSchedule.groupStep.findIndex(group => group.cardItemSection.filter(item => item.idStep === this.stepShow.id).length > 0);
     if (groupIndex > -1) {
       const stepIndex = this.sectionSchedule.groupStep[groupIndex].cardItemSection.findIndex(card => card.idStep === this.stepShow.id);
@@ -859,6 +873,7 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
 
   async onSaveButtonClicked() {
     this.formIsSaving = true;
+    this.cancelButton.hideButton();
     if (this.changedSteps && this.changedSteps.length > 0) {
       const stepsToSave = this.changedSteps.map(stepToSave => {
         const stepGroup = this.schedule.groupStep.find(group => group.year === stepToSave.changedGroupYear);
@@ -906,13 +921,32 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
         });
         
         this.refreshScheduleProgressBar();
+        this.scheduleSrv.refreshBackupSchedule(this.schedule);
         this.formIsSaving = false;
+        this.workpackData = this.workpackSrv.getWorkpackData();
+        this.workpackSrv.setWorkpackData({
+          ...this.workpackData,
+          workpack: {
+            ...this.workpackData.workpack,
+            dashboardStatus: 'OUTDATED',
+            dashboardSinceThen: moment().format('DD/MM/yyyy HH:mm:ss'),
+            dashboardCanRecalculate: false
+          }
+        });
         setTimeout( () => {
           const linked = this.workpackParams.idWorkpackModelLinked ? true : false;
           this.dashboardSrv.loadDashboard(linked);
         }, 1000)
       }
     }
+
+  }
+
+  handleOnCancel() {
+    this.saveButton.hideButton();
+    this.scheduleSrv.getBackupSchedule();
+    this.workpackSrv.nextPendingChanges(false);
+    this.loadScheduleData();
 
   }
 

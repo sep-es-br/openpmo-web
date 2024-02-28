@@ -11,8 +11,8 @@
         <app-card-loading [isCardLoading]="cardProperties.isLoading"></app-card-loading>
       </div>
       <div class="cost-account-model-addicional-properties add-actions" *ngIf="editPermission && !cardProperties.isLoading">
-        <p-menu #menuAddProperty [popup]="true" [model]="menuModelProperties"></p-menu>
-        <p-button [label]="'addProperty' | translate" icon="fa fa-plus" iconPos="right" class="button-add-property"
+        <p-menu class="menu-addicional-properties" #menuAddProperty [popup]="true" [model]="menuModelProperties"></p-menu>
+        <p-button [label]="'addProperty' | translate" icon="fa fa-plus" iconPos="right" class="button-add-property button-default-w8"
           (click)="menuAddProperty.toggle($event)">
         </p-button>
       </div>
@@ -26,5 +26,8 @@
       </div>
     </app-card>
   </div>
-  <app-save-button (save)="handleOnSubmit()"></app-save-button>
+  <app-buttons-container>
+    <app-save-button (save)="handleOnSubmit()"></app-save-button>
+    <app-cancel-button (cancel)="handleOnCancel()"></app-cancel-button>
+  </app-buttons-container>
 </div>

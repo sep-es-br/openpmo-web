@@ -68,14 +68,16 @@ export class CardItemComponent implements OnInit {
     }
     const params = this.properties?.paramsUrlCard ? this.properties?.paramsUrlCard : [];
     if (this.properties?.itemId) {
-      params.push({name: 'id', value: this.properties?.itemId});
+      const idAtributeName = this.properties.idAtributeName ? this.properties.idAtributeName : 'id';
+      params.push({name: idAtributeName, value: this.properties?.itemId});
     }
 
     this.navigateToPage(this.properties.urlCard, params);
   }
 
   getQueryParams() {
-    let params = this.properties?.itemId ? { id: this.properties.itemId } : {};
+    const idAtributeName = this.properties.idAtributeName ? this.properties.idAtributeName : 'id';
+    let params = this.properties?.itemId ? { [idAtributeName]: this.properties.itemId } : {};
     if (this.properties.paramsUrlCard) {
       params = {
         ...params,

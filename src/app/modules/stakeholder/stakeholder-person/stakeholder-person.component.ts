@@ -8,7 +8,7 @@ import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {TranslateService} from '@ngx-translate/core';
 import {MessageService} from 'primeng/api';
 import {Subject} from 'rxjs';
-import {takeUntil} from 'rxjs/operators';
+import { takeUntil, filter } from 'rxjs/operators';
 
 import {ResponsiveService} from 'src/app/shared/services/responsive.service';
 import {ICard} from 'src/app/shared/interfaces/ICard';
@@ -24,8 +24,8 @@ import {BreadcrumbService} from 'src/app/shared/services/breadcrumb.service';
 import {SaveButtonComponent} from 'src/app/shared/components/save-button/save-button.component';
 import {cpfValidator} from 'src/app/shared/utils/cpfValidator';
 import { MinLengthTextCustomValidator } from 'src/app/shared/utils/minLengthTextValidator';
-import { IWorkpackModel } from 'src/app/shared/interfaces/IWorkpackModel';
 import { WorkpackModelService } from 'src/app/shared/services/workpack-model.service';
+import { CancelButtonComponent } from 'src/app/shared/components/cancel-button/cancel-button.component';
 
 interface ICardItemRole {
   type: string;
@@ -45,6 +45,7 @@ interface ICardItemRole {
 export class StakeholderPersonComponent implements OnInit, OnDestroy {
 
   @ViewChild(SaveButtonComponent) saveButton: SaveButtonComponent;
+  @ViewChild(CancelButtonComponent) cancelButton: CancelButtonComponent;
 
   idWorkpack: number;
   idWorkpackModelLinked: number;
@@ -56,17 +57,24 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
   person: IPerson;
   cardPerson: ICard;
   cardRoles: ICard;
-  cardPermissions: ICard;
+  cardPermissions: ICard = {
+    toggleable: false,
+    initialStateToggle: false,
+    cardTitle: 'permissions',
+    collapseble: true,
+    initialStateCollapse: false
+  };;
   responsive: boolean;
   stakeholder: IStakeholder;
   stakeholderForm: FormGroup;
   stakeholderRoles: IStakeholderRole[];
+  stakeholderRolesBk: IStakeholderRole[] = [];
   stakeholderRolesCardItems: ICardItemRole[];
   stakeholderPermissions: IStakeholderPermission[];
-  user = false;
+  user = true;
   citizenAuthServer: boolean;
-  personSearchBy: string; // SEARCH / NEW
-  citizenSearchBy: string; //CPF | NAME
+  personSearchBy: string = 'SEARCH'; // SEARCH / NEW
+  citizenSearchBy: string = 'CPF'; //CPF | NAME
   searchedNameUser: string;
   searchedCpfUser: string;
   searchedEmailUser: string;
@@ -80,6 +88,7 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
   showListBoxPublicServers = false;
   showMessagePublicServerNotFoundByName = false;
   showMessageInvalidEmail = false;
+  isSamePerson = false;
   permissionLevelListOptions = [
     {label: this.translateSrv.instant('read'), value: 'READ'},
     {label: this.translateSrv.instant('edit'), value: 'EDIT'},
@@ -125,6 +134,16 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
       phoneNumber: [''],
       contactEmail: ['', [Validators.email]],
     });
+    this.stakeholderForm.valueChanges
+      .pipe(takeUntil(this.$destroy), filter(() => this.stakeholderForm.dirty && this.stakeholderForm.valid))
+      .subscribe(() => {
+        this.handleShowSaveButton();
+      });
+    this.stakeholderForm.valueChanges
+      .pipe(takeUntil(this.$destroy), filter(() => this.stakeholderForm.dirty))
+      .subscribe(() => {
+        this.cancelButton.showButton();
+      });
   }
 
   async ngOnDestroy(): Promise<void> {
@@ -137,9 +156,10 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
 
   async ngOnInit() {
     this.loadCards();
+    await this.getAuthServer();
     await this.loadWorkpack();
     await this.loadStakeholder();
-    await this.getAuthServer();
+    
     let breadcrumbItems = this.breadcrumbSrv.get;
     this.breadcrumbSrv.setMenu([
       ...breadcrumbItems,
@@ -152,9 +172,11 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
   }
 
   async getAuthServer() {
+    this.cardPerson.isLoading = true;
     const result = await this.authServerSrv.GetAuthServer();
     if (result.success) {
       this.citizenAuthServer = result.data;
+      if (!this.idPerson) this.cardPerson.isLoading = false;
     }
   }
   
@@ -168,7 +190,7 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
       }));
      
     } else {
-      const result = await this.workpackSrv.GetWorkpackById(this.idWorkpack);
+      const result = await this.workpackSrv.GetWorkpackById(this.idWorkpack, { 'id-plan': this.idPlan });
       if (result.success) {
         this.workpack = result.data;
       }
@@ -248,6 +270,7 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
       if (result.success) {
         this.stakeholder = result.data;
         this.person = this.stakeholder?.person;
+        this.user = this.person.isUser;
         this.cardPerson.isLoading = false;
         this.loadCardPermissions();
       }
@@ -281,6 +304,7 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
   validateClearSearchPerson(event) {
     if (event && (event.length === 0)) {
       this.person = undefined;
+      this.stakeholderRoles = [];
       this.setStakeholderFormFromPerson();
     }
   }
@@ -289,6 +313,7 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
     if (!event || (event.length === 0)) {
       this.publicServersResult = [];
       this.showListBoxPublicServers = false;
+      this.isSamePerson = false;
       this.showMessagePublicServerNotFoundByName = false;
     }
   }
@@ -297,7 +322,9 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
     if (!event || (event.length === 0)) {
       this.validCpf = true;
       this.citizenUserNotFoundByCpf = false;
+      this.isSamePerson = false;
       this.person = undefined;
+      this.stakeholderRoles = [];
       this.setStakeholderFormFromPerson();
     }
   }
@@ -305,19 +332,23 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
   validateClearSearchUserByEmail(event) {
     if (!event || (event.length === 0)) {
       this.person = undefined;
+      this.stakeholderRoles = [];
       this.setStakeholderFormFromPerson();
       this.showMessageInvalidEmail = false;
+      this.isSamePerson = false;
       this.showMessageNotFoundUserByEmail = false;
     }
   }
 
   validateClearSearchByUser() {
     this.person = undefined;
+    this.stakeholderRoles = [];
     this.setStakeholderFormFromPerson();
     this.publicServersResult = [];
     this.showListBoxPublicServers = false;
     this.showMessagePublicServerNotFoundByName = false;
     this.citizenUserNotFoundByCpf = false;
+    this.isSamePerson = false;
     this.validCpf = true;
     this.searchedCpfUser = null;
     this.searchedNameUser = null;
@@ -362,16 +393,27 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
         collapseble: true,
         initialStateCollapse: false
       };
+    } else {
+      this.cardPermissions = undefined;
     }
   }
 
   setStakeholderForm() {
     if (this.stakeholder) {
-      this.stakeholderForm.controls.fullName.setValue(this.stakeholder.person.fullName);
-      this.stakeholderForm.controls.address.setValue(this.stakeholder.person.address);
-      this.stakeholderForm.controls.phoneNumber.setValue(this.formatPhoneNumber(this.stakeholder.person.phoneNumber));
-      this.stakeholderForm.controls.contactEmail.setValue(this.stakeholder.person.contactEmail);
+      this.stakeholderForm.reset({
+        fullName: this.stakeholder.person.fullName,
+        address: this.stakeholder.person.address,
+        phoneNumber: this.formatPhoneNumber(this.stakeholder.person.phoneNumber),
+        contactEmail: this.stakeholder.person.contactEmail
+      });
       this.stakeholderRoles = this.stakeholder.roles && this.stakeholder.roles.map(role => ({
+        id: role.id,
+        active: role.active,
+        role: role.role,
+        from: new Date(role.from + 'T00:00:00'),
+        to: role.to ? new Date(role.to + 'T00:00:00') : null
+      }));
+      this.stakeholderRolesBk = this.stakeholder.roles && this.stakeholder.roles.map(role => ({
         id: role.id,
         active: role.active,
         role: role.role,
@@ -381,13 +423,16 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
       if (!this.editPermission) {
         this.stakeholderForm.disable();
       }
+      if (!this.isUserAdmin && this.idPerson === Number(this.authSrv.getIdPerson() )) {
+        this.isSamePerson = true;
+      }
       this.setStakeholderPermissionsCards();
     }
     this.loadStakeholderRolesCardsItems();
   }
 
   setStakeholderPermissionsCards() {
-    this.stakeholderPermissions = this.stakeholder.permissions;
+    this.stakeholderPermissions = this.stakeholder.permissions.map( p => ({...p}));
     const rolesNotPermissions = this.stakeholder.person.roles.filter(r =>
       this.stakeholderPermissions.filter(p => p.role === r.role).length === 0);
     if (rolesNotPermissions && rolesNotPermissions.length > 0) {
@@ -417,6 +462,9 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
       });
       this.isLoading = false;
       if (data) {
+        if (!this.isUserAdmin && data.id === Number(this.authSrv.getIdPerson())) {
+          this.isSamePerson = true;
+        }
         this.person = data;
         this.showMessageNotFoundUserByEmail = false;
       } else {
@@ -471,6 +519,9 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
       });
       this.isLoading = false;
       if (result.success) {
+        if (!this.isUserAdmin && result.data.id === Number(this.authSrv.getIdPerson())) {
+          this.isSamePerson = true;
+        }
         this.person = result.data;
         this.setStakeholderFormFromPerson();
       } else {
@@ -482,8 +533,8 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
   handleToggleUser(event) {
     this.person = undefined;
     this.setStakeholderFormFromPerson();
-    this.personSearchBy = null;
-    this.citizenSearchBy = null;
+    this.personSearchBy = 'SEARCH';
+    this.citizenSearchBy = 'CPF';
     this.searchedNameUser = null;
     this.searchedCpfUser = null;
     this.searchedEmailUser = null;
@@ -497,6 +548,7 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
     this.showListBoxPublicServers = false;
     this.showMessagePublicServerNotFoundByName = false;
     this.showMessageInvalidEmail = false;
+    this.isSamePerson = false;
     this.saveButton?.hideButton();
     if (event === true) {
       this.cardPermissions = {
@@ -520,6 +572,7 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
 
   async handleSelectedPublicServer(event) {
     this.isLoading = true;
+    this.isSamePerson = false;
     const publicServer = event.value;
     const result = await this.citizenUserSrv.GetPublicServer(publicServer.sub, {
       idOffice: this.idOffice,
@@ -527,6 +580,9 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
     });
     this.isLoading = false;
     if (result.success) {
+      if (!this.isUserAdmin && result.data.id === Number(this.authSrv.getIdPerson())) {
+        this.isSamePerson = true;
+      }
       this.person = result.data;
       this.setStakeholderFormFromPerson();
       this.searchedNameUser = '';
@@ -537,34 +593,40 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
 
   setStakeholderFormFromPerson() {
     if (this.person) {
-      this.stakeholderForm.controls.fullName.setValue(this.person.fullName);
-      this.stakeholderForm.controls.address.setValue(this.person.address);
-      this.stakeholderForm.controls.phoneNumber.setValue(this.formatPhoneNumber(this.person.phoneNumber));
-      this.stakeholderForm.controls.contactEmail.setValue(this.person.contactEmail);
+      this.stakeholderForm.reset({
+        fullName: this.person.fullName,
+        address: this.person.address,
+        phoneNumber: this.formatPhoneNumber(this.person.phoneNumber),
+        contactEmail: this.person.contactEmail
+      });
       if (this.person.roles && this.user) {
         this.stakeholderPermissions = this.person.roles.map(r => ({
           role: r.role,
           level: 'None'
         }));
       }
-      this.loadStakeholderRolesCardsItems();
     } else {
-      this.stakeholderForm.controls.fullName.setValue('');
-      this.stakeholderForm.controls.address.setValue('');
-      this.stakeholderForm.controls.phoneNumber.setValue('');
-      this.stakeholderForm.controls.contactEmail.setValue('');
+      this.stakeholderForm.reset({
+        fullName: '',
+        address: '',
+        phoneNumber: '',
+        contactEmail: ''
+      })
       this.stakeholderRoles = null;
       this.stakeholderPermissions = [];
     }
+    this.loadStakeholderRolesCardsItems();
   }
 
   loadStakeholderRolesCardsItems() {
+    this.saveButton.hideButton();
     if (this.stakeholderRoles) {
       this.stakeholderRolesCardItems = this.stakeholderRoles.map(role => ({
         type: 'role-card',
         readOnly: !this.editPermission,
         role,
-        personRoleOptions: this.personRolesOptions
+        personRoleOptions: this.personRolesOptions,
+        new: role.new
       }));
       if (this.editPermission) {
         this.stakeholderRolesCardItems.push({
@@ -597,20 +659,28 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
         role: '',
         active: true,
         from: new Date(),
-        to: null
+        to: null,
+        new: true
       });
     } else {
       this.stakeholderRoles = [{
         role: '',
         active: true,
         from: new Date(),
-        to: null
+        to: null,
+        new: true
       }];
     }
     this.loadStakeholderRolesCardsItems();
   }
 
+  deleteCardRole(cardRoleIndex) {
+    this.stakeholderRoles.splice(cardRoleIndex, 1);
+    this.stakeholderRolesCardItems.splice(cardRoleIndex, 1);
+  }
+
   handleShowSaveButton() {
+    this.cancelButton.showButton();
     if (this.stakeholderForm.valid && this.stakeholderForm.controls.fullName.value.trim().length > 0) {
       return this.validateStakeholder()
         ? this.saveButton?.showButton()
@@ -621,6 +691,7 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
   }
 
   async saveStakeholder() {
+    this.cancelButton.hideButton();
     if (!this.stakeholderForm.valid || !this.stakeholderForm.controls.fullName.value || this.stakeholderForm.controls.fullName.value.trim().length === 0) {
       return;
     }
@@ -725,8 +796,29 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
       return false;
     }
     // user should have permissions
-    return !(((this.user && !this.stakeholder) || (this.stakeholder && this.stakeholder.person.isUser && !this.idPerson))
-      && (!this.stakeholderPermissions || (this.stakeholderPermissions && (this.stakeholderPermissions.length === 0))
-      ));
+    if (this.user) {
+      return (this.stakeholderRolesCardItems && this.stakeholderRolesCardItems.filter( card => card.type !== 'new-role-card').length > 0)
+      || (this.stakeholderPermissions && this.stakeholderPermissions.length > 0)
+    } else {
+      return (this.stakeholderRolesCardItems && this.stakeholderRolesCardItems.filter( card => card.type !== 'new-role-card').length > 0)
+    }
+  }
+
+  handleOnCancel() {
+    this.saveButton.hideButton();
+    if (this.idPerson) {
+      this.stakeholderRoles = structuredClone(this.stakeholderRolesBk);
+      this.setStakeholderForm();
+    } else {
+      this.stakeholderRoles = [];
+      this.stakeholder = undefined;
+      this.validateClearSearchByCpf('');
+      this.validateClearSearchByUser();
+      this.validateClearSearchUserName('');
+      this.validateClearSearchPerson('');
+      this.citizenSearchBy = 'CPF';
+      this.user = true;
+      this.personSearchBy = 'SEARCH';
+    }
   }
 }

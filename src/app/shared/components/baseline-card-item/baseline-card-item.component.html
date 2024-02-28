@@ -97,7 +97,7 @@
     <div class="carditem-content">
       <i [ngClass]="[ 'app-icon', properties.icon, 'light-grey-icon']"
         (click)="properties.urlCard && navigateToPage(properties.urlCard, properties.paramsUrlCard)"
-        [ngStyle]="{ fontSize: (responsive ? 2 : (displayModeCard === 'list') ? 2.5 : 3) + 'rem', cursor: 'pointer' }"></i>
+        [ngStyle]="{ fontSize: (responsive ? 2 : (displayModeCard === 'list') ? 2 : 2.2) + 'rem', cursor: 'pointer' }"></i>
       <p-tieredMenu #menuIcon [popup]="true" [model]="properties.iconMenuItems"></p-tieredMenu>
     </div>
   </p-card>

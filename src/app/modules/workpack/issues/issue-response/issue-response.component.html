@@ -18,7 +18,9 @@
             <div class="p-field">
               <span class="p-float-label">
                 <input class="app-input-text" id="float-name" name="name" formControlName="name" type="text" pInputText />
-                <label class="app-input-label" for="float-name">{{ "name" | translate }} * </label>
+                <label class="app-input-label" for="float-name">{{ "name" | translate }} * 
+                  <i class="far fa-question-circle" [pTooltip]="'help.issueResponse.name' | translate"></i>
+                </label>
               </span>
               <app-input-message [form]="formIssueResponse" field="name"></app-input-message>
             </div>
@@ -28,7 +30,9 @@
                   [yearNavigator]="true" formControlName="date" [yearRange]="yearRangeCalculated"
                   icon="fas fa-calendar-alt" [dateFormat]="calendarFormat">
                 </p-calendar>
-                <label class="app-input-label" for="float-start">{{ "start" | translate }} * </label>
+                <label class="app-input-label" for="float-start">{{ "start" | translate }} * 
+                  <i class="far fa-question-circle" [pTooltip]="'help.issueResponse.start' | translate"></i>
+                </label>
               </span>
             </div>
             <div class="p-field">
@@ -36,7 +40,9 @@
                 <p-dropdown class="app-single-selection" [options]="statusOptions" formControlName="status"
                   dropdownIcon="fas fa-caret-down" [autoDisplayFirst]="false">
                 </p-dropdown>
-                <label class="app-input-label">{{'status'|translate}} *</label>
+                <label class="app-input-label">{{'status'|translate}} *
+                  <i class="far fa-question-circle" [pTooltip]="'help.issueResponse.status' | translate"></i>
+                </label>
               </span>
               <app-input-message [form]="formIssueResponse" field="status"></app-input-message>
             </div>
@@ -44,7 +50,9 @@
               <span class="p-float-label">
                 <textarea pInputTextarea id="float-plan" formControlName="plan" class="app-text-area" [rows]="1">
                 </textarea>
-                <label class="app-input-label" for="float-plan">{{ "plan" | translate }} * </label>
+                <label class="app-input-label" for="float-plan">{{ "plan" | translate }} * 
+                  <i class="far fa-question-circle" [pTooltip]="'help.issueResponse.planDescription' | translate"></i>
+                </label>
               </span>
               <app-input-message [form]="formIssueResponse" field="plan"></app-input-message>
             </div>
@@ -53,7 +61,9 @@
                 <p-multiSelect class="app-multiple-selection" dropdownIcon="fas fa-caret-down" formControlName="responsible"
                 [selectedItemsLabel]="language === 'pt-BR' ? '{0} itens selecionados' : '{0} items selected'"
                   [options]="stakeholderOptions" optionLabel="label"optionValue="value" ></p-multiSelect>
-                <label class="app-input-label" for="float-label" >{{'responsible' |translate}} *</label>
+                <label class="app-input-label" for="float-label" >{{'responsible' |translate}} *
+                  <i class="far fa-question-circle" [pTooltip]="'help.issueResponse.responsible' | translate"></i>
+                </label>
               </span>
               <app-input-message [form]="formIssueResponse" field="responsible"></app-input-message>
             </div>
@@ -66,4 +76,9 @@
     <span>{{idIssueResponse}}</span>
   </div>
 </div>
-<app-save-button #saveButton (save)="saveIssueResponse()"></app-save-button>
+<app-buttons-container>
+  <app-save-button #saveButton (save)="saveIssueResponse()"></app-save-button>
+  <app-cancel-button (cancel)="handleOnCancel()"></app-cancel-button>
+</app-buttons-container>
+
+

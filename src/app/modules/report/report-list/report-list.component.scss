@@ -6,6 +6,20 @@
     min-height: 150px;
   }
 
+  .back-to-management-container {
+    color: #13546C;
+    cursor: pointer;
+    margin-bottom: 1em;
+    width: max-content;
+    .fa-reply {
+      margin-right: 0.5em;
+    }
+    .text {
+      font-size: 0.8rem;
+      font-style: italic;
+    }
+  }
+
   .header-container {
     display: flex;
     flex-direction: row;

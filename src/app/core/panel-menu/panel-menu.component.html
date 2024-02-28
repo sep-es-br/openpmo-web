@@ -5,7 +5,7 @@
         <div class="title" [routerLink]="['/offices']">{{ (isAdminMenu ? 'offices' : 'officesAndPlans') | translate }}
         </div>
         <div class="action">
-          <i [class]="isFixed ? 'app-icon pin-on' : 'app-icon pin-off'" [ngStyle]="{ fontSize: '1rem' }"
+          <i [class]="isFixed ? 'app-icon pin-on' : 'app-icon pin-off'" [ngStyle]="{ fontSize: '0.9rem' }"
             (click)="handleChangeMenuMode()"></i>
         </div>
       </div>
@@ -19,7 +19,7 @@
         <div class="title" (click)="closeAllMenus()">{{ (isAdminMenu ? 'favorites' : 'myFavorites') | translate
           }}</div>
         <div class="action">
-          <i [class]="isFixed ? 'app-icon pin-on' : 'app-icon pin-off'" [ngStyle]="{ fontSize: '1rem' }"
+          <i [class]="isFixed ? 'app-icon pin-on' : 'app-icon pin-off'" [ngStyle]="{ fontSize: '0.9rem' }"
             (click)="handleChangeMenuMode()"></i>
         </div>
       </div>
@@ -48,9 +48,9 @@
         <div *ngIf="currentPlan" class="title" [routerLink]="['/plan']" [queryParams]="{id: currentPlan?.id}">{{ currentPlan?.name }}
         </div>
         <div *ngIf="!currentPlan" class="title">
-          {{'newPlan'|translate}}</div>
+          {{'newPlan'| translate}}</div>
         <div class="action" *ngIf="!loadingMenuPortfolio">
-          <i [class]="isFixed ? 'app-icon pin-on' : 'app-icon pin-off'" [ngStyle]="{ fontSize: '1rem' }"
+          <i [class]="isFixed ? 'app-icon pin-on' : 'app-icon pin-off'" [ngStyle]="{ fontSize: '0.9rem' }"
             (click)="handleChangeMenuMode()"></i>
         </div>
       </div>
@@ -65,7 +65,7 @@
         <div class="title" (click)="closeAllMenus()" [routerLink]="['/strategies']" [queryParams]="{idOffice: currentIDOffice}">{{'planModels'|translate}}
         </div>
         <div class="action">
-          <i [class]="isFixed ? 'app-icon pin-on' : 'app-icon pin-off'" [ngStyle]="{ fontSize: '1rem' }"
+          <i [class]="isFixed ? 'app-icon pin-on' : 'app-icon pin-off'" [ngStyle]="{ fontSize: '0.9rem' }"
             (click)="handleChangeMenuMode()"></i>
         </div>
       </div>

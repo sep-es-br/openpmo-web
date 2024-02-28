@@ -1,27 +1,28 @@
-import {AuthService} from '../../../../shared/services/auth.service';
-import {WorkpackService} from 'src/app/shared/services/workpack.service';
-import {IssueService} from '../../../../shared/services/issue.service';
-import {IconsEnum} from '../../../../shared/enums/IconsEnum';
-import {RiskResponseService} from '../../../../shared/services/risk-response.service';
-import {IRiskResponse} from '../../../../shared/interfaces/IRiskResponse';
-import {RiskResponsesPropertiesOptions} from '../../../../shared/constants/riskResponsesPropertiesOptions';
-import {ICardItem} from '../../../../shared/interfaces/ICardItem';
-import {RiskService} from '../../../../shared/services/risk.service';
-import {RisksPropertiesOptions} from '../../../../shared/constants/risksPropertiesOptions';
-import {IRisk} from '../../../../shared/interfaces/IRisk';
-import {ICard} from '../../../../shared/interfaces/ICard';
-import {filter, takeUntil} from 'rxjs/operators';
-import {MenuItem, MessageService, SelectItem} from 'primeng/api';
-import {BreadcrumbService} from '../../../../shared/services/breadcrumb.service';
-import {TranslateService} from '@ngx-translate/core';
-import {ResponsiveService} from '../../../../shared/services/responsive.service';
-import {FormBuilder, FormGroup, Validators} from '@angular/forms';
-import {ActivatedRoute, Router} from '@angular/router';
-import {Calendar} from 'primeng/calendar';
-import {SaveButtonComponent} from '../../../../shared/components/save-button/save-button.component';
-import {Component, OnDestroy, OnInit, ViewChild, ViewChildren} from '@angular/core';
-import {Subject} from 'rxjs';
+import { AuthService } from '../../../../shared/services/auth.service';
+import { WorkpackService } from 'src/app/shared/services/workpack.service';
+import { IssueService } from '../../../../shared/services/issue.service';
+import { IconsEnum } from '../../../../shared/enums/IconsEnum';
+import { RiskResponseService } from '../../../../shared/services/risk-response.service';
+import { IRiskResponse } from '../../../../shared/interfaces/IRiskResponse';
+import { RiskResponsesPropertiesOptions } from '../../../../shared/constants/riskResponsesPropertiesOptions';
+import { ICardItem } from '../../../../shared/interfaces/ICardItem';
+import { RiskService } from '../../../../shared/services/risk.service';
+import { RisksPropertiesOptions } from '../../../../shared/constants/risksPropertiesOptions';
+import { IRisk } from '../../../../shared/interfaces/IRisk';
+import { ICard } from '../../../../shared/interfaces/ICard';
+import { filter, takeUntil } from 'rxjs/operators';
+import { MenuItem, MessageService, SelectItem } from 'primeng/api';
+import { BreadcrumbService } from '../../../../shared/services/breadcrumb.service';
+import { TranslateService } from '@ngx-translate/core';
+import { ResponsiveService } from '../../../../shared/services/responsive.service';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Calendar } from 'primeng/calendar';
+import { SaveButtonComponent } from '../../../../shared/components/save-button/save-button.component';
+import { Component, OnDestroy, OnInit, ViewChild, ViewChildren } from '@angular/core';
+import { Subject } from 'rxjs';
 import * as moment from 'moment';
+import { CancelButtonComponent } from 'src/app/shared/components/cancel-button/cancel-button.component';
 
 @Component({
   selector: 'app-risk',
@@ -31,6 +32,7 @@ import * as moment from 'moment';
 export class RiskComponent implements OnInit, OnDestroy {
 
   @ViewChild(SaveButtonComponent) saveButton: SaveButtonComponent;
+  @ViewChild(CancelButtonComponent) cancelButton: CancelButtonComponent;
   @ViewChildren(Calendar) calendarComponents: Calendar[];
 
   responsive: boolean;
@@ -68,17 +70,17 @@ export class RiskComponent implements OnInit, OnDestroy {
     private authSrv: AuthService
   ) {
     this.actRouter.queryParams.subscribe(async queryParams => {
-      this.idRisk = +queryParams.id;
+      this.idRisk = +queryParams.idRisk;
       this.idWorkpack = +queryParams.idWorkpack;
     });
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.responsive = value);
     this.translateSrv.onLangChange.pipe(takeUntil(this.$destroy)).subscribe(() => {
-        setTimeout(() => this.calendarComponents?.map(calendar => {
-          calendar.ngOnInit();
-          calendar.dateFormat = this.translateSrv.instant('dateFormat');
-          calendar.updateInputfield();
-        }, 150));
-      }
+      setTimeout(() => this.calendarComponents?.map(calendar => {
+        calendar.ngOnInit();
+        calendar.dateFormat = this.translateSrv.instant('dateFormat');
+        calendar.updateInputfield();
+      }, 150));
+    }
     );
     this.formRisk = this.formBuilder.group({
       name: ['', Validators.required],
@@ -96,6 +98,9 @@ export class RiskComponent implements OnInit, OnDestroy {
     this.formRisk.valueChanges
       .pipe(takeUntil(this.$destroy), filter(() => this.formRisk.dirty && this.formRisk.valid))
       .subscribe(() => this.saveButton.showButton());
+    this.formRisk.valueChanges
+      .pipe(takeUntil(this.$destroy), filter(() => this.formRisk.dirty))
+      .subscribe(() => this.cancelButton.showButton());
   }
 
   ngOnDestroy(): void {
@@ -118,20 +123,16 @@ export class RiskComponent implements OnInit, OnDestroy {
   }
 
   setFormRisk() {
-    this.formRisk.controls.name.setValue(this.risk.name);
-    this.formRisk.controls.description.setValue(this.risk.description);
-    this.formRisk.controls.importance.setValue(this.risk.importance);
-    this.formRisk.controls.nature.setValue(this.risk.nature);
-    this.formRisk.controls.status.setValue(this.risk.status);
-    if (this.risk.likelyToHappenFrom) {
-      this.formRisk.controls.likelyToHappenFrom.setValue(new Date(this.risk.likelyToHappenFrom + 'T00:00:00'));
-    }
-    if (this.risk.likelyToHappenTo) {
-      this.formRisk.controls.likelyToHappenTo.setValue(new Date(this.risk.likelyToHappenTo + 'T00:00:00'));
-    }
-    if (this.risk.happenedIn) {
-      this.formRisk.controls.happenedIn.setValue(new Date(this.risk.happenedIn + 'T00:00:00'));
-    }
+    this.formRisk.reset({
+      name: this.risk.name,
+      description: this.risk.description,
+      importance: this.risk.importance,
+      nature: this.risk.nature,
+      status: this.risk.status,
+      likelyToHappenFrom: this.risk.likelyToHappenFrom ? new Date(this.risk.likelyToHappenFrom + 'T00:00:00') : null,
+      likelyToHappenTo: this.risk.likelyToHappenTo ? new Date(this.risk.likelyToHappenTo + 'T00:00:00') : null,
+      happenedIn: this.risk.happenedIn ? new Date(this.risk.happenedIn + 'T00:00:00') : null
+    })
     this.cardRiskProperties.isLoading = false;
   }
 
@@ -193,11 +194,11 @@ export class RiskComponent implements OnInit, OnDestroy {
       breadcrumbItems = await this.breadcrumbSrv.loadWorkpackBreadcrumbs(this.idWorkpack, this.idPlan)
     }
     this.breadcrumbSrv.setMenu([
-      ... breadcrumbItems,
+      ...breadcrumbItems,
       {
         key: 'risk',
         routerLink: ['/workpack/risks'],
-        queryParams: {idWorkpack: this.idWorkpack, id: this.idRisk},
+        queryParams: { idWorkpack: this.idWorkpack, idRisk: this.idRisk },
         info: this.risk?.name,
         tooltip: this.risk?.name
       }
@@ -218,6 +219,7 @@ export class RiskComponent implements OnInit, OnDestroy {
           this.translateSrv.instant(this.riskResponsePropertiesOptions.STRATEGY.NEGATIVE[resp.strategy].label),
         statusItem: this.translateSrv.instant(this.riskResponsePropertiesOptions.STATUS[resp.status].label),
         itemId: resp.id,
+        idAtributeName: 'idRiskResponse',
         menuItems: [{
           label: this.translateSrv.instant('delete'),
           icon: 'fas fa-trash-alt',
@@ -226,12 +228,12 @@ export class RiskComponent implements OnInit, OnDestroy {
         }] as MenuItem[],
         urlCard: '/workpack/risks/response',
         paramsUrlCard: [
-          {name: 'id', value: resp.id},
-          {name: 'idRisk', value: this.idRisk},
-          {name: 'riskNature', value: this.risk.nature},
-          {name: 'riskName', value: this.risk.name},
-          {name: 'edit', value: this.editPermission ? 'true' : 'false'},
-          {name: 'idWorkpack', value: this.idWorkpack},
+          { name: 'id', value: resp.id },
+          { name: 'idRisk', value: this.idRisk },
+          { name: 'riskNature', value: this.risk.nature },
+          { name: 'riskName', value: this.risk.name },
+          { name: 'edit', value: this.editPermission ? 'true' : 'false' },
+          { name: 'idWorkpack', value: this.idWorkpack },
         ]
       }));
       this.isLoadingResponseItems = false;
@@ -248,11 +250,11 @@ export class RiskComponent implements OnInit, OnDestroy {
         menuItems: null,
         urlCard: '/workpack/risks/response',
         paramsUrlCard: [
-          {name: 'idRisk', value: this.idRisk},
-          {name: 'riskNature', value: this.risk.nature},
-          {name: 'riskName', value: this.risk.name},
-          {name: 'edit', value: this.editPermission ? 'true' : 'false'},
-          {name: 'idWorkpack', value: this.idWorkpack},
+          { name: 'idRisk', value: this.idRisk },
+          { name: 'riskNature', value: this.risk.nature },
+          { name: 'riskName', value: this.risk.name },
+          { name: 'edit', value: this.editPermission ? 'true' : 'false' },
+          { name: 'idWorkpack', value: this.idWorkpack },
         ]
       });
       this.isLoadingResponseItems = false;
@@ -271,13 +273,14 @@ export class RiskComponent implements OnInit, OnDestroy {
   }
 
   async deleteRiskResponse(resp: IRiskResponse) {
-    const result = await this.riskResponseSrv.delete(resp, {useConfirm: true});
+    const result = await this.riskResponseSrv.delete(resp, { useConfirm: true });
     if (result.success) {
       this.riskResponseCardItems = Array.from(this.riskResponseCardItems.filter(r => r.itemId !== resp.id));
     }
   }
 
   async saveRisk() {
+    this.cancelButton.hideButton();
     const likelyToHappenFrom = this.getLikelyToHappenFrom();
     const likelyToHappenTo = this.getLikelyToHappenTo();
     if (likelyToHappenFrom && likelyToHappenTo && moment(likelyToHappenFrom).isAfter(likelyToHappenTo)) {
@@ -325,8 +328,26 @@ export class RiskComponent implements OnInit, OnDestroy {
     }
   }
 
+  handleOnCancel() {
+    this.saveButton.hideButton();
+    if (this.idRisk) {
+      this.setFormRisk();
+    } else {
+      this.formRisk.reset({
+        name: '',
+        description: '',
+        importance: null,
+        nature: this.riskPropertiesOptions.nature.THREAT.value,
+        status: this.riskPropertiesOptions.status.OPEN.value,
+        likelyToHappenFrom: null,
+        likelyToHappenTo: null,
+        happenedIn: null
+      });
+    }
+  }
+
   async getIssueForRisk() {
-    const result = await this.issueSrv.GetAll({'id-workpack': this.idWorkpack, idRisk: this.idRisk});
+    const result = await this.issueSrv.GetAll({ 'id-workpack': this.idWorkpack, idRisk: this.idRisk });
     return result.success && result.data && result.data.length > 0;
   }
 

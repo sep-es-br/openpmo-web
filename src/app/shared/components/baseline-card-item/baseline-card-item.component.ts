@@ -64,7 +64,8 @@ export class BaselineCardItemComponent implements OnInit, OnDestroy {
   }
 
   getQueryParams() {
-    let params = this.properties?.itemId ? { id: this.properties.itemId } : {};
+    const idAtributeName = this.properties.idAtributeName ? this.properties.idAtributeName : 'id';
+    let params = this.properties?.itemId ? { [idAtributeName]: this.properties.itemId } : {};
     if (this.properties.paramsUrlCard) {
       params = {
         ...params,

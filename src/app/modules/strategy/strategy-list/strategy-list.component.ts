@@ -234,7 +234,7 @@ export class StrategyListComponent implements OnInit, OnDestroy {
       this.filterSrv.setFilterProperties(filterProperties);
       this.router.navigate(['/config/filter-dataview'], {
         queryParams: {
-          id: idFilter,
+          idFilter: idFilter,
           entityName: 'plan-models',
           idOffice: this.idOffice
         }

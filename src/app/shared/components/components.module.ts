@@ -35,6 +35,9 @@ import { PropertyToggleComponent } from './properties/type-property/property-tog
 import { PropertyTreeSelectionComponent } from './properties/type-property/property-tree-selection/property-tree-selection.component';
 import { PropertyUnitSelectionComponent } from './properties/type-property/property-unit-selection/property-unit-selection.component';
 import { PropertyGroupComponent } from './properties/type-property/property-group/property-group.component';
+import { ButtonsContainerComponent } from './buttons-container/buttons-container.component';
+import { CancelButtonComponent } from './cancel-button/cancel-button.component';
+import { CardJournalInformationComponent } from './card-journal-information/card-journal-information.component';
 
 @NgModule({
   declarations: [
@@ -70,6 +73,9 @@ import { PropertyGroupComponent } from './properties/type-property/property-grou
     PropertyTreeSelectionComponent,
     PropertyUnitSelectionComponent,
     PropertyGroupComponent,
+    ButtonsContainerComponent,
+    CancelButtonComponent,
+    CardJournalInformationComponent,
   ],
   imports: [
     CommonModule,
@@ -100,7 +106,10 @@ import { PropertyGroupComponent } from './properties/type-property/property-grou
     CostAssignmentCardItemComponent,
     CardItemReportModelComponent,
     PropertyModelComponent,
-    PropertyComponent
+    PropertyComponent,
+    ButtonsContainerComponent,
+    CancelButtonComponent,
+    CardJournalInformationComponent
   ]
 })
 export class ComponentsModule { }

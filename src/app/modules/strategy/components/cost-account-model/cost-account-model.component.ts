@@ -26,6 +26,7 @@ import { CostAccountModelService } from 'src/app/shared/services/cost-account-mo
 import { ICostAccountModel } from 'src/app/shared/interfaces/ICostAccountModel';
 import { IOrganization } from 'src/app/shared/interfaces/IOrganization';
 import { TypeOrganization } from 'src/app/shared/enums/TypeOrganization';
+import { CancelButtonComponent } from 'src/app/shared/components/cancel-button/cancel-button.component';
 
 @Component({
   selector: 'app-cost-account-model',
@@ -35,6 +36,7 @@ import { TypeOrganization } from 'src/app/shared/enums/TypeOrganization';
 export class CostAccountModelComponent implements OnInit {
 
   @ViewChild(SaveButtonComponent) saveButton: SaveButtonComponent;
+  @ViewChild(CancelButtonComponent) cancelButton: CancelButtonComponent;
   cardProperties: ICard = {
     toggleable: false,
     initialStateToggle: false,
@@ -54,6 +56,7 @@ export class CostAccountModelComponent implements OnInit {
   idModel: number;
   costAccountModel: ICostAccountModel;
   modelProperties: IWorkpackModelProperty[] = [];
+  resetModelProperties: IWorkpackModelProperty[] = [];
   menuModelProperties: MenuItem[] = [];
   listDomains: SelectItem[] = [];
   listOrganizations: IOrganization[] = [];
@@ -175,6 +178,7 @@ export class CostAccountModelComponent implements OnInit {
     ];
     modelCostProperties.map(prop => this.checkProperty(prop));
     this.modelProperties = modelCostProperties;
+    this.resetModelProperties = modelCostProperties.map( propertie => ({...propertie}));
     this.saveButton.showButton();
   }
 
@@ -304,10 +308,12 @@ export class CostAccountModelComponent implements OnInit {
       .sort((a, b) => a[1] > b[1] ? 1 : -1)
       .map(prop => prop[0] as IWorkpackModelProperty);
     this.modelProperties = dataProperties;
+    this.resetModelProperties = dataProperties.map( propertie => ({...propertie}));
     this.cardProperties.isLoading = false;
   }
 
   checkProperties() {
+    this.cancelButton.showButton();
     const properties: IWorkpackModelProperty[] = [...this.modelProperties];
     // Value check
     const propertiesChecks: { valid: boolean; invalidKeys: string[]; prop: IWorkpackModelProperty }[] = properties.map(p => ({
@@ -574,10 +580,12 @@ export class CostAccountModelComponent implements OnInit {
     newProperty.isCollapsed = false;
     await this.checkProperty(newProperty);
     this.saveButton?.hideButton();
+    this.cancelButton.showButton();
     return this.modelProperties.push(newProperty);
   }
 
   async handleOnSubmit() {
+    this.cancelButton.hideButton();
     this.modelProperties.forEach(prop => {
       delete prop.extraList;
       delete prop.extraListDefaults;
@@ -616,6 +624,11 @@ export class CostAccountModelComponent implements OnInit {
       this.idModel = !this.idModel ? result.data.id : this.idModel;
       this.loadModel();
     }
+  }
+
+  handleOnCancel() {
+    this.saveButton.hideButton();
+    this.modelProperties = this.resetModelProperties.map( prop => ({...prop}));
   }
 
 

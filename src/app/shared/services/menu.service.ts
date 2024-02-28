@@ -43,7 +43,7 @@ export class MenuService extends BaseService<any> {
   private isPlanMenuObservable = new BehaviorSubject<boolean>(false);
   private closeAllMenus = new BehaviorSubject<boolean>(false);
   private closeMenuUser = new BehaviorSubject<boolean>(false);
-  private toggleMenu = new BehaviorSubject<string>('');
+  private toggleMenu = new BehaviorSubject<{menu: string, open: boolean}>({menu: '', open: false});
   private hasFavoriteItemsObservable = new BehaviorSubject<boolean>(false);
   private menuPortfolioItems = new BehaviorSubject<IMenuWorkpack[]>([]);
 

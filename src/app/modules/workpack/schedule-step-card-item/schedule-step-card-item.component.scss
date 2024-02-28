@@ -24,7 +24,7 @@
         .title-month {
           font-weight: bold;
           color: v.$fontInput;
-          font-size: 0.9em;
+          font-size: 0.8em;
           font-family: v.$fontFamilyMedium;
         }
         .title-day {
@@ -105,6 +105,13 @@
       display: flex;
       flex-direction: column;
       align-content: center;
+      .p-float-label {
+        padding-bottom: 5px !important;
+        margin-top: 5px !important;
+      }
+      .p-inputnumber-input {
+        font-size: 0.7rem !important;
+      }
       .progress-bar-unit-container {
         margin-top: 0.2em;
       }
@@ -199,7 +206,7 @@
     padding: 0.5em;
     .card-item-id {
       color: #888e96;
-      font-size: 0.6rem;
+      font-size: 0.5rem;
       font-family: v.$fontFamilyMedium;
     }
   }

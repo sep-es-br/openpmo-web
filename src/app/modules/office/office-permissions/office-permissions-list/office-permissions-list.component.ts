@@ -211,7 +211,7 @@ export class OfficePermissionsListComponent implements OnInit {
       this.filterSrv.setFilterProperties(filterProperties);
       this.router.navigate(['/config/filter-dataview'], {
         queryParams: {
-          id: idFilter,
+          idFilter: idFilter,
           entityName: 'office-permissions',
           idOffice: this.idOffice
         }

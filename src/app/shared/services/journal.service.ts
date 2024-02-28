@@ -1,7 +1,7 @@
 import { BehaviorSubject } from 'rxjs';
 import { Inject, Injectable, Injector } from '@angular/core';
 import { BaseService } from '../base/base.service';
-import { IJournal } from '../interfaces/Journal';
+import { IJournal } from '../interfaces/IJournal';
 import { ITreeViewScopePlan, ITreeViewScopeWorkpack } from '../interfaces/ITreeScopePersons';
 import { OfficeService } from './office.service';
 import { TreeNode } from 'primeng/api';
@@ -148,6 +148,8 @@ export class JournalService extends BaseService<IJournal> {
       this.hasAll = true;
     }
   }
+
+  
 
 
   async loadTreeViewScope() {

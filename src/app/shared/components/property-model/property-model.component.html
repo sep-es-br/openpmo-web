@@ -21,31 +21,41 @@
       <span class="p-float-label property-input p-field">
         <input class="app-input-text" type="text" pInputText [(ngModel)]="property.name" [required]="true"
           (ngModelChange)="changed.emit($event)" [disabled]="property.obligatory || property.viewOnly" />
-        <label class="input-label">{{ 'name' | translate }} *</label>
+        <label class="input-label">{{ 'name' | translate }} *
+          <i class="far fa-question-circle" [pTooltip]="'help.propertyModel.name' | translate"></i>
+        </label>
       </span>
       <span class="p-float-label property-input p-field">
         <input class="app-input-text" type="text" pInputText [(ngModel)]="property.label"
           (ngModelChange)="changed.emit($event)" [disabled]="property.viewOnly" />
-        <label class="input-label">{{ 'label' | translate }} *</label>
+        <label class="input-label">{{ 'label' | translate }} *
+          <i class="far fa-question-circle" [pTooltip]="'help.propertyModel.label' | translate"></i>
+        </label>
       </span>
       <span class="p-float-label property-input p-field input-number-scroll">
         <p-inputNumber inputStyleClass="app-input-text" [(ngModel)]="property.sortIndex" [showButtons]="true"
           (ngModelChange)="changed.emit($event)" [disabled]="property.viewOnly">
         </p-inputNumber>
-        <label class="input-label">{{ 'sortIndex' | translate }}</label>
+        <label class="input-label">{{ 'sortIndex' | translate }}
+          <i class="far fa-question-circle" [pTooltip]="'help.propertyModel.sortIndex' | translate"></i>
+        </label>
       </span>
       <span class="p-float-label property-input p-field input-number-scroll" *ngIf="property.type === 'NumberModel'">
         <p-inputNumber inputStyleClass="app-input-text" [(ngModel)]="property.precision" [showButtons]="true" [min]="1"
           [max]="6" (ngModelChange)="changed.emit($event)" [disabled]="property.viewOnly">
         </p-inputNumber>
-        <label class="input-label">{{ 'precision' | translate }}</label>
+        <label class="input-label">{{ 'precision' | translate }}
+          <i class="far fa-question-circle" [pTooltip]="'help.propertyModel.precision' | translate"></i>
+        </label>
       </span>
       <span class="p-float-label property-input app-input-chips p-field" *ngIf="property.type === 'SelectionModel'">
         <p-chips inputStyleClass="app-input-text" [(ngModel)]="property.possibleValuesOptions" [required]="true"
           [allowDuplicate]="false" (ngModelChange)="changed.emit($event)" [disabled]="property.viewOnly" separator=","
           (onRemove)="checkIfRemovedValueIsDefault($event)"
           [class.p-inputwrapper-filled]="property.possibleValuesOptions && property.possibleValuesOptions.length > 0"></p-chips>
-        <label class="input-label">{{ 'possibleValues' | translate }} *</label>
+        <label class="input-label">{{ 'possibleValues' | translate }} *
+          <i class="far fa-question-circle" [pTooltip]="'help.propertyModel.possibleValues' | translate"></i>
+        </label>
       </span>
       <span class="p-float-label property-selection p-field" *ngIf="property.type === 'LocalitySelectionModel'">
         <ng-container *ngIf="false; else singleDomainSelection">
@@ -61,15 +71,20 @@
             (ngModelChange)="changed.emit({ property: property, domainChanged: true })">
           </p-dropdown>
         </ng-template>
-        <label class="input-label">{{ 'domain' | translate }} *</label>
+        <label class="input-label">{{ 'domain' | translate }} *
+          <i class="far fa-question-circle" [pTooltip]="'help.propertyModel.domain' | translate"></i>
+        </label>
       </span>
       <span class="p-float-label property-input app-input-chips p-field"
         *ngIf="property.type === 'OrganizationSelectionModel'">
-        <p-multiSelect class="app-multiple-selection" dropdownIcon="fas fa-caret-down"
-          [options]="optionsSector" [(ngModel)]="property.sectorsList"
+        <p-multiSelect class="app-multiple-selection" dropdownIcon="fas fa-caret-down" [options]="optionsSector"
+          [(ngModel)]="property.sectorsList"
           [selectedItemsLabel]="language === 'pt-BR' ? '{0} itens selecionados' : '{0} items selected'"
-          [disabled]="property.viewOnly" [required]="true" (ngModelChange)="changed.emit({property: property, sectorChanged: true})"></p-multiSelect>
-        <label class="input-label">{{ 'sector' | translate }} *</label>
+          [disabled]="property.viewOnly" [required]="true"
+          (ngModelChange)="changed.emit({property: property, sectorChanged: true})"></p-multiSelect>
+        <label class="input-label">{{ 'sector' | translate }} *
+          <i class="far fa-question-circle" [pTooltip]="'help.propertyModel.sector' | translate"></i>
+        </label>
       </span>
       <!-- Default Value -->
       <ng-container [ngSwitch]="property.type">
@@ -77,31 +92,41 @@
           <p-inputNumber class="app-input-number" [(ngModel)]="property.defaultValue" [disabled]="property.viewOnly"
             [min]="property.min" [max]="property.max" (ngModelChange)="changed.emit($event)" [showButtons]="true">
           </p-inputNumber>
-          <label class="input-label">{{ 'defaultValue' | translate }}</label>
+          <label class="input-label">{{ 'defaultValue' | translate }}
+            <i class="far fa-question-circle" [pTooltip]="'help.propertyModel.defaultValue' | translate"></i>
+          </label>
         </span>
         <span *ngSwitchCase="'NumberModel'" class="p-float-label property-input p-field input-number-scroll">
           <p-inputNumber class="app-input-number" [(ngModel)]="property.defaultValue" [disabled]="property.viewOnly"
             mode="decimal" [min]="property.min" [max]="property.max" [minFractionDigits]="property.precision"
             (ngModelChange)="changed.emit($event)" [showButtons]="true">
           </p-inputNumber>
-          <label class="input-label">{{ 'defaultValue' | translate }}</label>
+          <label class="input-label">{{ 'defaultValue' | translate }}
+            <i class="far fa-question-circle" [pTooltip]="'help.propertyModel.defaultValue' | translate"></i>
+          </label>
         </span>
         <span *ngSwitchCase="'CurrencyModel'" class="p-float-label property-input p-field input-number-scroll">
           <p-inputNumber class="app-input-number" [(ngModel)]="property.defaultValue" [disabled]="property.viewOnly"
             mode="decimal" [min]="property.min" [max]="property.max" [minFractionDigits]="2" [maxFractionDigits]="2"
             (ngModelChange)="changed.emit($event)" [showButtons]="true">
           </p-inputNumber>
-          <label class="input-label">{{ 'defaultValue' | translate }}</label>
+          <label class="input-label">{{ 'defaultValue' | translate }}
+            <i class="far fa-question-circle" [pTooltip]="'help.propertyModel.defaultValue' | translate"></i>
+          </label>
         </span>
         <span *ngSwitchCase="'TextModel'" class="p-float-label property-input p-field">
           <input class="app-input-text" type="text" pInputText [(ngModel)]="property.defaultValue"
             (ngModelChange)="changed.emit($event)" [disabled]="property.viewOnly" />
-          <label class="input-label">{{ 'defaultValue' | translate }}</label>
+          <label class="input-label">{{ 'defaultValue' | translate }}
+            <i class="far fa-question-circle" [pTooltip]="'help.propertyModel.defaultValue' | translate"></i>
+          </label>
         </span>
         <span *ngSwitchCase="'TextAreaModel'" class="p-float-label property-input p-field">
           <input class="app-input-text" type="text" pInputText [(ngModel)]="property.defaultValue"
             (ngModelChange)="changed.emit($event)" [disabled]="property.viewOnly" />
-          <label class="input-label">{{ 'defaultValue' | translate }}</label>
+          <label class="input-label">{{ 'defaultValue' | translate }}
+            <i class="far fa-question-circle" [pTooltip]="'help.propertyModel.defaultValue' | translate"></i>
+          </label>
         </span>
         <span *ngSwitchCase="'SelectionModel'" class="p-float-label property-input p-field">
           <ng-container *ngIf="property.multipleSelection; else singleSelectionDefault">
@@ -117,7 +142,9 @@
               [disabled]="!property.possibleValuesOptions?.length || property.viewOnly" [autoDisplayFirst]="false"
               [required]="true" (ngModelChange)="changed.emit($event)"></p-dropdown>
           </ng-template>
-          <label class="input-label">{{ 'defaultValue' | translate }}</label>
+          <label class="input-label">{{ 'defaultValue' | translate }}
+            <i class="far fa-question-circle" [pTooltip]="'help.propertyModel.defaultValue' | translate"></i>
+          </label>
         </span>
         <span *ngSwitchCase="'ToggleModel'" class="property-checkbox p-field-checkbox">
           <p-inputSwitch class="app-toggle" [(ngModel)]="property.defaultValue" (ngModelChange)="changed.emit($event)"
@@ -128,7 +155,8 @@
           <p-dropdown class="app-single-selection" [options]="property.list" [(ngModel)]="property.defaults"
             dropdownIcon="fas fa-caret-down" [autoDisplayFirst]="false" [required]="true" [disabled]="property.viewOnly"
             [showClear]="true" (ngModelChange)="changed.emit($event)"></p-dropdown>
-          <label class="input-label">{{ 'defaultValue' | translate }}</label>
+          <label class="input-label">{{ 'defaultValue' | translate }}        
+            <i class="far fa-question-circle" [pTooltip]="'help.propertyModel.defaultValue' | translate"></i></label>
         </span>
         <span *ngSwitchCase="'OrganizationSelectionModel'" class="p-float-label property-input p-field">
           <ng-container *ngIf="property.multipleSelection; else singleOrganizationDefault">
@@ -142,11 +170,15 @@
               dropdownIcon="fas fa-caret-down" [autoDisplayFirst]="false" [required]="true"
               [disabled]="property.viewOnly" (ngModelChange)="changed.emit($event)"></p-dropdown>
           </ng-template>
-          <label class="input-label">{{ 'defaultValue' | translate }}</label>
+          <label class="input-label">{{ 'defaultValue' | translate }}
+            <i class="far fa-question-circle" [pTooltip]="'help.propertyModel.defaultValue' | translate"></i>
+          </label>
         </span>
         <span *ngSwitchCase="'LocalitySelectionModel'" class="p-field button-select-locality-container">
-          <label class="input-label">{{'defaultValue' | translate}}</label>
-          <p-button class="button-select-locality"
+          <label class="input-label">{{'defaultValue' | translate}}
+            <i class="far fa-question-circle" [pTooltip]="'help.propertyModel.defaultValue' | translate"></i>
+          </label>
+          <p-button class="button-select-locality button-default-w8"
             [icon]="!!property.showIconButtonSelectLocality ? 'fa fa-search' : '' " iconPos="left"
             (onClick)="opLocalityDefault.toggle($event)" [label]="property.selectedLocalities"></p-button>
         </span>
@@ -175,19 +207,25 @@
             [monthNavigator]="true" [yearNavigator]="true" [yearRange]="yearRange"
             (ngModelChange)="changed.emit($event)">
           </p-calendar>
-          <label class="input-label">{{ 'defaultValue' | translate }}</label>
+          <label class="input-label">{{ 'defaultValue' | translate }}
+            <i class="far fa-question-circle" [pTooltip]="'help.propertyModel.defaultValue' | translate"></i>
+          </label>
         </span>
       </ng-container>
       <!-- /Default Value -->
       <span class="property-checkbox p-field-checkbox">
         <p-checkbox class="app-checkbox" [(ngModel)]="property.fullLine" [binary]="true"
           (ngModelChange)="changed.emit($event)" [disabled]="property.viewOnly"></p-checkbox>
-        <label class="input-label">{{ 'fullLine' | translate }}</label>
+        <label class="input-label">{{ 'fullLine' | translate }}
+          <i class="far fa-question-circle" [pTooltip]="'help.propertyModel.fullLine' | translate"></i>
+        </label>
       </span>
       <span class="property-checkbox p-field-checkbox" *ngIf="property.type !== 'ToggleModel'">
         <p-checkbox class="app-checkbox" [(ngModel)]="property.required" [binary]="true"
           (ngModelChange)="changed.emit($event)" [disabled]="property.viewOnly || property.obligatory"></p-checkbox>
-        <label class="input-label">{{ 'required' | translate }}</label>
+        <label class="input-label">{{ 'required' | translate }}
+          <i class="far fa-question-circle" [pTooltip]="'help.propertyModel.required' | translate"></i>
+        </label>
       </span>
       <span class="property-checkbox p-field-checkbox"
         *ngIf="[ 'SelectionModel', 'LocalitySelectionModel', 'OrganizationSelectionModel' ].includes(property.type)">
@@ -195,39 +233,58 @@
           [disabled]="property.viewOnly" [required]="true"
           (ngModelChange)="changed.emit({property: property, multipleSelectedChanged: true}); checkDefaultValue();">
         </p-checkbox>
-        <label class="input-label">{{ 'multipleSelection' | translate }}</label>
+        <label class="input-label">{{ 'multipleSelection' | translate }}
+          <i class="far fa-question-circle" [pTooltip]="'help.propertyModel.multiSelection' | translate"></i>
+        </label>
       </span>
       <span class="p-float-label property-input p-field input-number-scroll"
         *ngIf="[ 'IntegerModel', 'TextModel', 'TextAreaModel'].includes(property.type)">
         <p-inputNumber inputStyleClass="app-input-text" [(ngModel)]="property.min" [showButtons]="true"
           (ngModelChange)="changed.emit($event)" [disabled]="property.viewOnly"></p-inputNumber>
-        <label class="input-label">{{ 'minimum' | translate }}</label>
+        <label class="input-label">{{ 'minimum' | translate }}
+          <i class="far fa-question-circle" [pTooltip]="'help.propertyModel.minimum' | translate"></i>
+        </label>
       </span>
       <span class="p-float-label property-input p-field input-number-scroll"
         *ngIf="['NumberModel'].includes(property.type)">
         <p-inputNumber inputStyleClass="app-input-text" [(ngModel)]="property.min"
           [minFractionDigits]="property.precision" [showButtons]="true" (ngModelChange)="changed.emit($event)"
           [disabled]="property.viewOnly"></p-inputNumber>
-        <label class="input-label">{{ 'minimum' | translate }}</label>
+        <label class="input-label">{{ 'minimum' | translate }}
+          <i class="far fa-question-circle" [pTooltip]="'help.propertyModel.minimum' | translate"></i></label>
       </span>
 
       <span class="p-float-label property-input p-field input-number-scroll"
         *ngIf="[ 'IntegerModel', 'TextModel', 'TextAreaModel' ].includes(property.type)">
         <p-inputNumber inputStyleClass="app-input-text" [(ngModel)]="property.max" [showButtons]="true"
           (ngModelChange)="changed.emit($event)" [disabled]="property.viewOnly"></p-inputNumber>
-        <label class="input-label">{{ 'maximum' | translate }}</label>
+        <label class="input-label">{{ 'maximum' | translate }}
+          <i class="far fa-question-circle" [pTooltip]="'help.propertyModel.maximum' | translate"></i>
+        </label>
       </span>
       <span class="p-float-label property-input p-field input-number-scroll"
         *ngIf="['NumberModel'].includes(property.type)">
         <p-inputNumber inputStyleClass="app-input-text" [(ngModel)]="property.max" [showButtons]="true"
           [minFractionDigits]="property.precision" (ngModelChange)="changed.emit($event)"
           [disabled]="property.viewOnly"></p-inputNumber>
-        <label class="input-label">{{ 'maximum' | translate }}</label>
+        <label class="input-label">{{ 'maximum' | translate }}
+          <i class="far fa-question-circle" [pTooltip]="'help.propertyModel.maximum' | translate"></i>
+        </label>
       </span>
       <span class="p-float-label property-input p-field input-number-scroll" *ngIf="property.type === 'TextAreaModel'">
         <p-inputNumber inputStyleClass="app-input-text" [(ngModel)]="property.rows" [showButtons]="true"
           (ngModelChange)="changed.emit($event)" [disabled]="property.viewOnly"></p-inputNumber>
-        <label class="input-label">{{ 'rows' | translate }}</label>
+        <label class="input-label">{{ 'rows' | translate }}
+          <i class="far fa-question-circle" [pTooltip]="'help.propertyModel.rows' | translate"></i>
+        </label>
+      </span>
+      <!-- help text -->
+      <span class="p-float-label property-input p-field help-text">
+        <textarea class="app-text-area" pInputTextarea [(ngModel)]="property.helpText" rows="1"
+          (ngModelChange)="changed.emit($event)" [disabled]="property.viewOnly"></textarea>
+        <label class="input-label">{{ 'help.textHelpOnline' | translate }}
+          <i class="far fa-question-circle" [pTooltip]="'help.propertyModel.helpText' | translate"></i>
+        </label>
       </span>
     </div>
   </div>

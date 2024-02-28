@@ -180,6 +180,7 @@ export class WorkpackSectionRisksComponent implements OnInit, OnDestroy {
         iconSvg: false,
         nameCardItem: risk.name,
         itemId: risk.id,
+        idAtributeName: 'idRisk',
         menuItems: [{
           label: this.translateSrv.instant('delete'),
           icon: 'fas fa-trash-alt',
@@ -190,7 +191,7 @@ export class WorkpackSectionRisksComponent implements OnInit, OnDestroy {
         paramsUrlCard: [
           { name: 'idWorkpack', value: this.workpackParams.idWorkpack },
           { name: 'idWorkpackModelLinked', value: this.workpackParams.idWorkpackModelLinked },
-          { name: 'id', value: risk.id },
+          { name: 'idRisk', value: risk.id },
         ]
       })) :
         this.risks.map(risk => ({
@@ -200,6 +201,7 @@ export class WorkpackSectionRisksComponent implements OnInit, OnDestroy {
           iconSvg: false,
           nameCardItem: risk.name,
           itemId: risk.id,
+          idAtributeName: 'idRisk',
           menuItems: [{
             label: this.translateSrv.instant('delete'),
             icon: 'fas fa-trash-alt',
@@ -210,7 +212,7 @@ export class WorkpackSectionRisksComponent implements OnInit, OnDestroy {
           paramsUrlCard: [
             { name: 'idWorkpack', value: this.workpackParams.idWorkpack },
             { name: 'idWorkpackModelLinked', value: this.workpackParams.idWorkpackModelLinked },
-            { name: 'id', value: risk.id },
+            { name: 'idRisk', value: risk.id },
           ]
         }));
       if (this.workpackSrv.getEditPermission() && !this.workpackData.workpack.canceled) {
@@ -221,6 +223,7 @@ export class WorkpackSectionRisksComponent implements OnInit, OnDestroy {
           iconSvg: true,
           nameCardItem: null,
           itemId: null,
+          idAtributeName: 'idRisk',
           menuItems: null,
           urlCard: '/workpack/risks',
           paramsUrlCard: [
@@ -260,7 +263,7 @@ export class WorkpackSectionRisksComponent implements OnInit, OnDestroy {
       await this.workpackBreadcrumbStorageSrv.setBreadcrumbStorage();
       this.router.navigate(['/filter-dataview'], {
         queryParams: {
-          id: idFilter,
+          idFilter: idFilter,
           entityName,
           idWorkpackModel: this.workpackData.workpackModel.id,
           idOffice: this.workpackParams.idOffice

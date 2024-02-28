@@ -14,6 +14,7 @@ interface ICardItemRole {
   role?: IStakeholderRole;
   readOnly?: boolean;
   personRoleOptions?: { label: string; value: string }[];
+  new?: boolean;
 }
 
 @Component({
@@ -28,6 +29,7 @@ export class StakeholderRoleCardItemComponent implements OnInit, OnDestroy {
   @Input() stakeholderRoles: IStakeholderRole[];
   @Output() newCardItemRole = new EventEmitter();
   @Output() roleChanged = new EventEmitter();
+  @Output() roleDeleted = new EventEmitter();
   responsive: boolean;
   iconsEnum = IconsEnum;
   calendarFormat: string;
@@ -69,5 +71,9 @@ export class StakeholderRoleCardItemComponent implements OnInit, OnDestroy {
 
   handleRoleChange() {
     this.roleChanged.next();
+  }
+
+  deleteRole() {
+    this.roleDeleted.next()
   }
 }

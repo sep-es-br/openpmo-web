@@ -20,6 +20,7 @@ import { IWorkpack } from 'src/app/shared/interfaces/IWorkpack';
 import * as moment from 'moment';
 import { ICartItemCostAssignment } from 'src/app/shared/interfaces/ICartItemCostAssignment';
 import { ICostAccount } from 'src/app/shared/interfaces/ICostAccount';
+import { CancelButtonComponent } from 'src/app/shared/components/cancel-button/cancel-button.component';
 
 @Component({
   selector: 'app-schedule',
@@ -32,6 +33,7 @@ import { ICostAccount } from 'src/app/shared/interfaces/ICostAccount';
 export class ScheduleComponent implements OnInit, OnDestroy {
 
   @ViewChild(SaveButtonComponent) saveButton: SaveButtonComponent;
+  @ViewChild(CancelButtonComponent) cancelButton: CancelButtonComponent;
   @ViewChildren(Calendar) calendarComponents: Calendar[];
 
   responsive: boolean;
@@ -291,6 +293,7 @@ export class ScheduleComponent implements OnInit, OnDestroy {
   }
 
   handleChangeValues() {
+    this.cancelButton.showButton();
     this.scheduleStartDate = this.formSchedule.controls.start.value;
     if (this.formSchedule.controls.actualWork.value > 0 && this.formSchedule.controls.start.value) {
       const startDate = moment(this.formSchedule.controls.start.value);
@@ -367,6 +370,7 @@ export class ScheduleComponent implements OnInit, OnDestroy {
   }
 
   async saveSchedule() {
+    this.cancelButton.hideButton();
     const startDate = moment(this.formSchedule.controls.start.value);
     const endDate = moment(this.formSchedule.controls.end.value);
     if (startDate.isSame(endDate, 'days')) {
@@ -418,4 +422,22 @@ export class ScheduleComponent implements OnInit, OnDestroy {
       );
     }
   }
+
+  handleOnCancel() {
+    this.saveButton.hideButton();
+    const newDate = moment();
+    this.formSchedule.reset({
+      start: newDate.toDate(),
+      end: newDate.add(1, 'days').toDate(),
+      plannedWork: null,
+      actualWork: null,
+      distribution: 'SIGMOIDAL'
+    });
+    this.costAssignmentsCardItems = [{
+      type: 'new-cost-card',
+      menuItemsNewCost: this.menuItemsCostAccounts
+    }];
+    this.reloadCostAssignmentTotals();
+  }
+
 }

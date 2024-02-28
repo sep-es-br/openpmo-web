@@ -13,7 +13,9 @@
           <div class="form-group" *ngIf="(!idProcess) || (idProcess && !isLoading)">
             <div class="p-field">
               <div class="input-container">
-                <label class="app-input-label" for="float-processNumber">{{ "processNumber" | translate }} * </label>
+                <label class="app-input-label" for="float-processNumber">{{ "processNumber" | translate }} * 
+                  <i class="far fa-question-circle" [pTooltip]="'help.process.number' | translate"></i>
+                </label>
                 <span class="p-input-icon-right">
                   <i class="pi pi-search" *ngIf="!idProcess"></i>
                   <input type="text" pInputText class="app-input-text" formControlName="processNumber"
@@ -24,7 +26,9 @@
             <div class="p-field margin-top-responsive" *ngIf="process">
               <span class="p-float-label">
                 <input class="app-input-text" id="float-name" formControlName="name" type="text" pInputText/>
-                <label class="app-input-label" for="float-name">{{ "name" | translate }} * </label>
+                <label class="app-input-label" for="float-name">{{ "name" | translate }} * 
+                  <i class="far fa-question-circle" [pTooltip]="'help.process.name' | translate"></i>
+                </label>
                 <app-input-message [form]="formProcess" field="name"></app-input-message>
               </span>
             </div>
@@ -42,7 +46,7 @@
             <div class="p-field">
               <span class="p-float-label">
                 <textarea pInputTextarea id="float-subject" formControlName="subject" class="app-text-area"
-                          [rows]="1">
+                          [rows]="2">
                 </textarea>
                 <label class="app-input-label" for="float-subject">{{ "subject" | translate }} * </label>
               </span>
@@ -75,7 +79,9 @@
                 <textarea pInputTextarea id="float-note" formControlName="note" class="app-text-area"
                           [rows]="1">
                 </textarea>
-                <label class="app-input-label" for="float-note">{{ "note" | translate }} </label>
+                <label class="app-input-label" for="float-note">{{ "note" | translate }} 
+                  <i class="far fa-question-circle" [pTooltip]="'help.process.note' | translate"></i>
+                </label>
               </span>
               <app-input-message [form]="formProcess" field="note"></app-input-message>
             </div>
@@ -150,4 +156,8 @@
     <span>{{idProcess}}</span>
   </div>
 </div>
-<app-save-button #saveButton (save)="saveProcess()"></app-save-button>
+<app-buttons-container>
+  <app-save-button #saveButton (save)="saveProcess()"></app-save-button>
+  <app-cancel-button (cancel)="handleOnCancel()"></app-cancel-button>
+</app-buttons-container>
+

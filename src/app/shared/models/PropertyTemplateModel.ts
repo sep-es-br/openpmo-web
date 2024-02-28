@@ -42,6 +42,7 @@ export class PropertyTemplateModel implements IProperty {
   needReason?: boolean;
   collapsed?: boolean;
   dirty = false;
+  helpText?: string;
 
   getValues() {
     const {

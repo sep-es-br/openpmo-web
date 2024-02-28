@@ -18,6 +18,7 @@ import { formatDateToString } from 'src/app/shared/utils/formatDateToString';
 import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
 import { SaveButtonComponent } from 'src/app/shared/components/save-button/save-button.component';
 import { WorkpackModelService } from 'src/app/shared/services/workpack-model.service';
+import { CancelButtonComponent } from 'src/app/shared/components/cancel-button/cancel-button.component';
 
 interface ICardItemRole {
   type: string;
@@ -37,6 +38,7 @@ interface ICardItemRole {
 export class StakeholderOrganizationComponent implements OnInit {
 
   @ViewChild(SaveButtonComponent) saveButton: SaveButtonComponent;
+  @ViewChild(CancelButtonComponent) cancelButton: CancelButtonComponent;
 
   idWorkpack: number;
   idWorkpackModelLinked: number;
@@ -53,6 +55,7 @@ export class StakeholderOrganizationComponent implements OnInit {
   responsive: boolean;
   stakeholder: IStakeholder;
   stakeholderRoles: IStakeholderRole[];
+  backupStakeholderRolesCardItems: ICardItemRole[];
   stakeholderRolesCardItems: ICardItemRole[];
   editPermission = false;
   isLoading = false;
@@ -139,7 +142,7 @@ export class StakeholderOrganizationComponent implements OnInit {
       this.rolesOptions = workpackData.workpackModel.organizationRoles?.map(role => ({ label: role, value: role }));
 
     } else {
-      const result = await this.workpackSrv.GetWorkpackById(this.idWorkpack);
+      const result = await this.workpackSrv.GetWorkpackById(this.idWorkpack, { 'id-plan': this.idPlan });
       if (result.success) {
         this.workpack = result.data;
       }
@@ -205,12 +208,13 @@ export class StakeholderOrganizationComponent implements OnInit {
       this.stakeholderRoles = null;
       this.loadStakeholderRolesCardsItems();
       this.saveButton?.hideButton();
+      this.cancelButton.showButton();
     }
   }
 
   loadStakeholderRolesCardsItems() {
     if (this.stakeholderRoles) {
-      this.stakeholderRolesCardItems = this.stakeholderRoles.map(role => ({
+      this.stakeholderRolesCardItems = this.stakeholderRoles && this.stakeholderRoles.map(role => ({
         type: 'role-card',
         readOnly: !this.editPermission,
         role,
@@ -229,6 +233,7 @@ export class StakeholderOrganizationComponent implements OnInit {
         }];
       }
     }
+    this.backupStakeholderRolesCardItems = this.stakeholderRolesCardItems.map( card => ({...card, role: {...card.role}}));
   }
 
   createNewCardItemRole() {
@@ -254,10 +259,12 @@ export class StakeholderOrganizationComponent implements OnInit {
         to: null
       }];
     }
+    this.cancelButton.showButton();
     this.loadStakeholderRolesCardsItems();
   }
 
   handleShowSaveButton() {
+    this.cancelButton.showButton();
     if (this.organization) {
       return this.validateStakeholder()
         ? this.saveButton?.showButton()
@@ -287,6 +294,7 @@ export class StakeholderOrganizationComponent implements OnInit {
   }
 
   async saveStakeholder() {
+    this.cancelButton.hideButton();
     this.formIsSaving = true;
     const stakeholderModel = {
       idWorkpack: this.idWorkpack,
@@ -340,4 +348,16 @@ export class StakeholderOrganizationComponent implements OnInit {
       }
     }
   }
+
+  handleOnCancel() {
+    this.saveButton.hideButton();
+    if (!this.idOrganization) {
+      this.organizationSelected = undefined;
+      this.organization = undefined;
+      this.stakeholderRoles = null;
+    }
+    this.stakeholderRolesCardItems = this.backupStakeholderRolesCardItems.filter( card => card.role.id || card.type === 'new-role-card')
+      .map(  card => ({...card, role: {...card.role}}));
+  }
+
 }

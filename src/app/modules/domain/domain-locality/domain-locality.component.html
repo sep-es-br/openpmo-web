@@ -14,30 +14,38 @@
       </div>
       <div>
         <form [formGroup]="formLocality">
-          <span class="p-float-label">
+          <span class="p-float-label" [class.desktop]="!responsive">
             <input formControlName="name" type="text" pInputText class="app-input-text" [class.mobile]="responsive"
-              [class.desktop]="!responsive" (input)="mirrorNameToFullname()">
+               (input)="mirrorNameToFullname()">
             <label for="float-input" class="app-input-label">{{'name' | translate}}<span
-                class="required-indicator">*</span></label>
+                class="required-indicator">*</span>
+                <i class="far fa-question-circle" [pTooltip]="'help.locality.name' | translate"></i>
+              </label>
           </span>
           <app-input-message [form]="formLocality" field="name"></app-input-message>
           <span class="p-float-label">
             <textarea pInputTextarea formControlName="fullName" class="app-text-area" rows="1">
               </textarea>
             <label for="float-input" class="app-input-label">{{'fullName' | translate}}<span
-                class="required-indicator">*</span></label>
+                class="required-indicator">*</span>
+                <i class="far fa-question-circle" [pTooltip]="'help.locality.fullName' | translate"></i>
+              </label>
           </span>
           <app-input-message [form]="formLocality" field="fullName"></app-input-message>
           <div class="p-grid">
             <span class="p-col-12 p-md-6 p-lg-3 p-float-label">
               <input formControlName="latitude" type="text" pInputText pKeyFilter="num" class="app-input-text"
-                [class.mobile]="responsive" [class.desktop]="!responsive">
-              <label for="float-input" class="app-input-label">GPS Latitude</label>
+                [class.mobile]="responsive">
+              <label for="float-input" class="app-input-label">GPS Latitude
+                <i class="far fa-question-circle" [pTooltip]="'help.locality.localityLatitude' | translate"></i>
+              </label>
             </span>
             <span class="p-col-12 p-md-6 p-lg-3 p-float-label">
               <input formControlName="longitude" type="text" pInputText pKeyFilter="num" class="app-input-text"
-                [class.mobile]="responsive" [class.desktop]="!responsive">
-              <label for="float-input" class="app-input-label">GPS Longitude</label>
+                [class.mobile]="responsive">
+              <label for="float-input" class="app-input-label">GPS Longitude
+                <i class="far fa-question-circle" [pTooltip]="'help.locality.localityLongitude' | translate"></i>
+              </label>
             </span>
           </div>
         </form>
@@ -77,5 +85,8 @@
   <div class="id-container" *ngIf="idLocality && cardProperties">
     <span>{{idLocality}}</span>
   </div>
-  <app-save-button [form]="formLocality" (save)="handleOnSubmit()"></app-save-button>
+  <app-buttons-container>
+    <app-save-button (save)="handleOnSubmit()"></app-save-button>
+    <app-cancel-button (cancel)="handleOnCancel()"></app-cancel-button>
+  </app-buttons-container>
 </div>

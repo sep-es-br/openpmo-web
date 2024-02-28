@@ -11,7 +11,9 @@
         <span class="p-float-label">
           <textarea pInputTextarea [rows]="3" class="app-text-area" id="float-name"
             formControlName="description"></textarea>
-          <label class="app-input-label" for="float-name">{{ "information" | translate }} * </label>
+          <label class="app-input-label" for="float-name">{{ "information" | translate }} * 
+            <i class="far fa-question-circle" [pTooltip]="'help.journal.description' | translate"></i>
+          </label>
         </span>
         <app-input-message [form]="formJournal" field="description"></app-input-message>
       </form>
@@ -28,5 +30,9 @@
       </div>
     </app-card>
   </div>
-  <app-save-button [form]="formJournal" (save)="handleOnSubmit()"></app-save-button>
+  <app-buttons-container>
+    <app-save-button [form]="formJournal" (save)="handleOnSubmit()"></app-save-button>
+    <app-cancel-button (cancel)="handleOnCancel()"></app-cancel-button>
+  </app-buttons-container>
+  
 </div>

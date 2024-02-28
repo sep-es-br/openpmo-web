@@ -19,6 +19,7 @@ import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Subject } from 'rxjs';
 import { ICard } from 'src/app/shared/interfaces/ICard';
+import { CancelButtonComponent } from 'src/app/shared/components/cancel-button/cancel-button.component';
 
 @Component({
   selector: 'app-sharing',
@@ -28,6 +29,7 @@ import { ICard } from 'src/app/shared/interfaces/ICard';
 export class SharingComponent implements OnInit {
 
   @ViewChild(SaveButtonComponent) saveButton: SaveButtonComponent;
+  @ViewChild(CancelButtonComponent) cancelButton: CancelButtonComponent;
 
   idWorkpack: number;
   idWorkpackParent: number;
@@ -234,6 +236,7 @@ export class SharingComponent implements OnInit {
     } else {
       this.cardItemSharing = Array.from(this.cardItemSharing.filter(card => card.titleCardItem !== this.translateSrv.instant('all')));
     }
+    this.cancelButton.showButton();
     if (office.id === this.office.id) {
       this.handleShowSaveButton();
     } else {
@@ -290,10 +293,11 @@ export class SharingComponent implements OnInit {
     if (this.cardItemSharing.filter(card => card.typeCardItem === 'sharedItem' && (!card.selectedOption || card.selectedOption === '')).length === 0) {
       this.saveButton.showButton();
     }
+    this.cancelButton.showButton();
   }
 
   async saveWorkpackSharing() {
-    this.saveButton?.hideButton();
+    this.cancelButton.hideButton();
     this.formIsSaving = true;
     const sharedWithSender: IWorkpackShared[] = this.cardItemSharing.filter(card => card.typeCardItem === 'sharedItem').map(share => ({
       id: share.itemId,
@@ -311,6 +315,11 @@ export class SharingComponent implements OnInit {
       });
     }
 
+  }
+
+  handleOnCancel() {
+    this.saveButton.hideButton();
+    this.loadSharedCardItems();
   }
 
 }

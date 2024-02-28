@@ -96,5 +96,9 @@
     </app-card>
   </div>
 </div>
-<app-save-button (save)="savePersonToAdministrator()"></app-save-button>
+<app-buttons-container>
+  <app-save-button (save)="savePersonToAdministrator()"></app-save-button>
+  <app-cancel-button (cancel)="handleOnCancel()"></app-cancel-button>
+</app-buttons-container>
+
 

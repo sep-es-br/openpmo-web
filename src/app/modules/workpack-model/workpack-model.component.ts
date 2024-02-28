@@ -41,6 +41,7 @@ import { MenuService } from 'src/app/shared/services/menu.service';
 import { ConfigDataViewService } from 'src/app/shared/services/config-dataview.service';
 import { TypeOrganization } from 'src/app/shared/enums/TypeOrganization';
 import { IOrganization } from 'src/app/shared/interfaces/IOrganization';
+import { CancelButtonComponent } from 'src/app/shared/components/cancel-button/cancel-button.component';
 
 interface IIcon {
   name: string;
@@ -62,6 +63,7 @@ interface IGroup {
 export class WorkpackModelComponent implements OnInit {
 
   @ViewChild(SaveButtonComponent) saveButton: SaveButtonComponent;
+  @ViewChild(CancelButtonComponent) cancelButton: CancelButtonComponent;
 
   idOffice: number;
   idStrategy: number;
@@ -122,6 +124,8 @@ export class WorkpackModelComponent implements OnInit {
   currentBreadcrumbSub: Subscription;
   isLoading = false;
   formIsSaving = false;
+  nextPosition: number;
+  workpackModel: IWorkpackModel;
 
   constructor(
     private router: Router,
@@ -224,14 +228,14 @@ export class WorkpackModelComponent implements OnInit {
   }
 
   async setFormProperties() {
-    let nextPosition;
+    this.nextPosition;
     if (!this.idWorkpackModel) {
       const result = await this.workpackModelSrv.getNextPosition({
         'id-workpack-model': Number(this.idParentWorkpack) ? this.idParentWorkpack : undefined,
         'id-plan-model': this.idStrategy
       });
       if (result.success) {
-        nextPosition = result.data.nextPosition;
+        this.nextPosition = result.data.nextPosition;
       }
     }
     this.formProperties = this.fb.group({
@@ -239,7 +243,7 @@ export class WorkpackModelComponent implements OnInit {
       nameInPlural: ['', Validators.required],
       icon: this.workpackModelType ? [IconsTypeWorkpackModelEnum[this.workpackModelType], Validators.required] :
         [undefined, Validators.required],
-      position: [nextPosition || 1, Validators.required],
+      position: [this.nextPosition || 1, Validators.required],
       sortedBy: 'name'
     });
     this.getSortedByList();
@@ -669,6 +673,7 @@ export class WorkpackModelComponent implements OnInit {
               const value = p.defaultValue && p.defaultValue.toLocaleString();
               p.defaultValue = value && new Date(value);
             }
+            p.helpText = p.helpText ? p.helpText : '';
             if (p.type === TypePropertyEnum.GroupModel) {
               p.menuModelProperties = this.loadMenuPropertyGroup(p);
               p.groupedProperties.forEach(async (gp) => {
@@ -681,6 +686,7 @@ export class WorkpackModelComponent implements OnInit {
                 if (gp.sectors) {
                   gp.sectorsList = gp.sectors.split(',').map(sector => sector.toUpperCase());
                 }
+                gp.helpText = gp.helpText ? gp.helpText : '';
                 if (gp.idDomain) {
                   gp.extraList = await this.getListLocalities(gp.idDomain, gp.multipleSelection);
                   gp.extraListDefaults = await this.getListLocalitiesDefaults(gp);
@@ -893,6 +899,7 @@ export class WorkpackModelComponent implements OnInit {
   }
 
   checkProperties(changeStakeholderRoles = false) {
+    this.cancelButton.showButton();
     if (this.formProperties.invalid) {
       this.saveButton?.hideButton();
       return;
@@ -1310,6 +1317,7 @@ export class WorkpackModelComponent implements OnInit {
   }
 
   async handleSubmit() {
+    this.cancelButton.hideButton();
     this.formIsSaving = true;
     this.modelProperties.forEach(prop => {
       delete prop.extraList;
@@ -1423,6 +1431,23 @@ export class WorkpackModelComponent implements OnInit {
       });
       this.formIsSaving = false;
       this.menuSrv.reloadMenuPlanModel();
+    }
+  }
+
+  handleOnCancel() {
+    this.saveButton.hideButton();
+    if (this.idWorkpackModel) {
+      this.loadDetails();
+    } else {
+      this.formProperties.reset({
+        name: '',
+        nameInPlural: '',
+        icon: this.workpackModelType ? [IconsTypeWorkpackModelEnum[this.workpackModelType]] :
+          [undefined],
+        position: [this.nextPosition || 1],
+        sortedBy: 'name'
+      });
+      this.loadDetails();
     }
   }
 

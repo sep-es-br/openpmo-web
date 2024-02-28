@@ -26,7 +26,9 @@
                 <input class="app-input-text" [class.responsive]="responsive" id="float-name" name="name"
                        formControlName="name" type="text" [ngStyle]="{'width': '30%'}" pInputText/>
                 <label class="app-input-label" for="float-name">{{ (!baseline?.cancelation ? "name" : "project") |
-                  translate }} * </label>
+                  translate }} * 
+                <i class="far fa-question-circle" [pTooltip]="(!baseline?.cancelation ? 'help.baseline.baselineName' : 'help.baseline.projectName') | translate"></i>  
+                </label>
               </span>
               <app-input-message [form]="formBaseline" field="name"></app-input-message>
             </div>
@@ -34,7 +36,9 @@
               <span class="p-float-label">
                 <input class="app-input-text" [class.responsive]="responsive" id="float-proposer" name="proposer"
                        formControlName="proposer" type="text" [ngStyle]="{'width': '30%'}" pInputText/>
-                <label class="app-input-label" for="float-proposer">{{ "proposer" | translate }} * </label>
+                <label class="app-input-label" for="float-proposer">{{ "proposer" | translate }} * 
+                  <i class="far fa-question-circle" [pTooltip]="'help.baseline.proposer' | translate"></i>
+                </label>
               </span>
               <app-input-message [form]="formBaseline" field="proposer"></app-input-message>
             </div>
@@ -43,7 +47,9 @@
                 <textarea pInputTextarea id="float-description" formControlName="description" class="app-text-area"
                           rows="1">
                 </textarea>
-                <label class="app-input-label" for="float-description">{{ "description" | translate }} * </label>
+                <label class="app-input-label" for="float-description">{{ "description" | translate }} * 
+                  <i class="far fa-question-circle" [pTooltip]="'help.baseline.description' | translate"></i>
+                </label>
               </span>
               <app-input-message [form]="formBaseline" field="description"></app-input-message>
             </div>
@@ -52,6 +58,7 @@
                 <textarea pInputTextarea id="float-message" formControlName="message" class="app-text-area" rows="1">
                 </textarea>
                 <label class="app-input-label" for="float-message">{{ "messageFromBaselineProposer" | translate }} *
+                  <i class="far fa-question-circle" [pTooltip]="'help.baseline.message' | translate"></i>
                 </label>
               </span>
               <app-input-message [form]="formBaseline" field="message"></app-input-message>

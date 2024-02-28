@@ -18,6 +18,7 @@ export class PropertyTextComponent implements OnInit {
   responsive: boolean;
   milestoneStatusEnum = MilestoneStatusEnum;
   $destroy = new Subject();
+  value;
 
   constructor(
     private responsiveSrv: ResponsiveService,
@@ -41,6 +42,7 @@ export class PropertyTextComponent implements OnInit {
     this.$destroy.complete();
     this.$destroy.unsubscribe();
   }
+
 
 }
 

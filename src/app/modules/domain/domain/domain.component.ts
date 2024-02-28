@@ -1,4 +1,3 @@
-import { IFilterProperty } from 'src/app/shared/interfaces/IFilterProperty';
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -15,7 +14,6 @@ import { ILocality, ILocalityRoot } from 'src/app/shared/interfaces/ILocality';
 import { ResponsiveService } from 'src/app/shared/services/responsive.service';
 import { DomainService } from 'src/app/shared/services/domain.service';
 import { IDomain } from 'src/app/shared/interfaces/IDomain';
-import { LocalityService } from 'src/app/shared/services/locality.service';
 import { TypeLocality } from 'src/app/shared/enums/TypeLocality';
 import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
 import { SaveButtonComponent } from 'src/app/shared/components/save-button/save-button.component';
@@ -23,11 +21,8 @@ import { OfficeService } from 'src/app/shared/services/office.service';
 import { AuthService } from 'src/app/shared/services/auth.service';
 import { IOffice } from 'src/app/shared/interfaces/IOffice';
 import { OfficePermissionService } from 'src/app/shared/services/office-permission.service';
-import { FilterDataviewService } from 'src/app/shared/services/filter-dataview.service';
-import { FilterDataviewPropertiesEntity } from 'src/app/shared/constants/filterDataviewPropertiesEntity';
-import { PropertyTemplateModel } from 'src/app/shared/models/PropertyTemplateModel';
-import { ThrowStmt } from '@angular/compiler';
 import { ConfigDataViewService } from 'src/app/shared/services/config-dataview.service';
+import { CancelButtonComponent } from 'src/app/shared/components/cancel-button/cancel-button.component';
 
 @Component({
   selector: 'app-domain',
@@ -37,6 +32,7 @@ import { ConfigDataViewService } from 'src/app/shared/services/config-dataview.s
 export class DomainComponent implements OnInit, OnDestroy {
 
   @ViewChild(SaveButtonComponent) saveButton: SaveButtonComponent;
+  @ViewChild(CancelButtonComponent) cancelButton: CancelButtonComponent;
 
   propertiesDomain: IDomain;
   responsive = false;
@@ -106,11 +102,17 @@ export class DomainComponent implements OnInit, OnDestroy {
     this.formDomain.valueChanges
       .pipe(takeUntil(this.$destroy), filter(() => this.formDomain.dirty && this.formDomain.valid &&
         (!this.propertiesDomain || !this.propertiesDomain.localityRoot ? this.formLocalityRoot.valid : true)))
-      .subscribe(() => this.saveButton.showButton());
+      .subscribe(() => { this.saveButton.showButton(); });
+    this.formDomain.valueChanges
+      .pipe(takeUntil(this.$destroy), filter(() => this.formDomain.dirty))
+      .subscribe(() => { this.cancelButton.showButton() });
     this.formLocalityRoot.valueChanges
       .pipe(takeUntil(this.$destroy), filter(() => this.formDomain.valid && this.formLocalityRoot.dirty
         && this.formLocalityRoot.valid))
       .subscribe(() => this.saveButton.showButton());
+    this.formLocalityRoot.valueChanges
+      .pipe(takeUntil(this.$destroy), filter(() => this.formLocalityRoot.dirty))
+      .subscribe(() => this.cancelButton.showButton());
     this.responsiveSvr.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.responsive = value);
   }
 
@@ -245,6 +247,7 @@ export class DomainComponent implements OnInit, OnDestroy {
   }
 
   async handleOnSubmit() {
+    this.cancelButton.hideButton();
     this.formIsSaving = true;
     const { success, data } = this.propertiesDomain
       ? await this.domainSvr.put({
@@ -252,7 +255,7 @@ export class DomainComponent implements OnInit, OnDestroy {
         localityRoot: this.propertiesDomain.localityRoot ? this.propertiesDomain.localityRoot : this.formLocalityRoot.value
       })
       : await this.domainSvr.post({ ...this.formDomain.value, idOffice: this.idOffice, localityRoot: this.formLocalityRoot.value });
-    
+
     if (success) {
       this.formIsSaving = false;
       if (!this.idDomain) {
@@ -274,7 +277,16 @@ export class DomainComponent implements OnInit, OnDestroy {
         info: this.propertiesDomain?.name,
         tooltip: this.propertiesDomain?.fullName
       });
-      
+
+    }
+  }
+
+  handleOnCancel() {
+    this.saveButton.hideButton();
+    if (this.idDomain) {
+      this.formDomain.reset({ name: this.propertiesDomain.name, fullName: this.propertiesDomain.fullName });
+    } else {
+      this.formDomain.reset();
     }
   }
 

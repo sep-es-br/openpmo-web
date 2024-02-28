@@ -11,8 +11,7 @@
               [pTooltip]="'managementEnded'|translate"></i>
             <i class="far fa-check-square" *ngIf="!!properties.completed" [pTooltip]="label|translate"></i>
           </div>
-          <div class="status-container"
-            *ngIf="(!properties.endManagementDate || properties.endManagementDate === null) && !properties.completed &&
+          <div class="status-container" *ngIf="(!properties.endManagementDate || properties.endManagementDate === null) && !properties.completed &&
             properties?.dashboardData?.risk?.total > 0">
             <i class="app-icon risk" [ngStyle]="{ fontSize: '1.5rem' }" [class.risk-red]="riskImportance === 'high'"
               [class.risk-yellow]="riskImportance === 'low'" [class.risk-orange]="riskImportance === 'medium'"
@@ -26,17 +25,17 @@
               </div>
               <div class="risks-container">
                 <div class="risk-importance-item" *ngIf="properties?.dashboardData?.risk?.high > 0">
-                  <i class="app-icon risk risk-red" [ngStyle]="{ fontSize: '1.5rem' }"></i>
+                  <i class="app-icon risk risk-red" [ngStyle]="{ fontSize: '1.2rem' }"></i>
                   <span>{{properties?.dashboardData?.risk?.high}}</span>
                   <label>{{'high'|translate}}</label>
                 </div>
                 <div class="risk-importance-item" *ngIf="properties?.dashboardData?.risk?.medium > 0">
-                  <i class="app-icon risk risk-orange" [ngStyle]="{ fontSize: '1.5rem' }"></i>
+                  <i class="app-icon risk risk-orange" [ngStyle]="{ fontSize: '1.2rem' }"></i>
                   <span>{{properties?.dashboardData?.risk?.medium}}</span>
                   <label>{{'medium'|translate}}</label>
                 </div>
                 <div class="risk-importance-item" *ngIf="properties?.dashboardData?.risk?.low > 0">
-                  <i class="app-icon risk risk-yellow" [ngStyle]="{ fontSize: '1.5rem' }"></i>
+                  <i class="app-icon risk risk-yellow" [ngStyle]="{ fontSize: '1.2rem' }"></i>
                   <span>{{properties?.dashboardData?.risk?.low}}</span>
                   <label>{{'low'|translate}}</label>
                 </div>
@@ -70,7 +69,8 @@
         <p-overlayPanel #milestonePanel class="milestones-overlay-panel">
           <div class="milestone-panel-content">
             <app-doughnut-chart [data]="dashboardMilestonesData"
-              [middleText]="properties?.dashboardData?.milestone?.quantity?.toString()" [midleTextBottom]="milestoneMidleTextBottom">
+              [middleText]="properties?.dashboardData?.milestone?.quantity?.toString()"
+              [midleTextBottom]="milestoneMidleTextBottom">
             </app-doughnut-chart>
           </div>
         </p-overlayPanel>
@@ -90,8 +90,9 @@
           <div class="triple-constraint-container" [ngStyle]="{'min-height': '21px'}">
             <i class="fas fa-dollar-sign" [ngStyle]="{color: iconCostColor}"
               *ngIf="properties?.dashboardData && properties?.dashboardData?.tripleConstraint"
+              (mouseleave)="costConstraintPanel.hide()"
               (mouseenter)="validateShowTripleConstraintCost() && costConstraintPanel.show($event)"
-              (mouseleave)="costConstraintPanel.hide()"></i>
+              ></i>
             <i class="far fa-clock" [ngStyle]="{color: iconScheduleColor}"
               *ngIf="properties?.dashboardData && properties?.dashboardData?.tripleConstraint"
               (mouseenter)="validateShowTripleConstraintSchedule() && scheduleConstraintPanel.show($event)"
@@ -129,7 +130,36 @@
             <span class="index" (mouseenter)="spiPanel.show($event)" (mouseleave)="spiPanel.hide()"
               *ngIf="properties?.dashboardData?.schedulePerformanceIndex"
               [ngStyle]="{color: spiColor}">{{'SPI'|translate}}</span>
+
+            <div class="status-container"
+              *ngIf="properties?.journalInformation?.date">
+              <i class="fas fa-info" *ngIf="!properties?.journalInformation?.actual"
+                (mouseenter)="handleShowJournalInformation(properties?.journalInformation); journalInformationPanel.show($event)"
+                ></i>
+              <i class="fas fa-info-circle" [ngStyle]="{ fontSize: '1.2rem' }"
+                *ngIf="properties?.journalInformation?.actual"
+                (mouseenter)="handleShowJournalInformation(properties.journalInformation); journalInformationPanel.show($event)"></i>
+            </div>
           </div>
+          <p-overlayPanel #journalInformationPanel class="journal-info-overlay-panel" [showCloseIcon]="true" [dismissable]="false">
+            <div class="journal-info-panel-content"
+              *ngIf="properties && properties?.journalInformation">
+
+              <div class="loading-menu-container" *ngIf="properties?.journalInformation?.loading">
+                <div class="menu-loading">
+                  <p-progressSpinner [style]="{width: '50px', height: '50px'}" styleClass="custom-spinner"
+                    strokeWidth="8" fill="#EEEEEE" animationDuration=".5s">
+                  </p-progressSpinner>
+                </div>
+              </div>
+              <div class="card-information-container" *ngIf="properties && properties?.journalInformation 
+                && properties?.journalInformation?.date
+                && !properties?.journalInformation?.loading">
+                <app-card-journal-information
+                  [information]="properties?.journalInformation"></app-card-journal-information>
+              </div>
+            </div>
+          </p-overlayPanel>
           <p-overlayPanel #cpiPanel>
             <div class="index-content">
               <span style="font-size: .8rem; white-space: pre-wrap;">{{ 'CPIdescription' | translate }}</span>
@@ -170,10 +200,39 @@
       <div class="right-container">
         <div class="dashboard-items-container">
           <div class="status-container">
+            <i class="fas fa-info" *ngIf="properties?.journalInformation?.date && !properties?.journalInformation?.actual"
+              (mouseenter)="handleShowJournalInformation(properties?.journalInformation); journalInformationPanelList.show($event)"
+              ></i>
+            <i class="fas fa-info-circle" [ngStyle]="{ fontSize: '1.2rem' }"
+              *ngIf="properties?.journalInformation?.date && properties?.journalInformation?.actual"
+              (mouseenter)="handleShowJournalInformation(properties.journalInformation); journalInformationPanelList.show($event)"
+              ></i>
+          </div>
+          <p-overlayPanel #journalInformationPanelList class="journal-info-overlay-panel" [showCloseIcon]="true" [dismissable]="false">
+            <div class="journal-info-panel-content"
+              *ngIf="properties && properties?.journalInformation">
+
+              <div class="loading-menu-container" *ngIf="properties?.journalInformation?.loading">
+                <div class="menu-loading">
+                  <p-progressSpinner [style]="{width: '50px', height: '50px'}" styleClass="custom-spinner"
+                    strokeWidth="8" fill="#EEEEEE" animationDuration=".5s">
+                  </p-progressSpinner>
+                </div>
+              </div>
+              <div class="card-information-container" *ngIf="properties && properties?.journalInformation 
+                && properties?.journalInformation?.date
+                && !properties?.journalInformation?.loading">
+                <app-card-journal-information
+                  [information]="properties?.journalInformation"></app-card-journal-information>
+              </div>
+            </div>
+          </p-overlayPanel>
+
+          <div class="status-container">
             <i class="app-icon risk" [ngStyle]="{ fontSize: '1.2rem' }" [class.risk-red]="riskImportance === 'high'"
               *ngIf="showRiskIndex()" [class.risk-yellow]="riskImportance === 'low'"
-              [class.risk-orange]="riskImportance === 'medium'" (mouseenter)="riskPanel.show($event)"
-              (mouseleave)="riskPanel.hide()"></i>
+              [class.risk-orange]="riskImportance === 'medium'" (mouseenter)="riskPanelList.show($event)"
+              (mouseleave)="riskPanelList.hide()"></i>
           </div>
           <div class="status-container">
             <i class="far fa-stop-circle"
@@ -182,7 +241,7 @@
             <i class="far fa-check-square" *ngIf="showEndManagementIndex() && !!properties.completed"
               [pTooltip]="label|translate"></i>
           </div>
-          <p-overlayPanel #riskPanel class="risk-overlay-panel">
+          <p-overlayPanel #riskPanelList class="risk-overlay-panel">
             <div class="risk-panel-content">
               <div class="title">
                 <span class="total">{{properties?.dashboardData?.risk?.total}}</span>
@@ -209,7 +268,7 @@
           </p-overlayPanel>
           <div class="milestones-progressbar-container">
             <div class="milestones-progressbar" *ngIf="properties.dashboardData?.milestone?.quantity > 0"
-              (mouseenter)="milestonePanel.show($event)" (mouseleave)="milestonePanel.hide()">
+              (mouseenter)="milestonePanelList.show($event)" (mouseleave)="milestonePanelList.hide()">
               <div class="ontime"
                 [ngStyle]="{ width: ((properties.dashboardData?.milestone?.onTime / (properties.dashboardData?.milestone?.quantity))*100)  + '%'}">
               </div>
@@ -224,27 +283,28 @@
               </div>
             </div>
           </div>
-          <p-overlayPanel #milestonePanel class="milestones-overlay-panel">
+          <p-overlayPanel #milestonePanelList class="milestones-overlay-panel">
             <div class="milestone-panel-content">
               <app-doughnut-chart [data]="dashboardMilestonesData"
-                [middleText]="properties?.dashboardData?.milestone?.quantity?.toString()" [midleTextBottom]="milestoneMidleTextBottom">
+                [middleText]="properties?.dashboardData?.milestone?.quantity?.toString()"
+                [midleTextBottom]="milestoneMidleTextBottom">
               </app-doughnut-chart>
             </div>
           </p-overlayPanel>
           <div class="indexes">
-            <span class="index" [ngStyle]="{color: cpiColor}" (mouseenter)="cpiPanel.show($event)"
+            <span class="index" [ngStyle]="{color: cpiColor}" (mouseenter)="cpiPanelList.show($event)"
               *ngIf="properties?.dashboardData?.costPerformanceIndex"
-              (mouseleave)="cpiPanel.hide()">{{'CPI'|translate}}</span>
-            <span class="index" (mouseenter)="spiPanel.show($event)" (mouseleave)="spiPanel.hide()"
+              (mouseleave)="cpiPanelList.hide()">{{'CPI'|translate}}</span>
+            <span class="index" (mouseenter)="spiPanelList.show($event)" (mouseleave)="spiPanelList.hide()"
               *ngIf="properties?.dashboardData?.schedulePerformanceIndex"
               [ngStyle]="{color: spiColor}">{{'SPI'|translate}}</span>
           </div>
-          <p-overlayPanel #cpiPanel>
+          <p-overlayPanel #cpiPanelList>
             <div class="constraint-content">
               <app-gauge-chart *ngIf="gaugeChartDataCPI" [config]="gaugeChartDataCPI"></app-gauge-chart>
             </div>
           </p-overlayPanel>
-          <p-overlayPanel #spiPanel>
+          <p-overlayPanel #spiPanelList>
             <div class="constraint-content">
               <app-gauge-chart *ngIf="gaugeChartDataSPI" [config]="gaugeChartDataSPI"></app-gauge-chart>
             </div>
@@ -252,31 +312,31 @@
           <div class="triple-constraint-container" [ngStyle]="{'min-height': '21px'}">
             <i class="fas fa-dollar-sign" [ngStyle]="{color: iconCostColor}"
               *ngIf="properties?.dashboardData && properties?.dashboardData?.tripleConstraint"
-              (mouseenter)="validateShowTripleConstraintCost() && costConstraintPanel.show($event)"
-              (mouseleave)="costConstraintPanel.hide()"></i>
+              (mouseenter)="validateShowTripleConstraintCost() && costConstraintPanelList.show($event)"
+              (mouseleave)="costConstraintPanelList.hide()"></i>
             <i class="far fa-clock" [ngStyle]="{color: iconScheduleColor}"
               *ngIf="properties?.dashboardData && properties?.dashboardData?.tripleConstraint"
-              (mouseenter)="validateShowTripleConstraintSchedule() && scheduleConstraintPanel.show($event)"
-              (mouseleave)="scheduleConstraintPanel.hide()"></i>
+              (mouseenter)="validateShowTripleConstraintSchedule() && scheduleConstraintPanelList.show($event)"
+              (mouseleave)="scheduleConstraintPanelList.hide()"></i>
             <i class="fas fa-boxes" [ngStyle]="{color: iconScopeColor}"
               *ngIf="properties?.dashboardData && properties?.dashboardData?.tripleConstraint"
-              (mouseenter)="validateShowTripleConstraintScope() && scopeConstraintPanel.show($event)"
-              (mouseleave)="scopeConstraintPanel.hide()"></i>
+              (mouseenter)="validateShowTripleConstraintScope() && scopeConstraintPanelList.show($event)"
+              (mouseleave)="scopeConstraintPanelList.hide()"></i>
           </div>
-          <p-overlayPanel #costConstraintPanel>
+          <p-overlayPanel #costConstraintPanelList>
             <div class="constraint-content" *ngIf="properties?.dashboardData">
               <ng-container *ngTemplateOutlet="legend"></ng-container>
               <app-cost-constraint [cost]="properties.dashboardData?.tripleConstraint?.cost"></app-cost-constraint>
             </div>
           </p-overlayPanel>
-          <p-overlayPanel #scheduleConstraintPanel>
+          <p-overlayPanel #scheduleConstraintPanelList>
             <div class="constraint-content" *ngIf="properties?.dashboardData">
               <ng-container *ngTemplateOutlet="legend"></ng-container>
               <app-schedule-constraint [schedule]="properties.dashboardData?.tripleConstraint?.schedule">
               </app-schedule-constraint>
             </div>
           </p-overlayPanel>
-          <p-overlayPanel #scopeConstraintPanel>
+          <p-overlayPanel #scopeConstraintPanelList>
             <div class="constraint-content" *ngIf="properties?.dashboardData">
               <ng-container *ngTemplateOutlet="legend"></ng-container>
               <app-scope-constraint [scope]="properties.dashboardData?.tripleConstraint?.scope"></app-scope-constraint>
@@ -318,7 +378,7 @@
           <div class="icons-container" [routerLink]="properties.urlCard" [queryParams]="getQueryParams()">
             <i [ngClass]=" ['concluded', 'lateConcluded'].includes(properties.statusItem) ?
               [ 'app-icon', 'flag-check', 'grey-icon'] : ['app-icon', 'flag-unchecked', 'grey-icon']"
-              [class.linked]="!!properties.linked || !!properties.shared" [ngStyle]="{ fontSize: '2rem' }"
+              [class.linked]="!!properties.linked || !!properties.shared" [ngStyle]="{ fontSize: '1.8rem' }"
               [class.on-time]="properties?.statusItem === 'ontime' && !properties?.canceled"
               [class.late]="properties?.statusItem === 'late'"
               [class.concluded]="properties?.statusItem === 'concluded' && !properties?.canceled"
@@ -344,8 +404,8 @@
               (ngModelChange)="changeMilestoneDate($event)" [showIcon]="true" inputId="icon">
             </p-calendar>
             <div class="reason-buttons" *ngIf="showReasonButtons">
-              <button type="button" pButton class="app-button" class="p-button-sm"
-                icon="fas fa-check" (click)="saveDate()"></button>
+              <button type="button" pButton class="app-button" class="p-button-sm" icon="fas fa-check"
+                (click)="saveDate()"></button>
               <button type="button" pButton class="app-button" class="p-button-sm" icon="fas fa-undo"
                 (click)="cancelDateChange()"></button>
             </div>
@@ -418,8 +478,8 @@
                 (ngModelChange)="changeMilestoneDate($event)" [showIcon]="true" inputId="icon">
               </p-calendar>
               <div class="reason-buttons" *ngIf="showReasonButtons">
-                <button type="button" pButton class="app-button" class="p-button-sm"
-                  icon="fas fa-check" (click)="saveDate()"></button>
+                <button type="button" pButton class="app-button" class="p-button-sm" icon="fas fa-check"
+                  (click)="saveDate()"></button>
                 <button type="button" pButton class="app-button" class="p-button-sm" icon="fas fa-undo"
                   (click)="cancelDateChange()"></button>
               </div>
@@ -468,27 +528,26 @@
   </p-card>
 
   <ng-template #legend>
-      <div class="constraint-content-cards" *ngIf="properties?.dashboardData">
-        <div class="subtitles-container">
-          <div class="subtitle-item">
-            <div class="subtitle-box subtitle-box-planned"></div>
-            <label class="subtitle-label-planned">{{'plannedBaseline'|translate}}</label>
-          </div>
-          <div class="subtitle-item">
-            <div class="subtitle-box subtitle-box-foreseen"></div>
-            <label class="subtitle-label-foreseen">{{'foreseen'|translate}}</label>
-          </div>
-          <div class="subtitle-item">
-            <div class="subtitle-box subtitle-box-actual"></div>
-            <label class="subtitle-label-actual">{{'actual'|translate}}</label>
-          </div>
+    <div class="constraint-content-cards" *ngIf="properties?.dashboardData">
+      <div class="subtitles-container">
+        <div class="subtitle-item">
+          <div class="subtitle-box subtitle-box-planned"></div>
+          <label class="subtitle-label-planned">{{'plannedBaseline'|translate}}</label>
         </div>
+        <div class="subtitle-item">
+          <div class="subtitle-box subtitle-box-foreseen"></div>
+          <label class="subtitle-label-foreseen">{{'foreseen'|translate}}</label>
+        </div>
+        <div class="subtitle-item">
+          <div class="subtitle-box subtitle-box-actual"></div>
+          <label class="subtitle-label-actual">{{'actual'|translate}}</label>
+        </div>
+      </div>
     </div>
   </ng-template>
 
-  <p-card *ngSwitchCase="'newCardItem'" class="workpack-new-carditem"
-    [class.mobile]="responsive" [class.cardList]="(displayModeCard === 'list')"
-    [class.new-card-item-mobile]="responsive">
+  <p-card *ngSwitchCase="'newCardItem'" class="workpack-new-carditem" [class.mobile]="responsive"
+    [class.cardList]="(displayModeCard === 'list')" [class.new-card-item-mobile]="responsive">
     <div class="carditem-content">
       <i #newItemIcon [ngClass]="[ 'card-link app-icon', properties.icon, 'light-grey-icon']"
         (click)="enable && properties.iconMenuItems && menuIcon.toggle($event); (enable && !properties.iconMenuItems || properties.iconMenuItems.length === 0) && handleLoadMenu()"

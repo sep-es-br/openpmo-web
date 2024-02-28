@@ -60,6 +60,9 @@
           background: rgba(22, 155, 213, 0.9);
           color: #ffffff;
         }
+        .p-button-label {
+          font-size: 0.8rem !important;
+        }
       }
       .button-delete {
         width: 180px;
@@ -70,6 +73,9 @@
         &:hover {
           background: rgba(255,106,106, 1);
           color: #ffffff;
+        }
+        .p-button-label {
+          font-size: 0.8rem !important;
         }
       }
     }
@@ -139,6 +145,48 @@
         }
         .card-item-container {
           padding: 0.5em;
+        }
+      }
+      .dataview-step-card-items {
+        .p-dataview-content .p-grid {
+          .card-item-container {
+            flex-basis: auto;
+    
+            &.show-details {
+              flex-basis: 210px;
+              &.mobile:not(.new-card-item) {
+                flex-basis: 100% !important;
+              }
+            }
+            &.show-resumed {
+              flex-basis: 130px;
+              &.mobile:not(.new-card-item) {
+                flex-basis: calc(50% - .5rem) !important;
+                margin: 0 .25rem .5rem .25rem !important;
+              }
+              &.new-card-item {
+                .app-new-step-card-item .p-card {
+                  height: 100%;
+    
+                  .p-card-body {
+                    height: 100%;
+                  }
+                  .p-card-body .p-card-content {
+                    height: 100%;
+                  }
+                  .p-card-body .p-card-content .card-item-content {
+                    height: 100%;
+                  }
+                }
+              }
+            }
+            &.new-card-item {
+              flex-basis: auto !important;
+              &.mobile {
+                margin: 0 auto 15px auto !important;
+              }
+            }
+          }
         }
       }
       .panel-content {

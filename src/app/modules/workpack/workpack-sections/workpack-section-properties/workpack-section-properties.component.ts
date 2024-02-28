@@ -24,6 +24,7 @@ import * as moment from 'moment';
 export class WorkpackSectionPropertiesComponent implements OnInit {
 
   @Output() onGetProperties = new EventEmitter();
+  backupProperties;
   sectionPropertiesProperties: PropertyTemplateModel[] = [];
   typePropertyModel = TypePropertyModelEnum;
   cardWorkpackProperties: ICard;
@@ -67,6 +68,13 @@ export class WorkpackSectionPropertiesComponent implements OnInit {
     this.saveButtonSrv.observableSaveButtonClicked.pipe(takeUntil(this.$destroy)).subscribe(clicked => {
       if (clicked) {
         this.onGetProperties.next({ properties: this.sectionPropertiesProperties });
+        this.propertySrv.saveChangesProperties();
+      }
+    });
+    this.saveButtonSrv.observableCancelButtonClicked.pipe(takeUntil(this.$destroy)).subscribe(clicked => {
+      if (clicked) {
+        this.propertySrv.cancelChangesProperties();
+        this.loadProperties();
       }
     });
     this.propertySrv.observableResetWorkpackProperties.pipe(takeUntil(this.$destroy)).subscribe(reset => {
@@ -146,9 +154,11 @@ export class WorkpackSectionPropertiesComponent implements OnInit {
     }
     this.workpackSrv.nextCheckCompletedChanged(event);
     this.saveButtonSrv.nextShowSaveButton(true);
+    this.saveButtonSrv.nextShowCancelButton(true)
   }
 
   checkProperties(property: PropertyTemplateModel) {
+    this.saveButtonSrv.nextShowCancelButton(true)
     let arePropertiesRequiredValid: boolean = this.checkPropertiesRequiredValid(property);
     let arePropertiesStringValid: boolean = this.checkPropertiesStringValid(property);
     const arePropertiesReasonValid: boolean = !property?.needReason || (property?.needReason && !!property?.reason?.trim());

@@ -116,7 +116,14 @@
       </div>
     </div>
   </app-card>
-  <app-save-button #saveButton (save)="onSaveButtonClicked()"></app-save-button>
+  <div class="id-container" *ngIf="workpackParams.idWorkpack">
+    <span>{{workpackParams.idWorkpack}}</span>
+  </div>
+  <app-buttons-container>
+    <app-save-button #saveButton (save)="onSaveButtonClicked()"></app-save-button>
+    <app-cancel-button (cancel)="handleOnCancel()"></app-cancel-button>
+  </app-buttons-container>
+  
 </div>
 <p-confirmDialog [header]="'confirmSpreadDifference' | translate" icon="pi pi-exclamation-triangle"
   key="spreadDifferenceConfirm">

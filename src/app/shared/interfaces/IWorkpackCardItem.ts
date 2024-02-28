@@ -1,5 +1,6 @@
 import { IMilestoneDashboard, ITripleConstraintDashboard } from './IDashboard';
 import { MenuItem } from 'primeng/api';
+import { IWorkpackJournalInformation } from './IJournal';
 export interface IWorkpackCardItem {
   typeCardItem: string;
   icon?: string;
@@ -43,5 +44,6 @@ export interface IWorkpackCardItem {
   },
   hasBaseline?: boolean;
   baselineName?: string;
+  journalInformation?: IWorkpackJournalInformation;
 }
 

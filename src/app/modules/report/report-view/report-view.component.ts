@@ -198,6 +198,7 @@ export class ReportViewComponent implements OnInit, OnDestroy {
     property.multipleSelection = propertyModel.multipleSelection;
     property.rows = propertyModel.rows ? propertyModel.rows : 1;
     property.decimals = propertyModel.decimals;
+    property.helpText = propertyModel.helpText;
     if (this.typePropertyModel[propertyModel.type] === TypePropertyModelEnum.ToggleModel) {
       property.value = propertyModel.defaultValue;
     } else {

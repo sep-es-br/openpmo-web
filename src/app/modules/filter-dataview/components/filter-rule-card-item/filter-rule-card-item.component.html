@@ -15,12 +15,16 @@
         <p-dropdown class="app-single-selection" [options]="filterRuleCard.propertiesList" optionLabel="label" [required]="true"
           [autoDisplayFirst]="false" [class.responsive]="responsive" [(ngModel)]="filterRuleCard.propertySelected"
           (onChange)="handlePropertySelected($event)"></p-dropdown>
-        <label class="app-input-label" for="float-name">{{ "property" | translate }} * </label>
+        <label class="app-input-label" for="float-name">{{ "property" | translate }} * 
+          <i class="far fa-question-circle" [pTooltip]="'help.filter.property' | translate"></i>
+        </label>
       </span>
       <span class="p-float-label">
         <p-dropdown class="app-single-selection" [class.responsive]="responsive" [options]="operatorsList" [required]="true"
           [autoDisplayFirst]="false" [(ngModel)]="filterRuleCard.operator" (onChange)="handleChangeRoleCard($event)"></p-dropdown>
-        <label class="app-input-label" for="float-name">{{ "operator" | translate }} * </label>
+        <label class="app-input-label" for="float-name">{{ "operator" | translate }} * 
+          <i class="far fa-question-circle" [pTooltip]="'help.filter.operator' | translate"></i>
+        </label>
       </span>
       <app-filter-rule-property [property]="propertySelected" [value]="filterRuleCard.value" (changed)="handleSetPropertyValue($event)">
       </app-filter-rule-property>

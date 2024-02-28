@@ -12,6 +12,9 @@
     }
     .app-button-green {
       margin-bottom: 0.5em;
+      .p-button {
+        height: 35px;
+      }
     }
     .property-input {
       min-width: 220px;
@@ -89,20 +92,20 @@
       font-size: 2rem;
       &.icon {
         font-size: 1rem;
-        width: 45px;
-        height: 45px;
+        width: 40px;
+        height: 40px;
         border-radius: 50%;
         display: flex;
         justify-content: center;
         align-items: center;
       }
       .fa-info-circle {
-        width: 45px;
-        height: 45px;
+        width: 40px;
+        height: 40px;
         display: flex;
         justify-content: center;
         align-items: center;
-        font-size: 2.8rem;
+        font-size: 2.5rem;
       }
     }
     .p-card {

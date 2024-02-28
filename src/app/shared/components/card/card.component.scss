@@ -58,6 +58,7 @@
         align-items: center;
         .label-toggle {
           margin-left: 0.5em;
+          font-size: 0.9rem;
         }
         .app-toggle {
           margin-left: 0.5rem;
@@ -84,7 +85,7 @@
     .card-title {
       color: v.$fontTitle;
       font-family: v.$fontFamilyMedium;
-      font-size: 1rem;
+      font-size: 0.9rem;
       text-transform: uppercase;
     }
     .card-title-mobile {
@@ -96,6 +97,7 @@
       align-items: center;
       margin-right: 2em;
       label {
+        font-size: 0.9rem;
         margin-right: 5px;
       }
       .p-checkbox .p-checkbox-box.p-highlight {
@@ -105,7 +107,7 @@
       .p-checkbox .p-checkbox-box .p-checkbox-icon {
         transition-duration: 0.2s;
         color: #2196F3;
-        font-size: 16px;
+        font-size: 0.9rem;
         font-weight: bold;
       }
       i {
@@ -132,7 +134,7 @@
       width: 50%;
       color: v.$fontTitle;
       font-family: v.$fontFamilyMedium;
-      font-size: 1rem;
+      font-size: 0.9rem;
       text-transform: uppercase;
       padding-right: 2em;
       .progress-bar-cost-container {
@@ -168,7 +170,7 @@
         position: relative;
 
         .app-input-text.p-inputtext {
-          font-size: 14px !important;
+          font-size: 0.8rem !important;
           width: 0 !important;
           border-bottom: none !important;
           transition: width .3s;
@@ -192,6 +194,7 @@
           &.animation-input {
             top: .4rem;
             padding: 0;
+            font-size: 0.9rem;
           }
         }
         .fa-close {
@@ -221,7 +224,7 @@
           margin-left: 1em;
         }
         label {
-          font-size: 14px;
+          font-size: 0.8rem;
         }
         .filter-selection {
           .p-dropdown {
@@ -242,7 +245,7 @@
           }
           .p-dropdown .p-inputtext {
             color: v.$fontInput;
-            font-size: 14px;
+            font-size: 0.8rem;
             font-family: v.$fontFamilyMedium;
             padding-left: 0;
           }
@@ -283,7 +286,7 @@
               flex: 1;
               text-align: center;
               color: #979797;
-              font-size: 15px;
+              font-size: 0.8rem;
             }
           }
         }

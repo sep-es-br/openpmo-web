@@ -1,5 +1,7 @@
 <div class="app-property-toggle">
   <p-inputSwitch class="app-toggle" [(ngModel)]="value"
     (ngModelChange)="handleChangedValue()"></p-inputSwitch>
-  <label class="input-label">{{property.label}}</label>
+  <label class="input-label">{{property.label}}
+    <i class="far fa-question-circle" *ngIf="property.helpText && property.helpText.length > 0" [pTooltip]="property.helpText"></i>
+  </label>
 </div>

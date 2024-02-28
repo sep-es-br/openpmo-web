@@ -1,4 +1,9 @@
 {
+  "dashboardStatus": "Situação",
+  "UPTODATE": "Atualizado",
+  "OUTDATED": "Desatualizado",
+  "CALCULATING": "Calculando",
+  "backToManagement": "Voltar para o gerenciamento",
   "baselinePlanned": "Planejado (linha de base)",
   "estimatedConcluded": "Estimado/ Concluído",
   "All": "Todos",
@@ -25,7 +30,7 @@
   "reportModels": "Modelos de relatórios",
   "reports": "Relatórios",
   "generateReport":"Gerar Relatório",
-  "notFoundBaselineOnStatus": "Não foram encontradas baselines nesta situação",
+  "notFoundBaselineOnStatus": "Não foram encontradas linhas de base nesta situação",
   "WAITING_MY_EVALUATION": "Aguardando minha avaliação",
   "WAITING_OTHERS_EVALUATIONS": "Aguardando demais avaliações",
   "notFoundPlansToThisOffice": "Este office não possui modelos de plano cadastrados para criar planos",
@@ -38,8 +43,8 @@
   "notFoundRisks": "Não foram encontrados riscos para este pacote de trabalho",
   "notFoundCostAccounts": "Não foram encontrados centros de custos para este pacote de trabalho",
   "notFoundWorkpacksToThisModel": "Não foram encontrados pacotes de trabalho para este modelo",
-  "noBaselines": "Não existem baselines neste projeto",
-  "noActiveBaselines": "Não existem baselines ativas neste projeto",
+  "noBaselines": "Não existem linhas de base neste projeto",
+  "noActiveBaselines": "Não existem linhas de base ativas neste projeto",
   "WBS": "EAP",
   "noRecordsFound": "Não há registros para serem exibidos",
   "viewMore": "Ver mais",
@@ -340,6 +345,7 @@
   "evaluations": "Avaliações",
   "comment": "Comentário",
   "cancel": "Cancelar",
+  "undo": "Desfazer",
   "cancellationProposal": "Proposta de cancelamento do projeto",
   "proposer": "Proponente",
   "current": "Atual",
@@ -384,7 +390,185 @@
   "uiUxDesigner": "Designer de UI UX",
   "difference": "Diferença",
   "confirmSpreadDifference": "Confirmar distribuição da diferença",
+  "help": {
+    "textHelpOnline": "Texto de ajuda",
+    "workpack": {
+      "name": "Nome do pacote de trabalho.",
+      "fullName": "Nome completo do pacote de trabalho.",
+      "date": "Data do marco crítico."
+    },
+    "propertyModel": {
+      "name": "Nome identificador da propriedade. Informação obrigatória.",
+      "label": "Legenda que será exibida na propriedade. Informação obrigatória.",
+      "sortIndex": "Ordem em que a propriedade será exibida no pacote de trabalho. Informação obrigatória.",
+      "precision": "Número de casas decimais que será utilizado nos valores da propriedade. Valor padrão é zero.",
+      "possibleValues": "Lista de opções que serão exibidas para seleção do valor da propriedade. Informação obrigatória.",
+      "domain": "Domínio para listar as localidades. Informação obrigatória.",
+      "sector": "Setor para filtrar a lista de organizações que serão exibidas como opções de valor na propriedade. Informação obrigatória.",
+      "defaultValue": "Valor padrão que será atribuído ao valor da propriedade.",
+      "fullLine": "Indica a largura da propriedade na tela. Quando estiver marcado, a propriedade ocupará toda a largura da tela na linha.",
+      "required": "Indica se o preenchimento do valor da propriedade é obrigatório.",
+      "multiSelection": "Quando estiver marcado permite que mais de uma opção seja selecionada como valor da propriedade.",
+      "minimum": "Valor mínimo para o valor da propriedade.",
+      "maximum": "Valor máximo para o valor da propriedade.",
+      "rows": "Número de linhas exibidas na propriedade do tipo caixa de texto.",
+      "helpText": "Texto de ajuda que será exibido na propriedade."
+    },
+    "organization": {
+      "sector": "Setor de atividade da organização. Seleção de uma das opções é obrigatória.",
+      "businessName": "Nome da organização. Máximo de 25 caracteres. Informação obrigatória.",
+      "socialName": "Nome social da organização. Informação obrigatória.",
+      "address": "Endereço completo da organização. Informação não obrigatória.",
+      "phoneNumber": "Número do telefone da organização. Informe somente os dígitos do número do telefone com o código de área. Informação não obrigatória.",
+      "contactEmail": "E-mail de contato da organização. Informe um email válido. Informação não obrigatória.",
+      "website": "Website da organização. Informação não obrigatória."
+    },
+    "domain": {
+      "name": "Nome do domínio. Máximo 25 caracteres. Informação obrigatória.",
+      "fullName": "Nome completo do domínio. Informação obrigatória.",
+      "rootLocalityName": "Nome da localidade raíz do domínio. Informação obrigatória.",
+      "rootLocalitFullName": "Nome completo da localidade raíz do domínio. Informação obrigatória.",
+      "rootLocalityLatitude": "GPS latitude da localidade raíz do domínio. Informação não obrigatória.",
+      "rootLocalityLongitude": "GPS longitude da localidade raíz do domínio. Informação não obrigatória."
+    },
+    "locality": {
+      "name": "Nome da localidade. Máximo 25 caracteres. Informação obrigatória.",
+      "fullName": "Nome completo da localidade. Informação obrigatória.",
+      "localityLatitude": "GPS latitude da localidade. Informação não obrigatória.",
+      "localityLongitude": "GPS longitude da localidade. Informação não obrigatória."
+    },
+    "measureUnit": {
+      "name": "Nome da unidade de medida. Máximo 25 caracteres. Informação obrigatória.",
+      "fullName": "Nome completo da unidade de medida. Informação obrigatória.",
+      "precision": "Precisão a ser utilizada nas casas decimais dos valores. O valor padrão é zero. Informação obrigatória."
+    },
+    "permission": {
+      "level": "Nível de permissão. Leitura para somente visualização, editar para alterações e nenhum para sem permissão."
+    },
+    "planModel": {
+      "name": "Nome do modelo de plano. Máximo 25 caracteres. Informação obrigatória.",
+      "fullName": "Nome completo do modelo de plano. Informação obrigatória.",
+      "sharedWith": "Escritórios com os quais deseja compartilhar este modelo de plano. Selecione a opção 'Todos' para compartilhar com todos os escritórios. Informação não obrigatória."
+    },
+    "workpackModel": {
+      "modelName": "Nome do modelo de pacote de trabalho. Informação obrigatória.",
+      "modelNameInPlural": "Nome do modelo de pacote de trabalho no plural. Informação obrigatória.",
+      "position": "Posição da aba ou painel do modelo de pacote de trabalho na visualização do pacote de trabalho. O valor padrão será a próxima posição depois da última utilizada para modelos no mesmo nível. Informação obrigatória.",
+      "icon": "Ícone que será exibido nos cartões dos pacotes de trabalho. Valor padrão definido de acordo com o tipo do modelo. Informação obrigatória.",
+      "sortedBy": "A propriedade que será utilizada para ordenar os pacotes de trabalho criados a partir deste modelo. Valor padrão é a propriedade 'nome'. Informação obrigatória.",
+      "dashboardShowStakeholders": "Funções das partes interessadas que serão exibidas no painel de controle do pacote de trabalho. Valores padrão são as funções possíveis na seção de partes interessadas do modelo. Informação não obrigatória.",
+      "stakeholdersPossibleRolesPerson": "Funções possíveis para atribuição ás partes interessadas do tipo pessoa no pacote de trabalho. Valores padrão são carregados na criação do modelo. Informação obrigatória se a seção de partes interessadas do modelo estiver ativa.",
+      "stakeholdersPossibleRolesOrganization": "Funções possíveis para atribuição ás partes interessadas do tipo organização no pacote de trabalho. Valores padrão são carregados na criação do modelo. Informação obrigatória se a seção de partes interessadas do modelo estiver ativa."
+    },
+    "reportModel": {
+      "name": "Nome do modelo de relatório. Informação obrigatória.",
+      "preferredFormat": "Formato do arquivo preferencial para exportação do relatório. Valor padrão é 'PDF'. Informação obrigatória.",
+      "fullName": "Nome completo do modelo de relatório. Informação obrigatória."
+    },
+    "office": {
+      "name": "Nome do escritório. Máximo 25 caracteres. Informação obrigatória.",
+      "fullName": "Nome completo do escritório. Informação obrigatória."
+    },
+    "plan": {
+      "planModelName": "Nome do modelo de plano utilizado pelo plano. Informação somente para leitura.",
+      "name": "Nome do plano. Máximo 25 caracteres. Informação obrigatória.",
+      "fullName": "Nome completo do plano. Informação obrigatória.",
+      "start": "Data de início do plano. Esta data deve ser menor que a data de fim do plano. Informação obrigatória.",
+      "finish": "Data de fim do plano. Esta data deve ser maior que a data de início do plano. Informação obrigatória."
+    },
+    "person": {
+      "address": "Endereço completo da pessoa. Informação não obrigatória.",
+      "phoneNumber": "Número do telefone da pessoa. Informar somente os dígitos com o código da área. Informação não obrigatória.",
+      "accessEmail": "E-mail utilizado para acessar a aplicação. Informações somente visualização.",
+      "contactEmail": "E-mail de contato da pessoa. Informação não obrigatória.",
+      "howDoYouWantYourNameDisplayed": "Informe seu apelido ou como você deseja que seu nome seja exibido."
+    },
+    "stakeholder": {
+      "role": "Função da parte interessada. Informação obrigatória.",
+      "from": "Data a partir da qual a parte interessada exercerá a função. Informação obrigatória.",
+      "to": "Data até quando a parte interessada exercerá a função. Informação não obrigatória."
+    },
+    "risk": {
+      "name": "Nome do risco. Informação obrigatória.",
+      "description": "Descrição do risco. Informação obrigatória.",
+      "importance": "Importância do risco. Informação obrigatória.",
+      "status": "Situação do risco. Informação obrigatória.",
+      "likelyToHappenFrom": "Data a partir da qual o risco pode ocorrer.",
+      "likelyToHappenTo": "Data até a qual o risco pode ocorrer.",
+      "happenedIn": "Data em que o risco ocorreu."
+    },
+    "RiskResponse": {
+      "name": "Nome do plano de resposta ao risco. Informação obrigatória.",
+      "when": "Quando o plano de resposta será executado. Informação obrigatória.",
+      "start": "Data de início da execução do plano de resposta. Informação obrigatória.",
+      "finish": "Data de fim da execução do plano de resposta. Informação obrigatória.",
+      "strategy": "Estratégia a ser utilizada na execução do plano de resposta. Informação obrigatória.",
+      "status": "Situação do plano de resposta. Informação obrigatória.",
+      "trigger": "Gatilho que colocará o plano de resposta em execução. Informação obrigatória.",
+      "planDescription": "Descrição do plano de resposta. Informação obrigatória.",
+      "responsible": "Partes interessadas responsáveis pela execução do plano de resposta. Informação obrigatória."
+    },
+    "issue": {
+      "name": "Nome do ocorrência. Informação obrigatória.",
+      "description": "Descrição do ocorrência. Informação obrigatória.",
+      "importance": "Importância do ocorrência. Informação obrigatória.",
+      "status": "Situação do ocorrência. Informação obrigatória."
+    },
+    "issueResponse": {
+      "name": "Nome do plano de resposta da ocorrência. Informação obrigatória.",
+      "start": "Data de início da execução do plano de resposta. Informação obrigatória.",
+      "status": "Situação do plano de resposta. Informação obrigatória.",
+      "planDescription": "Descrição do plano de resposta. Informação obrigatória.",
+      "responsible": "Partes interessadas responsáveis pela execução do plano de resposta. Informação obrigatória."
+    },
+    "process": {
+      "number": "Número do processo. Informação obrigatória.",
+      "name": "Nome do processo. Informação obrigatória.",
+      "note": "Notas referentes ao processo. Informação não obrigatória."
+    },
+    "journal": {
+      "description": "Descrição da nova informação. Informação obrigatória."
+    },
+    "baseline": {
+      "projectName": "Nome do projeto. Informação somente para visualização.",
+      "baselineName": "Nome da linha de base. Máximo 50 caracteres. Informação obrigatória.",
+      "proposer": "Proponente da linha de base. Informação somente para visualização.",
+      "description": "Descrição da linha de base. Informação obrigatória.",
+      "message": "Menssagem do proponente da linha de base. Informação obrigatória."
+    },
+    "schedule": {
+      "start": "Data de início do cronograma. Informação obrigatória.",
+      "finish": "Data de fim do cronograma. Informação obrigatória.",
+      "estimatedPhysical": "Valor físico estimado para o cronograma. Informação obrigatória. Zero é um valor válido.",
+      "actualPhysical": "Valor físico entregue atual para o cronograma. Informação não obrigatória.",
+      "estimatedCostTotal": "Valor do custo estimado total.",
+      "actualCostTotal": "Valor do custo realizado atual total.",
+      "distribution": "Método de distribuição dos valores dos meses. Sigmoidal: utiliza a função sigmóide para calcular os valores dos meses. Linear: distribui os valores dos meses de forma igualitária.",
+      "estimatedCost": "Valor do custo estimado para o centro de custo vinculado. Informação obrigatória. Zero é um valor válido.",
+      "actualCost": "Valor do custo realizado atual para o centro de custo vinculado. Informação não obrigatória."
+    },
+    "step": {
+      "start": "Data de início do mês. Informação obrigatória.",
+      "finish": "Data de fim do mês. Informação obrigatória.",
+      "estimatedPhysical": "Valor físico estimado para o mês. Informação obrigatória. Zero é um valor válido.",
+      "actualPhysical": "Valor físico entregue atual para o mês. Informação não obrigatória.",
+      "estimatedCostTotal": "Valor do custo estimado total.",
+      "baselineCostTotal": "Valor do custo planejado total na linha de base ativa.",
+      "actualCostTotal": "Valor do custo realizado atual total.",
+      "distribution": "Método de distribuição dos valores dos meses. Sigmoidal: utiliza a função sigmóide para calcular os valores dos meses. Linear: distribui os valores dos meses de forma igualitária.",
+      "estimatedCost": "Valor do custo estimado para o centro de custo vinculado. Informação obrigatória. Zero é um valor válido.",
+      "actualCost": "Valor do custo realizado atual para o centro de custo vinculado. Informação não obrigatória."
+    },
+    "filter": {
+      "name": "Nome do filtro. Informação obrigatória.",
+      "sortBy": "Propriedade a ser utilizada para ordenar os itens filtrados. Informação obrigatória.",
+      "property": "Propriedade cujo valor será utilizado na validação da regra.  Informação obrigatória.",
+      "operator": "Operador a ser utilizado na validação da regra.  Informação obrigatória.",
+      "value": "Valor a ser utilizado na validação da regra com os valores da propriedade selecionada.  Informação obrigatória."
+    }
+  },
   "messages": {
+    "isSamePerson": "Não é possível conceder permissão para si mesmo.",
     "scheduleCantHasNegativeValues": "O cronograma não pode ter valores negativos. Por favor verifique os valores informados.",
     "validateGenerateReport": "Os parâmetros obrigatórios devem ser preenchidos e o escopo selecionado.",
     "confirmRedistributeSchedule": "Deseja distribuir a diferença ",
@@ -406,7 +590,7 @@
     "resumeManagementAlert": "Esta ação retoma as atividades de gestão da entrega, permitindo sua edição.",
     "endManagementInputAlert": "Informe as razões do encerramento e selecione a data.",
     "endManagementSuccess": "Entrega encerrada com sucesso",
-    "confirmPaste": "Os models têm propriedades incompatíveis e que aquelas que não tiverem correspondentes serão excluídas. Você tem certeza que deseja colar este workpack?",
+    "confirmPaste": "Os models têm propriedades incompatíveis e que aquelas que não tiverem correspondentes serão excluídas. Você tem certeza que deseja colar este pacote de trabalho?",
     "optionalCommentAboutMyEvaluation": "Comentário opcional sobre a minha avaliação",
     "atentionEvaluateBaselineMessage": "Atenção. Uma vez confirmada, esta ação não poderá ser desfeita.",
     "confirmeApproveBaselineMessage": "Confirma a aprovação desta proposta de linha de base?",
@@ -434,7 +618,7 @@
     "invalidEmail": "Informe um email válido",
     "setValueOfInvalidFieldProperty": "Definir campos {{ field }} na propriedade {{ prop }}",
     "cantRemoveCostAccountWithScheduleOn": "Primeiro desabilite o Cronograma depois prossiga",
-    "cantRemovePropertyUsedInWorkpack": "Essa propriedade já está em uso em um workpack. Não pode ser excluída.",
+    "cantRemovePropertyUsedInWorkpack": "Essa propriedade já está em uso em um pacote de trabalho. Não pode ser excluída.",
     "cantEnableScheduleWithoutCostAccountOn": "Primeiro ative o Centros de Custo depois prossiga",
     "duplicatedNames": "Nomes duplicados: \n{{ names }}",
     "duplicatedLabels": "Legendas duplicadas: \n {{ labels }}",
@@ -596,7 +780,7 @@
       "propertyModel": {
         "delete": {
           "relationship": {
-            "error": "Essa propriedade já está em uso em um workpack. Não pode ser excluída."
+            "error": "Essa propriedade já está em uso em um pacote de trabalho. Não pode ser excluída."
           }
         }
       },
@@ -621,7 +805,7 @@
   "possibleRolesOrg": "Possíveis papéis de uma organização",
   "useCommaToSeparateValues": "Use virgula para separar os valores",
   "modelName": "Nome modelo",
-  "modelNameInPlural": "Nome modelo em plural",
+  "modelNameInPlural": "Nome modelo no plural",
   "icon": "Ícone",
   "sortedBy": "Ordernar por",
   "addProperty": "Adicionar propriedade",

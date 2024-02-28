@@ -191,7 +191,7 @@ export class OrganizationListComponent implements OnInit, OnDestroy {
       this.setBreadcrumbStorage(idFilter);
       this.router.navigate(['/config/filter-dataview'], {
         queryParams: {
-          id: idFilter,
+          idFilter: idFilter,
           entityName: 'organizations',
           idOffice: this.idOffice
         }

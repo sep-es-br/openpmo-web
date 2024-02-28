@@ -16,6 +16,7 @@ export interface IStakeholderRole {
   role: string;
   from: string | Date;
   to: string | Date;
+  new?: boolean;
 }
 
 export interface IStakeholderPermission {

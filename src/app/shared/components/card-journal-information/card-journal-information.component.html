@@ -1,0 +1,33 @@
+<div class="app-card-journal-information">
+  <p-card>
+    <ng-template pTemplate="header">
+      <strong class="title-header">
+        {{ "information" | translate }}
+      </strong>
+    </ng-template>
+    <ng-template pTemplate="subtitle">
+      <span> {{ information?.dateInformation }} </span>
+      <span> {{information?.author?.name}}(ID: {{information?.author?.id}})</span>
+    </ng-template>
+    <ng-template pTemplate="content" *ngIf="information && information.workpack">
+      <strong class="workpack-info">
+        {{information?.workpack?.workpackModelName}}: {{information?.workpack?.name}}(ID: {{information?.workpack?.id}})
+      </strong>
+      <span class="description-info"
+        >{{information?.information.description}}</span>
+      <div class="evidences" *ngIf="information.evidences && information.evidences.length > 0">
+        <figure>
+          <ng-container *ngFor="let evidence of information.evidences; let i = index">
+            <div class="evidence" [pTooltip]="evidence.name">
+              <img class="image" *ngIf="evidence.isImg" [src]="evidence.url" [alt]="evidence.name" width="65"
+                (click)="handleDownload(evidence.url, evidence.name, evidence.mimeType)">
+              <i class="icon" *ngIf="!evidence.isImg" [class]="evidence.icon"
+                (click)="handleDownload(evidence.url, evidence.name, evidence.mimeType)"> </i>
+              <figcaption class="legend">{{evidence.name}}</figcaption>
+            </div>
+          </ng-container>
+        </figure>
+      </div>
+    </ng-template>
+  </p-card>
+</div>

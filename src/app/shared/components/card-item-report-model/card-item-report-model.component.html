@@ -8,7 +8,7 @@
       <div class="card-item-content" [class.card-link]="properties.urlCard" [routerLink]="properties.urlCard"
         [class.cardList]="displayModeCard === 'list'" [queryParams]="getQueryParams()">
         <i [ngClass]="[ 'icon-card', properties.icon, 'grey-icon' ]"
-          [ngStyle]="{ fontSize: '2.5rem', color: properties.iconColor }"></i>
+          [ngStyle]="{ fontSize: '2rem', color: properties.iconColor }"></i>
         <span class="card-item-name">{{properties.nameCardItem}}</span>
         <span class="card-item-fullName" *ngIf="properties.fullNameCardItem" [pTooltip]="properties.fullNameCardItem" >{{properties.fullNameCardItem}}</span>
       </div>
@@ -22,7 +22,7 @@
       <div class="card-item-content" [class.card-link]="properties.urlCard" [routerLink]="properties.urlCard"
         [class.cardList]="displayModeCard === 'list'" [queryParams]="getQueryParams()">
         <i [ngClass]="properties.iconSvg ? [ 'app-icon', properties.icon, 'grey-icon'] : [ 'icon-card', properties.icon, 'grey-icon' ]"
-          [ngStyle]="{ fontSize: displayModeCard === 'list' ? '1.5rem' : '2.5rem' }"></i>
+          [ngStyle]="{ fontSize: displayModeCard === 'list' ? '1.5rem' : '1.8rem' }"></i>
         <span class="card-item-name">{{properties.nameCardItem}}</span>
         <span class="card-item-fullName" *ngIf="properties.fullNameCardItem" [pTooltip]="properties.fullNameCardItem">{{properties.fullNameCardItem}}</span>
       </div>
@@ -44,7 +44,7 @@
     <div class="carditem-content">
       <i [ngClass]="[ 'app-icon', properties.icon, 'light-grey-icon']"
         (click)="properties.urlCard && navigateToPage(properties.urlCard, properties.paramsUrlCard)"
-        [ngStyle]="{ fontSize: displayModeCard === 'list' ? '2.5rem' : (responsive ? 2 : 3) + 'rem' }"
+        [ngStyle]="{ fontSize: displayModeCard === 'list' ? '2rem' : (responsive ? 2 : 2.2) + 'rem' }"
         [class.card-link]="properties.iconMenuItems"></i>
     </div>
   </p-card>

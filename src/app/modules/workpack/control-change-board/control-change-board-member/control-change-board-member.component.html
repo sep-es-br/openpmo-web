@@ -125,7 +125,7 @@
         <ng-container *ngFor="let memberAs of ccbMember.memberAs; let i = index">
           <div class="memberAs-item" [class.responsive]="responsive">
             <div class="input-toogle-container">
-              <p-inputSwitch class="app-toggle" [(ngModel)]="memberAs.active" (ngModelChange)="showSaveButton()">
+              <p-inputSwitch class="app-toggle" [(ngModel)]="memberAs.active" (ngModelChange)="showSaveButton();">
               </p-inputSwitch>
               <label class="input-label">
                 <span *ngIf="memberAs.workLocation"> {{memberAs.workLocation}} - </span>
@@ -140,5 +140,8 @@
   <div class="loading-form-container" *ngIf="formIsSaving">
     <app-card-loading [isCardLoading]="formIsSaving"></app-card-loading>
   </div>
-  <app-save-button (save)="saveCcbMember()"></app-save-button>
+  <app-buttons-container>
+    <app-save-button (save)="saveCcbMember()"></app-save-button>
+    <app-cancel-button (cancel)="handleOnCancel()"></app-cancel-button>
+  </app-buttons-container>
 </div>

@@ -43,7 +43,7 @@
         align-items: center;
         .value {
           text-transform: none;
-          font-size: 0.875rem;
+          font-size: 10px;
           font-family: v.$fontFamilyBold;
           font-weight: 700;
         }
@@ -76,7 +76,7 @@
     width: 100%;
     margin-top: 5px;
     .baseline-label-value {
-      font-size: 12px;
+      font-size: 10px;
       font-weight: bold;
       color: #797979;
       text-transform: none;

@@ -19,4 +19,5 @@ export interface IFilterProperty {
   localitiesSelected?: TreeNode | TreeNode[];
   active?: boolean;
   invalid?: boolean;
+  helpText?: string;
 }

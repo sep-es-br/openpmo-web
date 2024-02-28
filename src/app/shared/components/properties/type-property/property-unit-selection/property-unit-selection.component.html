@@ -5,5 +5,7 @@
     [(ngModel)]="property.selectedValue" dropdownIcon="fas fa-caret-down" [autoDisplayFirst]="false"
     [required]="property.required" (ngModelChange)="changed.emit($event)">
   </p-dropdown>
-  <label class="app-input-label" [for]="property.name">{{property.label}} {{ property.required ? '*' : ''}}</label>
+  <label class="app-input-label" [for]="property.name">{{property.label}} {{ property.required ? '*' : ''}}
+    <i class="far fa-question-circle" *ngIf="property.helpText && property.helpText.length > 0" [pTooltip]="property.helpText"></i>
+  </label>
 </span>

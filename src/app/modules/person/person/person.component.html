@@ -29,12 +29,16 @@
             <span class="p-float-label property-input p-field">
               <input pInputText class="app-input-text" type="text" [class.responsive]="responsive"
                 formControlName="name">
-              <label class="app-input-label">{{ 'messages.labelNameProfile' | translate }} </label>
+              <label class="app-input-label">{{ 'messages.labelNameProfile' | translate }}
+                <i class="far fa-question-circle" [pTooltip]="'help.person.howDoYouWantYourNameDisplayed' | translate"></i>
+              </label>
             </span>
             <span class="p-float-label property-input p-field" *ngIf="propertiesPerson?.email">
               <input pInputText class="app-input-text" type="text" [class.responsive]="responsive"
                 formControlName="email" [readOnly]="true">
-              <label class="app-input-label">{{ 'accessEmail' | translate }} </label>
+              <label class="app-input-label">{{ 'accessEmail' | translate }} 
+                <i class="far fa-question-circle" [pTooltip]="'help.person.accessEmail' | translate"></i>
+              </label>
             </span>
           </form>
         </div>
@@ -49,19 +53,25 @@
                 <span class="p-float-label property-input-text p-field p-col-12 p-md-4">
                   <input pInputText class="app-input-text" type="text" [class.responsive]="responsive"
                     formControlName="contactEmail">
-                  <label class="app-input-label">{{ 'email' | translate }} </label>
+                  <label class="app-input-label">{{ 'email' | translate }} 
+                    <i class="far fa-question-circle" [pTooltip]="'help.person.contactEmail' | translate"></i>
+                  </label>
                 </span>
                 <span class="p-float-label left property-input p-field p-col-12 p-md-2">
                   <input pInputText class="app-input-text" formControlName="phoneNumber" [class.responsive]="responsive"
                     (blur)="setPhoneNumberMask()" [placeholder]="phoneNumberPlaceholder"
                     (focus)="setPhoneNumberPlaceholder()" (input)="setPhoneNumberPlaceholder()" />
-                  <label class="app-input-label">{{ 'phone' | translate }} </label>
+                  <label class="app-input-label">{{ 'phone' | translate }} 
+                    <i class="far fa-question-circle" [pTooltip]="'help.person.phoneNumber' | translate"></i>
+                  </label>
                 </span>
               </div>
               <span class="p-float-label property-input p-field">
                 <textarea pInputTextarea class="app-text-area" [class.responsive]="responsive" formControlName="address"
                   [rows]="1"></textarea>
-                <label class="app-input-label">{{ 'address' | translate }} </label>
+                <label class="app-input-label">{{ 'address' | translate }} 
+                  <i class="far fa-question-circle" [pTooltip]="'help.person.address' | translate"></i>
+                </label>
               </span>
             </form>
           </section>
@@ -129,5 +139,8 @@
       </div>
     </app-card>
   </div>
-  <app-save-button (save)="savePerson()"></app-save-button>
+  <app-buttons-container>
+    <app-save-button (save)="savePerson()"></app-save-button>
+    <app-cancel-button (cancel)="handleOnCancel()"></app-cancel-button>
+  </app-buttons-container>
 </div>

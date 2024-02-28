@@ -50,6 +50,8 @@ import { BreakdownStructureService } from 'src/app/shared/services/breakdown-str
 import { PersonService } from 'src/app/shared/services/person.service';
 import { IBreadcrumb } from 'src/app/shared/interfaces/IBreadcrumb';
 import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
+import { Location } from '@angular/common';
+import { CancelButtonComponent } from 'src/app/shared/components/cancel-button/cancel-button.component';
 import { TypeWorkpackModelEnum } from 'src/app/shared/enums/TypeWorkpackModelEnum';
 import { SetConfigWorkpackService } from 'src/app/shared/services/set-config-workpack.service';
 
@@ -61,6 +63,7 @@ import { SetConfigWorkpackService } from 'src/app/shared/services/set-config-wor
 export class WorkpackComponent implements OnDestroy {
 
   @ViewChild(SaveButtonComponent) saveButton: SaveButtonComponent;
+  @ViewChild(CancelButtonComponent) cancelButton: CancelButtonComponent;
   responsive: boolean;
   idPlan: number;
   propertiesPlan: IPlan;
@@ -74,8 +77,6 @@ export class WorkpackComponent implements OnDestroy {
   workpackModel: IWorkpackModel;
   typePropertyModel = TypePropertyModelEnum;
   workpack: IWorkpack;
-  workpackName: string;
-  workpackFullName: string;
   workpackProperties: IWorkpackProperty[];
   sectionWorkpackModelChildren: boolean;
   organizationsOffice: IOrganization[];
@@ -100,7 +101,6 @@ export class WorkpackComponent implements OnDestroy {
   fullScreenModeDashboard = false;
   changedStatusCompleted = false;
   endManagementResumePermission = false;
-  oldName: string = null;
   showTabview = false;
   hasWBS = false;
   selectedTab: ITabViewScrolled;
@@ -144,6 +144,7 @@ export class WorkpackComponent implements OnDestroy {
     private breakdownStructureSrv: BreakdownStructureService,
     private personSrv: PersonService,
     private breadcrumbSrv: BreadcrumbService,
+    private location: Location,
     private setConfigWorkpackSrv: SetConfigWorkpackService
   ) {
     this.actRouter.queryParams.subscribe(({ id }) => this.idWorkpack = id && +id);
@@ -204,6 +205,15 @@ export class WorkpackComponent implements OnDestroy {
         }
       }
     });
+    this.saveButtonSrv.observableShowCancelButton.pipe(takeUntil(this.$destroy)).subscribe(showButton => {
+      if (showButton && this.cancelButton) {
+        this.cancelButton.showButton();
+      } else {
+        if (this.cancelButton) {
+          this.cancelButton.hideButton();
+        }
+      }
+    });
     this.configDataViewSrv.observableCollapsePanelsStatus.pipe(takeUntil(this.$destroy)).subscribe(collapsePanelStatus => {
       this.collapsePanelsStatus = this.showTabview ? false : (collapsePanelStatus === 'collapse' ? true : false);
       this.handleChangeCollapseExpandPanel();
@@ -220,6 +230,7 @@ export class WorkpackComponent implements OnDestroy {
         this.workpack.completed = checkCompleted;
       }
     });
+    
   }
 
   ngOnDestroy(): void {
@@ -267,12 +278,16 @@ export class WorkpackComponent implements OnDestroy {
 
   async resetWorkpack() {
     this.workpackSrv.nextPendingChanges(false);
+    if (this.saveButton) {
+      this.saveButton.hideButton();
+    }
+    if (this.cancelButton) {
+      this.cancelButton.hideButton();
+    }
     this.isLoading = true;
     this.hasWBS = false;
     this.workpackModel = undefined;
     this.workpack = undefined;
-    this.workpackName = undefined;
-    this.workpackFullName = undefined;
     this.workpackProperties = [];
     this.sectionWorkpackModelChildren = undefined;
     this.cardsWorkPackModelChildren = [];
@@ -353,7 +368,7 @@ export class WorkpackComponent implements OnDestroy {
 
   async loadWorkpack(reloadOnlyProperties = false) {
     this.workpackSrv.nextLoadingWorkpack(true);
-    const result = await this.workpackSrv.GetWorkpackDataById(this.idWorkpack, { 'id-plan': this.idPlan });
+    const result = await this.workpackSrv.GetWorkpackDataById(this.idWorkpack, { 'id-plan': this.idPlan});
     if (result.success && result.data) {
       this.workpack = result.data;
       this.setUnitMeansure();
@@ -406,15 +421,13 @@ export class WorkpackComponent implements OnDestroy {
   async loadWorkpackLinked(reloadOnlyProperties = false) {
     this.workpackSrv.nextLoadingWorkpack(true);
     const result = await this.workpackSrv.GetWorkpackLinked(this.idWorkpack,
-      { 'id-workpack-model': this.idWorkpackModelLinked, 'id-plan': this.idPlan });
+      { 'id-workpack-model': this.idWorkpackModelLinked, 'id-plan': this.idPlan});
     if (result.success && result.data) {
       this.workpack = result.data;
       this.setUnitMeansure();
       const workpackParams = this.workpackSrv.getWorkpackParams();
       workpackParams.idOfficeOwnerWorkpackLinked = this.workpack.plan.idOffice;
       this.workpackSrv.setWorkpackParams({ ...workpackParams });
-      this.workpackName = this.workpack.name;
-      this.workpackFullName = this.workpack.fullName;
       if (!this.isUserAdmin && this.workpack) {
         const editPermission = !!this.workpack.permissions?.find(p => p.level === 'EDIT');
         this.workpackSrv.setEditPermission(editPermission);
@@ -690,6 +703,13 @@ export class WorkpackComponent implements OnDestroy {
             });
           }
         }
+        let actualInformation;
+        if (workpack.journalInformation) {
+          const today = moment();
+          const informationDate = moment(workpack.journalInformation.date, 'yyyy-MM-DD');
+          const diff = today.diff(informationDate, 'days');
+          actualInformation = diff <= 30;
+        }
         return {
           typeCardItem: workpack.type,
           icon: workpack.fontIcon,
@@ -719,7 +739,11 @@ export class WorkpackComponent implements OnDestroy {
           baselineName: workpack.activeBaselineName,
           subtitleCardItem: workpack.type === 'Milestone' ? (workpack.date ? workpack.date.split('T')[0] : null) : '',
           statusItem: workpack.type === 'Milestone' ? MilestoneStatusEnum[workpack.milestoneStatus] : '',
-          editPermission: workpack.completed && workpack.type === 'Milestone' ? false : this.getEditPermission()
+          editPermission: workpack.completed && workpack.type === 'Milestone' ? false : this.getEditPermission(),
+          journalInformation: {
+            ...workpack?.journalInformation,
+            actual: actualInformation
+          }
         };
       });
       if (this.workpackSrv.getEditPermission() && !idWorkpackModelLinked) {
@@ -1216,6 +1240,7 @@ export class WorkpackComponent implements OnDestroy {
   }
 
   onSaveButtonClicked() {
+    this.cancelButton.hideButton();
     this.workpackSrv.nextPendingChanges(false);
     this.saveButtonSrv.nextSaveButtonClicked(true);
   }
@@ -1310,31 +1335,55 @@ export class WorkpackComponent implements OnDestroy {
 
     if (success) {
       if (!isPut) {
-        const workpackParams = this.workpackSrv.getWorkpackParams();
-        this.workpackSrv.setWorkpackParams({
-          ...workpackParams,
-          idWorkpack: data.id
-        });
-        this.idWorkpack = data.id;
         this.personSrv.setPersonWorkLocal({
           idOffice: this.idOffice,
           idPlan: this.idPlan,
           idWorkpack: data.id,
           idWorkpackModelLinked: null
         });
-        this.resetWorkpack();
-       
+        if ((this.workpack && this.workpack.type !== TypeWorkpackEnum.MilestoneModel)
+          || (this.workpackModel && TypeWorkpackEnum[this.workpackModel.type] !== TypeWorkpackEnum.MilestoneModel)) {
+            const workpackParams = this.workpackSrv.getWorkpackParams();
+            this.workpackSrv.setWorkpackParams({
+              ...workpackParams,
+              idWorkpack: data.id
+            });
+            this.idWorkpack = data.id;
+            this.resetWorkpack();
+        } else { 
+          this.navigateToBack();
+        }
+      } else {
+        if ((this.workpack && this.workpack.type === TypeWorkpackEnum.MilestoneModel)
+          || (this.workpackModel && TypeWorkpackEnum[this.workpackModel.type] === TypeWorkpackEnum.MilestoneModel)) {
+        this.navigateToBack();
+        }
       }
-      this.formIsSaving = false;
       this.messageSrv.add({
         severity: 'success',
         summary: this.translateSrv.instant('success'),
         detail: this.translateSrv.instant('messages.savedSuccessfully')
       });
+      this.formIsSaving = false;
       setTimeout( () => {
         this.menuSrv.reloadMenuPortfolio(!isPut ? this.idWorkpack : undefined);
       },5000)
     }
+  }
+
+  navigateToBack() {
+    this.router.navigate(['/workpack'], {
+      queryParams: {
+        id: this.workpack && this.workpack.idParent ? this.workpack.idParent : this.idWorkpackParent,
+        idPlan: this.idPlan
+      }
+    })
+  }
+
+  handleOnCancel() {
+    this.saveButton.hideButton();
+    this.saveButtonSrv.nextCancelButtonClicked(true);
+    this.workpackSrv.nextPendingChanges(false);
   }
 
   async handleEditFilterWorkpackModel(event, idWorkpackModel: number) {
@@ -1343,7 +1392,7 @@ export class WorkpackComponent implements OnDestroy {
       await this.workpackBreadcrumbStorageSrv.setBreadcrumbStorage();
       this.router.navigate(['/filter-dataview'], {
         queryParams: {
-          id: idFilter,
+          idFilter: idFilter,
           entityName: `workpacks`,
           idWorkpackModel,
           idOffice: this.idOffice
@@ -1399,7 +1448,7 @@ export class WorkpackComponent implements OnDestroy {
       await this.workpackBreadcrumbStorageSrv.setBreadcrumbStorage();
       this.router.navigate(['/filter-dataview'], {
         queryParams: {
-          id: idFilter,
+          idFilter: idFilter,
           entityName,
           idWorkpackModel: this.workpack.idWorkpackModel,
           idOffice: this.idOffice

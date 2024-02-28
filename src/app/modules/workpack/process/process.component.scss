@@ -76,7 +76,7 @@
           label {
             color: #b5b5b5;
             margin-left: 0.5em;
-            font-size: 1rem;
+            font-size: 0.9rem;
             font-weight: bold;
           }
           .other_files {
@@ -88,7 +88,7 @@
           label {
             font-weight: 700;
             font-style: normal;
-            font-size: 16px;
+            font-size: 0.9rem;
             color: #44B39B;
             margin-left: 0.5em;
           }
@@ -101,7 +101,7 @@
     }
   }
   .history-container {
-    padding-top: 2em;
+    padding-top: 1em;
     width: 50%;
     .p-timeline-event-opposite, .p-timeline-event-content {
       padding-bottom: 1em;
@@ -119,7 +119,7 @@
       }
       .organization-name {
         color: #13546c;
-        font-size: 1em;
+        font-size: 0.9em;
         font-weight: bold;
         text-transform: uppercase;
         text-align: start;
@@ -133,7 +133,7 @@
       .date-container {
         margin-top: 1em;
         color: #13546c;
-        font-size: 0.8em;
+        font-size: 0.7em;
         font-weight: bold;
         text-align: start;
         span {

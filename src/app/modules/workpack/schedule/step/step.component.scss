@@ -178,13 +178,13 @@
             display: flex;
             flex-direction: column;
             .label {
-              font-size: 0.9rem;
+              font-size: 0.8rem;
               font-style: italic;
               color: v.$fontLabel;
             }
             .value {
               font-family: v.$fontFamilyMedium;
-              font-size: 1rem;
+              font-size: 0.9rem;
               color: v.$fontInput;
               padding: 0.5em 0;
               &.red {
@@ -242,31 +242,5 @@
       padding: 0.5em 0;
     }
   }
-  .app-save-button-layout {
-    position: relative;
-    height: 15vh;
-    width: 100%;
-    overflow: hidden;
-  }
-  .app-save-button-wrapper {
-    position: absolute;
-    bottom: 30%;
-    left: 0;
-    z-index: 100;
-
-    .button-label {
-      background-color: v.$bgButtonGreen;
-      color: #ffffff;
-      font-size: 1.25rem;
-      padding: .5em 1.5em;
-      text-align: center;
-      border-radius: 5px;
-      box-shadow: 1px 7px 10px 2px rgba(0,0,0,.1);
-      cursor: pointer;
-
-      &:hover {
-        background-color: v.$bgButtonGreenHover;
-      }
-    }
-  }
+  
 }

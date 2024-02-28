@@ -216,6 +216,13 @@ export class BreakdownStructureService extends BaseService<IWorkpackBreakdownStr
     if (!item?.dashboardData && ![this.typeWorkpackEnum.Milestone].includes(item?.workpackType)) {
       return null;
     }
+    let actualInformation;
+    if (item.journalInformation) {
+      const today = moment();
+      const informationDate = moment(item.journalInformation.date, 'yyyy-MM-DD');
+      const diff = today.diff(informationDate, 'days');
+      actualInformation = diff <= 30;
+    }
     const properties = {
       dashboardMilestonesData: null,
       riskImportance: null,
@@ -227,6 +234,10 @@ export class BreakdownStructureService extends BaseService<IWorkpackBreakdownStr
       gaugeChartDataCPI: null,
       gaugeChartDataSPI: null,
       progressBars: null,
+      journalInformation: {
+        ...item.journalInformation,
+        actual: actualInformation
+      }
     };
     if (item?.dashboardData?.risk && item?.dashboardData?.risk?.total > 0) {
       properties.riskImportance = item.dashboardData?.risk?.high > 0 ?

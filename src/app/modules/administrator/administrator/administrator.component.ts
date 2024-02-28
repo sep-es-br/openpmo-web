@@ -16,6 +16,7 @@ import {BreadcrumbService} from 'src/app/shared/services/breadcrumb.service';
 import {SaveButtonComponent} from 'src/app/shared/components/save-button/save-button.component';
 import {cpfValidator} from 'src/app/shared/utils/cpfValidator';
 import {CitizenUserService} from 'src/app/shared/services/citizen-user.service';
+import { CancelButtonComponent } from 'src/app/shared/components/cancel-button/cancel-button.component';
 
 
 @Component({
@@ -29,13 +30,14 @@ import {CitizenUserService} from 'src/app/shared/services/citizen-user.service';
 export class AdministratorComponent implements OnInit, OnDestroy {
 
   @ViewChild(SaveButtonComponent) saveButton: SaveButtonComponent;
+  @ViewChild(CancelButtonComponent) cancelButton: CancelButtonComponent;
 
   person: IPerson;
   cardAdministrator: ICard;
   responsive: boolean;
   citizenAuthServer: boolean;
   personSearchBy: string; // SEARCH / NEW
-  citizenSearchBy: string; //CPF | NAME
+  citizenSearchBy: string = 'CPF'; //CPF | NAME
   searchedNameUser: string;
   searchedCpfUser: string;
   searchedEmailUser: string;
@@ -115,13 +117,6 @@ export class AdministratorComponent implements OnInit, OnDestroy {
     }
   }
 
-  validateClearSearchPerson(event) {
-    if (!event || event.length === 0) {
-      this.person = undefined;
-      this.saveButton?.hideButton();
-    }
-  }
-
   validateClearSearchUserName(event) {
     if (!event || (event.length === 0)) {
       this.publicServersResult = [];
@@ -168,6 +163,7 @@ export class AdministratorComponent implements OnInit, OnDestroy {
   }
 
   async searchUserByEmail() {
+    
     if (this.searchedEmailUser && this.searchedEmailUser.length > 5 && this.searchedEmailUser.split('@').length > 1) {
       const {data} = await this.personSrv.GetByKey(this.searchedEmailUser);
       if (data) {
@@ -184,6 +180,7 @@ export class AdministratorComponent implements OnInit, OnDestroy {
         this.showMessageNotFoundUserByEmail = true;
       }
       this.saveButton.showButton();
+      this.cancelButton.showButton();
     } else {
       this.person = null;
       this.showMessageInvalidEmail = true;
@@ -219,6 +216,7 @@ export class AdministratorComponent implements OnInit, OnDestroy {
   async validateCpf() {
     this.citizenUserNotFoundByCpf = false;
     this.validCpf = cpfValidator(this.searchedCpfUser);
+    
     if (this.validCpf) {
       this.isLoading = true;
       const result = await this.citizenUserSrv.GetCitizenUserByCpf({
@@ -228,6 +226,7 @@ export class AdministratorComponent implements OnInit, OnDestroy {
       if (result.success) {
         this.person = result.data;
         this.saveButton.showButton();
+        this.cancelButton.showButton();
       } else {
         this.citizenUserNotFoundByCpf = true;
         this.saveButton?.hideButton();
@@ -245,6 +244,7 @@ export class AdministratorComponent implements OnInit, OnDestroy {
     const publicServer = event.value;
     const result = await this.citizenUserSrv.GetPublicServer(publicServer.sub);
     this.isLoading = false;
+    this.cancelButton.showButton();
     if (result.success) {
       this.person = result.data;
       this.searchedNameUser = '';
@@ -255,6 +255,7 @@ export class AdministratorComponent implements OnInit, OnDestroy {
   }
 
   async savePersonToAdministrator() {
+    this.cancelButton.hideButton();
     if (!this.person) {
       return;
     }
@@ -291,6 +292,15 @@ export class AdministratorComponent implements OnInit, OnDestroy {
         );
       }
     }
+  }
+
+  handleOnCancel() {
+    this.saveButton.hideButton();
+    this.citizenSearchBy = 'CPF';
+    this.validateClearSearchByCpf('');
+    this.validateClearSearchByUser();
+    this.validateClearSearchUserByEmail('');
+    this.validateClearSearchUserName('');
   }
 
 }

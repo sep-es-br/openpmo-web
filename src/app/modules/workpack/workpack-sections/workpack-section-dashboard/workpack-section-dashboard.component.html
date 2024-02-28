@@ -26,17 +26,15 @@
         </p-card>
       </div>
     </div>
-    <p-divider layout="horizontal"
-      *ngIf="(dashboard?.stakeholders && dashboard?.stakeholders.length > 0 && dashboardShowStakeholders && dashboardShowStakeholders.length > 0)
+    <p-divider layout="horizontal" *ngIf="(dashboard?.stakeholders && dashboard?.stakeholders.length > 0 && dashboardShowStakeholders && dashboardShowStakeholders.length > 0)
         && !isLoading"></p-divider>
     <div class="cards-list-container" *ngIf="dashboard && !isLoading">
       <div class="card-container" *ngFor="let workpackModel of dashboard?.workpacksByModel; let i = index ">
         <p-card>
-          <div class="card-item" [class.card-link]="workpackModel?.level <= 2"
-              (click)="workpackModel?.level <= 2 &&
+          <div class="card-item" [class.card-link]="workpackModel?.level <= 2" (click)="workpackModel?.level <= 2 &&
                 loadWorkpackModelMenu(workpackModel.idWorkpackModel, workpackModel.level, i, $event);
               workpackModel?.level <= 2 && menuContainer.toggle($event)">
-            <div class="card-avatar-container">
+            <div class="card-icon-container">
               <i [class]="workpackModel.icon"></i>
             </div>
             <div class="card-details">
@@ -47,34 +45,35 @@
           <p-overlayPanel #menuContainer class="workpack-menu-container" (onShow)="closeItemsMenu(i)">
             <div class="loading-menu-container" *ngIf="idMenuLoading === workpackModel.idWorkpackModel">
               <div class="menu-loading">
-                <p-progressSpinner [style]="{width: '50px', height: '50px'}"
-                  styleClass="custom-spinner" strokeWidth="8"
+                <p-progressSpinner [style]="{width: '50px', height: '50px'}" styleClass="custom-spinner" strokeWidth="8"
                   fill="#EEEEEE" animationDuration=".5s">
                 </p-progressSpinner>
               </div>
             </div>
             <div class="menu-container" *ngIf="idMenuLoading !== workpackModel.idWorkpackModel">
-              <p-panelMenu [model]="workpackModel.menuItems" class="menu-model" >
-              </p-panelMenu >
+              <p-panelMenu [model]="workpackModel.menuItems" class="menu-model">
+              </p-panelMenu>
             </div>
           </p-overlayPanel>
         </p-card>
       </div>
     </div>
     <p-divider layout="horizontal" *ngIf="!isLoading"></p-divider>
-    <div class="params-container" *ngIf="startDate && endDate && !isLoading">
-      <div class="param-item">
-        <label class="param-label">{{'reference'|translate}}</label>
-        <p-calendar class="app-select-date" [(ngModel)]="referenceMonth" view="month" [dateFormat]="calendarFormat"
-          [yearNavigator]="true" [showIcon]="true" icon="fas fa-calendar-alt" [yearRange]="yearRange"
-          [minDate]="startDate" [maxDate]="endDate" (ngModelChange)="handleSelectedReferenceMonth()"
-          [readonlyInput]="true" inputId="monthpicker"></p-calendar>
-      </div>
-      <div class="param-item" *ngIf="workpackType === 'Project' && !!baselines && baselines.length > 0">
-        <label class="param-label">{{'baseline'|translate}}</label>
-        <p-dropdown class="app-single-selection" [options]="baselines" optionLabel="name" optionValue="id"
-          [autoDisplayFirst]="false" [(ngModel)]="selectedBaseline" optionLabel="name"
-          (ngModelChange)="handleSeletedBaseline()"></p-dropdown>
+    <div class="top-container">
+      <div class="params-container" *ngIf="startDate && endDate && !isLoading">
+        <div class="param-item">
+          <label class="param-label">{{'reference'|translate}}</label>
+          <p-calendar class="app-select-date" [(ngModel)]="referenceMonth" view="month" [dateFormat]="calendarFormat"
+            [yearNavigator]="true" [showIcon]="true" icon="fas fa-calendar-alt" [yearRange]="yearRange"
+            [minDate]="startDate" [maxDate]="endDate" (ngModelChange)="handleSelectedReferenceMonth()"
+            [readonlyInput]="true" inputId="monthpicker"></p-calendar>
+        </div>
+        <div class="param-item" *ngIf="workpackType === 'Project' && !!baselines && baselines.length > 0">
+          <label class="param-label">{{'baseline'|translate}}</label>
+          <p-dropdown class="app-single-selection" [options]="baselines" optionLabel="name" optionValue="id"
+            [autoDisplayFirst]="false" [(ngModel)]="selectedBaseline" optionLabel="name"
+            (ngModelChange)="handleSeletedBaseline()"></p-dropdown>
+        </div>
       </div>
     </div>
     <div class="charts-container" *ngIf="!isLoading">

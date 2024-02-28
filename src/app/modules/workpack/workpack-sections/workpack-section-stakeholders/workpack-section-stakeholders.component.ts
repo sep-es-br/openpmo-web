@@ -315,7 +315,7 @@ export class WorkpackSectionStakeholdersComponent implements OnInit, OnDestroy {
       await this.workpackBreadcrumbStorageSrv.setBreadcrumbStorage();
       this.router.navigate(['/filter-dataview'], {
         queryParams: {
-          id: idFilter,
+          idFilter: idFilter,
           entityName,
           idWorkpackModel: this.workpackData.workpackModel.id,
           idOffice: this.workpackParams.idOffice

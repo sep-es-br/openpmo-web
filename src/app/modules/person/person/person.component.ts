@@ -18,8 +18,8 @@ import { AuthService } from 'src/app/shared/services/auth.service';
 import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
 import { Location } from '@angular/common';
 import { MinLengthTextCustomValidator } from 'src/app/shared/utils/minLengthTextValidator';
-import { WorkpackService } from 'src/app/shared/services/workpack.service';
 import { SetConfigWorkpackService } from 'src/app/shared/services/set-config-workpack.service';
+import { CancelButtonComponent } from 'src/app/shared/components/cancel-button/cancel-button.component';
 
 @Component({
   selector: 'app-person',
@@ -28,6 +28,7 @@ import { SetConfigWorkpackService } from 'src/app/shared/services/set-config-wor
 })
 export class PersonComponent implements OnInit, OnDestroy {
   @ViewChild(SaveButtonComponent) saveButton: SaveButtonComponent;
+  @ViewChild(CancelButtonComponent) cancelButton: CancelButtonComponent;
 
   cardProperties: ICard = {
     toggleable: false,
@@ -50,6 +51,7 @@ export class PersonComponent implements OnInit, OnDestroy {
   changedAvatar = false;
   deletedAvatar = false;
   avatarData;
+  oldAvatar;
   isLoading = false;
   formIsSaving = false;
 
@@ -86,7 +88,10 @@ export class PersonComponent implements OnInit, OnDestroy {
       .subscribe(() => this.saveButton?.hideButton());
     this.formPerson.valueChanges
       .pipe(takeUntil(this.$destroy), filter(() => this.formPerson.dirty && this.formPerson.valid))
-      .subscribe(() => this.saveButton.showButton());
+      .subscribe(() => { this.saveButton.showButton() });
+    this.formPerson.valueChanges
+      .pipe(takeUntil(this.$destroy), filter(() => this.formPerson.dirty))
+      .subscribe(() => { this.cancelButton.showButton() });
     this.responsiveSvr.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.responsive = value);
   }
 
@@ -269,8 +274,11 @@ export class PersonComponent implements OnInit, OnDestroy {
   }
 
   handleChangeAvatar(event) {
+    this.oldAvatar = this.propertiesPerson.avatar;
+    this.propertiesPerson.avatar = event;
     this.avatarData = event;
     this.changedAvatar = true;
+    this.cancelButton.showButton();
     if (this.formPerson.valid) {
       this.saveButton.showButton();
     }
@@ -278,12 +286,14 @@ export class PersonComponent implements OnInit, OnDestroy {
 
   async handleDeleteAvatar() {
     this.deletedAvatar = true;
+    this.cancelButton.showButton();
     if (this.formPerson.valid) {
       this.saveButton.showButton();
     }
   }
 
   async savePerson() {
+    this.cancelButton.hideButton();
     this.formIsSaving = true;
     if (this.changedAvatar) {
       await this.updateAvatar();
@@ -329,5 +339,21 @@ export class PersonComponent implements OnInit, OnDestroy {
       this.changedAvatar = false;
     }
   }
+
+  handleOnCancel() {
+    this.saveButton.hideButton();
+    if (this.changedAvatar) {
+      this.propertiesPerson.avatar = this.oldAvatar ? {...this.oldAvatar} : undefined;
+      this.changedAvatar = false;
+    }
+    if (this.deletedAvatar) {
+      this.propertiesPerson.avatar = {
+        ...this.propertiesPerson.avatar
+      };
+      this.deletedAvatar = false;
+    }
+    this.setFormPerson(this.propertiesPerson);
+  }
+
 
 }

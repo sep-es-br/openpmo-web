@@ -1,4 +1,3 @@
-import { CitizenUserService } from './../../../shared/services/citizen-user.service';
 import { takeUntil } from 'rxjs/operators';
 import { ResponsiveService } from 'src/app/shared/services/responsive.service';
 import { IFilterProperty } from './../../../shared/interfaces/IFilterProperty';
@@ -12,7 +11,6 @@ import { IOffice } from 'src/app/shared/interfaces/IOffice';
 import { AuthService } from 'src/app/shared/services/auth.service';
 import { OfficeService } from 'src/app/shared/services/office.service';
 import { FilterDataviewPropertiesEntity } from 'src/app/shared/constants/filterDataviewPropertiesEntity';
-import { PropertyTemplateModel } from 'src/app/shared/models/PropertyTemplateModel';
 import { ICardItemOffice } from 'src/app/shared/interfaces/ICardItemOffice';
 import { CookieService } from 'ngx-cookie';
 import * as moment from 'moment';
@@ -98,6 +96,7 @@ export class OfficeListComponent implements OnInit {
     const cookiesPermission = this.cookieSrv.get('cookiesPermission' + user.email);
     if(!!cookiesPermission) {
       this.showCookiesPermissionMessage = false;
+      this.handleSetCookiesPermission();
     } else {
       const cookiesDecline = localStorage.getItem('cookiesDecline' + user.email);
       if (!!cookiesDecline) {
@@ -217,7 +216,7 @@ export class OfficeListComponent implements OnInit {
       localStorage.removeItem('@pmo/current-breadcrumb');
       this.router.navigate(['/filter-dataview'], {
         queryParams: {
-          id: idFilter,
+          idFilter: idFilter,
           entityName: 'offices'
         }
       });

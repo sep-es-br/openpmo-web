@@ -4,12 +4,12 @@ export interface IPlan {
   id?: number;
   idOffice?: number;
   idPlanModel?: number;
-  planModel?: IPlanModel;
   name: string;
   fullName: string;
   start: string;
   finish: string;
   permissions?: IPermission[];
+  planModel?: IPlanModel;
 }
 
 interface IPermission {

@@ -182,7 +182,7 @@ export class DomainListComponent implements OnInit, OnDestroy {
       this.setBreadcrumbStorage(idFilter);
       this.router.navigate(['/config/filter-dataview'], {
         queryParams: {
-          id: idFilter,
+          idFilter: idFilter,
           entityName: 'domains',
           idOffice: this.idOffice
         }

@@ -263,12 +263,6 @@ export class DashboardService extends BaseService<IDashboard> {
     return result as IHttpResult<IWorkpackByModel[]>;
   }
 
-  public async GetDashboardScheduleInterval(options?): Promise<IHttpResult<{ startDate: string; endDate: string }>> {
-    const result = await this.http.get(`${this.urlBase}/schedule-interval`, { params: PrepareHttpParams(options) }).toPromise();
-    return result as IHttpResult<{ startDate: string; endDate: string }>;
-  }
-
-
   get observable() {
     return this.isExpandedMode.asObservable();
   }

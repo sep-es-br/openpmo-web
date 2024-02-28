@@ -10,7 +10,9 @@
       display="chip"
       (ngModelChange)="changed.emit($event)">
     </p-multiSelect>
-    <label class="app-input-label" for="float-label">{{property.label}} {{ property.required ? '*' : ''}}</label>
+    <label class="app-input-label" for="float-label">{{property.label}} {{ property.required ? '*' : ''}}
+      <i class="far fa-question-circle" *ngIf="property.helpText && property.helpText.length > 0" [pTooltip]="property.helpText"></i>
+    </label>
   </span>
 </ng-container>
 <ng-template #singleSelection>
@@ -22,7 +24,9 @@
       [(ngModel)]="property.selectedValues" (onBlur)="changed.emit($event)" dropdownIcon="fas fa-caret-down"
       [required]="property.required" (ngModelChange)="changed.emit($event)">
     </p-dropdown>
-    <label class="app-input-label" [for]="property.name">{{property.label}} {{ property.required ? '*' : ''}}</label>
+    <label class="app-input-label" [for]="property.name">{{property.label}} {{ property.required ? '*' : ''}}
+      <i class="far fa-question-circle" *ngIf="property.helpText && property.helpText.length > 0" [pTooltip]="property.helpText"></i>
+    </label>
   </span>
 </ng-template>
 <span class="input-message-error" *ngIf="property.invalid">

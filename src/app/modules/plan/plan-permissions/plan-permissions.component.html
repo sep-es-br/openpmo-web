@@ -27,6 +27,9 @@
           <span class="input-message-error" *ngIf="invalidMailMessage">
             {{ invalidMailMessage }}
           </span>
+          <span *ngIf="showMessageIsSamePerson" class="input-message-error">
+            {{ 'messages.isSamePerson'|translate }}
+          </span>
         </div>
         <div class="search-container-user-citizen" *ngIf="!key && !!citizenAuthServer">
           <div class="search-user-by" [class.responsive]="responsive">
@@ -52,6 +55,9 @@
             <span class="input-message-error" *ngIf="showMessagePublicServerNotFoundByName">
               {{'messages.publicServerNotFoundByName' |translate}}
             </span>
+            <span *ngIf="showMessageIsSamePerson" class="input-message-error">
+              {{ 'messages.isSamePerson'|translate }}
+            </span>
             <div class="listbox-public-servers-container" [class.responsive]="responsive">
               <p-listbox [options]="publicServersResult" *ngIf="showListBoxPublicServers" [multiple]="false"
                 [listStyle]="{'max-height':'250px'}" (onClick)="handleSelectedPublicServer($event)"
@@ -62,6 +68,9 @@
                   </span>
                 </ng-template>
               </p-listbox>
+              <span *ngIf="showMessageIsSamePerson" class="input-message-error">
+                {{ 'messages.isSamePerson'|translate }}
+              </span>
             </div>
           </div>
           <div class="search-by-cpf-container" [class.responsive]="responsive">
@@ -82,6 +91,9 @@
             <span *ngIf="citizenUserNotFoundByCpf" class="input-message-error">
               {{ 'messages.citizenUserNotFoundByCpf'|translate }}
             </span>
+            <span *ngIf="showMessageIsSamePerson && citizenSearchBy === 'CPF'" class="input-message-error">
+              {{ 'messages.isSamePerson'|translate }}
+            </span>
           </div>
         </div>
         <div class="loading-container" *ngIf="isLoadingCitizen">
@@ -97,7 +109,7 @@
           [emptyMessage]="'loadingEllipsis' | translate">
           <ng-template let-cardItem pTemplate="gridItem">
             <div class="p-col-12 p-md-3 p-sm-12 card-item-container" [class.responsive]="responsive">
-              <app-card-item-permission [properties]="cardItem" (changeSelected)="saveButton.showButton()">
+              <app-card-item-permission [properties]="cardItem" (changeSelected)="saveButton.showButton()" [isReadOnly]="isSamePerson">
               </app-card-item-permission>
             </div>
           </ng-template>
@@ -105,5 +117,8 @@
       </div>
     </app-card>
   </div>
-  <app-save-button #saveButton (save)="savePermission()"></app-save-button>
+  <app-buttons-container>
+    <app-save-button (save)="savePermission()"></app-save-button>
+    <app-cancel-button (cancel)="handleOnCancel()"></app-cancel-button>
+  </app-buttons-container>
 </div>

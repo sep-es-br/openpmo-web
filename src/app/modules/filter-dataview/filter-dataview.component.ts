@@ -32,6 +32,7 @@ import { CostAccountModelService } from 'src/app/shared/services/cost-account-mo
 import { TypeWorkpackModelEnum } from 'src/app/shared/enums/TypeWorkpackModelEnum';
 import { TypePropertyModelEnum } from 'src/app/shared/enums/TypePropertyModelEnum';
 import { CostAccountService } from 'src/app/shared/services/cost-account.service';
+import { CancelButtonComponent } from 'src/app/shared/components/cancel-button/cancel-button.component';
 
 @Component({
   selector: 'app-filter-dataview',
@@ -41,6 +42,7 @@ import { CostAccountService } from 'src/app/shared/services/cost-account.service
 export class FilterDataviewComponent implements OnInit, OnDestroy {
 
   @ViewChild(SaveButtonComponent) saveButton: SaveButtonComponent;
+  @ViewChild(CancelButtonComponent) cancelButton: CancelButtonComponent;
 
   $destroy = new Subject();
   formFilter: FormGroup;
@@ -53,6 +55,7 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
   filterData: IFilterDataview;
   propertiesListOptions: SelectItem[];
   ruleCards: ICardItemFilterRules[];
+  backupRoleCards: ICardItemFilterRules[];
   filterPropertiesList: IFilterProperty[] = this.filterSrv.get;
   filterPropertiesSub: Subscription;
   currentBreadcrumbItems: IBreadcrumb[] = this.breadcrumbSrv.get;
@@ -91,15 +94,21 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.$destroy), filter(status => status === 'INVALID'))
       .subscribe(() => this.saveButton?.hideButton());
     this.formFilter.valueChanges
-      .pipe(takeUntil(this.$destroy), filter(() => this.formFilter.dirty))
+      .pipe(takeUntil(this.$destroy), filter(() => this.formFilter.dirty && this.formFilter.valid))
       .subscribe(() => {
         if (this.validadeRulesCards()) {
           this.saveButton.showButton();
         }
+
+      });
+    this.formFilter.valueChanges
+      .pipe(takeUntil(this.$destroy), filter(() => this.formFilter.dirty))
+      .subscribe(() => {
+        this.cancelButton.showButton();
       });
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.responsive = value);
-    this.activeRoute.queryParams.subscribe(({ id, entityName, idWorkpackModel, idOffice }) => {
-      this.idFilter = id ? +id : undefined;
+    this.activeRoute.queryParams.subscribe(({ idFilter, entityName, idWorkpackModel, idOffice }) => {
+      this.idFilter = idFilter ? +idFilter : undefined;
       this.entityName = entityName;
       this.idWorkpackModel = idWorkpackModel ? +idWorkpackModel : undefined;
       this.idOffice = +idOffice;
@@ -134,7 +143,7 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
   }
 
   async checkURL(url: string) {
-    const [ path ] = url.slice(2).split('?');
+    const [path] = url.slice(2).split('?');
     if (path.startsWith('config/filter-dataview')) {
       const isAdmin = await this.authSrv.isUserAdmin();
       if (!isAdmin) {
@@ -157,7 +166,6 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
     });
     this.currentBreadcrumbSub = this.breadcrumbSrv.ready.subscribe(data => {
       this.currentBreadcrumbItems = data;
-      this.setCurrentBreadcrumb();
     });
     if (!!this.idWorkpackModel && this.entityName === 'workpacks') {
       await this.loadWorkpackFilterPropertiesList();
@@ -192,9 +200,9 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
   setCurrentBreadcrumb() {
     if (this.currentBreadcrumbItems && this.currentBreadcrumbItems.length > 0) {
       this.breadcrumbSrv.setMenu([...this.currentBreadcrumbItems,
-        ...[{
-          key: 'filter',
-        }]
+      ...[{
+        key: 'filter',
+      }]
       ]);
     }
   }
@@ -217,10 +225,12 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
   }
 
   setFormFilter() {
-    this.formFilter.controls.name.setValue(this.filterData.name);
-    this.formFilter.controls.favorite.setValue(this.filterData.favorite);
-    this.formFilter.controls.sortBy.setValue(this.filterData.sortBy);
-    this.formFilter.controls.sortByDirection.setValue(this.filterData.sortByDirection);
+    this.formFilter.reset({
+      name: this.filterData.name,
+      favorite: this.filterData.favorite,
+      sortBy: this.filterData.sortBy,
+      sortByDirection: this.filterData.sortByDirection
+    });
   }
 
   loadPropertiesCardFilter() {
@@ -258,7 +268,7 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
           }]
         };
       });
-      
+
       this.ruleCards.push({
         typeCard: 'new-card'
       });
@@ -267,9 +277,11 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
         typeCard: 'new-card'
       }];
     }
+    this.backupRoleCards = this.ruleCards.map( card => ({...card}));
   }
 
   async handleCreateNewRuleCard(event?) {
+    this.cancelButton.showButton();
     if (!this.idWorkpackModel || (!!this.idWorkpackModel && this.workpackModelEntitiesOptions.includes(this.entityName))) {
       await this.instanceFilterPropertiesList();
     }
@@ -300,6 +312,7 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
 
   handleDeleteCardItem(index) {
     this.ruleCards.splice(index, 1);
+    this.cancelButton.showButton();
     if (this.formFilter.valid && this.validadeRulesCards()) {
       this.saveButton.showButton();
     } else {
@@ -308,6 +321,7 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
   }
 
   handlePropertyValueChanged(event) {
+    this.cancelButton.showButton();
     if (this.formFilter.valid && this.validadeRulesCards()) {
       this.saveButton.showButton();
     } else {
@@ -325,6 +339,7 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
   }
 
   async handleOnSubmit() {
+    this.cancelButton.hideButton();
     const sender: IFilterDataview = {
       id: this.idFilter,
       name: this.formFilter.controls.name.value,
@@ -351,18 +366,36 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
     }
   }
 
+  handleOnCancel() {
+    this.saveButton.hideButton();
+    if (this.idFilter) {
+      this.setFormFilter();
+      this.ruleCards = this.backupRoleCards.map( card => ({...card}));
+    } else {
+      this.formFilter.reset({
+        name: '',
+        favorite: false,
+        sortBy: '',
+        sortByDirection: ''
+      });
+      this.ruleCards = [{
+        typeCard: 'new-card'
+      }];
+    }
+  }
+
   navigateToBack() {
     this.currentBreadcrumbItems = this.breadcrumbSrv.get;
-      if (this.currentBreadcrumbItems && this.currentBreadcrumbItems.length > 0) {
-        const lastItem = this.currentBreadcrumbItems[this.currentBreadcrumbItems.length - 1];
-        this.router.navigate([...lastItem.routerLink], {
-          queryParams: {
-            ...lastItem.queryParams
-          }
-        });
-      } else {
-        this.router.navigate(['/offices']);
-      }
+    if (this.currentBreadcrumbItems && this.currentBreadcrumbItems.length > 0) {
+      const lastItem = this.currentBreadcrumbItems[this.currentBreadcrumbItems.length - 1];
+      this.router.navigate([...lastItem.routerLink], {
+        queryParams: {
+          ...lastItem.queryParams
+        }
+      });
+    } else {
+      this.router.navigate(['/offices']);
+    }
   }
 
   getValueProperty(property: IFilterProperty, propValue) {
@@ -480,7 +513,8 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
         type: prop.type,
         label: this.translateSrv.instant(prop.label),
         name: prop.name,
-        possibleValues: prop.possibleValues
+        possibleValues: prop.possibleValues,
+        helpText: prop.helpText
       };
       this.filterPropertiesList.push(property);
     });
@@ -508,7 +542,7 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
       .filter(prop => this.typePropertyModel[prop.type] === TypePropertyModelEnum.OrganizationSelectionModel).length > 0) {
       await this.loadOrganizationsOffice();
     }
-    const costAccountPropertiesList = await Promise.all(costAccountModelActivesProperties.map( p => this.instanceProperty(p)));
+    const costAccountPropertiesList = await Promise.all(costAccountModelActivesProperties.map(p => this.instanceProperty(p)));
     this.filterPropertiesList = costAccountPropertiesList;
   }
 
@@ -532,7 +566,8 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
       defaultValue: propertyModel.defaultValue,
       min: propertyModel.min,
       max: propertyModel.max,
-      active: propertyModel.active
+      active: propertyModel.active,
+      helpText: propertyModel.helpText
     };
 
     if (this.typePropertyModel[propertyModel.type] === TypePropertyModelEnum.SelectionModel && propertyModel.multipleSelection) {
@@ -541,7 +576,7 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
     }
 
     if (this.typePropertyModel[propertyModel.type] === TypePropertyModelEnum.SelectionModel) {
-      const listOptions = (propertyModel.possibleValues as string).split(',').sort( (a, b) => a.localeCompare(b));
+      const listOptions = (propertyModel.possibleValues as string).split(',').sort((a, b) => a.localeCompare(b));
       property.possibleValues = listOptions.map(op => ({ label: op, value: op }));
     }
 
@@ -573,7 +608,7 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
     }
 
     if (this.typePropertyModel[propertyModel.type] === TypePropertyModelEnum.OrganizationSelectionModel) {
-      property.possibleValuesIds = this.organizations.filter( org => propertyModel.sectors.includes(org.sector.toLowerCase()))
+      property.possibleValuesIds = this.organizations.filter(org => propertyModel.sectors.includes(org.sector.toLowerCase()))
         .map(d => ({ label: d.name, value: d.id }));
     }
     if (this.typePropertyModel[propertyModel.type] === TypePropertyModelEnum.UnitSelectionModel) {
@@ -603,7 +638,7 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
       }
       return { label: locality.name, data: locality.id, selectable };
     });
-    list.sort( (a,b) => a.label.localeCompare(b.label));
+    list.sort((a, b) => a.label.localeCompare(b.label));
     if (multipleSelection) {
       this.addSelectAllNode(list, localityList, selectable);
     }
@@ -639,7 +674,7 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
   async loadOrganizationsOffice() {
     const result = await this.organizationSrv.GetAll({ 'id-office': this.idOffice });
     if (result.success) {
-      this.organizations = result.data && result.data.sort( (a, b) => a.name.localeCompare(b.name));
+      this.organizations = result.data && result.data.sort((a, b) => a.name.localeCompare(b.name));
     }
   }
 
@@ -650,7 +685,7 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
       return units.map(org => ({
         label: org.name,
         value: org.id
-      })).sort( (a, b) => a.label.localeCompare(b.label));
+      })).sort((a, b) => a.label.localeCompare(b.label));
     }
   }
 

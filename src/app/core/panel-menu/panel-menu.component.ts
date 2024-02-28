@@ -111,7 +111,7 @@ export class PanelMenuComponent implements OnInit {
       if (id === 0) {
         await this.loadPropertiesPlan();
       }
-      if (this.currentIDPlan !== 0 && this.currentIDPlan !== id) {
+      if (this.currentIDPlan !== 0 || id !== 0) {
         this.currentIDPlan = id;
         await this.loadPropertiesPlan();
         this.loadPortfolioMenu();
@@ -165,8 +165,8 @@ export class PanelMenuComponent implements OnInit {
     this.menuSrv.obsCloseAllMenus.pipe(takeUntil(this.$destroy)).subscribe( closeAllMenus => {
       if (closeAllMenus && !this.isFixed) this.setCloseAllMenus();
     });
-    this.menuSrv.obsToggleMenu.pipe(takeUntil(this.$destroy)).subscribe( value => {
-      this.toggleMenu(value);
+    this.menuSrv.obsToggleMenu.pipe(takeUntil(this.$destroy)).subscribe(({menu}) => {
+      this.toggleMenu(menu);
     });
 
   }
@@ -198,12 +198,12 @@ export class PanelMenuComponent implements OnInit {
       const infoPerson = await this.authSrv.getInfoPerson();
       if (infoPerson && infoPerson.workLocal) {
         if (infoPerson.workLocal.idWorkpackModelLinked || infoPerson.workLocal.idWorkpack || infoPerson.workLocal.idPlan) {
-          this.menuSrv.nextToggleMenu('portfolio');
+          this.menuSrv.nextToggleMenu({menu: 'portfolio', open: true});
         } else {
-          this.menuSrv.nextToggleMenu('office');
+          this.menuSrv.nextToggleMenu({menu: 'office', open: true});
         }
       } else {
-        this.menuSrv.nextToggleMenu('office');
+        this.menuSrv.nextToggleMenu({menu: 'office', open: true});
       }
       this.handleChangeMenuMode();
     }
@@ -350,6 +350,7 @@ export class PanelMenuComponent implements OnInit {
     }
     if (url.startsWith('offices') && (isNaN(id) || !id)) {
       this.itemsOffice = this.itemsOffice ? [...this.collapseMenuItems(this.itemsOffice)] : undefined;
+      this.menuSrv.nextToggleMenu({menu: 'office', open: false});
     }
     if (!id || isNaN(id)) {
       return;
@@ -357,11 +358,12 @@ export class PanelMenuComponent implements OnInit {
     if (url.startsWith('offices/office')) {
       this.menuOffices?.nativeElement.querySelector('.office-' + id)?.classList.add('active');
       this.itemsOffice = this.itemsOffice ? [...this.expandMenuOffice()] : undefined;
+      this.menuSrv.nextToggleMenu({menu: 'office', open: false});
 
     } else if (url.startsWith('strategies/strategy')) {
       this.menuPlanModel?.nativeElement.querySelector('.planModel-' + id)?.classList.add('active');
       this.itemsPlanModel = this.itemsPlanModel ? [...this.expandedMenuSelectedItem(this.itemsPlanModel, [], id)] : undefined;
-
+      this.menuSrv.nextToggleMenu({menu: 'planModel', open: false});
     } else if (url.startsWith('workpack-model')) {
       this.storageBreadcrumbsItems = this.breadcrumbSrv.get;
       const parents = this.parentsFromBreadcrumb();
@@ -372,13 +374,14 @@ export class PanelMenuComponent implements OnInit {
       } else {
         this.menuPlanModel?.nativeElement.querySelector('.workpackModel-' + id)?.classList.add('active');
       }
+      this.menuSrv.nextToggleMenu({menu: 'planModel', open: false});
     } else if (url.startsWith('plan')) {
       this.menuOffices?.nativeElement.querySelector('.plan-' + id)?.classList.add('active');
       this.itemsOffice = this.itemsOffice ? [...this.expandMenuOffice()] : this.itemsOffice;
       const itemsMenu = this.itemsPortfolio ? [...Array.from(this.itemsPortfolio)] : undefined;
       this.itemsPortfolio = itemsMenu ? [...this.collapseMenuItems(itemsMenu)] : undefined;
-
-    } else if (url.startsWith('workpack')) {
+      this.menuSrv.nextToggleMenu({menu: 'portfolio', open: false});
+    } else if (url.startsWith('workpack') || url.startsWith('stakeholder')) {
       this.itemsOffice = this.itemsOffice ? [...this.expandMenuOffice()] : this.itemsOffice;
       if (this.currentIDPlan) {
         this.menuOffices?.nativeElement.querySelector('.plan-' + this.currentIDPlan)?.classList.add('active');
@@ -393,6 +396,7 @@ export class PanelMenuComponent implements OnInit {
         this.itemsPortfolio = itemsMenu ? [...this.expandedMenuSelectedItem(itemsMenu, parents, id)] : undefined;
       }
       this.menuPortfolio?.nativeElement.querySelector('.workpack-' + id)?.classList.add('active');
+      this.menuSrv.nextToggleMenu({menu: 'portfolio', open: false});
     }
     if (!this.currentIDOffice || this.currentIDOffice === 0) {
       this.itemsOffice = [...this.itemsOffice.map(item => ({ ...item, expanded: false }))];
@@ -468,8 +472,13 @@ export class PanelMenuComponent implements OnInit {
   }
 
   getIdFromURL(url: string) {
+    
     const [path, queries] = url.split('?');
-    return queries ? Number((queries.split('id=')[1])?.split('&')[0]) : 0;
+    const id = queries ? Number((queries.split('id=')[1])?.split('&')[0]) : 0;
+    if ((url.startsWith('workpack') || url.startsWith('stakeholder')) && (!id || isNaN(id))) {
+      return queries ? Number((queries.split('idWorkpack=')[1])?.split('&')[0]) : 0;
+    }
+    return id;
   }
 
   getIdParentFromURL(url: string) {

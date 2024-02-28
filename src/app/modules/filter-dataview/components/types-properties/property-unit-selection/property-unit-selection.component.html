@@ -4,6 +4,8 @@
       [(ngModel)]="value" dropdownIcon="fas fa-caret-down" [autoDisplayFirst]="false"
       (ngModelChange)="handleChangedValue()">
     </p-dropdown>
-    <label class="app-input-label" [for]="property.name">{{'value' |translate}}</label>
+    <label class="app-input-label" [for]="property.name">{{'value' |translate}}
+      <i class="far fa-question-circle" *ngIf="property.helpText && property.helpText.length > 0" [pTooltip]="property.helpText"></i>
+    </label>
   </span>
 </div>

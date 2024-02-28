@@ -131,6 +131,7 @@ export class WorkpackSectionBaselinesComponent implements OnInit, OnDestroy {
           (base.status === 'APPROVED' ? base.activationDate : 'NONE')),
         baselineActive: base.active,
         itemId: base.id,
+        idAtributeName: 'idBaseline',
         menuItems: [{
           label: this.translateSrv.instant('delete'),
           icon: 'fas fa-trash-alt',
@@ -141,7 +142,7 @@ export class WorkpackSectionBaselinesComponent implements OnInit, OnDestroy {
         paramsUrlCard: [
           { name: 'idWorkpack', value: this.workpackParams.idWorkpack },
           { name: 'idWorkpackModelLinked', value: this.workpackParams.idWorkpackModelLinked },
-          { name: 'id', value: base.id },
+          { name: 'idBaseline', value: base.id },
         ]
       }));
       if (this.workpackSrv.getEditPermission() && !this.workpackData.workpack.cancelPropose && !this.workpackData.workpack.pendingBaseline) {
@@ -155,6 +156,7 @@ export class WorkpackSectionBaselinesComponent implements OnInit, OnDestroy {
           baselineStatusDate: undefined,
           baselineActive: undefined,
           itemId: null,
+          idAtributeName: 'idBaseline',
           menuItems: [],
           urlCard: '/workpack/baseline',
           paramsUrlCard: [

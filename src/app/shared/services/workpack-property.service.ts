@@ -27,6 +27,7 @@ export class WorkpackPropertyService {
   workpackParams: IWorkpackParams;
   typePropertyModel = TypePropertyModelEnum;
   properties;
+  backupProperties;
   organizations;
   domain;
   loading;
@@ -71,6 +72,7 @@ export class WorkpackPropertyService {
     } else {
       this.properties = [...propertiesEntity];
     }
+    this.backupProperties = this.properties && this.properties.map(prop => this.instanceBackupProperty(prop));
     this.loading = false;
     this.nextResetWorkpackProperties(true);
   }
@@ -84,12 +86,62 @@ export class WorkpackPropertyService {
     }
   }
 
+  saveChangesProperties() {
+    this.backupProperties = this.properties && this.properties.map(prop => this.instanceBackupProperty(prop));
+  }
+
+  cancelChangesProperties() {
+    this.properties = this.backupProperties && this.backupProperties.map(prop => this.instanceBackupProperty(prop));
+  }
+
   nextResetWorkpackProperties(nextValue: boolean) {
     this.resetWorkpackProperties.next(nextValue);
   }
 
   get observableResetWorkpackProperties() {
     return this.resetWorkpackProperties.asObservable();
+  }
+
+  instanceBackupProperty(pro: PropertyTemplateModel) {
+    const property = new PropertyTemplateModel();
+    property.active = pro.active;
+    property.id = pro.id;
+    property.type = pro.type;
+    property.idPropertyModel = pro.idPropertyModel;
+    property.fullLine = pro.fullLine;
+    property.label = pro.label;
+    property.name = pro.name;
+    property.required = pro.required;
+    property.disabled = pro.disabled;
+    property.sortIndex = pro.sortIndex;
+    property.defaultValue = pro.defaultValue;
+    property.defaults = pro.defaults;
+    property.min = pro.min;
+    property.max = pro.max;
+    property.precision = pro.precision;
+    property.possibleValues = pro.possibleValues;
+    property.possibleValuesIds = pro.possibleValuesIds;
+    property.multipleSelection = pro.multipleSelection;
+    property.rows = pro.rows;
+    property.decimals = pro.decimals;
+    property.localityList = pro.localityList;
+    property.idDomain = pro.idDomain;
+    property.localitiesSelected = pro.localitiesSelected;
+    property.labelButtonLocalitySelected = pro.labelButtonLocalitySelected;
+    property.showIconButton = pro.showIconButton;
+    property.value = pro.value;
+    property.selectedValues = pro.selectedValues;
+    property.selectedValue = pro.selectedValue;
+    property.invalid = pro.invalid;
+    property.message = pro.message;
+    property.groupedProperties = pro.groupedProperties;
+    property.milestoneData = pro.milestoneData;
+    property.reason = pro.reason;
+    property.needReason = pro.needReason;
+    property.collapsed = pro.collapsed;
+    property.dirty = pro.dirty;
+    property.helpText = pro.helpText;
+    return property;
   }
 
   loadProperty(name: string, type: string) {
@@ -103,6 +155,17 @@ export class WorkpackPropertyService {
     property.disabled = !this.workpackSrv.getEditPermission();
     property.sortIndex = 0;
     property.rows = name === 'fullName' ? 3 : 1;
+    switch (name) {
+      case 'name':
+        property.helpText = this.translateSrv.instant('help.workpack.name');
+        break;
+      case 'fullName':
+        property.helpText = this.translateSrv.instant('help.workpack.fullName');
+        break;
+      case 'date':
+        property.helpText = this.translateSrv.instant('help.workpack.date');
+        break;
+    }
     if (name === 'date') {
       const dateValue = this.workpackData?.workpack?.date ? this.workpackData?.workpack?.date.toLocaleString()
         : undefined;
@@ -137,6 +200,7 @@ export class WorkpackPropertyService {
     property.name = propertyModel.name;
     property.required = propertyModel.required;
     property.disabled = !this.workpackSrv.getEditPermission();
+    property.helpText = propertyModel.helpText;
     property.sortIndex = propertyModel.sortIndex;
     property.multipleSelection = propertyModel.multipleSelection;
     property.rows = propertyModel.rows ? propertyModel.rows : 1;

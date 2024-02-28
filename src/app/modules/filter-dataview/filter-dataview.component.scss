@@ -22,12 +22,12 @@
     }
     .p-dropdown .p-inputtext {
       color: v.$fontInput;
-      font-size: 1rem;
+      font-size: 0.9rem;
       font-family: v.$fontFamilyMedium;
       padding-left: 0;
     }
     .p-dropdown-panel .p-dropdown-items {
-      font-size: 1rem;
+      font-size: 0.9rem;
       font-family: v.$fontFamilyMedium;
       color: v.$fontInput;
       .p-dropdown-item.p-highlight {
@@ -40,10 +40,9 @@
     }
     .p-dropdown-trigger-icon {
       color: v.$fontInput;
-      font-size: 1rem;
+      font-size: 0.9rem;
     }
   }
-
   .loading-container {
     position: relative;
     min-height: 150px;
@@ -144,6 +143,9 @@
             border-radius: 3px;
             transition: background-color 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s;
           }
+          .p-checkbox-label, .p-radiobutton-label {
+            font-size: 0.9rem;
+          }
           .p-checkbox .p-checkbox-box.p-highlight {
             border-color: v.$borderCheckBox;
             background: transparent;
@@ -166,6 +168,9 @@
         }
       }
       
+    }
+    .p-checkbox-label, .p-radiobutton-label {
+      font-size: 0.9rem;
     }
     .formgroup-responsive {
       flex-direction: column;

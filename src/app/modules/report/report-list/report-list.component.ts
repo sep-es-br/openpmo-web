@@ -9,6 +9,8 @@ import { IPlan } from 'src/app/shared/interfaces/IPlan';
 import { ReportModelService } from 'src/app/shared/services/report-model.service';
 import { IReportModel } from 'src/app/shared/interfaces/IReportModel';
 import { ConfigDataViewService } from 'src/app/shared/services/config-dataview.service';
+import { AuthService } from 'src/app/shared/services/auth.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-report-list',
@@ -27,12 +29,16 @@ export class ReportListComponent implements OnInit {
   responsive = false;
   propertiesPlan: IPlan;
   reports: IReportModel[];
+  showBackToManagement = false;
+  infoPerson;
 
   constructor(
     private responsiveSvr: ResponsiveService,
     private breadcrumbSrv: BreadcrumbService,
     private reportModelSrv: ReportModelService,
-    private configDataViewSrv: ConfigDataViewService
+    private configDataViewSrv: ConfigDataViewService,
+    private authSrv: AuthService,
+    private router: Router
   ) {
     this.responsiveSvr.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.responsive = value);
     this.configDataViewSrv.observableDisplayModeAll.pipe(takeUntil(this.$destroy)).subscribe(displayMode => {
@@ -44,11 +50,59 @@ export class ReportListComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadReportModels();
+    this.checkShowBackToManagement();
   }
 
   ngOnDestroy(): void {
     this.$destroy.next();
     this.$destroy.complete();
+  }
+
+  checkShowBackToManagement() {
+    this.infoPerson = this.authSrv.getInfoPerson();
+    if (this.infoPerson && this.infoPerson.workLocal &&
+      (this.infoPerson.workLocal.idOffice || this.infoPerson.workLocal.idPlan || this.infoPerson.workLocal.idWorkpack) ) {
+        this.showBackToManagement = true;
+    }
+  }
+
+  async navigateToManagement() {
+    const workLocal = this.infoPerson.workLocal;
+      if (workLocal.idWorkpackModelLinked && workLocal.idWorkpack && workLocal.idPlan && workLocal.idOffice) {
+        this.router.navigate(['workpack'], {
+          queryParams: {
+            id: Number(workLocal.idWorkpack),
+            idPlan: Number(workLocal.idPlan),
+            idWorkpackModelLinked: Number(workLocal.idWorkpackModelLinked)
+          }
+        });
+        return;
+      }
+      if (workLocal.idWorkpack && workLocal.idPlan && workLocal.idOffice) {
+        this.router.navigate(['workpack'], {
+          queryParams: {
+            id: Number(workLocal.idWorkpack),
+            idPlan: Number(workLocal.idPlan),
+          }
+        });
+        return;
+      }
+      if (workLocal.idPlan && workLocal.idOffice) {
+        this.router.navigate(['plan'], {
+          queryParams: {
+            id: Number(workLocal.idPlan),
+          }
+        });
+        return;
+      }
+      if (workLocal.idOffice) {
+        this.router.navigate(['offices/office'], {
+          queryParams: {
+            id: Number(workLocal.idOffice),
+          }
+        });
+        return;
+      }
   }
 
   setBreadcrumb() {

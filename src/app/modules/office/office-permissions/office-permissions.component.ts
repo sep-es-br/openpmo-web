@@ -21,6 +21,7 @@ import { SaveButtonComponent } from 'src/app/shared/components/save-button/save-
 import { IOffice } from 'src/app/shared/interfaces/IOffice';
 import { OfficeService } from 'src/app/shared/services/office.service';
 import { AuthService } from 'src/app/shared/services/auth.service';
+import { CancelButtonComponent } from 'src/app/shared/components/cancel-button/cancel-button.component';
 
 @Component({
   selector: 'app-office-permissions',
@@ -33,6 +34,7 @@ import { AuthService } from 'src/app/shared/services/auth.service';
 export class OfficePermissionsComponent implements OnInit, OnDestroy {
 
   @ViewChild(SaveButtonComponent) saveButton: SaveButtonComponent;
+  @ViewChild(CancelButtonComponent) cancelButton: CancelButtonComponent;
 
   idOffice: number;
   propertiesOffice: IOffice;
@@ -50,7 +52,7 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
   invalidMailMessage: string;
   isReadOnly: boolean;
   citizenAuthServer: boolean;
-  citizenSearchBy: string; //CPF | NAME
+  citizenSearchBy: string = 'CPF'; //CPF | NAME
   searchedNameUser: string;
   searchedCpfUser: string;
   selectedPerson: IPerson;
@@ -62,6 +64,8 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
   isLoadingCitizen = false;
   isLoading = false;
   formIsSaving = false;
+  showMessageIsSamePerson = false;
+  isUserAdmin = false;
 
   constructor(
     private actRouter: ActivatedRoute,
@@ -104,6 +108,7 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
 
   async ngOnInit() {
     this.isLoading = true;
+    this.isUserAdmin = await this.authSrv.isUserAdmin();
     const editPermission = await this.officePermissionsSrv.getPermissions(this.idOffice);
     if (!editPermission) {
       await this.router.navigate(['/offices']);
@@ -245,9 +250,15 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
 
   async searchPerson() {
     this.saveButton?.hideButton();
+    this.showMessageIsSamePerson = false;
     if (this.searchedEmailPerson) {
       const { data } = await this.personSrv.GetByKey(this.searchedEmailPerson);
       if (data) {
+        if (!this.isUserAdmin && data.id === Number(this.authSrv.getIdPerson())) {
+          this.person = null;
+          this.showMessageIsSamePerson = true;
+          return;
+        }
         this.showSearchInputMessage = false;
         this.person = data;
         this.person.email = this.searchedEmailPerson;
@@ -271,6 +282,7 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
       this.publicServersResult = [];
       this.showListBoxPublicServers = false;
       this.showMessagePublicServerNotFoundByName = false;
+      this.showMessageIsSamePerson = false;
     }
   }
 
@@ -283,6 +295,7 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
     this.validCpf = true;
     this.searchedCpfUser = null;
     this.searchedNameUser = null;
+    this.showMessageIsSamePerson = false;
   }
 
   async searchCitizenUserByName() {
@@ -311,6 +324,7 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
       this.loadNewPermission();
       this.validCpf = true;
       this.citizenUserNotFoundByCpf = false;
+      this.showMessageIsSamePerson = false;
     }
   }
 
@@ -327,6 +341,10 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
       });
       this.isLoadingCitizen = false;
       if (result.success) {
+        if (!this.isUserAdmin && result.data.id === Number(this.authSrv.getIdPerson())) {
+          this.showMessageIsSamePerson = true;
+          return;
+        }
         this.person = result.data;
         this.loadNewPermission();
       } else {
@@ -345,6 +363,10 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
     });
     this.isLoadingCitizen = false;
     if (result.success) {
+      if (!this.isUserAdmin && result.data.id === Number(this.authSrv.getIdPerson())) {
+        this.showMessageIsSamePerson = true;
+        return;
+      }
       this.person = result.data;
       this.searchedNameUser = '';
       this.publicServersResult = [];
@@ -372,6 +394,7 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
   }
 
   async savePermission() {
+    this.cancelButton.hideButton();
     this.formIsSaving = true;
     this.permission.permissions = this.cardItemsOfficePermission
       .map(cardItem => (
@@ -399,6 +422,19 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
       });
       this.formIsSaving = false;
       await this.router.navigate(['/offices', 'permission'], { queryParams: { idOffice: this.idOffice } });
+    }
+  }
+
+
+  handleOnCancel() {
+    this.saveButton.hideButton();
+    if (this.key) {
+      this.loadCardItemsPersonPermissions();
+    } else {
+      this.validateClearSearchByCpf('');
+      this.validateClearSearchByUser();
+      this.validateClearSearchUserName('');
+      this.citizenSearchBy = 'CPF'
     }
   }
 }

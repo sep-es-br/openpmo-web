@@ -50,7 +50,9 @@
            display: flex;
            .p-button {
             background-color: v.$bgButtonGreen;
-            padding: 0.5rem 1.5rem;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 0;
             .pi {
               font-size: 1.2rem;
             }
@@ -68,7 +70,7 @@
           }
         }
         .app-input-label {
-          font-size: 1rem;
+          font-size: 0.8rem;
           top: -0.9rem !important;
         }
       }

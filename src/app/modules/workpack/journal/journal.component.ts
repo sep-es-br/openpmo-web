@@ -6,12 +6,12 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { MenuItem, MessageService } from 'primeng/api';
 import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { takeUntil, filter } from 'rxjs/operators';
+import { CancelButtonComponent } from 'src/app/shared/components/cancel-button/cancel-button.component';
 import { SaveButtonComponent } from 'src/app/shared/components/save-button/save-button.component';
 import { IconsEnum } from 'src/app/shared/enums/IconsEnum';
 import { ICard } from 'src/app/shared/interfaces/ICard';
 import { ICardItem } from 'src/app/shared/interfaces/ICardItem';
-import { IFile } from 'src/app/shared/interfaces/IFile';
 import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
 import { EvidenceService } from 'src/app/shared/services/evidence.service';
 import { JournalService } from 'src/app/shared/services/journal.service';
@@ -26,7 +26,8 @@ import { WorkpackShowTabviewService } from 'src/app/shared/services/workpack-sho
 export class JournalComponent implements OnInit {
 
   @ViewChild(SaveButtonComponent) saveButton: SaveButtonComponent;
-  
+  @ViewChild(CancelButtonComponent) cancelButton: CancelButtonComponent;
+
   cardJournalProperties: ICard = {
     toggleable: false,
     initialStateToggle: false,
@@ -63,10 +64,12 @@ export class JournalComponent implements OnInit {
     });
 
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.responsive = value);
-
     this.formJournal = this.formBuilder.group({
       description: ['', Validators.required],
     });
+    this.formJournal.valueChanges
+      .pipe(takeUntil(this.$destroy), filter(() => this.formJournal.dirty))
+      .subscribe(() => this.cancelButton.showButton());
   }
 
   async ngOnInit(): Promise<void> {
@@ -89,7 +92,7 @@ export class JournalComponent implements OnInit {
       breadcrumbItems = await this.breadcrumbSrv.loadWorkpackBreadcrumbs(this.idWorkpack, this.idPlan)
     }
     this.breadcrumbSrv.setMenu([
-      ... breadcrumbItems,
+      ...breadcrumbItems,
       ...[{
         key: this.translateSvr.instant('information'),
         info: this.translateSvr.instant('information'),
@@ -147,15 +150,11 @@ export class JournalComponent implements OnInit {
         ] as MenuItem[],
       });
     });
-     this.cardItemsEvidences.push({
+    this.cardItemsEvidences.push({
       typeCardItem: 'newCardItem',
       iconSvg: true,
       icon: IconsEnum.Plus,
     });
-  }
-
-  updateCardItemsEvidences(newFile) {
-    
   }
 
   createObjectUrl(file: File): SafeResourceUrl {
@@ -163,6 +162,7 @@ export class JournalComponent implements OnInit {
   }
 
   async handleOnSubmit() {
+    this.cancelButton.hideButton();
     this.formIsSaving = true;
     const sender = {
       ...this.formJournal.value,
@@ -176,7 +176,7 @@ export class JournalComponent implements OnInit {
         summary: this.translateSvr.instant('success'),
         detail: this.translateSvr.instant('messages.savedSuccessfully')
       });
-      setTimeout( () => {
+      setTimeout(() => {
         this.formIsSaving = false;
         this.route.navigate(['workpack'], {
           queryParams: {
@@ -185,13 +185,19 @@ export class JournalComponent implements OnInit {
           }
         })
       }, 1000)
-      
+
     }
 
   }
 
+  handleOnCancel() {
+    this.saveButton.hideButton();
+    this.formJournal.reset();
+    this.cardItemsEvidences = this.cardItemsEvidences.filter(card => card.typeCardItem === 'newCardItem');
+  }
+
   async uploadEvidencesAll(data) {
-    const results = await Promise.all(this.cardItemsEvidences.filter(card => card.typeCardItem !== 'newCardItem').map( async (evidence: any) => {
+    const results = await Promise.all(this.cardItemsEvidences.filter(card => card.typeCardItem !== 'newCardItem').map(async (evidence: any) => {
       if (evidence.itemId) {
         return {
           success: true
@@ -201,7 +207,7 @@ export class JournalComponent implements OnInit {
       const formData: FormData = new FormData();
       const blob = await file.blob();
       formData.append('file', blob, evidence.givenName);
-      const result =  await this.evidenceSrv.uploadEvidence(formData, data.id);
+      const result = await this.evidenceSrv.uploadEvidence(formData, data.id);
       if (result.success) {
         evidence.itemId = result.data.id
       }

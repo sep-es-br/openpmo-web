@@ -25,8 +25,8 @@ import { OfficeService } from 'src/app/shared/services/office.service';
 import { DomainService } from 'src/app/shared/services/domain.service';
 import { FilterDataviewService } from 'src/app/shared/services/filter-dataview.service';
 import { FilterDataviewPropertiesEntity } from 'src/app/shared/constants/filterDataviewPropertiesEntity';
-import { PropertyTemplateModel } from 'src/app/shared/models/PropertyTemplateModel';
 import { ConfigDataViewService } from 'src/app/shared/services/config-dataview.service';
+import { CancelButtonComponent } from 'src/app/shared/components/cancel-button/cancel-button.component';
 
 @Component({
   selector: 'app-domain-locality',
@@ -36,6 +36,7 @@ import { ConfigDataViewService } from 'src/app/shared/services/config-dataview.s
 export class DomainLocalityComponent implements OnInit, OnDestroy {
 
   @ViewChild(SaveButtonComponent) saveButton: SaveButtonComponent;
+  @ViewChild(CancelButtonComponent) cancelButton: CancelButtonComponent;
 
   propertiesLocality: ILocalityList;
   responsive = false;
@@ -153,8 +154,11 @@ export class DomainLocalityComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.$destroy), filter(status => status === 'INVALID'))
       .subscribe(() => this.saveButton?.hideButton());
     this.formLocality.valueChanges
+      .pipe(takeUntil(this.$destroy), filter(() => this.formLocality.dirty && this.formLocality.valid))
+      .subscribe(() => { this.saveButton.showButton(); });
+    this.formLocality.valueChanges
       .pipe(takeUntil(this.$destroy), filter(() => this.formLocality.dirty))
-      .subscribe(() => this.saveButton.showButton());
+      .subscribe(() => { this.cancelButton.showButton() });
     this.responsiveSvr.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.responsive = value);
   }
 
@@ -377,6 +381,7 @@ export class DomainLocalityComponent implements OnInit, OnDestroy {
   }
 
   async handleOnSubmit() {
+    this.cancelButton.hideButton();
     const idDomain = this.propertiesLocality?.domain
       ? this.propertiesLocality?.domain?.id
       : (this.propertiesLocality?.domainRoot && this.propertiesLocality?.domainRoot?.id);
@@ -411,6 +416,15 @@ export class DomainLocalityComponent implements OnInit, OnDestroy {
     }
   }
 
+  handleOnCancel() {
+    this.saveButton.hideButton();
+    if (this.idLocality) {
+      this.formLocality.reset(Object.keys(this.formLocality.controls).reduce((a, key) => (a[key] = this.propertiesLocality[key] || '', a), {}));
+    } else {
+      this.formLocality.reset();
+    }
+  }
+
   async loadFiltersLocalities() {
     const result = await this.filterSrv.getAllFilters('localities');
     if (result.success && result.data.length > 0) {
@@ -429,7 +443,7 @@ export class DomainLocalityComponent implements OnInit, OnDestroy {
       await this.setBreadcrumbStorage(idFilter);
       this.router.navigate(['/config/filter-dataview'], {
         queryParams: {
-          id: idFilter,
+          idFilter: idFilter,
           entityName: 'localities',
           idOffice: this.idOffice
         }

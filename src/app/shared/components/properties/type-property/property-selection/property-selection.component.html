@@ -6,7 +6,9 @@
       [(ngModel)]="property.value" [id]="property.name" [required]="property.required" [disabled]="property.disabled"
       display="chip" [maxSelectedLabels]="2" [class.ng-invalid]="property.invalid" (onBlur)="changed.emit($event)"
       (ngModelChange)="changed.emit($event)"></p-multiSelect>
-    <label class="app-input-label" for="float-label">{{property.label}} {{ property.required ? '*' : ''}}</label>
+    <label class="app-input-label" for="float-label">{{property.label}} {{ property.required ? '*' : ''}}
+      <i class="far fa-question-circle" *ngIf="property.helpText && property.helpText.length > 0" [pTooltip]="property.helpText"></i>
+    </label>
   </span>
 </ng-container>
 <ng-template #singleSelection>
@@ -17,7 +19,9 @@
       [autoDisplayFirst]="false" [disabled]="property.disabled" [required]="property.required"
       [class.ng-invalid]="property.invalid" (onBlur)="changed.emit($event)" (ngModelChange)="changed.emit($event)">
     </p-dropdown>
-    <label class="app-input-label" [for]="property.name">{{property.label}} {{ property.required ? '*' : ''}}</label>
+    <label class="app-input-label" [for]="property.name">{{property.label}} {{ property.required ? '*' : ''}}
+      <i class="far fa-question-circle"  *ngIf="property.helpText && property.helpText.length > 0" [pTooltip]="property.helpText"></i>
+    </label>
   </span>
 </ng-template>
 <span class="input-message-error" *ngIf="property.invalid">

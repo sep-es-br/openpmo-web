@@ -5,11 +5,14 @@
         [disabled]="!properties.role.active || properties.readOnly" [autoDisplayFirst]="false" [options]="properties.personRoleOptions"
         (onChange)="handleRoleChange()" [(ngModel)]="properties.role.role">
       </p-dropdown>
-      <label class="app-input-label" for="level-dropdown">{{ "role" | translate }}</label>
+      <label class="app-input-label" for="level-dropdown">{{ "role" | translate }}
+        <i class="far fa-question-circle" [pTooltip]="'help.stakeholder.role' | translate"></i>
+      </label>
     </span>
     <div class="card-header-toggle">
-      <p-inputSwitch class="app-toggle" [(ngModel)]="properties.role.active" (onChange)="handleRoleChange()" [disabled]="properties.readOnly">
+      <p-inputSwitch class="app-toggle" *ngIf="!properties.new" [(ngModel)]="properties.role.active" (onChange)="handleRoleChange()" [disabled]="properties.readOnly">
       </p-inputSwitch>
+      <i class="fas fa-trash-alt" style="cursor: pointer" (click)="deleteRole()" *ngIf="!!properties.new"></i>
     </div>
   </div>
   <div class="card-item-dates">
@@ -20,7 +23,9 @@
         [dateFormat]="calendarFormat" 
         (onSelect)="handleRoleChange()">
       </p-calendar>
-      <label class="app-input-label" for="float-from">{{ "from" | translate }}</label>
+      <label class="app-input-label" for="float-from">{{ "from" | translate }}
+        <i class="far fa-question-circle" [pTooltip]="'help.stakeholder.from' | translate"></i>
+      </label>
     </span>
     <span class="p-float-label">
       <p-calendar id="float-to" class="app-select-date" [showIcon]="true" [disabled]="!properties.role.active || properties.readOnly"
@@ -28,7 +33,9 @@
         [yearRange]="yearRange" icon="fas fa-calendar-alt" 
         [dateFormat]="calendarFormat">
       </p-calendar>
-      <label class="app-input-label" for="float-to">{{ "to" | translate }}</label>
+      <label class="app-input-label" for="float-to">{{ "to" | translate }}
+        <i class="far fa-question-circle" [pTooltip]="'help.stakeholder.to' | translate"></i>
+      </label>
     </span>
   </div>
 </p-card>
@@ -39,6 +46,6 @@
   <div class="card-item-content">
     <i [ngClass]="[ 'app-icon', iconsEnum.Plus, 'light-grey-icon' ]"
     (click)="handleNewCardItemRole()"
-    [ngStyle]="{ fontSize: responsive ? '2rem' : '3em', cursor: 'pointer' }"></i>
+    [ngStyle]="{ fontSize: responsive ? '2rem' : '2.2em', cursor: 'pointer' }"></i>
   </div>
 </p-card>

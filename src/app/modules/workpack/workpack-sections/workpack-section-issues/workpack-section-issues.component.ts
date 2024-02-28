@@ -156,6 +156,7 @@ export class WorkpackSectionIssuesComponent implements OnInit, OnDestroy {
         iconSvg: true,
         nameCardItem: issue.name,
         itemId: issue.id,
+        idAtributeName: 'idIssue',
         menuItems: [{
           label: this.translateSrv.instant('delete'),
           icon: 'fas fa-trash-alt',
@@ -166,7 +167,7 @@ export class WorkpackSectionIssuesComponent implements OnInit, OnDestroy {
         paramsUrlCard: [
           { name: 'idWorkpack', value: this.workpackParams.idWorkpack },
           { name: 'idWorkpackModelLinked', value: this.workpackParams.idWorkpackModelLinked },
-          { name: 'id', value: issue.id },
+          { name: 'idIssue', value: issue.id },
         ]
       })) :
         this.issues.map(issue => ({
@@ -176,6 +177,7 @@ export class WorkpackSectionIssuesComponent implements OnInit, OnDestroy {
           iconSvg: true,
           nameCardItem: issue.name,
           itemId: issue.id,
+          idAtributeName: 'idIssue',
           menuItems: [{
             label: this.translateSrv.instant('delete'),
             icon: 'fas fa-trash-alt',
@@ -197,6 +199,7 @@ export class WorkpackSectionIssuesComponent implements OnInit, OnDestroy {
           iconSvg: true,
           nameCardItem: null,
           itemId: null,
+          idAtributeName: 'idIssue',
           menuItems: null,
           urlCard: '/workpack/issues',
           paramsUrlCard: [
@@ -232,7 +235,7 @@ export class WorkpackSectionIssuesComponent implements OnInit, OnDestroy {
       await this.workpackBreadcrumbStorageSrv.setBreadcrumbStorage();
       this.router.navigate(['/filter-dataview'], {
         queryParams: {
-          id: idFilter,
+          idFilter: idFilter,
           entityName,
           idWorkpackModel: this.workpackData.workpackModel.id,
           idOffice: this.workpackParams.idOffice

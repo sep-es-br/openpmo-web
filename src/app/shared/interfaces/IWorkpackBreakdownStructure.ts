@@ -1,5 +1,7 @@
 import { TypeWorkpackEnumWBS } from '../enums/TypeWorkpackEnum';
+import { IFile } from './IFile';
 import { IMeasureUnit } from './IMeasureUnit';
+import { IInformation, IWorkpackJournalInformation } from './IJournal';
 
 export interface IWorkpackBreakdownStructure {
   idWorkpack:     number;
@@ -28,7 +30,7 @@ export interface IWorkpackBreakdownStructure {
   start?: string;
   workpackType?: TypeWorkpackEnumWBS;
   hasChildren?: boolean;
-
+  journalInformation?: IWorkpackJournalInformation;
   expirationDate?: string;
   milestoneDate?: string;
   milestoneStatus?: string;

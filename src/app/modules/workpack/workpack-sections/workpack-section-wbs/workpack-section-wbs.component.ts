@@ -13,6 +13,7 @@ import { IWorkpackParams } from 'src/app/shared/interfaces/IWorkpackDataParams';
 import { WorkpackService } from 'src/app/shared/services/workpack.service';
 import { WorkpackBreadcrumbStorageService } from 'src/app/shared/services/workpack-breadcrumb-storage.service';
 import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
+import { JournalService } from 'src/app/shared/services/journal.service';
 
 @Component({
   selector: 'app-workpack-section-wbs',
@@ -42,7 +43,8 @@ export class WorkpackSectionWBSComponent implements OnDestroy {
     private route: Router,
     private workpackSrv: WorkpackService,
     private workpackBreadcrumbStorageSrv: WorkpackBreadcrumbStorageService,
-    private breadcrumbSrv: BreadcrumbService
+    private breadcrumbSrv: BreadcrumbService,
+    private journalSrv: JournalService
   ) {
     this.isLoading = true;
     this.actRouter.queryParams.subscribe(async ({ idPlan }) => {
@@ -145,6 +147,49 @@ export class WorkpackSectionWBSComponent implements OnDestroy {
   async setWorkpackBreadcrumbStorage(idWorkpack, idPlan) {
     const breadcrumbItems = await this.workpackBreadcrumbStorageSrv.getBreadcrumbs(idWorkpack, idPlan);
     this.breadcrumbSrv.setBreadcrumbStorage(breadcrumbItems);
+  }
+
+  async handleShowJournalInformation(journalInformation) {
+    journalInformation.loading = true;
+    const result = await this.journalSrv.GetById(journalInformation.id);
+    if (result.success) {
+      journalInformation.information = result.data.information;
+      journalInformation.author = result.data.author;
+      journalInformation.dateInformation = result.data.date;
+      journalInformation.workpack = result.data.workpack;
+      journalInformation.evidences = result.data.evidences && result.data.evidences.map( evidence => {
+        const isImg = evidence.mimeType.includes('image');
+        let icon: string;
+        switch (evidence.mimeType) {
+          case 'application/pdf':
+            icon = 'far fa-file-pdf';
+            break;
+          case 'text/csv':
+            icon = 'fas fa-file-csv';
+            break;
+          case 'application/msword':
+            icon = 'far fa-file-word';
+            break;
+          case 'application/vnd.ms-excel':
+          case 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
+            icon = 'far fa-file-excel';
+            break;
+          case 'application/vnd.openxmlformats-officedocument.presentationml.presentation':
+          case 'application/vnd.ms-powerpoint':
+            icon = 'far fa-file-powerpoint';
+            break;
+          default:
+            icon = 'far fa-file';
+            break;
+        }
+        return {
+          ...evidence,
+          isImg,
+          icon
+        }
+      });
+      journalInformation.loading = false;
+    }
   }
 
 }
