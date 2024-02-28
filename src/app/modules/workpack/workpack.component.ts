@@ -1323,7 +1323,7 @@ export class WorkpackComponent implements OnDestroy {
           idWorkpackModelLinked: null
         });
         this.resetWorkpack();
-        this.menuSrv.reloadMenuPortfolio(!isPut ? this.idWorkpack : undefined);
+       
       }
       this.formIsSaving = false;
       this.messageSrv.add({
@@ -1331,6 +1331,9 @@ export class WorkpackComponent implements OnDestroy {
         summary: this.translateSrv.instant('success'),
         detail: this.translateSrv.instant('messages.savedSuccessfully')
       });
+      setTimeout( () => {
+        this.menuSrv.reloadMenuPortfolio(!isPut ? this.idWorkpack : undefined);
+      },5000)
     }
   }
 
