@@ -15,7 +15,6 @@ export class ScheduleService extends BaseService<any> {
   workpackData: IWorkpackData;
   schedule;
   loading;
-  backupSchedule;
 
   constructor(
     @Inject(Injector) injector: Injector,
@@ -39,7 +38,7 @@ export class ScheduleService extends BaseService<any> {
         const result = await this.GetSchedule({ 'id-workpack': this.workpackParams.idWorkpack });
         if (result.success) {
           this.schedule = result.data && result.data.length > 0 ? result.data[0] : undefined;
-          this.backupSchedule = structuredClone(this.schedule);
+          localStorage.setItem('@pmo/backupSchedule', JSON.stringify(this.schedule));
           this.loading = false;
           this.nextResetSchedule(true);
         }
@@ -64,12 +63,13 @@ export class ScheduleService extends BaseService<any> {
   }
 
   getBackupSchedule() {
-    this.schedule = structuredClone(this.backupSchedule);
+    const backupSchedule = localStorage.getItem('@pmo/backupSchedule');
+    this.schedule = JSON.parse(backupSchedule);
     return this.schedule;
   }
 
   refreshBackupSchedule(schedule) {
-    this.backupSchedule = structuredClone(schedule);
+    localStorage.setItem('@pmo/backupSchedule', JSON.stringify(schedule));
   }
 
   nextResetSchedule(nextValue: boolean) {

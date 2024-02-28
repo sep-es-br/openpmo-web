@@ -420,6 +420,7 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
         from: new Date(role.from + 'T00:00:00'),
         to: role.to ? new Date(role.to + 'T00:00:00') : null
       }));
+      localStorage.setItem('@pmo/stakeholderRolesBk', JSON.stringify(this.stakeholderRolesBk));
       if (!this.editPermission) {
         this.stakeholderForm.disable();
       }
@@ -807,7 +808,8 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
   handleOnCancel() {
     this.saveButton.hideButton();
     if (this.idPerson) {
-      this.stakeholderRoles = structuredClone(this.stakeholderRolesBk);
+      const stakeholderRolesBk = localStorage.getItem('@pmo/stakeholderRolesBk');
+      this.stakeholderRoles = JSON.parse(stakeholderRolesBk);
       this.setStakeholderForm();
     } else {
       this.stakeholderRoles = [];
