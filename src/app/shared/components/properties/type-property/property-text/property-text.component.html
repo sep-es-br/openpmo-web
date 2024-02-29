@@ -7,7 +7,7 @@
   [class.workpack-input-text-not-fullLine]="!property.fullLine && property.name !== 'name'" [class.workpack-input-text-mobile]="responsive">
     <input class="app-input-text" [id]="property.name" name="name" [(ngModel)]="property.value" type="text" pInputText
       [disabled]="property.disabled" [defaultValue]="property.defaultValue" [required]="property.required"
-      (blur)="changed.emit($event)" (change)="changed.emit($event)"
+      (blur)="changed.emit($event)" (ngModelChange)="changed.emit($event)"
       [class.ng-invalid]="property.invalid" />
     <label class="app-input-label" [for]="property.name">{{property.label}} {{ property.required ? '*' : ''}}
       <i class="far fa-question-circle" *ngIf="property.helpText && property.helpText.length > 0" [pTooltip]="property.helpText"></i>

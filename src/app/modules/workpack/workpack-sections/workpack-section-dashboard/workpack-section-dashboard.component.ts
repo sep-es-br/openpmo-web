@@ -152,10 +152,7 @@ export class WorkpackSectionDashboardComponent implements OnInit, OnChanges, OnD
           this.dashboard.workpacksByModel.splice(cardIndex, 1);
         }
       });
-      this.dashboard.workpacksByModel = this.dashboard.workpacksByModel.map( w => ({
-        ...w,
-        modelName: w.modelName === 'Eixos' ? 'Eixos granes para quebrar em vários' : w.modelName
-      }));
+      this.dashboard.workpacksByModel = this.dashboard.workpacksByModel;
       this.dashboard.workpacksByModel.sort( (a, b) => a.level - b.level);
     };
     this.yearRange = yearRange;
