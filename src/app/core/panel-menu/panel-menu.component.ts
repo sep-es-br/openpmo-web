@@ -346,7 +346,7 @@ export class PanelMenuComponent implements OnInit {
     }
     const id = idNewWorkpack ? idNewWorkpack : this.getIdFromURL(url);
     if ((url.startsWith('strategies') || url.startsWith('configuration-office')) && (isNaN(id) || !id)) {
-      this.itemsPlanModel = this.itemsPlanModel ? [...this.expandedMenuSelectedItem(this.itemsPlanModel, [], 0)] : undefined;
+      this.itemsPlanModel = this.itemsPlanModel ? [...this.expandedMenuModelSelectedItem(this.itemsPlanModel, [], 0)] : undefined;
     }
     if (url.startsWith('offices') && (isNaN(id) || !id)) {
       this.itemsOffice = this.itemsOffice ? [...this.collapseMenuItems(this.itemsOffice)] : undefined;
@@ -362,7 +362,7 @@ export class PanelMenuComponent implements OnInit {
 
     } else if (url.startsWith('strategies/strategy')) {
       this.menuPlanModel?.nativeElement.querySelector('.planModel-' + id)?.classList.add('active');
-      this.itemsPlanModel = this.itemsPlanModel ? [...this.expandedMenuSelectedItem(this.itemsPlanModel, [], id)] : undefined;
+      this.itemsPlanModel = this.itemsPlanModel ? [...this.expandedMenuModelSelectedItem(this.itemsPlanModel, [], id)] : undefined;
       this.menuSrv.nextToggleMenu({menu: 'planModel', open: false});
     } else if (url.startsWith('workpack-model')) {
       this.storageBreadcrumbsItems = this.breadcrumbSrv.get;

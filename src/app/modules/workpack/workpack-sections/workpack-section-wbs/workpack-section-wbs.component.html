@@ -96,13 +96,13 @@
 
         <!-- journal information container -->
         <div class="status-container" *ngIf="properties?.properties?.journalInformation?.date; else statusEmpty">
-          <i class="fas fa-info"
+          <i class="fas fa-info" style="cursor: pointer"
             *ngIf="!properties?.properties?.journalInformation?.actual"
-            (mouseenter)="handleShowJournalInformation(properties.properties.journalInformation); journalInformationPanel.show($event)" 
+            (click)="handleShowJournalInformation(properties.properties.journalInformation); journalInformationPanel.show($event)" 
             ></i>
-          <i class="fas fa-info-circle" [ngStyle]="{ fontSize: '1.2rem' }"
+          <i class="fas fa-info-circle" [ngStyle]="{ fontSize: '1.2rem', cursor: 'pointer' }"
             *ngIf="properties?.properties?.journalInformation?.actual"
-            (mouseenter)="handleShowJournalInformation(properties.properties.journalInformation); journalInformationPanel.show($event)" 
+            (click)="handleShowJournalInformation(properties.properties.journalInformation); journalInformationPanel.show($event)" 
             ></i>
         </div>
         <ng-template #statusEmpty>

@@ -236,7 +236,6 @@ export class WorkpackSectionJournalComponent implements OnInit, OnDestroy {
       };
     });
     this.isLoading = false;
-    console.log('journal', this.journalData);
   }
 
   formatTitle(information) {

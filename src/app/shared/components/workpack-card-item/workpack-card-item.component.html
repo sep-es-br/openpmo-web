@@ -133,12 +133,12 @@
 
             <div class="status-container"
               *ngIf="properties?.journalInformation?.date">
-              <i class="fas fa-info" *ngIf="!properties?.journalInformation?.actual"
-                (mouseenter)="handleShowJournalInformation(properties?.journalInformation); journalInformationPanel.show($event)"
+              <i class="fas fa-info" *ngIf="!properties?.journalInformation?.actual" style="cursor: pointer"
+                (click)="handleShowJournalInformation(properties?.journalInformation); journalInformationPanel.show($event)"
                 ></i>
               <i class="fas fa-info-circle" [ngStyle]="{ fontSize: '1.2rem' }"
-                *ngIf="properties?.journalInformation?.actual"
-                (mouseenter)="handleShowJournalInformation(properties.journalInformation); journalInformationPanel.show($event)"></i>
+                *ngIf="properties?.journalInformation?.actual" style="cursor: pointer"
+                (click)="handleShowJournalInformation(properties.journalInformation); journalInformationPanel.show($event)"></i>
             </div>
           </div>
           <p-overlayPanel #journalInformationPanel class="journal-info-overlay-panel" [showCloseIcon]="true" [dismissable]="false">
@@ -200,12 +200,12 @@
       <div class="right-container">
         <div class="dashboard-items-container">
           <div class="status-container">
-            <i class="fas fa-info" *ngIf="properties?.journalInformation?.date && !properties?.journalInformation?.actual"
-              (mouseenter)="handleShowJournalInformation(properties?.journalInformation); journalInformationPanelList.show($event)"
+            <i class="fas fa-info" *ngIf="properties?.journalInformation?.date && !properties?.journalInformation?.actual" style="cursor: pointer"
+              (click)="handleShowJournalInformation(properties?.journalInformation); journalInformationPanelList.show($event)"
               ></i>
-            <i class="fas fa-info-circle" [ngStyle]="{ fontSize: '1.2rem' }"
+            <i class="fas fa-info-circle" [ngStyle]="{ fontSize: '1.2rem' }" style="cursor: pointer"
               *ngIf="properties?.journalInformation?.date && properties?.journalInformation?.actual"
-              (mouseenter)="handleShowJournalInformation(properties.journalInformation); journalInformationPanelList.show($event)"
+              (click)="handleShowJournalInformation(properties.journalInformation); journalInformationPanelList.show($event)"
               ></i>
           </div>
           <p-overlayPanel #journalInformationPanelList class="journal-info-overlay-panel" [showCloseIcon]="true" [dismissable]="false">
