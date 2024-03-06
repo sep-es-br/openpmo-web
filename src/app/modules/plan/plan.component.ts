@@ -641,7 +641,7 @@ export class PlanComponent implements OnInit, OnDestroy {
   }
 
   async loadNewItemMenu(idPlan, idWorkpackModel, index) {
-    const sharedWorkpackList = await this.loadSharedWorkpackList(idWorkpackModel);
+    const sharedWorkpackList = await this.loadSharedWorkpackList(idWorkpackModel, idPlan);
     const iconMenuItems: MenuItem[] = [
       {
         label: this.translateSrv.instant('new'),
@@ -883,8 +883,8 @@ export class PlanComponent implements OnInit, OnDestroy {
     return { canPaste: false, incompatiblesProperties: true };
   }
 
-  async loadSharedWorkpackList(idWorkpackModel: number) {
-    const result = await this.workpackSrv.GetSharedWorkpacks({ 'id-workpack-model': idWorkpackModel });
+  async loadSharedWorkpackList(idWorkpackModel: number, idPlan: number) {
+    const result = await this.workpackSrv.GetSharedWorkpacks({ 'id-workpack-model': idWorkpackModel, 'id-plan': idPlan });
     if (result.success) {
       return result.data;
     }

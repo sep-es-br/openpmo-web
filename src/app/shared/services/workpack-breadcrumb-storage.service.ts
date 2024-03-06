@@ -33,23 +33,6 @@ export class WorkpackBreadcrumbStorageService {
   public async getBreadcrumbs(idWorkpack, idPlan) {
     const { success, data } = await this.breadcrumbSrv.getBreadcrumbWorkpack(idWorkpack, { 'id-plan': idPlan });
     if (success) {
-      const propertiesPlan = await this.planSrv.getCurrentPlan(idPlan);
-      const breadcrumbInit = [
-        {
-          key: 'office',
-          info: propertiesPlan.office.name,
-          tooltip: propertiesPlan.office.fullName,
-          routerLink: ['/offices', 'office'],
-          queryParams: { id: propertiesPlan.office.id },
-        },
-        {
-          key: 'plan',
-          info: propertiesPlan.name,
-          tooltip: propertiesPlan.fullName,
-          routerLink: ['/plan'],
-          queryParams: { id: propertiesPlan.id },
-        },
-      ];
       const breadcrumbItemsWorkpack = data.map(p => ({
         key: !p.modelName ? p.type.toLowerCase() : p.modelName,
         info: p.name,
@@ -58,7 +41,7 @@ export class WorkpackBreadcrumbStorageService {
         queryParams: { id: p.id, idWorkpackModelLinked: p.idWorkpackModelLinked, idPlan: idPlan },
         modelName: p.modelName
       }));
-      return [...breadcrumbInit, ...breadcrumbItemsWorkpack]
+      return [...breadcrumbItemsWorkpack]
     }
 
     return [];
@@ -78,7 +61,7 @@ export class WorkpackBreadcrumbStorageService {
       } else {
         const breadcrumbOfficeIndex = this.currentBreadcrumbItems.findIndex(item => item.key === 'office' && item.queryParams?.id === idOffice);
         const breadcrumbPlanIndex = this.currentBreadcrumbItems.findIndex(item => item.key === 'plan' && item.queryParams?.id === idPlan);
-        const breadcrumbParentIndex = this.currentBreadcrumbItems.findIndex(item => !['office', 'plan'].includes( item.key) && this.idParent && item.queryParams?.id === this.idParent);
+        const breadcrumbParentIndex = this.currentBreadcrumbItems.findIndex(item => !['office', 'plan'].includes(item.key) && this.idParent && item.queryParams?.id === this.idParent);
         if (breadcrumbOfficeIndex > -1 && breadcrumbPlanIndex > -1 && breadcrumbParentIndex > -1) {
           breadcrumb = [...this.currentBreadcrumbItems.slice(0, breadcrumbParentIndex + 1),
           ... this.workpackParams.idWorkpack
@@ -88,11 +71,16 @@ export class WorkpackBreadcrumbStorageService {
                 info: this.workpackData?.workpack?.name,
                 tooltip: this.workpackData?.workpack?.fullName,
                 routerLink: ['/workpack'],
-                queryParams: {
+                queryParams: this.workpackParams.idWorkpackModelLinked ? {
                   id: this.workpackParams?.idWorkpack,
                   idPlan: this.workpackParams?.idPlan,
-                  idWorkpackModelLinked: this.workpackParams.idWorkpackModelLinked
-                },
+                  idWorkpackModelLinked: this.workpackParams.idWorkpackModelLinked,
+                  idWorkpackLinkedParent: this.workpackParams.idWorkpackLinkedParent
+                } :
+                  {
+                    id: this.workpackParams?.idWorkpack,
+                    idPlan: this.workpackParams?.idPlan,
+                  },
                 modelName: this.workpackData.workpackModel?.modelName
               }
             ]
@@ -121,37 +109,13 @@ export class WorkpackBreadcrumbStorageService {
   }
 
   startNewBreadcrumb() {
-    const bread =  [
-      {
-        key: 'office',
-        info: this.workpackParams.propertiesOffice.name,
-        tooltip: this.workpackParams.propertiesOffice.fullName,
-        routerLink: ['/offices', 'office'],
-        queryParams: { id: this.workpackParams.idOffice },
-      },
-      {
-        key: 'plan',
-        info: this.workpackParams.propertiesPlan.name,
-        tooltip: this.workpackParams.propertiesPlan.fullName,
-        routerLink: ['/plan'],
-        queryParams: { id: this.workpackParams.propertiesPlan.id },
-      },
-      ... this.workpackParams.idWorkpack
-        ? [
-          {
-            key: this.workpackData.workpackModel?.type?.toLowerCase().replace('model', ''),
-            info: this.workpackData?.workpack?.name,
-            tooltip: this.workpackData?.workpack?.fullName,
-            routerLink: ['/workpack'],
-            queryParams: {
-              id: this.workpackParams.idWorkpack,
-              idPlan: this.workpackParams.idPlan,
-              idWorkpackModelLinked: this.workpackParams.idWorkpackModelLinked
-            },
-            modelName: this.workpackData.workpackModel?.modelName
-          }
-        ]
-        : [{
+    let breadcrumbItems;
+    if (this.workpackParams.idWorkpack) {
+      breadcrumbItems = this.getBreadcrumbs(this.workpackParams.idWorkpack, this.workpackParams.idPlan);
+    } else {
+      if (this.idParent) {
+        breadcrumbItems = this.getBreadcrumbs(this.idParent, this.workpackParams.idPlan);
+        breadcrumbItems.push({
           key: this.workpackData.workpackModel?.type?.toLowerCase().replace('model', ''),
           info: this.workpackData?.workpack?.name,
           tooltip: this.workpackData?.workpack?.fullName,
@@ -162,10 +126,40 @@ export class WorkpackBreadcrumbStorageService {
             idWorkpackParent: this.idParent
           },
           modelName: this.workpackData.workpackModel?.modelName
-        }]
-    ]
-    return bread;
+        });
+      } else {
+        breadcrumbItems = [{
+          key: 'office',
+          info: this.workpackParams.propertiesOffice.name,
+          tooltip: this.workpackParams.propertiesOffice.fullName,
+          routerLink: ['/offices', 'office'],
+          queryParams: { id: this.workpackParams.idOffice },
+        },
+        {
+          key: 'plan',
+          info: this.workpackParams.propertiesPlan.name,
+          tooltip: this.workpackParams.propertiesPlan.fullName,
+          routerLink: ['/plan'],
+          queryParams: { id: this.workpackParams.propertiesPlan.id },
+        },
+        {
+          key: this.workpackData.workpackModel?.type?.toLowerCase().replace('model', ''),
+          info: this.workpackData?.workpack?.name,
+          tooltip: this.workpackData?.workpack?.fullName,
+          routerLink: ['/workpack'],
+          queryParams: {
+            idPlan: this.workpackParams.idPlan,
+            idWorkpackModel: this.workpackParams.idWorkpackModel,
+            idWorkpackParent: this.idParent
+          },
+          modelName: this.workpackData.workpackModel?.modelName
+        }];
+      }
+    }
+    return breadcrumbItems;
   }
+
+
 
 
   getRouterLinkFromType(type: string): string[] {

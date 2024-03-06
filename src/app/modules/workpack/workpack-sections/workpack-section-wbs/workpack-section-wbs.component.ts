@@ -134,11 +134,15 @@ export class WorkpackSectionWBSComponent implements OnDestroy {
     return false;
   }
 
-  navigateToWorkpack(idWorkpack) {
-    this.setWorkpackBreadcrumbStorage(idWorkpack, this.idPlan)
+  navigateToWorkpack(item) {
+    if (item.idWorkpack === this.workpackParams.idWorkpack) {
+      return;
+    }
+    this.setWorkpackBreadcrumbStorage(item.idWorkpack, this.idPlan)
     this.route.navigate(['/workpack'], {
       queryParams: {
-        id: idWorkpack,
+        id: item.idWorkpack,
+        idWorkpaModelLinked: item.idWorkpaModelLinked,
         idPlan: this.idPlan
       }
     });

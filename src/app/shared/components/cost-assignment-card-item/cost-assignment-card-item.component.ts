@@ -1,4 +1,4 @@
-import { takeUntil } from 'rxjs/operators';
+import { takeUntil, debounceTime } from 'rxjs/operators';
 import { Subject } from 'rxjs';
 import { Component, OnInit, Input, Output, OnDestroy, EventEmitter } from '@angular/core';
 import { ConfirmationService, MenuItem, MessageService } from 'primeng/api';
@@ -28,6 +28,7 @@ export class CostAssignmentCardItemComponent implements OnInit, OnDestroy {
   $destroy = new Subject();
   actualWorkValidadeMessage: string;
   difference: number;
+  debounceValidate = new Subject();
 
   constructor(
     private responsiveSrv: ResponsiveService,
@@ -44,6 +45,9 @@ export class CostAssignmentCardItemComponent implements OnInit, OnDestroy {
     });
     this.currentLang = this.translateSrv.getDefaultLang();
     this.translateSrv.onDefaultLangChange.pipe(takeUntil(this.$destroy)).subscribe(({ lang }) => this.currentLang = lang);
+    this.debounceValidate.pipe(debounceTime(1000), takeUntil(this.$destroy)).subscribe((data) => {
+      this.checkCostAccountBalance(data);
+    });
   }
 
   ngOnDestroy(): void {
@@ -126,13 +130,13 @@ export class CostAssignmentCardItemComponent implements OnInit, OnDestroy {
     
   }
 
-  checkCostAccountBalance(event, field: string) {
-    if (!Number(event.value)) {
+  checkCostAccountBalance(data) {
+    if (!Number(data.value.value)) {
       return;
     }
     if (this.properties.costAccountAllocation && this.properties.costAccountAllocation.limit) {
       if (this.properties.costAccountAllocation.limit -
-          ( field === 'plannedWork' ? this.properties.costAccountAllocation.planed :  this.properties.costAccountAllocation.actual) - event.value < 0) {
+          ( data.type === 'plannedWork' ? this.properties.costAccountAllocation.planed :  this.properties.costAccountAllocation.actual) - data.value.value < 0) {
         this.messageSrv.add({
           detail: this.translateSrv.instant('messages.costAccountBalanceValidation'),
           severity: 'warn',

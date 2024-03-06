@@ -14,6 +14,7 @@ export interface  IWorkpackParams {
   idWorkpackModel: number;
   idWorkpackParent: number;
   idWorkpackModelLinked?: number;
+  idWorkpackLinkedParent?: number;
   idOfficeOwnerWorkpackLinked?: number;
   idOffice?: number;
   changedStatusCompleted: boolean;

@@ -165,7 +165,7 @@ export class WorkpackComponent implements OnDestroy {
         idPlan: idPlan && +idPlan,
         idWorkpackModel: idWorkpackModel && +idWorkpackModel,
         idWorkpackParent: idWorkpackParent && +idWorkpackParent,
-        idWorkpackModelLinked: idWorkpackModelLinked && +idWorkpackModelLinked
+        idWorkpackModelLinked: idWorkpackModelLinked && +idWorkpackModelLinked,
       });
       this.selectedTab = null;
       await this.resetWorkpack();
@@ -442,7 +442,7 @@ export class WorkpackComponent implements OnDestroy {
       }
       if (!reloadOnlyProperties) {
         this.workpackSrv.setWorkpackData({ workpack: this.workpack });
-        await this.loadWorkpackModel(this.workpack.idWorkpackModel);
+        await this.loadWorkpackModel(this.workpack.modelLinked.id);
       } else {
         this.workpackSrv.nextLoadingWorkpack(false)
       }
@@ -719,13 +719,13 @@ export class WorkpackComponent implements OnDestroy {
           itemId: workpack.id,
           menuItems,
           urlCard: '/workpack',
-          paramsUrlCard: workpack.idWorkpackModel !== idWorkpackModel ? [
+          paramsUrlCard: workpack.idWorkpackModel !== idWorkpackModel || !!workpack.linked ? [
             { name: 'idWorkpackModelLinked', value: idWorkpackModel },
-            { name: 'idPlan', value: this.idPlan },
+            { name: 'idPlan', value: this.idPlan }
           ] : (idWorkpackModelLinked ?
             [
               { name: 'idWorkpackModelLinked', value: idWorkpackModelLinked },
-              { name: 'idPlan', value: this.idPlan },
+              { name: 'idPlan', value: this.idPlan }
             ] : [
               { name: 'idPlan', value: this.idPlan },
             ]),
@@ -774,7 +774,7 @@ export class WorkpackComponent implements OnDestroy {
   }
 
   async loadNewItemMenu(idPlan, idWorkpackModel) {
-    const sharedWorkpackList = await this.loadSharedWorkpackList(idWorkpackModel);
+    const sharedWorkpackList = await this.loadSharedWorkpackList(idWorkpackModel, idPlan);
     const iconMenuItems: MenuItem[] = [
       {
         label: this.translateSrv.instant('new'),
@@ -1153,10 +1153,10 @@ export class WorkpackComponent implements OnDestroy {
     });
   }
 
-  async loadSharedWorkpackList(idWorkpackModel: number) {
+  async loadSharedWorkpackList(idWorkpackModel: number, idPlan: number) {
     const result = await this.workpackSrv.GetSharedWorkpacks({
       'id-workpack-model': idWorkpackModel,
-      'id-plan': this.idPlan
+      'id-plan': idPlan
     });
     if (result.success) {
       return result.data;

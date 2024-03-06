@@ -250,7 +250,6 @@ export class PersonComponent implements OnInit, OnDestroy {
   }
 
   async loadWorkpackConfig(idPlan, idWorkpack, url, queryParams) {
-    await this.setConfigWorkpackSrv.setWorkpackConfig(idPlan, idWorkpack);
     this.router.navigate([url], {
       queryParams
     });

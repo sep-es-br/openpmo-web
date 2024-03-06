@@ -196,7 +196,6 @@ export class CostAccountComponent implements OnInit {
         info: this.costAccountName,
       }
     ]);
-    this.breadcrumbSrv.setBreadcrumbStorage(breadcrumbItems);
   }
 
   async getBreadcrumbs() {

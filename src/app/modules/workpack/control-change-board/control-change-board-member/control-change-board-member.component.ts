@@ -24,6 +24,7 @@ import {IPlan} from 'src/app/shared/interfaces/IPlan';
 import {PlanService} from 'src/app/shared/services/plan.service';
 import {ControlChangeBoardService} from 'src/app/shared/services/control-change-board.service';
 import { CancelButtonComponent } from 'src/app/shared/components/cancel-button/cancel-button.component';
+import { WorkpackBreadcrumbStorageService } from 'src/app/shared/services/workpack-breadcrumb-storage.service';
 
 @Component({
   selector: 'app-control-change-board-member',
@@ -85,7 +86,8 @@ export class ControlChangeBoardMemberComponent implements OnInit, OnDestroy {
     private authServerSrv: AuthServerService,
     private formBuilder: FormBuilder,
     private planSrv: PlanService,
-    private ccbMemberSrv: ControlChangeBoardService
+    private ccbMemberSrv: ControlChangeBoardService,
+    private breadcrumbStorageSrv: WorkpackBreadcrumbStorageService
   ) {
     this.actRouter.queryParams.subscribe(async queryParams => {
       this.idPerson = +queryParams.idPerson;
@@ -123,34 +125,59 @@ export class ControlChangeBoardMemberComponent implements OnInit, OnDestroy {
     await this.loadCurrentUserInfo();
     this.loadCards();
     await this.loadPropertiesPlan();
-    await this.loadBreadcrumb();
+    await this.setBreadcrumb();
   }
 
-  async loadBreadcrumb() {
-    let breadcrumbItems = this.breadcrumbSrv.get;
+  async setBreadcrumb() {
+    const breadcrumbItems = await this.getBreadcrumbs();
+    this.breadcrumbStorageSrv.setBreadcrumbStorage(breadcrumbItems);
     this.breadcrumbSrv.setMenu([
       ...breadcrumbItems,
-      ...[
-        {
-          key: 'changeControlBoard',
-          info: 'ccbMembers',
-          routerLink: ['/workpack/change-control-board'],
-          queryParams: {
-            idProject: this.idProject,
-            idOffice: this.idOffice
-          },
+      {
+        key: 'changeControlBoard',
+        info: 'ccbMembers',
+        routerLink: ['/workpack/change-control-board'],
+        queryParams: {
+          idProject: this.idProject,
+          idOffice: this.idOffice
         },
-        {
-          key: 'ccbMember',
-          routerLink: ['/workpack/change-control-board/member'],
-          queryParams: {
-            idProject: this.idProject,
-            idPerson: this.idPerson,
-            idOffice: this.idOffice
-          },
-        }
-      ]
+      },
+      {
+        key: 'ccbMember',
+        routerLink: ['/workpack/change-control-board/member'],
+        queryParams: {
+          idProject: this.idProject,
+          idPerson: this.idPerson,
+          idOffice: this.idOffice
+        },
+      }
     ]);
+  }
+
+  async getBreadcrumbs() {
+    const { success, data } = await this.breadcrumbSrv.getBreadcrumbWorkpack
+      (this.idProject, { 'id-plan': this.idPlan });
+    return success
+      ? data.map(p => ({
+        key: !p.modelName ? p.type.toLowerCase() : p.modelName,
+        info: p.name,
+        tooltip: p.fullName,
+        routerLink: this.getRouterLinkFromType(p.type),
+        queryParams: { id: p.id, idWorkpackModelLinked: p.idWorkpackModelLinked, idPlan: this.idPlan },
+        modelName: p.modelName
+      }))
+      : [];
+  }
+
+  getRouterLinkFromType(type: string): string[] {
+    switch (type) {
+      case 'office':
+        return ['/offices', 'office'];
+      case 'plan':
+        return ['plan'];
+      default:
+        return ['/workpack'];
+    }
   }
 
   loadCards() {

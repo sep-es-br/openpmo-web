@@ -166,7 +166,12 @@ export class ScheduleComponent implements OnInit, OnDestroy {
     const result = await this.costAccountSrv.GetAll({ 'id-workpack': this.idWorkpack });
     if (result.success) {
       this.costAccounts = result.data;
-      const workpacksIds = this.costAccounts.map(cost => cost.idWorkpack);
+      this.setMenuItems();
+    }
+  }
+
+  setMenuItems() {
+    const workpacksIds = this.costAccounts.map(cost => cost.idWorkpack);
       const workpacksIdsNotRepeated = workpacksIds.filter((w, i) => workpacksIds.indexOf(w) === i);
 
       this.menuItemsCostAccounts = workpacksIdsNotRepeated.map( (idWorkpack) => {
@@ -184,7 +189,6 @@ export class ScheduleComponent implements OnInit, OnDestroy {
           })
         };
       });
-    }
   }
 
   createNewCardItemCost(idCost: number, costName: string) {
@@ -433,10 +437,12 @@ export class ScheduleComponent implements OnInit, OnDestroy {
       actualWork: null,
       distribution: 'SIGMOIDAL'
     });
+    this.setMenuItems();
     this.costAssignmentsCardItems = [{
       type: 'new-cost-card',
       menuItemsNewCost: this.menuItemsCostAccounts
     }];
+    
     this.reloadCostAssignmentTotals();
   }
 

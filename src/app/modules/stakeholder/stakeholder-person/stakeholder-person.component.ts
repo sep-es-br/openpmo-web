@@ -26,6 +26,7 @@ import {cpfValidator} from 'src/app/shared/utils/cpfValidator';
 import { MinLengthTextCustomValidator } from 'src/app/shared/utils/minLengthTextValidator';
 import { WorkpackModelService } from 'src/app/shared/services/workpack-model.service';
 import { CancelButtonComponent } from 'src/app/shared/components/cancel-button/cancel-button.component';
+import { WorkpackBreadcrumbStorageService } from 'src/app/shared/services/workpack-breadcrumb-storage.service';
 
 interface ICardItemRole {
   type: string;
@@ -116,7 +117,8 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
     private authServerSrv: AuthServerService,
     private planSrv: PlanService,
     private authSrv: AuthService,
-    private workpackModelSrv: WorkpackModelService
+    private workpackModelSrv: WorkpackModelService,
+    private breadcrumbStorageSrv: WorkpackBreadcrumbStorageService
   ) {
     this.citizenUserSrv.loadCitizenUsers();
     this.actRouter.queryParams.subscribe(async queryParams => {
@@ -159,8 +161,12 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
     await this.getAuthServer();
     await this.loadWorkpack();
     await this.loadStakeholder();
-    
-    let breadcrumbItems = this.breadcrumbSrv.get;
+    this.setBreadcrumb();
+  }
+
+  async setBreadcrumb() {
+    const breadcrumbItems = await this.getBreadcrumbs();
+    this.breadcrumbStorageSrv.setBreadcrumbStorage(breadcrumbItems);
     this.breadcrumbSrv.setMenu([
       ...breadcrumbItems,
       {
@@ -169,6 +175,32 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
         tooltip: this.stakeholder?.person.fullName
       }
     ]);
+  }
+
+  async getBreadcrumbs() {
+    const { success, data } = await this.breadcrumbSrv.getBreadcrumbWorkpack
+      (this.idWorkpack, { 'id-plan': this.idPlan });
+    return success
+      ? data.map(p => ({
+        key: !p.modelName ? p.type.toLowerCase() : p.modelName,
+        info: p.name,
+        tooltip: p.fullName,
+        routerLink: this.getRouterLinkFromType(p.type),
+        queryParams: { id: p.id, idWorkpackModelLinked: p.idWorkpackModelLinked, idPlan: this.idPlan },
+        modelName: p.modelName
+      }))
+      : [];
+  }
+
+  getRouterLinkFromType(type: string): string[] {
+    switch (type) {
+      case 'office':
+        return ['/offices', 'office'];
+      case 'plan':
+        return ['plan'];
+      default:
+        return ['/workpack'];
+    }
   }
 
   async getAuthServer() {

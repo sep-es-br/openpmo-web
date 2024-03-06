@@ -5,9 +5,10 @@ import { IWorkpackBreakdownStructure, IWorkpackBreakdownStructureWorkpackModel }
 import { IHttpResult } from '../interfaces/IHttpResult';
 import { WorkpackService } from './workpack.service';
 import { BehaviorSubject } from 'rxjs';
-import { IWorkpackData } from '../interfaces/IWorkpackDataParams';
+import { IWorkpackData, IWorkpackParams } from '../interfaces/IWorkpackDataParams';
 import { TreeNode } from 'primeng/api';
 import * as moment from 'moment';
+import { PrepareHttpParams } from '../utils/query.util';
 
 @Injectable({
   providedIn: 'root'
@@ -16,6 +17,7 @@ export class BreakdownStructureService extends BaseService<IWorkpackBreakdownStr
 
   private resetBreakdownStructure = new BehaviorSubject<boolean>(false);
   workpackData: IWorkpackData;
+  workpackParams: IWorkpackParams;
   wbs: IWorkpackBreakdownStructure;
   expandedAllDone = false;
   expandedAll = false;
@@ -57,20 +59,21 @@ export class BreakdownStructureService extends BaseService<IWorkpackBreakdownStr
   async loadBreakdownStructure(lazyLoading, idWorkpack: number) {
     this.loading = true;
     this.workpackData = this.workpackSrv.getWorkpackData();
+    this.workpackParams = this.workpackSrv.getWorkpackParams();
     if (this.workpackData && this.workpackData.workpack && this.workpackData.workpack.hasWBS !== false) {
-      await this.loadBWS(idWorkpack, lazyLoading);
+      await this.loadBWS(idWorkpack, lazyLoading, this.workpackParams.idPlan);
       this.loading = false;
       this.nextResetBreakdownStructure(true);
     }
   }
 
-  async loadBWS(idWorkpack: number, isLazyLoading) {
-    this.wbsTree = await this.getBreakdownStructureData(idWorkpack, isLazyLoading);
+  async loadBWS(idWorkpack: number, isLazyLoading, idPlan: number) {
+    this.wbsTree = await this.getBreakdownStructureData(idWorkpack, isLazyLoading, idPlan);
   }
 
-  async getBreakdownStructureData(idWorkpack: number, isLazyLoading) {
+  async getBreakdownStructureData(idWorkpack: number, isLazyLoading, idPlan: number) {
     const { success, data } =
-      await this.getByWorkpackId(idWorkpack, !isLazyLoading);
+      await this.getByWorkpackId(idWorkpack, {allLevels: !isLazyLoading, 'id-plan': idPlan});
     if (success) {
       this.wbs = data;
       if (data) {
@@ -95,7 +98,7 @@ export class BreakdownStructureService extends BaseService<IWorkpackBreakdownStr
     } else {
       this.loading = true;
       this.expandedAllDone = true;
-      this.wbsTree = await this.getBreakdownStructureData(idWorkpack, false);
+      this.wbsTree = await this.getBreakdownStructureData(idWorkpack, false, this.workpackParams.idPlan);
       this.loading = false;
       this.nextResetBreakdownStructure(true);
     }
@@ -114,7 +117,7 @@ export class BreakdownStructureService extends BaseService<IWorkpackBreakdownStr
     this.loading = true;
     const idWorkpack = event.node?.idWorkpack;
     if (idWorkpack && event.node?.children?.length === 0) {
-      const children = await this.getBreakdownStructureData(idWorkpack, true);
+      const children = await this.getBreakdownStructureData(idWorkpack, true, this.workpackParams.idPlan);
       event.node.children = children && children.length > 0 ? children[0].children : [];
       this.loading = false;
       this.nextResetBreakdownStructure(true);
@@ -556,9 +559,9 @@ export class BreakdownStructureService extends BaseService<IWorkpackBreakdownStr
     return { gaugeChartDataCPI, gaugeChartDataSPI };
   }
 
-  async getByWorkpackId(idWorkpack: number, allLevels: boolean): Promise<IHttpResult<IWorkpackBreakdownStructure>> {
+  async getByWorkpackId(idWorkpack: number, options): Promise<IHttpResult<IWorkpackBreakdownStructure>> {
     return await this.http.get<IHttpResult<IWorkpackBreakdownStructure>>
-      (`${this.urlBase}/${idWorkpack}?allLevels=${allLevels}`).toPromise();
+      (`${this.urlBase}/${idWorkpack}`, { params: PrepareHttpParams(options) }).toPromise();
   }
 
 }

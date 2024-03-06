@@ -4,9 +4,10 @@ import { IMeasureUnit } from './IMeasureUnit';
 import { IInformation, IWorkpackJournalInformation } from './IJournal';
 
 export interface IWorkpackBreakdownStructure {
-  idWorkpack:     number;
-  workpackName:   string;
-  dashboard?:     IDashboardData;
+  idWorkpack: number;
+  workpackName: string;
+  linked?: boolean;
+  dashboard?: IDashboardData;
   milestones?: {
       completed: boolean,
       milestoneDate: string;

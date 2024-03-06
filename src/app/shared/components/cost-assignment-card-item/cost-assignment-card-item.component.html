@@ -11,7 +11,7 @@
         <p-inputNumber [class]="'app-input-number costPlanned-'+properties.idCost " id="unit-planned"
           [(ngModel)]="properties.plannedWork"
           [class.red]="properties.plannedWork < 0"
-          (onInput)="handleCostChange($event,'plannedWork'); checkCostAccountBalance($event, 'plannedWork')"
+          (onInput)="handleCostChange($event,'plannedWork'); debounceValidate.next({value: $event, type:'plannedWork'})"
            mode="decimal" [locale]="currentLang" [minFractionDigits]="2" [maxFractionDigits]="2"
           [disabled]="!!properties.readonly">
         </p-inputNumber>
@@ -38,7 +38,7 @@
         <p-inputNumber class="app-input-number" id="float-planned" [(ngModel)]="properties.actualWork"
           [disabled]="!!properties.readonly"
           [class.red]="properties.actualWork < 0"
-          (onInput)="handleActualCostChange($event,'actualWork'); checkCostAccountBalance($event, 'actualWork')" mode="decimal" [locale]="currentLang"
+          (onInput)="handleActualCostChange($event,'actualWork'); debounceValidate.next({value: $event, type:'actualWork'})" mode="decimal" [locale]="currentLang"
           [minFractionDigits]="2" [maxFractionDigits]="2">
         </p-inputNumber>
         <label class="app-input-label" for="float-planned">{{properties.unitMeasureName}} {{ "actual" |translate }}
