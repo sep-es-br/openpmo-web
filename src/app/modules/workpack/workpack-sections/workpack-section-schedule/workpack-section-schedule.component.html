@@ -85,19 +85,12 @@
               [emptyMessage]="'loadingEllipsis' | translate">
               <ng-template let-step pTemplate="gridItem">
                 <div class="card-item-container show-resumed clickable" *ngIf="step.type === 'listStep'"
-                  [class.new-card-item]="['newStart', 'newEnd'].includes(step.type)" [class.mobile]="responsive"
-                  [routerLink]="['/workpack' , 'schedule', 'step' ]" [queryParams]="{
-                          id: step.idStep,
-                          idWorkpackModelLinked: workpackParams.idWorkpackModelLinked,
-                          stepType: step.stepOrder,
-                          unitName: step.unitName,
-                          unitPrecision: step.unitPrecision
-                        }">
+                  [class.mobile]="responsive"
+                  (click)="editScheduleStep(step.idStep, unitMeansure.name, unitMeansure.precision,'step')">
                   <app-schedule-step-card-item [properties]="step" [type]="'listStepResumed'">
                   </app-schedule-step-card-item>
                 </div>
-                <div class="card-item-container show-resumed clickable"
-                  *ngIf="['newStart', 'newEnd'].includes(step.type)"
+                <div class="card-item-container show-resumed clickable" *ngIf="['newStart', 'newEnd'].includes(step.type)"
                   [class.new-card-item]="['newStart', 'newEnd'].includes(step.type)" [class.mobile]="responsive"
                   [routerLink]="['/workpack' , 'schedule', 'step' ]" [queryParams]="{
                           idSchedule: schedule.id,

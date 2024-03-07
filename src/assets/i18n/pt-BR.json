@@ -554,6 +554,7 @@
       "actualPhysical": "Valor físico entregue atual para o mês. Informação não obrigatória.",
       "estimatedCostTotal": "Valor do custo estimado total.",
       "baselineCostTotal": "Valor do custo planejado total na linha de base ativa.",
+      "baselinePhysicalTotal": "Valor fisico planejado total na linha de base ativa.",
       "actualCostTotal": "Valor do custo realizado atual total.",
       "distribution": "Método de distribuição dos valores dos meses. Sigmoidal: utiliza a função sigmóide para calcular os valores dos meses. Linear: distribui os valores dos meses de forma igualitária.",
       "estimatedCost": "Valor do custo estimado para o centro de custo vinculado. Informação obrigatória. Zero é um valor válido.",

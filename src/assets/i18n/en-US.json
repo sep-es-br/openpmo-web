@@ -554,6 +554,7 @@
       "actualPhysical": "Actual physical value. Information is not required.",
       "estimatedCostTotal": "Total estimated cost value.",
       "baselineCostTotal": "Total planed cost value in active baseline.",
+      "baselinePhysicalTotal": "Total planed physical value in active baseline.",
       "actualCostTotal": "Total actual cost value.",
       "distribution": "Distribution method. Sigmoidal: use the sigmoide function to calculate steps values. Linear: use the equal values for steps.",
       "estimatedCost": "Estimated cost value to cost account linked. Information is required. Zero value is valid.",

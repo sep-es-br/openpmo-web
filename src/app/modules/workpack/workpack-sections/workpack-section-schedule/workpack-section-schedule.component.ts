@@ -341,6 +341,7 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
         initialStateCollapse: this.showTabview ? false : this.collapsePanelsStatus,
       }
     };
+    
   }
 
   async handleNewSchedule() {
@@ -387,7 +388,8 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
           idStep: idStep,
           stepType,
           unitName,
-          unitPrecision
+          unitPrecision,
+          idWorkpackModelLinked: this.workpackParams.idWorkpackModelLinked,
         }
       }
     );

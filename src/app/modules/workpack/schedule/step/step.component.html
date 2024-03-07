@@ -70,7 +70,9 @@
                   </span>
                 </div>
                 <div class="p-field planned-baseline" [class.responsive]="responsive"  *ngIf="baselinePlannedTotals && baselinePlannedTotals.plannedWork">
-                  <span class="label"> {{unitName}} {{ "plannedBaseline" |translate }}</span>
+                  <span class="label">
+                    {{unitName}} {{ "plannedBaseline" |translate }}
+                    <i class="far fa-question-circle" [pTooltip]="'help.step.baselinePhysicalTotal' | translate"></i></span>
                   <span class="value">{{ baselinePlannedTotals.plannedWork | number : '0.2' : currentLang }}</span>
                 </div>
               </div>
