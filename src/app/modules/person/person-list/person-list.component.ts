@@ -284,6 +284,7 @@ export class PersonListComponent implements OnInit, OnDestroy {
         info: this.propertiesOffice?.name,
         tooltip: this.propertiesOffice?.fullName,
         routerLink: ['/configuration-office'],
+        admin: true,
         queryParams: { idOffice: this.idOffice }
       },
       {
@@ -291,6 +292,7 @@ export class PersonListComponent implements OnInit, OnDestroy {
         info: 'persons',
         tooltip: this.translateSrv.instant('measureUnits'),
         routerLink: ['/persons'],
+        admin: true,
         queryParams: { idOffice: this.idOffice }
       }
     ]);

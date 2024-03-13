@@ -182,6 +182,7 @@ export class PersonComponent implements OnInit, OnDestroy {
         info: this.office?.name,
         tooltip: this.office?.fullName,
         routerLink: ['/configuration-office'],
+        admin: true,
         queryParams: { idOffice: this.idOffice }
       },
       {
@@ -189,10 +190,12 @@ export class PersonComponent implements OnInit, OnDestroy {
         info: 'persons',
         tooltip: this.translateSrv.instant('measureUnits'),
         routerLink: ['/persons'],
+        admin: true,
         queryParams: { idOffice: this.idOffice }
       },
       {
         key: 'profile',
+        admin: true,
         routerLink: ['/configuration-office/persons/person'],
         queryParams: { idOffice: this.idOffice, idPerson: this.idPerson }
       },
@@ -225,7 +228,7 @@ export class PersonComponent implements OnInit, OnDestroy {
             {
               idProject: workpack.id,
               idPerson: this.propertiesPerson.id,
-              id: this.propertiesPerson.id,
+              idMember: this.propertiesPerson.id,
               idOffice: this.idOffice,
               idPlan: plan.id
             } :
