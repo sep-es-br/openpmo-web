@@ -219,14 +219,6 @@ export class RiskResponseComponent implements OnInit {
       },
       {
         key: 'response',
-        routerLink: ['/workpack/risks/response'],
-        queryParams: {
-          idWorkpack: this.idWorkpack,
-          idRiskResponse: this.idRiskResponse,
-          idRisk: this.idRisk,
-          riskNature: this.riskNature,
-          riskName: this.riskName
-        },
         info: this.riskResponse?.name,
         tooltip: this.riskResponse?.name
       }
@@ -251,7 +243,8 @@ export class RiskResponseComponent implements OnInit {
       plan: this.formRiskResponse.controls.plan.value,
       responsible: this.formRiskResponse.controls.responsible.value
     };
-    const result = this.idRiskResponse ? await this.riskResponseSrv.put(sender) : await this.riskResponseSrv.post(sender);
+    const put = !!this.idRiskResponse;
+    const result =  put ? await this.riskResponseSrv.put(sender) : await this.riskResponseSrv.post(sender);
     this.formIsSaving = false;
     if (result.success) {
       this.messageSrv.add({
@@ -262,7 +255,7 @@ export class RiskResponseComponent implements OnInit {
       this.router.navigate(['/workpack/risks'], {
         queryParams: {
           idWorkpack: this.idWorkpack,
-          id: this.idRisk
+          idRisk: this.idRisk
         }
       });
     }

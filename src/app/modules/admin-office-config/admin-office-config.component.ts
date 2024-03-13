@@ -172,7 +172,8 @@ export class AdminOfficeConfigComponent implements OnInit {
       info: this.propertiesOffice?.name,
       tooltip: this.propertiesOffice?.fullName,
       routerLink: ['/configuration-office'],
-      queryParams: { idOffice: this.idOffice }
+      queryParams: { idOffice: this.idOffice },
+      admin: true
     }]);
   }
 

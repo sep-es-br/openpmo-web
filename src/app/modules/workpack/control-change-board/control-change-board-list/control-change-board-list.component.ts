@@ -163,6 +163,7 @@ export class ControlChangeBoardListComponent implements OnInit, OnDestroy {
           disabled: !this.editPermission
         }] as MenuItem[],
         urlCard: 'member',
+        idAtributeName: 'idMember',
         paramsUrlCard: [
           { name: 'idProject', value: this.idProject },
           { name: 'idPerson', value: controlChangeBoard.person.id },

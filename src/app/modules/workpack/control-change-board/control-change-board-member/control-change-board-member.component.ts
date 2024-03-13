@@ -144,12 +144,7 @@ export class ControlChangeBoardMemberComponent implements OnInit, OnDestroy {
       },
       {
         key: 'ccbMember',
-        routerLink: ['/workpack/change-control-board/member'],
-        queryParams: {
-          idProject: this.idProject,
-          idPerson: this.idPerson,
-          idOffice: this.idOffice
-        },
+        info: this.ccbMember && this.ccbMember.person ? this.ccbMember.person.name : ''
       }
     ]);
   }

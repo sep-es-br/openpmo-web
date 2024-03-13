@@ -382,6 +382,7 @@ export class WorkpackModelComponent implements OnInit {
         info: this.propertiesOffice?.name,
         tooltip: this.propertiesOffice?.fullName,
         routerLink: ['/configuration-office'],
+        admin: true,
         queryParams: { idOffice: this.idOffice }
       },
       {
@@ -389,6 +390,7 @@ export class WorkpackModelComponent implements OnInit {
         info: this.translateSrv.instant('planModels'),
         tooltip: 'planModels',
         routerLink: ['/strategies'],
+        admin: true,
         queryParams: { idOffice: this.idOffice }
       },
       {
@@ -396,6 +398,7 @@ export class WorkpackModelComponent implements OnInit {
         info: this.propertiesPlanModel?.name,
         tooltip: this.propertiesPlanModel?.fullName,
         routerLink: ['/strategies', 'strategy'],
+        admin: true,
         queryParams: { id: this.idStrategy, idOffice: this.idOffice }
       },
       ...this.idWorkpackModel
@@ -404,11 +407,13 @@ export class WorkpackModelComponent implements OnInit {
           info: this.modelName,
           tooltip: this.modelNamePlural,
           routerLink: ['/workpack-model'],
+          admin: true,
           queryParams: { idStrategy, id: this.idWorkpackModel, type, idOffice }
         }]
         : [{
           key: 'workpackModel',
           routerLink: ['/workpack-model'],
+          admin: true,
           queryParams: { idStrategy, type, idOffice, idParent: this.idParentWorkpack }
         }]
     ];
@@ -431,6 +436,7 @@ export class WorkpackModelComponent implements OnInit {
             key: 'workpackModel',
             info: this.modelName,
             tooltip: this.modelNamePlural,
+            admin: true,
             routerLink: ['/workpack-model'],
             queryParams: { idStrategy, id: this.idWorkpackModel, type, idOffice, idParent: this.idParentWorkpack }
           }]

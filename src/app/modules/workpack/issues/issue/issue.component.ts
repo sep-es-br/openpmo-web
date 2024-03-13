@@ -258,7 +258,8 @@ export class IssueComponent implements OnInit {
       nature: this.formIssue.controls.nature.value,
       status: this.formIssue.controls.status.value
     };
-    const result = this.idIssue ? await this.issueSrv.put(sender) : await this.issueSrv.post(sender);
+    const put = !!this.idIssue;
+    const result =  put ? await this.issueSrv.put(sender) : await this.issueSrv.post(sender);
     this.formIsSaving = false;
     if (result.success) {
       this.messageSrv.add({
@@ -271,6 +272,7 @@ export class IssueComponent implements OnInit {
         ...this.issue,
         ...sender
       };
+      this.setBreadcrumb();
       this.loadIssueResponseCardItems();
     }
   }

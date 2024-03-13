@@ -218,6 +218,7 @@ export class AdministratorListComponent implements OnInit, OnDestroy {
       {
         key: 'Administrators',
         routerLink: ['/administrators'],
+        admin: true
       }
     ]);
   }

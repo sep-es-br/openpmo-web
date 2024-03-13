@@ -104,6 +104,7 @@ export class CostAccountComponent implements OnInit {
     if (this.idCostAccount) {
       await this.loadCostAccount();
     } else {
+      this.setBreadcrumb();
       this.cardCostAccountProperties.isLoading = false;
     }
     const costAccountModelActiveProperties = this.costAccountModel.properties.filter(w => w.active);
@@ -156,7 +157,7 @@ export class CostAccountComponent implements OnInit {
         this.workpack = result.data;
       }
     }
-    this.setBreadcrumb();
+    
     this.editPermission = (!!this.workpack.permissions?.find(p => p.level === 'EDIT')
       || await this.authSrv.isUserAdmin()) && !this.workpack.canceled && !this.workpack.endManagementDate;
     const plan = await this.planSrv.getCurrentPlan(this.workpack.plan.id);
@@ -184,6 +185,7 @@ export class CostAccountComponent implements OnInit {
       const propertyNameCostAccount = this.costAccount.properties.find(p => p.idPropertyModel === propertyNameModel.id);
       this.costAccountName = propertyNameCostAccount.value as string;
       await this.loadCardCostAccountProperties();
+      this.setBreadcrumb();
     }
   }
 

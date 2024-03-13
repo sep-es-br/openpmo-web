@@ -123,6 +123,7 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
         info: this.propertiesOffice?.name,
         tooltip: this.propertiesOffice?.fullName,
         routerLink: ['/configuration-office'],
+        admin: true,
         queryParams: { idOffice: this.idOffice }
       },
       {
@@ -130,11 +131,13 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
         info: 'officePermissions',
         tooltip: this.translateSrv.instant('officePermissions'),
         routerLink: ['/offices', 'permission'],
+        admin: true,
         queryParams: { idOffice: this.idOffice },
       },
       {
         key: 'permissions',
         routerLink: ['/offices', 'permission', 'detail'],
+        admin: true,
         queryParams: { idOffice: this.idOffice, key: this.key }
       }
     ]);

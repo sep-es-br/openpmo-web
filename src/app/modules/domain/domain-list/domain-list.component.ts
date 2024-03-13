@@ -94,14 +94,16 @@ export class DomainListComponent implements OnInit, OnDestroy {
         info: this.propertiesOffice?.name,
         tooltip: this.propertiesOffice?.fullName,
         routerLink: ['/configuration-office'],
-        queryParams: { idOffice: this.idOffice }
+        queryParams: { idOffice: this.idOffice },
+        admin: true
       },
       {
         key: 'configuration',
         info: 'domains',
         tooltip: this.translateSrv.instant('domains'),
         routerLink: ['/domains'],
-        queryParams: { idOffice: this.idOffice }
+        queryParams: { idOffice: this.idOffice },
+        admin: true
       },
     ]);
   }
@@ -234,28 +236,32 @@ export class DomainListComponent implements OnInit, OnDestroy {
         info: this.propertiesOffice?.name,
         tooltip: this.propertiesOffice?.fullName,
         routerLink: ['/configuration-office'],
-        queryParams: { idOffice: this.idOffice }
+        queryParams: { idOffice: this.idOffice },
+        admin: true
       },
       {
         key: 'configuration',
         info: 'domains',
         tooltip: this.translateSrv.instant('domains'),
         routerLink: ['/domains'],
-        queryParams: { idOffice: this.idOffice }
+        queryParams: { idOffice: this.idOffice },
+        admin: true
       }] :
       [{
         key: 'administration',
         info: this.propertiesOffice?.name,
         tooltip: this.propertiesOffice?.fullName,
         routerLink: ['/configuration-office'],
-        queryParams: { idOffice: this.idOffice }
+        queryParams: { idOffice: this.idOffice },
+        admin: true
       },
       {
         key: 'configuration',
         info: 'domains',
         tooltip: this.translateSrv.instant('domains'),
         routerLink: ['/domains'],
-        queryParams: { idOffice: this.idOffice }
+        queryParams: { idOffice: this.idOffice },
+        admin: true
       }];
     this.breadcrumbSrv.setBreadcrumbStorage(breadcrumb);
   }

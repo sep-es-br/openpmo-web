@@ -108,6 +108,7 @@ export class OrganizationComponent implements OnInit, OnDestroy {
         info: this.propertiesOffice?.name,
         tooltip: this.propertiesOffice?.fullName,
         routerLink: ['/configuration-office'],
+        admin: true,
         queryParams: { idOffice: this.idOffice }
       },
       {
@@ -115,6 +116,7 @@ export class OrganizationComponent implements OnInit, OnDestroy {
         info: 'organizations',
         tooltip: this.translateSrv.instant('organizations'),
         routerLink: ['/organizations'],
+        admin: true,
         queryParams: { idOffice: this.idOffice }
       },
       {
@@ -122,6 +124,7 @@ export class OrganizationComponent implements OnInit, OnDestroy {
         info: this.propertiesOrganization?.name,
         tooltip: this.propertiesOrganization?.fullName,
         routerLink: ['/organizations', 'organization'],
+        admin: true,
         queryParams: { id: this.idOrganization }
       }
     ]);

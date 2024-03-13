@@ -304,7 +304,8 @@ export class RiskComponent implements OnInit, OnDestroy {
       nature: this.formRisk.controls.nature.value,
       status: this.formRisk.controls.status.value
     };
-    const result = this.idRisk ? await this.riskSrv.put(sender) : await this.riskSrv.post(sender);
+    const put = !!this.idRisk;
+    const result = put ? await this.riskSrv.put(sender) : await this.riskSrv.post(sender);
     this.formIsSaving = false;
     if (result.success) {
       this.messageSrv.add({
@@ -318,6 +319,7 @@ export class RiskComponent implements OnInit, OnDestroy {
         ...sender,
         id: result.data.id
       };
+      if (!put) this.setBreadcrumb();
       this.loadRiskResponseCardItems();
       if (this.risk.status === this.riskPropertiesOptions.status.HAPPENED.value) {
         const existsIssueForRisk = await this.getIssueForRisk();

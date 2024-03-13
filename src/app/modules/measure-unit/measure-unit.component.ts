@@ -101,12 +101,14 @@ export class MeasureUnitComponent implements OnInit {
         info: this.propertiesOffice?.name,
         tooltip: this.propertiesOffice?.fullName,
         routerLink: ['/configuration-office'],
+        admin: true,
         queryParams: { idOffice: this.idOffice }
       },
       {
         key: 'configuration',
         info: 'measureUnits',
         tooltip: this.translateSrv.instant('measureUnits'),
+        admin: true,
         routerLink: ['/measure-units'],
         queryParams: { idOffice: this.idOffice }
       }
@@ -374,6 +376,7 @@ export class MeasureUnitComponent implements OnInit {
         info: this.propertiesOffice?.name,
         tooltip: this.propertiesOffice?.fullName,
         routerLink: ['/configuration-office'],
+        admin: true,
         queryParams: { idOffice: this.idOffice }
       },
       {
@@ -381,6 +384,7 @@ export class MeasureUnitComponent implements OnInit {
         info: 'measureUnits',
         tooltip: this.translateSrv.instant('measureUnits'),
         routerLink: ['/measure-units'],
+        admin: true,
         queryParams: { idOffice: this.idOffice }
       }] :
       [{
@@ -388,6 +392,7 @@ export class MeasureUnitComponent implements OnInit {
         info: this.propertiesOffice?.name,
         tooltip: this.propertiesOffice?.fullName,
         routerLink: ['/configuration-office'],
+        admin: true,
         queryParams: { idOffice: this.idOffice }
       },
       {
@@ -395,6 +400,7 @@ export class MeasureUnitComponent implements OnInit {
         info: 'measureUnits',
         tooltip: this.translateSrv.instant('measureUnits'),
         routerLink: ['/measure-units'],
+        admin: true,
         queryParams: { idOffice: this.idOffice }
       }]
     this.breadcrumbSrv.setBreadcrumbStorage(breadcrumb);

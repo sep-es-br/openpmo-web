@@ -125,21 +125,24 @@ export class DomainLocalityComponent implements OnInit, OnDestroy {
           info: this.propertiesOffice?.name,
           tooltip: this.propertiesOffice?.fullName,
           routerLink: ['/configuration-office'],
-          queryParams: { idOffice: this.idOffice }
+          queryParams: { idOffice: this.idOffice },
+          admin: true
         },
         {
           key: 'configuration',
           info: 'domains',
           tooltip: this.translateSrv.instant('domains'),
           routerLink: ['/domains'],
-          queryParams: { idOffice: this.idOffice }
+          queryParams: { idOffice: this.idOffice },
+          admin: true
         },
         {
           key: 'domain',
           info: this.propertiesDomain?.name,
           tooltip: this.propertiesDomain?.fullName,
           routerLink: ['/domains', 'detail'],
-          queryParams: { id: this.idDomain, idOffice: this.idOffice }
+          queryParams: { id: this.idDomain, idOffice: this.idOffice },
+          admin: true
         },
         ... await this.getBreadcrumbs()
       ]);
@@ -173,13 +176,15 @@ export class DomainLocalityComponent implements OnInit, OnDestroy {
             info: l?.name,
             tooltip: l?.fullName,
             routerLink: ['/domains', 'locality'],
-            queryParams: { id: l.id, idOffice, idDomain, type: l.type, idParent: i ? data[i - 1].id : '' }
+            queryParams: { id: l.id, idOffice, idDomain, type: l.type, idParent: i ? data[i - 1].id : '' },
+            admin: true
           })),
           ... !this.idLocality
             ? [{
               key: this.type.toLowerCase(),
               routerLink: ['/domains', 'locality'],
-              queryParams: { idOffice, idDomain, type, idParent }
+              queryParams: { idOffice, idDomain, type, idParent },
+              admin: true
             }]
             : []
         ]
@@ -189,6 +194,7 @@ export class DomainLocalityComponent implements OnInit, OnDestroy {
         {
           key: this.type.toLowerCase(),
           routerLink: ['/domains', 'locality'],
+          admin: true,
           queryParams: { idOffice: this.idOffice, idDomain: this.idDomain, type: this.type }
         }
       ];
@@ -409,6 +415,7 @@ export class DomainLocalityComponent implements OnInit, OnDestroy {
       this.breadcrumbSrv.updateLastCrumb({
         key: 'locality',
         routerLink: ['/domains', 'locality'],
+        admin: true,
         queryParams: { id: this.idLocality, idOffice: this.idOffice },
         info: this.propertiesLocality?.name,
         tooltip: this.propertiesLocality?.fullName
@@ -498,6 +505,7 @@ export class DomainLocalityComponent implements OnInit, OnDestroy {
           info: this.propertiesOffice?.name,
           tooltip: this.propertiesOffice?.fullName,
           routerLink: ['/configuration-office'],
+          admin: true,
           queryParams: { idOffice: this.idOffice }
         },
         {
@@ -505,6 +513,7 @@ export class DomainLocalityComponent implements OnInit, OnDestroy {
           info: 'domains',
           tooltip: this.translateSrv.instant('domains'),
           routerLink: ['/domains'],
+          admin: true,
           queryParams: { idOffice: this.idOffice }
         },
         {
@@ -512,6 +521,7 @@ export class DomainLocalityComponent implements OnInit, OnDestroy {
           info: this.propertiesDomain?.name,
           tooltip: this.propertiesDomain?.fullName,
           routerLink: ['/domains', 'detail'],
+          admin: true,
           queryParams: { id: this.idDomain, idOffice: this.idOffice }
         },
         ... await this.getBreadcrumbs(),
@@ -522,6 +532,7 @@ export class DomainLocalityComponent implements OnInit, OnDestroy {
           info: this.propertiesOffice?.name,
           tooltip: this.propertiesOffice?.fullName,
           routerLink: ['/configuration-office'],
+          admin: true,
           queryParams: { idOffice: this.idOffice }
         },
         {
@@ -529,6 +540,7 @@ export class DomainLocalityComponent implements OnInit, OnDestroy {
           info: 'domains',
           tooltip: this.translateSrv.instant('domains'),
           routerLink: ['/domains'],
+          admin: true,
           queryParams: { idOffice: this.idOffice }
         },
         {
@@ -536,6 +548,7 @@ export class DomainLocalityComponent implements OnInit, OnDestroy {
           info: this.propertiesDomain?.name,
           tooltip: this.propertiesDomain?.fullName,
           routerLink: ['/domains', 'detail'],
+          admin: true,
           queryParams: { id: this.idDomain, idOffice: this.idOffice }
         },
         ... await this.getBreadcrumbs(),

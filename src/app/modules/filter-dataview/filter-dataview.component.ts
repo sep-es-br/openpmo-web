@@ -202,6 +202,7 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
       this.breadcrumbSrv.setMenu([...this.currentBreadcrumbItems,
       ...[{
         key: 'filter',
+        admin: true
       }]
       ]);
     }

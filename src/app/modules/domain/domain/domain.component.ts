@@ -137,21 +137,24 @@ export class DomainComponent implements OnInit, OnDestroy {
         info: this.propertiesOffice?.name,
         tooltip: this.propertiesOffice?.fullName,
         routerLink: ['/configuration-office'],
-        queryParams: { idOffice: this.idOffice }
+        queryParams: { idOffice: this.idOffice },
+        admin: true
       },
       {
         key: 'configuration',
         info: 'domains',
         tooltip: this.translateSrv.instant('domains'),
         routerLink: ['/domains'],
-        queryParams: { idOffice: this.idOffice }
+        queryParams: { idOffice: this.idOffice },
+        admin: true
       },
       {
         key: 'domain',
         info: this.propertiesDomain?.name,
         tooltip: this.propertiesDomain?.fullName,
         routerLink: ['/domains', 'detail'],
-        queryParams: { id: this.idDomain, idOffice: this.idOffice }
+        queryParams: { id: this.idDomain, idOffice: this.idOffice },
+        admin: true
       }
     ]);
   }

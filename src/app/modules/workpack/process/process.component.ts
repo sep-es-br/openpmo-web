@@ -218,8 +218,6 @@ export class ProcessComponent implements OnInit, OnDestroy {
       ...breadcrumbItems,
       {
         key: 'process',
-        routerLink: ['/workpack/process'],
-        queryParams: { idWorkpack: this.idWorkpack, idProcess: this.idProcess },
         info: this.process?.name,
         tooltip: this.process?.name
       }
@@ -271,7 +269,8 @@ export class ProcessComponent implements OnInit, OnDestroy {
       priority: this.formProcess.controls.priority.value,
       status: this.formProcess.controls.status.value
     };
-    const result = this.idProcess ? await this.processSrv.put(sender) : await this.processSrv.post(sender);
+    const put = !!this.idProcess;
+    const result =  put ? await this.processSrv.put(sender) : await this.processSrv.post(sender);
 
     if (result.success) {
       this.messageSrv.add({
@@ -280,6 +279,12 @@ export class ProcessComponent implements OnInit, OnDestroy {
         detail: this.translateSrv.instant('messages.savedSuccessfully')
       });
       this.idProcess = result.data.id;
+
+      if (!put) {
+        this.process.name = sender.name;
+        this.setBreadcrumb();
+        
+      };
       this.formIsSaving = false;
     }
   }

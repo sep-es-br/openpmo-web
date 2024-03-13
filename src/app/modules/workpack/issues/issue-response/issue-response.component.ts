@@ -200,13 +200,6 @@ export class IssueResponseComponent implements OnInit {
       },
       {
         key: 'response',
-        routerLink: ['/workpack/issues/response'],
-        queryParams: {
-          idWorkpack: this.idWorkpack,
-          idIssueResponse: this.idIssueResponse,
-          idIssue: this.idIssue,
-          issueName: this.issueName
-        },
         info: this.issueResponse?.name,
         tooltip: this.issueResponse?.name
       }
@@ -237,7 +230,7 @@ export class IssueResponseComponent implements OnInit {
       this.router.navigate(['/workpack/issues'], {
         queryParams: {
           idWorkpack: this.idWorkpack,
-          id: this.idIssue
+          idIssue: this.idIssue
         }
       })
     }

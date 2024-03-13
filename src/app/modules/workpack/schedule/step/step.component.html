@@ -1,7 +1,6 @@
 <div class="app-step">
   <div class="app-content-header" [class.mobile]="responsive">
-    <span *ngIf="this.idStep; else newStepTitle">{{ this.stepDetail?.periodFromStart | date: 'MMMM': 'UTC': currentLang
-      }}</span>
+    <span *ngIf="this.idStep; else newStepTitle">{{ this.stepDetail?.periodFromStart | date: 'MMMM': 'UTC': currentLang }}</span>
     <ng-template #newStepTitle>
       <span>{{ "newMonth" | translate }}</span>
     </ng-template>

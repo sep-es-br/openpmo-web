@@ -5,6 +5,7 @@ export interface IBreadcrumb {
   routerLink?: string[];
   queryParams?: any;
   modelName?: string;
+  admin?: boolean;
 }
 
 export interface IResultBreadcrumb {

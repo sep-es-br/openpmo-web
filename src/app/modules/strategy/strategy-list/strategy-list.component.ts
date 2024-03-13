@@ -108,6 +108,7 @@ export class StrategyListComponent implements OnInit, OnDestroy {
         info: this.propertiesOffice?.name,
         tooltip: this.propertiesOffice?.fullName,
         routerLink: ['/configuration-office'],
+        admin: true,
         queryParams: { idOffice: this.idOffice }
       },
       {
@@ -115,6 +116,7 @@ export class StrategyListComponent implements OnInit, OnDestroy {
         info: 'planModels',
         tooltip: this.translateSrv.instant('planModels'),
         routerLink: ['/strategies'],
+        admin: true,
         queryParams: { idOffice: this.idOffice }
       },
     ]);
@@ -285,6 +287,7 @@ export class StrategyListComponent implements OnInit, OnDestroy {
       key: 'administration',
       info: this.propertiesOffice?.name,
       tooltip: this.propertiesOffice?.fullName,
+      admin: true,
       routerLink: ['/configuration-office'],
       queryParams: { idOffice: this.idOffice }
     },
@@ -292,6 +295,7 @@ export class StrategyListComponent implements OnInit, OnDestroy {
       key: 'configuration',
       info: 'planModels',
       tooltip: this.translateSrv.instant('planModels'),
+      admin: true,
       routerLink: ['/strategies'],
       queryParams: { idOffice: this.idOffice }
     }] : 
@@ -299,6 +303,7 @@ export class StrategyListComponent implements OnInit, OnDestroy {
       key: 'administration',
       info: this.propertiesOffice?.name,
       tooltip: this.propertiesOffice?.fullName,
+      admin: true,
       routerLink: ['/configuration-office'],
       queryParams: { idOffice: this.idOffice }
     },
@@ -306,6 +311,7 @@ export class StrategyListComponent implements OnInit, OnDestroy {
       key: 'configuration',
       info: 'planModels',
       tooltip: this.translateSrv.instant('planModels'),
+      admin: true,
       routerLink: ['/strategies'],
       queryParams: { idOffice: this.idOffice }
     }]

@@ -98,10 +98,12 @@ export class AdministratorComponent implements OnInit, OnDestroy {
       {
         key: 'administrators',
         routerLink: ['/administrators'],
+        admin: true
       },
       {
         key: 'administrator',
         routerLink: ['/administrators/administrator'],
+        admin: true
       },
     ]);
   }

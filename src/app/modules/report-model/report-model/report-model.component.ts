@@ -234,6 +234,7 @@ export class ReportModelComponent implements OnInit {
         info: this.propertiesOffice?.name,
         tooltip: this.propertiesOffice?.fullName,
         routerLink: ['/configuration-office'],
+        admin: true,
         queryParams: { idOffice: this.idOffice }
       },
       {
@@ -241,18 +242,21 @@ export class ReportModelComponent implements OnInit {
         info: 'planModels',
         tooltip: this.translateSrv.instant('planModels'),
         routerLink: ['/strategies'],
+        admin: true,
         queryParams: { idOffice: this.idOffice }
       },
       {
         key: 'planModel',
         info: this.propertiesStrategy?.name,
         tooltip: this.propertiesStrategy?.fullName,
+        admin: true,
         routerLink: ['/strategies', 'strategy'],
         queryParams: { id: this.idStrategy, idOffice: this.idOffice }
       },
       {
         key: 'reportModel',
         info: this.report?.name,
+        admin: true,
         tooltip: this.report?.fullName,
         routerLink: [],
       }

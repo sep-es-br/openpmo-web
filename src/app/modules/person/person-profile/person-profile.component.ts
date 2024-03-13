@@ -241,6 +241,7 @@ export class PersonProfileComponent implements OnInit, OnDestroy {
     this.breadcrumbSrv.setMenu([
       {
         key: 'profile',
+        info: this.propertiesPerson.name,
         routerLink: ['/persons/profile'],
         queryParams: { idOffice: this.idOffice, idPerson: this.idPerson }
       },

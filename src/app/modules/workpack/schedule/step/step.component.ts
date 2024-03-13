@@ -189,7 +189,7 @@ export class StepComponent implements OnInit, OnDestroy {
       ...breadcrumbItems,
       {
         key: 'step',
-        info: ''
+        info: !this.idStep ? '' : moment(this.stepDetail.periodFromStart).format('MMMM')
       }
     ]);
   }

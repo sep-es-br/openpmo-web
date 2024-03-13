@@ -164,12 +164,14 @@ export class StrategyComponent implements OnDestroy {
           info: this.propertiesOffice?.name,
           tooltip: this.propertiesOffice?.fullName,
           routerLink: ['/configuration-office'],
+          admin: true,
           queryParams: { idOffice: this.idOffice }
         },
         {
           key: 'configuration',
           info: 'planModels',
           tooltip: this.translateSrv.instant('planModels'),
+          admin: true,
           routerLink: ['/strategies'],
           queryParams: { idOffice: this.idOffice }
         },
@@ -177,6 +179,7 @@ export class StrategyComponent implements OnDestroy {
           key: 'planModel',
           info: this.propertiesStrategy?.name,
           tooltip: this.propertiesStrategy?.fullName,
+          admin: true,
           routerLink: ['/strategies', 'strategy'],
           queryParams: { id: this.idStrategy, idOffice: this.idOffice }
         }
@@ -446,12 +449,14 @@ export class StrategyComponent implements OnDestroy {
         info: this.propertiesOffice?.name,
         tooltip: this.propertiesOffice?.fullName,
         routerLink: ['/configuration-office'],
+        admin: true,
         queryParams: { idOffice: this.idOffice }
       },
       {
         key: 'configuration',
         info: 'planModels',
         tooltip: this.translateSrv.instant('planModels'),
+        admin: true,
         routerLink: ['/strategies'],
         queryParams: { idOffice: this.idOffice }
       },
@@ -459,6 +464,7 @@ export class StrategyComponent implements OnDestroy {
         key: 'planModel',
         info: this.propertiesStrategy?.name,
         tooltip: this.propertiesStrategy?.fullName,
+        admin: true,
         routerLink: ['/strategies', 'strategy'],
         queryParams: { id: this.idStrategy, idOffice: this.idOffice }
       },
@@ -466,6 +472,7 @@ export class StrategyComponent implements OnDestroy {
         key: 'workpackModel',
         info: workpackModel.modelName,
         tooltip: workpackModel.modelNamePlural,
+        admin: true,
         routerLink: ['/workpack-model'],
         queryParams: { idStrategy: this.idStrategy, id: workpackModel.id, type: workpackModel.type, idOffice: this.idOffice }
       }
@@ -513,6 +520,7 @@ export class StrategyComponent implements OnDestroy {
       this.breadcrumbSrv.updateLastCrumb({
         key: 'planModel',
         routerLink: ['/strategies', 'strategy'],
+        admin: true,
         queryParams: { id: this.idStrategy, idOffice: this.idOffice },
         info: isPut ? this.propertiesStrategy?.name : this.formStrategy.controls.name?.value,
         tooltip: isPut ? this.propertiesStrategy?.fullName : this.formStrategy.controls.fullName?.value,
