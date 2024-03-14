@@ -36,6 +36,7 @@ export interface IMenuWorkpack {
   fullName?: string;
   name: string;
   idPlan?: number;
+  idParent?: number;
   fontIcon: string;
   children: IMenuWorkpack[];
   expanded?: boolean;

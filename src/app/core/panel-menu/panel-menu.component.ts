@@ -441,7 +441,10 @@ export class PanelMenuComponent implements OnInit {
     } else {
       list.forEach(item => {
         item.expanded = false;
-        item.items = item.children;
+        if (item.idParent === id) {
+          item.items = item.children;
+        }
+        
         if (item.items && item.items.length > 0) {
           item.items = this.expandedMenuSelectedItem(item.items, parents, id);
         }
@@ -731,6 +734,7 @@ export class PanelMenuComponent implements OnInit {
         title: workpack.fullName,
         tooltip: workpack.fullName,
         id: workpack.id,
+        idParent: workpack.idParent,
         expanded: false,
         styleClass: `workpack-${workpack.id} ${this.currentURL === `workpack?id=${workpack.id}` ? 'active' : ''}`,
         children,
