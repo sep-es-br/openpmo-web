@@ -159,6 +159,7 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
   async ngOnInit() {
     this.loadCards();
     await this.getAuthServer();
+    this.isUserAdmin = await this.authSrv.isUserAdmin();
     await this.loadWorkpack();
     await this.loadStakeholder();
     this.setBreadcrumb();
@@ -234,8 +235,8 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
         }));
       }
     }
-    const isUserAdmin = await this.authSrv.isUserAdmin();
-    if (isUserAdmin) {
+    
+    if (this.isUserAdmin) {
       this.editPermission = !this.workpack.canceled;
     } else {
       this.editPermission = (this.workpack.permissions && this.workpack.permissions.filter(p => p.level === 'EDIT').length > 0) && !this.workpack.canceled;

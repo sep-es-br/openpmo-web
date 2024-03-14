@@ -126,7 +126,8 @@ export class AdminOfficeConfigComponent implements OnInit {
       },
       {
         typeCardItem: 'listItem',
-        icon: 'fas fa-building',
+        iconSvg: true,
+        icon: IconsEnum.MapMarked,
         nameCardItem: this.translateSvr.instant('domains'),
         fullNameCardItem: this.translateSvr.instant('domains'),
         urlCard: '/domains',
