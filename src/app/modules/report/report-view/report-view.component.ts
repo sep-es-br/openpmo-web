@@ -72,20 +72,19 @@ export class ReportViewComponent implements OnInit, OnDestroy {
     const plan = localStorage.getItem('@currentPlan');
     this.idPlan = plan ? Number(plan) : undefined;
     this.loadPropertiesOffice();
-    this.activeRoute.queryParams.subscribe(async ({ id }) => {
+    this.activeRoute.queryParams.subscribe(async({ id }) => {
       this.idReportModel = +id;
       this.loadReportModel();
     });
     this.responsiveSvr.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.responsive = value);
     this.menuSrv.obsMenuPortfolioItems.pipe(takeUntil(this.$destroy)).subscribe(menuItems => {
-      if (menuItems && menuItems.length > 0 ) this.loadScope(menuItems);
+      if (menuItems && menuItems.length > 0 ) {this.loadScope(menuItems);}
     });
   }
 
   ngOnInit(): void {
-    this.setBreadcrumb();
-
   }
+
   ngOnDestroy(): void {
     this.$destroy.next();
     this.$destroy.complete();
@@ -122,11 +121,12 @@ export class ReportViewComponent implements OnInit, OnDestroy {
       this.loadCardProperties();
       this.instancePropertiesModel();
       this.checkProperties();
+      this.setBreadcrumb();
     }
   }
 
   async loadScope(menuItems: IMenuWorkpack[]) {
-    if (this.reportViewProperties) this.reportViewProperties.isLoading = true;
+    if (this.reportViewProperties) {this.reportViewProperties.isLoading = true;}
     const planStorage = localStorage.getItem('@pmo/propertiesCurrentPlan');
     const planProperties = JSON.parse(planStorage);
     const scopeData = menuItems;
@@ -143,7 +143,7 @@ export class ReportViewComponent implements OnInit, OnDestroy {
       rootNode
     ];
     this.selectedWorkpacks.push(rootNode);
-    if (this.reportViewProperties) this.reportViewProperties.isLoading = false;
+    if (this.reportViewProperties) {this.reportViewProperties.isLoading = false;}
     this.checkProperties();
   }
 
@@ -219,7 +219,8 @@ export class ReportViewComponent implements OnInit, OnDestroy {
     }
 
     if (this.typePropertyModel[propertyModel.type] === TypePropertyModelEnum.SelectionModel) {
-      const listOptions = propertyModel.possibleValues ? (propertyModel.possibleValues as string).split(',').sort((a, b) => a.localeCompare(b)) : [];
+      const listOptions = propertyModel.possibleValues ?
+        (propertyModel.possibleValues as string).split(',').sort((a, b) => a.localeCompare(b)) : [];
       property.possibleValues = listOptions.map(op => ({ label: op, value: op }));
     }
 
@@ -248,7 +249,7 @@ export class ReportViewComponent implements OnInit, OnDestroy {
         }
       }
       if (defaultSelectedLocalities && defaultSelectedLocalities.length > 1) {
-        property.labelButtonLocalitySelected = await Promise.all(defaultSelectedLocalities.map(async (loc) => {
+        property.labelButtonLocalitySelected = await Promise.all(defaultSelectedLocalities.map(async(loc) => {
           const result = await this.localitySrv.GetById(loc);
           if (result.success) {
             return result.data.name;
@@ -352,7 +353,7 @@ export class ReportViewComponent implements OnInit, OnDestroy {
     const result = await this.organizationSrv.GetAll({ 'id-office': this.propertiesOffice.id });
     if (result.success) {
       this.organizationsOffice = result.data;
-      this.organizationsOffice = this.organizationsOffice.sort((a, b) => a.name.localeCompare(b.name))
+      this.organizationsOffice = this.organizationsOffice.sort((a, b) => a.name.localeCompare(b.name));
     }
   }
 
@@ -396,14 +397,14 @@ export class ReportViewComponent implements OnInit, OnDestroy {
           routerLink: ['/reports'],
           queryParams: { idPlan: propertiesPlan.id },
           info: 'reports',
-          tooltip: 'reports'
+          tooltip: this.translateSrv.instant('reports')
         },
         {
           key: 'generateReport',
           routerLink: ['/reports', 'report-view'],
           queryParams: { id: this.idReportModel },
-          info: 'generateReport',
-          tooltip: 'generateReport'
+          info: this.reportModel.name,
+          tooltip: this.reportModel.fullName,
         },
       ]);
     }

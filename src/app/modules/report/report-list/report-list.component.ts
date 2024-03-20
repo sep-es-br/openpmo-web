@@ -1,5 +1,5 @@
 import { takeUntil } from 'rxjs/operators';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Subject } from 'rxjs';
 import { ICard } from 'src/app/shared/interfaces/ICard';
 import { ICardItem } from 'src/app/shared/interfaces/ICardItem';
@@ -11,13 +11,14 @@ import { IReportModel } from 'src/app/shared/interfaces/IReportModel';
 import { ConfigDataViewService } from 'src/app/shared/services/config-dataview.service';
 import { AuthService } from 'src/app/shared/services/auth.service';
 import { Router } from '@angular/router';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-report-list',
   templateUrl: './report-list.component.html',
   styleUrls: ['./report-list.component.scss']
 })
-export class ReportListComponent implements OnInit {
+export class ReportListComponent implements OnInit, OnDestroy {
 
   collapsePanelsStatus = true;
   displayModeAll = 'grid';
@@ -38,7 +39,8 @@ export class ReportListComponent implements OnInit {
     private reportModelSrv: ReportModelService,
     private configDataViewSrv: ConfigDataViewService,
     private authSrv: AuthService,
-    private router: Router
+    private router: Router,
+    private translateSrv: TranslateService
   ) {
     this.responsiveSvr.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.responsive = value);
     this.configDataViewSrv.observableDisplayModeAll.pipe(takeUntil(this.$destroy)).subscribe(displayMode => {
@@ -130,8 +132,8 @@ export class ReportListComponent implements OnInit {
           key: 'action',
           routerLink: ['/reports'],
           queryParams: { idPlan: this.propertiesPlan.id },
-          info: 'action',
-          tooltip: 'action'
+          info: 'reports',
+          tooltip: this.translateSrv.instant('reports')
         },
       ]);
     }
