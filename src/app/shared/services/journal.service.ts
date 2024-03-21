@@ -7,14 +7,14 @@ import { OfficeService } from './office.service';
 import { TreeNode } from 'primeng/api';
 import { IWorkpackData, IWorkpackParams } from '../interfaces/IWorkpackDataParams';
 import { WorkpackService } from './workpack.service';
+import { IHttpResult } from '../interfaces/IHttpResult';
+import { PrepareHttpParams } from '../utils/query.util';
 
 @Injectable({
   providedIn: 'root'
 })
 export class JournalService extends BaseService<IJournal> {
 
-  private resetJournal = new BehaviorSubject<boolean>(false);
-  private resetScope = new BehaviorSubject<boolean>(false);
   workpackData: IWorkpackData;
   workpackParams: IWorkpackParams;
   treeViewScope: TreeNode[] = [];
@@ -29,6 +29,8 @@ export class JournalService extends BaseService<IJournal> {
   hasMore = true;
   hasAll = true;
   loading;
+  private resetJournal = new BehaviorSubject<boolean>(false);
+  private resetScope = new BehaviorSubject<boolean>(false);
 
   constructor(
     @Inject(Injector) injector: Injector,
@@ -88,7 +90,7 @@ export class JournalService extends BaseService<IJournal> {
       hasMore: this.hasMore,
       hasAll: this.hasAll,
       loading: this.loading
-    }
+    };
   }
 
   async loadScope() {
@@ -114,8 +116,8 @@ export class JournalService extends BaseService<IJournal> {
         this.to = params.to ? params.to : this.to;
         this.type = params.type ? params.type : this.type;
         this.scopeName = params.scopeName ? params.scopeName : this.scopeName;
-        this.page = params.page ? params.page : this.page;
-        this.pageSize = params.pageSize ? params.pageSize : this.pageSize;
+        this.page = params.page >= 0 ? params.page : this.page;
+        this.pageSize = params.size ? params.size : this.pageSize;
         this.hasAll = params.hasAll !== undefined ? params.hasAll : this.hasAll;
         this.hasMore = params.hasMore !== undefined ? params.hasMore : this.hasMore;
       }
@@ -133,7 +135,11 @@ export class JournalService extends BaseService<IJournal> {
 
   // busca na api
   async getJournalData() {
-    const { data, success } = await this.GetAll({
+    if (!this.selectedWorkpacks || this.selectedWorkpacks.length === 0) {
+      await this.loadTreeViewScope();
+      this.nextResetScope(true);
+    }
+    const { data, success, pagination } = await this.GetAll({
       idWorkpack: this.workpackData.workpack.id,
       from: this.from,
       to: this.to,
@@ -144,13 +150,10 @@ export class JournalService extends BaseService<IJournal> {
     });
     if (success) {
       this.journalData = this.page > 0 ? this.journalData.concat(data) : data;
-      this.hasMore = data.length > 0 && data.length === this.pageSize;
+      this.hasMore = data.length > 0 && data.length === this.pageSize && this.page < pagination.totalPages - 1;
       this.hasAll = true;
     }
   }
-
-  
-
 
   async loadTreeViewScope() {
     const { data, success } = await this.officeSrv.GetTreeScopePersons(this.workpackParams.idOffice, {

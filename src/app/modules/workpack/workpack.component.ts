@@ -344,7 +344,7 @@ export class WorkpackComponent implements OnDestroy {
     this.baselineSrv.loadBaselines();
     this.processSrv.loadProcesses();
     this.journalSrv.loadJournal();
-    this.journalSrv.loadScope();
+    // this.journalSrv.loadScope();
     this.scheduleSrv.loadSchedule();
     this.workpackSrv.nextResetWorkpack(true);
     if (this.idWorkpack && this.workpackModel) {
@@ -1209,10 +1209,12 @@ export class WorkpackComponent implements OnDestroy {
   }
 
   async deleteWorkpackChildren(workpack) {
-    const result = await this.workpackSrv.delete(workpack);
-    if (result.success) {
-      const workpackModelIndex = this.cardsWorkPackModelChildren
+    const workpackModelIndex = this.cardsWorkPackModelChildren
         .findIndex(workpackModel => workpackModel.idWorkpackModel === workpack.idWorkpackModel);
+    this.cardsWorkPackModelChildren[workpackModelIndex].cardSection.isLoading = true;
+    const result = await this.workpackSrv.delete(workpack);
+    this.cardsWorkPackModelChildren[workpackModelIndex].cardSection.isLoading = false;
+    if (result.success) {
       if (workpackModelIndex > -1) {
         const workpackIndex = this.cardsWorkPackModelChildren[workpackModelIndex].cardItemsSection
           .findIndex(w => w.itemId === workpack.id);

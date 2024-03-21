@@ -129,7 +129,7 @@ export class PlanComponent implements OnInit, OnDestroy {
     });
     this.translateSrv.onLangChange.pipe(takeUntil(this.$destroy)).subscribe(() => {
       setTimeout(() => this.language = this.translateSrv.currentLang, 200);
-    })
+    });
     this.actRouter.queryParams
       .subscribe(({ id, idOffice, idPlanModel }) => {
         this.idOffice = +idOffice;
@@ -163,12 +163,12 @@ export class PlanComponent implements OnInit, OnDestroy {
     this.formPlan.valueChanges
       .pipe(takeUntil(this.$destroy), filter(() => this.formPlan.dirty && this.formPlan.valid))
       .subscribe(() => {
-        this.saveButton.showButton()
+        this.saveButton.showButton();
       });
     this.formPlan.valueChanges
       .pipe(takeUntil(this.$destroy), filter(() => this.formPlan.dirty))
       .subscribe(() => {
-        this.cancelButton.showButton()
+        this.cancelButton.showButton();
       });
 
     localStorage.removeItem('open-pmo:WORKPACK_TABVIEW');
@@ -180,7 +180,7 @@ export class PlanComponent implements OnInit, OnDestroy {
   }
 
   async ngOnInit() {
-    
+
     const today = moment();
     const yearStart = today.year();
     this.yearRange = (yearStart - 10).toString() + ':' + (yearStart + 10).toString();
@@ -235,7 +235,7 @@ export class PlanComponent implements OnInit, OnDestroy {
       isLoading: this.idPlan ? true : false,
       initialStateCollapse: !!this.idPlan
     };
-        
+
     if (this.idPlan) {
       this.planData = await this.planSrv.getCurrentPlan(this.idPlan);
       if (this.planData) {
@@ -272,7 +272,7 @@ export class PlanComponent implements OnInit, OnDestroy {
         });
         return;
       }
-      
+
     } else {
       this.isUserAdmin = await this.authSrv.isUserAdmin();
       if (!this.isUserAdmin) {
@@ -295,7 +295,7 @@ export class PlanComponent implements OnInit, OnDestroy {
       this.formPlan.controls.modelName.disable();
       this.formPlan.controls.modelFullName.disable();
     }
-    
+
     this.setWorkPlanUser();
     await this.loadPropertiesOffice();
   }
@@ -374,7 +374,6 @@ export class PlanComponent implements OnInit, OnDestroy {
         localStorage.setItem('@currentPlan', this.planData.id.toString());
         await this.loadWorkPackModels();
       }
-      this.planData 
       localStorage.setItem('@pmo/propertiesCurrentPlan', JSON.stringify(this.planData));
       this.messageSrv.add({
         severity: 'success',
@@ -450,9 +449,9 @@ export class PlanComponent implements OnInit, OnDestroy {
         return {
           idWorkpackModel: workpackModel.id,
           propertiesCard
-        }
+        };
       });
-      workpackModels.forEach(async (workpackModel, index) => {
+      workpackModels.forEach(async(workpackModel, index) => {
         const resultFilters = await this.filterSrv.getAllFilters(`workpackModels/${workpackModel.id}/workpacks`);
         if (resultFilters.success && Array.isArray(resultFilters.data)) {
           this.cardsPlanWorkPackModels[index].propertiesCard.filters = resultFilters.data;
@@ -514,7 +513,8 @@ export class PlanComponent implements OnInit, OnDestroy {
               disabled: !this.editPermission
             });
           }
-          if (!workpack.canceled && workpack.type === 'Deliverable' && (!workpack.endManagementDate || workpack.endManagementDate === null) && !workpack.linked) {
+          if (!workpack.canceled && workpack.type === 'Deliverable' &&
+          (!workpack.endManagementDate || workpack.endManagementDate === null) && !workpack.linked) {
             menuItems.push({
               label: this.translateSrv.instant('endManagement'),
               icon: 'far fa-stop-circle',
@@ -522,7 +522,8 @@ export class PlanComponent implements OnInit, OnDestroy {
               disabled: !this.editPermission
             });
           }
-          if (!workpack.canceled && workpack.type === 'Deliverable' && (!!workpack.endManagementDate && workpack.endManagementDate !== null) && !workpack.linked) {
+          if (!workpack.canceled && workpack.type === 'Deliverable' &&
+          (!!workpack.endManagementDate && workpack.endManagementDate !== null) && !workpack.linked) {
             menuItems.push({
               label: this.translateSrv.instant('resumeManagement'),
               icon: 'far fa-play-circle',
@@ -541,7 +542,7 @@ export class PlanComponent implements OnInit, OnDestroy {
             menuItems.push({
               label: this.translateSrv.instant('changeControlBoard'),
               icon: 'app-icon ccb-member',
-              command: async (event) => await this.navigateToConfigCCB(workpack.id),
+              command: async(event) => await this.navigateToConfigCCB(workpack.id),
             });
             if (!workpack.pendingBaseline && !workpack.cancelPropose && !!workpack.hasActiveBaseline && !workpack.linked) {
               menuItems.push({
@@ -597,7 +598,8 @@ export class PlanComponent implements OnInit, OnDestroy {
           itemId: workpack.id,
           menuItems,
           urlCard: '/workpack',
-          paramsUrlCard: workpack.linked ? [{ name: 'idPlan', value: this.idPlan }, { name: 'idWorkpackModelLinked', value: workpackModelId }] :
+          paramsUrlCard: workpack.linked ? [{ name: 'idPlan', value: this.idPlan },
+          { name: 'idWorkpackModelLinked', value: workpackModelId }] :
             [{ name: 'idPlan', value: this.idPlan }],
           linked: !!workpack.linked ? true : false,
           shared: workpack.sharedWith,
@@ -673,7 +675,8 @@ export class PlanComponent implements OnInit, OnDestroy {
     const workpackModelCardIndex = this.cardsPlanWorkPackModels.findIndex(card => card.idWorkpackModel === idWorkpackModel);
     if (workpackModelCardIndex > -1) {
       this.cardsPlanWorkPackModels[workpackModelCardIndex].propertiesCard.createNewElementMenuItemsWorkpack = iconMenuItems;
-      const newWorkpackCardIndex = this.cardsPlanWorkPackModels[workpackModelCardIndex].workpackItemCardList.findIndex( card => card.typeCardItem === 'newCardItem' );
+      const newWorkpackCardIndex = this.cardsPlanWorkPackModels[workpackModelCardIndex].workpackItemCardList
+      .findIndex( card => card.typeCardItem === 'newCardItem' );
       if (newWorkpackCardIndex > -1) {
         this.cardsPlanWorkPackModels[workpackModelCardIndex].workpackItemCardList[newWorkpackCardIndex].iconMenuItems = iconMenuItems;
       }
@@ -684,8 +687,8 @@ export class PlanComponent implements OnInit, OnDestroy {
   loadDashboardData(dashboard?, milestone?, risk?) {
      if (!dashboard) {
       return {
-        risk: risk,
-        milestone: milestone
+        risk,
+        milestone
       };
     }
     const dashboardData =  {
@@ -729,8 +732,8 @@ export class PlanComponent implements OnInit, OnDestroy {
         indexValue: dashboard.performanceIndex.schedulePerformanceIndexValue,
         scheduleVariation: dashboard.performanceIndex.schedulePerformanceIndexVariation
       } : null,
-      risk: risk,
-      milestone: milestone
+      risk,
+      milestone
     };
     return dashboardData;
   }
@@ -846,12 +849,10 @@ export class PlanComponent implements OnInit, OnDestroy {
           key: 'pasteConfirm',
           acceptLabel: this.translateSrv.instant('yes'),
           rejectLabel: this.translateSrv.instant('no'),
-          accept: async () => {
+          accept: async() => {
             await this.pasteWorkpack(workpackCuted, idWorkpackModelTo, idPlanTo, idParentTo);
           },
-          reject: () => {
-            return;
-          }
+          reject: () => {}
         });
       } else {
         await this.pasteWorkpack(workpackCuted, idWorkpackModelTo, idPlanTo, idParentTo);
@@ -908,10 +909,12 @@ export class PlanComponent implements OnInit, OnDestroy {
   }
 
   async deleteWorkpack(workpack: IWorkpackListCard, modelCardIndex: number) {
-    const result = await this.workpackSrv.deleteWorkpackCard(workpack, { useConfirm: true });
-    if (result.success) {
-      const workpackModelIndex = this.cardsPlanWorkPackModels
+    const workpackModelIndex = this.cardsPlanWorkPackModels
         .findIndex(workpackModel => workpackModel.idWorkpackModel === workpack.idWorkpackModel);
+    this.cardsPlanWorkPackModels[workpackModelIndex].propertiesCard.isLoading = true;
+    const result = await this.workpackSrv.deleteWorkpackCard(workpack, { useConfirm: true });
+    this.cardsPlanWorkPackModels[workpackModelIndex].propertiesCard.isLoading = false;
+    if (result.success) {
       if (workpackModelIndex > -1) {
         const workpackIndex = this.cardsPlanWorkPackModels[workpackModelIndex].workpackItemCardList
           .findIndex(w => w.itemId === workpack.id);
@@ -963,7 +966,7 @@ export class PlanComponent implements OnInit, OnDestroy {
       this.setBreadcrumbStorage();
       this.router.navigate(['/filter-dataview'], {
         queryParams: {
-          idFilter: idFilter,
+          idFilter,
           entityName: `workpacks`,
           idWorkpackModel,
           idOffice: this.idOffice

@@ -115,7 +115,7 @@ export class WorkpackSectionJournalComponent implements OnInit, OnDestroy {
   }
 
   async ngOnInit() {
-    
+
   }
 
   ngOnDestroy(): void {
@@ -158,8 +158,8 @@ export class WorkpackSectionJournalComponent implements OnInit, OnDestroy {
     });
     this.hasAll = hasAll;
     this.hasMore = hasMore;
-    if (loading) this.isLoading = true;
-    if (!loading) this.buidJournalView();
+    if (loading) {this.isLoading = true;}
+    if (!loading) {this.buidJournalView();}
   }
 
 
@@ -232,7 +232,7 @@ export class WorkpackSectionJournalComponent implements OnInit, OnDestroy {
         icon: iconsJournal[journal.type].icon,
         color: iconsJournal[journal.type].color,
         background: iconsJournal[journal.type].background
-        
+
       };
     });
     this.isLoading = false;
@@ -240,9 +240,9 @@ export class WorkpackSectionJournalComponent implements OnInit, OnDestroy {
 
   formatTitle(information) {
     const previousDate = this.language === 'pt-BR' ? moment(information.previousDate, 'yyyy-MM-DD').format('DD/MM/yyyy') :
-      moment(information.previousDate, 'yyyy-MM-DD').format('yyyy/MM/DD')
+      moment(information.previousDate, 'yyyy-MM-DD').format('yyyy/MM/DD');
     const newDate = this.language === 'pt-BR' ? moment(information.newDate, 'yyyy-MM-DD').format('DD/MM/yyyy') :
-      moment(information.newDate, 'yyyy-MM-DD').format('yyyy/MM/DD')
+      moment(information.newDate, 'yyyy-MM-DD').format('yyyy/MM/DD');
     return `${this.translateSrv.instant('previousDate')}: ${previousDate} - ${this.translateSrv.instant('newDate')}: ${newDate}`;
   }
 
@@ -250,9 +250,7 @@ export class WorkpackSectionJournalComponent implements OnInit, OnDestroy {
     const selected = this.selectedWorkpacks && (this.selectedWorkpacks.length > 1 ?
         this.selectedWorkpacks.length + ' ' + this.translateSrv.instant('selectedItems') :
         this.selectedWorkpacks[0].label);
-    if (selected)  this.formSearch.controls.scopeName.setValue(selected);
-        this.selectedWorkpacks && this.selectedWorkpacks.length === 1 ? this.selectedWorkpacks[0].label : '';
-      this.formSearch.controls.scopeName.setValue(selected);
+    if (selected) {this.formSearch.controls.scopeName.setValue(selected);}
   }
 
   handleDownload(dataurl: string, filename: string, mimeType) {
@@ -266,7 +264,7 @@ export class WorkpackSectionJournalComponent implements OnInit, OnDestroy {
     fetch(dataurl, header)
       .then(response => response.blob())
       .then(blob => {
-        const fileBlob = new Blob([blob], {type: mimeType})
+        const fileBlob = new Blob([blob], {type: mimeType});
         const link = document.createElement('a');
         link.href = URL.createObjectURL(fileBlob);
         link.download = filename;
@@ -315,22 +313,6 @@ export class WorkpackSectionJournalComponent implements OnInit, OnDestroy {
     this.journalData = [];
   }
 
-  private getFrom() {
-    const from = this.formSearch.controls.from.value;
-    if (from) {
-      return moment(from).format('DD/MM/YYYY');
-    }
-    return null;
-  }
-
-  private getTo() {
-    const to = this.formSearch.controls.to.value;
-    if (to) {
-      return moment(to).format('DD/MM/YYYY');
-    }
-    return null;
-  }
-
   handleNewInformation() {
     this.workpackParams = this.workpackSrv.getWorkpackParams();
     this.workpackData = this.workpackSrv.getWorkpackData();
@@ -338,7 +320,23 @@ export class WorkpackSectionJournalComponent implements OnInit, OnDestroy {
       queryParams: {
         idWorkpack: this.workpackData.workpack.id || this.workpackParams.idWorkpack
       }
-    })
+    });
+  }
+
+  getFrom() {
+    const from = this.formSearch.controls.from.value;
+    if (from) {
+      return moment(from).format('DD/MM/YYYY');
+    }
+    return null;
+  }
+
+  getTo() {
+    const to = this.formSearch.controls.to.value;
+    if (to) {
+      return moment(to).format('DD/MM/YYYY');
+    }
+    return null;
   }
 
 }
