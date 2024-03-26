@@ -321,9 +321,11 @@ export class WorkpackComponent implements OnDestroy {
       this.workpackSrv.setEditPermission(true);
     }
     const params = this.workpackSrv.getWorkpackParams();
+    const planProperties = await this.planSrv.getCurrentPlan(this.idPlan);
     this.workpackSrv.setWorkpackParams({
       ...params,
-      idPlan: this.idPlan
+      idPlan: this.idPlan,
+      idOffice: planProperties.idOffice
     });
     if (this.idWorkpack) {
       if (!this.idWorkpackModelLinked) {
@@ -409,9 +411,9 @@ export class WorkpackComponent implements OnDestroy {
   }
 
   async setUnitMeansure() {
-    const unitMeasureWorkpack = this.workpack.properties &&
+    const unitMeasureWorkpack = this.workpack.type === TypeWorkpackEnum.DeliverableModel &&  this.workpack.properties &&
     this.workpack.properties.find(prop => prop.type && prop.type === this.typePropertyModel.UnitSelectionModel);
-    if (unitMeasureWorkpack) {
+    if (unitMeasureWorkpack && unitMeasureWorkpack?.selectedValue) {
       const unitMeasure = await this.unitMeasureSrv.GetById(unitMeasureWorkpack?.selectedValue as number);
       if (unitMeasure.success) {
         this.workpackSrv.setUnitMeansure(unitMeasure.data);
@@ -1598,5 +1600,10 @@ export class WorkpackComponent implements OnDestroy {
     this.isLoading = false;
   }
 
+  showWorkpackId() {
+    const show = this.idWorkpack  && !this.workpackLoading && this.workpackModel &&
+    (!this.showTabview || (!!this.showTabview && (!this.selectedTab || this.selectedTab.key !== 'schedule')));
+    return show;
+  }
 
 }

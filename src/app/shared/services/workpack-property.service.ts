@@ -22,15 +22,15 @@ import { TypeWorkpackModelEnum } from '../enums/TypeWorkpackModelEnum';
 })
 export class WorkpackPropertyService {
 
-  private resetWorkpackProperties = new BehaviorSubject<boolean>(false);
   workpackData: IWorkpackData;
   workpackParams: IWorkpackParams;
   typePropertyModel = TypePropertyModelEnum;
-  properties;
-  backupProperties;
+  properties = [];
+  backupProperties = [];
   organizations;
   domain;
   loading;
+  private resetWorkpackProperties = new BehaviorSubject<boolean>(false);
 
   constructor(
     @Inject(Injector) injector: Injector,
@@ -58,17 +58,19 @@ export class WorkpackPropertyService {
       this.workpackData.workpackModel?.properties?.filter(w => w.active);
     if (workpackModelActivesProperties && workpackModelActivesProperties
       .filter(prop => this.typePropertyModel[prop.type] === TypePropertyModelEnum.OrganizationSelectionModel).length > 0) {
-      await this.loadOrganizationsOffice(this.workpackParams.idOfficeOwnerWorkpackLinked ? this.workpackParams.idOfficeOwnerWorkpackLinked : this.workpackParams.idOffice);
+      await this.loadOrganizationsOffice(this.workpackParams.idOfficeOwnerWorkpackLinked ?
+        this.workpackParams.idOfficeOwnerWorkpackLinked : this.workpackParams.idOffice);
     }
-    const propertiesEntity = [this.loadProperty('name', TypePropertyModelEnum.TextModel), this.loadProperty('fullName', TypePropertyModelEnum.TextAreaModel)];
+    const propertiesEntity =
+      [this.loadProperty('name', TypePropertyModelEnum.TextModel), this.loadProperty('fullName', TypePropertyModelEnum.TextAreaModel)];
     if (this.workpackData.workpackModel.type === TypeWorkpackModelEnum.MilestoneModel) {
       propertiesEntity.push(this.loadProperty('date', TypePropertyModelEnum.DateModel));
     }
     if (workpackModelActivesProperties && workpackModelActivesProperties.length > 0) {
-      const propertiesByModel = await Promise.all(workpackModelActivesProperties.filter(prop => prop.session !== 'COST').map(p => this.instanceProperty(p)));
+      const propertiesByModel = await Promise.all(workpackModelActivesProperties
+        .filter(prop => prop.session !== 'COST').map(p => this.instanceProperty(p)));
       propertiesByModel.sort((a, b) => a.sortIndex < b.sortIndex ? -1 : 0);
-      const propertiesList = [...this.properties, ...propertiesByModel];
-      this.properties = [...propertiesEntity, ...propertiesList];
+      this.properties = [...propertiesEntity, ...propertiesByModel];
     } else {
       this.properties = [...propertiesEntity];
     }
@@ -77,13 +79,13 @@ export class WorkpackPropertyService {
     this.nextResetWorkpackProperties(true);
   }
 
-  getPropertiesData() {
+  async getPropertiesData() {
     return {
       workpackData: this.workpackData,
       workpackParams: this.workpackParams,
       properties: this.properties,
       loading: this.loading
-    }
+    };
   }
 
   saveChangesProperties() {
@@ -174,7 +176,8 @@ export class WorkpackPropertyService {
       property.value = this.workpackData.workpack && this.workpackData.workpack[name];
     }
     // load properties milestone reference baseline
-    if ((name === 'date' || name === 'name') && this.workpackData.workpack && this.workpackData.workpack.type === TypeWorkpackEnum.MilestoneModel) {
+    if ((name === 'date' || name === 'name') &&
+      this.workpackData.workpack && this.workpackData.workpack.type === TypeWorkpackEnum.MilestoneModel) {
       const milestoneData = {
         baselineDate: this.workpackData?.workpack.baselineDate,
         milestoneStatus: this.workpackData?.workpack.milestoneStatus,
@@ -188,7 +191,8 @@ export class WorkpackPropertyService {
 
   async instanceProperty(propertyModel: IWorkpackModelProperty, group?: IWorkpackProperty): Promise<PropertyTemplateModel> {
     const property = new PropertyTemplateModel();
-    const propertyWorkpack = !group ? this.workpackData.workpack && this.workpackData.workpack?.properties && this.workpackData.workpack.properties.find(wp => wp.idPropertyModel === propertyModel.id) :
+    const propertyWorkpack = !group ? this.workpackData.workpack &&
+      this.workpackData.workpack?.properties && this.workpackData.workpack.properties.find(wp => wp.idPropertyModel === propertyModel.id) :
       group.groupedProperties.find(gp => gp.idPropertyModel === propertyModel.id);
 
     property.id = propertyWorkpack && propertyWorkpack.id;
@@ -227,7 +231,8 @@ export class WorkpackPropertyService {
     }
 
     if (this.typePropertyModel[propertyModel.type] === TypePropertyModelEnum.SelectionModel) {
-      const listOptions = propertyModel.possibleValues ? (propertyModel.possibleValues as string).split(',').sort((a, b) => a.localeCompare(b)) : [];
+      const listOptions = propertyModel.possibleValues ?
+      (propertyModel.possibleValues as string).split(',').sort((a, b) => a.localeCompare(b)) : [];
       property.possibleValues = listOptions.map(op => ({ label: op, value: op }));
     }
 
@@ -271,7 +276,6 @@ export class WorkpackPropertyService {
       property.possibleValuesIds = this.organizations
         .filter(org => !propertyModel.sectors || (propertyModel.sectors && propertyModel.sectors.includes(org.sector.toLowerCase())))
         .map(d => ({ label: d.name, value: d.id }));
-      (this.workpackParams.idOfficeOwnerWorkpackLinked ? this.workpackParams.idOfficeOwnerWorkpackLinked : this.workpackParams.idOffice);
       if (propertyModel.multipleSelection) {
         property.selectedValues = propertyWorkpack?.selectedValues ? propertyWorkpack?.selectedValues : propertyModel.defaults as number[];
       }
@@ -283,7 +287,8 @@ export class WorkpackPropertyService {
     }
     if (this.typePropertyModel[propertyModel.type] === TypePropertyModelEnum.UnitSelectionModel) {
       property.possibleValuesIds = await this.loadUnitMeasuresOffice
-        (!!this.workpackParams.idOfficeOwnerWorkpackLinked ? this.workpackParams.idOfficeOwnerWorkpackLinked : this.workpackParams.idOffice);
+        (!!this.workpackParams.idOfficeOwnerWorkpackLinked ?
+          this.workpackParams.idOfficeOwnerWorkpackLinked : this.workpackParams.idOffice);
       property.selectedValue = propertyWorkpack?.selectedValue ? propertyWorkpack?.selectedValue : propertyModel.defaults as number;
       property.defaults = propertyModel.defaults as number;
     }
@@ -338,7 +343,7 @@ export class WorkpackPropertyService {
       }
       return { label: locality.name, data: locality.id, selectable };
     });
-    list.sort((a, b) => a.label.localeCompare(b.label))
+    list.sort((a, b) => a.label.localeCompare(b.label));
     if (selectable && multipleSelection) {
       this.addSelectAllNode(list, localityList, selectable);
     }
@@ -367,7 +372,7 @@ export class WorkpackPropertyService {
       const result = await this.organizationSrv.GetAll({ 'id-office': idOffice });
       if (result.success) {
         this.organizations = result.data;
-        this.organizations = this.organizations.sort((a, b) => a.name.localeCompare(b.name))
+        this.organizations = this.organizations.sort((a, b) => a.name.localeCompare(b.name));
       }
     }
   }

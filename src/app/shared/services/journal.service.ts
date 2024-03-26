@@ -100,7 +100,6 @@ export class JournalService extends BaseService<IJournal> {
       !this.workpackData.workpack.canceled && !!this.workpackData.workpackModel &&
       !!this.workpackData.workpackModel.journalManagementSessionActive) {
       await this.loadTreeViewScope();
-      this.nextResetScope(true);
       }
   }
 
@@ -111,7 +110,8 @@ export class JournalService extends BaseService<IJournal> {
     if (!!this.workpackData.workpack && !!this.workpackData.workpack.id  && !!this.workpackData.workpackModel &&
       !!this.workpackData.workpackModel.journalManagementSessionActive) {
       if (params) {
-        this.selectedWorkpacks = params.selectedWorkpacks ? params.selectedWorkpacks : this.selectedWorkpacks;
+        this.selectedWorkpacks =
+          params.selectedWorkpacks ? params.selectedWorkpacks : this.selectedWorkpacks;
         this.from = params.from ? params.from : this.from;
         this.to = params.to ? params.to : this.to;
         this.type = params.type ? params.type : this.type;
@@ -124,13 +124,28 @@ export class JournalService extends BaseService<IJournal> {
       if (this.workpackData && this.workpackData.workpackModel && this.workpackData.workpackModel.journalManagementSessionActive) {
         await this.getJournalData();
         this.loading = false;
+        this.nextResetScope(true);
         this.nextResetJournal(true);
       }
     } else {
       this.loading = false;
+      this.nextResetScope(true);
       this.nextResetJournal(true);
     }
 
+  }
+
+  loadWorkpacksSelecteds(selectedWorkpacks) {
+    let scope = [...this.selectedWorkpacks];
+    const scopeSelected = [...scope];
+    scopeSelected.forEach(item => {
+      if (item.children) {
+        const children = item.children.map(child => child.data);
+        scope = scope.filter(itemScope => !children.includes(itemScope.data));
+      }
+    });
+    scope = scope.map(item => item.data);
+    return scope;
   }
 
   // busca na api
@@ -144,7 +159,7 @@ export class JournalService extends BaseService<IJournal> {
       from: this.from,
       to: this.to,
       type: this.type.join(','),
-      scope: this.selectedWorkpacks.map(node => node.data).join(','),
+      scope: this.loadWorkpacksSelecteds(this.selectedWorkpacks).join(','),
       page: this.page,
       size: this.pageSize
     });
@@ -165,6 +180,9 @@ export class JournalService extends BaseService<IJournal> {
       const treeWorkpackCurrent = this.findTreeWorkpack(this.workpackData.workpack.id, treePlan) as any;
       this.treeViewScope = this.loadTreeNodeWorkpacks([{ ...treeWorkpackCurrent }]);
       this.selectedWorkpacks = this.setSelectedNodes(this.treeViewScope);
+      this.scopeName = this.selectedWorkpacks && (this.selectedWorkpacks.length > 1 ?
+        this.selectedWorkpacks.length + ' ' + this.translateSrv.instant('selectedItems') :
+        this.selectedWorkpacks[0].label);
     }
   }
 

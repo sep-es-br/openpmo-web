@@ -232,7 +232,7 @@
     </div>
   </div>
 
-  <div class="id-container" *ngIf="idWorkpack  && !workpackLoading && workpackModel && (!showTabview || (!!showTabview && selectedTab && selectedTab.key !== 'schedule'))">
+  <div class="id-container" *ngIf="showWorkpackId()">
     <span>{{idWorkpack}}</span>
   </div>
 
