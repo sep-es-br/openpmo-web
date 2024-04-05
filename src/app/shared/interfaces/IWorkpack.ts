@@ -67,37 +67,38 @@ export interface IWorkpackListCard {
     milestoneStatus?: string;
     dashboard?: IWorkpackDashboard;
     risk?: {
-      high: number,
-      low: number,
-      medium: number,
-      total: number
-    },
-    milestone?: IMilestoneDashboard,
+      high: number;
+      low: number;
+      medium: number;
+      total: number;
+    };
+    milestone?: IMilestoneDashboard;
     idWorkpackModel?: number; // only screen
     idParent?: number; // only screen
     idPlan?: number; //only screen
     idOffice?: number; //only screen
+    plan?: IPlan;
     reason?: string; // only to screen
     // dashboardData is only screen
     dashboardData?: {
       risk?: {
-        high: number,
-        low: number,
-        medium: number,
-        total: number
-      },
-      milestone?: IMilestoneDashboard,
-      tripleConstraint?: ITripleConstraintDashboard,
+        high: number;
+      low: number;
+      medium: number;
+      total: number;
+      };
+      milestone?: IMilestoneDashboard;
+      tripleConstraint?: ITripleConstraintDashboard;
       costPerformanceIndex: {
-        costVariation: number,
-        indexValue: number
-      },
+        costVariation: number;
+        indexValue: number;
+      };
       schedulePerformanceIndex: {
-        indexValue: number,
-        scheduleVariation: number
-      },
+        indexValue: number;
+        scheduleVariation: number;
+      };
       earnedValue?: number;
-    },
+    };
     journalInformation?: IWorkpackJournalInformation;
 }
 
@@ -129,7 +130,7 @@ interface IWorkpackDashboard {
     costPerformanceIndexValue: number;
     costPerformanceIndexVariation: number;
     schedulePerformanceIndexValue: number;
-    schedulePerformanceIndexVariation: number
+    schedulePerformanceIndexVariation: number;
   };
   earnedValue?: number;
 }

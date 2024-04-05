@@ -74,6 +74,6 @@ export class StakeholderRoleCardItemComponent implements OnInit, OnDestroy {
   }
 
   deleteRole() {
-    this.roleDeleted.next()
+    this.roleDeleted.next();
   }
 }

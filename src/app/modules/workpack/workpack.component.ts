@@ -801,7 +801,7 @@ export class WorkpackComponent implements OnDestroy {
     const workpackCuted = this.workpackSrv.getWorkpackCuted();
     if (workpackCuted) {
       const { canPaste, incompatiblesProperties } = await this.checkPasteWorkpack(workpackCuted, idWorkpackModel);
-      const validPasteOutherOffice = workpackCuted.idOffice === this.idOffice ? true : this.isUserAdmin;
+      const validPasteOutherOffice = workpackCuted.plan.idOffice === this.idOffice ? true : this.isUserAdmin;
       if (canPaste && validPasteOutherOffice) {
         iconMenuItems.push({
           label: `${this.translateSrv.instant('paste')} ${workpackCuted.name}`,

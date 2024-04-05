@@ -1,7 +1,7 @@
 import {IMeasureUnit} from './../interfaces/IMeasureUnit';
 import {IWorkpackData, IWorkpackParams} from './../interfaces/IWorkpackDataParams';
 import {Injectable, Inject, Injector} from '@angular/core';
-import {BehaviorSubject, Observable} from 'rxjs';
+import {BehaviorSubject} from 'rxjs';
 import {BaseService} from '../base/base.service';
 import {StoreKeys} from '../constants';
 import {IHttpResult} from '../interfaces/IHttpResult';
@@ -24,11 +24,9 @@ export class WorkpackService extends BaseService<IWorkpack> {
   private workpackParams: IWorkpackParams;
   private editPermission: boolean;
   private unitMeansure: IMeasureUnit;
-  
 
   constructor(
-    @Inject(Injector) injector: Injector,
-   
+    @Inject(Injector) injector: Injector
   ) {
     super('workpack', injector);
   }
@@ -63,7 +61,7 @@ export class WorkpackService extends BaseService<IWorkpack> {
   }
 
   nextCanEditCheckCompleted(nextValue: boolean) {
-    this.canEditCheckCompleted.next(nextValue)
+    this.canEditCheckCompleted.next(nextValue);
   }
 
   get observableCheckCompletedChanged() {
@@ -119,12 +117,14 @@ export class WorkpackService extends BaseService<IWorkpack> {
   }
 
   public async GetWorkpackDataById(idWorkpack: number, options?): Promise<IHttpResult<IWorkpack>> {
-    const result = await this.http.get<IHttpResult<IWorkpack>>(`${this.urlBase}/${idWorkpack}`, {params: PrepareHttpParams(options)}).toPromise();
+    const result = await this.http.get<IHttpResult<IWorkpack>>(`${this.urlBase}/${idWorkpack}`,
+    {params: PrepareHttpParams(options)}).toPromise();
     return result as IHttpResult<IWorkpack>;
   }
 
   public async GetWorkpackListCards(options?): Promise<IHttpResult<IWorkpackListCard[]>> {
-    const result = await this.http.get<IHttpResult<IWorkpackListCard[]>>(`${this.urlBase}`, {params: PrepareHttpParams(options)}).toPromise();
+    const result = await this.http.get<IHttpResult<IWorkpackListCard[]>>(`${this.urlBase}`,
+    {params: PrepareHttpParams(options)}).toPromise();
     if (!result.data?.length) {
       result.data = [];
     }
@@ -223,7 +223,7 @@ export class WorkpackService extends BaseService<IWorkpack> {
     endManagementWorkpack: {
       idWorkpack: number;
       reason: string;
-      endManagementDate: string
+      endManagementDate: string;
     }): Promise<IHttpResult<any>> {
     const result = await this.http.patch(`${this.urlBase}/end-deliverable-management/${endManagementWorkpack.idWorkpack}`,
       {endManagementDate: endManagementWorkpack.endManagementDate, reason: endManagementWorkpack.reason}).toPromise();
@@ -238,7 +238,7 @@ export class WorkpackService extends BaseService<IWorkpack> {
 
   async patchMilestoneReason(idMilestone: number, dateReason: {
     date: string;
-    reason?: string
+    reason?: string;
   }): Promise<IHttpResult<any>> {
     const result = await this.http.patch(`${this.urlBase}/milestone/${idMilestone}`, {
       date: dateReason.date,
@@ -247,19 +247,20 @@ export class WorkpackService extends BaseService<IWorkpack> {
     return result as IHttpResult<any>;
   }
 
-  public async deleteWorkpackCard(model: IWorkpackListCard, options?: { message?: string; field?: string; useConfirm?: boolean }): Promise<IHttpResult<IWorkpackListCard>> {
+  public async deleteWorkpackCard(model: IWorkpackListCard, options?:
+  { message?: string; field?: string; useConfirm?: boolean }): Promise<IHttpResult<IWorkpackListCard>> {
     const message = options?.message;
     const field: string = options?.field;
     const useConfirm: boolean = options?.useConfirm || true;
 
-    return new Promise(async (resolve, reject) => {
+    return new Promise(async(resolve, reject) => {
       if (useConfirm) {
         this.confirmationSrv.confirm({
           message: message || `${this.translateSrv.instant('messages.deleteConfirmation')} ${model[field ? field : 'name'] || ''}?`,
           key: 'deleteConfirm',
           acceptLabel: this.translateSrv.instant('yes'),
           rejectLabel: this.translateSrv.instant('no'),
-          accept: async () => {
+          accept: async() => {
             const result = await this.http.delete<IHttpResult<IWorkpackListCard>>(`${this.urlBase}/${model['id']}`).toPromise();
             if (result.success) {
               setTimeout(() => {
@@ -283,9 +284,6 @@ export class WorkpackService extends BaseService<IWorkpack> {
     });
   }
   /* eslint-enable @typescript-eslint/dot-notation */
-
-
-  
 
 }
 
