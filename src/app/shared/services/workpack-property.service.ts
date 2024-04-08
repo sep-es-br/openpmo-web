@@ -193,7 +193,7 @@ export class WorkpackPropertyService {
     const property = new PropertyTemplateModel();
     const propertyWorkpack = !group ? this.workpackData.workpack &&
       this.workpackData.workpack?.properties && this.workpackData.workpack.properties.find(wp => wp.idPropertyModel === propertyModel.id) :
-      group.groupedProperties.find(gp => gp.idPropertyModel === propertyModel.id);
+      group.groupedProperties && group.groupedProperties.find(gp => gp.idPropertyModel === propertyModel.id);
 
     property.id = propertyWorkpack && propertyWorkpack.id;
     property.idPropertyModel = propertyModel.id;
