@@ -1,5 +1,5 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { ICard, progressBarValue } from 'src/app/shared/interfaces/ICard';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ICard } from 'src/app/shared/interfaces/ICard';
 import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
 import { ConfigDataViewService } from 'src/app/shared/services/config-dataview.service';
 import { ReportModelService } from 'src/app/shared/services/report-model.service';
@@ -41,7 +41,7 @@ import { CancelButtonComponent } from 'src/app/shared/components/cancel-button/c
   templateUrl: './report-model.component.html',
   styleUrls: ['./report-model.component.scss']
 })
-export class ReportModelComponent implements OnInit {
+export class ReportModelComponent implements OnInit, OnDestroy {
 
   @ViewChild(SaveButtonComponent) saveButton: SaveButtonComponent;
   @ViewChild(CancelButtonComponent) cancelButton: CancelButtonComponent;
@@ -63,7 +63,7 @@ export class ReportModelComponent implements OnInit {
     initialStateToggle: false,
     cardTitle: 'jrxmlSourceFiles',
     collapseble: true
-  }
+  };
   cardItemsFiles: ICardItem[] = [];
   resetCardItemsFiles: ICardItem[] = [];
   propertiesOffice: IOffice;
@@ -151,10 +151,10 @@ export class ReportModelComponent implements OnInit {
       .subscribe(() => this.saveButton?.hideButton());
     this.formReport.valueChanges
       .pipe(takeUntil(this.$destroy), filter(() => this.formReport.dirty && this.formReport.valid))
-      .subscribe(() => { this.saveButton.showButton() });
+      .subscribe(() => { this.saveButton.showButton();});
     this.formReport.valueChanges
       .pipe(takeUntil(this.$destroy), filter(() => this.formReport.dirty && this.formReport.valid))
-      .subscribe(() => { this.cancelButton.showButton() });
+      .subscribe(() => { this.cancelButton.showButton();});
     this.translateSrv.onLangChange
       .pipe(takeUntil(this.$destroy)).subscribe(({ lang }) => {
         this.currentLang = lang;
@@ -163,7 +163,7 @@ export class ReportModelComponent implements OnInit {
         }, 250);
       });
     this.responsiveSvr.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.responsive = value);
-    this.activeRoute.queryParams.subscribe(async ({ idStrategy, id, idOffice }) => {
+    this.activeRoute.queryParams.subscribe(async({ idStrategy, id, idOffice }) => {
       this.idStrategy = +idStrategy;
       this.idReport = +id;
       this.idOffice = +idOffice;
@@ -196,12 +196,10 @@ export class ReportModelComponent implements OnInit {
   }
 
   setPreferredFormatOptions() {
-    this.preferredFormatOptions = Object.keys(ReportPreferredFormatEnum).map(key => {
-      return {
-        label: key,
-        value: key
-      };
-    });
+    this.preferredFormatOptions = Object.keys(ReportPreferredFormatEnum).map(key => ({
+      label: key,
+      value: key
+    }));
   }
 
   async checkPermissions() {
@@ -319,7 +317,7 @@ export class ReportModelComponent implements OnInit {
         itemId: file.id,
         main: file.main,
         menuItems
-      }
+      };
     });
 
     if (this.isUserAdmin) {
@@ -329,10 +327,11 @@ export class ReportModelComponent implements OnInit {
         icon: IconsEnum.ArrowUp,
       });
     }
-    this.resetCardItemsFiles = this.cardItemsFiles.filter( file => file.itemId || file.typeCardItem === 'newCardItem').map(cardItem => ({ ...cardItem }));
+    this.resetCardItemsFiles = this.cardItemsFiles.filter( file => file.itemId ||
+      file.typeCardItem === 'newCardItem').map(cardItem => ({ ...cardItem }));
     setTimeout(() => {
       this.cardFiles.isLoading = false;
-    }, 300)
+    }, 300);
   }
 
   async handleSetAsMain(idFile) {
@@ -356,7 +355,7 @@ export class ReportModelComponent implements OnInit {
         } else {
           card.main = false;
         }
-      })
+      });
     }
   }
 
@@ -402,10 +401,14 @@ export class ReportModelComponent implements OnInit {
     }
   }
 
+  mirrorFullName(): boolean {
+    return (isNaN(this.idReport) && this.formReport && this.formReport.controls.fullName.pristine);
+  }
+
   async loadPropertiesParams() {
     const properties = this.report.paramModels;
     const dataPropertiesAndIndex = (await Promise.all(properties
-      .map(async (p, i) => {
+      .map(async(p, i) => {
         if (p.possibleValues) {
           p.possibleValuesOptions = (p.possibleValues as string).split(',');
         }
@@ -489,7 +492,7 @@ export class ReportModelComponent implements OnInit {
       this.saveButton?.hideButton();
       return;
     }
-    let showButton = true;
+    const showButton = true;
     if (showButton) {
       this.saveButton?.showButton();
       return;
@@ -595,10 +598,12 @@ export class ReportModelComponent implements OnInit {
         }
         if (event.property.multipleSelection) {
           const selectedLocality = event.property.extraListDefaults as TreeNode[];
-          event.property.defaults = selectedLocality.filter(local => local.data && !local.data.toString().includes('SELECTALL')).map(l => l.data);
+          event.property.defaults = selectedLocality
+          .filter(local => local.data && !local.data.toString().includes('SELECTALL')).map(l => l.data);
           if (selectedLocality.length > 1) {
             event.property.selectedLocalities =
-              `${selectedLocality.filter(local => local.data && !local.data.toString().includes('SELECTALL')).length} ${this.translateSrv.instant('selectedsLocalities')}`;
+              `${selectedLocality.filter(local => local.data
+                && !local.data.toString().includes('SELECTALL')).length} ${this.translateSrv.instant('selectedsLocalities')}`;
             event.property.showIconButtonSelectLocality = false;
           } else {
             event.property.selectedLocalities = selectedLocality.length > 0 ?
@@ -667,7 +672,7 @@ export class ReportModelComponent implements OnInit {
       }
       return { label: locality.name, data: locality.id, selectable };
     });
-    list.sort((a, b) => a.label < b.label ? -1 : 0)
+    list.sort((a, b) => a.label < b.label ? -1 : 0);
     if (selectable && multipleSelection) {
       this.addSelectAllNode(list, localityList, selectable);
     }
@@ -817,7 +822,7 @@ export class ReportModelComponent implements OnInit {
     this.files = [
       ...sendedFiles,
       ...await Promise.all(
-        sendFiles.map(async (fileUploaded) => {
+        sendFiles.map(async(fileUploaded) => {
           const file = await fetch(fileUploaded.url.changingThisBreaksApplicationSecurity);
           const formData: FormData = new FormData();
           const blob = await file.blob();
@@ -874,7 +879,7 @@ export class ReportModelComponent implements OnInit {
   }
 
   showButtonCompile() {
-    return this.idReport && this.report && this.files && this.files.length > 0 && this.files.filter(file => !file.id).length === 0
+    return this.idReport && this.report && this.files && this.files.length > 0 && this.files.filter(file => !file.id).length === 0;
   }
 
   async changedActiveStatus(event) {
@@ -886,7 +891,8 @@ export class ReportModelComponent implements OnInit {
       this.messageSrv.add({
         severity: 'success',
         summary: this.translateSrv.instant('success'),
-        detail: active ? this.translateSrv.instant('messages.activedSuccessfully') : this.translateSrv.instant('messages.inactivedSuccessfully')
+        detail: active ? this.translateSrv.instant('messages.activedSuccessfully')
+          : this.translateSrv.instant('messages.inactivedSuccessfully')
       });
     }
   }

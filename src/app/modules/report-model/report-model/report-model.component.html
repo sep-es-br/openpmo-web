@@ -43,7 +43,7 @@
           </div>
           <span class="p-float-label margin-top">
             <textarea pInputTextarea formControlName="fullName" class="app-text-area" rows="1"
-              [ngModel]="(formReport.touched) ? formReport.value.fullName : formReport.value.name">
+            [ngModel]="(mirrorFullName()) ? formReport?.value?.name : formReport?.value?.fullName">
               </textarea>
             <label for="float-input" class="app-input-label">{{'fullName' | translate}}<span
                 class="required-indicator">*</span>
@@ -120,5 +120,5 @@
     <app-save-button (save)="handleOnSubmit()" *ngIf="isUserAdmin"></app-save-button>
     <app-cancel-button (cancel)="handleOnCancel()"></app-cancel-button>
   </app-buttons-container>
- 
+
 </div>
