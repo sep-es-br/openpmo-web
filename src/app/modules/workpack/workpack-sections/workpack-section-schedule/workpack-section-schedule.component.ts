@@ -70,7 +70,7 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
     private messageSrv: MessageService,
     private dashboardSrv: DashboardService
   ) {
-    
+
     this.workpackShowTabviewSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => {
       this.showTabview = value;
     });
@@ -126,11 +126,11 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
     });
     this.sectionActive = workpackData && !!workpackData.workpack && !!workpackData.workpack.id  &&
       workpackData.workpackModel && workpackData.workpackModel.scheduleSessionActive;
-    if (!loading) this.loadScheduleSession();
+    if(!loading) {this.loadScheduleSession();}
   }
 
   async loadScheduleSession() {
-    if (!this.sectionActive) return;
+    if(!this.sectionActive) {return;}
     this.editPermission = this.workpackSrv.getEditPermission();
     this.unitMeansure = this.workpackSrv.getUnitMeansure();
     if (this.schedule && this.schedule.groupStep) {
@@ -229,7 +229,8 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
       const finalDatePlanned = moment(endDate);
       const daysToPlanned = finalDatePlanned.diff(initialDatePlanned, 'days');
       const dateActual = moment(new Date());
-      const daysToNow = finalDatePlanned.isSameOrBefore(dateActual) ? finalDatePlanned.diff(initialDatePlanned, 'days') : dateActual.diff(initialDatePlanned, 'days');
+      const daysToNow = finalDatePlanned.
+        isSameOrBefore(dateActual) ? finalDatePlanned.diff(initialDatePlanned, 'days') : dateActual.diff(initialDatePlanned, 'days');
       const baselineStartDate = this.schedule && new Date(this.schedule.baselineStart + 'T00:00:00');
       const baselineEndDate = this.schedule && new Date(this.schedule.baselineEnd + 'T00:00:00');
       const baselineDaysPlanned = moment(baselineEndDate).diff(moment(baselineStartDate), 'days');
@@ -341,7 +342,7 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
         initialStateCollapse: this.showTabview ? false : this.collapsePanelsStatus,
       }
     };
-    
+
   }
 
   async handleNewSchedule() {
@@ -369,7 +370,8 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
   }
 
   async handleDeleteSchedule() {
-    const result = await this.scheduleSrv.DeleteSchedule(this.schedule.id, { useConfirm: true, message: this.translateSrv.instant('messages.deleteScheduleConfirmation') });
+    const result = await this.scheduleSrv
+      .DeleteSchedule(this.schedule.id, { useConfirm: true, message: this.translateSrv.instant('messages.deleteScheduleConfirmation') });
     if (result.success) {
       this.schedule = null;
       this.sectionSchedule.groupStep = null;
@@ -385,7 +387,7 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
       ['workpack/schedule/step'],
       {
         queryParams: {
-          idStep: idStep,
+          idStep,
           stepType,
           unitName,
           unitPrecision,
@@ -408,7 +410,7 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
       this.changedSteps.push({
         changedGroupYear: groupYear,
         changedIdStep: idStep
-      })
+      });
     }
     this.workpackSrv.nextPendingChanges(true);
     this.saveButton.showButton();
@@ -424,32 +426,25 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
       this.saveButton.hideButton();
       return;
     }
-    const groupIndex = this.sectionSchedule.groupStep.findIndex(group => group.cardItemSection.filter(item => item.idStep === idStep).length > 0);
+    const groupIndex = this.sectionSchedule.groupStep.findIndex(group =>
+      group.cardItemSection.filter(item => item.idStep === idStep).length > 0);
     if (groupIndex > -1) {
       // atualizando a progressBar de custo do ano
       this.sectionSchedule.groupStep[groupIndex].groupProgressBar.forEach(group => {
         if (group.valueUnit === 'currency') {
           const groupTotalCost = this.sectionSchedule.groupStep[groupIndex].cardItemSection.filter(card => card.type === 'listStep')
-            .reduce((total, step) => {
-              return total + (step.costPlanned ? step.costPlanned : 0)
-            }, 0);
+            .reduce((total, step) => total + (step.costPlanned ? step.costPlanned : 0), 0);
           group.total = groupTotalCost;
           const groupProgressCost = this.sectionSchedule.groupStep[groupIndex].cardItemSection.filter(card => card.type === 'listStep')
-            .reduce((total, step) => {
-              return total + (step.costActual ? step.costActual : 0)
-            }, 0);
+            .reduce((total, step) => total + (step.costActual ? step.costActual : 0), 0);
           group.progress = groupProgressCost;
         }
         if (group.valueUnit !== 'currency' && group.valueUnit !== 'time') {
           const groupTotalUnit = this.sectionSchedule.groupStep[groupIndex].cardItemSection.filter(card => card.type === 'listStep')
-            .reduce((total, step) => {
-              return total + (step.unitPlanned ? step.unitPlanned : 0)
-            }, 0);
+            .reduce((total, step) => total + (step.unitPlanned ? step.unitPlanned : 0), 0);
           group.total = groupTotalUnit;
           const groupProgressUnit = this.sectionSchedule.groupStep[groupIndex].cardItemSection.filter(card => card.type === 'listStep')
-            .reduce((total, step) => {
-              return total + (step.unitActual ? step.unitActual : 0)
-            }, 0);
+            .reduce((total, step) => total + (step.unitActual ? step.unitActual : 0), 0);
           group.progress = groupProgressUnit;
         }
       });
@@ -465,13 +460,16 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
         return total + (progressBarCost ? progressBarCost.progress : 0);
       }, 0);
     });
-    this.sectionSchedule.cardSection.progressBarValues.filter(progress => progress.valueUnit !== 'currency' && progress.valueUnit !== 'time').forEach((section, index) => {
+    this.sectionSchedule.cardSection.progressBarValues
+      .filter(progress => progress.valueUnit !== 'currency' && progress.valueUnit !== 'time').forEach((section, index) => {
       section.total = this.sectionSchedule.groupStep.reduce((total, group) => {
-        const progressBarUnit = group.groupProgressBar.find(progressBar => progressBar.valueUnit !== 'currency' && progressBar.valueUnit !== 'time');
+        const progressBarUnit = group.groupProgressBar
+          .find(progressBar => progressBar.valueUnit !== 'currency' && progressBar.valueUnit !== 'time');
         return total + (progressBarUnit ? progressBarUnit.total : 0);
       }, 0);
       section.progress = this.sectionSchedule.groupStep.reduce((total, group) => {
-        const progressBarUnit = group.groupProgressBar.find(progressBar => progressBar.valueUnit !== 'currency' && progressBar.valueUnit !== 'time');
+        const progressBarUnit = group.groupProgressBar.
+        find(progressBar => progressBar.valueUnit !== 'currency' && progressBar.valueUnit !== 'time');
         return total + (progressBarUnit ? progressBarUnit.progress : 0);
       }, 0);
     });
@@ -487,7 +485,7 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
     this.spreadEvent = event;
     this.showTypeDistributionDialog = true;
     this.typeDistribution = 'SIGMOIDAL';
-    this.spreadMulticost = spreadMultiCost
+    this.spreadMulticost = spreadMultiCost;
   }
 
   handleSpreadDifference(event) {
@@ -495,15 +493,17 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
     const stepDate = event.stepDate;
     const idStep = event.idStep;
     const type = event.type;
-    const groupIndex = this.sectionSchedule.groupStep.findIndex(group => group.cardItemSection.filter(item => item.idStep === idStep).length > 0);
+    const groupIndex = this.sectionSchedule.groupStep
+    .findIndex(group => group.cardItemSection.filter(item => item.idStep === idStep).length > 0);
     if (groupIndex > -1) {
-      const stepsList = this.sectionSchedule.groupStep[groupIndex].cardItemSection.filter(step => moment(step.stepName).isAfter(moment(stepDate)) &&
+      const stepsList = this.sectionSchedule.groupStep[groupIndex].cardItemSection
+      .filter(step => moment(step.stepName).isAfter(moment(stepDate)) &&
         step.type === 'listStep');
       if (this.sectionSchedule.groupStep.length - (groupIndex + 1) > 0) {
         for (let i = groupIndex + 1; i < this.sectionSchedule.groupStep.length; i++) {
           this.sectionSchedule.groupStep[i].cardItemSection.filter(listStep => listStep.type === 'listStep').forEach(step => {
             stepsList.push(step);
-          })
+          });
         }
       }
       if (stepsList.length > 0) {
@@ -524,17 +524,16 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
         } else {
           const quantSteps = stepsList.length;
           let middle = (quantSteps - (quantSteps % 2)) / 2;
-          let indexes = [];
+          const indexes = [];
           for (let i = 0; i < quantSteps; i++) {
             indexes.unshift(middle);
             middle--;
           }
-          const values = stepsList.map( (step, index) => {
-            return index === (stepsList.length -1) ? 1 : 1 / ( 1 + Math.exp(- indexes[index]));
-          });
+          const values = stepsList.map( (step, index) => index === (stepsList.length -1) ? 1 : 1 / ( 1 + Math.exp(- indexes[index])));
 
           stepsList.forEach( (step, index) => {
-            const resultValue = index === 0 ? (values[index] * difference) : ((values[index] * difference) - (values[index - 1] * difference));
+            const resultValue = index === 0 ?
+              (values[index] * difference) : ((values[index] * difference) - (values[index - 1] * difference));
             const value = type === 'unitActual' ? +(resultValue.toFixed(this.unitMeansure.precision)) : +(resultValue.toFixed(2));
             if (type === 'unitActual') {
               step.unitPlanned = step.unitPlanned + value;
@@ -542,14 +541,16 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
               const idCost = this.getCostAccountStepChanged(idStep);
               this.replicateCostAccountValues(step.idStep, idCost, value);
             }
-          })
+          });
         }
-        
+
       }
       stepsList.forEach(step => {
-        const groupIndex = this.sectionSchedule.groupStep.findIndex(group => group.cardItemSection.filter(item => item.idStep === step.idStep).length > 0);
+        const groupIndex = this.sectionSchedule.groupStep.
+        findIndex(group => group.cardItemSection.filter(item => item.idStep === step.idStep).length > 0);
         if (groupIndex > -1) {
-          const stepIndex = this.sectionSchedule.groupStep[groupIndex].cardItemSection.findIndex(selectedStep => selectedStep.idStep === step.idStep);
+          const stepIndex = this.sectionSchedule.groupStep[groupIndex].cardItemSection.
+          findIndex(selectedStep => selectedStep.idStep === step.idStep);
           if (stepIndex > -1) {
             this.sectionSchedule.groupStep[groupIndex].cardItemSection[stepIndex] = { ...step };
             this.saveStepChanged(this.sectionSchedule.groupStep[groupIndex].year, step.idStep);
@@ -566,7 +567,7 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
       const stepIndex = this.schedule.groupStep[groupIndex].steps.findIndex(step => step.id === idStep);
       if (stepIndex > -1) {
         const stepCost = this.schedule.groupStep[groupIndex].steps[stepIndex].consumes[0];
-        return stepCost.costAccount.id
+        return stepCost.costAccount.id;
       }
     }
   }
@@ -604,8 +605,7 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
           group
         };
         if (this.stepShow && this.stepShow.consumes) {
-          this.costAssignmentsCardItemsEdited = this.stepShow.consumes.map(consume => {
-            return {
+          this.costAssignmentsCardItemsEdited = this.stepShow.consumes.map(consume => ({
               type: 'cost-card',
               unitMeasureName: '$',
               idCost: consume.idCostAccount,
@@ -616,12 +616,11 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
               readonly: !this.editPermission,
               showReplicateButton: this.stepShow.showReplicateButton,
               endStep: stepOrder === 'end'
-            };
-          });
+            }));
           this.cardCostEditPanel.show(event.clickEvent);
         }
       }
-    }    
+    };
   }
 
   decrementIndex() {
@@ -649,13 +648,14 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
       this.changedSteps.push({
         changedGroupYear: this.stepShow.group,
         changedIdStep: this.stepShow.id
-      })
+      });
     }
     const groupStepIndex = this.schedule.groupStep.findIndex(group => group.year === this.stepShow.group);
     if (groupStepIndex > -1) {
       const stepIndex = this.schedule.groupStep[groupStepIndex].steps.findIndex(step => step.id === this.stepShow.id);
       if (stepIndex > -1) {
-        const consumesIndex = this.schedule.groupStep[groupStepIndex].steps[stepIndex].consumes.findIndex(cons => cons.costAccount.id === cardChanged.idCost);
+        const consumesIndex = this.schedule.groupStep[groupStepIndex].steps[stepIndex].consumes.
+        findIndex(cons => cons.costAccount.id === cardChanged.idCost);
         if (consumesIndex > -1) {
           this.schedule.groupStep[groupStepIndex].steps[stepIndex].consumes[consumesIndex] = {
             ...this.schedule.groupStep[groupStepIndex].steps[stepIndex].consumes[consumesIndex],
@@ -668,34 +668,34 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
     this.workpackSrv.nextPendingChanges(true);
     this.saveButton.showButton();
     this.cancelButton.showButton();
-    const groupIndex = this.sectionSchedule.groupStep.findIndex(group => group.cardItemSection.filter(item => item.idStep === this.stepShow.id).length > 0);
+    const groupIndex = this.sectionSchedule.groupStep.
+    findIndex(group => group.cardItemSection.filter(item => item.idStep === this.stepShow.id).length > 0);
     if (groupIndex > -1) {
-      const stepIndex = this.sectionSchedule.groupStep[groupIndex].cardItemSection.findIndex(card => card.idStep === this.stepShow.id);
+      const stepIndex = this.sectionSchedule.groupStep[groupIndex].cardItemSection.
+      findIndex(card => card.idStep === this.stepShow.id);
       if (stepIndex > -1) {
-        this.sectionSchedule.groupStep[groupIndex].cardItemSection[stepIndex].costActual = this.costAssignmentsCardItemsEdited.reduce((total, item) => {
-          return total + item.actualWork;
-        }, 0);
-        this.sectionSchedule.groupStep[groupIndex].cardItemSection[stepIndex].costPlanned = this.costAssignmentsCardItemsEdited.reduce((total, item) => {
-          return total + item.plannedWork;
-        }, 0);
+        this.sectionSchedule.groupStep[groupIndex].cardItemSection[stepIndex].costActual =
+          this.costAssignmentsCardItemsEdited.reduce((total, item) => total + item.actualWork, 0);
+        this.sectionSchedule.groupStep[groupIndex].cardItemSection[stepIndex].costPlanned =
+        this.costAssignmentsCardItemsEdited.reduce((total, item) => total + item.plannedWork, 0);
         // Atualizando a progressBar de custo do card
         this.sectionSchedule.groupStep[groupIndex].cardItemSection[stepIndex].costProgressBar = {
           ...this.sectionSchedule.groupStep[groupIndex].cardItemSection[stepIndex].costProgressBar,
-          progress: this.costAssignmentsCardItemsEdited.reduce((total, item) => {
-            return total + item.actualWork;
-          }, 0),
-          total: this.costAssignmentsCardItemsEdited.reduce((total, item) => {
-            return total + item.plannedWork;
-          }, 0)
-        }
+          progress: this.costAssignmentsCardItemsEdited.reduce((total, item) => total + item.actualWork, 0),
+          total: this.costAssignmentsCardItemsEdited.reduce((total, item) => total + item.plannedWork, 0)
+        };
       }
       // atualizando a progressBar de custo do ano
       this.sectionSchedule.groupStep[groupIndex].groupProgressBar.forEach(group => {
         if (group.valueUnit === 'currency') {
-          group.total = this.sectionSchedule.groupStep[groupIndex].cardItemSection.filter(itemStep => itemStep.type === 'listStep').reduce((total, step) => { return total + step.costPlanned }, 0);
-          group.progress = this.sectionSchedule.groupStep[groupIndex].cardItemSection.filter(itemStep => itemStep.type === 'listStep').reduce((total, step) => { return total + step.costActual }, 0);
+          group.total = this.sectionSchedule.groupStep[groupIndex].cardItemSection.
+          filter(itemStep => itemStep.type === 'listStep').
+          reduce((total, step) => total + step.costPlanned, 0);
+          group.progress = this.sectionSchedule.groupStep[groupIndex].cardItemSection.
+          filter(itemStep => itemStep.type === 'listStep').
+          reduce((total, step) => total + step.costActual, 0);
         }
-      })
+      });
     }
     const hasNegativeValues = this.checkNegativeValues();
     if (hasNegativeValues) {
@@ -726,9 +726,11 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
     const stepDate = this.stepShow.periodFromStart;
     const idStep = this.stepShow.id;
     this.handleChangeValuesCardItem();
-    const groupIndex = this.sectionSchedule.groupStep.findIndex(group => group.cardItemSection.filter(item => item.idStep === idStep).length > 0);
+    const groupIndex = this.sectionSchedule.groupStep.findIndex(group => group.cardItemSection.
+      filter(item => item.idStep === idStep).length > 0);
     if (groupIndex > -1) {
-      const stepsList = this.sectionSchedule.groupStep[groupIndex].cardItemSection.filter(step => moment(step.stepName).isAfter(moment(stepDate)) &&
+      const stepsList = this.sectionSchedule.groupStep[groupIndex].cardItemSection.
+      filter(step => moment(step.stepName).isAfter(moment(stepDate)) &&
         step.type === 'listStep');
       if (this.sectionSchedule.groupStep.length - (groupIndex + 1) > 0) {
         for (let i = groupIndex + 1; i < this.sectionSchedule.groupStep.length; i++) {
@@ -750,20 +752,19 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
         } else {
           const quantSteps = stepsList.length;
           let middle = (quantSteps - (quantSteps % 2)) / 2;
-          let indexes = [];
+          const indexes = [];
           for (let i = 0; i < quantSteps; i++) {
             indexes.unshift(middle);
             middle--;
           }
-          const values = stepsList.map( (step, index) => {
-            return index === (stepsList.length -1) ? 1 : 1 / ( 1 + Math.exp(- indexes[index]));
-          });
+          const values = stepsList.map( (step, index) => index === (stepsList.length -1) ? 1 : 1 / ( 1 + Math.exp(- indexes[index])));
           stepsList.forEach( ( step, index ) => {
-            const valueStep = index === 0 ? (values[index] * difference) : ((values[index] * difference) - (values[index - 1] * difference));
+            const valueStep =
+              index === 0 ? (values[index] * difference) : ((values[index] * difference) - (values[index - 1] * difference));
             this.replicateCostAccountValues(step.idStep, cardChanged.idCost, valueStep);
           });
         }
-        
+
       }
     }
   }
@@ -773,7 +774,8 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
     if (groupIndex > -1) {
       const stepIndex = this.schedule.groupStep[groupIndex].steps.findIndex(step => step.id === idStep);
       if (stepIndex > -1) {
-        const stepsCost = this.schedule.groupStep[groupIndex].steps[stepIndex].consumes.filter( consume => consume.costAccount.id === idCost);
+        const stepsCost = this.schedule.groupStep[groupIndex].steps[stepIndex].consumes.
+        filter( consume => consume.costAccount.id === idCost);
         if (stepsCost && stepsCost.length > 0) {
           this.schedule.groupStep[groupIndex].steps[stepIndex].consumes.forEach(consume => {
             if (consume.costAccount.id === idCost) {
@@ -781,7 +783,8 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
             }
           });
         } else {
-          const totalPlannedCostAccounts =  this.schedule.groupStep[groupIndex].steps[stepIndex].consumes.reduce( (total, consume) => total + consume.plannedCost, 0);
+          const totalPlannedCostAccounts =  this.schedule.groupStep[groupIndex].steps[stepIndex].consumes.
+          reduce( (total, consume) => total + consume.plannedCost, 0);
           this.schedule.groupStep[groupIndex].steps[stepIndex].consumes.forEach(consume => {
             const plannedProp = totalPlannedCostAccounts ?  (consume.plannedCost / totalPlannedCostAccounts) * value : value;
             consume.plannedCost = consume.plannedCost + plannedProp;
@@ -792,7 +795,9 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
           plannedWork: this.schedule.groupStep[groupIndex].steps[stepIndex].plannedWork,
           actualWork: this.schedule.groupStep[groupIndex].steps[stepIndex].actualWork,
           periodFromStart: this.schedule.groupStep[groupIndex].steps[stepIndex].periodFromStart,
-          consumes: this.schedule.groupStep[groupIndex].steps[stepIndex].consumes && this.schedule.groupStep[groupIndex].steps[stepIndex].consumes.map(consume => ({
+          consumes: this.schedule.groupStep[groupIndex].steps[stepIndex].consumes &&
+          this.schedule.groupStep[groupIndex].steps[stepIndex].consumes.
+          map(consume => ({
             actualCost: consume.actualCost,
             plannedCost: consume.plannedCost,
             idCostAccount: consume.costAccount.id,
@@ -802,8 +807,7 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
           group: this.schedule.groupStep[groupIndex].year
         };
         if (this.stepShow && this.stepShow.consumes) {
-          this.costAssignmentsCardItemsEdited = this.stepShow.consumes.map(consume => {
-            return {
+          this.costAssignmentsCardItemsEdited = this.stepShow.consumes.map(consume => ({
               type: 'cost-card',
               unitMeasureName: '$',
               idCost: consume.idCostAccount,
@@ -813,8 +817,7 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
               actualWork: consume.actualCost,
               readonly: !this.editPermission,
               showReplicateButton: this.stepShow.showReplicateButton
-            };
-          });
+            }));
         }
         this.handleChangeValuesCardItem();
       }
@@ -823,9 +826,9 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
 
   async refreshScheduleProgressBar() {
     this.workpackSrv.nextPendingChanges(false);
-    const scheduleChanged = await this.scheduleSrv.GetScheduleById(this.schedule.id);
-    if (scheduleChanged.success) {
-      const scheduleValues = scheduleChanged.data;
+    const result = await this.scheduleSrv.GetSchedule({ 'id-workpack': this.workpackParams.idWorkpack });
+    if (result.success) {
+      const scheduleValues = result.data[0];
       this.scheduleSrv.setScheduleChanged(scheduleValues);
       const costIndex = this.sectionSchedule.cardSection.progressBarValues.findIndex(item => item.type === 'cost');
       if (costIndex > -1) {
@@ -854,12 +857,12 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
             group.groupProgressBar[scopeProgressIndex].progress = groupValue.actual;
           }
         }
-      })
+      });
     }
   }
 
   async saveCostAccountsStepChangeds() {
-    const costAccountChangedSaved = await Promise.all(this.costAccountsConsumesStepChangeds.map(async (item) => {
+    const costAccountChangedSaved = await Promise.all(this.costAccountsConsumesStepChangeds.map(async(item) => {
       const result = await this.scheduleSrv.putScheduleStepConsume(item.idStep, item.idCost, {
         actualCost: item.actualCost,
         plannedCost: item.plannedCost
@@ -899,7 +902,7 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
               idCostAccount: consume.costAccount.id,
               id: consume.id
             }))
-        }
+        };
       });
       const hasNegativeValues = stepsToSave.filter(step => step.plannedWork < 0 || step.actualWork < 0 ||
         (step.consumes && step.consumes.filter(consume => consume.actualCost < 0 || consume.plannedCost < 0).length > 0)).length > 0;
@@ -921,24 +924,13 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
           summary: this.translateSrv.instant('success'),
           detail: this.translateSrv.instant('messages.savedSuccessfully')
         });
-        
         this.refreshScheduleProgressBar();
         this.scheduleSrv.refreshBackupSchedule(this.schedule);
         this.formIsSaving = false;
-        this.workpackData = this.workpackSrv.getWorkpackData();
-        this.workpackSrv.setWorkpackData({
-          ...this.workpackData,
-          workpack: {
-            ...this.workpackData.workpack,
-            dashboardStatus: 'OUTDATED',
-            dashboardSinceThen: moment().format('DD/MM/yyyy HH:mm:ss'),
-            dashboardCanRecalculate: false
-          }
-        });
         setTimeout( () => {
           const linked = this.workpackParams.idWorkpackModelLinked ? true : false;
           this.dashboardSrv.loadDashboard(linked);
-        }, 1000)
+        }, 1000);
       }
     }
 

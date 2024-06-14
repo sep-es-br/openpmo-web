@@ -10,11 +10,11 @@ import { IWorkpackData, IWorkpackParams } from '../interfaces/IWorkpackDataParam
 @Injectable({ providedIn: 'root' })
 export class ScheduleService extends BaseService<any> {
 
-  private resetSchedule = new BehaviorSubject<boolean>(false);
   workpackParams: IWorkpackParams;
   workpackData: IWorkpackData;
   schedule;
   loading;
+  private resetSchedule = new BehaviorSubject<boolean>(false);
 
   constructor(
     @Inject(Injector) injector: Injector,
@@ -46,7 +46,6 @@ export class ScheduleService extends BaseService<any> {
       this.loading = false;
       this.nextResetSchedule(true);
     }
-    
   }
 
   setScheduleChanged(schedule) {
@@ -59,7 +58,7 @@ export class ScheduleService extends BaseService<any> {
       workpackData: this.workpackData,
       schedule: this.schedule,
       loading: this.loading
-    }
+    };
   }
 
   getBackupSchedule() {
