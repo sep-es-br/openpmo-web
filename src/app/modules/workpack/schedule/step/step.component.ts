@@ -82,7 +82,7 @@ export class StepComponent implements OnInit, OnDestroy {
     private messageSrv: MessageService,
     private authSrv: AuthService
   ) {
-    this.actRouter.queryParams.subscribe(async ({ idSchedule, idWorkpackModelLinked, stepType, idStep, unitName, unitPrecision }) => {
+    this.actRouter.queryParams.subscribe(async({ idSchedule, idWorkpackModelLinked, stepType, idStep, unitName, unitPrecision }) => {
       this.idSchedule = idSchedule;
       this.idWorkpackModelLinked = idWorkpackModelLinked;
       this.stepType = stepType;
@@ -153,7 +153,8 @@ export class StepComponent implements OnInit, OnDestroy {
             actualCost: consume.actualCost,
             plannedCost: consume.plannedCost,
             idCostAccount: consume.costAccount.id,
-            id: consume.id
+            id: consume.id,
+            nameCostAccount: consume.costAccount.name
           }))
         };
         this.baselinePlannedTotals = {
@@ -183,7 +184,7 @@ export class StepComponent implements OnInit, OnDestroy {
   async setBreadcrumb() {
     let breadcrumbItems = this.breadcrumbSrv.get;
     if (!breadcrumbItems || breadcrumbItems.length === 0) {
-      breadcrumbItems = await this.breadcrumbSrv.loadWorkpackBreadcrumbs(this.schedule.idWorkpack, this.idPlan)
+      breadcrumbItems = await this.breadcrumbSrv.loadWorkpackBreadcrumbs(this.schedule.idWorkpack, this.idPlan);
     }
     this.breadcrumbSrv.setMenu([
       ...breadcrumbItems,
@@ -313,17 +314,18 @@ export class StepComponent implements OnInit, OnDestroy {
       const actualDate = moment();
       const stepDate = moment(this.step.periodFromStart, 'yyy-MM-DD');
       const showReplicateButton = stepDate.isSameOrBefore(actualDate) ? true : false;
-      this.costAssignmentsCardItems = this.step.consumes.map(consume => {
+      this.costAssignmentsCardItems =  this.step.consumes.map(consume => {
         const costAccount = this.costAccounts.find(cost => cost.id === consume.idCostAccount);
-        const propertyModelName = costAccount.models.find(p => p.name === 'name');
-        const propertyName = costAccount.properties.find(p => p.idPropertyModel === propertyModelName.id);
+        const propertyModelName = costAccount && costAccount?.models.find(p => p.name === 'name');
+        const propertyName = costAccount && propertyModelName ?
+          costAccount?.properties.find(p => p.idPropertyModel === propertyModelName.id).value : consume.nameCostAccount;
         return {
           type: 'cost-card',
           unitMeasureName: '$',
           idCost: consume.idCostAccount,
           idCostAssignment: consume.id,
           showReplicateButton,
-          costAccountName: propertyName.value as string,
+          costAccountName: propertyName as string,
           plannedWork: consume.plannedCost,
           actualWork: consume.actualCost,
           menuItemsCost: [{
@@ -332,10 +334,10 @@ export class StepComponent implements OnInit, OnDestroy {
             command: (event) => this.deleteCost(consume.idCostAccount)
           }],
           readonly: !this.editPermission,
-          costAccountAllocation: costAccount.costAccountAllocation && {
-            limit: costAccount.costAccountAllocation.limit,
-            planed: costAccount.costAccountAllocation.planed - consume.plannedCost,
-            actual: costAccount.costAccountAllocation.actual - consume.actualCost,
+          costAccountAllocation: costAccount?.costAccountAllocation && {
+            limit: costAccount?.costAccountAllocation.limit,
+            planed: costAccount?.costAccountAllocation.planed - consume.plannedCost,
+            actual: costAccount?.costAccountAllocation.actual - consume.actualCost,
           }
         };
       });
@@ -366,7 +368,7 @@ export class StepComponent implements OnInit, OnDestroy {
       if (result.success) {
         this.costAccounts = result.data;
       }
-    } 
+    }
     const workpacksIds = this.costAccounts.map(cost => cost.idWorkpack);
     const workpacksIdsNotRepeated = workpacksIds.filter((w, i) => workpacksIds.indexOf(w) === i);
 
