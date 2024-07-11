@@ -1,11 +1,9 @@
 import { takeUntil } from 'rxjs/operators';
 import { ResponsiveService } from 'src/app/shared/services/responsive.service';
-import { ITripleConstraintDashboard } from './../../../../shared/interfaces/IDashboard';
+import { IDashboard, ITripleConstraintDashboard } from './../../../../shared/interfaces/IDashboard';
 import { Component, Input, OnInit, SimpleChanges } from '@angular/core';
 import * as moment from 'moment';
 import { Subject } from 'rxjs';
-import { LabelService } from 'src/app/shared/services/label.service';
-import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-triple-constraint-dashboard',
@@ -33,12 +31,9 @@ export class TripleConstraintDashboardComponent implements OnInit {
   $destroy = new Subject();
   responsive = false;
   mediaScreen1450: boolean;
-  foreseenLabel: string;
 
   constructor(
-    private responsiveSrv: ResponsiveService,
-    private labelService: LabelService,
-    private route: ActivatedRoute
+    private responsiveSrv: ResponsiveService
   ) {
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.responsive = value);
     this.responsiveSrv.resizeEvent.subscribe((value) => {
@@ -63,19 +58,6 @@ export class TripleConstraintDashboardComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.route.queryParams.subscribe(params => {
-      const idWorkpack = params['id']
-      if (idWorkpack) {
-        this.labelService.getLabels(idWorkpack).subscribe(
-          response => {
-            this.foreseenLabel = response.data;
-          },
-          error => {
-            console.error(error);
-          }
-        );
-      }
-    });
   }
 
   ngOnDestroy(): void {
