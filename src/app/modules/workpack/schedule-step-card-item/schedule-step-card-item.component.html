@@ -23,7 +23,7 @@
             [minFractionDigits]="properties.unitPrecision" [maxFractionDigits]="properties.unitPrecision"
             [locale]="language === 'pt-BR' ? 'pt-BR' : 'en-US'">
           </p-inputNumber>
-          <label class="app-input-label" for="float-unitPlanned">{{ "planned" |translate }}</label>
+          <label class="app-input-label" for="float-unitPlanned">{{ foreseenLabel |translate }}</label>
         </span>
         <div class="replicate-button-container">
           <i class="fas fa-caret-up" [class.disabled]="!properties.editPermission || !showReplicateButton" [class.replicate-hide]="!showReplicateButton"
@@ -60,7 +60,7 @@
             [(ngModel)]="properties.costPlanned" [minFractionDigits]="2" [maxFractionDigits]="2"
             [locale]="language === 'pt-BR' ? 'pt-BR' : 'en-US'">
           </p-inputNumber>
-          <label class="app-input-label" for="float-costPlanned">{{ "planned" |translate }}</label>
+          <label class="app-input-label" for="float-costPlanned">{{ foreseenLabel |translate }}</label>
         </span>
         <div class="replicate-button-container">
           <i class="fas fa-caret-up" [class.disabled]="!properties.editCosts || !properties.editPermission || !showReplicateButton"
