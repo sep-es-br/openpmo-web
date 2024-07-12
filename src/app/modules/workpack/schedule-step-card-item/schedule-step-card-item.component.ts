@@ -8,6 +8,8 @@ import { IconsEnum } from 'src/app/shared/enums/IconsEnum';
 import { IScheduleStepCardItem } from 'src/app/shared/interfaces/IScheduleStepCardItem';
 import * as moment from 'moment';
 import { ConfirmationService, MessageService } from 'primeng/api';
+import { LabelService } from 'src/app/shared/services/label.service';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-schedule-step-card-item',
@@ -31,11 +33,14 @@ export class ScheduleStepCardItemComponent implements OnInit, OnDestroy {
   item;
   difference;
   multiCostsEdited = false;
+  foreseenLabel: string;
 
   constructor(
     private messageSrv: MessageService,
     private translateSrv: TranslateService,
-    private confirmationSrv: ConfirmationService
+    private confirmationSrv: ConfirmationService,
+    private labelSrv: LabelService,
+    private route: ActivatedRoute
   ) {
     this.translateSrv.onLangChange.pipe(takeUntil(this.$destroy)).subscribe(() =>
       {
@@ -61,6 +66,20 @@ export class ScheduleStepCardItemComponent implements OnInit, OnDestroy {
         this.showReplicateButton = false;
       }
     }
+
+    this.route.queryParams.subscribe(params => {
+      const idWorkpack = params['id'];
+      if (idWorkpack) {
+        this.labelSrv.getLabels(idWorkpack).subscribe(
+          response => {
+            this.foreseenLabel = response.data;
+          },
+          error => {
+            console.error(error);
+          }
+        );
+      }
+    });
   }
 
   ngOnDestroy(): void {

@@ -21,6 +21,8 @@ import { SaveButtonComponent } from 'src/app/shared/components/save-button/save-
 import { ICartItemCostAssignment } from 'src/app/shared/interfaces/ICartItemCostAssignment';
 import { DashboardService } from 'src/app/shared/services/dashboard.service';
 import { CancelButtonComponent } from 'src/app/shared/components/cancel-button/cancel-button.component';
+import { LabelService } from 'src/app/shared/services/label.service';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-workpack-section-schedule',
@@ -58,6 +60,7 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
   spreadMulticost = false;
   sectionActive = false;
   formIsSaving = false;
+  foreseenLabel: string;
 
   constructor(
     private router: Router,
@@ -68,7 +71,9 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
     private scheduleSrv: ScheduleService,
     private workpackShowTabviewSrv: WorkpackShowTabviewService,
     private messageSrv: MessageService,
-    private dashboardSrv: DashboardService
+    private dashboardSrv: DashboardService,
+    private labelSrv: LabelService,
+    private route: ActivatedRoute
   ) {
 
     this.workpackShowTabviewSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => {
@@ -103,7 +108,33 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.route.queryParams.subscribe(params => {
+      const idWorkpack = params['id'];
+      if (idWorkpack) {
+        this.labelSrv.getLabels(idWorkpack).subscribe(
+          response => {
+            this.foreseenLabel = response.data;
+            this.loadScheduleData();
+          },
+          error => {
+            console.error(error);
+          }
+        );
+  
+        debugger
+        this.dashboardSrv.GetBaselines({ 'id-workpack': idWorkpack }).then(
+          response => {
+            console.log(response);
+          }
+        ).catch(
+          error => {
+            console.error(error);
+          }
+        );
+      }
+    });
   }
+  
 
   loadScheduleData() {
     const {
@@ -187,7 +218,7 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
           {
             total: Number(group.planed.toFixed(this.unitMeansure.precision)),
             progress: Number(group.actual.toFixed(this.unitMeansure.precision)),
-            labelTotal: 'planned',
+            labelTotal: this.foreseenLabel, 
             labelProgress: 'actual',
             valueUnit: this.unitMeansure && this.unitMeansure.name,
             color: 'rgba(236, 125, 49, 1)',
@@ -198,7 +229,7 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
           groupProgressBar.push({
             total: group.planedCost,
             progress: group.actualCost,
-            labelTotal: 'planned',
+            labelTotal: this.foreseenLabel,
             labelProgress: 'actual',
             valueUnit: 'currency',
             color: '#6cd3bd',
@@ -250,7 +281,7 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
             {
               total: Number(this.schedule.planed.toFixed(this.unitMeansure.precision)),
               progress: Number(this.schedule.actual.toFixed(this.unitMeansure.precision)),
-              labelTotal: 'planned',
+              labelTotal: this.foreseenLabel,
               labelProgress: 'actual',
               valueUnit: this.unitMeansure && this.unitMeansure.name,
               color: 'rgba(236, 125, 49, 1)',
@@ -261,7 +292,7 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
             {
               total: this.schedule.planedCost,
               progress: this.schedule.actualCost,
-              labelTotal: 'planned',
+              labelTotal: this.foreseenLabel,
               labelProgress: 'actual',
               valueUnit: 'currency',
               color: '#6cd3bd',
@@ -272,7 +303,7 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
             {
               total: daysToPlanned,
               progress: daysToNow < 0 ? 0 : daysToNow,
-              labelTotal: 'planned',
+              labelTotal: this.foreseenLabel,
               labelProgress: 'actual',
               valueUnit: 'time',
               color: '#659ee1',
