@@ -8,6 +8,8 @@ import { Subject } from 'rxjs';
 import { IEarnedValueAnalysisDashboard } from 'src/app/shared/interfaces/IDashboard';
 import { IGaugeChartData } from 'src/app/shared/interfaces/IGaugeChartData';
 import { ShortNumberPipe } from 'src/app/shared/pipes/shortNumberPipe';
+import { DashboardService } from 'src/app/shared/services/dashboard.service';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-earned-value-analysis-dashboard',
@@ -27,11 +29,14 @@ export class EarnedValueAnalysisDashboardComponent implements OnInit, OnChanges,
   $destroy = new Subject();
   responsive = false;
   mediaScreen1500: boolean;
+  showContent: boolean;
 
   constructor(
     private shortNumberPipe: ShortNumberPipe,
     private translateSrv: TranslateService,
-    private responsiveSrv: ResponsiveService
+    private responsiveSrv: ResponsiveService,
+    private dashboardSrv: DashboardService,
+    private route: ActivatedRoute
   ) {
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.responsive = value);
     this.responsiveSrv.resizeEvent.subscribe((value) => {
@@ -58,6 +63,32 @@ export class EarnedValueAnalysisDashboardComponent implements OnInit, OnChanges,
 
   ngOnInit(): void {
     this.setLanguage();
+
+    this.route.queryParams.subscribe(params => {
+      const idWorkpack = params['id'];
+      if (idWorkpack) {
+        this.dashboardSrv.GetBaselines({ 'id-workpack': idWorkpack }).then(
+          response => {
+            if (response.success && response.data && response.data.length > 0 || this.sumPerformanceIndexes() > 0 ) {
+              console.log(this.sumPerformanceIndexes());
+              this.showContent = true;
+            } else {
+              this.showContent = false;
+            }
+          }
+        ).catch(error => { console.log(error); }
+        );
+      }
+    });
+  }
+
+  sumPerformanceIndexes(): number {
+    const indexes = this.earnedValueAnalysis?.performanceIndexes;
+    return (indexes.earnedValue || 0) +
+      (indexes.actualCost || 0) +
+      (indexes.plannedValue || 0) +
+      (indexes.estimatesAtCompletion || 0) +
+      (indexes.estimateToComplete || 0);
   }
 
   ngOnDestroy(): void {

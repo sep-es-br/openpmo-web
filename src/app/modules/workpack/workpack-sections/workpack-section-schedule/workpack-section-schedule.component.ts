@@ -120,21 +120,9 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
             console.error(error);
           }
         );
-  
-        debugger
-        this.dashboardSrv.GetBaselines({ 'id-workpack': idWorkpack }).then(
-          response => {
-            console.log(response);
-          }
-        ).catch(
-          error => {
-            console.error(error);
-          }
-        );
       }
     });
   }
-  
 
   loadScheduleData() {
     const {
