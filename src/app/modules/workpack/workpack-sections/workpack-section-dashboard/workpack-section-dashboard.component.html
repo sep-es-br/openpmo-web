@@ -97,7 +97,9 @@
     <div class="earned-value-analysis-container"
       *ngIf="!!dashboardShowEva && dashboard && dashboard?.earnedValueAnalysis &&  
       dashboard?.earnedValueAnalysis?.earnedValueByStep && dashboard?.earnedValueAnalysis?.earnedValueByStep.length > 0 && !isLoading">
-      <app-earned-value-analysis-dashboard [earnedValueAnalysis]="dashboard.earnedValueAnalysis"
+      <app-earned-value-analysis-dashboard  
+        [tripleConstraint]="dashboard.tripleConstraint"
+        [earnedValueAnalysis]="dashboard.earnedValueAnalysis"
         [referenceMonth]="referenceMonth"></app-earned-value-analysis-dashboard>
     </div>
   </app-card>

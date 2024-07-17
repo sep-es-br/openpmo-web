@@ -5,7 +5,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { ChartData, ChartOptions } from 'chart.js';
 import * as moment from 'moment';
 import { Subject } from 'rxjs';
-import { IEarnedValueAnalysisDashboard } from 'src/app/shared/interfaces/IDashboard';
+import { IEarnedValueAnalysisDashboard, ITripleConstraintDashboard } from 'src/app/shared/interfaces/IDashboard';
 import { IGaugeChartData } from 'src/app/shared/interfaces/IGaugeChartData';
 import { ShortNumberPipe } from 'src/app/shared/pipes/shortNumberPipe';
 import { DashboardService } from 'src/app/shared/services/dashboard.service';
@@ -20,6 +20,7 @@ export class EarnedValueAnalysisDashboardComponent implements OnInit, OnChanges,
 
   @Input() earnedValueAnalysis: IEarnedValueAnalysisDashboard;
   @Input() referenceMonth;
+  @Input() tripleConstraint: ITripleConstraintDashboard;
   lineChartData: ChartData;
   lineChartOptions: ChartOptions;
   gaugeChartDataCPI: IGaugeChartData;
@@ -69,8 +70,7 @@ export class EarnedValueAnalysisDashboardComponent implements OnInit, OnChanges,
       if (idWorkpack) {
         this.dashboardSrv.GetBaselines({ 'id-workpack': idWorkpack }).then(
           response => {
-            if (response.success && response.data && response.data.length > 0 || this.sumPerformanceIndexes() > 0 ) {
-              console.log(this.sumPerformanceIndexes());
+            if (response.success && response.data && response.data.length > 0 || this.tripleConstraint.cost.plannedValue > 0 ) {
               this.showContent = true;
             } else {
               this.showContent = false;
