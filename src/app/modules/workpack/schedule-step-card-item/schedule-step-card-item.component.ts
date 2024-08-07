@@ -1,6 +1,4 @@
-import { InputTextModule } from 'primeng/inputtext';
-import { Component, Input, OnInit, EventEmitter, Output, OnDestroy, ViewChild, ElementRef } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, Input, OnInit, EventEmitter, Output, OnDestroy } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -10,6 +8,7 @@ import * as moment from 'moment';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { LabelService } from 'src/app/shared/services/label.service';
 import { ActivatedRoute } from '@angular/router';
+import { ScheduleStepCardItemService } from 'src/app/shared/services/schedule-step-card-item.service';
 
 @Component({
   selector: 'app-schedule-step-card-item',
@@ -34,13 +33,14 @@ export class ScheduleStepCardItemComponent implements OnInit, OnDestroy {
   difference;
   multiCostsEdited = false;
   foreseenLabel: string;
+  isPlannedValuesDisabled: boolean = false;
 
   constructor(
-    private messageSrv: MessageService,
     private translateSrv: TranslateService,
     private confirmationSrv: ConfirmationService,
     private labelSrv: LabelService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private scheduleCardItemSrv: ScheduleStepCardItemService
   ) {
     this.translateSrv.onLangChange.pipe(takeUntil(this.$destroy)).subscribe(() =>
       {
@@ -54,6 +54,7 @@ export class ScheduleStepCardItemComponent implements OnInit, OnDestroy {
     this.cardIdItem = this.properties.idStep ?
       `${this.properties.idStep < 10 ? '0' + this.properties.idStep : this.properties.idStep}` : '';
     this.setLanguage();
+    this.updatePlannedValues();
     if (this.properties.stepName)  {
       let dateStep = moment(this.properties.stepName);
       const monthStep = dateStep.month();
@@ -108,6 +109,16 @@ export class ScheduleStepCardItemComponent implements OnInit, OnDestroy {
     this.properties[item] = event.value;
     this.properties.costProgressBar.total = this.properties.costPlanned;
     this.properties.costProgressBar.progress = this.properties.costActual;
+
+    const dateStep = moment(this.properties.stepName, 'YYYY-MM');
+    const startOfCurrentMonth = moment().startOf('month');
+    const endOfPreviousMonth = startOfCurrentMonth.clone().subtract(1, 'day');
+
+    if (dateStep.isBefore(startOfCurrentMonth) && dateStep.isBefore(endOfPreviousMonth)) {
+      this.properties.costPlanned = this.properties.costActual;
+      this.properties.unitPlanned = this.properties.unitActual;
+    }
+
     this.stepChanged.next();
   }
 
@@ -174,5 +185,36 @@ export class ScheduleStepCardItemComponent implements OnInit, OnDestroy {
   disable() {
     this.multiCostsEdited = !this.properties.editCosts ? true : false;
   }
+
+  /**
+   * updates the value from 'disabled' in angular
+   */
+  updatePlannedValues() {
+    this.route.queryParams.subscribe(params => {
+      const workpackId = params['id'];
+      if (!workpackId) return;
+  
+      this.scheduleCardItemSrv.getCurrentBaseline(workpackId).subscribe(response => {
+        if (!response.success) {
+          console.error(response.error);
+          return;
+        }
+  
+        if (!this.properties.stepName) return;
+  
+        const dateStep = moment(this.properties.stepName, 'YYYY-MM');
+        const startOfCurrentMonth = moment().startOf('month');
+        const endOfPreviousMonth = startOfCurrentMonth.clone().subtract(1, 'day');
+  
+        // Applies only for the passed months
+        if (dateStep.isBefore(startOfCurrentMonth) && dateStep.isBefore(endOfPreviousMonth)) {
+          this.isPlannedValuesDisabled = true;
+          this.properties.costPlanned = this.properties.costActual;
+          this.properties.unitPlanned = this.properties.unitActual;
+        }
+      });
+    });
+  }
+  
 
 }
