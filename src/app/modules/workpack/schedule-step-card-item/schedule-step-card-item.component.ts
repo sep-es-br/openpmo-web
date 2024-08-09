@@ -9,6 +9,7 @@ import { ConfirmationService, MessageService } from 'primeng/api';
 import { LabelService } from 'src/app/shared/services/label.service';
 import { ActivatedRoute } from '@angular/router';
 import { ScheduleStepCardItemService } from 'src/app/shared/services/schedule-step-card-item.service';
+import { debug } from 'console';
 
 @Component({
   selector: 'app-schedule-step-card-item',
@@ -34,6 +35,7 @@ export class ScheduleStepCardItemComponent implements OnInit, OnDestroy {
   multiCostsEdited = false;
   foreseenLabel: string;
   isPlannedValuesDisabled: boolean = false;
+  isActualValuesDisabled: boolean = false;
 
   constructor(
     private translateSrv: TranslateService,
@@ -55,6 +57,7 @@ export class ScheduleStepCardItemComponent implements OnInit, OnDestroy {
       `${this.properties.idStep < 10 ? '0' + this.properties.idStep : this.properties.idStep}` : '';
     this.setLanguage();
     this.updatePlannedValues();
+    this.updateActualValues();
     if (this.properties.stepName)  {
       let dateStep = moment(this.properties.stepName);
       const monthStep = dateStep.month();
@@ -215,6 +218,33 @@ export class ScheduleStepCardItemComponent implements OnInit, OnDestroy {
       });
     });
   }
+
+  updateActualValues() {
+    debugger;
+    this.route.queryParams.subscribe(params => {
+      const workpackId = params['id'];
+      if (!workpackId) return;
   
+      this.scheduleCardItemSrv.getCurrentBaseline(workpackId).subscribe(response => {
+        if (!response.success) {
+          console.error(response.error);
+          return;
+        }
+  
+        if (!this.properties.stepName) return;
+  
+        const dateStep = moment(this.properties.stepName, 'YYYY-MM');
+        const startOfCurrentMonth = moment().startOf('month');
+  
+        // Applies only for the future months
+        if (dateStep.isAfter(startOfCurrentMonth)) {
+          this.isActualValuesDisabled = true;
+        } else {
+          this.isActualValuesDisabled = false;
+        }
+        // this.isActualValuesDisabled = dateStep.isAfter(startOfCurrentMonth) ? true : false;
+      });
+    });
+  }
 
 }

@@ -30,8 +30,9 @@
             (click)="properties.editPermission && showReplicateButton && confirmReplicateValueDif('unitActual')"></i>
         </div>
         <span class="p-float-label p-field">
+          <!-- Actual Unit -->
           <p-inputNumber class="app-input-number" id="float-unitActual" (onInput)="handleStepChange($event, 'unitActual')"
-            [disabled]="!properties.editPermission" [(ngModel)]="properties.unitActual"
+            [disabled]="!properties.editPermission || isActualValuesDisabled" [(ngModel)]="properties.unitActual"
             [class.red]="properties.unitActual < 0"
             [minFractionDigits]="properties.unitPrecision" [maxFractionDigits]="properties.unitPrecision"
             [locale]="language === 'pt-BR' ? 'pt-BR' : 'en-US'">
@@ -68,11 +69,12 @@
             (click)="(properties.editCosts && properties.editPermission && showReplicateButton) && confirmReplicateValueDif('costActual')"></i>
         </div>
         <span class="p-float-label p-field">
+          <!-- Actual Cost -->
           <p-inputNumber class="app-input-number" id="float-costActual"
             (click)="properties.multipleCosts && handleEditCosts($event); properties.multipleCosts && disable()"
             (onFocus)="properties.multipleCosts && handleEditCosts($event); properties.multipleCosts && disable()"
             (mouseout)="multiCostsEdited = false"
-            [disabled]="(properties.multipleCosts && multiCostsEdited) || !properties.editPermission || (!properties.multipleCosts && !properties.editCosts)"
+            [disabled]="(properties.multipleCosts && multiCostsEdited) || !properties.editPermission || (!properties.multipleCosts && !properties.editCosts) || isActualValuesDisabled"
             (onInput)="handleStepCostChange($event, 'costActual')"
             [class.red]="properties.costActual < 0"
             [(ngModel)]="properties.costActual" [minFractionDigits]="2" [maxFractionDigits]="2"
