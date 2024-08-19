@@ -228,6 +228,7 @@ export class ScheduleStepCardItemComponent implements OnInit, OnDestroy {
   }
   
   handleCurrentBaseline() {
+    debugger
     this.getWorkpackId().pipe(
       switchMap(workpackId => {
         if (!workpackId) return EMPTY;
