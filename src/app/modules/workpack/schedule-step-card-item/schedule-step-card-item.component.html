@@ -16,6 +16,17 @@
     <div class="unitValues">
       <div class="unitInputs p-fluid">
         <span class="column-title">{{properties.unitName}}</span>
+
+        <!--UNIT BASELINE-->
+        <span *ngIf="isCurrentBaseline" class="p-float-label p-field">
+          <p-inputNumber [class]="'app-input-number '+'unitBaseline '+'unitBaseline'+ properties.idStep" id="float-unitBaseline" (onInput)="handleStepChange($event, 'unitPlanned')"
+            [disabled]="true" [(ngModel)]="properties.unitBaseline"
+            [minFractionDigits]="properties.unitPrecision" [maxFractionDigits]="properties.unitPrecision"
+            [locale]="language === 'pt-BR' ? 'pt-BR' : 'en-US'">
+          </p-inputNumber>
+          <label class="app-input-label" for="float-unitBaseline]">{{"baselineCardItem" | translate}}</label>
+        </span>
+
         <span class="p-float-label p-field">
           <p-inputNumber [class]="'app-input-number '+'unitPlanned '+'unitPlanned-'+ properties.idStep" id="float-unitPlanned" (onInput)="handleStepChange($event, 'unitPlanned')"
             [disabled]="!properties.editPermission || isPlannedValuesDisabled" [(ngModel)]="properties.unitPlanned"
@@ -50,6 +61,18 @@
       <div class="costInputs p-fluid" [class.card-link]="properties.editPermission && !properties.editCosts && properties.multipleCosts"
         (click)="properties.multipleCosts && handleEditCosts($event)">
         <span class="column-title"> $ </span>
+        
+        <!--PLANNED COST BASELINE-->
+        <span *ngIf="isCurrentBaseline" class="p-float-label p-field">
+          <p-inputNumber [class]="'app-input-number '+'costBaseline-'+properties.idStep" id="float-costBaseline"
+            [disabled]="true"
+            [(ngModel)]="properties.baselinePlannedCost" 
+            [minFractionDigits]="2" [maxFractionDigits]="2"
+            [locale]="language === 'pt-BR' ? 'pt-BR' : 'en-US'">
+          </p-inputNumber>
+          <label class="app-input-label" for="float-costPlanned">{{ "baselineCardItem" | translate}}</label>
+        </span>
+
         <span class="p-float-label p-field">
           <p-inputNumber [class]="'app-input-number '+'costPlanned-'+properties.idStep" id="float-costPlanned"
             (click)="properties.multipleCosts && handleEditCosts($event); properties.multipleCosts && disable()"

@@ -1,7 +1,7 @@
 import { Component, Input, OnInit, EventEmitter, Output, OnDestroy } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
-import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { EMPTY, Observable, Subject } from 'rxjs';
+import { map, switchMap, takeUntil } from 'rxjs/operators';
 import { IconsEnum } from 'src/app/shared/enums/IconsEnum';
 import { IScheduleStepCardItem } from 'src/app/shared/interfaces/IScheduleStepCardItem';
 import * as moment from 'moment';
@@ -9,7 +9,6 @@ import { ConfirmationService, MessageService } from 'primeng/api';
 import { LabelService } from 'src/app/shared/services/label.service';
 import { ActivatedRoute } from '@angular/router';
 import { ScheduleStepCardItemService } from 'src/app/shared/services/schedule-step-card-item.service';
-import { debug } from 'console';
 
 @Component({
   selector: 'app-schedule-step-card-item',
@@ -36,6 +35,7 @@ export class ScheduleStepCardItemComponent implements OnInit, OnDestroy {
   foreseenLabel: string;
   isPlannedValuesDisabled: boolean = false;
   isActualValuesDisabled: boolean = false;
+  isCurrentBaseline: boolean = false;
 
   constructor(
     private translateSrv: TranslateService,
@@ -58,6 +58,7 @@ export class ScheduleStepCardItemComponent implements OnInit, OnDestroy {
     this.setLanguage();
     this.updatePlannedValues();
     this.updateActualValues();
+    this.handleCurrentBaseline();
     if (this.properties.stepName)  {
       let dateStep = moment(this.properties.stepName);
       const monthStep = dateStep.month();
@@ -219,31 +220,49 @@ export class ScheduleStepCardItemComponent implements OnInit, OnDestroy {
     });
   }
 
+  private getWorkpackId(): Observable<number | null> {
+    return this.route.queryParams.pipe(
+      map(params => params['id'] || null)
+    );
+  }
+  
+  private handleBaselineResponse(response: any) {
+    if (!response.success) {
+      console.error(response.error);
+      return false;
+    }
+    return true;
+  }
+  
+  handleCurrentBaseline() {
+    debugger
+    this.getWorkpackId().pipe(
+      switchMap(workpackId => {
+        if (!workpackId) return EMPTY;
+        return this.scheduleCardItemSrv.getCurrentBaseline(workpackId);
+      })
+    ).subscribe(response => {
+      if (this.handleBaselineResponse(response)) {
+        this.isCurrentBaseline = true;
+      }
+    });
+  }
+  
   updateActualValues() {
-    debugger;
-    this.route.queryParams.subscribe(params => {
-      const workpackId = params['id'];
-      if (!workpackId) return;
+    this.getWorkpackId().pipe(
+      switchMap(workpackId => {
+        if (!workpackId) return EMPTY;
+        return this.scheduleCardItemSrv.getCurrentBaseline(workpackId);
+      })
+    ).subscribe(response => {
+      if (!this.handleBaselineResponse(response)) return;
   
-      this.scheduleCardItemSrv.getCurrentBaseline(workpackId).subscribe(response => {
-        if (!response.success) {
-          console.error(response.error);
-          return;
-        }
+      if (!this.properties.stepName) return;
   
-        if (!this.properties.stepName) return;
+      const dateStep = moment(this.properties.stepName, 'YYYY-MM');
+      const startOfCurrentMonth = moment().startOf('month');
   
-        const dateStep = moment(this.properties.stepName, 'YYYY-MM');
-        const startOfCurrentMonth = moment().startOf('month');
-  
-        // Applies only for the future months
-        if (dateStep.isAfter(startOfCurrentMonth)) {
-          this.isActualValuesDisabled = true;
-        } else {
-          this.isActualValuesDisabled = false;
-        }
-        // this.isActualValuesDisabled = dateStep.isAfter(startOfCurrentMonth) ? true : false;
-      });
+      this.isActualValuesDisabled = dateStep.isAfter(startOfCurrentMonth);
     });
   }
 

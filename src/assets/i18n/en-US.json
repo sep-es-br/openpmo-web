@@ -188,6 +188,7 @@
   "actual": "Actual",
   "planned": "Foreseen",
   "foreseen": "Foreseen",
+  "baselineCardItem": "BL",
   "reprogrammed": "Reprogrammed",
   "totals": "Totals",
   "hideDetails": "Hide details",
