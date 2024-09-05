@@ -111,6 +111,7 @@ export class WorkpackComponent implements OnDestroy {
   workpackLoading = true;
   formIsSaving = false;
   workpackChildChanging = false;
+  linkEvent = false;
 
   constructor(
     private actRouter: ActivatedRoute,
@@ -153,13 +154,15 @@ export class WorkpackComponent implements OnDestroy {
       idPlan,
       idWorkpackModel,
       idWorkpackParent,
-      idWorkpackModelLinked
+      idWorkpackModelLinked,
+      linkEvent
     }) => {
       this.idWorkpack = id && +id;
       this.idPlan = idPlan && +idPlan;
       this.idWorkpackModel = idWorkpackModel && +idWorkpackModel;
       this.idWorkpackParent = idWorkpackParent && +idWorkpackParent;
       this.idWorkpackModelLinked = idWorkpackModelLinked && +idWorkpackModelLinked;
+      this.linkEvent = linkEvent;
       this.workpackSrv.setWorkpackParams({
         idWorkpack: id && +id,
         idPlan: idPlan && +idPlan,
@@ -297,7 +300,7 @@ export class WorkpackComponent implements OnDestroy {
     this.workpackSrv.setWorkpackData(undefined, true);
     await this.resetWorkpackSections();
     await this.loadWorkpackData();
-    this.workpackBreadcrumbStorageSrv.setBreadcrumb();
+    this.workpackBreadcrumbStorageSrv.setBreadcrumb(this.linkEvent);
     this.calendarFormat = this.translateSrv.instant('dateFormat');
   }
 

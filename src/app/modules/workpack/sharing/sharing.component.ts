@@ -16,7 +16,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { ResponsiveService } from 'src/app/shared/services/responsive.service';
 import { ActivatedRoute } from '@angular/router';
 import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Subject } from 'rxjs';
 import { ICard } from 'src/app/shared/interfaces/ICard';
 import { CancelButtonComponent } from 'src/app/shared/components/cancel-button/cancel-button.component';
@@ -26,7 +26,7 @@ import { CancelButtonComponent } from 'src/app/shared/components/cancel-button/c
   templateUrl: './sharing.component.html',
   styleUrls: ['./sharing.component.scss']
 })
-export class SharingComponent implements OnInit {
+export class SharingComponent implements OnInit, OnDestroy {
 
   @ViewChild(SaveButtonComponent) saveButton: SaveButtonComponent;
   @ViewChild(CancelButtonComponent) cancelButton: CancelButtonComponent;
@@ -111,8 +111,9 @@ export class SharingComponent implements OnInit {
     const result = await this.workpackSrv.GetWorkpackById(this.idWorkpack, { 'id-plan': this.idPlan });
     if (result.success) {
       this.workpack = result.data;
-      this.editPermission = (await this.authSrv.isUserAdmin() || this.workpack.permissions && this.workpack.permissions.filter(p => p.level === 'EDIT').length > 0
-        && !this.workpack.canceled)
+      this.editPermission = (await this.authSrv.isUserAdmin() ||
+        this.workpack.permissions && this.workpack.permissions.filter(p => p.level === 'EDIT').length > 0
+        && !this.workpack.canceled);
       this.workpackName = this.workpack.name;
       if (!this.idPlan) {
         this.idPlan = this.workpack.plan.id;
@@ -150,7 +151,7 @@ export class SharingComponent implements OnInit {
   async setBreadcrumbFromWorkpack() {
     let breadcrumbItems = this.breadcrumbSrv.get;
     if (!breadcrumbItems || breadcrumbItems.length === 0) {
-      breadcrumbItems = await this.breadcrumbSrv.loadWorkpackBreadcrumbs(this.idWorkpack, this.idPlan)
+      breadcrumbItems = await this.breadcrumbSrv.loadWorkpackBreadcrumbs(this.idWorkpack, this.idPlan);
     }
     this.breadcrumbSrv.setMenu([
       ... breadcrumbItems,
@@ -177,7 +178,7 @@ export class SharingComponent implements OnInit {
   async loadOfficeListForShare() {
     const result = await this.officeSrv.GetAll();
     if (result.success) {
-      this.officeListOptionsSharing = result.data;
+      this.officeListOptionsSharing = Array.from([...result.data]);
       this.officeListOptionsSharing.unshift({
         id: null,
         name: this.translateSrv.instant('all'),
@@ -200,14 +201,18 @@ export class SharingComponent implements OnInit {
         iconMenu: 'fas fa-trash-alt',
         itemId: share.id,
         office: share.office,
-        readOnly: !this.editPermission
+        readOnly: !this.editPermission,
+        canDelete: this.editPermission
       }));
     }
+    const officeIds = this.cardItemSharing.map( o => o.office.id);
     if (!!this.editPermission) {
+      const listOptions = Array.from([...this.officeListOptionsSharing.filter( op => !officeIds.includes(op.id) )]);
       this.cardItemSharing.push(
         {
           typeCardItem: 'newCardItemShared',
-          iconMenuItems: this.officeListOptionsSharing && this.officeListOptionsSharing.length > 0 ? this.officeListOptionsSharing.map(office => ({
+          iconMenuItems: listOptions &&
+            listOptions.length > 0 ? listOptions.map(office => ({
             label: office.name,
             icon: `app-icon ${IconsEnum.Offices}`,
             command: () => this.handleCreateNewShared(office),
@@ -229,6 +234,7 @@ export class SharingComponent implements OnInit {
       selectedOption: office.id === this.office.id ? 'EDIT' : '',
       titleCardItem: office.name,
       readOnly: office.id === this.office.id ? true : false,
+      canDelete: true,
       office
     });
     if (office.fullName === 'All') {
@@ -242,37 +248,55 @@ export class SharingComponent implements OnInit {
     } else {
       this.saveButton?.hideButton();
     }
-    const selectedOffices = this.cardItemSharing.map(card => card.titleCardItem);
+    const officeIds = this.cardItemSharing.map( o => o.office.id);
+    const listOptions = Array.from([...this.officeListOptionsSharing.filter( op => !officeIds.includes(op.id) )]);
     this.cardItemSharing.push({
       typeCardItem: 'newCardItemShared',
-      iconMenuItems: this.officeListOptionsSharing && this.officeListOptionsSharing.length > 0 ? this.officeListOptionsSharing
-        .filter(office => !selectedOffices.includes(office.name))
+      iconMenuItems: listOptions && listOptions.length > 0 ? listOptions
+        .filter(office => !officeIds.includes(office.id))
         .map(office => ({
           label: office.name,
           icon: `app-icon ${IconsEnum.Offices}`,
           command: () => this.handleCreateNewShared(office),
         })) : []
-    })
+    });
   }
 
   async deleteWorkpackShared(event) {
     if (event.id) {
       const workpackShared = this.workpackSharing.find(shared => shared.id === event.id);
-      const result = await this.workpackSharedSrv.deleteShareWorkpack({ 'id-shared-with': workpackShared.id !== this.idWorkpack ? workpackShared.id : undefined },
+      const result =
+        await this.workpackSharedSrv
+        .deleteShareWorkpack({ 'id-shared-with': workpackShared.id !== this.idWorkpack ? workpackShared.id : undefined },
         { field: workpackShared.office.name, useConfirm: true });
       if (result.success) {
         this.cardItemSharing = Array.from(this.cardItemSharing.filter(card => card.itemId !== event.id));
+        this.cardItemSharing.pop();
+        const officeIds = this.cardItemSharing.map( o => o.office.id);
+        const listOptions = Array.from([...this.officeListOptionsSharing.filter( op => !officeIds.includes(op.id) )]);
+        this.cardItemSharing.push({
+          typeCardItem: 'newCardItemShared',
+          iconMenuItems: listOptions && listOptions.length > 0 ? listOptions
+            .filter(office => !officeIds.includes(office.id))
+            .map(office => ({
+              label: office.name,
+              icon: `app-icon ${IconsEnum.Offices}`,
+              command: () => this.handleCreateNewShared(office),
+            })) : []
+        });
       }
     } else {
-      const message = event.office === this.translateSrv.instant('all') ? `${this.translateSrv.instant('messages.deleteSharedWithAllConfirmation')}?` :
-        `${this.translateSrv.instant('messages.deleteSharedWithConfirmation')} ${event.office}?`
+      const message = event.office === this.translateSrv.instant('all') ?
+        `${this.translateSrv.instant('messages.deleteSharedWithAllConfirmation')}?` :
+        `${this.translateSrv.instant('messages.deleteSharedWithConfirmation')} ${event.office}?`;
       this.confirmationSrv.confirm({
         message,
         key: 'deleteConfirm',
         acceptLabel: this.translateSrv.instant('yes'),
         rejectLabel: this.translateSrv.instant('no'),
-        accept: async () => {
-          this.cardItemSharing = Array.from(this.cardItemSharing.filter(card => !card.titleCardItem || card.titleCardItem !== event.office));
+        accept: async() => {
+          this.cardItemSharing = Array.from(this.cardItemSharing.filter(card => !card.titleCardItem ||
+            card.titleCardItem !== event.office));
           setTimeout(() => {
             this.messageSrv.add({
               severity: 'success',
@@ -280,9 +304,19 @@ export class SharingComponent implements OnInit {
               detail: this.translateSrv.instant('messages.deleteSuccessful')
             });
           }, 300);
-        },
-        reject: () => {
-          return;
+          this.cardItemSharing.pop();
+          const officeIds = this.cardItemSharing.map( o => o.office.id);
+          const listOptions = Array.from([...this.officeListOptionsSharing.filter( op => !officeIds.includes(op.id) )]);
+          this.cardItemSharing.push({
+            typeCardItem: 'newCardItemShared',
+            iconMenuItems: listOptions && listOptions.length > 0 ? listOptions
+              .filter(office => !officeIds.includes(office.id))
+              .map(office => ({
+                label: office.name,
+                icon: `app-icon ${IconsEnum.Offices}`,
+                command: () => this.handleCreateNewShared(office),
+              })) : []
+          });
         }
       });
     }
@@ -290,7 +324,8 @@ export class SharingComponent implements OnInit {
   }
 
   handleShowSaveButton() {
-    if (this.cardItemSharing.filter(card => card.typeCardItem === 'sharedItem' && (!card.selectedOption || card.selectedOption === '')).length === 0) {
+    if (this.cardItemSharing
+      .filter(card => card.typeCardItem === 'sharedItem' && (!card.selectedOption || card.selectedOption === '')).length === 0) {
       this.saveButton.showButton();
     }
     this.cancelButton.showButton();

@@ -50,7 +50,7 @@
   <p-header class="card-item-header">
     <span class="card-item-title-shared">{{properties.titleCardItem}}</span>
     <button type="button" pButton icon="fas fa-trash-alt"
-      (click)="!properties.readOnly && handleDeleteSharedCard()"></button>
+      (click)="(!properties.readOnly || properties.canDelete) && handleDeleteSharedCard()"></button>
   </p-header>
   <div class="card-item-content">
     <span class="p-float-label">
