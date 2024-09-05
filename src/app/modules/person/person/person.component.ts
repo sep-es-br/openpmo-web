@@ -70,14 +70,14 @@ export class PersonComponent implements OnInit, OnDestroy {
     private officePermissionSrv: OfficePermissionService,
     private setConfigWorkpackSrv: SetConfigWorkpackService
   ) {
-    this.activeRoute.queryParams.subscribe(async ({ idOffice, idPerson }) => {
+    this.activeRoute.queryParams.subscribe(async({ idOffice, idPerson }) => {
       this.idOffice = +idOffice;
       this.idPerson = +idPerson;
       await this.loads();
     });
     this.formPerson = this.formBuilder.group({
       name: ['', [Validators.required, MinLengthTextCustomValidator.minLengthText]],
-      fullname: ['', [Validators.required, MinLengthTextCustomValidator.minLengthText]],
+      fullName: ['', [Validators.required, MinLengthTextCustomValidator.minLengthText]],
       email: [''],
       contactEmail: ['', [Validators.email]],
       phoneNumber: [''],
@@ -88,10 +88,10 @@ export class PersonComponent implements OnInit, OnDestroy {
       .subscribe(() => this.saveButton?.hideButton());
     this.formPerson.valueChanges
       .pipe(takeUntil(this.$destroy), filter(() => this.formPerson.dirty && this.formPerson.valid))
-      .subscribe(() => { this.saveButton.showButton() });
+      .subscribe(() => { this.saveButton.showButton(); });
     this.formPerson.valueChanges
       .pipe(takeUntil(this.$destroy), filter(() => this.formPerson.dirty))
-      .subscribe(() => { this.cancelButton.showButton() });
+      .subscribe(() => { this.cancelButton.showButton(); });
     this.responsiveSvr.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.responsive = value);
   }
 
@@ -123,18 +123,18 @@ export class PersonComponent implements OnInit, OnDestroy {
   }
 
   formatPhoneNumber(value: string) {
-    if (!value) return value;
-    let formatedValue = value.replace(/\D/g, "");
-    formatedValue = formatedValue.replace(/^0/, "");
+    if(!value) {return value;}
+    let formatedValue = value.replace(/\D/g, '');
+    formatedValue = formatedValue.replace(/^0/, '');
     if (formatedValue.length > 10) {
-      formatedValue = formatedValue.replace(/^(\d\d)(\d{5})(\d{4}).*/, "($1) $2-$3");
+      formatedValue = formatedValue.replace(/^(\d\d)(\d{5})(\d{4}).*/, '($1) $2-$3');
     } else if (formatedValue.length > 5) {
-      formatedValue = formatedValue.replace(/^(\d\d)(\d{4})(\d{0,4}).*/, "($1) $2-$3");
+      formatedValue = formatedValue.replace(/^(\d\d)(\d{4})(\d{0,4}).*/, '($1) $2-$3');
     } else if (formatedValue.length > 2) {
-      formatedValue = formatedValue.replace(/^(\d\d)(\d{0,5})/, "($1) $2");
+      formatedValue = formatedValue.replace(/^(\d\d)(\d{0,5})/, '($1) $2');
     } else {
       if (formatedValue.length != 0) {
-        formatedValue = formatedValue.replace(/^(\d*)/, "($1");
+        formatedValue = formatedValue.replace(/^(\d*)/, '($1');
       }
     }
     return formatedValue;
@@ -205,7 +205,7 @@ export class PersonComponent implements OnInit, OnDestroy {
   setFormPerson(person: IPerson) {
     this.formPerson.reset({
       name: person?.name,
-      fullname: person?.fullName,
+      fullName: person?.fullName,
       email: person?.email,
       contactEmail: person?.contactEmail,
       phoneNumber: this.formatPhoneNumber(person.phoneNumber),
@@ -215,7 +215,8 @@ export class PersonComponent implements OnInit, OnDestroy {
 
   setCardsPlans(person: IPerson) {
     this.cardsPlans = person?.officePermission?.planPermissions?.filter(planPermission =>
-      planPermission.accessLevel !== 'NONE' || (planPermission.accessLevel === 'NONE' && planPermission.workpacksPermission && planPermission.workpacksPermission.length > 0))
+      planPermission.accessLevel !== 'NONE' || (planPermission.accessLevel === 'NONE'
+        && planPermission.workpacksPermission && planPermission.workpacksPermission.length > 0))
       .map(plan => ({
         toggleable: false,
         initialStateToggle: false,
@@ -236,7 +237,7 @@ export class PersonComponent implements OnInit, OnDestroy {
               idWorkpack: workpack.id,
               idPerson: this.propertiesPerson.id,
               idPlan: plan.id
-            }
+            };
           const cardItem: ICardItem = {
             icon: workpack.icon,
             typeCardItem: 'listItemPermissionWorkpack',
@@ -244,7 +245,7 @@ export class PersonComponent implements OnInit, OnDestroy {
             nameCardItem: workpack.name,
             subtitleCardItem: workpack?.roles?.map(role => this.translateSrv.instant(role)).join(', '),
             statusItem: workpack.ccbMember === true ? 'ccbMember' : workpack.accessLevel !== 'NONE' ? workpack.accessLevel : null,
-            onClick: async () => await this.loadWorkpackConfig(plan.id, workpack.id, urlCard, queryParams)
+            onClick: async() => await this.loadWorkpackConfig(plan.id, workpack.id, urlCard, queryParams)
           };
           return cardItem;
         }),
