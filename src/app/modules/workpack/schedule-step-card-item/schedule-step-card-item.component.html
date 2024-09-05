@@ -17,7 +17,6 @@
       <div class="unitInputs p-fluid">
         <span class="column-title">{{properties.unitName}}</span>
 
-        <!--UNIT BASELINE-->
         <span *ngIf="isCurrentBaseline" class="p-float-label p-field">
           <p-inputNumber [class]="'app-input-number '+'unitBaseline '+'unitBaseline'+ properties.idStep" id="float-unitBaseline" (onInput)="handleStepChange($event, 'unitPlanned')"
             [disabled]="true" [(ngModel)]="properties.unitBaseline"
@@ -27,21 +26,21 @@
           <label class="app-input-label" for="float-unitBaseline]">{{"baselineCardItem" | translate}}</label>
         </span>
 
-        <span class="p-float-label p-field">
+        <!-- UnitPlanned -->
+        <span *ngIf="!isPassedMonth" class="p-float-label p-field">
           <p-inputNumber [class]="'app-input-number '+'unitPlanned '+'unitPlanned-'+ properties.idStep" id="float-unitPlanned" (onInput)="handleStepChange($event, 'unitPlanned')"
-            [disabled]="!properties.editPermission || isPlannedValuesDisabled" [(ngModel)]="properties.unitPlanned"
+            [disabled]="!properties.editPermission" [(ngModel)]="properties.unitPlanned"
             [class.red]="properties.unitPlanned < 0"
             [minFractionDigits]="properties.unitPrecision" [maxFractionDigits]="properties.unitPrecision"
             [locale]="language === 'pt-BR' ? 'pt-BR' : 'en-US'">
           </p-inputNumber>
           <label class="app-input-label" for="float-unitPlanned">{{ foreseenLabel |translate }}</label>
         </span>
-        <div class="replicate-button-container">
+        <div *ngIf="!isPassedMonth" class="replicate-button-container">
           <i class="fas fa-caret-up" [class.disabled]="!properties.editPermission || !showReplicateButton" [class.replicate-hide]="!showReplicateButton"
             (click)="properties.editPermission && showReplicateButton && confirmReplicateValueDif('unitActual')"></i>
         </div>
         <span class="p-float-label p-field">
-          <!-- Actual Unit -->
           <p-inputNumber class="app-input-number" id="float-unitActual" (onInput)="handleStepChange($event, 'unitActual')"
             [disabled]="!properties.editPermission || isActualValuesDisabled" [(ngModel)]="properties.unitActual"
             [class.red]="properties.unitActual < 0"
@@ -62,7 +61,6 @@
         (click)="properties.multipleCosts && handleEditCosts($event)">
         <span class="column-title"> $ </span>
         
-        <!--PLANNED COST BASELINE-->
         <span *ngIf="isCurrentBaseline" class="p-float-label p-field">
           <p-inputNumber [class]="'app-input-number '+'costBaseline-'+properties.idStep" id="float-costBaseline"
             [disabled]="true"
@@ -73,12 +71,13 @@
           <label class="app-input-label" for="float-costPlanned">{{ "baselineCardItem" | translate}}</label>
         </span>
 
-        <span class="p-float-label p-field">
+        <!-- Cost Planned -->
+        <span *ngIf="!isPassedMonth" class="p-float-label p-field">
           <p-inputNumber [class]="'app-input-number '+'costPlanned-'+properties.idStep" id="float-costPlanned"
             (click)="properties.multipleCosts && handleEditCosts($event); properties.multipleCosts && disable()"
             (onFocus)="properties.multipleCosts && handleEditCosts($event); properties.multipleCosts && disable()"
             (mouseout)="multiCostsEdited = false"
-            [disabled]="(properties.multipleCosts && multiCostsEdited) || !properties.editPermission || (!properties.multipleCosts && !properties.editCosts) || isPlannedValuesDisabled"
+            [disabled]="(properties.multipleCosts && multiCostsEdited) || !properties.editPermission || (!properties.multipleCosts && !properties.editCosts)"
             (onInput)="handleStepCostChange($event, 'costPlanned')"
             [class.red]="properties.costPlanned < 0"
             [(ngModel)]="properties.costPlanned" [minFractionDigits]="2" [maxFractionDigits]="2"
@@ -86,13 +85,12 @@
           </p-inputNumber>
           <label class="app-input-label" for="float-costPlanned">{{ foreseenLabel |translate }}</label>
         </span>
-        <div class="replicate-button-container">
+        <div *ngIf="!isPassedMonth" class="replicate-button-container">
           <i class="fas fa-caret-up" [class.disabled]="!properties.editCosts || !properties.editPermission || !showReplicateButton"
             [class.replicate-hide]="!showReplicateButton"
             (click)="(properties.editCosts && properties.editPermission && showReplicateButton) && confirmReplicateValueDif('costActual')"></i>
         </div>
         <span class="p-float-label p-field">
-          <!-- Actual Cost -->
           <p-inputNumber class="app-input-number" id="float-costActual"
             (click)="properties.multipleCosts && handleEditCosts($event); properties.multipleCosts && disable()"
             (onFocus)="properties.multipleCosts && handleEditCosts($event); properties.multipleCosts && disable()"

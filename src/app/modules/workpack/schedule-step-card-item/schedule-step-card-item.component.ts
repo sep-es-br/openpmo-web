@@ -33,9 +33,9 @@ export class ScheduleStepCardItemComponent implements OnInit, OnDestroy {
   difference;
   multiCostsEdited = false;
   foreseenLabel: string;
-  isPlannedValuesDisabled: boolean = false;
   isActualValuesDisabled: boolean = false;
   isCurrentBaseline: boolean = false;
+  isPassedMonth: boolean = false;
 
   constructor(
     private translateSrv: TranslateService,
@@ -56,7 +56,7 @@ export class ScheduleStepCardItemComponent implements OnInit, OnDestroy {
     this.cardIdItem = this.properties.idStep ?
       `${this.properties.idStep < 10 ? '0' + this.properties.idStep : this.properties.idStep}` : '';
     this.setLanguage();
-    this.updatePlannedValues();
+    this.handlePassedMonths();
     this.updateActualValues();
     this.handleCurrentBaseline();
     if (this.properties.stepName)  {
@@ -190,34 +190,16 @@ export class ScheduleStepCardItemComponent implements OnInit, OnDestroy {
     this.multiCostsEdited = !this.properties.editCosts ? true : false;
   }
 
-  /**
-   * updates the value from 'disabled' in angular
-   */
-  updatePlannedValues() {
-    this.route.queryParams.subscribe(params => {
-      const workpackId = params['id'];
-      if (!workpackId) return;
-  
-      this.scheduleCardItemSrv.getCurrentBaseline(workpackId).subscribe(response => {
-        if (!response.success) {
-          console.error(response.error);
-          return;
-        }
-  
-        if (!this.properties.stepName) return;
-  
-        const dateStep = moment(this.properties.stepName, 'YYYY-MM');
-        const startOfCurrentMonth = moment().startOf('month');
-        const endOfPreviousMonth = startOfCurrentMonth.clone().subtract(1, 'day');
-  
-        // Applies only for the passed months
-        if (dateStep.isBefore(startOfCurrentMonth) && dateStep.isBefore(endOfPreviousMonth)) {
-          this.isPlannedValuesDisabled = true;
-          this.properties.costPlanned = this.properties.costActual;
-          this.properties.unitPlanned = this.properties.unitActual;
-        }
-      });
-    });
+  handlePassedMonths() {
+    if (!this.properties.stepName) return;
+    
+    const dateStep = moment(this.properties.stepName, 'YYYY-MM');
+    const startOfCurrentMonth = moment().startOf('month');
+    const endOfPreviousMonth = startOfCurrentMonth.clone().subtract(1, 'day');
+
+    if (dateStep.isBefore(startOfCurrentMonth) && dateStep.isBefore(endOfPreviousMonth)) {
+      this.isPassedMonth = true;
+    }
   }
 
   private getWorkpackId(): Observable<number | null> {
@@ -235,7 +217,6 @@ export class ScheduleStepCardItemComponent implements OnInit, OnDestroy {
   }
   
   handleCurrentBaseline() {
-    debugger
     this.getWorkpackId().pipe(
       switchMap(workpackId => {
         if (!workpackId) return EMPTY;
