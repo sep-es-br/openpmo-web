@@ -91,7 +91,7 @@ export class StakeholderOrganizationComponent implements OnInit {
     await this.loadStakeholder();
     let breadcrumbItems = this.breadcrumbSrv.get;
     if (!breadcrumbItems || breadcrumbItems.length === 0) {
-      breadcrumbItems = await this.breadcrumbSrv.loadWorkpackBreadcrumbs(this.idWorkpack, this.idPlan)
+      breadcrumbItems = await this.breadcrumbSrv.loadWorkpackBreadcrumbs(this.idWorkpack, this.idPlan);
     }
     this.breadcrumbSrv.setMenu([
       ...breadcrumbItems,
@@ -150,7 +150,7 @@ export class StakeholderOrganizationComponent implements OnInit {
       if (resultModel.success) {
         this.rolesOptions = resultModel.data.organizationRoles.map(role => ({
           label: role,
-          value: role.toLowerCase()
+          value: role
         }));
       }
     }
@@ -158,7 +158,8 @@ export class StakeholderOrganizationComponent implements OnInit {
     if (isUserAdmin) {
       this.editPermission = !this.workpack.canceled;
     } else {
-      this.editPermission = (this.workpack.permissions && this.workpack.permissions.filter(p => p.level === 'EDIT').length > 0) && !this.workpack.canceled;
+      this.editPermission =
+        (this.workpack.permissions && this.workpack.permissions.filter(p => p.level === 'EDIT').length > 0) && !this.workpack.canceled;
     }
   }
 

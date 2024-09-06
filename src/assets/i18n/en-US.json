@@ -646,6 +646,11 @@
       "thereAreNotCostAccounts": "There are not cost accounts"
     },
     "error": {
+      "link": {
+        "already": {
+          "exists": "This office has linked workpack in this office. You need to unlink this to revoke the sharing."
+        }
+      },
       "file": {
         "upload": {
           "maxsize": {

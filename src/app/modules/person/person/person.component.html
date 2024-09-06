@@ -22,7 +22,7 @@
             <span class="name" *ngIf="!propertiesPerson?.isUser">
               <span class="p-float-label property-input p-field">
                 <input pInputText class="app-input-text" type="text" [class.responsive]="responsive"
-                  formControlName="fullname">
+                  formControlName="fullName">
                 <label class="app-input-label">{{ 'fullName' | translate }} </label>
               </span>
             </span>
@@ -36,7 +36,7 @@
             <span class="p-float-label property-input p-field" *ngIf="propertiesPerson?.email">
               <input pInputText class="app-input-text" type="text" [class.responsive]="responsive"
                 formControlName="email" [readOnly]="true">
-              <label class="app-input-label">{{ 'accessEmail' | translate }} 
+              <label class="app-input-label">{{ 'accessEmail' | translate }}
                 <i class="far fa-question-circle" [pTooltip]="'help.person.accessEmail' | translate"></i>
               </label>
             </span>
@@ -53,7 +53,7 @@
                 <span class="p-float-label property-input-text p-field p-col-12 p-md-4">
                   <input pInputText class="app-input-text" type="text" [class.responsive]="responsive"
                     formControlName="contactEmail">
-                  <label class="app-input-label">{{ 'email' | translate }} 
+                  <label class="app-input-label">{{ 'email' | translate }}
                     <i class="far fa-question-circle" [pTooltip]="'help.person.contactEmail' | translate"></i>
                   </label>
                 </span>
@@ -61,7 +61,7 @@
                   <input pInputText class="app-input-text" formControlName="phoneNumber" [class.responsive]="responsive"
                     (blur)="setPhoneNumberMask()" [placeholder]="phoneNumberPlaceholder"
                     (focus)="setPhoneNumberPlaceholder()" (input)="setPhoneNumberPlaceholder()" />
-                  <label class="app-input-label">{{ 'phone' | translate }} 
+                  <label class="app-input-label">{{ 'phone' | translate }}
                     <i class="far fa-question-circle" [pTooltip]="'help.person.phoneNumber' | translate"></i>
                   </label>
                 </span>
@@ -69,7 +69,7 @@
               <span class="p-float-label property-input p-field">
                 <textarea pInputTextarea class="app-text-area" [class.responsive]="responsive" formControlName="address"
                   [rows]="1"></textarea>
-                <label class="app-input-label">{{ 'address' | translate }} 
+                <label class="app-input-label">{{ 'address' | translate }}
                   <i class="far fa-question-circle" [pTooltip]="'help.person.address' | translate"></i>
                 </label>
               </span>

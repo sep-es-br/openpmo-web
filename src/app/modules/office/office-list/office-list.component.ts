@@ -3,7 +3,7 @@ import { ResponsiveService } from 'src/app/shared/services/responsive.service';
 import { IFilterProperty } from './../../../shared/interfaces/IFilterProperty';
 import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
 import { FilterDataviewService } from '../../../shared/services/filter-dataview.service';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { IconsEnum } from 'src/app/shared/enums/IconsEnum';
 import { ICard } from 'src/app/shared/interfaces/ICard';
@@ -31,7 +31,7 @@ import { ConfigDataViewService } from 'src/app/shared/services/config-dataview.s
     )
   ]
 })
-export class OfficeListComponent implements OnInit {
+export class OfficeListComponent implements OnInit, OnDestroy {
 
   cardProperties: ICard = {
     toggleable: false,
@@ -121,7 +121,7 @@ export class OfficeListComponent implements OnInit {
   handleSetCookiesDecline() {
     const user = this.authSrv.getTokenPayload();
     if (user && user.email) {
-      localStorage.setItem('cookiesDecline' + user.email, 'true')
+      localStorage.setItem('cookiesDecline' + user.email, 'true');
     }
     this.showCookiesPermissionMessage = false;
   }
@@ -204,7 +204,7 @@ export class OfficeListComponent implements OnInit {
       this.cardProperties = {
         ...this.cardProperties,
         filters: result.data
-      }
+      };
     }
   }
 
@@ -216,7 +216,7 @@ export class OfficeListComponent implements OnInit {
       localStorage.removeItem('@pmo/current-breadcrumb');
       this.router.navigate(['/filter-dataview'], {
         queryParams: {
-          idFilter: idFilter,
+          idFilter,
           entityName: 'offices'
         }
       });
@@ -253,7 +253,7 @@ export class OfficeListComponent implements OnInit {
         label: prop.label,
         name: prop.apiValue,
         active: true,
-      }
+      };
       return property;
     });
     return filterPropertiesList;

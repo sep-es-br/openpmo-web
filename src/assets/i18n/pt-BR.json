@@ -646,6 +646,11 @@
       "thereAreNotCostAccounts": "Não existem centros de custo"
     },
     "error": {
+      "link": {
+        "already": {
+          "exists": "Este escritório já possui pacotes de trabalho consumindo este compartilhamento. Você deve primeiro desfazer o consumo para então desfazer o compartilhamento."
+        }
+      },
       "file": {
         "upload": {
           "maxsize": {
