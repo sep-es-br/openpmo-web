@@ -130,7 +130,7 @@ export class PersonService extends BaseService<IPerson> {
         success: true,
         data: this.avatarFile
       };
-    } 
+    }
     const result = await this.http.get(`${this.urlBase}/${idPerson}/avatar`).toPromise() as IHttpResult<IFile>;
     this.avatarFile = result.data as IFile;
     return result as IHttpResult<IFile>;
