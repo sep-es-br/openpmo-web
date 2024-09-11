@@ -1136,7 +1136,7 @@ export class WorkpackComponent implements OnDestroy {
       const idFilterSelected = this.cardsWorkPackModelChildren[index].cardSection.filters.find(defaultFilter => !!defaultFilter.favorite) ?
         this.cardsWorkPackModelChildren[index].cardSection.filters.find(defaultFilter => !!defaultFilter.favorite).id : undefined;
       const resultItemsList = await this.loadWorkpacksFromWorkpackModel
-        (this.idPlan, workpackModel.idWorkpackModelOriginal, idFilterSelected, '', false, workpackModel.idWorkpackModelLinked);
+        (this.idPlan, workpackModel.idWorkpackModelLinked, idFilterSelected, '', false, workpackModel.idWorkpackModelLinked);
       this.cardsWorkPackModelChildren[index].cardItemsSection = resultItemsList && resultItemsList.workpackItemCardList;
       this.cardsWorkPackModelChildren[index].cardSection.isLoading = false;
     });
