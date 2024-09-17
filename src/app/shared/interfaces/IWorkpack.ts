@@ -42,6 +42,7 @@ export interface IWorkpack {
       }[];
     };
     plan?: IPlan; // only getByIdworkpackLinked
+    planOrigin?: IPlan;
     model?: IWorkpackModel; // only getByIdWorkpackLinked
 }
 

@@ -432,7 +432,7 @@ export class WorkpackComponent implements OnDestroy {
       this.workpack = result.data;
       this.setUnitMeansure();
       const workpackParams = this.workpackSrv.getWorkpackParams();
-      workpackParams.idOfficeOwnerWorkpackLinked = this.workpack.plan.idOffice;
+      workpackParams.idOfficeOwnerWorkpackLinked = this.workpack.planOrigin.idOffice;
       this.workpackSrv.setWorkpackParams({ ...workpackParams });
       if (!this.isUserAdmin && this.workpack) {
         const editPermission = !!this.workpack.permissions?.find(p => p.level === 'EDIT');

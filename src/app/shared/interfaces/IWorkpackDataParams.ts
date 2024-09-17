@@ -5,7 +5,7 @@ import { IWorkpack } from 'src/app/shared/interfaces/IWorkpack';
 
 export interface IWorkpackData {
   workpack: IWorkpack;
-  workpackModel: IWorkpackModel;    
+  workpackModel: IWorkpackModel;
 }
 
 export interface  IWorkpackParams {
