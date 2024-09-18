@@ -1,6 +1,6 @@
 <div class="app-office-permission-detail">
   <div class="app-content-header" [class.mobile]="responsive" *ngIf="!isLoading">
-    <span *ngIf="key && person; else newPermissionTitle">{{ person.name }}</span>
+    <span *ngIf="key && person; else newPermissionTitle">{{ person.name | formatName }}</span>
     <ng-template #newPermissionTitle>
       <span>{{ "newPermission" | translate }}</span>
     </ng-template>
@@ -97,7 +97,7 @@
           <app-card-loading [isCardLoading]="isLoadingCitizen"></app-card-loading>
         </div>
         <p-card class="card-person" *ngIf="person" [class.responsive]="responsive">
-          <span class="person-name">{{person.name}}</span>
+          <span class="person-name">{{person.name | formatName}}</span>
           <span class="person-email">{{person.email}}</span>
         </p-card>
       </div>

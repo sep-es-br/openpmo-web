@@ -190,6 +190,8 @@
   "actual": "Realizado",
   "planned": "Estimado",
   "foreseen": "Estimado",
+  "baselineCardItem": "LB",
+  "reprogrammed": "Reprogramado",
   "totals": "Totais",
   "hideDetails": "Esconder detalhes",
   "showDetails": "Mostrar detalhes",

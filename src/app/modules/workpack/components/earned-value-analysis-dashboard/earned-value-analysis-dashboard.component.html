@@ -1,4 +1,4 @@
-<div class="app-earned-value-dashboard" [class.responsive]="!!responsive" [class.width-1500]="mediaScreen1500">
+<div *ngIf="showContent" class="app-earned-value-dashboard" [class.responsive]="!!responsive" [class.width-1500]="mediaScreen1500">
   <span class="title">{{'earnedValueAnalysis' | translate}}</span>
   <div class="card-panel">
     <div class="chart-container">

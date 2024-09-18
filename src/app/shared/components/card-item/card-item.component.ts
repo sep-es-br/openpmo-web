@@ -8,6 +8,7 @@ import localePt from '@angular/common/locales/pt';
 import { registerLocaleData } from '@angular/common';
 import { Subject } from 'rxjs';
 import { MobileViewService } from '../../services/mobile-view.service';
+import { FormatNamePipe } from '../../pipes/format-name.pipe';
 registerLocaleData(localePt);
 
 @Component({
@@ -32,7 +33,7 @@ export class CardItemComponent implements OnInit {
     private router: Router,
     private responsiveSrv: MobileViewService,
     private translateSrv: TranslateService,
-    private breadcrumbSrv: BreadcrumbService
+    private breadcrumbSrv: BreadcrumbService,
   ) {
     this.responsiveSrv.observable.subscribe(value => {
       this.responsive = value;
@@ -46,6 +47,14 @@ export class CardItemComponent implements OnInit {
     this.setLanguage();
     this.cardIdItem = this.properties.itemId || this.properties.itemId === 0 ?
       `${this.properties.itemId < 10 && this.properties.itemId !== 0 ? '0' + this.properties.itemId : this.properties.itemId}` : '';
+
+      const segments = this.properties.urlCard.split('/');
+      const isPerson = segments[2] === 'person';
+      
+      if (isPerson) {
+        this.properties.nameCardItem = FormatNamePipe.prototype.transform(this.properties.nameCardItem);
+        this.properties.fullNameCardItem = FormatNamePipe.prototype.transform(this.properties.fullNameCardItem);
+      }
   }
 
   navigateToPage(url: string, params?: { name: string; value: string | number }[]) {

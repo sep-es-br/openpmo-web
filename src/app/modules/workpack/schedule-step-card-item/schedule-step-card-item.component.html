@@ -16,22 +16,33 @@
     <div class="unitValues">
       <div class="unitInputs p-fluid">
         <span class="column-title">{{properties.unitName}}</span>
-        <span class="p-float-label p-field">
+
+        <span *ngIf="isCurrentBaseline" class="p-float-label p-field">
+          <p-inputNumber [class]="'app-input-number '+'unitBaseline '+'unitBaseline'+ properties.idStep" id="float-unitBaseline" (onInput)="handleStepChange($event, 'unitPlanned')"
+            [disabled]="true" [(ngModel)]="properties.unitBaseline"
+            [minFractionDigits]="properties.unitPrecision" [maxFractionDigits]="properties.unitPrecision"
+            [locale]="language === 'pt-BR' ? 'pt-BR' : 'en-US'">
+          </p-inputNumber>
+          <label class="app-input-label" for="float-unitBaseline]">{{"baselineCardItem" | translate}}</label>
+        </span>
+
+        <!-- UnitPlanned -->
+        <span [ngStyle]="{ 'visibility': !isPassedMonth ? 'visible' : 'hidden'  }" class="p-float-label p-field">
           <p-inputNumber [class]="'app-input-number '+'unitPlanned '+'unitPlanned-'+ properties.idStep" id="float-unitPlanned" (onInput)="handleStepChange($event, 'unitPlanned')"
             [disabled]="!properties.editPermission" [(ngModel)]="properties.unitPlanned"
             [class.red]="properties.unitPlanned < 0"
             [minFractionDigits]="properties.unitPrecision" [maxFractionDigits]="properties.unitPrecision"
             [locale]="language === 'pt-BR' ? 'pt-BR' : 'en-US'">
           </p-inputNumber>
-          <label class="app-input-label" for="float-unitPlanned">{{ "planned" |translate }}</label>
+          <label class="app-input-label" for="float-unitPlanned">{{ foreseenLabel |translate }}</label>
         </span>
-        <div class="replicate-button-container">
+        <div [ngStyle]="{ 'visibility': !isPassedMonth ? 'visible' : 'hidden'  }" class="replicate-button-container">
           <i class="fas fa-caret-up" [class.disabled]="!properties.editPermission || !showReplicateButton" [class.replicate-hide]="!showReplicateButton"
             (click)="properties.editPermission && showReplicateButton && confirmReplicateValueDif('unitActual')"></i>
         </div>
         <span class="p-float-label p-field">
           <p-inputNumber class="app-input-number" id="float-unitActual" (onInput)="handleStepChange($event, 'unitActual')"
-            [disabled]="!properties.editPermission" [(ngModel)]="properties.unitActual"
+            [disabled]="!properties.editPermission || isActualValuesDisabled" [(ngModel)]="properties.unitActual"
             [class.red]="properties.unitActual < 0"
             [minFractionDigits]="properties.unitPrecision" [maxFractionDigits]="properties.unitPrecision"
             [locale]="language === 'pt-BR' ? 'pt-BR' : 'en-US'">
@@ -49,7 +60,19 @@
       <div class="costInputs p-fluid" [class.card-link]="properties.editPermission && !properties.editCosts && properties.multipleCosts"
         (click)="properties.multipleCosts && handleEditCosts($event)">
         <span class="column-title"> $ </span>
-        <span class="p-float-label p-field">
+        
+        <span *ngIf="isCurrentBaseline" class="p-float-label p-field">
+          <p-inputNumber [class]="'app-input-number '+'costBaseline-'+properties.idStep" id="float-costBaseline"
+            [disabled]="true"
+            [(ngModel)]="properties.baselinePlannedCost" 
+            [minFractionDigits]="2" [maxFractionDigits]="2"
+            [locale]="language === 'pt-BR' ? 'pt-BR' : 'en-US'">
+          </p-inputNumber>
+          <label class="app-input-label" for="float-costPlanned">{{ "baselineCardItem" | translate}}</label>
+        </span>
+
+        <!-- Cost Planned -->
+        <span [ngStyle]="{ 'visibility': !isPassedMonth ? 'visible' : 'hidden'  }" class="p-float-label p-field">
           <p-inputNumber [class]="'app-input-number '+'costPlanned-'+properties.idStep" id="float-costPlanned"
             (click)="properties.multipleCosts && handleEditCosts($event); properties.multipleCosts && disable()"
             (onFocus)="properties.multipleCosts && handleEditCosts($event); properties.multipleCosts && disable()"
@@ -60,9 +83,9 @@
             [(ngModel)]="properties.costPlanned" [minFractionDigits]="2" [maxFractionDigits]="2"
             [locale]="language === 'pt-BR' ? 'pt-BR' : 'en-US'">
           </p-inputNumber>
-          <label class="app-input-label" for="float-costPlanned">{{ "planned" |translate }}</label>
+          <label class="app-input-label" for="float-costPlanned">{{ foreseenLabel |translate }}</label>
         </span>
-        <div class="replicate-button-container">
+        <div [ngStyle]="{ 'visibility': !isPassedMonth ? 'visible' : 'hidden'  }" class="replicate-button-container">
           <i class="fas fa-caret-up" [class.disabled]="!properties.editCosts || !properties.editPermission || !showReplicateButton"
             [class.replicate-hide]="!showReplicateButton"
             (click)="(properties.editCosts && properties.editPermission && showReplicateButton) && confirmReplicateValueDif('costActual')"></i>
@@ -72,7 +95,7 @@
             (click)="properties.multipleCosts && handleEditCosts($event); properties.multipleCosts && disable()"
             (onFocus)="properties.multipleCosts && handleEditCosts($event); properties.multipleCosts && disable()"
             (mouseout)="multiCostsEdited = false"
-            [disabled]="(properties.multipleCosts && multiCostsEdited) || !properties.editPermission || (!properties.multipleCosts && !properties.editCosts)"
+            [disabled]="(properties.multipleCosts && multiCostsEdited) || !properties.editPermission || (!properties.multipleCosts && !properties.editCosts) || isActualValuesDisabled"
             (onInput)="handleStepCostChange($event, 'costActual')"
             [class.red]="properties.costActual < 0"
             [(ngModel)]="properties.costActual" [minFractionDigits]="2" [maxFractionDigits]="2"

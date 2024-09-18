@@ -100,7 +100,7 @@
           <app-card-loading [isCardLoading]="isLoadingCitizen"></app-card-loading>
         </div>
         <p-card class="card-person" *ngIf="person" [class.responsive]="responsive">
-          <span class="person-name">{{person.name}}</span>
+          <span class="person-name">{{person.name | formatName}}</span>
           <span class="person-email">{{person.email}}</span>
         </p-card>
       </div>
