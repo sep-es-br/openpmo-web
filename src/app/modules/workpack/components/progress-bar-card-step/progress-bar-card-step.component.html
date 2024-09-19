@@ -1,7 +1,7 @@
 <div class="app-progress-card-step">
   <div class="progress-header-values-container" [ngStyle]="{width: barHeight === 17 ? '85%' : '100%'}"
     [class.responsive]="responsive">
-    <div class="progress-bar-total-container" *ngIf="total >= progress && total >= baseline"
+    <!-- <div class="progress-bar-total-container" *ngIf="total >= progress && total >= baseline"
       [ngStyle]="{width: '100%', background: barHeight === 7 ? 'rgba(0, 70, 96, 0.19)' : '#ffffff'}">
       <div class="progress-bar"
         [ngStyle]="{width: (progress/total)*100 + '%', background: total !== 0 ? color : 'transparent', height: barHeight + 'px'}">
@@ -12,7 +12,7 @@
       <div class="progress-bar"
         [ngStyle]="{width: (progress/total)*100 + '%', background: total !== 0 ? color : 'transparent', height: barHeight + 'px'}">
       </div>
-    </div>
+    </div> -->
     <div class="progress-bar-progress-container" *ngIf="progress > total && progress >= baseline"
       [ngStyle]="{width: '100%', background: color, height: barHeight + 'px'}">
       <div class="total-bar" [ngStyle]="{width: (total/progress)*100 + '%', background: 'transparent'}">

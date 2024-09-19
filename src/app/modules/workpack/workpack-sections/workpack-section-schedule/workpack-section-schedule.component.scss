@@ -151,6 +151,11 @@
         .p-dataview-content .p-grid {
           .card-item-container {
             flex-basis: auto;
+
+            &#card-labels-container {
+              // background-color: red;
+              flex-basis: 105px;
+            }
     
             &.show-details {
               flex-basis: 210px;
@@ -247,6 +252,45 @@
       }
       
     }
+
+    .labels-container .p-card {
+      // display: flex;
+      // flex-direction: column;
+      // justify-content: space-evenly;
+      // align-items: end;
+      // margin-top: 1px;
+      // border: 1px solid black;
+      // height: 100%;
+
+      // .p-card {
+          background: #ffffff7f;
+          // border: 1px solid #d4d4d4;
+          box-shadow: none;
+          display: flex;
+          flex-direction: column;
+          height: 100%;
+          width: 100%;
+          justify-content: space-evenly;
+          align-items: end;
+        // }
+    }
+
+    .label-item {
+      justify-content: space-between;
+      margin-bottom: -5px;
+      margin-top: 25px;
+      text-align: right;
+    }
+
+    .label-title {
+      font-weight: bold;
+      text-align: right;
+    }
+
+    div#actual-label-item {
+      margin-top: 50px;
+    }
+    
 }
 
 ::ng-deep .type-distribution-dialog {

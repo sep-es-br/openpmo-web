@@ -23,9 +23,12 @@
             [minFractionDigits]="properties.unitPrecision" [maxFractionDigits]="properties.unitPrecision"
             [locale]="language === 'pt-BR' ? 'pt-BR' : 'en-US'">
           </p-inputNumber>
-          <label class="app-input-label" for="float-unitBaseline]">{{"baselineCardItem" | translate}}</label>
         </span>
-
+        <div class="progress-bar-unit-container">
+          <app-progress-bar-card-step [total]="properties.unitPlanned" [progress]="properties.unitActual"
+            [baseline]="properties.unitBaseline" [color]="properties.unitProgressBar.color" [barHeight]="13">
+          </app-progress-bar-card-step>
+        </div>
         <!-- UnitPlanned -->
         <span [ngStyle]="{ 'visibility': !isPassedMonth ? 'visible' : 'hidden'  }" class="p-float-label p-field">
           <p-inputNumber [class]="'app-input-number '+'unitPlanned '+'unitPlanned-'+ properties.idStep" id="float-unitPlanned" (onInput)="handleStepChange($event, 'unitPlanned')"
@@ -34,8 +37,12 @@
             [minFractionDigits]="properties.unitPrecision" [maxFractionDigits]="properties.unitPrecision"
             [locale]="language === 'pt-BR' ? 'pt-BR' : 'en-US'">
           </p-inputNumber>
-          <label class="app-input-label" for="float-unitPlanned">{{ foreseenLabel |translate }}</label>
         </span>
+        <div class="progress-bar-unit-container">
+          <app-progress-bar-card-step [total]="properties.unitPlanned" [progress]="properties.unitActual"
+            [baseline]="properties.unitBaseline" [color]="properties.unitProgressBar.color" [barHeight]="13">
+          </app-progress-bar-card-step>
+        </div>
         <div [ngStyle]="{ 'visibility': !isPassedMonth ? 'visible' : 'hidden'  }" class="replicate-button-container">
           <i class="fas fa-caret-up" [class.disabled]="!properties.editPermission || !showReplicateButton" [class.replicate-hide]="!showReplicateButton"
             (click)="properties.editPermission && showReplicateButton && confirmReplicateValueDif('unitActual')"></i>
@@ -47,13 +54,12 @@
             [minFractionDigits]="properties.unitPrecision" [maxFractionDigits]="properties.unitPrecision"
             [locale]="language === 'pt-BR' ? 'pt-BR' : 'en-US'">
           </p-inputNumber>
-          <label class="app-input-label" for="float-unitActual">{{ "actual" |translate }}</label>
         </span>
-      </div>
-      <div class="progress-bar-unit-container">
-        <app-progress-bar-card-step [total]="properties.unitPlanned" [progress]="properties.unitActual"
-          [baseline]="properties.unitBaseline" [color]="properties.unitProgressBar.color" [barHeight]="13">
-        </app-progress-bar-card-step>
+        <div class="progress-bar-unit-container">
+          <app-progress-bar-card-step [total]="properties.unitPlanned" [progress]="properties.unitActual"
+            [baseline]="properties.unitBaseline" [color]="properties.unitProgressBar.color" [barHeight]="13">
+          </app-progress-bar-card-step>
+        </div>
       </div>
     </div>
     <div class="costValues">
@@ -68,9 +74,12 @@
             [minFractionDigits]="2" [maxFractionDigits]="2"
             [locale]="language === 'pt-BR' ? 'pt-BR' : 'en-US'">
           </p-inputNumber>
-          <label class="app-input-label" for="float-costPlanned">{{ "baselineCardItem" | translate}}</label>
         </span>
-
+        <div class="progress-bar-unit-container">
+          <app-progress-bar-card-step [total]="properties.unitPlanned" [progress]="properties.unitActual"
+            [baseline]="properties.unitBaseline" [color]="properties.unitProgressBar.color" [barHeight]="13">
+          </app-progress-bar-card-step>
+        </div>
         <!-- Cost Planned -->
         <span [ngStyle]="{ 'visibility': !isPassedMonth ? 'visible' : 'hidden'  }" class="p-float-label p-field">
           <p-inputNumber [class]="'app-input-number '+'costPlanned-'+properties.idStep" id="float-costPlanned"
@@ -83,8 +92,12 @@
             [(ngModel)]="properties.costPlanned" [minFractionDigits]="2" [maxFractionDigits]="2"
             [locale]="language === 'pt-BR' ? 'pt-BR' : 'en-US'">
           </p-inputNumber>
-          <label class="app-input-label" for="float-costPlanned">{{ foreseenLabel |translate }}</label>
         </span>
+        <div class="progress-bar-unit-container">
+          <app-progress-bar-card-step [total]="properties.unitPlanned" [progress]="properties.unitActual"
+            [baseline]="properties.unitBaseline" [color]="properties.unitProgressBar.color" [barHeight]="13">
+          </app-progress-bar-card-step>
+        </div>
         <div [ngStyle]="{ 'visibility': !isPassedMonth ? 'visible' : 'hidden'  }" class="replicate-button-container">
           <i class="fas fa-caret-up" [class.disabled]="!properties.editCosts || !properties.editPermission || !showReplicateButton"
             [class.replicate-hide]="!showReplicateButton"
@@ -101,15 +114,19 @@
             [(ngModel)]="properties.costActual" [minFractionDigits]="2" [maxFractionDigits]="2"
             [locale]="language === 'pt-BR' ? 'pt-BR' : 'en-US'">
           </p-inputNumber>
-          <label class="app-input-label" for="float-costActual">{{ "actual" |translate }}</label>
         </span>
+        <div class="progress-bar-unit-container">
+          <app-progress-bar-card-step [total]="properties.unitPlanned" [progress]="properties.unitActual"
+            [baseline]="properties.unitBaseline" [color]="properties.unitProgressBar.color" [barHeight]="13">
+          </app-progress-bar-card-step>
+        </div>
       </div>
-      <div class="progress-bar-cost-container">
+      <!-- <div class="progress-bar-cost-container">
         <app-progress-bar-card-step [total]="properties.costProgressBar.total"
           [progress]="properties.costProgressBar.progress" [baseline]="properties.baselinePlannedCost"
           [color]="properties.costProgressBar.color" [barHeight]="13">
         </app-progress-bar-card-step>
-      </div>
+      </div> -->
     </div>
   </div>
   <div class="card-item-footer" *ngIf="cardIdItem">
