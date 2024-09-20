@@ -23,6 +23,7 @@
             [minFractionDigits]="properties.unitPrecision" [maxFractionDigits]="properties.unitPrecision"
             [locale]="language === 'pt-BR' ? 'pt-BR' : 'en-US'">
           </p-inputNumber>
+          <label class="app-input-label" for="float-unitBaseline]">{{"baselineCardItem" | translate}}</label>
         </span>
         <div class="progress-bar-unit-container">
           <app-progress-bar-card-step [total]="properties.unitPlanned" [progress]="properties.unitActual"
@@ -37,6 +38,7 @@
             [minFractionDigits]="properties.unitPrecision" [maxFractionDigits]="properties.unitPrecision"
             [locale]="language === 'pt-BR' ? 'pt-BR' : 'en-US'">
           </p-inputNumber>
+          <label class="app-input-label" for="float-unitPlanned">{{ foreseenLabel |translate }}</label>
         </span>
         <div class="progress-bar-unit-container">
           <app-progress-bar-card-step [total]="properties.unitPlanned" [progress]="properties.unitActual"
@@ -54,6 +56,7 @@
             [minFractionDigits]="properties.unitPrecision" [maxFractionDigits]="properties.unitPrecision"
             [locale]="language === 'pt-BR' ? 'pt-BR' : 'en-US'">
           </p-inputNumber>
+          <label class="app-input-label" for="float-unitActual">{{ "actual" |translate }}</label>
         </span>
         <div class="progress-bar-unit-container">
           <app-progress-bar-card-step [total]="properties.unitPlanned" [progress]="properties.unitActual"
@@ -74,6 +77,7 @@
             [minFractionDigits]="2" [maxFractionDigits]="2"
             [locale]="language === 'pt-BR' ? 'pt-BR' : 'en-US'">
           </p-inputNumber>
+          <label class="app-input-label" for="float-costPlanned">{{ "baselineCardItem" | translate}}</label>
         </span>
         <div class="progress-bar-unit-container">
           <app-progress-bar-card-step [total]="properties.unitPlanned" [progress]="properties.unitActual"
@@ -92,6 +96,7 @@
             [(ngModel)]="properties.costPlanned" [minFractionDigits]="2" [maxFractionDigits]="2"
             [locale]="language === 'pt-BR' ? 'pt-BR' : 'en-US'">
           </p-inputNumber>
+          <label class="app-input-label" for="float-costPlanned">{{ foreseenLabel |translate }}</label>
         </span>
         <div class="progress-bar-unit-container">
           <app-progress-bar-card-step [total]="properties.unitPlanned" [progress]="properties.unitActual"
@@ -114,6 +119,7 @@
             [(ngModel)]="properties.costActual" [minFractionDigits]="2" [maxFractionDigits]="2"
             [locale]="language === 'pt-BR' ? 'pt-BR' : 'en-US'">
           </p-inputNumber>
+          <label class="app-input-label" for="float-costActual">{{ "actual" |translate }}</label>
         </span>
         <div class="progress-bar-unit-container">
           <app-progress-bar-card-step [total]="properties.unitPlanned" [progress]="properties.unitActual"
