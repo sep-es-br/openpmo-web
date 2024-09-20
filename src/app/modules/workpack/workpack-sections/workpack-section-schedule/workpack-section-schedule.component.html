@@ -41,9 +41,8 @@
           </div>
           <p-dataView [value]="groupStep.cardItemSection" layout="grid" styleClass="dataview-step-card-items"
             *ngIf="showDetails; else showResumed" [emptyMessage]="'loadingEllipsis' | translate">
-            <ng-template let-step let-index="rowIndex" pTemplate="gridItem">
-              
-              <div style="display: block;" class="card-item-container show-details" *ngIf="['newStart', 'newEnd'].includes(step.type)"
+            <ng-template let-step pTemplate="gridItem">
+              <div class="card-item-container show-details" *ngIf="['newStart', 'newEnd'].includes(step.type)"
                 [class.new-card-item]="['newStart', 'newEnd'].includes(step.type)" [class.mobile]="responsive">
                 <app-schedule-step-card-item [properties]="step" [type]="'listStep'" (onCreateNewStep)="handleCreateNewStep({
                   idSchedule: schedule.id,
@@ -54,21 +53,6 @@
                   (spreadDifference)="requestTypeDistributionInformation($event, false)"
                   (stepChanged)="saveStepChanged(groupStep.year, step.idStep)"></app-schedule-step-card-item>
               </div>
-
-              <div *ngIf="index % 7 === 0" id="card-labels-container" class="card-item-container show-details">
-                <p-card class="labels-container">
-                  <div id="baseline-label-item" class="label-item">
-                    <span id="span-baseline-label-item" class="app-input-label">{{"baselineCardItem" | translate}}</span>
-                  </div>
-                  <div id="foreseen-label-item" class="label-item">
-                    <span id="span-foreseen-label-item" class="app-input-label">{{ foreseenLabel | translate }}</span>
-                  </div>
-                  <div id="actual-label-item" class="label-item">
-                    <span id="span-actual-label-item" class="app-input-label">{{ "actual" | translate }}</span>
-                  </div>
-                </p-card>
-              </div>
-              
               <div class="card-item-container show-details" *ngIf="step.type === 'listStep'"
                 [class.new-card-item]="['newStart', 'newEnd'].includes(step.type)" [class.mobile]="responsive">
                 <app-schedule-step-card-item [properties]="step" [type]="'listStep'"
