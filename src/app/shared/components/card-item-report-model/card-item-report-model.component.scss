@@ -100,16 +100,15 @@
         font-family: v.$fontFamilyMedium;
         padding: 0.5em 5px 0;
         display: flex;
-        flex: 1;
         align-items: center;
         text-align: center;
+        font-weight: bold;
       }
       .card-item-fullName {
-        font-size: 14px;
+        font-size: small;
         font-family: v.$fontFamilyMedium;
         text-align: center;
-        // width: 260px;
-        padding: 0 5px;
+        padding: 5px 0;
         white-space: wrap;
         word-break: break-word;
         letter-spacing: normal;
@@ -119,7 +118,7 @@
         justify-content: flex-start;
         margin-left: 1em;
         .card-item-name {
-          padding: 0 5px 0;
+          padding: 0 15px 0;
         }
       }
     }
