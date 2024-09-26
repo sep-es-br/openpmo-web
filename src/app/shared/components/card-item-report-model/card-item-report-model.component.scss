@@ -107,7 +107,7 @@
       .card-item-fullName {
         font-size: small;
         font-family: v.$fontFamilyMedium;
-        text-align: center;
+        text-align: left;
         padding: 5px 5px 0px;
         white-space: wrap;
         word-break: break-word;
@@ -118,7 +118,7 @@
         justify-content: flex-start;
         margin-left: 1em;
         .card-item-name {
-          padding: 0 15px 0;
+          padding: 5px 15px 0;
         }
       }
     }
