@@ -210,6 +210,19 @@
       font-family: v.$fontFamilyMedium;
     }
   }
+
+  label.app-input-label {
+    display: flex;
+    align-items: center;
+    margin-top: 5px;
+    margin-left: -25px;
+  }
+
+  .card-item-content {
+    margin-left: 15px;
+    width: 250px;
+  }
+  
 }
 
 ::ng-deep p-card.app-step-card-item-resume .p-card {

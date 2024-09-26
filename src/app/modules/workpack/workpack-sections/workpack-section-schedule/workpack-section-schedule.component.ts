@@ -113,7 +113,7 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
       if (idWorkpack) {
         this.labelSrv.getLabels(idWorkpack).subscribe(
           response => {
-            this.foreseenLabel = response.data;
+            this.foreseenLabel = response.data[0].body.data;
             this.loadScheduleData();
           },
           error => {

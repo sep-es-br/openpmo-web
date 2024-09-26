@@ -68,7 +68,7 @@ export class TripleConstraintDashboardComponent implements OnInit {
       if (idWorkpack) {
         this.labelService.getLabels(idWorkpack).subscribe(
           response => {
-            this.foreseenLabel = response.data;
+            this.foreseenLabel = response.data[0].body.data;
           },
           error => {
             console.error(error);
