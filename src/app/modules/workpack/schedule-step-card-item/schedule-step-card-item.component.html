@@ -25,12 +25,14 @@
           </p-inputNumber>
           <label class="app-input-label" for="float-unitBaseline]">{{ "abbreviatedBaselineCardItem" | translate }}</label>
         </span>
+
+        <!-- Baseline superior esquerdo -->
         <div class="progress-bar-unit-container">
           <app-progress-bar-card-step [total]="properties.unitPlanned" [progress]="properties.unitActual"
             [baseline]="properties.unitBaseline" [color]="properties.unitProgressBar.color" [barHeight]="13">
           </app-progress-bar-card-step>
         </div>
-        <!-- UnitPlanned -->
+
         <span [ngStyle]="{ 'visibility': !isPassedMonth ? 'visible' : 'hidden'  }" class="p-float-label p-field">
           <p-inputNumber [class]="'app-input-number '+'unitPlanned '+'unitPlanned-'+ properties.idStep" id="float-unitPlanned" (onInput)="handleStepChange($event, 'unitPlanned')"
             [disabled]="!properties.editPermission" [(ngModel)]="properties.unitPlanned"
@@ -40,11 +42,14 @@
           </p-inputNumber>
           <label class="app-input-label" for="float-unitPlanned">{{ foreseenLabel | translate}}</label>
         </span>
-        <div class="progress-bar-unit-container">
+        
+        <!-- Reprogramado meio esquerdo -->
+        <div [ngStyle]="{ 'visibility': !isPassedMonth ? 'visible' : 'hidden'}" class="progress-bar-unit-container">
           <app-progress-bar-card-step [total]="properties.unitPlanned" [progress]="properties.unitActual"
             [baseline]="properties.unitBaseline" [color]="properties.unitProgressBar.color" [barHeight]="13">
           </app-progress-bar-card-step>
         </div>
+        
         <div [ngStyle]="{ 'visibility': !isPassedMonth ? 'visible' : 'hidden'  }" class="replicate-button-container">
           <i class="fas fa-caret-up" [class.disabled]="!properties.editPermission || !showReplicateButton" [class.replicate-hide]="!showReplicateButton"
             (click)="properties.editPermission && showReplicateButton && confirmReplicateValueDif('unitActual')"></i>
@@ -58,11 +63,14 @@
           </p-inputNumber>
           <label class="app-input-label" for="float-unitActual">{{"abbreviatedActual" | translate}}</label>
         </span>
+        
+        <!-- Real inferior esquerdo -->
         <div class="progress-bar-unit-container">
           <app-progress-bar-card-step [total]="properties.unitPlanned" [progress]="properties.unitActual"
             [baseline]="properties.unitBaseline" [color]="properties.unitProgressBar.color" [barHeight]="13">
           </app-progress-bar-card-step>
         </div>
+
       </div>
     </div>
     <div class="costValues">
@@ -79,12 +87,14 @@
           </p-inputNumber>
           <label class="app-input-label" for="float-costPlanned">{{"abbreviatedBaselineCardItem" | translate}}</label>
         </span>
+
+        <!-- Baseline superior direito -->
         <div class="progress-bar-unit-container">
           <app-progress-bar-card-step [total]="properties.unitPlanned" [progress]="properties.unitActual"
             [baseline]="properties.unitBaseline" [color]="properties.unitProgressBar.color" [barHeight]="13">
           </app-progress-bar-card-step>
         </div>
-        <!-- Cost Planned -->
+        
         <span [ngStyle]="{ 'visibility': !isPassedMonth ? 'visible' : 'hidden'  }" class="p-float-label p-field">
           <p-inputNumber [class]="'app-input-number '+'costPlanned-'+properties.idStep" id="float-costPlanned"
             (click)="properties.multipleCosts && handleEditCosts($event); properties.multipleCosts && disable()"
@@ -98,11 +108,14 @@
           </p-inputNumber>
           <label class="app-input-label" for="float-costPlanned">{{foreseenLabel | translate}}</label>
         </span>
-        <div class="progress-bar-unit-container">
+
+        <!-- Reprogramado meio direito -->
+        <div [ngStyle]="{ 'visibility': !isPassedMonth ? 'visible' : 'hidden'}" class="progress-bar-unit-container">
           <app-progress-bar-card-step [total]="properties.unitPlanned" [progress]="properties.unitActual"
             [baseline]="properties.unitBaseline" [color]="properties.unitProgressBar.color" [barHeight]="13">
           </app-progress-bar-card-step>
         </div>
+        
         <div [ngStyle]="{ 'visibility': !isPassedMonth ? 'visible' : 'hidden'  }" class="replicate-button-container">
           <i class="fas fa-caret-up" [class.disabled]="!properties.editCosts || !properties.editPermission || !showReplicateButton"
             [class.replicate-hide]="!showReplicateButton"
@@ -121,18 +134,14 @@
           </p-inputNumber>
           <label class="app-input-label" for="float-costActual">{{"abbreviatedActual" | translate}}</label>
         </span>
+        
+        <!-- Realizado inferior direito -->
         <div class="progress-bar-unit-container">
           <app-progress-bar-card-step [total]="properties.unitPlanned" [progress]="properties.unitActual"
             [baseline]="properties.unitBaseline" [color]="properties.unitProgressBar.color" [barHeight]="13">
           </app-progress-bar-card-step>
         </div>
       </div>
-      <!-- <div class="progress-bar-cost-container">
-        <app-progress-bar-card-step [total]="properties.costProgressBar.total"
-          [progress]="properties.costProgressBar.progress" [baseline]="properties.baselinePlannedCost"
-          [color]="properties.costProgressBar.color" [barHeight]="13">
-        </app-progress-bar-card-step>
-      </div> -->
     </div>
   </div>
   <div class="card-item-footer" *ngIf="cardIdItem">
