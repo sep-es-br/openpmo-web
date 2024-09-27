@@ -23,7 +23,7 @@
             [minFractionDigits]="properties.unitPrecision" [maxFractionDigits]="properties.unitPrecision"
             [locale]="language === 'pt-BR' ? 'pt-BR' : 'en-US'">
           </p-inputNumber>
-          <label class="app-input-label" for="float-unitBaseline]">{{ "abbreviatedBaselineCardItem" | translate }}</label>
+          <label pTooltip="{{ 'plannedBaseline' | translate }}" class="app-input-label" for="float-unitBaseline]">{{ "abbreviatedBaselineCardItem" | translate }}</label>
         </span>
 
         <!-- Baseline superior esquerdo -->
@@ -40,7 +40,7 @@
             [minFractionDigits]="properties.unitPrecision" [maxFractionDigits]="properties.unitPrecision"
             [locale]="language === 'pt-BR' ? 'pt-BR' : 'en-US'">
           </p-inputNumber>
-          <label class="app-input-label" for="float-unitPlanned">{{ foreseenLabel | translate}}</label>
+          <label pTooltip="{{ tooltipLabel | translate }}" class="app-input-label" for="float-unitPlanned">{{ foreseenLabel | translate}}</label>
         </span>
         
         <!-- Reprogramado meio esquerdo -->
@@ -61,7 +61,7 @@
             [minFractionDigits]="properties.unitPrecision" [maxFractionDigits]="properties.unitPrecision"
             [locale]="language === 'pt-BR' ? 'pt-BR' : 'en-US'">
           </p-inputNumber>
-          <label class="app-input-label" for="float-unitActual">{{"abbreviatedActual" | translate}}</label>
+          <label pTooltip="{{ 'actual' | translate }}" class="app-input-label" for="float-unitActual">{{"abbreviatedActual" | translate}}</label>
         </span>
         
         <!-- Real inferior esquerdo -->
@@ -85,7 +85,6 @@
             [minFractionDigits]="2" [maxFractionDigits]="2"
             [locale]="language === 'pt-BR' ? 'pt-BR' : 'en-US'">
           </p-inputNumber>
-          <label class="app-input-label" for="float-costPlanned">{{"abbreviatedBaselineCardItem" | translate}}</label>
         </span>
 
         <!-- Baseline superior direito -->
@@ -106,7 +105,6 @@
             [(ngModel)]="properties.costPlanned" [minFractionDigits]="2" [maxFractionDigits]="2"
             [locale]="language === 'pt-BR' ? 'pt-BR' : 'en-US'">
           </p-inputNumber>
-          <label class="app-input-label" for="float-costPlanned">{{foreseenLabel | translate}}</label>
         </span>
 
         <!-- Reprogramado meio direito -->
@@ -132,7 +130,6 @@
             [(ngModel)]="properties.costActual" [minFractionDigits]="2" [maxFractionDigits]="2"
             [locale]="language === 'pt-BR' ? 'pt-BR' : 'en-US'">
           </p-inputNumber>
-          <label class="app-input-label" for="float-costActual">{{"abbreviatedActual" | translate}}</label>
         </span>
         
         <!-- Realizado inferior direito -->

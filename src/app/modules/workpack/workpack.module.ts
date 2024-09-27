@@ -30,6 +30,8 @@ import { ProgressBarCostAccountComponent } from './components/progress-bar-cost-
 import { WorkpackSectionDashboardComponent } from './workpack-sections/workpack-section-dashboard/workpack-section-dashboard.component';
 import { WorkpackSectionJournalComponent } from './workpack-sections/workpack-section-journal/workpack-section-journal.component';
 import { WorkpackSectionWBSComponent } from './workpack-sections/workpack-section-wbs/workpack-section-wbs.component';
+import { TooltipModule } from 'primeng/tooltip'
+import { Tooltip } from 'chart.js';
 
 @NgModule({
   declarations: [
@@ -67,6 +69,7 @@ import { WorkpackSectionWBSComponent } from './workpack-sections/workpack-sectio
       ComponentsModule,
       FormsModule,
       ReactiveFormsModule,
+      TooltipModule
     ],
 })
 export class WorkpackModule { }

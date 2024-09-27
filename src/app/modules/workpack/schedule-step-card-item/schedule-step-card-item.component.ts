@@ -33,6 +33,7 @@ export class ScheduleStepCardItemComponent implements OnInit, OnDestroy {
   difference;
   multiCostsEdited = false;
   foreseenLabel: string;
+  tooltipLabel: string;
   isActualValuesDisabled: boolean = false;
   isCurrentBaseline: boolean = false;
   isPassedMonth: boolean = false;
@@ -77,7 +78,7 @@ export class ScheduleStepCardItemComponent implements OnInit, OnDestroy {
       if (idWorkpack) {
         this.labelSrv.getLabels(idWorkpack).subscribe(
           response => {
-            console.log(response.data[1].body.data);
+            this.tooltipLabel = response.data[0].body.data;
             this.foreseenLabel = response.data[1].body.data;
           },
           error => {

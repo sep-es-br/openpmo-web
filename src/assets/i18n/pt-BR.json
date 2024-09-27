@@ -336,7 +336,7 @@
   "REJECTED": "Rejeitada",
   "cancelling": "Cancelamento",
   "newBaseline": "Nova linha de base",
-  "plannedBaseline": "Planejado (linha de base)",
+  "plannedBaseline": "Planejado (LB)",
   "forecast": "Previsto",
   "message": "Mensagem",
   "messageFromBaselineProposer": "Mensagem do proponente da linha de base",
