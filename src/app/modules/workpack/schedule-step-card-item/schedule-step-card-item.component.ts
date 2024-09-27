@@ -77,6 +77,7 @@ export class ScheduleStepCardItemComponent implements OnInit, OnDestroy {
       if (idWorkpack) {
         this.labelSrv.getLabels(idWorkpack).subscribe(
           response => {
+            console.log(response.data[1].body.data);
             this.foreseenLabel = response.data[1].body.data;
           },
           error => {
