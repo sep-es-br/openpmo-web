@@ -28,8 +28,13 @@
 
         <!-- Baseline superior esquerdo -->
         <div class="progress-bar-unit-container">
-          <app-progress-bar-card-step [total]="properties.unitPlanned" [progress]="properties.unitActual"
-            [baseline]="properties.unitBaseline" [color]="properties.unitProgressBar.color" [barHeight]="13">
+          <app-progress-bar-card-step 
+            [total]="properties.unitBaseline" 
+            [progress]="properties.unitBaseline"
+            [baseline]="properties.unitBaseline" 
+            [color]="'#BFBFBF'" 
+            [barHeight]="4"
+            [maxValue]="maxValue">
           </app-progress-bar-card-step>
         </div>
 
@@ -45,8 +50,13 @@
         
         <!-- Reprogramado meio esquerdo -->
         <div [ngStyle]="{ 'visibility': !isPassedMonth ? 'visible' : 'hidden'}" class="progress-bar-unit-container">
-          <app-progress-bar-card-step [total]="properties.unitPlanned" [progress]="properties.unitActual"
-            [baseline]="properties.unitBaseline" [color]="properties.unitProgressBar.color" [barHeight]="13">
+          <app-progress-bar-card-step 
+            [total]="properties.unitPlanned" 
+            [progress]="properties.unitPlanned"
+            [baseline]="properties.unitBaseline" 
+            [color]="'#659EE1'" 
+            [barHeight]="4"
+            [maxValue]="maxValue">
           </app-progress-bar-card-step>
         </div>
         
@@ -66,8 +76,13 @@
         
         <!-- Real inferior esquerdo -->
         <div class="progress-bar-unit-container">
-          <app-progress-bar-card-step [total]="properties.unitPlanned" [progress]="properties.unitActual"
-            [baseline]="properties.unitBaseline" [color]="properties.unitProgressBar.color" [barHeight]="13">
+          <app-progress-bar-card-step 
+            [total]="properties.unitActual" 
+            [progress]="properties.unitActual"
+            [baseline]="properties.unitBaseline" 
+            [color]="'#FF8C22'" 
+            [barHeight]="4"
+            [maxValue]="maxValue">
           </app-progress-bar-card-step>
         </div>
 
@@ -89,8 +104,13 @@
 
         <!-- Baseline superior direito -->
         <div class="progress-bar-unit-container">
-          <app-progress-bar-card-step [total]="properties.unitPlanned" [progress]="properties.unitActual"
-            [baseline]="properties.unitBaseline" [color]="properties.unitProgressBar.color" [barHeight]="13">
+          <app-progress-bar-card-step 
+            [total]="properties.baselinePlannedCost" 
+            [progress]="properties.baselinePlannedCost"
+            [baseline]="properties.unitBaseline" 
+            [color]="'#BFBFBF'" 
+            [barHeight]="4"
+            [maxValue]="maxValue">
           </app-progress-bar-card-step>
         </div>
         
@@ -109,8 +129,13 @@
 
         <!-- Reprogramado meio direito -->
         <div [ngStyle]="{ 'visibility': !isPassedMonth ? 'visible' : 'hidden'}" class="progress-bar-unit-container">
-          <app-progress-bar-card-step [total]="properties.unitPlanned" [progress]="properties.unitActual"
-            [baseline]="properties.unitBaseline" [color]="properties.unitProgressBar.color" [barHeight]="13">
+          <app-progress-bar-card-step 
+            [total]="properties.costPlanned" 
+            [progress]="properties.costPlanned"
+            [baseline]="properties.unitBaseline" 
+            [color]="'#659EE1'" 
+            [barHeight]="4"
+            [maxValue]="maxValue">
           </app-progress-bar-card-step>
         </div>
         
@@ -134,8 +159,13 @@
         
         <!-- Realizado inferior direito -->
         <div class="progress-bar-unit-container">
-          <app-progress-bar-card-step [total]="properties.unitPlanned" [progress]="properties.unitActual"
-            [baseline]="properties.unitBaseline" [color]="properties.unitProgressBar.color" [barHeight]="13">
+          <app-progress-bar-card-step 
+            [total]="properties.costActual" 
+            [progress]="properties.costActual"
+            [baseline]="properties.unitBaseline" 
+            [color]="'#44B39B'" 
+            [barHeight]="4"
+            [maxValue]="maxValue">
           </app-progress-bar-card-step>
         </div>
       </div>

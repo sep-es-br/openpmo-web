@@ -1,41 +1,13 @@
 <div class="app-progress-card-step">
   <div class="progress-header-values-container" [ngStyle]="{width: barHeight === 17 ? '85%' : '100%'}"
     [class.responsive]="responsive">
-    <!-- <div class="progress-bar-total-container" *ngIf="total >= progress && total >= baseline"
-      [ngStyle]="{width: '100%', background: barHeight === 7 ? 'rgba(0, 70, 96, 0.19)' : '#ffffff'}">
+    
+    <div class="progress-bar-total-container"
+      [ngStyle]="{width: getProgressWidth() + '%', background: color}">
       <div class="progress-bar"
-        [ngStyle]="{width: (progress/total)*100 + '%', background: total !== 0 ? color : 'transparent', height: barHeight + 'px'}">
+        [ngStyle]="{width: getProgressWidth() + '%', background: total !== 0 ? color : 'transparent', height: barHeight + 'px'}">
       </div>
     </div>
-    <div class="progress-bar-total-container" *ngIf="total >= progress && total < baseline"
-      [ngStyle]="{width: (total/baseline)*100 + '%', background: barHeight === 7 ? 'rgba(0, 70, 96, 0.19)' : '#ffffff'}">
-      <div class="progress-bar"
-        [ngStyle]="{width: (progress/total)*100 + '%', background: total !== 0 ? color : 'transparent', height: barHeight + 'px'}">
-      </div>
-    </div> -->
-    <div class="progress-bar-progress-container" *ngIf="progress > total && progress >= baseline"
-      [ngStyle]="{width: '100%', background: color, height: barHeight + 'px'}">
-      <div class="total-bar" [ngStyle]="{width: (total/progress)*100 + '%', background: 'transparent'}">
-      </div>
-    </div>
-    <div class="progress-bar-progress-container" *ngIf="progress > total && progress < baseline"
-      [ngStyle]="{width: (progress/baseline)*100 + '%', background: color, height: barHeight + 'px'}">
-      <div class="total-bar" [ngStyle]="{width: (total/progress)*100 + '%', background: 'transparent'}">
-      </div>
-    </div>
-  </div>
-  <div class="baseline-bar-progress-container" *ngIf="baseline && baseline > total && baseline > progress">
-    <div class="progress-bar-baseline" [ngStyle]="{width: '100%', background: '#B2B2B2', height: '4px'}">
-    </div>
-  </div>
-  <div class="baseline-bar-progress-container" *ngIf="baseline && baseline <= total && total >= progress">
-    <div class="progress-bar-baseline"
-      [ngStyle]="{width: (baseline/total)*100 + '%', background: '#B2B2B2', height: '4px'}">
-    </div>
-  </div>
-  <div class="baseline-bar-progress-container" *ngIf="baseline && baseline <= progress && progress > total">
-    <div class="progress-bar-baseline"
-      [ngStyle]="{width: (baseline/progress)*100 + '%', background: '#B2B2B2', height: '4px'}">
-    </div>
+
   </div>
 </div>

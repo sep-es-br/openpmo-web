@@ -37,6 +37,7 @@ export class ScheduleStepCardItemComponent implements OnInit, OnDestroy {
   isActualValuesDisabled: boolean = false;
   isCurrentBaseline: boolean = false;
   isPassedMonth: boolean = false;
+  maxValue: number
 
   constructor(
     private translateSrv: TranslateService,
@@ -54,6 +55,7 @@ export class ScheduleStepCardItemComponent implements OnInit, OnDestroy {
    }
 
   ngOnInit(): void {
+    this.maxValue = this.getMaxValue()
     this.cardIdItem = this.properties.idStep ?
       `${this.properties.idStep < 10 ? '0' + this.properties.idStep : this.properties.idStep}` : '';
     this.setLanguage();
@@ -247,6 +249,23 @@ export class ScheduleStepCardItemComponent implements OnInit, OnDestroy {
   
       this.isActualValuesDisabled = dateStep.isAfter(startOfCurrentMonth);
     });
+  }
+
+  getMaxValue() {
+    if (this.properties.type === "newStart" || this.properties.type === "newEnd") return;
+
+    const inputValues = [
+      this.properties.unitActual,
+      this.properties.unitPlanned,
+      this.properties.costActual,
+      this.properties.costPlanned,
+      this.properties.unitBaseline,
+      this.properties.baselinePlannedCost
+    ];
+
+    console.log(Math.max(...inputValues));
+    
+    return Math.max(...inputValues);
   }
 
 }
