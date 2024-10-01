@@ -93,7 +93,6 @@ export class ScheduleStepCardItemComponent implements OnInit, OnDestroy {
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    debugger
     if (changes.properties) {
       this.maxValue = this.getMaxValue();
       this.cdr.detectChanges();

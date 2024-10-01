@@ -6,7 +6,6 @@ import { Pipe, PipeTransform } from '@angular/core';
 export class FormatNamePipe implements PipeTransform {
 
   transform(value: string): string {
-    debugger
     if (!value) return value;
 
     const names = value.trim().split(' ');
