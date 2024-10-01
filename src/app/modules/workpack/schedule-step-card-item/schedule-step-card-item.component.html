@@ -18,7 +18,8 @@
         <span class="column-title">{{properties.unitName}}</span>
 
         <span *ngIf="isCurrentBaseline" class="p-float-label p-field">
-          <p-inputNumber [class]="'app-input-number '+'unitBaseline '+'unitBaseline'+ properties.idStep" id="float-unitBaseline" (onInput)="handleStepChange($event, 'unitPlanned')"
+          <p-inputNumber [class]="'app-input-number '+'unitBaseline '+'unitBaseline'+ properties.idStep" id="float-unitBaseline" 
+            (onInput)="handleStepCostChange($event, 'unitBaseline')"
             [disabled]="true" [(ngModel)]="properties.unitBaseline"
             [minFractionDigits]="properties.unitPrecision" [maxFractionDigits]="properties.unitPrecision"
             [locale]="language === 'pt-BR' ? 'pt-BR' : 'en-US'">
@@ -39,9 +40,10 @@
         </div>
 
         <span [ngStyle]="{ 'visibility': !isPassedMonth ? 'visible' : 'hidden'  }" class="p-float-label p-field">
-          <p-inputNumber [class]="'app-input-number '+'unitPlanned '+'unitPlanned-'+ properties.idStep" id="float-unitPlanned" (onInput)="handleStepChange($event, 'unitPlanned')"
+          <p-inputNumber [class]="'app-input-number '+'unitPlanned '+'unitPlanned-'+ properties.idStep" id="float-unitPlanned"
             [disabled]="!properties.editPermission" [(ngModel)]="properties.unitPlanned"
             [class.red]="properties.unitPlanned < 0"
+            (onInput)="handleStepCostChange($event, 'unitPlanned')"
             [minFractionDigits]="properties.unitPrecision" [maxFractionDigits]="properties.unitPrecision"
             [locale]="language === 'pt-BR' ? 'pt-BR' : 'en-US'">
           </p-inputNumber>
@@ -69,6 +71,7 @@
             [disabled]="!properties.editPermission || isActualValuesDisabled" [(ngModel)]="properties.unitActual"
             [class.red]="properties.unitActual < 0"
             [minFractionDigits]="properties.unitPrecision" [maxFractionDigits]="properties.unitPrecision"
+            (onInput)="handleStepCostChange($event, 'unitActual')"
             [locale]="language === 'pt-BR' ? 'pt-BR' : 'en-US'">
           </p-inputNumber>
           <label pTooltip="{{ 'actual' | translate }}" class="app-input-label" for="float-unitActual">{{"abbreviatedActual" | translate}}</label>
@@ -97,6 +100,7 @@
           <p-inputNumber [class]="'app-input-number '+'costBaseline-'+properties.idStep" id="float-costBaseline"
             [disabled]="true"
             [(ngModel)]="properties.baselinePlannedCost" 
+            (onInput)="handleStepCostChange($event, 'baselinePlannedCost')"
             [minFractionDigits]="2" [maxFractionDigits]="2"
             [locale]="language === 'pt-BR' ? 'pt-BR' : 'en-US'">
           </p-inputNumber>

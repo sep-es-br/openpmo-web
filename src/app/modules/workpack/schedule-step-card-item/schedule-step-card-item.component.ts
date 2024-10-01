@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, EventEmitter, Output, OnDestroy } from '@angular/core';
+import { Component, Input, OnInit, EventEmitter, Output, OnDestroy, SimpleChanges, ChangeDetectorRef } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { EMPTY, Observable, Subject } from 'rxjs';
 import { map, switchMap, takeUntil } from 'rxjs/operators';
@@ -44,7 +44,8 @@ export class ScheduleStepCardItemComponent implements OnInit, OnDestroy {
     private confirmationSrv: ConfirmationService,
     private labelSrv: LabelService,
     private route: ActivatedRoute,
-    private scheduleCardItemSrv: ScheduleStepCardItemService
+    private scheduleCardItemSrv: ScheduleStepCardItemService,
+    private cdr: ChangeDetectorRef
   ) {
     this.translateSrv.onLangChange.pipe(takeUntil(this.$destroy)).subscribe(() =>
       {
@@ -91,6 +92,14 @@ export class ScheduleStepCardItemComponent implements OnInit, OnDestroy {
     });
   }
 
+  ngOnChanges(changes: SimpleChanges) {
+    debugger
+    if (changes.properties) {
+      this.maxValue = this.getMaxValue();
+      this.cdr.detectChanges();
+    }
+  }
+
   ngOnDestroy(): void {
     this.$destroy.next();
     this.$destroy.complete();
@@ -117,6 +126,8 @@ export class ScheduleStepCardItemComponent implements OnInit, OnDestroy {
     this.properties[item] = event.value;
     this.properties.costProgressBar.total = this.properties.costPlanned;
     this.properties.costProgressBar.progress = this.properties.costActual;
+
+    this.updateMaxValue();
 
     const dateStep = moment(this.properties.stepName, 'YYYY-MM');
     const startOfCurrentMonth = moment().startOf('month');
@@ -251,6 +262,11 @@ export class ScheduleStepCardItemComponent implements OnInit, OnDestroy {
     });
   }
 
+  updateMaxValue() {
+    this.maxValue = this.getMaxValue();
+    this.cdr.detectChanges();
+  }
+
   getMaxValue() {
     if (this.properties.type === "newStart" || this.properties.type === "newEnd") return;
 
@@ -262,8 +278,6 @@ export class ScheduleStepCardItemComponent implements OnInit, OnDestroy {
       this.properties.unitBaseline,
       this.properties.baselinePlannedCost
     ];
-
-    console.log(Math.max(...inputValues));
     
     return Math.max(...inputValues);
   }
