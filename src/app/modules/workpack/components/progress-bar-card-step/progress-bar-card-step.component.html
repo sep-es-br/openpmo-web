@@ -1,13 +1,10 @@
 <div class="app-progress-card-step">
   <div class="progress-header-values-container" [ngStyle]="{width: barHeight === 17 ? '85%' : '100%'}"
     [class.responsive]="responsive">
-    
-    <div class="progress-bar-total-container"
-      [ngStyle]="{width: getProgressWidth() + '%', background: color}">
+    <div class="progress-bar-total-container">
       <div class="progress-bar"
         [ngStyle]="{width: getProgressWidth() + '%', background: total !== 0 ? color : 'transparent', height: barHeight + 'px'}">
       </div>
     </div>
-
   </div>
 </div>

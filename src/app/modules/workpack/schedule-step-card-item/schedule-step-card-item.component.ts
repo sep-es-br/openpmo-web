@@ -37,7 +37,8 @@ export class ScheduleStepCardItemComponent implements OnInit, OnDestroy {
   isActualValuesDisabled: boolean = false;
   isCurrentBaseline: boolean = false;
   isPassedMonth: boolean = false;
-  maxValue: number
+  maxValueCosts: number;
+  maxValueUnit: number;
 
   constructor(
     private translateSrv: TranslateService,
@@ -56,7 +57,10 @@ export class ScheduleStepCardItemComponent implements OnInit, OnDestroy {
    }
 
   ngOnInit(): void {
-    this.maxValue = this.getMaxValue()
+    
+    this.maxValueCosts = this.getMaxValueCosts();
+    this.maxValueUnit = this.getMaxValueUnit();
+
     this.cardIdItem = this.properties.idStep ?
       `${this.properties.idStep < 10 ? '0' + this.properties.idStep : this.properties.idStep}` : '';
     this.setLanguage();
@@ -92,13 +96,6 @@ export class ScheduleStepCardItemComponent implements OnInit, OnDestroy {
     });
   }
 
-  ngOnChanges(changes: SimpleChanges) {
-    if (changes.properties) {
-      this.maxValue = this.getMaxValue();
-      this.cdr.detectChanges();
-    }
-  }
-
   ngOnDestroy(): void {
     this.$destroy.next();
     this.$destroy.complete();
@@ -126,7 +123,8 @@ export class ScheduleStepCardItemComponent implements OnInit, OnDestroy {
     this.properties.costProgressBar.total = this.properties.costPlanned;
     this.properties.costProgressBar.progress = this.properties.costActual;
 
-    this.updateMaxValue();
+    this.updateMaxValueCosts();
+    this.updateMaxValueUnit();
 
     const dateStep = moment(this.properties.stepName, 'YYYY-MM');
     const startOfCurrentMonth = moment().startOf('month');
@@ -261,23 +259,37 @@ export class ScheduleStepCardItemComponent implements OnInit, OnDestroy {
     });
   }
 
-  updateMaxValue() {
-    this.maxValue = this.getMaxValue();
+  updateMaxValueCosts() {
+    this.maxValueCosts = this.getMaxValueCosts();
     this.cdr.detectChanges();
   }
 
-  getMaxValue() {
+  updateMaxValueUnit() {
+    this.maxValueUnit = this.getMaxValueUnit();
+    this.cdr.detectChanges();
+  }
+
+  getMaxValueCosts() {
+    if (this.properties.type === "newStart" || this.properties.type === "newEnd") return;
+
+    const inputValues = [
+      this.properties.costActual,
+      this.properties.costPlanned,
+      this.properties.baselinePlannedCost
+    ];
+    
+    return Math.max(...inputValues);
+  }
+
+  getMaxValueUnit() {
     if (this.properties.type === "newStart" || this.properties.type === "newEnd") return;
 
     const inputValues = [
       this.properties.unitActual,
-      this.properties.unitPlanned,
-      this.properties.costActual,
-      this.properties.costPlanned,
       this.properties.unitBaseline,
-      this.properties.baselinePlannedCost
-    ];
-    
+      this.properties.unitPlanned
+    ]
+
     return Math.max(...inputValues);
   }
 
