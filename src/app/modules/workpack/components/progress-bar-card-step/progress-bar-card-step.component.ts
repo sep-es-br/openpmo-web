@@ -62,7 +62,6 @@ export class ProgressBarCardStepComponent implements OnInit {
   }
 
   getProgressWidth() {
-    debugger
     const progress = Math.min(this.progress, this.maxValue);
     const width = (progress / this.maxValue) * 100;
     return width === 0 ? 0 : width;

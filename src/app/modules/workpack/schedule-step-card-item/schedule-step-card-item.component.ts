@@ -221,7 +221,7 @@ export class ScheduleStepCardItemComponent implements OnInit, OnDestroy {
   }
   
   private handleBaselineResponse(response: any) {
-    if (!response.success) {
+    if (!response.data) {
       console.error(response.error);
       return false;
     }
