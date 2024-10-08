@@ -12,7 +12,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { WorkpackService } from 'src/app/shared/services/workpack.service';
 import { Router } from '@angular/router';
 import { Component, OnInit, OnDestroy, ViewChild, ElementRef , Input} from '@angular/core';
-import { Subject } from 'rxjs';
+import { Subject, Subscription, combineLatest } from 'rxjs';
 import * as moment from 'moment';
 import { WorkpackShowTabviewService } from 'src/app/shared/services/workpack-show-tabview.service';
 import { MessageService } from 'primeng/api';
@@ -23,6 +23,7 @@ import { DashboardService } from 'src/app/shared/services/dashboard.service';
 import { CancelButtonComponent } from 'src/app/shared/components/cancel-button/cancel-button.component';
 import { LabelService } from 'src/app/shared/services/label.service';
 import { ActivatedRoute } from '@angular/router';
+import { ScheduleStepCardItemService } from 'src/app/shared/services/schedule-step-card-item.service';
 
 @Component({
   selector: 'app-workpack-section-schedule',
@@ -62,6 +63,10 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
   formIsSaving = false;
   foreseenLabel: string;
 
+  isCurrentBaseline: boolean;
+
+  private _subscription: Subscription = new Subscription();
+
   constructor(
     private router: Router,
     private workpackSrv: WorkpackService,
@@ -69,6 +74,7 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
     private configDataViewSrv: ConfigDataViewService,
     private responsiveSrv: ResponsiveService,
     private scheduleSrv: ScheduleService,
+    private scheduleCardItemSrv: ScheduleStepCardItemService,
     private workpackShowTabviewSrv: WorkpackShowTabviewService,
     private messageSrv: MessageService,
     private dashboardSrv: DashboardService,
@@ -108,6 +114,12 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this._subscription.add(
+      this.scheduleCardItemSrv.isCurrentBaseline$.subscribe((isCurrentBaseline) => {
+        this.isCurrentBaseline = isCurrentBaseline;
+      })
+    )
+
     this.route.queryParams.subscribe(params => {
       const idWorkpack = params['id'];
       if (idWorkpack) {
@@ -411,6 +423,7 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
           unitName,
           unitPrecision,
           idWorkpackModelLinked: this.workpackParams.idWorkpackModelLinked,
+          hasActiveBaseline: this.isCurrentBaseline,
         }
       }
     );
@@ -594,6 +607,7 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.$destroy.complete();
     this.$destroy.unsubscribe();
+    this._subscription.unsubscribe();
   }
 
   async handleShowEditCost(event, group) {

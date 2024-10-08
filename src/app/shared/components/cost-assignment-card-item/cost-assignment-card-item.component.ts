@@ -18,6 +18,7 @@ export class CostAssignmentCardItemComponent implements OnInit, OnDestroy {
 
   @Input() properties: ICartItemCostAssignment;
   @Input() scheduleStartDate: Date;
+  @Input() isPassedMonth: boolean;
   @Output() costChanged = new EventEmitter();
   @Output() spreadDifference = new EventEmitter();
 

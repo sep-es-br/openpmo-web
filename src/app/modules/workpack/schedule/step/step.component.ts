@@ -3,8 +3,8 @@ import { Component, OnDestroy, OnInit, ViewChild, ViewChildren } from '@angular/
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import { Subject } from 'rxjs';
-import { takeUntil, filter } from 'rxjs/operators';
+import { Observable, Subject } from 'rxjs';
+import { map, takeUntil, filter } from 'rxjs/operators';
 import { Calendar } from 'primeng/calendar';
 import { MenuItem, MessageService } from 'primeng/api';
 import * as moment from 'moment';
@@ -69,6 +69,9 @@ export class StepComponent implements OnInit, OnDestroy {
   isLoading = false;
   formIsSaving = false;
 
+  isCurrentBaseline: boolean;
+  isPassedMonth: boolean = false;
+
   constructor(
     private actRouter: ActivatedRoute,
     private scheduleSrv: ScheduleService,
@@ -80,7 +83,8 @@ export class StepComponent implements OnInit, OnDestroy {
     private costAccountSrv: CostAccountService,
     private router: Router,
     private messageSrv: MessageService,
-    private authSrv: AuthService
+    private authSrv: AuthService,
+    private route: ActivatedRoute
   ) {
     this.actRouter.queryParams.subscribe(async({ idSchedule, idWorkpackModelLinked, stepType, idStep, unitName, unitPrecision }) => {
       this.idSchedule = idSchedule;
@@ -126,10 +130,18 @@ export class StepComponent implements OnInit, OnDestroy {
   }
 
   async ngOnInit() {
+
+    this.route.queryParams.subscribe(params => {
+      const hasActiveBaseline = params['hasActiveBaseline'];
+      this.isCurrentBaseline = hasActiveBaseline === 'true'
+    })
+
     this.calendarFormat = this.translateSrv.instant('dateFormat');
     this.isLoading = true;
     await this.loadPropertiesStep();
     this.isLoading = false;
+
+    this.handlePassedMonths();
   }
 
   async loadPropertiesStep() {
@@ -600,5 +612,17 @@ export class StepComponent implements OnInit, OnDestroy {
     }
 
 
+  }
+
+  handlePassedMonths() {
+    if (!this.stepDetail.periodFromStart) return;
+
+    const stepDate = moment(this.stepDetail.periodFromStart, 'YYYY-MM');
+    const startOfCurrentMonth = moment().startOf('month');
+    const endOfPreviousMonth = startOfCurrentMonth.clone().subtract(1, 'day');
+
+    if (stepDate.isBefore(startOfCurrentMonth) && stepDate.isBefore(endOfPreviousMonth)) {
+      this.isPassedMonth = true;
+    }
   }
 }

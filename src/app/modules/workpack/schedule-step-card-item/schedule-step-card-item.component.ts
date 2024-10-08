@@ -219,15 +219,7 @@ export class ScheduleStepCardItemComponent implements OnInit, OnDestroy {
       map(params => params['id'] || null)
     );
   }
-  
-  private handleBaselineResponse(response: any) {
-    if (!response.data) {
-      console.error(response.error);
-      return false;
-    }
-    return true;
-  }
-  
+
   handleCurrentBaseline() {
     this.getWorkpackId().pipe(
       switchMap(workpackId => {
@@ -235,9 +227,8 @@ export class ScheduleStepCardItemComponent implements OnInit, OnDestroy {
         return this.scheduleCardItemSrv.getCurrentBaseline(workpackId);
       })
     ).subscribe(response => {
-      if (this.handleBaselineResponse(response)) {
-        this.isCurrentBaseline = true;
-      }
+      this.isCurrentBaseline = response.data;
+      this.scheduleCardItemSrv.isCurrentBaseline$.next(this.isCurrentBaseline);
     });
   }
   
@@ -248,7 +239,6 @@ export class ScheduleStepCardItemComponent implements OnInit, OnDestroy {
         return this.scheduleCardItemSrv.getCurrentBaseline(workpackId);
       })
     ).subscribe(response => {
-      if (!this.handleBaselineResponse(response)) return;
   
       if (!this.properties.stepName) return;
   

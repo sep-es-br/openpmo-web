@@ -7,7 +7,7 @@
   </p-header>
   <div class="card-item-values p-fluid">
     <div class="float-label-container">
-      <span class="p-float-label" [class.responsive]="responsive">
+      <span class="p-float-label" [class.responsive]="responsive" *ngIf="!isPassedMonth">
         <p-inputNumber [class]="'app-input-number costPlanned-'+properties.idCost " id="unit-planned"
           [(ngModel)]="properties.plannedWork"
           [class.red]="properties.plannedWork < 0"
@@ -19,6 +19,21 @@
           <i class="far fa-question-circle" [pTooltip]="'help.schedule.estimatedCost' | translate"></i>
         </label>
       </span>
+
+
+      <span class="p-float-label" [class.responsive]="responsive" *ngIf="isPassedMonth">
+        <p-inputNumber [class]="'app-input-number costPlanned-'+properties.idCost " id="unit-planned"
+          [(ngModel)]="this.properties.costAccountAllocation.planed"
+          [class.red]="properties.plannedWork < 0"
+          (onInput)="handleCostChange($event,'plannedWork'); debounceValidate.next({value: $event, type:'plannedWork'})"
+           mode="decimal" [locale]="currentLang" [minFractionDigits]="2" [maxFractionDigits]="2"
+          [disabled]="!!properties.readonly">
+        </p-inputNumber>
+        <label class="app-input-label" for="unit-planned">{{properties.unitMeasureName}} {{ "plannedBaseline" |translate }} *
+          <i class="far fa-question-circle" [pTooltip]="'help.schedule.estimatedCost' | translate"></i>
+        </label>
+      </span>
+
     </div>
     <div class="cost-account-allocation"
       [class.red-balance]="properties.costAccountAllocation && (properties.costAccountAllocation.limit - properties.costAccountAllocation.planed - properties.plannedWork) < 0">
