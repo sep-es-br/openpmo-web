@@ -15,11 +15,10 @@
            mode="decimal" [locale]="currentLang" [minFractionDigits]="2" [maxFractionDigits]="2"
           [disabled]="!!properties.readonly">
         </p-inputNumber>
-        <label class="app-input-label" for="unit-planned">{{properties.unitMeasureName}} {{ "planned" |translate }} *
+        <label class="app-input-label" for="unit-planned">{{properties.unitMeasureName}} {{ hasActiveBaseline ? ("reprogrammed" | translate) : ("planned" |translate) }} *
           <i class="far fa-question-circle" [pTooltip]="'help.schedule.estimatedCost' | translate"></i>
         </label>
       </span>
-
 
       <span class="p-float-label" [class.responsive]="responsive" *ngIf="isPassedMonth">
         <p-inputNumber [class]="'app-input-number costPlanned-'+properties.idCost " id="unit-planned"
@@ -51,7 +50,7 @@
     <div class="float-label-container">
       <span class="p-float-label" [class.responsive]="responsive">
         <p-inputNumber class="app-input-number" id="float-planned" [(ngModel)]="properties.actualWork"
-          [disabled]="!!properties.readonly"
+          [disabled]="!!properties.readonly || isActualValuesDisabled"
           [class.red]="properties.actualWork < 0"
           (onInput)="handleActualCostChange($event,'actualWork'); debounceValidate.next({value: $event, type:'actualWork'})" mode="decimal" [locale]="currentLang"
           [minFractionDigits]="2" [maxFractionDigits]="2">

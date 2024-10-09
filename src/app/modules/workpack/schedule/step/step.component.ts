@@ -71,7 +71,8 @@ export class StepComponent implements OnInit, OnDestroy {
 
   isCurrentBaseline: boolean;
   isPassedMonth: boolean = false;
-
+  isActualValuesDisabled: boolean = false;
+  
   constructor(
     private actRouter: ActivatedRoute,
     private scheduleSrv: ScheduleService,
@@ -142,6 +143,7 @@ export class StepComponent implements OnInit, OnDestroy {
     this.isLoading = false;
 
     this.handlePassedMonths();
+    this.updateActualValues();
   }
 
   async loadPropertiesStep() {
@@ -624,5 +626,14 @@ export class StepComponent implements OnInit, OnDestroy {
     if (stepDate.isBefore(startOfCurrentMonth) && stepDate.isBefore(endOfPreviousMonth)) {
       this.isPassedMonth = true;
     }
+  }
+
+  updateActualValues() {
+    if (!this.stepDetail.periodFromStart) return;
+
+    const dateStep = moment(this.stepDetail.periodFromStart, 'YYYY-MM');
+    const startOfCurrentMonth = moment().startOf('month');
+
+    this.isActualValuesDisabled = dateStep.isAfter(startOfCurrentMonth);
   }
 }

@@ -19,6 +19,8 @@ export class CostAssignmentCardItemComponent implements OnInit, OnDestroy {
   @Input() properties: ICartItemCostAssignment;
   @Input() scheduleStartDate: Date;
   @Input() isPassedMonth: boolean;
+  @Input() hasActiveBaseline: boolean;
+  @Input() periodFromStart: Date;
   @Output() costChanged = new EventEmitter();
   @Output() spreadDifference = new EventEmitter();
 
@@ -30,6 +32,8 @@ export class CostAssignmentCardItemComponent implements OnInit, OnDestroy {
   actualWorkValidadeMessage: string;
   difference: number;
   debounceValidate = new Subject();
+
+  isActualValuesDisabled: boolean;
 
   constructor(
     private responsiveSrv: ResponsiveService,
@@ -59,6 +63,8 @@ export class CostAssignmentCardItemComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.cardIdItem = this.properties.idCost ?
       `${this.properties.idCost < 10 ? '0' + this.properties.idCost : this.properties.idCost}` : '';
+
+    this.updateActualValues();
   }
 
   handleCostChange(event, field: string) {
@@ -155,6 +161,16 @@ export class CostAssignmentCardItemComponent implements OnInit, OnDestroy {
     } else {
       this.actualWorkValidadeMessage = null;
     }
+  }
+
+  updateActualValues() {
+    debugger
+    if (!this.periodFromStart) return;
+
+    const dateStep = moment(this.periodFromStart, 'YYYY-MM');
+    const startOfCurrentMonth = moment().startOf('month');
+
+    this.isActualValuesDisabled = dateStep.isAfter(startOfCurrentMonth);
   }
 
 }

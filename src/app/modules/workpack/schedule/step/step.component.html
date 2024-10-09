@@ -51,7 +51,7 @@
                       (onInput)="handleChangeTotalsValues()" [minFractionDigits]="unitPrecision"
                       [maxFractionDigits]="unitPrecision" [locale]="currentLang === 'pt-BR' ? 'pt-BR' : 'en-US'">
                     </p-inputNumber>
-                    <label class="app-input-label">{{unitName}} {{ "planned" |translate }} * 
+                  <label class="app-input-label">{{unitName}} {{ isCurrentBaseline ? ("reprogrammed" | translate) : ("planned" | translate) }} * 
                       <i class="far fa-question-circle" [pTooltip]="'help.step.estimatedPhysical' | translate"></i>
                     </label>
                   </span>
@@ -59,7 +59,8 @@
                 <div class="p-field" [class.responsive]="responsive">
                   <span class="p-float-label" [class.responsive]="responsive">
                     <p-inputNumber class="app-input-number" formControlName="actualWork"
-                    [class.red]="formStep && formStep.controls.actualWork.value < 0"
+                      [class.red]="formStep && formStep.controls.actualWork.value < 0"
+                      [disabled]="isActualValuesDisabled"
                       (onInput)="handleChangeTotalsValues()" [minFractionDigits]="unitPrecision"
                       [maxFractionDigits]="unitPrecision" [locale]="currentLang === 'pt-BR' ? 'pt-BR' : 'en-US'">
                     </p-inputNumber>
@@ -70,7 +71,7 @@
                 </div>
                 <div class="p-field planned-baseline" [class.responsive]="responsive"  *ngIf="isCurrentBaseline">
                   <span class="label">
-                    {{unitName}} {{ "plannedBaseline" |translate }}
+                    {{unitName}} {{ "plannedBaseline" | translate }}
                     <i class="far fa-question-circle" [pTooltip]="'help.step.baselinePhysicalTotal' | translate"></i></span>
                   <span class="value">{{ baselinePlannedTotals.plannedWork | number : '0.2' : currentLang }}</span>
                 </div>
@@ -78,7 +79,7 @@
               
               <div class="cost-assignments-totals" [class.responsive]="responsive">
                 <div class="planned-total" *ngIf="!isPassedMonth">
-                  <span class="label"> $ {{ "planned" |translate }}
+                  <span class="label"> $ {{ isCurrentBaseline ? ("reprogrammed" | translate) : ("planned" | translate) }}
                     <i class="far fa-question-circle" [pTooltip]="'help.step.estimatedCostTotal' | translate"></i>
                   </span>
                   <span class="value" [class.red]="costAssignmentsTotals.plannedTotal < 0">{{ costAssignmentsTotals.plannedTotal | number : '0.2' : currentLang }}</span>
@@ -119,7 +120,7 @@
             [emptyMessage]="'loadingEllipsis' | translate">
             <ng-template let-cardItem pTemplate="gridItem">
               <div class="p-col-12 p-md-3 p-sm-12 card-item-container" [class.responsive]="responsive">
-                <app-cost-assignment-card-item [isPassedMonth]="isPassedMonth" [properties]="cardItem" (costChanged)="handleChangeValuesCardItems()">
+                <app-cost-assignment-card-item [periodFromStart]="this.stepDetail.periodFromStart" [hasActiveBaseline]="isCurrentBaseline" [isPassedMonth]="isPassedMonth" [properties]="cardItem" (costChanged)="handleChangeValuesCardItems()">
                 </app-cost-assignment-card-item>
               </div>
             </ng-template>

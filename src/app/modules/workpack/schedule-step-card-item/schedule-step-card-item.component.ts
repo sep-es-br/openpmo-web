@@ -233,20 +233,14 @@ export class ScheduleStepCardItemComponent implements OnInit, OnDestroy {
   }
   
   updateActualValues() {
-    this.getWorkpackId().pipe(
-      switchMap(workpackId => {
-        if (!workpackId) return EMPTY;
-        return this.scheduleCardItemSrv.getCurrentBaseline(workpackId);
-      })
-    ).subscribe(response => {
-  
-      if (!this.properties.stepName) return;
-  
-      const dateStep = moment(this.properties.stepName, 'YYYY-MM');
-      const startOfCurrentMonth = moment().startOf('month');
-  
-      this.isActualValuesDisabled = dateStep.isAfter(startOfCurrentMonth);
-    });
+
+    if (!this.properties.stepName) return;
+
+    const dateStep = moment(this.properties.stepName, 'YYYY-MM');
+    const startOfCurrentMonth = moment().startOf('month');
+
+    this.isActualValuesDisabled = dateStep.isAfter(startOfCurrentMonth);
+
   }
 
   updateMaxValueCosts() {
