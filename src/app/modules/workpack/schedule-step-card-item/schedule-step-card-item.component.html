@@ -39,7 +39,7 @@
           </app-progress-bar-card-step>
         </div>
 
-        <span [ngStyle]="{ 'visibility': !isPassedMonth ? 'visible' : 'hidden'  }" class="p-float-label p-field">
+        <span [ngStyle]="{ 'visibility': !isPassedMonth || !isCurrentBaseline ? 'visible' : 'hidden'  }" class="p-float-label p-field">
           <p-inputNumber [class]="'app-input-number '+'unitPlanned '+'unitPlanned-'+ properties.idStep" id="float-unitPlanned"
             [disabled]="!properties.editPermission" [(ngModel)]="properties.unitPlanned"
             [class.red]="properties.unitPlanned < 0"
