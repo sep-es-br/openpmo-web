@@ -142,8 +142,10 @@ export class StepComponent implements OnInit, OnDestroy {
     await this.loadPropertiesStep();
     this.isLoading = false;
 
-    this.handlePassedMonths();
-    this.updateActualValues();
+    if (this.stepDetail) {
+      this.handlePassedMonths();
+      this.updateActualValues();
+    }
   }
 
   async loadPropertiesStep() {
