@@ -120,7 +120,7 @@
             [emptyMessage]="'loadingEllipsis' | translate">
             <ng-template let-cardItem pTemplate="gridItem">
               <div class="p-col-12 p-md-3 p-sm-12 card-item-container" [class.responsive]="responsive">
-                <app-cost-assignment-card-item [periodFromStart]="this.stepDetail.periodFromStart" [hasActiveBaseline]="isCurrentBaseline" [isPassedMonth]="isPassedMonth" [properties]="cardItem" (costChanged)="handleChangeValuesCardItems()">
+                <app-cost-assignment-card-item [periodFromStart]="this.stepDetail?.periodFromStart" [hasActiveBaseline]="isCurrentBaseline" [isPassedMonth]="isPassedMonth" [properties]="cardItem" (costChanged)="handleChangeValuesCardItems()">
                 </app-cost-assignment-card-item>
               </div>
             </ng-template>
