@@ -130,10 +130,10 @@ export class ScheduleStepCardItemComponent implements OnInit, OnDestroy {
     const startOfCurrentMonth = moment().startOf('month');
     const endOfPreviousMonth = startOfCurrentMonth.clone().subtract(1, 'day');
 
-    if (dateStep.isBefore(startOfCurrentMonth) && dateStep.isBefore(endOfPreviousMonth)) {
-      this.properties.costPlanned = this.properties.costActual;
-      this.properties.unitPlanned = this.properties.unitActual;
-    }
+    // if (dateStep.isBefore(startOfCurrentMonth) && dateStep.isBefore(endOfPreviousMonth)) {
+    //   this.properties.costPlanned = this.properties.costActual;
+    //   this.properties.unitPlanned = this.properties.unitActual;
+    // }
 
     this.stepChanged.next();
   }
