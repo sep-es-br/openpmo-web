@@ -3,13 +3,20 @@ import { BaseService } from '../base/base.service';
 import { ICostAccount, ICostByWorkpack } from '../interfaces/ICostAccount';
 import { IHttpResult } from '../interfaces/IHttpResult';
 import { PrepareHttpParams } from '../utils/query.util';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { IWorkpackData, IWorkpackParams } from '../interfaces/IWorkpackDataParams';
 import { FilterDataviewService } from './filter-dataview.service';
 import { WorkpackService } from './workpack.service';
 import { OrganizationService } from './organization.service';
 import { PlanService } from './plan.service';
 import { CostAccountModelService } from './cost-account-model.service';
+import { map, tap } from "rxjs/operators";
+import { HttpHeaders } from '@angular/common/http';
+
+interface DropdownOption {
+  label: string;
+  value: any;
+}
 
 @Injectable({ providedIn: 'root' })
 export class CostAccountService extends BaseService<ICostAccount> {
@@ -121,4 +128,36 @@ export class CostAccountService extends BaseService<ICostAccount> {
     const result = await this.http.get(`${this.urlBase}/workpack`, { params: PrepareHttpParams(options) }).toPromise();
     return result as IHttpResult<ICostByWorkpack>;
   }
+
+  /**
+   * 
+   * @returns 
+   */
+  getUoOptions(): Observable<DropdownOption[]> {
+    const headers = new HttpHeaders().set('Accept-Charset', 'utf-8')
+    return this.http.get<any>(`${this.urlBase}/budgetUnit`, { headers, responseType: 'json' }).pipe(
+      map(data => {
+        const options: DropdownOption[] = [];
+        for (const item of data.data.resultset) {
+          options.push({ label: item[1], value: item[0] });
+        }
+        return options;
+      })
+    );
+  }
+
+  getPlanoOrcamentarioOptions(codUo: string): Observable<DropdownOption[]> {
+    const url = `${this.urlBase}/budgetPlan?codUo=${codUo}`; 
+    const headers = new HttpHeaders().set('Accept-Charset', 'utf-8')
+    return this.http.get<any>(url, { headers, responseType: 'json' }).pipe(
+      map(data => {
+        const options: DropdownOption[] = [];
+        for (const item of data.data.resultset) {
+          options.push({ label: item[2], value: item[1] });
+        }
+        return options;
+      })
+    );
+  }
+
 }

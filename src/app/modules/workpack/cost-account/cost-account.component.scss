@@ -47,4 +47,11 @@
       }
     }
   }
+
+  ::ng-deep .workpack-selection-not-fullLine {
+    .app-single-selection .p-dropdown {
+      width: 100%;
+    }
+  }
+  
 }
