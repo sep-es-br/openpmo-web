@@ -26,6 +26,8 @@ import { CostAccountModelService } from 'src/app/shared/services/cost-account-mo
 import { ICostAccountModel } from 'src/app/shared/interfaces/ICostAccountModel';
 import { IOrganization } from 'src/app/shared/interfaces/IOrganization';
 import { CancelButtonComponent } from 'src/app/shared/components/cancel-button/cancel-button.component';
+import { IBudgetPlan } from 'src/app/shared/interfaces/IBudgetPlan';
+import { IBudgetUnit } from 'src/app/shared/interfaces/IBudgetUnit';
 
 @Component({
   selector: 'app-cost-account',
@@ -58,6 +60,14 @@ export class CostAccountComponent implements OnInit {
   organizations: IOrganization[] = [];
   formIsSaving = false;
   backupProperties;
+
+  uoOptions: IBudgetUnit[] = [];
+  planoOrcamentarioOptions: IBudgetPlan[] = [];
+
+  selectedUo: IBudgetUnit;
+  selectedPlano: IBudgetPlan;
+
+  poDisabled = true;
 
   constructor(
     private actRouter: ActivatedRoute,
@@ -94,7 +104,34 @@ export class CostAccountComponent implements OnInit {
       isLoading: true
     };
     await this.loadProperties();
+
+    this.costAccountSrv.getUoOptions().subscribe(data =>  {
+      this.uoOptions = data.map(uo => ({ code: uo.value, name: uo.label}))
+    });
   }
+
+  onUoChange(event: any) {
+    this.cancelButton.showButton();
+    this.selectedUo = event.value;
+
+    console.log(this.selectedUo);
+    
+
+    const uoValue = event.value.code;
+    
+    this.costAccountSrv.getPlanoOrcamentarioOptions(uoValue).subscribe(data => {
+      this.planoOrcamentarioOptions = data.map(plan => ({ code: plan.value, name: plan.label}))
+      this.poDisabled = data.length === 0;
+    });
+    this.saveButton.showButton();
+  }
+
+  onPlanoChange(event: any) {
+    this.cancelButton.showButton();
+    this.selectedPlano = event.value;
+    this.saveButton.showButton();
+  }
+  
 
   async loadProperties() {
     this.idPlan = Number(localStorage.getItem('@currentPlan'));
@@ -568,6 +605,9 @@ export class CostAccountComponent implements OnInit {
   }
 
   async saveCostAccount() {
+    console.log(this.selectedUo);
+    console.log(this.selectedPlano);
+
     this.cancelButton.hideButton();
     this.costAccountProperties = this.sectionCostAccountProperties.map(p => p.getValues());
     if (this.sectionCostAccountProperties.filter(p => p.invalid).length > 0) {
@@ -576,11 +616,14 @@ export class CostAccountComponent implements OnInit {
 
     this.formIsSaving = true;
     if (this.idCostAccount) {
+      debugger
       const costAccount = {
         id: this.idCostAccount,
         idWorkpack: this.costAccount.idWorkpack,
         idCostAccountModel: this.costAccount.idCostAccountModel,
         properties: this.costAccountProperties,
+        selectedUo: this.selectedUo ? this.selectedUo : null,
+        selectedPlano: this.selectedPlano ? this.selectedPlano : null
       };
       const result = await this.costAccountSrv.put(costAccount);
       this.formIsSaving = false;
@@ -601,6 +644,8 @@ export class CostAccountComponent implements OnInit {
         idWorkpack: this.idWorkpack,
         idCostAccountModel: this.costAccountModel.id,
         properties: this.costAccountProperties,
+        selectedUo: this.selectedUo ? this.selectedUo : null,
+        selectedPlano: this.selectedPlano ? this.selectedPlano : null
       };
       const result = await this.costAccountSrv.post(costAccount);
       this.formIsSaving = false;
@@ -621,6 +666,8 @@ export class CostAccountComponent implements OnInit {
   handleOnCancel() {
     this.saveButton.hideButton();
     this.sectionCostAccountProperties = this.backupProperties.map( prop => this.instanceBackupProperty(prop));
+    this.selectedPlano = null;
+    this.selectedUo = null;
   }
 
 }
