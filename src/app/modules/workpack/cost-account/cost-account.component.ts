@@ -69,6 +69,9 @@ export class CostAccountComponent implements OnInit {
 
   poDisabled = true;
 
+  backupSelectedUo: any;
+  backupSelectedPlano: any;
+
   constructor(
     private actRouter: ActivatedRoute,
     private authSrv: AuthService,
@@ -109,6 +112,11 @@ export class CostAccountComponent implements OnInit {
     await this.loadProperties();
   }
 
+  initializeBackups() {
+    this.backupSelectedUo = this.selectedUo;
+    this.backupSelectedPlano = this.selectedPlano
+  }
+
   loadUoOptions() {
     return new Promise<void>((resolve) => {
       this.costAccountSrv.getUoOptions().subscribe(data => {
@@ -121,9 +129,6 @@ export class CostAccountComponent implements OnInit {
   onUoChange(event: any) {
     this.cancelButton.showButton();
     this.selectedUo = event.value;
-
-    console.log(this.selectedUo);
-    
 
     const uoValue = event.value.code;
     
@@ -231,7 +236,6 @@ export class CostAccountComponent implements OnInit {
       const propertyNameCostAccount = this.costAccount.properties.find(p => p.idPropertyModel === propertyNameModel.id);
       this.costAccountName = propertyNameCostAccount.value as string;
 
-      // Define a UO selecionada a partir das opções carregadas
       this.selectedUo = this.uoOptions.find(uo => uo.code == this.costAccount.unidadeOrcamentaria?.code);      
 
       if (this.selectedUo) {
@@ -239,8 +243,9 @@ export class CostAccountComponent implements OnInit {
           this.planoOrcamentarioOptions = poData.map(plan => ({ code: plan.value, name: plan.label }));
           this.poDisabled = poData.length === 0;
 
-          // Define o PO selecionado a partir do backend
-          this.selectedPlano = this.planoOrcamentarioOptions.find(plan => plan.code === this.costAccount.planoOrcamentario?.code);
+          this.selectedPlano = this.planoOrcamentarioOptions.find(plan => plan.code == this.costAccount.planoOrcamentario?.code);
+          this.backupSelectedUo = this.selectedUo;
+          this.backupSelectedPlano = this.selectedPlano;
         })
       }
       
@@ -628,8 +633,6 @@ export class CostAccountComponent implements OnInit {
   }
 
   async saveCostAccount() {
-    console.log(this.selectedUo);
-    console.log(this.selectedPlano);
 
     this.cancelButton.hideButton();
     this.costAccountProperties = this.sectionCostAccountProperties.map(p => p.getValues());
@@ -639,7 +642,6 @@ export class CostAccountComponent implements OnInit {
 
     this.formIsSaving = true;
     if (this.idCostAccount) {
-      debugger
       const costAccount = {
         id: this.idCostAccount,
         idWorkpack: this.costAccount.idWorkpack,
@@ -689,8 +691,8 @@ export class CostAccountComponent implements OnInit {
   handleOnCancel() {
     this.saveButton.hideButton();
     this.sectionCostAccountProperties = this.backupProperties.map( prop => this.instanceBackupProperty(prop));
-    this.selectedPlano = null;
-    this.selectedUo = null;
+    this.selectedPlano = this.backupSelectedPlano;
+    this.selectedUo = this.backupSelectedUo;
   }
 
 }
