@@ -189,6 +189,7 @@
   "costAssignment": "Centros de Custos Vinculados",
   "actual": "Realizado",
   "abbreviatedActual": "Real.",
+  "abbreviatedLiquidated": "Liq.",
   "planned": "Estimado",
   "foreseen": "Estimado",
   "abbreviatedForeseen": "Est.",
