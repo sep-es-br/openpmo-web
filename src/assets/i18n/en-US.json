@@ -1030,5 +1030,7 @@
   "actualCost": "Actual Cost",
   "plannedValue": "Planned Value",
   "estimatesAtCompletion": "Estimates At Completion",
-  "estimatesToComplete": "Estimates To Complete"
+  "estimatesToComplete": "Estimates To Complete",
+  "labelBudgetUnit": "Budget Unit",
+  "labelBudgetPlan": "Budget Plan"
 }

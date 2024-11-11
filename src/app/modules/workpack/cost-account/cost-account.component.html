@@ -27,50 +27,50 @@
         </div>
       </div>
 
-      <!-- UNIDADE ORÇAMENTÁRIA -->
+      <!-- NOVA UNIDADE ORÇAMENTÁRIA -->
       <span class="p-float-label" [class.workpack-selection-mobile]="responsive"
         [class.workpack-selection]="true" [class.workpack-selection-not-fullLine]="false">
-        <p-dropdown class="app-single-selection" dropdownIcon="fas fa-caret-down"
-          [options]="uoOptions" [(ngModel)]="selectedUo" optionLabel="name"
-          [autoDisplayFirst]="false" (onChange)="onUoChange($event)">
+        <p-dropdown class="app-single-selection p-budget" dropdownIcon="fas fa-caret-down" [options]="uoOptions"
+          [(ngModel)]="selectedUo" optionLabel="displayText" [filter]="true" filterBy="displayText" (onChange)="onUoChange($event)"
+          [showClear]="false">
 
           <ng-template pTemplate="selectedItem" let-selectedOption>
             <div class="flex align-items-center gap-2">
-              <div>{{ selectedOption.name }}</div>
+              <div>{{ selectedOption.displayText }}</div>
             </div>
           </ng-template>
 
           <ng-template let-uo pTemplate="item">
             <div class="flex align-items-center gap-2">
-              <div>{{ uo.name }}</div>
+              <div>{{ uo.displayText }}</div>
             </div>
           </ng-template>
         </p-dropdown>
-        <label class="app-input-label">Unidade Orçamentária (UO)</label>
+        <label class="app-input-label">{{ 'labelBudgetUnit' | translate }}</label>
       </span>
 
       <!-- PLANO ORÇAMENTÁRIO -->
       <span class="p-float-label" [class.workpack-selection-mobile]="responsive" [class.workpack-selection]="true"
         [class.workpack-selection-not-fullLine]="false">
-        <p-dropdown class="app-single-selection" dropdownIcon="fas fa-caret-down" [options]="planoOrcamentarioOptions"
-          [(ngModel)]="selectedPlano" optionLabel="name"
-          [filter]="true" filterBy="name" (onChange)="onPlanoChange($event)"
+        <p-dropdown class="app-single-selection p-budget" dropdownIcon="fas fa-caret-down" [options]="planoOrcamentarioOptions"
+          [(ngModel)]="selectedPlano" optionLabel="fullName"
+          [filter]="true" filterBy="fullName" (onChange)="onPlanoChange($event)"
           [showClear]="false" [disabled]="poDisabled">
       
           <ng-template pTemplate="selectedItem" let-selectedOption>
             <div class="flex align-items-center gap-2">
-              <div>{{ selectedOption.name }}</div>
+              <div>{{ selectedOption.fullName }}</div>
             </div>
           </ng-template>
       
           <ng-template let-plano pTemplate="item">
             <div class="flex align-items-center gap-2">
-              <div>{{ plano.name }}</div>
+              <div>{{ plano.fullName }}</div>
             </div>
           </ng-template>
       
         </p-dropdown>
-        <label class="app-input-label">Plano Orçamentário (PO)</label>
+        <label class="app-input-label">{{ 'labelBudgetUnit' | translate }}</label>
       </span>
 
     </app-cost-account-card>

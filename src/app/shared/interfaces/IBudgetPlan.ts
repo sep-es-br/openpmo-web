@@ -1,4 +1,5 @@
 export interface IBudgetPlan {
     code: string,
-    name: string
+    name: string,
+    // fullName: string
 }

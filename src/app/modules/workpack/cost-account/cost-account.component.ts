@@ -120,7 +120,12 @@ export class CostAccountComponent implements OnInit {
   loadUoOptions() {
     return new Promise<void>((resolve) => {
       this.costAccountSrv.getUoOptions().subscribe(data => {
-        this.uoOptions = data.map(uo => ({ code: uo.value, name: uo.label }));
+        this.uoOptions = data.map(uo => ({ 
+          code: uo.code, 
+          name: uo.name, 
+          fullName: uo.fullName,
+          displayText: `${uo.code} - ${uo.name} - ${uo.fullName}`
+        }));
         resolve();
       });
     });
@@ -133,7 +138,7 @@ export class CostAccountComponent implements OnInit {
     const uoValue = event.value.code;
     
     this.costAccountSrv.getPlanoOrcamentarioOptions(uoValue).subscribe(data => {
-      this.planoOrcamentarioOptions = data.map(plan => ({ code: plan.value, name: plan.label}))
+      this.planoOrcamentarioOptions = data.map(plan => ({ code: plan.code, name: plan.name, fullName: plan.fullName}))
       this.poDisabled = data.length === 0;
     });
     this.saveButton.showButton();
@@ -240,7 +245,7 @@ export class CostAccountComponent implements OnInit {
 
       if (this.selectedUo) {
         this.costAccountSrv.getPlanoOrcamentarioOptions(this.selectedUo.code).subscribe(poData => {
-          this.planoOrcamentarioOptions = poData.map(plan => ({ code: plan.value, name: plan.label }));
+          this.planoOrcamentarioOptions = poData.map(plan => ({ code: plan.code, name: plan.name, fullName: plan.fullName }));
           this.poDisabled = poData.length === 0;
 
           this.selectedPlano = this.planoOrcamentarioOptions.find(plan => plan.code == this.costAccount.planoOrcamentario?.code);

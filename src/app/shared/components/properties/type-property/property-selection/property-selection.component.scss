@@ -41,6 +41,12 @@
   }
 }
 
+::ng-deep .workpack-selection {
+  .p-budget .p-dropdown {
+    width: 100%;
+  }
+}
+
 ::ng-deep .workpack-selection-not-fullLine {
   .app-single-selection .p-dropdown {
     width: 100%;

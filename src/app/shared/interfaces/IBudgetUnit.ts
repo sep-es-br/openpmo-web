@@ -1,4 +1,5 @@
 export interface IBudgetUnit {
     code: string,
-    name: string
+    name: string,
+    // fullName: string
 }

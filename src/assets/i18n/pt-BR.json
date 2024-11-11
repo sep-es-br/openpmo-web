@@ -1030,5 +1030,7 @@
   "actualCost": "Custo Realizado",
   "plannedValue": "Valor Planejado",
   "estimatesAtCompletion": "Estimativa na Conclusão",
-  "estimatesToComplete": "Estimativa para Conclusão"
+  "estimatesToComplete": "Estimativa para Conclusão",
+  "labelBudgetUnit": "Unidade Orçamentária (UO)",
+  "labelBudgetPlan": "Plano Orçamentário (PO)"
 }
