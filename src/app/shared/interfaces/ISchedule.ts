@@ -61,6 +61,10 @@ export interface IConsume {
   costAccount: {
     id: number;
     name?: string;
+    codUo?: number;
+    unidadeOrcamentaria?: string;
+    codPo?: number;
+    planoOrcamentario?: string;
   };
 }
 

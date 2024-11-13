@@ -91,17 +91,6 @@
             [maxValue]="maxValueUnit">
           </app-progress-bar-card-step>
         </div>
-
-        <span class="p-float-label p-field">
-          <p-inputNumber class="app-input-number" id="float-liq"
-            [disabled]="true" [class.red]="properties.costActual < 0" 
-            [(ngModel)]="properties.unitActual" [minFractionDigits]="2" 
-            [maxFractionDigits]="2"
-            [locale]="language === 'pt-BR' ? 'pt-BR' : 'en-US'">
-          </p-inputNumber>
-          <label pTooltip="teste" class="app-input-label" for="float-liq">{{"abbreviatedLiquidated" | translate}}</label>
-        </span>
-
       </div>
     </div>
     <div class="costValues">
@@ -189,6 +178,10 @@
     </div>
   </div>
   <div class="card-item-footer" *ngIf="cardIdItem">
+    <span class="card-item-id">
+      <label class="card-item-liquidated-label" for="liquidated-value">{{'liquidated' | translate}}:</label>
+      <span id="liquidated-value" class="card-item-liquidated-value">{{properties.unitActual}}</span>
+    </span>
     <span class="card-item-id">
       {{cardIdItem}}
     </span>
