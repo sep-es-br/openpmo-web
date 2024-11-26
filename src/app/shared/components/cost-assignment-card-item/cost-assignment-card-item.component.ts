@@ -164,7 +164,6 @@ export class CostAssignmentCardItemComponent implements OnInit, OnDestroy {
   }
 
   updateActualValues() {
-    debugger
     if (!this.periodFromStart) return;
 
     const dateStep = moment(this.periodFromStart, 'YYYY-MM');

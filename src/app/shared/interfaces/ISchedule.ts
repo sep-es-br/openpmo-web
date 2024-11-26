@@ -51,6 +51,7 @@ export interface IStep {
   actualWork: number;
   periodFromStart?: Date;
   consumes?: IConsume[];
+  liquidated?: number;
 }
 
 export interface IConsume {
