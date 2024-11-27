@@ -65,9 +65,12 @@ export class CostAccountComponent implements OnInit {
   planoOrcamentarioOptions: IBudgetPlan[] = [];
 
   selectedUo: IBudgetUnit;
-  selectedPlano: IBudgetPlan;
+  selectedPlano: IBudgetPlan; 
 
   poDisabled = true;
+
+  backupSelectedUo: any;
+  backupSelectedPlano: any;
 
   constructor(
     private actRouter: ActivatedRoute,
@@ -103,10 +106,28 @@ export class CostAccountComponent implements OnInit {
       initialStateCollapse: false,
       isLoading: true
     };
-    await this.loadProperties();
 
-    this.costAccountSrv.getUoOptions().subscribe(data =>  {
-      this.uoOptions = data.map(uo => ({ code: uo.value, name: uo.label}))
+    await this.loadUoOptions();
+
+    await this.loadProperties();
+  }
+
+  initializeBackups() {
+    this.backupSelectedUo = this.selectedUo;
+    this.backupSelectedPlano = this.selectedPlano
+  }
+
+  loadUoOptions() {
+    return new Promise<void>((resolve) => {
+      this.costAccountSrv.getUoOptions().subscribe(data => {
+        this.uoOptions = data.map(uo => ({ 
+          code: uo.code, 
+          name: uo.name, 
+          fullName: uo.fullName,
+          displayText: `${uo.code} - ${uo.name} - ${uo.fullName}`
+        }));
+        resolve();
+      });
     });
   }
 
@@ -114,13 +135,10 @@ export class CostAccountComponent implements OnInit {
     this.cancelButton.showButton();
     this.selectedUo = event.value;
 
-    console.log(this.selectedUo);
-    
-
     const uoValue = event.value.code;
     
     this.costAccountSrv.getPlanoOrcamentarioOptions(uoValue).subscribe(data => {
-      this.planoOrcamentarioOptions = data.map(plan => ({ code: plan.value, name: plan.label}))
+      this.planoOrcamentarioOptions = data.map(plan => ({ code: plan.code, name: plan.name, fullName: plan.fullName}))
       this.poDisabled = data.length === 0;
     });
     this.saveButton.showButton();
@@ -218,9 +236,24 @@ export class CostAccountComponent implements OnInit {
     if (result.success) {
       this.costAccount = result.data;
       this.idWorkpack = this.costAccount.idWorkpack;
+
       const propertyNameModel = this.costAccount.models.find(p => p.name === 'name');
       const propertyNameCostAccount = this.costAccount.properties.find(p => p.idPropertyModel === propertyNameModel.id);
       this.costAccountName = propertyNameCostAccount.value as string;
+
+      this.selectedUo = this.uoOptions.find(uo => uo.code == this.costAccount.unidadeOrcamentaria?.code);      
+
+      if (this.selectedUo) {
+        this.costAccountSrv.getPlanoOrcamentarioOptions(this.selectedUo.code).subscribe(poData => {
+          this.planoOrcamentarioOptions = poData.map(plan => ({ code: plan.code, name: plan.name, fullName: plan.fullName }));
+          this.poDisabled = poData.length === 0;
+
+          this.selectedPlano = this.planoOrcamentarioOptions.find(plan => plan.code == this.costAccount.planoOrcamentario?.code);
+          this.backupSelectedUo = this.selectedUo;
+          this.backupSelectedPlano = this.selectedPlano;
+        })
+      }
+      
       await this.loadCardCostAccountProperties();
       this.setBreadcrumb();
     }
@@ -605,8 +638,6 @@ export class CostAccountComponent implements OnInit {
   }
 
   async saveCostAccount() {
-    console.log(this.selectedUo);
-    console.log(this.selectedPlano);
 
     this.cancelButton.hideButton();
     this.costAccountProperties = this.sectionCostAccountProperties.map(p => p.getValues());
@@ -616,14 +647,13 @@ export class CostAccountComponent implements OnInit {
 
     this.formIsSaving = true;
     if (this.idCostAccount) {
-      debugger
       const costAccount = {
         id: this.idCostAccount,
         idWorkpack: this.costAccount.idWorkpack,
         idCostAccountModel: this.costAccount.idCostAccountModel,
         properties: this.costAccountProperties,
-        selectedUo: this.selectedUo ? this.selectedUo : null,
-        selectedPlano: this.selectedPlano ? this.selectedPlano : null
+        unidadeOrcamentaria: this.selectedUo ? this.selectedUo : null,
+        planoOrcamentario: this.selectedPlano ? this.selectedPlano : null
       };
       const result = await this.costAccountSrv.put(costAccount);
       this.formIsSaving = false;
@@ -644,8 +674,8 @@ export class CostAccountComponent implements OnInit {
         idWorkpack: this.idWorkpack,
         idCostAccountModel: this.costAccountModel.id,
         properties: this.costAccountProperties,
-        selectedUo: this.selectedUo ? this.selectedUo : null,
-        selectedPlano: this.selectedPlano ? this.selectedPlano : null
+        unidadeOrcamentaria: this.selectedUo ? this.selectedUo : null,
+        planoOrcamentario: this.selectedPlano ? this.selectedPlano : null
       };
       const result = await this.costAccountSrv.post(costAccount);
       this.formIsSaving = false;
@@ -666,8 +696,8 @@ export class CostAccountComponent implements OnInit {
   handleOnCancel() {
     this.saveButton.hideButton();
     this.sectionCostAccountProperties = this.backupProperties.map( prop => this.instanceBackupProperty(prop));
-    this.selectedPlano = null;
-    this.selectedUo = null;
+    this.selectedPlano = this.backupSelectedPlano;
+    this.selectedUo = this.backupSelectedUo;
   }
 
 }

@@ -189,6 +189,7 @@
   "costAssignment": "Centros de Custos Vinculados",
   "actual": "Realizado",
   "abbreviatedActual": "Real.",
+  "abbreviatedLiquidated": "Liq.",
   "planned": "Estimado",
   "foreseen": "Estimado",
   "abbreviatedForeseen": "Est.",
@@ -1029,5 +1030,8 @@
   "actualCost": "Custo Realizado",
   "plannedValue": "Valor Planejado",
   "estimatesAtCompletion": "Estimativa na Conclusão",
-  "estimatesToComplete": "Estimativa para Conclusão"
+  "estimatesToComplete": "Estimativa para Conclusão",
+  "labelBudgetUnit": "Unidade Orçamentária (UO)",
+  "labelBudgetPlan": "Plano Orçamentário (PO)",
+  "liquidated": "Liquidado"
 }

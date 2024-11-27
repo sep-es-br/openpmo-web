@@ -51,6 +51,7 @@ export interface IStep {
   actualWork: number;
   periodFromStart?: Date;
   consumes?: IConsume[];
+  liquidatedValue?: number;
 }
 
 export interface IConsume {
@@ -61,6 +62,10 @@ export interface IConsume {
   costAccount: {
     id: number;
     name?: string;
+    codUo?: number;
+    unidadeOrcamentaria?: string;
+    codPo?: number;
+    planoOrcamentario?: string;
   };
 }
 

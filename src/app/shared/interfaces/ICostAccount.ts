@@ -1,3 +1,5 @@
+import { IBudgetPlan } from './IBudgetPlan';
+import { IBudgetUnit } from './IBudgetUnit';
 import { IWorkpackModelProperty } from './IWorkpackModelProperty';
 import { IWorkpackProperty } from './IWorkpackProperty';
 
@@ -13,7 +15,9 @@ export interface ICostAccount {
     actual: number;
     limit: number;
     planed: number;
-  } 
+  }
+  unidadeOrcamentaria: IBudgetUnit;
+  planoOrcamentario: IBudgetPlan; 
 }
 
 export interface ICostByWorkpack {

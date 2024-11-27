@@ -12,10 +12,12 @@ import { PlanService } from './plan.service';
 import { CostAccountModelService } from './cost-account-model.service';
 import { map, tap } from "rxjs/operators";
 import { HttpHeaders } from '@angular/common/http';
+import { log } from 'console';
 
 interface DropdownOption {
-  label: string;
-  value: any;
+  code: string;
+  name: string;
+  fullName: string
 }
 
 @Injectable({ providedIn: 'root' })
@@ -139,7 +141,7 @@ export class CostAccountService extends BaseService<ICostAccount> {
       map(data => {
         const options: DropdownOption[] = [];
         for (const item of data.data.resultset) {
-          options.push({ label: item[1], value: item[0] });
+          options.push({ code: item[0], name: item[1], fullName: item[2] });
         }
         return options;
       })
@@ -153,7 +155,7 @@ export class CostAccountService extends BaseService<ICostAccount> {
       map(data => {
         const options: DropdownOption[] = [];
         for (const item of data.data.resultset) {
-          options.push({ label: item[2], value: item[1] });
+          options.push({ name: item[0], code: item[1], fullName: item[2] });
         }
         return options;
       })

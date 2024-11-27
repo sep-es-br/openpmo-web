@@ -5,6 +5,7 @@ import { IScheduleStepCardItem } from '../../../../shared/interfaces/IScheduleSt
 import { IScheduleDetail } from '../../../../shared/interfaces/ISchedule';
 import { ScheduleService } from '../../../../shared/services/schedule.service';
 import { IScheduleSection } from '../../../../shared/interfaces/ISectionWorkpack';
+import { ISummaryJson } from '../../../../shared/interfaces/ISummaryJson';
 import { takeUntil } from 'rxjs/operators';
 import { ResponsiveService } from '../../../../shared/services/responsive.service';
 import { ConfigDataViewService } from 'src/app/shared/services/config-dataview.service';
@@ -24,6 +25,7 @@ import { CancelButtonComponent } from 'src/app/shared/components/cancel-button/c
 import { LabelService } from 'src/app/shared/services/label.service';
 import { ActivatedRoute } from '@angular/router';
 import { ScheduleStepCardItemService } from 'src/app/shared/services/schedule-step-card-item.service';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-workpack-section-schedule',
@@ -65,6 +67,9 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
 
   isCurrentBaseline: boolean;
 
+  // resumedSchedule: any;
+  // summaryJson: ISummaryJson[]
+
   private _subscription: Subscription = new Subscription();
 
   constructor(
@@ -79,7 +84,8 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
     private messageSrv: MessageService,
     private dashboardSrv: DashboardService,
     private labelSrv: LabelService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private http: HttpClient
   ) {
 
     this.workpackShowTabviewSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => {
@@ -155,10 +161,80 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
         }))
       }))
     });
+
     this.sectionActive = workpackData && !!workpackData.workpack && !!workpackData.workpack.id  &&
       workpackData.workpackModel && workpackData.workpackModel.scheduleSessionActive;
+
+    this.fetchAndMapLiquidatedValues(this.schedule)
+
     if(!loading) {this.loadScheduleSession();}
+
+    // this.summaryJson = this.transformData(this.schedule);
+    // this.resumedSchedule = this.fetchAndMapLiquidatedValues(this.summaryJson);
   }
+
+  /**
+   * Reduz o JSON Object de Schedule contendo os dados que eu necessito para o PO
+   * @param data o Object Schedule retornado do back-end
+   * @returns o JSON Object reduzido
+   */
+  // transformData(data: any): any {
+  //   return data.groupStep.map((group: any) => ({
+  //     year: group.year,
+  //     steps: group.steps.map((step: any) => ({
+  //       stepMonth: new Date(step.periodFromStart).getMonth() + 1,
+  //       consumes: step.consumes.map((consume: any) => ({
+  //         costAccount: {
+  //           codPo: consume.costAccount.codPo
+  //         }
+  //       }))
+  //     }))
+  //   }));
+  // }
+
+  /**
+   * 
+   * @param scheduleDetail 
+   * @returns 
+   */
+  async fetchAndMapLiquidatedValues(scheduleDetail: IScheduleDetail): Promise<IScheduleDetail> {
+    const monthAbbreviations = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
+  
+    for (const group of scheduleDetail.groupStep) {
+      for (const step of group.steps) {
+        if (step.consumes && step.consumes.length > 0) {
+          const codPo = String(step.consumes[0].costAccount.codPo).padStart(6, '0');
+
+          const response = await this.scheduleSrv.getLiquidatedValues(codPo);
+          const yearLiquidationData = response.data.resultset.find((data: any[]) => data[0] === group.year);
+  
+          if (yearLiquidationData) {
+            const monthlyValues = {
+              jan: yearLiquidationData[4],
+              fev: yearLiquidationData[5],
+              mar: yearLiquidationData[6],
+              abr: yearLiquidationData[7],
+              mai: yearLiquidationData[8],
+              jun: yearLiquidationData[9],
+              jul: yearLiquidationData[10],
+              ago: yearLiquidationData[11],
+              set: yearLiquidationData[12],
+              out: yearLiquidationData[13],
+              nov: yearLiquidationData[14],
+              dez: yearLiquidationData[15]
+            };
+  
+            const monthAbbreviation = monthAbbreviations[new Date(step.periodFromStart).getMonth()];
+            step.liquidatedValue = monthlyValues[monthAbbreviation];
+          }
+        }
+      }
+    }
+  
+    return scheduleDetail;
+  }
+  
+  
 
   async loadScheduleSession() {
     if(!this.sectionActive) {return;}
@@ -194,6 +270,7 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
             ((groupIndex === groupArray.length - 1 && stepIndex === stepArray.length - 1) ? 'end' : 'step'),
           unitPlanned: step.plannedWork ? step.plannedWork : 0,
           unitActual: step.actualWork ? step.actualWork : 0,
+          // liquidatedValue: step.liquidatedValue ? step.liquidatedValue : 0,
           unitBaseline: step.baselinePlannedWork ? step.baselinePlannedWork : 0,
           unitProgressBar: {
             total: step.plannedWork,
@@ -334,6 +411,7 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
         }
         this.sectionSchedule.groupStep[0].cardItemSection[0].stepDay = startDate;
         const groupStepItems: IScheduleStepCardItem[] = [startScheduleStep];
+        console.log(groupStepItems)
         this.sectionSchedule.groupStep[0].cardItemSection.forEach(card => {
           groupStepItems.push(card);
         });
