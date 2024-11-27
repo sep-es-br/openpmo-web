@@ -113,6 +113,10 @@ export class ScheduleService extends BaseService<any> {
     return this.http.patch(`${this.urlBase}/step/${idStep}/cost-account/${idCostAccount}`, cost).toPromise()  as Promise<IHttpResult<any>>;
   }
 
+  public getLiquidatedValues(codPo: string): Promise<IHttpResult<any>> {
+    return this.http.get(`${this.urlBase}/po/liquidated/${codPo}`).toPromise() as Promise<IHttpResult<any>>;
+  }
+
   public async DeleteScheduleStep(id: number, options?: { message?: string; useConfirm?: boolean }): Promise<IHttpResult<IStep>> {
     const message = options?.message;
     const useConfirm: boolean = options?.useConfirm || true;

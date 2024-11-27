@@ -157,8 +157,6 @@ export class CostAccountService extends BaseService<ICostAccount> {
         for (const item of data.data.resultset) {
           options.push({ name: item[0], code: item[1], fullName: item[2] });
         }
-        console.log(options);
-        
         return options;
       })
     );
