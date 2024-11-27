@@ -5,7 +5,6 @@ import { IconsEnum } from '../../enums/IconsEnum';
 import { ICardItemPermission } from '../../interfaces/ICardItemPermission';
 import { ResponsiveService } from '../../services/responsive.service';
 import { MobileViewService } from '../../services/mobile-view.service';
-import { FormatNamePipe } from '../../pipes/format-name.pipe';
 
 @Component({
   selector: 'app-card-item-permission',
@@ -36,9 +35,6 @@ export class CardItemPermissionComponent implements OnInit {
   ngOnInit(): void {
     this.cardIdItem = this.properties.itemId || this.properties.itemId === 0 ?
     `${ this.properties.itemId < 10 && this.properties.itemId !== 0 ? '0'+this.properties.itemId : this.properties.itemId}` : '';
-
-    this.properties.fullNameUser = FormatNamePipe.prototype.transform(this.properties.fullNameUser);
-    this.properties.titleCardItem = FormatNamePipe.prototype.transform(this.properties.titleCardItem); 
   }
 
   navigateToPage(url: string, params?: {name: string; value: string | number}[]) {
