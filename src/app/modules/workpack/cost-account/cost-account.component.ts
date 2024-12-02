@@ -247,7 +247,7 @@ export class CostAccountComponent implements OnInit {
       this.selectedUo = this.uoOptions.find(uo => uo.code == this.costAccount.unidadeOrcamentaria?.code);      
 
       if (this.selectedUo) {
-        this.costAccountSrv.getPlanoOrcamentarioOptions(this.selectedUo.code).subscribe(poData => {
+        this.costAccountSrv.getPlanoOrcamentarioOptions(this.selectedUo.code, this.costAccount.id).subscribe(poData => {
           this.planoOrcamentarioOptions = poData.map(plan => ({ code: plan.code, name: plan.name, fullName: plan.fullName }));
           this.poDisabled = poData.length === 0;
 
