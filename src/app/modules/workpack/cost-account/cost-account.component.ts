@@ -107,9 +107,10 @@ export class CostAccountComponent implements OnInit {
       isLoading: true
     };
 
+    await this.loadProperties();
+
     await this.loadUoOptions();
 
-    await this.loadProperties();
   }
 
   initializeBackups() {
@@ -118,8 +119,10 @@ export class CostAccountComponent implements OnInit {
   }
 
   loadUoOptions() {
+    console.log(this.costAccount.id);
+    
     return new Promise<void>((resolve) => {
-      this.costAccountSrv.getUoOptions().subscribe(data => {
+      this.costAccountSrv.getUoOptions(this.costAccount.id).subscribe(data => {
         this.uoOptions = data.map(uo => ({ 
           code: uo.code, 
           name: uo.name, 
@@ -137,7 +140,7 @@ export class CostAccountComponent implements OnInit {
 
     const uoValue = event.value.code;
     
-    this.costAccountSrv.getPlanoOrcamentarioOptions(uoValue).subscribe(data => {
+    this.costAccountSrv.getPlanoOrcamentarioOptions(uoValue, this.costAccount.id).subscribe(data => {
       this.planoOrcamentarioOptions = data.map(plan => ({ code: plan.code, name: plan.name, fullName: plan.fullName}))
       this.poDisabled = data.length === 0;
     });
