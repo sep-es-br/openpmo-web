@@ -11,7 +11,7 @@ import { OrganizationService } from './organization.service';
 import { PlanService } from './plan.service';
 import { CostAccountModelService } from './cost-account-model.service';
 import { map, tap } from "rxjs/operators";
-import { HttpHeaders, HttpParams } from '@angular/common/http';
+import { HttpHeaders } from '@angular/common/http';
 import { log } from 'console';
 
 interface DropdownOption {
@@ -135,9 +135,9 @@ export class CostAccountService extends BaseService<ICostAccount> {
    * 
    * @returns 
    */
-  getUoOptions(costAccountId: number): Observable<DropdownOption[]> {
+  getUoOptions(): Observable<DropdownOption[]> {
     const headers = new HttpHeaders().set('Accept-Charset', 'utf-8')
-    return this.http.get<any>(`${this.urlBase}/budgetUnit/${costAccountId}`, { headers, responseType: 'json' }).pipe(
+    return this.http.get<any>(`${this.urlBase}/budgetUnit`, { headers, responseType: 'json' }).pipe(
       map(data => {
         const options: DropdownOption[] = [];
         for (const item of data.data.resultset) {
@@ -148,8 +148,8 @@ export class CostAccountService extends BaseService<ICostAccount> {
     );
   }
 
-  getPlanoOrcamentarioOptions(codUo: string, costAccountId: number): Observable<DropdownOption[]> {
-    const url = `${this.urlBase}/budgetPlan?codUo=${codUo}&costAccountId=${costAccountId}`; 
+  getPlanoOrcamentarioOptions(codUo: string): Observable<DropdownOption[]> {
+    const url = `${this.urlBase}/budgetPlan?codUo=${codUo}`; 
     const headers = new HttpHeaders().set('Accept-Charset', 'utf-8')
     return this.http.get<any>(url, { headers, responseType: 'json' }).pipe(
       map(data => {
