@@ -131,35 +131,4 @@ export class CostAccountService extends BaseService<ICostAccount> {
     return result as IHttpResult<ICostByWorkpack>;
   }
 
-  /**
-   * 
-   * @returns 
-   */
-  getUoOptions(): Observable<DropdownOption[]> {
-    const headers = new HttpHeaders().set('Accept-Charset', 'utf-8')
-    return this.http.get<any>(`${this.urlBase}/pentaho/budgetUnit`, { headers, responseType: 'json' }).pipe(
-      map(data => {
-        const options: DropdownOption[] = [];
-        for (const item of data.data.resultset) {
-          options.push({ code: item[0], name: item[1], fullName: item[2] });
-        }
-        return options;
-      })
-    );
-  }
-
-  getPlanoOrcamentarioOptions(codUo: string): Observable<DropdownOption[]> {
-    const url = `${this.urlBase}/pentaho/budgetPlan?codUo=${codUo}`; 
-    const headers = new HttpHeaders().set('Accept-Charset', 'utf-8')
-    return this.http.get<any>(url, { headers, responseType: 'json' }).pipe(
-      map(data => {
-        const options: DropdownOption[] = [];
-        for (const item of data.data.resultset) {
-          options.push({ name: item[0], code: item[1], fullName: item[2] });
-        }
-        return options;
-      })
-    );
-  }
-
 }

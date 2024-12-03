@@ -1,48 +1,49 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import { map } from 'rxjs/operators';
-import { of } from 'rxjs';
+import { HttpClient } from "@angular/common/http";
+import { Injectable, Injector } from "@angular/core";
+import { APP_CONFIG } from "../tokens/AppConfigToken";
+import { Observable } from "rxjs";
+import { map } from "rxjs/operators";
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: "root"
 })
-export class DataService {
-  private apiUrl = 'https://bi.sep.local/pentaho/plugin/cda/api/doQuery?path=/public/dashboard/plano_orcamentario/api_po_liquidado.cda&dataAccessId=api_po_liquidado';
+export class PentahoService {
+  private baseUrl: string;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private injector: Injector) {
+    const appConfig = injector.get(APP_CONFIG)
+    this.baseUrl = `${appConfig.API}`
+  }
 
-  getLiquidatedValues(codPo: string) {
-    const url = `${this.apiUrl}&parampCodPo=${codPo}`;
-    const headers = new HttpHeaders({
-      Authorization: 'Basic ' + btoa('anonimo.bi:Da$hb0ard')
-    });
-
-    return this.http.get<any>(url, { headers }).pipe(
-      map((response) => {
-        const data = response.resultset;
-        const result = {};
-
-        // Parsing and mapping the data
-        data.forEach((item) => {
-          const year = item[0];
-          result[year] = {
-            jan: item[4],
-            feb: item[5],
-            mar: item[6],
-            apr: item[7],
-            may: item[8],
-            jun: item[9],
-            jul: item[10],
-            aug: item[11],
-            sep: item[12],
-            oct: item[13],
-            nov: item[14],
-            dec: item[15],
-          };
-        });
-        
-        return result;
+  getUoOptions(costAccountId: number): Observable<DropdownOption[]> {
+    const url = `${this.baseUrl}/cost-accounts/pentaho/budgetUnit/${costAccountId}`;
+    return this.http.get<any>(url, { responseType: 'json' }).pipe(
+      map(data => {
+        const options: DropdownOption[] = [];
+        for (const item of data.data.resultset) {
+          options.push({ code: item[0], name: item[1], fullName: item[2] });
+        }
+        return options;
       })
     );
   }
+
+  getPlanoOrcamentarioOptions(codUo: string, costAccountId: number): Observable<DropdownOption[]> {
+    const url = `${this.baseUrl}/pentaho/budgetPlan?codUo=${codUo}&costAccountId=${costAccountId}`;
+    return this.http.get<any>(url, { responseType: 'json' }).pipe(
+      map(data => {
+        const options: DropdownOption[] = [];
+        for (const item of data.data.resultset) {
+          options.push({ name: item[0], code: item[1], fullName: item[2] });
+        }
+        return options;
+      })
+    );
+  }
+}
+
+export interface DropdownOption {
+  code: string;
+  name: string;
+  fullName: string;
 }

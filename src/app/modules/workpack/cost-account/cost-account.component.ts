@@ -28,6 +28,7 @@ import { IOrganization } from 'src/app/shared/interfaces/IOrganization';
 import { CancelButtonComponent } from 'src/app/shared/components/cancel-button/cancel-button.component';
 import { IBudgetPlan } from 'src/app/shared/interfaces/IBudgetPlan';
 import { IBudgetUnit } from 'src/app/shared/interfaces/IBudgetUnit';
+import { PentahoService } from 'src/app/shared/services/pentaho.service';
 
 @Component({
   selector: 'app-cost-account',
@@ -86,7 +87,8 @@ export class CostAccountComponent implements OnInit {
     private planSrv: PlanService,
     private unitMeasureSrv: MeasureUnitService,
     private router: Router,
-    private costAccountModelSrv: CostAccountModelService
+    private costAccountModelSrv: CostAccountModelService,
+    private pentahoSrv: PentahoService
   ) {
     this.actRouter.queryParams.subscribe(async queryParams => {
       this.idCostAccount = queryParams.idCostAccount;
@@ -107,9 +109,10 @@ export class CostAccountComponent implements OnInit {
       isLoading: true
     };
 
+    await this.loadProperties();
+
     await this.loadUoOptions();
 
-    await this.loadProperties();
   }
 
   initializeBackups() {
@@ -118,8 +121,10 @@ export class CostAccountComponent implements OnInit {
   }
 
   loadUoOptions() {
+    console.log(this.costAccount.id);
+    
     return new Promise<void>((resolve) => {
-      this.costAccountSrv.getUoOptions().subscribe(data => {
+      this.pentahoSrv.getUoOptions(this.costAccount.id).subscribe(data => {
         this.uoOptions = data.map(uo => ({ 
           code: uo.code, 
           name: uo.name, 
@@ -137,7 +142,7 @@ export class CostAccountComponent implements OnInit {
 
     const uoValue = event.value.code;
     
-    this.costAccountSrv.getPlanoOrcamentarioOptions(uoValue).subscribe(data => {
+    this.pentahoSrv.getPlanoOrcamentarioOptions(uoValue, this.costAccount.id).subscribe(data => {
       this.planoOrcamentarioOptions = data.map(plan => ({ code: plan.code, name: plan.name, fullName: plan.fullName}))
       this.poDisabled = data.length === 0;
     });
@@ -244,7 +249,7 @@ export class CostAccountComponent implements OnInit {
       this.selectedUo = this.uoOptions.find(uo => uo.code == this.costAccount.unidadeOrcamentaria?.code);      
 
       if (this.selectedUo) {
-        this.costAccountSrv.getPlanoOrcamentarioOptions(this.selectedUo.code).subscribe(poData => {
+        this.pentahoSrv.getPlanoOrcamentarioOptions(this.selectedUo.code, this.costAccount.id).subscribe(poData => {
           this.planoOrcamentarioOptions = poData.map(plan => ({ code: plan.code, name: plan.name, fullName: plan.fullName }));
           this.poDisabled = poData.length === 0;
 
