@@ -114,7 +114,7 @@ export class ScheduleService extends BaseService<any> {
   }
 
   public getLiquidatedValues(codPo: string): Promise<IHttpResult<any>> {
-    return this.http.get(`${this.urlBase}/po/liquidated/${codPo}`).toPromise() as Promise<IHttpResult<any>>;
+    return this.http.get(`${this.urlBase}/pentaho/po/liquidated/${codPo}`).toPromise() as Promise<IHttpResult<any>>;
   }
 
   public async DeleteScheduleStep(id: number, options?: { message?: string; useConfirm?: boolean }): Promise<IHttpResult<IStep>> {
