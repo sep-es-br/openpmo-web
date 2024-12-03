@@ -29,7 +29,7 @@ export class PentahoService {
   }
 
   getPlanoOrcamentarioOptions(codUo: string, costAccountId: number): Observable<DropdownOption[]> {
-    const url = `${this.baseUrl}/pentaho/budgetPlan?codUo=${codUo}&costAccountId=${costAccountId}`;
+    const url = `${this.baseUrl}/cost-accounts/pentaho/budgetUnit?codUo=${codUo}&costAccountId=${costAccountId}`;
     return this.http.get<any>(url, { responseType: 'json' }).pipe(
       map(data => {
         const options: DropdownOption[] = [];
