@@ -234,8 +234,6 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
     return scheduleDetail;
   }
   
-  
-
   async loadScheduleSession() {
     if(!this.sectionActive) {return;}
     this.editPermission = this.workpackSrv.getEditPermission();
@@ -270,7 +268,7 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
             ((groupIndex === groupArray.length - 1 && stepIndex === stepArray.length - 1) ? 'end' : 'step'),
           unitPlanned: step.plannedWork ? step.plannedWork : 0,
           unitActual: step.actualWork ? step.actualWork : 0,
-          // liquidatedValue: step.liquidatedValue ? step.liquidatedValue : 0,
+          liquidatedValue: step.liquidatedValue ? step.liquidatedValue : 0,
           unitBaseline: step.baselinePlannedWork ? step.baselinePlannedWork : 0,
           unitProgressBar: {
             total: step.plannedWork,
@@ -291,6 +289,7 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
           editCosts: step.consumes && step.consumes.length === 1 ? true : false,
           multipleCosts: step.consumes && step.consumes.length > 1 ? true : false,
         }));
+        console.log(cardItemSection)
         const groupProgressBar = [
           {
             total: Number(group.planed.toFixed(this.unitMeansure.precision)),
@@ -411,7 +410,6 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
         }
         this.sectionSchedule.groupStep[0].cardItemSection[0].stepDay = startDate;
         const groupStepItems: IScheduleStepCardItem[] = [startScheduleStep];
-        console.log(groupStepItems)
         this.sectionSchedule.groupStep[0].cardItemSection.forEach(card => {
           groupStepItems.push(card);
         });
