@@ -1033,5 +1033,7 @@
   "estimatesToComplete": "Estimativa para Conclusão",
   "labelBudgetUnit": "Unidade Orçamentária (UO)",
   "labelBudgetPlan": "Plano Orçamentário (PO)",
-  "liquidated": "Liquidado"
+  "liquidated": "Liquidado",
+  "budgeted": "Orçado",
+  "authorized": "Autorizado"
 }

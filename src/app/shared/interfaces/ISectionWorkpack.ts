@@ -25,5 +25,7 @@ export interface IScheduleSection {
     start?: boolean;
     end?: boolean;
     groupProgressBar?: progressBarValue[];
+    budgetedValue?: string,
+    authorizedValue?: string,
   }[];
 }

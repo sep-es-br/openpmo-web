@@ -38,6 +38,8 @@ export interface IGroupStep {
   actualCost?: number;
   planed?: number;
   planedCost?: number;
+  budgetedValue?: string;
+  authorizedValue?: string;
 }
 
 export interface IStep {

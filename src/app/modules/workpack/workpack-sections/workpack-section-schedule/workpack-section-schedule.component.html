@@ -30,6 +30,19 @@
           <div class="group-header-container">
             <span class="group-step-year">{{groupStep.year}}</span>
             <div class="group-progress-bar-container">
+
+              <div class="group-liquidated">
+                <div class="budgeted" [class.mobile]="responsive">
+                  <span class="budgeted-label">{{"budgeted" | translate}}:</span>
+                  <span class="budgeted-value">{{groupStep.budgetedValue || '0'}}</span>
+                </div>
+  
+                <div class="authorized" [class.mobile]="responsive">
+                  <span class="authorized-label">{{"authorized" | translate}}:</span>
+                  <span class="authorized-value">{{groupStep.authorizedValue || '0'}}</span>
+                </div>
+              </div>
+
               <div class="progress-bar-container" *ngFor="let progressBar of groupStep.groupProgressBar">
                 <app-progress-bar-schedule-year [class.progress-bar-mobile]="responsive" [total]="progressBar.total"
                   [progress]="progressBar.progress" [labelTotal]="progressBar.labelTotal"

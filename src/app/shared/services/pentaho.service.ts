@@ -4,7 +4,6 @@ import { APP_CONFIG } from "../tokens/AppConfigToken";
 import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
 import { IHttpResult } from "../interfaces/IHttpResult";
-import { IStep } from "../interfaces/ISchedule";
 
 @Injectable({
   providedIn: "root"

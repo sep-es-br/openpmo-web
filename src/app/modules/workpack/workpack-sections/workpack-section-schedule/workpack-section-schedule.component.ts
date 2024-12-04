@@ -181,15 +181,28 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
    */
   async fetchAndMapLiquidatedValues(scheduleDetail: IScheduleDetail): Promise<IScheduleDetail> {
     const monthAbbreviations = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
-  
+    const liquidatedValuesCache = new Map<string, any>();
+
     for (const group of scheduleDetail.groupStep) {
+      group.budgetedValue = this.formatter.format(0);
+      group.authorizedValue = this.formatter.format(0);
+
       for (const step of group.steps) {
+        step.liquidatedValue = this.formatter.format(0);
+
         if (step.consumes && step.consumes.length > 0) {
           const codPo = String(step.consumes[0].costAccount.codPo).padStart(6, '0');
 
-          const response = await this.pentahoSrv.getLiquidatedValues(codPo);
+          let response = liquidatedValuesCache.get(codPo);
+
+          if (!response) {
+            response = await this.pentahoSrv.getLiquidatedValues(codPo);
+            liquidatedValuesCache.set(codPo, response);
+          }
+
           const yearLiquidationData = response.data.resultset.find((data: any[]) => data[0] === group.year);
   
+
           if (yearLiquidationData) {
             const monthlyValues = {
               jan: yearLiquidationData[4],
@@ -206,8 +219,15 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
               dez: yearLiquidationData[15]
             };
   
+
             const monthAbbreviation = monthAbbreviations[new Date(step.periodFromStart).getMonth()];
             step.liquidatedValue = this.formatter.format(monthlyValues[monthAbbreviation] || 0);
+
+            const budgetedValue = yearLiquidationData[2] !== undefined ? yearLiquidationData[2] : 0;
+            const authorizedValue = yearLiquidationData[3] !== undefined ? yearLiquidationData[3] : 0;
+
+            group.budgetedValue = this.formatter.format(budgetedValue);
+            group.authorizedValue = this.formatter.format(authorizedValue);
           }
         }
       }
@@ -295,6 +315,8 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
         }
         return {
           year: group.year,
+          budgetedValue: group.budgetedValue,
+          authorizedValue: group.authorizedValue,
           cardItemSection,
           groupProgressBar
         };
