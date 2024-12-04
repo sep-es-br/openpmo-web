@@ -9,7 +9,7 @@ export interface IScheduleStepCardItem {
   stepOrder?: string;
   unitPlanned?: number;
   unitActual?: number;
-  liquidatedValue?: number,
+  liquidatedValue?: string,
   unitBaseline?: number;
   unitProgressBar?: {
     total: number;

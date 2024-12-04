@@ -26,6 +26,7 @@ import { LabelService } from 'src/app/shared/services/label.service';
 import { ActivatedRoute } from '@angular/router';
 import { ScheduleStepCardItemService } from 'src/app/shared/services/schedule-step-card-item.service';
 import { HttpClient } from '@angular/common/http';
+import { PentahoService } from 'src/app/shared/services/pentaho.service';
 
 @Component({
   selector: 'app-workpack-section-schedule',
@@ -67,8 +68,10 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
 
   isCurrentBaseline: boolean;
 
-  // resumedSchedule: any;
-  // summaryJson: ISummaryJson[]
+  formatter = new Intl.NumberFormat('pt-BR', {
+    style: 'currency',
+    currency: 'BRL'
+  })
 
   private _subscription: Subscription = new Subscription();
 
@@ -85,7 +88,8 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
     private dashboardSrv: DashboardService,
     private labelSrv: LabelService,
     private route: ActivatedRoute,
-    private http: HttpClient
+    private http: HttpClient,
+    private pentahoSrv: PentahoService
   ) {
 
     this.workpackShowTabviewSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => {
@@ -142,7 +146,7 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
     });
   }
 
-  loadScheduleData() {
+  async loadScheduleData() {
     const {
       workpackParams,
       workpackData,
@@ -165,32 +169,10 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
     this.sectionActive = workpackData && !!workpackData.workpack && !!workpackData.workpack.id  &&
       workpackData.workpackModel && workpackData.workpackModel.scheduleSessionActive;
 
-    this.fetchAndMapLiquidatedValues(this.schedule)
+    await this.fetchAndMapLiquidatedValues(this.schedule)
 
-    if(!loading) {this.loadScheduleSession();}
-
-    // this.summaryJson = this.transformData(this.schedule);
-    // this.resumedSchedule = this.fetchAndMapLiquidatedValues(this.summaryJson);
+    this.loadScheduleSession();
   }
-
-  /**
-   * Reduz o JSON Object de Schedule contendo os dados que eu necessito para o PO
-   * @param data o Object Schedule retornado do back-end
-   * @returns o JSON Object reduzido
-   */
-  // transformData(data: any): any {
-  //   return data.groupStep.map((group: any) => ({
-  //     year: group.year,
-  //     steps: group.steps.map((step: any) => ({
-  //       stepMonth: new Date(step.periodFromStart).getMonth() + 1,
-  //       consumes: step.consumes.map((consume: any) => ({
-  //         costAccount: {
-  //           codPo: consume.costAccount.codPo
-  //         }
-  //       }))
-  //     }))
-  //   }));
-  // }
 
   /**
    * 
@@ -205,7 +187,7 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
         if (step.consumes && step.consumes.length > 0) {
           const codPo = String(step.consumes[0].costAccount.codPo).padStart(6, '0');
 
-          const response = await this.scheduleSrv.getLiquidatedValues(codPo);
+          const response = await this.pentahoSrv.getLiquidatedValues(codPo);
           const yearLiquidationData = response.data.resultset.find((data: any[]) => data[0] === group.year);
   
           if (yearLiquidationData) {
@@ -225,7 +207,7 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
             };
   
             const monthAbbreviation = monthAbbreviations[new Date(step.periodFromStart).getMonth()];
-            step.liquidatedValue = monthlyValues[monthAbbreviation];
+            step.liquidatedValue = this.formatter.format(monthlyValues[monthAbbreviation] || 0);
           }
         }
       }
@@ -268,7 +250,7 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
             ((groupIndex === groupArray.length - 1 && stepIndex === stepArray.length - 1) ? 'end' : 'step'),
           unitPlanned: step.plannedWork ? step.plannedWork : 0,
           unitActual: step.actualWork ? step.actualWork : 0,
-          liquidatedValue: step.liquidatedValue ? step.liquidatedValue : 0,
+          liquidatedValue: step.liquidatedValue,
           unitBaseline: step.baselinePlannedWork ? step.baselinePlannedWork : 0,
           unitProgressBar: {
             total: step.plannedWork,
@@ -289,7 +271,6 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
           editCosts: step.consumes && step.consumes.length === 1 ? true : false,
           multipleCosts: step.consumes && step.consumes.length > 1 ? true : false,
         }));
-        console.log(cardItemSection)
         const groupProgressBar = [
           {
             total: Number(group.planed.toFixed(this.unitMeansure.precision)),

@@ -3,6 +3,8 @@ import { Injectable, Injector } from "@angular/core";
 import { APP_CONFIG } from "../tokens/AppConfigToken";
 import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
+import { IHttpResult } from "../interfaces/IHttpResult";
+import { IStep } from "../interfaces/ISchedule";
 
 @Injectable({
   providedIn: "root"
@@ -39,6 +41,10 @@ export class PentahoService {
         return options;
       })
     );
+  }
+
+  getLiquidatedValues(codPo: string): Promise<IHttpResult<any>> {
+    return this.http.get(`${this.baseUrl}/schedules/pentaho/po/liquidated/${codPo}`).toPromise() as Promise<IHttpResult<any>>;
   }
 }
 
