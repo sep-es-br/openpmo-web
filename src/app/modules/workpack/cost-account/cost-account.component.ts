@@ -110,9 +110,6 @@ export class CostAccountComponent implements OnInit {
     };
 
     await this.loadProperties();
-
-    await this.loadUoOptions();
-
   }
 
   initializeBackups() {
@@ -121,10 +118,8 @@ export class CostAccountComponent implements OnInit {
   }
 
   loadUoOptions() {
-    console.log(this.costAccount.id);
-    
     return new Promise<void>((resolve) => {
-      this.pentahoSrv.getUoOptions(this.costAccount.id).subscribe(data => {
+      this.pentahoSrv.getUoOptions(this.idCostAccount).subscribe(data => {
         this.uoOptions = data.map(uo => ({ 
           code: uo.code, 
           name: uo.name, 
@@ -162,6 +157,7 @@ export class CostAccountComponent implements OnInit {
       await this.loadWorkpack();
     }
     if (this.idCostAccount) {
+      await this.loadUoOptions();
       await this.loadCostAccount();
     } else {
       this.setBreadcrumb();
