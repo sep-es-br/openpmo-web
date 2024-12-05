@@ -186,6 +186,7 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
     for (const group of scheduleDetail.groupStep) {
       group.budgetedValue = this.formatter.format(0);
       group.authorizedValue = this.formatter.format(0);
+      let liquidatedTotal = 0;
 
       for (const step of group.steps) {
         step.liquidatedValue = this.formatter.format(0);
@@ -221,7 +222,10 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
   
 
             const monthAbbreviation = monthAbbreviations[new Date(step.periodFromStart).getMonth()];
+            const liquidatedValue = monthlyValues[monthAbbreviation] || 0;
             step.liquidatedValue = this.formatter.format(monthlyValues[monthAbbreviation] || 0);
+
+            liquidatedTotal += liquidatedValue;
 
             const budgetedValue = yearLiquidationData[2] !== undefined ? yearLiquidationData[2] : 0;
             const authorizedValue = yearLiquidationData[3] !== undefined ? yearLiquidationData[3] : 0;
@@ -231,6 +235,8 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
           }
         }
       }
+
+      group.liquidatedTotal = this.formatter.format(liquidatedTotal);
     }
   
     return scheduleDetail;
@@ -317,6 +323,7 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
           year: group.year,
           budgetedValue: group.budgetedValue,
           authorizedValue: group.authorizedValue,
+          liquidatedTotal: group.liquidatedTotal,
           cardItemSection,
           groupProgressBar
         };

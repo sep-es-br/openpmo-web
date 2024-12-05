@@ -41,6 +41,11 @@
                   <span class="authorized-label">{{"authorized" | translate}}:</span>
                   <span class="authorized-value">{{groupStep.authorizedValue || '0'}}</span>
                 </div>
+
+                <div class="liquidatedTotal" [class.mobile]="responsive">
+                  <span class="liquidatedTotal-label">{{"liquidated" | translate}}:</span>
+                  <span class="liquidatedTotal-value">{{groupStep.liquidatedTotal || '0'}}</span>
+                </div>
               </div>
 
               <div class="progress-bar-container" *ngFor="let progressBar of groupStep.groupProgressBar">
