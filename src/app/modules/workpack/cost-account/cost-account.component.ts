@@ -117,9 +117,9 @@ export class CostAccountComponent implements OnInit {
     this.backupSelectedPlano = this.selectedPlano
   }
 
-  loadUoOptions() {
+  loadUoOptions(idWorkpack: number) {
     return new Promise<void>((resolve) => {
-      this.pentahoSrv.getUoOptions(this.idCostAccount).subscribe(data => {
+      this.pentahoSrv.getUoOptions(idWorkpack).subscribe(data => {
         this.uoOptions = data.map(uo => ({ 
           code: uo.code, 
           name: uo.name, 
@@ -132,12 +132,13 @@ export class CostAccountComponent implements OnInit {
   }
 
   onUoChange(event: any) {
+    debugger
     this.cancelButton.showButton();
     this.selectedUo = event.value;
 
     const uoValue = event.value.code;
     
-    this.pentahoSrv.getPlanoOrcamentarioOptions(uoValue, this.costAccount.id).subscribe(data => {
+    this.pentahoSrv.getPlanoOrcamentarioOptions(uoValue, this.idWorkpack).subscribe(data => {
       this.planoOrcamentarioOptions = data.map(plan => ({ code: plan.code, name: plan.name, fullName: plan.fullName}))
       this.poDisabled = data.length === 0;
     });
@@ -152,12 +153,14 @@ export class CostAccountComponent implements OnInit {
   
 
   async loadProperties() {
+    debugger
     this.idPlan = Number(localStorage.getItem('@currentPlan'));
     if (this.idWorkpack) {
+      await this.loadUoOptions(this.idWorkpack)
       await this.loadWorkpack();
     }
     if (this.idCostAccount) {
-      await this.loadUoOptions();
+      await this.loadUoOptions(this.idCostAccount);
       await this.loadCostAccount();
     } else {
       this.setBreadcrumb();
