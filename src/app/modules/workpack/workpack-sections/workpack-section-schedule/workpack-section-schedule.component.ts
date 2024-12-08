@@ -171,6 +171,7 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
 
     await this.fetchAndMapLiquidatedValues(this.schedule)
 
+    console.log(this.schedule)
     this.loadScheduleSession();
   }
 
@@ -190,57 +191,57 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
 
       for (const step of group.steps) {
         step.liquidatedValue = this.formatter.format(0);
+        let stepLiquidatedTotal = 0; // Total dos valores liquidados para o step
 
         if (step.consumes && step.consumes.length > 0) {
-          const codPo = String(step.consumes[0].costAccount.codPo).padStart(6, '0');
+          for (const consume of step.consumes) {
+            const codPo = String(consume.costAccount.codPo).padStart(6, '0');
 
-          let response = liquidatedValuesCache.get(codPo);
+            let response = liquidatedValuesCache.get(codPo);
 
-          if (!response) {
-            response = await this.pentahoSrv.getLiquidatedValues(codPo);
-            liquidatedValuesCache.set(codPo, response);
-          }
+            if (!response) {
+              response = await this.pentahoSrv.getLiquidatedValues(codPo);
+              liquidatedValuesCache.set(codPo, response);
+            }
 
-          const yearLiquidationData = response.data.resultset.find((data: any[]) => data[0] === group.year);
-  
+            const yearLiquidationData = response.data.resultset.find((data: any[]) => data[0] === group.year);
 
-          if (yearLiquidationData) {
-            const monthlyValues = {
-              jan: yearLiquidationData[4],
-              fev: yearLiquidationData[5],
-              mar: yearLiquidationData[6],
-              abr: yearLiquidationData[7],
-              mai: yearLiquidationData[8],
-              jun: yearLiquidationData[9],
-              jul: yearLiquidationData[10],
-              ago: yearLiquidationData[11],
-              set: yearLiquidationData[12],
-              out: yearLiquidationData[13],
-              nov: yearLiquidationData[14],
-              dez: yearLiquidationData[15]
-            };
-  
+            if (yearLiquidationData) {
+              const monthlyValues = {
+                jan: yearLiquidationData[4],
+                fev: yearLiquidationData[5],
+                mar: yearLiquidationData[6],
+                abr: yearLiquidationData[7],
+                mai: yearLiquidationData[8],
+                jun: yearLiquidationData[9],
+                jul: yearLiquidationData[10],
+                ago: yearLiquidationData[11],
+                set: yearLiquidationData[12],
+                out: yearLiquidationData[13],
+                nov: yearLiquidationData[14],
+                dez: yearLiquidationData[15]
+              };
 
-            const monthAbbreviation = monthAbbreviations[new Date(step.periodFromStart).getMonth()];
-            const liquidatedValue = monthlyValues[monthAbbreviation] || 0;
-            step.liquidatedValue = this.formatter.format(monthlyValues[monthAbbreviation] || 0);
+              const monthAbbreviation = monthAbbreviations[new Date(step.periodFromStart).getMonth()];
+              const liquidatedValue = monthlyValues[monthAbbreviation] || 0;
 
-            liquidatedTotal += liquidatedValue;
-
-            const budgetedValue = yearLiquidationData[2] !== undefined ? yearLiquidationData[2] : 0;
-            const authorizedValue = yearLiquidationData[3] !== undefined ? yearLiquidationData[3] : 0;
-
-            group.budgetedValue = this.formatter.format(budgetedValue);
-            group.authorizedValue = this.formatter.format(authorizedValue);
+              stepLiquidatedTotal += liquidatedValue;
+              liquidatedTotal += liquidatedValue;
+            }
           }
         }
+
+        // Atualiza o valor liquidado total do step
+        step.liquidatedValue = this.formatter.format(stepLiquidatedTotal);
       }
 
+      // Atualiza o valor total liquidado do grupo
       group.liquidatedTotal = this.formatter.format(liquidatedTotal);
     }
-  
+
     return scheduleDetail;
   }
+
   
   async loadScheduleSession() {
     if(!this.sectionActive) {return;}
