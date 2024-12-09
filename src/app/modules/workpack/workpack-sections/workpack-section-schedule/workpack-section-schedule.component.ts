@@ -196,11 +196,12 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
         if (step.consumes && step.consumes.length > 0) {
           for (const consume of step.consumes) {
             const codPo = String(consume.costAccount.codPo).padStart(6, '0');
+            const codUo = String(consume.costAccount.codUo).padStart(5, '0');
 
             let response = liquidatedValuesCache.get(codPo);
 
             if (!response) {
-              response = await this.pentahoSrv.getLiquidatedValues(codPo);
+              response = await this.pentahoSrv.getLiquidatedValues(codPo, codUo);
               liquidatedValuesCache.set(codPo, response);
             }
 

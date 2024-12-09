@@ -42,8 +42,8 @@ export class PentahoService {
     );
   }
 
-  getLiquidatedValues(codPo: string): Promise<IHttpResult<any>> {
-    return this.http.get(`${this.baseUrl}/schedules/pentaho/po/liquidated/${codPo}`).toPromise() as Promise<IHttpResult<any>>;
+  getLiquidatedValues(codPo: string, codUo: string): Promise<IHttpResult<any>> {
+    return this.http.get(`${this.baseUrl}/schedules/pentaho/po/liquidated/${codPo}/${codUo}`).toPromise() as Promise<IHttpResult<any>>;
   }
 }
 
