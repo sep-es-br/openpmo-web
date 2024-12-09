@@ -191,7 +191,7 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
 
       for (const step of group.steps) {
         step.liquidatedValue = this.formatter.format(0);
-        let stepLiquidatedTotal = 0; // Total dos valores liquidados para o step
+        let stepLiquidatedTotal = 0;
 
         if (step.consumes && step.consumes.length > 0) {
           for (const consume of step.consumes) {
@@ -227,15 +227,19 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
 
               stepLiquidatedTotal += liquidatedValue;
               liquidatedTotal += liquidatedValue;
+
+              const budgetedValue = yearLiquidationData[2] !== undefined ? yearLiquidationData[2] : 0;
+              const authorizedValue = yearLiquidationData[3] !== undefined ? yearLiquidationData[3] : 0;
+
+              group.budgetedValue = this.formatter.format(budgetedValue);
+              group.authorizedValue = this.formatter.format(authorizedValue);
             }
           }
         }
 
-        // Atualiza o valor liquidado total do step
         step.liquidatedValue = this.formatter.format(stepLiquidatedTotal);
       }
 
-      // Atualiza o valor total liquidado do grupo
       group.liquidatedTotal = this.formatter.format(liquidatedTotal);
     }
 
