@@ -29,6 +29,7 @@ import { CancelButtonComponent } from 'src/app/shared/components/cancel-button/c
 import { IBudgetPlan } from 'src/app/shared/interfaces/IBudgetPlan';
 import { IBudgetUnit } from 'src/app/shared/interfaces/IBudgetUnit';
 import { PentahoService } from 'src/app/shared/services/pentaho.service';
+import { resolve } from 'dns';
 
 @Component({
   selector: 'app-cost-account',
@@ -63,7 +64,14 @@ export class CostAccountComponent implements OnInit {
   backupProperties;
 
   uoOptions: IBudgetUnit[] = [];
-  planoOrcamentarioOptions: IBudgetPlan[] = [];
+  planoOrcamentarioOptions: IBudgetPlan[] = [
+    {
+      code: null,
+      name: null,
+      fullName: null,
+      displayText: '- Nenhum -'
+    }
+  ];
 
   selectedUo: IBudgetUnit;
   selectedPlano: IBudgetPlan; 
@@ -120,30 +128,54 @@ export class CostAccountComponent implements OnInit {
   loadUoOptions(idWorkpack: number) {
     return new Promise<void>((resolve) => {
       this.pentahoSrv.getUoOptions(idWorkpack).subscribe(data => {
-        this.uoOptions = data.map(uo => ({ 
-          code: uo.code, 
-          name: uo.name, 
-          fullName: uo.fullName,
-          displayText: `${uo.code} - ${uo.name} - ${uo.fullName}`
-        }));
+        this.uoOptions = [
+          {
+            code: null,
+            name: null,
+            fullName: null,
+            displayText: '- Nenhum -'
+          },
+          ...data.map(uo => ({
+            code: uo.code,
+            name: uo.name,
+            fullName: uo.fullName,
+            displayText: `${uo.code} - ${uo.name} - ${uo.fullName}`
+          }))
+        ];
         resolve();
       });
     });
   }
 
+
   onUoChange(event: any) {
-    debugger
+    debugger;
     this.cancelButton.showButton();
     this.selectedUo = event.value;
 
     const uoValue = event.value.code;
-    
+
     this.pentahoSrv.getPlanoOrcamentarioOptions(uoValue, this.idWorkpack).subscribe(data => {
-      this.planoOrcamentarioOptions = data.map(plan => ({ code: plan.code, name: plan.name, fullName: plan.fullName}))
+      this.planoOrcamentarioOptions = [
+        {
+          code: null,
+          name: null,
+          fullName: null,
+          displayText: '- Nenhum -'
+        },
+        ...data.map(plan => ({
+          code: plan.code,
+          name: plan.name,
+          fullName: plan.fullName,
+          displayText: plan.fullName
+        }))
+      ];
       this.poDisabled = data.length === 0;
     });
+
     this.saveButton.showButton();
   }
+  
 
   onPlanoChange(event: any) {
     this.cancelButton.showButton();
@@ -249,14 +281,27 @@ export class CostAccountComponent implements OnInit {
 
       if (this.selectedUo) {
         this.pentahoSrv.getPlanoOrcamentarioOptions(this.selectedUo.code, this.costAccount.id).subscribe(poData => {
-          this.planoOrcamentarioOptions = poData.map(plan => ({ code: plan.code, name: plan.name, fullName: plan.fullName }));
+          this.planoOrcamentarioOptions = [
+            { 
+              code: null, 
+              name: null, 
+              fullName: null, 
+              displayText: '- Nenhum -' 
+            },
+            ...poData.map(plan => ({ 
+              code: plan.code, 
+              name: plan.name, 
+              fullName: plan.fullName, 
+              displayText: plan.fullName 
+            }))
+          ];
           this.poDisabled = poData.length === 0;
-
+      
           this.selectedPlano = this.planoOrcamentarioOptions.find(plan => plan.code == this.costAccount.planoOrcamentario?.code);
           this.backupSelectedUo = this.selectedUo;
           this.backupSelectedPlano = this.selectedPlano;
-        })
-      }
+        });
+      }      
       
       await this.loadCardCostAccountProperties();
       this.setBreadcrumb();

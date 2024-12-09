@@ -53,19 +53,19 @@
       <span class="p-float-label" [class.workpack-selection-mobile]="responsive" [class.workpack-selection]="true"
         [class.workpack-selection-not-fullLine]="false">
         <p-dropdown class="app-single-selection p-budget" dropdownIcon="fas fa-caret-down" [options]="planoOrcamentarioOptions"
-          [(ngModel)]="selectedPlano" optionLabel="fullName"
-          [filter]="true" filterBy="fullName" (onChange)="onPlanoChange($event)"
+          [(ngModel)]="selectedPlano" optionLabel="displayText"
+          [filter]="true" filterBy="displayText" (onChange)="onPlanoChange($event)"
           [showClear]="false" [disabled]="poDisabled">
       
           <ng-template pTemplate="selectedItem" let-selectedOption>
             <div class="flex align-items-center gap-2">
-              <div>{{ selectedOption.fullName }}</div>
+              <div>{{ selectedOption.displayText }}</div>
             </div>
           </ng-template>
       
           <ng-template let-plano pTemplate="item">
             <div class="flex align-items-center gap-2">
-              <div>{{ plano.fullName }}</div>
+              <div>{{ plano.displayText }}</div>
             </div>
           </ng-template>
       
