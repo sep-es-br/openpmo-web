@@ -87,12 +87,6 @@ export class TabviewScrolledComponent implements OnChanges, OnDestroy {
         this.showMessageNotFound = true;
         return;
       }
-
-      /**
-       * Open PMO: Sprint 11
-       */
-      this.orderTabs('costAccounts', 'schedule');
-
       const index = this.existsWorkpackTabStorage() ? this.findIndexTabStorage() : 0;
       this.selectTab(this.tabs[index]);
       this.prepareScrolls();
@@ -103,37 +97,11 @@ export class TabviewScrolledComponent implements OnChanges, OnDestroy {
           this.showMessageNotFound = true;
           return;
         }
-
-        /**
-         * Open PMO: Sprint 11
-         */
-        this.orderTabs('costAccounts', 'schedule')
-
         this.selectTab(this.tabs[0]);
         this.prepareScrolls();
       }
     }
 
-  }
-
-  /**
-   * method that sorts the "Cost Account" tab to the left of the "Schedule" tab
-   * @param keyToMove the tab that will move
-   * @param targetKey the reference tab
-   * @author joao.almeida
-   */
-  orderTabs(keyToMove: string, targetKey: string) {
-    const tabToMove = this.tabs.find(tab => tab.key === keyToMove);
-
-    if (!tabToMove) return;
-
-    this.tabs = this.tabs.filter(tab => tab.key !== keyToMove);
-
-    const targetIndex = this.tabs.findIndex(tab => tab.key === targetKey);
-
-    if (targetIndex !== -1) {
-      this.tabs.splice(targetIndex, 0, tabToMove)
-    }
   }
 
   selectTab(item: ITabViewScrolled) {
