@@ -149,7 +149,6 @@ export class CostAccountComponent implements OnInit {
 
 
   onUoChange(event: any) {
-    debugger;
     this.cancelButton.showButton();
     this.selectedUo = event.value;
 
@@ -185,7 +184,6 @@ export class CostAccountComponent implements OnInit {
   
 
   async loadProperties() {
-    debugger
     this.idPlan = Number(localStorage.getItem('@currentPlan'));
     if (this.idWorkpack) {
       await this.loadUoOptions(this.idWorkpack)

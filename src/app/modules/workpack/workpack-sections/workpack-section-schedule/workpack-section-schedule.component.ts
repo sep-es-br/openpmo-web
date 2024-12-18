@@ -169,9 +169,10 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
     this.sectionActive = workpackData && !!workpackData.workpack && !!workpackData.workpack.id  &&
       workpackData.workpackModel && workpackData.workpackModel.scheduleSessionActive;
 
-    await this.fetchAndMapLiquidatedValues(this.schedule)
+    if (this.schedule.groupStep != undefined || this.schedule.groupStep != null) {
+      await this.fetchAndMapLiquidatedValues(this.schedule)
+    }
 
-    console.log(this.schedule)
     this.loadScheduleSession();
   }
 
