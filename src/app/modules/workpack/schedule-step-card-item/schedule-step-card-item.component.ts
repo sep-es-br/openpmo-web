@@ -196,13 +196,22 @@ export class ScheduleStepCardItemComponent implements OnInit, OnDestroy {
   handlePassedMonths() {
     if (!this.properties.stepName) return;
     
-    const dateStep = moment(this.properties.stepName, 'YYYY-MM');
-    const startOfCurrentMonth = moment().startOf('month');
-    const endOfPreviousMonth = startOfCurrentMonth.clone().subtract(1, 'day');
+    const stepDate = this.formatToYearMonth(this.properties.stepName);
+    const currentDate = this.formatToYearMonth(new Date());
 
-    if (dateStep.isBefore(startOfCurrentMonth) && dateStep.isBefore(endOfPreviousMonth)) {
-      this.isPassedMonth = true;
-    }
+    this.isPassedMonth = stepDate < currentDate;
+  }
+
+  updateActualValues() {
+
+    const stepDate = this.formatToYearMonth(this.properties.stepName);
+    const currentDate = this.formatToYearMonth(new Date());
+    
+    this.isActualValuesDisabled = stepDate > currentDate;
+  }
+
+  private formatToYearMonth(date: Date): number {
+    return (date.getFullYear() * 100) + (date.getMonth() + 1);
   }
 
   private getWorkpackId(): Observable<number | null> {
@@ -223,17 +232,6 @@ export class ScheduleStepCardItemComponent implements OnInit, OnDestroy {
     });
   }
   
-  updateActualValues() {
-
-    if (!this.properties.stepName) return;
-
-    const dateStep = moment(this.properties.stepName, 'YYYY-MM');
-    const startOfCurrentMonth = moment().startOf('month');
-
-    this.isActualValuesDisabled = dateStep.isAfter(startOfCurrentMonth);
-
-  }
-
   updateMaxValueCosts() {
     this.maxValueCosts = this.getMaxValueCosts();
     this.cdr.detectChanges();
