@@ -18,6 +18,7 @@ import { EarnedValueAnalysisDashboardComponent } from './components/earned-value
 import { ProgressBarScheduleYearComponent } from './components/progress-bar-schedule-year/progress-bar-schedule-year.component';
 import { WorkpackSectionPropertiesComponent } from './workpack-sections/workpack-section-properties/workpack-section-properties.component';
 import { WorkpackSectionCostAccountsComponent } from './workpack-sections/workpack-section-cost-accounts/workpack-section-cost-accounts.component';
+import { WorkpackSectionIndicatorsComponent} from './workpack-sections/workpack-section-indicators/workpack-section-indicators.component';
 import { WorkpackSectionScheduleComponent } from './workpack-sections/workpack-section-schedule/workpack-section-schedule.component';
 import { WorkpackSectionStakeholdersComponent } from './workpack-sections/workpack-section-stakeholders/workpack-section-stakeholders.component';
 import { WorkpackSectionBaselinesComponent } from './workpack-sections/workpack-section-baselines/workpack-section-baselines.component';
@@ -50,6 +51,7 @@ import { Tooltip } from 'chart.js';
     ProgressBarScheduleYearComponent,
     WorkpackSectionPropertiesComponent,
     WorkpackSectionCostAccountsComponent,
+    WorkpackSectionIndicatorsComponent,
     WorkpackSectionScheduleComponent,
     WorkpackSectionStakeholdersComponent,
     WorkpackSectionBaselinesComponent,

@@ -121,6 +121,12 @@
           <app-workpack-section-baselines></app-workpack-section-baselines>
         </div>
       </div>
+      <!--INDICADORES-->
+      <div tabViewBody *ngIf="selectedTab?.key === 'indicators'">
+        <div class="card-indicators">
+          <app-workpack-section-indicators></app-workpack-section-indicators>
+        </div>
+      </div>
       <div tabviewBody *ngIf="selectedTab?.key === 'risks'">
         <div class="card-risks">
           <app-workpack-section-risks></app-workpack-section-risks>
@@ -217,6 +223,9 @@
     </div>
     <div class="card-baselines">
       <app-workpack-section-baselines></app-workpack-section-baselines>
+    </div>
+    <div class="card-indicators">
+      <app-workpack-section-indicators></app-workpack-section-indicators>
     </div>
     <div class="card-risks">
       <app-workpack-section-risks></app-workpack-section-risks>

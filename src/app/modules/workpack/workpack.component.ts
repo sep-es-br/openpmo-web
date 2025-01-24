@@ -1563,6 +1563,12 @@ export class WorkpackComponent implements OnDestroy {
           key: 'costAccounts'
         });
       }
+      if (this.idWorkpack && this.workpackModel) {
+        this.tabs.push({
+          menu: 'indicators',
+          key: 'indicators'
+        });
+      }
       if (this.getShowBaselineSection()) {
         this.tabs.push({
           menu: 'baselines',
