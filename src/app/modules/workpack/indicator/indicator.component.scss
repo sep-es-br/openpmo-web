@@ -1,0 +1,26 @@
+.card-content {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem; /* Espaço entre o formulário e o componente */
+  }
+  
+  .form-container {
+    flex: 1;
+  }
+  
+  .separator {
+    width: 1px;
+    background-color: black; /* Cor do separador */
+    height: 100%;
+  }
+  
+  .other-component {
+    flex: 1;
+    /* Ajuste adicional do estilo do componente */
+  }
+
+  .indicators-label {
+    font-size: 14px !important;
+    top: 0% !important; 
+  }
+  

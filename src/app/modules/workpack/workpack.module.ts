@@ -7,6 +7,7 @@ import { ComponentsModule } from 'src/app/shared/components/components.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ScheduleStepCardItemComponent } from './schedule-step-card-item/schedule-step-card-item.component';
 import { ProcessComponent } from './process/process.component';
+import { IndicatorComponent } from './indicator/indicator.component';
 import { ProgressBarCardStepComponent } from './components/progress-bar-card-step/progress-bar-card-step.component';
 import { SharingComponent } from './sharing/sharing.component';
 import { BaselineComponent } from './baseline/baseline.component';
@@ -40,6 +41,7 @@ import { Tooltip } from 'chart.js';
     CostAccountComponent,
     ScheduleStepCardItemComponent,
     ProcessComponent,
+    IndicatorComponent,
     ProgressBarCardStepComponent,
     SharingComponent,
     BaselineComponent,

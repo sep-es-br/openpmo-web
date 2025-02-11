@@ -1,16 +1,4 @@
-@use "src/variables" as v;
-
-::ng-deep .app-workpack-section-indicators {
-  .loading-container {
-    position: relative;
-    min-height: 150px;
-  }
-  app-card-item.inherited {
-    .p-card {
-      background-color: transparent !important;
-     .card-item-header .p-button {
-        visibility: hidden;
-      }
-    }
-  }
+.loading-container {
+  position: relative;
+  min-height: 150px;
 }
