@@ -1566,7 +1566,7 @@ export class WorkpackComponent implements OnDestroy {
           key: 'costAccounts'
         });
       }
-      if (this.idWorkpack && this.workpackModel) {
+      if (this.idWorkpack && this.workpackModel && this.workpack.type === TypeWorkpackEnum.ProjectModel) {
         this.tabs.push({
           menu: 'indicators',
           key: 'indicators'
