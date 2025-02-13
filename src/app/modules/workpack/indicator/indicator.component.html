@@ -107,7 +107,7 @@
               </span>
               <!-- Meta Realizada -->
               <span class="p-float-label">
-                <input [value]="data.achievedGoals" id="achieved-goal" type="text" pInputText class="app-input-text achieved-goal-input">
+                <input [(ngModel)]="data.achievedGoals" id="achieved-goal" type="text" pInputText class="app-input-text achieved-goal-input">
                 <label for="achieved-goal" class="indicators-label achieved-goal-label"> {{ "achievedGoal" | translate }}</label>
               </span>
               <!-- Atualizacao -->

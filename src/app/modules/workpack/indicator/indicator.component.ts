@@ -236,7 +236,6 @@ export class IndicatorComponent implements OnInit, OnDestroy {
     }
 
     validateExpectedGoals(): boolean {
-        debugger
         const totalExpected = this.periodData.reduce((sum, data) => {
             const expectedGoals = Number(data.expectedGoals) || 0; // Converte para número ou usa 0 como padrão
             return sum + expectedGoals;
@@ -323,6 +322,7 @@ export class IndicatorComponent implements OnInit, OnDestroy {
     }
 
     async saveIndicator() {
+        debugger
         if (!this.validateExpectedGoals()) {
             this.messageSrv.add({ severity: 'warn', summary: 'Atenção', detail: 'A soma das metas previstas ultrapassou a meta finalística.'})
             return;
@@ -331,14 +331,14 @@ export class IndicatorComponent implements OnInit, OnDestroy {
         this.cancelButton.hideButton();
         this.formIsSaving = true;
 
-        const expectedGoals = this.periodList.map((period, index) => ({
-            period: String(period),
-            value: this.expectedGoals[index] || 0 
+        const expectedGoals = this.periodData.map((data, index) => ({
+            period: String(data.period),
+            value: Number(data.expectedGoals) || 0
         }));
 
-        const achievedGoals = this.periodList.map((period, index) => ({
-            period: String(period),
-            value: this.achievedGoals[index] || 0
+        const achievedGoals = this.periodData.map((data, index) => ({
+            period: String(data.period),
+            value: Number(data.achievedGoals) || 0
         }))
 
         this.updateDate = this.getCurrentDate();
