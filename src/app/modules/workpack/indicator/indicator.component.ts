@@ -208,7 +208,6 @@ export class IndicatorComponent implements OnInit, OnDestroy {
     }
 
     formatPeriod(periods: number[], periodicity: string): string[] {
-        debugger
         if (periodicity === 'SEMESTRAL') {
             return periods.map(year => [`${year}/1`, `${year}/2`]).reduce((acc, val) => acc.concat(val), []);
         } else if (periodicity === 'ANUAL') {
@@ -237,13 +236,24 @@ export class IndicatorComponent implements OnInit, OnDestroy {
     }
 
     validateExpectedGoals(): boolean {
-        const totalExpected = this.expectedGoals.reduce((sum, value) => sum + value, 0);
+        debugger
+        const totalExpected = this.periodData.reduce((sum, data) => {
+            const expectedGoals = Number(data.expectedGoals) || 0; // Converte para número ou usa 0 como padrão
+            return sum + expectedGoals;
+        }, 0);
         return totalExpected <= this.finalGoal;
     }
 
     onExpectedGoalChange(): void {
         if (!this.validateExpectedGoals()) {
-            this.messageSrv.add({ severity: 'warn', summary: 'Sucesso', detail: 'A soma das metas previstas ultrapassou a meta finalística.' });
+            this.messageSrv.add({ 
+                severity: 'warn', 
+                summary: 'Sucesso', 
+                detail: 'A soma das metas previstas ultrapassou a meta finalística.' 
+            });
+            this.saveButton.hideButton()
+        } else {
+            this.saveButton.showButton()
         }
     }
 
@@ -293,7 +303,6 @@ export class IndicatorComponent implements OnInit, OnDestroy {
     }
 
     async onPeriodicityChange(event: any) {
-        debugger
         this.cancelButton.showButton();
         this.selectedPeriodicity = event.value;
     
@@ -364,7 +373,7 @@ export class IndicatorComponent implements OnInit, OnDestroy {
 
     handleOnCancel() {
         this.saveButton.hideButton();
-        this.periodList = []
+        this.periodData = []
         if (this.idIndicator) {
             this.setFormIndicator();
         } else {

@@ -97,17 +97,17 @@
               </span>
               <!-- Meta Prevista -->
               <span class="p-float-label">
-                <input disabled="true" [value]="data.expectedGoals" id="expected-goal" type="text" pInputText class="app-input-text" (input)="onExpectedGoalChange()">
+                <input [(ngModel)]="data.expectedGoals" id="expected-goal" type="text" pInputText class="app-input-text" (input)="onExpectedGoalChange()">
                 <label for="expected-goal" class="indicators-label">{{ "expectedGoal" | translate }}</label>
               </span>
               <!-- Medida -->
               <span class="p-float-label">
-                <input [value]="data.measure || '--'" disabled="true" id="measure" type="text" pInputText class="app-input-text">
+                <input [value]="selectedMeasure || data.measure || '--'" disabled="true" id="measure" type="text" pInputText class="app-input-text">
                 <label for="measure" class="indicators-label">{{ "measure" | translate }}</label>
               </span>
               <!-- Meta Realizada -->
               <span class="p-float-label">
-                <input disabled="true" [value]="data.achievedGoals" id="achieved-goal" type="text" pInputText class="app-input-text achieved-goal-input">
+                <input [value]="data.achievedGoals" id="achieved-goal" type="text" pInputText class="app-input-text achieved-goal-input">
                 <label for="achieved-goal" class="indicators-label achieved-goal-label"> {{ "achievedGoal" | translate }}</label>
               </span>
               <!-- Atualizacao -->
