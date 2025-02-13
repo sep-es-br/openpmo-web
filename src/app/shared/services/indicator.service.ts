@@ -5,6 +5,7 @@ import { BehaviorSubject } from 'rxjs/internal/BehaviorSubject';
 import { WorkpackService } from './workpack.service';
 import { FilterDataviewService } from './filter-dataview.service';
 import { IWorkpackData, IWorkpackParams } from '../interfaces/IWorkpackDataParams';
+import { PrepareHttpParams } from '../utils/query.util';
 
 @Injectable({
     providedIn: 'root'
@@ -83,5 +84,13 @@ export class IndicatorService extends BaseService<IIndicator> {
 
     get observableResetIndicator() {
         return this.resetIndicator.asObservable();
+    }
+
+    loadPeriodData(idWorkpack: number) {
+        return this.http.get(`${this.urlBase}/period/${idWorkpack}`)
+    }
+
+    loadOrganizationFromOffice(idOffice: number) {
+        return this.http.get(`${this.urlBase}/office/${idOffice}`)
     }
 }

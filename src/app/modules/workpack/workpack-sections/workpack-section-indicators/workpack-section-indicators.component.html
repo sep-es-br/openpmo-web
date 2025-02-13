@@ -1,4 +1,4 @@
-<div class="card-indicators" *ngIf="sectionIndicators && sectionActive">
+<div class="card-indicators">
   <app-card [properties]="sectionIndicators.cardSection" [class.panel-tab-view]="showTabview"
     [loading]="sectionIndicators.cardSection.isLoading" (searchText)="handleSearchText($event)"
     (editFilter)="handleEditFilterEntity($event, 'indicators')" (newFilter)="handleNewFilterEntity('indicators')"
