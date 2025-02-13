@@ -176,7 +176,6 @@ export class IndicatorComponent implements OnInit, OnDestroy {
     }
 
     preparePeriodData() {
-        debugger
         if (!this.indicator) return;
 
         const allPeriods = [
@@ -218,22 +217,23 @@ export class IndicatorComponent implements OnInit, OnDestroy {
         return [];
     }
 
-    loadPeriodData(periodicity: string): void {
-        debugger
-        this.periodList = [];
-        this.indicatorSrv.loadPeriodData(this.idWorkpack).subscribe({
-            next: (result: any) => {
-
-                const years = (result as {data: number[]}).data
-                this.periodList = this.formatPeriod(years, periodicity);
-                this.expectedGoals = new Array(this.periodList.length).fill(0);
-                this.achievedGoals = new Array(this.periodList.length).fill(0);
-
-            },
-            error: (error) => {
-                console.log('Erro ao carregar os períodos: ', error)
-            }
-        })
+    loadPeriodData(periodicity: string): Promise<void> {
+        return new Promise((resolve, reject) => {
+            this.periodList = [];
+            this.indicatorSrv.loadPeriodData(this.idWorkpack).subscribe({
+                next: (result: any) => {
+                    const years = (result as { data: number[] }).data;
+                    this.periodList = this.formatPeriod(years, periodicity);
+                    this.expectedGoals = new Array(this.periodList.length).fill(0);
+                    this.achievedGoals = new Array(this.periodList.length).fill(0);
+                    resolve();
+                },
+                error: (error) => {
+                    console.log('Erro ao carregar os períodos: ', error);
+                    reject(error);
+                }
+            });
+        });
     }
 
     validateExpectedGoals(): boolean {
@@ -292,23 +292,28 @@ export class IndicatorComponent implements OnInit, OnDestroy {
         this.selectedMeasure = event.value;
     }
 
-    onPeriodicityChange(event: any) {
+    async onPeriodicityChange(event: any) {
         debugger
         this.cancelButton.showButton();
         this.selectedPeriodicity = event.value;
-        this.loadPeriodData(this.selectedPeriodicity);
-
-        this.periodData = this.periodList.map(period => ({
-            period: period,
-            expectedGoals: 0,
-            achievedGoals: 0,
-            measure: this.selectedMeasure || '--',
-            lastUpdate: '--'
-        }));
+    
+        try {
+            
+            await this.loadPeriodData(this.selectedPeriodicity);
+    
+            this.periodData = this.periodList.map(period => ({
+                period: period,
+                expectedGoals: 0,
+                achievedGoals: 0,
+                measure: this.selectedMeasure || '--',
+                lastUpdate: '--'
+            }));
+        } catch (error) {
+            console.error('Erro ao carregar os períodos:', error);
+        }
     }
 
     async saveIndicator() {
-        debugger
         if (!this.validateExpectedGoals()) {
             this.messageSrv.add({ severity: 'warn', summary: 'Atenção', detail: 'A soma das metas previstas ultrapassou a meta finalística.'})
             return;
