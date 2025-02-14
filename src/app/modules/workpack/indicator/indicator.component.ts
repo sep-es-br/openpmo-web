@@ -14,6 +14,7 @@ import { ICardItem } from "src/app/shared/interfaces/ICardItem";
 import { IIndicator } from "src/app/shared/interfaces/IIndicator";
 import { IPeriodData } from "src/app/shared/interfaces/IPeriodData";
 import { ISourceIndicators } from "src/app/shared/interfaces/ISourceIndicators";
+import { IUnitMeasureIndicators } from "src/app/shared/interfaces/IUnitMeasureIndicators";
 import { AuthService } from "src/app/shared/services/auth.service";
 import { BreadcrumbService } from "src/app/shared/services/breadcrumb.service";
 import { IndicatorService } from "src/app/shared/services/indicator.service";
@@ -76,6 +77,7 @@ export class IndicatorComponent implements OnInit, OnDestroy {
     updateDate: string | null = null;
     
     sourceOptions: ISourceIndicators[] = [];
+    unitMeasureOptions: IUnitMeasureIndicators[] = [];
     periodList: string[] = [];
     selectedSource: string;
     selectedMeasure: string;
@@ -129,6 +131,7 @@ export class IndicatorComponent implements OnInit, OnDestroy {
         this.idOffice = Number(localStorage.getItem('@currentOffice'));
         await this.loadPropertiesIndicator();
         await this.loadFontOptions(this.idOffice);
+        await this.loadUnitMeasure(this.idOffice);
         await this.setBreadcrumb();
     }
 
@@ -202,6 +205,19 @@ export class IndicatorComponent implements OnInit, OnDestroy {
                     data["data"].map(item => ({
                         name: item
                     }))
+                resolve();
+            })
+        })
+    }
+
+    async loadUnitMeasure(idOffice: number) {
+        return new Promise<void>((resolve) => {
+            this.indicatorSrv.loadUnitMeasureFromOffice(idOffice).subscribe(data => {
+                this.unitMeasureOptions = 
+                    data["data"].map(item => ({
+                        name: item
+                    }))
+                    console.log(data)
                 resolve();
             })
         })

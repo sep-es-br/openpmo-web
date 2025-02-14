@@ -54,8 +54,8 @@
               <!-- Medida -->
               <div class="p-field">
                 <span class="p-float-label">
-                  <p-dropdown class="app-single-selection" [options]="measurementOptions" formControlName="measure"
-                    (onChange)="onMeasureChange($event)" optionLabel="label" optionValue="value"
+                  <p-dropdown [filter]="true" filterBy="name" [showClear]="false" class="app-single-selection" [options]="unitMeasureOptions" formControlName="measure"
+                    (onChange)="onMeasureChange($event)" optionLabel="name" optionValue="name"
                     dropdownIcon="fas fa-caret-down" [autoDisplayFirst]="false"></p-dropdown>
                   <label class="indicators-label">{{ "measure" | translate }}</label>
                 </span>
