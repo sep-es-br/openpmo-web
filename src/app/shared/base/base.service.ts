@@ -53,6 +53,10 @@ export abstract class BaseService<T> {
     return this.http.get<IHttpResult<T>>(`${this.urlBase}/${id}`).toPromise();
   }
 
+  public async GetByIdWithIdWorkpack(idWorkpack: number, id: number, noLoading?: boolean): Promise<IHttpResult<T>> {
+    return this.http.get<IHttpResult<T>>(`${this.urlBase}/${idWorkpack}/${id}`).toPromise();
+  }
+
   public post(model: T): Promise<IHttpResult<T>> {
     return this.http.post<IHttpResult<T>>(this.urlBase, model).toPromise();
   }

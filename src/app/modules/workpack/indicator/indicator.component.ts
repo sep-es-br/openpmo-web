@@ -166,7 +166,7 @@ export class IndicatorComponent implements OnInit, OnDestroy {
         };
     
         if (this.idIndicator) {
-            const result = await this.indicatorSrv.GetById(this.idIndicator);
+            const result = await this.indicatorSrv.GetByIdWithIdWorkpack(this.idWorkpack, this.idIndicator);
             if (result.success) {
                 this.indicator = result.data;
                 await this.loadFontOptions(this.idOffice);
