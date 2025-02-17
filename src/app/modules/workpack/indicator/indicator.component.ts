@@ -322,6 +322,8 @@ export class IndicatorComponent implements OnInit, OnDestroy {
             source: this.sourceOptions.find(item => item.name == this.indicator.source)?.name,
             measure: this.indicator.measure,
             finalGoal: this.indicator.finalGoal,
+            startDate: this.indicator.startDate,
+            endDate: this.indicator.endDate,
             periodicity: this.periodicityOptions.find(item => item.value === this.indicator.periodicity)?.value
         });
         this.finalGoal = this.indicator.finalGoal
@@ -376,6 +378,7 @@ export class IndicatorComponent implements OnInit, OnDestroy {
     }
 
     async saveIndicator() {
+        debugger
         if (!this.validateExpectedGoals()) {
             this.messageSrv.add({ severity: 'warn', summary: 'Atenção', detail: 'A soma das metas previstas ultrapassou a meta finalística.'});
             return;
@@ -395,6 +398,9 @@ export class IndicatorComponent implements OnInit, OnDestroy {
         }));
     
         this.updateDate = this.getCurrentDate();
+
+        const startDateFormatted = this.formatDate(this.formIndicator.controls.startDate.value);
+        const endDateFormatted = this.formatDate(this.formIndicator.controls.endDate.value);
     
         const sender: IIndicator = {
             id: this.idIndicator,
@@ -405,8 +411,8 @@ export class IndicatorComponent implements OnInit, OnDestroy {
             measure: this.formIndicator.controls.measure.value,
             finalGoal: this.formIndicator.controls.finalGoal.value,
             periodicity: this.formIndicator.controls.periodicity.value,
-            startDate: this.formIndicator.controls.startDate.value,
-            endDate: this.formIndicator.controls.endDate.value,
+            startDate: startDateFormatted,
+            endDate: endDateFormatted,
             expectedGoals: expectedGoals,
             achievedGoals: achievedGoals,
             lastUpdate: this.updateDate
@@ -463,4 +469,14 @@ export class IndicatorComponent implements OnInit, OnDestroy {
         const rangeYearEnd = date.add(10, 'years').year();
         this.yearRangeCalculated = `${rangeYearStart}:${rangeYearEnd};`
       }
+
+      formatDate(date: Date): string {
+        if (!date) return;
+
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const year = date.getFullYear();
+
+        return `${day}/${month}/${year}`;
+      }	
 }
