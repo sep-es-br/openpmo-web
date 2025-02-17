@@ -72,6 +72,53 @@
                 <app-input-message [form]="formIndicator" field="finalGoal"></app-input-message>
               </div>
 
+              <!-- Data Inicio -->
+              <!-- <div class="p-field">
+                <span class="p-float-label">
+                  <p-calendar formControlName="startDate" 
+                    [showIcon]="true" 
+                    dateFormat="dd/mm/yy" 
+                    [maxDate]="formIndicator.value.endDate" 
+                    (onSelect)="onDateChange()">
+                  </p-calendar>
+                  <label class="indicators-label">{{ "startDate" | translate }}</label>
+                </span>
+                <app-input-message [form]="formIndicator" field="startDate"></app-input-message>
+              </div> -->
+              <div class="p-field">
+                <span class="p-float-label">
+                  <p-calendar id="float-start" class="app-select-date" [showIcon]="true" [monthNavigator]="true"
+                    [yearNavigator]="true" [yearRange]="yearRangeCalculated" formControlName="startDate"
+                    icon="fas fa-calendar-alt" dateFormat="dd/mm/yy" (onSelect)="onDateChange()">
+                  </p-calendar>
+                  <label class="indicators-label" for="float-start">{{ "startDate" | translate }}</label>
+                </span>
+              </div>
+
+              <!-- Data Fim -->
+              <!-- <div class="p-field">
+                <span class="p-float-label">
+                    <p-calendar 
+                        formControlName="endDate" 
+                        [showIcon]="true" 
+                        dateFormat="dd/mm/yy" 
+                        [minDate]="formIndicator.value.startDate"
+                        (onSelect)="onDateChange()">
+                    </p-calendar>
+                    <label class="indicators-label">{{ "endDate" | translate }}</label>
+                </span>
+                <app-input-message [form]="formIndicator" field="endDate"></app-input-message>
+            </div> -->
+            <div class="p-field">
+              <span class="p-float-label">
+                <p-calendar id="float-start" class="app-select-date" [showIcon]="true" [monthNavigator]="true"
+                  [yearNavigator]="true" [yearRange]="yearRangeCalculated" formControlName="endDate"
+                  icon="fas fa-calendar-alt" dateFormat="dd/mm/yy" (onSelect)="onDateChange()">
+                </p-calendar>
+                <label class="indicators-label" for="float-start">{{ "endDate" | translate }}</label>
+              </span>
+            </div>
+
               <!-- Periodicidade -->
               <div class="p-field">
                 <span class="p-float-label">

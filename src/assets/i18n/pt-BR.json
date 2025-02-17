@@ -262,6 +262,8 @@
   "description": "Descrição",
   "finalGoal": "Meta Finalística",
   "measure": "Medida",
+  "startDate": "Data Início",
+  "endDate": "Data Fim",
   "periodicity": "Periodicidade",
   "period": "Período",
   "expectedGoal": "Meta Prevista",

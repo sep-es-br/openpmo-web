@@ -7,6 +7,8 @@ export interface IIndicator {
     measure?: string;
     finalGoal?: number;
     periodicity?: string;
+    startDate?: string;
+    endDate?: string;
     expectedGoals?: Array<{ period: string; value: number }>;
     achievedGoals?: Array<{ period: string; value: number}>;
     lastUpdate: string;

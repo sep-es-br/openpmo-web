@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { ActivatedRoute, Router } from "@angular/router";
 import { TranslateService } from "@ngx-translate/core";
 import { resolve } from "dns";
+import * as moment from "moment";
 import { MessageService, SelectItem } from "primeng/api";
 import { Subject } from "rxjs";
 import { filter, flatMap, takeUntil } from "rxjs/operators";
@@ -119,6 +120,8 @@ export class IndicatorComponent implements OnInit, OnDestroy {
             finalGoal: [""],
             source: [null],
             measure: [null],
+            startDate: [null, Validators.required],
+            endDate: [null, Validators.required],
             periodicity: [null]
         });
         this.formIndicator.statusChanges.pipe(takeUntil(this.$destroy), filter(status => status === 'INVALID')).subscribe(() => this.saveButton?.hideButton());
@@ -129,6 +132,7 @@ export class IndicatorComponent implements OnInit, OnDestroy {
     async ngOnInit() {
         this.idPlan = Number(localStorage.getItem('@currentPlan'));
         this.idOffice = Number(localStorage.getItem('@currentOffice'));
+        await this.calculateYearRange();
         await this.loadPropertiesIndicator();
         await this.loadFontOptions(this.idOffice);
         await this.loadUnitMeasure(this.idOffice);
@@ -259,7 +263,37 @@ export class IndicatorComponent implements OnInit, OnDestroy {
         return totalExpected <= this.finalGoal;
     }
 
+    getYearsBetweenDates(startDate: Date, endDate: Date): number[] {
+        const startYear = startDate.getFullYear();
+        const endYear = endDate.getFullYear();
+        const years = [];
+
+        for (let year = startYear; year <= endYear; year++) {
+            years.push(year);
+        }
+
+        return years;
+    }
+
+    onDateChange(): void {
+        const startDate = this.formIndicator.value.startDate;
+        const endDate = this.formIndicator.value.endDate;
+    
+        if (startDate && endDate) {
+            const years = this.getYearsBetweenDates(startDate, endDate);
+            this.periodList = this.formatPeriod(years, this.selectedPeriodicity || 'ANUAL'); // Usa 'ANUAL' como padrão
+            this.periodData = this.periodList.map(period => ({
+                period: period,
+                expectedGoals: 0,
+                achievedGoals: 0,
+                measure: this.selectedMeasure || '--',
+                lastUpdate: '--'
+            }));
+        }
+    }
+
     onExpectedGoalChange(): void {
+        // data.lastUpdate = this.getCurrentDate();
         if (!this.validateExpectedGoals()) {
             this.messageSrv.add({ 
                 severity: 'warn', 
@@ -270,6 +304,10 @@ export class IndicatorComponent implements OnInit, OnDestroy {
         } else {
             this.saveButton.showButton()
         }
+    }
+
+    onAchievedGoalChange(data: any) {
+        data.lastUpdate = this.getCurrentDate();
     }
 
     onFinalGoalChange(event: any): void {
@@ -321,10 +359,12 @@ export class IndicatorComponent implements OnInit, OnDestroy {
         this.cancelButton.showButton();
         this.selectedPeriodicity = event.value;
     
-        try {
-            
-            await this.loadPeriodData(this.selectedPeriodicity);
+        const startDate = this.formIndicator.value.startDate;
+        const endDate = this.formIndicator.value.endDate;
     
+        if (startDate && endDate) {
+            const years = this.getYearsBetweenDates(startDate, endDate);
+            this.periodList = this.formatPeriod(years, this.selectedPeriodicity);
             this.periodData = this.periodList.map(period => ({
                 period: period,
                 expectedGoals: 0,
@@ -332,33 +372,30 @@ export class IndicatorComponent implements OnInit, OnDestroy {
                 measure: this.selectedMeasure || '--',
                 lastUpdate: '--'
             }));
-        } catch (error) {
-            console.error('Erro ao carregar os períodos:', error);
         }
     }
 
     async saveIndicator() {
-        debugger
         if (!this.validateExpectedGoals()) {
-            this.messageSrv.add({ severity: 'warn', summary: 'Atenção', detail: 'A soma das metas previstas ultrapassou a meta finalística.'})
+            this.messageSrv.add({ severity: 'warn', summary: 'Atenção', detail: 'A soma das metas previstas ultrapassou a meta finalística.'});
             return;
         }
-
+    
         this.cancelButton.hideButton();
         this.formIsSaving = true;
-
-        const expectedGoals = this.periodData.map((data, index) => ({
+    
+        const expectedGoals = this.periodData.map(data => ({
             period: String(data.period),
             value: Number(data.expectedGoals) || 0
         }));
-
-        const achievedGoals = this.periodData.map((data, index) => ({
+    
+        const achievedGoals = this.periodData.map(data => ({
             period: String(data.period),
             value: Number(data.achievedGoals) || 0
-        }))
-
+        }));
+    
         this.updateDate = this.getCurrentDate();
-
+    
         const sender: IIndicator = {
             id: this.idIndicator,
             idWorkpack: this.idWorkpack,
@@ -368,22 +405,25 @@ export class IndicatorComponent implements OnInit, OnDestroy {
             measure: this.formIndicator.controls.measure.value,
             finalGoal: this.formIndicator.controls.finalGoal.value,
             periodicity: this.formIndicator.controls.periodicity.value,
+            startDate: this.formIndicator.controls.startDate.value,
+            endDate: this.formIndicator.controls.endDate.value,
             expectedGoals: expectedGoals,
             achievedGoals: achievedGoals,
             lastUpdate: this.updateDate
         };
+    
         const put = !!this.idIndicator;
         const result = put ? await this.indicatorSrv.put(sender) : await this.indicatorSrv.post(sender);
         this.formIsSaving = false;
+    
         if (result.success) {
             this.messageSrv.add({ severity: 'success', summary: 'Sucesso', detail: put ? 'Indicador atualizado com sucesso' : 'Indicador criado com sucesso' });
-            this.router.navigate(['/workpack'],
-                {
-                    queryParams: {
-                        id: this.idWorkpack,
-                        idPlan: this.idPlan
-                    }
-                });
+            this.router.navigate(['/workpack'], {
+                queryParams: {
+                    id: this.idWorkpack,
+                    idPlan: this.idPlan
+                }
+            });
         }
     }
 
@@ -416,4 +456,11 @@ export class IndicatorComponent implements OnInit, OnDestroy {
 
         return `${day}/${month}/${year}`;
     }
+
+    calculateYearRange() {
+        const date = moment();
+        const rangeYearStart = date.year();
+        const rangeYearEnd = date.add(10, 'years').year();
+        this.yearRangeCalculated = `${rangeYearStart}:${rangeYearEnd};`
+      }
 }
