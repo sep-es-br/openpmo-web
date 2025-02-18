@@ -144,7 +144,7 @@
               </span>
               <!-- Meta Prevista -->
               <span class="p-float-label">
-                <input [(ngModel)]="data.expectedGoals" id="expected-goal" type="text" pInputText class="app-input-text" (input)="onExpectedGoalChange()">
+                <input [(ngModel)]="data.expectedGoals" id="expected-goal" type="text" pInputText class="app-input-text" (input)="onExpectedGoalChange(data)">
                 <label for="expected-goal" class="indicators-label">{{ "expectedGoal" | translate }}</label>
               </span>
               <!-- Medida -->
@@ -154,7 +154,7 @@
               </span>
               <!-- Meta Realizada -->
               <span class="p-float-label">
-                <input [(ngModel)]="data.achievedGoals" id="achieved-goal" type="text" pInputText class="app-input-text achieved-goal-input">
+                <input [(ngModel)]="data.achievedGoals" id="achieved-goal" type="text" pInputText class="app-input-text achieved-goal-input" (input)="onAchievedGoalChange(data)">
                 <label for="achieved-goal" class="indicators-label achieved-goal-label"> {{ "achievedGoal" | translate }}</label>
               </span>
               <!-- Atualizacao -->

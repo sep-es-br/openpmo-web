@@ -122,7 +122,9 @@ export class IndicatorComponent implements OnInit, OnDestroy {
             measure: [null],
             startDate: [null, Validators.required],
             endDate: [null, Validators.required],
-            periodicity: [null]
+            periodicity: [null],
+            expectedGoals: [null],
+            achievedGoals: [null]
         });
         this.formIndicator.statusChanges.pipe(takeUntil(this.$destroy), filter(status => status === 'INVALID')).subscribe(() => this.saveButton?.hideButton());
         this.formIndicator.valueChanges.pipe(takeUntil(this.$destroy), filter(() => this.formIndicator.dirty && this.formIndicator.valid)).subscribe(() => this.saveButton.showButton());
@@ -151,7 +153,11 @@ export class IndicatorComponent implements OnInit, OnDestroy {
             source: [null],
             measure: [null],
             finalGoal: [""],
-            periodicity: [null]
+            periodicity: [null],
+            startDate: [null],
+            endDate: [null],
+            expectedGoals: [null],
+            achievedGoals: [null]
         });
     }
 
@@ -292,8 +298,10 @@ export class IndicatorComponent implements OnInit, OnDestroy {
         }
     }
 
-    onExpectedGoalChange(): void {
-        // data.lastUpdate = this.getCurrentDate();
+    onExpectedGoalChange(data: any): void {
+        data.lastUpdate = this.getCurrentDate();
+        this.formIndicator.markAsDirty();
+        
         if (!this.validateExpectedGoals()) {
             this.messageSrv.add({ 
                 severity: 'warn', 
@@ -307,7 +315,9 @@ export class IndicatorComponent implements OnInit, OnDestroy {
     }
 
     onAchievedGoalChange(data: any) {
+        this.formIndicator.markAsDirty();
         data.lastUpdate = this.getCurrentDate();
+        this.saveButton.showButton();
     }
 
     onFinalGoalChange(event: any): void {
@@ -324,7 +334,10 @@ export class IndicatorComponent implements OnInit, OnDestroy {
             finalGoal: this.indicator.finalGoal,
             startDate: this.indicator.startDate,
             endDate: this.indicator.endDate,
-            periodicity: this.periodicityOptions.find(item => item.value === this.indicator.periodicity)?.value
+            periodicity: this.periodicityOptions.find(item => item.value === this.indicator.periodicity)?.value,
+            expectedGoals: this.indicator.expectedGoals,
+            achievedGoals: this.indicator.achievedGoals,
+            lastUpdate: this.indicator.lastUpdate
         });
         this.finalGoal = this.indicator.finalGoal
         this.cardIndicatorProperties.isLoading = false;
@@ -378,7 +391,6 @@ export class IndicatorComponent implements OnInit, OnDestroy {
     }
 
     async saveIndicator() {
-        debugger
         if (!this.validateExpectedGoals()) {
             this.messageSrv.add({ severity: 'warn', summary: 'Atenção', detail: 'A soma das metas previstas ultrapassou a meta finalística.'});
             return;
@@ -399,8 +411,11 @@ export class IndicatorComponent implements OnInit, OnDestroy {
     
         this.updateDate = this.getCurrentDate();
 
-        const startDateFormatted = this.formatDate(this.formIndicator.controls.startDate.value);
-        const endDateFormatted = this.formatDate(this.formIndicator.controls.endDate.value);
+        debugger
+        if (!this.idIndicator) {
+            this.formIndicator.controls.startDate.setValue(this.formatDate(this.formIndicator.controls.startDate.value));
+            this.formIndicator.controls.endDate.setValue(this.formatDate(this.formIndicator.controls.endDate.value));
+        }
     
         const sender: IIndicator = {
             id: this.idIndicator,
@@ -411,8 +426,8 @@ export class IndicatorComponent implements OnInit, OnDestroy {
             measure: this.formIndicator.controls.measure.value,
             finalGoal: this.formIndicator.controls.finalGoal.value,
             periodicity: this.formIndicator.controls.periodicity.value,
-            startDate: startDateFormatted,
-            endDate: endDateFormatted,
+            startDate: this.formIndicator.controls.startDate.value,
+            endDate: this.formIndicator.controls.endDate.value,
             expectedGoals: expectedGoals,
             achievedGoals: achievedGoals,
             lastUpdate: this.updateDate
@@ -465,12 +480,13 @@ export class IndicatorComponent implements OnInit, OnDestroy {
 
     calculateYearRange() {
         const date = moment();
-        const rangeYearStart = date.year();
-        const rangeYearEnd = date.add(10, 'years').year();
+        const rangeYearStart = 2015
+        const rangeYearEnd = date.add(30, 'years').year();
         this.yearRangeCalculated = `${rangeYearStart}:${rangeYearEnd};`
       }
 
       formatDate(date: Date): string {
+        debugger
         if (!date) return;
 
         const day = String(date.getDate()).padStart(2, '0');
