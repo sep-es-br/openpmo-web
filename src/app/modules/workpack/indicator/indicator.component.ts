@@ -22,6 +22,7 @@ import { IndicatorService } from "src/app/shared/services/indicator.service";
 import { PentahoService } from "src/app/shared/services/pentaho.service";
 import { ResponsiveService } from "src/app/shared/services/responsive.service";
 import { WorkpackService } from "src/app/shared/services/workpack.service";
+import { ChangeDetectorRef } from "@angular/core";
 
 @Component({
     selector: 'app-indicator',
@@ -102,7 +103,8 @@ export class IndicatorComponent implements OnInit, OnDestroy {
         private router: Router,
         private workpackSrv: WorkpackService,
         private authSrv: AuthService,
-        private pentahoSrv: PentahoService
+        private pentahoSrv: PentahoService,
+        private cdr: ChangeDetectorRef
     ) {
         this.actRouter.queryParams.subscribe(async queryParams => {
             this.idIndicator = +queryParams.idIndicator;
@@ -166,6 +168,7 @@ export class IndicatorComponent implements OnInit, OnDestroy {
     }
 
     async loadPropertiesIndicator() {
+        debugger
         this.cardIndicatorProperties = {
             toggleable: false,
             initialStateToggle: false,
@@ -189,26 +192,36 @@ export class IndicatorComponent implements OnInit, OnDestroy {
     }
 
     preparePeriodData() {
+        debugger;
         if (!this.indicator) return;
-
+    
+        // Obtém todos os períodos únicos de expectedGoals e achievedGoals
         const allPeriods = [
             ...this.indicator.expectedGoals.map(g => g.period),
             ...this.indicator.achievedGoals.map(g => g.period)
         ];
         const uniquePeriods = Array.from(new Set(allPeriods)).sort();
-
+    
+        // Mapeia os períodos únicos para o periodData
         this.periodData = uniquePeriods.map(period => {
+            // Encontra o expectedGoal correspondente ao período
+            const expectedGoal = this.indicator.expectedGoals.find(g => g.period === period);
+            // Encontra o achievedGoal correspondente ao período
+            const achievedGoal = this.indicator.achievedGoals.find(g => g.period === period);
+    
+            // Retorna o objeto para o periodData
             return {
                 period: period,
-                expectedGoals: this.indicator.expectedGoals.find(g => g.period === period)?.value || 0,
-                achievedGoals: this.indicator.achievedGoals.find(g => g.period === period)?.value || 0,
-                measure: this.indicator.measure,
-                lastUpdate: this.indicator.lastUpdate
+                expectedGoals: expectedGoal?.value || 0, // Usa o valor do expectedGoal ou 0 se não existir
+                achievedGoals: achievedGoal?.value || 0, // Usa o valor do achievedGoal ou 0 se não existir
+                measure: this.indicator.measure, // Usa a medida do indicador
+                lastUpdate: expectedGoal?.lastUpdate || achievedGoal?.lastUpdate || '--' // Usa o lastUpdate do expectedGoal ou achievedGoal, ou '--' se não existir
             };
         });
     }
 
     async loadFontOptions(idOffice: number) {
+        debugger
         return new Promise<void>((resolve) => {
             this.indicatorSrv.loadOrganizationFromOffice(idOffice).subscribe(data => {
                 this.sourceOptions =
@@ -227,7 +240,6 @@ export class IndicatorComponent implements OnInit, OnDestroy {
                     data["data"].map(item => ({
                         name: item
                     }))
-                    console.log(data)
                 resolve();
             })
         })
@@ -285,17 +297,34 @@ export class IndicatorComponent implements OnInit, OnDestroy {
         const startDate = this.formIndicator.value.startDate;
         const endDate = this.formIndicator.value.endDate;
     
-        if (startDate && endDate) {
-            const years = this.getYearsBetweenDates(startDate, endDate);
-            this.periodList = this.formatPeriod(years, this.selectedPeriodicity || 'ANUAL'); // Usa 'ANUAL' como padrão
-            this.periodData = this.periodList.map(period => ({
-                period: period,
-                expectedGoals: 0,
-                achievedGoals: 0,
-                measure: this.selectedMeasure || '--',
-                lastUpdate: '--'
-            }));
+        // Verifica se as datas são válidas
+        if (!startDate || !endDate || isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+            return;
         }
+    
+        // Verifica se a data de início é anterior à data de fim
+        if (startDate > endDate) {
+            this.messageSrv.add({
+                severity: 'warn',
+                summary: 'Atenção',
+                detail: 'A data de início deve ser anterior à data de fim.'
+            });
+            return;
+        }
+    
+        // Recalcula o periodData com base nas novas datas
+        const years = this.getYearsBetweenDates(startDate, endDate);
+        this.periodList = this.formatPeriod(years, this.selectedPeriodicity || 'ANUAL'); // Usa 'ANUAL' como padrão
+        this.periodData = this.periodList.map(period => ({
+            period: period,
+            expectedGoals: 0,
+            achievedGoals: 0,
+            measure: this.selectedMeasure || '--',
+            lastUpdate: '--'
+        }));
+    
+        // Força a renderização da tabela
+        this.cdr.detectChanges();
     }
 
     onExpectedGoalChange(data: any): void {
@@ -326,20 +355,30 @@ export class IndicatorComponent implements OnInit, OnDestroy {
     }
 
     setFormIndicator() {
+        // Converte as datas para o tipo Date
+        const startDate = this.indicator.startDate ? this.formatDate(this.indicator.startDate) : null;
+        const endDate = this.indicator.endDate ? this.formatDate(this.indicator.endDate) : null;
+    
         this.formIndicator.reset({
             name: this.indicator.name,
             description: this.indicator.description,
             source: this.sourceOptions.find(item => item.name == this.indicator.source)?.name,
             measure: this.indicator.measure,
             finalGoal: this.indicator.finalGoal,
-            startDate: this.indicator.startDate,
-            endDate: this.indicator.endDate,
+            startDate: startDate, // Objeto Date ou null
+            endDate: endDate,     // Objeto Date ou null
             periodicity: this.periodicityOptions.find(item => item.value === this.indicator.periodicity)?.value,
             expectedGoals: this.indicator.expectedGoals,
             achievedGoals: this.indicator.achievedGoals,
             lastUpdate: this.indicator.lastUpdate
         });
-        this.finalGoal = this.indicator.finalGoal
+    
+        // Recalcula o periodData com base nas datas do indicador
+        if (startDate && endDate) {
+            this.onDateChange();
+        }
+    
+        this.finalGoal = this.indicator.finalGoal;
         this.cardIndicatorProperties.isLoading = false;
     }
 
@@ -401,21 +440,17 @@ export class IndicatorComponent implements OnInit, OnDestroy {
     
         const expectedGoals = this.periodData.map(data => ({
             period: String(data.period),
-            value: Number(data.expectedGoals) || 0
+            value: Number(data.expectedGoals) || 0,
+            lastUpdate: data.lastUpdate
         }));
     
         const achievedGoals = this.periodData.map(data => ({
             period: String(data.period),
-            value: Number(data.achievedGoals) || 0
+            value: Number(data.achievedGoals) || 0,
+            lastUpdate: data.lastUpdate
         }));
     
         this.updateDate = this.getCurrentDate();
-
-        debugger
-        if (!this.idIndicator) {
-            this.formIndicator.controls.startDate.setValue(this.formatDate(this.formIndicator.controls.startDate.value));
-            this.formIndicator.controls.endDate.setValue(this.formatDate(this.formIndicator.controls.endDate.value));
-        }
     
         const sender: IIndicator = {
             id: this.idIndicator,
@@ -485,14 +520,27 @@ export class IndicatorComponent implements OnInit, OnDestroy {
         this.yearRangeCalculated = `${rangeYearStart}:${rangeYearEnd};`
       }
 
-      formatDate(date: Date): string {
-        debugger
-        if (!date) return;
+    formatDate(date: string | Date): Date | null {
+        if (!date) return null;
 
-        const day = String(date.getDate()).padStart(2, '0');
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const year = date.getFullYear();
+        // Se já for um objeto Date, retorna diretamente
+        if (date instanceof Date) {
+            return date;
+        }
 
-        return `${day}/${month}/${year}`;
-      }	
+        // Se for uma string no formato ISO 8601 (2022-02-28T03:00:00.000Z)
+        if (typeof date === 'string' && date.includes('T')) {
+            return new Date(date); // Converte a string ISO 8601 para Date
+        }
+
+        // Se for uma string no formato "dd/mm/yyyy"
+        if (typeof date === 'string') {
+            const [day, month, year] = date.split('/');
+            if (day && month && year) {
+                return new Date(+year, +month - 1, +day); // Mês é base 0 no JavaScript
+            }
+        }
+
+        return null; // Retorna null se a data for inválida
+    }
 }
