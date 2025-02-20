@@ -62,7 +62,7 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
   currentBreadcrumbSub: Subscription;
   typePropertyModel = TypePropertyModelEnum;
   idOffice: number;
-  workpackModelEntitiesOptions = ['stakeholders', 'risks', 'issues', 'processes'];
+  workpackModelEntitiesOptions = ['stakeholders', 'risks', 'issues', 'processes', 'indicators'];
   localityList;
   organizations: IOrganization[] = [];
   idCostAccountModel: number;
@@ -133,6 +133,9 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
           break;
         case 'processes':
           this.filterUrl = `workpackModels/${this.idWorkpackModel}/processes`;
+          break;
+        case 'indicators':
+          this.filterUrl = `workpackModels/${this.idWorkpackModel}/indicators`;
           break;
         default:
           break;

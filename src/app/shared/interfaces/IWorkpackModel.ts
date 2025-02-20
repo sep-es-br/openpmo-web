@@ -27,6 +27,7 @@ export interface IWorkpackModel {
   sortByField?: string;
   riskAndIssueManagementSessionActive?: boolean;
   processesManagementSessionActive?: boolean;
+  indicatorsManagementSessionActive?: boolean;
   dashboardSessionActive?: boolean;
   dashboardShowEva?: boolean;
   dashboardShowMilestones?: boolean;

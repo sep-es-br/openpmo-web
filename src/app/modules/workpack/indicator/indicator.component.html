@@ -1,0 +1,163 @@
+<div class="app-indicator">
+  <div class="app-content-header">
+    <span *ngIf="!idIndicator" class="header-title">{{ "newIndicator" | translate }}</span>
+    <span *ngIf="!!idIndicator && indicator" class="header-title">{{ indicator.name }}</span>
+  </div>
+
+  <div class="loading-form-container" *ngIf="formIsSaving">
+    <app-card-loading [isCardLoading]="formIsSaving"></app-card-loading>
+  </div>
+
+  <div class="card-properties-indicator" *ngIf="cardIndicatorProperties" [class.responsive]="responsive">
+    <app-card [properties]="cardIndicatorProperties" class="mt-0 inputs-float-label">
+
+      <div class="loading-container" *ngIf="cardIndicatorProperties.isLoading">
+        <app-card-loading [isCardLoading]="cardIndicatorProperties.isLoading"></app-card-loading>
+      </div>
+
+      <div class="wrapper">
+        
+        <div class="p-grid grid-content" *ngIf="!cardIndicatorProperties.isLoading">
+          <form [formGroup]="formIndicator" class="form-container">
+            <div class="p-fluid">
+              <!-- Nome -->
+              <div class="p-field">
+                <span class="p-float-label">
+                  <input id="float-name" formControlName="name" type="text" class="app-input-text" pInputText />
+                  <label class="indicators-label" for="float-name">{{ "name" | translate }} *</label>
+                </span>
+                <app-input-message [form]="formIndicator" field="name"></app-input-message>
+              </div>
+
+              <!-- Descrição -->
+              <div class="p-field">
+                <span class="p-float-label">
+                  <textarea pInputTextarea formControlName="description" class="app-text-area" [rows]="3"
+                    id="float-description"
+                    [ngModel]="(mirrorDescription()) ? formIndicator.value.name : formIndicator.value.description"></textarea>
+                  <label class="indicators-label" for="float-description">{{ "description" | translate }} *</label>
+                </span>
+                <app-input-message [form]="formIndicator" field="description"></app-input-message>
+              </div>
+
+              <!-- Fonte -->
+              <div class="p-field">
+                <span class="p-float-label">
+                  <p-dropdown [filter]="true" filterBy="name" [showClear]="false" class="app-single-selection" [options]="sourceOptions" formControlName="source"
+                    optionLabel="name" optionValue="name" dropdownIcon="fas fa-caret-down" [autoDisplayFirst]="false"
+                    (onChange)="onSourceChange($event)"></p-dropdown>
+                  <label class="indicators-label">{{ "source" | translate }}</label>
+                </span>
+                <app-input-message [form]="formIndicator" field="source"></app-input-message>
+              </div>
+
+              <!-- Medida -->
+              <div class="p-field">
+                <span class="p-float-label">
+                  <p-dropdown [filter]="true" filterBy="name" [showClear]="false" class="app-single-selection" [options]="unitMeasureOptions" formControlName="measure"
+                    (onChange)="onMeasureChange($event)" optionLabel="name" optionValue="name"
+                    dropdownIcon="fas fa-caret-down" [autoDisplayFirst]="false"></p-dropdown>
+                  <label class="indicators-label">{{ "measure" | translate }}</label>
+                </span>
+                <app-input-message [form]="formIndicator" field="measure"></app-input-message>
+              </div>
+
+              <!-- Meta Finalística -->
+              <div class="p-field">
+                <span class="p-float-label">
+                  <input id="float-final-goal" formControlName="finalGoal" type="number" class="app-input-text"
+                    pInputText (input)="onFinalGoalChange($event)"/>
+                  <label class="indicators-label" for="float-final-goal">{{ "finalGoal" | translate }}</label>
+                </span>
+                <app-input-message [form]="formIndicator" field="finalGoal"></app-input-message>
+              </div>
+
+              <div class="p-field">
+                <span class="p-float-label">
+                  <p-calendar id="float-start" class="app-select-date" [showIcon]="true" [monthNavigator]="true"
+                    [yearNavigator]="true" [yearRange]="yearRangeCalculated" formControlName="startDate"
+                    icon="fas fa-calendar-alt" dateFormat="dd/mm/yy" (onSelect)="onDateChange()">
+                  </p-calendar>
+                  <label class="indicators-label" for="float-start">{{ "startDate" | translate }}</label>
+                </span>
+              </div>
+              
+              <div class="p-field">
+                <span class="p-float-label">
+                  <p-calendar id="float-start" class="app-select-date" [showIcon]="true" [monthNavigator]="true"
+                    [yearNavigator]="true" [yearRange]="yearRangeCalculated" formControlName="endDate"
+                    icon="fas fa-calendar-alt" dateFormat="dd/mm/yy" (onSelect)="onDateChange()">
+                  </p-calendar>
+                  <label class="indicators-label" for="float-start">{{ "endDate" | translate }}</label>
+                </span>
+              </div>
+
+              <!-- Periodicidade -->
+              <div class="p-field">
+                <span class="p-float-label">
+                  <p-dropdown class="app-single-selection" [options]="periodicityOptions" formControlName="periodicity"
+                    (onChange)="onPeriodicityChange($event)" optionLabel="label" optionValue="value"
+                    dropdownIcon="fas fa-caret-down" [autoDisplayFirst]="false"></p-dropdown>
+                  <label class="indicators-label">{{ "periodicity" | translate }}</label>
+                </span>
+                <app-input-message [form]="formIndicator" field="periodicity"></app-input-message>
+              </div>
+            </div>
+          </form>
+        </div>
+
+        <div class="separator"></div>
+
+        <div class="p-grid grid-content">
+          <div class="table-wrapper" *ngFor="let data of periodData; let i = index" [@fadeIn]>
+              <!-- Periodo -->
+              <span class="p-float-label">
+                <input [value]="data.period" disabled="true" id="period" type="text" pInputText class="app-input-text">
+                <label for="period" class="indicators-label">{{ "period" | translate }}</label>
+              </span>
+              <!-- Meta Prevista -->
+              <span class="p-float-label">
+                <input [(ngModel)]="data.expectedGoals" id="expected-goal" type="text" pInputText class="app-input-text" (input)="onExpectedGoalChange(data)">
+                <label for="expected-goal" class="indicators-label">{{ "expectedGoal" | translate }}</label>
+              </span>
+              <!-- Medida -->
+              <span class="p-float-label">
+                <input [value]="selectedMeasure || data.measure || '--'" disabled="true" id="measure" type="text" pInputText class="app-input-text">
+                <label for="measure" class="indicators-label">{{ "measure" | translate }}</label>
+              </span>
+              <!-- Meta Realizada -->
+              <span class="p-float-label">
+                <input [(ngModel)]="data.achievedGoals" id="achieved-goal" type="text" pInputText class="app-input-text achieved-goal-input" (input)="onAchievedGoalChange(data)">
+                <label for="achieved-goal" class="indicators-label achieved-goal-label"> {{ "achievedGoal" | translate }}</label>
+              </span>
+              <!-- Atualizacao -->
+              <span class="p-float-label">
+                <input [value]="data.lastUpdate || '--'" disabled="true" id="update" type="text" pInputText class="app-input-text update-input">
+                <label for="update" class="indicators-label update-label">{{ "update" | translate }}</label>
+              </span>
+          </div>
+        </div>
+
+      </div>
+
+    </app-card>
+  </div>
+
+  <!-- Loading de Itens da Resposta -->
+  <section>
+    <div class="loading-container" *ngIf="isLoadingResponseItems">
+      <app-card-loading [isCardLoading]="isLoadingResponseItems"></app-card-loading>
+    </div>
+  </section>
+
+  <!-- ID do Indicador -->
+  <div class="id-container" *ngIf="idIndicator && cardIndicatorProperties">
+    <span>{{ idIndicator }}</span>
+  </div>
+
+  <!-- Botões de Ação -->
+  <app-buttons-container>
+    <app-save-button (save)="saveIndicator()"></app-save-button>
+    <app-cancel-button (cancel)="handleOnCancel()"></app-cancel-button>
+  </app-buttons-container>
+</div>

@@ -8,6 +8,7 @@ import { takeUntil } from 'rxjs/operators';
 import { IWorkpackCardItem } from './../../shared/interfaces/IWorkpackCardItem';
 import { BaselineService } from './../../shared/services/baseline.service';
 import { ProcessService } from './../../shared/services/process.service';
+import { IndicatorService } from './../../shared/services/indicator.service';
 import { IssueService } from './../../shared/services/issue.service';
 import { RiskService } from './../../shared/services/risk.service';
 import { TypePropertyModelEnum } from './../../shared/enums/TypePropertyModelEnum';
@@ -132,6 +133,7 @@ export class WorkpackComponent implements OnDestroy {
     public riskSrv: RiskService,
     public issueSrv: IssueService,
     public processSrv: ProcessService,
+    public indicatorSrv: IndicatorService,
     public baselineSrv: BaselineService,
     private confirmationSrv: ConfirmationService,
     private dashboardSrv: DashboardService,
@@ -348,6 +350,7 @@ export class WorkpackComponent implements OnDestroy {
     this.issueSrv.loadIssues();
     this.baselineSrv.loadBaselines();
     this.processSrv.loadProcesses();
+    this.indicatorSrv.loadIndicators();
     this.journalSrv.loadJournal();
     // this.journalSrv.loadScope();
     this.scheduleSrv.loadSchedule();
@@ -1561,6 +1564,12 @@ export class WorkpackComponent implements OnDestroy {
         this.tabs.push({
           menu: 'costAccounts',
           key: 'costAccounts'
+        });
+      }
+      if (this.idWorkpack && this.workpackModel && this.workpack.type === TypeWorkpackEnum.ProjectModel) {
+        this.tabs.push({
+          menu: 'indicators',
+          key: 'indicators'
         });
       }
       if (this.getShowBaselineSection()) {

@@ -7,6 +7,7 @@ import { WorkpackComponent } from './workpack.component';
 import { SharingComponent } from './sharing/sharing.component';
 import { BaselineCancellingComponent } from './baseline-cancelling/baseline-cancelling.component';
 import { JournalComponent } from './journal/journal.component';
+import { IndicatorComponent } from './indicator/indicator.component';
 
 const routes: Routes = [
   {
@@ -35,6 +36,10 @@ const routes: Routes = [
       {
         path: 'processes',
         component: ProcessComponent
+      },
+      {
+        path: 'indicators',
+        component: IndicatorComponent
       },
       {
         path: 'sharing',
