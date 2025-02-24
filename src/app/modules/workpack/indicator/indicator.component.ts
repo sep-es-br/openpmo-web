@@ -430,6 +430,7 @@ export class IndicatorComponent implements OnInit, OnDestroy {
     }
 
     async saveIndicator() {
+        debugger
         if (!this.validateExpectedGoals()) {
             this.messageSrv.add({ severity: 'warn', summary: 'Atenção', detail: 'A soma das metas previstas ultrapassou a meta finalística.'});
             return;
@@ -437,16 +438,25 @@ export class IndicatorComponent implements OnInit, OnDestroy {
     
         this.cancelButton.hideButton();
         this.formIsSaving = true;
+
+        const parseDecimal = (value: string | number): number => {
+            if (typeof value === 'number') return value;
+            if (typeof value === 'string') {
+                const parsedValue = parseFloat(value.replace(',', '.'));
+                return isNaN(parsedValue) ? 0 : parsedValue;
+            }
+            return 0;
+        }
     
         const expectedGoals = this.periodData.map(data => ({
             period: String(data.period),
-            value: Number(data.expectedGoals) || 0,
+            value: parseDecimal(data.expectedGoals) || 0,
             lastUpdate: data.lastUpdate
         }));
     
         const achievedGoals = this.periodData.map(data => ({
             period: String(data.period),
-            value: Number(data.achievedGoals) || 0,
+            value: parseDecimal(data.achievedGoals) || 0,
             lastUpdate: data.lastUpdate
         }));
     
