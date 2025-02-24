@@ -182,7 +182,6 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
    * @returns 
    */
   async fetchAndMapLiquidatedValues(scheduleDetail: IScheduleDetail): Promise<IScheduleDetail> {
-    debugger
     const monthAbbreviations = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
     const liquidatedValuesCache = new Map<string, any>();
 
@@ -203,46 +202,39 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
             let response = liquidatedValuesCache.get(codPo);
 
             if (!response) {
-              try {
-                response = await this.pentahoSrv.getLiquidatedValues(codPo, codUo);
-                liquidatedValuesCache.set(codPo, response);
-              } catch (error) {
-                console.error("Erro ao buscar valores liquidados ", error)
-                response = {data: {resultset: []}};
-              }
+              response = await this.pentahoSrv.getLiquidatedValues(codPo, codUo);
+              liquidatedValuesCache.set(codPo, response);
             }
 
-            if (response?.data?.resultset?.length) {
-              const yearLiquidationData = response.data.resultset.find((data: any[]) => data[0] === group.year);
+            const yearLiquidationData = response.data.resultset.find((data: any[]) => data[0] === group.year);
 
-              if (yearLiquidationData) {
-                const monthlyValues = {
-                  jan: yearLiquidationData[4],
-                  fev: yearLiquidationData[5],
-                  mar: yearLiquidationData[6],
-                  abr: yearLiquidationData[7],
-                  mai: yearLiquidationData[8],
-                  jun: yearLiquidationData[9],
-                  jul: yearLiquidationData[10],
-                  ago: yearLiquidationData[11],
-                  set: yearLiquidationData[12],
-                  out: yearLiquidationData[13],
-                  nov: yearLiquidationData[14],
-                  dez: yearLiquidationData[15]
-                };
+            if (yearLiquidationData) {
+              const monthlyValues = {
+                jan: yearLiquidationData[4],
+                fev: yearLiquidationData[5],
+                mar: yearLiquidationData[6],
+                abr: yearLiquidationData[7],
+                mai: yearLiquidationData[8],
+                jun: yearLiquidationData[9],
+                jul: yearLiquidationData[10],
+                ago: yearLiquidationData[11],
+                set: yearLiquidationData[12],
+                out: yearLiquidationData[13],
+                nov: yearLiquidationData[14],
+                dez: yearLiquidationData[15]
+              };
 
-                const monthAbbreviation = monthAbbreviations[new Date(step.periodFromStart).getMonth()];
-                const liquidatedValue = monthlyValues[monthAbbreviation] || 0;
+              const monthAbbreviation = monthAbbreviations[new Date(step.periodFromStart).getMonth()];
+              const liquidatedValue = monthlyValues[monthAbbreviation] || 0;
 
-                stepLiquidatedTotal += liquidatedValue;
-                liquidatedTotal += liquidatedValue;
+              stepLiquidatedTotal += liquidatedValue;
+              liquidatedTotal += liquidatedValue;
 
-                const budgetedValue = yearLiquidationData[2] !== undefined ? yearLiquidationData[2] : 0;
-                const authorizedValue = yearLiquidationData[3] !== undefined ? yearLiquidationData[3] : 0;
+              const budgetedValue = yearLiquidationData[2] !== undefined ? yearLiquidationData[2] : 0;
+              const authorizedValue = yearLiquidationData[3] !== undefined ? yearLiquidationData[3] : 0;
 
-                group.budgetedValue = this.formatter.format(budgetedValue);
-                group.authorizedValue = this.formatter.format(authorizedValue);
-              }
+              group.budgetedValue = this.formatter.format(budgetedValue);
+              group.authorizedValue = this.formatter.format(authorizedValue);
             }
           }
         }

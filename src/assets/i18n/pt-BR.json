@@ -1047,5 +1047,7 @@
   "labelBudgetPlan": "Plano Orçamentário (PO)",
   "liquidated": "Liquidado",
   "budgeted": "Orçado",
-  "authorized": "Autorizado"
+  "authorized": "Autorizado",
+  "indicator.name": "Nome do indicador. Informação obrigatória.",
+  "indicator.description": "Descrição do indicador. Informação obrigatória."
 }

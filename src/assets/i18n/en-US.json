@@ -1040,5 +1040,7 @@
   "labelBudgetPlan": "Budget Plan",
   "liquidated": "Liquidated",
   "budgeted": "Budgeted",
-  "authorized": "Authorized"
+  "authorized": "Authorized",
+  "indicator.name": "Name of the indicator. Mandatory information.",
+  "indicator.description": "Description of the indicator. Mandatory information."
 }

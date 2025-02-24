@@ -24,7 +24,9 @@
               <div class="p-field">
                 <span class="p-float-label">
                   <input id="float-name" formControlName="name" type="text" class="app-input-text" pInputText />
-                  <label class="indicators-label" for="float-name">{{ "name" | translate }} *</label>
+                  <label class="indicators-label" for="float-name">{{ "name" | translate }} *
+                    <i class="far fa-question-circle" [pTooltip]="'indicator.name' | translate"></i>
+                  </label>
                 </span>
                 <app-input-message [form]="formIndicator" field="name"></app-input-message>
               </div>
@@ -35,7 +37,9 @@
                   <textarea pInputTextarea formControlName="description" class="app-text-area" [rows]="3"
                     id="float-description"
                     [ngModel]="(mirrorDescription()) ? formIndicator.value.name : formIndicator.value.description"></textarea>
-                  <label class="indicators-label" for="float-description">{{ "description" | translate }} *</label>
+                  <label class="indicators-label" for="float-description">{{ "description" | translate }} *
+                    <i class="far fa-question-circle" [pTooltip]="'indicator.description' | translate"></i>
+                  </label>
                 </span>
                 <app-input-message [form]="formIndicator" field="description"></app-input-message>
               </div>
