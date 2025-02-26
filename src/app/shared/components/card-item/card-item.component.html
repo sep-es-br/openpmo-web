@@ -86,10 +86,7 @@
       <div class="card-item-content" [class.card-link]="properties.urlCard" (click)="handleNavigateToPage()"
         [class.cardList]="displayModeCard === 'list'">
         <div class="icons-container">
-          <i [ngClass]="properties.iconSvg ? [ 'app-icon', properties.icon, 'grey-icon'] : [ 'icon-card', properties.icon, 'grey-icon' ]"
-            [class.risk-red]="properties.iconColor === 'high'" [class.risk-orange]="properties.iconColor === 'medium'"
-            [class.linked]="!!properties.linked || !!properties.shared"
-            [class.risk-yellow]="properties.iconColor === 'low'" [ngStyle]="(displayModeCard === 'list') ? { fontSize: '1.5rem' } : { fontSize: '1.8rem' }"></i>
+          <i class="fas fa-tachometer-alt"></i>
           <i [ngClass]="['app-icon', 'link-to', 'grey-icon', 'linked']" *ngIf="!!properties.linked"></i>
           <i [ngClass]="['app-icon', 'sharing', 'grey-icon', 'linked']"
             *ngIf="!!properties.shared && !properties.linked"></i>
@@ -107,10 +104,7 @@
       <div class="card-item-content" [class.card-link]="properties.urlCard" (click)="handleNavigateToPage()"
         [class.cardList]="displayModeCard === 'list'">
         <div class="icons-container">
-          <i [ngClass]="properties.iconSvg ? [ 'app-icon', properties.icon, 'grey-icon'] : [ 'icon-card', properties.icon, 'grey-icon' ]"
-            [class.risk-red]="properties.iconColor === 'high'" [class.risk-orange]="properties.iconColor === 'medium'"
-            [class.linked]="!!properties.linked || !!properties.shared"
-            [class.risk-yellow]="properties.iconColor === 'low'" [ngStyle]="(displayModeCard === 'list') ? { fontSize: '1.5rem' } : { fontSize: '1.8rem' }"></i>
+          <i class="fas fa-tachometer-alt"></i>
           <i [ngClass]="['app-icon', 'link-to', 'grey-icon', 'linked']" *ngIf="!!properties.linked"></i>
           <i [ngClass]="['app-icon', 'sharing', 'grey-icon', 'linked']"
             *ngIf="!!properties.shared && !properties.linked"></i>
