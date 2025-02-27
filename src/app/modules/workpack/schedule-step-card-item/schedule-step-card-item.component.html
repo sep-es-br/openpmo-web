@@ -40,7 +40,7 @@
         </div>
 
         <!-- VALOR ESTIMADO/REPROGRAMADO -->
-        <span [ngStyle]="{ 'visibility': !isPassedMonth || !isCurrentBaseline ? 'visible' : 'hidden'  }" class="p-float-label p-field">
+        <span class="p-float-label p-field">
           <p-inputNumber [class]="'app-input-number '+'unitPlanned '+'unitPlanned-'+ properties.idStep" id="float-unitPlanned"
             [disabled]="!properties.editPermission" [(ngModel)]="properties.unitPlanned"
             [class.red]="properties.unitPlanned < 0"
@@ -52,7 +52,7 @@
         </span>
         
         <!-- Reprogramado meio esquerdo -->
-        <div [ngStyle]="{ 'visibility': !isPassedMonth || !isCurrentBaseline ? 'visible' : 'hidden'}" class="progress-bar-unit-container">
+        <div class="progress-bar-unit-container">
           <app-progress-bar-card-step 
             [total]="properties.unitPlanned" 
             [progress]="properties.unitPlanned"
@@ -120,7 +120,7 @@
           </app-progress-bar-card-step>
         </div>
         
-        <span [ngStyle]="{ 'visibility': !isPassedMonth || !isCurrentBaseline ? 'visible' : 'hidden'  }" class="p-float-label p-field">
+        <span class="p-float-label p-field">
           <p-inputNumber [class]="'app-input-number '+'costPlanned-'+properties.idStep" id="float-costPlanned"
             (click)="properties.multipleCosts && handleEditCosts($event); properties.multipleCosts && disable()"
             (onFocus)="properties.multipleCosts && handleEditCosts($event); properties.multipleCosts && disable()"
@@ -134,7 +134,7 @@
         </span>
 
         <!-- Reprogramado meio direito -->
-        <div [ngStyle]="{ 'visibility': !isPassedMonth || !isCurrentBaseline ? 'visible' : 'hidden'}" class="progress-bar-unit-container">
+        <div class="progress-bar-unit-container">
           <app-progress-bar-card-step 
             [total]="properties.costPlanned" 
             [progress]="properties.costPlanned"
