@@ -304,6 +304,7 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
           editCosts: step.consumes && step.consumes.length === 1 ? true : false,
           multipleCosts: step.consumes && step.consumes.length > 1 ? true : false,
         }));
+        
         const groupProgressBar = [
           {
             total: Number(group.planed.toFixed(this.unitMeansure.precision)),
@@ -326,6 +327,27 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
             type: 'cost'
           });
         }
+
+        groupProgressBar.push({
+          total: group.steps.reduce((total, step) => total + (step.baselinePlannedWork || 0), 0),
+          progress: group.steps.reduce((total, step) => total + (step.actualWork || 0), 0),
+          labelTotal: 'plannedBaseline',
+          labelProgress: 'actual',
+          valueUnit: this.unitMeansure && this.unitMeansure.name,
+          color: '#BFBFBF',
+          type: 'cost'
+        })
+
+        groupProgressBar.push({
+          total: group.steps.reduce((total, step) => total + (step.baselinePlannedCost ? step.baselinePlannedCost : 0), 0),
+          progress: group.steps.reduce((total, step) => total + (step.baselinePlannedCost ? step.baselinePlannedCost : 0), 0),
+          labelTotal: 'plannedBaseline',
+          labelProgress: 'plannedBaseline',
+          valueUnit: 'currency',
+          color: '#BFBFBF',
+          type: 'cost'
+        })
+        
         return {
           year: group.year,
           budgetedValue: group.budgetedValue,
@@ -530,6 +552,7 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
   }
 
   async saveStepChanged(groupYear: number, idStep: number) {
+    debugger
     const stepIsChangedBefore = this.changedSteps.find(step => step.changedIdStep === idStep);
     if (!stepIsChangedBefore) {
       this.changedSteps.push({
@@ -758,6 +781,7 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
   }
 
   async handleChangeValuesCardItem() {
+    debugger
     const cardChanged = this.costAssignmentsCardItemsEdited[this.indexCardEdited];
 
     if (!cardChanged.actualWork || cardChanged.actualWork === null) {
@@ -951,6 +975,7 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
   }
 
   async refreshScheduleProgressBar() {
+    debugger
     this.workpackSrv.nextPendingChanges(false);
     const result = await this.scheduleSrv.GetSchedule({ 'id-workpack': this.workpackParams.idWorkpack });
     if (result.success) {
