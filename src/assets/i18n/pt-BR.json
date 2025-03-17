@@ -821,6 +821,9 @@
           "subtitle": "Você não tem permissão de acesso a nenhum recurso no Open PMO",
           "solution": "Para solicitar acesso, entre em contato com o gerente do recurso"
         }
+      },
+      "risk": {
+        "has-issue-relationship": "Não é possível excluir o risco pois está associado a uma ocorrência."
       }
     }
   },

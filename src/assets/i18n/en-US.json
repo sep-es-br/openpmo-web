@@ -815,6 +815,9 @@
             }
           }
         }
+      },
+      "risk": {
+        "has-issue-relationship": "This risk can not be deleted because it has a related issue."
       }
     }
   },
