@@ -552,7 +552,6 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
   }
 
   async saveStepChanged(groupYear: number, idStep: number) {
-    debugger
     const stepIsChangedBefore = this.changedSteps.find(step => step.changedIdStep === idStep);
     if (!stepIsChangedBefore) {
       this.changedSteps.push({
@@ -781,7 +780,7 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
   }
 
   async handleChangeValuesCardItem() {
-    debugger
+    
     const cardChanged = this.costAssignmentsCardItemsEdited[this.indexCardEdited];
 
     if (!cardChanged.actualWork || cardChanged.actualWork === null) {
@@ -975,7 +974,6 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
   }
 
   async refreshScheduleProgressBar() {
-    debugger
     this.workpackSrv.nextPendingChanges(false);
     const result = await this.scheduleSrv.GetSchedule({ 'id-workpack': this.workpackParams.idWorkpack });
     if (result.success) {
@@ -1081,7 +1079,8 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
         setTimeout( () => {
           const linked = this.workpackParams.idWorkpackModelLinked ? true : false;
           this.dashboardSrv.loadDashboard(linked);
-        }, 1000);
+          location.reload();
+        }, 100);
       }
     }
 
