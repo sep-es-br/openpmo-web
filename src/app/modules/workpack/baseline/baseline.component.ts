@@ -191,7 +191,7 @@ export class BaselineComponent implements OnInit, OnDestroy {
     this.baseline.updates = await this.baselineSrv.getUpdates({'id-workpack': this.idWorkpack});
     this.cardBaselineUpdates.isLoading = false;
     if (this.baseline.updates.length > 0) {
-      this.baseline.updates.forEach(updates => updates.included = true);
+      this.baseline.updates.forEach(updates => updates.included = updates.classification === 'NEW');
       this.includeAllUpdates = true;
       this.togglesReadOnly = this.baseline.updates.filter(update => update.classification !== 'NEW').length === 0;
     }
