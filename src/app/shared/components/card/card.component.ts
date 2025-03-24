@@ -1,5 +1,5 @@
 import { WorkpackService } from 'src/app/shared/services/workpack.service';
-import { Component, Input, OnDestroy, Output, SimpleChanges, EventEmitter, OnInit, OnChanges } from '@angular/core';
+import { Component, Input, OnDestroy, Output, SimpleChanges, EventEmitter, OnInit, OnChanges, ViewChild, ElementRef } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { Subject, Subscription } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -16,6 +16,8 @@ import { WorkpackShowTabviewService } from '../../services/workpack-show-tabview
   styleUrls: ['./card.component.scss']
 })
 export class CardComponent implements OnInit, OnDestroy, OnChanges {
+
+  @ViewChild('newItemIcon') newItemIcon: ElementRef;
 
   @Input() properties: ICard;
   @Input() loading: boolean;
@@ -38,6 +40,7 @@ export class CardComponent implements OnInit, OnDestroy, OnChanges {
   canEditCheckCompleted: boolean;
   showTabview = false;
   showAnimationSearch = false;
+  enable = true;
 
   constructor(
     private responsiveSrv: ResponsiveService,
@@ -173,6 +176,13 @@ export class CardComponent implements OnInit, OnDestroy, OnChanges {
 
   get label(): string {
     return this.properties.workpackType ? this.properties.workpackType === 'Milestone' ? 'completed' : 'scopeCompleted' : '';
+  }
+
+  async handleLoadMenu() {
+    this.enable = false;
+    await this.properties.onNewItem();
+    this.enable = true;
+    this.newItemIcon.nativeElement.click();
   }
 
 }

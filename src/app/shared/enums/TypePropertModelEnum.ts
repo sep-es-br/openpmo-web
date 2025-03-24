@@ -1,4 +1,4 @@
-export enum TypePropertyModelEnum {
+export enum TypePropertModelEnum {
   CurrencyModel = 'CurrencyModel',
   DateModel = 'DateModel',
   IntegerModel = 'IntegerModel',

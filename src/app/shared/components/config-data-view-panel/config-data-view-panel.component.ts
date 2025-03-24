@@ -71,7 +71,16 @@ export class ConfigDataViewPanelComponent implements OnInit, OnDestroy {
       const cookiesPermission = this.cookieSrv.get('cookiesPermission'+ this.user.email);
       if (!!cookiesPermission) {
         this.cookiesPermission = true;
+        this.handleSetCookiesPermission();
       }
+    }
+  }
+
+  handleSetCookiesPermission() {
+    const date = moment().add(60, 'days').calendar();
+    const user = this.authSrv.getTokenPayload();
+    if (user && user.email) {
+      this.cookieSrv.put('cookiesPermission' + user.email, 'true', { expires: date });
     }
   }
 

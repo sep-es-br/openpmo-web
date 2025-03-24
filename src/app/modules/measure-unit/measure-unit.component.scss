@@ -142,7 +142,7 @@
   }
 }
 
-::ng-deep .app-unit-measure p-card.new-card-item {
+::ng-deep .app-unit-measure p-card.unit-new-card-item {
   .p-card {
     background-color: transparent;
     box-shadow: none;
@@ -179,7 +179,7 @@
 
 ::ng-deep
   .app-unit-measure
-  p-card.new-card-item
+  p-card.unit-new-card-item
   .p-card
   .p-card-body
   .p-card-content
@@ -194,7 +194,7 @@
   }
 }
 
-::ng-deep .app-unit-measure .new-card-item.new-card-item-mobile {
+::ng-deep .app-unit-measure .unit-new-card-item.new-card-item-mobile {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -218,7 +218,7 @@
   }
 }
 
-::ng-deep .app-unit-measure .new-card-item.list-mode {
+::ng-deep .app-unit-measure .unit-new-card-item.list-mode {
   .p-card {
     height: 80px;
   }

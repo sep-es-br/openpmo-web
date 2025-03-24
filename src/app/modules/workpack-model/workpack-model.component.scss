@@ -69,6 +69,10 @@
     width: 100%;
   }
 
+  .desktop-width {
+    width: 15% !important;
+  }
+
   .property-input {
     display: inline-block;
 
@@ -89,12 +93,15 @@
   .icon-item {
     display: flex;
     flex: 1;
-    justify-content: space-between;
+    // justify-content: space-between;
     text-transform: capitalize;
 
     i {
-      font-size: 1.5rem;
-      margin-right: 1em;
+      font-size: 1rem;
+      margin-right: 0.5em;
+    }
+    .icon-description {
+      font-size: 0.8rem;
     }
   }
   .icon-item-selected i {
@@ -117,7 +124,6 @@
       }
       .right-side {
         display: flex;
-        align-items: center;
         .app-icon {
           display: flex;
           cursor: pointer;

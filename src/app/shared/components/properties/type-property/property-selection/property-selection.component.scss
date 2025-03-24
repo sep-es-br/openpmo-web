@@ -15,7 +15,7 @@
 ::ng-deep .app-multiple-selection {
   .p-multiselect-label-container {
     color: v.$fontInput;
-    font-size: 1rem;
+    font-size: 0.8rem;
     font-family: v.$fontFamilyMedium;
     .p-multiselect-label {
       display: block;
@@ -38,6 +38,12 @@
 ::ng-deep .workpack-selection {
   .app-single-selection .p-dropdown {
     width: 20%;
+  }
+}
+
+::ng-deep .workpack-selection {
+  .p-budget .p-dropdown {
+    width: 100%;
   }
 }
 

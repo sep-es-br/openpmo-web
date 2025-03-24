@@ -6,8 +6,8 @@
     flex-direction: column;
     flex: 1;
     height: 100%;
-    max-width: 280px;
-    width: 280px;
+    max-width: 260px;
+    width: 260px;
     border: 1px solid #D4D4D4;
     box-shadow: none;
       .card-item-header {
@@ -127,17 +127,17 @@
         }
       }
       .app-icon {
-        font-size: 2.5rem;
+        font-size: 1.8rem;
         &.list {
           font-size: 1.5rem;
         }
       }
       .icon-new {
-        font-size: 3rem;
+        font-size: 2.2rem;
         color: rgba(147, 147, 147, 0.5);
       }
       .card-item-name {
-        font-size: 1.2rem;
+        font-size: 0.9rem;
         font-family: v.$fontFamilyMedium;
         padding: 0.5em;
         display: flex;
@@ -225,8 +225,8 @@
     display: flex;
     justify-content: center;
     height: 100%;
-    max-width: 280px;
-    width: 280px;
+    max-width: 260px;
+    width: 260px;
     border: 1px solid #D4D4D4;
     box-shadow: none;
 
@@ -256,7 +256,7 @@
     }
 
     .p-card-body .p-card-content .carditem-content {
-      padding: 0;
+      padding: 1.5em;
       display: flex;
       justify-content: center;
       align-items: center;

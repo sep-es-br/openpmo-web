@@ -21,6 +21,7 @@ import { Subject } from 'rxjs';
 import { Calendar } from 'primeng/calendar';
 import { SaveButtonComponent } from './../../../../shared/components/save-button/save-button.component';
 import { Component, OnInit, ViewChild, ViewChildren } from '@angular/core';
+import { CancelButtonComponent } from 'src/app/shared/components/cancel-button/cancel-button.component';
 
 @Component({
   selector: 'app-issue',
@@ -30,6 +31,7 @@ import { Component, OnInit, ViewChild, ViewChildren } from '@angular/core';
 export class IssueComponent implements OnInit {
 
   @ViewChild(SaveButtonComponent) saveButton: SaveButtonComponent;
+  @ViewChild(CancelButtonComponent) cancelButton: CancelButtonComponent;
   @ViewChildren(Calendar) calendarComponents: Calendar[];
 
   responsive: boolean;
@@ -60,11 +62,10 @@ export class IssueComponent implements OnInit {
     private issueSrv: IssueService,
     private issueResponseSrv: IssueResponseService,
     private workpackSrv: WorkpackService,
-    private router: Router,
     private authSrv: AuthService
   ) {
     this.actRouter.queryParams.subscribe(async queryParams => {
-      this.idIssue = queryParams.id && +queryParams.id;
+      this.idIssue = queryParams.idIssue && +queryParams.idIssue;
       this.idWorkpack = queryParams.idWorkpack && +queryParams.idWorkpack;
       this.idWorkpackModelLinked = queryParams.idWorkpackModelLinked && +queryParams.idWorkpackModelLinked;
     });
@@ -83,6 +84,9 @@ export class IssueComponent implements OnInit {
     this.formIssue.valueChanges
       .pipe(takeUntil(this.$destroy), filter(() => this.formIssue.dirty && this.formIssue.valid))
       .subscribe(() => this.saveButton.showButton());
+    this.formIssue.valueChanges
+      .pipe(takeUntil(this.$destroy), filter(() => this.formIssue.dirty))
+      .subscribe(() => this.cancelButton.showButton());
   }
 
   ngOnDestroy(): void {
@@ -104,12 +108,14 @@ export class IssueComponent implements OnInit {
   }
 
   setFormIssue() {
-    this.formIssue.controls.name.setValue(this.issue.name);
-    this.formIssue.controls.description.setValue(this.issue.description);
-    this.formIssue.controls.importance.setValue(this.issue.importance);
-    this.formIssue.controls.nature.setValue(this.issue.nature);
-    this.formIssue.controls.status.setValue(this.issue.status);
-    this.formIssue.controls.triggeredBy.setValue(this.issue.triggeredBy);
+    this.formIssue.reset({
+      name: this.issue.name,
+      triggeredBy: this.issue.triggeredBy,
+      description: this.issue.description,
+      importance: this.issue.importance,
+      nature: this.issue.nature,
+      status: this.issue.status,
+    });
   }
 
   async loadPropertiesIssue() {
@@ -162,11 +168,11 @@ export class IssueComponent implements OnInit {
       breadcrumbItems = await this.breadcrumbSrv.loadWorkpackBreadcrumbs(this.idWorkpack, this.idPlan)
     }
     this.breadcrumbSrv.setMenu([
-      ... breadcrumbItems,
+      ...breadcrumbItems,
       {
         key: 'issue',
         routerLink: ['/workpack/issues'],
-        queryParams: { idWorkpack: this.idWorkpack, id: this.idIssue },
+        queryParams: { idWorkpack: this.idWorkpack, idIssue: this.idIssue },
         info: this.issue?.name,
         tooltip: this.issue?.name
       }
@@ -183,6 +189,7 @@ export class IssueComponent implements OnInit {
         nameCardItem: resp.name,
         subtitleCardItem: this.translateSrv.instant(this.issueResponsePropertiesOptions.STATUS[resp.status].label),
         itemId: resp.id,
+        idAtributeName: 'idIssueResponse',
         menuItems: [{
           label: this.translateSrv.instant('delete'),
           icon: 'fas fa-trash-alt',
@@ -240,6 +247,7 @@ export class IssueComponent implements OnInit {
   }
 
   async saveIssue() {
+    this.cancelButton.hideButton();
     this.formIsSaving = true;
     const sender: IIssue = {
       id: this.idIssue,
@@ -250,7 +258,8 @@ export class IssueComponent implements OnInit {
       nature: this.formIssue.controls.nature.value,
       status: this.formIssue.controls.status.value
     };
-    const result = this.idIssue ? await this.issueSrv.put(sender) : await this.issueSrv.post(sender);
+    const put = !!this.idIssue;
+    const result =  put ? await this.issueSrv.put(sender) : await this.issueSrv.post(sender);
     this.formIsSaving = false;
     if (result.success) {
       this.messageSrv.add({
@@ -261,8 +270,26 @@ export class IssueComponent implements OnInit {
       this.idIssue = result.data.id;
       this.issue = {
         ...this.issue,
-        ...sender };
+        ...sender
+      };
+      this.setBreadcrumb();
       this.loadIssueResponseCardItems();
+    }
+  }
+
+  handleOnCancel() {
+    this.saveButton.hideButton();
+    if (this.idIssue) {
+      this.setFormIssue();
+    } else {
+      this.formIssue.reset({
+        name: '',
+        triggeredBy: null,
+        description: '',
+        importance: null,
+        nature: this.issuePropertiesOptions.nature.PROBLEM.value,
+        status: this.issuePropertiesOptions.status.OPEN.value
+      });
     }
   }
 

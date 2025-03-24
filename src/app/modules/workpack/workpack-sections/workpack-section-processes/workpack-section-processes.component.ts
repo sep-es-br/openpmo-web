@@ -174,6 +174,7 @@ export class WorkpackSectionProcessesComponent implements OnInit {
         subtitleCardItem: proc.processNumber,
         organizationName: proc.currentOrganization,
         itemId: proc.id,
+        idAtributeName: 'idProcess',
         priority: proc.priority,
         menuItems: [{
           label: this.translateSrv.instant('delete'),
@@ -196,6 +197,7 @@ export class WorkpackSectionProcessesComponent implements OnInit {
           subtitleCardItem: null,
           organizationName: null,
           itemId: null,
+          idAtributeName: 'idProcess',
           priority: false,
           menuItems: null,
           urlCard: '/workpack/processes',
@@ -230,9 +232,9 @@ export class WorkpackSectionProcessesComponent implements OnInit {
       await this.workpackBreadcrumbStorageSrv.setBreadcrumbStorage();
       this.router.navigate(['/filter-dataview'], {
         queryParams: {
-          id: idFilter,
+          idFilter: idFilter,
           entityName,
-          idWorkpackModel: this.workpackData.workpack.model.id,
+          idWorkpackModel: this.workpackData.workpackModel.id,
           idOffice: this.workpackParams.idOffice
         }
       });
@@ -246,7 +248,7 @@ export class WorkpackSectionProcessesComponent implements OnInit {
     this.router.navigate(['/filter-dataview'], {
       queryParams: {
         entityName,
-        idWorkpackModel: this.workpackData.workpack.model.id,
+        idWorkpackModel: this.workpackData.workpackModel.id,
         idOffice: this.workpackParams.idOffice
       }
     });

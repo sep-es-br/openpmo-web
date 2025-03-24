@@ -2,12 +2,64 @@ import { MenuItem } from "primeng/api";
 import { IMilestonePropertyData } from "./IMilestonePropertyData";
 
 export interface IDashboard {
-  earnedValueAnalysis: IEarnedValueAnalysisDashboard;
+  tripleConstraint: {
+    costVariation: number;
+    costPlannedValue: number;
+    costForeseenValue: number;
+    costActualValue: number;
+    schedulePlannedStartDate: string;
+    schedulePlannedEndDate: string;
+    scheduleForeseenStartDate: string;
+    scheduleForeseenEndDate: string;
+    scheduleActualStartDate: string;
+    scheduleActualEndDate: string;
+    scheduleVariation: number;
+    schedulePlannedValue: number;
+    scheduleForeseenValue: number;
+    scheduleActualValue: number;
+    scopeVariation: number;
+    scopePlannedVariationPercent: number;
+    scopeForeseenVariationPercent: number;
+    scopeActualVariationPercent: number;
+    scopePlannedValue: number;
+    scopeForeseenValue: number;
+    scopeActualValue: number;
+  };
+  performanceIndex: {
+    costPerformanceIndexValue: number;
+    costPerformanceIndexVariation: number;
+    schedulePerformanceIndexValue: number;
+    schedulePerformanceIndexVariation: number;
+    actualCost: number;
+    earnedValue: number;
+    estimateToComplete: number;
+    estimatesAtCompletion: number;
+    plannedValue: number;
+    plannedValueRefMonth?: number;
+  };
+  earnedValueByStep: IEarnedValueByStep[]; 
+  scheduleInterval: { initialDate: string; endDate: string };
+  
   milestone?: IMilestoneDashboard;
-  milestones?: IMilestonePropertyData[];
   risk?: IRiskDashboard;
   stakeholders?: IStakeholderDashboard[];
-  tripleConstraint: ITripleConstraintDashboard[] | ITripleConstraintDashboard;
+  workpacksByModel?: {
+    idWorkpackModel: number;
+    level: number;
+    quantity: number;
+    modelName: string;
+    icon: string;
+    menuItems?: MenuItem[];
+    workpacks?: IWorkpackByModel[];
+  }[];
+}
+
+export interface IDashboardData {
+  earnedValueAnalysis: IEarnedValueAnalysisDashboard;
+  milestone?: IMilestoneDashboard;
+  risk?: IRiskDashboard;
+  stakeholders?: IStakeholderDashboard[];
+  tripleConstraint: ITripleConstraintDashboard;
   costPerformanceIndex?:     any;
   schedulePerformanceIndex?: any;
   earnedValue?: number;
@@ -46,15 +98,16 @@ export interface IEarnedValueAnalysisDashboard {
       indexValue: number;
       scheduleVariation: number;
     };
-  }[];
-  earnedValueByStep:
-  {
-    actualCost: number;
-    plannedValue: number;
-    earnedValue: number;
-    estimatedCost: number;
-    date: string;
-  }[];
+  };
+  earnedValueByStep: IEarnedValueByStep[];
+}
+
+export interface IEarnedValueByStep {
+  actualCost: number;
+  plannedCost: number;
+  earnedValue: number;
+  estimatedCost: number;
+  date: string;
 }
 
 export interface IMilestoneDashboard {
@@ -116,6 +169,8 @@ export interface ITripleConstraintDashboard {
     plannedVariationPercent: number;
     foreseenValue?: number;
     actualValue?: number;
+    plannedValue?: number;
     variation: number;
+    foreseenWorkRefMonth?: number;
   };
 }

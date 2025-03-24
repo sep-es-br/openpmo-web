@@ -1,0 +1,83 @@
+.card-content {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  
+  .form-container {
+    flex: 1;
+  }
+  
+  .separator {
+    width: 1px;
+    background-color: #D0D8D9;
+    height: auto;
+    margin: 10px 50px;
+  }
+  
+  .other-component {
+    flex: 1;
+  }
+
+  .indicators-label {
+    font-size: 14px !important;
+    top: 0% !important; 
+  }
+
+  .wrapper {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    height: auto;
+  }
+
+  .grid-content {
+    width: 100%;
+  }
+
+  .table-wrapper {
+
+    display: flex;
+    flex-direction: row;
+
+    span.p-float-label {
+      margin-left: 1rem;
+      margin-right: 1rem;
+    }
+
+    input.app-input-text {
+      width: 115px;
+    }
+  }
+
+  .indicators-label.update-label {
+    color: #44B39B;
+  }
+
+  .indicators-label.achieved-goal-label {
+    color: #44B39B;
+  }
+
+  
+  #achieved-goal {
+    color: #44B39B;
+  }
+
+  #update {
+    color: #44B39B;
+    border-bottom: none;
+  }
+
+  #period {
+    border-bottom: none;
+  }
+
+  #measure {
+    border-bottom: none;
+  }
+
+  .error-message {
+    color: red;
+    font-size: 0.9rem;
+    margin-top: 10px;
+  }

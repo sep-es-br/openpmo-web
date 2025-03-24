@@ -7,11 +7,17 @@
     flex-direction: column;
     flex: 1;
     height: 100%;
-    max-width: 280px;
-    width: 280px;
+    max-width: 260px;
+    width: 260px;
     border: 1px solid #D4D4D4;
     box-shadow: none;
     display: flex;
+    .display-mode-grid {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      flex: 1;
+    }
     .display-mode-grid, .display-mode-list {
       .card-item-header {
         width: 100%;
@@ -90,32 +96,29 @@
         color: rgba(147, 147, 147, 0.5);
       }
       .card-item-name {
-        font-size: 1.2rem;
+        font-size: 0.9rem;
         font-family: v.$fontFamilyMedium;
         padding: 0.5em 5px 0;
         display: flex;
-        flex: 1;
         align-items: center;
         text-align: center;
+        font-weight: bold;
       }
       .card-item-fullName {
-        font-size: 14px;
+        font-size: small;
         font-family: v.$fontFamilyMedium;
-        text-align: center;
-        width: 280px;
-        padding: 0 5px;
-        white-space: nowrap;
+        text-align: left;
+        padding: 5px 5px 0px;
+        white-space: wrap;
         word-break: break-word;
-        overflow: hidden;
-        text-overflow: ellipsis;
         letter-spacing: normal;
       }
       &.cardList {
         flex-direction: row;
         justify-content: flex-start;
-        margin-left: 2em;
+        margin-left: 1em;
         .card-item-name {
-          padding: 0 5px 0;
+          padding: 5px 15px 0;
         }
       }
     }
@@ -154,8 +157,8 @@
     display: flex;
     justify-content: center;
     height: 100%;
-    max-width: 280px;
-    width: 280px;
+    max-width: 260px;
+    width: 260px;
     border: 1px solid #D4D4D4;
     box-shadow: none;
     .p-card-body {

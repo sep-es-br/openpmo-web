@@ -12,7 +12,8 @@ export interface ICardItemPermission {
   itemId?: number;
   levelListOptions?: { label: string; value: string}[];
   selectedOption?: string;
-  iconMenuItems?: MenuItem[]; 
+  iconMenuItems?: MenuItem[];
   readOnly?: boolean;
+  canDelete?: boolean;
   office?: IOffice;
 }

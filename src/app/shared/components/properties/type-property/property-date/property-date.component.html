@@ -9,10 +9,13 @@
       <p-calendar [id]="property.name" [(ngModel)]="property.value" class="app-select-date" [showIcon]="true"
         icon="fas fa-calendar-alt" [dateFormat]="calendarFormat" [defaultDate]="defaultValue" [monthNavigator]="true"
         [yearNavigator]="true" [yearRange]="yearRange" [required]="property.required" [minDate]="dateMin" [maxDate]="dateMax"
-        [disabled]="property.disabled || (property.milestoneData && property.milestoneData.completed)" [class.ng-invalid]="property.invalid" (ngModelChange)="changeDateValue($event)"     
+        [disabled]="property.disabled || (property.milestoneData && property.milestoneData.completed)" [class.ng-invalid]="property.invalid" 
+        (ngModelChange)="changeDateValue($event)"     
         >
       </p-calendar>
-      <label class="app-input-label" [for]="property.name">{{ property.label}} {{ property.required ? '*' : ''}}</label>
+      <label class="app-input-label" [for]="property.name">{{ property.label}} {{ property.required ? '*' : ''}}
+        <i class="far fa-question-circle" *ngIf="property.helpText && property.helpText.length > 0" [pTooltip]="property.helpText"></i>
+      </label>
     </span>
 
     <span class="p-float-label" style="margin-top: 1.7rem;" *ngIf="showReason" [class.workpack-date-mobile]="responsive" [class.workpack-date]="property.fullLine"
@@ -20,7 +23,9 @@
       <textarea pInputTextarea id="justification" class="app-text-area" [(ngModel)]="property.reason"
         [disabled]="property.disabled" [required]="true" (input)="changed.emit($event)">
       </textarea>
-      <label class="app-input-label" for="justification">{{ 'justification' | translate }} * </label>
+      <label class="app-input-label" for="justification">{{ 'justification' | translate }} * 
+        <i class="far fa-question-circle" *ngIf="property.helpText && property.helpText.length > 0" [pTooltip]="property.helpText"></i>
+      </label>
     </span>
   </div>
 </ng-template>
@@ -36,7 +41,7 @@
   </span>
   <div class="milestone-date-container"
     *ngIf="property?.milestoneData && !!property?.milestoneData?.baselineDate">
-    <span class="milestone-date-label">Linha de Base</span>
+    <span class="milestone-date-label">{{'baseline' |translate}}</span>
     <span class="milestone-date-baseline">
       {{ language === 'pt-BR' ? (property?.milestoneData?.baselineDate|date:'dd/MM/yyyy') :
                   (property?.milestoneData?.baselineDate|date:'yyyy/MM/dd') }}</span>

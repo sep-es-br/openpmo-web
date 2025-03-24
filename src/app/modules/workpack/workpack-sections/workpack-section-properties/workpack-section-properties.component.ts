@@ -9,7 +9,7 @@ import { TypePropertyModelEnum } from '../../../../shared/enums/TypePropertyMode
 import { PropertyTemplateModel } from '../../../../shared/models/PropertyTemplateModel';
 import { Subject } from 'rxjs';
 import { WorkpackService } from 'src/app/shared/services/workpack.service';
-import { Component, OnInit, Output, Input, EventEmitter } from '@angular/core';
+import { Component, OnInit, Output, Input, EventEmitter, OnDestroy } from '@angular/core';
 import { MessageService, SelectItem, TreeNode } from 'primeng/api';
 import { ConfigDataViewService } from 'src/app/shared/services/config-dataview.service';
 import { WorkpackShowTabviewService } from 'src/app/shared/services/workpack-show-tabview.service';
@@ -21,10 +21,11 @@ import * as moment from 'moment';
   templateUrl: './workpack-section-properties.component.html',
   styleUrls: ['./workpack-section-properties.component.scss']
 })
-export class WorkpackSectionPropertiesComponent implements OnInit {
+export class WorkpackSectionPropertiesComponent implements OnInit, OnDestroy {
 
   @Output() onGetProperties = new EventEmitter();
-  sectionPropertiesProperties: PropertyTemplateModel[];
+  backupProperties;
+  sectionPropertiesProperties: PropertyTemplateModel[] = [];
   typePropertyModel = TypePropertyModelEnum;
   cardWorkpackProperties: ICard;
   responsive: boolean;
@@ -67,6 +68,13 @@ export class WorkpackSectionPropertiesComponent implements OnInit {
     this.saveButtonSrv.observableSaveButtonClicked.pipe(takeUntil(this.$destroy)).subscribe(clicked => {
       if (clicked) {
         this.onGetProperties.next({ properties: this.sectionPropertiesProperties });
+        this.propertySrv.saveChangesProperties();
+      }
+    });
+    this.saveButtonSrv.observableCancelButtonClicked.pipe(takeUntil(this.$destroy)).subscribe(clicked => {
+      if (clicked) {
+        this.propertySrv.cancelChangesProperties();
+        this.loadProperties();
       }
     });
     this.propertySrv.observableResetWorkpackProperties.pipe(takeUntil(this.$destroy)).subscribe(reset => {
@@ -89,21 +97,23 @@ export class WorkpackSectionPropertiesComponent implements OnInit {
   }
 
   async loadProperties() {
+    this.sectionPropertiesProperties = [];
     this.isLoading = true;
     const {
       properties,
       workpackParams,
       workpackData,
       loading
-    } = this.propertySrv.getPropertiesData();
+    } = await this.propertySrv.getPropertiesData();
     this.workpackParams = workpackParams;
     this.workpackData = workpackData;
     this.sectionPropertiesProperties = properties;
     if (this.cardWorkpackProperties) {
       this.cardWorkpackProperties.initialStateCollapse = this.workpackParams?.idWorkpack && !this.showTabview;
-      this.showExpandedCollapseButtons = this.sectionPropertiesProperties.filter( prop => prop.type === TypePropertyModelEnum.GroupModel).length > 0;
+      this.showExpandedCollapseButtons =
+      this.sectionPropertiesProperties.filter( prop => prop.type === TypePropertyModelEnum.GroupModel).length > 0;
     }
-    if (!loading) this.showCheckCompleted();
+    if (!loading) {this.showCheckCompleted();}
   }
 
   showCheckCompleted() {
@@ -117,7 +127,7 @@ export class WorkpackSectionPropertiesComponent implements OnInit {
         && !this.workpackData.workpack.hasScheduleSectionActive
         && !this.workpackData.workpack.canceled
         && (!this.workpackData.workpack.endManagementDate)) ? true : false,
-    }
+    };
     this.isLoading = false;
   }
 
@@ -146,9 +156,11 @@ export class WorkpackSectionPropertiesComponent implements OnInit {
     }
     this.workpackSrv.nextCheckCompletedChanged(event);
     this.saveButtonSrv.nextShowSaveButton(true);
+    this.saveButtonSrv.nextShowCancelButton(true);
   }
 
   checkProperties(property: PropertyTemplateModel) {
+    this.saveButtonSrv.nextShowCancelButton(true);
     let arePropertiesRequiredValid: boolean = this.checkPropertiesRequiredValid(property);
     let arePropertiesStringValid: boolean = this.checkPropertiesStringValid(property);
     const arePropertiesReasonValid: boolean = !property?.needReason || (property?.needReason && !!property?.reason?.trim());
@@ -186,7 +198,8 @@ export class WorkpackSectionPropertiesComponent implements OnInit {
               prop.selectedValues = selectedLocality ? [selectedLocality.data] : [];
             }
             if (prop.multipleSelection) {
-              const selectedLocality = prop.localitiesSelected && prop.localitiesSelected !== null ? prop.localitiesSelected as TreeNode[] : [];
+              const selectedLocality =
+                prop.localitiesSelected && prop.localitiesSelected !== null ? prop.localitiesSelected as TreeNode[] : [];
               prop.selectedValues = selectedLocality.filter(locality => locality.data !== prop.idDomain)
                 .map(l => l.data);
             }

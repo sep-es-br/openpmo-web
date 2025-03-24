@@ -6,6 +6,21 @@
       position: relative;
     }
   }
+
+  .back-to-management-container {
+    color: #13546C;
+    cursor: pointer;
+    width: max-content;
+    margin-bottom: 1em;
+    .fa-reply {
+      margin-right: 0.5em;
+    }
+    .text {
+      font-size: 0.8rem;
+      font-style: italic;
+    }
+  }
+  
   .loading-container {
     position: relative;
     min-height: 150px;

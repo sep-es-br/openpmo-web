@@ -6,8 +6,8 @@
     flex-direction: column;
     flex: 1;
     height: 100%;
-    max-width: 280px;
-    width: 280px;
+    max-width: 260px;
+    width: 260px;
     border: 1px solid #D4D4D4;
     box-shadow: none;
 
@@ -19,6 +19,15 @@
         min-height: 2rem;
       }
     }
+
+    .right-side {
+      .card-item-header {
+        .menu-none {
+          min-height: 0;
+        }
+      }
+    }
+
 
     .card-item-header p-menu {
       .p-menu-overlay .p-menu-list .p-menuitem .p-menuitem-link {
@@ -33,7 +42,7 @@
         }
 
         .p-menuitem-text {
-          font-size: 0.9rem;
+          font-size: 0.8rem;
           font-family: v.$fontFamilyMedium;
           color: #939393;
         }
@@ -149,9 +158,10 @@
 
     .card-item-content {
       display: flex;
-      max-width: 280px;
+      max-width: 260px;
       flex-direction: column;
       align-items: center;
+      justify-content: center;
       color: #888e96;
       padding: 0 !important;
 
@@ -190,14 +200,12 @@
 
       .card-item-name {
         max-width: 100%;
-        font-size: 1.2rem;
+        font-size: 0.9rem;
         font-family: v.$fontFamilyMedium;
         padding: 0.5rem 0.5rem 0.5rem 0.5rem;
         text-align: center;
-        white-space: nowrap;
+        white-space: wrap;
         word-break: break-word;
-        overflow: hidden;
-        text-overflow: ellipsis;
       }
 
       .role {
@@ -229,6 +237,10 @@
         }
       }
 
+      .card-item-funder, .card-item-costValue {
+        font-size: 0.8rem;
+      }
+
       .subtitle-card-risk {
         font-size: 0.8rem;
         font-family: v.$fontFamilyMedium;
@@ -238,7 +250,7 @@
       &.cardList {
         flex-direction: row;
         justify-content: flex-start;
-        margin-left: 2em;
+        margin-left: 1em;
       }
     }
 
@@ -246,9 +258,8 @@
       width: 100%;
       display: flex;
       flex-direction: column;
-      align-items: center;
-      max-width: 43px;
-      margin-bottom: 5px;
+      align-items: flex-end;
+      padding: 5px;
 
       .card-item-id {
         color: #888e96;
@@ -286,6 +297,8 @@
   &.listPerson {
     .p-card-body {
       padding-top: 0.5em !important;
+      
+      
 
       .app-avatar .avatar {
         padding-bottom: 0;
@@ -318,6 +331,7 @@
 
       .organization-name {
         margin-left: 0.5em;
+        font-size: 0.8rem;
       }
 
       .p-card-body {
@@ -342,8 +356,16 @@
 
   &.cardList.listPerson {
     .p-card-body {
-      padding-top: 5px !important;
+      padding-top: 0 !important;
 
+      .card-item-footer {
+        width: auto;
+        flex-direction: row;
+      }
+      .p-card-content {
+        flex-direction: row;
+        justify-content: space-between;
+      }
       .app-avatar .avatar .p-avatar-xl {
         width: 40px;
         height: 40px;
@@ -392,6 +414,7 @@
 
         .organization-name {
           color: #009dd4;
+          font-size: 0.8rem;
         }
       }
     }
@@ -407,9 +430,6 @@
     padding: 0.5rem 0.5rem 0;
   }
 
-  .organization-name {
-    padding: 0.5rem 0.5rem 0;
-  }
 }
 
 ::ng-deep .new-carditem {
@@ -418,8 +438,8 @@
     display: flex;
     justify-content: center;
     height: 100%;
-    max-width: 280px;
-    width: 280px;
+    max-width: 260px;
+    width: 260px;
     border: 1px solid #D4D4D4;
     box-shadow: none;
 
@@ -475,6 +495,8 @@
         li {
           padding: 0.5em;
           color: #888E96;
+          font-size: 0.8rem;
+          cursor: pointer;
         }
 
         :hover {

@@ -22,7 +22,9 @@
               <span class="p-float-label">
                 <input formControlName="name" type="text" pInputText class="app-input-text">
                 <label for="float-input" class="app-input-label">{{'name' | translate}}<span
-                    class="required-indicator">*</span></label>
+                    class="required-indicator">*</span>
+                    <i class="far fa-question-circle" [pTooltip]="'help.reportModel.name' | translate"></i>
+                  </label>
               </span>
               <app-input-message [form]="formReport" field="name" *ngIf="isUserAdmin"></app-input-message>
             </div>
@@ -31,17 +33,22 @@
                 <p-dropdown class="app-single-selection" [options]="preferredFormatOptions"
                   formControlName="preferredOutputFormat" dropdownIcon="fas fa-caret-down" [autoDisplayFirst]="false">
                 </p-dropdown>
-                <label class="app-input-label">{{'preferredFormat'|translate}}</label>
+                <label class="app-input-label">{{'preferredFormat'|translate}} <span
+                  class="required-indicator">*</span>
+                  <i class="far fa-question-circle" [pTooltip]="'help.reportModel.preferredFormat' | translate"></i>
+                </label>
               </span>
               <app-input-message [form]="formReport" *ngIf="isUserAdmin" field="preferredOutputFormat"></app-input-message>
             </div>
           </div>
           <span class="p-float-label margin-top">
             <textarea pInputTextarea formControlName="fullName" class="app-text-area" rows="1"
-              [ngModel]="(formReport.touched) ? formReport.value.fullName : formReport.value.name">
+            [ngModel]="(mirrorFullName()) ? formReport?.value?.name : formReport?.value?.fullName">
               </textarea>
             <label for="float-input" class="app-input-label">{{'fullName' | translate}}<span
-                class="required-indicator">*</span></label>
+                class="required-indicator">*</span>
+                <i class="far fa-question-circle" [pTooltip]="'help.reportModel.fullName' | translate"></i>
+              </label>
           </span>
           <app-input-message [form]="formReport" *ngIf="isUserAdmin" field="fullName"></app-input-message>
         </form>
@@ -54,8 +61,8 @@
         <app-card-loading [isCardLoading]="cardParameters.isLoading"></app-card-loading>
       </div>
       <div class="report-model-addicional-properties add-actions" *ngIf="isUserAdmin">
-        <p-menu #menuAddProperty [popup]="true" [model]="menuModelProperties"></p-menu>
-        <p-button [label]="'addParameter' | translate" icon="fa fa-plus" iconPos="right" class="button-add-property"
+        <p-menu class="menu-addicional-properties" #menuAddProperty [popup]="true" [model]="menuModelProperties"></p-menu>
+        <p-button [label]="'addParameter' | translate" icon="fa fa-plus" iconPos="right" class="button-add-property button-default-w8"
           (click)="menuAddProperty.toggle($event)">
         </p-button>
       </div>
@@ -95,7 +102,7 @@
         </ng-template>
       </p-dataView>
       <div class="compile-section-container" *ngIf="showButtonCompile() && isUserAdmin">
-        <p-button [label]="'compile' | translate" icon="fa fa-cog" iconPos="right" class="button-add"
+        <p-button [label]="'compile' | translate" icon="fa fa-cog" iconPos="right" class="button-add button-default-w8"
           (click)="handleCompileModel()">
         </p-button>
         <div class="input-toggle">
@@ -109,5 +116,9 @@
   <div class="id-container" *ngIf="idReport">
     <span>{{idReport}}</span>
   </div>
-  <app-save-button (save)="handleOnSubmit()" *ngIf="isUserAdmin"></app-save-button>
+  <app-buttons-container>
+    <app-save-button (save)="handleOnSubmit()" *ngIf="isUserAdmin"></app-save-button>
+    <app-cancel-button (cancel)="handleOnCancel()"></app-cancel-button>
+  </app-buttons-container>
+
 </div>

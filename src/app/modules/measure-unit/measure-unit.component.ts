@@ -23,6 +23,7 @@ import { OfficePermissionService } from 'src/app/shared/services/office-permissi
 import { OfficeService } from 'src/app/shared/services/office.service';
 import { ResponsiveService } from 'src/app/shared/services/responsive.service';
 import { ConfigDataViewService } from 'src/app/shared/services/config-dataview.service';
+import { CancelButtonComponent } from 'src/app/shared/components/cancel-button/cancel-button.component';
 
 @Component({
   selector: 'app-measure-unit',
@@ -32,6 +33,7 @@ import { ConfigDataViewService } from 'src/app/shared/services/config-dataview.s
 export class MeasureUnitComponent implements OnInit {
 
   @ViewChild(SaveButtonComponent) saveButton: SaveButtonComponent;
+  @ViewChild(CancelButtonComponent) cancelButton: CancelButtonComponent;
 
   formsMeasureUnits: { id: string; form: FormGroup }[] = [];
   measureUnits: IMeasureUnit[];
@@ -99,12 +101,14 @@ export class MeasureUnitComponent implements OnInit {
         info: this.propertiesOffice?.name,
         tooltip: this.propertiesOffice?.fullName,
         routerLink: ['/configuration-office'],
+        admin: true,
         queryParams: { idOffice: this.idOffice }
       },
       {
         key: 'configuration',
         info: 'measureUnits',
         tooltip: this.translateSrv.instant('measureUnits'),
+        admin: true,
         routerLink: ['/measure-units'],
         queryParams: { idOffice: this.idOffice }
       }
@@ -181,7 +185,7 @@ export class MeasureUnitComponent implements OnInit {
             .subscribe(() => this.saveButton?.hideButton());
           item.form.valueChanges
             .pipe(takeUntil(this.$destroy), filter(() => item.form.dirty && item.form.valid))
-            .subscribe(() => this.saveButton?.showButton());
+            .subscribe(() => {this.saveButton?.showButton(); this.cancelButton.showButton()});
         });
       }
     } else {
@@ -199,44 +203,46 @@ export class MeasureUnitComponent implements OnInit {
   };
 
   async handleOnSubmit() {
+    this.cancelButton.hideButton();
     const formItemsChanged = this.formsMeasureUnits.filter(item => item.form.dirty && item.form.valid);
     formItemsChanged.forEach(async ({ form, id }) => {
-      const { success, data } = form.value.id
-        ? await this.measureUnitSvr.put(form.value)
-        : await this.measureUnitSvr.post({ ...form.value, idOffice: this.idOffice });
-      if (success) {
-        form.reset({ ...form.value, id: data.id });
-        this.messageSrv.add({
-          severity: 'success',
-          summary: this.translateSrv.instant('success'),
-          detail: this.translateSrv.instant('messages.savedSuccessfully')
-        });
-        if (id.startsWith('local')) {
-          const cardItemIndex = this.cardItemsProperties.findIndex(card => card.newId === id);
-          const formItem = this.formsMeasureUnits.find(f => f.id === id);
-          formItem.id = data.id.toString();
-          const measureUnit = form.value;
-          const newCard = ({
-            typeCardItem: 'listItem',
-            icon: IconsEnum.UnitSelection,
-            nameCardItem: measureUnit.name,
-            id: measureUnit.id,
-            itemId: measureUnit.id ?
-              `${measureUnit.id < 10 ? '0' + measureUnit.id : measureUnit.id}` : '',
-            menuItems: [{
-              label: 'Delete', icon: 'fas fa-trash-alt',
-              command: () => this.deleteMeasureUnit(measureUnit),
-              disabled: !this.editPermission
-            }] as MenuItem[],
+        const { success, data } = form.value.id
+          ? await this.measureUnitSvr.put(form.value)
+          : await this.measureUnitSvr.post({ ...form.value, idOffice: this.idOffice });
+        if (success) {
+          form.reset({ ...form.value, id: data.id });
+          this.messageSrv.add({
+            severity: 'success',
+            summary: this.translateSrv.instant('success'),
+            detail: this.translateSrv.instant('messages.savedSuccessfully')
           });
-          this.cardItemsProperties = [
-            ... this.cardItemsProperties.slice(0, cardItemIndex),
-            newCard,
-            ... this.cardItemsProperties.slice(cardItemIndex + 1)
-          ];
-        }
-      };
-    });
+          if (id.startsWith('local')) {
+            const cardItemIndex = this.cardItemsProperties.findIndex(card => card.newId === id);
+            const formItem = this.formsMeasureUnits.find(f => f.id === id);
+            formItem.id = data.id.toString();
+            const measureUnit = form.value;
+            const newCard = ({
+              typeCardItem: 'listItem',
+              icon: IconsEnum.UnitSelection,
+              nameCardItem: measureUnit.name,
+              id: measureUnit.id,
+              itemId: measureUnit.id ?
+                `${measureUnit.id < 10 ? '0' + measureUnit.id : measureUnit.id}` : '',
+              menuItems: [{
+                label: 'Delete', icon: 'fas fa-trash-alt',
+                command: () => this.deleteMeasureUnit(measureUnit),
+                disabled: !this.editPermission
+              }] as MenuItem[],
+            });
+            this.cardItemsProperties = [
+              ... this.cardItemsProperties.slice(0, cardItemIndex),
+              newCard,
+              ... this.cardItemsProperties.slice(cardItemIndex + 1)
+            ];
+          }
+        };
+      }
+    );
   }
 
   handleAddCardItem() {
@@ -279,7 +285,7 @@ export class MeasureUnitComponent implements OnInit {
       .subscribe(() => this.saveButton?.hideButton());
     newForm.form.valueChanges
       .pipe(takeUntil(this.$destroy), filter(() => newForm.form.dirty && newForm.form.valid))
-      .subscribe(() => this.saveButton?.showButton());
+      .subscribe(() => {this.saveButton?.showButton(); this.cancelButton?.showButton()});
     this.formsMeasureUnits.push(newForm);
   }
 
@@ -318,7 +324,7 @@ export class MeasureUnitComponent implements OnInit {
       this.setBreadcrumbStorage(idFilter);
       this.router.navigate(['/config/filter-dataview'], {
         queryParams: {
-          id: idFilter,
+          idFilter: idFilter,
           entityName: 'unitMeasures',
           idOffice: this.idOffice
         }
@@ -370,6 +376,7 @@ export class MeasureUnitComponent implements OnInit {
         info: this.propertiesOffice?.name,
         tooltip: this.propertiesOffice?.fullName,
         routerLink: ['/configuration-office'],
+        admin: true,
         queryParams: { idOffice: this.idOffice }
       },
       {
@@ -377,6 +384,7 @@ export class MeasureUnitComponent implements OnInit {
         info: 'measureUnits',
         tooltip: this.translateSrv.instant('measureUnits'),
         routerLink: ['/measure-units'],
+        admin: true,
         queryParams: { idOffice: this.idOffice }
       }] :
       [{
@@ -384,6 +392,7 @@ export class MeasureUnitComponent implements OnInit {
         info: this.propertiesOffice?.name,
         tooltip: this.propertiesOffice?.fullName,
         routerLink: ['/configuration-office'],
+        admin: true,
         queryParams: { idOffice: this.idOffice }
       },
       {
@@ -391,9 +400,23 @@ export class MeasureUnitComponent implements OnInit {
         info: 'measureUnits',
         tooltip: this.translateSrv.instant('measureUnits'),
         routerLink: ['/measure-units'],
+        admin: true,
         queryParams: { idOffice: this.idOffice }
       }]
     this.breadcrumbSrv.setBreadcrumbStorage(breadcrumb);
+  }
+
+  handleOnCancel() {
+    this.saveButton.hideButton();
+    const formItemsChanged = this.formsMeasureUnits.filter(item => item.form.dirty && item.form.valid);
+    formItemsChanged.forEach( ({form, id}) => {
+      const unitIndex = this.measureUnits.findIndex( unit => unit.id.toString() === id);
+      if (unitIndex > -1) {
+        form.reset(Object.keys(form.controls).reduce((a, key) => (a[key] = this.measureUnits[unitIndex][key] || '', a), {}))
+      } else {
+        form.reset({name: '', fullName: '', precision: 0});
+      }
+    });
   }
 
 }

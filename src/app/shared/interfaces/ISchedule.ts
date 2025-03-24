@@ -38,6 +38,9 @@ export interface IGroupStep {
   actualCost?: number;
   planed?: number;
   planedCost?: number;
+  budgetedValue?: string;
+  authorizedValue?: string;
+  liquidatedTotal?: string;
 }
 
 export interface IStep {
@@ -51,6 +54,7 @@ export interface IStep {
   actualWork: number;
   periodFromStart?: Date;
   consumes?: IConsume[];
+  liquidatedValue?: string;
 }
 
 export interface IConsume {
@@ -61,6 +65,10 @@ export interface IConsume {
   costAccount: {
     id: number;
     name?: string;
+    codUo?: number;
+    unidadeOrcamentaria?: string;
+    codPo?: number;
+    planoOrcamentario?: string;
   };
 }
 

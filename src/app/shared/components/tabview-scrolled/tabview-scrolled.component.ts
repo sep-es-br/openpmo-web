@@ -118,6 +118,7 @@ export class TabviewScrolledComponent implements OnChanges, OnDestroy {
           this.workpackSrv.nextPendingChanges(false);
           this.selectedTabChange.emit({ tabs: this.selectedTab });
           this.saveButtonSrv.nextShowSaveButton(false);
+          this.saveButtonSrv.nextShowCancelButton(false);
         },
         reject: () => {
         }

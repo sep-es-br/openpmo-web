@@ -1,4 +1,9 @@
 {
+  "dashboardStatus": "Dashboard status",
+  "UPTODATE": "Uptodate",
+  "OUTDATED": "Outdated",
+  "CALCULATING": "Calculating",
+  "backToManagement": "Back to management",
   "baselinePlanned": "Planned (baseline)",
   "estimatedConcluded": "Estimated / Concluded",
   "All": "All",
@@ -37,6 +42,7 @@
   "notFoundIssues": "Not found issues to this workpack",
   "notFoundRisks": "Not found risks to this workpack",
   "notFoundCostAccounts": "Not found cost accounts to this workpack",
+  "notFoundIndicators": "Not found indicators to this workpack",
   "notFoundWorkpacksToThisModel": "Not found workpacks to this model",
   "noBaselines": "Not exists baselines in this project",
   "noActiveBaselines": "Not exists baselines actives in this project",
@@ -181,8 +187,14 @@
   "costAccounts": "Cost Accounts",
   "costAssignment": "Cost Assignment",
   "actual": "Actual",
+  "abbreviatedActual": "Act.",
+  "abbreviatedLiquidated": "Liq.",
   "planned": "Foreseen",
   "foreseen": "Foreseen",
+  "abbreviatedForeseen": "Fore.",
+  "abbreviatedBaselineCardItem": "Plan.",
+  "reprogrammed": "Reprogrammed",
+  "abbreviatedReprogrammed": "Rep.",
   "totals": "Totals",
   "hideDetails": "Hide details",
   "showDetails": "Show details",
@@ -242,8 +254,12 @@
   "risk": "Risk",
   "response": "Response",
   "newRisk": "New risk",
+  "newIndicator": "New indicator",
   "importance": "Importance",
   "description": "Description",
+  "finalGoal": "Final goal",
+  "measure": "Measure",
+  "periodicity": "Periodicity",
   "status": "Status",
   "preOccurrency": "Pre occurrency",
   "postOccurrency": "Post occurrency",
@@ -325,7 +341,7 @@
   "REJECTED": "Rejected",
   "cancelling": "Cancelling",
   "newBaseline": "New baseline",
-  "plannedBaseline": "Planned (baseline)",
+  "plannedBaseline": "Planned (BL)",
   "forecast": "Forecast",
   "BASIC_READ": "Basic read",
   "NONE": "None",
@@ -341,6 +357,7 @@
   "evaluations": "Evaluations",
   "comment": "Comment",
   "cancel": "Cancel",
+  "undo": "Undo",
   "cancellationProposal": "Project cancellation proposal",
   "proposer": "Proposer",
   "current": "Current",
@@ -384,7 +401,186 @@
   "uiUxDesigner": "UI UX Designer",
   "difference": "Difference",
   "confirmSpreadDifference": "Confirm spread difference",
+  "help": {
+    "textHelpOnline": "Text help",
+    "workpack": {
+      "name": "Workpack name.",
+      "fullName": "Workpack fullname.",
+      "date": "Milestone date."
+    },
+    "propertyModel": {
+      "name": "Property identifier name. Information is required.",
+      "label": "Property displayed label. Information is required.",
+      "sortIndex": "The order in which the property will be displayed in workpack. Information is required.",
+      "precision": "The number of decimal places to be used in property values. Default value is zero.",
+      "possibleValues": "List of options will be displayed to select in the property value. Information is required.",
+      "domain": "Domain to list the localities. Information is required.",
+      "sector": "Sector to filter the organizations will be displayed in option list of property value. Information is required.",
+      "defaultValue": "Default value will be inputed in property value.",
+      "fullLine": "Indicate the property width. When it is checked, the property will be displayed occupay the entire width of the screen.",
+      "required": "The property value information is required.",
+      "multiSelection": "If it is checked, will be selected more then one option to property value.",
+      "minimum": "Minimum value to property value.",
+      "maximum": "Maximum value to property value.",
+      "rows": "Number of lines do textarea property.",
+      "helpText": "Help text to be displayed in property."
+    },
+    "organization": {
+      "sector": "Sector of activity of the organization. The selection of one option is required.",
+      "businessName": "Organization name. Maximum size 25 characters. Information is required.",
+      "socialName": "Organization social name. Information is required.",
+      "address": "Organization complete address. Information is not required.",
+      "phoneNumber": "Organization phone number. Enter the phone number with area code. Only numbers. Information is not required.",
+      "contactEmail": "Organization contact e-mail. Enter a valid e-mail. Information is not required.",
+      "website": "Organization Website. Information is not required."
+    },
+    "domain": {
+      "name": "Domain name. Maximum size 25 characters. Information is required.",
+      "fullName": "Domain fullname. Information is required.",
+      "rootLocalityName": "Root locality name. Information is required.",
+      "rootLocalitFullName": "Root locality fullname. Information is required.",
+      "rootLocalityLatitude": "Root locality GPS latitude. Information is not required.",
+      "rootLocalityLongitude": "Root locality GPS longitude. Information is not required."
+    },
+    "locality": {
+      "name": "Locality name. Maximum size 25 characters. Information is required.",
+      "fullName": "Locality fullname. Information is required.",
+      "localityLatitude": "Locality GPS latitude. Information is not required.",
+      "localityLongitude": "Locality GPS longitude. Information is not required."
+    },
+    "measureUnit": {
+      "name": "Meansure unit name. Maximum size 25 characters. Information is required.",
+      "fullName": "Meansure unit fullname. Information is required.",
+      "precision": "Precision to be used in the decimal places of the values. Default value is zero. Information is required."
+    },
+    "permission": {
+      "level": "Permission level. Read for only visualization, edit for changes and none for no permission."
+    },
+    "planModel": {
+      "name": "Plan model name. Maximum size 25 characters. Information is required.",
+      "fullName": "Plan model fullname. Information is required.",
+      "sharedWith": "Offices with which you wish to share this plan model. Select the option 'All' to sharing with all offices. Information is not required."
+    },
+    "workpackModel": {
+      "modelName": "Workpack model name. Maximum size 25 characters. Information is required.",
+      "modelNameInPlural": "Workpack model name in plural. Information is required.",
+      "position": "Position of workpack model tab or panel in worpack view. Default value is the next position after the last used by models in the same level. Information is required.",
+      "icon": "Icon to be showed in the workpack card. Default value is defined by workpack model type. Information is required.",
+      "sortedBy": "The property will be used to order the workpacks created from this workpack model. Default value is the property 'name'. Information is required.",
+      "dashboardShowStakeholders": "Roles by stakeholders should be displaed in workpack dashboard. Default values are possible roles from stakeholder section. Information is not required.",
+      "stakeholdersPossibleRolesPerson": "Possible roles of a stakeholder person in workpack stakeholder section. Default values are selected when the model is created. Information required if the stakeholder section is on.",
+      "stakeholdersPossibleRolesOrganization": "Possible roles of a stakeholder organization in workpack stakeholder section. Default values are selected when the model is created. Information required if the stakeholder section is on."
+    },
+    "reportModel": {
+      "name": "Report model name. Information is required.",
+      "preferredFormat": "Preferred format file to export report. Default value is 'PDF'. Information is required.",
+      "fullName": "Report model fullname. Information is required."
+    },
+    "office": {
+      "name": "Office name. Maximum size 25 characters. Information is required.",
+      "fullName": "Office fullname. Information is required."
+    },
+    "plan": {
+      "planModelName": "Name of the plan model linked to the plan. This information is readonly.",
+      "name": "Plan name. Maximum size 25 characters. Information is required.",
+      "fullName": "Plan fullname. Information is required.",
+      "start": "Plan date start. It should be before plan finish date. Information is required.",
+      "finish": "Plan date finish. It should be after plan start date. Information is required."
+    },
+    "person": {
+      "address": "Person full address. Information is not required.",
+      "phoneNumber": "Person phone number. Enter the phone number with area code. Only numbers. Information is not required.",
+      "accessEmail": "E-mail used to access aplication. Information readonly.",
+      "contactEmail": "Person contact e-mail. Information is not required.",
+      "howDoYouWantYourNameDisplayed": "Input your nickname or how you want your name to be displayed."
+    },
+    "stakeholder": {
+      "role": "Stakeholder role. Information is required.",
+      "from": "Date from which the stakeholder will perform the role. Information is required.",
+      "to": "Date until which the stakeholder will perform the role. Information is not required."
+    },
+    "risk": {
+      "name": "Risk name. Information is required.",
+      "description": "Risk description. Information is required.",
+      "importance": "Risk importance. Information is required.",
+      "status": "Risk status. Information is required.",
+      "likelyToHappenFrom": "Date from likely to happen.",
+      "likelyToHappenTo": "Date to likely to happen.",
+      "happenedIn": "Date when risk was happened."
+    },
+    "RiskResponse": {
+      "name": "Issue response plan name. Information is required.",
+      "when": "When the response plan will be executed. Information is required.",
+      "start": "Start date of response plan execution. Information is required.",
+      "finish": "Finish date of response plan execution. Information is required.",
+      "strategy": "Strategy that will be used to execution. Information is required.",
+      "status": "Response plan status. Information is required.",
+      "trigger": "Trigger that set on the response plan execution. Information is required.",
+      "planDescription": "Response plan description. Information is required.",
+      "responsible": "Responsibles stakeholders to execute the response plan. Information is required."
+    },
+    "issue": {
+      "name": "Issue name. Information is required.",
+      "description": "Issue description. Information is required.",
+      "importance": "Issue importante. Information is required.",
+      "status": "Issue status. Information is required."
+    },
+    "issueResponse": {
+      "name": "Issue response plan name. Information is required.",
+      "start": "Start date of response plan execution. Information is required.",
+      "status": "Response plan status. Information is required.",
+      "planDescription": "Response plan description. Information is required.",
+      "responsible": "Responsibles stakeholders to execute the response plan. Information is required."
+    },
+    "process": {
+      "number": "Process number. Information is required.",
+      "name": "Process name. Information is required.",
+      "note": "Process note. Information is not required."
+    },
+    "journal": {
+      "description": "Description of new information. Information is required."
+    },
+    "baseline": {
+      "projectName": "Project name. Readonly information.",
+      "baselineName": "Baseline name. Maximum lenght 50 characters. Information is required.",
+      "proposer": "Baseline proposer. Readonly information.",
+      "description": "Baseline description. Information is required.",
+      "message": "Message from baseline proposer. Information is required."
+    },
+    "schedule": {
+      "start": "Start date of schedule. Information is required.",
+      "finish": "Finish date of schedule. Information is required.",
+      "estimatedPhysical": "Estimated physical value. Information is required. Zero value is valid.",
+      "actualPhysical": "Actual physical value. Information is not required.",
+      "estimatedCostTotal": "Total estimated cost value.",
+      "actualCostTotal": "Total actual cost value.",
+      "distribution": "Distribution method. Sigmoidal: use the sigmoide function to calculate steps values. Linear: use the equal values for steps.",
+      "estimatedCost": "Estimated cost value to cost account linked. Information is required. Zero value is valid.",
+      "actualCost": "Actual cost value to cost account linked. Information is not required."
+    },
+    "step": {
+      "start": "Start date of step. Information is required.",
+      "finish": "Finish date of step. Information is required.",
+      "estimatedPhysical": "Estimated physical value. Information is required. Zero value is valid.",
+      "actualPhysical": "Actual physical value. Information is not required.",
+      "estimatedCostTotal": "Total estimated cost value.",
+      "baselineCostTotal": "Total planed cost value in active baseline.",
+      "baselinePhysicalTotal": "Total planed physical value in active baseline.",
+      "actualCostTotal": "Total actual cost value.",
+      "distribution": "Distribution method. Sigmoidal: use the sigmoide function to calculate steps values. Linear: use the equal values for steps.",
+      "estimatedCost": "Estimated cost value to cost account linked. Information is required. Zero value is valid.",
+      "actualCost": "Actual cost value to cost account linked. Information is not required."
+    },
+    "filter": {
+      "name": "Filter name. Information is required.",
+      "sortBy": "Property for sort filtered items. Information is required.",
+      "property": "Property to validate role.  Information is required.",
+      "operator": "Operator to validate role.  Information is required.",
+      "value": "Value to validade role with property values.  Information is required."
+    }
+  },
   "messages": {
+    "isSamePerson": "You can not give permission to yourself.",
     "scheduleCantHasNegativeValues": "Schedule can't has negative values. Please, check the values.",
     "validateGenerateReport": "Required parameters must be filled in and the scope selected.",
     "confirmRedistributeSchedule": "Do you want to spread the difference of ",
@@ -459,6 +655,11 @@
       "thereAreNotCostAccounts": "There are not cost accounts"
     },
     "error": {
+      "link": {
+        "already": {
+          "exists": "This office has linked workpack in this office. You need to unlink this to revoke the sharing."
+        }
+      },
       "file": {
         "upload": {
           "maxsize": {
@@ -614,6 +815,9 @@
             }
           }
         }
+      },
+      "risk": {
+        "has-issue-relationship": "This risk can not be deleted because it has a related issue."
       }
     }
   },
@@ -834,5 +1038,12 @@
   "actualCost": "Actual Cost",
   "plannedValue": "Planned Value",
   "estimatesAtCompletion": "Estimates At Completion",
-  "estimatesToComplete": "Estimates To Complete"
+  "estimatesToComplete": "Estimates To Complete",
+  "labelBudgetUnit": "Budget Unit",
+  "labelBudgetPlan": "Budget Plan",
+  "liquidated": "Liquidated",
+  "budgeted": "Budgeted",
+  "authorized": "Authorized",
+  "indicator.name": "Name of the indicator. Mandatory information.",
+  "indicator.description": "Description of the indicator. Mandatory information."
 }

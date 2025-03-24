@@ -49,10 +49,6 @@
       }
     }
 
-    .progress-bar-total-container {
-      border: 1px solid #004660;
-    }
-
     .progress-bar-progress-container {
       border: none;
     }
@@ -75,6 +71,7 @@
     width: 100%;
     margin-top: 5px;
   }
+  margin-top: -10px;
 }
 
 

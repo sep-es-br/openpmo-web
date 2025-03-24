@@ -42,12 +42,14 @@ export class PropertyTemplateModel implements IProperty {
   needReason?: boolean;
   collapsed?: boolean;
   dirty = false;
+  helpText?: string;
 
   getValues() {
     const {
       id,
       idPropertyModel,
       type,
+      name,
       value,
       selectedValue,
       selectedValues,
@@ -59,7 +61,8 @@ export class PropertyTemplateModel implements IProperty {
     const property: IWorkpackProperty = {
       id,
       idPropertyModel,
-      type
+      type,
+      name
     };
     switch (this.type) {
       case TypePropertyModelEnum.DateModel:

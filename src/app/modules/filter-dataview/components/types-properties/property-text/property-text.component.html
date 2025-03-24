@@ -3,6 +3,8 @@
     <input class="app-input-text" [id]="property.name" name="name" [(ngModel)]="value" type="text" pInputText
       [defaultValue]="property.defaultValue" (input)="handleChangedValue()"
       />
-    <label class="app-input-label" for="float-name">{{ "value" | translate }} * </label>
+    <label class="app-input-label" for="float-name">{{ "value" | translate }} *
+      <i class="far fa-question-circle" *ngIf="property.helpText && property.helpText.length > 0" [pTooltip]="property.helpText"></i>
+    </label>
   </span>
 </div>

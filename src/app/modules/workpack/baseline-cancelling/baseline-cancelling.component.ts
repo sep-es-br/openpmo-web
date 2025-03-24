@@ -70,8 +70,6 @@ export class BaselineCancellingComponent implements OnInit {
       ...breadcrumbItems,
       {
         key: 'baseline',
-        routerLink: ['/workpack/cancelling'],
-        queryParams: { idWorkpack: this.idWorkpack, idWorkpackModelLinked: this.idWorkpackModelLinked },
         info: this.baseline?.name,
         tooltip: this.baseline?.name
       }

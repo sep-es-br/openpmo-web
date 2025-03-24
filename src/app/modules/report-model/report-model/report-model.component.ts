@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ICard } from 'src/app/shared/interfaces/ICard';
 import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
 import { ConfigDataViewService } from 'src/app/shared/services/config-dataview.service';
@@ -20,7 +20,7 @@ import { IPlanModel } from 'src/app/shared/interfaces/IPlanModel';
 import { IReportModel, IReportModelFile } from 'src/app/shared/interfaces/IReportModel';
 import { ReportPreferredFormatEnum } from 'src/app/shared/enums/ReportPreferredFormatEnum';
 import { LocalityService } from 'src/app/shared/services/locality.service';
-import { TypePropertyModelEnum as TypePropertyEnum } from 'src/app/shared/enums/TypePropertModelEnum';
+import { TypePropertModelEnum as TypePropertyEnum } from 'src/app/shared/enums/TypePropertModelEnum';
 import { IWorkpackModelProperty } from 'src/app/shared/interfaces/IWorkpackModelProperty';
 import { ILocalityList } from 'src/app/shared/interfaces/ILocality';
 import { IconPropertyWorkpackModelEnum } from 'src/app/shared/enums/IconPropertyWorkpackModelEnum';
@@ -34,15 +34,18 @@ import { ReportModelFileService } from 'src/app/shared/services/report-model-fil
 import { MinLengthTextCustomValidator } from 'src/app/shared/utils/minLengthTextValidator';
 import { TypeOrganization } from 'src/app/shared/enums/TypeOrganization';
 import { IOrganization } from 'src/app/shared/interfaces/IOrganization';
+import { CancelButtonComponent } from 'src/app/shared/components/cancel-button/cancel-button.component';
 
 @Component({
   selector: 'app-report-model',
   templateUrl: './report-model.component.html',
   styleUrls: ['./report-model.component.scss']
 })
-export class ReportModelComponent implements OnInit {
+export class ReportModelComponent implements OnInit, OnDestroy {
 
   @ViewChild(SaveButtonComponent) saveButton: SaveButtonComponent;
+  @ViewChild(CancelButtonComponent) cancelButton: CancelButtonComponent;
+
   cardProperties: ICard = {
     toggleable: false,
     initialStateToggle: false,
@@ -60,8 +63,9 @@ export class ReportModelComponent implements OnInit {
     initialStateToggle: false,
     cardTitle: 'jrxmlSourceFiles',
     collapseble: true
-  }
+  };
   cardItemsFiles: ICardItem[] = [];
+  resetCardItemsFiles: ICardItem[] = [];
   propertiesOffice: IOffice;
   propertiesStrategy: IPlanModel;
   idStrategy: number;
@@ -79,6 +83,7 @@ export class ReportModelComponent implements OnInit {
   report: IReportModel;
   preferredFormatOptions: SelectItem[];
   modelProperties: IWorkpackModelProperty[] = [];
+  resetModelProperties: IWorkpackModelProperty[] = [];
   menuModelProperties: MenuItem[] = [];
   currentLang: string;
   listDomains: SelectItem[] = [];
@@ -145,8 +150,11 @@ export class ReportModelComponent implements OnInit {
       .pipe(takeUntil(this.$destroy), filter(status => status === 'INVALID'))
       .subscribe(() => this.saveButton?.hideButton());
     this.formReport.valueChanges
-      .pipe(takeUntil(this.$destroy), filter(() => this.formReport.dirty))
-      .subscribe(() => {this.saveButton.showButton()});
+      .pipe(takeUntil(this.$destroy), filter(() => this.formReport.dirty && this.formReport.valid))
+      .subscribe(() => { this.saveButton.showButton();});
+    this.formReport.valueChanges
+      .pipe(takeUntil(this.$destroy), filter(() => this.formReport.dirty && this.formReport.valid))
+      .subscribe(() => { this.cancelButton.showButton();});
     this.translateSrv.onLangChange
       .pipe(takeUntil(this.$destroy)).subscribe(({ lang }) => {
         this.currentLang = lang;
@@ -155,7 +163,7 @@ export class ReportModelComponent implements OnInit {
         }, 250);
       });
     this.responsiveSvr.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.responsive = value);
-    this.activeRoute.queryParams.subscribe(async ({ idStrategy, id, idOffice }) => {
+    this.activeRoute.queryParams.subscribe(async({ idStrategy, id, idOffice }) => {
       this.idStrategy = +idStrategy;
       this.idReport = +id;
       this.idOffice = +idOffice;
@@ -170,7 +178,7 @@ export class ReportModelComponent implements OnInit {
       }
       this.cardProperties.initialStateCollapse = this.idReport ? true : false;
     });
-    
+
   }
 
   ngOnInit(): void {
@@ -188,12 +196,10 @@ export class ReportModelComponent implements OnInit {
   }
 
   setPreferredFormatOptions() {
-    this.preferredFormatOptions = Object.keys(ReportPreferredFormatEnum).map(key => {
-      return {
-        label: key,
-        value: key
-      };
-    });
+    this.preferredFormatOptions = Object.keys(ReportPreferredFormatEnum).map(key => ({
+      label: key,
+      value: key
+    }));
   }
 
   async checkPermissions() {
@@ -226,6 +232,7 @@ export class ReportModelComponent implements OnInit {
         info: this.propertiesOffice?.name,
         tooltip: this.propertiesOffice?.fullName,
         routerLink: ['/configuration-office'],
+        admin: true,
         queryParams: { idOffice: this.idOffice }
       },
       {
@@ -233,31 +240,34 @@ export class ReportModelComponent implements OnInit {
         info: 'planModels',
         tooltip: this.translateSrv.instant('planModels'),
         routerLink: ['/strategies'],
+        admin: true,
         queryParams: { idOffice: this.idOffice }
       },
       {
         key: 'planModel',
         info: this.propertiesStrategy?.name,
         tooltip: this.propertiesStrategy?.fullName,
+        admin: true,
         routerLink: ['/strategies', 'strategy'],
         queryParams: { id: this.idStrategy, idOffice: this.idOffice }
       },
       {
         key: 'reportModel',
         info: this.report?.name,
+        admin: true,
         tooltip: this.report?.fullName,
         routerLink: [],
       }
     ]);
   }
 
-  async loadReport(dontSetFormReport = false) {
+  async loadReport() {
     this.cardParameters.isLoading = true;
     const result = await this.reportModelSrv.GetById(this.idReport);
     if (result.success) {
       this.cardProperties.isLoading = false;
       this.report = result.data;
-      if (!dontSetFormReport) this.setFormReportValues();
+      this.setFormReportValues();
       if (this.report.paramModels) {
         this.loadPropertiesParams();
       } else {
@@ -307,7 +317,7 @@ export class ReportModelComponent implements OnInit {
         itemId: file.id,
         main: file.main,
         menuItems
-      }
+      };
     });
 
     if (this.isUserAdmin) {
@@ -317,9 +327,11 @@ export class ReportModelComponent implements OnInit {
         icon: IconsEnum.ArrowUp,
       });
     }
+    this.resetCardItemsFiles = this.cardItemsFiles.filter( file => file.itemId ||
+      file.typeCardItem === 'newCardItem').map(cardItem => ({ ...cardItem }));
     setTimeout(() => {
       this.cardFiles.isLoading = false;
-    }, 300)
+    }, 300);
   }
 
   async handleSetAsMain(idFile) {
@@ -343,12 +355,12 @@ export class ReportModelComponent implements OnInit {
         } else {
           card.main = false;
         }
-      })
+      });
     }
   }
 
   async handleDownloadFile(idFile) {
-    const file = this.files.find( f => f.id === idFile);
+    const file = this.files.find(f => f.id === idFile);
     const result = await this.reportModelFileSrv.downloadFile(idFile, {
       'id-report-model': this.idReport
     });
@@ -379,18 +391,24 @@ export class ReportModelComponent implements OnInit {
   }
 
   setFormReportValues() {
-    this.formReport.controls.name.setValue(this.report.name);
-    this.formReport.controls.fullName.setValue(this.report.fullName);
-    this.formReport.controls.preferredOutputFormat.setValue(this.report.preferredOutputFormat);
+    this.formReport.reset({
+      name: this.report.name,
+      fullName: this.report.fullName,
+      preferredOutputFormat: this.report.preferredOutputFormat
+    });
     if (!this.isUserAdmin) {
       this.formReport.disable();
     }
   }
 
+  mirrorFullName(): boolean {
+    return (isNaN(this.idReport) && this.formReport && this.formReport.controls.fullName.pristine);
+  }
+
   async loadPropertiesParams() {
     const properties = this.report.paramModels;
     const dataPropertiesAndIndex = (await Promise.all(properties
-      .map(async (p, i) => {
+      .map(async(p, i) => {
         if (p.possibleValues) {
           p.possibleValuesOptions = (p.possibleValues as string).split(',');
         }
@@ -424,7 +442,7 @@ export class ReportModelComponent implements OnInit {
           }
         }
         if (p.sectors) {
-          p.sectorsList = p.sectors.split(',').map( sector => sector.toUpperCase());
+          p.sectorsList = p.sectors.split(',').map(sector => sector.toUpperCase());
         }
         if (p.type === TypePropertyEnum.DateModel) {
           const value = p.defaultValue && p.defaultValue.toLocaleString();
@@ -438,6 +456,7 @@ export class ReportModelComponent implements OnInit {
       .sort((a, b) => a[1] > b[1] ? 1 : -1)
       .map(prop => prop[0] as IWorkpackModelProperty);
     this.modelProperties = dataProperties;
+    this.resetModelProperties = dataProperties.map(propertie => ({ ...propertie }));
     this.cardParameters.isLoading = false;
   }
 
@@ -473,7 +492,7 @@ export class ReportModelComponent implements OnInit {
       this.saveButton?.hideButton();
       return;
     }
-    let showButton = true;
+    const showButton = true;
     if (showButton) {
       this.saveButton?.showButton();
       return;
@@ -550,7 +569,7 @@ export class ReportModelComponent implements OnInit {
         this.listOrganizations = result.data;
       }
     }
-    return this.listOrganizations.filter( org => sectors.includes(org.sector)).map(d => ({ label: d.name, value: d.id }));
+    return this.listOrganizations.filter(org => sectors.includes(org.sector)).map(d => ({ label: d.name, value: d.id }));
   }
 
   async getListMeasureUnits() {
@@ -579,10 +598,12 @@ export class ReportModelComponent implements OnInit {
         }
         if (event.property.multipleSelection) {
           const selectedLocality = event.property.extraListDefaults as TreeNode[];
-          event.property.defaults = selectedLocality.filter(local => local.data && !local.data.toString().includes('SELECTALL')).map(l => l.data);
+          event.property.defaults = selectedLocality
+          .filter(local => local.data && !local.data.toString().includes('SELECTALL')).map(l => l.data);
           if (selectedLocality.length > 1) {
             event.property.selectedLocalities =
-              `${selectedLocality.filter(local => local.data && !local.data.toString().includes('SELECTALL')).length} ${this.translateSrv.instant('selectedsLocalities')}`;
+              `${selectedLocality.filter(local => local.data
+                && !local.data.toString().includes('SELECTALL')).length} ${this.translateSrv.instant('selectedsLocalities')}`;
             event.property.showIconButtonSelectLocality = false;
           } else {
             event.property.selectedLocalities = selectedLocality.length > 0 ?
@@ -593,8 +614,8 @@ export class ReportModelComponent implements OnInit {
       }
     }
     if (event?.property && event.property?.sectors && this.editPermission) {
-      if(!!event.sectorChanged) {
-        event.property.sectors = event.property?.sectorsList.map( sec => sec.toLowerCase()).join(',');
+      if (!!event.sectorChanged) {
+        event.property.sectors = event.property?.sectorsList.map(sec => sec.toLowerCase()).join(',');
         event.property.list = await this.getListOrganizations(event.property.sectorsList);
         event.property.defaults = [];
       }
@@ -651,7 +672,7 @@ export class ReportModelComponent implements OnInit {
       }
       return { label: locality.name, data: locality.id, selectable };
     });
-    list.sort((a, b) => a.label < b.label ? -1 : 0)
+    list.sort((a, b) => a.label < b.label ? -1 : 0);
     if (selectable && multipleSelection) {
       this.addSelectAllNode(list, localityList, selectable);
     }
@@ -701,12 +722,13 @@ export class ReportModelComponent implements OnInit {
       required: false,
       multipleSelection: false,
       sectorsList: type === TypePropertyEnum.OrganizationSelectionModel ?
-      [TypeOrganization.Private.toUpperCase(), TypeOrganization.Public.toUpperCase(), TypeOrganization.Third.toUpperCase()] : [],
+        [TypeOrganization.Private.toUpperCase(), TypeOrganization.Public.toUpperCase(), TypeOrganization.Third.toUpperCase()] : [],
       selectedLocalities: type === TypePropertyEnum.LocalitySelectionModel && this.translateSrv.instant('selectDefaultValue'),
       showIconButtonSelectLocality: type === TypePropertyEnum.LocalitySelectionModel
     };
     newProperty.isCollapsed = false;
     await this.checkProperty(newProperty);
+    this.cancelButton.showButton();
     this.saveButton?.hideButton();
     return this.modelProperties.push(newProperty);
   }
@@ -726,6 +748,7 @@ export class ReportModelComponent implements OnInit {
       this.saveButton.showButton();
       this.checkProperties();
     }
+    this.cancelButton.showButton();
     this.loadCardItemsFiles();
   }
 
@@ -734,6 +757,7 @@ export class ReportModelComponent implements OnInit {
   }
 
   async handleOnSubmit() {
+    this.cancelButton.hideButton();
     this.formIsSaving = true;
     if (this.files && this.files.length > 0) {
       await this.sendUploadedFiles();
@@ -776,7 +800,7 @@ export class ReportModelComponent implements OnInit {
     });
     sender.paramModels = [...propertiesClone];
     sender.files = [...this.files];
-    if (sender.files && sender.files.length > 0 && sender.files.filter( file => !!file.main).length === 0) {
+    if (sender.files && sender.files.length > 0 && sender.files.filter(file => !!file.main).length === 0) {
       sender.files[0].main = true;
     }
     const result = this.idReport ? await this.reportModelSrv.put(sender) : await this.reportModelSrv.post(sender);
@@ -788,7 +812,7 @@ export class ReportModelComponent implements OnInit {
         detail: this.translateSrv.instant('messages.savedSuccessfully')
       });
       this.idReport = !this.idReport ? result.data.id : this.idReport;
-      this.loadReport(true);
+      this.loadReport();
     }
   }
 
@@ -798,7 +822,7 @@ export class ReportModelComponent implements OnInit {
     this.files = [
       ...sendedFiles,
       ...await Promise.all(
-        sendFiles.map(async (fileUploaded) => {
+        sendFiles.map(async(fileUploaded) => {
           const file = await fetch(fileUploaded.url.changingThisBreaksApplicationSecurity);
           const formData: FormData = new FormData();
           const blob = await file.blob();
@@ -813,8 +837,23 @@ export class ReportModelComponent implements OnInit {
           }
         })
       )
-    ]
+    ];
     await this.saveReport();
+  }
+
+  handleOnCancel() {
+    this.saveButton.hideButton();
+    if (!this.idReport) {
+      this.formReport.reset({
+        name: '',
+        fullName: '',
+        preferredOutputFormat: 'PDF'
+      });
+    } else {
+      this.setFormReportValues();
+    }
+    this.modelProperties = this.resetModelProperties.map(modelProp => ({ ...modelProp }));
+    this.cardItemsFiles = this.resetCardItemsFiles.map(cardItem => ({ ...cardItem }));
   }
 
   async handleCompileModel() {
@@ -840,7 +879,7 @@ export class ReportModelComponent implements OnInit {
   }
 
   showButtonCompile() {
-    return this.idReport && this.report && this.files && this.files.length > 0 && this.files.filter(file => !file.id).length === 0
+    return this.idReport && this.report && this.files && this.files.length > 0 && this.files.filter(file => !file.id).length === 0;
   }
 
   async changedActiveStatus(event) {
@@ -852,7 +891,8 @@ export class ReportModelComponent implements OnInit {
       this.messageSrv.add({
         severity: 'success',
         summary: this.translateSrv.instant('success'),
-        detail: active ? this.translateSrv.instant('messages.activedSuccessfully') : this.translateSrv.instant('messages.inactivedSuccessfully')
+        detail: active ? this.translateSrv.instant('messages.activedSuccessfully')
+          : this.translateSrv.instant('messages.inactivedSuccessfully')
       });
     }
   }

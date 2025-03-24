@@ -1,7 +1,6 @@
 <div class="app-step">
   <div class="app-content-header" [class.mobile]="responsive">
-    <span *ngIf="this.idStep; else newStepTitle">{{ this.stepDetail?.periodFromStart | date: 'MMMM': 'UTC': currentLang
-      }}</span>
+    <span *ngIf="this.idStep; else newStepTitle">{{ this.stepDetail?.periodFromStart | date: 'MMMM': 'UTC': currentLang }}</span>
     <ng-template #newStepTitle>
       <span>{{ "newMonth" | translate }}</span>
     </ng-template>
@@ -24,7 +23,9 @@
                   [maxDate]="maxStart" [defaultDate]="start" formControlName="start" (onSelect)="handleChangeValuesCardItems()"
                   [class.responsive]="responsive" icon="fas fa-calendar-alt" [dateFormat]="calendarFormat">
                 </p-calendar>
-                <label class="app-input-label" for="float-start">{{ "start" | translate }}</label>
+                <label class="app-input-label" for="float-start">{{ "start" | translate }}
+                  <i class="far fa-question-circle" [pTooltip]="'help.step.start' | translate"></i>
+                </label>
               </span>
             </div>
             <div class="p-field" [class.responsive]="responsive" *ngIf="(stepType === 'end' || (stepType === 'start' && !!onlyOneStep)) || stepType === 'newEnd'">
@@ -33,8 +34,9 @@
                   [class.responsive]="responsive" icon="fas fa-calendar-alt" [minDate]="minEnd" [maxDate]="maxEnd"
                   [defaultDate]="end" (onSelect)="handleChangeValuesCardItems()" [dateFormat]="calendarFormat">
                 </p-calendar>
-                <label class="app-input-label" class="properties-label" for="float-end">{{ "finish" |
-                  translate}}</label>
+                <label class="app-input-label" class="properties-label" for="float-end">{{ "finish" | translate}}
+                  <i class="far fa-question-circle" [pTooltip]="'help.step.finish' | translate"></i>
+                </label>
               </span>
             </div>
           </div>
@@ -42,48 +44,63 @@
             <span class="totals-title">{{"totals" | translate}}</span>
             <div class="unitMeasureValues">
               <div class="p-formgroup-inline" [class.responsive]="responsive">
-                <div class="p-field" [class.responsive]="responsive">
+                <div class="p-field" [class.responsive]="responsive" *ngIf="!isPassedMonth">
                   <span class="p-float-label" [class.responsive]="responsive">
                     <p-inputNumber class="app-input-number" formControlName="plannedWork"
                       [class.red]="formStep && formStep.controls.plannedWork.value < 0"
                       (onInput)="handleChangeTotalsValues()" [minFractionDigits]="unitPrecision"
                       [maxFractionDigits]="unitPrecision" [locale]="currentLang === 'pt-BR' ? 'pt-BR' : 'en-US'">
                     </p-inputNumber>
-                    <label class="app-input-label">{{unitName}} {{ "planned" |translate }} * </label>
+                  <label class="app-input-label">{{unitName}} {{ isCurrentBaseline ? ("reprogrammed" | translate) : ("planned" | translate) }} * 
+                      <i class="far fa-question-circle" [pTooltip]="'help.step.estimatedPhysical' | translate"></i>
+                    </label>
                   </span>
                 </div>
                 <div class="p-field" [class.responsive]="responsive">
                   <span class="p-float-label" [class.responsive]="responsive">
                     <p-inputNumber class="app-input-number" formControlName="actualWork"
-                    [class.red]="formStep && formStep.controls.actualWork.value < 0"
+                      [class.red]="formStep && formStep.controls.actualWork.value < 0"
+                      [disabled]="isActualValuesDisabled"
                       (onInput)="handleChangeTotalsValues()" [minFractionDigits]="unitPrecision"
                       [maxFractionDigits]="unitPrecision" [locale]="currentLang === 'pt-BR' ? 'pt-BR' : 'en-US'">
                     </p-inputNumber>
-                    <label class="app-input-label" for="float-actual">{{unitName}} {{ "actual" |translate }}</label>
+                    <label class="app-input-label" for="float-actual">{{unitName}} {{ "actual" |translate }}
+                      <i class="far fa-question-circle" [pTooltip]="'help.step.actualPhysical' | translate"></i>
+                    </label>
                   </span>
                 </div>
-                <div class="p-field planned-baseline" [class.responsive]="responsive"  *ngIf="baselinePlannedTotals && baselinePlannedTotals.plannedWork">
-                  <span class="label"> {{unitName}} {{ "plannedBaseline" |translate }}</span>
+                <div class="p-field planned-baseline" [class.responsive]="responsive"  *ngIf="isCurrentBaseline">
+                  <span class="label">
+                    {{unitName}} {{ "plannedBaseline" | translate }}
+                    <i class="far fa-question-circle" [pTooltip]="'help.step.baselinePhysicalTotal' | translate"></i></span>
                   <span class="value">{{ baselinePlannedTotals.plannedWork | number : '0.2' : currentLang }}</span>
                 </div>
               </div>
               
               <div class="cost-assignments-totals" [class.responsive]="responsive">
-                <div class="planned-total">
-                  <span class="label"> $ {{ "planned" |translate }}</span>
+                <div class="planned-total" *ngIf="!isPassedMonth">
+                  <span class="label"> $ {{ isCurrentBaseline ? ("reprogrammed" | translate) : ("planned" | translate) }}
+                    <i class="far fa-question-circle" [pTooltip]="'help.step.estimatedCostTotal' | translate"></i>
+                  </span>
                   <span class="value" [class.red]="costAssignmentsTotals.plannedTotal < 0">{{ costAssignmentsTotals.plannedTotal | number : '0.2' : currentLang }}</span>
                 </div>
                 <div class="actual-total">
-                  <span class="label"> $ {{ "actual" |translate }}</span>
+                  <span class="label"> $ {{ "actual" |translate }}
+                    <i class="far fa-question-circle" [pTooltip]="'help.step.actualCostTotal' | translate"></i>
+                  </span>
                   <span class="value" [class.red]="costAssignmentsTotals.actualTotal < 0">{{ costAssignmentsTotals.actualTotal | number : '0.2' : currentLang }}</span>
                 </div>
-                <div class="planned-baseline" [class.responsive]="responsive" *ngIf="baselinePlannedTotals && baselinePlannedTotals.plannedCost">
-                  <span class="label"> $ {{ "plannedBaseline" |translate }}</span>
+                <div class="planned-baseline" [class.responsive]="responsive" *ngIf="isCurrentBaseline">
+                  <span class="label"> $ {{ "plannedBaseline" |translate }}
+                    <i class="far fa-question-circle" [pTooltip]="'help.step.baselineCostTotal' | translate"></i>
+                  </span>
                   <span class="value">{{ baselinePlannedTotals.plannedCost | number : '0.2' : currentLang }}</span>
                 </div>
               </div>
               <div class="p-field distribution-container" [class.responsive]="responsive" *ngIf="!idStep">
-                <label class="app-input-label" class="properties-label" for="float-end">{{ "distribution" |translate}}</label>
+                <label class="app-input-label" class="properties-label" for="float-end">{{ "distribution" |translate}}
+                  <i class="far fa-question-circle" [pTooltip]="'help.step.distribution' | translate"></i>
+                </label>
                 <div class="radios-container">
                   <p-radioButton class="distribution-radio" value="SIGMOIDAL" formControlName="distribution" [label]="'sigmoidal'| translate">
                   </p-radioButton>
@@ -103,7 +120,7 @@
             [emptyMessage]="'loadingEllipsis' | translate">
             <ng-template let-cardItem pTemplate="gridItem">
               <div class="p-col-12 p-md-3 p-sm-12 card-item-container" [class.responsive]="responsive">
-                <app-cost-assignment-card-item [properties]="cardItem" (costChanged)="handleChangeValuesCardItems()">
+                <app-cost-assignment-card-item [periodFromStart]="this.stepDetail?.periodFromStart" [hasActiveBaseline]="isCurrentBaseline" [isPassedMonth]="isPassedMonth" [properties]="cardItem" (costChanged)="handleChangeValuesCardItems()">
                 </app-cost-assignment-card-item>
               </div>
             </ng-template>
@@ -115,9 +132,8 @@
   <div class="id-container" *ngIf="idStep && cardStepProperties && !isLoading">
     <span>{{idStep}}</span>
   </div>
-  <div class="app-save-button-layout">
-    <div class="app-save-button-wrapper" *ngIf="!!showSaveButton" @enterLeave>
-      <span class="button-label" (click)="saveStep()">{{ 'save' | translate }}</span>
-    </div>
-  </div>
+  <app-buttons-container>
+    <app-save-button (save)="saveStep()"></app-save-button>
+    <app-cancel-button (cancel)="handleOnCancel()"></app-cancel-button>
+  </app-buttons-container>
   

@@ -12,6 +12,7 @@ import { Router } from '@angular/router';
 import { FilterDataviewPropertiesEntity } from 'src/app/shared/constants/filterDataviewPropertiesEntity';
 import { IFilterProperty } from 'src/app/shared/interfaces/IFilterProperty';
 import { BaselinesPanelsEnum } from 'src/app/shared/enums/BaselinesPanelsEnum';
+import { AuthService } from 'src/app/shared/services/auth.service';
 
 
 @Component({
@@ -29,7 +30,9 @@ export class BaselinesListComponent implements OnInit, OnDestroy {
   pageSize = 5;
   isLoading = false;
   panelsEnum = BaselinesPanelsEnum;
-  filters
+  filters;
+  showBackToManagement = false;
+  infoPerson;
 
   constructor(
     private responsiveSrv: ResponsiveService,
@@ -38,6 +41,7 @@ export class BaselinesListComponent implements OnInit, OnDestroy {
     private configDataViewSrv: ConfigDataViewService,
     private filterSrv: FilterDataviewService,
     private router: Router,
+    private authSrv: AuthService
   ) {
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.responsive = value);
     this.configDataViewSrv.observableCollapsePanelsStatus.pipe(takeUntil(this.$destroy)).subscribe(collapsePanelStatus => {
@@ -58,6 +62,7 @@ export class BaselinesListComponent implements OnInit, OnDestroy {
   async ngOnInit(): Promise<void> {
     await this.setBreadcrumb();
     this.setCardsBaselines();
+    this.checkShowBackToManagement();
   }
 
   ngOnDestroy(): void {
@@ -74,6 +79,54 @@ export class BaselinesListComponent implements OnInit, OnDestroy {
     ]);
   }
 
+  checkShowBackToManagement() {
+    this.infoPerson = this.authSrv.getInfoPerson();
+    if (this.infoPerson && this.infoPerson.workLocal &&
+      (this.infoPerson.workLocal.idOffice || this.infoPerson.workLocal.idPlan || this.infoPerson.workLocal.idWorkpack) ) {
+        this.showBackToManagement = true;
+    }
+  }
+
+  async navigateToManagement() {
+    const workLocal = this.infoPerson.workLocal;
+      if (workLocal.idWorkpackModelLinked && workLocal.idWorkpack && workLocal.idPlan && workLocal.idOffice) {
+        this.router.navigate(['workpack'], {
+          queryParams: {
+            id: Number(workLocal.idWorkpack),
+            idPlan: Number(workLocal.idPlan),
+            idWorkpackModelLinked: Number(workLocal.idWorkpackModelLinked)
+          }
+        });
+        return;
+      }
+      if (workLocal.idWorkpack && workLocal.idPlan && workLocal.idOffice) {
+        this.router.navigate(['workpack'], {
+          queryParams: {
+            id: Number(workLocal.idWorkpack),
+            idPlan: Number(workLocal.idPlan),
+          }
+        });
+        return;
+      }
+      if (workLocal.idPlan && workLocal.idOffice) {
+        this.router.navigate(['plan'], {
+          queryParams: {
+            id: Number(workLocal.idPlan),
+          }
+        });
+        return;
+      }
+      if (workLocal.idOffice) {
+        this.router.navigate(['offices/office'], {
+          queryParams: {
+            id: Number(workLocal.idOffice),
+          }
+        });
+        return;
+      }
+  }
+
+  
   async setCardsBaselines() {
     this.cardsBaselines = [];
     Object
@@ -153,7 +206,7 @@ export class BaselinesListComponent implements OnInit, OnDestroy {
       this.filterSrv.setFilterProperties(filterProperties);
       this.router.navigate(['/filter-dataview'], {
         queryParams: {
-          id: idFilter,
+          idFilter: idFilter,
           entityName: 'baselines'
         }
       });

@@ -47,13 +47,13 @@
         background-color: transparent;
       }
       .p-dropdown {
-        font-size: 0.9rem;
+        font-size: 0.8rem !important;
         width: 50px;
         height: 30px;
         border: solid 1px #999999;
         background-color: transparent;
         .p-inputtext {
-          font-size: 0.9rem;
+          font-size: 0.8rem;
           padding: 2px 0 2px 5px;
           background-color: transparent;
         }
@@ -64,6 +64,9 @@
         .pi-chevron-down {
           font-size: 0.8rem !important;
         }
+      }
+      .p-dropdown-panel .p-dropdown-items .p-dropdown-item {
+        font-size: 0.8rem;
       }
       .p-dropdown:not(.disabled).p-focus {
         box-shadow: none;

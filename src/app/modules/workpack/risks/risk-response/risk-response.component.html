@@ -19,12 +19,16 @@
               <span class="p-float-label">
                 <input class="app-input-text" id="float-name" name="name" formControlName="name" type="text"
                   pInputText />
-                <label class="app-input-label" for="float-name">{{ "name" | translate }} * </label>
+                <label class="app-input-label" for="float-name">{{ "name" | translate }} * 
+                  <i class="far fa-question-circle" [pTooltip]="'help.riskResponse.name' | translate"></i>
+                </label>
               </span>
               <app-input-message [form]="formRiskResponse" field="name"></app-input-message>
             </div>
             <div class="p-field when-container">
-              <label class="when-label">{{'when' |translate}}</label>
+              <label class="when-label">{{'when' |translate}}
+                <i class="far fa-question-circle" [pTooltip]="'help.riskResponse.when' | translate"></i>
+              </label>
               <div class="when-radios-container">
                 <p-radioButton class="when-radio" value="PRE_OCCURRENCE" formControlName="when"
                   [label]="'preOccurrency' |translate">
@@ -41,7 +45,9 @@
                   [yearNavigator]="true" formControlName="startDate" [yearRange]="yearRangeCalculated"
                   icon="fas fa-calendar-alt" [dateFormat]="calendarFormat">
                 </p-calendar>
-                <label class="app-input-label" for="float-start">{{ "start" | translate }}</label>
+                <label class="app-input-label" for="float-start">{{ "start" | translate }}
+                  <i class="far fa-question-circle" [pTooltip]="'help.riskResponse.start' | translate"></i>
+                </label>
               </span>
             </div>
             <div class="p-field end">
@@ -50,8 +56,9 @@
                   [monthNavigator]="true" [yearNavigator]="true" [yearRange]="yearRangeCalculated"
                   icon="fas fa-calendar-alt" [dateFormat]="calendarFormat">
                 </p-calendar>
-                <label class="app-input-label" class="properties-label" for="float-end">{{ "finish" |
-                  translate}}</label>
+                <label class="app-input-label" class="properties-label" for="float-end">{{ "finish" | translate}}
+                  <i class="far fa-question-circle" [pTooltip]="'help.riskResponse.finish' | translate"></i>
+                </label>
               </span>
             </div>
           </div>
@@ -61,7 +68,9 @@
                 <p-dropdown class="app-single-selection" [options]="strategyOptions" formControlName="strategy"
                   dropdownIcon="fas fa-caret-down" [autoDisplayFirst]="false">
                 </p-dropdown>
-                <label class="app-input-label">{{'strategy'|translate}} * </label>
+                <label class="app-input-label">{{'strategy'|translate}} * 
+                  <i class="far fa-question-circle" [pTooltip]="'help.riskResponse.strategy' | translate"></i>
+                </label>
               </span>
               <app-input-message [form]="formRiskResponse" field="strategy"></app-input-message>
             </div>
@@ -70,7 +79,9 @@
                 <p-dropdown class="app-single-selection" [options]="statusOptions" formControlName="status"
                   dropdownIcon="fas fa-caret-down" [autoDisplayFirst]="false">
                 </p-dropdown>
-                <label class="app-input-label">{{'status'|translate}} *</label>
+                <label class="app-input-label">{{'status'|translate}} *
+                  <i class="far fa-question-circle" [pTooltip]="'help.riskResponse.status' | translate"></i>
+                </label>
               </span>
               <app-input-message [form]="formRiskResponse" field="status"></app-input-message>
             </div>
@@ -80,7 +91,9 @@
               <span class="p-float-label">
                 <textarea pInputTextarea id="float-trigger" formControlName="trigger" class="app-text-area" [rows]="1" >
                 </textarea>
-                <label class="app-input-label" for="float-trigger">{{ "trigger" | translate }}</label>
+                <label class="app-input-label" for="float-trigger">{{ "trigger" | translate }}
+                  <i class="far fa-question-circle" [pTooltip]="'help.riskResponse.trigger' | translate"></i>
+                </label>
               </span>
               <app-input-message [form]="formRiskResponse" field="trigger"></app-input-message>
             </div>
@@ -88,7 +101,9 @@
               <span class="p-float-label">
                 <textarea pInputTextarea id="float-plan" formControlName="plan" class="app-text-area" [rows]="1">
                 </textarea>
-                <label class="app-input-label" for="float-plan">{{ "plan" | translate }}</label>
+                <label class="app-input-label" for="float-plan">{{ "plan" | translate }}
+                  <i class="far fa-question-circle" [pTooltip]="'help.riskResponse.planDescription' | translate"></i>
+                </label>
               </span>
               <app-input-message [form]="formRiskResponse" field="plan"></app-input-message>
             </div>
@@ -98,7 +113,9 @@
                 [selectedItemsLabel]="language === 'pt-BR' ? '{0} itens selecionados' : '{0} items selected'"
                   formControlName="responsible" [options]="stakeholderOptions" optionLabel="label" optionValue="value">
                 </p-multiSelect>
-                <label class="app-input-label" for="float-label">{{'responsible' |translate}}</label>
+                <label class="app-input-label" for="float-label">{{'responsible' |translate}}
+                  <i class="far fa-question-circle" [pTooltip]="'help.riskResponse.responsible' | translate"></i>
+                </label>
               </span>
               <app-input-message [form]="formRiskResponse" field="responsible"></app-input-message>
             </div>
@@ -111,4 +128,7 @@
     <span>{{idRiskResponse}}</span>
   </div>
 </div>
-<app-save-button #saveButton (save)="saveRiskResponse()"></app-save-button>
+<app-buttons-container>
+  <app-save-button #saveButton (save)="saveRiskResponse()"></app-save-button>
+  <app-cancel-button (cancel)="handleOnCancel()"></app-cancel-button>
+</app-buttons-container>

@@ -24,10 +24,10 @@
         font-family: v.$fontFamilyBold;
         font-weight: 700;
         font-style: normal;
-        font-size: 1rem;
+        font-size: 0.9rem;
         color: #004660;
         > i {
-          font-size: 1.5rem;
+          font-size: 1.2rem;
         }
         > span {
           margin-left: 1em;
@@ -40,7 +40,7 @@
         justify-content: center;
         font-family: v.$fontFamilyBold;
         font-weight: bold;
-        font-size: 0.8rem;
+        font-size: 0.7rem;
       }
       .negative-variation {
         color: #EA5C5C;
@@ -68,7 +68,7 @@
           font-family: v.$fontFamilyBold;
           font-weight: 700;
           font-style: normal;
-          font-size: 12px;
+          font-size: 10px;
           color: #B5B5B5;
         }
         .progress-bar {

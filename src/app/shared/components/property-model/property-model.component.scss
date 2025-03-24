@@ -12,6 +12,7 @@
   .model-property-header {
     display: flex;
     flex: 1;
+    font-size: 0.8rem !important;
     justify-content: space-between;
 
     .left-side {
@@ -47,7 +48,6 @@
   .p-panel-header {
     display: inline-flex;
     min-width: 200px;
-    min-height: 65px;
     background-color: rgba(250, 250, 249, 1);
     border-color: v.$borderLightGrey;;
     padding: .5em;
@@ -71,6 +71,10 @@
     label {
       margin-bottom: 5px;
     }
+  }
+  .help-text {
+    min-width: 20%;
+    flex: 1;
   }
   .p-toggleable-content  .p-panel-content {
     background-color: rgba(250, 250, 249, 1);

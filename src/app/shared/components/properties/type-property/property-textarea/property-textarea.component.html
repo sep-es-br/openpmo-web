@@ -5,5 +5,7 @@
     [class.ng-invalid]="property.invalid" [rows]="property.rows ? property.rows : 1"
     (ngModelChange)="changed.emit($event)">
   </textarea>
-  <label class="app-input-label" [for]="property.name">{{ property.label}} {{ property.required ? '*' : ''}}</label>
+  <label class="app-input-label" [for]="property.name">{{ property.label}} {{ property.required ? '*' : ''}}
+    <i class="far fa-question-circle" *ngIf="property.helpText && property.helpText.length > 0" [pTooltip]="property.helpText"></i>
+  </label>
 </span>

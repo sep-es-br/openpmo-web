@@ -47,7 +47,7 @@ export class RiskService extends BaseService<IRisk> {
           this.idFilterSelected = params.idFilterSelected;
           this.term = params.term
         } else {
-          const resultFilter = await this.filterSrv.getAllFilters(`workpackModels/${this.workpackData.workpack.model.id}/risks`);
+          const resultFilter = await this.filterSrv.getAllFilters(`workpackModels/${this.workpackData.workpackModel.id}/risks`);
           if (resultFilter.success) {
             this.filters = resultFilter.data;
             this.idFilterSelected = this.filters && this.filters.find(defaultFilter => !!defaultFilter.favorite) ?

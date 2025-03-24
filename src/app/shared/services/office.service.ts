@@ -8,6 +8,7 @@ import { IHttpResult } from '../interfaces/IHttpResult';
 import { IOffice } from '../interfaces/IOffice';
 import { ITreeViewScopeOffice } from '../interfaces/ITreeScopePersons';
 import { AuthService } from './auth.service';
+import { PrepareHttpParams } from '../utils/query.util';
 
 @Injectable({
   providedIn: 'root'
@@ -53,8 +54,8 @@ export class OfficeService extends BaseService<IOffice> {
     }, 500);
   }
 
-  public async GetTreeScopePersons(idOffice: number): Promise<IHttpResult<ITreeViewScopeOffice>> {
-    const result = await this.http.get(`${this.urlBase}/${idOffice}/tree-view`).toPromise();
+  public async GetTreeScopePersons(idOffice: number, options?): Promise<IHttpResult<ITreeViewScopeOffice>> {
+    const result = await this.http.get(`${this.urlBase}/${idOffice}/tree-view`, { params: PrepareHttpParams(options) }).toPromise();
     return result as IHttpResult<ITreeViewScopeOffice>;
   }
 

@@ -14,6 +14,7 @@ import { Subject } from 'rxjs';
 import { SaveButtonComponent } from 'src/app/shared/components/save-button/save-button.component';
 import { Component, EventEmitter, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import * as moment from 'moment';
+import { CancelButtonComponent } from 'src/app/shared/components/cancel-button/cancel-button.component';
 
 @Component({
   selector: 'app-process',
@@ -23,6 +24,7 @@ import * as moment from 'moment';
 export class ProcessComponent implements OnInit, OnDestroy {
 
   @ViewChild(SaveButtonComponent) saveButton: SaveButtonComponent;
+  @ViewChild(CancelButtonComponent) cancelButton: CancelButtonComponent;
 
   responsive: boolean;
   idProcess: number;
@@ -39,6 +41,7 @@ export class ProcessComponent implements OnInit, OnDestroy {
   isLoading = false;
   idPlan: number;
   formIsSaving = false;
+  processNumber = '';
 
   constructor(
     private actRouter: ActivatedRoute,
@@ -52,7 +55,7 @@ export class ProcessComponent implements OnInit, OnDestroy {
     private workpackSrv: WorkpackService
   ) {
     this.actRouter.queryParams.subscribe(async queryParams => {
-      this.idProcess = queryParams.id && +queryParams.id;
+      this.idProcess = queryParams.idProcess && +queryParams.idProcess;
       this.idWorkpack = queryParams.idWorkpack && +queryParams.idWorkpack;
     });
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.responsive = value);
@@ -72,7 +75,11 @@ export class ProcessComponent implements OnInit, OnDestroy {
     this.formProcess.valueChanges
       .pipe(takeUntil(this.$destroy), filter(() => this.formProcess.dirty && this.formProcess.valid))
       .subscribe(() => this.saveButton.showButton());
+    this.formProcess.valueChanges
+      .pipe(takeUntil(this.$destroy), filter(() => this.formProcess.dirty))
+      .subscribe(() => this.cancelButton.showButton());
     this.debounceSearch.pipe(debounceTime(300), takeUntil(this.$destroy)).subscribe(() => {
+      this.processNumber = this.formProcess.controls.processNumber.value;
       this.resetFormProcess();
       this.process = undefined;
       this.showProcessHistory = false;
@@ -91,13 +98,16 @@ export class ProcessComponent implements OnInit, OnDestroy {
   }
 
   resetFormProcess() {
-    this.formProcess.controls.name.setValue('');
-    this.formProcess.controls.subject.setValue('');
-    this.formProcess.controls.currentOrganization.setValue('');
-    this.formProcess.controls.lengthOfStayOn.setValue(null);
-    this.formProcess.controls.note.setValue('');
-    this.formProcess.controls.priority.setValue('');
-    this.formProcess.controls.status.setValue('');
+    this.formProcess.reset({
+      name: '',
+      processNumber: this.processNumber,
+      subject: '',
+      currentOrganization: '',
+      lengthOfStayOn: '',
+      note: '',
+      priority: false,
+      status: ''
+    });
   }
 
   ngOnDestroy(): void {
@@ -137,20 +147,23 @@ export class ProcessComponent implements OnInit, OnDestroy {
   }
 
   setFormProcess() {
+
     const days = this.process.lengthOfStayOn === 1 ? this.process.lengthOfStayOn.toString() + ' ' + this.translateSrv.instant('day') :
       this.process.lengthOfStayOn.toString() + ' ' + this.translateSrv.instant('days');
-    this.formProcess.controls.name.setValue(this.process.name);
-    this.formProcess.controls.processNumber.setValue(this.process.processNumber);
-    this.formProcess.controls.subject.setValue(this.process.subject);
-    this.formProcess.controls.currentOrganization.setValue(this.process.currentOrganization);
-    this.formProcess.controls.lengthOfStayOn.setValue(days);
-    this.formProcess.controls.note.setValue(this.process.note);
-    this.formProcess.controls.priority.setValue(this.process.priority);
+    this.formProcess.reset({
+      name: this.process.name,
+      processNumber: this.process.processNumber,
+      subject: this.process.subject,
+      currentOrganization: this.process.currentOrganization,
+      lengthOfStayOn: days,
+      note: this.process.note,
+      priority: this.process.priority,
+      status: this.process.status
+    });
     this.formProcess.controls.subject.disable();
     this.formProcess.controls.currentOrganization.disable();
     this.formProcess.controls.lengthOfStayOn.disable();
     this.formProcess.controls.priority.disable();
-    this.formProcess.controls.status.setValue(this.process.status);
     this.formProcess.controls.status.disable();
     if (this.idProcess) {
       this.formProcess.controls.processNumber.disable();
@@ -160,7 +173,7 @@ export class ProcessComponent implements OnInit, OnDestroy {
     } else {
       this.isLoading = false;
     }
-    
+
   }
 
   async loadPropertiesProcess() {
@@ -202,11 +215,9 @@ export class ProcessComponent implements OnInit, OnDestroy {
       breadcrumbItems = await this.breadcrumbSrv.loadWorkpackBreadcrumbs(this.idWorkpack, this.idPlan)
     }
     this.breadcrumbSrv.setMenu([
-      ... breadcrumbItems,
+      ...breadcrumbItems,
       {
         key: 'process',
-        routerLink: ['/workpack/process'],
-        queryParams: { idWorkpack: this.idWorkpack, id: this.idProcess },
         info: this.process?.name,
         tooltip: this.process?.name
       }
@@ -244,6 +255,7 @@ export class ProcessComponent implements OnInit, OnDestroy {
   }
 
   async saveProcess() {
+    this.cancelButton.hideButton();
     this.formIsSaving = true;
     const sender: IProcess = {
       id: this.idProcess,
@@ -257,8 +269,9 @@ export class ProcessComponent implements OnInit, OnDestroy {
       priority: this.formProcess.controls.priority.value,
       status: this.formProcess.controls.status.value
     };
-    const result = this.idProcess ? await this.processSrv.put(sender) : await this.processSrv.post(sender);
-    
+    const put = !!this.idProcess;
+    const result =  put ? await this.processSrv.put(sender) : await this.processSrv.post(sender);
+
     if (result.success) {
       this.messageSrv.add({
         severity: 'success',
@@ -266,7 +279,33 @@ export class ProcessComponent implements OnInit, OnDestroy {
         detail: this.translateSrv.instant('messages.savedSuccessfully')
       });
       this.idProcess = result.data.id;
+
+      if (!put) {
+        this.process.name = sender.name;
+        this.setBreadcrumb();
+        
+      };
       this.formIsSaving = false;
+    }
+  }
+
+  handleOnCancel() {
+    this.saveButton.hideButton();
+    if (this.idProcess) {
+      this.setFormProcess();
+    } else {
+      this.formProcess.reset({
+        name: '',
+        processNumber: '',
+        subject: '',
+        currentOrganization: '',
+        lengthOfStayOn: '',
+        note: '',
+        priority: false,
+        status: ''
+      });
+      this.process = undefined;
+      this.cardProcessHistory = undefined;
     }
   }
 

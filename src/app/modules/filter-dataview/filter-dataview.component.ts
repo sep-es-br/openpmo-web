@@ -4,7 +4,6 @@ import { LocalityService } from './../../shared/services/locality.service';
 import { DomainService } from './../../shared/services/domain.service';
 import { ILocalityList } from './../../shared/interfaces/ILocality';
 import { IDomain } from './../../shared/interfaces/IDomain';
-import { TypePropertyModelEnum } from './../../shared/enums/TypePropertyModelEnum';
 import { IWorkpackModelProperty } from './../../shared/interfaces/IWorkpackModelProperty';
 import { WorkpackModelService } from './../../shared/services/workpack-model.service';
 import { IBreadcrumb } from './../../shared/interfaces/IBreadcrumb';
@@ -30,6 +29,10 @@ import { AuthService } from 'src/app/shared/services/auth.service';
 import { OfficePermissionService } from 'src/app/shared/services/office-permission.service';
 import { IOrganization } from 'src/app/shared/interfaces/IOrganization';
 import { CostAccountModelService } from 'src/app/shared/services/cost-account-model.service';
+import { TypeWorkpackModelEnum } from 'src/app/shared/enums/TypeWorkpackModelEnum';
+import { TypePropertyModelEnum } from 'src/app/shared/enums/TypePropertyModelEnum';
+import { CostAccountService } from 'src/app/shared/services/cost-account.service';
+import { CancelButtonComponent } from 'src/app/shared/components/cancel-button/cancel-button.component';
 
 @Component({
   selector: 'app-filter-dataview',
@@ -39,6 +42,7 @@ import { CostAccountModelService } from 'src/app/shared/services/cost-account-mo
 export class FilterDataviewComponent implements OnInit, OnDestroy {
 
   @ViewChild(SaveButtonComponent) saveButton: SaveButtonComponent;
+  @ViewChild(CancelButtonComponent) cancelButton: CancelButtonComponent;
 
   $destroy = new Subject();
   formFilter: FormGroup;
@@ -51,13 +55,14 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
   filterData: IFilterDataview;
   propertiesListOptions: SelectItem[];
   ruleCards: ICardItemFilterRules[];
+  backupRoleCards: ICardItemFilterRules[];
   filterPropertiesList: IFilterProperty[] = this.filterSrv.get;
   filterPropertiesSub: Subscription;
   currentBreadcrumbItems: IBreadcrumb[] = this.breadcrumbSrv.get;
   currentBreadcrumbSub: Subscription;
   typePropertyModel = TypePropertyModelEnum;
   idOffice: number;
-  workpackModelEntitiesOptions = ['stakeholders', 'risks', 'issues', 'processes'];
+  workpackModelEntitiesOptions = ['stakeholders', 'risks', 'issues', 'processes', 'indicators'];
   localityList;
   organizations: IOrganization[] = [];
   idCostAccountModel: number;
@@ -80,25 +85,32 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
     private authSrv: AuthService,
     private officePermissionSrv: OfficePermissionService,
     private router: Router,
-    private costAccountModelSrv: CostAccountModelService
+    private costAccountModelSrv: CostAccountModelService,
+    private costAccountSrv: CostAccountService
+  
   ) {
     this.loadFormFilter();
     this.formFilter.statusChanges
       .pipe(takeUntil(this.$destroy), filter(status => status === 'INVALID'))
       .subscribe(() => this.saveButton?.hideButton());
     this.formFilter.valueChanges
-      .pipe(takeUntil(this.$destroy), filter(() => this.formFilter.dirty))
+      .pipe(takeUntil(this.$destroy), filter(() => this.formFilter.dirty && this.formFilter.valid))
       .subscribe(() => {
         if (this.validadeRulesCards()) {
           this.saveButton.showButton();
         }
+
+      });
+    this.formFilter.valueChanges
+      .pipe(takeUntil(this.$destroy), filter(() => this.formFilter.dirty))
+      .subscribe(() => {
+        this.cancelButton.showButton();
       });
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.responsive = value);
-    this.activeRoute.queryParams.subscribe(({ id, entityName, idWorkpackModel, idOffice, idCostAccountModel }) => {
-      this.idFilter = id ? +id : undefined;
+    this.activeRoute.queryParams.subscribe(({ idFilter, entityName, idWorkpackModel, idOffice }) => {
+      this.idFilter = idFilter ? +idFilter : undefined;
       this.entityName = entityName;
       this.idWorkpackModel = idWorkpackModel ? +idWorkpackModel : undefined;
-      this.idCostAccountModel = idCostAccountModel ? +idCostAccountModel : undefined;
       this.idOffice = +idOffice;
       this.checkURL(`#${this.locationSrv.path()}`);
     });
@@ -122,6 +134,9 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
         case 'processes':
           this.filterUrl = `workpackModels/${this.idWorkpackModel}/processes`;
           break;
+        case 'indicators':
+          this.filterUrl = `workpackModels/${this.idWorkpackModel}/indicators`;
+          break;
         default:
           break;
       }
@@ -131,7 +146,7 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
   }
 
   async checkURL(url: string) {
-    const [ path ] = url.slice(2).split('?');
+    const [path] = url.slice(2).split('?');
     if (path.startsWith('config/filter-dataview')) {
       const isAdmin = await this.authSrv.isUserAdmin();
       if (!isAdmin) {
@@ -154,7 +169,6 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
     });
     this.currentBreadcrumbSub = this.breadcrumbSrv.ready.subscribe(data => {
       this.currentBreadcrumbItems = data;
-      this.setCurrentBreadcrumb();
     });
     if (!!this.idWorkpackModel && this.entityName === 'workpacks') {
       await this.loadWorkpackFilterPropertiesList();
@@ -189,9 +203,10 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
   setCurrentBreadcrumb() {
     if (this.currentBreadcrumbItems && this.currentBreadcrumbItems.length > 0) {
       this.breadcrumbSrv.setMenu([...this.currentBreadcrumbItems,
-        ...[{
-          key: 'filter',
-        }]
+      ...[{
+        key: 'filter',
+        admin: true
+      }]
       ]);
     }
   }
@@ -201,7 +216,7 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
       label: (!this.idWorkpackModel || (!!this.idWorkpackModel && this.workpackModelEntitiesOptions.includes(this.entityName)))
         ? this.translateSrv.instant(prop.name) : prop.label,
       value: (!this.idWorkpackModel || (!!this.idWorkpackModel && this.workpackModelEntitiesOptions.includes(this.entityName)))
-        ? prop.name : prop.idPropertyModel.toString()
+        ? prop.name : (prop.idPropertyModel ? prop.idPropertyModel.toString() : prop.name)
     }));
   }
 
@@ -214,10 +229,12 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
   }
 
   setFormFilter() {
-    this.formFilter.controls.name.setValue(this.filterData.name);
-    this.formFilter.controls.favorite.setValue(this.filterData.favorite);
-    this.formFilter.controls.sortBy.setValue(this.filterData.sortBy);
-    this.formFilter.controls.sortByDirection.setValue(this.filterData.sortByDirection);
+    this.formFilter.reset({
+      name: this.filterData.name,
+      favorite: this.filterData.favorite,
+      sortBy: this.filterData.sortBy,
+      sortByDirection: this.filterData.sortByDirection
+    });
   }
 
   loadPropertiesCardFilter() {
@@ -238,7 +255,8 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
       this.ruleCards = this.filterData.rules.map(rule => {
         const propertySelected = (!this.idWorkpackModel || (!!this.idWorkpackModel && this.workpackModelEntitiesOptions.includes(this.entityName)))
           ? { ...this.filterPropertiesList.find(property => property.name === rule.propertyName) } :
-          { ...this.filterPropertiesList.find(property => property.idPropertyModel.toString() === rule.propertyName.toString()) };
+          { ...this.filterPropertiesList.find(property => (property.idPropertyModel && property.idPropertyModel.toString() === rule.propertyName.toString()) ||
+            (property.name === rule.propertyName.toString())) };
         return {
           id: rule.id,
           typeCard: 'rule-card',
@@ -254,7 +272,7 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
           }]
         };
       });
-      
+
       this.ruleCards.push({
         typeCard: 'new-card'
       });
@@ -263,9 +281,11 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
         typeCard: 'new-card'
       }];
     }
+    this.backupRoleCards = this.ruleCards.map( card => ({...card}));
   }
 
   async handleCreateNewRuleCard(event?) {
+    this.cancelButton.showButton();
     if (!this.idWorkpackModel || (!!this.idWorkpackModel && this.workpackModelEntitiesOptions.includes(this.entityName))) {
       await this.instanceFilterPropertiesList();
     }
@@ -296,6 +316,7 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
 
   handleDeleteCardItem(index) {
     this.ruleCards.splice(index, 1);
+    this.cancelButton.showButton();
     if (this.formFilter.valid && this.validadeRulesCards()) {
       this.saveButton.showButton();
     } else {
@@ -304,6 +325,7 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
   }
 
   handlePropertyValueChanged(event) {
+    this.cancelButton.showButton();
     if (this.formFilter.valid && this.validadeRulesCards()) {
       this.saveButton.showButton();
     } else {
@@ -321,6 +343,7 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
   }
 
   async handleOnSubmit() {
+    this.cancelButton.hideButton();
     const sender: IFilterDataview = {
       id: this.idFilter,
       name: this.formFilter.controls.name.value,
@@ -330,7 +353,7 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
       rules: this.ruleCards.filter(ruleCard => ruleCard.typeCard !== 'new-card').map(card => ({
         id: card.id,
         propertyName: (!this.idWorkpackModel || (!!this.idWorkpackModel && this.workpackModelEntitiesOptions.includes(this.entityName))) ?
-          card.propertySelected.name : card.propertySelected.idPropertyModel.toString(),
+          card.propertySelected.name : (card.propertySelected.idPropertyModel ? card.propertySelected.idPropertyModel.toString() : card.propertySelected.name),
         operator: card.operator,
         value: (!this.idWorkpackModel || (!!this.idWorkpackModel && this.workpackModelEntitiesOptions
           .includes(this.entityName))) ? card.value :
@@ -347,25 +370,42 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
     }
   }
 
+  handleOnCancel() {
+    this.saveButton.hideButton();
+    if (this.idFilter) {
+      this.setFormFilter();
+      this.ruleCards = this.backupRoleCards.map( card => ({...card}));
+    } else {
+      this.formFilter.reset({
+        name: '',
+        favorite: false,
+        sortBy: '',
+        sortByDirection: ''
+      });
+      this.ruleCards = [{
+        typeCard: 'new-card'
+      }];
+    }
+  }
+
   navigateToBack() {
     this.currentBreadcrumbItems = this.breadcrumbSrv.get;
-      if (this.currentBreadcrumbItems && this.currentBreadcrumbItems.length > 0) {
-        const lastItem = this.currentBreadcrumbItems[this.currentBreadcrumbItems.length - 1];
-        this.router.navigate([...lastItem.routerLink], {
-          queryParams: {
-            ...lastItem.queryParams
-          }
-        });
-      } else {
-        this.router.navigate(['/offices']);
-      }
+    if (this.currentBreadcrumbItems && this.currentBreadcrumbItems.length > 0) {
+      const lastItem = this.currentBreadcrumbItems[this.currentBreadcrumbItems.length - 1];
+      this.router.navigate([...lastItem.routerLink], {
+        queryParams: {
+          ...lastItem.queryParams
+        }
+      });
+    } else {
+      this.router.navigate(['/offices']);
+    }
   }
 
   getValueProperty(property: IFilterProperty, propValue) {
     let value;
     switch (property.type) {
       case TypePropertyModelEnum.DateModel:
-        const date = propValue as Date;
         value = moment(propValue).format('yyyy-MM-DD');
         break;
       case TypePropertyModelEnum.SelectionModel:
@@ -477,7 +517,8 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
         type: prop.type,
         label: this.translateSrv.instant(prop.label),
         name: prop.name,
-        possibleValues: prop.possibleValues
+        possibleValues: prop.possibleValues,
+        helpText: prop.helpText
       };
       this.filterPropertiesList.push(property);
     });
@@ -486,12 +527,18 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
   async loadWorkpackFilterPropertiesList() {
     const resultWorkpackModel = await this.workpackModelSrv.GetById(this.idWorkpackModel);
     const workpackModel = resultWorkpackModel.success && resultWorkpackModel.data;
-    const workpackModelActivesProperties = workpackModel.properties.filter(w => w.active);
-    const workpackModelPropertiesList = await Promise.all(workpackModelActivesProperties.map(p => this.instanceProperty(p)));
-    this.filterPropertiesList = workpackModelPropertiesList;
+    this.filterPropertiesList = [this.instancePropertyStaticWorkpack('name', TypePropertyModelEnum.TextModel)];
+    this.filterPropertiesList.push(this.instancePropertyStaticWorkpack('fullName', TypePropertyModelEnum.TextAreaModel));
+    if( workpackModel.type === TypeWorkpackModelEnum.MilestoneModel) {
+      this.filterPropertiesList.push(this.instancePropertyStaticWorkpack('date', TypePropertyModelEnum.DateModel))
+    }
+    const workpackModelActivesProperties = workpackModel.properties && workpackModel.properties.filter(w => w.active);
+    const workpackModelPropertiesList = workpackModelActivesProperties && await Promise.all(workpackModelActivesProperties.map(p => this.instanceProperty(p)));
+    this.filterPropertiesList = workpackModelPropertiesList ? [...this.filterPropertiesList, ...workpackModelPropertiesList] : this.filterPropertiesList;
   }
 
   async loadCostAccountFilterPropertiesList() {
+    this.idCostAccountModel = await this.costAccountSrv.loadIdCostAccountModel();
     const resultCostAccountModel = await this.costAccountModelSrv.GetById(this.idCostAccountModel);
     const costAccountModel = resultCostAccountModel.success && resultCostAccountModel.data;
     const costAccountModelActivesProperties = costAccountModel.properties.filter(w => w.active);
@@ -499,8 +546,18 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
       .filter(prop => this.typePropertyModel[prop.type] === TypePropertyModelEnum.OrganizationSelectionModel).length > 0) {
       await this.loadOrganizationsOffice();
     }
-    const costAccountPropertiesList = await Promise.all(costAccountModelActivesProperties.map( p => this.instanceProperty(p)));
+    const costAccountPropertiesList = await Promise.all(costAccountModelActivesProperties.map(p => this.instanceProperty(p)));
     this.filterPropertiesList = costAccountPropertiesList;
+  }
+
+  instancePropertyStaticWorkpack(name: string, type: string) {
+    const property: IFilterProperty = {
+      type: type,
+      label: this.translateSrv.instant(name),
+      name: name,
+      multipleSelection: false,
+    };
+    return property;
   }
 
   async instanceProperty(propertyModel: IWorkpackModelProperty): Promise<IFilterProperty> {
@@ -513,7 +570,8 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
       defaultValue: propertyModel.defaultValue,
       min: propertyModel.min,
       max: propertyModel.max,
-      active: propertyModel.active
+      active: propertyModel.active,
+      helpText: propertyModel.helpText
     };
 
     if (this.typePropertyModel[propertyModel.type] === TypePropertyModelEnum.SelectionModel && propertyModel.multipleSelection) {
@@ -522,7 +580,7 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
     }
 
     if (this.typePropertyModel[propertyModel.type] === TypePropertyModelEnum.SelectionModel) {
-      const listOptions = (propertyModel.possibleValues as string).split(',').sort( (a, b) => a.localeCompare(b));
+      const listOptions = (propertyModel.possibleValues as string).split(',').sort((a, b) => a.localeCompare(b));
       property.possibleValues = listOptions.map(op => ({ label: op, value: op }));
     }
 
@@ -554,7 +612,7 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
     }
 
     if (this.typePropertyModel[propertyModel.type] === TypePropertyModelEnum.OrganizationSelectionModel) {
-      property.possibleValuesIds = this.organizations.filter( org => propertyModel.sectors.includes(org.sector.toLowerCase()))
+      property.possibleValuesIds = this.organizations.filter(org => propertyModel.sectors.includes(org.sector.toLowerCase()))
         .map(d => ({ label: d.name, value: d.id }));
     }
     if (this.typePropertyModel[propertyModel.type] === TypePropertyModelEnum.UnitSelectionModel) {
@@ -584,7 +642,7 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
       }
       return { label: locality.name, data: locality.id, selectable };
     });
-    list.sort( (a,b) => a.label.localeCompare(b.label));
+    list.sort((a, b) => a.label.localeCompare(b.label));
     if (multipleSelection) {
       this.addSelectAllNode(list, localityList, selectable);
     }
@@ -620,7 +678,7 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
   async loadOrganizationsOffice() {
     const result = await this.organizationSrv.GetAll({ 'id-office': this.idOffice });
     if (result.success) {
-      this.organizations = result.data && result.data.sort( (a, b) => a.name.localeCompare(b.name));
+      this.organizations = result.data && result.data.sort((a, b) => a.name.localeCompare(b.name));
     }
   }
 
@@ -631,7 +689,7 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
       return units.map(org => ({
         label: org.name,
         value: org.id
-      })).sort( (a, b) => a.label.localeCompare(b.label));
+      })).sort((a, b) => a.label.localeCompare(b.label));
     }
   }
 

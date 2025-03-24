@@ -21,7 +21,9 @@
             <input formControlName="name" type="text" pInputText class="app-input-text" [class.mobile]="responsive"
               [class.desktop]="!responsive">
             <label for="float-input" class="app-input-label">{{'name' | translate}}<span
-                class="required-indicator">*</span></label>
+                class="required-indicator">*</span>
+                <i class="far fa-question-circle" [pTooltip]="'help.planModel.name' | translate"></i>
+              </label>
           </span>
           <app-input-message [form]="formStrategy" field="name"></app-input-message>
           <span class="p-float-label margin-top">
@@ -29,7 +31,9 @@
               [ngModel]="(formStrategy.touched) ? formStrategy.value.fullName : formStrategy.value.name">
               </textarea>
             <label for="float-input" class="app-input-label">{{'fullName' | translate}}<span
-                class="required-indicator">*</span></label>
+                class="required-indicator">*</span>
+                <i class="far fa-question-circle" [pTooltip]="'help.planModel.fullName' | translate"></i>
+              </label>
           </span>
           <app-input-message [form]="formStrategy" field="fullName"></app-input-message>
         </form>
@@ -100,7 +104,9 @@
             [disabled]="!editPermission" [showToggleAll]="false" display="chip" optionLabel="name"
             [selectedItemsLabel]="language === 'pt-BR' ? '{0} itens selecionados' : '{0} items selected'"
             (onChange)="checkSelectAllOffices($event)"></p-multiSelect>
-          <label class="app-input-label" for="float-label">{{'offices'|translate}}</label>
+          <label class="app-input-label" for="float-label">{{'offices'|translate}}
+            <i class="far fa-question-circle" [pTooltip]="'help.planModel.sharedWith' | translate"></i>
+          </label>
         </span>
       </app-card>
     </div>
@@ -140,5 +146,8 @@
   <div class="id-container" *ngIf="idStrategy && cardProperties">
     <span>{{idStrategy}}</span>
   </div>
-  <app-save-button (save)="handleOnSubmit()"></app-save-button>
+  <app-buttons-container>
+    <app-save-button (save)="handleOnSubmit()"></app-save-button>
+    <app-cancel-button (cancel)="handleOnCancel()"></app-cancel-button>
+  </app-buttons-container>
 </div>

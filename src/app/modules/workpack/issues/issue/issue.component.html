@@ -17,7 +17,9 @@
             <div class="p-field">
               <span class="p-float-label">
                 <input class="app-input-text" id="float-name" formControlName="name" type="text" pInputText />
-                <label class="app-input-label" for="float-name">{{ "name" | translate }} * </label>
+                <label class="app-input-label" for="float-name">{{ "name" | translate }} * 
+                  <i class="far fa-question-circle" [pTooltip]="'help.issue.name' | translate"></i>
+                </label>
               </span>
               <app-input-message [form]="formIssue" field="name"></app-input-message>
             </div>
@@ -37,7 +39,9 @@
                 <textarea pInputTextarea inputId="float-description" formControlName="description" class="app-text-area"
                   [rows]="3" [ngModel]="(mirrorDescription()) ? formIssue.value.name : formIssue.value.description">
                 </textarea>
-                <label class="app-input-label" for="float-description">{{ "description" | translate }} * </label>
+                <label class="app-input-label" for="float-description">{{ "description" | translate }} * 
+                  <i class="far fa-question-circle" [pTooltip]="'help.issue.description' | translate"></i>
+                </label>
               </span>
               <app-input-message [form]="formIssue" field="description"></app-input-message>
             </div>
@@ -57,12 +61,16 @@
                 <p-dropdown class="app-single-selection" [options]="importanceOptions" formControlName="importance"
                   dropdownIcon="fas fa-caret-down" [autoDisplayFirst]="false">
                 </p-dropdown>
-                <label class="app-input-label">{{'importance'|translate}}</label>
+                <label class="app-input-label">{{'importance'|translate}} *
+                  <i class="far fa-question-circle" [pTooltip]="'help.issue.importance' | translate"></i>
+                </label>
               </span>
               <app-input-message [form]="formIssue" field="importance"></app-input-message>
             </div>
             <div class="status-container">
-              <label class="status-label">{{'status' |translate}}</label>
+              <label class="status-label">{{'status' |translate}}
+                <i class="far fa-question-circle" [pTooltip]="'help.issue.status' | translate"></i>
+              </label>
               <div class="p-field status-radios-container">
                 <p-radioButton class="status-radio" groupname="status-group" value="OPEN" formControlName="status"
                   [label]="'open' |translate">
@@ -94,5 +102,9 @@
   <div class="id-container" *ngIf="idIssue && cardIssueProperties">
     <span>{{idIssue}}</span>
   </div>
-  <app-save-button #saveButton (save)="saveIssue()"></app-save-button>
+ 
+  <app-buttons-container>
+    <app-save-button #saveButton (save)="saveIssue()"></app-save-button>
+    <app-cancel-button (cancel)="handleOnCancel()"></app-cancel-button>
+  </app-buttons-container>
 </div>

@@ -5,7 +5,7 @@ import { IWorkpack } from 'src/app/shared/interfaces/IWorkpack';
 
 export interface IWorkpackData {
   workpack: IWorkpack;
-  workpackModel: IWorkpackModel;    
+  workpackModel: IWorkpackModel;
 }
 
 export interface  IWorkpackParams {
@@ -14,6 +14,7 @@ export interface  IWorkpackParams {
   idWorkpackModel: number;
   idWorkpackParent: number;
   idWorkpackModelLinked?: number;
+  idWorkpackLinkedParent?: number;
   idOfficeOwnerWorkpackLinked?: number;
   idOffice?: number;
   changedStatusCompleted: boolean;

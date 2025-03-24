@@ -30,6 +30,24 @@
           <div class="group-header-container">
             <span class="group-step-year">{{groupStep.year}}</span>
             <div class="group-progress-bar-container">
+
+              <div class="group-liquidated">
+                <div class="budgeted" [class.mobile]="responsive">
+                  <span class="budgeted-label">{{"budgeted" | translate}}:</span>
+                  <span class="budgeted-value">{{groupStep.budgetedValue || '0'}}</span>
+                </div>
+  
+                <div class="authorized" [class.mobile]="responsive">
+                  <span class="authorized-label">{{"authorized" | translate}}:</span>
+                  <span class="authorized-value">{{groupStep.authorizedValue || '0'}}</span>
+                </div>
+
+                <div class="liquidatedTotal" [class.mobile]="responsive">
+                  <span class="liquidatedTotal-label">{{"liquidated" | translate}}:</span>
+                  <span class="liquidatedTotal-value">{{groupStep.liquidatedTotal || '0'}}</span>
+                </div>
+              </div>
+
               <div class="progress-bar-container" *ngFor="let progressBar of groupStep.groupProgressBar">
                 <app-progress-bar-schedule-year [class.progress-bar-mobile]="responsive" [total]="progressBar.total"
                   [progress]="progressBar.progress" [labelTotal]="progressBar.labelTotal"
@@ -85,19 +103,12 @@
               [emptyMessage]="'loadingEllipsis' | translate">
               <ng-template let-step pTemplate="gridItem">
                 <div class="card-item-container show-resumed clickable" *ngIf="step.type === 'listStep'"
-                  [class.new-card-item]="['newStart', 'newEnd'].includes(step.type)" [class.mobile]="responsive"
-                  [routerLink]="['/workpack' , 'schedule', 'step' ]" [queryParams]="{
-                          id: step.idStep,
-                          idWorkpackModelLinked: workpackParams.idWorkpackModelLinked,
-                          stepType: step.stepOrder,
-                          unitName: step.unitName,
-                          unitPrecision: step.unitPrecision
-                        }">
+                  [class.mobile]="responsive"
+                  (click)="editScheduleStep(step.idStep, unitMeansure.name, unitMeansure.precision,'step')">
                   <app-schedule-step-card-item [properties]="step" [type]="'listStepResumed'">
                   </app-schedule-step-card-item>
                 </div>
-                <div class="card-item-container show-resumed clickable"
-                  *ngIf="['newStart', 'newEnd'].includes(step.type)"
+                <div class="card-item-container show-resumed clickable" *ngIf="['newStart', 'newEnd'].includes(step.type)"
                   [class.new-card-item]="['newStart', 'newEnd'].includes(step.type)" [class.mobile]="responsive"
                   [routerLink]="['/workpack' , 'schedule', 'step' ]" [queryParams]="{
                           idSchedule: schedule.id,
@@ -116,7 +127,14 @@
       </div>
     </div>
   </app-card>
-  <app-save-button #saveButton (save)="onSaveButtonClicked()"></app-save-button>
+  <div class="id-container" *ngIf="workpackParams.idWorkpack">
+    <span>{{workpackParams.idWorkpack}}</span>
+  </div>
+  <app-buttons-container>
+    <app-save-button #saveButton (save)="onSaveButtonClicked()"></app-save-button>
+    <app-cancel-button (cancel)="handleOnCancel()"></app-cancel-button>
+  </app-buttons-container>
+  
 </div>
 <p-confirmDialog [header]="'confirmSpreadDifference' | translate" icon="pi pi-exclamation-triangle"
   key="spreadDifferenceConfirm">

@@ -4,6 +4,9 @@
   background: #ffffff7f;
   border: 1px solid #d4d4d4;
   box-shadow: none;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 
   .p-card-header {
     width: 100%;
@@ -21,7 +24,7 @@
         .title-month {
           font-weight: bold;
           color: v.$fontInput;
-          font-size: 0.9em;
+          font-size: 0.8em;
           font-family: v.$fontFamilyMedium;
         }
         .title-day {
@@ -88,13 +91,13 @@
     width: 100%;
     padding: 0;
     height: 100%;
+    background-color: #ffffff;
   }
   .card-item-content {
     max-width: 100%;
     padding: 0 0.5em;
     display: grid;
     grid-template-columns: 1fr 1fr;
-    column-gap: 0.5em;
     align-items: flex-start;
     color: #888e96;
     .unitValues,
@@ -102,12 +105,21 @@
       display: flex;
       flex-direction: column;
       align-content: center;
+      .p-float-label {
+        padding-bottom: 10px !important;
+        margin-top: 5px !important;
+      }
+      .p-inputnumber-input {
+        font-size: 0.7rem !important;
+      }
       .progress-bar-unit-container {
         margin-top: 0.2em;
+        margin-bottom: 10px;
       }
       .progress-bar-cost-container {
         flex: 1;
         margin-top: 0.2em;
+        margin-bottom: 10px;
       }
       .app-input-number.red {
         .p-inputnumber .p-inputtext {
@@ -118,6 +130,8 @@
       .replicate-button-container {
         width: 100%;
         text-align: center;
+        margin-bottom: -10px;
+        margin-top: -10px;
         > i {
           font-size: 1.3rem;
           cursor: pointer;
@@ -160,8 +174,10 @@
         }
       }
       .app-input-label {
-        font-size: 0.6rem;
+        font-size: 0.7rem;
         text-align: center;
+        font-weight: bold;
+        max-width: fit-content;
       }
     }
     .costValues .costInputs {
@@ -192,14 +208,36 @@
   }
   .card-item-footer {
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
     padding: 0.5em;
+    background: #f5f5f4;
     .card-item-id {
       color: #888e96;
-      font-size: 0.6rem;
+      font-size: 0.5rem;
       font-family: v.$fontFamilyMedium;
     }
   }
+
+  .card-item-liquidated-value {
+    padding: 5px;
+  }
+
+  .card-item-liquidated-label {
+    font-weight: bold;
+  }
+
+  label.app-input-label {
+    display: flex;
+    align-items: center;
+    margin-top: 5px;
+    margin-left: -30px;
+  }
+
+  .card-item-content {
+    margin-left: 15px;
+    width: 250px;
+  }
+  
 }
 
 ::ng-deep p-card.app-step-card-item-resume .p-card {
@@ -217,6 +255,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      background-color: #F5F5F3;
       .header-title {
         padding: 0.5rem 0.5rem 0 0.5rem;
 
@@ -243,6 +282,7 @@
     width: 100%;
     padding: 0;
     height: 100%;
+    background-color: #ffffff;
   }
   .card-item-content {
     width: 100%;

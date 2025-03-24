@@ -18,11 +18,22 @@
       <div class="p-grid" *ngIf="!cardPlanProperties.isLoading">
         <form [formGroup]="formPlan">
           <div class="p-fluid">
+            <div class="p-field" >
+              <span class="p-float-label">
+                <input class="app-input-text" [class.responsive]="responsive" id="float-modelName" name="modelName"
+                  formControlName="modelName" type="text" pInputText [ngStyle]="{'width': '30%'}"  />
+                <label class="app-input-label" for="float-modelName">{{ "planModel" | translate }} * 
+                  <i class="far fa-question-circle" [pTooltip]="'help.plan.planModelName' | translate"></i>
+                </label>
+              </span>
+            </div>
             <div class="p-field">
               <span class="p-float-label">
                 <input class="app-input-text" [class.responsive]="responsive" id="float-name" name="name"
                   formControlName="name" type="text" [ngStyle]="{'width': '30%'}" pInputText />
-                <label class="app-input-label" for="float-name">{{ "name" | translate }} * </label>
+                <label class="app-input-label" for="float-name">{{ "name" | translate }} * 
+                  <i class="far fa-question-circle" [pTooltip]="'help.plan.name' | translate"></i>
+                </label>
               </span>
               <app-input-message [form]="formPlan" field="name"></app-input-message>
             </div>
@@ -31,7 +42,9 @@
                 <textarea pInputTextarea id="float-fullName" formControlName="fullName" class="app-text-area" rows="3"
                   [ngModel]="(mirrorFullName()) ? formPlan.value.name : formPlan.value.fullName">
                 </textarea>
-                <label class="app-input-label" for="float-fullName">{{ "fullName" | translate }} * </label>
+                <label class="app-input-label" for="float-fullName">{{ "fullName" | translate }} * 
+                  <i class="far fa-question-circle" [pTooltip]="'help.plan.fullName' | translate"></i>
+                </label>
               </span>
               <app-input-message [form]="formPlan" field="fullName"></app-input-message>
             </div>
@@ -43,7 +56,9 @@
                   [monthNavigator]="true" [yearNavigator]="true" [yearRange]="yearRange" [class.responsive]="responsive"
                   icon="fas fa-calendar-alt" [dateFormat]="calendarFormat">
                 </p-calendar>
-                <label class="app-input-label" for="float-start">{{ "start" | translate }} * </label>
+                <label class="app-input-label" for="float-start">{{ "start" | translate }} * 
+                  <i class="far fa-question-circle" [pTooltip]="'help.plan.start' | translate"></i>
+                </label>
               </span>
               <app-input-message [form]="formPlan" field="start"></app-input-message>
             </div>
@@ -53,8 +68,10 @@
                   [monthNavigator]="true" [yearNavigator]="true" [yearRange]="yearRange" [class.responsive]="responsive"
                   icon="fas fa-calendar-alt" [dateFormat]="calendarFormat">
                 </p-calendar>
-                <label class="app-input-label" class="properties-label" for="float-finish">{{ "finish" |
-                  translate}} * </label>
+                <label class="app-input-label" for="float-finish">{{ "finish" |
+                  translate}} * 
+                <i class="far fa-question-circle" [pTooltip]="'help.plan.finish' | translate"></i>  
+                </label>
               </span>
               <app-input-message [form]="formPlan" field="finish"></app-input-message>
             </div>
@@ -106,7 +123,11 @@
   <div class="id-container" *ngIf="idPlan && cardPlanProperties">
     <span>{{idPlan}}</span>
   </div>
-  <app-save-button (save)="savePlan()"></app-save-button>
+  
+  <app-buttons-container>
+    <app-save-button (save)="savePlan()"></app-save-button>
+    <app-cancel-button (cancel)="handleOnCancel()"></app-cancel-button>
+  </app-buttons-container>
 
   <p-dialog class="resume-management-dialog" [class.responsive]="!!responsive" [header]="'resumeManagement' |translate"
     [(visible)]="showDialogResumeManagement" [style]="!responsive ? {width: '30vw'} : {width: '90vw'}"

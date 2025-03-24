@@ -2,7 +2,7 @@
 
 ::ng-deep p-card.app-card-item-role .p-card {
   height: 100%;
-  padding: 1em 0.5em;
+  padding: 0 0.5em;
   
   .p-card-body {
     height: 100%;
@@ -19,21 +19,31 @@
   .p-card-content {
     height: 100%;
     padding: 0;
+    .p-float-label {
+      margin-top: 1em;
+      > label {
+        font-size: 12px !important;
+      }
+    }
     .card-item-header {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      .p-float-label {
-        margin-top: 1em;
-      }
+      
       .p-dropdown {
         width: 100%;
         .p-inputtext {
-          font-size: 0.8rem;
+          font-size: 12px !important;
         }
+      }
+      .p-inputtext {
+        font-size: 12px !important;
       }
       .card-header-toggle {
         display: flex;
         justify-content: flex-end;
+        .fa-trash-alt {
+          padding-top: 0.5em;
+        }
       }
     }
     .card-item-dates {
@@ -44,7 +54,7 @@
       padding-bottom: 1em;
       .app-select-date {
         .p-calendar .p-inputtext {
-          font-size: 0.8rem;
+          font-size: 12px !important;
           padding: 0.5em;
         }
       }

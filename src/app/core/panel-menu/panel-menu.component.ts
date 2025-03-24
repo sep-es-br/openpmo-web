@@ -111,7 +111,7 @@ export class PanelMenuComponent implements OnInit {
       if (id === 0) {
         await this.loadPropertiesPlan();
       }
-      if (this.currentIDPlan !== 0 && this.currentIDPlan !== id) {
+      if (this.currentIDPlan !== 0 || id !== 0) {
         this.currentIDPlan = id;
         await this.loadPropertiesPlan();
         this.loadPortfolioMenu();
@@ -165,8 +165,8 @@ export class PanelMenuComponent implements OnInit {
     this.menuSrv.obsCloseAllMenus.pipe(takeUntil(this.$destroy)).subscribe( closeAllMenus => {
       if (closeAllMenus && !this.isFixed) this.setCloseAllMenus();
     });
-    this.menuSrv.obsToggleMenu.pipe(takeUntil(this.$destroy)).subscribe( value => {
-      this.toggleMenu(value);
+    this.menuSrv.obsToggleMenu.pipe(takeUntil(this.$destroy)).subscribe(({menu}) => {
+      this.toggleMenu(menu);
     });
 
   }
@@ -198,12 +198,12 @@ export class PanelMenuComponent implements OnInit {
       const infoPerson = await this.authSrv.getInfoPerson();
       if (infoPerson && infoPerson.workLocal) {
         if (infoPerson.workLocal.idWorkpackModelLinked || infoPerson.workLocal.idWorkpack || infoPerson.workLocal.idPlan) {
-          this.menuSrv.nextToggleMenu('portfolio');
+          this.menuSrv.nextToggleMenu({menu: 'portfolio', open: true});
         } else {
-          this.menuSrv.nextToggleMenu('office');
+          this.menuSrv.nextToggleMenu({menu: 'office', open: true});
         }
       } else {
-        this.menuSrv.nextToggleMenu('office');
+        this.menuSrv.nextToggleMenu({menu: 'office', open: true});
       }
       this.handleChangeMenuMode();
     }
@@ -346,10 +346,11 @@ export class PanelMenuComponent implements OnInit {
     }
     const id = idNewWorkpack ? idNewWorkpack : this.getIdFromURL(url);
     if ((url.startsWith('strategies') || url.startsWith('configuration-office')) && (isNaN(id) || !id)) {
-      this.itemsPlanModel = this.itemsPlanModel ? [...this.expandedMenuSelectedItem(this.itemsPlanModel, [], 0)] : undefined;
+      this.itemsPlanModel = this.itemsPlanModel ? [...this.expandedMenuModelSelectedItem(this.itemsPlanModel, [], 0)] : undefined;
     }
     if (url.startsWith('offices') && (isNaN(id) || !id)) {
       this.itemsOffice = this.itemsOffice ? [...this.collapseMenuItems(this.itemsOffice)] : undefined;
+      this.menuSrv.nextToggleMenu({menu: 'office', open: false});
     }
     if (!id || isNaN(id)) {
       return;
@@ -357,11 +358,12 @@ export class PanelMenuComponent implements OnInit {
     if (url.startsWith('offices/office')) {
       this.menuOffices?.nativeElement.querySelector('.office-' + id)?.classList.add('active');
       this.itemsOffice = this.itemsOffice ? [...this.expandMenuOffice()] : undefined;
+      this.menuSrv.nextToggleMenu({menu: 'office', open: false});
 
     } else if (url.startsWith('strategies/strategy')) {
       this.menuPlanModel?.nativeElement.querySelector('.planModel-' + id)?.classList.add('active');
-      this.itemsPlanModel = this.itemsPlanModel ? [...this.expandedMenuSelectedItem(this.itemsPlanModel, [], id)] : undefined;
-
+      this.itemsPlanModel = this.itemsPlanModel ? [...this.expandedMenuModelSelectedItem(this.itemsPlanModel, [], id)] : undefined;
+      this.menuSrv.nextToggleMenu({menu: 'planModel', open: false});
     } else if (url.startsWith('workpack-model')) {
       this.storageBreadcrumbsItems = this.breadcrumbSrv.get;
       const parents = this.parentsFromBreadcrumb();
@@ -372,13 +374,14 @@ export class PanelMenuComponent implements OnInit {
       } else {
         this.menuPlanModel?.nativeElement.querySelector('.workpackModel-' + id)?.classList.add('active');
       }
+      this.menuSrv.nextToggleMenu({menu: 'planModel', open: false});
     } else if (url.startsWith('plan')) {
       this.menuOffices?.nativeElement.querySelector('.plan-' + id)?.classList.add('active');
       this.itemsOffice = this.itemsOffice ? [...this.expandMenuOffice()] : this.itemsOffice;
       const itemsMenu = this.itemsPortfolio ? [...Array.from(this.itemsPortfolio)] : undefined;
       this.itemsPortfolio = itemsMenu ? [...this.collapseMenuItems(itemsMenu)] : undefined;
-
-    } else if (url.startsWith('workpack')) {
+      this.menuSrv.nextToggleMenu({menu: 'portfolio', open: false});
+    } else if (url.startsWith('workpack') || url.startsWith('stakeholder')) {
       this.itemsOffice = this.itemsOffice ? [...this.expandMenuOffice()] : this.itemsOffice;
       if (this.currentIDPlan) {
         this.menuOffices?.nativeElement.querySelector('.plan-' + this.currentIDPlan)?.classList.add('active');
@@ -393,6 +396,7 @@ export class PanelMenuComponent implements OnInit {
         this.itemsPortfolio = itemsMenu ? [...this.expandedMenuSelectedItem(itemsMenu, parents, id)] : undefined;
       }
       this.menuPortfolio?.nativeElement.querySelector('.workpack-' + id)?.classList.add('active');
+      this.menuSrv.nextToggleMenu({menu: 'portfolio', open: false});
     }
     if (!this.currentIDOffice || this.currentIDOffice === 0) {
       this.itemsOffice = [...this.itemsOffice.map(item => ({ ...item, expanded: false }))];
@@ -422,10 +426,12 @@ export class PanelMenuComponent implements OnInit {
     return list;
   }
 
-  expandedMenuSelectedItem(list: MenuItem[], parents, id) {
+  expandedMenuSelectedItem(list, parents, id) {
     const itemIndex = list.findIndex(item => parents.includes(item.id) || item.id === id);
     if (itemIndex > -1) {
       list[itemIndex].expanded = true;
+      list[itemIndex].items = list[itemIndex].children;
+      list.forEach( l => l.items = l.children);
       if (list[itemIndex].items && list[itemIndex].items.length > 0) {
         list[itemIndex].items = this.expandedMenuSelectedItem(list[itemIndex].items, parents, id);
         return list;
@@ -435,6 +441,10 @@ export class PanelMenuComponent implements OnInit {
     } else {
       list.forEach(item => {
         item.expanded = false;
+        if (item.idParent === id) {
+          item.items = item.children;
+        }
+        
         if (item.items && item.items.length > 0) {
           item.items = this.expandedMenuSelectedItem(item.items, parents, id);
         }
@@ -468,8 +478,13 @@ export class PanelMenuComponent implements OnInit {
   }
 
   getIdFromURL(url: string) {
+    
     const [path, queries] = url.split('?');
-    return queries ? Number((queries.split('id=')[1])?.split('&')[0]) : 0;
+    const id = queries ? Number((queries.split('id=')[1])?.split('&')[0]) : 0;
+    if ((url.startsWith('workpack') || url.startsWith('stakeholder')) && (!id || isNaN(id))) {
+      return queries ? Number((queries.split('idWorkpack=')[1])?.split('&')[0]) : 0;
+    }
+    return id;
   }
 
   getIdParentFromURL(url: string) {
@@ -546,7 +561,7 @@ export class PanelMenuComponent implements OnInit {
       if (success) {
         const menuPortfolioData = data || [];
         this.menuSrv.nextMenuPortfolioItems(menuPortfolioData);
-        this.itemsPortfolio = this.buildMenuItemPortfolio(data || []);
+        this.itemsPortfolio = this.buildMenuItemPortfolio(data || [], 0);
         this.loadingMenuPortfolio = false;
         if (!this.changedUrl || this.linkEvent) {
           this.selectMenuActive(this.router.url.slice(1), idNewWorkpack);
@@ -707,34 +722,46 @@ export class PanelMenuComponent implements OnInit {
     }
   }
 
-  buildMenuItemPortfolio(root: IMenuWorkpack[]) {
-    return root.map(workpack => ({
-      label: workpack.name,
-      icon: workpack.fontIcon,
-      idPlan: workpack.idPlan,
-      fullName: workpack.fullName,
-      title: workpack.fullName,
-      tooltip: workpack.fullName,
-      id: workpack.id,
-      expanded: false,
-      styleClass: `workpack-${workpack.id} ${this.currentURL === `workpack?id=${workpack.id}` ? 'active' : ''}`,
-      items: workpack.children?.length ? this.buildMenuItemPortfolio(workpack.children) : undefined,
-      command: (e) => {
-        const classList = Array.from(e.originalEvent?.target?.classList) || [];
-        if (classList.some((className: string) => ['p-menuitem-text', 'fas', 'app-icon'].includes(className))) {
-          e.item.expanded = false;
-          this.setWorkpackBreadcrumbStorage(workpack.id, this.currentIDPlan);
-          this.router.navigate(['/workpack'], {
-            queryParams: {
-              id: workpack.id,
-              idWorkpaModelLinked: workpack.idWorkpackModelLinked,
-              idPlan: this.currentIDPlan
-            }
-          });
-          this.closeAllMenus();
+  buildMenuItemPortfolio(root: IMenuWorkpack[], level: number) {
+    level++;
+    return root.map(workpack => {
+      const children =  workpack.children?.length ? this.buildMenuItemPortfolio(workpack.children, level) : undefined;
+      return {
+        label: workpack.name,
+        icon: workpack.fontIcon,
+        idPlan: workpack.idPlan,
+        fullName: workpack.fullName,
+        title: workpack.fullName,
+        tooltip: workpack.fullName,
+        id: workpack.id,
+        idParent: workpack.idParent,
+        expanded: false,
+        styleClass: `workpack-${workpack.id} ${this.currentURL === `workpack?id=${workpack.id}` ? 'active' : ''}`,
+        children,
+        items: level < 3 ? children : undefined,
+        command: (e) => {
+          const classList = Array.from(e.originalEvent?.target?.classList) || [];
+          if (classList.some((className: string) => ['p-menuitem-text', 'fas', 'app-icon'].includes(className))) {
+            e.item.expanded = false;
+            this.setWorkpackBreadcrumbStorage(workpack.id, this.currentIDPlan);
+            this.router.navigate(['/workpack'], {
+              queryParams: {
+                id: workpack.id,
+                idWorkpaModelLinked: workpack.idWorkpackModelLinked,
+                idPlan: this.currentIDPlan
+              }
+            });
+            this.closeAllMenus();
+          }
+          e.item.items = e.item.children;
+          if (e.item.children && e.item.children.length > 0) {
+            e.item.children.forEach(child => {
+              child.items = child.children;
+            });
+          }
         }
       }
-    }));
+    });
   }
 
   async setWorkpackBreadcrumbStorage(idWorkpack, idPlan) {

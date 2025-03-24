@@ -22,6 +22,8 @@ import { IPlan } from 'src/app/shared/interfaces/IPlan';
 import { PlanService } from 'src/app/shared/services/plan.service';
 import { IOffice } from 'src/app/shared/interfaces/IOffice';
 import { OfficeService } from 'src/app/shared/services/office.service';
+import { AuthService } from 'src/app/shared/services/auth.service';
+import { CancelButtonComponent } from 'src/app/shared/components/cancel-button/cancel-button.component';
 
 @Component({
   selector: 'app-plan-permissions',
@@ -34,6 +36,7 @@ import { OfficeService } from 'src/app/shared/services/office.service';
 export class PlanPermissionsComponent implements OnInit, OnDestroy {
 
   @ViewChild(SaveButtonComponent) saveButton: SaveButtonComponent;
+  @ViewChild(CancelButtonComponent) cancelButton: CancelButtonComponent;
 
   idPlan: number;
   propertiesPlan: IPlan;
@@ -51,7 +54,7 @@ export class PlanPermissionsComponent implements OnInit, OnDestroy {
   $destroy = new Subject();
   invalidMailMessage: string;
   citizenAuthServer: boolean;
-  citizenSearchBy: string; //CPF | NAME
+  citizenSearchBy: string = 'CPF'; //CPF | NAME
   searchedNameUser: string;
   searchedCpfUser: string;
   selectedPerson: IPerson;
@@ -65,6 +68,9 @@ export class PlanPermissionsComponent implements OnInit, OnDestroy {
   isLoadingCitizen = false;
   isLoading = false;
   formIsSaving = false;
+  isUserAdmin = false;
+  showMessageIsSamePerson = false;
+  isSamePerson = false;
 
   constructor(
     private actRouter: ActivatedRoute,
@@ -79,6 +85,7 @@ export class PlanPermissionsComponent implements OnInit, OnDestroy {
     private officeSrv: OfficeService,
     private citizenUserSrv: CitizenUserService,
     private authServerSrv: AuthServerService,
+    private authSrv: AuthService
   ) {
     this.actRouter.queryParams.subscribe(async queryParams => {
       this.idPlan = +queryParams.idPlan;
@@ -106,6 +113,7 @@ export class PlanPermissionsComponent implements OnInit, OnDestroy {
 
   async ngOnInit() {
     this.isLoading = true;
+    this.isUserAdmin = await this.authSrv.isUserAdmin();
     await this.getAuthServer();
     await this.loadPermission();
     await this.loadPropertiesPlan();
@@ -172,6 +180,7 @@ export class PlanPermissionsComponent implements OnInit, OnDestroy {
     if (!event || (event.length === 0)) {
       this.publicServersResult = [];
       this.showListBoxPublicServers = false;
+      this.showMessageIsSamePerson = false;
       this.showMessagePublicServerNotFoundByName = false;
     }
   }
@@ -182,6 +191,7 @@ export class PlanPermissionsComponent implements OnInit, OnDestroy {
     this.showListBoxPublicServers = false;
     this.showMessagePublicServerNotFoundByName = false;
     this.citizenUserNotFoundByCpf = false;
+    this.showMessageIsSamePerson = false;
     this.validCpf = true;
     this.searchedCpfUser = null;
     this.searchedNameUser = null;
@@ -189,6 +199,7 @@ export class PlanPermissionsComponent implements OnInit, OnDestroy {
 
   async searchCitizenUserByName() {
     this.saveButton?.hideButton();
+    this.cancelButton.showButton();
     this.publicServersResult = [];
     if (this.person) {
       this.person = undefined;
@@ -212,11 +223,13 @@ export class PlanPermissionsComponent implements OnInit, OnDestroy {
       this.loadNewPermission();
       this.validCpf = true;
       this.citizenUserNotFoundByCpf = false;
+      this.showMessageIsSamePerson = false;
     }
   }
 
   async validateCpf() {
     this.saveButton?.hideButton();
+    this.cancelButton.showButton();
     this.citizenUserNotFoundByCpf = false;
     this.validCpf = cpfValidator(this.searchedCpfUser);
     if (this.validCpf) {
@@ -228,6 +241,10 @@ export class PlanPermissionsComponent implements OnInit, OnDestroy {
       });
       this.isLoadingCitizen = false;
       if (result.success) {
+        if (!this.isUserAdmin && result.data.id === Number(this.authSrv.getIdPerson())) {
+          this.showMessageIsSamePerson = true;
+          return;
+        }
         this.person = result.data;
         this.loadNewPermission();
       } else {
@@ -243,6 +260,10 @@ export class PlanPermissionsComponent implements OnInit, OnDestroy {
     const result = await this.citizenUserSrv.GetPublicServer(publicServer.sub, { idOffice: this.idOffice, loadWorkLocation: false });
     this.isLoadingCitizen = false;
     if (result.success) {
+      if (!this.isUserAdmin && result.data.id === Number(this.authSrv.getIdPerson())) {
+        this.showMessageIsSamePerson = true;
+        return;
+      }
       this.person = result.data;
       this.searchedNameUser = '';
       this.publicServersResult = [];
@@ -270,8 +291,10 @@ export class PlanPermissionsComponent implements OnInit, OnDestroy {
           email: this.permission.person.email,
           guid: this.permission.person.guid,
           key: this.permission.person.key,
+          id: this.permission.person.id,
           roles: this.permission.permissions.map(p => ({'role': p.role}))
         };
+        this.isSamePerson = !this.isUserAdmin && this.person.id === Number(this.authSrv.getIdPerson());
       }
       this.loadCardItemsPersonPermissions();
       this.isLoading = false;
@@ -290,7 +313,8 @@ export class PlanPermissionsComponent implements OnInit, OnDestroy {
           { label: this.translateSrv.instant('edit'), value: 'EDIT' },
           { label: this.translateSrv.instant('none'), value: 'NONE' }
         ],
-        selectedOption: p.level
+        selectedOption: p.level,
+        readOnly: this.isSamePerson
       }));
       const rolesNotPermissions = this.permission?.permissions ? this.permission?.person?.roles
         .filter(r => this.permission?.permissions.filter(p => p.role === r.role).length === 0) : this.permission?.person?.roles;
@@ -325,10 +349,17 @@ export class PlanPermissionsComponent implements OnInit, OnDestroy {
   }
 
   async searchPerson() {
+    this.showMessageIsSamePerson = false;
     this.saveButton?.hideButton();
+    this.cancelButton.showButton();
     if (this.searchedEmailPerson) {
       const { data } = await this.personSrv.GetByKey(this.searchedEmailPerson);
       if (data) {
+        if (!this.isUserAdmin && data.id === Number(this.authSrv.getIdPerson())) {
+          this.person = null;
+          this.showMessageIsSamePerson = true;
+          return;
+        }
         this.showSearchInputMessage = false;
         this.person = data;
         this.person.email = this.searchedEmailPerson
@@ -364,6 +395,7 @@ export class PlanPermissionsComponent implements OnInit, OnDestroy {
   }
 
   async savePermission() {
+    this.cancelButton.hideButton();
     this.formIsSaving = true;
     this.permission.permissions = this.cardItemsPlanPermission.filter( p => p.selectedOption && p.selectedOption !== 'NONE').map(cardItem => (
       {
@@ -390,6 +422,18 @@ export class PlanPermissionsComponent implements OnInit, OnDestroy {
         detail: this.translateSrv.instant('messages.savedSuccessfully')
       });
       this.router.navigate([ '/plan', 'permission' ], { queryParams: { idPlan: this.idPlan }});
+    }
+  }
+
+  handleOnCancel() {
+    this.saveButton.hideButton();
+    if (this.key) {
+      this.loadCardItemsPersonPermissions();
+    } else {
+      this.validateClearSearchByCpf('');
+      this.validateClearSearchByUser();
+      this.validateClearSearchUserName('');
+      this.citizenSearchBy = 'CPF';
     }
   }
 }

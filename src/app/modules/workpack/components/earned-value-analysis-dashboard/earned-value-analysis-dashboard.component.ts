@@ -5,9 +5,11 @@ import { TranslateService } from '@ngx-translate/core';
 import { ChartData, ChartOptions } from 'chart.js';
 import * as moment from 'moment';
 import { Subject } from 'rxjs';
-import { IEarnedValueAnalysisDashboard } from 'src/app/shared/interfaces/IDashboard';
+import { IEarnedValueAnalysisDashboard, ITripleConstraintDashboard } from 'src/app/shared/interfaces/IDashboard';
 import { IGaugeChartData } from 'src/app/shared/interfaces/IGaugeChartData';
 import { ShortNumberPipe } from 'src/app/shared/pipes/shortNumberPipe';
+import { DashboardService } from 'src/app/shared/services/dashboard.service';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-earned-value-analysis-dashboard',
@@ -18,6 +20,7 @@ export class EarnedValueAnalysisDashboardComponent implements OnInit, OnChanges,
 
   @Input() earnedValueAnalysis: IEarnedValueAnalysisDashboard;
   @Input() referenceMonth;
+  @Input() tripleConstraint: ITripleConstraintDashboard;
   lineChartData: ChartData;
   lineChartOptions: ChartOptions;
   gaugeChartDataCPI: IGaugeChartData;
@@ -27,11 +30,14 @@ export class EarnedValueAnalysisDashboardComponent implements OnInit, OnChanges,
   $destroy = new Subject();
   responsive = false;
   mediaScreen1500: boolean;
+  showContent: boolean;
 
   constructor(
     private shortNumberPipe: ShortNumberPipe,
     private translateSrv: TranslateService,
-    private responsiveSrv: ResponsiveService
+    private responsiveSrv: ResponsiveService,
+    private dashboardSrv: DashboardService,
+    private route: ActivatedRoute
   ) {
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.responsive = value);
     this.responsiveSrv.resizeEvent.subscribe((value) => {
@@ -58,6 +64,31 @@ export class EarnedValueAnalysisDashboardComponent implements OnInit, OnChanges,
 
   ngOnInit(): void {
     this.setLanguage();
+
+    this.route.queryParams.subscribe(params => {
+      const idWorkpack = params['id'];
+      if (idWorkpack) {
+        this.dashboardSrv.GetBaselines({ 'id-workpack': idWorkpack }).then(
+          response => {
+            if (response.success && response.data && response.data.length > 0 || this.tripleConstraint.cost.plannedValue > 0 ) {
+              this.showContent = true;
+            } else {
+              this.showContent = false;
+            }
+          }
+        ).catch(error => { console.log(error); }
+        );
+      }
+    });
+  }
+
+  sumPerformanceIndexes(): number {
+    const indexes = this.earnedValueAnalysis?.performanceIndexes;
+    return (indexes.earnedValue || 0) +
+      (indexes.actualCost || 0) +
+      (indexes.plannedValue || 0) +
+      (indexes.estimatesAtCompletion || 0) +
+      (indexes.estimateToComplete || 0);
   }
 
   ngOnDestroy(): void {
@@ -89,11 +120,11 @@ export class EarnedValueAnalysisDashboardComponent implements OnInit, OnChanges,
         },
         {
           label: this.translateSrv.instant('PV'),
-          data: this.earnedValueAnalysis.earnedValueByStep?.map(item => item.plannedValue),
+          data: this.earnedValueAnalysis.earnedValueByStep?.map(item => item.plannedCost),
           fill: false,
           borderColor: '#b5b5b5',
-          pointBorderWidth: this.earnedValueAnalysis.earnedValueByStep?.map(item => item.plannedValue).length > 1 ? 1 : 0,
-          pointRadius: this.earnedValueAnalysis.earnedValueByStep?.map(item => item.plannedValue).length > 1 ? 4 : 0,
+          pointBorderWidth: this.earnedValueAnalysis.earnedValueByStep?.map(item => item.plannedCost).length > 1 ? 1 : 0,
+          pointRadius: this.earnedValueAnalysis.earnedValueByStep?.map(item => item.plannedCost).length > 1 ? 4 : 0,
         },
         {
           label: this.translateSrv.instant('EC'),
@@ -141,32 +172,32 @@ export class EarnedValueAnalysisDashboardComponent implements OnInit, OnChanges,
 
   setGaugeChartData() {
     this.gaugeChartDataCPI = {
-      value: this.earnedValueAnalysis?.performanceIndexes[0]?.costPerformanceIndex &&
-        (this.earnedValueAnalysis.performanceIndexes[0].actualCost !== 0 &&
-          this.earnedValueAnalysis.performanceIndexes[0].actualCost !== null &&
-          this.earnedValueAnalysis.performanceIndexes[0].actualCost !== undefined)
+      value: this.earnedValueAnalysis?.performanceIndexes?.costPerformanceIndex &&
+        (this.earnedValueAnalysis.performanceIndexes?.actualCost !== 0 &&
+          this.earnedValueAnalysis.performanceIndexes.actualCost !== null &&
+          this.earnedValueAnalysis.performanceIndexes.actualCost !== undefined)
         ?
-        (this.earnedValueAnalysis?.performanceIndexes[0]?.costPerformanceIndex?.indexValue === null ? 0 : this.earnedValueAnalysis?.performanceIndexes[0]?.costPerformanceIndex?.indexValue)
+        (this.earnedValueAnalysis?.performanceIndexes?.costPerformanceIndex?.indexValue === null ? 0 : this.earnedValueAnalysis?.performanceIndexes?.costPerformanceIndex?.indexValue)
         : (null),
       labelBottom: 'CPI',
       classIconLabelBottom: 'fas fa-dollar-sign',
-      valueProgressBar: this.earnedValueAnalysis?.performanceIndexes[0]?.costPerformanceIndex ? this.earnedValueAnalysis?.performanceIndexes[0]?.costPerformanceIndex?.costVariation : null,
-      maxProgressBar: this.earnedValueAnalysis?.performanceIndexes[0]?.earnedValue,
+      valueProgressBar: this.earnedValueAnalysis?.performanceIndexes?.costPerformanceIndex ? this.earnedValueAnalysis?.performanceIndexes?.costPerformanceIndex?.costVariation : null,
+      maxProgressBar: this.earnedValueAnalysis?.performanceIndexes?.earnedValue,
       labelBottomProgressBar: 'CV',
     };
     this.gaugeChartDataSPI = {
-      value: this.earnedValueAnalysis?.performanceIndexes[0]?.schedulePerformanceIndex &&
-        (this.earnedValueAnalysis.performanceIndexes[0].plannedValue !== 0 &&
-          this.earnedValueAnalysis.performanceIndexes[0].plannedValue !== null &&
-          this.earnedValueAnalysis.performanceIndexes[0].plannedValue !== undefined)
+      value: this.earnedValueAnalysis?.performanceIndexes?.schedulePerformanceIndex &&
+        (this.earnedValueAnalysis.performanceIndexes.plannedValue !== 0 &&
+          this.earnedValueAnalysis.performanceIndexes.plannedValue !== null &&
+          this.earnedValueAnalysis.performanceIndexes.plannedValue !== undefined)
         ?
-        (this.earnedValueAnalysis?.performanceIndexes[0]?.schedulePerformanceIndex?.indexValue === null ? 0 : this.earnedValueAnalysis?.performanceIndexes[0]?.schedulePerformanceIndex?.indexValue)
+        (this.earnedValueAnalysis?.performanceIndexes?.schedulePerformanceIndex?.indexValue === null ? 0 : this.earnedValueAnalysis?.performanceIndexes?.schedulePerformanceIndex?.indexValue)
         : null,
       labelBottom: 'SPI',
       classIconLabelBottom: 'fas fa-clock',
-      valueProgressBar: this.earnedValueAnalysis?.performanceIndexes[0]?.schedulePerformanceIndex ?
-        this.earnedValueAnalysis?.performanceIndexes[0]?.schedulePerformanceIndex?.scheduleVariation : null,
-      maxProgressBar: this.earnedValueAnalysis?.performanceIndexes[0]?.earnedValue,
+      valueProgressBar: this.earnedValueAnalysis?.performanceIndexes?.schedulePerformanceIndex ?
+        this.earnedValueAnalysis?.performanceIndexes?.schedulePerformanceIndex?.scheduleVariation : null,
+      maxProgressBar: this.earnedValueAnalysis?.performanceIndexes?.earnedValue,
       labelBottomProgressBar: 'SV',
     };
   }
@@ -178,7 +209,7 @@ export class EarnedValueAnalysisDashboardComponent implements OnInit, OnChanges,
       plannedValue,
       estimatesAtCompletion,
       estimateToComplete
-    } = this.earnedValueAnalysis.performanceIndexes[0];
+    } = this.earnedValueAnalysis.performanceIndexes;
     const values = [
       earnedValue === null ? 0 : earnedValue,
       actualCost === null ? 0 : actualCost,

@@ -32,7 +32,8 @@
       border-radius: 4px 4px 0 0;
       .app-tabview-scrolled-header-item {
         display: inline-block;
-        padding: 1rem 0;
+        padding: 0.5rem 0;
+        font-size: 0.9rem;
         color: #6c757d;
         cursor: pointer;
         white-space: nowrap;
@@ -64,8 +65,8 @@
 
   .button-scroll {
     position: absolute;
-    top: 8px;
-    height: 2.9rem;
+    top: 0;
+    height: 100%;
     width: 2rem;
     z-index: 1;
     cursor: pointer;

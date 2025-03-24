@@ -36,11 +36,13 @@ $mobileMenuHeight: 90px;
       height: 2rem;
     }
   }
-
+  .app-icon, .far.fa-star, .fa-file-alt {
+    color: #ffffff;
+  }
   .item {
     color: #eeeeee;
     font-size: 1.5rem;
-    padding: 1em 0;
+    padding: 0.7em 0;
     cursor: pointer;
     width: 100%;
     text-align: center;
@@ -57,160 +59,37 @@ $mobileMenuHeight: 90px;
     &:hover {
       background-color: rgba(0, 0, 0, 0.1);
     }
+    &.opened {
+      background-color: #eeeeee;
+      color: #023c55;
+      .app-icon, .far.fa-star, .fa-file-alt {
+        color: #023c55;
+      }
+    }
   }
 
-  .offices {
-    color: #ffffff59!important;
+  // .offices {
+  //   color: #ffffff59!important;
+  // }
+
+  .opened {
+    .app-icon.offices {
+      color: #023c55 !important;
     }
+  }
   
-    .app-icon, .far.fa-star, .fa-file-alt {
-      color: #ffffff;
-    }
-  
-    &.admin-menu {
+  &.admin-menu {
       background-color: v.$bgMenuAdmin;
       .item {
         color: #ffffff !important;
       }
-    }
-    &.mobile {
-      width: 100%;
-      display: flex;
-      flex-direction: row;
-      height: $mobileMenuHeight;
-      background-color: v.$bg;
-      position: fixed;
-      top: auto;
-      bottom: 0;
-      padding: 0.5em;
-      font-size: .688rem;
-  
-      .app-icon, .favorite-icon, .fa-file-alt {
-        color: v.$iconGrey;
-      }
-  
-      &.admin-menu {
+      .item.adm-opened {
+        color: v.$bgMenuAdmin;
+        background-color: #eeeeee;
         .app-icon {
-          color: v.$bgMenuAdmin;
+          color: v.$bgMenuAdmin !important;
         }
       }
-      .menuadmin-icons-mobileview-container {
-        width: 100%;
-        display: flex;
-        flex-direction: row;
-        justify-content: space-between;
-        align-items: flex-start;
-        padding: 0.5em;
-        .item {
-          padding: 0;
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-          width: 25%;
-          height: 100%;
-          color: v.$fontLabel;
-          padding: 12px 0;
-          .item-label {
-            font-size: 11px;
-            padding-top: 5px;
-            max-width: 100%;
-            color: #a7074b;
-          }
-        }
-        .item-avatar {
-          width: 25%;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: flex-start;
-          padding: 12px 0;
-          height: 100%;
-          color: v.$fontLabel;
-          .item-label {
-            color: #a7074b;
-            font-size: 11px;
-          }
-          .app-avatar {
-            display: flex;
-            flex-direction: row;
-            justify-content: center;
-            width: 100%;
-            .avatar {
-              padding: 0 !important;
-            }
-            .avatar.small {
-              text-align: center !important;
-              width: 100%;
-              color: #888E96;
-              .p-avatar-xl .p-avatar-icon {
-                font-size: 2.25rem;
-              }
-            }
-            .p-avatar {
-              width: 36px;
-              height: 36px;
-            }
-          }
-        }
-      }
-      .menugeneral-icons-mobileview-container {
-        width: 100%;
-        display: flex;
-        flex-direction: row;
-        justify-content: space-evenly;
-        align-items: flex-start;
-        position: relative;
-        height: 90px;
-        background-color: #d9d9d9;
-        .item {
-          width: 25%;
-          padding: 0.5em 0;
-          display: flex;
-          flex-direction: column;
-          justify-content: space-between;
-          height: 90%;
-          .item-label {
-            color: #888E96;
-            font-size: 11px;
-          }
-        }
-        .item-avatar {
-          width: 25%;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: space-between;
-          padding: 12px 0;
-          height: 91%;
-          color: v.$fontLabel;
-  
-          .item-label {
-            color: #888E96;
-            font-size: 11px;
-          }
-          .app-avatar {
-            display: flex;
-            flex-direction: row;
-            justify-content: center;
-            width: 100%;
-            .avatar {
-              padding: 0 !important;
-            }
-            .avatar.small {
-              text-align: center !important;
-              width: 100%;
-              color: #888E96;
-              .p-avatar-xl .p-avatar-icon {
-                font-size: 1.9rem;
-              }
-            }
-            .p-avatar {
-              width: 36px;
-              height: 36px;
-            }
-          }
-        }
-      }
-    }
+  }
 
 }

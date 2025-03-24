@@ -27,7 +27,7 @@
         <span class="card-item-name cancelling" [pTooltip]="properties.fullNameCardItem"
           *ngIf="properties.icon === 'fas fa-times'" tooltipPosition="bottom">{{'cancelling'|translate}}</span>
         <span class="card-item-status"
-          [ngStyle]="{ color:  ['rejected', 'approved', 'draft'].includes(properties.baselineStatus) ? '#009dd4' : '#888e96' }"
+          [ngStyle]="{ color:  ['rejected', 'approved', 'draft'].includes(properties.baselineStatus) ? '#009dd4' : '#888e96' }" style="text-align: center"
           *ngIf="properties.baselineStatus">{{properties.baselineStatus |translate}}</span>
         <span class="card-item-status-date" [class.date-none]="properties?.baselineStatusDate === 'NONE'">
           {{ properties?.baselineStatusDate !== 'NONE' ? (language === 'pt' ?
@@ -97,7 +97,7 @@
     <div class="carditem-content">
       <i [ngClass]="[ 'app-icon', properties.icon, 'light-grey-icon']"
         (click)="properties.urlCard && navigateToPage(properties.urlCard, properties.paramsUrlCard)"
-        [ngStyle]="{ fontSize: (responsive ? 2 : (displayModeCard === 'list') ? 2.5 : 3) + 'rem', cursor: 'pointer' }"></i>
+        [ngStyle]="{ fontSize: (responsive ? 2 : (displayModeCard === 'list') ? 2 : 2.2) + 'rem', cursor: 'pointer' }"></i>
       <p-tieredMenu #menuIcon [popup]="true" [model]="properties.iconMenuItems"></p-tieredMenu>
     </div>
   </p-card>

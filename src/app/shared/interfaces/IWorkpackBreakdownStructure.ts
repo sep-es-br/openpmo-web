@@ -1,10 +1,13 @@
 import { TypeWorkpackEnumWBS } from '../enums/TypeWorkpackEnum';
+import { IFile } from './IFile';
 import { IMeasureUnit } from './IMeasureUnit';
+import { IInformation, IWorkpackJournalInformation } from './IJournal';
 
 export interface IWorkpackBreakdownStructure {
-  idWorkpack:     number;
-  workpackName:   string;
-  dashboard?:     IDashboardData;
+  idWorkpack: number;
+  workpackName: string;
+  linked?: boolean;
+  dashboard?: IDashboardData;
   milestones?: {
       completed: boolean,
       milestoneDate: string;
@@ -28,7 +31,7 @@ export interface IWorkpackBreakdownStructure {
   start?: string;
   workpackType?: TypeWorkpackEnumWBS;
   hasChildren?: boolean;
-
+  journalInformation?: IWorkpackJournalInformation;
   expirationDate?: string;
   milestoneDate?: string;
   milestoneStatus?: string;
@@ -97,6 +100,7 @@ interface ITripleConstraintDashboard {
     foreseenValue?: number;
     actualValue?: number;
     variation: number;
+    foreseenWorkRefMonth?: number;
   };
 
 }

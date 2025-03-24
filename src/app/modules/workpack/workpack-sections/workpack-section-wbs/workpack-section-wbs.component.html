@@ -16,10 +16,10 @@
     <ng-template let-node styleClass="teste" pTemplate="default">
       <!-- DATA -->
       <div class="container-custom-tree container-workpackmodel"
-        [class.custom-padding]="node?.workpackModelType === typeWorkpackModelEnum.MilestoneModel"
+        [class.custom-padding]="node?.workpackModelType === typeWorkpackEnum.Milestone"
         *ngIf="node.workpacks; else workpackModels">
         <div class="tree-label">{{ node.workpackModelName }}</div>
-        <div class="container-milestone" *ngIf="node?.workpackModelType === typeWorkpackModelEnum.MilestoneModel">
+        <div class="container-milestone" *ngIf="node?.workpackModelType === typeWorkpackEnum.Milestone">
           <div class="milestone-column">{{"baselinePlanned" |translate}}</div>
           <div class="milestone-column">{{"estimatedConcluded" | translate}}</div>
           <div class="milestone-column">{{"status" |translate}}</div>
@@ -29,7 +29,7 @@
       <!-- CHILDREN -->
       <ng-template #workpackModels>
         <div class="container-custom-tree container-workpack">
-          <div class="tree-label link" (click)="navigateToWorkpack(node.idWorkpack)">{{ node.workpackName }}</div>
+          <div class="tree-label link" (click)="navigateToWorkpack(node)">{{node.workpackName }}</div>
           <div class="container-properties" [class.deliverable]="node?.workpackType === typeWorkpackEnum.Deliverable">
             <ng-container *ngIf="node?.workpackType !== typeWorkpackEnum.Deliverable; else schedule">
               <ng-container *ngIf="node?.workpackType !== typeWorkpackEnum.Milestone; else milestoneData"
@@ -93,6 +93,41 @@
   <ng-template #rightContent let-properties="node">
     <div class="right-container">
       <div class="dashboard-items-container">
+
+        <!-- journal information container -->
+        <div class="status-container" *ngIf="properties?.properties?.journalInformation?.date; else statusEmpty">
+          <i class="fas fa-info" style="cursor: pointer"
+            *ngIf="!properties?.properties?.journalInformation?.actual"
+            (click)="handleShowJournalInformation(properties.properties.journalInformation); journalInformationPanel.show($event)" 
+            ></i>
+          <i class="fas fa-info-circle" [ngStyle]="{ fontSize: '1.2rem', cursor: 'pointer' }"
+            *ngIf="properties?.properties?.journalInformation?.actual"
+            (click)="handleShowJournalInformation(properties.properties.journalInformation); journalInformationPanel.show($event)" 
+            ></i>
+        </div>
+        <ng-template #statusEmpty>
+          <div class="status-empty"></div>
+        </ng-template>
+        <p-overlayPanel #journalInformationPanel class="journal-info-overlay-panel"  [showCloseIcon]="true" [dismissable]="false">
+          <div class="journal-info-panel-content" *ngIf="properties?.properties && properties?.properties?.journalInformation">
+            
+            <div class="loading-menu-container" *ngIf="properties?.properties?.journalInformation?.loading">
+              <div class="menu-loading">
+                <p-progressSpinner [style]="{width: '50px', height: '50px'}"
+                  styleClass="custom-spinner" strokeWidth="8"
+                  fill="#EEEEEE" animationDuration=".5s">
+                </p-progressSpinner>
+              </div>
+            </div>
+            <div class="card-information-container" 
+            *ngIf="properties?.properties && properties?.properties?.journalInformation 
+            && properties?.properties?.journalInformation?.information
+            && !properties?.properties?.journalInformation?.loading">
+              <app-card-journal-information [information]="properties?.properties?.journalInformation" ></app-card-journal-information>
+            </div>
+          </div>
+        </p-overlayPanel>
+        <!-- risk container -->
         <div class="status-container" *ngIf="(!properties?.endManagementDate || properties?.endManagementDate === null) &&
                 !properties?.completed && properties?.dashboardData?.risk?.total > 0; else statusEmpty">
           <i class="app-icon risk" [ngStyle]="{ fontSize: '1.2rem' }"
@@ -119,17 +154,17 @@
             </div>
             <div class="risks-container">
               <div class="risk-importance-item" *ngIf="properties?.dashboardData?.risk?.high > 0">
-                <i class="app-icon risk risk-red" [ngStyle]="{ fontSize: '1.5rem' }"></i>
+                <i class="app-icon risk risk-red" [ngStyle]="{ fontSize: '1.2rem' }"></i>
                 <span>{{properties?.dashboardData?.risk?.high}}</span>
                 <label>{{'high'|translate}}</label>
               </div>
               <div class="risk-importance-item" *ngIf="properties?.dashboardData?.risk?.medium > 0">
-                <i class="app-icon risk risk-orange" [ngStyle]="{ fontSize: '1.5rem' }"></i>
+                <i class="app-icon risk risk-orange" [ngStyle]="{ fontSize: '1.2rem' }"></i>
                 <span>{{properties?.dashboardData?.risk?.medium}}</span>
                 <label>{{'medium'|translate}}</label>
               </div>
               <div class="risk-importance-item" *ngIf="properties?.dashboardData?.risk?.low > 0">
-                <i class="app-icon risk risk-yellow" [ngStyle]="{ fontSize: '1.5rem' }"></i>
+                <i class="app-icon risk risk-yellow" [ngStyle]="{ fontSize: '1.2rem' }"></i>
                 <span>{{properties?.dashboardData?.risk?.low}}</span>
                 <label>{{'low'|translate}}</label>
               </div>
@@ -172,14 +207,16 @@
         <p-overlayPanel #cpiPanel>
           <div class="constraint-content">
             <span>{{ 'CPIdescription' | translate }}</span>
-            <app-gauge-chart *ngIf="properties?.properties?.gaugeChartDataCPI && properties?.dashboardData?.costPerformanceIndex"
+            <app-gauge-chart
+              *ngIf="properties?.properties?.gaugeChartDataCPI && properties?.dashboardData?.costPerformanceIndex"
               [config]="properties?.properties?.gaugeChartDataCPI"></app-gauge-chart>
           </div>
         </p-overlayPanel>
         <p-overlayPanel #spiPanel>
           <div class="constraint-content">
             <span>{{ 'SPIdescription' | translate }}</span>
-            <app-gauge-chart *ngIf="properties?.properties?.gaugeChartDataSPI && properties?.dashboardData?.schedulePerformanceIndex"
+            <app-gauge-chart
+              *ngIf="properties?.properties?.gaugeChartDataSPI && properties?.dashboardData?.schedulePerformanceIndex"
               [config]="properties?.properties?.gaugeChartDataSPI"></app-gauge-chart>
           </div>
         </p-overlayPanel>

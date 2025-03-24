@@ -6,11 +6,17 @@
     flex-direction: column;
     flex: 1;
     height: 100%;
-    max-width: 280px;
-    width: 280px;
+    max-width: 260px;
+    width: 260px;
     border: 1px solid v.$borderCard;
     box-shadow: none;
     display: flex;
+    .display-mode-grid {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      flex: 1;
+    }
     .display-mode-grid, .display-mode-list {
       .card-item-header {
         width: 100%;
@@ -55,7 +61,7 @@
           margin-right: 1rem;
         }
         .p-menuitem-text {
-          font-size: 0.9rem;
+          font-size: 0.8rem;
           font-family: v.$fontFamilyMedium;
           color: v.$iconGrey        }
       }
@@ -131,7 +137,7 @@
         padding: 0.5em;
         align-items: center;
         text-align: center;
-        width: 280px;
+        width: 260px;
         white-space: nowrap;
         word-break: break-word;
         overflow: hidden;
@@ -181,8 +187,8 @@
     display: flex;
     justify-content: center;
     height: 100%;
-    max-width: 280px;
-    width: 280px;
+    max-width: 260px;
+    width: 260px;
     border: 1px solid v.$borderCard;
     box-shadow: none;
     .p-card-body {
@@ -190,20 +196,6 @@
     }
     .p-card-body .p-card-content {
       height: 100%;
-      p-menu {
-        .p-menu-overlay .p-menu-list {
-          max-width: 20em;
-          .p-menuitem .p-menuitem-link {
-            .p-menuitem-icon {
-              font-size: 0.8rem;
-              color: v.$iconGrey            }
-            .p-menuitem-text {
-              font-size: 0.9rem;
-              font-family: v.$fontFamilyMedium;
-              color: v.$iconGrey            }
-          }
-        }
-      }
     }
     .p-card-body .p-card-content .carditem-content {
       padding: 2em;
@@ -214,7 +206,7 @@
       width: 100%;
       .app-icon {
         cursor: pointer;
-        font-size: 3rem;
+        font-size: 2rem;
       }
       p-fileupload {
         .p-fileupload-buttonbar {
@@ -225,7 +217,7 @@
           .p-button {
             background: transparent;
             border: none;
-            font-size: 3rem;
+            font-size: 2rem;
             padding: 0;
             color: v.$iconGrey;
             margin: 0;
@@ -252,7 +244,7 @@
         .carditem-content {
           padding: 0;
           .app-icon {
-            font-size: 2.5rem;
+            font-size: 2rem;
           }
         }
       }

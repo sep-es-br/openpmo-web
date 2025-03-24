@@ -20,6 +20,7 @@ import { IWorkpack } from 'src/app/shared/interfaces/IWorkpack';
 import * as moment from 'moment';
 import { ICartItemCostAssignment } from 'src/app/shared/interfaces/ICartItemCostAssignment';
 import { ICostAccount } from 'src/app/shared/interfaces/ICostAccount';
+import { CancelButtonComponent } from 'src/app/shared/components/cancel-button/cancel-button.component';
 
 @Component({
   selector: 'app-schedule',
@@ -32,6 +33,7 @@ import { ICostAccount } from 'src/app/shared/interfaces/ICostAccount';
 export class ScheduleComponent implements OnInit, OnDestroy {
 
   @ViewChild(SaveButtonComponent) saveButton: SaveButtonComponent;
+  @ViewChild(CancelButtonComponent) cancelButton: CancelButtonComponent;
   @ViewChildren(Calendar) calendarComponents: Calendar[];
 
   responsive: boolean;
@@ -164,7 +166,12 @@ export class ScheduleComponent implements OnInit, OnDestroy {
     const result = await this.costAccountSrv.GetAll({ 'id-workpack': this.idWorkpack });
     if (result.success) {
       this.costAccounts = result.data;
-      const workpacksIds = this.costAccounts.map(cost => cost.idWorkpack);
+      this.setMenuItems();
+    }
+  }
+
+  setMenuItems() {
+    const workpacksIds = this.costAccounts.map(cost => cost.idWorkpack);
       const workpacksIdsNotRepeated = workpacksIds.filter((w, i) => workpacksIds.indexOf(w) === i);
 
       this.menuItemsCostAccounts = workpacksIdsNotRepeated.map( (idWorkpack) => {
@@ -182,7 +189,6 @@ export class ScheduleComponent implements OnInit, OnDestroy {
           })
         };
       });
-    }
   }
 
   createNewCardItemCost(idCost: number, costName: string) {
@@ -291,6 +297,7 @@ export class ScheduleComponent implements OnInit, OnDestroy {
   }
 
   handleChangeValues() {
+    this.cancelButton.showButton();
     this.scheduleStartDate = this.formSchedule.controls.start.value;
     if (this.formSchedule.controls.actualWork.value > 0 && this.formSchedule.controls.start.value) {
       const startDate = moment(this.formSchedule.controls.start.value);
@@ -367,6 +374,7 @@ export class ScheduleComponent implements OnInit, OnDestroy {
   }
 
   async saveSchedule() {
+    this.cancelButton.hideButton();
     const startDate = moment(this.formSchedule.controls.start.value);
     const endDate = moment(this.formSchedule.controls.end.value);
     if (startDate.isSame(endDate, 'days')) {
@@ -418,4 +426,24 @@ export class ScheduleComponent implements OnInit, OnDestroy {
       );
     }
   }
+
+  handleOnCancel() {
+    this.saveButton.hideButton();
+    const newDate = moment();
+    this.formSchedule.reset({
+      start: newDate.toDate(),
+      end: newDate.add(1, 'days').toDate(),
+      plannedWork: null,
+      actualWork: null,
+      distribution: 'SIGMOIDAL'
+    });
+    this.setMenuItems();
+    this.costAssignmentsCardItems = [{
+      type: 'new-cost-card',
+      menuItemsNewCost: this.menuItemsCostAccounts
+    }];
+    
+    this.reloadCostAssignmentTotals();
+  }
+
 }

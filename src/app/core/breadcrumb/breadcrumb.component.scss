@@ -109,7 +109,19 @@
         margin-bottom: -1rem;
         padding: 0 .5rem;
       }
+      &.last-crumb-highlighted {
+        .link {
+          background-color: #44B39B;
+          color: #ffff;
+          font-weight: 700;
+        }
+        .info {
+          color: #44B39B;
+          font-weight: 700;
+        }
+      }
     }
+    
   }
   &.mobile {
     font-size: .688rem;

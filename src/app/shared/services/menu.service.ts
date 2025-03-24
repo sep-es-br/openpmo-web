@@ -10,6 +10,7 @@ import { IHttpResult } from '../interfaces/IHttpResult';
 
 import { IMenu, IMenuOffice, IMenuWorkpack } from '../interfaces/IMenu';
 import { PrepareHttpParams } from '../utils/query.util';
+import { adminsPath, plansPath } from '../constants/menuUrls';
 
 interface IMenuState {
   isFixed: boolean;
@@ -29,9 +30,8 @@ interface IMenuState {
 
 export class MenuService extends BaseService<any> {
 
-  adminsPath = [ 'strategies', 'organizations', 'domains', 'config/filter-dataview',
-    'measure-units', 'offices/permission', 'workpack-model', 'configuration-office', 'persons', 'report-models' ];
-  plansPath = [ 'plan', 'workpack', 'stakeholder', 'reports', 'ccbmember-baselines-view', 'filter-dataview', 'persons/profile'];
+  adminsPath = adminsPath;
+  plansPath = plansPath;
   idNewWorkpack: number;
 
   private $reloadMenuOffice = new Subject();
@@ -43,7 +43,7 @@ export class MenuService extends BaseService<any> {
   private isPlanMenuObservable = new BehaviorSubject<boolean>(false);
   private closeAllMenus = new BehaviorSubject<boolean>(false);
   private closeMenuUser = new BehaviorSubject<boolean>(false);
-  private toggleMenu = new BehaviorSubject<string>('');
+  private toggleMenu = new BehaviorSubject<{menu: string, open: boolean}>({menu: '', open: false});
   private hasFavoriteItemsObservable = new BehaviorSubject<boolean>(false);
   private menuPortfolioItems = new BehaviorSubject<IMenuWorkpack[]>([]);
 

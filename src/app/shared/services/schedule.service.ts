@@ -10,11 +10,11 @@ import { IWorkpackData, IWorkpackParams } from '../interfaces/IWorkpackDataParam
 @Injectable({ providedIn: 'root' })
 export class ScheduleService extends BaseService<any> {
 
-  private resetSchedule = new BehaviorSubject<boolean>(false);
   workpackParams: IWorkpackParams;
   workpackData: IWorkpackData;
   schedule;
   loading;
+  private resetSchedule = new BehaviorSubject<boolean>(false);
 
   constructor(
     @Inject(Injector) injector: Injector,
@@ -38,6 +38,7 @@ export class ScheduleService extends BaseService<any> {
         const result = await this.GetSchedule({ 'id-workpack': this.workpackParams.idWorkpack });
         if (result.success) {
           this.schedule = result.data && result.data.length > 0 ? result.data[0] : undefined;
+          localStorage.setItem('@pmo/backupSchedule', JSON.stringify(this.schedule));
           this.loading = false;
           this.nextResetSchedule(true);
         }
@@ -45,7 +46,6 @@ export class ScheduleService extends BaseService<any> {
       this.loading = false;
       this.nextResetSchedule(true);
     }
-    
   }
 
   setScheduleChanged(schedule) {
@@ -58,7 +58,17 @@ export class ScheduleService extends BaseService<any> {
       workpackData: this.workpackData,
       schedule: this.schedule,
       loading: this.loading
-    }
+    };
+  }
+
+  getBackupSchedule() {
+    const backupSchedule = localStorage.getItem('@pmo/backupSchedule');
+    this.schedule = JSON.parse(backupSchedule);
+    return this.schedule;
+  }
+
+  refreshBackupSchedule(schedule) {
+    localStorage.setItem('@pmo/backupSchedule', JSON.stringify(schedule));
   }
 
   nextResetSchedule(nextValue: boolean) {
@@ -91,8 +101,8 @@ export class ScheduleService extends BaseService<any> {
     return this.http.put(`${this.urlBase}/step`, step).toPromise() as Promise<IHttpResult<IStepPost>>;
   }
 
-  public putScheduleStepBatch(steps: IStepPost[]): Promise<IHttpResult<IStepPost[]>> {
-    return this.http.put(`${this.urlBase}/step/batch`, steps).toPromise() as Promise<IHttpResult<IStepPost[]>>;
+  public putScheduleStepBatch(steps: IStepPost[], idSchedule: number): Promise<IHttpResult<IStepPost[]>> {
+    return this.http.put(`${this.urlBase}/step/batch/${idSchedule}`, steps).toPromise() as Promise<IHttpResult<IStepPost[]>>;
   }
 
   public postScheduleStep(step: IStepPost): Promise<IHttpResult<IStepPost>> {

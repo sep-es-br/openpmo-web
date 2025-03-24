@@ -29,5 +29,6 @@ export interface IProperty {
   invalid?: boolean;
   message?: string;
   collapsed?: boolean;
+  helpText?: string;
   getValues();
 }

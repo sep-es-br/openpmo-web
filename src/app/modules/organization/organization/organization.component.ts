@@ -1,22 +1,23 @@
-import {Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import {FormBuilder, FormGroup, Validators} from '@angular/forms';
-import {ActivatedRoute, Router} from '@angular/router';
-import {TranslateService} from '@ngx-translate/core';
-import {Subject} from 'rxjs';
-import {filter, takeUntil} from 'rxjs/operators';
-import {MessageService} from 'primeng/api';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
+import { TranslateService } from '@ngx-translate/core';
+import { Subject } from 'rxjs';
+import { filter, takeUntil } from 'rxjs/operators';
+import { MessageService } from 'primeng/api';
 
-import {ICard} from 'src/app/shared/interfaces/ICard';
-import {ResponsiveService} from 'src/app/shared/services/responsive.service';
-import {OrganizationService} from 'src/app/shared/services/organization.service';
-import {IOrganization} from 'src/app/shared/interfaces/IOrganization';
-import {TypeOrganization} from 'src/app/shared/enums/TypeOrganization';
-import {BreadcrumbService} from 'src/app/shared/services/breadcrumb.service';
-import {SaveButtonComponent} from 'src/app/shared/components/save-button/save-button.component';
-import {AuthService} from 'src/app/shared/services/auth.service';
-import {IOffice} from 'src/app/shared/interfaces/IOffice';
-import {OfficePermissionService} from 'src/app/shared/services/office-permission.service';
-import {OfficeService} from 'src/app/shared/services/office.service';
+import { ICard } from 'src/app/shared/interfaces/ICard';
+import { ResponsiveService } from 'src/app/shared/services/responsive.service';
+import { OrganizationService } from 'src/app/shared/services/organization.service';
+import { IOrganization } from 'src/app/shared/interfaces/IOrganization';
+import { TypeOrganization } from 'src/app/shared/enums/TypeOrganization';
+import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
+import { SaveButtonComponent } from 'src/app/shared/components/save-button/save-button.component';
+import { AuthService } from 'src/app/shared/services/auth.service';
+import { IOffice } from 'src/app/shared/interfaces/IOffice';
+import { OfficePermissionService } from 'src/app/shared/services/office-permission.service';
+import { OfficeService } from 'src/app/shared/services/office.service';
+import { CancelButtonComponent } from 'src/app/shared/components/cancel-button/cancel-button.component';
 
 @Component({
   selector: 'app-organization',
@@ -26,6 +27,7 @@ import {OfficeService} from 'src/app/shared/services/office.service';
 export class OrganizationComponent implements OnInit, OnDestroy {
 
   @ViewChild(SaveButtonComponent) saveButton: SaveButtonComponent;
+  @ViewChild(CancelButtonComponent) cancelButton: CancelButtonComponent;
 
   propertiesOrganization: IOrganization;
   optionsSector;
@@ -68,15 +70,18 @@ export class OrganizationComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.$destroy), filter(status => status === 'INVALID'))
       .subscribe(() => this.saveButton?.hideButton());
     this.formOrganization.valueChanges
+      .pipe(takeUntil(this.$destroy), filter(() => this.formOrganization.dirty && this.formOrganization.valid))
+      .subscribe(() => { this.saveButton.showButton(); });
+    this.formOrganization.valueChanges
       .pipe(takeUntil(this.$destroy), filter(() => this.formOrganization.dirty))
-      .subscribe(() => this.saveButton.showButton());
+      .subscribe(() => { this.cancelButton.showButton() });
     this.optionsSector = [
-      {name: translateSrv.instant(TypeOrganization.Private), value: TypeOrganization.Private.toLocaleUpperCase()},
-      {name: translateSrv.instant(TypeOrganization.Public), value: TypeOrganization.Public.toLocaleUpperCase()},
-      {name: translateSrv.instant(TypeOrganization.Third), value: TypeOrganization.Third.toLocaleUpperCase()}
+      { name: translateSrv.instant(TypeOrganization.Private), value: TypeOrganization.Private.toLocaleUpperCase() },
+      { name: translateSrv.instant(TypeOrganization.Public), value: TypeOrganization.Public.toLocaleUpperCase() },
+      { name: translateSrv.instant(TypeOrganization.Third), value: TypeOrganization.Third.toLocaleUpperCase() }
     ];
     this.responsiveSvr.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.responsive = value);
-    this.activeRoute.queryParams.subscribe(({id, idOffice}) => {
+    this.activeRoute.queryParams.subscribe(({ id, idOffice }) => {
       this.idOrganization = +id;
       this.idOffice = +idOffice;
     });
@@ -103,21 +108,24 @@ export class OrganizationComponent implements OnInit, OnDestroy {
         info: this.propertiesOffice?.name,
         tooltip: this.propertiesOffice?.fullName,
         routerLink: ['/configuration-office'],
-        queryParams: {idOffice: this.idOffice}
+        admin: true,
+        queryParams: { idOffice: this.idOffice }
       },
       {
         key: 'configuration',
         info: 'organizations',
         tooltip: this.translateSrv.instant('organizations'),
         routerLink: ['/organizations'],
-        queryParams: {idOffice: this.idOffice}
+        admin: true,
+        queryParams: { idOffice: this.idOffice }
       },
       {
         key: 'organization',
         info: this.propertiesOrganization?.name,
         tooltip: this.propertiesOrganization?.fullName,
         routerLink: ['/organizations', 'organization'],
-        queryParams: {id: this.idOrganization}
+        admin: true,
+        queryParams: { id: this.idOrganization }
       }
     ]);
   }
@@ -135,7 +143,7 @@ export class OrganizationComponent implements OnInit, OnDestroy {
   async loadPropertiesOrganization() {
     if (this.idOrganization) {
       this.isLoading = true;
-      const {data, success} = await this.organizationSvr.GetById(this.idOrganization);
+      const { data, success } = await this.organizationSvr.GetById(this.idOrganization);
       if (success) {
         this.propertiesOrganization = data;
         this.formOrganization.reset(
@@ -194,14 +202,15 @@ export class OrganizationComponent implements OnInit, OnDestroy {
   }
 
   async handleOnSubmit() {
+    this.cancelButton.hideButton();
     this.formIsSaving = true;
     let phoneNumber = this.formOrganization.controls.phoneNumber.value;
     if (phoneNumber) {
       phoneNumber = phoneNumber.replace(/\D+/g, '');
     }
     this.formIsSaving = true;
-    const {success} = this.propertiesOrganization
-      ? await this.organizationSvr.put({...this.formOrganization.value, id: this.idOrganization})
+    const { success } = this.propertiesOrganization
+      ? await this.organizationSvr.put({ ...this.formOrganization.value, id: this.idOrganization })
       : await this.organizationSvr.post({
         ...this.formOrganization.value,
         phoneNumber,
@@ -214,7 +223,18 @@ export class OrganizationComponent implements OnInit, OnDestroy {
         detail: this.translateSrv.instant('messages.savedSuccessfully')
       });
       this.formIsSaving = false;
-      await this.router.navigate(['/organizations'], {queryParams: {idOffice: this.idOffice}});
+      await this.router.navigate(['/organizations'], { queryParams: { idOffice: this.idOffice } });
+    }
+  }
+
+  handleOnCancel() {
+    this.saveButton.hideButton();
+    if (this.idOrganization) {
+      this.formOrganization.reset(
+        Object.keys(this.formOrganization.controls).reduce((a, key) => (a[key] = this.propertiesOrganization[key] || '', a), {})
+      );
+    } else {
+      this.formOrganization.reset();
     }
   }
 

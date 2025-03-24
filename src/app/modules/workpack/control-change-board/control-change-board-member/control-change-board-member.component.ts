@@ -23,6 +23,8 @@ import {IControlChangeBoard} from 'src/app/shared/interfaces/IControlChangeBoard
 import {IPlan} from 'src/app/shared/interfaces/IPlan';
 import {PlanService} from 'src/app/shared/services/plan.service';
 import {ControlChangeBoardService} from 'src/app/shared/services/control-change-board.service';
+import { CancelButtonComponent } from 'src/app/shared/components/cancel-button/cancel-button.component';
+import { WorkpackBreadcrumbStorageService } from 'src/app/shared/services/workpack-breadcrumb-storage.service';
 
 @Component({
   selector: 'app-control-change-board-member',
@@ -35,6 +37,7 @@ import {ControlChangeBoardService} from 'src/app/shared/services/control-change-
 export class ControlChangeBoardMemberComponent implements OnInit, OnDestroy {
 
   @ViewChild(SaveButtonComponent) saveButton: SaveButtonComponent;
+  @ViewChild(CancelButtonComponent) cancelButton: CancelButtonComponent;
 
   idOffice: number;
   idPerson: number;
@@ -53,7 +56,7 @@ export class ControlChangeBoardMemberComponent implements OnInit, OnDestroy {
   $destroy = new Subject();
   invalidMailMessage: string;
   citizenAuthServer: boolean;
-  citizenSearchBy: string; //CPF | NAME
+  citizenSearchBy: string = 'CPF'; //CPF | NAME
   searchedNameUser: string;
   searchedCpfUser: string;
   selectedPerson: IPerson;
@@ -68,6 +71,7 @@ export class ControlChangeBoardMemberComponent implements OnInit, OnDestroy {
   isUser = true;
   phoneNumberPlaceholder = '';
   formIsSaving = false;
+  ccbMemberAsBackup;
 
   constructor(
     private actRouter: ActivatedRoute,
@@ -82,7 +86,8 @@ export class ControlChangeBoardMemberComponent implements OnInit, OnDestroy {
     private authServerSrv: AuthServerService,
     private formBuilder: FormBuilder,
     private planSrv: PlanService,
-    private ccbMemberSrv: ControlChangeBoardService
+    private ccbMemberSrv: ControlChangeBoardService,
+    private breadcrumbStorageSrv: WorkpackBreadcrumbStorageService
   ) {
     this.actRouter.queryParams.subscribe(async queryParams => {
       this.idPerson = +queryParams.idPerson;
@@ -120,37 +125,54 @@ export class ControlChangeBoardMemberComponent implements OnInit, OnDestroy {
     await this.loadCurrentUserInfo();
     this.loadCards();
     await this.loadPropertiesPlan();
-    await this.loadBreadcrumb();
+    await this.setBreadcrumb();
   }
 
-  async loadBreadcrumb() {
-    let breadcrumbItems = this.breadcrumbSrv.get;
-    if (!breadcrumbItems || breadcrumbItems.length === 0) {
-      breadcrumbItems = await this.breadcrumbSrv.loadWorkpackBreadcrumbs(this.idProject, this.idPlan)
-    }
+  async setBreadcrumb() {
+    const breadcrumbItems = await this.getBreadcrumbs();
+    this.breadcrumbStorageSrv.setBreadcrumbStorage(breadcrumbItems);
     this.breadcrumbSrv.setMenu([
       ...breadcrumbItems,
-      ...[
-        {
-          key: 'changeControlBoard',
-          info: 'ccbMembers',
-          routerLink: ['/workpack/change-control-board'],
-          queryParams: {
-            idProject: this.idProject,
-            idOffice: this.idOffice
-          },
+      {
+        key: 'changeControlBoard',
+        info: 'ccbMembers',
+        routerLink: ['/workpack/change-control-board'],
+        queryParams: {
+          idProject: this.idProject,
+          idOffice: this.idOffice
         },
-        {
-          key: 'ccbMember',
-          routerLink: ['/workpack/change-control-board/member'],
-          queryParams: {
-            idProject: this.idProject,
-            idPerson: this.idPerson,
-            idOffice: this.idOffice
-          },
-        }
-      ]
+      },
+      {
+        key: 'ccbMember',
+        info: this.ccbMember && this.ccbMember.person ? this.ccbMember.person.name : ''
+      }
     ]);
+  }
+
+  async getBreadcrumbs() {
+    const { success, data } = await this.breadcrumbSrv.getBreadcrumbWorkpack
+      (this.idProject, { 'id-plan': this.idPlan });
+    return success
+      ? data.map(p => ({
+        key: !p.modelName ? p.type.toLowerCase() : p.modelName,
+        info: p.name,
+        tooltip: p.fullName,
+        routerLink: this.getRouterLinkFromType(p.type),
+        queryParams: { id: p.id, idWorkpackModelLinked: p.idWorkpackModelLinked, idPlan: this.idPlan },
+        modelName: p.modelName
+      }))
+      : [];
+  }
+
+  getRouterLinkFromType(type: string): string[] {
+    switch (type) {
+      case 'office':
+        return ['/offices', 'office'];
+      case 'plan':
+        return ['plan'];
+      default:
+        return ['/workpack'];
+    }
   }
 
   loadCards() {
@@ -233,35 +255,12 @@ export class ControlChangeBoardMemberComponent implements OnInit, OnDestroy {
           this.setFormPerson(this.ccbMember.person);
           if (!this.ccbMember.memberAs) {
             this.setMemberAsCcbMember(this.ccbMember.person);
+          } else {
+            this.ccbMemberAsBackup = this.ccbMember.memberAs.map( item => ({...item}));
           }
         }
         this.isLoading = false;
       }
-    }
-  }
-
-  async getBreadcrumbs(idWorkpack: number) {
-    const {success, data} = await this.breadcrumbSrv.getBreadcrumbWorkpack(idWorkpack, {'id-plan': this.idPlan});
-    return success
-      ? data.map(p => ({
-        key: !p.modelName ? p.type.toLowerCase() : p.modelName,
-        info: p.name,
-        tooltip: p.fullName,
-        routerLink: this.getRouterLinkFromType(p.type),
-        queryParams: {id: p.id, idWorkpackModelLinked: p.idWorkpackModelLinked, idPlan: this.idPlan},
-        modelName: p.modelName
-      }))
-      : [];
-  }
-
-  getRouterLinkFromType(type: string): string[] {
-    switch (type) {
-      case 'office':
-        return ['/offices', 'office'];
-      case 'plan':
-        return ['plan'];
-      default:
-        return ['/workpack'];
     }
   }
 
@@ -424,9 +423,11 @@ export class ControlChangeBoardMemberComponent implements OnInit, OnDestroy {
 
   showSaveButton() {
     this.saveButton.showButton();
+    this.cancelButton.showButton();
   }
 
   async saveCcbMember() {
+    this.cancelButton.hideButton();
     let phoneNumber = this.formPerson.controls.phoneNumber.value;
     if (phoneNumber) {
       phoneNumber = phoneNumber.replace(/\D+/g, '');
@@ -461,4 +462,22 @@ export class ControlChangeBoardMemberComponent implements OnInit, OnDestroy {
       }
     });
   }
+
+  handleOnCancel() {
+    this.saveButton.hideButton();
+    this.formPerson.reset({
+      address: this.ccbMember && this.ccbMember.person ? this.ccbMember.person.address : '',
+      phoneNumber: this.ccbMember && this.ccbMember.person ? this.formatPhoneNumber(this.ccbMember.person.phoneNumber) : '',
+      contactEmail: this.ccbMember && this.ccbMember.person ? this.ccbMember.person.contactEmail : ''
+    });
+    if (!this.idPerson) {
+      this.validateClearSearchByCpf('');
+      this.validateClearSearchByUser();
+      this.validateClearSearchUserName('');
+      this.citizenSearchBy = 'CPF';
+    } else {
+      this.ccbMember.memberAs = this.ccbMemberAsBackup.map( item => ({...item}));
+    }
+  }
+
 }

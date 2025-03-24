@@ -5,12 +5,13 @@ import { TranslateService } from '@ngx-translate/core';
 import { ResponsiveService } from './../../services/responsive.service';
 import { Router } from '@angular/router';
 import { IWorkpackCardItem } from './../../interfaces/IWorkpackCardItem';
-import { Component, OnInit, Input, OnDestroy } from '@angular/core';
+import { Component, OnInit, Input, OnDestroy, ViewChild, ElementRef } from '@angular/core';
 import { ChartData } from 'chart.js';
 import { Subject } from 'rxjs';
 import * as moment from 'moment';
 import { WorkpackService } from '../../services/workpack.service';
 import { MessageService } from 'primeng/api';
+import { JournalService } from '../../services/journal.service';
 
 @Component({
   selector: 'app-workpack-card-item',
@@ -18,6 +19,8 @@ import { MessageService } from 'primeng/api';
   styleUrls: ['./workpack-card-item.component.scss']
 })
 export class WorkpackCardItemComponent implements OnInit, OnDestroy {
+
+  @ViewChild('newItemIcon') newItemIcon: ElementRef;
 
   @Input() properties: IWorkpackCardItem;
   @Input() displayModeCard: string;
@@ -43,18 +46,20 @@ export class WorkpackCardItemComponent implements OnInit, OnDestroy {
   attentionMilestone = false;
   milestoneStatusEnum = MilestoneStatusEnum;
 
-  milestoneDate: Date;
+  milestoneDate: Date = null;
   showReasonModal: boolean;
-  reasonValue: string;
+  reasonValue: string = '';
   showReasonButtons = false;
   milestoneMidleTextBottom: string;
+  enable = true;
 
   constructor(
     private router: Router,
     private responsiveSrv: ResponsiveService,
     private translateSrv: TranslateService,
     private workpackSrv: WorkpackService,
-    private messageSrv: MessageService
+    private messageSrv: MessageService,
+    private journalSrv: JournalService
   ) {
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.responsive = value);
     this.translateSrv.onLangChange.pipe(takeUntil(this.$destroy)).subscribe(() => {
@@ -192,7 +197,7 @@ export class WorkpackCardItemComponent implements OnInit, OnDestroy {
       value: this.properties.dashboardData?.costPerformanceIndex !== null ?
         (this.properties.dashboardData?.costPerformanceIndex?.indexValue !== null ?
           this.properties.dashboardData?.costPerformanceIndex?.indexValue : 0) :
-          null,
+        null,
       labelBottom: 'CPI',
       classIconLabelBottom: 'fas fa-dollar-sign',
       valueProgressBar: this.properties.dashboardData?.costPerformanceIndex !== null ?
@@ -206,7 +211,7 @@ export class WorkpackCardItemComponent implements OnInit, OnDestroy {
       value: this.properties.dashboardData?.schedulePerformanceIndex !== null ?
         (this.properties.dashboardData?.schedulePerformanceIndex?.indexValue !== null ?
           this.properties.dashboardData?.schedulePerformanceIndex?.indexValue : 0) :
-          null,
+        null,
       labelBottom: 'SPI',
       classIconLabelBottom: 'fas fa-clock',
       valueProgressBar: this.properties.dashboardData?.schedulePerformanceIndex !== null ?
@@ -259,7 +264,7 @@ export class WorkpackCardItemComponent implements OnInit, OnDestroy {
         }
       } else {
         if (this.properties.dashboardData.tripleConstraint?.cost?.foreseenValue >=
-            this.properties.dashboardData?.tripleConstraint?.cost?.actualValue) {
+          this.properties.dashboardData?.tripleConstraint?.cost?.actualValue) {
           this.iconCostColor = '#888E96';
         } else {
           this.iconCostColor = '#EA5C5C';
@@ -306,11 +311,11 @@ export class WorkpackCardItemComponent implements OnInit, OnDestroy {
             this.iconScopeColor = '#EA5C5C';
           }
         } else {
-          this.iconScopeColor = '#EA5C5C';
+          this.iconScopeColor = '#44B39B';
         }
       } else {
-        if (this.properties.dashboardData?.tripleConstraint?.scope?.foreseenValue !== null &&
-          this.properties.dashboardData?.tripleConstraint?.scope?.foreseenValue >=
+        if (this.properties.dashboardData?.tripleConstraint?.scope?.foreseenWorkRefMonth !== null &&
+          this.properties.dashboardData?.tripleConstraint?.scope?.foreseenWorkRefMonth >=
           this.properties.dashboardData?.tripleConstraint?.scope?.actualValue) {
           this.iconScopeColor = '#EA5C5C';
         } else {
@@ -404,6 +409,56 @@ export class WorkpackCardItemComponent implements OnInit, OnDestroy {
 
   showEndManagementIndex() {
     return (!!this.properties.endManagementDate && this.properties.endManagementDate !== null) || !!this.properties.completed;
+  }
+
+  async handleShowJournalInformation(journalInformation) {
+    journalInformation.loading = true;
+    const result = await this.journalSrv.GetById(journalInformation.id);
+    if (result.success) {
+      journalInformation.information = result.data.information;
+      journalInformation.author = result.data.author;
+      journalInformation.dateInformation = result.data.date;
+      journalInformation.workpack = result.data.workpack;
+      journalInformation.evidences = result.data.evidences && result.data.evidences.map( evidence => {
+        const isImg = evidence.mimeType.includes('image');
+        let icon: string;
+        switch (evidence.mimeType) {
+          case 'application/pdf':
+            icon = 'far fa-file-pdf';
+            break;
+          case 'text/csv':
+            icon = 'fas fa-file-csv';
+            break;
+          case 'application/msword':
+            icon = 'far fa-file-word';
+            break;
+          case 'application/vnd.ms-excel':
+          case 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
+            icon = 'far fa-file-excel';
+            break;
+          case 'application/vnd.openxmlformats-officedocument.presentationml.presentation':
+          case 'application/vnd.ms-powerpoint':
+            icon = 'far fa-file-powerpoint';
+            break;
+          default:
+            icon = 'far fa-file';
+            break;
+        }
+        return {
+          ...evidence,
+          isImg,
+          icon
+        }
+      });
+      journalInformation.loading = false;
+    }
+  }
+
+  async handleLoadMenu() {
+    this.enable = false;
+    await this.properties.onNewItem();
+    this.enable = true;
+    this.newItemIcon.nativeElement.click();
   }
 }
 

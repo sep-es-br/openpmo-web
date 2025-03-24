@@ -212,7 +212,7 @@ export class PlanPermissionsListComponent implements OnInit, OnDestroy {
       this.setBreadcrumbStorage();
       this.router.navigate(['/filter-dataview'], {
         queryParams: {
-          id: idFilter,
+          idFilter: idFilter,
           entityName: 'plan-permissions'
         }
       });

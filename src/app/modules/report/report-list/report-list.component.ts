@@ -1,5 +1,5 @@
 import { takeUntil } from 'rxjs/operators';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Subject } from 'rxjs';
 import { ICard } from 'src/app/shared/interfaces/ICard';
 import { ICardItem } from 'src/app/shared/interfaces/ICardItem';
@@ -9,13 +9,16 @@ import { IPlan } from 'src/app/shared/interfaces/IPlan';
 import { ReportModelService } from 'src/app/shared/services/report-model.service';
 import { IReportModel } from 'src/app/shared/interfaces/IReportModel';
 import { ConfigDataViewService } from 'src/app/shared/services/config-dataview.service';
+import { AuthService } from 'src/app/shared/services/auth.service';
+import { Router } from '@angular/router';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-report-list',
   templateUrl: './report-list.component.html',
   styleUrls: ['./report-list.component.scss']
 })
-export class ReportListComponent implements OnInit {
+export class ReportListComponent implements OnInit, OnDestroy {
 
   collapsePanelsStatus = true;
   displayModeAll = 'grid';
@@ -27,12 +30,17 @@ export class ReportListComponent implements OnInit {
   responsive = false;
   propertiesPlan: IPlan;
   reports: IReportModel[];
+  showBackToManagement = false;
+  infoPerson;
 
   constructor(
     private responsiveSvr: ResponsiveService,
     private breadcrumbSrv: BreadcrumbService,
     private reportModelSrv: ReportModelService,
-    private configDataViewSrv: ConfigDataViewService
+    private configDataViewSrv: ConfigDataViewService,
+    private authSrv: AuthService,
+    private router: Router,
+    private translateSrv: TranslateService
   ) {
     this.responsiveSvr.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.responsive = value);
     this.configDataViewSrv.observableDisplayModeAll.pipe(takeUntil(this.$destroy)).subscribe(displayMode => {
@@ -44,11 +52,59 @@ export class ReportListComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadReportModels();
+    this.checkShowBackToManagement();
   }
 
   ngOnDestroy(): void {
     this.$destroy.next();
     this.$destroy.complete();
+  }
+
+  checkShowBackToManagement() {
+    this.infoPerson = this.authSrv.getInfoPerson();
+    if (this.infoPerson && this.infoPerson.workLocal &&
+      (this.infoPerson.workLocal.idOffice || this.infoPerson.workLocal.idPlan || this.infoPerson.workLocal.idWorkpack) ) {
+        this.showBackToManagement = true;
+    }
+  }
+
+  async navigateToManagement() {
+    const workLocal = this.infoPerson.workLocal;
+      if (workLocal.idWorkpackModelLinked && workLocal.idWorkpack && workLocal.idPlan && workLocal.idOffice) {
+        this.router.navigate(['workpack'], {
+          queryParams: {
+            id: Number(workLocal.idWorkpack),
+            idPlan: Number(workLocal.idPlan),
+            idWorkpackModelLinked: Number(workLocal.idWorkpackModelLinked)
+          }
+        });
+        return;
+      }
+      if (workLocal.idWorkpack && workLocal.idPlan && workLocal.idOffice) {
+        this.router.navigate(['workpack'], {
+          queryParams: {
+            id: Number(workLocal.idWorkpack),
+            idPlan: Number(workLocal.idPlan),
+          }
+        });
+        return;
+      }
+      if (workLocal.idPlan && workLocal.idOffice) {
+        this.router.navigate(['plan'], {
+          queryParams: {
+            id: Number(workLocal.idPlan),
+          }
+        });
+        return;
+      }
+      if (workLocal.idOffice) {
+        this.router.navigate(['offices/office'], {
+          queryParams: {
+            id: Number(workLocal.idOffice),
+          }
+        });
+        return;
+      }
   }
 
   setBreadcrumb() {
@@ -76,8 +132,8 @@ export class ReportListComponent implements OnInit {
           key: 'action',
           routerLink: ['/reports'],
           queryParams: { idPlan: this.propertiesPlan.id },
-          info: 'action',
-          tooltip: 'action'
+          info: 'reports',
+          tooltip: this.translateSrv.instant('reports')
         },
       ]);
     }

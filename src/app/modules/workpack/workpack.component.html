@@ -7,10 +7,12 @@
   <div class="header-container" [class.mobile]="responsive" *ngIf="workpackModel && idWorkpack && !workpackLoading">
     <div class="app-content-header" [class.mobile]="responsive">
       <span class="label">{{workpackModel?.modelName}}:</span>
-      <span class="text">{{workpackFullName}}</span>
+      <span class="text actual-element">{{workpack?.fullName}}</span>
     </div>
     <div class="container-actions">
-      <i [pTooltip]="(workpack?.favoritedBy ? 'removeFavorite' : 'addFavorite') | translate" (click)="!favoriteProcessing && handleFavorite()" [class.responsive]="responsive"
+      <i
+        *ngIf="checkHasPermission"
+        [pTooltip]="(workpack?.favoritedBy ? 'removeFavorite' : 'addFavorite') | translate" (click)="!favoriteProcessing && handleFavorite()" [class.responsive]="responsive"
         [class]="(workpack?.favoritedBy ? 'fas icon-favorite-checked ' : 'far ') + 'fa-star icon-favorite'">
       </i>
       <app-config-data-view-panel  [notShowCollapseOptions]="showTabview"></app-config-data-view-panel>
@@ -30,7 +32,7 @@
       </div>
       <div tabviewBody *ngIf="selectedTab?.key === 'dashboard'">
         <div class="card-dashboard">
-          <app-workpack-section-dashboard [idWorkpack]="idWorkpack" [workpackFullName]="workpackFullName"
+          <app-workpack-section-dashboard [idWorkpack]="idWorkpack" [workpackFullName]="workpack?.fullName"
             [dashboardShowStakeholders]="workpackModel?.dashboardShowStakeholders"
             [dashboardShowRisks]="workpackModel?.dashboardShowRisks"
             [dashboardShowEva]="workpackModel?.dashboardShowEva" [workpackType]="workpack?.type"
@@ -114,6 +116,12 @@
           <app-workpack-section-cost-accounts></app-workpack-section-cost-accounts>
         </div>
       </div>
+      <!--INDICADORES-->
+      <div tabviewBody *ngIf="selectedTab?.key === 'indicators'">
+        <div class="card-indicators">
+          <app-workpack-section-indicators></app-workpack-section-indicators>
+        </div>
+      </div>
       <div tabviewBody *ngIf="selectedTab?.key === 'baselines'">
         <div class="card-baselines">
           <app-workpack-section-baselines></app-workpack-section-baselines>
@@ -145,7 +153,7 @@
   <div class="panels-container" *ngIf="!showTabview  && !workpackLoading">
     <div class="card-dashboard"
       *ngIf="!!idWorkpack && !!workpack && !workpack.canceled && !!workpackModel && !!workpackModel.dashboardSessionActive">
-      <app-workpack-section-dashboard [idWorkpack]="idWorkpack" [workpackFullName]="workpackFullName"
+      <app-workpack-section-dashboard [idWorkpack]="idWorkpack" [workpackFullName]="workpack?.fullName"
         [dashboardShowStakeholders]="workpackModel?.dashboardShowStakeholders"
         [dashboardShowRisks]="workpackModel?.dashboardShowRisks" [dashboardShowEva]="workpackModel?.dashboardShowEva"
         [workpackType]="workpack?.type" [collapsePanelsStatus]="collapsePanelsStatus"
@@ -213,6 +221,9 @@
     <div class="card-cost-accounts">
       <app-workpack-section-cost-accounts></app-workpack-section-cost-accounts>
     </div>
+    <div class="card-indicators">
+      <app-workpack-section-indicators></app-workpack-section-indicators>
+    </div>
     <div class="card-baselines">
       <app-workpack-section-baselines></app-workpack-section-baselines>
     </div>
@@ -230,11 +241,14 @@
     </div>
   </div>
 
-  <div class="id-container" *ngIf="idWorkpack  && !workpackLoading && workpackModel">
+  <div class="id-container" *ngIf="showWorkpackId()">
     <span>{{idWorkpack}}</span>
   </div>
 
-  <app-save-button #saveButton (save)="onSaveButtonClicked()"></app-save-button>
+  <app-buttons-container>
+    <app-save-button #saveButton (save)="onSaveButtonClicked()"></app-save-button>
+    <app-cancel-button (cancel)="handleOnCancel()"></app-cancel-button>
+  </app-buttons-container>
 
   <p-dialog class="end-management-dialog" [class.responsive]="!!responsive" [header]="'endManagement' |translate"
     [(visible)]="showDialogEndManagement" [style]="!responsive ? {width: '30vw'} : {width: '90vw'}" [closable]="false"

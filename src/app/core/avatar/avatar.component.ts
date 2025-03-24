@@ -49,7 +49,7 @@ export class AvatarComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   async ngOnChanges(changes: SimpleChanges) {
-    if ((changes.idPerson && changes.idPerson.currentValue) || (changes.avatar && changes.avatar.currentValue)) {
+    if ((changes.idPerson && changes.idPerson.currentValue) || (changes.avatar )) {
       await this.redirectSetAvatarStatus();
     }
   }
@@ -58,9 +58,12 @@ export class AvatarComponent implements OnInit, OnChanges, OnDestroy {
     if (this.idPerson) {
       await this.setAvatarPerson();
     }
-    if (this.avatar) {
-      this.avatarFile = this.avatar;
+    if (this.avatar || this.avatarFile) {
+      this.avatarFile = this.avatar ? this.avatar : this.avatarFile;
       this.hasAvatar = true;
+    } else {
+      this.hasAvatar = false;
+      this.avatarFile = null;
     }
   }
 

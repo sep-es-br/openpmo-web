@@ -3,13 +3,22 @@ import { BaseService } from '../base/base.service';
 import { ICostAccount, ICostByWorkpack } from '../interfaces/ICostAccount';
 import { IHttpResult } from '../interfaces/IHttpResult';
 import { PrepareHttpParams } from '../utils/query.util';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { IWorkpackData, IWorkpackParams } from '../interfaces/IWorkpackDataParams';
 import { FilterDataviewService } from './filter-dataview.service';
 import { WorkpackService } from './workpack.service';
 import { OrganizationService } from './organization.service';
 import { PlanService } from './plan.service';
 import { CostAccountModelService } from './cost-account-model.service';
+import { map, tap } from "rxjs/operators";
+import { HttpHeaders, HttpParams } from '@angular/common/http';
+import { log } from 'console';
+
+interface DropdownOption {
+  code: string;
+  name: string;
+  fullName: string
+}
 
 @Injectable({ providedIn: 'root' })
 export class CostAccountService extends BaseService<ICostAccount> {
@@ -23,7 +32,6 @@ export class CostAccountService extends BaseService<ICostAccount> {
   funders;
   term = '';
   loading;
-  idCostAccountModel: number;
 
   constructor(
     @Inject(Injector) injector: Injector,
@@ -53,7 +61,7 @@ export class CostAccountService extends BaseService<ICostAccount> {
         this.idFilterSelected = params.idFilterSelected;
         this.term = params.term;
       } else {
-        const resultFilters = await this.filterSrv.getAllFilters(`workpackModels/${this.workpackData.workpack.model.id}/costAccounts`);
+        const resultFilters = await this.filterSrv.getAllFilters(`workpackModels/${this.workpackData.workpackModel.id}/costAccounts`);
         this.filters = resultFilters.success && resultFilters.data ? resultFilters.data : [];
         this.idFilterSelected = this.filters.find(defaultFilter => !!defaultFilter.favorite) ?
           this.filters.find(defaultFilter => !!defaultFilter.favorite).id : undefined;
@@ -64,22 +72,20 @@ export class CostAccountService extends BaseService<ICostAccount> {
       const result = await this.GetAll({ 'id-workpack': this.workpackParams.idWorkpack, idFilter: this.idFilterSelected, term: this.term });
       if (result.success) {
         this.costAccounts = result.data;
-        await this.loadIdCostAccountModel();
         this.loading = false;
         this.nextResetCostAccount(true);
       }
     } else {
-      await this.loadIdCostAccountModel();
       this.loading = false;
       this.nextResetCostAccount(true);
     }
   }
 
-  async loadIdCostAccountModel() {
+  public async loadIdCostAccountModel() {
     const propertiesPlan = await this.planSrv.getCurrentPlan(this.workpackParams.idPlan);
     const result = await this.costAccountModelSrv.GetCostAccountModelByPlanModel({'id-plan-model': propertiesPlan.planModel.id});
     if (result.success) {
-      this.idCostAccountModel = result.data.id;
+      return result.data.id;
     }
   }
 
@@ -104,7 +110,6 @@ export class CostAccountService extends BaseService<ICostAccount> {
       workpackParams: this.workpackParams,
       filters: this.filters,
       costAccounts: this.costAccounts,
-      idCostAccountModel:this.idCostAccountModel,
       idFilterSelected: this.idFilterSelected,
       term: this.term,
       funders: this.funders,
@@ -125,4 +130,5 @@ export class CostAccountService extends BaseService<ICostAccount> {
     const result = await this.http.get(`${this.urlBase}/workpack`, { params: PrepareHttpParams(options) }).toPromise();
     return result as IHttpResult<ICostByWorkpack>;
   }
+
 }

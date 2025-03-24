@@ -14,6 +14,7 @@ body {
 
 .p-component {
   font-family: v.$fontFamilyMedium !important;
+  font-size: 0.9rem !important;
 }
 
 .spacer {
@@ -59,7 +60,7 @@ body {
   width: 100%;
   text-align: end;
   padding: 0.5em;
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   font-family: "Montserrat Medium", "Montserrat Regular", "Montserrat", sans-serif !important;
   color: #004660;
 }
@@ -69,11 +70,9 @@ app-card {
     margin-top: 15px;
 
     .p-panel-content {
-      padding: 0 15px !important;
+      padding: 0 15px 0.5em !important;
     }
     .p-panel-header {
-      padding: 15px !important;
-
       .p-panel-header-icon {
         width: auto;
         height: auto;
@@ -101,8 +100,8 @@ app-card {
 }
 
 .app-content-header {
-  padding-bottom: 1.3em;
-  font-size: 1rem;
+  padding-bottom: 0.5em;
+  font-size: 0.9rem;
   font-family: v.$fontFamilyMedium !important;
   color: v.$fontInput;
   font-weight: 500;
@@ -132,11 +131,18 @@ app-card {
   }
 }
 
+.fa-question-circle {
+  font-size: 0.9rem;
+  margin-left: 1em;
+  color: #d4d4d4;
+}
+
 .p-float-label {
   margin-top: 15px;
   padding-bottom: 10px;
   > label {
     left: 0 !important;
+    pointer-events: auto !important;
   }
   .p-inputtextarea {
     padding-top: 0 !important;
@@ -172,8 +178,35 @@ div[class^='card-properties'] app-card .p-panel {
   }
 }
 
+.dataview-card-items {
+  .p-paginator {
+    background: transparent;
+    .p-dropdown:not(.disabled).p-focus {
+      box-shadow: none;
+      border-color: #6c757d;
+    }
+    .p-dropdown-label.p-inputtext {
+      font-size: 0.8rem !important;
+    }
+    .p-dropdown-item {
+      font-size: 0.8rem !important;
+    }
+    .p-dropdown-trigger .p-dropdown-trigger-icon {
+      font-size: 0.8rem !important;
+    }
+    .p-dropdown:not(.disabled):hover {
+      border-color: #6c757d;
+    }
+    .p-dropdown-panel .p-dropdown-items .p-dropdown-item.p-highlight {
+      background: #e9ecef;
+    }
+  }
+  .p-dataview .p-paginator-bottom {
+    border: none;
+  }
+}
 
-.outlet p-dataview.app-dataview {
+.outlet p-dataview.app-dataview  {
   position: static !important;
   background-color: transparent;
 
@@ -188,6 +221,15 @@ div[class^='card-properties'] app-card .p-panel {
     .p-dropdown:not(.disabled).p-focus {
       box-shadow: none;
       border-color: #6c757d;
+    }
+    .p-dropdown-label.p-inputtext {
+      font-size: 0.8rem !important;
+    }
+    .p-dropdown-item {
+      font-size: 0.8rem !important;
+    }
+    .p-dropdown-trigger .p-dropdown-trigger-icon {
+      font-size: 0.8rem !important;
     }
     .p-dropdown:not(.disabled):hover {
       border-color: #6c757d;
@@ -207,9 +249,15 @@ div[class^='card-properties'] app-card .p-panel {
   }
 }
 
+.button-default-w8 {
+   .p-button .p-button-label {
+    font-size: 0.8rem !important;
+  }
+}
+
 .app-input-text.p-inputtext {
   font-family: v.$fontFamilyMedium;
-  font-size: 1rem;
+  font-size: 0.9rem;
   border: none;
   border-bottom: 1px solid v.$borderInput;
   border-radius: 0;
@@ -229,9 +277,12 @@ div[class^='card-properties'] app-card .p-panel {
     width: 100%;
   }
 }
+.app-input-text.p-inputnumber {
+  font-size: 0.9rem;
+}
 .app-autocomplete .p-autocomplete .p-inputtext {
   font-family: v.$fontFamilyMedium;
-  font-size: 1rem;
+  font-size: 0.9rem;
   border: none;
   border-bottom: 1px solid v.$borderInput;
   border-radius: 0;
@@ -253,7 +304,7 @@ div[class^='card-properties'] app-card .p-panel {
 }
 .p-inputmask.p-inputtext {
   font-family: v.$fontFamilyMedium;
-  font-size: 1rem;
+  font-size: 0.9rem;
   border: none;
   border-bottom: 1px solid v.$borderInput;
   border-radius: 0;
@@ -276,7 +327,7 @@ div[class^='card-properties'] app-card .p-panel {
 
 .app-text-area.p-inputtextarea {
   font-family: v.$fontFamilyMedium;
-  font-size: 1rem;
+  font-size: 0.9rem;
   border: none;
   border-bottom: 1px solid v.$borderInput;
   border-radius: 0;
@@ -316,7 +367,7 @@ div[class^='card-properties'] app-card .p-panel {
   .p-inputnumber {
     .p-inputtext {
       font-family: v.$fontFamilyMedium;
-      font-size: 1rem;
+      font-size: 0.9rem;
       border: none;
       border-bottom: 1px solid v.$borderInput !important;
       border-radius: 0;
@@ -336,6 +387,7 @@ div[class^='card-properties'] app-card .p-panel {
     .p-inputtext {
       font-family: v.$fontFamilyMedium;
       border: none;
+      font-size: 0.9rem;
       border-bottom: 1px solid v.$borderInput;
       border-radius: 0;
       background-color: transparent;
@@ -370,13 +422,11 @@ div[class^='card-properties'] app-card .p-panel {
 }
 
 .app-toggle {
-  width: 2.4em;
-  height: 1.4em;
   display: flex;
   align-items: center;
   .p-inputswitch{
-    width: 2.4em;
-    height: 1.1em;
+    width: 2em;
+    height: 1em;
     align-content: center;
   }
   .p-inputswitch.p-focus .p-inputswitch-slider {
@@ -388,19 +438,47 @@ div[class^='card-properties'] app-card .p-panel {
   .p-inputswitch .p-inputswitch-slider {
     align-content: center;
   }
+  .p-inputswitch.p-inputswitch-checked .p-inputswitch-slider:before {
+    left: -3px;
+  }
   .p-inputswitch .p-inputswitch-slider::before {
-    width: 0.9em;
-    height: 0.9em;
-    top: 0.7em;
-    left: 2px;
+    width: 0.7em;
+    height: 0.7em;
+    top: 0.8em;
+    left: 3px;
+  }
+}
+
+
+.card-item-header {
+  .p-menu .p-menuitem {
+    font-size: 0.8rem !important;
+    .p-menuitem-link {
+      font-size: 0.8rem;
+      padding: 0.5em;
+    }
+  }
+}
+
+.menu-addicional-properties {
+  .p-menu .p-menuitem-link {
+    font-size: 0.9rem !important;
+    padding: 0.5rem 0.75rem;
   }
 }
 
 .app-tree-selection {
   .p-tree {
-    font-size: 0.9rem;
+    font-size: 0.8rem;
     font-family: v.$fontFamilyMedium !important;
     color: v.$fontInput;
+    padding: 0.5em;
+    .p-tree-container .p-treenode .p-treenode-content {
+      padding: 0;
+    }
+    .p-tree-toggler-icon.pi {
+      font-size: 0.8;
+    }
     .p-tree-container .p-treenode .p-treenode-content:focus {
       box-shadow: 0 0 0 0.2rem v.$borderInput;
     }
@@ -446,12 +524,12 @@ div[class^='card-properties'] app-card .p-panel {
   }
   .p-dropdown .p-inputtext {
     color: v.$fontInput;
-    font-size: 1rem;
+    font-size: 0.9rem;
     font-family: v.$fontFamilyMedium;
     padding-left: 0;
   }
   .p-dropdown-panel .p-dropdown-items {
-    font-size: 1rem;
+    font-size: 0.9rem;
     font-family: v.$fontFamilyMedium;
     color: v.$fontInput;
     .p-dropdown-item.p-highlight {
@@ -464,7 +542,7 @@ div[class^='card-properties'] app-card .p-panel {
   }
   .p-dropdown-trigger-icon {
     color: #004660;
-    font-size: 1.2rem;
+    font-size: 1rem;
   }
 }
 
@@ -476,12 +554,13 @@ div[class^='card-properties'] app-card .p-panel {
     border-bottom: 1px solid v.$borderInput;
   }
   .p-multiselect:hover {
-    border: none;
+    border: none !important;
+    box-shadow: none;
     border-bottom: 1px solid v.$borderInputHover !important;
   }
   .p-multiselect-filter-container .p-inputtext {
     color: v.$fontInput;
-    font-size: 1rem;
+    font-size: 0.9rem;
     font-family: v.$fontFamilyMedium;
   }
   .p-multiselect-filter-container .p-inputtext:hover {
@@ -493,7 +572,7 @@ div[class^='card-properties'] app-card .p-panel {
   }
   .p-multiselect-label-container {
     color: v.$fontInput;
-    font-size: 1rem;
+    font-size: 0.8rem;
     font-family: v.$fontFamilyMedium;
   }
   .p-multiselect-trigger {
@@ -501,12 +580,15 @@ div[class^='card-properties'] app-card .p-panel {
   }
   .p-multiselect-trigger-icon {
     color: #004660;
-    font-size: 1.2rem;
+    font-size: 0.8rem;
   }
   .p-multiselect-panel .p-multiselect-items {
-    font-size: 1rem;
+    font-size: 0.8rem !important;
     font-family: v.$fontFamilyMedium;
     color: v.$fontInput;
+    .p-multiselect-item {
+      font-size: 0.8rem !important;
+    }
     .p-multiselect-item.p-highlight {
       background-color: transparent;
       border: none;
@@ -532,7 +614,7 @@ div[class^='card-properties'] app-card .p-panel {
 }
 
 .app-input-label {
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   font-style: italic;
   color: v.$fontLabel;
   font-family: v.$fontFamilyRegular;
@@ -545,7 +627,7 @@ div[class^='card-properties'] app-card .p-panel {
 // componente input inline desabled
 .app-input-text-inline.p-inputtext {
   font-family: v.$fontFamilyMedium;
-  font-size: 1rem;
+  font-size: 0.9rem;
   border: none;
   border-bottom: 1px solid v.$borderInput;
   border-radius: 0;
@@ -569,7 +651,7 @@ div[class^='card-properties'] app-card .p-panel {
 .app-input-chips .p-chips .p-inputtext,
   .p-multiselect.p-multiselect-chip .p-multiselect-token {
   font-family: v.$fontFamilyMedium;
-  font-size: 1rem;
+  font-size: 0.9rem;
   border: none;
   border-bottom: 1px solid v.$borderInput;
   border-radius: 0;
@@ -591,6 +673,14 @@ div[class^='card-properties'] app-card .p-panel {
   }
   .full-line {
     width: 100%;
+  }
+}
+
+.app-input-chips {
+  .p-chips {
+    .p-chips-token-label {
+      font-size: 0.8rem;
+    }
   }
 }
 
@@ -661,7 +751,7 @@ div[class^='card-properties'] app-card .p-panel {
 
 
 .p-dataview .p-dataview-content .p-grid .card-item-container {
-  flex-basis: 280px;
+  flex-basis: 260px;
   @media screen and (max-width: 768px) {
     flex-basis: 100%;
   }

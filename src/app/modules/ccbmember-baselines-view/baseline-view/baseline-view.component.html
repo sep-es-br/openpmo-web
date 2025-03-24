@@ -247,7 +247,7 @@
                     </div>
                     <div class="item-values" *ngIf="!responsive">
                       <span>{{item.currentValue ? (item.currentValue|shortNumber:language) : ''}}</span>
-                      <span>{{(item.proposedValue && (!item.currentValue || (item.currentValue !== item.proposedValue))) ? (item.proposedValue|shortNumber:language) : ''}}</span>
+                      <span>{{(item.proposedValue && (!item.currentValue || (item.variation && item.variation !== 0))) ? (item.proposedValue|shortNumber:language) : ''}}</span>
                       <div class="variation-container" [class.positive-variation]="item.variation > 0"
                            [class.negative-variation]="item.variation < 0">
                         <i *ngIf="item.variation > 0 || item.variation < 0" class="fas"
@@ -395,7 +395,7 @@
                     </div>
                     <div class="item-values" *ngIf="!responsive">
                       <span>{{item.currentValue ? (item.currentValue|shortNumber:language) + ' ' + item.unitName : ''}}</span>
-                      <span>{{(item.proposedValue && (!item?.currentValue || item.proposedValue !== item?.currentValue)) ? (item.proposedValue|shortNumber:language) + ' ' + item.unitName : ''}}</span>
+                      <span>{{(!item.currentValue || (item.currentValue && item.proposedValue && (item?.variation && item.variation !== 0))) ? (item.proposedValue|shortNumber:language) + ' ' + item.unitName : ''}}</span>
                       <div class="variation-container" [class.positive-variation]="item.variation > 0"
                            [class.negative-variation]="item.variation < 0">
                         <i *ngIf="item.variation > 0 || item.variation < 0" class="fas"

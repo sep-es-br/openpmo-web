@@ -22,6 +22,7 @@ export class ProgressBarCardStepComponent implements OnInit {
   @Input() color: string;
   @Input() valueUnit: string;
   @Input() barHeight: number;
+  @Input() maxValue: number;
 
   language: string;
   $destroy = new Subject();
@@ -58,6 +59,12 @@ export class ProgressBarCardStepComponent implements OnInit {
 
   setLanguage() {
     this.language = this.translateSrv.currentLang;
+  }
+
+  getProgressWidth() {
+    const progress = Math.min(this.progress, this.maxValue);
+    const width = (progress / this.maxValue) * 100;
+    return width === 0 ? 0 : width;
   }
 
 }

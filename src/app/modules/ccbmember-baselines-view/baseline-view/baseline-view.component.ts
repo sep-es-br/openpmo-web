@@ -80,7 +80,7 @@ export class BaselineViewComponent implements OnInit, OnDestroy {
       },
       {
         key: 'baseline',
-        routerLink: ['/ccbmember-baselines-view/baseline']
+        info: this.baseline.name
       }
     ]);
   }

@@ -5,9 +5,10 @@ import { IWorkpackBreakdownStructure, IWorkpackBreakdownStructureWorkpackModel }
 import { IHttpResult } from '../interfaces/IHttpResult';
 import { WorkpackService } from './workpack.service';
 import { BehaviorSubject } from 'rxjs';
-import { IWorkpackData } from '../interfaces/IWorkpackDataParams';
+import { IWorkpackData, IWorkpackParams } from '../interfaces/IWorkpackDataParams';
 import { TreeNode } from 'primeng/api';
 import * as moment from 'moment';
+import { PrepareHttpParams } from '../utils/query.util';
 
 @Injectable({
   providedIn: 'root'
@@ -16,6 +17,7 @@ export class BreakdownStructureService extends BaseService<IWorkpackBreakdownStr
 
   private resetBreakdownStructure = new BehaviorSubject<boolean>(false);
   workpackData: IWorkpackData;
+  workpackParams: IWorkpackParams;
   wbs: IWorkpackBreakdownStructure;
   expandedAllDone = false;
   expandedAll = false;
@@ -57,20 +59,21 @@ export class BreakdownStructureService extends BaseService<IWorkpackBreakdownStr
   async loadBreakdownStructure(lazyLoading, idWorkpack: number) {
     this.loading = true;
     this.workpackData = this.workpackSrv.getWorkpackData();
+    this.workpackParams = this.workpackSrv.getWorkpackParams();
     if (this.workpackData && this.workpackData.workpack && this.workpackData.workpack.hasWBS !== false) {
-      await this.loadBWS(idWorkpack, lazyLoading);
+      await this.loadBWS(idWorkpack, lazyLoading, this.workpackParams.idPlan);
       this.loading = false;
       this.nextResetBreakdownStructure(true);
     }
   }
 
-  async loadBWS(idWorkpack: number, isLazyLoading) {
-    this.wbsTree = await this.getBreakdownStructureData(idWorkpack, isLazyLoading);
+  async loadBWS(idWorkpack: number, isLazyLoading, idPlan: number) {
+    this.wbsTree = await this.getBreakdownStructureData(idWorkpack, isLazyLoading, idPlan);
   }
 
-  async getBreakdownStructureData(idWorkpack: number, isLazyLoading) {
+  async getBreakdownStructureData(idWorkpack: number, isLazyLoading, idPlan: number) {
     const { success, data } =
-      await this.getByWorkpackId(idWorkpack, !isLazyLoading);
+      await this.getByWorkpackId(idWorkpack, {allLevels: !isLazyLoading, 'id-plan': idPlan});
     if (success) {
       this.wbs = data;
       if (data) {
@@ -95,7 +98,7 @@ export class BreakdownStructureService extends BaseService<IWorkpackBreakdownStr
     } else {
       this.loading = true;
       this.expandedAllDone = true;
-      this.wbsTree = await this.getBreakdownStructureData(idWorkpack, false);
+      this.wbsTree = await this.getBreakdownStructureData(idWorkpack, false, this.workpackParams.idPlan);
       this.loading = false;
       this.nextResetBreakdownStructure(true);
     }
@@ -114,7 +117,7 @@ export class BreakdownStructureService extends BaseService<IWorkpackBreakdownStr
     this.loading = true;
     const idWorkpack = event.node?.idWorkpack;
     if (idWorkpack && event.node?.children?.length === 0) {
-      const children = await this.getBreakdownStructureData(idWorkpack, true);
+      const children = await this.getBreakdownStructureData(idWorkpack, true, this.workpackParams.idPlan);
       event.node.children = children && children.length > 0 ? children[0].children : [];
       this.loading = false;
       this.nextResetBreakdownStructure(true);
@@ -142,7 +145,7 @@ export class BreakdownStructureService extends BaseService<IWorkpackBreakdownStr
   }
 
   mapTreeNodes(data: IWorkpackBreakdownStructure) {
-    const dashboardData = data.dashboard && this.loadDashboardData(data.dashboard, data.milestones, data.risks);
+    const dashboardData = (data.dashboard || data.milestones || data.risks) && this.loadDashboardData(data.dashboard, data.milestones, data.risks);
     if (dashboardData) {
       data.dashboardData = dashboardData;
     }
@@ -163,8 +166,7 @@ export class BreakdownStructureService extends BaseService<IWorkpackBreakdownStr
     const expanded = !this.expandedAll ? level <= 1 : true;
     data.forEach(item => {
       const workpackOrWorkpackModels = isWorkpack ? item.workpackModels : item.workpacks;
-
-      const dashboardData = item.dashboard && this.loadDashboardData(item.dashboard, item.milestones, item.risks);
+      const dashboardData = (item.dashboard || item.risks || item.milestones) && this.loadDashboardData(item.dashboard, item.milestones, item.risks);
       if (dashboardData) {
         item.dashboardData = dashboardData;
       }
@@ -214,8 +216,15 @@ export class BreakdownStructureService extends BaseService<IWorkpackBreakdownStr
   }
 
   buildProperties(item: IWorkpackBreakdownStructure) {
-    if (!item?.dashboard && ![this.typeWorkpackEnum.Milestone].includes(item?.workpackType)) {
+    if (!item?.dashboardData && ![this.typeWorkpackEnum.Milestone].includes(item?.workpackType)) {
       return null;
+    }
+    let actualInformation;
+    if (item.journalInformation) {
+      const today = moment();
+      const informationDate = moment(item.journalInformation.date, 'yyyy-MM-DD');
+      const diff = today.diff(informationDate, 'days');
+      actualInformation = diff <= 30;
     }
     const properties = {
       dashboardMilestonesData: null,
@@ -228,6 +237,10 @@ export class BreakdownStructureService extends BaseService<IWorkpackBreakdownStr
       gaugeChartDataCPI: null,
       gaugeChartDataSPI: null,
       progressBars: null,
+      journalInformation: {
+        ...item.journalInformation,
+        actual: actualInformation
+      }
     };
     if (item?.dashboardData?.risk && item?.dashboardData?.risk?.total > 0) {
       properties.riskImportance = item.dashboardData?.risk?.high > 0 ?
@@ -282,80 +295,23 @@ export class BreakdownStructureService extends BaseService<IWorkpackBreakdownStr
           foreseenValue: dashboard.tripleConstraint?.scopeForeseenValue,
           actualValue: dashboard.tripleConstraint?.scopeActualValue,
           plannedValue: dashboard.tripleConstraint?.scopePlannedValue,
-          variation: dashboard.tripleConstraint?.scopeVariation
+          variation: dashboard.tripleConstraint?.scopeVariation,
+          foreseenWorkRefMonth: dashboard.tripleConstraint?.scopeForeseenWorkRefMonth
         }
       },
       earnedValue: dashboard && dashboard.performanceIndex && dashboard.performanceIndex?.earnedValue,
-      costPerformanceIndex: dashboard && dashboard.performanceIndex ? {
+      costPerformanceIndex: dashboard && dashboard.performanceIndex && dashboard.performanceIndex?.costPerformanceIndexValue ? {
         costVariation: dashboard.performanceIndex?.costPerformanceIndexVariation,
         indexValue: dashboard.performanceIndex?.costPerformanceIndexValue
       } : null,
-      schedulePerformanceIndex: dashboard && dashboard.performanceIndex ? {
+      schedulePerformanceIndex: dashboard && dashboard.performanceIndex && dashboard.performanceIndex?.schedulePerformanceIndexValue ? {
         indexValue: dashboard.performanceIndex?.schedulePerformanceIndexValue,
         scheduleVariation: dashboard.performanceIndex?.schedulePerformanceIndexVariation
       } : null,
-      risk: risks && {high: 0, low: 0, medium: 0, closed: 0, total: 0},
-      milestone: milestones && {concluded: 0, late: 0, lateConcluded: 0, onTime: 0, quantity: 0}
+      risk: risks,
+      milestone: milestones
     };
-    const totalRisk = risks && risks.reduce( ( totalRisk: {high: number; low: number; medium: number; closed: number; total: number}, risk) => {
-      switch (risk.importance) {
-        case 'HIGH':
-          totalRisk.high++;
-          break;
-        case 'LOW':
-          totalRisk.low++;
-          break;
-        case 'MEDIUM':
-          totalRisk.medium++;
-          break;
-      }
-      if (risk.status !== 'OPEN') totalRisk.closed++;
-      totalRisk.total++
-      return totalRisk;
-    }, {high: 0, low: 0, medium: 0, closed: 0, total: 0});
-
-    const totalMilestones = milestones && milestones.reduce( ( totalMilestones: {
-        concluded: number;
-        late: number;
-        lateConcluded: number;
-        onTime: number;
-        quantity: number
-      }, milestone) => {
-      
-      if (milestone.completed) {
-        if (!milestone.snapshotDate) {
-          totalMilestones.concluded++;
-          totalMilestones.quantity++;
-          return totalMilestones;
-        } else {
-          const milestoneDate = moment(milestone.milestoneDate, 'yyyy-MM-DD');
-          const snapshotDate = moment(milestone.snapshotDate, 'yyyy-MM-DD');
-          if (milestoneDate.isSameOrBefore(snapshotDate)) {
-            totalMilestones.concluded++;
-            totalMilestones.quantity++;
-            return totalMilestones;
-          } else {
-            totalMilestones.lateConcluded++;
-            totalMilestones.quantity++;
-            return totalMilestones;
-          }
-        }
-      } else {
-        const today = moment();
-        const milestoneDate = moment(milestone.milestoneDate, 'yyyy-MM-DD');
-        if (milestoneDate.isBefore(today)) {
-          totalMilestones.late++;
-          totalMilestones.quantity++;
-          return totalMilestones;
-        } else {
-          totalMilestones.onTime++;
-          totalMilestones.quantity++;
-          return totalMilestones;
-        }
-      }
-    }, {concluded: 0, late: 0, lateConcluded: 0, onTime: 0, quantity: 0});
-    dashboardData.risk = totalRisk;
-    dashboardData.milestone = totalMilestones;
+   
     return dashboardData;
   }
 
@@ -364,17 +320,17 @@ export class BreakdownStructureService extends BaseService<IWorkpackBreakdownStr
       return null;
     }
 
-    data.baselineCost = data.dashboard.tripleConstraint?.costPlannedValue;
-    data.planedCost = data.dashboard.tripleConstraint?.costForeseenValue;
-    data.actualCost = data.dashboard.tripleConstraint?.costActualValue;
-    data.start = data.dashboard.tripleConstraint?.scheduleForeseenStartDate;
-    data.end = data.dashboard.tripleConstraint?.scheduleForeseenEndDate;
-    data.baselineStart = data.dashboard.tripleConstraint?.schedulePlannedStartDate;
-    data.baselineEnd = data.dashboard.tripleConstraint?.schedulePlannedEndDate;
-    data.baselinePlanned = data.dashboard.tripleConstraint?.scopePlannedValue;
+    data.baselineCost = data?.dashboard?.tripleConstraint?.costPlannedValue;
+    data.planedCost = data?.dashboard?.tripleConstraint?.costForeseenValue;
+    data.actualCost = data?.dashboard?.tripleConstraint?.costActualValue;
+    data.start = data?.dashboard?.tripleConstraint?.scheduleForeseenStartDate;
+    data.end = data?.dashboard?.tripleConstraint?.scheduleForeseenEndDate;
+    data.baselineStart = data?.dashboard?.tripleConstraint?.schedulePlannedStartDate;
+    data.baselineEnd = data?.dashboard?.tripleConstraint?.schedulePlannedEndDate;
+    data.baselinePlanned = data?.dashboard?.tripleConstraint?.scopePlannedValue;
     data.unitMeasure = data.unitMeasure;
-    data.planed = data.dashboard.tripleConstraint?.scopeForeseenValue;
-    data.actual = data.dashboard.tripleConstraint?.scopeActualValue;
+    data.planed = data?.dashboard?.tripleConstraint?.scopeForeseenValue;
+    data.actual = data?.dashboard?.tripleConstraint?.scopeActualValue;
 
     const startDate = data && new Date(data.start + 'T00:00:00');
     const endDate = data && new Date(data.end + 'T00:00:00');
@@ -527,10 +483,11 @@ export class BreakdownStructureService extends BaseService<IWorkpackBreakdownStr
             iconScopeColor = '#EA5C5C';
           }
         } else {
-          iconScopeColor = '#EA5C5C';
+          iconScopeColor = '#44B39B';
         }
       } else {
-        if (properties.dashboardData?.tripleConstraint?.scope?.foreseenValue >=
+        if (properties.dashboardData?.tripleConstraint?.scope?.foreseenWorkRefMonth && 
+            properties.dashboardData?.tripleConstraint?.scope?.foreseenWorkRefMonth >=
           properties.dashboardData?.tripleConstraint?.scope?.actualValue) {
           iconScopeColor = '#EA5C5C';
         } else {
@@ -602,9 +559,9 @@ export class BreakdownStructureService extends BaseService<IWorkpackBreakdownStr
     return { gaugeChartDataCPI, gaugeChartDataSPI };
   }
 
-  async getByWorkpackId(idWorkpack: number, allLevels: boolean): Promise<IHttpResult<IWorkpackBreakdownStructure>> {
+  async getByWorkpackId(idWorkpack: number, options): Promise<IHttpResult<IWorkpackBreakdownStructure>> {
     return await this.http.get<IHttpResult<IWorkpackBreakdownStructure>>
-      (`${this.urlBase}/${idWorkpack}?allLevels=${allLevels}`).toPromise();
+      (`${this.urlBase}/${idWorkpack}`, { params: PrepareHttpParams(options) }).toPromise();
   }
 
 }

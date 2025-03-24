@@ -17,6 +17,8 @@ import { PlanService } from 'src/app/shared/services/plan.service';
 import { formatDateToString } from 'src/app/shared/utils/formatDateToString';
 import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
 import { SaveButtonComponent } from 'src/app/shared/components/save-button/save-button.component';
+import { WorkpackModelService } from 'src/app/shared/services/workpack-model.service';
+import { CancelButtonComponent } from 'src/app/shared/components/cancel-button/cancel-button.component';
 
 interface ICardItemRole {
   type: string;
@@ -36,6 +38,7 @@ interface ICardItemRole {
 export class StakeholderOrganizationComponent implements OnInit {
 
   @ViewChild(SaveButtonComponent) saveButton: SaveButtonComponent;
+  @ViewChild(CancelButtonComponent) cancelButton: CancelButtonComponent;
 
   idWorkpack: number;
   idWorkpackModelLinked: number;
@@ -52,6 +55,7 @@ export class StakeholderOrganizationComponent implements OnInit {
   responsive: boolean;
   stakeholder: IStakeholder;
   stakeholderRoles: IStakeholderRole[];
+  backupStakeholderRolesCardItems: ICardItemRole[];
   stakeholderRolesCardItems: ICardItemRole[];
   editPermission = false;
   isLoading = false;
@@ -69,7 +73,8 @@ export class StakeholderOrganizationComponent implements OnInit {
     private messageSrv: MessageService,
     private breadcrumbSrv: BreadcrumbService,
     private router: Router,
-    private authSrv: AuthService
+    private authSrv: AuthService,
+    private workpackModelSrv: WorkpackModelService
   ) {
     this.actRouter.queryParams.subscribe(async queryParams => {
       this.idPlan = queryParams.idPlan;
@@ -84,22 +89,14 @@ export class StakeholderOrganizationComponent implements OnInit {
 
   async ngOnInit() {
     await this.loadStakeholder();
-    const propertyNameWorkpackModel = this.workpack.model.properties.find(p => p.name === 'name');
-    const propertyNameWorkpack = this.workpack.properties.find(p => p.idPropertyModel === propertyNameWorkpackModel.id);
-    const workpackName = propertyNameWorkpack.value as string;
-    const propertyFullNameWorkpackModel = this.workpack.model.properties.find(p => p.name === 'fullName');
-    const propertyFullNameWorkpack = this.workpack.properties.find(p => p.idPropertyModel === propertyFullNameWorkpackModel.id);
-    const workpackFullName = propertyFullNameWorkpack.value as string;
     let breadcrumbItems = this.breadcrumbSrv.get;
     if (!breadcrumbItems || breadcrumbItems.length === 0) {
-      breadcrumbItems = await this.breadcrumbSrv.loadWorkpackBreadcrumbs(this.idWorkpack, this.idPlan)
+      breadcrumbItems = await this.breadcrumbSrv.loadWorkpackBreadcrumbs(this.idWorkpack, this.idPlan);
     }
     this.breadcrumbSrv.setMenu([
       ...breadcrumbItems,
       {
         key: 'stakeholder',
-        routerLink: ['/stakeholder/organization'],
-        queryParams: { idWorkpack: this.idWorkpack, idOrganization: this.idOrganization },
         info: this.stakeholder?.organization?.name,
         tooltip: this.stakeholder?.organization?.fullName
       }
@@ -109,11 +106,13 @@ export class StakeholderOrganizationComponent implements OnInit {
   async loadStakeholder() {
     this.isLoading = true;
     if (this.idOrganization) {
-      const result = await this.stakeholderSrv.GetStakeholderOrganization({'id-workpack': this.idWorkpack,
-      'id-organization': this.idOrganization});
+      const result = await this.stakeholderSrv.GetStakeholderOrganization({
+        'id-workpack': this.idWorkpack,
+        'id-organization': this.idOrganization
+      });
       if (result.success) {
         this.stakeholder = result.data;
-        this.stakeholderRoles = this.stakeholder.roles && this.stakeholder.roles.map( role => ({
+        this.stakeholderRoles = this.stakeholder.roles && this.stakeholder.roles.map(role => ({
           id: role.id,
           active: role.active,
           role: role.role,
@@ -137,16 +136,30 @@ export class StakeholderOrganizationComponent implements OnInit {
   }
 
   async loadWorkpack() {
-    const result = await this.workpackSrv.GetWorkpackById(this.idWorkpack, {'id-plan': this.idPlan});
-    if (result.success) {
-      this.workpack = result.data;
-      this.rolesOptions = this.workpack?.model?.organizationRoles?.map(role => ({ label: role, value: role }));
-      const isUserAdmin = await this.authSrv.isUserAdmin();
-      if (isUserAdmin) {
-        this.editPermission = !this.workpack.canceled;
-      } else {
-        this.editPermission = (this.workpack.permissions && this.workpack.permissions.filter(p => p.level === 'EDIT').length > 0) && !this.workpack.canceled;
+    const workpackData = this.workpackSrv.getWorkpackData();
+    if (workpackData && workpackData.workpack && workpackData.workpack.id === this.idWorkpack && workpackData.workpackModel) {
+      this.workpack = workpackData.workpack;
+      this.rolesOptions = workpackData.workpackModel.organizationRoles?.map(role => ({ label: role, value: role }));
+
+    } else {
+      const result = await this.workpackSrv.GetWorkpackById(this.idWorkpack, { 'id-plan': this.idPlan });
+      if (result.success) {
+        this.workpack = result.data;
       }
+      const resultModel = await this.workpackModelSrv.GetById(this.workpack.idWorkpackModel);
+      if (resultModel.success) {
+        this.rolesOptions = resultModel.data.organizationRoles.map(role => ({
+          label: role,
+          value: role
+        }));
+      }
+    }
+    const isUserAdmin = await this.authSrv.isUserAdmin();
+    if (isUserAdmin) {
+      this.editPermission = !this.workpack.canceled;
+    } else {
+      this.editPermission =
+        (this.workpack.permissions && this.workpack.permissions.filter(p => p.level === 'EDIT').length > 0) && !this.workpack.canceled;
     }
   }
 
@@ -196,12 +209,13 @@ export class StakeholderOrganizationComponent implements OnInit {
       this.stakeholderRoles = null;
       this.loadStakeholderRolesCardsItems();
       this.saveButton?.hideButton();
+      this.cancelButton.showButton();
     }
   }
 
   loadStakeholderRolesCardsItems() {
     if (this.stakeholderRoles) {
-      this.stakeholderRolesCardItems = this.stakeholderRoles.map(role => ({
+      this.stakeholderRolesCardItems = this.stakeholderRoles && this.stakeholderRoles.map(role => ({
         type: 'role-card',
         readOnly: !this.editPermission,
         role,
@@ -220,6 +234,7 @@ export class StakeholderOrganizationComponent implements OnInit {
         }];
       }
     }
+    this.backupStakeholderRolesCardItems = this.stakeholderRolesCardItems.map( card => ({...card, role: {...card.role}}));
   }
 
   createNewCardItemRole() {
@@ -245,10 +260,12 @@ export class StakeholderOrganizationComponent implements OnInit {
         to: null
       }];
     }
+    this.cancelButton.showButton();
     this.loadStakeholderRolesCardsItems();
   }
 
   handleShowSaveButton() {
+    this.cancelButton.showButton();
     if (this.organization) {
       return this.validateStakeholder()
         ? this.saveButton?.showButton()
@@ -258,11 +275,11 @@ export class StakeholderOrganizationComponent implements OnInit {
   }
 
   validateStakeholder() {
-    if(!this.stakeholderRoles) {
+    if (!this.stakeholderRoles) {
       return false;
     }
-    const roleNotOk = this.stakeholderRoles.filter( r => {
-      if( !r.role) {
+    const roleNotOk = this.stakeholderRoles.filter(r => {
+      if (!r.role) {
         return r;
       }
       if (r.to !== null) {
@@ -271,18 +288,19 @@ export class StakeholderOrganizationComponent implements OnInit {
         }
       }
     });
-    if(roleNotOk && roleNotOk.length > 0) {
+    if (roleNotOk && roleNotOk.length > 0) {
       return false;
     }
     return true;
   }
 
   async saveStakeholder() {
+    this.cancelButton.hideButton();
     this.formIsSaving = true;
     const stakeholderModel = {
       idWorkpack: this.idWorkpack,
       idOrganization: this.organization.id,
-      roles: this.stakeholderRoles.map( r => ({
+      roles: this.stakeholderRoles.map(r => ({
         ...r,
         to: r.to !== null ? formatDateToString(r.to as Date, true) : null,
         from: formatDateToString(r.from as Date, true)
@@ -331,4 +349,16 @@ export class StakeholderOrganizationComponent implements OnInit {
       }
     }
   }
+
+  handleOnCancel() {
+    this.saveButton.hideButton();
+    if (!this.idOrganization) {
+      this.organizationSelected = undefined;
+      this.organization = undefined;
+      this.stakeholderRoles = null;
+    }
+    this.stakeholderRolesCardItems = this.backupStakeholderRolesCardItems.filter( card => card.role.id || card.type === 'new-role-card')
+      .map(  card => ({...card, role: {...card.role}}));
+  }
+
 }

@@ -18,7 +18,9 @@
               <span class="p-float-label">
                 <input class="app-input-text" id="float-name" formControlName="name" type="text"
                   [class.responsive]="responsive" [ngStyle]="{'width': '30%'}" pInputText />
-                <label class="app-input-label" for="float-name">{{ "name" | translate }} * </label>
+                <label class="app-input-label" for="float-name">{{ "name" | translate }} * 
+                  <i class="far fa-question-circle" [pTooltip]="'help.risk.name' | translate"></i>
+                </label>
               </span>
               <app-input-message [form]="formRisk" field="name"></app-input-message>
             </div>
@@ -28,7 +30,9 @@
                   id="float-description"
                   [ngModel]="(mirrorDescription()) ? formRisk.value.name : formRisk.value.description">
                 </textarea>
-                <label class="app-input-label" for="float-description">{{ "description" | translate }} *</label>
+                <label class="app-input-label" for="float-description">{{ "description" | translate }} *
+                  <i class="far fa-question-circle" [pTooltip]="'help.risk.description' | translate"></i>
+                </label>
               </span>
               <app-input-message [form]="formRisk" field="description"></app-input-message>
             </div>
@@ -39,7 +43,9 @@
                 <p-dropdown class="app-single-selection" [options]="importanceOptions" formControlName="importance"
                   [class.responsive]="responsive" dropdownIcon="fas fa-caret-down" [autoDisplayFirst]="false">
                 </p-dropdown>
-                <label class="app-input-label">{{'importance'|translate}}</label>
+                <label class="app-input-label">{{'importance'|translate}} *
+                  <i class="far fa-question-circle" [pTooltip]="'help.risk.importance' | translate"></i>
+                </label>
               </span>
               <app-input-message [form]="formRisk" field="importance"></app-input-message>
             </div>
@@ -50,7 +56,9 @@
                 [label]="'opportunity' |translate"></p-radioButton>
             </div>
           </div>
-          <label class="status-title">{{'status' |translate}}</label>
+          <label class="status-title">{{'status' |translate}}
+            <i class="far fa-question-circle" [pTooltip]="'help.risk.status' | translate"></i>
+          </label>
           <div class="p-fluid">
             <div class="p-field status-container">
               <p-radioButton class="status-radio" value="OPEN" formControlName="status" [label]="'open' |translate">
@@ -62,7 +70,8 @@
             </div>
           </div>
           <div class="likely-to-happen" *ngIf="formRisk.controls.status.value === 'OPEN'">
-            <label class="likely-to-happen-title">{{'likelyToHappen' |translate}}</label>
+            <label class="likely-to-happen-title">{{'likelyToHappen' |translate}}
+            </label>
           </div>
           <div class="formgroup-dates">
             <div class="p-field" *ngIf="formRisk.controls.status.value === 'OPEN'">
@@ -71,7 +80,9 @@
                   [yearNavigator]="true" formControlName="likelyToHappenFrom" [yearRange]="yearRangeCalculated"
                   icon="fas fa-calendar-alt" [dateFormat]="calendarFormat">
                 </p-calendar>
-                <label class="app-input-label" for="float-start">{{ "fromNoDateEqualAny" | translate }}</label>
+                <label class="app-input-label" for="float-start">{{ "fromNoDateEqualAny" | translate }}
+                  <i class="far fa-question-circle" [pTooltip]="'help.risk.likelyToHappenFrom' | translate"></i>
+                </label>
               </span>
             </div>
             <div class="p-field end-date" *ngIf="formRisk.controls.status.value === 'OPEN'">
@@ -80,8 +91,9 @@
                   [monthNavigator]="true" [yearNavigator]="true" [yearRange]="yearRangeCalculated"
                   icon="fas fa-calendar-alt" [dateFormat]="calendarFormat">
                 </p-calendar>
-                <label class="app-input-label properties-label" for="float-end">{{ "toNoDateEqualAny" |
-                  translate}}</label>
+                <label class="app-input-label properties-label" for="float-end">{{ "toNoDateEqualAny" | translate}}
+                <i class="far fa-question-circle" [pTooltip]="'help.risk.likelyToHappenTo' | translate"></i>  
+                </label>
               </span>
             </div>
             <div class="p-field" *ngIf="formRisk.controls.status.value === 'HAPPENED'">
@@ -90,7 +102,9 @@
                   formControlName="happenedIn" [yearRange]="yearRangeCalculated" icon="fas fa-calendar-alt"
                   [dateFormat]="calendarFormat">
                 </p-calendar>
-                <label class="app-input-label" for="float-start">{{ "in" | translate }}</label>
+                <label class="app-input-label" for="float-start">{{ "in" | translate }}
+                  <i class="far fa-question-circle" [pTooltip]="'help.risk.happenedIn' | translate"></i>
+                </label>
               </span>
             </div>
           </div>
@@ -119,5 +133,9 @@
   <div class="id-container" *ngIf="idRisk && cardRiskProperties">
     <span>{{idRisk}}</span>
   </div>
-  <app-save-button (save)="saveRisk()"></app-save-button>
+  <app-buttons-container>
+    <app-save-button (save)="saveRisk()"></app-save-button>
+    <app-cancel-button (cancel)="handleOnCancel()"></app-cancel-button>
+  </app-buttons-container>
+  
 </div>

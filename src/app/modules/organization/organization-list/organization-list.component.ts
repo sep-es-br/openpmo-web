@@ -91,12 +91,14 @@ export class OrganizationListComponent implements OnInit, OnDestroy {
         info: this.propertiesOffice?.name,
         tooltip: this.propertiesOffice?.fullName,
         routerLink: ['/configuration-office'],
+        admin: true,
         queryParams: { idOffice: this.idOffice }
       },
       {
         key: 'configuration',
         info: 'organizations',
         tooltip: this.translateSrv.instant('organizations'),
+        admin: true,
         routerLink: ['/organizations'],
         queryParams: { idOffice: this.idOffice }
       }
@@ -191,7 +193,7 @@ export class OrganizationListComponent implements OnInit, OnDestroy {
       this.setBreadcrumbStorage(idFilter);
       this.router.navigate(['/config/filter-dataview'], {
         queryParams: {
-          id: idFilter,
+          idFilter: idFilter,
           entityName: 'organizations',
           idOffice: this.idOffice
         }
@@ -242,6 +244,7 @@ export class OrganizationListComponent implements OnInit, OnDestroy {
       key: 'administration',
       info: this.propertiesOffice?.name,
       tooltip: this.propertiesOffice?.fullName,
+      admin: true,
       routerLink: ['/configuration-office'],
       queryParams: { idOffice: this.idOffice }
     },
@@ -249,6 +252,7 @@ export class OrganizationListComponent implements OnInit, OnDestroy {
       key: 'configuration',
       info: 'organizations',
       tooltip: this.translateSrv.instant('organizations'),
+      admin: true,
       routerLink: ['/organizations'],
       queryParams: { idOffice: this.idOffice }
     }] :
@@ -256,12 +260,14 @@ export class OrganizationListComponent implements OnInit, OnDestroy {
       key: 'administration',
       info: this.propertiesOffice?.name,
       tooltip: this.propertiesOffice?.fullName,
+      admin: true,
       routerLink: ['/configuration-office'],
       queryParams: { idOffice: this.idOffice }
     },
     {
       key: 'configuration',
       info: 'organizations',
+      admin: true,
       tooltip: this.translateSrv.instant('organizations'),
       routerLink: ['/organizations'],
       queryParams: { idOffice: this.idOffice }

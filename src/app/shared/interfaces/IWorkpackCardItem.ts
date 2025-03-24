@@ -1,5 +1,6 @@
 import { IMilestoneDashboard, ITripleConstraintDashboard } from './IDashboard';
 import { MenuItem } from 'primeng/api';
+import { IWorkpackJournalInformation } from './IJournal';
 export interface IWorkpackCardItem {
   typeCardItem: string;
   icon?: string;
@@ -21,6 +22,7 @@ export interface IWorkpackCardItem {
   canceled?: boolean;
   endManagementDate?: string;
   completed?: boolean;
+  onNewItem?;
   dashboardData?: {
     risk?: {
       high: number,
@@ -42,5 +44,6 @@ export interface IWorkpackCardItem {
   },
   hasBaseline?: boolean;
   baselineName?: string;
+  journalInformation?: IWorkpackJournalInformation;
 }
 

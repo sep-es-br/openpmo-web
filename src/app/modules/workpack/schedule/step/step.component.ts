@@ -1,10 +1,10 @@
 import { AuthService } from './../../../../shared/services/auth.service';
-import { Component, OnDestroy, OnInit, ViewChildren } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild, ViewChildren } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import { Subject } from 'rxjs';
-import { takeUntil, filter } from 'rxjs/operators';
+import { Observable, Subject } from 'rxjs';
+import { map, takeUntil, filter } from 'rxjs/operators';
 import { Calendar } from 'primeng/calendar';
 import { MenuItem, MessageService } from 'primeng/api';
 import * as moment from 'moment';
@@ -18,8 +18,9 @@ import { WorkpackService } from 'src/app/shared/services/workpack.service';
 import { CostAccountService } from 'src/app/shared/services/cost-account.service';
 import { enterLeave } from 'src/app/shared/animations/enterLeave.animation';
 import { ICostAccount } from 'src/app/shared/interfaces/ICostAccount';
-import { PlanService } from 'src/app/shared/services/plan.service';
 import { ICartItemCostAssignment } from 'src/app/shared/interfaces/ICartItemCostAssignment';
+import { SaveButtonComponent } from 'src/app/shared/components/save-button/save-button.component';
+import { CancelButtonComponent } from 'src/app/shared/components/cancel-button/cancel-button.component';
 
 @Component({
   selector: 'app-step',
@@ -32,6 +33,8 @@ import { ICartItemCostAssignment } from 'src/app/shared/interfaces/ICartItemCost
 export class StepComponent implements OnInit, OnDestroy {
 
   @ViewChildren(Calendar) calendarComponents: Calendar[];
+  @ViewChild(SaveButtonComponent) saveButton: SaveButtonComponent;
+  @ViewChild(CancelButtonComponent) cancelButton: CancelButtonComponent;
   responsive: boolean;
   idSchedule: number;
   idWorkpackModelLinked: number;
@@ -55,10 +58,9 @@ export class StepComponent implements OnInit, OnDestroy {
   cardCostAssignmentsProperties: ICard;
   costAccounts: ICostAccount[];
   costAssignmentsCardItems: ICartItemCostAssignment[] = [];
-  showSaveButton = false;
   menuItemsCostAccounts: MenuItem[];
   costAssignmentsTotals = { plannedTotal: 0, actualTotal: 0 };
-  baselinePlannedTotals: {plannedCost: number; plannedWork: number};
+  baselinePlannedTotals: { plannedCost: number; plannedWork: number };
   $destroy = new Subject();
   calendarFormat: string;
   currentLang = '';
@@ -67,6 +69,10 @@ export class StepComponent implements OnInit, OnDestroy {
   isLoading = false;
   formIsSaving = false;
 
+  isCurrentBaseline: boolean;
+  isPassedMonth: boolean = false;
+  isActualValuesDisabled: boolean = false;
+  
   constructor(
     private actRouter: ActivatedRoute,
     private scheduleSrv: ScheduleService,
@@ -78,13 +84,14 @@ export class StepComponent implements OnInit, OnDestroy {
     private costAccountSrv: CostAccountService,
     private router: Router,
     private messageSrv: MessageService,
-    private authSrv: AuthService
+    private authSrv: AuthService,
+    private route: ActivatedRoute
   ) {
-    this.actRouter.queryParams.subscribe(async ({ idSchedule, idWorkpackModelLinked, stepType, id, unitName, unitPrecision }) => {
+    this.actRouter.queryParams.subscribe(async({ idSchedule, idWorkpackModelLinked, stepType, idStep, unitName, unitPrecision }) => {
       this.idSchedule = idSchedule;
       this.idWorkpackModelLinked = idWorkpackModelLinked;
       this.stepType = stepType;
-      this.idStep = id;
+      this.idStep = idStep;
       this.unitName = unitName;
       this.unitPrecision = unitPrecision;
     });
@@ -113,6 +120,9 @@ export class StepComponent implements OnInit, OnDestroy {
     this.formStep.valueChanges
       .pipe(takeUntil(this.$destroy), filter(() => this.formStep.dirty && this.formStep.valid))
       .subscribe(() => this.handleChangeValuesCardItems());
+    this.formStep.valueChanges
+      .pipe(takeUntil(this.$destroy), filter(() => this.formStep.dirty))
+      .subscribe(() => this.cancelButton.showButton());
   }
 
   ngOnDestroy(): void {
@@ -121,10 +131,21 @@ export class StepComponent implements OnInit, OnDestroy {
   }
 
   async ngOnInit() {
+
+    this.route.queryParams.subscribe(params => {
+      const hasActiveBaseline = params['hasActiveBaseline'];
+      this.isCurrentBaseline = hasActiveBaseline === 'true'
+    })
+
     this.calendarFormat = this.translateSrv.instant('dateFormat');
     this.isLoading = true;
     await this.loadPropertiesStep();
     this.isLoading = false;
+
+    if (this.stepDetail) {
+      this.handlePassedMonths();
+      this.updateActualValues();
+    }
   }
 
   async loadPropertiesStep() {
@@ -148,7 +169,8 @@ export class StepComponent implements OnInit, OnDestroy {
             actualCost: consume.actualCost,
             plannedCost: consume.plannedCost,
             idCostAccount: consume.costAccount.id,
-            id: consume.id
+            id: consume.id,
+            nameCostAccount: consume.costAccount.name
           }))
         };
         this.baselinePlannedTotals = {
@@ -165,7 +187,6 @@ export class StepComponent implements OnInit, OnDestroy {
           this.onlyOneStep = this.schedule.groupStep[0].steps.length === 1;
         }
         await this.loadPermissions();
-
       }
     }
     if (this.schedule.idWorkpack) {
@@ -179,15 +200,13 @@ export class StepComponent implements OnInit, OnDestroy {
   async setBreadcrumb() {
     let breadcrumbItems = this.breadcrumbSrv.get;
     if (!breadcrumbItems || breadcrumbItems.length === 0) {
-      breadcrumbItems = await this.breadcrumbSrv.loadWorkpackBreadcrumbs(this.schedule.idWorkpack, this.idPlan)
+      breadcrumbItems = await this.breadcrumbSrv.loadWorkpackBreadcrumbs(this.schedule.idWorkpack, this.idPlan);
     }
     this.breadcrumbSrv.setMenu([
-      ... breadcrumbItems,
+      ...breadcrumbItems,
       {
         key: 'step',
-        routerLink: ['/workpack/schedule/step'],
-        queryParams: { id: this.idStep },
-        info: ''
+        info: !this.idStep ? '' : moment(this.stepDetail.periodFromStart).format('MMMM')
       }
     ]);
   }
@@ -209,57 +228,87 @@ export class StepComponent implements OnInit, OnDestroy {
   }
 
   setStepFormValues() {
-    if (this.stepType === 'start') {
-      this.start = new Date(this.schedule.start + 'T00:00:00');
-      if (this.stepDetail) {
-        this.formStep.controls.start.setValue(this.start);
-      }
-      this.start.setDate(1);
-      if (!this.stepDetail) {
+    switch (this.stepType) {
+      case 'start':
+        this.start = new Date(this.schedule.start + 'T00:00:00');
+        if (this.stepDetail) {
+          this.formStep.reset({
+            start: this.start,
+            end: null,
+            plannedWork: this.stepDetail.plannedWork,
+            actualWork: this.stepDetail.actualWork,
+          });
+        }
+        this.start.setDate(1);
+        if (!this.stepDetail) {
+          this.start.setMonth(this.start.getMonth() - 1);
+        }
+        this.minStart = new Date(this.start);
+        const numDaysStart = moment(this.start).daysInMonth();
+        this.maxStart = new Date(this.start);
+        this.maxStart.setDate(numDaysStart);
+        break;
+      case 'end':
+        this.end = new Date(this.schedule.end + 'T00:00:00');
+        if (this.stepDetail) {
+          this.formStep.reset({
+            start: null,
+            end: this.end,
+            plannedWork: this.stepDetail.plannedWork,
+            actualWork: this.stepDetail.actualWork,
+          });
+        }
+        this.end.setDate(1);
+        if (!this.stepDetail) {
+          this.end.setMonth(this.end.getMonth() + 1);
+        }
+        this.minEnd = new Date(this.end);
+        const numDaysEnd = moment(this.end).daysInMonth();
+        this.maxEnd = new Date(this.end);
+        this.maxEnd.setDate(numDaysEnd);
+        break;
+      case 'newStart':
+        this.start = new Date(this.schedule.start + 'T00:00:00');
+        this.start.setDate(1);
         this.start.setMonth(this.start.getMonth() - 1);
-      }
-      this.minStart = new Date(this.start);
-      const numDays = moment(this.start).daysInMonth();
-      this.maxStart = new Date(this.start);
-      this.maxStart.setDate(numDays);
-    }
-    if (this.stepType === 'end' || !!this.onlyOneStep) {
-      this.end = new Date(this.schedule.end + 'T00:00:00');
-      if (this.stepDetail) {
-        this.formStep.controls.end.setValue(this.end);
-      }
-      this.end.setDate(1);
-      if (!this.stepDetail) {
+        this.minStart = null;
+        this.formStep.controls.start.setValidators(Validators.required);
+        this.formStep.reset({
+          start: this.start,
+          end: null,
+          plannedWork: null,
+          actualWork: null,
+          distribution: 'SIGMOIDAL'
+        });
+        const numDays = moment(this.start).daysInMonth();
+        this.maxStart = new Date(this.start);
+        this.maxStart.setDate(numDays);
+        break;
+      case 'newEnd':
+        this.end = new Date(this.schedule.end + 'T00:00:00');
+        this.end.setDate(1);
         this.end.setMonth(this.end.getMonth() + 1);
-      }
-      this.minEnd = new Date(this.end);
-      const numDays = moment(this.end).daysInMonth();
-      this.maxEnd = new Date(this.end);
-      this.maxEnd.setDate(numDays);
-    }
-    if (this.stepType === 'newStart') {
-      this.start = new Date(this.schedule.start + 'T00:00:00');
-      this.start.setDate(1);
-      this.start.setMonth(this.start.getMonth() - 1);
-      this.minStart = null;
-      this.formStep.controls.start.setValue(this.start);
-      this.formStep.controls.start.setValidators(Validators.required);
-      const numDays = moment(this.start).daysInMonth();
-      this.maxStart = new Date(this.start);
-      this.maxStart.setDate(numDays);
-    }
-    if (this.stepType === 'newEnd') {
-      this.end = new Date(this.schedule.end + 'T00:00:00');
-      this.end.setDate(1);
-      this.end.setMonth(this.end.getMonth() + 1);
-      this.formStep.controls.end.setValue(this.end);
-      this.formStep.controls.end.setValidators(Validators.required);
-      this.minEnd = new Date(this.end);
-      this.maxEnd = null;
-    }
-    if (this.stepDetail) {
-      this.formStep.controls.plannedWork.setValue(this.stepDetail.plannedWork);
-      this.formStep.controls.actualWork.setValue(this.stepDetail.actualWork);
+        this.formStep.controls.end.setValidators(Validators.required);
+        this.formStep.reset({
+          start: null,
+          end: this.end,
+          plannedWork: null,
+          actualWork: null,
+          distribution: 'SIGMOIDAL'
+        });
+        this.minEnd = new Date(this.end);
+        this.maxEnd = null;
+        break;
+      default:
+        if (this.stepDetail) {
+          this.formStep.reset({
+            start: null,
+            end: null,
+            plannedWork: this.stepDetail.plannedWork,
+            actualWork: this.stepDetail.actualWork,
+          });
+        }
+        break;
     }
     if (!this.editPermission) {
       this.formStep.disable();
@@ -281,17 +330,18 @@ export class StepComponent implements OnInit, OnDestroy {
       const actualDate = moment();
       const stepDate = moment(this.step.periodFromStart, 'yyy-MM-DD');
       const showReplicateButton = stepDate.isSameOrBefore(actualDate) ? true : false;
-      this.costAssignmentsCardItems = this.step.consumes.map(consume => {
+      this.costAssignmentsCardItems =  this.step.consumes.map(consume => {
         const costAccount = this.costAccounts.find(cost => cost.id === consume.idCostAccount);
-        const propertyModelName = costAccount.models.find(p => p.name === 'name');
-        const propertyName = costAccount.properties.find(p => p.idPropertyModel === propertyModelName.id);
+        const propertyModelName = costAccount && costAccount?.models.find(p => p.name === 'name');
+        const propertyName = costAccount && propertyModelName ?
+          costAccount?.properties.find(p => p.idPropertyModel === propertyModelName.id).value : consume.nameCostAccount;
         return {
           type: 'cost-card',
           unitMeasureName: '$',
           idCost: consume.idCostAccount,
           idCostAssignment: consume.id,
           showReplicateButton,
-          costAccountName: propertyName.value as string,
+          costAccountName: propertyName as string,
           plannedWork: consume.plannedCost,
           actualWork: consume.actualCost,
           menuItemsCost: [{
@@ -300,10 +350,10 @@ export class StepComponent implements OnInit, OnDestroy {
             command: (event) => this.deleteCost(consume.idCostAccount)
           }],
           readonly: !this.editPermission,
-          costAccountAllocation: costAccount.costAccountAllocation && {
-            limit: costAccount.costAccountAllocation.limit,
-            planed: costAccount.costAccountAllocation.planed - consume.plannedCost,
-            actual: costAccount.costAccountAllocation.actual - consume.actualCost,
+          costAccountAllocation: costAccount?.costAccountAllocation && {
+            limit: costAccount?.costAccountAllocation.limit,
+            planed: costAccount?.costAccountAllocation.planed - consume.plannedCost,
+            actual: costAccount?.costAccountAllocation.actual - consume.actualCost,
           }
         };
       });
@@ -322,40 +372,43 @@ export class StepComponent implements OnInit, OnDestroy {
         menuItemsNewCost: this.menuItemsCostAccounts
       }];
     }
-    if (!this.menuItemsCostAccounts ||  this.menuItemsCostAccounts.length === 0) {
+    if (!this.menuItemsCostAccounts || this.menuItemsCostAccounts.length === 0) {
       this.cardCostAssignmentsProperties = undefined;
     }
   }
 
   async loadMenuItemsCostAccounts() {
     const costAccountsIds = this.step?.consumes ? this.step.consumes.map(consume => consume.idCostAccount) : [];
-    const result = await this.costAccountSrv.GetAll({ 'id-workpack': this.schedule.idWorkpack });
-    if (result.success) {
-      this.costAccounts = result.data;
-      const workpacksIds = this.costAccounts.map(cost => cost.idWorkpack);
-      const workpacksIdsNotRepeated = workpacksIds.filter((w, i) => workpacksIds.indexOf(w) === i);
-
-      this.menuItemsCostAccounts = workpacksIdsNotRepeated.map(idWorkpack => {
-        const workpackCostAccounts = this.costAccounts.filter(cost => cost.idWorkpack === idWorkpack);
-        return {
-          label: workpackCostAccounts[0].workpackModelName,
-          items: workpackCostAccounts.map(workpackCost => {
-            const propertyModelName = workpackCost.models.find(p => p.name === 'name');
-            const propertyName = workpackCost.properties.find(p => p.idPropertyModel === propertyModelName.id);
-            return {
-              label: propertyName.value as string,
-              id: workpackCost.id.toString(),
-              disabled: costAccountsIds.includes(workpackCost.id) || (!this.editPermission),
-              command: () => this.createNewCardItemCost(workpackCost.id, propertyName.value as string)
-            } as MenuItem;
-          })
-        };
-      });
+    if (!this.costAccounts) {
+      const result = await this.costAccountSrv.GetAll({ 'id-workpack': this.schedule.idWorkpack });
+      if (result.success) {
+        this.costAccounts = result.data;
+      }
     }
+    const workpacksIds = this.costAccounts.map(cost => cost.idWorkpack);
+    const workpacksIdsNotRepeated = workpacksIds.filter((w, i) => workpacksIds.indexOf(w) === i);
+
+    this.menuItemsCostAccounts = workpacksIdsNotRepeated.map(idWorkpack => {
+      const workpackCostAccounts = this.costAccounts.filter(cost => cost.idWorkpack === idWorkpack);
+      return {
+        label: workpackCostAccounts[0].workpackModelName,
+        items: workpackCostAccounts.map(workpackCost => {
+          const propertyModelName = workpackCost.models.find(p => p.name === 'name');
+          const propertyName = workpackCost.properties.find(p => p.idPropertyModel === propertyModelName.id);
+          return {
+            label: propertyName.value as string,
+            id: workpackCost.id.toString(),
+            disabled: costAccountsIds.includes(workpackCost.id) || (!this.editPermission),
+            command: () => this.createNewCardItemCost(workpackCost.id, propertyName.value as string)
+          } as MenuItem;
+        })
+      };
+    });
   }
 
   createNewCardItemCost(idCost: number, costName: string) {
-    const costAccountSelected = this.costAccounts.find( cost => cost.id === idCost);
+    this.cancelButton.showButton();
+    const costAccountSelected = this.costAccounts.find(cost => cost.id === idCost);
     const costAssignmentsCardItemsList = this.costAssignmentsCardItems.filter(card => card.type === 'cost-card');
     const costAccountsIds = costAssignmentsCardItemsList.map(cardItem => (cardItem.idCost));
     this.menuItemsCostAccounts = Array.from(this.menuItemsCostAccounts.map(group => {
@@ -438,7 +491,8 @@ export class StepComponent implements OnInit, OnDestroy {
     this.menuItemsCostAccounts = Array.from(menuItems);
     this.costAssignmentsCardItems = Array.from(this.costAssignmentsCardItems.filter(cost => cost.idCost !== idCost));
     this.reloadCostAssignmentTotals();
-    this.showSaveButton = true;
+    this.saveButton.showButton();
+    this.cancelButton.showButton();
   }
 
   handleChangeValuesCardItems() {
@@ -447,21 +501,22 @@ export class StepComponent implements OnInit, OnDestroy {
       if (this.costAssignmentsCardItems && this.costAssignmentsCardItems.length > 1) {
         this.reloadCostAssignmentTotals();
       }
-      this.showSaveButton = true;
+      this.saveButton.showButton();
     } else {
-      this.showSaveButton = false;
+      this.saveButton.hideButton();
     }
-    
+
   }
 
   handleChangeTotalsValues() {
+    this.cancelButton.showButton();
     if (this.formStep.valid) {
       if (this.costAssignmentsCardItems && this.costAssignmentsCardItems.length > 1) {
         this.reloadCostAssignmentTotals();
       }
-      this.showSaveButton = true;
+      this.saveButton.showButton();
     } else {
-      this.showSaveButton = false;
+      this.saveButton.hideButton();
     }
   }
 
@@ -480,18 +535,18 @@ export class StepComponent implements OnInit, OnDestroy {
 
 
   async saveStep() {
+    this.cancelButton.hideButton();
     const end = moment(this.formStep.controls.end.value).format('yyyy-MM-DD');
     const start = moment(this.formStep.controls.start.value).format('yyyy-MM-DD');
     const hasNegativeValues = this.formStep.controls.plannedWork.value < 0 || this.formStep.controls.actualWork.value < 0 ||
-      (this.costAssignmentsCardItems && this.costAssignmentsCardItems.filter( item => item.type === 'cost-card' &&
-        (item.plannedWork < 0 || item.actualWork < 0)).length > 0 );
+      (this.costAssignmentsCardItems && this.costAssignmentsCardItems.filter(item => item.type === 'cost-card' &&
+        (item.plannedWork < 0 || item.actualWork < 0)).length > 0);
     if (hasNegativeValues) {
       this.messageSrv.add({
         detail: this.translateSrv.instant('messages.scheduleCantHasNegativeValues'),
         severity: 'warn',
         summary: this.translateSrv.instant('atention')
       });
-      this.showSaveButton = false;
       return;
     }
     this.step = {
@@ -544,5 +599,43 @@ export class StepComponent implements OnInit, OnDestroy {
         );
       }
     }
+  }
+
+  handleOnCancel() {
+    this.saveButton.hideButton();
+    this.setStepFormValues();
+    if (!this.idStep) {
+      this.costAssignmentsCardItems = [{
+        type: 'new-cost-card',
+        menuItemsNewCost: this.menuItemsCostAccounts
+      }];
+      this.reloadCostAssignmentTotals();
+    } else {
+      this.loadMenuItemsCostAccounts();
+      this.loadCostAssignmentSession();
+    }
+
+
+  }
+
+  handlePassedMonths() {
+    if (!this.stepDetail.periodFromStart) return;
+
+    const stepDate = moment(this.stepDetail.periodFromStart, 'YYYY-MM');
+    const startOfCurrentMonth = moment().startOf('month');
+    const endOfPreviousMonth = startOfCurrentMonth.clone().subtract(1, 'day');
+
+    if (stepDate.isBefore(startOfCurrentMonth) && stepDate.isBefore(endOfPreviousMonth)) {
+      this.isPassedMonth = true;
+    }
+  }
+
+  updateActualValues() {
+    if (!this.stepDetail.periodFromStart) return;
+
+    const dateStep = moment(this.stepDetail.periodFromStart, 'YYYY-MM');
+    const startOfCurrentMonth = moment().startOf('month');
+
+    this.isActualValuesDisabled = dateStep.isAfter(startOfCurrentMonth);
   }
 }

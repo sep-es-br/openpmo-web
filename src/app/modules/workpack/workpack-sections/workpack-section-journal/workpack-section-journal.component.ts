@@ -10,9 +10,8 @@ import { iconsJournal } from 'src/app/shared/constants/iconsJournal';
 import { StatusJournalEnum } from 'src/app/shared/enums/StatusJournalEnum';
 import { TypeJournalEnum } from 'src/app/shared/enums/TypeJournalEnum';
 import { ICard } from 'src/app/shared/interfaces/ICard';
-import { ITreeViewScopePlan, ITreeViewScopeWorkpack } from 'src/app/shared/interfaces/ITreeScopePersons';
+import { IJournal } from 'src/app/shared/interfaces/IJournal';
 import { IWorkpackData, IWorkpackParams } from 'src/app/shared/interfaces/IWorkpackDataParams';
-import { IJournal } from 'src/app/shared/interfaces/Journal';
 import { AuthService } from 'src/app/shared/services/auth.service';
 import { ConfigDataViewService } from 'src/app/shared/services/config-dataview.service';
 import { JournalService } from 'src/app/shared/services/journal.service';
@@ -116,7 +115,7 @@ export class WorkpackSectionJournalComponent implements OnInit, OnDestroy {
   }
 
   async ngOnInit() {
-    
+
   }
 
   ngOnDestroy(): void {
@@ -159,8 +158,8 @@ export class WorkpackSectionJournalComponent implements OnInit, OnDestroy {
     });
     this.hasAll = hasAll;
     this.hasMore = hasMore;
-    if (loading) this.isLoading = true;
-    if (!loading) this.buidJournalView();
+    if (loading) {this.isLoading = true;}
+    if (!loading) {this.buidJournalView();}
   }
 
 
@@ -233,7 +232,7 @@ export class WorkpackSectionJournalComponent implements OnInit, OnDestroy {
         icon: iconsJournal[journal.type].icon,
         color: iconsJournal[journal.type].color,
         background: iconsJournal[journal.type].background
-        
+
       };
     });
     this.isLoading = false;
@@ -241,17 +240,17 @@ export class WorkpackSectionJournalComponent implements OnInit, OnDestroy {
 
   formatTitle(information) {
     const previousDate = this.language === 'pt-BR' ? moment(information.previousDate, 'yyyy-MM-DD').format('DD/MM/yyyy') :
-      moment(information.previousDate, 'yyyy-MM-DD').format('yyyy/MM/DD')
+      moment(information.previousDate, 'yyyy-MM-DD').format('yyyy/MM/DD');
     const newDate = this.language === 'pt-BR' ? moment(information.newDate, 'yyyy-MM-DD').format('DD/MM/yyyy') :
-      moment(information.newDate, 'yyyy-MM-DD').format('yyyy/MM/DD')
+      moment(information.newDate, 'yyyy-MM-DD').format('yyyy/MM/DD');
     return `${this.translateSrv.instant('previousDate')}: ${previousDate} - ${this.translateSrv.instant('newDate')}: ${newDate}`;
   }
 
   async loadTreeViewScope() {
-    const selected = this.selectedWorkpacks && this.selectedWorkpacks.length > 1 ?
+    const selected = this.selectedWorkpacks && this.selectedWorkpacks.length > 0 ? (this.selectedWorkpacks.length > 1 ?
         this.selectedWorkpacks.length + ' ' + this.translateSrv.instant('selectedItems') :
-        this.selectedWorkpacks && this.selectedWorkpacks.length === 1 ? this.selectedWorkpacks[0].label : '';
-      this.formSearch.controls.scopeName.setValue(selected);
+        this.selectedWorkpacks[0].label) : undefined;
+    if (selected) {this.formSearch.controls.scopeName.setValue(selected);}
   }
 
   handleDownload(dataurl: string, filename: string, mimeType) {
@@ -265,7 +264,7 @@ export class WorkpackSectionJournalComponent implements OnInit, OnDestroy {
     fetch(dataurl, header)
       .then(response => response.blob())
       .then(blob => {
-        const fileBlob = new Blob([blob], {type: mimeType})
+        const fileBlob = new Blob([blob], {type: mimeType});
         const link = document.createElement('a');
         link.href = URL.createObjectURL(fileBlob);
         link.download = filename;
@@ -314,22 +313,6 @@ export class WorkpackSectionJournalComponent implements OnInit, OnDestroy {
     this.journalData = [];
   }
 
-  private getFrom() {
-    const from = this.formSearch.controls.from.value;
-    if (from) {
-      return moment(from).format('DD/MM/YYYY');
-    }
-    return null;
-  }
-
-  private getTo() {
-    const to = this.formSearch.controls.to.value;
-    if (to) {
-      return moment(to).format('DD/MM/YYYY');
-    }
-    return null;
-  }
-
   handleNewInformation() {
     this.workpackParams = this.workpackSrv.getWorkpackParams();
     this.workpackData = this.workpackSrv.getWorkpackData();
@@ -337,7 +320,23 @@ export class WorkpackSectionJournalComponent implements OnInit, OnDestroy {
       queryParams: {
         idWorkpack: this.workpackData.workpack.id || this.workpackParams.idWorkpack
       }
-    })
+    });
+  }
+
+  getFrom() {
+    const from = this.formSearch.controls.from.value;
+    if (from) {
+      return moment(from).format('DD/MM/YYYY');
+    }
+    return null;
+  }
+
+  getTo() {
+    const to = this.formSearch.controls.to.value;
+    if (to) {
+      return moment(to).format('DD/MM/YYYY');
+    }
+    return null;
   }
 
 }

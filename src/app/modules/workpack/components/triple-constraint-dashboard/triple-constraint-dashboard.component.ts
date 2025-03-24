@@ -1,9 +1,11 @@
 import { takeUntil } from 'rxjs/operators';
 import { ResponsiveService } from 'src/app/shared/services/responsive.service';
-import { IDashboard, ITripleConstraintDashboard } from './../../../../shared/interfaces/IDashboard';
+import { ITripleConstraintDashboard } from './../../../../shared/interfaces/IDashboard';
 import { Component, Input, OnInit, SimpleChanges } from '@angular/core';
 import * as moment from 'moment';
 import { Subject } from 'rxjs';
+import { LabelService } from 'src/app/shared/services/label.service';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-triple-constraint-dashboard',
@@ -31,9 +33,12 @@ export class TripleConstraintDashboardComponent implements OnInit {
   $destroy = new Subject();
   responsive = false;
   mediaScreen1450: boolean;
+  foreseenLabel: string;
 
   constructor(
-    private responsiveSrv: ResponsiveService
+    private responsiveSrv: ResponsiveService,
+    private labelService: LabelService,
+    private route: ActivatedRoute
   ) {
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.responsive = value);
     this.responsiveSrv.resizeEvent.subscribe((value) => {
@@ -58,6 +63,19 @@ export class TripleConstraintDashboardComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.route.queryParams.subscribe(params => {
+      const idWorkpack = params['id']
+      if (idWorkpack) {
+        this.labelService.getLabels(idWorkpack).subscribe(
+          response => {
+            this.foreseenLabel = response.data[0].body.data;
+          },
+          error => {
+            console.error(error);
+          }
+        );
+      }
+    });
   }
 
   ngOnDestroy(): void {
@@ -67,7 +85,7 @@ export class TripleConstraintDashboardComponent implements OnInit {
 
   loadMaxCostValue() {
     const values = [];
-    if (this.tripleConstraint.cost.plannedValue) {
+    if (this.tripleConstraint?.cost?.plannedValue) {
       values.push(this.tripleConstraint.cost.plannedValue);
     }
     if (this.tripleConstraint.cost.foreseenValue) {
@@ -94,7 +112,7 @@ export class TripleConstraintDashboardComponent implements OnInit {
   }
 
   loadChartScheduleValues() {
-    if (this && this.tripleConstraint && this.tripleConstraint.schedule) {
+    if (this.tripleConstraint && this.tripleConstraint.schedule) {
       const startDates = [];
       if (this.tripleConstraint.schedule.plannedStartDate) {
         startDates.push(this.tripleConstraint.schedule.plannedStartDate);

@@ -53,6 +53,10 @@ export abstract class BaseService<T> {
     return this.http.get<IHttpResult<T>>(`${this.urlBase}/${id}`).toPromise();
   }
 
+  public async GetByIdWithIdWorkpack(idWorkpack: number, id: number, noLoading?: boolean): Promise<IHttpResult<T>> {
+    return this.http.get<IHttpResult<T>>(`${this.urlBase}/${idWorkpack}/${id}`).toPromise();
+  }
+
   public post(model: T): Promise<IHttpResult<T>> {
     return this.http.post<IHttpResult<T>>(this.urlBase, model).toPromise();
   }
@@ -67,14 +71,14 @@ export abstract class BaseService<T> {
     const field: string = options?.field;
     const useConfirm: boolean = options?.useConfirm || true;
 
-    return new Promise(async (resolve, reject) => {
+    return new Promise(async(resolve, reject) => {
       if (useConfirm) {
         this.confirmationSrv.confirm({
           message: message || `${this.translateSrv.instant('messages.deleteConfirmation')} ${model[field ? field : 'name'] || ''}?`,
           key: 'deleteConfirm',
           acceptLabel: this.translateSrv.instant('yes'),
           rejectLabel: this.translateSrv.instant('no'),
-          accept: async () => {
+          accept: async() => {
             const result = await this.http.delete<IHttpResult<T>>(`${this.urlBase}/${model['id']}`).toPromise();
             if (result.success) {
               setTimeout(() => {

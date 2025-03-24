@@ -3,7 +3,6 @@ import { IWorkpackModelProperty } from './IWorkpackModelProperty';
 
 export interface IWorkpackModel {
   id?: number;
-  idParent?: number;
   idPlanModel?: number;
   type: TypeWorkpackModelEnum;
   modelName: string;
@@ -25,8 +24,10 @@ export interface IWorkpackModel {
   scheduleSessionActive?: boolean;
   properties?: IWorkpackModelProperty[];
   sortBy: IWorkpackModelProperty;
+  sortByField?: string;
   riskAndIssueManagementSessionActive?: boolean;
   processesManagementSessionActive?: boolean;
+  indicatorsManagementSessionActive?: boolean;
   dashboardSessionActive?: boolean;
   dashboardShowEva?: boolean;
   dashboardShowMilestones?: boolean;

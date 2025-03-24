@@ -17,6 +17,7 @@ import { Calendar } from 'primeng/calendar';
 import { SaveButtonComponent } from './../../../../shared/components/save-button/save-button.component';
 import { Component, OnInit, ViewChild, ViewChildren } from '@angular/core';
 import * as moment from 'moment';
+import { CancelButtonComponent } from 'src/app/shared/components/cancel-button/cancel-button.component';
 
 @Component({
   selector: 'app-issue-response',
@@ -26,6 +27,7 @@ import * as moment from 'moment';
 export class IssueResponseComponent implements OnInit {
 
   @ViewChild(SaveButtonComponent) saveButton: SaveButtonComponent;
+  @ViewChild(CancelButtonComponent) cancelButton: CancelButtonComponent;
   @ViewChildren(Calendar) calendarComponents: Calendar[];
 
   responsive: boolean;
@@ -64,7 +66,7 @@ export class IssueResponseComponent implements OnInit {
       setTimeout(() => this.setLanguage(), 200);
     });
     this.actRouter.queryParams.subscribe(async queryParams => {
-      this.idIssueResponse = queryParams.id && +queryParams.id;
+      this.idIssueResponse = queryParams.idIssueResponse && +queryParams.idIssueResponse;
       this.idIssue = queryParams.idIssue && +queryParams.idIssue;
       this.issueName = queryParams.issueName && queryParams.issueName;
       this.idWorkpack = queryParams.idWorkpack && +queryParams.idWorkpack;
@@ -91,6 +93,9 @@ export class IssueResponseComponent implements OnInit {
     this.formIssueResponse.valueChanges
       .pipe(takeUntil(this.$destroy), filter(() => this.formIssueResponse.dirty && this.formIssueResponse.valid))
       .subscribe(() => this.saveButton.showButton());
+    this.formIssueResponse.valueChanges
+      .pipe(takeUntil(this.$destroy), filter(() => this.formIssueResponse.dirty))
+      .subscribe(() => this.cancelButton.showButton());
   }
 
   ngOnDestroy(): void {
@@ -116,12 +121,13 @@ export class IssueResponseComponent implements OnInit {
   }
 
   setFormIssueResponse() {
-    this.formIssueResponse.controls.name.setValue(this.issueResponse.name);
-    this.formIssueResponse.controls.date.setValue(new Date
-      (moment(this.issueResponse.date, 'DD/MM/YYYY').format('YYYY-MM-DD') + 'T00:00:00'));
-    this.formIssueResponse.controls.status.setValue(this.issueResponse.status);
-    this.formIssueResponse.controls.plan.setValue(this.issueResponse.plan);
-    this.formIssueResponse.controls.responsible.setValue(this.issueResponse.responsible.map(resp => (resp.id)));
+    this.formIssueResponse.reset({
+      name: this.issueResponse.name,
+      date: new Date(moment(this.issueResponse.date, 'DD/MM/YYYY').format('YYYY-MM-DD') + 'T00:00:00'),
+      status: this.issueResponse.status,
+      plan: this.issueResponse.plan,
+      responsible: this.issueResponse.responsible ? this.issueResponse.responsible.map(resp => (resp.id)) : []
+    });
     this.cardIssueResponseProperties.isLoading = false;
   }
 
@@ -184,23 +190,16 @@ export class IssueResponseComponent implements OnInit {
       breadcrumbItems = await this.breadcrumbSrv.loadWorkpackBreadcrumbs(this.idWorkpack, this.idPlan)
     }
     this.breadcrumbSrv.setMenu([
-      ... breadcrumbItems,
+      ...breadcrumbItems,
       {
         key: 'issue',
         routerLink: ['/workpack/issues'],
-        queryParams: { idWorkpack: this.idWorkpack, id: this.idIssue },
+        queryParams: { idWorkpack: this.idWorkpack, idIssue: this.idIssue },
         info: this.issueName,
         tooltip: this.issueName
       },
       {
         key: 'response',
-        routerLink: ['/workpack/issues/response'],
-        queryParams: {
-          idWorkpack: this.idWorkpack,
-          id: this.idIssueResponse,
-          idIssue: this.idIssue,
-          issueName: this.issueName
-        },
         info: this.issueResponse?.name,
         tooltip: this.issueResponse?.name
       }
@@ -208,6 +207,7 @@ export class IssueResponseComponent implements OnInit {
   }
 
   async saveIssueResponse() {
+    this.cancelButton.hideButton();
     this.formIsSaving = true;
     const sender: IIssueResponse = {
       id: this.idIssueResponse,
@@ -230,11 +230,27 @@ export class IssueResponseComponent implements OnInit {
       this.router.navigate(['/workpack/issues'], {
         queryParams: {
           idWorkpack: this.idWorkpack,
-          id: this.idIssue
+          idIssue: this.idIssue
         }
       })
     }
   }
+
+  handleOnCancel() {
+    this.saveButton.hideButton();
+    if (this.idIssueResponse) {
+      this.setFormIssueResponse();
+    } else {
+      this.formIssueResponse.reset({
+        name: '',
+        date: null,
+        status: '',
+        plan: '',
+        responsible: [],
+      });
+    }
+  }
+
 
 }
 

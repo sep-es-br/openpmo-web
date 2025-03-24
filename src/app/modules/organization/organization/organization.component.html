@@ -16,19 +16,23 @@
       <div>
         <form [formGroup]="formOrganization" class="form-organization">
           <div class="p-fluid p-formgroup-inline p-grid">
-            <span class="p-field p-col-12 p-md-6 p-lg-3 p-float-label">
+            <span class="p-field p-col-12 p-md-6 p-lg-3 p-float-label" >
               <p-dropdown id="sector" [options]="optionsSector" dropdownIcon="fas fa-caret-down"
                           formControlName="sector" class="app-single-selection" [class.mobile]="responsive"
                           [class.desktop]="!responsive" [autoDisplayFirst]="false" optionLabel="name"
                           optionValue="value">
               </p-dropdown>
-              <label for="sector" class="app-input-label">{{'sector' | translate}}</label>
+              <label for="sector"  class="app-input-label" >{{'sector' | translate}} * 
+                <i class="far fa-question-circle" [pTooltip]="'help.organization.sector' | translate"></i>
+              </label>
             </span>
             <span class="p-field p-col-12 p-md-6 p-lg-3 p-float-label">
               <input id="businessName" formControlName="name" type="text" pInputText class="app-input-text"
                      [class.mobile]="responsive">
               <label for="businessName" class="app-input-label">{{'businessName' | translate}}<span
-                class="required-indicator">*</span></label>
+                class="required-indicator">*</span>
+                <i class="far fa-question-circle" [pTooltip]="'help.organization.businessName' | translate"></i>
+              </label>
               <app-input-message [form]="formOrganization" field="name"></app-input-message>
             </span>
           </div>
@@ -37,31 +41,41 @@
             [ngModel]="(formOrganization.touched) ? formOrganization.value.fullName : formOrganization.value.name">
             </textarea>
             <label for="socialName" class="app-input-label">{{'socialName' | translate}}<span
-              class="required-indicator">*</span></label>
+              class="required-indicator">*</span>
+              <i class="far fa-question-circle" [pTooltip]="'help.organization.socialName' | translate"></i>
+            </label>
           </span>
           <app-input-message [form]="formOrganization" field="fullName"></app-input-message>
           <span class="p-float-label">
-            <textarea id="address" pInputTextarea formControlName="address" class="app-text-area" rows="1">
+            <textarea id="address" pInputTextarea formControlName="address" class="app-text-area" rows="2">
             </textarea>
-            <label for="address" class="app-input-label">{{'address' | translate}}</label>
+            <label for="address" class="app-input-label">{{'address' | translate}}
+              <i class="far fa-question-circle" [pTooltip]="'help.organization.address' | translate"></i>
+            </label>
           </span>
           <span class="p-float-label">
             <input id="phone" pInputText class="app-input-text" formControlName="phoneNumber"
                    [class.responsive]="responsive" [class.desktop]="!responsive" (blur)="setPhoneNumberMask()"
                    [placeholder]="phoneNumberPlaceholder" (focusin)="setPhoneNumberPlaceholder()"
                    (focusout)="clearPhoneNumberPlaceholder()" (input)="setPhoneNumberPlaceholder()"/>
-            <label for="phone" class="app-input-label">{{'phone' | translate}}</label>
+            <label for="phone" class="app-input-label">{{'phone' | translate}}
+              <i class="far fa-question-circle" [pTooltip]="'help.organization.phoneNumber' | translate"></i>
+            </label>
           </span>
           <span class="p-float-label">
             <input id="contactEmail" formControlName="contactEmail" type="text" pInputText class="app-input-text"
                    [class.mobile]="responsive" [class.desktop]="!responsive">
-            <label for="contactEmail" class="app-input-label">{{'contactEmail' | translate}}</label>
+            <label for="contactEmail" class="app-input-label">{{'contactEmail' | translate}}
+              <i class="far fa-question-circle" [pTooltip]="'help.organization.contactEmail' | translate"></i>
+            </label>
           </span>
           <app-input-message [form]="formOrganization" field="contactEmail"></app-input-message>
           <span class="p-float-label">
             <input id="website" formControlName="website" type="text" pInputText class="app-input-text"
                    [class.mobile]="responsive" [class.desktop]="!responsive">
-            <label for="website" class="app-input-label">Website</label>
+            <label for="website" class="app-input-label">Website
+              <i class="far fa-question-circle" [pTooltip]="'help.organization.website' | translate"></i>
+            </label>
           </span>
         </form>
       </div>
@@ -70,5 +84,8 @@
   <div class="id-container" *ngIf="idOrganization && cardProperties && !isLoading">
     <span>{{idOrganization}}</span>
   </div>
-  <app-save-button (save)="handleOnSubmit()"></app-save-button>
+  <app-buttons-container>
+    <app-save-button (save)="handleOnSubmit()"></app-save-button>
+    <app-cancel-button (cancel)="handleOnCancel()"></app-cancel-button>
+  </app-buttons-container>
 </div>

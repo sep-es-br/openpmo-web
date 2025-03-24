@@ -7,6 +7,12 @@
     position: relative;
     min-height: 150px;
   }
+  .input-label, .app-input-label {
+    font-size: 0.9rem !important;
+  }
+  .p-radiobutton-label {
+    font-size: 0.9rem;
+  }
   .loading-form-container {
     position: absolute;
     min-height: 150px;
@@ -527,6 +533,12 @@
         margin-top: 2em;
         .p-float-label {
           padding-bottom: 1.5em;
+          .app-input-label {
+            font-size: 12px !important;
+          }
+          .app-single-selection .p-dropdown .p-inputtext {
+            font-size: 12px !important;
+          }
         }
 
         .card-item-role-description {

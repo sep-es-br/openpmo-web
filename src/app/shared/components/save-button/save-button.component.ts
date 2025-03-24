@@ -29,8 +29,8 @@ export class SaveButtonComponent implements OnDestroy {
   };
   @Output() save = new EventEmitter();
   isShowingButton = false;
-  responsive = false;
   $destroy = new Subject();
+  responsive = false;
 
   constructor(
     private responsiveSrv: ResponsiveService

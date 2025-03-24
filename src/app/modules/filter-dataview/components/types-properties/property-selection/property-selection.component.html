@@ -5,7 +5,9 @@
         [selectedItemsLabel]="language === 'pt-BR' ? '{0} itens selecionados' : '{0} items selected'"
         [(ngModel)]="value" [id]="property.name" optionLabel="label" optionValue="value"
         (onChange)="handleChangedValue()"></p-multiSelect>
-      <label class="app-input-label" for="float-label">{{'value'| translate}}</label>
+      <label class="app-input-label" for="float-label">{{'value'| translate}}
+         <i class="far fa-question-circle" *ngIf="property.helpText && property.helpText.length > 0" [pTooltip]="property.helpText"></i>
+      </label>
     </span>
   </ng-container>
   <ng-template #singleSelection>
@@ -14,7 +16,9 @@
         [(ngModel)]="value" dropdownIcon="fas fa-caret-down" [autoDisplayFirst]="false"
         (onChange)="handleChangedValue()">
       </p-dropdown>
-      <label class="app-input-label" [for]="property.name">{{'value'| translate}}</label>
+      <label class="app-input-label" [for]="property.name">{{'value'| translate}}
+         <i class="far fa-question-circle" *ngIf="property.helpText && property.helpText.length > 0" [pTooltip]="property.helpText"></i>
+      </label>
     </span>
   </ng-template>
 </div>

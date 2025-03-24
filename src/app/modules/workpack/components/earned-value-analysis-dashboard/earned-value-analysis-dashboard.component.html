@@ -1,4 +1,4 @@
-<div class="app-earned-value-dashboard" [class.responsive]="!!responsive" [class.width-1500]="mediaScreen1500">
+<div *ngIf="showContent" class="app-earned-value-dashboard" [class.responsive]="!!responsive" [class.width-1500]="mediaScreen1500">
   <span class="title">{{'earnedValueAnalysis' | translate}}</span>
   <div class="card-panel">
     <div class="chart-container">
@@ -22,55 +22,55 @@
         <label>{{'EV'|translate}} ({{'earnedValue' | translate}})</label>
         <div class="progress-bar-total-container"
           [ngStyle]="{width: '100%', background: 'rgba(230, 230, 230, 1)', height: '31px'}">
-          <div class="progress-bar" [pTooltip]="earnedValueAnalysis?.performanceIndexes[0]?.earnedValue|number:'2.0-2':language"
-            [ngStyle]="{width: (earnedValueAnalysis?.performanceIndexes[0]?.earnedValue/maxProgressBar)*85 + '%', background: 'rgba(68, 179, 155, 1)', height: '31px'}">
+          <div class="progress-bar" [pTooltip]="earnedValueAnalysis?.performanceIndexes?.earnedValue|number:'2.0-2':language"
+            [ngStyle]="{width: (earnedValueAnalysis?.performanceIndexes?.earnedValue/maxProgressBar)*85 + '%', background: 'rgba(68, 179, 155, 1)', height: '31px'}">
           </div>
           <label
-            class="progress-label" *ngIf="earnedValueAnalysis?.performanceIndexes[0]?.earnedValue !== 0">{{earnedValueAnalysis?.performanceIndexes[0]?.earnedValue|shortNumber:language}}</label>
+            class="progress-label" *ngIf="earnedValueAnalysis?.performanceIndexes?.earnedValue !== 0">{{earnedValueAnalysis?.performanceIndexes?.earnedValue|shortNumber:language}}</label>
         </div>
       </div>
       <div class="progress-bar-container">
         <label>{{'AC'|translate}} ({{'actualCost' | translate}})</label>
         <div class="progress-bar-total-container"
           [ngStyle]="{width: '100%', background: 'rgba(230, 230, 230, 1)', height: '31px'}">
-          <div class="progress-bar" [pTooltip]="earnedValueAnalysis?.performanceIndexes[0]?.actualCost|number:'2.0-2':language"
-            [ngStyle]="{width: (earnedValueAnalysis?.performanceIndexes[0]?.actualCost/maxProgressBar)*85 + '%', background: 'rgba(68, 179, 155, 1)', height: '31px'}">
+          <div class="progress-bar" [pTooltip]="earnedValueAnalysis?.performanceIndexes?.actualCost|number:'2.0-2':language"
+            [ngStyle]="{width: (earnedValueAnalysis?.performanceIndexes?.actualCost/maxProgressBar)*85 + '%', background: 'rgba(68, 179, 155, 1)', height: '31px'}">
           </div>
           <label
-            class="progress-label" *ngIf="earnedValueAnalysis?.performanceIndexes[0]?.actualCost !== 0">{{earnedValueAnalysis?.performanceIndexes[0]?.actualCost|shortNumber:language}}</label>
+            class="progress-label" *ngIf="earnedValueAnalysis?.performanceIndexes?.actualCost !== 0">{{earnedValueAnalysis?.performanceIndexes?.actualCost|shortNumber:language}}</label>
         </div>
       </div>
       <div class="progress-bar-container">
         <label>{{'PV'|translate}} ({{'plannedValue' | translate}})</label>
         <div class="progress-bar-total-container"
           [ngStyle]="{width: '100%', background: 'rgba(230, 230, 230, 1)', height: '31px'}">
-          <div class="progress-bar" [pTooltip]="earnedValueAnalysis?.performanceIndexes[0]?.plannedValue|number:'2.0-2':language"
-            [ngStyle]="{width: (earnedValueAnalysis?.performanceIndexes[0]?.plannedValue/maxProgressBar)*85 + '%', background: 'rgba(68, 179, 155, 1)', height: '31px'}">
+          <div class="progress-bar" [pTooltip]="earnedValueAnalysis?.performanceIndexes?.plannedValue|number:'2.0-2':language"
+            [ngStyle]="{width: (earnedValueAnalysis?.performanceIndexes?.plannedValue/maxProgressBar)*85 + '%', background: 'rgba(68, 179, 155, 1)', height: '31px'}">
           </div>
           <label
-            class="progress-label" *ngIf="earnedValueAnalysis?.performanceIndexes[0]?.plannedValue !== 0">{{earnedValueAnalysis?.performanceIndexes[0]?.plannedValue|shortNumber:language}}</label>
+            class="progress-label" *ngIf="earnedValueAnalysis?.performanceIndexes?.plannedValue !== 0">{{earnedValueAnalysis?.performanceIndexes?.plannedValue|shortNumber:language}}</label>
         </div>
       </div>
       <div class="progress-bar-container">
         <label>{{'EAC'|translate}} ({{'estimatesAtCompletion' | translate}})</label>
         <div class="progress-bar-total-container"
           [ngStyle]="{width: '100%', background: 'rgba(230, 230, 230, 1)', height: '31px'}">
-          <div class="progress-bar " [pTooltip]="earnedValueAnalysis?.performanceIndexes[0]?.estimatesAtCompletion|number:'2.0-2':language"
-            [ngStyle]="{width: (earnedValueAnalysis?.performanceIndexes[0]?.estimatesAtCompletion/maxProgressBar)*85 + '%', background: 'rgba(68, 179, 155, 1)', height: '31px'}">
+          <div class="progress-bar " [pTooltip]="earnedValueAnalysis?.performanceIndexes?.estimatesAtCompletion|number:'2.0-2':language"
+            [ngStyle]="{width: (earnedValueAnalysis?.performanceIndexes?.estimatesAtCompletion/maxProgressBar)*85 + '%', background: 'rgba(68, 179, 155, 1)', height: '31px'}">
           </div>
           <label
-            class="progress-label" *ngIf="earnedValueAnalysis?.performanceIndexes[0]?.estimatesAtCompletion !== 0">{{earnedValueAnalysis?.performanceIndexes[0]?.estimatesAtCompletion|shortNumber:language}}</label>
+            class="progress-label" *ngIf="earnedValueAnalysis?.performanceIndexes?.estimatesAtCompletion !== 0">{{earnedValueAnalysis?.performanceIndexes?.estimatesAtCompletion|shortNumber:language}}</label>
         </div>
       </div>
       <div class="progress-bar-container">
         <label>{{'ETC'|translate}} ({{'estimatesToComplete' | translate}})</label>
         <div class="progress-bar-total-container"
           [ngStyle]="{width: '100%', background: 'rgba(230, 230, 230, 1)', height: '31px'}">
-          <div class="progress-bar" [pTooltip]="earnedValueAnalysis?.performanceIndexes[0]?.estimateToComplete|number:'2.0-2':language"
-            [ngStyle]="{width: (earnedValueAnalysis?.performanceIndexes[0]?.estimateToComplete/maxProgressBar)*85 + '%', background: 'rgba(68, 179, 155, 1)', height: '31px'}">
+          <div class="progress-bar" [pTooltip]="earnedValueAnalysis?.performanceIndexes?.estimateToComplete|number:'2.0-2':language"
+            [ngStyle]="{width: (earnedValueAnalysis?.performanceIndexes?.estimateToComplete/maxProgressBar)*85 + '%', background: 'rgba(68, 179, 155, 1)', height: '31px'}">
           </div>
           <label
-            class="progress-label" *ngIf="earnedValueAnalysis?.performanceIndexes[0]?.estimateToComplete !== 0">{{(earnedValueAnalysis?.performanceIndexes[0]?.estimateToComplete)|shortNumber:language}}</label>
+            class="progress-label" *ngIf="earnedValueAnalysis?.performanceIndexes?.estimateToComplete !== 0">{{(earnedValueAnalysis?.performanceIndexes?.estimateToComplete)|shortNumber:language}}</label>
         </div>
       </div>
     </div>

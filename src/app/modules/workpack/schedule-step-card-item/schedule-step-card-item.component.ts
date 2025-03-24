@@ -1,13 +1,14 @@
-import { InputTextModule } from 'primeng/inputtext';
-import { Component, Input, OnInit, EventEmitter, Output, OnDestroy, ViewChild, ElementRef } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, Input, OnInit, EventEmitter, Output, OnDestroy, SimpleChanges, ChangeDetectorRef } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
-import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { EMPTY, Observable, Subject } from 'rxjs';
+import { map, switchMap, takeUntil } from 'rxjs/operators';
 import { IconsEnum } from 'src/app/shared/enums/IconsEnum';
 import { IScheduleStepCardItem } from 'src/app/shared/interfaces/IScheduleStepCardItem';
 import * as moment from 'moment';
 import { ConfirmationService, MessageService } from 'primeng/api';
+import { LabelService } from 'src/app/shared/services/label.service';
+import { ActivatedRoute } from '@angular/router';
+import { ScheduleStepCardItemService } from 'src/app/shared/services/schedule-step-card-item.service';
 
 @Component({
   selector: 'app-schedule-step-card-item',
@@ -31,11 +32,21 @@ export class ScheduleStepCardItemComponent implements OnInit, OnDestroy {
   item;
   difference;
   multiCostsEdited = false;
+  foreseenLabel: string;
+  tooltipLabel: string;
+  isActualValuesDisabled: boolean = false;
+  isCurrentBaseline: boolean = false;
+  isPassedMonth: boolean = false;
+  maxValueCosts: number;
+  maxValueUnit: number;
 
   constructor(
-    private messageSrv: MessageService,
     private translateSrv: TranslateService,
-    private confirmationSrv: ConfirmationService
+    private confirmationSrv: ConfirmationService,
+    private labelSrv: LabelService,
+    private route: ActivatedRoute,
+    private scheduleCardItemSrv: ScheduleStepCardItemService,
+    private cdr: ChangeDetectorRef
   ) {
     this.translateSrv.onLangChange.pipe(takeUntil(this.$destroy)).subscribe(() =>
       {
@@ -46,9 +57,16 @@ export class ScheduleStepCardItemComponent implements OnInit, OnDestroy {
    }
 
   ngOnInit(): void {
+    
+    this.maxValueCosts = this.getMaxValueCosts();
+    this.maxValueUnit = this.getMaxValueUnit();
+
     this.cardIdItem = this.properties.idStep ?
       `${this.properties.idStep < 10 ? '0' + this.properties.idStep : this.properties.idStep}` : '';
     this.setLanguage();
+    this.handlePassedMonths();
+    this.updateActualValues();
+    this.handleCurrentBaseline();
     if (this.properties.stepName)  {
       let dateStep = moment(this.properties.stepName);
       const monthStep = dateStep.month();
@@ -61,6 +79,21 @@ export class ScheduleStepCardItemComponent implements OnInit, OnDestroy {
         this.showReplicateButton = false;
       }
     }
+
+    this.route.queryParams.subscribe(params => {
+      const idWorkpack = params['id'];
+      if (idWorkpack) {
+        this.labelSrv.getLabels(idWorkpack).subscribe(
+          response => {
+            this.tooltipLabel = response.data[0].body.data;
+            this.foreseenLabel = response.data[1].body.data;
+          },
+          error => {
+            console.error(error);
+          }
+        );
+      }
+    });
   }
 
   ngOnDestroy(): void {
@@ -89,6 +122,10 @@ export class ScheduleStepCardItemComponent implements OnInit, OnDestroy {
     this.properties[item] = event.value;
     this.properties.costProgressBar.total = this.properties.costPlanned;
     this.properties.costProgressBar.progress = this.properties.costActual;
+
+    this.updateMaxValueCosts();
+    this.updateMaxValueUnit();
+
     this.stepChanged.next();
   }
 
@@ -154,6 +191,79 @@ export class ScheduleStepCardItemComponent implements OnInit, OnDestroy {
 
   disable() {
     this.multiCostsEdited = !this.properties.editCosts ? true : false;
+  }
+
+  handlePassedMonths() {
+    if (!this.properties.stepName) return;
+    
+    const stepDate = this.formatToYearMonth(this.properties.stepName);
+    const currentDate = this.formatToYearMonth(new Date());
+
+    this.isPassedMonth = stepDate < currentDate;
+  }
+
+  updateActualValues() {
+
+    const stepDate = this.formatToYearMonth(this.properties.stepName);
+    const currentDate = this.formatToYearMonth(new Date());
+    
+    this.isActualValuesDisabled = stepDate > currentDate;
+  }
+
+  private formatToYearMonth(date: Date): number {
+    return (date.getFullYear() * 100) + (date.getMonth() + 1);
+  }
+
+  private getWorkpackId(): Observable<number | null> {
+    return this.route.queryParams.pipe(
+      map(params => params['id'] || null)
+    );
+  }
+
+  handleCurrentBaseline() {
+    this.getWorkpackId().pipe(
+      switchMap(workpackId => {
+        if (!workpackId) return EMPTY;
+        return this.scheduleCardItemSrv.getCurrentBaseline(workpackId);
+      })
+    ).subscribe(response => {
+      this.isCurrentBaseline = response.data;
+      this.scheduleCardItemSrv.isCurrentBaseline$.next(this.isCurrentBaseline);
+    });
+  }
+  
+  updateMaxValueCosts() {
+    this.maxValueCosts = this.getMaxValueCosts();
+    this.cdr.detectChanges();
+  }
+
+  updateMaxValueUnit() {
+    this.maxValueUnit = this.getMaxValueUnit();
+    this.cdr.detectChanges();
+  }
+
+  getMaxValueCosts() {
+    if (this.properties.type === "newStart" || this.properties.type === "newEnd") return;
+
+    const inputValues = [
+      this.properties.costActual,
+      this.properties.costPlanned,
+      this.properties.baselinePlannedCost
+    ];
+    
+    return Math.max(...inputValues);
+  }
+
+  getMaxValueUnit() {
+    if (this.properties.type === "newStart" || this.properties.type === "newEnd") return;
+
+    const inputValues = [
+      this.properties.unitActual,
+      this.properties.unitBaseline,
+      this.properties.unitPlanned
+    ]
+
+    return Math.max(...inputValues);
   }
 
 }

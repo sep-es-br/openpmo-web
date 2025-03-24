@@ -54,10 +54,10 @@ export class BaselineComponent implements OnInit, OnDestroy {
     private translateSrv: TranslateService
   ) {
     this.actRouter.queryParams
-      .subscribe(({id, idWorkpack, idWorkpackModelLinked}) => {
+      .subscribe(({idBaseline, idWorkpack, idWorkpackModelLinked}) => {
         this.idWorkpack = idWorkpack && +idWorkpack;
         this.idWorkpackModelLinked = idWorkpackModelLinked && +idWorkpackModelLinked;
-        this.idBaseline = id && +id;
+        this.idBaseline = idBaseline && +idBaseline;
       });
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.responsive = value);
     this.formBaseline = this.formBuilder.group({
@@ -87,8 +87,6 @@ export class BaselineComponent implements OnInit, OnDestroy {
       ...breadcrumbItems,
       {
         key: 'baseline',
-        routerLink: ['/workpack/baseline'],
-        queryParams: {idWorkpack: this.idWorkpack, id: this.idBaseline},
         info: this.baseline?.name,
         tooltip: this.baseline?.name
       }
@@ -193,7 +191,7 @@ export class BaselineComponent implements OnInit, OnDestroy {
     this.baseline.updates = await this.baselineSrv.getUpdates({'id-workpack': this.idWorkpack});
     this.cardBaselineUpdates.isLoading = false;
     if (this.baseline.updates.length > 0) {
-      this.baseline.updates.forEach(updates => updates.included = true);
+      this.baseline.updates.forEach(updates => updates.included = updates.classification === 'NEW');
       this.includeAllUpdates = true;
       this.togglesReadOnly = this.baseline.updates.filter(update => update.classification !== 'NEW').length === 0;
     }

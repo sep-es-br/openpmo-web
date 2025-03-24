@@ -95,7 +95,7 @@ export class PersonListComponent implements OnInit, OnDestroy {
       ccbMemberStatus: 'ALL',
       name: ['']
     });
-    this.activeRoute.queryParams.subscribe(async ({ idOffice }) => {
+    this.activeRoute.queryParams.subscribe(async({ idOffice }) => {
       this.idOffice = +idOffice;
       this.scope = [this.idOffice];
       await this.loads();
@@ -127,14 +127,14 @@ export class PersonListComponent implements OnInit, OnDestroy {
   }
 
   async loadPersons(event?) {
-    if (!this.idOffice) return;
+    if (!this.idOffice) {return;}
     if (event) {
       this.page = event.first / this.pageSize;
       this.first = event.first;
     }
     this.isLoading = true;
     this.cardItemsProperties = [];
-    
+
     const { success, data, pagination } = await this.personSrv.GetAllPersons(this.idOffice,
       {
         page: this.page,
@@ -173,7 +173,6 @@ export class PersonListComponent implements OnInit, OnDestroy {
       }));
       this.totalRecords = pagination.totalRecords;
       this.isLoading = false;
-      
     }
 
     this.cardItemsProperties = itemsProperties;
@@ -215,7 +214,7 @@ export class PersonListComponent implements OnInit, OnDestroy {
   setSelectedNodes(list: TreeNode[]) {
     let result = [];
     list.forEach(l => {
-      result.push(l)
+      result.push(l);
       if (l.children && l.children.length > 0) {
         const resultChildren = this.setSelectedNodes(l.children);
         result = result.concat(resultChildren);
@@ -270,7 +269,7 @@ export class PersonListComponent implements OnInit, OnDestroy {
       { label: this.translateSrv.instant('all'), value: 'ALL' },
       { label: this.translateSrv.instant('members'), value: 'CCB_MEMBERS' },
       { label: this.translateSrv.instant('noMembers'), value: 'NON_CCB_MEMBERS' },
-    ]
+    ];
   }
 
   async getOfficeById() {
@@ -284,6 +283,7 @@ export class PersonListComponent implements OnInit, OnDestroy {
         info: this.propertiesOffice?.name,
         tooltip: this.propertiesOffice?.fullName,
         routerLink: ['/configuration-office'],
+        admin: true,
         queryParams: { idOffice: this.idOffice }
       },
       {
@@ -291,6 +291,7 @@ export class PersonListComponent implements OnInit, OnDestroy {
         info: 'persons',
         tooltip: this.translateSrv.instant('measureUnits'),
         routerLink: ['/persons'],
+        admin: true,
         queryParams: { idOffice: this.idOffice }
       }
     ]);

@@ -8,6 +8,7 @@ import localePt from '@angular/common/locales/pt';
 import { registerLocaleData } from '@angular/common';
 import { Subject } from 'rxjs';
 import { MobileViewService } from '../../services/mobile-view.service';
+import { FormatNamePipe } from '../../pipes/format-name.pipe';
 registerLocaleData(localePt);
 
 @Component({
@@ -68,14 +69,16 @@ export class CardItemComponent implements OnInit {
     }
     const params = this.properties?.paramsUrlCard ? this.properties?.paramsUrlCard : [];
     if (this.properties?.itemId) {
-      params.push({name: 'id', value: this.properties?.itemId});
+      const idAtributeName = this.properties.idAtributeName ? this.properties.idAtributeName : 'id';
+      params.push({name: idAtributeName, value: this.properties?.itemId});
     }
 
     this.navigateToPage(this.properties.urlCard, params);
   }
 
   getQueryParams() {
-    let params = this.properties?.itemId ? { id: this.properties.itemId } : {};
+    const idAtributeName = this.properties.idAtributeName ? this.properties.idAtributeName : 'id';
+    let params = this.properties?.itemId ? { [idAtributeName]: this.properties.itemId } : {};
     if (this.properties.paramsUrlCard) {
       params = {
         ...params,
@@ -87,5 +90,9 @@ export class CardItemComponent implements OnInit {
 
   handleModelSelected(event) {
     this.reuseModelSelected.next({idModel: event.node.data});
+  }
+
+  async handleLoadPermission() {
+    await this.properties.onClick();
   }
 }

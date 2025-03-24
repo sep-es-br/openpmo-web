@@ -1,6 +1,5 @@
 <div class="app-cost-account">
-  <div *ngIf="idCostAccount; else newCostAccountTitle" class="app-content-header"
-    [class.mobile]="responsive">
+  <div *ngIf="idCostAccount; else newCostAccountTitle" class="app-content-header" [class.mobile]="responsive">
     <span class="label">{{ 'account' | translate }}:</span>
     <span class="text">{{ costAccountName }}</span>
   </div>
@@ -19,15 +18,69 @@
         <app-card-loading [isCardLoading]="formIsSaving"></app-card-loading>
       </div>
       <div class="properties-container" *ngIf="!cardCostAccountProperties.isLoading">
-        <div class="property-container" *ngFor="let property of sectionCostAccountProperties" [class.fullLine]="property.fullLine">
-          <app-property [property]="property" (changed)="checkProperties(property)">
-          </app-property>
+        <div class="property-container" *ngFor="let property of sectionCostAccountProperties"
+          [class.not-fullLine]="!property.fullLine && property.type !== 'TextArea' && property.type !== 'Group' && property.name !== 'name'"
+          [class.fullLine]="property.fullLine || property.type === 'TextArea' || property.type === 'Group' || property.name === 'name'">
+
+          <app-property [property]="property" (changed)="checkProperties(property)"></app-property>
+
         </div>
       </div>
+
+      <!-- NOVA UNIDADE ORÇAMENTÁRIA -->
+      <span class="p-float-label" [class.workpack-selection-mobile]="responsive"
+        [class.workpack-selection]="true" [class.workpack-selection-not-fullLine]="false">
+        <p-dropdown class="app-single-selection p-budget" dropdownIcon="fas fa-caret-down" [options]="uoOptions"
+          [(ngModel)]="selectedUo" optionLabel="displayText" [filter]="true" filterBy="displayText" (onChange)="onUoChange($event)"
+          [showClear]="false">
+
+          <ng-template pTemplate="selectedItem" let-selectedOption>
+            <div class="flex align-items-center gap-2">
+              <div>{{ selectedOption.displayText }}</div>
+            </div>
+          </ng-template>
+
+          <ng-template let-uo pTemplate="item">
+            <div class="flex align-items-center gap-2">
+              <div>{{ uo.displayText }}</div>
+            </div>
+          </ng-template>
+        </p-dropdown>
+        <label class="app-input-label">{{ 'labelBudgetUnit' | translate }}</label>
+      </span>
+
+      <!-- PLANO ORÇAMENTÁRIO -->
+      <span class="p-float-label" [class.workpack-selection-mobile]="responsive" [class.workpack-selection]="true"
+        [class.workpack-selection-not-fullLine]="false">
+        <p-dropdown class="app-single-selection p-budget" dropdownIcon="fas fa-caret-down" [options]="planoOrcamentarioOptions"
+          [(ngModel)]="selectedPlano" optionLabel="displayText"
+          [filter]="true" filterBy="displayText" (onChange)="onPlanoChange($event)"
+          [showClear]="false" [disabled]="poDisabled">
+      
+          <ng-template pTemplate="selectedItem" let-selectedOption>
+            <div class="flex align-items-center gap-2">
+              <div>{{ selectedOption.displayText }}</div>
+            </div>
+          </ng-template>
+      
+          <ng-template let-plano pTemplate="item">
+            <div class="flex align-items-center gap-2">
+              <div>{{ plano.displayText }}</div>
+            </div>
+          </ng-template>
+      
+        </p-dropdown>
+        <label class="app-input-label">{{ 'labelBudgetPlan' | translate }}</label>
+      </span>
+
     </app-cost-account-card>
   </div>
   <div class="id-container" *ngIf="idCostAccount && sectionCostAccountProperties">
     <span>{{idCostAccount}}</span>
   </div>
-  <app-save-button (save)="saveCostAccount()"></app-save-button>
+
+  <app-buttons-container>
+    <app-save-button (save)="saveCostAccount()"></app-save-button>
+    <app-cancel-button (cancel)="handleOnCancel()"></app-cancel-button>
+  </app-buttons-container>
 </div>

@@ -92,13 +92,19 @@
         </div>
       </div>
       <div class="new-element-button-container"
-        (click)="!properties.createNewElementMenuItems &&  !properties.createNewElementMenuItemsWorkpack && handleCreateNewElement()"
+        (click)="!properties.createNewElementMenuItems && handleCreateNewElement()"
         *ngIf="!properties.initialStateCollapse && properties.showCreateNemElementButton"
         [class.card-link]="!properties.createNewElementMenuItems">
-        <i class="app-icon plus" (click)=" properties.createNewElementMenuItems ? menuIcon.toggle($event) :
-          (properties.createNewElementMenuItemsWorkpack ? menuIconWorkpack.toggle($event) : '')"
+        <i class="app-icon plus" (click)=" properties.createNewElementMenuItems ? menuIcon.toggle($event) : ''"
           [class.icon-link]="properties.createNewElementMenuItems"></i>
         <p-menu #menuIcon [popup]="true" [model]="properties.createNewElementMenuItems"></p-menu>
+      </div>
+      <div class="new-element-button-container card-link"
+        *ngIf="!properties.initialStateCollapse && properties.showCreateNemElementButtonWorkpack">
+        <i #newItemIcon class="app-icon plus" 
+        (click)="enable && properties.createNewElementMenuItemsWorkpack && properties.createNewElementMenuItemsWorkpack.length > 0 && menuIconWorkpack.toggle($event);
+          enable && (!properties.createNewElementMenuItemsWorkpack || properties.createNewElementMenuItemsWorkpack.length === 0) && handleLoadMenu()"
+          [class.icon-link]="properties.createNewElementMenuItems"></i>
         <p-slideMenu #menuIconWorkpack [showTransitionOptions]="'0ms'" [hideTransitionOptions]="'0ms'" [backLabel]="'back'|translate"
           [model]="properties.createNewElementMenuItemsWorkpack" [popup]="true"></p-slideMenu>
       </div>

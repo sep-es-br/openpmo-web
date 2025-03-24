@@ -335,7 +335,7 @@ export class MobileMenuComponent implements OnInit {
     }
     const id = idNewWorkpack ? idNewWorkpack : this.getIdFromURL(url);
     if ((url.startsWith('strategies') || url.startsWith('configuration-office')) && (isNaN(id) || !id)) {
-      this.itemsPlanModel = this.itemsPlanModel ? [...this.expandedMenuSelectedItem(this.itemsPlanModel, [], 0)] : undefined;
+      this.itemsPlanModel = this.itemsPlanModel ? [...this.expandedMenuModelSelectedItem(this.itemsPlanModel, [], 0)] : undefined;
     }
     if (url.startsWith('offices') && (isNaN(id) || !id)) {
       this.itemsOffice = this.itemsOffice ? [...this.collapseMenuItems(this.itemsOffice)] : undefined;
@@ -349,7 +349,7 @@ export class MobileMenuComponent implements OnInit {
 
     } else if (url.startsWith('strategies/strategy')) {
       this.menuPlanModel?.nativeElement.querySelector('.planModel-' + id)?.classList.add('active');
-      this.itemsPlanModel = this.itemsPlanModel ? [...this.expandedMenuSelectedItem(this.itemsPlanModel, [], id)] : undefined;
+      this.itemsPlanModel = this.itemsPlanModel ? [...this.expandedMenuModelSelectedItem(this.itemsPlanModel, [], id)] : undefined;
 
     } else if (url.startsWith('workpack-model')) {
       this.storageBreadcrumbsItems = this.breadcrumbSrv.get;
@@ -411,10 +411,12 @@ export class MobileMenuComponent implements OnInit {
     return list;
   }
 
-  expandedMenuSelectedItem(list: MenuItem[], parents, id) {
+  expandedMenuSelectedItem(list, parents, id) {
     const itemIndex = list.findIndex(item => parents.includes(item.id) || item.id === id);
     if (itemIndex > -1) {
       list[itemIndex].expanded = true;
+      list[itemIndex].items = list[itemIndex].children;
+      list.forEach( l => l.items = l.children);
       if (list[itemIndex].items && list[itemIndex].items.length > 0) {
         list[itemIndex].items = this.expandedMenuSelectedItem(list[itemIndex].items, parents, id);
         return list;
@@ -424,6 +426,7 @@ export class MobileMenuComponent implements OnInit {
     } else {
       list.forEach(item => {
         item.expanded = false;
+        if (item.idParent === id) item.items = item.children;
         if (item.items && item.items.length > 0) {
           item.items = this.expandedMenuSelectedItem(item.items, parents, id);
         }
@@ -532,7 +535,7 @@ export class MobileMenuComponent implements OnInit {
       if (success) {
         const menuPortfolioData = data || [];
         this.menuSrv.nextMenuPortfolioItems(menuPortfolioData);
-        this.itemsPortfolio = this.buildMenuItemPortfolio(data || []);
+        this.itemsPortfolio = this.buildMenuItemPortfolio(data || [], 0);
         this.loadingMenuPortfolio = false;
         if (!this.changedUrl || this.linkEvent) {
           this.selectMenuActive(this.router.url.slice(1), idNewWorkpack)
@@ -695,36 +698,47 @@ export class MobileMenuComponent implements OnInit {
     }
   }
 
-  buildMenuItemPortfolio(root: IMenuWorkpack[]) {
-    return root.map(workpack => ({
-      label: workpack.name,
-      icon: workpack.fontIcon,
-      idPlan: workpack.idPlan,
-      fullName: workpack.fullName,
-      title: workpack.fullName,
-      tooltip: workpack.fullName,
-      id: workpack.id,
-      expanded: false,
-      styleClass: `workpack-${workpack.id} ${this.currentURL === `workpack?id=${workpack.id}` ? 'active' : ''}`,
-      items: workpack.children?.length ? this.buildMenuItemPortfolio(workpack.children) : undefined,
-      command: (e) => {
-        const classList = Array.from(e.originalEvent?.target?.classList) || [];
-        if (classList.some((className: string) => ['p-menuitem-text', 'fas', 'app-icon'].includes(className))) {
-          e.item.expanded = false;
-          this.setWorkpackBreadcrumbStorage(workpack.id, this.currentIDPlan);
-          this.router.navigate(['/workpack'], {
-            queryParams: {
-              id: workpack.id,
-              idWorkpaModelLinked: workpack.idWorkpackModelLinked,
-              idPlan: this.currentIDPlan
-            }
-          });
-          this.closeAllMenus();
+  buildMenuItemPortfolio(root: IMenuWorkpack[], level: number) {
+    level++;
+    return root.map(workpack => {
+      const children =  workpack.children?.length ? this.buildMenuItemPortfolio(workpack.children, level) : undefined;
+      return {
+        label: workpack.name,
+        icon: workpack.fontIcon,
+        idPlan: workpack.idPlan,
+        fullName: workpack.fullName,
+        title: workpack.fullName,
+        tooltip: workpack.fullName,
+        id: workpack.id,
+        idParent: workpack.idParent,
+        expanded: false,
+        styleClass: `workpack-${workpack.id} ${this.currentURL === `workpack?id=${workpack.id}` ? 'active' : ''}`,
+        children,
+        items: level < 3 ? children : undefined,
+        command: (e) => {
+          const classList = Array.from(e.originalEvent?.target?.classList) || [];
+          if (classList.some((className: string) => ['p-menuitem-text', 'fas', 'app-icon'].includes(className))) {
+            e.item.expanded = false;
+            this.setWorkpackBreadcrumbStorage(workpack.id, this.currentIDPlan);
+            this.router.navigate(['/workpack'], {
+              queryParams: {
+                id: workpack.id,
+                idWorkpaModelLinked: workpack.idWorkpackModelLinked,
+                idPlan: this.currentIDPlan
+              }
+            });
+            this.closeAllMenus();
+          }
+          e.item.items = e.item.children;
+          if (e.item.children && e.item.children.length > 0) {
+            e.item.children.forEach(child => {
+              child.items = child.children;
+            });
+          }
         }
       }
-    }));
+    });
   }
-
   async setWorkpackBreadcrumbStorage(idWorkpack, idPlan) {
     const breadcrumbItems = await this.workpackBreadcrumbStorageSrv.getBreadcrumbs(idWorkpack, idPlan);
     this.breadcrumbSrv.setBreadcrumbStorage(breadcrumbItems);

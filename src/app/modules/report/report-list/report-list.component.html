@@ -1,4 +1,8 @@
 <div class="app-report-list">
+  <div class="back-to-management-container" *ngIf="showBackToManagement" (click)="navigateToManagement()">
+    <i class="fas fa-reply"></i>
+    <span class="text">{{'backToManagement' | translate}}</span>
+  </div>
   <div class="header-container" [class.mobile]="responsive">
     <div class="app-content-header" [class.mobile]="responsive">
       <span>{{ 'reports' | translate }}</span>

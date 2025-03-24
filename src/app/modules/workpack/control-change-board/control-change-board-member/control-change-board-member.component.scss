@@ -256,7 +256,9 @@
         border-radius: 5px;
         border: 1px solid #d4d4d4;
         margin-bottom: 0.4rem;
-
+        .input-label {
+          font-size: 0.9rem;
+        }
         .input-toogle-container {
           display: flex;
           .app-toggle {

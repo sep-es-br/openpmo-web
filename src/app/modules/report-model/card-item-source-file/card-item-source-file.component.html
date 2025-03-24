@@ -11,13 +11,13 @@
       <div class="card-item-content" [class.card-link]="properties.urlCard"
         [class.cardList]="displayModeCard === 'list'">
         <i [ngClass]="properties.iconSvg ? [ 'app-icon', properties.icon, 'grey-icon'] : [ 'icon-card', properties.icon, 'grey-icon' ]"
-          [ngStyle]="{ fontSize: '3rem' }"></i>
+          [ngStyle]="{ fontSize: '2rem' }"></i>
         <span class="card-item-name" [pTooltip]="properties.fullNameCardItem"
           tooltipPosition="bottom">{{properties.nameCardItem}}</span>
       </div>
-      <div class="card-item-footer" *ngIf="cardIdItem">
+      <div class="card-item-footer">
         <span class="card-item-id">
-          {{cardIdItem}}
+          {{cardIdItem ? cardIdItem : ''}}
         </span>
       </div>
     </div>

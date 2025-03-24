@@ -1,20 +1,20 @@
 import { BehaviorSubject } from 'rxjs';
 import { Inject, Injectable, Injector } from '@angular/core';
 import { BaseService } from '../base/base.service';
-import { IJournal } from '../interfaces/Journal';
+import { IJournal } from '../interfaces/IJournal';
 import { ITreeViewScopePlan, ITreeViewScopeWorkpack } from '../interfaces/ITreeScopePersons';
 import { OfficeService } from './office.service';
 import { TreeNode } from 'primeng/api';
 import { IWorkpackData, IWorkpackParams } from '../interfaces/IWorkpackDataParams';
 import { WorkpackService } from './workpack.service';
+import { IHttpResult } from '../interfaces/IHttpResult';
+import { PrepareHttpParams } from '../utils/query.util';
 
 @Injectable({
   providedIn: 'root'
 })
 export class JournalService extends BaseService<IJournal> {
 
-  private resetJournal = new BehaviorSubject<boolean>(false);
-  private resetScope = new BehaviorSubject<boolean>(false);
   workpackData: IWorkpackData;
   workpackParams: IWorkpackParams;
   treeViewScope: TreeNode[] = [];
@@ -29,6 +29,8 @@ export class JournalService extends BaseService<IJournal> {
   hasMore = true;
   hasAll = true;
   loading;
+  private resetJournal = new BehaviorSubject<boolean>(false);
+  private resetScope = new BehaviorSubject<boolean>(false);
 
   constructor(
     @Inject(Injector) injector: Injector,
@@ -88,7 +90,7 @@ export class JournalService extends BaseService<IJournal> {
       hasMore: this.hasMore,
       hasAll: this.hasAll,
       loading: this.loading
-    }
+    };
   }
 
   async loadScope() {
@@ -98,7 +100,6 @@ export class JournalService extends BaseService<IJournal> {
       !this.workpackData.workpack.canceled && !!this.workpackData.workpackModel &&
       !!this.workpackData.workpackModel.journalManagementSessionActive) {
       await this.loadTreeViewScope();
-      this.nextResetScope(true);
       }
   }
 
@@ -109,54 +110,79 @@ export class JournalService extends BaseService<IJournal> {
     if (!!this.workpackData.workpack && !!this.workpackData.workpack.id  && !!this.workpackData.workpackModel &&
       !!this.workpackData.workpackModel.journalManagementSessionActive) {
       if (params) {
-        this.selectedWorkpacks = params.selectedWorkpacks ? params.selectedWorkpacks : this.selectedWorkpacks;
+        this.selectedWorkpacks =
+          params.selectedWorkpacks ? params.selectedWorkpacks : this.selectedWorkpacks;
         this.from = params.from ? params.from : this.from;
         this.to = params.to ? params.to : this.to;
         this.type = params.type ? params.type : this.type;
         this.scopeName = params.scopeName ? params.scopeName : this.scopeName;
-        this.page = params.page ? params.page : this.page;
-        this.pageSize = params.pageSize ? params.pageSize : this.pageSize;
+        this.page = params.page >= 0 ? params.page : this.page;
+        this.pageSize = params.size ? params.size : this.pageSize;
         this.hasAll = params.hasAll !== undefined ? params.hasAll : this.hasAll;
         this.hasMore = params.hasMore !== undefined ? params.hasMore : this.hasMore;
       }
       if (this.workpackData && this.workpackData.workpackModel && this.workpackData.workpackModel.journalManagementSessionActive) {
         await this.getJournalData();
         this.loading = false;
+        this.nextResetScope(true);
         this.nextResetJournal(true);
       }
     } else {
       this.loading = false;
+      this.nextResetScope(true);
       this.nextResetJournal(true);
     }
 
   }
 
+  loadWorkpacksSelecteds(selectedWorkpacks) {
+    let scope = [...this.selectedWorkpacks];
+    const scopeSelected = [...scope];
+    scopeSelected.forEach(item => {
+      if (item.children) {
+        const children = item.children.map(child => child.data);
+        scope = scope.filter(itemScope => !children.includes(itemScope.data));
+      }
+    });
+    scope = scope.map(item => item.data);
+    return scope;
+  }
+
   // busca na api
   async getJournalData() {
-    const { data, success } = await this.GetAll({
+    if (!this.selectedWorkpacks || this.selectedWorkpacks.length === 0) {
+      await this.loadTreeViewScope();
+      this.nextResetScope(true);
+    }
+    const { data, success, pagination } = await this.GetAll({
       idWorkpack: this.workpackData.workpack.id,
       from: this.from,
       to: this.to,
       type: this.type.join(','),
-      scope: this.selectedWorkpacks.map(node => node.data).join(','),
+      scope: this.loadWorkpacksSelecteds(this.selectedWorkpacks).join(','),
       page: this.page,
       size: this.pageSize
     });
     if (success) {
       this.journalData = this.page > 0 ? this.journalData.concat(data) : data;
-      this.hasMore = data.length > 0 && data.length === this.pageSize;
+      this.hasMore = data.length > 0 && data.length === this.pageSize && this.page < pagination.totalPages - 1;
       this.hasAll = true;
     }
   }
 
-
   async loadTreeViewScope() {
-    const { data, success } = await this.officeSrv.GetTreeScopePersons(this.workpackParams.idOffice);
+    const { data, success } = await this.officeSrv.GetTreeScopePersons(this.workpackParams.idOffice, {
+      'id-plan': this.workpackParams.idPlan,
+      'id-workpack': this.workpackParams.idWorkpack
+    });
     if (success) {
       const treePlan = data.plans.find(plan => plan.id === this.workpackParams.idPlan);
       const treeWorkpackCurrent = this.findTreeWorkpack(this.workpackData.workpack.id, treePlan) as any;
       this.treeViewScope = this.loadTreeNodeWorkpacks([{ ...treeWorkpackCurrent }]);
       this.selectedWorkpacks = this.setSelectedNodes(this.treeViewScope);
+      this.scopeName = this.selectedWorkpacks && (this.selectedWorkpacks.length > 1 ?
+        this.selectedWorkpacks.length + ' ' + this.translateSrv.instant('selectedItems') :
+        this.selectedWorkpacks[0].label);
     }
   }
 

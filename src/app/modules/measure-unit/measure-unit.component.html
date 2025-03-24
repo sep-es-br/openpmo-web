@@ -31,14 +31,18 @@
                 <span class="p-float-label p-field">
                   <input formControlName="name" type="text" pInputText class="app-input-text">
                   <label for="float-input" class="app-input-label">{{'name' | translate}}<span
-                      class="required-indicator">*</span></label>
+                      class="required-indicator">*</span>
+                      <i class="far fa-question-circle" [pTooltip]="'help.measureUnit.name' | translate"></i>
+                    </label>
                 </span>
                 <app-input-message [form]="getFormById(cardItem.id || cardItem.newId)" field="name">
                 </app-input-message>
                 <span class="p-float-label p-field margin-top">
                   <input formControlName="fullName" type="text" pInputText class="app-input-text">
                   <label for="float-input" class="app-input-label">{{'fullName' | translate}}<span
-                      class="required-indicator">*</span></label>
+                      class="required-indicator">*</span>
+                      <i class="far fa-question-circle" [pTooltip]="'help.measureUnit.fullName' | translate"></i>
+                    </label>
                 </span>
                 <app-input-message [form]="getFormById(cardItem.id || cardItem.newId)" field="fullName">
                 </app-input-message>
@@ -46,7 +50,9 @@
                   <p-inputNumber type="number" formControlName="precision" class="app-input-number" [min]="0"
                     [max]="5"></p-inputNumber>
                   <label for="float-input" class="app-input-label">{{'precision' | translate}}<span
-                      class="required-indicator">*</span></label>
+                      class="required-indicator">*</span>
+                      <i class="far fa-question-circle" [pTooltip]="'help.measureUnit.precision' | translate"></i>
+                    </label>
                 </span>
                 <app-input-message [form]="getFormById(cardItem.id || cardItem.newId)" field="precision">
                 </app-input-message>
@@ -58,7 +64,7 @@
               </span>
             </div>
           </p-card>
-          <p-card *ngIf="cardItem.typeCardItem === 'newCardItem'" class="new-card-item"
+          <p-card *ngIf="cardItem.typeCardItem === 'newCardItem'" class="unit-new-card-item"
             [class.new-card-item-mobile]="responsive" (click)="handleAddCardItem()">
             <div class="card-item-content">
               <i [ngClass]="[ 'app-icon', cardItem.icon, 'light-grey-icon' ]"
@@ -114,7 +120,7 @@
               </div>
             </div>
           </p-card>
-          <p-card *ngIf="cardItem.typeCardItem === 'newCardItem'" class="new-card-item list-mode"
+          <p-card *ngIf="cardItem.typeCardItem === 'newCardItem'" class="unit-new-card-item list-mode"
             [class.new-card-item-mobile]="responsive">
             <div class="card-item-content">
               <i [ngClass]="[ 'app-icon', cardItem.icon, 'light-grey-icon' ]" (click)="handleAddCardItem()"
@@ -125,6 +131,9 @@
       </ng-template>
     </p-dataView>
     </app-card>
-    <app-save-button #saveButton (save)="handleOnSubmit()"></app-save-button>
+    <app-buttons-container>
+      <app-save-button (save)="handleOnSubmit()"></app-save-button>
+      <app-cancel-button (cancel)="handleOnCancel()"></app-cancel-button>
+    </app-buttons-container>
   </div>
 </div>

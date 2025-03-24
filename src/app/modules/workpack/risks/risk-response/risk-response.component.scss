@@ -89,7 +89,7 @@
         .p-field {
           display: flex;
           flex-direction: column;
-          width: 13%;
+          width: 20%;
           margin-right: 2em;
           .p-float-label {
             width: 100%;
@@ -99,12 +99,15 @@
             .p-inputtext {
               width: 100%;
             }
+            .p-calendar {
+              width: 100%;
+            }
           }
         }
         .when-container {
           display: flex;
           flex-direction: column;
-          width: 20%;
+          width: 30%;
           .when-label {
             font-size: 12px;
             font-style: italic;

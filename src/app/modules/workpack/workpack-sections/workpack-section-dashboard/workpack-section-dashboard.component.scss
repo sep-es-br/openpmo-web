@@ -25,6 +25,13 @@
       }
     }
   }
+  .fa-sync-alt {
+    padding: 0.45rem;
+    background: #44B39B;
+    color: #FFF;
+    border-radius: 4px;
+    cursor: pointer;
+  }
   &.expanded {
     display: flex;
     position: absolute;
@@ -134,12 +141,15 @@
     flex-direction: row;
     flex-wrap: wrap;
     align-items: center;
-    margin-top: 1.5em;
+    margin-top: 1em;
     margin-bottom: 1em;
     .p-card {
-      min-width: 186px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      min-width: 160px;
       max-width: 372px;
-      height: 68px;
+      height: 55px;
       margin-bottom: 1em;
       background-color: rgba(250, 250, 249, 1);
       box-sizing: border-box;
@@ -151,10 +161,18 @@
       -webkit-box-shadow: none;
       box-shadow: none;
       .p-card-content {
-        padding: 0;
+        padding: 5px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        flex: 1;
       }
       .p-card-body {
-        padding: 0.5em;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        flex: 1;
       }
     }
     .card-container {
@@ -169,21 +187,27 @@
       flex-direction: row;
       align-items: center;
       .card-avatar-container {
-        width: 52px;
-        height: 52px;
+        width: 45px;
+        height: 45px;
+      }
+      .card-icon-container {
+        width: 30px;
+        height: 30px;
+      }
+      .card-avatar-container, .card-icon-container {
         display: flex;
         align-items: center;
         justify-content: center;
         > i {
-          font-size: 2rem;
+          font-size: 1.2rem;
           color: #888E96;
         }
         .app-avatar .avatar .p-avatar-xl {
-          width: 52px !important;
-          height: 52px !important;
+          width: 45px !important;
+          height: 45px !important;
         }
         .app-avatar .avatar .p-avatar-xl .p-avatar-icon {
-          font-size: 2rem;
+          font-size: 1.5rem;
         }
         .app-avatar .avatar {
           padding: 0 !important;
@@ -192,7 +216,7 @@
       .card-details {
         display: flex;
         flex-direction: column;
-        width: calc(100% - 52px);
+        max-width: 327px;
         .name {
           font-weight: 700;
           font-style: normal;
@@ -218,7 +242,7 @@
           text-overflow: ellipsis;
         }
         .quantity {
-          font-size: 1.5rem;
+          font-size: 1.2rem;
           font-weight: 700;
           color: #888E96;
         }
@@ -228,10 +252,18 @@
       }
     }
   }
+  .top-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0;
+    width: 100%;
+  }
+
   .params-container {
     display: flex;
     flex-direction: row;
-    width: 100%;
     align-items: center;
     padding: 0;
     .param-item {
@@ -286,6 +318,10 @@
       align-items: center;
       justify-content: space-evenly;
       flex: 1;
+      .dashboard-item {
+        display: flex;
+        height: 100%;
+      }
     }
   }
 }

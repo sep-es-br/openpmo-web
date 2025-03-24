@@ -7,6 +7,7 @@ import { ComponentsModule } from 'src/app/shared/components/components.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ScheduleStepCardItemComponent } from './schedule-step-card-item/schedule-step-card-item.component';
 import { ProcessComponent } from './process/process.component';
+import { IndicatorComponent } from './indicator/indicator.component';
 import { ProgressBarCardStepComponent } from './components/progress-bar-card-step/progress-bar-card-step.component';
 import { SharingComponent } from './sharing/sharing.component';
 import { BaselineComponent } from './baseline/baseline.component';
@@ -18,6 +19,7 @@ import { EarnedValueAnalysisDashboardComponent } from './components/earned-value
 import { ProgressBarScheduleYearComponent } from './components/progress-bar-schedule-year/progress-bar-schedule-year.component';
 import { WorkpackSectionPropertiesComponent } from './workpack-sections/workpack-section-properties/workpack-section-properties.component';
 import { WorkpackSectionCostAccountsComponent } from './workpack-sections/workpack-section-cost-accounts/workpack-section-cost-accounts.component';
+import { WorkpackSectionIndicatorsComponent} from './workpack-sections/workpack-section-indicators/workpack-section-indicators.component';
 import { WorkpackSectionScheduleComponent } from './workpack-sections/workpack-section-schedule/workpack-section-schedule.component';
 import { WorkpackSectionStakeholdersComponent } from './workpack-sections/workpack-section-stakeholders/workpack-section-stakeholders.component';
 import { WorkpackSectionBaselinesComponent } from './workpack-sections/workpack-section-baselines/workpack-section-baselines.component';
@@ -30,6 +32,8 @@ import { ProgressBarCostAccountComponent } from './components/progress-bar-cost-
 import { WorkpackSectionDashboardComponent } from './workpack-sections/workpack-section-dashboard/workpack-section-dashboard.component';
 import { WorkpackSectionJournalComponent } from './workpack-sections/workpack-section-journal/workpack-section-journal.component';
 import { WorkpackSectionWBSComponent } from './workpack-sections/workpack-section-wbs/workpack-section-wbs.component';
+import { TooltipModule } from 'primeng/tooltip'
+import { Tooltip } from 'chart.js';
 
 @NgModule({
   declarations: [
@@ -37,6 +41,7 @@ import { WorkpackSectionWBSComponent } from './workpack-sections/workpack-sectio
     CostAccountComponent,
     ScheduleStepCardItemComponent,
     ProcessComponent,
+    IndicatorComponent,
     ProgressBarCardStepComponent,
     SharingComponent,
     BaselineComponent,
@@ -48,6 +53,7 @@ import { WorkpackSectionWBSComponent } from './workpack-sections/workpack-sectio
     ProgressBarScheduleYearComponent,
     WorkpackSectionPropertiesComponent,
     WorkpackSectionCostAccountsComponent,
+    WorkpackSectionIndicatorsComponent,
     WorkpackSectionScheduleComponent,
     WorkpackSectionStakeholdersComponent,
     WorkpackSectionBaselinesComponent,
@@ -67,6 +73,7 @@ import { WorkpackSectionWBSComponent } from './workpack-sections/workpack-sectio
       ComponentsModule,
       FormsModule,
       ReactiveFormsModule,
+      TooltipModule
     ],
 })
 export class WorkpackModule { }

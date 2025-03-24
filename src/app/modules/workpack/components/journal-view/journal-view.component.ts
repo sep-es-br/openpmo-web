@@ -1,6 +1,6 @@
 import { Component, ElementRef, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
-import { Route, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import * as moment from 'moment';
 import { SelectItem, TreeNode } from 'primeng/api';
@@ -10,8 +10,8 @@ import { iconsJournal } from 'src/app/shared/constants/iconsJournal';
 import { StatusJournalEnum } from 'src/app/shared/enums/StatusJournalEnum';
 import { TypeJournalEnum } from 'src/app/shared/enums/TypeJournalEnum';
 import { ICard } from 'src/app/shared/interfaces/ICard';
+import { IJournal } from 'src/app/shared/interfaces/IJournal';
 import { ITreeViewScopePlan, ITreeViewScopeWorkpack } from 'src/app/shared/interfaces/ITreeScopePersons';
-import { IJournal } from 'src/app/shared/interfaces/Journal';
 import { AuthService } from 'src/app/shared/services/auth.service';
 import { JournalService } from 'src/app/shared/services/journal.service';
 import { OfficeService } from 'src/app/shared/services/office.service';

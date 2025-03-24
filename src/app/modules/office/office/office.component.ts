@@ -1,7 +1,6 @@
 import { IFilterProperty } from 'src/app/shared/interfaces/IFilterProperty';
 import { FilterDataviewPropertiesEntity } from './../../../shared/constants/filterDataviewPropertiesEntity';
 import { FilterDataviewService } from './../../../shared/services/filter-dataview.service';
-import { PropertyTemplateModel } from './../../../shared/models/PropertyTemplateModel';
 import { Component, OnDestroy, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -27,6 +26,7 @@ import { OfficePermissionService } from 'src/app/shared/services/office-permissi
 import { MenuService } from 'src/app/shared/services/menu.service';
 import { ConfigDataViewService } from 'src/app/shared/services/config-dataview.service';
 import { PersonService } from 'src/app/shared/services/person.service';
+import { CancelButtonComponent } from 'src/app/shared/components/cancel-button/cancel-button.component';
 
 @Component({
   selector: 'app-office',
@@ -36,6 +36,7 @@ import { PersonService } from 'src/app/shared/services/person.service';
 export class OfficeComponent implements OnDestroy {
 
   @ViewChild(SaveButtonComponent) saveButton: SaveButtonComponent;
+  @ViewChild(CancelButtonComponent) cancelButton: CancelButtonComponent;
 
   propertiesOffice: IOffice;
   responsive = false;
@@ -127,7 +128,13 @@ export class OfficeComponent implements OnDestroy {
     this.formOffice.valueChanges
       .pipe(takeUntil(this.$destroy), filter(() => this.formOffice.dirty && this.formOffice.valid))
       .subscribe(() => {
-        this.saveButton.showButton()});
+        this.saveButton.showButton();
+      });
+    this.formOffice.valueChanges
+      .pipe(takeUntil(this.$destroy), filter(() => this.formOffice.dirty))
+      .subscribe(() => {
+        this.cancelButton.showButton();
+      });
     this.responsiveSvr.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.responsive = value);
     localStorage.removeItem('open-pmo:WORKPACK_TABVIEW');
   }
@@ -235,13 +242,13 @@ export class OfficeComponent implements OnDestroy {
           icon: IconsEnum.Plan,
           nameCardItem: plan.name,
           fullNameCardItem: plan.fullName,
+          subtitleCardItem: plan.planModel && plan.planModel.name,
           itemId: plan.id,
           menuItems: [
             {
               label: this.translateSrv.instant('permissions'),
               icon: 'icon: fas fa-user-lock',
               command: () => this.navigateToPlanPermissions(plan.id),
-              disabled: !this.editPermission
             },
             {
               label: this.translateSrv.instant('delete'),
@@ -260,7 +267,7 @@ export class OfficeComponent implements OnDestroy {
     this.cardPlans = {
       ...this.cardPlans,
       idFilterSelected: this.idFilterSelected,
-      showCreateNemElementButton:  this.editPermission && this.menuItemsNewPlan?.length > 0 ? true : false,
+      showCreateNemElementButton: this.editPermission && this.menuItemsNewPlan?.length > 0 ? true : false,
       createNewElementMenuItems: this.menuItemsNewPlan
     }
     this.isLoading = false;
@@ -295,13 +302,23 @@ export class OfficeComponent implements OnDestroy {
     }
   }
 
+  handleOnCancel() {
+    this.saveButton.hideButton();
+    if (this.idOffice) {
+      this.formOffice.reset({ name: this.propertiesOffice.name, fullName: this.propertiesOffice.fullName });
+    } else {
+      this.formOffice.reset();
+    }
+  }
+
   async handleOnSubmit() {
+    this.cancelButton.hideButton();
     const isPut = !!this.idOffice;
     this.formIsSaving = true;
     const { success, data } = isPut
       ? await this.officeSrv.put({ ...this.formOffice.value, id: this.idOffice })
       : await this.officeSrv.post(this.formOffice.value);
-    if (success) {                     
+    if (success) {
       this.idOffice = data.id;
       if (!this.isUserAdmin && !isPut) {
         this.createOfficePermission(data.id);
@@ -361,7 +378,7 @@ export class OfficeComponent implements OnDestroy {
       this.filterSrv.setFilterProperties(filterProperties);
       this.router.navigate(['/filter-dataview'], {
         queryParams: {
-          id: idFilter,
+          idFilter: idFilter,
           entityName: 'plans'
         }
       });
@@ -381,7 +398,8 @@ export class OfficeComponent implements OnDestroy {
 
   async handleSearchText(event) {
     const term = event.term;
-    const result = await this.planSrv.GetAll({ 'id-office': this.idOffice,
+    const result = await this.planSrv.GetAll({
+      'id-office': this.idOffice,
       idFilter: this.idFilterSelected,
       term
     });

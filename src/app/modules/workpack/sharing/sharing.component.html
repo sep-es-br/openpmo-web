@@ -23,5 +23,9 @@
       </p-dataView>
     </app-card>
   </div>
-  <app-save-button #saveButton (save)="saveWorkpackSharing()"></app-save-button>
+  
+  <app-buttons-container>
+    <app-save-button #saveButton (save)="saveWorkpackSharing()"></app-save-button>
+    <app-cancel-button (cancel)="handleOnCancel()"></app-cancel-button>
+  </app-buttons-container>
 </div>

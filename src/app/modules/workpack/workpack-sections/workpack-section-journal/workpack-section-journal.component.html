@@ -1,7 +1,7 @@
 <div class="app-journal-view">
   <app-card [properties]="cardJournalProperties" *ngIf="sectionActive">
     <form class="filters p-grid p-fluid" [formGroup]="formSearch" [class.responsive]="responsive">
-      <p-button class="app-button-green" [label]="'newInformation' | translate" (onClick)="handleNewInformation()"
+      <p-button class="app-button-green button-default-w8" [label]="'newInformation' | translate" (onClick)="handleNewInformation()"
         [disabled]="!editPermission || workpackData?.workpack?.canceled"></p-button>
       <span class="p-float-label property-input p-field p-col">
         <p-calendar id="float-start" formControlName="from" class="app-select-date" [showIcon]="true"
@@ -35,7 +35,7 @@
           <ng-template pTemplate>
             <div class="app-tree-selection">
               <p-tree [value]="treeViewScope" selectionMode="checkbox" [(selection)]="selectedWorkpacks"
-                [propagateSelectionUp]="false">
+                >
               </p-tree>
             </div>
           </ng-template>

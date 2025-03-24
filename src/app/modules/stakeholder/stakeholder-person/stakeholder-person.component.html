@@ -46,7 +46,7 @@
             </div>
           </div>
 
-          <div class="search-container-non-user-citizen" *ngIf="user && !citizenAuthServer"
+          <div class="search-container-non-user-citizen" *ngIf="user && !citizenAuthServer && !cardPerson.isLoading"
                [class.responsive]="responsive">
             <div class="name-person-container" [class.responsive]="responsive">
               <span class="p-float-label">
@@ -66,9 +66,9 @@
             </span>
           </div>
 
-          <div class="search-container-user-citizen" *ngIf="user && !!citizenAuthServer">
+          <div class="search-container-user-citizen" *ngIf="user && !!citizenAuthServer && !cardPerson.isLoading">
             <div class="search-user-by" [class.responsive]="responsive">
-              <label>{{'searchBy'|translate}}:</label>
+              <label class="app-input-label">{{'searchBy'|translate}}:</label>
               <div class="radios-container">
                 <p-radioButton class="search-user-radio" value="CPF" [(ngModel)]="citizenSearchBy" [label]="'CPF'"
                                (ngModelChange)="validateClearSearchByUser()">
@@ -143,9 +143,11 @@
             <div class="p-field">
               <span class="p-float-label">
                 <textarea pInputTextarea class="app-text-area" id="float-address" formControlName="address" rows="1"
-                          [class.responsive]="responsive" (input)="handleShowSaveButton()">
+                          [class.responsive]="responsive">
                 </textarea>
-                <label class="app-input-label" for="float-address">{{ "address" | translate }}</label>
+                <label class="app-input-label" for="float-address">{{ "address" | translate }}
+                  <i class="far fa-question-circle" [pTooltip]="'help.person.address' | translate"></i>
+                </label>
               </span>
             </div>
             <div class="p-field">
@@ -153,8 +155,10 @@
                 <input id="phone" pInputText class="app-input-text" formControlName="phoneNumber"
                        [class.responsive]="responsive" [class.desktop]="!responsive" (blur)="setPhoneNumberMask()"
                        [placeholder]="phoneNumberPlaceholder" (focusin)="setPhoneNumberPlaceholder()"
-                       (focusout)="clearPhoneNumberPlaceholder()" (input)="setPhoneNumberPlaceholder(); handleShowSaveButton()"/>
-                <label class="app-input-label" for="phone">{{ "phoneNumber" | translate }}</label>
+                       (focusout)="clearPhoneNumberPlaceholder(); handleShowSaveButton()" (input)="setPhoneNumberPlaceholder(); handleShowSaveButton()"/>
+                <label class="app-input-label" for="phone">{{ "phoneNumber" | translate }}
+                  <i class="far fa-question-circle" [pTooltip]="'help.person.phoneNumber' | translate"></i>
+                </label>
               </span>
               <app-input-message [form]="stakeholderForm" field="phoneNumber"></app-input-message>
             </div>
@@ -163,7 +167,9 @@
                 <input class="app-input-text short-input" [class.responsive]="responsive" id="float-contactEmail"
                        name="contactEmail" formControlName="contactEmail" type="email"
                        (input)="handleShowSaveButton()" pInputText/>
-                <label class="app-input-label" for="float-contactEmail">{{"contactEmail" | translate}}</label>
+                <label class="app-input-label" for="float-contactEmail">{{"contactEmail" | translate}}
+                  <i class="far fa-question-circle" [pTooltip]="'help.person.contactEmail' | translate"></i>
+                </label>
               </span>
               <app-input-message [form]="stakeholderForm" field="contactEmail"></app-input-message>
             </div>
@@ -173,13 +179,13 @@
     </app-card>
   </div>
   <div class="card-roles" *ngIf="showFormPerson()">
-    <app-card [properties]="cardRoles" *ngIf="cardRoles">
+    <app-card [properties]="cardRoles" *ngIf="cardRoles && stakeholderRolesCardItems && stakeholderRolesCardItems.length > 0">
       <div class="card-item-roles-container">
         <p-dataView [value]="stakeholderRolesCardItems" layout="grid" styleClass="dataview-card-items"
                     [emptyMessage]="'loadingEllipsis' | translate">
-          <ng-template let-cardItem pTemplate="gridItem">
+          <ng-template let-cardItem let-i="rowIndex" pTemplate="gridItem">
             <div class="p-col-12 p-md-3 p-sm-12 card-item-container" [class.responsive]="responsive">
-              <app-stakeholder-role-card-item [properties]="cardItem" (newCardItemRole)="createNewCardItemRole()"
+              <app-stakeholder-role-card-item [properties]="cardItem" (newCardItemRole)="createNewCardItemRole()" (roleDeleted)="deleteCardRole(i)"
                                               (roleChanged)="handleShowSaveButton()">
               </app-stakeholder-role-card-item>
             </div>
@@ -204,10 +210,12 @@
                 <div class="card-item-content">
                   <span class="p-float-label">
                     <p-dropdown id="level-dropdown" dropdownIcon="fas fa-caret-down" class="app-single-selection"
-                                [autoDisplayFirst]="false" (onChange)="handleShowSaveButton()" [disabled]="!editPermission"
+                                [autoDisplayFirst]="false" (onChange)="handleShowSaveButton()" [disabled]="!editPermission || isSamePerson"
                                 [options]="permissionLevelListOptions" [(ngModel)]="cardItem.level">
                     </p-dropdown>
-                    <label class="app-input-label" for="level-dropdown">{{ "level" | translate }}</label>
+                    <label class="app-input-label" for="level-dropdown">{{ "level" | translate }}
+                      <i class="far fa-question-circle" [pTooltip]="'help.permission.level' | translate"></i>
+                    </label>
                   </span>
                 </div>
               </p-card>
@@ -229,4 +237,8 @@
     </app-card>
   </div>
 </div>
-<app-save-button [form]="stakeholderForm" (save)="saveStakeholder()"></app-save-button>
+<app-buttons-container>
+  <app-save-button (save)="saveStakeholder()"></app-save-button>
+  <app-cancel-button (cancel)="handleOnCancel()"></app-cancel-button>
+</app-buttons-container>
+

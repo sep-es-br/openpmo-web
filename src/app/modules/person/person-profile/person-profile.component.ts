@@ -14,6 +14,8 @@ import { SaveButtonComponent } from 'src/app/shared/components/save-button/save-
 import { AuthService } from 'src/app/shared/services/auth.service';
 import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
 import { MinLengthTextCustomValidator } from 'src/app/shared/utils/minLengthTextValidator';
+import { SetConfigWorkpackService } from 'src/app/shared/services/set-config-workpack.service';
+import { CancelButtonComponent } from 'src/app/shared/components/cancel-button/cancel-button.component';
 
 @Component({
   selector: 'app-person-profile',
@@ -22,6 +24,7 @@ import { MinLengthTextCustomValidator } from 'src/app/shared/utils/minLengthText
 })
 export class PersonProfileComponent implements OnInit, OnDestroy {
   @ViewChild(SaveButtonComponent) saveButton: SaveButtonComponent;
+  @ViewChild(CancelButtonComponent) cancelButton: CancelButtonComponent;
 
   cardProperties: ICard = {
     toggleable: false,
@@ -44,6 +47,9 @@ export class PersonProfileComponent implements OnInit, OnDestroy {
   avatarData;
   isLoading = false;
   formIsSaving = false;
+  showBackToManagement = false;
+  infoPerson;
+  oldAvatar;
 
   constructor(
     private personSrv: PersonService,
@@ -54,6 +60,7 @@ export class PersonProfileComponent implements OnInit, OnDestroy {
     private translateSrv: TranslateService,
     private messageSrv: MessageService,
     private breadcrumbSrv: BreadcrumbService,
+    private setConfigWorkpackSrv: SetConfigWorkpackService
   ) {
     this.formPerson = this.formBuilder.group({
       name: ['', [Validators.required, MinLengthTextCustomValidator.minLengthText]],
@@ -69,11 +76,62 @@ export class PersonProfileComponent implements OnInit, OnDestroy {
     this.formPerson.valueChanges
       .pipe(takeUntil(this.$destroy), filter(() => this.formPerson.dirty && this.formPerson.valid))
       .subscribe(() => this.saveButton.showButton());
+    this.formPerson.valueChanges
+      .pipe(takeUntil(this.$destroy), filter(() => this.formPerson.dirty))
+      .subscribe(() => { this.cancelButton.showButton() });
     this.responsiveSvr.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.responsive = value);
   }
 
   async ngOnInit() {
     await this.loads();
+    this.checkShowBackToManagement();
+  }
+
+  checkShowBackToManagement() {
+    this.infoPerson = this.authSrv.getInfoPerson();
+    if (this.infoPerson && this.infoPerson.workLocal &&
+      (this.infoPerson.workLocal.idOffice || this.infoPerson.workLocal.idPlan || this.infoPerson.workLocal.idWorkpack)) {
+      this.showBackToManagement = true;
+    }
+  }
+
+  async navigateToManagement() {
+    const workLocal = this.infoPerson.workLocal;
+    if (workLocal.idWorkpackModelLinked && workLocal.idWorkpack && workLocal.idPlan && workLocal.idOffice) {
+      this.router.navigate(['workpack'], {
+        queryParams: {
+          id: Number(workLocal.idWorkpack),
+          idPlan: Number(workLocal.idPlan),
+          idWorkpackModelLinked: Number(workLocal.idWorkpackModelLinked)
+        }
+      });
+      return;
+    }
+    if (workLocal.idWorkpack && workLocal.idPlan && workLocal.idOffice) {
+      this.router.navigate(['workpack'], {
+        queryParams: {
+          id: Number(workLocal.idWorkpack),
+          idPlan: Number(workLocal.idPlan),
+        }
+      });
+      return;
+    }
+    if (workLocal.idPlan && workLocal.idOffice) {
+      this.router.navigate(['plan'], {
+        queryParams: {
+          id: Number(workLocal.idPlan),
+        }
+      });
+      return;
+    }
+    if (workLocal.idOffice) {
+      this.router.navigate(['offices/office'], {
+        queryParams: {
+          id: Number(workLocal.idOffice),
+        }
+      });
+      return;
+    }
   }
 
   ngOnDestroy(): void {
@@ -183,6 +241,7 @@ export class PersonProfileComponent implements OnInit, OnDestroy {
     this.breadcrumbSrv.setMenu([
       {
         key: 'profile',
+        info: this.propertiesPerson.name,
         routerLink: ['/persons/profile'],
         queryParams: { idOffice: this.idOffice, idPerson: this.idPerson }
       },
@@ -212,25 +271,14 @@ export class PersonProfileComponent implements OnInit, OnDestroy {
           icon: workpack.icon,
           typeCardItem: 'listItemPermissionWorkpack',
           itemId: workpack.id,
-          urlCard: `/stakeholder/person`,
-          paramsUrlCard: [
-            { name: 'idWorkpack', value: workpack.id },
-            { name: 'idPerson', value: this.propertiesPerson.id },
-            { name: 'idPlan', value: plan.id }
-          ],
           nameCardItem: workpack.name,
           subtitleCardItem: workpack?.roles?.join(', '),
           statusItem: workpack.ccbMember ? 'ccbMember' : workpack.accessLevel,
-          profileView: true
+          profileView: true,
         };
         return cardItem;
       }),
     }));
-  }
-
-  async navigateToPage(url: string, email?: string, idOffice?: number, idPlan?: number) {
-    await this.router.navigate([`${url}`]);
-    await this.router.navigate([url], { queryParams: { idPlan, email, idOffice } });
   }
 
   async handleChangeOffice(event) {
@@ -249,8 +297,11 @@ export class PersonProfileComponent implements OnInit, OnDestroy {
   }
 
   handleChangeAvatar(event) {
+    this.oldAvatar = this.propertiesPerson.avatar;
+    this.propertiesPerson.avatar = event;
     this.avatarData = event;
     this.changedAvatar = true;
+    this.cancelButton.showButton();
     if (this.formPerson.valid) {
       this.saveButton.showButton();
     }
@@ -258,12 +309,14 @@ export class PersonProfileComponent implements OnInit, OnDestroy {
 
   async handleDeleteAvatar() {
     this.deletedAvatar = true;
+    this.cancelButton.showButton();
     if (this.formPerson.valid) {
       this.saveButton.showButton();
     }
   }
 
   async savePerson() {
+    this.cancelButton.hideButton();
     this.formIsSaving = true;
     if (this.changedAvatar) {
       await this.updateAvatar();
@@ -327,5 +380,20 @@ export class PersonProfileComponent implements OnInit, OnDestroy {
       this.changedAvatar = false;
       this.personSrv.avatarChangedNext(true);
     }
+  }
+
+  handleOnCancel() {
+    this.saveButton.hideButton();
+    if (this.changedAvatar) {
+      this.propertiesPerson.avatar = this.oldAvatar ? { ...this.oldAvatar } : undefined;
+      this.changedAvatar = false;
+    }
+    if (this.deletedAvatar) {
+      this.propertiesPerson.avatar = {
+        ...this.propertiesPerson.avatar
+      };
+      this.deletedAvatar = false;
+    }
+    this.setFormPerson(this.propertiesPerson);
   }
 }

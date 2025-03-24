@@ -46,7 +46,9 @@ export class TemplateComponent implements OnDestroy, OnInit {
           this.prepareLineSplitter();
         });
       }
-    this.menuSrv.obsToggleMenu.pipe(takeUntil(this.$destroy)).subscribe( value => value && value.trim().length > 0 && !this.isMenuFixed && this.openSlideMenu());
+    this.menuSrv.obsToggleMenu.pipe(takeUntil(this.$destroy)).subscribe( ({menu, open}) => {
+      if (menu && menu.trim().length > 0 && !this.isMenuFixed && open) this.openSlideMenu()
+    });
     this.menuSrv.obsCloseAllMenus.pipe(takeUntil(this.$destroy)).subscribe( close => close && !this.isMenuFixed && this.closeSlideMenu());
   }
 
@@ -57,6 +59,10 @@ export class TemplateComponent implements OnDestroy, OnInit {
   ngOnDestroy(): void {
     this.$destroy.next();
     this.$destroy.complete();
+  }
+
+  handleClickContent() {
+    if (!this.isMenuFixed) this.closeAllMenus();
   }
 
   prepareLineSplitter() {

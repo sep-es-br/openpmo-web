@@ -83,9 +83,11 @@ import { NavMenuComponent } from './nav-menu/nav-menu.component';
 import { PanelMenuComponent } from './panel-menu/panel-menu.component';
 import { UserSlideMenuComponent } from './user-slide-menu/user-slide-menu.component';
 import { MobileMenuComponent } from './mobile-menu/mobile-menu.component';
+import { BadgeModule } from 'primeng/badge';
 
 @NgModule({
   imports: [
+    BadgeModule,
     AccordionModule,
     AutoCompleteModule,
     BreadcrumbModule,
@@ -165,6 +167,7 @@ import { MobileMenuComponent } from './mobile-menu/mobile-menu.component';
     ChartModule
   ],
   exports: [
+    BadgeModule,
     AccordionModule,
     AutoCompleteModule,
     BreadcrumbModule,

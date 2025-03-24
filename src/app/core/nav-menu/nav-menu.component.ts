@@ -26,9 +26,16 @@ export class NavMenuComponent implements OnInit {
     {label: 'portfolio', isOpen: false},
     {label: 'planModel', isOpen: false},
     {label: 'favorite', isOpen: false},
-    {label: 'more', isOpen: false}
+    {label: 'ccbmember-baselines-view', isOpen: false},
+    {label: 'reports', isOpen: false}
   ];
-
+  menusAdmin: IMenu[] = [
+    {label: 'organizations', isOpen: false},
+    {label: 'domains', isOpen: false},
+    {label: 'measure-units', isOpen: false},
+    {label: 'offices/permission', isOpen: false},
+    {label: 'persons', isOpen: false},
+  ];
   isUserAdmin = false;
   currentURL = '';
   currentUserInfo: IPerson;
@@ -57,13 +64,17 @@ export class NavMenuComponent implements OnInit {
     this.menuSrv.obsCloseMenuUser.pipe(takeUntil(this.$destroy)).subscribe( close => {
       this.showUserMenu = false;
     });
+    this.officeSrv.observableIdOffice().pipe(takeUntil(this.$destroy)).subscribe(async id => {
+      this.currentIDOffice = id;
+    });
     this.planSrv.observableIdPlan().pipe(takeUntil(this.$destroy)).subscribe(async id => {
       if (id !== 0) {
         this.currentIDPlan = id;
       } 
-      this.loadPropertiesPlan();
+      await this.loadPropertiesPlan();
       if (this.currentIDPlan && this.currentIDPlan !== 0) this.loadReportsMenu();
     });
+    
     this.locationSrv.onUrlChange(url => {
       this.currentURL = url.slice(2);
     });
@@ -73,7 +84,69 @@ export class NavMenuComponent implements OnInit {
     this.menuSrv.hasFavoriteItems.pipe(takeUntil(this.$destroy)).subscribe( hasFavoriteItems => {
       this.hasFavoriteItems = hasFavoriteItems;
     });
+    this.locationSrv.onUrlChange(url => {
+      this.selectMenuActive(url.slice(2));
+    });
+    this.menuSrv.obsToggleMenu.pipe(takeUntil(this.$destroy)).subscribe( ({menu}) => {
+      this.toggleMenu(menu, false);
+    });
     
+  }
+
+  selectMenuActive(url) {
+    if (!url.startsWith('ccbmember-baselines-view')) {
+      this.menus.forEach( item => {
+        if (item.label === 'ccbmember-baselines-view') {
+          item.isOpen = false;
+        }
+      });
+    } else {
+      this.menus.forEach( item => {
+        if (item.label === 'ccbmember-baselines-view') {
+          item.isOpen = true;
+        } else {
+          item.isOpen = false;
+        }
+      })
+      this.menuSrv.nextMenuState({
+        isFixed: false
+      });
+      this.menuSrv.nextCloseAllMenus(true);
+      this.showUserMenu = false;
+    }
+    if (!url.startsWith('reports')) {
+      this.menus.forEach( item => {
+        if (item.label === 'reports') {
+          item.isOpen = false;
+        }
+      });
+    } else {
+      this.menus.forEach( item => {
+        if (item.label === 'reports') {
+          item.isOpen = true;
+        } else {
+          item.isOpen = false;
+        }
+      });
+      this.menuSrv.nextMenuState({
+        isFixed: false
+      });
+      this.menuSrv.nextCloseAllMenus(true);
+      this.showUserMenu = false;
+    }
+    this.menusAdmin.forEach( item => {
+      if (url.startsWith(item.label)) {
+        item.isOpen = true;
+        this.menuSrv.nextMenuState({
+          isFixed: false
+        });
+        this.menus.forEach( item => item.isOpen = false);
+        this.menuSrv.nextCloseAllMenus(true);
+        this.showUserMenu = false;
+      } else {
+        item.isOpen = false;
+      }
+    });
   }
 
   ngOnDestroy(): void {
@@ -114,18 +187,35 @@ export class NavMenuComponent implements OnInit {
     }
   }
 
-  toggleMenu(menu: string) {
+  toggleMenu(menu: string, next = true) {
     this.menus.forEach(m => {
       m.isOpen = m.label === menu ? true : false
     });
+
+    this.menusAdmin.forEach( item => item.isOpen = false);
     this.showUserMenu = false;
-    this.menuSrv.nextToggleMenu(menu);
+    if (next) {
+      const user = this.authSrv.getTokenPayload();
+      const isFixed = this.cookieSrv.get('menuMode' + user?.email) === 'true' ? true : false;
+      this.menuSrv.nextToggleMenu({menu, open: true})
+      if (!!isFixed) {
+        this.menuSrv.nextMenuState({
+          isFixed: isFixed
+        });
+      }
+    };
   }
 
   isMenuOpen(menu?: string) {
     return menu
       ? this.menus.find(m => m.label === menu)?.isOpen
       : this.menus.reduce((a, b) => a ? a : b.isOpen, false);
+  }
+
+  isMenuAdminOpen(menu?: string) {
+    return menu
+      ? this.menusAdmin.find(m => m.label === menu)?.isOpen
+      : this.menusAdmin.reduce((a, b) => a ? a : b.isOpen, false);
   }
 
   closeAllMenus() {
@@ -140,6 +230,7 @@ export class NavMenuComponent implements OnInit {
     this.menuSrv.nextMenuState({
       isFixed: false
     });
+    this.closeAllMenus();
     this.menuSrv.nextCloseAllMenus(true);
     this.showUserMenu = true;
   }

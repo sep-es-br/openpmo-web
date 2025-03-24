@@ -16,39 +16,110 @@
     <div class="unitValues">
       <div class="unitInputs p-fluid">
         <span class="column-title">{{properties.unitName}}</span>
-        <span class="p-float-label p-field">
-          <p-inputNumber [class]="'app-input-number '+'unitPlanned '+'unitPlanned-'+ properties.idStep" id="float-unitPlanned" (onInput)="handleStepChange($event, 'unitPlanned')"
-            [disabled]="!properties.editPermission" [(ngModel)]="properties.unitPlanned"
-            [class.red]="properties.unitPlanned < 0"
+
+        <span *ngIf="isCurrentBaseline" class="p-float-label p-field">
+          <p-inputNumber [class]="'app-input-number '+'unitBaseline '+'unitBaseline'+ properties.idStep" id="float-unitBaseline" 
+            (onInput)="handleStepCostChange($event, 'unitBaseline')"
+            [disabled]="true" [(ngModel)]="properties.unitBaseline"
             [minFractionDigits]="properties.unitPrecision" [maxFractionDigits]="properties.unitPrecision"
             [locale]="language === 'pt-BR' ? 'pt-BR' : 'en-US'">
           </p-inputNumber>
-          <label class="app-input-label" for="float-unitPlanned">{{ "planned" |translate }}</label>
+          <label pTooltip="{{ 'plannedBaseline' | translate }}" class="app-input-label" for="float-unitBaseline]">{{ "abbreviatedBaselineCardItem" | translate }}</label>
         </span>
-        <div class="replicate-button-container">
+
+        <!-- Baseline superior esquerdo -->
+        <div class="progress-bar-unit-container">
+          <app-progress-bar-card-step 
+            [total]="properties.unitBaseline" 
+            [progress]="properties.unitBaseline"
+            [baseline]="properties.unitBaseline" 
+            [color]="'#BFBFBF'" 
+            [barHeight]="4"
+            [maxValue]="maxValueUnit">
+          </app-progress-bar-card-step>
+        </div>
+
+        <!-- VALOR ESTIMADO/REPROGRAMADO -->
+        <span class="p-float-label p-field">
+          <p-inputNumber [class]="'app-input-number '+'unitPlanned '+'unitPlanned-'+ properties.idStep" id="float-unitPlanned"
+            [disabled]="!properties.editPermission" [(ngModel)]="properties.unitPlanned"
+            [class.red]="properties.unitPlanned < 0"
+            (onInput)="handleStepCostChange($event, 'unitPlanned')"
+            [minFractionDigits]="properties.unitPrecision" [maxFractionDigits]="properties.unitPrecision"
+            [locale]="language === 'pt-BR' ? 'pt-BR' : 'en-US'">
+          </p-inputNumber>
+          <label pTooltip="{{ tooltipLabel | translate }}" class="app-input-label" for="float-unitPlanned">{{ foreseenLabel | translate}}</label>
+        </span>
+        
+        <!-- Reprogramado meio esquerdo -->
+        <div class="progress-bar-unit-container">
+          <app-progress-bar-card-step 
+            [total]="properties.unitPlanned" 
+            [progress]="properties.unitPlanned"
+            [baseline]="properties.unitBaseline" 
+            [color]="'#659EE1'" 
+            [barHeight]="4"
+            [maxValue]="maxValueUnit">
+          </app-progress-bar-card-step>
+        </div>
+        
+        <div [ngStyle]="{ 'visibility': !isPassedMonth || !isCurrentBaseline ? 'visible' : 'hidden'  }" class="replicate-button-container">
           <i class="fas fa-caret-up" [class.disabled]="!properties.editPermission || !showReplicateButton" [class.replicate-hide]="!showReplicateButton"
             (click)="properties.editPermission && showReplicateButton && confirmReplicateValueDif('unitActual')"></i>
         </div>
+        
+        <!-- VALOR REALIZADO -->
         <span class="p-float-label p-field">
           <p-inputNumber class="app-input-number" id="float-unitActual" (onInput)="handleStepChange($event, 'unitActual')"
-            [disabled]="!properties.editPermission" [(ngModel)]="properties.unitActual"
+            [disabled]="!properties.editPermission || isActualValuesDisabled" [(ngModel)]="properties.unitActual"
             [class.red]="properties.unitActual < 0"
             [minFractionDigits]="properties.unitPrecision" [maxFractionDigits]="properties.unitPrecision"
+            (onInput)="handleStepCostChange($event, 'unitActual')"
             [locale]="language === 'pt-BR' ? 'pt-BR' : 'en-US'">
           </p-inputNumber>
-          <label class="app-input-label" for="float-unitActual">{{ "actual" |translate }}</label>
+          <label pTooltip="{{ 'actual' | translate }}" class="app-input-label" for="float-unitActual">{{"abbreviatedActual" | translate}}</label>
         </span>
-      </div>
-      <div class="progress-bar-unit-container">
-        <app-progress-bar-card-step [total]="properties.unitPlanned" [progress]="properties.unitActual"
-          [baseline]="properties.unitBaseline" [color]="properties.unitProgressBar.color" [barHeight]="13">
-        </app-progress-bar-card-step>
+        
+        <!-- Real inferior esquerdo -->
+        <div class="progress-bar-unit-container">
+          <app-progress-bar-card-step 
+            [total]="properties.unitActual" 
+            [progress]="properties.unitActual"
+            [baseline]="properties.unitBaseline" 
+            [color]="'#FF8C22'" 
+            [barHeight]="4"
+            [maxValue]="maxValueUnit">
+          </app-progress-bar-card-step>
+        </div>
       </div>
     </div>
     <div class="costValues">
       <div class="costInputs p-fluid" [class.card-link]="properties.editPermission && !properties.editCosts && properties.multipleCosts"
         (click)="properties.multipleCosts && handleEditCosts($event)">
         <span class="column-title"> $ </span>
+        
+        <span *ngIf="isCurrentBaseline" class="p-float-label p-field">
+          <p-inputNumber [class]="'app-input-number '+'costBaseline-'+properties.idStep" id="float-costBaseline"
+            [disabled]="true"
+            [(ngModel)]="properties.baselinePlannedCost" 
+            (onInput)="handleStepCostChange($event, 'baselinePlannedCost')"
+            [minFractionDigits]="2" [maxFractionDigits]="2"
+            [locale]="language === 'pt-BR' ? 'pt-BR' : 'en-US'">
+          </p-inputNumber>
+        </span>
+
+        <!-- Baseline superior direito -->
+        <div class="progress-bar-unit-container">
+          <app-progress-bar-card-step 
+            [total]="properties.baselinePlannedCost" 
+            [progress]="properties.baselinePlannedCost"
+            [baseline]="properties.unitBaseline" 
+            [color]="'#BFBFBF'" 
+            [barHeight]="4"
+            [maxValue]="maxValueCosts">
+          </app-progress-bar-card-step>
+        </div>
+        
         <span class="p-float-label p-field">
           <p-inputNumber [class]="'app-input-number '+'costPlanned-'+properties.idStep" id="float-costPlanned"
             (click)="properties.multipleCosts && handleEditCosts($event); properties.multipleCosts && disable()"
@@ -60,9 +131,21 @@
             [(ngModel)]="properties.costPlanned" [minFractionDigits]="2" [maxFractionDigits]="2"
             [locale]="language === 'pt-BR' ? 'pt-BR' : 'en-US'">
           </p-inputNumber>
-          <label class="app-input-label" for="float-costPlanned">{{ "planned" |translate }}</label>
         </span>
-        <div class="replicate-button-container">
+
+        <!-- Reprogramado meio direito -->
+        <div class="progress-bar-unit-container">
+          <app-progress-bar-card-step 
+            [total]="properties.costPlanned" 
+            [progress]="properties.costPlanned"
+            [baseline]="properties.unitBaseline" 
+            [color]="'#659EE1'" 
+            [barHeight]="4"
+            [maxValue]="maxValueCosts">
+          </app-progress-bar-card-step>
+        </div>
+        
+        <div [ngStyle]="{ 'visibility': !isPassedMonth || !isCurrentBaseline ? 'visible' : 'hidden'  }" class="replicate-button-container">
           <i class="fas fa-caret-up" [class.disabled]="!properties.editCosts || !properties.editPermission || !showReplicateButton"
             [class.replicate-hide]="!showReplicateButton"
             (click)="(properties.editCosts && properties.editPermission && showReplicateButton) && confirmReplicateValueDif('costActual')"></i>
@@ -72,24 +155,33 @@
             (click)="properties.multipleCosts && handleEditCosts($event); properties.multipleCosts && disable()"
             (onFocus)="properties.multipleCosts && handleEditCosts($event); properties.multipleCosts && disable()"
             (mouseout)="multiCostsEdited = false"
-            [disabled]="(properties.multipleCosts && multiCostsEdited) || !properties.editPermission || (!properties.multipleCosts && !properties.editCosts)"
+            [disabled]="(properties.multipleCosts && multiCostsEdited) || !properties.editPermission || (!properties.multipleCosts && !properties.editCosts) || isActualValuesDisabled"
             (onInput)="handleStepCostChange($event, 'costActual')"
             [class.red]="properties.costActual < 0"
             [(ngModel)]="properties.costActual" [minFractionDigits]="2" [maxFractionDigits]="2"
             [locale]="language === 'pt-BR' ? 'pt-BR' : 'en-US'">
           </p-inputNumber>
-          <label class="app-input-label" for="float-costActual">{{ "actual" |translate }}</label>
         </span>
-      </div>
-      <div class="progress-bar-cost-container">
-        <app-progress-bar-card-step [total]="properties.costProgressBar.total"
-          [progress]="properties.costProgressBar.progress" [baseline]="properties.baselinePlannedCost"
-          [color]="properties.costProgressBar.color" [barHeight]="13">
-        </app-progress-bar-card-step>
+        
+        <!-- Realizado inferior direito -->
+        <div class="progress-bar-unit-container">
+          <app-progress-bar-card-step 
+            [total]="properties.costActual" 
+            [progress]="properties.costActual"
+            [baseline]="properties.unitBaseline" 
+            [color]="'#44B39B'" 
+            [barHeight]="4"
+            [maxValue]="maxValueCosts">
+          </app-progress-bar-card-step>
+        </div>
       </div>
     </div>
   </div>
   <div class="card-item-footer" *ngIf="cardIdItem">
+    <span class="card-item-id">
+      <label class="card-item-liquidated-label" for="liquidated-value">{{'liquidated' | translate}}:</label>
+      <span id="liquidated-value" class="card-item-liquidated-value">{{properties.liquidatedValue}}</span>
+    </span>
     <span class="card-item-id">
       {{cardIdItem}}
     </span>

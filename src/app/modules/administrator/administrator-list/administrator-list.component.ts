@@ -29,7 +29,7 @@ export class AdministratorListComponent implements OnInit, OnDestroy {
     cardTitle: 'administrators',
     collapseble: true,
     initialStateCollapse: false,
-  
+
   };
   displayModeAll = 'grid';
   pageSize = 5;
@@ -39,6 +39,8 @@ export class AdministratorListComponent implements OnInit, OnDestroy {
   idCurrentPerson: number;
   isLoading = false;
   $destroy = new Subject();
+  showBackToManagement = false;
+  infoPerson;
 
   constructor(
     private responsiveSrv: ResponsiveService,
@@ -69,11 +71,59 @@ export class AdministratorListComponent implements OnInit, OnDestroy {
     await this.loadCurrentUserInfo();
     await this.loadAdministrators();
     this.loadBreadcrump();
+    this.checkShowBackToManagement()
+  }
+
+  checkShowBackToManagement() {
+    this.infoPerson = this.authSrv.getInfoPerson();
+    if (this.infoPerson && this.infoPerson.workLocal &&
+      (this.infoPerson.workLocal.idOffice || this.infoPerson.workLocal.idPlan || this.infoPerson.workLocal.idWorkpack)) {
+      this.showBackToManagement = true;
+    }
+  }
+
+  async navigateToManagement() {
+    const workLocal = this.infoPerson.workLocal;
+    if (workLocal.idWorkpackModelLinked && workLocal.idWorkpack && workLocal.idPlan && workLocal.idOffice) {
+      this.router.navigate(['workpack'], {
+        queryParams: {
+          id: Number(workLocal.idWorkpack),
+          idPlan: Number(workLocal.idPlan),
+          idWorkpackModelLinked: Number(workLocal.idWorkpackModelLinked)
+        }
+      });
+      return;
+    }
+    if (workLocal.idWorkpack && workLocal.idPlan && workLocal.idOffice) {
+      this.router.navigate(['workpack'], {
+        queryParams: {
+          id: Number(workLocal.idWorkpack),
+          idPlan: Number(workLocal.idPlan),
+        }
+      });
+      return;
+    }
+    if (workLocal.idPlan && workLocal.idOffice) {
+      this.router.navigate(['plan'], {
+        queryParams: {
+          id: Number(workLocal.idPlan),
+        }
+      });
+      return;
+    }
+    if (workLocal.idOffice) {
+      this.router.navigate(['offices/office'], {
+        queryParams: {
+          id: Number(workLocal.idOffice),
+        }
+      });
+      return;
+    }
   }
 
   ngOnDestroy(): void {
-      this.$destroy.complete();
-      this.$destroy.unsubscribe();
+    this.$destroy.complete();
+    this.$destroy.unsubscribe();
   }
 
   async loadCurrentUserInfo() {
@@ -94,12 +144,12 @@ export class AdministratorListComponent implements OnInit, OnDestroy {
   loadCardItemsAdministrators() {
     if (this.administrators) {
       this.cardItemsAdministrators = this.administrators.map(administrator => {
-      return  {
+        return {
           typeCardItem: 'listItem',
           titleCardItem: administrator.name,
           fullNameUser: administrator.fullName,
           roleDescription: administrator.email,
-          menuItems:  [{
+          menuItems: [{
             label: this.translateSrv.instant('delete'),
             icon: 'fas fa-trash-alt',
             command: (event) => this.deleteAdministrator(administrator),
@@ -123,7 +173,7 @@ export class AdministratorListComponent implements OnInit, OnDestroy {
     this.breadcrumbSrv.setMenu([
       {
         key: 'administrators',
-        routerLink: [ '/administrators' ],
+        routerLink: ['/administrators'],
       }
     ]);
   }
@@ -133,7 +183,7 @@ export class AdministratorListComponent implements OnInit, OnDestroy {
   }
 
   async deleteAdministrator(administrator: IPerson) {
-    if(administrator.id === this.idCurrentPerson) {
+    if (administrator.id === this.idCurrentPerson) {
       return this.messageSrv.add({
         summary: this.translateSrv.instant('error'),
         severity: 'warn',
@@ -142,9 +192,9 @@ export class AdministratorListComponent implements OnInit, OnDestroy {
     }
     const result = await this.personSrv.setPersonAdministrator(administrator.id, false);
     if (result.success) {
-      const administratorIndex = this.cardItemsAdministrators.findIndex( p => p.itemId === administrator.id);
+      const administratorIndex = this.cardItemsAdministrators.findIndex(p => p.itemId === administrator.id);
       if (administratorIndex > -1) {
-        this.cardItemsAdministrators.splice(administratorIndex,1);
+        this.cardItemsAdministrators.splice(administratorIndex, 1);
         this.cardItemsAdministrators = Array.from(this.cardItemsAdministrators);
         this.totalRecords = this.cardItemsAdministrators && this.cardItemsAdministrators.length;
       }
@@ -167,7 +217,8 @@ export class AdministratorListComponent implements OnInit, OnDestroy {
     this.breadcrumbSrv.setBreadcrumbStorage([
       {
         key: 'Administrators',
-        routerLink: [ '/administrators' ],
+        routerLink: ['/administrators'],
+        admin: true
       }
     ]);
   }

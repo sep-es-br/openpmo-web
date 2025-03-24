@@ -18,8 +18,7 @@
       align-items: center;
     }
     .card-item-title {
-      font-size: 1rem;
-      font-family: v.$fontTitle !important;
+      font-size: 0.9rem;
       color: v.$fontInput;
     }
     .card-item-header p-menu {
@@ -84,6 +83,9 @@
         &.red-balance {
           color: #EA5C5C;
         }
+      }
+      .app-input-number .p-inputnumber .p-inputtext {
+        font-size: 0.8rem !important;
       }
       .p-float-label {
         width: 100%;

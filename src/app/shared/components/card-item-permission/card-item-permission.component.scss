@@ -5,10 +5,17 @@
   flex-direction: column;
   flex: 1;
   height: 100%;
-  max-width: 280px;
-  width: 280px;
+  max-width: 260px;
+  width: 260px;
   border: 1px solid #D4D4D4;
   box-shadow: none;
+  .input-label {
+    font-size: 12px !important;
+    font-style: italic;
+    font-family: "Montserrat Regular", "Montserrat", sans-serif;
+    color: #939393;
+  }
+  
   .p-card-header {
     display: flex;
     justify-content: space-between;
@@ -27,7 +34,7 @@
           color: #939393;
         }
         .p-menuitem-text {
-          font-size: 0.9rem;
+          font-size: 0.8rem;
           font-family: v.$fontFamilyMedium;
           color: #939393;
         }
@@ -43,7 +50,7 @@
       }
     }
     .card-item-title {
-      font-size: 1rem;
+      font-size: 0.9rem;
       font-family: v.$fontFamilyMedium;
       color: v.$fontTitle;
       padding: 0.7em;
@@ -51,7 +58,6 @@
       word-break: break-word;
       overflow: hidden;
       text-overflow: ellipsis;
-      flex: 1;
     }
     .card-item-title-role {
       font-size: 0.8rem;
@@ -67,7 +73,7 @@
       height: 60px;
     }
     .card-item-title-shared {
-      font-size: 1rem;
+      font-size: 0.9rem;
       font-family: v.$fontFamilyMedium;
       color: v.$fontTitle;
       font-weight: bold;
@@ -103,10 +109,11 @@
     padding: 0 0.7em;
     display: flex;
     flex-direction: column;
-    max-width: 280px;
+    max-width: 260px;
     flex: 1;
+    
     .card-item-role-description {
-      font-size: 1rem;
+      font-size: 0.8rem;
       font-family: v.$fontFamilyMedium;
       padding: 0.2em 0;
       color: v.$fontLabel;
@@ -184,8 +191,8 @@
   .p-card {
     background-color: transparent;
     height: 100%;
-    max-width: 280px;
-    width: 280px;
+    max-width: 260px;
+    width: 260px;
     border: 1px solid #D4D4D4;
     box-shadow: none;
     .p-card-body .p-card-content p-menu {
@@ -210,6 +217,9 @@
       padding: 0 !important;
       height: 100%;
     }
+    .p-card-content {
+      padding: 0 !important;
+    }
     .p-card-content .card-item-content {
       min-height: 150px;
       width: 100%;
@@ -225,14 +235,15 @@
         .p-tieredmenu-overlay ul {
           max-width: 23em;
           max-height: 25em;
-          overflow-y: scroll;
+          overflow-y: auto;
           .p-menuitem .p-menuitem-link {
+            padding: 0.5rem;
             .p-menuitem-icon {
               font-size: 0.8rem;
               color: #939393;
             }
             .p-menuitem-text {
-              font-size: 0.9rem;
+              font-size: 0.8rem;
               font-family: v.$fontFamilyMedium;
               color: #939393;
             }
