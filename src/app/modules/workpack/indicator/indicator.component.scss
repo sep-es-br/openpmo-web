@@ -42,7 +42,6 @@
 
     span.p-float-label {
       margin-left: 1rem;
-      margin-right: 1rem;
     }
 
     input.app-input-text {
@@ -65,19 +64,15 @@
 
   #update {
     color: #44B39B;
-    border-bottom: none;
-  }
-
-  #period {
-    border-bottom: none;
-  }
-
-  #measure {
-    border-bottom: none;
   }
 
   .error-message {
     color: red;
     font-size: 0.9rem;
     margin-top: 10px;
+  }
+
+  #justification {
+    // comprimento do input customizado
+    width: 215px !important;
   }

@@ -9,11 +9,7 @@ export interface IIndicator {
     periodicity?: string;
     startDate?: Date;
     endDate?: Date;
-    expectedGoals?: Array<{
-        lastUpdate: any; period: string; value: number 
-}>;
-    achievedGoals?: Array<{
-        lastUpdate: any; period: string; value: number
-}>;
+    expectedGoals?: Array<{lastUpdate: any; period: string; value: number; justification: string}>;
+    achievedGoals?: Array<{lastUpdate: any; period: string; value: number; justification: string}>;
     lastUpdate: string;
 }

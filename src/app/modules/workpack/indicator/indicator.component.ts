@@ -126,7 +126,8 @@ export class IndicatorComponent implements OnInit, OnDestroy {
             endDate: [null, Validators.required],
             periodicity: [null],
             expectedGoals: [null],
-            achievedGoals: [null]
+            achievedGoals: [null],
+            justification: [null]
         });
         this.formIndicator.statusChanges.pipe(takeUntil(this.$destroy), filter(status => status === 'INVALID')).subscribe(() => this.saveButton?.hideButton());
         this.formIndicator.valueChanges.pipe(takeUntil(this.$destroy), filter(() => this.formIndicator.dirty && this.formIndicator.valid)).subscribe(() => this.saveButton.showButton());
@@ -159,7 +160,8 @@ export class IndicatorComponent implements OnInit, OnDestroy {
             startDate: [null],
             endDate: [null],
             expectedGoals: [null],
-            achievedGoals: [null]
+            achievedGoals: [null],
+            justification: [null]
         });
     }
 
@@ -168,7 +170,6 @@ export class IndicatorComponent implements OnInit, OnDestroy {
     }
 
     async loadPropertiesIndicator() {
-        debugger
         this.cardIndicatorProperties = {
             toggleable: false,
             initialStateToggle: false,
@@ -192,7 +193,6 @@ export class IndicatorComponent implements OnInit, OnDestroy {
     }
 
     preparePeriodData() {
-        debugger;
         if (!this.indicator) return;
     
         // Obtém todos os períodos únicos de expectedGoals e achievedGoals
@@ -215,13 +215,13 @@ export class IndicatorComponent implements OnInit, OnDestroy {
                 expectedGoals: expectedGoal?.value || 0, // Usa o valor do expectedGoal ou 0 se não existir
                 achievedGoals: achievedGoal?.value || 0, // Usa o valor do achievedGoal ou 0 se não existir
                 measure: this.indicator.measure, // Usa a medida do indicador
-                lastUpdate: expectedGoal?.lastUpdate || achievedGoal?.lastUpdate || '--' // Usa o lastUpdate do expectedGoal ou achievedGoal, ou '--' se não existir
+                lastUpdate: expectedGoal?.lastUpdate || achievedGoal?.lastUpdate || '--', // Usa o lastUpdate do expectedGoal ou achievedGoal, ou '--' se não existir
+                justification: expectedGoal?.justification || achievedGoal?.justification || '' // Usa a justificativa do expectedGoal ou achievedGoal, ou '' se não existir
             };
         });
     }
 
     async loadFontOptions(idOffice: number) {
-        debugger
         return new Promise<void>((resolve) => {
             this.indicatorSrv.loadOrganizationFromOffice(idOffice).subscribe(data => {
                 this.sourceOptions =
@@ -320,7 +320,8 @@ export class IndicatorComponent implements OnInit, OnDestroy {
             expectedGoals: 0,
             achievedGoals: 0,
             measure: this.selectedMeasure || '--',
-            lastUpdate: '--'
+            lastUpdate: '--',
+            justification: ''
         }));
     
         // Força a renderização da tabela
@@ -430,7 +431,6 @@ export class IndicatorComponent implements OnInit, OnDestroy {
     }
 
     async saveIndicator() {
-        debugger
         if (!this.validateExpectedGoals()) {
             this.messageSrv.add({ severity: 'warn', summary: 'Atenção', detail: 'A soma das metas previstas ultrapassou a meta finalística.'});
             return;
@@ -451,13 +451,15 @@ export class IndicatorComponent implements OnInit, OnDestroy {
         const expectedGoals = this.periodData.map(data => ({
             period: String(data.period),
             value: parseDecimal(data.expectedGoals) || 0,
-            lastUpdate: data.lastUpdate
+            lastUpdate: data.lastUpdate,
+            justification: data.justification
         }));
     
         const achievedGoals = this.periodData.map(data => ({
             period: String(data.period),
             value: parseDecimal(data.achievedGoals) || 0,
-            lastUpdate: data.lastUpdate
+            lastUpdate: data.lastUpdate,
+            justification: data.justification
         }));
     
         this.updateDate = this.getCurrentDate();

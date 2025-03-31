@@ -269,6 +269,7 @@
   "expectedGoal": "Meta Prevista",
   "achievedGoal": "Meta Realizada",
   "update": "Atualização",
+  "goalJustification": "Justificativa",
   "status": "Situação",
   "preOccurrency": "Pré ocorrência",
   "postOccurrency": "Pós ocorrência",
@@ -513,7 +514,8 @@
       "status": "Situação do risco. Informação obrigatória.",
       "likelyToHappenFrom": "Data a partir da qual o risco pode ocorrer.",
       "likelyToHappenTo": "Data até a qual o risco pode ocorrer.",
-      "happenedIn": "Data em que o risco ocorreu."
+      "happenedIn": "Data em que o risco ocorreu.",
+      "has-issue-relationship": "teste"
     },
     "RiskResponse": {
       "name": "Nome do plano de resposta ao risco. Informação obrigatória.",

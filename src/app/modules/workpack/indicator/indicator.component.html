@@ -17,7 +17,7 @@
 
       <div class="wrapper">
         
-        <div class="p-grid grid-content" *ngIf="!cardIndicatorProperties.isLoading">
+        <div class="p-grid grid-content" style="width: 40%;" *ngIf="!cardIndicatorProperties.isLoading">
           <form [formGroup]="formIndicator" class="form-container">
             <div class="p-fluid">
               <!-- Nome -->
@@ -138,6 +138,11 @@
               <span class="p-float-label">
                 <input [value]="data.lastUpdate || '--'" disabled="true" id="update" type="text" pInputText class="app-input-text update-input">
                 <label for="update" class="indicators-label update-label">{{ "update" | translate }}</label>
+              </span>
+              <!-- Justificativa da Meta -->
+              <span class="p-float-label">
+                <input [(ngModel)]="data.justification" id="justification" type="text" pInputText class="app-input-text">
+                <label for="justification" class="indicators-label">{{ "goalJustification" | translate }}</label>
               </span>
           </div>
         </div>
