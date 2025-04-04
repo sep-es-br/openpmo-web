@@ -265,6 +265,7 @@
   "startDate": "Start date",
   "endDate": "End date",
   "period": "Period",
+  "periods": "Periods",
   "expectedGoal": "Expected Goal",
   "achievedGoal": "Achieved Goal",
   "update": "Update",
@@ -1054,6 +1055,5 @@
   "budgeted": "Budgeted",
   "authorized": "Authorized",
   "indicator.name": "Name of the indicator. Mandatory information.",
-  "indicator.description": "Description of the indicator. Mandatory information.",
-  "periodData": "Period Data"
+  "indicator.description": "Description of the indicator. Mandatory information."
 }

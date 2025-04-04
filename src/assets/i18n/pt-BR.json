@@ -267,6 +267,7 @@
   "endDate": "Data Fim",
   "periodicity": "Periodicidade",
   "period": "Período",
+  "periods": "Períodos",
   "expectedGoal": "Meta Prevista",
   "achievedGoal": "Meta Realizada",
   "update": "Atualização",
@@ -1055,6 +1056,5 @@
   "budgeted": "Orçado",
   "authorized": "Autorizado",
   "indicator.name": "Nome do indicador. Informação obrigatória.",
-  "indicator.description": "Descrição do indicador. Informação obrigatória.",
-  "periodData": "Dados do período"
+  "indicator.description": "Descrição do indicador. Informação obrigatória."
 }

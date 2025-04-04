@@ -171,6 +171,7 @@ export class WorkpackSectionIndicatorsComponent implements OnInit {
         icon: 'process',
         iconSvg: true,
         nameCardItem: indicator.name,
+        fullNameCardItem: indicator.description,
         itemId: indicator.id,
         idAtributeName: 'idIndicator',
         menuItems: [{

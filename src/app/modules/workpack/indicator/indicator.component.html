@@ -105,7 +105,7 @@
 
   <div class="card-period-data" *ngIf="cardIndicatorProperties && periodData?.length > 0">
     <app-card [properties]="{ 
-      cardTitle: 'periodData', 
+      cardTitle: periodData.length > 1 ? 'periods' : 'period',
       toggleable: false,
       initialStateToggle: false,
       collapseble: true,
