@@ -192,6 +192,7 @@ export class WorkpackSectionIndicatorsComponent implements OnInit {
           icon: IconsEnum.Plus,
           iconSvg: true,
           nameCardItem: null,
+          fullNameCardItem: null,
           itemId: null,
           idAtributeName: 'idIndicator',
           menuItems: null,
