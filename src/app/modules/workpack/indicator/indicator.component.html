@@ -17,11 +17,11 @@
 
       <div class="wrapper">
         
-        <div class="p-grid grid-content" style="width: 40%;" *ngIf="!cardIndicatorProperties.isLoading">
+        <div class="p-grid grid-content" *ngIf="!cardIndicatorProperties.isLoading">
           <form [formGroup]="formIndicator" class="form-container">
             <div class="p-fluid">
               <!-- Nome -->
-              <div class="p-field">
+              <div class="p-field mobile" style="width: 30%;">
                 <span class="p-float-label">
                   <input id="float-name" formControlName="name" type="text" class="app-input-text" pInputText />
                   <label class="indicators-label" for="float-name">{{ "name" | translate }} *
@@ -34,7 +34,7 @@
               <!-- Descrição -->
               <div class="p-field">
                 <span class="p-float-label">
-                  <textarea pInputTextarea formControlName="description" class="app-text-area" [rows]="3"
+                  <textarea pInputTextarea formControlName="description" class="app-text-area" [rows]="2"
                     id="float-description"
                     [ngModel]="(mirrorDescription()) ? formIndicator.value.name : formIndicator.value.description"></textarea>
                   <label class="indicators-label" for="float-description">{{ "description" | translate }} *
@@ -45,7 +45,7 @@
               </div>
 
               <!-- Fonte -->
-              <div class="p-field">
+              <div class="p-field mobile" style="width: 20%;">
                 <span class="p-float-label">
                   <p-dropdown [filter]="true" filterBy="name" [showClear]="false" class="app-single-selection" [options]="sourceOptions" formControlName="source"
                     optionLabel="name" optionValue="name" dropdownIcon="fas fa-caret-down" [autoDisplayFirst]="false"
@@ -56,7 +56,7 @@
               </div>
 
               <!-- Medida -->
-              <div class="p-field">
+              <div class="p-field mobile" style="width: 20%;">
                 <span class="p-float-label">
                   <p-dropdown [filter]="true" filterBy="name" [showClear]="false" class="app-single-selection" [options]="unitMeasureOptions" formControlName="measure"
                     (onChange)="onMeasureChange($event)" optionLabel="name" optionValue="name"
@@ -66,17 +66,7 @@
                 <app-input-message [form]="formIndicator" field="measure"></app-input-message>
               </div>
 
-              <!-- Meta Finalística -->
-              <div class="p-field">
-                <span class="p-float-label">
-                  <input id="float-final-goal" formControlName="finalGoal" type="number" class="app-input-text"
-                    pInputText (input)="onFinalGoalChange($event)"/>
-                  <label class="indicators-label" for="float-final-goal">{{ "finalGoal" | translate }}</label>
-                </span>
-                <app-input-message [form]="formIndicator" field="finalGoal"></app-input-message>
-              </div>
-
-              <div class="p-field">
+              <div class="p-field mobile" style="width: 20%;">
                 <span class="p-float-label">
                   <p-calendar id="float-start" class="app-select-date" [showIcon]="true" [monthNavigator]="true"
                     [yearNavigator]="true" [yearRange]="yearRangeCalculated" formControlName="startDate"
@@ -86,7 +76,7 @@
                 </span>
               </div>
               
-              <div class="p-field">
+              <div class="p-field mobile" style="width: 20%;">
                 <span class="p-float-label">
                   <p-calendar id="float-start" class="app-select-date" [showIcon]="true" [monthNavigator]="true"
                     [yearNavigator]="true" [yearRange]="yearRangeCalculated" formControlName="endDate"
@@ -97,7 +87,7 @@
               </div>
 
               <!-- Periodicidade -->
-              <div class="p-field">
+              <div class="p-field mobile" style="width: 20%;">
                 <span class="p-float-label">
                   <p-dropdown class="app-single-selection" [options]="periodicityOptions" formControlName="periodicity"
                     (onChange)="onPeriodicityChange($event)" optionLabel="label" optionValue="value"
@@ -109,46 +99,58 @@
             </div>
           </form>
         </div>
+      </div>
+    </app-card>
+  </div>
 
-        <div class="separator"></div>
+  <div class="card-period-data" *ngIf="cardIndicatorProperties && periodData?.length > 0">
+    <app-card [properties]="{ 
+      cardTitle: periodData.length > 1 ? 'periods' : 'period',
+      toggleable: false,
+      initialStateToggle: false,
+      collapseble: true,
+      initialStateCollapse: false,
+      isLoading: true }" class="mt-3">
 
-        <div class="p-grid grid-content">
-          <div class="table-wrapper" *ngFor="let data of periodData; let i = index" [@fadeIn]>
-              <!-- Periodo -->
-              <span class="p-float-label">
-                <input [value]="data.period" disabled="true" id="period" type="text" pInputText class="app-input-text">
-                <label for="period" class="indicators-label">{{ "period" | translate }}</label>
-              </span>
-              <!-- Meta Prevista -->
-              <span class="p-float-label">
-                <input [(ngModel)]="data.expectedGoals" id="expected-goal" type="text" pInputText class="app-input-text" (input)="onExpectedGoalChange(data)">
-                <label for="expected-goal" class="indicators-label">{{ "expectedGoal" | translate }}</label>
-              </span>
-              <!-- Medida -->
-              <span class="p-float-label">
-                <input [value]="selectedMeasure || data.measure || '--'" disabled="true" id="measure" type="text" pInputText class="app-input-text">
-                <label for="measure" class="indicators-label">{{ "measure" | translate }}</label>
-              </span>
-              <!-- Meta Realizada -->
-              <span class="p-float-label">
-                <input [(ngModel)]="data.achievedGoals" id="achieved-goal" type="text" pInputText class="app-input-text achieved-goal-input" (input)="onAchievedGoalChange(data)">
-                <label for="achieved-goal" class="indicators-label achieved-goal-label"> {{ "achievedGoal" | translate }}</label>
-              </span>
-              <!-- Atualizacao -->
-              <span class="p-float-label">
-                <input [value]="data.lastUpdate || '--'" disabled="true" id="update" type="text" pInputText class="app-input-text update-input">
-                <label for="update" class="indicators-label update-label">{{ "update" | translate }}</label>
-              </span>
-              <!-- Justificativa da Meta -->
-              <span class="p-float-label">
-                <input [(ngModel)]="data.justification" id="justification" type="text" pInputText class="app-input-text">
-                <label for="justification" class="indicators-label">{{ "goalJustification" | translate }}</label>
-              </span>
+      <div class="grid-container">
+        <div class="table-wrapper" *ngFor="let data of periodData; let i = index" [@fadeIn]>
+          
+          <!-- Período -->
+          <div class="period-header">{{ data.period }}</div>
+
+          <!-- Meta Prevista e Meta Realizada -->
+          <div class="grid-row">
+            <span class="p-float-label half-width">
+              <input [(ngModel)]="data.expectedGoals" id="expected-goal" type="text" pInputText class="app-input-text" (input)="onExpectedGoalChange(data)">
+              <label for="expected-goal" class="indicators-label" >{{ "expectedGoal" | translate }}</label>
+            </span>
+            <span class="p-float-label half-width">
+              <input [(ngModel)]="data.achievedGoals" id="achieved-goal" type="text" pInputText class="app-input-text" (input)="onAchievedGoalChange(data)">
+              <label for="achieved-goal" class="indicators-label achieved-goal-label">{{ "achievedGoal" | translate }}</label>
+            </span>
+          </div>
+
+          <!-- Medida e Última Atualização -->
+          <div class="grid-row">
+            <span class="p-float-label half-width">
+              <input [value]="selectedMeasure || data.measure || '--'" disabled id="measure" type="text" pInputText class="app-input-text">
+              <label for="measure" class="indicators-label">{{ "measure" | translate }}</label>
+            </span>
+            <span class="p-float-label half-width">
+              <input [value]="data.lastUpdate || '--'" disabled id="update" type="text" pInputText class="app-input-text">
+              <label for="update" class="indicators-label update-label">{{ "update" | translate }}</label>
+            </span>
+          </div>
+
+          <!-- Justificativa -->
+          <div class="grid-row">
+            <span class="p-float-label full-width">
+              <textarea [(ngModel)]="data.justification" id="justification" pInputTextarea class="app-text-area" [rows]="2" (input)="onJustificationChange()"></textarea>
+              <label for="justification" class="indicators-label">{{ "goalJustification" | translate }}</label>
+            </span>
           </div>
         </div>
-
       </div>
-
     </app-card>
   </div>
 

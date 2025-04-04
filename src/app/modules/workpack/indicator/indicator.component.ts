@@ -30,15 +30,15 @@ import { ChangeDetectorRef } from "@angular/core";
     styleUrls: ['./indicator.component.scss'],
     animations: [
         trigger('fadeIn', [
-          transition(':enter', [
-            style({ opacity: 0 }),
-            animate('300ms ease-in', style({ opacity: 1 }))
-          ]),
-          transition(':leave', [
-            animate('300ms ease-out', style({ opacity: 0 }))
-          ])
+            transition(':enter', [
+                style({ opacity: 0 }),
+                animate('300ms ease-in', style({ opacity: 1 }))
+            ]),
+            transition(':leave', [
+                animate('300ms ease-out', style({ opacity: 0 }))
+            ])
         ])
-      ],
+    ],
 })
 export class IndicatorComponent implements OnInit, OnDestroy {
 
@@ -63,6 +63,8 @@ export class IndicatorComponent implements OnInit, OnDestroy {
     idOffice: number;
     formIsSaving = false;
     isLoadingResponseItems = false;
+    currentStartDate: Date | null = null;
+    currentEndDate: Date | null = null;
 
     measurementOptions = [
         { label: '(%) Percentual', value: "%" },
@@ -75,9 +77,9 @@ export class IndicatorComponent implements OnInit, OnDestroy {
         { label: 'Anual', value: "ANUAL" },
         { label: 'Semestral', value: "SEMESTRAL" }
     ];
-      
+
     updateDate: string | null = null;
-    
+
     sourceOptions: ISourceIndicators[] = [];
     unitMeasureOptions: IUnitMeasureIndicators[] = [];
     periodList: string[] = [];
@@ -87,8 +89,6 @@ export class IndicatorComponent implements OnInit, OnDestroy {
 
     expectedGoals: number[] = [];
     achievedGoals: number[] = [];
-
-    finalGoal: number = 0;
 
     periodData: any[] = [];
 
@@ -118,8 +118,7 @@ export class IndicatorComponent implements OnInit, OnDestroy {
 
         this.formIndicator = this.formBuilder.group({
             name: ['', Validators.required],
-            description: ["", Validators.required],
-            finalGoal: [""],
+            description: ['', Validators.required],
             source: [null],
             measure: [null],
             startDate: [null, Validators.required],
@@ -155,7 +154,6 @@ export class IndicatorComponent implements OnInit, OnDestroy {
             description: [""],
             source: [null],
             measure: [null],
-            finalGoal: [""],
             periodicity: [null],
             startDate: [null],
             endDate: [null],
@@ -178,14 +176,13 @@ export class IndicatorComponent implements OnInit, OnDestroy {
             initialStateCollapse: false,
             isLoading: true
         };
-    
+
         if (this.idIndicator) {
             const result = await this.indicatorSrv.GetByIdWithIdWorkpack(this.idWorkpack, this.idIndicator);
             if (result.success) {
                 this.indicator = result.data;
                 await this.loadFontOptions(this.idOffice);
                 this.setFormIndicator();
-                this.preparePeriodData();
             }
         } else {
             this.cardIndicatorProperties.isLoading = false;
@@ -194,32 +191,16 @@ export class IndicatorComponent implements OnInit, OnDestroy {
 
     preparePeriodData() {
         if (!this.indicator) return;
-    
-        // Obtém todos os períodos únicos de expectedGoals e achievedGoals
-        const allPeriods = [
-            ...this.indicator.expectedGoals.map(g => g.period),
-            ...this.indicator.achievedGoals.map(g => g.period)
-        ];
-        const uniquePeriods = Array.from(new Set(allPeriods)).sort();
-    
-        // Mapeia os períodos únicos para o periodData
-        this.periodData = uniquePeriods.map(period => {
-            // Encontra o expectedGoal correspondente ao período
-            const expectedGoal = this.indicator.expectedGoals.find(g => g.period === period);
-            // Encontra o achievedGoal correspondente ao período
-            const achievedGoal = this.indicator.achievedGoals.find(g => g.period === period);
-    
-            // Retorna o objeto para o periodData
-            return {
-                period: period,
-                expectedGoals: expectedGoal?.value || 0, // Usa o valor do expectedGoal ou 0 se não existir
-                achievedGoals: achievedGoal?.value || 0, // Usa o valor do achievedGoal ou 0 se não existir
-                measure: this.indicator.measure, // Usa a medida do indicador
-                lastUpdate: expectedGoal?.lastUpdate || achievedGoal?.lastUpdate || '--', // Usa o lastUpdate do expectedGoal ou achievedGoal, ou '--' se não existir
-                justification: expectedGoal?.justification || achievedGoal?.justification || '' // Usa a justificativa do expectedGoal ou achievedGoal, ou '' se não existir
-            };
-        });
+        this.periodData = [...this.indicator.periodGoals].map(goal => ({
+            period: goal.period,
+            expectedGoals: goal.expectedValue,
+            achievedGoals: goal.achievedValue,
+            measure: this.indicator.measure,
+            lastUpdate: goal.lastUpdate || '--',
+            justification: goal.justification
+        }));
     }
+
 
     async loadFontOptions(idOffice: number) {
         return new Promise<void>((resolve) => {
@@ -236,7 +217,7 @@ export class IndicatorComponent implements OnInit, OnDestroy {
     async loadUnitMeasure(idOffice: number) {
         return new Promise<void>((resolve) => {
             this.indicatorSrv.loadUnitMeasureFromOffice(idOffice).subscribe(data => {
-                this.unitMeasureOptions = 
+                this.unitMeasureOptions =
                     data["data"].map(item => ({
                         name: item
                     }))
@@ -273,14 +254,6 @@ export class IndicatorComponent implements OnInit, OnDestroy {
         });
     }
 
-    validateExpectedGoals(): boolean {
-        const totalExpected = this.periodData.reduce((sum, data) => {
-            const expectedGoals = Number(data.expectedGoals) || 0; // Converte para número ou usa 0 como padrão
-            return sum + expectedGoals;
-        }, 0);
-        return totalExpected <= this.finalGoal;
-    }
-
     getYearsBetweenDates(startDate: Date, endDate: Date): number[] {
         const startYear = startDate.getFullYear();
         const endYear = endDate.getFullYear();
@@ -293,16 +266,49 @@ export class IndicatorComponent implements OnInit, OnDestroy {
         return years;
     }
 
+    generatePeriodData(startDate: Date, endDate: Date): void {
+        const years = this.getYearsBetweenDates(startDate, endDate);
+        this.periodList = this.formatPeriod(years, this.selectedPeriodicity || 'ANUAL');
+
+        const existingDataMap: Record<string, {
+            expectedGoals: number | null;
+            achievedGoals: number | null;
+            lastUpdate: string | null;
+        }> = {};
+
+        if (this.periodData) {
+            this.periodData.forEach(item => {
+                existingDataMap[item.period] = {
+                    expectedGoals: item.expectedGoals,
+                    achievedGoals: item.achievedGoals,
+                    lastUpdate: item.lastUpdate
+                };
+            });
+        }
+
+        this.periodData = this.periodList.map(period => {
+            const existingData = existingDataMap[period];
+            return {
+                period: period,
+                expectedGoals: existingData?.expectedGoals ?? null,
+                achievedGoals: existingData?.achievedGoals ?? null,
+                measure: this.selectedMeasure || '--',
+                lastUpdate: existingData?.lastUpdate || '--',
+                justification: null
+            };
+        });
+
+        this.cdr.detectChanges();
+    }
+
     onDateChange(): void {
         const startDate = this.formIndicator.value.startDate;
         const endDate = this.formIndicator.value.endDate;
-    
-        // Verifica se as datas são válidas
+
         if (!startDate || !endDate || isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
             return;
         }
-    
-        // Verifica se a data de início é anterior à data de fim
+
         if (startDate > endDate) {
             this.messageSrv.add({
                 severity: 'warn',
@@ -311,75 +317,71 @@ export class IndicatorComponent implements OnInit, OnDestroy {
             });
             return;
         }
-    
-        // Recalcula o periodData com base nas novas datas
-        const years = this.getYearsBetweenDates(startDate, endDate);
-        this.periodList = this.formatPeriod(years, this.selectedPeriodicity || 'ANUAL'); // Usa 'ANUAL' como padrão
-        this.periodData = this.periodList.map(period => ({
-            period: period,
-            expectedGoals: 0,
-            achievedGoals: 0,
-            measure: this.selectedMeasure || '--',
-            lastUpdate: '--',
-            justification: ''
-        }));
-    
-        // Força a renderização da tabela
-        this.cdr.detectChanges();
+
+        if (!this.formIndicator.value.periodicity) {
+            this.formIndicator.patchValue({
+                periodicity: 'ANUAL'
+            });
+            this.selectedPeriodicity = 'ANUAL';
+        }
+
+        if (
+            startDate.getTime() !== this.currentStartDate?.getTime() ||
+            endDate.getTime() !== this.currentEndDate?.getTime()
+        ) {
+            this.generatePeriodData(startDate, endDate);
+            this.currentStartDate = startDate;
+            this.currentEndDate = endDate;
+        } else {
+            this.preparePeriodData();
+        }
     }
 
     onExpectedGoalChange(data: any): void {
         data.lastUpdate = this.getCurrentDate();
         this.formIndicator.markAsDirty();
-        
-        if (!this.validateExpectedGoals()) {
-            this.messageSrv.add({ 
-                severity: 'warn', 
-                summary: 'Sucesso', 
-                detail: 'A soma das metas previstas ultrapassou a meta finalística.' 
-            });
-            this.saveButton.hideButton()
-        } else {
-            this.saveButton.showButton()
-        }
+        this.saveButton.showButton();
+        this.cancelButton.showButton();
     }
 
     onAchievedGoalChange(data: any) {
         this.formIndicator.markAsDirty();
         data.lastUpdate = this.getCurrentDate();
         this.saveButton.showButton();
+        this.cancelButton.showButton();
     }
 
-    onFinalGoalChange(event: any): void {
-        const value = event.target.value
-        this.finalGoal = +value;
+    onJustificationChange() {
+        this.formIndicator.markAsDirty();
+        this.saveButton.showButton();
+        this.cancelButton.showButton();
     }
 
     setFormIndicator() {
-        // Converte as datas para o tipo Date
         const startDate = this.indicator.startDate ? this.formatDate(this.indicator.startDate) : null;
         const endDate = this.indicator.endDate ? this.formatDate(this.indicator.endDate) : null;
-    
+        this.selectedPeriodicity = this.periodicityOptions.find(item => item.value === this.indicator.periodicity)?.value;
+        this.selectedMeasure = this.indicator.measure;
+
         this.formIndicator.reset({
             name: this.indicator.name,
             description: this.indicator.description,
             source: this.sourceOptions.find(item => item.name == this.indicator.source)?.name,
-            measure: this.indicator.measure,
-            finalGoal: this.indicator.finalGoal,
-            startDate: startDate, // Objeto Date ou null
-            endDate: endDate,     // Objeto Date ou null
-            periodicity: this.periodicityOptions.find(item => item.value === this.indicator.periodicity)?.value,
-            expectedGoals: this.indicator.expectedGoals,
-            achievedGoals: this.indicator.achievedGoals,
+            measure: this.selectedMeasure,
+            startDate: startDate,
+            endDate: endDate,
+            periodicity: this.selectedPeriodicity,
+            periodGoals: this.indicator.periodGoals,
             lastUpdate: this.indicator.lastUpdate
         });
-    
-        // Recalcula o periodData com base nas datas do indicador
+
+        this.currentStartDate = startDate;
+        this.currentEndDate = endDate;
+
         if (startDate && endDate) {
             this.onDateChange();
         }
-    
-        this.finalGoal = this.indicator.finalGoal;
+
         this.cardIndicatorProperties.isLoading = false;
     }
 
@@ -391,7 +393,7 @@ export class IndicatorComponent implements OnInit, OnDestroy {
         this.breadcrumbSrv.setMenu([
             ...breadcrumbItems,
             {
-                key: 'indicators',
+                key: 'indicator',
                 routerLink: ['/workpack/indicators'],
                 queryParams: { idWorkpack: this.idWorkpack, idIndicator: this.idIndicator },
                 info: this.indicator?.name,
@@ -413,57 +415,109 @@ export class IndicatorComponent implements OnInit, OnDestroy {
     async onPeriodicityChange(event: any) {
         this.cancelButton.showButton();
         this.selectedPeriodicity = event.value;
-    
         const startDate = this.formIndicator.value.startDate;
         const endDate = this.formIndicator.value.endDate;
-    
+
         if (startDate && endDate) {
             const years = this.getYearsBetweenDates(startDate, endDate);
             this.periodList = this.formatPeriod(years, this.selectedPeriodicity);
-            this.periodData = this.periodList.map(period => ({
-                period: period,
-                expectedGoals: 0,
-                achievedGoals: 0,
-                measure: this.selectedMeasure || '--',
-                lastUpdate: '--'
-            }));
+
+            const existingGoalsMap: {
+                [period: string]: {
+                    expected: number | null;  // Permite null
+                    achieved: number | null;  // Permite null
+                    lastUpdate: string | null;
+                };
+            } = {};
+
+            if (this.indicator?.periodGoals) {
+                if (this.selectedPeriodicity === 'ANUAL') {
+                    this.indicator.periodGoals.forEach(goal => {
+                        const year = goal.period.split('/')[0];
+                        if (!existingGoalsMap[year]) {
+                            existingGoalsMap[year] = {
+                                expected: null,
+                                achieved: null,
+                                lastUpdate: null
+                            };
+                        }
+                        if (goal.expectedValue !== null) {
+                            existingGoalsMap[year].expected =
+                                existingGoalsMap[year].expected !== null
+                                    ? existingGoalsMap[year].expected! + goal.expectedValue
+                                    : goal.expectedValue;
+                        }
+                        if (goal.achievedValue !== null) {
+                            existingGoalsMap[year].achieved =
+                                existingGoalsMap[year].achieved !== null
+                                    ? existingGoalsMap[year].achieved! + goal.achievedValue
+                                    : goal.achievedValue;
+                        }
+
+                        if (goal.lastUpdate && goal.lastUpdate !== '--') {
+                            if (!existingGoalsMap[year].lastUpdate ||
+                                new Date(goal.lastUpdate) > new Date(existingGoalsMap[year].lastUpdate!)) {
+                                existingGoalsMap[year].lastUpdate = goal.lastUpdate;
+                            }
+                        }
+                    });
+                } else {
+                    this.indicator.periodGoals.forEach(goal => {
+                        existingGoalsMap[goal.period] = {
+                            expected: goal.expectedValue,
+                            achieved: goal.achievedValue,
+                            lastUpdate: goal.lastUpdate || null
+                        };
+                    });
+                }
+            }
+
+            this.periodData = this.periodList.map(period => {
+                const existingGoal = existingGoalsMap[period];
+                return {
+                    period: period,
+                    expectedGoals: existingGoal ? existingGoal.expected : null,
+                    achievedGoals: existingGoal ? existingGoal.achieved : null,
+                    measure: this.selectedMeasure || '--',
+                    lastUpdate: existingGoal?.lastUpdate || '--',
+                    justification: this.selectedPeriodicity === 'ANUAL' ? null :
+                        (existingGoal ? this.indicator.periodGoals?.find(g => g.period === period)?.justification || null : null)
+                };
+            });
+
+            this.cdr.detectChanges();
         }
     }
 
     async saveIndicator() {
-        if (!this.validateExpectedGoals()) {
-            this.messageSrv.add({ severity: 'warn', summary: 'Atenção', detail: 'A soma das metas previstas ultrapassou a meta finalística.'});
-            return;
-        }
-    
+
         this.cancelButton.hideButton();
         this.formIsSaving = true;
 
-        const parseDecimal = (value: string | number): number => {
+        const parseDecimal = (value: string | number | null | undefined): number | null => {
+            if (value === null || value === undefined) return null;
+
             if (typeof value === 'number') return value;
+
             if (typeof value === 'string') {
-                const parsedValue = parseFloat(value.replace(',', '.'));
-                return isNaN(parsedValue) ? 0 : parsedValue;
+                const trimmedValue = value.trim();
+                if (trimmedValue === '') return null;
+                const parsedValue = parseFloat(trimmedValue.replace(',', '.'));
+                return isNaN(parsedValue) ? null : parsedValue;
             }
-            return 0;
-        }
-    
-        const expectedGoals = this.periodData.map(data => ({
+
+            return null;
+        };
+        const periodGoals = this.periodData.map(data => ({
             period: String(data.period),
-            value: parseDecimal(data.expectedGoals) || 0,
+            expectedValue: parseDecimal(data.expectedGoals),
+            achievedValue: parseDecimal(data.achievedGoals),
             lastUpdate: data.lastUpdate,
-            justification: data.justification
+            justification: data.justification || null
         }));
-    
-        const achievedGoals = this.periodData.map(data => ({
-            period: String(data.period),
-            value: parseDecimal(data.achievedGoals) || 0,
-            lastUpdate: data.lastUpdate,
-            justification: data.justification
-        }));
-    
+
         this.updateDate = this.getCurrentDate();
-    
+
         const sender: IIndicator = {
             id: this.idIndicator,
             idWorkpack: this.idWorkpack,
@@ -471,19 +525,17 @@ export class IndicatorComponent implements OnInit, OnDestroy {
             description: this.formIndicator.controls.description.value,
             source: this.formIndicator.controls.source.value,
             measure: this.formIndicator.controls.measure.value,
-            finalGoal: this.formIndicator.controls.finalGoal.value,
             periodicity: this.formIndicator.controls.periodicity.value,
             startDate: this.formIndicator.controls.startDate.value,
             endDate: this.formIndicator.controls.endDate.value,
-            expectedGoals: expectedGoals,
-            achievedGoals: achievedGoals,
+            periodGoals: periodGoals,
             lastUpdate: this.updateDate
         };
-    
+
         const put = !!this.idIndicator;
         const result = put ? await this.indicatorSrv.put(sender) : await this.indicatorSrv.post(sender);
         this.formIsSaving = false;
-    
+
         if (result.success) {
             this.messageSrv.add({ severity: 'success', summary: 'Sucesso', detail: put ? 'Indicador atualizado com sucesso' : 'Indicador criado com sucesso' });
             this.router.navigate(['/workpack'], {
@@ -506,7 +558,6 @@ export class IndicatorComponent implements OnInit, OnDestroy {
                 description: "",
                 source: null,
                 measure: null,
-                finalGoal: "",
                 periodicity: null
             })
         }
@@ -530,29 +581,26 @@ export class IndicatorComponent implements OnInit, OnDestroy {
         const rangeYearStart = 2015
         const rangeYearEnd = date.add(30, 'years').year();
         this.yearRangeCalculated = `${rangeYearStart}:${rangeYearEnd};`
-      }
+    }
 
     formatDate(date: string | Date): Date | null {
         if (!date) return null;
 
-        // Se já for um objeto Date, retorna diretamente
         if (date instanceof Date) {
             return date;
         }
 
-        // Se for uma string no formato ISO 8601 (2022-02-28T03:00:00.000Z)
         if (typeof date === 'string' && date.includes('T')) {
-            return new Date(date); // Converte a string ISO 8601 para Date
+            return new Date(date);
         }
 
-        // Se for uma string no formato "dd/mm/yyyy"
         if (typeof date === 'string') {
             const [day, month, year] = date.split('/');
             if (day && month && year) {
-                return new Date(+year, +month - 1, +day); // Mês é base 0 no JavaScript
+                return new Date(+year, +month - 1, +day);
             }
         }
 
-        return null; // Retorna null se a data for inválida
+        return null;
     }
 }

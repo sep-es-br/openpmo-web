@@ -2,3 +2,11 @@
   position: relative;
   min-height: 150px;
 }
+
+::ng-deep .app-card-item .p-card .card-item-content .icons-container{
+  font-size: 1.5rem;
+}
+
+::ng-deep .baseline-card-item .p-card .card-item-content .icons-container{
+  font-size: 1.8rem;
+}
