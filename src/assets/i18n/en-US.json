@@ -255,6 +255,8 @@
   "response": "Response",
   "newRisk": "New risk",
   "newIndicator": "New indicator",
+  "indicators": "Indicators",
+  "indicator": "Indicator",
   "importance": "Importance",
   "description": "Description",
   "finalGoal": "Final goal",
@@ -1052,5 +1054,6 @@
   "budgeted": "Budgeted",
   "authorized": "Authorized",
   "indicator.name": "Name of the indicator. Mandatory information.",
-  "indicator.description": "Description of the indicator. Mandatory information."
+  "indicator.description": "Description of the indicator. Mandatory information.",
+  "periodData": "Period Data"
 }

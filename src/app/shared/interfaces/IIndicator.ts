@@ -5,11 +5,9 @@ export interface IIndicator {
     description?: string;
     source?: string;
     measure?: string;
-    finalGoal?: number;
     periodicity?: string;
     startDate?: Date;
     endDate?: Date;
-    expectedGoals?: Array<{lastUpdate: any; period: string; value: number; justification: string}>;
-    achievedGoals?: Array<{lastUpdate: any; period: string; value: number; justification: string}>;
+    periodGoals?: Array<{lastUpdate: any; period: string; expectedValue: number; achievedValue: number; justification: string}>;
     lastUpdate: string;
 }

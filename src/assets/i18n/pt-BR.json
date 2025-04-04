@@ -188,6 +188,7 @@
   "account": "Centro de Custo",
   "costAccounts": "Centros de Custo",
   "indicators": "Indicadores",
+  "indicator": "Indicador",
   "costAssignment": "Centros de Custos Vinculados",
   "actual": "Realizado",
   "abbreviatedActual": "Real.",
@@ -1054,5 +1055,6 @@
   "budgeted": "Orçado",
   "authorized": "Autorizado",
   "indicator.name": "Nome do indicador. Informação obrigatória.",
-  "indicator.description": "Descrição do indicador. Informação obrigatória."
+  "indicator.description": "Descrição do indicador. Informação obrigatória.",
+  "periodData": "Dados do período"
 }
