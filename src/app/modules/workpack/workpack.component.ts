@@ -693,13 +693,13 @@ export class WorkpackComponent implements OnDestroy {
               });
             }
           }
-          if (this.workpackSrv.getEditPermission() && !workpack.canceled && !workpack.linked) {
-            menuItems.push({
-              label: this.translateSrv.instant('cut'),
-              icon: 'fas fa-cut',
-              command: (event) => this.handleCutWorkpack(workpack),
-            });
-          }
+          // if (this.workpackSrv.getEditPermission() && !workpack.canceled && !workpack.linked) {
+          //   menuItems.push({
+          //     label: this.translateSrv.instant('cut'),
+          //     icon: 'fas fa-cut',
+          //     command: (event) => this.handleCutWorkpack(workpack),
+          //   });
+          // }
           if (!workpack.canceled && workpack.idWorkpackModel === idWorkpackModel
             && this.workpackSrv.getEditPermission() && !idWorkpackModelLinked && !workpack.linked) {
             menuItems.push({
