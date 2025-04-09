@@ -665,11 +665,11 @@ export class WorkpackComponent implements OnDestroy {
             });
           }
           if (workpack.cancelable && this.workpackSrv.getEditPermission() && !workpack.linked) {
-            menuItems.push({
-              label: this.translateSrv.instant('cancel'),
-              icon: 'fas fa-times',
-              command: (event) => this.handleCancelWorkpack(workpack.id),
-            });
+            // menuItems.push({
+            //   label: this.translateSrv.instant('cancel'),
+            //   icon: 'fas fa-times',
+            //   command: (event) => this.handleCancelWorkpack(workpack.id),
+            // });
           }
           if (workpack.type === 'Project' && this.workpackSrv.getEditPermission()) {
             menuItems.push({
