@@ -94,8 +94,7 @@
       </div>
     </div>
     <div class="costValues">
-      <div class="costInputs p-fluid" [class.card-link]="properties.editPermission && !properties.editCosts && properties.multipleCosts"
-        (click)="properties.multipleCosts && handleEditCosts($event)">
+      <div class="costInputs p-fluid" [class.card-link]="properties.editPermission && !properties.editCosts && properties.multipleCosts">
         <span class="column-title"> $ </span>
         
         <span *ngIf="isCurrentBaseline" class="p-float-label p-field">

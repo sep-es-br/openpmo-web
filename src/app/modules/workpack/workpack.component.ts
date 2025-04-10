@@ -1613,9 +1613,12 @@ export class WorkpackComponent implements OnDestroy {
   }
 
   showWorkpackId() {
-    const show = this.idWorkpack  && !this.workpackLoading && this.workpackModel &&
-    (!this.showTabview || (!!this.showTabview && (!this.selectedTab || this.selectedTab.key !== 'schedule')));
-    return show;
+    setTimeout(() => {
+      const show = this.idWorkpack  && !this.workpackLoading && this.workpackModel &&
+      (!this.showTabview || (!!this.showTabview && (!this.selectedTab || this.selectedTab.key !== 'schedule')));
+      return show;
+    });
+
   }
 
 }

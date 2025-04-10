@@ -58,7 +58,6 @@
     }
   }
   .card-link {
-    cursor: pointer !important;
     .p-disabled, .p-component:disabled {
       opacity: 1 !important;
     }
@@ -67,6 +66,13 @@
     }
     .replicate-button-container {
       cursor: pointer;
+    }
+    #float-costBaseline{
+      opacity: 0.6 !important;
+
+      .p-inputnumber-input {
+        cursor: default !important;
+      }
     }
   }
   .p-card-body {
