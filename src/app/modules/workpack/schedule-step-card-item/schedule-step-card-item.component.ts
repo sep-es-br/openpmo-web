@@ -65,7 +65,7 @@ export class ScheduleStepCardItemComponent implements OnInit, OnDestroy {
       `${this.properties.idStep < 10 ? '0' + this.properties.idStep : this.properties.idStep}` : '';
     this.setLanguage();
     this.handlePassedMonths();
-    this.updateActualValues();
+    // this.updateActualValues();
     this.handleCurrentBaseline();
     if (this.properties.stepName)  {
       let dateStep = moment(this.properties.stepName);
@@ -195,7 +195,7 @@ export class ScheduleStepCardItemComponent implements OnInit, OnDestroy {
 
   handlePassedMonths() {
     if (!this.properties.stepName) return;
-    
+
     const stepDate = this.formatToYearMonth(this.properties.stepName);
     const currentDate = this.formatToYearMonth(new Date());
 
@@ -206,15 +206,15 @@ export class ScheduleStepCardItemComponent implements OnInit, OnDestroy {
 
     const stepDate = this.formatToYearMonth(this.properties.stepName);
     const currentDate = this.formatToYearMonth(new Date());
-    
+
     this.isActualValuesDisabled = stepDate > currentDate;
   }
 
-  private formatToYearMonth(date: Date): number {
+  formatToYearMonth(date: Date): number {
     return (date.getFullYear() * 100) + (date.getMonth() + 1);
   }
 
-  private getWorkpackId(): Observable<number | null> {
+  getWorkpackId(): Observable<number | null> {
     return this.route.queryParams.pipe(
       map(params => params['id'] || null)
     );
