@@ -1,4 +1,5 @@
-<p-card *ngIf="type === 'listStep' && properties.type === 'listStep'" class="app-step-card-item">
+<p-card *ngIf="type === 'listStep' && properties.type === 'listStep'" class="app-step-card-item"
+  [ngStyle]="!properties.idStep ? {'display': 'flex', 'height': 'auto'} : {}" [ngClass]="{'no-bg': !properties.idStep}">
   <p-header *ngIf="properties.menuItems" class="card-item-header">
     <div class="header-title">
       <span class="title-month">
@@ -9,8 +10,14 @@
         {{properties.stepDay ? (properties.stepDay|date:'d') : ''}}
       </span>
     </div>
-    <p-menu #menu [popup]="true" [model]="properties.menuItems"></p-menu>
-    <button type="button" pButton icon="pi pi-ellipsis-v" (click)="menu.toggle($event)"></button>
+      <p-menu #menu [popup]="true" [model]="properties.menuItems"></p-menu>
+      <button 
+        type="button" 
+        pButton 
+        icon="pi pi-ellipsis-v" 
+        (click)="menu.toggle($event)"
+        [ngStyle]="{ 'visibility': properties.menuItems && properties.menuItems.length > 0 ? 'visible' : 'hidden'  }"
+      ></button>
   </p-header>
   <div class="card-item-content">
     <div class="unitValues">
@@ -28,7 +35,7 @@
         </span>
 
         <!-- Baseline superior esquerdo -->
-        <div class="progress-bar-unit-container">
+        <div class="progress-bar-unit-container" *ngIf="properties.idStep">
           <app-progress-bar-card-step 
             [total]="properties.unitBaseline" 
             [progress]="properties.unitBaseline"
@@ -40,7 +47,7 @@
         </div>
 
         <!-- VALOR ESTIMADO/REPROGRAMADO -->
-        <span class="p-float-label p-field">
+        <span class="p-float-label p-field" *ngIf="properties.idStep">
           <p-inputNumber [class]="'app-input-number '+'unitPlanned '+'unitPlanned-'+ properties.idStep" id="float-unitPlanned"
             [disabled]="!properties.editPermission" [(ngModel)]="properties.unitPlanned"
             [class.red]="properties.unitPlanned < 0"
@@ -52,7 +59,7 @@
         </span>
         
         <!-- Reprogramado meio esquerdo -->
-        <div class="progress-bar-unit-container">
+        <div class="progress-bar-unit-container" *ngIf="properties.idStep">
           <app-progress-bar-card-step 
             [total]="properties.unitPlanned" 
             [progress]="properties.unitPlanned"
@@ -63,13 +70,13 @@
           </app-progress-bar-card-step>
         </div>
         
-        <div [ngStyle]="{ 'visibility': !isPassedMonth || !isCurrentBaseline ? 'visible' : 'hidden'  }" class="replicate-button-container">
+        <div [ngStyle]="{ 'visibility': !isPassedMonth || !isCurrentBaseline ? 'visible' : 'hidden'  }" class="replicate-button-container" *ngIf="properties.idStep">
           <i class="fas fa-caret-up" [class.disabled]="!properties.editPermission || !showReplicateButton" [class.replicate-hide]="!showReplicateButton"
             (click)="properties.editPermission && showReplicateButton && confirmReplicateValueDif('unitActual')"></i>
         </div>
         
         <!-- VALOR REALIZADO -->
-        <span class="p-float-label p-field">
+        <span class="p-float-label p-field" *ngIf="properties.idStep">
           <p-inputNumber class="app-input-number" id="float-unitActual" (onInput)="handleStepChange($event, 'unitActual')"
             [disabled]="!properties.editPermission || isActualValuesDisabled" [(ngModel)]="properties.unitActual"
             [class.red]="properties.unitActual < 0"
@@ -81,7 +88,7 @@
         </span>
         
         <!-- Real inferior esquerdo -->
-        <div class="progress-bar-unit-container">
+        <div class="progress-bar-unit-container" *ngIf="properties.idStep">
           <app-progress-bar-card-step 
             [total]="properties.unitActual" 
             [progress]="properties.unitActual"
@@ -108,7 +115,7 @@
         </span>
 
         <!-- Baseline superior direito -->
-        <div class="progress-bar-unit-container">
+        <div class="progress-bar-unit-container" *ngIf="properties.idStep">
           <app-progress-bar-card-step 
             [total]="properties.baselinePlannedCost" 
             [progress]="properties.baselinePlannedCost"
@@ -119,7 +126,7 @@
           </app-progress-bar-card-step>
         </div>
         
-        <span class="p-float-label p-field">
+        <span class="p-float-label p-field" *ngIf="properties.idStep">
           <p-inputNumber [class]="'app-input-number '+'costPlanned-'+properties.idStep" id="float-costPlanned"
             (click)="properties.multipleCosts && handleEditCosts($event); properties.multipleCosts && disable()"
             (onFocus)="properties.multipleCosts && handleEditCosts($event); properties.multipleCosts && disable()"
@@ -133,7 +140,7 @@
         </span>
 
         <!-- Reprogramado meio direito -->
-        <div class="progress-bar-unit-container">
+        <div class="progress-bar-unit-container" *ngIf="properties.idStep">
           <app-progress-bar-card-step 
             [total]="properties.costPlanned" 
             [progress]="properties.costPlanned"
@@ -144,12 +151,12 @@
           </app-progress-bar-card-step>
         </div>
         
-        <div [ngStyle]="{ 'visibility': !isPassedMonth || !isCurrentBaseline ? 'visible' : 'hidden'  }" class="replicate-button-container">
+        <div [ngStyle]="{ 'visibility': !isPassedMonth || !isCurrentBaseline ? 'visible' : 'hidden'  }" class="replicate-button-container" *ngIf="properties.idStep">
           <i class="fas fa-caret-up" [class.disabled]="!properties.editCosts || !properties.editPermission || !showReplicateButton"
             [class.replicate-hide]="!showReplicateButton"
             (click)="(properties.editCosts && properties.editPermission && showReplicateButton) && confirmReplicateValueDif('costActual')"></i>
         </div>
-        <span class="p-float-label p-field">
+        <span class="p-float-label p-field" *ngIf="properties.idStep">
           <p-inputNumber class="app-input-number" id="float-costActual"
             (click)="properties.multipleCosts && handleEditCosts($event); properties.multipleCosts && disable()"
             (onFocus)="properties.multipleCosts && handleEditCosts($event); properties.multipleCosts && disable()"
@@ -163,7 +170,7 @@
         </span>
         
         <!-- Realizado inferior direito -->
-        <div class="progress-bar-unit-container">
+        <div class="progress-bar-unit-container" *ngIf="properties.idStep">
           <app-progress-bar-card-step 
             [total]="properties.costActual" 
             [progress]="properties.costActual"

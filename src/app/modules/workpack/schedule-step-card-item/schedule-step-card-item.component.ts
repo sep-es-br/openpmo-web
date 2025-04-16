@@ -23,6 +23,9 @@ export class ScheduleStepCardItemComponent implements OnInit, OnDestroy {
   @Output() editCost = new EventEmitter();
   @Output() spreadDifference = new EventEmitter();
   @Output() onCreateNewStep = new EventEmitter();
+  @Input() isCurrentBaseline: boolean;
+  @Input() foreseenLabel: string;
+  @Input() tooltipLabel: string;
 
   cardIdItem: string;
   iconEnum = IconsEnum;
@@ -32,10 +35,7 @@ export class ScheduleStepCardItemComponent implements OnInit, OnDestroy {
   item;
   difference;
   multiCostsEdited = false;
-  foreseenLabel: string;
-  tooltipLabel: string;
   isActualValuesDisabled: boolean = false;
-  isCurrentBaseline: boolean = false;
   isPassedMonth: boolean = false;
   maxValueCosts: number;
   maxValueUnit: number;
@@ -51,13 +51,11 @@ export class ScheduleStepCardItemComponent implements OnInit, OnDestroy {
     this.translateSrv.onLangChange.pipe(takeUntil(this.$destroy)).subscribe(() =>
       {
         setTimeout(() => this.setLanguage(), 200);
-       this.ngOnInit();
       }
     );
    }
 
   ngOnInit(): void {
-    
     this.maxValueCosts = this.getMaxValueCosts();
     this.maxValueUnit = this.getMaxValueUnit();
 
@@ -66,7 +64,6 @@ export class ScheduleStepCardItemComponent implements OnInit, OnDestroy {
     this.setLanguage();
     this.handlePassedMonths();
     // this.updateActualValues();
-    this.handleCurrentBaseline();
     if (this.properties.stepName)  {
       let dateStep = moment(this.properties.stepName);
       const monthStep = dateStep.month();
@@ -80,20 +77,6 @@ export class ScheduleStepCardItemComponent implements OnInit, OnDestroy {
       }
     }
 
-    this.route.queryParams.subscribe(params => {
-      const idWorkpack = params['id'];
-      if (idWorkpack) {
-        this.labelSrv.getLabels(idWorkpack).subscribe(
-          response => {
-            this.tooltipLabel = response.data[0].body.data;
-            this.foreseenLabel = response.data[1].body.data;
-          },
-          error => {
-            console.error(error);
-          }
-        );
-      }
-    });
   }
 
   ngOnDestroy(): void {
@@ -220,18 +203,6 @@ export class ScheduleStepCardItemComponent implements OnInit, OnDestroy {
     );
   }
 
-  handleCurrentBaseline() {
-    this.getWorkpackId().pipe(
-      switchMap(workpackId => {
-        if (!workpackId) return EMPTY;
-        return this.scheduleCardItemSrv.getCurrentBaseline(workpackId);
-      })
-    ).subscribe(response => {
-      this.isCurrentBaseline = response.data;
-      this.scheduleCardItemSrv.isCurrentBaseline$.next(this.isCurrentBaseline);
-    });
-  }
-  
   updateMaxValueCosts() {
     this.maxValueCosts = this.getMaxValueCosts();
     this.cdr.detectChanges();

@@ -13,7 +13,7 @@
       </button>
       <button type="button" class="p-button-text button-delete" (click)="handleDeleteSchedule()" pButton
         [disabled]="!editPermission" icon="fas fa-trash-alt" iconPos="left"
-        [label]="translateSrv.instant('deleteSchedule')">
+        [label]="translateSrv.instant('deleteSchedule')" *ngIf="!this.schedule.baselineStart">
       </button>
     </div>
     <div class="loading-container" *ngIf="sectionSchedule.cardSection.isLoading">
@@ -62,7 +62,8 @@
             <ng-template let-step pTemplate="gridItem">
               <div class="card-item-container show-details" *ngIf="['newStart', 'newEnd'].includes(step.type)"
                 [class.new-card-item]="['newStart', 'newEnd'].includes(step.type)" [class.mobile]="responsive">
-                <app-schedule-step-card-item [properties]="step" [type]="'listStep'" (onCreateNewStep)="handleCreateNewStep({
+                <app-schedule-step-card-item [properties]="step" [type]="'listStep'" [isCurrentBaseline]="isCurrentBaseline" [tooltipLabel]="tooltipLabel" [foreseenLabel]="abbreviatedLabel"  
+                (onCreateNewStep)="handleCreateNewStep({
                   idSchedule: schedule.id,
                   idWorkpackModelLinked: workpackParams.idWorkpackModelLinked,
                   stepType: step.type,
@@ -73,7 +74,7 @@
               </div>
               <div class="card-item-container show-details" *ngIf="step.type === 'listStep'"
                 [class.new-card-item]="['newStart', 'newEnd'].includes(step.type)" [class.mobile]="responsive">
-                <app-schedule-step-card-item [properties]="step" [type]="'listStep'"
+                <app-schedule-step-card-item [properties]="step" [type]="'listStep'" [isCurrentBaseline]="isCurrentBaseline" [tooltipLabel]="tooltipLabel" [foreseenLabel]="abbreviatedLabel"
                   (editCost)="handleShowEditCost($event, groupStep.year)"
                   (spreadDifference)="requestTypeDistributionInformation($event, false)"
                   (stepChanged)="saveStepChanged(groupStep.year, step.idStep)"></app-schedule-step-card-item>
@@ -105,7 +106,7 @@
                 <div class="card-item-container show-resumed clickable" *ngIf="step.type === 'listStep'"
                   [class.mobile]="responsive"
                   (click)="editScheduleStep(step.idStep, unitMeansure.name, unitMeansure.precision,'step')">
-                  <app-schedule-step-card-item [properties]="step" [type]="'listStepResumed'">
+                  <app-schedule-step-card-item [properties]="step" [type]="'listStepResumed'" [isCurrentBaseline]="isCurrentBaseline" [tooltipLabel]="tooltipLabel" [foreseenLabel]="abbreviatedLabel">
                   </app-schedule-step-card-item>
                 </div>
                 <div class="card-item-container show-resumed clickable" *ngIf="['newStart', 'newEnd'].includes(step.type)"
@@ -117,7 +118,7 @@
                           unitName: step.unitName,
                           unitPrecision: step.unitPrecision
                         }">
-                  <app-schedule-step-card-item [properties]="step" [type]="'listStepResumed'">
+                  <app-schedule-step-card-item [properties]="step" [type]="'listStepResumed'" [isCurrentBaseline]="isCurrentBaseline" [tooltipLabel]="tooltipLabel" [foreseenLabel]="abbreviatedLabel">
                   </app-schedule-step-card-item>
                 </div>
               </ng-template>
