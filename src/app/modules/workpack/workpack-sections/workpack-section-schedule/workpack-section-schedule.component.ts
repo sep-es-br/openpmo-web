@@ -288,15 +288,6 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
             (isLastGroup && isLastInCurrentGroup) ||
             (nextGroupsHaveOnlyNulls && isLastInCurrentGroup);
 
-            console.log({
-              groupIndex,
-              isLastGroup,
-              isLastInCurrentGroup,
-              nextGroupsHaveOnlyNulls,
-              stepId: step.id,
-              isEnd
-          });
-
           let stepOrder: 'start' | 'end' | 'step';
 
           if (isStart) {
