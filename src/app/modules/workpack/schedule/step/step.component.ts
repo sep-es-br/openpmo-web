@@ -233,7 +233,7 @@ export class StepComponent implements OnInit, OnDestroy {
         this.start = new Date(this.schedule.start + 'T00:00:00');
         if (this.stepDetail) {
           this.formStep.reset({
-            start: this.start,
+            start: new Date(this.start),
             end: null,
             plannedWork: this.stepDetail.plannedWork,
             actualWork: this.stepDetail.actualWork,
@@ -253,7 +253,7 @@ export class StepComponent implements OnInit, OnDestroy {
         if (this.stepDetail) {
           this.formStep.reset({
             start: null,
-            end: this.end,
+            end: new Date(this.end),
             plannedWork: this.stepDetail.plannedWork,
             actualWork: this.stepDetail.actualWork,
           });
