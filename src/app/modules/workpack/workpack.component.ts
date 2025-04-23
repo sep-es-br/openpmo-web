@@ -665,11 +665,11 @@ export class WorkpackComponent implements OnDestroy {
             });
           }
           if (workpack.cancelable && this.workpackSrv.getEditPermission() && !workpack.linked) {
-            menuItems.push({
-              label: this.translateSrv.instant('cancel'),
-              icon: 'fas fa-times',
-              command: (event) => this.handleCancelWorkpack(workpack.id),
-            });
+            // menuItems.push({
+            //   label: this.translateSrv.instant('cancel'),
+            //   icon: 'fas fa-times',
+            //   command: (event) => this.handleCancelWorkpack(workpack.id),
+            // });
           }
           if (workpack.type === 'Project' && this.workpackSrv.getEditPermission()) {
             menuItems.push({
@@ -693,13 +693,13 @@ export class WorkpackComponent implements OnDestroy {
               });
             }
           }
-          if (this.workpackSrv.getEditPermission() && !workpack.canceled && !workpack.linked) {
-            menuItems.push({
-              label: this.translateSrv.instant('cut'),
-              icon: 'fas fa-cut',
-              command: (event) => this.handleCutWorkpack(workpack),
-            });
-          }
+          // if (this.workpackSrv.getEditPermission() && !workpack.canceled && !workpack.linked) {
+          //   menuItems.push({
+          //     label: this.translateSrv.instant('cut'),
+          //     icon: 'fas fa-cut',
+          //     command: (event) => this.handleCutWorkpack(workpack),
+          //   });
+          // }
           if (!workpack.canceled && workpack.idWorkpackModel === idWorkpackModel
             && this.workpackSrv.getEditPermission() && !idWorkpackModelLinked && !workpack.linked) {
             menuItems.push({
@@ -1613,9 +1613,12 @@ export class WorkpackComponent implements OnDestroy {
   }
 
   showWorkpackId() {
-    const show = this.idWorkpack  && !this.workpackLoading && this.workpackModel &&
-    (!this.showTabview || (!!this.showTabview && (!this.selectedTab || this.selectedTab.key !== 'schedule')));
-    return show;
+    setTimeout(() => {
+      const show = this.idWorkpack  && !this.workpackLoading && this.workpackModel &&
+      (!this.showTabview || (!!this.showTabview && (!this.selectedTab || this.selectedTab.key !== 'schedule')));
+      return show;
+    });
+
   }
 
 }
