@@ -269,12 +269,12 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
       const groupStep = this.schedule.groupStep && this.schedule.groupStep.map((group, groupIndex, groupArray) => {
         const allGroups = groupArray || [];
 
-        const firstGroupWithOnlyNulls = groupIndex === 0 && group.steps?.every(s => !s.id);
-
         const isFirstGroup = groupIndex === 0;
         const isLastGroup = groupIndex === allGroups.length - 1;
 
-        const nextGroupsHaveOnlyNulls = isFirstGroup && allGroups.slice(1).every(g => g.steps?.every(s => !s.id));
+        const nextGroupsHaveOnlyNulls = allGroups
+          .slice(groupIndex + 1)
+          .every(g => !g.steps || g.steps.every(s => !s.id));
         const prevGroupsHaveOnlyNulls = !isFirstGroup && allGroups.slice(0, groupIndex).every(g => g.steps?.every(s => !s.id));
 
         const cardItemSection = group.steps && group.steps.map((step, stepIndex, stepArray) => {
