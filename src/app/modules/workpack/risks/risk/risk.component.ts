@@ -83,8 +83,8 @@ export class RiskComponent implements OnInit, OnDestroy {
     }
     );
     this.formRisk = this.formBuilder.group({
-      name: ['', Validators.required],
-      description: ['', Validators.required],
+      name: ['', [Validators.required, Validators.maxLength(50)]],
+      description: ['', [Validators.required, Validators.maxLength(600)]],
       importance: [null, Validators.required],
       nature: [this.riskPropertiesOptions.nature.THREAT.value, Validators.required],
       status: [this.riskPropertiesOptions.status.OPEN.value, Validators.required],

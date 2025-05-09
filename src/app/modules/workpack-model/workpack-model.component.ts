@@ -239,8 +239,8 @@ export class WorkpackModelComponent implements OnInit {
       }
     }
     this.formProperties = this.fb.group({
-      name: ['', Validators.required],
-      nameInPlural: ['', Validators.required],
+      name: ['', [Validators.required, Validators.maxLength(50)]],
+      nameInPlural: ['', [Validators.required, Validators.maxLength(600)]],
       icon: this.workpackModelType ? [IconsTypeWorkpackModelEnum[this.workpackModelType], Validators.required] :
         [undefined, Validators.required],
       position: [this.nextPosition || 1, Validators.required],
@@ -911,6 +911,14 @@ export class WorkpackModelComponent implements OnInit {
       return;
     }
     const properties: IWorkpackModelProperty[] = [...this.modelProperties];
+    const hasInvalidMax = properties.some(p =>
+      [TypePropertyEnum.IntegerModel, TypePropertyEnum.TextModel, TypePropertyEnum.TextAreaModel].includes(p.type) && 
+      (p.max === null || p.max === undefined || p.max <= 0)
+    );
+    if (hasInvalidMax) {
+      this.saveButton?.hideButton();
+      return;
+    }
     // Value check
     const propertiesChecks: { valid: boolean; invalidKeys: string[]; prop: IWorkpackModelProperty }[] = properties.map(p => ({
       valid: p.requiredFields

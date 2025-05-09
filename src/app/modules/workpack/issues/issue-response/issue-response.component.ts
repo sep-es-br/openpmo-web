@@ -81,7 +81,7 @@ export class IssueResponseComponent implements OnInit {
     }
     );
     this.formIssueResponse = this.formBuilder.group({
-      name: ['', Validators.required],
+      name: ['', [Validators.required, Validators.maxLength(50)]],
       date: null,
       status: ['', Validators.required],
       plan: ['', Validators.required],
