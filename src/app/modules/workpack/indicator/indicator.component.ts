@@ -117,7 +117,7 @@ export class IndicatorComponent implements OnInit, OnDestroy {
         this.responseService.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.responsive = value);
 
         this.formIndicator = this.formBuilder.group({
-            name: ['', [Validators.required, Validators.maxLength(60)]],
+            name: ['', [Validators.required, Validators.maxLength(50)]],
             description: ['', [Validators.required, Validators.maxLength(600)]],
             source: [null],
             measure: [null],

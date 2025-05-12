@@ -122,6 +122,12 @@ export class WorkpackSectionPropertiesComponent implements OnInit, OnDestroy {
       this.sectionPropertiesProperties.filter( prop => prop.type === TypePropertyModelEnum.GroupModel).length > 0;
     }
     if (!loading) {this.showCheckCompleted();}
+
+    this.sectionPropertiesProperties.forEach(prop => {
+      if (prop.type !== TypePropertyModelEnum.GroupModel) {
+        this.checkPropertiesStringValid(prop);
+      }
+    });
   }
 
   showCheckCompleted() {
