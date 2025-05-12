@@ -462,11 +462,11 @@ export class ReportModelComponent implements OnInit, OnDestroy {
 
   checkProperties() {
     const properties: IWorkpackModelProperty[] = [...this.modelProperties];
-    const hasInvalidMax = properties.some(p => 
-      [TypePropertyEnum.IntegerModel, TypePropertyEnum.TextModel, TypePropertyEnum.TextAreaModel].includes(p.type) && 
+    const hasInvalidMax = properties.some(p =>
+      Object.values(TypePropertyEnum).includes(p.type as TypePropertyEnum) &&
       (p.max === null || p.max === undefined || p.max <= 0)
     );
-  
+
     if (hasInvalidMax) {
       this.saveButton?.hideButton();
       return;
