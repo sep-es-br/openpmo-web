@@ -202,7 +202,7 @@
   "step": "Step",
   "newMonth": "New Month",
   "minLenght": "Minimun lenght",
-  "maxLenght": "Maximun lenght",
+  "maxLength": "Maximum of {{max}} characters exceeded.",
   "minValue": "Minimun value",
   "maxValue": "Maximum value",
   "list": "List",

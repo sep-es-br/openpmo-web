@@ -254,7 +254,7 @@ export class WorkpackSectionPropertiesComponent implements OnInit, OnDestroy {
             prop.invalid = !valid;
             prop.message = !valid
             ? (String(prop.value).length > 0
-                ? `${this.translateSrv.instant('maxLenght')} é ${prop.max}.`
+                ? `${this.translateSrv.instant('maxLength', { max: prop.max })}`
                 : this.translateSrv.instant('required'))
             : '';
           }
