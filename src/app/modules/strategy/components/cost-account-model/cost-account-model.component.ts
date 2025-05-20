@@ -315,6 +315,14 @@ export class CostAccountModelComponent implements OnInit {
   checkProperties() {
     this.cancelButton.showButton();
     const properties: IWorkpackModelProperty[] = [...this.modelProperties];
+    const hasInvalidMax = properties.some(p =>
+      ['IntegerModel', 'TextModel', 'TextAreaModel'].includes(p.type) &&
+      !p.max
+    );
+    if (hasInvalidMax) {
+      this.saveButton?.hideButton();
+      return;
+    }
     // Value check
     const propertiesChecks: { valid: boolean; invalidKeys: string[]; prop: IWorkpackModelProperty }[] = properties.map(p => ({
       valid: p.requiredFields && p.requiredFields

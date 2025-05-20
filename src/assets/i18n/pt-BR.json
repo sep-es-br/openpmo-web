@@ -206,7 +206,7 @@
   "step": "Passo",
   "newMonth": "Novo Mês",
   "minLenght": "Mínimo de caracteres",
-  "maxLenght": "Máximo de caracteres",
+  "maxLength": "Máximo de {{max}} caracteres excedido.",
   "minValue": "Valor mínimo",
   "maxValue": "Valor máximo",
   "list": "Lista",

@@ -533,7 +533,7 @@ export class ReportViewComponent implements OnInit, OnDestroy {
             : String(prop.value).length <= Number(prop.max) && String(prop.value).length > 0) : true;
           if (property && property.idPropertyModel === prop.idPropertyModel) {
             prop.invalid = !valid;
-            prop.message = !valid ? (String(prop.value).length > 0 ? prop.message = this.translateSrv.instant('maxLenght')
+            prop.message = !valid ? (String(prop.value).length > 0 ? prop.message = this.translateSrv.instant('maxLength', { max: prop.max })
               : prop.message = this.translateSrv.instant('required')) : '';
           }
         }

@@ -68,6 +68,7 @@ export class PropertyModelComponent implements OnDestroy, OnChanges, AfterViewIn
     if (this.property?.extraList && this.property?.multipleSelection) {
       this.selectedSelectAllIfChildrenAllSelecteds(this.property.extraList[0]);
     }
+    this.setDefaultMax();
   }
 
   ngOnDestroy(): void {
@@ -81,6 +82,17 @@ export class PropertyModelComponent implements OnDestroy, OnChanges, AfterViewIn
       {label: this.translateSrv.instant(this.typeOrganizationEnum.Public), value: this.typeOrganizationEnum.Public.toLocaleUpperCase()},
       {label: this.translateSrv.instant(this.typeOrganizationEnum.Third), value: this.typeOrganizationEnum.Third.toLocaleUpperCase()}
     ];
+  }
+
+  setDefaultMax() {
+    if (this.property) {
+      if (this.property.type === 'TextModel' && this.property.max == null) {
+        this.property.max = 50;
+      }
+      if (this.property.type === 'TextAreaModel' && this.property.max == null) {
+        this.property.max = 600;
+      }
+    }
   }
 
   setLanguage() {
