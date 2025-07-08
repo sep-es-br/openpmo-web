@@ -67,6 +67,7 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
   foreseenLabel: string;
   tooltipLabel: string;
   abbreviatedLabel: string;
+  loadBaseline = true;
 
   isCurrentBaseline = false;
 
@@ -152,6 +153,7 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
     ).subscribe(response => {
       this.isCurrentBaseline = response.data;
       this.scheduleCardItemSrv.isCurrentBaseline$.next(this.isCurrentBaseline);
+      this.loadBaseline= false;
     });
   }
 
@@ -162,102 +164,183 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
       schedule,
       loading
     } = this.scheduleSrv.getScheduleData();
+    
     this.workpackParams = workpackParams;
     this.workpackData = workpackData;
-    this.schedule = Object.assign({
-      ...schedule,
-      groupedSteps: schedule &&  schedule.groupedSteps && schedule.groupedSteps.map( group => ({
-        ...group,
-        steps: group.steps && group.steps.map( step => ({
-          ...step,
-          consumes: step.consumes && step.consumes.map( c => ({...c}))
-        }))
-      }))
-    });
-
-    this.sectionActive = workpackData && !!workpackData.workpack && !!workpackData.workpack.id  &&
-      workpackData.workpackModel && workpackData.workpackModel.scheduleSessionActive;
-
-    if (this.schedule.groupStep != undefined || this.schedule.groupStep != null) {
-      await this.fetchAndMapLiquidatedValues(this.schedule)
-    }
-
+    
+    this.schedule = this.prepareScheduleStructure(schedule);
+    
+    this.sectionActive = this.checkSectionActive(workpackData);
+    
     this.loadScheduleSession();
-  }
+    
+    if (this.hasGroupSteps()) {
+      this.loadLiquidatedValuesWithRetry();
+    }
+}
 
-  /**
-   * 
-   * @param scheduleDetail 
-   * @returns 
-   */
-  async fetchAndMapLiquidatedValues(scheduleDetail: IScheduleDetail): Promise<IScheduleDetail> {
+
+private prepareScheduleStructure(schedule: any): any {
+  return Object.assign({
+    ...schedule,
+    groupStep: schedule?.groupStep?.map(group => ({
+      ...group,
+      budgetedValue: 'Carregando...',
+      authorizedValue: 'Carregando...',
+      liquidatedTotal: 'Carregando...',
+      steps: group.steps?.map(step => ({
+        ...step,
+        liquidatedValue: 'Carregando...',
+        consumes: step.consumes?.map(c => ({ ...c }))
+      }))
+    })),
+    groupedSteps: schedule?.groupedSteps?.map(group => ({
+      ...group,
+      steps: group.steps?.map(step => ({
+        ...step,
+        consumes: step.consumes?.map(c => ({ ...c }))
+      }))
+    }))
+  });
+}
+
+private checkSectionActive(workpackData: any): boolean {
+    return workpackData?.workpack?.id && 
+           workpackData?.workpackModel?.scheduleSessionActive;
+}
+
+private hasGroupSteps(): boolean {
+    return this.schedule?.groupStep != undefined || 
+           this.schedule?.groupStep != null;
+}
+
+private async loadLiquidatedValuesWithRetry(maxRetries = 3, retryDelay = 2000) {
+    let retryCount = 0;
+    const tryLoad = async () => {
+        try {
+            const updatedSchedule = await this.fetchAndMapLiquidatedValues(this.schedule);
+            this.schedule = updatedSchedule;
+            this.updateLiquidatedValues();
+        } catch (error) {
+            console.warn('Falha ao carregar valores liquidados:', error);
+            retryCount++;
+            if (retryCount < maxRetries) {
+                setTimeout(tryLoad, retryDelay);
+            }
+        }
+    };
+
+    tryLoad();
+}
+
+private async fetchAndMapLiquidatedValues(scheduleDetail: IScheduleDetail): Promise<IScheduleDetail> {
     const monthAbbreviations = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
     const liquidatedValuesCache = new Map<string, any>();
+    const clone = JSON.parse(JSON.stringify(scheduleDetail));
 
-    for (const group of scheduleDetail.groupStep) {
-      group.budgetedValue = this.formatter.format(0);
-      group.authorizedValue = this.formatter.format(0);
-      let liquidatedTotal = 0;
+    try {
+        for (const group of clone.groupStep) {
+            group.budgetedValue = this.formatter.format(0);
+            group.authorizedValue = this.formatter.format(0);
+            let liquidatedTotal = 0;
 
-      for (const step of group.steps) {
-        step.liquidatedValue = this.formatter.format(0);
-        let stepLiquidatedTotal = 0;
+            for (const step of group.steps) {
+                step.liquidatedValue = this.formatter.format(0);
+                let stepLiquidatedTotal = 0;
 
-        if (step.consumes && step.consumes.length > 0) {
-          for (const consume of step.consumes) {
-            const codPo = String(consume.costAccount.codPo).padStart(6, '0');
-            const codUo = String(consume.costAccount.codUo).padStart(5, '0');
+                if (step.consumes?.length > 0) {
+                    for (const consume of step.consumes) {
+                        try {
+                            if (!consume.costAccount?.codPo || !consume.costAccount?.codUo) {
+                                continue;
+                            }
 
-            let response = liquidatedValuesCache.get(codPo);
+                            const codPo = String(consume.costAccount.codPo).padStart(6, '0');
+                            const codUo = String(consume.costAccount.codUo).padStart(5, '0');
+                            
+                            let response = liquidatedValuesCache.get(codPo);
+                            
+                            if (!response) {
+                                response = await this.pentahoSrv.getLiquidatedValues(codPo, codUo);
+                                liquidatedValuesCache.set(codPo, response);
+                            }
 
-            if (!response) {
-              response = await this.pentahoSrv.getLiquidatedValues(codPo, codUo);
-              liquidatedValuesCache.set(codPo, response);
+                            const yearLiquidationData = response.data.resultset.find((data: any[]) => data[0] === group.year);
+
+                            if (yearLiquidationData) {
+                                const monthlyValues = this.extractMonthlyValues(yearLiquidationData);
+                                const monthAbbreviation = monthAbbreviations[new Date(step.periodFromStart).getMonth()];
+                                const liquidatedValue = monthlyValues[monthAbbreviation] || 0;
+
+                                stepLiquidatedTotal += liquidatedValue;
+                                liquidatedTotal += liquidatedValue;
+
+                                const budgetedValue = yearLiquidationData[2] ?? 0;
+                                const authorizedValue = yearLiquidationData[3] ?? 0;
+
+                                group.budgetedValue = this.formatter.format(budgetedValue);
+                                group.authorizedValue = this.formatter.format(authorizedValue);
+                            }
+                        } catch (error) {
+                            console.warn(`Erro ao processar consume ${consume.id}:`, error);
+                            continue;
+                        }
+                    }
+                }
+
+                step.liquidatedValue = this.formatter.format(stepLiquidatedTotal);
             }
 
-            const yearLiquidationData = response.data.resultset.find((data: any[]) => data[0] === group.year);
-
-            if (yearLiquidationData) {
-              const monthlyValues = {
-                jan: yearLiquidationData[4],
-                fev: yearLiquidationData[5],
-                mar: yearLiquidationData[6],
-                abr: yearLiquidationData[7],
-                mai: yearLiquidationData[8],
-                jun: yearLiquidationData[9],
-                jul: yearLiquidationData[10],
-                ago: yearLiquidationData[11],
-                set: yearLiquidationData[12],
-                out: yearLiquidationData[13],
-                nov: yearLiquidationData[14],
-                dez: yearLiquidationData[15]
-              };
-
-              const monthAbbreviation = monthAbbreviations[new Date(step.periodFromStart).getMonth()];
-              const liquidatedValue = monthlyValues[monthAbbreviation] || 0;
-
-              stepLiquidatedTotal += liquidatedValue;
-              liquidatedTotal += liquidatedValue;
-
-              const budgetedValue = yearLiquidationData[2] !== undefined ? yearLiquidationData[2] : 0;
-              const authorizedValue = yearLiquidationData[3] !== undefined ? yearLiquidationData[3] : 0;
-
-              group.budgetedValue = this.formatter.format(budgetedValue);
-              group.authorizedValue = this.formatter.format(authorizedValue);
-            }
-          }
+            group.liquidatedTotal = this.formatter.format(liquidatedTotal);
         }
 
-        step.liquidatedValue = this.formatter.format(stepLiquidatedTotal);
-      }
-
-      group.liquidatedTotal = this.formatter.format(liquidatedTotal);
+        return clone;
+    } catch (error) {
+        console.error('Erro crítico ao mapear valores liquidados:', error);
+        throw error;
     }
+}
 
-    return scheduleDetail;
+private extractMonthlyValues(yearLiquidationData: any[]): any {
+    return {
+        jan: yearLiquidationData[4],
+        fev: yearLiquidationData[5],
+        mar: yearLiquidationData[6],
+        abr: yearLiquidationData[7],
+        mai: yearLiquidationData[8],
+        jun: yearLiquidationData[9],
+        jul: yearLiquidationData[10],
+        ago: yearLiquidationData[11],
+        set: yearLiquidationData[12],
+        out: yearLiquidationData[13],
+        nov: yearLiquidationData[14],
+        dez: yearLiquidationData[15]
+    };
+}
+
+updateLiquidatedValues() {
+  if (!this.sectionSchedule?.groupStep || !this.schedule?.groupStep) {
+    return;
   }
 
-  
+  this.sectionSchedule.groupStep.forEach(sectionGroup => {
+    const scheduleGroup = this.schedule.groupStep.find(g => g.year === sectionGroup.year);
+    if (!scheduleGroup) return;
+
+    sectionGroup.budgetedValue = scheduleGroup.budgetedValue;
+    sectionGroup.authorizedValue = scheduleGroup.authorizedValue;
+    sectionGroup.liquidatedTotal = scheduleGroup.liquidatedTotal;
+
+    sectionGroup.cardItemSection?.forEach(sectionStep => {
+      const scheduleStep = scheduleGroup.steps.find(s => s.id === sectionStep.idStep);
+      if (scheduleStep) {
+        sectionStep.liquidatedValue = scheduleStep.liquidatedValue;
+        
+      }
+    });
+  });
+}
+
   async loadScheduleSession() {
     if(!this.sectionActive) {return;}
     this.editPermission = this.workpackSrv.getEditPermission();
@@ -372,7 +455,7 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
           valueUnit: this.unitMeansure && this.unitMeansure.name,
           color: '#BFBFBF',
           type: 'cost'
-        })
+        });
 
         groupProgressBar.push({
           total: group.steps.reduce((total, step) => total + (step.baselinePlannedCost ? step.baselinePlannedCost : 0), 0),
@@ -382,7 +465,7 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
           valueUnit: 'currency',
           color: '#BFBFBF',
           type: 'cost'
-        })
+        });
         return {
           year: group.year,
           budgetedValue: group.budgetedValue,
@@ -513,7 +596,6 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
           }
         });
       });
-      this.sectionSchedule.cardSection.isLoading = false;
       return;
     } else {
       this.schedule = undefined;
