@@ -214,24 +214,35 @@ private hasGroupSteps(): boolean {
            this.schedule?.groupStep != null;
 }
 
-private async loadLiquidatedValuesWithRetry(maxRetries = 3, retryDelay = 2000) {
-    let retryCount = 0;
-    const tryLoad = async () => {
-        try {
-            const updatedSchedule = await this.fetchAndMapLiquidatedValues(this.schedule);
-            this.schedule = updatedSchedule;
-            this.updateLiquidatedValues();
-        } catch (error) {
-            console.warn('Falha ao carregar valores liquidados:', error);
-            retryCount++;
-            if (retryCount < maxRetries) {
-                setTimeout(tryLoad, retryDelay);
-            }
-        }
-    };
+private async loadLiquidatedValuesWithRetry(maxRetries = 5, initialDelay = 2000, maxDelay = 32000) {
+  let retryCount = 0;
+  let currentDelay = initialDelay;
 
-    tryLoad();
+  while (retryCount < maxRetries) {
+    try {
+      const updatedSchedule = await this.fetchAndMapLiquidatedValues(this.schedule);
+      this.schedule = updatedSchedule;
+      this.updateLiquidatedValues();
+      return;
+    } catch (error) {
+      retryCount++;
+      console.warn(`⚠️ Tentativa ${retryCount} falhou. Próxima em ${currentDelay / 1000}s`, error);
+
+      if (retryCount >= maxRetries) {
+        console.error('❌ Todas as tentativas falharam.');
+        break;
+      }
+
+      await this.delay(currentDelay);
+      currentDelay = Math.min(currentDelay * 2, maxDelay);
+    }
+  }
 }
+
+private delay(ms: number): Promise<void> {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 
 private async fetchAndMapLiquidatedValues(scheduleDetail: IScheduleDetail): Promise<IScheduleDetail> {
     const monthAbbreviations = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
@@ -250,7 +261,6 @@ private async fetchAndMapLiquidatedValues(scheduleDetail: IScheduleDetail): Prom
 
                 if (step.consumes?.length > 0) {
                     for (const consume of step.consumes) {
-                        try {
                             if (!consume.costAccount?.codPo || !consume.costAccount?.codUo) {
                                 continue;
                             }
@@ -261,8 +271,8 @@ private async fetchAndMapLiquidatedValues(scheduleDetail: IScheduleDetail): Prom
                             let response = liquidatedValuesCache.get(codPo);
                             
                             if (!response) {
-                                response = await this.pentahoSrv.getLiquidatedValues(codPo, codUo);
-                                liquidatedValuesCache.set(codPo, response);
+                              response = await this.pentahoSrv.getLiquidatedValues(codPo, codUo);
+                              liquidatedValuesCache.set(codPo, response);
                             }
 
                             const yearLiquidationData = response.data.resultset.find((data: any[]) => data[0] === group.year);
@@ -281,10 +291,6 @@ private async fetchAndMapLiquidatedValues(scheduleDetail: IScheduleDetail): Prom
                                 group.budgetedValue = this.formatter.format(budgetedValue);
                                 group.authorizedValue = this.formatter.format(authorizedValue);
                             }
-                        } catch (error) {
-                            console.warn(`Erro ao processar consume ${consume.id}:`, error);
-                            continue;
-                        }
                     }
                 }
 
@@ -296,7 +302,6 @@ private async fetchAndMapLiquidatedValues(scheduleDetail: IScheduleDetail): Prom
 
         return clone;
     } catch (error) {
-        console.error('Erro crítico ao mapear valores liquidados:', error);
         throw error;
     }
 }
