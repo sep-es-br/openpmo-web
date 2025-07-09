@@ -175,7 +175,7 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
     this.loadScheduleSession();
     
     if (this.hasGroupSteps()) {
-      this.loadLiquidatedValuesWithRetry();
+      this.loadLiquidatedValues();
     }
 }
 
@@ -214,34 +214,33 @@ private hasGroupSteps(): boolean {
            this.schedule?.groupStep != null;
 }
 
-private async loadLiquidatedValuesWithRetry(maxRetries = 5, initialDelay = 2000, maxDelay = 32000) {
-  let retryCount = 0;
-  let currentDelay = initialDelay;
-
-  while (retryCount < maxRetries) {
-    try {
-      const updatedSchedule = await this.fetchAndMapLiquidatedValues(this.schedule);
-      this.schedule = updatedSchedule;
-      this.updateLiquidatedValues();
-      return;
-    } catch (error) {
-      retryCount++;
-      console.warn(`⚠️ Tentativa ${retryCount} falhou. Próxima em ${currentDelay / 1000}s`, error);
-
-      if (retryCount >= maxRetries) {
-        console.error('❌ Todas as tentativas falharam.');
-        break;
-      }
-
-      await this.delay(currentDelay);
-      currentDelay = Math.min(currentDelay * 2, maxDelay);
-    }
+private async loadLiquidatedValues(): Promise<void> {
+  try {
+    const updatedSchedule = await this.fetchAndMapLiquidatedValues(this.schedule);
+    this.schedule = updatedSchedule;
+    this.updateLiquidatedValues();
+  } catch (error) {
+    this.schedule = this.clearLiquidatedValues(this.schedule);
+    this.updateLiquidatedValues(); 
   }
 }
 
-private delay(ms: number): Promise<void> {
-  return new Promise(resolve => setTimeout(resolve, ms));
+private clearLiquidatedValues(schedule: any): any {
+  return {
+    ...schedule,
+    groupStep: schedule?.groupStep?.map(group => ({
+      ...group,
+      budgetedValue: 'Não disponível',
+      authorizedValue: 'Não disponível',
+      liquidatedTotal: 'Não disponível',
+      steps: group.steps?.map(step => ({
+        ...step,
+        liquidatedValue: 'Não disponível'
+      }))
+    }))
+  };
 }
+
 
 
 private async fetchAndMapLiquidatedValues(scheduleDetail: IScheduleDetail): Promise<IScheduleDetail> {
