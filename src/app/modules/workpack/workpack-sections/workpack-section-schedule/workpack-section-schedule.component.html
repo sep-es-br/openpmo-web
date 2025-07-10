@@ -23,7 +23,7 @@
       <app-card-loading [isCardLoading]="formIsSaving"></app-card-loading>
     </div>
     <div class="schedule-steps-section"
-      *ngIf="sectionSchedule && sectionSchedule.groupStep && !sectionSchedule.cardSection.isLoading">
+      *ngIf="sectionSchedule && sectionSchedule.groupStep && !sectionSchedule.cardSection.isLoading && !loadBaseline">
       <div class="schedule-steps-container" *ngFor="let groupStep of sectionSchedule.groupStep"
         [class.schedule-steps-container-mobile]="responsive">
         <div class="data-view-steps-container">
