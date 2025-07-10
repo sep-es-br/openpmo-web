@@ -187,6 +187,11 @@ export class ScheduleStepCardItemComponent implements OnInit, OnDestroy {
 
   updateActualValues() {
 
+    if (!this.properties.stepName) {
+      this.isActualValuesDisabled = true;
+      return;
+    } 
+
     const stepDate = this.formatToYearMonth(this.properties.stepName);
     const currentDate = this.formatToYearMonth(new Date());
 
