@@ -63,7 +63,7 @@ export class ScheduleStepCardItemComponent implements OnInit, OnDestroy {
       `${this.properties.idStep < 10 ? '0' + this.properties.idStep : this.properties.idStep}` : '';
     this.setLanguage();
     this.handlePassedMonths();
-    // this.updateActualValues();
+    this.updateActualValues();
     if (this.properties.stepName)  {
       let dateStep = moment(this.properties.stepName);
       const monthStep = dateStep.month();
@@ -186,6 +186,11 @@ export class ScheduleStepCardItemComponent implements OnInit, OnDestroy {
   }
 
   updateActualValues() {
+
+    if (!this.properties.stepName) {
+      this.isActualValuesDisabled = true;
+      return;
+    } 
 
     const stepDate = this.formatToYearMonth(this.properties.stepName);
     const currentDate = this.formatToYearMonth(new Date());
