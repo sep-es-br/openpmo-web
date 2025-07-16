@@ -135,14 +135,6 @@ export class CostAccountComponent implements OnInit {
         displayText: 'Carregando...'
       }]
 
-      this.planoOrcamentarioOptions = [
-        { 
-          code: null, 
-          name: null, 
-          fullName: null, 
-          displayText: 'Carregando...' 
-        }]
-
     this.pentahoSrv.getUoOptions(idWorkpack).subscribe({
       next: data => {
         this.uoOptions = [
@@ -175,13 +167,6 @@ export class CostAccountComponent implements OnInit {
 
     const uoValue = event.value.code;
 
-    this.planoOrcamentarioOptions = [
-      {
-        code: null,
-        name: null,
-        fullName: null,
-        displayText: 'Carregando...'
-      }]
 
     this.pentahoSrv.getPlanoOrcamentarioOptions(uoValue, this.idWorkpack).subscribe(data => {
       this.planoOrcamentarioOptions = [
