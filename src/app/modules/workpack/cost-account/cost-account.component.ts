@@ -30,6 +30,7 @@ import { IBudgetPlan } from 'src/app/shared/interfaces/IBudgetPlan';
 import { IBudgetUnit } from 'src/app/shared/interfaces/IBudgetUnit';
 import { PentahoService } from 'src/app/shared/services/pentaho.service';
 import { resolve } from 'dns';
+import { delay } from 'rxjs/operators';
 
 @Component({
   selector: 'app-cost-account',
@@ -125,9 +126,25 @@ export class CostAccountComponent implements OnInit {
     this.backupSelectedPlano = this.selectedPlano
   }
 
-  loadUoOptions(idWorkpack: number) {
-    return new Promise<void>((resolve) => {
-      this.pentahoSrv.getUoOptions(idWorkpack).subscribe(data => {
+  loadUoOptions(idWorkpack: number, onFinish?: () => void): void {
+    this.uoOptions = [
+      {
+        code: null,
+        name: null,
+        fullName: null,
+        displayText: 'Carregando...'
+      }]
+
+      this.planoOrcamentarioOptions = [
+        { 
+          code: null, 
+          name: null, 
+          fullName: null, 
+          displayText: 'Carregando...' 
+        }]
+
+    this.pentahoSrv.getUoOptions(idWorkpack).subscribe({
+      next: data => {
         this.uoOptions = [
           {
             code: null,
@@ -142,17 +159,29 @@ export class CostAccountComponent implements OnInit {
             displayText: `${uo.code} - ${uo.name} - ${uo.fullName}`
           }))
         ];
-        resolve();
-      });
+        if (onFinish) onFinish();
+      },
+      error: err => {
+        console.error('Erro ao obter UO options do Pentaho:', err);
+        if (onFinish) onFinish();
+      }
     });
   }
-
+  
 
   onUoChange(event: any) {
     this.cancelButton.showButton();
     this.selectedUo = event.value;
 
     const uoValue = event.value.code;
+
+    this.planoOrcamentarioOptions = [
+      {
+        code: null,
+        name: null,
+        fullName: null,
+        displayText: 'Carregando...'
+      }]
 
     this.pentahoSrv.getPlanoOrcamentarioOptions(uoValue, this.idWorkpack).subscribe(data => {
       this.planoOrcamentarioOptions = [
@@ -186,11 +215,13 @@ export class CostAccountComponent implements OnInit {
   async loadProperties() {
     this.idPlan = Number(localStorage.getItem('@currentPlan'));
     if (this.idWorkpack) {
-      await this.loadUoOptions(this.idWorkpack)
+      this.loadUoOptions(this.idWorkpack);
       await this.loadWorkpack();
     }
     if (this.idCostAccount) {
-      await this.loadUoOptions(this.idCostAccount);
+      this.loadUoOptions(this.idCostAccount, () => {
+        this.setupUoAndPlano()
+      });
       await this.loadCostAccount();
     } else {
       this.setBreadcrumb();
@@ -204,6 +235,37 @@ export class CostAccountComponent implements OnInit {
     this.sectionCostAccountProperties = await Promise.all(costAccountModelActiveProperties.map(p => this.instanceProperty(p)));
     this.backupProperties = this.sectionCostAccountProperties.map( prop => this.instanceBackupProperty(prop));
   }
+
+  setupUoAndPlano() {
+    if (!this.costAccount) return;
+  
+    this.selectedUo = this.uoOptions.find(uo => uo.code == this.costAccount.unidadeOrcamentaria?.code);
+  
+    if (this.selectedUo) {
+      this.pentahoSrv.getPlanoOrcamentarioOptions(this.selectedUo.code, this.costAccount.id).subscribe(poData => {
+        this.planoOrcamentarioOptions = [
+          { 
+            code: null, 
+            name: null, 
+            fullName: null, 
+            displayText: '- Nenhum -' 
+          },
+          ...poData.map(plan => ({ 
+            code: plan.code, 
+            name: plan.name, 
+            fullName: plan.fullName, 
+            displayText: plan.fullName 
+          }))
+        ];
+        this.poDisabled = poData.length === 0;
+  
+        this.selectedPlano = this.planoOrcamentarioOptions.find(plan => plan.code == this.costAccount.planoOrcamentario?.code);
+        this.backupSelectedUo = this.selectedUo;
+        this.backupSelectedPlano = this.selectedPlano;
+      });
+    }
+  }
+  
 
   async loadCardCostAccountProperties() {
     if (this.costAccount) {
@@ -275,31 +337,6 @@ export class CostAccountComponent implements OnInit {
       const propertyNameCostAccount = this.costAccount.properties.find(p => p.idPropertyModel === propertyNameModel.id);
       this.costAccountName = propertyNameCostAccount.value as string;
 
-      this.selectedUo = this.uoOptions.find(uo => uo.code == this.costAccount.unidadeOrcamentaria?.code);      
-
-      if (this.selectedUo) {
-        this.pentahoSrv.getPlanoOrcamentarioOptions(this.selectedUo.code, this.costAccount.id).subscribe(poData => {
-          this.planoOrcamentarioOptions = [
-            { 
-              code: null, 
-              name: null, 
-              fullName: null, 
-              displayText: '- Nenhum -' 
-            },
-            ...poData.map(plan => ({ 
-              code: plan.code, 
-              name: plan.name, 
-              fullName: plan.fullName, 
-              displayText: plan.fullName 
-            }))
-          ];
-          this.poDisabled = poData.length === 0;
-      
-          this.selectedPlano = this.planoOrcamentarioOptions.find(plan => plan.code == this.costAccount.planoOrcamentario?.code);
-          this.backupSelectedUo = this.selectedUo;
-          this.backupSelectedPlano = this.selectedPlano;
-        });
-      }      
       
       await this.loadCardCostAccountProperties();
       this.setBreadcrumb();
