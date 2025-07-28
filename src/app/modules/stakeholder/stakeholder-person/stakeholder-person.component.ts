@@ -374,6 +374,7 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
   }
 
   validateClearSearchByUser() {
+    this.stakeholder = undefined;
     this.person = undefined;
     this.stakeholderRoles = [];
     this.setStakeholderFormFromPerson();
@@ -542,8 +543,10 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
   }
 
   async validateCpf() {
+    this.stakeholder = undefined;
     this.citizenUserNotFoundByCpf = false;
     this.validCpf = cpfValidator(this.searchedCpfUser);
+  
     if (this.validCpf) {
       this.isLoading = true;
       const result = await this.citizenUserSrv.GetCitizenUserByCpf({
@@ -551,20 +554,51 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
         idOffice: this.idOffice,
         loadWorkLocation: false
       });
+  
       this.isLoading = false;
+  
       if (result.success) {
+        const personId = result.data?.id;
+  
+        // Se retornou um ID, tenta carregar o stakeholder
+        if (personId) {
+          const stakeholderResult = await this.stakeholderSrv.GetStakeholderPerson({
+            'id-workpack': this.idWorkpack,
+            idPerson: personId,
+            'id-plan': this.idPlan
+          });
+  
+          if (stakeholderResult.success) {
+            this.stakeholder = stakeholderResult.data;
+            this.person = this.stakeholder?.person;
+            this.user = this.person.isUser;
+            this.cardPerson.isLoading = false;
+            this.setStakeholderForm();
+            this.loadCardPermissions();
+          } else {
+            // Se não encontrou o stakeholder, continua como antes
+            this.person = result.data;
+            this.setStakeholderFormFromPerson();
+          }
+        } else {
+          // Se não tiver id na data, continua como antes
+          this.person = result.data;
+          this.setStakeholderFormFromPerson();
+        }
+  
+        // Verifica se é a mesma pessoa logada
         if (!this.isUserAdmin && result.data.id === Number(this.authSrv.getIdPerson())) {
           this.isSamePerson = true;
         }
-        this.person = result.data;
-        this.setStakeholderFormFromPerson();
       } else {
         this.citizenUserNotFoundByCpf = true;
       }
     }
   }
+  
 
   handleToggleUser(event) {
+    this.stakeholder = undefined;
     this.person = undefined;
     this.setStakeholderFormFromPerson();
     this.personSearchBy = 'SEARCH';
@@ -608,22 +642,47 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
     this.isLoading = true;
     this.isSamePerson = false;
     const publicServer = event.value;
+  
     const result = await this.citizenUserSrv.GetPublicServer(publicServer.sub, {
       idOffice: this.idOffice,
       loadWorkLocation: false
     });
+  
     this.isLoading = false;
+  
     if (result.success) {
-      if (!this.isUserAdmin && result.data.id === Number(this.authSrv.getIdPerson())) {
+      const personId = result.data.id;
+  
+      if (!this.isUserAdmin && personId === Number(this.authSrv.getIdPerson())) {
         this.isSamePerson = true;
       }
+  
       this.person = result.data;
       this.setStakeholderFormFromPerson();
       this.searchedNameUser = '';
       this.publicServersResult = [];
       this.showListBoxPublicServers = false;
+  
+      // Novo trecho adicionado:
+      if (personId) {
+        const stakeholderResult = await this.stakeholderSrv.GetStakeholderPerson({
+          'id-workpack': this.idWorkpack,
+          idPerson: personId,
+          'id-plan': this.idPlan
+        });
+  
+        if (stakeholderResult.success) {
+          this.stakeholder = stakeholderResult.data;
+          this.person = this.stakeholder?.person;
+          this.user = this.person.isUser;
+          this.cardPerson.isLoading = false;
+          this.setStakeholderForm();
+          this.loadCardPermissions();
+        }
+      }
     }
   }
+  
 
   setStakeholderFormFromPerson() {
     if (this.person) {
@@ -773,7 +832,7 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
       idPlan: this.idPlan,
       permissions
     };
-    if (this.idPerson) {
+    if (this.idPerson || this.stakeholder) {
       const result = await this.stakeholderSrv.putStakeholderPerson(stakeholderModel);
       this.formIsSaving = false;
       if (result.success) {

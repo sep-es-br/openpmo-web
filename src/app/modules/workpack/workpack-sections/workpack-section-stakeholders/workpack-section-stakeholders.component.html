@@ -3,11 +3,6 @@
     [loading]="sectionStakeholder.cardSection.isLoading" (searchText)="handleSearchText($event)"
     (editFilter)="handleEditFilterEntity($event, 'stakeholders')" (newFilter)="handleNewFilterEntity('stakeholders')"
     (selectedFilter)="handleSelectedFilterStakeholder($event)">
-    <div class="input-toggle-stakeholder">
-      <p-inputSwitch class="app-toggle" [(ngModel)]="stakeholderSectionShowInactives"
-        (onChange)="handleStakeholderInactiveToggle()"></p-inputSwitch>
-      <label class="input-label">{{"showInactive" | translate}}</label>
-    </div>
     <div class="stakeholders-list-container">
       <div class="loading-container" *ngIf="sectionStakeholder.cardSection.isLoading">
         <app-card-loading [isCardLoading]="sectionStakeholder.cardSection.isLoading"></app-card-loading>

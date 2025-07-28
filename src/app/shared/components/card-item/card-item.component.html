@@ -203,7 +203,7 @@
           [ngStyle]="{ fontSize: '2rem' }"></i>
         <span class="card-item-name" [pTooltip]="properties.fullNameCardItem"
           tooltipPosition="bottom">{{properties.nameCardItem}}</span>
-        <span class="card-item-subtitle" *ngIf="properties.subtitleCardItem">{{properties.subtitleCardItem}}</span>
+        <div class="subtitle" [innerHTML]="properties.subtitleCardItem"></div>
       </div>
       <div class="card-item-footer" *ngIf="cardIdItem">
         <span class="card-item-id">
@@ -219,7 +219,7 @@
           [ngStyle]="{ fontSize: '1.5rem' }"></i>
         <span class="card-item-name" [pTooltip]="properties.fullNameCardItem"
           tooltipPosition="bottom">{{properties.nameCardItem}}</span>
-        <span class="card-item-subtitle" *ngIf="properties.subtitleCardItem">{{properties.subtitleCardItem}}</span>
+        <div class="subtitle" [innerHTML]="properties.subtitleCardItem"></div>
       </div>
       <div class="right-side">
         <p-header *ngIf="properties.menuItems" class="card-item-header">
