@@ -11,7 +11,8 @@
     width: 100%;
   }
   .app-button-wrapper {
-    padding-bottom: 75px;
+    pointer-events: none;
+    margin-bottom: 75px;
     z-index: 100;
     position: fixed;
     width: 100%;
@@ -23,6 +24,7 @@
     align-items: center;
   
     ::ng-deep .button-label {
+      pointer-events: auto;
       font-size: 1.25rem;
       padding: .5em 1.5em;
       text-align: center;

@@ -27,7 +27,6 @@ export class WorkpackSectionStakeholdersComponent implements OnInit, OnDestroy {
 
   sectionStakeholder: ISection;
   stakeholders: IStakeholder[];
-  stakeholderSectionShowInactives = false;
   totalRecordsStakeholders: number;
   workpackData: IWorkpackData;
   workpackParams: IWorkpackParams;
@@ -147,19 +146,14 @@ export class WorkpackSectionStakeholdersComponent implements OnInit, OnDestroy {
         searchTerm: this.term,
         showCreateNemElementButton: this.workpackSrv.getEditPermission() ? true : false,
       },
-      cardItemsSection: await this.loadSectionStakeholderCards(this.stakeholderSectionShowInactives)
+      cardItemsSection: await this.loadSectionStakeholderCards()
     }
     this.totalRecordsStakeholders = this.sectionStakeholder.cardItemsSection && this.sectionStakeholder.cardItemsSection.length;
   }
 
-  async loadSectionStakeholderCards(showInactives: boolean) {
+  async loadSectionStakeholderCards() {
     if (this.stakeholders && this.stakeholders.length > 0) {
-      const cardItems = this.stakeholders.filter(stake => {
-        if (!showInactives && stake.roles && stake.roles.length > 0) {
-          return stake.roles.find(r => r.active && (!r.to || r.to === null || moment(r.to, 'yyyy-MM-DD').isSameOrAfter(moment()))
-            && (!r.from || r.from === null || moment(r.from, 'yyyy-MM-DD').isSameOrBefore(moment())));
-        } else { return stake; }
-      }).map(stakeholder => {
+      const cardItems = this.stakeholders.map(stakeholder => {
         const editPermission = stakeholder.permissions && stakeholder.permissions.filter(p => p.level === 'EDIT').length > 0;
         const readPermission = stakeholder.permissions && stakeholder.permissions.filter(p => p.level === 'READ').length > 0;
         const samePlan = (!stakeholder.permissions || stakeholder.permissions.length === 0) ||
@@ -171,10 +165,17 @@ export class WorkpackSectionStakeholdersComponent implements OnInit, OnDestroy {
           iconSvg: true,
           nameCardItem: stakeholder.person ? stakeholder.person.name : stakeholder.organization.name,
           fullNameCardItem: stakeholder.person ? stakeholder.person.fullName : stakeholder.organization.fullName,
-          subtitleCardItem: stakeholder.roles && stakeholder.roles.filter(r => r.active && (!r.to || r.to === null ||
-            moment(r.to, 'yyyy-MM-DD').isSameOrAfter(moment()))
-            && (!r.from || r.from === null || moment(r.from, 'yyyy-MM-DD').isSameOrBefore(moment())))
-            .map(role => this.translateSrv.instant(role.role)).join(', '),
+          subtitleCardItem: stakeholder.roles
+          ?.map(role => {
+            const isActive = role.active &&
+              (!role.to || moment(role.to, 'yyyy-MM-DD').isSameOrAfter(moment())) &&
+              (!role.from || moment(role.from, 'yyyy-MM-DD').isSameOrBefore(moment()));
+            const roleText = this.translateSrv.instant(role.role);
+            return isActive
+              ? `<span class="card-item-subtitle">${roleText}</span>`
+              : `<span class="role-inactive card-item-subtitle">${roleText}</span>`;
+          })
+          .join(', '),
           itemId: stakeholder.person ? stakeholder.person.id : stakeholder.organization.id,
           menuItems: [{
             label: this.translateSrv.instant('delete'),
@@ -291,7 +292,7 @@ export class WorkpackSectionStakeholdersComponent implements OnInit, OnDestroy {
   }
 
   async handleStakeholderInactiveToggle() {
-    this.sectionStakeholder.cardItemsSection = await this.loadSectionStakeholderCards(this.stakeholderSectionShowInactives);
+    this.sectionStakeholder.cardItemsSection = await this.loadSectionStakeholderCards();
   }
 
   navigateToPageStakeholder(url) {
