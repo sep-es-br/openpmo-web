@@ -126,6 +126,13 @@ export class PropertyModelComponent implements OnDestroy, OnChanges, AfterViewIn
     }
   }
 
+  isProtected(value: string): boolean {
+    if (this.property.name === 'Situação') {
+      return ['Concluída', 'Cancelada', 'A Cancelar'].includes(value.trim());
+    }
+    return false;
+  }
+
   handleCollapseChanged(collapsed: boolean) {
     this.property.isCollapsed = collapsed;
   }

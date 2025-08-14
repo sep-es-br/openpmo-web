@@ -5,6 +5,7 @@ import { PropertyTemplateModel } from 'src/app/shared/models/PropertyTemplateMod
 import { ResponsiveService } from 'src/app/shared/services/responsive.service';
 import { Subject } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
+import { SelectItem, SelectItemGroup } from 'primeng/api';
 
 @Component({
   selector: 'app-property-selection',
@@ -19,6 +20,8 @@ export class PropertySelectionComponent implements OnInit {
   responsive: boolean;
   $destroy = new Subject();
   language: string;
+  possibleValuesOptions: (SelectItem | SelectItemGroup)[] = [];
+  hasGroups = false;
 
   constructor(
     private responsiveSrv: ResponsiveService,
@@ -34,6 +37,7 @@ export class PropertySelectionComponent implements OnInit {
 
   ngOnInit(): void {
     this.setLanguage();
+    this.transformPossibleValues()
   }
   
   ngOnDestroy() {
@@ -44,5 +48,52 @@ export class PropertySelectionComponent implements OnInit {
   setLanguage() {
     this.language = this.translateSrv.currentLang;
   }
+
+transformPossibleValues(): void {
+  if (!this.property?.possibleValues) {
+    this.possibleValuesOptions = [];
+    this.hasGroups = false;
+    return;
+  }
+
+  const grouped: SelectItemGroup[] = [];
+  const standalone: SelectItem[] = [];
+
+  this.property.possibleValues.forEach(pv => {
+    if (pv.label.includes('\\')) {
+      const [groupNameRaw, itemNameRaw] = pv.label.split('\\');
+      const groupName = groupNameRaw.trim();
+      const itemName = itemNameRaw.trim();
+
+      let group = grouped.find(g => g.label === groupName);
+      if (!group) {
+        group = { label: groupName, items: [] };
+        grouped.push(group);
+      }
+      group.items.push({ label: itemName, value: pv.value });
+    } else {
+      standalone.push({ label: pv.label.trim(), value: pv.value, disabled: pv.label.includes('Cancelada') });
+    }
+  });
+
+  this.possibleValuesOptions = [];
+
+  this.possibleValuesOptions.push(...grouped);
+
+  if (standalone.length) {
+    this.possibleValuesOptions.push({
+      label: 'Outros',
+      items: standalone
+    });
+  }
+
+  this.hasGroups = this.possibleValuesOptions.some(opt => 
+    'items' in opt && 
+    opt.items.length > 0 && 
+    opt.label !== 'Outros'
+  );
+
+}
+
 
 }

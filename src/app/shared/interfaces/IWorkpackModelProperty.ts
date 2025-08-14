@@ -36,4 +36,5 @@ export interface IWorkpackModelProperty {
   menuModelProperties?: MenuItem[]; //only screen
   showIconButtonSelectLocality?: boolean; //only screen
   helpText?: string;
+  disableMultipleSelection?: boolean;
 }

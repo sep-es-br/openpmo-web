@@ -160,3 +160,7 @@
     }
 
 }
+
+::ng-deep .p-chips-token span.protected-chip ~ .p-chips-token-icon {
+  display: none !important;
+}
