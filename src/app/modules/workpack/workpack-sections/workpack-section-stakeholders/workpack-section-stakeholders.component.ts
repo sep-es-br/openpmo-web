@@ -168,7 +168,7 @@ export class WorkpackSectionStakeholdersComponent implements OnInit, OnDestroy {
           subtitleCardItem: stakeholder.roles
           ?.map(role => {
             const isActive = role.active &&
-              (!role.to || moment(role.to, 'yyyy-MM-DD').isSameOrAfter(moment())) &&
+              (!role.to || moment(role.to, 'yyyy-MM-DD').set('hour', 23).set('minute', 59).set('second', 59).isSameOrAfter(moment())) &&
               (!role.from || moment(role.from, 'yyyy-MM-DD').isSameOrBefore(moment()));
             const roleText = this.translateSrv.instant(role.role);
             return isActive
