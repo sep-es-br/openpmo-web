@@ -363,6 +363,8 @@
   "baselines": "Baselines",
   "CHANGED": "Changed",
   "DELETED": "Deleted",
+  "TO_CANCEL": "To cancel",
+  "CANCELLED": "Cancelled",
   "NEW": "New",
   "submit": "Submit",
   "evaluations": "Evaluations",

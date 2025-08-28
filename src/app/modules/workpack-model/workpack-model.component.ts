@@ -457,6 +457,7 @@ export class WorkpackModelComponent implements OnInit {
       concluida: "Concluída",
       cancelada: "Cancelada",
       Acancelar: "A Cancelar",
+      emExecucao: "Em execução",
       aLicitar: "Planejamento\\A Licitar",
       acoesPreparatorias: "Planejamento\\Ações preparatórias",
       contratoAssinado: "Planejamento\\Contrato assinado",
@@ -466,7 +467,6 @@ export class WorkpackModelComponent implements OnInit {
       licitacaoConcluida: "Planejamento\\Licitação concluída",
       projetoElaborado: "Planejamento\\Projeto elaborado",
       projetoEmElaboracao: "Planejamento\\Projeto em elaboração",
-      emExecucao: "Em execução",
       paralisado: "Paralisado"
     };
     const defaultProperties: IWorkpackModelProperty[] = [];

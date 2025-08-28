@@ -84,7 +84,7 @@
         <p-card *ngFor="let item of baseline?.updates" class="card-list-item">
           <div class="card-item-content">
             <div class="item-description">
-              <p-inputSwitch class="app-toggle" [(ngModel)]="item.included" [disabled]="togglesReadOnly">
+              <p-inputSwitch class="app-toggle" [(ngModel)]="item.included" [disabled]="togglesReadOnly || item.classification === 'TO_CANCEL'">
               </p-inputSwitch>
               <div class="item-description-container" [class.item-description-container-responsive]="responsive">
                 <i *ngIf="!responsive"
