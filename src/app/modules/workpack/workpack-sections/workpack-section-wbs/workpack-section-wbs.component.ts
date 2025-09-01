@@ -33,7 +33,7 @@ export class WorkpackSectionWBSComponent implements OnDestroy {
   isLoading = false;
   idPlan: number;
   topPosLoading = 128;
-  collapsed: boolean = true;
+  collapsed = true;
   workpackParams: IWorkpackParams;
 
   constructor(
@@ -47,7 +47,7 @@ export class WorkpackSectionWBSComponent implements OnDestroy {
     private journalSrv: JournalService
   ) {
     this.isLoading = true;
-    this.actRouter.queryParams.subscribe(async ({ idPlan }) => {
+    this.actRouter.queryParams.subscribe(async({ idPlan }) => {
       this.idPlan = idPlan && +idPlan;
     });
     this.translateSrv.onLangChange.pipe(takeUntil(this.$destroy)).subscribe(() => {
@@ -57,7 +57,7 @@ export class WorkpackSectionWBSComponent implements OnDestroy {
       if (reset) {
         this.loadBreakdownStructureData();
       }
-    })
+    });
   }
 
   ngOnDestroy(): void {
@@ -81,6 +81,7 @@ export class WorkpackSectionWBSComponent implements OnDestroy {
     const { wbsTree, loading } = this.breakdownStructureSrv.getWBSTree();
     this.wbsTree = wbsTree;
     this.isLoading = loading;
+    console.log('this.wbsTree: ', this.wbsTree);
   }
 
   nodeCollapse(nodeList, level) {
@@ -138,7 +139,7 @@ export class WorkpackSectionWBSComponent implements OnDestroy {
     if (item.idWorkpack === this.workpackParams.idWorkpack) {
       return;
     }
-    this.setWorkpackBreadcrumbStorage(item.idWorkpack, this.idPlan)
+    this.setWorkpackBreadcrumbStorage(item.idWorkpack, this.idPlan);
     this.route.navigate(['/workpack'], {
       queryParams: {
         id: item.idWorkpack,
@@ -190,7 +191,7 @@ export class WorkpackSectionWBSComponent implements OnDestroy {
           ...evidence,
           isImg,
           icon
-        }
+        };
       });
       journalInformation.loading = false;
     }

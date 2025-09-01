@@ -29,7 +29,20 @@
       <!-- CHILDREN -->
       <ng-template #workpackModels>
         <div class="container-custom-tree container-workpack">
-          <div class="tree-label link" (click)="navigateToWorkpack(node)">{{node.workpackName }}</div>
+          <div class="workpack-title-box">
+            <i
+              *ngIf="node.workpackType === 'Project' && node.hasActiveBaseline === false"
+              class="warning-icon fa fa-exclamation-triangle"
+              aria-hidden="true"
+            ></i>
+            <div
+              class="tree-label link"
+              [ngClass]="{ 'alert-text': (node.workpackType === 'Project' && node.hasActiveBaseline === false) }"
+              (click)="navigateToWorkpack(node)"
+            >
+              {{node.workpackName }}
+            </div>
+          </div>
           <div class="container-properties" [class.deliverable]="node?.workpackType === typeWorkpackEnum.Deliverable">
             <ng-container *ngIf="node?.workpackType !== typeWorkpackEnum.Deliverable; else schedule">
               <ng-container *ngIf="node?.workpackType !== typeWorkpackEnum.Milestone; else milestoneData"
