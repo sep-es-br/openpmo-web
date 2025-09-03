@@ -38,6 +38,7 @@ import { PropertyGroupComponent } from './properties/type-property/property-grou
 import { ButtonsContainerComponent } from './buttons-container/buttons-container.component';
 import { CancelButtonComponent } from './cancel-button/cancel-button.component';
 import { CardJournalInformationComponent } from './card-journal-information/card-journal-information.component';
+import { CardListComponent } from './card-list/card-list.component';
 
 @NgModule({
   declarations: [
@@ -76,6 +77,7 @@ import { CardJournalInformationComponent } from './card-journal-information/card
     ButtonsContainerComponent,
     CancelButtonComponent,
     CardJournalInformationComponent,
+    CardListComponent,
   ],
   imports: [
     CommonModule,
@@ -88,6 +90,7 @@ import { CardJournalInformationComponent } from './card-journal-information/card
     CardComponent,
     CardItemComponent,
     CardItemPermissionComponent,
+    CardListComponent,
     InputMessageComponent,
     SaveButtonComponent,
     ProgressBarComponent,

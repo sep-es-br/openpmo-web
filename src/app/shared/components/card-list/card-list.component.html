@@ -1,0 +1,6 @@
+<ng-container *ngFor="let item of itemList; trackBy: trackByFn; index as i"
+    [ngTemplateOutlet]="itemElem" [ngTemplateOutletContext]="{$implicit: item, index: i}">
+</ng-container>
+<div role="button" class="newItem" *ngIf="itemList" (click)="newItemFunc()">
+    <i class="card-link app-icon plus light-grey-icon"></i>
+</div>

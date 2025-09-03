@@ -1,4 +1,4 @@
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpParams } from "@angular/common/http";
 import { Injectable, Injector } from "@angular/core";
 import { APP_CONFIG } from "../tokens/AppConfigToken";
 import { Observable, of } from "rxjs";
@@ -78,6 +78,37 @@ export class PentahoService {
       })
     );
   }
+
+  
+  getInstrumentsOptions(codUo: string, startYear: number, endYear : number): Observable<IInstrument[]> {
+    const url = `${this.baseUrl}/cost-accounts/pentaho/instrumentsList?`;
+    const params = new HttpParams()
+                    .set("codUo", codUo)
+                    .set("startYear", startYear.toString())
+                    .set("endYear", endYear.toString());
+
+    return this.http.get<any>(url, { responseType: 'json' , params: params }).pipe(
+      map(({data}) => data?.resultset as any[]),
+      map(resultset => resultset?.map( values => {
+        return {
+          modalidade: values[0],
+          num_original: values[1],
+          codigo_SIGEFES: values[2],
+          nome: values[3],
+          dsc_objetivo: values[4],
+          dat_inicio_vigencia: values[5],
+          dat_fim_vigencia: values[6],
+          cod_favorecido: values[7],
+          nome_favorecido: values[8],
+          valor: values[9]
+        } as IInstrument;
+      })),
+      catchError(error => {
+        console.error('Erro ao buscar lista de instrumentos', error);
+        return of([]);
+      })
+    );
+  }
   
 
   getLiquidatedValues(codPo: string, codUo: string): Promise<IHttpResult<any>> {
@@ -95,4 +126,17 @@ export interface DropdownOption {
   code: string;
   name: string;
   fullName: string;
+}
+
+export interface IInstrument {
+    modalidade: string;
+    num_original: string;
+    codigo_SIGEFES: string;
+    nome: string;
+    dsc_objetivo: string;
+    dat_inicio_vigencia: string;
+    dat_fim_vigencia: string;
+    cod_favorecido: string;
+    nome_favorecido: string;
+    valor: number;
 }

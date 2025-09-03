@@ -1,0 +1,16 @@
+:host {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, 20rem);
+    gap: 1rem;
+    justify-content: center;
+
+
+    .newItem {
+        border: 1px solid #d4d4d4;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        min-height: 10rem;
+    }
+}
