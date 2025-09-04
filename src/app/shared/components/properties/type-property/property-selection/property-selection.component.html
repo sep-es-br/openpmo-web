@@ -21,7 +21,7 @@
       [group]="hasGroups"
       [readonly]="property.disabled" [(ngModel)]="property.value" dropdownIcon="fas fa-caret-down"
       [autoDisplayFirst]="false" [disabled]="property.disabled" [required]="property.required"
-      [class.ng-invalid]="property.invalid" (onBlur)="changed.emit($event)" (ngModelChange)="changed.emit($event)">
+      [class.ng-invalid]="property.invalid" (onBlur)="changed.emit($event)" (ngModelChange)="onSelectionChange($event)">
     </p-dropdown>
     <label class="app-input-label" [for]="property.name">{{property.label}} {{ property.required ? '*' : ''}}
       <i class="far fa-question-circle"  *ngIf="property.helpText && property.helpText.length > 0" [pTooltip]="property.helpText"></i>

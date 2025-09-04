@@ -456,7 +456,7 @@ export class WorkpackModelComponent implements OnInit {
     const possibleValuesObj = {
       concluida: "Concluída",
       cancelada: "Cancelada",
-      Acancelar: "A Cancelar",
+      Acancelar: "A cancelar",
       emExecucao: "Em execução",
       aLicitar: "Planejamento\\A Licitar",
       acoesPreparatorias: "Planejamento\\Ações preparatórias",
