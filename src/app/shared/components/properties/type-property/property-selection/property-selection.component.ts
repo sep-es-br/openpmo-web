@@ -106,7 +106,7 @@ export class PropertySelectionComponent implements OnInit {
   }
 
   onSelectionChange(value: any) {
-    if (this.property.label === 'Status da Entrega' && value === 'Concluída') {
+    if (this.property.name === 'Situação' && value === 'Concluída') {
       this.verifyDeliverable(this.property.id);
     }
     this.changed.emit(value);
