@@ -1,3 +1,4 @@
+import { IInstrument } from '../services/pentaho.service';
 import { IBudgetPlan } from './IBudgetPlan';
 import { IBudgetUnit } from './IBudgetUnit';
 import { IWorkpackModelProperty } from './IWorkpackModelProperty';
@@ -18,6 +19,7 @@ export interface ICostAccount {
   }
   unidadeOrcamentaria: IBudgetUnit;
   planoOrcamentario: IBudgetPlan; 
+  instruments : IInstrument[];
 }
 
 export interface ICostByWorkpack {

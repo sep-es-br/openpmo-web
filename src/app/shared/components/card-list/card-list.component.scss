@@ -1,8 +1,23 @@
 :host {
     display: grid;
-    grid-template-columns: repeat(auto-fill, 20rem);
+    grid-template-columns: repeat(auto-fill, var(--card-width, 1fr));
+    grid-template-rows: repeat(auto-fill, var(--card-heigth, 1fr));
     gap: 1rem;
     justify-content: center;
+
+    .card-item {
+        background-color: white;
+        padding: 1rem;
+        position: relative;
+        
+        .icon-remover {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            cursor: pointer;
+        }
+
+    }
 
 
     .newItem {
@@ -12,5 +27,9 @@
         justify-content: center;
         cursor: pointer;
         min-height: 10rem;
+
+        i::before {
+            font-size: xxx-large;
+        }
     }
 }

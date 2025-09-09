@@ -1032,6 +1032,8 @@
   "currentExpenses": "Despesa Corrente",
   "idDomain": "Domínio",
   "programObjective": "Objetivo do Programa",
+  "instrumentObjective": "Objetivo",
+  "instrumentRecipient": "Favorecido",
   "phoneNumber": "Número Telefone",
   "person": "Pessoa",
   "persons": "Pessoas",

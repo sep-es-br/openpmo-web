@@ -58,12 +58,12 @@
     .year-interval {
       display: flex;
       gap: 3rem;
-    }
-  }
 
-  .cardItem {
-    background-color: white;
-    padding: 1rem;
+      @media screen and (max-width: 768px) {
+        flex-direction: column;
+        gap: 1rem;
+      }
+    }
   }
   
 

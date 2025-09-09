@@ -91,16 +91,16 @@ export class PentahoService {
       map(({data}) => data?.resultset as any[]),
       map(resultset => resultset?.map( values => {
         return {
-          modalidade: values[0],
-          num_original: values[1],
-          codigo_SIGEFES: values[2],
-          nome: values[3],
-          dsc_objetivo: values[4],
-          dat_inicio_vigencia: values[5],
-          dat_fim_vigencia: values[6],
-          cod_favorecido: values[7],
-          nome_favorecido: values[8],
-          valor: values[9]
+          type: values[0],
+          originalNum: values[1],
+          sigefesCode: values[2],
+          name: values[3],
+          objective: values[4],
+          startPeriod: values[5],
+          endPeriod: values[6],
+          recipientCode: values[7],
+          recipientName: values[8],
+          value: values[9]
         } as IInstrument;
       })),
       catchError(error => {
@@ -129,14 +129,14 @@ export interface DropdownOption {
 }
 
 export interface IInstrument {
-    modalidade: string;
-    num_original: string;
-    codigo_SIGEFES: string;
-    nome: string;
-    dsc_objetivo: string;
-    dat_inicio_vigencia: string;
-    dat_fim_vigencia: string;
-    cod_favorecido: string;
-    nome_favorecido: string;
-    valor: number;
+    type: string;
+    originalNum: string;
+    sigefesCode: string;
+    name: string;
+    objective: string;
+    startPeriod: string;
+    endPeriod: string;
+    recipientCode: string;
+    recipientName: string;
+    value: number;
 }

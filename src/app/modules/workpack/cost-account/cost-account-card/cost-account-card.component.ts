@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, HostListener, Input, OnInit, Output } from '@angular/core';
 import { IInstrument } from 'src/app/shared/services/pentaho.service';
 
 @Component({
@@ -11,12 +11,19 @@ export class CostAccountCardInstrumentComponent implements OnInit {
   @Input() instrument : IInstrument;
   @Input() instrumentList : IInstrument[];
 
-  @Output() updateInstrument = new EventEmitter<IInstrument>()
+  @Output() updateInstrument = new EventEmitter<IInstrument>();
+
+  isMobile = window.innerWidth <= 768;
+
+  @HostListener('window:resize')
+  onResize() {
+    this.isMobile = window.innerWidth <= 768;
+  }
 
   constructor() { }
 
   triggerUpdate(newInstrumentCode : string) {
-    this.instrument = this.instrumentList.find(i => i.codigo_SIGEFES === newInstrumentCode);
+    this.instrument = this.instrumentList.find(i => i.sigefesCode === newInstrumentCode);
 
     this.updateInstrument.emit(this.instrument);
   }

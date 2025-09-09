@@ -1,20 +1,32 @@
+
+      <!-- type: string;
+    originalNum: string;
+    SIGEFESCode: string;
+    name: string;
+    objective: string;
+    StartPeriod: string;
+    EndPeriod: string;
+    RecipientCode: string;
+    RecipientName: string;
+    value: number; -->
 <div class="cardItem">
     <header>
-        $ {{instrument?.modalidade | uppercase}}
+        <span>$ {{instrument?.type | uppercase}}</span>
     </header>
     <div>
         <span class="p-float-label property-input p-field">
 
             <p-dropdown class="app-single-selection" [options]="instrumentList" [autoDisplayFirst]="false" [showClear]="false"
-                (onChange)="triggerUpdate($event.value)" optionValue="codigo_SIGEFES" [filter]="true" filterBy="codigo_SIGEFES,nome"
-                dropdownIcon="fas fa-caret-down"  [(ngModel)]="instrument.codigo_SIGEFES">
+                (onChange)="triggerUpdate($event.value)" optionValue="sigefesCode" [filter]="true" filterBy="sigefesCode,name"
+                dropdownIcon="fas fa-caret-down"  [(ngModel)]="instrument.sigefesCode" [required]="true">
 
                 <ng-template let-selected pTemplate="selectedItem">
-                    <span pTooltip="({{selected.codigo_SIGEFES}}) {{selected.nome}}">({{selected.codigo_SIGEFES}}) {{selected.nome}}</span>
+                    <span pTooltip="({{selected.sigefesCode}}) {{selected.name}}"
+                        [tooltipDisabled]="isMobile">({{selected.sigefesCode}}) {{selected.name}}</span>
                 </ng-template>
 
                 <ng-template let-item pTemplate="item">
-                    <span pTooltip="({{item.codigo_SIGEFES}}) {{item.nome}}">({{item.codigo_SIGEFES}}) {{item.nome}}</span>
+                    <span pTooltip="({{item.sigefesCode}}) {{item.name}}" [tooltipDisabled]="isMobile">({{item.sigefesCode}}) {{item.name}}</span>
                 </ng-template>
 
             </p-dropdown>
@@ -22,8 +34,14 @@
             <i class="far fa-question-circle" [pTooltip]="'help.costAccount.selectInstrument' | translate"></i></label>
         </span>
         <span>{{'tcuCode' | translate}}</span>
-        <span>{{instrument?.num_original ? instrument.num_original : '-'}}</span>
+        <span>{{instrument?.originalNum ? instrument.originalNum : '-'}}</span>
+        <span>{{ 'instrumentObjective' | translate}}</span>
+        <span [pTooltip]="instrument?.objective" [tooltipDisabled]="isMobile">{{ instrument?.objective ? instrument.objective : '-' }}</span>
+        <span>{{ 'instrumentRecipient' | translate}}</span>
+        <span pTooltip="{{instrument?.name ? '(' + instrument.recipientCode+') ' +instrument.recipientName : ''}}"
+               [tooltipDisabled]="isMobile" >{{ instrument?.recipientName ? ('('+instrument.recipientCode+') '+instrument.recipientName) : '-' }}</span>
         <span>{{'value' | translate}}</span>
-        <span>{{instrument?.valor ? instrument.valor : '-'}}</span>
+        <span>{{instrument?.value ? (instrument.value | currency:'BRL':'symbol':'1.2-2':'pt-BR') : '-'}}</span>
+        
     </div>
 </div>

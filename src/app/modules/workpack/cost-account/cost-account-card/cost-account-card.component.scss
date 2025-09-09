@@ -14,6 +14,13 @@
         .p-field {
             grid-column: span 2;
         }
+
+        span:not(.p-field):nth-of-type(odd) {
+            display: block;                /* faz ocupar todo espaço do dropdown */
+            overflow: hidden;              /* esconde o excesso */
+            text-overflow: ellipsis;       /* adiciona os ... */
+            white-space: nowrap;           /* não quebra linha */
+        }
     }
     
     ::ng-deep .p-dropdown {
@@ -22,6 +29,10 @@
         .p-dropdown-panel  {
             @extend .p-dropdown-label;
             max-width: 50rem;
+
+            @media screen and (max-width: 768px) {
+                max-width: 100%;
+            }
         }
 
         .p-dropdown-label {

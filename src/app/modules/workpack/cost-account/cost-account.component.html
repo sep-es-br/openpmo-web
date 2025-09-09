@@ -104,17 +104,7 @@
         </span>
 
       </div>
-      <!-- modalidade: string;
-    num_original: string;
-    codigo_SIGEFES: string;
-    nome: string;
-    dsc_objetivo: string;
-    dat_inicio_vigencia: string;
-    dat_fim_vigencia: string;
-    cod_favorecido: string;
-    nome_favorecido: string;
-    valor: number; -->
-      <app-card-list [itemList]="selectedInstruments" [newItemFunc]="newInstrumentFunc">
+      <app-card-list [itemList]="selectedInstruments" [newItemFunc]="newInstrumentFunc" [removeItemFunc]="removerInstrumentFunc" cardWidth="20rem">
         <ng-template #itemElem let-item let-i="index" >
             <app-cost-account-card-instrument [instrument]="item" [instrumentList]="instrumentsList" 
                 (updateInstrument)="setInstrumentItem($event, i)"></app-cost-account-card-instrument>

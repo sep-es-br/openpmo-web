@@ -97,7 +97,35 @@ export class CostAccountComponent implements OnInit {
 
   newInstrumentFunc = () => {
     this.selectedInstruments.push({} as IInstrument);
+    
+    if(this.instrumentsChanged()) {
+      this.saveButton.showButton();
+      this.cancelButton.showButton();
+    } else {
+      this.saveButton.hideButton();
+      this.cancelButton.hideButton();
+    }
   }
+
+  removerInstrumentFunc = (item: IInstrument) => {
+    
+    if(this.selectedInstruments) {
+      const index = this.selectedInstruments.indexOf(item);
+      if (index !== -1) {
+        this.selectedInstruments.splice(index, 1); // remove o item na posição `index`
+      }
+    }
+    
+    if(this.instrumentsChanged()) {
+      this.saveButton.showButton();
+      this.cancelButton.showButton();
+    } else {
+      this.saveButton.hideButton();
+      this.cancelButton.hideButton();
+    }
+
+  }
+
   poDisabled = true;
 
   backupSelectedUo: any;
@@ -132,20 +160,40 @@ export class CostAccountComponent implements OnInit {
   }
 
   trackByInstrument = (i: number, item: IInstrument) => {
-    return item.codigo_SIGEFES;
+    return item.sigefesCode;
   }
 
   get instrumentsOptions() {
-    return this.instrumentsList.map(v => v.codigo_SIGEFES)
+    return this.instrumentsList.map(v => v.sigefesCode)
   }
 
   instrumentWithCodigo(codigo: string | null) {
-    return this.instrumentsList.find(i => i.codigo_SIGEFES === codigo);
+    return this.instrumentsList.find(i => i.sigefesCode === codigo);
   }
 
   setInstrumentItem(instrument : IInstrument, index: number) {
     
+    if(index >= this.costAccount.instruments.length || instrument.sigefesCode !== this.costAccount.instruments[index].sigefesCode) {
+      this.saveButton.showButton(); 
+      this.cancelButton.showButton()
+    } else {
+      this.saveButton.hideButton();
+      this.cancelButton.hideButton();
+    }
+    
+    
     Object.assign(this.selectedInstruments[index], instrument); 
+
+  }
+  
+  instrumentsChanged() {
+    // verifica se mudou tamanho
+    if (this.selectedInstruments.length !== this.costAccount.instruments.length) return true;
+
+    // verifica se algum sigefesCode mudou na mesma posição
+    return this.selectedInstruments.some((selected, i) =>
+      selected.sigefesCode !== this.costAccount.instruments[i]?.sigefesCode
+    );
   }
 
 
@@ -186,7 +234,7 @@ export class CostAccountComponent implements OnInit {
   }
 
   formatSelectedInstrument(instruments : IInstrument[]){
-    return instruments?.map(item => `${item?.num_original}`).join(', ') ;
+    return instruments?.map(item => `${item?.originalNum}`).join(', ') ;
   }
 
   loadUoOptions(idWorkpack: number, onFinish?: () => void): void {
@@ -391,6 +439,7 @@ export class CostAccountComponent implements OnInit {
 
       
       await this.loadCardCostAccountProperties();
+      this.selectedInstruments = this.costAccount.instruments.map(item => ({...item}));
       this.setBreadcrumb();
     }
   }
@@ -789,7 +838,8 @@ export class CostAccountComponent implements OnInit {
         idCostAccountModel: this.costAccount.idCostAccountModel,
         properties: this.costAccountProperties,
         unidadeOrcamentaria: this.selectedUo ? this.selectedUo : null,
-        planoOrcamentario: this.selectedPlano ? this.selectedPlano : null
+        planoOrcamentario: this.selectedPlano ? this.selectedPlano : null,
+        instruments: this.selectedInstruments ?? []
       };
       const result = await this.costAccountSrv.put(costAccount);
       this.formIsSaving = false;
@@ -811,7 +861,8 @@ export class CostAccountComponent implements OnInit {
         idCostAccountModel: this.costAccountModel.id,
         properties: this.costAccountProperties,
         unidadeOrcamentaria: this.selectedUo ? this.selectedUo : null,
-        planoOrcamentario: this.selectedPlano ? this.selectedPlano : null
+        planoOrcamentario: this.selectedPlano ? this.selectedPlano : null,
+        instruments: this.selectedInstruments ?? []
       };
       const result = await this.costAccountSrv.post(costAccount);
       this.formIsSaving = false;
