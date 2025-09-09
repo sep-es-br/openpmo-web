@@ -1,0 +1,53 @@
+:host {
+
+    .cardItem {
+        display: flex;
+        flex-direction: column;
+    }
+
+    div {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 0.5rem;
+        
+
+        .p-field {
+            grid-column: span 2;
+        }
+
+        span:not(.p-field):nth-of-type(odd) {
+            display: block;                /* faz ocupar todo espaço do dropdown */
+            overflow: hidden;              /* esconde o excesso */
+            text-overflow: ellipsis;       /* adiciona os ... */
+            white-space: nowrap;           /* não quebra linha */
+        }
+    }
+    
+    ::ng-deep .p-dropdown {
+        width: 100%;
+
+        .p-dropdown-panel  {
+            @extend .p-dropdown-label;
+            max-width: 50rem;
+
+            @media screen and (max-width: 768px) {
+                max-width: 100%;
+            }
+        }
+
+        .p-dropdown-label {
+
+            span:not(.p-dropdown-filter-icon) {
+                display: block;                /* faz ocupar todo espaço do dropdown */
+                overflow: hidden;              /* esconde o excesso */
+                text-overflow: ellipsis;       /* adiciona os ... */
+                white-space: nowrap;           /* não quebra linha */
+                width: 100%;                   /* garante largura completa */
+
+            }
+
+            
+        }
+    }
+
+}

@@ -60,12 +60,12 @@ export class ProcessComponent implements OnInit, OnDestroy {
     });
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.responsive = value);
     this.formProcess = this.formBuilder.group({
-      name: ['', Validators.required],
+      name: ['', [Validators.required, Validators.maxLength(50)]],
       processNumber: ['', Validators.required],
       subject: ['', Validators.required],
       currentOrganization: ['', Validators.required],
       lengthOfStayOn: ['', Validators.required],
-      note: [''],
+      note: ['', Validators.maxLength(600)],
       priority: false,
       status: ''
     });

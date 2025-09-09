@@ -263,8 +263,8 @@
       <span class="p-float-label property-input p-field input-number-scroll"
         *ngIf="[ 'IntegerModel', 'TextModel', 'TextAreaModel' ].includes(property.type)">
         <p-inputNumber inputStyleClass="app-input-text" [(ngModel)]="property.max" [showButtons]="true"
-          (ngModelChange)="changed.emit($event)" [disabled]="property.viewOnly"></p-inputNumber>
-        <label class="input-label">{{ 'maximum' | translate }}
+          (ngModelChange)="changed.emit($event)"  [required]="true" [disabled]="property.viewOnly"></p-inputNumber>
+        <label class="input-label">{{ 'maximum' | translate }} *
           <i class="far fa-question-circle" [pTooltip]="'help.propertyModel.maximum' | translate"></i>
         </label>
       </span>

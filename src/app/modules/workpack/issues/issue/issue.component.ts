@@ -71,7 +71,7 @@ export class IssueComponent implements OnInit {
     });
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.responsive = value);
     this.formIssue = this.formBuilder.group({
-      name: ['', Validators.required],
+      name: ['', [Validators.required, Validators.maxLength(50)]],
       triggeredBy: null,
       description: ['', Validators.required],
       importance: [null, Validators.required],

@@ -108,12 +108,26 @@ export class WorkpackSectionPropertiesComponent implements OnInit, OnDestroy {
     this.workpackParams = workpackParams;
     this.workpackData = workpackData;
     this.sectionPropertiesProperties = properties;
+    this.sectionPropertiesProperties.forEach((property) => {
+      if (property.name === 'name') {
+        property.max = 50;
+      }
+      if (property.name === 'fullName') {
+        property.max = 600;
+      }
+    });
     if (this.cardWorkpackProperties) {
       this.cardWorkpackProperties.initialStateCollapse = this.workpackParams?.idWorkpack && !this.showTabview;
       this.showExpandedCollapseButtons =
       this.sectionPropertiesProperties.filter( prop => prop.type === TypePropertyModelEnum.GroupModel).length > 0;
     }
     if (!loading) {this.showCheckCompleted();}
+
+    this.sectionPropertiesProperties.forEach(prop => {
+      if (prop.type !== TypePropertyModelEnum.GroupModel) {
+        this.checkPropertiesStringValid(prop);
+      }
+    });
   }
 
   showCheckCompleted() {
@@ -238,8 +252,11 @@ export class WorkpackSectionPropertiesComponent implements OnInit, OnDestroy {
             : String(prop.value).length <= Number(prop.max) && String(prop.value).length > 0) : true;
           if (property.idPropertyModel === prop.idPropertyModel) {
             prop.invalid = !valid;
-            prop.message = !valid ? (String(prop.value).length > 0 ? prop.message = this.translateSrv.instant('maxLenght')
-              : prop.message = this.translateSrv.instant('required')) : '';
+            prop.message = !valid
+            ? (String(prop.value).length > 0
+                ? `${this.translateSrv.instant('maxLength', { max: prop.max })}`
+                : this.translateSrv.instant('required'))
+            : '';
           }
         }
         const groupedPropertiesValid = prop.type === 'Group' ? this.checkPropertiesStringValid(property, prop.groupedProperties) : true;

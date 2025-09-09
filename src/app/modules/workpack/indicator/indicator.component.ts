@@ -117,8 +117,8 @@ export class IndicatorComponent implements OnInit, OnDestroy {
         this.responseService.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.responsive = value);
 
         this.formIndicator = this.formBuilder.group({
-            name: ['', Validators.required],
-            description: ['', Validators.required],
+            name: ['', [Validators.required, Validators.maxLength(50)]],
+            description: ['', [Validators.required, Validators.maxLength(600)]],
             source: [null],
             measure: [null],
             startDate: [null, Validators.required],
@@ -183,6 +183,7 @@ export class IndicatorComponent implements OnInit, OnDestroy {
                 this.indicator = result.data;
                 await this.loadFontOptions(this.idOffice);
                 this.setFormIndicator();
+                this.formIndicator.markAllAsTouched();
             }
         } else {
             this.cardIndicatorProperties.isLoading = false;
@@ -340,20 +341,32 @@ export class IndicatorComponent implements OnInit, OnDestroy {
     onExpectedGoalChange(data: any): void {
         data.lastUpdate = this.getCurrentDate();
         this.formIndicator.markAsDirty();
-        this.saveButton.showButton();
+        if (this.formIndicator.valid) {
+            this.saveButton.showButton();
+        } else {
+            this.saveButton.hideButton();
+        }
         this.cancelButton.showButton();
     }
 
-    onAchievedGoalChange(data: any) {
+    onAchievedGoalChange(data: any): void {
         this.formIndicator.markAsDirty();
         data.lastUpdate = this.getCurrentDate();
-        this.saveButton.showButton();
+        if (this.formIndicator.valid) {
+            this.saveButton.showButton();
+        } else {
+            this.saveButton.hideButton();
+        }
         this.cancelButton.showButton();
     }
 
-    onJustificationChange() {
+    onJustificationChange(): void {
         this.formIndicator.markAsDirty();
-        this.saveButton.showButton();
+        if (this.formIndicator.valid) {
+            this.saveButton.showButton();
+        } else {
+            this.saveButton.hideButton();
+        }
         this.cancelButton.showButton();
     }
 
@@ -561,6 +574,7 @@ export class IndicatorComponent implements OnInit, OnDestroy {
                 periodicity: null
             })
         }
+        this.formIndicator.markAllAsTouched();
     }
 
     trackByFn(index: number, item: any): any {
