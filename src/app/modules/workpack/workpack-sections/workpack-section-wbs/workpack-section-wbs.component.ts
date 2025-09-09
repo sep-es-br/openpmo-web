@@ -197,4 +197,94 @@ export class WorkpackSectionWBSComponent implements OnDestroy {
     }
   }
 
+  shouldDisplayWarningStyles(node: any): {
+    displayWarningIcon: boolean;
+    displayColoredText: boolean;
+    displayDashedText: boolean;
+    textTooltipMessage: string;
+  } {
+    let tooltipMessage = '- Projeto não possui Área de Base ativa';
+
+    if (node && node.workpackType === TypeWorkpackEnumWBS.Milestone) {
+      if (node.milestoneStatus === 'CHANGED') {
+        if (!node.hasActiveBaseline) {
+          // Se o projeto não possui linha de base ativa, mantém o alerta nos Milestones
+          tooltipMessage = `${tooltipMessage}\n- Este item foi reestruturado e requer um novo salvamento da linha de base no projeto`;
+        } else {
+          tooltipMessage = '- Este item foi reestruturado e requer um novo salvamento da linha de base no projeto';
+        }
+
+        return {
+          displayWarningIcon: true,
+          displayColoredText: true,
+          displayDashedText: false,
+          textTooltipMessage: tooltipMessage,
+        };
+      } else if (node.milestoneStatus === 'TO_CANCEL') {
+        if (!node.hasActiveBaseline) {
+          tooltipMessage = `${tooltipMessage}\n- Este item está \"a cancelar\" e requer um novo salvamento da linha de base no projeto`;
+        } else {
+          tooltipMessage = '- Este item está \"a cancelar\" e requer um novo salvamento da linha de base no projeto';
+        }
+
+        return {
+          displayWarningIcon: true,
+          displayColoredText: true,
+          displayDashedText: true,
+          textTooltipMessage: tooltipMessage,
+        };
+      }
+    } else if (node && node.workpackType === TypeWorkpackEnumWBS.Deliverable) {
+      if (node.deliverableStatus === 'CHANGED') {
+        if (!node.hasActiveBaseline) {
+          // Se o projeto não possui linha de base ativa, mantém o alerta nas Entregas
+          tooltipMessage = `${tooltipMessage}\n- Este item foi reestruturado e requer um novo salvamento da linha de base no projeto`;
+        } else {
+          tooltipMessage = '- Este item foi reestruturado e requer um novo salvamento da linha de base no projeto';
+        }
+
+        return {
+          displayWarningIcon: true,
+          displayColoredText: true,
+          displayDashedText: false,
+          textTooltipMessage: tooltipMessage,
+        };
+      } else if (node.deliverableStatus === 'TO_CANCEL') {
+        if (!node.hasActiveBaseline) {
+          tooltipMessage = `${tooltipMessage}\n- Este item está \"a cancelar\" e requer um novo salvamento da linha de base no projeto`;
+        } else {
+          tooltipMessage = '- Este item está \"a cancelar\" e requer um novo salvamento da linha de base no projeto';
+        }
+
+        return {
+          displayWarningIcon: true,
+          displayColoredText: true,
+          displayDashedText: true,
+          textTooltipMessage: tooltipMessage,
+        };
+      }
+
+      if (node?.dashboard?.tripleConstraint?.scopeActualValue > 0) {
+        tooltipMessage = `${tooltipMessage}\n- Este item foi criado e requer um novo salvamento da linha de base no projeto`;
+      } else {
+        tooltipMessage = `${tooltipMessage}\n- Este item foi criado e requer validação de escopo`;
+      }
+    } else if (node && !node.hasActiveBaseline) {
+      // Se não há linha de base ativa
+
+      return {
+        displayWarningIcon: true,
+        displayColoredText: true,
+        displayDashedText: false,
+        textTooltipMessage: tooltipMessage,
+      };
+    } else {
+      return {
+        displayWarningIcon: false,
+        displayColoredText: false,
+        displayDashedText: false,
+        textTooltipMessage: '',
+      };
+    }
+  }
 }

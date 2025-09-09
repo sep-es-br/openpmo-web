@@ -20,27 +20,29 @@
         *ngIf="node.workpacks; else workpackModels">
         <div class="tree-label">{{ node.workpackModelName }}</div>
         <div class="container-milestone" *ngIf="node?.workpackModelType === typeWorkpackEnum.Milestone">
-          <div class="milestone-column">{{"baselinePlanned" |translate}}</div>
-          <div class="milestone-column">{{"estimatedConcluded" | translate}}</div>
-          <div class="milestone-column">{{"status" |translate}}</div>
+          <div class="milestone-column">{{ "baselinePlanned" | translate }}</div>
+          <div class="milestone-column">{{ "estimatedConcluded" | translate }}</div>
+          <div class="milestone-column">{{ "status" | translate }}</div>
         </div>
       </div>
 
       <!-- CHILDREN -->
       <ng-template #workpackModels>
         <div class="container-custom-tree container-workpack">
-          <div class="workpack-title-box">
+          <div class="workpack-title-box" [pTooltip]="shouldDisplayWarningStyles(node).textTooltipMessage">
+            <!-- *ngIf="node.workpackType === 'Project' && node.hasActiveBaseline === false" -->
             <i
-              *ngIf="node.workpackType === 'Project' && node.hasActiveBaseline === false"
+              *ngIf="shouldDisplayWarningStyles(node).displayWarningIcon"
               class="warning-icon fa fa-exclamation-triangle"
               aria-hidden="true"
             ></i>
+            <!-- [ngClass]="{ 'alert-text': (node.workpackType === 'Project' && node.hasActiveBaseline === false) }" -->
             <div
               class="tree-label link"
-              [ngClass]="{ 'alert-text': (node.workpackType === 'Project' && node.hasActiveBaseline === false) }"
+              [ngClass]="{ 'alert-text': shouldDisplayWarningStyles(node).displayColoredText }"
               (click)="navigateToWorkpack(node)"
             >
-              {{node.workpackName }}
+              {{ node.workpackName }}
             </div>
           </div>
           <div class="container-properties" [class.deliverable]="node?.workpackType === typeWorkpackEnum.Deliverable">
