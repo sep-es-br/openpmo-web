@@ -221,7 +221,7 @@ export class CostAccountComponent implements OnInit {
   }
 
   async updateInstruments(){
-    if(!this.selectedUo || !this.selectedStartYear || !this.selectedEndYear) return;
+    if(!this.selectedUo?.code || !this.selectedStartYear || !this.selectedEndYear) return;
 
       this.instrumentsList = await this.pentahoSrv.getInstrumentsOptions(this.selectedUo.code, this.selectedStartYear, this.selectedEndYear).toPromise();
 
@@ -439,7 +439,7 @@ export class CostAccountComponent implements OnInit {
 
       
       await this.loadCardCostAccountProperties();
-      this.selectedInstruments = this.costAccount.instruments.map(item => ({...item}));
+      this.selectedInstruments = this.costAccount.instruments?.map(item => ({...item})) ?? [];
       this.setBreadcrumb();
     }
   }
