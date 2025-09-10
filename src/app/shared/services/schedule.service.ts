@@ -105,6 +105,12 @@ export class ScheduleService extends BaseService<any> {
     return this.http.put(`${this.urlBase}/step/batch/${idSchedule}`, steps).toPromise() as Promise<IHttpResult<IStepPost[]>>;
   }
 
+  public async checkDeliverableComplete(deliverableId: number): Promise<IHttpResult<boolean>> {
+    return this.http
+      .get<IHttpResult<boolean>>(`${this.urlBase}/step/check-complete/${deliverableId}`)
+      .toPromise();
+  }
+
   public postScheduleStep(step: IStepPost): Promise<IHttpResult<IStepPost>> {
     return this.http.post(`${this.urlBase}/step`, step).toPromise() as Promise<IHttpResult<IStepPost>>;
   }

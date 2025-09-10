@@ -109,6 +109,7 @@
   "myRolesPermissions": "Meus cargos e permissões",
   "locality": "Localidade",
   "properties": "Propriedades",
+  "instruments": "Instrumentos",
   "user": "Usuário",
   "english": "Inglês",
   "portuguese": "Português",
@@ -174,6 +175,8 @@
   "edition": "Edição",
   "failure": "Falha",
   "riskResponse": "Resposta Risco",
+  "selectInstrument": "Selecionar Contratos/Convênios",
+  "tcuCode": "Código TCU/Órgão",
   "edited": "Editado",
   "created": "Criado",
   "removed": "Removido",
@@ -362,6 +365,8 @@
   "baselines": "Linhas de base",
   "CHANGED": "Alterado",
   "DELETED": "Excluído",
+  "TO_CANCEL": "A cancelar",
+  "CANCELLED": "Cancelada",
   "NEW": "Novo",
   "submit": "Submeter",
   "evaluations": "Avaliações",
@@ -414,6 +419,11 @@
   "confirmSpreadDifference": "Confirmar distribuição da diferença",
   "help": {
     "textHelpOnline": "Texto de ajuda",
+    "costAccount": {
+      "endDate": "Data final do intervalo de tempo",
+      "startDate": "Data inicial do intervalo de tempo",
+      "selectInstrument": "Instrumento a ser adicionado"
+    },
     "workpack": {
       "name": "Nome do pacote de trabalho.",
       "fullName": "Nome completo do pacote de trabalho.",
@@ -1024,6 +1034,8 @@
   "currentExpenses": "Despesa Corrente",
   "idDomain": "Domínio",
   "programObjective": "Objetivo do Programa",
+  "instrumentObjective": "Objetivo",
+  "instrumentRecipient": "Favorecido",
   "phoneNumber": "Número Telefone",
   "person": "Pessoa",
   "persons": "Pessoas",

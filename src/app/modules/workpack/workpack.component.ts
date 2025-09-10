@@ -631,14 +631,14 @@ export class WorkpackComponent implements OnDestroy {
         workpack.idPlan = idPlan;
         workpack.idWorkpackModel = idWorkpackModel;
         workpack.idParent = this.idWorkpack;
-        if (workpack.canceled && workpack.type !== 'Project') {
+        if (workpack.canceled && workpack.type !== 'Project' && workpack.type !== 'Deliverable') {
           menuItems.push({
             label: this.translateSrv.instant('restore'),
             icon: 'fas fa-redo-alt',
             command: (event) => this.handleRestoreWorkpack(workpack.id),
           });
         } else {
-          if (workpack.type !== 'Project' && !!workpack.canDeleted && !workpack.canceled && !workpack.linked) {
+          if (workpack.type !== 'Project' && !!workpack.canDeleted && !workpack.canceled && !workpack.linked && !(workpack.type === 'Deliverable' && workpack.hasActiveBaseline)) {
             menuItems.push({
               label: this.translateSrv.instant('delete'),
               icon: 'fas fa-trash-alt',

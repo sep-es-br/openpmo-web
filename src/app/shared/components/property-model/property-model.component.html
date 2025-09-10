@@ -52,7 +52,13 @@
         <p-chips inputStyleClass="app-input-text" [(ngModel)]="property.possibleValuesOptions" [required]="true"
           [allowDuplicate]="false" (ngModelChange)="changed.emit($event)" [disabled]="property.viewOnly" separator=","
           (onRemove)="checkIfRemovedValueIsDefault($event)"
-          [class.p-inputwrapper-filled]="property.possibleValuesOptions && property.possibleValuesOptions.length > 0"></p-chips>
+          [class.p-inputwrapper-filled]="property.possibleValuesOptions && property.possibleValuesOptions.length > 0">
+          <ng-template let-item pTemplate="item">
+            <span [class.protected-chip]="isProtected(item)">
+              {{item}}
+            </span>
+          </ng-template>
+        </p-chips>
         <label class="input-label">{{ 'possibleValues' | translate }} *
           <i class="far fa-question-circle" [pTooltip]="'help.propertyModel.possibleValues' | translate"></i>
         </label>
@@ -133,7 +139,7 @@
             <p-multiSelect class="app-multiple-selection" dropdownIcon="fas fa-caret-down"
               [options]="property.possibleValuesOptions | toSelectItem" [(ngModel)]="property.defaultValue"
               [selectedItemsLabel]="language === 'pt-BR' ? '{0} itens selecionados' : '{0} items selected'"
-              [disabled]="!property.possibleValuesOptions?.length || property.viewOnly" [required]="true"
+              [disabled]="!property.possibleValuesOptions?.length || property.viewOnly" [required]="true" 
               (ngModelChange)="changed.emit($event)"></p-multiSelect>
           </ng-container>
           <ng-template #singleSelectionDefault>
@@ -230,7 +236,7 @@
       <span class="property-checkbox p-field-checkbox"
         *ngIf="[ 'SelectionModel', 'LocalitySelectionModel', 'OrganizationSelectionModel' ].includes(property.type)">
         <p-checkbox class="app-checkbox" [(ngModel)]="property.multipleSelection" [binary]="true"
-          [disabled]="property.viewOnly" [required]="true"
+          [disabled]="property.viewOnly || property.disableMultipleSelection" [required]="true"
           (ngModelChange)="changed.emit({property: property, multipleSelectedChanged: true}); checkDefaultValue();">
         </p-checkbox>
         <label class="input-label">{{ 'multipleSelection' | translate }}

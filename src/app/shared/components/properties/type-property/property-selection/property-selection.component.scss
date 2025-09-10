@@ -70,3 +70,17 @@
 ::ng-deep .p-multiselect-panel .p-multiselect-items .p-multiselect-item.p-highlight  {
   background-color: rgba(68, 179, 155, 0.4) !important;
 }
+
+::ng-deep .p-dropdown-panel .p-dropdown-items .p-dropdown-item-group + p-dropdownitem > li.p-dropdown-item,
+::ng-deep .p-dropdown-panel .p-dropdown-items .p-dropdown-item-group + p-dropdownitem ~ p-dropdownitem > li.p-dropdown-item {
+  padding-left: 2rem !important;
+}
+
+::ng-deep .p-dropdown-panel .p-dropdown-items .p-dropdown-item-group:last-of-type {
+  display: none !important;
+}
+
+::ng-deep .p-dropdown-panel .p-dropdown-items .p-dropdown-item-group:last-of-type + p-dropdownitem > li.p-dropdown-item,
+::ng-deep .p-dropdown-panel .p-dropdown-items .p-dropdown-item-group:last-of-type + p-dropdownitem ~ p-dropdownitem > li.p-dropdown-item {
+  padding-left: 1rem !important;
+}

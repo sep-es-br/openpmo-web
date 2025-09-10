@@ -3,7 +3,7 @@
   "version": "2.2.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve --hmr",
+    "start": "set NODE_OPTIONS=--openssl-legacy-provider && ng serve --hmr",
     "build": "ng build",
     "build:dev": "ng build",
     "build:test": "ng build --configuration=test",
