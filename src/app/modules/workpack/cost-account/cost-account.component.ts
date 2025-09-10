@@ -188,7 +188,7 @@ export class CostAccountComponent implements OnInit {
   
   instrumentsChanged() {
     // verifica se mudou tamanho
-    if (this.selectedInstruments.length !== this.costAccount.instruments.length) return true;
+    if (this.selectedInstruments.length !== (this.costAccount.instruments?.length ?? 0)) return true;
 
     // verifica se algum sigefesCode mudou na mesma posição
     return this.selectedInstruments.some((selected, i) =>
