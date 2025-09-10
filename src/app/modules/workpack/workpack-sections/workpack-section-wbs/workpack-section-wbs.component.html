@@ -29,17 +29,15 @@
       <!-- CHILDREN -->
       <ng-template #workpackModels>
         <div class="container-custom-tree container-workpack">
-          <div class="workpack-title-box" [pTooltip]="shouldDisplayWarningStyles(node).textTooltipMessage">
-            <!-- *ngIf="node.workpackType === 'Project' && node.hasActiveBaseline === false" -->
+          <div class="workpack-title-box" [pTooltip]="shouldDisplayWarningStyles(node)?.textTooltipMessage">
             <i
               *ngIf="shouldDisplayWarningStyles(node).displayWarningIcon"
               class="warning-icon fa fa-exclamation-triangle"
               aria-hidden="true"
             ></i>
-            <!-- [ngClass]="{ 'alert-text': (node.workpackType === 'Project' && node.hasActiveBaseline === false) }" -->
             <div
               class="tree-label link"
-              [ngClass]="{ 'alert-text': shouldDisplayWarningStyles(node).displayColoredText }"
+              [ngClass]="{ 'alert-text': shouldDisplayWarningStyles(node).displayColoredText, 'dashed-text': shouldDisplayWarningStyles(node).displayDashedText }"
               (click)="navigateToWorkpack(node)"
             >
               {{ node.workpackName }}

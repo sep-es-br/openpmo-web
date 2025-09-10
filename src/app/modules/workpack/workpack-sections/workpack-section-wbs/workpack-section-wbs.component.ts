@@ -203,9 +203,29 @@ export class WorkpackSectionWBSComponent implements OnDestroy {
     displayDashedText: boolean;
     textTooltipMessage: string;
   } {
-    let tooltipMessage = '- Projeto não possui Área de Base ativa';
+    let tooltipMessage = '- Projeto não possui Linha de Base ativa';
 
-    if (node && node.workpackType === TypeWorkpackEnumWBS.Milestone) {
+    if (
+      node &&
+      (node.workpackType === TypeWorkpackEnumWBS.Program) ||
+      (
+        node.workpackType === TypeWorkpackEnumWBS.Organizer &&
+        node.workpackModels.some(
+          (wpck: any) =>
+            wpck.workpackModelType === 'Program' ||
+            wpck.workpackModelType === 'Project' ||
+            wpck.workpackModelName === 'Subprogramas'
+          )
+      )
+    ) {
+      // É um node de Programa ou Área Temática
+      return {
+        displayWarningIcon: false,
+        displayColoredText: false,
+        displayDashedText: false,
+        textTooltipMessage: '',
+      };
+    } else if (node && node.workpackType === TypeWorkpackEnumWBS.Milestone) {
       if (node.milestoneStatus === 'CHANGED') {
         if (!node.hasActiveBaseline) {
           // Se o projeto não possui linha de base ativa, mantém o alerta nos Milestones
@@ -269,7 +289,9 @@ export class WorkpackSectionWBSComponent implements OnDestroy {
       } else {
         tooltipMessage = `${tooltipMessage}\n- Este item foi criado e requer validação de escopo`;
       }
-    } else if (node && !node.hasActiveBaseline) {
+    }
+
+    if (node && !node.hasActiveBaseline) {
       // Se não há linha de base ativa
 
       return {
