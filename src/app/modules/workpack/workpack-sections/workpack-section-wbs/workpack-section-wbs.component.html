@@ -20,16 +20,29 @@
         *ngIf="node.workpacks; else workpackModels">
         <div class="tree-label">{{ node.workpackModelName }}</div>
         <div class="container-milestone" *ngIf="node?.workpackModelType === typeWorkpackEnum.Milestone">
-          <div class="milestone-column">{{"baselinePlanned" |translate}}</div>
-          <div class="milestone-column">{{"estimatedConcluded" | translate}}</div>
-          <div class="milestone-column">{{"status" |translate}}</div>
+          <div class="milestone-column">{{ "baselinePlanned" | translate }}</div>
+          <div class="milestone-column">{{ "estimatedConcluded" | translate }}</div>
+          <div class="milestone-column">{{ "status" | translate }}</div>
         </div>
       </div>
 
       <!-- CHILDREN -->
       <ng-template #workpackModels>
         <div class="container-custom-tree container-workpack">
-          <div class="tree-label link" (click)="navigateToWorkpack(node)">{{node.workpackName }}</div>
+          <div class="workpack-title-box" [pTooltip]="shouldDisplayWarningStyles(node)?.textTooltipMessage">
+            <i
+              *ngIf="shouldDisplayWarningStyles(node).displayWarningIcon"
+              class="warning-icon fa fa-exclamation-triangle"
+              aria-hidden="true"
+            ></i>
+            <div
+              class="tree-label link"
+              [ngClass]="{ 'alert-text': shouldDisplayWarningStyles(node).displayColoredText, 'dashed-text': shouldDisplayWarningStyles(node).displayDashedText }"
+              (click)="navigateToWorkpack(node)"
+            >
+              {{ node.workpackName }}
+            </div>
+          </div>
           <div class="container-properties" [class.deliverable]="node?.workpackType === typeWorkpackEnum.Deliverable">
             <ng-container *ngIf="node?.workpackType !== typeWorkpackEnum.Deliverable; else schedule">
               <ng-container *ngIf="node?.workpackType !== typeWorkpackEnum.Milestone; else milestoneData"

@@ -33,7 +33,7 @@ export class WorkpackSectionWBSComponent implements OnDestroy {
   isLoading = false;
   idPlan: number;
   topPosLoading = 128;
-  collapsed: boolean = true;
+  collapsed = true;
   workpackParams: IWorkpackParams;
 
   constructor(
@@ -47,7 +47,7 @@ export class WorkpackSectionWBSComponent implements OnDestroy {
     private journalSrv: JournalService
   ) {
     this.isLoading = true;
-    this.actRouter.queryParams.subscribe(async ({ idPlan }) => {
+    this.actRouter.queryParams.subscribe(async({ idPlan }) => {
       this.idPlan = idPlan && +idPlan;
     });
     this.translateSrv.onLangChange.pipe(takeUntil(this.$destroy)).subscribe(() => {
@@ -57,7 +57,7 @@ export class WorkpackSectionWBSComponent implements OnDestroy {
       if (reset) {
         this.loadBreakdownStructureData();
       }
-    })
+    });
   }
 
   ngOnDestroy(): void {
@@ -138,7 +138,7 @@ export class WorkpackSectionWBSComponent implements OnDestroy {
     if (item.idWorkpack === this.workpackParams.idWorkpack) {
       return;
     }
-    this.setWorkpackBreadcrumbStorage(item.idWorkpack, this.idPlan)
+    this.setWorkpackBreadcrumbStorage(item.idWorkpack, this.idPlan);
     this.route.navigate(['/workpack'], {
       queryParams: {
         id: item.idWorkpack,
@@ -190,10 +190,122 @@ export class WorkpackSectionWBSComponent implements OnDestroy {
           ...evidence,
           isImg,
           icon
-        }
+        };
       });
       journalInformation.loading = false;
     }
   }
 
+  shouldDisplayWarningStyles(node: any): {
+    displayWarningIcon: boolean;
+    displayColoredText: boolean;
+    displayDashedText: boolean;
+    textTooltipMessage: string;
+  } {
+    let tooltipMessage = '- Projeto não possui Linha de Base ativa';
+
+    if (
+      node &&
+      (node.workpackType === TypeWorkpackEnumWBS.Program) ||
+      (
+        node.workpackType === TypeWorkpackEnumWBS.Organizer &&
+        node.workpackModels.some(
+          (wpck: any) =>
+            wpck.workpackModelType === 'Program' ||
+            wpck.workpackModelType === 'Project' ||
+            wpck.workpackModelName === 'Subprogramas'
+          )
+      )
+    ) {
+      // É um node de Programa ou Área Temática
+      return {
+        displayWarningIcon: false,
+        displayColoredText: false,
+        displayDashedText: false,
+        textTooltipMessage: '',
+      };
+    } else if (node && node.workpackType === TypeWorkpackEnumWBS.Milestone) {
+      if (node.milestoneStatus === 'CHANGED') {
+        if (!node.hasActiveBaseline) {
+          // Se o projeto não possui linha de base ativa, mantém o alerta nos Milestones
+          tooltipMessage = `${tooltipMessage}\n- Este item foi reestruturado e requer um novo salvamento da linha de base no projeto`;
+        } else {
+          tooltipMessage = '- Este item foi reestruturado e requer um novo salvamento da linha de base no projeto';
+        }
+
+        return {
+          displayWarningIcon: true,
+          displayColoredText: true,
+          displayDashedText: false,
+          textTooltipMessage: tooltipMessage,
+        };
+      } else if (node.milestoneStatus === 'TO_CANCEL') {
+        if (!node.hasActiveBaseline) {
+          tooltipMessage = `${tooltipMessage}\n- Este item está \"a cancelar\" e requer um novo salvamento da linha de base no projeto`;
+        } else {
+          tooltipMessage = '- Este item está \"a cancelar\" e requer um novo salvamento da linha de base no projeto';
+        }
+
+        return {
+          displayWarningIcon: true,
+          displayColoredText: true,
+          displayDashedText: true,
+          textTooltipMessage: tooltipMessage,
+        };
+      }
+    } else if (node && node.workpackType === TypeWorkpackEnumWBS.Deliverable) {
+      if (node.deliverableStatus === 'CHANGED') {
+        if (!node.hasActiveBaseline) {
+          // Se o projeto não possui linha de base ativa, mantém o alerta nas Entregas
+          tooltipMessage = `${tooltipMessage}\n- Este item foi reestruturado e requer um novo salvamento da linha de base no projeto`;
+        } else {
+          tooltipMessage = '- Este item foi reestruturado e requer um novo salvamento da linha de base no projeto';
+        }
+
+        return {
+          displayWarningIcon: true,
+          displayColoredText: true,
+          displayDashedText: false,
+          textTooltipMessage: tooltipMessage,
+        };
+      } else if (node.deliverableStatus === 'TO_CANCEL') {
+        if (!node.hasActiveBaseline) {
+          tooltipMessage = `${tooltipMessage}\n- Este item está \"a cancelar\" e requer um novo salvamento da linha de base no projeto`;
+        } else {
+          tooltipMessage = '- Este item está \"a cancelar\" e requer um novo salvamento da linha de base no projeto';
+        }
+
+        return {
+          displayWarningIcon: true,
+          displayColoredText: true,
+          displayDashedText: true,
+          textTooltipMessage: tooltipMessage,
+        };
+      }
+
+      if (node?.dashboard?.tripleConstraint?.scopeActualValue > 0) {
+        tooltipMessage = `${tooltipMessage}\n- Este item foi criado e requer um novo salvamento da linha de base no projeto`;
+      } else {
+        tooltipMessage = `${tooltipMessage}\n- Este item foi criado e requer validação de escopo`;
+      }
+    }
+
+    if (node && node.hasActiveBaseline !== null && node.hasActiveBaseline === false) {
+      // Se não há linha de base ativa
+
+      return {
+        displayWarningIcon: true,
+        displayColoredText: true,
+        displayDashedText: false,
+        textTooltipMessage: tooltipMessage,
+      };
+    } else {
+      return {
+        displayWarningIcon: false,
+        displayColoredText: false,
+        displayDashedText: false,
+        textTooltipMessage: '',
+      };
+    }
+  }
 }
