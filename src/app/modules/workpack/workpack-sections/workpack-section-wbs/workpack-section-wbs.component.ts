@@ -81,7 +81,6 @@ export class WorkpackSectionWBSComponent implements OnDestroy {
     const { wbsTree, loading } = this.breakdownStructureSrv.getWBSTree();
     this.wbsTree = wbsTree;
     this.isLoading = loading;
-    console.log('this.wbsTree: ', this.wbsTree);
   }
 
   nodeCollapse(nodeList, level) {
@@ -291,7 +290,7 @@ export class WorkpackSectionWBSComponent implements OnDestroy {
       }
     }
 
-    if (node && !node.hasActiveBaseline) {
+    if (node && node.hasActiveBaseline !== null && node.hasActiveBaseline === false) {
       // Se não há linha de base ativa
 
       return {
