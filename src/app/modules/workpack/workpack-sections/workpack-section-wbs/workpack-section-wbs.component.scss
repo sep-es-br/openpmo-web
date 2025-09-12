@@ -222,6 +222,14 @@
           margin-left: 10px;
           width: 100%;
         }
+        .new-label {
+          padding: 0.15rem 0.35rem;
+          border: 1px solid #0083BB;
+          border-radius: 20px;
+          font-size: 14px;
+          color: #0083BB;
+          text-transform: uppercase;
+        }
       }
       .header-values-cost-account.responsive {
         display: flex;

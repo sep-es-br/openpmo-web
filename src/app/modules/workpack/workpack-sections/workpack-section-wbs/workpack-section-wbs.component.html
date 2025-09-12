@@ -29,7 +29,7 @@
       <!-- CHILDREN -->
       <ng-template #workpackModels>
         <div class="container-custom-tree container-workpack">
-          <div class="workpack-title-box" [pTooltip]="shouldDisplayWarningStyles(node)?.textTooltipMessage">
+          <div class="workpack-title-box" [pTooltip]="parseTooltipTranslatedStrings(shouldDisplayWarningStyles(node)?.textTooltipMessages)">
             <i
               *ngIf="shouldDisplayWarningStyles(node).displayWarningIcon"
               class="warning-icon fa fa-exclamation-triangle"
@@ -74,23 +74,48 @@
             </ng-template>
             <ng-template #schedule>
               <div class="header-values-cost-account" *ngIf="node?.properties?.progressBars">
-                <div class="progress-bar-cost-container" (mouseenter)="progressBarPanel.show($event)"
-                  (mouseleave)="progressBarPanel.hide()" *ngFor="let progressBar of node.properties.progressBars">
-                  <app-progress-bar [total]="progressBar.total" [progress]="progressBar.progress"
-                    [labelTotal]="progressBar.labelTotal" [labelProgress]="progressBar.labelProgress"
-                    [valueUnit]="progressBar.valueUnit" [baselineTotal]="progressBar.baselinePlanned"
-                    [color]="progressBar.color" [startDateBaseline]="progressBar.startDateBaseline"
-                    [endDateBaseline]="progressBar.endDateBaseline" [startDateTotal]="progressBar.startDateTotal"
-                    [endDateTotal]="progressBar.endDateTotal" [barHeight]="progressBar.barHeight"
-                    [disableLabels]="true">
+                <ng-container *ngIf="node?.deliverableStatus && node?.deliverableStatus === 'NEW'">
+                  <div class="status-container">
+                    <span class="new-label">{{ "new" | translate }}</span>
+                  </div>
+                </ng-container>
+                <div
+                  *ngFor="let progressBar of node.properties.progressBars"
+                  class="progress-bar-cost-container"
+                  (mouseenter)="progressBarPanel.show($event)"
+                  (mouseleave)="progressBarPanel.hide()"
+                >
+                  <app-progress-bar
+                    [total]="progressBar.total"
+                    [progress]="progressBar.progress"
+                    [labelTotal]="progressBar.labelTotal"
+                    [labelProgress]="progressBar.labelProgress"
+                    [valueUnit]="progressBar.valueUnit"
+                    [baselineTotal]="progressBar.baselinePlanned"
+                    [color]="progressBar.color"
+                    [startDateBaseline]="progressBar.startDateBaseline"
+                    [endDateBaseline]="progressBar.endDateBaseline"
+                    [startDateTotal]="progressBar.startDateTotal"
+                    [endDateTotal]="progressBar.endDateTotal"
+                    [barHeight]="progressBar.barHeight"
+                    [disableLabels]="true"
+                  >
                   </app-progress-bar>
                   <p-overlayPanel #progressBarPanel class="progressbar-overlay-panel">
-                    <app-progress-bar [total]="progressBar.total" [progress]="progressBar.progress"
-                      [labelTotal]="progressBar.labelTotal" [labelProgress]="progressBar.labelProgress"
-                      [valueUnit]="progressBar.valueUnit" [baselineTotal]="progressBar.baselinePlanned"
-                      [color]="progressBar.color" [startDateBaseline]="progressBar.startDateBaseline"
-                      [endDateBaseline]="progressBar.endDateBaseline" [startDateTotal]="progressBar.startDateTotal"
-                      [endDateTotal]="progressBar.endDateTotal" [barHeight]="progressBar.barHeight">
+                    <app-progress-bar
+                      [total]="progressBar.total"
+                      [progress]="progressBar.progress"
+                      [labelTotal]="progressBar.labelTotal"
+                      [labelProgress]="progressBar.labelProgress"
+                      [valueUnit]="progressBar.valueUnit"
+                      [baselineTotal]="progressBar.baselinePlanned"
+                      [color]="progressBar.color"
+                      [startDateBaseline]="progressBar.startDateBaseline"
+                      [endDateBaseline]="progressBar.endDateBaseline"
+                      [startDateTotal]="progressBar.startDateTotal"
+                      [endDateTotal]="progressBar.endDateTotal"
+                      [barHeight]="progressBar.barHeight"
+                    >
                     </app-progress-bar>
                   </p-overlayPanel>
                 </div>
@@ -118,6 +143,7 @@
             (click)="handleShowJournalInformation(properties.properties.journalInformation); journalInformationPanel.show($event)" 
             ></i>
         </div>
+        
         <ng-template #statusEmpty>
           <div class="status-empty"></div>
         </ng-template>
