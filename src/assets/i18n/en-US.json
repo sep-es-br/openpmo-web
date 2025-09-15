@@ -1059,5 +1059,11 @@
   "budgeted": "Budgeted",
   "authorized": "Authorized",
   "indicator.name": "Name of the indicator. Mandatory information.",
-  "indicator.description": "Description of the indicator. Mandatory information."
+  "indicator.description": "Description of the indicator. Mandatory information.",
+
+  "workpack-section-wbs-alert-project-without-baseline": "Project doesn't have a valid Baseline",
+  "workpack-section-wbs-alert-item-was-changed": "This item has been reestructured and it requires a new Baseline to be saved for/in the Project",
+  "workpack-section-wbs-alert-item-to-cancel": "This item is \"To Cancel\" and it requires a new Baseline to be saved for/in the Project",
+  "workpack-section-wbs-alert-item-new-valid-scope": "This item was created and it requires a new Baseline to be saved for/in the Project",
+  "workpack-section-wbs-alert-item-new-invalid-scope": "This item was created and it requires a scope validation"
 }
