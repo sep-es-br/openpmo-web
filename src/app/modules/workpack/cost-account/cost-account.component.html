@@ -107,7 +107,7 @@
       <app-card-list [itemList]="selectedInstruments" [newItemFunc]="newInstrumentFunc" [removeItemFunc]="removerInstrumentFunc" cardWidth="20rem">
         <ng-template #itemElem let-item let-i="index" >
             <app-cost-account-card-instrument [instrument]="item" [instrumentList]="instrumentsList" 
-                (updateInstrument)="setInstrumentItem($event, i)"></app-cost-account-card-instrument>
+                (updateInstrument)="setInstrumentItem($event, i)" [selectedInstrumentList]="selectedInstruments" ></app-cost-account-card-instrument>
         </ng-template>
         
       </app-card-list>

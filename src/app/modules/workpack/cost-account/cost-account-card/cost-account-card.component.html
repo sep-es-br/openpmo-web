@@ -16,7 +16,7 @@
     <div>
         <span class="p-float-label property-input p-field">
 
-            <p-dropdown class="app-single-selection" [options]="instrumentList" [autoDisplayFirst]="false" [showClear]="false"
+            <p-dropdown class="app-single-selection" [options]="modifiedInstrumentList" [autoDisplayFirst]="false" [showClear]="false"
                 (onChange)="triggerUpdate($event.value)" optionValue="sigefesCode" [filter]="true" filterBy="sigefesCode,name"
                 dropdownIcon="fas fa-caret-down"  [(ngModel)]="instrument.sigefesCode" [required]="true">
 

@@ -28,9 +28,16 @@ export class PentahoService {
   //     })
   //   );
   // }
-  getUoOptions(costAccountId: number): Observable<DropdownOption[]> {
+  getUoOptions(costAccountId: number, codPo?: string): Observable<DropdownOption[]> {
     const url = `${this.baseUrl}/cost-accounts/pentaho/budgetUnit/${costAccountId}`;
-    return this.http.get<any>(url, { responseType: 'json' }).pipe(
+
+    let params = new HttpParams();
+
+    if(codPo) {
+      params = params.set("codPo", codPo)
+    }
+
+    return this.http.get<any>(url, { responseType: 'json', params: params }).pipe(
       map(data => {
         const options: DropdownOption[] = [];
         if (data && data.data && data.data.resultset) {
@@ -61,8 +68,15 @@ export class PentahoService {
   //   );
   // }
   getPlanoOrcamentarioOptions(codUo: string, costAccountId: number): Observable<DropdownOption[]> {
-    const url = `${this.baseUrl}/cost-accounts/pentaho/budgetPlan?codUo=${codUo}&costAccountId=${costAccountId}`;
-    return this.http.get<any>(url, { responseType: 'json' }).pipe(
+    
+
+    const url = `${this.baseUrl}/cost-accounts/pentaho/budgetPlan`;
+
+    let params = new HttpParams().set("costAccountId", costAccountId.toString()); 
+
+    if(codUo) params = params.set("codUo", codUo)
+
+    return this.http.get<any>(url, { responseType: 'json', params: params }).pipe(
       map(data => {
         const options: DropdownOption[] = [];
         if (data && data.data && data.data.resultset) {
@@ -80,12 +94,15 @@ export class PentahoService {
   }
 
   
-  getInstrumentsOptions(codUo: string, startYear: number, endYear : number): Observable<IInstrument[]> {
+  getInstrumentsOptions(idCostAccount: number, codUo: string, startYear: number, endYear : number, codPo?: string): Observable<IInstrument[]> {
     const url = `${this.baseUrl}/cost-accounts/pentaho/instrumentsList?`;
-    const params = new HttpParams()
+    let params = new HttpParams()
+                    .set("costAccountId", idCostAccount.toString())
                     .set("codUo", codUo)
                     .set("startYear", startYear.toString())
                     .set("endYear", endYear.toString());
+
+    if(codPo) params = params.set("codPo", codPo);
 
     return this.http.get<any>(url, { responseType: 'json' , params: params }).pipe(
       map(({data}) => data?.resultset as any[]),

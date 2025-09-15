@@ -15,6 +15,11 @@
             top: 1rem;
             right: 1rem;
             cursor: pointer;
+            display: none;
+        }
+
+        &:hover .icon-remover {
+            display: unset;
         }
 
     }

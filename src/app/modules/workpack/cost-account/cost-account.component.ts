@@ -105,7 +105,7 @@ export class CostAccountComponent implements OnInit {
       this.saveButton.hideButton();
       this.cancelButton.hideButton();
     }
-  }
+  };
 
   removerInstrumentFunc = (item: IInstrument) => {
     
@@ -124,7 +124,7 @@ export class CostAccountComponent implements OnInit {
       this.cancelButton.hideButton();
     }
 
-  }
+  };
 
   poDisabled = true;
 
@@ -223,7 +223,7 @@ export class CostAccountComponent implements OnInit {
   async updateInstruments(){
     if(!this.selectedUo?.code || !this.selectedStartYear || !this.selectedEndYear) return;
 
-      this.instrumentsList = await this.pentahoSrv.getInstrumentsOptions(this.selectedUo.code, this.selectedStartYear, this.selectedEndYear).toPromise();
+      this.instrumentsList = await this.pentahoSrv.getInstrumentsOptions(this.idWorkpack, this.selectedUo.code, this.selectedStartYear, this.selectedEndYear, this.selectedPlano?.code).toPromise();
 
   }
 
@@ -237,7 +237,7 @@ export class CostAccountComponent implements OnInit {
     return instruments?.map(item => `${item?.originalNum}`).join(', ') ;
   }
 
-  loadUoOptions(idWorkpack: number, onFinish?: () => void): void {
+  loadUoOptions(idWorkpack: number, onFinish?: () => void, codPo? : string): void {
     this.uoOptions = [
       {
         code: null,
@@ -246,7 +246,7 @@ export class CostAccountComponent implements OnInit {
         displayText: 'Carregando...'
       }]
 
-    this.pentahoSrv.getUoOptions(idWorkpack).subscribe({
+    this.pentahoSrv.getUoOptions(idWorkpack, codPo).subscribe({
       next: data => {
         this.uoOptions = [
           {
@@ -254,14 +254,22 @@ export class CostAccountComponent implements OnInit {
             name: null,
             fullName: null,
             displayText: '- Nenhum -'
-          },
+          }
+        ];
+
+        if(this.selectedUo?.code && !data.some(uo => uo.code === this.selectedUo.code)){
+          this.uoOptions.push(this.selectedUo)
+        }
+
+        this.uoOptions.push(
           ...data.map(uo => ({
             code: uo.code,
             name: uo.name,
             fullName: uo.fullName,
             displayText: `${uo.code} - ${uo.name} - ${uo.fullName}`
           }))
-        ];
+        );
+
         if (onFinish) onFinish();
       },
       error: err => {
@@ -278,7 +286,6 @@ export class CostAccountComponent implements OnInit {
 
     const uoValue = event.value.code;
 
-
     this.pentahoSrv.getPlanoOrcamentarioOptions(uoValue, this.idWorkpack).subscribe(data => {
       this.planoOrcamentarioOptions = [
         {
@@ -286,14 +293,22 @@ export class CostAccountComponent implements OnInit {
           name: null,
           fullName: null,
           displayText: '- Nenhum -'
-        },
+        }
+      ];
+
+      if(this.selectedPlano?.code && !data.some(plan => plan.code === this.selectedPlano.code)){
+        this.planoOrcamentarioOptions.push(this.selectedPlano)
+      }
+
+      this.planoOrcamentarioOptions.push(
         ...data.map(plan => ({
           code: plan.code,
           name: plan.name,
           fullName: plan.fullName,
           displayText: plan.fullName
         }))
-      ];
+      );
+
       this.poDisabled = data.length === 0;
     });
 
@@ -306,6 +321,8 @@ export class CostAccountComponent implements OnInit {
     this.cancelButton.showButton();
     this.selectedPlano = event.value;
     this.saveButton.showButton();
+    this.loadUoOptions(this.idWorkpack, undefined, this.selectedPlano.code);
+    this.updateInstruments();
   }
   
 
@@ -337,24 +354,34 @@ export class CostAccountComponent implements OnInit {
   setupUoAndPlano() {
     if (!this.costAccount) return;
   
-    this.selectedUo = this.uoOptions.find(uo => uo.code == this.costAccount.unidadeOrcamentaria?.code);
+    this.selectedUo = this.uoOptions.find(uo => uo?.code == this.costAccount.unidadeOrcamentaria?.code);
   
     if (this.selectedUo) {
-      this.pentahoSrv.getPlanoOrcamentarioOptions(this.selectedUo.code, this.costAccount.id).subscribe(poData => {
+      this.pentahoSrv.getPlanoOrcamentarioOptions(this.selectedUo?.code, this.costAccount.id).subscribe(poData => {
         this.planoOrcamentarioOptions = [
           { 
             code: null, 
             name: null, 
             fullName: null, 
             displayText: '- Nenhum -' 
-          },
+          }
+        ];
+
+        if(this.costAccount.planoOrcamentario?.code && !poData.some(po => po.code === this.costAccount.planoOrcamentario.code)) {
+          this.planoOrcamentarioOptions.push({
+            ...this.costAccount.planoOrcamentario,
+            displayText: this.costAccount.planoOrcamentario.fullName
+          })
+        }
+
+        this.planoOrcamentarioOptions.push(
           ...poData.map(plan => ({ 
             code: plan.code, 
             name: plan.name, 
             fullName: plan.fullName, 
             displayText: plan.fullName 
           }))
-        ];
+        );
         this.poDisabled = poData.length === 0;
   
         this.selectedPlano = this.planoOrcamentarioOptions.find(plan => plan.code == this.costAccount.planoOrcamentario?.code);
