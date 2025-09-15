@@ -5,7 +5,7 @@ import { Component, ContentChild, ContentChildren, EventEmitter, HostBinding, In
   templateUrl: './card-list.component.html',
   styleUrls: ['./card-list.component.scss']
 })
-export class CardListComponent<T> implements OnInit {
+export class CardListComponent<T> {
 
   @ContentChild('itemElem') itemElem : TemplateRef<any>;
   
@@ -40,9 +40,5 @@ export class CardListComponent<T> implements OnInit {
   }
 
   constructor() { }
-
-  ngOnInit(): void {
-    
-  }
 
 }

@@ -6,10 +6,11 @@ import { IInstrument } from 'src/app/shared/services/pentaho.service';
   templateUrl: './cost-account-card.component.html',
   styleUrls: ['./cost-account-card.component.scss']
 })
-export class CostAccountCardInstrumentComponent implements OnInit {
+export class CostAccountCardInstrumentComponent {
 
   @Input() instrument : IInstrument;
   @Input() instrumentList : IInstrument[];
+  @Input() selectedInstrumentList : IInstrument[];
 
   @Output() updateInstrument = new EventEmitter<IInstrument>();
 
@@ -28,7 +29,16 @@ export class CostAccountCardInstrumentComponent implements OnInit {
     this.updateInstrument.emit(this.instrument);
   }
 
-  ngOnInit(): void {
+  get modifiedInstrumentList() {
+    if(this.instrument?.sigefesCode && !this.filteredInstrumentList.some(i => i.sigefesCode === this.instrument.sigefesCode))
+      return [this.instrument, ...this.filteredInstrumentList]
+    else
+      return this.filteredInstrumentList;
+  }
+
+  get filteredInstrumentList() {
+      return this.instrumentList
+        .filter(instrument => !this.selectedInstrumentList?.some(_inst => _inst.sigefesCode === instrument.sigefesCode))
   }
 
 }
