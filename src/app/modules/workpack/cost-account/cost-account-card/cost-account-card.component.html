@@ -42,6 +42,10 @@
                [tooltipDisabled]="isMobile" >{{ instrument?.recipientName ? ('('+instrument.recipientCode+') '+instrument.recipientName) : '-' }}</span>
         <span>{{'value' | translate}}</span>
         <span>{{instrument?.value ? (instrument.value | currency:'BRL':'symbol':'1.2-2':'pt-BR') : '-'}}</span>
+        <span>{{'startDate' | translate}}</span>
+        <span>{{instrument?.startPeriod ? (instrument.startPeriod) : '-'}}</span>
+        <span>{{'endDate' | translate}}</span>
+        <span>{{instrument?.endPeriod ? (instrument.endPeriod) : '-'}}</span>
         
     </div>
 </div>
