@@ -234,7 +234,21 @@ export class WorkpackSectionWBSComponent implements OnDestroy {
           textTooltipMessages: [],
         };
       } else if (node && node.workpackType === TypeWorkpackEnumWBS.Milestone) {
-        if (node.milestoneStatus === 'CHANGED') {
+        if (node.milestoneStatus === 'NEW') {
+          if (!node.hasActiveBaseline) {
+            // Se o projeto não possui linha de base ativa, mantém o alerta nos Milestones
+            tooltipMessages.push('workpack-section-wbs-alert-item-is-new');
+          } else {
+            tooltipMessages = ['workpack-section-wbs-alert-item-is-new'];
+          }
+
+          return {
+            displayWarningIcon: true,
+            displayColoredText: true,
+            displayDashedText: false,
+            textTooltipMessages: tooltipMessages,
+          };
+        } else if (node.milestoneStatus === 'CHANGED') {
           if (!node.hasActiveBaseline) {
             // Se o projeto não possui linha de base ativa, mantém o alerta nos Milestones
             // tooltipMessages.push('Este item foi reestruturado e requer um novo salvamento da linha de base no projeto');

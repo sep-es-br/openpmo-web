@@ -1060,6 +1060,7 @@
   "indicator.description": "Descrição do indicador. Informação obrigatória.",
 
   "workpack-section-wbs-alert-project-without-baseline": "Projeto não possui Linha de Base ativa",
+  "workpack-section-wbs-alert-item-is-new": "Este item é Novo, e portanto não está incluso em nenhuma Linha de Base",
   "workpack-section-wbs-alert-item-was-changed": "Este item foi reestruturado e requer um novo salvamento da Linha de Base no Projeto",
   "workpack-section-wbs-alert-item-to-cancel": "Este item está \"À Cancelar\" e requer um novo salvamento da Linha de Base no Projeto",
   "workpack-section-wbs-alert-item-new-valid-scope": "Este item foi criado e requer um novo salvamento da Linha de Base no Projeto",
