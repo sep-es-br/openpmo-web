@@ -239,6 +239,18 @@
         color: #333;
         display: flex;
         text-align: center;
+
+        .new-box {
+          display: flex;
+          width: 60px;
+          align-items: center;
+          justify-content: center;
+          border: 1px solid #0083BB;
+          border-radius: 20px;
+          text-transform: uppercase;
+          color: #0083BB;
+        }
+
         .milestone-column {
           width: 120px;
           display: flex;
