@@ -281,7 +281,15 @@ export class WorkpackSectionWBSComponent implements OnDestroy {
           };
         }
       } else if (node && node.workpackType === TypeWorkpackEnumWBS.Deliverable) {
-        if (node.deliverableStatus === 'CHANGED') {
+        if (node.deliverableStatus === 'NEW') {
+          if (node?.dashboard?.tripleConstraint?.costActualValue > 0) {
+            // tooltipMessages.push('Este item foi criado e requer um novo salvamento da linha de base no projeto');
+            tooltipMessages.push('workpack-section-wbs-alert-item-new-valid-scope');
+          } else {
+            // tooltipMessages.push('Este item foi criado e requer validação de escopo');
+            tooltipMessages.push('workpack-section-wbs-alert-item-new-invalid-scope');
+          }
+        } else if (node.deliverableStatus === 'CHANGED') {
           if (!node.hasActiveBaseline) {
             // Se o projeto não possui linha de base ativa, mantém o alerta nas Entregas
             // tooltipMessages.push('Este item foi reestruturado e requer um novo salvamento da linha de base no projeto');
@@ -312,14 +320,6 @@ export class WorkpackSectionWBSComponent implements OnDestroy {
             displayDashedText: true,
             textTooltipMessages: tooltipMessages,
           };
-        }
-
-        if (node?.dashboard?.tripleConstraint?.scopeActualValue > 0) {
-          // tooltipMessages.push('Este item foi criado e requer um novo salvamento da linha de base no projeto');
-          tooltipMessages.push('workpack-section-wbs-alert-item-new-valid-scope');
-        } else {
-          // tooltipMessages.push('Este item foi criado e requer validação de escopo');
-          tooltipMessages.push('workpack-section-wbs-alert-item-new-invalid-scope');
         }
       }
 
