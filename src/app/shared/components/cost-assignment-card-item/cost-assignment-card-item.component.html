@@ -50,7 +50,7 @@
     <div class="float-label-container">
       <span class="p-float-label" [class.responsive]="responsive">
         <p-inputNumber class="app-input-number" id="float-planned" [(ngModel)]="properties.actualWork"
-          [disabled]="!!properties.readonly || isActualValuesDisabled"
+          [ngClass]="{'disabled-field': !!properties.readonly || isActualValuesDisabled}"
           [class.red]="properties.actualWork < 0"
           (onInput)="handleActualCostChange($event,'actualWork'); debounceValidate.next({value: $event, type:'actualWork'})" mode="decimal" [locale]="currentLang"
           [minFractionDigits]="2" [maxFractionDigits]="2">
