@@ -289,6 +289,13 @@ export class WorkpackSectionWBSComponent implements OnDestroy {
             // tooltipMessages.push('Este item foi criado e requer validação de escopo');
             tooltipMessages.push('workpack-section-wbs-alert-item-new-invalid-scope');
           }
+
+          return {
+            displayWarningIcon: true,
+            displayColoredText: true,
+            displayDashedText: false,
+            textTooltipMessages: tooltipMessages,
+          };
         } else if (node.deliverableStatus === 'CHANGED') {
           if (!node.hasActiveBaseline) {
             // Se o projeto não possui linha de base ativa, mantém o alerta nas Entregas
