@@ -333,10 +333,10 @@ export class CostAccountComponent implements OnInit {
       await this.loadWorkpack();
     }
     if (this.idCostAccount) {
+      await this.loadCostAccount();
       this.loadUoOptions(this.idCostAccount, () => {
         this.setupUoAndPlano()
       });
-      await this.loadCostAccount();
     } else {
       this.setBreadcrumb();
       this.cardCostAccountProperties.isLoading = false;
