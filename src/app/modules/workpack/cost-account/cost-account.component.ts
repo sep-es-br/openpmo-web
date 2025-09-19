@@ -173,7 +173,7 @@ export class CostAccountComponent implements OnInit {
 
   setInstrumentItem(instrument : IInstrument, index: number) {
     
-    if(index >= this.costAccount.instruments.length || instrument.sigefesCode !== this.costAccount.instruments[index].sigefesCode) {
+    if(index >= this.costAccount.instruments?.length || instrument.sigefesCode !== this.costAccount.instruments?.[index].sigefesCode) {
       this.saveButton.showButton(); 
       this.cancelButton.showButton()
     } else {
