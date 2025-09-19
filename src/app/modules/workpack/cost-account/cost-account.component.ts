@@ -313,6 +313,7 @@ export class CostAccountComponent implements OnInit {
     });
 
     this.saveButton.showButton();
+    this.selectedInstruments = [];
     this.updateInstruments();
   }
   
