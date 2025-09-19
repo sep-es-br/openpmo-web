@@ -1064,5 +1064,6 @@
   "workpack-section-wbs-alert-item-was-changed": "Este item foi reestruturado e requer um novo salvamento da Linha de Base no Projeto",
   "workpack-section-wbs-alert-item-to-cancel": "Este item está \"À Cancelar\" e requer um novo salvamento da Linha de Base no Projeto",
   "workpack-section-wbs-alert-item-new-valid-scope": "Este item foi criado e requer um novo salvamento da Linha de Base no Projeto",
-  "workpack-section-wbs-alert-item-new-invalid-scope": "Este item foi criado e requer validação de escopo"
+  "workpack-section-wbs-alert-item-new-invalid-scope": "Este item foi criado e requer validação de escopo",
+  "workpack-section-wbs-alert-delivery-without-schedule": "Esta Entrega não possui um Cronograma"
 }
