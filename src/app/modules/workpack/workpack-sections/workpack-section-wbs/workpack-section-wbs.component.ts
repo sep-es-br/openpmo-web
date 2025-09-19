@@ -205,13 +205,25 @@ export class WorkpackSectionWBSComponent implements OnDestroy {
     const firstEAPElement = this.wbsTree[0];
 
     if (
-      firstEAPElement.dashboard &&
-      firstEAPElement.dashboard.tripleConstraint.scheduleForeseenStartDate &&
-      firstEAPElement.dashboard.tripleConstraint.scheduleForeseenEndDate
+      !firstEAPElement.dashboard ||
+      !firstEAPElement.dashboard.tripleConstraint ||
+      !firstEAPElement.dashboard.tripleConstraint.scheduleForeseenStartDate ||
+      !firstEAPElement.dashboard.tripleConstraint.scheduleForeseenEndDate
     ) {
-      // Habilita os alertas apenas se o primeiro elemento da hierarquia houver cronograma
-      // let tooltipMessages = ['Projeto não possui Linha de Base ativa'];
-      let tooltipMessages = ['workpack-section-wbs-alert-project-without-baseline'];
+      // Se o primeiro elemento da hierarquia não houver cronograma, desabilita todos os alertas
+      return {
+        displayWarningIcon: false,
+        displayColoredText: false,
+        displayDashedText: false,
+        textTooltipMessages: [],
+      };
+    } else {
+      // Se houver cronograma, verifica se há alertas
+      const tooltipMessages = [];
+
+      if (!node.projectHasActiveBaseline) {
+        tooltipMessages.push('workpack-section-wbs-alert-project-without-baseline');
+      }
 
       if (
         node &&
@@ -234,127 +246,76 @@ export class WorkpackSectionWBSComponent implements OnDestroy {
           textTooltipMessages: [],
         };
       } else if (node && node.workpackType === TypeWorkpackEnumWBS.Milestone) {
-        if (node.milestoneStatus === 'NEW') {
-          if (!node.hasActiveBaseline) {
-            // Se o projeto não possui linha de base ativa, mantém o alerta nos Milestones
+        if (node.milestoneStatus) {
+          if (node.milestoneStatus === 'NEW') {
             tooltipMessages.push('workpack-section-wbs-alert-item-is-new');
-          } else {
-            tooltipMessages = ['workpack-section-wbs-alert-item-is-new'];
-          }
-
-          return {
-            displayWarningIcon: true,
-            displayColoredText: true,
-            displayDashedText: false,
-            textTooltipMessages: tooltipMessages,
-          };
-        } else if (node.milestoneStatus === 'CHANGED') {
-          if (!node.hasActiveBaseline) {
-            // Se o projeto não possui linha de base ativa, mantém o alerta nos Milestones
-            // tooltipMessages.push('Este item foi reestruturado e requer um novo salvamento da linha de base no projeto');
+          } else if (node.milestoneStatus === 'CHANGED') {
             tooltipMessages.push('workpack-section-wbs-alert-item-was-changed');
-          } else {
-            // tooltipMessages = ['Este item foi reestruturado e requer um novo salvamento da linha de base no projeto'];
-            tooltipMessages = ['workpack-section-wbs-alert-item-was-changed'];
-          }
-
-          return {
-            displayWarningIcon: true,
-            displayColoredText: true,
-            displayDashedText: false,
-            textTooltipMessages: tooltipMessages,
-          };
-        } else if (node.milestoneStatus === 'TO_CANCEL') {
-          if (!node.hasActiveBaseline) {
-            // tooltipMessages.push('Este item está \"a cancelar\" e requer um novo salvamento da linha de base no projeto');
+            // Este item foi reestruturado e requer um novo salvamento da linha de base no projeto
+          } else if (node.milestoneStatus === 'TO_CANCEL') {
             tooltipMessages.push('workpack-section-wbs-alert-item-to-cancel');
-          } else {
-            // tooltipMessages = ['Este item está \"a cancelar\" e requer um novo salvamento da linha de base no projeto'];
-            tooltipMessages = ['workpack-section-wbs-alert-item-to-cancel'];
+            // Este item está "a cancelar" e requer um novo salvamento da linha de base no projeto
           }
 
           return {
             displayWarningIcon: true,
             displayColoredText: true,
-            displayDashedText: true,
+            displayDashedText: node.milestoneStatus === 'TO_CANCEL',
             textTooltipMessages: tooltipMessages,
           };
         }
-      } else if (node && node.workpackType === TypeWorkpackEnumWBS.Deliverable) {
-        if (node.deliverableStatus === 'NEW') {
-          if (node?.dashboard?.tripleConstraint?.costActualValue > 0) {
-            // tooltipMessages.push('Este item foi criado e requer um novo salvamento da linha de base no projeto');
-            tooltipMessages.push('workpack-section-wbs-alert-item-new-valid-scope');
-          } else {
-            // tooltipMessages.push('Este item foi criado e requer validação de escopo');
-            tooltipMessages.push('workpack-section-wbs-alert-item-new-invalid-scope');
-          }
-
-          return {
-            displayWarningIcon: true,
-            displayColoredText: true,
-            displayDashedText: false,
-            textTooltipMessages: tooltipMessages,
-          };
-        } else if (node.deliverableStatus === 'CHANGED') {
-          if (!node.hasActiveBaseline) {
-            // Se o projeto não possui linha de base ativa, mantém o alerta nas Entregas
-            // tooltipMessages.push('Este item foi reestruturado e requer um novo salvamento da linha de base no projeto');
-            tooltipMessages.push('workpack-section-wbs-alert-item-was-changed');
-          } else {
-            // tooltipMessages = ['Este item foi reestruturado e requer um novo salvamento da linha de base no projeto'];
-            tooltipMessages = ['workpack-section-wbs-alert-item-was-changed'];
-          }
-
-          return {
-            displayWarningIcon: true,
-            displayColoredText: true,
-            displayDashedText: false,
-            textTooltipMessages: tooltipMessages,
-          };
-        } else if (node.deliverableStatus === 'TO_CANCEL') {
-          if (!node.hasActiveBaseline) {
-            // tooltipMessages.push('Este item está \"a cancelar\" e requer um novo salvamento da linha de base no projeto');
-            tooltipMessages.push('workpack-section-wbs-alert-item-to-cancel');
-          } else {
-            // tooltipMessages = ['Este item está \"a cancelar\" e requer um novo salvamento da linha de base no projeto'];
-            tooltipMessages = ['workpack-section-wbs-alert-item-to-cancel'];
-          }
-
-          return {
-            displayWarningIcon: true,
-            displayColoredText: true,
-            displayDashedText: true,
-            textTooltipMessages: tooltipMessages,
-          };
-        }
-      }
-
-      if (node && node.hasActiveBaseline !== null && node.hasActiveBaseline === false) {
-        // Se não há linha de base ativa
 
         return {
-          displayWarningIcon: true,
-          displayColoredText: true,
+          displayWarningIcon: tooltipMessages.length > 0,
+          displayColoredText: tooltipMessages.length > 0,
           displayDashedText: false,
           textTooltipMessages: tooltipMessages,
         };
+      } else if (node && node.workpackType === TypeWorkpackEnumWBS.Deliverable) {
+        if (node.deliverableStatus) {
+          if (node.deliverableStatus === 'NEW') {
+            if (node?.dashboard?.tripleConstraint?.costActualValue > 0) {
+              tooltipMessages.push('workpack-section-wbs-alert-item-new-valid-scope');
+              // Este item foi criado e requer um novo salvamento da linha de base no projeto
+            } else {
+              tooltipMessages.push('workpack-section-wbs-alert-item-new-invalid-scope');
+              // Este item foi criado e requer validação de escopo
+            }
+
+            if (node?.deliveryHasSchedule === false) {
+              tooltipMessages.push('workpack-section-wbs-alert-delivery-without-schedule');
+              // Esta Entrega não possui um Cronograma
+            }
+          } else if (node.deliverableStatus === 'CHANGED') {
+            tooltipMessages.push('workpack-section-wbs-alert-item-was-changed');
+            // Este item foi reestruturado e requer um novo salvamento da linha de base no projeto
+          } else if (node.deliverableStatus === 'TO_CANCEL') {
+            tooltipMessages.push('workpack-section-wbs-alert-item-to-cancel');
+            // Este item está "a cancelar" e requer um novo salvamento da linha de base no projeto
+          }
+
+          return {
+            displayWarningIcon: true,
+            displayColoredText: true,
+            displayDashedText: node.deliverableStatus === 'TO_CANCEL',
+            textTooltipMessages: tooltipMessages,
+          };
+        } else {
+          return {
+            displayWarningIcon: tooltipMessages.length > 0,
+            displayColoredText: tooltipMessages.length > 0,
+            displayDashedText: false,
+            textTooltipMessages: tooltipMessages,
+          };
+        }
       } else {
         return {
           displayWarningIcon: false,
           displayColoredText: false,
           displayDashedText: false,
-          textTooltipMessages: [],
+          textTooltipMessages: tooltipMessages,
         };
       }
-    } else {
-      // Desabilita todos os alertas caso o primeiro elemento da hierarquia não possuir cronograma
-      return {
-        displayWarningIcon: false,
-        displayColoredText: false,
-        displayDashedText: false,
-        textTooltipMessages: [],
-      };
     }
   }
 
