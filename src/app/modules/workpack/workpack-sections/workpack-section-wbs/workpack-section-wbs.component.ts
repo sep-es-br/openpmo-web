@@ -274,7 +274,7 @@ export class WorkpackSectionWBSComponent implements OnDestroy {
       } else if (node && node.workpackType === TypeWorkpackEnumWBS.Deliverable) {
         if (node.deliverableStatus) {
           if (node.deliverableStatus === 'NEW') {
-            if (node?.dashboard?.tripleConstraint?.costActualValue > 0) {
+            if (node?.dashboard?.tripleConstraint?.scopeForeseenValue > 0) {
               tooltipMessages.push('workpack-section-wbs-alert-item-new-valid-scope');
               // Este item foi criado e requer um novo salvamento da linha de base no projeto
             } else {
