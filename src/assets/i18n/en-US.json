@@ -564,7 +564,7 @@
     "schedule": {
       "start": "Start date of schedule. Information is required.",
       "finish": "Finish date of schedule. Information is required.",
-      "estimatedPhysical": "Estimated physical value. Information is required. Zero value is valid.",
+      "estimatedPhysical": "Estimated physical value. Information is required. Value zero is valid for creating the Schedule, but to submit a Baseline, the Estimated value must be greater than zero.",
       "actualPhysical": "Actual physical value. Information is not required.",
       "estimatedCostTotal": "Total estimated cost value.",
       "actualCostTotal": "Total actual cost value.",
@@ -1067,5 +1067,8 @@
   "workpack-section-wbs-alert-item-to-cancel": "This item is \"To Cancel\" and it requires a new Baseline to be saved for/in the Project",
   "workpack-section-wbs-alert-item-new-valid-scope": "This item was created and it requires a new Baseline to be saved for/in the Project",
   "workpack-section-wbs-alert-item-new-invalid-scope": "This item was created and it requires a scope validation",
-  "workpack-section-wbs-alert-delivery-without-schedule": "This Delivery doesn't have a Schedule"
+  "workpack-section-wbs-alert-delivery-without-schedule": "This Delivery doesn't have a Schedule",
+
+  "NO_SCHEDULE": "Doesn't have a Schedule",
+  "UNDEFINED_SCOPE": "Scope is undefined"
 }

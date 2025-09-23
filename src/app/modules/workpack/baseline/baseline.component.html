@@ -84,19 +84,44 @@
         <p-card *ngFor="let item of baseline?.updates" class="card-list-item">
           <div class="card-item-content">
             <div class="item-description">
-              <p-inputSwitch class="app-toggle" [(ngModel)]="item.included" [disabled]="togglesReadOnly || item.classification === 'TO_CANCEL'">
+              <p-inputSwitch
+                class="app-toggle"
+                [(ngModel)]="item.included"
+                [disabled]="togglesReadOnly || item.classification === 'TO_CANCEL' || shouldDisplayDeliveryWarnings(item)"
+              >
               </p-inputSwitch>
               <div class="item-description-container" [class.item-description-container-responsive]="responsive">
                 <i *ngIf="!responsive"
                    [ngClass]=" item.description === 'structure' ? [ 'app-icon', item.icon, 'light-grey-icon'] : [ item.icon, 'light-grey-icon']"
-                   [ngStyle]="{ fontSize: '1.8rem'}"></i>
-                <span class="item-description" [class.item-description-responsive]="responsive">
-                  {{item.description === 'structure' ? ('structure'|translate) : item.description}}
+                   [ngStyle]="{ fontSize: '1.8rem'}">
+                </i>
+                <ng-container *ngIf="shouldDisplayDeliveryWarnings(item)">
+                  <i
+                    class="warning-icon fa fa-exclamation-triangle"
+                    [ngStyle]="{ marginLeft: '1em', marginRight: '.5em' }"
+                    aria-hidden="true"
+                  ></i>
+                </ng-container>
+                <span
+                  class="item-description"
+                  [class.item-description-responsive]="responsive"
+                  [ngClass]="shouldDisplayDeliveryWarnings(item) ? 'alert-text pointer ml-0' : ''"
+                  [pTooltip]="getDeliveryTooltipWarnings(item)"
+                >
+                  {{ item.description === 'structure' ? ('structure'|translate) : item.description }}
                 </span>
               </div>
             </div>
             <div class="item-status" [class.item-status-responsive]="responsive">
-              <span>{{item.classification |translate}}</span>
+              <ng-container *ngIf="shouldDisplayDeliveryWarnings(item)">
+                <i
+                  class="warning-icon fa fa-exclamation-triangle"
+                  aria-hidden="true"
+                ></i>
+              </ng-container>
+              <span [ngClass]="shouldDisplayDeliveryWarnings(item) ? 'alert-text' : ''">
+                {{ item.classification | translate }}
+              </span>
             </div>
           </div>
         </p-card>
@@ -105,7 +130,7 @@
   </div>
   <div class="actions-buttons-container" [class.actions-buttons-container-responsive]="responsive"
        *ngIf="!idBaseline || baseline?.status === 'DRAFT'">
-    <p-button class="action-button submit-button" [label]="'submit'|translate" [disabled]="formIsSaving" (onClick)="saveDraftAndSubmitBaseline()">
+    <p-button class="action-button submit-button" [label]="'submit'|translate" [disabled]="shouldDisableBaselineSubmission" (onClick)="saveDraftAndSubmitBaseline()">
     </p-button>
     <p-button class="action-button draft-button" [label]="'draft'|translate" [disabled]="formIsSaving" (onClick)="handleSaveDraftBaseline()">
     </p-button>
@@ -159,7 +184,7 @@
   <div class="id-container" *ngIf="idBaseline && cardBaselineProperties">
     <span>{{idBaseline}}</span>
   </div>
-  <p-dialog [header]="'comment'|translate" [(visible)]="!!showCommentDialog"
+  <p-dialog [header]="'comment'|translate" [visible]="!!showCommentDialog"
             [style]="!responsive ? {width: '30vw'} : {width: '90vw'}" (onHide)="showCommentDialog=false">
     <div class="comment-container">
       <textarea pInputTextarea class="app-text-area comment" rows="3" [disabled]="true">{{selectedComment}}</textarea>

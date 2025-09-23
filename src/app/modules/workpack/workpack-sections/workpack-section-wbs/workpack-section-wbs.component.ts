@@ -245,6 +245,18 @@ export class WorkpackSectionWBSComponent implements OnDestroy {
           displayDashedText: false,
           textTooltipMessages: [],
         };
+      } else if (
+        node &&
+        (node.workpackType === TypeWorkpackEnumWBS.Project) ||
+        (node.workpackType === TypeWorkpackEnumWBS.Organizer)
+      ) {
+        // É um node de Projeto ou Organizer abaixo de Projeto (como Etapa ou Sub-Etapa)
+        return {
+          displayWarningIcon: !node.projectHasActiveBaseline,
+          displayColoredText: !node.projectHasActiveBaseline,
+          displayDashedText: false,
+          textTooltipMessages: tooltipMessages,
+        };
       } else if (node && node.workpackType === TypeWorkpackEnumWBS.Milestone) {
         if (node.milestoneStatus) {
           if (node.milestoneStatus === 'NEW') {
