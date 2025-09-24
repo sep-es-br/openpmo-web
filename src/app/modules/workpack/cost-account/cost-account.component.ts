@@ -865,7 +865,7 @@ export class CostAccountComponent implements OnInit {
         idWorkpack: this.costAccount.idWorkpack,
         idCostAccountModel: this.costAccount.idCostAccountModel,
         properties: this.costAccountProperties,
-        unidadeOrcamentaria: this.selectedUo ? this.selectedUo : null,
+        unidadeOrcamentaria: this.selectedUo?.code ? this.selectedUo : null,
         planoOrcamentario: this.selectedPlano ? this.selectedPlano : null,
         instruments: this.selectedInstruments.map(si => this.instrumentsList.find(fi => fi.sigefesCode === si.sigefesCode)) ?? []
       };
