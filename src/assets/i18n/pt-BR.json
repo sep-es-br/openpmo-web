@@ -1079,6 +1079,8 @@
   "workpack-section-wbs-alert-item-new-invalid-scope": "Este item foi criado e requer validação de escopo",
   "workpack-section-wbs-alert-delivery-without-schedule": "Esta Entrega não possui um Cronograma",
 
-  "NO_SCHEDULE": "Não possui cronograma",
-  "UNDEFINED_SCOPE": "Possui escopo indefinido"
+  "NO_SCHEDULE": "Entrega sem cronograma",
+  "UNDEFINED_SCOPE": "Entrega sem escopo",
+
+  "baseline-disabled-submission-warning": "Não será possível salvar uma nova Linha de Base até que os itens com pendências acima sejam resolvidos"
 }

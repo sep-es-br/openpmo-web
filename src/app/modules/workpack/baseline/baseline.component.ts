@@ -38,22 +38,24 @@ export class BaselineComponent implements OnInit, OnDestroy {
   showCommentDialog = false;
   selectedComment = '';
   isLoading = false;
-  formIsSaving = false;
+  formIsLoading = false;
 
-  get shouldDisableBaselineSubmission(): boolean {
-    const condition = (
-      this.formIsSaving ||
-      (
-        this.baseline &&
-        this.baseline.updates &&
-        this.baseline.updates.length > 0 &&
-        this.baseline.updates.some(
-          (update) => [UpdateStatus.NO_SCHEDULE, UpdateStatus.UNDEFINED_SCOPE].includes(update.classification)
-        )
+  get areTherePendentUpdatesListed(): boolean {
+    return (
+      this.baseline &&
+      this.baseline.updates &&
+      this.baseline.updates.length > 0 &&
+      this.baseline.updates.some(
+        (update) => [UpdateStatus.NO_SCHEDULE, UpdateStatus.UNDEFINED_SCOPE].includes(update.classification)
       )
     );
+  }
 
-    return condition;
+  get shouldDisableBaselineSubmission(): boolean {
+    return (
+      this.formIsLoading ||
+      this.areTherePendentUpdatesListed
+    );
   }
 
   constructor(
@@ -135,6 +137,8 @@ export class BaselineComponent implements OnInit, OnDestroy {
   }
 
   async loadPropertiesBaseline() {
+    this.formIsLoading = true;
+
     this.cardBaselineProperties = {
       toggleable: false,
       initialStateToggle: false,
@@ -181,6 +185,8 @@ export class BaselineComponent implements OnInit, OnDestroy {
     if (!this.idBaseline || this.baseline.status === 'DRAFT') {
       await this.loadUpdates();
     }
+
+    this.formIsLoading = false;
   }
 
   async loadPermissions() {
@@ -241,11 +247,11 @@ export class BaselineComponent implements OnInit, OnDestroy {
       description: this.formBaseline.controls.description.value,
       message: this.formBaseline.controls.message.value
     };
-    this.formIsSaving = true;
+    this.formIsLoading = true;
     const result = this.idBaseline
       ? await this.baselineSrv.putBaseline(this.idBaseline, this.baseline)
       : await this.baselineSrv.post(this.baseline);
-    this.formIsSaving = false;
+    this.formIsLoading = false;
     if (result.success) {
       if (!this.idBaseline) {
         this.baseline.id = result.data.id;
@@ -262,9 +268,9 @@ export class BaselineComponent implements OnInit, OnDestroy {
   }
 
   async handleSubmitBaseline() {
-    this.formIsSaving = true;
+    this.formIsLoading = true;
     const result = await this.baselineSrv.submitBaseline(this.idBaseline, this.baseline.updates);
-    this.formIsSaving = false;
+    this.formIsLoading = false;
     if (result.success) {
       const idPlan = Number(localStorage.getItem('@currentPlan'));
       await this.router.navigate(

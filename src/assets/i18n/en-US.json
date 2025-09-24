@@ -1069,6 +1069,8 @@
   "workpack-section-wbs-alert-item-new-invalid-scope": "This item was created and it requires a scope validation",
   "workpack-section-wbs-alert-delivery-without-schedule": "This Delivery doesn't have a Schedule",
 
-  "NO_SCHEDULE": "Doesn't have a Schedule",
-  "UNDEFINED_SCOPE": "Scope is undefined"
+  "NO_SCHEDULE": "Delivery without Schedule",
+  "UNDEFINED_SCOPE": "Delivery without Scope",
+
+  "baseline-disabled-submission-warning": "It won't be possible to save a new Baseline as long as the pending items above are dealt with"
 }
