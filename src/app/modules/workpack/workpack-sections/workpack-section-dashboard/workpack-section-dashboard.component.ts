@@ -193,7 +193,7 @@ export class WorkpackSectionDashboardComponent implements OnInit, OnChanges, OnD
     this.idMenuLoading = idWorkpackModel;
     const result = await this.dashboardSrv.GetMenuItemsByWorkpackModel({
       idWorkpackActual: this.workpackParams.idWorkpack,
-      idWorkpackModel: idWorkpackModel,
+      idWorkpackModel,
       menuLevel: level
     });
     if (result.success) {
@@ -229,14 +229,14 @@ export class WorkpackSectionDashboardComponent implements OnInit, OnChanges, OnD
         queryParams: {
           id: wp.id,
           idWorkpackModelLinked: wp.idWorkpackModel,
-          idPlan: idPlan
+          idPlan
         }
       });
     } else {
       this.route.navigate(['workpack'], {
         queryParams: {
           id: wp.id,
-          idPlan: idPlan
+          idPlan
         }
       });
     }
