@@ -1,7 +1,7 @@
 import {AuthService} from '../../../shared/services/auth.service';
 import {BaselineService} from '../../../shared/services/baseline.service';
-import {IBaseline, IBaselineUpdates} from '../../../shared/interfaces/IBaseline';
-import {takeUntil} from 'rxjs/operators';
+import {IBaseline, IBaselineUpdates, UpdateStatus} from '../../../shared/interfaces/IBaseline';
+import {first, takeUntil} from 'rxjs/operators';
 import {BreadcrumbService} from 'src/app/shared/services/breadcrumb.service';
 import {ResponsiveService} from 'src/app/shared/services/responsive.service';
 import {WorkpackService} from 'src/app/shared/services/workpack.service';
@@ -10,8 +10,8 @@ import {Subject} from 'rxjs';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {ICard} from 'src/app/shared/interfaces/ICard';
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {MessageService} from "primeng/api";
-import {TranslateService} from "@ngx-translate/core";
+import {MessageService} from 'primeng/api';
+import {TranslateService} from '@ngx-translate/core';
 
 @Component({
   selector: 'app-baseline',
@@ -19,7 +19,6 @@ import {TranslateService} from "@ngx-translate/core";
   styleUrls: ['./baseline.component.scss']
 })
 export class BaselineComponent implements OnInit, OnDestroy {
-
   idBaseline: number;
   idWorkpack: number;
   idWorkpackModelLinked: number;
@@ -39,7 +38,25 @@ export class BaselineComponent implements OnInit, OnDestroy {
   showCommentDialog = false;
   selectedComment = '';
   isLoading = false;
-  formIsSaving = false;
+  formIsLoading = false;
+
+  get areTherePendentUpdatesListed(): boolean {
+    return (
+      this.baseline &&
+      this.baseline.updates &&
+      this.baseline.updates.length > 0 &&
+      this.baseline.updates.some(
+        (update) => [UpdateStatus.NO_SCHEDULE, UpdateStatus.UNDEFINED_SCOPE].includes(update.classification)
+      )
+    );
+  }
+
+  get shouldDisableBaselineSubmission(): boolean {
+    return (
+      this.formIsLoading ||
+      this.areTherePendentUpdatesListed
+    );
+  }
 
   constructor(
     private actRouter: ActivatedRoute,
@@ -68,21 +85,22 @@ export class BaselineComponent implements OnInit, OnDestroy {
     });
   }
 
-  ngOnDestroy(): void {
-    this.$destroy.next();
-    this.$destroy.complete();
-  }
-
   async ngOnInit() {
     await this.loadPropertiesBaseline();
     await this.setBreadcrumb();
   }
 
+  ngOnDestroy(): void {
+    this.$destroy.next();
+    this.$destroy.complete();
+  }
+
   async setBreadcrumb() {
     let breadcrumbItems = this.breadcrumbSrv.get;
     if (!breadcrumbItems || breadcrumbItems.length === 0) {
-      breadcrumbItems = await this.breadcrumbSrv.loadWorkpackBreadcrumbs(this.idWorkpack, this.idPlan)
+      breadcrumbItems = await this.breadcrumbSrv.loadWorkpackBreadcrumbs(this.idWorkpack, this.idPlan);
     }
+
     this.breadcrumbSrv.setMenu([
       ...breadcrumbItems,
       {
@@ -119,6 +137,8 @@ export class BaselineComponent implements OnInit, OnDestroy {
   }
 
   async loadPropertiesBaseline() {
+    this.formIsLoading = true;
+
     this.cardBaselineProperties = {
       toggleable: false,
       initialStateToggle: false,
@@ -165,22 +185,25 @@ export class BaselineComponent implements OnInit, OnDestroy {
     if (!this.idBaseline || this.baseline.status === 'DRAFT') {
       await this.loadUpdates();
     }
+
+    this.formIsLoading = false;
   }
 
   async loadPermissions() {
     const isUserAdmin = await this.authSrv.isUserAdmin();
     this.idPlan = Number(localStorage.getItem('@currentPlan'));
     const result = await this.workpackSrv.GetWorkpackPermissions(this.idWorkpack, {'id-plan': this.idPlan});
-      if (result.success) {
-        const workpack = result.data;
-        if (isUserAdmin) {
-          this.editPermission = !workpack.canceled;
-        } else {
-          this.editPermission = workpack.permissions && workpack.permissions.filter(p => p.level === 'EDIT').length > 0 && !workpack.canceled;
-        }
-        
+
+    if (result.success) {
+      const workpack = result.data;
+      if (isUserAdmin) {
+        this.editPermission = !workpack.canceled;
+      } else {
+        this.editPermission =
+          workpack.permissions &&
+          workpack.permissions.filter(p => p.level === 'EDIT').length > 0 && !workpack.canceled;
       }
-    
+    }
   }
 
   handleCollapsed(event?) {
@@ -191,8 +214,10 @@ export class BaselineComponent implements OnInit, OnDestroy {
     this.baseline.updates = await this.baselineSrv.getUpdates({'id-workpack': this.idWorkpack});
     this.cardBaselineUpdates.isLoading = false;
     if (this.baseline.updates.length > 0) {
-      this.baseline.updates.forEach(updates => updates.included = updates.classification === 'NEW' ||  updates.classification === 'TO_CANCEL');
-      this.includeAllUpdates = true;
+      this.baseline.updates.forEach(
+        updates => updates.included = (updates.classification === 'NEW' ||  updates.classification === 'TO_CANCEL')
+      );
+      this.includeAllUpdates = this.baseline.updates.every((update) => update.included);
       this.togglesReadOnly = this.baseline.updates.filter(update => update.classification !== 'NEW').length === 0;
     }
   }
@@ -222,11 +247,11 @@ export class BaselineComponent implements OnInit, OnDestroy {
       description: this.formBaseline.controls.description.value,
       message: this.formBaseline.controls.message.value
     };
-    this.formIsSaving = true;
+    this.formIsLoading = true;
     const result = this.idBaseline
       ? await this.baselineSrv.putBaseline(this.idBaseline, this.baseline)
       : await this.baselineSrv.post(this.baseline);
-    this.formIsSaving = false;
+    this.formIsLoading = false;
     if (result.success) {
       if (!this.idBaseline) {
         this.baseline.id = result.data.id;
@@ -243,9 +268,9 @@ export class BaselineComponent implements OnInit, OnDestroy {
   }
 
   async handleSubmitBaseline() {
-    this.formIsSaving = true;
+    this.formIsLoading = true;
     const result = await this.baselineSrv.submitBaseline(this.idBaseline, this.baseline.updates);
-    this.formIsSaving = false;
+    this.formIsLoading = false;
     if (result.success) {
       const idPlan = Number(localStorage.getItem('@currentPlan'));
       await this.router.navigate(
@@ -295,4 +320,24 @@ export class BaselineComponent implements OnInit, OnDestroy {
     }
   }
 
+  shouldDisplayDeliveryWarnings(update: IBaselineUpdates): boolean {
+    return (
+      update.deliveryModelHasActiveSchedule &&
+      [UpdateStatus.NO_SCHEDULE, UpdateStatus.UNDEFINED_SCOPE].includes(update.classification)
+    );
+  }
+
+  getDeliveryTooltipWarnings(update: IBaselineUpdates) {
+    if (update.deliveryModelHasActiveSchedule) {
+      if (update.classification === UpdateStatus.NO_SCHEDULE) {
+        const firstSentence = this.translateSrv.instant('workpack-section-wbs-alert-delivery-without-schedule');
+
+        return `- ${firstSentence}`;
+      } else if (update.classification === UpdateStatus.UNDEFINED_SCOPE) {
+        const firstSentence = this.translateSrv.instant('workpack-section-wbs-alert-item-new-invalid-scope');
+
+        return `- ${firstSentence}`;
+      }
+    }
+  }
 }

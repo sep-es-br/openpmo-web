@@ -572,7 +572,7 @@
     "schedule": {
       "start": "Data de início do cronograma. Informação obrigatória.",
       "finish": "Data de fim do cronograma. Informação obrigatória.",
-      "estimatedPhysical": "Valor físico estimado para o cronograma. Informação obrigatória. Zero é um valor válido.",
+      "estimatedPhysical": "Valor físico estimado para o cronograma. Informação obrigatória. O valor zero é válido para a criação do cronograma, porém, para submissão da linha de base, o valor estimado deve ser maior que zero.",
       "actualPhysical": "Valor físico entregue atual para o cronograma. Informação não obrigatória.",
       "estimatedCostTotal": "Valor do custo estimado total.",
       "actualCostTotal": "Valor do custo realizado atual total.",
@@ -1077,5 +1077,10 @@
   "workpack-section-wbs-alert-item-to-cancel": "Este item está \"À Cancelar\" e requer um novo salvamento da Linha de Base no Projeto",
   "workpack-section-wbs-alert-item-new-valid-scope": "Este item foi criado e requer um novo salvamento da Linha de Base no Projeto",
   "workpack-section-wbs-alert-item-new-invalid-scope": "Este item foi criado e requer validação de escopo",
-  "workpack-section-wbs-alert-delivery-without-schedule": "Esta Entrega não possui um Cronograma"
+  "workpack-section-wbs-alert-delivery-without-schedule": "Esta Entrega não possui um Cronograma",
+
+  "NO_SCHEDULE": "Entrega sem cronograma",
+  "UNDEFINED_SCOPE": "Entrega sem escopo",
+
+  "baseline-disabled-submission-warning": "Não será possível salvar uma nova Linha de Base até que os itens com pendências acima sejam resolvidos"
 }
