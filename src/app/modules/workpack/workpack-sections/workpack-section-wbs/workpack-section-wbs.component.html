@@ -29,7 +29,7 @@
       <!-- CHILDREN -->
       <ng-template #workpackModels>
         <div class="container-custom-tree container-workpack">
-          <div class="workpack-title-box" [pTooltip]="parseTooltipTranslatedStrings(shouldDisplayWarningStyles(node)?.textTooltipMessages)">
+          <div class="workpack-title-box" [pTooltip]="parseTooltipTranslatedStrings(shouldDisplayWarningStyles(node).textTooltipMessages)">
             <i
               *ngIf="shouldDisplayWarningStyles(node).displayWarningIcon"
               class="warning-icon fa fa-exclamation-triangle"
@@ -37,7 +37,7 @@
             ></i>
             <div
               class="tree-label link"
-              [ngClass]="{ 'alert-text': shouldDisplayWarningStyles(node).displayColoredText, 'dashed-text': shouldDisplayWarningStyles(node).displayColoredText }"
+              [ngClass]="{ 'alert-text': shouldDisplayWarningStyles(node).displayColoredText, 'dashed-text': shouldDisplayWarningStyles(node).displayDashedText }"
               (click)="navigateToWorkpack(node)"
             >
               {{ node.workpackName }}
@@ -52,7 +52,7 @@
 
             <ng-template #milestoneData>
               <div class="container-milestone">
-                <ng-container *ngIf="node?.milestoneStatus && node?.milestoneStatus === 'NEW'">
+                <ng-container *ngIf="shouldDisplayNewTag(node)">
                   <div class="new-box">
                     <span class="new-label">{{ "new" | translate }}</span>
                   </div>
@@ -82,7 +82,7 @@
             </ng-template>
             <ng-template #schedule>
               <div class="header-values-cost-account" *ngIf="node?.properties?.progressBars">
-                <ng-container *ngIf="node?.deliverableStatus && node?.deliverableStatus === 'NEW'">
+                <ng-container *ngIf="shouldDisplayNewTag(node)">
                   <div class="status-container">
                     <span class="new-label">{{ "new" | translate }}</span>
                   </div>

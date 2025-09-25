@@ -202,15 +202,11 @@ export class WorkpackSectionWBSComponent implements OnDestroy {
     displayDashedText: boolean;
     textTooltipMessages: Array<string>;
   } {
-    const firstEAPElement = this.wbsTree[0];
-
     if (
-      !firstEAPElement.dashboard ||
-      !firstEAPElement.dashboard.tripleConstraint ||
-      !firstEAPElement.dashboard.tripleConstraint.scheduleForeseenStartDate ||
-      !firstEAPElement.dashboard.tripleConstraint.scheduleForeseenEndDate
+      !node.classifications ||
+      node.workpackType === TypeWorkpackEnumWBS.Portfolio ||
+      node.workpackType === TypeWorkpackEnumWBS.Program
     ) {
-      // Se o primeiro elemento da hierarquia não houver cronograma, desabilita todos os alertas
       return {
         displayWarningIcon: false,
         displayColoredText: false,
@@ -218,124 +214,90 @@ export class WorkpackSectionWBSComponent implements OnDestroy {
         textTooltipMessages: [],
       };
     } else {
-      // Se houver cronograma, verifica se há alertas
-      const tooltipMessages = [];
-
-      if (!node.projectHasActiveBaseline) {
-        tooltipMessages.push('workpack-section-wbs-alert-project-without-baseline');
-      }
-
       if (
-        node &&
-        (node.workpackType === TypeWorkpackEnumWBS.Program) ||
-        (
-          node.workpackType === TypeWorkpackEnumWBS.Organizer &&
-          node.workpackModels.some(
-            (wpck: any) =>
-              wpck.workpackModelType === 'Program' ||
-              wpck.workpackModelType === 'Project' ||
-              wpck.workpackModelName === 'Subprogramas'
-            )
-        )
+        node.workpackType === TypeWorkpackEnumWBS.Project ||
+        node.workpackType === TypeWorkpackEnumWBS.Organizer
       ) {
-        // É um node de Programa ou Área Temática
-        return {
-          displayWarningIcon: false,
-          displayColoredText: false,
-          displayDashedText: false,
-          textTooltipMessages: [],
-        };
-      } else if (
-        node &&
-        (node.workpackType === TypeWorkpackEnumWBS.Project) ||
-        (node.workpackType === TypeWorkpackEnumWBS.Organizer)
-      ) {
-        // É um node de Projeto ou Organizer abaixo de Projeto (como Etapa ou Sub-Etapa)
-        return {
-          displayWarningIcon: !node.projectHasActiveBaseline,
-          displayColoredText: !node.projectHasActiveBaseline,
-          displayDashedText: false,
-          textTooltipMessages: tooltipMessages,
-        };
-      } else if (node && node.workpackType === TypeWorkpackEnumWBS.Milestone) {
-        if (node.milestoneStatus) {
-          if (node.milestoneStatus === 'NEW') {
-            tooltipMessages.push('workpack-section-wbs-alert-item-is-new');
-          } else if (node.milestoneStatus === 'CHANGED') {
-            tooltipMessages.push('workpack-section-wbs-alert-item-was-changed');
-            // Este item foi reestruturado e requer um novo salvamento da linha de base no projeto
-          } else if (node.milestoneStatus === 'TO_CANCEL') {
-            tooltipMessages.push('workpack-section-wbs-alert-item-to-cancel');
-            // Este item está "a cancelar" e requer um novo salvamento da linha de base no projeto
-          }
-
+        if (
+          node.classifications.deletedWithBaseline ||
+          node.classifications.isNew ||
+          node.classifications.noSchedule ||
+          node.classifications.noScope ||
+          node.classifications.toCancel
+        ) {
           return {
             displayWarningIcon: true,
             displayColoredText: true,
-            displayDashedText: node.milestoneStatus === 'TO_CANCEL',
-            textTooltipMessages: tooltipMessages,
-          };
-        }
-
-        return {
-          displayWarningIcon: tooltipMessages.length > 0,
-          displayColoredText: tooltipMessages.length > 0,
-          displayDashedText: false,
-          textTooltipMessages: tooltipMessages,
-        };
-      } else if (node && node.workpackType === TypeWorkpackEnumWBS.Deliverable) {
-        if (node.deliverableStatus) {
-          if (node.deliverableStatus === 'NEW') {
-            if (node?.dashboard?.tripleConstraint?.scopeForeseenValue > 0) {
-              tooltipMessages.push('workpack-section-wbs-alert-item-new-valid-scope');
-              // Este item foi criado e requer um novo salvamento da linha de base no projeto
-            } else {
-              tooltipMessages.push('workpack-section-wbs-alert-item-new-invalid-scope');
-              // Este item foi criado e requer validação de escopo
-            }
-
-            if (node?.deliveryHasSchedule === false) {
-              tooltipMessages.push('workpack-section-wbs-alert-delivery-without-schedule');
-              // Esta Entrega não possui um Cronograma
-            }
-          } else if (node.deliverableStatus === 'CHANGED') {
-            tooltipMessages.push('workpack-section-wbs-alert-item-was-changed');
-            // Este item foi reestruturado e requer um novo salvamento da linha de base no projeto
-          } else if (node.deliverableStatus === 'TO_CANCEL') {
-            tooltipMessages.push('workpack-section-wbs-alert-item-to-cancel');
-            // Este item está "a cancelar" e requer um novo salvamento da linha de base no projeto
-          }
-
-          return {
-            displayWarningIcon: true,
-            displayColoredText: true,
-            displayDashedText: node.deliverableStatus === 'TO_CANCEL',
-            textTooltipMessages: tooltipMessages,
+            displayDashedText: false,
+            textTooltipMessages: [
+              'workpack-eap-alert-pending-items',
+              // 'Verifique itens pendentes abaixo',
+            ],
           };
         } else {
           return {
-            displayWarningIcon: tooltipMessages.length > 0,
-            displayColoredText: tooltipMessages.length > 0,
+            displayWarningIcon: false,
+            displayColoredText: false,
             displayDashedText: false,
-            textTooltipMessages: tooltipMessages,
+            textTooltipMessages: [],
           };
         }
-      } else {
+      } else if (
+        node.workpackType === TypeWorkpackEnumWBS.Deliverable ||
+        node.workpackType === TypeWorkpackEnumWBS.Milestone
+      ) {
+        const messages = [];
+
+        if (node.classifications.deletedWithBaseline) {
+          // messages.push('Este item foi excluído');
+          messages.push('workpack-eap-alert-deleted-item');
+        }
+        if (node.classifications.isNew) {
+          // messages.push('Item novo fora da Linha de Base ativa');
+          messages.push('workpack-eap-alert-new-item');
+        }
+        if (node.classifications.noSchedule) {
+          // messages.push('Entrega sem Cronograma');
+          messages.push('workpack-eap-alert-no-schedule');
+        }
+        if (
+          !node.classifications.noSchedule &&
+          node.classifications.noScope
+        ) {
+          // messages.push('Entrega sem escopo estimado (físico = 0)');
+          messages.push('workpack-eap-alert-no-scope');
+        }
+        if (node.classifications.toCancel) {
+          // messages.push('Item a cancelar. Requer aprovação de nova Linha de Base');
+          messages.push('workpack-eap-alert-to-cancel');
+        }
+
         return {
-          displayWarningIcon: false,
-          displayColoredText: false,
+          displayWarningIcon: messages.length > 0,
+          displayColoredText: messages.length > 0,
           displayDashedText: false,
-          textTooltipMessages: tooltipMessages,
+          textTooltipMessages: messages,
         };
       }
     }
+  }
+
+  shouldDisplayNewTag(node: any) {
+    return (
+      (
+        node.workpackType === TypeWorkpackEnumWBS.Deliverable ||
+        node.workpackType === TypeWorkpackEnumWBS.Milestone
+      ) &&
+      node.classifications &&
+      node.classifications.isNew
+    );
   }
 
   parseTooltipTranslatedStrings(messages: Array<string>): string {
     if (messages && messages.length > 0) {
       const finalMessagesObj = this.translateSrv.instant(messages);
       const finalMessages = Object.values(finalMessagesObj);
-      finalMessages[0] = `- ${finalMessages[0]}`;
+      if (finalMessages.length > 1) { finalMessages[0] = `- ${finalMessages[0]}`; }
 
       return finalMessages.join('\n- ');
     }
