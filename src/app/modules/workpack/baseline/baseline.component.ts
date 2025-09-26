@@ -223,7 +223,9 @@ export class BaselineComponent implements OnInit, OnDestroy {
   }
 
   handleSetAllTogglesUpdates(event) {
-    this.baseline.updates.forEach(update => {
+    this.baseline.updates
+    .filter((update) => ![UpdateStatus.NO_SCHEDULE, UpdateStatus.UNDEFINED_SCOPE].includes(update.classification))
+    .forEach(update => {
       if (update.classification === 'TO_CANCEL') {
         update.included = true;
       } else {
@@ -330,11 +332,11 @@ export class BaselineComponent implements OnInit, OnDestroy {
   getDeliveryTooltipWarnings(update: IBaselineUpdates) {
     if (update.deliveryModelHasActiveSchedule) {
       if (update.classification === UpdateStatus.NO_SCHEDULE) {
-        const firstSentence = this.translateSrv.instant('workpack-section-wbs-alert-delivery-without-schedule');
+        const firstSentence = this.translateSrv.instant('workpack-eap-alert-no-schedule');
 
         return `- ${firstSentence}`;
       } else if (update.classification === UpdateStatus.UNDEFINED_SCOPE) {
-        const firstSentence = this.translateSrv.instant('workpack-section-wbs-alert-item-new-invalid-scope');
+        const firstSentence = this.translateSrv.instant('workpack-eap-alert-no-scope');
 
         return `- ${firstSentence}`;
       }
