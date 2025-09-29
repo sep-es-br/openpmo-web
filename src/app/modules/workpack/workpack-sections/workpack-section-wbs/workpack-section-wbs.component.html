@@ -29,7 +29,7 @@
       <!-- CHILDREN -->
       <ng-template #workpackModels>
         <div class="container-custom-tree container-workpack">
-          <div class="workpack-title-box" [pTooltip]="parseTooltipTranslatedStrings(shouldDisplayWarningStyles(node)?.textTooltipMessages)">
+          <div class="workpack-title-box" [pTooltip]="parseTooltipTranslatedStrings(shouldDisplayWarningStyles(node).textTooltipMessages)">
             <i
               *ngIf="shouldDisplayWarningStyles(node).displayWarningIcon"
               class="warning-icon fa fa-exclamation-triangle"
@@ -52,19 +52,27 @@
 
             <ng-template #milestoneData>
               <div class="container-milestone">
-                <div class="milestone-column">{{ language === 'pt' ? (node.snapshotDate|date:'dd/MM/yyyy') :
-                  (node.snapshotDate|date:'yyyy/MM/dd') }}</div>
-                <div class="milestone-column">{{ language === 'pt' ? (node.expirationDate|date:'dd/MM/yyyy') :
-                  (node.expirationDate|date:'yyyy/MM/dd') }}</div>
+                <ng-container *ngIf="shouldDisplayNewTag(node)">
+                  <div class="new-box">
+                    <span class="new-label">{{ "new" | translate }}</span>
+                  </div>
+                </ng-container>
+
+                <div class="milestone-column">
+                  {{ node.snapshotDate ? (language === 'pt' ? (node.snapshotDate | date:'dd/MM/yyyy') : (node.snapshotDate | date:'yyyy/MM/dd')) : '--' }}
+                </div>
+                <div class="milestone-column">
+                  {{ node.expirationDate ?  (language === 'pt' ? (node.expirationDate|date:'dd/MM/yyyy') : (node.expirationDate|date:'yyyy/MM/dd')) : '--' }}
+                </div>
                 <div class="milestone-column">
                   <div class="icons-container">
                     <i [ngClass]=" [milestoneStatusEnum.CONCLUDED, milestoneStatusEnum.LATE_CONCLUDED].includes(milestoneStatusEnum[node?.milestoneStatus]) ?
                         [ 'app-icon', 'flag-check', 'grey-icon'] : ['app-icon', 'flag-unchecked', 'grey-icon']"
                       [ngStyle]="{ fontSize: '1.2rem' }"
-                      [class.on-time]="milestoneStatusEnum[node?.milestoneStatus] === milestoneStatusEnum.ON_TIME && !node?.canceled"
-                      [class.late]="milestoneStatusEnum[node?.milestoneStatus] === milestoneStatusEnum.LATE"
-                      [class.concluded]="milestoneStatusEnum[node?.milestoneStatus] === milestoneStatusEnum.CONCLUDED && !node?.canceled"
-                      [class.late-concluded]="milestoneStatusEnum[node?.milestoneStatus] === milestoneStatusEnum.LATE_CONCLUDED && !node?.canceled"></i>
+                      [class.on-time]="milestoneStatusEnum[node?.milestonePeriodStatus] === milestoneStatusEnum.ON_TIME && !node?.canceled"
+                      [class.late]="milestoneStatusEnum[node?.milestonePeriodStatus] === milestoneStatusEnum.LATE"
+                      [class.concluded]="milestoneStatusEnum[node?.milestonePeriodStatus] === milestoneStatusEnum.CONCLUDED && !node?.canceled"
+                      [class.late-concluded]="milestoneStatusEnum[node?.milestonePeriodStatus] === milestoneStatusEnum.LATE_CONCLUDED && !node?.canceled"></i>
                     <i [ngClass]="['app-icon', 'link-to', 'grey-icon', 'linked']" *ngIf="!!node.linked"></i>
                     <i [ngClass]="['app-icon', 'sharing', 'grey-icon', 'linked']"
                       *ngIf="!!node.shared && !node.linked"></i>
@@ -74,7 +82,7 @@
             </ng-template>
             <ng-template #schedule>
               <div class="header-values-cost-account" *ngIf="node?.properties?.progressBars">
-                <ng-container *ngIf="node?.deliverableStatus && node?.deliverableStatus === 'NEW'">
+                <ng-container *ngIf="shouldDisplayNewTag(node)">
                   <div class="status-container">
                     <span class="new-label">{{ "new" | translate }}</span>
                   </div>

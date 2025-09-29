@@ -78,7 +78,8 @@
         <!-- VALOR REALIZADO -->
         <span class="p-float-label p-field" *ngIf="properties.idStep">
           <p-inputNumber class="app-input-number" id="float-unitActual" (onInput)="handleStepChange($event, 'unitActual')"
-            [disabled]="!properties.editPermission || isActualValuesDisabled" [(ngModel)]="properties.unitActual"
+            [(ngModel)]="properties.unitActual"
+            [ngClass]="{'disabled-field': !properties.editPermission || isActualValuesDisabled}"
             [class.red]="properties.unitActual < 0"
             [minFractionDigits]="properties.unitPrecision" [maxFractionDigits]="properties.unitPrecision"
             (onInput)="handleStepCostChange($event, 'unitActual')"
@@ -161,7 +162,7 @@
             (click)="properties.multipleCosts && handleEditCosts($event); properties.multipleCosts && disable()"
             (onFocus)="properties.multipleCosts && handleEditCosts($event); properties.multipleCosts && disable()"
             (mouseout)="multiCostsEdited = false"
-            [disabled]="(properties.multipleCosts && multiCostsEdited) || !properties.editPermission || (!properties.multipleCosts && !properties.editCosts) || isActualValuesDisabled"
+            [ngClass]="{'disabled-field': (properties.multipleCosts && multiCostsEdited) || !properties.editPermission || (!properties.multipleCosts && !properties.editCosts) || isActualValuesDisabled}"
             (onInput)="handleStepCostChange($event, 'costActual')"
             [class.red]="properties.costActual < 0"
             [(ngModel)]="properties.costActual" [minFractionDigits]="2" [maxFractionDigits]="2"

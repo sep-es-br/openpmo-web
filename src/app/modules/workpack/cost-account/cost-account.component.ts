@@ -173,7 +173,7 @@ export class CostAccountComponent implements OnInit {
 
   setInstrumentItem(instrument : IInstrument, index: number) {
     
-    if(index >= this.costAccount.instruments.length || instrument.sigefesCode !== this.costAccount.instruments[index].sigefesCode) {
+    if(index >= this.costAccount.instruments?.length || instrument.sigefesCode !== this.costAccount.instruments?.[index].sigefesCode) {
       this.saveButton.showButton(); 
       this.cancelButton.showButton()
     } else {
@@ -188,10 +188,10 @@ export class CostAccountComponent implements OnInit {
   
   instrumentsChanged() {
     // verifica se mudou tamanho
-    if (this.selectedInstruments.length !== this.costAccount.instruments.length) return true;
+    if (this.selectedInstruments?.length !== this.costAccount.instruments?.length) return true;
 
     // verifica se algum sigefesCode mudou na mesma posição
-    return this.selectedInstruments.some((selected, i) =>
+    return this.selectedInstruments?.some((selected, i) =>
       selected.sigefesCode !== this.costAccount.instruments[i]?.sigefesCode
     );
   }
@@ -313,6 +313,7 @@ export class CostAccountComponent implements OnInit {
     });
 
     this.saveButton.showButton();
+    this.selectedInstruments = [];
     this.updateInstruments();
   }
   
@@ -333,10 +334,10 @@ export class CostAccountComponent implements OnInit {
       await this.loadWorkpack();
     }
     if (this.idCostAccount) {
+      await this.loadCostAccount();
       this.loadUoOptions(this.idCostAccount, () => {
         this.setupUoAndPlano()
       });
-      await this.loadCostAccount();
     } else {
       this.setBreadcrumb();
       this.cardCostAccountProperties.isLoading = false;
@@ -864,9 +865,9 @@ export class CostAccountComponent implements OnInit {
         idWorkpack: this.costAccount.idWorkpack,
         idCostAccountModel: this.costAccount.idCostAccountModel,
         properties: this.costAccountProperties,
-        unidadeOrcamentaria: this.selectedUo ? this.selectedUo : null,
+        unidadeOrcamentaria: this.selectedUo?.code ? this.selectedUo : null,
         planoOrcamentario: this.selectedPlano ? this.selectedPlano : null,
-        instruments: this.selectedInstruments ?? []
+        instruments: this.selectedInstruments.map(si => this.instrumentsList.find(fi => fi.sigefesCode === si.sigefesCode)) ?? []
       };
       const result = await this.costAccountSrv.put(costAccount);
       this.formIsSaving = false;

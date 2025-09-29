@@ -14,16 +14,23 @@ import { PrepareHttpParams } from '../utils/query.util';
   providedIn: 'root'
 })
 export class BreakdownStructureService extends BaseService<IWorkpackBreakdownStructure> {
+  workpackData: IWorkpackData;
+
+  workpackParams: IWorkpackParams;
+
+  wbs: IWorkpackBreakdownStructure;
+
+  expandedAllDone = false;
+
+  expandedAll = false;
+
+  wbsTree: any = [];
+
+  typeWorkpackEnum = TypeWorkpackEnumWBS;
+
+  loading;
 
   private resetBreakdownStructure = new BehaviorSubject<boolean>(false);
-  workpackData: IWorkpackData;
-  workpackParams: IWorkpackParams;
-  wbs: IWorkpackBreakdownStructure;
-  expandedAllDone = false;
-  expandedAll = false;
-  wbsTree: any = [];
-  typeWorkpackEnum = TypeWorkpackEnumWBS;
-  loading;
 
   constructor(
     @Inject(Injector) injector: Injector,
@@ -50,7 +57,7 @@ export class BreakdownStructureService extends BaseService<IWorkpackBreakdownStr
   }
 
   getWBSTree() {
-    return { 
+    return {
       wbsTree: this.wbsTree,
       loading: this.loading
     };
@@ -102,7 +109,6 @@ export class BreakdownStructureService extends BaseService<IWorkpackBreakdownStr
       this.loading = false;
       this.nextResetBreakdownStructure(true);
     }
-    
   }
 
   nodeExpandAll(nodeList) {
@@ -145,7 +151,9 @@ export class BreakdownStructureService extends BaseService<IWorkpackBreakdownStr
   }
 
   mapTreeNodes(data: IWorkpackBreakdownStructure) {
-    const dashboardData = (data.dashboard || data.milestones || data.risks) && this.loadDashboardData(data.dashboard, data.milestones, data.risks);
+    const dashboardData =
+      (data.dashboard || data.milestones || data.risks) &&
+      this.loadDashboardData(data.dashboard, data.milestones, data.risks);
     if (dashboardData) {
       data.dashboardData = dashboardData;
     }
@@ -166,7 +174,9 @@ export class BreakdownStructureService extends BaseService<IWorkpackBreakdownStr
     const expanded = !this.expandedAll ? level <= 1 : true;
     data.forEach(item => {
       const workpackOrWorkpackModels = isWorkpack ? item.workpackModels : item.workpacks;
-      const dashboardData = (item.dashboard || item.risks || item.milestones) && this.loadDashboardData(item.dashboard, item.milestones, item.risks);
+      const dashboardData =
+        (item.dashboard || item.risks || item.milestones) &&
+        this.loadDashboardData(item.dashboard, item.milestones, item.risks);
       if (dashboardData) {
         item.dashboardData = dashboardData;
       }
@@ -189,16 +199,16 @@ export class BreakdownStructureService extends BaseService<IWorkpackBreakdownStr
     milestone.expirationDate = milestone.milestoneDate;
       if (milestone.completed) {
         if (!milestone.snapshotDate) {
-          milestone.milestoneStatus = 'CONCLUDED';
+          milestone.milestonePeriodStatus = 'CONCLUDED';
           return milestone;
         } else {
           const milestoneDate = moment(milestone.milestoneDate, 'yyyy-MM-DD');
           const snapshotDate = moment(milestone.snapshotDate, 'yyyy-MM-DD');
           if (milestoneDate.isSameOrBefore(snapshotDate)) {
-            milestone.milestoneStatus = 'CONCLUDED';
+            milestone.milestonePeriodStatus = 'CONCLUDED';
             return milestone;
           } else {
-            milestone.milestoneStatus = 'LATE_CONCLUDED';
+            milestone.milestonePeriodStatus = 'LATE_CONCLUDED';
             return milestone;
           }
         }
@@ -206,10 +216,10 @@ export class BreakdownStructureService extends BaseService<IWorkpackBreakdownStr
         const today = moment();
         const milestoneDate = moment(milestone.milestoneDate, 'yyyy-MM-DD');
         if (milestoneDate.isBefore(today)) {
-          milestone.milestoneStatus = 'LATE';
+          milestone.milestonePeriodStatus = 'LATE';
           return milestone;
         } else {
-          milestone.milestoneStatus = 'ON_TIME';
+          milestone.milestonePeriodStatus = 'ON_TIME';
           return milestone;
         }
       }
@@ -311,7 +321,7 @@ export class BreakdownStructureService extends BaseService<IWorkpackBreakdownStr
       risk: risks,
       milestone: milestones
     };
-   
+
     return dashboardData;
   }
 
@@ -486,7 +496,7 @@ export class BreakdownStructureService extends BaseService<IWorkpackBreakdownStr
           iconScopeColor = '#44B39B';
         }
       } else {
-        if (properties.dashboardData?.tripleConstraint?.scope?.foreseenWorkRefMonth && 
+        if (properties.dashboardData?.tripleConstraint?.scope?.foreseenWorkRefMonth &&
             properties.dashboardData?.tripleConstraint?.scope?.foreseenWorkRefMonth >=
           properties.dashboardData?.tripleConstraint?.scope?.actualValue) {
           iconScopeColor = '#EA5C5C';

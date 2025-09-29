@@ -77,6 +77,11 @@
       padding-bottom: 2em;
       
     }
+
+    .warning-text {
+      font-size: 12px;
+      color: #F59A23;
+    }
   }
   .panel-evaluations {
     .evaluations-container {
@@ -139,10 +144,25 @@
     .item-description-container-responsive {
       margin-left: 0;
     }
+    .warning-icon {
+      color: #F59A23;
+      margin-right: 0.25em;
+    }
+    .alert-text {
+      color: #F59A23;
+
+      &.pointer {
+        cursor: pointer;
+      }
+      &.ml-0 {
+        margin-left: 0;
+      }
+    }
     .item-status {
       display: flex;
       flex-direction: row;
       align-items: center;
+
       .comment {
         margin-right: 2em;
         cursor: pointer;
