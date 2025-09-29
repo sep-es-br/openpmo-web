@@ -1,17 +1,17 @@
 <div class="app-workpack-section-baselines" *ngIf="sectionBaselines && sectionActive">
   <app-card [properties]="sectionBaselines.cardSection" [class.panel-tab-view]="showTabview">
-    <div class="input-toggle-baseline">
+    <!-- <div class="input-toggle-baseline">
       <p-inputSwitch class="app-toggle" [(ngModel)]="baselinesSectionShowInactives"
         (ngModelChange)="handleBaselineShowInactiveToggle($event)">
       </p-inputSwitch>
       <label class="input-label">{{"showInactive" | translate}}</label>
-    </div>
+    </div> -->
     <div class="baselines-list-container">
       <div class="loading-container" *ngIf="sectionBaselines?.cardSection?.isLoading">
         <app-card-loading [isCardLoading]="sectionBaselines?.cardSection?.isLoading"></app-card-loading>
       </div>
       <p-dataView [value]="sectionBaselines.cardItemsSection" layout="grid" class="app-dataview"
-        [emptyMessage]="(baselinesSectionShowInactives ? 'noBaselines' : 'noActiveBaselines') | translate"
+        [emptyMessage]="'noBaselines' | translate"
         *ngIf="(displayModeAll === 'grid' || (displayModeAll === 'list' && !!responsive)) && !sectionBaselines?.cardSection?.isLoading">
         <ng-template let-cardItem pTemplate="gridItem">
           <div class="p-col-12 p-md-3 p-sm-12 card-item-container">
@@ -21,7 +21,7 @@
         </ng-template>
       </p-dataView>
       <p-dataView [value]="sectionBaselines.cardItemsSection" layout="list" class="app-dataview app-dataview-list"
-        [emptyMessage]="(baselinesSectionShowInactives ? 'noBaselines' : 'noActiveBaselines') | translate"
+        [emptyMessage]="'noBaselines' | translate"
         *ngIf="(displayModeAll === 'list' && !responsive) && !sectionBaselines?.cardSection?.isLoading">
         <ng-template let-cardItem pTemplate="listItem">
           <div class="p-col-12">
