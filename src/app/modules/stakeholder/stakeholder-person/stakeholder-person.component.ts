@@ -92,9 +92,9 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
   isSamePerson = false;
   permissionLevelListOptions = [
     {label: this.translateSrv.instant('read'), value: 'READ'},
+    {label: this.translateSrv.instant('update'), value: 'UPDATE' },
     {label: this.translateSrv.instant('edit'), value: 'EDIT'},
     {label: this.translateSrv.instant('none'), value: 'None'},
-    {label: this.translateSrv.instant('update'), value: 'UPDATE' },
 
   ];
   $destroy = new Subject();

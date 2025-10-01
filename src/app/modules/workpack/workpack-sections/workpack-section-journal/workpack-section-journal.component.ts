@@ -115,7 +115,6 @@ export class WorkpackSectionJournalComponent implements OnInit, OnDestroy {
   }
 
   async ngOnInit() {
-
   }
 
   ngOnDestroy(): void {
@@ -153,6 +152,10 @@ export class WorkpackSectionJournalComponent implements OnInit, OnDestroy {
     this.sectionActive = !!this.workpackData.workpack && !!this.workpackData.workpack.id  && !!this.workpackData.workpackModel &&
       !!this.workpackData.workpackModel.journalManagementSessionActive;
     this.editPermission = this.workpackSrv.getEditPermission() ? true : false;
+    const permission = this.workpackSrv.getPermissionLevel();
+    if (permission === 'UPDATE') {
+      this.editPermission = true;
+    }
     this.formSearch.reset({
       ...searchParams
     });

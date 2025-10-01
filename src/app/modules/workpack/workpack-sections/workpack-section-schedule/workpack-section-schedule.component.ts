@@ -1190,7 +1190,7 @@ updateLiquidatedValues() {
         this.saveButton.hideButton();
         return;
       }
-      const result = await this.scheduleSrv.putScheduleStepBatch(stepsToSave, this.schedule.id);
+      const result = await this.scheduleSrv.putScheduleStepBatch(stepsToSave, this.schedule.id, this.workpackParams.idPlan, this.workpackParams.idWorkpack);
       if (result.success) {
         this.dashboardSrv.resetDashboardData();
         this.changedSteps = [];

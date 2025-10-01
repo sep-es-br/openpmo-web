@@ -24,6 +24,7 @@ export class WorkpackService extends BaseService<IWorkpack> {
   private workpackParams: IWorkpackParams;
   private editPermission: boolean;
   private unitMeansure: IMeasureUnit;
+  private permissionLevel: String;
 
   constructor(
     @Inject(Injector) injector: Injector
@@ -114,6 +115,14 @@ export class WorkpackService extends BaseService<IWorkpack> {
 
   public getUnitMeansure() {
     return this.unitMeansure;
+  }
+
+  public setPermissionLevel(permissionLevel: String) {
+    this.permissionLevel = permissionLevel;
+  }
+
+  public getPermissionLevel() {
+    return this.permissionLevel;
   }
 
   public async GetWorkpackDataById(idWorkpack: number, options?): Promise<IHttpResult<IWorkpack>> {

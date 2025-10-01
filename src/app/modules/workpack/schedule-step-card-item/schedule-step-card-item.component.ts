@@ -9,6 +9,7 @@ import { ConfirmationService, MessageService } from 'primeng/api';
 import { LabelService } from 'src/app/shared/services/label.service';
 import { ActivatedRoute } from '@angular/router';
 import { ScheduleStepCardItemService } from 'src/app/shared/services/schedule-step-card-item.service';
+import { WorkpackPropertyService } from 'src/app/shared/services/workpack-property.service';
 
 @Component({
   selector: 'app-schedule-step-card-item',
@@ -39,6 +40,7 @@ export class ScheduleStepCardItemComponent implements OnInit, OnDestroy {
   isPassedMonth: boolean = false;
   maxValueCosts: number;
   maxValueUnit: number;
+  permission: String;
 
   constructor(
     private translateSrv: TranslateService,
@@ -46,7 +48,8 @@ export class ScheduleStepCardItemComponent implements OnInit, OnDestroy {
     private labelSrv: LabelService,
     private route: ActivatedRoute,
     private scheduleCardItemSrv: ScheduleStepCardItemService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private propertySrv: WorkpackPropertyService
   ) {
     this.translateSrv.onLangChange.pipe(takeUntil(this.$destroy)).subscribe(() =>
       {
@@ -58,6 +61,9 @@ export class ScheduleStepCardItemComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.maxValueCosts = this.getMaxValueCosts();
     this.maxValueUnit = this.getMaxValueUnit();
+    this.propertySrv.getPermissionLevel().then(permission => {
+        this.permission = permission;
+    });
 
     this.cardIdItem = this.properties.idStep ?
       `${this.properties.idStep < 10 ? '0' + this.properties.idStep : this.properties.idStep}` : '';
