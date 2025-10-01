@@ -183,7 +183,7 @@ export class WorkpackSectionIndicatorsComponent implements OnInit {
         urlCard: '/workpack/indicators',
         paramsUrlCard: [
           { name: 'idWorkpack', value: this.workpackParams.idWorkpack },
-          { name: 'id', value: indicator.id },
+          { name: 'id', value: this.workpackParams.idPlan },
         ]
       }));
       if (this.workpackSrv.getEditPermission() && !this.workpackData.workpack.canceled) {

@@ -128,6 +128,14 @@ export class WorkpackSectionPropertiesComponent implements OnInit, OnDestroy {
         this.checkPropertiesStringValid(prop);
       }
     });
+
+    this.propertySrv.getPermissionLevel().then(permission => {
+      if (permission === 'UPDATE' && this.workpackData.workpack.type === 'Milestone') {
+        this.cardWorkpackProperties.canEditCheckCompleted = true
+        this.sectionPropertiesProperties.find(p => p.name === 'date')!.disabled = false;
+      }
+    });
+  
   }
 
   showCheckCompleted() {

@@ -14,7 +14,8 @@ export class InputMessageComponent {
 
   isInvalid() {
     try {
-      return !this.form.get(this.field).valid && this.form.get(this.field).touched;
+      const control = this.form.get(this.field);
+      return control && control.enabled && control.invalid && control.touched;
     } catch (error) {
       return false;
     }
