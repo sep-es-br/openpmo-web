@@ -64,6 +64,8 @@ export class WorkpackSectionDashboardComponent implements OnInit, OnChanges, OnD
   sectionActive = false;
   idMenuLoading: number;
 
+  isBeingBuild = false;
+
   constructor(
     private dashboardSrv: DashboardService,
     private translateSrv: TranslateService,
@@ -106,8 +108,16 @@ export class WorkpackSectionDashboardComponent implements OnInit, OnChanges, OnD
     this.dashboardSrv.observableResetDashboard.pipe(takeUntil(this.$destroy)).subscribe(reset => {
       if (reset) {
         this.loadDashboardData();
+        this.dashboardSrv.isItemBeingBuild(this.workpackData.workpack.id).then(
+          ({success, data}) => {
+            if(success) {
+              this.isBeingBuild = data.value
+            }
+          }
+        );
       }
     });
+
   }
 
   async ngOnChanges(changes: SimpleChanges) {
