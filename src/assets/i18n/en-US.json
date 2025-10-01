@@ -1064,12 +1064,12 @@
   "workpack-eap-alert-pending-items": "Verify pending items below",
   "workpack-eap-alert-deleted-item": "This item has been deleted",
   "workpack-eap-alert-new-item": "New item outside the active Baseline",
-  "workpack-eap-alert-no-schedule": "Delivery without Schedule",
-  "workpack-eap-alert-no-scope": "Delivery without an estimated scope (physical = 0)",
+  "workpack-eap-alert-no-schedule": "Delivery without schedule",
+  "workpack-eap-alert-no-scope": "Delivery without scope",
   "workpack-eap-alert-to-cancel": "Item to be canceled. Requires approval of a new Baseline",
 
-  "NO_SCHEDULE": "Delivery without Schedule",
-  "UNDEFINED_SCOPE": "Delivery without Scope",
+  "NO_SCHEDULE": "Delivery without schedule",
+  "UNDEFINED_SCOPE": "Delivery without scope",
 
-  "baseline-disabled-submission-warning": "It won't be possible to save a new Baseline as long as the pending items above are dealt with"
+  "baseline-disabled-submission-warning": "Impossible to submit Baseline with pending items"
 }

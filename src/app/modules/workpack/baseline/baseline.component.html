@@ -76,8 +76,12 @@
         <app-card-loading [isCardLoading]="cardBaselineUpdates.isLoading"></app-card-loading>
       </div>
       <div class="app-toggle-container" *ngIf="!cardBaselineUpdates.isLoading">
-        <p-inputSwitch class="app-toggle toggle-all" [(ngModel)]="includeAllUpdates"
-                       (onChange)="handleSetAllTogglesUpdates($event)" [disabled]="togglesReadOnly">
+        <p-inputSwitch
+          class="app-toggle toggle-all"
+          [(ngModel)]="includeAllUpdates"
+          [disabled]="allTogglerIsDisabled"
+          (onChange)="handleSetAllTogglesUpdates($event)"
+        >
         </p-inputSwitch>
       </div>
       <div class="updates-container" *ngIf="!cardBaselineUpdates.isLoading">
@@ -87,7 +91,7 @@
               <p-inputSwitch
                 class="app-toggle"
                 [(ngModel)]="item.included"
-                [disabled]="togglesReadOnly || item.classification === 'TO_CANCEL' || shouldDisplayDeliveryWarnings(item)"
+                [disabled]="allTogglerIsDisabled || item.classification === 'TO_CANCEL' || shouldDisplayDeliveryWarnings(item)"
               >
               </p-inputSwitch>
               <div class="item-description-container" [class.item-description-container-responsive]="responsive">

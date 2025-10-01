@@ -1075,12 +1075,12 @@
   "workpack-eap-alert-pending-items": "Verifique itens pendentes abaixo",
   "workpack-eap-alert-deleted-item": "Este item foi excluído",
   "workpack-eap-alert-new-item": "Item novo fora da Linha de Base ativa",
-  "workpack-eap-alert-no-schedule": "Entrega sem Cronograma",
-  "workpack-eap-alert-no-scope": "Entrega sem escopo estimado (físico = 0)",
+  "workpack-eap-alert-no-schedule": "Entrega sem cronograma",
+  "workpack-eap-alert-no-scope": "Entrega sem escopo",
   "workpack-eap-alert-to-cancel": "Item a cancelar. Requer aprovação de nova Linha de Base",
 
   "NO_SCHEDULE": "Entrega sem cronograma",
   "UNDEFINED_SCOPE": "Entrega sem escopo",
 
-  "baseline-disabled-submission-warning": "Não será possível salvar uma nova Linha de Base até que os itens com pendências acima sejam resolvidos"
+  "baseline-disabled-submission-warning": "Impossível submeter Linha de Base com pendências"
 }
