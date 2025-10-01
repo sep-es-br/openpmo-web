@@ -88,6 +88,10 @@ export class WorkpackPropertyService {
     };
   }
 
+  async getPermissionLevel(){
+    return this.workpackSrv.getPermissionLevel();
+  }
+
   saveChangesProperties() {
     this.backupProperties = this.properties && this.properties.map(prop => this.instanceBackupProperty(prop));
   }

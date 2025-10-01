@@ -156,12 +156,13 @@ export class WorkpackSectionStakeholdersComponent implements OnInit, OnDestroy {
       const cardItems = this.stakeholders.map(stakeholder => {
         const editPermission = stakeholder.permissions && stakeholder.permissions.filter(p => p.level === 'EDIT').length > 0;
         const readPermission = stakeholder.permissions && stakeholder.permissions.filter(p => p.level === 'READ').length > 0;
+        const updatePermission = stakeholder.permissions && stakeholder.permissions.filter(p => p.level === 'UPDATE').length > 0;
         const samePlan = (!stakeholder.permissions || stakeholder.permissions.length === 0) ||
           (stakeholder.permissions && stakeholder.permissions.filter(p => p.idPlan === this.workpackParams.idPlan).length > 0);
         return {
           typeCardItem: 'listItemStakeholder',
           icon: stakeholder.person ? (editPermission ? IconsEnum.UserEdit :
-            (readPermission ? IconsEnum.UserRead : IconsEnum.UserCircle)) : IconsEnum.Building,
+            (readPermission ? IconsEnum.UserRead : updatePermission ? IconsEnum.UserUpdate : IconsEnum.UserCircle)) : IconsEnum.Building,
           iconSvg: true,
           nameCardItem: stakeholder.person ? stakeholder.person.name : stakeholder.organization.name,
           fullNameCardItem: stakeholder.person ? stakeholder.person.fullName : stakeholder.organization.fullName,

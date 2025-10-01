@@ -1,6 +1,7 @@
 export interface IIndicator {
     id?: number;
     idWorkpack?: number;
+    idPlan?: number;
     name?: string;
     description?: string;
     source?: string;

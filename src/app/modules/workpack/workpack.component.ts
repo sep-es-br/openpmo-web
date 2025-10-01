@@ -440,6 +440,8 @@ export class WorkpackComponent implements OnDestroy {
       if (!this.isUserAdmin && this.workpack) {
         const editPermission = !!this.workpack.permissions?.find(p => p.level === 'EDIT');
         this.workpackSrv.setEditPermission(editPermission);
+        const permission = this.workpack.permissions.find(p => p.level);
+        this.workpackSrv.setPermissionLevel(permission?.level);
       }
       if (reloadOnlyProperties) {
         const workpackData = this.workpackSrv.getWorkpackData();
@@ -467,6 +469,8 @@ export class WorkpackComponent implements OnDestroy {
 
   async loadUserPermission() {
     let editPermission = !!this.workpack.permissions?.find(p => p.level === 'EDIT');
+    const permission = this.workpack.permissions.find(p => p.level);
+    this.workpackSrv.setPermissionLevel(permission?.level);
     if (this.workpack.endManagementDate !== null) {
       if (this.workpackSrv.getEditPermission()) {
         this.endManagementResumePermission = true;
