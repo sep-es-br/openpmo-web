@@ -20,6 +20,7 @@
   "action": "Ação",
   "active": "Ativo",
   "compile": "Compilar",
+  "itemBeingBuild": "Item em estruturação.",
   "reportModel": "Modelo de Relatório",
   "download": "Download",
   "setAsMain": "Definir como principal",

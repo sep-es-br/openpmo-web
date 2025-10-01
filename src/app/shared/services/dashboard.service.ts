@@ -8,6 +8,8 @@ import { PrepareHttpParams } from '../utils/query.util';
 import { IWorkpackData, IWorkpackParams } from '../interfaces/IWorkpackDataParams';
 import { WorkpackService } from './workpack.service';
 import * as moment from 'moment';
+import * as assert from 'assert';
+import { assertNotNull } from '@angular/compiler/src/output/output_ast';
 
 @Injectable({
   providedIn: 'root'
@@ -261,6 +263,11 @@ export class DashboardService extends BaseService<IDashboard> {
   public async GetMenuItemsByWorkpackModel(options?): Promise<IHttpResult<IWorkpackByModel[]>> {
     const result = await this.http.get(`${this.urlBase}/workpack-model/menu`, { params: PrepareHttpParams(options) }).toPromise();
     return result as IHttpResult<IWorkpackByModel[]>;
+  }
+
+  public async isItemBeingBuild(wpId : number): Promise<IHttpResult<{value: boolean}>> {
+    const result = await this.http.get(`${this.urlBase}/${wpId!}/isBeingBuild`).toPromise();
+    return result as IHttpResult<{value: boolean}>;
   }
 
   get observable() {
