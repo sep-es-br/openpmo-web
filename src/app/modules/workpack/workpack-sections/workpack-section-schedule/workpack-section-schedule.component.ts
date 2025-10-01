@@ -5,15 +5,14 @@ import { IScheduleStepCardItem } from '../../../../shared/interfaces/IScheduleSt
 import { IScheduleDetail } from '../../../../shared/interfaces/ISchedule';
 import { ScheduleService } from '../../../../shared/services/schedule.service';
 import { IScheduleSection } from '../../../../shared/interfaces/ISectionWorkpack';
-import { ISummaryJson } from '../../../../shared/interfaces/ISummaryJson';
 import { map, switchMap, takeUntil } from 'rxjs/operators';
 import { ResponsiveService } from '../../../../shared/services/responsive.service';
 import { ConfigDataViewService } from 'src/app/shared/services/config-dataview.service';
 import { TranslateService } from '@ngx-translate/core';
 import { WorkpackService } from 'src/app/shared/services/workpack.service';
 import { Router } from '@angular/router';
-import { Component, OnInit, OnDestroy, ViewChild, ElementRef , Input} from '@angular/core';
-import { EMPTY, Subject, Subscription, combineLatest } from 'rxjs';
+import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
+import { EMPTY, Subject, Subscription } from 'rxjs';
 import * as moment from 'moment';
 import { WorkpackShowTabviewService } from 'src/app/shared/services/workpack-show-tabview.service';
 import { MessageService } from 'primeng/api';
@@ -25,7 +24,6 @@ import { CancelButtonComponent } from 'src/app/shared/components/cancel-button/c
 import { LabelService } from 'src/app/shared/services/label.service';
 import { ActivatedRoute } from '@angular/router';
 import { ScheduleStepCardItemService } from 'src/app/shared/services/schedule-step-card-item.service';
-import { HttpClient } from '@angular/common/http';
 import { PentahoService } from 'src/app/shared/services/pentaho.service';
 
 @Component({
@@ -34,39 +32,65 @@ import { PentahoService } from 'src/app/shared/services/pentaho.service';
   styleUrls: ['./workpack-section-schedule.component.scss']
 })
 export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
-
   @ViewChild('cardCostEditPanel') cardCostEditPanel: OverlayPanel;
+
   @ViewChild(SaveButtonComponent) saveButton: SaveButtonComponent;
+
   @ViewChild(CancelButtonComponent) cancelButton: SaveButtonComponent;
 
   workpackParams: IWorkpackParams;
+
   workpackData: IWorkpackData;
+
   $destroy = new Subject();
+
   collapsePanelsStatus: boolean;
+
   responsive = false;
+
   sectionSchedule: IScheduleSection;
+
   schedule: IScheduleDetail;
+
   showDetails = true;
+
   unitMeansure: IMeasureUnit;
+
   editPermission: boolean;
+
   showTabview = false;
+
   costAssignmentsCardItemsEdited: ICartItemCostAssignment[] = [];
+
   indexCardEdited = 0;
+
   stepShow: IStepPost;
+
   showTypeDistributionDialog = false;
+
   typeDistribution = 'SIGMOIDAL';
+
   costAccountsConsumesStepChangeds = [];
+
   changedSteps: {
     changedGroupYear;
     changedIdStep;
   }[] = [];
+
   spreadEvent;
+
   spreadMulticost = false;
+
   sectionActive = false;
+
   formIsSaving = false;
+
   foreseenLabel: string;
+
   tooltipLabel: string;
+
   abbreviatedLabel: string;
+
   loadBaseline = true;
 
   isCurrentBaseline = false;
@@ -74,9 +98,9 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
   formatter = new Intl.NumberFormat('pt-BR', {
     style: 'currency',
     currency: 'BRL'
-  })
+  });
 
-  private _subscription: Subscription = new Subscription();
+  private subscription: Subscription = new Subscription();
 
   constructor(
     private router: Router,
@@ -91,13 +115,12 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
     private dashboardSrv: DashboardService,
     private labelSrv: LabelService,
     private route: ActivatedRoute,
-    private http: HttpClient,
     private pentahoSrv: PentahoService
   ) {
-
     this.workpackShowTabviewSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => {
       this.showTabview = value;
     });
+
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(responsive => this.responsive = responsive);
     this.configDataViewSrv.observableCollapsePanelsStatus.pipe(takeUntil(this.$destroy)).subscribe(collapsePanelStatus => {
       this.collapsePanelsStatus = collapsePanelStatus === 'collapse' ? true : false;
@@ -109,6 +132,7 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
         }
       });
     });
+
     this.sectionSchedule = {
       cardSection: {
         toggleable: false,
@@ -119,6 +143,7 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
         initialStateCollapse: this.showTabview ? false : this.collapsePanelsStatus,
       }
     };
+
     this.scheduleSrv.observableResetSchedule.pipe(takeUntil(this.$destroy)).subscribe(reset => {
       if (reset) {
         this.loadScheduleData();
@@ -127,9 +152,8 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-
     this.route.queryParams.subscribe(params => {
-      const idWorkpack = params['id'];
+      const idWorkpack = params.id;
       if (idWorkpack) {
         this.labelSrv.getLabels(idWorkpack).subscribe(
           response => {
@@ -144,8 +168,9 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
         );
       }
     });
+
     this.route.queryParams.pipe(
-      map(params => params['id']),
+      map(params => params.id),
       switchMap(workpackId => {
         if (!workpackId) return EMPTY;
         return this.scheduleCardItemSrv.getCurrentBaseline(workpackId);
@@ -157,6 +182,12 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
     });
   }
 
+  ngOnDestroy(): void {
+    this.$destroy.complete();
+    this.$destroy.unsubscribe();
+    this.subscription.unsubscribe();
+  }
+
   async loadScheduleData() {
     const {
       workpackParams,
@@ -164,195 +195,195 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
       schedule,
       loading
     } = this.scheduleSrv.getScheduleData();
-    
+
     this.workpackParams = workpackParams;
     this.workpackData = workpackData;
-    
     this.schedule = this.prepareScheduleStructure(schedule);
-    
     this.sectionActive = this.checkSectionActive(workpackData);
-    
     this.loadScheduleSession();
-    
+
     if (this.hasGroupSteps()) {
       this.loadLiquidatedValues();
     }
-}
-
-
-private prepareScheduleStructure(schedule: any): any {
-  return Object.assign({
-    ...schedule,
-    groupStep: schedule?.groupStep?.map(group => ({
-      ...group,
-      budgetedValue: 'Carregando...',
-      authorizedValue: 'Carregando...',
-      liquidatedTotal: 'Carregando...',
-      steps: group.steps?.map(step => ({
-        ...step,
-        liquidatedValue: 'Carregando...',
-        consumes: step.consumes?.map(c => ({ ...c }))
-      }))
-    })),
-    groupedSteps: schedule?.groupedSteps?.map(group => ({
-      ...group,
-      steps: group.steps?.map(step => ({
-        ...step,
-        consumes: step.consumes?.map(c => ({ ...c }))
-      }))
-    }))
-  });
-}
-
-private checkSectionActive(workpackData: any): boolean {
-    return workpackData?.workpack?.id && 
-           workpackData?.workpackModel?.scheduleSessionActive;
-}
-
-private hasGroupSteps(): boolean {
-    return this.schedule?.groupStep != undefined || 
-           this.schedule?.groupStep != null;
-}
-
-private async loadLiquidatedValues(): Promise<void> {
-  try {
-    const updatedSchedule = await this.fetchAndMapLiquidatedValues(this.schedule);
-    this.schedule = updatedSchedule;
-    this.updateLiquidatedValues();
-  } catch (error) {
-    this.schedule = this.clearLiquidatedValues(this.schedule);
-    this.updateLiquidatedValues(); 
   }
-}
 
-private clearLiquidatedValues(schedule: any): any {
-  return {
-    ...schedule,
-    groupStep: schedule?.groupStep?.map(group => ({
-      ...group,
-      budgetedValue: 'Não disponível',
-      authorizedValue: 'Não disponível',
-      liquidatedTotal: 'Não disponível',
-      steps: group.steps?.map(step => ({
-        ...step,
-        liquidatedValue: 'Não disponível'
+  prepareScheduleStructure(schedule: any): any {
+    return Object.assign({
+      ...schedule,
+      groupStep: schedule?.groupStep?.map(group => ({
+        ...group,
+        budgetedValue: 'Carregando...',
+        authorizedValue: 'Carregando...',
+        liquidatedTotal: 'Carregando...',
+        steps: group.steps?.map(step => ({
+          ...step,
+          liquidatedValue: 'Carregando...',
+          consumes: step.consumes?.map(c => ({ ...c }))
+        }))
+      })),
+      groupedSteps: schedule?.groupedSteps?.map(group => ({
+        ...group,
+        steps: group.steps?.map(step => ({
+          ...step,
+          consumes: step.consumes?.map(c => ({ ...c }))
+        }))
       }))
-    }))
-  };
-}
+    });
+  }
 
+  checkSectionActive(workpackData: any): boolean {
+    return (
+      workpackData?.workpack?.id &&
+      workpackData?.workpackModel?.scheduleSessionActive
+    );
+  }
 
+  hasGroupSteps(): boolean {
+    return (
+      this.schedule?.groupStep != undefined ||
+      this.schedule?.groupStep != null
+    );
+  }
 
-private async fetchAndMapLiquidatedValues(scheduleDetail: IScheduleDetail): Promise<IScheduleDetail> {
+  async loadLiquidatedValues(): Promise<void> {
+    try {
+      const updatedSchedule = await this.fetchAndMapLiquidatedValues(this.schedule);
+      this.schedule = updatedSchedule;
+      this.updateLiquidatedValues();
+    } catch (error) {
+      this.schedule = this.clearLiquidatedValues(this.schedule);
+      this.updateLiquidatedValues();
+    }
+  }
+
+  clearLiquidatedValues(schedule: any): any {
+    return {
+      ...schedule,
+      groupStep: schedule?.groupStep?.map(group => ({
+        ...group,
+        budgetedValue: 'Não disponível',
+        authorizedValue: 'Não disponível',
+        liquidatedTotal: 'Não disponível',
+        steps: group.steps?.map(step => ({
+          ...step,
+          liquidatedValue: 'Não disponível'
+        }))
+      }))
+    };
+  }
+
+  async fetchAndMapLiquidatedValues(scheduleDetail: IScheduleDetail): Promise<IScheduleDetail> {
     const monthAbbreviations = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
     const liquidatedValuesCache = new Map<string, any>();
     const clone = JSON.parse(JSON.stringify(scheduleDetail));
 
     try {
-        for (const group of clone.groupStep) {
-            group.budgetedValue = this.formatter.format(0);
-            group.authorizedValue = this.formatter.format(0);
-            let liquidatedTotal = 0;
+      for (const group of clone.groupStep) {
+        group.budgetedValue = this.formatter.format(0);
+        group.authorizedValue = this.formatter.format(0);
+        let liquidatedTotal = 0;
 
-            for (const step of group.steps) {
-                step.liquidatedValue = this.formatter.format(0);
-                let stepLiquidatedTotal = 0;
+        for (const step of group.steps) {
+          step.liquidatedValue = this.formatter.format(0);
+          let stepLiquidatedTotal = 0;
 
-                if (step.consumes?.length > 0) {
-                    for (const consume of step.consumes) {
-                            if (!consume.costAccount?.codPo || !consume.costAccount?.codUo) {
-                                continue;
-                            }
+          if (step.consumes?.length > 0) {
+            for (const consume of step.consumes) {
+              if (!consume.costAccount?.codPo || !consume.costAccount?.codUo) {
+                continue;
+              }
 
-                            const codPo = String(consume.costAccount.codPo).padStart(6, '0');
-                            const codUo = String(consume.costAccount.codUo).padStart(5, '0');
-                            
-                            let response = liquidatedValuesCache.get(codPo);
-                            
-                            if (!response) {
-                              response = await this.pentahoSrv.getLiquidatedValues(codPo, codUo);
-                              liquidatedValuesCache.set(codPo, response);
-                            }
+              const codPo = String(consume.costAccount.codPo).padStart(6, '0');
+              const codUo = String(consume.costAccount.codUo).padStart(5, '0');
 
-                            const yearLiquidationData = response.data.resultset.find((data: any[]) => data[0] === group.year);
+              let response = liquidatedValuesCache.get(codPo);
 
-                            if (yearLiquidationData) {
-                                const monthlyValues = this.extractMonthlyValues(yearLiquidationData);
-                                const monthAbbreviation = monthAbbreviations[new Date(step.periodFromStart).getMonth()];
-                                const liquidatedValue = monthlyValues[monthAbbreviation] || 0;
+              if (!response) {
+                response = await this.pentahoSrv.getLiquidatedValues(codPo, codUo);
+                liquidatedValuesCache.set(codPo, response);
+              }
 
-                                stepLiquidatedTotal += liquidatedValue;
-                                liquidatedTotal += liquidatedValue;
+              const yearLiquidationData = response.data.resultset.find((data: any[]) => data[0] === group.year);
 
-                                const budgetedValue = yearLiquidationData[2] ?? 0;
-                                const authorizedValue = yearLiquidationData[3] ?? 0;
+              if (yearLiquidationData) {
+                const monthlyValues = this.extractMonthlyValues(yearLiquidationData);
+                const monthAbbreviation = monthAbbreviations[new Date(step.periodFromStart).getMonth()];
+                const liquidatedValue = monthlyValues[monthAbbreviation] || 0;
 
-                                group.budgetedValue = this.formatter.format(budgetedValue);
-                                group.authorizedValue = this.formatter.format(authorizedValue);
-                            }
-                    }
-                }
+                stepLiquidatedTotal += liquidatedValue;
+                liquidatedTotal += liquidatedValue;
 
-                step.liquidatedValue = this.formatter.format(stepLiquidatedTotal);
+                const budgetedValue = yearLiquidationData[2] ?? 0;
+                const authorizedValue = yearLiquidationData[3] ?? 0;
+
+                group.budgetedValue = this.formatter.format(budgetedValue);
+                group.authorizedValue = this.formatter.format(authorizedValue);
+              }
             }
+          }
 
-            group.liquidatedTotal = this.formatter.format(liquidatedTotal);
+          step.liquidatedValue = this.formatter.format(stepLiquidatedTotal);
         }
 
-        return clone;
+        group.liquidatedTotal = this.formatter.format(liquidatedTotal);
+      }
+
+      return clone;
     } catch (error) {
-        throw error;
+      throw error;
     }
-}
-
-private extractMonthlyValues(yearLiquidationData: any[]): any {
-    return {
-        jan: yearLiquidationData[4],
-        fev: yearLiquidationData[5],
-        mar: yearLiquidationData[6],
-        abr: yearLiquidationData[7],
-        mai: yearLiquidationData[8],
-        jun: yearLiquidationData[9],
-        jul: yearLiquidationData[10],
-        ago: yearLiquidationData[11],
-        set: yearLiquidationData[12],
-        out: yearLiquidationData[13],
-        nov: yearLiquidationData[14],
-        dez: yearLiquidationData[15]
-    };
-}
-
-updateLiquidatedValues() {
-  if (!this.sectionSchedule?.groupStep || !this.schedule?.groupStep) {
-    return;
   }
 
-  this.sectionSchedule.groupStep.forEach(sectionGroup => {
-    const scheduleGroup = this.schedule.groupStep.find(g => g.year === sectionGroup.year);
-    if (!scheduleGroup) return;
+  extractMonthlyValues(yearLiquidationData: any[]): any {
+    return {
+      jan: yearLiquidationData[4],
+      fev: yearLiquidationData[5],
+      mar: yearLiquidationData[6],
+      abr: yearLiquidationData[7],
+      mai: yearLiquidationData[8],
+      jun: yearLiquidationData[9],
+      jul: yearLiquidationData[10],
+      ago: yearLiquidationData[11],
+      set: yearLiquidationData[12],
+      out: yearLiquidationData[13],
+      nov: yearLiquidationData[14],
+      dez: yearLiquidationData[15]
+    };
+  }
 
-    sectionGroup.budgetedValue = scheduleGroup.budgetedValue;
-    sectionGroup.authorizedValue = scheduleGroup.authorizedValue;
-    sectionGroup.liquidatedTotal = scheduleGroup.liquidatedTotal;
+  updateLiquidatedValues() {
+    if (!this.sectionSchedule?.groupStep || !this.schedule?.groupStep) {
+      return;
+    }
 
-    sectionGroup.cardItemSection?.forEach(sectionStep => {
-      const scheduleStep = scheduleGroup.steps.find(s => s.id === sectionStep.idStep);
-      if (scheduleStep) {
-        sectionStep.liquidatedValue = scheduleStep.liquidatedValue;
-        
-      }
+    this.sectionSchedule.groupStep.forEach(sectionGroup => {
+      const scheduleGroup = this.schedule.groupStep.find(g => g.year === sectionGroup.year);
+      if (!scheduleGroup) return;
+
+      sectionGroup.budgetedValue = scheduleGroup.budgetedValue;
+      sectionGroup.authorizedValue = scheduleGroup.authorizedValue;
+      sectionGroup.liquidatedTotal = scheduleGroup.liquidatedTotal;
+
+      sectionGroup.cardItemSection?.forEach(sectionStep => {
+        const scheduleStep = scheduleGroup.steps.find(s => s.id === sectionStep.idStep);
+        if (scheduleStep) {
+          sectionStep.liquidatedValue = scheduleStep.liquidatedValue;
+        }
+      });
     });
-  });
-}
+  }
 
   async loadScheduleSession() {
-    if(!this.sectionActive) {return;}
+    if (!this.sectionActive) return;
+
     this.editPermission = this.workpackSrv.getEditPermission();
     this.unitMeansure = this.workpackSrv.getUnitMeansure();
+
     if (this.schedule && this.schedule.groupStep) {
       if (this.unitMeansure && !this.unitMeansure.precision) {
         this.unitMeansure.precision = 0;
       }
+
       const groupStep = this.schedule.groupStep && this.schedule.groupStep.map((group, groupIndex, groupArray) => {
         const allGroups = groupArray || [];
 
@@ -384,6 +415,7 @@ updateLiquidatedValues() {
           } else {
             stepOrder = 'step';
           }
+
           const menuItems = step.id ? [{
             label: this.translateSrv.instant('properties'),
             icon: 'fas fa-edit',
@@ -400,8 +432,8 @@ updateLiquidatedValues() {
             type: 'listStep',
             editPermission: !!this.editPermission && !this.workpackData.workpack.canceled,
             stepName: new Date(step.periodFromStart + 'T00:00:00'),
-            menuItems: menuItems,
-            stepOrder: stepOrder,
+            menuItems,
+            stepOrder,
             unitPlanned: step.plannedWork ? step.plannedWork : 0,
             unitActual: step.actualWork ? step.actualWork : 0,
             liquidatedValue: step.liquidatedValue,
@@ -425,51 +457,62 @@ updateLiquidatedValues() {
             editCosts: step.consumes && step.consumes.length === 1 ? true : false,
             multipleCosts: step.consumes && step.consumes.length > 1 ? true : false,
           };
-        }
-      );
+        });
 
         const groupProgressBar = [
           {
             total: Number(group.planed.toFixed(this.unitMeansure.precision)),
             progress: Number(group.actual.toFixed(this.unitMeansure.precision)),
+            planned: group.steps.reduce((total, step) => total + (step.baselinePlannedWork || 0), 0),
             labelTotal: this.foreseenLabel,
             labelProgress: 'actual',
+            labelPlanned: 'plannedBaseline',
             valueUnit: this.unitMeansure && this.unitMeansure.name,
-            color: 'rgba(236, 125, 49, 1)',
+            color: '#EC7D31',
             type: 'scope'
           }
+          // Realizado - Reprogramado
+          // Planejado
         ];
+
         if (group.planedCost > 0) {
           groupProgressBar.push({
             total: group.planedCost,
             progress: group.actualCost,
+            planned: group.steps.reduce((total, step) => total + (step.baselinePlannedCost ? step.baselinePlannedCost : 0), 0),
             labelTotal: this.foreseenLabel,
             labelProgress: 'actual',
+            labelPlanned: 'plannedBaseline',
             valueUnit: 'currency',
-            color: '#6cd3bd',
+            color: '#6CD3BD',
             type: 'cost'
           });
+          // Realizado - Reprogramado
+          // Planejado
         }
 
-        groupProgressBar.push({
-          total: group.steps.reduce((total, step) => total + (step.baselinePlannedWork || 0), 0),
-          progress: group.steps.reduce((total, step) => total + (step.actualWork || 0), 0),
-          labelTotal: 'plannedBaseline',
-          labelProgress: 'actual',
-          valueUnit: this.unitMeansure && this.unitMeansure.name,
-          color: '#BFBFBF',
-          type: 'cost'
-        });
+        // groupProgressBar.push({
+        //   total: group.steps.reduce((total, step) => total + (step.baselinePlannedWork || 0), 0),
+        //   progress: group.steps.reduce((total, step) => total + (step.actualWork || 0), 0),
+        //   labelTotal: 'plannedBaseline',
+        //   labelProgress: 'actual',
+        //   valueUnit: this.unitMeansure && this.unitMeansure.name,
+        //   color: '#BFBFBF',
+        //   type: 'cost'
+        // });
+        // Realizado - Planejado
 
-        groupProgressBar.push({
-          total: group.steps.reduce((total, step) => total + (step.baselinePlannedCost ? step.baselinePlannedCost : 0), 0),
-          progress: group.steps.reduce((total, step) => total + (step.baselinePlannedCost ? step.baselinePlannedCost : 0), 0),
-          labelTotal: 'plannedBaseline',
-          labelProgress: 'plannedBaseline',
-          valueUnit: 'currency',
-          color: '#BFBFBF',
-          type: 'cost'
-        });
+        // groupProgressBar.push({
+        //   total: group.steps.reduce((total, step) => total + (step.baselinePlannedCost ? step.baselinePlannedCost : 0), 0),
+        //   progress: group.steps.reduce((total, step) => total + (step.baselinePlannedCost ? step.baselinePlannedCost : 0), 0),
+        //   labelTotal: 'plannedBaseline',
+        //   labelProgress: 'plannedBaseline',
+        //   valueUnit: 'currency',
+        //   color: '#BFBFBF',
+        //   type: 'cost'
+        // });
+        // Planejado - Planejado
+
         return {
           year: group.year,
           budgetedValue: group.budgetedValue,
@@ -479,6 +522,7 @@ updateLiquidatedValues() {
           groupProgressBar
         };
       });
+
       const startDate = this.schedule && new Date(this.schedule.start + 'T00:00:00');
       const endDate = this.schedule && new Date(this.schedule.end + 'T00:00:00');
       const startScheduleStep = !!this.editPermission && {
@@ -487,12 +531,14 @@ updateLiquidatedValues() {
         unitName: this.unitMeansure.name,
         unitPrecision: this.unitMeansure.precision,
       };
+
       const endScheduleStep = !!this.editPermission && {
         type: 'newEnd',
         stepOrder: 'newEnd',
         unitName: this.unitMeansure.name,
         unitPrecision: this.unitMeansure.precision,
       };
+
       const initialDatePlanned = moment(startDate);
       const finalDatePlanned = moment(endDate);
       const daysToPlanned = finalDatePlanned.diff(initialDatePlanned, 'days');
@@ -502,6 +548,7 @@ updateLiquidatedValues() {
       const baselineStartDate = this.schedule && new Date(this.schedule.baselineStart + 'T00:00:00');
       const baselineEndDate = this.schedule && new Date(this.schedule.baselineEnd + 'T00:00:00');
       const baselineDaysPlanned = moment(baselineEndDate).diff(moment(baselineStartDate), 'days');
+
       this.sectionSchedule = {
         cardSection: {
           toggleable: false,
@@ -521,7 +568,7 @@ updateLiquidatedValues() {
               labelTotal: this.foreseenLabel,
               labelProgress: 'actual',
               valueUnit: this.unitMeansure && this.unitMeansure.name,
-              color: 'rgba(236, 125, 49, 1)',
+              color: '#ec7d31',
               barHeight: 17,
               baselinePlanned: Number(this.schedule.baselinePlaned.toFixed(this.unitMeansure.precision)),
               type: 'scope'
@@ -568,6 +615,7 @@ updateLiquidatedValues() {
           if (step.stepOrder === 'start') {
             group.start = true;
             step.stepDay = startDate;
+
             if (this.editPermission && step.idStep) {
               step.menuItems = step.menuItems || [];
               step.menuItems.push({
@@ -577,16 +625,20 @@ updateLiquidatedValues() {
                 disabled: !!this.workpackData.workpack.canceled
               });
             }
+
             if (!hasEndStep) {
               group.end = true;
               group.cardItemSection.push(endScheduleStep);
             }
+
             const groupStepItems: IScheduleStepCardItem[] = [startScheduleStep, ...group.cardItemSection];
             group.cardItemSection = groupStepItems;
           }
+
           if (step.stepOrder === 'end') {
             group.end = true;
             step.stepDay = endDate;
+
             if (this.editPermission && step.idStep) {
               step.menuItems = step.menuItems || [];
               step.menuItems.push({
@@ -596,14 +648,17 @@ updateLiquidatedValues() {
                 disabled: !!this.workpackData.workpack.canceled
               });
             }
+
             group.cardItemSection.push(endScheduleStep);
           }
         });
       });
+
       return;
     } else {
       this.schedule = undefined;
     }
+
     this.sectionSchedule = {
       cardSection: {
         toggleable: false,
@@ -614,7 +669,6 @@ updateLiquidatedValues() {
         initialStateCollapse: this.showTabview ? false : this.collapsePanelsStatus,
       }
     };
-
   }
 
   async handleNewSchedule() {
@@ -665,8 +719,8 @@ updateLiquidatedValues() {
           unitPrecision,
           idWorkpackModelLinked: this.workpackParams.idWorkpackModelLinked,
           hasActiveBaseline: this.isCurrentBaseline,
-        }
-      }
+        },
+      },
     );
   }
 
@@ -685,6 +739,7 @@ updateLiquidatedValues() {
         changedIdStep: idStep
       });
     }
+
     this.workpackSrv.nextPendingChanges(true);
     this.saveButton.showButton();
     this.cancelButton.showButton();
@@ -699,6 +754,7 @@ updateLiquidatedValues() {
       this.saveButton.hideButton();
       return;
     }
+
     const groupIndex = this.sectionSchedule.groupStep.findIndex(group =>
       group.cardItemSection.filter(item => item.idStep === idStep).length > 0);
     if (groupIndex > -1) {
@@ -712,6 +768,7 @@ updateLiquidatedValues() {
             .reduce((total, step) => total + (step.costActual ? step.costActual : 0), 0);
           group.progress = groupProgressCost;
         }
+
         if (group.valueUnit !== 'currency' && group.valueUnit !== 'time') {
           const groupTotalUnit = this.sectionSchedule.groupStep[groupIndex].cardItemSection.filter(card => card.type === 'listStep')
             .reduce((total, step) => total + (step.unitPlanned ? step.unitPlanned : 0), 0);
@@ -722,6 +779,7 @@ updateLiquidatedValues() {
         }
       });
     }
+
     // atualizando a progressBar de custo do schedule geral
     this.sectionSchedule.cardSection.progressBarValues.filter(progress => progress.valueUnit === 'currency').forEach((section, index) => {
       section.total = this.sectionSchedule.groupStep.reduce((total, group) => {
@@ -779,6 +837,7 @@ updateLiquidatedValues() {
           });
         }
       }
+
       if (stepsList.length > 0) {
         if (this.typeDistribution === 'LINEAR') {
           let stepIndex = 0;
@@ -816,11 +875,12 @@ updateLiquidatedValues() {
             }
           });
         }
-
       }
+
       stepsList.forEach(step => {
         const groupIndex = this.sectionSchedule.groupStep.
         findIndex(group => group.cardItemSection.filter(item => item.idStep === step.idStep).length > 0);
+
         if (groupIndex > -1) {
           const stepIndex = this.sectionSchedule.groupStep[groupIndex].cardItemSection.
           findIndex(selectedStep => selectedStep.idStep === step.idStep);
@@ -830,7 +890,6 @@ updateLiquidatedValues() {
           }
         }
       });
-
     }
   }
 
@@ -843,12 +902,6 @@ updateLiquidatedValues() {
         return stepCost.costAccount.id;
       }
     }
-  }
-
-  ngOnDestroy(): void {
-    this.$destroy.complete();
-    this.$destroy.unsubscribe();
-    this._subscription.unsubscribe();
   }
 
   async handleShowEditCost(event, group) {
@@ -880,17 +933,18 @@ updateLiquidatedValues() {
         };
         if (this.stepShow && this.stepShow.consumes) {
           this.costAssignmentsCardItemsEdited = this.stepShow.consumes.map(consume => ({
-              type: 'cost-card',
-              unitMeasureName: '$',
-              idCost: consume.idCostAccount,
-              idCostAssignment: consume.id,
-              costAccountName: consume.nameCostAccount,
-              plannedWork: consume.plannedCost,
-              actualWork: consume.actualCost,
-              readonly: !this.editPermission,
-              showReplicateButton: this.stepShow.showReplicateButton,
-              endStep: stepOrder === 'end'
-            }));
+            type: 'cost-card',
+            unitMeasureName: '$',
+            idCost: consume.idCostAccount,
+            idCostAssignment: consume.id,
+            costAccountName: consume.nameCostAccount,
+            plannedWork: consume.plannedCost,
+            actualWork: consume.actualCost,
+            readonly: !this.editPermission,
+            showReplicateButton: this.stepShow.showReplicateButton,
+            endStep: stepOrder === 'end'
+          }));
+
           this.cardCostEditPanel.show(event.clickEvent);
         }
       }
@@ -906,13 +960,13 @@ updateLiquidatedValues() {
   }
 
   async handleChangeValuesCardItem() {
-    
     const cardChanged = this.costAssignmentsCardItemsEdited[this.indexCardEdited];
 
     if (!cardChanged.actualWork || cardChanged.actualWork === null) {
       cardChanged.actualWork = 0;
       this.costAssignmentsCardItemsEdited[this.indexCardEdited].actualWork = 0;
     }
+
     if (!cardChanged.plannedWork || cardChanged.plannedWork === null) {
       cardChanged.plannedWork = 0;
       this.costAssignmentsCardItemsEdited[this.indexCardEdited].plannedWork = 0;
@@ -925,6 +979,7 @@ updateLiquidatedValues() {
         changedIdStep: this.stepShow.id
       });
     }
+
     const groupStepIndex = this.schedule.groupStep.findIndex(group => group.year === this.stepShow.group);
     if (groupStepIndex > -1) {
       const stepIndex = this.schedule.groupStep[groupStepIndex].steps.findIndex(step => step.id === this.stepShow.id);
@@ -940,6 +995,7 @@ updateLiquidatedValues() {
         }
       }
     }
+
     this.workpackSrv.nextPendingChanges(true);
     this.saveButton.showButton();
     this.cancelButton.showButton();
@@ -960,6 +1016,7 @@ updateLiquidatedValues() {
           total: this.costAssignmentsCardItemsEdited.reduce((total, item) => total + item.plannedWork, 0)
         };
       }
+
       // atualizando a progressBar de custo do ano
       this.sectionSchedule.groupStep[groupIndex].groupProgressBar.forEach(group => {
         if (group.valueUnit === 'currency') {
@@ -972,6 +1029,7 @@ updateLiquidatedValues() {
         }
       });
     }
+
     const hasNegativeValues = this.checkNegativeValues();
     if (hasNegativeValues) {
       this.messageSrv.add({
@@ -982,6 +1040,7 @@ updateLiquidatedValues() {
       this.saveButton.hideButton();
       return;
     }
+
     // atualizando a progressBar de custo do schedule geral
     this.sectionSchedule.cardSection.progressBarValues.filter(progress => progress.valueUnit === 'currency').forEach((section, index) => {
       section.total = this.sectionSchedule.groupStep.reduce((total, group) => {
@@ -1014,6 +1073,7 @@ updateLiquidatedValues() {
           });
         }
       }
+
       if (stepsList.length > 0) {
         let stepIndex = 0;
         if (this.typeDistribution === 'LINEAR') {
@@ -1039,7 +1099,6 @@ updateLiquidatedValues() {
             this.replicateCostAccountValues(step.idStep, cardChanged.idCost, valueStep);
           });
         }
-
       }
     }
   }
@@ -1065,6 +1124,7 @@ updateLiquidatedValues() {
             consume.plannedCost = consume.plannedCost + plannedProp;
           });
         }
+
         this.stepShow = {
           id: this.schedule.groupStep[groupIndex].steps[stepIndex].id,
           plannedWork: this.schedule.groupStep[groupIndex].steps[stepIndex].plannedWork,
@@ -1083,17 +1143,18 @@ updateLiquidatedValues() {
         };
         if (this.stepShow && this.stepShow.consumes) {
           this.costAssignmentsCardItemsEdited = this.stepShow.consumes.map(consume => ({
-              type: 'cost-card',
-              unitMeasureName: '$',
-              idCost: consume.idCostAccount,
-              idCostAssignment: consume.id,
-              costAccountName: consume.nameCostAccount,
-              plannedWork: consume.plannedCost,
-              actualWork: consume.actualCost,
-              readonly: !this.editPermission,
-              showReplicateButton: this.stepShow.showReplicateButton
-            }));
+            type: 'cost-card',
+            unitMeasureName: '$',
+            idCost: consume.idCostAccount,
+            idCostAssignment: consume.id,
+            costAccountName: consume.nameCostAccount,
+            plannedWork: consume.plannedCost,
+            actualWork: consume.actualCost,
+            readonly: !this.editPermission,
+            showReplicateButton: this.stepShow.showReplicateButton
+          }));
         }
+
         this.handleChangeValuesCardItem();
       }
     }
@@ -1110,11 +1171,13 @@ updateLiquidatedValues() {
         this.sectionSchedule.cardSection.progressBarValues[costIndex].total = scheduleValues.planedCost;
         this.sectionSchedule.cardSection.progressBarValues[costIndex].progress = scheduleValues.actualCost;
       }
+
       const scopeIndex = this.sectionSchedule.cardSection.progressBarValues.findIndex(item => item.type === 'scope');
       if (scopeIndex > -1) {
         this.sectionSchedule.cardSection.progressBarValues[scopeIndex].total = scheduleValues.planed;
         this.sectionSchedule.cardSection.progressBarValues[scopeIndex].progress = scheduleValues.actual;
       }
+
       this.sectionSchedule.groupStep.forEach(group => {
         const costProgressIndex = group.groupProgressBar.findIndex(progress => progress.type === 'cost');
         if (costProgressIndex > -1) {
@@ -1124,6 +1187,7 @@ updateLiquidatedValues() {
             group.groupProgressBar[costProgressIndex].progress = groupValue.actualCost;
           }
         }
+
         const scopeProgressIndex = group.groupProgressBar.findIndex(progress => progress.type === 'scope');
         if (scopeProgressIndex > -1) {
           const groupValue = scheduleValues.groupStep.find(groupStep => groupStep.year === group.year);
@@ -1190,7 +1254,9 @@ updateLiquidatedValues() {
         this.saveButton.hideButton();
         return;
       }
+
       const result = await this.scheduleSrv.putScheduleStepBatch(stepsToSave, this.schedule.id, this.workpackParams.idPlan, this.workpackParams.idWorkpack);
+
       if (result.success) {
         this.dashboardSrv.resetDashboardData();
         this.changedSteps = [];
@@ -1209,7 +1275,6 @@ updateLiquidatedValues() {
         }, 100);
       }
     }
-
   }
 
   handleOnCancel() {
@@ -1217,7 +1282,5 @@ updateLiquidatedValues() {
     this.scheduleSrv.getBackupSchedule();
     this.workpackSrv.nextPendingChanges(false);
     this.loadScheduleData();
-
   }
-
 }

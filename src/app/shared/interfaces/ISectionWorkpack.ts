@@ -1,7 +1,7 @@
 import { IScheduleStepCardItem } from './IScheduleStepCardItem';
 import { IWorkpackCardItem } from './IWorkpackCardItem';
 import { ICardItem } from './ICardItem';
-import { ICard, progressBarValue } from 'src/app/shared/interfaces/ICard';
+import { ICard, ProgressBarValue } from 'src/app/shared/interfaces/ICard';
 export interface ISection {
   idWorkpackModel?: number;
   cardSection: ICard;
@@ -24,9 +24,9 @@ export interface IScheduleSection {
     cardItemSection?: IScheduleStepCardItem[];
     start?: boolean;
     end?: boolean;
-    groupProgressBar?: progressBarValue[];
-    budgetedValue?: string,
-    authorizedValue?: string,
-    liquidatedTotal?: string
+    groupProgressBar?: ProgressBarValue[];
+    budgetedValue?: string;
+    authorizedValue?: string;
+    liquidatedTotal?: string;
   }[];
 }

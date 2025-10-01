@@ -642,7 +642,13 @@ export class WorkpackComponent implements OnDestroy {
             command: (event) => this.handleRestoreWorkpack(workpack.id),
           });
         } else {
-          if (workpack.type !== 'Project' && !!workpack.canDeleted && !workpack.canceled && !workpack.linked && !(workpack.type === 'Deliverable' && workpack.hasActiveBaseline)) {
+          if (
+            workpack.type !== 'Project' &&
+            !!workpack.canDeleted &&
+            !workpack.canceled &&
+            !workpack.linked &&
+            !(workpack.type === 'Deliverable' && workpack.hasActiveBaseline)
+          ) {
             menuItems.push({
               label: this.translateSrv.instant('delete'),
               icon: 'fas fa-trash-alt',
@@ -697,7 +703,12 @@ export class WorkpackComponent implements OnDestroy {
               });
             }
           }
-          if (this.workpackSrv.getEditPermission() && !workpack.canceled && !workpack.linked && workpack.type === TypeWorkpackEnum.ProjectModel) {
+          if (
+            this.workpackSrv.getEditPermission() &&
+            !workpack.canceled &&
+            !workpack.linked &&
+            workpack.type === TypeWorkpackEnum.ProjectModel
+          ) {
             menuItems.push({
               label: this.translateSrv.instant('cut'),
               icon: 'fas fa-cut',
@@ -1617,11 +1628,10 @@ export class WorkpackComponent implements OnDestroy {
   }
 
   showWorkpackId() {
-    // setTimeout(() => {
+    setTimeout(() => {
       const show = this.idWorkpack  && !this.workpackLoading && this.workpackModel &&
       (!this.showTabview || (!!this.showTabview && (!this.selectedTab || this.selectedTab.key !== 'schedule')));
       return show;
-    // });
+    });
   }
-
 }
