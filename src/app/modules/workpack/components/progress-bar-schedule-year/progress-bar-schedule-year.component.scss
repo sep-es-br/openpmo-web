@@ -5,13 +5,13 @@
   min-width: 150px;
   display: flex;
   flex-direction: row;
-  align-items: flex-end;
+  
   .unit-container {
     flex: 1;
     margin-right: 10px;
     padding: 0;
     display: flex;
-    align-items: flex-end;
+    align-items: center;
     justify-content: flex-end;
     font-size: 12px;
     span {

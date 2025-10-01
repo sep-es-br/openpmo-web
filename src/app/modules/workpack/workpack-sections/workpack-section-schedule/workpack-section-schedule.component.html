@@ -49,10 +49,17 @@
               </div>
 
               <div class="progress-bar-container" *ngFor="let progressBar of groupStep.groupProgressBar">
-                <app-progress-bar-schedule-year [class.progress-bar-mobile]="responsive" [total]="progressBar.total"
-                  [progress]="progressBar.progress" [labelTotal]="progressBar.labelTotal"
-                  [labelProgress]="progressBar.labelProgress" [valueUnit]="progressBar.valueUnit"
-                  [color]="progressBar.color">
+                <app-progress-bar-schedule-year
+                  [class.progress-bar-mobile]="responsive"
+                  [total]="progressBar.total"
+                  [progress]="progressBar.progress"
+                  [planned]="progressBar?.planned"
+                  [labelTotal]="progressBar.labelTotal"
+                  [labelProgress]="progressBar.labelProgress"
+                  [labelPlanned]="progressBar?.labelPlanned"
+                  [valueUnit]="progressBar.valueUnit"
+                  [color]="progressBar.color"
+                >
                 </app-progress-bar-schedule-year>
               </div>
             </div>
