@@ -76,7 +76,8 @@ export class BaselineComponent implements OnInit, OnDestroy {
     return (
       this.formIsLoading ||
       this.areTherePendentUpdatesListed ||
-      !this.baseline.updates.some((update) => update.included)
+      !this.baseline.updates.some((update) => update.included) ||
+      !this.formBaseline.valid
     );
   }
 
@@ -297,7 +298,8 @@ export class BaselineComponent implements OnInit, OnDestroy {
 
   async handleSubmitBaseline() {
     this.formIsLoading = true;
-    const result = await this.baselineSrv.submitBaseline(this.idBaseline, this.baseline.updates);
+    const selectedUpdates = this.baseline.updates.filter((update) => update.included);
+    const result = await this.baselineSrv.submitBaseline(this.idBaseline, selectedUpdates);
     this.formIsLoading = false;
     if (result.success) {
       const idPlan = Number(localStorage.getItem('@currentPlan'));

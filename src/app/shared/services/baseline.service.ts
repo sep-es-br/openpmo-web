@@ -4,7 +4,6 @@ import { IHttpResult } from './../interfaces/IHttpResult';
 import { Inject, Injectable, Injector } from '@angular/core';
 import { BaseService } from '../base/base.service';
 import { BehaviorSubject } from 'rxjs';
-import { IWorkpackBaselines } from '../interfaces/IWorkpackBaselines';
 import { IWorkpackData, IWorkpackParams } from '../interfaces/IWorkpackDataParams';
 import { WorkpackService } from './workpack.service';
 import { TypeWorkpackEnum } from '../enums/TypeWorkpackEnum';
@@ -13,12 +12,15 @@ import { TypeWorkpackEnum } from '../enums/TypeWorkpackEnum';
   providedIn: 'root'
 })
 export class BaselineService extends BaseService<IBaseline> {
+  workpackData: IWorkpackData;
+
+  workpackParams: IWorkpackParams;
+
+  baselines;
+
+  loading;
 
   private resetBaselines = new BehaviorSubject<boolean>(false);
-  workpackData: IWorkpackData;
-  workpackParams: IWorkpackParams;
-  baselines;
-  loading;
 
   constructor(
     @Inject(Injector) injector: Injector,
@@ -61,7 +63,7 @@ export class BaselineService extends BaseService<IBaseline> {
       workpackParams: this.workpackParams,
       baselines: this.baselines,
       loading: this.loading
-    }
+    };
   }
 
   deleteBaselineFromData(id) {

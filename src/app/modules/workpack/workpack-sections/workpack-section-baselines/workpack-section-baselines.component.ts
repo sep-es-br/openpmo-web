@@ -12,6 +12,7 @@ import { ISection } from '../../../../shared/interfaces/ISectionWorkpack';
 import { Component, OnDestroy } from '@angular/core';
 import { WorkpackShowTabviewService } from 'src/app/shared/services/workpack-show-tabview.service';
 import { TypeWorkpackEnum } from 'src/app/shared/enums/TypeWorkpackEnum';
+import { BaselineStatusEnum } from 'src/app/shared/enums/BaselineStatusEnum';
 
 @Component({
   selector: 'app-workpack-section-baselines',
@@ -148,10 +149,12 @@ export class WorkpackSectionBaselinesComponent implements OnDestroy {
           { name: 'idBaseline', value: base.id },
         ]
       }));
+
       if (
         this.workpackSrv.getEditPermission() &&
         !this.workpackData.workpack.cancelPropose &&
-        !this.workpackData.workpack.pendingBaseline
+        !this.workpackData.workpack.pendingBaseline &&
+        !this.baselines.some((baseline) => baseline.status === BaselineStatusEnum.PROPOSED)
       ) {
         cardItems.push({
           typeCardItem: 'newCardItem',
