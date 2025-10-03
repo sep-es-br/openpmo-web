@@ -151,7 +151,7 @@ export class WorkpackSectionRisksComponent implements OnInit, OnDestroy {
   }
 
   async getRisks() {
-    this.riskSrv.loadRisks({ idFilterSelected: this.idFilterSelected, term: this.term })
+    this.riskSrv.loadRisks({ idFilterSelected: this.idFilterSelected, term: this.term });
   }
 
   async loadRiskSection() {
@@ -167,7 +167,8 @@ export class WorkpackSectionRisksComponent implements OnInit, OnDestroy {
         showCreateNemElementButton: this.workpackSrv.getEditPermission() ? true : false,
       },
       cardItemsSection: await this.loadSectionRisksCards(this.riskSectionShowClosed)
-    }
+    };
+
     this.totalRecordsRisks = this.sectionRisk.cardItemsSection && this.sectionRisk.cardItemsSection.length;
   }
 
@@ -263,7 +264,7 @@ export class WorkpackSectionRisksComponent implements OnInit, OnDestroy {
       await this.workpackBreadcrumbStorageSrv.setBreadcrumbStorage();
       this.router.navigate(['/filter-dataview'], {
         queryParams: {
-          idFilter: idFilter,
+          idFilter,
           entityName,
           idWorkpackModel: this.workpackData.workpackModel.id,
           idOffice: this.workpackParams.idOffice
