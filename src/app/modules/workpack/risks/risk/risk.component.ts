@@ -73,6 +73,7 @@ export class RiskComponent implements OnInit, OnDestroy {
       this.idRisk = +queryParams.idRisk;
       this.idWorkpack = +queryParams.idWorkpack;
     });
+
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.responsive = value);
     this.translateSrv.onLangChange.pipe(takeUntil(this.$destroy)).subscribe(() => {
       setTimeout(() => this.calendarComponents?.map(calendar => {
@@ -80,8 +81,8 @@ export class RiskComponent implements OnInit, OnDestroy {
         calendar.dateFormat = this.translateSrv.instant('dateFormat');
         calendar.updateInputfield();
       }, 150));
-    }
-    );
+    });
+
     this.formRisk = this.formBuilder.group({
       name: ['', [Validators.required, Validators.maxLength(50)]],
       description: ['', [Validators.required, Validators.maxLength(600)]],
@@ -92,6 +93,7 @@ export class RiskComponent implements OnInit, OnDestroy {
       likelyToHappenTo: null,
       happenedIn: null
     });
+
     this.formRisk.statusChanges
       .pipe(takeUntil(this.$destroy), filter(status => status === 'INVALID'))
       .subscribe(() => this.saveButton?.hideButton());
@@ -113,9 +115,6 @@ export class RiskComponent implements OnInit, OnDestroy {
     this.idPlan = Number(localStorage.getItem('@currentPlan'));
     await this.loadPropertiesRisk();
     await this.setBreadcrumb();
-    if (!this.idRisk) {
-      this.editPermission = true;
-    }
   }
 
   mirrorDescription(): boolean {
@@ -132,7 +131,8 @@ export class RiskComponent implements OnInit, OnDestroy {
       likelyToHappenFrom: this.risk.likelyToHappenFrom ? new Date(this.risk.likelyToHappenFrom + 'T00:00:00') : null,
       likelyToHappenTo: this.risk.likelyToHappenTo ? new Date(this.risk.likelyToHappenTo + 'T00:00:00') : null,
       happenedIn: this.risk.happenedIn ? new Date(this.risk.happenedIn + 'T00:00:00') : null
-    })
+    });
+
     this.cardRiskProperties.isLoading = false;
   }
 
@@ -145,20 +145,26 @@ export class RiskComponent implements OnInit, OnDestroy {
       initialStateCollapse: false,
       isLoading: true
     };
+
     this.importanceOptions = Object.keys(this.riskPropertiesOptions.importance).map(key => ({
       label: this.translateSrv.instant(this.riskPropertiesOptions.importance[key].label),
       value: this.riskPropertiesOptions.importance[key].value
     }));
+
     this.calculateYearRange();
     const result = this.idRisk && await this.riskSrv.GetById(this.idRisk);
+    await this.loadPermissions();
+
     if (result.success) {
       this.risk = result.data;
-      await this.loadPermissions();
       this.setFormRisk();
     }
+
     if (this.idRisk) {
       this.loadRiskResponseCardItems();
     } else {
+      this.createAddRiskCard();
+
       this.cardRiskProperties.isLoading = false;
     }
   }
@@ -171,9 +177,12 @@ export class RiskComponent implements OnInit, OnDestroy {
       if (isUserAdmin) {
         this.editPermission = !workpack.canceled;
       } else {
-        this.editPermission = workpack.permissions && workpack.permissions.filter(p => p.level === 'EDIT').length > 0 && !workpack.canceled;
+        this.editPermission =
+          workpack.permissions &&
+          workpack.permissions.filter(p => p.level === 'EDIT').length > 0 && !workpack.canceled;
       }
     }
+
     if (!this.editPermission) {
       this.formRisk.disable();
     } else {
@@ -191,8 +200,9 @@ export class RiskComponent implements OnInit, OnDestroy {
   async setBreadcrumb() {
     let breadcrumbItems = this.breadcrumbSrv.get;
     if (!breadcrumbItems || breadcrumbItems.length === 0) {
-      breadcrumbItems = await this.breadcrumbSrv.loadWorkpackBreadcrumbs(this.idWorkpack, this.idPlan)
+      breadcrumbItems = await this.breadcrumbSrv.loadWorkpackBreadcrumbs(this.idWorkpack, this.idPlan);
     }
+
     this.breadcrumbSrv.setMenu([
       ...breadcrumbItems,
       {
@@ -238,7 +248,23 @@ export class RiskComponent implements OnInit, OnDestroy {
       }));
       this.isLoadingResponseItems = false;
     }
+
+    this.createAddRiskCard();
+
+    if (this.riskResponseCardItems && this.riskResponseCardItems.length > 0) {
+      this.cardRiskResponsesProperties = {
+        toggleable: false,
+        initialStateToggle: false,
+        cardTitle: 'responsePlan',
+        collapseble: false,
+        initialStateCollapse: false
+      };
+    }
+  }
+
+  createAddRiskCard() {
     if (this.editPermission) {
+      if (!this.riskResponseCardItems) this.riskResponseCardItems = [];
       this.riskResponseCardItems.push({
         typeCardItem: 'newCardItem',
         icon: IconsEnum.Plus,
@@ -251,24 +277,16 @@ export class RiskComponent implements OnInit, OnDestroy {
         urlCard: '/workpack/risks/response',
         paramsUrlCard: [
           { name: 'idRisk', value: this.idRisk },
-          { name: 'riskNature', value: this.risk.nature },
-          { name: 'riskName', value: this.risk.name },
+          { name: 'riskNature', value: this.risk?.nature },
+          { name: 'riskName', value: this.risk?.name },
           { name: 'edit', value: this.editPermission ? 'true' : 'false' },
           { name: 'idWorkpack', value: this.idWorkpack },
         ]
       });
+
       this.isLoadingResponseItems = false;
     } else {
       this.isLoadingResponseItems = false;
-    }
-    if (this.riskResponseCardItems && this.riskResponseCardItems.length > 0) {
-      this.cardRiskResponsesProperties = {
-        toggleable: false,
-        initialStateToggle: false,
-        cardTitle: 'responsePlan',
-        collapseble: false,
-        initialStateCollapse: false
-      };
     }
   }
 
@@ -283,6 +301,7 @@ export class RiskComponent implements OnInit, OnDestroy {
     this.cancelButton.hideButton();
     const likelyToHappenFrom = this.getLikelyToHappenFrom();
     const likelyToHappenTo = this.getLikelyToHappenTo();
+
     if (likelyToHappenFrom && likelyToHappenTo && moment(likelyToHappenFrom).isAfter(likelyToHappenTo)) {
       this.messageSrv.add({
         severity: 'warn',
@@ -291,6 +310,7 @@ export class RiskComponent implements OnInit, OnDestroy {
       });
       return;
     }
+
     this.formIsSaving = true;
     const sender: IRisk = {
       id: this.idRisk,
@@ -304,6 +324,7 @@ export class RiskComponent implements OnInit, OnDestroy {
       nature: this.formRisk.controls.nature.value,
       status: this.formRisk.controls.status.value
     };
+
     const put = !!this.idRisk;
     const result = put ? await this.riskSrv.put(sender) : await this.riskSrv.post(sender);
     this.formIsSaving = false;
@@ -313,14 +334,17 @@ export class RiskComponent implements OnInit, OnDestroy {
         summary: this.translateSrv.instant('success'),
         detail: this.translateSrv.instant('messages.savedSuccessfully')
       });
+
       this.idRisk = result.data.id;
       this.risk = {
         ...this.risk,
         ...sender,
         id: result.data.id
       };
+
       if (!put) this.setBreadcrumb();
       this.loadRiskResponseCardItems();
+
       if (this.risk.status === this.riskPropertiesOptions.status.HAPPENED.value) {
         const existsIssueForRisk = await this.getIssueForRisk();
         if (!existsIssueForRisk) {
