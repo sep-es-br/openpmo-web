@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { TreeNode } from 'primeng/api';
@@ -28,9 +28,13 @@ import { IOrganization } from 'src/app/shared/interfaces/IOrganization';
 import { CancelButtonComponent } from 'src/app/shared/components/cancel-button/cancel-button.component';
 import { IBudgetPlan } from 'src/app/shared/interfaces/IBudgetPlan';
 import { IBudgetUnit } from 'src/app/shared/interfaces/IBudgetUnit';
-import { PentahoService } from 'src/app/shared/services/pentaho.service';
+import { IInstrument, PentahoService } from 'src/app/shared/services/pentaho.service';
 import { resolve } from 'dns';
-import { delay } from 'rxjs/operators';
+import { delay, switchMap } from 'rxjs/operators';
+import { combineLatest } from 'rxjs';
+import { Dropdown } from 'primeng/dropdown';
+import { InputNumber } from 'primeng/inputnumber';
+import { NgModel } from '@angular/forms';
 
 @Component({
   selector: 'app-cost-account',
@@ -41,6 +45,9 @@ export class CostAccountComponent implements OnInit {
 
   @ViewChild(SaveButtonComponent) saveButton: SaveButtonComponent;
   @ViewChild(CancelButtonComponent) cancelButton: CancelButtonComponent;
+  @ViewChild('uoSelect', {static: true}) uoSelect : Dropdown;
+  @ViewChild('startYearField', {static: true}) startYearField : InputNumber;
+  @ViewChild('endYearField', {static: true}) endYearField : InputNumber;
 
   responsive: boolean;
   idWorkpack: number;
@@ -52,6 +59,7 @@ export class CostAccountComponent implements OnInit {
   costAccount: ICostAccount;
   costAccountName: string;
   cardCostAccountProperties: ICard;
+  instrumentProperty: ICard;
   sectionCostAccountProperties: PropertyTemplateModel[];
   costAccountProperties: IWorkpackProperty[];
   typePropertyModel = TypePropertyModelEnum;
@@ -63,6 +71,8 @@ export class CostAccountComponent implements OnInit {
   organizations: IOrganization[] = [];
   formIsSaving = false;
   backupProperties;
+  today = new Date();
+  language : string;
 
   uoOptions: IBudgetUnit[] = [];
   planoOrcamentarioOptions: IBudgetPlan[] = [
@@ -76,6 +86,45 @@ export class CostAccountComponent implements OnInit {
 
   selectedUo: IBudgetUnit;
   selectedPlano: IBudgetPlan; 
+
+  selectedStartYear: number = this.today.getFullYear();
+  selectedEndYear: number = this.today.getFullYear();
+
+  selectedInstruments : IInstrument[] = [];
+
+  instrumentsList : IInstrument[];
+
+
+  newInstrumentFunc = () => {
+    this.selectedInstruments.push({} as IInstrument);
+    
+    if(this.instrumentsChanged()) {
+      this.saveButton.showButton();
+      this.cancelButton.showButton();
+    } else {
+      this.saveButton.hideButton();
+      this.cancelButton.hideButton();
+    }
+  };
+
+  removerInstrumentFunc = (item: IInstrument) => {
+    
+    if(this.selectedInstruments) {
+      const index = this.selectedInstruments.indexOf(item);
+      if (index !== -1) {
+        this.selectedInstruments.splice(index, 1); // remove o item na posição `index`
+      }
+    }
+    
+    if(this.instrumentsChanged()) {
+      this.saveButton.showButton();
+      this.cancelButton.showButton();
+    } else {
+      this.saveButton.hideButton();
+      this.cancelButton.hideButton();
+    }
+
+  };
 
   poDisabled = true;
 
@@ -106,7 +155,47 @@ export class CostAccountComponent implements OnInit {
       this.idWorkpackModelLinked = queryParams.idWorkpackModelLinked;
     });
     this.responsiveSrv.observable.subscribe(value => this.responsive = value);
+    this.language = this.translateSrv.currentLang;
+    
   }
+
+  trackByInstrument = (i: number, item: IInstrument) => {
+    return item.sigefesCode;
+  }
+
+  get instrumentsOptions() {
+    return this.instrumentsList.map(v => v.sigefesCode)
+  }
+
+  instrumentWithCodigo(codigo: string | null) {
+    return this.instrumentsList.find(i => i.sigefesCode === codigo);
+  }
+
+  setInstrumentItem(instrument : IInstrument, index: number) {
+    
+    if(index >= this.costAccount.instruments?.length || instrument.sigefesCode !== this.costAccount.instruments?.[index].sigefesCode) {
+      this.saveButton.showButton(); 
+      this.cancelButton.showButton()
+    } else {
+      this.saveButton.hideButton();
+      this.cancelButton.hideButton();
+    }
+    
+    
+    Object.assign(this.selectedInstruments[index], instrument); 
+
+  }
+  
+  instrumentsChanged() {
+    // verifica se mudou tamanho
+    if (this.selectedInstruments?.length !== this.costAccount.instruments?.length) return true;
+
+    // verifica se algum sigefesCode mudou na mesma posição
+    return this.selectedInstruments?.some((selected, i) =>
+      selected.sigefesCode !== this.costAccount.instruments[i]?.sigefesCode
+    );
+  }
+
 
   async ngOnInit() {
     this.cardCostAccountProperties = {
@@ -118,15 +207,37 @@ export class CostAccountComponent implements OnInit {
       isLoading: true
     };
 
+    this.instrumentProperty = {
+      toggleable: false,
+      initialStateToggle: false,
+      cardTitle: 'instruments',
+      collapseble: true,
+      initialStateCollapse: false,
+      isLoading: true
+    } as ICard;
+
     await this.loadProperties();
+
   }
+
+  async updateInstruments(){
+    if(!this.selectedUo?.code || !this.selectedStartYear || !this.selectedEndYear) return;
+
+      this.instrumentsList = await this.pentahoSrv.getInstrumentsOptions(this.idWorkpack, this.selectedUo.code, this.selectedStartYear, this.selectedEndYear, this.selectedPlano?.code).toPromise();
+
+  }
+
 
   initializeBackups() {
     this.backupSelectedUo = this.selectedUo;
     this.backupSelectedPlano = this.selectedPlano
   }
 
-  loadUoOptions(idWorkpack: number, onFinish?: () => void): void {
+  formatSelectedInstrument(instruments : IInstrument[]){
+    return instruments?.map(item => `${item?.originalNum}`).join(', ') ;
+  }
+
+  loadUoOptions(idWorkpack: number, onFinish?: () => void, codPo? : string): void {
     this.uoOptions = [
       {
         code: null,
@@ -135,7 +246,7 @@ export class CostAccountComponent implements OnInit {
         displayText: 'Carregando...'
       }]
 
-    this.pentahoSrv.getUoOptions(idWorkpack).subscribe({
+    this.pentahoSrv.getUoOptions(idWorkpack, codPo).subscribe({
       next: data => {
         this.uoOptions = [
           {
@@ -143,14 +254,22 @@ export class CostAccountComponent implements OnInit {
             name: null,
             fullName: null,
             displayText: '- Nenhum -'
-          },
+          }
+        ];
+
+        if(this.selectedUo?.code && !data.some(uo => uo.code === this.selectedUo.code)){
+          this.uoOptions.push(this.selectedUo)
+        }
+
+        this.uoOptions.push(
           ...data.map(uo => ({
             code: uo.code,
             name: uo.name,
             fullName: uo.fullName,
             displayText: `${uo.code} - ${uo.name} - ${uo.fullName}`
           }))
-        ];
+        );
+
         if (onFinish) onFinish();
       },
       error: err => {
@@ -167,7 +286,6 @@ export class CostAccountComponent implements OnInit {
 
     const uoValue = event.value.code;
 
-
     this.pentahoSrv.getPlanoOrcamentarioOptions(uoValue, this.idWorkpack).subscribe(data => {
       this.planoOrcamentarioOptions = [
         {
@@ -175,18 +293,28 @@ export class CostAccountComponent implements OnInit {
           name: null,
           fullName: null,
           displayText: '- Nenhum -'
-        },
+        }
+      ];
+
+      if(this.selectedPlano?.code && !data.some(plan => plan.code === this.selectedPlano.code)){
+        this.planoOrcamentarioOptions.push(this.selectedPlano)
+      }
+
+      this.planoOrcamentarioOptions.push(
         ...data.map(plan => ({
           code: plan.code,
           name: plan.name,
           fullName: plan.fullName,
           displayText: plan.fullName
         }))
-      ];
+      );
+
       this.poDisabled = data.length === 0;
     });
 
     this.saveButton.showButton();
+    this.selectedInstruments = [];
+    this.updateInstruments();
   }
   
 
@@ -194,6 +322,8 @@ export class CostAccountComponent implements OnInit {
     this.cancelButton.showButton();
     this.selectedPlano = event.value;
     this.saveButton.showButton();
+    this.loadUoOptions(this.idWorkpack, undefined, this.selectedPlano.code);
+    this.updateInstruments();
   }
   
 
@@ -204,13 +334,14 @@ export class CostAccountComponent implements OnInit {
       await this.loadWorkpack();
     }
     if (this.idCostAccount) {
+      await this.loadCostAccount();
       this.loadUoOptions(this.idCostAccount, () => {
         this.setupUoAndPlano()
       });
-      await this.loadCostAccount();
     } else {
       this.setBreadcrumb();
       this.cardCostAccountProperties.isLoading = false;
+      this.instrumentProperty.isLoading = false;
     }
     const costAccountModelActiveProperties = this.costAccountModel.properties.filter(w => w.active);
     if (costAccountModelActiveProperties && costAccountModelActiveProperties
@@ -224,30 +355,42 @@ export class CostAccountComponent implements OnInit {
   setupUoAndPlano() {
     if (!this.costAccount) return;
   
-    this.selectedUo = this.uoOptions.find(uo => uo.code == this.costAccount.unidadeOrcamentaria?.code);
+    this.selectedUo = this.uoOptions.find(uo => uo?.code == this.costAccount.unidadeOrcamentaria?.code);
   
     if (this.selectedUo) {
-      this.pentahoSrv.getPlanoOrcamentarioOptions(this.selectedUo.code, this.costAccount.id).subscribe(poData => {
+      this.pentahoSrv.getPlanoOrcamentarioOptions(this.selectedUo?.code, this.costAccount.id).subscribe(poData => {
         this.planoOrcamentarioOptions = [
           { 
             code: null, 
             name: null, 
             fullName: null, 
             displayText: '- Nenhum -' 
-          },
+          }
+        ];
+
+        if(this.costAccount.planoOrcamentario?.code && !poData.some(po => po.code === this.costAccount.planoOrcamentario.code)) {
+          this.planoOrcamentarioOptions.push({
+            ...this.costAccount.planoOrcamentario,
+            displayText: this.costAccount.planoOrcamentario.fullName
+          })
+        }
+
+        this.planoOrcamentarioOptions.push(
           ...poData.map(plan => ({ 
             code: plan.code, 
             name: plan.name, 
             fullName: plan.fullName, 
             displayText: plan.fullName 
           }))
-        ];
+        );
         this.poDisabled = poData.length === 0;
   
         this.selectedPlano = this.planoOrcamentarioOptions.find(plan => plan.code == this.costAccount.planoOrcamentario?.code);
         this.backupSelectedUo = this.selectedUo;
         this.backupSelectedPlano = this.selectedPlano;
+
       });
+      this.updateInstruments()
     }
   }
   
@@ -324,6 +467,7 @@ export class CostAccountComponent implements OnInit {
 
       
       await this.loadCardCostAccountProperties();
+      this.selectedInstruments = this.costAccount.instruments?.map(item => ({...item})) ?? [];
       this.setBreadcrumb();
     }
   }
@@ -721,8 +865,9 @@ export class CostAccountComponent implements OnInit {
         idWorkpack: this.costAccount.idWorkpack,
         idCostAccountModel: this.costAccount.idCostAccountModel,
         properties: this.costAccountProperties,
-        unidadeOrcamentaria: this.selectedUo ? this.selectedUo : null,
-        planoOrcamentario: this.selectedPlano ? this.selectedPlano : null
+        unidadeOrcamentaria: this.selectedUo?.code ? this.selectedUo : null,
+        planoOrcamentario: this.selectedPlano ? this.selectedPlano : null,
+        instruments: this.selectedInstruments.map(si => this.instrumentsList.find(fi => fi.sigefesCode === si.sigefesCode)) ?? []
       };
       const result = await this.costAccountSrv.put(costAccount);
       this.formIsSaving = false;
@@ -744,7 +889,8 @@ export class CostAccountComponent implements OnInit {
         idCostAccountModel: this.costAccountModel.id,
         properties: this.costAccountProperties,
         unidadeOrcamentaria: this.selectedUo ? this.selectedUo : null,
-        planoOrcamentario: this.selectedPlano ? this.selectedPlano : null
+        planoOrcamentario: this.selectedPlano ? this.selectedPlano : null,
+        instruments: this.selectedInstruments ?? []
       };
       const result = await this.costAccountSrv.post(costAccount);
       this.formIsSaving = false;

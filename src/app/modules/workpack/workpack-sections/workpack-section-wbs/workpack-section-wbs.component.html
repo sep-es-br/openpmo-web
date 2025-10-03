@@ -20,16 +20,29 @@
         *ngIf="node.workpacks; else workpackModels">
         <div class="tree-label">{{ node.workpackModelName }}</div>
         <div class="container-milestone" *ngIf="node?.workpackModelType === typeWorkpackEnum.Milestone">
-          <div class="milestone-column">{{"baselinePlanned" |translate}}</div>
-          <div class="milestone-column">{{"estimatedConcluded" | translate}}</div>
-          <div class="milestone-column">{{"status" |translate}}</div>
+          <div class="milestone-column">{{ "baselinePlanned" | translate }}</div>
+          <div class="milestone-column">{{ "estimatedConcluded" | translate }}</div>
+          <div class="milestone-column">{{ "status" | translate }}</div>
         </div>
       </div>
 
       <!-- CHILDREN -->
       <ng-template #workpackModels>
         <div class="container-custom-tree container-workpack">
-          <div class="tree-label link" (click)="navigateToWorkpack(node)">{{node.workpackName }}</div>
+          <div class="workpack-title-box" [pTooltip]="parseTooltipTranslatedStrings(shouldDisplayWarningStyles(node).textTooltipMessages)">
+            <i
+              *ngIf="shouldDisplayWarningStyles(node).displayWarningIcon"
+              class="warning-icon fa fa-exclamation-triangle"
+              aria-hidden="true"
+            ></i>
+            <div
+              class="tree-label link"
+              [ngClass]="{ 'alert-text': shouldDisplayWarningStyles(node).displayColoredText, 'dashed-text': shouldDisplayWarningStyles(node).displayDashedText }"
+              (click)="navigateToWorkpack(node)"
+            >
+              {{ node.workpackName }}
+            </div>
+          </div>
           <div class="container-properties" [class.deliverable]="node?.workpackType === typeWorkpackEnum.Deliverable">
             <ng-container *ngIf="node?.workpackType !== typeWorkpackEnum.Deliverable; else schedule">
               <ng-container *ngIf="node?.workpackType !== typeWorkpackEnum.Milestone; else milestoneData"
@@ -39,19 +52,27 @@
 
             <ng-template #milestoneData>
               <div class="container-milestone">
-                <div class="milestone-column">{{ language === 'pt' ? (node.snapshotDate|date:'dd/MM/yyyy') :
-                  (node.snapshotDate|date:'yyyy/MM/dd') }}</div>
-                <div class="milestone-column">{{ language === 'pt' ? (node.expirationDate|date:'dd/MM/yyyy') :
-                  (node.expirationDate|date:'yyyy/MM/dd') }}</div>
+                <ng-container *ngIf="shouldDisplayNewTag(node)">
+                  <div class="new-box">
+                    <span class="new-label">{{ "new" | translate }}</span>
+                  </div>
+                </ng-container>
+
+                <div class="milestone-column">
+                  {{ node.snapshotDate ? (language === 'pt' ? (node.snapshotDate | date:'dd/MM/yyyy') : (node.snapshotDate | date:'yyyy/MM/dd')) : '--' }}
+                </div>
+                <div class="milestone-column">
+                  {{ node.expirationDate ?  (language === 'pt' ? (node.expirationDate|date:'dd/MM/yyyy') : (node.expirationDate|date:'yyyy/MM/dd')) : '--' }}
+                </div>
                 <div class="milestone-column">
                   <div class="icons-container">
                     <i [ngClass]=" [milestoneStatusEnum.CONCLUDED, milestoneStatusEnum.LATE_CONCLUDED].includes(milestoneStatusEnum[node?.milestoneStatus]) ?
                         [ 'app-icon', 'flag-check', 'grey-icon'] : ['app-icon', 'flag-unchecked', 'grey-icon']"
                       [ngStyle]="{ fontSize: '1.2rem' }"
-                      [class.on-time]="milestoneStatusEnum[node?.milestoneStatus] === milestoneStatusEnum.ON_TIME && !node?.canceled"
-                      [class.late]="milestoneStatusEnum[node?.milestoneStatus] === milestoneStatusEnum.LATE"
-                      [class.concluded]="milestoneStatusEnum[node?.milestoneStatus] === milestoneStatusEnum.CONCLUDED && !node?.canceled"
-                      [class.late-concluded]="milestoneStatusEnum[node?.milestoneStatus] === milestoneStatusEnum.LATE_CONCLUDED && !node?.canceled"></i>
+                      [class.on-time]="milestoneStatusEnum[node?.milestonePeriodStatus] === milestoneStatusEnum.ON_TIME && !node?.canceled"
+                      [class.late]="milestoneStatusEnum[node?.milestonePeriodStatus] === milestoneStatusEnum.LATE"
+                      [class.concluded]="milestoneStatusEnum[node?.milestonePeriodStatus] === milestoneStatusEnum.CONCLUDED && !node?.canceled"
+                      [class.late-concluded]="milestoneStatusEnum[node?.milestonePeriodStatus] === milestoneStatusEnum.LATE_CONCLUDED && !node?.canceled"></i>
                     <i [ngClass]="['app-icon', 'link-to', 'grey-icon', 'linked']" *ngIf="!!node.linked"></i>
                     <i [ngClass]="['app-icon', 'sharing', 'grey-icon', 'linked']"
                       *ngIf="!!node.shared && !node.linked"></i>
@@ -61,23 +82,48 @@
             </ng-template>
             <ng-template #schedule>
               <div class="header-values-cost-account" *ngIf="node?.properties?.progressBars">
-                <div class="progress-bar-cost-container" (mouseenter)="progressBarPanel.show($event)"
-                  (mouseleave)="progressBarPanel.hide()" *ngFor="let progressBar of node.properties.progressBars">
-                  <app-progress-bar [total]="progressBar.total" [progress]="progressBar.progress"
-                    [labelTotal]="progressBar.labelTotal" [labelProgress]="progressBar.labelProgress"
-                    [valueUnit]="progressBar.valueUnit" [baselineTotal]="progressBar.baselinePlanned"
-                    [color]="progressBar.color" [startDateBaseline]="progressBar.startDateBaseline"
-                    [endDateBaseline]="progressBar.endDateBaseline" [startDateTotal]="progressBar.startDateTotal"
-                    [endDateTotal]="progressBar.endDateTotal" [barHeight]="progressBar.barHeight"
-                    [disableLabels]="true">
+                <ng-container *ngIf="shouldDisplayNewTag(node)">
+                  <div class="status-container">
+                    <span class="new-label">{{ "new" | translate }}</span>
+                  </div>
+                </ng-container>
+                <div
+                  *ngFor="let progressBar of node.properties.progressBars"
+                  class="progress-bar-cost-container"
+                  (mouseenter)="progressBarPanel.show($event)"
+                  (mouseleave)="progressBarPanel.hide()"
+                >
+                  <app-progress-bar
+                    [total]="progressBar.total"
+                    [progress]="progressBar.progress"
+                    [labelTotal]="progressBar.labelTotal"
+                    [labelProgress]="progressBar.labelProgress"
+                    [valueUnit]="progressBar.valueUnit"
+                    [baselineTotal]="progressBar.baselinePlanned"
+                    [color]="progressBar.color"
+                    [startDateBaseline]="progressBar.startDateBaseline"
+                    [endDateBaseline]="progressBar.endDateBaseline"
+                    [startDateTotal]="progressBar.startDateTotal"
+                    [endDateTotal]="progressBar.endDateTotal"
+                    [barHeight]="progressBar.barHeight"
+                    [disableLabels]="true"
+                  >
                   </app-progress-bar>
                   <p-overlayPanel #progressBarPanel class="progressbar-overlay-panel">
-                    <app-progress-bar [total]="progressBar.total" [progress]="progressBar.progress"
-                      [labelTotal]="progressBar.labelTotal" [labelProgress]="progressBar.labelProgress"
-                      [valueUnit]="progressBar.valueUnit" [baselineTotal]="progressBar.baselinePlanned"
-                      [color]="progressBar.color" [startDateBaseline]="progressBar.startDateBaseline"
-                      [endDateBaseline]="progressBar.endDateBaseline" [startDateTotal]="progressBar.startDateTotal"
-                      [endDateTotal]="progressBar.endDateTotal" [barHeight]="progressBar.barHeight">
+                    <app-progress-bar
+                      [total]="progressBar.total"
+                      [progress]="progressBar.progress"
+                      [labelTotal]="progressBar.labelTotal"
+                      [labelProgress]="progressBar.labelProgress"
+                      [valueUnit]="progressBar.valueUnit"
+                      [baselineTotal]="progressBar.baselinePlanned"
+                      [color]="progressBar.color"
+                      [startDateBaseline]="progressBar.startDateBaseline"
+                      [endDateBaseline]="progressBar.endDateBaseline"
+                      [startDateTotal]="progressBar.startDateTotal"
+                      [endDateTotal]="progressBar.endDateTotal"
+                      [barHeight]="progressBar.barHeight"
+                    >
                     </app-progress-bar>
                   </p-overlayPanel>
                 </div>
@@ -105,6 +151,7 @@
             (click)="handleShowJournalInformation(properties.properties.journalInformation); journalInformationPanel.show($event)" 
             ></i>
         </div>
+        
         <ng-template #statusEmpty>
           <div class="status-empty"></div>
         </ng-template>

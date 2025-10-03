@@ -64,6 +64,8 @@ export class WorkpackSectionDashboardComponent implements OnInit, OnChanges, OnD
   sectionActive = false;
   idMenuLoading: number;
 
+  isBeingBuild = false;
+
   constructor(
     private dashboardSrv: DashboardService,
     private translateSrv: TranslateService,
@@ -106,8 +108,16 @@ export class WorkpackSectionDashboardComponent implements OnInit, OnChanges, OnD
     this.dashboardSrv.observableResetDashboard.pipe(takeUntil(this.$destroy)).subscribe(reset => {
       if (reset) {
         this.loadDashboardData();
+        this.dashboardSrv.isItemBeingBuild(this.workpackData.workpack.id).then(
+          ({success, data}) => {
+            if(success) {
+              this.isBeingBuild = data.value
+            }
+          }
+        );
       }
     });
+
   }
 
   async ngOnChanges(changes: SimpleChanges) {
@@ -193,7 +203,7 @@ export class WorkpackSectionDashboardComponent implements OnInit, OnChanges, OnD
     this.idMenuLoading = idWorkpackModel;
     const result = await this.dashboardSrv.GetMenuItemsByWorkpackModel({
       idWorkpackActual: this.workpackParams.idWorkpack,
-      idWorkpackModel: idWorkpackModel,
+      idWorkpackModel,
       menuLevel: level
     });
     if (result.success) {
@@ -229,14 +239,14 @@ export class WorkpackSectionDashboardComponent implements OnInit, OnChanges, OnD
         queryParams: {
           id: wp.id,
           idWorkpackModelLinked: wp.idWorkpackModel,
-          idPlan: idPlan
+          idPlan
         }
       });
     } else {
       this.route.navigate(['workpack'], {
         queryParams: {
           id: wp.id,
-          idPlan: idPlan
+          idPlan
         }
       });
     }

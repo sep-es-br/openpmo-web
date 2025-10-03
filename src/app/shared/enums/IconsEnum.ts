@@ -48,6 +48,7 @@ export enum IconsEnum {
   Users = 'users',
   UserEdit = 'user-edit',
   UserRead = 'user-view',
+  UserUpdate = 'user-update',
   PlanModel = 'plan-model',
   CCBMember = 'ccb-member',
   OtherFiles = 'other_files',

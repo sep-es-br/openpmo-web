@@ -48,6 +48,25 @@
     }
   }
 
+  .instrumentsList {
+    @import '../../../shared/components/property-model/property-model.component.scss';
+
+    ::ng-deep .p-multiselect-label {
+      min-width: 30rem;
+    }
+
+    .year-interval {
+      display: flex;
+      gap: 3rem;
+
+      @media screen and (max-width: 768px) {
+        flex-direction: column;
+        gap: 1rem;
+      }
+    }
+  }
+  
+
   ::ng-deep .workpack-selection-not-fullLine {
     .app-single-selection .p-dropdown {
       width: 100%;

@@ -1,0 +1,9 @@
+<div class="card-item" *ngFor="let item of itemList; trackBy: trackByFn; index as i">
+    <ng-container [ngTemplateOutlet]="itemElem" [ngTemplateOutletContext]="{$implicit: item, index: i}"></ng-container>
+    <i class="fas fa-trash-alt icon-remover" role="button" (click)="removeItemFunc(item)"></i>
+</div>
+
+
+<div role="button" class="newItem" *ngIf="itemList" (click)="newItemFunc()">
+    <i class="card-link app-icon plus light-grey-icon"></i>
+</div>

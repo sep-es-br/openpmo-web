@@ -32,7 +32,7 @@
         [class.workpack-selection]="true" [class.workpack-selection-not-fullLine]="false">
         <p-dropdown class="app-single-selection p-budget" dropdownIcon="fas fa-caret-down" [options]="uoOptions"
           [(ngModel)]="selectedUo" optionLabel="displayText" [filter]="true" filterBy="displayText" (onChange)="onUoChange($event)"
-          [showClear]="false">
+          [showClear]="false" #uoSelect>
 
           <ng-template pTemplate="selectedItem" let-selectedOption>
             <div class="flex align-items-center gap-2">
@@ -74,7 +74,47 @@
       </span>
 
     </app-cost-account-card>
+    
   </div>
+  <!-- <br />
+  <div class="card-properties-cost-account instrumentsList" *ngIf="sectionCostAccountProperties &&  instrumentsList">
+    <app-cost-account-card [properties]="instrumentProperty" class="mt-0 inputs-float-label">
+      <div class="loading-form-container" *ngIf="formIsSaving">
+        <app-card-loading [isCardLoading]="formIsSaving"></app-card-loading>
+      </div>
+      
+      <div class="year-interval">
+        
+
+        <span class="p-float-label property-input p-field input-number-scroll">
+          <p-inputNumber inputStyleClass="app-input-text" [(ngModel)]="selectedStartYear" [showButtons]="true"
+            #startYearField [min]="2020" [max]="today.getFullYear()"  mode="decimal" [useGrouping]="false"
+            (ngModelChange)="updateInstruments()" ></p-inputNumber>
+          <label class="input-label">{{ 'startDate' | translate }}
+            <i class="far fa-question-circle" [pTooltip]="'help.costAccount.startDate' | translate"></i>
+          </label>
+        </span>
+        <span class="p-float-label property-input p-field input-number-scroll">
+          <p-inputNumber inputStyleClass="app-input-text" [(ngModel)]="selectedEndYear" [showButtons]="true"
+            #endYearField [min]="2020" [max]="today.getFullYear()"  mode="decimal" [useGrouping]="false" 
+            (ngModelChange)="updateInstruments()" ></p-inputNumber>
+          <label class="input-label">{{ 'endDate' | translate }}
+            <i class="far fa-question-circle" [pTooltip]="'help.costAccount.endDate' | translate"></i>
+          </label>
+        </span>
+
+      </div>
+      <app-card-list [itemList]="selectedInstruments" [newItemFunc]="newInstrumentFunc" [removeItemFunc]="removerInstrumentFunc" cardWidth="20rem">
+        <ng-template #itemElem let-item let-i="index" >
+            <app-cost-account-card-instrument [instrument]="item" [instrumentList]="instrumentsList" 
+                (updateInstrument)="setInstrumentItem($event, i)" [selectedInstrumentList]="selectedInstruments" ></app-cost-account-card-instrument>
+        </ng-template>
+        
+      </app-card-list>
+
+    </app-cost-account-card>
+    
+  </div> -->
   <div class="id-container" *ngIf="idCostAccount && sectionCostAccountProperties">
     <span>{{idCostAccount}}</span>
   </div>

@@ -24,10 +24,10 @@ export interface IBaselineUpdates {
   idWorkpack?: number;
   icon: string;
   description: string;
-  classification: string; // NEW | CHANGED | DELETED
+  classification: UpdateStatus; // NEW | CHANGED | DELETED | TO_CANCEL | NO_SCHEDULE | UNDEFINED_SCOPE
   included?: boolean;
-
   readonly?: boolean; //only screen
+  deliveryModelHasActiveSchedule?: boolean; // Only for deliveries
 }
 
 export interface IBaselineEvaluations {
@@ -69,7 +69,7 @@ interface IScheduleBaseline {
   }[];
 
   //only screen
-  monthsInPeriod?: number; 
+  monthsInPeriod?: number;
   difStartCurrentDateAndStartProposedDate?: number;
   difEndCurrentDateAndEndProposedDate?: number;
   marginHightProposedBar?: number;
@@ -89,3 +89,12 @@ interface IScopeBaseline {
     variation?: number;
   }[];
 }
+
+export enum UpdateStatus {
+  NEW = 'NEW',
+  CHANGED = 'CHANGED',
+  DELETED = 'DELETED',
+  TO_CANCEL = 'TO_CANCEL',
+  NO_SCHEDULE = 'NO_SCHEDULE',
+  UNDEFINED_SCOPE = 'UNDEFINED_SCOPE',
+};

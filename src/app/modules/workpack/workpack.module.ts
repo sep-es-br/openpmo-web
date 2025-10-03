@@ -27,18 +27,20 @@ import { WorkpackSectionRisksComponent } from './workpack-sections/workpack-sect
 import { WorkpackSectionIssuesComponent } from './workpack-sections/workpack-section-issues/workpack-section-issues.component';
 import { WorkpackSectionProcessesComponent } from './workpack-sections/workpack-section-processes/workpack-section-processes.component';
 import { CostAccountComponent } from './cost-account/cost-account.component';
-import { CostAccountCardComponent } from './components/cost-account-card/cost-account-card.component';
 import { ProgressBarCostAccountComponent } from './components/progress-bar-cost-account/progress-bar-cost-account.component';
 import { WorkpackSectionDashboardComponent } from './workpack-sections/workpack-section-dashboard/workpack-section-dashboard.component';
 import { WorkpackSectionJournalComponent } from './workpack-sections/workpack-section-journal/workpack-section-journal.component';
 import { WorkpackSectionWBSComponent } from './workpack-sections/workpack-section-wbs/workpack-section-wbs.component';
 import { TooltipModule } from 'primeng/tooltip'
 import { Tooltip } from 'chart.js';
+import { CostAccountCardInstrumentComponent } from './cost-account/cost-account-card/cost-account-card.component';
+import { CostAccountCardComponent } from './components/cost-account-card/cost-account-card.component';
 
 @NgModule({
   declarations: [
     WorkpackComponent,
     CostAccountComponent,
+    CostAccountCardInstrumentComponent,
     ScheduleStepCardItemComponent,
     ProcessComponent,
     IndicatorComponent,

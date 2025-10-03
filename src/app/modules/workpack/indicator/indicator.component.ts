@@ -23,6 +23,7 @@ import { PentahoService } from "src/app/shared/services/pentaho.service";
 import { ResponsiveService } from "src/app/shared/services/responsive.service";
 import { WorkpackService } from "src/app/shared/services/workpack.service";
 import { ChangeDetectorRef } from "@angular/core";
+import { WorkpackPropertyService } from "src/app/shared/services/workpack-property.service";
 
 @Component({
     selector: 'app-indicator',
@@ -92,24 +93,26 @@ export class IndicatorComponent implements OnInit, OnDestroy {
 
     periodData: any[] = [];
 
+    permission: String;
+
     constructor(
         private actRouter: ActivatedRoute,
         private formBuilder: FormBuilder,
         private responseService: ResponsiveService,
-        private translateSrv: TranslateService,
         private breadcrumbSrv: BreadcrumbService,
         private messageSrv: MessageService,
         private indicatorSrv: IndicatorService,
         private router: Router,
-        private workpackSrv: WorkpackService,
+        private propertySrv: WorkpackPropertyService,
+        private cdr: ChangeDetectorRef,
         private authSrv: AuthService,
-        private pentahoSrv: PentahoService,
-        private cdr: ChangeDetectorRef
+        private workpackService: WorkpackService
     ) {
         this.actRouter.queryParams.subscribe(async queryParams => {
+            console.log(queryParams)
             this.idIndicator = +queryParams.idIndicator;
             this.idWorkpack = +queryParams.idWorkpack;
-            this.idPlan = +queryParams.idPlan;
+            this.idPlan = +queryParams.id;
             this.idOffice = +queryParams.idOffice;
             this.idWorkpackModelLinked = +queryParams.idWorkpackModelLinked;
         });
@@ -181,6 +184,26 @@ export class IndicatorComponent implements OnInit, OnDestroy {
             const result = await this.indicatorSrv.GetByIdWithIdWorkpack(this.idWorkpack, this.idIndicator);
             if (result.success) {
                 this.indicator = result.data;
+                const isUserAdmin = await this.authSrv.isUserAdmin();
+
+                if (isUserAdmin) {
+                this.permission = 'EDIT';
+                this.formIndicator.enable();
+                } else {
+                this.propertySrv.getPermissionLevel().then(async permission => {
+                    if (!permission) {
+                    try {
+                        const response = await this.workpackService.GetWorkpackPermissions(this.idWorkpack,  { 'id-plan': this.idPlan ? Number(this.idPlan) : undefined });
+                        this.permission = response?.data?.permissions?.[0]?.level;
+                    } catch (error) {
+                        console.error('Erro ao buscar permissões do workpack', error);
+                        this.permission = 'READ';
+                    }
+                    } else {
+                    this.permission = permission;
+                    }
+                });
+                }
                 await this.loadFontOptions(this.idOffice);
                 this.setFormIndicator();
                 this.formIndicator.markAllAsTouched();
@@ -534,6 +557,7 @@ export class IndicatorComponent implements OnInit, OnDestroy {
         const sender: IIndicator = {
             id: this.idIndicator,
             idWorkpack: this.idWorkpack,
+            idPlan: this.idPlan,
             name: this.formIndicator.controls.name.value,
             description: this.formIndicator.controls.description.value,
             source: this.formIndicator.controls.source.value,

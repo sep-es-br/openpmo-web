@@ -118,6 +118,13 @@
     resize: vertical;
 }
 
+.disabled-field {
+  user-select: none !important;
+  pointer-events: none !important;
+  cursor: not-allowed !important;
+  opacity: 0.6;
+}
+
 /* Responsividade */
 @media (max-width: 935px) {
   .table-wrapper {

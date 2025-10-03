@@ -1050,6 +1050,9 @@ app-root p-toast .p-toast {
   &.user-edit:before {
     content: "\e954";
   }
+  &.user-update:before {
+    content: "\e960";
+  }
   &.unlink:before {
     content: "\e955";
   }

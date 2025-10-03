@@ -128,6 +128,14 @@ export class WorkpackSectionPropertiesComponent implements OnInit, OnDestroy {
         this.checkPropertiesStringValid(prop);
       }
     });
+
+    this.propertySrv.getPermissionLevel().then(permission => {
+      if (permission === 'UPDATE' && this.workpackData.workpack.type === 'Milestone') {
+        this.cardWorkpackProperties.canEditCheckCompleted = true
+        this.sectionPropertiesProperties.find(p => p.name === 'date')!.disabled = false;
+      }
+    });
+  
   }
 
   showCheckCompleted() {
@@ -136,7 +144,7 @@ export class WorkpackSectionPropertiesComponent implements OnInit, OnDestroy {
       workpackCompleted: this.workpackData.workpack && this.workpackData.workpack.completed,
       workpackType: this.workpackData.workpack && this.workpackData.workpack.type,
       workpackCanceled: this.workpackData.workpack && this.workpackData.workpack.canceled,
-      showCheckCompleted: !!this.workpackData.workpack,
+      showCheckCompleted: !!this.workpackData.workpack && this.workpackData.workpackModel?.type !== 'DeliverableModel',
       canEditCheckCompleted: (this.workpackSrv.getEditPermission() && this.workpackData.workpack && this.workpackData.workpack.id
         && !this.workpackData.workpack.hasScheduleSectionActive
         && !this.workpackData.workpack.canceled

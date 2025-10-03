@@ -453,6 +453,22 @@ export class WorkpackModelComponent implements OnInit {
   }
 
   loadDefaultProperties() {
+    const possibleValuesObj = {
+      concluida: "Concluída",
+      cancelada: "Cancelada",
+      Acancelar: "A cancelar",
+      emExecucao: "Em execução",
+      aLicitar: "Planejamento\\A Licitar",
+      acoesPreparatorias: "Planejamento\\Ações preparatórias",
+      contratoAssinado: "Planejamento\\Contrato assinado",
+      convenioAssinado: "Planejamento\\Convênio assinado",
+      editalPublicado: "Planejamento\\Edital Publicado",
+      emLicitacao: "Planejamento\\Em Licitação",
+      licitacaoConcluida: "Planejamento\\Licitação concluída",
+      projetoElaborado: "Planejamento\\Projeto elaborado",
+      projetoEmElaboracao: "Planejamento\\Projeto em elaboração",
+      paralisado: "Paralisado"
+    };
     const defaultProperties: IWorkpackModelProperty[] = [];
     switch (this.workpackModelType) {
       case TypeWorkpackModelEnum.ProgramModel:
@@ -505,12 +521,14 @@ export class WorkpackModelComponent implements OnInit {
             name: this.translateSrv.instant('status'),
             type: TypePropertyEnum.SelectionModel,
             multipleSelection: false,
-            possibleValuesOptions: Object.values(this.translateSrv.instant(['preparatoryActions', 'projectElaboration', 'projectElaborated',
-              'agreementSigned', 'publishedNotice', 'biddingFinished', 'signedContract', 'executationStarted', 'blocked'])),
-            defaultValue: this.translateSrv.instant('preparatoryActions'),
+            obligatory: true,
+            disableMultipleSelection: true,
+            possibleValuesOptions: Object.values(possibleValuesObj),
+            defaultValue: "Planejamento\\Ações preparatórias",
             sortIndex: 3,
             fullLine: false,
-            required: true
+            required: true,
+            
           },
           {
             active: true,
@@ -827,9 +845,11 @@ export class WorkpackModelComponent implements OnInit {
     property.viewOnly = !this.editPermission;
     property.obligatory = !!property.obligatory
       || [...this.workpackModelType === TypeWorkpackModelEnum.DeliverableModel
-          ? ['Measure Unit', 'Unidade de Medida']
+          ? ['Measure Unit', 'Unidade de Medida', 'Situação', 'Status']
           : []
       ].includes(property.name);
+
+    property.disableMultipleSelection = property.name === 'Situação'
   }
 
   async deleteProperty(property: IWorkpackModelProperty, group?: IWorkpackModelProperty) {
@@ -1357,6 +1377,7 @@ export class WorkpackModelComponent implements OnInit {
       delete prop.viewOnly;
       delete prop.obligatory;
       delete prop.defaultsDetails;
+      delete prop.disableMultipleSelection;
     });
     const propertiesGroupClone = [...this.modelProperties.filter(prop => prop.type === TypePropertyEnum.GroupModel)];
     propertiesGroupClone.forEach(propGroup => {

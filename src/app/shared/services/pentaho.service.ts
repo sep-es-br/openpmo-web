@@ -1,4 +1,4 @@
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpParams } from "@angular/common/http";
 import { Injectable, Injector } from "@angular/core";
 import { APP_CONFIG } from "../tokens/AppConfigToken";
 import { Observable, of } from "rxjs";
@@ -28,9 +28,16 @@ export class PentahoService {
   //     })
   //   );
   // }
-  getUoOptions(costAccountId: number): Observable<DropdownOption[]> {
+  getUoOptions(costAccountId: number, codPo?: string): Observable<DropdownOption[]> {
     const url = `${this.baseUrl}/cost-accounts/pentaho/budgetUnit/${costAccountId}`;
-    return this.http.get<any>(url, { responseType: 'json' }).pipe(
+
+    let params = new HttpParams();
+
+    if(codPo) {
+      params = params.set("codPo", codPo)
+    }
+
+    return this.http.get<any>(url, { responseType: 'json', params: params }).pipe(
       map(data => {
         const options: DropdownOption[] = [];
         if (data && data.data && data.data.resultset) {
@@ -61,8 +68,15 @@ export class PentahoService {
   //   );
   // }
   getPlanoOrcamentarioOptions(codUo: string, costAccountId: number): Observable<DropdownOption[]> {
-    const url = `${this.baseUrl}/cost-accounts/pentaho/budgetPlan?codUo=${codUo}&costAccountId=${costAccountId}`;
-    return this.http.get<any>(url, { responseType: 'json' }).pipe(
+    
+
+    const url = `${this.baseUrl}/cost-accounts/pentaho/budgetPlan`;
+
+    let params = new HttpParams().set("costAccountId", costAccountId.toString()); 
+
+    if(codUo) params = params.set("codUo", codUo)
+
+    return this.http.get<any>(url, { responseType: 'json', params: params }).pipe(
       map(data => {
         const options: DropdownOption[] = [];
         if (data && data.data && data.data.resultset) {
@@ -74,6 +88,40 @@ export class PentahoService {
       }),
       catchError(error => {
         console.error('Erro ao buscar opções de Plano Orçamentário', error);
+        return of([]);
+      })
+    );
+  }
+
+  
+  getInstrumentsOptions(idCostAccount: number, codUo: string, startYear: number, endYear : number, codPo?: string): Observable<IInstrument[]> {
+    const url = `${this.baseUrl}/cost-accounts/pentaho/instrumentsList?`;
+    let params = new HttpParams()
+                    .set("costAccountId", idCostAccount.toString())
+                    .set("codUo", codUo)
+                    .set("startYear", startYear.toString())
+                    .set("endYear", endYear.toString());
+
+    if(codPo) params = params.set("codPo", codPo);
+
+    return this.http.get<any>(url, { responseType: 'json' , params: params }).pipe(
+      map(({data}) => data?.resultset as any[]),
+      map(resultset => resultset?.map( values => {
+        return {
+          type: values[0],
+          originalNum: values[1],
+          sigefesCode: values[2],
+          name: values[3],
+          objective: values[4],
+          startPeriod: values[5],
+          endPeriod: values[6],
+          recipientCode: values[7],
+          recipientName: values[8],
+          value: values[9]
+        } as IInstrument;
+      })),
+      catchError(error => {
+        console.error('Erro ao buscar lista de instrumentos', error);
         return of([]);
       })
     );
@@ -95,4 +143,17 @@ export interface DropdownOption {
   code: string;
   name: string;
   fullName: string;
+}
+
+export interface IInstrument {
+    type: string;
+    originalNum: string;
+    sigefesCode: string;
+    name: string;
+    objective: string;
+    startPeriod: string;
+    endPeriod: string;
+    recipientCode: string;
+    recipientName: string;
+    value: number;
 }

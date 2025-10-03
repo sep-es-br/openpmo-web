@@ -440,6 +440,8 @@ export class WorkpackComponent implements OnDestroy {
       if (!this.isUserAdmin && this.workpack) {
         const editPermission = !!this.workpack.permissions?.find(p => p.level === 'EDIT');
         this.workpackSrv.setEditPermission(editPermission);
+        const permission = this.workpack.permissions.find(p => p.level);
+        this.workpackSrv.setPermissionLevel(permission?.level);
       }
       if (reloadOnlyProperties) {
         const workpackData = this.workpackSrv.getWorkpackData();
@@ -467,6 +469,8 @@ export class WorkpackComponent implements OnDestroy {
 
   async loadUserPermission() {
     let editPermission = !!this.workpack.permissions?.find(p => p.level === 'EDIT');
+    const permission = this.workpack.permissions.find(p => p.level);
+    this.workpackSrv.setPermissionLevel(permission?.level);
     if (this.workpack.endManagementDate !== null) {
       if (this.workpackSrv.getEditPermission()) {
         this.endManagementResumePermission = true;
@@ -631,14 +635,20 @@ export class WorkpackComponent implements OnDestroy {
         workpack.idPlan = idPlan;
         workpack.idWorkpackModel = idWorkpackModel;
         workpack.idParent = this.idWorkpack;
-        if (workpack.canceled && workpack.type !== 'Project') {
+        if (workpack.canceled && workpack.type !== 'Project' && workpack.type !== 'Deliverable') {
           menuItems.push({
             label: this.translateSrv.instant('restore'),
             icon: 'fas fa-redo-alt',
             command: (event) => this.handleRestoreWorkpack(workpack.id),
           });
         } else {
-          if (workpack.type !== 'Project' && !!workpack.canDeleted && !workpack.canceled && !workpack.linked) {
+          if (
+            workpack.type !== 'Project' &&
+            !!workpack.canDeleted &&
+            !workpack.canceled &&
+            !workpack.linked &&
+            !(workpack.type === 'Deliverable' && workpack.hasActiveBaseline)
+          ) {
             menuItems.push({
               label: this.translateSrv.instant('delete'),
               icon: 'fas fa-trash-alt',
@@ -693,7 +703,12 @@ export class WorkpackComponent implements OnDestroy {
               });
             }
           }
-          if (this.workpackSrv.getEditPermission() && !workpack.canceled && !workpack.linked && workpack.type === TypeWorkpackEnum.ProjectModel) {
+          if (
+            this.workpackSrv.getEditPermission() &&
+            !workpack.canceled &&
+            !workpack.linked &&
+            workpack.type === TypeWorkpackEnum.ProjectModel
+          ) {
             menuItems.push({
               label: this.translateSrv.instant('cut'),
               icon: 'fas fa-cut',
@@ -1618,7 +1633,5 @@ export class WorkpackComponent implements OnDestroy {
       (!this.showTabview || (!!this.showTabview && (!this.selectedTab || this.selectedTab.key !== 'schedule')));
       return show;
     });
-
   }
-
 }

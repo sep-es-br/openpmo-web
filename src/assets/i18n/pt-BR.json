@@ -20,6 +20,7 @@
   "action": "Ação",
   "active": "Ativo",
   "compile": "Compilar",
+  "itemBeingBuild": "Item em estruturação.",
   "reportModel": "Modelo de Relatório",
   "download": "Download",
   "setAsMain": "Definir como principal",
@@ -109,6 +110,7 @@
   "myRolesPermissions": "Meus cargos e permissões",
   "locality": "Localidade",
   "properties": "Propriedades",
+  "instruments": "Instrumentos",
   "user": "Usuário",
   "english": "Inglês",
   "portuguese": "Português",
@@ -174,6 +176,8 @@
   "edition": "Edição",
   "failure": "Falha",
   "riskResponse": "Resposta Risco",
+  "selectInstrument": "Selecionar Contratos/Convênios",
+  "tcuCode": "Código TCU/Órgão",
   "edited": "Editado",
   "created": "Criado",
   "removed": "Removido",
@@ -362,6 +366,8 @@
   "baselines": "Linhas de base",
   "CHANGED": "Alterado",
   "DELETED": "Excluído",
+  "TO_CANCEL": "A cancelar",
+  "CANCELLED": "Cancelada",
   "NEW": "Novo",
   "submit": "Submeter",
   "evaluations": "Avaliações",
@@ -414,6 +420,11 @@
   "confirmSpreadDifference": "Confirmar distribuição da diferença",
   "help": {
     "textHelpOnline": "Texto de ajuda",
+    "costAccount": {
+      "endDate": "Data final do intervalo de tempo",
+      "startDate": "Data inicial do intervalo de tempo",
+      "selectInstrument": "Instrumento a ser adicionado"
+    },
     "workpack": {
       "name": "Nome do pacote de trabalho.",
       "fullName": "Nome completo do pacote de trabalho.",
@@ -562,7 +573,7 @@
     "schedule": {
       "start": "Data de início do cronograma. Informação obrigatória.",
       "finish": "Data de fim do cronograma. Informação obrigatória.",
-      "estimatedPhysical": "Valor físico estimado para o cronograma. Informação obrigatória. Zero é um valor válido.",
+      "estimatedPhysical": "Valor físico estimado para o cronograma. Informação obrigatória. O valor zero é válido para a criação do cronograma, porém, para submissão da linha de base, o valor estimado deve ser maior que zero.",
       "actualPhysical": "Valor físico entregue atual para o cronograma. Informação não obrigatória.",
       "estimatedCostTotal": "Valor do custo estimado total.",
       "actualCostTotal": "Valor do custo realizado atual total.",
@@ -1024,6 +1035,8 @@
   "currentExpenses": "Despesa Corrente",
   "idDomain": "Domínio",
   "programObjective": "Objetivo do Programa",
+  "instrumentObjective": "Objetivo",
+  "instrumentRecipient": "Favorecido",
   "phoneNumber": "Número Telefone",
   "person": "Pessoa",
   "persons": "Pessoas",
@@ -1057,5 +1070,17 @@
   "budgeted": "Orçado",
   "authorized": "Autorizado",
   "indicator.name": "Nome do indicador. Informação obrigatória.",
-  "indicator.description": "Descrição do indicador. Informação obrigatória."
+  "indicator.description": "Descrição do indicador. Informação obrigatória.",
+
+  "workpack-eap-alert-pending-items": "Verifique itens pendentes abaixo",
+  "workpack-eap-alert-deleted-item": "Este item foi excluído",
+  "workpack-eap-alert-new-item": "Item novo fora da Linha de Base ativa",
+  "workpack-eap-alert-no-schedule": "Entrega sem cronograma",
+  "workpack-eap-alert-no-scope": "Entrega sem escopo",
+  "workpack-eap-alert-to-cancel": "Item a cancelar. Requer aprovação de nova Linha de Base",
+
+  "NO_SCHEDULE": "Entrega sem cronograma",
+  "UNDEFINED_SCOPE": "Entrega sem escopo",
+
+  "baseline-disabled-submission-warning": "Impossível submeter Linha de Base com pendências"
 }

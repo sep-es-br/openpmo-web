@@ -9,7 +9,7 @@ import { WorkpackService } from 'src/app/shared/services/workpack.service';
 import { Subject } from 'rxjs';
 import { IBaseline } from '../../../../shared/interfaces/IBaseline';
 import { ISection } from '../../../../shared/interfaces/ISectionWorkpack';
-import { Component, OnInit, OnDestroy, Input } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { WorkpackShowTabviewService } from 'src/app/shared/services/workpack-show-tabview.service';
 import { TypeWorkpackEnum } from 'src/app/shared/enums/TypeWorkpackEnum';
 
@@ -18,7 +18,7 @@ import { TypeWorkpackEnum } from 'src/app/shared/enums/TypeWorkpackEnum';
   templateUrl: './workpack-section-baselines.component.html',
   styleUrls: ['./workpack-section-baselines.component.scss']
 })
-export class WorkpackSectionBaselinesComponent implements OnInit, OnDestroy {
+export class WorkpackSectionBaselinesComponent implements OnDestroy {
 
   baselinesSectionShowInactives = false;
   sectionBaselines: ISection;
@@ -77,10 +77,6 @@ export class WorkpackSectionBaselinesComponent implements OnInit, OnDestroy {
     });
   }
 
-  ngOnInit(): void {
-    
-  }
-
   ngOnDestroy(): void {
     this.$destroy.complete();
     this.$destroy.unsubscribe();
@@ -96,7 +92,11 @@ export class WorkpackSectionBaselinesComponent implements OnInit, OnDestroy {
     this.workpackData = workpackData;
     this.workpackParams = workpackParams;
     this.baselines = baselines;
-    this.sectionActive = workpackData && workpackData.workpack && workpackData.workpack.id && workpackData.workpack.type === TypeWorkpackEnum.ProjectModel;
+    this.sectionActive =
+      workpackData &&
+      workpackData.workpack &&
+      workpackData.workpack.id &&
+      workpackData.workpack.type === TypeWorkpackEnum.ProjectModel;
     if (!loading) this.loadBaselineSection();
   }
 
@@ -108,19 +108,22 @@ export class WorkpackSectionBaselinesComponent implements OnInit, OnDestroy {
         ...this.sectionBaselines?.cardSection,
         isLoading: false
       },
-      cardItemsSection: await this.loadSectionBaselinesCards(this.baselinesSectionShowInactives)
-    }
+      cardItemsSection: (await this.loadSectionBaselinesCards())
+    };
   }
 
-  async loadSectionBaselinesCards(showInactives: boolean) {
+  // async loadSectionBaselinesCards(showInactives: boolean) {
+  async loadSectionBaselinesCards() {
     if (this.baselines && this.baselines.length > 0) {
-      const cardItems = this.baselines.filter(b => {
-        if (!showInactives) {
-          if (!!b.active) { return b; }
-        } else {
-          return b;
-        }
-      }).map(base => ({
+      const cardItems = this.baselines
+      // .filter(b => {
+      //   if (!showInactives) {
+      //     if (!!b.active) { return b; }
+      //   } else {
+      //     return b;
+      //   }
+      // })
+      .map(base => ({
         typeCardItem: 'listItem',
         icon: !!base.cancelation ? 'fas fa-times' : 'baseline',
         iconColor: base.cancelation && '#FF7F81',
@@ -128,7 +131,7 @@ export class WorkpackSectionBaselinesComponent implements OnInit, OnDestroy {
         nameCardItem: base.name,
         baselineStatus: base.status.toLowerCase(),
         baselineStatusDate: base.active ? base.activationDate : (base.status === 'PROPOSED' ? base.proposalDate :
-          (base.status === 'APPROVED' ? base.activationDate : 'NONE')),
+          (base.status === 'APPROVED' ? base.activationDate : '')),
         baselineActive: base.active,
         itemId: base.id,
         idAtributeName: 'idBaseline',
@@ -145,7 +148,11 @@ export class WorkpackSectionBaselinesComponent implements OnInit, OnDestroy {
           { name: 'idBaseline', value: base.id },
         ]
       }));
-      if (this.workpackSrv.getEditPermission() && !this.workpackData.workpack.cancelPropose && !this.workpackData.workpack.pendingBaseline) {
+      if (
+        this.workpackSrv.getEditPermission() &&
+        !this.workpackData.workpack.cancelPropose &&
+        !this.workpackData.workpack.pendingBaseline
+      ) {
         cardItems.push({
           typeCardItem: 'newCardItem',
           icon: IconsEnum.Plus,
@@ -165,9 +172,14 @@ export class WorkpackSectionBaselinesComponent implements OnInit, OnDestroy {
           ]
         });
       }
-      return cardItems;
+
+      return cardItems.sort((a, b) => a.baselineStatusDate && a.baselineStatusDate > b.baselineStatusDate ? -1 : 1);
     } else {
-      const cardItem = (this.workpackSrv.getEditPermission() && !this.workpackData.workpack.cancelPropose && !this.workpackData.workpack.pendingBaseline) ?
+      const cardItem = (
+        this.workpackSrv.getEditPermission() &&
+        !this.workpackData.workpack.cancelPropose &&
+        !this.workpackData.workpack.pendingBaseline
+      ) ?
         [{
           typeCardItem: 'newCardItem',
           icon: IconsEnum.Plus,
@@ -180,18 +192,19 @@ export class WorkpackSectionBaselinesComponent implements OnInit, OnDestroy {
             { name: 'idWorkpack', value: this.workpackParams.idWorkpack },
             { name: 'idWorkpackModelLinked', value: this.workpackParams.idWorkpackModelLinked },
           ]
-        }] : [];
-        setTimeout(() => {}, 5000)
+        }]
+        : [];
+      setTimeout(() => {}, 5000);
       return cardItem;
     }
   }
 
-  async handleBaselineShowInactiveToggle(event) {
-    this.sectionBaselines = {
-      ...this.sectionBaselines,
-      cardItemsSection: await this.loadSectionBaselinesCards(event)
-    }
-  }
+  // async handleBaselineShowInactiveToggle(event) {
+  //   this.sectionBaselines = {
+  //     ...this.sectionBaselines,
+  //     cardItemsSection: await this.loadSectionBaselinesCards(event)
+  //   };
+  // }
 
   async deleteBaseline(base: IBaseline) {
     const result = await this.baselineSrv.delete(base, { useConfirm: true });

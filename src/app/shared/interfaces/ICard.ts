@@ -24,7 +24,7 @@ export interface ICard {
     endDate: Date;
   };
   onNewItem?;
-  progressBarValues?: progressBarValue[];
+  progressBarValues?: ProgressBarValue[];
   onToggle?: EventEmitter<boolean>;
   cardItems?: ICardItem[];
   canEditCheckCompleted?: boolean;
@@ -39,12 +39,14 @@ export interface ICard {
   searchTerm?: string;
 }
 
-export interface progressBarValue {
+export interface ProgressBarValue {
   total: number;
   progress?: number;
+  planned?: number;
   limit?: number;
   labelTotal: string;
   labelProgress?: string;
+  labelPlanned?: string;
   valueUnit: string;
   color: string;
   barHeight?: number;

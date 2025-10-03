@@ -18,6 +18,7 @@ import { appInitializerFactory } from './translation/appInitializerFactory';
 import { CookieModule } from 'ngx-cookie';
 import { AdminOfficeConfigComponent } from './modules/admin-office-config/admin-office-config.component';
 import { ComponentsModule } from './shared/components/components.module';
+import { CardListComponent } from './shared/components/card-list/card-list.component';
 
 @NgModule({
   declarations: [

@@ -33,7 +33,7 @@ export class WorkpackSectionWBSComponent implements OnDestroy {
   isLoading = false;
   idPlan: number;
   topPosLoading = 128;
-  collapsed: boolean = true;
+  collapsed = true;
   workpackParams: IWorkpackParams;
 
   constructor(
@@ -47,7 +47,7 @@ export class WorkpackSectionWBSComponent implements OnDestroy {
     private journalSrv: JournalService
   ) {
     this.isLoading = true;
-    this.actRouter.queryParams.subscribe(async ({ idPlan }) => {
+    this.actRouter.queryParams.subscribe(async({ idPlan }) => {
       this.idPlan = idPlan && +idPlan;
     });
     this.translateSrv.onLangChange.pipe(takeUntil(this.$destroy)).subscribe(() => {
@@ -57,7 +57,7 @@ export class WorkpackSectionWBSComponent implements OnDestroy {
       if (reset) {
         this.loadBreakdownStructureData();
       }
-    })
+    });
   }
 
   ngOnDestroy(): void {
@@ -138,7 +138,7 @@ export class WorkpackSectionWBSComponent implements OnDestroy {
     if (item.idWorkpack === this.workpackParams.idWorkpack) {
       return;
     }
-    this.setWorkpackBreadcrumbStorage(item.idWorkpack, this.idPlan)
+    this.setWorkpackBreadcrumbStorage(item.idWorkpack, this.idPlan);
     this.route.navigate(['/workpack'], {
       queryParams: {
         id: item.idWorkpack,
@@ -190,10 +190,118 @@ export class WorkpackSectionWBSComponent implements OnDestroy {
           ...evidence,
           isImg,
           icon
-        }
+        };
       });
       journalInformation.loading = false;
     }
   }
 
+  shouldDisplayWarningStyles(node: any): {
+    displayWarningIcon: boolean;
+    displayColoredText: boolean;
+    displayDashedText: boolean;
+    textTooltipMessages: Array<string>;
+  } {
+    if (
+      !node.classifications ||
+      node.workpackType === TypeWorkpackEnumWBS.Portfolio ||
+      node.workpackType === TypeWorkpackEnumWBS.Program
+    ) {
+      return {
+        displayWarningIcon: false,
+        displayColoredText: false,
+        displayDashedText: false,
+        textTooltipMessages: [],
+      };
+    } else {
+      if (
+        node.workpackType === TypeWorkpackEnumWBS.Project ||
+        node.workpackType === TypeWorkpackEnumWBS.Organizer
+      ) {
+        if (
+          node.classifications.deletedWithBaseline ||
+          node.classifications.isNew ||
+          node.classifications.noSchedule ||
+          node.classifications.noScope ||
+          node.classifications.toCancel
+        ) {
+          return {
+            displayWarningIcon: true,
+            displayColoredText: true,
+            displayDashedText: false,
+            textTooltipMessages: [
+              'workpack-eap-alert-pending-items',
+              // 'Verifique itens pendentes abaixo',
+            ],
+          };
+        } else {
+          return {
+            displayWarningIcon: false,
+            displayColoredText: false,
+            displayDashedText: false,
+            textTooltipMessages: [],
+          };
+        }
+      } else if (
+        node.workpackType === TypeWorkpackEnumWBS.Deliverable ||
+        node.workpackType === TypeWorkpackEnumWBS.Milestone
+      ) {
+        const messages = [];
+
+        if (node.classifications.deletedWithBaseline) {
+          // messages.push('Este item foi excluído');
+          messages.push('workpack-eap-alert-deleted-item');
+        }
+        if (node.classifications.isNew) {
+          // messages.push('Item novo fora da Linha de Base ativa');
+          messages.push('workpack-eap-alert-new-item');
+        }
+        if (node.classifications.noSchedule) {
+          // messages.push('Entrega sem Cronograma');
+          messages.push('workpack-eap-alert-no-schedule');
+        }
+        if (
+          !node.classifications.noSchedule &&
+          node.classifications.noScope
+        ) {
+          // messages.push('Entrega sem escopo estimado (físico = 0)');
+          messages.push('workpack-eap-alert-no-scope');
+        }
+        if (node.classifications.toCancel) {
+          // messages.push('Item a cancelar. Requer aprovação de nova Linha de Base');
+          messages.push('workpack-eap-alert-to-cancel');
+        }
+
+        return {
+          displayWarningIcon: messages.length > 0,
+          displayColoredText: messages.length > 0,
+          displayDashedText: false,
+          textTooltipMessages: messages,
+        };
+      }
+    }
+  }
+
+  shouldDisplayNewTag(node: any) {
+    return (
+      (
+        node.workpackType === TypeWorkpackEnumWBS.Deliverable ||
+        node.workpackType === TypeWorkpackEnumWBS.Milestone
+      ) &&
+      node.classifications &&
+      node.classifications.isNew
+    );
+  }
+
+  parseTooltipTranslatedStrings(messages: Array<string>): string {
+    if (messages && messages.length > 0) {
+      const finalMessagesObj = this.translateSrv.instant(messages);
+      const finalMessages = Object.values(finalMessagesObj);
+      if (finalMessages.length > 1) { finalMessages[0] = `- ${finalMessages[0]}`; }
+
+      return finalMessages.join('\n- ');
+    }
+
+    return '';
+  }
 }

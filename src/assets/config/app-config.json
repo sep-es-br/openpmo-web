@@ -1,5 +1,5 @@
 {
-  "API": "https://pmo.totemti.com.br/openpmo",
+  "API": "http://localhost:8080/openpmo",
   "authButtonIcon": "",
   "authButtonText": {
     "en-US": "Enter",

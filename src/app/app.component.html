@@ -5,6 +5,11 @@
 <p-confirmDialog [header]="'confirmClearPendingChanges' | translate" icon="pi pi-exclamation-triangle"
                  key="clearPendingChangesConfirm">
 </p-confirmDialog>
+<p-confirmDialog 
+    [header]="'Atenção'" 
+    [icon]="'pi pi-exclamation-triangle'" 
+    key="deliverableInfoConfirm">
+</p-confirmDialog>
 <p-toast position="top-right"></p-toast>
 <ng-container *ngIf="showTemplate !== undefined">
   <ng-container *ngIf="environment.env !== envEnum.PRODUCTION">

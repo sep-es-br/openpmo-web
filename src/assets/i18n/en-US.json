@@ -21,6 +21,7 @@
   "active": "Active",
   "compile": "Compile",
   "reportModel": "Report Model",
+  "instruments": "Instruments",
   "reports": "Reports",
   "download": "Download",
   "setAsMain": "Set as main",
@@ -363,6 +364,8 @@
   "baselines": "Baselines",
   "CHANGED": "Changed",
   "DELETED": "Deleted",
+  "TO_CANCEL": "To cancel",
+  "CANCELLED": "Cancelled",
   "NEW": "New",
   "submit": "Submit",
   "evaluations": "Evaluations",
@@ -561,7 +564,7 @@
     "schedule": {
       "start": "Start date of schedule. Information is required.",
       "finish": "Finish date of schedule. Information is required.",
-      "estimatedPhysical": "Estimated physical value. Information is required. Zero value is valid.",
+      "estimatedPhysical": "Estimated physical value. Information is required. Value zero is valid for creating the Schedule, but to submit a Baseline, the Estimated value must be greater than zero.",
       "actualPhysical": "Actual physical value. Information is not required.",
       "estimatedCostTotal": "Total estimated cost value.",
       "actualCostTotal": "Total actual cost value.",
@@ -1056,5 +1059,17 @@
   "budgeted": "Budgeted",
   "authorized": "Authorized",
   "indicator.name": "Name of the indicator. Mandatory information.",
-  "indicator.description": "Description of the indicator. Mandatory information."
+  "indicator.description": "Description of the indicator. Mandatory information.",
+
+  "workpack-eap-alert-pending-items": "Verify pending items below",
+  "workpack-eap-alert-deleted-item": "This item has been deleted",
+  "workpack-eap-alert-new-item": "New item outside the active Baseline",
+  "workpack-eap-alert-no-schedule": "Delivery without schedule",
+  "workpack-eap-alert-no-scope": "Delivery without scope",
+  "workpack-eap-alert-to-cancel": "Item to be canceled. Requires approval of a new Baseline",
+
+  "NO_SCHEDULE": "Delivery without schedule",
+  "UNDEFINED_SCOPE": "Delivery without scope",
+
+  "baseline-disabled-submission-warning": "Impossible to submit Baseline with pending items"
 }

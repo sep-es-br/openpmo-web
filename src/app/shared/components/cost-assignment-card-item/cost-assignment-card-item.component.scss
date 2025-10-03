@@ -87,6 +87,14 @@
       .app-input-number .p-inputnumber .p-inputtext {
         font-size: 0.8rem !important;
       }
+      .app-input-number.disabled-field {
+        .p-inputnumber-input {
+          user-select: none !important;
+          pointer-events: none !important;
+          cursor: not-allowed !important;
+          opacity: 0.6;
+        }
+      }
       .p-float-label {
         width: 100%;
         .app-input-number.red {
