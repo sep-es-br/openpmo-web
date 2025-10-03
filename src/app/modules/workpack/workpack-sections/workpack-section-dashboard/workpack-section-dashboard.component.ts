@@ -68,7 +68,6 @@ export class WorkpackSectionDashboardComponent implements OnInit, OnChanges, OnD
     labels: [],
     datasets: []
   };
-  totalStatusAmmount : number;
 
   isBeingBuild = false;
 
@@ -159,7 +158,7 @@ export class WorkpackSectionDashboardComponent implements OnInit, OnChanges, OnD
     this.baselines = baselines;
     this.selectedBaseline = selectedBaseline;
     this.dashboard = dashboard;
-    if(dashboard.dashboardStatusData) {
+    if(dashboard?.dashboardStatusData) {
       this.dashboardStatusData = {
         labels: ["Concluída", "Em Execução", "Cancelada", "Em Planejamento", "Paralisada"],
         datasets: [
@@ -182,7 +181,6 @@ export class WorkpackSectionDashboardComponent implements OnInit, OnChanges, OnD
         ]
 
       };
-      this.totalStatusAmmount = dashboard.dashboardStatusData.totalDeliverable;
     }
     
     if (this.dashboard && this.dashboard.workpacksByModel) {
@@ -217,6 +215,7 @@ export class WorkpackSectionDashboardComponent implements OnInit, OnChanges, OnD
     this.calendarFormat = this.translateSrv.instant('dateFormatMonthYear');
     this.midleTextMilestones = this.translateSrv.instant('milestonesLabelChart');
     this.midleTextRisks = this.translateSrv.instant('risksLabelChart');
+    this.midleTextDelivable = this.translateSrv.instant('DeliverableLabelChart');
   }
 
   ngOnDestroy(): void {

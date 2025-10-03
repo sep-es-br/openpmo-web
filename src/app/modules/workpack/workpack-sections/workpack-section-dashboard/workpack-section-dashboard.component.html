@@ -91,7 +91,7 @@
         </div>
         <div class="risk-milestone-charts-container">
           <div class="dashboard-item" *ngIf="dashboardStatusData">
-            <app-doughnut-chart [data]="dashboardStatusData" [middleText]="totalStatusAmmount?.toString()"
+            <app-doughnut-chart [data]="dashboardStatusData" [middleText]="dashboard?.dashboardStatusData?.totalDeliverable?.toString()"
               [midleTextBottom]="midleTextDelivable">
             </app-doughnut-chart>
           </div>
