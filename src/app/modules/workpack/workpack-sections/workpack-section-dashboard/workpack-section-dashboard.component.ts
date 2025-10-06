@@ -87,6 +87,7 @@ export class WorkpackSectionDashboardComponent implements OnInit, OnChanges, OnD
     this.responsiveSrv.resizeEvent.subscribe((value) => {
       this.mediaScreen1700 = value.width <= 1700;
     });
+    
     this.cardDashboardProperties = {
       toggleable: false,
       initialStateToggle: false,
@@ -114,13 +115,6 @@ export class WorkpackSectionDashboardComponent implements OnInit, OnChanges, OnD
     this.dashboardSrv.observableResetDashboard.pipe(takeUntil(this.$destroy)).subscribe(reset => {
       if (reset) {
         this.loadDashboardData();
-        this.dashboardSrv.isItemBeingBuild(this.workpackData.workpack.id).then(
-          ({success, data}) => {
-            if(success) {
-              this.isBeingBuild = data.value
-            }
-          }
-        );
       }
     });
 
@@ -149,15 +143,19 @@ export class WorkpackSectionDashboardComponent implements OnInit, OnChanges, OnD
       yearRange,
       startDate,
       endDate,
-      loading
+      loading,
+      isBeingBuild
     } = this.dashboardSrv.getDashboardData();
     this.workpackParams = workpackParams;
     this.workpackData = workpackData;
+    
+    
     this.scheduleInterval = scheduleInterval;
     this.referenceMonth = referenceMonth;
     this.baselines = baselines;
     this.selectedBaseline = selectedBaseline;
     this.dashboard = dashboard;
+    this.isBeingBuild = isBeingBuild;
     if(dashboard?.dashboardStatusData) {
       this.dashboardStatusData = {
         labels: ["Concluída", "Em Execução", "Cancelada", "Em Planejamento", "Paralisada"],

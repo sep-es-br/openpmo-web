@@ -29,6 +29,7 @@ export class DashboardService extends BaseService<IDashboard> {
   endDate;
   linked = false;
   loading;
+  isBeingBuild = false;
   dashboardStatusData : IDashboardStatusData
 
   constructor(
@@ -57,6 +58,7 @@ export class DashboardService extends BaseService<IDashboard> {
     this.endDate = undefined;
     this.linked = false;
     this.loading = true;
+    this.isBeingBuild = false;
     this.dashboardStatusData = undefined;
     this.nextResetDashboard(true);
   }
@@ -73,7 +75,8 @@ export class DashboardService extends BaseService<IDashboard> {
       yearRange: this.yearRange,
       startDate: this.startDate,
       endDate: this.endDate,
-      loading: this.loading
+      loading: this.loading,
+      isBeingBuild: this.isBeingBuild
     }
   }
 
@@ -133,10 +136,19 @@ export class DashboardService extends BaseService<IDashboard> {
           'linked': this.linked });
       if (success) {
         this.dashboard = this.setDashboardData(data);
+        
         this.setScheduleInterval(data);
         this.calculateReferenceMonth();
         this.validateDashboard();
       }
+    }
+    if(this.workpackData?.workpack) {
+      const { success, data } = await this.isItemBeingBuild(this.workpackData.workpack.id)
+      
+      if(success) {
+        this.isBeingBuild = data.value
+      }
+        
     }
   }
 
