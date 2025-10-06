@@ -52,6 +52,7 @@ export interface IDashboard {
     menuItems?: MenuItem[];
     workpacks?: IWorkpackByModel[];
   }[];
+  dashboardStatusData: IDashboardStatusData;
 }
 
 export interface IDashboardData {
@@ -72,6 +73,17 @@ export interface IDashboardData {
     menuItems?: MenuItem[];
     workpacks?: IWorkpackByModel[];
   }[];
+  dashboardStatusData: IDashboardStatusData;
+}
+
+export interface IDashboardStatusData {
+    statusConcluida : number;
+    statusEmExec : number;
+    statusCancelada : number;
+    statusCancelar : number;
+    statusPlanejamento : number;
+    statusParalisada : number;
+    totalDeliverable : number;
 }
 
 export interface IWorkpackByModel {

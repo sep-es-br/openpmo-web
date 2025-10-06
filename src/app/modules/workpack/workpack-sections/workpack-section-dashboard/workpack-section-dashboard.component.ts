@@ -4,7 +4,7 @@ import { Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges, ViewChil
 import { TranslateService } from '@ngx-translate/core';
 import { ChartData } from 'chart.js';
 import { ICard } from 'src/app/shared/interfaces/ICard';
-import { IDashboardData } from 'src/app/shared/interfaces/IDashboard';
+import { IDashboardData, IDashboardStatusData } from 'src/app/shared/interfaces/IDashboard';
 import { DashboardService } from 'src/app/shared/services/dashboard.service';
 import { Calendar } from 'primeng/calendar';
 import { Subject } from 'rxjs';
@@ -55,6 +55,7 @@ export class WorkpackSectionDashboardComponent implements OnInit, OnChanges, OnD
   endDate: Date;
   midleTextMilestones: string;
   midleTextRisks: string;
+  midleTextDelivable: string;
   showTabview = false;
   isLoading = false;
   mediaScreen1700: boolean;
@@ -63,6 +64,10 @@ export class WorkpackSectionDashboardComponent implements OnInit, OnChanges, OnD
   workpackData: IWorkpackData;
   sectionActive = false;
   idMenuLoading: number;
+  dashboardStatusData : ChartData = {
+    labels: [],
+    datasets: []
+  };
 
   isBeingBuild = false;
 
@@ -102,6 +107,7 @@ export class WorkpackSectionDashboardComponent implements OnInit, OnChanges, OnD
         }
         this.midleTextMilestones = this.translateSrv.instant('milestonesLabelChart');
         this.midleTextRisks = this.translateSrv.instant('risksLabelChart');
+        this.midleTextDelivable = this.translateSrv.instant('DeliverableLabelChart');
         this.setDashboardMilestonesData();
         this.setDashboardRisksData();
       }, 150)
@@ -150,6 +156,31 @@ export class WorkpackSectionDashboardComponent implements OnInit, OnChanges, OnD
     this.selectedBaseline = selectedBaseline;
     this.dashboard = dashboard;
     this.isBeingBuild = isBeingBuild;
+    if(dashboard?.dashboardStatusData) {
+      this.dashboardStatusData = {
+        labels: ["Concluída", "Em Execução", "Cancelada", "Em Planejamento", "Paralisada"],
+        datasets: [
+          {
+            data: [
+              dashboard.dashboardStatusData.statusConcluida, 
+              dashboard.dashboardStatusData.statusEmExec, 
+              dashboard.dashboardStatusData.statusCancelada, 
+              dashboard.dashboardStatusData.statusPlanejamento, 
+              dashboard.dashboardStatusData.statusParalisada
+            ],
+            backgroundColor: [
+              "#118DFF",
+              "#55B95E",
+              "#CC2C52",
+              "#EC78EA",
+              "#EA9D42"
+            ]
+          }
+        ]
+
+      };
+    }
+    
     if (this.dashboard && this.dashboard.workpacksByModel) {
       const cards = Array.from(this.dashboard.workpacksByModel);
       cards.forEach( (card) => {
@@ -182,6 +213,7 @@ export class WorkpackSectionDashboardComponent implements OnInit, OnChanges, OnD
     this.calendarFormat = this.translateSrv.instant('dateFormatMonthYear');
     this.midleTextMilestones = this.translateSrv.instant('milestonesLabelChart');
     this.midleTextRisks = this.translateSrv.instant('risksLabelChart');
+    this.midleTextDelivable = this.translateSrv.instant('DeliverableLabelChart');
   }
 
   ngOnDestroy(): void {
