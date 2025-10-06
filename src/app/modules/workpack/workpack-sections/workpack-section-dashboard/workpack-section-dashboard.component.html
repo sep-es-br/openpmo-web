@@ -29,7 +29,7 @@
     <p-divider layout="horizontal" *ngIf="(dashboard?.stakeholders && dashboard?.stakeholders.length > 0 && dashboardShowStakeholders && dashboardShowStakeholders.length > 0)
         && !isLoading"></p-divider>
     <ng-template #beingBuild>
-      <ng-container *ngIf="dashboard && !isLoading">
+      <ng-container *ngIf="!isLoading">
         <p-divider layout="horizontal" *ngIf="!isLoading"></p-divider>
         <div>{{'itemBeingBuild' | translate}}</div>
       </ng-container>
