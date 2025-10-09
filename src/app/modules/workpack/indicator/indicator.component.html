@@ -121,11 +121,27 @@
           <!-- Meta Prevista e Meta Realizada -->
           <div class="grid-row">
             <span class="p-float-label half-width">
-              <input [(ngModel)]="data.expectedGoals" id="expected-goal" [ngClass]="{'disabled-field': permission !== 'EDIT'}" type="text" pInputText class="app-input-text" (input)="onExpectedGoalChange(data)">
+              <input
+                class="app-input-text"
+                id="expected-goal"
+                type="text"
+                pInputText
+                [(ngModel)]="data.expectedGoals"
+                [ngClass]="{ 'disabled-field': permission !== 'EDIT' }"
+                (input)="onExpectedGoalChange(data)"
+              >
               <label for="expected-goal" class="indicators-label" >{{ "expectedGoal" | translate }}</label>
             </span>
             <span class="p-float-label half-width">
-              <input [(ngModel)]="data.achievedGoals" [ngClass]="{'disabled-field': permission !== 'EDIT' && permission !== 'UPDATE'}" id="achieved-goal" type="text" pInputText class="app-input-text" (input)="onAchievedGoalChange(data)">
+              <input
+                class="app-input-text"
+                id="achieved-goal"
+                type="text"
+                pInputText
+                [(ngModel)]="data.achievedGoals"
+                [ngClass]="{ 'disabled-field': (permission !== 'EDIT' && permission !== 'UPDATE') || isCurrentYearBeforeParam(data.period) }"
+                (input)="onAchievedGoalChange(data)"
+              >
               <label for="achieved-goal" class="indicators-label achieved-goal-label">{{ "achievedGoal" | translate }}</label>
             </span>
           </div>
