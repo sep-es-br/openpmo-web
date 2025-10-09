@@ -29,6 +29,7 @@ export class WorkpackSectionDashboardComponent implements OnInit, OnChanges, OnD
   @Input() dashboardShowRisks: boolean;
   @Input() dashboardShowMilestones: boolean;
   @Input() dashboardShowEva: boolean;
+  @Input() dashboardShowDeliveryStatus: boolean;
   @Input() workpackFullName: string;
   @Input() workpackType: string;
   @Input() collapsePanelsStatus: boolean;
