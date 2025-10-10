@@ -869,6 +869,7 @@
   "currency": "$",
   "milestonesLabelChart": "MARCOS CRÍTICOS",
   "risksLabelChart": "RISCOS",
+  "DeliverableLabelChart": "ENTREGAS",
   "labels": {
     "labels": "Legendas",
     "IntegerModel": "Inteiro",

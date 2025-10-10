@@ -15,7 +15,7 @@ import { ICard } from './../../../../shared/interfaces/ICard';
 import { Subject } from 'rxjs';
 import { Calendar } from 'primeng/calendar';
 import { SaveButtonComponent } from './../../../../shared/components/save-button/save-button.component';
-import { Component, OnInit, ViewChild, ViewChildren } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild, ViewChildren } from '@angular/core';
 import * as moment from 'moment';
 import { CancelButtonComponent } from 'src/app/shared/components/cancel-button/cancel-button.component';
 
@@ -24,31 +24,51 @@ import { CancelButtonComponent } from 'src/app/shared/components/cancel-button/c
   templateUrl: './risk-response.component.html',
   styleUrls: ['./risk-response.component.scss']
 })
-export class RiskResponseComponent implements OnInit {
-
+export class RiskResponseComponent implements OnInit, OnDestroy {
   @ViewChild(SaveButtonComponent) saveButton: SaveButtonComponent;
+
   @ViewChild(CancelButtonComponent) cancelButton: CancelButtonComponent;
+
   @ViewChildren(Calendar) calendarComponents: Calendar[];
 
   responsive: boolean;
+
   idRisk: number;
+
   riskName: string;
+
   idWorkpack: number;
+
   riskNature: string;
+
   idRiskResponse: number;
+
   editPermission: boolean;
+
   $destroy = new Subject();
+
   calendarFormat: string;
+
   cardRiskResponseProperties: ICard;
+
   formRiskResponse: FormGroup;
+
   riskResponse: IRiskResponse;
+
   riskResponsePropertiesOptions = RiskResponsesPropertiesOptions;
+
   yearRangeCalculated: string;
+
   strategyOptions: SelectItem[];
+
   statusOptions: SelectItem[];
+
   stakeholderOptions: SelectItem[];
+
   idPlan: number;
+
   language: string;
+
   formIsSaving = false;
 
   constructor(
@@ -67,6 +87,7 @@ export class RiskResponseComponent implements OnInit {
     this.translateSrv.onLangChange.pipe(takeUntil(this.$destroy)).subscribe(() => {
       setTimeout(() => this.setLanguage(), 200);
     });
+
     this.actRouter.queryParams.subscribe(async queryParams => {
       this.idRiskResponse = queryParams.idRiskResponse && +queryParams.idRiskResponse;
       this.idRisk = queryParams.idRisk && +queryParams.idRisk;
@@ -74,6 +95,7 @@ export class RiskResponseComponent implements OnInit {
       this.idWorkpack = queryParams.idWorkpack && +queryParams.idWorkpack;
       this.riskNature = queryParams.riskNature && queryParams.riskNature;
     });
+
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.responsive = value);
     this.translateSrv.onLangChange.pipe(takeUntil(this.$destroy)).subscribe(() => {
       setTimeout(() => this.calendarComponents?.map(calendar => {
@@ -81,8 +103,8 @@ export class RiskResponseComponent implements OnInit {
         calendar.dateFormat = this.translateSrv.instant('dateFormat');
         calendar.updateInputfield();
       }, 150));
-    }
-    );
+    });
+
     this.formRiskResponse = this.formBuilder.group({
       name: ['', Validators.required],
       when: ['', Validators.required],
@@ -94,33 +116,38 @@ export class RiskResponseComponent implements OnInit {
       plan: [''],
       responsible: [],
     });
+
     this.formRiskResponse.statusChanges
       .pipe(takeUntil(this.$destroy), filter(status => status === 'INVALID'))
       .subscribe(() => this.saveButton?.hideButton());
+
     this.formRiskResponse.valueChanges
       .pipe(takeUntil(this.$destroy), filter(() => this.formRiskResponse.dirty && this.formRiskResponse.valid))
       .subscribe(() => this.saveButton.showButton());
+
     this.formRiskResponse.valueChanges
       .pipe(takeUntil(this.$destroy), filter(() => this.formRiskResponse.dirty))
       .subscribe(() => this.cancelButton.showButton());
-  }
-
-  ngOnDestroy(): void {
-    this.$destroy.next();
-    this.$destroy.complete();
   }
 
   async ngOnInit() {
     this.setLanguage();
     this.calendarFormat = this.translateSrv.instant('dateFormat');
     this.idPlan = Number(localStorage.getItem('@currentPlan'));
+
     await this.loadPropertiesRiskResponse();
     await this.setBreadcrumb();
+
     if (!this.editPermission) {
-      this.formRiskResponse.disable;
+      this.formRiskResponse.disable();
     } else {
-      this.formRiskResponse.enable;
+      this.formRiskResponse.enable();
     }
+  }
+
+  ngOnDestroy(): void {
+    this.$destroy.next();
+    this.$destroy.complete();
   }
 
   setLanguage() {
@@ -137,8 +164,14 @@ export class RiskResponseComponent implements OnInit {
       status: this.riskResponse.status,
       trigger: this.riskResponse.trigger,
       plan: this.riskResponse.plan,
-      responsible: this.riskResponse.responsible && this.riskResponse.responsible.length > 0 ? this.riskResponse.responsible.map(resp => resp.id) : [],
-    })
+      responsible: (
+          this.riskResponse.responsible &&
+          this.riskResponse.responsible.length > 0
+        )
+        ? this.riskResponse.responsible.map(resp => resp.id)
+        : [],
+    });
+
     this.cardRiskResponseProperties.isLoading = false;
   }
 
@@ -151,24 +184,30 @@ export class RiskResponseComponent implements OnInit {
       initialStateCollapse: false,
       isLoading: true
     };
-    this.strategyOptions = this.riskNature === 'OPPORTUNITY' ? Object.keys(this.riskResponsePropertiesOptions.STRATEGY.POSITIVE).map(key => ({
-      label: this.translateSrv.instant(this.riskResponsePropertiesOptions.STRATEGY.POSITIVE[key].label),
-      value: this.riskResponsePropertiesOptions.STRATEGY.POSITIVE[key].value
-    })) : Object.keys(this.riskResponsePropertiesOptions.STRATEGY.NEGATIVE).map(key => ({
-      label: this.translateSrv.instant(this.riskResponsePropertiesOptions.STRATEGY.NEGATIVE[key].label),
-      value: this.riskResponsePropertiesOptions.STRATEGY.NEGATIVE[key].value
-    }));
+
+    this.strategyOptions = this.riskNature === 'OPPORTUNITY'
+      ? Object.keys(this.riskResponsePropertiesOptions.STRATEGY.POSITIVE).map(key => ({
+          label: this.translateSrv.instant(this.riskResponsePropertiesOptions.STRATEGY.POSITIVE[key].label),
+          value: this.riskResponsePropertiesOptions.STRATEGY.POSITIVE[key].value
+        }))
+      : Object.keys(this.riskResponsePropertiesOptions.STRATEGY.NEGATIVE).map(key => ({
+          label: this.translateSrv.instant(this.riskResponsePropertiesOptions.STRATEGY.NEGATIVE[key].label),
+          value: this.riskResponsePropertiesOptions.STRATEGY.NEGATIVE[key].value
+        }));
+
     this.statusOptions = Object.keys(this.riskResponsePropertiesOptions.STATUS).map(key => ({
       label: this.translateSrv.instant(this.riskResponsePropertiesOptions.STATUS[key].label),
       value: this.riskResponsePropertiesOptions.STATUS[key].value
     }));
+
     await this.loadStakeholdersList();
     this.calculateYearRange();
+    await this.loadPermissions();
+
     if (!this.idRiskResponse) this.cardRiskResponseProperties.isLoading = false;
     const result = this.idRiskResponse && await this.riskResponseSrv.GetById(this.idRiskResponse);
     if (result && result.success) {
       this.riskResponse = result.data;
-      await this.loadPermissions();
       this.setFormRiskResponse();
     }
   }
@@ -176,6 +215,7 @@ export class RiskResponseComponent implements OnInit {
   async loadPermissions() {
     const isUserAdmin = await this.authSrv.isUserAdmin();
     const result = await this.workpackSrv.GetWorkpackPermissions(this.idWorkpack, { 'id-plan': this.idPlan });
+
     if (result.success) {
       const workpack = result.data;
       if (isUserAdmin) {
@@ -200,14 +240,15 @@ export class RiskResponseComponent implements OnInit {
     const date = moment();
     const rangeYearStart = date.year();
     const rangeYearEnd = date.add(10, 'years').year();
-    this.yearRangeCalculated = `${rangeYearStart}:${rangeYearEnd};`
+    this.yearRangeCalculated = `${rangeYearStart}:${rangeYearEnd};`;
   }
 
   async setBreadcrumb() {
     let breadcrumbItems = this.breadcrumbSrv.get;
     if (!breadcrumbItems || breadcrumbItems.length === 0) {
-      breadcrumbItems = await this.breadcrumbSrv.loadWorkpackBreadcrumbs(this.idWorkpack, this.idPlan)
+      breadcrumbItems = await this.breadcrumbSrv.loadWorkpackBreadcrumbs(this.idWorkpack, this.idPlan);
     }
+
     this.breadcrumbSrv.setMenu([
       ...breadcrumbItems,
       {
@@ -233,25 +274,40 @@ export class RiskResponseComponent implements OnInit {
       idRisk: this.idRisk,
       name: this.formRiskResponse.controls.name.value,
       when: this.formRiskResponse.controls.when.value,
-      startDate: this.formRiskResponse.controls.when.value === 'PRE_OCCURRENCE' && (this.formRiskResponse.controls.startDate.value && this.formRiskResponse.controls.startDate.value !== null)
-        ? moment(this.formRiskResponse.controls.startDate.value).format('yyyy-MM-DD') : undefined,
-      endDate: this.formRiskResponse.controls.when.value === 'PRE_OCCURRENCE' && (this.formRiskResponse.controls.endDate.value && this.formRiskResponse.controls.endDate.value !== null)
-        ? moment(this.formRiskResponse.controls.endDate.value).format('yyyy-MM-DD') : undefined,
+      startDate:
+        this.formRiskResponse.controls.when.value === 'PRE_OCCURRENCE' &&
+        (
+          this.formRiskResponse.controls.startDate.value &&
+          this.formRiskResponse.controls.startDate.value !== null
+        )
+        ? moment(this.formRiskResponse.controls.startDate.value).format('yyyy-MM-DD')
+        : undefined,
+      endDate:
+        this.formRiskResponse.controls.when.value === 'PRE_OCCURRENCE' &&
+        (
+          this.formRiskResponse.controls.endDate.value &&
+          this.formRiskResponse.controls.endDate.value !== null
+        )
+        ? moment(this.formRiskResponse.controls.endDate.value).format('yyyy-MM-DD')
+        : undefined,
       strategy: this.formRiskResponse.controls.strategy.value,
       status: this.formRiskResponse.controls.status.value,
       trigger: this.formRiskResponse.controls.trigger.value,
       plan: this.formRiskResponse.controls.plan.value,
       responsible: this.formRiskResponse.controls.responsible.value
     };
+
     const put = !!this.idRiskResponse;
     const result =  put ? await this.riskResponseSrv.put(sender) : await this.riskResponseSrv.post(sender);
     this.formIsSaving = false;
+
     if (result.success) {
       this.messageSrv.add({
         severity: 'success',
         summary: this.translateSrv.instant('success'),
         detail: this.translateSrv.instant('messages.savedSuccessfully')
       });
+
       this.router.navigate(['/workpack/risks'], {
         queryParams: {
           idWorkpack: this.idWorkpack,
@@ -263,6 +319,7 @@ export class RiskResponseComponent implements OnInit {
 
   handleOnCancel() {
     this.saveButton.hideButton();
+
     if (this.idRiskResponse) {
       this.setFormRiskResponse();
     } else {
@@ -279,5 +336,4 @@ export class RiskResponseComponent implements OnInit {
       });
     }
   }
-
 }

@@ -90,6 +90,11 @@
           </app-triple-constraint-dashboard>
         </div>
         <div class="risk-milestone-charts-container">
+          <div class="dashboard-item" *ngIf="!!dashboardShowDeliveryStatus && dashboardStatusData">
+            <app-doughnut-chart [data]="dashboardStatusData" [middleText]="dashboard?.dashboardStatusData?.totalDeliverable?.toString()"
+              [midleTextBottom]="midleTextDelivable">
+            </app-doughnut-chart>
+          </div>
           <div class="dashboard-item" *ngIf="!!dashboardShowMilestones && dashboardMilestonesData">
             <app-doughnut-chart [data]="dashboardMilestonesData" [middleText]="dashboard?.milestone?.quantity?.toString()"
               [midleTextBottom]="midleTextMilestones"></app-doughnut-chart>

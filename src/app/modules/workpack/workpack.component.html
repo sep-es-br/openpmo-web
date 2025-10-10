@@ -35,7 +35,8 @@
           <app-workpack-section-dashboard [idWorkpack]="idWorkpack" [workpackFullName]="workpack?.fullName"
             [dashboardShowStakeholders]="workpackModel?.dashboardShowStakeholders"
             [dashboardShowRisks]="workpackModel?.dashboardShowRisks"
-            [dashboardShowEva]="workpackModel?.dashboardShowEva" [workpackType]="workpack?.type"
+            [dashboardShowEva]="workpackModel?.dashboardShowEva"
+            [dashboardShowDeliveryStatus]="workpackModel?.dashboardShowDeliveryStatus" [workpackType]="workpack?.type"
             [collapsePanelsStatus]="collapsePanelsStatus"
             [dashboardShowMilestones]="workpackModel?.dashboardShowMilestones"></app-workpack-section-dashboard>
         </div>
@@ -156,8 +157,9 @@
       <app-workpack-section-dashboard [idWorkpack]="idWorkpack" [workpackFullName]="workpack?.fullName"
         [dashboardShowStakeholders]="workpackModel?.dashboardShowStakeholders"
         [dashboardShowRisks]="workpackModel?.dashboardShowRisks" [dashboardShowEva]="workpackModel?.dashboardShowEva"
-        [workpackType]="workpack?.type" [collapsePanelsStatus]="collapsePanelsStatus"
-        [dashboardShowMilestones]="workpackModel?.dashboardShowMilestones"></app-workpack-section-dashboard>
+            [dashboardShowDeliveryStatus]="workpackModel?.dashboardShowDeliveryStatus" [workpackType]="workpack?.type" 
+            [collapsePanelsStatus]="collapsePanelsStatus" [dashboardShowMilestones]="workpackModel?.dashboardShowMilestones"
+            ></app-workpack-section-dashboard>
     </div>
     <div class="card-properties-workpack">
       <div class="loading-form-container" *ngIf="formIsSaving">

@@ -1,7 +1,7 @@
 import { BehaviorSubject } from 'rxjs';
 import { Inject, Injectable, Injector } from '@angular/core';
 import { BaseService } from '../base/base.service';
-import { IDashboard, IDashboardData, IWorkpackByModel } from '../interfaces/IDashboard';
+import { IDashboard, IDashboardData, IDashboardStatusData, IWorkpackByModel } from '../interfaces/IDashboard';
 import { IBaseline } from '../interfaces/IBaseline';
 import { IHttpResult } from '../interfaces/IHttpResult';
 import { PrepareHttpParams } from '../utils/query.util';
@@ -30,6 +30,7 @@ export class DashboardService extends BaseService<IDashboard> {
   linked = false;
   loading;
   isBeingBuild = false;
+  dashboardStatusData : IDashboardStatusData
 
   constructor(
     @Inject(Injector) injector: Injector,
@@ -58,6 +59,7 @@ export class DashboardService extends BaseService<IDashboard> {
     this.linked = false;
     this.loading = true;
     this.isBeingBuild = false;
+    this.dashboardStatusData = undefined;
     this.nextResetDashboard(true);
   }
 

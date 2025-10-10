@@ -32,6 +32,7 @@ export interface IWorkpackModel {
   dashboardShowEva?: boolean;
   dashboardShowMilestones?: boolean;
   dashboardShowRisks?: boolean;
+  dashboardShowDeliveryStatus?: boolean;
   dashboardShowStakeholders?: string[];
 }
 
