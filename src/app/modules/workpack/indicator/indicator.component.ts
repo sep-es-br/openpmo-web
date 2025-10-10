@@ -129,8 +129,8 @@ export class IndicatorComponent implements OnInit, OnDestroy {
   ) {
     this.actRouter.queryParams.subscribe(async (queryParams) => {
       console.log(queryParams);
-      this.idIndicator = +queryParams.idIndicator;
-      this.idWorkpack = +queryParams.idWorkpack;
+      this.idIndicator = queryParams.idIndicator;
+      this.idWorkpack = queryParams.idWorkpack;
       this.idPlan = +queryParams.id;
       this.idOffice = +queryParams.idOffice;
       this.idWorkpackModelLinked = +queryParams.idWorkpackModelLinked;
@@ -225,46 +225,43 @@ export class IndicatorComponent implements OnInit, OnDestroy {
         this.idWorkpack,
         this.idIndicator
       );
+
       if (result.success) {
         this.indicator = result.data;
-        const isUserAdmin = await this.authSrv.isUserAdmin();
-
-        if (isUserAdmin) {
-          this.permission = 'EDIT';
-          this.formIndicator.enable();
-        } else {
-          this.propertySrv
-            .getPermissionLevel()
-            .then(async (permission: string) => {
-              if (!permission) {
-                try {
-                  const response =
-                    await this.workpackService.GetWorkpackPermissions(
-                      this.idWorkpack,
-                      {
-                        'id-plan': this.idPlan
-                          ? Number(this.idPlan)
-                          : undefined,
-                      }
-                    );
-                  this.permission = response?.data?.permissions?.[0]?.level;
-                } catch (error) {
-                  console.error('Erro ao buscar permissões do workpack', error);
-                  this.permission = 'READ';
-                }
-              } else {
-                this.permission = permission;
-              }
-            });
-        }
-
-        await this.loadFontOptions(this.idOffice);
-        this.setFormIndicator();
-        this.formIndicator.markAllAsTouched();
       }
-    } else {
-      this.cardIndicatorProperties.isLoading = false;
     }
+
+    const isUserAdmin = await this.authSrv.isUserAdmin();
+
+    if (isUserAdmin) {
+      this.permission = 'EDIT';
+      this.formIndicator.enable();
+    } else {
+      await this.propertySrv
+        .getPermissionLevel()
+        .then(async (permission: string) => {
+          if (!permission) {
+            try {
+              const response =
+                await this.workpackService.GetWorkpackPermissions(
+                  this.idWorkpack,
+                  { 'id-plan': this.idPlan ? Number(this.idPlan) : undefined }
+                );
+              this.permission = response?.data?.permissions?.[0]?.level;
+            } catch (error) {
+              console.error('Erro ao buscar permissões do workpack', error);
+              this.permission = 'READ';
+            }
+          } else {
+            this.permission = permission;
+          }
+        });
+    }
+
+    await this.loadFontOptions(this.idOffice);
+    this.setFormIndicator();
+    this.formIndicator.markAllAsTouched();
+    this.cardIndicatorProperties.isLoading = false;
   }
 
   preparePeriodData() {
@@ -462,29 +459,29 @@ export class IndicatorComponent implements OnInit, OnDestroy {
   }
 
   setFormIndicator() {
-    const startDate = this.indicator.startDate
-      ? this.formatDate(this.indicator.startDate)
+    const startDate = this.indicator?.startDate
+      ? this.formatDate(this.indicator?.startDate)
       : null;
-    const endDate = this.indicator.endDate
-      ? this.formatDate(this.indicator.endDate)
+    const endDate = this.indicator?.endDate
+      ? this.formatDate(this.indicator?.endDate)
       : null;
     this.selectedPeriodicity = this.periodicityOptions.find(
-      (item) => item.value === this.indicator.periodicity
+      (item) => item.value === this.indicator?.periodicity
     )?.value;
-    this.selectedMeasure = this.indicator.measure;
+    this.selectedMeasure = this.indicator?.measure;
 
     this.formIndicator.reset({
-      name: this.indicator.name,
-      description: this.indicator.description,
-      source: this.sourceOptions.find(
-        (item) => item.name == this.indicator.source
-      )?.name,
+      name: this.indicator?.name || '',
+      description: this.indicator?.description || '',
+      source:
+        this.sourceOptions.find((item) => item.name == this.indicator?.source)
+          ?.name || '',
       measure: this.selectedMeasure,
       startDate,
       endDate,
       periodicity: this.selectedPeriodicity,
-      periodGoals: this.indicator.periodGoals,
-      lastUpdate: this.indicator.lastUpdate,
+      periodGoals: this.indicator?.periodGoals || '',
+      lastUpdate: this.indicator?.lastUpdate || '',
     });
 
     this.currentStartDate = startDate;
@@ -742,6 +739,6 @@ export class IndicatorComponent implements OnInit, OnDestroy {
   }
 
   isCurrentYearBeforeParam(param: any): boolean {
-    return new Date().getFullYear() < Number(param);
+    return new Date().getFullYear() < Number((param as string).slice(0, 4));
   }
 }
