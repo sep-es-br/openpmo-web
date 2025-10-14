@@ -271,6 +271,7 @@
   "expectedGoal": "Expected Goal",
   "achievedGoal": "Achieved Goal",
   "update": "Update",
+  "UPDATE": "Update",
   "goalJustification": "Justification",
   "status": "Status",
   "preOccurrency": "Pre occurrency",
