@@ -119,6 +119,14 @@ export class DashboardService extends BaseService<IDashboard> {
             'linked': this.linked
           });
       if (success) {
+        if(this.workpackData?.workpack) {
+          const { success, data } = await this.isItemBeingBuild(this.workpackData.workpack.id)
+          
+          if(success) {
+            this.isBeingBuild = data.value
+          }
+            
+        }
         this.dashboard = this.setDashboardData(data);
         if (!params || !params.referenceMonth) {
           this.setScheduleInterval(data);
@@ -135,20 +143,20 @@ export class DashboardService extends BaseService<IDashboard> {
           'id-workpack-model-linked': this.workpackParams.idWorkpackModelLinked,
           'linked': this.linked });
       if (success) {
+        if(this.workpackData?.workpack) {
+          const { success, data } = await this.isItemBeingBuild(this.workpackData.workpack.id)
+          
+          if(success) {
+            this.isBeingBuild = data.value
+          }
+            
+        }
         this.dashboard = this.setDashboardData(data);
         
         this.setScheduleInterval(data);
         this.calculateReferenceMonth();
         this.validateDashboard();
       }
-    }
-    if(this.workpackData?.workpack) {
-      const { success, data } = await this.isItemBeingBuild(this.workpackData.workpack.id)
-      
-      if(success) {
-        this.isBeingBuild = data.value
-      }
-        
     }
   }
 
