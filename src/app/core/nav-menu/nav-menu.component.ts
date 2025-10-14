@@ -21,6 +21,8 @@ export class NavMenuComponent implements OnInit {
 
   @Output() changeMenu = new EventEmitter<boolean>();
 
+  
+
   menus: IMenu[] = [
     {label: 'office', isOpen: false},
     {label: 'portfolio', isOpen: false},

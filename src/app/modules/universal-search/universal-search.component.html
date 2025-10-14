@@ -1,3 +1,8 @@
-<p>
-  universal-search works!
-</p>
+<div class="dataview-filters-text">
+  <input pInputText id="id-app-inputtext" class="app-input-text p-inputtext animation-input"
+          [(ngModel)]="searchTerm"
+          [placeholder]="translateSrv.instant('search')"
+  />
+  <i class="fas fa-search animation-input"
+      (click)="handleSearchText()"></i>
+</div>
