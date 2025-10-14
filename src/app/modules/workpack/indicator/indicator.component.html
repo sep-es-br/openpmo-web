@@ -23,7 +23,15 @@
               <!-- Nome -->
               <div class="p-field mobile" style="width: 30%;">
                 <span class="p-float-label">
-                  <input id="float-name" formControlName="name" type="text" class="app-input-text" pInputText  [ngClass]="{'disabled-field': permission !== 'EDIT'}" />
+                  <input
+                    class="app-input-text"
+                    id="float-name"
+                    type="text"
+                    formControlName="name"
+                    pInputText
+                    [ngClass]="{'disabled-field': permission !== 'EDIT'}"
+                    [disabled]="permission !== 'EDIT'"
+                  />
                   <label class="indicators-label" for="float-name">{{ "name" | translate }} *
                     <i class="far fa-question-circle" [pTooltip]="'indicator.name' | translate"></i>
                   </label>
@@ -34,9 +42,17 @@
               <!-- Descrição -->
               <div class="p-field">
                 <span class="p-float-label">
-                  <textarea pInputTextarea formControlName="description" class="app-text-area" [rows]="2"
+                  <textarea
+                    class="app-text-area"
                     id="float-description"
-                    [ngModel]="(mirrorDescription()) ? formIndicator.value.name : formIndicator.value.description"  [ngClass]="{'disabled-field': permission !== 'EDIT'}"></textarea>
+                    formControlName="description"
+                    pInputTextarea
+                    [rows]="2"
+                    [ngModel]="(mirrorDescription()) ? formIndicator.value.name : formIndicator.value.description"
+                    [ngClass]="{'disabled-field': permission !== 'EDIT'}"
+                    [disabled]="permission !== 'EDIT'"
+                  >
+                  </textarea>
                   <label class="indicators-label" for="float-description">{{ "description" | translate }} *
                     <i class="far fa-question-circle" [pTooltip]="'indicator.description' | translate"></i>
                   </label>
@@ -47,9 +63,22 @@
               <!-- Fonte -->
               <div class="p-field mobile" style="width: 20%;">
                 <span class="p-float-label">
-                  <p-dropdown [filter]="true" filterBy="name" [showClear]="false" class="app-single-selection" [options]="sourceOptions" formControlName="source"
-                    optionLabel="name" optionValue="name" dropdownIcon="fas fa-caret-down" [autoDisplayFirst]="false"
-                    (onChange)="onSourceChange($event)"  [ngClass]="{'disabled-field': permission !== 'EDIT'}"></p-dropdown>
+                  <p-dropdown
+                    class="app-single-selection"
+                    formControlName="source"
+                    filterBy="name"
+                    optionLabel="name"
+                    optionValue="name"
+                    dropdownIcon="fas fa-caret-down"
+                    [ngClass]="{'disabled-field': permission !== 'EDIT'}"
+                    [disabled]="permission !== 'EDIT'"
+                    [filter]="true"
+                    [showClear]="false"
+                    [options]="sourceOptions"
+                    [autoDisplayFirst]="false"
+                    (onChange)="onSourceChange($event)"
+                  >
+                  </p-dropdown>
                   <label class="indicators-label">{{ "source" | translate }}</label>
                 </span>
                 <app-input-message [form]="formIndicator" field="source"></app-input-message>
@@ -58,9 +87,22 @@
               <!-- Medida -->
               <div class="p-field mobile" style="width: 20%;">
                 <span class="p-float-label">
-                  <p-dropdown [filter]="true" filterBy="name" [showClear]="false" class="app-single-selection" [options]="unitMeasureOptions" formControlName="measure"
-                    (onChange)="onMeasureChange($event)" optionLabel="name" optionValue="name"
-                    dropdownIcon="fas fa-caret-down" [autoDisplayFirst]="false" [ngClass]="{'disabled-field': permission !== 'EDIT'}"></p-dropdown>
+                  <p-dropdown
+                    class="app-single-selection"
+                    formControlName="measure"
+                    filterBy="name"
+                    optionLabel="name"
+                    optionValue="name"
+                    dropdownIcon="fas fa-caret-down"
+                    [ngClass]="{'disabled-field': permission !== 'EDIT'}"
+                    [disabled]="permission !== 'EDIT'"
+                    [filter]="true"
+                    [showClear]="false"
+                    [options]="unitMeasureOptions"
+                    [autoDisplayFirst]="false"
+                    (onChange)="onMeasureChange($event)"
+                  >
+                  </p-dropdown>
                   <label class="indicators-label">{{ "measure" | translate }}</label>
                 </span>
                 <app-input-message [form]="formIndicator" field="measure"></app-input-message>
@@ -68,9 +110,20 @@
 
               <div class="p-field mobile" style="width: 20%;">
                 <span class="p-float-label">
-                  <p-calendar id="float-start" class="app-select-date" [showIcon]="true" [monthNavigator]="true"
-                    [yearNavigator]="true" [yearRange]="yearRangeCalculated" formControlName="startDate"
-                    icon="fas fa-calendar-alt" dateFormat="dd/mm/yy" (onSelect)="onDateChange()" [ngClass]="{'disabled-field': permission !== 'EDIT'}">
+                  <p-calendar
+                    class="app-select-date"
+                    id="float-start"
+                    icon="fas fa-calendar-alt"
+                    formControlName="startDate"
+                    dateFormat="dd/mm/yy"
+                    [ngClass]="{'disabled-field': permission !== 'EDIT'}"
+                    [disabled]="permission !== 'EDIT'"
+                    [showIcon]="true"
+                    [monthNavigator]="true"
+                    [yearNavigator]="true"
+                    [yearRange]="yearRangeCalculated"
+                    (onSelect)="onDateChange()"
+                  >
                   </p-calendar>
                   <label class="indicators-label" for="float-start">{{ "startDate" | translate }}</label>
                 </span>
@@ -78,9 +131,20 @@
               
               <div class="p-field mobile" style="width: 20%;">
                 <span class="p-float-label">
-                  <p-calendar id="float-start" class="app-select-date" [showIcon]="true" [monthNavigator]="true"
-                    [yearNavigator]="true" [yearRange]="yearRangeCalculated" formControlName="endDate"
-                    icon="fas fa-calendar-alt" dateFormat="dd/mm/yy" (onSelect)="onDateChange()" [ngClass]="{'disabled-field': permission !== 'EDIT'}">
+                  <p-calendar
+                    class="app-select-date"
+                    id="float-start"
+                    icon="fas fa-calendar-alt"
+                    formControlName="endDate"
+                    dateFormat="dd/mm/yy"
+                    [ngClass]="{'disabled-field': permission !== 'EDIT'}"
+                    [disabled]="permission !== 'EDIT'"
+                    [showIcon]="true"
+                    [monthNavigator]="true"
+                    [yearNavigator]="true"
+                    [yearRange]="yearRangeCalculated"
+                    (onSelect)="onDateChange()"
+                  >
                   </p-calendar>
                   <label class="indicators-label" for="float-start">{{ "endDate" | translate }}</label>
                 </span>
@@ -89,9 +153,19 @@
               <!-- Periodicidade -->
               <div class="p-field mobile" style="width: 20%;">
                 <span class="p-float-label">
-                  <p-dropdown class="app-single-selection" [options]="periodicityOptions" formControlName="periodicity"
-                    (onChange)="onPeriodicityChange($event)" optionLabel="label" optionValue="value"
-                    dropdownIcon="fas fa-caret-down" [autoDisplayFirst]="false" [ngClass]="{'disabled-field': permission !== 'EDIT'}"></p-dropdown>
+                  <p-dropdown
+                    class="app-single-selection"
+                    formControlName="periodicity"
+                    optionLabel="label"
+                    optionValue="value"
+                    dropdownIcon="fas fa-caret-down"
+                    [options]="periodicityOptions"
+                    [autoDisplayFirst]="false"
+                    [ngClass]="{'disabled-field': permission !== 'EDIT'}"
+                    [disabled]="permission !== 'EDIT'"
+                    (onChange)="onPeriodicityChange($event)"
+                  >
+                  </p-dropdown>
                   <label class="indicators-label">{{ "periodicity" | translate }}</label>
                 </span>
                 <app-input-message [form]="formIndicator" field="periodicity"></app-input-message>
@@ -128,6 +202,7 @@
                 pInputText
                 [(ngModel)]="data.expectedGoals"
                 [ngClass]="{ 'disabled-field': permission !== 'EDIT' }"
+                [disabled]="permission !== 'EDIT'"
                 (input)="onExpectedGoalChange(data)"
               >
               <label for="expected-goal" class="indicators-label" >{{ "expectedGoal" | translate }}</label>
@@ -140,6 +215,7 @@
                 pInputText
                 [(ngModel)]="data.achievedGoals"
                 [ngClass]="{ 'disabled-field': (permission !== 'EDIT' && permission !== 'UPDATE') || isCurrentYearBeforeParam(data.period) }"
+                [disabled]="(permission !== 'EDIT' && permission !== 'UPDATE') || isCurrentYearBeforeParam(data.period)"
                 (input)="onAchievedGoalChange(data)"
               >
               <label for="achieved-goal" class="indicators-label achieved-goal-label">{{ "achievedGoal" | translate }}</label>
@@ -149,11 +225,27 @@
           <!-- Medida e Última Atualização -->
           <div class="grid-row">
             <span class="p-float-label half-width">
-              <input [value]="selectedMeasure || data.measure || '--'" [ngClass]="{'disabled-field': true }" id="measure" type="text" pInputText class="app-input-text">
+              <input
+                class="app-input-text"
+                id="measure"
+                type="text"
+                pInputText
+                [value]="selectedMeasure || data.measure || '--'"
+                [ngClass]="{'disabled-field': true }"
+                [disabled]="true"
+              >
               <label for="measure" class="indicators-label">{{ "measure" | translate }}</label>
             </span>
             <span class="p-float-label half-width">
-              <input [value]="data.lastUpdate || '--'" [ngClass]="{'disabled-field': true }" id="update" type="text" pInputText class="app-input-text">
+              <input
+                class="app-input-text"
+                id="update"
+                type="text"
+                pInputText
+                [value]="data.lastUpdate || '--'"
+                [ngClass]="{'disabled-field': true }"
+                [disabled]="true"
+              >
               <label for="update" class="indicators-label update-label">{{ "update" | translate }}</label>
             </span>
           </div>
@@ -161,7 +253,17 @@
           <!-- Justificativa -->
           <div class="grid-row">
             <span class="p-float-label full-width">
-              <textarea [(ngModel)]="data.justification" id="justification" [ngClass]="{'disabled-field': permission !== 'EDIT'}" pInputTextarea class="app-text-area" [rows]="2" (input)="onJustificationChange()"></textarea>
+              <textarea
+                class="app-text-area"
+                id="justification"
+                pInputTextarea
+                [rows]="2"
+                [(ngModel)]="data.justification"
+                [ngClass]="{'disabled-field': permission !== 'EDIT'}"
+                [disabled]="permission !== 'EDIT'"
+                (input)="onJustificationChange()"
+              >
+              </textarea>
               <label for="justification" class="indicators-label">{{ "goalJustification" | translate }}</label>
             </span>
           </div>
