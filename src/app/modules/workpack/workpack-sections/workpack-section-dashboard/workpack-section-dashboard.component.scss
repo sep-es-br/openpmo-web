@@ -310,14 +310,15 @@
     flex-direction: row;
     width: 100%;
     .triple-constraint-container {
-      width: 65%;
+      flex: 1;
     }
     .risk-milestone-charts-container {
       display: flex;
       flex-direction: row;
       align-items: center;
-      justify-content: space-evenly;
+      justify-content: flex-end;
       flex: 1;
+      gap: 0.8rem;
       .dashboard-item {
         display: flex;
         height: 100%;
