@@ -27,7 +27,8 @@ export class NavMenuComponent implements OnInit {
     {label: 'planModel', isOpen: false},
     {label: 'favorite', isOpen: false},
     {label: 'ccbmember-baselines-view', isOpen: false},
-    {label: 'reports', isOpen: false}
+    {label: 'reports', isOpen: false},
+    {label: 'search', isOpen: false}
   ];
   menusAdmin: IMenu[] = [
     {label: 'organizations', isOpen: false},
