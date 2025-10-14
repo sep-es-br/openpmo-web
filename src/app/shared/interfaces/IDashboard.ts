@@ -79,7 +79,6 @@ export interface IDashboardData {
 export interface IDashboardStatusData {
     statusConcluida : number;
     statusEmExec : number;
-    statusCancelada : number;
     statusCancelar : number;
     statusPlanejamento : number;
     statusParalisada : number;
