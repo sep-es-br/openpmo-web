@@ -159,20 +159,22 @@ export class WorkpackSectionDashboardComponent implements OnInit, OnChanges, OnD
     this.isBeingBuild = isBeingBuild;
     if(dashboard?.dashboardStatusData) {
       this.dashboardStatusData = {
-        labels: ["Concluída", "Em Execução", "Em Planejamento", "Paralisada"],
+        labels: ["Concluída", "Em Execução", "Paralisada", "Em Planejamento", "A Cancelar"],
         datasets: [
           {
             data: [
               dashboard.dashboardStatusData.statusConcluida, 
               dashboard.dashboardStatusData.statusEmExec, 
+              dashboard.dashboardStatusData.statusParalisada,
               dashboard.dashboardStatusData.statusPlanejamento, 
-              dashboard.dashboardStatusData.statusParalisada
+              dashboard.dashboardStatusData.statusCancelar
             ],
             backgroundColor: [
               "#118DFF",
               "#55B95E",
+              "#EA9D42",
               "#EC78EA",
-              "#EA9D42"
+              "#CC2C52"
             ]
           }
         ]
