@@ -58,7 +58,7 @@ export class BaselineComponent implements OnInit, OnDestroy {
   formIsLoading = false;
 
   get allTogglerIsDisabled(): boolean {
-    return this.areTherePendentUpdatesListed;
+    return this.areTherePendentUpdatesListed || this.formBaseline.disabled;
   }
 
   get areTherePendentUpdatesListed(): boolean {
@@ -179,7 +179,8 @@ export class BaselineComponent implements OnInit, OnDestroy {
       isLoading: true
     };
     if (this.idBaseline) {
-      const result = await this.baselineSrv.GetById(this.idBaseline);
+      // const result = await this.baselineSrv.GetById(this.idBaseline);
+      const result = await this.baselineSrv.GetByIdWithIdWorkpack(this.idWorkpack, this.idBaseline);
       this.baseline = result.data;
       this.cardBaselineProperties.isLoading = false;
       if (this.baseline) {

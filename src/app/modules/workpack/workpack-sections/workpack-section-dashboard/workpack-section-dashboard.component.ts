@@ -118,7 +118,7 @@ export class WorkpackSectionDashboardComponent implements OnInit, OnChanges, OnD
         this.loadDashboardData();
       }
     });
-
+    
   }
 
   async ngOnChanges(changes: SimpleChanges) {
@@ -159,20 +159,18 @@ export class WorkpackSectionDashboardComponent implements OnInit, OnChanges, OnD
     this.isBeingBuild = isBeingBuild;
     if(dashboard?.dashboardStatusData) {
       this.dashboardStatusData = {
-        labels: ["Concluída", "Em Execução", "Cancelada", "Em Planejamento", "Paralisada"],
+        labels: ["Concluída", "Em Execução", "Em Planejamento", "Paralisada"],
         datasets: [
           {
             data: [
               dashboard.dashboardStatusData.statusConcluida, 
               dashboard.dashboardStatusData.statusEmExec, 
-              dashboard.dashboardStatusData.statusCancelada, 
               dashboard.dashboardStatusData.statusPlanejamento, 
               dashboard.dashboardStatusData.statusParalisada
             ],
             backgroundColor: [
               "#118DFF",
               "#55B95E",
-              "#CC2C52",
               "#EC78EA",
               "#EA9D42"
             ]
