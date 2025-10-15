@@ -30,4 +30,19 @@
       box-shadow: none;
     }
   }
+
+  &.disabled-field {
+    user-select: none !important;
+    -moz-user-select: none !important;
+    pointer-events: none !important;
+    cursor: not-allowed !important;
+    opacity: 0.6;
+    
+    input.p-inputnumber {
+      user-select: none !important;
+      -moz-user-select: none !important;
+      pointer-events: none !important;
+      cursor: not-allowed !important;
+    }
+  }
 }
