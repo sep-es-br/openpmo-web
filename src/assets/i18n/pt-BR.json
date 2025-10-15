@@ -276,6 +276,7 @@
   "expectedGoal": "Meta Prevista",
   "achievedGoal": "Meta Realizada",
   "update": "Atualização",
+  "UPDATE": "Atualização",
   "goalJustification": "Justificativa",
   "status": "Situação",
   "preOccurrency": "Pré ocorrência",

@@ -86,14 +86,14 @@
             </div>
             <div class="container-permission">
               <div class="permission">
-                <span class="label" *ngIf="['EDIT', 'READ'].includes(propertiesPerson?.officePermission?.accessLevel)">
+                <span class="label" *ngIf="['EDIT', 'READ', 'UPDATE'].includes(propertiesPerson?.officePermission?.accessLevel)">
                   {{'officePermission' | translate}}</span>
                 <span class="value"
-                  *ngIf="['EDIT', 'READ'].includes(propertiesPerson?.officePermission?.accessLevel)">{{propertiesPerson?.officePermission?.accessLevel
+                  *ngIf="['EDIT', 'READ', 'UPDATE'].includes(propertiesPerson?.officePermission?.accessLevel)">{{propertiesPerson?.officePermission?.accessLevel
                   | translate}}</span>
               </div>
               <div class="button-change"
-                *ngIf="['EDIT', 'READ'].includes(propertiesPerson?.officePermission?.accessLevel)">
+                *ngIf="['EDIT', 'READ', 'UPDATE'].includes(propertiesPerson?.officePermission?.accessLevel)">
                 <button pButton [label]="'change' | translate"
                   (click)="navigateToPage('offices/permission/detail', this.propertiesPerson.key, this.idOffice)">
                   <i class="fas fa-share"></i>
@@ -107,14 +107,14 @@
                   <div class="container-permission">
                     <div class="permission">
                       <span class="label"
-                        *ngIf="['EDIT', 'READ'].includes(propertiesPerson?.officePermission?.planPermissions[i].accessLevel)">
+                        *ngIf="['EDIT', 'READ', 'UPDATE'].includes(propertiesPerson?.officePermission?.planPermissions[i].accessLevel)">
                         {{'planPermission' | translate}}</span>
                       <span class="value"
-                        *ngIf="['EDIT', 'READ'].includes(propertiesPerson?.officePermission?.planPermissions[i].accessLevel)">
+                        *ngIf="['EDIT', 'READ', 'UPDATE'].includes(propertiesPerson?.officePermission?.planPermissions[i].accessLevel)">
                         {{propertiesPerson?.officePermission?.planPermissions[i].accessLevel |translate}}</span>
                     </div>
                     <div class="button-change"
-                      *ngIf="['EDIT', 'READ'].includes(propertiesPerson?.officePermission?.planPermissions[i].accessLevel)">
+                      *ngIf="['EDIT', 'READ', 'UPDATE'].includes(propertiesPerson?.officePermission?.planPermissions[i].accessLevel)">
                       <button pButton [label]="'change' | translate"
                         (click)="navigateToPage('plan/permission/detail',
                       this.propertiesPerson.key, undefined, propertiesPerson?.officePermission?.planPermissions[i].id)">
