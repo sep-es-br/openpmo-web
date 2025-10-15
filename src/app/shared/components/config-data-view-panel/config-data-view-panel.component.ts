@@ -17,6 +17,7 @@ export class ConfigDataViewPanelComponent implements OnInit, OnDestroy {
 
   @Input() notShowCollapseOptions: boolean = false;
   @Input() notShowpageSizeOptions: boolean = false;
+  @Input() notShowLayoutTypeOptions: boolean = false;
 
   collapsed = true;
   displayMode = 'list';

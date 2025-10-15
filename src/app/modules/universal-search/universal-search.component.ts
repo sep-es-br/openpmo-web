@@ -1,6 +1,8 @@
 import { AfterViewInit, Component, OnInit } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
+import { delay } from 'rxjs/operators';
 import { MenuService } from 'src/app/shared/services/menu.service';
+import { SearchService } from 'src/app/shared/services/search.service';
 
 @Component({
   selector: 'app-universal-search',
@@ -9,24 +11,35 @@ import { MenuService } from 'src/app/shared/services/menu.service';
 })
 export class UniversalSearchComponent implements OnInit, AfterViewInit {
 
-  searchTerm : string;
+  searchTerm;
+  minLength = 3;
+
+  loading$ = this.searchSrv.loading$;
+  result$ = this.searchSrv.result$;
+  
 
   constructor(
-    private menuSrv : MenuService,
-    public translateSrv : TranslateService
+    public translateSrv : TranslateService,
+    private searchSrv : SearchService
   ) {
     
    }
+
+
 
   ngOnInit() {
     
   }
 
   ngAfterViewInit(): void {
+    this.searchSrv.searchTerm$.pipe(delay(500)).subscribe(value => this.searchTerm = value)
   }
 
-  handleSearchText() {
-    alert(this.searchTerm)
+  handleSearchText(term : string) {
+    if(term.trim().length < this.minLength) return;
+
+    this.searchSrv.doUniversalSearch(term);
+
   }
 
 }

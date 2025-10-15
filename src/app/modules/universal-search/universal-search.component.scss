@@ -1,7 +1,17 @@
 :host {
-    .dataview-filters-text {
+
+  header {
+    display: flex;
+    flex-direction: row;
+    .busca-wrapper{
+      display: flex;
+      flex-direction: column;
+      line-height: 1.5rem;
+      flex-grow: 1;
+
+      .dataview-filters-text {
         margin-right: 2em;
-        width: 25%;
+        width: 50%;
         height: 2rem;
         display: flex;
         justify-content: flex-end;
@@ -51,5 +61,20 @@
           }
         }
       }
+
+      .alert-min-length{
+        font-style: italic;
+        font-size: small;
+      }
+    }
+
+    .actions {
+        display: flex;
+        justify-content: flex-end;
+        flex-grow: 1;
+    }
+  }
+
+    
 }
 

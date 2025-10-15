@@ -1,8 +1,25 @@
-<div class="dataview-filters-text">
-  <input pInputText id="id-app-inputtext" class="app-input-text p-inputtext animation-input"
-          [(ngModel)]="searchTerm"
-          [placeholder]="translateSrv.instant('search')"
-  />
-  <i class="fas fa-search animation-input"
-      (click)="handleSearchText()"></i>
-</div>
+<header>
+    <div class="busca-wrapper">
+        <div class="dataview-filters-text">
+            <input pInputText id="id-app-inputtext" class="app-input-text p-inputtext animation-input"
+                ([ngModel])="searchTerm" (ngModelChange)="handleSearchText($event)"
+                [placeholder]="translateSrv.instant('search')"
+            />
+            <i class="fas fa-search animation-input"></i>
+        </div>
+        <span class="alert-min-length">Digite pelo menos 3 caracteres para buscar</span>
+    </div>
+    <div class="actions">
+        <app-config-data-view-panel [notShowCollapseOptions]="true" [notShowLayoutTypeOptions]="true" ></app-config-data-view-panel>
+    </div>
+</header>
+<main>
+    <ng-template #loading>
+        <p>{{ 'loading' | translate }}...</p>
+    </ng-template>
+    <ng-container *ngIf="!(loading$ | async); else loading">
+        
+    </ng-container>
+</main>
+
+
