@@ -1,54 +1,102 @@
 <span class="p-float-label" [class.workpack-input-number-mobile]="responsive"
   [class.workpack-input-number]="property.fullLine" [class.workpack-input-number-not-fullLine]="!property.fullLine">
   <ng-container [ngSwitch]="property.type">
-    <p-inputNumber
-      *ngSwitchCase="type.IntegerModel"
-      class="app-input-number"
-      [ngClass]="{ 'ng-invalid': property.invalid, 'disabled-field': property.disabled }"
-      [id]="property.name"
-      [required]="property.required"
-      [min]="property.min"
-      [max]="property.max"
-      [locale]="language"
-      [(ngModel)]="property.value"
-      (ngModelChange)="changed.emit($event)"
-      (onBlur)="changed.emit($event)"
-    >
-    </p-inputNumber>
-    <p-inputNumber
-      *ngSwitchCase="type.NumberModel"
-      class="app-input-number"
-      [ngClass]="{ 'ng-invalid': property.invalid, 'disabled-field': property.disabled }"
-      [id]="property.name"
-      [required]="property.required"
-      [min]="property.min" 
-      [max]="property.max"
-      [minFractionDigits]="property.precision"
-      [maxFractionDigits]="property.precision"
-      [locale]="language"
-      [(ngModel)]="property.value"
-      (ngModelChange)="changed.emit($event)"
-      (onBlur)="changed.emit($event)"
-    >
-    </p-inputNumber>
-    <p-inputNumber
-      *ngSwitchCase="type.CurrencyModel"
-      class="app-input-number"
-      mode="decimal"
-      [ngClass]="{ 'ng-invalid': property.invalid, 'disabled-field': property.disabled }"
-      [id]="property.name"
-      [required]="property.required"
-      [minFractionDigits]="2"
-      [maxFractionDigits]="2"
-      [locale]="language"
-      [(ngModel)]="property.value"
-      [attr.readonlyInput]="property.disabled"
-      [attr.tabindex]="-1"
-      (ngModelChange)="changed.emit($event)"
-      (onBlur)="changed.emit($event)"
-    >
-    </p-inputNumber>
+    <ng-container *ngSwitchCase="type.IntegerModel">
+      <ng-container *ngIf="!property.disabled else disabledInput">
+        <p-inputNumber
+          class="app-input-number"
+          [ngClass]="{ 'ng-invalid': property.invalid }"
+          [id]="property.name"
+          [required]="property.required"
+          [min]="property.min"
+          [max]="property.max"
+          [locale]="language"
+          [(ngModel)]="property.value"
+          (ngModelChange)="changed.emit($event)"
+          (onBlur)="changed.emit($event)"
+        >
+        </p-inputNumber>
+      </ng-container>
+      <ng-template #disabledInput>
+        <input
+          class="app-input-number custom-input p-inputnumber p-component p-filled disabled-field"
+          type="number"
+          [ngClass]="{ 'ng-invalid': property.invalid }"
+          [disabled]="true"
+          [id]="property.name"
+          [required]="property.required"
+          [min]="property.min" 
+          [max]="property.max"
+          [(ngModel)]="property.value"
+        />
+      </ng-template>
+    </ng-container>
+
+    <ng-container *ngSwitchCase="type.NumberModel">
+      <ng-container *ngIf="!property.disabled else disabledInput">
+        <p-inputNumber
+          class="app-input-number"
+          [ngClass]="{ 'ng-invalid': property.invalid }"
+          [id]="property.name"
+          [required]="property.required"
+          [min]="property.min" 
+          [max]="property.max"
+          [minFractionDigits]="property.precision"
+          [maxFractionDigits]="property.precision"
+          [locale]="language"
+          [(ngModel)]="property.value"
+          (ngModelChange)="changed.emit($event)"
+          (onBlur)="changed.emit($event)"
+        >
+        </p-inputNumber>
+      </ng-container>
+      <ng-template #disabledInput>
+        <input
+          class="app-input-number custom-input p-inputnumber p-component p-filled disabled-field"
+          type="number"
+          [ngClass]="{ 'ng-invalid': property.invalid }"
+          [disabled]="true"
+          [id]="property.name"
+          [required]="property.required"
+          [min]="property.min" 
+          [max]="property.max"
+          [(ngModel)]="property.value"
+        />
+      </ng-template>
+    </ng-container>
+
+    <ng-container *ngSwitchCase="type.CurrencyModel">
+      <ng-container *ngIf="!property.disabled else disabledInput">
+        <p-inputNumber
+          class="app-input-number"
+          mode="decimal"
+          [ngClass]="{ 'ng-invalid': property.invalid }"
+          [id]="property.name"
+          [required]="property.required"
+          [minFractionDigits]="2"
+          [maxFractionDigits]="2"
+          [locale]="language"
+          [(ngModel)]="property.value"
+          (ngModelChange)="changed.emit($event)"
+          (onBlur)="changed.emit($event)"
+        >
+        </p-inputNumber>
+      </ng-container>
+
+      <ng-template #disabledInput>
+        <input
+          class="app-input-number custom-input p-inputnumber p-component p-filled disabled-field"
+          type="number"
+          [ngClass]="{ 'ng-invalid': property.invalid }"
+          [disabled]="true"
+          [id]="property.name"
+          [required]="property.required"
+          [(ngModel)]="property.value"
+        />
+      </ng-template>
+    </ng-container>
   </ng-container>
+
   <label class="app-input-label" [for]="property.name">{{property.label}} {{ property.required ? '*' : ''}}
     <i class="far fa-question-circle" *ngIf="property.helpText && property.helpText.length > 0" [pTooltip]="property.helpText"></i>
   </label>
