@@ -2,7 +2,7 @@
     <div class="busca-wrapper">
         <div class="dataview-filters-text">
             <input pInputText id="id-app-inputtext" class="app-input-text p-inputtext animation-input"
-                ([ngModel])="searchTerm" (ngModelChange)="handleSearchText($event)"
+                [ngModel]="(searchTerm | async)" (ngModelChange)="handleSearchText($event)"
                 [placeholder]="translateSrv.instant('search')"
             />
             <i class="fas fa-search animation-input"></i>
@@ -18,7 +18,10 @@
         <p>{{ 'loading' | translate }}...</p>
     </ng-template>
     <ng-container *ngIf="!(loading$ | async); else loading">
-        
+        <div *ngFor="let item of (result$ | async)">
+            {{item.breadcrumbs}}
+
+        </div>
     </ng-container>
 </main>
 
