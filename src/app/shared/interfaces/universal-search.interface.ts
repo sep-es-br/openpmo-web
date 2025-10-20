@@ -6,11 +6,11 @@ export interface IUniversalSearch {
     name : string;
     fullName : string;
     matchDistance : number;
-    breadcrumbs : IBreadCrumb[] | string;
+    breadcrumbs : IBreadCrumb[] | string[];
 }
 
 export interface IBreadCrumb {
     id : number;
-    nome : number;
-    modelo : number; 
+    nome : string;
+    modelo : string; 
 }

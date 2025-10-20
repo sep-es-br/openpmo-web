@@ -137,6 +137,26 @@ export class NavMenuComponent implements OnInit {
       this.menuSrv.nextCloseAllMenus(true);
       this.showUserMenu = false;
     }
+    if (!url.startsWith('search')) {
+      this.menus.forEach( item => {
+        if (item.label === 'search') {
+          item.isOpen = false;
+        }
+      });
+    } else {
+      this.menus.forEach( item => {
+        if (item.label === 'search') {
+          item.isOpen = true;
+        } else {
+          item.isOpen = false;
+        }
+      });
+      this.menuSrv.nextMenuState({
+        isFixed: false
+      });
+      this.menuSrv.nextCloseAllMenus(true);
+      this.showUserMenu = false;
+    }
     this.menusAdmin.forEach( item => {
       if (url.startsWith(item.label)) {
         item.isOpen = true;

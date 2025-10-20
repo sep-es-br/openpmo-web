@@ -5,6 +5,8 @@ import { UniversalSearchRoutes } from './universal-search.routing';
 import { FormsModule } from '@angular/forms';
 import { ComponentsModule } from 'src/app/shared/components/components.module';
 import { TranslateModule } from '@ngx-translate/core';
+import { DataViewModule } from 'primeng/dataview';
+import { SearchItemCardComponent } from '../../shared/components/search-item-card/search-item-card.component';
 
 @NgModule({
   imports: [
@@ -12,7 +14,8 @@ import { TranslateModule } from '@ngx-translate/core';
     UniversalSearchRoutes,
     FormsModule,
     ComponentsModule,
-    TranslateModule
+    TranslateModule,
+    DataViewModule
   ],
   declarations: [
     UniversalSearchComponent

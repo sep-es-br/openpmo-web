@@ -34,7 +34,7 @@
       [queryParams]="{idPlan: currentPlan?.id}" [pTooltip]="'reports' | translate" [class.opened]="isMenuOpen('reports')">
       <i class="far fa-file-alt" [ngStyle]="{ fontSize: '1.5rem' }"></i>
     </div>
-    <div class="item" *ngIf="!!currentIDPlan && isPlanMenu" [routerLink]="['/search']" routerLinkActive="opened"
+    <div class="item" *ngIf="!!currentIDPlan && isPlanMenu" [routerLink]="['/search']" [class.opened]="isMenuOpen('search')"
       [queryParams]="{idPlan: currentPlan?.id}" [pTooltip]="'search' | translate" >
       <i class="fas fa-search" [ngStyle]="{ fontSize: '1.5rem' }"></i>
     </div>

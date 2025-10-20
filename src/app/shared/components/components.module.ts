@@ -39,6 +39,7 @@ import { ButtonsContainerComponent } from './buttons-container/buttons-container
 import { CancelButtonComponent } from './cancel-button/cancel-button.component';
 import { CardJournalInformationComponent } from './card-journal-information/card-journal-information.component';
 import { CardListComponent } from './card-list/card-list.component';
+import { SearchItemCardComponent } from './search-item-card/search-item-card.component';
 
 @NgModule({
   declarations: [
@@ -78,6 +79,7 @@ import { CardListComponent } from './card-list/card-list.component';
     CancelButtonComponent,
     CardJournalInformationComponent,
     CardListComponent,
+    SearchItemCardComponent
   ],
   imports: [
     CommonModule,
@@ -112,7 +114,8 @@ import { CardListComponent } from './card-list/card-list.component';
     PropertyComponent,
     ButtonsContainerComponent,
     CancelButtonComponent,
-    CardJournalInformationComponent
+    CardJournalInformationComponent,
+    SearchItemCardComponent
   ]
 })
 export class ComponentsModule { }

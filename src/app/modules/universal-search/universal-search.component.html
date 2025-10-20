@@ -2,8 +2,8 @@
     <div class="busca-wrapper">
         <div class="dataview-filters-text">
             <input pInputText id="id-app-inputtext" class="app-input-text p-inputtext animation-input"
-                [ngModel]="(searchTerm | async)" (ngModelChange)="handleSearchText($event)"
-                [placeholder]="translateSrv.instant('search')"
+                [(ngModel)]="searchTerm" (ngModelChange)="onSearchInput($event)"
+                placeholder="{{'search' | translate}}"
             />
             <i class="fas fa-search animation-input"></i>
         </div>
@@ -14,15 +14,18 @@
     </div>
 </header>
 <main>
-    <ng-template #loading>
-        <p>{{ 'loading' | translate }}...</p>
-    </ng-template>
-    <ng-container *ngIf="!(loading$ | async); else loading">
-        <div *ngFor="let item of (result$ | async)">
-            {{item.breadcrumbs}}
-
-        </div>
-    </ng-container>
+    <app-card-loading *ngIf="(loading$ | async) as loading" [isCardLoading]="loading"></app-card-loading>
+            
+    <p-dataView [value]="result" layout="list" class="app-dataview app-dataview-list" [first]="pageData.page * pageData.pageSize"
+        [paginator]="true" [rows]="pageData.pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false"
+        [totalRecords]="result ? totalCount : 1" [lazy]="true" (onLazyLoad)="onLazyLoadPage($event)"
+        [emptyMessage]="'notFoundSearch' | translate" [style.display]="(!(loading$ | async) && result && searchTerm) ? 'block' : 'none'" >
+        <ng-template let-cardItem pTemplate="listItem">
+            <div class="p-col p-col-12">
+                <app-search-item-card [item]="cardItem"></app-search-item-card>
+            </div>
+        </ng-template>
+    </p-dataView>
 </main>
 
 

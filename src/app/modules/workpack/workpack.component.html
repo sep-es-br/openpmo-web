@@ -8,6 +8,24 @@
     <div class="app-content-header" [class.mobile]="responsive">
       <span class="label">{{workpackModel?.modelName}}:</span>
       <span class="text actual-element">{{workpack?.fullName}}</span>
+      <div class="dataview-filters-text" #searchBar *ngIf="!workpackLoading && idWorkpack">
+        <input pInputText class="app-input-text"
+               [class.animation-input]="showAnimationSearch"
+               [(ngModel)]="searchTerm"
+               [placeholder]="'search' | translate"
+        />
+        <i class="fas fa-search"
+           *ngIf="!showAnimationSearch"
+           [class.animation-input]="showAnimationSearch"
+           [class.no-animation]="!showAnimationSearch"
+           (click)="showAnimationSearch = true"></i>
+
+        <i class="fas fa-search"
+           *ngIf="showAnimationSearch"
+           [class.animation-input]="showAnimationSearch"
+           [class.no-animation]="!showAnimationSearch"
+           (click)="handleSearchText()"></i>
+      </div>  
     </div>
     <div class="container-actions">
       <i
@@ -22,225 +40,242 @@
     <span class="label">{{'new' | translate}}</span>
     <span class="text">{{workpackModel?.modelName}}</span>
   </div>
-  <div class="tabview-container" *ngIf="showTabview && !workpackLoading">
-    <app-tabview-scrolled [tabs]="tabs" (selectedTabChange)="changeTab($event)" [idWorkpack]="idWorkpack">
-      <div tabviewBody *ngIf="selectedTab?.key === 'WBS'">
-        <div class="card-WBS">
-          <app-workpack-section-wbs
-            (onHasWBS)="handleOnHasWBS($event)"></app-workpack-section-wbs>
+  <ng-container *ngIf="!isSearching">
+    <div class="tabview-container" *ngIf="showTabview && !workpackLoading">
+        <app-tabview-scrolled [tabs]="tabs" (selectedTabChange)="changeTab($event)" [idWorkpack]="idWorkpack">
+        <div tabviewBody *ngIf="selectedTab?.key === 'WBS'">
+            <div class="card-WBS">
+            <app-workpack-section-wbs
+                (onHasWBS)="handleOnHasWBS($event)"></app-workpack-section-wbs>
+            </div>
         </div>
-      </div>
-      <div tabviewBody *ngIf="selectedTab?.key === 'dashboard'">
-        <div class="card-dashboard">
-          <app-workpack-section-dashboard [idWorkpack]="idWorkpack" [workpackFullName]="workpack?.fullName"
+        <div tabviewBody *ngIf="selectedTab?.key === 'dashboard'">
+            <div class="card-dashboard">
+            <app-workpack-section-dashboard [idWorkpack]="idWorkpack" [workpackFullName]="workpack?.fullName"
+                [dashboardShowStakeholders]="workpackModel?.dashboardShowStakeholders"
+                [dashboardShowRisks]="workpackModel?.dashboardShowRisks"
+                [dashboardShowEva]="workpackModel?.dashboardShowEva"
+                [dashboardShowDeliveryStatus]="workpackModel?.dashboardShowDeliveryStatus" [workpackType]="workpack?.type"
+                [collapsePanelsStatus]="collapsePanelsStatus"
+                [dashboardShowMilestones]="workpackModel?.dashboardShowMilestones"></app-workpack-section-dashboard>
+            </div>
+        </div>
+        <div tabviewBody *ngIf="selectedTab?.key === 'properties'">
+            <div class="card-properties-workpack">
+            <div class="loading-form-container" *ngIf="formIsSaving">
+                <app-card-loading [isCardLoading]="formIsSaving"></app-card-loading>
+            </div>
+            <app-workpack-section-properties (onGetProperties)="saveWorkpack($event)"></app-workpack-section-properties>
+            </div>
+        </div>
+        <div tabviewBody *ngIf="selectedTab?.key === 'schedule'">
+            <div class="card-schedule">
+            <app-workpack-section-schedule></app-workpack-section-schedule>
+            </div>
+        </div>
+        <div tabviewBody>
+            <div class="card-workpack-model" *ngFor="let workpackModel of cardsWorkPackModelChildren; let i = index">
+            <app-card [properties]="workpackModel.cardSection" [class.panel-tab-view]="showTabview"
+                (editFilter)="handleEditFilterWorkpackModel($event, workpackModel.idWorkpackModel)"
+                (newFilter)="handleNewFilterWorkpackModel(workpackModel.idWorkpackModel)"
+                (selectedFilter)="handleSelectedFilterWorkpackModel($event, workpackModel.idWorkpackModel)"
+                (searchText)="handleSearchTextWorkpackModel($event, workpackModel.idWorkpackModel)"
+                (createNewElement)="handleCreateNewWorkpack(workpackModel.idWorkpackModel)"
+                [loading]="workpackModel.cardSection.isLoading"
+                *ngIf="(selectedTab?.key === workpackModel.cardSection.tabTitle)">
+
+                <div class="input-toggle-workpack-cancelled">
+                <p-inputSwitch class="app-toggle" [(ngModel)]="workpackModel.workpackShowCancelleds"
+                    (onChange)="handleWorkpackCancelledToggle(i, $event)"></p-inputSwitch>
+                <label class="input-label">{{"showCanceled" | translate}}</label>
+                </div>
+                <div class="workpacks-list-container">
+                <div class="loading-container" *ngIf="workpackModel.cardSection.isLoading">
+                    <app-card-loading [isCardLoading]="true"></app-card-loading>
+                </div>
+                <div class="loading-form-container" *ngIf="workpackChildChanging">
+                    <app-card-loading [isCardLoading]="workpackChildChanging"></app-card-loading>
+                </div>
+                <p-dataView [value]="workpackModel.cardItemsSection" layout="grid" styleClass="dataview-card-items"
+                    *ngIf="(displayModeAll === 'grid' || (displayModeAll === 'list' && !!responsive)) && !workpackModel?.cardSection?.isLoading"
+                    [paginator]="true" [rows]="pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false"
+                    [totalRecords]="totalRecordsWorkpacks ? totalRecordsWorkpacks[i] : 1"
+                    [emptyMessage]="'notFoundWorkpacksToThisModel' | translate">
+                    <ng-template let-cardItem pTemplate="gridItem">
+                    <div class="p-col-12 p-md-3 p-sm-12 card-item-container">
+                        <app-workpack-card-item [properties]="cardItem"></app-workpack-card-item>
+                    </div>
+                    </ng-template>
+                </p-dataView>
+                <p-dataView [value]="workpackModel.cardItemsSection" layout="list" class="app-dataview app-dataview-list"
+                    styleClass="dataview-card-items"
+                    *ngIf="(displayModeAll === 'list' && !responsive)  && !workpackModel?.cardSection?.isLoading"
+                    [paginator]="true" [rows]="pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false"
+                    [totalRecords]="totalRecordsWorkpacks ? totalRecordsWorkpacks[i] : 1"
+                    [emptyMessage]="'notFoundWorkpacksToThisModel' | translate">
+                    <ng-template let-cardItem pTemplate="listItem">
+                    <div class="p-col-12">
+                        <app-workpack-card-item [properties]="cardItem" [displayModeCard]="displayModeAll">
+                        </app-workpack-card-item>
+                    </div>
+                    </ng-template>
+                </p-dataView>
+                </div>
+                <div>
+                </div>
+            </app-card>
+            </div>
+        </div>
+        <div tabviewBody *ngIf="selectedTab?.key === 'stakeholdersAndPermissions'">
+            <div class="card-stakeholders">
+            <app-workpack-section-stakeholders></app-workpack-section-stakeholders>
+            </div>
+        </div>
+        <div tabviewBody *ngIf="selectedTab?.key === 'costAccounts'">
+            <div class="card-cost-accounts">
+            <app-workpack-section-cost-accounts></app-workpack-section-cost-accounts>
+            </div>
+        </div>
+        <!--INDICADORES-->
+        <div tabviewBody *ngIf="selectedTab?.key === 'indicators'">
+            <div class="card-indicators">
+            <app-workpack-section-indicators></app-workpack-section-indicators>
+            </div>
+        </div>
+        <div tabviewBody *ngIf="selectedTab?.key === 'baselines'">
+            <div class="card-baselines">
+            <app-workpack-section-baselines></app-workpack-section-baselines>
+            </div>
+        </div>
+        <div tabviewBody *ngIf="selectedTab?.key === 'risks'">
+            <div class="card-risks">
+            <app-workpack-section-risks></app-workpack-section-risks>
+            </div>
+        </div>
+        <div tabviewBody *ngIf="selectedTab?.key === 'issues'">
+            <div class="card-issues">
+            <app-workpack-section-issues></app-workpack-section-issues>
+            </div>
+        </div>
+        <div tabviewBody *ngIf="selectedTab?.key === 'processes'">
+            <div class="card-processes">
+            <app-workpack-section-processes></app-workpack-section-processes>
+            </div>
+        </div>
+        <div tabviewBody *ngIf="selectedTab?.key === 'journal'">
+            <div class="card-journal">
+            <app-workpack-section-journal></app-workpack-section-journal >
+            </div>
+        </div>
+        </app-tabview-scrolled>
+    </div>
+
+    <div class="panels-container" *ngIf="!showTabview  && !workpackLoading">
+        <div class="card-dashboard"
+        *ngIf="!!idWorkpack && !!workpack && !workpack.canceled && !!workpackModel && !!workpackModel.dashboardSessionActive">
+        <app-workpack-section-dashboard [idWorkpack]="idWorkpack" [workpackFullName]="workpack?.fullName"
             [dashboardShowStakeholders]="workpackModel?.dashboardShowStakeholders"
-            [dashboardShowRisks]="workpackModel?.dashboardShowRisks"
-            [dashboardShowEva]="workpackModel?.dashboardShowEva"
-            [dashboardShowDeliveryStatus]="workpackModel?.dashboardShowDeliveryStatus" [workpackType]="workpack?.type"
-            [collapsePanelsStatus]="collapsePanelsStatus"
-            [dashboardShowMilestones]="workpackModel?.dashboardShowMilestones"></app-workpack-section-dashboard>
+            [dashboardShowRisks]="workpackModel?.dashboardShowRisks" [dashboardShowEva]="workpackModel?.dashboardShowEva"
+                [dashboardShowDeliveryStatus]="workpackModel?.dashboardShowDeliveryStatus" [workpackType]="workpack?.type" 
+                [collapsePanelsStatus]="collapsePanelsStatus" [dashboardShowMilestones]="workpackModel?.dashboardShowMilestones"
+                ></app-workpack-section-dashboard>
         </div>
-      </div>
-      <div tabviewBody *ngIf="selectedTab?.key === 'properties'">
         <div class="card-properties-workpack">
-          <div class="loading-form-container" *ngIf="formIsSaving">
+        <div class="loading-form-container" *ngIf="formIsSaving">
             <app-card-loading [isCardLoading]="formIsSaving"></app-card-loading>
-          </div>
-          <app-workpack-section-properties (onGetProperties)="saveWorkpack($event)"></app-workpack-section-properties>
         </div>
-      </div>
-      <div tabviewBody *ngIf="selectedTab?.key === 'schedule'">
+        <app-workpack-section-properties (onGetProperties)="saveWorkpack($event)"></app-workpack-section-properties>
+        </div>
         <div class="card-schedule">
-          <app-workpack-section-schedule></app-workpack-section-schedule>
+        <app-workpack-section-schedule></app-workpack-section-schedule>
         </div>
-      </div>
-      <div tabviewBody>
+        <section *ngIf="sectionWorkpackModelChildren" class="workpackModels-cards-section">
         <div class="card-workpack-model" *ngFor="let workpackModel of cardsWorkPackModelChildren; let i = index">
-          <app-card [properties]="workpackModel.cardSection" [class.panel-tab-view]="showTabview"
+            <app-card [properties]="workpackModel.cardSection"
             (editFilter)="handleEditFilterWorkpackModel($event, workpackModel.idWorkpackModel)"
             (newFilter)="handleNewFilterWorkpackModel(workpackModel.idWorkpackModel)"
             (selectedFilter)="handleSelectedFilterWorkpackModel($event, workpackModel.idWorkpackModel)"
             (searchText)="handleSearchTextWorkpackModel($event, workpackModel.idWorkpackModel)"
-            (createNewElement)="handleCreateNewWorkpack(workpackModel.idWorkpackModel)"
-            [loading]="workpackModel.cardSection.isLoading"
-            *ngIf="(selectedTab?.key === workpackModel.cardSection.tabTitle)">
-
+            (createNewElement)="handleCreateNewWorkpack(workpackModel.idWorkpackModel)">
             <div class="input-toggle-workpack-cancelled">
-              <p-inputSwitch class="app-toggle" [(ngModel)]="workpackModel.workpackShowCancelleds"
+                <p-inputSwitch class="app-toggle" [(ngModel)]="workpackModel.workpackShowCancelleds"
                 (onChange)="handleWorkpackCancelledToggle(i, $event)"></p-inputSwitch>
-              <label class="input-label">{{"showCanceled" | translate}}</label>
+                <label class="input-label">{{"showCanceled" | translate}}</label>
             </div>
             <div class="workpacks-list-container">
-              <div class="loading-container" *ngIf="workpackModel.cardSection.isLoading">
-                <app-card-loading [isCardLoading]="true"></app-card-loading>
-              </div>
-              <div class="loading-form-container" *ngIf="workpackChildChanging">
-                <app-card-loading [isCardLoading]="workpackChildChanging"></app-card-loading>
-              </div>
-              <p-dataView [value]="workpackModel.cardItemsSection" layout="grid" styleClass="dataview-card-items"
-                *ngIf="(displayModeAll === 'grid' || (displayModeAll === 'list' && !!responsive)) && !workpackModel?.cardSection?.isLoading"
+                <div class="loading-container" *ngIf="workpackModel.cardSection.isLoading">
+                <app-card-loading [isCardLoading]="workpackModel.cardSection.isLoading"></app-card-loading>
+                </div>
+                <p-dataView [value]="workpackModel.cardItemsSection" layout="grid" styleClass="dataview-card-items"
+                *ngIf="(displayModeAll === 'grid' || (displayModeAll === 'list' && !!responsive)) && !workpackModel.cardSection.isLoading"
                 [paginator]="true" [rows]="pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false"
                 [totalRecords]="totalRecordsWorkpacks ? totalRecordsWorkpacks[i] : 1"
                 [emptyMessage]="'notFoundWorkpacksToThisModel' | translate">
                 <ng-template let-cardItem pTemplate="gridItem">
-                  <div class="p-col-12 p-md-3 p-sm-12 card-item-container">
+                    <div class="p-col-12 p-md-3 p-sm-12 card-item-container">
                     <app-workpack-card-item [properties]="cardItem"></app-workpack-card-item>
-                  </div>
+                    </div>
                 </ng-template>
-              </p-dataView>
-              <p-dataView [value]="workpackModel.cardItemsSection" layout="list" class="app-dataview app-dataview-list"
+                </p-dataView>
+                <p-dataView [value]="workpackModel.cardItemsSection" layout="list" class="app-dataview app-dataview-list"
                 styleClass="dataview-card-items"
-                *ngIf="(displayModeAll === 'list' && !responsive)  && !workpackModel?.cardSection?.isLoading"
+                *ngIf="(displayModeAll === 'list' && !responsive) && !workpackModel.cardSection.isLoading"
                 [paginator]="true" [rows]="pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false"
                 [totalRecords]="totalRecordsWorkpacks ? totalRecordsWorkpacks[i] : 1"
                 [emptyMessage]="'notFoundWorkpacksToThisModel' | translate">
                 <ng-template let-cardItem pTemplate="listItem">
-                  <div class="p-col-12">
+                    <div class="p-col-12">
                     <app-workpack-card-item [properties]="cardItem" [displayModeCard]="displayModeAll">
                     </app-workpack-card-item>
-                  </div>
+                    </div>
                 </ng-template>
-              </p-dataView>
+                </p-dataView>
             </div>
             <div>
             </div>
-          </app-card>
+            </app-card>
         </div>
-      </div>
-      <div tabviewBody *ngIf="selectedTab?.key === 'stakeholdersAndPermissions'">
+        </section>
         <div class="card-stakeholders">
-          <app-workpack-section-stakeholders></app-workpack-section-stakeholders>
+        <app-workpack-section-stakeholders></app-workpack-section-stakeholders>
         </div>
-      </div>
-      <div tabviewBody *ngIf="selectedTab?.key === 'costAccounts'">
         <div class="card-cost-accounts">
-          <app-workpack-section-cost-accounts></app-workpack-section-cost-accounts>
+        <app-workpack-section-cost-accounts></app-workpack-section-cost-accounts>
         </div>
-      </div>
-      <!--INDICADORES-->
-      <div tabviewBody *ngIf="selectedTab?.key === 'indicators'">
         <div class="card-indicators">
-          <app-workpack-section-indicators></app-workpack-section-indicators>
+        <app-workpack-section-indicators></app-workpack-section-indicators>
         </div>
-      </div>
-      <div tabviewBody *ngIf="selectedTab?.key === 'baselines'">
         <div class="card-baselines">
-          <app-workpack-section-baselines></app-workpack-section-baselines>
+        <app-workpack-section-baselines></app-workpack-section-baselines>
         </div>
-      </div>
-      <div tabviewBody *ngIf="selectedTab?.key === 'risks'">
         <div class="card-risks">
-          <app-workpack-section-risks></app-workpack-section-risks>
+        <app-workpack-section-risks></app-workpack-section-risks>
         </div>
-      </div>
-      <div tabviewBody *ngIf="selectedTab?.key === 'issues'">
         <div class="card-issues">
-          <app-workpack-section-issues></app-workpack-section-issues>
+        <app-workpack-section-issues></app-workpack-section-issues>
         </div>
-      </div>
-      <div tabviewBody *ngIf="selectedTab?.key === 'processes'">
         <div class="card-processes">
-          <app-workpack-section-processes></app-workpack-section-processes>
+        <app-workpack-section-processes></app-workpack-section-processes>
         </div>
-      </div>
-      <div tabviewBody *ngIf="selectedTab?.key === 'journal'">
-        <div class="card-journal">
-          <app-workpack-section-journal></app-workpack-section-journal >
+        <div class="card-journal" *ngIf="workpackModel && workpackModel.journalManagementSessionActive">
+        <app-workpack-section-journal ></app-workpack-section-journal >
         </div>
-      </div>
-    </app-tabview-scrolled>
-  </div>
-
-  <div class="panels-container" *ngIf="!showTabview  && !workpackLoading">
-    <div class="card-dashboard"
-      *ngIf="!!idWorkpack && !!workpack && !workpack.canceled && !!workpackModel && !!workpackModel.dashboardSessionActive">
-      <app-workpack-section-dashboard [idWorkpack]="idWorkpack" [workpackFullName]="workpack?.fullName"
-        [dashboardShowStakeholders]="workpackModel?.dashboardShowStakeholders"
-        [dashboardShowRisks]="workpackModel?.dashboardShowRisks" [dashboardShowEva]="workpackModel?.dashboardShowEva"
-            [dashboardShowDeliveryStatus]="workpackModel?.dashboardShowDeliveryStatus" [workpackType]="workpack?.type" 
-            [collapsePanelsStatus]="collapsePanelsStatus" [dashboardShowMilestones]="workpackModel?.dashboardShowMilestones"
-            ></app-workpack-section-dashboard>
     </div>
-    <div class="card-properties-workpack">
-      <div class="loading-form-container" *ngIf="formIsSaving">
-        <app-card-loading [isCardLoading]="formIsSaving"></app-card-loading>
-      </div>
-      <app-workpack-section-properties (onGetProperties)="saveWorkpack($event)"></app-workpack-section-properties>
-    </div>
-    <div class="card-schedule">
-      <app-workpack-section-schedule></app-workpack-section-schedule>
-    </div>
-    <section *ngIf="sectionWorkpackModelChildren" class="workpackModels-cards-section">
-      <div class="card-workpack-model" *ngFor="let workpackModel of cardsWorkPackModelChildren; let i = index">
-        <app-card [properties]="workpackModel.cardSection"
-          (editFilter)="handleEditFilterWorkpackModel($event, workpackModel.idWorkpackModel)"
-          (newFilter)="handleNewFilterWorkpackModel(workpackModel.idWorkpackModel)"
-          (selectedFilter)="handleSelectedFilterWorkpackModel($event, workpackModel.idWorkpackModel)"
-          (searchText)="handleSearchTextWorkpackModel($event, workpackModel.idWorkpackModel)"
-          (createNewElement)="handleCreateNewWorkpack(workpackModel.idWorkpackModel)">
-          <div class="input-toggle-workpack-cancelled">
-            <p-inputSwitch class="app-toggle" [(ngModel)]="workpackModel.workpackShowCancelleds"
-              (onChange)="handleWorkpackCancelledToggle(i, $event)"></p-inputSwitch>
-            <label class="input-label">{{"showCanceled" | translate}}</label>
-          </div>
-          <div class="workpacks-list-container">
-            <div class="loading-container" *ngIf="workpackModel.cardSection.isLoading">
-              <app-card-loading [isCardLoading]="workpackModel.cardSection.isLoading"></app-card-loading>
+  </ng-container>
+  <div class="searchContainer" [style.display]="(isSearching && !workpackLoading) ? 'flex' : 'none'">
+    <i class="fas fa-times fa-lg" [pTooltip]="'back' | translate" role="button" [attr.aria-label]="'back' | translate"
+        (click)="handleCloseSearching()" ></i>
+          
+    <p-dataView [value]="result" layout="list" class="app-dataview app-dataview-list" [first]="page"
+        [paginator]="true" [rows]="pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false"
+        [totalRecords]="totalCountResults ? totalCountResults : 1" [lazy]="true" (onLazyLoad)="handlePageChange($event)"
+        [emptyMessage]="'notFoundSearch' | translate" >
+        <ng-template let-cardItem pTemplate="listItem">
+            <div class="p-col p-col-12">
+                <app-search-item-card [item]="cardItem"></app-search-item-card>
             </div>
-            <p-dataView [value]="workpackModel.cardItemsSection" layout="grid" styleClass="dataview-card-items"
-              *ngIf="(displayModeAll === 'grid' || (displayModeAll === 'list' && !!responsive)) && !workpackModel.cardSection.isLoading"
-              [paginator]="true" [rows]="pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false"
-              [totalRecords]="totalRecordsWorkpacks ? totalRecordsWorkpacks[i] : 1"
-              [emptyMessage]="'notFoundWorkpacksToThisModel' | translate">
-              <ng-template let-cardItem pTemplate="gridItem">
-                <div class="p-col-12 p-md-3 p-sm-12 card-item-container">
-                  <app-workpack-card-item [properties]="cardItem"></app-workpack-card-item>
-                </div>
-              </ng-template>
-            </p-dataView>
-            <p-dataView [value]="workpackModel.cardItemsSection" layout="list" class="app-dataview app-dataview-list"
-              styleClass="dataview-card-items"
-              *ngIf="(displayModeAll === 'list' && !responsive) && !workpackModel.cardSection.isLoading"
-              [paginator]="true" [rows]="pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false"
-              [totalRecords]="totalRecordsWorkpacks ? totalRecordsWorkpacks[i] : 1"
-              [emptyMessage]="'notFoundWorkpacksToThisModel' | translate">
-              <ng-template let-cardItem pTemplate="listItem">
-                <div class="p-col-12">
-                  <app-workpack-card-item [properties]="cardItem" [displayModeCard]="displayModeAll">
-                  </app-workpack-card-item>
-                </div>
-              </ng-template>
-            </p-dataView>
-          </div>
-          <div>
-          </div>
-        </app-card>
-      </div>
-    </section>
-    <div class="card-stakeholders">
-      <app-workpack-section-stakeholders></app-workpack-section-stakeholders>
-    </div>
-    <div class="card-cost-accounts">
-      <app-workpack-section-cost-accounts></app-workpack-section-cost-accounts>
-    </div>
-    <div class="card-indicators">
-      <app-workpack-section-indicators></app-workpack-section-indicators>
-    </div>
-    <div class="card-baselines">
-      <app-workpack-section-baselines></app-workpack-section-baselines>
-    </div>
-    <div class="card-risks">
-      <app-workpack-section-risks></app-workpack-section-risks>
-    </div>
-    <div class="card-issues">
-      <app-workpack-section-issues></app-workpack-section-issues>
-    </div>
-    <div class="card-processes">
-      <app-workpack-section-processes></app-workpack-section-processes>
-    </div>
-    <div class="card-journal" *ngIf="workpackModel && workpackModel.journalManagementSessionActive">
-      <app-workpack-section-journal ></app-workpack-section-journal >
-    </div>
+        </ng-template>
+    </p-dataView>
   </div>
 
   <div class="id-container" *ngIf="showWorkpackId()">

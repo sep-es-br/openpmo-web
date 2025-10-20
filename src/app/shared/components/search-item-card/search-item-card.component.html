@@ -1,0 +1,18 @@
+<div class="icon-wrapper">
+    <i class="icon grey-icon" [ngClass]="item.icon"></i>
+</div>
+<div class="itemInfo">
+    <h2>{{item.name}}</h2>
+    <p>{{item.fullName}}</p>
+    <span class="breadcrumb">
+        <ng-container *ngFor="let bc of item.breadcrumbs; index as i">
+           <span class="breadcrumb-item">
+                <i class="fas fa-angle-right" *ngIf="i > 0"></i>
+                <span class="breadcrumb-label" [class.min-width]="bc.nome.length > 10">{{ bc.nome }}</span>
+            </span>
+        </ng-container>
+    </span>
+</div>
+<div>
+    
+</div>
