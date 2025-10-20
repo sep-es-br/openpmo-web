@@ -2,7 +2,6 @@ import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { TreeNode } from 'primeng/api';
-
 import { ICard } from 'src/app/shared/interfaces/ICard';
 import { ResponsiveService } from 'src/app/shared/services/responsive.service';
 import { WorkpackService } from 'src/app/shared/services/workpack.service';
@@ -28,77 +27,110 @@ import { IOrganization } from 'src/app/shared/interfaces/IOrganization';
 import { CancelButtonComponent } from 'src/app/shared/components/cancel-button/cancel-button.component';
 import { IBudgetPlan } from 'src/app/shared/interfaces/IBudgetPlan';
 import { IBudgetUnit } from 'src/app/shared/interfaces/IBudgetUnit';
-import { IInstrument, PentahoService } from 'src/app/shared/services/pentaho.service';
-import { resolve } from 'dns';
-import { delay, switchMap } from 'rxjs/operators';
-import { combineLatest } from 'rxjs';
+import {
+  IInstrument,
+  PentahoService,
+} from 'src/app/shared/services/pentaho.service';
 import { Dropdown } from 'primeng/dropdown';
 import { InputNumber } from 'primeng/inputnumber';
-import { NgModel } from '@angular/forms';
 
 @Component({
   selector: 'app-cost-account',
   templateUrl: './cost-account.component.html',
-  styleUrls: ['./cost-account.component.scss']
+  styleUrls: ['./cost-account.component.scss'],
 })
 export class CostAccountComponent implements OnInit {
-
   @ViewChild(SaveButtonComponent) saveButton: SaveButtonComponent;
+
   @ViewChild(CancelButtonComponent) cancelButton: CancelButtonComponent;
-  @ViewChild('uoSelect', {static: true}) uoSelect : Dropdown;
-  @ViewChild('startYearField', {static: true}) startYearField : InputNumber;
-  @ViewChild('endYearField', {static: true}) endYearField : InputNumber;
+
+  @ViewChild('uoSelect', { static: true }) uoSelect: Dropdown;
+
+  @ViewChild('startYearField', { static: true }) startYearField: InputNumber;
+
+  @ViewChild('endYearField', { static: true }) endYearField: InputNumber;
 
   responsive: boolean;
+
   idWorkpack: number;
+
   idWorkpackModelLinked: number;
+
   idPlan: number;
+
   costAccountModel: ICostAccountModel;
+
   workpack: IWorkpack;
+
   idCostAccount: number;
+
   costAccount: ICostAccount;
+
   costAccountName: string;
+
   cardCostAccountProperties: ICard;
+
   instrumentProperty: ICard;
+
   sectionCostAccountProperties: PropertyTemplateModel[];
+
   costAccountProperties: IWorkpackProperty[];
+
   typePropertyModel = TypePropertyModelEnum;
+
   idOffice: number;
+
   editPermission = false;
+
   oldName: string = null;
+
   costAccountLimit: number;
+
   idPlanModel: number;
+
   organizations: IOrganization[] = [];
+
   formIsSaving = false;
+
   backupProperties;
+
   today = new Date();
-  language : string;
+
+  language: string;
 
   uoOptions: IBudgetUnit[] = [];
+
   planoOrcamentarioOptions: IBudgetPlan[] = [
     {
       code: null,
       name: null,
       fullName: null,
-      displayText: '- Nenhum -'
-    }
+      displayText: '- Nenhum -',
+    },
   ];
 
   selectedUo: IBudgetUnit;
-  selectedPlano: IBudgetPlan; 
+
+  selectedPlano: IBudgetPlan;
 
   selectedStartYear: number = this.today.getFullYear();
+
   selectedEndYear: number = this.today.getFullYear();
 
-  selectedInstruments : IInstrument[] = [];
+  selectedInstruments: IInstrument[] = [];
 
-  instrumentsList : IInstrument[];
+  instrumentsList: IInstrument[];
 
+  poDisabled = true;
+
+  backupSelectedUo: any;
+
+  backupSelectedPlano: any;
 
   newInstrumentFunc = () => {
     this.selectedInstruments.push({} as IInstrument);
-    
-    if(this.instrumentsChanged()) {
+
+    if (this.instrumentsChanged()) {
       this.saveButton.showButton();
       this.cancelButton.showButton();
     } else {
@@ -108,28 +140,27 @@ export class CostAccountComponent implements OnInit {
   };
 
   removerInstrumentFunc = (item: IInstrument) => {
-    
-    if(this.selectedInstruments) {
+    if (this.selectedInstruments) {
       const index = this.selectedInstruments.indexOf(item);
       if (index !== -1) {
         this.selectedInstruments.splice(index, 1); // remove o item na posição `index`
       }
     }
-    
-    if(this.instrumentsChanged()) {
+
+    if (this.instrumentsChanged()) {
       this.saveButton.showButton();
       this.cancelButton.showButton();
     } else {
       this.saveButton.hideButton();
       this.cancelButton.hideButton();
     }
-
   };
 
-  poDisabled = true;
+  trackByInstrument = (i: number, item: IInstrument) => item.sigefesCode;
 
-  backupSelectedUo: any;
-  backupSelectedPlano: any;
+  get instrumentsOptions() {
+    return this.instrumentsList.map((v) => v.sigefesCode);
+  }
 
   constructor(
     private actRouter: ActivatedRoute,
@@ -148,54 +179,19 @@ export class CostAccountComponent implements OnInit {
     private costAccountModelSrv: CostAccountModelService,
     private pentahoSrv: PentahoService
   ) {
-    this.actRouter.queryParams.subscribe(async queryParams => {
+    this.actRouter.queryParams.subscribe(async (queryParams) => {
       this.idCostAccount = queryParams.idCostAccount;
       this.idWorkpack = queryParams.idWorkpack;
       this.idPlan = queryParams.idPlan;
       this.idWorkpackModelLinked = queryParams.idWorkpackModelLinked;
     });
-    this.responsiveSrv.observable.subscribe(value => this.responsive = value);
-    this.language = this.translateSrv.currentLang;
-    
-  }
 
-  trackByInstrument = (i: number, item: IInstrument) => {
-    return item.sigefesCode;
-  }
-
-  get instrumentsOptions() {
-    return this.instrumentsList.map(v => v.sigefesCode)
-  }
-
-  instrumentWithCodigo(codigo: string | null) {
-    return this.instrumentsList.find(i => i.sigefesCode === codigo);
-  }
-
-  setInstrumentItem(instrument : IInstrument, index: number) {
-    
-    if(index >= this.costAccount.instruments?.length || instrument.sigefesCode !== this.costAccount.instruments?.[index].sigefesCode) {
-      this.saveButton.showButton(); 
-      this.cancelButton.showButton()
-    } else {
-      this.saveButton.hideButton();
-      this.cancelButton.hideButton();
-    }
-    
-    
-    Object.assign(this.selectedInstruments[index], instrument); 
-
-  }
-  
-  instrumentsChanged() {
-    // verifica se mudou tamanho
-    if (this.selectedInstruments?.length !== this.costAccount.instruments?.length) return true;
-
-    // verifica se algum sigefesCode mudou na mesma posição
-    return this.selectedInstruments?.some((selected, i) =>
-      selected.sigefesCode !== this.costAccount.instruments[i]?.sigefesCode
+    this.responsiveSrv.observable.subscribe(
+      (value) => (this.responsive = value)
     );
-  }
 
+    this.language = this.translateSrv.currentLang;
+  }
 
   async ngOnInit() {
     this.cardCostAccountProperties = {
@@ -204,7 +200,7 @@ export class CostAccountComponent implements OnInit {
       cardTitle: 'properties',
       collapseble: true,
       initialStateCollapse: false,
-      isLoading: true
+      isLoading: true,
     };
 
     this.instrumentProperty = {
@@ -213,72 +209,123 @@ export class CostAccountComponent implements OnInit {
       cardTitle: 'instruments',
       collapseble: true,
       initialStateCollapse: false,
-      isLoading: true
+      isLoading: true,
     } as ICard;
 
     await this.loadProperties();
-
   }
 
-  async updateInstruments(){
-    if(!this.selectedUo?.code || !this.selectedStartYear || !this.selectedEndYear) return;
-
-      this.instrumentsList = await this.pentahoSrv.getInstrumentsOptions(this.idWorkpack, this.selectedUo.code, this.selectedStartYear, this.selectedEndYear, this.selectedPlano?.code).toPromise();
-
+  instrumentWithCodigo(codigo: string | null) {
+    return this.instrumentsList.find((i) => i.sigefesCode === codigo);
   }
 
+  setInstrumentItem(instrument: IInstrument, index: number) {
+    if (
+      index >= this.costAccount.instruments?.length ||
+      instrument.sigefesCode !==
+        this.costAccount.instruments?.[index].sigefesCode
+    ) {
+      this.saveButton.showButton();
+      this.cancelButton.showButton();
+    } else {
+      this.saveButton.hideButton();
+      this.cancelButton.hideButton();
+    }
+
+    Object.assign(this.selectedInstruments[index], instrument);
+  }
+
+  instrumentsChanged() {
+    // Verifica se mudou tamanho
+    if (
+      this.selectedInstruments?.length !== this.costAccount.instruments?.length
+    )
+      return true;
+
+    // Verifica se algum sigefesCode mudou na mesma posição
+    return this.selectedInstruments?.some(
+      (selected, i) =>
+        selected.sigefesCode !== this.costAccount.instruments[i]?.sigefesCode
+    );
+  }
+
+  async updateInstruments() {
+    if (
+      !this.selectedUo?.code ||
+      !this.selectedStartYear ||
+      !this.selectedEndYear
+    )
+      return;
+
+    this.instrumentsList = await this.pentahoSrv
+      .getInstrumentsOptions(
+        this.idWorkpack,
+        this.selectedUo.code,
+        this.selectedStartYear,
+        this.selectedEndYear,
+        this.selectedPlano?.code
+      )
+      .toPromise();
+  }
 
   initializeBackups() {
     this.backupSelectedUo = this.selectedUo;
-    this.backupSelectedPlano = this.selectedPlano
+    this.backupSelectedPlano = this.selectedPlano;
   }
 
-  formatSelectedInstrument(instruments : IInstrument[]){
-    return instruments?.map(item => `${item?.originalNum}`).join(', ') ;
+  formatSelectedInstrument(instruments: IInstrument[]) {
+    return instruments?.map((item) => `${item?.originalNum}`).join(', ');
   }
 
-  loadUoOptions(idWorkpack: number, onFinish?: () => void, codPo? : string): void {
+  loadUoOptions(
+    idWorkpack: number,
+    onFinish?: () => void,
+    codPo?: string
+  ): void {
     this.uoOptions = [
       {
         code: null,
         name: null,
         fullName: null,
-        displayText: 'Carregando...'
-      }]
+        displayText: 'Carregando...',
+      },
+    ];
 
     this.pentahoSrv.getUoOptions(idWorkpack, codPo).subscribe({
-      next: data => {
+      next: (data) => {
         this.uoOptions = [
           {
             code: null,
             name: null,
             fullName: null,
-            displayText: '- Nenhum -'
-          }
+            displayText: '- Nenhum -',
+          },
         ];
 
-        if(this.selectedUo?.code && !data.some(uo => uo.code === this.selectedUo.code)){
-          this.uoOptions.push(this.selectedUo)
+        if (
+          this.selectedUo?.code &&
+          !data.some((uo) => uo.code === this.selectedUo.code)
+        ) {
+          this.uoOptions.push(this.selectedUo);
         }
 
         this.uoOptions.push(
-          ...data.map(uo => ({
+          ...data.map((uo) => ({
             code: uo.code,
             name: uo.name,
             fullName: uo.fullName,
-            displayText: `${uo.code} - ${uo.name} - ${uo.fullName}`
+            displayText: `${uo.code} - ${uo.name} - ${uo.fullName}`,
           }))
         );
 
         if (onFinish) onFinish();
       },
-      error: err => {
+      error: (err) => {
         console.error('Erro ao obter UO options do Pentaho:', err);
         if (onFinish) onFinish();
-      }
+      },
     });
   }
-  
 
   onUoChange(event: any) {
     this.cancelButton.showButton();
@@ -286,37 +333,41 @@ export class CostAccountComponent implements OnInit {
 
     const uoValue = event.value.code;
 
-    this.pentahoSrv.getPlanoOrcamentarioOptions(uoValue, this.idWorkpack).subscribe(data => {
-      this.planoOrcamentarioOptions = [
-        {
-          code: null,
-          name: null,
-          fullName: null,
-          displayText: '- Nenhum -'
+    this.pentahoSrv
+      .getPlanoOrcamentarioOptions(uoValue, this.idWorkpack)
+      .subscribe((data) => {
+        this.planoOrcamentarioOptions = [
+          {
+            code: null,
+            name: null,
+            fullName: null,
+            displayText: '- Nenhum -',
+          },
+        ];
+
+        if (
+          this.selectedPlano?.code &&
+          !data.some((plan) => plan.code === this.selectedPlano.code)
+        ) {
+          this.planoOrcamentarioOptions.push(this.selectedPlano);
         }
-      ];
 
-      if(this.selectedPlano?.code && !data.some(plan => plan.code === this.selectedPlano.code)){
-        this.planoOrcamentarioOptions.push(this.selectedPlano)
-      }
+        this.planoOrcamentarioOptions.push(
+          ...data.map((plan) => ({
+            code: plan.code,
+            name: plan.name,
+            fullName: plan.fullName,
+            displayText: plan.fullName,
+          }))
+        );
 
-      this.planoOrcamentarioOptions.push(
-        ...data.map(plan => ({
-          code: plan.code,
-          name: plan.name,
-          fullName: plan.fullName,
-          displayText: plan.fullName
-        }))
-      );
-
-      this.poDisabled = data.length === 0;
-    });
+        this.poDisabled = data.length === 0;
+      });
 
     this.saveButton.showButton();
     this.selectedInstruments = [];
     this.updateInstruments();
   }
-  
 
   onPlanoChange(event: any) {
     this.cancelButton.showButton();
@@ -325,7 +376,6 @@ export class CostAccountComponent implements OnInit {
     this.loadUoOptions(this.idWorkpack, undefined, this.selectedPlano.code);
     this.updateInstruments();
   }
-  
 
   async loadProperties() {
     this.idPlan = Number(localStorage.getItem('@currentPlan'));
@@ -336,109 +386,143 @@ export class CostAccountComponent implements OnInit {
     if (this.idCostAccount) {
       await this.loadCostAccount();
       this.loadUoOptions(this.idCostAccount, () => {
-        this.setupUoAndPlano()
+        this.setupUoAndPlano();
       });
     } else {
       this.setBreadcrumb();
       this.cardCostAccountProperties.isLoading = false;
       this.instrumentProperty.isLoading = false;
     }
-    const costAccountModelActiveProperties = this.costAccountModel.properties.filter(w => w.active);
-    if (costAccountModelActiveProperties && costAccountModelActiveProperties
-      .filter(prop => this.typePropertyModel[prop.type] === TypePropertyModelEnum.OrganizationSelectionModel).length > 0) {
+    const costAccountModelActiveProperties =
+      this.costAccountModel.properties.filter((w) => w.active);
+    if (
+      costAccountModelActiveProperties &&
+      costAccountModelActiveProperties.filter(
+        (prop) =>
+          this.typePropertyModel[prop.type] ===
+          TypePropertyModelEnum.OrganizationSelectionModel
+      ).length > 0
+    ) {
       await this.loadOrganizationsOffice();
     }
-    this.sectionCostAccountProperties = await Promise.all(costAccountModelActiveProperties.map(p => this.instanceProperty(p)));
-    this.backupProperties = this.sectionCostAccountProperties.map( prop => this.instanceBackupProperty(prop));
+    this.sectionCostAccountProperties = await Promise.all(
+      costAccountModelActiveProperties.map((p) => this.instanceProperty(p))
+    );
+    this.backupProperties = this.sectionCostAccountProperties.map((prop) =>
+      this.instanceBackupProperty(prop)
+    );
   }
 
   setupUoAndPlano() {
     if (!this.costAccount) return;
-  
-    this.selectedUo = this.uoOptions.find(uo => uo?.code == this.costAccount.unidadeOrcamentaria?.code);
-  
+
+    this.selectedUo = this.uoOptions.find(
+      (uo) => uo?.code == this.costAccount.unidadeOrcamentaria?.code
+    );
+
     if (this.selectedUo) {
-      this.pentahoSrv.getPlanoOrcamentarioOptions(this.selectedUo?.code, this.costAccount.id).subscribe(poData => {
-        this.planoOrcamentarioOptions = [
-          { 
-            code: null, 
-            name: null, 
-            fullName: null, 
-            displayText: '- Nenhum -' 
+      this.pentahoSrv
+        .getPlanoOrcamentarioOptions(this.selectedUo?.code, this.costAccount.id)
+        .subscribe((poData) => {
+          this.planoOrcamentarioOptions = [
+            {
+              code: null,
+              name: null,
+              fullName: null,
+              displayText: '- Nenhum -',
+            },
+          ];
+
+          if (
+            this.costAccount.planoOrcamentario?.code &&
+            !poData.some(
+              (po) => po.code === this.costAccount.planoOrcamentario.code
+            )
+          ) {
+            this.planoOrcamentarioOptions.push({
+              ...this.costAccount.planoOrcamentario,
+              displayText: this.costAccount.planoOrcamentario.fullName,
+            });
           }
-        ];
 
-        if(this.costAccount.planoOrcamentario?.code && !poData.some(po => po.code === this.costAccount.planoOrcamentario.code)) {
-          this.planoOrcamentarioOptions.push({
-            ...this.costAccount.planoOrcamentario,
-            displayText: this.costAccount.planoOrcamentario.fullName
-          })
-        }
+          this.planoOrcamentarioOptions.push(
+            ...poData.map((plan) => ({
+              code: plan.code,
+              name: plan.name,
+              fullName: plan.fullName,
+              displayText: plan.fullName,
+            }))
+          );
+          this.poDisabled = poData.length === 0;
 
-        this.planoOrcamentarioOptions.push(
-          ...poData.map(plan => ({ 
-            code: plan.code, 
-            name: plan.name, 
-            fullName: plan.fullName, 
-            displayText: plan.fullName 
-          }))
-        );
-        this.poDisabled = poData.length === 0;
-  
-        this.selectedPlano = this.planoOrcamentarioOptions.find(plan => plan.code == this.costAccount.planoOrcamentario?.code);
-        this.backupSelectedUo = this.selectedUo;
-        this.backupSelectedPlano = this.selectedPlano;
-
-      });
-      this.updateInstruments()
+          this.selectedPlano = this.planoOrcamentarioOptions.find(
+            (plan) => plan.code == this.costAccount.planoOrcamentario?.code
+          );
+          this.backupSelectedUo = this.selectedUo;
+          this.backupSelectedPlano = this.selectedPlano;
+        });
+      this.updateInstruments();
     }
   }
-  
 
   async loadCardCostAccountProperties() {
     if (this.costAccount) {
       const costAccountTotalValues =
-        await this.costAccountSrv.GetCostsByWorkpack({ id: this.costAccount.id, 'id-workpack': this.costAccount.idWorkpack });
+        await this.costAccountSrv.GetCostsByWorkpack({
+          id: this.costAccount.id,
+          'id-workpack': this.costAccount.idWorkpack,
+        });
       if (costAccountTotalValues.success) {
         this.cardCostAccountProperties = {
           ...this.cardCostAccountProperties,
-          progressBarValues: [{
-            total: costAccountTotalValues.data.planed,
-            progress: costAccountTotalValues.data.actual,
-            limit: this.costAccountLimit,
-            labelProgress: this.translateSrv.instant('actual'),
-            labelTotal: this.translateSrv.instant('planned'),
-            color: '#44B39B',
-            valueUnit: 'currency',
-            barHeight: 17
-          }]
+          progressBarValues: [
+            {
+              total: costAccountTotalValues.data.planed,
+              progress: costAccountTotalValues.data.actual,
+              limit: this.costAccountLimit,
+              labelProgress: this.translateSrv.instant('actual'),
+              labelTotal: this.translateSrv.instant('planned'),
+              color: '#44B39B',
+              valueUnit: 'currency',
+              barHeight: 17,
+            },
+          ],
         };
         this.cardCostAccountProperties = {
           ...this.cardCostAccountProperties,
-          isLoading: false
+          isLoading: false,
         };
         return;
       }
     }
     this.cardCostAccountProperties = {
       ...this.cardCostAccountProperties,
-      isLoading: false
+      isLoading: false,
     };
   }
 
   async loadWorkpack(onlyBreadcrumb: boolean = false) {
     const workpackData = this.workpackSrv.getWorkpackData();
-    if (workpackData && workpackData.workpack && workpackData.workpack.id === this.idWorkpack) {
+    if (
+      workpackData &&
+      workpackData.workpack &&
+      workpackData.workpack.id === this.idWorkpack
+    ) {
       this.workpack = workpackData.workpack;
     } else {
-      const result = await this.workpackSrv.GetWorkpackById(this.idWorkpack, { 'id-plan': this.idPlan });
+      const result = await this.workpackSrv.GetWorkpackById(this.idWorkpack, {
+        'id-plan': this.idPlan,
+      });
       if (result.success) {
         this.workpack = result.data;
       }
     }
-    
-    this.editPermission = (!!this.workpack.permissions?.find(p => p.level === 'EDIT')
-      || await this.authSrv.isUserAdmin()) && !this.workpack.canceled && !this.workpack.endManagementDate;
+
+    this.editPermission =
+      (!!this.workpack.permissions?.find((p) => p.level === 'EDIT') ||
+        (await this.authSrv.isUserAdmin())) &&
+      !this.workpack.canceled &&
+      !this.workpack.endManagementDate;
     const plan = await this.planSrv.getCurrentPlan(this.workpack.plan.id);
     if (plan) {
       this.idOffice = plan.idOffice;
@@ -449,7 +533,10 @@ export class CostAccountComponent implements OnInit {
   }
 
   async loadCostAccountModel() {
-    const result = await this.costAccountModelSrv.GetCostAccountModelByPlanModel({ 'id-plan-model': this.idPlanModel });
+    const result =
+      await this.costAccountModelSrv.GetCostAccountModelByPlanModel({
+        'id-plan-model': this.idPlanModel,
+      });
     if (result.success && result.data) {
       this.costAccountModel = result.data;
     }
@@ -461,13 +548,17 @@ export class CostAccountComponent implements OnInit {
       this.costAccount = result.data;
       this.idWorkpack = this.costAccount.idWorkpack;
 
-      const propertyNameModel = this.costAccount.models.find(p => p.name === 'name');
-      const propertyNameCostAccount = this.costAccount.properties.find(p => p.idPropertyModel === propertyNameModel.id);
+      const propertyNameModel = this.costAccount.models.find(
+        (p) => p.name === 'name'
+      );
+      const propertyNameCostAccount = this.costAccount.properties.find(
+        (p) => p.idPropertyModel === propertyNameModel.id
+      );
       this.costAccountName = propertyNameCostAccount.value as string;
 
-      
       await this.loadCardCostAccountProperties();
-      this.selectedInstruments = this.costAccount.instruments?.map(item => ({...item})) ?? [];
+      this.selectedInstruments =
+        this.costAccount.instruments?.map((item) => ({ ...item })) ?? [];
       this.setBreadcrumb();
     }
   }
@@ -479,22 +570,28 @@ export class CostAccountComponent implements OnInit {
       {
         key: 'account',
         info: this.costAccountName,
-      }
+      },
     ]);
   }
 
   async getBreadcrumbs() {
-    const { success, data } = await this.breadcrumbSrv.getBreadcrumbWorkpack
-      (this.idWorkpack, { 'id-plan': this.idPlan });
+    const { success, data } = await this.breadcrumbSrv.getBreadcrumbWorkpack(
+      this.idWorkpack,
+      { 'id-plan': this.idPlan }
+    );
     return success
-      ? data.map(p => ({
-        key: !p.modelName ? p.type.toLowerCase() : p.modelName,
-        info: p.name,
-        tooltip: p.fullName,
-        routerLink: this.getRouterLinkFromType(p.type),
-        queryParams: { id: p.id, idWorkpackModelLinked: p.idWorkpackModelLinked, idPlan: this.idPlan },
-        modelName: p.modelName
-      }))
+      ? data.map((p) => ({
+          key: !p.modelName ? p.type.toLowerCase() : p.modelName,
+          info: p.name,
+          tooltip: p.fullName,
+          routerLink: this.getRouterLinkFromType(p.type),
+          queryParams: {
+            id: p.id,
+            idWorkpackModelLinked: p.idWorkpackModelLinked,
+            idPlan: this.idPlan,
+          },
+          modelName: p.modelName,
+        }))
       : [];
   }
 
@@ -509,9 +606,15 @@ export class CostAccountComponent implements OnInit {
     }
   }
 
-  async instanceProperty(propertyModel: IWorkpackModelProperty): Promise<PropertyTemplateModel> {
+  async instanceProperty(
+    propertyModel: IWorkpackModelProperty
+  ): Promise<PropertyTemplateModel> {
     const property = new PropertyTemplateModel();
-    const propertyCostAccount = this.costAccount && this.costAccount.properties.find(cost => cost.idPropertyModel === propertyModel.id);
+    const propertyCostAccount =
+      this.costAccount &&
+      this.costAccount.properties.find(
+        (cost) => cost.idPropertyModel === propertyModel.id
+      );
 
     property.id = propertyCostAccount && propertyCostAccount.id;
     property.idPropertyModel = propertyModel.id;
@@ -527,98 +630,169 @@ export class CostAccountComponent implements OnInit {
     property.rows = propertyModel.rows;
     property.decimals = propertyModel.decimals;
     property.helpText = propertyModel.helpText;
-    if (this.typePropertyModel[propertyModel.type] === TypePropertyModelEnum.ToggleModel) {
-      property.value = propertyCostAccount && (propertyCostAccount?.value !== null && propertyCostAccount?.value !== undefined) ?
-        propertyCostAccount?.value : propertyModel.defaultValue;
+    if (
+      this.typePropertyModel[propertyModel.type] ===
+      TypePropertyModelEnum.ToggleModel
+    ) {
+      property.value =
+        propertyCostAccount &&
+        propertyCostAccount?.value !== null &&
+        propertyCostAccount?.value !== undefined
+          ? propertyCostAccount?.value
+          : propertyModel.defaultValue;
     } else {
-      property.value = propertyCostAccount?.value ? propertyCostAccount?.value : propertyModel.defaultValue;
+      property.value = propertyCostAccount?.value
+        ? propertyCostAccount?.value
+        : propertyModel.defaultValue;
     }
-    property.value = propertyCostAccount?.value ? propertyCostAccount?.value : propertyModel.defaultValue;
-    property.defaultValue = propertyCostAccount?.value ? propertyCostAccount?.value : propertyModel.defaultValue;
+    property.value = propertyCostAccount?.value
+      ? propertyCostAccount?.value
+      : propertyModel.defaultValue;
+    property.defaultValue = propertyCostAccount?.value
+      ? propertyCostAccount?.value
+      : propertyModel.defaultValue;
     property.min = propertyModel.min;
     property.max = propertyModel.max;
     property.precision = propertyModel.precision;
-    if (this.typePropertyModel[propertyModel.type] === TypePropertyModelEnum.DateModel) {
-      const dateValue = propertyCostAccount?.value ?
-        propertyCostAccount?.value.toLocaleString() : propertyModel.defaultValue.toLocaleString();
+    if (
+      this.typePropertyModel[propertyModel.type] ===
+      TypePropertyModelEnum.DateModel
+    ) {
+      const dateValue = propertyCostAccount?.value
+        ? propertyCostAccount?.value.toLocaleString()
+        : propertyModel.defaultValue.toLocaleString();
       property.value = new Date(dateValue);
     }
-    if (this.typePropertyModel[propertyModel.type] === TypePropertyModelEnum.SelectionModel && propertyModel.multipleSelection) {
-      const listValues = propertyCostAccount?.value ? propertyCostAccount?.value as string : propertyModel.defaultValue as string;
-      property.defaultValue = listValues.length > 0 ? listValues.split(',') : null;
+    if (
+      this.typePropertyModel[propertyModel.type] ===
+        TypePropertyModelEnum.SelectionModel &&
+      propertyModel.multipleSelection
+    ) {
+      const listValues = propertyCostAccount?.value
+        ? (propertyCostAccount?.value as string)
+        : (propertyModel.defaultValue as string);
+      property.defaultValue =
+        listValues.length > 0 ? listValues.split(',') : null;
       property.value = listValues.length > 0 ? listValues.split(',') : null;
     }
 
-    if (this.typePropertyModel[propertyModel.type] === TypePropertyModelEnum.SelectionModel) {
-      const listOptions = propertyModel.possibleValues ? (propertyModel.possibleValues as string).split(',').sort((a, b) => a.localeCompare(b)) : [];
-      property.possibleValues = listOptions.map(op => ({ label: op, value: op }));
+    if (
+      this.typePropertyModel[propertyModel.type] ===
+      TypePropertyModelEnum.SelectionModel
+    ) {
+      const listOptions = propertyModel.possibleValues
+        ? (propertyModel.possibleValues as string)
+            .split(',')
+            .sort((a, b) => a.localeCompare(b))
+        : [];
+      property.possibleValues = listOptions.map((op) => ({
+        label: op,
+        value: op,
+      }));
     }
 
-    if (this.typePropertyModel[propertyModel.type] === TypePropertyModelEnum.LocalitySelectionModel) {
+    if (
+      this.typePropertyModel[propertyModel.type] ===
+      TypePropertyModelEnum.LocalitySelectionModel
+    ) {
       const domain = await this.loadDomain(propertyModel.idDomain);
       const localityList = await this.loadDomainLocalities(domain.id);
-      const selectable = (this.workpackSrv.getEditPermission());
+      const selectable = this.workpackSrv.getEditPermission();
       const rootNode: TreeNode = {
         label: domain.localityRoot.name,
         data: domain.localityRoot.id,
-        children: this.loadLocality(localityList[0].children, selectable, property.multipleSelection),
-        selectable
+        children: this.loadLocality(
+          localityList[0].children,
+          selectable,
+          property.multipleSelection
+        ),
+        selectable,
       };
       property.idDomain = propertyModel.idDomain;
       property.localityList = [rootNode];
-      const defaultSelectedLocalities = propertyCostAccount?.selectedValues ?
-        propertyCostAccount?.selectedValues as number[] : (propertyModel.defaults ? propertyModel.defaults as number[] : undefined);
+      const defaultSelectedLocalities = propertyCostAccount?.selectedValues
+        ? (propertyCostAccount?.selectedValues as number[])
+        : propertyModel.defaults
+        ? (propertyModel.defaults as number[])
+        : undefined;
       if (defaultSelectedLocalities?.length > 0) {
-        const selectedLocalityList = this.loadSelectedLocality(defaultSelectedLocalities, property.localityList);
+        const selectedLocalityList = this.loadSelectedLocality(
+          defaultSelectedLocalities,
+          property.localityList
+        );
         property.localitiesSelected = propertyModel.multipleSelection
-          ? selectedLocalityList as TreeNode[]
-          : selectedLocalityList[0] as TreeNode;
+          ? (selectedLocalityList as TreeNode[])
+          : (selectedLocalityList[0] as TreeNode);
       }
       if (defaultSelectedLocalities && defaultSelectedLocalities.length === 1) {
-        const resultLocality = await this.localitySrv.GetById(defaultSelectedLocalities[0]);
+        const resultLocality = await this.localitySrv.GetById(
+          defaultSelectedLocalities[0]
+        );
         if (resultLocality.success) {
           property.labelButtonLocalitySelected = [resultLocality.data.name];
           property.showIconButton = false;
         }
       }
       if (defaultSelectedLocalities && defaultSelectedLocalities.length > 1) {
-        property.labelButtonLocalitySelected = await Promise.all(defaultSelectedLocalities.map(async (loc) => {
-          const result = await this.localitySrv.GetById(loc);
-          if (result.success) {
-            return result.data.name
-          }
-        }));
+        property.labelButtonLocalitySelected = await Promise.all(
+          defaultSelectedLocalities.map(async (loc) => {
+            const result = await this.localitySrv.GetById(loc);
+            if (result.success) {
+              return result.data.name;
+            }
+          })
+        );
         property.showIconButton = false;
       }
-      if (!defaultSelectedLocalities || (defaultSelectedLocalities && defaultSelectedLocalities.length === 0)) {
+      if (
+        !defaultSelectedLocalities ||
+        (defaultSelectedLocalities && defaultSelectedLocalities.length === 0)
+      ) {
         property.labelButtonLocalitySelected = [];
         property.showIconButton = true;
       }
     }
 
-    if (this.typePropertyModel[propertyModel.type] === TypePropertyModelEnum.OrganizationSelectionModel) {
-      property.possibleValuesIds = this.organizations.filter(org => propertyModel.sectors && propertyModel.sectors.includes(org.sector.toLowerCase()))
-        .map(d => ({ label: d.name, value: d.id }));
+    if (
+      this.typePropertyModel[propertyModel.type] ===
+      TypePropertyModelEnum.OrganizationSelectionModel
+    ) {
+      property.possibleValuesIds = this.organizations
+        .filter(
+          (org) =>
+            propertyModel.sectors &&
+            propertyModel.sectors.includes(org.sector.toLowerCase())
+        )
+        .map((d) => ({ label: d.name, value: d.id }));
       if (propertyModel.multipleSelection) {
-        property.selectedValues = propertyCostAccount?.selectedValues ?
-          propertyCostAccount?.selectedValues : propertyModel.defaults as number[];
+        property.selectedValues = propertyCostAccount?.selectedValues
+          ? propertyCostAccount?.selectedValues
+          : (propertyModel.defaults as number[]);
       }
       if (!propertyModel.multipleSelection) {
-        const defaults = propertyModel.defaults && propertyModel.defaults as number[];
+        const defaults =
+          propertyModel.defaults && (propertyModel.defaults as number[]);
         const defaultsValue = defaults && defaults[0];
-        property.selectedValues = propertyCostAccount?.selectedValues ?
-          propertyCostAccount?.selectedValues[0] : (defaultsValue && defaultsValue);
+        property.selectedValues = propertyCostAccount?.selectedValues
+          ? propertyCostAccount?.selectedValues[0]
+          : defaultsValue && defaultsValue;
       }
     }
-    if (this.typePropertyModel[propertyModel.type] === TypePropertyModelEnum.UnitSelectionModel) {
-      this.loadUnitMeasuresOffice().then(unitMeasures => {
+    if (
+      this.typePropertyModel[propertyModel.type] ===
+      TypePropertyModelEnum.UnitSelectionModel
+    ) {
+      this.loadUnitMeasuresOffice().then((unitMeasures) => {
         property.possibleValuesIds = unitMeasures;
       });
-      property.selectedValue = propertyCostAccount?.selectedValue ? propertyCostAccount?.selectedValue : propertyModel.defaults as number;
+      property.selectedValue = propertyCostAccount?.selectedValue
+        ? propertyCostAccount?.selectedValue
+        : (propertyModel.defaults as number);
       property.defaults = propertyModel.defaults as number;
     }
     if (property.name.toLowerCase() === 'limit') {
-      this.costAccountLimit = property.value && Number(property.value) ? Number(property.value) : 0;
+      this.costAccountLimit =
+        property.value && Number(property.value) ? Number(property.value) : 0;
     }
     return property;
   }
@@ -673,37 +847,51 @@ export class CostAccountComponent implements OnInit {
     return null;
   }
 
-  loadLocality(localityList: ILocalityList[], selectable: boolean, multipleSelection: boolean) {
-    const list: TreeNode[] = localityList?.map(locality => {
+  loadLocality(
+    localityList: ILocalityList[],
+    selectable: boolean,
+    multipleSelection: boolean
+  ) {
+    const list: TreeNode[] = localityList?.map((locality) => {
       if (locality.children) {
         return {
           label: locality.name,
           data: locality.id,
-          children: this.loadLocality(locality.children, selectable, multipleSelection),
+          children: this.loadLocality(
+            locality.children,
+            selectable,
+            multipleSelection
+          ),
           selectable,
         };
       }
       return { label: locality.name, data: locality.id, selectable };
     });
-    list.sort((a, b) => a.label < b.label ? -1 : 0)
+    list.sort((a, b) => (a.label < b.label ? -1 : 0));
     if (selectable && multipleSelection) {
       this.addSelectAllNode(list, localityList, selectable);
     }
     return list;
   }
 
-  addSelectAllNode(list: TreeNode[], localityList: ILocalityList[], selectable: boolean) {
+  addSelectAllNode(
+    list: TreeNode[],
+    localityList: ILocalityList[],
+    selectable: boolean
+  ) {
     list?.unshift({
       label: this.translateSrv.instant('selectAll'),
       key: 'SELECTALL' + localityList[0]?.id,
       selectable,
       styleClass: 'green-node',
-      data: 'SELECTALL' + localityList[0]?.id
+      data: 'SELECTALL' + localityList[0]?.id,
     });
   }
 
   async loadDomainLocalities(idDomain: number) {
-    const result = await this.localitySrv.getLocalitiesTreeFromDomain({ 'id-domain': idDomain });
+    const result = await this.localitySrv.getLocalitiesTreeFromDomain({
+      'id-domain': idDomain,
+    });
     if (result) {
       return result as ILocalityList[];
     }
@@ -711,12 +899,15 @@ export class CostAccountComponent implements OnInit {
 
   loadSelectedLocality(seletectedIds: number[], list: TreeNode[]) {
     let result = [];
-    list.forEach(l => {
+    list.forEach((l) => {
       if (seletectedIds.includes(l.data)) {
         result.push(l);
-      };
+      }
       if (l.children && l.children.length > 0) {
-        const resultChildren = this.loadSelectedLocality(seletectedIds, l.children);
+        const resultChildren = this.loadSelectedLocality(
+          seletectedIds,
+          l.children
+        );
         result = result.concat(resultChildren);
       }
     });
@@ -737,39 +928,53 @@ export class CostAccountComponent implements OnInit {
       return {
         label: locality.name,
         data: locality.id,
-        children: locality.children.map(c => this.loadSelectedTreeNode(c))
+        children: locality.children.map((c) => this.loadSelectedTreeNode(c)),
       };
     }
     return {
       label: locality.name,
-      data: locality.id
+      data: locality.id,
     };
   }
 
   async loadOrganizationsOffice() {
     if (this.idOffice) {
-      const result = await this.organizationSrv.GetAll({ 'id-office': this.idOffice });
+      const result = await this.organizationSrv.GetAll({
+        'id-office': this.idOffice,
+      });
       if (result.success) {
         this.organizations = result.data;
-        this.organizations = this.organizations.sort((a, b) => a.name.localeCompare(b.name))
+        this.organizations = this.organizations.sort((a, b) =>
+          a.name.localeCompare(b.name)
+        );
       }
     }
   }
 
   async loadUnitMeasuresOffice() {
-    const result = await this.unitMeasureSrv.GetAll({ idOffice: this.idOffice });
+    const result = await this.unitMeasureSrv.GetAll({
+      idOffice: this.idOffice,
+    });
     if (result.success) {
       const units = result.data;
-      return units.map(org => ({
-        label: org.name,
-        value: org.id
-      })).sort((a, b) => a.label.localeCompare(b.label));
+      return units
+        .map((org) => ({
+          label: org.name,
+          value: org.id,
+        }))
+        .sort((a, b) => a.label.localeCompare(b.label));
     }
   }
 
   mirrorToFullName(nameProperty) {
-    const fullName = this.sectionCostAccountProperties.find((p) => (p.name === 'fullName'));
-    if (isNaN(this.idCostAccount) && (nameProperty?.value !== null) && (this.oldName === fullName?.value)) {
+    const fullName = this.sectionCostAccountProperties.find(
+      (p) => p.name === 'fullName'
+    );
+    if (
+      isNaN(this.idCostAccount) &&
+      nameProperty?.value !== null &&
+      this.oldName === fullName?.value
+    ) {
       this.sectionCostAccountProperties.forEach((prop) => {
         if (prop.name === 'fullName') {
           prop.value = nameProperty.value;
@@ -779,82 +984,121 @@ export class CostAccountComponent implements OnInit {
     this.oldName = nameProperty.value;
   }
 
-
   checkProperties(property: PropertyTemplateModel) {
     this.cancelButton.showButton();
     if (property.name === 'name') {
       this.mirrorToFullName(property);
     }
     if (property.name === 'limit') {
-      this.cardCostAccountProperties = this.cardCostAccountProperties.progressBarValues ? {
-        ...this.cardCostAccountProperties,
-        progressBarValues: [{
-          ...this.cardCostAccountProperties.progressBarValues[0],
-          limit: property.value && Number(property.value) ? Number(property.value) : 0
-        }]
-      } : {
-        ...this.cardCostAccountProperties
-      };
-    }
-    const arePropertiesRequiredValid: boolean = this.sectionCostAccountProperties
-      .filter(({ required }) => required)
-      .map((prop) => {
-        let valid = (prop.value instanceof Array
-          ? (prop.value.length > 0)
-          : typeof prop.value == 'boolean' || typeof prop.value == 'number'
-          || !!prop.value || (prop.value !== null && prop.value !== undefined));
-        if (['OrganizationSelection', 'UnitSelection', 'LocalitySelection'].includes(prop.type)) {
-          if (prop.type === 'LocalitySelection') {
-            if (!prop.multipleSelection) {
-              const selectedLocality = prop.localitiesSelected as TreeNode;
-              prop.selectedValues = [selectedLocality.data];
-            }
-            if (prop.multipleSelection) {
-              const selectedLocality = prop.localitiesSelected as TreeNode[];
-              prop.selectedValues = selectedLocality.filter(locality => locality.data !== prop.idDomain)
-                .map(l => l.data);
-            }
+      this.cardCostAccountProperties = this.cardCostAccountProperties
+        .progressBarValues
+        ? {
+            ...this.cardCostAccountProperties,
+            progressBarValues: [
+              {
+                ...this.cardCostAccountProperties.progressBarValues[0],
+                limit:
+                  property.value && Number(property.value)
+                    ? Number(property.value)
+                    : 0,
+              },
+            ],
           }
-          valid = (typeof prop.selectedValue === 'number' || (prop.selectedValues instanceof Array ?
-            prop.selectedValues.length > 0 : typeof prop.selectedValues == 'number'));
-        }
-        if (property.idPropertyModel === prop.idPropertyModel) {
-          prop.invalid = !valid;
-          prop.message = valid ? '' : this.translateSrv.instant('required');
-        }
-        return valid;
-      })
-      .reduce((a, b) => a ? b : a, true);
-
-    const arePropertiesStringValid: boolean = this.sectionCostAccountProperties
-      .filter(({ min, max, value }) => ((min || max) && typeof value == 'string'))
-      .map((prop) => {
-        let valid = true;
-        valid = (prop.min && prop.required) || (prop.min && prop.value && String(prop.value).length > 0)  ? String(prop.value).length >= prop.min : true;
-        if (property.idPropertyModel === prop.idPropertyModel) {
-          prop.invalid = !valid;
-          prop.message = !valid ? prop.message = this.translateSrv.instant('minLenght') : '';
-        }
-        if (valid) {
-          valid = prop.max ? (!prop.required ? String(prop.value).length <= prop.max
-            : String(prop.value).length <= prop.max && String(prop.value).length > 0) : true;
+        : {
+            ...this.cardCostAccountProperties,
+          };
+    }
+    const arePropertiesRequiredValid: boolean =
+      this.sectionCostAccountProperties
+        .filter(({ required }) => required)
+        .map((prop) => {
+          let valid =
+            prop.value instanceof Array
+              ? prop.value.length > 0
+              : typeof prop.value == 'boolean' ||
+                typeof prop.value == 'number' ||
+                !!prop.value ||
+                (prop.value !== null && prop.value !== undefined);
+          if (
+            [
+              'OrganizationSelection',
+              'UnitSelection',
+              'LocalitySelection',
+            ].includes(prop.type)
+          ) {
+            if (prop.type === 'LocalitySelection') {
+              if (!prop.multipleSelection) {
+                const selectedLocality = prop.localitiesSelected as TreeNode;
+                prop.selectedValues = [selectedLocality.data];
+              }
+              if (prop.multipleSelection) {
+                const selectedLocality = prop.localitiesSelected as TreeNode[];
+                prop.selectedValues = selectedLocality
+                  .filter((locality) => locality.data !== prop.idDomain)
+                  .map((l) => l.data);
+              }
+            }
+            valid =
+              typeof prop.selectedValue === 'number' ||
+              (prop.selectedValues instanceof Array
+                ? prop.selectedValues.length > 0
+                : typeof prop.selectedValues == 'number');
+          }
           if (property.idPropertyModel === prop.idPropertyModel) {
             prop.invalid = !valid;
-            prop.message = !valid ? (String(prop.value).length > 0 ? prop.message = this.translateSrv.instant('maxLength', { max: prop.max })
-              : prop.message = this.translateSrv.instant('required')) : '';
+            prop.message = valid ? '' : this.translateSrv.instant('required');
+          }
+          return valid;
+        })
+        .reduce((a, b) => (a ? b : a), true);
+
+    const arePropertiesStringValid: boolean = this.sectionCostAccountProperties
+      .filter(({ min, max, value }) => (min || max) && typeof value == 'string')
+      .map((prop) => {
+        let valid = true;
+        valid =
+          (prop.min && prop.required) ||
+          (prop.min && prop.value && String(prop.value).length > 0)
+            ? String(prop.value).length >= prop.min
+            : true;
+        if (property.idPropertyModel === prop.idPropertyModel) {
+          prop.invalid = !valid;
+          prop.message = !valid
+            ? (prop.message = this.translateSrv.instant('minLenght'))
+            : '';
+        }
+        if (valid) {
+          valid = prop.max
+            ? !prop.required
+              ? String(prop.value).length <= prop.max
+              : String(prop.value).length <= prop.max &&
+                String(prop.value).length > 0
+            : true;
+          if (property.idPropertyModel === prop.idPropertyModel) {
+            prop.invalid = !valid;
+            prop.message = !valid
+              ? String(prop.value).length > 0
+                ? (prop.message = this.translateSrv.instant('maxLength', {
+                    max: prop.max,
+                  }))
+                : (prop.message = this.translateSrv.instant('required'))
+              : '';
           }
         }
         return valid;
       })
-      .reduce((a, b) => a ? b : a, true);
-    return (arePropertiesRequiredValid && arePropertiesStringValid) ? this.saveButton?.showButton() : this.saveButton?.hideButton();
+      .reduce((a, b) => (a ? b : a), true);
+    return arePropertiesRequiredValid && arePropertiesStringValid
+      ? this.saveButton?.showButton()
+      : this.saveButton?.hideButton();
   }
 
   async saveCostAccount() {
-
     this.cancelButton.hideButton();
-    this.costAccountProperties = this.sectionCostAccountProperties.map(p => p.getValues());
-    if (this.sectionCostAccountProperties.filter(p => p.invalid).length > 0) {
+    this.costAccountProperties = this.sectionCostAccountProperties.map((p) =>
+      p.getValues()
+    );
+    if (this.sectionCostAccountProperties.filter((p) => p.invalid).length > 0) {
       return;
     }
 
@@ -867,20 +1111,21 @@ export class CostAccountComponent implements OnInit {
         properties: this.costAccountProperties,
         unidadeOrcamentaria: this.selectedUo?.code ? this.selectedUo : null,
         planoOrcamentario: this.selectedPlano ? this.selectedPlano : null,
-        instruments: this.selectedInstruments.map(si => this.instrumentsList.find(fi => fi.sigefesCode === si.sigefesCode)) ?? []
+        instruments:
+          this.selectedInstruments.map((si) =>
+            this.instrumentsList.find((fi) => fi.sigefesCode === si.sigefesCode)
+          ) ?? [],
       };
       const result = await this.costAccountSrv.put(costAccount);
       this.formIsSaving = false;
       if (result.success) {
-        this.router.navigate(['/workpack'],
-          {
-            queryParams: {
-              id: this.idWorkpack,
-              idWorkpackModelLinked: this.idWorkpackModelLinked,
-              idPlan: this.idPlan
-            }
-          }
-        );
+        this.router.navigate(['/workpack'], {
+          queryParams: {
+            id: this.idWorkpack,
+            idWorkpackModelLinked: this.idWorkpackModelLinked,
+            idPlan: this.idPlan,
+          },
+        });
       }
     }
     if (!this.idCostAccount) {
@@ -890,29 +1135,28 @@ export class CostAccountComponent implements OnInit {
         properties: this.costAccountProperties,
         unidadeOrcamentaria: this.selectedUo ? this.selectedUo : null,
         planoOrcamentario: this.selectedPlano ? this.selectedPlano : null,
-        instruments: this.selectedInstruments ?? []
+        instruments: this.selectedInstruments ?? [],
       };
       const result = await this.costAccountSrv.post(costAccount);
       this.formIsSaving = false;
       if (result.success) {
-        this.router.navigate(['/workpack'],
-          {
-            queryParams: {
-              id: this.idWorkpack,
-              idWorkpackModelLinked: this.idWorkpackModelLinked,
-              idPlan: this.idPlan
-            }
-          }
-        );
+        this.router.navigate(['/workpack'], {
+          queryParams: {
+            id: this.idWorkpack,
+            idWorkpackModelLinked: this.idWorkpackModelLinked,
+            idPlan: this.idPlan,
+          },
+        });
       }
     }
   }
 
   handleOnCancel() {
     this.saveButton.hideButton();
-    this.sectionCostAccountProperties = this.backupProperties.map( prop => this.instanceBackupProperty(prop));
+    this.sectionCostAccountProperties = this.backupProperties.map((prop) =>
+      this.instanceBackupProperty(prop)
+    );
     this.selectedPlano = this.backupSelectedPlano;
     this.selectedUo = this.backupSelectedUo;
   }
-
 }

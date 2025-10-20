@@ -52,7 +52,8 @@
         "curly": "off",
         "@typescript-eslint/no-inferrable-types": "off",
         "@typescript-eslint/space-before-function-paren": "off",
-        "@typescript-eslint/lines-between-class-members": "warn"
+        "@typescript-eslint/lines-between-class-members": "warn",
+        "@typescript-eslint/member-ordering": "off"
       }
     },
     {
