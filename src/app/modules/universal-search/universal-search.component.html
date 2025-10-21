@@ -2,7 +2,7 @@
     <div class="busca-wrapper">
         <div class="dataview-filters-text">
             <input pInputText id="id-app-inputtext" class="app-input-text p-inputtext animation-input"
-                [(ngModel)]="searchTerm" (ngModelChange)="onSearchInput($event)"
+                [formControl]="searchControl"
                 placeholder="{{'search' | translate}}"
             />
             <i class="fas fa-search animation-input"></i>
