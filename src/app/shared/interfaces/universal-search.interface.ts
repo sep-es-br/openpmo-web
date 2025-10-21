@@ -6,7 +6,7 @@ export interface IUniversalSearch {
     name : string;
     fullName : string;
     matchDistance : number;
-    breadcrumbs : IBreadCrumb[] | string[];
+    breadcrumbs : IBreadCrumb[];
 }
 
 export interface IBreadCrumb {
