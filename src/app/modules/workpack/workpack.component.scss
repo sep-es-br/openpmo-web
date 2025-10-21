@@ -75,6 +75,65 @@
     align-items: center;
     flex: 1;
     border-bottom: 1px solid #D4D4D4;
+
+    .text {
+        flex-grow: 1;
+    }
+
+    .dataview-filters-text {
+        align-self: flex-end;
+        margin-right: 0.3em;
+        width: 11rem;
+        height: 2rem;
+        display: flex;
+        justify-content: flex-end;
+        position: relative;
+
+        .app-input-text.p-inputtext {
+          font-size: 0.8rem !important;
+          width: 0 !important;
+          border-bottom: none !important;
+          transition: width .3s;
+          &.animation-input {
+            width: 100% !important;
+            border-bottom: 1px solid #b6c8cd !important;
+          }
+        }
+        .fa-search {
+          position: absolute;
+          cursor: pointer;
+          transition: all .3s;
+
+          &.no-animation {
+            padding: 0.45rem;
+            background: #44B39B;
+            color: #FFF;
+            top: 0;
+            border-radius: 4px;
+          }
+          &.animation-input {
+            top: .4rem;
+            padding: 0;
+            font-size: 0.9rem;
+          }
+        }
+        .fa-close {
+          position: absolute;
+          cursor: pointer;
+          transition: all 0.3s;
+          font-size: .6rem;
+          top: 0.7rem;
+          padding: 0;
+          &.no-animation { left: 92%; }
+          &.animation-input {
+            left: 80%;
+            &:hover {
+              font-size: .8rem;
+            }
+          }
+        }
+      }
+
   }
   .header-container.mobile {
     flex-direction: column;
@@ -87,6 +146,9 @@
     display: flex;
     justify-content: flex-end;
     align-items: center;
+
+    
+
     .icon-favorite {
       color: #959595;
       font-size: 1.5rem;
@@ -161,6 +223,12 @@
         border: none;
       }
     }
+  }
+
+  .searchContainer {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.3rem;
   }
 
 }

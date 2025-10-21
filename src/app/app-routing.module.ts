@@ -105,6 +105,11 @@ const routes: Routes = [
     canActivate: [ AuthGuard ],
     loadChildren: () => import('./modules/report/report.module').then(m => m.ReportModule)
   },
+  {
+    path: 'search',
+    canActivate: [ AuthGuard ],
+    loadChildren: () => import('./modules/universal-search/universal-search.module').then(m => m.UniversalSearchModule)
+  },
 ];
 
 @NgModule({

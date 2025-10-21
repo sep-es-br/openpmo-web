@@ -44,6 +44,7 @@
   "notFoundRisks": "Não foram encontrados riscos para este pacote de trabalho",
   "notFoundCostAccounts": "Não foram encontrados centros de custos para este pacote de trabalho",
   "notFoundIndicators": "Não foram encontrados indicadores para este pacote de trabalho",
+  "notFoundSearch": "Nenhum elemento encontrado",
   "notFoundWorkpacksToThisModel": "Não foram encontrados pacotes de trabalho para este modelo",
   "noBaselines": "Não existem linhas de base neste projeto",
   "noActiveBaselines": "Não existem linhas de base ativas neste projeto",

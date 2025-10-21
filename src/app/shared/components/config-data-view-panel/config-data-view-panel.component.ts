@@ -2,11 +2,12 @@ import { ConfigDataViewService } from './../../services/config-dataview.service'
 import { takeUntil } from 'rxjs/operators';
 import { ResponsiveService } from './../../services/responsive.service';
 import { SelectItem } from 'primeng/api';
-import { Component, Input, OnInit, OnDestroy } from '@angular/core';
+import { Component, Input, OnInit, OnDestroy, Output } from '@angular/core';
 import { CookieService } from 'ngx-cookie';
 import { AuthService } from '../../services/auth.service';
 import * as moment from 'moment';
 import { Subject } from 'rxjs';
+import { EventEmitter } from 'stream';
 
 @Component({
   selector: 'app-config-data-view-panel',
@@ -17,6 +18,7 @@ export class ConfigDataViewPanelComponent implements OnInit, OnDestroy {
 
   @Input() notShowCollapseOptions: boolean = false;
   @Input() notShowpageSizeOptions: boolean = false;
+  @Input() notShowLayoutTypeOptions: boolean = false;
 
   collapsed = true;
   displayMode = 'list';
