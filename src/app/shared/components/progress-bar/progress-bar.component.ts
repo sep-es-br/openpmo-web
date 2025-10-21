@@ -42,6 +42,8 @@ export class ProgressBarComponent implements OnInit, OnDestroy {
 
   @Input() displayWhenTotalIsZero: boolean = false;
 
+  @Input() displayFilledBarsWhenTotalIsZero: boolean = true;
+
   language: string;
 
   $destroy = new Subject();
