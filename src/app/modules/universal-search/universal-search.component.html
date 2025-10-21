@@ -16,7 +16,7 @@
 <main>
     <app-card-loading *ngIf="(loading$ | async) as loading" [isCardLoading]="loading"></app-card-loading>
             
-    <p-dataView [value]="result" layout="list" class="app-dataview app-dataview-list" [first]="pageData.page * pageData.pageSize"
+    <p-dataView [value]="result" layout="list" class="app-dataview app-dataview-list" [(first)]="first"
         [paginator]="true" [rows]="pageData.pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false"
         [totalRecords]="result ? totalCount : 1" [lazy]="true" (onLazyLoad)="onLazyLoadPage($event)"
         [emptyMessage]="'notFoundSearch' | translate" [style.display]="(!(loading$ | async) && result && searchTerm) ? 'block' : 'none'" >

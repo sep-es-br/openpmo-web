@@ -29,6 +29,7 @@ export class UniversalSearchComponent implements OnDestroy, AfterViewInit {
     result : IUniversalSearch[];
     propertiesPlan:IPlan;
     pageData : PageDef = {} as PageDef;
+    first : number;
 
     $destroy = new Subject<void>();
   
@@ -42,7 +43,11 @@ export class UniversalSearchComponent implements OnDestroy, AfterViewInit {
     this.setBreadcrumb();
     this.searchSrv.searchTerm$.pipe(takeUntil(this.$destroy)).subscribe(term => this.searchTerm = term);
     this.searchSrv.totalCount$.pipe(takeUntil(this.$destroy)).subscribe(total => this.totalCount = total);
-    this.configDataViewSrv.observablePageSize.pipe(takeUntil(this.$destroy)).subscribe(pgSize => this.pageData.pageSize = pgSize)
+    this.configDataViewSrv.observablePageSize.pipe(takeUntil(this.$destroy)).subscribe(pgSize => {
+        this.onLazyLoadPage({first: 0, rows: pgSize} as LazyLoadEvent)
+        this.pageData.pageSize = pgSize;
+        this.first = 0;        
+    })
     this.searchSrv.result$.pipe(take(1)).subscribe(_result => this.result = _result.data.data);
 
     this.pageData.page = 0;

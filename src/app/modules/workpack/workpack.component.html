@@ -266,7 +266,7 @@
     <i class="fas fa-times fa-lg" [pTooltip]="'back' | translate" role="button" [attr.aria-label]="'back' | translate"
         (click)="handleCloseSearching()" ></i>
           
-    <p-dataView [value]="result" layout="list" class="app-dataview app-dataview-list" [first]="page"
+    <p-dataView [value]="result" layout="list" class="app-dataview app-dataview-list" [first]="page * pageSize"
         [paginator]="true" [rows]="pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false"
         [totalRecords]="totalCountResults ? totalCountResults : 1" [lazy]="true" (onLazyLoad)="handlePageChange($event)"
         [emptyMessage]="'notFoundSearch' | translate" >
