@@ -30,10 +30,19 @@
       <!-- NOVA UNIDADE ORÇAMENTÁRIA -->
       <span class="p-float-label" [class.workpack-selection-mobile]="responsive"
         [class.workpack-selection]="true" [class.workpack-selection-not-fullLine]="false">
-        <p-dropdown class="app-single-selection p-budget" dropdownIcon="fas fa-caret-down" [options]="uoOptions"
-          [(ngModel)]="selectedUo" optionLabel="displayText" [filter]="true" filterBy="displayText" (onChange)="onUoChange($event)"
-          [showClear]="false" #uoSelect>
-
+        <p-dropdown
+          class="app-single-selection p-budget"
+          dropdownIcon="fas fa-caret-down"
+          optionLabel="displayText"
+          filterBy="displayText"
+          [options]="uoOptions"
+          [filter]="true"
+          [showClear]="false"
+          [disabled]="!editPermission"
+          [(ngModel)]="selectedUo"
+          (onChange)="onUoChange($event)"
+          #uoSelect
+        >
           <ng-template pTemplate="selectedItem" let-selectedOption>
             <div class="flex align-items-center gap-2">
               <div>{{ selectedOption.displayText }}</div>
@@ -52,11 +61,18 @@
       <!-- PLANO ORÇAMENTÁRIO -->
       <span class="p-float-label" [class.workpack-selection-mobile]="responsive" [class.workpack-selection]="true"
         [class.workpack-selection-not-fullLine]="false">
-        <p-dropdown class="app-single-selection p-budget" dropdownIcon="fas fa-caret-down" [options]="planoOrcamentarioOptions"
-          [(ngModel)]="selectedPlano" optionLabel="displayText"
-          [filter]="true" filterBy="displayText" (onChange)="onPlanoChange($event)"
-          [showClear]="false" [disabled]="poDisabled">
-      
+        <p-dropdown
+          class="app-single-selection p-budget"
+          dropdownIcon="fas fa-caret-down"
+          filterBy="displayText"
+          optionLabel="displayText"
+          [options]="planoOrcamentarioOptions"
+          [filter]="true"
+          [showClear]="false"
+          [disabled]="poDisabled || !editPermission"
+          [(ngModel)]="selectedPlano"
+          (onChange)="onPlanoChange($event)"
+        >
           <ng-template pTemplate="selectedItem" let-selectedOption>
             <div class="flex align-items-center gap-2">
               <div>{{ selectedOption.displayText }}</div>
@@ -68,7 +84,6 @@
               <div>{{ plano.displayText }}</div>
             </div>
           </ng-template>
-      
         </p-dropdown>
         <label class="app-input-label">{{ 'labelBudgetPlan' | translate }}</label>
       </span>

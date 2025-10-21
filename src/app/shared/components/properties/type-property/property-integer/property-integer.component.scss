@@ -37,12 +37,12 @@
     pointer-events: none !important;
     cursor: not-allowed !important;
     opacity: 0.6;
-    
-    input.p-inputnumber {
-      user-select: none !important;
-      -moz-user-select: none !important;
-      pointer-events: none !important;
-      cursor: not-allowed !important;
-    }
+  }
+
+  &.custom-input {
+    background: none;
+    border: none;
+    border-bottom: 1px solid #87A0A9;
+    padding-top: 1em;
   }
 }
