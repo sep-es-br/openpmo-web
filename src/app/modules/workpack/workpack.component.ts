@@ -249,6 +249,7 @@ export class WorkpackComponent implements OnDestroy {
         this.changedStatusCompleted = true;
         this.workpack.completed = checkCompleted;
       }
+      this.handleCloseSearching();
     });
 
   }
@@ -260,9 +261,7 @@ export class WorkpackComponent implements OnDestroy {
         const clickedInside = path.includes(this.searchBarRef.nativeElement);
 
         if (!clickedInside && !this.isSearching) {
-            this.page = 0;
-            this.searchTerm = undefined;
-            this.showAnimationSearch = false;
+            this.handleCloseSearching();
         }
     }
 

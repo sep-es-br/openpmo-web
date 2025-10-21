@@ -25,7 +25,7 @@ export class UniversalSearchComponent implements OnDestroy, AfterViewInit {
 
     // searchTerm$ = this.searchSrv.searchTerm$;
     searchTerm;
-    loading$ = this.searchSrv.loading$;
+    loading = false;
     totalCount : number;
     result : IUniversalSearch[];
     propertiesPlan:IPlan;
@@ -35,6 +35,8 @@ export class UniversalSearchComponent implements OnDestroy, AfterViewInit {
     $destroy = new Subject<void>();
 
     searchControl = new FormControl();
+
+    canload = false;
   
 
   constructor(
@@ -44,22 +46,13 @@ export class UniversalSearchComponent implements OnDestroy, AfterViewInit {
     private configDataViewSrv : ConfigDataViewService
   ) {
     this.setBreadcrumb();
-    this.searchSrv.searchTerm$.pipe(takeUntil(this.$destroy)).subscribe(term => this.searchTerm = term);
-    this.searchSrv.totalCount$.pipe(takeUntil(this.$destroy)).subscribe(total => this.totalCount = total);
     this.configDataViewSrv.observablePageSize.pipe(takeUntil(this.$destroy)).subscribe(pgSize => {
-        this.onLazyLoadPage({first: 0, rows: pgSize} as LazyLoadEvent)
+        if(this.canload) this.onLazyLoadPage({first: 0, rows: pgSize} as LazyLoadEvent)
         this.pageData.pageSize = pgSize;
         this.first = 0;        
     })
-    this.searchSrv.result$.pipe(take(1)).subscribe(_result => this.result = _result?.data?.data);
 
-    this.pageData.page = 0;
     
-    if(this.searchSrv.pageData) {
-        this.pageData = this.searchSrv.pageData;
-        this.configDataViewSrv.nextPageSize(this.pageData.pageSize);
-    }
-
     this.searchControl.valueChanges.pipe(
         takeUntil(this.$destroy),
         debounceTime(1000)
@@ -67,15 +60,6 @@ export class UniversalSearchComponent implements OnDestroy, AfterViewInit {
    }
 
    ngAfterViewInit(): void {
-
-        const { page, pageSize } = this.searchSrv.pageData;
-
-        const first = page * pageSize;
-        this.dataView.onLazyLoad.emit({
-            first,
-            rows: pageSize
-        })
-
 
    }
 
@@ -122,44 +106,40 @@ export class UniversalSearchComponent implements OnDestroy, AfterViewInit {
     onSearchInput(term: string) {
         if (term?.trim().length < this.searchSrv.minLength) return;
         
-        
-        if (term !== this.searchSrv.searchTerm$.value) {
-            this.searchSrv.setSearchTerm(term);
-            this.searchSrv.setPageData({ page: 0, pageSize: this.pageData.pageSize }); // sempre volta pra primeira página
-            this.searchSrv.triggerSearch().subscribe(_result => {
-                if(_result?.success) {
-                    this.result = _result.data.data;
-                } else {
-                    this.result = [];
-                }
-            });
-        }
+        const pageData = { page: 0, pageSize: this.pageData.pageSize };
 
+        this.doSearch(term, pageData);
         
     }   
 
     onLazyLoadPage(event: LazyLoadEvent) {
-        const currentTerm = this.searchSrv.searchTerm$.value;
+        if(!this.canload) {
+            this.canload = true;
+            return;
+        }
 
         const pageData: PageDef = {
             page: event.first / event.rows,
             pageSize: event.rows
         };
 
-        if (
-            this.searchSrv.pageData?.page !== pageData.page ||
-            this.searchSrv.pageData?.pageSize !== pageData.pageSize
-        ) {
-            this.searchSrv.setPageData(pageData);
-            this.searchSrv.triggerSearch().subscribe(_result => {
-                    if(_result?.success) {
-                        this.result = _result.data.data;
-                    } else {
-                        this.result = [];
-                    }
-                });
-        }
+        this.doSearch(this.searchControl.value, pageData);
     }
+
+    doSearch(term?, dataPage?) {
+
+        this.loading = true;
+        this.searchSrv.doSimpleSearch(term ?? this.searchTerm, undefined, dataPage ?? this.pageData)
+        .pipe(finalize(() => this.loading = false))
+        .subscribe(_result => {
+                if(_result?.success) {
+                    this.result = _result.data.data;
+                    this.totalCount = _result.data.totalRecords;
+                } else {
+                    this.result = [];
+                }
+            });
+    } 
 
 
 }
