@@ -1,5 +1,9 @@
 <div class="app-workpack-section-schedule" *ngIf="sectionSchedule && sectionActive">
-  <app-card [properties]="sectionSchedule.cardSection" [class.panel-tab-view]="showTabview">
+  <app-card
+    [properties]="sectionSchedule.cardSection"
+    [class.panel-tab-view]="showTabview"
+    [displayProgressBarIfTotalIsZero]="true"
+  >
     <button type="button" class="p-button-text button-new-schedule"
       *ngIf="!schedule && !!editPermission && !sectionSchedule.cardSection.isLoading" (click)="handleNewSchedule()"
       pButton icon="pi pi-plus" iconPos="left" [label]="translateSrv.instant('newSchedule')"
@@ -64,27 +68,55 @@
               </div>
             </div>
           </div>
-          <p-dataView [value]="groupStep.cardItemSection" layout="grid" styleClass="dataview-step-card-items"
-            *ngIf="showDetails; else showResumed" [emptyMessage]="'loadingEllipsis' | translate">
+          <p-dataView
+            *ngIf="showDetails; else showResumed"
+            layout="grid"
+            styleClass="dataview-step-card-items"
+            [value]="groupStep.cardItemSection"
+            [emptyMessage]="'loadingEllipsis' | translate"
+          >
             <ng-template let-step pTemplate="gridItem">
-              <div class="card-item-container show-details" *ngIf="['newStart', 'newEnd'].includes(step.type)"
-                [class.new-card-item]="['newStart', 'newEnd'].includes(step.type)" [class.mobile]="responsive">
-                <app-schedule-step-card-item [properties]="step" [type]="'listStep'" [isCurrentBaseline]="isCurrentBaseline" [tooltipLabel]="tooltipLabel" [foreseenLabel]="abbreviatedLabel"  
-                (onCreateNewStep)="handleCreateNewStep({
-                  idSchedule: schedule.id,
-                  idWorkpackModelLinked: workpackParams.idWorkpackModelLinked,
-                  stepType: step.type,
-                  unitName: step.unitName,
-                  unitPrecision: step.unitPrecision})" 
+              <div
+                *ngIf="['newStart', 'newEnd'].includes(step.type)"
+                class="card-item-container show-details"
+                [class.new-card-item]="['newStart', 'newEnd'].includes(step.type)"
+                [class.mobile]="responsive"
+              >
+                <app-schedule-step-card-item
+                  [properties]="step"
+                  [type]="'listStep'"
+                  [isCurrentBaseline]="isCurrentBaseline"
+                  [tooltipLabel]="tooltipLabel"
+                  [foreseenLabel]="abbreviatedLabel"  
+                  (onCreateNewStep)="handleCreateNewStep({
+                    idSchedule: schedule.id,
+                    idWorkpackModelLinked: workpackParams.idWorkpackModelLinked,
+                    stepType: step.type,
+                    unitName: step.unitName,
+                    unitPrecision: step.unitPrecision
+                  })" 
                   (spreadDifference)="requestTypeDistributionInformation($event, false)"
-                  (stepChanged)="saveStepChanged(groupStep.year, step.idStep)"></app-schedule-step-card-item>
+                  (stepChanged)="saveStepChanged(groupStep.year, step.idStep)"
+                >
+                </app-schedule-step-card-item>
               </div>
-              <div class="card-item-container show-details" *ngIf="step.type === 'listStep'"
-                [class.new-card-item]="['newStart', 'newEnd'].includes(step.type)" [class.mobile]="responsive">
-                <app-schedule-step-card-item [properties]="step" [type]="'listStep'" [isCurrentBaseline]="isCurrentBaseline" [tooltipLabel]="tooltipLabel" [foreseenLabel]="abbreviatedLabel"
+              <div
+                *ngIf="step.type === 'listStep'"
+                class="card-item-container show-details"
+                [class.new-card-item]="['newStart', 'newEnd'].includes(step.type)"
+                [class.mobile]="responsive"
+              >
+                <app-schedule-step-card-item
+                  [properties]="step"
+                  [type]="'listStep'"
+                  [isCurrentBaseline]="isCurrentBaseline"
+                  [tooltipLabel]="tooltipLabel"
+                  [foreseenLabel]="abbreviatedLabel"
                   (editCost)="handleShowEditCost($event, groupStep.year)"
                   (spreadDifference)="requestTypeDistributionInformation($event, false)"
-                  (stepChanged)="saveStepChanged(groupStep.year, step.idStep)"></app-schedule-step-card-item>
+                  (stepChanged)="saveStepChanged(groupStep.year, step.idStep)"
+                >
+                </app-schedule-step-card-item>
               </div>
               <p-overlayPanel #cardCostEditPanel [dismissable]="true">
                 <ng-template pTemplate>

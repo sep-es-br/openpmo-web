@@ -1,5 +1,8 @@
-<div class="app-progress" [class.app-progress-with-baseline]="baselineTotal && baselineTotal > 0"
-  *ngIf="total && total !== 0">
+<div
+  *ngIf="total !== undefined && (displayWhenTotalIsZero || total !== 0)"
+  class="app-progress"
+  [class.app-progress-with-baseline]="baselineTotal && baselineTotal > 0"
+>
   <div class="unit-container">
     <span *ngIf="!['currency', 'time'].includes(valueUnit)" [ngStyle]="{color: color}">{{valueUnit}}</span>
     <span *ngIf="valueUnit === 'currency'" [ngStyle]="{color: color}">$</span>
