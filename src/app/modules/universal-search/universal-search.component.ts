@@ -1,10 +1,11 @@
-import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+ import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { FormControl } from '@angular/forms';
 import { ActivatedRoute, Data } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { LazyLoadEvent } from 'primeng/api';
 import { DataView } from 'primeng/dataview';
 import { Observable, OperatorFunction, Subject } from 'rxjs';
-import { delay, map, take, takeUntil, tap } from 'rxjs/operators';
+import { debounceTime, delay, distinctUntilChanged, map, take, takeUntil, tap } from 'rxjs/operators';
 import { IHttpResult } from 'src/app/shared/interfaces/IHttpResult';
 import { IPlan } from 'src/app/shared/interfaces/IPlan';
 import { IBreadCrumb, IUniversalSearch } from 'src/app/shared/interfaces/universal-search.interface';
@@ -32,6 +33,8 @@ export class UniversalSearchComponent implements OnDestroy, AfterViewInit {
     first : number;
 
     $destroy = new Subject<void>();
+
+    searchControl = new FormControl();
   
 
   constructor(
@@ -48,7 +51,7 @@ export class UniversalSearchComponent implements OnDestroy, AfterViewInit {
         this.pageData.pageSize = pgSize;
         this.first = 0;        
     })
-    this.searchSrv.result$.pipe(take(1)).subscribe(_result => this.result = _result.data.data);
+    this.searchSrv.result$.pipe(take(1)).subscribe(_result => this.result = _result?.data?.data);
 
     this.pageData.page = 0;
     
@@ -56,6 +59,11 @@ export class UniversalSearchComponent implements OnDestroy, AfterViewInit {
         this.pageData = this.searchSrv.pageData;
         this.configDataViewSrv.nextPageSize(this.pageData.pageSize);
     }
+
+    this.searchControl.valueChanges.pipe(
+        takeUntil(this.$destroy),
+        debounceTime(1000)
+    ).subscribe(value => this.onSearchInput(value))
    }
 
    ngAfterViewInit(): void {
