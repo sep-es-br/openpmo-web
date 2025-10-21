@@ -1,0 +1,99 @@
+:host {
+
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  header {
+    display: flex;
+    flex-direction: row;
+    .busca-wrapper{
+      display: flex;
+      flex-direction: column;
+      line-height: 1.5rem;
+      flex-grow: 1;
+
+      .dataview-filters-text {
+        margin-right: 2em;
+        width: 50%;
+        height: 2rem;
+        display: flex;
+        justify-content: flex-end;
+        position: relative;
+
+        .app-input-text.p-inputtext {
+          font-size: 0.8rem !important;
+          width: 0 !important;
+          border-bottom: none !important;
+          transition: width .3s;
+          &.animation-input {
+            width: 100% !important;
+            border-bottom: 1px solid #b6c8cd !important;
+          }
+        }
+        .fa-search {
+          position: absolute;
+          cursor: pointer;
+          transition: all .3s;
+
+          &.no-animation {
+            padding: 0.45rem;
+            background: #44B39B;
+            color: #FFF;
+            top: 0;
+            border-radius: 4px;
+          }
+          &.animation-input {
+            top: .4rem;
+            padding: 0;
+            font-size: 0.9rem;
+          }
+        }
+        .fa-close {
+          position: absolute;
+          cursor: pointer;
+          transition: all 0.3s;
+          font-size: .6rem;
+          top: 0.7rem;
+          padding: 0;
+          &.no-animation { left: 92%; }
+          &.animation-input {
+            left: 80%;
+            &:hover {
+              font-size: .8rem;
+            }
+          }
+        }
+      }
+
+      .alert-min-length{
+        font-style: italic;
+        font-size: small;
+      }
+    }
+
+    .actions {
+        display: flex;
+        justify-content: flex-end;
+        flex-grow: 1;
+    }
+  }
+  main {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    position: relative;
+
+    app-card-loading {
+        background-color: unset !important;
+    }
+
+    app-dataview {
+        div.card {
+            background-color: white;
+        }
+    }
+  }
+
+    
+}
+

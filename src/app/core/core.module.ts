@@ -84,6 +84,7 @@ import { PanelMenuComponent } from './panel-menu/panel-menu.component';
 import { UserSlideMenuComponent } from './user-slide-menu/user-slide-menu.component';
 import { MobileMenuComponent } from './mobile-menu/mobile-menu.component';
 import { BadgeModule } from 'primeng/badge';
+import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
 
 @NgModule({
   imports: [
@@ -164,8 +165,9 @@ import { BadgeModule } from 'primeng/badge';
     TimelineModule,
     AvatarModule,
     ImageCropperModule,
-    ChartModule
-  ],
+    ChartModule,
+    FontAwesomeModule
+],
   exports: [
     BadgeModule,
     AccordionModule,

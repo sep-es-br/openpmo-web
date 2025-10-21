@@ -21,13 +21,16 @@ export class NavMenuComponent implements OnInit {
 
   @Output() changeMenu = new EventEmitter<boolean>();
 
+  
+
   menus: IMenu[] = [
     {label: 'office', isOpen: false},
     {label: 'portfolio', isOpen: false},
     {label: 'planModel', isOpen: false},
     {label: 'favorite', isOpen: false},
     {label: 'ccbmember-baselines-view', isOpen: false},
-    {label: 'reports', isOpen: false}
+    {label: 'reports', isOpen: false},
+    {label: 'search', isOpen: false}
   ];
   menusAdmin: IMenu[] = [
     {label: 'organizations', isOpen: false},
@@ -123,6 +126,26 @@ export class NavMenuComponent implements OnInit {
     } else {
       this.menus.forEach( item => {
         if (item.label === 'reports') {
+          item.isOpen = true;
+        } else {
+          item.isOpen = false;
+        }
+      });
+      this.menuSrv.nextMenuState({
+        isFixed: false
+      });
+      this.menuSrv.nextCloseAllMenus(true);
+      this.showUserMenu = false;
+    }
+    if (!url.startsWith('search')) {
+      this.menus.forEach( item => {
+        if (item.label === 'search') {
+          item.isOpen = false;
+        }
+      });
+    } else {
+      this.menus.forEach( item => {
+        if (item.label === 'search') {
           item.isOpen = true;
         } else {
           item.isOpen = false;
