@@ -37,6 +37,8 @@ export class CardComponent implements OnInit, OnDestroy, OnChanges {
 
   @Input() displayProgressBarIfTotalIsZero: boolean = false;
 
+  @Input() displayFilledBarsWhenTotalIsZero: boolean = true;
+
   @Output() selectedFilter = new EventEmitter();
 
   @Output() editFilter = new EventEmitter();
