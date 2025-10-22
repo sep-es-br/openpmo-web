@@ -11,7 +11,7 @@
       <div class="dataview-filters-text" #searchBar *ngIf="!workpackLoading && idWorkpack">
         <input pInputText class="app-input-text"
                [class.animation-input]="showAnimationSearch"
-               [(ngModel)]="searchTerm"
+               [(ngModel)]="searchTerm" (keydown.enter)="handleSearchText()"
                [placeholder]="'search' | translate"
         />
         <i class="fas fa-search"
