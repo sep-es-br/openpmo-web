@@ -8,11 +8,14 @@
     <div class="app-content-header" [class.mobile]="responsive">
       <span class="label">{{workpackModel?.modelName}}:</span>
       <span class="text actual-element">{{workpack?.fullName}}</span>
-      <div class="dataview-filters-text" #searchBar *ngIf="!workpackLoading && idWorkpack">
+      
+    </div>
+    <div class="container-actions">
+        <div class="dataview-filters-text" #searchBar *ngIf="!workpackLoading && idWorkpack">
         <input pInputText class="app-input-text"
                [class.animation-input]="showAnimationSearch"
                [(ngModel)]="searchTerm" (keydown.enter)="handleSearchText()"
-               [placeholder]="'search' | translate"
+               [placeholder]="'minLengthSearch' | translate"
         />
         <i class="fas fa-search"
            *ngIf="!showAnimationSearch"
@@ -26,8 +29,6 @@
            [class.no-animation]="!showAnimationSearch"
            (click)="handleSearchText()"></i>
       </div>  
-    </div>
-    <div class="container-actions">
       <i
         *ngIf="checkHasPermission"
         [pTooltip]="(workpack?.favoritedBy ? 'removeFavorite' : 'addFavorite') | translate" (click)="!favoriteProcessing && handleFavorite()" [class.responsive]="responsive"
