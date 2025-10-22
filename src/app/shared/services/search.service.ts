@@ -43,7 +43,6 @@ export class SearchService extends BaseService<IUniversalSearch> {
 
   public doSimpleSearch(term: string, workpackId?: number, pageData? : PageDef) {
 
-    if(this._loading$.value) return this.result$;
     
     const storedPlan = localStorage.getItem('@pmo/propertiesCurrentPlan');
     this._propertiesPlan = storedPlan ? JSON.parse(storedPlan) : undefined;
@@ -73,11 +72,11 @@ export class SearchService extends BaseService<IUniversalSearch> {
       tap((result) => {
         this._result$.next(result); 
         this._totalCount$.next(result?.data?.totalRecords)// atualiza os resultados explicitamente
-        this.msgSrv.add({
-          summary: this.translateSrv.instant('success'),
-          severity: 'success',
-          detail: 'Busca concluída'
-        });
+        // this.msgSrv.add({
+        //   summary: this.translateSrv.instant('success'),
+        //   severity: 'success',
+        //   detail: 'Busca concluída'
+        // });
       }),
       finalize(() => this._loading$.next(false))
     );
