@@ -3,11 +3,10 @@
         <div class="dataview-filters-text">
             <input pInputText id="id-app-inputtext" class="app-input-text p-inputtext animation-input"
                 [formControl]="searchControl"
-                placeholder="{{'search' | translate}}"
+                [placeholder]="'minLengthSearch' | translate"
             />
             <i class="fas fa-search animation-input"></i>
         </div>
-        <span class="alert-min-length">Digite pelo menos 3 caracteres para buscar</span>
     </div>
     <div class="actions">
         <app-config-data-view-panel [notShowCollapseOptions]="true" [notShowLayoutTypeOptions]="true" ></app-config-data-view-panel>
