@@ -36,7 +36,7 @@
             <span class="group-step-year">{{groupStep.year}}</span>
             <div class="group-progress-bar-container">
 
-              <div class="group-liquidated">
+              <!-- <div class="group-liquidated">
                 <div class="budgeted" [class.mobile]="responsive">
                   <span class="budgeted-label">{{"budgeted" | translate}}:</span>
                   <span class="budgeted-value">{{groupStep.budgetedValue || '0'}}</span>
@@ -51,7 +51,7 @@
                   <span class="liquidatedTotal-label">{{"liquidated" | translate}}:</span>
                   <span class="liquidatedTotal-value">{{groupStep.liquidatedTotal || '0'}}</span>
                 </div>
-              </div>
+              </div> -->
 
               <div class="progress-bar-container" *ngFor="let progressBar of groupStep.groupProgressBar">
                 <app-progress-bar-schedule-year
