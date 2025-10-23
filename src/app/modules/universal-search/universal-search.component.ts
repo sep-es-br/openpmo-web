@@ -104,6 +104,10 @@ export class UniversalSearchComponent implements OnDestroy, AfterViewInit {
   }
 
     onSearchInput(term: string) {
+        if(!this.canload) {
+            this.canload = true;
+            return;
+        }
         if (term?.trim().length < this.searchSrv.minLength) return;
         
         const pageData = { page: 0, pageSize: this.pageData.pageSize };
