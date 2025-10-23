@@ -232,6 +232,10 @@
     flex-direction: column;
     align-items: flex-start;
     gap: 0.3rem;
+
+    .app-dataview {
+        width: 100%;
+    }
   }
 
 }

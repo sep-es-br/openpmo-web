@@ -273,7 +273,7 @@
         [emptyMessage]="'notFoundSearch' | translate" >
         <ng-template let-cardItem pTemplate="listItem">
             <div class="p-col p-col-12">
-                <app-search-item-card [item]="cardItem"></app-search-item-card>
+                <app-search-item-card [item]="cardItem" (onRedirect)="this.handleCloseSearching()"></app-search-item-card>
             </div>
         </ng-template>
     </p-dataView>
