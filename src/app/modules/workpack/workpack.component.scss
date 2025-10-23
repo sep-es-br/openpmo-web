@@ -80,10 +80,23 @@
         flex-grow: 1;
     }
 
+
+  }
+  .header-container.mobile {
+    flex-direction: column;
+  }
+  .mobile {
+    width: 100%;
+  }
+
+  .container-actions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+
     .dataview-filters-text {
         align-self: flex-end;
-        margin-right: 0.3em;
-        width: 11rem;
+        margin-right: 0.5em;
         height: 2rem;
         display: flex;
         justify-content: flex-end;
@@ -94,15 +107,19 @@
           width: 0 !important;
           border-bottom: none !important;
           transition: width .3s;
+          margin-left: 2rem;
           &.animation-input {
-            width: 100% !important;
-            border-bottom: 1px solid #b6c8cd !important;
+            width: 20rem !important;
+            margin-left: 0.5rem !important;
+            border-bottom: 1px solid #828f92 !important;
           }
+
         }
         .fa-search {
           position: absolute;
           cursor: pointer;
           transition: all .3s;
+          color: #959595;
 
           &.no-animation {
             padding: 0.45rem;
@@ -133,20 +150,6 @@
           }
         }
       }
-
-  }
-  .header-container.mobile {
-    flex-direction: column;
-  }
-  .mobile {
-    width: 100%;
-  }
-
-  .container-actions {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-
     
 
     .icon-favorite {
@@ -229,6 +232,10 @@
     flex-direction: column;
     align-items: flex-start;
     gap: 0.3rem;
+
+    .app-dataview {
+        width: 100%;
+    }
   }
 
 }

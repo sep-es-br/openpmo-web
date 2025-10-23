@@ -3,23 +3,22 @@
         <div class="dataview-filters-text">
             <input pInputText id="id-app-inputtext" class="app-input-text p-inputtext animation-input"
                 [formControl]="searchControl"
-                placeholder="{{'search' | translate}}"
+                [placeholder]="'minLengthSearch' | translate"
             />
             <i class="fas fa-search animation-input"></i>
         </div>
-        <span class="alert-min-length">Digite pelo menos 3 caracteres para buscar</span>
     </div>
     <div class="actions">
         <app-config-data-view-panel [notShowCollapseOptions]="true" [notShowLayoutTypeOptions]="true" ></app-config-data-view-panel>
     </div>
 </header>
 <main>
-    <app-card-loading *ngIf="(loading$ | async) as loading" [isCardLoading]="loading"></app-card-loading>
+    <app-card-loading *ngIf="loading" [isCardLoading]="loading"></app-card-loading>
             
     <p-dataView [value]="result" layout="list" class="app-dataview app-dataview-list" [first]="first"
         [paginator]="true" [rows]="pageData.pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false"
         [totalRecords]="result ? totalCount : 1" [lazy]="true" (onLazyLoad)="onLazyLoadPage($event)"
-        [emptyMessage]="'notFoundSearch' | translate" [style.display]="(!(loading$ | async) && result && searchTerm) ? 'block' : 'none'" >
+        [emptyMessage]="'notFoundSearch' | translate" [style.display]="(!loading && result && searchControl.value) ? 'block' : 'none'" >
         <ng-template let-cardItem pTemplate="listItem">
             <div class="p-col p-col-12">
                 <app-search-item-card [item]="cardItem"></app-search-item-card>

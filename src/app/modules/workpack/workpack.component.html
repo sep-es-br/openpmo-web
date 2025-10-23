@@ -8,17 +8,20 @@
     <div class="app-content-header" [class.mobile]="responsive">
       <span class="label">{{workpackModel?.modelName}}:</span>
       <span class="text actual-element">{{workpack?.fullName}}</span>
-      <div class="dataview-filters-text" #searchBar *ngIf="!workpackLoading && idWorkpack">
+      
+    </div>
+    <div class="container-actions">
+        <div class="dataview-filters-text" #searchBar *ngIf="!workpackLoading && idWorkpack">
         <input pInputText class="app-input-text"
                [class.animation-input]="showAnimationSearch"
-               [(ngModel)]="searchTerm"
-               [placeholder]="'search' | translate"
+               [(ngModel)]="searchTerm" (keydown.enter)="handleSearchText()"
+               [placeholder]="'minLengthSearch' | translate"
         />
         <i class="fas fa-search"
            *ngIf="!showAnimationSearch"
            [class.animation-input]="showAnimationSearch"
            [class.no-animation]="!showAnimationSearch"
-           (click)="showAnimationSearch = true"></i>
+           (click)="openSearch()"></i>
 
         <i class="fas fa-search"
            *ngIf="showAnimationSearch"
@@ -26,8 +29,6 @@
            [class.no-animation]="!showAnimationSearch"
            (click)="handleSearchText()"></i>
       </div>  
-    </div>
-    <div class="container-actions">
       <i
         *ngIf="checkHasPermission"
         [pTooltip]="(workpack?.favoritedBy ? 'removeFavorite' : 'addFavorite') | translate" (click)="!favoriteProcessing && handleFavorite()" [class.responsive]="responsive"
@@ -272,7 +273,7 @@
         [emptyMessage]="'notFoundSearch' | translate" >
         <ng-template let-cardItem pTemplate="listItem">
             <div class="p-col p-col-12">
-                <app-search-item-card [item]="cardItem"></app-search-item-card>
+                <app-search-item-card [item]="cardItem" (onRedirect)="this.handleCloseSearching()"></app-search-item-card>
             </div>
         </ng-template>
     </p-dataView>

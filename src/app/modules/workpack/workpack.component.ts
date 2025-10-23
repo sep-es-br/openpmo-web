@@ -162,7 +162,8 @@ export class WorkpackComponent implements OnDestroy {
     private breadcrumbSrv: BreadcrumbService,
     private location: Location,
     private setConfigWorkpackSrv: SetConfigWorkpackService,
-    private searchSrv : SearchService
+    private searchSrv : SearchService,
+    private thisElemRef : ElementRef<HTMLElement>
   ) {
     this.actRouter.queryParams.subscribe(({ id }) => this.idWorkpack = id && +id);
     this.actRouter.queryParams.subscribe(async({
@@ -249,6 +250,7 @@ export class WorkpackComponent implements OnDestroy {
         this.changedStatusCompleted = true;
         this.workpack.completed = checkCompleted;
       }
+      this.handleCloseSearching();
     });
 
   }
@@ -259,11 +261,15 @@ export class WorkpackComponent implements OnDestroy {
         const path = evt.composedPath();
         const clickedInside = path.includes(this.searchBarRef.nativeElement);
 
-        if (!clickedInside && !this.isSearching) {
-            this.page = 0;
-            this.searchTerm = undefined;
-            this.showAnimationSearch = false;
+        if (!clickedInside && (!this.isSearching || !path.includes(this.thisElemRef.nativeElement))) {
+            this.handleCloseSearching();
         }
+    }
+
+    openSearch() {
+        this.showAnimationSearch = true;
+        (this.searchBarRef.nativeElement.querySelector('.app-input-text') as HTMLInputElement).focus();
+        
     }
 
   ngOnDestroy(): void {
