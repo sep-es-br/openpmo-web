@@ -1080,6 +1080,7 @@
   "workpack-eap-alert-no-schedule": "Entrega sem cronograma",
   "workpack-eap-alert-no-scope": "Entrega sem escopo",
   "workpack-eap-alert-to-cancel": "Item a cancelar. Requer aprovação de nova Linha de Base",
+  "workpack-eap-alert-deleted-items-below": "Existem entregas excluídas nesse item",
 
   "NO_SCHEDULE": "Entrega sem cronograma",
   "UNDEFINED_SCOPE": "Entrega sem escopo",
