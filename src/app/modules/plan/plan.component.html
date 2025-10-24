@@ -4,10 +4,31 @@
       <span *ngIf="idPlan"> <span class="label">{{ 'plan' | translate }}:</span> {{ planData?.fullName }}</span>
       <span *ngIf="!idPlan">{{ 'newPlan' | translate }}</span>
     </div>
-    <app-config-data-view-panel>
-    </app-config-data-view-panel>
+    <div class="dataview-filters-text" #searchBar>
+        <input pInputText class="app-input-text"
+            [class.animation-input]="showAnimationSearch"
+            [(ngModel)]="searchTerm" (keydown.enter)="handleSearchTextNew()"
+            [placeholder]="'minLengthSearch' | translate"
+        />
+        <i class="fas fa-search"
+        *ngIf="!showAnimationSearch"
+        [class.animation-input]="showAnimationSearch"
+        [class.no-animation]="!showAnimationSearch"
+        (click)="openSearch()"></i>
+
+        <i class="fas fa-search"
+        *ngIf="showAnimationSearch"
+        [class.animation-input]="showAnimationSearch"
+        [class.no-animation]="!showAnimationSearch"
+        (click)="handleSearchTextNew()"></i>
+    </div> 
+    <div class="container-actions">
+         
+        <app-config-data-view-panel>
+        </app-config-data-view-panel>
+    </div>
   </div>
-  <div class="card-properties-plan">
+  <div class="card-properties-plan" *ngIf="!isSearching">
     <app-card [properties]="cardPlanProperties" class="mt-0 inputs-float-label">
       <div class="loading-container" *ngIf="cardPlanProperties.isLoading">
         <app-card-loading [isCardLoading]="cardPlanProperties.isLoading"></app-card-loading>
@@ -82,43 +103,62 @@
   </div>
 
   <section *ngIf="idPlan" class="workpackModels-cards-section">
-    <div class="card-workpack-model" *ngFor="let workpackModel of cardsPlanWorkPackModels; let i = index">
-      <app-card [properties]="workpackModel.propertiesCard"
-        (editFilter)="handleEditFilter($event, workpackModel.idWorkpackModel)"
-        (newFilter)="handleNewFilter(workpackModel.idWorkpackModel)"
-        (selectedFilter)="handleSelectedFilter($event, workpackModel.idWorkpackModel)"
-        (searchText)="handleSearchText($event, workpackModel.idWorkpackModel)"
-        (createNewElement)="handleCreateNewWorkpack(workpackModel.idWorkpackModel)">
-        <div class="loading-container" *ngIf="workpackModel.propertiesCard.isLoading">
-          <app-card-loading [isCardLoading]="workpackModel.propertiesCard.isLoading"></app-card-loading>
+    <ng-conteiner *ngIf="!isSearching; else searchResult">
+        <div class="card-workpack-model" *ngFor="let workpackModel of cardsPlanWorkPackModels; let i = index">
+            <app-card [properties]="workpackModel.propertiesCard"
+                (editFilter)="handleEditFilter($event, workpackModel.idWorkpackModel)"
+                (newFilter)="handleNewFilter(workpackModel.idWorkpackModel)"
+                (selectedFilter)="handleSelectedFilter($event, workpackModel.idWorkpackModel)"
+                (searchText)="handleSearchText($event, workpackModel.idWorkpackModel)"
+                (createNewElement)="handleCreateNewWorkpack(workpackModel.idWorkpackModel)">
+                <div class="loading-container" *ngIf="workpackModel.propertiesCard.isLoading">
+                <app-card-loading [isCardLoading]="workpackModel.propertiesCard.isLoading"></app-card-loading>
+                </div>
+                <p-dataView [value]="workpackModel.workpackItemCardList" layout="grid" class="app-dataview"
+                *ngIf="(displayModeAll === 'grid' || (displayModeAll === 'list' && !!responsive)) && !workpackModel.propertiesCard.isLoading"
+                [paginator]="true" [rows]="pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false"
+                [totalRecords]="totalRecords ? totalRecords[i] : 1"
+                [emptyMessage]="'notFoundWorkpacksToThisModel' | translate">
+                <ng-template let-cardItem pTemplate="gridItem">
+                    <div class="p-col-12 p-md-3 p-sm-12 card-item-container">
+                    <app-workpack-card-item [properties]="cardItem"></app-workpack-card-item>
+                    </div>
+                </ng-template>
+                </p-dataView>
+                <p-dataView [value]="workpackModel.workpackItemCardList" layout="list" class="app-dataview app-dataview-list"
+                *ngIf="(displayModeAll === 'list' && !responsive) && !workpackModel.propertiesCard.isLoading"
+                [paginator]="true" [rows]="pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false"
+                [totalRecords]="totalRecords ? totalRecords[i] : 1"
+                [emptyMessage]="'notFoundWorkpacksToThisModel' | translate">
+                <ng-template let-cardItem pTemplate="listItem">
+                    <div class="p-col-12">
+                    <app-workpack-card-item [properties]="cardItem"
+                        [displayModeCard]="displayModeAll"></app-workpack-card-item>
+                    </div>
+                </ng-template>
+                </p-dataView>
+                <div>
+                </div>
+            </app-card>
         </div>
-        <p-dataView [value]="workpackModel.workpackItemCardList" layout="grid" class="app-dataview"
-          *ngIf="(displayModeAll === 'grid' || (displayModeAll === 'list' && !!responsive)) && !workpackModel.propertiesCard.isLoading"
-          [paginator]="true" [rows]="pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false"
-          [totalRecords]="totalRecords ? totalRecords[i] : 1"
-          [emptyMessage]="'notFoundWorkpacksToThisModel' | translate">
-          <ng-template let-cardItem pTemplate="gridItem">
-            <div class="p-col-12 p-md-3 p-sm-12 card-item-container">
-              <app-workpack-card-item [properties]="cardItem"></app-workpack-card-item>
-            </div>
-          </ng-template>
+    </ng-conteiner>
+    <ng-template #searchResult>
+        <app-card-loading [isCardLoading]="searchLoading"></app-card-loading>
+        <ng-container *ngIf="!searchLoading"></ng-container>
+        <i class="fas fa-times fa-lg" [pTooltip]="'back' | translate" role="button" [attr.aria-label]="'back' | translate"
+            (click)="handleCloseSearching()" ></i>
+            
+        <p-dataView [value]="result" layout="list" class="app-dataview app-dataview-list" [first]="page * pageSize"
+            [paginator]="true" [rows]="pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false"
+            [totalRecords]="totalCountResults ? totalCountResults : 1" [lazy]="true" (onLazyLoad)="handlePageChange($event)"
+            [emptyMessage]="'notFoundSearch' | translate" >
+            <ng-template let-cardItem pTemplate="listItem">
+                <div class="p-col p-col-12">
+                    <app-search-item-card [item]="cardItem" (onRedirect)="this.handleCloseSearching()"></app-search-item-card>
+                </div>
+            </ng-template>
         </p-dataView>
-        <p-dataView [value]="workpackModel.workpackItemCardList" layout="list" class="app-dataview app-dataview-list"
-          *ngIf="(displayModeAll === 'list' && !responsive) && !workpackModel.propertiesCard.isLoading"
-          [paginator]="true" [rows]="pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false"
-          [totalRecords]="totalRecords ? totalRecords[i] : 1"
-          [emptyMessage]="'notFoundWorkpacksToThisModel' | translate">
-          <ng-template let-cardItem pTemplate="listItem">
-            <div class="p-col-12">
-              <app-workpack-card-item [properties]="cardItem"
-                [displayModeCard]="displayModeAll"></app-workpack-card-item>
-            </div>
-          </ng-template>
-        </p-dataView>
-        <div>
-        </div>
-      </app-card>
-    </div>
+    </ng-template>
   </section>
   <div class="id-container" *ngIf="idPlan && cardPlanProperties">
     <span>{{idPlan}}</span>
