@@ -165,7 +165,9 @@ export class WorkpackComponent implements OnDestroy {
     private searchSrv : SearchService,
     private thisElemRef : ElementRef<HTMLElement>
   ) {
-    this.actRouter.queryParams.subscribe(({ id }) => this.idWorkpack = id && +id);
+    this.actRouter.queryParams.subscribe(({ id }) => {
+        this.idWorkpack = id && +id;
+    });
     this.actRouter.queryParams.subscribe(async({
       id,
       idPlan,
@@ -192,7 +194,6 @@ export class WorkpackComponent implements OnDestroy {
     });
     this.breadcrumbSrv.ready.pipe(takeUntil(this.$destroy)).subscribe(data => {
       this.workpackBreadcrumbStorageSrv.setBreadcrumb();
-      this.handleCloseSearching();
     });
     this.menuSrv.getRemovedFavorites.pipe(takeUntil(this.$destroy)).subscribe((idRemoved) => {
       if (+this.idWorkpack === +idRemoved) {
@@ -352,6 +353,7 @@ export class WorkpackComponent implements OnDestroy {
   }
 
   async resetWorkpack() {
+    this.handleCloseSearching();
     this.workpackSrv.nextPendingChanges(false);
     if (this.saveButton) {
       this.saveButton.hideButton();
