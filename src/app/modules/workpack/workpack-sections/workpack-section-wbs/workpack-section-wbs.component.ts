@@ -249,12 +249,15 @@ export class WorkpackSectionWBSComponent implements OnDestroy {
         textTooltipMessages: [],
       };
     } else {
-      const everyWorkpackModel =
-        node.workpackModels.length > 0 &&
-        node.workpackModels.every(
-          (workpackModel: any) =>
-            workpackModel.workpacks.length > 0 &&
-            workpackModel.workpacks.every(
+      if (
+        node.workpackType === TypeWorkpackEnumWBS.Organizer &&
+        node.classifications.deletedWithBaseline &&
+        node.children &&
+        node.children.length > 0 &&
+        node.children.every(
+          (child: any) =>
+            child.workpacks.length > 0 &&
+            child.workpacks.every(
               (workpack: any) =>
                 workpack.classifications.deletedWithBaseline === false &&
                 workpack.classifications.isNew === false &&
@@ -262,23 +265,16 @@ export class WorkpackSectionWBSComponent implements OnDestroy {
                 workpack.classifications.noScope === false &&
                 workpack.classifications.toCancel === false
             )
-        );
-
-      if (node.workpackName === 'Construção de +20 praças saudáveis ') {
-        console.log('everyWorkpackModel: ', everyWorkpackModel);
-      }
-      if (
-        node.workpackType === TypeWorkpackEnumWBS.Organizer &&
-        node.classifications.deletedWithBaseline &&
-        node.workpackModels &&
-        node.workpackModels.length > 0 &&
-        everyWorkpackModel
+        )
       ) {
         return {
           displayWarningIcon: true,
           displayColoredText: true,
           displayDashedText: false,
-          textTooltipMessages: ['workpack-eap-alert-deleted-items-below'],
+          textTooltipMessages: [
+            'workpack-eap-alert-deleted-items-below',
+            // Existem entregas excluídas nesse item
+          ],
         };
       } else if (
         node.workpackType === TypeWorkpackEnumWBS.Project ||
