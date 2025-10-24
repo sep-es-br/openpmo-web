@@ -42,6 +42,64 @@
   .header-container {
     display: flex;
     flex-direction: row;
+
+    .dataview-filters-text {
+        align-self: flex-end;
+        margin-right: 0.5em;
+        margin-bottom: 0.5em;
+        height: 2rem;
+        display: flex;
+        justify-content: flex-end;
+        position: relative;
+
+        .app-input-text.p-inputtext {
+          font-size: 0.8rem !important;
+          width: 0 !important;
+          border-bottom: none !important;
+          transition: width .3s;
+          margin-left: 2rem;
+          &.animation-input {
+            width: 20rem !important;
+            margin-left: 0.5rem !important;
+            border-bottom: 1px solid #828f92 !important;
+          }
+
+        }
+        .fa-search {
+          position: absolute;
+          cursor: pointer;
+          transition: all .3s;
+          color: #959595;
+
+          &.no-animation {
+            padding: 0.45rem;
+            background: #44B39B;
+            color: #FFF;
+            top: 0;
+            border-radius: 4px;
+          }
+          &.animation-input {
+            top: .4rem;
+            padding: 0;
+            font-size: 0.9rem;
+          }
+        }
+        .fa-close {
+          position: absolute;
+          cursor: pointer;
+          transition: all 0.3s;
+          font-size: .6rem;
+          top: 0.7rem;
+          padding: 0;
+          &.no-animation { left: 92%; }
+          &.animation-input {
+            left: 80%;
+            &:hover {
+              font-size: .8rem;
+            }
+          }
+        }
+      }
   }
   .app-content-header {
     display: flex;
