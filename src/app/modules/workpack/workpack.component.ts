@@ -192,6 +192,7 @@ export class WorkpackComponent implements OnDestroy {
     });
     this.breadcrumbSrv.ready.pipe(takeUntil(this.$destroy)).subscribe(data => {
       this.workpackBreadcrumbStorageSrv.setBreadcrumb();
+      this.handleCloseSearching();
     });
     this.menuSrv.getRemovedFavorites.pipe(takeUntil(this.$destroy)).subscribe((idRemoved) => {
       if (+this.idWorkpack === +idRemoved) {
