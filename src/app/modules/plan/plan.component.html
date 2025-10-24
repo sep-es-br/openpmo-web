@@ -103,7 +103,7 @@
   </div>
 
   <section *ngIf="idPlan" class="workpackModels-cards-section">
-    <ng-conteiner *ngIf="!isSearching; else searchResult">
+    <ng-container *ngIf="!isSearching; else searchResult">
         <div class="card-workpack-model" *ngFor="let workpackModel of cardsPlanWorkPackModels; let i = index">
             <app-card [properties]="workpackModel.propertiesCard"
                 (editFilter)="handleEditFilter($event, workpackModel.idWorkpackModel)"
@@ -141,7 +141,7 @@
                 </div>
             </app-card>
         </div>
-    </ng-conteiner>
+    </ng-container>
     <ng-template #searchResult>
         <app-card-loading [isCardLoading]="searchLoading"></app-card-loading>
         <ng-container *ngIf="!searchLoading"></ng-container>
