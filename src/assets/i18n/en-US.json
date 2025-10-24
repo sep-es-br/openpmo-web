@@ -1068,6 +1068,7 @@
   "workpack-eap-alert-no-schedule": "Delivery without schedule",
   "workpack-eap-alert-no-scope": "Delivery without scope",
   "workpack-eap-alert-to-cancel": "Item to be canceled. Requires approval of a new Baseline",
+  "workpack-eap-alert-deleted-items-below": "There are Deliveries that were deleted in this Item",
 
   "NO_SCHEDULE": "Delivery without schedule",
   "UNDEFINED_SCOPE": "Delivery without scope",

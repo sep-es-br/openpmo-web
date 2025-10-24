@@ -36,134 +36,138 @@
       </div>
       <div class="total"></div>
     </div>
-    <div class="progress-bar-total-container"
-      *ngIf="total >= progress && total >= baselineTotal && this.valueUnit !== 'time'"
-      [ngStyle]="{width: '100%', background: barHeight === 7 ? 'rgba(0, 70, 96, 0.19)' : '#ffffff', 'margin-right': marginRightTotal + '%', 'margin-left': marginLeftTotal + '%'}">
-      <div class="progress-bar"
-        [ngStyle]="{width: (progress/total)*100 + '%', background: color, height: barHeight + 'px'}">
+    <ng-container *ngIf="displayFilledBarsWhenTotalIsZero || (!displayFilledBarsWhenTotalIsZero && (total > 0 || progress > 0 || baselineTotal > 0))">
+      <div class="progress-bar-total-container"
+        *ngIf="total >= progress && total >= baselineTotal && this.valueUnit !== 'time'"
+        [ngStyle]="{ width: '100%', background: barHeight === 7 ? 'rgba(0, 70, 96, 0.19)' : '#ffffff', 'margin-right': marginRightTotal + '%', 'margin-left': marginLeftTotal + '%' }">
+        <div class="progress-bar"
+          [ngStyle]="{ width: (progress / total) * 100 + '%', background: color, height: barHeight + 'px' }">
+        </div>
       </div>
-    </div>
-    <div class="progress-bar-total-container"
-      *ngIf="total >= progress && total < baselineTotal  && this.valueUnit !== 'time'"
-      [ngStyle]="{width: (total/baselineTotal)*100 + '%', background: barHeight === 7 ? 'rgba(0, 70, 96, 0.19)' : '#ffffff', 'margin-right': marginRightTotal + '%', 'margin-left': marginLeftTotal + '%'}">
-      <div class="progress-bar"
-        [ngStyle]="{width: (progress/total)*100 + '%', background: color, height: barHeight + 'px'}">
+      <div class="progress-bar-total-container"
+        *ngIf="total >= progress && total < baselineTotal && this.valueUnit !== 'time'"
+        [ngStyle]="{ width: (total / baselineTotal) * 100 + '%', background: barHeight === 7 ? 'rgba(0, 70, 96, 0.19)' : '#ffffff', 'margin-right': marginRightTotal + '%', 'margin-left': marginLeftTotal + '%' }">
+        <div class="progress-bar"
+          [ngStyle]="{ width: (progress / total) * 100 + '%', background: color, height: barHeight + 'px' }">
+        </div>
       </div>
-    </div>
-    <div class="progress-bar-progress-container"
-      *ngIf="progress > total && progress > baselineTotal  && this.valueUnit !== 'time'"
-      [ngStyle]="{width: '100%', background: color, height: barHeight + 'px', 'margin-right': marginRightTotal + '%', 'margin-left': marginLeftTotal + '%'}">
-      <div class="total-bar" [ngStyle]="{width: (total/progress)*100 + '%', background: 'transparent'}">
+      <div class="progress-bar-progress-container"
+        *ngIf="progress > total && progress >= baselineTotal && this.valueUnit !== 'time'"
+        [ngStyle]="{ width: '100%', background: color, height: barHeight + 'px', 'margin-right': marginRightTotal + '%', 'margin-left': marginLeftTotal + '%' }">
+        <div class="total-bar" [ngStyle]="{ width: (total / progress) * 100 + '%', background: 'transparent', height: barHeight + 'px' }">
+        </div>
       </div>
-    </div>
-    <div class="progress-bar-progress-container"
-      *ngIf="progress > total && progress < baselineTotal  && this.valueUnit !== 'time'"
-      [ngStyle]="{width: (progress/baselineTotal)*100 + '%', background: color, height: barHeight + 'px', 'margin-right': marginRightTotal + '%', 'margin-left': marginLeftTotal + '%'}">
-      <div class="total-bar" [ngStyle]="{width: (total/progress)*100 + '%', background: 'transparent'}">
+      <div class="progress-bar-progress-container"
+        *ngIf="progress > total && progress < baselineTotal && this.valueUnit !== 'time'"
+        [ngStyle]="{ width: (progress / baselineTotal) * 100 + '%', background: color, height: barHeight + 'px', 'margin-right': marginRightTotal + '%', 'margin-left': marginLeftTotal + '%' }">
+        <div class="total-bar" [ngStyle]="{ width: (total / progress) * 100 + '%', background: 'transparent', height: barHeight + 'px' }">
+        </div>
       </div>
-    </div>
-    <div class="baseline-bar-progress-container"
-      *ngIf="baselineTotal && baselineTotal > total && baselineTotal > progress  && this.valueUnit !== 'time'"
-      [ngStyle]="{'margin-right': marginLeftTotal + '%', 'margin-left': marginRightTotal + '%'}">
-      <div class="progress-bar-baseline" [ngStyle]="{width: '100%', background: '#B2B2B2', height: '4px'}">
+      <div class="baseline-bar-progress-container"
+        *ngIf="baselineTotal && baselineTotal > total && baselineTotal > progress  && this.valueUnit !== 'time'"
+        [ngStyle]="{ 'margin-right': marginLeftTotal + '%', 'margin-left': marginRightTotal + '%' }">
+        <div class="progress-bar-baseline" [ngStyle]="{ width: '100%', background: '#B2B2B2', height: '4px' }">
+        </div>
+        <div class="baseline-wrapper" *ngIf="!disableLabels">
+          <span
+            class="baseline-label-value"
+            [pTooltip]="(valueUnit === 'currency' ? '$ ' : '') + 
+                        (language === 'pt' ? 
+                          (valueUnit === 'currency' ? (baselineTotal | number:'0.2-2':'pt') : (baselineTotal | number:'0.0-0':'pt')) : 
+                          (valueUnit === 'currency' ? (baselineTotal | number:'0.2-2':'en') : (baselineTotal | number:'0.0-0':'en'))) + 
+                        ' ' + 
+                        (valueUnit === 'currency' ? '' : (valueUnit === 'time' ? ('days' | translate) : valueUnit))"
+            tooltipPosition="right"
+            style="font-weight: bold; margin-right: 8px;"
+          >
+            {{ valueUnit !== 'time' ? (baselineTotal | shortNumber:language) : baselineTotal + 'd' }}
+          </span>
+        </div>
+        <label class="baseline-label-text" *ngIf="!disableLabels">{{'plannedBaseline'|translate}}</label>
       </div>
-      <div class="baseline-wrapper" *ngIf="!disableLabels">
-        <span class="baseline-label-value"
-              [pTooltip]="(valueUnit === 'currency' ? '$ ' : '') + 
-                          (language === 'pt' ? 
-                            (valueUnit === 'currency' ? (baselineTotal | number:'0.2-2':'pt') : (baselineTotal | number:'0.0-0':'pt')) : 
-                            (valueUnit === 'currency' ? (baselineTotal | number:'0.2-2':'en') : (baselineTotal | number:'0.0-0':'en'))) + 
-                          ' ' + 
-                          (valueUnit === 'currency' ? '' : (valueUnit === 'time' ? ('days' | translate) : valueUnit))"
-              tooltipPosition="right"
-              style="font-weight: bold; margin-right: 8px;">
-          {{ valueUnit !== 'time' ? (baselineTotal | shortNumber:language) : baselineTotal + 'd' }}
-        </span>
+      <div class="baseline-bar-progress-container"
+        *ngIf="baselineTotal && baselineTotal <= total && total >= progress  && this.valueUnit !== 'time'"
+        [ngStyle]="{'margin-right': marginLeftTotal + '%', 'margin-left': marginRightTotal + '%'}">
+        <div class="progress-bar-baseline"
+          [ngStyle]="{width: (baselineTotal/total)*100 + '%', background: '#B2B2B2', height: '4px'}">
+        </div>
+        <div class="baseline-wrapper" *ngIf="!disableLabels">
+          <span class="baseline-label-value"
+                [pTooltip]="(valueUnit === 'currency' ? '$ ' : '') + 
+                            (language === 'pt' ? 
+                              (valueUnit === 'currency' ? (baselineTotal | number:'0.2-2':'pt') : (baselineTotal | number:'0.0-0':'pt')) : 
+                              (valueUnit === 'currency' ? (baselineTotal | number:'0.2-2':'en') : (baselineTotal | number:'0.0-0':'en'))) + 
+                            ' ' + 
+                            (valueUnit === 'currency' ? '' : (valueUnit === 'time' ? ('days' | translate) : valueUnit))"
+                tooltipPosition="right"
+                style="font-weight: bold; margin-right: 8px;">
+            {{ valueUnit !== 'time' ? (baselineTotal | shortNumber:language) : baselineTotal + 'd' }}
+          </span>
+        </div>
+        <label class="baseline-label-text" *ngIf="!disableLabels">{{'plannedBaseline'|translate}}</label>
       </div>
-      <label class="baseline-label-text" *ngIf="!disableLabels">{{'plannedBaseline'|translate}}</label>
-    </div>
-    <div class="baseline-bar-progress-container"
-      *ngIf="baselineTotal && baselineTotal <= total && total >= progress  && this.valueUnit !== 'time'"
-      [ngStyle]="{'margin-right': marginLeftTotal + '%', 'margin-left': marginRightTotal + '%'}">
-      <div class="progress-bar-baseline"
-        [ngStyle]="{width: (baselineTotal/total)*100 + '%', background: '#B2B2B2', height: '4px'}">
+      <div class="baseline-bar-progress-container"
+        *ngIf="baselineTotal && baselineTotal <= progress && progress > total  && this.valueUnit !== 'time'"
+        [ngStyle]="{'margin-right': marginLeftTotal + '%', 'margin-left': marginRightTotal + '%'}">
+        <div class="progress-bar-baseline"
+          [ngStyle]="{width: (baselineTotal/progress)*100 + '%', background: '#B2B2B2', height: '4px'}">
+        </div>
+        <div class="baseline-wrapper" *ngIf="!disableLabels">
+          <span class="baseline-label-value"
+                [pTooltip]="(valueUnit === 'currency' ? '$ ' : '') + 
+                            (language === 'pt' ? 
+                              (valueUnit === 'currency' ? (baselineTotal | number:'0.2-2':'pt') : (baselineTotal | number:'0.0-0':'pt')) : 
+                              (valueUnit === 'currency' ? (baselineTotal | number:'0.2-2':'en') : (baselineTotal | number:'0.0-0':'en'))) + 
+                            ' ' + 
+                            (valueUnit === 'currency' ? '' : (valueUnit === 'time' ? ('days' | translate) : valueUnit))"
+                tooltipPosition="right"
+                style="font-weight: bold; margin-right: 8px;">
+            {{ valueUnit !== 'time' ? (baselineTotal | shortNumber:language) : baselineTotal + 'd' }}
+          </span>
+        </div>
+        <label class="baseline-label-text" *ngIf="!disableLabels">{{'plannedBaseline'|translate}}</label>
       </div>
-      <div class="baseline-wrapper" *ngIf="!disableLabels">
-        <span class="baseline-label-value"
-              [pTooltip]="(valueUnit === 'currency' ? '$ ' : '') + 
-                          (language === 'pt' ? 
-                            (valueUnit === 'currency' ? (baselineTotal | number:'0.2-2':'pt') : (baselineTotal | number:'0.0-0':'pt')) : 
-                            (valueUnit === 'currency' ? (baselineTotal | number:'0.2-2':'en') : (baselineTotal | number:'0.0-0':'en'))) + 
-                          ' ' + 
-                          (valueUnit === 'currency' ? '' : (valueUnit === 'time' ? ('days' | translate) : valueUnit))"
-              tooltipPosition="right"
-              style="font-weight: bold; margin-right: 8px;">
-          {{ valueUnit !== 'time' ? (baselineTotal | shortNumber:language) : baselineTotal + 'd' }}
-        </span>
+      <!-- progressbar schedule -->
+      <div class="progress-bar-total-container"
+        *ngIf="totalDate >= progressDate && totalDate >= baselineDate && this.valueUnit === 'time'"
+        [ngStyle]="{width: totalDate + '%', background: barHeight === 7 ? 'rgba(0, 70, 96, 0.19)' : '#ffffff', 'margin-right': marginRightTotal + '%', 'margin-left': marginLeftTotal + '%'}">
+        <div class="progress-bar"
+          [ngStyle]="{width: percProgress + '%', background: color, height: barHeight + 'px'}">
+        </div>
       </div>
-      <label class="baseline-label-text" *ngIf="!disableLabels">{{'plannedBaseline'|translate}}</label>
-    </div>
-    <div class="baseline-bar-progress-container"
-      *ngIf="baselineTotal && baselineTotal <= progress && progress > total  && this.valueUnit !== 'time'"
-      [ngStyle]="{'margin-right': marginLeftTotal + '%', 'margin-left': marginRightTotal + '%'}">
-      <div class="progress-bar-baseline"
-        [ngStyle]="{width: (baselineTotal/progress)*100 + '%', background: '#B2B2B2', height: '4px'}">
+      <div class="progress-bar-total-container"
+        *ngIf="totalDate >= progressDate && totalDate < baselineDate  && this.valueUnit === 'time'"
+        [ngStyle]="{width: totalDate + '%', background: barHeight === 7 ? 'rgba(0, 70, 96, 0.19)' : '#ffffff', 'margin-right': marginRightTotal + '%', 'margin-left': marginLeftTotal + '%'}">
+        <div class="progress-bar"
+          [ngStyle]="{width: percProgress + '%', background: color, height: barHeight + 'px'}">
+        </div>
       </div>
-      <div class="baseline-wrapper" *ngIf="!disableLabels">
-        <span class="baseline-label-value"
-              [pTooltip]="(valueUnit === 'currency' ? '$ ' : '') + 
-                          (language === 'pt' ? 
-                            (valueUnit === 'currency' ? (baselineTotal | number:'0.2-2':'pt') : (baselineTotal | number:'0.0-0':'pt')) : 
-                            (valueUnit === 'currency' ? (baselineTotal | number:'0.2-2':'en') : (baselineTotal | number:'0.0-0':'en'))) + 
-                          ' ' + 
-                          (valueUnit === 'currency' ? '' : (valueUnit === 'time' ? ('days' | translate) : valueUnit))"
-              tooltipPosition="right"
-              style="font-weight: bold; margin-right: 8px;">
-          {{ valueUnit !== 'time' ? (baselineTotal | shortNumber:language) : baselineTotal + 'd' }}
-        </span>
+      <div class="progress-bar-progress-container"
+        *ngIf="progressDate > totalDate && progressDate > baselineDate  && this.valueUnit === 'time'"
+        [ngStyle]="{width: progressDate + '%', background: color, height: barHeight + 'px', 'margin-right': marginRightTotal + '%', 'margin-left': marginLeftTotal + '%'}">
+        <div class="total-bar" [ngStyle]="{width: percTotal + '%', background: 'transparent'}">
+        </div>
       </div>
-      <label class="baseline-label-text" *ngIf="!disableLabels">{{'plannedBaseline'|translate}}</label>
-    </div>
-    <!-- progressbar schedule -->
-    <div class="progress-bar-total-container"
-      *ngIf="totalDate >= progressDate && totalDate >= baselineDate && this.valueUnit === 'time'"
-      [ngStyle]="{width: totalDate + '%', background: barHeight === 7 ? 'rgba(0, 70, 96, 0.19)' : '#ffffff', 'margin-right': marginRightTotal + '%', 'margin-left': marginLeftTotal + '%'}">
-      <div class="progress-bar"
-        [ngStyle]="{width: percProgress + '%', background: color, height: barHeight + 'px'}">
+      <div class="progress-bar-progress-container"
+        *ngIf="progressDate > totalDate && progressDate < baselineDate  && this.valueUnit === 'time'"
+        [ngStyle]="{width: progressDate + '%', background: color, height: barHeight + 'px', 'margin-right': marginRightTotal + '%', 'margin-left': marginLeftTotal + '%'}">
+        <div class="total-bar" [ngStyle]="{width: percTotal + '%', background: 'transparent'}">
+        </div>
       </div>
-    </div>
-    <div class="progress-bar-total-container"
-      *ngIf="totalDate >= progressDate && totalDate < baselineDate  && this.valueUnit === 'time'"
-      [ngStyle]="{width: totalDate + '%', background: barHeight === 7 ? 'rgba(0, 70, 96, 0.19)' : '#ffffff', 'margin-right': marginRightTotal + '%', 'margin-left': marginLeftTotal + '%'}">
-      <div class="progress-bar"
-        [ngStyle]="{width: percProgress + '%', background: color, height: barHeight + 'px'}">
+      <div class="baseline-bar-progress-container"
+        *ngIf="baselineDate && baselineDate > 0 && valueUnit === 'time'"
+        [ngStyle]="{'margin-right': marginRightBaseline + '%', 'margin-left': marginLeftBaseline + '%'}">
+        <div class="progress-bar-baseline" [ngStyle]="{width: baselineDate + '%', background: '#B2B2B2', height: '4px'}">
+        </div>
+        <div class="baseline-wrapper" *ngIf="!disableLabels">
+          <span class="baseline-label-value"
+                [pTooltip]="baselineTotal + ' ' + ('days' | translate)"
+                tooltipPosition="right">
+            {{ baselineTotal + 'd' }}
+          </span>
+        </div>
+        <label class="baseline-label-text" *ngIf="!disableLabels">{{'plannedBaseline'|translate}}</label>
       </div>
-    </div>
-    <div class="progress-bar-progress-container"
-      *ngIf="progressDate > totalDate && progressDate > baselineDate  && this.valueUnit === 'time'"
-      [ngStyle]="{width: progressDate + '%', background: color, height: barHeight + 'px', 'margin-right': marginRightTotal + '%', 'margin-left': marginLeftTotal + '%'}">
-      <div class="total-bar" [ngStyle]="{width: percTotal + '%', background: 'transparent'}">
-      </div>
-    </div>
-    <div class="progress-bar-progress-container"
-      *ngIf="progressDate > totalDate && progressDate < baselineDate  && this.valueUnit === 'time'"
-      [ngStyle]="{width: progressDate + '%', background: color, height: barHeight + 'px', 'margin-right': marginRightTotal + '%', 'margin-left': marginLeftTotal + '%'}">
-      <div class="total-bar" [ngStyle]="{width: percTotal + '%', background: 'transparent'}">
-      </div>
-    </div>
-    <div class="baseline-bar-progress-container"
-      *ngIf="baselineDate && baselineDate > 0 && valueUnit === 'time'"
-      [ngStyle]="{'margin-right': marginRightBaseline + '%', 'margin-left': marginLeftBaseline + '%'}">
-      <div class="progress-bar-baseline" [ngStyle]="{width: baselineDate + '%', background: '#B2B2B2', height: '4px'}">
-      </div>
-      <div class="baseline-wrapper" *ngIf="!disableLabels">
-        <span class="baseline-label-value"
-              [pTooltip]="baselineTotal + ' ' + ('days' | translate)"
-              tooltipPosition="right">
-          {{ baselineTotal + 'd' }}
-        </span>
-      </div>
-      <label class="baseline-label-text" *ngIf="!disableLabels">{{'plannedBaseline'|translate}}</label>
-    </div>
+    </ng-container>
   </div>
 </div>

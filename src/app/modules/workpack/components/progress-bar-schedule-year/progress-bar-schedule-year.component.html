@@ -26,10 +26,14 @@
       </div>
       <div class="total"></div>
     </div>
-    <div class="progress-bar-total-container" [ngStyle]="{width: '100%', background: 'transparent'}">
+    <div
+      *ngIf="total > 0 || progress > 0 || planned > 0"
+      class="progress-bar-total-container"
+      [ngStyle]="{width: '100%', background: 'transparent'}"
+    >
       <ng-container *ngIf="total >= progress">
         <ng-container *ngIf="!planned else plannedIncluded">
-          <div class="progress-bar" [ngStyle]="{ width: (progress / total) * 100 + '%', background: color, height: '3px' }"></div>
+          <div class="progress-bar" [ngStyle]="{ width: ((progress / total) * 100) + '%', background: color, height: '3px' }"></div>
           <div class="progress-bar" [ngStyle]="{ width: '100%', background: '#004660', height: '3px' }"></div>
         </ng-container>
         <ng-template #plannedIncluded>

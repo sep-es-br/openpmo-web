@@ -104,6 +104,7 @@ export class UniversalSearchComponent implements OnDestroy, AfterViewInit {
   }
 
     onSearchInput(term: string) {
+        if(term.length < 3) return;
         if(!this.canload) {
             this.canload = true;
             return;
@@ -117,6 +118,7 @@ export class UniversalSearchComponent implements OnDestroy, AfterViewInit {
     }   
 
     onLazyLoadPage(event: LazyLoadEvent) {
+        if(this.searchControl.value?.length < 3) return;
         if(!this.canload) {
             this.canload = true;
             return;
