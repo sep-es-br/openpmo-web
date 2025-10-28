@@ -72,28 +72,13 @@ export class SearchService extends BaseService<IUniversalSearch> {
       tap((result) => {
         this._result$.next(result); 
         this._totalCount$.next(result?.data?.totalRecords)// atualiza os resultados explicitamente
-        // this.msgSrv.add({
-        //   summary: this.translateSrv.instant('success'),
-        //   severity: 'success',
-        //   detail: 'Busca concluída'
-        // });
+        
       }),
       finalize(() => this._loading$.next(false))
     );
   }
 
-  public setSearchTerm(term: string) {
-    this._searchTerm.next(term);
-  }
 
-  public setPageData(pageData: PageDef) {
-    this._pageData = pageData;
-  }
-
-  public triggerSearch(workpackId?: number) {
-    this.doSimpleSearch(this._searchTerm.value, workpackId).pipe(take(1)).subscribe();
-    return this.result$;
-  }
 
   public get result$() {
     return this._result$.asObservable();

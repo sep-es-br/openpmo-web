@@ -1,12 +1,12 @@
 import { MilestoneStatusEnum } from './../../shared/enums/MilestoneStatusEnum';
 import { IWorkpackCardItem } from './../../shared/interfaces/IWorkpackCardItem';
 import { FilterDataviewService } from 'src/app/shared/services/filter-dataview.service';
-import { Component, OnDestroy, OnInit, ViewChild, ViewChildren } from '@angular/core';
+import { Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild, ViewChildren } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Calendar } from 'primeng/calendar';
 import { Subject } from 'rxjs';
-import { filter, takeUntil } from 'rxjs/operators';
+import { filter, finalize, takeUntil } from 'rxjs/operators';
 import { TranslateService } from '@ngx-translate/core';
 import { ICard } from 'src/app/shared/interfaces/ICard';
 import { IPlan } from 'src/app/shared/interfaces/IPlan';
@@ -18,7 +18,7 @@ import { WorkpackService } from 'src/app/shared/services/workpack.service';
 import { IWorkpack, IWorkpackListCard } from 'src/app/shared/interfaces/IWorkpack';
 import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
 import { AuthService } from 'src/app/shared/services/auth.service';
-import { ConfirmationService, MenuItem, MessageService } from 'primeng/api';
+import { ConfirmationService, LazyLoadEvent, MenuItem, MessageService } from 'primeng/api';
 import { OfficeService } from 'src/app/shared/services/office.service';
 import { PlanPermissionService } from 'src/app/shared/services/plan-permissions.service';
 import { SaveButtonComponent } from 'src/app/shared/components/save-button/save-button.component';
@@ -32,6 +32,8 @@ import { PlanModelService } from 'src/app/shared/services/plan-model.service';
 import { IPlanModel } from 'src/app/shared/interfaces/IPlanModel';
 import { SetConfigWorkpackService } from 'src/app/shared/services/set-config-workpack.service';
 import { CancelButtonComponent } from 'src/app/shared/components/cancel-button/cancel-button.component';
+import { IUniversalSearch } from 'src/app/shared/interfaces/universal-search.interface';
+import { PageDef, SearchService } from 'src/app/shared/services/search.service';
 
 
 interface IWorkpackModelCard {
@@ -50,6 +52,7 @@ export class PlanComponent implements OnInit, OnDestroy {
   @ViewChild(SaveButtonComponent) saveButton: SaveButtonComponent;
   @ViewChild(CancelButtonComponent) cancelButton: CancelButtonComponent;
   @ViewChildren(Calendar) calendarComponents: Calendar[];
+    @ViewChild('searchBar') searchBarRef : ElementRef<HTMLDivElement>
 
   responsive: boolean;
   idPlanModel: number;
@@ -82,6 +85,17 @@ export class PlanComponent implements OnInit, OnDestroy {
   formIsSaving = false;
   propertiesPlanModel: IPlanModel;
 
+  
+    showAnimationSearch = false;
+
+    searchTerm;
+    page = 0;
+    result : IUniversalSearch[];
+    totalCountResults : number;
+
+    isSearching = false;
+    searchLoading = false;
+
   constructor(
     private actRouter: ActivatedRoute,
     private planSrv: PlanService,
@@ -103,7 +117,9 @@ export class PlanComponent implements OnInit, OnDestroy {
     private configDataViewSrv: ConfigDataViewService,
     private personSrv: PersonService,
     private planModelSrv: PlanModelService,
-    private setConfigWorkpackSrv: SetConfigWorkpackService
+    private setConfigWorkpackSrv: SetConfigWorkpackService,
+    private searchSrv : SearchService,
+    private thisElemRef : ElementRef<HTMLElement>
   ) {
     this.configDataViewSrv.observableCollapsePanelsStatus.pipe(takeUntil(this.$destroy)).subscribe(collapsePanelStatus => {
       this.collapsePanelsStatus = collapsePanelStatus === 'collapse' ? true : false;
@@ -125,6 +141,7 @@ export class PlanComponent implements OnInit, OnDestroy {
       this.displayModeAll = displayMode;
     });
     this.configDataViewSrv.observablePageSize.pipe(takeUntil(this.$destroy)).subscribe(pageSize => {
+        if(this.isSearching) this.handlePageChange({first: 0, rows: pageSize});
       this.pageSize = pageSize;
     });
     this.translateSrv.onLangChange.pipe(takeUntil(this.$destroy)).subscribe(() => {
@@ -174,6 +191,55 @@ export class PlanComponent implements OnInit, OnDestroy {
     localStorage.removeItem('open-pmo:WORKPACK_TABVIEW');
   }
 
+    @HostListener('window:click', ['$event'])
+    handleClick(evt: MouseEvent) {
+        if(!this.searchBarRef) return;
+        const path = evt.composedPath();
+        const clickedInside = path.includes(this.searchBarRef.nativeElement);
+
+        if (!clickedInside && (!this.isSearching || !path.includes(this.thisElemRef.nativeElement))) {
+            this.handleCloseSearching();
+        }
+    }
+
+    
+
+  handleCloseSearching() {
+    this.isSearching = false;
+    this.searchTerm = undefined;
+    this.page = 0;
+    this.showAnimationSearch = false;
+  }
+
+  
+    handlePageChange(evt : LazyLoadEvent) {
+  
+      const pageData: PageDef = {
+          page: evt.first / evt.rows,
+          pageSize: evt.rows
+      };
+  
+      if (
+          this.page !== pageData.page ||
+          this.pageSize !== pageData.pageSize
+      ) {
+          this.page = pageData.page;
+          this.searchLoading = true;
+          this.searchSrv.doSimpleSearch(this.searchTerm, undefined, pageData)
+              .pipe(finalize(() => this.searchLoading = false))
+              .subscribe(_result => {
+                  if(_result?.success) {
+                      this.isSearching = true;
+                      this.result = _result.data.data;
+                      this.totalCountResults = _result.data.totalRecords;
+                  } else {
+                      this.result = [];
+                      this.totalCountResults = undefined;
+                  }
+              });
+      }
+    }
+
   ngOnDestroy(): void {
     this.$destroy.next();
     this.$destroy.complete();
@@ -213,6 +279,7 @@ export class PlanComponent implements OnInit, OnDestroy {
   }
 
   async resetPlan() {
+    this.handleCloseSearching()
     if (!this.idPlan) {
       this.planSrv.nextNewPlan(true);
     }
@@ -444,7 +511,8 @@ export class PlanComponent implements OnInit, OnDestroy {
           collapseble: true,
           isLoading: true,
           initialStateCollapse: this.collapsePanelsStatus,
-          showFilters: true
+          showFilters: true,
+          hideTextFilter: true
         };
         return {
           idWorkpackModel: workpackModel.id,
@@ -981,6 +1049,42 @@ export class PlanComponent implements OnInit, OnDestroy {
     this.cardsPlanWorkPackModels[workpackModelCardIndex].propertiesCard.idFilterSelected = idFilter;
     await this.reloadWorkpacksOfWorkpackModelSelectedFilter(idWorkpackModel);
   }
+
+  
+    openSearch() {
+        this.showAnimationSearch = true;
+        (this.searchBarRef.nativeElement.querySelector('.app-input-text') as HTMLInputElement).focus();
+        
+    }
+  
+    handleSearchTextNew() {
+      if (this.searchTerm?.trim().length < this.searchSrv.minLength) return;
+          
+          
+      if (this.searchTerm !== this.searchSrv.searchTerm$.value) {
+  
+          this.page = 0;
+          const pageData = {
+              page: this.page,
+              pageSize: this.pageSize
+          } as PageDef;
+  
+          
+          this.searchLoading = true;
+          this.searchSrv.doSimpleSearch(this.searchTerm, undefined, pageData)
+              .pipe(finalize(() => this.searchLoading = false))
+              .subscribe(_result => {
+                  if(_result?.success) {
+                      this.isSearching = true;
+                      this.result = _result.data.data;
+                      this.totalCountResults = _result.data.totalRecords;
+                  } else {
+                      this.result = [];
+                      this.totalCountResults = undefined;
+                  }
+              });
+      }
+    }
 
   async handleSearchText(event, idWorkpackModel: number) {
     const term = event.term;
