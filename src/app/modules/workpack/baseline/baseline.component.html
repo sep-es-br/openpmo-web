@@ -85,21 +85,22 @@
         </p-inputSwitch>
       </div>
       <div class="updates-container" *ngIf="!cardBaselineUpdates.isLoading">
-        <p-card *ngFor="let item of baseline?.updates" class="card-list-item">
+        
+        <!-- <p-card *ngFor="let etapa of baseline?.updates" class="card-list-item">
           <div class="card-item-content">
             <div class="item-description">
               <p-inputSwitch
                 class="app-toggle"
-                [(ngModel)]="item.included"
-                [disabled]="allTogglerIsDisabled || item.classification === 'TO_CANCEL' || shouldDisplayDeliveryWarnings(item)"
+                [(ngModel)]="etapa.included"
+                [disabled]="allTogglerIsDisabled || etapa.classification === 'TO_CANCEL' || shouldDisplayDeliveryWarnings(etapa)"
               >
               </p-inputSwitch>
               <div class="item-description-container" [class.item-description-container-responsive]="responsive">
                 <i *ngIf="!responsive"
-                   [ngClass]=" item.description === 'structure' ? [ 'app-icon', item.icon, 'light-grey-icon'] : [ item.icon, 'light-grey-icon']"
+                   [ngClass]=" etapa.description === 'structure' ? [ 'app-icon', etapa.icon, 'light-grey-icon'] : [ etapa.icon, 'light-grey-icon']"
                    [ngStyle]="{ fontSize: '1.8rem'}">
                 </i>
-                <ng-container *ngIf="shouldDisplayDeliveryWarnings(item)">
+                <ng-container *ngIf="shouldDisplayDeliveryWarnings(etapa)">
                   <i
                     class="warning-icon fa fa-exclamation-triangle"
                     [ngStyle]="{ marginLeft: '1em', marginRight: '.5em' }"
@@ -109,26 +110,26 @@
                 <span
                   class="item-description"
                   [class.item-description-responsive]="responsive"
-                  [ngClass]="shouldDisplayDeliveryWarnings(item) ? 'alert-text pointer ml-0' : ''"
-                  [pTooltip]="getDeliveryTooltipWarnings(item)"
+                  [ngClass]="shouldDisplayDeliveryWarnings(etapa) ? 'alert-text pointer ml-0' : ''"
+                  [pTooltip]="getDeliveryTooltipWarnings(etapa)"
                 >
-                  {{ item.description === 'structure' ? ('structure'|translate) : item.description }}
+                  {{ etapa.description === 'structure' ? ('structure'|translate) : etapa.description }}
                 </span>
               </div>
             </div>
             <div class="item-status" [class.item-status-responsive]="responsive">
-              <ng-container *ngIf="shouldDisplayDeliveryWarnings(item)">
+              <ng-container *ngIf="shouldDisplayDeliveryWarnings(etapa)">
                 <i
                   class="warning-icon fa fa-exclamation-triangle"
                   aria-hidden="true"
                 ></i>
               </ng-container>
-              <span [ngClass]="shouldDisplayDeliveryWarnings(item) ? 'alert-text' : ''">
-                {{ item.classification | translate }}
+              <span [ngClass]="shouldDisplayDeliveryWarnings(etapa) ? 'alert-text' : ''">
+                {{ etapa.classification | translate }}
               </span>
             </div>
           </div>
-        </p-card>
+        </p-card> -->
       </div>
 
       <ng-container *ngIf="areTherePendentUpdatesListed">

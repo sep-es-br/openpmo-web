@@ -10,8 +10,9 @@ import { Subject } from 'rxjs';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ICard } from 'src/app/shared/interfaces/ICard';
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { MessageService } from 'primeng/api';
+import { MessageService, TreeNode } from 'primeng/api';
 import { TranslateService } from '@ngx-translate/core';
+import { TypeWorkpackEnumWBS } from 'src/app/shared/enums/TypeWorkpackEnum';
 
 @Component({
   selector: 'app-baseline',
@@ -56,6 +57,8 @@ export class BaselineComponent implements OnInit, OnDestroy {
   isLoading = false;
 
   formIsLoading = false;
+
+  updatesTree: Array<TreeNode>;
 
   get allTogglerIsDisabled(): boolean {
     return this.areTherePendentUpdatesListed || this.formBaseline.disabled;
@@ -235,19 +238,134 @@ export class BaselineComponent implements OnInit, OnDestroy {
   }
 
   async loadUpdates() {
-    this.baseline.updates = await this.baselineSrv.getUpdates({'id-workpack': this.idWorkpack});
+    this.baseline.updates = await this.baselineSrv.getUpdates({'id-workpack': this.idWorkpack, idPlan: this.idPlan });
     this.cardBaselineUpdates.isLoading = false;
+    console.log('this.baseline.updates: ', this.baseline.updates);
 
-    if (this.baseline.updates.length > 0) {
-      this.baseline.updates.forEach(
-        updates => updates.included = (
-          !this.areTherePendentUpdatesListed &&
-          (updates.classification === UpdateStatus.NEW || updates.classification === UpdateStatus.TO_CANCEL)
-        )
-      );
+    const conditionToEntityStartSelected = (entity: any) => (
+      !this.areTherePendentUpdatesListed &&
+      (entity.classification === UpdateStatus.NEW || entity.classification === UpdateStatus.TO_CANCEL)
+    );
 
-      this.includeAllUpdates = this.baseline.updates.every((update) => update.included);
-    }
+    // this.updatesTree
+    const etapasTitleObject = {
+      label: 'Etapas',
+      icon: 'fas fa-tasks',
+      children: [],
+    };
+
+    this.baseline.updates.forEach((etapa) => {
+      const etapaObject = {
+        label: etapa.name,
+        icon: etapa.fontIcon,
+        children: [],
+      };
+
+      etapasTitleObject.children.push(etapaObject);
+
+      if (etapa.children) {
+        const buildMilestonesAndDeliveries = (childs: Array<IBaselineUpdates>): {
+          milestoneTitleObject?: any;
+          deliveryTitleObject?: any;
+        } => {
+          const milestones = childs.filter((el) => el.type === TypeWorkpackEnumWBS.Milestone);
+          const deliveries = childs.filter((el) => el.type === TypeWorkpackEnumWBS.Deliverable);
+
+          let finalResult: {
+            milestoneTitleObject?: any;
+            deliveryTitleObject?: any;
+          } = {};
+
+          if (milestones.length > 0) {
+            const milestoneTitleObject = {
+              label: 'Marcos críticos',
+              icon: 'fas fa-flag',
+              children: [],
+            };
+
+            milestones.forEach((milestone) => {
+              const milestoneObject = {
+                label: milestone.name,
+                icon: milestone.fontIcon,
+                children: [],
+                included: conditionToEntityStartSelected(milestone),
+                readonly: false,
+              };
+
+              milestoneTitleObject.children.push(milestoneObject);
+            });
+
+            finalResult = {
+              ...finalResult,
+              milestoneTitleObject,
+            };
+          }
+
+          if (deliveries.length > 0) {
+            const deliveryTitleObject = {
+              label: 'Entregas',
+              icon: 'fas fa-boxes',
+              children: [],
+            };
+
+            deliveries.forEach((delivery) => {
+              const deliveryObject = {
+                label: delivery.name,
+                icon: delivery.fontIcon,
+                children: [],
+                included: conditionToEntityStartSelected(delivery),
+                readonly: false,
+              };
+
+              deliveryTitleObject.children.push(deliveryObject);
+            });
+
+            finalResult = {
+              ...finalResult,
+              deliveryTitleObject,
+            };
+          }
+
+          return finalResult;
+        };
+
+        if (etapa.children.some((el) => el.type === 'Organizer' && el.modelName === 'Subetapa')) {
+          const subetapaTitleObject = {
+            label: 'Subetapas',
+            icon: 'fas fa-tasks',
+            children: [],
+          };
+
+          etapaObject.children.push(subetapaTitleObject);
+
+          etapa.children.forEach((subetapa) => {
+            const subetapaObject = {
+              label: subetapa.name,
+              icon: subetapa.fontIcon,
+              children: [],
+            };
+
+            subetapaTitleObject.children.push(subetapaObject);
+
+            const milestonesAndDeliveries = buildMilestonesAndDeliveries(subetapa.children);
+            if (milestonesAndDeliveries.milestoneTitleObject) subetapaObject.children.push(milestonesAndDeliveries.milestoneTitleObject);
+            if (milestonesAndDeliveries.deliveryTitleObject) subetapaObject.children.push(milestonesAndDeliveries.deliveryTitleObject);
+            // Nesse ponto, o TitleObject dos Marcos e Entregas já estão carregados com os Marcos e as Entregas
+          });
+        } else {
+          const milestonesAndDeliveries = buildMilestonesAndDeliveries(etapa.children);
+          if (milestonesAndDeliveries.milestoneTitleObject) etapaObject.children.push(milestonesAndDeliveries.milestoneTitleObject);
+          if (milestonesAndDeliveries.deliveryTitleObject) etapaObject.children.push(milestonesAndDeliveries.deliveryTitleObject);
+          // Nesse ponto, o TitleObject dos Marcos e Entregas já estão carregados com os Marcos e as Entregas
+        }
+      }
+    });
+
+    this.updatesTree = [etapasTitleObject];
+
+    console.log('this.updatesTree: ', this.updatesTree);
+
+    // this.includeAllUpdates = this.baseline.updates.every((update) => update.included);
   }
 
   handleSetAllTogglesUpdates(event) {
