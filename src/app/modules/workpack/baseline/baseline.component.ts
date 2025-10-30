@@ -58,7 +58,9 @@ export class BaselineComponent implements OnInit, OnDestroy {
 
   formIsLoading = false;
 
-  updatesTree: Array<TreeNode>;
+  updatesTree: Array<TreeNode<IBaselineUpdates>>;
+
+  treeShouldStartExpanded: boolean = true;
 
   get allTogglerIsDisabled(): boolean {
     return this.areTherePendentUpdatesListed || this.formBaseline.disabled;
@@ -181,8 +183,8 @@ export class BaselineComponent implements OnInit, OnDestroy {
       initialStateCollapse: false,
       isLoading: true
     };
+
     if (this.idBaseline) {
-      // const result = await this.baselineSrv.GetById(this.idBaseline);
       const result = await this.baselineSrv.GetByIdWithIdWorkpack(this.idWorkpack, this.idBaseline);
       this.baseline = result.data;
       this.cardBaselineProperties.isLoading = false;
@@ -238,29 +240,30 @@ export class BaselineComponent implements OnInit, OnDestroy {
   }
 
   async loadUpdates() {
-    this.baseline.updates = await this.baselineSrv.getUpdates({'id-workpack': this.idWorkpack, idPlan: this.idPlan });
+    const updates = await this.baselineSrv.getUpdates({'id-workpack': this.idWorkpack, idPlan: this.idPlan });
+    this.baseline.updates = [];
     this.cardBaselineUpdates.isLoading = false;
-    console.log('this.baseline.updates: ', this.baseline.updates);
 
-    const conditionToEntityStartSelected = (entity: any) => (
+    const conditionToEntityStartSelected = (entity: IBaselineUpdates) => (
       !this.areTherePendentUpdatesListed &&
       (entity.classification === UpdateStatus.NEW || entity.classification === UpdateStatus.TO_CANCEL)
     );
 
-    // this.updatesTree
     const etapasTitleObject = {
       label: 'Etapas',
       icon: 'fas fa-tasks',
       children: [],
       property: 'title',
+      expanded: this.treeShouldStartExpanded,
     };
 
-    this.baseline.updates.forEach((etapa) => {
+    updates.forEach((etapa) => {
       const etapaObject = {
         label: etapa.name,
         icon: etapa.fontIcon,
         children: [],
         property: 'value',
+        expanded: this.treeShouldStartExpanded,
       };
 
       etapasTitleObject.children.push(etapaObject);
@@ -284,6 +287,7 @@ export class BaselineComponent implements OnInit, OnDestroy {
               icon: 'fas fa-flag',
               children: [],
               property: 'title',
+              expanded: this.treeShouldStartExpanded,
             };
 
             milestones.forEach((milestone) => {
@@ -292,13 +296,18 @@ export class BaselineComponent implements OnInit, OnDestroy {
                 icon: milestone.fontIcon,
                 children: [],
                 included: conditionToEntityStartSelected(milestone),
-                readonly: false,
+                readonly: [UpdateStatus.NO_SCHEDULE, UpdateStatus.UNDEFINED_SCOPE].includes(milestone.classification),
                 property: 'value',
                 classification: milestone.classification,
                 idWorkpack: milestone.idWorkpack,
+                expanded: this.treeShouldStartExpanded,
               };
 
               milestoneTitleObject.children.push(milestoneObject);
+              this.baseline.updates.push({
+                ...milestone,
+                included: conditionToEntityStartSelected(milestone),
+              });
             });
 
             finalResult = {
@@ -313,6 +322,7 @@ export class BaselineComponent implements OnInit, OnDestroy {
               icon: 'fas fa-boxes',
               children: [],
               property: 'title',
+              expanded: this.treeShouldStartExpanded,
             };
 
             deliveries.forEach((delivery) => {
@@ -321,13 +331,18 @@ export class BaselineComponent implements OnInit, OnDestroy {
                 icon: delivery.fontIcon,
                 children: [],
                 included: conditionToEntityStartSelected(delivery),
-                readonly: false,
+                readonly: [UpdateStatus.NO_SCHEDULE, UpdateStatus.UNDEFINED_SCOPE].includes(delivery.classification),
                 property: 'value',
                 classification: delivery.classification,
                 idWorkpack: delivery.idWorkpack,
+                expanded: this.treeShouldStartExpanded,
               };
 
               deliveryTitleObject.children.push(deliveryObject);
+              this.baseline.updates.push({
+                ...delivery,
+                included: conditionToEntityStartSelected(delivery),
+              });
             });
 
             finalResult = {
@@ -345,6 +360,7 @@ export class BaselineComponent implements OnInit, OnDestroy {
             icon: 'fas fa-tasks',
             children: [],
             property: 'title',
+            expanded: this.treeShouldStartExpanded,
           };
 
           etapaObject.children.push(subetapaTitleObject);
@@ -355,6 +371,7 @@ export class BaselineComponent implements OnInit, OnDestroy {
               icon: subetapa.fontIcon,
               children: [],
               property: 'value',
+              expanded: this.treeShouldStartExpanded,
             };
 
             subetapaTitleObject.children.push(subetapaObject);
@@ -374,20 +391,20 @@ export class BaselineComponent implements OnInit, OnDestroy {
     });
 
     this.updatesTree = [etapasTitleObject];
-
-    console.log('this.updatesTree: ', this.updatesTree);
-
-    // this.includeAllUpdates = this.baseline.updates.every((update) => update.included);
+    this.includeAllUpdates = this.baseline.updates.every((update) => update.included);
   }
 
-  handleSetAllTogglesUpdates(event) {
-    this.baseline.updates
-    .filter((update) => ![UpdateStatus.NO_SCHEDULE, UpdateStatus.UNDEFINED_SCOPE].includes(update.classification))
-    .forEach(update => {
+  handleSetAllTogglesUpdates(isEnabled: boolean) {
+    [
+      ...this.baseline.updates,
+      ...this.getBottomTreeNodes(this.updatesTree)
+    ]
+    .filter((update: any) => ![UpdateStatus.NO_SCHEDULE, UpdateStatus.UNDEFINED_SCOPE].includes(update.classification))
+    .forEach((update: any) => {
       if (update.classification === UpdateStatus.TO_CANCEL) {
         update.included = true;
       } else {
-        update.included = event.checked;
+        update.included = isEnabled;
       }
     });
   }
@@ -500,5 +517,35 @@ export class BaselineComponent implements OnInit, OnDestroy {
         return `- ${firstSentence}`;
       }
     }
+  }
+
+  handleToggleSwitchChange(isEnabled: boolean, workpackId: number) {
+    const changedUpdate = this.baseline.updates.find((update) => update.idWorkpack === workpackId);
+
+    if (changedUpdate) {
+      if (changedUpdate.classification === UpdateStatus.TO_CANCEL) {
+        changedUpdate.included = true;
+      } else {
+        changedUpdate.included = isEnabled;
+      }
+    }
+
+    const allUpdates = [...this.baseline.updates, ...this.getBottomTreeNodes(this.updatesTree)];
+    this.includeAllUpdates = allUpdates.every((update: any) => update.included);
+    // Se por acaso tiver selecionado todas as Atualizações, habilita o switch geral
+  }
+
+  getBottomTreeNodes(tree: Array<TreeNode>): Array<TreeNode> {
+    const finalNodes = [];
+
+    tree.forEach((node) => {
+      if (node.children && node.children.length > 0) {
+        finalNodes.push(...this.getBottomTreeNodes(node.children));
+      } else {
+        finalNodes.push(node);
+      }
+    });
+
+    return finalNodes;
   }
 }

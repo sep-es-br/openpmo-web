@@ -77,18 +77,54 @@
       padding-bottom: 2em;
       
       .p-tree .p-tree-container .p-treenode .p-treenode-content .p-tree-toggler {
-        margin-right: 0;
         width: 1.5rem;
         height: 1.5rem;
       }
-      .container-custom-tree {
-        padding: 5px 0.5rem;
+      .p-treenode {
+        padding-left: 0;
+        padding-right: 0;
+      }
+      .p-treenode-content {
+        width: 100%;
+        padding: 0;
+        line-height: 2.5em;
+
+        &:focus {
+          outline: 0;
+          box-shadow: none;
+        }
+      }
+      .p-treenode-label {
+        width: 100%;
+      }
+      .p-treenode-icon {
+        width: auto;
       }
 
       .container-workpackmodel {
-        background-color: #f8f9fb;
         display: flex;
         justify-content: space-between;
+        padding-top: 0;
+        padding-bottom: 0;
+        padding-left: 0.5em;
+        padding-right: 0.5em;
+        border-bottom: 1px solid #DEE2E6;
+
+        &.grey-background {
+          background-color: #F8F9FB;
+        }
+
+        .line-left-side {
+          display: flex;
+
+          .item-title {
+            font-weight: bold;
+            text-transform: uppercase;
+          }
+        }
+        .line-right-side {
+          margin-right: 4em;
+        }
 
         .tree-label {
           font-weight: 700;
@@ -99,7 +135,9 @@
           justify-content: center;
         }
 
-        
+        .app-toggle {
+          padding-right: 1em;
+        }
       }
     }
 
