@@ -312,12 +312,10 @@ export class WorkpackComponent implements OnDestroy {
             .pipe(finalize(() => this.workpackLoading = false))
             .subscribe(_result => {
                 if(_result?.success) {
-                    this.isSearching = true;
                     this.result = _result.data.data;
                     this.totalCountResults = _result.data.totalRecords;
                 } else {
-                    this.result = [];
-                    this.totalCountResults = undefined;
+                    this.handleCloseSearching();
                 }
             });
     }
@@ -629,6 +627,7 @@ export class WorkpackComponent implements OnDestroy {
         collapseble: this.showTabview ? false : true,
         initialStateCollapse: this.collapsePanelsStatus,
         showFilters: true,
+        hideTextFilter: true,
         showCreateNemElementButtonWorkpack: this.workpackSrv.getEditPermission() ? true : false,
         createNewElementMenuItemsWorkpack: [],
         filters: []

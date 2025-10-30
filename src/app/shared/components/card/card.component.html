@@ -62,8 +62,9 @@
         </app-progress-bar>
       </div>
     </div>
-    <div class="dataview-filters-container" *ngIf="properties.showFilters || properties.showCreateNemElementButton">
-      <div class="dataview-filters-text" *ngIf="!properties.initialStateCollapse && properties.showFilters">
+    <div class="dataview-filters-container" *ngIf="properties.showFilters || properties.showCreateNemElementButton"
+        [style.width]="properties.hideTextFilter ? '28%' : '40%'">
+      <div class="dataview-filters-text" *ngIf="!properties.initialStateCollapse && properties.showFilters && !properties.hideTextFilter">
         <input pInputText [id]="'id-app-inputtext' + properties.cardTitle" class="app-input-text"
                [class.animation-input]="showAnimationSearch"
                [(ngModel)]="properties.searchTerm"
