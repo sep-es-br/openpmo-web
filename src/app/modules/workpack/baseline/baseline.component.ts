@@ -252,6 +252,7 @@ export class BaselineComponent implements OnInit, OnDestroy {
       label: 'Etapas',
       icon: 'fas fa-tasks',
       children: [],
+      property: 'title',
     };
 
     this.baseline.updates.forEach((etapa) => {
@@ -259,6 +260,7 @@ export class BaselineComponent implements OnInit, OnDestroy {
         label: etapa.name,
         icon: etapa.fontIcon,
         children: [],
+        property: 'value',
       };
 
       etapasTitleObject.children.push(etapaObject);
@@ -281,6 +283,7 @@ export class BaselineComponent implements OnInit, OnDestroy {
               label: 'Marcos críticos',
               icon: 'fas fa-flag',
               children: [],
+              property: 'title',
             };
 
             milestones.forEach((milestone) => {
@@ -290,6 +293,9 @@ export class BaselineComponent implements OnInit, OnDestroy {
                 children: [],
                 included: conditionToEntityStartSelected(milestone),
                 readonly: false,
+                property: 'value',
+                classification: milestone.classification,
+                idWorkpack: milestone.idWorkpack,
               };
 
               milestoneTitleObject.children.push(milestoneObject);
@@ -306,6 +312,7 @@ export class BaselineComponent implements OnInit, OnDestroy {
               label: 'Entregas',
               icon: 'fas fa-boxes',
               children: [],
+              property: 'title',
             };
 
             deliveries.forEach((delivery) => {
@@ -315,6 +322,9 @@ export class BaselineComponent implements OnInit, OnDestroy {
                 children: [],
                 included: conditionToEntityStartSelected(delivery),
                 readonly: false,
+                property: 'value',
+                classification: delivery.classification,
+                idWorkpack: delivery.idWorkpack,
               };
 
               deliveryTitleObject.children.push(deliveryObject);
@@ -334,6 +344,7 @@ export class BaselineComponent implements OnInit, OnDestroy {
             label: 'Subetapas',
             icon: 'fas fa-tasks',
             children: [],
+            property: 'title',
           };
 
           etapaObject.children.push(subetapaTitleObject);
@@ -343,6 +354,7 @@ export class BaselineComponent implements OnInit, OnDestroy {
               label: subetapa.name,
               icon: subetapa.fontIcon,
               children: [],
+              property: 'value',
             };
 
             subetapaTitleObject.children.push(subetapaObject);

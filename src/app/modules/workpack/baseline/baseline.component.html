@@ -85,7 +85,50 @@
         </p-inputSwitch>
       </div>
       <div class="updates-container" *ngIf="!cardBaselineUpdates.isLoading">
-        
+        <p-tree [value]="updatesTree">
+          <ng-template let-node pTemplate="default">
+            <!-- <ng-container *ngIf="node.property === 'title' else valueField">
+              <div class="container-custom-tree container-workpackmodel">
+                <div class="tree-label">{{ node.label }}</div>
+              </div>
+            </ng-container> -->
+
+            <!-- <ng-template #valueField> -->
+              <div class="container-custom-tree container-workpackmodel">
+                <ng-container *ngIf="!node.children || node.children.length === 0">
+                  <p-inputSwitch
+                    class="app-toggle"
+                    [(ngModel)]="node.included"
+                    [disabled]="allTogglerIsDisabled || node.classification === 'TO_CANCEL' || shouldDisplayDeliveryWarnings(node)"
+                  >
+                  </p-inputSwitch>
+                </ng-container>
+
+                <!-- <i
+                  *ngIf="!responsive"
+                  [ngClass]="node.icon"
+                  class="light-grey-icon"
+                >
+                </i> -->
+                <ng-container *ngIf="shouldDisplayDeliveryWarnings(node)">
+                  <i
+                    class="warning-icon fa fa-exclamation-triangle"
+                    [ngStyle]="{ marginLeft: '1em', marginRight: '.5em' }"
+                    aria-hidden="true"
+                  ></i>
+                </ng-container>
+                <span
+                  class="item-description"
+                  [class.item-description-responsive]="responsive"
+                  [ngClass]="shouldDisplayDeliveryWarnings(node) ? 'alert-text pointer ml-0' : ''"
+                  [pTooltip]="getDeliveryTooltipWarnings(node)"
+                >
+                  {{ node.label }}
+                </span>
+              </div>
+            <!-- </ng-template> -->
+          </ng-template>
+        </p-tree>
         <!-- <p-card *ngFor="let etapa of baseline?.updates" class="card-list-item">
           <div class="card-item-content">
             <div class="item-description">
