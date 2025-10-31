@@ -8,6 +8,7 @@ import { AuthService } from '../../services/auth.service';
 import * as moment from 'moment';
 import { Subject } from 'rxjs';
 import { EventEmitter } from 'stream';
+import { PersonService } from '../../services/person.service';
 
 @Component({
   selector: 'app-config-data-view-panel',
@@ -39,7 +40,8 @@ export class ConfigDataViewPanelComponent implements OnInit, OnDestroy {
     private cookieSrv: CookieService,
     private authSrv: AuthService,
     private responsiveSrv: ResponsiveService,
-    private configDataSrv: ConfigDataViewService
+    private configDataSrv: ConfigDataViewService,
+    private personSrv : PersonService
   ) {
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.responsive = value);
     this.configDataSrv.observableCollapsePanelsStatus.pipe(takeUntil(this.$destroy)).subscribe(collapsePanelStatus => {
@@ -51,6 +53,14 @@ export class ConfigDataViewPanelComponent implements OnInit, OnDestroy {
     this.configDataSrv.observablePageSize.pipe(takeUntil(this.$destroy)).subscribe(pageSize => {
       this.selectedPageSize = pageSize;
     });
+    this.personSrv.$preferences.pipe(takeUntil(this.$destroy)).subscribe(preferences => {
+        if(preferences) {
+            // this.displayMode = preferences.displayMode?.toLowerCase() ?? 'list';
+            this.configDataSrv.nextPageSize(preferences.pageSize ?? 5)
+            this.configDataSrv.nextDisplayModeAll(preferences.displayMode?.toLowerCase() ?? 'list');
+        }
+    })
+    
   }
 
   async ngOnInit() {
@@ -117,6 +127,7 @@ export class ConfigDataViewPanelComponent implements OnInit, OnDestroy {
       this.setCookiesDisplayMode(displayMode);
     }
     this.configDataSrv.nextDisplayModeAll(displayMode );
+    this.personSrv.nextAndSavePreferences({displayMode: displayMode.toUpperCase() as ('LIST' | 'CARD')});
   }
 
   handleChangePageSize() {
@@ -124,6 +135,7 @@ export class ConfigDataViewPanelComponent implements OnInit, OnDestroy {
       this.setCookiesPageSize(this.selectedPageSize);
     }
     this.configDataSrv.nextPageSize(this.selectedPageSize );
+    this.personSrv.nextAndSavePreferences({pageSize: this.selectedPageSize})
   }
 
   setCookiesDisplayMode(displayMode: string) {
