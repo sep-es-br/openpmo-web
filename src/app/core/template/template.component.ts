@@ -28,7 +28,7 @@ export class TemplateComponent implements OnDestroy, OnInit {
     public mobileViewSrv: MobileViewService,
     public menuSrv: MenuService,
     public dashboardSrv: DashboardService,
-    public workpackShowTabViewSrv: WorkpackShowTabviewService,
+    public workpackShowTabViewSrv: WorkpackShowTabviewService
   ) {
     this.dashboardSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.fullScreenModeDashboard = value);
     this.mobileViewSrv.observable.pipe(takeUntil(this.$destroy)).subscribe( mobileView => {
@@ -47,7 +47,7 @@ export class TemplateComponent implements OnDestroy, OnInit {
         });
       }
     this.menuSrv.obsToggleMenu.pipe(takeUntil(this.$destroy)).subscribe( ({menu, open}) => {
-      if (menu && menu.trim().length > 0 && !this.isMenuFixed && open) this.openSlideMenu()
+      if (menu && menu.trim().length > 0 && open) this.openSlideMenu()
     });
     this.menuSrv.obsCloseAllMenus.pipe(takeUntil(this.$destroy)).subscribe( close => close && !this.isMenuFixed && this.closeSlideMenu());
   }

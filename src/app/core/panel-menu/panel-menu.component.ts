@@ -6,7 +6,7 @@ import * as moment from 'moment';
 import { CookieService } from 'ngx-cookie';
 import { ConfirmationService, MenuItem } from 'primeng/api';
 import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { skipWhile, take, takeUntil } from 'rxjs/operators';
 
 import { IMenu, IMenuPlanModel, IMenuWorkpack, IMenuWorkpackModel } from 'src/app/shared/interfaces/IMenu';
 import { IPerson } from 'src/app/shared/interfaces/IPerson';
@@ -23,6 +23,7 @@ import { IOffice } from 'src/app/shared/interfaces/IOffice';
 import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
 import { ReportService } from 'src/app/shared/services/report.service';
 import { WorkpackBreadcrumbStorageService } from 'src/app/shared/services/workpack-breadcrumb-storage.service';
+import { PersonService } from 'src/app/shared/services/person.service';
 
 @Component({
   selector: 'app-panel-menu',
@@ -91,6 +92,7 @@ export class PanelMenuComponent implements OnInit {
     private confirmationSrv: ConfirmationService,
     private breadcrumbSrv: BreadcrumbService,
     private workpackBreadcrumbStorageSrv: WorkpackBreadcrumbStorageService,
+    private personSrv: PersonService
   ) {
     this.menuSrv.getMenuState.pipe(takeUntil(this.$destroy)).subscribe(async (menuState) => {
       this.isFixed = menuState.isFixed;
@@ -168,6 +170,11 @@ export class PanelMenuComponent implements OnInit {
     this.menuSrv.obsToggleMenu.pipe(takeUntil(this.$destroy)).subscribe(({menu}) => {
       this.toggleMenu(menu);
     });
+    this.personSrv.$preferences.pipe(takeUntil(this.$destroy)).subscribe(
+        preferences => {
+            this.menuSrv.nextMenuState({isFixed: preferences?.fixedMenu ?? false});
+        }
+    );
 
   }
 
@@ -216,6 +223,7 @@ export class PanelMenuComponent implements OnInit {
     this.menuSrv.nextMenuState({
       isFixed: this.isFixed
     });
+    this.personSrv.nextAndSavePreferences({fixedMenu: this.isFixed });
     
   }
 
@@ -329,6 +337,8 @@ export class PanelMenuComponent implements OnInit {
   }
 
   async selectMenuActive(url: string, idNewWorkpack?: number) {
+    const preferences = await this.personSrv.$preferences.pipe(take(1)).toPromise();
+
     if (!this.menuOffices || !this.menuPortfolio) {
       return;
     }
@@ -350,7 +360,7 @@ export class PanelMenuComponent implements OnInit {
     }
     if (url.startsWith('offices') && (isNaN(id) || !id)) {
       this.itemsOffice = this.itemsOffice ? [...this.collapseMenuItems(this.itemsOffice)] : undefined;
-      this.menuSrv.nextToggleMenu({menu: 'office', open: false});
+      this.menuSrv.nextToggleMenu({menu: 'office', open: (preferences?.fixedMenu ?? false)});
     }
     if (!id || isNaN(id)) {
       return;
@@ -358,12 +368,12 @@ export class PanelMenuComponent implements OnInit {
     if (url.startsWith('offices/office')) {
       this.menuOffices?.nativeElement.querySelector('.office-' + id)?.classList.add('active');
       this.itemsOffice = this.itemsOffice ? [...this.expandMenuOffice()] : undefined;
-      this.menuSrv.nextToggleMenu({menu: 'office', open: false});
+      this.menuSrv.nextToggleMenu({menu: 'office', open: (preferences?.fixedMenu ?? false)});
 
     } else if (url.startsWith('strategies/strategy')) {
       this.menuPlanModel?.nativeElement.querySelector('.planModel-' + id)?.classList.add('active');
       this.itemsPlanModel = this.itemsPlanModel ? [...this.expandedMenuModelSelectedItem(this.itemsPlanModel, [], id)] : undefined;
-      this.menuSrv.nextToggleMenu({menu: 'planModel', open: false});
+      this.menuSrv.nextToggleMenu({menu: 'planModel', open: (preferences?.fixedMenu ?? false)});
     } else if (url.startsWith('workpack-model')) {
       this.storageBreadcrumbsItems = this.breadcrumbSrv.get;
       const parents = this.parentsFromBreadcrumb();
@@ -374,13 +384,13 @@ export class PanelMenuComponent implements OnInit {
       } else {
         this.menuPlanModel?.nativeElement.querySelector('.workpackModel-' + id)?.classList.add('active');
       }
-      this.menuSrv.nextToggleMenu({menu: 'planModel', open: false});
+      this.menuSrv.nextToggleMenu({menu: 'planModel', open: (preferences?.fixedMenu ?? false)});
     } else if (url.startsWith('plan')) {
       this.menuOffices?.nativeElement.querySelector('.plan-' + id)?.classList.add('active');
       this.itemsOffice = this.itemsOffice ? [...this.expandMenuOffice()] : this.itemsOffice;
       const itemsMenu = this.itemsPortfolio ? [...Array.from(this.itemsPortfolio)] : undefined;
       this.itemsPortfolio = itemsMenu ? [...this.collapseMenuItems(itemsMenu)] : undefined;
-      this.menuSrv.nextToggleMenu({menu: 'portfolio', open: false});
+      this.menuSrv.nextToggleMenu({menu: 'portfolio', open: (preferences?.fixedMenu ?? false)});
     } else if (url.startsWith('workpack') || url.startsWith('stakeholder')) {
       this.itemsOffice = this.itemsOffice ? [...this.expandMenuOffice()] : this.itemsOffice;
       if (this.currentIDPlan) {
@@ -396,7 +406,7 @@ export class PanelMenuComponent implements OnInit {
         this.itemsPortfolio = itemsMenu ? [...this.expandedMenuSelectedItem(itemsMenu, parents, id)] : undefined;
       }
       this.menuPortfolio?.nativeElement.querySelector('.workpack-' + id)?.classList.add('active');
-      this.menuSrv.nextToggleMenu({menu: 'portfolio', open: false});
+      this.menuSrv.nextToggleMenu({menu: 'portfolio', open: (preferences?.fixedMenu ?? false)});
     }
     if (!this.currentIDOffice || this.currentIDOffice === 0) {
       this.itemsOffice = [...this.itemsOffice.map(item => ({ ...item, expanded: false }))];
