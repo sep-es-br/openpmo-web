@@ -130,7 +130,6 @@ export class PanelMenuComponent implements OnInit {
     });
     this.menuSrv.obsReloadMenuOffice().pipe(takeUntil(this.$destroy)).subscribe(async () => {
       await this.loadOfficeMenu();
-      this.getMenuModeUser();
     });
     this.menuSrv.obsReloadMenuFavorite().pipe(takeUntil(this.$destroy)).subscribe(() => {
       this.loadFavoritesMenu();
@@ -187,7 +186,6 @@ export class PanelMenuComponent implements OnInit {
     const token = this.authSrv.getAccessToken();
     if (token) {
       await this.loadOfficeMenu();
-      this.getMenuModeUser();
     };
   }
 
@@ -197,29 +195,8 @@ export class PanelMenuComponent implements OnInit {
     }
   }
 
-  async getMenuModeUser() {
-    if (this.menus.filter( item => item.isOpen).length === 0) this.toggleMenu('office');
-    const user = this.authSrv.getTokenPayload();
-    const isFixed = this.cookieSrv.get('menuMode' + user?.email) === 'true' ? true : false;
-    if (!!isFixed) {
-      const infoPerson = await this.authSrv.getInfoPerson();
-      if (infoPerson && infoPerson.workLocal) {
-        if (infoPerson.workLocal.idWorkpackModelLinked || infoPerson.workLocal.idWorkpack || infoPerson.workLocal.idPlan) {
-          this.menuSrv.nextToggleMenu({menu: 'portfolio', open: true});
-        } else {
-          this.menuSrv.nextToggleMenu({menu: 'office', open: true});
-        }
-      } else {
-        this.menuSrv.nextToggleMenu({menu: 'office', open: true});
-      }
-      this.handleChangeMenuMode();
-    }
-  }
-
-
   handleChangeMenuMode() {
     this.isFixed = !this.isFixed;
-    this.setCookieMenuMode();
     this.menuSrv.nextMenuState({
       isFixed: this.isFixed
     });
@@ -227,14 +204,6 @@ export class PanelMenuComponent implements OnInit {
     
   }
 
-  setCookieMenuMode() {
-    const user = this.authSrv.getTokenPayload();
-    const cookiesPermission = this.cookieSrv.get('cookiesPermission' + user.email);
-    if (!!cookiesPermission && user && user.email) {
-      const date = moment().add(60, 'days').calendar();
-      this.cookieSrv.put('menuMode' + user?.email, this.isFixed ? 'true' : 'false', { expires: date });
-    }
-  }
 
   updateMenuOfficeOnAdminChange() {
     this.itemsOffice = this.itemsOffice && this.itemsOffice

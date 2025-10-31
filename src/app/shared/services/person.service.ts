@@ -264,12 +264,6 @@ export class PersonService extends BaseService<IPerson>{
     })    
   }
 
-  savePreferences(){
-    this._preferences.pipe(take(1), finalize(() => this.updatePreferences())).subscribe({
-        next: (preferences) => preferences ? this.http.put(`${this.urlBase}/preferences`, preferences).subscribe() : undefined
-    })
-  }
-
   updatePreferences() {
     this.http.get<IHttpResult<IPreferences>>(`${this.urlBase}/preferences`).subscribe({
         next: ({success, data}) => success ? this._preferences.next(data) : undefined
