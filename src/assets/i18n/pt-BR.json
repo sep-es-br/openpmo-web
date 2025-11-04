@@ -44,6 +44,7 @@
   "notFoundRisks": "Não foram encontrados riscos para este pacote de trabalho",
   "notFoundCostAccounts": "Não foram encontrados centros de custos para este pacote de trabalho",
   "notFoundIndicators": "Não foram encontrados indicadores para este pacote de trabalho",
+  "notFoundSearch": "Nenhum elemento encontrado",
   "notFoundWorkpacksToThisModel": "Não foram encontrados pacotes de trabalho para este modelo",
   "noBaselines": "Não existem linhas de base neste projeto",
   "noActiveBaselines": "Não existem linhas de base ativas neste projeto",
@@ -1050,6 +1051,7 @@
   "noStakeholders": "Não Partes Interessadas",
   "access": "Acesso",
   "search": "Procurar",
+  "minLengthSearch": "Digite pelo menos 3 caracteres para buscar",
   "from": "De",
   "to": "Até",
   "workpackModel": "Modelo de Pacote de Trabalho",
@@ -1080,6 +1082,7 @@
   "workpack-eap-alert-no-schedule": "Entrega sem cronograma",
   "workpack-eap-alert-no-scope": "Entrega sem escopo",
   "workpack-eap-alert-to-cancel": "Item a cancelar. Requer aprovação de nova Linha de Base",
+  "workpack-eap-alert-deleted-items-below": "Existem entregas excluídas nesse item",
 
   "NO_SCHEDULE": "Entrega sem cronograma",
   "UNDEFINED_SCOPE": "Entrega sem escopo",

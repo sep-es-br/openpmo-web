@@ -1,4 +1,4 @@
-<div class="app-progress-bar-schedule-year" *ngIf="total && total !== 0">
+<div class="app-progress-bar-schedule-year">
   <div class="unit-container">
     <span *ngIf="!['currency'].includes(valueUnit)" [ngStyle]="{color: color}">{{valueUnit}}</span>
     <span *ngIf="valueUnit === 'currency'" [ngStyle]="{color: color}">$</span>
@@ -26,14 +26,18 @@
       </div>
       <div class="total"></div>
     </div>
-    <div class="progress-bar-total-container" [ngStyle]="{width: '100%', background: 'transparent'}">
+    <div
+      *ngIf="total > 0 || progress > 0 || planned > 0"
+      class="progress-bar-total-container"
+      [ngStyle]="{width: '100%', background: 'transparent'}"
+    >
       <ng-container *ngIf="total >= progress">
         <ng-container *ngIf="!planned else plannedIncluded">
-          <div class="progress-bar" [ngStyle]="{ width: (progress / total) * 100 + '%', background: color, height: '3px' }"></div>
+          <div class="progress-bar" [ngStyle]="{ width: ((progress / total) * 100) + '%', background: color, height: '3px' }"></div>
           <div class="progress-bar" [ngStyle]="{ width: '100%', background: '#004660', height: '3px' }"></div>
         </ng-container>
         <ng-template #plannedIncluded>
-          <div class="progress-bar" [ngStyle]="{ width: (planned > total) ? ((progress / planned) * 100 + '%') : (progress / total), background: color, height: '3px' }"></div>
+          <div class="progress-bar" [ngStyle]="{ width: (planned > total) ? ((progress / planned) * 100 + '%') : ((progress / total) * 100 + '%'), background: color, height: '3px' }"></div>
           <div class="progress-bar" [ngStyle]="{ width: (planned > total) ? ((total / planned) * 100 + '%') : '100%' , background: '#004660', height: '3px' }"></div>
           <div class="progress-bar" [ngStyle]="{ width: (planned > total) ? '100%' : ((planned / total) * 100 + '%'), background: '#797979', height: '3px' }"></div>
         </ng-template>
@@ -45,7 +49,7 @@
         </ng-container>
         <ng-template #plannedIncluded>
           <div class="progress-bar" [ngStyle]="{ width: (planned > progress) ? ((progress / planned) * 100 + '%') : '100%', background: color, height: '3px' }"></div>
-          <div class="progress-bar" [ngStyle]="{ width: (planned > progress) ? ((total / planned) * 100 + '%') : (total / progress), background: '#004660', height: '3px' }"></div>
+          <div class="progress-bar" [ngStyle]="{ width: (planned > progress) ? ((total / planned) * 100 + '%') : ((total / progress) * 100 + '%'), background: '#004660', height: '3px' }"></div>
           <div class="progress-bar" [ngStyle]="{ width: (planned > progress) ? '100%' : ((planned / progress) * 100 + '%'), background: '#797979', height: '3px' }"></div>
         </ng-template>
       </ng-container>

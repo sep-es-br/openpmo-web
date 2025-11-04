@@ -38,14 +38,27 @@
         (ngModelChange)="handleChangeCheckCompleted($event)"></p-checkbox>
     </div>
     <div class="header-values-cost-account" *ngIf="properties.progressBarValues" [class.not-collapseble]="!properties.collapseble" [class.responsive]="responsive">
-      <div class="progress-bar-cost-container" *ngFor="let progressBar of properties.progressBarValues">
-        <app-progress-bar [total]="progressBar.total" [class.progress-bar-mobile]="responsive"
-          [progress]="progressBar.progress" [labelTotal]="progressBar.labelTotal"
-          [labelProgress]="progressBar.labelProgress" [valueUnit]="progressBar.valueUnit"
-          [baselineTotal]="progressBar.baselinePlanned" [color]="progressBar.color"
-          [startDateBaseline]="progressBar.startDateBaseline" [endDateBaseline]="progressBar.endDateBaseline"
-          [startDateTotal]="progressBar.startDateTotal" [endDateTotal]="progressBar.endDateTotal"
-          [barHeight]="progressBar.barHeight">
+      <div
+        *ngFor="let progressBar of properties.progressBarValues"
+        class="progress-bar-cost-container"
+      >
+        <app-progress-bar
+          [total]="progressBar.total"
+          [class.progress-bar-mobile]="responsive"
+          [progress]="progressBar.progress"
+          [labelTotal]="progressBar.labelTotal"
+          [labelProgress]="progressBar.labelProgress"
+          [valueUnit]="progressBar.valueUnit"
+          [baselineTotal]="progressBar.baselinePlanned"
+          [color]="progressBar.color"
+          [startDateBaseline]="progressBar.startDateBaseline"
+          [startDateTotal]="progressBar.startDateTotal"
+          [endDateBaseline]="progressBar.endDateBaseline"
+          [endDateTotal]="progressBar.endDateTotal"
+          [barHeight]="progressBar.barHeight"
+          [displayWhenTotalIsZero]="displayProgressBarIfTotalIsZero"
+          [displayFilledBarsWhenTotalIsZero]="displayFilledBarsWhenTotalIsZero"
+        >
         </app-progress-bar>
       </div>
     </div>

@@ -1,7 +1,5 @@
 import { Component, OnDestroy, Output, EventEmitter } from '@angular/core';
-import {
-  IWorkpackBreakdownStructure,
-} from 'src/app/shared/interfaces/IWorkpackBreakdownStructure';
+import { IWorkpackBreakdownStructure } from 'src/app/shared/interfaces/IWorkpackBreakdownStructure';
 import { TypeWorkpackEnumWBS } from 'src/app/shared/enums/TypeWorkpackEnum';
 import { Subject } from 'rxjs';
 import { MilestoneStatusEnum } from 'src/app/shared/enums/MilestoneStatusEnum';
@@ -18,22 +16,33 @@ import { JournalService } from 'src/app/shared/services/journal.service';
 @Component({
   selector: 'app-workpack-section-wbs',
   templateUrl: './workpack-section-wbs.component.html',
-  styleUrls: ['./workpack-section-wbs.component.scss']
+  styleUrls: ['./workpack-section-wbs.component.scss'],
 })
 export class WorkpackSectionWBSComponent implements OnDestroy {
-
   @Output() onHasWBS = new EventEmitter();
+
   typeWorkpackEnum = TypeWorkpackEnumWBS;
+
   wbsTree: any = [];
+
   language: string;
+
   $destroy = new Subject();
+
   attentionMilestone = false;
+
   milestoneStatusEnum = MilestoneStatusEnum;
+
   label;
+
   isLoading = false;
+
   idPlan: number;
+
   topPosLoading = 128;
+
   collapsed = true;
+
   workpackParams: IWorkpackParams;
 
   constructor(
@@ -47,17 +56,21 @@ export class WorkpackSectionWBSComponent implements OnDestroy {
     private journalSrv: JournalService
   ) {
     this.isLoading = true;
-    this.actRouter.queryParams.subscribe(async({ idPlan }) => {
+    this.actRouter.queryParams.subscribe(async ({ idPlan }) => {
       this.idPlan = idPlan && +idPlan;
     });
-    this.translateSrv.onLangChange.pipe(takeUntil(this.$destroy)).subscribe(() => {
-      setTimeout(() => this.setLanguage(), 500);
-    });
-    this.breakdownStructureSrv.observableResetBreakdownStructure.pipe(takeUntil(this.$destroy)).subscribe(reset => {
-      if (reset) {
-        this.loadBreakdownStructureData();
-      }
-    });
+    this.translateSrv.onLangChange
+      .pipe(takeUntil(this.$destroy))
+      .subscribe(() => {
+        setTimeout(() => this.setLanguage(), 500);
+      });
+    this.breakdownStructureSrv.observableResetBreakdownStructure
+      .pipe(takeUntil(this.$destroy))
+      .subscribe((reset) => {
+        if (reset) {
+          this.loadBreakdownStructureData();
+        }
+      });
   }
 
   ngOnDestroy(): void {
@@ -71,7 +84,9 @@ export class WorkpackSectionWBSComponent implements OnDestroy {
       this.breakdownStructureSrv.collapseAll();
     } else {
       this.isLoading = true;
-      this.breakdownStructureSrv.loadBWSExpandedAll(this.workpackParams.idWorkpack);
+      this.breakdownStructureSrv.loadBWSExpandedAll(
+        this.workpackParams.idWorkpack
+      );
     }
   }
 
@@ -79,17 +94,22 @@ export class WorkpackSectionWBSComponent implements OnDestroy {
     this.setLanguage();
     this.workpackParams = this.workpackSrv.getWorkpackParams();
     const { wbsTree, loading } = this.breakdownStructureSrv.getWBSTree();
+    console.log('wbsTree: ', wbsTree);
     this.wbsTree = wbsTree;
     this.isLoading = loading;
   }
 
   nodeCollapse(nodeList, level) {
     level++;
-    return nodeList ? nodeList.map(node => ({
-      ...node,
-      expanded: level <= 1,
-      children: node.children ? this.nodeCollapse(node.children, level) : []
-    })) : [];
+    return nodeList
+      ? nodeList.map((node) => ({
+          ...node,
+          expanded: level <= 1,
+          children: node.children
+            ? this.nodeCollapse(node.children, level)
+            : [],
+        }))
+      : [];
   }
 
   async nodeExpand(event) {
@@ -111,24 +131,33 @@ export class WorkpackSectionWBSComponent implements OnDestroy {
   }
 
   validateShowTripleConstraintCost(properties: IWorkpackBreakdownStructure) {
-    if (properties?.dashboardData?.tripleConstraint?.cost &&
-      properties?.dashboardData?.tripleConstraint?.cost?.foreseenValue > 0) {
+    if (
+      properties?.dashboardData?.tripleConstraint?.cost &&
+      properties?.dashboardData?.tripleConstraint?.cost?.foreseenValue > 0
+    ) {
       return true;
     }
     return false;
   }
 
-  validateShowTripleConstraintSchedule(properties: IWorkpackBreakdownStructure) {
-    if (properties?.dashboardData?.tripleConstraint?.schedule &&
-      properties?.dashboardData?.tripleConstraint?.schedule?.foreseenStartDate !== null) {
+  validateShowTripleConstraintSchedule(
+    properties: IWorkpackBreakdownStructure
+  ) {
+    if (
+      properties?.dashboardData?.tripleConstraint?.schedule &&
+      properties?.dashboardData?.tripleConstraint?.schedule
+        ?.foreseenStartDate !== null
+    ) {
       return true;
     }
     return false;
   }
 
   validateShowTripleConstraintScope(properties: IWorkpackBreakdownStructure) {
-    if (properties?.dashboardData?.tripleConstraint?.scope &&
-      properties?.dashboardData?.tripleConstraint?.scope?.foreseenValue > 0) {
+    if (
+      properties?.dashboardData?.tripleConstraint?.scope &&
+      properties?.dashboardData?.tripleConstraint?.scope?.foreseenValue > 0
+    ) {
       return true;
     }
     return false;
@@ -143,13 +172,17 @@ export class WorkpackSectionWBSComponent implements OnDestroy {
       queryParams: {
         id: item.idWorkpack,
         idWorkpaModelLinked: item.idWorkpaModelLinked,
-        idPlan: this.idPlan
-      }
+        idPlan: this.idPlan,
+      },
     });
   }
 
   async setWorkpackBreadcrumbStorage(idWorkpack, idPlan) {
-    const breadcrumbItems = await this.workpackBreadcrumbStorageSrv.getBreadcrumbs(idWorkpack, idPlan);
+    const breadcrumbItems =
+      await this.workpackBreadcrumbStorageSrv.getBreadcrumbs(
+        idWorkpack,
+        idPlan
+      );
     this.breadcrumbSrv.setBreadcrumbStorage(breadcrumbItems);
   }
 
@@ -161,37 +194,39 @@ export class WorkpackSectionWBSComponent implements OnDestroy {
       journalInformation.author = result.data.author;
       journalInformation.dateInformation = result.data.date;
       journalInformation.workpack = result.data.workpack;
-      journalInformation.evidences = result.data.evidences && result.data.evidences.map( evidence => {
-        const isImg = evidence.mimeType.includes('image');
-        let icon: string;
-        switch (evidence.mimeType) {
-          case 'application/pdf':
-            icon = 'far fa-file-pdf';
-            break;
-          case 'text/csv':
-            icon = 'fas fa-file-csv';
-            break;
-          case 'application/msword':
-            icon = 'far fa-file-word';
-            break;
-          case 'application/vnd.ms-excel':
-          case 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
-            icon = 'far fa-file-excel';
-            break;
-          case 'application/vnd.openxmlformats-officedocument.presentationml.presentation':
-          case 'application/vnd.ms-powerpoint':
-            icon = 'far fa-file-powerpoint';
-            break;
-          default:
-            icon = 'far fa-file';
-            break;
-        }
-        return {
-          ...evidence,
-          isImg,
-          icon
-        };
-      });
+      journalInformation.evidences =
+        result.data.evidences &&
+        result.data.evidences.map((evidence) => {
+          const isImg = evidence.mimeType.includes('image');
+          let icon: string;
+          switch (evidence.mimeType) {
+            case 'application/pdf':
+              icon = 'far fa-file-pdf';
+              break;
+            case 'text/csv':
+              icon = 'fas fa-file-csv';
+              break;
+            case 'application/msword':
+              icon = 'far fa-file-word';
+              break;
+            case 'application/vnd.ms-excel':
+            case 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
+              icon = 'far fa-file-excel';
+              break;
+            case 'application/vnd.openxmlformats-officedocument.presentationml.presentation':
+            case 'application/vnd.ms-powerpoint':
+              icon = 'far fa-file-powerpoint';
+              break;
+            default:
+              icon = 'far fa-file';
+              break;
+          }
+          return {
+            ...evidence,
+            isImg,
+            icon,
+          };
+        });
       journalInformation.loading = false;
     }
   }
@@ -215,6 +250,33 @@ export class WorkpackSectionWBSComponent implements OnDestroy {
       };
     } else {
       if (
+        node.workpackType === TypeWorkpackEnumWBS.Organizer &&
+        node.classifications.deletedWithBaseline &&
+        node.children &&
+        node.children.length > 0 &&
+        node.children.every(
+          (child: any) =>
+            child.workpacks.length > 0 &&
+            child.workpacks.every(
+              (workpack: any) =>
+                workpack.classifications.deletedWithBaseline === false &&
+                workpack.classifications.isNew === false &&
+                workpack.classifications.noSchedule === false &&
+                workpack.classifications.noScope === false &&
+                workpack.classifications.toCancel === false
+            )
+        )
+      ) {
+        return {
+          displayWarningIcon: true,
+          displayColoredText: true,
+          displayDashedText: false,
+          textTooltipMessages: [
+            'workpack-eap-alert-deleted-items-below',
+            // Existem entregas excluídas nesse item
+          ],
+        };
+      } else if (
         node.workpackType === TypeWorkpackEnumWBS.Project ||
         node.workpackType === TypeWorkpackEnumWBS.Organizer
       ) {
@@ -260,10 +322,7 @@ export class WorkpackSectionWBSComponent implements OnDestroy {
           // messages.push('Entrega sem Cronograma');
           messages.push('workpack-eap-alert-no-schedule');
         }
-        if (
-          !node.classifications.noSchedule &&
-          node.classifications.noScope
-        ) {
+        if (!node.classifications.noSchedule && node.classifications.noScope) {
           // messages.push('Entrega sem escopo estimado (físico = 0)');
           messages.push('workpack-eap-alert-no-scope');
         }
@@ -284,10 +343,8 @@ export class WorkpackSectionWBSComponent implements OnDestroy {
 
   shouldDisplayNewTag(node: any) {
     return (
-      (
-        node.workpackType === TypeWorkpackEnumWBS.Deliverable ||
-        node.workpackType === TypeWorkpackEnumWBS.Milestone
-      ) &&
+      (node.workpackType === TypeWorkpackEnumWBS.Deliverable ||
+        node.workpackType === TypeWorkpackEnumWBS.Milestone) &&
       node.classifications &&
       node.classifications.isNew
     );
@@ -297,7 +354,9 @@ export class WorkpackSectionWBSComponent implements OnDestroy {
     if (messages && messages.length > 0) {
       const finalMessagesObj = this.translateSrv.instant(messages);
       const finalMessages = Object.values(finalMessagesObj);
-      if (finalMessages.length > 1) { finalMessages[0] = `- ${finalMessages[0]}`; }
+      if (finalMessages.length > 1) {
+        finalMessages[0] = `- ${finalMessages[0]}`;
+      }
 
       return finalMessages.join('\n- ');
     }
