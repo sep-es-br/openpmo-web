@@ -87,7 +87,7 @@
       .p-treenode-content {
         width: 100%;
         padding: 0;
-        line-height: 2.5em;
+        line-height: 2em;
 
         &:focus {
           outline: 0;
@@ -109,17 +109,31 @@
         padding-left: 0.5em;
         padding-right: 0.5em;
         border-bottom: 1px solid #DEE2E6;
+        font-size: 12px;
 
         &.grey-background {
           background-color: #F8F9FB;
         }
 
+        .warning-icon {
+          color: #F59A23;
+          margin-right: 0.25em;
+        }
+        .alert-text {
+          color: #F59A23;
+        }
+
         .line-left-side {
           display: flex;
+          align-items: center;
 
           .item-title {
             font-weight: bold;
             text-transform: uppercase;
+          }
+
+          .dashed-text {
+            text-decoration: dashed;
           }
         }
         .line-right-side {

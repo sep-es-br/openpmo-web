@@ -76,13 +76,15 @@
         <app-card-loading [isCardLoading]="cardBaselineUpdates.isLoading"></app-card-loading>
       </div>
       <div class="app-toggle-container" *ngIf="!cardBaselineUpdates.isLoading">
-        <p-inputSwitch
-          class="app-toggle toggle-all"
-          [(ngModel)]="includeAllUpdates"
-          [disabled]="allTogglerIsDisabled"
-          (onChange)="handleSetAllTogglesUpdates($event.checked)"
-        >
-        </p-inputSwitch>
+        <ng-container *ngIf="!this.baseline.idWorkpack && this.baseline.status === 'DRAFT'">
+          <p-inputSwitch
+            class="app-toggle toggle-all"
+            [(ngModel)]="includeAllUpdates"
+            [disabled]="allTogglerIsDisabled"
+            (onChange)="handleSetAllTogglesUpdates($event.checked)"
+          >
+          </p-inputSwitch>
+        </ng-container>
       </div>
       <div class="updates-container" *ngIf="!cardBaselineUpdates.isLoading">
         <p-tree [value]="updatesTree">
@@ -92,24 +94,30 @@
               [ngClass]="{ 'grey-background': node.property === 'title' }"
             >
               <div class="line-left-side">
-                <ng-container *ngIf="!node.children || node.children.length === 0">
+                <ng-container *ngIf="
+                  !this.baseline.idWorkpack &&
+                  this.baseline.status === 'DRAFT' &&
+                  (
+                    !node.children ||
+                    node.children.length === 0
+                  )
+                ">
                   <p-inputSwitch
                     class="app-toggle"
                     [(ngModel)]="node.included"
-                    [disabled]="allTogglerIsDisabled || node.classification === 'TO_CANCEL' || shouldDisplayDeliveryWarnings(node)"
+                    [disabled]="allTogglerIsDisabled || node.classification === 'TO_CANCEL' || node.warnings?.shouldDisplayDeliveryWarnings"
                     (onChange)="handleToggleSwitchChange($event.checked, node.idWorkpack)"
                   >
                   </p-inputSwitch>
                 </ng-container>
-                <ng-container *ngIf="shouldDisplayDeliveryWarnings(node)">
+                <ng-container *ngIf="node.warnings?.shouldDisplayDeliveryWarnings">
                   <i
                     class="warning-icon fa fa-exclamation-triangle"
                     [ngStyle]="{ marginLeft: '1em', marginRight: '.5em' }"
-                    aria-hidden="true"
                   ></i>
                 </ng-container>
                 <span
-                  [ngClass]="{ 'alert-text pointer ml-0': shouldDisplayDeliveryWarnings(node), 'item-title': node.property === 'title', 'item-description-responsive': responsive }"
+                  [ngClass]="{ 'alert-text pointer ml-0' : node.warnings?.shouldDisplayDeliveryWarnings, 'item-title': node.property === 'title', 'item-description-responsive': responsive }"
                   [pTooltip]="getDeliveryTooltipWarnings(node)"
                 >
                   {{ node.label }}
@@ -117,13 +125,13 @@
               </div>
 
               <div class="line-right-side">
-                <ng-container *ngIf="shouldDisplayDeliveryWarnings(node)">
+                <ng-container *ngIf="node.warnings?.shouldDisplayDeliveryWarnings">
                   <i
                     class="warning-icon fa fa-exclamation-triangle"
                     aria-hidden="true"
                   ></i>
                 </ng-container>
-                <span [ngClass]="shouldDisplayDeliveryWarnings(node) ? 'alert-text' : ''">
+                <span [ngClass]="node.warnings?.shouldDisplayDeliveryWarnings ? 'alert-text' : ''">
                   {{ node.classification | translate }}
                 </span>
               </div>

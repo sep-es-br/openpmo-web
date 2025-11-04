@@ -14,6 +14,22 @@ import { MessageService, TreeNode } from 'primeng/api';
 import { TranslateService } from '@ngx-translate/core';
 import { TypeWorkpackEnumWBS } from 'src/app/shared/enums/TypeWorkpackEnum';
 
+interface BaselineUpdateBreakdown {
+  label: string;
+  icon: string;
+  children: Array<BaselineUpdateBreakdown>;
+  included: boolean;
+  readonly: boolean;
+  property: string;
+  classification: UpdateStatus;
+  idWorkpack: number;
+  expanded: boolean;
+  warnings?: {
+    shouldDisplayDeliveryWarnings: boolean;
+    deliveryTooltipWarnings: string;
+  };
+}
+
 @Component({
   selector: 'app-baseline',
   templateUrl: './baseline.component.html',
@@ -197,7 +213,7 @@ export class BaselineComponent implements OnInit, OnDestroy {
         if (this.baseline.status !== 'DRAFT') {
           this.formBaseline.disable();
           if (this.baseline.updates) {
-            this.baseline.updates.forEach(update => update.included = true);
+            this.assembleUpdatesTree(this.baseline.updates);
           }
         }
       }
@@ -244,6 +260,10 @@ export class BaselineComponent implements OnInit, OnDestroy {
     this.baseline.updates = [];
     this.cardBaselineUpdates.isLoading = false;
 
+    this.assembleUpdatesTree(updates);
+  }
+
+  assembleUpdatesTree(updates: Array<any>) {
     const conditionToEntityStartSelected = (entity: IBaselineUpdates) => (
       !this.areTherePendentUpdatesListed &&
       (entity.classification === UpdateStatus.NEW || entity.classification === UpdateStatus.TO_CANCEL)
@@ -326,7 +346,7 @@ export class BaselineComponent implements OnInit, OnDestroy {
             };
 
             deliveries.forEach((delivery) => {
-              const deliveryObject = {
+              let deliveryObject: BaselineUpdateBreakdown = {
                 label: delivery.name,
                 icon: delivery.fontIcon,
                 children: [],
@@ -337,6 +357,19 @@ export class BaselineComponent implements OnInit, OnDestroy {
                 idWorkpack: delivery.idWorkpack,
                 expanded: this.treeShouldStartExpanded,
               };
+
+              if (
+                delivery.deliveryModelHasActiveSchedule &&
+                [UpdateStatus.NO_SCHEDULE, UpdateStatus.UNDEFINED_SCOPE].includes(delivery.classification)
+              ) {
+                deliveryObject = {
+                  ...deliveryObject,
+                  warnings: {
+                    shouldDisplayDeliveryWarnings: true,
+                    deliveryTooltipWarnings: this.getDeliveryTooltipWarnings(delivery),
+                  },
+                };
+              }
 
               deliveryTitleObject.children.push(deliveryObject);
               this.baseline.updates.push({
@@ -496,13 +529,6 @@ export class BaselineComponent implements OnInit, OnDestroy {
     if (this.idBaseline) {
       await this.handleSubmitBaseline();
     }
-  }
-
-  shouldDisplayDeliveryWarnings(update: IBaselineUpdates): boolean {
-    return (
-      update.deliveryModelHasActiveSchedule &&
-      [UpdateStatus.NO_SCHEDULE, UpdateStatus.UNDEFINED_SCOPE].includes(update.classification)
-    );
   }
 
   getDeliveryTooltipWarnings(update: IBaselineUpdates) {
