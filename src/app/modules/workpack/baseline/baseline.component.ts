@@ -269,6 +269,105 @@ export class BaselineComponent implements OnInit, OnDestroy {
       (entity.classification === UpdateStatus.NEW || entity.classification === UpdateStatus.TO_CANCEL)
     );
 
+    // A função abaixo serve para criar os objetos de Marcos Críticos e Entregas que serão inseridos na árvore
+    const buildMilestonesAndDeliveries = (childs: Array<IBaselineUpdates>): {
+      milestoneTitleObject?: any;
+      deliveryTitleObject?: any;
+    } => {
+      const milestones = childs.filter((el) => el.type === TypeWorkpackEnumWBS.Milestone);
+      const deliveries = childs.filter((el) => el.type === TypeWorkpackEnumWBS.Deliverable);
+
+      let finalResult: {
+        milestoneTitleObject?: any;
+        deliveryTitleObject?: any;
+      } = {};
+
+      if (milestones.length > 0) {
+        const milestoneTitleObject = {
+          label: 'Marcos críticos',
+          icon: 'fas fa-flag',
+          children: [],
+          property: 'title',
+          expanded: this.treeShouldStartExpanded,
+        };
+
+        milestones.forEach((milestone) => {
+          const milestoneObject = {
+            label: milestone.name,
+            icon: milestone.fontIcon,
+            children: [],
+            included: conditionToEntityStartSelected(milestone),
+            readonly: [UpdateStatus.NO_SCHEDULE, UpdateStatus.UNDEFINED_SCOPE].includes(milestone.classification),
+            property: 'value',
+            classification: milestone.classification,
+            idWorkpack: milestone.idWorkpack,
+            expanded: this.treeShouldStartExpanded,
+          };
+
+          milestoneTitleObject.children.push(milestoneObject);
+          this.baseline.updates.push({
+            ...milestone,
+            included: conditionToEntityStartSelected(milestone),
+          });
+        });
+
+        finalResult = {
+          ...finalResult,
+          milestoneTitleObject,
+        };
+      }
+
+      if (deliveries.length > 0) {
+        const deliveryTitleObject = {
+          label: 'Entregas',
+          icon: 'fas fa-boxes',
+          children: [],
+          property: 'title',
+          expanded: this.treeShouldStartExpanded,
+        };
+
+        deliveries.forEach((delivery) => {
+          let deliveryObject: BaselineUpdateBreakdown = {
+            label: delivery.name,
+            icon: delivery.fontIcon,
+            children: [],
+            included: conditionToEntityStartSelected(delivery),
+            readonly: [UpdateStatus.NO_SCHEDULE, UpdateStatus.UNDEFINED_SCOPE].includes(delivery.classification),
+            property: 'value',
+            classification: delivery.classification,
+            idWorkpack: delivery.idWorkpack,
+            expanded: this.treeShouldStartExpanded,
+          };
+
+          if (
+            delivery.deliveryModelHasActiveSchedule &&
+            [UpdateStatus.NO_SCHEDULE, UpdateStatus.UNDEFINED_SCOPE].includes(delivery.classification)
+          ) {
+            deliveryObject = {
+              ...deliveryObject,
+              warnings: {
+                shouldDisplayDeliveryWarnings: true,
+                deliveryTooltipWarnings: this.getDeliveryTooltipWarnings(delivery),
+              },
+            };
+          }
+
+          deliveryTitleObject.children.push(deliveryObject);
+          this.baseline.updates.push({
+            ...delivery,
+            included: conditionToEntityStartSelected(delivery),
+          });
+        });
+
+        finalResult = {
+          ...finalResult,
+          deliveryTitleObject,
+        };
+      }
+
+      return finalResult;
+    };
+
     const etapasTitleObject = {
       label: 'Etapas',
       icon: 'fas fa-tasks',
@@ -276,6 +375,13 @@ export class BaselineComponent implements OnInit, OnDestroy {
       property: 'title',
       expanded: this.treeShouldStartExpanded,
     };
+
+    const deletedItemsBlock = updates.find((el) => (
+      el.idWorkpack === -1 &&
+      el.modelName === 'Excluídos'
+    ));
+
+    if (deletedItemsBlock) updates = updates.filter((el) => el.modelName !== 'Excluídos');
 
     updates.forEach((etapa) => {
       const etapaObject = {
@@ -289,104 +395,6 @@ export class BaselineComponent implements OnInit, OnDestroy {
       etapasTitleObject.children.push(etapaObject);
 
       if (etapa.children) {
-        const buildMilestonesAndDeliveries = (childs: Array<IBaselineUpdates>): {
-          milestoneTitleObject?: any;
-          deliveryTitleObject?: any;
-        } => {
-          const milestones = childs.filter((el) => el.type === TypeWorkpackEnumWBS.Milestone);
-          const deliveries = childs.filter((el) => el.type === TypeWorkpackEnumWBS.Deliverable);
-
-          let finalResult: {
-            milestoneTitleObject?: any;
-            deliveryTitleObject?: any;
-          } = {};
-
-          if (milestones.length > 0) {
-            const milestoneTitleObject = {
-              label: 'Marcos críticos',
-              icon: 'fas fa-flag',
-              children: [],
-              property: 'title',
-              expanded: this.treeShouldStartExpanded,
-            };
-
-            milestones.forEach((milestone) => {
-              const milestoneObject = {
-                label: milestone.name,
-                icon: milestone.fontIcon,
-                children: [],
-                included: conditionToEntityStartSelected(milestone),
-                readonly: [UpdateStatus.NO_SCHEDULE, UpdateStatus.UNDEFINED_SCOPE].includes(milestone.classification),
-                property: 'value',
-                classification: milestone.classification,
-                idWorkpack: milestone.idWorkpack,
-                expanded: this.treeShouldStartExpanded,
-              };
-
-              milestoneTitleObject.children.push(milestoneObject);
-              this.baseline.updates.push({
-                ...milestone,
-                included: conditionToEntityStartSelected(milestone),
-              });
-            });
-
-            finalResult = {
-              ...finalResult,
-              milestoneTitleObject,
-            };
-          }
-
-          if (deliveries.length > 0) {
-            const deliveryTitleObject = {
-              label: 'Entregas',
-              icon: 'fas fa-boxes',
-              children: [],
-              property: 'title',
-              expanded: this.treeShouldStartExpanded,
-            };
-
-            deliveries.forEach((delivery) => {
-              let deliveryObject: BaselineUpdateBreakdown = {
-                label: delivery.name,
-                icon: delivery.fontIcon,
-                children: [],
-                included: conditionToEntityStartSelected(delivery),
-                readonly: [UpdateStatus.NO_SCHEDULE, UpdateStatus.UNDEFINED_SCOPE].includes(delivery.classification),
-                property: 'value',
-                classification: delivery.classification,
-                idWorkpack: delivery.idWorkpack,
-                expanded: this.treeShouldStartExpanded,
-              };
-
-              if (
-                delivery.deliveryModelHasActiveSchedule &&
-                [UpdateStatus.NO_SCHEDULE, UpdateStatus.UNDEFINED_SCOPE].includes(delivery.classification)
-              ) {
-                deliveryObject = {
-                  ...deliveryObject,
-                  warnings: {
-                    shouldDisplayDeliveryWarnings: true,
-                    deliveryTooltipWarnings: this.getDeliveryTooltipWarnings(delivery),
-                  },
-                };
-              }
-
-              deliveryTitleObject.children.push(deliveryObject);
-              this.baseline.updates.push({
-                ...delivery,
-                included: conditionToEntityStartSelected(delivery),
-              });
-            });
-
-            finalResult = {
-              ...finalResult,
-              deliveryTitleObject,
-            };
-          }
-
-          return finalResult;
-        };
-
         if (etapa.children.some((el) => el.type === 'Organizer' && el.modelName === 'Subetapa')) {
           const subetapaTitleObject = {
             label: 'Subetapas',
@@ -423,7 +431,32 @@ export class BaselineComponent implements OnInit, OnDestroy {
       }
     });
 
-    this.updatesTree = [etapasTitleObject];
+    if (deletedItemsBlock) {
+      const deletedItemsTitle = {
+        label: deletedItemsBlock.modelNameInPlural,
+        icon: deletedItemsBlock.fontIcon,
+        children: [],
+        property: 'title',
+        expanded: this.treeShouldStartExpanded,
+      };
+
+      const deletedDeliveriesAndMilestones = buildMilestonesAndDeliveries(deletedItemsBlock.children);
+      if (deletedDeliveriesAndMilestones.milestoneTitleObject) {
+        deletedItemsTitle.children.push(deletedDeliveriesAndMilestones.milestoneTitleObject);
+      }
+      if (deletedDeliveriesAndMilestones.deliveryTitleObject) {
+        deletedItemsTitle.children.push(deletedDeliveriesAndMilestones.deliveryTitleObject);
+      }
+
+      this.updatesTree = [etapasTitleObject, deletedItemsTitle];
+      this.baseline.updates = [
+        ...this.baseline.updates,
+        ...deletedItemsBlock.children,
+      ];
+    } else {
+      this.updatesTree = [etapasTitleObject];
+    }
+
     this.includeAllUpdates = this.baseline.updates.every((update) => update.included);
   }
 
