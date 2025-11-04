@@ -42,7 +42,7 @@ export class AppComponent implements OnInit, OnDestroy {
           this.showTemplate = showTemplate;
         }
       });
-      this.personSrv.updatePreferences();      
+      this.personSrv.updatePreferences().subscribe();      
   }
 
   ngOnDestroy(): void {

@@ -7,9 +7,9 @@ import { IOffice } from '../interfaces/IOffice';
 import { IPerson, IWorkLocal } from '../interfaces/IPerson';
 import { IPersonProfile } from '../interfaces/IPersonProfile';
 import { PrepareHttpParams } from '../utils/query.util';
-import { BehaviorSubject, Subject } from 'rxjs';
+import { BehaviorSubject, forkJoin, Observable, Subject } from 'rxjs';
 import { IPreferences } from '../interfaces/preferences.interface';
-import { finalize, take, takeUntil } from 'rxjs/operators';
+import { finalize, map, mergeMap, take, takeUntil, tap } from 'rxjs/operators';
 
 @Injectable({ providedIn: 'root' })
 export class PersonService extends BaseService<IPerson>{
@@ -249,10 +249,11 @@ export class PersonService extends BaseService<IPerson>{
   }
 
   nextAndSavePreferences(preferences : Partial<IPreferences>) {
-    this._preferences.pipe(
-        take(1)
-    ).subscribe({
-        next: (inPreferences) => {
+    forkJoin({
+        preferencesResp: this.updatePreferences()
+    }).pipe(map(({preferencesResp}) => ({inPreferences: preferencesResp.data})))
+    .subscribe({
+        next: ({inPreferences}) => {
             inPreferences = inPreferences ?? {} as IPreferences;
 
             Object.assign(inPreferences, preferences);
@@ -261,13 +262,14 @@ export class PersonService extends BaseService<IPerson>{
 
             this.http.put(`${this.urlBase}/preferences`, inPreferences).subscribe();
         }
-    })    
+    })
+       
   }
 
-  updatePreferences() {
-    this.http.get<IHttpResult<IPreferences>>(`${this.urlBase}/preferences`).subscribe({
-        next: ({success, data}) => success ? this._preferences.next(data) : undefined
-    }); 
+  updatePreferences() : Observable<IHttpResult<IPreferences>> {
+    return this.http.get<IHttpResult<IPreferences>>(`${this.urlBase}/preferences`)
+    .pipe(tap(({success, data}) => success ? this._preferences.next(data) : undefined))
+     
   }
 
 }
