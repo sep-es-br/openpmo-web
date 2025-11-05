@@ -7,6 +7,7 @@ import { Subject } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
 import { ConfirmationService, SelectItem, SelectItemGroup } from 'primeng/api';
 import { ScheduleService } from 'src/app/shared/services/schedule.service';
+import { TypeWorkpackEnumWBS } from 'src/app/shared/enums/TypeWorkpackEnum';
 
 @Component({
   selector: 'app-property-selection',
@@ -62,6 +63,15 @@ export class PropertySelectionComponent implements OnInit {
     const grouped: SelectItemGroup[] = [];
     const standalone: SelectItem[] = [];
 
+    const typeWorkPack = this.property.typeWorkPack;
+
+    const disabledMap: Record<string, string[]> = {
+      Project: ['Cancelado', 'Concluído', 'A cancelar'],
+      Deliverable: ['Cancelada', 'Concluída'],
+    };
+    
+    const disabledLabels = disabledMap[typeWorkPack] || [];
+
     this.property.possibleValues.forEach(pv => {
       if (pv.label.includes('\\')) {
         const [groupNameRaw, itemNameRaw] = pv.label.split('\\');
@@ -75,9 +85,10 @@ export class PropertySelectionComponent implements OnInit {
         }
         group.items.push({ label: itemName, value: pv.value });
       } else {
-        const shouldDisable =
-        pv.label.includes('Cancelada') ||
-        (this.property.id == null && pv.label.includes('Concluída'));
+        const shouldDisable = disabledLabels.some((word) =>
+          pv.label.includes(word)
+        );
+
         standalone.push({
           label: pv.label.trim(),
           value: pv.value,
@@ -103,12 +114,37 @@ export class PropertySelectionComponent implements OnInit {
       opt.label !== 'Outros'
     );
 
+    const onlyHasOutros =
+    this.possibleValuesOptions.length === 1 &&
+    this.possibleValuesOptions[0].label === 'Outros';
+    
+    const isStatusOrSituacao =
+    this.property.name === 'Situação' || this.property.name === 'Status';
+  
+    const isProjectOrDeliverable =
+      typeWorkPack === TypeWorkpackEnumWBS.Project || typeWorkPack === TypeWorkpackEnumWBS.Deliverable;
+    
+    if (onlyHasOutros && isStatusOrSituacao && isProjectOrDeliverable) {
+      this.property.possibleValues = standalone.map((item) => ({
+        label: item.label,
+        value: item.value,
+        disabled: item.disabled,
+      }));
+    
+      this.hasGroups = false;
+      }
+
   }
 
   onSelectionChange(value: any) {
-    if (this.property.name === 'Situação' && value === 'Concluída') {
+    const isSituacao = this.property.name === 'Situação';
+    const isConcluida = value === 'Concluída';
+    const isDeliverable = this.property.typeWorkPack === TypeWorkpackEnumWBS.Deliverable;
+  
+    if (isSituacao && isConcluida && isDeliverable) {
       this.verifyDeliverable(this.property.id);
     }
+  
     this.changed.emit(value);
   }
   
