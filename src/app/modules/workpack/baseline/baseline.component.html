@@ -76,7 +76,7 @@
         <app-card-loading [isCardLoading]="cardBaselineUpdates.isLoading"></app-card-loading>
       </div>
       <div class="app-toggle-container" *ngIf="!cardBaselineUpdates.isLoading">
-        <ng-container *ngIf="!this.baseline.idWorkpack && this.baseline.status === 'DRAFT'">
+        <ng-container *ngIf="!this.idBaseline && this.baseline.status === 'DRAFT'">
           <p-inputSwitch
             class="app-toggle toggle-all"
             [(ngModel)]="includeAllUpdates"
@@ -95,7 +95,7 @@
             >
               <div class="line-left-side">
                 <ng-container *ngIf="
-                  !this.baseline.idWorkpack &&
+                  !this.idBaseline &&
                   this.baseline.status === 'DRAFT' &&
                   (
                     !node.children ||
