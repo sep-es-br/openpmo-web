@@ -264,8 +264,8 @@ export class BaselineComponent implements OnInit, OnDestroy {
   }
 
   assembleUpdatesTree(updates: Array<any>) {
-    const conditionToEntityStartSelected = (entity: IBaselineUpdates) => (
-      !this.areTherePendentUpdatesListed &&
+    const conditionToEntityStartSelected = (updates: Array<IBaselineUpdates>, entity: IBaselineUpdates) => (
+      !updates.some((el) => [UpdateStatus.NO_SCHEDULE, UpdateStatus.UNDEFINED_SCOPE].includes(el.classification)) &&
       (entity.classification === UpdateStatus.NEW || entity.classification === UpdateStatus.TO_CANCEL)
     );
 
@@ -276,6 +276,7 @@ export class BaselineComponent implements OnInit, OnDestroy {
     } => {
       const milestones = childs.filter((el) => el.type === TypeWorkpackEnumWBS.Milestone);
       const deliveries = childs.filter((el) => el.type === TypeWorkpackEnumWBS.Deliverable);
+      const updates = [...milestones, ...deliveries];
 
       let finalResult: {
         milestoneTitleObject?: any;
@@ -296,7 +297,7 @@ export class BaselineComponent implements OnInit, OnDestroy {
             label: milestone.name,
             icon: milestone.fontIcon,
             children: [],
-            included: conditionToEntityStartSelected(milestone),
+            included: conditionToEntityStartSelected(updates, milestone),
             readonly: [UpdateStatus.NO_SCHEDULE, UpdateStatus.UNDEFINED_SCOPE].includes(milestone.classification),
             property: 'value',
             classification: milestone.classification,
@@ -307,7 +308,7 @@ export class BaselineComponent implements OnInit, OnDestroy {
           milestoneTitleObject.children.push(milestoneObject);
           this.baseline.updates.push({
             ...milestone,
-            included: conditionToEntityStartSelected(milestone),
+            included: conditionToEntityStartSelected(updates, milestone),
           });
         });
 
@@ -331,7 +332,7 @@ export class BaselineComponent implements OnInit, OnDestroy {
             label: delivery.name,
             icon: delivery.fontIcon,
             children: [],
-            included: conditionToEntityStartSelected(delivery),
+            included: conditionToEntityStartSelected(updates, delivery),
             readonly: [UpdateStatus.NO_SCHEDULE, UpdateStatus.UNDEFINED_SCOPE].includes(delivery.classification),
             property: 'value',
             classification: delivery.classification,
@@ -355,7 +356,7 @@ export class BaselineComponent implements OnInit, OnDestroy {
           deliveryTitleObject.children.push(deliveryObject);
           this.baseline.updates.push({
             ...delivery,
-            included: conditionToEntityStartSelected(delivery),
+            included: conditionToEntityStartSelected(updates, delivery),
           });
         });
 
