@@ -73,9 +73,6 @@ export class ScopeConstraintComponent implements OnInit {
     if (this.scope.plannedVariationPercent) {
       values.push(this.scope.plannedVariationPercent);
     }
-    if (this.scope.foreseenVariationPercent) {
-      values.push(this.scope.foreseenVariationPercent);
-    }
     if (this.scope.actualVariationPercent) {
       values.push(this.scope.actualVariationPercent);
     }
