@@ -33,7 +33,6 @@ export class TripleConstraintDashboardComponent implements OnInit {
   $destroy = new Subject();
   responsive = false;
   mediaScreen1450: boolean;
-  foreseenLabel: string;
 
   constructor(
     private responsiveSrv: ResponsiveService,
@@ -63,19 +62,7 @@ export class TripleConstraintDashboardComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.route.queryParams.subscribe(params => {
-      const idWorkpack = params['id']
-      if (idWorkpack) {
-        this.labelService.getLabels(idWorkpack).subscribe(
-          response => {
-            this.foreseenLabel = response.data[0].body.data;
-          },
-          error => {
-            console.error(error);
-          }
-        );
-      }
-    });
+    
   }
 
   ngOnDestroy(): void {
