@@ -4,14 +4,14 @@
       <i class="far fa-clock"></i>
       <span>{{'schedule'|translate|uppercase}}</span>
     </div>
-    <div class="variation" [class.positive-variation]="schedule?.variation > 0"
+    <!-- <div class="variation" [class.positive-variation]="schedule?.variation > 0"
       [class.not-variation]="!schedule?.variation || schedule?.variation === 0"
       [class.negative-variation]="schedule?.variation < 0">
       <i class="fas" [class.fa-arrow-left]="schedule?.variation > 0"
         [class.fa-arrow-right]="schedule?.variation <= 0"></i>
       <span>{{schedule?.variation < 0 ? (schedule?.variation * (-1)|number:'1.0-1':language) :
           schedule?.variation|number:'1.0-1':language}}d</span>
-    </div>
+    </div> -->
   </div>
   <div class="content-card">
     <div *ngIf="schedule.plannedValue" class="content-card-item planned"
