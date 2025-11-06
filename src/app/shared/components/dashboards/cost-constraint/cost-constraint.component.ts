@@ -14,9 +14,7 @@ export class CostConstraintComponent implements OnInit {
 
   @Input() cost: {
     actualValue: number,
-    foreseenValue: number,
     plannedValue: number,
-    variation: number
   };
   maxCostValue: number;
   monthsInPeriod: number;
@@ -64,9 +62,6 @@ export class CostConstraintComponent implements OnInit {
     if (this.cost) {
       if (this.cost.plannedValue) {
         values.push(this.cost.plannedValue);
-      }
-      if (this.cost.foreseenValue) {
-        values.push(this.cost.foreseenValue);
       }
       if (this.cost.actualValue) {
         values.push(this.cost.actualValue);

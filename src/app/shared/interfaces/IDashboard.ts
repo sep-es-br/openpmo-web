@@ -3,26 +3,17 @@ import { IMilestonePropertyData } from "./IMilestonePropertyData";
 
 export interface IDashboard {
   tripleConstraint: {
-    costVariation: number;
     costPlannedValue: number;
-    costForeseenValue: number;
     costActualValue: number;
     schedulePlannedStartDate: string;
     schedulePlannedEndDate: string;
-    scheduleForeseenStartDate: string;
-    scheduleForeseenEndDate: string;
     scheduleActualStartDate: string;
     scheduleActualEndDate: string;
-    scheduleVariation: number;
     schedulePlannedValue: number;
-    scheduleForeseenValue: number;
     scheduleActualValue: number;
-    scopeVariation: number;
     scopePlannedVariationPercent: number;
-    scopeForeseenVariationPercent: number;
     scopeActualVariationPercent: number;
     scopePlannedValue: number;
-    scopeForeseenValue: number;
     scopeActualValue: number;
   };
   performanceIndex: {
@@ -117,7 +108,6 @@ export interface IEarnedValueByStep {
   actualCost: number;
   plannedCost: number;
   earnedValue: number;
-  estimatedCost: number;
   date: string;
 }
 
@@ -158,30 +148,20 @@ export interface ITripleConstraintDashboard {
   mesAno?: string;
   cost: {
     actualValue: number;
-    foreseenValue: number;
     plannedValue: number;
-    variation: number;
   };
   schedule: {
     actualEndDate: string;
     actualStartDate: string;
     actualValue: number;
-    foreseenEndDate: string;
-    foreseenStartDate: string;
-    foreseenValue: number;
     plannedEndDate: string;
     plannedStartDate: string;
     plannedValue: number;
-    variation: number;
   };
   scope: {
     actualVariationPercent: number;
-    foreseenVariationPercent: number;
     plannedVariationPercent: number;
-    foreseenValue?: number;
     actualValue?: number;
     plannedValue?: number;
-    variation: number;
-    foreseenWorkRefMonth?: number;
   };
 }

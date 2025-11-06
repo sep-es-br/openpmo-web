@@ -13,21 +13,15 @@ export class ScopeConstraintComponent implements OnInit {
 
   @Input() scope: {
     actualVariationPercent: number,
-    foreseenVariationPercent: number,
     plannedVariationPercent?: number,
-    foreseenValue?: number;
-    actualValue?: number;
-    variation?: number
+    actualValue?: number
   }
   maxScopeValue: number;
   marginRightPlanned: number;
-  marginRightForeseen: number;
   marginRightActual: number;
   difPlannedEndDateToMaxEndDate: number;
-  difForeseenEndDateToMaxEndDate: number;
   difActualEndDateToMaxEndDate: number;
   marginLeftPlanned: number;
-  marginLeftForeseen: number;
   marginLeftActual: number;
   $destroy = new Subject();
   responsive = false;
@@ -72,9 +66,6 @@ export class ScopeConstraintComponent implements OnInit {
     const values = [];
     if (this.scope.plannedVariationPercent) {
       values.push(this.scope.plannedVariationPercent);
-    }
-    if (this.scope.foreseenVariationPercent) {
-      values.push(this.scope.foreseenVariationPercent);
     }
     if (this.scope.actualVariationPercent) {
       values.push(this.scope.actualVariationPercent);
