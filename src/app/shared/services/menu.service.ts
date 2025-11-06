@@ -1,7 +1,7 @@
 import { IMenuFavorites, IMenuPlanModel, PlanMenuItem } from './../interfaces/IMenu';
 import { MenuItem } from 'primeng/api';
 import { Location } from '@angular/common';
-import { Inject, Injectable, Injector } from '@angular/core';
+import { Inject, Injectable, Injector, OnDestroy } from '@angular/core';
 import * as moment from 'moment';
 import { CookieService } from 'ngx-cookie';
 import { BehaviorSubject, Subject } from 'rxjs';
@@ -11,6 +11,8 @@ import { IHttpResult } from '../interfaces/IHttpResult';
 import { IMenu, IMenuOffice, IMenuWorkpack } from '../interfaces/IMenu';
 import { PrepareHttpParams } from '../utils/query.util';
 import { adminsPath, plansPath } from '../constants/menuUrls';
+import { PersonService } from './person.service';
+import { take, takeUntil } from 'rxjs/operators';
 
 interface IMenuState {
   isFixed: boolean;
@@ -28,7 +30,7 @@ interface IMenuState {
   providedIn: 'root'
 })
 
-export class MenuService extends BaseService<any> {
+export class MenuService extends BaseService<any> implements OnDestroy{
 
   adminsPath = adminsPath;
   plansPath = plansPath;
@@ -63,14 +65,21 @@ export class MenuService extends BaseService<any> {
     itemsPlanModel: []
   } as IMenuState);
 
+  private $destroy = new Subject();
+
   constructor(
     @Inject(Injector) injector: Injector,
     private locationSrv: Location,
-    private cookieSrv: CookieService
   ) {
     super('menus', injector);
     this.checkURL(`#${this.locationSrv.path()}`);
     this.locationSrv.onUrlChange(url => this.checkURL(url));
+        
+  }
+
+  ngOnDestroy(): void {
+      this.$destroy.next();
+      this.$destroy.complete();
   }
 
   checkURL(url: string) {

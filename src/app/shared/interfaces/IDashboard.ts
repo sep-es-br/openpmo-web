@@ -117,7 +117,6 @@ export interface IEarnedValueByStep {
   actualCost: number;
   plannedCost: number;
   earnedValue: number;
-  estimatedCost: number;
   date: string;
 }
 

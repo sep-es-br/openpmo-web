@@ -14,6 +14,7 @@ export interface ICard {
   toggleLabel?: string;
   initialStateToggle: boolean;
   showFilters?: boolean;
+  hideTextFilter?: boolean;
   filters?: IFilterDataview[];
   showCreateNemElementButtonWorkpack?: boolean;
   showCreateNemElementButton?: boolean;

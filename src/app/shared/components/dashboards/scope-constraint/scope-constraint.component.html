@@ -4,14 +4,14 @@
             <i class="fas fa-boxes"></i>
             <span>{{'scopeLabel'|translate|uppercase}}</span>
           </div>
-          <div class="variation"
+          <!-- <div class="variation"
             [class.not-variation]="!scope?.variation || scope?.variation === 0"
             [class.positive-variation]="scope?.variation < 0"
             [class.negative-variation]="scope?.variation > 0">
             <i class="fas" [class.fa-arrow-down]="scope?.variation > 0"
               [class.fa-arrow-up]="scope?.variation <= 0"></i>
             <span>{{scope?.variation < 0 ? (scope?.variation * (-1)|number:'1.0-1':language) : scope?.variation|number:'1.0-1':language}}%</span>
-          </div>
+          </div> -->
         </div>
         <div class="content-card">
           <div *ngIf="scope?.plannedVariationPercent" class="content-card-item planned"
@@ -20,12 +20,6 @@
               (scope?.plannedVariationPercent)|number:'1.0-1':language}}%</label>
             <div [ngStyle]="{width: '100%', background: '#B5B5B5', height: '28px'}"></div>
           </div>
-          <!-- <div *ngIf="scope?.foreseenVariationPercent" class="content-card-item foreseen"
-            [ngStyle]="{width: (((scope?.foreseenVariationPercent / maxScopeValue)*100) + '%'), 'min-width': '10%'}">
-            <label>{{scope?.foreseenVariationPercent &&
-              (scope?.foreseenVariationPercent)|number:'1.0-1':language}}%</label>
-            <div [ngStyle]="{width: '100%', background: '#44B39B', height: '28px'}"></div>
-          </div> -->
           <div *ngIf="scope?.actualVariationPercent && scope?.actualVariationPercent >= 0.5" class="content-card-item actual"
             [ngStyle]="{width: (((scope?.actualVariationPercent / maxScopeValue)*100) + '%'), 'min-width': '10%'}">
             <label>{{(scope?.actualVariationPercent &&

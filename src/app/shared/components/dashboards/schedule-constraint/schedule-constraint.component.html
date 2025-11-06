@@ -4,14 +4,14 @@
       <i class="far fa-clock"></i>
       <span>{{'schedule'|translate|uppercase}}</span>
     </div>
-    <div class="variation" [class.positive-variation]="schedule?.variation > 0"
+    <!-- <div class="variation" [class.positive-variation]="schedule?.variation > 0"
       [class.not-variation]="!schedule?.variation || schedule?.variation === 0"
       [class.negative-variation]="schedule?.variation < 0">
       <i class="fas" [class.fa-arrow-left]="schedule?.variation > 0"
         [class.fa-arrow-right]="schedule?.variation <= 0"></i>
       <span>{{schedule?.variation < 0 ? (schedule?.variation * (-1)|number:'1.0-1':language) :
           schedule?.variation|number:'1.0-1':language}}d</span>
-    </div>
+    </div> -->
   </div>
   <div class="content-card">
     <div *ngIf="schedule.plannedValue" class="content-card-item planned"
@@ -26,18 +26,6 @@
       <div class="progress-bar" [ngStyle]="{width: '100%', background: '#B5B5B5', height: '28px'}">
         {{schedule?.plannedValue|number:'1.0-1':language}}m</div>
     </div>
-    <!-- <div *ngIf="schedule?.foreseenValue" class="content-card-item foreseen"
-      [ngStyle]="{width: (schedule?.foreseenValue / (monthsInPeriod))* 100 + '%', 'min-width': '20%', 'margin-left': this.marginLeftForeseen + '%', 'margin-right': this.marginRightForeseen + '%'}">
-      <div class="date-labels">
-        <label [class.start-space]="((schedule?.foreseenValue / (monthsInPeriod))* 100) <= 20">{{language
-          === 'pt' ? (schedule?.foreseenStartDate|date:'dd/MM/yyyy') :
-          (schedule?.foreseenStartDate|date:'yyyy/MM/dd')}}</label>
-        <label style="margin-left: 5px">{{language === 'pt' ? (schedule?.foreseenEndDate|date:'dd/MM/yyyy') :
-          (schedule?.foreseenEndDate|date:'yyyy/MM/dd')}}</label>
-      </div>
-      <div class="progress-bar" [ngStyle]="{width: '100%', background: '#44B39B', height: '28px'}">
-        {{schedule?.foreseenValue|number:'1.0-1':language}}m</div>
-    </div> -->
     <div *ngIf="schedule?.actualValue" class="content-card-item actual"
       [ngStyle]="{width: (schedule?.actualValue / (monthsInPeriod))* 100 + '%', 'min-width': '20%', 'margin-left': this.marginLeftActual + '%', 'margin-right': this.marginRightActual + '%'}">
       <div class="date-labels">
