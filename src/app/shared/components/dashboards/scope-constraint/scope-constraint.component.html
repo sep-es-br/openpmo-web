@@ -20,12 +20,6 @@
               (scope?.plannedVariationPercent)|number:'1.0-1':language}}%</label>
             <div [ngStyle]="{width: '100%', background: '#B5B5B5', height: '28px'}"></div>
           </div>
-          <!-- <div *ngIf="scope?.foreseenVariationPercent" class="content-card-item foreseen"
-            [ngStyle]="{width: (((scope?.foreseenVariationPercent / maxScopeValue)*100) + '%'), 'min-width': '10%'}">
-            <label>{{scope?.foreseenVariationPercent &&
-              (scope?.foreseenVariationPercent)|number:'1.0-1':language}}%</label>
-            <div [ngStyle]="{width: '100%', background: '#44B39B', height: '28px'}"></div>
-          </div> -->
           <div *ngIf="scope?.actualVariationPercent && scope?.actualVariationPercent >= 0.5" class="content-card-item actual"
             [ngStyle]="{width: (((scope?.actualVariationPercent / maxScopeValue)*100) + '%'), 'min-width': '10%'}">
             <label>{{(scope?.actualVariationPercent &&

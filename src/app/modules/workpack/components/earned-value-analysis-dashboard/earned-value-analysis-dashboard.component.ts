@@ -126,14 +126,6 @@ export class EarnedValueAnalysisDashboardComponent implements OnInit, OnChanges,
           pointBorderWidth: this.earnedValueAnalysis.earnedValueByStep?.map(item => item.plannedCost).length > 1 ? 1 : 0,
           pointRadius: this.earnedValueAnalysis.earnedValueByStep?.map(item => item.plannedCost).length > 1 ? 4 : 0,
         },
-        // {
-        //   label: this.translateSrv.instant('EC'),
-        //   data: this.earnedValueAnalysis.earnedValueByStep?.filter(step => moment(step.date, 'yyyy-MM').isSameOrBefore(referenceMonth)).map(item => item.estimatedCost),
-        //   fill: false,
-        //   borderColor: '#44b39b',
-        //   pointBorderWidth: this.earnedValueAnalysis.earnedValueByStep?.filter(step => moment(step.date, 'yyyy-MM').isSameOrBefore(referenceMonth)).map(item => item.estimatedCost).length > 1 ? 1 : 0,
-        //   pointRadius: this.earnedValueAnalysis.earnedValueByStep?.filter(step => moment(step.date, 'yyyy-MM').isSameOrBefore(referenceMonth)).map(item => item.estimatedCost).length > 1 ? 4 : 0,
-        // }
       ]
     };
 
