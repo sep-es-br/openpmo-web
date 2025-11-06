@@ -76,59 +76,70 @@
         <app-card-loading [isCardLoading]="cardBaselineUpdates.isLoading"></app-card-loading>
       </div>
       <div class="app-toggle-container" *ngIf="!cardBaselineUpdates.isLoading">
-        <p-inputSwitch
-          class="app-toggle toggle-all"
-          [(ngModel)]="includeAllUpdates"
-          [disabled]="allTogglerIsDisabled"
-          (onChange)="handleSetAllTogglesUpdates($event)"
-        >
-        </p-inputSwitch>
+        <ng-container *ngIf="!this.idBaseline || this.baseline.status === 'DRAFT'">
+          <p-inputSwitch
+            class="app-toggle toggle-all"
+            [(ngModel)]="includeAllUpdates"
+            [disabled]="allTogglerIsDisabled"
+            (onChange)="handleSetAllTogglesUpdates($event.checked)"
+          >
+          </p-inputSwitch>
+        </ng-container>
       </div>
       <div class="updates-container" *ngIf="!cardBaselineUpdates.isLoading">
-        <p-card *ngFor="let item of baseline?.updates" class="card-list-item">
-          <div class="card-item-content">
-            <div class="item-description">
-              <p-inputSwitch
-                class="app-toggle"
-                [(ngModel)]="item.included"
-                [disabled]="allTogglerIsDisabled || item.classification === 'TO_CANCEL' || shouldDisplayDeliveryWarnings(item)"
-              >
-              </p-inputSwitch>
-              <div class="item-description-container" [class.item-description-container-responsive]="responsive">
-                <i *ngIf="!responsive"
-                   [ngClass]=" item.description === 'structure' ? [ 'app-icon', item.icon, 'light-grey-icon'] : [ item.icon, 'light-grey-icon']"
-                   [ngStyle]="{ fontSize: '1.8rem'}">
-                </i>
-                <ng-container *ngIf="shouldDisplayDeliveryWarnings(item)">
+        <p-tree [value]="updatesTree">
+          <ng-template let-node pTemplate="default">
+            <div
+              class="container-custom-tree container-workpackmodel"
+              [ngClass]="{ 'grey-background': node.property === 'title' }"
+            >
+              <div class="line-left-side">
+                <ng-container *ngIf="
+                  (
+                    !this.idBaseline ||
+                    this.baseline.status === 'DRAFT'
+                  ) &&
+                  (
+                    !node.children ||
+                    node.children.length === 0
+                  )
+                ">
+                  <p-inputSwitch
+                    class="app-toggle"
+                    [(ngModel)]="node.included"
+                    [disabled]="allTogglerIsDisabled || node.classification === 'TO_CANCEL' || node.warnings?.shouldDisplayDeliveryWarnings"
+                    (onChange)="handleToggleSwitchChange($event.checked, node.idWorkpack)"
+                  >
+                  </p-inputSwitch>
+                </ng-container>
+                <ng-container *ngIf="node.warnings?.shouldDisplayDeliveryWarnings">
                   <i
                     class="warning-icon fa fa-exclamation-triangle"
                     [ngStyle]="{ marginLeft: '1em', marginRight: '.5em' }"
-                    aria-hidden="true"
                   ></i>
                 </ng-container>
                 <span
-                  class="item-description"
-                  [class.item-description-responsive]="responsive"
-                  [ngClass]="shouldDisplayDeliveryWarnings(item) ? 'alert-text pointer ml-0' : ''"
-                  [pTooltip]="getDeliveryTooltipWarnings(item)"
+                  [ngClass]="{ 'alert-text pointer ml-0' : node.warnings?.shouldDisplayDeliveryWarnings, 'item-title': node.property === 'title', 'item-description-responsive': responsive }"
+                  [pTooltip]="getDeliveryTooltipWarnings(node)"
                 >
-                  {{ item.description === 'structure' ? ('structure'|translate) : item.description }}
+                  {{ node.label }}
+                </span>
+              </div>
+
+              <div class="line-right-side">
+                <ng-container *ngIf="node.warnings?.shouldDisplayDeliveryWarnings">
+                  <i
+                    class="warning-icon fa fa-exclamation-triangle"
+                    aria-hidden="true"
+                  ></i>
+                </ng-container>
+                <span [ngClass]="node.warnings?.shouldDisplayDeliveryWarnings ? 'alert-text' : ''">
+                  {{ node.classification | translate }}
                 </span>
               </div>
             </div>
-            <div class="item-status" [class.item-status-responsive]="responsive">
-              <ng-container *ngIf="shouldDisplayDeliveryWarnings(item)">
-                <i
-                  class="warning-icon fa fa-exclamation-triangle"
-                  aria-hidden="true"
-                ></i>
-              </ng-container>
-              <span [ngClass]="shouldDisplayDeliveryWarnings(item) ? 'alert-text' : ''">
-                {{ item.classification | translate }}
-              </span>
-            </div>
-          </div>
-        </p-card>
+          </ng-template>
+        </p-tree>
       </div>
 
       <ng-container *ngIf="areTherePendentUpdatesListed">

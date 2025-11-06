@@ -16,11 +16,6 @@
       <label>{{cost?.plannedValue|shortNumber:language}}</label>
       <div class="progress-bar" [ngStyle]="{width: '100%', background: '#B5B5B5', height: '28px'}"></div>
     </div>
-    <!-- <div *ngIf="cost?.foreseenValue && cost?.foreseenValue > 0" class="content-card-item foreseen" [pTooltip]="cost?.foreseenValue|number:'2.0-2':language"
-      [ngStyle]="{width: ((cost?.foreseenValue / maxCostValue)*100) + '%', 'min-width': '10%'}">
-      <label>{{cost?.foreseenValue| shortNumber:language}}</label>
-      <div class="progress-bar" [ngStyle]="{width: '100%', background: '#44B39B', height: '28px'}"></div>
-    </div> -->
     <div *ngIf="cost?.actualValue && cost?.actualValue > 0" class="content-card-item actual" [pTooltip]="cost?.actualValue|number:'2.0-2':language"
       [ngStyle]="{width: ((cost?.actualValue / maxCostValue)*100) + '%', 'min-width': '10%'}">
       <label>{{cost.actualValue| shortNumber:language}}</label>

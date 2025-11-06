@@ -1,3 +1,5 @@
+import { TypeWorkpackEnumWBS } from '../enums/TypeWorkpackEnum';
+
 export interface IBaseline {
   id?: number;
   idWorkpack: number;
@@ -21,9 +23,16 @@ export interface IBaseline {
 }
 
 export interface IBaselineUpdates {
-  idWorkpack?: number;
-  icon: string;
-  description: string;
+  idWorkpack: number;
+  idWorkpackModel: number;
+  idPlan: number;
+  name: string;
+  fullName: string;
+  fontIcon: string;
+  modelName: string;
+  modelNameInPlural: string;
+  type: TypeWorkpackEnumWBS;
+  children?: Array<IBaselineUpdates>;
   classification: UpdateStatus; // NEW | CHANGED | DELETED | TO_CANCEL | NO_SCHEDULE | UNDEFINED_SCOPE
   included?: boolean;
   readonly?: boolean; //only screen
@@ -39,7 +48,7 @@ export interface IBaselineEvaluations {
   myEvaluation?: boolean;
 }
 
-interface ICostBaseline  {
+interface ICostBaseline {
   variation?: number;
   currentValue?: number;
   proposedValue: number;
@@ -97,4 +106,4 @@ export enum UpdateStatus {
   TO_CANCEL = 'TO_CANCEL',
   NO_SCHEDULE = 'NO_SCHEDULE',
   UNDEFINED_SCOPE = 'UNDEFINED_SCOPE',
-};
+}
