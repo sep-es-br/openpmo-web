@@ -282,11 +282,6 @@ export class DashboardService extends BaseService<IDashboard> {
     return result as IHttpResult<IDashboard>;
   }
 
-  public async GetMenuItemsByWorkpackModel(options?): Promise<IHttpResult<IWorkpackByModel[]>> {
-    const result = await this.http.get(`${this.urlBase}/workpack-model/menu`, { params: PrepareHttpParams(options) }).toPromise();
-    return result as IHttpResult<IWorkpackByModel[]>;
-  }
-
   public async isItemBeingBuild(wpId : number): Promise<IHttpResult<{value: boolean}>> {
     const result = await this.http.get(`${this.urlBase}/${wpId!}/isBeingBuild`).toPromise();
     return result as IHttpResult<{value: boolean}>;

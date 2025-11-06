@@ -511,7 +511,8 @@ export class PlanComponent implements OnInit, OnDestroy {
           collapseble: true,
           isLoading: true,
           initialStateCollapse: this.collapsePanelsStatus,
-          showFilters: true
+          showFilters: true,
+          hideTextFilter: true
         };
         return {
           idWorkpackModel: workpackModel.id,
