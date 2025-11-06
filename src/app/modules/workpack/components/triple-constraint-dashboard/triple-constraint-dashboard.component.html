@@ -21,7 +21,7 @@
         <app-schedule-constraint [schedule]="tripleConstraint?.schedule"></app-schedule-constraint>
       </div>
       <div class="card-constraint-container"
-        *ngIf="tripleConstraint?.scope  && (tripleConstraint?.scope?.plannedVariationPercent > 0 || tripleConstraint?.scope?.foreseenVariationPercent > 0)">
+        *ngIf="tripleConstraint?.scope  && (tripleConstraint?.scope?.plannedVariationPercent > 0 )">
         <app-scope-constraint [scope]="tripleConstraint?.scope"></app-scope-constraint>
       </div>
     </div>
