@@ -483,7 +483,7 @@
       </div>
     </p-panel>
   </div>
-  <p-dialog [(visible)]="!!showDialogConfirmation" [style]="!responsive ? {width: '50vw'} : {width: '90vw'}"
+  <p-dialog [visible]="!!showDialogConfirmation" [style]="!responsive ? {width: '50vw'} : {width: '90vw'}"
             (onHide)="showDialogConfirmation=false">
     <ng-template pTemplate="header">
       <div class="title" [class.title-responsive]="responsive">
@@ -515,7 +515,7 @@
       </div>
     </p-footer>
   </p-dialog>
-  <p-dialog [header]="'comment'|translate" [(visible)]="!!showCommentDialog"
+  <p-dialog [header]="'comment'|translate" [visible]="!!showCommentDialog"
             [style]="!responsive ? {width: '30vw'} : {width: '90vw'}"
             (onHide)="showCommentDialog=false">
     <div class="comment-container">
