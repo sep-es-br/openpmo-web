@@ -4,7 +4,7 @@ import { Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges, ViewChil
 import { TranslateService } from '@ngx-translate/core';
 import { ChartData } from 'chart.js';
 import { ICard } from 'src/app/shared/interfaces/ICard';
-import { IDashboardData, IDashboardStatusData } from 'src/app/shared/interfaces/IDashboard';
+import { IDashboardData } from 'src/app/shared/interfaces/IDashboard';
 import { DashboardService } from 'src/app/shared/services/dashboard.service';
 import { Calendar } from 'primeng/calendar';
 import { Subject } from 'rxjs';
@@ -22,55 +22,93 @@ import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
   styleUrls: ['./workpack-section-dashboard.component.scss']
 })
 export class WorkpackSectionDashboardComponent implements OnInit, OnChanges, OnDestroy {
-
-  @ViewChild(Calendar) calendarComponent: Calendar;
   @Input() idWorkpack: number;
+
   @Input() dashboardShowStakeholders: string[];
+
   @Input() dashboardShowRisks: boolean;
+
   @Input() dashboardShowMilestones: boolean;
+
   @Input() dashboardShowEva: boolean;
+
   @Input() dashboardShowDeliveryStatus: boolean;
+
   @Input() workpackFullName: string;
+
   @Input() workpackType: string;
+
   @Input() collapsePanelsStatus: boolean;
 
+  @ViewChild(Calendar) calendarComponent: Calendar;
+
   dashboard: IDashboardData;
+
   cardDashboardProperties: ICard;
+
   dashboardMilestonesData: ChartData = {
     labels: [],
     datasets: []
   };
+
   dashboardRisksData: ChartData = {
     labels: [],
     datasets: []
   };
+
   iconsEnum = IconsTypeWorkpackEnum;
+
   referenceMonth: Date;
+
   selectedBaseline: number;
+
   yearRange: string;
+
   $destroy = new Subject();
+
   calendarFormat: string;
+
   baselines: IBaseline[];
+
   responsive = false;
+
   startDate: Date;
+
   endDate: Date;
+
   midleTextMilestones: string;
+
   midleTextRisks: string;
+
   midleTextDelivable: string;
+
   showTabview = false;
+
   isLoading = false;
+
   mediaScreen1700: boolean;
+
   scheduleInterval;
+
   workpackParams: IWorkpackParams;
+
   workpackData: IWorkpackData;
+
   sectionActive = false;
+
   idMenuLoading: number;
-  dashboardStatusData : ChartData = {
+
+  dashboardStatusData: ChartData = {
     labels: [],
     datasets: []
   };
 
   isBeingBuild = false;
+
+  windowProperties = {
+    isMenuPanelOpen: false,
+    currentWindowSize: window.innerWidth,
+  };
 
   constructor(
     private dashboardSrv: DashboardService,
@@ -79,16 +117,21 @@ export class WorkpackSectionDashboardComponent implements OnInit, OnChanges, OnD
     private workpackShowTabviewSrv: WorkpackShowTabviewService,
     private route: Router,
     private workpackBreadcrumbStorageSrv: WorkpackBreadcrumbStorageService,
-    private breadcrumbSrv: BreadcrumbService
+    private breadcrumbSrv: BreadcrumbService,
   ) {
     this.isLoading = true;
     this.workpackShowTabviewSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => {
       this.showTabview = value;
     });
-    this.responsiveSrv.resizeEvent.subscribe((value) => {
-      this.mediaScreen1700 = value.width <= 1700;
+
+    this.responsiveSrv.resizeEvent.subscribe((currentValue) => {
+      this.mediaScreen1700 = currentValue.width <= 1700;
+      this.windowProperties = {
+        isMenuPanelOpen: currentValue.width <= this.windowProperties.currentWindowSize,
+        currentWindowSize: currentValue.width,
+      };
     });
-    
+
     this.cardDashboardProperties = {
       toggleable: false,
       initialStateToggle: false,
@@ -98,6 +141,7 @@ export class WorkpackSectionDashboardComponent implements OnInit, OnChanges, OnD
       showFullScreen: true,
       fullScreen: false
     };
+
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.responsive = value);
     this.translateSrv.onLangChange.pipe(takeUntil(this.$destroy)).subscribe(() =>
       setTimeout(() => {
@@ -113,12 +157,19 @@ export class WorkpackSectionDashboardComponent implements OnInit, OnChanges, OnD
         this.setDashboardRisksData();
       }, 150)
     );
+
     this.dashboardSrv.observableResetDashboard.pipe(takeUntil(this.$destroy)).subscribe(reset => {
       if (reset) {
         this.loadDashboardData();
       }
     });
-    
+  }
+
+  async ngOnInit(): Promise<void> {
+    this.calendarFormat = this.translateSrv.instant('dateFormatMonthYear');
+    this.midleTextMilestones = this.translateSrv.instant('milestonesLabelChart');
+    this.midleTextRisks = this.translateSrv.instant('risksLabelChart');
+    this.midleTextDelivable = this.translateSrv.instant('DeliverableLabelChart');
   }
 
   async ngOnChanges(changes: SimpleChanges) {
@@ -130,6 +181,11 @@ export class WorkpackSectionDashboardComponent implements OnInit, OnChanges, OnD
         initialStateCollapse: this.collapsePanelsStatus
       });
     }
+  }
+
+  ngOnDestroy(): void {
+    this.$destroy.next();
+    this.$destroy.complete();
   }
 
   loadDashboardData() {
@@ -149,77 +205,78 @@ export class WorkpackSectionDashboardComponent implements OnInit, OnChanges, OnD
     } = this.dashboardSrv.getDashboardData();
     this.workpackParams = workpackParams;
     this.workpackData = workpackData;
-    
-    
+
     this.scheduleInterval = scheduleInterval;
     this.referenceMonth = referenceMonth;
     this.baselines = baselines;
     this.selectedBaseline = selectedBaseline;
     this.dashboard = dashboard;
     this.isBeingBuild = isBeingBuild;
-    if(dashboard?.dashboardStatusData) {
+
+    if (dashboard?.dashboardStatusData) {
       this.dashboardStatusData = {
-        labels: ["Concluída", "Em Execução", "Paralisada", "Em Planejamento", "A Cancelar"],
+        labels: ['Concluída', 'Em Execução', 'Paralisada', 'Em Planejamento', 'A Cancelar'],
         datasets: [
           {
             data: [
-              dashboard.dashboardStatusData.statusConcluida, 
-              dashboard.dashboardStatusData.statusEmExec, 
+              dashboard.dashboardStatusData.statusConcluida,
+              dashboard.dashboardStatusData.statusEmExec,
               dashboard.dashboardStatusData.statusParalisada,
-              dashboard.dashboardStatusData.statusPlanejamento, 
+              dashboard.dashboardStatusData.statusPlanejamento,
               dashboard.dashboardStatusData.statusCancelar
             ],
             backgroundColor: [
-              "#118DFF",
-              "#55B95E",
-              "#EA9D42",
-              "#EC78EA",
-              "#CC2C52"
-            ]
-          }
-        ]
-
+              '#118DFF',
+              '#55B95E',
+              '#EA9D42',
+              '#EC78EA',
+              '#CC2C52'
+            ],
+          },
+        ],
       };
     }
-    
+
     if (this.dashboard && this.dashboard.workpacksByModel) {
       const cards = Array.from(this.dashboard.workpacksByModel);
       cards.forEach( (card) => {
-        const cardModelIndex = this.dashboard.workpacksByModel.findIndex( c => c.idWorkpackModel === card.idWorkpackModel && c.level < card.level );
+        const cardModelIndex = this.dashboard.workpacksByModel.findIndex(c =>
+          c.idWorkpackModel === card.idWorkpackModel &&
+          c.level < card.level
+        );
         if (cardModelIndex > -1) {
-          this.dashboard.workpacksByModel[cardModelIndex].quantity = this.dashboard.workpacksByModel[cardModelIndex].quantity + card.quantity;
+          this.dashboard.workpacksByModel[cardModelIndex].quantity = (
+            this.dashboard.workpacksByModel[cardModelIndex].quantity +
+            card.quantity
+          );
+
           const cardIndex = this.dashboard.workpacksByModel.findIndex( c => c === card);
           this.dashboard.workpacksByModel.splice(cardIndex, 1);
         }
       });
+
       this.dashboard.workpacksByModel = this.dashboard.workpacksByModel;
       this.dashboard.workpacksByModel.sort( (a, b) => a.level - b.level);
-    };
+    }
+
     this.yearRange = yearRange;
     this.startDate = startDate;
     this.endDate = endDate;
     this.dashboardMilestonesData = undefined;
     this.dashboardRisksData = undefined;
-    this.sectionActive = !!workpackData.workpack && !!workpackData.workpack.id &&
-      !workpackData.workpack.canceled && !!workpackData.workpackModel &&
+    this.sectionActive = (
+      !!workpackData.workpack &&
+      !!workpackData.workpack.id &&
+      !workpackData.workpack.canceled &&
+      !!workpackData.workpackModel &&
       !!workpackData.workpackModel.dashboardSessionActive
+    );
+
     if (this.dashboard && !loading && this.sectionActive) {
       this.setDashboardMilestonesData();
       this.setDashboardRisksData();
     }
     this.isLoading = loading;
-  }
-
-  async ngOnInit(): Promise<void> {
-    this.calendarFormat = this.translateSrv.instant('dateFormatMonthYear');
-    this.midleTextMilestones = this.translateSrv.instant('milestonesLabelChart');
-    this.midleTextRisks = this.translateSrv.instant('risksLabelChart');
-    this.midleTextDelivable = this.translateSrv.instant('DeliverableLabelChart');
-  }
-
-  ngOnDestroy(): void {
-    this.$destroy.next();
-    this.$destroy.complete();
   }
 
   async getDashboard() {
@@ -245,7 +302,7 @@ export class WorkpackSectionDashboardComponent implements OnInit, OnChanges, OnD
           const classList = Array.from(e.originalEvent?.target?.classList) || [];
           if (classList.some((className: string) => ['p-menuitem-text', 'fas'].includes(className))) {
             e.item.expanded = false;
-            this.navigateToWorkpackItem(wp, this.workpackParams.idPlan)
+            this.navigateToWorkpackItem(wp, this.workpackParams.idPlan);
           }
         },
         items: wp.workpacks && wp.workpacks.length > 0 ? wp.workpacks.map( child => ({
@@ -350,8 +407,6 @@ export class WorkpackSectionDashboardComponent implements OnInit, OnChanges, OnD
 
   handleOnFullScreen(fullScreenMode: boolean) {
     this.cardDashboardProperties.fullScreen = fullScreenMode;
-    this.dashboardSrv.next(fullScreenMode)
+    this.dashboardSrv.next(fullScreenMode);
   }
-
-
 }
