@@ -68,23 +68,34 @@
           </div>
         </div>
       </div>
-      <div class="charts-container" *ngIf="!isLoading">
-        <div class="triple-constraint-container" *ngIf="dashboard && dashboard?.tripleConstraint">
+      <div
+        *ngIf="!isLoading"
+        class="charts-container d-flex flex-column w-100 mb-4"
+        [ngClass]="{ 'flex-xxl-row': !windowProperties.isMenuPanelOpen }"
+      >
+        <div
+          *ngIf="dashboard && dashboard?.tripleConstraint"
+          class="triple-constraint-container"
+          [ngClass]="windowProperties.isMenuPanelOpen ? 'col-12' : 'col-xxl-6'"
+        >
           <app-triple-constraint-dashboard
             [tripleConstraint]="dashboard && dashboard?.tripleConstraint">
           </app-triple-constraint-dashboard>
         </div>
-        <div class="risk-milestone-charts-container">
-          <div class="dashboard-item" *ngIf="!!dashboardShowDeliveryStatus && dashboardStatusData">
+        <div
+          class="risk-milestone-charts-container d-flex flex-column flex-xl-row justify-content-center"
+          [ngClass]="windowProperties.isMenuPanelOpen ? 'col-12' : 'col-xxl-6'"
+        >
+          <div class="dashboard-item col-12 col-xl-4" *ngIf="!!dashboardShowDeliveryStatus && dashboardStatusData">
             <app-doughnut-chart [data]="dashboardStatusData" [middleText]="dashboard?.dashboardStatusData?.totalDeliverable?.toString()"
               [midleTextBottom]="midleTextDelivable">
             </app-doughnut-chart>
           </div>
-          <div class="dashboard-item" *ngIf="!!dashboardShowMilestones && dashboardMilestonesData">
+          <div class="dashboard-item col-12 col-xl-4" *ngIf="!!dashboardShowMilestones && dashboardMilestonesData">
             <app-doughnut-chart [data]="dashboardMilestonesData" [middleText]="dashboard?.milestone?.quantity?.toString()"
               [midleTextBottom]="midleTextMilestones"></app-doughnut-chart>
           </div>
-          <div class="dashboard-item" *ngIf="dashboardRisksData && !!dashboardShowRisks">
+          <div class="dashboard-item col-12 col-xl-4" *ngIf="dashboardRisksData && !!dashboardShowRisks">
             <app-doughnut-chart [data]="dashboardRisksData" [middleText]="dashboard?.risk?.total?.toString()"
               [midleTextBottom]="midleTextRisks">
             </app-doughnut-chart>
