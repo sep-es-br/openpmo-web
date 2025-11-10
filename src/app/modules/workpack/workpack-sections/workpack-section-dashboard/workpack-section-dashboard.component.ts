@@ -325,52 +325,6 @@ export class WorkpackSectionDashboardComponent
     });
   }
 
-  async loadWorkpackModelMenu(idWorkpackModel, level, index, event) {
-    if (this.dashboard.workpacksByModel[index].menuItems) {
-      return;
-    }
-    this.idMenuLoading = idWorkpackModel;
-    const result = await this.dashboardSrv.GetMenuItemsByWorkpackModel({
-      idWorkpackActual: this.workpackParams.idWorkpack,
-      idWorkpackModel,
-      menuLevel: level,
-    });
-    if (result.success) {
-      this.dashboard.workpacksByModel[index].menuItems =
-        result.data && result.data.length > 0
-          ? result.data.map((wp) => ({
-              label: wp.name,
-              icon: wp.icon,
-              command: (e) => {
-                const classList =
-                  Array.from(e.originalEvent?.target?.classList) || [];
-                if (
-                  classList.some((className: string) =>
-                    ['p-menuitem-text', 'fas'].includes(className)
-                  )
-                ) {
-                  e.item.expanded = false;
-                  this.navigateToWorkpackItem(wp, this.workpackParams.idPlan);
-                }
-              },
-              items:
-                wp.workpacks && wp.workpacks.length > 0
-                  ? wp.workpacks.map((child) => ({
-                      label: child.name,
-                      icon: child.icon,
-                      command: () =>
-                        this.navigateToWorkpackItem(
-                          child,
-                          this.workpackParams.idPlan
-                        ),
-                    }))
-                  : undefined,
-            }))
-          : undefined;
-      this.idMenuLoading = undefined;
-    }
-  }
-
   closeItemsMenu(index) {
     this.dashboard.workpacksByModel[index].menuItems =
       this.dashboard.workpacksByModel[index].menuItems &&
