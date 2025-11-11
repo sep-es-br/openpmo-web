@@ -39,12 +39,22 @@
 
         .breadcrumb-label {
           white-space: nowrap;
-          // overflow: hidden;
           text-overflow: ellipsis;
           flex-grow: 1;
           max-width: 30rem;
           box-sizing: border-box;
-          // flex: 1 1 auto; /* Let it grow and shrink */
+
+          &.constant-overflow {
+            overflow: hidden;
+          }
+          
+          @media screen and (max-width: 576px) {
+            max-width: 20rem;
+
+            &.conditional-overflow {
+              overflow: hidden;
+            }
+          }
         }
       }
     }

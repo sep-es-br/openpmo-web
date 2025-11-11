@@ -12,8 +12,8 @@
         <span class="breadcrumb-item">
           <i class="fas fa-angle-right" *ngIf="i > 0"></i>
           <span
-            class="breadcrumb-label" [class.min-width]="bc.nome.length > 10"
-            [ngStyle]="{ 'overflow': bc.nome.length >= 70 ? 'hidden' : '' }"
+            class="breadcrumb-label"
+            [ngClass]="bc.nome.length > 70 ? 'constant-overflow' : 'conditional-overflow'"
           >
             {{ bc.nome }}
           </span>
