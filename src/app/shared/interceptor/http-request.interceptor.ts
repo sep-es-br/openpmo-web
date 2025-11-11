@@ -10,7 +10,7 @@ import {
   HttpClient,
 } from '@angular/common/http';
 import { Observable, from, of } from 'rxjs';
-import { catchError, finalize, map, retryWhen, switchMap } from 'rxjs/operators';
+import { catchError, finalize, map, retryWhen, shareReplay, switchMap } from 'rxjs/operators';
 import { TranslateService } from '@ngx-translate/core';
 import { MessageService } from 'primeng/api';
 import * as _ from 'lodash';
@@ -27,6 +27,9 @@ export class HttpRequestInterceptor implements HttpInterceptor {
   http: HttpClient;
   isRefreshingToken = false;
 
+  requestCount = 0;
+  requestCache = new Map<any, Observable<HttpEvent<any>>>();
+  
   constructor(
     private authService: AuthService,
     private messageSrv: MessageService,
@@ -37,6 +40,8 @@ export class HttpRequestInterceptor implements HttpInterceptor {
     this.appConfig = appConfig;
   }
 
+
+
   intercept(
     req: HttpRequest<any>,
     next: HttpHandler,
@@ -45,7 +50,16 @@ export class HttpRequestInterceptor implements HttpInterceptor {
     const accessToken = this.authService.getAccessToken();
     const headers = new HttpHeaders(accessToken ? { Authorization: `Bearer ${accessToken}` } : { }) ;
     req = req.clone({ headers });
-    return next.handle(req).pipe(
+
+
+    const thisKey = this.stableStringify({url: req.url, paramMap: req.params, body: req.body});
+
+    if(this.requestCache.has(thisKey)){
+        return this.requestCache.get(thisKey);
+    }
+
+    this.requestCount++;
+    const obs = next.handle(req).pipe(
       map((event: HttpEvent<any>) => {
         if (event instanceof HttpResponse && req.url.startsWith(this.appConfig.API)) {
           const body = event.body;
@@ -105,8 +119,16 @@ export class HttpRequestInterceptor implements HttpInterceptor {
             message: error?.error?.error || error?.message,
           }
         }));
-      })
+      }),
+      finalize(() => {
+            this.requestCount--
+            this.requestCache.delete(thisKey);
+        }),
+        shareReplay(1)   
     );
+
+    this.requestCache.set(thisKey, obs);
+    return obs;
   }
 
   handleUnauthorized(req: HttpRequest<any>, next: HttpHandler): Observable<any> {
@@ -162,4 +184,18 @@ export class HttpRequestInterceptor implements HttpInterceptor {
     }
   }
 
+    stableStringify(obj: any): string {
+        if (obj === null || typeof obj !== 'object') {
+            return JSON.stringify(obj);
+        }
+
+        if (Array.isArray(obj)) {
+            return `[${obj.map(this.stableStringify).join(',')}]`;
+        }
+
+        // Ordena chaves antes de serializar
+        const keys = Object.keys(obj).sort();
+        const entries = keys.map(key => `"${key}":${this.stableStringify(obj[key])}`);
+        return `{${entries.join(',')}}`;
+    }
 }
