@@ -52,7 +52,10 @@ export class HttpRequestInterceptor implements HttpInterceptor {
     req = req.clone({ headers });
 
 
-    const thisKey = this.stableStringify({url: req.url, paramMap: req.params, body: req.body});
+    const thisKey = this.stableStringify({url: req.urlWithParams, body: req.body});
+
+    console.log(thisKey);
+    console.log(req);
 
     if(this.requestCache.has(thisKey)){
         return this.requestCache.get(thisKey);
@@ -190,7 +193,7 @@ export class HttpRequestInterceptor implements HttpInterceptor {
         }
 
         if (Array.isArray(obj)) {
-            return `[${obj.map(this.stableStringify).join(',')}]`;
+            return `[${obj.map(x => this.stableStringify(x)).join(',')}]`;
         }
 
         // Ordena chaves antes de serializar
