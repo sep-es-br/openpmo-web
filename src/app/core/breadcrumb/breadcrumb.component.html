@@ -3,11 +3,11 @@
     [class.fullscreen-mode-dashboard]="fullScreenModeDashboard"
     [class.admin]="isAdminMenu"
     [class.management]="!isAdminMenu">
-  <div class="labels row">
-    <div class="name row" *ngIf="crumbOffice"> {{crumbOffice.info}}</div>
-    <div class="name row" *ngIf="crumbPlan"> {{crumbPlan.info}}</div>
+  <div class="labels">
+    <div class="name" *ngIf="crumbOffice"> {{crumbOffice.info}}</div>
+    <div class="name" *ngIf="crumbPlan"> {{crumbPlan.info}}</div>
   </div>
-  <div class="crumbs row" #crumbsEl>
+  <div class="crumbs" #crumbsEl>
     <div class="home" [class.adjust-padding]="isOverflowing" [class.cursor-loading]="loadingWorkpack">
       <i class="app-icon home" [ngStyle]="{ fontSize: isMobileView ? '1.5rem' : '1.7rem' }"
       (click)="handleNavigateBredcrumb()"></i>

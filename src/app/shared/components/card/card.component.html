@@ -4,38 +4,42 @@
   expandIcon="pi pi-angle-down" collapseIcon="pi pi-angle-up" [class.mobile]="responsive"
   (collapsedChange)="handleCollapsed($event)">
   <p-header class="card-header" [class.card-header-mobile]="responsive">
-    <div class="header-title" (click)="properties.collapseble && handleCollapsed()"
-      [class.card-collapseble]="properties.collapseble">
-      <div class="header-title-text">
-        <span class="card-title" [class.card-title-mobile]="responsive" *ngIf="properties.cardTitle">{{
-          properties.notShowCardTitle ? '' : (properties.cardTitle | translate) }}</span>
-        <p-inputSwitch class="app-toggle" *ngIf="properties.toggleable" [(ngModel)]="properties.initialStateToggle"
-          (ngModelChange)="properties.onToggle?.emit($event)">
-        </p-inputSwitch>
-        <label class="label-toggle" *ngIf="properties.toggleLabel">{{properties.toggleLabel|translate}}</label>
+    <div class="d-flex flex-row col-12">
+      <div class="header-title d-flex col-6" (click)="properties.collapseble && handleCollapsed()"
+        [class.card-collapseble]="properties.collapseble">
+        <div class="header-title-text">
+          <span class="card-title" [class.card-title-mobile]="responsive" *ngIf="properties.cardTitle">{{
+            properties.notShowCardTitle ? '' : (properties.cardTitle | translate) }}</span>
+          <p-inputSwitch class="app-toggle" *ngIf="properties.toggleable" [(ngModel)]="properties.initialStateToggle"
+            (ngModelChange)="properties.onToggle?.emit($event)">
+          </p-inputSwitch>
+          <label class="label-toggle" *ngIf="properties.toggleLabel">{{properties.toggleLabel|translate}}</label>
+        </div>
+        <div class="header-title-dates" *ngIf="properties.headerDates">
+          <span class="start-date">{{language === 'pt-BR' ? (properties.headerDates?.startDate|date:'dd/MM/yyyy') :
+            (properties.headerDates?.startDate|date:'yyyy/MM/dd')}}</span>
+          <i class="fas fa-caret-right"></i>
+          <span class="end-date">{{language === 'pt-BR' ? (properties.headerDates?.endDate|date:'dd/MM/yyyy') :
+            (properties.headerDates?.endDate|date:'yyyy/MM/dd')}}</span>
+        </div>
       </div>
-      <div class="header-title-dates" *ngIf="properties.headerDates">
-        <span class="start-date">{{language === 'pt-BR' ? (properties.headerDates?.startDate|date:'dd/MM/yyyy') :
-          (properties.headerDates?.startDate|date:'yyyy/MM/dd')}}</span>
-        <i class="fas fa-caret-right"></i>
-        <span class="end-date">{{language === 'pt-BR' ? (properties.headerDates?.endDate|date:'dd/MM/yyyy') :
-          (properties.headerDates?.endDate|date:'yyyy/MM/dd')}}</span>
+
+      <div class="header-title-check-completed d-flex col-6 justify-content-end" [class.mr-0]="!properties.initialStateCollapse && !properties.collapseble"
+        *ngIf="!properties.initialStateCollapse && properties.showFullScreen && !properties.fullScreen"
+        [class.responsive]="responsive">
+        <i class="fas fa-expand-arrows-alt" (click)="handleChangeFullScreen(true)"></i>
       </div>
-    </div>
-    <div class="header-title-check-completed" [class.mr-0]="!properties.initialStateCollapse && !properties.collapseble"
-      *ngIf="!properties.initialStateCollapse && properties.showFullScreen && !properties.fullScreen"
-      [class.responsive]="responsive">
-      <i class="fas fa-expand-arrows-alt" (click)="handleChangeFullScreen(true)"></i>
+
+      <div class="header-title-check-completed d-flex col-6 justify-content-end" [class.responsive]="responsive" *ngIf="!!properties.showCheckCompleted">
+        <label>{{ label | translate }}</label>
+        <p-checkbox [(ngModel)]="properties.workpackCompleted" [binary]="true"
+          [disabled]="properties.workpackCanceled || !canEditCheckCompleted"
+          (ngModelChange)="handleChangeCheckCompleted($event)"></p-checkbox>
+      </div>
     </div>
     <div class="header-title-check-completed" *ngIf="properties.showFullScreen && properties.fullScreen"
       [class.responsive]="responsive">
       <i class="fas fa-times" (click)="handleChangeFullScreen(false)"></i>
-    </div>
-    <div class="header-title-check-completed" [class.responsive]="responsive" *ngIf="!!properties.showCheckCompleted">
-      <label>{{label|translate}}</label>
-      <p-checkbox [(ngModel)]="properties.workpackCompleted" [binary]="true"
-        [disabled]="properties.workpackCanceled || !canEditCheckCompleted"
-        (ngModelChange)="handleChangeCheckCompleted($event)"></p-checkbox>
     </div>
     <div class="header-values-cost-account" *ngIf="properties.progressBarValues" [class.not-collapseble]="!properties.collapseble" [class.responsive]="responsive">
       <div
