@@ -101,6 +101,8 @@
         display: flex;
         justify-content: flex-end;
         position: relative;
+        width: 100%;
+        max-width: 25em;
 
         .app-input-text.p-inputtext {
           font-size: 0.8rem !important;
@@ -108,8 +110,9 @@
           border-bottom: none !important;
           transition: width .3s;
           margin-left: 2rem;
+
           &.animation-input {
-            width: 20rem !important;
+            width: 100% !important;
             margin-left: 0.5rem !important;
             border-bottom: 1px solid #828f92 !important;
           }
@@ -125,9 +128,10 @@
             padding: 0.45rem;
             background: #44B39B;
             color: #FFF;
-            top: 0;
+            top: -5px;
             border-radius: 4px;
           }
+
           &.animation-input {
             top: .4rem;
             padding: 0;
@@ -162,7 +166,7 @@
       }
       &.responsive {
         padding-bottom: 0;
-        padding-top: 5px;
+        padding-top: 0;
       }
     }
   }
