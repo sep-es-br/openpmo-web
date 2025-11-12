@@ -54,9 +54,6 @@ export class HttpRequestInterceptor implements HttpInterceptor {
 
     const thisKey = this.stableStringify({url: req.urlWithParams, body: req.body});
 
-    console.log(thisKey);
-    console.log(req);
-
     if(this.requestCache.has(thisKey)){
         return this.requestCache.get(thisKey);
     }
