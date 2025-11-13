@@ -1,4 +1,4 @@
-import { Component, HostListener, OnInit } from '@angular/core';
+import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import { filter } from 'rxjs/operators';
 
@@ -7,24 +7,31 @@ import { WorkpackShowTabviewService } from './shared/services/workpack-show-tabv
 import { MobileViewService } from './shared/services/mobile-view.service';
 import {environment} from '../environments/environment';
 import {EnvEnum} from './shared/enums/EnvEnum';
+import { PersonService } from './shared/services/person.service';
+import { Subject } from 'rxjs';
+import { MenuService } from './shared/services/menu.service';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent implements OnInit {
+export class AppComponent implements OnInit, OnDestroy {
 
   isMobileView = false;
   showTemplate: boolean;
   environment = environment;
   envEnum = EnvEnum;
 
+  private $destroy = new Subject();
+
   constructor(
     private responsiveSrv: ResponsiveService,
     private mobileViewSrv: MobileViewService,
     private workpackShowTabViewSrv: WorkpackShowTabviewService,
     private router: Router,
+    private personSrv: PersonService,
+    private menuSrv : MenuService
   ){
     this.responsiveSrv.observable.subscribe(isMobileView => this.isMobileView = isMobileView);
     this.router.events
@@ -35,6 +42,12 @@ export class AppComponent implements OnInit {
           this.showTemplate = showTemplate;
         }
       });
+      this.personSrv.updatePreferences().subscribe();      
+  }
+
+  ngOnDestroy(): void {
+      this.$destroy.next();
+      this.$destroy.complete();
   }
 
   @HostListener('window:resize', ['$event'])

@@ -304,74 +304,6 @@
       }
     }
   }
-  .charts-container {
-    padding-bottom: 1em;
-    display: flex;
-    flex-direction: row;
-    width: 100%;
-    .triple-constraint-container {
-      flex: 1;
-    }
-    .risk-milestone-charts-container {
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      justify-content: flex-end;
-      flex: 1;
-      gap: 1rem;
-      .dashboard-item {
-        display: flex;
-        height: 100%;
-      }
-    }
-  }
-}
-
-.app-dashboard.width-1700 {
-  .charts-container {
-    padding-bottom: 1em;
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    .triple-constraint-container {
-      width: 100%;
-    }
-    .risk-milestone-charts-container {
-      flex-direction: row;
-      align-items: center;
-      justify-content: space-evenly;
-      flex: 1;
-      margin-top: 1em;
-      .dashboard-item {
-        margin-bottom: 0;
-      }
-    }
-  }
-}
-
-
-@media screen and (max-width: 1700px) {
-  .app-dashboard {
-    .charts-container {
-      padding-bottom: 1em;
-      display: flex;
-      flex-direction: column;
-      width: 100%;
-      .triple-constraint-container {
-        width: 100%;
-      }
-      .risk-milestone-charts-container {
-        flex-direction: row;
-        align-items: center;
-        justify-content: space-evenly;
-        flex: 1;
-        margin-top: 1em;
-        .dashboard-item {
-          margin-bottom: 0;
-        }
-      }
-    }
-  }
 }
 
 ::ng-deep .app-dashboard.responsive {
@@ -415,24 +347,24 @@
       }
     }
   }
-  .charts-container {
-    padding-bottom: 1em;
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    .triple-constraint-container {
-      width: 100%;
-    }
-    .risk-milestone-charts-container {
-      flex-direction: column !important;
-      align-items: center;
-      justify-content: center;
-      flex: 1;
-      margin-top: 1em;
-      .dashboard-item {
-        margin-bottom: 1em;
-      }
-    }
-  }
+  // .charts-container {
+  //   padding-bottom: 1em;
+  //   display: flex;
+  //   flex-direction: column;
+  //   width: 100%;
+  //   .triple-constraint-container {
+  //     width: 100%;
+  //   }
+  //   .risk-milestone-charts-container {
+  //     flex-direction: column !important;
+  //     align-items: center;
+  //     justify-content: center;
+  //     flex: 1;
+  //     margin-top: 1em;
+  //     .dashboard-item {
+  //       margin-bottom: 1em;
+  //     }
+  //   }
+  // }
 }
 

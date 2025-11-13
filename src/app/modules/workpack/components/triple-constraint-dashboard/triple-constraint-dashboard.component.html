@@ -6,10 +6,6 @@
         <div class="subtitle-box subtitle-box-planned"></div>
         <label class="subtitle-label-planned">{{'plannedBaseline'|translate}}</label>
       </div>
-      <!-- <div class="subtitle-item">
-        <div class="subtitle-box subtitle-box-foreseen"></div>
-        <label class="subtitle-label-foreseen">{{foreseenLabel|translate}}</label>
-      </div> -->
       <div class="subtitle-item">
         <div class="subtitle-box subtitle-box-actual"></div>
         <label class="subtitle-label-actual">{{'actual'|translate}}</label>
@@ -25,7 +21,7 @@
         <app-schedule-constraint [schedule]="tripleConstraint?.schedule"></app-schedule-constraint>
       </div>
       <div class="card-constraint-container"
-        *ngIf="tripleConstraint?.scope  && (tripleConstraint?.scope?.plannedVariationPercent > 0 || tripleConstraint?.scope?.foreseenVariationPercent > 0)">
+        *ngIf="tripleConstraint?.scope  && (tripleConstraint?.scope?.plannedVariationPercent > 0 )">
         <app-scope-constraint [scope]="tripleConstraint?.scope"></app-scope-constraint>
       </div>
     </div>

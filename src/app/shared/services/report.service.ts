@@ -6,6 +6,8 @@ import { IReportModel, IReportModelFile } from '../interfaces/IReportModel';
 import { PrepareHttpParams } from '../utils/query.util';
 import { IReportScope } from '../interfaces/IReportScope';
 import { IReportGenerate } from '../interfaces/IReportGenerate';
+import { Observable } from 'rxjs';
+import { finalize, shareReplay, tap } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -18,8 +20,25 @@ export class ReportService extends BaseService<IReportModel> {
     super('report', injector);
   }
 
+  private readonly cacheHasActiveReports = new Map<string, IHttpResult<boolean>>()
+
   async checkHasActiveReports(options): Promise<IHttpResult<boolean>> {
-    return await this.http.get<IHttpResult<boolean>>(`${this.urlBase}/active/has-model`, { params: PrepareHttpParams(options) }).toPromise();
+
+    const key = this.getKeyFrom(options);
+
+    if(this.cacheHasActiveReports.has(key)) {
+        return await Promise.resolve(this.cacheHasActiveReports.get(key));
+    } else {
+        const obs = this.http.get<IHttpResult<boolean>>(`${this.urlBase}/active/has-model`, { params: PrepareHttpParams(options) })
+                    .pipe(
+                        tap((resp) => this.cacheHasActiveReports.set(key, resp)),
+                        finalize(() => setTimeout(() => this.cacheHasActiveReports.delete(key), 5000) ), 
+                        shareReplay(1)
+                    );
+
+        ;
+        return await obs.toPromise();
+    }
   }
 
   async getScopeReport(options): Promise<IHttpResult<IReportScope>> {
@@ -31,6 +50,12 @@ export class ReportService extends BaseService<IReportModel> {
       responseType: 'blob',
       observe: 'response'
     }).toPromise();
+  }
+
+
+
+  getKeyFrom(obj: any) {
+    return Object.keys(obj).sort().map(k => obj[k].toString()).join(':');
   }
 
 }

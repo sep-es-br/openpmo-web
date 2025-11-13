@@ -4,11 +4,11 @@
       <i class="fas fa-dollar-sign"></i>
       <span>{{'cost'|translate|uppercase}}</span>
     </div>
-    <div class="variation" [class.positive-variation]="cost?.variation > 0"
+    <!-- <div class="variation" [class.positive-variation]="cost?.variation > 0"
       [class.not-variation]="!cost?.variation ||cost?.variation === 0" [class.negative-variation]="cost?.variation < 0">
       <i class="fas" [class.fa-arrow-up]="cost?.variation < 0" [class.fa-arrow-down]="cost?.variation >= 0"></i>
       <span>{{cost?.variation < 0 ? (cost?.variation * (-1)|number:'1.0-1':language) : cost?.variation|number:'1.0-1':language}}%</span>
-    </div>
+    </div> -->
   </div>
   <div class="content-card">
     <div *ngIf="cost?.plannedValue && cost?.plannedValue > 0" class="content-card-item planned" [pTooltip]="cost?.plannedValue|number:'2.0-2':language"
@@ -16,11 +16,6 @@
       <label>{{cost?.plannedValue|shortNumber:language}}</label>
       <div class="progress-bar" [ngStyle]="{width: '100%', background: '#B5B5B5', height: '28px'}"></div>
     </div>
-    <!-- <div *ngIf="cost?.foreseenValue && cost?.foreseenValue > 0" class="content-card-item foreseen" [pTooltip]="cost?.foreseenValue|number:'2.0-2':language"
-      [ngStyle]="{width: ((cost?.foreseenValue / maxCostValue)*100) + '%', 'min-width': '10%'}">
-      <label>{{cost?.foreseenValue| shortNumber:language}}</label>
-      <div class="progress-bar" [ngStyle]="{width: '100%', background: '#44B39B', height: '28px'}"></div>
-    </div> -->
     <div *ngIf="cost?.actualValue && cost?.actualValue > 0" class="content-card-item actual" [pTooltip]="cost?.actualValue|number:'2.0-2':language"
       [ngStyle]="{width: ((cost?.actualValue / maxCostValue)*100) + '%', 'min-width': '10%'}">
       <label>{{cost.actualValue| shortNumber:language}}</label>

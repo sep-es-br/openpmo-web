@@ -38,9 +38,7 @@
       <div class="cards-list-container" *ngIf="dashboard && !isLoading">
         <div class="card-container" *ngFor="let workpackModel of dashboard?.workpacksByModel; let i = index ">
           <p-card>
-            <div class="card-item" [class.card-link]="workpackModel?.level <= 2" (click)="workpackModel?.level <= 2 &&
-                  loadWorkpackModelMenu(workpackModel.idWorkpackModel, workpackModel.level, i, $event);
-                workpackModel?.level <= 2 && menuContainer.toggle($event)">
+            <div class="card-item">
               <div class="card-icon-container">
                 <i [class]="workpackModel.icon"></i>
               </div>
@@ -49,19 +47,6 @@
                 <span class="type">{{workpackModel.modelName}}</span>
               </div>
             </div>
-            <p-overlayPanel #menuContainer class="workpack-menu-container" (onShow)="closeItemsMenu(i)">
-              <div class="loading-menu-container" *ngIf="idMenuLoading === workpackModel.idWorkpackModel">
-                <div class="menu-loading">
-                  <p-progressSpinner [style]="{width: '50px', height: '50px'}" styleClass="custom-spinner" strokeWidth="8"
-                    fill="#EEEEEE" animationDuration=".5s">
-                  </p-progressSpinner>
-                </div>
-              </div>
-              <div class="menu-container" *ngIf="idMenuLoading !== workpackModel.idWorkpackModel">
-                <p-panelMenu [model]="workpackModel.menuItems" class="menu-model">
-                </p-panelMenu>
-              </div>
-            </p-overlayPanel>
           </p-card>
         </div>
       </div>
@@ -83,23 +68,34 @@
           </div>
         </div>
       </div>
-      <div class="charts-container" *ngIf="!isLoading">
-        <div class="triple-constraint-container" *ngIf="dashboard && dashboard?.tripleConstraint">
+      <div
+        *ngIf="!isLoading"
+        class="charts-container d-flex flex-column w-100 mb-4"
+        [ngClass]="{ 'flex-xxl-row': !windowProperties.isMenuPanelOpen }"
+      >
+        <div
+          *ngIf="dashboard && dashboard?.tripleConstraint"
+          class="triple-constraint-container"
+          [ngClass]="windowProperties.isMenuPanelOpen ? 'col-12' : 'col-xxl-6'"
+        >
           <app-triple-constraint-dashboard
             [tripleConstraint]="dashboard && dashboard?.tripleConstraint">
           </app-triple-constraint-dashboard>
         </div>
-        <div class="risk-milestone-charts-container">
-          <div class="dashboard-item" *ngIf="!!dashboardShowDeliveryStatus && dashboardStatusData">
+        <div
+          class="risk-milestone-charts-container d-flex flex-column flex-xl-row justify-content-center"
+          [ngClass]="windowProperties.isMenuPanelOpen ? 'col-12' : 'col-xxl-6'"
+        >
+          <div class="dashboard-item col-12 col-xl-4 mb-4 mb-xl-0" *ngIf="!!dashboardShowDeliveryStatus && dashboardStatusData">
             <app-doughnut-chart [data]="dashboardStatusData" [middleText]="dashboard?.dashboardStatusData?.totalDeliverable?.toString()"
               [midleTextBottom]="midleTextDelivable">
             </app-doughnut-chart>
           </div>
-          <div class="dashboard-item" *ngIf="!!dashboardShowMilestones && dashboardMilestonesData">
+          <div class="dashboard-item col-12 col-xl-4 mb-4 mb-xl-0" *ngIf="!!dashboardShowMilestones && dashboardMilestonesData">
             <app-doughnut-chart [data]="dashboardMilestonesData" [middleText]="dashboard?.milestone?.quantity?.toString()"
               [midleTextBottom]="midleTextMilestones"></app-doughnut-chart>
           </div>
-          <div class="dashboard-item" *ngIf="dashboardRisksData && !!dashboardShowRisks">
+          <div class="dashboard-item col-12 col-xl-4 mb-4 mb-xl-0" *ngIf="dashboardRisksData && !!dashboardShowRisks">
             <app-doughnut-chart [data]="dashboardRisksData" [middleText]="dashboard?.risk?.total?.toString()"
               [midleTextBottom]="midleTextRisks">
             </app-doughnut-chart>

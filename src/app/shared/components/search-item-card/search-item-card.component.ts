@@ -1,4 +1,4 @@
-import { Component, EventEmitter, HostListener, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, HostListener, Input, Output } from '@angular/core';
 import { Router } from '@angular/router';
 import { IUniversalSearch } from 'src/app/shared/interfaces/universal-search.interface';
 
@@ -7,25 +7,16 @@ import { IUniversalSearch } from 'src/app/shared/interfaces/universal-search.int
   templateUrl: './search-item-card.component.html',
   styleUrls: ['./search-item-card.component.scss']
 })
-export class SearchItemCardComponent implements OnInit {
+export class SearchItemCardComponent {
+  @Input() item!: IUniversalSearch;
 
-    @Input() item! : IUniversalSearch;
+  @Output() onRedirect = new EventEmitter<void>();
 
-    @Output() onRedirect = new EventEmitter<void>();
-
-  constructor(
-    private router : Router
-  ) { }
+  constructor(private router: Router) { }
 
   @HostListener('click')
   handleRedirect() {
     this.router.navigateByUrl(`workpack?id=${this.item.id}&idPlan=${this.item.planId}`);
     this.onRedirect.emit();
   }
-
-
-
-  ngOnInit() {
-  }
-
 }

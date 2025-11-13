@@ -1,16 +1,19 @@
 import { IMenuFavorites, IMenuPlanModel, PlanMenuItem } from './../interfaces/IMenu';
 import { MenuItem } from 'primeng/api';
 import { Location } from '@angular/common';
-import { Inject, Injectable, Injector } from '@angular/core';
+import { Inject, Injectable, Injector, OnDestroy } from '@angular/core';
 import * as moment from 'moment';
 import { CookieService } from 'ngx-cookie';
-import { BehaviorSubject, Subject } from 'rxjs';
+import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { BaseService } from '../base/base.service';
 import { IHttpResult } from '../interfaces/IHttpResult';
 
 import { IMenu, IMenuOffice, IMenuWorkpack } from '../interfaces/IMenu';
 import { PrepareHttpParams } from '../utils/query.util';
 import { adminsPath, plansPath } from '../constants/menuUrls';
+import { finalize, shareReplay, tap } from 'rxjs/operators';
+import { PersonService } from './person.service';
+import { take, takeUntil } from 'rxjs/operators';
 
 interface IMenuState {
   isFixed: boolean;
@@ -28,7 +31,7 @@ interface IMenuState {
   providedIn: 'root'
 })
 
-export class MenuService extends BaseService<any> {
+export class MenuService extends BaseService<any> implements OnDestroy{
 
   adminsPath = adminsPath;
   plansPath = plansPath;
@@ -63,14 +66,21 @@ export class MenuService extends BaseService<any> {
     itemsPlanModel: []
   } as IMenuState);
 
+  private $destroy = new Subject();
+
   constructor(
     @Inject(Injector) injector: Injector,
     private locationSrv: Location,
-    private cookieSrv: CookieService
   ) {
     super('menus', injector);
     this.checkURL(`#${this.locationSrv.path()}`);
     this.locationSrv.onUrlChange(url => this.checkURL(url));
+        
+  }
+
+  ngOnDestroy(): void {
+      this.$destroy.next();
+      this.$destroy.complete();
   }
 
   checkURL(url: string) {
@@ -152,26 +162,49 @@ export class MenuService extends BaseService<any> {
     return this.http.get<IHttpResult<IMenuOffice[]>>(`${this.urlBase}/office`).toPromise();
   }
 
+    private cacheItensPortifolio = new  Map<string, Observable<IHttpResult<IMenuWorkpack[]>>>();
+    
   getItemsPortfolio(idOffice: number, idPlan: number): Promise<IHttpResult<IMenuWorkpack[]>> {
-    return this.http.get<IHttpResult<IMenuWorkpack[]>>(`${this.urlBase}/portfolio`,
-      {
-        params: PrepareHttpParams({
-          'id-office': idOffice,
-          'id-plan': idPlan
-       })
-      }
-    ).toPromise();
+    const key = `${idOffice}:${idPlan}`;
+    
+    if(this.cacheItensPortifolio.has(key)) {
+        return this.cacheItensPortifolio.get(key).toPromise();
+    } else {
+        const obs = this.http.get<IHttpResult<IMenuWorkpack[]>>(`${this.urlBase}/portfolio`,
+            {
+                params: PrepareHttpParams({
+                    'id-office': idOffice,
+                    'id-plan': idPlan
+                })
+            }
+        ).pipe(finalize(() => this.cacheItensPortifolio.delete(key)), shareReplay(1));
+
+        this.cacheItensPortifolio.set(key, obs);
+        return obs.toPromise();
+    }
+    
   }
 
+  private readonly cacheParentsItemsPortifolio = new Map<string, Observable<IHttpResult<{parents: number[]}>>>();
+
   getParentsItemsPortfolio(idWorkpack: number, idPlan: number): Promise<IHttpResult<{parents: number[]}>> {
-    return this.http.get<IHttpResult<{parents: number[]}>>(`${this.urlBase}/portfolios/parents`,
-      {
-        params: PrepareHttpParams({
-          'id-workpack': idWorkpack,
-          'id-plan': idPlan
-       })
-      }
-    ).toPromise();
+    const key = `${idWorkpack}:${idPlan}`;
+    
+    if(this.cacheParentsItemsPortifolio.has(key)){
+        return this.cacheParentsItemsPortifolio.get(key).toPromise();
+    } else {
+        const obs = this.http.get<IHttpResult<{parents: number[]}>>(`${this.urlBase}/portfolios/parents`,
+            {
+                params: PrepareHttpParams({
+                    'id-workpack': idWorkpack,
+                    'id-plan': idPlan
+                })
+            }
+        ).pipe(finalize(() => this.cacheParentsItemsPortifolio.delete(key)), shareReplay(1));
+
+        this.cacheParentsItemsPortifolio.set(key, obs);
+        return obs.toPromise();
+    }
   }
 
   getParentsItemsWorkpackModel(idWorkpackModel: number): Promise<IHttpResult<{parents: number[]}>> {
