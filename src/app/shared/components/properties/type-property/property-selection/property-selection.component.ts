@@ -67,7 +67,7 @@ export class PropertySelectionComponent implements OnInit {
 
     const disabledMap: Record<string, string[]> = {
       Project: ['Cancelado', 'Concluído', 'A cancelar'],
-      Deliverable: ['Cancelada', 'Concluída'],
+      Deliverable: ['Cancelada'],
     };
     
     const disabledLabels = disabledMap[typeWorkPack] || [];
