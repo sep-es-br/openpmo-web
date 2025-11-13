@@ -8,6 +8,7 @@ import {IHttpResult} from '../interfaces/IHttpResult';
 import {IWorkpack, IWorkpackListCard} from '../interfaces/IWorkpack';
 import {PrepareHttpParams} from '../utils/query.util';
 import {IWorkpackFavorite} from '../interfaces/IWorkpackFavorite';
+import { finalize, shareReplay, tap } from 'rxjs/operators';
 
 
 @Injectable({providedIn: 'root'})
@@ -206,8 +207,21 @@ export class WorkpackService extends BaseService<IWorkpack> {
     return result as IHttpResult<any>;
   }
 
+  private readonly cacheItensFavoritos = new Map<number, IHttpResult<IWorkpackFavorite[]>>();
+
   public async getItemsFavorites(idPlan: number): Promise<IHttpResult<IWorkpackFavorite[]>> {
-    return await this.http.get<IHttpResult<any>>(`${this.urlBase}/favorites?id-plan=${idPlan}`).toPromise();
+
+    if(this.cacheItensFavoritos.has(idPlan)){
+        return await Promise.resolve(this.cacheItensFavoritos.get(idPlan));
+    } else {
+        return await this.http.get<IHttpResult<any>>(`${this.urlBase}/favorites?id-plan=${idPlan}`)
+                    .pipe(
+                        tap(resp => this.cacheItensFavoritos.set(idPlan, resp)),
+                        finalize(() => setTimeout(() => this.cacheItensFavoritos.delete(idPlan), 5000)),
+                        shareReplay(1)
+                    ).toPromise();  
+    }
+
   }
 
   public async patchToggleWorkpackFavorite(idWorkpack: number, idPlan: number): Promise<IHttpResult<any>> {

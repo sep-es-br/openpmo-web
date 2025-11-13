@@ -1,5 +1,6 @@
 /* You can add global styles to this file, and also import other style files */
 @use 'src/variables' as v;
+@use 'src/assets/scss/bootstrap-5.3.8/bootstrap-grid';
 
 :root {
   --font-family: v.$fontFamilyMedium !important;
