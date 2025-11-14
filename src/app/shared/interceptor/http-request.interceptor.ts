@@ -54,9 +54,6 @@ export class HttpRequestInterceptor implements HttpInterceptor {
 
     const thisKey = this.stableStringify({url: req.urlWithParams, body: req.body});
 
-    console.log(thisKey);
-    console.log(req);
-
     if(this.requestCache.has(thisKey)){
         return this.requestCache.get(thisKey);
     }
@@ -125,7 +122,7 @@ export class HttpRequestInterceptor implements HttpInterceptor {
       }),
       finalize(() => {
             this.requestCount--
-            this.requestCache.delete(thisKey);
+            setTimeout(() => this.requestCache.delete(thisKey), 5_000); 
         }),
         shareReplay(1)   
     );
