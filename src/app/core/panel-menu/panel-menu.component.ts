@@ -8,7 +8,7 @@ import { ConfirmationService, MenuItem } from 'primeng/api';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
-import { IMenu, IMenuPlanModel, IMenuWorkpack, IMenuWorkpackModel } from 'src/app/shared/interfaces/IMenu';
+import { IMenu, IMenuPlanModel, IMenuWorkpack, IMenuWorkpackModel, MenuButtons } from 'src/app/shared/interfaces/IMenu';
 import { IPerson } from 'src/app/shared/interfaces/IPerson';
 import { IPlan } from 'src/app/shared/interfaces/IPlan';
 import { AuthService } from 'src/app/shared/services/auth.service';
@@ -21,7 +21,6 @@ import { WorkpackService } from 'src/app/shared/services/workpack.service';
 import { IMenuFavorites } from '../../shared/interfaces/IMenu';
 import { IOffice } from 'src/app/shared/interfaces/IOffice';
 import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
-import { ReportService } from 'src/app/shared/services/report.service';
 import { WorkpackBreadcrumbStorageService } from 'src/app/shared/services/workpack-breadcrumb-storage.service';
 
 @Component({
@@ -29,51 +28,80 @@ import { WorkpackBreadcrumbStorageService } from 'src/app/shared/services/workpa
   templateUrl: './panel-menu.component.html',
   styleUrls: ['./panel-menu.component.scss']
 })
-export class PanelMenuComponent implements OnInit {
-
+export class PanelMenuComponent implements OnInit, OnDestroy {
   @ViewChild('menuSliderOffices') menuOffices: ElementRef<HTMLDivElement>;
+
   @ViewChild('menuSliderPortfolio') menuPortfolio: ElementRef<HTMLDivElement>;
+
   @ViewChild('menuSliderPlanModel') menuPlanModel: ElementRef<HTMLDivElement>;
 
   @Output() changeMenu = new EventEmitter<boolean>();
 
   menus: IMenu[] = [
-    { label: 'office', isOpen: false },
-    { label: 'portfolio', isOpen: false },
-    { label: 'planModel', isOpen: false },
-    { label: 'favorite', isOpen: false },
-    { label: 'user', isOpen: false },
-    { label: 'more', isOpen: false }
+    { label: MenuButtons.OFFICE, isOpen: false },
+    { label: MenuButtons.PORTFOLIO, isOpen: false },
+    { label: MenuButtons.PLAN_MODEL, isOpen: false },
+    { label: MenuButtons.FAVORITES, isOpen: false },
+    { label: MenuButtons.USER, isOpen: false },
+    { label: MenuButtons.MORE, isOpen: false }
   ];
 
   items: MenuItem[] = [];
+
   itemsOfficeUnchanged = [];
+
   itemsOffice = [];
+
   itemsPlanModel: MenuItem[] = [];
+
   itemsFavorites: IMenuFavorites[] = [];
+
   itemsPortfolio = [];
+
   itemsLanguages: MenuItem[] = [];
+
   username = '';
+
   currentIDOffice = 0;
+
   currentURL = '';
+
   currentUserInfo: IPerson;
+
   $destroy = new Subject();
+
   editPermissionOnOffice = false;
+
   isPlanMenu = false;
+
   currentPlan: IPlan;
+
   currentIDPlan = 0;
+
   isFixed = false;
+
   menuStateChanged = false;
+
   isAdminMenu = false;
+
   parentsWorkpack = [];
+
   changedUrl = false;
+
   propertiesOffice: IOffice;
+
   itemsBreadcrumb = [];
+
   storageBreadcrumbsItems = [];
+
   hasReports = false;
+
   linkEvent = false;
+
   idOfficeItemsPlanModel: number;
+
   loadingMenuPortfolio = false;
+
   user;
 
   constructor(
@@ -95,6 +123,7 @@ export class PanelMenuComponent implements OnInit {
     this.menuSrv.getMenuState.pipe(takeUntil(this.$destroy)).subscribe(async (menuState) => {
       this.isFixed = menuState.isFixed;
     });
+
     this.translateChangeSrv.getCurrentLang()
       .pipe(takeUntil(this.$destroy))
       .subscribe(() => this.handleChangeLanguage());
@@ -107,10 +136,12 @@ export class PanelMenuComponent implements OnInit {
         this.loadPlanModelMenu();
       }
     });
+
     this.planSrv.observableIdPlan().pipe(takeUntil(this.$destroy)).subscribe(async id => {
       if (id === 0) {
         await this.loadPropertiesPlan();
       }
+
       if (this.currentIDPlan !== 0 || id !== 0) {
         this.currentIDPlan = id;
         await this.loadPropertiesPlan();
@@ -118,6 +149,7 @@ export class PanelMenuComponent implements OnInit {
         this.loadFavoritesMenu();
       }
     });
+
     this.planSrv.observableNewPlan().pipe(takeUntil(this.$destroy)).subscribe(value => {
       if (!!value) {
         this.currentPlan = undefined;
@@ -126,54 +158,56 @@ export class PanelMenuComponent implements OnInit {
         this.itemsFavorites = [];
       }
     });
+
     this.menuSrv.obsReloadMenuOffice().pipe(takeUntil(this.$destroy)).subscribe(async () => {
       await this.loadOfficeMenu();
       this.getMenuModeUser();
     });
+
     this.menuSrv.obsReloadMenuFavorite().pipe(takeUntil(this.$destroy)).subscribe(() => {
       this.loadFavoritesMenu();
     });
+
     this.menuSrv.obsReloadMenuPortfolio().pipe(takeUntil(this.$destroy)).subscribe(() => {
       const idNewWorkpack = this.menuSrv.getIdNewWorkpack();
       this.changedUrl = false;
       this.loadPortfolioMenu(idNewWorkpack);
-
     });
+
     this.menuSrv.obsReloadMenuPlanModel().pipe(takeUntil(this.$destroy)).subscribe(() => this.loadPlanModelMenu());
     this.menuSrv.isAdminMenu.pipe(takeUntil(this.$destroy)).subscribe(isAdminMenu => {
       this.isAdminMenu = isAdminMenu;
       this.updateMenuOfficeOnAdminChange();
       if (!isAdminMenu) {
-        const planModelMenuIsOpen = this.menus.find( item => item.label === 'planModel' && item.isOpen === true);
+        const planModelMenuIsOpen = this.menus.find( item => item.label === MenuButtons.PLAN_MODEL && item.isOpen === true);
         if (planModelMenuIsOpen) {
           this.toggleMenu('office');
         }
       }
-      if (isAdminMenu) {      
+
+      if (isAdminMenu) {
         this.getOfficePermission();
       }
     });
+
     this.menuSrv.isPlanMenu.pipe(takeUntil(this.$destroy)).subscribe(isPlanMenu => {
       this.isPlanMenu = isPlanMenu;
     });
+
     this.locationSrv.onUrlChange(url => {
       this.changedUrl = true;
       this.currentURL = url.slice(2);
       this.linkEvent = this.currentURL.includes('linkEvent');
       if (!this.linkEvent) this.selectMenuActive(url.slice(2));
     });
+
     this.menuSrv.obsCloseAllMenus.pipe(takeUntil(this.$destroy)).subscribe( closeAllMenus => {
       if (closeAllMenus && !this.isFixed) this.setCloseAllMenus();
     });
+
     this.menuSrv.obsToggleMenu.pipe(takeUntil(this.$destroy)).subscribe(({menu}) => {
       this.toggleMenu(menu);
     });
-
-  }
-
-  ngOnDestroy(): void {
-    this.$destroy.next();
-    this.$destroy.complete();
   }
 
   async ngOnInit() {
@@ -182,6 +216,11 @@ export class PanelMenuComponent implements OnInit {
       await this.loadOfficeMenu();
       this.getMenuModeUser();
     };
+  }
+
+  ngOnDestroy(): void {
+    this.$destroy.next();
+    this.$destroy.complete();
   }
 
   async getPropertiesOffice(idOffice) {
@@ -209,14 +248,12 @@ export class PanelMenuComponent implements OnInit {
     }
   }
 
-
   handleChangeMenuMode() {
     this.isFixed = !this.isFixed;
     this.setCookieMenuMode();
     this.menuSrv.nextMenuState({
       isFixed: this.isFixed
     });
-    
   }
 
   setCookieMenuMode() {
@@ -404,7 +441,9 @@ export class PanelMenuComponent implements OnInit {
   }
 
   parentsFromBreadcrumb() {
-    const parents = this.storageBreadcrumbsItems.filter(item => ['workpackModel', 'planModel'].includes(item.key)).map(item => item.queryParams.id);
+    const parents = this.storageBreadcrumbsItems
+      .filter(item => ['workpackModel', 'planModel'].includes(item.key))
+      .map(item => item.queryParams.id);
     return parents;
   }
 
@@ -413,6 +452,7 @@ export class PanelMenuComponent implements OnInit {
     if (officeIndex > -1) {
       this.itemsOffice[officeIndex].expanded = true;
     }
+
     return this.itemsOffice;
   }
 
@@ -423,6 +463,7 @@ export class PanelMenuComponent implements OnInit {
         item.items = this.collapseMenuItems(item.items);
       }
     });
+
     return list;
   }
 
@@ -444,11 +485,12 @@ export class PanelMenuComponent implements OnInit {
         if (item.idParent === id) {
           item.items = item.children;
         }
-        
+
         if (item.items && item.items.length > 0) {
           item.items = this.expandedMenuSelectedItem(item.items, parents, id);
         }
-      })
+      });
+
       return list;
     }
   }
@@ -472,13 +514,13 @@ export class PanelMenuComponent implements OnInit {
         if (item.items && item.items.length > 0) {
           item.items = this.expandedMenuModelSelectedItem(item.items, parents, id);
         }
-      })
+      });
+
       return list;
     }
   }
 
   getIdFromURL(url: string) {
-    
     const [path, queries] = url.split('?');
     const id = queries ? Number((queries.split('id=')[1])?.split('&')[0]) : 0;
     if ((url.startsWith('workpack') || url.startsWith('stakeholder')) && (!id || isNaN(id))) {
@@ -587,7 +629,7 @@ export class PanelMenuComponent implements OnInit {
 
   toggleMenu(menu: string) {
     this.menus.forEach(m => {
-      m.isOpen = m.label === menu ? true : false
+      m.isOpen = m.label === menu ? true : false;
     });
   }
 
@@ -597,8 +639,13 @@ export class PanelMenuComponent implements OnInit {
       label: planModel.name,
       title: planModel.fullName,
       icon: 'app-icon plan-model',
-      styleClass: `${planModel.id}-${planModel.fullName} planModel-${planModel.id} ${this.currentURL === `planModel?id=${planModel.id}` ? 'active' : ''}`,
-      items: planModel.workpackModels?.length ? this.buildMenuItemWorkpackModel(planModel.workpackModels, this.currentIDOffice, planModel, [planModel.id]) : undefined,
+      styleClass: (
+        `${planModel.id}-${planModel.fullName} ` +
+        `planModel-${planModel.id} ${this.currentURL === `planModel?id=${planModel.id}` ? 'active' : ''}`
+      ),
+      items: planModel.workpackModels?.length
+        ? this.buildMenuItemWorkpackModel(planModel.workpackModels, this.currentIDOffice, planModel, [planModel.id])
+        : undefined,
       command: (e) => {
         const classList = Array.from(e.originalEvent?.target?.classList) || [];
         if (classList.some((className: string) => ['p-menuitem-text', 'fas', 'app-icon'].includes(className))) {
@@ -635,9 +682,24 @@ export class PanelMenuComponent implements OnInit {
       nameInPlural: workpackModel.nameInPlural,
       type: workpackModel.type,
       parents: [...parents, parent],
-      styleClass: parent ? `workpackModel-${workpackModel.id}-${[...parents, parent].join('-')}  ${this.currentURL === `workpackModel?id=${workpackModel.id}` ? 'active' : ''}` :
-        `workpackModel-${workpackModel.id}  ${this.currentURL === `workpackModel?id=${workpackModel.id}` ? 'active' : ''}`,
-      items: workpackModel.children?.length ? this.buildMenuItemWorkpackModel(workpackModel.children, idOffice, planModel, (parent ? [...parents, parent] : [...parents]), workpackModel.id) : undefined,
+      styleClass: parent
+        ? (
+            `workpackModel-${workpackModel.id}-${[...parents, parent].join('-')}  ` +
+            `${this.currentURL === `workpackModel?id=${workpackModel.id}` ? 'active' : ''}`
+          )
+        : (
+            `workpackModel-${workpackModel.id}  ` +
+            `${this.currentURL === `workpackModel?id=${workpackModel.id}` ? 'active' : ''}`
+          ),
+      items: workpackModel.children?.length
+        ? this.buildMenuItemWorkpackModel(
+            workpackModel.children,
+            idOffice,
+            planModel,
+            (parent ? [...parents, parent]: [...parents]),
+            workpackModel.id
+          )
+        : undefined,
       command: (e) => {
         const classList = Array.from(e.originalEvent?.target?.classList) || [];
         if (classList.some((className: string) => ['p-menuitem-text', 'fas', 'app-icon'].includes(className))) {
@@ -674,21 +736,21 @@ export class PanelMenuComponent implements OnInit {
         info: this.propertiesOffice?.name,
         tooltip: this.propertiesOffice?.fullName,
         routerLink: ['/configuration-office'],
-        queryParams: { idOffice: idOffice }
+        queryParams: { idOffice }
       },
       {
         key: 'configuration',
         info: this.translateSrv.instant('planModels'),
         tooltip: 'planModels',
         routerLink: ['/strategies'],
-        queryParams: { idOffice: idOffice }
+        queryParams: { idOffice }
       },
       {
         key: 'planModel',
         info: planModelSelected?.name,
         tooltip: planModelSelected?.fullName,
         routerLink: ['/strategies', 'strategy'],
-        queryParams: { id: planModelSelected.id, idOffice: idOffice }
+        queryParams: { id: planModelSelected.id, idOffice }
       },
     ];
     const currentPlanModel = this.itemsPlanModel.find(planModel => planModel.id === planModelSelected.id);
@@ -760,7 +822,7 @@ export class PanelMenuComponent implements OnInit {
             });
           }
         }
-      }
+      };
     });
   }
 
@@ -796,12 +858,9 @@ export class PanelMenuComponent implements OnInit {
 
   setCloseAllMenus() {
     this.menus.forEach(menu => menu.isOpen = false);
-    
   }
 
   closeAllMenus() {
     this.menuSrv.nextCloseAllMenus(true);
   }
-
 }
-
