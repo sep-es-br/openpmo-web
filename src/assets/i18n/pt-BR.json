@@ -1088,5 +1088,6 @@
   "NO_SCHEDULE": "Entrega sem cronograma",
   "UNDEFINED_SCOPE": "Entrega sem escopo",
 
-  "baseline-disabled-submission-warning": "Impossível submeter Linha de Base com pendências"
+  "baseline-disabled-submission-warning": "Impossível submeter Linha de Base com pendências",
+  "languages": "Idiomas"
 }
