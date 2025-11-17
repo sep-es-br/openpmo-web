@@ -8,7 +8,7 @@ import { ConfirmationService, MenuItem } from 'primeng/api';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
-import { IMenu, IMenuPlanModel, IMenuWorkpack, IMenuWorkpackModel } from 'src/app/shared/interfaces/IMenu';
+import { IMenu, IMenuPlanModel, IMenuWorkpack, IMenuWorkpackModel, MenuButtons } from 'src/app/shared/interfaces/IMenu';
 import { IPerson } from 'src/app/shared/interfaces/IPerson';
 import { IPlan } from 'src/app/shared/interfaces/IPlan';
 import { AuthService } from 'src/app/shared/services/auth.service';
@@ -30,52 +30,81 @@ import { WorkpackBreadcrumbStorageService } from 'src/app/shared/services/workpa
   templateUrl: './mobile-menu.component.html',
   styleUrls: ['./mobile-menu.component.scss']
 })
-export class MobileMenuComponent implements OnInit {
-
+export class MobileMenuComponent implements OnInit, OnDestroy {
   @ViewChild('menuSliderOffices') menuOffices: ElementRef<HTMLDivElement>;
+
   @ViewChild('menuSliderPortfolio') menuPortfolio: ElementRef<HTMLDivElement>;
+
   @ViewChild('menuSliderPlanModel') menuPlanModel: ElementRef<HTMLDivElement>;
 
   @Output() changeMenu = new EventEmitter<boolean>();
 
   menus: IMenu[] = [
-    { label: 'office', isOpen: false },
-    { label: 'portfolio', isOpen: false },
-    { label: 'planModel', isOpen: false },
-    { label: 'favorite', isOpen: false },
-    { label: 'user', isOpen: false },
-    { label: 'more', isOpen: false }
+    { label: MenuButtons.OFFICE, isOpen: false },
+    { label: MenuButtons.PORTFOLIO, isOpen: false },
+    { label: MenuButtons.FAVORITES, isOpen: false },
+    { label: MenuButtons.CCB, isOpen: false },
+    { label: MenuButtons.UNIVERSAL_SEARCH, isOpen: false },
   ];
 
   isMobileView = false;
+
   isChangingView = false;
+
   items: MenuItem[] = [];
+
   itemsOfficeUnchanged = [];
+
   itemsOffice = [];
+
   itemsPlanModel: MenuItem[] = [];
+
   itemsFavorites: IMenuFavorites[] = [];
+
   itemsPortfolio = [];
+
   itemsLanguages: MenuItem[] = [];
+
   username = '';
+
   currentIDOffice = 0;
+
   isUserAdmin = false;
+
   currentURL = '';
+
   currentUserInfo: IPerson;
+
   $destroy = new Subject();
+
   editPermissionOnOffice = false;
+
   isPlanMenu = false;
+
   currentPlan: IPlan;
+
   currentIDPlan = 0;
+
   menuStateChanged = false;
+
   isAdminMenu = false;
+
   parentsWorkpack = [];
+
   changedUrl = false;
+
   propertiesOffice: IOffice;
+
   itemsBreadcrumb = [];
+
   storageBreadcrumbsItems = [];
+
   hasReports = false;
+
   linkEvent = false;
+
   idOfficeItemsPlanModel: number;
+
   loadingMenuPortfolio = false;
 
   constructor(
@@ -389,7 +418,10 @@ export class MobileMenuComponent implements OnInit {
   }
 
   parentsFromBreadcrumb() {
-    const parents = this.storageBreadcrumbsItems.filter(item => ['workpackModel', 'planModel'].includes(item.key)).map(item => item.queryParams.id);
+    const parents = this.storageBreadcrumbsItems
+      .filter(item => ['workpackModel', 'planModel']
+      .includes(item.key))
+      .map(item => item.queryParams.id);
     return parents;
   }
 
@@ -430,7 +462,8 @@ export class MobileMenuComponent implements OnInit {
         if (item.items && item.items.length > 0) {
           item.items = this.expandedMenuSelectedItem(item.items, parents, id);
         }
-      })
+      });
+
       return list;
     }
   }
@@ -454,7 +487,8 @@ export class MobileMenuComponent implements OnInit {
         if (item.items && item.items.length > 0) {
           item.items = this.expandedMenuModelSelectedItem(item.items, parents, id);
         }
-      })
+      });
+
       return list;
     }
   }
@@ -538,7 +572,7 @@ export class MobileMenuComponent implements OnInit {
         this.itemsPortfolio = this.buildMenuItemPortfolio(data || [], 0);
         this.loadingMenuPortfolio = false;
         if (!this.changedUrl || this.linkEvent) {
-          this.selectMenuActive(this.router.url.slice(1), idNewWorkpack)
+          this.selectMenuActive(this.router.url.slice(1), idNewWorkpack);
         }
       }
     }
@@ -573,8 +607,13 @@ export class MobileMenuComponent implements OnInit {
       label: planModel.name,
       title: planModel.fullName,
       icon: 'app-icon plan-model',
-      styleClass: `${planModel.id}-${planModel.fullName} planModel-${planModel.id} ${this.currentURL === `planModel?id=${planModel.id}` ? 'active' : ''}`,
-      items: planModel.workpackModels?.length ? this.buildMenuItemWorkpackModel(planModel.workpackModels, this.currentIDOffice, planModel, [planModel.id]) : undefined,
+      styleClass: (
+        `${planModel.id}-${planModel.fullName} planModel-${planModel.id}` +
+        `${this.currentURL === `planModel?id=${planModel.id}` ? 'active' : ''}`
+      ),
+      items: planModel.workpackModels?.length
+        ? this.buildMenuItemWorkpackModel(planModel.workpackModels, this.currentIDOffice, planModel, [planModel.id])
+        : undefined,
       command: (e) => {
         const classList = Array.from(e.originalEvent?.target?.classList) || [];
         if (classList.some((className: string) => ['p-menuitem-text', 'fas', 'app-icon'].includes(className))) {
@@ -611,9 +650,22 @@ export class MobileMenuComponent implements OnInit {
       nameInPlural: workpackModel.nameInPlural,
       type: workpackModel.type,
       parents: [...parents, parent],
-      styleClass: parent ? `workpackModel-${workpackModel.id}-${[...parents, parent].join('-')}  ${this.currentURL === `workpackModel?id=${workpackModel.id}` ? 'active' : ''}` :
-        `workpackModel-${workpackModel.id}  ${this.currentURL === `workpackModel?id=${workpackModel.id}` ? 'active' : ''}`,
-      items: workpackModel.children?.length ? this.buildMenuItemWorkpackModel(workpackModel.children, idOffice, planModel, (parent ? [...parents, parent] : [...parents]), workpackModel.id) : undefined,
+      styleClass: parent
+      ? (
+          `workpackModel-${workpackModel.id}-${[...parents, parent].join('-')}` +
+          `${this.currentURL === `workpackModel?id=${workpackModel.id}` ? 'active' : ''}`
+        )
+      :
+        (
+          `workpackModel-${workpackModel.id}` +
+          `${this.currentURL === `workpackModel?id=${workpackModel.id}` ? 'active' : ''}`
+        ),
+      items: workpackModel.children?.length
+        ? this.buildMenuItemWorkpackModel(workpackModel.children, idOffice, planModel, (parent
+          ? [...parents, parent]
+          : [...parents]),
+          workpackModel.id)
+        : undefined,
       command: (e) => {
         const classList = Array.from(e.originalEvent?.target?.classList) || [];
         if (classList.some((className: string) => ['p-menuitem-text', 'fas', 'app-icon'].includes(className))) {
@@ -650,21 +702,21 @@ export class MobileMenuComponent implements OnInit {
         info: this.propertiesOffice?.name,
         tooltip: this.propertiesOffice?.fullName,
         routerLink: ['/configuration-office'],
-        queryParams: { idOffice: idOffice }
+        queryParams: { idOffice }
       },
       {
         key: 'configuration',
         info: this.translateSrv.instant('planModels'),
         tooltip: 'planModels',
         routerLink: ['/strategies'],
-        queryParams: { idOffice: idOffice }
+        queryParams: { idOffice }
       },
       {
         key: 'planModel',
         info: planModelSelected?.name,
         tooltip: planModelSelected?.fullName,
         routerLink: ['/strategies', 'strategy'],
-        queryParams: { id: planModelSelected.id, idOffice: idOffice }
+        queryParams: { id: planModelSelected.id, idOffice }
       },
     ];
     const currentPlanModel = this.itemsPlanModel.find(planModel => planModel.id === planModelSelected.id);
@@ -736,9 +788,10 @@ export class MobileMenuComponent implements OnInit {
             });
           }
         }
-      }
+      };
     });
   }
+
   async setWorkpackBreadcrumbStorage(idWorkpack, idPlan) {
     const breadcrumbItems = await this.workpackBreadcrumbStorageSrv.getBreadcrumbs(idWorkpack, idPlan);
     this.breadcrumbSrv.setBreadcrumbStorage(breadcrumbItems);
