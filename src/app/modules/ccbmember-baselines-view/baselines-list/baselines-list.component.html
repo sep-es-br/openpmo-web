@@ -12,16 +12,29 @@
   </div>
   <ng-container *ngFor="let cardBaseline of cardsBaselines; let i = index">
     <div class="card-container">
-      <app-card [properties]="cardBaseline" class="mt-0" (editFilter)="handleEditFilter($event)" (searchText)="handleSearchText($event, cardBaseline.cardTitle)"
-        (newFilter)="handleNewFilter()" (selectedFilter)="handleSelectedFilter($event, cardBaseline.cardTitle)">
+      <app-card
+        class="mt-0"
+        [properties]="cardBaseline"
+        (editFilter)="handleEditFilter($event)"
+        (searchText)="handleSearchText($event, cardBaseline.cardTitle)"
+        (newFilter)="handleNewFilter()"
+        (selectedFilter)="handleSelectedFilter($event, cardBaseline.cardTitle)"
+      >
         <div class="loading-container" *ngIf="cardBaseline.isLoading">
           <app-card-loading [isCardLoading]="cardBaseline.isLoading"></app-card-loading>
         </div>
-        <p-dataView [value]="cardBaseline.cardItems" layout="grid" class="app-dataview"
-          *ngIf="displayModeAll === 'grid' || (displayModeAll === 'list' && !!responsive && !cardBaseline.isLoading)" [paginator]="true"
-          [rows]="pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false"
+        <p-dataView
+          *ngIf="displayModeAll === 'grid' || (displayModeAll === 'list' && !!responsive && !cardBaseline.isLoading)"
+          class="app-dataview"
+          layout="grid"
+          [value]="cardBaseline.cardItems"
+          [paginator]="true"
+          [rows]="pageSize"
+          [showJumpToPageDropdown]="true"
+          [showPageLinks]="false"
           [totalRecords]="cardBaseline.totalRecords"
-          [emptyMessage]="'notFoundBaselineOnStatus' | translate">
+          [emptyMessage]="'notFoundBaselineOnStatus' | translate"
+        >
           <ng-template let-cardItem pTemplate="gridItem">
             <div class="p-col-12 p-md-3 p-sm-12 card-item-container">
               <app-baseline-card-item [properties]="cardItem"></app-baseline-card-item>
@@ -29,10 +42,18 @@
           </ng-template>
         </p-dataView>
 
-        <p-dataView [value]="cardBaseline.cardItems" layout="list" class="app-dataview app-dataview-list"
-          *ngIf="displayModeAll === 'list' && !responsive && !cardBaseline.isLoading" [paginator]="true" [rows]="pageSize"
-          [showJumpToPageDropdown]="true" [showPageLinks]="false" [totalRecords]="cardBaseline.totalRecords"
-          [emptyMessage]="'notFoundBaselineOnStatus' | translate">
+        <p-dataView
+          *ngIf="displayModeAll === 'list' && !responsive && !cardBaseline.isLoading"
+          class="app-dataview app-dataview-list"
+          layout="list"
+          [value]="cardBaseline.cardItems"
+          [paginator]="true"
+          [rows]="pageSize"
+          [showJumpToPageDropdown]="true"
+          [showPageLinks]="false"
+          [totalRecords]="cardBaseline.totalRecords"
+          [emptyMessage]="'notFoundBaselineOnStatus' | translate"
+        >
           <ng-template let-cardItem pTemplate="listItem">
             <div class="p-col-12">
               <app-baseline-card-item [properties]="cardItem"
