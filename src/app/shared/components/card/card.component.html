@@ -36,35 +36,36 @@
           [disabled]="properties.workpackCanceled || !canEditCheckCompleted"
           (ngModelChange)="handleChangeCheckCompleted($event)"></p-checkbox>
       </div>
+
+      <div class="header-values-cost-account" *ngIf="properties.progressBarValues" [class.not-collapseble]="!properties.collapseble" [class.responsive]="responsive">
+        <div
+          *ngFor="let progressBar of properties.progressBarValues"
+          class="progress-bar-cost-container"
+        >
+          <app-progress-bar
+            [total]="progressBar.total"
+            [class.progress-bar-mobile]="responsive"
+            [progress]="progressBar.progress"
+            [labelTotal]="progressBar.labelTotal"
+            [labelProgress]="progressBar.labelProgress"
+            [valueUnit]="progressBar.valueUnit"
+            [baselineTotal]="progressBar.baselinePlanned"
+            [color]="progressBar.color"
+            [startDateBaseline]="progressBar.startDateBaseline"
+            [startDateTotal]="progressBar.startDateTotal"
+            [endDateBaseline]="progressBar.endDateBaseline"
+            [endDateTotal]="progressBar.endDateTotal"
+            [barHeight]="progressBar.barHeight"
+            [displayWhenTotalIsZero]="displayProgressBarIfTotalIsZero"
+            [displayFilledBarsWhenTotalIsZero]="displayFilledBarsWhenTotalIsZero"
+          >
+          </app-progress-bar>
+        </div>
+      </div>
     </div>
     <div class="header-title-check-completed" *ngIf="properties.showFullScreen && properties.fullScreen"
       [class.responsive]="responsive">
       <i class="fas fa-times" (click)="handleChangeFullScreen(false)"></i>
-    </div>
-    <div class="header-values-cost-account" *ngIf="properties.progressBarValues" [class.not-collapseble]="!properties.collapseble" [class.responsive]="responsive">
-      <div
-        *ngFor="let progressBar of properties.progressBarValues"
-        class="progress-bar-cost-container"
-      >
-        <app-progress-bar
-          [total]="progressBar.total"
-          [class.progress-bar-mobile]="responsive"
-          [progress]="progressBar.progress"
-          [labelTotal]="progressBar.labelTotal"
-          [labelProgress]="progressBar.labelProgress"
-          [valueUnit]="progressBar.valueUnit"
-          [baselineTotal]="progressBar.baselinePlanned"
-          [color]="progressBar.color"
-          [startDateBaseline]="progressBar.startDateBaseline"
-          [startDateTotal]="progressBar.startDateTotal"
-          [endDateBaseline]="progressBar.endDateBaseline"
-          [endDateTotal]="progressBar.endDateTotal"
-          [barHeight]="progressBar.barHeight"
-          [displayWhenTotalIsZero]="displayProgressBarIfTotalIsZero"
-          [displayFilledBarsWhenTotalIsZero]="displayFilledBarsWhenTotalIsZero"
-        >
-        </app-progress-bar>
-      </div>
     </div>
     <div class="dataview-filters-container" *ngIf="properties.showFilters || properties.showCreateNemElementButton"
         [style.width]="properties.hideTextFilter ? '28%' : '40%'">
