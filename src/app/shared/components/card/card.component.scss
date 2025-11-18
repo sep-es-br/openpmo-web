@@ -219,14 +219,14 @@
       flex-direction: row;
       align-items: flex-end;
       justify-content: flex-end;
-      width: 40%;
+      width: 100%;
       
       .dataview-filters {
-        margin-right: 1.5rem;
         display: flex;
+        justify-content: end;
         flex-direction: row;
         align-items: center;
-        flex: 1;
+
         .options-container {
           // width: 90%;
           margin-left: 1em;
@@ -332,6 +332,7 @@
     flex-direction: column;
     justify-content: flex-start;
     align-items: flex-start;
+
     .header-values-cost-account {
       display: flex;
       flex-direction: column;
@@ -340,16 +341,19 @@
       font-family: v.$fontFamilyMedium;
       font-size: 1rem;
       text-transform: uppercase;
+
       .progress-bar-cost-container {
         width: 100%;
         display: flex;
         justify-content: center;
         margin-top: 1em;
+
         .progress-bar-mobile {
           width: 100%;
         }
       }
     }
+
     .dataview-filters-container {
       width: 100%;
       flex-direction: column;
