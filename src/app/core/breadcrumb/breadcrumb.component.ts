@@ -131,7 +131,7 @@ export class BreadcrumbComponent implements OnInit, OnChanges {
     public authSrv: AuthService,
     private planSrv: PlanService,
     private translateChangeSrv: TranslateChangeService,
-    private translateSrv: TranslateService,
+    private translateSrv: TranslateService
   ) {
     this.mobileViewSrv.observable.subscribe(
       (isMobileView) => (this.isMobileView = isMobileView)
@@ -143,14 +143,19 @@ export class BreadcrumbComponent implements OnInit, OnChanges {
       .pipe(takeUntil(this.$destroy))
       .subscribe((value) => (this.fullScreenModeDashboard = value));
 
-    this.translateChangeSrv.getCurrentLang()
+    this.translateChangeSrv
+      .getCurrentLang()
       .pipe(takeUntil(this.$destroy))
       .subscribe((res: { lang: string }) => {
         this.currentLanguage = res.lang;
 
         // Procura os botões de idioma no menu responsivo pra exibir o ícone de check corretamente no idioma selecionado
-        const ptMenuItem = this.responsiveMenuButtons.find((item) => item.id === 'language-pt');
-        const enMenuItem = this.responsiveMenuButtons.find((item) => item.id === 'language-en');
+        const ptMenuItem = this.responsiveMenuButtons.find(
+          (item) => item.id === 'language-pt'
+        );
+        const enMenuItem = this.responsiveMenuButtons.find(
+          (item) => item.id === 'language-en'
+        );
 
         if (ptMenuItem && enMenuItem) {
           if (this.currentLanguage === 'pt-BR') {
@@ -175,22 +180,29 @@ export class BreadcrumbComponent implements OnInit, OnChanges {
     this.currentUserInfo = await this.authSrv.getInfoPerson();
 
     if (this.isUserAdmin) {
-      const userMenuAdmin = this.responsiveMenuButtons.find((item) => item.id === 'user-menu-admin');
+      const userMenuAdmin = this.responsiveMenuButtons.find(
+        (item) => item.id === 'user-menu-admin'
+      );
       if (userMenuAdmin) {
         userMenuAdmin.visible = true;
       }
     }
 
     if (this.currentUserInfo && this.currentUserInfo.name) {
-      const userMenuName = this.responsiveMenuButtons.find((item) => item.id === 'user-name');
+      const userMenuName = this.responsiveMenuButtons.find(
+        (item) => item.id === 'user-name'
+      );
       if (userMenuName) {
         userMenuName.label = this.currentUserInfo.name;
       }
     }
 
-    this.planSrv.observableIdPlan().pipe(takeUntil(this.$destroy)).subscribe(async id => {
-      this.currentPlanId = id;
-    });
+    this.planSrv
+      .observableIdPlan()
+      .pipe(takeUntil(this.$destroy))
+      .subscribe(async (id) => {
+        this.currentPlanId = id;
+      });
   }
 
   ngOnChanges(changes: SimpleChanges) {

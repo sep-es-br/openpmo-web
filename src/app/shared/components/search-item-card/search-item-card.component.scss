@@ -1,86 +1,62 @@
-:host {
-    display: flex;
-    gap: 0.3rem;
-    background-color: white;
-    width: 100%;
-    padding: 0.5rem;
-    border: solid 1px #d4d4d4;
-    cursor: pointer;
+.card {
+  background-color: white;
+  border: solid 1px #D4D4D4;
+  cursor: pointer;
 
+  .icon-wrapper {
+    .icon {
+      font-size: 12px;
+    }
 
-    .icon-wrapper {
+    .model-name {
+      font-size: 12px;
+      text-align: center;
+      color: #888E96;
+      text-transform: uppercase;
+    }
+  }
+
+  .item-info {
+    color: #888E96;
+
+    .short-name, .full-name {
+      font-size: 14px;
+      text-align: justify;
+    }
+
+    .breadcrumb {
+      font-size: 12px;
+      font-style: italic;
         
-        width: 5rem ;
+      .breadcrumb-item {
         display: flex;
-        flex-direction: column;
-        gap: 0.3rem;
-        justify-content: center;
         align-items: center;
-        
-        .icon {
-            font-size: 1.3rem;
+
+        i {
+          padding-inline: 0.3rem;
+          flex: 0 0 auto; /* Prevent shrinking/growing */
         }
 
-        .modelName {
-            text-align: center;
-            font-size: smaller;
-        }
-    }
+        .breadcrumb-label {
+          white-space: nowrap;
+          text-overflow: ellipsis;
+          flex-grow: 1;
+          max-width: 30rem;
+          box-sizing: border-box;
 
-    .itemInfo {
-        display: flex;
-        flex-direction: column;
-        gap: 0.3rem;
-        color: #888e96;
-        max-width: 90%;
+          &.constant-overflow {
+            overflow: hidden;
+          }
+          
+          @media screen and (max-width: 576px) {
+            max-width: 20rem;
 
-        h2 {
-            font-size: 0.9lh;
-        }
-
-        h2, p {
-            margin: 0;
-            font-size: smaller;
-        }
-
-        .breadcrumb {
-            max-width: 100%;
-            display: flex;
-            gap: 0.3rem;
-            align-items: center;
-            flex-wrap: wrap;
-            font-size: smaller;
-            font-style: italic;
-            
-            
-            .breadcrumb-item {
-                display: flex;
-                align-items: center;
-
-                i {
-                    padding-inline: 0.3rem;
-                    flex: 0 0 auto; /* Prevent shrinking/growing */
-                }
-
-                .breadcrumb-label {
-                    white-space: nowrap;
-                    overflow: hidden;
-                    text-overflow: ellipsis;
-                    flex-grow: 1;
-                    max-width: 20rem;
-                    box-sizing: border-box;
-                    // flex: 1 1 auto; /* Let it grow and shrink */
-
-                }
-
+            &.conditional-overflow {
+              overflow: hidden;
             }
-
-
-            
-            
+          }
         }
-
+      }
     }
-
-    
+  }
 }
