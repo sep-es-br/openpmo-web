@@ -2,7 +2,6 @@ import { DashboardService } from 'src/app/shared/services/dashboard.service';
 import { takeUntil } from 'rxjs/operators';
 import { MenuService } from 'src/app/shared/services/menu.service';
 import { Component, OnDestroy, OnInit } from '@angular/core';
-
 import { ResponsiveService } from 'src/app/shared/services/responsive.service';
 import { Subject } from 'rxjs';
 import { WorkpackShowTabviewService } from 'src/app/shared/services/workpack-show-tabview.service';
@@ -13,14 +12,19 @@ import { MobileViewService } from 'src/app/shared/services/mobile-view.service';
   templateUrl: './template.component.html',
   styleUrls: ['./template.component.scss']
 })
-export class TemplateComponent implements OnDestroy, OnInit {
-
+export class TemplateComponent implements OnInit, OnDestroy {
   isMenuFixed = false;
+
   $destroy = new Subject();
+
   fullScreenModeDashboard = false;
+
   isAdminMenu = false;
+
   menuWidth = 0.01;
+
   mainWidth = 99.99;
+
   menuMobile = false;
 
   constructor(
@@ -47,18 +51,18 @@ export class TemplateComponent implements OnDestroy, OnInit {
         });
       }
     this.menuSrv.obsToggleMenu.pipe(takeUntil(this.$destroy)).subscribe( ({menu, open}) => {
-      if (menu && menu.trim().length > 0 && !this.isMenuFixed && open) this.openSlideMenu()
+      if (menu && menu.trim().length > 0 && !this.isMenuFixed && open) this.openSlideMenu();
     });
     this.menuSrv.obsCloseAllMenus.pipe(takeUntil(this.$destroy)).subscribe( close => close && !this.isMenuFixed && this.closeSlideMenu());
-  }
-
-  toggleMenu(isAdmin: boolean) {
-    this.isAdminMenu = isAdmin;
   }
 
   ngOnDestroy(): void {
     this.$destroy.next();
     this.$destroy.complete();
+  }
+
+  toggleMenu(isAdmin: boolean) {
+    this.isAdminMenu = isAdmin;
   }
 
   handleClickContent() {
@@ -115,7 +119,7 @@ export class TemplateComponent implements OnDestroy, OnInit {
   }
 
   closeAllMenus() {
-    this.closeSlideMenu()
+    this.closeSlideMenu();
     this.menuSrv.nextCloseMenuUser(true);
   }
 
@@ -134,8 +138,8 @@ export class TemplateComponent implements OnDestroy, OnInit {
   }
 
   openSlideMenu() {
-    this.menuWidth = 20;
-    this.mainWidth = 80;
+    this.menuWidth = 15;
+    this.mainWidth = 85;
     const splitterPanels = document.querySelectorAll('.p-splitter-panel-nested');
     if (splitterPanels.length > 1) {
       splitterPanels[0].setAttribute('style', `flex-basis: calc(${this.menuWidth}% - 4px);`);
@@ -147,5 +151,4 @@ export class TemplateComponent implements OnDestroy, OnInit {
   handleCloseMenu() {
     if (!this.isMenuFixed) this.closeAllMenus();
   }
-
 }

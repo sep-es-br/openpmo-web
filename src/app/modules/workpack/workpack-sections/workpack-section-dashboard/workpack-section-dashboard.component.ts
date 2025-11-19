@@ -215,7 +215,7 @@ export class WorkpackSectionDashboardComponent implements OnInit, OnChanges, OnD
 
     if (dashboard?.dashboardStatusData) {
       this.dashboardStatusData = {
-        labels: ['Concluída', 'Em Execução', 'Paralisada', 'Em Planejamento', 'A Cancelar'],
+        labels: ['Concluída', 'Execução', 'Paralisada', 'Planejamento', 'A Cancelar'],
         datasets: [
           {
             data: [
