@@ -57,7 +57,7 @@ $mobileMenuHeight: 90px;
     }
 
     .p-menuitem-text {
-      font-size: 0.8rem;
+      font-size: 12px;
       width: calc(100% - 50px) !important;
     } 
 
@@ -81,6 +81,8 @@ $mobileMenuHeight: 90px;
     }
     .p-panelmenu .p-panelmenu-content .p-menuitem .p-menuitem-link {
       position: relative;
+      padding: .5rem 1rem;
+
       .p-panelmenu-icon {
         order: 2;
         margin-left: 0.6rem;
