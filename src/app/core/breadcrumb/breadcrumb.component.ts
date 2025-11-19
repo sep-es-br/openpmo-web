@@ -3,12 +3,10 @@ import { DashboardService } from 'src/app/shared/services/dashboard.service';
 import { takeUntil } from 'rxjs/operators';
 import { Component, ElementRef, HostListener, Input, OnInit, SimpleChanges, ViewChild, OnChanges } from '@angular/core';
 import { Router } from '@angular/router';
-
 import { IBreadcrumb } from 'src/app/shared/interfaces/IBreadcrumb';
 import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
-import { ResponsiveService } from 'src/app/shared/services/responsive.service';
 import { Subject } from 'rxjs';
-import {WorkpackService} from "../../shared/services/workpack.service";
+import {WorkpackService} from '../../shared/services/workpack.service';
 
 @Component({
   selector: 'app-breadcrumb',
@@ -17,16 +15,27 @@ import {WorkpackService} from "../../shared/services/workpack.service";
 })
 export class BreadcrumbComponent implements OnInit, OnChanges {
   @Input() isAdminMenu = false;
+
   @ViewChild('crumbsEl') crumbsEl: ElementRef;
+
   crumbs: IBreadcrumb[] = [];
+
   crumpsHide: IBreadcrumb[] = [];
+
   isMobileView = false;
+
   isOverflowing = false;
+
   addCrumbHidden = true;
+
   crumbOffice: IBreadcrumb;
+
   crumbPlan: IBreadcrumb;
+
   $destroy = new Subject();
+
   fullScreenModeDashboard = false;
+
   loadingWorkpack = false;
 
   constructor(
@@ -42,13 +51,13 @@ export class BreadcrumbComponent implements OnInit, OnChanges {
   }
 
   @HostListener('window:resize', ['$event'])
-  onResize(event) {
+  onResize(event: any) {
     this.addCrumbHidden = true;
     this.detectOverflow();
   }
 
   ngOnInit(): void {
-    this.breadcrumbSrv.observable.subscribe( async(menu) => {
+    this.breadcrumbSrv.observable.subscribe(async (menu) => {
       await this.resetAll();
       await this.setCrumbs(menu);
       this.detectOverflow();
@@ -66,11 +75,12 @@ export class BreadcrumbComponent implements OnInit, OnChanges {
   }
 
   async setCrumbs(crumbs: IBreadcrumb[]) {
-    if(crumbs.length > 0) {
+    console.log('crumbs: ', crumbs);
+    if (crumbs.length > 0) {
       this.crumbOffice = crumbs.find( crumb => crumb.key === 'office');
       this.crumbPlan = crumbs.find( crumb => crumb.key === 'plan');
     }
-    this.crumbs = crumbs.filter( crumb => !['office','plan'].includes(crumb.key));
+    this.crumbs = crumbs.filter(crumb => !['office','plan'].includes(crumb.key));
   }
 
   handleNavigateBredcrumb() {
@@ -113,8 +123,8 @@ export class BreadcrumbComponent implements OnInit, OnChanges {
          const secondElement = 1;
          const hideCrump = this.crumbs.splice(secondElement, 1)[0];
          this.crumpsHide.push(hideCrump);
-         this.crumbs[firstCrumb].routerLink = hideCrump.routerLink;
-         this.crumbs[firstCrumb].queryParams = hideCrump.queryParams;
+         this.crumbs[firstCrumb].routerLink = hideCrump?.routerLink;
+         this.crumbs[firstCrumb].queryParams = hideCrump?.queryParams;
       } else {
         const hideCrump = this.crumbs.shift();
         this.crumpsHide.push(hideCrump);

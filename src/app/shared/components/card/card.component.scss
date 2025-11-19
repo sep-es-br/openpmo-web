@@ -96,6 +96,8 @@
       flex-direction: row;
       align-items: center;
       margin-right: 2em;
+      position: relative;
+
       label {
         font-size: 0.9rem;
         margin-right: 5px;
@@ -112,6 +114,11 @@
       }
       i {
         cursor: pointer;
+        position: absolute;
+        
+        @media screen and (max-width: 970px) {
+          bottom: 0px;
+        }
       }
       &.mr-0 {
         margin-right: 0 !important;
@@ -160,7 +167,7 @@
       flex-direction: row;
       align-items: flex-end;
       justify-content: flex-end;
-      width: 40%;
+      //width: 40%;
       .dataview-filters-text {
         margin-right: 2em;
         width: 11rem;

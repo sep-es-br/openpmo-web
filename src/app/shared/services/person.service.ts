@@ -1,5 +1,5 @@
 import { HttpHeaders } from '@angular/common/http';
-import { Injectable, Inject, Injector } from '@angular/core';
+import { Injectable, Inject, Injector, OnDestroy } from '@angular/core';
 import { BaseService } from '../base/base.service';
 import { IFile } from '../interfaces/IFile';
 import { IHttpResult } from '../interfaces/IHttpResult';
@@ -7,13 +7,17 @@ import { IOffice } from '../interfaces/IOffice';
 import { IPerson, IWorkLocal } from '../interfaces/IPerson';
 import { IPersonProfile } from '../interfaces/IPersonProfile';
 import { PrepareHttpParams } from '../utils/query.util';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, forkJoin, Observable, Subject } from 'rxjs';
+import { IPreferences } from '../interfaces/preferences.interface';
+import { finalize, map, mergeMap, take, takeUntil, tap } from 'rxjs/operators';
 
 @Injectable({ providedIn: 'root' })
-export class PersonService extends BaseService<IPerson> {
+export class PersonService extends BaseService<IPerson>{
 
   private avatarChanged = new BehaviorSubject<boolean>(false);
   avatarFile: IFile;
+  private readonly _preferences = new BehaviorSubject<IPreferences>(undefined);
+  
 
   constructor(
     @Inject(Injector) injector: Injector
@@ -226,6 +230,46 @@ export class PersonService extends BaseService<IPerson> {
       localStorage.setItem('@PMO/infoPerson', JSON.stringify(person));
     }
     return await this.http.patch<IHttpResult<any>>(`${this.urlBase}/work-local`, workLocal).toPromise();
+  }
+
+  get $preferences() {
+    return this._preferences.asObservable();
+  }
+
+  nextPreferences(preferences : Partial<IPreferences>) {
+    this._preferences.pipe(take(1)).subscribe({
+        next: (inPreferences) => {
+            inPreferences = inPreferences ?? {} as IPreferences;
+
+            Object.assign(inPreferences, preferences);
+            
+            this._preferences.next(inPreferences as IPreferences);
+        }
+    })    
+  }
+
+  nextAndSavePreferences(preferences : Partial<IPreferences>) {
+    forkJoin({
+        preferencesResp: this.updatePreferences()
+    }).pipe(map(({preferencesResp}) => ({inPreferences: preferencesResp.data})))
+    .subscribe({
+        next: ({inPreferences}) => {
+            inPreferences = inPreferences ?? {} as IPreferences;
+
+            Object.assign(inPreferences, preferences);
+            
+            this._preferences.next(inPreferences as IPreferences);
+
+            this.http.put(`${this.urlBase}/preferences`, inPreferences).subscribe();
+        }
+    })
+       
+  }
+
+  updatePreferences() : Observable<IHttpResult<IPreferences>> {
+    return this.http.get<IHttpResult<IPreferences>>(`${this.urlBase}/preferences`)
+    .pipe(tap(({success, data}) => success ? this._preferences.next(data) : undefined))
+     
   }
 
 }

@@ -627,6 +627,7 @@ export class WorkpackComponent implements OnDestroy {
         collapseble: this.showTabview ? false : true,
         initialStateCollapse: this.collapsePanelsStatus,
         showFilters: true,
+        hideTextFilter: true,
         showCreateNemElementButtonWorkpack: this.workpackSrv.getEditPermission() ? true : false,
         createNewElementMenuItemsWorkpack: [],
         filters: []
