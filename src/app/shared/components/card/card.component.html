@@ -9,8 +9,8 @@
   (collapsedChange)="handleCollapsed($event)"
 >
   <p-header class="card-header d-flex flex-column w-100 justify-content-center align-items-start" [class.card-header-mobile]="responsive">
-    <div class="d-flex flex-row col-12">
-      <div class="header-title d-flex col-6" (click)="properties.collapseble && handleCollapsed()"
+    <div class="d-flex flex-column flex-sm-row col-12">
+      <div class="header-title d-flex col-12 col-sm-6" (click)="properties.collapseble && handleCollapsed()"
         [class.card-collapseble]="properties.collapseble">
         <div class="header-title-text">
           <span class="card-title" [class.card-title-mobile]="responsive" *ngIf="properties.cardTitle">{{
@@ -29,7 +29,7 @@
         </div>
       </div>
 
-      <div class="d-flex col-6 justify-content-end">
+      <div class="d-flex col-12 col-sm-6 justify-content-center justify-content-sm-end">
         <div
           *ngIf="!properties.initialStateCollapse && properties.showFilters"
           class="header-title-check-completed dataview-filters-text d-flex col-4 justify-content-end"
