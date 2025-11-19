@@ -8,6 +8,7 @@ import { SharingComponent } from './sharing/sharing.component';
 import { BaselineCancellingComponent } from './baseline-cancelling/baseline-cancelling.component';
 import { JournalComponent } from './journal/journal.component';
 import { IndicatorComponent } from './indicator/indicator.component';
+import { dashboardResolver } from 'src/app/shared/resolvers/dashboard.resolver';
 
 const routes: Routes = [
   {
@@ -15,6 +16,8 @@ const routes: Routes = [
     children: [
       {
         path: '',
+        resolve: {data: dashboardResolver},
+        runGuardsAndResolvers: 'always',
         component: WorkpackComponent
       },
       {
