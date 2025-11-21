@@ -370,7 +370,7 @@ export class WorkpackComponent implements OnDestroy {
     this.workpackSrv.setEditPermission(false);
     this.workpackSrv.setUnitMeansure(undefined);
     this.workpackSrv.setWorkpackData(undefined, true);
-    await this.resetWorkpackSections();
+    if(!this.isLoading) await this.resetWorkpackSections();
     await this.loadWorkpackData();
     this.workpackBreadcrumbStorageSrv.setBreadcrumb(this.linkEvent);
     this.calendarFormat = this.translateSrv.instant('dateFormat');
@@ -411,7 +411,7 @@ export class WorkpackComponent implements OnDestroy {
     } else {
       await this.loadWorkpackModel(this.idWorkpackModel);
     }
-    this.propertySrv.loadProperties();
+    if(! this.dashboardSrv.referenceMonth) this.dashboardSrv.calculateReferenceMonth();
     const linked = this.idWorkpackModelLinked ? true : false;
     this.dashboardSrv.loadDashboard(linked);
     this.costAccountSrv.loadCostAccounts();

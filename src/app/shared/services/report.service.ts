@@ -20,25 +20,10 @@ export class ReportService extends BaseService<IReportModel> {
     super('report', injector);
   }
 
-  private readonly cacheHasActiveReports = new Map<string, IHttpResult<boolean>>()
-
   async checkHasActiveReports(options): Promise<IHttpResult<boolean>> {
 
-    const key = this.getKeyFrom(options);
-
-    if(this.cacheHasActiveReports.has(key)) {
-        return await Promise.resolve(this.cacheHasActiveReports.get(key));
-    } else {
-        const obs = this.http.get<IHttpResult<boolean>>(`${this.urlBase}/active/has-model`, { params: PrepareHttpParams(options) })
-                    .pipe(
-                        tap((resp) => this.cacheHasActiveReports.set(key, resp)),
-                        finalize(() => setTimeout(() => this.cacheHasActiveReports.delete(key), 5000) ), 
-                        shareReplay(1)
-                    );
-
-        ;
-        return await obs.toPromise();
-    }
+    return await this.http.get<IHttpResult<boolean>>(`${this.urlBase}/active/has-model`, { params: PrepareHttpParams(options) }).toPromise();
+    
   }
 
   async getScopeReport(options): Promise<IHttpResult<IReportScope>> {

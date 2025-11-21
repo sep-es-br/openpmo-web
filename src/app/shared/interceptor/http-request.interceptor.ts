@@ -122,7 +122,7 @@ export class HttpRequestInterceptor implements HttpInterceptor {
       }),
       finalize(() => {
             this.requestCount--
-            this.requestCache.delete(thisKey);
+            setTimeout(() => this.requestCache.delete(thisKey), 5_000); 
         }),
         shareReplay(1)   
     );

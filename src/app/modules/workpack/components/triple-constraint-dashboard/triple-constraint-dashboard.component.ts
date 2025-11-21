@@ -123,7 +123,7 @@ export class TripleConstraintDashboardComponent implements OnInit {
       if (this.tripleConstraint.schedule.actualEndDate) {
         endDates.push(this.tripleConstraint.schedule.actualEndDate);
       }
-      const endDate = endDates.reduce((a, b) => {
+      const endDate = endDates.length === 0 ? startDate : endDates.reduce((a, b) => {
         if (moment(a).isAfter(moment(b))) { return a; }
         else { return b; }
       });

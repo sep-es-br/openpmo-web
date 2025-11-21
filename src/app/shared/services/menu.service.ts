@@ -162,49 +162,31 @@ export class MenuService extends BaseService<any> implements OnDestroy{
     return this.http.get<IHttpResult<IMenuOffice[]>>(`${this.urlBase}/office`).toPromise();
   }
 
-    private cacheItensPortifolio = new  Map<string, Observable<IHttpResult<IMenuWorkpack[]>>>();
     
   getItemsPortfolio(idOffice: number, idPlan: number): Promise<IHttpResult<IMenuWorkpack[]>> {
-    const key = `${idOffice}:${idPlan}`;
-    
-    if(this.cacheItensPortifolio.has(key)) {
-        return this.cacheItensPortifolio.get(key).toPromise();
-    } else {
-        const obs = this.http.get<IHttpResult<IMenuWorkpack[]>>(`${this.urlBase}/portfolio`,
-            {
-                params: PrepareHttpParams({
-                    'id-office': idOffice,
-                    'id-plan': idPlan
-                })
-            }
-        ).pipe(finalize(() => this.cacheItensPortifolio.delete(key)), shareReplay(1));
-
-        this.cacheItensPortifolio.set(key, obs);
-        return obs.toPromise();
-    }
+  
+    return this.http.get<IHttpResult<IMenuWorkpack[]>>(`${this.urlBase}/portfolio`,
+        {
+            params: PrepareHttpParams({
+                'id-office': idOffice,
+                'id-plan': idPlan
+            })
+        }
+    ).toPromise();
     
   }
 
-  private readonly cacheParentsItemsPortifolio = new Map<string, Observable<IHttpResult<{parents: number[]}>>>();
 
   getParentsItemsPortfolio(idWorkpack: number, idPlan: number): Promise<IHttpResult<{parents: number[]}>> {
-    const key = `${idWorkpack}:${idPlan}`;
     
-    if(this.cacheParentsItemsPortifolio.has(key)){
-        return this.cacheParentsItemsPortifolio.get(key).toPromise();
-    } else {
-        const obs = this.http.get<IHttpResult<{parents: number[]}>>(`${this.urlBase}/portfolios/parents`,
-            {
-                params: PrepareHttpParams({
-                    'id-workpack': idWorkpack,
-                    'id-plan': idPlan
-                })
-            }
-        ).pipe(finalize(() => this.cacheParentsItemsPortifolio.delete(key)), shareReplay(1));
-
-        this.cacheParentsItemsPortifolio.set(key, obs);
-        return obs.toPromise();
-    }
+    return this.http.get<IHttpResult<{parents: number[]}>>(`${this.urlBase}/portfolios/parents`,
+        {
+            params: PrepareHttpParams({
+                'id-workpack': idWorkpack,
+                'id-plan': idPlan
+            })
+        }
+    ).toPromise();
   }
 
   getParentsItemsWorkpackModel(idWorkpackModel: number): Promise<IHttpResult<{parents: number[]}>> {
