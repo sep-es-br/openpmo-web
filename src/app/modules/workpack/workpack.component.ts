@@ -370,7 +370,7 @@ export class WorkpackComponent implements OnDestroy {
     this.workpackSrv.setEditPermission(false);
     this.workpackSrv.setUnitMeansure(undefined);
     this.workpackSrv.setWorkpackData(undefined, true);
-    await this.resetWorkpackSections();
+    if(!this.isLoading) await this.resetWorkpackSections();
     await this.loadWorkpackData();
     this.workpackBreadcrumbStorageSrv.setBreadcrumb(this.linkEvent);
     this.calendarFormat = this.translateSrv.instant('dateFormat');

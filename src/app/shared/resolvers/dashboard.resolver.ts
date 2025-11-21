@@ -17,6 +17,7 @@ import { PlanService } from "../services/plan.service";
 import { WorkpackModelService } from "../services/workpack-model.service";
 import { OfficeService } from "../services/office.service";
 import { PersonService } from "../services/person.service";
+import { BreakdownStructureService } from "../services/breakdown-structure.service";
 
 @Injectable({providedIn: 'root'})
 export class dashboardResolver implements Resolve<any> {
@@ -27,6 +28,7 @@ export class dashboardResolver implements Resolve<any> {
     private costAccountSrv: CostAccountService;
     private stakeholderSrv: StakeholderService;
     private riskSrv: RiskService;
+    private breakdownStructureSrv: BreakdownStructureService
     private issueSrv: IssueService;
     private baselineSrv: BaselineService;
     private processSrv: ProcessService;
@@ -75,6 +77,7 @@ export class dashboardResolver implements Resolve<any> {
         this.workpackModelSrv = this.injector.get(WorkpackModelService);
         this.officeSrv = this.injector.get(OfficeService);
         this.personSrv = this.injector.get(PersonService);
+        this.breakdownStructureSrv = this.injector.get(BreakdownStructureService);
     }
 
     async resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
@@ -101,6 +104,7 @@ export class dashboardResolver implements Resolve<any> {
             idWorkpackParent: idWorkpackParent && +idWorkpackParent,
             idWorkpackModelLinked: idWorkpackModelLinked && +idWorkpackModelLinked,
         });
+        await this.resetWorkpackSections();
         await this.loadWorkpackData();
 
     }
@@ -255,6 +259,22 @@ export class dashboardResolver implements Resolve<any> {
       idWorkpackModelLinked: this.idWorkpackModelLinked ? this.idWorkpackModelLinked : null
     });
   }
+
+  
+  async resetWorkpackSections() {
+    this.propertySrv.resetPropertiesData();
+    this.breakdownStructureSrv.resetBreakdownStructureData();
+    this.dashboardSrv.resetDashboardData();
+    this.costAccountSrv.resetCostAccountsData();
+    this.stakeholderSrv.resetStakeholdersData();
+    this.riskSrv.resetRisksData();
+    this.issueSrv.resetIssuesData();
+    this.baselineSrv.resetBaselinesData();
+    this.processSrv.resetProcessesData();
+    this.journalSrv.resetJournalData();
+    this.scheduleSrv.resetScheduleData();
+  }
+
 
 
 }
