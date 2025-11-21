@@ -4,7 +4,7 @@
   expandIcon="pi pi-angle-down" collapseIcon="pi pi-angle-up" [class.mobile]="responsive"
   (collapsedChange)="handleCollapsed($event)">
   <p-header class="card-header" [class.card-header-mobile]="responsive">
-    <div class="d-flex flex-column flex-sm-row col-12">
+    <div class="d-flex flex-column flex-sm-row col-12 col-md">
       <div class="header-title d-flex col-6" (click)="properties.collapseble && handleCollapsed()"
         [class.card-collapseble]="properties.collapseble">
         <div class="header-title-text">
