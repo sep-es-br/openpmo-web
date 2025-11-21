@@ -42,10 +42,10 @@
 
 
 <ng-template #menuAdmin>
-  <div class="item" (click)="toggleMenu('office', true)" [pTooltip]="'offices' | translate" *ngIf="isUserAdmin" [class.adm-opened]="isMenuOpen('office')">
+  <div class="item" (click)="toggleMenu(MenuButtons.OFFICE, true)" [pTooltip]="'offices' | translate" *ngIf="isUserAdmin" [class.adm-opened]="isMenuOpen('office')">
     <i class="app-icon offices" [ngStyle]="{ fontSize: '1.4rem' }"></i>
   </div>
-  <div class="item" (click)="toggleMenu('planModel', true)" [pTooltip]="'planModels' | translate" [class.adm-opened]="isMenuOpen('planModel')">
+  <div class="item" (click)="toggleMenu(MenuButtons.PLAN_MODEL, true)" [pTooltip]="'planModels' | translate" [class.adm-opened]="isMenuOpen('planModel')">
     <i class="app-icon plan-model" [ngStyle]="{ fontSize: '1.3rem' }"></i>
   </div>
   <div class="item" [routerLink]="['/organizations']" [queryParams]="{ idOffice: currentIDOffice }" [class.adm-opened]="isMenuAdminOpen('organizations')"

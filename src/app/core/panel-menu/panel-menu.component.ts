@@ -387,7 +387,9 @@ export class PanelMenuComponent implements OnInit {
   }
 
   parentsFromBreadcrumb() {
-    const parents = this.storageBreadcrumbsItems.filter(item => ['workpackModel', 'planModel'].includes(item.key)).map(item => item.queryParams.id);
+    const parents = this.storageBreadcrumbsItems
+      .filter(item => ['workpackModel', 'planModel'].includes(item.key))
+      .map(item => item.queryParams.id);
     return parents;
   }
 

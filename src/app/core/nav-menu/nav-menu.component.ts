@@ -32,6 +32,8 @@ import { ReportService } from 'src/app/shared/services/report.service';
 export class NavMenuComponent implements OnInit, OnDestroy {
   @Output() changeMenu = new EventEmitter<boolean>();
 
+    MenuButtons = MenuButtons; // expõe pro template
+
   menus: IMenu[] = [
     { label: MenuButtons.OFFICE, isOpen: false },
     { label: MenuButtons.PORTFOLIO, isOpen: false },
