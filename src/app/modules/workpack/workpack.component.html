@@ -12,10 +12,14 @@
     </div>
     <div class="container-actions">
         <div class="dataview-filters-text" #searchBar *ngIf="!workpackLoading && idWorkpack">
-        <input pInputText class="app-input-text"
-               [class.animation-input]="showAnimationSearch"
-               [(ngModel)]="searchTerm" (keydown.enter)="handleSearchText()"
-               [placeholder]="'minLengthSearch' | translate"
+        <input
+          pInputText
+          id="id-app-inputtext"
+          class="app-input-text"
+          [ngClass]="{ 'animation-input': showAnimationSearch }"
+          [(ngModel)]="searchTerm"
+          [placeholder]="'minLengthSearch' | translate"
+          (keydown.enter)="handleSearchText()"
         />
         <i class="fas fa-search"
            *ngIf="!showAnimationSearch"
