@@ -29,6 +29,10 @@
           transition: width .3s;
           text-overflow: ellipsis;
 
+          :focus {
+            text-overflow: ellipsis;
+          }
+
           &.animation-input {
             width: 100% !important;
             border-bottom: 1px solid #b6c8cd !important;

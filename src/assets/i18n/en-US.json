@@ -1075,5 +1075,6 @@
   "UNDEFINED_SCOPE": "Delivery without scope",
 
   "baseline-disabled-submission-warning": "Impossible to submit Baseline with pending items",
-  "languages": "Languages"
+  "languages": "Languages",
+  "minLengthSearch": "Type at least 3 characters"
 }
