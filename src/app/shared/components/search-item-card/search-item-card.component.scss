@@ -31,6 +31,8 @@
       .breadcrumb-item {
         display: flex;
         align-items: center;
+        margin: 0;
+        max-width: 100%;
 
         i {
           padding-inline: 0.3rem;
@@ -43,18 +45,8 @@
           flex-grow: 1;
           max-width: 30rem;
           box-sizing: border-box;
-
-          &.constant-overflow {
-            overflow: hidden;
-          }
-          
-          @media screen and (max-width: 576px) {
-            max-width: 20rem;
-
-            &.conditional-overflow {
-              overflow: hidden;
-            }
-          }
+          overflow: hidden;
+          padding-right: 2px;
         }
       }
     }
