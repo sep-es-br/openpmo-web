@@ -102,7 +102,7 @@ export class ScheduleConstraintComponent implements OnInit {
       if (this.schedule.actualEndDate) {
         endDates.push(this.schedule.actualEndDate);
       }
-      const endDate = endDates.reduce((a, b) => {
+      const endDate = endDates.length === 0 ? startDate : endDates.reduce((a, b) => {
         if (moment(a).isAfter(moment(b))) {return a;}
         else {return b;}
       });
