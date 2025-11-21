@@ -341,12 +341,12 @@ export class PanelMenuComponent implements OnInit {
     if (url.startsWith('offices/office')) {
       this.menuOffices?.nativeElement.querySelector('.office-' + id)?.classList.add('active');
       this.itemsOffice = this.itemsOffice ? [...this.expandMenuOffice()] : undefined;
-      this.menuSrv.nextToggleMenu({menu: 'office', open: (preferences?.fixedMenu ?? false)});
+      this.menuSrv.nextToggleMenu({menu: MenuButtons.OFFICE, open: (preferences?.fixedMenu ?? false)});
 
     } else if (url.startsWith('strategies/strategy')) {
       this.menuPlanModel?.nativeElement.querySelector('.planModel-' + id)?.classList.add('active');
       this.itemsPlanModel = this.itemsPlanModel ? [...this.expandedMenuModelSelectedItem(this.itemsPlanModel, [], id)] : undefined;
-      this.menuSrv.nextToggleMenu({menu: 'planModel', open: (preferences?.fixedMenu ?? false)});
+      this.menuSrv.nextToggleMenu({menu: MenuButtons.PLAN_MODEL, open: (preferences?.fixedMenu ?? false)});
     } else if (url.startsWith('workpack-model')) {
       this.storageBreadcrumbsItems = this.breadcrumbSrv.get;
       const parents = this.parentsFromBreadcrumb();
@@ -357,13 +357,13 @@ export class PanelMenuComponent implements OnInit {
       } else {
         this.menuPlanModel?.nativeElement.querySelector('.workpackModel-' + id)?.classList.add('active');
       }
-      this.menuSrv.nextToggleMenu({menu: 'planModel', open: (preferences?.fixedMenu ?? false)});
+      this.menuSrv.nextToggleMenu({menu: MenuButtons.PLAN_MODEL, open: (preferences?.fixedMenu ?? false)});
     } else if (url.startsWith('plan')) {
       this.menuOffices?.nativeElement.querySelector('.plan-' + id)?.classList.add('active');
       this.itemsOffice = this.itemsOffice ? [...this.expandMenuOffice()] : this.itemsOffice;
       const itemsMenu = this.itemsPortfolio ? [...Array.from(this.itemsPortfolio)] : undefined;
       this.itemsPortfolio = itemsMenu ? [...this.collapseMenuItems(itemsMenu)] : undefined;
-      this.menuSrv.nextToggleMenu({menu: 'portfolio', open: (preferences?.fixedMenu ?? false)});
+      this.menuSrv.nextToggleMenu({menu: MenuButtons.PORTFOLIO, open: (preferences?.fixedMenu ?? false)});
     } else if (url.startsWith('workpack') || url.startsWith('stakeholder')) {
       this.itemsOffice = this.itemsOffice ? [...this.expandMenuOffice()] : this.itemsOffice;
       if (this.currentIDPlan) {
@@ -379,7 +379,7 @@ export class PanelMenuComponent implements OnInit {
         this.itemsPortfolio = itemsMenu ? [...this.expandedMenuSelectedItem(itemsMenu, parents, id)] : undefined;
       }
       this.menuPortfolio?.nativeElement.querySelector('.workpack-' + id)?.classList.add('active');
-      this.menuSrv.nextToggleMenu({menu: 'portfolio', open: (preferences?.fixedMenu ?? false)});
+      this.menuSrv.nextToggleMenu({menu: MenuButtons.PORTFOLIO, open: (preferences?.fixedMenu ?? false)});
     }
     if (!this.currentIDOffice || this.currentIDOffice === 0) {
       this.itemsOffice = [...this.itemsOffice.map(item => ({ ...item, expanded: false }))];

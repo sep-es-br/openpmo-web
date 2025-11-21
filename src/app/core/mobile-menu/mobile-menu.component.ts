@@ -47,6 +47,8 @@ export class MobileMenuComponent implements OnInit, OnDestroy {
     { label: MenuButtons.UNIVERSAL_SEARCH, isOpen: false },
   ];
 
+  MenuButtons = MenuButtons;
+
   isMobileView = false;
 
   isChangingView = false;

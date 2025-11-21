@@ -33,6 +33,7 @@ export class NavMenuComponent implements OnInit, OnDestroy {
   @Output() changeMenu = new EventEmitter<boolean>();
 
     MenuButtons = MenuButtons; // expõe pro template
+    MenuAdminButtons = MenuAdminButtons
 
   menus: IMenu[] = [
     { label: MenuButtons.OFFICE, isOpen: false },

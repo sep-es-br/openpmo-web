@@ -13,28 +13,28 @@
 
 
 <ng-template #menuGeneral>
-  <div class="item" (click)="toggleMenu('office', true)" [class.opened]="isMenuOpen('office')"
+  <div class="item" (click)="toggleMenu(MenuButtons.OFFICE, true)" [class.opened]="isMenuOpen(MenuButtons.OFFICE)"
       [pTooltip]="'officesAndPlans' | translate">
       <i class="app-icon offices" [ngStyle]="{ fontSize: '1.6rem' }"></i>
     </div>
     <div class="item" *ngIf="currentUserInfo?.isCcbMember" [routerLink]="['/ccbmember-baselines-view']"
-      [pTooltip]="'changeControlBoard' | translate" [class.opened]="isMenuOpen('ccbmember-baselines-view')">
+      [pTooltip]="'changeControlBoard' | translate" [class.opened]="isMenuOpen(MenuButtons.CCB)">
       <i class="app-icon ccb-view" [ngStyle]="{ fontSize: '1.67rem' }"></i>
     </div>
-    <div class="item" (click)="toggleMenu('portfolio', true)" [pTooltip]="currentPlan?.name" [class.opened]="isMenuOpen('portfolio')"
+    <div class="item" (click)="toggleMenu(MenuButtons.PORTFOLIO)" [pTooltip]="currentPlan?.name" [class.opened]="isMenuOpen(MenuButtons.PORTFOLIO)"
       *ngIf="!!currentIDPlan && isPlanMenu">
       <i class="app-icon briefcase" [ngStyle]="{ fontSize: '1.3rem' }"></i>
     </div>
-    <div class="item" (click)="toggleMenu('favorite', true)" [class.opened]="isMenuOpen('favorite')"
+    <div class="item" (click)="toggleMenu(MenuButtons.FAVORITES)" [class.opened]="isMenuOpen(MenuButtons.FAVORITES)"
       *ngIf="hasFavoriteItems && !!currentIDPlan && isPlanMenu"
       [pTooltip]="'myFavorites' | translate">
       <i class="favorite-icon far fa-star" [ngStyle]="{ fontSize: '1.7rem' }"></i>
     </div>
     <div class="item" *ngIf="!!currentIDPlan && isPlanMenu && hasReports" [routerLink]="['/reports']"
-      [queryParams]="{idPlan: currentPlan?.id}" [pTooltip]="'reports' | translate" [class.opened]="isMenuOpen('reports')">
+      [queryParams]="{idPlan: currentPlan?.id}" [pTooltip]="'reports' | translate" [class.opened]="isMenuOpen(MenuButtons.REPORTS)">
       <i class="far fa-file-alt" [ngStyle]="{ fontSize: '1.5rem' }"></i>
     </div>
-    <div class="item" *ngIf="!!currentIDPlan && isPlanMenu" [routerLink]="['/search']" [class.opened]="isMenuOpen('search')"
+    <div class="item" *ngIf="!!currentIDPlan && isPlanMenu" [routerLink]="['/search']" [class.opened]="isMenuOpen(MenuButtons.UNIVERSAL_SEARCH)"
       [queryParams]="{idPlan: currentPlan?.id}" [pTooltip]="'search' | translate" >
       <i class="fas fa-search" [ngStyle]="{ fontSize: '1.5rem' }"></i>
     </div>
@@ -42,29 +42,29 @@
 
 
 <ng-template #menuAdmin>
-  <div class="item" (click)="toggleMenu(MenuButtons.OFFICE, true)" [pTooltip]="'offices' | translate" *ngIf="isUserAdmin" [class.adm-opened]="isMenuOpen('office')">
+  <div class="item" (click)="toggleMenu(MenuButtons.OFFICE, true)" [pTooltip]="'offices' | translate" *ngIf="isUserAdmin" [class.adm-opened]="isMenuOpen(MenuButtons.OFFICE)">
     <i class="app-icon offices" [ngStyle]="{ fontSize: '1.4rem' }"></i>
   </div>
-  <div class="item" (click)="toggleMenu(MenuButtons.PLAN_MODEL, true)" [pTooltip]="'planModels' | translate" [class.adm-opened]="isMenuOpen('planModel')">
+  <div class="item" (click)="toggleMenu(MenuButtons.PLAN_MODEL, true)" [pTooltip]="'planModels' | translate" [class.adm-opened]="isMenuOpen(MenuButtons.PLAN_MODEL)">
     <i class="app-icon plan-model" [ngStyle]="{ fontSize: '1.3rem' }"></i>
   </div>
-  <div class="item" [routerLink]="['/organizations']" [queryParams]="{ idOffice: currentIDOffice }" [class.adm-opened]="isMenuAdminOpen('organizations')"
+  <div class="item" [routerLink]="['/organizations']" [queryParams]="{ idOffice: currentIDOffice }" [class.adm-opened]="isMenuAdminOpen(MenuAdminButtons.ORGANIZATIONS)"
     [pTooltip]="'organizations' | translate">
     <i class="app-icon building" [ngStyle]="{ fontSize: '1.3rem' }"></i>
   </div>
-  <div class="item" [routerLink]="['/domains']" [queryParams]="{ idOffice: currentIDOffice }" [class.adm-opened]="isMenuAdminOpen('domains')"
+  <div class="item" [routerLink]="['/domains']" [queryParams]="{ idOffice: currentIDOffice }" [class.adm-opened]="isMenuAdminOpen(MenuAdminButtons.DOMAINS)"
     [pTooltip]="'domains' | translate">
     <i class="app-icon map-marked" [ngStyle]="{ fontSize: '1.3rem' }"></i>
   </div>
-  <div class="item" [routerLink]="['/measure-units']" [queryParams]="{ idOffice: currentIDOffice }" [class.adm-opened]="isMenuAdminOpen('measure-units')"
+  <div class="item" [routerLink]="['/measure-units']" [queryParams]="{ idOffice: currentIDOffice }" [class.adm-opened]="isMenuAdminOpen(MenuAdminButtons.MEASURE_UNITS)"
     [pTooltip]="'measureUnits' | translate">
     <i class="app-icon unit-selection-alt" [ngStyle]="{ fontSize: '.7rem' }"></i>
   </div>
-  <div class="item" [routerLink]="['/offices/permission']" [queryParams]="{ idOffice: currentIDOffice }" [class.adm-opened]="isMenuAdminOpen('offices/permission')"
+  <div class="item" [routerLink]="['/offices/permission']" [queryParams]="{ idOffice: currentIDOffice }" [class.adm-opened]="isMenuAdminOpen(MenuAdminButtons.OFFICES_PERMISSION)"
     [pTooltip]="'officePermissions' | translate">
     <i class="app-icon permission" [ngStyle]="{ fontSize: '1.3rem' }"></i>
   </div>
-  <div class="item" [routerLink]="['/persons']" [queryParams]="{ idOffice: currentIDOffice }" [class.adm-opened]="isMenuAdminOpen('persons')"
+  <div class="item" [routerLink]="['/persons']" [queryParams]="{ idOffice: currentIDOffice }" [class.adm-opened]="isMenuAdminOpen(MenuAdminButtons.PERSONS)"
     [pTooltip]="'people' | translate">
     <i class="app-icon users" [ngStyle]="{ fontSize: '1.2rem' }"></i>
   </div>
