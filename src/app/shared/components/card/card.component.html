@@ -26,37 +26,7 @@
           <span class="end-date">{{language === 'pt-BR' ? (properties.headerDates?.endDate|date:'dd/MM/yyyy') :
             (properties.headerDates?.endDate|date:'yyyy/MM/dd')}}</span>
         </div>
-      </div>
-
-      <div class="d-flex col-sm-6 col-md justify-content-end">
-        <div
-          *ngIf="!properties.initialStateCollapse && properties.showFilters && !properties.hideTextFilter"
-          class="header-title-check-completed dataview-filters-text d-flex col-4 justify-content-end"
-        >
-          <input
-            pInputText
-            class="app-input-text"
-            [id]="'id-app-inputtext' + properties.cardTitle"
-            [class.animation-input]="showAnimationSearch"
-            [(ngModel)]="properties.searchTerm"
-            [placeholder]="translateSrv.instant('search')"
-          />
-          <i class="fas fa-search"
-            *ngIf="!showAnimationSearch"
-            [class.animation-input]="showAnimationSearch"
-            [class.no-animation]="!showAnimationSearch"
-            (click)="showAnimationSearch = true"
-          >
-          </i>
-
-          <i class="fas fa-search"
-            *ngIf="showAnimationSearch"
-            [class.animation-input]="showAnimationSearch"
-            [class.no-animation]="!showAnimationSearch"
-            (click)="handleSearchText()"
-          >
-          </i>
-        </div>
+      </div>      
 
         <div class="header-title-check-completed d-flex col-4 justify-content-end" [class.mr-0]="!properties.initialStateCollapse && !properties.collapseble"
           *ngIf="!properties.initialStateCollapse && properties.showFullScreen && !properties.fullScreen"
@@ -115,19 +85,36 @@
     
     <div class="dataview-filters-container" *ngIf="properties.showFilters || properties.showCreateNemElementButton"
         [style.width]="properties.hideTextFilter ? '28%' : '40%'">
-      <div class="dataview-filters-text" *ngIf="!properties.initialStateCollapse && properties.showFilters && !properties.hideTextFilter">
-        <input pInputText [id]="'id-app-inputtext' + properties.cardTitle" class="app-input-text"
-               [class.animation-input]="showAnimationSearch"
-               [(ngModel)]="properties.searchTerm"
-               [placeholder]="translateSrv.instant('search')"
-        />
-        <i class="fas fa-search"
-           *ngIf="!showAnimationSearch"
-           [class.animation-input]="showAnimationSearch"
-           [class.no-animation]="!showAnimationSearch"
-           (click)="showAnimationSearch = true"></i>
+        <div class="d-flex col-sm-6 col-md justify-content-end">
+        <div
+          *ngIf="!properties.initialStateCollapse && properties.showFilters && !properties.hideTextFilter"
+          class="header-title-check-completed dataview-filters-text d-flex col-4 justify-content-end"
+        >
+          <input
+            pInputText
+            class="app-input-text"
+            [id]="'id-app-inputtext' + properties.cardTitle"
+            [class.animation-input]="showAnimationSearch"
+            [(ngModel)]="properties.searchTerm"
+            [placeholder]="translateSrv.instant('search')"
+          />
+          <i class="fas fa-search"
+            *ngIf="!showAnimationSearch"
+            [class.animation-input]="showAnimationSearch"
+            [class.no-animation]="!showAnimationSearch"
+            (click)="showAnimationSearch = true"
+          >
+          </i>
 
-    <div class="dataview-filters-container" *ngIf="properties.showFilters || properties.showCreateNemElementButton">
+          <i class="fas fa-search"
+            *ngIf="showAnimationSearch"
+            [class.animation-input]="showAnimationSearch"
+            [class.no-animation]="!showAnimationSearch"
+            (click)="handleSearchText()"
+          >
+          </i>
+        </div>
+    </div>  
       <div class="dataview-filters" *ngIf="!properties.initialStateCollapse && properties.showFilters">
         <label>{{'show'|translate}}</label>
         <div class="options-container d-flex flex-row justify-content-between align-items-center">
