@@ -416,6 +416,7 @@
   "uiUxDesigner": "UI UX Designer",
   "difference": "Difference",
   "confirmSpreadDifference": "Confirm spread difference",
+  "universalSearch": "Universal search",
   "help": {
     "textHelpOnline": "Text help",
     "workpack": {
@@ -1073,5 +1074,7 @@
   "NO_SCHEDULE": "Delivery without schedule",
   "UNDEFINED_SCOPE": "Delivery without scope",
 
-  "baseline-disabled-submission-warning": "Impossible to submit Baseline with pending items"
+  "baseline-disabled-submission-warning": "Impossible to submit Baseline with pending items",
+  "languages": "Languages",
+  "minLengthSearch": "Type at least 3 characters"
 }

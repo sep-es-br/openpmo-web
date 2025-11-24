@@ -9,15 +9,14 @@
 
     <span class="breadcrumb d-flex flex-wrap align-items-center w-100">
       <ng-container *ngFor="let bc of item.breadcrumbs; index as i">
-        <span class="breadcrumb-item">
+        <p class="breadcrumb-item">
           <i class="fas fa-angle-right" *ngIf="i > 0"></i>
           <span
             class="breadcrumb-label"
-            [ngClass]="bc.nome.length > 70 ? 'constant-overflow' : 'conditional-overflow'"
           >
             {{ bc.nome }}
           </span>
-        </span>
+        </p>
       </ng-container>
     </span>
   </div>

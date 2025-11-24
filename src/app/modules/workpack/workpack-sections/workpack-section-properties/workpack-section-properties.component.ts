@@ -13,7 +13,7 @@ import { Component, OnInit, Output, Input, EventEmitter, OnDestroy } from '@angu
 import { MessageService, SelectItem, TreeNode } from 'primeng/api';
 import { ConfigDataViewService } from 'src/app/shared/services/config-dataview.service';
 import { WorkpackShowTabviewService } from 'src/app/shared/services/workpack-show-tabview.service';
-import { TypeWorkpackEnum } from 'src/app/shared/enums/TypeWorkpackEnum';
+import { TypeWorkpackEnum, TypeWorkpackEnumWBS } from 'src/app/shared/enums/TypeWorkpackEnum';
 import * as moment from 'moment';
 
 @Component({
@@ -107,7 +107,30 @@ export class WorkpackSectionPropertiesComponent implements OnInit, OnDestroy {
     } = await this.propertySrv.getPropertiesData();
     this.workpackParams = workpackParams;
     this.workpackData = workpackData;
+    const typeWorkPack = workpackData?.workpack?.type;
+
     this.sectionPropertiesProperties = properties;
+
+    this.sectionPropertiesProperties.forEach((prop) => {
+      prop.typeWorkPack = typeWorkPack as unknown as TypeWorkpackEnumWBS;
+
+      const isStatusOrSituation =
+      prop.name === 'Status' || prop.name === 'Situação';
+      const isProject = prop.typeWorkPack === TypeWorkpackEnumWBS.Project;
+    
+      const currentValue =
+        (prop.value as string) ||
+        (prop.defaultValue as string) ||
+        '';
+    
+      const isFinalStatus =
+        currentValue === 'A cancelar' || currentValue === 'Concluído';
+    
+      if (isStatusOrSituation && isProject && isFinalStatus) {
+        prop.disabled = true;
+      }
+    });
+
     this.sectionPropertiesProperties.forEach((property) => {
       if (property.name === 'name') {
         property.max = 50;
@@ -144,7 +167,9 @@ export class WorkpackSectionPropertiesComponent implements OnInit, OnDestroy {
       workpackCompleted: this.workpackData.workpack && this.workpackData.workpack.completed,
       workpackType: this.workpackData.workpack && this.workpackData.workpack.type,
       workpackCanceled: this.workpackData.workpack && this.workpackData.workpack.canceled,
-      showCheckCompleted: !!this.workpackData.workpack && this.workpackData.workpackModel?.type !== 'DeliverableModel',
+      showCheckCompleted:
+        !!this.workpackData.workpack &&
+        !['DeliverableModel', 'ProjectModel'].includes(this.workpackData.workpackModel?.type),
       canEditCheckCompleted: (this.workpackSrv.getEditPermission() && this.workpackData.workpack && this.workpackData.workpack.id
         && !this.workpackData.workpack.hasScheduleSectionActive
         && !this.workpackData.workpack.canceled

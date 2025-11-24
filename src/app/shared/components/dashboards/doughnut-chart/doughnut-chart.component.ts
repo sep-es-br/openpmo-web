@@ -12,22 +12,35 @@ import { Subject } from 'rxjs';
 })
 export class DoughnutChartComponent implements OnInit, OnDestroy {
   @Input() data: ChartData;
+
   @Input() middleText: string;
+
   @Input() midleTextBottom: string;
+
+  @Input() legendCustomClass: string;
+
   $destroy = new Subject();
+
   language: string;
 
   type = 'doughnut';
+
   plugins = [];
 
   options: ChartOptions;
 
-  constructor(
-    private translateSrv: TranslateService
-  ) {
-    this.plugins = [ChartDataLabels, {
-      afterDatasetDraw: (chart: Chart) => this.drawMiddleTextChart(chart, this.middleText, this.midleTextBottom)
-    }];
+  constructor(private translateSrv: TranslateService) {
+    this.plugins = [
+      ChartDataLabels,
+      {
+        afterDatasetDraw: (chart: Chart) => this.drawMiddleTextChart(
+          chart,
+          this.middleText,
+          this.midleTextBottom,
+        ),
+      },
+    ];
+
     this.translateSrv.onLangChange.pipe(takeUntil(this.$destroy)).subscribe(() =>
       setTimeout(() => {
         this.setLanguage();
@@ -55,9 +68,7 @@ export class DoughnutChartComponent implements OnInit, OnDestroy {
               return '';
             }
             const datapoints = context.chart.data.datasets[0].data as ChartPoint[];
-            function totalSum(total, datapoint) {
-              return total + datapoint;
-            }
+            const totalSum = (total: any, datapoint: any) => total + datapoint;
             const totalValue = datapoints.reduce(totalSum, 0);
             const percentageValue = (Number((value / totalValue * 100).toFixed(1)).toLocaleString(this.language));
             return `${(percentageValue)}%`;
@@ -68,7 +79,7 @@ export class DoughnutChartComponent implements OnInit, OnDestroy {
         display: false,
       },
       aspectRatio: 1
-    }
+    };
   }
 
   setLanguage() {

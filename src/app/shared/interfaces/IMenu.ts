@@ -1,7 +1,32 @@
 import { MenuItem } from 'primeng/api';
 
+export enum MenuButtons {
+  OFFICE = 'office',
+  PORTFOLIO = 'portfolio',
+  FAVORITES = 'favorites',
+  CCB = 'ccb',
+  REPORTS = 'reports',
+  UNIVERSAL_SEARCH = 'universal-search',
+  PLAN_MODEL = 'plan-model',
+  USER = 'user',
+  MORE = 'more',
+}
+
+export enum MenuAdminButtons {
+  ORGANIZATIONS = 'organizations',
+  DOMAINS = 'domains',
+  MEASURE_UNITS = 'measure-units',
+  OFFICES_PERMISSION = 'offices/permission',
+  PERSONS = 'persons',
+}
+
 export interface IMenu {
-  label: string;
+  label: MenuButtons;
+  isOpen: boolean;
+}
+
+export interface IMenuAdmin {
+  label: MenuAdminButtons;
   isOpen: boolean;
 }
 

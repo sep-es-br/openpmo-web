@@ -123,55 +123,10 @@
       &.mr-0 {
         margin-right: 0 !important;
       }
-    }
-    .header-title-check-completed.responsive {
-      flex: 1;
-      justify-content: flex-end;
-      align-self: flex-end;
-      margin-right: 5px;
-      label {
-        font-size: 0.8rem;
-      }
-    }
-    .header-values-cost-account {
-      display: flex;
-      flex-direction: row;
-      align-items: flex-start;
-      justify-content: flex-end;
-      width: 50%;
-      color: v.$fontTitle;
-      font-family: v.$fontFamilyMedium;
-      font-size: 0.9rem;
-      text-transform: uppercase;
-      padding-right: 2em;
-      .progress-bar-cost-container {
-        width: 30%;
-        margin-right: 10px;
-        margin-left: 25px;
-      }
-      &.not-collapseble {
-        padding-right: 0;
-        .progress-bar-cost-container {
-          margin-right: 0;
-        }
-      }
-    }
-    .header-values-cost-account.responsive {
-      display: flex;
-      flex-direction: column;
-      width: 100%;
-      padding-right: 0;
-    }
-    .dataview-filters-container {
-      display: flex;
-      flex-direction: row;
-      align-items: flex-end;
-      justify-content: flex-end;
-      //width: 40%;
-      .dataview-filters-text {
-        margin-right: 2em;
+
+      &.dataview-filters-text {
+        margin-right: 1em;
         width: 11rem;
-        height: 2rem;
         display: flex;
         justify-content: flex-end;
         position: relative;
@@ -220,14 +175,59 @@
           }
         }
       }
+    }
+    .header-title-check-completed.responsive {
+      flex: 1;
+      justify-content: flex-end;
+      align-self: flex-end;
+      margin-right: 5px;
+      label {
+        font-size: 0.8rem;
+      }
+    }
+    .header-values-cost-account {
+      display: flex;
+      flex-direction: row;
+      align-items: flex-start;
+      justify-content: flex-end;
+      width: 100%;
+      color: v.$fontTitle;
+      font-family: v.$fontFamilyMedium;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      padding-right: 2em;
+      .progress-bar-cost-container {
+        width: 30%;
+        margin-right: 10px;
+        margin-left: 25px;
+      }
+      &.not-collapseble {
+        padding-right: 0;
+        .progress-bar-cost-container {
+          margin-right: 0;
+        }
+      }
+    }
+    .header-values-cost-account.responsive {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      padding-right: 0;
+    }
+    .dataview-filters-container {
+      display: flex;
+      flex-direction: row;
+      align-items: flex-end;
+      justify-content: flex-end;
+      
       .dataview-filters {
-        margin-right: 1.5rem;
         display: flex;
+        justify-content: end;
         flex-direction: row;
         align-items: center;
-        flex: 1;
+
         .options-container {
-          width: 90%;
+          // width: 90%;
           margin-left: 1em;
         }
         label {
@@ -297,28 +297,28 @@
             }
           }
         }
-      }
-      .new-element-button-container {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 53px;
-        height: 38px;
-        border: 1px solid  rgba(212, 212, 212, 0.5);
-        margin-right: 1.5em;
-        .plus {
-          color: #d4d4d4;
-          font-size: 1.3rem;
+
+        .new-element-button-container {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 53px;
+          height: 38px;
+          border: 1px solid  rgba(212, 212, 212, 0.5);
+          margin-right: 4.5em;
+          .plus {
+            color: #d4d4d4;
+            font-size: 1.3rem;
+          }
+          .icon-link {
+            cursor: pointer;
+          }
         }
-        .icon-link {
+        .card-link {
           cursor: pointer;
         }
       }
-      .card-link {
-        cursor: pointer;
-      }
     }
-
   }
 
   .card-collapseble {
@@ -331,6 +331,7 @@
     flex-direction: column;
     justify-content: flex-start;
     align-items: flex-start;
+
     .header-values-cost-account {
       display: flex;
       flex-direction: column;
@@ -339,16 +340,19 @@
       font-family: v.$fontFamilyMedium;
       font-size: 1rem;
       text-transform: uppercase;
+
       .progress-bar-cost-container {
         width: 100%;
         display: flex;
         justify-content: center;
         margin-top: 1em;
+
         .progress-bar-mobile {
           width: 100%;
         }
       }
     }
+
     .dataview-filters-container {
       width: 100%;
       flex-direction: column;
