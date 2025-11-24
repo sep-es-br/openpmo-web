@@ -1729,7 +1729,7 @@ export class WorkpackComponent implements OnDestroy {
 
   showWorkpackId() {
     setTimeout(() => {
-      const show = this.idWorkpack  && !this.workpackLoading && this.workpackModel &&
+      const show = this.idWorkpack  && !this.workpackLoading && this.workpackModel && !this.isSearching &&
       (!this.showTabview || (!!this.showTabview && (!this.selectedTab || this.selectedTab.key !== 'schedule')));
       return show;
     });
