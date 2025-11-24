@@ -453,22 +453,7 @@ export class WorkpackModelComponent implements OnInit {
   }
 
   loadDefaultProperties() {
-    const possibleValuesObj = {
-      concluida: "Concluída",
-      cancelada: "Cancelada",
-      Acancelar: "A cancelar",
-      emExecucao: "Em execução",
-      aLicitar: "Planejamento\\A Licitar",
-      acoesPreparatorias: "Planejamento\\Ações preparatórias",
-      contratoAssinado: "Planejamento\\Contrato assinado",
-      convenioAssinado: "Planejamento\\Convênio assinado",
-      editalPublicado: "Planejamento\\Edital Publicado",
-      emLicitacao: "Planejamento\\Em Licitação",
-      licitacaoConcluida: "Planejamento\\Licitação concluída",
-      projetoElaborado: "Planejamento\\Projeto elaborado",
-      projetoEmElaboracao: "Planejamento\\Projeto em elaboração",
-      paralisado: "Paralisado"
-    };
+
     const defaultProperties: IWorkpackModelProperty[] = [];
     switch (this.workpackModelType) {
       case TypeWorkpackModelEnum.ProgramModel:
@@ -501,6 +486,23 @@ export class WorkpackModelComponent implements OnInit {
         });
         break;
       case TypeWorkpackModelEnum.DeliverableModel:
+        const possibleValuesObj = {
+          concluida: "Concluída",
+          cancelada: "Cancelada",
+          Acancelar: "A cancelar",
+          emExecucao: "Em execução",
+          aLicitar: "Planejamento\\A Licitar",
+          acoesPreparatorias: "Planejamento\\Ações preparatórias",
+          contratoAssinado: "Planejamento\\Contrato assinado",
+          convenioAssinado: "Planejamento\\Convênio assinado",
+          editalPublicado: "Planejamento\\Edital Publicado",
+          emLicitacao: "Planejamento\\Em Licitação",
+          licitacaoConcluida: "Planejamento\\Licitação concluída",
+          projetoElaborado: "Planejamento\\Projeto elaborado",
+          projetoEmElaboracao: "Planejamento\\Projeto em elaboração",
+          paralisada: "Paralisada"
+        };
+
         defaultProperties.push(
           {
             active: true,
@@ -563,6 +565,30 @@ export class WorkpackModelComponent implements OnInit {
             required: true,
             rows: 3,
             max: 500
+          },
+          {
+            active: true,
+            label: this.translateSrv.instant('Status do Projeto'),
+            name: this.translateSrv.instant('status'),
+            type: TypePropertyEnum.SelectionModel,
+            multipleSelection: false,
+            obligatory: true,
+            disableMultipleSelection: true,
+            possibleValuesOptions: [
+              "Concluído",
+              "Cancelado",
+              "A cancelar",
+              "Execução",
+              "Estruturação",
+              "Suspenso",
+              "Paralisado",
+              "Planejamento"
+            ],
+            defaultValue: "Execução",
+            sortIndex: 3,
+            fullLine: false,
+            required: true,
+            
           },
           {
             active: true,
@@ -843,13 +869,17 @@ export class WorkpackModelComponent implements OnInit {
     property.list = list;
     property.requiredFields = requiredFields;
     property.viewOnly = !this.editPermission;
-    property.obligatory = !!property.obligatory
-      || [...this.workpackModelType === TypeWorkpackModelEnum.DeliverableModel
+    property.obligatory = !!property.obligatory ||
+      [
+        ...(this.workpackModelType === TypeWorkpackModelEnum.DeliverableModel
           ? ['Measure Unit', 'Unidade de Medida', 'Situação', 'Status']
-          : []
+          : []),
+        ...(this.workpackModelType === TypeWorkpackModelEnum.ProjectModel
+          ? ['Situação', 'Status']
+          : []),
       ].includes(property.name);
 
-    property.disableMultipleSelection = property.name === 'Situação'
+    property.disableMultipleSelection = property.name === 'Situação' || property.name === 'Status';
   }
 
   async deleteProperty(property: IWorkpackModelProperty, group?: IWorkpackModelProperty) {

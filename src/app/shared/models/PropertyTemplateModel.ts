@@ -4,6 +4,7 @@ import { TypePropertyModelEnum } from '../enums/TypePropertyModelEnum';
 import { IProperty } from '../interfaces/IProperty';
 import { IWorkpackProperty } from '../interfaces/IWorkpackProperty';
 import { IMilestonePropertyData } from '../interfaces/IMilestonePropertyData';
+import { TypeWorkpackEnumWBS } from '../enums/TypeWorkpackEnum';
 
 export class PropertyTemplateModel implements IProperty {
   id?: number;
@@ -43,6 +44,7 @@ export class PropertyTemplateModel implements IProperty {
   collapsed?: boolean;
   dirty = false;
   helpText?: string;
+  typeWorkPack?: TypeWorkpackEnumWBS;
 
   getValues() {
     const {

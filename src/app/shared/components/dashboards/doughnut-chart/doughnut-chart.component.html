@@ -1,9 +1,14 @@
 <div class="chart-doughnut">
-  <div class="legends">
+  <div class="legends d-flex flex-row flex-wrap justify-content-between mb-2">
     <ng-container *ngFor="let label of data?.labels; let i = index">
-      <div class="legend">
-        <div class="box-color" [ngStyle]="{ backgroundColor: data.datasets[0].backgroundColor[i] }"></div>
-        <label class="label"> {{label}} </label>
+      <div class="legend-box d-flex col-6">
+        <div
+          class="legend d-flex align-items-center"
+          [ngClass]="legendCustomClass"
+        >
+          <div class="box-color" [ngStyle]="{ backgroundColor: data.datasets[0].backgroundColor[i] }"></div>
+          <label class="label">{{ label }}</label>
+        </div>
       </div>
     </ng-container>
   </div>

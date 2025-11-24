@@ -1,76 +1,76 @@
 <nav class="app-menu mobile" [class.admin-menu]="isAdminMenu">
-  <ng-container *ngIf="isAdminMenu; else menuGeneral">
-    <ng-container *ngTemplateOutlet="menuAdmin"></ng-container>
-  </ng-container>
+  <div class="menugeneral-icons-mobileview-container">
+    <div
+      *ngIf="itemsOffice?.length > 0"
+      class="item"
+      [pTooltip]="'officesAndPlans' | translate"
+      [ngStyle]="{ width: itemsFavorites?.length > 0 && !!currentIDOffice && !!currentIDPlan && isPlanMenu ? '20%' : '25%' }"
+      (click)="toggleMenu('office')"
+    >
+      <i class="app-icon offices"></i>
+      <div class="item-label">
+        {{ 'offices' | translate }}
+      </div>
+    </div>
+    <div
+      *ngIf="!!currentIDOffice && !!currentIDPlan && isPlanMenu"
+      class="item"
+      [ngStyle]="{ width: itemsFavorites?.length > 0 && !!currentIDOffice && !!currentIDPlan && isPlanMenu ? '20%' : '25%' }"
+      [pTooltip]="currentPlan?.name"
+      (click)="toggleMenu('portfolio')"
+    >
+      <i class="app-icon briefcase"></i>
+      <div class="item-label">
+        {{ currentPlan?.name }}
+      </div>
+    </div>
+    <div
+      *ngIf="itemsFavorites?.length > 0 && !!currentIDOffice && !!currentIDPlan && isPlanMenu"
+      class="item"
+      [ngStyle]="{width: '20%'}"
+      [pTooltip]="'myFavorites' | translate"
+      (click)="toggleMenu('favorites')"
+    >
+      <i class="favorite-icon far fa-star"></i>
+      <div class="item-label">
+        {{ 'myFavorites' | translate }}
+      </div>
+    </div>
+    <div
+      *ngIf="currentUserInfo?.isCcbMember"
+      class="item"
+      [routerLink]="['/ccbmember-baselines-view']"
+      [ngStyle]="{width: itemsFavorites?.length > 0 && !!currentIDOffice && !!currentIDPlan && isPlanMenu ? '20%' : '25%'}"
+      [pTooltip]="'changeControlBoard' | translate"
+      (click)="toggleMenu('ccb')"
+    >
+      <i class="app-icon ccb-view"></i>
+      <div
+        class="item-label"
+        [routerLink]="['/ccbmember-baselines-view']"
+      >
+        {{ 'changeControlBoard' | translate }}
+      </div>
+    </div>
+    <div
+      class="item"
+      [routerLink]="['/search']"
+      [ngStyle]="{width: itemsFavorites?.length > 0 && !!currentIDOffice && !!currentIDPlan && isPlanMenu ? '20%' : '25%'}"
+      [pTooltip]="'universalSearch' | translate"
+      (click)="toggleMenu('universal-search')"
+    >
+      <i class="search-icon fas fa-search"></i>
+      <div
+        class="item-label"
+        [routerLink]="['/search']"
+      >
+        {{ 'universalSearch' | translate }}
+      </div>
+    </div>
+  </div>
 </nav>
 
 <div class="menu-layout" *ngIf="(isMenuOpen() && isMobileView) || isMenuOpen('user')" (click)="closeAllMenus()"></div>
-
-<ng-template #menuGeneral>
-  <div class="menugeneral-icons-mobileview-container">
-    <div class="item-avatar"
-      [ngStyle]="{width: itemsFavorites?.length > 0 && !!currentIDOffice && !!currentIDPlan && isPlanMenu ? '20%' : '25%'}"
-      (click)="toggleMenu('user')">
-      <app-avatar [idPerson]="currentUserInfo?.id" [menu]="true"></app-avatar>
-      <div class="item-label">{{username}}</div>
-    </div>
-    <div class="item"
-      [ngStyle]="{width: itemsFavorites?.length > 0 && !!currentIDOffice && !!currentIDPlan && isPlanMenu ? '20%' : '25%'}"
-      (click)="toggleMenu('office')" *ngIf="itemsOffice?.length > 0" [pTooltip]="'officesAndPlans' | translate">
-      <i class="app-icon offices" [ngStyle]="{ fontSize: '1.6rem' }"></i>
-      <div class="item-label">{{ 'offices' | translate }}</div>
-    </div>
-    <div class="item"
-      [ngStyle]="{width: itemsFavorites?.length > 0 && !!currentIDOffice && !!currentIDPlan && isPlanMenu ? '20%' : '25%'}"
-      (click)="toggleMenu('portfolio')" [pTooltip]="currentPlan?.name"
-      *ngIf="!!currentIDOffice && !!currentIDPlan && isPlanMenu">
-      <i class="app-icon briefcase" [ngStyle]="{ fontSize: '1.6rem' }"></i>
-      <div class="item-label">{{
-        currentPlan?.name }}</div>
-    </div>
-    <div class="item" [ngStyle]="{width: '20%'}" (click)="toggleMenu('favorite')"
-      *ngIf="itemsFavorites?.length > 0 && !!currentIDOffice && !!currentIDPlan && isPlanMenu"
-      [pTooltip]="'myFavorites' | translate">
-      <i class="favorite-icon far fa-star" [ngStyle]="{ fontSize: '1.6rem' }"></i>
-      <div class="item-label">{{ 'myFavorites' | translate }}</div>
-    </div>
-    <div class="item"
-      [ngStyle]="{width: itemsFavorites?.length > 0 && !!currentIDOffice && !!currentIDPlan && isPlanMenu ? '20%' : '25%'}"
-      *ngIf="currentUserInfo?.isCcbMember" [routerLink]="['/ccbmember-baselines-view']"
-      [pTooltip]="'changeControlBoard' | translate">
-      <i class="app-icon ccb-view" [ngStyle]="{ fontSize: '1.6rem' }"></i>
-      <div class="item-label" [routerLink]="['/ccbmember-baselines-view']">{{'changeControlBoard' |
-        translate}}</div>
-    </div>
-    <div class="item" [ngStyle]="{width: '20%'}" (click)="toggleMenu('reportModel')" [pTooltip]="'reports' | translate"
-      *ngIf="!!currentIDOffice && !!currentIDPlan && isPlanMenu && hasReports">
-      <i class="far fa-file-alt" [ngStyle]="{ fontSize: '1.4rem' }"></i>
-      <div class="item-label" [routerLink]="['/reports']" [queryParams]="{idPlan: currentPlan?.id}">{{'reportModels' |
-        translate}}</div>
-    </div>
-  </div>
-</ng-template>
-
-<ng-template #menuAdmin>
-  <div class="menuadmin-icons-mobileview-container">
-    <div class="item-avatar" (click)="toggleMenu('user')">
-      <app-avatar [idPerson]="currentUserInfo?.id" [menu]="true"></app-avatar>
-      <div class="item-label">{{username}}</div>
-    </div>
-    <div class="item" (click)="toggleMenu('office')" *ngIf="isUserAdmin">
-      <i class="app-icon offices" [ngStyle]="{ fontSize: '2rem' }"></i>
-      <div class="item-label">{{ 'offices' | translate }}</div>
-    </div>
-    <div class="item" (click)="toggleMenu('planModel')">
-      <i class="app-icon plan-model" [ngStyle]="{ fontSize: '2rem' }"></i>
-      <div class="item-label">{{ 'planModels' | translate }}</div>
-    </div>
-    <div class="item" (click)="toggleMenu('more')">
-      <i class="app-icon ellipsis-v" [ngStyle]="{ fontSize: '2rem' }"></i>
-      <div class="item-label">{{ 'more' | translate }}</div>
-    </div>
-  </div>
-</ng-template>
 
 <div class="app-menu-slide" #menuSliderOffices [class.open]="isMenuOpen('office')" [class.mobile]="isMobileView"
   [class.changing]="isChangingView">
@@ -85,7 +85,7 @@
   </div>
 </div>
 
-<div class="app-menu-slide" [class.open]="isMenuOpen('favorite')" [class.mobile]="isMobileView"
+<div class="app-menu-slide" [class.open]="isMenuOpen('favorites')" [class.mobile]="isMobileView"
   [class.changing]="isChangingView">
   <div class="top-bar">
     <div class="title" (click)="closeAllMenus()">{{ (isAdminMenu ? 'favorites' : 'myFavorites') | translate }}
@@ -122,7 +122,7 @@
       <i class="app-icon arrow-left" [ngStyle]="{ fontSize: '1rem' }" (click)="closeAllMenus()"></i>
     </div>
     <div *ngIf="!currentPlan" class="title">
-      {{'newPlan'|translate}}</div>
+      {{'newPlan' | translate}}</div>
   </div>
   <span *ngIf="loadingMenuPortfolio" style="padding: 1em">{{'loadingEllipsis'|translate}}</span>
   <p-panelMenu *ngIf="!loadingMenuPortfolio" [model]="itemsPortfolio"></p-panelMenu>
@@ -131,18 +131,18 @@
   </div>
 </div>
 
-<div class="app-menu-slide" #menuSliderPlanModel [class.open]="isMenuOpen('planModel')" [class.mobile]="isMobileView"
+<div class="app-menu-slide" #menuSliderPlanModel [class.open]="isMenuOpen('plan-model')" [class.mobile]="isMobileView"
   [class.changing]="isChangingView">
   <div class="top-bar">
     <div class="title" (click)="closeAllMenus()" [routerLink]="['/strategies']"
-      [queryParams]="{idOffice: currentIDOffice}">{{'planModels'|translate}}</div>
+      [queryParams]="{idOffice: currentIDOffice}">{{ 'planModels' | translate }}</div>
     <div class="action" *ngIf="!isMobileView">
       <i class="app-icon arrow-left" [ngStyle]="{ fontSize: '1rem' }" (click)="closeAllMenus()"></i>
     </div>
   </div>
   <p-panelMenu [model]="itemsPlanModel"></p-panelMenu>
   <div class="action-mobile" *ngIf="isMobileView">
-    <i class="app-icon angle-down" [ngStyle]="{ fontSize: '1rem' }" (click)="toggleMenu('planModel')"></i>
+    <i class="app-icon angle-down" [ngStyle]="{ fontSize: '1rem' }" (click)="toggleMenu(MenuButtons.PLAN_MODEL)"></i>
   </div>
 </div>
 
