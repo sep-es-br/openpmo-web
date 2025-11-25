@@ -412,6 +412,7 @@ export class WorkpackComponent implements OnDestroy {
       await this.loadWorkpackModel(this.idWorkpackModel);
     }
     if(! this.dashboardSrv.referenceMonth) this.dashboardSrv.calculateReferenceMonth();
+    await this.propertySrv.loadProperties()
     const linked = this.idWorkpackModelLinked ? true : false;
     this.dashboardSrv.loadDashboard(linked);
     this.costAccountSrv.loadCostAccounts();
