@@ -102,12 +102,18 @@
                   (
                     !node.children ||
                     node.children.length === 0
-                  )
+                    
+                  ) 
                 ">
                   <p-inputSwitch
                     class="app-toggle"
                     [(ngModel)]="node.included"
-                    [disabled]="allTogglerIsDisabled || node.classification === 'TO_CANCEL' || node.warnings?.shouldDisplayDeliveryWarnings"
+                    [disabled]="
+                        allTogglerIsDisabled || 
+                        node.classification === 'TO_CANCEL' || 
+                        node.warnings?.shouldDisplayDeliveryWarnings ||
+                        node.classification === 'UNCHANGED'
+                        "
                     (onChange)="handleToggleSwitchChange($event.checked, node.idWorkpack)"
                   >
                   </p-inputSwitch>

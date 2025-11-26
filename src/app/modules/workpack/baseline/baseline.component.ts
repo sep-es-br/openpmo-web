@@ -475,7 +475,7 @@ export class BaselineComponent implements OnInit, OnDestroy {
       ...this.baseline.updates,
       ...this.getBottomTreeNodes(this.updatesTree)
     ]
-    .filter((update: any) => ![UpdateStatus.NO_SCHEDULE, UpdateStatus.UNDEFINED_SCOPE].includes(update.classification))
+    .filter((update: any) => ![UpdateStatus.NO_SCHEDULE, UpdateStatus.UNDEFINED_SCOPE, UpdateStatus.UNCHANGED].includes(update.classification))
     .forEach((update: any) => {
       if (update.classification === UpdateStatus.TO_CANCEL) {
         update.included = true;
