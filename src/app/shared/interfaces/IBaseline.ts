@@ -20,6 +20,7 @@ export interface IBaseline {
   scope?: IScopeBaseline;
   default?: boolean;
   projectFullName?: string;
+  tripleConstraintBreakdown?: Array<ITripleConstraintBreakdown>;
 }
 
 export interface IBaselineUpdates {
@@ -106,4 +107,48 @@ export enum UpdateStatus {
   TO_CANCEL = 'TO_CANCEL',
   NO_SCHEDULE = 'NO_SCHEDULE',
   UNDEFINED_SCOPE = 'UNDEFINED_SCOPE',
+  UNCHANGED = 'UNCHANGED',
+}
+
+export interface ITripleConstraintBreakdown {
+  idWorkpack: number;
+  idPlan: number;
+  name: string;
+  fullName: string;
+  fontIcon: string;
+  type: string;
+  modelName: string;
+  modelNameInPlural: string;
+  workpackStatus?: UpdateStatus;
+  costDetails: CostDetailItem;
+  scheduleDetails: ScheduleDetailItem;
+  scopeDetails: ScopeDetailItem;
+  children?: Array<ITripleConstraintBreakdown>;
+}
+
+export interface CostDetailItem {
+  idWorkpack: number;
+  icon: string;
+  description: string;
+  currentValue?: number;
+  proposedValue?: number;
+}
+
+export interface ScheduleDetailItem {
+  idWorkpack: number;
+  icon: string;
+  description: string;
+  currentDate?: string;
+  proposedDate?: string;
+  variation?: number;
+}
+
+export interface ScopeDetailItem {
+  idWorkpack: number;
+  icon: string;
+  description: string;
+  currentValue?: string;
+  proposedValue?: string;
+  unitName?: string;
+  variation?: number;
 }

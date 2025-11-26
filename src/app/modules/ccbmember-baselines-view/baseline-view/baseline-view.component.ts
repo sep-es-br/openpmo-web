@@ -1,41 +1,70 @@
-import {TranslateService} from '@ngx-translate/core';
-import {takeUntil} from 'rxjs/operators';
-import {BreadcrumbService} from '../../../shared/services/breadcrumb.service';
-import {ResponsiveService} from '../../../shared/services/responsive.service';
-import {BaselineService} from '../../../shared/services/baseline.service';
-import {ActivatedRoute, Router} from '@angular/router';
-import {Subject} from 'rxjs';
-import {IBaseline} from '../../../shared/interfaces/IBaseline';
-import {Component, ElementRef, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import { TranslateService } from '@ngx-translate/core';
+import { takeUntil } from 'rxjs/operators';
+import { BreadcrumbService } from '../../../shared/services/breadcrumb.service';
+import { ResponsiveService } from '../../../shared/services/responsive.service';
+import { BaselineService } from '../../../shared/services/baseline.service';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Subject } from 'rxjs';
+import {
+  IBaseline,
+  ITripleConstraintBreakdown,
+  UpdateStatus,
+} from '../../../shared/interfaces/IBaseline';
+import {
+  Component,
+  ElementRef,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import * as moment from 'moment';
+import { TypeWorkpackEnumWBS } from 'src/app/shared/enums/TypeWorkpackEnum';
 
 @Component({
   selector: 'app-baseline-view',
   templateUrl: './baseline-view.component.html',
-  styleUrls: ['./baseline-view.component.scss']
+  styleUrls: ['./baseline-view.component.scss'],
 })
 export class BaselineViewComponent implements OnInit, OnDestroy {
-
   @ViewChild('buttonNo') buttonNo: ElementRef;
 
   idBaseline: number;
+
   responsive: boolean;
+
   baseline: IBaseline;
+
   $destroy = new Subject();
+
   comment: string;
+
   language: string;
+
   showCostDetails = false;
+
   showScheduleDetails = false;
+
   showScopeDetails = false;
+
   evaluationComment: string;
+
   baselineEvaluatedByUser = false;
+
   showDialogConfirmation = false;
+
   messageDialog: string;
+
   evaluateDecision: string;
+
   selectedComment = '';
+
   showCommentDialog = false;
+
   isLoading = false;
+
   formIsSaving = false;
+
+  tripleConstraintsTree: Array<any>;
 
   constructor(
     private actRouter: ActivatedRoute,
@@ -43,28 +72,31 @@ export class BaselineViewComponent implements OnInit, OnDestroy {
     private responsiveSrv: ResponsiveService,
     private breadcrumbSrv: BreadcrumbService,
     private translateSrv: TranslateService,
-    private router: Router,
+    private router: Router
   ) {
-    this.actRouter.queryParams
-      .subscribe(({id}) => {
-        this.idBaseline = +id;
-      });
-    this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.responsive = value);
-    this.translateSrv.onLangChange.pipe(takeUntil(this.$destroy)).subscribe(async() => {
-      setTimeout(() => this.setLanguage(), 200);
-      await this.ngOnInit();
+    this.actRouter.queryParams.subscribe(({ id }) => {
+      this.idBaseline = +id;
     });
-  }
-
-  ngOnDestroy(): void {
-    this.$destroy.next();
-    this.$destroy.complete();
+    this.responsiveSrv.observable
+      .pipe(takeUntil(this.$destroy))
+      .subscribe((value) => (this.responsive = value));
+    this.translateSrv.onLangChange
+      .pipe(takeUntil(this.$destroy))
+      .subscribe(async () => {
+        setTimeout(() => this.setLanguage(), 200);
+        await this.ngOnInit();
+      });
   }
 
   async ngOnInit() {
     this.setLanguage();
     await this.loadPropertiesBaseline();
     await this.setBreadcrumb();
+  }
+
+  ngOnDestroy(): void {
+    this.$destroy.next();
+    this.$destroy.complete();
   }
 
   setLanguage() {
@@ -76,12 +108,12 @@ export class BaselineViewComponent implements OnInit, OnDestroy {
       {
         key: 'changeControlBoard',
         routerLink: ['/ccbmember-baselines-view'],
-        info: 'baselines'
+        info: 'baselines',
       },
       {
         key: 'baseline',
-        info: this.baseline.name
-      }
+        info: this.baseline.name,
+      },
     ]);
   }
 
@@ -90,32 +122,82 @@ export class BaselineViewComponent implements OnInit, OnDestroy {
     const result = await this.baselineSrv.getBaselineView(this.idBaseline);
     if (result.success) {
       this.baseline = result.data;
+      console.log('this.baseline: ', this.baseline);
       this.loadChartScheduleValues();
       this.checkEvaluation();
+      this.assembleBreakdownTree(this.baseline.tripleConstraintBreakdown);
       this.isLoading = false;
     }
   }
 
   checkEvaluation() {
-    this.baselineEvaluatedByUser = this.baseline.evaluations
-      && this.baseline.evaluations.filter(evaluation => !!evaluation.myEvaluation && !!evaluation.decision).length > 0;
+    this.baselineEvaluatedByUser =
+      this.baseline.evaluations &&
+      this.baseline.evaluations.filter(
+        (evaluation) => !!evaluation.myEvaluation && !!evaluation.decision
+      ).length > 0;
   }
 
   loadChartScheduleValues() {
     if (this.baseline && this.baseline.schedule) {
-      const startDate = (this.baseline?.schedule?.currentStartDate && this.baseline?.schedule?.proposedStartDate) ? (moment(this.baseline?.schedule?.currentStartDate, 'yyyy-MM-DD').isBefore(moment(this.baseline.schedule.proposedStartDate, 'yyyy-MM-DD')) ?
-        moment(this.baseline?.schedule?.currentStartDate, 'yyyy-MM-DD') :
-        moment(this.baseline?.schedule?.proposedStartDate, 'yyyy-MM-DD')) : (this.baseline?.schedule?.currentStartDate ? moment(this.baseline?.schedule?.currentStartDate, 'yyyy-MM-DD') : moment(this.baseline?.schedule?.proposedStartDate, 'yyyy-MM-DD'));
-      const endDate = (this.baseline.schedule.currentEndDate && this.baseline.schedule.proposedEndDate) ? (moment(this.baseline.schedule.currentEndDate, 'yyyy-MM-DD').isAfter(moment(this.baseline.schedule.proposedEndDate, 'yyyy-MM-DD')) ?
-        moment(this.baseline?.schedule?.currentEndDate, 'yyyy-MM-DD') :
-        moment(this.baseline?.schedule?.proposedEndDate, 'yyyy-MM-DD')) : (this.baseline.schedule.currentEndDate ? moment(this.baseline.schedule.currentEndDate, 'yyyy-MM-DD') : moment(this.baseline.schedule.proposedEndDate, 'yyyy-MM-DD'));
-      this.baseline.schedule.monthsInPeriod = Number((endDate.diff(startDate, 'days') / 30).toFixed(1));
-      this.baseline.schedule.difStartCurrentDateAndStartProposedDate = Number((moment(this.baseline.schedule.currentStartDate, 'yyyy-MM-DD').diff(moment(this.baseline.schedule.proposedStartDate, 'yyyy-MM-DD'), 'days') / 30).toFixed(1));
-      this.baseline.schedule.difEndCurrentDateAndEndProposedDate = Number((moment(this.baseline.schedule.currentEndDate, 'yyyy-MM-DD').diff(moment(this.baseline.schedule.proposedEndDate, 'yyyy-MM-DD'), 'days') / 30).toFixed(1));
-      this.baseline.schedule.marginHightProposedBar = this.baseline.schedule.difEndCurrentDateAndEndProposedDate > 0 ?
-        (this.baseline.schedule.monthsInPeriod > 0 ? (100 / this.baseline.schedule.monthsInPeriod) * this.baseline.schedule.difEndCurrentDateAndEndProposedDate : 0) : 0;
-      this.baseline.schedule.marginLeftCurrentBar = this.baseline.schedule.difStartCurrentDateAndStartProposedDate > 0 ?
-        (this.baseline.schedule.monthsInPeriod > 0 ? (100 / this.baseline.schedule.monthsInPeriod) * this.baseline.schedule.difStartCurrentDateAndStartProposedDate : 0) : 0;
+      const startDate =
+        this.baseline?.schedule?.currentStartDate &&
+        this.baseline?.schedule?.proposedStartDate
+          ? moment(
+              this.baseline?.schedule?.currentStartDate,
+              'yyyy-MM-DD'
+            ).isBefore(
+              moment(this.baseline.schedule.proposedStartDate, 'yyyy-MM-DD')
+            )
+            ? moment(this.baseline?.schedule?.currentStartDate, 'yyyy-MM-DD')
+            : moment(this.baseline?.schedule?.proposedStartDate, 'yyyy-MM-DD')
+          : this.baseline?.schedule?.currentStartDate
+          ? moment(this.baseline?.schedule?.currentStartDate, 'yyyy-MM-DD')
+          : moment(this.baseline?.schedule?.proposedStartDate, 'yyyy-MM-DD');
+      const endDate =
+        this.baseline.schedule.currentEndDate &&
+        this.baseline.schedule.proposedEndDate
+          ? moment(this.baseline.schedule.currentEndDate, 'yyyy-MM-DD').isAfter(
+              moment(this.baseline.schedule.proposedEndDate, 'yyyy-MM-DD')
+            )
+            ? moment(this.baseline?.schedule?.currentEndDate, 'yyyy-MM-DD')
+            : moment(this.baseline?.schedule?.proposedEndDate, 'yyyy-MM-DD')
+          : this.baseline.schedule.currentEndDate
+          ? moment(this.baseline.schedule.currentEndDate, 'yyyy-MM-DD')
+          : moment(this.baseline.schedule.proposedEndDate, 'yyyy-MM-DD');
+      this.baseline.schedule.monthsInPeriod = Number(
+        (endDate.diff(startDate, 'days') / 30).toFixed(1)
+      );
+      this.baseline.schedule.difStartCurrentDateAndStartProposedDate = Number(
+        (
+          moment(this.baseline.schedule.currentStartDate, 'yyyy-MM-DD').diff(
+            moment(this.baseline.schedule.proposedStartDate, 'yyyy-MM-DD'),
+            'days'
+          ) / 30
+        ).toFixed(1)
+      );
+      this.baseline.schedule.difEndCurrentDateAndEndProposedDate = Number(
+        (
+          moment(this.baseline.schedule.currentEndDate, 'yyyy-MM-DD').diff(
+            moment(this.baseline.schedule.proposedEndDate, 'yyyy-MM-DD'),
+            'days'
+          ) / 30
+        ).toFixed(1)
+      );
+      this.baseline.schedule.marginHightProposedBar =
+        this.baseline.schedule.difEndCurrentDateAndEndProposedDate > 0
+          ? this.baseline.schedule.monthsInPeriod > 0
+            ? (100 / this.baseline.schedule.monthsInPeriod) *
+              this.baseline.schedule.difEndCurrentDateAndEndProposedDate
+            : 0
+          : 0;
+      this.baseline.schedule.marginLeftCurrentBar =
+        this.baseline.schedule.difStartCurrentDateAndStartProposedDate > 0
+          ? this.baseline.schedule.monthsInPeriod > 0
+            ? (100 / this.baseline.schedule.monthsInPeriod) *
+              this.baseline.schedule.difStartCurrentDateAndStartProposedDate
+            : 0
+          : 0;
     }
   }
 
@@ -158,9 +240,22 @@ export class BaselineViewComponent implements OnInit, OnDestroy {
   }
 
   handleEvaluate(decision: string) {
-    this.messageDialog = decision === 'APPROVED' ?
-      (!this.baseline.cancelation ? `${this.translateSrv.instant('messages.confirmeApproveBaselineMessage')}` : `${this.translateSrv.instant('messages.confirmeApproveCancellingProjectMessage')}`)
-      : (!this.baseline.cancelation ? `${this.translateSrv.instant('messages.confirmeRejectBaselineMessage')}` : `${this.translateSrv.instant('messages.confirmeRejectCancellingProjectMessage')}`);
+    this.messageDialog =
+      decision === 'APPROVED'
+        ? !this.baseline.cancelation
+          ? `${this.translateSrv.instant(
+              'messages.confirmeApproveBaselineMessage'
+            )}`
+          : `${this.translateSrv.instant(
+              'messages.confirmeApproveCancellingProjectMessage'
+            )}`
+        : !this.baseline.cancelation
+        ? `${this.translateSrv.instant(
+            'messages.confirmeRejectBaselineMessage'
+          )}`
+        : `${this.translateSrv.instant(
+            'messages.confirmeRejectCancellingProjectMessage'
+          )}`;
     this.showDialogConfirmation = true;
     setTimeout(() => {
       this.buttonNo.nativeElement.focus();
@@ -174,7 +269,7 @@ export class BaselineViewComponent implements OnInit, OnDestroy {
     this.messageDialog = null;
     const result = await this.baselineSrv.evaluateBaseline(this.idBaseline, {
       decision: this.evaluateDecision,
-      comment: this.evaluationComment
+      comment: this.evaluationComment,
     });
     this.formIsSaving = false;
     if (result.success) {
@@ -192,4 +287,156 @@ export class BaselineViewComponent implements OnInit, OnDestroy {
     this.showCommentDialog = true;
   }
 
+  assembleBreakdownTree(workpacks: Array<ITripleConstraintBreakdown>) {
+    // A função abaixo serve para criar os objetos de Marcos Críticos e Entregas que serão inseridos na árvore
+    const buildMilestonesAndDeliveries = (
+      childs: Array<ITripleConstraintBreakdown>
+    ): {
+      milestoneTitleObject?: any;
+      deliveryTitleObject?: any;
+    } => {
+      const milestones = childs.filter(
+        (el) => el.type === TypeWorkpackEnumWBS.Milestone
+      );
+      const deliveries = childs.filter(
+        (el) => el.type === TypeWorkpackEnumWBS.Deliverable
+      );
+      const updates = [...milestones, ...deliveries];
+
+      let finalResult: {
+        milestoneTitleObject?: any;
+        deliveryTitleObject?: any;
+      } = {};
+
+      if (milestones.length > 0) {
+        const milestoneTitleObject = {
+          label: 'Marcos críticos',
+          icon: 'fas fa-flag',
+          children: [],
+          property: 'title',
+        };
+
+        milestones.forEach((milestone) => {
+          const milestoneObject = {
+            label: milestone.name,
+            icon: milestone.fontIcon,
+            children: [],
+            property: 'value',
+            idWorkpack: milestone.idWorkpack,
+            classification: milestone?.workpackStatus || '',
+          };
+
+          milestoneTitleObject.children.push(milestoneObject);
+        });
+
+        finalResult = {
+          ...finalResult,
+          milestoneTitleObject,
+        };
+      }
+
+      if (deliveries.length > 0) {
+        const deliveryTitleObject = {
+          label: 'Entregas',
+          icon: 'fas fa-boxes',
+          children: [],
+          property: 'title',
+        };
+
+        deliveries.forEach((delivery) => {
+          const deliveryObject = {
+            label: delivery.name,
+            icon: delivery.fontIcon,
+            children: [],
+            property: 'value',
+            idWorkpack: delivery.idWorkpack,
+            classification: delivery?.workpackStatus || '',
+          };
+
+          deliveryTitleObject.children.push(deliveryObject);
+        });
+
+        finalResult = {
+          ...finalResult,
+          deliveryTitleObject,
+        };
+      }
+
+      return finalResult;
+    };
+
+    const etapasTitleObject = {
+      label: 'Etapas',
+      icon: 'fas fa-tasks',
+      children: [],
+      property: 'title',
+    };
+
+    workpacks.forEach((etapa) => {
+      const etapaObject = {
+        label: etapa.name,
+        icon: etapa.fontIcon,
+        children: [],
+        property: 'value',
+      };
+
+      etapasTitleObject.children.push(etapaObject);
+
+      if (etapa.children) {
+        if (
+          etapa.children.some(
+            (el) => el.type === 'Organizer' && el.modelName === 'Subetapa'
+          )
+        ) {
+          const subetapaTitleObject = {
+            label: 'Subetapas',
+            icon: 'fas fa-tasks',
+            children: [],
+            property: 'title',
+          };
+
+          etapaObject.children.push(subetapaTitleObject);
+
+          etapa.children.forEach((subetapa) => {
+            const subetapaObject = {
+              label: subetapa.name,
+              icon: subetapa.fontIcon,
+              children: [],
+              property: 'value',
+            };
+
+            subetapaTitleObject.children.push(subetapaObject);
+
+            const milestonesAndDeliveries = buildMilestonesAndDeliveries(
+              subetapa.children
+            );
+            if (milestonesAndDeliveries.milestoneTitleObject)
+              subetapaObject.children.push(
+                milestonesAndDeliveries.milestoneTitleObject
+              );
+            if (milestonesAndDeliveries.deliveryTitleObject)
+              subetapaObject.children.push(
+                milestonesAndDeliveries.deliveryTitleObject
+              );
+            // Nesse ponto, o TitleObject dos Marcos e Entregas já estão carregados com os Marcos e as Entregas
+          });
+        } else {
+          const milestonesAndDeliveries = buildMilestonesAndDeliveries(
+            etapa.children
+          );
+          if (milestonesAndDeliveries.milestoneTitleObject)
+            etapaObject.children.push(
+              milestonesAndDeliveries.milestoneTitleObject
+            );
+          if (milestonesAndDeliveries.deliveryTitleObject)
+            etapaObject.children.push(
+              milestonesAndDeliveries.deliveryTitleObject
+            );
+          // Nesse ponto, o TitleObject dos Marcos e Entregas já estão carregados com os Marcos e as Entregas
+        }
+      }
+    });
+
+    this.tripleConstraintsTree = [etapasTitleObject];
+  }
 }
