@@ -5,12 +5,11 @@
   #cardPanel
   [toggleable]="!properties?.fullScreen && properties?.collapseble && (!properties.toggleable || properties.initialStateToggle && properties.toggleable)"
   [collapsed]="properties.initialStateCollapse || !(!properties.toggleable || (properties.toggleable && properties.initialStateToggle))"
-  [class.mobile]="responsive"
-  (collapsedChange)="handleCollapsed($event)"
->
-  <p-header class="card-header d-flex flex-column flex-md-row w-100 justify-content-center align-items-start" [class.card-header-mobile]="responsive">
-    <div class="d-flex flex-column flex-sm-row col">
-      <div class="header-title d-flex col-sm-6 col-md " (click)="properties.collapseble && handleCollapsed()"
+  expandIcon="pi pi-angle-down" collapseIcon="pi pi-angle-up" [class.mobile]="responsive"
+  (collapsedChange)="handleCollapsed($event)">
+  <p-header class="card-header" [class.card-header-mobile]="responsive">
+    <div class="d-flex flex-column flex-sm-row col-12 col-md">
+      <div class="header-title d-flex col-6" (click)="properties.collapseble && handleCollapsed()"
         [class.card-collapseble]="properties.collapseble">
         <div class="header-title-text">
           <span class="card-title" [class.card-title-mobile]="responsive" *ngIf="properties.cardTitle">{{
@@ -27,37 +26,7 @@
           <span class="end-date">{{language === 'pt-BR' ? (properties.headerDates?.endDate|date:'dd/MM/yyyy') :
             (properties.headerDates?.endDate|date:'yyyy/MM/dd')}}</span>
         </div>
-      </div>
-
-      <div class="d-flex col-sm-6 col-md justify-content-end">
-        <div
-          *ngIf="!properties.initialStateCollapse && properties.showFilters && !properties.hideTextFilter"
-          class="header-title-check-completed dataview-filters-text d-flex col-4 justify-content-end"
-        >
-          <input
-            pInputText
-            class="app-input-text"
-            [id]="'id-app-inputtext' + properties.cardTitle"
-            [class.animation-input]="showAnimationSearch"
-            [(ngModel)]="properties.searchTerm"
-            [placeholder]="translateSrv.instant('search')"
-          />
-          <i class="fas fa-search"
-            *ngIf="!showAnimationSearch"
-            [class.animation-input]="showAnimationSearch"
-            [class.no-animation]="!showAnimationSearch"
-            (click)="showAnimationSearch = true"
-          >
-          </i>
-
-          <i class="fas fa-search"
-            *ngIf="showAnimationSearch"
-            [class.animation-input]="showAnimationSearch"
-            [class.no-animation]="!showAnimationSearch"
-            (click)="handleSearchText()"
-          >
-          </i>
-        </div>
+      </div>      
 
         <div class="header-title-check-completed d-flex col-4 justify-content-end" [class.mr-0]="!properties.initialStateCollapse && !properties.collapseble"
           *ngIf="!properties.initialStateCollapse && properties.showFullScreen && !properties.fullScreen"
@@ -72,7 +41,16 @@
             (ngModelChange)="handleChangeCheckCompleted($event)"></p-checkbox>
         </div>
 
-        <div class="header-values-cost-account" *ngIf="properties.progressBarValues" [class.not-collapseble]="!properties.collapseble" [class.responsive]="responsive">
+      <div class="header-title-check-completed d-flex col-6 justify-content-end" [class.responsive]="responsive" *ngIf="!!properties.showCheckCompleted">
+        <label>{{ label | translate }}</label>
+        <p-checkbox [(ngModel)]="properties.workpackCompleted" [binary]="true"
+          [disabled]="properties.workpackCanceled || !canEditCheckCompleted"
+          (ngModelChange)="handleChangeCheckCompleted($event)">
+        </p-checkbox>
+      </div>
+
+      <div class="d-flex col-12 justify-content-center col-sm-6 justify-content-sm-end">
+        <div class="header-values-cost-account " *ngIf="properties.progressBarValues" [class.not-collapseble]="!properties.collapseble" [class.responsive]="responsive">
           <div
             *ngFor="let progressBar of properties.progressBarValues"
             class="progress-bar-cost-container"
@@ -104,8 +82,39 @@
       [class.responsive]="responsive">
       <i class="fas fa-times" (click)="handleChangeFullScreen(false)"></i>
     </div>
+    
+    <div class="dataview-filters-container" *ngIf="properties.showFilters || properties.showCreateNemElementButton"
+        [style.width]="properties.hideTextFilter ? '28%' : '40%'">
+        <div class="d-flex col-sm-6 col-md justify-content-end">
+        <div
+          *ngIf="!properties.initialStateCollapse && properties.showFilters && !properties.hideTextFilter"
+          class="header-title-check-completed dataview-filters-text d-flex col-4 justify-content-end"
+        >
+          <input
+            pInputText
+            class="app-input-text"
+            [id]="'id-app-inputtext' + properties.cardTitle"
+            [class.animation-input]="showAnimationSearch"
+            [(ngModel)]="properties.searchTerm"
+            [placeholder]="translateSrv.instant('search')"
+          />
+          <i class="fas fa-search"
+            *ngIf="!showAnimationSearch"
+            [class.animation-input]="showAnimationSearch"
+            [class.no-animation]="!showAnimationSearch"
+            (click)="showAnimationSearch = true"
+          >
+          </i>
 
-    <div class="dataview-filters-container" *ngIf="properties.showFilters || properties.showCreateNemElementButton">
+          <i class="fas fa-search"
+            *ngIf="showAnimationSearch"
+            [class.animation-input]="showAnimationSearch"
+            [class.no-animation]="!showAnimationSearch"
+            (click)="handleSearchText()"
+          >
+          </i>
+        </div>
+    </div>  
       <div class="dataview-filters" *ngIf="!properties.initialStateCollapse && properties.showFilters">
         <label>{{'show'|translate}}</label>
         <div class="options-container d-flex flex-row justify-content-between align-items-center">

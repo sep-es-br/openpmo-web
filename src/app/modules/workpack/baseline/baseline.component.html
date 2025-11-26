@@ -142,11 +142,16 @@
         </p-tree>
       </div>
 
-      <ng-container *ngIf="areTherePendentUpdatesListed">
-        <span class="warning-text">
+      <div class="d-flex flex-column">
+        <span class="warning-text" *ngIf="showFailMinMilestoneRequirement">
+            * {{ 'baseline-less-then-required-milestone' | translate : {'0': minMilestoneRequirement} }} 
+        </span>
+
+        <span class="warning-text"  *ngIf="areTherePendentUpdatesListed">
           * {{ 'baseline-disabled-submission-warning' | translate }}
         </span>
-      </ng-container>
+      </div>
+
     </app-card>
   </div>
 
