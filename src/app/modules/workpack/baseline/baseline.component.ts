@@ -78,6 +78,10 @@ export class BaselineComponent implements OnInit, OnDestroy {
 
   treeShouldStartExpanded: boolean = true;
 
+  showFailMinMilestoneRequirement: boolean;
+
+  minMilestoneRequirement: number;
+
   get allTogglerIsDisabled(): boolean {
     return this.areTherePendentUpdatesListed || this.formBaseline.disabled;
   }
@@ -90,7 +94,7 @@ export class BaselineComponent implements OnInit, OnDestroy {
       this.baseline.updates.some(
         (update) => [UpdateStatus.NO_SCHEDULE, UpdateStatus.UNDEFINED_SCOPE].includes(update.classification)
       )
-    );
+    ) || this.showFailMinMilestoneRequirement;
   }
 
   get shouldDisableBaselineSubmission(): boolean {
@@ -259,6 +263,11 @@ export class BaselineComponent implements OnInit, OnDestroy {
     const updates = await this.baselineSrv.getUpdates({'id-workpack': this.idWorkpack, idPlan: this.idPlan });
     this.baseline.updates = [];
     this.cardBaselineUpdates.isLoading = false;
+
+    const { valid, requiredAmount } = await this.baselineSrv.checkMilestonesRequirement(this.idWorkpack);
+    console.log({valid, requiredAmount})
+    this.showFailMinMilestoneRequirement = !valid;
+    this.minMilestoneRequirement = requiredAmount;
 
     this.assembleUpdatesTree(updates);
   }

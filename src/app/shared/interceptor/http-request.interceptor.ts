@@ -87,10 +87,11 @@ export class HttpRequestInterceptor implements HttpInterceptor {
               detail: error.error.map(err => `${field} ${err.field} ${this.translateSrv.instant(`messages.error.${err.error}`)}`).join('. ')
             });
           } else {
+            const msgParts = (message as string).split(';', 2);
             this.messageSrv.add({
               summary: this.translateSrv.instant('error'),
               severity: 'warn',
-              detail: this.translateSrv.instant(`messages.error.${message}`)
+              detail: this.translateSrv.instant(`messages.error.${msgParts[0]}`, msgParts[1]?.split(';'))
             });
           }
         }
