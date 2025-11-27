@@ -15,6 +15,7 @@ import { ConfigDataViewService } from 'src/app/shared/services/config-dataview.s
 import { WorkpackShowTabviewService } from 'src/app/shared/services/workpack-show-tabview.service';
 import { TypeWorkpackEnum, TypeWorkpackEnumWBS } from 'src/app/shared/enums/TypeWorkpackEnum';
 import * as moment from 'moment';
+import { TypeWorkpackModelEnum } from 'src/app/shared/enums/TypeWorkpackModelEnum';
 
 @Component({
   selector: 'app-workpack-section-properties',
