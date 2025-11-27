@@ -38,8 +38,8 @@
         </p-checkbox>
       </div>
 
-      <div class="d-flex col-12 justify-content-center col-sm-6 justify-content-sm-end">
-        <div class="header-values-cost-account " *ngIf="properties.progressBarValues" [class.not-collapseble]="!properties.collapseble" [class.responsive]="responsive">
+      <div class="d-flex col-12 justify-content-center col-sm-6 justify-content-sm-end" *ngIf="properties.progressBarValues">
+        <div class="header-values-cost-account " [class.not-collapseble]="!properties.collapseble" [class.responsive]="responsive">
           <div
             *ngFor="let progressBar of properties.progressBarValues"
             class="progress-bar-cost-container"
