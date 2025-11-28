@@ -5,11 +5,7 @@ import { ResponsiveService } from '../../../shared/services/responsive.service';
 import { BaselineService } from '../../../shared/services/baseline.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subject } from 'rxjs';
-import {
-  IBaseline,
-  ITripleConstraintBreakdown,
-  UpdateStatus,
-} from '../../../shared/interfaces/IBaseline';
+import { IBaseline, ITripleConstraintBreakdown } from '../../../shared/interfaces/IBaseline';
 import {
   Component,
   ElementRef,
@@ -40,12 +36,6 @@ export class BaselineViewComponent implements OnInit, OnDestroy {
 
   language: string;
 
-  showCostDetails = false;
-
-  showScheduleDetails = false;
-
-  showScopeDetails = false;
-
   evaluationComment: string;
 
   baselineEvaluatedByUser = false;
@@ -65,6 +55,8 @@ export class BaselineViewComponent implements OnInit, OnDestroy {
   formIsSaving = false;
 
   tripleConstraintsTree: Array<any>;
+
+  treeShouldStartExpanded: boolean = true;
 
   constructor(
     private actRouter: ActivatedRoute,
@@ -140,50 +132,39 @@ export class BaselineViewComponent implements OnInit, OnDestroy {
 
   loadChartScheduleValues() {
     if (this.baseline && this.baseline.schedule) {
+      const currentStartDate = moment(this.baseline.schedule?.currentStartDate, 'yyyy-MM-DD');
+      const currentEndDate = moment(this.baseline.schedule?.currentEndDate, 'yyyy-MM-DD');
+      const proposedStartDate = moment(this.baseline.schedule?.proposedStartDate, 'yyyy-MM-DD');
+      const proposedEndDate = moment(this.baseline.schedule?.proposedEndDate, 'yyyy-MM-DD');
+
       const startDate =
-        this.baseline?.schedule?.currentStartDate &&
-        this.baseline?.schedule?.proposedStartDate
-          ? moment(
-              this.baseline?.schedule?.currentStartDate,
-              'yyyy-MM-DD'
-            ).isBefore(
-              moment(this.baseline.schedule.proposedStartDate, 'yyyy-MM-DD')
-            )
-            ? moment(this.baseline?.schedule?.currentStartDate, 'yyyy-MM-DD')
-            : moment(this.baseline?.schedule?.proposedStartDate, 'yyyy-MM-DD')
-          : this.baseline?.schedule?.currentStartDate
-          ? moment(this.baseline?.schedule?.currentStartDate, 'yyyy-MM-DD')
-          : moment(this.baseline?.schedule?.proposedStartDate, 'yyyy-MM-DD');
+        this.baseline.schedule?.currentStartDate &&
+        this.baseline.schedule?.proposedStartDate
+          ? currentStartDate.isBefore(proposedStartDate)
+            ? currentStartDate
+            : proposedStartDate
+          : this.baseline.schedule?.currentStartDate
+          ? currentStartDate
+          : proposedStartDate;
+
       const endDate =
-        this.baseline.schedule.currentEndDate &&
-        this.baseline.schedule.proposedEndDate
-          ? moment(this.baseline.schedule.currentEndDate, 'yyyy-MM-DD').isAfter(
-              moment(this.baseline.schedule.proposedEndDate, 'yyyy-MM-DD')
-            )
-            ? moment(this.baseline?.schedule?.currentEndDate, 'yyyy-MM-DD')
-            : moment(this.baseline?.schedule?.proposedEndDate, 'yyyy-MM-DD')
-          : this.baseline.schedule.currentEndDate
-          ? moment(this.baseline.schedule.currentEndDate, 'yyyy-MM-DD')
-          : moment(this.baseline.schedule.proposedEndDate, 'yyyy-MM-DD');
-      this.baseline.schedule.monthsInPeriod = Number(
-        (endDate.diff(startDate, 'days') / 30).toFixed(1)
-      );
+        this.baseline.schedule?.currentEndDate &&
+        this.baseline.schedule?.proposedEndDate
+          ? currentEndDate.isAfter(proposedEndDate)
+            ? currentEndDate
+            : proposedEndDate
+          : this.baseline.schedule?.currentEndDate
+          ? currentEndDate
+          : proposedEndDate;
+
+      this.baseline.schedule.monthsInPeriod = Number((endDate.diff(startDate, 'days') / 30).toFixed(1));
       this.baseline.schedule.difStartCurrentDateAndStartProposedDate = Number(
-        (
-          moment(this.baseline.schedule.currentStartDate, 'yyyy-MM-DD').diff(
-            moment(this.baseline.schedule.proposedStartDate, 'yyyy-MM-DD'),
-            'days'
-          ) / 30
-        ).toFixed(1)
+        (currentStartDate.diff(proposedStartDate, 'days') / 30).toFixed(1)
       );
       this.baseline.schedule.difEndCurrentDateAndEndProposedDate = Number(
-        (
-          moment(this.baseline.schedule.currentEndDate, 'yyyy-MM-DD').diff(
-            moment(this.baseline.schedule.proposedEndDate, 'yyyy-MM-DD'),
-            'days'
-          ) / 30
-        ).toFixed(1)
+        (currentEndDate.diff(proposedEndDate, 'days') / 30).toFixed(1)
       );
+
       this.baseline.schedule.marginHightProposedBar =
         this.baseline.schedule.difEndCurrentDateAndEndProposedDate > 0
           ? this.baseline.schedule.monthsInPeriod > 0
@@ -198,44 +179,6 @@ export class BaselineViewComponent implements OnInit, OnDestroy {
               this.baseline.schedule.difStartCurrentDateAndStartProposedDate
             : 0
           : 0;
-    }
-  }
-
-  handleShowCardDetails(card: string) {
-    switch (card) {
-      case 'cost':
-        this.showCostDetails = true;
-        this.showScheduleDetails = false;
-        this.showScopeDetails = false;
-        break;
-      case 'schedule':
-        this.showCostDetails = false;
-        this.showScheduleDetails = true;
-        this.showScopeDetails = false;
-        break;
-      case 'scope':
-        this.showCostDetails = false;
-        this.showScheduleDetails = false;
-        this.showScopeDetails = true;
-        break;
-      default:
-        break;
-    }
-  }
-
-  handleCloseCardDetails(card: string) {
-    switch (card) {
-      case 'cost':
-        this.showCostDetails = false;
-        break;
-      case 'schedule':
-        this.showScheduleDetails = false;
-        break;
-      case 'scope':
-        this.showScopeDetails = false;
-        break;
-      default:
-        break;
     }
   }
 
@@ -301,7 +244,6 @@ export class BaselineViewComponent implements OnInit, OnDestroy {
       const deliveries = childs.filter(
         (el) => el.type === TypeWorkpackEnumWBS.Deliverable
       );
-      const updates = [...milestones, ...deliveries];
 
       let finalResult: {
         milestoneTitleObject?: any;
@@ -314,6 +256,7 @@ export class BaselineViewComponent implements OnInit, OnDestroy {
           icon: 'fas fa-flag',
           children: [],
           property: 'title',
+          expanded: this.treeShouldStartExpanded,
         };
 
         milestones.forEach((milestone) => {
@@ -324,6 +267,10 @@ export class BaselineViewComponent implements OnInit, OnDestroy {
             property: 'value',
             idWorkpack: milestone.idWorkpack,
             classification: milestone?.workpackStatus || '',
+            costDetails: milestone?.costDetails,
+            scheduleDetails: milestone?.scheduleDetails,
+            scopeDetails: milestone?.scopeDetails,
+            workpackStatus: milestone?.workpackStatus,
           };
 
           milestoneTitleObject.children.push(milestoneObject);
@@ -341,6 +288,7 @@ export class BaselineViewComponent implements OnInit, OnDestroy {
           icon: 'fas fa-boxes',
           children: [],
           property: 'title',
+          expanded: this.treeShouldStartExpanded,
         };
 
         deliveries.forEach((delivery) => {
@@ -351,6 +299,10 @@ export class BaselineViewComponent implements OnInit, OnDestroy {
             property: 'value',
             idWorkpack: delivery.idWorkpack,
             classification: delivery?.workpackStatus || '',
+            costDetails: delivery?.costDetails,
+            scheduleDetails: delivery?.scheduleDetails,
+            scopeDetails: delivery?.scopeDetails,
+            workpackStatus: delivery?.workpackStatus,
           };
 
           deliveryTitleObject.children.push(deliveryObject);
@@ -370,6 +322,7 @@ export class BaselineViewComponent implements OnInit, OnDestroy {
       icon: 'fas fa-tasks',
       children: [],
       property: 'title',
+      expanded: this.treeShouldStartExpanded,
     };
 
     workpacks.forEach((etapa) => {
@@ -377,7 +330,8 @@ export class BaselineViewComponent implements OnInit, OnDestroy {
         label: etapa.name,
         icon: etapa.fontIcon,
         children: [],
-        property: 'value',
+        property: 'subtitle',
+        expanded: this.treeShouldStartExpanded,
       };
 
       etapasTitleObject.children.push(etapaObject);
@@ -393,6 +347,7 @@ export class BaselineViewComponent implements OnInit, OnDestroy {
             icon: 'fas fa-tasks',
             children: [],
             property: 'title',
+            expanded: this.treeShouldStartExpanded,
           };
 
           etapaObject.children.push(subetapaTitleObject);
@@ -402,7 +357,8 @@ export class BaselineViewComponent implements OnInit, OnDestroy {
               label: subetapa.name,
               icon: subetapa.fontIcon,
               children: [],
-              property: 'value',
+              property: 'subtitle',
+              expanded: this.treeShouldStartExpanded,
             };
 
             subetapaTitleObject.children.push(subetapaObject);
@@ -438,5 +394,6 @@ export class BaselineViewComponent implements OnInit, OnDestroy {
     });
 
     this.tripleConstraintsTree = [etapasTitleObject];
+    console.log('this.tripleConstraintsTree: ', this.tripleConstraintsTree);
   }
 }

@@ -94,9 +94,7 @@
                 class="subtitle-label-proposed">{{!baseline.cancelation ? ('proposed'|translate) : ('forecast'|translate)}}</label>
             </div>
             <div class="charts">
-              <div class="card card-cost"
-                   *ngIf="baseline && baseline.cost && (baseline.cost.currentValue > 0 || baseline.cost.proposedValue > 0)"
-                   (click)="handleShowCardDetails('cost')">
+              <div class="card card-cost" *ngIf="baseline && baseline.cost && (baseline.cost.currentValue > 0 || baseline.cost.proposedValue > 0)">
                 <div class="header-card">
                   <div class="title-card">
                     <i class="fas fa-dollar-sign"></i>
@@ -125,9 +123,7 @@
                   </div>
                 </div>
               </div>
-              <div class="card card-schedule"
-                   *ngIf="baseline && baseline.schedule && (baseline.schedule.currentValue > 0 || baseline.schedule.proposedValue > 0)"
-                   (click)="handleShowCardDetails('schedule')">
+              <div class="card card-schedule" *ngIf="baseline && baseline.schedule && (baseline.schedule.currentValue > 0 || baseline.schedule.proposedValue > 0)">
                 <div class="header-card">
                   <div class="title-card">
                     <i class="far fa-clock"></i>
@@ -172,9 +168,7 @@
                   </div>
                 </div>
               </div>
-              <div class="card card-scope"
-                   *ngIf="baseline && baseline.scope && (baseline.scope.currentScopePercent > 0 || baseline.scope.proposedScopePercent > 0)"
-                   (click)="handleShowCardDetails('scope')">
+              <div class="card card-scope" *ngIf="baseline && baseline.scope && (baseline.scope.currentScopePercent > 0 || baseline.scope.proposedScopePercent > 0)">
                 <div class="header-card">
                   <div class="title-card">
                     <i class="fas fa-boxes"></i>
@@ -207,228 +201,92 @@
               </div>
             </div>
           </div>
-          <div class="details-panels"
-               *ngIf="!!showCostDetails && baseline?.cost?.costDetails && baseline?.cost?.costDetails.length > 0">
-            <div class="details-panel-header">
-              <span>{{'costDetails' |translate}}</span>
-              <i class="fas fa-times" (click)="handleCloseCardDetails('cost')"></i>
-            </div>
-            <div class="details-panel-content">
-              <div class="detail-itens-container">
-                <p-card class="card-list-item header">
-                  <div class="card-item-content">
-                    <div class="item-description">
-                      <div class="item-description-container"
-                           [class.item-description-container-responsive]="responsive">
-                        <span class="item-description header" [class.item-description-responsive]="responsive">
-                          {{'items'|translate}}
-                        </span>
-                      </div>
-                    </div>
-                    <div class="item-values header" [class.item-values-responsive]="responsive" *ngIf="!responsive">
-                      <span>{{(!baseline.cancelation ? ('current'|translate) : ('planned'|translate))}}</span>
-                      <span>{{(!baseline.cancelation ? ('proposed'|translate) : ('forecast'|translate))}}</span>
-                      <span class="transparent-header">{{'variation'|translate}}</span>
-                    </div>
+          
+          <div class="updates-container" *ngIf="!isLoading">
+            <p-tree [value]="tripleConstraintsTree">
+              <ng-template let-node pTemplate="default">
+                <div
+                  class="container-workpackmodel"
+                  [ngClass]="{ 'grey-background': node.property === 'title' }"
+                >
+                  <div class="line-left-side">
+                    <span [ngClass]="{ 'item-title': node.property === 'title', 'item-description-responsive': responsive }">
+                      {{ node.label }}
+                    </span>
                   </div>
-                </p-card>
-                <p-card *ngFor="let item of baseline?.cost?.costDetails" class="card-list-item">
-                  <div class="card-item-content">
-                    <div class="item-description">
-                      <div class="item-description-container"
-                           [class.item-description-container-responsive]="responsive">
-                        <i
-                          [ngClass]=" item.description === 'structure' ? [ 'app-icon', item.icon, 'grey-icon'] : [ item.icon, 'grey-icon']"
-                          [ngStyle]="{ fontSize: '1.5rem'}"></i>
-                        <span class="item-description" [class.item-description-responsive]="responsive">
-                          {{item.description}}
-                        </span>
-                      </div>
+
+                  <ng-container *ngIf="node.property === 'value'">
+                    <div class="line-right-side">
+                      <ng-container *ngIf="node.workpackStatus === 'UNCHANGED' else standardInfo">
+                        <i class="warning-icon fa fa-exclamation-triangle" aria-hidden="true"></i>
+                        Não alterado
+                      </ng-container>
+                      <ng-template #standardInfo>
+                        <div class="detail-box d-flex flex-column">
+                          <div class="d-flex flex-row col-12">
+                            <span class="col-3 item-subtitle">Atual</span>
+                            <div class="d-flex flex-row col-3">
+                              <span
+                                class="item-value"
+                                [ngClass]="node.costDetails && node.costDetails.currentValue && node.costDetails.variation ? 'col-8' : 'col-12'"
+                              >
+                                <!-- [ngStyle]="{ 'text-align': node.costDetails && node.costDetails.currentValue && node.costDetails.variation ? 'end' : 'center' }" -->
+                                {{ (node.costDetails?.currentValue | shortNumber : language : 2) || '0,00' }}
+                              </span>
+                              <ng-container *ngIf="node.costDetails && node.costDetails.currentValue && node.costDetails.variation">
+                                <span
+                                  class="d-flex flex-row align-items-center col-4 item-variation"
+                                  [ngStyle]="{ 'color': node.costDetails.variation > 0 ? '#CF0E0E' : '#0ECF0E' }"
+                                >
+                                  <i
+                                    class="fas me-1"
+                                    [ngClass]="{ 'fa-arrow-up': node.costDetails.variation > 0, 'fa-arrow-down': node.costDetails.variation < 0 }"
+                                  >
+                                  </i>
+                                  <span>{{ node.costDetails.variation < 0 ? node.costDetails.variation * (-1) : node.costDetails.variation }}%</span>
+                                </span>
+                              </ng-container>
+                            </div>
+                            <span class="col-3 item-value">{{ (node.scheduleDetails?.currentDate | date : (language === 'pt' ? 'dd-MM-yyyy' : 'yyyy-MM-dd')) || '--' }}</span>
+                            <div class="d-flex flex-row col-3">
+                              <span
+                                class="item-value"
+                                [ngClass]="node.scopeDetails && node.scopeDetails.currentValue && node.scopeDetails.variation ? 'col-8' : 'col-12'"
+                                >
+                                <!-- [ngStyle]="{ 'text-align': node.costDetails && node.costDetails.currentValue && node.costDetails.variation ? 'end' : 'center' }" -->
+                                {{ (node.scopeDetails?.currentValue | shortNumber: language : 2) || '--' }}
+                              </span>
+                              <ng-container *ngIf="node.scopeDetails && node.scopeDetails.currentValue && node.scopeDetails.variation">
+                                <span
+                                  class="d-flex flex-row align-items-center col-4 item-variation"
+                                  [ngStyle]="{ 'color': node.scopeDetails.variation > 0 ? '#0ECF0E' : '#CF0E0E' }"
+                                >
+                                  <i
+                                    class="fas me-1"
+                                    [ngClass]="{ 'fa-arrow-up': node.scopeDetails.variation > 0, 'fa-arrow-down': node.scopeDetails.variation < 0 }"
+                                  >
+                                  </i>
+                                  <span>{{ node.scopeDetails.variation < 0 ? node.scopeDetails.variation * (-1) : node.scopeDetails.variation }}%</span>
+                                </span>
+                              </ng-container>
+                            </div>
+                          </div>
+                          <div class="d-flex flex-row col-12">
+                            <span class="col-3 item-subtitle">Proposta</span>
+                            <span class="col-3 item-value">{{ (node.costDetails?.proposedValue | shortNumber : language : 2) || '0,00' }}</span>
+                            <span class="col-3 item-value">{{ (node.scheduleDetails?.proposedDate | date : (language === 'pt' ? 'dd-MM-yyyy' : 'yyyy-MM-dd')) || '--' }}</span>
+                            <span class="col-3 item-value">{{ (node.scopeDetails?.proposedValue | shortNumber : language : 2) || '--' }}</span>
+                          </div>
+                        </div>
+                      </ng-template>
+                      <!-- <span [ngClass]="node.warnings?.shouldDisplayDeliveryWarnings ? 'alert-text' : ''">
+                        {{ node.classification | translate }}
+                      </span> -->
                     </div>
-                    <div class="item-values" *ngIf="!responsive">
-                      <span>{{item.currentValue ? (item.currentValue|shortNumber:language) : ''}}</span>
-                      <span>{{(item.proposedValue && (!item.currentValue || (item.variation && item.variation !== 0))) ? (item.proposedValue|shortNumber:language) : ''}}</span>
-                      <div class="variation-container" [class.positive-variation]="item.variation > 0"
-                           [class.negative-variation]="item.variation < 0">
-                        <i *ngIf="item.variation > 0 || item.variation < 0" class="fas"
-                           [class.fa-arrow-up]="item.variation < 0"
-                           [class.fa-arrow-down]="item.variation >= 0"></i>
-                        <span>{{item.variation ? (item.variation < 0 ? item.variation * (-1) + '%' : item.variation
-                          + '%') : '' }}</span>
-                      </div>
-                    </div>
-                    <div class="item-values" *ngIf="!!responsive">
-                      <div class="item-value">
-                        <span class="header">{{'current'|translate}}</span>
-                        <span>{{item.currentValue ? (item.currentValue|shortNumber:language) : ''}}</span>
-                      </div>
-                      <div class="item-value">
-                        <span class="header">{{'proposed'|translate}}</span>
-                        <span>{{(item.proposedValue && (!item.currentValue || (item.currentValue !== item.proposedValue))) ? (item.proposedValue|shortNumber:language) : ''}}</span>
-                      </div>
-                      <div class="variation-container" [class.positive-variation]="item.variation > 0"
-                           [class.negative-variation]="item.variation < 0">
-                        <i *ngIf="item.variation > 0 || item.variation < 0" class="fas"
-                           [class.fa-arrow-up]="item.variation < 0"
-                           [class.fa-arrow-down]="item.variation > 0"></i>
-                        <span>{{item.variation ? (item.variation < 0 ? item.variation * (-1) + '%' : item.variation
-                          + '%') : '' }}</span>
-                      </div>
-                    </div>
-                  </div>
-                </p-card>
-              </div>
-            </div>
-          </div>
-          <div class="details-panels"
-               *ngIf="!!showScheduleDetails && baseline?.schedule?.scheduleDetails && baseline?.schedule?.scheduleDetails.length > 0">
-            <div class="details-panel-header">
-              <span>{{'scheduleDetails' |translate}}</span>
-              <i class="fas fa-times" (click)="handleCloseCardDetails('schedule')"></i>
-            </div>
-            <div class="details-panel-content">
-              <div class="detail-itens-container">
-                <p-card class="card-list-item header">
-                  <div class="card-item-content">
-                    <div class="item-description">
-                      <div class="item-description-container"
-                           [class.item-description-container-responsive]="responsive">
-                        <span class="item-description header" [class.item-description-responsive]="responsive">
-                          {{'items'|translate}}
-                        </span>
-                      </div>
-                    </div>
-                    <div class="item-values header" [class.item-values-responsive]="responsive" *ngIf="!responsive">
-                      <span>{{(!baseline.cancelation ? ('current'|translate) : ('planned'|translate))}}</span>
-                      <span>{{(!baseline.cancelation ? ('proposed'|translate) : ('forecast'|translate))}}</span>
-                      <span class="transparent-header">{{'variation'|translate}}</span>
-                    </div>
-                  </div>
-                </p-card>
-                <p-card *ngFor="let item of baseline?.schedule?.scheduleDetails" class="card-list-item">
-                  <div class="card-item-content">
-                    <div class="item-description">
-                      <div class="item-description-container"
-                           [class.item-description-container-responsive]="responsive">
-                        <i
-                          [ngClass]=" item.description === 'structure' ? [ 'app-icon', item.icon, 'grey-icon'] : [ item.icon, 'grey-icon']"
-                          [ngStyle]="{ fontSize: '1.5rem'}"></i>
-                        <span class="item-description" [class.item-description-responsive]="responsive">
-                          {{item.description}}
-                        </span>
-                      </div>
-                    </div>
-                    <div class="item-values" *ngIf="!responsive">
-                      <span>{{language === 'pt' ? (item?.currentDate|date:'dd/MM/yyyy') :
-                        (item?.currentDate|date:'yyyy/MM/dd')}}</span>
-                      <span>{{language === 'pt' ? (!item?.currentDate || (item?.currentDate && item?.currentDate !== item?.proposedDate) ? (item?.proposedDate|date:'dd/MM/yyyy') : '') :
-                        (!item?.currentDate || (item?.currentDate && item?.currentDate !== item?.proposedDate) ? (item?.proposedDate|date:'yyyy/MM/dd') : '')}}</span>
-                      <div class="variation-container" [class.positive-variation]="item.variation < 0"
-                           [class.negative-variation]="item.variation > 0">
-                        <i class="fas" *ngIf="item.variation" [class.fa-arrow-left]="item.variation < 0"
-                           [class.fa-arrow-right]="item.variation >= 0"></i>
-                        <span>{{item.variation ? (item.variation < 0 ? item.variation * (-1) + '%' : item.variation
-                          + '%') : '' }}</span>
-                      </div>
-                    </div>
-                    <div class="item-values" *ngIf="!!responsive">
-                      <div class="item-value">
-                        <span class="header">{{'current'|translate}}</span>
-                        <span>{{language === 'pt' ? (item?.currentDate|date:'dd/MM/yyyy') :
-                          (item?.currentDate|date:'yyyy/MM/dd')}}</span>
-                      </div>
-                      <div class="item-value">
-                        <span class="header">{{'proposed'|translate}}</span>
-                        <span>{{language === 'pt' ? (!item?.currentDate || (item?.currentDate && item?.currentDate !== item?.proposedDate) ? (item?.proposedDate|date:'dd/MM/yyyy') : '') :
-                          (!item?.currentDate || (item?.currentDate && item?.currentDate !== item?.proposedDate) ? (item?.proposedDate|date:'yyyy/MM/dd') : '')}}</span>
-                      </div>
-                      <div class="variation-container" [class.positive-variation]="item.variation > 0"
-                           [class.negative-variation]="item.variation < 0">
-                        <i class="fas" [class.fa-arrow-left]="item.variation < 0"
-                           [class.fa-arrow-right]="item.variation >= 0"></i>
-                        <span>{{item.variation ? (item.variation < 0 ? item.variation * (-1) + '%' : item.variation
-                          + '%') : '' }}</span>
-                      </div>
-                    </div>
-                  </div>
-                </p-card>
-              </div>
-            </div>
-          </div>
-          <div class="details-panels"
-               *ngIf="!!showScopeDetails && baseline?.scope?.scopeDetails && baseline?.scope?.scopeDetails.length > 0">
-            <div class="details-panel-header">
-              <span>{{'scopeDetails' |translate}}</span>
-              <i class="fas fa-times" (click)="handleCloseCardDetails('scope')"></i>
-            </div>
-            <div class="details-panel-content">
-              <div class="detail-itens-container">
-                <p-card class="card-list-item header">
-                  <div class="card-item-content">
-                    <div class="item-description">
-                      <div class="item-description-container"
-                           [class.item-description-container-responsive]="responsive">
-                        <span class="item-description header" [class.item-description-responsive]="responsive">
-                          {{'items'|translate}}
-                        </span>
-                      </div>
-                    </div>
-                    <div class="item-values header" [class.item-values-responsive]="responsive" *ngIf="!responsive">
-                      <span>{{(!baseline.cancelation ? ('current'|translate) : ('planned'|translate))}}</span>
-                      <span>{{(!baseline.cancelation ? ('proposed'|translate) : ('forecast'|translate))}}</span>
-                      <span class="transparent-header">{{'variation'|translate}}</span>
-                    </div>
-                  </div>
-                </p-card>
-                <p-card *ngFor="let item of baseline?.scope?.scopeDetails" class="card-list-item">
-                  <div class="card-item-content">
-                    <div class="item-description">
-                      <div class="item-description-container"
-                           [class.item-description-container-responsive]="responsive">
-                        <i
-                          [ngClass]=" item.description === 'structure' ? [ 'app-icon', item.icon, 'grey-icon'] : [ item.icon, 'grey-icon']"
-                          [ngStyle]="{ fontSize: '1.5rem'}"></i>
-                        <span class="item-description" [class.item-description-responsive]="responsive">
-                          {{item.description}}
-                        </span>
-                      </div>
-                    </div>
-                    <div class="item-values" *ngIf="!responsive">
-                      <span>{{item.currentValue ? (item.currentValue|shortNumber:language) + ' ' + item.unitName : ''}}</span>
-                      <span>{{(!item.currentValue || (item.currentValue && item.proposedValue && (item?.variation && item.variation !== 0))) ? (item.proposedValue|shortNumber:language) + ' ' + item.unitName : ''}}</span>
-                      <div class="variation-container" [class.positive-variation]="item.variation > 0"
-                           [class.negative-variation]="item.variation < 0">
-                        <i *ngIf="item.variation > 0 || item.variation < 0" class="fas"
-                           [class.fa-arrow-up]="item.variation > 0"
-                           [class.fa-arrow-down]="item.variation <= 0"></i>
-                        <span>{{item.variation ? (item.variation < 0 ? item.variation * (-1) + '%' : item.variation
-                          + '%') : '' }}</span>
-                      </div>
-                    </div>
-                    <div class="item-values" *ngIf="!!responsive">
-                      <div class="item-value">
-                        <span
-                          class="header">{{ !baseline.cancelation ? ('current'|translate) : ('planned'|translate)}}</span>
-                        <span>{{item.currentValue ? (item.currentValue|shortNumber:language) + ' ' + item.unitName : ''}}</span>
-                      </div>
-                      <div class="item-value">
-                        <span
-                          class="header">{{ !baseline.cancelation ? ('proposed'|translate) : ('forecast'|translate)}}</span>
-                        <span>{{(item.proposedValue && (!item?.currentValue || item.proposedValue !== item?.currentValue)) ? (item.proposedValue|shortNumber:language) + ' ' + item.unitName : ''}}</span>
-                      </div>
-                      <div class="variation-container" [class.positive-variation]="item.variation > 0"
-                           [class.negative-variation]="item.variation < 0">
-                        <i *ngIf="item.variation > 0 || item.variation < 0" class="fas"
-                           [class.fa-arrow-up]="item.variation < 0"
-                           [class.fa-arrow-down]="item.variation >= 0"></i>
-                        <span>{{item.variation ? (item.variation < 0 ? item.variation * (-1) + '%' : item.variation
-                          + '%') : '' }}</span>
-                      </div>
-                    </div>
-                  </div>
-                </p-card>
-              </div>
-            </div>
+                  </ng-container>
+                </div>
+              </ng-template>
+            </p-tree>
           </div>
         </div>
         <div class="evaluations-section" *ngIf="!responsive && !isLoading" >
@@ -475,7 +333,6 @@
                   <i *ngIf="item.decision && item.decision === 'REJECTED'" class="fas fa-times"
                      [ngStyle]="{ fontSize: '1.5rem', color: '#EA5C5C', padding: '0 3px'}"></i>
                 </div>
-
               </div>
             </p-card>
           </div>
@@ -483,48 +340,61 @@
       </div>
     </p-panel>
   </div>
-  <p-dialog [visible]="!!showDialogConfirmation" [style]="!responsive ? {width: '50vw'} : {width: '90vw'}"
-            (onHide)="showDialogConfirmation=false">
+
+  <p-dialog
+    [visible]="!!showDialogConfirmation"
+    [style]="!responsive ? { width: '50vw' } : { width: '90vw' }"
+    (onHide)="showDialogConfirmation = false"
+  >
     <ng-template pTemplate="header">
       <div class="title" [class.title-responsive]="responsive">
         <i class="fas fa-exclamation-triangle"></i>
-        <span>{{'messages.atentionEvaluateBaselineMessage'|translate}}</span>
+        <span>{{ 'messages.atentionEvaluateBaselineMessage' | translate}}</span>
       </div>
     </ng-template>
     <div class="content-dialog-confirmation">
       <div class="message">
-        {{messageDialog}}
+        {{ messageDialog }}
       </div>
       <div class="message-item" *ngIf="!baseline?.cancelation">
-        <label>{{'baseline'|translate}}:</label>
-        <span class="baseline-description">{{baseline?.description}}</span>
+        <label>{{ 'baseline' | translate }}:</label>
+        <span class="baseline-description">{{ baseline?.description }}</span>
       </div>
       <div class="message-item">
-        <label>{{'project'|translate}}:</label>
-        <span class="project-name">{{baseline?.projectName}}</span>
+        <label>{{ 'project' | translate }}:</label>
+        <span class="project-name">{{ baseline?.projectName }}</span>
       </div>
       <div class="message-item">
-        <label>{{'proposer'|translate}}:</label>
-        <span class="project-name">{{baseline?.proposer}}</span>
+        <label>{{ 'proposer' | translate }}:</label>
+        <span class="project-name">{{ baseline?.proposer }}</span>
       </div>
     </div>
     <p-footer>
       <div class="buttons-container" [class.buttons-container-responsive]="responsive">
-        <button #buttonNo pButton class="no" [label]="'no'|translate" (click)="handleCancelEvaluate()"></button>
-        <button pButton class="yes" [label]="'yes'|translate" (click)="submitEvaluate()"></button>
+        <button #buttonNo pButton class="no" [label]="'no' | translate" (click)="handleCancelEvaluate()"></button>
+        <button pButton class="yes" [label]="'yes' | translate" (click)="submitEvaluate()"></button>
       </div>
     </p-footer>
   </p-dialog>
-  <p-dialog [header]="'comment'|translate" [visible]="!!showCommentDialog"
-            [style]="!responsive ? {width: '30vw'} : {width: '90vw'}"
-            (onHide)="showCommentDialog=false">
+  <p-dialog
+    [header]="'comment' | translate"
+    [visible]="!!showCommentDialog"
+    [style]="!responsive ? { width: '30vw' } : { width: '90vw' }"
+    (onHide)="showCommentDialog = false"
+  >
     <div class="comment-container">
-      <textarea pInputTextarea class="app-text-area comment" rows="3"
-                [disabled]="true">{{selectedComment}}</textarea>
+      <textarea
+        pInputTextarea
+        class="app-text-area comment"
+        rows="3"
+        [disabled]="true"
+      >
+        {{ selectedComment }}
+      </textarea>
     </div>
   </p-dialog>
   <div class="loading-container" *ngIf="isLoading">
-    <app-card-loading [isCardLoading]="isLoading" ></app-card-loading>
+    <app-card-loading [isCardLoading]="isLoading"></app-card-loading>
   </div>
   <div class="loading-form-container" *ngIf="formIsSaving">
     <app-card-loading [isCardLoading]="formIsSaving"></app-card-loading>
