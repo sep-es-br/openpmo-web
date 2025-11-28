@@ -80,6 +80,7 @@ export class WorkpackModelComponent implements OnInit {
   cardPropertiesSchedule: ICard;
   cardPropertiesRiskAndIssues: ICard;
   cardPropertiesProcesses: ICard;
+  cardPropertiesNotifications: ICard;
   cardPropertiesDashboard: ICard;
   rolesPersonOptions = ['manager', 'teamMember', 'sponsor', 'partner'];
   rolesOrgOptions = ['funder', 'client', 'competitor'];
@@ -127,6 +128,22 @@ export class WorkpackModelComponent implements OnInit {
   nextPosition: number;
   workpackModel: IWorkpackModel;
 
+  notificationsStakeholderRolesOptions: SelectItem[] = [];
+  notifications = {
+    selectedRoles: ['manager'].map(item => this.translateSrv.instant(item)),
+    eventCritical: {
+      enabled: true,
+      daysBefore: 5
+    },
+    eventSchedule: {
+      enabled: true,
+      dayOfMonth: 10
+    }
+  };
+  // lista de dias 1–31
+  daysList = Array.from({ length: 31 }, (_, i) => ({ label: `${i+1}`, value: i+1 }));
+
+
   constructor(
     private router: Router,
     private activeRoute: ActivatedRoute,
@@ -155,6 +172,10 @@ export class WorkpackModelComponent implements OnInit {
       });
       this.cardPropertiesStakeholders = Object.assign({}, {
         ...this.cardPropertiesStakeholders,
+        initialStateCollapse: this.collapsePanelsStatus
+      });
+      this.cardPropertiesNotifications = Object.assign({}, {
+        ...this.cardPropertiesNotifications,
         initialStateCollapse: this.collapsePanelsStatus
       });
       this.cardPropertiesCostAccount = Object.assign({}, {
@@ -196,6 +217,10 @@ export class WorkpackModelComponent implements OnInit {
       this.workpackModelType = type;
       this.posibleRolesOrg = this.rolesOrgOptions.map(role => this.translateSrv.instant(role));
       this.posibleRolesPerson = this.rolesPersonOptions.map(role => this.translateSrv.instant(role));
+      this.notificationsStakeholderRolesOptions = this.posibleRolesPerson.map(item => ({
+        label: this.translateSrv.instant(item),
+        value: this.translateSrv.instant(item),
+      }));
       this.resetValues();
       await this.setFormProperties();
       this.scrollTop();
@@ -328,6 +353,7 @@ export class WorkpackModelComponent implements OnInit {
     this.cardItemsModels = [];
     this.cardProperties = null;
     this.cardPropertiesStakeholders = null;
+    this.cardPropertiesNotifications = null;
     this.cardPropertiesDashboard = null;
     this.cardPropertiesRiskAndIssues = null;
     this.cardPropertiesCostAccount = null;
@@ -786,6 +812,7 @@ export class WorkpackModelComponent implements OnInit {
       this.cardPropertiesJournal.initialStateToggle = data.journalManagementSessionActive;
       this.cardPropertiesModels.initialStateToggle = data.childWorkpackModelSessionActive;
       this.cardPropertiesStakeholders.initialStateToggle = data.stakeholderSessionActive;
+      this.cardPropertiesNotifications.initialStateToggle = data.notificationsSessionActive;
       this.cardPropertiesDashboard.initialStateToggle = data.dashboardSessionActive;
       this.dashboardPanel = {
         dashboardShowEva: data.dashboardShowEva,
@@ -796,6 +823,23 @@ export class WorkpackModelComponent implements OnInit {
           || (data.personRoles && data.personRoles.length > 0)) ?
           data.organizationRoles.concat(data.personRoles).map(item => ({ label: item, value: item })) :
           this.stakeholders.map(item => ({ label: this.translateSrv.instant(item), value: this.translateSrv.instant(item) })),
+      };
+      this.notificationsStakeholderRolesOptions = (data.personRoles && data.personRoles.length > 0) ?
+          data.personRoles.map(item => ({ label: item, value: item })) :
+          this.posibleRolesPerson.map(item => ({
+            label: this.translateSrv.instant(item),
+            value: this.translateSrv.instant(item),
+          }));
+      this.notifications = {
+        selectedRoles: data.notificationsSelectedRoles,
+        eventCritical: {
+          enabled: data.notificationsEventCriticalEnabled,
+          daysBefore: data.notificationsEventCriticalDaysBefore
+        },
+        eventSchedule: {
+          enabled: data.notificationsEventScheduleEnabled,
+          dayOfMonth: data.notificationsEventScheduleDayOfMonth
+        }
       };
       this.cardPropertiesRiskAndIssues.initialStateToggle = data.riskAndIssueManagementSessionActive;
       this.cardPropertiesProcesses.initialStateToggle = data.processesManagementSessionActive;
@@ -1000,6 +1044,18 @@ export class WorkpackModelComponent implements OnInit {
 
       this.dashboardPanel.dashboardShowStakeholders = this.dashboardPanel.dashboardShowStakeholders
         .filter(option => this.dashboardPanel.dashboardStakeholderRolesOptions.find(role => role.value === option));
+    }
+    if (this.cardPropertiesNotifications?.initialStateToggle && changeStakeholderRoles) {
+
+      const roles = this.posibleRolesPerson || [];
+      this.notificationsStakeholderRolesOptions = roles.map(item => ({
+        label: this.translateSrv.instant(item),
+        value: this.translateSrv.instant(item),
+      }));
+      this.notifications.selectedRoles =
+        this.notifications.selectedRoles.filter(role =>
+          this.notificationsStakeholderRolesOptions.find(opt => opt.value === role)
+        );
     }
     const separationForDuplicateCheck = properties.map(prop => [prop.name, prop.label])
       .reduce((a, b) => ((a[0].push(b[0])), a[1].push(b[1]), a), [[], []]);
@@ -1237,6 +1293,14 @@ export class WorkpackModelComponent implements OnInit {
       initialStateCollapse: false,
       onToggle: new EventEmitter<boolean>()
     };
+    this.cardPropertiesNotifications = {
+      toggleable: this.editPermission,
+      initialStateToggle: this.workpackModelType === TypeWorkpackModelEnum.ProjectModel,
+      cardTitle: 'notifications',
+      collapseble: true,
+      initialStateCollapse: false,
+      onToggle: new EventEmitter<boolean>()
+    };
     this.cardPropertiesDashboard = {
       toggleable: this.editPermission,
       initialStateToggle: false,
@@ -1286,6 +1350,42 @@ export class WorkpackModelComponent implements OnInit {
         this.posibleRolesOrg = [];
       }
       this.checkProperties();
+    });
+    this.cardPropertiesNotifications.onToggle
+      .pipe(takeUntil(this.$destroy))
+      .subscribe(() => {
+        if (!!this.cardPropertiesNotifications.initialStateToggle) {
+
+          this.notifications.selectedRoles = ['manager'].map(item => this.translateSrv.instant(item));
+
+          this.notifications.eventCritical = {
+            enabled: true,
+            daysBefore: 7
+          };
+
+          this.notifications.eventSchedule = {
+            enabled: true,
+            dayOfMonth: 10
+          };
+
+          this.cardPropertiesNotifications = {
+            ...this.cardPropertiesNotifications,
+            initialStateCollapse: true
+          };
+
+        } else {
+          this.notifications.selectedRoles = [];
+          this.notifications.eventCritical = {
+            enabled: false,
+            daysBefore: null
+          };
+          this.notifications.eventSchedule = {
+            enabled: false,
+            dayOfMonth: null
+          };
+        }
+
+        this.checkProperties();
     });
     this.cardPropertiesDashboard.onToggle.pipe(takeUntil(this.$destroy)).subscribe(() => {
       if (!!this.cardPropertiesDashboard.initialStateToggle) {
@@ -1441,6 +1541,7 @@ export class WorkpackModelComponent implements OnInit {
       scheduleSessionActive: !!this.cardPropertiesSchedule?.initialStateToggle,
       stakeholderSessionActive: !!this.cardPropertiesStakeholders?.initialStateToggle,
       riskAndIssueManagementSessionActive: !!this.cardPropertiesRiskAndIssues?.initialStateToggle,
+      notificationsSessionActive: !!this.cardPropertiesNotifications?.initialStateToggle,
       processesManagementSessionActive: !!this.cardPropertiesProcesses.initialStateToggle,
       costSessionActive: !!this.cardPropertiesCostAccount?.initialStateToggle,
       journalManagementSessionActive: !!this.cardPropertiesJournal?.initialStateToggle,
@@ -1449,6 +1550,11 @@ export class WorkpackModelComponent implements OnInit {
       dashboardShowMilestones: this.dashboardPanel?.dashboardShowMilestones,
       dashboardShowRisks: this.dashboardPanel?.dashboardShowRisks,
       dashboardShowStakeholders: this.dashboardPanel?.dashboardShowStakeholders,
+      notificationsSelectedRoles: this.notifications?.selectedRoles,
+      notificationsEventCriticalEnabled: this.notifications?.eventCritical?.enabled,
+      notificationsEventCriticalDaysBefore: this.notifications?.eventCritical?.daysBefore,
+      notificationsEventScheduleEnabled: this.notifications?.eventSchedule?.enabled,
+      notificationsEventScheduleDayOfMonth: this.notifications?.eventSchedule?.dayOfMonth,
       fontIcon: icon,
       type: this.workpackModelType,
       idPlanModel: this.idStrategy,

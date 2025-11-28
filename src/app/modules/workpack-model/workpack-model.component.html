@@ -124,6 +124,94 @@
           </span>
         </app-card>
       </div>
+      <!-- CARD DE NOTIFICAÇÕES – Apenas para Project -->
+      <div class="card notifications" *ngIf="workpackModelType === 'ProjectModel'">
+        <app-card [properties]="cardPropertiesNotifications" *ngIf="cardPropertiesNotifications" class="inputs-float-label">
+
+          <!-- MULTISELECT DE FUNÇÕES -->
+          <div class="notification-field app-input-chips app-multiple-selection">
+
+            <label class="app-input-label">
+              Funções que recebem notificações
+              <i class="far fa-question-circle"
+                 [pTooltip]="'Selecione os papéis que vão receber os e-mails de notificação'">
+              </i>
+            </label>
+          
+            <p-multiSelect 
+              [options]="this.notificationsStakeholderRolesOptions"
+              optionLabel="label"
+              optionValue="value"
+              display="chip"
+              [selectedItemsLabel]="currentLang === 'pt-BR' ? '{0} itens selecionados' : '{0} items selected'"
+              [(ngModel)]="notifications.selectedRoles"
+              (onChange)="checkProperties()"
+              [disabled]="!editPermission">
+            </p-multiSelect>
+          
+          </div>
+          <br>
+
+          <!-- TÍTULO DA SEÇÃO -->
+          <label class="app-input-label">
+            Sobre os eventos
+            <i class="far fa-question-circle"
+               [pTooltip]="'Configurações de notificações automáticas'">
+            </i>
+          </label>
+        
+          <div class="toggles-container-notifications">
+          
+            <!-- EVENTO 1 -->
+            <div class="toggle-item event-row">
+              <label>MARCO CRÍTICO A VENCER</label>
+          
+              <p-inputSwitch 
+                class="app-toggle"
+                [(ngModel)]="notifications.eventCritical.enabled"
+                [disabled]="!editPermission"
+                (ngModelChange)="checkProperties()">
+              </p-inputSwitch>
+          
+              <p-dropdown 
+                class="event-dropdown"
+                [options]="daysList"
+                [(ngModel)]="notifications.eventCritical.daysBefore"
+                [disabled]="!editPermission || !notifications.eventCritical.enabled"
+                (ngModelChange)="checkProperties()">
+              </p-dropdown>
+          
+              <span class="event-suffix">DIAS ANTES DO VENCIMENTO</span>
+            </div>
+          
+            <!-- EVENTO 2 -->
+            <div class="toggle-item event-row">
+              <label>CRONOGRAMAS E DIÁRIOS A ATUALIZAR</label>
+          
+              <p-inputSwitch 
+                class="app-toggle"
+                [(ngModel)]="notifications.eventSchedule.enabled"
+                [disabled]="!editPermission"
+                (ngModelChange)="checkProperties()">
+              </p-inputSwitch>
+          
+              <span class="event-prefix">NO DIA</span>
+          
+              <p-dropdown 
+                class="event-dropdown"
+                [options]="daysList"
+                [(ngModel)]="notifications.eventSchedule.dayOfMonth"
+                [disabled]="!editPermission || !notifications.eventSchedule.enabled"
+                (ngModelChange)="checkProperties()">
+              </p-dropdown>
+          
+              <span class="event-suffix">DO MÊS SEGUINTE</span>
+            </div>
+          </div>
+
+        </app-card>
+      </div>
+
       <div class="card dashboard" *ngIf="dashboardPanel">
         <app-card [properties]="cardPropertiesDashboard" *ngIf="cardPropertiesDashboard" class="inputs-float-label">
           <div class="dashboard-show-options app-input-chips app-multiple-selection">
