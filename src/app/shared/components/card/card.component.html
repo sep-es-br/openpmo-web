@@ -41,13 +41,6 @@
             (ngModelChange)="handleChangeCheckCompleted($event)"></p-checkbox>
         </div>
 
-      <div class="header-title-check-completed d-flex col-6 justify-content-end" [class.responsive]="responsive" *ngIf="!!properties.showCheckCompleted">
-        <label>{{ label | translate }}</label>
-        <p-checkbox [(ngModel)]="properties.workpackCompleted" [binary]="true"
-          [disabled]="properties.workpackCanceled || !canEditCheckCompleted"
-          (ngModelChange)="handleChangeCheckCompleted($event)">
-        </p-checkbox>
-      </div>
 
       <div class="d-flex col-12 justify-content-center col-sm-6 justify-content-sm-end" *ngIf="properties.progressBarValues">
         <div class="header-values-cost-account " [class.not-collapseble]="!properties.collapseble" [class.responsive]="responsive">
