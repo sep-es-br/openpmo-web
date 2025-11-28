@@ -15,21 +15,6 @@ $mobileMenuHeight: 90px;
   position: sticky;
   top: 0;
 
-  .logo {
-    padding: 1em 0;
-
-    img {
-      width: 2rem;
-      height: 2rem;
-    }
-  }
-  .icon-delete-favorite {
-    position: absolute;
-    top: 0;
-    left: 0;
-    background-color: red;
-  }
-
   .item {
     color: #eeeeee;
     font-size: 1.5rem;
@@ -37,9 +22,15 @@ $mobileMenuHeight: 90px;
     cursor: pointer;
     width: 100%;
     text-align: center;
+
     &:focus {
       outline: none !important;
     }
+
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+    }
+
     .item-label {
       font-size: 1rem;
       max-width: 95%;
@@ -47,25 +38,16 @@ $mobileMenuHeight: 90px;
       white-space: nowrap;
       text-overflow: ellipsis;
     }
-    &:hover {
-      background-color: rgba(0, 0, 0, 0.1);
-    }
   }
-
-  .offices {
-  color: #ffffff59!important;
-  }
-
-  .app-icon, .far.fa-star, .fa-file-alt {
-    color: #ffffff;
-  }
-
+  
   &.admin-menu {
     background-color: v.$bgMenuAdmin;
+
     .item {
-      color: #ffffff !important;
+      color: #FFFFFF !important;
     }
   }
+
   &.mobile {
     width: 100%;
     display: flex;
@@ -78,8 +60,9 @@ $mobileMenuHeight: 90px;
     padding: 0.5em;
     font-size: .688rem;
 
-    .app-icon, .favorite-icon, .fa-file-alt {
+    .app-icon, .favorite-icon, .search-icon, .fa-file-alt {
       color: v.$iconGrey;
+      font-size: 1.6rem;
     }
 
     &.admin-menu {
@@ -87,65 +70,7 @@ $mobileMenuHeight: 90px;
         color: v.$bgMenuAdmin;
       }
     }
-    .menuadmin-icons-mobileview-container {
-      width: 100%;
-      display: flex;
-      flex-direction: row;
-      justify-content: space-between;
-      align-items: flex-start;
-      padding: 0.5em;
-      .item {
-        padding: 0;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        width: 25%;
-        height: 100%;
-        color: v.$fontLabel;
-        padding: 12px 0;
-        .item-label {
-          font-size: 11px;
-          padding-top: 5px;
-          max-width: 100%;
-          color: #a7074b;
-        }
-      }
-      .item-avatar {
-        width: 25%;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: flex-start;
-        padding: 12px 0;
-        height: 100%;
-        color: v.$fontLabel;
-        .item-label {
-          color: #a7074b;
-          font-size: 11px;
-        }
-        .app-avatar {
-          display: flex;
-          flex-direction: row;
-          justify-content: center;
-          width: 100%;
-          .avatar {
-            padding: 0 !important;
-          }
-          .avatar.small {
-            text-align: center !important;
-            width: 100%;
-            color: #888E96;
-            .p-avatar-xl .p-avatar-icon {
-              font-size: 2.25rem;
-            }
-          }
-          .p-avatar {
-            width: 36px;
-            height: 36px;
-          }
-        }
-      }
-    }
+
     .menugeneral-icons-mobileview-container {
       width: 100%;
       display: flex;
@@ -154,53 +79,18 @@ $mobileMenuHeight: 90px;
       align-items: flex-start;
       position: relative;
       height: 90px;
-      background-color: #d9d9d9;
+      background-color: #D9D9D9;
+
       .item {
-        width: 25%;
         padding: 0.5em 0;
         display: flex;
         flex-direction: column;
         justify-content: space-between;
         height: 90%;
-        .item-label {
-          color: #888E96;
-          font-size: 11px;
-        }
-      }
-      .item-avatar {
-        width: 25%;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: space-between;
-        padding: 12px 0;
-        height: 91%;
-        color: v.$fontLabel;
 
         .item-label {
           color: #888E96;
           font-size: 11px;
-        }
-        .app-avatar {
-          display: flex;
-          flex-direction: row;
-          justify-content: center;
-          width: 100%;
-          .avatar {
-            padding: 0 !important;
-          }
-          .avatar.small {
-            text-align: center !important;
-            width: 100%;
-            color: #888E96;
-            .p-avatar-xl .p-avatar-icon {
-              font-size: 1.9rem;
-            }
-          }
-          .p-avatar {
-            width: 36px;
-            height: 36px;
-          }
         }
       }
     }

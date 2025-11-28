@@ -87,17 +87,30 @@
           [ngClass]="windowProperties.isMenuPanelOpen ? 'col-12' : 'col-xxl-6'"
         >
           <div class="dashboard-item col-12 col-xl-4 mb-4 mb-xl-0" *ngIf="!!dashboardShowDeliveryStatus && dashboardStatusData">
-            <app-doughnut-chart [data]="dashboardStatusData" [middleText]="dashboard?.dashboardStatusData?.totalDeliverable?.toString()"
-              [midleTextBottom]="midleTextDelivable">
+            <app-doughnut-chart
+              [data]="dashboardStatusData"
+              [middleText]="dashboard?.dashboardStatusData?.totalDeliverable?.toString()"
+              [midleTextBottom]="midleTextDelivable"
+              [legendCustomClass]="'col-8 col-sm-4 col-lg-3 col-xl-9'"
+            >
             </app-doughnut-chart>
           </div>
           <div class="dashboard-item col-12 col-xl-4 mb-4 mb-xl-0" *ngIf="!!dashboardShowMilestones && dashboardMilestonesData">
-            <app-doughnut-chart [data]="dashboardMilestonesData" [middleText]="dashboard?.milestone?.quantity?.toString()"
-              [midleTextBottom]="midleTextMilestones"></app-doughnut-chart>
+            <app-doughnut-chart
+              [data]="dashboardMilestonesData"
+              [middleText]="dashboard?.milestone?.quantity?.toString()"
+              [midleTextBottom]="midleTextMilestones"
+              [legendCustomClass]="'col-8 col-sm-4 col-lg-3 col-xl-9'"
+            >
+            </app-doughnut-chart>
           </div>
           <div class="dashboard-item col-12 col-xl-4 mb-4 mb-xl-0" *ngIf="dashboardRisksData && !!dashboardShowRisks">
-            <app-doughnut-chart [data]="dashboardRisksData" [middleText]="dashboard?.risk?.total?.toString()"
-              [midleTextBottom]="midleTextRisks">
+            <app-doughnut-chart
+              [data]="dashboardRisksData"
+              [middleText]="dashboard?.risk?.total?.toString()"
+              [midleTextBottom]="midleTextRisks"
+              [legendCustomClass]="'col-6 col-sm-3 col-md-2 col-xl-4'"
+            >
             </app-doughnut-chart>
           </div>
         </div>

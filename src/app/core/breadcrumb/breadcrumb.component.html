@@ -7,32 +7,42 @@
     <div class="name" *ngIf="crumbOffice"> {{ crumbOffice.info }}</div>
     <div class="name" *ngIf="crumbPlan"> {{ crumbPlan.info }}</div>
   </div>
-  <div class="crumbs" #crumbsEl>
-    <div class="home" [class.adjust-padding]="isOverflowing" [class.cursor-loading]="loadingWorkpack">
-      <i class="app-icon home" [ngStyle]="{ fontSize: isMobileView ? '1.5rem' : '1.7rem' }"
-      (click)="handleNavigateBredcrumb()"></i>
-    </div>
-    <ng-container *ngFor="let crumb of crumbs; let i = index">
-      <i class="app-icon angle-right" [ngStyle]="{ fontSize: isMobileView ? '.45rem' : '.6rem' }"></i>
-      <div
-        class="crumb"
-        [class.last-crumb-highlighted]="i + 1 === crumbs.length && !crumb.admin"
+  <div class="d-flex flex-row w-100 align-items-center">
+    <div
+      class="crumbs"
+      [ngStyle]="{ width: isMobileView ? '90%' : '100%' }"
+      #crumbsEl
+    >
+      <div class="home" [class.adjust-padding]="isOverflowing" [class.cursor-loading]="loadingWorkpack">
+        <i class="app-icon home" [ngStyle]="{ fontSize: isMobileView ? '1.5rem' : '1.7rem' }"
+        (click)="handleNavigateBredcrumb()"></i>
+      </div>
+      <ng-container *ngFor="let crumb of crumbs; let i = index">
+        <i class="app-icon angle-right" [ngStyle]="{ fontSize: isMobileView ? '.45rem' : '.6rem' }"></i>
+        <div class="crumb" [class.last-crumb-highlighted]="i + 1 === crumbs.length && !crumb.admin"
         [class.last-crumb]="i + 1 === crumbs.length && crumb.admin"
-        [class.cursor-loading]="loadingWorkpack"
-      >
-        <div
-          class="link"
-          (click)="navigateTo(crumb, i)"
-        >
-          {{ crumb.modelName ? crumb.modelName : (crumb.key | translate) }}
+        [class.cursor-loading]="loadingWorkpack">
+          <div class="link" (click)="navigateTo(crumb, i)">{{ crumb.modelName ? crumb.modelName : (crumb.key | translate) }}</div>
+          <div class="info" [pTooltip]="crumb.tooltip || crumb.info " *ngIf="(crumb.tooltip || crumb.info) && !isMobileView">
+            {{ (crumb.info || crumb.tooltip)|translate }}
+          </div>
         </div>
-        <div
-          *ngIf="(crumb.tooltip || crumb.info) && !isMobileView"
-          class="info"
-          [pTooltip]="crumb.tooltip || crumb.info"
+      </ng-container>
+    </div>
+    <ng-container *ngIf="isMobileView">
+      <div class="menu">
+        <p-menu
+          [model]="responsiveMenuButtons"
+          [popup]="true"
+          start
+          #menu
         >
-          {{ (crumb.info || crumb.tooltip) | translate }}
-        </div>
+        </p-menu>
+        <p-button
+          icon="fas fa-bars"
+          (click)="menu.toggle($event)"
+        >
+        </p-button>
       </div>
     </ng-container>
   </div>

@@ -61,7 +61,7 @@
   "administrator": "Administrador",
   "administrators": "Administradores",
   "dashboard": "Painel de Controle",
-  "lateConcluded": "Concluído com atraso",
+  "lateConcluded": "Concluído atrasado",
   "concluded": "Concluído",
   "late": "Atrasado",
   "ontime": "No prazo",
@@ -420,6 +420,7 @@
   "uiUxDesigner": "Designer de UI UX",
   "difference": "Diferença",
   "confirmSpreadDifference": "Confirmar distribuição da diferença",
+  "universalSearch": "Busca universal",
   "help": {
     "textHelpOnline": "Texto de ajuda",
     "costAccount": {
@@ -1051,7 +1052,7 @@
   "noStakeholders": "Não Partes Interessadas",
   "access": "Acesso",
   "search": "Procurar",
-  "minLengthSearch": "Digite pelo menos 3 caracteres para buscar",
+  "minLengthSearch": "Digite pelo menos 3 caracteres",
   "from": "De",
   "to": "Até",
   "workpackModel": "Modelo de Pacote de Trabalho",
@@ -1087,5 +1088,6 @@
   "NO_SCHEDULE": "Entrega sem cronograma",
   "UNDEFINED_SCOPE": "Entrega sem escopo",
 
-  "baseline-disabled-submission-warning": "Impossível submeter Linha de Base com pendências"
+  "baseline-disabled-submission-warning": "Impossível submeter Linha de Base com pendências",
+  "languages": "Idiomas"
 }

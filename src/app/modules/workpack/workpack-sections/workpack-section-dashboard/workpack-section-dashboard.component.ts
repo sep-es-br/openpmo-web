@@ -249,9 +249,9 @@ export class WorkpackSectionDashboardComponent
       this.dashboardStatusData = {
         labels: [
           'Concluída',
-          'Em Execução',
+          'Execução',
           'Paralisada',
-          'Em Planejamento',
+          'Planejamento',
           'A Cancelar',
         ],
         datasets: [

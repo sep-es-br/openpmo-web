@@ -152,7 +152,42 @@
     }
   }
 
+  .menu {
+    width: 10%;
+  }
   .cursor-loading, .cursor-loading * {
     cursor: wait !important;
+  }
+}
+
+::ng-deep .p-button {
+  background: #44B39B;
+  border: 1px solid #44B39B;
+}
+::ng-deep .p-button:enabled:hover {
+  background: #44B39B !important;
+  border-color: #44B39B !important;
+}
+::ng-deep .p-menu.p-menu-overlay {
+  left: 259px;
+}
+::ng-deep .p-menu-list {
+  .disabled-as-normal {
+    .p-disabled {
+      opacity: 1;
+    }
+  }
+
+  .p-menuitem {
+    .p-menuitem-link {
+      .p-menuitem-icon {
+        &.fa-check {
+          color: #37A51B;
+        }
+        &.fa-times {
+          color: #D54848;
+        }
+      }
+    }
   }
 }
