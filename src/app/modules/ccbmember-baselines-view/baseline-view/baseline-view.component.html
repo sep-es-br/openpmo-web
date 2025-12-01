@@ -215,73 +215,117 @@
                     </span>
                   </div>
 
+                  <ng-container *ngIf="node.property === 'title' && (node.label === 'Marcos críticos' || node.label === 'Entregas')">
+                    <div class="line-right-side">
+                      <div class="titles-box d-flex flex-row col-12">
+                        <span class="col-3 item-title"></span>
+                        <span class="col-3 item-title">Custo</span>
+                        <span class="col-3 item-title">Datas</span>
+                        <span class="col-3 item-title">Escopo</span>
+                      </div>
+                    </div>
+                  </ng-container>
+                  
                   <ng-container *ngIf="node.property === 'value'">
                     <div class="line-right-side">
-                      <ng-container *ngIf="node.workpackStatus === 'UNCHANGED' else standardInfo">
-                        <i class="warning-icon fa fa-exclamation-triangle" aria-hidden="true"></i>
-                        Não alterado
-                      </ng-container>
-                      <ng-template #standardInfo>
-                        <div class="detail-box d-flex flex-column">
-                          <div class="d-flex flex-row col-12">
-                            <span class="col-3 item-subtitle">Atual</span>
-                            <div class="d-flex flex-row col-3">
-                              <span
-                                class="item-value"
-                                [ngClass]="node.costDetails && node.costDetails.currentValue && node.costDetails.variation ? 'col-8' : 'col-12'"
-                              >
-                                <!-- [ngStyle]="{ 'text-align': node.costDetails && node.costDetails.currentValue && node.costDetails.variation ? 'end' : 'center' }" -->
-                                {{ (node.costDetails?.currentValue | shortNumber : language : 2) || '0,00' }}
-                              </span>
-                              <ng-container *ngIf="node.costDetails && node.costDetails.currentValue && node.costDetails.variation">
-                                <span
-                                  class="d-flex flex-row align-items-center col-4 item-variation"
-                                  [ngStyle]="{ 'color': node.costDetails.variation > 0 ? '#CF0E0E' : '#0ECF0E' }"
-                                >
-                                  <i
-                                    class="fas me-1"
-                                    [ngClass]="{ 'fa-arrow-up': node.costDetails.variation > 0, 'fa-arrow-down': node.costDetails.variation < 0 }"
-                                  >
-                                  </i>
-                                  <span>{{ node.costDetails.variation < 0 ? node.costDetails.variation * (-1) : node.costDetails.variation }}%</span>
-                                </span>
-                              </ng-container>
-                            </div>
-                            <span class="col-3 item-value">{{ (node.scheduleDetails?.currentDate | date : (language === 'pt' ? 'dd-MM-yyyy' : 'yyyy-MM-dd')) || '--' }}</span>
-                            <div class="d-flex flex-row col-3">
-                              <span
-                                class="item-value"
-                                [ngClass]="node.scopeDetails && node.scopeDetails.currentValue && node.scopeDetails.variation ? 'col-8' : 'col-12'"
-                                >
-                                <!-- [ngStyle]="{ 'text-align': node.costDetails && node.costDetails.currentValue && node.costDetails.variation ? 'end' : 'center' }" -->
-                                {{ (node.scopeDetails?.currentValue | shortNumber: language : 2) || '--' }}
-                              </span>
-                              <ng-container *ngIf="node.scopeDetails && node.scopeDetails.currentValue && node.scopeDetails.variation">
-                                <span
-                                  class="d-flex flex-row align-items-center col-4 item-variation"
-                                  [ngStyle]="{ 'color': node.scopeDetails.variation > 0 ? '#0ECF0E' : '#CF0E0E' }"
-                                >
-                                  <i
-                                    class="fas me-1"
-                                    [ngClass]="{ 'fa-arrow-up': node.scopeDetails.variation > 0, 'fa-arrow-down': node.scopeDetails.variation < 0 }"
-                                  >
-                                  </i>
-                                  <span>{{ node.scopeDetails.variation < 0 ? node.scopeDetails.variation * (-1) : node.scopeDetails.variation }}%</span>
-                                </span>
-                              </ng-container>
-                            </div>
-                          </div>
-                          <div class="d-flex flex-row col-12">
-                            <span class="col-3 item-subtitle">Proposta</span>
-                            <span class="col-3 item-value">{{ (node.costDetails?.proposedValue | shortNumber : language : 2) || '0,00' }}</span>
-                            <span class="col-3 item-value">{{ (node.scheduleDetails?.proposedDate | date : (language === 'pt' ? 'dd-MM-yyyy' : 'yyyy-MM-dd')) || '--' }}</span>
-                            <span class="col-3 item-value">{{ (node.scopeDetails?.proposedValue | shortNumber : language : 2) || '--' }}</span>
-                          </div>
+                      <div class="detail-box d-flex flex-row col-12">
+                        <div
+                          class="d-flex flex-column col-3"
+                          [ngClass]="{ 'justify-content-center': node.workpackStatus === 'UNCHANGED' }"
+                        >
+                          <ng-container *ngIf="node.workpackStatus === 'UNCHANGED' else standardTitles">
+                            <span class="item-alert">Não alterado</span>
+                          </ng-container>
+
+                          <ng-template #standardTitles>
+                            <span class="item-subtitle">Atual</span>
+                            <span class="item-subtitle">Proposta</span>
+                          </ng-template>
                         </div>
-                      </ng-template>
-                      <!-- <span [ngClass]="node.warnings?.shouldDisplayDeliveryWarnings ? 'alert-text' : ''">
-                        {{ node.classification | translate }}
-                      </span> -->
+                        <div class="d-flex flex-column col-2">
+                          <ng-container *ngIf="node.workpackStatus === 'UNCHANGED' else standardCostValues">
+                            <span class="item-value"></span>
+                            <span class="item-value"></span>
+                          </ng-container>
+
+                          <ng-template #standardCostValues>
+                            <span class="item-value">
+                              {{ (node.costDetails?.currentValue | shortNumber : language : 2) || '0,00' }}
+                            </span>
+                            <span class="item-value">
+                              {{ (node.costDetails?.proposedValue | shortNumber : language : 2) || '0,00' }}
+                            </span>
+                          </ng-template>
+                        </div>
+                        <div class="d-flex flex-column col-1 justify-content-center">
+                          <ng-container *ngIf="node.costDetails?.variation && node.costDetails.variation !== 0">
+                            <span
+                              class="item-variation d-flex align-items-center"
+                              [ngStyle]="{ 'color': node.costDetails.variation > 0 ? '#CF0E0E' : '#0ECF0E' }"
+                            >
+                              <i
+                                class="fas"
+                                [ngClass]="{ 'fa-arrow-up': node.costDetails.variation > 0, 'fa-arrow-down': node.costDetails.variation < 0 }"
+                              >
+                              </i>
+                              <span>{{ node.costDetails.variation < 0 ? node.costDetails.variation * (-1) : node.costDetails.variation }}%</span>
+                            </span>
+                          </ng-container>
+                        </div>
+                        <div class="d-flex flex-column col-2">
+                          <span class="item-value">
+                            {{ (node.scheduleDetails?.currentDate | date : (language === 'pt' ? 'dd-MM-yyyy' : 'yyyy-MM-dd')) || '--' }}
+                          </span>
+                          <span class="item-value">
+                            {{ (node.scheduleDetails?.proposedDate | date : (language === 'pt' ? 'dd-MM-yyyy' : 'yyyy-MM-dd')) || '--' }}
+                          </span>
+                        </div>
+                        <div class="d-flex flex-column col-1 justify-content-center">
+                          <ng-container *ngIf="node.scheduleDetails?.variation && node.scheduleDetails.variation !== 0">
+                            <span
+                              class="item-variation d-flex align-items-center"
+                              [ngStyle]="{ 'color': node.scheduleDetails.variation > 0 ? '#CF0E0E' : '#0ECF0E' }"
+                            >
+                              <i
+                                class="fas"
+                                [ngClass]="{ 'fa-arrow-up': node.scheduleDetails.variation > 0, 'fa-arrow-down': node.scheduleDetails.variation < 0 }"
+                              >
+                              </i>
+                              <span>{{ node.scheduleDetails.variation < 0 ? node.scheduleDetails.variation * (-1) : node.scheduleDetails.variation }}%</span>
+                            </span>
+                          </ng-container>
+                        </div>
+                        <div class="d-flex flex-column col-2">
+                          <ng-container *ngIf="node.workpackStatus === 'UNCHANGED' else standardScopeValues">
+                            <span class="item-value"></span>
+                            <span class="item-value"></span>
+                          </ng-container>
+
+                          <ng-template #standardScopeValues>
+                            <span class="item-value">
+                              {{ (node.scopeDetails?.currentValue | shortNumber : language : 2) || '--' }}
+                            </span>
+                            <span class="item-value">
+                              {{ (node.scopeDetails?.proposedValue | shortNumber : language : 2) || '--' }}
+                            </span>
+                          </ng-template>
+                        </div>
+                        <div class="d-flex flex-column col-1 justify-content-center">
+                          <ng-container *ngIf="node.scopeDetails?.variation && node.scopeDetails.variation !== 0">
+                            <span
+                              class="item-variation d-flex align-items-center"
+                              [ngStyle]="{ 'color': node.scopeDetails.variation > 0 ? '#0ECF0E' : '#CF0E0E' }"
+                            >
+                              <i
+                                class="fas"
+                                [ngClass]="{ 'fa-arrow-up': node.scopeDetails.variation > 0, 'fa-arrow-down': node.scopeDetails.variation < 0 }"
+                              >
+                              </i>
+                              <span>{{ node.scopeDetails.variation < 0 ? node.scopeDetails.variation * (-1) : node.scopeDetails.variation }}%</span>
+                            </span>
+                          </ng-container>
+                        </div>
+                      </div>
                     </div>
                   </ng-container>
                 </div>

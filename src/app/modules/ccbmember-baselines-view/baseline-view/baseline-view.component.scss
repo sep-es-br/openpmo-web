@@ -380,15 +380,19 @@
                 margin-right: 4em;
                 width: 50%;
 
-                .detail-box {
+                .titles-box, .detail-box {
                   width: 100%;
 
-                  .item-subtitle {
+                  .item-title, .item-subtitle {
                     font-weight: bold;
                     font-size: 11px;
                     color: #1B4F61;
                   }
 
+                  .item-title {
+                    text-align: center;
+                    text-transform: uppercase;
+                  }
                   .item-value {
                     text-align: end;
                   }
