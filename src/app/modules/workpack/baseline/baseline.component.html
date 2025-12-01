@@ -112,6 +112,7 @@
                         allTogglerIsDisabled || 
                         node.classification === 'TO_CANCEL' || 
                         node.warnings?.shouldDisplayDeliveryWarnings ||
+                        node.classification === 'DELETED' ||
                         node.classification === 'UNCHANGED'
                         "
                     (onChange)="handleToggleSwitchChange($event.checked, node.idWorkpack)"
