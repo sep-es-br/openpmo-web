@@ -371,6 +371,7 @@
   "TO_CANCEL": "A cancelar",
   "CANCELLED": "Cancelada",
   "NEW": "Novo",
+  "UNCHANGED": "Não alterado",
   "submit": "Submeter",
   "evaluations": "Avaliações",
   "comment": "Comentário",
@@ -773,6 +774,26 @@
         },
         "paste": {
           "error": "Problemas ao tentar colar o pacote de trabalho."
+        },
+        "has": {
+            "less": {
+                "then": {
+                    "required": {
+                        "milestone": {
+                            "amount": {
+                                "error": "O projeto deve possuir pelo menos {{0}} marcos críticos para submissão da Linha de Base."
+                            }
+                        }
+                    }
+                }
+            },
+            "no": {
+                "planned": {
+                    "work": {
+                        "error": "Não é possível submeter uma Linha de Base sem escopo"
+                    }
+                }
+            }
         }
       },
       "permission": {
@@ -1087,7 +1108,7 @@
 
   "NO_SCHEDULE": "Entrega sem cronograma",
   "UNDEFINED_SCOPE": "Entrega sem escopo",
-
+  "baseline-less-then-required-milestone": "O projeto deve possuir pelo menos {{0}} marcos críticos para submissão da Linha de Base.",
   "baseline-disabled-submission-warning": "Impossível submeter Linha de Base com pendências",
   "languages": "Idiomas"
 }

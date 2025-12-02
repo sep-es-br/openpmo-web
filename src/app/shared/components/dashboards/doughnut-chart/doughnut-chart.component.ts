@@ -1,16 +1,20 @@
 import { takeUntil } from 'rxjs/operators';
 import { TranslateService } from '@ngx-translate/core';
-import { Component, Input, OnInit, OnDestroy } from '@angular/core';
+import { Component, Input, OnInit, OnDestroy, ViewChild, AfterViewInit } from '@angular/core';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import { Chart, ChartData, ChartOptions, ChartPoint } from 'chart.js';
 import { Subject } from 'rxjs';
+import { UIChart } from 'primeng/chart';
 
 @Component({
   selector: 'app-doughnut-chart',
   templateUrl: './doughnut-chart.component.html',
   styleUrls: ['./doughnut-chart.component.scss']
 })
-export class DoughnutChartComponent implements OnInit, OnDestroy {
+export class DoughnutChartComponent implements OnInit, AfterViewInit, OnDestroy {
+
+    @ViewChild('chart') chart : UIChart
+
   @Input() data: ChartData;
 
   @Input() middleText: string;
@@ -46,6 +50,10 @@ export class DoughnutChartComponent implements OnInit, OnDestroy {
         this.setLanguage();
       }, 150)
     );
+  }
+
+  ngAfterViewInit(): void {
+      setTimeout(() => this.chart.reinit(), 0)
   }
 
   ngOnInit(): void {
