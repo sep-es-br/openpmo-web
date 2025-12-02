@@ -250,10 +250,10 @@
 
                           <ng-template #standardCostValues>
                             <span class="item-value">
-                              {{ (node.costDetails?.currentValue | shortNumber : language : 2) || '0,00' }}
+                              {{ (node.costDetails?.currentValue | shortNumber : language : (node.precisionFactor || 2)) || '0,00' }}
                             </span>
                             <span class="item-value">
-                              {{ (node.costDetails?.proposedValue | shortNumber : language : 2) || '0,00' }}
+                              {{ (node.costDetails?.proposedValue | shortNumber : language : (node.precisionFactor || 2)) || '0,00' }}
                             </span>
                           </ng-template>
                         </div>
@@ -281,17 +281,17 @@
                           </span>
                         </div>
                         <div class="d-flex flex-column col-1 justify-content-center">
-                          <ng-container *ngIf="node.scheduleDetails?.variation && node.scheduleDetails.variation !== 0">
+                          <ng-container *ngIf="node.scheduleDetails?.variationInDays && node.scheduleDetails.variationInDays !== 0">
                             <span
                               class="item-variation d-flex align-items-center"
-                              [ngStyle]="{ 'color': node.scheduleDetails.variation > 0 ? '#CF0E0E' : '#0ECF0E' }"
+                              [ngStyle]="{ 'color': node.scheduleDetails.variationInDays > 0 ? '#CF0E0E' : '#0ECF0E' }"
                             >
                               <i
                                 class="fas"
-                                [ngClass]="{ 'fa-arrow-up': node.scheduleDetails.variation > 0, 'fa-arrow-down': node.scheduleDetails.variation < 0 }"
+                                [ngClass]="{ 'fa-arrow-up': node.scheduleDetails.variationInDays > 0, 'fa-arrow-down': node.scheduleDetails.variationInDays < 0 }"
                               >
                               </i>
-                              <span>{{ node.scheduleDetails.variation < 0 ? node.scheduleDetails.variation * (-1) : node.scheduleDetails.variation }}%</span>
+                              <span>{{ node.scheduleDetails.variationInDays < 0 ? node.scheduleDetails.variationInDays * (-1) : node.scheduleDetails.variationInDays }}d</span>
                             </span>
                           </ng-container>
                         </div>
@@ -303,10 +303,10 @@
 
                           <ng-template #standardScopeValues>
                             <span class="item-value">
-                              {{ (node.scopeDetails?.currentValue | shortNumber : language : 2) || '--' }}
+                              {{ (node.scopeDetails?.currentValue | shortNumber : language : (node.precisionFactor || 2)) || '--' }}
                             </span>
                             <span class="item-value">
-                              {{ (node.scopeDetails?.proposedValue | shortNumber : language : 2) || '--' }}
+                              {{ (node.scopeDetails?.proposedValue | shortNumber : language : (node.precisionFactor || 2)) || '--' }}
                             </span>
                           </ng-template>
                         </div>

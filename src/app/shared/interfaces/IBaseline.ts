@@ -1,4 +1,5 @@
 import { TypeWorkpackEnumWBS } from '../enums/TypeWorkpackEnum';
+import { UnitMeasure } from './IUnitMeasureIndicators';
 
 export interface IBaseline {
   id?: number;
@@ -21,6 +22,7 @@ export interface IBaseline {
   default?: boolean;
   projectFullName?: string;
   tripleConstraintBreakdown?: Array<ITripleConstraintBreakdown>;
+  officeUnitMeasures?: Array<UnitMeasure>;
 }
 
 export interface IBaselineUpdates {

@@ -15,6 +15,7 @@ import {
 } from '@angular/core';
 import * as moment from 'moment';
 import { TypeWorkpackEnumWBS } from 'src/app/shared/enums/TypeWorkpackEnum';
+import { UnitMeasure } from 'src/app/shared/interfaces/IUnitMeasureIndicators';
 
 @Component({
   selector: 'app-baseline-view',
@@ -114,10 +115,10 @@ export class BaselineViewComponent implements OnInit, OnDestroy {
     const result = await this.baselineSrv.getBaselineView(this.idBaseline);
     if (result.success) {
       this.baseline = result.data;
-      console.log('this.baseline: ', this.baseline);
       this.loadChartScheduleValues();
       this.checkEvaluation();
-      this.assembleBreakdownTree(this.baseline.tripleConstraintBreakdown);
+      this.assembleBreakdownTree(this.baseline.tripleConstraintBreakdown, this.baseline.officeUnitMeasures);
+
       this.isLoading = false;
     }
   }
@@ -230,7 +231,17 @@ export class BaselineViewComponent implements OnInit, OnDestroy {
     this.showCommentDialog = true;
   }
 
-  assembleBreakdownTree(workpacks: Array<ITripleConstraintBreakdown>) {
+  assembleBreakdownTree(workpacks: Array<ITripleConstraintBreakdown>, unitsOfMeasurement: Array<UnitMeasure>) {
+    // A função abaixo serve para obter o nível de precisão baseado na unidade de medida
+    const getPrecisionFactor = (unit: string): number => {
+      if (!unit) return 2;
+
+      const unitRef = unitsOfMeasurement.find((el) => el.name === unit);
+      if (unitRef) return unitRef.precision;
+
+      return 2;
+    };
+
     // A função abaixo serve para criar os objetos de Marcos Críticos e Entregas que serão inseridos na árvore
     const buildMilestonesAndDeliveries = (
       childs: Array<ITripleConstraintBreakdown>
@@ -271,6 +282,7 @@ export class BaselineViewComponent implements OnInit, OnDestroy {
             scheduleDetails: milestone?.scheduleDetails,
             scopeDetails: milestone?.scopeDetails,
             workpackStatus: milestone?.workpackStatus,
+            precisionFactor: getPrecisionFactor(milestone.scopeDetails?.unitName)
           };
 
           milestoneTitleObject.children.push(milestoneObject);
@@ -303,6 +315,7 @@ export class BaselineViewComponent implements OnInit, OnDestroy {
             scheduleDetails: delivery?.scheduleDetails,
             scopeDetails: delivery?.scopeDetails,
             workpackStatus: delivery?.workpackStatus,
+            precisionFactor: getPrecisionFactor(delivery?.scopeDetails.unitName),
           };
 
           deliveryTitleObject.children.push(deliveryObject);
@@ -394,6 +407,5 @@ export class BaselineViewComponent implements OnInit, OnDestroy {
     });
 
     this.tripleConstraintsTree = [etapasTitleObject];
-    console.log('this.tripleConstraintsTree: ', this.tripleConstraintsTree);
   }
 }
