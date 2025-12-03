@@ -168,7 +168,7 @@
           
               <p-inputSwitch 
                 class="app-toggle"
-                [(ngModel)]="notifications.eventCritical.enabled"
+                [(ngModel)]="notifications.eventMilestone.enabled"
                 [disabled]="!editPermission"
                 (ngModelChange)="checkProperties()">
               </p-inputSwitch>
@@ -176,8 +176,8 @@
               <p-dropdown 
                 class="event-dropdown"
                 [options]="daysList"
-                [(ngModel)]="notifications.eventCritical.daysBefore"
-                [disabled]="!editPermission || !notifications.eventCritical.enabled"
+                [(ngModel)]="notifications.eventMilestone.daysBefore"
+                [disabled]="!editPermission || !notifications.eventMilestone.enabled"
                 (ngModelChange)="checkProperties()">
               </p-dropdown>
           

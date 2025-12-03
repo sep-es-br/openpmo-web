@@ -36,8 +36,8 @@ export interface IWorkpackModel {
   dashboardShowDeliveryStatus?: boolean;
   dashboardShowStakeholders?: string[];
   notificationsSelectedRoles: string[];
-  notificationsEventCriticalEnabled?: boolean;
-  notificationsEventCriticalDaysBefore?: number;
+  notificationsEventMilestoneEnabled?: boolean;
+  notificationsEventMilestoneDaysBefore?: number;
   notificationsEventScheduleEnabled?: boolean;
   notificationsEventScheduleDayOfMonth?: number;
 }

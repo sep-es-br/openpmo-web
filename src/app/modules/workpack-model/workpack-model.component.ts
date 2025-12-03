@@ -131,7 +131,7 @@ export class WorkpackModelComponent implements OnInit {
   notificationsStakeholderRolesOptions: SelectItem[] = [];
   notifications = {
     selectedRoles: ['manager'].map(item => this.translateSrv.instant(item)),
-    eventCritical: {
+    eventMilestone: {
       enabled: true,
       daysBefore: 5
     },
@@ -832,9 +832,9 @@ export class WorkpackModelComponent implements OnInit {
           }));
       this.notifications = {
         selectedRoles: data.notificationsSelectedRoles,
-        eventCritical: {
-          enabled: data.notificationsEventCriticalEnabled,
-          daysBefore: data.notificationsEventCriticalDaysBefore
+        eventMilestone: {
+          enabled: data.notificationsEventMilestoneEnabled,
+          daysBefore: data.notificationsEventMilestoneDaysBefore
         },
         eventSchedule: {
           enabled: data.notificationsEventScheduleEnabled,
@@ -1358,7 +1358,7 @@ export class WorkpackModelComponent implements OnInit {
 
           this.notifications.selectedRoles = ['manager'].map(item => this.translateSrv.instant(item));
 
-          this.notifications.eventCritical = {
+          this.notifications.eventMilestone = {
             enabled: true,
             daysBefore: 7
           };
@@ -1375,7 +1375,7 @@ export class WorkpackModelComponent implements OnInit {
 
         } else {
           this.notifications.selectedRoles = [];
-          this.notifications.eventCritical = {
+          this.notifications.eventMilestone = {
             enabled: false,
             daysBefore: null
           };
@@ -1551,8 +1551,8 @@ export class WorkpackModelComponent implements OnInit {
       dashboardShowRisks: this.dashboardPanel?.dashboardShowRisks,
       dashboardShowStakeholders: this.dashboardPanel?.dashboardShowStakeholders,
       notificationsSelectedRoles: this.notifications?.selectedRoles,
-      notificationsEventCriticalEnabled: this.notifications?.eventCritical?.enabled,
-      notificationsEventCriticalDaysBefore: this.notifications?.eventCritical?.daysBefore,
+      notificationsEventMilestoneEnabled: this.notifications?.eventMilestone?.enabled,
+      notificationsEventMilestoneDaysBefore: this.notifications?.eventMilestone?.daysBefore,
       notificationsEventScheduleEnabled: this.notifications?.eventSchedule?.enabled,
       notificationsEventScheduleDayOfMonth: this.notifications?.eventSchedule?.dayOfMonth,
       fontIcon: icon,
