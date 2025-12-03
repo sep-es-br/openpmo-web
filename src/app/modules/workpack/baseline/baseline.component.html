@@ -100,12 +100,19 @@
                   (
                     !node.children ||
                     node.children.length === 0
-                  )
+                    
+                  ) 
                 ">
                   <p-inputSwitch
                     class="app-toggle"
                     [(ngModel)]="node.included"
-                    [disabled]="allTogglerIsDisabled || node.classification === 'TO_CANCEL' || node.warnings?.shouldDisplayDeliveryWarnings"
+                    [disabled]="
+                        allTogglerIsDisabled || 
+                        node.classification === 'TO_CANCEL' || 
+                        node.warnings?.shouldDisplayDeliveryWarnings ||
+                        node.classification === 'DELETED' ||
+                        node.classification === 'UNCHANGED'
+                        "
                     (onChange)="handleToggleSwitchChange($event.checked, node.idWorkpack)"
                   >
                   </p-inputSwitch>
@@ -140,11 +147,16 @@
         </p-tree>
       </div>
 
-      <ng-container *ngIf="areTherePendentUpdatesListed">
-        <span class="warning-text">
+      <div class="d-flex flex-column">
+        <span class="warning-text" *ngIf="showFailMinMilestoneRequirement">
+            * {{ 'baseline-less-then-required-milestone' | translate : {'0': minMilestoneRequirement} }} 
+        </span>
+
+        <span class="warning-text"  *ngIf="areTherePendentUpdatesListed">
           * {{ 'baseline-disabled-submission-warning' | translate }}
         </span>
-      </ng-container>
+      </div>
+
     </app-card>
   </div>
 

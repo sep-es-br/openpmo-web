@@ -78,6 +78,10 @@ export class BaselineComponent implements OnInit, OnDestroy {
 
   treeShouldStartExpanded: boolean = true;
 
+  showFailMinMilestoneRequirement: boolean;
+
+  minMilestoneRequirement: number;
+
   get allTogglerIsDisabled(): boolean {
     return this.areTherePendentUpdatesListed || this.formBaseline.disabled;
   }
@@ -90,7 +94,7 @@ export class BaselineComponent implements OnInit, OnDestroy {
       this.baseline.updates.some(
         (update) => [UpdateStatus.NO_SCHEDULE, UpdateStatus.UNDEFINED_SCOPE].includes(update.classification)
       )
-    );
+    ) || this.showFailMinMilestoneRequirement;
   }
 
   get shouldDisableBaselineSubmission(): boolean {
@@ -260,13 +264,18 @@ export class BaselineComponent implements OnInit, OnDestroy {
     this.baseline.updates = [];
     this.cardBaselineUpdates.isLoading = false;
 
+    const { valid, requiredAmount } = await this.baselineSrv.checkMilestonesRequirement(this.idWorkpack);
+    console.log({valid, requiredAmount})
+    this.showFailMinMilestoneRequirement = !valid;
+    this.minMilestoneRequirement = requiredAmount;
+
     this.assembleUpdatesTree(updates);
   }
 
   assembleUpdatesTree(updates: Array<any>) {
     const conditionToEntityStartSelected = (updates: Array<IBaselineUpdates>, entity: IBaselineUpdates) => (
       !updates.some((el) => [UpdateStatus.NO_SCHEDULE, UpdateStatus.UNDEFINED_SCOPE].includes(el.classification)) &&
-      (entity.classification === UpdateStatus.NEW || entity.classification === UpdateStatus.TO_CANCEL)
+      (entity.classification === UpdateStatus.NEW || entity.classification === UpdateStatus.TO_CANCEL || entity.classification === UpdateStatus.DELETED)
     );
 
     // A função abaixo serve para criar os objetos de Marcos Críticos e Entregas que serão inseridos na árvore
@@ -466,9 +475,9 @@ export class BaselineComponent implements OnInit, OnDestroy {
       ...this.baseline.updates,
       ...this.getBottomTreeNodes(this.updatesTree)
     ]
-    .filter((update: any) => ![UpdateStatus.NO_SCHEDULE, UpdateStatus.UNDEFINED_SCOPE].includes(update.classification))
+    .filter((update: any) => ![UpdateStatus.NO_SCHEDULE, UpdateStatus.UNDEFINED_SCOPE, UpdateStatus.UNCHANGED].includes(update.classification))
     .forEach((update: any) => {
-      if (update.classification === UpdateStatus.TO_CANCEL) {
+      if ([UpdateStatus.TO_CANCEL, UpdateStatus.DELETED].includes(update.classification)) {
         update.included = true;
       } else {
         update.included = isEnabled;
@@ -583,7 +592,7 @@ export class BaselineComponent implements OnInit, OnDestroy {
     const changedUpdate = this.baseline.updates.find((update) => update.idWorkpack === workpackId);
 
     if (changedUpdate) {
-      if (changedUpdate.classification === UpdateStatus.TO_CANCEL) {
+      if ([UpdateStatus.DELETED, UpdateStatus.TO_CANCEL].includes(changedUpdate.classification)) {
         changedUpdate.included = true;
       } else {
         changedUpdate.included = isEnabled;
