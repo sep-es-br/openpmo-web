@@ -224,9 +224,8 @@
 
   <p-dialog
     [header]="'comment' | translate"
-    [visible]="!!showCommentDialog"
     [style]="!responsive ? {width: '30vw'} : {width: '90vw'}"
-    (onHide)="showCommentDialog = false"
+    [(visible)]="showCommentDialog"
   >
     <div class="comment-container">
       <textarea pInputTextarea class="app-text-area comment" rows="3" [disabled]="true">{{selectedComment}}</textarea>
