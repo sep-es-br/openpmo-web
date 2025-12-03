@@ -168,9 +168,10 @@ export class WorkpackSectionPropertiesComponent implements OnInit, OnDestroy {
       workpackCompleted: this.workpackData.workpack && this.workpackData.workpack.completed,
       workpackType: this.workpackData.workpack && this.workpackData.workpack.type,
       workpackCanceled: this.workpackData.workpack && this.workpackData.workpack.canceled,
-      showCheckCompleted:
-        !!this.workpackData.workpack &&
-        !['DeliverableModel', 'ProjectModel'].includes(this.workpackData.workpackModel?.type),
+      showCheckCompleted: 
+                !!this.workpackData.workpack && 
+                ![TypeWorkpackModelEnum.DeliverableModel, TypeWorkpackModelEnum.ProjectModel]
+                    .includes(this.workpackData.workpackModel?.type),
       canEditCheckCompleted: (this.workpackSrv.getEditPermission() && this.workpackData.workpack && this.workpackData.workpack.id
         && !this.workpackData.workpack.hasScheduleSectionActive
         && !this.workpackData.workpack.canceled
