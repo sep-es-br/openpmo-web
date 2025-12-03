@@ -65,7 +65,7 @@ export class BaselineViewComponent implements OnInit, OnDestroy {
     private responsiveSrv: ResponsiveService,
     private breadcrumbSrv: BreadcrumbService,
     private translateSrv: TranslateService,
-    private router: Router
+    private router: Router,
   ) {
     this.actRouter.queryParams.subscribe(({ id }) => {
       this.idBaseline = +id;
