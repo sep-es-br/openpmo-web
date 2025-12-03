@@ -697,7 +697,7 @@ export class WorkpackComponent implements OnDestroy {
     });
     let workpacks = result.success && result.data;
     if (!showCancelled && workpacks && !this.workpack?.canceled) {
-      workpacks = workpacks.filter(wp => !wp.canceled);
+      workpacks = workpacks.filter(wp => wp.type === 'Milestone' ? !wp.deleted : !wp.canceled);
     }
     if (workpacks && workpacks.length > 0) {
       const workpackItemCardList: IWorkpackCardItem[] = workpacks.map(workpack => {
