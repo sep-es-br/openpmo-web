@@ -202,7 +202,7 @@
             </div>
           </div>
           
-          <div class="updates-container" *ngIf="!isLoading">
+          <div class="updates-container" *ngIf="!isLoading && !baseline.cancelation">
             <p-tree [value]="tripleConstraintsTree">
               <ng-template let-node pTemplate="default">
                 <div
