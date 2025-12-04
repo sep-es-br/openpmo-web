@@ -10,9 +10,6 @@
       <span>{{ 'cancellationProposal' | translate }}</span>
     </div>
   </div>
-  <div class="loading-form-container" *ngIf="formIsLoading">
-    <app-card-loading [isCardLoading]="formIsLoading"></app-card-loading>
-  </div>
   <div class="card-properties-baseline">
     <app-card [properties]="cardBaselineProperties" class="mt-0 inputs-float-label">
       <div class="loading-container" *ngIf="cardBaselineProperties.isLoading">
