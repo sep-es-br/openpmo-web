@@ -698,7 +698,7 @@ export class WorkpackComponent implements OnDestroy {
     });
     let workpacks = result.success && result.data;
     if (!showCancelled && workpacks && !this.workpack?.canceled) {
-      workpacks = workpacks.filter(wp => !wp.canceled);
+      workpacks = workpacks.filter(wp => wp.type === 'Milestone' ? !wp.deleted : !wp.canceled);
     }
     if (workpacks && workpacks.length > 0) {
       const workpackItemCardList: IWorkpackCardItem[] = workpacks.map(workpack => {
@@ -708,7 +708,7 @@ export class WorkpackComponent implements OnDestroy {
         workpack.idPlan = idPlan;
         workpack.idWorkpackModel = idWorkpackModel;
         workpack.idParent = this.idWorkpack;
-        if (workpack.canceled && workpack.type !== 'Project' && workpack.type !== 'Deliverable') {
+        if (((workpack.canceled || workpack.deleted) && workpack.type !== 'Project' && workpack.type !== 'Deliverable')) {
           menuItems.push({
             label: this.translateSrv.instant('restore'),
             icon: 'fas fa-redo-alt',
@@ -832,7 +832,7 @@ export class WorkpackComponent implements OnDestroy {
             ]),
           linked: !!idWorkpackModelLinked ? true : (!!workpack.linked ? true : false),
           shared: workpack.sharedWith,
-          canceled: workpack.canceled,
+          canceled: workpack.type === 'Milestone' ? workpack.deleted : workpack.canceled,
           completed: workpack.completed,
           endManagementDate: workpack.endManagementDate,
           dashboardData: this.loadDashboardData(workpack.dashboard, workpack.milestone, workpack.risk),
