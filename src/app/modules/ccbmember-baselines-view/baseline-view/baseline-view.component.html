@@ -210,7 +210,10 @@
                   [ngClass]="{ 'grey-background': node.property === 'title' }"
                 >
                   <div class="line-left-side">
-                    <span [ngClass]="{ 'item-title': node.property === 'title', 'item-description-responsive': responsive }">
+                    <span
+                      class="item-description"
+                      [ngClass]="{ 'item-title': node.property === 'title', 'item-subtitle': node.property === 'subtitle', 'item-description-responsive': responsive }"
+                    >
                       {{ node.label }}
                     </span>
                   </div>
@@ -231,10 +234,10 @@
                       <div class="detail-box d-flex flex-row col-12">
                         <div
                           class="d-flex flex-column col-3"
-                          [ngClass]="{ 'justify-content-center': node.workpackStatus === 'UNCHANGED' }"
+                          [ngClass]="{ 'justify-content-center': node.statusDisplayMessage }"
                         >
-                          <ng-container *ngIf="node.workpackStatus === 'UNCHANGED' else standardTitles">
-                            <span class="item-alert">Não alterado</span>
+                          <ng-container *ngIf="node.statusDisplayMessage else standardTitles">
+                            <span class="item-alert">{{ node.statusDisplayMessage | translate }}</span>
                           </ng-container>
 
                           <ng-template #standardTitles>
@@ -243,7 +246,7 @@
                           </ng-template>
                         </div>
                         <div class="d-flex flex-column col-2">
-                          <ng-container *ngIf="node.workpackStatus === 'UNCHANGED' else standardCostValues">
+                          <ng-container *ngIf="['UNCHANGED', 'DELETED', 'TO_CANCEL'].includes(node.workpackStatus) else standardCostValues">
                             <span class="item-value"></span>
                             <span class="item-value"></span>
                           </ng-container>
@@ -273,12 +276,20 @@
                           </ng-container>
                         </div>
                         <div class="d-flex flex-column col-2">
-                          <span class="item-value">
-                            {{ (node.scheduleDetails?.currentDate | date : (language === 'pt' ? 'dd-MM-yyyy' : 'yyyy-MM-dd')) || '--' }}
-                          </span>
-                          <span class="item-value">
-                            {{ (node.scheduleDetails?.proposedDate | date : (language === 'pt' ? 'dd-MM-yyyy' : 'yyyy-MM-dd')) || '--' }}
-                          </span>
+                          <ng-container *ngIf="node.shouldDisplayBothDates else singleDate">
+                            <!-- Só mostra as duas datas se as duas estiverem disponíveis, e se forem diferentes uma da outra -->
+                            <span class="item-value">
+                              {{ (node.scheduleDetails.currentDate | date : (language === 'pt' ? 'dd-MM-yyyy' : 'yyyy-MM-dd')) }}
+                            </span>
+                            <span class="item-value">
+                              {{ (node.scheduleDetails.proposedDate | date : (language === 'pt' ? 'dd-MM-yyyy' : 'yyyy-MM-dd')) }}
+                            </span>
+                          </ng-container>
+                          <ng-template #singleDate>
+                            <span class="item-value">
+                              {{ (node.scheduleDetails?.currentDate ? node.scheduleDetails.currentDate : node.scheduleDetails?.proposedDate) | date : (language === 'pt' ? 'dd-MM-yyyy' : 'yyyy-MM-dd') }}
+                            </span>
+                          </ng-template>
                         </div>
                         <div class="d-flex flex-column col-1 justify-content-center">
                           <ng-container *ngIf="node.scheduleDetails?.variationInDays && node.scheduleDetails.variationInDays !== 0">
@@ -296,7 +307,7 @@
                           </ng-container>
                         </div>
                         <div class="d-flex flex-column col-2">
-                          <ng-container *ngIf="node.workpackStatus === 'UNCHANGED' else standardScopeValues">
+                          <ng-container *ngIf="['UNCHANGED', 'DELETED', 'TO_CANCEL'].includes(node.workpackStatus) else standardScopeValues">
                             <span class="item-value"></span>
                             <span class="item-value"></span>
                           </ng-container>

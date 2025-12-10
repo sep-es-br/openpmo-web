@@ -364,18 +364,23 @@
               .line-left-side {
                 display: flex;
                 align-items: center;
+                max-width: 40%;
 
-                .item-title {
-                  font-weight: bold;
-                  text-transform: uppercase;
-                  font-size: 11px;
-                  color: #1B4F61
-                }
+                .item-description {
+                  line-height: 1em;
 
-                .dashed-text {
-                  text-decoration: dashed;
+                  &.item-title {
+                    font-weight: bold;
+                    text-transform: uppercase;
+                    font-size: 11px;
+                    color: #1B4F61
+                  }
+                  &.item-subtitle {
+                    line-height: 2em;
+                  }
                 }
               }
+
               .line-right-side {
                 margin-right: 4em;
                 width: 50%;
