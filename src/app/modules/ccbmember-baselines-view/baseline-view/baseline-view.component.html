@@ -237,7 +237,12 @@
                           [ngClass]="{ 'justify-content-center': node.statusDisplayMessage }"
                         >
                           <ng-container *ngIf="node.statusDisplayMessage else standardTitles">
-                            <span class="item-alert">{{ node.statusDisplayMessage | translate }}</span>
+                            <span
+                              class="item-alert"
+                              [ngClass]="{ 'highlight-alert': ['DELETED', 'TO_CANCEL'].includes(node.workpackStatus) }"
+                            >
+                              {{ node.statusDisplayMessage | translate }}
+                            </span>
                           </ng-container>
 
                           <ng-template #standardTitles>
