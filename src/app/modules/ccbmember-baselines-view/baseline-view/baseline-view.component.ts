@@ -277,12 +277,28 @@ export class BaselineViewComponent implements OnInit, OnDestroy {
             children: [],
             property: 'value',
             idWorkpack: milestone.idWorkpack,
-            classification: milestone?.workpackStatus || '',
             costDetails: milestone?.costDetails,
             scheduleDetails: milestone?.scheduleDetails,
             scopeDetails: milestone?.scopeDetails,
             workpackStatus: milestone?.workpackStatus,
-            precisionFactor: getPrecisionFactor(milestone.scopeDetails?.unitName)
+            precisionFactor: getPrecisionFactor(milestone.scopeDetails?.unitName),
+            statusDisplayMessage: milestone?.workpackStatus || undefined,
+            shouldDisplayBothDates: (
+              (
+                milestone?.scheduleDetails &&
+                milestone.scheduleDetails?.currentDate &&
+                milestone.scheduleDetails?.proposedDate &&
+                !milestone.scheduleDetails.currentDate.match(milestone.scheduleDetails.proposedDate)
+              ) ||
+              (
+                milestone.scheduleDetails?.currentDate &&
+                !milestone.scheduleDetails?.proposedDate
+              ) ||
+              (
+                !milestone.scheduleDetails?.currentDate &&
+                milestone.scheduleDetails?.proposedDate
+              )
+            )
           };
 
           milestoneTitleObject.children.push(milestoneObject);
@@ -316,6 +332,23 @@ export class BaselineViewComponent implements OnInit, OnDestroy {
             scopeDetails: delivery?.scopeDetails,
             workpackStatus: delivery?.workpackStatus,
             precisionFactor: getPrecisionFactor(delivery?.scopeDetails.unitName),
+            statusDisplayMessage: delivery?.workpackStatus || undefined,
+            shouldDisplayBothDates: (
+              (
+                delivery?.scheduleDetails &&
+                delivery.scheduleDetails?.currentDate &&
+                delivery.scheduleDetails?.proposedDate &&
+                !delivery.scheduleDetails.currentDate.match(delivery.scheduleDetails.proposedDate)
+              ) ||
+              (
+                delivery.scheduleDetails?.currentDate &&
+                !delivery.scheduleDetails?.proposedDate
+              ) ||
+              (
+                !delivery.scheduleDetails?.currentDate &&
+                delivery.scheduleDetails?.proposedDate
+              )
+            )
           };
 
           deliveryTitleObject.children.push(deliveryObject);
