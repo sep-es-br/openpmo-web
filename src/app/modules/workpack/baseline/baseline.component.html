@@ -151,6 +151,9 @@
         <span class="warning-text" *ngIf="showFailMinMilestoneRequirement">
             * {{ 'baseline-less-then-required-milestone' | translate : {'0': minMilestoneRequirement} }} 
         </span>
+        <span class="warning-text" *ngIf="showFailPlannedWorkRequirement">
+            * {{ 'baseline-not-have-required-plannedWork' | translate }} 
+        </span>
 
         <span class="warning-text"  *ngIf="areTherePendentUpdatesListed">
           * {{ 'baseline-disabled-submission-warning' | translate }}

@@ -79,6 +79,7 @@ export class BaselineComponent implements OnInit, OnDestroy {
   treeShouldStartExpanded: boolean = true;
 
   showFailMinMilestoneRequirement: boolean;
+  showFailPlannedWorkRequirement: boolean;
 
   minMilestoneRequirement: number;
 
@@ -94,7 +95,7 @@ export class BaselineComponent implements OnInit, OnDestroy {
       this.baseline.updates.some(
         (update) => [UpdateStatus.NO_SCHEDULE, UpdateStatus.UNDEFINED_SCOPE].includes(update.classification)
       )
-    ) || this.showFailMinMilestoneRequirement;
+    ) || this.showFailMinMilestoneRequirement || this.showFailPlannedWorkRequirement;
   }
 
   get shouldDisableBaselineSubmission(): boolean {
@@ -265,8 +266,9 @@ export class BaselineComponent implements OnInit, OnDestroy {
     this.cardBaselineUpdates.isLoading = false;
 
     const { valid, requiredAmount } = await this.baselineSrv.checkMilestonesRequirement(this.idWorkpack);
-    console.log({valid, requiredAmount})
+    const reqPlanWork = await this.baselineSrv.checkPlannedWorkRequirement(this.idWorkpack);
     this.showFailMinMilestoneRequirement = !valid;
+    this.showFailPlannedWorkRequirement = !reqPlanWork.valid
     this.minMilestoneRequirement = requiredAmount;
 
     this.assembleUpdatesTree(updates);
