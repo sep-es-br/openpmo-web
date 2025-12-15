@@ -7,9 +7,6 @@
   }
 
   header {
-    display: flex;
-    flex-direction: row;
-
     .busca-wrapper{
       display: flex;
       flex-direction: column;
@@ -30,6 +27,11 @@
           width: 0 !important;
           border-bottom: none !important;
           transition: width .3s;
+          text-overflow: ellipsis;
+
+          :focus {
+            text-overflow: ellipsis;
+          }
 
           &.animation-input {
             width: 100% !important;
