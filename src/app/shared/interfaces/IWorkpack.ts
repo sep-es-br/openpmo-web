@@ -61,6 +61,7 @@ export interface IWorkpackListCard {
     hasActiveBaseline?: boolean;
     activeBaselineName?: string;
     canceled?: boolean;
+    deleted?: boolean;
     cancelable?: boolean;
     completed?: boolean;
     canDeleted?: boolean;

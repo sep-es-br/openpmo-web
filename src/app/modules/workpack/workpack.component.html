@@ -92,7 +92,7 @@
                 <div class="input-toggle-workpack-cancelled">
                 <p-inputSwitch class="app-toggle" [(ngModel)]="workpackModel.workpackShowCancelleds"
                     (onChange)="handleWorkpackCancelledToggle(i, $event)"></p-inputSwitch>
-                <label class="input-label">{{"showCanceled" | translate}}</label>
+                <label class="input-label">{{(selectedTab.key == "Marcos críticos" ? 'showInactive' : 'showCanceled') | translate}}</label>
                 </div>
                 <div class="workpacks-list-container">
                 <div class="loading-container" *ngIf="workpackModel.cardSection.isLoading">
