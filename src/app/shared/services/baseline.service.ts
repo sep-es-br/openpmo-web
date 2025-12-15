@@ -8,6 +8,8 @@ import { IWorkpackData, IWorkpackParams } from '../interfaces/IWorkpackDataParam
 import { WorkpackService } from './workpack.service';
 import { TypeWorkpackEnum } from '../enums/TypeWorkpackEnum';
 
+type checkMilestonesRequirementResponse = {valid: boolean, requiredAmount: number}
+type checkPlannedWorkRequirementResponse = {valid: boolean}
 @Injectable({
   providedIn: 'root'
 })
@@ -78,6 +80,18 @@ export class BaselineService extends BaseService<IBaseline> {
     const { success, data } = await
       this.http.get<IHttpResult<IBaselineUpdates[]>>(`${this.urlBase}/updates`, { params: PrepareHttpParams(options) }).toPromise();
     return success ? data : [];
+  }
+
+  public async checkMilestonesRequirement(idWorkpack): Promise<checkMilestonesRequirementResponse> {
+    const { success, data } = await
+      this.http.get<IHttpResult<checkMilestonesRequirementResponse>>(`${this.urlBase}/check-milestone-requirement`, { params: {"id-workpack": idWorkpack} }).toPromise();
+    return success ? data : {} as checkMilestonesRequirementResponse;
+  }
+
+  public async checkPlannedWorkRequirement(idWorkpack): Promise<checkPlannedWorkRequirementResponse> {
+    const { success, data } = await
+      this.http.get<IHttpResult<checkPlannedWorkRequirementResponse>>(`${this.urlBase}/check-plannedWork-requirement`, { params: {"id-workpack": idWorkpack} }).toPromise();
+    return success ? data : {} as checkPlannedWorkRequirementResponse;
   }
 
   public putBaseline(idBaseline: number, model: IBaseline): Promise<IHttpResult<IBaseline>> {
