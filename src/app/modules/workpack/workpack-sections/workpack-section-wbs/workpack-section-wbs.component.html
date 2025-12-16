@@ -141,15 +141,149 @@
       <div class="dashboard-items-container">
 
         <!-- journal information container -->
-        <div class="status-container" *ngIf="properties?.properties?.journalInformation?.date; else statusEmpty">
-          <i class="fas fa-info" style="cursor: pointer"
+         <!-- TEM QUE ARRUMAR PRA FAZER APARECER PRAS ENTREGAS TB -->
+        <div class="status-container" *ngIf="properties.projectStatus || properties.deliverableStatus">
+          <ng-container
+            *ngIf="
+              (
+                properties?.projectStatus &&
+                (
+                  properties.projectStatus === 'ESTRUTURACAO' ||
+                  properties.projectStatus === 'PLANEJAMENTO'
+                )
+              ) ||
+              (
+                properties?.deliverableStatus &&
+                (
+                  properties.deliverableStatus === 'ACOES_PREPARATORIAS' ||
+                  properties.deliverableStatus === 'PROJETO_EM_ELABORACAO' ||
+                  properties.deliverableStatus === 'PROJETO_ELABORADO' ||
+                  properties.deliverableStatus === 'CONVENIO_ASSINADO' ||
+                  properties.deliverableStatus === 'EDITAL_PUBLICADO' ||
+                  properties.deliverableStatus === 'LICITACAO_CONCLUIDA' ||
+                  properties.deliverableStatus === 'CONTRATO_ASSINADO' ||
+                  properties.deliverableStatus === 'EM_LICITACAO' ||
+                  properties.deliverableStatus === 'A_LICITAR'
+                )
+              )
+            "
+          >
+            <img
+              class="preparation-status"
+              src="../../../../../assets/svg/cone.svg"
+              [pTooltip]="properties?.projectStatus || properties?.deliverableStatus"
+            >
+          </ng-container>
+
+          <ng-container
+            *ngIf="
+              (
+                properties?.projectStatus &&
+                properties.projectStatus === 'EXECUCAO'
+              ) ||
+              (
+                properties?.deliverableStatus &&
+                (
+                  properties.deliverableStatus === 'OBRA_EM_ANDAMENTO' ||
+                  properties.deliverableStatus === 'SERVICO_EM_ANDAMENTO' ||
+                  properties.deliverableStatus === 'EM_EXECUCAO'
+                )
+              )
+            "
+          >
+            <i
+              class="status-icon fas fa-play-circle"
+              [ngStyle]="{ color: '#00B89C' }"
+              [pTooltip]="properties?.projectStatus || properties?.deliverableStatus"
+            >
+            </i>
+          </ng-container>
+
+          <ng-container
+            *ngIf="
+              (
+                properties?.projectStatus &&
+                properties.projectStatus === 'CONCLUIDO'
+              ) ||
+              (
+                properties?.deliverableStatus &&
+                properties.deliverableStatus === 'CONCLUIDA'
+              )
+            "
+          >
+            <i
+              class="status-icon fas fa-check-circle"
+              [ngStyle]="{ color: '#0081C1' }"
+              [pTooltip]="properties?.projectStatus || properties?.deliverableStatus"
+            >
+            </i>
+          </ng-container>
+
+          <ng-container
+            *ngIf="
+              (
+                properties?.projectStatus &&
+                (
+                  properties.projectStatus === 'PARALISADO' ||
+                  properties.projectStatus === 'SUSPENSO'
+                )
+              ) ||
+              (
+                properties?.deliverableStatus &&
+                (
+                  properties.deliverableStatus === 'PARALISADO' ||
+                  properties.deliverableStatus === 'SUSPENSA'
+                )
+              )
+            "
+          >
+            <i
+              class="status-icon fas fa-pause-circle"
+              [ngStyle]="{ color: '#FB7800' }"
+              [pTooltip]="properties?.projectStatus || properties?.deliverableStatus"
+            >
+            </i>
+          </ng-container>
+
+          <ng-container
+            *ngIf="
+              (
+                properties?.projectStatus &&
+                properties.projectStatus === 'CANCELADO'
+              ) ||
+              (
+                properties?.deliverableStatus &&
+                (
+                  properties.deliverableStatus === 'CANCELADA' ||
+                  properties.deliverableStatus === 'A_CANCELAR'
+                )
+              )
+            "
+          >
+            <i
+              class="status-icon fas fa-times-circle"
+              [ngStyle]="{ color: '#FA4C4F' }"
+              [pTooltip]="properties?.projectStatus || properties?.deliverableStatus"
+            >
+            </i>
+          </ng-container>
+        </div>
+
+        <div class="journal-container" *ngIf="properties?.properties?.journalInformation?.date; else statusEmpty">
+          <i
             *ngIf="!properties?.properties?.journalInformation?.actual"
+            class="fas fa-info"
+            style="cursor: pointer"
             (click)="handleShowJournalInformation(properties.properties.journalInformation); journalInformationPanel.show($event)" 
-            ></i>
-          <i class="fas fa-info-circle" [ngStyle]="{ fontSize: '1.2rem', cursor: 'pointer' }"
+          >
+          </i>
+          <i
             *ngIf="properties?.properties?.journalInformation?.actual"
+            class="fas fa-info-circle"
+            [ngStyle]="{ fontSize: '1.2rem', cursor: 'pointer' }"
             (click)="handleShowJournalInformation(properties.properties.journalInformation); journalInformationPanel.show($event)" 
-            ></i>
+          >
+          </i>
         </div>
         
         <ng-template #statusEmpty>
