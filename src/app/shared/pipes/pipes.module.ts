@@ -5,13 +5,15 @@ import { CommonModule } from '@angular/common';
 import { FormatarTelefonePipe } from './formatarTelefonePipe';
 import { FromStringArrayToSelectItemPipe } from './fromStringArrayToSelectItemPipe';
 import { FormatNamePipe } from './format-name.pipe';
+import { WorkpackStatusConfigPipe } from './workpackStatusConfig.pipe';
 
 @NgModule({
   declarations: [
     FormatarTelefonePipe,
     FromStringArrayToSelectItemPipe,
     ShortNumberPipe,
-    FormatNamePipe
+    FormatNamePipe,
+    WorkpackStatusConfigPipe,
   ],
   imports: [
     CommonModule
@@ -20,7 +22,8 @@ import { FormatNamePipe } from './format-name.pipe';
     FormatarTelefonePipe,
     FromStringArrayToSelectItemPipe,
     ShortNumberPipe,
-    FormatNamePipe
+    FormatNamePipe,
+    WorkpackStatusConfigPipe
   ],
   providers: [ShortNumberPipe]
 })
