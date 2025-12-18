@@ -4,6 +4,7 @@ import { IWorkpackProperty } from './IWorkpackProperty';
 import { IPlan } from './IPlan';
 import { IWorkpackModel } from './IWorkpackModel';
 import { IWorkpackJournalInformation } from './IJournal';
+import { DeliverableStatus, ProjectStatus } from '../enums/WorkpackStatusEnum';
 
 export interface IWorkpack {
     id?: number;
@@ -102,6 +103,8 @@ export interface IWorkpackListCard {
       earnedValue?: number;
     };
     journalInformation?: IWorkpackJournalInformation;
+    projectStatus?: ProjectStatus;
+    deliverableStatus?: DeliverableStatus;
 }
 
 interface IWorkpackDashboard {

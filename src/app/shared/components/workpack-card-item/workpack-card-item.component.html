@@ -200,6 +200,41 @@
       <div class="right-container">
         <div class="dashboard-items-container">
           <div class="status-container">
+            <ng-container
+              *ngIf="properties?.projectStatus"
+              [ngTemplateOutlet]="iconConfig"
+              [ngTemplateOutletContext]="properties.projectStatus | workpackStatusConfig"
+            >
+              <ng-template
+                #iconConfig
+                let-icon="icon"
+                let-iconOrigin="iconOrigin"
+                let-iconSrc="iconSrc"
+                let-iconColor="iconColor"
+              >
+                <div class="status-container">
+                  <ng-container *ngIf="iconOrigin === 'img' else iconTemplate">
+                    <img
+                      class="img-status-icon"
+                      [ngStyle]="{ color: iconColor || 'black' }"
+                      [src]="'../../../../../../../..' + iconSrc"
+                      [pTooltip]="icon"
+                    >
+                  </ng-container>
+
+                  <ng-template #iconTemplate>
+                    <i
+                      class="i-status-icon"
+                      [ngClass]="iconSrc"
+                      [ngStyle]="{ color: iconColor || 'black' }"
+                      [pTooltip]="icon"
+                    >
+                    </i>
+                  </ng-template>
+                </div>
+              </ng-template>
+            </ng-container>
+            
             <i class="fas fa-info" *ngIf="properties?.journalInformation?.date && !properties?.journalInformation?.actual" style="cursor: pointer"
               (click)="handleShowJournalInformation(properties?.journalInformation); journalInformationPanelList.show($event)"
               ></i>
