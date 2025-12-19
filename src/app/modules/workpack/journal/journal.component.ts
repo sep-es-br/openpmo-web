@@ -141,6 +141,7 @@ export class JournalComponent implements OnInit {
         nameCardItem: newFile.name,
         icon: this.getIconFromMimeTypeFile(newFile.mimeType),
         givenName: newFile.givenName,
+        file: file,
         menuItems: [
           {
             label: this.translateSvr.instant('delete'),
@@ -156,6 +157,7 @@ export class JournalComponent implements OnInit {
       icon: IconsEnum.Plus,
     });
   }
+  
 
   createObjectUrl(file: File): SafeResourceUrl {
     return this.sanatizer.bypassSecurityTrustResourceUrl(URL.createObjectURL(file));
@@ -197,23 +199,25 @@ export class JournalComponent implements OnInit {
   }
 
   async uploadEvidencesAll(data) {
-    const results = await Promise.all(this.cardItemsEvidences.filter(card => card.typeCardItem !== 'newCardItem').map(async (evidence: any) => {
-      if (evidence.itemId) {
-        return {
-          success: true
-        };
+    const formData = new FormData();
+    const evidencesToUpload = [];
+    for (const evidence of this.cardItemsEvidences) {
+      if (evidence.typeCardItem === 'newCardItem') continue;
+      if (evidence.itemId) continue;
+      if (!(evidence.file instanceof File)) {
+        console.error('Arquivo inválido:', evidence);
+        continue;
       }
-      const file = await fetch(evidence.urlImg.changingThisBreaksApplicationSecurity);
-      const formData: FormData = new FormData();
-      const blob = await file.blob();
-      formData.append('file', blob, evidence.givenName);
-      const result = await this.evidenceSrv.uploadEvidence(formData, data.id);
-      if (result.success) {
-        evidence.itemId = result.data.id
-      }
-      return result;
-    }));
-    return results;
+      formData.append('files', evidence.file);
+      evidencesToUpload.push(evidence);
+    }
+    const result = await this.evidenceSrv.uploadEvidences(formData, data.id);
+    if (result?.success && Array.isArray(result.data)) {
+      result.data.forEach((res, index) => {
+        evidencesToUpload[index].itemId = res.id;
+      });
+    }
+    return result;
   }
 
 }
