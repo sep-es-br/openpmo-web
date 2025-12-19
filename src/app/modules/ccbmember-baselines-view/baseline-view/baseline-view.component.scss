@@ -127,7 +127,8 @@
           flex-direction: column;
           flex: 1;
           border-right: solid 1px v.$borderLightGrey;
-          padding-right: 4em;
+          padding-right: 1rem;
+
           .baseline-description-container {
             .description-text {
               display: flex;
@@ -196,13 +197,13 @@
               display: flex;
               flex-direction: row;
               align-items: center;
-              justify-content: flex-start;
+              justify-content: space-between;
               flex: 1;
+
               .card {
                 width: 31%;
                 min-height: 180px;
                 padding: 0.5em;
-                margin-right: 1.5em;
                 background-color: v.$bgWhite;
                 box-sizing: border-box;
                 border-width: 1px;
@@ -210,7 +211,7 @@
                 border-color: v.$borderCard;
                 border-radius: 5px;
                 box-shadow: none;
-                cursor: pointer;
+
                 .header-card {
                   display: flex;
                   flex-direction: row;
@@ -306,6 +307,113 @@
               }
             }
           }
+
+          .updates-container {
+            display: flex;
+            flex-direction: column;
+            padding-top: 1em;
+            padding-bottom: 2em;
+            
+            .p-tree .p-tree-container .p-treenode .p-treenode-content .p-tree-toggler {
+              width: 1.5rem;
+              height: 1.5rem;
+            }
+            .p-treenode {
+              padding-left: 0;
+              padding-right: 0;
+            }
+            .p-treenode-content {
+              width: 100%;
+              padding: 0;
+              line-height: 2em;
+
+              &:focus {
+                outline: 0;
+                box-shadow: none;
+              }
+            }
+            .p-treenode-label {
+              width: 100%;
+            }
+            .p-treenode-icon {
+              width: auto;
+            }
+
+            .container-workpackmodel {
+              display: flex;
+              justify-content: space-between;
+              padding-top: 0;
+              padding-bottom: 0;
+              padding-left: 0.5em;
+              padding-right: 0.5em;
+              border-bottom: 1px solid #DEE2E6;
+              font-size: 12px;
+
+              &.grey-background {
+                background-color: #F8F9FB;
+              }
+
+              .warning-icon {
+                color: #F59A23;
+                margin-right: 0.25em;
+              }
+              .alert-text {
+                color: #F59A23;
+              }
+
+              .line-left-side {
+                display: flex;
+                align-items: center;
+
+                .item-title {
+                  font-weight: bold;
+                  text-transform: uppercase;
+                  font-size: 11px;
+                  color: #1B4F61
+                }
+
+                .dashed-text {
+                  text-decoration: dashed;
+                }
+              }
+              .line-right-side {
+                margin-right: 4em;
+                width: 50%;
+
+                .titles-box, .detail-box {
+                  width: 100%;
+
+                  .item-title, .item-subtitle {
+                    font-weight: bold;
+                    font-size: 11px;
+                    color: #1B4F61;
+                  }
+
+                  .item-title {
+                    text-align: center;
+                    text-transform: uppercase;
+                  }
+                  .item-value {
+                    text-align: end;
+                  }
+                }
+              }
+
+              .tree-label {
+                font-weight: 700;
+                font-size: 14px;
+                text-transform: uppercase;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+              }
+
+              .app-toggle {
+                padding-right: 1em;
+              }
+            }
+          }
+
           .details-panels {
             margin-top: 1em;
             padding: 0.5em 0.5em 2em 0.5em;
@@ -644,63 +752,6 @@
               .card {
                 width: 100%;
                 margin-bottom: 1em;
-              }
-            }
-          }
-          .details-panels {
-            .card-list-item {
-              .p-card .p-card-body .p-card-content {
-                .card-item-content {
-                  flex-direction: column !important;
-                  align-items: flex-start;
-                  .item-values {
-                    padding-top: 1em;
-                    width: 100%;
-                    align-items: flex-start;
-                    .item-value {
-                      width: 33%;
-                      display: flex;
-                      flex-direction: column;
-                      align-items: flex-start;
-                      justify-content: flex-start;
-                      color: v.$fontTitle;
-                      font-size: 15px;
-                      font-family: v.$fontFamily;
-                      > span {
-
-                        display: flex;
-                        flex-direction: row;
-                        justify-content: flex-start;
-                        align-items: flex-start;
-                      }
-
-                      .header {
-                        font-weight: 700;
-                        font-family: v.$fontFamilyBold;
-                      }
-                    }
-                    .variation-container {
-                      width: 33%;
-                      align-self: flex-end;
-                      display: flex;
-                      flex-direction: row;
-                      align-items: center;
-                      justify-content: flex-end;
-                      font-weight: 700;
-                      font-family: v.$fontFamilyBold;
-                      > i {
-                        margin-right: 5px;
-                      }
-                    }
-                    .negative-variation {
-                      color: v.$fontRed;
-                    }
-                    .positive-variation {
-                      color: v.$bgButtonGreen;
-                    }
-
-                  }
-                }
               }
             }
           }

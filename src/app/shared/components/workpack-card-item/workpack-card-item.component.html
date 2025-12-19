@@ -399,7 +399,7 @@
             }}
           </span>
           <div class="calendar-container">
-            <p-calendar  *ngIf="properties?.editPermission" [(ngModel)]="milestoneDate"
+            <p-calendar  *ngIf="properties?.editPermission" [(ngModel)]="milestoneDate" [disabled]="properties?.canceled"
               [dateFormat]="language === 'pt-BR' ? 'dd/mm/yy' : 'yy/mm/dd'" [showOnFocus]="false"
               (ngModelChange)="changeMilestoneDate($event)" [showIcon]="true" inputId="icon">
             </p-calendar>
@@ -473,7 +473,7 @@
           </span>
           <ng-container *ngIf="!showReasonModal; else reasonContainer">
             <div class="calendar-container" *ngIf="properties?.editPermission">
-              <p-calendar [(ngModel)]="milestoneDate" *ngIf="properties?.editPermission"
+              <p-calendar [(ngModel)]="milestoneDate" *ngIf="properties?.editPermission" [disabled]="properties?.canceled"
                 [dateFormat]="language === 'pt-BR' ? 'dd/mm/yy' : 'yy/mm/dd'" [showOnFocus]="false"
                 (ngModelChange)="changeMilestoneDate($event)" [showIcon]="true" inputId="icon">
               </p-calendar>
