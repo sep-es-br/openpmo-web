@@ -331,7 +331,7 @@ export class BaselineViewComponent implements OnInit, OnDestroy {
             scheduleDetails: delivery?.scheduleDetails,
             scopeDetails: delivery?.scopeDetails,
             workpackStatus: delivery?.workpackStatus,
-            precisionFactor: getPrecisionFactor(delivery?.scopeDetails.unitName),
+            precisionFactor: getPrecisionFactor(delivery?.scopeDetails?.unitName) || undefined,
             statusDisplayMessage: delivery?.workpackStatus || undefined,
             shouldDisplayBothDates: (
               (
