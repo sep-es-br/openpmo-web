@@ -1,0 +1,9 @@
+export enum BaselineUpdateStatus {
+  NEW = 'NEW',
+  CHANGED = 'CHANGED',
+  DELETED = 'DELETED',
+  TO_CANCEL = 'TO_CANCEL',
+  NO_SCHEDULE = 'NO_SCHEDULE',
+  UNDEFINED_SCOPE = 'UNDEFINED_SCOPE',
+  UNCHANGED = 'UNCHANGED',
+}

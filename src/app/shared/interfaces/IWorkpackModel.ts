@@ -22,6 +22,7 @@ export interface IWorkpackModel {
   };
   stakeholderSessionActive?: boolean;
   scheduleSessionActive?: boolean;
+  notificationsSessionActive?: boolean;
   properties?: IWorkpackModelProperty[];
   sortBy: IWorkpackModelProperty;
   sortByField?: string;
@@ -34,6 +35,11 @@ export interface IWorkpackModel {
   dashboardShowRisks?: boolean;
   dashboardShowDeliveryStatus?: boolean;
   dashboardShowStakeholders?: string[];
+  notificationsSelectedRoles: string[];
+  notificationsEventMilestoneEnabled?: boolean;
+  notificationsEventMilestoneDaysBefore?: number;
+  notificationsEventScheduleEnabled?: boolean;
+  notificationsEventScheduleDayOfMonth?: number;
 }
 
 export interface IReusableWorkpackModel {

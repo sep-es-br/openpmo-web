@@ -94,7 +94,6 @@ export class WorkpackSectionWBSComponent implements OnDestroy {
     this.setLanguage();
     this.workpackParams = this.workpackSrv.getWorkpackParams();
     const { wbsTree, loading } = this.breakdownStructureSrv.getWBSTree();
-    console.log('wbsTree: ', wbsTree);
     this.wbsTree = wbsTree;
     this.isLoading = loading;
   }

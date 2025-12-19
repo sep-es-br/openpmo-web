@@ -193,7 +193,7 @@
     padding: 0.5em !important;
 
   }
-  .dashboard-show-options {
+  .dashboard-show-options, .notification-field {
     padding-top: 0.5em;
     padding-bottom: 0.5em;
     display: flex;
@@ -395,6 +395,51 @@
   .workpack-model-addicional-properties {
     .addicional-properties-container {
       width: 100%;
+    }
+  }
+}
+
+
+.events-title {
+  font-size: 0.75rem;
+  color: #6d7c80;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+
+  i {
+    margin-left: 5px;
+    font-size: 0.8rem;
+    color: #a0b0b5;
+  }
+}
+
+.toggles-container-notifications {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  .toggle-item {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding-bottom: 0.5em;
+    gap: 0.5rem;
+    width: auto !important; 
+    label {
+      color: #004660;
+    }
+    .event-prefix,
+    .event-suffix {
+      color: #004660;
+    }
+    ::ng-deep .event-dropdown .p-dropdown {
+      border: none;
+      border-bottom: 1px solid #b6c8cd;
+      border-radius: 0;
+
+      :not(.p-disabled):hover {
+        border-color: #b6c8cd;
+      }
     }
   }
 }
