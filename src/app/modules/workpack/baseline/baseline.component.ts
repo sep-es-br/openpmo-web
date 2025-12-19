@@ -114,13 +114,9 @@ export class BaselineComponent implements OnInit, OnDestroy {
     private messageSrv: MessageService,
     private translateSrv: TranslateService
   ) {
-    this.actRouter.queryParams
-      .subscribe(({idBaseline, idWorkpack, idWorkpackModelLinked}) => {
-        this.idWorkpack = idWorkpack && +idWorkpack;
-        this.idWorkpackModelLinked = idWorkpackModelLinked && +idWorkpackModelLinked;
-        this.idBaseline = idBaseline && +idBaseline;
-      });
-    this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.responsive = value);
+    this.responsiveSrv.observable
+      .pipe(takeUntil(this.$destroy))
+      .subscribe((value) => (this.responsive = value));
     this.formBaseline = this.formBuilder.group({
       name: ['', [Validators.required, Validators.maxLength(50)]],
       proposer: null,
@@ -130,6 +126,13 @@ export class BaselineComponent implements OnInit, OnDestroy {
   }
 
   async ngOnInit() {
+    const params = this.actRouter.queryParams.toPromise();
+    
+    this.idWorkpack = params['idWorkpack'] && +params['idWorkpack'];
+    this.idWorkpackModelLinked =
+        params['idWorkpackModelLinked'] && +params['idWorkpackModelLinked'];
+    this.idBaseline = params['idBaseline'] && +params['idBaseline'];
+     
     await this.loadPropertiesBaseline();
     await this.setBreadcrumb();
   }
