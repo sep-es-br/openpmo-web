@@ -77,11 +77,12 @@ export class BaselineComponent implements OnInit, OnDestroy {
   updatesTree: Array<TreeNode<IBaselineUpdates>>;
 
   treeShouldStartExpanded: boolean = true;
-
+  
   showFailMinMilestoneRequirement: boolean;
   showFailPlannedWorkRequirement: boolean;
 
   minMilestoneRequirement: number;
+
 
   get allTogglerIsDisabled(): boolean {
     return this.areTherePendentUpdatesListed || this.formBaseline.disabled;
@@ -102,7 +103,7 @@ export class BaselineComponent implements OnInit, OnDestroy {
     return (
       this.formIsLoading ||
       this.areTherePendentUpdatesListed ||
-      !this.baseline.updates.some((update) => update.included) ||
+      !this.baseline?.updates.some((update) => update.included) ||
       !this.formBaseline.valid
     );
   }
@@ -131,15 +132,20 @@ export class BaselineComponent implements OnInit, OnDestroy {
   }
 
   async ngOnInit() {
-    const params = this.actRouter.queryParams.toPromise();
-    
-    this.idWorkpack = params['idWorkpack'] && +params['idWorkpack'];
-    this.idWorkpackModelLinked =
-        params['idWorkpackModelLinked'] && +params['idWorkpackModelLinked'];
-    this.idBaseline = params['idBaseline'] && +params['idBaseline'];
+
+    this.actRouter.queryParams.pipe(takeUntil(this.$destroy)).subscribe({
+        next: async ({ idWorkpack, idWorkpackModelLinked, idBaseline }) => {
+            this.idWorkpack = idWorkpack && +idWorkpack;
+            this.idWorkpackModelLinked =
+                idWorkpackModelLinked && +idWorkpackModelLinked;
+            this.idBaseline = idBaseline && +idBaseline;
      
-    await this.loadPropertiesBaseline();
-    await this.setBreadcrumb();
+            await this.loadPropertiesBaseline();
+            await this.setBreadcrumb();
+        }
+    });
+    
+    
   }
 
   ngOnDestroy(): void {
@@ -280,7 +286,7 @@ export class BaselineComponent implements OnInit, OnDestroy {
   assembleUpdatesTree(updates: Array<any>) {
     const conditionToEntityStartSelected = (updates: Array<IBaselineUpdates>, entity: IBaselineUpdates) => (
       !updates.some((el) => [UpdateStatus.NO_SCHEDULE, UpdateStatus.UNDEFINED_SCOPE].includes(el.classification)) &&
-      (entity.classification === UpdateStatus.NEW || entity.classification === UpdateStatus.TO_CANCEL || entity.classification === UpdateStatus.DELETED)
+      (entity.classification === UpdateStatus.NEW || entity.classification === UpdateStatus.TO_CANCEL)
     );
 
     // A função abaixo serve para criar os objetos de Marcos Críticos e Entregas que serão inseridos na árvore
@@ -480,9 +486,9 @@ export class BaselineComponent implements OnInit, OnDestroy {
       ...this.baseline.updates,
       ...this.getBottomTreeNodes(this.updatesTree)
     ]
-    .filter((update: any) => ![UpdateStatus.NO_SCHEDULE, UpdateStatus.UNDEFINED_SCOPE, UpdateStatus.UNCHANGED].includes(update.classification))
+    .filter((update: any) => ![UpdateStatus.NO_SCHEDULE, UpdateStatus.UNDEFINED_SCOPE].includes(update.classification))
     .forEach((update: any) => {
-      if ([UpdateStatus.TO_CANCEL, UpdateStatus.DELETED].includes(update.classification)) {
+      if (update.classification === UpdateStatus.TO_CANCEL) {
         update.included = true;
       } else {
         update.included = isEnabled;
@@ -597,7 +603,7 @@ export class BaselineComponent implements OnInit, OnDestroy {
     const changedUpdate = this.baseline.updates.find((update) => update.idWorkpack === workpackId);
 
     if (changedUpdate) {
-      if ([UpdateStatus.DELETED, UpdateStatus.TO_CANCEL].includes(changedUpdate.classification)) {
+      if (changedUpdate.classification === UpdateStatus.TO_CANCEL) {
         changedUpdate.included = true;
       } else {
         changedUpdate.included = isEnabled;

@@ -12,11 +12,11 @@
   </div>
 
   <div class="card-properties-baseline">
-    <app-card [properties]="cardBaselineProperties" class="mt-0 inputs-float-label">
-      <div class="loading-container" *ngIf="cardBaselineProperties.isLoading">
-        <app-card-loading [isCardLoading]="cardBaselineProperties.isLoading"></app-card-loading>
+    <app-card [properties]="cardBaselineProperties" *ngIf="cardBaselineProperties" class="mt-0 inputs-float-label">
+      <div class="loading-container" *ngIf="cardBaselineProperties?.isLoading">
+        <app-card-loading [isCardLoading]="cardBaselineProperties?.isLoading"></app-card-loading>
       </div>
-      <div class="p-grid" *ngIf="!cardBaselineProperties.isLoading">
+      <div class="p-grid" *ngIf="!cardBaselineProperties?.isLoading">
         <form [formGroup]="formBaseline">
           <div class="p-fluid">
             <div class="p-field">
@@ -84,7 +84,7 @@
           </p-inputSwitch>
         </ng-container>
       </div>
-      <div class="updates-container" *ngIf="!cardBaselineUpdates.isLoading">
+      <div class="updates-container" *ngIf="!cardBaselineUpdates?.isLoading">
         <p-tree [value]="updatesTree">
           <ng-template let-node pTemplate="default">
             <div
