@@ -128,7 +128,6 @@ export class IndicatorComponent implements OnInit, OnDestroy {
     private workpackService: WorkpackService
   ) {
     this.actRouter.queryParams.subscribe(async (queryParams) => {
-      console.log(queryParams);
       this.idIndicator = queryParams.idIndicator;
       this.idWorkpack = queryParams.idWorkpack;
       this.idPlan = +queryParams.id;
