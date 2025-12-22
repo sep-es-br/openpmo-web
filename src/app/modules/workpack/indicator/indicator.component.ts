@@ -128,7 +128,6 @@ export class IndicatorComponent implements OnInit, OnDestroy {
     private workpackService: WorkpackService
   ) {
     this.actRouter.queryParams.subscribe(async (queryParams) => {
-      console.log(queryParams);
       this.idIndicator = queryParams.idIndicator;
       this.idWorkpack = queryParams.idWorkpack;
       this.idPlan = +queryParams.id;
@@ -223,7 +222,8 @@ export class IndicatorComponent implements OnInit, OnDestroy {
     if (this.idIndicator) {
       const result = await this.indicatorSrv.GetByIdWithIdWorkpack(
         this.idWorkpack,
-        this.idIndicator
+        this.idIndicator,
+        this.idPlan
       );
 
       if (result.success) {
