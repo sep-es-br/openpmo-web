@@ -223,7 +223,8 @@ export class IndicatorComponent implements OnInit, OnDestroy {
     if (this.idIndicator) {
       const result = await this.indicatorSrv.GetByIdWithIdWorkpack(
         this.idWorkpack,
-        this.idIndicator
+        this.idIndicator,
+        this.idPlan
       );
 
       if (result.success) {

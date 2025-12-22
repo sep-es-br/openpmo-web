@@ -53,8 +53,14 @@ export abstract class BaseService<T> {
     return this.http.get<IHttpResult<T>>(`${this.urlBase}/${id}`).toPromise();
   }
 
-  public async GetByIdWithIdWorkpack(idWorkpack: number, id: number, noLoading?: boolean): Promise<IHttpResult<T>> {
-    return this.http.get<IHttpResult<T>>(`${this.urlBase}/${idWorkpack}/${id}`).toPromise();
+  public async GetByIdWithIdWorkpack(idWorkpack: number, id: number, idPlan: number, noLoading?: boolean): Promise<IHttpResult<T>> {
+
+    const params: any = {};
+
+    if (idPlan !== undefined && idPlan !== null) {
+      params.idPlan = idPlan.toString();
+    }
+    return this.http.get<IHttpResult<T>>(`${this.urlBase}/${idWorkpack}/${id}`, { params }).toPromise();
   }
 
   public post(model: T): Promise<IHttpResult<T>> {

@@ -215,7 +215,12 @@ export class BaselineComponent implements OnInit, OnDestroy {
     };
 
     if (this.idBaseline) {
-      const result = await this.baselineSrv.GetByIdWithIdWorkpack(this.idWorkpack, this.idBaseline);
+      this.idPlan = Number(localStorage.getItem('@currentPlan'));
+      const result = await this.baselineSrv.GetByIdWithIdWorkpack(
+        this.idWorkpack,
+        this.idBaseline,
+        this.idPlan
+      );
       this.baseline = result.data;
       this.cardBaselineProperties.isLoading = false;
       if (this.baseline) {
