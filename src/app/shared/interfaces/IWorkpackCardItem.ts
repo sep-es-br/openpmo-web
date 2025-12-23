@@ -46,7 +46,6 @@ export interface IWorkpackCardItem {
   hasBaseline?: boolean;
   baselineName?: string;
   journalInformation?: IWorkpackJournalInformation;
-  projectStatus?: ProjectStatus;
-  deliverableStatus?: DeliverableStatus;
+  statusProperty?: ProjectStatus | DeliverableStatus;
 }
 

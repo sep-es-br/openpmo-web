@@ -129,6 +129,11 @@ export class WorkpackCardItemComponent implements OnInit, OnDestroy {
     this.setLanguage();
   }
 
+  ngOnDestroy() {
+    this.$destroy.next();
+    this.$destroy.complete();
+  }
+
   changeMilestoneDate(event: any) {
     this.workpackSrv.nextPendingChanges(true);
     const momentEvent = moment(event).format('yyyy-MM-DD');
@@ -202,11 +207,6 @@ export class WorkpackCardItemComponent implements OnInit, OnDestroy {
   setMilestoneDateProperty() {
     const date = this.properties.subtitleCardItem.split('-');
     this.milestoneDate = new Date(date[0], date[1] - 1, date[2]);
-  }
-
-  ngOnDestroy() {
-    this.$destroy.next();
-    this.$destroy.complete();
   }
 
   setLanguage() {

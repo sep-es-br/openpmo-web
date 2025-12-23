@@ -890,8 +890,7 @@ export class WorkpackComponent implements OnDestroy {
             ...workpack?.journalInformation,
             actual: actualInformation
           },
-          projectStatus: workpack?.projectStatus || undefined,
-          deliverableStatus: workpack?.deliverableStatus || undefined,
+          statusProperty: workpack?.statusProperty || undefined,
         };
       });
       if (this.workpackSrv.getEditPermission() && !idWorkpackModelLinked) {

@@ -103,8 +103,7 @@ export interface IWorkpackListCard {
       earnedValue?: number;
     };
     journalInformation?: IWorkpackJournalInformation;
-    projectStatus?: ProjectStatus;
-    deliverableStatus?: DeliverableStatus;
+    statusProperty?: ProjectStatus | DeliverableStatus;
 }
 
 interface IWorkpackDashboard {
