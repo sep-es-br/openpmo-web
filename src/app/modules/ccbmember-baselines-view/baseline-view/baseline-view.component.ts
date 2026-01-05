@@ -244,7 +244,7 @@ export class BaselineViewComponent implements OnInit, OnDestroy {
 
     // A função abaixo serve para criar os objetos de Marcos Críticos e Entregas que serão inseridos na árvore
     const buildMilestonesAndDeliveries = (
-      childs: Array<ITripleConstraintBreakdown>
+      childs: Array<ITripleConstraintBreakdown>  = []
     ): {
       milestoneTitleObject?: any;
       deliveryTitleObject?: any;
