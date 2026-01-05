@@ -16,16 +16,17 @@ export enum DeliverableStatus {
   EDITAL_PUBLICADO = 'Edital publicado',
   LICITACAO_CONCLUIDA = 'Licitação concluída',
   CONTRATO_ASSINADO = 'Contrato assinado',
+  EM_LICITACAO = 'Em licitação',
+  A_LICITAR = 'A licitar',
   OBRA_EM_ANDAMENTO = 'Obra em andamento',
   SERVICO_EM_ANDAMENTO = 'Serviço em andamento',
   CONCLUIDA = 'Concluída',
   SUSPENSA = 'Suspensa',
   EM_EXECUCAO = 'Em execução',
-  PARALISADO = 'Paralisado',
-  EM_LICITACAO = 'Em licitação',
+  PARALISADA = 'Paralisada',
   CANCELADA = 'Cancelada',
-  A_LICITAR = 'A licitar',
   A_CANCELAR = 'A cancelar',
+  PLANEJAMENTO = 'Planejamento',
 }
 
 export enum WorkpackStatusIcons {
@@ -94,7 +95,7 @@ export const WorkpackStatusMap = new Map<
     [
       ProjectStatus.PARALISADO,
       ProjectStatus.SUSPENSO,
-      DeliverableStatus.PARALISADO,
+      DeliverableStatus.PARALISADA,
       DeliverableStatus.SUSPENSA,
     ],
     {
@@ -122,28 +123,50 @@ export const WorkpackStatusMap = new Map<
 type AnyStatus = ProjectStatus | DeliverableStatus;
 
 const normalizeStatus = (status: AnyStatus | string): AnyStatus | undefined => {
-  if (Object.values(ProjectStatus).includes(status as ProjectStatus)) {
-    return status as ProjectStatus;
-  }
+  const checkForStatus = (value: AnyStatus | string): AnyStatus | undefined => {
+    const equivalentProjectStatus = Object.values(ProjectStatus).find(el => el.toLowerCase() === value.toLowerCase());
 
-  if (Object.values(DeliverableStatus).includes(status as DeliverableStatus)) {
-    return status as DeliverableStatus;
-  }
+    if (equivalentProjectStatus) {
+      return equivalentProjectStatus as ProjectStatus;
+    }
 
-  if (status in ProjectStatus) {
-    return ProjectStatus[status as keyof typeof ProjectStatus];
-  }
+    const equivalentDeliverableStatus = Object.values(DeliverableStatus).find(el => el.toLowerCase() === value.toLowerCase());
 
-  if (status in DeliverableStatus) {
-    return DeliverableStatus[status as keyof typeof DeliverableStatus];
-  }
+    if (equivalentDeliverableStatus) {
+      return equivalentDeliverableStatus as DeliverableStatus;
+    }
+
+    if (value in ProjectStatus) {
+      return ProjectStatus[value as keyof typeof ProjectStatus];
+    }
+
+    if (value in DeliverableStatus) {
+      return DeliverableStatus[value as keyof typeof DeliverableStatus];
+    }
+
+    return undefined;
+  };
+
+  const firstTry = checkForStatus(status);
+  if (firstTry) return firstTry;
+
+  // Considera o caso onde criaram um status com o nome escrito errado. Sem acento, por exemplo.
+  // "Execucao" em vez de "Execução"
+  status = status.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  const secondTry = checkForStatus(status);
+  if (secondTry) return secondTry;
 
   return undefined;
 };
 
 export const getWorkpackStatusConfigByStatus = (
-  status: ProjectStatus | DeliverableStatus
+  status: ProjectStatus | DeliverableStatus | string
 ): WorkpackStatusConfig => {
+  // Considera o caso onde o status é algo como 'Planejamento\A licitar'
+  if (status.toString().includes('\\')) {
+    status = status.split('\\')[1];
+  }
+
   const normalizedStatus = normalizeStatus(status);
 
   if (!normalizeStatus) return undefined;
