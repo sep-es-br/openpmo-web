@@ -331,12 +331,8 @@ export class BaselineComponent implements OnInit, OnDestroy {
       milestoneTitleObject?: any;
       deliveryTitleObject?: any;
     } => {
-      const milestones = childs.filter(
-        (el) => el.type === TypeWorkpackEnumWBS.Milestone
-      );
-      const deliveries = childs.filter(
-        (el) => el.type === TypeWorkpackEnumWBS.Deliverable
-      );
+      const milestones = (childs ?? []).filter((el) => el.type === TypeWorkpackEnumWBS.Milestone);
+      const deliveries = (childs ?? []).filter((el) => el.type === TypeWorkpackEnumWBS.Deliverable);
       const updates = [...milestones, ...deliveries];
 
       let finalResult: {
