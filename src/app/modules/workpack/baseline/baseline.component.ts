@@ -1,6 +1,9 @@
 import { AuthService } from '../../../shared/services/auth.service';
 import { BaselineService } from '../../../shared/services/baseline.service';
-import { IBaseline, IBaselineUpdates, UpdateStatus } from '../../../shared/interfaces/IBaseline';
+import {
+  IBaseline,
+  IBaselineUpdates,
+} from '../../../shared/interfaces/IBaseline';
 import { takeUntil } from 'rxjs/operators';
 import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
 import { ResponsiveService } from 'src/app/shared/services/responsive.service';
@@ -13,6 +16,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MessageService, TreeNode } from 'primeng/api';
 import { TranslateService } from '@ngx-translate/core';
 import { TypeWorkpackEnumWBS } from 'src/app/shared/enums/TypeWorkpackEnum';
+import { BaselineUpdateStatus } from 'src/app/shared/enums/BaselineUpdateStatus';
 
 interface BaselineUpdateBreakdown {
   label: string;
@@ -21,7 +25,7 @@ interface BaselineUpdateBreakdown {
   included: boolean;
   readonly: boolean;
   property: string;
-  classification: UpdateStatus;
+  classification: BaselineUpdateStatus;
   idWorkpack: number;
   expanded: boolean;
   warnings?: {
@@ -33,7 +37,7 @@ interface BaselineUpdateBreakdown {
 @Component({
   selector: 'app-baseline',
   templateUrl: './baseline.component.html',
-  styleUrls: ['./baseline.component.scss']
+  styleUrls: ['./baseline.component.scss'],
 })
 export class BaselineComponent implements OnInit, OnDestroy {
   idBaseline: number;
@@ -77,12 +81,12 @@ export class BaselineComponent implements OnInit, OnDestroy {
   updatesTree: Array<TreeNode<IBaselineUpdates>>;
 
   treeShouldStartExpanded: boolean = true;
-  
+
   showFailMinMilestoneRequirement: boolean;
+
   showFailPlannedWorkRequirement: boolean;
 
   minMilestoneRequirement: number;
-
 
   get allTogglerIsDisabled(): boolean {
     return this.areTherePendentUpdatesListed || this.formBaseline.disabled;
@@ -90,13 +94,17 @@ export class BaselineComponent implements OnInit, OnDestroy {
 
   get areTherePendentUpdatesListed(): boolean {
     return (
-      this.baseline &&
-      this.baseline.updates &&
-      this.baseline.updates.length > 0 &&
-      this.baseline.updates.some(
-        (update) => [UpdateStatus.NO_SCHEDULE, UpdateStatus.UNDEFINED_SCOPE].includes(update.classification)
-      )
-    ) || this.showFailMinMilestoneRequirement || this.showFailPlannedWorkRequirement;
+      (this.baseline &&
+        this.baseline.updates &&
+        this.baseline.updates.length > 0 &&
+        this.baseline.updates.some((update) =>
+          [BaselineUpdateStatus.NO_SCHEDULE, BaselineUpdateStatus.UNDEFINED_SCOPE].includes(
+            update.classification
+          )
+        )) ||
+      this.showFailMinMilestoneRequirement ||
+      this.showFailPlannedWorkRequirement
+    );
   }
 
   get shouldDisableBaselineSubmission(): boolean {
@@ -132,20 +140,17 @@ export class BaselineComponent implements OnInit, OnDestroy {
   }
 
   async ngOnInit() {
-
     this.actRouter.queryParams.pipe(takeUntil(this.$destroy)).subscribe({
-        next: async ({ idWorkpack, idWorkpackModelLinked, idBaseline }) => {
-            this.idWorkpack = idWorkpack && +idWorkpack;
-            this.idWorkpackModelLinked =
-                idWorkpackModelLinked && +idWorkpackModelLinked;
-            this.idBaseline = idBaseline && +idBaseline;
-     
-            await this.loadPropertiesBaseline();
-            await this.setBreadcrumb();
-        }
+      next: async ({ idWorkpack, idWorkpackModelLinked, idBaseline }) => {
+        this.idWorkpack = idWorkpack && +idWorkpack;
+        this.idWorkpackModelLinked =
+          idWorkpackModelLinked && +idWorkpackModelLinked;
+        this.idBaseline = idBaseline && +idBaseline;
+
+        await this.loadPropertiesBaseline();
+        await this.setBreadcrumb();
+      },
     });
-    
-    
   }
 
   ngOnDestroy(): void {
@@ -156,7 +161,10 @@ export class BaselineComponent implements OnInit, OnDestroy {
   async setBreadcrumb() {
     let breadcrumbItems = this.breadcrumbSrv.get;
     if (!breadcrumbItems || breadcrumbItems.length === 0) {
-      breadcrumbItems = await this.breadcrumbSrv.loadWorkpackBreadcrumbs(this.idWorkpack, this.idPlan);
+      breadcrumbItems = await this.breadcrumbSrv.loadWorkpackBreadcrumbs(
+        this.idWorkpack,
+        this.idPlan
+      );
     }
 
     this.breadcrumbSrv.setMenu([
@@ -164,22 +172,29 @@ export class BaselineComponent implements OnInit, OnDestroy {
       {
         key: 'baseline',
         info: this.baseline?.name,
-        tooltip: this.baseline?.name
-      }
+        tooltip: this.baseline?.name,
+      },
     ]);
   }
 
   async getBreadcrumbs(idWorkpack: number) {
-    const {success, data} = await this.breadcrumbSrv.getBreadcrumbWorkpack(idWorkpack, {'id-plan': this.idPlan});
+    const { success, data } = await this.breadcrumbSrv.getBreadcrumbWorkpack(
+      idWorkpack,
+      { 'id-plan': this.idPlan }
+    );
     return success
-      ? data.map(p => ({
-        key: !p.modelName ? p.type.toLowerCase() : p.modelName,
-        info: p.name,
-        tooltip: p.fullName,
-        routerLink: this.getRouterLinkFromType(p.type),
-        queryParams: {id: p.id, idWorkpackModelLinked: p.idWorkpackModelLinked, idPlan: this.idPlan},
-        modelName: p.modelName
-      }))
+      ? data.map((p) => ({
+          key: !p.modelName ? p.type.toLowerCase() : p.modelName,
+          info: p.name,
+          tooltip: p.fullName,
+          routerLink: this.getRouterLinkFromType(p.type),
+          queryParams: {
+            id: p.id,
+            idWorkpackModelLinked: p.idWorkpackModelLinked,
+            idPlan: this.idPlan,
+          },
+          modelName: p.modelName,
+        }))
       : [];
   }
 
@@ -203,7 +218,7 @@ export class BaselineComponent implements OnInit, OnDestroy {
       cardTitle: 'properties',
       collapseble: true,
       initialStateCollapse: false,
-      isLoading: this.idBaseline ? true : false
+      isLoading: this.idBaseline ? true : false,
     };
     this.cardBaselineUpdates = {
       toggleable: false,
@@ -211,7 +226,7 @@ export class BaselineComponent implements OnInit, OnDestroy {
       cardTitle: this.translateSrv.instant('updates'),
       collapseble: true,
       initialStateCollapse: false,
-      isLoading: true
+      isLoading: true,
     };
 
     if (this.idBaseline) {
@@ -227,7 +242,9 @@ export class BaselineComponent implements OnInit, OnDestroy {
         this.idWorkpack = this.baseline.idWorkpack;
         this.formBaseline.controls.name.setValue(this.baseline.name);
         this.formBaseline.controls.proposer.setValue(this.baseline.proposer);
-        this.formBaseline.controls.description.setValue(this.baseline.description);
+        this.formBaseline.controls.description.setValue(
+          this.baseline.description
+        );
         this.formBaseline.controls.message.setValue(this.baseline.message);
         if (this.baseline.status !== 'DRAFT') {
           this.formBaseline.disable();
@@ -245,7 +262,8 @@ export class BaselineComponent implements OnInit, OnDestroy {
       };
     }
     await this.loadPermissions();
-    this.cardBaselineUpdates.isLoading = !this.idBaseline || this.baseline.status === 'DRAFT';
+    this.cardBaselineUpdates.isLoading =
+      !this.idBaseline || this.baseline.status === 'DRAFT';
     if (!this.idBaseline || this.baseline.status === 'DRAFT') {
       await this.loadUpdates();
     }
@@ -256,7 +274,10 @@ export class BaselineComponent implements OnInit, OnDestroy {
   async loadPermissions() {
     const isUserAdmin = await this.authSrv.isUserAdmin();
     this.idPlan = Number(localStorage.getItem('@currentPlan'));
-    const result = await this.workpackSrv.GetWorkpackPermissions(this.idWorkpack, {'id-plan': this.idPlan});
+    const result = await this.workpackSrv.GetWorkpackPermissions(
+      this.idWorkpack,
+      { 'id-plan': this.idPlan }
+    );
 
     if (result.success) {
       const workpack = result.data;
@@ -265,7 +286,8 @@ export class BaselineComponent implements OnInit, OnDestroy {
       } else {
         this.editPermission =
           workpack.permissions &&
-          workpack.permissions.filter(p => p.level === 'EDIT').length > 0 && !workpack.canceled;
+          workpack.permissions.filter((p) => p.level === 'EDIT').length > 0 &&
+          !workpack.canceled;
       }
     }
   }
@@ -275,14 +297,20 @@ export class BaselineComponent implements OnInit, OnDestroy {
   }
 
   async loadUpdates() {
-    const updates = await this.baselineSrv.getUpdates({'id-workpack': this.idWorkpack, idPlan: this.idPlan });
+    const updates = await this.baselineSrv.getUpdates({
+      'id-workpack': this.idWorkpack,
+      idPlan: this.idPlan,
+    });
     this.baseline.updates = [];
     this.cardBaselineUpdates.isLoading = false;
 
-    const { valid, requiredAmount } = await this.baselineSrv.checkMilestonesRequirement(this.idWorkpack);
-    const reqPlanWork = await this.baselineSrv.checkPlannedWorkRequirement(this.idWorkpack);
+    const { valid, requiredAmount } =
+      await this.baselineSrv.checkMilestonesRequirement(this.idWorkpack);
+    const reqPlanWork = await this.baselineSrv.checkPlannedWorkRequirement(
+      this.idWorkpack
+    );
     this.showFailMinMilestoneRequirement = !valid;
-    this.showFailPlannedWorkRequirement = !reqPlanWork.valid
+    this.showFailPlannedWorkRequirement = !reqPlanWork.valid;
     this.minMilestoneRequirement = requiredAmount;
 
     this.assembleUpdatesTree(updates);
@@ -417,18 +445,27 @@ export class BaselineComponent implements OnInit, OnDestroy {
   }
 
   handleSetAllTogglesUpdates(isEnabled: boolean) {
-    [
-      ...this.baseline.updates,
-      ...this.getBottomTreeNodes(this.updatesTree)
-    ]
-    .filter((update: any) => ![UpdateStatus.NO_SCHEDULE, UpdateStatus.UNDEFINED_SCOPE].includes(update.classification))
-    .forEach((update: any) => {
-      if (update.classification === UpdateStatus.TO_CANCEL) {
-        update.included = true;
-      } else {
-        update.included = isEnabled;
-      }
-    });
+    [...this.baseline.updates, ...this.getBottomTreeNodes(this.updatesTree)]
+      .filter(
+        (update: any) =>
+          ![
+            BaselineUpdateStatus.NO_SCHEDULE,
+            BaselineUpdateStatus.UNDEFINED_SCOPE,
+            BaselineUpdateStatus.UNCHANGED,
+          ].includes(update.classification)
+      )
+      .forEach((update: any) => {
+        if (
+          [
+            BaselineUpdateStatus.TO_CANCEL,
+            BaselineUpdateStatus.DELETED,
+          ].includes(update.classification)
+        ) {
+          update.included = true;
+        } else {
+          update.included = isEnabled;
+        }
+      });
   }
 
   async handleSaveDraftBaseline(showMessage = true) {
@@ -436,7 +473,9 @@ export class BaselineComponent implements OnInit, OnDestroy {
       this.messageSrv.add({
         severity: 'warn',
         summary: this.translateSrv.instant('atention'),
-        detail: this.translateSrv.instant('messages.requiredInformationsMustBeFilled')
+        detail: this.translateSrv.instant(
+          'messages.requiredInformationsMustBeFilled'
+        ),
       });
       return;
     }
@@ -444,7 +483,7 @@ export class BaselineComponent implements OnInit, OnDestroy {
       ...this.baseline,
       name: this.formBaseline.controls.name.value,
       description: this.formBaseline.controls.description.value,
-      message: this.formBaseline.controls.message.value
+      message: this.formBaseline.controls.message.value,
     };
     this.formIsLoading = true;
     const result = this.idBaseline
@@ -460,7 +499,7 @@ export class BaselineComponent implements OnInit, OnDestroy {
         this.messageSrv.add({
           severity: 'success',
           summary: this.translateSrv.instant('success'),
-          detail: this.translateSrv.instant('messages.savedSuccessfully')
+          detail: this.translateSrv.instant('messages.savedSuccessfully'),
         });
       }
     }
@@ -468,42 +507,45 @@ export class BaselineComponent implements OnInit, OnDestroy {
 
   async handleSubmitBaseline() {
     this.formIsLoading = true;
-    const selectedUpdates = this.baseline.updates.filter((update) => update.included);
-    const result = await this.baselineSrv.submitBaseline(this.idBaseline, selectedUpdates);
+    const selectedUpdates = this.baseline.updates.filter(
+      (update) => update.included
+    );
+    const result = await this.baselineSrv.submitBaseline(
+      this.idBaseline,
+      selectedUpdates
+    );
     this.formIsLoading = false;
     if (result.success) {
       const idPlan = Number(localStorage.getItem('@currentPlan'));
-      await this.router.navigate(
-        ['/workpack'],
-        {
-          queryParams: this.idWorkpackModelLinked ? {
-            id: this.idWorkpack,
-            idPlan,
-            idWorkpackModelLinked: this.idWorkpackModelLinked
-          } : {
-            id: this.idWorkpack,
-            idPlan,
-          }
-        }
-      );
+      await this.router.navigate(['/workpack'], {
+        queryParams: this.idWorkpackModelLinked
+          ? {
+              id: this.idWorkpack,
+              idPlan,
+              idWorkpackModelLinked: this.idWorkpackModelLinked,
+            }
+          : {
+              id: this.idWorkpack,
+              idPlan,
+            },
+      });
     }
   }
 
   async handleCancelChanges() {
     const idPlan = Number(localStorage.getItem('@currentPlan'));
-    await this.router.navigate(
-      ['/workpack'],
-      {
-        queryParams: this.idWorkpackModelLinked ? {
-          id: this.idWorkpack,
-          idPlan,
-          idWorkpackModelLinked: this.idWorkpackModelLinked
-        } : {
-          id: this.idWorkpack,
-          idPlan,
-        }
-      }
-    );
+    await this.router.navigate(['/workpack'], {
+      queryParams: this.idWorkpackModelLinked
+        ? {
+            id: this.idWorkpack,
+            idPlan,
+            idWorkpackModelLinked: this.idWorkpackModelLinked,
+          }
+        : {
+            id: this.idWorkpack,
+            idPlan,
+          },
+    });
   }
 
   handleShowDialogComment(comment) {
@@ -522,12 +564,18 @@ export class BaselineComponent implements OnInit, OnDestroy {
 
   getDeliveryTooltipWarnings(update: IBaselineUpdates) {
     if (update.deliveryModelHasActiveSchedule) {
-      if (update.classification === UpdateStatus.NO_SCHEDULE) {
-        const firstSentence = this.translateSrv.instant('workpack-eap-alert-no-schedule');
+      if (update.classification === BaselineUpdateStatus.NO_SCHEDULE) {
+        const firstSentence = this.translateSrv.instant(
+          'workpack-eap-alert-no-schedule'
+        );
 
         return `- ${firstSentence}`;
-      } else if (update.classification === UpdateStatus.UNDEFINED_SCOPE) {
-        const firstSentence = this.translateSrv.instant('workpack-eap-alert-no-scope');
+      } else if (
+        update.classification === BaselineUpdateStatus.UNDEFINED_SCOPE
+      ) {
+        const firstSentence = this.translateSrv.instant(
+          'workpack-eap-alert-no-scope'
+        );
 
         return `- ${firstSentence}`;
       }
@@ -535,17 +583,26 @@ export class BaselineComponent implements OnInit, OnDestroy {
   }
 
   handleToggleSwitchChange(isEnabled: boolean, workpackId: number) {
-    const changedUpdate = this.baseline.updates.find((update) => update.idWorkpack === workpackId);
+    const changedUpdate = this.baseline.updates.find(
+      (update) => update.idWorkpack === workpackId
+    );
 
     if (changedUpdate) {
-      if (changedUpdate.classification === UpdateStatus.TO_CANCEL) {
+      if (
+        [BaselineUpdateStatus.DELETED, BaselineUpdateStatus.TO_CANCEL].includes(
+          changedUpdate.classification
+        )
+      ) {
         changedUpdate.included = true;
       } else {
         changedUpdate.included = isEnabled;
       }
     }
 
-    const allUpdates = [...this.baseline.updates, ...this.getBottomTreeNodes(this.updatesTree)];
+    const allUpdates = [
+      ...this.baseline.updates,
+      ...this.getBottomTreeNodes(this.updatesTree),
+    ];
     this.includeAllUpdates = allUpdates.every((update: any) => update.included);
     // Se por acaso tiver selecionado todas as Atualizações, habilita o switch geral
   }

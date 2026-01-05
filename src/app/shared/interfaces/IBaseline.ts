@@ -1,3 +1,4 @@
+import { BaselineUpdateStatus } from '../enums/BaselineUpdateStatus';
 import { TypeWorkpackEnumWBS } from '../enums/TypeWorkpackEnum';
 import { UnitMeasure } from './IUnitMeasureIndicators';
 
@@ -36,7 +37,7 @@ export interface IBaselineUpdates {
   modelNameInPlural: string;
   type: TypeWorkpackEnumWBS;
   children?: Array<IBaselineUpdates>;
-  classification: UpdateStatus; // NEW | CHANGED | DELETED | TO_CANCEL | NO_SCHEDULE | UNDEFINED_SCOPE
+  classification: BaselineUpdateStatus; // NEW | CHANGED | DELETED | TO_CANCEL | NO_SCHEDULE | UNDEFINED_SCOPE
   included?: boolean;
   readonly?: boolean; //only screen
   deliveryModelHasActiveSchedule?: boolean; // Only for deliveries
@@ -102,16 +103,6 @@ interface IScopeBaseline {
   }[];
 }
 
-export enum UpdateStatus {
-  NEW = 'NEW',
-  CHANGED = 'CHANGED',
-  DELETED = 'DELETED',
-  TO_CANCEL = 'TO_CANCEL',
-  NO_SCHEDULE = 'NO_SCHEDULE',
-  UNDEFINED_SCOPE = 'UNDEFINED_SCOPE',
-  UNCHANGED = 'UNCHANGED',
-}
-
 export interface ITripleConstraintBreakdown {
   idWorkpack: number;
   idPlan: number;
@@ -121,7 +112,7 @@ export interface ITripleConstraintBreakdown {
   type: string;
   modelName: string;
   modelNameInPlural: string;
-  workpackStatus?: UpdateStatus;
+  workpackStatus?: BaselineUpdateStatus;
   costDetails: CostDetailItem;
   scheduleDetails: ScheduleDetailItem;
   scopeDetails: ScopeDetailItem;
