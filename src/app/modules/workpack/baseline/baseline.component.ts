@@ -95,7 +95,7 @@ export class BaselineComponent implements OnInit, OnDestroy {
       this.baseline.updates &&
       this.baseline.updates.length > 0 &&
       this.baseline.updates.some(
-        (update) => [UpdateStatus.NO_SCHEDULE, UpdateStatus.UNDEFINED_SCOPE].includes(update.classification)
+        (update) => [BaselineUpdateStatus.NO_SCHEDULE, BaselineUpdateStatus.UNDEFINED_SCOPE].includes(update.classification)
       )
     ) || this.showFailMinMilestoneRequirement || this.showFailPlannedWorkRequirement;
   }
