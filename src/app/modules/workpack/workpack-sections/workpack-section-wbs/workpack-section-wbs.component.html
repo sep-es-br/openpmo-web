@@ -81,6 +81,41 @@
               </div>
             </ng-template>
             <ng-template #schedule>
+              <ng-container
+                *ngIf="node?.deliverableStatus"
+                [ngTemplateOutlet]="iconConfig"
+                [ngTemplateOutletContext]="node.deliverableStatus | workpackStatusConfig"
+              >
+                <ng-template
+                  #iconConfig
+                  let-icon="icon"
+                  let-iconOrigin="iconOrigin"
+                  let-iconSrc="iconSrc"
+                  let-iconColor="iconColor"
+                >
+                  <div class="status-container">
+                    <ng-container *ngIf="iconOrigin === 'img' else iconTemplate">
+                      <img
+                        class="img-status-icon"
+                        [ngStyle]="{ color: iconColor || 'black' }"
+                        [src]="'../../../../../../../..' + iconSrc"
+                        [pTooltip]="icon"
+                      >
+                    </ng-container>
+
+                    <ng-template #iconTemplate>
+                      <i
+                        class="i-status-icon"
+                        [ngClass]="iconSrc"
+                        [ngStyle]="{ color: iconColor || 'black' }"
+                        [pTooltip]="icon"
+                      >
+                      </i>
+                    </ng-template>
+                  </div>
+                </ng-template>
+              </ng-container>
+              
               <div class="header-values-cost-account" *ngIf="node?.properties?.progressBars">
                 <ng-container *ngIf="shouldDisplayNewTag(node)">
                   <div class="status-container">
@@ -130,7 +165,6 @@
               </div>
             </ng-template>
           </div>
-
         </div>
       </ng-template>
     </ng-template>
@@ -139,17 +173,56 @@
   <ng-template #rightContent let-properties="node">
     <div class="right-container">
       <div class="dashboard-items-container">
+        <ng-container
+          *ngIf="properties.projectStatus"
+          [ngTemplateOutlet]="iconConfig"
+          [ngTemplateOutletContext]="properties.projectStatus | workpackStatusConfig"
+        >
+          <ng-template
+            #iconConfig
+            let-icon="icon"
+            let-iconOrigin="iconOrigin"
+            let-iconSrc="iconSrc"
+            let-iconColor="iconColor"
+          >
+            <div class="status-container">
+              <ng-container *ngIf="iconOrigin === 'img' else iconTemplate">
+                <img
+                  class="img-status-icon"
+                  [ngStyle]="{ color: iconColor || 'black' }"
+                  [src]="'../../../../../../../..' + iconSrc"
+                  [pTooltip]="icon"
+                >
+              </ng-container>
 
-        <!-- journal information container -->
-        <div class="status-container" *ngIf="properties?.properties?.journalInformation?.date; else statusEmpty">
-          <i class="fas fa-info" style="cursor: pointer"
+              <ng-template #iconTemplate>
+                <i
+                  class="i-status-icon"
+                  [ngClass]="iconSrc"
+                  [ngStyle]="{ color: iconColor || 'black' }"
+                  [pTooltip]="icon"
+                >
+                </i>
+              </ng-template>
+            </div>
+          </ng-template>
+        </ng-container>
+
+        <div class="journal-container" *ngIf="properties?.properties?.journalInformation?.date; else statusEmpty">
+          <i
             *ngIf="!properties?.properties?.journalInformation?.actual"
+            class="fas fa-info"
+            style="cursor: pointer"
             (click)="handleShowJournalInformation(properties.properties.journalInformation); journalInformationPanel.show($event)" 
-            ></i>
-          <i class="fas fa-info-circle" [ngStyle]="{ fontSize: '1.2rem', cursor: 'pointer' }"
+          >
+          </i>
+          <i
             *ngIf="properties?.properties?.journalInformation?.actual"
+            class="fas fa-info-circle"
+            [ngStyle]="{ fontSize: '1.2rem', cursor: 'pointer' }"
             (click)="handleShowJournalInformation(properties.properties.journalInformation); journalInformationPanel.show($event)" 
-            ></i>
+          >
+          </i>
         </div>
         
         <ng-template #statusEmpty>

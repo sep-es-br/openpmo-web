@@ -124,12 +124,24 @@
         </div>
         <div class="right-content">
           <div class="indexes">
-            <span class="index" [ngStyle]="{color: cpiColor}" (mouseenter)="cpiPanel.show($event)"
+            <span
+              *ngIf="properties?.dashboardData?.costPerformanceIndex"
+              class="index"
+              [ngStyle]="{color: cpiColor}"
+              (mouseenter)="cpiPanel.show($event)"
               (mouseleave)="cpiPanel.hide()"
-              *ngIf="properties?.dashboardData?.costPerformanceIndex">{{'CPI'|translate}}</span>
-            <span class="index" (mouseenter)="spiPanel.show($event)" (mouseleave)="spiPanel.hide()"
+            >
+              {{ 'CPI' | translate }}
+            </span>
+            <span
               *ngIf="properties?.dashboardData?.schedulePerformanceIndex"
-              [ngStyle]="{color: spiColor}">{{'SPI'|translate}}</span>
+              class="index"
+              (mouseenter)="spiPanel.show($event)"
+              (mouseleave)="spiPanel.hide()"
+              [ngStyle]="{ color: spiColor }"
+            >
+              {{ 'SPI' | translate }}
+            </span>
 
             <div class="status-container"
               *ngIf="properties?.journalInformation?.date">
@@ -140,6 +152,42 @@
                 *ngIf="properties?.journalInformation?.actual" style="cursor: pointer"
                 (click)="handleShowJournalInformation(properties.journalInformation); journalInformationPanel.show($event)"></i>
             </div>
+          </div>
+          <div
+            *ngIf="properties?.statusProperty"
+            class="status-box"
+          >
+            <ng-container
+              [ngTemplateOutlet]="iconConfig"
+              [ngTemplateOutletContext]="properties.statusProperty | workpackStatusConfig"
+            >
+              <ng-template
+                #iconConfig
+                let-icon="icon"
+                let-iconOrigin="iconOrigin"
+                let-iconSrc="iconSrc"
+                let-iconColor="iconColor"
+              >
+                <ng-container *ngIf="iconOrigin === 'img' else iconTemplate">
+                  <img
+                    class="img-status-icon"
+                    [ngStyle]="{ color: iconColor || 'black' }"
+                    [src]="'../../../../../../../..' + iconSrc"
+                    [pTooltip]="icon"
+                  >
+                </ng-container>
+
+                <ng-template #iconTemplate>
+                  <i
+                    class="i-status-icon"
+                    [ngClass]="iconSrc"
+                    [ngStyle]="{ color: iconColor || 'black' }"
+                    [pTooltip]="icon"
+                  >
+                  </i>
+                </ng-template>
+              </ng-template>
+            </ng-container>
           </div>
           <p-overlayPanel #journalInformationPanel class="journal-info-overlay-panel" [showCloseIcon]="true" [dismissable]="false">
             <div class="journal-info-panel-content"
@@ -200,6 +248,39 @@
       <div class="right-container">
         <div class="dashboard-items-container">
           <div class="status-container">
+            <ng-container
+              *ngIf="properties?.statusProperty"
+              [ngTemplateOutlet]="iconConfig"
+              [ngTemplateOutletContext]="properties.statusProperty | workpackStatusConfig"
+            >
+              <ng-template
+                #iconConfig
+                let-icon="icon"
+                let-iconOrigin="iconOrigin"
+                let-iconSrc="iconSrc"
+                let-iconColor="iconColor"
+              >
+                <ng-container *ngIf="iconOrigin === 'img' else iconTemplate">
+                  <img
+                    class="img-status-icon"
+                    [ngStyle]="{ color: iconColor || 'black' }"
+                    [src]="'../../../../../../../..' + iconSrc"
+                    [pTooltip]="icon"
+                  >
+                </ng-container>
+
+                <ng-template #iconTemplate>
+                  <i
+                    class="i-status-icon"
+                    [ngClass]="iconSrc"
+                    [ngStyle]="{ color: iconColor || 'black' }"
+                    [pTooltip]="icon"
+                  >
+                  </i>
+                </ng-template>
+              </ng-template>
+            </ng-container>
+            
             <i class="fas fa-info" *ngIf="properties?.journalInformation?.date && !properties?.journalInformation?.actual" style="cursor: pointer"
               (click)="handleShowJournalInformation(properties?.journalInformation); journalInformationPanelList.show($event)"
               ></i>
