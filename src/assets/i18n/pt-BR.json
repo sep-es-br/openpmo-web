@@ -1110,6 +1110,7 @@
   "NO_SCHEDULE": "Entrega sem cronograma",
   "UNDEFINED_SCOPE": "Entrega sem escopo",
   "baseline-less-then-required-milestone": "O projeto deve possuir pelo menos {{0}} marcos críticos para submissão da Linha de Base.",
+  "baseline-not-have-required-plannedWork": "Não é possível submeter uma Linha de Base sem escopo",
   "baseline-disabled-submission-warning": "Impossível submeter Linha de Base com pendências",
   "languages": "Idiomas"
 }

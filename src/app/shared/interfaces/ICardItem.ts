@@ -40,5 +40,6 @@ export interface ICardItem {
   main?: boolean;
   idAtributeName?: string;
   onClick?;
+  file?: File;
 }
 

@@ -14,11 +14,11 @@ export class EvidenceService extends BaseService<any> {
     super('evidence', injector);
   }
 
-  async uploadEvidence(file: FormData, idJournal: number): Promise<IHttpResult<any>> {
-    const headers = new HttpHeaders({
-      'Form-Data': 'true'
-    });
-    const result = await this.http.post(`${this.urlBase}/${idJournal}`, file, { headers }).toPromise();
+  async uploadEvidences(filesFormData: FormData, idJournal: number): Promise<IHttpResult<any>> {
+    const result = await this.http
+      .post(`${this.urlBase}/${idJournal}`, filesFormData)
+      .toPromise();
+
     return result as IHttpResult<any>;
   }
 

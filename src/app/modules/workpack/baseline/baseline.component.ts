@@ -78,10 +78,12 @@ export class BaselineComponent implements OnInit, OnDestroy {
   updatesTree: Array<TreeNode<IBaselineUpdates>>;
 
   treeShouldStartExpanded: boolean = true;
-
+  
   showFailMinMilestoneRequirement: boolean;
+  showFailPlannedWorkRequirement: boolean;
 
   minMilestoneRequirement: number;
+
 
   get allTogglerIsDisabled(): boolean {
     return this.areTherePendentUpdatesListed || this.formBaseline.disabled;
@@ -89,24 +91,20 @@ export class BaselineComponent implements OnInit, OnDestroy {
 
   get areTherePendentUpdatesListed(): boolean {
     return (
-      (this.baseline &&
-        this.baseline.updates &&
-        this.baseline.updates.length > 0 &&
-        this.baseline.updates.some((update) =>
-          [
-            BaselineUpdateStatus.NO_SCHEDULE,
-            BaselineUpdateStatus.UNDEFINED_SCOPE,
-          ].includes(update.classification)
-        )) ||
-      this.showFailMinMilestoneRequirement
-    );
+      this.baseline &&
+      this.baseline.updates &&
+      this.baseline.updates.length > 0 &&
+      this.baseline.updates.some(
+        (update) => [UpdateStatus.NO_SCHEDULE, UpdateStatus.UNDEFINED_SCOPE].includes(update.classification)
+      )
+    ) || this.showFailMinMilestoneRequirement || this.showFailPlannedWorkRequirement;
   }
 
   get shouldDisableBaselineSubmission(): boolean {
     return (
       this.formIsLoading ||
       this.areTherePendentUpdatesListed ||
-      !this.baseline.updates.some((update) => update.included) ||
+      !this.baseline?.updates.some((update) => update.included) ||
       !this.formBaseline.valid
     );
   }
@@ -123,14 +121,6 @@ export class BaselineComponent implements OnInit, OnDestroy {
     private messageSrv: MessageService,
     private translateSrv: TranslateService
   ) {
-    this.actRouter.queryParams.subscribe(
-      ({ idBaseline, idWorkpack, idWorkpackModelLinked }) => {
-        this.idWorkpack = idWorkpack && +idWorkpack;
-        this.idWorkpackModelLinked =
-          idWorkpackModelLinked && +idWorkpackModelLinked;
-        this.idBaseline = idBaseline && +idBaseline;
-      }
-    );
     this.responsiveSrv.observable
       .pipe(takeUntil(this.$destroy))
       .subscribe((value) => (this.responsive = value));
@@ -143,8 +133,20 @@ export class BaselineComponent implements OnInit, OnDestroy {
   }
 
   async ngOnInit() {
-    await this.loadPropertiesBaseline();
-    await this.setBreadcrumb();
+
+    this.actRouter.queryParams.pipe(takeUntil(this.$destroy)).subscribe({
+        next: async ({ idWorkpack, idWorkpackModelLinked, idBaseline }) => {
+            this.idWorkpack = idWorkpack && +idWorkpack;
+            this.idWorkpackModelLinked =
+                idWorkpackModelLinked && +idWorkpackModelLinked;
+            this.idBaseline = idBaseline && +idBaseline;
+     
+            await this.loadPropertiesBaseline();
+            await this.setBreadcrumb();
+        }
+    });
+    
+    
   }
 
   ngOnDestroy(): void {
@@ -224,9 +226,11 @@ export class BaselineComponent implements OnInit, OnDestroy {
     };
 
     if (this.idBaseline) {
+      this.idPlan = Number(localStorage.getItem('@currentPlan'));
       const result = await this.baselineSrv.GetByIdWithIdWorkpack(
         this.idWorkpack,
-        this.idBaseline
+        this.idBaseline,
+        this.idPlan
       );
       this.baseline = result.data;
       this.cardBaselineProperties.isLoading = false;
@@ -296,10 +300,10 @@ export class BaselineComponent implements OnInit, OnDestroy {
     this.baseline.updates = [];
     this.cardBaselineUpdates.isLoading = false;
 
-    const { valid, requiredAmount } =
-      await this.baselineSrv.checkMilestonesRequirement(this.idWorkpack);
-    console.log({ valid, requiredAmount });
+    const { valid, requiredAmount } = await this.baselineSrv.checkMilestonesRequirement(this.idWorkpack);
+    const reqPlanWork = await this.baselineSrv.checkPlannedWorkRequirement(this.idWorkpack);
     this.showFailMinMilestoneRequirement = !valid;
+    this.showFailPlannedWorkRequirement = !reqPlanWork.valid
     this.minMilestoneRequirement = requiredAmount;
 
     this.assembleUpdatesTree(updates);
