@@ -363,15 +363,15 @@ export class BaselineComponent implements OnInit, OnDestroy {
   ): boolean {
     return (
       !siblings.some((el) =>
-        [UpdateStatus.NO_SCHEDULE, UpdateStatus.UNDEFINED_SCOPE].includes(el.classification)
+        [BaselineUpdateStatus.NO_SCHEDULE, BaselineUpdateStatus.UNDEFINED_SCOPE].includes(el.classification)
       ) &&
-      (entity.classification === UpdateStatus.NEW ||
-        entity.classification === UpdateStatus.TO_CANCEL)
+      (entity.classification === BaselineUpdateStatus.NEW ||
+        entity.classification === BaselineUpdateStatus.TO_CANCEL)
     );
   }
 
   private isReadonly(entity: IBaselineUpdates): boolean {
-    return [UpdateStatus.NO_SCHEDULE, UpdateStatus.UNDEFINED_SCOPE]
+    return [BaselineUpdateStatus.NO_SCHEDULE, BaselineUpdateStatus.UNDEFINED_SCOPE]
       .includes(entity.classification);
   }
 
