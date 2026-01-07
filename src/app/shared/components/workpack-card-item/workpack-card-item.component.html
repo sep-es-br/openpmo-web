@@ -283,13 +283,32 @@
               </ng-template>
             </ng-container>
             
-            <i class="fas fa-info" *ngIf="properties?.journalInformation?.date && !properties?.journalInformation?.actual" style="cursor: pointer"
+            <i
+              *ngIf="properties?.journalInformation?.date && !properties?.journalInformation?.actual"
+              class="fas fa-info"
+              style="cursor: pointer"
               (click)="handleShowJournalInformation(properties?.journalInformation); journalInformationPanelList.show($event)"
-              ></i>
-            <i class="fas fa-info-circle" [ngStyle]="{ fontSize: '1.2rem' }" style="cursor: pointer"
+            >
+            </i>
+            <i
               *ngIf="properties?.journalInformation?.date && properties?.journalInformation?.actual"
+              class="fas fa-info-circle"
+              [ngStyle]="{ fontSize: '1.2rem' }"
+              style="cursor: pointer"
               (click)="handleShowJournalInformation(properties.journalInformation); journalInformationPanelList.show($event)"
-              ></i>
+            >
+            </i>
+
+            <i
+              *ngIf="showRiskIndex()"
+              class="app-icon risk i-risk-icon"
+              [class.risk-red]="riskImportance === 'high'"
+              [class.risk-yellow]="riskImportance === 'low'"
+              [class.risk-orange]="riskImportance === 'medium'"
+              (mouseenter)="riskPanelList.show($event)"
+              (mouseleave)="riskPanelList.hide()"
+            >
+            </i>
           </div>
           <p-overlayPanel #journalInformationPanelList class="journal-info-overlay-panel" [showCloseIcon]="true" [dismissable]="false">
             <div class="journal-info-panel-content"
@@ -311,12 +330,6 @@
             </div>
           </p-overlayPanel>
 
-          <div class="status-container">
-            <i class="app-icon risk" [ngStyle]="{ fontSize: '1.2rem' }" [class.risk-red]="riskImportance === 'high'"
-              *ngIf="showRiskIndex()" [class.risk-yellow]="riskImportance === 'low'"
-              [class.risk-orange]="riskImportance === 'medium'" (mouseenter)="riskPanelList.show($event)"
-              (mouseleave)="riskPanelList.hide()"></i>
-          </div>
           <div class="status-container">
             <i class="far fa-stop-circle"
               *ngIf="showEndManagementIndex() && !!properties.endManagementDate && properties.endManagementDate !== null"
