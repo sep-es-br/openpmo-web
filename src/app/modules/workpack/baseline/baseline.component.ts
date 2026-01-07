@@ -98,9 +98,10 @@ export class BaselineComponent implements OnInit, OnDestroy {
         this.baseline.updates &&
         this.baseline.updates.length > 0 &&
         this.baseline.updates.some((update) =>
-          [BaselineUpdateStatus.NO_SCHEDULE, BaselineUpdateStatus.UNDEFINED_SCOPE].includes(
-            update.classification
-          )
+          [
+            BaselineUpdateStatus.NO_SCHEDULE,
+            BaselineUpdateStatus.UNDEFINED_SCOPE,
+          ].includes(update.classification)
         )) ||
       this.showFailMinMilestoneRequirement ||
       this.showFailPlannedWorkRequirement
@@ -370,7 +371,10 @@ export class BaselineComponent implements OnInit, OnDestroy {
   ): boolean {
     return (
       !siblings.some((el) =>
-        [BaselineUpdateStatus.NO_SCHEDULE, BaselineUpdateStatus.UNDEFINED_SCOPE].includes(el.classification)
+        [
+          BaselineUpdateStatus.NO_SCHEDULE,
+          BaselineUpdateStatus.UNDEFINED_SCOPE,
+        ].includes(el.classification)
       ) &&
       (entity.classification === BaselineUpdateStatus.NEW ||
         entity.classification === BaselineUpdateStatus.TO_CANCEL)
@@ -378,13 +382,13 @@ export class BaselineComponent implements OnInit, OnDestroy {
   }
 
   private isReadonly(entity: IBaselineUpdates): boolean {
-    return [BaselineUpdateStatus.NO_SCHEDULE, BaselineUpdateStatus.UNDEFINED_SCOPE]
-      .includes(entity.classification);
+    return [
+      BaselineUpdateStatus.NO_SCHEDULE,
+      BaselineUpdateStatus.UNDEFINED_SCOPE,
+    ].includes(entity.classification);
   }
 
-  private buildTreeRecursive(
-    nodes: IBaselineUpdates[]
-  ): any[] {
+  private buildTreeRecursive(nodes: IBaselineUpdates[]): any[] {
     if (!nodes || nodes.length === 0) return [];
     // Agrupa os nós filhos por modelNameInPlural
     const grouped = this.groupByModelNameInPlural(nodes);

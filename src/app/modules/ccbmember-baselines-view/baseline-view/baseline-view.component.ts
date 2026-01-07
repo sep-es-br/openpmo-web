@@ -5,7 +5,10 @@ import { ResponsiveService } from '../../../shared/services/responsive.service';
 import { BaselineService } from '../../../shared/services/baseline.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subject } from 'rxjs';
-import { IBaseline, ITripleConstraintBreakdown } from '../../../shared/interfaces/IBaseline';
+import {
+  IBaseline,
+  ITripleConstraintBreakdown,
+} from '../../../shared/interfaces/IBaseline';
 import {
   Component,
   ElementRef,
@@ -65,7 +68,7 @@ export class BaselineViewComponent implements OnInit, OnDestroy {
     private responsiveSrv: ResponsiveService,
     private breadcrumbSrv: BreadcrumbService,
     private translateSrv: TranslateService,
-    private router: Router,
+    private router: Router
   ) {
     this.actRouter.queryParams.subscribe(({ id }) => {
       this.idBaseline = +id;
@@ -117,7 +120,10 @@ export class BaselineViewComponent implements OnInit, OnDestroy {
       this.baseline = result.data;
       this.loadChartScheduleValues();
       this.checkEvaluation();
-      this.assembleBreakdownTree(this.baseline.tripleConstraintBreakdown, this.baseline.officeUnitMeasures);
+      this.assembleBreakdownTree(
+        this.baseline.tripleConstraintBreakdown,
+        this.baseline.officeUnitMeasures
+      );
 
       this.isLoading = false;
     }
@@ -133,10 +139,22 @@ export class BaselineViewComponent implements OnInit, OnDestroy {
 
   loadChartScheduleValues() {
     if (this.baseline && this.baseline.schedule) {
-      const currentStartDate = moment(this.baseline.schedule?.currentStartDate, 'yyyy-MM-DD');
-      const currentEndDate = moment(this.baseline.schedule?.currentEndDate, 'yyyy-MM-DD');
-      const proposedStartDate = moment(this.baseline.schedule?.proposedStartDate, 'yyyy-MM-DD');
-      const proposedEndDate = moment(this.baseline.schedule?.proposedEndDate, 'yyyy-MM-DD');
+      const currentStartDate = moment(
+        this.baseline.schedule?.currentStartDate,
+        'yyyy-MM-DD'
+      );
+      const currentEndDate = moment(
+        this.baseline.schedule?.currentEndDate,
+        'yyyy-MM-DD'
+      );
+      const proposedStartDate = moment(
+        this.baseline.schedule?.proposedStartDate,
+        'yyyy-MM-DD'
+      );
+      const proposedEndDate = moment(
+        this.baseline.schedule?.proposedEndDate,
+        'yyyy-MM-DD'
+      );
 
       const startDate =
         this.baseline.schedule?.currentStartDate &&
@@ -158,7 +176,9 @@ export class BaselineViewComponent implements OnInit, OnDestroy {
           ? currentEndDate
           : proposedEndDate;
 
-      this.baseline.schedule.monthsInPeriod = Number((endDate.diff(startDate, 'days') / 30).toFixed(1));
+      this.baseline.schedule.monthsInPeriod = Number(
+        (endDate.diff(startDate, 'days') / 30).toFixed(1)
+      );
       this.baseline.schedule.difStartCurrentDateAndStartProposedDate = Number(
         (currentStartDate.diff(proposedStartDate, 'days') / 30).toFixed(1)
       );
@@ -231,7 +251,10 @@ export class BaselineViewComponent implements OnInit, OnDestroy {
     this.showCommentDialog = true;
   }
 
-  assembleBreakdownTree(workpacks: Array<ITripleConstraintBreakdown>, unitsOfMeasurement: Array<UnitMeasure>) {
+  assembleBreakdownTree(
+    workpacks: Array<ITripleConstraintBreakdown>,
+    unitsOfMeasurement: Array<UnitMeasure>
+  ) {
     // A função abaixo serve para obter o nível de precisão baseado na unidade de medida
     const getPrecisionFactor = (unit: string): number => {
       if (!unit) return 2;
@@ -242,203 +265,88 @@ export class BaselineViewComponent implements OnInit, OnDestroy {
       return 2;
     };
 
-    // A função abaixo serve para criar os objetos de Marcos Críticos e Entregas que serão inseridos na árvore
-    const buildMilestonesAndDeliveries = (
-      childs: Array<ITripleConstraintBreakdown> = []
-    ): {
-      milestoneTitleObject?: any;
-      deliveryTitleObject?: any;
-    } => {
-      const milestones = childs.filter(
-        (el) => el.type === TypeWorkpackEnumWBS.Milestone
-      );
-      const deliveries = childs.filter(
-        (el) => el.type === TypeWorkpackEnumWBS.Deliverable
-      );
-
-      let finalResult: {
-        milestoneTitleObject?: any;
-        deliveryTitleObject?: any;
-      } = {};
-
-      if (milestones.length > 0) {
-        const milestoneTitleObject = {
-          label: 'Marcos críticos',
-          icon: 'fas fa-flag',
-          children: [],
-          property: 'title',
-          expanded: this.treeShouldStartExpanded,
-        };
-
-        milestones.forEach((milestone) => {
-          const milestoneObject = {
-            label: milestone.name,
-            icon: milestone.fontIcon,
-            children: [],
-            property: 'value',
-            idWorkpack: milestone.idWorkpack,
-            costDetails: milestone?.costDetails,
-            scheduleDetails: milestone?.scheduleDetails,
-            scopeDetails: milestone?.scopeDetails,
-            workpackStatus: milestone?.workpackStatus,
-            precisionFactor: getPrecisionFactor(milestone.scopeDetails?.unitName),
-            statusDisplayMessage: milestone?.workpackStatus || undefined,
-            shouldDisplayBothDates: (
-              (
-                milestone?.scheduleDetails &&
-                milestone.scheduleDetails?.currentDate &&
-                milestone.scheduleDetails?.proposedDate &&
-                !milestone.scheduleDetails.currentDate.match(milestone.scheduleDetails.proposedDate)
-              ) ||
-              (
-                milestone.scheduleDetails?.currentDate &&
-                !milestone.scheduleDetails?.proposedDate
-              ) ||
-              (
-                !milestone.scheduleDetails?.currentDate &&
-                milestone.scheduleDetails?.proposedDate
-              )
-            )
-          };
-
-          milestoneTitleObject.children.push(milestoneObject);
-        });
-
-        finalResult = {
-          ...finalResult,
-          milestoneTitleObject,
-        };
-      }
-
-      if (deliveries.length > 0) {
-        const deliveryTitleObject = {
-          label: 'Entregas',
-          icon: 'fas fa-boxes',
-          children: [],
-          property: 'title',
-          expanded: this.treeShouldStartExpanded,
-        };
-
-        deliveries.forEach((delivery) => {
-          const deliveryObject = {
-            label: delivery.name,
-            icon: delivery.fontIcon,
-            children: [],
-            property: 'value',
-            idWorkpack: delivery.idWorkpack,
-            classification: delivery?.workpackStatus || '',
-            costDetails: delivery?.costDetails,
-            scheduleDetails: delivery?.scheduleDetails,
-            scopeDetails: delivery?.scopeDetails,
-            workpackStatus: delivery?.workpackStatus,
-            precisionFactor: getPrecisionFactor(delivery?.scopeDetails?.unitName) || undefined,
-            statusDisplayMessage: delivery?.workpackStatus || undefined,
-            shouldDisplayBothDates: (
-              (
-                delivery?.scheduleDetails &&
-                delivery.scheduleDetails?.currentDate &&
-                delivery.scheduleDetails?.proposedDate &&
-                !delivery.scheduleDetails.currentDate.match(delivery.scheduleDetails.proposedDate)
-              ) ||
-              (
-                delivery.scheduleDetails?.currentDate &&
-                !delivery.scheduleDetails?.proposedDate
-              ) ||
-              (
-                !delivery.scheduleDetails?.currentDate &&
-                delivery.scheduleDetails?.proposedDate
-              )
-            )
-          };
-
-          deliveryTitleObject.children.push(deliveryObject);
-        });
-
-        finalResult = {
-          ...finalResult,
-          deliveryTitleObject,
-        };
-      }
-
-      return finalResult;
-    };
-
-    const etapasTitleObject = {
-      label: 'Etapas',
-      icon: 'fas fa-tasks',
-      children: [],
-      property: 'title',
-      expanded: this.treeShouldStartExpanded,
-    };
-
-    workpacks.forEach((etapa) => {
-      const etapaObject = {
-        label: etapa.name,
-        icon: etapa.fontIcon,
-        children: [],
-        property: 'subtitle',
-        expanded: this.treeShouldStartExpanded,
-      };
-
-      etapasTitleObject.children.push(etapaObject);
-
-      if (etapa.children) {
-        if (
-          etapa.children.some(
-            (el) => el.type === 'Organizer' && el.modelName === 'Subetapa'
-          )
-        ) {
-          const subetapaTitleObject = {
-            label: 'Subetapas',
-            icon: 'fas fa-tasks',
-            children: [],
-            property: 'title',
-            expanded: this.treeShouldStartExpanded,
-          };
-
-          etapaObject.children.push(subetapaTitleObject);
-
-          etapa.children.forEach((subetapa) => {
-            const subetapaObject = {
-              label: subetapa.name,
-              icon: subetapa.fontIcon,
-              children: [],
-              property: 'subtitle',
-              expanded: this.treeShouldStartExpanded,
-            };
-
-            subetapaTitleObject.children.push(subetapaObject);
-
-            const milestonesAndDeliveries = buildMilestonesAndDeliveries(
-              subetapa.children
-            );
-            if (milestonesAndDeliveries.milestoneTitleObject)
-              subetapaObject.children.push(
-                milestonesAndDeliveries.milestoneTitleObject
-              );
-            if (milestonesAndDeliveries.deliveryTitleObject)
-              subetapaObject.children.push(
-                milestonesAndDeliveries.deliveryTitleObject
-              );
-            // Nesse ponto, o TitleObject dos Marcos e Entregas já estão carregados com os Marcos e as Entregas
-          });
-        } else {
-          const milestonesAndDeliveries = buildMilestonesAndDeliveries(
-            etapa.children
-          );
-          if (milestonesAndDeliveries.milestoneTitleObject)
-            etapaObject.children.push(
-              milestonesAndDeliveries.milestoneTitleObject
-            );
-          if (milestonesAndDeliveries.deliveryTitleObject)
-            etapaObject.children.push(
-              milestonesAndDeliveries.deliveryTitleObject
-            );
-          // Nesse ponto, o TitleObject dos Marcos e Entregas já estão carregados com os Marcos e as Entregas
+    const groupByModelNameInPlural = (
+      nodes: Array<ITripleConstraintBreakdown>
+    ): Map<string, Array<ITripleConstraintBreakdown>> => {
+      const map = new Map<string, Array<ITripleConstraintBreakdown>>();
+      nodes.forEach((n) => {
+        const key = n.modelNameInPlural || n.modelName || 'Itens';
+        if (!map.has(key)) {
+          map.set(key, []);
         }
-      }
-    });
+        map.get(key).push(n);
+      });
+      return map;
+    };
 
-    this.tripleConstraintsTree = [etapasTitleObject];
+    const buildTreeRecursively = (
+      nodes: Array<ITripleConstraintBreakdown>
+    ): Array<any> => {
+      if (!nodes || nodes.length === 0) return [];
+      // Agrupa os nós filhos por modelNameInPlural
+      const grouped = groupByModelNameInPlural(nodes);
+      const result: any[] = [];
+      grouped.forEach((groupNodes, groupTitle) => {
+        // Title node (ex: "Marcos críticos", "Entregas")
+        const titleNode: any = {
+          label: groupTitle,
+          // icon: groupNodes[0]?.fontIcon,
+          property: 'title',
+          expanded: this.treeShouldStartExpanded,
+          children: [],
+        };
+
+        groupNodes.forEach((node) => {
+          const treeNode: any = {
+            label: node.name,
+            icon: node.fontIcon,
+            property: [
+              TypeWorkpackEnumWBS.Deliverable,
+              TypeWorkpackEnumWBS.Milestone,
+            ].includes(node.type as TypeWorkpackEnumWBS)
+              ? 'value'
+              : (node.type as TypeWorkpackEnumWBS) ===
+                TypeWorkpackEnumWBS.Organizer
+              ? 'subtitle'
+              : 'title',
+            expanded: this.treeShouldStartExpanded,
+            children: [],
+            idWorkpack: node.idWorkpack,
+            costDetails: node?.costDetails,
+            scheduleDetails: node?.scheduleDetails,
+            scopeDetails: node?.scopeDetails,
+            workpackStatus: node?.workpackStatus,
+            precisionFactor: getPrecisionFactor(node.scopeDetails?.unitName),
+            statusDisplayMessage: node?.workpackStatus || undefined,
+            shouldDisplayBothDates:
+              (node?.scheduleDetails &&
+                node.scheduleDetails?.currentDate &&
+                node.scheduleDetails?.proposedDate &&
+                !node.scheduleDetails.currentDate.match(
+                  node.scheduleDetails.proposedDate
+                )) ||
+              (node.scheduleDetails?.currentDate &&
+                !node.scheduleDetails?.proposedDate) ||
+              (!node.scheduleDetails?.currentDate &&
+                node.scheduleDetails?.proposedDate),
+          };
+
+          // recursão (caso Organizer tenha filhos)
+          if (node.children && node.children.length > 0) {
+            treeNode.children = buildTreeRecursively(node.children);
+          }
+          titleNode.children.push(treeNode);
+        });
+
+        // só adiciona o title se tiver filhos
+        if (titleNode.children.length > 0) {
+          result.push(titleNode);
+        }
+      });
+
+      return result;
+    };
+
+    this.tripleConstraintsTree = buildTreeRecursively(workpacks);
   }
 }
