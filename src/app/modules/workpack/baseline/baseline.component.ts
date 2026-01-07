@@ -78,8 +78,9 @@ export class BaselineComponent implements OnInit, OnDestroy {
   updatesTree: Array<TreeNode<IBaselineUpdates>>;
 
   treeShouldStartExpanded: boolean = true;
-  
+
   showFailMinMilestoneRequirement: boolean;
+
   showFailPlannedWorkRequirement: boolean;
 
   minMilestoneRequirement: number;
@@ -140,13 +141,11 @@ export class BaselineComponent implements OnInit, OnDestroy {
             this.idWorkpackModelLinked =
                 idWorkpackModelLinked && +idWorkpackModelLinked;
             this.idBaseline = idBaseline && +idBaseline;
-     
+
             await this.loadPropertiesBaseline();
             await this.setBreadcrumb();
         }
     });
-    
-    
   }
 
   ngOnDestroy(): void {
@@ -303,7 +302,7 @@ export class BaselineComponent implements OnInit, OnDestroy {
     const { valid, requiredAmount } = await this.baselineSrv.checkMilestonesRequirement(this.idWorkpack);
     const reqPlanWork = await this.baselineSrv.checkPlannedWorkRequirement(this.idWorkpack);
     this.showFailMinMilestoneRequirement = !valid;
-    this.showFailPlannedWorkRequirement = !reqPlanWork.valid
+    this.showFailPlannedWorkRequirement = !reqPlanWork.valid;
     this.minMilestoneRequirement = requiredAmount;
 
     this.assembleUpdatesTree(updates);
@@ -352,7 +351,7 @@ export class BaselineComponent implements OnInit, OnDestroy {
       if (!map.has(key)) {
         map.set(key, []);
       }
-      map.get(key)!.push(n);
+      map.get(key).push(n);
     });
     return map;
   }
