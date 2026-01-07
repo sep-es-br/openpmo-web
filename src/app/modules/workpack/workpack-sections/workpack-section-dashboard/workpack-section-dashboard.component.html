@@ -71,21 +71,17 @@
       <div
         *ngIf="!isLoading"
         class="charts-container d-flex flex-column w-100 mb-4"
-        [ngClass]="{ 'flex-xxl-row': !windowProperties.isMenuPanelOpen }"
+        [ngClass]="windowProperties.isMenuPanelOpen ? 'flex-xxl-row' : 'flex-xl-row'"
       >
         <div
           *ngIf="dashboard && dashboard?.tripleConstraint"
-          class="triple-constraint-container"
-          [ngClass]="windowProperties.isMenuPanelOpen ? 'col-12' : 'col-xxl-6'"
+          class="triple-constraint-container col-12 col-xxl-6"
         >
           <app-triple-constraint-dashboard
             [tripleConstraint]="dashboard && dashboard?.tripleConstraint">
           </app-triple-constraint-dashboard>
         </div>
-        <div
-          class="risk-milestone-charts-container d-flex flex-column flex-xl-row justify-content-center"
-          [ngClass]="windowProperties.isMenuPanelOpen ? 'col-12' : 'col-xxl-6'"
-        >
+        <div class="risk-milestone-charts-container d-flex flex-column flex-xl-row justify-content-center col-12 col-xxl-6">
           <div class="dashboard-item col-12 col-xl-4 mb-4 mb-xl-0" *ngIf="!!dashboardShowDeliveryStatus && dashboardStatusData">
             <app-doughnut-chart
               [data]="dashboardStatusData"

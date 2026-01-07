@@ -78,10 +78,12 @@ export class BaselineComponent implements OnInit, OnDestroy {
   updatesTree: Array<TreeNode<IBaselineUpdates>>;
 
   treeShouldStartExpanded: boolean = true;
-
+  
   showFailMinMilestoneRequirement: boolean;
+  showFailPlannedWorkRequirement: boolean;
 
   minMilestoneRequirement: number;
+
 
   get allTogglerIsDisabled(): boolean {
     return this.areTherePendentUpdatesListed || this.formBaseline.disabled;
@@ -89,24 +91,20 @@ export class BaselineComponent implements OnInit, OnDestroy {
 
   get areTherePendentUpdatesListed(): boolean {
     return (
-      (this.baseline &&
-        this.baseline.updates &&
-        this.baseline.updates.length > 0 &&
-        this.baseline.updates.some((update) =>
-          [
-            BaselineUpdateStatus.NO_SCHEDULE,
-            BaselineUpdateStatus.UNDEFINED_SCOPE,
-          ].includes(update.classification)
-        )) ||
-      this.showFailMinMilestoneRequirement
-    );
+      this.baseline &&
+      this.baseline.updates &&
+      this.baseline.updates.length > 0 &&
+      this.baseline.updates.some(
+        (update) => [BaselineUpdateStatus.NO_SCHEDULE, BaselineUpdateStatus.UNDEFINED_SCOPE].includes(update.classification)
+      )
+    ) || this.showFailMinMilestoneRequirement || this.showFailPlannedWorkRequirement;
   }
 
   get shouldDisableBaselineSubmission(): boolean {
     return (
       this.formIsLoading ||
       this.areTherePendentUpdatesListed ||
-      !this.baseline.updates.some((update) => update.included) ||
+      !this.baseline?.updates.some((update) => update.included) ||
       !this.formBaseline.valid
     );
   }
@@ -123,14 +121,6 @@ export class BaselineComponent implements OnInit, OnDestroy {
     private messageSrv: MessageService,
     private translateSrv: TranslateService
   ) {
-    this.actRouter.queryParams.subscribe(
-      ({ idBaseline, idWorkpack, idWorkpackModelLinked }) => {
-        this.idWorkpack = idWorkpack && +idWorkpack;
-        this.idWorkpackModelLinked =
-          idWorkpackModelLinked && +idWorkpackModelLinked;
-        this.idBaseline = idBaseline && +idBaseline;
-      }
-    );
     this.responsiveSrv.observable
       .pipe(takeUntil(this.$destroy))
       .subscribe((value) => (this.responsive = value));
@@ -143,8 +133,20 @@ export class BaselineComponent implements OnInit, OnDestroy {
   }
 
   async ngOnInit() {
-    await this.loadPropertiesBaseline();
-    await this.setBreadcrumb();
+
+    this.actRouter.queryParams.pipe(takeUntil(this.$destroy)).subscribe({
+        next: async ({ idWorkpack, idWorkpackModelLinked, idBaseline }) => {
+            this.idWorkpack = idWorkpack && +idWorkpack;
+            this.idWorkpackModelLinked =
+                idWorkpackModelLinked && +idWorkpackModelLinked;
+            this.idBaseline = idBaseline && +idBaseline;
+     
+            await this.loadPropertiesBaseline();
+            await this.setBreadcrumb();
+        }
+    });
+    
+    
   }
 
   ngOnDestroy(): void {
@@ -224,9 +226,11 @@ export class BaselineComponent implements OnInit, OnDestroy {
     };
 
     if (this.idBaseline) {
+      this.idPlan = Number(localStorage.getItem('@currentPlan'));
       const result = await this.baselineSrv.GetByIdWithIdWorkpack(
         this.idWorkpack,
-        this.idBaseline
+        this.idBaseline,
+        this.idPlan
       );
       this.baseline = result.data;
       this.cardBaselineProperties.isLoading = false;
@@ -296,264 +300,141 @@ export class BaselineComponent implements OnInit, OnDestroy {
     this.baseline.updates = [];
     this.cardBaselineUpdates.isLoading = false;
 
-    const { valid, requiredAmount } =
-      await this.baselineSrv.checkMilestonesRequirement(this.idWorkpack);
-    console.log({ valid, requiredAmount });
+    const { valid, requiredAmount } = await this.baselineSrv.checkMilestonesRequirement(this.idWorkpack);
+    const reqPlanWork = await this.baselineSrv.checkPlannedWorkRequirement(this.idWorkpack);
     this.showFailMinMilestoneRequirement = !valid;
+    this.showFailPlannedWorkRequirement = !reqPlanWork.valid
     this.minMilestoneRequirement = requiredAmount;
 
     this.assembleUpdatesTree(updates);
   }
 
-  assembleUpdatesTree(updates: Array<any>) {
-    const conditionToEntityStartSelected = (
-      updates: Array<IBaselineUpdates>,
-      entity: IBaselineUpdates
-    ) =>
-      !updates.some((el) =>
-        [
-          BaselineUpdateStatus.NO_SCHEDULE,
-          BaselineUpdateStatus.UNDEFINED_SCOPE,
-        ].includes(el.classification)
-      ) &&
-      (entity.classification === BaselineUpdateStatus.NEW ||
-        entity.classification === BaselineUpdateStatus.TO_CANCEL ||
-        entity.classification === BaselineUpdateStatus.DELETED);
-
-    // A função abaixo serve para criar os objetos de Marcos Críticos e Entregas que serão inseridos na árvore
-    const buildMilestonesAndDeliveries = (
-      childs: Array<IBaselineUpdates>
-    ): {
-      milestoneTitleObject?: any;
-      deliveryTitleObject?: any;
-    } => {
-      const milestones = childs.filter(
-        (el) => el.type === TypeWorkpackEnumWBS.Milestone
-      );
-      const deliveries = childs.filter(
-        (el) => el.type === TypeWorkpackEnumWBS.Deliverable
-      );
-      const updates = [...milestones, ...deliveries];
-
-      let finalResult: {
-        milestoneTitleObject?: any;
-        deliveryTitleObject?: any;
-      } = {};
-
-      if (milestones.length > 0) {
-        const milestoneTitleObject = {
-          label: 'Marcos críticos',
-          icon: 'fas fa-flag',
-          children: [],
-          property: 'title',
-          expanded: this.treeShouldStartExpanded,
-        };
-
-        milestones.forEach((milestone) => {
-          const milestoneObject = {
-            label: milestone.name,
-            icon: milestone.fontIcon,
-            children: [],
-            included: conditionToEntityStartSelected(updates, milestone),
-            readonly: [
-              BaselineUpdateStatus.NO_SCHEDULE,
-              BaselineUpdateStatus.UNDEFINED_SCOPE,
-            ].includes(milestone.classification),
-            property: 'value',
-            classification: milestone.classification,
-            idWorkpack: milestone.idWorkpack,
-            expanded: this.treeShouldStartExpanded,
-          };
-
-          milestoneTitleObject.children.push(milestoneObject);
-          this.baseline.updates.push({
-            ...milestone,
-            included: conditionToEntityStartSelected(updates, milestone),
-          });
-        });
-
-        finalResult = {
-          ...finalResult,
-          milestoneTitleObject,
-        };
-      }
-
-      if (deliveries.length > 0) {
-        const deliveryTitleObject = {
-          label: 'Entregas',
-          icon: 'fas fa-boxes',
-          children: [],
-          property: 'title',
-          expanded: this.treeShouldStartExpanded,
-        };
-
-        deliveries.forEach((delivery) => {
-          let deliveryObject: BaselineUpdateBreakdown = {
-            label: delivery.name,
-            icon: delivery.fontIcon,
-            children: [],
-            included: conditionToEntityStartSelected(updates, delivery),
-            readonly: [
-              BaselineUpdateStatus.NO_SCHEDULE,
-              BaselineUpdateStatus.UNDEFINED_SCOPE,
-            ].includes(delivery.classification),
-            property: 'value',
-            classification: delivery.classification,
-            idWorkpack: delivery.idWorkpack,
-            expanded: this.treeShouldStartExpanded,
-          };
-
-          if (
-            delivery.deliveryModelHasActiveSchedule &&
-            [
-              BaselineUpdateStatus.NO_SCHEDULE,
-              BaselineUpdateStatus.UNDEFINED_SCOPE,
-            ].includes(delivery.classification)
-          ) {
-            deliveryObject = {
-              ...deliveryObject,
-              warnings: {
-                shouldDisplayDeliveryWarnings: true,
-                deliveryTooltipWarnings:
-                  this.getDeliveryTooltipWarnings(delivery),
-              },
-            };
-          }
-
-          deliveryTitleObject.children.push(deliveryObject);
-          this.baseline.updates.push({
-            ...delivery,
-            included: conditionToEntityStartSelected(updates, delivery),
-          });
-        });
-
-        finalResult = {
-          ...finalResult,
-          deliveryTitleObject,
-        };
-      }
-
-      return finalResult;
-    };
-
-    const etapasTitleObject = {
-      label: 'Etapas',
-      icon: 'fas fa-tasks',
-      children: [],
-      property: 'title',
-      expanded: this.treeShouldStartExpanded,
-    };
+  assembleUpdatesTree(updates: IBaselineUpdates[]) {
+    this.baseline.updates = [];
 
     const deletedItemsBlock = updates.find(
       (el) => el.idWorkpack === -1 && el.modelName === 'Excluídos'
     );
 
-    if (deletedItemsBlock)
-      updates = updates.filter((el) => el.modelName !== 'Excluídos');
-
-    updates.forEach((etapa) => {
-      const etapaObject = {
-        label: etapa.name,
-        icon: etapa.fontIcon,
-        children: [],
-        property: 'value',
-        expanded: this.treeShouldStartExpanded,
-      };
-
-      etapasTitleObject.children.push(etapaObject);
-
-      if (etapa.children) {
-        if (
-          etapa.children.some(
-            (el) => el.type === 'Organizer' && el.modelName === 'Subetapa'
-          )
-        ) {
-          const subetapaTitleObject = {
-            label: 'Subetapas',
-            icon: 'fas fa-tasks',
-            children: [],
-            property: 'title',
-            expanded: this.treeShouldStartExpanded,
-          };
-
-          etapaObject.children.push(subetapaTitleObject);
-
-          etapa.children.forEach((subetapa) => {
-            const subetapaObject = {
-              label: subetapa.name,
-              icon: subetapa.fontIcon,
-              children: [],
-              property: 'value',
-              expanded: this.treeShouldStartExpanded,
-            };
-
-            subetapaTitleObject.children.push(subetapaObject);
-
-            const milestonesAndDeliveries = buildMilestonesAndDeliveries(
-              subetapa.children
-            );
-            if (milestonesAndDeliveries.milestoneTitleObject)
-              subetapaObject.children.push(
-                milestonesAndDeliveries.milestoneTitleObject
-              );
-            if (milestonesAndDeliveries.deliveryTitleObject)
-              subetapaObject.children.push(
-                milestonesAndDeliveries.deliveryTitleObject
-              );
-            // Nesse ponto, o TitleObject dos Marcos e Entregas já estão carregados com os Marcos e as Entregas
-          });
-        } else {
-          const milestonesAndDeliveries = buildMilestonesAndDeliveries(
-            etapa.children
-          );
-          if (milestonesAndDeliveries.milestoneTitleObject)
-            etapaObject.children.push(
-              milestonesAndDeliveries.milestoneTitleObject
-            );
-          if (milestonesAndDeliveries.deliveryTitleObject)
-            etapaObject.children.push(
-              milestonesAndDeliveries.deliveryTitleObject
-            );
-          // Nesse ponto, o TitleObject dos Marcos e Entregas já estão carregados com os Marcos e as Entregas
-        }
-      }
-    });
+    let rootNodes = updates;
 
     if (deletedItemsBlock) {
-      const deletedItemsTitle = {
-        label: deletedItemsBlock.modelNameInPlural,
-        icon: deletedItemsBlock.fontIcon,
-        children: [],
-        property: 'title',
-        expanded: this.treeShouldStartExpanded,
-      };
-
-      const deletedDeliveriesAndMilestones = buildMilestonesAndDeliveries(
-        deletedItemsBlock.children
-      );
-      if (deletedDeliveriesAndMilestones.milestoneTitleObject) {
-        deletedItemsTitle.children.push(
-          deletedDeliveriesAndMilestones.milestoneTitleObject
-        );
-      }
-      if (deletedDeliveriesAndMilestones.deliveryTitleObject) {
-        deletedItemsTitle.children.push(
-          deletedDeliveriesAndMilestones.deliveryTitleObject
-        );
-      }
-
-      this.updatesTree = [etapasTitleObject, deletedItemsTitle];
-      this.baseline.updates = [
-        ...this.baseline.updates,
-        ...deletedItemsBlock.children,
-      ];
-    } else {
-      this.updatesTree = [etapasTitleObject];
+      rootNodes = updates.filter((el) => el.modelName !== 'Excluídos');
     }
 
-    this.includeAllUpdates = this.baseline.updates.every(
-      (update) => update.included
+    const mainTree = this.buildTreeRecursive(rootNodes);
+
+    if (deletedItemsBlock) {
+      const deletedTree = {
+        label: deletedItemsBlock.modelNameInPlural,
+        // icon: deletedItemsBlock.fontIcon,
+        property: 'title',
+        expanded: this.treeShouldStartExpanded,
+        children: this.buildTreeRecursive(deletedItemsBlock.children),
+      };
+
+      this.updatesTree = [...mainTree, deletedTree];
+    } else {
+      this.updatesTree = mainTree;
+    }
+
+    this.includeAllUpdates =
+      this.baseline.updates.length > 0 &&
+      this.baseline.updates.every((u) => u.included);
+  }
+
+  private groupByModelNameInPlural(
+    nodes: IBaselineUpdates[]
+  ): Map<string, IBaselineUpdates[]> {
+    const map = new Map<string, IBaselineUpdates[]>();
+    nodes.forEach((n) => {
+      const key = n.modelNameInPlural || n.modelName || 'Itens';
+      if (!map.has(key)) {
+        map.set(key, []);
+      }
+      map.get(key)!.push(n);
+    });
+    return map;
+  }
+
+  private shouldStartSelected(
+    siblings: IBaselineUpdates[],
+    entity: IBaselineUpdates
+  ): boolean {
+    return (
+      !siblings.some((el) =>
+        [BaselineUpdateStatus.NO_SCHEDULE, BaselineUpdateStatus.UNDEFINED_SCOPE].includes(el.classification)
+      ) &&
+      (entity.classification === BaselineUpdateStatus.NEW ||
+        entity.classification === BaselineUpdateStatus.TO_CANCEL)
     );
+  }
+
+  private isReadonly(entity: IBaselineUpdates): boolean {
+    return [BaselineUpdateStatus.NO_SCHEDULE, BaselineUpdateStatus.UNDEFINED_SCOPE]
+      .includes(entity.classification);
+  }
+
+  private buildTreeRecursive(
+    nodes: IBaselineUpdates[]
+  ): any[] {
+    if (!nodes || nodes.length === 0) return [];
+    // Agrupa os nós filhos por modelNameInPlural
+    const grouped = this.groupByModelNameInPlural(nodes);
+    const result: any[] = [];
+    grouped.forEach((groupNodes, groupTitle) => {
+      // Title node (ex: "Marcos críticos", "Entregas")
+      const titleNode: any = {
+        label: groupTitle,
+        // icon: groupNodes[0]?.fontIcon,
+        property: 'title',
+        expanded: this.treeShouldStartExpanded,
+        children: [],
+      };
+      groupNodes.forEach((node) => {
+        const treeNode: any = {
+          label: node.name,
+          icon: node.fontIcon,
+          property: 'value',
+          expanded: this.treeShouldStartExpanded,
+          classification: node.classification,
+          idWorkpack: node.idWorkpack,
+          readonly: this.isReadonly(node),
+          included: this.shouldStartSelected(groupNodes, node),
+          children: [],
+        };
+        // warnings para Deliverable
+        if (
+          node.type === TypeWorkpackEnumWBS.Deliverable &&
+          node.deliveryModelHasActiveSchedule &&
+          this.isReadonly(node)
+        ) {
+          treeNode.warnings = {
+            shouldDisplayDeliveryWarnings: true,
+            deliveryTooltipWarnings: this.getDeliveryTooltipWarnings(node),
+          };
+        }
+        if (
+          node.type === TypeWorkpackEnumWBS.Deliverable ||
+          node.type === TypeWorkpackEnumWBS.Milestone
+        ) {
+          this.baseline.updates.push({
+            ...node,
+            included: treeNode.included,
+          });
+        }
+        // recursão (caso Organizer tenha filhos)
+        if (node.children && node.children.length > 0) {
+          treeNode.children = this.buildTreeRecursive(node.children);
+        }
+        titleNode.children.push(treeNode);
+      });
+      // só adiciona o title se tiver filhos
+      if (titleNode.children.length > 0) {
+        result.push(titleNode);
+      }
+    });
+    return result;
   }
 
   handleSetAllTogglesUpdates(isEnabled: boolean) {

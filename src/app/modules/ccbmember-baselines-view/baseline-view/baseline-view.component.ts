@@ -5,7 +5,10 @@ import { ResponsiveService } from '../../../shared/services/responsive.service';
 import { BaselineService } from '../../../shared/services/baseline.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subject } from 'rxjs';
-import { IBaseline, ITripleConstraintBreakdown } from '../../../shared/interfaces/IBaseline';
+import {
+  IBaseline,
+  ITripleConstraintBreakdown,
+} from '../../../shared/interfaces/IBaseline';
 import {
   Component,
   ElementRef,
@@ -65,7 +68,7 @@ export class BaselineViewComponent implements OnInit, OnDestroy {
     private responsiveSrv: ResponsiveService,
     private breadcrumbSrv: BreadcrumbService,
     private translateSrv: TranslateService,
-    private router: Router,
+    private router: Router
   ) {
     this.actRouter.queryParams.subscribe(({ id }) => {
       this.idBaseline = +id;
@@ -117,7 +120,10 @@ export class BaselineViewComponent implements OnInit, OnDestroy {
       this.baseline = result.data;
       this.loadChartScheduleValues();
       this.checkEvaluation();
-      this.assembleBreakdownTree(this.baseline.tripleConstraintBreakdown, this.baseline.officeUnitMeasures);
+      this.assembleBreakdownTree(
+        this.baseline.tripleConstraintBreakdown,
+        this.baseline.officeUnitMeasures
+      );
 
       this.isLoading = false;
     }
@@ -133,10 +139,22 @@ export class BaselineViewComponent implements OnInit, OnDestroy {
 
   loadChartScheduleValues() {
     if (this.baseline && this.baseline.schedule) {
-      const currentStartDate = moment(this.baseline.schedule?.currentStartDate, 'yyyy-MM-DD');
-      const currentEndDate = moment(this.baseline.schedule?.currentEndDate, 'yyyy-MM-DD');
-      const proposedStartDate = moment(this.baseline.schedule?.proposedStartDate, 'yyyy-MM-DD');
-      const proposedEndDate = moment(this.baseline.schedule?.proposedEndDate, 'yyyy-MM-DD');
+      const currentStartDate = moment(
+        this.baseline.schedule?.currentStartDate,
+        'yyyy-MM-DD'
+      );
+      const currentEndDate = moment(
+        this.baseline.schedule?.currentEndDate,
+        'yyyy-MM-DD'
+      );
+      const proposedStartDate = moment(
+        this.baseline.schedule?.proposedStartDate,
+        'yyyy-MM-DD'
+      );
+      const proposedEndDate = moment(
+        this.baseline.schedule?.proposedEndDate,
+        'yyyy-MM-DD'
+      );
 
       const startDate =
         this.baseline.schedule?.currentStartDate &&
@@ -158,7 +176,9 @@ export class BaselineViewComponent implements OnInit, OnDestroy {
           ? currentEndDate
           : proposedEndDate;
 
-      this.baseline.schedule.monthsInPeriod = Number((endDate.diff(startDate, 'days') / 30).toFixed(1));
+      this.baseline.schedule.monthsInPeriod = Number(
+        (endDate.diff(startDate, 'days') / 30).toFixed(1)
+      );
       this.baseline.schedule.difStartCurrentDateAndStartProposedDate = Number(
         (currentStartDate.diff(proposedStartDate, 'days') / 30).toFixed(1)
       );
@@ -231,7 +251,10 @@ export class BaselineViewComponent implements OnInit, OnDestroy {
     this.showCommentDialog = true;
   }
 
-  assembleBreakdownTree(workpacks: Array<ITripleConstraintBreakdown>, unitsOfMeasurement: Array<UnitMeasure>) {
+  assembleBreakdownTree(
+    workpacks: Array<ITripleConstraintBreakdown>,
+    unitsOfMeasurement: Array<UnitMeasure>
+  ) {
     // A função abaixo serve para obter o nível de precisão baseado na unidade de medida
     const getPrecisionFactor = (unit: string): number => {
       if (!unit) return 2;
@@ -244,7 +267,7 @@ export class BaselineViewComponent implements OnInit, OnDestroy {
 
     // A função abaixo serve para criar os objetos de Marcos Críticos e Entregas que serão inseridos na árvore
     const buildMilestonesAndDeliveries = (
-      childs: Array<ITripleConstraintBreakdown>
+      childs: Array<ITripleConstraintBreakdown> = []
     ): {
       milestoneTitleObject?: any;
       deliveryTitleObject?: any;
@@ -281,24 +304,21 @@ export class BaselineViewComponent implements OnInit, OnDestroy {
             scheduleDetails: milestone?.scheduleDetails,
             scopeDetails: milestone?.scopeDetails,
             workpackStatus: milestone?.workpackStatus,
-            precisionFactor: getPrecisionFactor(milestone.scopeDetails?.unitName),
+            precisionFactor: getPrecisionFactor(
+              milestone.scopeDetails?.unitName
+            ),
             statusDisplayMessage: milestone?.workpackStatus || undefined,
-            shouldDisplayBothDates: (
-              (
-                milestone?.scheduleDetails &&
+            shouldDisplayBothDates:
+              (milestone?.scheduleDetails &&
                 milestone.scheduleDetails?.currentDate &&
                 milestone.scheduleDetails?.proposedDate &&
-                !milestone.scheduleDetails.currentDate.match(milestone.scheduleDetails.proposedDate)
-              ) ||
-              (
-                milestone.scheduleDetails?.currentDate &&
-                !milestone.scheduleDetails?.proposedDate
-              ) ||
-              (
-                !milestone.scheduleDetails?.currentDate &&
-                milestone.scheduleDetails?.proposedDate
-              )
-            )
+                !milestone.scheduleDetails.currentDate.match(
+                  milestone.scheduleDetails.proposedDate
+                )) ||
+              (milestone.scheduleDetails?.currentDate &&
+                !milestone.scheduleDetails?.proposedDate) ||
+              (!milestone.scheduleDetails?.currentDate &&
+                milestone.scheduleDetails?.proposedDate),
           };
 
           milestoneTitleObject.children.push(milestoneObject);
@@ -331,24 +351,20 @@ export class BaselineViewComponent implements OnInit, OnDestroy {
             scheduleDetails: delivery?.scheduleDetails,
             scopeDetails: delivery?.scopeDetails,
             workpackStatus: delivery?.workpackStatus,
-            precisionFactor: getPrecisionFactor(delivery?.scopeDetails?.unitName) || undefined,
+            precisionFactor:
+              getPrecisionFactor(delivery?.scopeDetails?.unitName) || undefined,
             statusDisplayMessage: delivery?.workpackStatus || undefined,
-            shouldDisplayBothDates: (
-              (
-                delivery?.scheduleDetails &&
+            shouldDisplayBothDates:
+              (delivery?.scheduleDetails &&
                 delivery.scheduleDetails?.currentDate &&
                 delivery.scheduleDetails?.proposedDate &&
-                !delivery.scheduleDetails.currentDate.match(delivery.scheduleDetails.proposedDate)
-              ) ||
-              (
-                delivery.scheduleDetails?.currentDate &&
-                !delivery.scheduleDetails?.proposedDate
-              ) ||
-              (
-                !delivery.scheduleDetails?.currentDate &&
-                delivery.scheduleDetails?.proposedDate
-              )
-            )
+                !delivery.scheduleDetails.currentDate.match(
+                  delivery.scheduleDetails.proposedDate
+                )) ||
+              (delivery.scheduleDetails?.currentDate &&
+                !delivery.scheduleDetails?.proposedDate) ||
+              (!delivery.scheduleDetails?.currentDate &&
+                delivery.scheduleDetails?.proposedDate),
           };
 
           deliveryTitleObject.children.push(deliveryObject);
