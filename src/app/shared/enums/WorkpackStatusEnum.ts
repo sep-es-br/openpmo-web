@@ -124,13 +124,13 @@ type AnyStatus = ProjectStatus | DeliverableStatus;
 
 const normalizeStatus = (status: AnyStatus | string): AnyStatus | undefined => {
   const checkForStatus = (value: AnyStatus | string): AnyStatus | undefined => {
-    const equivalentProjectStatus = Object.values(ProjectStatus).find(el => el.toLowerCase() === value.toLowerCase());
+    const equivalentProjectStatus = Object.values(ProjectStatus).find(el => el.toLowerCase() === value.toLowerCase().trim());
 
     if (equivalentProjectStatus) {
       return equivalentProjectStatus as ProjectStatus;
     }
 
-    const equivalentDeliverableStatus = Object.values(DeliverableStatus).find(el => el.toLowerCase() === value.toLowerCase());
+    const equivalentDeliverableStatus = Object.values(DeliverableStatus).find(el => el.toLowerCase() === value.toLowerCase().trim());
 
     if (equivalentDeliverableStatus) {
       return equivalentDeliverableStatus as DeliverableStatus;
