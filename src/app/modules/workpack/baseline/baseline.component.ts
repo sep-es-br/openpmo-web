@@ -1,6 +1,9 @@
 import { AuthService } from '../../../shared/services/auth.service';
 import { BaselineService } from '../../../shared/services/baseline.service';
-import { IBaseline, IBaselineUpdates } from '../../../shared/interfaces/IBaseline';
+import {
+  IBaseline,
+  IBaselineUpdates,
+} from '../../../shared/interfaces/IBaseline';
 import { takeUntil } from 'rxjs/operators';
 import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
 import { ResponsiveService } from 'src/app/shared/services/responsive.service';
@@ -78,12 +81,12 @@ export class BaselineComponent implements OnInit, OnDestroy {
   updatesTree: Array<TreeNode<IBaselineUpdates>>;
 
   treeShouldStartExpanded: boolean = true;
-  
+
   showFailMinMilestoneRequirement: boolean;
+
   showFailPlannedWorkRequirement: boolean;
 
   minMilestoneRequirement: number;
-
 
   get allTogglerIsDisabled(): boolean {
     return this.areTherePendentUpdatesListed || this.formBaseline.disabled;
@@ -91,13 +94,18 @@ export class BaselineComponent implements OnInit, OnDestroy {
 
   get areTherePendentUpdatesListed(): boolean {
     return (
-      this.baseline &&
-      this.baseline.updates &&
-      this.baseline.updates.length > 0 &&
-      this.baseline.updates.some(
-        (update) => [BaselineUpdateStatus.NO_SCHEDULE, BaselineUpdateStatus.UNDEFINED_SCOPE].includes(update.classification)
-      )
-    ) || this.showFailMinMilestoneRequirement || this.showFailPlannedWorkRequirement;
+      (this.baseline &&
+        this.baseline.updates &&
+        this.baseline.updates.length > 0 &&
+        this.baseline.updates.some((update) =>
+          [
+            BaselineUpdateStatus.NO_SCHEDULE,
+            BaselineUpdateStatus.UNDEFINED_SCOPE,
+          ].includes(update.classification)
+        )) ||
+      this.showFailMinMilestoneRequirement ||
+      this.showFailPlannedWorkRequirement
+    );
   }
 
   get shouldDisableBaselineSubmission(): boolean {
@@ -133,20 +141,17 @@ export class BaselineComponent implements OnInit, OnDestroy {
   }
 
   async ngOnInit() {
-
     this.actRouter.queryParams.pipe(takeUntil(this.$destroy)).subscribe({
-        next: async ({ idWorkpack, idWorkpackModelLinked, idBaseline }) => {
-            this.idWorkpack = idWorkpack && +idWorkpack;
-            this.idWorkpackModelLinked =
-                idWorkpackModelLinked && +idWorkpackModelLinked;
-            this.idBaseline = idBaseline && +idBaseline;
-     
-            await this.loadPropertiesBaseline();
-            await this.setBreadcrumb();
-        }
+      next: async ({ idWorkpack, idWorkpackModelLinked, idBaseline }) => {
+        this.idWorkpack = idWorkpack && +idWorkpack;
+        this.idWorkpackModelLinked =
+          idWorkpackModelLinked && +idWorkpackModelLinked;
+        this.idBaseline = idBaseline && +idBaseline;
+
+        await this.loadPropertiesBaseline();
+        await this.setBreadcrumb();
+      },
     });
-    
-    
   }
 
   ngOnDestroy(): void {
@@ -300,10 +305,13 @@ export class BaselineComponent implements OnInit, OnDestroy {
     this.baseline.updates = [];
     this.cardBaselineUpdates.isLoading = false;
 
-    const { valid, requiredAmount } = await this.baselineSrv.checkMilestonesRequirement(this.idWorkpack);
-    const reqPlanWork = await this.baselineSrv.checkPlannedWorkRequirement(this.idWorkpack);
+    const { valid, requiredAmount } =
+      await this.baselineSrv.checkMilestonesRequirement(this.idWorkpack);
+    const reqPlanWork = await this.baselineSrv.checkPlannedWorkRequirement(
+      this.idWorkpack
+    );
     this.showFailMinMilestoneRequirement = !valid;
-    this.showFailPlannedWorkRequirement = !reqPlanWork.valid
+    this.showFailPlannedWorkRequirement = !reqPlanWork.valid;
     this.minMilestoneRequirement = requiredAmount;
 
     this.assembleUpdatesTree(updates);
@@ -352,7 +360,7 @@ export class BaselineComponent implements OnInit, OnDestroy {
       if (!map.has(key)) {
         map.set(key, []);
       }
-      map.get(key)!.push(n);
+      map.get(key).push(n);
     });
     return map;
   }
@@ -363,7 +371,10 @@ export class BaselineComponent implements OnInit, OnDestroy {
   ): boolean {
     return (
       !siblings.some((el) =>
-        [BaselineUpdateStatus.NO_SCHEDULE, BaselineUpdateStatus.UNDEFINED_SCOPE].includes(el.classification)
+        [
+          BaselineUpdateStatus.NO_SCHEDULE,
+          BaselineUpdateStatus.UNDEFINED_SCOPE,
+        ].includes(el.classification)
       ) &&
       (entity.classification === BaselineUpdateStatus.NEW ||
         entity.classification === BaselineUpdateStatus.TO_CANCEL)
@@ -371,13 +382,13 @@ export class BaselineComponent implements OnInit, OnDestroy {
   }
 
   private isReadonly(entity: IBaselineUpdates): boolean {
-    return [BaselineUpdateStatus.NO_SCHEDULE, BaselineUpdateStatus.UNDEFINED_SCOPE]
-      .includes(entity.classification);
+    return [
+      BaselineUpdateStatus.NO_SCHEDULE,
+      BaselineUpdateStatus.UNDEFINED_SCOPE,
+    ].includes(entity.classification);
   }
 
-  private buildTreeRecursive(
-    nodes: IBaselineUpdates[]
-  ): any[] {
+  private buildTreeRecursive(nodes: IBaselineUpdates[]): any[] {
     if (!nodes || nodes.length === 0) return [];
     // Agrupa os nós filhos por modelNameInPlural
     const grouped = this.groupByModelNameInPlural(nodes);
