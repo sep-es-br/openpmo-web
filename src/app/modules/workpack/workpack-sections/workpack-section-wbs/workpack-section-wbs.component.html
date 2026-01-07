@@ -92,6 +92,7 @@
                   let-iconOrigin="iconOrigin"
                   let-iconSrc="iconSrc"
                   let-iconColor="iconColor"
+                  let-tooltip="tooltipMessage"
                 >
                   <div class="status-container">
                     <ng-container *ngIf="iconOrigin === 'img' else iconTemplate">
@@ -99,7 +100,7 @@
                         class="img-status-icon"
                         [ngStyle]="{ color: iconColor || 'black' }"
                         [src]="'../../../../../../../..' + iconSrc"
-                        [pTooltip]="icon"
+                        [pTooltip]="tooltip"
                       >
                     </ng-container>
 
@@ -108,7 +109,7 @@
                         class="i-status-icon"
                         [ngClass]="iconSrc"
                         [ngStyle]="{ color: iconColor || 'black' }"
-                        [pTooltip]="icon"
+                        [pTooltip]="tooltip"
                       >
                       </i>
                     </ng-template>
@@ -184,6 +185,7 @@
             let-iconOrigin="iconOrigin"
             let-iconSrc="iconSrc"
             let-iconColor="iconColor"
+            let-tooltip="tooltipMessage"
           >
             <div class="status-container">
               <ng-container *ngIf="iconOrigin === 'img' else iconTemplate">
@@ -191,7 +193,7 @@
                   class="img-status-icon"
                   [ngStyle]="{ color: iconColor || 'black' }"
                   [src]="'../../../../../../../..' + iconSrc"
-                  [pTooltip]="icon"
+                  [pTooltip]="tooltip"
                 >
               </ng-container>
 
@@ -200,7 +202,7 @@
                   class="i-status-icon"
                   [ngClass]="iconSrc"
                   [ngStyle]="{ color: iconColor || 'black' }"
-                  [pTooltip]="icon"
+                  [pTooltip]="tooltip"
                 >
                 </i>
               </ng-template>
