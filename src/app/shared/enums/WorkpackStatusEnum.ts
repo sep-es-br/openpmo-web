@@ -41,6 +41,7 @@ export interface WorkpackStatusConfig {
   icon: WorkpackStatusIcons;
   iconOrigin: 'img' | 'i';
   iconSrc: string;
+  tooltipMessage?: ProjectStatus | DeliverableStatus | string;
   iconColor?: string;
 }
 
@@ -169,11 +170,15 @@ export const getWorkpackStatusConfigByStatus = (
 
   const normalizedStatus = normalizeStatus(status);
 
-  if (!normalizeStatus) return undefined;
+  if (!normalizedStatus) return undefined;
 
   for (const [statusList, config] of WorkpackStatusMap.entries()) {
     if (statusList.includes(normalizedStatus)) {
-      return config;
+      const finalConfig: WorkpackStatusConfig = {
+        ...config,
+        tooltipMessage: status,
+      };
+      return finalConfig;
     }
   }
 
