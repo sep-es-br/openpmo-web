@@ -97,15 +97,21 @@
             margin-top: 0.5em;
             color: v.$fontTitle;
           }
+          .p-float-label {
+            &.email-box, &.address-box {
+              padding-right: 1.5rem;
+            }
+            &.phone-box {
+              padding-left: 1.5rem;
+            }
+          }
+
           .p-float-label.left > label {
-            left: 0.5rem !important;
+            left: 1.5rem !important;
           }
           .form {
             .property-input-text{
               padding-left: 0;
-            }
-            .app-text-area.p-inputtextarea {
-              width: 50%;
             }
           }
           .unifique-contacts {
@@ -200,6 +206,14 @@
         width: 100%;
         .p-float-label {
           width: 100%;
+
+          &.email-box, &.address-box {
+            padding-right: 0;
+          }
+          &.phone-box {
+            padding-left: 0;
+          }
+
           .app-single-selection {
             width: 100%;
             .p-dropdown {
