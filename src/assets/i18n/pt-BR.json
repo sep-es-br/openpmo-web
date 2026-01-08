@@ -636,7 +636,7 @@
     "confirmeRejectBaselineMessage": "Confirma a rejeição desta proposta de linha de base?",
     "confirmeApproveCancellingProjectMessage": "Confirma a aprovação do cancelamento do projeto?",
     "confirmeRejectCancellingProjectMessage": "Confirma a rejeição do cancelamento do projeto?",
-    "labelNameProfile": "Como deseja que seu nome seja exibido",
+    "labelNameProfile": "Como seu nome será exibido",
     "infoPmo": "Open PMO é um software de código aberto fornecido gratuitamente, sem suporte, certificação, manutenção, garantia ou indenização por",
     "personNotFound": "Pessoa não encontrada.",
     "invalidDate": "Data selecionada deve estar dentro do mês/ano sugerido.",
