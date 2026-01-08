@@ -512,7 +512,7 @@ export class BaselineComponent implements OnInit, OnDestroy {
   async handleSubmitBaseline() {
     this.formIsLoading = true;
     const selectedUpdates = this.baseline.updates.filter(
-      (update) => update.included
+      (update) => update.included ||update.classification === BaselineUpdateStatus.CHANGED
     );
     const result = await this.baselineSrv.submitBaseline(
       this.idBaseline,
