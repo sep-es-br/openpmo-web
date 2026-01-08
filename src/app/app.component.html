@@ -8,7 +8,8 @@
 <p-confirmDialog 
     [header]="'Atenção'" 
     [icon]="'pi pi-exclamation-triangle'" 
-    key="deliverableInfoConfirm">
+    key="deliverableInfoConfirm"
+    [closable]="false">
 </p-confirmDialog>
 <p-toast position="top-right"></p-toast>
 <ng-container *ngIf="showTemplate !== undefined">
