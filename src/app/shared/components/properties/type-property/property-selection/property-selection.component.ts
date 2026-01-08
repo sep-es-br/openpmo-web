@@ -153,29 +153,21 @@ export class PropertySelectionComponent implements OnInit {
       const result = await this.scheduleSrv.checkDeliverableComplete(deliverableId);
   
       if (!result.success || !result.data) {
-
-        this.property.value = this.property.defaultValue;
-
         this.confirmationService.confirm({
           key: 'deliverableInfoConfirm',
           message: 'Para concluir uma entrega, deve-se atualizar o cronograma, registrando como realizado ao menos 100% do escopo planejado. A seleção "Concluída" será feita automaticamente pelo sistema.',
           icon: 'pi pi-exclamation-triangle',
           acceptLabel: 'OK',
-          rejectVisible: false
+          rejectVisible: false,
+          accept: () => {
+            this.property.value = this.property.defaultValue;
+          }
         });
       }
     } catch (err) {
       this.property.value = this.property.defaultValue;
       console.error('Erro ao verificar deliverable, voltando para o default:', err);
     }
-  }
-
-  private resetProperty(): void {
-    this.property.value = this.property.defaultValue;
-  }
-
-  onConfirmDialogClose(): void {
-    this.resetProperty();
   }
 
 }
