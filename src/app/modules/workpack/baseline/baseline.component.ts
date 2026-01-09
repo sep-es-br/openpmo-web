@@ -463,6 +463,7 @@ export class BaselineComponent implements OnInit, OnDestroy {
           [
             BaselineUpdateStatus.TO_CANCEL,
             BaselineUpdateStatus.DELETED,
+            BaselineUpdateStatus.NEW,
           ].includes(update.classification)
         ) {
           update.included = true;
@@ -512,7 +513,7 @@ export class BaselineComponent implements OnInit, OnDestroy {
   async handleSubmitBaseline() {
     this.formIsLoading = true;
     const selectedUpdates = this.baseline.updates.filter(
-      (update) => update.included ||update.classification === BaselineUpdateStatus.CHANGED
+      (update) => update.classification !== BaselineUpdateStatus.UNCHANGED
     );
     const result = await this.baselineSrv.submitBaseline(
       this.idBaseline,

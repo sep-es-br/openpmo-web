@@ -111,7 +111,8 @@
                         node.classification === 'TO_CANCEL' || 
                         node.warnings?.shouldDisplayDeliveryWarnings ||
                         node.classification === 'DELETED' ||
-                        node.classification === 'UNCHANGED'
+                        node.classification === 'UNCHANGED' ||
+                        node.classification === 'NEW'
                         "
                     (onChange)="handleToggleSwitchChange($event.checked, node.idWorkpack)"
                   >
