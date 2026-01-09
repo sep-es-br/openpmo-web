@@ -377,7 +377,8 @@ export class BaselineComponent implements OnInit, OnDestroy {
         ].includes(el.classification)
       ) &&
       (entity.classification === BaselineUpdateStatus.NEW ||
-        entity.classification === BaselineUpdateStatus.TO_CANCEL)
+        entity.classification === BaselineUpdateStatus.TO_CANCEL ||
+        entity.classification === BaselineUpdateStatus.DELETED)
     );
   }
 
