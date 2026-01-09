@@ -183,6 +183,7 @@
       .warning-icon {
         color: #F59A23;
         margin-right: 0.25em;
+        font-size: 14px
       }
   
       .tree-label {
@@ -201,9 +202,32 @@
     }
 
     .container-properties {
+      display: flex;
+
       &.deliverable {
         width: 60%;
       }
+
+      .status-container {
+        width: 60px;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        .img-status-icon {
+          width: 20px;
+          height: 20px;
+          border: 1px solid black;
+          border-radius: 50%;
+          padding: 1px;
+        }
+
+        .i-status-icon {
+          font-size: 20px !important;
+        }
+      }
+
       .header-values-cost-account {
         display: flex;
         flex-direction: row;
@@ -295,6 +319,7 @@
         flex-direction: row;
         width: fit-content;
         height: 100%;
+
         .dashboard-items-container {
           display: flex;
           flex-direction: row;
@@ -302,7 +327,28 @@
           justify-content: space-between;
           width: 100%;
           height: 100%;
+
           .status-container {
+            width: 60px;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            .img-status-icon {
+              width: 20px;
+              height: 20px;
+              border: 1px solid black;
+              border-radius: 50%;
+              padding: 1px;
+            }
+
+            .i-status-icon {
+              font-size: 20px !important;
+            }
+          }
+
+          .journal-container {
             width: 60px;
             display: flex;
             flex-direction: row;

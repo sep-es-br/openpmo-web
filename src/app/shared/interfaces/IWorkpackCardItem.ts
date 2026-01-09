@@ -1,6 +1,7 @@
 import { IMilestoneDashboard, ITripleConstraintDashboard } from './IDashboard';
 import { MenuItem } from 'primeng/api';
 import { IWorkpackJournalInformation } from './IJournal';
+import { DeliverableStatus, ProjectStatus } from '../enums/WorkpackStatusEnum';
 export interface IWorkpackCardItem {
   typeCardItem: string;
   icon?: string;
@@ -25,25 +26,26 @@ export interface IWorkpackCardItem {
   onNewItem?;
   dashboardData?: {
     risk?: {
-      high: number,
-      low: number,
-      medium: number,
-      total: number
-    },
-    milestone?: IMilestoneDashboard,
-    tripleConstraint?: ITripleConstraintDashboard,
+      high: number;
+      low: number;
+      medium: number;
+      total: number;
+    };
+    milestone?: IMilestoneDashboard;
+    tripleConstraint?: ITripleConstraintDashboard;
     costPerformanceIndex?: {
-      costVariation: number,
-      indexValue: number
-    },
+      costVariation: number;
+      indexValue: number;
+    };
     earnedValue?: number;
     schedulePerformanceIndex?: {
-      indexValue: number,
-      scheduleVariation: number
-    }
-  },
+      indexValue: number;
+      scheduleVariation: number;
+    };
+  };
   hasBaseline?: boolean;
   baselineName?: string;
   journalInformation?: IWorkpackJournalInformation;
+  statusProperty?: ProjectStatus | DeliverableStatus;
 }
 

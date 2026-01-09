@@ -19,38 +19,59 @@ import { JournalService } from '../../services/journal.service';
   styleUrls: ['./workpack-card-item.component.scss']
 })
 export class WorkpackCardItemComponent implements OnInit, OnDestroy {
+  @Input() properties: IWorkpackCardItem;
+
+  @Input() displayModeCard: string;
 
   @ViewChild('newItemIcon') newItemIcon: ElementRef;
 
-  @Input() properties: IWorkpackCardItem;
-  @Input() displayModeCard: string;
-
   cardIdItem: string;
+
   language: string;
+
   iconImg;
+
   responsive: boolean;
+
   cardType = 'standard';
+
   riskImportance = 'high';
+
   dashboardMilestonesData: ChartData = {
     labels: [],
     datasets: []
   };
+
   iconCostColor = '#888E96';
+
   iconScheduleColor = '#888E96';
+
   iconScopeColor = '#888E96';
+
   cpiColor: string;
+
   spiColor: string;
+
   gaugeChartDataCPI: IGaugeChartData;
+
   gaugeChartDataSPI: IGaugeChartData;
+
   $destroy = new Subject();
+
   attentionMilestone = false;
+
   milestoneStatusEnum = MilestoneStatusEnum;
 
   milestoneDate: Date = null;
+
   showReasonModal: boolean;
+
   reasonValue: string = '';
+
   showReasonButtons = false;
+
   milestoneMidleTextBottom: string;
+
   enable = true;
 
   constructor(
@@ -106,6 +127,11 @@ export class WorkpackCardItemComponent implements OnInit, OnDestroy {
       this.loadPerformanceIndexes();
     }
     this.setLanguage();
+  }
+
+  ngOnDestroy() {
+    this.$destroy.next();
+    this.$destroy.complete();
   }
 
   changeMilestoneDate(event: any) {
@@ -181,11 +207,6 @@ export class WorkpackCardItemComponent implements OnInit, OnDestroy {
   setMilestoneDateProperty() {
     const date = this.properties.subtitleCardItem.split('-');
     this.milestoneDate = new Date(date[0], date[1] - 1, date[2]);
-  }
-
-  ngOnDestroy() {
-    this.$destroy.next();
-    this.$destroy.complete();
   }
 
   setLanguage() {
@@ -377,7 +398,10 @@ export class WorkpackCardItemComponent implements OnInit, OnDestroy {
   }
 
   validateShowTripleConstraintCost() {
-    if (this.properties?.dashboardData?.tripleConstraint?.cost && this.properties?.dashboardData?.tripleConstraint?.cost?.foreseenValue > 0) {
+    if (
+      this.properties?.dashboardData?.tripleConstraint?.cost &&
+      this.properties?.dashboardData?.tripleConstraint?.cost?.foreseenValue > 0
+    ) {
       return true;
     }
     return false;
@@ -392,7 +416,10 @@ export class WorkpackCardItemComponent implements OnInit, OnDestroy {
   }
 
   validateShowTripleConstraintScope() {
-    if (this.properties?.dashboardData?.tripleConstraint?.scope && this.properties?.dashboardData?.tripleConstraint?.scope?.foreseenValue > 0) {
+    if (
+      this.properties?.dashboardData?.tripleConstraint?.scope &&
+      this.properties?.dashboardData?.tripleConstraint?.scope?.foreseenValue > 0
+    ) {
       return true;
     }
     return false;
@@ -448,7 +475,7 @@ export class WorkpackCardItemComponent implements OnInit, OnDestroy {
           ...evidence,
           isImg,
           icon
-        }
+        };
       });
       journalInformation.loading = false;
     }

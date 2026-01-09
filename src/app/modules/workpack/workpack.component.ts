@@ -64,66 +64,112 @@ import { IUniversalSearch } from 'src/app/shared/interfaces/universal-search.int
   styleUrls: ['./workpack.component.scss']
 })
 export class WorkpackComponent implements OnDestroy {
-
   @ViewChild(SaveButtonComponent) saveButton: SaveButtonComponent;
+
   @ViewChild(CancelButtonComponent) cancelButton: CancelButtonComponent;
-    @ViewChild('searchBar') searchBarRef : ElementRef<HTMLDivElement>
+
+  @ViewChild('searchBar') searchBarRef: ElementRef<HTMLDivElement>;
 
   responsive: boolean;
+
   idPlan: number;
+
   propertiesPlan: IPlan;
+
   idOffice: number;
+
   idOfficeOwnerWorkpackLinked: number;
+
   propertiesOffice: IOffice;
+
   idWorkpackModel: number;
+
   idWorkpack: number;
+
   idWorkpackParent: number;
+
   idWorkpackModelLinked: number;
+
   workpackModel: IWorkpackModel;
+
   typePropertyModel = TypePropertyModelEnum;
+
   workpack: IWorkpack;
+
   workpackProperties: IWorkpackProperty[];
+
   sectionWorkpackModelChildren: boolean;
+
   organizationsOffice: IOrganization[];
+
   unitMeasuresOffice: IMeasureUnit[];
+
   cardsWorkPackModelChildren: ISectionWorkpacks[];
+
   isUserAdmin: boolean;
+
   collapsePanelsStatus = true;
+
   displayModeAll = 'grid';
+
   pageSize = 5;
+
   totalRecordsWorkpacks: number[] = [];
+
   showDialogEndManagement = false;
+
   showDialogResumeManagement = false;
+
   endManagementWorkpack: {
     idWorkpackModel?: number;
     idWorkpack: number;
     reason: string;
     endManagementDate: Date;
   };
+
   calendarFormat = '';
+
   $destroy = new Subject();
+
   language: string;
+
   fullScreenModeDashboard = false;
+
   changedStatusCompleted = false;
+
   endManagementResumePermission = false;
+
   showTabview = false;
+
   hasWBS = false;
+
   selectedTab: ITabViewScrolled;
+
   tabs: ITabViewScrolled[];
+
   isLoading = false;
+
   favoriteProcessing = false;
+
   currentBreadcrumbItems: IBreadcrumb[];
+
   workpackLoading = true;
+
   formIsSaving = false;
+
   workpackChildChanging = false;
+
   linkEvent = false;
 
   showAnimationSearch = false;
 
   searchTerm;
+
   page = 0;
-  result : IUniversalSearch[];
-  totalCountResults : number;
+
+  result: IUniversalSearch[];
+
+  totalCountResults: number;
 
   isSearching = false;
 
@@ -162,8 +208,8 @@ export class WorkpackComponent implements OnDestroy {
     private breadcrumbSrv: BreadcrumbService,
     private location: Location,
     private setConfigWorkpackSrv: SetConfigWorkpackService,
-    private searchSrv : SearchService,
-    private thisElemRef : ElementRef<HTMLElement>
+    private searchSrv: SearchService,
+    private thisElemRef: ElementRef<HTMLElement>
   ) {
     this.actRouter.queryParams.subscribe(({ id }) => {
         this.idWorkpack = id && +id;
@@ -257,26 +303,25 @@ export class WorkpackComponent implements OnDestroy {
 
   }
 
-    @HostListener('window:click', ['$event'])
-    handleClick(evt: MouseEvent) {
-        if(!this.searchBarRef) return;
-        const path = evt.composedPath();
-        const clickedInside = path.includes(this.searchBarRef.nativeElement);
-
-        if (!clickedInside && (!this.isSearching || !path.includes(this.thisElemRef.nativeElement))) {
-            this.handleCloseSearching();
-        }
-    }
-
-    openSearch() {
-        this.showAnimationSearch = true;
-        (this.searchBarRef.nativeElement.querySelector('.app-input-text') as HTMLInputElement).focus();
-        
-    }
-
   ngOnDestroy(): void {
     this.$destroy.next();
     this.$destroy.complete();
+  }
+
+  @HostListener('window:click', ['$event'])
+  handleClick(evt: MouseEvent) {
+    if(!this.searchBarRef) return;
+    const path = evt.composedPath();
+    const clickedInside = path.includes(this.searchBarRef.nativeElement);
+
+    if (!clickedInside && (!this.isSearching || !path.includes(this.thisElemRef.nativeElement))) {
+      this.handleCloseSearching();
+    }
+  }
+
+  openSearch() {
+    this.showAnimationSearch = true;
+    (this.searchBarRef.nativeElement.querySelector('.app-input-text') as HTMLInputElement).focus();
   }
 
   setWorkWorkpack() {
@@ -295,7 +340,7 @@ export class WorkpackComponent implements OnDestroy {
     this.showAnimationSearch = false;
   }
 
-  handlePageChange(evt : LazyLoadEvent) {
+  handlePageChange(evt: LazyLoadEvent) {
 
     const pageData: PageDef = {
         page: evt.first / evt.rows,
@@ -413,7 +458,7 @@ export class WorkpackComponent implements OnDestroy {
     }
     this.propertySrv.loadProperties();
     if(! this.dashboardSrv.referenceMonth) this.dashboardSrv.calculateReferenceMonth();
-    await this.propertySrv.loadProperties()
+    await this.propertySrv.loadProperties();
     const linked = this.idWorkpackModelLinked ? true : false;
     this.dashboardSrv.loadDashboard(linked);
     this.costAccountSrv.loadCostAccounts();
@@ -844,7 +889,8 @@ export class WorkpackComponent implements OnDestroy {
           journalInformation: {
             ...workpack?.journalInformation,
             actual: actualInformation
-          }
+          },
+          statusProperty: workpack?.statusProperty || undefined,
         };
       });
       if (this.workpackSrv.getEditPermission() && !idWorkpackModelLinked) {
@@ -1517,8 +1563,7 @@ export class WorkpackComponent implements OnDestroy {
 
   handleSearchText() {
     if (this.searchTerm?.trim().length < this.searchSrv.minLength) return;
-        
-        
+
     if (this.searchTerm !== this.searchSrv.searchTerm$.value) {
 
         this.page = 0;
@@ -1527,7 +1572,6 @@ export class WorkpackComponent implements OnDestroy {
             pageSize: this.pageSize
         } as PageDef;
 
-        
         this.workpackLoading = true;
         this.searchSrv.doSimpleSearch(this.searchTerm, this.idWorkpack, pageData)
             .pipe(finalize(() => this.workpackLoading = false))
