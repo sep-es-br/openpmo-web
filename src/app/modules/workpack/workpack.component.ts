@@ -774,31 +774,31 @@ export class WorkpackComponent implements OnDestroy {
               disabled: !this.workpackSrv.getEditPermission()
             });
           }
-          if (!workpack.canceled && workpack.type === 'Deliverable' &&
-            (!workpack.endManagementDate || workpack.endManagementDate === null)) {
-            menuItems.push({
-              label: this.translateSrv.instant('endManagement'),
-              icon: 'far fa-stop-circle',
-              command: (event) => this.endManagementOfDeliverable(workpack, idWorkpackModel),
-              disabled: !this.workpackSrv.getEditPermission()
-            });
-          }
-          if (!workpack.canceled && workpack.type === 'Deliverable' &&
-            (!!workpack.endManagementDate && workpack.endManagementDate !== null)) {
-            menuItems.push({
-              label: this.translateSrv.instant('resumeManagement'),
-              icon: 'far fa-play-circle',
-              command: (event) => this.resumeManagementOfDeliverable(workpack, idWorkpackModel),
-              disabled: !this.endManagementResumePermission && !this.workpackSrv.getEditPermission()
-            });
-          }
-          if (workpack.cancelable && this.workpackSrv.getEditPermission() && !workpack.linked) {
+          // if (!workpack.canceled && workpack.type === 'Deliverable' &&
+          //   (!workpack.endManagementDate || workpack.endManagementDate === null)) {
+          //   menuItems.push({
+          //     label: this.translateSrv.instant('endManagement'),
+          //     icon: 'far fa-stop-circle',
+          //     command: (event) => this.endManagementOfDeliverable(workpack, idWorkpackModel),
+          //     disabled: !this.workpackSrv.getEditPermission()
+          //   });
+          // }
+          // if (!workpack.canceled && workpack.type === 'Deliverable' &&
+          //   (!!workpack.endManagementDate && workpack.endManagementDate !== null)) {
+          //   menuItems.push({
+          //     label: this.translateSrv.instant('resumeManagement'),
+          //     icon: 'far fa-play-circle',
+          //     command: (event) => this.resumeManagementOfDeliverable(workpack, idWorkpackModel),
+          //     disabled: !this.endManagementResumePermission && !this.workpackSrv.getEditPermission()
+          //   });
+          // }
+          // if (workpack.cancelable && this.workpackSrv.getEditPermission() && !workpack.linked) {
             // menuItems.push({
             //   label: this.translateSrv.instant('cancel'),
             //   icon: 'fas fa-times',
             //   command: (event) => this.handleCancelWorkpack(workpack.id),
             // });
-          }
+          // }
           if (workpack.type === 'Project' && this.workpackSrv.getEditPermission()) {
             menuItems.push({
               label: this.translateSrv.instant('changeControlBoard'),
