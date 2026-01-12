@@ -11,7 +11,7 @@ import { OfficeService } from 'src/app/shared/services/office.service';
 import { IOffice } from 'src/app/shared/interfaces/IOffice';
 import { IPlan } from 'src/app/shared/interfaces/IPlan';
 import { PlanService } from 'src/app/shared/services/plan.service';
-import { share, takeUntil } from 'rxjs/operators';
+import { takeUntil } from 'rxjs/operators';
 import { TranslateService } from '@ngx-translate/core';
 import { ResponsiveService } from 'src/app/shared/services/responsive.service';
 import { ActivatedRoute } from '@angular/router';
@@ -27,22 +27,34 @@ import { CancelButtonComponent } from 'src/app/shared/components/cancel-button/c
   styleUrls: ['./sharing.component.scss']
 })
 export class SharingComponent implements OnInit, OnDestroy {
-
   @ViewChild(SaveButtonComponent) saveButton: SaveButtonComponent;
+
   @ViewChild(CancelButtonComponent) cancelButton: CancelButtonComponent;
 
   idWorkpack: number;
+
   idWorkpackParent: number;
+
   idPlan: number;
+
   responsive: boolean;
+
   plan: IPlan;
+
   office: IOffice;
+
   workpack: IWorkpack;
+
   $destroy = new Subject();
+
   workpackSharing: IWorkpackShared[];
+
   workpackName: string;
+
   workpackFullName: string;
+
   cardItemSharing: ICardItemPermission[];
+
   workpackSharingCard: ICard = {
     toggleable: false,
     initialStateToggle: false,
@@ -50,9 +62,13 @@ export class SharingComponent implements OnInit, OnDestroy {
     collapseble: false,
     initialStateCollapse: false
   };
+
   officeListOptionsSharing: IOffice[];
+
   editPermission = false;
+
   isLoading = false;
+
   formIsSaving = false;
 
   constructor(
@@ -194,7 +210,7 @@ export class SharingComponent implements OnInit, OnDestroy {
         typeCardItem: 'sharedItem',
         levelListOptions: [
           { label: this.translateSrv.instant('read'), value: 'READ' },
-          { label: this.translateSrv.instant('edit'), value: 'EDIT' }
+          // { label: this.translateSrv.instant('edit'), value: 'EDIT' }
         ],
         selectedOption: share.level,
         titleCardItem: share.office.name,
@@ -229,7 +245,7 @@ export class SharingComponent implements OnInit, OnDestroy {
       typeCardItem: 'sharedItem',
       levelListOptions: [
         { label: this.translateSrv.instant('read'), value: 'READ' },
-        { label: this.translateSrv.instant('edit'), value: 'EDIT' }
+        // { label: this.translateSrv.instant('edit'), value: 'EDIT' }
       ],
       selectedOption: office.id === this.office.id ? 'EDIT' : '',
       titleCardItem: office.name,
