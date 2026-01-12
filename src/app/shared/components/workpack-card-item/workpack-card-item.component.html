@@ -124,12 +124,24 @@
         </div>
         <div class="right-content">
           <div class="indexes">
-            <span class="index" [ngStyle]="{color: cpiColor}" (mouseenter)="cpiPanel.show($event)"
+            <span
+              *ngIf="properties?.dashboardData?.costPerformanceIndex"
+              class="index"
+              [ngStyle]="{color: cpiColor}"
+              (mouseenter)="cpiPanel.show($event)"
               (mouseleave)="cpiPanel.hide()"
-              *ngIf="properties?.dashboardData?.costPerformanceIndex">{{'CPI'|translate}}</span>
-            <span class="index" (mouseenter)="spiPanel.show($event)" (mouseleave)="spiPanel.hide()"
+            >
+              {{ 'CPI' | translate }}
+            </span>
+            <span
               *ngIf="properties?.dashboardData?.schedulePerformanceIndex"
-              [ngStyle]="{color: spiColor}">{{'SPI'|translate}}</span>
+              class="index"
+              (mouseenter)="spiPanel.show($event)"
+              (mouseleave)="spiPanel.hide()"
+              [ngStyle]="{ color: spiColor }"
+            >
+              {{ 'SPI' | translate }}
+            </span>
 
             <div class="status-container"
               *ngIf="properties?.journalInformation?.date">
@@ -140,6 +152,43 @@
                 *ngIf="properties?.journalInformation?.actual" style="cursor: pointer"
                 (click)="handleShowJournalInformation(properties.journalInformation); journalInformationPanel.show($event)"></i>
             </div>
+          </div>
+          <div
+            *ngIf="properties?.statusProperty"
+            class="status-box"
+          >
+            <ng-container
+              [ngTemplateOutlet]="iconConfig"
+              [ngTemplateOutletContext]="properties.statusProperty | workpackStatusConfig"
+            >
+              <ng-template
+                #iconConfig
+                let-icon="icon"
+                let-iconOrigin="iconOrigin"
+                let-iconSrc="iconSrc"
+                let-iconColor="iconColor"
+                let-tooltip="tooltipMessage"
+              >
+                <ng-container *ngIf="iconOrigin === 'img' else iconTemplate">
+                  <img
+                    class="img-status-icon"
+                    [ngStyle]="{ color: iconColor || 'black' }"
+                    [src]="'../../../../../../../..' + iconSrc"
+                    [pTooltip]="tooltip"
+                  >
+                </ng-container>
+
+                <ng-template #iconTemplate>
+                  <i
+                    class="i-status-icon"
+                    [ngClass]="iconSrc"
+                    [ngStyle]="{ color: iconColor || 'black' }"
+                    [pTooltip]="tooltip"
+                  >
+                  </i>
+                </ng-template>
+              </ng-template>
+            </ng-container>
           </div>
           <p-overlayPanel #journalInformationPanel class="journal-info-overlay-panel" [showCloseIcon]="true" [dismissable]="false">
             <div class="journal-info-panel-content"
@@ -200,13 +249,66 @@
       <div class="right-container">
         <div class="dashboard-items-container">
           <div class="status-container">
-            <i class="fas fa-info" *ngIf="properties?.journalInformation?.date && !properties?.journalInformation?.actual" style="cursor: pointer"
+            <ng-container
+              *ngIf="properties?.statusProperty"
+              [ngTemplateOutlet]="iconConfig"
+              [ngTemplateOutletContext]="properties.statusProperty | workpackStatusConfig"
+            >
+              <ng-template
+                #iconConfig
+                let-icon="icon"
+                let-iconOrigin="iconOrigin"
+                let-iconSrc="iconSrc"
+                let-iconColor="iconColor"
+                let-tooltip="tooltipMessage"
+              >
+                <ng-container *ngIf="iconOrigin === 'img' else iconTemplate">
+                  <img
+                    class="img-status-icon"
+                    [ngStyle]="{ color: iconColor || 'black' }"
+                    [src]="'../../../../../../../..' + iconSrc"
+                    [pTooltip]="tooltip"
+                  >
+                </ng-container>
+
+                <ng-template #iconTemplate>
+                  <i
+                    class="i-status-icon"
+                    [ngClass]="iconSrc"
+                    [ngStyle]="{ color: iconColor || 'black' }"
+                    [pTooltip]="tooltip"
+                  >
+                  </i>
+                </ng-template>
+              </ng-template>
+            </ng-container>
+            
+            <i
+              *ngIf="properties?.journalInformation?.date && !properties?.journalInformation?.actual"
+              class="fas fa-info"
+              style="cursor: pointer"
               (click)="handleShowJournalInformation(properties?.journalInformation); journalInformationPanelList.show($event)"
-              ></i>
-            <i class="fas fa-info-circle" [ngStyle]="{ fontSize: '1.2rem' }" style="cursor: pointer"
+            >
+            </i>
+            <i
               *ngIf="properties?.journalInformation?.date && properties?.journalInformation?.actual"
+              class="fas fa-info-circle"
+              [ngStyle]="{ fontSize: '1.2rem' }"
+              style="cursor: pointer"
               (click)="handleShowJournalInformation(properties.journalInformation); journalInformationPanelList.show($event)"
-              ></i>
+            >
+            </i>
+
+            <i
+              *ngIf="showRiskIndex()"
+              class="app-icon risk i-risk-icon"
+              [class.risk-red]="riskImportance === 'high'"
+              [class.risk-yellow]="riskImportance === 'low'"
+              [class.risk-orange]="riskImportance === 'medium'"
+              (mouseenter)="riskPanelList.show($event)"
+              (mouseleave)="riskPanelList.hide()"
+            >
+            </i>
           </div>
           <p-overlayPanel #journalInformationPanelList class="journal-info-overlay-panel" [showCloseIcon]="true" [dismissable]="false">
             <div class="journal-info-panel-content"
@@ -228,12 +330,6 @@
             </div>
           </p-overlayPanel>
 
-          <div class="status-container">
-            <i class="app-icon risk" [ngStyle]="{ fontSize: '1.2rem' }" [class.risk-red]="riskImportance === 'high'"
-              *ngIf="showRiskIndex()" [class.risk-yellow]="riskImportance === 'low'"
-              [class.risk-orange]="riskImportance === 'medium'" (mouseenter)="riskPanelList.show($event)"
-              (mouseleave)="riskPanelList.hide()"></i>
-          </div>
           <div class="status-container">
             <i class="far fa-stop-circle"
               *ngIf="showEndManagementIndex() && !!properties.endManagementDate && properties.endManagementDate !== null"

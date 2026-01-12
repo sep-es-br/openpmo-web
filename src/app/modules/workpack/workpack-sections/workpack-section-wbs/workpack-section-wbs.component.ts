@@ -12,6 +12,12 @@ import { WorkpackService } from 'src/app/shared/services/workpack.service';
 import { WorkpackBreadcrumbStorageService } from 'src/app/shared/services/workpack-breadcrumb-storage.service';
 import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
 import { JournalService } from 'src/app/shared/services/journal.service';
+import {
+  DeliverableStatus,
+  ProjectStatus,
+  WorkpackStatusConfig,
+  getWorkpackStatusConfigByStatus,
+} from 'src/app/shared/enums/WorkpackStatusEnum';
 
 @Component({
   selector: 'app-workpack-section-wbs',
@@ -94,7 +100,6 @@ export class WorkpackSectionWBSComponent implements OnDestroy {
     this.setLanguage();
     this.workpackParams = this.workpackSrv.getWorkpackParams();
     const { wbsTree, loading } = this.breakdownStructureSrv.getWBSTree();
-    console.log('wbsTree: ', wbsTree);
     this.wbsTree = wbsTree;
     this.isLoading = loading;
   }
@@ -362,5 +367,9 @@ export class WorkpackSectionWBSComponent implements OnDestroy {
     }
 
     return '';
+  }
+
+  getWorkpackStatusConfig(status: ProjectStatus | DeliverableStatus): WorkpackStatusConfig {
+    return getWorkpackStatusConfigByStatus(status);
   }
 }
