@@ -833,8 +833,13 @@ export class WorkpackComponent implements OnDestroy {
               command: (event) => this.handleCutWorkpack(workpack),
             });
           }
-          if (!workpack.canceled && workpack.idWorkpackModel === idWorkpackModel
-            && this.workpackSrv.getEditPermission() && !idWorkpackModelLinked && !workpack.linked) {
+          if (
+            workpack.type !== TypeWorkpackEnum.DeliverableModel &&
+            !workpack.canceled &&
+            workpack.idWorkpackModel === idWorkpackModel &&
+            this.workpackSrv.getEditPermission() &&
+            !idWorkpackModelLinked && !workpack.linked
+          ) {
             menuItems.push({
               label: this.translateSrv.instant('sharing'),
               icon: 'app-icon share',
