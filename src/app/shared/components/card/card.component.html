@@ -177,16 +177,16 @@
           </div>
         </div>
       </div>
-    </div>
-    
-    <div class="expanded-buttons-container"  *ngIf="showExpandedCollapseButtons">
-      <div class="button-container">
-        <i class="fas fa-angle-double-down" [pTooltip]="'expandAllGroups'|translate" [class.selected]="!collapsed"
-          (click)="collapsed = false; collapseAllPropertiesGroups.next(false)"></i>
-      </div>
-      <div class="button-container">
-        <i class="fas fa-angle-double-up"[class.selected]="collapsed" [pTooltip]="'collapseAllGroups'|translate" 
-          (click)="collapsed = true; collapseAllPropertiesGroups.next(true)"></i>
+
+      <div class="expanded-buttons-container"  *ngIf="showExpandedCollapseButtons">
+        <div class="button-container">
+          <i class="fas fa-angle-double-down" [pTooltip]="'expandAllGroups'|translate" [class.selected]="!collapsed"
+            (click)="collapsed = false; collapseAllPropertiesGroups.next(false)"></i>
+        </div>
+        <div class="button-container">
+          <i class="fas fa-angle-double-up"[class.selected]="collapsed" [pTooltip]="'collapseAllGroups'|translate" 
+            (click)="collapsed = true; collapseAllPropertiesGroups.next(true)"></i>
+        </div>
       </div>
     </div>
   </p-header>
