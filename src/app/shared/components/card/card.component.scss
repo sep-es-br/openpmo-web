@@ -123,53 +123,8 @@
       &.mr-0 {
         margin-right: 0 !important;
       }
-    }
-    .header-title-check-completed.responsive {
-      flex: 1;
-      justify-content: flex-end;
-      align-self: flex-end;
-      margin-right: 5px;
-      label {
-        font-size: 0.8rem;
-      }
-    }
-    .header-values-cost-account {
-      display: flex;
-      flex-direction: row;
-      align-items: flex-start;
-      justify-content: flex-end;
-      width: 100%;
-      color: v.$fontTitle;
-      font-family: v.$fontFamilyMedium;
-      font-size: 0.9rem;
-      text-transform: uppercase;
-      padding-right: 2em;
-      .progress-bar-cost-container {
-        width: 30%;
-        margin-right: 10px;
-        margin-left: 25px;
-      }
-      &.not-collapseble {
-        padding-right: 0;
-        .progress-bar-cost-container {
-          margin-right: 0;
-        }
-      }
-    }
-    .header-values-cost-account.responsive {
-      display: flex;
-      flex-direction: column;
-      width: 100%;
-      padding-right: 0;
-    }
-    .dataview-filters-container {
-      display: flex;
-      flex-direction: row;
-      align-items: flex-end;
-      justify-content: flex-end;
-      //width: 40%;
-      .dataview-filters-text {
-        margin-right: 2em;
+
+      .dataview-filters-text {        
         width: 11rem;
         display: flex;
         justify-content: flex-end;
@@ -219,6 +174,52 @@
           }
         }
       }
+    }
+    .header-title-check-completed.responsive {
+      flex: 1;
+      justify-content: flex-end;
+      align-self: flex-end;
+      margin-right: 5px;
+      label {
+        font-size: 0.8rem;
+      }
+    }
+    .header-values-cost-account {
+      display: flex;
+      flex-direction: row;
+      align-items: flex-start;
+      justify-content: flex-end;
+      width: 100%;
+      color: v.$fontTitle;
+      font-family: v.$fontFamilyMedium;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      padding-right: 2em;
+      .progress-bar-cost-container {
+        width: 30%;
+        margin-right: 10px;
+        margin-left: 25px;
+      }
+      &.not-collapseble {
+        padding-right: 0;
+        .progress-bar-cost-container {
+          margin-right: 0;
+        }
+      }
+    }
+    .header-values-cost-account.responsive {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      padding-right: 0;
+    }
+    .dataview-filters-container {
+      display: flex;
+      flex-direction: row;
+      align-items: flex-end;
+      justify-content: flex-end;
+      //width: 40%;
+      
     }
     .header-title-check-completed.responsive {
       flex: 1;
@@ -371,7 +372,7 @@
 
   p-header.card-header-mobile {
     display: flex;
-    width: 100%;
+    width: 95%;
     flex-direction: column;
     justify-content: flex-start;
     align-items: flex-start;

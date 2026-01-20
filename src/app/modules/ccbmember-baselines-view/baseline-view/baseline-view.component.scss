@@ -313,6 +313,18 @@
             flex-direction: column;
             padding-top: 1em;
             padding-bottom: 2em;
+
+            p-tree {
+              overflow: auto;
+
+              @media screen and (max-width: 768px) {
+                max-height: 40em;
+              }
+            }
+
+            .p-tree {
+              min-width: 50em;
+            }
             
             .p-tree .p-tree-container .p-treenode .p-treenode-content .p-tree-toggler {
               width: 1.5rem;
