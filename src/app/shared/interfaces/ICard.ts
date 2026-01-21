@@ -38,6 +38,11 @@ export interface ICard {
   isLoading?: boolean;
   idFilterSelected?: number;
   searchTerm?: string;
+  headerLabels?: {
+    text: string;
+    type: 'blue' | 'yellow' | 'red';
+    icon?: string;
+  }[];
 }
 
 export interface ProgressBarValue {

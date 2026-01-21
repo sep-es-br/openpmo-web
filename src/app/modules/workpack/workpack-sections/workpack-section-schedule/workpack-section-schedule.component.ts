@@ -18,7 +18,7 @@ import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { EMPTY, Subject, Subscription } from 'rxjs';
 import * as moment from 'moment';
 import { WorkpackShowTabviewService } from 'src/app/shared/services/workpack-show-tabview.service';
-import { MessageService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
 import { OverlayPanel } from 'primeng/overlaypanel';
 import { SaveButtonComponent } from 'src/app/shared/components/save-button/save-button.component';
 import { ICartItemCostAssignment } from 'src/app/shared/interfaces/ICartItemCostAssignment';
@@ -62,6 +62,8 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
   editPermission: boolean;
 
   showTabview = false;
+
+  skipAlertsConfirmation = false;
 
   costAssignmentsCardItemsEdited: ICartItemCostAssignment[] = [];
 
@@ -118,7 +120,8 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
     private dashboardSrv: DashboardService,
     private labelSrv: LabelService,
     private route: ActivatedRoute,
-    private pentahoSrv: PentahoService
+    private pentahoSrv: PentahoService,
+    private confirmationService: ConfirmationService
   ) {
     this.workpackShowTabviewSrv.observable
       .pipe(takeUntil(this.$destroy))
@@ -157,6 +160,7 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
         cardTitle: 'schedule',
         collapseble: this.showTabview ? false : true,
         isLoading: true,
+        headerLabels: [],
         initialStateCollapse: this.showTabview
           ? false
           : this.collapsePanelsStatus,
@@ -226,6 +230,11 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
     if (this.hasGroupSteps()) {
       this.loadLiquidatedValues();
     }
+    this.sectionSchedule.cardSection.headerLabels = [];
+    this.validateTotalScopeReached();
+    this.validatePhysicalReplannedDifferentFromPlanned();
+    this.validateTotalFinancialExceeded();
+    this.validateReplannedFinancialTotal();
   }
 
   prepareScheduleStructure(schedule: any): any {
@@ -653,6 +662,8 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
         'days'
       );
 
+      const previousLabels = this.sectionSchedule?.cardSection?.headerLabels ?? [];
+
       this.sectionSchedule = {
         cardSection: {
           toggleable: false,
@@ -660,6 +671,7 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
           initialStateToggle: false,
           cardTitle: this.showTabview ? '' : 'schedule',
           collapseble: this.showTabview ? false : true,
+          headerLabels: previousLabels,
           initialStateCollapse: this.showTabview
             ? false
             : this.collapsePanelsStatus,
@@ -854,8 +866,6 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
   }
 
   async saveStepChanged(groupYear: number, idStep: number) {
-    console.log('groupYear: ', groupYear);
-    console.log('idStep: ', idStep);
     const stepIsChangedBefore = this.changedSteps.find(
       (step) => step.changedIdStep === idStep
     );
@@ -993,6 +1003,11 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
           0
         );
       });
+      this.sectionSchedule.cardSection.headerLabels = [];
+      this.validateTotalScopeReached();
+      this.validatePhysicalReplannedDifferentFromPlanned();
+      this.validateTotalFinancialExceeded();
+      this.validateReplannedFinancialTotal();
   }
 
   checkNegativeValues() {
@@ -1609,6 +1624,32 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
   }
 
   async onSaveButtonClicked() {
+
+    if (!this.skipAlertsConfirmation) {
+      const alerts = this.getActiveScheduleAlerts();
+
+      if (alerts.length > 0) {
+        this.confirmationService.confirm({
+          key: 'scheduleAlertsConfirm',
+          message:
+            'Este cronograma possui os seguintes alertas:<br><br>' +
+            alerts.map(a => `${a};`).join('<br>'),
+          acceptLabel: 'confirmar',
+          rejectLabel: 'corrigir',
+          accept: () => {
+            this.skipAlertsConfirmation = true;
+            this.onSaveButtonClicked();
+          },
+          reject: () => {
+            this.saveButton.showButton();
+          }
+        });
+        return;
+      }
+    }
+
+    this.skipAlertsConfirmation = false;
+
     this.formIsSaving = true;
     this.cancelButton.hideButton();
     if (this.changedSteps && this.changedSteps.length > 0) {
@@ -1698,5 +1739,79 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
     this.scheduleSrv.getBackupSchedule();
     this.workpackSrv.nextPendingChanges(false);
     this.loadScheduleData();
+  }
+
+  validateTotalFinancialExceeded() {
+    const costBar = this.sectionSchedule.cardSection.progressBarValues
+    .find(bar => bar.type === 'cost');
+
+    if (!costBar || !costBar.baselinePlanned) return;
+    const planned = costBar.baselinePlanned;
+    const actual = costBar.progress;
+
+    if (actual > planned * 1.25) {
+      this.sectionSchedule.cardSection.headerLabels.push({
+        text: 'Realização de custo excedida acima de 25%',
+        type: 'red',
+        icon: 'fas fa-money-bill-wave'
+      });
+    }
+  }
+
+  validatePhysicalReplannedDifferentFromPlanned() {
+    const bar = this.sectionSchedule.cardSection.progressBarValues
+      .find(b => b.type === 'scope');
+
+    if (!bar || bar.baselinePlanned == null || bar.baselinePlanned === 0) return;
+
+    const planned = bar.baselinePlanned;
+    const replanned = bar.total;
+
+    const variation = Math.abs(replanned - planned) / planned;
+
+    if (variation <= 0.01) return;
+
+    const isExceeding = replanned > planned;
+
+    this.sectionSchedule.cardSection.headerLabels.push({
+      text: `Escopo físico reprogramado ${isExceeding ? 'excedente' : 'insuficiente'} ao planejado`,
+      type: 'yellow',
+      icon: 'fas fa-boxes'
+    });
+  }
+
+  validateTotalScopeReached() {
+    const scopeBar = this.sectionSchedule.cardSection.progressBarValues
+      .find(bar => bar.type === 'scope');
+
+    if (!scopeBar) return;
+
+    if (scopeBar.progress >= scopeBar.baselinePlanned) {
+      this.sectionSchedule.cardSection.headerLabels.push({
+        text: 'Escopo concluído',
+        type: 'blue',
+        icon: 'fas fa-flag-checkered'
+      });
+    }
+  }
+
+  validateReplannedFinancialTotal() {
+    const costBar = this.sectionSchedule.cardSection.progressBarValues
+      .find(bar => bar.type === 'cost');
+
+    if (!costBar || costBar.total === costBar.baselinePlanned) return;
+
+    if (costBar.total > costBar.baselinePlanned * 1.25) {
+      this.sectionSchedule.cardSection.headerLabels.push({
+        text: 'Reprogramação de custo excedida acima de 25%',
+        type: 'yellow',
+        icon: 'fas fa-money-bill-wave'
+      });
+    }
+  }
+
+  private getActiveScheduleAlerts(): string[] {
+    return this.sectionSchedule.cardSection.headerLabels
+      ?.map(label => `- ${label.text}`) ?? [];
   }
 }
