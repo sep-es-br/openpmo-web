@@ -177,6 +177,23 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+
+    this.route.queryParams
+      .pipe(
+        map((params) => params.id),
+        switchMap((workpackId) => {
+          if (!workpackId) return EMPTY;
+          return this.scheduleCardItemSrv.getCurrentBaseline(workpackId);
+        })
+      )
+      .subscribe((response) => {
+        this.isCurrentBaseline = response.data;
+        this.scheduleCardItemSrv.isCurrentBaseline$.next(
+          this.isCurrentBaseline
+        );
+        this.loadBaseline = false;
+      });
+
     this.route.queryParams.subscribe((params) => {
       const idWorkpack = params.id;
       if (idWorkpack) {
@@ -194,21 +211,6 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
       }
     });
 
-    this.route.queryParams
-      .pipe(
-        map((params) => params.id),
-        switchMap((workpackId) => {
-          if (!workpackId) return EMPTY;
-          return this.scheduleCardItemSrv.getCurrentBaseline(workpackId);
-        })
-      )
-      .subscribe((response) => {
-        this.isCurrentBaseline = response.data;
-        this.scheduleCardItemSrv.isCurrentBaseline$.next(
-          this.isCurrentBaseline
-        );
-        this.loadBaseline = false;
-      });
   }
 
   ngOnDestroy(): void {
