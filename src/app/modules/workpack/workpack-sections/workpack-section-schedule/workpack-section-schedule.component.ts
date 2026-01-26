@@ -1742,42 +1742,46 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
   }
 
   validateTotalFinancialExceeded() {
-    const costBar = this.sectionSchedule.cardSection.progressBarValues
-    .find(bar => bar.type === 'cost');
+    if(this.isCurrentBaseline){
+      const costBar = this.sectionSchedule.cardSection.progressBarValues
+      .find(bar => bar.type === 'cost');
 
-    if (!costBar || !costBar.baselinePlanned) return;
-    const planned = costBar.baselinePlanned;
-    const actual = costBar.progress;
+      if (!costBar || costBar.progress === costBar.baselinePlanned) return;
+      const planned = costBar.baselinePlanned;
+      const actual = costBar.progress;
 
-    if (actual > planned * 1.25) {
-      this.sectionSchedule.cardSection.headerLabels.push({
-        text: 'Realização de custo excedida acima de 25%',
-        type: 'red',
-        icon: 'fas fa-money-bill-wave'
-      });
+      if (actual > planned * 1.25) {
+        this.sectionSchedule.cardSection.headerLabels.push({
+          text: 'Realização de custo excedida acima de 25%',
+          type: 'red',
+          icon: 'fas fa-money-bill-wave'
+        });
+      }
     }
   }
 
   validatePhysicalReplannedDifferentFromPlanned() {
-    const bar = this.sectionSchedule.cardSection.progressBarValues
-      .find(b => b.type === 'scope');
+    if(this.isCurrentBaseline){
+      const bar = this.sectionSchedule.cardSection.progressBarValues
+        .find(b => b.type === 'scope');
 
-    if (!bar || bar.baselinePlanned == null || bar.baselinePlanned === 0) return;
+      if (!bar || bar.baselinePlanned == null || bar.baselinePlanned === 0) return;
 
-    const planned = bar.baselinePlanned;
-    const replanned = bar.total;
+      const planned = bar.baselinePlanned;
+      const replanned = bar.total;
 
-    const variation = Math.abs(replanned - planned) / planned;
+      const variation = Math.abs(replanned - planned) / planned;
 
-    if (variation <= 0.01) return;
+      if (variation <= 0.01) return;
 
-    const isExceeding = replanned > planned;
+      const isExceeding = replanned > planned;
 
-    this.sectionSchedule.cardSection.headerLabels.push({
-      text: `Escopo físico reprogramado ${isExceeding ? 'excedente' : 'insuficiente'} ao planejado`,
-      type: 'yellow',
-      icon: 'fas fa-boxes'
-    });
+      this.sectionSchedule.cardSection.headerLabels.push({
+        text: `Escopo físico reprogramado ${isExceeding ? 'excedente' : 'insuficiente'} ao planejado`,
+        type: 'yellow',
+        icon: 'fas fa-boxes'
+      });
+    }
   }
 
   validateTotalScopeReached() {
@@ -1786,27 +1790,40 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
 
     if (!scopeBar) return;
 
-    if (scopeBar.progress >= scopeBar.baselinePlanned) {
-      this.sectionSchedule.cardSection.headerLabels.push({
-        text: 'Escopo concluído',
-        type: 'blue',
-        icon: 'fas fa-flag-checkered'
-      });
+    if(this.isCurrentBaseline){
+      if ( scopeBar.baselinePlanned > 0 && scopeBar.progress >= scopeBar.baselinePlanned) {
+        this.sectionSchedule.cardSection.headerLabels.push({
+          text: 'Escopo concluído',
+          type: 'blue',
+          icon: 'fas fa-flag-checkered'
+        });
+      }
+    } else {
+      if (scopeBar.total > 0 && scopeBar.progress >= scopeBar.total) {
+        this.sectionSchedule.cardSection.headerLabels.push({
+          text: 'Escopo concluído',
+          type: 'blue',
+          icon: 'fas fa-flag-checkered'
+        });
+      }
     }
+
   }
 
   validateReplannedFinancialTotal() {
-    const costBar = this.sectionSchedule.cardSection.progressBarValues
-      .find(bar => bar.type === 'cost');
+    if(this.isCurrentBaseline){
+      const costBar = this.sectionSchedule.cardSection.progressBarValues
+        .find(bar => bar.type === 'cost');
 
-    if (!costBar || costBar.total === costBar.baselinePlanned) return;
+      if (!costBar || costBar.total === costBar.baselinePlanned) return;
 
-    if (costBar.total > costBar.baselinePlanned * 1.25) {
-      this.sectionSchedule.cardSection.headerLabels.push({
-        text: 'Reprogramação de custo excedida acima de 25%',
-        type: 'yellow',
-        icon: 'fas fa-money-bill-wave'
-      });
+      if (costBar.total > costBar.baselinePlanned * 1.25) {
+        this.sectionSchedule.cardSection.headerLabels.push({
+          text: 'Reprogramação de custo excedida acima de 25%',
+          type: 'yellow',
+          icon: 'fas fa-money-bill-wave'
+        });
+      }
     }
   }
 
