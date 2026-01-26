@@ -8,7 +8,7 @@ import { IScheduleStepCardItem } from '../../../../shared/interfaces/IScheduleSt
 import { IScheduleDetail } from '../../../../shared/interfaces/ISchedule';
 import { ScheduleService } from '../../../../shared/services/schedule.service';
 import { IScheduleSection } from '../../../../shared/interfaces/ISectionWorkpack';
-import { map, switchMap, takeUntil } from 'rxjs/operators';
+import { map, skip, switchMap, takeUntil } from 'rxjs/operators';
 import { ResponsiveService } from '../../../../shared/services/responsive.service';
 import { ConfigDataViewService } from 'src/app/shared/services/config-dataview.service';
 import { TranslateService } from '@ngx-translate/core';
@@ -178,6 +178,26 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
 
+    this.route.queryParams.subscribe(async (params) => {
+      const idWorkpack = params.id;
+      if (!idWorkpack) return;
+
+      try {
+        const response = await this.labelSrv
+          .getLabels(idWorkpack)
+          .toPromise();
+
+        this.foreseenLabel = response.data[0].body.data;
+        this.tooltipLabel = response.data[0].body.data;
+        this.abbreviatedLabel = response.data[1].body.data;
+
+        await this.loadScheduleData();
+        this.runAllValidations();
+      } catch (error) {
+        console.error(error);
+      }
+    });
+
     this.route.queryParams
       .pipe(
         map((params) => params.id),
@@ -192,24 +212,9 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
           this.isCurrentBaseline
         );
         this.loadBaseline = false;
-      });
 
-    this.route.queryParams.subscribe((params) => {
-      const idWorkpack = params.id;
-      if (idWorkpack) {
-        this.labelSrv.getLabels(idWorkpack).subscribe(
-          (response) => {
-            this.foreseenLabel = response.data[0].body.data;
-            this.tooltipLabel = response.data[0].body.data;
-            this.abbreviatedLabel = response.data[1].body.data;
-            this.loadScheduleData();
-          },
-          (error) => {
-            console.error(error);
-          }
-        );
-      }
-    });
+        this.runAllValidations();
+      });
 
   }
 
@@ -232,11 +237,6 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
     if (this.hasGroupSteps()) {
       this.loadLiquidatedValues();
     }
-    this.sectionSchedule.cardSection.headerLabels = [];
-    this.validateTotalScopeReached();
-    this.validatePhysicalReplannedDifferentFromPlanned();
-    this.validateTotalFinancialExceeded();
-    this.validateReplannedFinancialTotal();
   }
 
   prepareScheduleStructure(schedule: any): any {
@@ -1005,11 +1005,7 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
           0
         );
       });
-      this.sectionSchedule.cardSection.headerLabels = [];
-      this.validateTotalScopeReached();
-      this.validatePhysicalReplannedDifferentFromPlanned();
-      this.validateTotalFinancialExceeded();
-      this.validateReplannedFinancialTotal();
+      this.runAllValidations();
   }
 
   checkNegativeValues() {
@@ -1832,5 +1828,13 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
   private getActiveScheduleAlerts(): string[] {
     return this.sectionSchedule.cardSection.headerLabels
       ?.map(label => `- ${label.text}`) ?? [];
+  }
+
+  private runAllValidations(): void {
+    this.sectionSchedule.cardSection.headerLabels = [];
+    this.validateTotalScopeReached();
+    this.validatePhysicalReplannedDifferentFromPlanned();
+    this.validateTotalFinancialExceeded();
+    this.validateReplannedFinancialTotal();
   }
 }
