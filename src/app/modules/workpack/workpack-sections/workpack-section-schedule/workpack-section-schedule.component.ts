@@ -8,7 +8,7 @@ import { IScheduleStepCardItem } from '../../../../shared/interfaces/IScheduleSt
 import { IScheduleDetail } from '../../../../shared/interfaces/ISchedule';
 import { ScheduleService } from '../../../../shared/services/schedule.service';
 import { IScheduleSection } from '../../../../shared/interfaces/ISectionWorkpack';
-import { map, switchMap, takeUntil } from 'rxjs/operators';
+import { map, skip, switchMap, takeUntil } from 'rxjs/operators';
 import { ResponsiveService } from '../../../../shared/services/responsive.service';
 import { ConfigDataViewService } from 'src/app/shared/services/config-dataview.service';
 import { TranslateService } from '@ngx-translate/core';
@@ -177,20 +177,24 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.route.queryParams.subscribe((params) => {
+
+    this.route.queryParams.subscribe(async (params) => {
       const idWorkpack = params.id;
-      if (idWorkpack) {
-        this.labelSrv.getLabels(idWorkpack).subscribe(
-          (response) => {
-            this.foreseenLabel = response.data[0].body.data;
-            this.tooltipLabel = response.data[0].body.data;
-            this.abbreviatedLabel = response.data[1].body.data;
-            this.loadScheduleData();
-          },
-          (error) => {
-            console.error(error);
-          }
-        );
+      if (!idWorkpack) return;
+
+      try {
+        const response = await this.labelSrv
+          .getLabels(idWorkpack)
+          .toPromise();
+
+        this.foreseenLabel = response.data[0].body.data;
+        this.tooltipLabel = response.data[0].body.data;
+        this.abbreviatedLabel = response.data[1].body.data;
+
+        await this.loadScheduleData();
+        this.runAllValidations();
+      } catch (error) {
+        console.error(error);
       }
     });
 
@@ -208,7 +212,10 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
           this.isCurrentBaseline
         );
         this.loadBaseline = false;
+
+        this.runAllValidations();
       });
+
   }
 
   ngOnDestroy(): void {
@@ -230,11 +237,6 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
     if (this.hasGroupSteps()) {
       this.loadLiquidatedValues();
     }
-    this.sectionSchedule.cardSection.headerLabels = [];
-    this.validateTotalScopeReached();
-    this.validatePhysicalReplannedDifferentFromPlanned();
-    this.validateTotalFinancialExceeded();
-    this.validateReplannedFinancialTotal();
   }
 
   prepareScheduleStructure(schedule: any): any {
@@ -1003,11 +1005,7 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
           0
         );
       });
-      this.sectionSchedule.cardSection.headerLabels = [];
-      this.validateTotalScopeReached();
-      this.validatePhysicalReplannedDifferentFromPlanned();
-      this.validateTotalFinancialExceeded();
-      this.validateReplannedFinancialTotal();
+      this.runAllValidations();
   }
 
   checkNegativeValues() {
@@ -1742,42 +1740,46 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
   }
 
   validateTotalFinancialExceeded() {
-    const costBar = this.sectionSchedule.cardSection.progressBarValues
-    .find(bar => bar.type === 'cost');
+    if(this.isCurrentBaseline){
+      const costBar = this.sectionSchedule.cardSection.progressBarValues
+      .find(bar => bar.type === 'cost');
 
-    if (!costBar || !costBar.baselinePlanned) return;
-    const planned = costBar.baselinePlanned;
-    const actual = costBar.progress;
+      if (!costBar || costBar.progress === costBar.baselinePlanned) return;
+      const planned = costBar.baselinePlanned;
+      const actual = costBar.progress;
 
-    if (actual > planned * 1.25) {
-      this.sectionSchedule.cardSection.headerLabels.push({
-        text: 'Realização de custo excedida acima de 25%',
-        type: 'red',
-        icon: 'fas fa-money-bill-wave'
-      });
+      if (actual > planned * 1.25) {
+        this.sectionSchedule.cardSection.headerLabels.push({
+          text: 'Realização de custo excedida acima de 25%',
+          type: 'red',
+          icon: 'fas fa-money-bill-wave'
+        });
+      }
     }
   }
 
   validatePhysicalReplannedDifferentFromPlanned() {
-    const bar = this.sectionSchedule.cardSection.progressBarValues
-      .find(b => b.type === 'scope');
+    if(this.isCurrentBaseline){
+      const bar = this.sectionSchedule.cardSection.progressBarValues
+        .find(b => b.type === 'scope');
 
-    if (!bar || bar.baselinePlanned == null || bar.baselinePlanned === 0) return;
+      if (!bar || bar.baselinePlanned == null || bar.baselinePlanned === 0) return;
 
-    const planned = bar.baselinePlanned;
-    const replanned = bar.total;
+      const planned = bar.baselinePlanned;
+      const replanned = bar.total;
 
-    const variation = Math.abs(replanned - planned) / planned;
+      const variation = Math.abs(replanned - planned) / planned;
 
-    if (variation <= 0.01) return;
+      if (variation <= 0.01) return;
 
-    const isExceeding = replanned > planned;
+      const isExceeding = replanned > planned;
 
-    this.sectionSchedule.cardSection.headerLabels.push({
-      text: `Escopo físico reprogramado ${isExceeding ? 'excedente' : 'insuficiente'} ao planejado`,
-      type: 'yellow',
-      icon: 'fas fa-boxes'
-    });
+      this.sectionSchedule.cardSection.headerLabels.push({
+        text: `Escopo físico reprogramado ${isExceeding ? 'excedente' : 'insuficiente'} ao planejado`,
+        type: 'yellow',
+        icon: 'fas fa-boxes'
+      });
+    }
   }
 
   validateTotalScopeReached() {
@@ -1786,32 +1788,53 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
 
     if (!scopeBar) return;
 
-    if (scopeBar.progress >= scopeBar.baselinePlanned) {
-      this.sectionSchedule.cardSection.headerLabels.push({
-        text: 'Escopo concluído',
-        type: 'blue',
-        icon: 'fas fa-flag-checkered'
-      });
+    if(this.isCurrentBaseline){
+      if ( scopeBar.baselinePlanned > 0 && scopeBar.progress >= scopeBar.baselinePlanned) {
+        this.sectionSchedule.cardSection.headerLabels.push({
+          text: 'Escopo concluído',
+          type: 'blue',
+          icon: 'fas fa-flag-checkered'
+        });
+      }
+    } else {
+      if (scopeBar.total > 0 && scopeBar.progress >= scopeBar.total) {
+        this.sectionSchedule.cardSection.headerLabels.push({
+          text: 'Escopo concluído',
+          type: 'blue',
+          icon: 'fas fa-flag-checkered'
+        });
+      }
     }
+
   }
 
   validateReplannedFinancialTotal() {
-    const costBar = this.sectionSchedule.cardSection.progressBarValues
-      .find(bar => bar.type === 'cost');
+    if(this.isCurrentBaseline){
+      const costBar = this.sectionSchedule.cardSection.progressBarValues
+        .find(bar => bar.type === 'cost');
 
-    if (!costBar || costBar.total === costBar.baselinePlanned) return;
+      if (!costBar || costBar.total === costBar.baselinePlanned) return;
 
-    if (costBar.total > costBar.baselinePlanned * 1.25) {
-      this.sectionSchedule.cardSection.headerLabels.push({
-        text: 'Reprogramação de custo excedida acima de 25%',
-        type: 'yellow',
-        icon: 'fas fa-money-bill-wave'
-      });
+      if (costBar.total > costBar.baselinePlanned * 1.25) {
+        this.sectionSchedule.cardSection.headerLabels.push({
+          text: 'Reprogramação de custo excedida acima de 25%',
+          type: 'yellow',
+          icon: 'fas fa-money-bill-wave'
+        });
+      }
     }
   }
 
   private getActiveScheduleAlerts(): string[] {
     return this.sectionSchedule.cardSection.headerLabels
       ?.map(label => `- ${label.text}`) ?? [];
+  }
+
+  private runAllValidations(): void {
+    this.sectionSchedule.cardSection.headerLabels = [];
+    this.validateTotalScopeReached();
+    this.validatePhysicalReplannedDifferentFromPlanned();
+    this.validateTotalFinancialExceeded();
+    this.validateReplannedFinancialTotal();
   }
 }
