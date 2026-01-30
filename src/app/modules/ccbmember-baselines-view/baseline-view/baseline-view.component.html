@@ -438,9 +438,8 @@
   </p-dialog>
   <p-dialog
     [header]="'comment' | translate"
-    [visible]="!!showCommentDialog"
+    [(visible)]="showCommentDialog"
     [style]="!responsive ? { width: '30vw' } : { width: '90vw' }"
-    (onHide)="showCommentDialog = false"
   >
     <div class="comment-container">
       <textarea

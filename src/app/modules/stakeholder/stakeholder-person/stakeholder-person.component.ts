@@ -303,6 +303,7 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
         'id-plan': this.idPlan
       });
       if (result.success) {
+        console.log(result.data)
         this.stakeholder = result.data;
         this.person = this.stakeholder?.person;
         this.user = this.person.isUser;
@@ -442,20 +443,35 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
         phoneNumber: this.formatPhoneNumber(this.stakeholder.person.phoneNumber),
         contactEmail: this.stakeholder.person.contactEmail
       });
-      this.stakeholderRoles = this.stakeholder.roles && this.stakeholder.roles.map(role => ({
-        id: role.id,
-        active: role.active,
-        role: role.role,
-        from: new Date(role.from + 'T00:00:00'),
-        to: role.to ? new Date(role.to + 'T00:00:00') : null
-      }));
-      this.stakeholderRolesBk = this.stakeholder.roles && this.stakeholder.roles.map(role => ({
-        id: role.id,
-        active: role.active,
-        role: role.role,
-        from: new Date(role.from + 'T00:00:00'),
-        to: role.to ? new Date(role.to + 'T00:00:00') : null
-      }));
+      const now = new Date();
+
+      this.stakeholderRoles =
+        this.stakeholder.roles && this.stakeholder.roles.map(role => {
+          const toDate = role.to ? new Date(role.to + 'T00:00:00') : null;
+          const expired = !!toDate && toDate.getTime() < now.getTime();
+
+          return {
+            id: role.id,
+            active: expired ? false : role.active, // 👈 REGRA AQUI
+            role: role.role,
+            from: new Date(role.from + 'T00:00:00'),
+            to: toDate
+          };
+        });
+
+      this.stakeholderRolesBk =
+        this.stakeholder.roles && this.stakeholder.roles.map(role => {
+          const toDate = role.to ? new Date(role.to + 'T00:00:00') : null;
+          const expired = !!toDate && toDate.getTime() < now.getTime();
+
+          return {
+            id: role.id,
+            active: expired ? false : role.active, // 👈 MESMA REGRA
+            role: role.role,
+            from: new Date(role.from + 'T00:00:00'),
+            to: toDate
+          };
+        });
       localStorage.setItem('@pmo/stakeholderRolesBk', JSON.stringify(this.stakeholderRolesBk));
       if (!this.editPermission) {
         this.stakeholderForm.disable();
