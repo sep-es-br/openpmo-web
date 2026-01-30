@@ -854,8 +854,6 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
   }
 
   async saveStepChanged(groupYear: number, idStep: number) {
-    console.log('groupYear: ', groupYear);
-    console.log('idStep: ', idStep);
     const stepIsChangedBefore = this.changedSteps.find(
       (step) => step.changedIdStep === idStep
     );
