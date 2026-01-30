@@ -303,7 +303,6 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
         'id-plan': this.idPlan
       });
       if (result.success) {
-        console.log(result.data)
         this.stakeholder = result.data;
         this.person = this.stakeholder?.person;
         this.user = this.person.isUser;
