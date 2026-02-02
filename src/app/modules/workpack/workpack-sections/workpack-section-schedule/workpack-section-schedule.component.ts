@@ -1732,11 +1732,12 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
     }
   }
 
-  handleOnCancel() {
+  async handleOnCancel() {
     this.saveButton.hideButton();
     this.scheduleSrv.getBackupSchedule();
     this.workpackSrv.nextPendingChanges(false);
-    this.loadScheduleData();
+    await this.loadScheduleData();
+    this.runAllValidations();
   }
 
   validateTotalFinancialExceeded() {
