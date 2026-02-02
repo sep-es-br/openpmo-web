@@ -26,7 +26,17 @@
           <span class="end-date">{{language === 'pt-BR' ? (properties.headerDates?.endDate|date:'dd/MM/yyyy') :
             (properties.headerDates?.endDate|date:'yyyy/MM/dd')}}</span>
         </div>
-      </div>
+
+        <div class="header-labels" *ngIf="properties.headerLabels?.length">
+          <span
+            *ngFor="let label of properties.headerLabels"
+            class="label"
+            [ngClass]="label.type">
+            <i *ngIf="label.icon" class="{{ label.icon }}"></i>
+            {{ label.text }}
+          </span>
+        </div>
+      </div>      
 
       <div class="header-title-check-completed d-flex col-4 justify-content-end" [class.mr-0]="!properties.initialStateCollapse && !properties.collapseble"
         *ngIf="!properties.initialStateCollapse && properties.showFullScreen && !properties.fullScreen"
