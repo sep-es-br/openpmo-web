@@ -477,3 +477,35 @@
     }
   }
 }
+
+.header-labels {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.label.blue {
+  background: #2196f3;
+  color: #fff;
+}
+
+.label.yellow {
+  background: #fbc02d;
+  color: #fff;
+}
+
+.label.red {
+  background: #e53935;
+  color: #fff;
+}
