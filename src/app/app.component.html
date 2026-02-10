@@ -11,6 +11,14 @@
     key="deliverableInfoConfirm"
     [closable]="false">
 </p-confirmDialog>
+
+<p-confirmDialog
+  key="scheduleAlertsConfirm"
+  [header]="'Atenção'"
+  icon="pi pi-exclamation-triangle"
+  [closable]="false">
+</p-confirmDialog>
+
 <p-toast position="top-right"></p-toast>
 <ng-container *ngIf="showTemplate !== undefined">
   <ng-container *ngIf="environment.env !== envEnum.PRODUCTION">
