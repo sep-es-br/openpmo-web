@@ -67,7 +67,12 @@ export class ProcessComponent implements OnInit, OnDestroy {
       lengthOfStayOn: ['', Validators.required],
       note: ['', Validators.maxLength(600)],
       priority: false,
-      status: ''
+      status: '',
+      lengthOfStayOnSector: ['', Validators.required],
+      actingDate: ['', Validators.required],
+      actingOrganization: ['', Validators.required],
+      actingSector: ['', Validators.required],
+      lastDispatchDate: ['', Validators.required]
     });
     this.formProcess.statusChanges
       .pipe(takeUntil(this.$destroy), filter(status => status === 'INVALID'))
@@ -104,6 +109,11 @@ export class ProcessComponent implements OnInit, OnDestroy {
       subject: '',
       currentOrganization: '',
       lengthOfStayOn: '',
+      lengthOfStayOnSector: '',
+      actingDate: '',
+      actingOrganization: '',
+      actingSector: '',
+      lastDispatchDate: '',
       note: '',
       priority: false,
       status: ''
@@ -156,6 +166,13 @@ export class ProcessComponent implements OnInit, OnDestroy {
       subject: this.process.subject,
       currentOrganization: this.process.currentOrganization,
       lengthOfStayOn: days,
+
+      lengthOfStayOnSector: this.process.lengthOfStayOnSector,
+      actingDate: this.process.actingDate,
+      actingOrganization: this.process.actingOrganization,
+      actingSector: this.process.actingSector,
+      lastDispatchDate: this.process.lastDispatchDate,
+
       note: this.process.note,
       priority: this.process.priority,
       status: this.process.status
@@ -165,6 +182,11 @@ export class ProcessComponent implements OnInit, OnDestroy {
     this.formProcess.controls.lengthOfStayOn.disable();
     this.formProcess.controls.priority.disable();
     this.formProcess.controls.status.disable();
+    this.formProcess.controls.lengthOfStayOnSector.disable();
+    this.formProcess.controls.actingDate.disable();
+    this.formProcess.controls.actingOrganization.disable();
+    this.formProcess.controls.actingSector.disable();
+    this.formProcess.controls.lastDispatchDate.disable();
     if (this.idProcess) {
       this.formProcess.controls.processNumber.disable();
     }
@@ -264,7 +286,14 @@ export class ProcessComponent implements OnInit, OnDestroy {
       processNumber: this.formProcess.controls.processNumber.value,
       subject: this.formProcess.controls.subject.value,
       currentOrganization: this.formProcess.controls.currentOrganization.value,
+
       lengthOfStayOn: this.process.lengthOfStayOn,
+      lengthOfStayOnSector: this.process.lengthOfStayOnSector,
+      actingDate: this.process.actingDate,
+      actingOrganization: this.process.actingOrganization,
+      actingSector: this.process.actingSector,
+      lastDispatchDate: this.process.lastDispatchDate,
+
       note: this.formProcess.controls.note.value,
       priority: this.formProcess.controls.priority.value,
       status: this.formProcess.controls.status.value
@@ -300,6 +329,11 @@ export class ProcessComponent implements OnInit, OnDestroy {
         subject: '',
         currentOrganization: '',
         lengthOfStayOn: '',
+        lengthOfStayOnSector: '',
+        actingDate: '',
+        actingOrganization: '',
+        actingSector: '',
+        lastDispatchDate: '',
         note: '',
         priority: false,
         status: ''
