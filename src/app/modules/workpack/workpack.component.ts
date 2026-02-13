@@ -884,7 +884,7 @@ export class WorkpackComponent implements OnDestroy {
             ]),
           linked: !!idWorkpackModelLinked ? true : (!!workpack.linked ? true : false),
           shared: workpack.sharedWith,
-          canceled: workpack.type === 'Milestone' && workpack.deleted || workpack.canceled,
+          canceled: workpack.deleted || workpack.canceled,
           completed: workpack.completed,
           endManagementDate: workpack.endManagementDate,
           dashboardData: this.loadDashboardData(workpack.dashboard, workpack.milestone, workpack.risk),
