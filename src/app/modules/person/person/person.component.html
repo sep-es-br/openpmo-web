@@ -57,7 +57,7 @@
                     <i class="far fa-question-circle" [pTooltip]="'help.person.contactEmail' | translate"></i>
                   </label>
                 </span>
-                <span class="p-float-label left property-input p-field p-col-12 p-md-2">
+                <span class="p-float-label left property-input-text p-field p-col-12 p-md-4">
                   <input pInputText class="app-input-text" formControlName="phoneNumber" [class.responsive]="responsive"
                     (blur)="setPhoneNumberMask()" [placeholder]="phoneNumberPlaceholder"
                     (focus)="setPhoneNumberPlaceholder()" (input)="setPhoneNumberPlaceholder()" />
@@ -66,7 +66,7 @@
                   </label>
                 </span>
               </div>
-              <span class="p-float-label property-input p-field">
+              <span class="p-float-label property-input-text p-field">
                 <textarea pInputTextarea class="app-text-area" [class.responsive]="responsive" formControlName="address"
                   [rows]="1"></textarea>
                 <label class="app-input-label">{{ 'address' | translate }}

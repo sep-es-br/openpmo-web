@@ -78,15 +78,12 @@
               }
             }
           }
-          .p-float-label.left > label {
-            left: 0.5rem !important;
-          }
           .form {
-            .property-input-text{
-              padding-left: 0;
+            .property-input-text, .property-input{
+              padding-left: 0 !important;
             }
             .app-text-area.p-inputtextarea {
-              width: 50%;
+              width: 65%;
             }
           }
           .container-permission {
@@ -156,4 +153,8 @@
       }
     }
   }
+}
+
+.custom-small-padding {
+  padding: 4px !important;
 }
