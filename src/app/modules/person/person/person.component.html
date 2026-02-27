@@ -18,6 +18,9 @@
             (deleteAvatar)="handleDeleteAvatar()"></app-avatar>
 
           <span class="name" *ngIf="propertiesPerson?.isUser && !loading">{{propertiesPerson?.fullName}}</span>
+          <div *ngIf="propertiesPerson.isUser" class="user-label">
+            Usuário
+          </div>
           <form [formGroup]="formPerson" class="form" *ngIf="!loading">
             <span class="name" *ngIf="!propertiesPerson?.isUser">
               <span class="p-float-label property-input p-field">

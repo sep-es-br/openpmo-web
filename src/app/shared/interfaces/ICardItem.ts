@@ -41,5 +41,6 @@ export interface ICardItem {
   idAtributeName?: string;
   onClick?;
   file?: File;
+  isUser?: boolean;
 }
 

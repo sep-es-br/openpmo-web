@@ -157,6 +157,7 @@ export class PersonListComponent implements OnInit, OnDestroy {
           fullNameCardItem: person.fullName,
           avatar: person.avatar,
           itemId: person.id,
+          isUser: person.isUser,
           urlCard: 'person',
           paramsUrlCard: [
             {
