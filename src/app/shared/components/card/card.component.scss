@@ -196,7 +196,8 @@
       text-transform: uppercase;
       padding-right: 2em;
       .progress-bar-cost-container {
-        width: 30%;
+        flex: 1 1 200px; 
+        min-width: 200px;
         margin-right: 10px;
         margin-left: 25px;
       }
