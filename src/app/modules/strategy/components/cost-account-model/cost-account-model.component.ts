@@ -391,7 +391,14 @@ export class CostAccountModelComponent implements OnInit {
     property.list = list;
     property.requiredFields = requiredFields;
     property.viewOnly = !this.editPermission;
-    property.obligatory = !!property.obligatory;
+    
+    const alwaysObligatoryFields = ['name', 'fullName', 'limit', 'funder'];
+
+    if (alwaysObligatoryFields.includes(property.name)) {
+      property.obligatory = true;
+    } else {
+      property.obligatory = !!property.obligatory;
+    }
   }
 
   async deleteProperty(property: IWorkpackModelProperty, group?: IWorkpackModelProperty) {
