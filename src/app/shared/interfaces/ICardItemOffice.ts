@@ -16,4 +16,5 @@ export interface ICardItemOffice  {
   editPermission?: boolean;
   office?: IOffice;
   iconMenuItems?: MenuItem[];
+  isUser?: boolean;
 }

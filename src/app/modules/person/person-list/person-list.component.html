@@ -9,7 +9,7 @@
   <div class="card-container">
     <app-card [properties]="cardProperties" class="mt-0" *ngIf="cardProperties">
       <div class="card-person-container">
-        <form [formGroup]="formSearch" class="form-search" [class.responsive]="!!responsive">
+        <form [formGroup]="formSearch" class="form-search" [class.responsive]="!!responsive" (ngSubmit)="loadPersons()">
           <span class="p-float-label property-input p-field">
             <input pInputText class="app-input-text scope" [class.responsive]="responsive"
               (click)="treeViewScopeOverlay.toggle($event)" formControlName="scopeName" [readonly]="true" />
@@ -35,7 +35,7 @@
           <span class="p-float-label property-input search p-field input-group">
             <input pInputText class="app-input-text" type="search" [class.responsive]="responsive"
               formControlName="name" [placeholder]="'nameOrFullName' | translate">
-            <button type="button" pButton pRipple icon="pi pi-search" (click)="loadPersons()"></button>
+            <button type="submit" pButton pRipple icon="pi pi-search"></button>
             <label class="app-input-label">{{ 'search' | translate }} </label>
           </span>
           <p-overlayPanel #treeViewScopeOverlay [showCloseIcon]="true" [dismissable]="false"

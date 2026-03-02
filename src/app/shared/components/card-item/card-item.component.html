@@ -360,8 +360,12 @@
     <div class="card-item-content" [class.card-link]="properties.urlCard" [routerLink]="properties.urlCard"
       [class.cardList]="displayModeCard === 'list'" [queryParams]="getQueryParams()">
       <app-avatar [edit]="false" [avatar]="properties.avatar"> </app-avatar>
-      <span class="card-item-name" [pTooltip]="properties.fullNameCardItem"
-        tooltipPosition="bottom">{{properties.nameCardItem}}</span>
+      <span class="card-item-name">
+        {{ properties.fullNameCardItem }}
+        <span *ngIf="properties.isUser" class="user-label">
+          Usuário
+        </span>
+      </span>
     </div>
     <div class="card-item-footer" *ngIf="cardIdItem">
       <span class="card-item-id">
