@@ -18,10 +18,7 @@ import { TypeLocality } from 'src/app/shared/enums/TypeLocality';
 import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
 import { SaveButtonComponent } from 'src/app/shared/components/save-button/save-button.component';
 import { AuthService } from 'src/app/shared/services/auth.service';
-import { OfficePermissionService } from 'src/app/shared/services/office-permission.service';
-import { IOffice } from 'src/app/shared/interfaces/IOffice';
 import { IDomain } from 'src/app/shared/interfaces/IDomain';
-import { OfficeService } from 'src/app/shared/services/office.service';
 import { DomainService } from 'src/app/shared/services/domain.service';
 import { FilterDataviewService } from 'src/app/shared/services/filter-dataview.service';
 import { FilterDataviewPropertiesEntity } from 'src/app/shared/constants/filterDataviewPropertiesEntity';
@@ -45,10 +42,7 @@ export class DomainLocalityComponent implements OnInit, OnDestroy {
   idDomain: number;
   propertiesDomain: IDomain;
   idParent: number;
-  idOffice: number;
-  propertiesOffice: IOffice;
   type: string;
-  planModelsOfficeList: IPlanModel[];
   cardProperties: ICard;
   cardLocalities: ICard = {
     toggleable: false,
@@ -63,7 +57,6 @@ export class DomainLocalityComponent implements OnInit, OnDestroy {
   cardItemPlanMenu: MenuItem[];
   $destroy = new Subject();
   isUserAdmin: boolean;
-  editPermission: boolean;
   collapsePanelsStatus = true;
   displayModeAll = 'grid';
   pageSize = 5;
@@ -82,9 +75,7 @@ export class DomainLocalityComponent implements OnInit, OnDestroy {
     private router: Router,
     private breadcrumbSrv: BreadcrumbService,
     private authSrv: AuthService,
-    private officePermissionSrv: OfficePermissionService,
     private messageSrv: MessageService,
-    private officeSrv: OfficeService,
     private domainSrv: DomainService,
     private filterSrv: FilterDataviewService,
     private configDataViewSrv: ConfigDataViewService
@@ -106,14 +97,12 @@ export class DomainLocalityComponent implements OnInit, OnDestroy {
     this.configDataViewSrv.observablePageSize.pipe(takeUntil(this.$destroy)).subscribe(pageSize => {
       this.pageSize = pageSize;
     });
-    this.activeRoute.queryParams.subscribe(async ({ id, idOffice, idDomain, type, idParent }) => {
+    this.activeRoute.queryParams.subscribe(async ({ id, idDomain, type, idParent }) => {
       this.idLocality = +id;
-      this.idOffice = +idOffice;
       this.idDomain = +idDomain;
       this.type = type;
       this.idParent = +idParent;
       this.saveButton?.hideButton();
-      this.editPermission = await this.officePermissionSrv.getPermissions(this.idOffice);
       this.cardLocalities = {
         ...this.cardLocalities,
         searchTerm: ''
@@ -121,19 +110,8 @@ export class DomainLocalityComponent implements OnInit, OnDestroy {
       await this.loadPropertiesLocality();
       this.breadcrumbSrv.setMenu([
         {
-          key: 'administration',
-          info: this.propertiesOffice?.name,
-          tooltip: this.propertiesOffice?.fullName,
-          routerLink: ['/configuration-office'],
-          queryParams: { idOffice: this.idOffice },
-          admin: true
-        },
-        {
-          key: 'configuration',
-          info: 'domains',
-          tooltip: this.translateSrv.instant('domains'),
+          key: 'domains',
           routerLink: ['/domains'],
-          queryParams: { idOffice: this.idOffice },
           admin: true
         },
         {
@@ -141,7 +119,7 @@ export class DomainLocalityComponent implements OnInit, OnDestroy {
           info: this.propertiesDomain?.name,
           tooltip: this.propertiesDomain?.fullName,
           routerLink: ['/domains', 'detail'],
-          queryParams: { id: this.idDomain, idOffice: this.idOffice },
+          queryParams: { id: this.idDomain },
           admin: true
         },
         ... await this.getBreadcrumbs()
@@ -168,7 +146,7 @@ export class DomainLocalityComponent implements OnInit, OnDestroy {
   async getBreadcrumbs() {
     if (this.idLocality || this.idParent) {
       const { success, data } = await this.breadcrumbSrv.getBreadcrumbLocality(this.idLocality || this.idParent);
-      const { idOffice, idDomain, type, idParent } = this;
+      const { idDomain, type, idParent } = this;
       return success
         ? [
           ...data.map((l, i) => ({
@@ -176,26 +154,27 @@ export class DomainLocalityComponent implements OnInit, OnDestroy {
             info: l?.name,
             tooltip: l?.fullName,
             routerLink: ['/domains', 'locality'],
-            queryParams: { id: l.id, idOffice, idDomain, type: l.type, idParent: i ? data[i - 1].id : '' },
+            queryParams: { id: l.id, idDomain, type: l.type, idParent: i ? data[i - 1].id : '' },
             admin: true
           })),
           ... !this.idLocality
             ? [{
               key: this.type.toLowerCase(),
               routerLink: ['/domains', 'locality'],
-              queryParams: { idOffice, idDomain, type, idParent },
+              queryParams: { idDomain, type, idParent },
               admin: true
             }]
             : []
         ]
         : [];
     } else {
+      console.log(this.type)
       return [
         {
           key: this.type.toLowerCase(),
           routerLink: ['/domains', 'locality'],
           admin: true,
-          queryParams: { idOffice: this.idOffice, idDomain: this.idDomain, type: this.type }
+          queryParams: { idDomain: this.idDomain, type: this.type }
         }
       ];
     }
@@ -208,7 +187,7 @@ export class DomainLocalityComponent implements OnInit, OnDestroy {
 
   async ngOnInit() {
     this.isUserAdmin = await this.authSrv.isUserAdmin();
-    if (!this.isUserAdmin && !this.editPermission) {
+    if (!this.isUserAdmin) {
       this.router.navigate(['/offices']);
     }
     await this.loadCards();
@@ -238,17 +217,11 @@ export class DomainLocalityComponent implements OnInit, OnDestroy {
       if (success) {
         this.propertiesLocality = data as ILocalityList;
         this.formLocality.reset(Object.keys(this.formLocality.controls).reduce((a, key) => (a[key] = data[key] || '', a), {}));
-        if (!this.editPermission) {
-          this.formLocality.disable();
-        }
       }
       this.loadCardItemsChildrenLocalities();
     } else {
       this.propertiesLocality = undefined;
       this.formLocality?.reset();
-    }
-    if (this.idOffice) {
-      this.propertiesOffice = await this.officeSrv.getCurrentOffice(this.idOffice);
     }
     this.idDomain = this.idDomain ||
       (this.propertiesLocality?.domain
@@ -279,15 +252,14 @@ export class DomainLocalityComponent implements OnInit, OnDestroy {
         queryParams: {
           type,
           idParent: this.idLocality,
-          idDomain: this.propertiesLocality.domain ? this.propertiesLocality.domain.id : this.propertiesLocality.domainRoot.id,
-          idOffice: this.idOffice
+          idDomain: this.propertiesLocality.domain ? this.propertiesLocality.domain.id : this.propertiesLocality.domainRoot.id
         },
       }
     );
   }
 
   loadCardItemsChildrenLocalities() {
-    const itemsChildrenLocalities: ICardItem[] = this.editPermission ? [
+    const itemsChildrenLocalities: ICardItem[] = [
       {
         typeCardItem: 'newCardItem',
         iconSvg: true,
@@ -323,12 +295,11 @@ export class DomainLocalityComponent implements OnInit, OnDestroy {
               : this.propertiesLocality?.domainRoot && this.propertiesLocality?.domainRoot?.id)
           },
           { name: 'idParent', value: this.idLocality },
-          { name: 'idOffice', value: this.idOffice },
           { name: 'type', value: this.propertiesLocality?.children ? this.propertiesLocality?.children[0]?.type : undefined }
         ]
       }
-    ] : [];
-    this.cardLocalities.showCreateNemElementButton = this.editPermission && this.propertiesLocality
+    ];
+    this.cardLocalities.showCreateNemElementButton = this.propertiesLocality
       && this.propertiesLocality.children ? true : false;
     if (this.propertiesLocality?.children) {
       itemsChildrenLocalities.unshift(...this.propertiesLocality.children.map(locality => (
@@ -345,7 +316,6 @@ export class DomainLocalityComponent implements OnInit, OnDestroy {
               label: this.translateSrv.instant('delete'),
               icon: 'fas fa-trash-alt',
               command: () => this.deleteLocality(locality as ILocality),
-              disabled: !this.editPermission
             },
           ] as MenuItem[],
           urlCard: '/domains/locality',
@@ -357,7 +327,6 @@ export class DomainLocalityComponent implements OnInit, OnDestroy {
                 : this.propertiesLocality?.domainRoot?.id)
             },
             { name: 'idParent', value: this.idLocality },
-            { name: 'idOffice', value: this.idOffice },
             { name: 'type', value: this.propertiesLocality?.children ? this.propertiesLocality.children[0].type : undefined }
           ]
         }
@@ -380,7 +349,6 @@ export class DomainLocalityComponent implements OnInit, OnDestroy {
       queryParams: {
         idDomain: this.propertiesLocality?.domain ? this.propertiesLocality?.domain?.id : this.propertiesLocality?.domainRoot?.id,
         idParent: this.idLocality,
-        idOffice: this.idOffice,
         type: this.propertiesLocality?.children ? this.propertiesLocality.children[0].type : undefined
       }
     });
@@ -416,7 +384,7 @@ export class DomainLocalityComponent implements OnInit, OnDestroy {
         key: 'locality',
         routerLink: ['/domains', 'locality'],
         admin: true,
-        queryParams: { id: this.idLocality, idOffice: this.idOffice },
+        queryParams: { id: this.idLocality },
         info: this.propertiesLocality?.name,
         tooltip: this.propertiesLocality?.fullName
       });
@@ -451,8 +419,7 @@ export class DomainLocalityComponent implements OnInit, OnDestroy {
       this.router.navigate(['/config/filter-dataview'], {
         queryParams: {
           idFilter: idFilter,
-          entityName: 'localities',
-          idOffice: this.idOffice
+          entityName: 'localities'
         }
       });
     }
@@ -476,8 +443,7 @@ export class DomainLocalityComponent implements OnInit, OnDestroy {
     await this.setBreadcrumbStorage();
     this.router.navigate(['/config/filter-dataview'], {
       queryParams: {
-        entityName: 'localities',
-        idOffice: this.idOffice
+        entityName: 'localities'
       }
     });
   }
@@ -501,20 +467,9 @@ export class DomainLocalityComponent implements OnInit, OnDestroy {
     const breadcrumb = idFilter ?
       [
         {
-          key: 'administration',
-          info: this.propertiesOffice?.name,
-          tooltip: this.propertiesOffice?.fullName,
-          routerLink: ['/configuration-office'],
-          admin: true,
-          queryParams: { idOffice: this.idOffice }
-        },
-        {
-          key: 'configuration',
-          info: 'domains',
-          tooltip: this.translateSrv.instant('domains'),
+          key: 'domains',
           routerLink: ['/domains'],
-          admin: true,
-          queryParams: { idOffice: this.idOffice }
+          admin: true
         },
         {
           key: 'domain',
@@ -522,26 +477,15 @@ export class DomainLocalityComponent implements OnInit, OnDestroy {
           tooltip: this.propertiesDomain?.fullName,
           routerLink: ['/domains', 'detail'],
           admin: true,
-          queryParams: { id: this.idDomain, idOffice: this.idOffice }
+          queryParams: { id: this.idDomain }
         },
         ... await this.getBreadcrumbs(),
       ] :
       [
         {
-          key: 'administration',
-          info: this.propertiesOffice?.name,
-          tooltip: this.propertiesOffice?.fullName,
-          routerLink: ['/configuration-office'],
-          admin: true,
-          queryParams: { idOffice: this.idOffice }
-        },
-        {
-          key: 'configuration',
-          info: 'domains',
-          tooltip: this.translateSrv.instant('domains'),
+          key: 'domains',
           routerLink: ['/domains'],
           admin: true,
-          queryParams: { idOffice: this.idOffice }
         },
         {
           key: 'domain',
@@ -549,7 +493,7 @@ export class DomainLocalityComponent implements OnInit, OnDestroy {
           tooltip: this.propertiesDomain?.fullName,
           routerLink: ['/domains', 'detail'],
           admin: true,
-          queryParams: { id: this.idDomain, idOffice: this.idOffice }
+          queryParams: { id: this.idDomain }
         },
         ... await this.getBreadcrumbs(),
       ]

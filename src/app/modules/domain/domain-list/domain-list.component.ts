@@ -13,12 +13,9 @@ import { IconsEnum } from 'src/app/shared/enums/IconsEnum';
 import { ICard } from 'src/app/shared/interfaces/ICard';
 import { ICardItem } from 'src/app/shared/interfaces/ICardItem';
 import { IDomain } from 'src/app/shared/interfaces/IDomain';
-import { IOffice } from 'src/app/shared/interfaces/IOffice';
 import { AuthService } from 'src/app/shared/services/auth.service';
 import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
 import { DomainService } from 'src/app/shared/services/domain.service';
-import { OfficePermissionService } from 'src/app/shared/services/office-permission.service';
-import { OfficeService } from 'src/app/shared/services/office.service';
 import { ResponsiveService } from 'src/app/shared/services/responsive.service';
 import { ConfigDataViewService } from 'src/app/shared/services/config-dataview.service';
 
@@ -36,8 +33,6 @@ export class DomainListComponent implements OnInit, OnDestroy {
     collapseble: true,
     initialStateCollapse: false
   };
-  idOffice: number;
-  propertiesOffice: IOffice;
   cardItemsProperties: ICardItem[];
   isUserAdmin: boolean;
   editPermission: boolean;
@@ -52,12 +47,10 @@ export class DomainListComponent implements OnInit, OnDestroy {
 
   constructor(
     private domainSvr: DomainService,
-    private officeSrv: OfficeService,
     private translateSvr: TranslateService,
     private activeRoute: ActivatedRoute,
     private breadcrumbSrv: BreadcrumbService,
     private authSrv: AuthService,
-    private officePermissionSrv: OfficePermissionService,
     private responsiveSrv: ResponsiveService,
     private filterSrv: FilterDataviewService,
     private router: Router,
@@ -72,38 +65,24 @@ export class DomainListComponent implements OnInit, OnDestroy {
     this.configDataViewSrv.observablePageSize.pipe(takeUntil(this.$destroy)).subscribe(pageSize => {
       this.pageSize = pageSize;
     });
-    this.activeRoute.queryParams.subscribe(params => {
-      this.idOffice = +params.idOffice;
-    });
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.responsive = value);
   }
 
   async ngOnInit() {
 
-    this.editPermission = await this.officePermissionSrv.getPermissions(this.idOffice);
-    if (!this.editPermission) {
+    this.isUserAdmin = await this.authSrv.isUserAdmin();
+    this.editPermission = this.isUserAdmin
+    if (!this.isUserAdmin && !this.editPermission) {
       this.router.navigate(['/offices']);
     }
     this.isLoading = true;
     await this.loadFiltersDomains();
     await this.loadPropertiesDomains();
-    await this.getOfficeById();
     this.breadcrumbSrv.setMenu([
       {
-        key: 'administration',
-        info: this.propertiesOffice?.name,
-        tooltip: this.propertiesOffice?.fullName,
-        routerLink: ['/configuration-office'],
-        queryParams: { idOffice: this.idOffice },
-        admin: true
-      },
-      {
-        key: 'configuration',
-        info: 'domains',
-        tooltip: this.translateSrv.instant('domains'),
+        key: 'domains',
         routerLink: ['/domains'],
-        queryParams: { idOffice: this.idOffice },
-        admin: true
+        admin: false
       },
     ]);
   }
@@ -113,14 +92,9 @@ export class DomainListComponent implements OnInit, OnDestroy {
     this.$destroy.complete();
   }
 
-  async getOfficeById() {
-    this.propertiesOffice = await this.officeSrv.getCurrentOffice(this.idOffice);
-  }
-
   async loadPropertiesDomains() {
     this.isLoading = true;
     const { success, data } = await this.domainSvr.GetAll({
-      'id-office': this.idOffice,
       idFilter: this.idFilterSelected,
       term: this.term
     });
@@ -129,8 +103,7 @@ export class DomainListComponent implements OnInit, OnDestroy {
         typeCardItem: 'newCardItem',
         iconSvg: true,
         icon: IconsEnum.Plus,
-        urlCard: '/domains/detail',
-        paramsUrlCard: [{ name: 'idOffice', value: this.idOffice }]
+        urlCard: '/domains/detail'
       }
     ] : [];
     this.cardProperties.showCreateNemElementButton = this.editPermission ? true : false;
@@ -148,8 +121,7 @@ export class DomainListComponent implements OnInit, OnDestroy {
           command: () => this.deleteDomain(domain),
           disabled: !this.editPermission
         }] as MenuItem[],
-        urlCard: 'domains/detail',
-        paramsUrlCard: [{ name: 'idOffice', value: this.idOffice }]
+        urlCard: 'domains/detail'
       })));
     }
     this.isLoading = false;
@@ -185,8 +157,7 @@ export class DomainListComponent implements OnInit, OnDestroy {
       this.router.navigate(['/config/filter-dataview'], {
         queryParams: {
           idFilter: idFilter,
-          entityName: 'domains',
-          idOffice: this.idOffice
+          entityName: 'domains'
         }
       });
     }
@@ -210,7 +181,6 @@ export class DomainListComponent implements OnInit, OnDestroy {
     this.router.navigate(['/config/filter-dataview'], {
       queryParams: {
         entityName: 'domains',
-        idOffice: this.idOffice
       }
     });
   }
@@ -231,43 +201,23 @@ export class DomainListComponent implements OnInit, OnDestroy {
 
   setBreadcrumbStorage(idFilter?) {
     const breadcrumb = idFilter ?
-      [{
-        key: 'administration',
-        info: this.propertiesOffice?.name,
-        tooltip: this.propertiesOffice?.fullName,
-        routerLink: ['/configuration-office'],
-        queryParams: { idOffice: this.idOffice },
-        admin: true
-      },
+      [
       {
-        key: 'configuration',
-        info: 'domains',
-        tooltip: this.translateSrv.instant('domains'),
+        key: 'domains',
         routerLink: ['/domains'],
-        queryParams: { idOffice: this.idOffice },
         admin: true
       }] :
-      [{
-        key: 'administration',
-        info: this.propertiesOffice?.name,
-        tooltip: this.propertiesOffice?.fullName,
-        routerLink: ['/configuration-office'],
-        queryParams: { idOffice: this.idOffice },
-        admin: true
-      },
+      [
       {
-        key: 'configuration',
-        info: 'domains',
-        tooltip: this.translateSrv.instant('domains'),
+        key: 'domains',
         routerLink: ['/domains'],
-        queryParams: { idOffice: this.idOffice },
         admin: true
       }];
     this.breadcrumbSrv.setBreadcrumbStorage(breadcrumb);
   }
 
   createNewDomain() {
-    this.router.navigate(['/domains/detail'], { queryParams: { idOffice: this.idOffice } });
+    this.router.navigate(['/domains/detail']);
   }
 
 }
