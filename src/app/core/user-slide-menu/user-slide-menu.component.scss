@@ -103,3 +103,8 @@
 ::ng-deep .p-tooltip.p-tooltip-right {
   z-index: 10000;
 }
+
+::ng-deep .p-tieredmenu {
+  width: auto;
+  top: auto !important;
+}

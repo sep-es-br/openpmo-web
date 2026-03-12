@@ -14,7 +14,6 @@ export enum MenuButtons {
 
 export enum MenuAdminButtons {
   ORGANIZATIONS = 'organizations',
-  DOMAINS = 'domains',
   MEASURE_UNITS = 'measure-units',
   OFFICES_PERMISSION = 'offices/permission',
   PERSONS = 'persons',

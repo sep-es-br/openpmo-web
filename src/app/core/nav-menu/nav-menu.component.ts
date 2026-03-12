@@ -47,7 +47,6 @@ export class NavMenuComponent implements OnInit, OnDestroy {
 
   menusAdmin: IMenuAdmin[] = [
     { label: MenuAdminButtons.ORGANIZATIONS, isOpen: false },
-    { label: MenuAdminButtons.DOMAINS, isOpen: false },
     { label: MenuAdminButtons.MEASURE_UNITS, isOpen: false },
     { label: MenuAdminButtons.OFFICES_PERMISSION, isOpen: false },
     { label: MenuAdminButtons.PERSONS, isOpen: false },
