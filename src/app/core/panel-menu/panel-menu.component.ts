@@ -66,7 +66,7 @@ export class PanelMenuComponent implements OnInit {
   currentIDPlan = 0;
   isFixed = false;
   menuStateChanged = false;
-  isAdminMenu = false;
+  isOfficeConfigMenu = false;
   parentsWorkpack = [];
   changedUrl = false;
   propertiesOffice: IOffice;
@@ -142,10 +142,10 @@ export class PanelMenuComponent implements OnInit {
 
     });
     this.menuSrv.obsReloadMenuPlanModel().pipe(takeUntil(this.$destroy)).subscribe(() => this.loadPlanModelMenu());
-    this.menuSrv.isAdminMenu.pipe(takeUntil(this.$destroy)).subscribe(isAdminMenu => {
-      this.isAdminMenu = isAdminMenu;
+    this.menuSrv.isOfficeConfigMenu.pipe(takeUntil(this.$destroy)).subscribe(isOfficeConfigMenu => {
+      this.isOfficeConfigMenu = isOfficeConfigMenu;
       this.updateMenuOfficeOnAdminChange();
-      if (!isAdminMenu) {
+      if (!isOfficeConfigMenu) {
         const planModelMenuIsOpen = this.menus.find(
             (item) =>
               item.label === MenuButtons.PLAN_MODEL && item.isOpen === true
@@ -154,7 +154,7 @@ export class PanelMenuComponent implements OnInit {
           this.toggleMenu('office');
         }
       }
-      if (isAdminMenu) {      
+      if (isOfficeConfigMenu) {      
         this.getOfficePermission();
       }
     });
@@ -211,7 +211,7 @@ export class PanelMenuComponent implements OnInit {
 
   updateMenuOfficeOnAdminChange() {
     this.itemsOffice = this.itemsOffice && this.itemsOffice
-      .map((office, i) => ((office.items = this.isAdminMenu ? undefined : this.itemsOfficeUnchanged[i].items), office));
+      .map((office, i) => ((office.items = this.isOfficeConfigMenu ? undefined : this.itemsOfficeUnchanged[i].items), office));
   }
 
   async getOfficePermission() {
@@ -282,7 +282,7 @@ export class PanelMenuComponent implements OnInit {
           const classList = Array.from(e.originalEvent?.target?.classList) || [];
           if (classList.some((className: string) => ['p-menuitem-text', 'fas', 'app-icon'].includes(className))) {
             e.item.expanded = false;
-            if (this.isAdminMenu) {
+            if (this.isOfficeConfigMenu) {
               this.router.navigate(['/configuration-office'], { queryParams: { idOffice: office.id } });
             } else {
               this.router.navigate(['/offices', 'office'], { queryParams: { id: office.id } });
@@ -290,7 +290,7 @@ export class PanelMenuComponent implements OnInit {
             this.closeAllMenus();
           }
         },
-        items: !this.isAdminMenu && office.plans
+        items: !this.isOfficeConfigMenu && office.plans
           ? office.plans.map(plan =>
           ({
             label: plan.name,

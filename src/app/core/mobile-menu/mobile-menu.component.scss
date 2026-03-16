@@ -5,7 +5,7 @@ $mobileMenuHeight: 90px;
   display: flex;
   flex-direction: column;
   width: 64px;
-  background-color: v.$bgMenuUser;
+  background-color: v.$bgMenuOffice;
   align-items: center;
   justify-content: center;
   height: 100%;
@@ -48,6 +48,14 @@ $mobileMenuHeight: 90px;
     }
   }
 
+  &.office-menu {
+    background-color: v.$bgMenuOffice;
+  
+    .item {
+      color: #FFFFFF !important;
+    }
+  }
+
   &.mobile {
     width: 100%;
     display: flex;
@@ -68,6 +76,12 @@ $mobileMenuHeight: 90px;
     &.admin-menu {
       .app-icon {
         color: v.$bgMenuAdmin;
+      }
+    }
+
+    &.office-menu {
+      .app-icon {
+        color: v.$bgMenuOffice;
       }
     }
 
@@ -379,6 +393,11 @@ $mobileMenuHeight: 90px;
     &.admin-menu {
       app-icon svg {
         fill: v.$bgMenuAdmin;
+      }
+    }
+    &.office-menu {
+      app-icon svg {
+        fill: v.$bgMenuOffice;
       }
     }
   }

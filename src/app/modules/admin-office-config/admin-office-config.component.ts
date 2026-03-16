@@ -160,7 +160,7 @@ export class AdminOfficeConfigComponent implements OnInit {
 
   setBreadcrumb() {
     this.breadcrumbSrv.setMenu([{
-      key: 'administration',
+      key: 'officeConfiguration',
       info: this.propertiesOffice?.name,
       tooltip: this.propertiesOffice?.fullName,
       routerLink: ['/configuration-office'],

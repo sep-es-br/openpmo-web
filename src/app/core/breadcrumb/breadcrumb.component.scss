@@ -1,10 +1,13 @@
 @use 'src/variables' as v;
 
 .admin {
-  border-color: #a7074b!important;
+  border-color: #296D5E!important;
 }
 .management {
   border-color: #023c55 !important
+}
+.office {
+  border-color: #a7074b!important;
 }
 .app-breadcrumb {
   display: flex;
