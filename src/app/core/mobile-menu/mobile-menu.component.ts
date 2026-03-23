@@ -707,7 +707,7 @@ export class MobileMenuComponent implements OnInit, OnDestroy {
   async setBreadcrumbStorage(idOffice, planModelSelected, workpackModel, parents, parent) {
     this.itemsBreadcrumb = [
       {
-        key: 'administration',
+        key: 'officeConfiguration',
         info: this.propertiesOffice?.name,
         tooltip: this.propertiesOffice?.fullName,
         routerLink: ['/configuration-office'],

@@ -15,6 +15,7 @@ export enum MenuButtons {
 export enum MenuAdminButtons {
   DOMAINS = 'domains',
   ADMINISTRATORS = 'administrators',
+  ADMINISTRATION = 'administration'
 }
 
 export enum MenuOfficeConfigurationButtons {

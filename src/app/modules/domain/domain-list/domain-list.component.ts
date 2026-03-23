@@ -29,7 +29,7 @@ export class DomainListComponent implements OnInit, OnDestroy {
   cardProperties: ICard = {
     toggleable: false,
     initialStateToggle: false,
-    cardTitle: '',
+    cardTitle: 'domains',
     collapseble: true,
     initialStateCollapse: false
   };
@@ -44,6 +44,8 @@ export class DomainListComponent implements OnInit, OnDestroy {
   idFilterSelected: number;
   isLoading = false;
   term = '';
+  infoPerson;
+  showBackToManagement = false;
 
   constructor(
     private domainSvr: DomainService,
@@ -80,16 +82,67 @@ export class DomainListComponent implements OnInit, OnDestroy {
     await this.loadPropertiesDomains();
     this.breadcrumbSrv.setMenu([
       {
+        key: 'administration',
+        routerLink: ['/administration'],
+      },
+      {
         key: 'domains',
-        routerLink: ['/domains'],
-        admin: false
+        routerLink: ['/domains']
       },
     ]);
+    this.checkShowBackToManagement();
   }
 
   ngOnDestroy(): void {
     this.$destroy.next();
     this.$destroy.complete();
+  }
+
+  checkShowBackToManagement() {
+    this.infoPerson = this.authSrv.getInfoPerson();
+    if (this.infoPerson && this.infoPerson.workLocal &&
+      (this.infoPerson.workLocal.idOffice || this.infoPerson.workLocal.idPlan || this.infoPerson.workLocal.idWorkpack)) {
+      this.showBackToManagement = true;
+    }
+  }
+
+  async navigateToManagement() {
+    const workLocal = this.infoPerson.workLocal;
+    if (workLocal.idWorkpackModelLinked && workLocal.idWorkpack && workLocal.idPlan && workLocal.idOffice) {
+      this.router.navigate(['workpack'], {
+        queryParams: {
+          id: Number(workLocal.idWorkpack),
+          idPlan: Number(workLocal.idPlan),
+          idWorkpackModelLinked: Number(workLocal.idWorkpackModelLinked)
+        }
+      });
+      return;
+    }
+    if (workLocal.idWorkpack && workLocal.idPlan && workLocal.idOffice) {
+      this.router.navigate(['workpack'], {
+        queryParams: {
+          id: Number(workLocal.idWorkpack),
+          idPlan: Number(workLocal.idPlan),
+        }
+      });
+      return;
+    }
+    if (workLocal.idPlan && workLocal.idOffice) {
+      this.router.navigate(['plan'], {
+        queryParams: {
+          id: Number(workLocal.idPlan),
+        }
+      });
+      return;
+    }
+    if (workLocal.idOffice) {
+      this.router.navigate(['offices/office'], {
+        queryParams: {
+          id: Number(workLocal.idOffice),
+        }
+      });
+      return;
+    }
   }
 
   async loadPropertiesDomains() {
@@ -199,20 +252,18 @@ export class DomainListComponent implements OnInit, OnDestroy {
     return filterPropertiesList;
   }
 
-  setBreadcrumbStorage(idFilter?) {
-    const breadcrumb = idFilter ?
-      [
+  setBreadcrumbStorage() {
+    const breadcrumb = [
+      {
+        key: 'administration',
+        routerLink: ['/administration'],
+      },
       {
         key: 'domains',
         routerLink: ['/domains'],
         admin: true
-      }] :
-      [
-      {
-        key: 'domains',
-        routerLink: ['/domains'],
-        admin: true
-      }];
+      }
+      ];
     this.breadcrumbSrv.setBreadcrumbStorage(breadcrumb);
   }
 

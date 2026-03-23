@@ -3,4 +3,4 @@ export const officeConfigurationPaths  = [ 'strategies', 'organizations', 'confi
 
 export const plansPath = [ 'plan', 'workpack', 'stakeholder', 'reports', 'ccbmember-baselines-view', 'filter-dataview', 'persons/profile', 'search'];
 
-export const adminsPath = [ 'domains' , 'administrators'];
+export const adminsPath = [ 'domains' , 'administrators', 'administration'];

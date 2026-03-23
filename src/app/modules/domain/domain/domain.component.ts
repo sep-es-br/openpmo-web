@@ -122,6 +122,10 @@ export class DomainComponent implements OnInit, OnDestroy {
     await this.loadPropertiesDomain();
     this.breadcrumbSrv.setMenu([
       {
+        key: 'administration',
+        routerLink: ['/administration'],
+      },
+      {
         key: 'domains',
         routerLink: ['/domains'],
         admin: true

@@ -4,7 +4,7 @@
     <div class="display-mode-grid" *ngIf="displayModeCard !== 'list'">
       <p-header class="card-item-header">
         <i class="fas fa-trash" *ngIf="editPermission" (click)="handleDeleteOffice(properties.office)"></i>
-        <i class="fas fa-tools" *ngIf="!!properties.urlMenuConfig && !!properties.paramsUrlMenuConfig"
+        <i class="fas fa-sliders" *ngIf="!!properties.urlMenuConfig && !!properties.paramsUrlMenuConfig"
           (click)="navigateToPage(properties.urlMenuConfig, properties.paramsUrlMenuConfig)"></i>
       </p-header>
       <div class="card-item-content" [class.card-link]="properties.urlCard" [routerLink]="properties.urlCard"
@@ -31,7 +31,7 @@
       <div class="right-side">
         <p-header class="card-item-header">
           <i class="fas fa-trash" *ngIf="editPermission" (click)="handleDeleteOffice(properties.office)"></i>
-          <i class="fas fa-tools" *ngIf="!!properties.urlMenuConfig && !!properties.paramsUrlMenuConfig"
+          <i class="fas fa-sliders" *ngIf="!!properties.urlMenuConfig && !!properties.paramsUrlMenuConfig"
             (click)="navigateToPage(properties.urlMenuConfig, properties.paramsUrlMenuConfig)"></i>
         </p-header>
         <div class="card-item-footer" *ngIf="cardIdItem">

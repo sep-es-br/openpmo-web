@@ -404,7 +404,7 @@ export class WorkpackModelComponent implements OnInit {
     const { idOffice, idStrategy, workpackModelType: type } = this;
     return [
       {
-        key: 'administration',
+        key: 'officeConfiguration',
         info: this.propertiesOffice?.name,
         tooltip: this.propertiesOffice?.fullName,
         routerLink: ['/configuration-office'],

@@ -161,7 +161,7 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
     await this.loadCurrentUserInfo();
     this.breadcrumbSrv.setMenu([
       {
-        key: 'administration',
+        key: 'officeConfiguration',
         info: this.propertiesOffice?.name,
         tooltip: this.propertiesOffice?.fullName,
         routerLink: ['/configuration-office'],

@@ -110,6 +110,10 @@ export class DomainLocalityComponent implements OnInit, OnDestroy {
       await this.loadPropertiesLocality();
       this.breadcrumbSrv.setMenu([
         {
+          key: 'administration',
+          routerLink: ['/administration'],
+        },
+        {
           key: 'domains',
           routerLink: ['/domains'],
           admin: true
