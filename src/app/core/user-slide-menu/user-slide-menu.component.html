@@ -9,7 +9,7 @@
   <div class="languages">
     <p-tieredMenu [model]="itemsLanguages"></p-tieredMenu>
   </div>
-  <div class="item" [routerLink]="['/administration']" (click)="closeUserMenu()">
+  <div class="item" [routerLink]="['/administration']" *ngIf="!!isUserAdmin" (click)="closeUserMenu()">
     <i class="fas fa-tools" [ngStyle]="{ fontSize: '1.3rem' }"></i>
     <span>{{ 'administration' | translate }}</span>
   </div>

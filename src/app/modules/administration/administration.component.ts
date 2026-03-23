@@ -31,6 +31,7 @@ export class AdministrationComponent implements OnInit {
   isLoading = false;
   showBackToManagement = false;
   infoPerson;
+  isUserAdmin = false
 
   $destroy = new Subject();
 
@@ -52,7 +53,11 @@ export class AdministrationComponent implements OnInit {
       .subscribe(value => this.responsive = value);
   }
 
-  ngOnInit(): void {
+async ngOnInit() {
+    this.isUserAdmin = await this.authSrv.isUserAdmin();
+    if (!this.isUserAdmin) {
+      this.router.navigate(['/offices']);
+    }
     this.loadCardItemsProperties();
     this.checkShowBackToManagement();
     this.loadBreadcrump();
