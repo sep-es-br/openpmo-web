@@ -206,10 +206,9 @@ export class DomainListComponent implements OnInit, OnDestroy {
     if (idFilter) {
       const filterProperties = this.loadFilterPropertiesList();
       this.filterSrv.setFilterProperties(filterProperties);
-      this.setBreadcrumbStorage(idFilter);
+      this.setBreadcrumbStorage();
       this.router.navigate(['/config/filter-dataview'], {
         queryParams: {
-          idFilter: idFilter,
           entityName: 'domains'
         }
       });
