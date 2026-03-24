@@ -172,7 +172,6 @@ export class DomainLocalityComponent implements OnInit, OnDestroy {
         ]
         : [];
     } else {
-      console.log(this.type)
       return [
         {
           key: this.type.toLowerCase(),

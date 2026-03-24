@@ -238,10 +238,14 @@ export class DomainComponent implements OnInit, OnDestroy {
       this.formIsSaving = false;
       if (!this.idDomain) {
         this.idDomain = data.id;
-        this.propertiesDomain = {
-          ...this.formDomain.value, localityRoot: this.formLocalityRoot.value
-        };
-        await this.loadLocalities();
+        
+        this.router.navigate([], {
+          relativeTo: this.activeRoute,
+          queryParams: { id: this.idDomain },
+          queryParamsHandling: 'merge'
+        });
+
+        await this.loadPropertiesDomain();
       }
       this.messageSrv.add({
         severity: 'success',
