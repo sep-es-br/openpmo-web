@@ -17,7 +17,6 @@ export class UserSlideMenuComponent implements OnInit {
   isUserAdmin = false;
   currentUserInfo: IPerson;
   itemsLanguages: MenuItem[] = [];
-  itemsAdministration: MenuItem[] = [];
   username = '';
 
   constructor(
@@ -30,7 +29,6 @@ export class UserSlideMenuComponent implements OnInit {
       this.isUserAdmin = this.currentUserInfo.administrator;
     }
     this.loadItemsLanguage();
-    this.loadItemsAdministration()
   }
 
   async ngOnInit() {
@@ -77,37 +75,6 @@ export class UserSlideMenuComponent implements OnInit {
   changeLanguage(language: string) {
     this.translateChangeSrv.changeLangDefault(language);
     window.location.reload();
-  }
-
-  loadItemsAdministration() {
-    this.itemsAdministration = [
-      {
-        label: 'Administração',
-        icon: 'fas fa-users-cog',
-        items: [
-          {
-            label: 'Administradores',
-            routerLink: '/administrators',
-            command: () => {
-              this.closeUserMenu();
-            }
-          },
-          {
-            label: 'Domínio',
-            routerLink: '/domains',
-            command: () => {
-              this.closeUserMenu();
-            }
-          },
-          {
-            label: 'Unidade de Medida',
-            command: () => {
-              this.closeUserMenu();
-            }
-          }
-        ]
-      }
-    ];
   }
 
   closeUserMenu() {

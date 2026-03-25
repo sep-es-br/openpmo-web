@@ -2,7 +2,7 @@
   <div class="app-menu-slide-fixed" #menuSliderOffices [class.hidden]="!menus[0].isOpen">
     <div class="slide-wrapper">
       <div class="top-bar">
-        <div class="title" [routerLink]="['/offices']">{{ (isAdminMenu ? 'offices' : 'officesAndPlans') | translate }}
+        <div class="title" [routerLink]="['/offices']">{{ (isOfficeConfigMenu ? 'offices' : 'officesAndPlans') | translate }}
         </div>
         <div class="action">
           <i [class]="isFixed ? 'app-icon pin-on' : 'app-icon pin-off'" [ngStyle]="{ fontSize: '0.9rem' }"
@@ -16,7 +16,7 @@
   <div class="app-menu-slide-fixed" [class.hidden]="!menus[3].isOpen" [class.open]="isMenuOpen('favorite')">
     <div class="slide-wrapper">
       <div class="top-bar">
-        <div class="title" (click)="closeAllMenus()">{{ (isAdminMenu ? 'favorites' : 'myFavorites') | translate
+        <div class="title" (click)="closeAllMenus()">{{ (isOfficeConfigMenu ? 'favorites' : 'myFavorites') | translate
           }}</div>
         <div class="action">
           <i [class]="isFixed ? 'app-icon pin-on' : 'app-icon pin-off'" [ngStyle]="{ fontSize: '0.9rem' }"

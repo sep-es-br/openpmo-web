@@ -104,7 +104,7 @@ export class OrganizationComponent implements OnInit, OnDestroy {
     this.propertiesOffice = await this.officeSrv.getCurrentOffice(this.idOffice);
     this.breadcrumbSrv.setMenu([
       {
-        key: 'administration',
+        key: 'officeConfiguration',
         info: this.propertiesOffice?.name,
         tooltip: this.propertiesOffice?.fullName,
         routerLink: ['/configuration-office'],

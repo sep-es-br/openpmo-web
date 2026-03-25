@@ -36,7 +36,7 @@ $mobileMenuHeight: 90px;
       height: 2rem;
     }
   }
-  .app-icon, .far.fa-star, .fa-file-alt {
+  .app-icon, .far.fa-star, .fa-icon, .fa-file-alt {
     color: #ffffff;
   }
   .item {
@@ -62,7 +62,7 @@ $mobileMenuHeight: 90px;
     &.opened {
       background-color: #eeeeee;
       color: #023c55;
-      .app-icon, .far.fa-star, .fa-file-alt {
+      .app-icon, .far.fa-star, .fa-icon , .fa-file-alt {
         color: #023c55;
       }
     }
@@ -89,7 +89,27 @@ $mobileMenuHeight: 90px;
         .app-icon {
           color: v.$bgMenuAdmin !important;
         }
+        .app-icon, .far.fa-star, .fa-icon , .fa-file-alt {
+          color: v.$bgMenuAdmin !important;
+        }
       }
+  }
+
+  &.office-menu {
+    background-color: v.$bgMenuOffice;
+  
+    .item {
+      color: #ffffff !important;
+    }
+  
+    .item.ofc-opened {
+      background-color: #eeeeee;
+      color: v.$bgMenuOffice;
+  
+      .app-icon {
+        color: v.$bgMenuOffice !important;
+      }
+    }
   }
 
 }

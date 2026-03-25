@@ -1,0 +1,53 @@
+.app-config {
+    width: 100%;
+  }
+  
+  .header-container {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: space-between;
+  
+    .app-content-header {
+      display: flex;
+      flex-direction: row;
+      align-items: flex-start;
+      justify-content: flex-start;
+      flex: 1;
+    }
+  }
+
+  .back-to-management-container {
+    color: #13546C;
+    cursor: pointer;
+    margin-bottom: 1em;
+    width: max-content;
+    .fa-reply {
+      margin-right: 0.5em;
+    }
+    .text {
+      font-size: 0.8rem;
+      font-style: italic;
+    }
+  }
+  
+  .loading-container {
+    position: relative;
+    min-height: 150px;
+  }
+  
+  .header-container.mobile {
+    flex-direction: column;
+  
+    .app-content-header {
+      width: 100%;
+    }
+  }
+  
+  ::ng-deep .admin-config .app-card-item .p-card .p-card-body {
+    padding: 1.2rem 0 !important;
+  }
+  
+  ::ng-deep .admin-config .app-dataview-list .app-card-item .p-card .p-card-body {
+    padding: 0 !important;
+  }

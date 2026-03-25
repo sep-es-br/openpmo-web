@@ -160,7 +160,7 @@ export class StrategyComponent implements OnDestroy {
       }
       this.breadcrumbSrv.setMenu([
         {
-          key: 'administration',
+          key: 'officeConfiguration',
           info: this.propertiesOffice?.name,
           tooltip: this.propertiesOffice?.fullName,
           routerLink: ['/configuration-office'],
@@ -445,7 +445,7 @@ export class StrategyComponent implements OnDestroy {
   getCurrentBreadcrumb(workpackModel) {
     const breadcrumb = [
       {
-        key: 'administration',
+        key: 'officeConfiguration',
         info: this.propertiesOffice?.name,
         tooltip: this.propertiesOffice?.fullName,
         routerLink: ['/configuration-office'],

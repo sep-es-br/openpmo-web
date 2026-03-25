@@ -21,9 +21,8 @@
         padding: 10px;
         min-height: 37px;
         cursor: pointer;
-        .fa-tools {
+        .fa-sliders {
           font-size: 1rem;
-          transform: rotate(30deg);
           color: v.$iconGrey;
         }
         .fa-trash {
@@ -48,7 +47,7 @@
           padding-bottom: 0;
           min-height: 1rem;
           justify-content: flex-end;
-          .fa-tools {
+          .fa-sliders {
             font-size: 15px;
             margin-left: 1rem;
           }

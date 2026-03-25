@@ -19,6 +19,8 @@ export class TemplateComponent implements OnInit, OnDestroy {
 
   fullScreenModeDashboard = false;
 
+  isOfficeConfigMenu = false;
+
   isAdminMenu = false;
 
   menuWidth = 0.01;
@@ -66,6 +68,17 @@ export class TemplateComponent implements OnInit, OnDestroy {
       .subscribe(
         (close) => close && !this.isMenuFixed && this.closeSlideMenu()
       );
+      this.menuSrv.isAdminMenu
+      .pipe(takeUntil(this.$destroy))
+      .subscribe((isAdminMenu) => {
+        this.isAdminMenu = isAdminMenu;
+      });
+
+    this.menuSrv.isOfficeConfigMenu
+      .pipe(takeUntil(this.$destroy))
+      .subscribe((isOfficeConfigMenu) => {
+        this.isOfficeConfigMenu = isOfficeConfigMenu;
+      });
   }
 
   ngOnDestroy(): void {
@@ -73,8 +86,8 @@ export class TemplateComponent implements OnInit, OnDestroy {
     this.$destroy.complete();
   }
 
-  toggleMenu(isAdmin: boolean) {
-    this.isAdminMenu = isAdmin;
+  toggleMenu(isOfficeConfig: boolean) {
+    this.isOfficeConfigMenu = isOfficeConfig;
   }
 
   handleClickContent() {

@@ -1,8 +1,9 @@
 <div class="app-breadcrumb"
     [class.mobile]="isMobileView"
     [class.fullscreen-mode-dashboard]="fullScreenModeDashboard"
+    [class.office]="isOfficeConfigMenu"
     [class.admin]="isAdminMenu"
-    [class.management]="!isAdminMenu">
+    [class.management]="!isOfficeConfigMenu && !isAdminMenu">
   <div class="labels">
     <div class="name" *ngIf="crumbOffice"> {{ crumbOffice.info }}</div>
     <div class="name" *ngIf="crumbPlan"> {{ crumbPlan.info }}</div>

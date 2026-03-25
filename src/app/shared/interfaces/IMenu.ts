@@ -13,6 +13,12 @@ export enum MenuButtons {
 }
 
 export enum MenuAdminButtons {
+  DOMAINS = 'domains',
+  ADMINISTRATORS = 'administrators',
+  ADMINISTRATION = 'administration'
+}
+
+export enum MenuOfficeConfigurationButtons {
   ORGANIZATIONS = 'organizations',
   MEASURE_UNITS = 'measure-units',
   OFFICES_PERMISSION = 'offices/permission',
@@ -26,6 +32,11 @@ export interface IMenu {
 
 export interface IMenuAdmin {
   label: MenuAdminButtons;
+  isOpen: boolean;
+}
+
+export interface IMenuOfficeConfiguration {
+  label: MenuOfficeConfigurationButtons;
   isOpen: boolean;
 }
 

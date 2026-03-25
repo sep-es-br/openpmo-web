@@ -97,7 +97,7 @@ export class MeasureUnitComponent implements OnInit {
     await this.getOfficeById();
     this.breadcrumbSrv.setMenu([
       {
-        key: 'administration',
+        key: 'officeConfiguration',
         info: this.propertiesOffice?.name,
         tooltip: this.propertiesOffice?.fullName,
         routerLink: ['/configuration-office'],
@@ -372,7 +372,7 @@ export class MeasureUnitComponent implements OnInit {
   setBreadcrumbStorage(idFilter?) {
     const breadcrumb = idFilter ?
       [{
-        key: 'administration',
+        key: 'officeConfiguration',
         info: this.propertiesOffice?.name,
         tooltip: this.propertiesOffice?.fullName,
         routerLink: ['/configuration-office'],
@@ -388,7 +388,7 @@ export class MeasureUnitComponent implements OnInit {
         queryParams: { idOffice: this.idOffice }
       }] :
       [{
-        key: 'administration',
+        key: 'officeConfiguration',
         info: this.propertiesOffice?.name,
         tooltip: this.propertiesOffice?.fullName,
         routerLink: ['/configuration-office'],

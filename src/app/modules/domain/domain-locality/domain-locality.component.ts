@@ -110,6 +110,10 @@ export class DomainLocalityComponent implements OnInit, OnDestroy {
       await this.loadPropertiesLocality();
       this.breadcrumbSrv.setMenu([
         {
+          key: 'administration',
+          routerLink: ['/administration'],
+        },
+        {
           key: 'domains',
           routerLink: ['/domains'],
           admin: true
@@ -168,7 +172,6 @@ export class DomainLocalityComponent implements OnInit, OnDestroy {
         ]
         : [];
     } else {
-      console.log(this.type)
       return [
         {
           key: this.type.toLowerCase(),
