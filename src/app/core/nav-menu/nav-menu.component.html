@@ -52,10 +52,6 @@
     [pTooltip]="'organizations' | translate">
     <i class="app-icon building" [ngStyle]="{ fontSize: '1.3rem' }"></i>
   </div>
-  <div class="item" [routerLink]="['/domains']" [queryParams]="{ idOffice: currentIDOffice }" [class.adm-opened]="isMenuAdminOpen(MenuAdminButtons.DOMAINS)"
-    [pTooltip]="'domains' | translate">
-    <i class="app-icon map-marked" [ngStyle]="{ fontSize: '1.3rem' }"></i>
-  </div>
   <div class="item" [routerLink]="['/measure-units']" [queryParams]="{ idOffice: currentIDOffice }" [class.adm-opened]="isMenuAdminOpen(MenuAdminButtons.MEASURE_UNITS)"
     [pTooltip]="'measureUnits' | translate">
     <i class="app-icon unit-selection-alt" [ngStyle]="{ fontSize: '.7rem' }"></i>
