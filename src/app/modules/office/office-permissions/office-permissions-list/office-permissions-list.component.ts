@@ -88,7 +88,7 @@ export class OfficePermissionsListComponent implements OnInit {
     await this.loadCurrentUserInfo();
     this.breadcrumbSrv.setMenu([
       {
-        key: 'administration',
+        key: 'officeConfiguration',
         info: this.propertiesOffice?.name,
         tooltip: this.propertiesOffice?.fullName,
         routerLink: ['/configuration-office'],
@@ -261,7 +261,7 @@ export class OfficePermissionsListComponent implements OnInit {
     const breadcrumb = idFilter ?
       [
         {
-          key: 'administration',
+          key: 'officeConfiguration',
           info: this.propertiesOffice?.name,
           tooltip: this.propertiesOffice?.fullName,
           routerLink: ['/configuration-office'],
@@ -276,7 +276,7 @@ export class OfficePermissionsListComponent implements OnInit {
         }] :
       [
         {
-          key: 'administration',
+          key: 'officeConfiguration',
           info: this.propertiesOffice?.name,
           tooltip: this.propertiesOffice?.fullName,
           routerLink: ['/configuration-office'],

@@ -8,7 +8,10 @@
   <app-mobile-menu (changeMenu)="toggleMenu($event)"></app-mobile-menu>
   <main>
     <div class="main-content">
-      <app-breadcrumb [isAdminMenu]="isAdminMenu"></app-breadcrumb>
+      <app-breadcrumb
+        [isOfficeConfigMenu]="isOfficeConfigMenu"
+        [isAdminMenu]="isAdminMenu">
+      </app-breadcrumb>
       <div class="outlet">
         <router-outlet></router-outlet>
       </div>
@@ -31,7 +34,10 @@
         </ng-template>
         <ng-template>
           <div class="main-content" (click)="handleClickContent()">
-            <app-breadcrumb [isAdminMenu]="isAdminMenu"></app-breadcrumb>
+            <app-breadcrumb
+              [isOfficeConfigMenu]="isOfficeConfigMenu"
+              [isAdminMenu]="isAdminMenu">
+            </app-breadcrumb>
             <div class="content">
               <div class="outlet fixed">
                 <router-outlet></router-outlet>

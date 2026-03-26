@@ -10,7 +10,7 @@ import { IHttpResult } from '../interfaces/IHttpResult';
 
 import { IMenu, IMenuOffice, IMenuWorkpack } from '../interfaces/IMenu';
 import { PrepareHttpParams } from '../utils/query.util';
-import { adminsPath, plansPath } from '../constants/menuUrls';
+import { officeConfigurationPaths , plansPath, adminsPath } from '../constants/menuUrls';
 import { finalize, shareReplay, tap } from 'rxjs/operators';
 import { PersonService } from './person.service';
 import { take, takeUntil } from 'rxjs/operators';
@@ -33,8 +33,9 @@ interface IMenuState {
 
 export class MenuService extends BaseService<any> implements OnDestroy{
 
-  adminsPath = adminsPath;
+  officeConfigurationPaths  = officeConfigurationPaths ;
   plansPath = plansPath;
+  adminsPath = adminsPath;
   idNewWorkpack: number;
 
   private $reloadMenuOffice = new Subject();
@@ -42,6 +43,7 @@ export class MenuService extends BaseService<any> implements OnDestroy{
   private $reloadMenuPortfolio = new Subject();
   private $reloadMenuPlanModel = new Subject();
   private $removedFavorites = new Subject();
+  private isOfficeConfigMenuObservable = new BehaviorSubject<boolean>(false);
   private isAdminMenuObservable = new BehaviorSubject<boolean>(false);
   private isPlanMenuObservable = new BehaviorSubject<boolean>(false);
   private closeAllMenus = new BehaviorSubject<boolean>(false);
@@ -84,9 +86,19 @@ export class MenuService extends BaseService<any> implements OnDestroy{
   }
 
   checkURL(url: string) {
-    const [ path ] = url.slice(2).split('?');
-    this.isAdminMenuObservable.next(!!this.adminsPath.find(p => path.startsWith(p)) && path !== 'persons/profile');
-    this.isPlanMenuObservable.next(!!this.plansPath.find(p => path.startsWith(p)));
+    const [path] = url.slice(2).split('?');
+
+    this.isOfficeConfigMenuObservable.next(
+      !!this.officeConfigurationPaths.find(p => path.startsWith(p)) && path !== 'persons/profile'
+    );
+
+    this.isPlanMenuObservable.next(
+      !!this.plansPath.find(p => path.startsWith(p))
+    );
+
+    this.isAdminMenuObservable.next(
+      !!this.adminsPath.find(p => path.startsWith(p))
+    );
   }
 
   nextMenuPortfolioItems(value) {
@@ -205,6 +217,14 @@ export class MenuService extends BaseService<any> implements OnDestroy{
         params: PrepareHttpParams({ 'id-office': idOffice })
       }
     ).toPromise();
+  }
+
+  nextIsOfficeConfigMenu(value: boolean) {
+    this.isAdminMenuObservable.next(value);
+  }
+
+  get isOfficeConfigMenu() {
+    return this.isOfficeConfigMenuObservable.asObservable();
   }
 
   nextIsAdminMenu(value: boolean) {

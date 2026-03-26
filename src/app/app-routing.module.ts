@@ -4,6 +4,7 @@ import { AuthGuard } from './shared/guards/auth-guard';
 import { HomeComponent } from './modules/home/home.component';
 import { LoginComponent } from './modules/login/login.component';
 import { AdminOfficeConfigComponent } from './modules/admin-office-config/admin-office-config.component';
+import { AdministrationComponent } from './modules/administration/administration.component';
 
 const routes: Routes = [
   {
@@ -43,6 +44,11 @@ const routes: Routes = [
     path: 'configuration-office',
     canActivate: [ AuthGuard],
     component: AdminOfficeConfigComponent
+  },
+  {
+    path: 'administration',
+    canActivate: [ AuthGuard],
+    component: AdministrationComponent
   },
   {
     path: 'domains',

@@ -178,7 +178,7 @@ export class PersonComponent implements OnInit, OnDestroy {
   setBreadcrumb() {
     this.breadcrumbSrv.setMenu([
       {
-        key: 'administration',
+        key: 'officeConfiguration',
         info: this.office?.name,
         tooltip: this.office?.fullName,
         routerLink: ['/configuration-office'],

@@ -1,4 +1,6 @@
-<nav class="app-menu mobile" [class.admin-menu]="isAdminMenu">
+<nav class="app-menu mobile"
+     [class.admin-menu]="isAdminMenu"
+     [class.office-menu]="isOfficeConfigMenu">
   <div class="menugeneral-icons-mobileview-container">
     <div
       *ngIf="itemsOffice?.length > 0"
@@ -75,8 +77,7 @@
 <div class="app-menu-slide" #menuSliderOffices [class.open]="isMenuOpen('office')" [class.mobile]="isMobileView"
   [class.changing]="isChangingView">
   <div class="top-bar">
-    <div class="title" (click)="closeAllMenus()" [routerLink]="['/offices']">{{ (isAdminMenu ? 'offices' :
-      'officesAndPlans') | translate }}
+    <div class="title" (click)="closeAllMenus()" [routerLink]="['/offices']">{{ ((isOfficeConfigMenu || isAdminMenu) ? 'offices' : 'officesAndPlans') | translate }}
     </div>
   </div>
   <p-panelMenu [model]="itemsOffice"></p-panelMenu>
@@ -88,7 +89,7 @@
 <div class="app-menu-slide" [class.open]="isMenuOpen('favorites')" [class.mobile]="isMobileView"
   [class.changing]="isChangingView">
   <div class="top-bar">
-    <div class="title" (click)="closeAllMenus()">{{ (isAdminMenu ? 'favorites' : 'myFavorites') | translate }}
+    <div class="title" (click)="closeAllMenus()">{{ ((isOfficeConfigMenu || isAdminMenu) ? 'favorites' : 'myFavorites') | translate }}
     </div>
   </div>
   <div class="f-panelmenu">

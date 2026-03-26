@@ -172,6 +172,10 @@ export class AdministratorListComponent implements OnInit, OnDestroy {
   loadBreadcrump() {
     this.breadcrumbSrv.setMenu([
       {
+        key: 'administration',
+        routerLink: ['/administration'],
+      },
+      {
         key: 'administrators',
         routerLink: ['/administrators'],
       }
@@ -216,9 +220,12 @@ export class AdministratorListComponent implements OnInit, OnDestroy {
   setBreadcrumbStorage() {
     this.breadcrumbSrv.setBreadcrumbStorage([
       {
-        key: 'Administrators',
+        key: 'administration',
+        routerLink: ['/administration'],
+      },
+      {
+        key: 'administrators',
         routerLink: ['/administrators'],
-        admin: true
       }
     ]);
   }

@@ -17,10 +17,7 @@ import { IDomain } from 'src/app/shared/interfaces/IDomain';
 import { TypeLocality } from 'src/app/shared/enums/TypeLocality';
 import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
 import { SaveButtonComponent } from 'src/app/shared/components/save-button/save-button.component';
-import { OfficeService } from 'src/app/shared/services/office.service';
 import { AuthService } from 'src/app/shared/services/auth.service';
-import { IOffice } from 'src/app/shared/interfaces/IOffice';
-import { OfficePermissionService } from 'src/app/shared/services/office-permission.service';
 import { ConfigDataViewService } from 'src/app/shared/services/config-dataview.service';
 import { CancelButtonComponent } from 'src/app/shared/components/cancel-button/cancel-button.component';
 
@@ -39,8 +36,6 @@ export class DomainComponent implements OnInit, OnDestroy {
   formDomain: FormGroup;
   formLocalityRoot: FormGroup;
   idDomain: number;
-  idOffice: number;
-  planModelsOfficeList: IPlanModel[];
   cardProperties: ICard;
   cardLocalityRoot: ICard;
   localities: ILocality[];
@@ -49,8 +44,6 @@ export class DomainComponent implements OnInit, OnDestroy {
   $destroy = new Subject();
   isUserAdmin: boolean;
   editPermission: boolean;
-  permissionsOffices: IOffice[];
-  propertiesOffice: IOffice;
   displayModeAll = 'grid';
   pageSize = 5;
   totalRecords: number;
@@ -66,9 +59,7 @@ export class DomainComponent implements OnInit, OnDestroy {
     private router: Router,
     private responsiveSvr: ResponsiveService,
     private breadcrumbSrv: BreadcrumbService,
-    private officeSrv: OfficeService,
     private authSrv: AuthService,
-    private officePermissionSrv: OfficePermissionService,
     private messageSrv: MessageService,
     private configDataViewSrv: ConfigDataViewService
   ) {
@@ -78,9 +69,8 @@ export class DomainComponent implements OnInit, OnDestroy {
     this.configDataViewSrv.observablePageSize.pipe(takeUntil(this.$destroy)).subscribe(pageSize => {
       this.pageSize = pageSize;
     });
-    this.activeRoute.queryParams.subscribe(({ id, idOffice }) => {
+    this.activeRoute.queryParams.subscribe(({ id }) => {
       this.idDomain = +id;
-      this.idOffice = +idOffice;
     });
     this.formDomain = this.formBuilder.group({
       name: ['', [Validators.required, Validators.maxLength(25)]],
@@ -124,28 +114,20 @@ export class DomainComponent implements OnInit, OnDestroy {
   async ngOnInit() {
     this.isLoading = true;
     this.isUserAdmin = await this.authSrv.isUserAdmin();
-    this.editPermission = await this.officePermissionSrv.getPermissions(this.idOffice);
+    this.editPermission = this.isUserAdmin
     if (!this.isUserAdmin && !this.editPermission) {
       this.router.navigate(['/offices']);
     }
     await this.loadCards();
     await this.loadPropertiesDomain();
-    await this.loadPropertiesOffice();
     this.breadcrumbSrv.setMenu([
       {
         key: 'administration',
-        info: this.propertiesOffice?.name,
-        tooltip: this.propertiesOffice?.fullName,
-        routerLink: ['/configuration-office'],
-        queryParams: { idOffice: this.idOffice },
-        admin: true
+        routerLink: ['/administration'],
       },
       {
-        key: 'configuration',
-        info: 'domains',
-        tooltip: this.translateSrv.instant('domains'),
+        key: 'domains',
         routerLink: ['/domains'],
-        queryParams: { idOffice: this.idOffice },
         admin: true
       },
       {
@@ -153,7 +135,7 @@ export class DomainComponent implements OnInit, OnDestroy {
         info: this.propertiesDomain?.name,
         tooltip: this.propertiesDomain?.fullName,
         routerLink: ['/domains', 'detail'],
-        queryParams: { id: this.idDomain, idOffice: this.idOffice },
+        queryParams: { id: this.idDomain },
         admin: true
       }
     ]);
@@ -209,12 +191,6 @@ export class DomainComponent implements OnInit, OnDestroy {
     }
   }
 
-  async loadPropertiesOffice() {
-    if (this.idOffice) {
-      this.propertiesOffice = await this.officeSrv.getCurrentOffice(this.idOffice);
-    }
-  }
-
   async loadLocalities() {
     const localities: ILocalityRoot[] = [];
     if (this.propertiesDomain && this.propertiesDomain.localityRoot) {
@@ -226,7 +202,7 @@ export class DomainComponent implements OnInit, OnDestroy {
   }
 
   navigateToPage(type: string) {
-    this.router.navigate(['/domains/locality'], { queryParams: { type, idDomain: this.idDomain, idOffice: this.idOffice } });
+    this.router.navigate(['/domains/locality'], { queryParams: { type, idDomain: this.idDomain } });
   }
 
   loadCardItemsLocalities() {
@@ -240,8 +216,7 @@ export class DomainComponent implements OnInit, OnDestroy {
           nameCardItem: locality.name,
           fullNameCardItem: locality.fullName,
           itemId: locality.id,
-          urlCard: '/domains/locality',
-          paramsUrlCard: [{ name: 'idOffice', value: this.idOffice }]
+          urlCard: '/domains/locality'
         }
       )));
     }
@@ -257,16 +232,20 @@ export class DomainComponent implements OnInit, OnDestroy {
         ...this.formDomain.value, id: this.idDomain,
         localityRoot: this.propertiesDomain.localityRoot ? this.propertiesDomain.localityRoot : this.formLocalityRoot.value
       })
-      : await this.domainSvr.post({ ...this.formDomain.value, idOffice: this.idOffice, localityRoot: this.formLocalityRoot.value });
+      : await this.domainSvr.post({ ...this.formDomain.value, localityRoot: this.formLocalityRoot.value });
 
     if (success) {
       this.formIsSaving = false;
       if (!this.idDomain) {
         this.idDomain = data.id;
-        this.propertiesDomain = {
-          ...this.formDomain.value, idOffice: this.idOffice, localityRoot: this.formLocalityRoot.value
-        };
-        await this.loadLocalities();
+        
+        this.router.navigate([], {
+          relativeTo: this.activeRoute,
+          queryParams: { id: this.idDomain },
+          queryParamsHandling: 'merge'
+        });
+
+        await this.loadPropertiesDomain();
       }
       this.messageSrv.add({
         severity: 'success',
@@ -276,7 +255,7 @@ export class DomainComponent implements OnInit, OnDestroy {
       this.breadcrumbSrv.updateLastCrumb({
         key: 'domain',
         routerLink: ['/domains', 'detail'],
-        queryParams: { id: this.idDomain, idOffice: this.idOffice },
+        queryParams: { id: this.idDomain },
         info: this.propertiesDomain?.name,
         tooltip: this.propertiesDomain?.fullName
       });

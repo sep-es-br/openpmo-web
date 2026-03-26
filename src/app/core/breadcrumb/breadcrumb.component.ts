@@ -29,6 +29,7 @@ import { TranslateService } from '@ngx-translate/core';
   styleUrls: ['./breadcrumb.component.scss'],
 })
 export class BreadcrumbComponent implements OnInit, OnChanges {
+  @Input() isOfficeConfigMenu = false;
   @Input() isAdminMenu = false;
 
   @ViewChild('crumbsEl') crumbsEl: ElementRef;
@@ -206,7 +207,13 @@ export class BreadcrumbComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    this.isAdminMenu = changes.isAdminMenu.currentValue;
+    if (changes.isOfficeConfigMenu) {
+      this.isOfficeConfigMenu = changes.isOfficeConfigMenu.currentValue;
+    }
+
+    if (changes.isAdminMenu) {
+      this.isAdminMenu = changes.isAdminMenu.currentValue;
+    }
   }
 
   async resetAll() {

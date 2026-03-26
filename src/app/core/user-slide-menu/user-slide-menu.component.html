@@ -9,9 +9,9 @@
   <div class="languages">
     <p-tieredMenu [model]="itemsLanguages"></p-tieredMenu>
   </div>
-  <div class="item" [routerLink]="['/administrators']" *ngIf="!!isUserAdmin" (click)="closeUserMenu()">
-    <i class="fas fa-users-cog" [ngStyle]="{ fontSize: '1.4rem' }"></i>
-    <span>{{ 'administrators' | translate }}</span>
+  <div class="item" [routerLink]="['/administration']" *ngIf="!!isUserAdmin" (click)="closeUserMenu()">
+    <i class="fas fa-tools" [ngStyle]="{ fontSize: '1.3rem' }"></i>
+    <span>{{ 'administration' | translate }}</span>
   </div>
   <div class="logout" (click)="authSrv.signOut()">
     <i class="app-icon sign-out-alt" [ngStyle]="{ fontSize: '1rem' }"></i>

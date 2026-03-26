@@ -12,8 +12,10 @@ import { takeUntil } from 'rxjs/operators';
 import {
   IMenu,
   IMenuAdmin,
+  MenuOfficeConfigurationButtons,
   MenuAdminButtons,
   MenuButtons,
+  IMenuOfficeConfiguration,
 } from 'src/app/shared/interfaces/IMenu';
 import { IPerson } from 'src/app/shared/interfaces/IPerson';
 import { IPlan } from 'src/app/shared/interfaces/IPlan';
@@ -33,7 +35,8 @@ export class NavMenuComponent implements OnInit, OnDestroy {
   @Output() changeMenu = new EventEmitter<boolean>();
 
     MenuButtons = MenuButtons; // expõe pro template
-    MenuAdminButtons = MenuAdminButtons
+    MenuAdminButtons = MenuAdminButtons;
+    MenuOfficeConfigurationButtons = MenuOfficeConfigurationButtons;
 
   menus: IMenu[] = [
     { label: MenuButtons.OFFICE, isOpen: false },
@@ -46,11 +49,15 @@ export class NavMenuComponent implements OnInit, OnDestroy {
   ];
 
   menusAdmin: IMenuAdmin[] = [
-    { label: MenuAdminButtons.ORGANIZATIONS, isOpen: false },
     { label: MenuAdminButtons.DOMAINS, isOpen: false },
-    { label: MenuAdminButtons.MEASURE_UNITS, isOpen: false },
-    { label: MenuAdminButtons.OFFICES_PERMISSION, isOpen: false },
-    { label: MenuAdminButtons.PERSONS, isOpen: false },
+    { label: MenuAdminButtons.ADMINISTRATORS, isOpen: false },
+  ];
+
+  menusOfficeConfiguration: IMenuOfficeConfiguration[] = [
+    { label: MenuOfficeConfigurationButtons.ORGANIZATIONS, isOpen: false },
+    { label: MenuOfficeConfigurationButtons.MEASURE_UNITS, isOpen: false },
+    { label: MenuOfficeConfigurationButtons.OFFICES_PERMISSION, isOpen: false },
+    { label: MenuOfficeConfigurationButtons.PERSONS, isOpen: false },
   ];
 
   isUserAdmin = false;
@@ -62,6 +69,8 @@ export class NavMenuComponent implements OnInit, OnDestroy {
   $destroy = new Subject();
 
   isPlanMenu = false;
+
+  isOfficeConfigMenu = false;
 
   isAdminMenu = false;
 
@@ -87,11 +96,17 @@ export class NavMenuComponent implements OnInit, OnDestroy {
     private reportSrv: ReportService,
     private personSrv: PersonService
   ) {
-    this.menuSrv.isAdminMenu
+    this.menuSrv.isOfficeConfigMenu
       .pipe(takeUntil(this.$destroy))
-      .subscribe((isAdminMenu) => {
-        this.isAdminMenu = isAdminMenu;
+      .subscribe((isOfficeConfigMenu) => {
+        this.isOfficeConfigMenu = isOfficeConfigMenu;
       });
+
+    this.menuSrv.isAdminMenu
+    .pipe(takeUntil(this.$destroy))
+    .subscribe((isAdminMenu) => {
+      this.isAdminMenu = isAdminMenu;
+    });
 
     this.menuSrv.obsCloseMenuUser
       .pipe(takeUntil(this.$destroy))
@@ -235,6 +250,24 @@ export class NavMenuComponent implements OnInit, OnDestroy {
         adminBtn.isOpen = false;
       }
     });
+
+    this.menusOfficeConfiguration.forEach((officeBtn) => {
+      if (url.startsWith(officeBtn.label)) {
+        officeBtn.isOpen = true;
+
+        this.menuSrv.nextMenuState({
+          isFixed: false,
+        });
+
+        this.menus.forEach((btn) => (btn.isOpen = false));
+        this.menusAdmin.forEach((btn) => (btn.isOpen = false));
+
+        this.menuSrv.nextCloseAllMenus(true);
+        this.showUserMenu = false;
+      } else {
+        officeBtn.isOpen = false;
+      }
+    });
   }
 
   async loadCurrentInfo() {
@@ -278,6 +311,7 @@ export class NavMenuComponent implements OnInit, OnDestroy {
     });
 
     this.menusAdmin.forEach((item) => (item.isOpen = false));
+    this.menusOfficeConfiguration.forEach((item) => (item.isOpen = false));
     this.showUserMenu = false;
     if (next) {
       const user = this.authSrv.getTokenPayload();
@@ -303,6 +337,12 @@ export class NavMenuComponent implements OnInit, OnDestroy {
     return menu
       ? this.menusAdmin.find((m) => m.label === menu)?.isOpen
       : this.menusAdmin.reduce((a, b) => (a ? a : b.isOpen), false);
+  }
+
+  isMenuOfficeConfigurationOpen(menu?: string) {
+    return menu
+      ? this.menusOfficeConfiguration.find((m) => m.label === menu)?.isOpen
+      : this.menusOfficeConfiguration.reduce((a, b) => (a ? a : b.isOpen), false);
   }
 
   closeAllMenus() {
