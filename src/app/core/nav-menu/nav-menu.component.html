@@ -60,10 +60,6 @@
     [pTooltip]="'organizations' | translate">
     <i class="app-icon building" [ngStyle]="{ fontSize: '1.3rem' }"></i>
   </div>
-  <div class="item" [routerLink]="['/measure-units']" [queryParams]="{ idOffice: currentIDOffice }" [class.ofc-opened]="isMenuOfficeConfigurationOpen(MenuOfficeConfigurationButtons.MEASURE_UNITS)"
-    [pTooltip]="'measureUnits' | translate">
-    <i class="app-icon unit-selection-alt" [ngStyle]="{ fontSize: '.7rem' }"></i>
-  </div>
   <div class="item" [routerLink]="['/offices/permission']" [queryParams]="{ idOffice: currentIDOffice }" [class.ofc-opened]="isMenuOfficeConfigurationOpen(MenuOfficeConfigurationButtons.OFFICES_PERMISSION)"
     [pTooltip]="'officePermissions' | translate">
     <i class="app-icon permission" [ngStyle]="{ fontSize: '1.3rem' }"></i>
@@ -88,6 +84,10 @@
   [class.adm-opened]="isMenuAdminOpen(MenuAdminButtons.DOMAINS)"
   [pTooltip]="'domains' | translate">
   <i class="app-icon map-marked" [ngStyle]="{ fontSize: '1.3rem' }"></i>
+  </div>
+    <div class="item" [routerLink]="['/measure-units']" [class.adm-opened]="isMenuAdminOpen(MenuAdminButtons.MEASURE_UNITS)"
+    [pTooltip]="'measureUnits' | translate">
+    <i class="app-icon unit-selection-alt" [ngStyle]="{ fontSize: '.7rem' }"></i>
   </div>
 </ng-template>
 

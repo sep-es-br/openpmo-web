@@ -52,6 +52,8 @@ export class MeasureUnitComponent implements OnInit {
   cardProperties: ICard;
   isLoading = false;
   term = '';
+  showBackToManagement = false;
+  infoPerson;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -86,7 +88,7 @@ export class MeasureUnitComponent implements OnInit {
     this.cardProperties = {
       toggleable: false,
       initialStateToggle: false,
-      cardTitle: '',
+      cardTitle: 'measureUnits',
       collapseble: false,
       initialStateCollapse: false,
     };
@@ -97,26 +99,27 @@ export class MeasureUnitComponent implements OnInit {
     await this.getOfficeById();
     this.breadcrumbSrv.setMenu([
       {
-        key: 'officeConfiguration',
-        info: this.propertiesOffice?.name,
-        tooltip: this.propertiesOffice?.fullName,
-        routerLink: ['/configuration-office'],
-        admin: true,
-        queryParams: { idOffice: this.idOffice }
+        key: 'administration',
+        routerLink: ['/administration'],
       },
       {
-        key: 'configuration',
-        info: 'measureUnits',
-        tooltip: this.translateSrv.instant('measureUnits'),
-        admin: true,
+        key: 'measureUnits',
         routerLink: ['/measure-units'],
-        queryParams: { idOffice: this.idOffice }
       }
     ]);
+    this.checkShowBackToManagement();
   }
 
   async getOfficeById() {
     this.propertiesOffice = await this.officeSrv.getCurrentOffice(this.idOffice);
+  }
+
+  checkShowBackToManagement() {
+    this.infoPerson = this.authSrv.getInfoPerson();
+    if (this.infoPerson && this.infoPerson.workLocal &&
+      (this.infoPerson.workLocal.idOffice || this.infoPerson.workLocal.idPlan || this.infoPerson.workLocal.idWorkpack)) {
+      this.showBackToManagement = true;
+    }
   }
 
   async loadMeasureUnitList() {
@@ -163,6 +166,45 @@ export class MeasureUnitComponent implements OnInit {
     }
     this.totalRecords = this.cardItemsProperties && this.cardItemsProperties.length;
     this.cardProperties.showCreateNemElementButton = this.editPermission ? true : false;
+  }
+
+   async navigateToManagement() {
+    const workLocal = this.infoPerson.workLocal;
+    if (workLocal.idWorkpackModelLinked && workLocal.idWorkpack && workLocal.idPlan && workLocal.idOffice) {
+      this.router.navigate(['workpack'], {
+        queryParams: {
+          id: Number(workLocal.idWorkpack),
+          idPlan: Number(workLocal.idPlan),
+          idWorkpackModelLinked: Number(workLocal.idWorkpackModelLinked)
+        }
+      });
+      return;
+    }
+    if (workLocal.idWorkpack && workLocal.idPlan && workLocal.idOffice) {
+      this.router.navigate(['workpack'], {
+        queryParams: {
+          id: Number(workLocal.idWorkpack),
+          idPlan: Number(workLocal.idPlan),
+        }
+      });
+      return;
+    }
+    if (workLocal.idPlan && workLocal.idOffice) {
+      this.router.navigate(['plan'], {
+        queryParams: {
+          id: Number(workLocal.idPlan),
+        }
+      });
+      return;
+    }
+    if (workLocal.idOffice) {
+      this.router.navigate(['offices/office'], {
+        queryParams: {
+          id: Number(workLocal.idOffice),
+        }
+      });
+      return;
+    }
   }
 
   loadFormsMeasureUnits() {
