@@ -125,7 +125,6 @@ export class MeasureUnitComponent implements OnInit {
   async loadMeasureUnitList() {
     this.isLoading = true;
     const result = await this.measureUnitSvr.GetAll({
-      idOffice: this.idOffice,
       idFilter: this.idFilterSelected,
       term: this.term
     });

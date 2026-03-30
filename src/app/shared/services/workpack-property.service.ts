@@ -381,11 +381,8 @@ export class WorkpackPropertyService {
     }
   }
 
-  async loadUnitMeasuresOffice(idOffice) {
-    if (!idOffice) {
-      return [];
-    }
-    const result = await this.unitMeasureSrv.GetAll({ idOffice });
+  async loadUnitMeasuresOffice() {
+    const result = await this.unitMeasureSrv.GetAll();
     if (result.success) {
       const units = result.data;
       return units.map(org => ({
