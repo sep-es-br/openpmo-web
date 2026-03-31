@@ -290,9 +290,7 @@ export class WorkpackPropertyService {
       }
     }
     if (this.typePropertyModel[propertyModel.type] === TypePropertyModelEnum.UnitSelectionModel) {
-      property.possibleValuesIds = await this.loadUnitMeasuresOffice
-        (!!this.workpackParams.idOfficeOwnerWorkpackLinked ?
-          this.workpackParams.idOfficeOwnerWorkpackLinked : this.workpackParams.idOffice);
+      property.possibleValuesIds = await this.loadUnitMeasuresOffice();
       property.selectedValue = propertyWorkpack?.selectedValue ? propertyWorkpack?.selectedValue : propertyModel.defaults as number;
       property.defaults = propertyModel.defaults as number;
     }
