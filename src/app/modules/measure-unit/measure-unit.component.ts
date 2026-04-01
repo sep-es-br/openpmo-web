@@ -85,6 +85,7 @@ export class MeasureUnitComponent implements OnInit {
 
 
   async ngOnInit() {
+
     this.cardProperties = {
       toggleable: false,
       initialStateToggle: false,
@@ -93,7 +94,10 @@ export class MeasureUnitComponent implements OnInit {
       initialStateCollapse: false,
     };
     this.isUserAdmin = await this.authSrv.isUserAdmin();
-    this.editPermission = await this.officePermissionSrv.getPermissions(this.idOffice);
+    this.editPermission = this.isUserAdmin;
+    if (!this.isUserAdmin) {
+      this.router.navigate(['/offices']);
+    }
     await this.loadFiltersUnitMeansures();
     await this.loadMeasureUnitList();
     await this.getOfficeById();
