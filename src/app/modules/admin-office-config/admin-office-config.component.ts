@@ -126,14 +126,6 @@ export class AdminOfficeConfigComponent implements OnInit {
       },
       {
         typeCardItem: 'listItem',
-        icon: 'fas fa-ruler-horizontal',
-        nameCardItem: this.translateSvr.instant('measureUnits'),
-        fullNameCardItem: this.translateSvr.instant('measureUnits'),
-        urlCard: '/measure-units',
-        paramsUrlCard: [{ name: 'idOffice', value: this.idOffice }]
-      },
-      {
-        typeCardItem: 'listItem',
         icon: 'fas fa-lock',
         nameCardItem: this.translateSvr.instant('permissions'),
         fullNameCardItem: this.translateSvr.instant('permissions'),

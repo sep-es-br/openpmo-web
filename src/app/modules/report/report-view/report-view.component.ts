@@ -276,7 +276,7 @@ export class ReportViewComponent implements OnInit, OnDestroy {
       }
     }
     if (this.typePropertyModel[propertyModel.type] === TypePropertyModelEnum.UnitSelectionModel) {
-      property.possibleValuesIds = await this.loadUnitMeasuresOffice(this.propertiesOffice.id);
+      property.possibleValuesIds = await this.loadUnitMeasuresOffice();
       property.selectedValue = propertyModel.defaults as number;
       property.defaults = propertyModel.defaults as number;
     }
@@ -357,11 +357,9 @@ export class ReportViewComponent implements OnInit, OnDestroy {
     }
   }
 
-  async loadUnitMeasuresOffice(idOffice) {
-    if (!idOffice) {
-      return [];
-    }
-    const result = await this.unitMeasureSrv.GetAll({ idOffice });
+  async loadUnitMeasuresOffice() {
+
+    const result = await this.unitMeasureSrv.GetAll();
     if (result.success) {
       const units = result.data;
       return units.map(org => ({
