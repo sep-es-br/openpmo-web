@@ -952,9 +952,7 @@ export class CostAccountComponent implements OnInit {
   }
 
   async loadUnitMeasuresOffice() {
-    const result = await this.unitMeasureSrv.GetAll({
-      idOffice: this.idOffice,
-    });
+    const result = await this.unitMeasureSrv.GetAll();
     if (result.success) {
       const units = result.data;
       return units
