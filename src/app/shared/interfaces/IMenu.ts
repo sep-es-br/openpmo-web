@@ -15,14 +15,14 @@ export enum MenuButtons {
 export enum MenuAdminButtons {
   DOMAINS = 'domains',
   ADMINISTRATORS = 'administrators',
-  ADMINISTRATION = 'administration'
+  ADMINISTRATION = 'administration',
+  MEASURE_UNITS = 'measure-units'
 }
 
 export enum MenuOfficeConfigurationButtons {
   ORGANIZATIONS = 'organizations',
-  MEASURE_UNITS = 'measure-units',
   OFFICES_PERMISSION = 'offices/permission',
-  PERSONS = 'persons',
+  PERSONS = 'persons'
 }
 
 export interface IMenu {

@@ -138,13 +138,13 @@ async ngOnInit() {
             fullNameCardItem: this.translateSvr.instant('domain'),
             urlCard: '/domains'
         },
-        // {
-        //     typeCardItem: 'listItem',
-        //     icon: 'fas fa-ruler-horizontal',
-        //     nameCardItem: this.translateSvr.instant('measureUnits'),
-        //     fullNameCardItem: this.translateSvr.instant('measureUnits'),
-        //     urlCard: '/measure-units'
-        // }
+        {
+            typeCardItem: 'listItem',
+            icon: 'fas fa-ruler-horizontal',
+            nameCardItem: this.translateSvr.instant('measureUnits'),
+            fullNameCardItem: this.translateSvr.instant('measureUnits'),
+            urlCard: '/measure-units'
+        }
     ];
 
     setTimeout(() => {
