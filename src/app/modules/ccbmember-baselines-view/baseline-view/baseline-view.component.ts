@@ -129,6 +129,14 @@ export class BaselineViewComponent implements OnInit, OnDestroy {
     }
   }
 
+  getFilteredEvaluations() {
+    if (!this.baseline?.evaluations) return [];
+    if (this.baseline.status === 'APPROVED') {
+      return this.baseline.evaluations.filter(e => e.decision === 'APPROVED');
+    }
+    return this.baseline.evaluations;
+  }
+
   checkEvaluation() {
     this.baselineEvaluatedByUser =
       this.baseline.evaluations &&

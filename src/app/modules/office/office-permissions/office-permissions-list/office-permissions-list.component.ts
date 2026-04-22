@@ -149,6 +149,7 @@ export class OfficePermissionsListComponent implements OnInit {
           roleDescription: (p.permissions.filter(r => r.level === 'EDIT').length > 0
             ? this.translateSrv.instant('edit')
             : this.translateSrv.instant('read')),
+          isCCMMember: p.permissions.some(r => r.ccmMember === true),
           menuItems: [{
             label: this.translateSrv.instant('delete'),
             icon: 'fas fa-trash-alt',
