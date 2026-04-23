@@ -32,6 +32,12 @@ export class IndicatorService extends BaseService<IIndicator> {
     async loadIndicators(params?) {
         this.workpackData = this.workpackSrv.getWorkpackData();
         this.workpackParams = this.workpackSrv.getWorkpackParams();
+        
+        if (!this.workpackParams?.idWorkpack) {
+            this.loading = false;
+            return;
+          }
+        
         if (this.workpackData && this.workpackData?.workpack?.id && this.workpackData?.workpackModel) {
             if (!this.workpackParams.idWorkpackModelLinked || (this.workpackSrv.getEditPermission() && !!this.workpackParams.idWorkpackModelLinked)) {
                 if (params) {
