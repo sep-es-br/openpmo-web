@@ -94,7 +94,7 @@ export class IndicatorService extends BaseService<IIndicator> {
         return this.http.get(`${this.urlBase}/office/${idOffice}`)
     }
 
-    loadUnitMeasureFromOffice(idOffice: number) {
-        return this.http.get(`${this.urlBase}/unitMeasure/${idOffice}`)
+    loadUnitMeasure() {
+        return this.http.get(`${this.urlBase}/unitMeasure`)
     }
 }
