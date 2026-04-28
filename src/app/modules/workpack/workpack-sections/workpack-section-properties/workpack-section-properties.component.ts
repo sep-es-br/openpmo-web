@@ -112,6 +112,20 @@ export class WorkpackSectionPropertiesComponent implements OnInit, OnDestroy {
 
     this.sectionPropertiesProperties = properties;
 
+    this.sectionPropertiesProperties = this.sectionPropertiesProperties
+    .map(prop => {
+      if (prop.type === TypePropertyModelEnum.GroupModel && Array.isArray(prop.groupedProperties)) {
+        prop.groupedProperties = prop.groupedProperties.filter(child => child.active);
+      }
+      return prop;
+    })
+    .filter(prop => {
+      if (prop.type === TypePropertyModelEnum.GroupModel) {
+        return prop.groupedProperties && prop.groupedProperties.length > 0;
+      }
+      return true;
+    });
+    
     this.sectionPropertiesProperties.forEach((prop) => {
       prop.typeWorkPack = typeWorkPack as unknown as TypeWorkpackEnumWBS;
 
