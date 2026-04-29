@@ -65,10 +65,14 @@ export class AuthService {
   }
 
   async signOut() {
-    this.clearStorage();
-    this.userLogout.next(true);
-    this.currentUserInfo = undefined;
-    window.location.href = 'https://acessocidadao.es.gov.br/is/logout';
+    this.http.post(`${this.appConfig.API}/logout`, {}).subscribe({
+      next: () => {
+        this.router.navigateByUrl('/');
+        this.clearStorage();
+        this.userLogout.next(true);
+        this.currentUserInfo = undefined;
+      }
+    });
   }
 
   async signOutCitizenAccess() {
@@ -157,7 +161,7 @@ export class AuthService {
   }
 
   private getUrlForAuth() {
-    return `${this.appConfig.API}/oauth2/authorization/idsvr?front_callback_url=${this.getFrontFallbackUrl()}`;
+    return `${this.appConfig.API}/oauth2/authorization/${this.appConfig.authProvider}?front_callback_url=${this.getFrontFallbackUrl()}`;
   }
   private getUrlForSignout(token: string) {
     return `${this.appConfig.API}/signout?token=${token}`;
