@@ -314,6 +314,7 @@ export class PlanPermissionsComponent implements OnInit, OnDestroy {
           { label: this.translateSrv.instant('none'), value: 'NONE' }
         ],
         selectedOption: p.level,
+        isCCMMember: !!p.ccmMember,
         readOnly: this.isSamePerson
       }));
       const rolesNotPermissions = this.permission?.permissions ? this.permission?.person?.roles
@@ -401,7 +402,8 @@ export class PlanPermissionsComponent implements OnInit, OnDestroy {
       {
         id: cardItem.itemId,
         role: cardItem.titleCardItem,
-        level: cardItem.selectedOption
+        level: cardItem.selectedOption,
+        ccmMember: !!cardItem.isCCMMember
       }
     ));
     const permission: IPlanPermission = {

@@ -259,6 +259,7 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
             { label: this.translateSrv.instant('none'), value: 'NONE' },
           ],
           selectedOption: p.level,
+          isCCMMember: !!p.ccmMember,
           itemId: p.id,
         }));
       const rolesNotPermissions = this.permission?.permissions
@@ -475,13 +476,14 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
   async savePermission() {
     this.cancelButton.hideButton();
     this.formIsSaving = true;
-    this.permission.permissions = this.cardItemsOfficePermission.map(
-      (cardItem) => ({
+    this.permission.permissions = this.cardItemsOfficePermission
+      .filter(p => p.selectedOption && p.selectedOption !== 'NONE')
+      .map(cardItem => ({
         id: cardItem.itemId,
         role: cardItem.titleCardItem,
         level: cardItem.selectedOption,
-      })
-    );
+        ccmMember: !!cardItem.isCCMMember,
+    }));
 
     const permission: IOfficePermission = {
       idOffice: this.idOffice,

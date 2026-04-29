@@ -1,7 +1,7 @@
 <div class="app-ccb-list">
   <div class="header-container" [class.mobile]="responsive">
     <div class="app-content-header" [class.mobile]="responsive" *ngIf="idProject">
-      <span class="label"> {{'project' | translate}}: </span>
+      <span *ngIf="modelName" class="label"> {{ modelName }}: </span>
       <span class="text"> {{ projectName }}</span>
     </div>
     <app-config-data-view-panel [notShowCollapseOptions]="true">

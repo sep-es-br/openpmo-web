@@ -253,11 +253,8 @@ export class ControlChangeBoardMemberComponent implements OnInit, OnDestroy {
         this.ccbMember = data;
         if (this.ccbMember) {
           this.setFormPerson(this.ccbMember.person);
-          if (!this.ccbMember.memberAs) {
-            this.setMemberAsCcbMember(this.ccbMember.person);
-          } else {
-            this.ccbMemberAsBackup = this.ccbMember.memberAs.map( item => ({...item}));
-          }
+          this.setMemberAsCcbMember(this.ccbMember.person);
+          this.ccbMemberAsBackup = this.ccbMember.memberAs.map(item => ({ ...item }));
         }
         this.isLoading = false;
       }
@@ -273,11 +270,31 @@ export class ControlChangeBoardMemberComponent implements OnInit, OnDestroy {
   }
 
   setMemberAsCcbMember(person: IPerson) {
-    this.ccbMember.memberAs = person && person.roles ? person.roles.map(role => ({
-      active: false,
+    const current = this.ccbMember.memberAs || [];
+    const personRoles = person?.roles || [];
+
+    const normalizedPersonRoles = personRoles.map(role => ({
       role: this.translateSrv.instant(role.role),
       workLocation: role.workLocation
-    })) : [];
+    }));
+
+    const allRoles = [...current, ...normalizedPersonRoles];
+
+    const unique = allRoles.reduce((acc: any[], item: any) => {
+      const exists = acc.find(m => m.role === item.role);
+
+      if (!exists) {
+        acc.push({
+          active: 'active' in item ? item.active : false,
+          role: item.role,
+          workLocation: item.workLocation
+        });
+      }
+
+      return acc;
+    }, []);
+
+    this.ccbMember.memberAs = unique;
   }
 
   async getAuthServer() {
@@ -432,8 +449,13 @@ export class ControlChangeBoardMemberComponent implements OnInit, OnDestroy {
     if (phoneNumber) {
       phoneNumber = phoneNumber.replace(/\D+/g, '');
     }
+
+    const filteredMemberAs = (this.ccbMember.memberAs || [])
+    .filter(m => m.active);
+
     const sender = {
       ...this.ccbMember,
+      memberAs: filteredMemberAs,
       idOffice: this.plan.idOffice,
       idWorkpack: this.idProject,
       person: {

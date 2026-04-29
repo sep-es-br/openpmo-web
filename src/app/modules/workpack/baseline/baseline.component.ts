@@ -199,6 +199,18 @@ export class BaselineComponent implements OnInit, OnDestroy {
       : [];
   }
 
+  getFilteredEvaluations(): any[] {
+    if (!this.baseline?.evaluations) {
+      return [];
+    }
+
+    if (this.baseline.status === 'APPROVED') {
+      return this.baseline.evaluations.filter(e => e.decision === 'APPROVED');
+    }
+
+    return this.baseline.evaluations;
+  }
+
   getRouterLinkFromType(type: string): string[] {
     switch (type) {
       case 'office':

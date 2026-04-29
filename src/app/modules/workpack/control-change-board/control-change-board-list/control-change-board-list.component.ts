@@ -46,6 +46,7 @@ export class ControlChangeBoardListComponent implements OnInit, OnDestroy {
   showInactive = false;
   idPlan: number;
   isLoading = false;
+  modelName: string;
 
   constructor(
     private controlChangeBoardSvr: ControlChangeBoardService,
@@ -77,10 +78,12 @@ export class ControlChangeBoardListComponent implements OnInit, OnDestroy {
     this.isLoading = true;
     await this.loadPropertiesProject();
     await this.loadControlChangeBoard();
+
     let breadcrumbItems = this.breadcrumbSrv.get;
-    this.breadcrumbSrv.setMenu([
+
+    const newBreadcrumb = [
       ...breadcrumbItems,
-      ...[{
+      {
         key: 'changeControlBoard',
         info: 'ccbMembers',
         routerLink: ['/workpack/change-control-board'],
@@ -88,8 +91,15 @@ export class ControlChangeBoardListComponent implements OnInit, OnDestroy {
           idProject: this.idProject,
           idOffice: this.idOffice
         },
-      }]
-    ]);
+      }
+    ];
+
+    const lastItem = breadcrumbItems[breadcrumbItems.length - 1];
+    if (lastItem) {
+      this.modelName = lastItem.modelName;
+    }
+
+    this.breadcrumbSrv.setMenu(newBreadcrumb);
   }
 
   ngOnDestroy(): void {

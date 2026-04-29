@@ -9,6 +9,7 @@
   </p-header>
   <div class="card-item-content" (click)="navigateToPage(properties.urlCard, properties.paramsUrlCard)">
     <span class="card-item-role-description">{{properties.roleDescription}}</span>
+    <span class="ccm-text" *ngIf="properties.isCCMMember"> Membro do CCM</span>
   </div>
   <div class="card-item-footer" *ngIf="cardIdItem"
     (click)="navigateToPage(properties.urlCard, properties.paramsUrlCard)">
@@ -34,6 +35,18 @@
         <i class="far fa-question-circle" [pTooltip]="'help.permission.level' | translate"></i>
       </label>
     </span>
+    <div class="card-header-toggle">
+      <p-inputSwitch 
+        class="app-toggle"
+        [(ngModel)]="properties.isCCMMember"
+        (onChange)="handleSelect()"
+        [disabled]="
+        isReadOnly || 
+        properties.readOnly || 
+        !(properties.selectedOption === 'READ' || properties.selectedOption === 'EDIT')">
+      </p-inputSwitch>
+      <span class="ccm-text">Membro do CCM</span>
+    </div>
   </div>
 </p-card>
 
