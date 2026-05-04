@@ -165,7 +165,7 @@ export class AdministratorComponent implements OnInit, OnDestroy {
   }
 
   async searchUserByEmail() {
-    
+
     if (this.searchedEmailUser && this.searchedEmailUser.length > 5 && this.searchedEmailUser.split('@').length > 1) {
       const {data} = await this.personSrv.GetByKey(this.searchedEmailUser);
       if (data) {
@@ -176,6 +176,7 @@ export class AdministratorComponent implements OnInit, OnDestroy {
           name: this.searchedEmailUser.split('@')[0],
           fullName: this.searchedEmailUser.split('@')[0],
           email: this.searchedEmailUser,
+          key: this.searchedEmailUser,
           administrator: true,
           isUser: true,
         };
@@ -218,7 +219,7 @@ export class AdministratorComponent implements OnInit, OnDestroy {
   async validateCpf() {
     this.citizenUserNotFoundByCpf = false;
     this.validCpf = cpfValidator(this.searchedCpfUser);
-    
+
     if (this.validCpf) {
       this.isLoading = true;
       const result = await this.citizenUserSrv.GetCitizenUserByCpf({
