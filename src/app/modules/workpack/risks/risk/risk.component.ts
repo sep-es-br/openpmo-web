@@ -381,9 +381,10 @@ export class RiskComponent implements OnInit, OnDestroy {
     const result = await this.issueSrv.CreateIssueFromRisk(this.idRisk);
     if (result.success) {
       const idIssue = result.data.id;
+      console.log('Issue created with id ', idIssue);
       await this.router.navigate(['/workpack/issues'], {
         queryParams: {
-          id: idIssue,
+            idIssue: idIssue,
           idWorkpack: this.idWorkpack,
           idWorkpackModelLinked: this.idWorkpackModelLinked,
           edit: this.editPermission
