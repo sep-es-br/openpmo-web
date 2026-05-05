@@ -89,6 +89,8 @@ export class MobileMenuComponent implements OnInit, OnDestroy {
 
   menuStateChanged = false;
 
+  isOfficeConfigMenu = false;
+
   isAdminMenu = false;
 
   parentsWorkpack = [];
@@ -170,13 +172,18 @@ export class MobileMenuComponent implements OnInit, OnDestroy {
 
     });
     this.menuSrv.obsReloadMenuPlanModel().pipe(takeUntil(this.$destroy)).subscribe(() => this.loadPlanModelMenu());
-    this.menuSrv.isAdminMenu.pipe(takeUntil(this.$destroy)).subscribe(isAdminMenu => {
-      this.isAdminMenu = isAdminMenu;
-      this.changeMenu.emit(this.isAdminMenu);
+    this.menuSrv.isOfficeConfigMenu.pipe(takeUntil(this.$destroy)).subscribe(isOfficeConfigMenu => {
+      this.isOfficeConfigMenu = isOfficeConfigMenu;
+      this.changeMenu.emit(this.isOfficeConfigMenu);
       this.updateMenuOfficeOnAdminChange();
-      if (isAdminMenu) {
+      if (isOfficeConfigMenu) {
         this.getOfficePermission();
       }
+    });
+    this.menuSrv.isAdminMenu
+      .pipe(takeUntil(this.$destroy))
+      .subscribe(isAdminMenu => {
+        this.isAdminMenu = isAdminMenu;
     });
     this.menuSrv.isPlanMenu.pipe(takeUntil(this.$destroy)).subscribe(isPlanMenu => {
       this.isPlanMenu = isPlanMenu;
@@ -211,7 +218,7 @@ export class MobileMenuComponent implements OnInit, OnDestroy {
       ? 'Admin'
       : (this.currentUserInfo.name?.split(' ').shift() || payload.email);
     this.getMenuModeUser();
-    this.changeMenu.emit(this.isAdminMenu);
+    this.changeMenu.emit(this.isOfficeConfigMenu || this.isAdminMenu);
   }
 
   async loadCurrentInfo() {
@@ -250,7 +257,7 @@ export class MobileMenuComponent implements OnInit, OnDestroy {
 
   updateMenuOfficeOnAdminChange() {
     this.itemsOffice = this.itemsOffice && this.itemsOffice
-      .map((office, i) => ((office.items = this.isAdminMenu ? undefined : this.itemsOfficeUnchanged[i].items), office));
+      .map((office, i) => ((office.items = this.isOfficeConfigMenu ? undefined : this.itemsOfficeUnchanged[i].items), office));
   }
 
   async getOfficePermission() {
@@ -321,7 +328,7 @@ export class MobileMenuComponent implements OnInit, OnDestroy {
           const classList = Array.from(e.originalEvent?.target?.classList) || [];
           if (classList.some((className: string) => ['p-menuitem-text', 'fas', 'app-icon'].includes(className))) {
             e.item.expanded = false;
-            if (this.isAdminMenu) {
+            if (this.isOfficeConfigMenu) {
               this.router.navigate(['/configuration-office'], { queryParams: { idOffice: office.id } });
             } else {
               this.router.navigate(['/offices', 'office'], { queryParams: { id: office.id } });
@@ -329,7 +336,7 @@ export class MobileMenuComponent implements OnInit, OnDestroy {
             this.closeAllMenus();
           }
         },
-        items: !this.isAdminMenu && office.plans
+        items: !this.isOfficeConfigMenu && office.plans
           ? office.plans.map(plan =>
           ({
             label: plan.name,
@@ -700,7 +707,7 @@ export class MobileMenuComponent implements OnInit, OnDestroy {
   async setBreadcrumbStorage(idOffice, planModelSelected, workpackModel, parents, parent) {
     this.itemsBreadcrumb = [
       {
-        key: 'administration',
+        key: 'officeConfiguration',
         info: this.propertiesOffice?.name,
         tooltip: this.propertiesOffice?.fullName,
         routerLink: ['/configuration-office'],

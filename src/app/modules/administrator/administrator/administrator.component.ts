@@ -176,6 +176,7 @@ export class AdministratorComponent implements OnInit, OnDestroy {
           name: this.searchedEmailUser.split('@')[0],
           fullName: this.searchedEmailUser.split('@')[0],
           email: this.searchedEmailUser,
+          key: this.searchedEmailUser,
           administrator: true,
           key: this.searchedEmailUser,
           isUser: true,

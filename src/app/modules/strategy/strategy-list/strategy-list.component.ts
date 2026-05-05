@@ -104,7 +104,7 @@ export class StrategyListComponent implements OnInit, OnDestroy {
   setBreadcrumb() {
     this.breadcrumbSrv.setMenu([
       {
-        key: 'administration',
+        key: 'officeConfiguration',
         info: this.propertiesOffice?.name,
         tooltip: this.propertiesOffice?.fullName,
         routerLink: ['/configuration-office'],
@@ -284,7 +284,7 @@ export class StrategyListComponent implements OnInit, OnDestroy {
   setBreadcrumbStorage(idFilter?) {
     const breadcrumb = idFilter ?
     [{
-      key: 'administration',
+      key: 'officeConfiguration',
       info: this.propertiesOffice?.name,
       tooltip: this.propertiesOffice?.fullName,
       admin: true,
@@ -300,7 +300,7 @@ export class StrategyListComponent implements OnInit, OnDestroy {
       queryParams: { idOffice: this.idOffice }
     }] : 
     [{
-      key: 'administration',
+      key: 'officeConfiguration',
       info: this.propertiesOffice?.name,
       tooltip: this.propertiesOffice?.fullName,
       admin: true,

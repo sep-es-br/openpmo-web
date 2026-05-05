@@ -404,7 +404,7 @@ export class WorkpackModelComponent implements OnInit {
     const { idOffice, idStrategy, workpackModelType: type } = this;
     return [
       {
-        key: 'administration',
+        key: 'officeConfiguration',
         info: this.propertiesOffice?.name,
         tooltip: this.propertiesOffice?.fullName,
         routerLink: ['/configuration-office'],
@@ -1127,7 +1127,6 @@ export class WorkpackModelComponent implements OnInit {
       const result = await this.domainSrv.GetAll();
       if (result.success) {
         this.listDomains = result.data
-          .filter(d => d.office?.id === this.idOffice)
           .map(d => ({ label: d.name, value: d.id }));
       }
     }

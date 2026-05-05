@@ -87,7 +87,7 @@ export class OrganizationListComponent implements OnInit, OnDestroy {
     await this.getOfficeById();
     this.breadcrumbSrv.setMenu([
       {
-        key: 'administration',
+        key: 'officeConfiguration',
         info: this.propertiesOffice?.name,
         tooltip: this.propertiesOffice?.fullName,
         routerLink: ['/configuration-office'],
@@ -241,7 +241,7 @@ export class OrganizationListComponent implements OnInit, OnDestroy {
 
   setBreadcrumbStorage(idFilter?) {
     const breadCrumb = idFilter ? [{
-      key: 'administration',
+      key: 'officeConfiguration',
       info: this.propertiesOffice?.name,
       tooltip: this.propertiesOffice?.fullName,
       admin: true,
@@ -257,7 +257,7 @@ export class OrganizationListComponent implements OnInit, OnDestroy {
       queryParams: { idOffice: this.idOffice }
     }] :
     [{
-      key: 'administration',
+      key: 'officeConfiguration',
       info: this.propertiesOffice?.name,
       tooltip: this.propertiesOffice?.fullName,
       admin: true,

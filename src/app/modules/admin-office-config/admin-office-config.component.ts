@@ -126,23 +126,6 @@ export class AdminOfficeConfigComponent implements OnInit {
       },
       {
         typeCardItem: 'listItem',
-        iconSvg: true,
-        icon: IconsEnum.MapMarked,
-        nameCardItem: this.translateSvr.instant('domains'),
-        fullNameCardItem: this.translateSvr.instant('domains'),
-        urlCard: '/domains',
-        paramsUrlCard: [{ name: 'idOffice', value: this.idOffice }]
-      },
-      {
-        typeCardItem: 'listItem',
-        icon: 'fas fa-ruler-horizontal',
-        nameCardItem: this.translateSvr.instant('measureUnits'),
-        fullNameCardItem: this.translateSvr.instant('measureUnits'),
-        urlCard: '/measure-units',
-        paramsUrlCard: [{ name: 'idOffice', value: this.idOffice }]
-      },
-      {
-        typeCardItem: 'listItem',
         icon: 'fas fa-lock',
         nameCardItem: this.translateSvr.instant('permissions'),
         fullNameCardItem: this.translateSvr.instant('permissions'),
@@ -169,7 +152,7 @@ export class AdminOfficeConfigComponent implements OnInit {
 
   setBreadcrumb() {
     this.breadcrumbSrv.setMenu([{
-      key: 'administration',
+      key: 'officeConfiguration',
       info: this.propertiesOffice?.name,
       tooltip: this.propertiesOffice?.fullName,
       routerLink: ['/configuration-office'],

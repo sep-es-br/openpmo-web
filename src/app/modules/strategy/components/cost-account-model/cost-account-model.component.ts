@@ -197,7 +197,7 @@ export class CostAccountModelComponent implements OnInit {
     await this.loadPropertiesStrategy();
     this.breadcrumbSrv.setMenu([
       {
-        key: 'administration',
+        key: 'officeConfiguration',
         info: this.propertiesOffice?.name,
         tooltip: this.propertiesOffice?.fullName,
         routerLink: ['/configuration-office'],

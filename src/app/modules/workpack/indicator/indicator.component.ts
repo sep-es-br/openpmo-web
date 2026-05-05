@@ -178,7 +178,7 @@ export class IndicatorComponent implements OnInit, OnDestroy {
     await this.calculateYearRange();
     await this.loadPropertiesIndicator();
     await this.loadFontOptions(this.idOffice);
-    await this.loadUnitMeasure(this.idOffice);
+    await this.loadUnitMeasure();
     await this.setBreadcrumb();
   }
 
@@ -289,10 +289,10 @@ export class IndicatorComponent implements OnInit, OnDestroy {
     });
   }
 
-  async loadUnitMeasure(idOffice: number) {
+  async loadUnitMeasure() {
     return new Promise<void>((resolve) => {
       this.indicatorSrv
-        .loadUnitMeasureFromOffice(idOffice)
+        .loadUnitMeasure()
         .subscribe((data: any) => {
           this.unitMeasureOptions = data.data.map((item) => ({
             name: item,

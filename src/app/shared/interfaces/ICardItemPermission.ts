@@ -16,4 +16,5 @@ export interface ICardItemPermission {
   readOnly?: boolean;
   canDelete?: boolean;
   office?: IOffice;
+  isCCMMember?: boolean;
 }

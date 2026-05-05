@@ -34,7 +34,7 @@ export class CardItemPermissionComponent implements OnInit {
 
   ngOnInit(): void {
     this.cardIdItem = this.properties.itemId || this.properties.itemId === 0 ?
-    `${ this.properties.itemId < 10 && this.properties.itemId !== 0 ? '0'+this.properties.itemId : this.properties.itemId}` : ''; 
+    `${ this.properties.itemId < 10 && this.properties.itemId !== 0 ? '0'+this.properties.itemId : this.properties.itemId}` : '';
   }
 
   navigateToPage(url: string, params?: {name: string; value: string | number}[]) {
@@ -51,6 +51,15 @@ export class CardItemPermissionComponent implements OnInit {
   }
 
   handleSelect() {
+    const level = this.properties.selectedOption;
+    const isAllowed = level === 'READ' || level === 'EDIT';
+    if (!isAllowed) {
+      this.properties.isCCMMember = false;
+      setTimeout(() => {
+        this.changeSelected.next();
+      });
+      return;
+    }
     this.changeSelected.next();
   }
 
