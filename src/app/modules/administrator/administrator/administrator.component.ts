@@ -178,7 +178,6 @@ export class AdministratorComponent implements OnInit, OnDestroy {
           email: this.searchedEmailUser,
           key: this.searchedEmailUser,
           administrator: true,
-          key: this.searchedEmailUser,
           isUser: true,
         };
         this.showMessageNotFoundUserByEmail = true;
