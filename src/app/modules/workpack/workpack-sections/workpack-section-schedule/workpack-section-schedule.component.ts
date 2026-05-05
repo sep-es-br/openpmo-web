@@ -490,7 +490,7 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
                     {
                       label: this.translateSrv.instant('properties'),
                       icon: 'fas fa-edit',
-                      command: () =>
+                      command: () => this.unitMeansure &&
                         this.editScheduleStep(
                           step.id,
                           this.unitMeansure.name,
@@ -558,9 +558,9 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
 
           const groupProgressBar = [
             {
-              total: Number(group.planed.toFixed(this.unitMeansure.precision)),
+              total: Number(group.planed.toFixed(this.unitMeansure?.precision ?? 2)),
               progress: Number(
-                group.actual.toFixed(this.unitMeansure.precision)
+                group.actual.toFixed(this.unitMeansure?.precision ?? 2)
               ),
               planned: group.steps.reduce(
                 (total, step) => total + (step.baselinePlannedWork || 0),
@@ -637,15 +637,15 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
       const startScheduleStep = !!this.editPermission && {
         type: 'newStart',
         stepOrder: 'newStart',
-        unitName: this.unitMeansure.name,
-        unitPrecision: this.unitMeansure.precision,
+        unitName: this.unitMeansure?.name,
+        unitPrecision: this.unitMeansure?.precision,
       };
 
       const endScheduleStep = !!this.editPermission && {
         type: 'newEnd',
         stepOrder: 'newEnd',
-        unitName: this.unitMeansure.name,
-        unitPrecision: this.unitMeansure.precision,
+        unitName: this.unitMeansure?.name,
+        unitPrecision: this.unitMeansure?.precision,
       };
 
       const initialDatePlanned = moment(startDate);
@@ -684,10 +684,10 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
           progressBarValues: [
             {
               total: Number(
-                this.schedule.planed.toFixed(this.unitMeansure.precision)
+                this.schedule.planed.toFixed(this.unitMeansure?.precision ?? 2)
               ),
               progress: Number(
-                this.schedule.actual.toFixed(this.unitMeansure.precision)
+                this.schedule.actual.toFixed(this.unitMeansure?.precision ?? 2)
               ),
               labelTotal: this.foreseenLabel,
               labelProgress: 'actual',
@@ -696,7 +696,7 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
               barHeight: 17,
               baselinePlanned: Number(
                 this.schedule.baselinePlaned.toFixed(
-                  this.unitMeansure.precision
+                  this.unitMeansure?.precision ?? 2
                 )
               ),
               type: 'scope',
@@ -710,7 +710,7 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
               color: '#6cd3bd',
               barHeight: 17,
               baselinePlanned: Number(
-                this.schedule.baselineCost.toFixed(this.unitMeansure.precision)
+                this.schedule.baselineCost.toFixed(this.unitMeansure?.precision ?? 2)
               ),
               type: 'cost',
             },
@@ -1068,7 +1068,7 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
             const resultValue = difference / month;
             const value =
               type === 'unitActual'
-                ? +resultValue.toFixed(this.unitMeansure.precision)
+                ? +resultValue.toFixed(this.unitMeansure?.precision ?? 2)
                 : +resultValue.toFixed(2);
             difference = difference - value;
             if (type === 'unitActual') {
@@ -1105,7 +1105,7 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
                 : values[index] * difference - values[index - 1] * difference;
             const value =
               type === 'unitActual'
-                ? +resultValue.toFixed(this.unitMeansure.precision)
+                ? +resultValue.toFixed(this.unitMeansure?.precision ?? 2)
                 : +resultValue.toFixed(2);
             if (type === 'unitActual') {
               step.unitPlanned = step.unitPlanned + value;
