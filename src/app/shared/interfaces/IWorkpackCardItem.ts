@@ -47,5 +47,6 @@ export interface IWorkpackCardItem {
   baselineName?: string;
   journalInformation?: IWorkpackJournalInformation;
   statusProperty?: ProjectStatus | DeliverableStatus;
+  canUseCCB?: boolean;
 }
 

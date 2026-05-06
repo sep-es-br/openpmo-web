@@ -11,4 +11,5 @@ interface IPermission {
   id?: number;
   level: string;
   role: string;
+  ccmMember?: boolean;
 }
