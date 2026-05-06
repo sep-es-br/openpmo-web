@@ -14,7 +14,7 @@ import { ConfigDataViewService } from 'src/app/shared/services/config-dataview.s
 import { TranslateService } from '@ngx-translate/core';
 import { WorkpackService } from 'src/app/shared/services/workpack.service';
 import { Router } from '@angular/router';
-import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, AfterViewInit } from '@angular/core';
 import { EMPTY, Subject, Subscription } from 'rxjs';
 import * as moment from 'moment';
 import { WorkpackShowTabviewService } from 'src/app/shared/services/workpack-show-tabview.service';
@@ -34,7 +34,7 @@ import { PentahoService } from 'src/app/shared/services/pentaho.service';
   templateUrl: './workpack-section-schedule.component.html',
   styleUrls: ['./workpack-section-schedule.component.scss'],
 })
-export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
+export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy, AfterViewInit {
   @ViewChild('cardCostEditPanel') cardCostEditPanel: OverlayPanel;
 
   @ViewChild(SaveButtonComponent) saveButton: SaveButtonComponent;
@@ -167,6 +167,12 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
       },
     };
 
+
+  }
+
+  runValidation = false;
+
+  ngAfterViewInit() {
     this.scheduleSrv.observableResetSchedule
       .pipe(takeUntil(this.$destroy))
       .subscribe((reset) => {
@@ -174,6 +180,11 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
           this.loadScheduleData();
         }
       });
+
+    if(this.runValidation) {
+      this.runAllValidations();
+      this.runValidation = false;
+    }
   }
 
   ngOnInit(): void {
@@ -192,7 +203,7 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
         this.abbreviatedLabel = response.data[1].body.data;
 
         await this.loadScheduleData();
-        this.runAllValidations();
+        this.runValidation = true;
       } catch (error) {
         console.error(error);
       }
@@ -213,7 +224,7 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
         );
         this.loadBaseline = false;
 
-        this.runAllValidations();
+        this.runValidation = true;
       });
 
   }
