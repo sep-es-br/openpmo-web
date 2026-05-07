@@ -14,7 +14,7 @@ import { ConfigDataViewService } from 'src/app/shared/services/config-dataview.s
 import { TranslateService } from '@ngx-translate/core';
 import { WorkpackService } from 'src/app/shared/services/workpack.service';
 import { Router } from '@angular/router';
-import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, AfterViewInit } from '@angular/core';
 import { EMPTY, Subject, Subscription } from 'rxjs';
 import * as moment from 'moment';
 import { WorkpackShowTabviewService } from 'src/app/shared/services/workpack-show-tabview.service';
@@ -34,7 +34,7 @@ import { PentahoService } from 'src/app/shared/services/pentaho.service';
   templateUrl: './workpack-section-schedule.component.html',
   styleUrls: ['./workpack-section-schedule.component.scss'],
 })
-export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
+export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy, AfterViewInit {
   @ViewChild('cardCostEditPanel') cardCostEditPanel: OverlayPanel;
 
   @ViewChild(SaveButtonComponent) saveButton: SaveButtonComponent;
@@ -167,6 +167,12 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
       },
     };
 
+
+  }
+
+  runValidation = false;
+
+  ngAfterViewInit() {
     this.scheduleSrv.observableResetSchedule
       .pipe(takeUntil(this.$destroy))
       .subscribe((reset) => {
@@ -174,6 +180,11 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
           this.loadScheduleData();
         }
       });
+
+    if(this.runValidation) {
+      this.runAllValidations();
+      this.runValidation = false;
+    }
   }
 
   ngOnInit(): void {
@@ -192,7 +203,7 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
         this.abbreviatedLabel = response.data[1].body.data;
 
         await this.loadScheduleData();
-        this.runAllValidations();
+        this.runValidation = true;
       } catch (error) {
         console.error(error);
       }
@@ -213,7 +224,7 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
         );
         this.loadBaseline = false;
 
-        this.runAllValidations();
+        this.runValidation = true;
       });
 
   }
@@ -490,7 +501,7 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
                     {
                       label: this.translateSrv.instant('properties'),
                       icon: 'fas fa-edit',
-                      command: () =>
+                      command: () => this.unitMeansure &&
                         this.editScheduleStep(
                           step.id,
                           this.unitMeansure.name,
@@ -558,9 +569,9 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
 
           const groupProgressBar = [
             {
-              total: Number(group.planed.toFixed(this.unitMeansure.precision)),
+              total: Number(group.planed.toFixed(this.unitMeansure?.precision ?? 2)),
               progress: Number(
-                group.actual.toFixed(this.unitMeansure.precision)
+                group.actual.toFixed(this.unitMeansure?.precision ?? 2)
               ),
               planned: group.steps.reduce(
                 (total, step) => total + (step.baselinePlannedWork || 0),
@@ -637,15 +648,15 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
       const startScheduleStep = !!this.editPermission && {
         type: 'newStart',
         stepOrder: 'newStart',
-        unitName: this.unitMeansure.name,
-        unitPrecision: this.unitMeansure.precision,
+        unitName: this.unitMeansure?.name,
+        unitPrecision: this.unitMeansure?.precision,
       };
 
       const endScheduleStep = !!this.editPermission && {
         type: 'newEnd',
         stepOrder: 'newEnd',
-        unitName: this.unitMeansure.name,
-        unitPrecision: this.unitMeansure.precision,
+        unitName: this.unitMeansure?.name,
+        unitPrecision: this.unitMeansure?.precision,
       };
 
       const initialDatePlanned = moment(startDate);
@@ -684,10 +695,10 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
           progressBarValues: [
             {
               total: Number(
-                this.schedule.planed.toFixed(this.unitMeansure.precision)
+                this.schedule.planed.toFixed(this.unitMeansure?.precision ?? 2)
               ),
               progress: Number(
-                this.schedule.actual.toFixed(this.unitMeansure.precision)
+                this.schedule.actual.toFixed(this.unitMeansure?.precision ?? 2)
               ),
               labelTotal: this.foreseenLabel,
               labelProgress: 'actual',
@@ -696,7 +707,7 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
               barHeight: 17,
               baselinePlanned: Number(
                 this.schedule.baselinePlaned.toFixed(
-                  this.unitMeansure.precision
+                  this.unitMeansure?.precision ?? 2
                 )
               ),
               type: 'scope',
@@ -710,7 +721,7 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
               color: '#6cd3bd',
               barHeight: 17,
               baselinePlanned: Number(
-                this.schedule.baselineCost.toFixed(this.unitMeansure.precision)
+                this.schedule.baselineCost.toFixed(this.unitMeansure?.precision ?? 2)
               ),
               type: 'cost',
             },
@@ -1068,7 +1079,7 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
             const resultValue = difference / month;
             const value =
               type === 'unitActual'
-                ? +resultValue.toFixed(this.unitMeansure.precision)
+                ? +resultValue.toFixed(this.unitMeansure?.precision ?? 2)
                 : +resultValue.toFixed(2);
             difference = difference - value;
             if (type === 'unitActual') {
@@ -1105,7 +1116,7 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy {
                 : values[index] * difference - values[index - 1] * difference;
             const value =
               type === 'unitActual'
-                ? +resultValue.toFixed(this.unitMeansure.precision)
+                ? +resultValue.toFixed(this.unitMeansure?.precision ?? 2)
                 : +resultValue.toFixed(2);
             if (type === 'unitActual') {
               step.unitPlanned = step.unitPlanned + value;

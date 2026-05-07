@@ -16,8 +16,8 @@ export class PersonService extends BaseService<IPerson>{
 
   private avatarChanged = new BehaviorSubject<boolean>(false);
   avatarFile: IFile;
-  private readonly _preferences = new BehaviorSubject<IPreferences>(undefined);
-  
+  private readonly preferences = new BehaviorSubject<IPreferences>(undefined);
+
 
   constructor(
     @Inject(Injector) injector: Injector
@@ -30,12 +30,14 @@ export class PersonService extends BaseService<IPerson>{
   }
 
   avatarChangedNext(nextValue: boolean) {
-    this.avatarChanged.next(nextValue)
+    this.avatarChanged.next(nextValue);
   }
 
 
   public async GetAllPersons(idOffice: number, options, paramsBody? ): Promise<IHttpResult<IPerson[]>> {
-    const result = await this.http.post<IHttpResult<IPerson[]>>(`${this.urlBase}/office/${idOffice}?${PrepareHttpParams(options)}`, paramsBody).toPromise();
+    const url = `${this.urlBase}/office/${idOffice}?${PrepareHttpParams(options)}`;
+
+    const result = await this.http.post<IHttpResult<IPerson[]>>(url, paramsBody).toPromise();
     if (!result.data?.length) {
       result.data = [];
     }
@@ -153,7 +155,9 @@ export class PersonService extends BaseService<IPerson>{
     const headers = new HttpHeaders({
       'Form-Data': 'true'
     });
-    const result = await this.http.post(`${this.urlBase}/${idPerson}/avatar`, file, { headers, params: PrepareHttpParams(options) }).toPromise();
+    const url = `${this.urlBase}/${idPerson}/avatar`;
+
+    const result = await this.http.post(url, file, { headers, params: PrepareHttpParams(options) }).toPromise();
     return result as IHttpResult<IFile>;
   }
 
@@ -233,22 +237,22 @@ export class PersonService extends BaseService<IPerson>{
   }
 
   get $preferences() {
-    return this._preferences.asObservable();
+    return this.preferences.asObservable();
   }
 
-  nextPreferences(preferences : Partial<IPreferences>) {
-    this._preferences.pipe(take(1)).subscribe({
+  nextPreferences(preferences: Partial<IPreferences>) {
+    this.preferences.pipe(take(1)).subscribe({
         next: (inPreferences) => {
             inPreferences = inPreferences ?? {} as IPreferences;
 
             Object.assign(inPreferences, preferences);
-            
-            this._preferences.next(inPreferences as IPreferences);
+
+            this.preferences.next(inPreferences as IPreferences);
         }
-    })    
+    });
   }
 
-  nextAndSavePreferences(preferences : Partial<IPreferences>) {
+  nextAndSavePreferences(preferences: Partial<IPreferences>) {
     forkJoin({
         preferencesResp: this.updatePreferences()
     }).pipe(map(({preferencesResp}) => ({inPreferences: preferencesResp.data})))
@@ -257,19 +261,19 @@ export class PersonService extends BaseService<IPerson>{
             inPreferences = inPreferences ?? {} as IPreferences;
 
             Object.assign(inPreferences, preferences);
-            
-            this._preferences.next(inPreferences as IPreferences);
+
+            this.preferences.next(inPreferences as IPreferences);
 
             this.http.put(`${this.urlBase}/preferences`, inPreferences).subscribe();
         }
-    })
-       
+    });
+
   }
 
-  updatePreferences() : Observable<IHttpResult<IPreferences>> {
+  updatePreferences(): Observable<IHttpResult<IPreferences>> {
     return this.http.get<IHttpResult<IPreferences>>(`${this.urlBase}/preferences`)
-    .pipe(tap(({success, data}) => success ? this._preferences.next(data) : undefined))
-     
+    .pipe(tap(({success, data}) => success ? this.preferences.next(data) : undefined));
+
   }
 
 }

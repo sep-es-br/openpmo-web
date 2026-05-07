@@ -1,5 +1,6 @@
 {
   "API": "http://localhost:8080/openpmo",
+  "authProvider": "idsvr",
   "authButtonIcon": "",
   "authButtonText": {
     "en-US": "Enter",
