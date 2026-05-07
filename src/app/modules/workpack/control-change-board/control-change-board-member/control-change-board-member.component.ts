@@ -331,7 +331,7 @@ export class ControlChangeBoardMemberComponent implements OnInit, OnDestroy {
         this.ccbMember.person = {
           name,
           email: this.searchedEmailPerson,
-          roles: [{role: 'citizen'}]
+          roles: [{ role: 'citizen', workLocation: undefined }]
         };
         this.showSaveButton();
       }

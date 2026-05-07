@@ -265,7 +265,7 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
       const rolesNotPermissions = this.permission?.permissions
         ? this.permission?.person?.roles.filter(
             (r) =>
-              this.permission?.permissions.filter((p) => p.role === r.role)
+              this.permission?.permissions.filter((p) => p.role === (r.role ?? (r as any)))
                 .length === 0
           )
         : this.permission?.person?.roles;
@@ -458,7 +458,7 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
   loadNewPermission() {
     if (this.person) {
       const permissions = this.person.roles
-        ? this.person.roles.map((p) => ({ role: p.role, level: 'NONE' }))
+        ? this.person.roles.map((p) => ({ role: p.role ?? (p as any), level: 'NONE' }))
         : [{ role: 'citizen', level: 'NONE' }];
       this.permission = {
         idOffice: this.idOffice,

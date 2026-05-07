@@ -214,7 +214,7 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
       if (!this.idPerson) this.cardPerson.isLoading = false;
     }
   }
-  
+
   async loadWorkpack() {
     const workpackData = this.workpackSrv.getWorkpackData();
     if (workpackData && workpackData.workpack && workpackData.workpack.id === this.idWorkpack && workpackData.workpackModel) {
@@ -223,7 +223,7 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
         label: role,
         value: role.toLowerCase()
       }));
-     
+
     } else {
       const result = await this.workpackSrv.GetWorkpackById(this.idWorkpack, { 'id-plan': this.idPlan });
       if (result.success) {
@@ -237,7 +237,7 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
         }));
       }
     }
-    
+
     if (this.isUserAdmin) {
       this.editPermission = !this.workpack.canceled;
     } else {
@@ -247,7 +247,7 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
     if (resultPlan) {
       this.idOffice = resultPlan.idOffice;
     }
-    
+
   }
 
   setPhoneNumberMask() {
@@ -486,18 +486,18 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
   setStakeholderPermissionsCards() {
     this.stakeholderPermissions = this.stakeholder.permissions.map( p => ({...p}));
     const rolesNotPermissions = this.stakeholder.person.roles.filter(r =>
-      this.stakeholderPermissions.filter(p => p.role === r.role).length === 0);
+      this.stakeholderPermissions.filter(p => p.role.toLowerCase() === (r.role ?? (r as any)).toLowerCase()).length === 0);
     if (rolesNotPermissions && rolesNotPermissions.length > 0) {
       rolesNotPermissions.forEach(r => {
         if (this.stakeholderPermissions && this.stakeholderPermissions.length > 0) {
           this.stakeholderPermissions.push({
-            role: r.role,
+            role: r.role ?? (r as any),
             level: 'None'
           });
         } else {
           this.stakeholderPermissions = [
             {
-              role: r.role,
+              role: r.role ?? (r as any),
               level: 'None'
             }
           ];
@@ -563,7 +563,7 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
     this.stakeholder = undefined;
     this.citizenUserNotFoundByCpf = false;
     this.validCpf = cpfValidator(this.searchedCpfUser);
-  
+
     if (this.validCpf) {
       this.isLoading = true;
       const result = await this.citizenUserSrv.GetCitizenUserByCpf({
@@ -571,12 +571,12 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
         idOffice: this.idOffice,
         loadWorkLocation: false
       });
-  
+
       this.isLoading = false;
-  
+
       if (result.success) {
         const personId = result.data?.id;
-  
+
         // Se retornou um ID, tenta carregar o stakeholder
         if (personId) {
           const stakeholderResult = await this.stakeholderSrv.GetStakeholderPerson({
@@ -584,7 +584,7 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
             idPerson: personId,
             'id-plan': this.idPlan
           });
-  
+
           if (stakeholderResult.success) {
             this.stakeholder = stakeholderResult.data;
             this.person = this.stakeholder?.person;
@@ -602,7 +602,7 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
           this.person = result.data;
           this.setStakeholderFormFromPerson();
         }
-  
+
         // Verifica se é a mesma pessoa logada
         if (!this.isUserAdmin && result.data.id === Number(this.authSrv.getIdPerson())) {
           this.isSamePerson = true;
@@ -612,7 +612,7 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
       }
     }
   }
-  
+
 
   handleToggleUser(event) {
     this.stakeholder = undefined;
@@ -659,27 +659,27 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
     this.isLoading = true;
     this.isSamePerson = false;
     const publicServer = event.value;
-  
+
     const result = await this.citizenUserSrv.GetPublicServer(publicServer.sub, {
       idOffice: this.idOffice,
       loadWorkLocation: false
     });
-  
+
     this.isLoading = false;
-  
+
     if (result.success) {
       const personId = result.data.id;
-  
+
       if (!this.isUserAdmin && personId === Number(this.authSrv.getIdPerson())) {
         this.isSamePerson = true;
       }
-  
+
       this.person = result.data;
       this.setStakeholderFormFromPerson();
       this.searchedNameUser = '';
       this.publicServersResult = [];
       this.showListBoxPublicServers = false;
-  
+
       // Novo trecho adicionado:
       if (personId) {
         const stakeholderResult = await this.stakeholderSrv.GetStakeholderPerson({
@@ -687,7 +687,7 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
           idPerson: personId,
           'id-plan': this.idPlan
         });
-  
+
         if (stakeholderResult.success) {
           this.stakeholder = stakeholderResult.data;
           this.person = this.stakeholder?.person;
@@ -699,7 +699,7 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
       }
     }
   }
-  
+
 
   setStakeholderFormFromPerson() {
     if (this.person) {
@@ -711,7 +711,7 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
       });
       if (this.person.roles && this.user) {
         this.stakeholderPermissions = this.person.roles.map(r => ({
-          role: r.role,
+          role: r.role ?? (r as any),
           level: 'None'
         }));
       }
@@ -743,7 +743,7 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
           type: 'new-role-card'
         });
       }
-     
+
     } else {
      if (this.editPermission) {
       this.stakeholderRolesCardItems = [{

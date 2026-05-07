@@ -10,6 +10,7 @@ import { MenuService } from 'src/app/shared/services/menu.service';
 import { OfficeService } from 'src/app/shared/services/office.service';
 import { PlanService } from 'src/app/shared/services/plan.service';
 import { TranslateChangeService } from 'src/app/shared/services/translate-change.service';
+import {PersonService} from '../../shared/services/person.service';
 
 @Component({
   selector: 'app-home',
@@ -19,6 +20,7 @@ import { TranslateChangeService } from 'src/app/shared/services/translate-change
 export class HomeComponent implements OnInit {
 
   routerPlanWork = false;
+
   infoPerson: IPerson;
 
   constructor(
@@ -30,7 +32,8 @@ export class HomeComponent implements OnInit {
     private cookieSrv: CookieService,
     private planSrv: PlanService,
     private officeSrv: OfficeService,
-    private menuSrv: MenuService
+    private menuSrv: MenuService,
+    private personSrv: PersonService,
   ) {
     this.breadcrumbSrv.setMenu([]);
     this.activatedRoute.queryParams
@@ -53,7 +56,7 @@ export class HomeComponent implements OnInit {
           this.authSrv.saveToken(userInfo);
           this.authSrv.nextIsLoginDenied(false);
           const user = this.authSrv.getTokenPayload();
-          await this.authSrv.setInfoPerson()
+          await this.authSrv.setInfoPerson();
           const language = user ? this.cookieSrv.get('cookiesDefaultLanguateUser' + user.email) : null;
           if (language) {
             this.translateChangeSrv.changeLangDefault(language);
@@ -64,13 +67,14 @@ export class HomeComponent implements OnInit {
           } else {
             this.menuSrv.reloadMenuOffice();
           }
+          this.personSrv.updatePreferences().subscribe();
         }
       });
   }
 
   async ngOnInit() {
     if (!this.authSrv.isAuthenticated()) {
-      const routeLink = '/login'
+      const routeLink = '/login';
       this.router.navigate([routeLink]);
     } else {
       this.router.navigate(['/offices']);
@@ -84,7 +88,7 @@ export class HomeComponent implements OnInit {
         this.navigateWorkPerson();
       } else {
         this.menuSrv.reloadMenuOffice();
-        const routeLink = '/offices'
+        const routeLink = '/offices';
         this.router.navigate([routeLink]);
       }
     }

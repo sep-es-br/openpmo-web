@@ -41,7 +41,7 @@
                   <span class="budgeted-label">{{"budgeted" | translate}}:</span>
                   <span class="budgeted-value">{{groupStep.budgetedValue || '0'}}</span>
                 </div>
-  
+
                 <div class="authorized" [class.mobile]="responsive">
                   <span class="authorized-label">{{"authorized" | translate}}:</span>
                   <span class="authorized-value">{{groupStep.authorizedValue || '0'}}</span>
@@ -88,14 +88,14 @@
                   [type]="'listStep'"
                   [isCurrentBaseline]="isCurrentBaseline"
                   [tooltipLabel]="tooltipLabel"
-                  [foreseenLabel]="abbreviatedLabel"  
+                  [foreseenLabel]="abbreviatedLabel"
                   (onCreateNewStep)="handleCreateNewStep({
                     idSchedule: schedule.id,
                     idWorkpackModelLinked: workpackParams.idWorkpackModelLinked,
                     stepType: step.type,
                     unitName: step.unitName,
                     unitPrecision: step.unitPrecision
-                  })" 
+                  })"
                   (spreadDifference)="requestTypeDistributionInformation($event, false)"
                   (stepChanged)="saveStepChanged(groupStep.year, step.idStep)"
                 >
@@ -145,7 +145,7 @@
               <ng-template let-step pTemplate="gridItem">
                 <div class="card-item-container show-resumed clickable" *ngIf="step.type === 'listStep'"
                   [class.mobile]="responsive"
-                  (click)="editScheduleStep(step.idStep, unitMeansure.name, unitMeansure.precision,'step')">
+                  (click)="unitMeansure && editScheduleStep(step.idStep, unitMeansure.name, unitMeansure.precision,'step')">
                   <app-schedule-step-card-item [properties]="step" [type]="'listStepResumed'" [isCurrentBaseline]="isCurrentBaseline" [tooltipLabel]="tooltipLabel" [foreseenLabel]="abbreviatedLabel">
                   </app-schedule-step-card-item>
                 </div>
@@ -175,7 +175,7 @@
     <app-save-button #saveButton (save)="onSaveButtonClicked()"></app-save-button>
     <app-cancel-button (cancel)="handleOnCancel()"></app-cancel-button>
   </app-buttons-container>
-  
+
 </div>
 <p-confirmDialog [header]="'confirmSpreadDifference' | translate" icon="pi pi-exclamation-triangle"
   key="spreadDifferenceConfirm">
