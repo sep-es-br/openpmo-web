@@ -137,10 +137,10 @@
             (onFocus)="properties.multipleCosts && handleEditCosts($event); properties.multipleCosts && disable()"
             (mouseout)="multiCostsEdited = false"
             [ngClass]="{
-              'disabled-field': (properties.multipleCosts && multiCostsEdited) || 
-                                !properties.editPermission || 
+              'disabled-field': !properties.editPermission || 
                                 (!properties.multipleCosts && !properties.editCosts)
             }"
+            [class.disabled-multiple]="properties.multipleCosts"
             (onInput)="handleStepCostChange($event, 'costPlanned')"
             [class.red]="properties.costPlanned < 0"
             [(ngModel)]="properties.costPlanned" [minFractionDigits]="2" [maxFractionDigits]="2"
@@ -170,8 +170,9 @@
             (click)="properties.multipleCosts && handleEditCosts($event); properties.multipleCosts && disable()"
             (onFocus)="properties.multipleCosts && handleEditCosts($event); properties.multipleCosts && disable()"
             (mouseout)="multiCostsEdited = false"
-            [ngClass]="{'disabled-field': (properties.multipleCosts && multiCostsEdited) || (permission !== 'UPDATE' && !properties.editPermission)  || (!properties.multipleCosts && !properties.editCosts) || isActualValuesDisabled}"
+            [ngClass]="{'disabled-field': (permission !== 'UPDATE' && !properties.editPermission)  || (!properties.multipleCosts && !properties.editCosts) || isActualValuesDisabled}"
             (onInput)="handleStepCostChange($event, 'costActual')"
+            [class.disabled-multiple]="properties.multipleCosts"
             [class.red]="properties.costActual < 0"
             [(ngModel)]="properties.costActual" [minFractionDigits]="2" [maxFractionDigits]="2"
             [locale]="language === 'pt-BR' ? 'pt-BR' : 'en-US'">

@@ -128,7 +128,7 @@
                     <div class="card-cost-assignments">
                       <app-cost-assignment-card-item [properties]="costAssignmentsCardItemsEdited[indexCardEdited]"
                         (spreadDifference)="requestTypeDistributionInformation($event, true)"
-                        (costChanged)="handleChangeValuesCardItem()">
+                        (costChanged)="handleChangeValuesCardItem()" [hasActiveBaseline]="isCurrentBaseline">
                       </app-cost-assignment-card-item>
                     </div>
                     <i class="fas fa-chevron-right"

@@ -190,6 +190,16 @@
             opacity: 0.6;
           }
         }
+        &.disabled-multiple {
+          .p-inputnumber-input {
+            font-size: 0.9rem;
+            padding: 0;
+            text-align: center;
+            user-select: none !important;
+            pointer-events: none !important;
+            cursor: not-allowed !important;
+          }
+        }
       }
       .app-input-label {
         font-size: 0.7rem;
@@ -226,6 +236,16 @@
             pointer-events: none !important;
             cursor: not-allowed !important;
             opacity: 0.6;
+          }
+        }
+        &.disabled-multiple {
+          .p-inputnumber-input {
+            font-size: 0.9rem;
+            padding: 0;
+            text-align: center;
+            user-select: none !important;
+            pointer-events: none !important;
+            cursor: not-allowed !important;
           }
         }
       }
