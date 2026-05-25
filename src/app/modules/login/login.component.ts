@@ -68,7 +68,7 @@ export class LoginComponent implements OnInit, OnDestroy {
   }
 
   async handleClickLogout() {
-    await this.authSrv.signOutCitizenAccess();
+    await this.authSrv.signOut();
   }
 
   handleChangeLanguage() {

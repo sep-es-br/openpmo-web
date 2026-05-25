@@ -292,7 +292,7 @@ export class PlanPermissionsComponent implements OnInit, OnDestroy {
           guid: this.permission.person.guid,
           key: this.permission.person.key,
           id: this.permission.person.id,
-          roles: this.permission.permissions.map(p => ({'role': p.role}))
+          roles: this.permission.permissions.map(p => ({role: p.role}))
         };
         this.isSamePerson = !this.isUserAdmin && this.person.id === Number(this.authSrv.getIdPerson());
       }
@@ -314,6 +314,7 @@ export class PlanPermissionsComponent implements OnInit, OnDestroy {
           { label: this.translateSrv.instant('none'), value: 'NONE' }
         ],
         selectedOption: p.level,
+        isCCMMember: !!p.ccmMember,
         readOnly: this.isSamePerson
       }));
       const rolesNotPermissions = this.permission?.permissions ? this.permission?.person?.roles
@@ -382,7 +383,7 @@ export class PlanPermissionsComponent implements OnInit, OnDestroy {
   loadNewPermission() {
     if (this.person) {
       const permissions = this.person.roles
-        ?  this.person.roles.map(p => ({ role: p.role, level: 'NONE' }))
+        ?  this.person.roles.map(p => ({ role: p.role ?? (p as any), level: 'NONE' }))
         : [{ role: 'citizen', level: 'NONE' }];
       this.permission = {
         idPlan: this.idPlan,
@@ -401,7 +402,8 @@ export class PlanPermissionsComponent implements OnInit, OnDestroy {
       {
         id: cardItem.itemId,
         role: cardItem.titleCardItem,
-        level: cardItem.selectedOption
+        level: cardItem.selectedOption,
+        ccmMember: !!cardItem.isCCMMember
       }
     ));
     const permission: IPlanPermission = {

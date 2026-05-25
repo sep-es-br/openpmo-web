@@ -28,8 +28,8 @@ export class HttpRequestInterceptor implements HttpInterceptor {
   isRefreshingToken = false;
 
   requestCount = 0;
-  requestCache = new Map<any, Observable<HttpEvent<any>>>();
-  
+  requestCache = new Map<any, Observable<any>>();
+
   constructor(
     private authService: AuthService,
     private messageSrv: MessageService,
@@ -48,9 +48,13 @@ export class HttpRequestInterceptor implements HttpInterceptor {
   ) {
 
     const accessToken = this.authService.getAccessToken();
-    const headers = new HttpHeaders(accessToken ? { Authorization: `Bearer ${accessToken}` } : { }) ;
-    req = req.clone({ headers });
 
+    let header: {[index: string]: string} = {};
+
+    if(accessToken) header = { Authorization: `Bearer ${accessToken}` };
+
+
+    req = req.clone({ setHeaders: header , withCredentials: true });
 
     const thisKey = this.stableStringify({url: req.urlWithParams, body: req.body});
 
@@ -103,7 +107,7 @@ export class HttpRequestInterceptor implements HttpInterceptor {
           });
         }
         else if (error.status === 401) {
-          return this.handleUnauthorized(req, next);
+          return this.route.navigate(['/login']);
         }
         else if (error.status === 500 && error.message.startsWith('JWT expired ')) {
           this.messageSrv.add({
@@ -122,10 +126,10 @@ export class HttpRequestInterceptor implements HttpInterceptor {
         }));
       }),
       finalize(() => {
-            this.requestCount--
-            setTimeout(() => this.requestCache.delete(thisKey), 5_000); 
+            this.requestCount--;
+            setTimeout(() => this.requestCache.delete(thisKey), 5_000);
         }),
-        shareReplay(1)   
+        shareReplay(1)
     );
 
     this.requestCache.set(thisKey, obs);
@@ -168,6 +172,7 @@ export class HttpRequestInterceptor implements HttpInterceptor {
                 severity: 'warn',
                 detail: this.translateSrv.instant('messages.error.unauthorized')
               });
+              this.route.navigate(['/login']);
               return of(new HttpResponse({
                 body: {
                   success: false,

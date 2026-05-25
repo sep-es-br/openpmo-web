@@ -30,8 +30,7 @@ export class AppComponent implements OnInit, OnDestroy {
     private mobileViewSrv: MobileViewService,
     private workpackShowTabViewSrv: WorkpackShowTabviewService,
     private router: Router,
-    private personSrv: PersonService,
-    private menuSrv : MenuService
+    private menuSrv: MenuService
   ){
     this.responsiveSrv.observable.subscribe(isMobileView => this.isMobileView = isMobileView);
     this.router.events
@@ -42,7 +41,6 @@ export class AppComponent implements OnInit, OnDestroy {
           this.showTemplate = showTemplate;
         }
       });
-      this.personSrv.updatePreferences().subscribe();      
   }
 
   ngOnDestroy(): void {

@@ -206,7 +206,7 @@
       </p-header>
 
       <div *ngIf="baseline && baseline.status !== 'DRAFT'" class="evaluations-container">
-        <p-card *ngFor="let item of baseline?.evaluations" class="card-list-item">
+        <p-card *ngFor="let item of getFilteredEvaluations()" class="card-list-item">
           <div class="card-item-content">
             <div class="item-description">
               <div class="item-description-container" [class.item-description-container-responsive]="responsive">

@@ -801,12 +801,14 @@ export class WorkpackComponent implements OnDestroy {
             //   command: (event) => this.handleCancelWorkpack(workpack.id),
             // });
           }
-          if (workpack.type === 'Project' && this.workpackSrv.getEditPermission()) {
+          if (workpack.canUseCCB &&this.workpackSrv.getEditPermission()) {
             menuItems.push({
               label: this.translateSrv.instant('changeControlBoard'),
               icon: 'app-icon ccb-member',
-              command: async(event) =>  await this.navigateToConfigCCB(workpack.id),
+              command: async (event) => await this.navigateToConfigCCB(workpack.id),
             });
+          }
+          if (workpack.type === 'Project' && this.workpackSrv.getEditPermission()) {
             if (!workpack.pendingBaseline && !workpack.cancelPropose && !!workpack.hasActiveBaseline && !workpack.linked) {
               menuItems.push({
                 label: this.translateSrv.instant('cancel'),

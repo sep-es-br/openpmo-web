@@ -246,7 +246,6 @@ export class PlanComponent implements OnInit, OnDestroy {
   }
 
   async ngOnInit() {
-
     const today = moment();
     const yearStart = today.year();
     this.yearRange = (yearStart - 10).toString() + ':' + (yearStart + 10).toString();
@@ -606,7 +605,7 @@ export class PlanComponent implements OnInit, OnDestroy {
               command: (event) => this.handleCancelWorkpack(workpack.id, index),
             });
           }
-          if (workpack.type === 'Project' && this.editPermission && !workpack.linked) {
+          if (workpack.canUseCCB && this.editPermission && !workpack.linked) {
             menuItems.push({
               label: this.translateSrv.instant('changeControlBoard'),
               icon: 'app-icon ccb-member',

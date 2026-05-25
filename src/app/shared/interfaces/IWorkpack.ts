@@ -104,6 +104,7 @@ export interface IWorkpackListCard {
     };
     journalInformation?: IWorkpackJournalInformation;
     statusProperty?: ProjectStatus | DeliverableStatus;
+      canUseCCB?: boolean;
 }
 
 interface IWorkpackDashboard {

@@ -383,7 +383,7 @@ export class RiskComponent implements OnInit, OnDestroy {
       const idIssue = result.data.id;
       await this.router.navigate(['/workpack/issues'], {
         queryParams: {
-          id: idIssue,
+            idIssue: idIssue,
           idWorkpack: this.idWorkpack,
           idWorkpackModelLinked: this.idWorkpackModelLinked,
           edit: this.editPermission
