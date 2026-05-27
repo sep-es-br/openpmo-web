@@ -9,5 +9,16 @@ constructor(
   @Inject(Injector) injector: Injector
 ) {
   super('organizations', injector);
-}
+  }
+
+  async existsIntegratedOrganizationByName(
+    name: string
+  ) {
+    const params: any = { name };
+
+    return this.http.get(
+      `${this.urlBase}/exists-integrated-name`,
+      { params }
+    ).toPromise();
+  }
 }
