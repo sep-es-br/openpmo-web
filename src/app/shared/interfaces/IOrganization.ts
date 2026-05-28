@@ -9,5 +9,7 @@ export interface IOrganization{
   email?: string;
   phoneNumber?: string;
   website?: string;
+  suffix?: string;
+  integration?: string;
 }
 
