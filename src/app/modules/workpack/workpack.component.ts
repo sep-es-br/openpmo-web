@@ -661,6 +661,7 @@ export class WorkpackComponent implements OnDestroy {
         await this.loadSectionsWorkpackChildrenLinked();
       }
     }
+    console.log(this.workpackModel);
   }
 
   async loadSectionsWorkpackChildren() {

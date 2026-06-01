@@ -28,84 +28,94 @@
         </app-config-data-view-panel>
     </div>
   </div>
-  <div class="card-properties-plan" *ngIf="!isSearching">
-    <app-card [properties]="cardPlanProperties" class="mt-0 inputs-float-label">
-      <div class="loading-container" *ngIf="cardPlanProperties.isLoading">
-        <app-card-loading [isCardLoading]="cardPlanProperties.isLoading"></app-card-loading>
-      </div>
-      <div class="loading-form-container" *ngIf="formIsSaving">
-        <app-card-loading [isCardLoading]="formIsSaving"></app-card-loading>
-      </div>
-      <div class="p-grid" *ngIf="!cardPlanProperties.isLoading">
-        <form [formGroup]="formPlan">
-          <div class="p-fluid">
-            <div class="p-field" >
-              <span class="p-float-label">
-                <input class="app-input-text" [class.responsive]="responsive" id="float-modelName" name="modelName"
-                  formControlName="modelName" type="text" pInputText [ngStyle]="{'width': '30%'}"  />
-                <label class="app-input-label" for="float-modelName">{{ "planModel" | translate }} * 
-                  <i class="far fa-question-circle" [pTooltip]="'help.plan.planModelName' | translate"></i>
-                </label>
-              </span>
-            </div>
-            <div class="p-field">
-              <span class="p-float-label">
-                <input class="app-input-text" [class.responsive]="responsive" id="float-name" name="name"
-                  formControlName="name" type="text" [ngStyle]="{'width': '30%'}" pInputText />
-                <label class="app-input-label" for="float-name">{{ "name" | translate }} * 
-                  <i class="far fa-question-circle" [pTooltip]="'help.plan.name' | translate"></i>
-                </label>
-              </span>
-              <app-input-message [form]="formPlan" field="name"></app-input-message>
-            </div>
-            <div class="p-field">
-              <span class="p-float-label">
-                <textarea pInputTextarea id="float-fullName" formControlName="fullName" class="app-text-area" rows="3"
-                  [ngModel]="(mirrorFullName()) ? formPlan.value.name : formPlan.value.fullName">
-                </textarea>
-                <label class="app-input-label" for="float-fullName">{{ "fullName" | translate }} * 
-                  <i class="far fa-question-circle" [pTooltip]="'help.plan.fullName' | translate"></i>
-                </label>
-              </span>
-              <app-input-message [form]="formPlan" field="fullName"></app-input-message>
-            </div>
-          </div>
-          <div class="p-formgroup-inline">
-            <div class="p-field" [class.responsive]="responsive">
-              <span class="p-float-label" [class.responsive]="responsive">
-                <p-calendar id="float-start" formControlName="start" class="app-select-date" [showIcon]="true"
-                  [monthNavigator]="true" [yearNavigator]="true" [yearRange]="yearRange" [class.responsive]="responsive"
-                  icon="fas fa-calendar-alt" [dateFormat]="calendarFormat">
-                </p-calendar>
-                <label class="app-input-label" for="float-start">{{ "start" | translate }} * 
-                  <i class="far fa-question-circle" [pTooltip]="'help.plan.start' | translate"></i>
-                </label>
-              </span>
-              <app-input-message [form]="formPlan" field="start"></app-input-message>
-            </div>
-            <div class="p-field" [class.responsive]="responsive">
-              <span class="p-float-label" [class.responsive]="responsive">
-                <p-calendar id="float-finish" formControlName="finish" class="app-select-date" [showIcon]="true"
-                  [monthNavigator]="true" [yearNavigator]="true" [yearRange]="yearRange" [class.responsive]="responsive"
-                  icon="fas fa-calendar-alt" [dateFormat]="calendarFormat">
-                </p-calendar>
-                <label class="app-input-label" for="float-finish">{{ "finish" |
-                  translate}} * 
-                <i class="far fa-question-circle" [pTooltip]="'help.plan.finish' | translate"></i>  
-                </label>
-              </span>
-              <app-input-message [form]="formPlan" field="finish"></app-input-message>
-            </div>
-          </div>
-        </form>
-      </div>
-    </app-card>
+
+  <app-tabview-scrolled
+  [tabs]="tabs"
+  (selectedTabChange)="changeTab($event)">
+
+  <!-- dashboard -->
+  <div tabviewBody *ngIf="selectedTab?.key === 'dashboard'">
+    
   </div>
 
-  <section *ngIf="idPlan" class="workpackModels-cards-section">
-    <ng-container *ngIf="!isSearching; else searchResult">
-        <div class="card-workpack-model" *ngFor="let workpackModel of cardsPlanWorkPackModels; let i = index">
-            <app-card [properties]="workpackModel.propertiesCard"
+  <!-- WBS -->
+  <div tabviewBody *ngIf="selectedTab?.key === 'WBS'">
+  </div>
+
+  <!-- propriedades -->
+  <div tabviewBody *ngIf="selectedTab?.key === 'properties'">
+    <div class="card-properties-plan" *ngIf="!isSearching">
+      <app-card *ngIf="cardPlanProperties" [properties]="cardPlanProperties" class="mt-0 inputs-float-label">
+        <div class="loading-container" *ngIf="cardPlanProperties.isLoading">
+          <app-card-loading [isCardLoading]="cardPlanProperties.isLoading"></app-card-loading>
+        </div>
+        <div class="loading-form-container" *ngIf="formIsSaving">
+          <app-card-loading [isCardLoading]="formIsSaving"></app-card-loading>
+        </div>
+        <div class="p-grid" *ngIf="!cardPlanProperties.isLoading">
+          <form [formGroup]="formPlan">
+            <div class="p-fluid">
+              <div class="p-field">
+                <span class="p-float-label">
+                  <input class="app-input-text" [class.responsive]="responsive" id="float-name" name="name"
+                    formControlName="name" type="text" [ngStyle]="{'width': '30%'}" pInputText />
+                  <label class="app-input-label" for="float-name">{{ "name" | translate }} * 
+                    <i class="far fa-question-circle" [pTooltip]="'help.plan.name' | translate"></i>
+                  </label>
+                </span>
+                <app-input-message [form]="formPlan" field="name"></app-input-message>
+              </div>
+              <div class="p-field">
+                <span class="p-float-label">
+                  <textarea pInputTextarea id="float-fullName" formControlName="fullName" class="app-text-area" rows="3"
+                    [ngModel]="(mirrorFullName()) ? formPlan.value.name : formPlan.value.fullName">
+                  </textarea>
+                  <label class="app-input-label" for="float-fullName">{{ "fullName" | translate }} * 
+                    <i class="far fa-question-circle" [pTooltip]="'help.plan.fullName' | translate"></i>
+                  </label>
+                </span>
+                <app-input-message [form]="formPlan" field="fullName"></app-input-message>
+              </div>
+            </div>
+            <div class="p-formgroup-inline">
+              <div class="p-field" [class.responsive]="responsive">
+                <span class="p-float-label" [class.responsive]="responsive">
+                  <p-calendar id="float-start" formControlName="start" class="app-select-date" [showIcon]="true"
+                    [monthNavigator]="true" [yearNavigator]="true" [yearRange]="yearRange" [class.responsive]="responsive"
+                    icon="fas fa-calendar-alt" [dateFormat]="calendarFormat">
+                  </p-calendar>
+                  <label class="app-input-label" for="float-start">{{ "start" | translate }} * 
+                    <i class="far fa-question-circle" [pTooltip]="'help.plan.start' | translate"></i>
+                  </label>
+                </span>
+                <app-input-message [form]="formPlan" field="start"></app-input-message>
+              </div>
+              <div class="p-field" [class.responsive]="responsive">
+                <span class="p-float-label" [class.responsive]="responsive">
+                  <p-calendar id="float-finish" formControlName="finish" class="app-select-date" [showIcon]="true"
+                    [monthNavigator]="true" [yearNavigator]="true" [yearRange]="yearRange" [class.responsive]="responsive"
+                    icon="fas fa-calendar-alt" [dateFormat]="calendarFormat">
+                  </p-calendar>
+                  <label class="app-input-label" for="float-finish">{{ "finish" |
+                    translate}} * 
+                  <i class="far fa-question-circle" [pTooltip]="'help.plan.finish' | translate"></i>  
+                  </label>
+                </span>
+                <app-input-message [form]="formPlan" field="finish"></app-input-message>
+              </div>
+            </div>
+          </form>
+        </div>
+      </app-card>
+    </div>
+  </div>
+
+  <!-- workpack models -->
+  <div tabviewBody>
+      
+  <ng-container *ngFor="let workpackModel of cardsPlanWorkPackModels ; let i = index">
+    <div *ngIf="selectedTab?.key === workpackModel.propertiesCard.cardTitle">
+      <app-card [properties]="workpackModel.propertiesCard"
                 (editFilter)="handleEditFilter($event, workpackModel.idWorkpackModel)"
                 (newFilter)="handleNewFilter(workpackModel.idWorkpackModel)"
                 (selectedFilter)="handleSelectedFilter($event, workpackModel.idWorkpackModel)"
@@ -140,26 +150,12 @@
                 <div>
                 </div>
             </app-card>
-        </div>
+    </div>
     </ng-container>
-    <ng-template #searchResult>
-        <app-card-loading [isCardLoading]="searchLoading"></app-card-loading>
-        <ng-container *ngIf="!searchLoading"></ng-container>
-        <i class="fas fa-times fa-lg" [pTooltip]="'back' | translate" role="button" [attr.aria-label]="'back' | translate"
-            (click)="handleCloseSearching()" ></i>
-            
-        <p-dataView [value]="result" layout="list" class="app-dataview app-dataview-list" [first]="page * pageSize"
-            [paginator]="true" [rows]="pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false"
-            [totalRecords]="totalCountResults ? totalCountResults : 1" [lazy]="true" (onLazyLoad)="handlePageChange($event)"
-            [emptyMessage]="'notFoundSearch' | translate" >
-            <ng-template let-cardItem pTemplate="listItem">
-                <div class="p-col p-col-12">
-                    <app-search-item-card [item]="cardItem" (onRedirect)="this.handleCloseSearching()"></app-search-item-card>
-                </div>
-            </ng-template>
-        </p-dataView>
-    </ng-template>
-  </section>
+  </div>
+
+</app-tabview-scrolled>
+
   <div class="id-container" *ngIf="idPlan && cardPlanProperties">
     <span>{{idPlan}}</span>
   </div>

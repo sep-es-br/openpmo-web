@@ -34,6 +34,7 @@ import { SetConfigWorkpackService } from 'src/app/shared/services/set-config-wor
 import { CancelButtonComponent } from 'src/app/shared/components/cancel-button/cancel-button.component';
 import { IUniversalSearch } from 'src/app/shared/interfaces/universal-search.interface';
 import { PageDef, SearchService } from 'src/app/shared/services/search.service';
+import { ITabViewScrolled } from 'src/app/shared/components/tabview-scrolled/tabview-scrolled.component';
 
 
 interface IWorkpackModelCard {
@@ -84,6 +85,8 @@ export class PlanComponent implements OnInit, OnDestroy {
   language: string;
   formIsSaving = false;
   propertiesPlanModel: IPlanModel;
+  tabs: ITabViewScrolled[];
+  selectedTab: ITabViewScrolled;
 
   
     showAnimationSearch = false;
@@ -297,6 +300,7 @@ export class PlanComponent implements OnInit, OnDestroy {
       toggleable: false,
       initialStateToggle: false,
       cardTitle: 'properties',
+      notShowCardTitle: true,
       collapseble: true,
       isLoading: this.idPlan ? true : false,
       initialStateCollapse: !!this.idPlan
@@ -389,6 +393,39 @@ export class PlanComponent implements OnInit, OnDestroy {
     if (result.success) {
       this.propertiesPlanModel = result.data;
     }
+  }
+
+  loadPlanTabs() {
+    this.tabs = [];
+  
+    this.tabs.push({
+      menu: 'dashboard',
+      key: 'dashboard'
+    });
+  
+    this.tabs.push({
+      menu: 'WBS',
+      key: 'WBS'
+    });
+  
+    this.tabs.push({
+      menu: 'properties',
+      key: 'properties'
+    });
+    console.log(this.cardsPlanWorkPackModels);
+    if (this.cardsPlanWorkPackModels?.length) {
+      this.tabs.push(
+        ...this.cardsPlanWorkPackModels.map(model => ({
+          menu: model.propertiesCard.cardTitle,
+          key: model.propertiesCard.cardTitle
+        }))
+      );
+    }
+  }
+
+
+  changeTab(event: { tabs: ITabViewScrolled }) {
+    this.selectedTab = event.tabs;
   }
 
   async savePlan() {
@@ -545,6 +582,7 @@ export class PlanComponent implements OnInit, OnDestroy {
         this.totalRecords[i] = workpackModel.workpackItemCardList && workpackModel.workpackItemCardList.length;
       });
     }
+    await this.loadPlanTabs();
   }
 
   async loadWorkpacksFromWorkpackModel(idPlan: number, workpackModelId: number, index: number, idFilterSelected: number, term?: string) {
