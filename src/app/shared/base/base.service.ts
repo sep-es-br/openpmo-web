@@ -49,8 +49,16 @@ export abstract class BaseService<T> {
     return result;
   }
 
-  public async GetById(id: number, noLoading?: boolean): Promise<IHttpResult<T>> {
-    return this.http.get<IHttpResult<T>>(`${this.urlBase}/${id}`).toPromise();
+  public async GetById(
+    id: number,
+    idOffice?: number,
+    noLoading?: boolean
+  ): Promise<IHttpResult<T>> {
+    let url = `${this.urlBase}/${id}`;
+    if (idOffice != null) {
+      url += `?id-office=${idOffice}`;
+    }
+    return this.http.get<IHttpResult<T>>(url).toPromise();
   }
 
   public async GetByIdWithIdWorkpack(idWorkpack: number, id: number, idPlan: number, noLoading?: boolean): Promise<IHttpResult<T>> {

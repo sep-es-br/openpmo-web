@@ -43,6 +43,7 @@ export class OrganizationComponent implements OnInit, OnDestroy {
   phoneNumberPlaceholder = '';
   isLoading = false;
   formIsSaving = false;
+  isIntegration = false;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -143,9 +144,10 @@ export class OrganizationComponent implements OnInit, OnDestroy {
   async loadPropertiesOrganization() {
     if (this.idOrganization) {
       this.isLoading = true;
-      const { data, success } = await this.organizationSvr.GetById(this.idOrganization);
+      const { data, success } = await this.organizationSvr.GetById(this.idOrganization, this.idOffice);
       if (success) {
         this.propertiesOrganization = data;
+        this.isIntegration = !!this.propertiesOrganization.integration;
         this.formOrganization.reset(
           Object.keys(this.formOrganization.controls).reduce((a, key) => (a[key] = data[key] || '', a), {})
         );
@@ -154,6 +156,14 @@ export class OrganizationComponent implements OnInit, OnDestroy {
           this.formOrganization.disable();
         }
         this.isLoading = false;
+
+        const controls = ['sector', 'name', 'fullName'];
+
+        controls.forEach(control => {
+          this.isIntegration
+            ? this.formOrganization.get(control)?.disable()
+            : this.formOrganization.get(control)?.enable();
+        });
       }
     } else {
       this.isLoading = false;
@@ -204,15 +214,41 @@ export class OrganizationComponent implements OnInit, OnDestroy {
   async handleOnSubmit() {
     this.cancelButton.hideButton();
     this.formIsSaving = true;
-    let phoneNumber = this.formOrganization.controls.phoneNumber.value;
+
+      const formValue = this.formOrganization.getRawValue();
+
+      if(!this.isIntegration){
+        const response: any =
+        await this.organizationSvr.existsIntegratedOrganizationByName(
+          formValue.name,
+        );
+
+        if (response?.data) {
+          this.formOrganization.get('name')
+            ?.setErrors({ duplicatedIntegratedName: true });
+
+          this.messageSrv.add({
+            severity: 'warn',
+            summary: this.translateSrv.instant('warning'),
+            detail: 'Já existe uma organização integrada com esse nome.'
+          });
+
+          this.formIsSaving = false;
+          this.cancelButton.showButton();
+          return;
+        }
+      }
+
+
+    let phoneNumber = formValue.phoneNumber;
     if (phoneNumber) {
       phoneNumber = phoneNumber.replace(/\D+/g, '');
     }
     this.formIsSaving = true;
     const { success } = this.propertiesOrganization
-      ? await this.organizationSvr.put({ ...this.formOrganization.value, id: this.idOrganization })
+      ? await this.organizationSvr.put({ ...formValue, phoneNumber, id: this.idOrganization, idOffice: this.idOffice })
       : await this.organizationSvr.post({
-        ...this.formOrganization.value,
+        ...formValue,
         phoneNumber,
         idOffice: this.idOffice
       });

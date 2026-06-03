@@ -136,13 +136,17 @@ export class OrganizationListComponent implements OnInit, OnDestroy {
         iconSvg: true,
         icon: IconsEnum.Building,
         nameCardItem: organization.name,
+        subtitleCardItem: organization.suffix,
         fullNameCardItem: organization.fullName,
         itemId: organization.id,
-        menuItems: [{
-          label: 'Delete', icon: 'fas fa-trash-alt',
-          command: () => this.deleteOrganization(organization),
-          disabled: !this.editPermission
-        }] as MenuItem[],
+        menuItems: organization.integration
+        ? []
+        : [{
+            label: 'Delete',
+            icon: 'fas fa-trash-alt',
+            command: () => this.deleteOrganization(organization),
+            disabled: !this.editPermission
+          }] as MenuItem[],
         urlCard: 'organizations/organization',
         paramsUrlCard: [{ name: 'idOffice', value: this.idOffice }],
       })
