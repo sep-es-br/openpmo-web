@@ -245,7 +245,7 @@ export class SharingComponent implements OnInit, OnDestroy {
       typeCardItem: 'sharedItem',
       levelListOptions: [
         { label: this.translateSrv.instant('read'), value: 'READ' },
-        // { label: this.translateSrv.instant('edit'), value: 'EDIT' }
+        { label: this.translateSrv.instant('edit'), value: 'EDIT' }
       ],
       selectedOption: office.id === this.office.id ? 'EDIT' : '',
       titleCardItem: office.name,

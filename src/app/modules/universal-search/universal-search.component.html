@@ -1,3 +1,7 @@
+<div class="back-to-management-container" *ngIf="showBackToManagement" (click)="navigateToManagement()">
+  <i class="fas fa-reply"></i>
+  <span class="text">{{'backToManagement' | translate}}</span>
+</div>
 <header class="d-flex flex-row">
   <div class="busca-wrapper col-9">
     <div class="dataview-filters-text">
