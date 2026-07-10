@@ -23,6 +23,8 @@ export class PropertyTemplateModel implements IProperty {
   max?: number;
   precision?: number;
   possibleValues?: { label: string; value: string }[];
+  // Lista mestre, preservada enquanto possibleValues é filtrado em cascata (grupo do PPA).
+  allPossibleValues?: { label: string; value: string }[];
   possibleValuesIds?: { label: string; value: number }[];
   multipleSelection?: boolean;
   rows?: number;

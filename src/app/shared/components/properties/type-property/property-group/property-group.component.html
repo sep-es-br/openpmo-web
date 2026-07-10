@@ -19,7 +19,7 @@
         (changed)="changed.emit($event)">
       </app-property-integer>
       <app-property-selection *ngSwitchCase="types.SelectionModel" [property]="groupedProp"
-        (changed)="changed.emit($event)">
+        (changed)="onGroupedChanged(groupedProp, $event)">
       </app-property-selection>
       <app-property-textarea *ngSwitchCase="types.TextAreaModel" [property]="groupedProp"
         (changed)="changed.emit($event)">

@@ -126,6 +126,7 @@ export class WorkpackPropertyService {
     property.max = pro.max;
     property.precision = pro.precision;
     property.possibleValues = pro.possibleValues;
+    property.allPossibleValues = pro.allPossibleValues;
     property.possibleValuesIds = pro.possibleValuesIds;
     property.multipleSelection = pro.multipleSelection;
     property.rows = pro.rows;
