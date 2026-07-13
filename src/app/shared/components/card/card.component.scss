@@ -41,7 +41,7 @@
     }
     .selected {
       border-color: rgba(68, 179, 155, 1);
-      color: #44B39B;
+      color: v.$fontAccent;
     }
   }
   p-header.card-header {
@@ -147,7 +147,7 @@
 
           &.no-animation {
             padding: 0.45rem;
-            background: #44B39B;
+            background: v.$bgButtonSubmit;
             color: #FFF;
             top: 0;
             border-radius: 4px;
@@ -315,7 +315,7 @@
             justify-content: flex-end;
           }
           .p-dropdown-trigger-icon {
-            color: #004660;
+            color: v.$fontTitle;
             font-size: 1.2rem;
           }
           .filter-item {

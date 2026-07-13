@@ -1,0 +1,157 @@
+/*
+ * O tema do PrimeNG (saga-blue) é um CSS pré-compilado: ele não enxerga os tokens
+ * de src/themes/_tokens.scss. Este arquivo reescreve, por tema, as cores que o
+ * saga-blue traz fixas.
+ *
+ * O angular.json carrega o saga-blue DEPOIS do styles.scss, então empatar em
+ * especificidade não basta — o saga-blue venceria por vir por último. O prefixo
+ * [data-theme='...'] resolve isso: ele acrescenta um nível de especificidade, e a
+ * regra passa a vencer independentemente da ordem.
+ *
+ * Nada aqui é escrito para o tema Espírito Santo: sem data-theme='pb' no <html>,
+ * nenhum destes seletores casa, e o saga-blue continua valendo como sempre valeu.
+ */
+
+$pb-primary: #30599B;
+$pb-primary-dark: #1F3D6B;
+$pb-highlight-bg: #EDF1F8;
+$pb-text: #252525;
+
+[data-theme='pb'] {
+
+  /* Botões */
+  .p-button {
+    background: $pb-primary;
+    border-color: $pb-primary;
+
+    &:enabled:hover,
+    &:enabled:active {
+      background: $pb-primary-dark;
+      border-color: $pb-primary-dark;
+    }
+
+    &:focus {
+      box-shadow: 0 0 0 2px #ffffff, 0 0 0 4px rgba(48, 89, 155, 0.5);
+    }
+
+    &.p-button-text,
+    &.p-button-outlined {
+      color: $pb-primary;
+      background: transparent;
+    }
+  }
+
+  /* Links */
+  .p-link:focus {
+    box-shadow: 0 0 0 2px #ffffff, 0 0 0 4px rgba(48, 89, 155, 0.5);
+  }
+
+  /* Campos de formulário */
+  .p-inputtext:enabled:focus,
+  .p-dropdown:not(.p-disabled).p-focus,
+  .p-multiselect:not(.p-disabled).p-focus,
+  .p-inputnumber.p-inputwrapper-focus .p-inputtext {
+    border-color: $pb-primary;
+    box-shadow: 0 0 0 1px rgba(48, 89, 155, 0.35);
+  }
+
+  .p-inputtext:enabled:hover,
+  .p-dropdown:not(.p-disabled):hover,
+  .p-multiselect:not(.p-disabled):hover {
+    border-color: $pb-primary;
+  }
+
+  /* Itens selecionados em listas, dropdowns e autocomplete */
+  .p-dropdown-panel .p-dropdown-items .p-dropdown-item.p-highlight,
+  .p-multiselect-panel .p-multiselect-items .p-multiselect-item.p-highlight,
+  .p-autocomplete-panel .p-autocomplete-items .p-autocomplete-item.p-highlight,
+  .p-listbox .p-listbox-list .p-listbox-item.p-highlight {
+    color: $pb-primary;
+    background: $pb-highlight-bg;
+  }
+
+  /* Checkbox e radio */
+  .p-checkbox .p-checkbox-box.p-highlight,
+  .p-radiobutton .p-radiobutton-box.p-highlight {
+    border-color: $pb-primary;
+    background: $pb-primary;
+
+    &:hover {
+      border-color: $pb-primary-dark;
+      background: $pb-primary-dark;
+    }
+  }
+
+  .p-checkbox:not(.p-checkbox-disabled) .p-checkbox-box:hover,
+  .p-radiobutton:not(.p-radiobutton-disabled) .p-radiobutton-box:hover {
+    border-color: $pb-primary;
+  }
+
+  /* Switch */
+  .p-inputswitch.p-inputswitch-checked .p-inputswitch-slider {
+    background: $pb-primary;
+  }
+
+  /* Abas */
+  .p-tabview .p-tabview-nav li.p-highlight .p-tabview-nav-link {
+    color: $pb-primary;
+    border-color: $pb-primary;
+  }
+
+  /* Menus */
+  .p-menu .p-menuitem-link:not(.p-disabled):hover,
+  .p-panelmenu .p-panelmenu-header > a:not(.p-disabled):hover {
+    background: $pb-highlight-bg;
+  }
+
+  /* Tabelas */
+  .p-datatable .p-datatable-tbody > tr.p-highlight {
+    color: $pb-primary;
+    background: $pb-highlight-bg;
+  }
+
+  .p-datatable .p-sortable-column.p-highlight {
+    color: $pb-primary;
+  }
+
+  /* Paginação */
+  .p-paginator .p-paginator-pages .p-paginator-page.p-highlight {
+    color: $pb-primary;
+    background: $pb-highlight-bg;
+  }
+
+  /* Calendário */
+  .p-datepicker table td > span.p-highlight {
+    color: $pb-primary;
+    background: $pb-highlight-bg;
+  }
+
+  .p-datepicker table td.p-datepicker-today > span {
+    background: $pb-highlight-bg;
+  }
+
+  /* Progresso e loading */
+  .p-progressbar .p-progressbar-value {
+    background: $pb-primary;
+  }
+
+  .p-progress-spinner-circle {
+    stroke: $pb-primary;
+  }
+
+  /* Slider */
+  .p-slider .p-slider-range {
+    background: $pb-primary;
+  }
+
+  .p-slider .p-slider-handle {
+    border-color: $pb-primary;
+  }
+
+  /* Chips e tags */
+  .p-chips .p-chips-multiple-container .p-chips-token,
+  .p-multiselect .p-multiselect-token {
+    color: $pb-primary;
+    background: $pb-highlight-bg;
+  }
+}

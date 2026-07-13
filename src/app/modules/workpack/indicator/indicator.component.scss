@@ -1,3 +1,4 @@
+@use 'src/variables' as v;
 .card-content {
     display: flex;
     align-items: flex-start;
@@ -10,7 +11,7 @@
   
   .separator {
     width: 1px;
-    background-color: #D0D8D9;
+    background-color: v.$bgBreadcrumb;
     height: auto;
     margin: 10px 50px;
   }
@@ -36,20 +37,20 @@
   }
 
   .indicators-label.update-label {
-    color: #44B39B;
+    color: v.$fontAccent;
   }
 
   .indicators-label.achieved-goal-label {
-    color: #44B39B;
+    color: v.$fontAccent;
   }
 
   
   #achieved-goal {
-    color: #44B39B;
+    color: v.$fontAccent;
   }
 
   #update {
-    color: #44B39B;
+    color: v.$fontAccent;
   }
 
   .error-message {
