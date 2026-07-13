@@ -1,15 +1,3 @@
-/*
- * Camada de indireção para os tokens de tema (src/themes/_tokens.scss).
- *
- * Os nomes e a semântica são os mesmos de antes: os componentes continuam usando
- * v.$fontTitle, v.$bgMenuUser, etc. O que mudou é que o valor passou a ser resolvido
- * em runtime pelo tema ativo, em vez de ser fixado no build.
- *
- * Não aplique funções de cor do SCSS (darken, lighten, mix, ...) sobre estas
- * variáveis: elas contêm var(--...), que o SCSS não avalia em tempo de build.
- * Para uma variação de cor, crie um token novo em _tokens.scss.
- */
-
 /* FONT */
 $fontTitle: var(--op-font-title);
 $fontLabel: var(--op-font-label);

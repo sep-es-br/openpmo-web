@@ -45,9 +45,5 @@ const THEMES: { [name: string]: ITheme } = {
   [PB_THEME.name]: PB_THEME
 };
 
-/*
- * Um nome desconhecido, vazio ou ausente cai no tema padrão (es) — é o que garante
- * que uma instalação sem a property app.theme continue exatamente como hoje.
- */
 export const resolveTheme = (name?: string): ITheme =>
   THEMES[(name || '').trim().toLowerCase()] || THEMES[DEFAULT_THEME_NAME];

@@ -1,14 +1,3 @@
-/*
- * Tokens de tema.
- *
- * :root carrega o tema Espírito Santo — os valores são idênticos aos que estavam
- * fixos em src/_variables.scss. Sem o atributo data-theme no <html>, o app resolve
- * para cá, e nada muda em relação ao comportamento anterior.
- *
- * Cada tema adicional sobrescreve apenas os tokens que mudam, sob [data-theme='<nome>'].
- * O atributo é aplicado em src/main.ts antes do bootstrap do Angular.
- */
-
 :root {
   /* FONT */
   --op-font-title: #004660;
@@ -25,14 +14,6 @@
   --op-font-gray: #888E96;
   --op-font-approved: #44B39B;
   --op-font-reject: #EA5C5C;
-
-  /*
-   * Acento de marca: a cor das ações e dos destaques da interface (links, itens
-   * selecionados, botões de ação). No ES calha de ser o mesmo verde do status
-   * "aprovado"; no PB vira o azul institucional. Por isso são tokens separados —
-   * --op-font-approved e --op-bg-approved seguem a semântica de status (verde em
-   * ambos os temas), e o acento acompanha a identidade visual.
-   */
   --op-font-accent: #44B39B;
   --op-bg-approved: #44B39B;
 
@@ -89,7 +70,6 @@
   --op-loading-blue: #489FB5;
 }
 
-/* Paraíba — Design System da CODATA */
 [data-theme='pb'] {
   /* FONT */
   --op-font-title: #30599B;
