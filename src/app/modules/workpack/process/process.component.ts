@@ -61,7 +61,7 @@ export class ProcessComponent implements OnInit, OnDestroy {
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.responsive = value);
     this.formProcess = this.formBuilder.group({
       name: ['', [Validators.required, Validators.maxLength(50)]],
-      processNumber: ['', Validators.required],
+     processNumber: ['', [Validators.required, Validators.pattern(/^[0-9]{4}-[A-Z0-9]{5}$/)]],
       subject: ['', Validators.required],
       currentOrganization: ['', Validators.required],
       lengthOfStayOn: ['', Validators.required],
@@ -83,15 +83,18 @@ export class ProcessComponent implements OnInit, OnDestroy {
     this.formProcess.valueChanges
       .pipe(takeUntil(this.$destroy), filter(() => this.formProcess.dirty))
       .subscribe(() => this.cancelButton.showButton());
-    this.debounceSearch.pipe(debounceTime(300), takeUntil(this.$destroy)).subscribe(() => {
-      this.processNumber = this.formProcess.controls.processNumber.value;
-      this.resetFormProcess();
-      this.process = undefined;
-      this.showProcessHistory = false;
-      this.cardProcessHistory = undefined;
-      if (this.formProcess.controls.processNumber.value && this.formProcess.controls.processNumber.value.length > 3) {
-        this.searchProcessByNumber();
-      }
+this.debounceSearch.pipe(debounceTime(300), takeUntil(this.$destroy)).subscribe(() => {
+  const rawValue: string = this.formProcess.controls.processNumber.value;
+  this.processNumber = rawValue ? rawValue.toUpperCase() : rawValue;
+  this.resetFormProcess();
+  this.process = undefined;
+  this.showProcessHistory = false;
+  this.cardProcessHistory = undefined;
+
+  const processNumberRegex = /^[0-9]{4}-[A-Z0-9]{5}$/i; // note o "i" - case-insensitive
+  if (this.processNumber && processNumberRegex.test(this.processNumber)) {
+    this.searchProcessByNumber(); // usa this.processNumber já em upper
+  }
     });
     this.currentLang = this.translateSrv.currentLang;
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.responsive = value);
@@ -102,23 +105,23 @@ export class ProcessComponent implements OnInit, OnDestroy {
     );
   }
 
-  resetFormProcess() {
-    this.formProcess.reset({
-      name: '',
-      processNumber: this.processNumber,
-      subject: '',
-      currentOrganization: '',
-      lengthOfStayOn: '',
-      lengthOfStayOnSector: '',
-      actingDate: '',
-      actingOrganization: '',
-      actingSector: '',
-      lastDispatchDate: '',
-      note: '',
-      priority: false,
-      status: ''
-    });
-  }
+ 
+resetFormProcess() {
+  this.formProcess.patchValue({
+    name: '',
+    subject: '',
+    currentOrganization: '',
+    lengthOfStayOn: '',
+    lengthOfStayOnSector: '',
+    actingDate: '',
+    actingOrganization: '',
+    actingSector: '',
+    lastDispatchDate: '',
+    note: '',
+    priority: false,
+    status: ''
+  });
+}
 
   ngOnDestroy(): void {
     this.$destroy.next();
@@ -141,7 +144,8 @@ export class ProcessComponent implements OnInit, OnDestroy {
 
   async searchProcessByNumber() {
     this.isLoading = true;
-    const result = await this.processSrv.GetProcessByNumber({ 'process-number': this.formProcess.controls.processNumber.value });
+  const value = this.formProcess.controls.processNumber.value?.toUpperCase();
+  const result = await this.processSrv.GetProcessByNumber({ 'process-number': value });
     this.isLoading = true;
     if (result.success && result.data) {
       this.process = result.data;
@@ -343,4 +347,7 @@ export class ProcessComponent implements OnInit, OnDestroy {
     }
   }
 
+onProcessNumberInput() {
+  this.debounceSearch.next();
+}
 }
