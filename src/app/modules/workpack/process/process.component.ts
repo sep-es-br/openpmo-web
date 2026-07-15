@@ -91,9 +91,9 @@ export class ProcessComponent implements OnInit, OnDestroy {
       this.showProcessHistory = false;
       this.cardProcessHistory = undefined;
 
-      const processNumberRegex = /^[0-9]{4}-[A-Z0-9]{5}$/i; // note o "i" - case-insensitive
+      const processNumberRegex = /^[0-9]{4}-[A-Z0-9]{5}$/i; 
       if (this.processNumber && processNumberRegex.test(this.processNumber)) {
-        this.searchProcessByNumber(); // usa this.processNumber já em upper
+        this.searchProcessByNumber();
       }
     });
     this.currentLang = this.translateSrv.currentLang;
