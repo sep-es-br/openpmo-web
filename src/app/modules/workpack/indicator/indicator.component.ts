@@ -4,8 +4,8 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import * as moment from 'moment';
 import { MessageService, SelectItem } from 'primeng/api';
-import { Subject } from 'rxjs';
-import { filter, takeUntil } from 'rxjs/operators';
+import { Subject, combineLatest } from 'rxjs';
+import { debounceTime, filter, takeUntil } from 'rxjs/operators';
 import { CancelButtonComponent } from 'src/app/shared/components/cancel-button/cancel-button.component';
 import { SaveButtonComponent } from 'src/app/shared/components/save-button/save-button.component';
 import { ICard } from 'src/app/shared/interfaces/ICard';
@@ -20,6 +20,7 @@ import { ResponsiveService } from 'src/app/shared/services/responsive.service';
 import { WorkpackService } from 'src/app/shared/services/workpack.service';
 import { ChangeDetectorRef } from '@angular/core';
 import { WorkpackPropertyService } from 'src/app/shared/services/workpack-property.service';
+
 
 @Component({
   selector: 'app-indicator',
@@ -170,6 +171,25 @@ export class IndicatorComponent implements OnInit, OnDestroy {
         filter(() => this.formIndicator.dirty)
       )
       .subscribe(() => this.cancelButton.showButton());
+    
+      ///adddddd ---------------------------------------------------------
+          combineLatest([
+      this.formIndicator.get('startDate').valueChanges,
+      this.formIndicator.get('endDate').valueChanges,
+    ])
+      .pipe(
+        takeUntil(this.$destroy),
+        debounceTime(300),
+        filter(([start, end]) => {
+          return (
+            start instanceof Date &&
+            end instanceof Date &&
+            !isNaN(start.getTime()) &&
+            !isNaN(end.getTime())
+          );
+        })
+      )
+      .subscribe(() => this.onDateChange());
   }
 
   async ngOnInit() {

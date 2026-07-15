@@ -348,9 +348,6 @@ export class ProcessComponent implements OnInit, OnDestroy {
   }
 
 
-
-
-
   onProcessNumberInput() {
     this.debounceSearch.next();
   }
