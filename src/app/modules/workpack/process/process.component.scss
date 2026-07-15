@@ -43,6 +43,8 @@
           margin-right: 2em;
           .p-inputtext {
             width: 100%;
+            text-transform: uppercase;
+
           }
           .p-float-label {
             width: 100%;
@@ -52,6 +54,7 @@
             }
             .p-inputtext {
               width: 100%;
+    
             }
           }
           .input-container {
@@ -62,6 +65,9 @@
                 color: #004660;
               }
             }
+           .input-container .p-inputmask input {
+            text-transform: uppercase;
+           }
           }
         }
       }
