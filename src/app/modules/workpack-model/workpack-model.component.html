@@ -268,6 +268,21 @@
         </app-card>
       </div>
     </ng-container>
+
+    <div class="card commitments" *ngIf="workpackModelType === 'DeliverableModel'">
+      <app-card [properties]="cardPropertiesCommitments" *ngIf="cardPropertiesCommitments">
+      </app-card>
+    </div>
+    
+    <div class="card procurements" *ngIf="workpackModelType === 'DeliverableModel'">
+      <app-card [properties]="cardPropertiesProcurements" *ngIf="cardPropertiesProcurements">
+      </app-card>
+    </div>
+    
+    <div class="card agreements" *ngIf="workpackModelType === 'DeliverableModel'">
+      <app-card [properties]="cardPropertiesAgreements" *ngIf="cardPropertiesAgreements">
+      </app-card>
+    </div>
   
     <div class="card models">
       <app-card [properties]="cardPropertiesModels" *ngIf="cardPropertiesModels && idWorkpackModel">
