@@ -163,6 +163,9 @@
   "newSchedule": "Novo cronograma",
   "schedule": "Cronograma",
   "journal": "Diário",
+  "commitments": "Empenhos",
+  "procurements": "Licitações",
+  "Agreements": "Acordos",
   "showInactive": "Exibir inativos",
   "inactive": "Inativa",
   "sector": "Setor",
@@ -867,7 +870,8 @@
       "risk": {
         "has-issue-relationship": "Não é possível excluir o risco pois está associado a uma ocorrência."
       }
-    }
+    },
+    "commitmentNotFound": "Nota de empenho não encontrada"
   },
   "field": "Campo",
   "possibleRolesPerson": "Possíveis papéis de pessoa",
@@ -1113,5 +1117,26 @@
   "baseline-less-then-required-milestone": "O projeto deve possuir pelo menos {{0}} marcos críticos para submissão da Linha de Base.",
   "baseline-not-have-required-plannedWork": "Não é possível submeter uma Linha de Base sem escopo",
   "baseline-disabled-submission-warning": "Impossível submeter Linha de Base com pendências",
-  "languages": "Idiomas"
+  "languages": "Idiomas",
+
+  "commitment": "Empenho",
+  "newCommitment": "Novo Empenho",
+  "managementUnit": "Unidade Gestora",
+  "commitmentNote": "Nota de empenho",
+  "cnpj": "CNPJ",
+  "protocol": "Protocolo",
+  "year": "Ano",
+
+  "procurement": "Licitação",
+  "newProcurement": "Nova Licitação",
+  "modality": "Modalidade",
+
+  "cooperation": "Convênio",
+  "newCooperation": "Novo Convênio",
+  "grantorBeneficiaryName": "Nome Concedente / Convenente",
+
+  "contract": "Contrato",
+  "newContract": "Novo Contrato",
+  "supplier": "Fornecedor"
+
 }

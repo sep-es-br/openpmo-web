@@ -159,6 +159,9 @@
   "newSchedule": "New schedule",
   "schedule": "Schedule",
   "journal": "Journal",
+  "commitments": "Commitments",
+  "procurements": "Procurements",
+  "Agreements": "Agreements",
   "showInactive": "Show inactive",
   "inactive": "Inactive",
   "sector": "Sector",
@@ -837,7 +840,8 @@
       "risk": {
         "has-issue-relationship": "This risk can not be deleted because it has a related issue."
       }
-    }
+    },
+    "commitmentNotFound": "Commitment note not found"
   },
   "field": "Field",
   "possibleRolesPerson": "Possible roles of a person",
@@ -1078,5 +1082,25 @@
 
   "baseline-disabled-submission-warning": "Impossible to submit Baseline with pending items",
   "languages": "Languages",
-  "minLengthSearch": "Type at least 3 characters"
+  "minLengthSearch": "Type at least 3 characters",
+
+  "commitment": "Commitment",
+  "newCommitment": "New Commitment",
+  "managementUnit": "Management Unit",
+  "commitmentNote": "Commitment Note",
+  "cnpj": "CNPJ",
+  "protocol": "Protocol",
+
+  "procurement": "Procurement",
+  "newProcurement": "New Procurement",
+  "year": "Year",
+  "modality": "Modality",
+
+  "cooperation": "Cooperation",
+  "newCooperation": "New Cooperation",
+  "grantorBeneficiaryName": "Grantor / Beneficiary Name",
+
+  "contract": "Contract",
+  "newContract": "New Contract",
+  "supplier": "Supplier"
 }

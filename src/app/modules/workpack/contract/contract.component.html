@@ -1,0 +1,176 @@
+<div class="app-contract">
+    <div class="app-content-header">
+      <span *ngIf="!idContract">
+        {{ 'newContract' | translate }}
+      </span>
+  
+      <span *ngIf="idContract && contract">
+        {{ contract.processNumber }}
+      </span>
+    </div>
+  
+    <div
+      class="loading-form-container"
+      *ngIf="formIsSaving"
+    >
+      <app-card-loading
+        [isCardLoading]="formIsSaving"
+      >
+      </app-card-loading>
+    </div>
+  
+    <div
+      class="card-properties-contract"
+      *ngIf="cardContractProperties"
+      [class.responsive]="responsive"
+    >
+      <app-card
+        [properties]="cardContractProperties"
+        class="mt-0 inputs-float-label"
+      >
+        <form [formGroup]="formContract">
+  
+          <div class="contract-field selection-small app-property-selection">
+            <span class="p-float-label">
+              <p-dropdown
+                class="app-single-selection"
+                inputId="year"
+                formControlName="year"
+                [options]="yearOptions"
+                optionLabel="label"
+                optionValue="value"
+                dropdownIcon="fas fa-caret-down"
+                [autoDisplayFirst]="false"
+                [disabled]="!editPermission || !!idContract"
+                (onChange)="handleYearChange()"
+              >
+              </p-dropdown>
+  
+              <label class="app-input-label" for="year">
+                {{ 'year' | translate }} *
+              </label>
+            </span>
+          </div>
+  
+          <div class="contract-field selection-small app-property-selection">
+            <span class="p-float-label">
+              <p-dropdown
+                class="app-single-selection"
+                inputId="organization"
+                formControlName="organization"
+                [options]="organizationOptions"
+                optionLabel="label"
+                optionValue="value"
+                dropdownIcon="fas fa-caret-down"
+                [autoDisplayFirst]="false"
+                [disabled]="!editPermission || !!idContract"
+                (onChange)="handleOrganizationChange()"
+              >
+              </p-dropdown>
+  
+              <label class="app-input-label" for="organization">
+                {{ 'organization' | translate }} *
+              </label>
+            </span>
+          </div>
+  
+          <div class="contract-field selection-medium app-property-selection">
+            <span class="p-float-label">
+              <p-dropdown
+                class="app-single-selection"
+                inputId="process"
+                formControlName="process"
+                [options]="processOptions"
+                optionLabel="label"
+                optionValue="value"
+                dropdownIcon="fas fa-caret-down"
+                [autoDisplayFirst]="false"
+                [filter]="true"
+                [showClear]="true"
+                [disabled]="
+                  !editPermission ||
+                  !formContract.controls.organization.value ||
+                  !formContract.controls.year.value
+                "
+                (onChange)="handleProcessChange($event)"
+              >
+              </p-dropdown>
+  
+              <label class="app-input-label" for="process">
+                {{ 'process' | translate }} *
+              </label>
+            </span>
+          </div>
+  
+          <ng-container
+            *ngIf="
+              !isLoading &&
+              formContract.controls.process.value
+            "
+          >
+            <div class="contract-field text-small app-property-text">
+              <span class="p-float-label workpack-input-text-not-fullLine">
+                <input
+                  id="supplierCnpj"
+                  class="app-input-text"
+                  pInputText
+                  formControlName="supplierCnpj"
+                  readonly
+                />
+  
+                <label class="app-input-label" for="supplierCnpj">
+                  {{ 'cnpj' | translate }}
+                </label>
+              </span>
+            </div>
+  
+            <div class="contract-field text-small app-property-text">
+              <span class="p-float-label workpack-input-text-not-fullLine">
+                <input
+                  id="supplierName"
+                  class="app-input-text"
+                  pInputText
+                  formControlName="supplierName"
+                  readonly
+                />
+  
+                <label class="app-input-label" for="supplierName">
+                  {{ 'supplier' | translate }}
+                </label>
+              </span>
+            </div>
+  
+            <div class="contract-field text-small app-property-text">
+              <span class="p-float-label workpack-input-text-not-fullLine">
+                <input
+                  id="protocol"
+                  class="app-input-text"
+                  pInputText
+                  formControlName="protocol"
+                  readonly
+                />
+  
+                <label class="app-input-label" for="protocol">
+                  {{ 'protocol' | translate }}
+                </label>
+              </span>
+            </div>
+          </ng-container>
+        </form>
+      </app-card>
+    </div>
+  </div>
+  
+  <app-buttons-container>
+    <app-save-button
+      #saveButton
+      (save)="saveContract()"
+    >
+    </app-save-button>
+  
+    <app-cancel-button
+      #cancelButton
+      (cancel)="handleOnCancel()"
+    >
+    </app-cancel-button>
+  </app-buttons-container>
