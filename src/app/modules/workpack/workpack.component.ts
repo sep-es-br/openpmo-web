@@ -57,7 +57,7 @@ import { TypeWorkpackModelEnum } from 'src/app/shared/enums/TypeWorkpackModelEnu
 import { SetConfigWorkpackService } from 'src/app/shared/services/set-config-workpack.service';
 import { PageDef, SearchService } from 'src/app/shared/services/search.service';
 import { IUniversalSearch } from 'src/app/shared/interfaces/universal-search.interface';
-import { CommitmentsService } from 'src/app/shared/services/commitments.service';
+import { ObligationsService } from 'src/app/shared/services/obligations.service';
 import { ProcurementsService } from 'src/app/shared/services/procurements.service';
 import { AgreementsService } from 'src/app/shared/services/agreements.service';
 
@@ -195,7 +195,7 @@ export class WorkpackComponent implements OnDestroy {
     public riskSrv: RiskService,
     public issueSrv: IssueService,
     public processSrv: ProcessService,
-    public commitmentsSrv: CommitmentsService,
+    public obligationsSrv: ObligationsService,
     public procurementsSrv: ProcurementsService,
     public AgreementsSrv: AgreementsService,
     public indicatorSrv: IndicatorService,
@@ -439,7 +439,7 @@ export class WorkpackComponent implements OnDestroy {
     this.processSrv.resetProcessesData();
     this.journalSrv.resetJournalData();
     this.scheduleSrv.resetScheduleData();
-    this.commitmentsSrv.resetCommitmentsData();
+    this.obligationsSrv.resetObligationsData();
     this.procurementsSrv.resetProcurementsData();
     this.AgreementsSrv.resetAgreementsData();
   }
@@ -476,7 +476,7 @@ export class WorkpackComponent implements OnDestroy {
     this.issueSrv.loadIssues();
     this.baselineSrv.loadBaselines();
     this.processSrv.loadProcesses();
-    this.commitmentsSrv.loadCommitments();
+    this.obligationsSrv.loadObligations();
     this.procurementsSrv.loadProcurements();
     this.AgreementsSrv.loadAgreements();
     this.indicatorSrv.loadIndicators();
@@ -1778,10 +1778,10 @@ export class WorkpackComponent implements OnDestroy {
           key: 'processes'
         });
       }
-      if (this.idWorkpack && this.workpackModel && this.workpackModel.commitmentsSessionActive) {
+      if (this.idWorkpack && this.workpackModel && this.workpackModel.obligationsSessionActive) {
         this.tabs.push({
-          menu: 'commitments',
-          key: 'commitments'
+          menu: 'obligations',
+          key: 'obligations'
         });
       }
       if (this.idWorkpack && this.workpackModel && this.workpackModel.procurementsSessionActive) {

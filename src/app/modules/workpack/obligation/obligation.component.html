@@ -1,11 +1,11 @@
-<div class="app-commitment">
+<div class="app-obligation">
   <div class="app-content-header">
-    <span *ngIf="!idCommitment">
-      {{ "newCommitment" | translate }}
+    <span *ngIf="!idObligation">
+      {{ "newObligation" | translate }}
     </span>
 
-    <span *ngIf="idCommitment && commitment">
-      {{ commitment.commitmentNumber }}
+    <span *ngIf="idObligation && obligation">
+      {{ obligation.obligationNumber }}
     </span>
   </div>
 
@@ -14,17 +14,17 @@
   </div>
 
   <div
-    class="card-properties-commitment"
-    *ngIf="cardCommitmentProperties"
+    class="card-properties-obligation"
+    *ngIf="cardObligationProperties"
     [class.responsive]="responsive"
   >
     <app-card
-      [properties]="cardCommitmentProperties"
+      [properties]="cardObligationProperties"
       class="mt-0 inputs-float-label"
     >
-      <form [formGroup]="formCommitment">
+      <form [formGroup]="formObligation">
         <!-- Ano -->
-        <div class="commitment-field selection-small app-property-selection">
+        <div class="obligation-field selection-small app-property-selection">
           <span class="p-float-label">
             <p-dropdown
               class="app-single-selection"
@@ -35,7 +35,7 @@
               optionValue="value"
               dropdownIcon="fas fa-caret-down"
               [autoDisplayFirst]="false"
-              [disabled]="!editPermission || !!idCommitment"
+              [disabled]="!editPermission || !!idObligation"
               (onChange)="handleYearChange()"
             >
             </p-dropdown>
@@ -45,12 +45,12 @@
             </label>
           </span>
 
-          <app-input-message [form]="formCommitment" field="year">
+          <app-input-message [form]="formObligation" field="year">
           </app-input-message>
         </div>
 
         <!-- Unidade Gestora -->
-        <div class="commitment-field selection-small app-property-selection">
+        <div class="obligation-field selection-small app-property-selection">
           <span class="p-float-label">
             <p-dropdown
               class="app-single-selection"
@@ -61,7 +61,7 @@
               optionValue="value"
               dropdownIcon="fas fa-caret-down"
               [autoDisplayFirst]="false"
-              [disabled]="!editPermission || !!idCommitment"
+              [disabled]="!editPermission || !!idObligation"
               (onChange)="handleManagementUnitChange()"
             >
             </p-dropdown>
@@ -71,18 +71,18 @@
             </label>
           </span>
 
-          <app-input-message [form]="formCommitment" field="managementUnit">
+          <app-input-message [form]="formObligation" field="managementUnit">
           </app-input-message>
         </div>
 
-        <!-- Nota de empenho -->
-        <div class="commitment-field selection-medium app-property-selection">
+        <!-- Nota de obrigação -->
+        <div class="obligation-field selection-medium app-property-selection">
           <span class="p-float-label">
             <p-dropdown
               class="app-single-selection"
-              inputId="commitmentNote"
-              formControlName="commitmentNote"
-              [options]="commitmentNoteOptions"
+              inputId="obligationNote"
+              formControlName="obligationNote"
+              [options]="obligationNoteOptions"
               optionLabel="label"
               optionValue="value"
               dropdownIcon="fas fa-caret-down"
@@ -91,27 +91,27 @@
               [showClear]="true"
               [disabled]="
                 !editPermission ||
-                !formCommitment.controls.managementUnit.value ||
-                !formCommitment.controls.year.value
+                !formObligation.controls.managementUnit.value ||
+                !formObligation.controls.year.value
               "
-              (onChange)="handleCommitmentNoteChange($event)"
+              (onChange)="handleObligationNoteChange($event)"
             >
             </p-dropdown>
 
-            <label class="app-input-label" for="commitmentNote">
-              {{ "commitmentNote" | translate }} *
+            <label class="app-input-label" for="obligationNote">
+              {{ "obligationNote" | translate }} *
             </label>
           </span>
 
-          <app-input-message [form]="formCommitment" field="commitmentNote">
+          <app-input-message [form]="formObligation" field="obligationNote">
           </app-input-message>
         </div>
 
         <ng-container
-          *ngIf="!isLoading && formCommitment.controls.commitmentNote.value"
+          *ngIf="!isLoading && formObligation.controls.obligationNote.value"
         >
           <!-- CNPJ -->
-          <div class="commitment-field text-small app-property-text">
+          <div class="obligation-field text-small app-property-text">
             <span class="p-float-label workpack-input-text">
               <input
                 id="supplierCnpj"
@@ -129,7 +129,7 @@
           </div>
 
           <!-- Valor -->
-          <div class="commitment-field text-small app-property-text">
+          <div class="obligation-field text-small app-property-text">
             <span class="p-float-label workpack-input-text-not-fullLine">
               <input
                 id="amount"
@@ -147,7 +147,7 @@
           </div>
 
           <!-- Protocolo -->
-          <div class="commitment-field text-small app-property-text">
+          <div class="obligation-field text-small app-property-text">
             <span class="p-float-label workpack-input-text-not-fullLine">
               <input
                 id="protocol"
@@ -170,14 +170,14 @@
 
   <div
     class="id-container"
-    *ngIf="idCommitment && cardCommitmentProperties && !isLoading"
+    *ngIf="idObligation && cardObligationProperties && !isLoading"
   >
-    <span>{{ idCommitment }}</span>
+    <span>{{ idObligation }}</span>
   </div>
 </div>
 
 <app-buttons-container>
-  <app-save-button #saveButton (save)="saveCommitment()"> </app-save-button>
+  <app-save-button #saveButton (save)="saveObligation()"> </app-save-button>
 
   <app-cancel-button #cancelButton (cancel)="handleOnCancel()">
   </app-cancel-button>

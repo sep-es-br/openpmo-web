@@ -82,7 +82,7 @@ export class WorkpackModelComponent implements OnInit {
   cardPropertiesProcesses: ICard;
   cardPropertiesNotifications: ICard;
   cardPropertiesDashboard: ICard;
-  cardPropertiesCommitments: ICard;
+  cardPropertiesObligations: ICard;
   cardPropertiesProcurements: ICard;
   cardPropertiesAgreements: ICard;
   rolesPersonOptions = ['manager', 'teamMember', 'sponsor', 'partner'];
@@ -201,8 +201,8 @@ export class WorkpackModelComponent implements OnInit {
         ...this.cardPropertiesDashboard,
         initialStateCollapse: this.collapsePanelsStatus
       });
-      this.cardPropertiesCommitments = Object.assign({}, {
-        ...this.cardPropertiesCommitments,
+      this.cardPropertiesObligations = Object.assign({}, {
+        ...this.cardPropertiesObligations,
         initialStateCollapse: this.collapsePanelsStatus
       });
       this.cardPropertiesProcurements = Object.assign({}, {
@@ -377,7 +377,7 @@ export class WorkpackModelComponent implements OnInit {
     this.cardPropertiesModels = null;
     this.cardPropertiesSchedule = null;
     this.cardPropertiesSchedule = null;
-    this.cardPropertiesCommitments = null;
+    this.cardPropertiesObligations = null;
     this.cardPropertiesProcurements = null;
     this.cardPropertiesAgreements = null;
     this.setCurrentBreadcrumb();
@@ -864,7 +864,7 @@ export class WorkpackModelComponent implements OnInit {
       this.cardPropertiesProcesses.initialStateToggle = data.processesManagementSessionActive;
       if (this.workpackModelType === TypeWorkpackModelEnum.DeliverableModel) {
         this.cardPropertiesSchedule.initialStateToggle = data.scheduleSessionActive;
-        this.cardPropertiesCommitments.initialStateToggle = data.commitmentsSessionActive;
+        this.cardPropertiesObligations.initialStateToggle = data.obligationsSessionActive;
         this.cardPropertiesProcurements.initialStateToggle = data.procurementsSessionActive;
         this.cardPropertiesAgreements.initialStateToggle = data.agreementsSessionActive;
       }
@@ -1499,15 +1499,15 @@ export class WorkpackModelComponent implements OnInit {
         }
         this.checkProperties();
       });
-      this.cardPropertiesCommitments = {
+      this.cardPropertiesObligations = {
         toggleable: this.editPermission,
         initialStateToggle: false,
-        cardTitle: 'commitmentss',
+        cardTitle: 'obligations',
         collapseble: false,
         initialStateCollapse: true,
         onToggle: new EventEmitter<boolean>()
       };
-      this.cardPropertiesCommitments.onToggle
+      this.cardPropertiesObligations.onToggle
         .pipe(takeUntil(this.$destroy))
         .subscribe(() => this.checkProperties());
       this.cardPropertiesProcurements = {
@@ -1609,7 +1609,7 @@ export class WorkpackModelComponent implements OnInit {
       notificationsEventMilestoneDaysBefore: this.notifications?.eventMilestone?.daysBefore,
       notificationsEventScheduleEnabled: this.notifications?.eventSchedule?.enabled,
       notificationsEventScheduleDayOfMonth: this.notifications?.eventSchedule?.dayOfMonth,
-      commitmentsSessionActive: !!this.cardPropertiesCommitments?.initialStateToggle,
+      obligationsSessionActive: !!this.cardPropertiesObligations?.initialStateToggle,
       procurementsSessionActive: !!this.cardPropertiesProcurements?.initialStateToggle,
       agreementsSessionActive: !!this.cardPropertiesAgreements?.initialStateToggle,
       fontIcon: icon,

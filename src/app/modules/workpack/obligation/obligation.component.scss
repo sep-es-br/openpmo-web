@@ -1,6 +1,6 @@
 @use "src/variables" as v;
 
-::ng-deep .app-commitment {
+::ng-deep .app-obligation {
   width: 100%;
   position: relative;
 
@@ -29,7 +29,7 @@
     }
   }
 
-  .card-properties-commitment {
+  .card-properties-obligation {
     width: 100%;
 
     form {
@@ -37,7 +37,7 @@
       padding-bottom: 3em;
     }
 
-    .commitment-field {
+    .obligation-field {
       display: block;
       margin-bottom: 2em;
     }
@@ -73,7 +73,7 @@
     }
   }
 
-  .card-properties-commitment.responsive {
+  .card-properties-obligation.responsive {
     .selection-small,
     .selection-medium,
     .text-full,

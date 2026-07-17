@@ -135,6 +135,86 @@
   </p-card>
   <!-- FIM INDICADORES -->
 
+  <!-- INÍCIO EMPENHO -->
+  <p-card *ngSwitchCase="'listItemObligation'" class="app-card-item listItem" [class.mobile]="responsive"
+    [class.cardList]="displayModeCard === 'list'" [class.canceled]="properties.canceled">
+    <div class="display-mode-grid" *ngIf="displayModeCard !== 'list'">
+      <p-header *ngIf="properties.menuItems" class="card-item-header">
+        <p-menu #menu [popup]="true" [model]="properties.menuItems">
+        </p-menu>
+  
+        <button type="button" pButton icon="pi pi-ellipsis-v" [class.hidden]="!properties.menuItems.length"
+          (click)="menu.toggle($event)">
+        </button>
+      </p-header>
+  
+      <p-header *ngIf="!properties.menuItems" class="card-item-header">
+        <span class="menu-none"></span>
+      </p-header>
+  
+      <div class="card-item-content" [class.card-link]="properties.urlCard" (click)="handleNavigateToPage()"
+        [class.cardList]="displayModeCard === 'list'">
+        <div class="icons-container">
+          <i class="fas fa-file-invoice-dollar"></i>
+        </div>
+  
+        <span class="card-item-name" [pTooltip]="properties.fullNameCardItem" tooltipPosition="bottom">
+          {{ properties.nameCardItem }}
+        </span>
+  
+        <span class="card-item-subtitle" *ngIf="properties.subtitleCardItem">
+          {{ properties.subtitleCardItem }}
+        </span>
+      </div>
+  
+      <div class="card-item-footer" *ngIf="cardIdItem">
+        <span class="card-item-id">
+          {{ cardIdItem }}
+        </span>
+      </div>
+    </div>
+  
+    <div class="display-mode-list" *ngIf="displayModeCard === 'list'">
+      <div class="card-item-content" [class.card-link]="properties.urlCard" (click)="handleNavigateToPage()"
+        [class.cardList]="displayModeCard === 'list'">
+        <div class="icons-container">
+          <i class="fas fa-file-invoice-dollar"></i>
+        </div>
+  
+        <span class="card-item-name" [pTooltip]="properties.fullNameCardItem" tooltipPosition="bottom">
+          {{ properties.nameCardItem }}
+        </span>
+  
+        <span class="card-item-subtitle" *ngIf="properties.subtitleCardItem">
+          {{ properties.subtitleCardItem }}
+        </span>
+      </div>
+  
+      <div class="right-side">
+        <p-header *ngIf="properties.menuItems" class="card-item-header">
+          <p-menu #menu [popup]="true" [model]="properties.menuItems">
+          </p-menu>
+  
+          <button type="button" pButton icon="pi pi-ellipsis-v" [class.hidden]="!properties.menuItems.length"
+            (click)="menu.toggle($event)">
+          </button>
+        </p-header>
+  
+        <p-header *ngIf="!properties.menuItems" class="card-item-header">
+          <span class="menu-none"></span>
+        </p-header>
+  
+        <div class="card-item-footer" *ngIf="cardIdItem">
+          <span class="card-item-id">
+            {{ cardIdItem }}
+          </span>
+        </div>
+      </div>
+    </div>
+  </p-card>
+  <!-- FIM OBRIGAÇÕES -->
+  
+
   <p-card *ngSwitchCase="'listItemProcess'" class="app-card-item listItem process" [class.mobile]="responsive"
     [class.cardList]="displayModeCard === 'list'">
     <div class="display-mode-grid" *ngIf="displayModeCard !== 'list'">

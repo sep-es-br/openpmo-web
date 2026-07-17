@@ -5,21 +5,21 @@ import { BaseService } from '../base/base.service';
 import { IWorkpackData, IWorkpackParams } from '../interfaces/IWorkpackDataParams';
 import { WorkpackService } from './workpack.service';
 import { FilterDataviewService } from './filter-dataview.service';
-import { ICommitment } from '../interfaces/ICommitment';
+import { IObligation } from '../interfaces/IObligation';
 import { IHttpResult } from '../interfaces/IHttpResult';
 import { PrepareHttpParams } from '../utils/query.util';
 
 @Injectable({
   providedIn: 'root'
 })
-export class CommitmentsService extends BaseService<ICommitment> {
+export class ObligationsService extends BaseService<IObligation> {
 
-  private resetCommitments = new BehaviorSubject<boolean>(false);
+  private resetObligations = new BehaviorSubject<boolean>(false);
 
   workpackData: IWorkpackData;
   workpackParams: IWorkpackParams;
   filters;
-  commitments;
+  obligations;
   idFilterSelected;
   term = '';
   loading;
@@ -29,19 +29,19 @@ export class CommitmentsService extends BaseService<ICommitment> {
     private workpackSrv: WorkpackService,
     private filterSrv: FilterDataviewService
   ) {
-    super('commitments', injector);
+    super('obligations', injector);
   }
 
-  resetCommitmentsData() {
+  resetObligationsData() {
     this.filters = [];
-    this.commitments = [];
+    this.obligations = [];
     this.idFilterSelected = undefined;
     this.term = '';
     this.loading = true;
-    this.nextResetCommitments(true);
+    this.nextResetObligations(true);
   }
 
-  async loadCommitments(params?) {
+  async loadObligations(params?) {
     this.workpackData = this.workpackSrv.getWorkpackData();
     this.workpackParams = this.workpackSrv.getWorkpackParams();
 
@@ -49,7 +49,7 @@ export class CommitmentsService extends BaseService<ICommitment> {
       this.workpackData &&
       this.workpackData?.workpack?.id &&
       this.workpackData?.workpackModel &&
-      this.workpackData.workpackModel.commitmentsSessionActive
+      this.workpackData.workpackModel.obligationsSessionActive
     ) {
 
       if (
@@ -67,7 +67,7 @@ export class CommitmentsService extends BaseService<ICommitment> {
 
           const resultFilters =
             await this.filterSrv.getAllFilters(
-              `workpackModels/${this.workpackData.workpackModel.id}/commitments`
+              `workpackModels/${this.workpackData.workpackModel.id}/obligations`
             );
 
           this.filters =
@@ -82,57 +82,57 @@ export class CommitmentsService extends BaseService<ICommitment> {
               : undefined;
         }
 
-        const resultCommitments = await this.GetAll({
+        const resultObligations = await this.GetAll({
           'id-workpack': this.workpackParams.idWorkpack,
           idFilter: this.idFilterSelected,
           term: this.term
         });
 
-        this.commitments =
-          resultCommitments.success
-            ? resultCommitments.data
+        this.obligations =
+          resultObligations.success
+            ? resultObligations.data
             : [];
 
         this.loading = false;
-        this.nextResetCommitments(true);
+        this.nextResetObligations(true);
       }
 
     } else {
       this.loading = false;
-      this.nextResetCommitments(true);
+      this.nextResetObligations(true);
     }
   }
 
-  getCommitmentsData() {
+  getObligationsData() {
     return {
       workpackData: this.workpackData,
       workpackParams: this.workpackParams,
       filters: this.filters,
-      commitments: this.commitments,
+      obligations: this.obligations,
       term: this.term,
       idFilterSelected: this.idFilterSelected,
       loading: this.loading
     };
   }
 
-  deleteCommitmentFromData(id) {
-    this.commitments =
-      this.commitments.filter(
-        commitment => commitment.id !== id
+  deleteObligationFromData(id) {
+    this.obligations =
+      this.obligations.filter(
+        obligation => obligation.id !== id
       );
   }
 
-  nextResetCommitments(nextValue: boolean) {
-    this.resetCommitments.next(nextValue);
+  nextResetObligations(nextValue: boolean) {
+    this.resetObligations.next(nextValue);
   }
 
-  get observableResetCommitments() {
-    return this.resetCommitments.asObservable();
+  get observableResetObligations() {
+    return this.resetObligations.asObservable();
   }
 
-  public async GetCommitmentByNumber(
+  public async GetObligationByNumber(
     options?
-  ): Promise<IHttpResult<ICommitment>> {
+  ): Promise<IHttpResult<IObligation>> {
     return this.http.get(
       `${this.urlBase}/search`,
       {
@@ -140,6 +140,6 @@ export class CommitmentsService extends BaseService<ICommitment> {
           PrepareHttpParams(options)
       }
     ).toPromise() as
-      Promise<IHttpResult<ICommitment>>;
+      Promise<IHttpResult<IObligation>>;
   }
 }

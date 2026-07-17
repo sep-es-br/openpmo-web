@@ -159,7 +159,7 @@
   "newSchedule": "New schedule",
   "schedule": "Schedule",
   "journal": "Journal",
-  "commitments": "Commitments",
+  "obligations": "Obligations",
   "procurements": "Procurements",
   "Agreements": "Agreements",
   "showInactive": "Show inactive",
@@ -841,7 +841,7 @@
         "has-issue-relationship": "This risk can not be deleted because it has a related issue."
       }
     },
-    "commitmentNotFound": "Commitment note not found"
+    "obligationNotFound": "Obligation note not found"
   },
   "field": "Field",
   "possibleRolesPerson": "Possible roles of a person",
@@ -1084,10 +1084,10 @@
   "languages": "Languages",
   "minLengthSearch": "Type at least 3 characters",
 
-  "commitment": "Commitment",
-  "newCommitment": "New Commitment",
+  "obligation": "Obligation",
+  "newObligation": "New Obligation",
   "managementUnit": "Management Unit",
-  "commitmentNote": "Commitment Note",
+  "obligationNote": "Obligation Note",
   "cnpj": "CNPJ",
   "protocol": "Protocol",
 

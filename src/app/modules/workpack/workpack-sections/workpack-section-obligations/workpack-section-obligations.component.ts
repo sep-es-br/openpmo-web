@@ -7,14 +7,14 @@ import { takeUntil } from 'rxjs/operators';
 
 import { FilterDataviewPropertiesEntity } from 'src/app/shared/constants/filterDataviewPropertiesEntity';
 import { IconsEnum } from 'src/app/shared/enums/IconsEnum';
-import { ICommitment } from 'src/app/shared/interfaces/ICommitment';
+import { IObligation } from 'src/app/shared/interfaces/IObligation';
 import { IFilterProperty } from 'src/app/shared/interfaces/IFilterProperty';
 import { ISection } from 'src/app/shared/interfaces/ISectionWorkpack';
 import {
   IWorkpackData,
   IWorkpackParams,
 } from 'src/app/shared/interfaces/IWorkpackDataParams';
-import { CommitmentsService } from 'src/app/shared/services/commitments.service';
+import { ObligationsService } from 'src/app/shared/services/obligations.service';
 
 import { ConfigDataViewService } from 'src/app/shared/services/config-dataview.service';
 import { FilterDataviewService } from 'src/app/shared/services/filter-dataview.service';
@@ -24,16 +24,16 @@ import { WorkpackShowTabviewService } from 'src/app/shared/services/workpack-sho
 import { WorkpackService } from 'src/app/shared/services/workpack.service';
 
 @Component({
-  selector: 'app-workpack-section-commitments',
-  templateUrl: './workpack-section-commitments.component.html',
-  styleUrls: ['./workpack-section-commitments.component.scss'],
+  selector: 'app-workpack-section-obligations',
+  templateUrl: './workpack-section-obligations.component.html',
+  styleUrls: ['./workpack-section-obligations.component.scss'],
 })
-export class WorkpackSectionCommitmentsComponent implements OnInit, OnDestroy {
-  totalRecordsCommitments: number;
+export class WorkpackSectionObligationsComponent implements OnInit, OnDestroy {
+  totalRecordsObligations: number;
 
-  commitments: ICommitment[];
+  obligations: IObligation[];
 
-  sectionCommitments: ISection;
+  sectionObligations: ISection;
 
   workpackData: IWorkpackData;
 
@@ -67,7 +67,7 @@ export class WorkpackSectionCommitmentsComponent implements OnInit, OnDestroy {
     private configDataViewSrv: ConfigDataViewService,
     private workpackBreadcrumbStorageSrv: WorkpackBreadcrumbStorageService,
     private responsiveSrv: ResponsiveService,
-    private commitmentsSrv: CommitmentsService,
+    private obligationsSrv: ObligationsService,
     private workpackShowTabviewSrv: WorkpackShowTabviewService
   ) {
     this.workpackShowTabviewSrv.observable
@@ -87,10 +87,10 @@ export class WorkpackSectionCommitmentsComponent implements OnInit, OnDestroy {
       .subscribe((collapsePanelStatus) => {
         this.collapsePanelsStatus = collapsePanelStatus === 'collapse';
 
-        this.sectionCommitments = this.sectionCommitments && {
-          ...this.sectionCommitments,
+        this.sectionObligations = this.sectionObligations && {
+          ...this.sectionObligations,
           cardSection: {
-            ...this.sectionCommitments.cardSection,
+            ...this.sectionObligations.cardSection,
             initialStateCollapse: this.showTabview
               ? false
               : this.collapsePanelsStatus,
@@ -110,11 +110,11 @@ export class WorkpackSectionCommitmentsComponent implements OnInit, OnDestroy {
         this.pageSize = pageSize;
       });
 
-    this.sectionCommitments = {
+    this.sectionObligations = {
       cardSection: {
         toggleable: false,
         initialStateToggle: false,
-        cardTitle: this.showTabview ? '' : 'commitments',
+        cardTitle: this.showTabview ? '' : 'obligations',
         collapseble: !this.showTabview,
         initialStateCollapse: this.showTabview
           ? false
@@ -126,11 +126,11 @@ export class WorkpackSectionCommitmentsComponent implements OnInit, OnDestroy {
       },
     };
 
-    this.commitmentsSrv.observableResetCommitments
+    this.obligationsSrv.observableResetObligations
       .pipe(takeUntil(this.$destroy))
       .subscribe((reset) => {
         if (reset) {
-          this.loadCommitmentsData();
+          this.loadObligationsData();
         }
       });
   }
@@ -142,129 +142,128 @@ export class WorkpackSectionCommitmentsComponent implements OnInit, OnDestroy {
     this.$destroy.complete();
   }
 
-  loadCommitmentsData(): void {
+  loadObligationsData(): void {
     const {
       workpackData,
       workpackParams,
       filters,
-      commitments,
+      obligations,
       term,
       idFilterSelected,
       loading,
-    } = this.commitmentsSrv.getCommitmentsData();
+    } = this.obligationsSrv.getObligationsData();
 
     this.workpackData = workpackData;
     this.workpackParams = workpackParams;
     this.filters = filters;
-    this.commitments = commitments;
+    this.obligations = obligations;
     this.idFilterSelected = idFilterSelected;
     this.term = term;
 
     this.sectionActive =
       !!this.workpackData?.workpack?.id &&
       !!this.workpackData?.workpackModel &&
-      !!this.workpackData.workpackModel.commitmentsSessionActive;
+      !!this.workpackData.workpackModel.obligationsSessionActive;
 
     if (!loading) {
-      this.loadCommitmentsSection();
+      this.loadObligationsSection();
     }
   }
 
-  getCommitments(): void {
-    this.commitmentsSrv.loadCommitments({
+  getObligations(): void {
+    this.obligationsSrv.loadObligations({
       idFilterSelected: this.idFilterSelected,
       term: this.term,
     });
   }
 
-  handleCreateNewCommitment(): void {
-    this.router.navigate(['/workpack/commitments'], {
+  handleCreateNewObligation(): void {
+    this.router.navigate(['/workpack/obligations'], {
       queryParams: {
         idWorkpack: this.workpackParams.idWorkpack,
       },
     });
   }
 
-  async deleteCommitment(commitment: ICommitment): Promise<void> {
-    const result = await this.commitmentsSrv.delete(commitment, {
+  async deleteObligation(obligation: IObligation): Promise<void> {
+    const result = await this.obligationsSrv.delete(obligation, {
       useConfirm: true,
     });
 
     if (result.success) {
-      this.sectionCommitments.cardItemsSection = Array.from(
-        this.sectionCommitments.cardItemsSection.filter(
-          (item) => item.itemId !== commitment.id
+      this.sectionObligations.cardItemsSection = Array.from(
+        this.sectionObligations.cardItemsSection.filter(
+          (item) => item.itemId !== obligation.id
         )
       );
 
-      this.commitmentsSrv.deleteCommitmentFromData(commitment.id);
+      this.obligationsSrv.deleteObligationFromData(obligation.id);
 
-      this.totalRecordsCommitments =
-        this.sectionCommitments.cardItemsSection?.length || 0;
+      this.totalRecordsObligations =
+        this.sectionObligations.cardItemsSection?.length || 0;
     }
   }
 
-  handleSelectedFilterCommitment(event): void {
+  handleSelectedFilterObligation(event): void {
     this.idFilterSelected = event.filter;
-    this.getCommitments();
+    this.getObligations();
   }
 
   handleSearchText(event): void {
     this.term = event.term;
-    this.getCommitments();
+    this.getObligations();
   }
 
-  async loadCommitmentsSection(): Promise<void> {
+  async loadObligationsSection(): Promise<void> {
     if (!this.sectionActive) {
       return;
     }
 
-    this.sectionCommitments = {
-      ...this.sectionCommitments,
+    this.sectionObligations = {
+      ...this.sectionObligations,
       cardSection: {
-        ...this.sectionCommitments.cardSection,
+        ...this.sectionObligations.cardSection,
         filters: this.filters?.length ? this.filters : [],
         showCreateNemElementButton: this.workpackSrv.getEditPermission(),
         idFilterSelected: this.idFilterSelected,
         searchTerm: this.term,
         isLoading: false,
       },
-      cardItemsSection: await this.loadSectionCommitmentsCards(),
+      cardItemsSection: await this.loadSectionObligationsCards(),
     };
 
-    this.totalRecordsCommitments =
-      this.sectionCommitments.cardItemsSection?.length || 0;
+    this.totalRecordsObligations =
+      this.sectionObligations.cardItemsSection?.length || 0;
   }
 
-  async loadSectionCommitmentsCards() {
-    if (this.commitments?.length) {
-      const cardItems = this.commitments.map((commitment) => ({
-        typeCardItem: 'listItemCommitment',
+  async loadSectionObligationsCards() {
+    console.log('loadSectionObligationsCards', this.obligations);
+    if (this.obligations?.length) {
+      const cardItems = this.obligations.map((obligation) => ({
+        typeCardItem: 'listItemObligation',
 
         icon: 'file-invoice-dollar',
 
         iconSvg: false,
 
-        nameCardItem: commitment.commitmentNumber,
+        nameCardItem: obligation.description ,
 
-        subtitleCardItem: commitment.description,
+        subtitleCardItem: obligation.obligationNumber,
 
-        organizationName: commitment.managementUnitName,
+        itemId: obligation.id,
 
-        itemId: commitment.id,
-
-        idAtributeName: 'idCommitment',
+        idAtributeName: 'idObligation',
 
         menuItems: [
           {
             label: this.translateSrv.instant('delete'),
             icon: 'fas fa-trash-alt',
-            command: () => this.deleteCommitment(commitment),
+            command: () => this.deleteObligation(obligation),
             disabled: !this.workpackSrv.getEditPermission(),
           },
         ] as MenuItem[],
 
-        urlCard: '/workpack/commitments',
+        urlCard: '/workpack/obligations',
 
         paramsUrlCard: [
           {
@@ -273,7 +272,7 @@ export class WorkpackSectionCommitmentsComponent implements OnInit, OnDestroy {
           },
           {
             name: 'id',
-            value: commitment.id,
+            value: obligation.id,
           },
         ],
       }));
@@ -282,7 +281,7 @@ export class WorkpackSectionCommitmentsComponent implements OnInit, OnDestroy {
         this.workpackSrv.getEditPermission() &&
         !this.workpackData.workpack.canceled
       ) {
-        cardItems.push(this.createNewCommitmentCard());
+        cardItems.push(this.createNewObligationCard());
       }
 
       return cardItems;
@@ -292,13 +291,13 @@ export class WorkpackSectionCommitmentsComponent implements OnInit, OnDestroy {
       this.workpackSrv.getEditPermission() &&
       !this.workpackData.workpack.canceled
     ) {
-      return [this.createNewCommitmentCard()];
+      return [this.createNewObligationCard()];
     }
 
     return [];
   }
 
-  private createNewCommitmentCard(): any {
+  private createNewObligationCard(): any {
     return {
       typeCardItem: 'newCardItem',
       icon: IconsEnum.Plus,
@@ -307,9 +306,9 @@ export class WorkpackSectionCommitmentsComponent implements OnInit, OnDestroy {
       subtitleCardItem: null,
       organizationName: null,
       itemId: null,
-      idAtributeName: 'idCommitment',
+      idAtributeName: 'idObligation',
       menuItems: null,
-      urlCard: '/workpack/commitments',
+      urlCard: '/workpack/obligations',
       paramsUrlCard: [
         {
           name: 'idWorkpack',

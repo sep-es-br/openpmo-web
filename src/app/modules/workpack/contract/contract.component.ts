@@ -8,7 +8,7 @@ import { filter, takeUntil } from 'rxjs/operators';
 
 import { CancelButtonComponent } from 'src/app/shared/components/cancel-button/cancel-button.component';
 import { SaveButtonComponent } from 'src/app/shared/components/save-button/save-button.component';
-import { IAgreements } from 'src/app/shared/interfaces/IAgreements';
+import { IAgreementCreate, IAgreements, IAgreementUpdate } from 'src/app/shared/interfaces/IAgreements';
 import { ICard } from 'src/app/shared/interfaces/ICard';
 import { AgreementsService } from 'src/app/shared/services/agreements.service';
 import { AuthService } from 'src/app/shared/services/auth.service';
@@ -317,52 +317,55 @@ export class ContractComponent implements OnInit, OnDestroy {
     this.cancelButton?.hideButton();
     this.formIsSaving = true;
 
-    const selectedOrganization = this.organizationOptions.find(
-      (option) => option.value === this.formContract.controls.organization.value
-    );
+    const formValue = this.formContract.getRawValue();
 
     const selectedProcess = this.processOptions.find(
-      (option) => option.value === this.formContract.controls.process.value
+      (option) => option.value === formValue.process
     );
 
-    const sender: IAgreements = {
-      id: this.idContract,
+    const sender: IAgreementCreate = {
       idWorkpack: this.idWorkpack,
-
       type: 'CONTRACT',
-
-      organizationId: this.formContract.controls.organization.value,
-
-      organizationName: selectedOrganization?.label,
-
-      year: this.formContract.controls.year.value,
-
-      processId: this.formContract.controls.process.value,
-
       processNumber: selectedProcess?.data?.processNumber,
-
       object: selectedProcess?.data?.object,
-
-      supplierCnpj: this.formContract.controls.supplierCnpj.value,
-
-      supplierName: this.formContract.controls.supplierName.value,
-
-      protocol: this.formContract.controls.protocol.value,
     };
 
-    const put = !!this.idContract;
+    let result;
 
-    const result = put
-      ? await this.agreementsSrv.put(sender)
-      : await this.agreementsSrv.post(sender);
+    if (this.idContract) {
+      const updateSender: IAgreementUpdate = {
+        ...sender,
+        id: this.idContract,
+      };
+
+      result = await this.agreementsSrv.put(updateSender);
+    } else {
+      result = await this.agreementsSrv.post(sender);
+    }
 
     if (result.success) {
+      const isUpdate = !!this.idContract;
+
       this.idContract = result.data.id;
 
       this.contract = {
         ...this.contract,
-        ...sender,
         id: result.data.id,
+        idWorkpack: this.idWorkpack,
+        type: 'CONTRACT',
+        processNumber: sender.processNumber,
+        object: sender.object,
+
+        organizationId: formValue.organization,
+        organizationName: this.organizationOptions.find(
+          (option) => option.value === formValue.organization
+        )?.label,
+
+        year: formValue.year,
+        processId: formValue.process,
+        supplierCnpj: formValue.supplierCnpj,
+        supplierName: formValue.supplierName,
+        protocol: formValue.protocol,
       };
 
       this.messageSrv.add({
@@ -370,6 +373,10 @@ export class ContractComponent implements OnInit, OnDestroy {
         summary: this.translateSrv.instant('success'),
         detail: this.translateSrv.instant('messages.savedSuccessfully'),
       });
+
+      if (!isUpdate) {
+        await this.setBreadcrumb();
+      }
 
       this.formContract.markAsPristine();
       this.saveButton?.hideButton();

@@ -1,33 +1,33 @@
 <div
-  class="card-commitments"
-  *ngIf="sectionCommitments && sectionActive"
+  class="card-obligations"
+  *ngIf="sectionObligations && sectionActive"
 >
   <app-card
-    [properties]="sectionCommitments.cardSection"
+    [properties]="sectionObligations.cardSection"
     [class.panel-tab-view]="showTabview"
-    [loading]="sectionCommitments.cardSection.isLoading"
+    [loading]="sectionObligations.cardSection.isLoading"
     (searchText)="handleSearchText($event)"
-    (editFilter)="handleEditFilterEntity($event, 'commitments')"
-    (newFilter)="handleNewFilterEntity('commitments')"
-    (selectedFilter)="handleSelectedFilterCommitment($event)"
-    (createNewElement)="handleCreateNewCommitment()"
+    (editFilter)="handleEditFilterEntity($event, 'obligations')"
+    (newFilter)="handleNewFilterEntity('obligations')"
+    (selectedFilter)="handleSelectedFilterObligation($event)"
+    (createNewElement)="handleCreateNewObligation()"
   >
-    <div class="commitments-list-container">
+    <div class="obligations-list-container">
       <div
         class="loading-container"
-        *ngIf="sectionCommitments.cardSection.isLoading"
+        *ngIf="sectionObligations.cardSection.isLoading"
       >
         <app-card-loading
-          [isCardLoading]="sectionCommitments.cardSection.isLoading"
+          [isCardLoading]="sectionObligations.cardSection.isLoading"
         >
         </app-card-loading>
       </div>
 
       <p-dataView
-        [value]="sectionCommitments.cardItemsSection"
+        [value]="sectionObligations.cardItemsSection"
         layout="grid"
         class="app-dataview"
-        [emptyMessage]="'notFoundCommitments' | translate"
+        [emptyMessage]="'notFoundObligations' | translate"
         *ngIf="
           (
             displayModeAll === 'grid' ||
@@ -36,13 +36,13 @@
               responsive
             )
           ) &&
-          !sectionCommitments.cardSection.isLoading
+          !sectionObligations.cardSection.isLoading
         "
         [paginator]="true"
         [rows]="pageSize"
         [showJumpToPageDropdown]="true"
         [showPageLinks]="false"
-        [totalRecords]="totalRecordsCommitments"
+        [totalRecords]="totalRecordsObligations"
       >
         <ng-template
           let-cardItem
@@ -60,20 +60,20 @@
       </p-dataView>
 
       <p-dataView
-        [value]="sectionCommitments.cardItemsSection"
+        [value]="sectionObligations.cardItemsSection"
         layout="list"
         class="app-dataview app-dataview-list"
-        [emptyMessage]="'notFoundCommitments' | translate"
+        [emptyMessage]="'notFoundObligations' | translate"
         *ngIf="
           displayModeAll === 'list' &&
           !responsive &&
-          !sectionCommitments.cardSection.isLoading
+          !sectionObligations.cardSection.isLoading
         "
         [paginator]="true"
         [rows]="pageSize"
         [showJumpToPageDropdown]="true"
         [showPageLinks]="false"
-        [totalRecords]="totalRecordsCommitments"
+        [totalRecords]="totalRecordsObligations"
       >
         <ng-template
           let-cardItem

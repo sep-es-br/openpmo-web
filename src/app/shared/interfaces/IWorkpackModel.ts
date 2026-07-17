@@ -40,7 +40,7 @@ export interface IWorkpackModel {
   notificationsEventMilestoneDaysBefore?: number;
   notificationsEventScheduleEnabled?: boolean;
   notificationsEventScheduleDayOfMonth?: number;
-  commitmentsSessionActive?: boolean;
+  obligationsSessionActive?: boolean;
   procurementsSessionActive?: boolean;
   agreementsSessionActive?: boolean;
 }

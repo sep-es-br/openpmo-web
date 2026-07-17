@@ -8,7 +8,7 @@ import { filter, takeUntil } from 'rxjs/operators';
 
 import { CancelButtonComponent } from 'src/app/shared/components/cancel-button/cancel-button.component';
 import { SaveButtonComponent } from 'src/app/shared/components/save-button/save-button.component';
-import { IAgreements } from 'src/app/shared/interfaces/IAgreements';
+import { IAgreementCreate, IAgreements, IAgreementUpdate } from 'src/app/shared/interfaces/IAgreements';
 import { ICard } from 'src/app/shared/interfaces/ICard';
 import { AgreementsService } from 'src/app/shared/services/agreements.service';
 import { AuthService } from 'src/app/shared/services/auth.service';
@@ -345,61 +345,61 @@ export class CooperationComponent implements OnInit, OnDestroy {
   async saveCooperation(): Promise<void> {
     if (this.formCooperation.invalid) {
       this.formCooperation.markAllAsTouched();
-
       return;
     }
 
     this.cancelButton?.hideButton();
     this.formIsSaving = true;
 
-    const selectedManagementUnit = this.managementUnitOptions.find(
-      (option) =>
-        option.value === this.formCooperation.controls.managementUnit.value
-    );
+    const formValue = this.formCooperation.getRawValue();
 
     const selectedProcess = this.processOptions.find(
-      (option) => option.value === this.formCooperation.controls.process.value
+      (option) => option.value === formValue.process
     );
 
-    const sender: IAgreements = {
-      id: this.idCooperation,
-
+    const sender: IAgreementCreate = {
       idWorkpack: this.idWorkpack,
-
       type: 'COOPERATION',
-
-      managementUnitId: this.formCooperation.controls.managementUnit.value,
-
-      managementUnitName: selectedManagementUnit?.label,
-
-      year: this.formCooperation.controls.year.value,
-
-      processId: this.formCooperation.controls.process.value,
-
       processNumber: selectedProcess?.data?.processNumber,
-
       object: selectedProcess?.data?.object,
-
-      grantorCnpj: this.formCooperation.controls.grantorCnpj.value,
-
-      grantorName: this.formCooperation.controls.grantorName.value,
-
-      protocol: this.formCooperation.controls.protocol.value,
     };
 
-    const put = !!this.idCooperation;
+    let result;
 
-    const result = put
-      ? await this.agreementsSrv.put(sender)
-      : await this.agreementsSrv.post(sender);
+    if (this.idCooperation) {
+      const updateSender: IAgreementUpdate = {
+        ...sender,
+        id: this.idCooperation,
+      };
+
+      result = await this.agreementsSrv.put(updateSender);
+    } else {
+      result = await this.agreementsSrv.post(sender);
+    }
 
     if (result.success) {
+      const isUpdate = !!this.idCooperation;
+
       this.idCooperation = result.data.id;
 
       this.cooperation = {
         ...this.cooperation,
-        ...sender,
         id: result.data.id,
+        idWorkpack: this.idWorkpack,
+        type: 'COOPERATION',
+        processNumber: sender.processNumber,
+        object: sender.object,
+
+        managementUnitId: formValue.managementUnit,
+        managementUnitName: this.managementUnitOptions.find(
+          (option) => option.value === formValue.managementUnit
+        )?.label,
+
+        year: formValue.year,
+        processId: formValue.process,
+        grantorCnpj: formValue.grantorCnpj,
+        grantorName: formValue.grantorName,
+        protocol: formValue.protocol,
       };
 
       this.messageSrv.add({
@@ -408,12 +408,11 @@ export class CooperationComponent implements OnInit, OnDestroy {
         detail: this.translateSrv.instant('messages.savedSuccessfully'),
       });
 
-      if (!put) {
+      if (!isUpdate) {
         await this.setBreadcrumb();
       }
 
       this.formCooperation.markAsPristine();
-
       this.saveButton?.hideButton();
       this.cancelButton?.hideButton();
     }

@@ -163,7 +163,7 @@
   "newSchedule": "Novo cronograma",
   "schedule": "Cronograma",
   "journal": "Diário",
-  "commitments": "Empenhos",
+  "obligations": "Obrigações",
   "procurements": "Licitações",
   "Agreements": "Acordos",
   "showInactive": "Exibir inativos",
@@ -871,7 +871,7 @@
         "has-issue-relationship": "Não é possível excluir o risco pois está associado a uma ocorrência."
       }
     },
-    "commitmentNotFound": "Nota de empenho não encontrada"
+    "obligationNotFound": "Nota de obrigação não encontrada"
   },
   "field": "Campo",
   "possibleRolesPerson": "Possíveis papéis de pessoa",
@@ -1119,10 +1119,10 @@
   "baseline-disabled-submission-warning": "Impossível submeter Linha de Base com pendências",
   "languages": "Idiomas",
 
-  "commitment": "Empenho",
-  "newCommitment": "Novo Empenho",
+  "obligation": "Obrigação",
+  "newObligation": "Nova Obrigação",
   "managementUnit": "Unidade Gestora",
-  "commitmentNote": "Nota de empenho",
+  "obligationNote": "Nota de obrigação",
   "cnpj": "CNPJ",
   "protocol": "Protocolo",
   "year": "Ano",

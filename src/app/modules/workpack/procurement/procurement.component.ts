@@ -9,7 +9,7 @@ import { filter, takeUntil } from 'rxjs/operators';
 import { CancelButtonComponent } from 'src/app/shared/components/cancel-button/cancel-button.component';
 import { SaveButtonComponent } from 'src/app/shared/components/save-button/save-button.component';
 import { ICard } from 'src/app/shared/interfaces/ICard';
-import { IProcurement } from 'src/app/shared/interfaces/IProcurement';
+import { IProcurement, IProcurementCreate, IProcurementUpdate } from 'src/app/shared/interfaces/IProcurement';
 import { AuthService } from 'src/app/shared/services/auth.service';
 import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
 import { ProcurementsService } from 'src/app/shared/services/procurements.service';
@@ -348,74 +348,72 @@ export class ProcurementComponent implements OnInit, OnDestroy {
   async saveProcurement(): Promise<void> {
     if (this.formProcurement.invalid) {
       this.formProcurement.markAllAsTouched();
-
       return;
     }
 
     this.cancelButton?.hideButton();
     this.formIsSaving = true;
 
+    const formValue = this.formProcurement.getRawValue();
+
     const selectedProcess = this.procurementProcessOptions.find(
-      (option) =>
-        option.value === this.formProcurement.controls.procurementProcess.value
+      (option) => option.value === formValue.procurementProcess
     );
 
-    const selectedOrganization = this.organizationOptions.find(
-      (option) =>
-        option.value === this.formProcurement.controls.organization.value
-    );
-
-    const sender: IProcurement = {
-      id: this.idProcurement,
-
+    const sender: IProcurementCreate = {
       idWorkpack: this.idWorkpack,
-
-      organizationId: this.formProcurement.controls.organization.value,
-
-      organizationName: selectedOrganization?.label,
-
-      year: this.formProcurement.controls.year.value,
-
-      processId: this.formProcurement.controls.procurementProcess.value,
-
       processNumber: selectedProcess?.data?.processNumber,
-
       object: selectedProcess?.data?.object,
-
-      modality: this.formProcurement.controls.modality.value,
-
-      status: this.formProcurement.controls.status.value,
-
-      protocol: this.formProcurement.controls.protocol.value,
     };
 
-    const put = !!this.idProcurement;
+    let result;
 
-    const result = put
-      ? await this.procurementsSrv.put(sender)
-      : await this.procurementsSrv.post(sender);
+    if (this.idProcurement) {
+      const updateSender: IProcurementUpdate = {
+        ...sender,
+        id: this.idProcurement,
+      };
+
+      result = await this.procurementsSrv.put(updateSender);
+    } else {
+      result = await this.procurementsSrv.post(sender);
+    }
 
     if (result.success) {
+      const isUpdate = !!this.idProcurement;
+
+      this.idProcurement = result.data.id;
+
+      this.procurement = {
+        ...this.procurement,
+        id: result.data.id,
+        idWorkpack: this.idWorkpack,
+        processNumber: sender.processNumber,
+        object: sender.object,
+
+        organizationId: formValue.organization,
+        organizationName: this.organizationOptions.find(
+          (option) => option.value === formValue.organization
+        )?.label,
+
+        year: formValue.year,
+        processId: formValue.procurementProcess,
+        modality: formValue.modality,
+        status: formValue.status,
+        protocol: formValue.protocol,
+      };
+
       this.messageSrv.add({
         severity: 'success',
         summary: this.translateSrv.instant('success'),
         detail: this.translateSrv.instant('messages.savedSuccessfully'),
       });
 
-      this.idProcurement = result.data.id;
-
-      this.procurement = {
-        ...this.procurement,
-        ...sender,
-        id: result.data.id,
-      };
-
-      if (!put) {
+      if (!isUpdate) {
         await this.setBreadcrumb();
       }
 
       this.formProcurement.markAsPristine();
-
       this.saveButton?.hideButton();
       this.cancelButton?.hideButton();
     }

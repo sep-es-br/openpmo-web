@@ -21,3 +21,14 @@ export interface IProcurement {
 
   protocol?: string;
 }
+
+export interface IProcurementCreate {
+  idWorkpack: number;
+  processNumber: string;
+  object: string;
+}
+
+export interface IProcurementUpdate
+  extends IProcurementCreate {
+  id: number;
+}

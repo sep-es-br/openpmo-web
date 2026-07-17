@@ -35,10 +35,10 @@ import { TooltipModule } from 'primeng/tooltip'
 import { Tooltip } from 'chart.js';
 import { CostAccountCardInstrumentComponent } from './cost-account/cost-account-card/cost-account-card.component';
 import { CostAccountCardComponent } from './components/cost-account-card/cost-account-card.component';
-import { WorkpackSectionCommitmentsComponent } from './workpack-sections/workpack-section-commitments/workpack-section-commitments.component';
+import { WorkpackSectionObligationsComponent } from './workpack-sections/workpack-section-obligations/workpack-section-obligations.component';
 import { WorkpackSectionProcurementsComponent } from './workpack-sections/workpack-section-procurements/workpack-section-procurements.component';
 import { WorkpackSectionAgreementsComponent } from './workpack-sections/workpack-section-agreements/workpack-section-agreements.component';
-import { CommitmentComponent } from './commitment/commitment.component';
+import { ObligationComponent } from './obligation/obligation.component';
 import { ProcurementComponent } from './procurement/procurement.component';
 import { CooperationComponent } from './cooperation/cooperation.component';
 import { ContractComponent } from './contract/contract.component';
@@ -57,7 +57,7 @@ import { ContractComponent } from './contract/contract.component';
     BaselineCancellingComponent,
     JournalViewComponent,
     JournalComponent,
-    CommitmentComponent,
+    ObligationComponent,
     ProcurementComponent,
     CooperationComponent,
     ContractComponent,
@@ -78,7 +78,7 @@ import { ContractComponent } from './contract/contract.component';
     WorkpackSectionDashboardComponent,
     WorkpackSectionJournalComponent,
     WorkpackSectionWBSComponent,
-    WorkpackSectionCommitmentsComponent,
+    WorkpackSectionObligationsComponent,
     WorkpackSectionProcurementsComponent,
     WorkpackSectionAgreementsComponent
   ],

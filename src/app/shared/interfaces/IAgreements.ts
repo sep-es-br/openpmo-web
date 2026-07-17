@@ -24,3 +24,14 @@ export interface IAgreements {
 
   protocol?: string;
 }
+
+export interface IAgreementCreate {
+  idWorkpack: number;
+  type: 'CONTRACT' | 'COOPERATION';
+  processNumber: string;
+  object: string;
+}
+
+export interface IAgreementUpdate extends IAgreementCreate {
+  id: number;
+}

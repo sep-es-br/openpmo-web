@@ -9,7 +9,7 @@ import { BaselineCancellingComponent } from './baseline-cancelling/baseline-canc
 import { JournalComponent } from './journal/journal.component';
 import { IndicatorComponent } from './indicator/indicator.component';
 import { dashboardResolver } from 'src/app/shared/resolvers/dashboard.resolver';
-import { CommitmentComponent } from './commitment/commitment.component';
+import { ObligationComponent } from './obligation/obligation.component';
 import { ProcurementComponent } from './procurement/procurement.component';
 import { ContractComponent } from './contract/contract.component';
 import { CooperationComponent } from './cooperation/cooperation.component';
@@ -65,8 +65,8 @@ const routes: Routes = [
         component: BaselineCancellingComponent
       },
       {
-        path: 'commitments',
-        component: CommitmentComponent
+        path: 'obligations',
+        component: ObligationComponent
       },
       {
         path: 'procurements',
