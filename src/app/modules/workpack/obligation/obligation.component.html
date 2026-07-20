@@ -35,7 +35,7 @@
               optionValue="value"
               dropdownIcon="fas fa-caret-down"
               [autoDisplayFirst]="false"
-              [disabled]="!editPermission || !!idObligation"
+              [disabled]="!editPermission"
               (onChange)="handleYearChange()"
             >
             </p-dropdown>
@@ -61,7 +61,7 @@
               optionValue="value"
               dropdownIcon="fas fa-caret-down"
               [autoDisplayFirst]="false"
-              [disabled]="!editPermission || !!idObligation"
+              [disabled]="!editPermission"
               (onChange)="handleManagementUnitChange()"
             >
             </p-dropdown>

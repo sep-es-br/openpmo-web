@@ -246,7 +246,7 @@ export class WorkpackSectionObligationsComponent implements OnInit, OnDestroy {
 
         iconSvg: false,
 
-        nameCardItem: obligation.description ,
+        nameCardItem: obligation.description?.toUpperCase(),
 
         subtitleCardItem: obligation.obligationNumber,
 

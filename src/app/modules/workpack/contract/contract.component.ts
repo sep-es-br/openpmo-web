@@ -113,6 +113,8 @@ export class ContractComponent implements OnInit, OnDestroy {
   }
 
   async ngOnInit(): Promise<void> {
+    this.loadMockOptions();
+
     await this.loadPropertiesContract();
     await this.setBreadcrumb();
 
@@ -120,9 +122,8 @@ export class ContractComponent implements OnInit, OnDestroy {
       this.formContract.disable();
     } else {
       this.formContract.enable();
+      this.disableComplementaryFields();
     }
-
-    this.loadMockOptions();
   }
 
   ngOnDestroy(): void {
@@ -220,21 +221,90 @@ export class ContractComponent implements OnInit, OnDestroy {
   }
 
   setFormContract(): void {
+    this.ensureCurrentOptions();
+
+    const selectedProcess = this.getCurrentProcessOption();
+
+    const processValue = selectedProcess?.value ||
+      this.contract.processId || this.contract.processNumber;
+
+    const processData = selectedProcess?.data || {};
+
     this.formContract.reset({
-      organization: this.contract.organizationId,
+      organization:
+        this.contract.organizationId || this.contract.organizationName,
 
       year: this.contract.year,
 
-      process: this.contract.processId,
+      process: processValue,
 
-      supplierCnpj: this.contract.supplierCnpj,
+      supplierCnpj: this.contract.supplierCnpj || processData.supplierCnpj,
 
-      supplierName: this.contract.supplierName,
+      supplierName: this.contract.supplierName || processData.supplierName,
 
-      protocol: this.contract.protocol,
+      protocol: this.contract.protocol || processData.protocol,
     });
 
     this.isLoading = false;
+  }
+
+  private ensureCurrentOptions(): void {
+    const organizationValue =
+      this.contract.organizationId || this.contract.organizationName;
+
+    if (
+      organizationValue &&
+      !this.organizationOptions.some(
+        (option) => option.value === organizationValue
+      )
+    ) {
+      this.organizationOptions.push({
+        label: (
+          this.contract.organizationName || String(organizationValue)
+        ).toUpperCase(),
+        value: organizationValue,
+      });
+    }
+
+    if (
+      this.contract.year &&
+      !this.yearOptions.some((option) => option.value === this.contract.year)
+    ) {
+      this.yearOptions.push({
+        label: String(this.contract.year),
+        value: this.contract.year,
+      });
+    }
+
+    const processValue = this.contract.processId || this.contract.processNumber;
+
+    if (
+      processValue &&
+      !this.getCurrentProcessOption()
+    ) {
+      this.processOptions.push({
+        label: [this.contract.processNumber, this.contract.object]
+          .filter(Boolean)
+          .join(' - ')
+          .toUpperCase(),
+        value: processValue,
+        data: this.contract,
+      });
+    }
+  }
+
+  private getCurrentProcessOption(): any {
+    return this.processOptions.find(
+      (option) =>
+        option.value === this.contract.processId ||
+        String(option.data?.processNumber) === String(this.contract.processNumber)
+    );
+  }
+
+  private disableComplementaryFields(): void {
+    this.formContract.controls.supplierCnpj.disable();
+    this.formContract.controls.supplierName.disable();
+    this.formContract.controls.protocol.disable();
   }
 
   async loadPropertiesContract(): Promise<void> {

@@ -240,15 +240,13 @@ export class WorkpackSectionProcurementsComponent implements OnInit, OnDestroy {
       const cardItems = this.procurements.map((procurement) => ({
         typeCardItem: 'listItemProcurement',
 
-        icon: 'gavel',
+        icon: 'assets/svg/bid.svg',
 
-        iconSvg: false,
+        iconSvg: true,
 
-        nameCardItem: procurement.processNumber,
+        nameCardItem: procurement.object?.toUpperCase(),
 
-        subtitleCardItem: procurement.object,
-
-        organizationName: procurement.organizationName,
+        subtitleCardItem: procurement.processNumber,
 
         itemId: procurement.id,
 

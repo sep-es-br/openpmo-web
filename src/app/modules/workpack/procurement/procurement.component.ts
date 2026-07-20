@@ -125,6 +125,8 @@ export class ProcurementComponent implements OnInit, OnDestroy {
   }
 
   async ngOnInit(): Promise<void> {
+    this.loadMockOptions();
+
     await this.loadPropertiesProcurement();
     await this.setBreadcrumb();
 
@@ -132,9 +134,8 @@ export class ProcurementComponent implements OnInit, OnDestroy {
       this.formProcurement.disable();
     } else {
       this.formProcurement.enable();
+      this.disableComplementaryFields();
     }
-
-    this.loadMockOptions();
   }
 
   ngOnDestroy(): void {
@@ -225,7 +226,7 @@ export class ProcurementComponent implements OnInit, OnDestroy {
         result.success
           ? result.data.map(item => ({
               label:
-                `${item.processNumber} - ${item.object}`,
+                `${item.processNumber} - ${item.object}`.toUpperCase(),
               value: item.id,
               data: item
             }))
@@ -250,21 +251,92 @@ export class ProcurementComponent implements OnInit, OnDestroy {
   }
 
   setFormProcurement(): void {
+    this.ensureCurrentOptions();
+
+    const selectedProcess = this.getCurrentProcessOption();
+
+    const processValue = selectedProcess?.value ||
+      this.procurement.processId || this.procurement.processNumber;
+
+    const processData = selectedProcess?.data || {};
+
     this.formProcurement.reset({
-      organization: this.procurement.organizationId,
+      organization:
+        this.procurement.organizationId || this.procurement.organizationName,
 
       year: this.procurement.year,
 
-      procurementProcess: this.procurement.processId,
+      procurementProcess: processValue,
 
-      modality: this.procurement.modality,
+      modality: this.procurement.modality || processData.modality,
 
-      status: this.procurement.status,
+      status: this.procurement.status || processData.status,
 
-      protocol: this.procurement.protocol,
+      protocol: this.procurement.protocol || processData.protocol,
     });
 
     this.isLoading = false;
+  }
+
+  private ensureCurrentOptions(): void {
+    const organizationValue =
+      this.procurement.organizationId || this.procurement.organizationName;
+
+    if (
+      organizationValue &&
+      !this.organizationOptions.some(
+        (option) => option.value === organizationValue
+      )
+    ) {
+      this.organizationOptions.push({
+        label: (
+          this.procurement.organizationName || String(organizationValue)
+        ).toUpperCase(),
+        value: organizationValue,
+      });
+    }
+
+    if (
+      this.procurement.year &&
+      !this.yearOptions.some((option) => option.value === this.procurement.year)
+    ) {
+      this.yearOptions.push({
+        label: String(this.procurement.year),
+        value: this.procurement.year,
+      });
+    }
+
+    const processValue =
+      this.procurement.processId || this.procurement.processNumber;
+
+    if (
+      processValue &&
+      !this.getCurrentProcessOption()
+    ) {
+      this.procurementProcessOptions.push({
+        label: [this.procurement.processNumber, this.procurement.object]
+          .filter(Boolean)
+          .join(' - ')
+          .toUpperCase(),
+        value: processValue,
+        data: this.procurement,
+      });
+    }
+  }
+
+  private getCurrentProcessOption(): any {
+    return this.procurementProcessOptions.find(
+      (option) =>
+        option.value === this.procurement.processId ||
+        String(option.data?.processNumber) ===
+          String(this.procurement.processNumber)
+    );
+  }
+
+  private disableComplementaryFields(): void {
+    this.formProcurement.controls.modality.disable();
+    this.formProcurement.controls.status.disable();
+    this.formProcurement.controls.protocol.disable();
   }
 
   async loadPropertiesProcurement(): Promise<void> {

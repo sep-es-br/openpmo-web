@@ -125,6 +125,8 @@ export class CooperationComponent implements OnInit, OnDestroy {
   }
 
   async ngOnInit(): Promise<void> {
+    this.loadMockOptions();
+
     await this.loadPropertiesCooperation();
     await this.setBreadcrumb();
 
@@ -132,9 +134,8 @@ export class CooperationComponent implements OnInit, OnDestroy {
       this.formCooperation.disable();
     } else {
       this.formCooperation.enable();
+      this.disableComplementaryFields();
     }
-
-    this.loadMockOptions();
   }
 
   ngOnDestroy(): void {
@@ -225,7 +226,7 @@ export class CooperationComponent implements OnInit, OnDestroy {
         result.success
           ? result.data.map(item => ({
               label:
-                `${item.processNumber} - ${item.object}`,
+                `${item.processNumber} - ${item.object}`.toUpperCase(),
               value: item.id,
               data: item
             }))
@@ -250,21 +251,94 @@ export class CooperationComponent implements OnInit, OnDestroy {
   }
 
   setFormCooperation(): void {
+    this.ensureCurrentOptions();
+
+    const selectedProcess = this.getCurrentProcessOption();
+
+    const processValue = selectedProcess?.value ||
+      this.cooperation.processId || this.cooperation.processNumber;
+
+    const processData = selectedProcess?.data || {};
+
     this.formCooperation.reset({
-      managementUnit: this.cooperation.managementUnitId,
+      managementUnit:
+        this.cooperation.managementUnitId ||
+        this.cooperation.managementUnitName,
 
       year: this.cooperation.year,
 
-      process: this.cooperation.processId,
+      process: processValue,
 
-      grantorCnpj: this.cooperation.grantorCnpj,
+      grantorCnpj: this.cooperation.grantorCnpj || processData.grantorCnpj,
 
-      grantorName: this.cooperation.grantorName,
+      grantorName: this.cooperation.grantorName || processData.grantorName,
 
-      protocol: this.cooperation.protocol,
+      protocol: this.cooperation.protocol || processData.protocol,
     });
 
     this.isLoading = false;
+  }
+
+  private ensureCurrentOptions(): void {
+    const managementUnitValue =
+      this.cooperation.managementUnitId ||
+      this.cooperation.managementUnitName;
+
+    if (
+      managementUnitValue &&
+      !this.managementUnitOptions.some(
+        (option) => option.value === managementUnitValue
+      )
+    ) {
+      this.managementUnitOptions.push({
+        label: (
+          this.cooperation.managementUnitName || String(managementUnitValue)
+        ).toUpperCase(),
+        value: managementUnitValue,
+      });
+    }
+
+    if (
+      this.cooperation.year &&
+      !this.yearOptions.some((option) => option.value === this.cooperation.year)
+    ) {
+      this.yearOptions.push({
+        label: String(this.cooperation.year),
+        value: this.cooperation.year,
+      });
+    }
+
+    const processValue =
+      this.cooperation.processId || this.cooperation.processNumber;
+
+    if (
+      processValue &&
+      !this.getCurrentProcessOption()
+    ) {
+      this.processOptions.push({
+        label: [this.cooperation.processNumber, this.cooperation.object]
+          .filter(Boolean)
+          .join(' - ')
+          .toUpperCase(),
+        value: processValue,
+        data: this.cooperation,
+      });
+    }
+  }
+
+  private getCurrentProcessOption(): any {
+    return this.processOptions.find(
+      (option) =>
+        option.value === this.cooperation.processId ||
+        String(option.data?.processNumber) ===
+          String(this.cooperation.processNumber)
+    );
+  }
+
+  private disableComplementaryFields(): void {
+    this.formCooperation.controls.grantorCnpj.disable();
+    this.formCooperation.controls.grantorName.disable();
+    this.formCooperation.controls.protocol.disable();
   }
 
   async loadPropertiesCooperation(): Promise<void> {

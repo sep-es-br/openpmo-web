@@ -273,20 +273,39 @@ export class WorkpackSectionAgreementsComponent
 
   async loadSectionAgreementsCards() {
     if (this.Agreements?.length) {
+
       const cardItems = this.Agreements.map((Agreements) => ({
         typeCardItem: 'listItemAgreements',
 
-        icon: 'file-contract',
+        icon: Agreements.type === 'CONTRACT'
+          ? 'file-contract'
+          : 'handshake',
 
         iconSvg: false,
 
-        subtitleCardItem: Agreements.object,
+        nameCardItem: Agreements.object?.toUpperCase(),
+
+        subtitleCardItem: [
+          Agreements.processNumber,
+          Agreements.type
+            ? this.translateSrv.instant(
+                Agreements.type === 'CONTRACT'
+                  ? 'contract'
+                  : 'cooperation'
+              )
+            : null,
+        ]
+          .filter(Boolean)
+          .join(' - ')
+          .toUpperCase(),
 
         organizationName: Agreements.organizationName,
 
         itemId: Agreements.id,
 
-        idAtributeName: 'idAgreements',
+        idAtributeName: Agreements.type === 'CONTRACT'
+          ? 'idContract'
+          : 'idCooperation',
 
         menuItems: [
           {
@@ -297,7 +316,9 @@ export class WorkpackSectionAgreementsComponent
           },
         ] as MenuItem[],
 
-        urlCard: '/workpack/agreements',
+        urlCard: Agreements.type === 'CONTRACT'
+          ? '/workpack/contracts'
+          : '/workpack/cooperations',
 
         paramsUrlCard: [
           {

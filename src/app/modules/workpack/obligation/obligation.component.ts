@@ -124,10 +124,7 @@ export class ObligationComponent implements OnInit, OnDestroy {
       this.formObligation.disable();
     } else {
       this.formObligation.enable();
-
-      if (this.idObligation) {
-        this.disableIdentificationFields();
-      }
+      this.disableComplementaryFields();
     }
   }
 
@@ -234,7 +231,7 @@ export class ObligationComponent implements OnInit, OnDestroy {
      *   result.success
      *     ? result.data.map(item => ({
      *         label:
-     *           `${item.obligationNumber} - ${item.description}`,
+     *           `${item.obligationNumber} - ${item.description}`.toUpperCase(),
      *         value: item.obligationNumber,
      *         data: item
      *       }))
@@ -243,7 +240,7 @@ export class ObligationComponent implements OnInit, OnDestroy {
 
     this.obligationNoteOptions = [
       {
-        label: '2026NE000458 - Aquisição de mudas de espécies nativas',
+        label: '2026NE000458 - AQUISIÇÃO DE MUDAS DE ESPÉCIES NATIVAS',
         value: '2026NE000458',
         data: {
           obligationNumber: '2026NE000458',
@@ -302,10 +299,6 @@ export class ObligationComponent implements OnInit, OnDestroy {
       protocol: this.obligation.protocol,
     });
 
-    if (this.editPermission) {
-      this.disableIdentificationFields();
-    }
-
     this.isLoading = false;
   }
 
@@ -327,7 +320,7 @@ export class ObligationComponent implements OnInit, OnDestroy {
       )
     ) {
       this.managementUnitOptions.push({
-        label: this.obligation.managementUnitName,
+        label: this.obligation.managementUnitName.toUpperCase(),
         value: this.obligation.managementUnitName,
       });
     }
@@ -339,9 +332,16 @@ export class ObligationComponent implements OnInit, OnDestroy {
       )
     ) {
       this.obligationNoteOptions.push({
-        label: this.obligation.obligationNumber,
+        label: [
+          this.obligation.obligationNumber,
+          this.obligation.description,
+        ]
+          .filter(Boolean)
+          .join(' - ')
+          .toUpperCase(),
         value: this.obligation.obligationNumber,
         data: {
+          description: this.obligation.description,
           supplierCnpj: this.obligation.supplierCnpj,
           amount: this.obligation.amount,
           protocol: this.obligation.protocol,
@@ -350,12 +350,12 @@ export class ObligationComponent implements OnInit, OnDestroy {
     }
   }
 
-  private disableIdentificationFields(): void {
-    this.formObligation.controls.year.disable();
+  private disableComplementaryFields(): void {
+    this.formObligation.controls.supplierCnpj.disable();
 
-    this.formObligation.controls.managementUnit.disable();
+    this.formObligation.controls.amount.disable();
 
-    this.formObligation.controls.obligationNote.disable();
+    this.formObligation.controls.protocol.disable();
   }
 
   async loadPropertiesObligation(): Promise<void> {
@@ -492,7 +492,6 @@ export class ObligationComponent implements OnInit, OnDestroy {
 
       if (!isUpdate) {
         await this.setBreadcrumb();
-        this.disableIdentificationFields();
       }
 
       this.formObligation.markAsPristine();
