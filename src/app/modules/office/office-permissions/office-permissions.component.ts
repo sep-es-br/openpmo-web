@@ -341,6 +341,7 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
         this.person = {
           name,
           email: this.searchedEmailPerson,
+          key: this.searchedEmailPerson,
           roles: [{ role: 'citizen' }],
         };
       }
