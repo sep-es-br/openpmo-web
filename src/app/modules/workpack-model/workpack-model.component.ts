@@ -1133,15 +1133,26 @@ export class WorkpackModelComponent implements OnInit {
     return this.listDomains;
   }
 
-  async getListOrganizations(sectors: string[]) {
-    if (!this.listOrganizations.length) {
-      const result = await this.organizationSrv.GetAll({ 'id-office': this.idOffice });
-      if (result.success) {
-        this.listOrganizations = result.data;
-      }
+ async getListOrganizations(sectors: string[]) {
+  if (!this.listOrganizations.length) {
+    const result = await this.organizationSrv.GetAll({ 'id-office': this.idOffice });
+    if (result.success) {
+      this.listOrganizations = result.data;
     }
-    return this.listOrganizations.filter(org => sectors && sectors.includes(org.sector)).map(d => ({ label: d.name, value: d.id }));
   }
+  return this.listOrganizations
+    .filter(org => {
+      if (!sectors) {
+        return false;
+      }
+      const matchesSector = sectors.includes(org.sector);
+      const matchesGoves = sectors.includes('GOVES') && org.integration === 'GOVES';
+      return matchesSector || matchesGoves;
+    })
+    .sort((a, b) => a.name.localeCompare(b.name))
+    .map(d => ({ label: d.name, value: d.id }));
+}
+
 
   async getListMeasureUnits() {
     if (!this.listMeasureUnits.length) {

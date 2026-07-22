@@ -80,7 +80,8 @@ export class PropertyModelComponent implements OnDestroy, OnChanges, AfterViewIn
     this.optionsSector = [
       {label: this.translateSrv.instant(this.typeOrganizationEnum.Private), value: this.typeOrganizationEnum.Private.toLocaleUpperCase()},
       {label: this.translateSrv.instant(this.typeOrganizationEnum.Public), value: this.typeOrganizationEnum.Public.toLocaleUpperCase()},
-      {label: this.translateSrv.instant(this.typeOrganizationEnum.Third), value: this.typeOrganizationEnum.Third.toLocaleUpperCase()}
+      {label: this.translateSrv.instant(this.typeOrganizationEnum.Third), value: this.typeOrganizationEnum.Third.toLocaleUpperCase()},
+      {label: this.translateSrv.instant(this.typeOrganizationEnum.GOVES), value: this.typeOrganizationEnum.GOVES.toLocaleUpperCase()}
     ];
   }
 
