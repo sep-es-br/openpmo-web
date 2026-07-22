@@ -1,5 +1,5 @@
 <div class="app-cooperation">
-    <div class="app-content-header">
+    <div class="app-content-header" *ngIf="!isLoading">
       <span *ngIf="!idCooperation">
         {{ 'newCooperation' | translate }}
       </span>
@@ -10,23 +10,28 @@
           cooperation
         "
       >
-        {{ cooperation.processNumber }}
+        <span
+          [pTooltip]="cooperation.object"
+          tooltipPosition="bottom"
+        >
+          {{ truncateProcessLabel(cooperation.object, 150) }}
+        </span>
       </span>
     </div>
   
     <div
       class="loading-form-container"
-      *ngIf="formIsSaving"
+      *ngIf="isLoading || formIsSaving"
     >
       <app-card-loading
-        [isCardLoading]="formIsSaving"
+        [isCardLoading]="isLoading || formIsSaving"
       >
       </app-card-loading>
     </div>
   
     <div
       class="card-properties-cooperation"
-      *ngIf="cardCooperationProperties"
+      *ngIf="cardCooperationProperties && !isLoading"
       [class.responsive]="responsive"
     >
       <app-card
@@ -35,10 +40,13 @@
       >
         <form [formGroup]="formCooperation">
   
-          <!-- Ano -->
-          <div
-            class="cooperation-field selection-small app-property-selection"
-          >
+          <ng-container *ngIf="!idCooperation">
+          <div class="agreement-search-filters">
+          <span class="agreement-search-label">
+            {{ 'searchBy' | translate }}:
+          </span>
+
+          <div class="cooperation-field selection-year app-property-selection">
             <span class="p-float-label">
               <p-dropdown
                 class="app-single-selection"
@@ -49,7 +57,6 @@
                 optionValue="value"
                 dropdownIcon="fas fa-caret-down"
                 [autoDisplayFirst]="false"
-                [disabled]="!editPermission"
                 (onChange)="handleYearChange()"
               >
               </p-dropdown>
@@ -58,7 +65,7 @@
                 class="app-input-label"
                 for="year"
               >
-                {{ 'year' | translate }} *
+                {{ 'year' | translate }}
               </label>
             </span>
   
@@ -68,10 +75,13 @@
             >
             </app-input-message>
           </div>
-  
-          <!-- Unidade Gestora -->
+
+          <span class="agreement-search-connector">
+            {{ 'agreementSearchAnd' | translate }}
+          </span>
+
           <div
-            class="cooperation-field selection-small app-property-selection"
+            class="cooperation-field selection-organization app-property-selection"
           >
             <span class="p-float-label">
               <p-dropdown
@@ -83,7 +93,6 @@
                 optionValue="value"
                 dropdownIcon="fas fa-caret-down"
                 [autoDisplayFirst]="false"
-                [disabled]="!editPermission"
                 (onChange)="
                   handleManagementUnitChange()
                 "
@@ -94,7 +103,7 @@
                 class="app-input-label"
                 for="managementUnit"
               >
-                {{ 'managementUnit' | translate }} *
+                {{ 'managementUnit' | translate }}
               </label>
             </span>
   
@@ -104,9 +113,33 @@
             >
             </app-input-message>
           </div>
+
+          <span class="agreement-search-connector">
+            {{ 'agreementSearchOr' | translate }}
+          </span>
+
+          <div class="cooperation-field protocol-search app-property-text">
+            <span class="p-float-label">
+              <p-inputMask
+                inputId="protocolSearch"
+                formControlName="protocolSearch"
+                mask="9999-*****"
+                [autoClear]="false"
+                (onInput)="handleProtocolInput()"
+                (onComplete)="handleProtocolComplete()"
+              ></p-inputMask>
+
+              <label class="app-input-label" for="protocolSearch">
+                {{ 'protocol' | translate }}
+              </label>
+            </span>
+          </div>
+          </div>
+          </ng-container>
   
           <!-- Processo -->
           <div
+            *ngIf="!idCooperation && processSearchCompleted"
             class="cooperation-field selection-medium app-property-selection"
           >
             <span class="p-float-label">
@@ -121,28 +154,36 @@
                 [autoDisplayFirst]="false"
                 [filter]="true"
                 [showClear]="true"
-                [disabled]="
-                  !editPermission ||
-                  !formCooperation
-                    .controls
-                    .managementUnit
-                    .value ||
-                  !formCooperation
-                    .controls
-                    .year
-                    .value
-                "
                 (onChange)="
                   handleProcessChange($event)
                 "
               >
+                <ng-template let-process pTemplate="selectedItem">
+                  <span
+                    class="process-option-label"
+                    [pTooltip]="process.label"
+                    tooltipPosition="bottom"
+                  >
+                    {{ truncateProcessLabel(process.label) }}
+                  </span>
+                </ng-template>
+
+                <ng-template let-process pTemplate="item">
+                  <span
+                    class="process-option-label"
+                    [pTooltip]="process.label"
+                    tooltipPosition="bottom"
+                  >
+                    {{ truncateProcessLabel(process.label) }}
+                  </span>
+                </ng-template>
               </p-dropdown>
   
               <label
                 class="app-input-label"
                 for="process"
               >
-                {{ 'process' | translate }} *
+                {{ 'cooperation' | translate }} *
               </label>
             </span>
   
@@ -151,6 +192,24 @@
               field="process"
             >
             </app-input-message>
+          </div>
+
+          <div
+            *ngIf="idCooperation"
+            class="cooperation-field text-medium app-property-text"
+          >
+            <div class="readonly-field">
+              <div class="app-input-label readonly-label">
+                {{ 'cooperation' | translate }}
+              </div>
+              <div
+                class="readonly-value"
+                [pTooltip]="processFullValue"
+                tooltipPosition="bottom"
+              >
+                {{ processFullValue || '-' }}
+              </div>
+            </div>
           </div>
   
           <ng-container
@@ -166,78 +225,45 @@
             <div
               class="cooperation-field text-medium app-property-text"
             >
-              <span
-                class="p-float-label workpack-input-text-not-fullLine"
-              >
-                <input
-                  id="grantorCnpj"
-                  class="app-input-text"
-                  type="text"
-                  pInputText
-                  formControlName="grantorCnpj"
-                  readonly
-                />
-  
-                <label
-                  class="app-input-label"
-                  for="grantorCnpj"
-                >
+              <div class="readonly-field">
+                <div class="app-input-label readonly-label">
                   {{ 'cnpj' | translate }}
-                </label>
-              </span>
+                </div>
+                <div class="readonly-value">
+                  {{ formCooperation.controls.partyCnpj.value || '-' }}
+                </div>
+              </div>
             </div>
   
             <!-- Concedente/Convenente -->
             <div
               class="cooperation-field text-medium app-property-text"
             >
-              <span
-                class="p-float-label workpack-input-text-not-fullLine"
-              >
-                <input
-                  id="grantorName"
-                  class="app-input-text"
-                  type="text"
-                  pInputText
-                  formControlName="grantorName"
-                  readonly
-                />
-  
-                <label
-                  class="app-input-label"
-                  for="grantorName"
-                >
+              <div class="readonly-field">
+                <div class="app-input-label readonly-label">
                   {{
                     'grantorBeneficiaryName'
                       | translate
                   }}
-                </label>
-              </span>
+                </div>
+                <div class="readonly-value">
+                  {{ formCooperation.controls.partyName.value || '-' }}
+                </div>
+              </div>
             </div>
   
             <!-- Protocolo -->
             <div
               class="cooperation-field text-medium app-property-text"
             >
-              <span
-                class="p-float-label workpack-input-text-not-fullLine"
-              >
-                <input
-                  id="protocol"
-                  class="app-input-text"
-                  type="text"
-                  pInputText
-                  formControlName="protocol"
-                  readonly
-                />
-  
-                <label
-                  class="app-input-label"
-                  for="protocol"
-                >
+              <div class="readonly-field">
+                <div class="app-input-label readonly-label">
                   {{ 'protocol' | translate }}
-                </label>
-              </span>
+                </div>
+                <div class="readonly-value">
+                  {{ formCooperation.controls.protocol.value || '-' }}
+                </div>
+              </div>
             </div>
           </ng-container>
         </form>
@@ -256,7 +282,7 @@
     </div>
   </div>
   
-  <app-buttons-container>
+  <app-buttons-container *ngIf="!isLoading && !idCooperation">
     <app-save-button
       #saveButton
       (save)="saveCooperation()"

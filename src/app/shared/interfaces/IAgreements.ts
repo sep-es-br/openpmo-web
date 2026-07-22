@@ -1,34 +1,34 @@
+export type AgreementType = 'CONTRACT' | 'COOPERATION';
+
+export interface IAgreementOrganization {
+  identifier: string;
+  name: string;
+}
+
 export interface IAgreements {
   id?: number;
   idWorkpack?: number;
 
-  type?: 'CONTRACT' | 'COOPERATION';
+  type?: AgreementType;
 
-  organizationId?: number;
   organizationName?: string;
 
-  managementUnitId?: number;
-  managementUnitName?: string;
 
   year?: number;
 
   processId?: number;
-  processNumber?: string;
   object?: string;
 
-  supplierCnpj?: string;
-  supplierName?: string;
-
-  grantorCnpj?: string;
-  grantorName?: string;
+  partyCnpj?: string;
+  partyName?: string;
 
   protocol?: string;
 }
 
 export interface IAgreementCreate {
   idWorkpack: number;
-  type: 'CONTRACT' | 'COOPERATION';
-  processNumber: string;
+  type: AgreementType;
+  processId: number;
   object: string;
 }
 

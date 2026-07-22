@@ -11,7 +11,12 @@ import { FilterDataviewService } from
   './filter-dataview.service';
 import { WorkpackService } from
   './workpack.service';
-import { IAgreements } from '../interfaces/IAgreements';
+import {
+  AgreementType,
+  IAgreementOrganization,
+  IAgreements
+} from '../interfaces/IAgreements';
+import { IHttpResult } from '../interfaces/IHttpResult';
 
 @Injectable({
   providedIn: 'root'
@@ -36,6 +41,50 @@ export class AgreementsService
     private filterSrv: FilterDataviewService
   ) {
     super('agreements', injector);
+  }
+
+  getProviderYears(type: AgreementType): Promise<IHttpResult<number[]>> {
+    return this.http.get<IHttpResult<number[]>>(
+      `${this.urlBase}/years`, { params: { type } }
+    ).toPromise();
+  }
+
+  getProviderOrganizations(
+    type: AgreementType,
+    year: number
+  ): Promise<IHttpResult<IAgreementOrganization[]>> {
+    return this.http.get<IHttpResult<IAgreementOrganization[]>>(
+      `${this.urlBase}/organizations`,
+      { params: { type, year: String(year) } }
+    ).toPromise();
+  }
+
+  getProviderProcesses(
+    type: AgreementType,
+    year: number,
+    organization: IAgreementOrganization
+  ): Promise<IHttpResult<IAgreements[]>> {
+    return this.http.get<IHttpResult<IAgreements[]>>(
+      `${this.urlBase}/processes`,
+      {
+        params: {
+          type,
+          year: String(year),
+          'organization-identifier': organization.identifier,
+          'organization-name': organization.name
+        }
+      }
+    ).toPromise();
+  }
+
+  getProviderProcess(
+    type: AgreementType,
+    processId: number
+  ): Promise<IHttpResult<IAgreements>> {
+    return this.http.get<IHttpResult<IAgreements>>(
+      `${this.urlBase}/processes/${processId}`,
+      { params: { type } }
+    ).toPromise();
   }
 
   resetAgreementsData(): void {

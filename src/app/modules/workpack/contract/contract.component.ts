@@ -1,3 +1,4 @@
+import { Location } from '@angular/common';
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
@@ -8,13 +9,14 @@ import { filter, takeUntil } from 'rxjs/operators';
 
 import { CancelButtonComponent } from 'src/app/shared/components/cancel-button/cancel-button.component';
 import { SaveButtonComponent } from 'src/app/shared/components/save-button/save-button.component';
-import { IAgreementCreate, IAgreements, IAgreementUpdate } from 'src/app/shared/interfaces/IAgreements';
+import { IAgreementCreate, IAgreementOrganization, IAgreements, IAgreementUpdate } from 'src/app/shared/interfaces/IAgreements';
 import { ICard } from 'src/app/shared/interfaces/ICard';
 import { AgreementsService } from 'src/app/shared/services/agreements.service';
 import { AuthService } from 'src/app/shared/services/auth.service';
 import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
 import { ResponsiveService } from 'src/app/shared/services/responsive.service';
 import { WorkpackService } from 'src/app/shared/services/workpack.service';
+import { truncateText } from 'src/app/shared/utils/truncateText';
 
 @Component({
   selector: 'app-contract',
@@ -50,6 +52,17 @@ export class ContractComponent implements OnInit, OnDestroy {
   yearOptions = [];
   processOptions = [];
 
+  processFullValue = '';
+
+  processSearchCompleted = false;
+
+  truncateProcessLabel(
+    value: string | null | undefined,
+    maxLength?: number
+  ): string {
+    return truncateText(value, maxLength);
+  }
+
   constructor(
     private actRouter: ActivatedRoute,
     private formBuilder: FormBuilder,
@@ -59,7 +72,8 @@ export class ContractComponent implements OnInit, OnDestroy {
     private messageSrv: MessageService,
     private agreementsSrv: AgreementsService,
     private authSrv: AuthService,
-    private workpackSrv: WorkpackService
+    private workpackSrv: WorkpackService,
+    private location: Location
   ) {
     this.actRouter.queryParams
       .pipe(takeUntil(this.$destroy))
@@ -76,11 +90,12 @@ export class ContractComponent implements OnInit, OnDestroy {
       });
 
     this.formContract = this.formBuilder.group({
-      organization: [null, Validators.required],
-      year: [null, Validators.required],
-      process: [null, Validators.required],
-      supplierCnpj: [''],
-      supplierName: [''],
+      organization: [{ value: null, disabled: true }],
+      year: [null],
+      process: [{ value: null, disabled: true }, Validators.required],
+      protocolSearch: [''],
+      partyCnpj: [''],
+      partyName: [''],
       protocol: [''],
     });
 
@@ -96,10 +111,18 @@ export class ContractComponent implements OnInit, OnDestroy {
     this.formContract.valueChanges
       .pipe(
         takeUntil(this.$destroy),
-        filter(() => this.formContract.dirty && this.formContract.valid)
+        filter(() => this.formContract.dirty)
       )
       .subscribe(() => {
-        this.saveButton?.showButton();
+        if (
+          !this.idContract &&
+          this.formContract.valid &&
+          this.formContract.controls.process.value
+        ) {
+          this.saveButton?.showButton();
+        } else {
+          this.saveButton?.hideButton();
+        }
       });
 
     this.formContract.valueChanges
@@ -113,8 +136,9 @@ export class ContractComponent implements OnInit, OnDestroy {
   }
 
   async ngOnInit(): Promise<void> {
-    this.loadMockOptions();
-
+    if (!this.idContract) {
+      await this.loadYears();
+    }
     await this.loadPropertiesContract();
     await this.setBreadcrumb();
 
@@ -122,7 +146,11 @@ export class ContractComponent implements OnInit, OnDestroy {
       this.formContract.disable();
     } else {
       this.formContract.enable();
-      this.disableComplementaryFields();
+      if (this.idContract) {
+        this.formContract.controls.process.disable();
+      } else {
+        this.updateFilterControls();
+      }
     }
   }
 
@@ -131,68 +159,125 @@ export class ContractComponent implements OnInit, OnDestroy {
     this.$destroy.complete();
   }
 
-  private loadMockOptions(): void {
-    this.organizationOptions = [
-      {
-        label: 'SECULT',
-        value: 1,
-      },
-    ];
+  private async loadYears(): Promise<void> {
+    const result = await this.agreementsSrv.getProviderYears('CONTRACT');
 
-    this.yearOptions = [
-      {
-        label: '2023',
-        value: 2023,
-      },
-    ];
-
-    this.processOptions = [
-      {
-        label: '47621222 - AQUISIÇÃO DE GUILHOTINA ELÉTRICA',
-        value: 47621222,
-        data: {
-          processNumber: '47621222',
-          object: 'AQUISIÇÃO DE GUILHOTINA ELÉTRICA',
-          supplierCnpj: '14.530.067/0001-42',
-          supplierName: 'GRÁFICA TRIÂNGULO LTDA - EPP',
-          protocol: '2025-NRFTYU',
-        },
-      },
-    ];
+    this.yearOptions = result.success && Array.isArray(result.data)
+      ? result.data
+          .map((year) => ({ label: String(year), value: year }))
+          .sort((first, second) => Number(second.value) - Number(first.value))
+      : [];
   }
 
-  handleOrganizationChange(): void {
+  async handleOrganizationChange(): Promise<void> {
     this.clearProcessData();
-    this.loadProcesses();
+    this.updateFilterControls();
+    await this.loadProcesses();
   }
 
-  handleYearChange(): void {
+  async handleYearChange(): Promise<void> {
+    this.organizationOptions = [];
     this.clearProcessData();
-    this.loadProcesses();
+    this.formContract.patchValue({ organization: null, protocolSearch: '' });
+    this.updateFilterControls();
+    await this.loadOrganizations();
+    this.updateFilterControls();
   }
 
   private clearProcessData(): void {
+    this.processSearchCompleted = false;
     this.processOptions = [];
 
     this.formContract.patchValue({
       process: null,
-      supplierCnpj: '',
-      supplierName: '',
+      partyCnpj: '',
+      partyName: '',
       protocol: '',
     });
   }
 
   async loadProcesses(): Promise<void> {
-    const organization = this.formContract.controls.organization.value;
+    const organizationIdentifier =
+      this.formContract.controls.organization.value;
 
     const year = this.formContract.controls.year.value;
 
-    if (!organization || !year) {
+    const selectedOrganization = this.organizationOptions.find(
+      (option) => option.value === organizationIdentifier
+    );
+
+    if (!selectedOrganization || !year) {
       return;
     }
 
-    // Substituir futuramente pela consulta real.
-    this.loadMockOptions();
+    const result = await this.agreementsSrv.getProviderProcesses(
+      'CONTRACT', year, selectedOrganization.data
+    );
+
+    this.processOptions = result.success && Array.isArray(result.data)
+      ? result.data
+          .map((item) => ({
+            label: [item.processId, item.object]
+              .filter(Boolean).join(' - ').toUpperCase(),
+            value: item.processId,
+            data: item
+          }))
+          .sort((first, second) =>
+            first.label.localeCompare(second.label, 'pt-BR', { numeric: true })
+          )
+      : [];
+
+    this.processSearchCompleted = !!result.success;
+  }
+
+  handleProtocolInput(): void {
+    const protocol = this.formContract.controls.protocolSearch.value;
+
+    if (!protocol) {
+      return;
+    }
+
+    this.organizationOptions = [];
+    this.clearProcessData();
+    this.formContract.patchValue({ year: null, organization: null });
+    this.updateFilterControls();
+  }
+
+  handleProtocolComplete(): void {
+    const protocol = String(
+      this.formContract.controls.protocolSearch.value || ''
+    ).toUpperCase();
+
+    this.formContract.controls.protocolSearch.setValue(protocol, {
+      emitEvent: false,
+    });
+
+    // Ao integrar o endpoint, preencha processOptions e marque
+    // processSearchCompleted como true depois do retorno bem-sucedido.
+  }
+
+  private async loadOrganizations(): Promise<void> {
+    const year = this.formContract.controls.year.value;
+
+    if (!year) {
+      return;
+    }
+
+    const result = await this.agreementsSrv.getProviderOrganizations(
+      'CONTRACT', year
+    );
+
+    this.organizationOptions = result.success && Array.isArray(result.data)
+      ? result.data
+          .map((item: IAgreementOrganization) => ({
+            label: item.name.toUpperCase(),
+            value: item.identifier,
+            data: item
+          }))
+          .sort((first, second) =>
+            first.label.localeCompare(second.label, 'pt-BR')
+          )
+      : [];
   }
 
   handleProcessChange(event): void {
@@ -201,23 +286,28 @@ export class ContractComponent implements OnInit, OnDestroy {
     );
 
     this.formContract.patchValue({
-      supplierCnpj: selectedProcess?.data?.supplierCnpj || '',
+      partyCnpj: selectedProcess?.data?.partyCnpj || '',
 
-      supplierName: selectedProcess?.data?.supplierName || '',
+      partyName: selectedProcess?.data?.partyName || '',
 
       protocol: selectedProcess?.data?.protocol || '',
     });
   }
 
   resetFormContract(): void {
+    this.processFullValue = '';
+    this.processSearchCompleted = false;
+
     this.formContract.reset({
       organization: null,
       year: null,
       process: null,
-      supplierCnpj: '',
-      supplierName: '',
+      protocolSearch: '',
+      partyCnpj: '',
+      partyName: '',
       protocol: '',
     });
+    this.updateFilterControls();
   }
 
   setFormContract(): void {
@@ -225,22 +315,27 @@ export class ContractComponent implements OnInit, OnDestroy {
 
     const selectedProcess = this.getCurrentProcessOption();
 
-    const processValue = selectedProcess?.value ||
-      this.contract.processId || this.contract.processNumber;
+    this.processFullValue = this.idContract
+      ? [this.contract.processId, this.contract.object]
+          .filter(Boolean).join(' - ').toUpperCase()
+      : '';
+
+    const processValue = this.idContract
+      ? truncateText(this.processFullValue)
+      : selectedProcess?.value || this.contract.processId;
 
     const processData = selectedProcess?.data || {};
 
     this.formContract.reset({
-      organization:
-        this.contract.organizationId || this.contract.organizationName,
+      organization: this.contract.organizationName,
 
       year: this.contract.year,
 
       process: processValue,
 
-      supplierCnpj: this.contract.supplierCnpj || processData.supplierCnpj,
+      partyCnpj: this.contract.partyCnpj || processData.partyCnpj,
 
-      supplierName: this.contract.supplierName || processData.supplierName,
+      partyName: this.contract.partyName || processData.partyName,
 
       protocol: this.contract.protocol || processData.protocol,
     });
@@ -249,8 +344,7 @@ export class ContractComponent implements OnInit, OnDestroy {
   }
 
   private ensureCurrentOptions(): void {
-    const organizationValue =
-      this.contract.organizationId || this.contract.organizationName;
+    const organizationValue = this.contract.organizationName;
 
     if (
       organizationValue &&
@@ -276,14 +370,14 @@ export class ContractComponent implements OnInit, OnDestroy {
       });
     }
 
-    const processValue = this.contract.processId || this.contract.processNumber;
+    const processValue = this.contract.processId;
 
     if (
       processValue &&
       !this.getCurrentProcessOption()
     ) {
       this.processOptions.push({
-        label: [this.contract.processNumber, this.contract.object]
+        label: [this.contract.processId, this.contract.object]
           .filter(Boolean)
           .join(' - ')
           .toUpperCase(),
@@ -296,15 +390,29 @@ export class ContractComponent implements OnInit, OnDestroy {
   private getCurrentProcessOption(): any {
     return this.processOptions.find(
       (option) =>
-        option.value === this.contract.processId ||
-        String(option.data?.processNumber) === String(this.contract.processNumber)
+        option.value === this.contract.processId
     );
   }
 
-  private disableComplementaryFields(): void {
-    this.formContract.controls.supplierCnpj.disable();
-    this.formContract.controls.supplierName.disable();
-    this.formContract.controls.protocol.disable();
+  private updateFilterControls(): void {
+    if (!this.editPermission || this.idContract) {
+      return;
+    }
+
+    if (
+      this.formContract.controls.year.value &&
+      this.organizationOptions.length
+    ) {
+      this.formContract.controls.organization.enable();
+    } else {
+      this.formContract.controls.organization.disable();
+    }
+
+    if (this.formContract.controls.organization.value) {
+      this.formContract.controls.process.enable();
+    } else {
+      this.formContract.controls.process.disable();
+    }
   }
 
   async loadPropertiesContract(): Promise<void> {
@@ -323,6 +431,16 @@ export class ContractComponent implements OnInit, OnDestroy {
 
     if (result && result.success) {
       this.contract = result.data;
+
+      if (this.contract.processId) {
+        const detailResult = await this.agreementsSrv.getProviderProcess(
+          'CONTRACT', this.contract.processId
+        );
+
+        if (detailResult.success && detailResult.data) {
+          this.contract = { ...this.contract, ...detailResult.data };
+        }
+      }
 
       await this.loadPermissions();
 
@@ -372,14 +490,17 @@ export class ContractComponent implements OnInit, OnDestroy {
       ...breadcrumbItems,
       {
         key: 'contract',
-        info: this.contract?.processNumber,
-        tooltip: this.contract?.processNumber,
+        info: this.contract?.object || '',
+        tooltip: this.contract?.object || '',
       },
     ]);
   }
 
   async saveContract(): Promise<void> {
-    if (this.formContract.invalid) {
+    if (
+      this.formContract.invalid ||
+      !this.formContract.controls.process.value
+    ) {
       this.formContract.markAllAsTouched();
       return;
     }
@@ -396,7 +517,7 @@ export class ContractComponent implements OnInit, OnDestroy {
     const sender: IAgreementCreate = {
       idWorkpack: this.idWorkpack,
       type: 'CONTRACT',
-      processNumber: selectedProcess?.data?.processNumber,
+      processId: selectedProcess?.data?.processId,
       object: selectedProcess?.data?.object,
     };
 
@@ -423,20 +544,20 @@ export class ContractComponent implements OnInit, OnDestroy {
         id: result.data.id,
         idWorkpack: this.idWorkpack,
         type: 'CONTRACT',
-        processNumber: sender.processNumber,
+        processId: sender.processId,
         object: sender.object,
 
-        organizationId: formValue.organization,
         organizationName: this.organizationOptions.find(
           (option) => option.value === formValue.organization
         )?.label,
 
         year: formValue.year,
-        processId: formValue.process,
-        supplierCnpj: formValue.supplierCnpj,
-        supplierName: formValue.supplierName,
+        partyCnpj: formValue.partyCnpj,
+        partyName: formValue.partyName,
         protocol: formValue.protocol,
       };
+
+      this.setFormContract();
 
       this.messageSrv.add({
         severity: 'success',
@@ -451,6 +572,7 @@ export class ContractComponent implements OnInit, OnDestroy {
       this.formContract.markAsPristine();
       this.saveButton?.hideButton();
       this.cancelButton?.hideButton();
+      this.location.back();
     }
 
     this.formIsSaving = false;

@@ -21,6 +21,7 @@ import { ResponsiveService } from 'src/app/shared/services/responsive.service';
 import { WorkpackBreadcrumbStorageService } from 'src/app/shared/services/workpack-breadcrumb-storage.service';
 import { WorkpackShowTabviewService } from 'src/app/shared/services/workpack-show-tabview.service';
 import { WorkpackService } from 'src/app/shared/services/workpack.service';
+import { truncateText } from 'src/app/shared/utils/truncateText';
 
 @Component({
   selector: 'app-workpack-section-agreements',
@@ -283,10 +284,12 @@ export class WorkpackSectionAgreementsComponent
 
         iconSvg: false,
 
-        nameCardItem: Agreements.object?.toUpperCase(),
+        nameCardItem: truncateText(Agreements.object?.toUpperCase()),
+
+        fullNameCardItem: Agreements.object?.toUpperCase(),
 
         subtitleCardItem: [
-          Agreements.processNumber,
+          Agreements.processId,
           Agreements.type
             ? this.translateSrv.instant(
                 Agreements.type === 'CONTRACT'

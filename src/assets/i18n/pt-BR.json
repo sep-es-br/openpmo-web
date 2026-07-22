@@ -727,6 +727,11 @@
           }
         }
       },
+      "agreement": {
+        "already": {
+          "exists": "Este contrato ou convênio já foi adicionado a este elemento."
+        }
+      },
       "already": {
         "exists": {
           "permission": "Já existe permissão para esta pessoa neste elemento!"
@@ -1125,6 +1130,8 @@
   "obligationNote": "Nota de Empenho",
   "cnpj": "CNPJ",
   "protocol": "Protocolo",
+  "agreementSearchAnd": "e",
+  "agreementSearchOr": "ou",
   "year": "Ano",
 
   "procurement": "Licitação",

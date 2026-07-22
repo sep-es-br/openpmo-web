@@ -719,6 +719,11 @@
           }
         }
       },
+      "agreement": {
+        "already": {
+          "exists": "This contract or cooperation agreement has already been added to this item."
+        }
+      },
       "generic": "We were unable to process your request",
       "unauthorized": "You do not have permission to access this functionality",
       "expired": "Your session is expired. Please login again.",
@@ -1090,6 +1095,8 @@
   "obligationNote": "Obligation Note",
   "cnpj": "CNPJ",
   "protocol": "Protocol",
+  "agreementSearchAnd": "and",
+  "agreementSearchOr": "or",
 
   "procurement": "Procurement",
   "newProcurement": "New Procurement",

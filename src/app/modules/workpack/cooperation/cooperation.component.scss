@@ -20,11 +20,11 @@
     top: 0;
     align-items: center;
     justify-content: center;
-    background-color: #d0d8d9;
+    background-color: #F5F5F3;
     opacity: 0.4;
 
     .app-card-loading {
-      background-color: #d0d8d9;
+      background-color: #F5F5F3;
       opacity: 0.4;
     }
   }
@@ -38,8 +38,63 @@
     }
 
     .cooperation-field {
+      margin-top: 1em;
       display: block;
       margin-bottom: 2em;
+    }
+
+    .agreement-search-filters {
+      display: flex;
+      align-items: flex-end;
+      gap: 1rem;
+      margin-bottom: 2.5em;
+
+      .cooperation-field {
+        margin-bottom: 0;
+      }
+
+      .agreement-search-label,
+      .agreement-search-connector {
+        flex: 0 0 auto;
+        margin-bottom: 0.65rem;
+        color: v.$fontInput;
+      }
+
+      .agreement-search-label {
+        font-style: italic;
+      }
+
+      .agreement-search-connector {
+        margin-left: 0.25rem;
+        margin-right: 0.25rem;
+      }
+
+      .protocol-search {
+        width: 260px;
+        min-width: 220px;
+
+        .p-inputmask {
+          width: 100%;
+        }
+      }
+    }
+
+    .selection-year {
+      width: 110px;
+      min-width: 110px;
+
+      .p-dropdown {
+        width: 100%;
+      }
+    }
+
+    .selection-organization {
+      width: 500px;
+      min-width: 300px;
+
+      .p-dropdown {
+        width: 100%;
+      }
     }
 
     .selection-small {
@@ -67,10 +122,74 @@
         width: 100%;
       }
     }
+
+    .readonly-field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+
+      .readonly-label {
+        display: block;
+        position: static;
+      }
+
+      .readonly-value {
+        display: block;
+        width: 100%;
+        min-height: 1.75rem;
+        padding-bottom: 0.35rem;
+        color: v.$fontInput;
+        overflow-wrap: anywhere;
+      }
+    }
   }
 
   .card-properties-cooperation.responsive {
+    .agreement-search-filters {
+      flex-direction: column;
+      align-items: flex-start;
+      width: 100%;
+      text-align: left;
+
+      .agreement-search-label,
+      .agreement-search-connector {
+        margin-bottom: 0;
+        margin-left: 0;
+        margin-right: 0;
+      }
+
+      .p-dropdown-label,
+      .p-inputtext {
+        text-align: left;
+      }
+
+      .selection-year,
+      .selection-organization,
+      .protocol-search {
+        width: 100%;
+        min-width: 0;
+      }
+    }
+
+    .process-option-label {
+      display: block;
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .p-dropdown-panel {
+      max-width: calc(100vw - 2rem);
+
+      .p-dropdown-item {
+        overflow: hidden;
+      }
+    }
+
     .selection-small,
+    .selection-year,
+    .selection-organization,
     .selection-medium,
     .text-medium {
       width: 100%;

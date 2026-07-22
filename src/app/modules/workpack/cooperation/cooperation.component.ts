@@ -1,3 +1,4 @@
+import { Location } from '@angular/common';
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
@@ -8,13 +9,14 @@ import { filter, takeUntil } from 'rxjs/operators';
 
 import { CancelButtonComponent } from 'src/app/shared/components/cancel-button/cancel-button.component';
 import { SaveButtonComponent } from 'src/app/shared/components/save-button/save-button.component';
-import { IAgreementCreate, IAgreements, IAgreementUpdate } from 'src/app/shared/interfaces/IAgreements';
+import { IAgreementCreate, IAgreementOrganization, IAgreements, IAgreementUpdate } from 'src/app/shared/interfaces/IAgreements';
 import { ICard } from 'src/app/shared/interfaces/ICard';
 import { AgreementsService } from 'src/app/shared/services/agreements.service';
 import { AuthService } from 'src/app/shared/services/auth.service';
 import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
 import { ResponsiveService } from 'src/app/shared/services/responsive.service';
 import { WorkpackService } from 'src/app/shared/services/workpack.service';
+import { truncateText } from 'src/app/shared/utils/truncateText';
 
 @Component({
   selector: 'app-cooperation',
@@ -56,6 +58,17 @@ export class CooperationComponent implements OnInit, OnDestroy {
 
   processOptions = [];
 
+  processFullValue = '';
+
+  processSearchCompleted = false;
+
+  truncateProcessLabel(
+    value: string | null | undefined,
+    maxLength?: number
+  ): string {
+    return truncateText(value, maxLength);
+  }
+
   constructor(
     private actRouter: ActivatedRoute,
     private formBuilder: FormBuilder,
@@ -65,7 +78,8 @@ export class CooperationComponent implements OnInit, OnDestroy {
     private messageSrv: MessageService,
     private agreementsSrv: AgreementsService,
     private authSrv: AuthService,
-    private workpackSrv: WorkpackService
+    private workpackSrv: WorkpackService,
+    private location: Location
   ) {
     this.actRouter.queryParams
       .pipe(takeUntil(this.$destroy))
@@ -83,15 +97,17 @@ export class CooperationComponent implements OnInit, OnDestroy {
       });
 
     this.formCooperation = this.formBuilder.group({
-      managementUnit: [null, Validators.required],
+      managementUnit: [{ value: null, disabled: true }],
 
-      year: [null, Validators.required],
+      year: [null],
 
-      process: [null, Validators.required],
+      process: [{ value: null, disabled: true }, Validators.required],
 
-      grantorCnpj: [''],
+      protocolSearch: [''],
 
-      grantorName: [''],
+      partyCnpj: [''],
+
+      partyName: [''],
 
       protocol: [''],
     });
@@ -108,10 +124,18 @@ export class CooperationComponent implements OnInit, OnDestroy {
     this.formCooperation.valueChanges
       .pipe(
         takeUntil(this.$destroy),
-        filter(() => this.formCooperation.dirty && this.formCooperation.valid)
+        filter(() => this.formCooperation.dirty)
       )
       .subscribe(() => {
-        this.saveButton?.showButton();
+        if (
+          !this.idCooperation &&
+          this.formCooperation.valid &&
+          this.formCooperation.controls.process.value
+        ) {
+          this.saveButton?.showButton();
+        } else {
+          this.saveButton?.hideButton();
+        }
       });
 
     this.formCooperation.valueChanges
@@ -125,8 +149,9 @@ export class CooperationComponent implements OnInit, OnDestroy {
   }
 
   async ngOnInit(): Promise<void> {
-    this.loadMockOptions();
-
+    if (!this.idCooperation) {
+      await this.loadYears();
+    }
     await this.loadPropertiesCooperation();
     await this.setBreadcrumb();
 
@@ -134,7 +159,11 @@ export class CooperationComponent implements OnInit, OnDestroy {
       this.formCooperation.disable();
     } else {
       this.formCooperation.enable();
-      this.disableComplementaryFields();
+      if (this.idCooperation) {
+        this.formCooperation.controls.process.disable();
+      } else {
+        this.updateFilterControls();
+      }
     }
   }
 
@@ -143,97 +172,144 @@ export class CooperationComponent implements OnInit, OnDestroy {
     this.$destroy.complete();
   }
 
-  private loadMockOptions(): void {
-    this.managementUnitOptions = [
-      {
-        label: 'SECULT',
-        value: 1,
-      },
-    ];
+  private async loadYears(): Promise<void> {
+    const result = await this.agreementsSrv.getProviderYears('COOPERATION');
 
-    this.yearOptions = [
-      {
-        label: '2026',
-        value: 2026,
-      },
-    ];
-
-    this.processOptions = [
-      {
-        label: '47621222 - AQUISIÇÃO DE GUILHOTINA ELÉTRICA',
-        value: 47621222,
-        data: {
-          processNumber: '47621222',
-          object: 'AQUISIÇÃO DE GUILHOTINA ELÉTRICA',
-          grantorCnpj: '14.530.067/0001-42',
-          grantorName: 'ASSOCIAÇÃO EVANGÉLICA BENEFICENTE E. SANTENSE',
-          protocol: '2025-NRFTYU',
-        },
-      },
-    ];
+    this.yearOptions = result.success && Array.isArray(result.data)
+      ? result.data
+          .map((year) => ({ label: String(year), value: year }))
+          .sort((first, second) => Number(second.value) - Number(first.value))
+      : [];
   }
 
   resetFormCooperation(): void {
+    this.processFullValue = '';
+    this.processSearchCompleted = false;
+
     this.formCooperation.reset({
       managementUnit: null,
       year: null,
       process: null,
-      grantorCnpj: '',
-      grantorName: '',
+      protocolSearch: '',
+      partyCnpj: '',
+      partyName: '',
       protocol: '',
     });
+    this.updateFilterControls();
   }
 
-  handleManagementUnitChange(): void {
+  async handleManagementUnitChange(): Promise<void> {
     this.clearProcessData();
-    this.loadProcesses();
+    this.updateFilterControls();
+    await this.loadProcesses();
   }
 
-  handleYearChange(): void {
+  async handleYearChange(): Promise<void> {
+    this.managementUnitOptions = [];
     this.clearProcessData();
-    this.loadProcesses();
+    this.formCooperation.patchValue({
+      managementUnit: null,
+      protocolSearch: '',
+    });
+    this.updateFilterControls();
+    await this.loadManagementUnits();
+    this.updateFilterControls();
   }
 
   private clearProcessData(): void {
+    this.processSearchCompleted = false;
     this.processOptions = [];
 
     this.formCooperation.patchValue({
       process: null,
-      grantorCnpj: '',
-      grantorName: '',
+      partyCnpj: '',
+      partyName: '',
       protocol: '',
     });
   }
 
   async loadProcesses(): Promise<void> {
-    const managementUnit = this.formCooperation.controls.managementUnit.value;
+    const managementUnitIdentifier =
+      this.formCooperation.controls.managementUnit.value;
 
     const year = this.formCooperation.controls.year.value;
 
-    if (!managementUnit || !year) {
+    const selectedManagementUnit = this.managementUnitOptions.find(
+      (option) => option.value === managementUnitIdentifier
+    );
+
+    if (!selectedManagementUnit || !year) {
       return;
     }
 
-    /*
-      const result =
-        await this.agreementsSrv
-          .getCooperationProcesses({
-            managementUnit,
-            year
-          });
+    const result = await this.agreementsSrv.getProviderProcesses(
+      'COOPERATION', year, selectedManagementUnit.data
+    );
 
-      this.processOptions =
-        result.success
-          ? result.data.map(item => ({
-              label:
-                `${item.processNumber} - ${item.object}`.toUpperCase(),
-              value: item.id,
-              data: item
-            }))
-          : [];
-      */
+    this.processOptions = result.success && Array.isArray(result.data)
+      ? result.data
+          .map((item) => ({
+            label: [item.processId, item.object]
+              .filter(Boolean).join(' - ').toUpperCase(),
+            value: item.processId,
+            data: item
+          }))
+          .sort((first, second) =>
+            first.label.localeCompare(second.label, 'pt-BR', { numeric: true })
+          )
+      : [];
 
-    this.loadMockOptions();
+    this.processSearchCompleted = !!result.success;
+  }
+
+  handleProtocolInput(): void {
+    const protocol = this.formCooperation.controls.protocolSearch.value;
+
+    if (!protocol) {
+      return;
+    }
+
+    this.managementUnitOptions = [];
+    this.clearProcessData();
+    this.formCooperation.patchValue({ year: null, managementUnit: null });
+    this.updateFilterControls();
+  }
+
+  handleProtocolComplete(): void {
+    const protocol = String(
+      this.formCooperation.controls.protocolSearch.value || ''
+    ).toUpperCase();
+
+    this.formCooperation.controls.protocolSearch.setValue(protocol, {
+      emitEvent: false,
+    });
+
+    // Ao integrar o endpoint, preencha processOptions e marque
+    // processSearchCompleted como true depois do retorno bem-sucedido.
+  }
+
+  private async loadManagementUnits(): Promise<void> {
+    const year = this.formCooperation.controls.year.value;
+
+    if (!year) {
+      return;
+    }
+
+    const result = await this.agreementsSrv.getProviderOrganizations(
+      'COOPERATION', year
+    );
+
+    this.managementUnitOptions = result.success && Array.isArray(result.data)
+      ? result.data
+          .map((item: IAgreementOrganization) => ({
+            label: item.name.toUpperCase(),
+            value: item.identifier,
+            data: item
+          }))
+          .sort((first, second) =>
+            first.label.localeCompare(second.label, 'pt-BR')
+          )
+      : [];
   }
 
   handleProcessChange(event): void {
@@ -242,9 +318,9 @@ export class CooperationComponent implements OnInit, OnDestroy {
     );
 
     this.formCooperation.patchValue({
-      grantorCnpj: selectedProcess?.data?.grantorCnpj || '',
+      partyCnpj: selectedProcess?.data?.partyCnpj || '',
 
-      grantorName: selectedProcess?.data?.grantorName || '',
+      partyName: selectedProcess?.data?.partyName || '',
 
       protocol: selectedProcess?.data?.protocol || '',
     });
@@ -255,23 +331,27 @@ export class CooperationComponent implements OnInit, OnDestroy {
 
     const selectedProcess = this.getCurrentProcessOption();
 
-    const processValue = selectedProcess?.value ||
-      this.cooperation.processId || this.cooperation.processNumber;
+    this.processFullValue = this.idCooperation
+      ? [this.cooperation.processId, this.cooperation.object]
+          .filter(Boolean).join(' - ').toUpperCase()
+      : '';
+
+    const processValue = this.idCooperation
+      ? truncateText(this.processFullValue)
+      : selectedProcess?.value || this.cooperation.processId;
 
     const processData = selectedProcess?.data || {};
 
     this.formCooperation.reset({
-      managementUnit:
-        this.cooperation.managementUnitId ||
-        this.cooperation.managementUnitName,
+      managementUnit: this.cooperation.organizationName,
 
       year: this.cooperation.year,
 
       process: processValue,
 
-      grantorCnpj: this.cooperation.grantorCnpj || processData.grantorCnpj,
+      partyCnpj: this.cooperation.partyCnpj || processData.partyCnpj,
 
-      grantorName: this.cooperation.grantorName || processData.grantorName,
+      partyName: this.cooperation.partyName || processData.partyName,
 
       protocol: this.cooperation.protocol || processData.protocol,
     });
@@ -280,9 +360,7 @@ export class CooperationComponent implements OnInit, OnDestroy {
   }
 
   private ensureCurrentOptions(): void {
-    const managementUnitValue =
-      this.cooperation.managementUnitId ||
-      this.cooperation.managementUnitName;
+    const managementUnitValue = this.cooperation.organizationName;
 
     if (
       managementUnitValue &&
@@ -292,7 +370,7 @@ export class CooperationComponent implements OnInit, OnDestroy {
     ) {
       this.managementUnitOptions.push({
         label: (
-          this.cooperation.managementUnitName || String(managementUnitValue)
+          this.cooperation.organizationName || String(managementUnitValue)
         ).toUpperCase(),
         value: managementUnitValue,
       });
@@ -308,15 +386,14 @@ export class CooperationComponent implements OnInit, OnDestroy {
       });
     }
 
-    const processValue =
-      this.cooperation.processId || this.cooperation.processNumber;
+    const processValue = this.cooperation.processId;
 
     if (
       processValue &&
       !this.getCurrentProcessOption()
     ) {
       this.processOptions.push({
-        label: [this.cooperation.processNumber, this.cooperation.object]
+        label: [this.cooperation.processId, this.cooperation.object]
           .filter(Boolean)
           .join(' - ')
           .toUpperCase(),
@@ -329,16 +406,29 @@ export class CooperationComponent implements OnInit, OnDestroy {
   private getCurrentProcessOption(): any {
     return this.processOptions.find(
       (option) =>
-        option.value === this.cooperation.processId ||
-        String(option.data?.processNumber) ===
-          String(this.cooperation.processNumber)
+        option.value === this.cooperation.processId
     );
   }
 
-  private disableComplementaryFields(): void {
-    this.formCooperation.controls.grantorCnpj.disable();
-    this.formCooperation.controls.grantorName.disable();
-    this.formCooperation.controls.protocol.disable();
+  private updateFilterControls(): void {
+    if (!this.editPermission || this.idCooperation) {
+      return;
+    }
+
+    if (
+      this.formCooperation.controls.year.value &&
+      this.managementUnitOptions.length
+    ) {
+      this.formCooperation.controls.managementUnit.enable();
+    } else {
+      this.formCooperation.controls.managementUnit.disable();
+    }
+
+    if (this.formCooperation.controls.managementUnit.value) {
+      this.formCooperation.controls.process.enable();
+    } else {
+      this.formCooperation.controls.process.disable();
+    }
   }
 
   async loadPropertiesCooperation(): Promise<void> {
@@ -358,6 +448,16 @@ export class CooperationComponent implements OnInit, OnDestroy {
 
     if (result && result.success) {
       this.cooperation = result.data;
+
+      if (this.cooperation.processId) {
+        const detailResult = await this.agreementsSrv.getProviderProcess(
+          'COOPERATION', this.cooperation.processId
+        );
+
+        if (detailResult.success && detailResult.data) {
+          this.cooperation = { ...this.cooperation, ...detailResult.data };
+        }
+      }
 
       await this.loadPermissions();
 
@@ -404,7 +504,7 @@ export class CooperationComponent implements OnInit, OnDestroy {
       );
     }
 
-    const cooperationInfo = this.cooperation?.processNumber;
+    const cooperationInfo = this.cooperation?.object || '';
 
     this.breadcrumbSrv.setMenu([
       ...breadcrumbItems,
@@ -417,7 +517,10 @@ export class CooperationComponent implements OnInit, OnDestroy {
   }
 
   async saveCooperation(): Promise<void> {
-    if (this.formCooperation.invalid) {
+    if (
+      this.formCooperation.invalid ||
+      !this.formCooperation.controls.process.value
+    ) {
       this.formCooperation.markAllAsTouched();
       return;
     }
@@ -434,7 +537,7 @@ export class CooperationComponent implements OnInit, OnDestroy {
     const sender: IAgreementCreate = {
       idWorkpack: this.idWorkpack,
       type: 'COOPERATION',
-      processNumber: selectedProcess?.data?.processNumber,
+      processId: selectedProcess?.data?.processId,
       object: selectedProcess?.data?.object,
     };
 
@@ -461,20 +564,20 @@ export class CooperationComponent implements OnInit, OnDestroy {
         id: result.data.id,
         idWorkpack: this.idWorkpack,
         type: 'COOPERATION',
-        processNumber: sender.processNumber,
+        processId: sender.processId,
         object: sender.object,
 
-        managementUnitId: formValue.managementUnit,
-        managementUnitName: this.managementUnitOptions.find(
+        organizationName: this.managementUnitOptions.find(
           (option) => option.value === formValue.managementUnit
         )?.label,
 
         year: formValue.year,
-        processId: formValue.process,
-        grantorCnpj: formValue.grantorCnpj,
-        grantorName: formValue.grantorName,
+        partyCnpj: formValue.partyCnpj,
+        partyName: formValue.partyName,
         protocol: formValue.protocol,
       };
+
+      this.setFormCooperation();
 
       this.messageSrv.add({
         severity: 'success',
@@ -489,6 +592,7 @@ export class CooperationComponent implements OnInit, OnDestroy {
       this.formCooperation.markAsPristine();
       this.saveButton?.hideButton();
       this.cancelButton?.hideButton();
+      this.location.back();
     }
 
     this.formIsSaving = false;
