@@ -363,7 +363,8 @@ export class PlanPermissionsComponent implements OnInit, OnDestroy {
         }
         this.showSearchInputMessage = false;
         this.person = data;
-        this.person.email = this.searchedEmailPerson
+        this.person.key = this.person.key ?? this.searchedEmailPerson;
+        this.person.email = this.searchedEmailPerson;
       } else {
         const email = this.searchedEmailPerson.split('@');
         const name = email[0];
