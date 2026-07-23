@@ -1135,7 +1135,7 @@ export class WorkpackModelComponent implements OnInit {
 
   
 
- async getListOrganizations(sectors: string[]) {
+async getListOrganizations(sectors: string[]) {
   if (!this.listOrganizations.length) {
     const result = await this.organizationSrv.GetAll({ 'id-office': this.idOffice });
     if (result.success) {
@@ -1154,9 +1154,11 @@ export class WorkpackModelComponent implements OnInit {
       return matchesSector || matchesIntegration;
     })
     .sort((a, b) => a.name.localeCompare(b.name))
-    .map(d => ({ label: d.name, value: d.id }));
+    .map(d => ({
+      label: d.suffix ? `${d.name} - ${d.suffix}` : d.name,
+      value: d.id
+    }));
 }
-
 
 get integrationSectorOptions(): SelectItem[] {
   const integrations = Array.from(
