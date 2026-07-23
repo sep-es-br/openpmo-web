@@ -18,8 +18,12 @@
                 </label>
                 <span class="p-input-icon-right">
                   <i class="pi pi-search" *ngIf="!idProcess"></i>
-                  <input type="text" pInputText class="app-input-text" formControlName="processNumber"
-                         (change)="debounceSearch.next()">
+                <p-inputMask               
+                class="app-input-text"
+                formControlName="processNumber"
+                mask="9999-*****"
+                (onInput)="onProcessNumberInput()">
+              </p-inputMask>
                 </span>
               </div>
             </div>
