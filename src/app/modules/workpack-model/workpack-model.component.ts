@@ -1142,22 +1142,36 @@ export class WorkpackModelComponent implements OnInit {
       this.listOrganizations = result.data;
     }
   }
+
+  if (!sectors) {
+    return [];
+  }
+
   return this.listOrganizations
     .filter(org => {
-      if (!sectors) {
-        return false;
-      }
       const matchesSector = sectors.includes(org.sector);
-      const matchesGoves = sectors.includes('GOVES') && org.integration === 'GOVES';
-      return matchesSector || matchesGoves;
+      const matchesIntegration = !!org.integration && sectors.includes(org.integration.toUpperCase());
+      return matchesSector || matchesIntegration;
     })
     .sort((a, b) => a.name.localeCompare(b.name))
-    .map(d => ({
-  label: d.integration === 'GOVES' && d.suffix ? `${d.name} (${d.suffix})` : d.name,
-  value: d.id
-}));
+    .map(d => ({ label: d.name, value: d.id }));
 }
 
+
+get integrationSectorOptions(): SelectItem[] {
+  const integrations = Array.from(
+    new Set(
+      this.listOrganizations
+        .map(org => org.integration)
+        .filter((i): i is string => !!i)
+        .map(i => i.toUpperCase())
+    )
+  );
+  return integrations.map(integration => ({
+    label: integration,
+    value: integration
+  }));
+}
 
   async getListMeasureUnits() {
     if (!this.listMeasureUnits.length) {
