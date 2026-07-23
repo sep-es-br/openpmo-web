@@ -263,7 +263,7 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
           itemId: p.id,
         }));
       const rolesNotPermissions = this.permission?.permissions
-        ? this.permission?.person?.roles.filter(
+        ? this.permission?.person?.roles?.filter(
             (r) =>
               this.permission?.permissions.filter((p) => p.role === (r.role ?? (r as any)))
                 .length === 0
@@ -334,6 +334,7 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
         }
         this.showSearchInputMessage = false;
         this.person = data;
+        this.person.key = this.person.key ?? this.searchedEmailPerson;
         this.person.email = this.searchedEmailPerson;
       } else {
         const email = this.searchedEmailPerson.split('@');
@@ -341,6 +342,7 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
         this.person = {
           name,
           email: this.searchedEmailPerson,
+          key: this.searchedEmailPerson,
           roles: [{ role: 'citizen' }],
         };
       }

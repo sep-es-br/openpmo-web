@@ -28,7 +28,7 @@ export class HttpRequestInterceptor implements HttpInterceptor {
   isRefreshingToken = false;
 
   requestCount = 0;
-  requestCache = new Map<any, Observable<HttpEvent<any>>>();
+  requestCache = new Map<any, Observable<any>>();
 
   constructor(
     private authService: AuthService,
@@ -107,7 +107,7 @@ export class HttpRequestInterceptor implements HttpInterceptor {
           });
         }
         else if (error.status === 401) {
-          return this.handleUnauthorized(req, next);
+          return this.route.navigate(['/login']);
         }
         else if (error.status === 500 && error.message.startsWith('JWT expired ')) {
           this.messageSrv.add({
@@ -126,7 +126,7 @@ export class HttpRequestInterceptor implements HttpInterceptor {
         }));
       }),
       finalize(() => {
-            this.requestCount--
+            this.requestCount--;
             setTimeout(() => this.requestCache.delete(thisKey), 5_000);
         }),
         shareReplay(1)
