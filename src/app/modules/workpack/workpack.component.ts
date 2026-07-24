@@ -147,6 +147,8 @@ export class WorkpackComponent implements OnDestroy {
 
   tabs: ITabViewScrolled[];
 
+  returnTab: string;   //add
+
   isLoading = false;
 
   favoriteProcessing = false;
@@ -220,13 +222,15 @@ export class WorkpackComponent implements OnDestroy {
       idWorkpackModel,
       idWorkpackParent,
       idWorkpackModelLinked,
-      linkEvent
+      linkEvent,
+      returnTab   //add
     }) => {
       this.idWorkpack = id && +id;
       this.idPlan = idPlan && +idPlan;
       this.idWorkpackModel = idWorkpackModel && +idWorkpackModel;
       this.idWorkpackParent = idWorkpackParent && +idWorkpackParent;
       this.idWorkpackModelLinked = idWorkpackModelLinked && +idWorkpackModelLinked;
+      this.returnTab = returnTab;  //add
       this.linkEvent = linkEvent;
       this.workpackSrv.setWorkpackParams({
         idWorkpack: id && +id,
@@ -440,6 +444,7 @@ export class WorkpackComponent implements OnDestroy {
     if (this.isUserAdmin || !this.idWorkpack) {
       this.workpackSrv.setEditPermission(true);
     }
+      console.log('1 - isUserAdmin:', this.isUserAdmin, 'editPermission logo após setEditPermission(true)?', this.workpackSrv.getEditPermission());
     const params = this.workpackSrv.getWorkpackParams();
     const planProperties = await this.planSrv.getCurrentPlan(this.idPlan);
     this.workpackSrv.setWorkpackParams({
@@ -501,6 +506,7 @@ export class WorkpackComponent implements OnDestroy {
         this.workpackSrv.setEditPermission(false);
       } else if (!this.isUserAdmin && this.workpack) {
         await this.loadUserPermission();
+        console.log('2 - depois de loadUserPermission, editPermission =', this.workpackSrv.getEditPermission());
       }
 
       if (reloadOnlyProperties) {
@@ -664,6 +670,7 @@ export class WorkpackComponent implements OnDestroy {
   }
 
   async loadSectionsWorkpackChildren() {
+      console.log('editPermission?', this.workpackSrv.getEditPermission());
     this.cardsWorkPackModelChildren = this.workpackModel?.children ? this.workpackModel?.children?.map(workpackModel => {
       const propertiesCard: ICard = {
         toggleable: false,
@@ -1305,7 +1312,8 @@ export class WorkpackComponent implements OnDestroy {
       queryParams: {
         idPlan,
         idWorkpackModel,
-        idWorkpackParent
+        idWorkpackParent,
+        returnTab: this.selectedTab?.key //add
       }
     });
   }
@@ -1354,7 +1362,8 @@ export class WorkpackComponent implements OnDestroy {
       queryParams: {
         idPlan: this.idPlan,
         idWorkpackModel,
-        idWorkpackParent: this.idWorkpack
+        idWorkpackParent: this.idWorkpack,
+        returnTab: this.selectedTab?.key //add
       }
     });
   }
@@ -1535,7 +1544,8 @@ export class WorkpackComponent implements OnDestroy {
     this.router.navigate(['/workpack'], {
       queryParams: {
         id: this.workpack && this.workpack.idParent ? this.workpack.idParent : this.idWorkpackParent,
-        idPlan: this.idPlan
+        idPlan: this.idPlan,
+        returnTab: this.returnTab   //add
       }
     });
   }
@@ -1685,9 +1695,12 @@ export class WorkpackComponent implements OnDestroy {
     return filterPropertiesList;
   }
 
-  changeTab(event: { tabs: ITabViewScrolled }) {
-    this.selectedTab = event.tabs;
+ changeTab(event: { tabs: ITabViewScrolled }) {
+  this.selectedTab = event.tabs;
+  if (this.returnTab) {
+    this.returnTab = undefined; 
   }
+}
 
   loadWorkpackTabs() {
     this.tabs = [];

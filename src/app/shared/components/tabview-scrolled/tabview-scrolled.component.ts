@@ -23,6 +23,7 @@ export class TabviewScrolledComponent implements OnChanges, OnDestroy {
   @Output() selectedTabChange = new EventEmitter<{ tabs: ITabViewScrolled }>();
   @Input() tabs: ITabViewScrolled[] = [];
   @Input() idWorkpack: number;
+  @Input() forcedTabKey: string;
   selectedTab: ITabViewScrolled;
   tabBody: string;
   showTabview: boolean;
@@ -81,29 +82,27 @@ export class TabviewScrolledComponent implements OnChanges, OnDestroy {
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    
-    if ((changes.tabs && changes.tabs.currentValue) && (changes.idWorkpack && changes.idWorkpack.currentValue)) {
-      if (!this.tabs.length) {
-        this.showMessageNotFound = true;
-        return;
-      }
-      const index = this.existsWorkpackTabStorage() ? this.findIndexTabStorage() : 0;
-      this.selectTab(this.tabs[index]);
-      this.prepareScrolls();
-      
-    } else {
-      if ((changes.tabs && changes.tabs.currentValue) && !this.idWorkpack) {
-        if (!this.tabs.length) {
-          this.showMessageNotFound = true;
-          return;
-        }
-        this.selectTab(this.tabs[0]);
-        this.prepareScrolls();
-      }
+  if (changes.tabs && changes.tabs.currentValue) {
+    if (!this.tabs.length) {
+      this.showMessageNotFound = true;
+      return;
     }
-
+    if (this.idWorkpack) {
+      const forcedIndex = this.forcedTabKey
+        ? this.tabs.findIndex(tab => tab.key === this.forcedTabKey)
+        : -1;
+      const index = forcedIndex !== -1
+        ? forcedIndex
+        : (this.existsWorkpackTabStorage() ? this.findIndexTabStorage() : 0);
+      this.selectTab(this.tabs[index]);
+    } else {
+      this.selectTab(this.tabs[0]);
+    }
+    this.prepareScrolls();
+  } else {
+    this.showMessageNotFound = false;
   }
-
+}
   selectTab(item: ITabViewScrolled) {
     if (this.pendingChanges) {
       this.confirmationSrv.confirm({
