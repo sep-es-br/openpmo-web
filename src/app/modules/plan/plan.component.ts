@@ -248,7 +248,7 @@ export class PlanComponent implements OnInit, OnDestroy {
   async ngOnInit() {
     const today = moment();
     const yearStart = today.year();
-    this.yearRange = (yearStart - 10).toString() + ':' + (yearStart + 10).toString();
+    this.yearRange = (yearStart - 10).toString() + ':' + (yearStart + 30).toString();
     this.calendarFormat = this.translateSrv.instant('dateFormat');
   }
 
