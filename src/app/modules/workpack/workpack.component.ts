@@ -211,9 +211,6 @@ export class WorkpackComponent implements OnDestroy {
     private searchSrv: SearchService,
     private thisElemRef: ElementRef<HTMLElement>
   ) {
-    this.actRouter.queryParams.subscribe(({ id }) => {
-        this.idWorkpack = id && +id;
-    });
     this.actRouter.queryParams.subscribe(async({
       id,
       idPlan,
