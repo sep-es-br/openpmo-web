@@ -4,7 +4,7 @@ import { ISectionWorkpacks } from './../../shared/interfaces/ISectionWorkpack';
 import { DashboardService } from 'src/app/shared/services/dashboard.service';
 import { MilestoneStatusEnum } from './../../shared/enums/MilestoneStatusEnum';
 import { IFilterProperty } from 'src/app/shared/interfaces/IFilterProperty';
-import {finalize, switchMap, takeUntil} from 'rxjs/operators';
+import {distinctUntilChanged, filter, finalize, switchMap, take, takeUntil} from 'rxjs/operators';
 import { IWorkpackCardItem } from './../../shared/interfaces/IWorkpackCardItem';
 import { BaselineService } from './../../shared/services/baseline.service';
 import { ProcessService } from './../../shared/services/process.service';
@@ -15,7 +15,7 @@ import { TypePropertyModelEnum } from './../../shared/enums/TypePropertyModelEnu
 import { FilterDataviewPropertiesEntity } from 'src/app/shared/constants/filterDataviewPropertiesEntity';
 import { FilterDataviewService } from 'src/app/shared/services/filter-dataview.service';
 import {Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, NavigationEnd, Params, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { ConfirmationService, LazyLoadEvent, MenuItem, MessageService, SelectItem } from 'primeng/api';
 import { ICard } from 'src/app/shared/interfaces/ICard';
@@ -40,7 +40,7 @@ import { MenuService } from 'src/app/shared/services/menu.service';
 import { IOffice } from 'src/app/shared/interfaces/IOffice';
 import { IPlan } from 'src/app/shared/interfaces/IPlan';
 import * as moment from 'moment';
-import { Subject } from 'rxjs';
+import { from, merge, of, Subject } from 'rxjs';
 import { WorkpackShowTabviewService } from 'src/app/shared/services/workpack-show-tabview.service';
 import { ConfigDataViewService } from 'src/app/shared/services/config-dataview.service';
 import { ITabViewScrolled } from 'src/app/shared/components/tabview-scrolled/tabview-scrolled.component';
@@ -147,6 +147,10 @@ export class WorkpackComponent implements OnDestroy, OnInit {
 
   tabs: ITabViewScrolled[];
 
+  tabviewIdWorkpack: number;
+
+  tabviewContextVersion = 0;
+
   isLoading = false;
 
   favoriteProcessing = false;
@@ -172,6 +176,8 @@ export class WorkpackComponent implements OnDestroy, OnInit {
   totalCountResults: number;
 
   isSearching = false;
+
+  private workpackLoadId = 0;
 
   constructor(
     private actRouter: ActivatedRoute,
@@ -277,33 +283,52 @@ export class WorkpackComponent implements OnDestroy, OnInit {
   }
 
   ngOnInit() {
-    this.actRouter.queryParams.pipe(
-      switchMap(async ({
-                         id,
-                         idPlan,
-                         idWorkpackModel,
-                         idWorkpackParent,
-                         idWorkpackModelLinked,
-                         linkEvent
-                       }) => {
-        this.idWorkpack = id && +id;
-        this.idPlan = idPlan && +idPlan;
-        this.idWorkpackModel = idWorkpackModel && +idWorkpackModel;
-        this.idWorkpackParent = idWorkpackParent && +idWorkpackParent;
-        this.idWorkpackModelLinked = idWorkpackModelLinked && +idWorkpackModelLinked;
-        this.linkEvent = linkEvent;
-        this.workpackSrv.setWorkpackParams({
-          idWorkpack: id && +id,
-          idPlan: idPlan && +idPlan,
-          idWorkpackModel: idWorkpackModel && +idWorkpackModel,
-          idWorkpackParent: idWorkpackParent && +idWorkpackParent,
-          idWorkpackModelLinked: idWorkpackModelLinked && +idWorkpackModelLinked,
-        });
-        this.selectedTab = null;
-        return this.resetWorkpack();
+    merge(
+      of(null),
+      this.router.events.pipe(filter((event): event is NavigationEnd => event instanceof NavigationEnd))
+    ).pipe(
+      switchMap(() => this.actRouter.queryParams.pipe(take(1))),
+      distinctUntilChanged((prev, curr) => this.areSameWorkpackQueryParams(prev, curr)),
+      takeUntil(this.$destroy),
+      switchMap((params) => {
+        this.applyWorkpackQueryParams(params);
+        const loadId = ++this.workpackLoadId;
+        return from(this.resetWorkpack(loadId));
       })
     ).subscribe();
+  }
 
+  private areSameWorkpackQueryParams(prev: Params, curr: Params): boolean {
+    const keys = ['id', 'idPlan', 'idWorkpackModel', 'idWorkpackParent', 'idWorkpackModelLinked', 'linkEvent'];
+    return keys.every(key => prev[key] === curr[key]);
+  }
+
+  private applyWorkpackQueryParams({
+    id,
+    idPlan,
+    idWorkpackModel,
+    idWorkpackParent,
+    idWorkpackModelLinked,
+    linkEvent
+  }: Params) {
+    this.idWorkpack = id && +id;
+    this.idPlan = idPlan && +idPlan;
+    this.idWorkpackModel = idWorkpackModel && +idWorkpackModel;
+    this.idWorkpackParent = idWorkpackParent && +idWorkpackParent;
+    this.idWorkpackModelLinked = idWorkpackModelLinked && +idWorkpackModelLinked;
+    this.linkEvent = linkEvent;
+    this.workpackSrv.setWorkpackParams({
+      idWorkpack: id && +id,
+      idPlan: idPlan && +idPlan,
+      idWorkpackModel: idWorkpackModel && +idWorkpackModel,
+      idWorkpackParent: idWorkpackParent && +idWorkpackParent,
+      idWorkpackModelLinked: idWorkpackModelLinked && +idWorkpackModelLinked,
+    });
+    this.selectedTab = null;
+  }
+
+  private isStaleWorkpackLoad(loadId: number): boolean {
+    return loadId !== this.workpackLoadId;
   }
 
   ngOnDestroy(): void {
@@ -398,7 +423,8 @@ export class WorkpackComponent implements OnDestroy, OnInit {
     this.pageSize = event.pageSize;
   }
 
-  async resetWorkpack() {
+  async resetWorkpack(loadId?: number) {
+    const currentLoadId = loadId ?? ++this.workpackLoadId;
     this.handleCloseSearching();
     this.workpackSrv.nextPendingChanges(false);
     if (this.saveButton) {
@@ -407,6 +433,10 @@ export class WorkpackComponent implements OnDestroy, OnInit {
     if (this.cancelButton) {
       this.cancelButton.hideButton();
     }
+    this.tabs = [];
+    this.tabviewIdWorkpack = undefined;
+    this.tabviewContextVersion++;
+    this.selectedTab = null;
     this.isLoading = true;
     this.hasWBS = false;
     this.workpackModel = undefined;
@@ -419,7 +449,13 @@ export class WorkpackComponent implements OnDestroy, OnInit {
     this.workpackSrv.setUnitMeansure(undefined);
     this.workpackSrv.setWorkpackData(undefined, true);
     if(!this.isLoading) await this.resetWorkpackSections();
-    await this.loadWorkpackData();
+    if (this.isStaleWorkpackLoad(currentLoadId)) {
+      return;
+    }
+    await this.loadWorkpackData(currentLoadId);
+    if (this.isStaleWorkpackLoad(currentLoadId)) {
+      return;
+    }
     this.workpackBreadcrumbStorageSrv.setBreadcrumb(this.linkEvent);
     this.calendarFormat = this.translateSrv.instant('dateFormat');
   }
@@ -438,13 +474,22 @@ export class WorkpackComponent implements OnDestroy, OnInit {
     this.scheduleSrv.resetScheduleData();
   }
 
-  async loadWorkpackData() {
+  async loadWorkpackData(loadId?: number) {
+    if (loadId !== undefined && this.isStaleWorkpackLoad(loadId)) {
+      return;
+    }
     this.isUserAdmin = await this.authSrv.isUserAdmin();
+    if (loadId !== undefined && this.isStaleWorkpackLoad(loadId)) {
+      return;
+    }
     if (this.isUserAdmin || !this.idWorkpack) {
       this.workpackSrv.setEditPermission(true);
     }
     const params = this.workpackSrv.getWorkpackParams();
     const planProperties = await this.planSrv.getCurrentPlan(this.idPlan);
+    if (loadId !== undefined && this.isStaleWorkpackLoad(loadId)) {
+      return;
+    }
     this.workpackSrv.setWorkpackParams({
       ...params,
       idPlan: this.idPlan,
@@ -452,12 +497,18 @@ export class WorkpackComponent implements OnDestroy, OnInit {
     });
     if (this.idWorkpack) {
       if (!this.idWorkpackModelLinked) {
-        await this.loadWorkpack();
+        await this.loadWorkpack(false, loadId);
       } else {
-        await this.loadWorkpackLinked();
+        await this.loadWorkpackLinked(false, loadId);
+      }
+      if (loadId !== undefined && this.isStaleWorkpackLoad(loadId)) {
+        return;
       }
     } else {
-      await this.loadWorkpackModel(this.idWorkpackModel);
+      await this.loadWorkpackModel(this.idWorkpackModel, loadId);
+      if (loadId !== undefined && this.isStaleWorkpackLoad(loadId)) {
+        return;
+      }
     }
     this.propertySrv.loadProperties();
     if(! this.dashboardSrv.referenceMonth) this.dashboardSrv.calculateReferenceMonth();
@@ -494,7 +545,7 @@ export class WorkpackComponent implements OnDestroy, OnInit {
     }
   }
 
-  async loadWorkpack(reloadOnlyProperties = false) {
+  async loadWorkpack(reloadOnlyProperties = false, loadId?: number) {
     this.workpackSrv.nextLoadingWorkpack(true);
     const result = await this.workpackSrv.GetWorkpackDataById(this.idWorkpack, { 'id-plan': this.idPlan});
     if (result.success && result.data) {
@@ -516,7 +567,7 @@ export class WorkpackComponent implements OnDestroy, OnInit {
       }
       if (!reloadOnlyProperties) {
         this.workpackSrv.setWorkpackData({ workpack: this.workpack });
-        await this.loadWorkpackModel(this.workpack.idWorkpackModel);
+        await this.loadWorkpackModel(this.workpack.idWorkpackModel, loadId);
       } else {
         this.workpackSrv.nextLoadingWorkpack(false);
       }
@@ -547,7 +598,7 @@ export class WorkpackComponent implements OnDestroy, OnInit {
     }
   }
 
-  async loadWorkpackLinked(reloadOnlyProperties = false) {
+  async loadWorkpackLinked(reloadOnlyProperties = false, loadId?: number) {
     this.workpackSrv.nextLoadingWorkpack(true);
     const result = await this.workpackSrv.GetWorkpackLinked(this.idWorkpack,
       { 'id-workpack-model': this.idWorkpackModelLinked, 'id-plan': this.idPlan});
@@ -573,7 +624,7 @@ export class WorkpackComponent implements OnDestroy, OnInit {
       }
       if (!reloadOnlyProperties) {
         this.workpackSrv.setWorkpackData({ workpack: this.workpack });
-        await this.loadWorkpackModel(this.workpack.modelLinked.id);
+        await this.loadWorkpackModel(this.workpack.modelLinked.id, loadId);
       } else {
         this.workpackSrv.nextLoadingWorkpack(false);
       }
@@ -600,9 +651,12 @@ export class WorkpackComponent implements OnDestroy, OnInit {
     this.workpackSrv.setEditPermission(editPermission);
   }
 
-  async loadWorkpackModel(idWorkpackModel) {
+  async loadWorkpackModel(idWorkpackModel, loadId?: number) {
     this.workpackSrv.nextLoadingWorkpack(true);
     const result = await this.workpackModelSrv.GetById(idWorkpackModel);
+    if (loadId !== undefined && this.isStaleWorkpackLoad(loadId)) {
+      return;
+    }
     if (result.success) {
       this.workpackModel = result.data;
       const workpackData = this.workpackSrv.getWorkpackData();
@@ -615,7 +669,10 @@ export class WorkpackComponent implements OnDestroy, OnInit {
       if (this.idWorkpack) {
         await this.checkWorkpackHasEap();
       }
-      this.loadWorkpackTabs();
+      if (loadId !== undefined && this.isStaleWorkpackLoad(loadId)) {
+        return;
+      }
+      this.loadWorkpackTabs(loadId);
     } else {
       this.isLoading = false;
     }
@@ -1506,13 +1563,12 @@ export class WorkpackComponent implements OnDestroy, OnInit {
         });
         if ((this.workpack && this.workpack.type !== TypeWorkpackEnum.MilestoneModel)
           || (this.workpackModel && TypeWorkpackEnum[this.workpackModel.type] !== TypeWorkpackEnum.MilestoneModel)) {
-            const workpackParams = this.workpackSrv.getWorkpackParams();
-            this.workpackSrv.setWorkpackParams({
-              ...workpackParams,
-              idWorkpack: data.id
+            this.router.navigate(['/workpack'], {
+              queryParams: {
+                id: data.id,
+                idPlan: this.idPlan
+              }
             });
-            this.idWorkpack = data.id;
-            this.resetWorkpack();
         } else {
           this.navigateToBack();
         }
@@ -1692,7 +1748,12 @@ export class WorkpackComponent implements OnDestroy, OnInit {
     this.selectedTab = event.tabs;
   }
 
-  loadWorkpackTabs() {
+  loadWorkpackTabs(loadId?: number) {
+    if (loadId !== undefined && this.isStaleWorkpackLoad(loadId)) {
+      return;
+    }
+    this.tabviewIdWorkpack = this.idWorkpack;
+    this.tabviewContextVersion++;
     this.tabs = [];
     if (this.idWorkpack) {
       if (!!this.idWorkpack && !!this.workpack &&
