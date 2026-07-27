@@ -21,6 +21,7 @@ import { ResponsiveService } from 'src/app/shared/services/responsive.service';
 import { WorkpackBreadcrumbStorageService } from 'src/app/shared/services/workpack-breadcrumb-storage.service';
 import { WorkpackShowTabviewService } from 'src/app/shared/services/workpack-show-tabview.service';
 import { WorkpackService } from 'src/app/shared/services/workpack.service';
+import { truncateText } from 'src/app/shared/utils/truncateText';
 
 @Component({
   selector: 'app-workpack-section-procurements',
@@ -244,9 +245,11 @@ export class WorkpackSectionProcurementsComponent implements OnInit, OnDestroy {
 
         iconSvg: true,
 
-        nameCardItem: procurement.object?.toUpperCase(),
+        nameCardItem: truncateText(procurement.object?.toUpperCase()),
 
-        subtitleCardItem: procurement.processNumber,
+        fullNameCardItem: procurement.object?.toUpperCase(),
+
+        subtitleCardItem: procurement.processId,
 
         itemId: procurement.id,
 

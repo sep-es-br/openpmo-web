@@ -24,9 +24,10 @@ export interface IProcurement {
 
 export interface IProcurementCreate {
   idWorkpack: number;
-  processNumber: string;
+  processId: number;
   object: string;
 }
+export interface IProcurementOrganization { identifier: string; name: string; }
 
 export interface IProcurementUpdate
   extends IProcurementCreate {

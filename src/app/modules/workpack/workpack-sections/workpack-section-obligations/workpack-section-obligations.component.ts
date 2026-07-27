@@ -22,6 +22,7 @@ import { ResponsiveService } from 'src/app/shared/services/responsive.service';
 import { WorkpackBreadcrumbStorageService } from 'src/app/shared/services/workpack-breadcrumb-storage.service';
 import { WorkpackShowTabviewService } from 'src/app/shared/services/workpack-show-tabview.service';
 import { WorkpackService } from 'src/app/shared/services/workpack.service';
+import { truncateText } from 'src/app/shared/utils/truncateText';
 
 @Component({
   selector: 'app-workpack-section-obligations',
@@ -237,7 +238,6 @@ export class WorkpackSectionObligationsComponent implements OnInit, OnDestroy {
   }
 
   async loadSectionObligationsCards() {
-    console.log('loadSectionObligationsCards', this.obligations);
     if (this.obligations?.length) {
       const cardItems = this.obligations.map((obligation) => ({
         typeCardItem: 'listItemObligation',
@@ -246,7 +246,9 @@ export class WorkpackSectionObligationsComponent implements OnInit, OnDestroy {
 
         iconSvg: false,
 
-        nameCardItem: obligation.description?.toUpperCase(),
+        nameCardItem: truncateText(obligation.description?.toUpperCase()),
+
+        fullNameCardItem: obligation.description?.toUpperCase(),
 
         subtitleCardItem: obligation.obligationNumber,
 

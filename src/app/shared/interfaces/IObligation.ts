@@ -7,7 +7,13 @@ export interface IObligation {
 
     managementUnitName?: string;
 
+    managementUnitCode?: string;
+
     year?: number;
+
+    processId?: string;
+
+    processNumber?: string;
 
     obligationNumber?: string;
 
@@ -15,7 +21,7 @@ export interface IObligation {
 
     supplierCnpj?: string;
 
-    amount?: number;
+    amount?: string;
 
     protocol?: string;
 }
@@ -24,7 +30,9 @@ export interface IObligationCreate {
     idWorkpack: number;
     obligationNumber: string;
     description: string;
+    managementUnitCode: string;
   }
+export interface IObligationManagementUnit { code: string; name: string; }
 
   export interface IObligationUpdate
     extends IObligationCreate {

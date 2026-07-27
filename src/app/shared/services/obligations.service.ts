@@ -8,6 +8,7 @@ import { FilterDataviewService } from './filter-dataview.service';
 import { IObligation } from '../interfaces/IObligation';
 import { IHttpResult } from '../interfaces/IHttpResult';
 import { PrepareHttpParams } from '../utils/query.util';
+import { IObligationManagementUnit } from '../interfaces/IObligation';
 
 @Injectable({
   providedIn: 'root'
@@ -31,6 +32,10 @@ export class ObligationsService extends BaseService<IObligation> {
   ) {
     super('obligations', injector);
   }
+  getProviderYears():Promise<IHttpResult<number[]>> { return this.http.get<IHttpResult<number[]>>(`${this.urlBase}/years`).toPromise(); }
+  getProviderManagementUnits(year:number):Promise<IHttpResult<IObligationManagementUnit[]>> { return this.http.get<IHttpResult<IObligationManagementUnit[]>>(`${this.urlBase}/management-units`,{params:{year:String(year)}}).toPromise(); }
+  getProviderProcesses(year:number,u:IObligationManagementUnit):Promise<IHttpResult<IObligation[]>> { return this.http.get<IHttpResult<IObligation[]>>(`${this.urlBase}/processes`,{params:{year:String(year),'management-unit-code':String(u.code)}}).toPromise(); }
+  getProviderProcess(id:string,code:string):Promise<IHttpResult<IObligation>> { return this.http.get<IHttpResult<IObligation>>(`${this.urlBase}/processes/${id}`,{params:{'management-unit-code':code}}).toPromise(); }
 
   resetObligationsData() {
     this.filters = [];

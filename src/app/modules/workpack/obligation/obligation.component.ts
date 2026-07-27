@@ -1,75 +1,44 @@
-import {
-  Component,
-  OnDestroy,
-  OnInit,
-  ViewChild
-} from '@angular/core';
-import {
-  FormBuilder,
-  FormGroup,
-  Validators
-} from '@angular/forms';
+import { Location } from '@angular/common';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { MessageService } from 'primeng/api';
 import { Subject } from 'rxjs';
-import { filter, takeUntil } from 'rxjs/operators';
+import { takeUntil } from 'rxjs/operators';
 
-import { CancelButtonComponent } from
-  'src/app/shared/components/cancel-button/cancel-button.component';
-import { SaveButtonComponent } from
-  'src/app/shared/components/save-button/save-button.component';
-import { ICard } from
-  'src/app/shared/interfaces/ICard';
-import { IObligation, IObligationCreate, IObligationUpdate } from
-  'src/app/shared/interfaces/IObligation';
-import { AuthService } from
-  'src/app/shared/services/auth.service';
-import { BreadcrumbService } from
-  'src/app/shared/services/breadcrumb.service';
-import { ObligationsService } from
-  'src/app/shared/services/obligations.service';
-import { ResponsiveService } from
-  'src/app/shared/services/responsive.service';
-import { WorkpackService } from
-  'src/app/shared/services/workpack.service';
+import { CancelButtonComponent } from 'src/app/shared/components/cancel-button/cancel-button.component';
+import { SaveButtonComponent } from 'src/app/shared/components/save-button/save-button.component';
+import { ICard } from 'src/app/shared/interfaces/ICard';
+import { IObligation, IObligationCreate, IObligationManagementUnit } from 'src/app/shared/interfaces/IObligation';
+import { AuthService } from 'src/app/shared/services/auth.service';
+import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
+import { ObligationsService } from 'src/app/shared/services/obligations.service';
+import { ResponsiveService } from 'src/app/shared/services/responsive.service';
+import { WorkpackService } from 'src/app/shared/services/workpack.service';
 
-@Component({
-  selector: 'app-obligation',
-  templateUrl: './obligation.component.html',
-  styleUrls: ['./obligation.component.scss'],
-})
+@Component({ selector: 'app-obligation', templateUrl: './obligation.component.html', styleUrls: ['./obligation.component.scss'] })
 export class ObligationComponent implements OnInit, OnDestroy {
-  @ViewChild(SaveButtonComponent)
-  saveButton: SaveButtonComponent;
-
-  @ViewChild(CancelButtonComponent)
-  cancelButton: CancelButtonComponent;
-
+  @ViewChild(SaveButtonComponent) saveButton: SaveButtonComponent;
+  @ViewChild(CancelButtonComponent) cancelButton: CancelButtonComponent;
   responsive = false;
-
   idObligation: number;
   idWorkpack: number;
   idPlan: number;
-
   editPermission = false;
   isLoading = false;
   formIsSaving = false;
-
-  $destroy = new Subject<void>();
-
   cardObligationProperties: ICard;
-
   formObligation: FormGroup;
-
   obligation: IObligation;
-
-  managementUnitOptions = [];
   yearOptions = [];
-  obligationNoteOptions = [];
+  managementUnitOptions = [];
+  processOptions = [];
+  processSearchCompleted = false;
+  private destroy$ = new Subject<void>();
 
   constructor(
-    private actRouter: ActivatedRoute,
+    private route: ActivatedRoute,
     private formBuilder: FormBuilder,
     private responsiveSrv: ResponsiveService,
     private translateSrv: TranslateService,
@@ -77,442 +46,188 @@ export class ObligationComponent implements OnInit, OnDestroy {
     private messageSrv: MessageService,
     private obligationsSrv: ObligationsService,
     private authSrv: AuthService,
-    private workpackSrv: WorkpackService
+    private workpackSrv: WorkpackService,
+    private location: Location
   ) {
-    this.actRouter.queryParams
-      .pipe(takeUntil(this.$destroy))
-      .subscribe((queryParams) => {
-        this.idObligation = queryParams.idObligation
-          ? Number(queryParams.idObligation)
-          : undefined;
-
-        this.idWorkpack = queryParams.idWorkpack
-          ? Number(queryParams.idWorkpack)
-          : undefined;
-      });
-
-    this.responsiveSrv.observable
-      .pipe(takeUntil(this.$destroy))
-      .subscribe((value) => {
-        this.responsive = value;
-      });
-
-    this.formObligation = this.formBuilder.group({
-      year: [null, Validators.required],
-
-      managementUnit: [null, Validators.required],
-
-      obligationNote: [null, Validators.required],
-
-      supplierCnpj: [''],
-
-      amount: [''],
-
-      protocol: [''],
+    this.route.queryParams.pipe(takeUntil(this.destroy$)).subscribe(params => {
+      this.idObligation = params.idObligation ? Number(params.idObligation) : undefined;
+      this.idWorkpack = params.idWorkpack ? Number(params.idWorkpack) : undefined;
     });
-
-    this.configureFormChanges();
+    this.responsiveSrv.observable.pipe(takeUntil(this.destroy$)).subscribe(value => this.responsive = value);
+    this.formObligation = this.formBuilder.group({
+      year: [null],
+      managementUnit: [{ value: null, disabled: true }],
+      process: [{ value: null, disabled: true }, Validators.required],
+      description: [''],
+      supplierCnpj: [''],
+      amount: [''],
+      protocol: ['']
+    });
   }
 
   async ngOnInit(): Promise<void> {
-    this.loadInitialOptions();
-
-    await this.loadPropertiesObligation();
-    await this.setBreadcrumb();
-
-    if (!this.editPermission) {
-      this.formObligation.disable();
-    } else {
-      this.formObligation.enable();
-      this.disableComplementaryFields();
-    }
-  }
-
-  ngOnDestroy(): void {
-    this.$destroy.next();
-    this.$destroy.complete();
-  }
-
-  private configureFormChanges(): void {
-    this.formObligation.statusChanges
-      .pipe(
-        takeUntil(this.$destroy),
-        filter((status) => status === 'INVALID')
-      )
-      .subscribe(() => {
-        this.saveButton?.hideButton();
-      });
-
-    this.formObligation.valueChanges
-      .pipe(
-        takeUntil(this.$destroy),
-        filter(() => this.formObligation.dirty && this.formObligation.valid)
-      )
-      .subscribe(() => {
-        this.saveButton?.showButton();
-      });
-
-    this.formObligation.valueChanges
-      .pipe(
-        takeUntil(this.$destroy),
-        filter(() => this.formObligation.dirty)
-      )
-      .subscribe(() => {
-        this.cancelButton?.showButton();
-      });
-  }
-
-  private loadInitialOptions(): void {
-    this.managementUnitOptions = [
-      {
-        label: 'SECULT',
-        value: 'SECULT',
-      },
-    ];
-
-    this.yearOptions = [
-      {
-        label: '2026',
-        value: 2026,
-      },
-    ];
-
-    /*
-     * Pode deixar vazio inicialmente.
-     * Ele será populado depois que Ano e Unidade Gestora
-     * forem selecionados.
-     */
-    this.obligationNoteOptions = [];
-  }
-
-  handleYearChange(): void {
-    this.clearObligationSelection();
-    this.loadObligationNotes();
-  }
-
-  handleManagementUnitChange(): void {
-    this.clearObligationSelection();
-    this.loadObligationNotes();
-  }
-
-  private clearObligationSelection(): void {
-    this.obligationNoteOptions = [];
-
-    this.formObligation.patchValue({
-      obligationNote: null,
-      supplierCnpj: '',
-      amount: '',
-      protocol: '',
-    });
-  }
-
-  async loadObligationNotes(): Promise<void> {
-    const year = this.formObligation.controls.year.value;
-
-    const managementUnit = this.formObligation.controls.managementUnit.value;
-
-    if (!year || !managementUnit) {
-      return;
-    }
-
+    this.cardObligationProperties = { toggleable: false, initialStateToggle: false, cardTitle: 'obligation', collapseble: true, initialStateCollapse: false };
     this.isLoading = true;
-
-    /*
-     * Quando o endpoint estiver pronto, substitua o mock:
-     *
-     * const result =
-     *   await this.obligationsSrv
-     *     .getObligationNotes({
-     *       year,
-     *       managementUnit
-     *     });
-     *
-     * this.obligationNoteOptions =
-     *   result.success
-     *     ? result.data.map(item => ({
-     *         label:
-     *           `${item.obligationNumber} - ${item.description}`.toUpperCase(),
-     *         value: item.obligationNumber,
-     *         data: item
-     *       }))
-     *     : [];
-     */
-
-    this.obligationNoteOptions = [
-      {
-        label: '2026NE000458 - AQUISIÇÃO DE MUDAS DE ESPÉCIES NATIVAS',
-        value: '2026NE000458',
-        data: {
-          obligationNumber: '2026NE000458',
-          description: 'Aquisição de mudas de espécies nativas',
-          supplierCnpj: '14.530.067/0001-42',
-          amount: '1.000.000,00',
-          protocol: '2026/000458',
-        },
-      },
-    ];
-
-    this.isLoading = false;
-  }
-
-  handleObligationNoteChange(event): void {
-    const selectedNote = this.obligationNoteOptions.find(
-      (option) => option.value === event.value
-    );
-
-    this.formObligation.patchValue({
-      supplierCnpj: selectedNote?.data?.supplierCnpj || '',
-
-      amount: selectedNote?.data?.amount || '',
-
-      protocol: selectedNote?.data?.protocol || '',
-    });
-  }
-
-  resetFormObligation(): void {
-    this.formObligation.reset({
-      year: null,
-      managementUnit: null,
-      obligationNote: null,
-      supplierCnpj: '',
-      amount: '',
-      protocol: '',
-    });
-
-    this.obligationNoteOptions = [];
-  }
-
-  setFormObligation(): void {
-    this.ensureCurrentOptions();
-
-    this.formObligation.reset({
-      year: this.obligation.year,
-
-      managementUnit: this.obligation.managementUnitName,
-
-      obligationNote: this.obligation.obligationNumber,
-
-      supplierCnpj: this.obligation.supplierCnpj,
-
-      amount: this.obligation.amount,
-
-      protocol: this.obligation.protocol,
-    });
-
-    this.isLoading = false;
-  }
-
-  private ensureCurrentOptions(): void {
-    if (
-      this.obligation?.year &&
-      !this.yearOptions.some((option) => option.value === this.obligation.year)
-    ) {
-      this.yearOptions.push({
-        label: String(this.obligation.year),
-        value: this.obligation.year,
-      });
-    }
-
-    if (
-      this.obligation?.managementUnitName &&
-      !this.managementUnitOptions.some(
-        (option) => option.value === this.obligation.managementUnitName
-      )
-    ) {
-      this.managementUnitOptions.push({
-        label: this.obligation.managementUnitName.toUpperCase(),
-        value: this.obligation.managementUnitName,
-      });
-    }
-
-    if (
-      this.obligation?.obligationNumber &&
-      !this.obligationNoteOptions.some(
-        (option) => option.value === this.obligation.obligationNumber
-      )
-    ) {
-      this.obligationNoteOptions.push({
-        label: [
-          this.obligation.obligationNumber,
-          this.obligation.description,
-        ]
-          .filter(Boolean)
-          .join(' - ')
-          .toUpperCase(),
-        value: this.obligation.obligationNumber,
-        data: {
-          description: this.obligation.description,
-          supplierCnpj: this.obligation.supplierCnpj,
-          amount: this.obligation.amount,
-          protocol: this.obligation.protocol,
-        },
-      });
-    }
-  }
-
-  private disableComplementaryFields(): void {
-    this.formObligation.controls.supplierCnpj.disable();
-
-    this.formObligation.controls.amount.disable();
-
-    this.formObligation.controls.protocol.disable();
-  }
-
-  async loadPropertiesObligation(): Promise<void> {
-    this.cardObligationProperties = {
-      toggleable: false,
-      initialStateToggle: false,
-      cardTitle: 'obligation',
-      collapseble: true,
-      initialStateCollapse: false,
-    };
-
-    this.isLoading = !!this.idObligation;
-
-    const result = this.idObligation
-      ? await this.obligationsSrv.GetById(this.idObligation)
-      : undefined;
-
     await this.loadPermissions();
-
-    if (result?.success) {
-      this.obligation = result.data;
-      this.setFormObligation();
-    } else {
+    if (this.idObligation) await this.loadObligation();
+    else {
+      await this.loadYears();
       this.isLoading = false;
+      this.updateFilterControls();
     }
+    await this.setBreadcrumb();
   }
 
-  async loadPermissions(): Promise<void> {
-    const isUserAdmin = await this.authSrv.isUserAdmin();
+  ngOnDestroy(): void { this.destroy$.next(); this.destroy$.complete(); }
 
-    this.idPlan = Number(localStorage.getItem('@currentPlan'));
-
-    const result = await this.workpackSrv.GetWorkpackPermissions(
-      this.idWorkpack,
-      {
-        'id-plan': this.idPlan,
-      }
-    );
-
-    if (!result.success) {
-      return;
-    }
-
-    const workpack = result.data;
-
-    if (isUserAdmin) {
-      this.editPermission = !workpack.canceled;
-
-      return;
-    }
-
-    this.editPermission =
-      !!workpack.permissions &&
-      workpack.permissions.some((permission) => permission.level === 'EDIT') &&
-      !workpack.canceled;
+  private async loadYears(): Promise<void> {
+    const result = await this.obligationsSrv.getProviderYears();
+    this.yearOptions = result.success ? result.data.sort((a, b) => b - a).map(value => ({ label: String(value), value })) : [];
   }
 
-  async setBreadcrumb(): Promise<void> {
-    let breadcrumbItems = this.breadcrumbSrv.get;
+  async handleYearChange(): Promise<void> {
+    this.managementUnitOptions = [];
+    this.clearProcess();
+    this.formObligation.patchValue({ managementUnit: null }, { emitEvent: false });
+    this.updateFilterControls();
+    const year = this.formObligation.controls.year.value;
+    if (!year) return;
+    const result = await this.obligationsSrv.getProviderManagementUnits(year);
+    this.managementUnitOptions = result.success
+      ? result.data.sort((a, b) => a.name.localeCompare(b.name)).map(data => ({ label: data.name, value: data.code, data }))
+      : [];
+    this.updateFilterControls();
+  }
 
-    if (!breadcrumbItems || breadcrumbItems.length === 0) {
-      breadcrumbItems = await this.breadcrumbSrv.loadWorkpackBreadcrumbs(
-        this.idWorkpack,
-        this.idPlan
-      );
+  async handleManagementUnitChange(): Promise<void> {
+    this.clearProcess();
+    this.updateFilterControls();
+    const year = this.formObligation.controls.year.value;
+    const selected = this.managementUnitOptions.find(option => option.value === this.formObligation.controls.managementUnit.value);
+    if (!year || !selected) return;
+    const result = await this.obligationsSrv.getProviderProcesses(year, selected.data as IObligationManagementUnit);
+    this.processOptions = result.success
+      ? result.data.sort((a, b) => String(b.processId).localeCompare(String(a.processId))).map(data => ({
+          label: [data.processId, data.description].filter(Boolean).join(' - ').toUpperCase(),
+          value: data.processId,
+          data
+        }))
+      : [];
+    this.processSearchCompleted = true;
+    this.updateFilterControls();
+  }
+
+  async handleProcessChange(event): Promise<void> {
+    this.clearDetails();
+    if (!event.value) { this.saveButton?.hideButton(); return; }
+    const unitCode = this.formObligation.controls.managementUnit.value;
+    const result = await this.obligationsSrv.getProviderProcess(event.value, unitCode);
+    const selected = this.processOptions.find(option => option.value === event.value);
+    const data = result.success ? result.data : selected?.data;
+    if (selected) selected.data = data;
+    this.patchDetails(data);
+    this.saveButton?.showButton();
+    this.cancelButton?.showButton();
+  }
+
+  private clearProcess(): void {
+    this.processOptions = [];
+    this.processSearchCompleted = false;
+    this.formObligation.patchValue({ process: null }, { emitEvent: false });
+    this.clearDetails();
+    this.saveButton?.hideButton();
+    this.cancelButton?.hideButton();
+  }
+
+  private clearDetails(): void {
+    this.formObligation.patchValue({ description: '', supplierCnpj: '', amount: '', protocol: '' }, { emitEvent: false });
+  }
+
+  private patchDetails(data: IObligation): void {
+    this.formObligation.patchValue({
+      description: data?.description || '', supplierCnpj: data?.supplierCnpj || '', amount: data?.amount || '', protocol: data?.protocol || data?.processNumber || ''
+    }, { emitEvent: false });
+  }
+
+  private updateFilterControls(): void {
+    if (!this.editPermission || this.idObligation) return;
+    const unit = this.formObligation.controls.managementUnit;
+    const process = this.formObligation.controls.process;
+    if (this.formObligation.controls.year.value && this.managementUnitOptions.length) unit.enable({ emitEvent: false });
+    else unit.disable({ emitEvent: false });
+    if (unit.value && this.processOptions.length) process.enable({ emitEvent: false });
+    else process.disable({ emitEvent: false });
+  }
+
+  private async loadObligation(): Promise<void> {
+    const result = await this.obligationsSrv.GetById(this.idObligation);
+    if (result.success) {
+      this.obligation = result.data;
+      this.formObligation.patchValue({ process: result.data.obligationNumber, ...result.data });
+      this.formObligation.disable();
     }
-
-    const obligationInfo = this.obligation?.obligationNumber;
-
-    this.breadcrumbSrv.setMenu([
-      ...breadcrumbItems,
-      {
-        key: 'obligation',
-        info: obligationInfo,
-        tooltip: obligationInfo,
-      },
-    ]);
+    this.isLoading = false;
   }
 
   async saveObligation(): Promise<void> {
-    if (this.formObligation.invalid) {
-      this.formObligation.markAllAsTouched();
-      return;
-    }
-
-    this.cancelButton?.hideButton();
+    const selected = this.processOptions.find(option => option.value === this.formObligation.controls.process.value);
+    if (!selected) return;
     this.formIsSaving = true;
-
-    const formValue = this.formObligation.getRawValue();
-
-    const selectedNote = this.obligationNoteOptions.find(
-      (option) => option.value === formValue.obligationNote
-    );
-
     const sender: IObligationCreate = {
       idWorkpack: this.idWorkpack,
-      obligationNumber: formValue.obligationNote,
-      description: selectedNote?.data?.description
+      obligationNumber: selected.data.processId,
+      description: selected.data.description,
+      managementUnitCode: this.formObligation.controls.managementUnit.value
     };
-
-    const isUpdate = !!this.idObligation;
-
-    const result = isUpdate
-      ? await this.obligationsSrv.put({
-          ...sender,
-          id: this.idObligation
-        } as IObligationUpdate)
-      : await this.obligationsSrv.post(sender);
-
-    if (result.success) {
-      this.idObligation = result.data.id;
-
-      this.obligation = {
-        ...this.obligation,
-        ...sender,
-        id: result.data.id,
-
-        managementUnitName: formValue.managementUnit,
-
-        year: formValue.year,
-
-        supplierCnpj: formValue.supplierCnpj,
-
-        amount: formValue.amount,
-
-        protocol: formValue.protocol,
-      };
-
-      this.messageSrv.add({
-        severity: 'success',
-        summary: this.translateSrv.instant('success'),
-        detail: this.translateSrv.instant('messages.savedSuccessfully'),
-      });
-
-      if (!isUpdate) {
-        await this.setBreadcrumb();
-      }
-
-      this.formObligation.markAsPristine();
-
-      this.saveButton?.hideButton();
-      this.cancelButton?.hideButton();
-    }
-
+    const result = await this.obligationsSrv.post(sender);
     this.formIsSaving = false;
+    if (result.success) {
+      this.messageSrv.add({ severity: 'success', summary: this.translateSrv.instant('success'), detail: this.translateSrv.instant('messages.savedSuccessfully') });
+      this.location.back();
+    }
   }
 
   handleOnCancel(): void {
-    this.saveButton?.hideButton();
-    this.cancelButton?.hideButton();
+    this.formObligation.reset();
+    this.managementUnitOptions = [];
+    this.clearProcess();
+    this.updateFilterControls();
+  }
 
-    if (this.idObligation) {
-      this.setFormObligation();
-      return;
-    }
+  truncateProcessLabel(value: string, limit = 90): string { return value && value.length > limit ? `${value.slice(0, limit)}...` : value; }
 
-    this.resetFormObligation();
-    this.obligation = undefined;
+  formatCurrency(value: string | number): string {
+    if (value === null || value === undefined || value === '') return '-';
+
+    const text = String(value).trim();
+    const normalized = text.includes(',')
+      ? text.replace(/\./g, '').replace(',', '.')
+      : text;
+    const amount = Number(normalized);
+
+    if (Number.isNaN(amount)) return text;
+
+    return new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL'
+    }).format(amount).replace(/\s/g, '');
+  }
+
+  get processFullValue(): string { return [this.obligation?.obligationNumber, this.obligation?.description].filter(Boolean).join(' - '); }
+
+  private async loadPermissions(): Promise<void> {
+    const isAdmin = await this.authSrv.isUserAdmin();
+    this.idPlan = Number(localStorage.getItem('@currentPlan'));
+    const result = await this.workpackSrv.GetWorkpackPermissions(this.idWorkpack, { 'id-plan': this.idPlan });
+    if (!result.success) return;
+    const workpack = result.data;
+    this.editPermission = !workpack.canceled && (isAdmin || !!workpack.permissions?.some(permission => permission.level === 'EDIT'));
+  }
+
+  private async setBreadcrumb(): Promise<void> {
+    let items = this.breadcrumbSrv.get;
+    if (!items?.length) items = await this.breadcrumbSrv.loadWorkpackBreadcrumbs(this.idWorkpack, this.idPlan);
+    const info = this.obligation?.description || this.obligation?.obligationNumber;
+    this.breadcrumbSrv.setMenu([...items, { key: 'obligation', info: this.truncateProcessLabel(info, 90), tooltip: info }]);
   }
 }

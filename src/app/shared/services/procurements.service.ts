@@ -10,6 +10,8 @@ import {
 import { FilterDataviewService } from './filter-dataview.service';
 import { WorkpackService } from './workpack.service';
 import { IProcurement } from '../interfaces/IProcurement';
+import { IProcurementOrganization } from '../interfaces/IProcurement';
+import { IHttpResult } from '../interfaces/IHttpResult';
 
 @Injectable({
   providedIn: 'root'
@@ -34,6 +36,10 @@ export class ProcurementsService extends BaseService<IProcurement> {
   ) {
     super('procurements', injector);
   }
+  getProviderYears(): Promise<IHttpResult<number[]>> { return this.http.get<IHttpResult<number[]>>(`${this.urlBase}/years`).toPromise(); }
+  getProviderOrganizations(year: number): Promise<IHttpResult<IProcurementOrganization[]>> { return this.http.get<IHttpResult<IProcurementOrganization[]>>(`${this.urlBase}/organizations`, {params:{year:String(year)}}).toPromise(); }
+  getProviderProcesses(year:number,o:IProcurementOrganization):Promise<IHttpResult<IProcurement[]>> { return this.http.get<IHttpResult<IProcurement[]>>(`${this.urlBase}/processes`,{params:{year:String(year),'organization-identifier':o.identifier,'organization-name':o.name}}).toPromise(); }
+  getProviderProcess(id:number):Promise<IHttpResult<IProcurement>> { return this.http.get<IHttpResult<IProcurement>>(`${this.urlBase}/processes/${id}`).toPromise(); }
 
   resetProcurementsData(): void {
     this.filters = [];
