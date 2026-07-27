@@ -4,7 +4,7 @@ import { ISectionWorkpacks } from './../../shared/interfaces/ISectionWorkpack';
 import { DashboardService } from 'src/app/shared/services/dashboard.service';
 import { MilestoneStatusEnum } from './../../shared/enums/MilestoneStatusEnum';
 import { IFilterProperty } from 'src/app/shared/interfaces/IFilterProperty';
-import { finalize, takeUntil } from 'rxjs/operators';
+import {finalize, switchMap, takeUntil} from 'rxjs/operators';
 import { IWorkpackCardItem } from './../../shared/interfaces/IWorkpackCardItem';
 import { BaselineService } from './../../shared/services/baseline.service';
 import { ProcessService } from './../../shared/services/process.service';
@@ -14,7 +14,7 @@ import { RiskService } from './../../shared/services/risk.service';
 import { TypePropertyModelEnum } from './../../shared/enums/TypePropertyModelEnum';
 import { FilterDataviewPropertiesEntity } from 'src/app/shared/constants/filterDataviewPropertiesEntity';
 import { FilterDataviewService } from 'src/app/shared/services/filter-dataview.service';
-import { Component, ElementRef, HostListener, OnDestroy, ViewChild } from '@angular/core';
+import {Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { ConfirmationService, LazyLoadEvent, MenuItem, MessageService, SelectItem } from 'primeng/api';
@@ -63,7 +63,7 @@ import { IUniversalSearch } from 'src/app/shared/interfaces/universal-search.int
   templateUrl: './workpack.component.html',
   styleUrls: ['./workpack.component.scss']
 })
-export class WorkpackComponent implements OnDestroy {
+export class WorkpackComponent implements OnDestroy, OnInit {
   @ViewChild(SaveButtonComponent) saveButton: SaveButtonComponent;
 
   @ViewChild(CancelButtonComponent) cancelButton: CancelButtonComponent;
@@ -211,30 +211,6 @@ export class WorkpackComponent implements OnDestroy {
     private searchSrv: SearchService,
     private thisElemRef: ElementRef<HTMLElement>
   ) {
-    this.actRouter.queryParams.subscribe(async({
-      id,
-      idPlan,
-      idWorkpackModel,
-      idWorkpackParent,
-      idWorkpackModelLinked,
-      linkEvent
-    }) => {
-      this.idWorkpack = id && +id;
-      this.idPlan = idPlan && +idPlan;
-      this.idWorkpackModel = idWorkpackModel && +idWorkpackModel;
-      this.idWorkpackParent = idWorkpackParent && +idWorkpackParent;
-      this.idWorkpackModelLinked = idWorkpackModelLinked && +idWorkpackModelLinked;
-      this.linkEvent = linkEvent;
-      this.workpackSrv.setWorkpackParams({
-        idWorkpack: id && +id,
-        idPlan: idPlan && +idPlan,
-        idWorkpackModel: idWorkpackModel && +idWorkpackModel,
-        idWorkpackParent: idWorkpackParent && +idWorkpackParent,
-        idWorkpackModelLinked: idWorkpackModelLinked && +idWorkpackModelLinked,
-      });
-      this.selectedTab = null;
-      await this.resetWorkpack();
-    });
     this.breadcrumbSrv.ready.pipe(takeUntil(this.$destroy)).subscribe(data => {
       this.workpackBreadcrumbStorageSrv.setBreadcrumb();
     });
@@ -297,6 +273,36 @@ export class WorkpackComponent implements OnDestroy {
       }
       this.handleCloseSearching();
     });
+
+  }
+
+  ngOnInit() {
+    this.actRouter.queryParams.pipe(
+      switchMap(async ({
+                         id,
+                         idPlan,
+                         idWorkpackModel,
+                         idWorkpackParent,
+                         idWorkpackModelLinked,
+                         linkEvent
+                       }) => {
+        this.idWorkpack = id && +id;
+        this.idPlan = idPlan && +idPlan;
+        this.idWorkpackModel = idWorkpackModel && +idWorkpackModel;
+        this.idWorkpackParent = idWorkpackParent && +idWorkpackParent;
+        this.idWorkpackModelLinked = idWorkpackModelLinked && +idWorkpackModelLinked;
+        this.linkEvent = linkEvent;
+        this.workpackSrv.setWorkpackParams({
+          idWorkpack: id && +id,
+          idPlan: idPlan && +idPlan,
+          idWorkpackModel: idWorkpackModel && +idWorkpackModel,
+          idWorkpackParent: idWorkpackParent && +idWorkpackParent,
+          idWorkpackModelLinked: idWorkpackModelLinked && +idWorkpackModelLinked,
+        });
+        this.selectedTab = null;
+        return this.resetWorkpack();
+      })
+    ).subscribe();
 
   }
 
