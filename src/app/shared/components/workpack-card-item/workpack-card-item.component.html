@@ -646,7 +646,7 @@
     [class.cardList]="(displayModeCard === 'list')" [class.new-card-item-mobile]="responsive">
     <div class="carditem-content">
       <i #newItemIcon [ngClass]="[ 'card-link app-icon', properties.icon, 'light-grey-icon']"
-        (click)="enable && properties.iconMenuItems && menuIcon.toggle($event); (enable && !properties.iconMenuItems || properties.iconMenuItems.length === 0) && handleLoadMenu()"
+        (click)="enable && properties.iconMenuItems && menuIcon.toggle($event); (enable && !properties.iconMenuItems || properties.iconMenuItems?.length === 0) && handleLoadMenu()"
         [ngStyle]="{ fontSize: (responsive ? 2 : (displayModeCard === 'list') ? 2.5 : 3) + 'rem', cursor: 'pointer' }"
         ></i>
       <p-tieredMenu #menuIcon [popup]="true" [model]="properties.iconMenuItems"></p-tieredMenu>
