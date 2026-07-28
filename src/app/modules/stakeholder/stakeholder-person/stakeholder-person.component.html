@@ -53,6 +53,7 @@
                 <input class="app-input-text input-search" [class.responsive]="responsive" id="float-search"
                        (ngModelChange)="validateClearSearchUserByEmail($event)" [(ngModel)]="searchedEmailUser"
                        pInputText
+                       (keydown.enter)="searchUserByEmail()"
                        (blur)="searchUserByEmail()" type="email"/>
                 <label class="app-input-label" for="float-search">{{ "searchByEmail" | translate }}</label>
               </span>
@@ -82,7 +83,9 @@
             <div *ngIf="citizenSearchBy === 'NAME'" class="search-citizen-user-by-name">
               <div class="user-by-name-input-container">
                 <input class="app-input-text input-search-name" [class.responsive]="responsive"
-                       (ngModelChange)="validateClearSearchUserName($event)" [(ngModel)]="searchedNameUser" pInputText/>
+                       (ngModelChange)="validateClearSearchUserName($event)"
+                       (keydown.enter)="searchCitizenUserByName()"
+                       [(ngModel)]="searchedNameUser" pInputText/>
                 <button pButton class="button-search" [label]="!responsive ? ('search'|translate) : ''"
                         (click)="searchCitizenUserByName()"
                         [disabled]="!searchedNameUser || (searchedNameUser && searchedNameUser.length === 0) || isLoading"
@@ -107,6 +110,7 @@
               <div class="user-by-cpf-input-container" *ngIf="citizenSearchBy === 'CPF'"
                    [class.responsive]="responsive">
                 <p-inputMask [(ngModel)]="searchedCpfUser" mask="999.999.999-99" placeholder="000.000.000-00"
+                             (keydown.enter)="validateCpf()"
                              (ngModelChange)="validateClearSearchByCpf($event)" [class.responsive]="responsive"
                              [unmask]="true">
                 </p-inputMask>

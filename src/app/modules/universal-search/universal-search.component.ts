@@ -1,5 +1,6 @@
 import { Component, OnDestroy, ViewChild } from '@angular/core';
 import { FormControl } from '@angular/forms';
+import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { LazyLoadEvent } from 'primeng/api';
 import { DataView } from 'primeng/dataview';
@@ -7,6 +8,7 @@ import { Subject } from 'rxjs';
 import { debounceTime, finalize, takeUntil } from 'rxjs/operators';
 import { IPlan } from 'src/app/shared/interfaces/IPlan';
 import { IUniversalSearch } from 'src/app/shared/interfaces/universal-search.interface';
+import { AuthService } from 'src/app/shared/services/auth.service';
 import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
 import { ConfigDataViewService } from 'src/app/shared/services/config-dataview.service';
 import { PageDef, SearchService } from 'src/app/shared/services/search.service';
@@ -39,11 +41,17 @@ export class UniversalSearchComponent implements OnDestroy {
 
   canLoad = false;
 
+  showBackToManagement = false;
+
+  infoPerson;
+
   constructor(
     private translateSrv: TranslateService,
     private searchSrv: SearchService,
     private breadcrumbSrv: BreadcrumbService,
-    private configDataViewSrv: ConfigDataViewService
+    private configDataViewSrv: ConfigDataViewService,
+    private router: Router,
+    private authSrv: AuthService,
   ) {
     this.setBreadcrumb();
     this.configDataViewSrv.observablePageSize
@@ -59,11 +67,21 @@ export class UniversalSearchComponent implements OnDestroy {
       takeUntil(this.$destroy),
       debounceTime(1000)
     ).subscribe(value => this.onSearchInput(value));
+
+    this.checkShowBackToManagement();
   }
 
   ngOnDestroy(): void {
     this.$destroy.next();
     this.$destroy.complete();
+  }
+
+  checkShowBackToManagement() {
+    this.infoPerson = this.authSrv.getInfoPerson();
+    if (this.infoPerson && this.infoPerson.workLocal &&
+      (this.infoPerson.workLocal.idOffice || this.infoPerson.workLocal.idPlan || this.infoPerson.workLocal.idWorkpack)) {
+      this.showBackToManagement = true;
+    }
   }
 
   setBreadcrumb() {
@@ -140,5 +158,44 @@ export class UniversalSearchComponent implements OnDestroy {
           }
       }
     );
+  }
+
+  async navigateToManagement() {
+    const workLocal = this.infoPerson.workLocal;
+    if (workLocal.idWorkpackModelLinked && workLocal.idWorkpack && workLocal.idPlan && workLocal.idOffice) {
+      this.router.navigate(['workpack'], {
+        queryParams: {
+          id: Number(workLocal.idWorkpack),
+          idPlan: Number(workLocal.idPlan),
+          idWorkpackModelLinked: Number(workLocal.idWorkpackModelLinked)
+        }
+      });
+      return;
+    }
+    if (workLocal.idWorkpack && workLocal.idPlan && workLocal.idOffice) {
+      this.router.navigate(['workpack'], {
+        queryParams: {
+          id: Number(workLocal.idWorkpack),
+          idPlan: Number(workLocal.idPlan),
+        }
+      });
+      return;
+    }
+    if (workLocal.idPlan && workLocal.idOffice) {
+      this.router.navigate(['plan'], {
+        queryParams: {
+          id: Number(workLocal.idPlan),
+        }
+      });
+      return;
+    }
+    if (workLocal.idOffice) {
+      this.router.navigate(['offices/office'], {
+        queryParams: {
+          id: Number(workLocal.idOffice),
+        }
+      });
+      return;
+    }
   }
 }

@@ -1133,15 +1133,47 @@ export class WorkpackModelComponent implements OnInit {
     return this.listDomains;
   }
 
-  async getListOrganizations(sectors: string[]) {
-    if (!this.listOrganizations.length) {
-      const result = await this.organizationSrv.GetAll({ 'id-office': this.idOffice });
-      if (result.success) {
-        this.listOrganizations = result.data;
-      }
+  
+
+async getListOrganizations(sectors: string[]) {
+  if (!this.listOrganizations.length) {
+    const result = await this.organizationSrv.GetAll({ 'id-office': this.idOffice });
+    if (result.success) {
+      this.listOrganizations = result.data;
     }
-    return this.listOrganizations.filter(org => sectors && sectors.includes(org.sector)).map(d => ({ label: d.name, value: d.id }));
   }
+
+  if (!sectors) {
+    return [];
+  }
+
+  return this.listOrganizations
+    .filter(org => {
+      const matchesSector = sectors.includes(org.sector);
+      const matchesIntegration = !!org.integration && sectors.includes(org.integration.toUpperCase());
+      return matchesSector || matchesIntegration;
+    })
+    .sort((a, b) => a.name.localeCompare(b.name))
+    .map(d => ({
+      label: d.suffix ? `${d.name} - ${d.suffix}` : d.name,
+      value: d.id
+    }));
+}
+
+get integrationSectorOptions(): SelectItem[] {
+  const integrations = Array.from(
+    new Set(
+      this.listOrganizations
+        .map(org => org.integration)
+        .filter((i): i is string => !!i)
+        .map(i => i.toUpperCase())
+    )
+  );
+  return integrations.map(integration => ({
+    label: integration,
+    value: integration
+  }));
+}
 
   async getListMeasureUnits() {
     if (!this.listMeasureUnits.length) {

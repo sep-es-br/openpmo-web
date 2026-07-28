@@ -100,6 +100,9 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
 
   isUserAdmin = false;
 
+  containsName = false;
+  containsEmail = false;
+
   constructor(
     private actRouter: ActivatedRoute,
     private authSrv: AuthService,
@@ -144,6 +147,16 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
   async ngOnDestroy(): Promise<void> {
     this.$destroy.next();
     this.$destroy.complete();
+  }
+
+  reloadRequirements(){
+    if((this.containsName || this.person.name)
+      && (this.containsEmail || (this.person.email && this.person.email.indexOf('@') > -1))
+      && !this.cardItemsOfficePermission.some(permission => !permission.selectedOption)
+    ) {
+      this.saveButton.showButton(); this.cancelButton.showButton();
+    }
+
   }
 
   async ngOnInit() {
@@ -238,6 +251,9 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
           roles: this.permission.permissions.map((p) => ({ role: p.role })),
           guid: this.permission.person.guid,
         };
+
+        this.containsEmail = !!this.permission.person.email;
+        this.containsName = !!this.permission.person.name;
       }
       this.loadCardItemsPersonPermissions();
     } else {
@@ -425,6 +441,8 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
           return;
         }
         this.person = result.data;
+        this.containsName = !!this.person.name;
+        this.containsEmail = !!this.person.email;
         this.loadNewPermission();
       } else {
         this.citizenUserNotFoundByCpf = true;

@@ -21,6 +21,7 @@ export class PropertyModelComponent implements OnDestroy, OnChanges, AfterViewIn
 
   @ViewChild(Calendar) calendarComponent: Calendar;
   @Input() property: IWorkpackModelProperty;
+  @Input() integrationSectorOptions: SelectItem[] = [];
   @Output() delete = new EventEmitter();
   @Output() changed = new EventEmitter();
   IconsEnum = IconPropertyWorkpackModelEnum;
@@ -64,25 +65,30 @@ export class PropertyModelComponent implements OnDestroy, OnChanges, AfterViewIn
     }
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
-    if (this.property?.extraList && this.property?.multipleSelection) {
-      this.selectedSelectAllIfChildrenAllSelecteds(this.property.extraList[0]);
-    }
-    this.setDefaultMax();
-  }
-
   ngOnDestroy(): void {
-    this.$destroy.next();
-    this.$destroy.complete();
-  }
+  this.$destroy.next();
+  this.$destroy.complete();
+}
 
-  loadSectorOptions() {
-    this.optionsSector = [
-      {label: this.translateSrv.instant(this.typeOrganizationEnum.Private), value: this.typeOrganizationEnum.Private.toLocaleUpperCase()},
-      {label: this.translateSrv.instant(this.typeOrganizationEnum.Public), value: this.typeOrganizationEnum.Public.toLocaleUpperCase()},
-      {label: this.translateSrv.instant(this.typeOrganizationEnum.Third), value: this.typeOrganizationEnum.Third.toLocaleUpperCase()}
-    ];
+ ngOnChanges(changes: SimpleChanges): void {
+  if (changes.integrationSectorOptions) {
+    this.loadSectorOptions();
   }
+  if (this.property?.extraList && this.property?.multipleSelection) {
+    this.selectedSelectAllIfChildrenAllSelecteds(this.property.extraList[0]);
+  }
+  this.setDefaultMax();
+}
+
+  
+loadSectorOptions() {
+  this.optionsSector = [
+    { label: this.translateSrv.instant(this.typeOrganizationEnum.Private), value: this.typeOrganizationEnum.Private.toLocaleUpperCase() },
+    { label: this.translateSrv.instant(this.typeOrganizationEnum.Public), value: this.typeOrganizationEnum.Public.toLocaleUpperCase() },
+    { label: this.translateSrv.instant(this.typeOrganizationEnum.Third), value: this.typeOrganizationEnum.Third.toLocaleUpperCase() },
+    ...(this.integrationSectorOptions || [])
+  ];
+}
 
   setDefaultMax() {
     if (this.property) {
