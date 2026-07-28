@@ -27,6 +27,8 @@ import { MinLengthTextCustomValidator } from 'src/app/shared/utils/minLengthText
 import { WorkpackModelService } from 'src/app/shared/services/workpack-model.service';
 import { CancelButtonComponent } from 'src/app/shared/components/cancel-button/cancel-button.component';
 import { WorkpackBreadcrumbStorageService } from 'src/app/shared/services/workpack-breadcrumb-storage.service';
+import { IOrganization } from 'src/app/shared/interfaces/IOrganization';
+import { OrganizationService } from 'src/app/shared/services/organization.service';
 
 interface ICardItemRole {
   type: string;
@@ -54,6 +56,8 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
   workpack: IWorkpack;
   idOffice: number;
   idPerson: number;
+  selectedOrganization: IOrganization; //add
+  resultOrganizationsByName: IOrganization[]; //add
   personRolesOptions: { label: string; value: string }[];
   person: IPerson;
   cardPerson: ICard;
@@ -120,7 +124,8 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
     private planSrv: PlanService,
     private authSrv: AuthService,
     private workpackModelSrv: WorkpackModelService,
-    private breadcrumbStorageSrv: WorkpackBreadcrumbStorageService
+    private breadcrumbStorageSrv: WorkpackBreadcrumbStorageService,
+    private organizationSrv: OrganizationService    //add
   ) {
     this.citizenUserSrv.loadCitizenUsers();
     this.actRouter.queryParams.subscribe(async queryParams => {
@@ -441,7 +446,10 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
         address: this.stakeholder.person.address,
         phoneNumber: this.formatPhoneNumber(this.stakeholder.person.phoneNumber),
         contactEmail: this.stakeholder.person.contactEmail
+        
       });
+
+       this.selectedOrganization = this.stakeholder.person.organization ?? null //add
       const now = new Date();
 
       this.stakeholderRoles =
@@ -451,7 +459,7 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
 
           return {
             id: role.id,
-            active: expired ? false : role.active, // 👈 REGRA AQUI
+            active: expired ? false : role.active, 
             role: role.role,
             from: new Date(role.from + 'T00:00:00'),
             to: toDate
@@ -709,6 +717,7 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
         phoneNumber: this.formatPhoneNumber(this.person.phoneNumber),
         contactEmail: this.person.contactEmail
       });
+      this.selectedOrganization = this.person.organization ?? null;
       if (this.person.roles && this.user) {
         this.stakeholderPermissions = this.person.roles.map(r => ({
           role: r.role ?? (r as any),
@@ -724,6 +733,7 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
       })
       this.stakeholderRoles = null;
       this.stakeholderPermissions = [];
+        this.selectedOrganization = null; 
     }
     this.loadStakeholderRolesCardsItems();
   }
@@ -839,7 +849,8 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
         contactEmail: this.stakeholderForm.controls.contactEmail.value,
         phoneNumber: this.stakeholderForm.controls.phoneNumber.value
           ? this.stakeholderForm.controls.phoneNumber.value.replace(/\D+/g, '') : null,
-        isUser: true
+        isUser: true,
+        organization: this.selectedOrganization,
       },
       roles: this.stakeholderRoles && this.stakeholderRoles.map(r => ({
         ...r,
@@ -932,4 +943,19 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
       this.personSearchBy = 'SEARCH';
     }
   }
+
+  //add
+async searchOrganizationByName(event) {
+  this.isLoading = true;
+  const result = await this.organizationSrv.GetAll({
+    'id-office': this.idOffice,
+    term: event.query.toString()
+  });
+  this.isLoading = false;
+  if (result.success) {
+    this.resultOrganizationsByName = result.data;
+  }
+}
+
+
 }
