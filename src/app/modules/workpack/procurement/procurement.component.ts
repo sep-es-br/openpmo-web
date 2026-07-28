@@ -188,7 +188,12 @@ export class ProcurementComponent implements OnInit, OnDestroy {
     const selected = this.processOptions.find(option => option.value === this.formProcurement.controls.process.value);
     if (!selected) return;
     this.formIsSaving = true;
-    const sender: IProcurementCreate = { idWorkpack: this.idWorkpack, processId: selected.data.processId, object: selected.data.object };
+    const sender: IProcurementCreate = {
+      idWorkpack: this.idWorkpack,
+      processId: selected.data.processId,
+      object: selected.data.object,
+      organizationIdentifier: this.formProcurement.controls.organization.value
+    };
     const result = await this.procurementsSrv.post(sender);
     this.formIsSaving = false;
     if (result.success) {

@@ -30,6 +30,7 @@ export interface IAgreementCreate {
   type: AgreementType;
   processId: number;
   object: string;
+  organizationIdentifier: string;
 }
 
 export interface IAgreementUpdate extends IAgreementCreate {

@@ -26,6 +26,7 @@ export interface IProcurementCreate {
   idWorkpack: number;
   processId: number;
   object: string;
+  organizationIdentifier: string;
 }
 export interface IProcurementOrganization { identifier: string; name: string; }
 

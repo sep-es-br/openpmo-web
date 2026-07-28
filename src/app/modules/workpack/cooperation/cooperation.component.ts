@@ -539,6 +539,7 @@ export class CooperationComponent implements OnInit, OnDestroy {
       type: 'COOPERATION',
       processId: selectedProcess?.data?.processId,
       object: selectedProcess?.data?.object,
+      organizationIdentifier: formValue.managementUnit,
     };
 
     let result;

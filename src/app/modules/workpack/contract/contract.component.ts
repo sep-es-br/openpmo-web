@@ -519,6 +519,7 @@ export class ContractComponent implements OnInit, OnDestroy {
       type: 'CONTRACT',
       processId: selectedProcess?.data?.processId,
       object: selectedProcess?.data?.object,
+      organizationIdentifier: formValue.organization,
     };
 
     let result;
