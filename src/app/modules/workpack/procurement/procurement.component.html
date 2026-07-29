@@ -42,12 +42,12 @@
               <ng-template let-process pTemplate="selectedItem"><span class="process-option-label" [pTooltip]="process.label">{{ truncateProcessLabel(process.label) }}</span></ng-template>
               <ng-template let-process pTemplate="item"><span class="process-option-label" [pTooltip]="process.label">{{ truncateProcessLabel(process.label) }}</span></ng-template>
             </p-dropdown>
-            <label class="app-input-label" for="process">{{ 'process' | translate }} *</label>
+            <label class="app-input-label" for="process">{{ 'procurements' | translate }} *</label>
           </span>
         </div>
 
         <div *ngIf="idProcurement" class="procurement-field text-medium app-property-text">
-          <div class="readonly-field"><div class="app-input-label readonly-label">{{ 'process' | translate }}</div><div class="readonly-value">{{ processFullValue || '-' }}</div></div>
+          <div class="readonly-field"><div class="app-input-label readonly-label">{{ 'procurements' | translate }}</div><div class="readonly-value">{{ processFullValue || '-' }}</div></div>
         </div>
 
         <ng-container *ngIf="formProcurement.controls.process.value">
