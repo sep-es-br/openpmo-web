@@ -269,17 +269,20 @@
       </div>
     </ng-container>
 
-    <div class="card obligations" *ngIf="workpackModelType === 'DeliverableModel'">
+    <div class="card obligations"
+      *ngIf="workpackModelType === 'DeliverableModel' && pluginAvailability.obligations">
       <app-card [properties]="cardPropertiesObligations" *ngIf="cardPropertiesObligations">
       </app-card>
     </div>
     
-    <div class="card procurements" *ngIf="workpackModelType === 'DeliverableModel'">
+    <div class="card procurements"
+      *ngIf="workpackModelType === 'DeliverableModel' && pluginAvailability.procurements">
       <app-card [properties]="cardPropertiesProcurements" *ngIf="cardPropertiesProcurements">
       </app-card>
     </div>
     
-    <div class="card agreements" *ngIf="workpackModelType === 'DeliverableModel'">
+    <div class="card agreements"
+      *ngIf="workpackModelType === 'DeliverableModel' && pluginAvailability.agreements">
       <app-card [properties]="cardPropertiesAgreements" *ngIf="cardPropertiesAgreements">
       </app-card>
     </div>

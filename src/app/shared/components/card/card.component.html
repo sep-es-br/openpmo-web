@@ -14,7 +14,8 @@
         <div class="header-title-text">
           <span class="card-title" [class.card-title-mobile]="responsive" *ngIf="properties.cardTitle">{{
             properties.notShowCardTitle ? '' : (properties.cardTitle | translate) }}</span>
-          <p-inputSwitch class="app-toggle" *ngIf="properties.toggleable" [(ngModel)]="properties.initialStateToggle"
+          <p-inputSwitch class="app-toggle" *ngIf="properties.toggleable" [disabled]="properties.disabledToggle"
+            [(ngModel)]="properties.initialStateToggle"
             (ngModelChange)="properties.onToggle?.emit($event)">
           </p-inputSwitch>
           <label class="label-toggle" *ngIf="properties.toggleLabel">{{properties.toggleLabel|translate}}</label>

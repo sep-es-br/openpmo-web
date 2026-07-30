@@ -42,6 +42,7 @@ import { ConfigDataViewService } from 'src/app/shared/services/config-dataview.s
 import { TypeOrganization } from 'src/app/shared/enums/TypeOrganization';
 import { IOrganization } from 'src/app/shared/interfaces/IOrganization';
 import { CancelButtonComponent } from 'src/app/shared/components/cancel-button/cancel-button.component';
+import { IPluginAvailability, PluginAvailabilityService } from 'src/app/shared/services/plugin-availability.service';
 
 interface IIcon {
   name: string;
@@ -130,6 +131,11 @@ export class WorkpackModelComponent implements OnInit {
   formIsSaving = false;
   nextPosition: number;
   workpackModel: IWorkpackModel;
+  pluginAvailability: IPluginAvailability = {
+    agreements: false,
+    procurements: false,
+    obligations: false
+  };
 
   notificationsStakeholderRolesOptions: SelectItem[] = [];
   notifications = {
@@ -165,7 +171,8 @@ export class WorkpackModelComponent implements OnInit {
     private officeSrv: OfficeService,
     private planModelSrv: PlanModelService,
     private menuSrv: MenuService,
-    private configDataViewSrv: ConfigDataViewService
+    private configDataViewSrv: ConfigDataViewService,
+    private pluginAvailabilitySrv: PluginAvailabilityService
   ) {
     this.configDataViewSrv.observableCollapsePanelsStatus.pipe(takeUntil(this.$destroy)).subscribe(collapsePanelStatus => {
       this.collapsePanelsStatus = collapsePanelStatus === 'collapse' ? true : false;
@@ -390,6 +397,7 @@ export class WorkpackModelComponent implements OnInit {
   }
 
   async loadDetails() {
+    await this.loadPluginAvailability();
     this.loadCards();
     if (this.idWorkpackModel) {
       if (!this.editPermission) {
@@ -401,6 +409,21 @@ export class WorkpackModelComponent implements OnInit {
       await this.loadCardItemsModels();
     }
     this.setCurrentBreadcrumb();
+  }
+
+  async loadPluginAvailability(): Promise<void> {
+    try {
+      const result = await this.pluginAvailabilitySrv.getAvailability();
+      if (result.success && result.data) {
+        this.pluginAvailability = result.data;
+      }
+    } catch (_) {
+      this.pluginAvailability = {
+        agreements: false,
+        procurements: false,
+        obligations: false
+      };
+    }
   }
 
   async getOfficeById() {
@@ -864,9 +887,12 @@ export class WorkpackModelComponent implements OnInit {
       this.cardPropertiesProcesses.initialStateToggle = data.processesManagementSessionActive;
       if (this.workpackModelType === TypeWorkpackModelEnum.DeliverableModel) {
         this.cardPropertiesSchedule.initialStateToggle = data.scheduleSessionActive;
-        this.cardPropertiesObligations.initialStateToggle = data.obligationsSessionActive;
-        this.cardPropertiesProcurements.initialStateToggle = data.procurementsSessionActive;
-        this.cardPropertiesAgreements.initialStateToggle = data.agreementsSessionActive;
+        this.cardPropertiesObligations.initialStateToggle =
+          this.pluginAvailability.obligations && data.obligationsSessionActive;
+        this.cardPropertiesProcurements.initialStateToggle =
+          this.pluginAvailability.procurements && data.procurementsSessionActive;
+        this.cardPropertiesAgreements.initialStateToggle =
+          this.pluginAvailability.agreements && data.agreementsSessionActive;
       }
       this.childrenModels = (data.children || []);
       this.totalRecords = data.children && data.children.length + 1;
@@ -1501,6 +1527,7 @@ export class WorkpackModelComponent implements OnInit {
       });
       this.cardPropertiesObligations = {
         toggleable: this.editPermission,
+        disabledToggle: !this.pluginAvailability.obligations,
         initialStateToggle: false,
         cardTitle: 'obligations',
         collapseble: false,
@@ -1512,6 +1539,7 @@ export class WorkpackModelComponent implements OnInit {
         .subscribe(() => this.checkProperties());
       this.cardPropertiesProcurements = {
         toggleable: this.editPermission,
+        disabledToggle: !this.pluginAvailability.procurements,
         initialStateToggle: false,
         cardTitle: 'procurements',
         collapseble: false,
@@ -1523,6 +1551,7 @@ export class WorkpackModelComponent implements OnInit {
         .subscribe(() => this.checkProperties());
       this.cardPropertiesAgreements = {
         toggleable: this.editPermission,
+        disabledToggle: !this.pluginAvailability.agreements,
         initialStateToggle: false,
         cardTitle: 'Agreements',
         collapseble: false,
