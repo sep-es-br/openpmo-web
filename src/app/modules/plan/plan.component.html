@@ -71,31 +71,31 @@
             </div>
           </div>
           <div class="p-formgroup-inline">
-            <div class="p-field" [class.responsive]="responsive">
-              <span class="p-float-label" [class.responsive]="responsive">
-                <p-calendar id="float-start" formControlName="start" class="app-select-date" [showIcon]="true"
-                  [monthNavigator]="true" [yearNavigator]="true" [yearRange]="yearRange" [class.responsive]="responsive"
-                  icon="fas fa-calendar-alt" [dateFormat]="calendarFormat">
-                </p-calendar>
-                <label class="app-input-label" for="float-start">{{ "start" | translate }} * 
-                  <i class="far fa-question-circle" [pTooltip]="'help.plan.start' | translate"></i>
-                </label>
-              </span>
-              <app-input-message [form]="formPlan" field="start"></app-input-message>
-            </div>
-            <div class="p-field" [class.responsive]="responsive">
-              <span class="p-float-label" [class.responsive]="responsive">
-                <p-calendar id="float-finish" formControlName="finish" class="app-select-date" [showIcon]="true"
-                  [monthNavigator]="true" [yearNavigator]="true" [yearRange]="yearRange" [class.responsive]="responsive"
-                  icon="fas fa-calendar-alt" [dateFormat]="calendarFormat">
-                </p-calendar>
-                <label class="app-input-label" for="float-finish">{{ "finish" |
-                  translate}} * 
-                <i class="far fa-question-circle" [pTooltip]="'help.plan.finish' | translate"></i>  
-                </label>
-              </span>
-              <app-input-message [form]="formPlan" field="finish"></app-input-message>
-            </div>
+           <div class="p-field" [class.responsive]="responsive">    <!-- mexi aqui -->
+            <span class="p-float-label" [class.responsive]="responsive">
+              <p-calendar id="float-start" formControlName="start" class="app-select-date" [showIcon]="true"
+                [monthNavigator]="true" [yearNavigator]="true" [yearRange]="yearRange" [class.responsive]="responsive"
+                icon="fas fa-calendar-alt" [dateFormat]="calendarFormat">
+              </p-calendar>
+              <label class="app-input-label" for="float-start">{{ "start" | translate }} * 
+                <i class="far fa-question-circle" [pTooltip]="'help.plan.start' | translate"></i>
+              </label>
+            </span>
+            <app-input-message [form]="formPlan" field="start"></app-input-message>
+          </div>
+                <div class="p-field" [class.responsive]="responsive">
+        <span class="p-float-label" [class.responsive]="responsive">
+          <p-calendar id="float-finish" formControlName="finish" class="app-select-date" [showIcon]="true"
+            [monthNavigator]="true" [yearNavigator]="true" [yearRange]="yearRange" [class.responsive]="responsive"
+            icon="fas fa-calendar-alt" [dateFormat]="calendarFormat"
+           [minDate]="formPlan.get('start')?.value">
+          </p-calendar>
+          <label class="app-input-label" for="float-finish">{{ "finish" | translate }} * 
+            <i class="far fa-question-circle" [pTooltip]="'help.plan.finish' | translate"></i>  
+          </label>
+        </span>
+        <app-input-message [form]="formPlan" field="finish"></app-input-message>
+      </div>
           </div>
         </form>
       </div>
