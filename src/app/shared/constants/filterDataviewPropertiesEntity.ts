@@ -142,6 +142,21 @@ export const FilterDataviewPropertiesEntity = {
     { label: 'note', apiValue: 'note', type: TypePropertyModelEnum.TextModel },
     { label: 'priority', apiValue: 'priority', type: TypePropertyModelEnum.ToggleModel },
   ],
+  agreements: [
+    { label: 'processId', apiValue: 'processId', type: TypePropertyModelEnum.IntegerModel },
+    { label: 'object', apiValue: 'object', type: TypePropertyModelEnum.TextModel },
+    { label: 'organizationIdentifier', apiValue: 'organizationIdentifier', type: TypePropertyModelEnum.TextModel },
+  ],
+  procurements: [
+    { label: 'processId', apiValue: 'processId', type: TypePropertyModelEnum.IntegerModel },
+    { label: 'object', apiValue: 'object', type: TypePropertyModelEnum.TextModel },
+    { label: 'organizationIdentifier', apiValue: 'organizationIdentifier', type: TypePropertyModelEnum.TextModel },
+  ],
+  obligations: [
+    { label: 'obligationNumber', apiValue: 'obligationNumber', type: TypePropertyModelEnum.TextModel },
+    { label: 'description', apiValue: 'description', type: TypePropertyModelEnum.TextModel },
+    { label: 'organizationIdentifier', apiValue: 'organizationIdentifier', type: TypePropertyModelEnum.TextModel },
+  ],
   baselines: [
     { label: 'name', apiValue: 'name', type: TypePropertyModelEnum.TextModel },
     { label: 'description', apiValue: 'description', type: TypePropertyModelEnum.TextModel },

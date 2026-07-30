@@ -168,6 +168,23 @@
             <app-workpack-section-processes></app-workpack-section-processes>
             </div>
         </div>
+        <div tabviewBody *ngIf="selectedTab?.key === 'obligations'">
+          <div class="card-obligations">
+            <app-workpack-section-obligations></app-workpack-section-obligations>
+          </div>
+        </div>
+        <div tabviewBody *ngIf="selectedTab?.key === 'procurements'">
+          <div class="card-procurements">
+            <app-workpack-section-procurements>
+            </app-workpack-section-procurements>
+          </div>
+        </div>
+        <div tabviewBody *ngIf="selectedTab?.key === 'Agreements'">
+          <div class="card-agreements">
+            <app-workpack-section-agreements>
+            </app-workpack-section-agreements>
+          </div>
+        </div>
         <div tabviewBody *ngIf="selectedTab?.key === 'journal'">
             <div class="card-journal">
             <app-workpack-section-journal></app-workpack-section-journal >
@@ -263,6 +280,18 @@
         <div class="card-processes">
         <app-workpack-section-processes></app-workpack-section-processes>
         </div>
+        <div class="card-obligations">
+          <app-workpack-section-obligations></app-workpack-section-obligations>
+        </div>
+
+        <div class="card-procurements">
+          <app-workpack-section-procurements></app-workpack-section-procurements>
+        </div>
+
+        <div class="card-agreements">
+          <app-workpack-section-agreements></app-workpack-section-agreements>
+        </div>
+
         <div class="card-journal" *ngIf="workpackModel && workpackModel.journalManagementSessionActive">
         <app-workpack-section-journal ></app-workpack-section-journal >
         </div>

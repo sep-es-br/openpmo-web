@@ -1,0 +1,93 @@
+<div
+  class="card-obligations"
+  *ngIf="sectionObligations && sectionActive"
+>
+  <app-card
+    [properties]="sectionObligations.cardSection"
+    [class.panel-tab-view]="showTabview"
+    [loading]="sectionObligations.cardSection.isLoading"
+    (searchText)="handleSearchText($event)"
+    (editFilter)="handleEditFilterEntity($event, 'obligations')"
+    (newFilter)="handleNewFilterEntity('obligations')"
+    (selectedFilter)="handleSelectedFilterObligation($event)"
+    (createNewElement)="handleCreateNewObligation()"
+  >
+    <div class="obligations-list-container">
+      <div
+        class="loading-container"
+        *ngIf="sectionObligations.cardSection.isLoading"
+      >
+        <app-card-loading
+          [isCardLoading]="sectionObligations.cardSection.isLoading"
+        >
+        </app-card-loading>
+      </div>
+
+      <p-dataView
+        [value]="sectionObligations.cardItemsSection"
+        layout="grid"
+        class="app-dataview"
+        [emptyMessage]="'notFoundObligations' | translate"
+        *ngIf="
+          (
+            displayModeAll === 'grid' ||
+            (
+              displayModeAll === 'list' &&
+              responsive
+            )
+          ) &&
+          !sectionObligations.cardSection.isLoading
+        "
+        [paginator]="true"
+        [rows]="pageSize"
+        [showJumpToPageDropdown]="true"
+        [showPageLinks]="false"
+        [totalRecords]="totalRecordsObligations"
+      >
+        <ng-template
+          let-cardItem
+          pTemplate="gridItem"
+        >
+          <div
+            class="p-col-12 p-md-3 p-sm-12 card-item-container"
+          >
+            <app-card-item
+              [properties]="cardItem"
+            >
+            </app-card-item>
+          </div>
+        </ng-template>
+      </p-dataView>
+
+      <p-dataView
+        [value]="sectionObligations.cardItemsSection"
+        layout="list"
+        class="app-dataview app-dataview-list"
+        [emptyMessage]="'notFoundObligations' | translate"
+        *ngIf="
+          displayModeAll === 'list' &&
+          !responsive &&
+          !sectionObligations.cardSection.isLoading
+        "
+        [paginator]="true"
+        [rows]="pageSize"
+        [showJumpToPageDropdown]="true"
+        [showPageLinks]="false"
+        [totalRecords]="totalRecordsObligations"
+      >
+        <ng-template
+          let-cardItem
+          pTemplate="listItem"
+        >
+          <div class="p-col-12">
+            <app-card-item
+              [properties]="cardItem"
+              [displayModeCard]="displayModeAll"
+            >
+            </app-card-item>
+          </div>
+        </ng-template>
+      </p-dataView>
+    </div>
+  </app-card>
+</div>

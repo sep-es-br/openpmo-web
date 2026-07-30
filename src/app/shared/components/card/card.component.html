@@ -14,7 +14,8 @@
         <div class="header-title-text">
           <span class="card-title" [class.card-title-mobile]="responsive" *ngIf="properties.cardTitle">{{
             properties.notShowCardTitle ? '' : (properties.cardTitle | translate) }}</span>
-          <p-inputSwitch class="app-toggle" *ngIf="properties.toggleable" [(ngModel)]="properties.initialStateToggle"
+          <p-inputSwitch class="app-toggle" *ngIf="properties.toggleable" [disabled]="properties.disabledToggle"
+            [(ngModel)]="properties.initialStateToggle"
             (ngModelChange)="properties.onToggle?.emit($event)">
           </p-inputSwitch>
           <label class="label-toggle" *ngIf="properties.toggleLabel">{{properties.toggleLabel|translate}}</label>
@@ -125,10 +126,10 @@
           <div class="options-container d-flex flex-row justify-content-between align-items-center">
             <div class="d-flex col-8">
               <p-dropdown class="filter-selection" [disabled]="loading" [options]="filterListOptions" dropdownIcon="fas fa-caret-down"
-                scrollHeight="300px" [(ngModel)]="properties.idFilterSelected">
+                scrollHeight="300px" [(ngModel)]="properties.idFilterSelected" (onChange)="handleFilterChange($event)">
                 <ng-template let-filter pTemplate="item">
                   <div class="filter-item" *ngIf="filter.value !== -1">
-                    <div class="filter-item-label" (click)="handleFilterSelected(filter.value)">{{filter.label}}</div>
+                    <div class="filter-item-label">{{filter.label}}</div>
                     <i class="fas fa-pencil-alt" (click)="handleFilterEdit(filter.value)" *ngIf="filter.value !== null"></i>
                   </div>
                   <div class="divider" *ngIf="filter.label === 'divider'">
@@ -136,9 +137,8 @@
                       <p-divider></p-divider>
                     </div>
                   </div>
-                  <div class="new-filter" *ngIf="filter.value === -1 && filter.label !== 'divider'"
-                    (onClick)="handleNewFilter()">
-                    <div class="label-new-filter" (click)="handleNewFilter()">{{filter.label}}</div>
+                  <div class="new-filter" *ngIf="filter.value === -1 && filter.label !== 'divider'">
+                    <div class="label-new-filter">{{filter.label}}</div>
                   </div>
                 </ng-template>
               </p-dropdown>

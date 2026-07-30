@@ -1,0 +1,92 @@
+<div
+  class="card-agreements"
+  *ngIf="sectionAgreements && sectionActive"
+>
+  <app-card
+    [properties]="sectionAgreements.cardSection"
+    [class.panel-tab-view]="showTabview"
+    [loading]="sectionAgreements.cardSection.isLoading"
+    (searchText)="handleSearchText($event)"
+    (editFilter)="handleEditFilterEntity($event, 'agreements')"
+    (newFilter)="handleNewFilterEntity('agreements')"
+    (selectedFilter)="handleSelectedFilterAgreements($event)"
+  >
+    <div class="agreements-list-container">
+      <div
+        class="loading-container"
+        *ngIf="sectionAgreements.cardSection.isLoading"
+      >
+        <app-card-loading
+          [isCardLoading]="sectionAgreements.cardSection.isLoading"
+        >
+        </app-card-loading>
+      </div>
+
+      <p-dataView
+        [value]="sectionAgreements.cardItemsSection"
+        layout="grid"
+        class="app-dataview"
+        [emptyMessage]="'notFoundAgreements' | translate"
+        *ngIf="
+          (
+            displayModeAll === 'grid' ||
+            (
+              displayModeAll === 'list' &&
+              responsive
+            )
+          ) &&
+          !sectionAgreements.cardSection.isLoading
+        "
+        [paginator]="true"
+        [rows]="pageSize"
+        [showJumpToPageDropdown]="true"
+        [showPageLinks]="false"
+        [totalRecords]="totalRecordsAgreements"
+      >
+        <ng-template
+          let-cardItem
+          pTemplate="gridItem"
+        >
+          <div
+            class="p-col-12 p-md-3 p-sm-12 card-item-container"
+          >
+            <app-card-item
+              [properties]="cardItem"
+            >
+            </app-card-item>
+          </div>
+        </ng-template>
+      </p-dataView>
+
+      <p-dataView
+        [value]="sectionAgreements.cardItemsSection"
+        layout="list"
+        class="app-dataview app-dataview-list"
+        [emptyMessage]="'notFoundAgreements' | translate"
+        *ngIf="
+          displayModeAll === 'list' &&
+          !responsive &&
+          !sectionAgreements.cardSection.isLoading
+        "
+        [paginator]="true"
+        [rows]="pageSize"
+        [showJumpToPageDropdown]="true"
+        [showPageLinks]="false"
+        [totalRecords]="totalRecordsAgreements"
+      >
+        <ng-template
+          let-cardItem
+          pTemplate="listItem"
+        >
+          <div class="p-col-12">
+            <app-card-item
+              [properties]="cardItem"
+              [displayModeCard]="displayModeAll"
+            >
+            </app-card-item>
+          </div>
+        </ng-template>
+      </p-dataView>
+    </div>
+  </app-card>
+</div>

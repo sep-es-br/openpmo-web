@@ -204,6 +204,14 @@ export class CardComponent implements OnInit, OnDestroy, OnChanges {
     this.selectedFilter.emit({ filter: idFilter });
   }
 
+  handleFilterChange(event): void {
+    if (event.value === -1) {
+      this.handleNewFilter();
+      return;
+    }
+    this.handleFilterSelected(event.value);
+  }
+
   handleFilterEdit(idFilter: number) {
     this.editFilter.emit({ filter: idFilter });
   }
