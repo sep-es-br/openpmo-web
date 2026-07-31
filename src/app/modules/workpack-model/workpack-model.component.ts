@@ -796,6 +796,7 @@ export class WorkpackModelComponent implements OnInit {
                 delete gp.defaultsDetails;
                 await this.checkProperty(gp);
               });
+              p.groupedProperties = this.sortPropertiesBySortIndex(p.groupedProperties);
             }
             delete p.defaultsDetails;
             await this.checkProperty(p);
@@ -805,7 +806,7 @@ export class WorkpackModelComponent implements OnInit {
         const dataProperties = dataPropertiesAndIndex
           .sort((a, b) => a[1] > b[1] ? 1 : -1)
           .map(prop => prop[0] as IWorkpackModelProperty);
-        this.modelProperties = dataProperties;
+        this.modelProperties = this.sortPropertiesBySortIndex(dataProperties);
       }
       this.getSortedByList();
       this.cardPropertiesCostAccount.initialStateToggle = data.costSessionActive;
@@ -1812,7 +1813,7 @@ get integrationSectorOptions(): SelectItem[] {
         const dataProperties = dataPropertiesAndIndex
           .sort((a, b) => a[1] > b[1] ? 1 : -1)
           .map(prop => prop[0] as IWorkpackModelProperty);
-        this.modelProperties = dataProperties;
+        this.modelProperties = this.sortPropertiesBySortIndex(dataProperties);
         this.modelProperties.filter(prop => prop.type === TypePropertyEnum.GroupModel).forEach(group => {
           group.menuModelProperties = this.loadMenuPropertyGroup(group);
         });
@@ -1865,9 +1866,10 @@ get integrationSectorOptions(): SelectItem[] {
         await this.checkProperty(p);
         if (p.type === TypePropertyEnum.GroupModel && p.groupedProperties && p.groupedProperties.length > 0) {
           const groupedPropertiesAndIndex = await this.refreshProperties(p.groupedProperties);
-          p.groupedProperties = groupedPropertiesAndIndex
+          const groupedProperties = groupedPropertiesAndIndex
             .sort((a, b) => a[1] > b[1] ? 1 : -1)
             .map(prop => prop[0] as IWorkpackModelProperty);
+          p.groupedProperties = this.sortPropertiesBySortIndex(groupedProperties);
         }
         return [p, i];
       }))
