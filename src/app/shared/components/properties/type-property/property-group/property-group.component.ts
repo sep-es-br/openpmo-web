@@ -32,4 +32,16 @@ export class PropertyGroupComponent implements OnInit {
   ngOnInit(): void {
   }
 
+  get groupedProperties(): PropertyTemplateModel[] {
+    return (this.groupProperty?.groupedProperties || [])
+      .map((property, index) => ({ property, index }))
+      .sort((a, b) => {
+        const sortIndexA = a.property.sortIndex ?? Number.MAX_SAFE_INTEGER;
+        const sortIndexB = b.property.sortIndex ?? Number.MAX_SAFE_INTEGER;
+
+        return sortIndexA - sortIndexB || a.index - b.index;
+      })
+      .map(item => item.property);
+  }
+
 }
