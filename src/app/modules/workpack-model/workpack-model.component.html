@@ -83,7 +83,7 @@
           </p-button>
         </div>
         <div class="workpack-model-addicional-properties">
-          <div *ngFor="let property of sortPropertiesBySortIndex(modelProperties)" [class.addicional-properties-container]="property.isCollapsed"
+          <div *ngFor="let property of modelProperties" [class.addicional-properties-container]="property.isCollapsed"
             [class.addicional-properties-group-container]="property.type === typePropertyEnum.GroupModel"
             [class.open]="!property.isCollapsed">
            <app-property-model class="addicional-properties"
@@ -356,7 +356,7 @@
       </p-button>
     </div>
     <div class="group-addicional-properties">
-      <div class="addicional-properties-container" *ngFor="let groupProp of sortPropertiesBySortIndex(group.groupedProperties)"
+      <div class="addicional-properties-container" *ngFor="let groupProp of group.groupedProperties"
         [class.open]="!groupProp.isCollapsed" [class.addicional-properties-container]="groupProp.isCollapsed"
         [class.addicional-properties-group-container]="groupProp.type === typePropertyEnum.GroupModel">
        <app-property-model class="addicional-properties" [property]="groupProp"
