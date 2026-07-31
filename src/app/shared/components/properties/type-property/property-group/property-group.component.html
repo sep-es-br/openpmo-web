@@ -4,7 +4,7 @@
       [icon]="groupProperty.collapsed  ? 'pi pi-angle-down' : 'pi pi-angle-up'" [label]="groupProperty.name">
     </p-button>
   </ng-template>
-  <div class="property-group-container" *ngFor="let groupedProp of groupProperty.groupedProperties">
+  <div class="property-group-container" *ngFor="let groupedProp of groupedProperties">
     <ng-container [ngSwitch]="groupedProp.type">
       <app-property-text *ngSwitchCase="types.TextModel" [property]="groupedProp" (changed)="changed.emit($event)">
       </app-property-text>

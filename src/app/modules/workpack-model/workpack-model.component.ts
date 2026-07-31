@@ -880,6 +880,18 @@ export class WorkpackModelComponent implements OnInit {
       : this.modelProperties.push(newProperty);
   }
 
+  sortPropertiesBySortIndex(properties: IWorkpackModelProperty[] = []): IWorkpackModelProperty[] {
+    return properties
+      .map((property, index) => ({ property, index }))
+      .sort((a, b) => {
+        const sortIndexA = a.property.sortIndex ?? Number.MAX_SAFE_INTEGER;
+        const sortIndexB = b.property.sortIndex ?? Number.MAX_SAFE_INTEGER;
+
+        return sortIndexA - sortIndexB || a.index - b.index;
+      })
+      .map(item => item.property);
+  }
+
   async checkProperty(property: IWorkpackModelProperty) {
     let list = [];
     let requiredFields = ['name', 'label', 'sortIndex'];
