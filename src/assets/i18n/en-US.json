@@ -673,6 +673,11 @@
       "thereAreNotCostAccounts": "There are not cost accounts"
     },
     "error": {
+      "citizen": {
+        "not": {
+          "found": "The informed user must have or create an Acesso Cidadão account."
+        }
+      },
       "link": {
         "already": {
           "exists": "This office has linked workpack in this office. You need to unlink this to revoke the sharing."
