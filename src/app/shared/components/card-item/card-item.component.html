@@ -551,7 +551,7 @@
   </p-card>
 
   <p-card *ngSwitchCase="'listControlChangeBoard'" class="app-card-item listItem" [class.mobile]="responsive"
-    [class.cardList]="displayModeCard === 'list'">
+    [class.cardList]="displayModeCard === 'list'" [class.disabled]="properties.disabled">
     <div class="display-mode-grid" *ngIf="displayModeCard !== 'list'">
       <p-header *ngIf="properties.menuItems" class="card-item-header">
         <p-menu #menu [popup]="true" [model]="properties.menuItems"></p-menu>

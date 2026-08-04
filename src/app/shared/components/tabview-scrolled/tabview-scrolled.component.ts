@@ -1,5 +1,5 @@
 import { takeUntil } from 'rxjs/operators';
-import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges } from '@angular/core';
 import { ResponsiveService } from '../../services/responsive.service';
 import { WorkpackShowTabviewService } from '../../services/workpack-show-tabview.service';
 import { Subject } from 'rxjs';
@@ -21,15 +21,25 @@ export interface ITabViewScrolled {
 export class TabviewScrolledComponent implements OnChanges, OnDestroy {
 
   @Output() selectedTabChange = new EventEmitter<{ tabs: ITabViewScrolled }>();
+
   @Input() tabs: ITabViewScrolled[] = [];
+
   @Input() idWorkpack: number;
+
   @Input() contextVersion: number;
+
   selectedTab: ITabViewScrolled;
+
   tabBody: string;
+
   showTabview: boolean;
+
   $destroy = new Subject();
+
   pendingChanges = false;
+
   showMessageNotFound: boolean;
+
   tabViewStorage = 'open-pmo:WORKPACK_TABVIEW';
 
   constructor(
@@ -158,7 +168,7 @@ export class TabviewScrolledComponent implements OnChanges, OnDestroy {
       storageTab?.push(tabview);
     }
     localStorage.setItem(this.tabViewStorage, JSON.stringify(storageTab));
-  } 
+  }
 
   prepareScrolls() {
     if (!this.showTabview) {
