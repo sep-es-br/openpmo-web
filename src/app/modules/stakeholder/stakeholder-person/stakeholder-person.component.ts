@@ -579,8 +579,7 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
       this.isLoading = true;
       const result = await this.citizenUserSrv.GetCitizenUserByCpf({
         cpf: this.searchedCpfUser,
-        idOffice: this.idOffice,
-        loadWorkLocation: false
+        idOffice: this.idOffice
       });
 
       this.isLoading = false;
@@ -601,7 +600,8 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
             const stakeholderPerson = this.stakeholder?.person;
             this.person = {
               ...stakeholderPerson,
-              contactEmail: stakeholderPerson?.contactEmail || result.data?.contactEmail
+              contactEmail: stakeholderPerson?.contactEmail || result.data?.contactEmail,
+              organization: stakeholderPerson?.organization || result.data?.organization
             };
             this.stakeholder.person = this.person;
             this.user = this.person.isUser;
@@ -677,8 +677,7 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
     const publicServer = event.value;
 
     const result = await this.citizenUserSrv.GetPublicServer(publicServer.sub, {
-      idOffice: this.idOffice,
-      loadWorkLocation: false
+      idOffice: this.idOffice
     });
 
     this.isLoading = false;
@@ -709,7 +708,8 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
           const stakeholderPerson = this.stakeholder?.person;
           this.person = {
             ...stakeholderPerson,
-            contactEmail: stakeholderPerson?.contactEmail || result.data?.contactEmail
+            contactEmail: stakeholderPerson?.contactEmail || result.data?.contactEmail,
+            organization: stakeholderPerson?.organization || result.data?.organization
           };
           this.stakeholder.person = this.person;
           this.user = this.person.isUser;
