@@ -1,0 +1,93 @@
+<div
+  class="card-procurements"
+  *ngIf="sectionProcurements && sectionActive"
+>
+  <app-card
+    [properties]="sectionProcurements.cardSection"
+    [class.panel-tab-view]="showTabview"
+    [loading]="sectionProcurements.cardSection.isLoading"
+    (searchText)="handleSearchText($event)"
+    (editFilter)="handleEditFilterEntity($event, 'procurements')"
+    (newFilter)="handleNewFilterEntity('procurements')"
+    (selectedFilter)="handleSelectedFilterProcurement($event)"
+    (createNewElement)="handleCreateNewProcurement()"
+  >
+    <div class="procurements-list-container">
+      <div
+        class="loading-container"
+        *ngIf="sectionProcurements.cardSection.isLoading"
+      >
+        <app-card-loading
+          [isCardLoading]="sectionProcurements.cardSection.isLoading"
+        >
+        </app-card-loading>
+      </div>
+
+      <p-dataView
+        [value]="sectionProcurements.cardItemsSection"
+        layout="grid"
+        class="app-dataview"
+        [emptyMessage]="'notFoundProcurements' | translate"
+        *ngIf="
+          (
+            displayModeAll === 'grid' ||
+            (
+              displayModeAll === 'list' &&
+              responsive
+            )
+          ) &&
+          !sectionProcurements.cardSection.isLoading
+        "
+        [paginator]="true"
+        [rows]="pageSize"
+        [showJumpToPageDropdown]="true"
+        [showPageLinks]="false"
+        [totalRecords]="totalRecordsProcurements"
+      >
+        <ng-template
+          let-cardItem
+          pTemplate="gridItem"
+        >
+          <div
+            class="p-col-12 p-md-3 p-sm-12 card-item-container"
+          >
+            <app-card-item
+              [properties]="cardItem"
+            >
+            </app-card-item>
+          </div>
+        </ng-template>
+      </p-dataView>
+
+      <p-dataView
+        [value]="sectionProcurements.cardItemsSection"
+        layout="list"
+        class="app-dataview app-dataview-list"
+        [emptyMessage]="'notFoundProcurements' | translate"
+        *ngIf="
+          displayModeAll === 'list' &&
+          !responsive &&
+          !sectionProcurements.cardSection.isLoading
+        "
+        [paginator]="true"
+        [rows]="pageSize"
+        [showJumpToPageDropdown]="true"
+        [showPageLinks]="false"
+        [totalRecords]="totalRecordsProcurements"
+      >
+        <ng-template
+          let-cardItem
+          pTemplate="listItem"
+        >
+          <div class="p-col-12">
+            <app-card-item
+              [properties]="cardItem"
+              [displayModeCard]="displayModeAll"
+            >
+            </app-card-item>
+          </div>
+        </ng-template>
+      </p-dataView>
+    </div>
+  </app-card>
+</div>

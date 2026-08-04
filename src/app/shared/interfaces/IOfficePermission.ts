@@ -5,6 +5,13 @@ export interface IOfficePermission {
   email?: string;
   person?: IPerson;
   key?: string;
+  identityValidation?: IPublicIdentityValidation;
+}
+
+export interface IPublicIdentityValidation {
+  searchType: 'CPF' | 'PUBLIC_AGENT';
+  cpf?: string;
+  sub: string;
 }
 
 interface IPermission {

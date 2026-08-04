@@ -35,6 +35,13 @@ import { TooltipModule } from 'primeng/tooltip'
 import { Tooltip } from 'chart.js';
 import { CostAccountCardInstrumentComponent } from './cost-account/cost-account-card/cost-account-card.component';
 import { CostAccountCardComponent } from './components/cost-account-card/cost-account-card.component';
+import { WorkpackSectionObligationsComponent } from './workpack-sections/workpack-section-obligations/workpack-section-obligations.component';
+import { WorkpackSectionProcurementsComponent } from './workpack-sections/workpack-section-procurements/workpack-section-procurements.component';
+import { WorkpackSectionAgreementsComponent } from './workpack-sections/workpack-section-agreements/workpack-section-agreements.component';
+import { ObligationComponent } from './obligation/obligation.component';
+import { ProcurementComponent } from './procurement/procurement.component';
+import { CooperationComponent } from './cooperation/cooperation.component';
+import { ContractComponent } from './contract/contract.component';
 
 @NgModule({
   declarations: [
@@ -50,6 +57,10 @@ import { CostAccountCardComponent } from './components/cost-account-card/cost-ac
     BaselineCancellingComponent,
     JournalViewComponent,
     JournalComponent,
+    ObligationComponent,
+    ProcurementComponent,
+    CooperationComponent,
+    ContractComponent,
     TripleConstraintDashboardComponent,
     EarnedValueAnalysisDashboardComponent,
     ProgressBarScheduleYearComponent,
@@ -67,6 +78,9 @@ import { CostAccountCardComponent } from './components/cost-account-card/cost-ac
     WorkpackSectionDashboardComponent,
     WorkpackSectionJournalComponent,
     WorkpackSectionWBSComponent,
+    WorkpackSectionObligationsComponent,
+    WorkpackSectionProcurementsComponent,
+    WorkpackSectionAgreementsComponent
   ],
   imports: [
       CommonModule,
