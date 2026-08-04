@@ -1,6 +1,15 @@
 @use "src/variables" as v;
 
 ::ng-deep .app-card-item {
+
+
+  &.disabled {
+    .p-card {
+      background-color: lightgray !important;
+    }
+
+  }
+
   .p-card {
     display: flex;
     flex-direction: column;
@@ -10,6 +19,7 @@
     width: 260px;
     border: 1px solid #D4D4D4;
     box-shadow: none;
+
 
     .card-item-header {
       display: flex;
@@ -177,8 +187,16 @@
       }
 
       .icon-card {
-        font-size: 2.5rem;
+        font-size: 1.5rem;
+        width: 1.5rem;
+        height: 1.5rem;
         color: #888e96;
+      }
+
+      .card-item-svg-icon {
+        width: 1.5rem;
+        height: 1.5rem;
+        object-fit: contain;
       }
 
       .risk-red {
@@ -282,6 +300,7 @@
     }
   }
 
+
   &.mobile {
     .p-card {
       max-width: 100%;
@@ -297,8 +316,8 @@
   &.listPerson {
     .p-card-body {
       padding-top: 0.5em !important;
-      
-      
+
+
 
       .app-avatar .avatar {
         padding-bottom: 0;

@@ -1,4 +1,7 @@
+import {EnvEnum} from '../app/shared/enums/EnvEnum';
+
 export const environment = {
-  production: true,
-  version: "1.2.1"
+  production: false,
+  env: EnvEnum.HOMOLOGATION,
+  version: '2.2.0'
 };

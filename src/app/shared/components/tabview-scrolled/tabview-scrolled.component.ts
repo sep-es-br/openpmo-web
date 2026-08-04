@@ -1,5 +1,5 @@
 import { takeUntil } from 'rxjs/operators';
-import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges } from '@angular/core';
 import { ResponsiveService } from '../../services/responsive.service';
 import { WorkpackShowTabviewService } from '../../services/workpack-show-tabview.service';
 import { Subject } from 'rxjs';
@@ -21,14 +21,25 @@ export interface ITabViewScrolled {
 export class TabviewScrolledComponent implements OnChanges, OnDestroy {
 
   @Output() selectedTabChange = new EventEmitter<{ tabs: ITabViewScrolled }>();
+
   @Input() tabs: ITabViewScrolled[] = [];
+
   @Input() idWorkpack: number;
+
+  @Input() contextVersion: number;
+
   selectedTab: ITabViewScrolled;
+
   tabBody: string;
+
   showTabview: boolean;
+
   $destroy = new Subject();
+
   pendingChanges = false;
+
   showMessageNotFound: boolean;
+
   tabViewStorage = 'open-pmo:WORKPACK_TABVIEW';
 
   constructor(
@@ -60,19 +71,19 @@ export class TabviewScrolledComponent implements OnChanges, OnDestroy {
     this.$destroy.unsubscribe();
   }
 
-  existsWorkpackTabStorage() {
+  existsWorkpackTabStorage(idWorkpack = this.idWorkpack) {
     const storageTab = localStorage.getItem(this.tabViewStorage);
     if (!storageTab) {
       return false;
     }
     const selectedTabStorage = JSON.parse(storageTab);
-    return selectedTabStorage.some(tab => tab.idWorkpack === this.idWorkpack);
+    return selectedTabStorage.some(tab => tab.idWorkpack === idWorkpack);
   }
 
-  findIndexTabStorage() {
+  findIndexTabStorage(idWorkpack = this.idWorkpack) {
     const storageTab = localStorage.getItem(this.tabViewStorage);
     const selectedTabStorage = JSON.parse(storageTab);
-    const index = selectedTabStorage.findIndex(tab => tab.idWorkpack === this.idWorkpack);
+    const index = selectedTabStorage.findIndex(tab => tab.idWorkpack === idWorkpack);
     if (index === -1) {
       return 0;
     }
@@ -81,30 +92,33 @@ export class TabviewScrolledComponent implements OnChanges, OnDestroy {
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    
-    if ((changes.tabs && changes.tabs.currentValue) && (changes.idWorkpack && changes.idWorkpack.currentValue)) {
-      if (!this.tabs.length) {
+    const tabs = changes.tabs?.currentValue as ITabViewScrolled[] | undefined;
+    if (!tabs?.length) {
+      if (changes.tabs) {
         this.showMessageNotFound = true;
-        return;
       }
-      const index = this.existsWorkpackTabStorage() ? this.findIndexTabStorage() : 0;
-      this.selectTab(this.tabs[index]);
-      this.prepareScrolls();
-      
-    } else {
-      if ((changes.tabs && changes.tabs.currentValue) && !this.idWorkpack) {
-        if (!this.tabs.length) {
-          this.showMessageNotFound = true;
-          return;
-        }
-        this.selectTab(this.tabs[0]);
-        this.prepareScrolls();
-      }
+      return;
     }
 
+    if (changes.tabs && !changes.contextVersion && !changes.idWorkpack) {
+      return;
+    }
+
+    this.showMessageNotFound = false;
+    const idWorkpack = changes.idWorkpack
+      ? changes.idWorkpack.currentValue
+      : this.idWorkpack;
+
+    if (idWorkpack) {
+      const index = this.existsWorkpackTabStorage(idWorkpack) ? this.findIndexTabStorage(idWorkpack) : 0;
+      this.selectTab(this.tabs[index], idWorkpack);
+    } else {
+      this.selectTab(this.tabs[0], idWorkpack);
+    }
+    this.prepareScrolls();
   }
 
-  selectTab(item: ITabViewScrolled) {
+  selectTab(item: ITabViewScrolled, idWorkpack = this.idWorkpack) {
     if (this.pendingChanges) {
       this.confirmationSrv.confirm({
         message: this.translateSrv.instant('messages.confirmClearPendingChanges'),
@@ -114,7 +128,7 @@ export class TabviewScrolledComponent implements OnChanges, OnDestroy {
         accept: async () => {
           this.selectedTab = item;
           this.tabBody = `${item.key}`;
-          this.setStorageTab();
+          this.setStorageTab(idWorkpack);
           this.workpackSrv.nextPendingChanges(false);
           this.selectedTabChange.emit({ tabs: this.selectedTab });
           this.saveButtonSrv.nextShowSaveButton(false);
@@ -126,15 +140,15 @@ export class TabviewScrolledComponent implements OnChanges, OnDestroy {
     } else {
       this.selectedTab = item;
       this.tabBody = `${item.key}`;
-      this.setStorageTab();
+      this.setStorageTab(idWorkpack);
       this.selectedTabChange.emit({ tabs: this.selectedTab });
     }
   }
 
-  setStorageTab() {
-    if (!this.idWorkpack) return;
+  setStorageTab(idWorkpack = this.idWorkpack) {
+    if (!idWorkpack) return;
     const tabview = {
-      idWorkpack: this.idWorkpack,
+      idWorkpack,
       tab: this.selectedTab,
     };
     const tabs = localStorage.getItem(this.tabViewStorage);
@@ -147,7 +161,7 @@ export class TabviewScrolledComponent implements OnChanges, OnDestroy {
       localStorage.setItem(this.tabViewStorage, JSON.stringify([tabview]));
       return;
     }
-    const findIndex = storageTab?.findIndex(tab => tab.idWorkpack === this.idWorkpack);
+    const findIndex = storageTab?.findIndex(tab => tab.idWorkpack === idWorkpack);
     if (findIndex !== -1) {
       storageTab[findIndex] = tabview;
     } else {

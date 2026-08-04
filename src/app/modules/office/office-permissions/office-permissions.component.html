@@ -97,8 +97,20 @@
           <app-card-loading [isCardLoading]="isLoadingCitizen"></app-card-loading>
         </div>
         <p-card class="card-person" *ngIf="person" [class.responsive]="responsive">
-          <span class="person-name">{{person.name}}</span>
-          <span class="person-email">{{person.email}}</span>
+          <div class="fields-person p-d-flex p-flex-column">
+            <span class="person-name" *ngIf="containsName">{{person.name}}</span>
+            <div *ngIf="!containsName">
+              <label for="inName">Nome<span class="required-indicator">*</span>: </label>
+              <input id="inName" pInputText type="text" [(ngModel)]="person.name" (ngModelChange)="reloadRequirements()"/>
+            </div>
+            <span class="person-email" *ngIf="containsEmail">{{person.email}}</span>
+            <div *ngIf="!containsEmail" >
+              <label>Email<span class="required-indicator">*</span>: </label>
+              <input pInputText type="email" [(ngModel)]="person.email" (ngModelChange)="reloadRequirements()"/>
+            </div>
+          </div>
+
+
         </p-card>
       </div>
       <div class="data-view-containter" *ngIf="person && !isLoading">
@@ -106,7 +118,7 @@
           [emptyMessage]="'loadingEllipsis' | translate">
           <ng-template let-cardItem pTemplate="gridItem">
             <div class="p-col-12 p-md-3 p-sm-12 card-item-container" [class.responsive]="responsive">
-              <app-card-item-permission [properties]="cardItem" (changeSelected)="saveButton.showButton(); cancelButton.showButton()"
+              <app-card-item-permission [properties]="cardItem" (changeSelected)="reloadRequirements()"
                 [isReadOnly]="isReadOnly">
               </app-card-item-permission>
             </div>
