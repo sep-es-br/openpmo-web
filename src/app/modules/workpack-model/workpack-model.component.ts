@@ -42,6 +42,7 @@ import { ConfigDataViewService } from 'src/app/shared/services/config-dataview.s
 import { TypeOrganization } from 'src/app/shared/enums/TypeOrganization';
 import { IOrganization } from 'src/app/shared/interfaces/IOrganization';
 import { CancelButtonComponent } from 'src/app/shared/components/cancel-button/cancel-button.component';
+import { IPluginAvailability, PluginAvailabilityService } from 'src/app/shared/services/plugin-availability.service';
 
 interface IIcon {
   name: string;
@@ -82,6 +83,9 @@ export class WorkpackModelComponent implements OnInit {
   cardPropertiesProcesses: ICard;
   cardPropertiesNotifications: ICard;
   cardPropertiesDashboard: ICard;
+  cardPropertiesObligations: ICard;
+  cardPropertiesProcurements: ICard;
+  cardPropertiesAgreements: ICard;
   rolesPersonOptions = ['manager', 'teamMember', 'sponsor', 'partner'];
   rolesOrgOptions = ['funder', 'client', 'competitor'];
   posibleRolesPerson: string[];
@@ -127,6 +131,11 @@ export class WorkpackModelComponent implements OnInit {
   formIsSaving = false;
   nextPosition: number;
   workpackModel: IWorkpackModel;
+  pluginAvailability: IPluginAvailability = {
+    agreements: false,
+    procurements: false,
+    obligations: false
+  };
 
   notificationsStakeholderRolesOptions: SelectItem[] = [];
   notifications = {
@@ -162,7 +171,8 @@ export class WorkpackModelComponent implements OnInit {
     private officeSrv: OfficeService,
     private planModelSrv: PlanModelService,
     private menuSrv: MenuService,
-    private configDataViewSrv: ConfigDataViewService
+    private configDataViewSrv: ConfigDataViewService,
+    private pluginAvailabilitySrv: PluginAvailabilityService
   ) {
     this.configDataViewSrv.observableCollapsePanelsStatus.pipe(takeUntil(this.$destroy)).subscribe(collapsePanelStatus => {
       this.collapsePanelsStatus = collapsePanelStatus === 'collapse' ? true : false;
@@ -196,6 +206,18 @@ export class WorkpackModelComponent implements OnInit {
       });
       this.cardPropertiesDashboard = Object.assign({}, {
         ...this.cardPropertiesDashboard,
+        initialStateCollapse: this.collapsePanelsStatus
+      });
+      this.cardPropertiesObligations = Object.assign({}, {
+        ...this.cardPropertiesObligations,
+        initialStateCollapse: this.collapsePanelsStatus
+      });
+      this.cardPropertiesProcurements = Object.assign({}, {
+        ...this.cardPropertiesProcurements,
+        initialStateCollapse: this.collapsePanelsStatus
+      });
+      this.cardPropertiesAgreements = Object.assign({}, {
+        ...this.cardPropertiesAgreements,
         initialStateCollapse: this.collapsePanelsStatus
       });
     });
@@ -361,6 +383,10 @@ export class WorkpackModelComponent implements OnInit {
     this.cardPropertiesJournal = null;
     this.cardPropertiesModels = null;
     this.cardPropertiesSchedule = null;
+    this.cardPropertiesSchedule = null;
+    this.cardPropertiesObligations = null;
+    this.cardPropertiesProcurements = null;
+    this.cardPropertiesAgreements = null;
     this.setCurrentBreadcrumb();
   }
 
@@ -371,6 +397,7 @@ export class WorkpackModelComponent implements OnInit {
   }
 
   async loadDetails() {
+    await this.loadPluginAvailability();
     this.loadCards();
     if (this.idWorkpackModel) {
       if (!this.editPermission) {
@@ -382,6 +409,21 @@ export class WorkpackModelComponent implements OnInit {
       await this.loadCardItemsModels();
     }
     this.setCurrentBreadcrumb();
+  }
+
+  async loadPluginAvailability(): Promise<void> {
+    try {
+      const result = await this.pluginAvailabilitySrv.getAvailability();
+      if (result.success && result.data) {
+        this.pluginAvailability = result.data;
+      }
+    } catch (_) {
+      this.pluginAvailability = {
+        agreements: false,
+        procurements: false,
+        obligations: false
+      };
+    }
   }
 
   async getOfficeById() {
@@ -796,6 +838,7 @@ export class WorkpackModelComponent implements OnInit {
                 delete gp.defaultsDetails;
                 await this.checkProperty(gp);
               });
+              p.groupedProperties = this.sortPropertiesBySortIndex(p.groupedProperties);
             }
             delete p.defaultsDetails;
             await this.checkProperty(p);
@@ -805,7 +848,7 @@ export class WorkpackModelComponent implements OnInit {
         const dataProperties = dataPropertiesAndIndex
           .sort((a, b) => a[1] > b[1] ? 1 : -1)
           .map(prop => prop[0] as IWorkpackModelProperty);
-        this.modelProperties = dataProperties;
+        this.modelProperties = this.sortPropertiesBySortIndex(dataProperties);
       }
       this.getSortedByList();
       this.cardPropertiesCostAccount.initialStateToggle = data.costSessionActive;
@@ -845,6 +888,12 @@ export class WorkpackModelComponent implements OnInit {
       this.cardPropertiesProcesses.initialStateToggle = data.processesManagementSessionActive;
       if (this.workpackModelType === TypeWorkpackModelEnum.DeliverableModel) {
         this.cardPropertiesSchedule.initialStateToggle = data.scheduleSessionActive;
+        this.cardPropertiesObligations.initialStateToggle =
+          this.pluginAvailability.obligations && data.obligationsSessionActive;
+        this.cardPropertiesProcurements.initialStateToggle =
+          this.pluginAvailability.procurements && data.procurementsSessionActive;
+        this.cardPropertiesAgreements.initialStateToggle =
+          this.pluginAvailability.agreements && data.agreementsSessionActive;
       }
       this.childrenModels = (data.children || []);
       this.totalRecords = data.children && data.children.length + 1;
@@ -878,6 +927,18 @@ export class WorkpackModelComponent implements OnInit {
     return groupProperty
       ? groupProperty.groupedProperties.push(newProperty)
       : this.modelProperties.push(newProperty);
+  }
+
+  sortPropertiesBySortIndex(properties: IWorkpackModelProperty[] = []): IWorkpackModelProperty[] {
+    return properties
+      .map((property, index) => ({ property, index }))
+      .sort((a, b) => {
+        const sortIndexA = a.property.sortIndex ?? Number.MAX_SAFE_INTEGER;
+        const sortIndexB = b.property.sortIndex ?? Number.MAX_SAFE_INTEGER;
+
+        return sortIndexA - sortIndexB || a.index - b.index;
+      })
+      .map(item => item.property);
   }
 
   async checkProperty(property: IWorkpackModelProperty) {
@@ -1509,6 +1570,42 @@ get integrationSectorOptions(): SelectItem[] {
         }
         this.checkProperties();
       });
+      this.cardPropertiesObligations = {
+        toggleable: this.editPermission,
+        disabledToggle: !this.pluginAvailability.obligations,
+        initialStateToggle: false,
+        cardTitle: 'obligations',
+        collapseble: false,
+        initialStateCollapse: true,
+        onToggle: new EventEmitter<boolean>()
+      };
+      this.cardPropertiesObligations.onToggle
+        .pipe(takeUntil(this.$destroy))
+        .subscribe(() => this.checkProperties());
+      this.cardPropertiesProcurements = {
+        toggleable: this.editPermission,
+        disabledToggle: !this.pluginAvailability.procurements,
+        initialStateToggle: false,
+        cardTitle: 'procurements',
+        collapseble: false,
+        initialStateCollapse: true,
+        onToggle: new EventEmitter<boolean>()
+      };
+      this.cardPropertiesProcurements.onToggle
+        .pipe(takeUntil(this.$destroy))
+        .subscribe(() => this.checkProperties());
+      this.cardPropertiesAgreements = {
+        toggleable: this.editPermission,
+        disabledToggle: !this.pluginAvailability.agreements,
+        initialStateToggle: false,
+        cardTitle: 'Agreements',
+        collapseble: false,
+        initialStateCollapse: true,
+        onToggle: new EventEmitter<boolean>()
+      };
+      this.cardPropertiesAgreements.onToggle
+        .pipe(takeUntil(this.$destroy))
+        .subscribe(() => this.checkProperties());
     }
   }
 
@@ -1586,6 +1683,9 @@ get integrationSectorOptions(): SelectItem[] {
       notificationsEventMilestoneDaysBefore: this.notifications?.eventMilestone?.daysBefore,
       notificationsEventScheduleEnabled: this.notifications?.eventSchedule?.enabled,
       notificationsEventScheduleDayOfMonth: this.notifications?.eventSchedule?.dayOfMonth,
+      obligationsSessionActive: !!this.cardPropertiesObligations?.initialStateToggle,
+      procurementsSessionActive: !!this.cardPropertiesProcurements?.initialStateToggle,
+      agreementsSessionActive: !!this.cardPropertiesAgreements?.initialStateToggle,
       fontIcon: icon,
       type: this.workpackModelType,
       idPlanModel: this.idStrategy,
@@ -1800,7 +1900,7 @@ get integrationSectorOptions(): SelectItem[] {
         const dataProperties = dataPropertiesAndIndex
           .sort((a, b) => a[1] > b[1] ? 1 : -1)
           .map(prop => prop[0] as IWorkpackModelProperty);
-        this.modelProperties = dataProperties;
+        this.modelProperties = this.sortPropertiesBySortIndex(dataProperties);
         this.modelProperties.filter(prop => prop.type === TypePropertyEnum.GroupModel).forEach(group => {
           group.menuModelProperties = this.loadMenuPropertyGroup(group);
         });
@@ -1853,9 +1953,10 @@ get integrationSectorOptions(): SelectItem[] {
         await this.checkProperty(p);
         if (p.type === TypePropertyEnum.GroupModel && p.groupedProperties && p.groupedProperties.length > 0) {
           const groupedPropertiesAndIndex = await this.refreshProperties(p.groupedProperties);
-          p.groupedProperties = groupedPropertiesAndIndex
+          const groupedProperties = groupedPropertiesAndIndex
             .sort((a, b) => a[1] > b[1] ? 1 : -1)
             .map(prop => prop[0] as IWorkpackModelProperty);
+          p.groupedProperties = this.sortPropertiesBySortIndex(groupedProperties);
         }
         return [p, i];
       }))

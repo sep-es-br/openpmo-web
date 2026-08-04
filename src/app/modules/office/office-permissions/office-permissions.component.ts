@@ -263,69 +263,56 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
     }
   }
 
-  loadCardItemsPersonPermissions() {
-    if (this.permission) {
-      this.cardItemsOfficePermission =
-        this.permission?.permissions &&
-        this.permission?.permissions.map((p) => ({
+loadCardItemsPersonPermissions() {
+  if (this.permission) {
+    this.cardItemsOfficePermission =
+      this.permission?.permissions &&
+      this.permission?.permissions.map((p) => ({
+        typeCardItem: 'editItem',
+        titleCardItem: p.role,
+        levelListOptions: [
+          { label: this.translateSrv.instant('read'), value: 'READ' },
+          { label: this.translateSrv.instant('edit'), value: 'EDIT' },
+          { label: this.translateSrv.instant('none'), value: 'NONE' },
+        ],
+        selectedOption: p.level,  
+        isCCMMember: !!p.ccmMember,
+        itemId: p.id,
+      }));
+
+    const rolesNotPermissions = this.permission?.permissions
+      ? this.permission?.person?.roles?.filter(
+          (r) =>
+            this.permission?.permissions.filter((p) => p.role === (r.role ?? (r as any)))
+              .length === 0
+        )
+      : this.permission?.person?.roles;
+
+    if (rolesNotPermissions) {
+      rolesNotPermissions.forEach((r) => {
+        const newItem = {
           typeCardItem: 'editItem',
-          titleCardItem: p.role,
+          titleCardItem: r.role,
           levelListOptions: [
             { label: this.translateSrv.instant('read'), value: 'READ' },
             { label: this.translateSrv.instant('edit'), value: 'EDIT' },
-            // { label: this.translateSrv.instant('update'), value: 'UPDATE' },
             { label: this.translateSrv.instant('none'), value: 'NONE' },
           ],
-          selectedOption: p.level,
-          isCCMMember: !!p.ccmMember,
-          itemId: p.id,
-        }));
-      const rolesNotPermissions = this.permission?.permissions
-        ? this.permission?.person?.roles?.filter(
-            (r) =>
-              this.permission?.permissions.filter((p) => p.role === (r.role ?? (r as any)))
-                .length === 0
-          )
-        : this.permission?.person?.roles;
-      if (rolesNotPermissions) {
-        rolesNotPermissions.forEach((r) => {
-          if (
-            this.cardItemsOfficePermission &&
-            this.cardItemsOfficePermission.length > 0
-          ) {
-            this.cardItemsOfficePermission.push({
-              typeCardItem: 'editItem',
-              titleCardItem: r.role,
-              levelListOptions: [
-                { label: this.translateSrv.instant('read'), value: 'READ' },
-                { label: this.translateSrv.instant('edit'), value: 'EDIT' },
-                // { label: this.translateSrv.instant('update'), value: 'UPDATE' },
-                { label: this.translateSrv.instant('none'), value: 'NONE' },
-              ],
-            });
-          } else {
-            this.cardItemsOfficePermission = [
-              {
-                typeCardItem: 'editItem',
-                titleCardItem: r.role,
-                levelListOptions: [
-                  { label: this.translateSrv.instant('read'), value: 'READ' },
-                  { label: this.translateSrv.instant('edit'), value: 'EDIT' },
-                  // {
-                  //   label: this.translateSrv.instant('update'),
-                  //   value: 'UPDATE',
-                  // },
-                  { label: this.translateSrv.instant('none'), value: 'NONE' },
-                ],
-              },
-            ];
-          }
-        });
-      }
-    } else {
-      this.cardItemsOfficePermission = null;
+          selectedOption: 'NONE', // add
+        };
+
+        if (this.cardItemsOfficePermission && this.cardItemsOfficePermission.length > 0) {
+          this.cardItemsOfficePermission.push(newItem);
+        } else {
+          this.cardItemsOfficePermission = [newItem];
+        }
+      });
     }
+  } else {
+    this.cardItemsOfficePermission = null;
   }
+}
+
 
   async loadCurrentUserInfo() {
     this.currentUserInfo = await this.authSrv.getInfoPerson();

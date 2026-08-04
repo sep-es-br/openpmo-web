@@ -163,6 +163,13 @@
   "newSchedule": "Novo cronograma",
   "schedule": "Cronograma",
   "journal": "Diário",
+  "obligations": "Empenhos",
+  "procurements": "Licitações",
+  "Agreements": "Acordos",
+  "processId": "Número do processo",
+  "object": "Objeto",
+  "organizationIdentifier": "Código do órgão/UG",
+  "obligationNumber": "Número do empenho",
   "showInactive": "Exibir inativos",
   "inactive": "Inativa",
   "sector": "Setor",
@@ -729,6 +736,11 @@
           }
         }
       },
+      "agreement": {
+        "already": {
+          "exists": "Este contrato ou convênio já foi adicionado a este elemento."
+        }
+      },
       "already": {
         "exists": {
           "permission": "Já existe permissão para esta pessoa neste elemento!"
@@ -872,7 +884,8 @@
       "risk": {
         "has-issue-relationship": "Não é possível excluir o risco pois está associado a uma ocorrência."
       }
-    }
+    },
+    "obligationNotFound": "Nota de obrigação não encontrada"
   },
   "field": "Campo",
   "possibleRolesPerson": "Possíveis papéis de pessoa",
@@ -1118,5 +1131,28 @@
   "baseline-less-then-required-milestone": "O projeto deve possuir pelo menos {{0}} marcos críticos para submissão da Linha de Base.",
   "baseline-not-have-required-plannedWork": "Não é possível submeter uma Linha de Base sem escopo",
   "baseline-disabled-submission-warning": "Impossível submeter Linha de Base com pendências",
-  "languages": "Idiomas"
+  "languages": "Idiomas",
+
+  "obligation": "Empenho",
+  "newObligation": "Novo Empenho",
+  "managementUnit": "Unidade Gestora",
+  "obligationNote": "Nota de Empenho",
+  "cnpj": "CNPJ",
+  "protocol": "Protocolo",
+  "agreementSearchAnd": "e",
+  "agreementSearchOr": "ou",
+  "year": "Ano",
+
+  "procurement": "Licitação",
+  "newProcurement": "Nova Licitação",
+  "modality": "Modalidade",
+
+  "cooperation": "Convênio",
+  "newCooperation": "Novo Convênio",
+  "grantorBeneficiaryName": "Nome Concedente / Convenente",
+
+  "contract": "Contrato",
+  "newContract": "Novo Contrato",
+  "supplier": "Fornecedor"
+
 }

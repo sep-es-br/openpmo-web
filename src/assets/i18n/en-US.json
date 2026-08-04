@@ -159,6 +159,13 @@
   "newSchedule": "New schedule",
   "schedule": "Schedule",
   "journal": "Journal",
+  "obligations": "Obligations",
+  "procurements": "Procurements",
+  "Agreements": "Agreements",
+  "processId": "Process number",
+  "object": "Object",
+  "organizationIdentifier": "Organization/management unit code",
+  "obligationNumber": "Obligation number",
   "showInactive": "Show inactive",
   "inactive": "Inactive",
   "sector": "Sector",
@@ -721,6 +728,11 @@
           }
         }
       },
+      "agreement": {
+        "already": {
+          "exists": "This contract or cooperation agreement has already been added to this item."
+        }
+      },
       "generic": "We were unable to process your request",
       "unauthorized": "You do not have permission to access this functionality",
       "expired": "Your session is expired. Please login again.",
@@ -842,7 +854,8 @@
       "risk": {
         "has-issue-relationship": "This risk can not be deleted because it has a related issue."
       }
-    }
+    },
+    "obligationNotFound": "Obligation note not found"
   },
   "field": "Field",
   "possibleRolesPerson": "Possible roles of a person",
@@ -1083,5 +1096,27 @@
 
   "baseline-disabled-submission-warning": "Impossible to submit Baseline with pending items",
   "languages": "Languages",
-  "minLengthSearch": "Type at least 3 characters"
+  "minLengthSearch": "Type at least 3 characters",
+
+  "obligation": "Obligation",
+  "newObligation": "New Obligation",
+  "managementUnit": "Management Unit",
+  "obligationNote": "Obligation Note",
+  "cnpj": "CNPJ",
+  "protocol": "Protocol",
+  "agreementSearchAnd": "and",
+  "agreementSearchOr": "or",
+
+  "procurement": "Procurement",
+  "newProcurement": "New Procurement",
+  "year": "Year",
+  "modality": "Modality",
+
+  "cooperation": "Cooperation",
+  "newCooperation": "New Cooperation",
+  "grantorBeneficiaryName": "Grantor / Beneficiary Name",
+
+  "contract": "Contract",
+  "newContract": "New Contract",
+  "supplier": "Supplier"
 }
