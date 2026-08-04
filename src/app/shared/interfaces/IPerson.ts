@@ -19,7 +19,8 @@ export interface IPerson {
   avatar?: IFile;
   isCcbMember?: boolean;
   workLocal?: IWorkLocal;
-  organization?: IOrganization;   ///add
+  organization?: IOrganization;
+  idOrganization?: number;
 }
 
 export interface IWorkLocal {
