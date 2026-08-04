@@ -27,6 +27,7 @@ export class AuthService {
   currentUserInfo: IPerson;
   userLogout = new Subject();
   private isLoginDenied = new BehaviorSubject<boolean>(false);
+  private infoPersonChanged = new Subject<IPerson>();
 
 
   constructor(
@@ -71,6 +72,7 @@ export class AuthService {
         this.clearStorage();
         this.userLogout.next(true);
         this.currentUserInfo = undefined;
+        this.infoPersonChanged.next(undefined);
       }
     });
   }
@@ -112,6 +114,7 @@ export class AuthService {
       if (success) {
         this.currentUserInfo = data;
         localStorage.setItem('@PMO/infoPerson', JSON.stringify(this.currentUserInfo));
+        this.infoPersonChanged.next(this.currentUserInfo);
       }
     }
   }
@@ -121,6 +124,10 @@ export class AuthService {
     if (infoPersonItem) {
       return JSON.parse(infoPersonItem);
     }
+  }
+
+  get infoPersonChanged$() {
+    return this.infoPersonChanged.asObservable();
   }
 
   getIdPerson(): number {

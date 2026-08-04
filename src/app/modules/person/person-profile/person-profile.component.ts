@@ -345,6 +345,8 @@ export class PersonProfileComponent implements OnInit, OnDestroy {
       });
       if (success) {
         await this.loadPerson();
+        await this.authSrv.setInfoPerson();
+        this.setBreadcrumb();
         this.messageSrv.add({
           severity: 'success',
           summary: this.translateSrv.instant('success'),
@@ -355,6 +357,9 @@ export class PersonProfileComponent implements OnInit, OnDestroy {
     } else {
       const { success } = await this.personSrv.updateNameAdministradorPerson(this.idPerson, sender.name);
       if (success) {
+        await this.authSrv.setInfoPerson();
+        this.propertiesPerson = this.authSrv.getInfoPerson();
+        this.setBreadcrumb();
         this.messageSrv.add({
           severity: 'success',
           summary: this.translateSrv.instant('success'),

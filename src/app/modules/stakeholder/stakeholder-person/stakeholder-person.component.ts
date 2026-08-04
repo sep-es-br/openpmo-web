@@ -590,7 +590,12 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
 
           if (stakeholderResult.success) {
             this.stakeholder = stakeholderResult.data;
-            this.person = this.stakeholder?.person;
+            const stakeholderPerson = this.stakeholder?.person;
+            this.person = {
+              ...stakeholderPerson,
+              contactEmail: stakeholderPerson?.contactEmail || result.data?.contactEmail
+            };
+            this.stakeholder.person = this.person;
             this.user = this.person.isUser;
             this.cardPerson.isLoading = false;
             this.setStakeholderForm();
@@ -693,7 +698,12 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
 
         if (stakeholderResult.success) {
           this.stakeholder = stakeholderResult.data;
-          this.person = this.stakeholder?.person;
+          const stakeholderPerson = this.stakeholder?.person;
+          this.person = {
+            ...stakeholderPerson,
+            contactEmail: stakeholderPerson?.contactEmail || result.data?.contactEmail
+          };
+          this.stakeholder.person = this.person;
           this.user = this.person.isUser;
           this.cardPerson.isLoading = false;
           this.setStakeholderForm();

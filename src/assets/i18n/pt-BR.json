@@ -691,6 +691,11 @@
       "thereAreNotCostAccounts": "Não existem centros de custo"
     },
     "error": {
+      "citizen": {
+        "not": {
+          "found": "O usuário informado precisa possuir ou criar uma conta no Acesso Cidadão."
+        }
+      },
       "link": {
         "already": {
           "exists": "Este escritório já possui pacotes de trabalho consumindo este compartilhamento. Você deve primeiro desfazer o consumo para então desfazer o compartilhamento."
