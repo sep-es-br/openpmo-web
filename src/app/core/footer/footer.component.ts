@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { VersionService } from 'src/app/shared/services/version.service';
+import { ThemeService } from 'src/app/shared/services/theme.service';
+import { ITheme } from 'src/app/shared/interfaces/ITheme';
 import { environment } from 'src/environments/environment';
 import { DialogModule } from 'primeng/dialog';
 
@@ -18,10 +20,14 @@ export class FooterComponent implements OnInit {
 
   mouseOverText = false;
 
+  theme: ITheme;
 
   constructor(
-    private versionSrv: VersionService
-  ) { }
+    private versionSrv: VersionService,
+    private themeSrv: ThemeService
+  ) {
+    this.theme = this.themeSrv.theme;
+  }
 
 
   async ngOnInit() {

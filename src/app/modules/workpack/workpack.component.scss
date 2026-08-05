@@ -35,13 +35,13 @@
     flex-direction: row;
     align-items: center;
     justify-content: center;
-    background-color: #d0d8d9;
+    background-color: v.$bgBreadcrumb;
     opacity: 0.4;
     left: 0;
     top: 0;
     height: 100%;
     .app-card-loading {
-      background-color: #d0d8d9;
+      background-color: v.$bgBreadcrumb;
       opacity: 0.4;
     }
   }
@@ -67,7 +67,7 @@
     margin-bottom: 1em;
   }
   .actual-element {
-    color: #44B39B;
+    color: v.$fontAccent;
     font-style: italic;
     font-weight: bold;
   }
@@ -130,7 +130,7 @@
 
         &.no-animation {
           padding: 0.45rem;
-          background: #44B39B;
+          background: v.$bgButtonSubmit;
           color: #FFF;
           top: 0;
           border-radius: 4px;

@@ -1,3 +1,4 @@
+@use 'src/variables' as v;
 ::ng-deep .app-property-group {
   width: 100%;
   .p-panel .p-panel-header {
@@ -5,7 +6,7 @@
     padding-top: 1.5em;
     .p-button {
       background-color: transparent;
-      color: #004660;
+      color: v.$fontTitle;
       border: none;
       box-shadow: none;
       padding-left: 0;
