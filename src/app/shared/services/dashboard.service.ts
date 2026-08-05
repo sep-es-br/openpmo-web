@@ -253,6 +253,19 @@ export class DashboardService extends BaseService<IDashboard> {
 
 
   calculateReferenceMonth() {
+    if (
+      !this.scheduleInterval?.initialDate ||
+      !this.scheduleInterval?.endDate ||
+      !moment(this.scheduleInterval.initialDate).isValid() ||
+      !moment(this.scheduleInterval.endDate).isValid()
+    ) {
+      this.referenceMonth = undefined;
+      this.yearRange = undefined;
+      this.startDate = undefined;
+      this.endDate = undefined;
+      return;
+    }
+
     const startDateMonthFormat = this.scheduleInterval && moment(this.scheduleInterval?.initialDate, 'yyyy-MM-DD').format('MM-yyyy');
     const startDate = moment(startDateMonthFormat, 'MM-yyyy').toDate();
     
