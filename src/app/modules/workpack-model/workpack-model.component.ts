@@ -796,6 +796,7 @@ export class WorkpackModelComponent implements OnInit {
                 delete gp.defaultsDetails;
                 await this.checkProperty(gp);
               });
+              p.groupedProperties = this.sortPropertiesBySortIndex(p.groupedProperties);
             }
             delete p.defaultsDetails;
             await this.checkProperty(p);
@@ -805,7 +806,7 @@ export class WorkpackModelComponent implements OnInit {
         const dataProperties = dataPropertiesAndIndex
           .sort((a, b) => a[1] > b[1] ? 1 : -1)
           .map(prop => prop[0] as IWorkpackModelProperty);
-        this.modelProperties = dataProperties;
+        this.modelProperties = this.sortPropertiesBySortIndex(dataProperties);
       }
       this.getSortedByList();
       this.cardPropertiesCostAccount.initialStateToggle = data.costSessionActive;
@@ -878,6 +879,18 @@ export class WorkpackModelComponent implements OnInit {
     return groupProperty
       ? groupProperty.groupedProperties.push(newProperty)
       : this.modelProperties.push(newProperty);
+  }
+
+  sortPropertiesBySortIndex(properties: IWorkpackModelProperty[] = []): IWorkpackModelProperty[] {
+    return properties
+      .map((property, index) => ({ property, index }))
+      .sort((a, b) => {
+        const sortIndexA = a.property.sortIndex ?? Number.MAX_SAFE_INTEGER;
+        const sortIndexB = b.property.sortIndex ?? Number.MAX_SAFE_INTEGER;
+
+        return sortIndexA - sortIndexB || a.index - b.index;
+      })
+      .map(item => item.property);
   }
 
   async checkProperty(property: IWorkpackModelProperty) {
@@ -1800,7 +1813,7 @@ get integrationSectorOptions(): SelectItem[] {
         const dataProperties = dataPropertiesAndIndex
           .sort((a, b) => a[1] > b[1] ? 1 : -1)
           .map(prop => prop[0] as IWorkpackModelProperty);
-        this.modelProperties = dataProperties;
+        this.modelProperties = this.sortPropertiesBySortIndex(dataProperties);
         this.modelProperties.filter(prop => prop.type === TypePropertyEnum.GroupModel).forEach(group => {
           group.menuModelProperties = this.loadMenuPropertyGroup(group);
         });
@@ -1853,9 +1866,10 @@ get integrationSectorOptions(): SelectItem[] {
         await this.checkProperty(p);
         if (p.type === TypePropertyEnum.GroupModel && p.groupedProperties && p.groupedProperties.length > 0) {
           const groupedPropertiesAndIndex = await this.refreshProperties(p.groupedProperties);
-          p.groupedProperties = groupedPropertiesAndIndex
+          const groupedProperties = groupedPropertiesAndIndex
             .sort((a, b) => a[1] > b[1] ? 1 : -1)
             .map(prop => prop[0] as IWorkpackModelProperty);
+          p.groupedProperties = this.sortPropertiesBySortIndex(groupedProperties);
         }
         return [p, i];
       }))
