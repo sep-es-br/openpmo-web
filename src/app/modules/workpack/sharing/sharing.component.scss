@@ -1,3 +1,4 @@
+@use 'src/variables' as v;
 ::ng-deep .card-permissions {
   .p-panel-toggleable {
     position: relative;
@@ -16,13 +17,13 @@
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  background-color: #d0d8d9;
+  background-color: v.$bgBreadcrumb;
   opacity: 0.4;
   left: 0;
   top: 0;
   height: 100%;
   .app-card-loading {
-    background-color: #d0d8d9;
+    background-color: v.$bgBreadcrumb;
     opacity: 0.4;
   }
 }

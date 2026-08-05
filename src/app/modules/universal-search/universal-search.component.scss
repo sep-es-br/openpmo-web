@@ -1,3 +1,4 @@
+@use 'src/variables' as v;
 :host {
   display: flex;
   flex-direction: column;
@@ -60,7 +61,7 @@
 
           &.no-animation {
             padding: 0.45rem;
-            background: #44B39B;
+            background: v.$bgButtonSubmit;
             color: #FFF;
             top: 0;
             border-radius: 4px;
