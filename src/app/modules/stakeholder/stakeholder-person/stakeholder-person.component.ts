@@ -222,7 +222,10 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
 
   async loadWorkpack() {
     const workpackData = this.workpackSrv.getWorkpackData();
-    if (workpackData && workpackData.workpack && workpackData.workpack.id === this.idWorkpack && workpackData.workpackModel) {
+    const cachedPermissionsAreAvailable = this.isUserAdmin
+      || Array.isArray(workpackData?.workpack?.permissions);
+    if (workpackData && workpackData.workpack && workpackData.workpack.id === this.idWorkpack
+      && workpackData.workpackModel && cachedPermissionsAreAvailable) {
       this.workpack = workpackData.workpack;
       this.personRolesOptions = workpackData.workpackModel.personRoles?.map(role => ({
         label: role,
@@ -483,9 +486,9 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
           };
         });
       localStorage.setItem('@pmo/stakeholderRolesBk', JSON.stringify(this.stakeholderRolesBk));
-      if (!this.editPermission) {
-        this.stakeholderForm.disable();
-      }
+      this.editPermission
+        ? this.stakeholderForm.enable()
+        : this.stakeholderForm.disable();
       if (!this.isUserAdmin && this.idPerson === Number(this.authSrv.getIdPerson() )) {
         this.isSamePerson = true;
       }
