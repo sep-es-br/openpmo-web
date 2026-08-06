@@ -1,5 +1,6 @@
 <footer class="footer">
-  <img class="logo" src="../../../assets/images/brasao_rodape.png">
+  <img class="logo" *ngFor="let logo of theme.footerBrandLogos" [src]="logo.src" [alt]="logo.alt"
+       [style.height]="logo.height">
   <div class="descriptions">
    {{'messages.infoPmo' | translate}}<br/>
    <strong>{{ 'messages.stateDepartmentFooterNotice' | translate }}</strong>

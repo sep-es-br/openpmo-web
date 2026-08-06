@@ -16,13 +16,13 @@
     flex-direction: row;
     align-items: center;
     justify-content: center;
-    background-color: #d0d8d9;
+    background-color: v.$bgBreadcrumb;
     opacity: 0.4;
     left: 0;
     top: 0;
     height: 100%;
     .app-card-loading {
-      background-color: #d0d8d9;
+      background-color: v.$bgBreadcrumb;
       opacity: 0.4;
     }
   }
@@ -43,6 +43,8 @@
           margin-right: 2em;
           .p-inputtext {
             width: 100%;
+            text-transform: uppercase;
+
           }
           .p-float-label {
             width: 100%;
@@ -52,6 +54,7 @@
             }
             .p-inputtext {
               width: 100%;
+    
             }
           }
           .input-container {
@@ -59,9 +62,12 @@
             flex-direction: column;
             .p-input-icon-right {
               .pi-search {
-                color: #004660;
+                color: v.$fontTitle;
               }
             }
+           .input-container .p-inputmask input {
+            text-transform: uppercase;
+           }
           }
         }
       }
@@ -89,11 +95,11 @@
             font-weight: 700;
             font-style: normal;
             font-size: 0.9rem;
-            color: #44B39B;
+            color: v.$fontAccent;
             margin-left: 0.5em;
           }
           .process-selo {
-            color: #44B39B;
+            color: v.$fontAccent;
             font-size: 1.5rem;
           }
         }
@@ -107,7 +113,7 @@
       padding-bottom: 1em;
     }
     .p-timeline-event-marker {
-      border-color: #13546c;
+      border-color: v.$fontBreadcrumb;
     }
     .p-card {
       .p-card-content {
@@ -118,21 +124,21 @@
         justify-content: flex-start;
       }
       .organization-name {
-        color: #13546c;
+        color: v.$fontBreadcrumb;
         font-size: 0.9em;
         font-weight: bold;
         text-transform: uppercase;
         text-align: start;
       }
       .sector {
-        color: #13546c;
+        color: v.$fontBreadcrumb;
         font-size: 0.7em;
         text-transform: uppercase;
         text-align: start;
       }
       .date-container {
         margin-top: 1em;
-        color: #13546c;
+        color: v.$fontBreadcrumb;
         font-size: 0.7em;
         font-weight: bold;
         text-align: start;
@@ -142,7 +148,7 @@
         }
       }
       .status-container {
-        color: #13546c;
+        color: v.$fontBreadcrumb;
         font-size: 0.8em;
         text-align: start;
         margin-top: 1em;

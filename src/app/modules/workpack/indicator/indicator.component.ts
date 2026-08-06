@@ -4,8 +4,8 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import * as moment from 'moment';
 import { MessageService, SelectItem } from 'primeng/api';
-import { Subject } from 'rxjs';
-import { filter, takeUntil } from 'rxjs/operators';
+import { Subject, combineLatest } from 'rxjs';
+import { debounceTime, filter, takeUntil } from 'rxjs/operators';
 import { CancelButtonComponent } from 'src/app/shared/components/cancel-button/cancel-button.component';
 import { SaveButtonComponent } from 'src/app/shared/components/save-button/save-button.component';
 import { ICard } from 'src/app/shared/interfaces/ICard';
@@ -20,6 +20,7 @@ import { ResponsiveService } from 'src/app/shared/services/responsive.service';
 import { WorkpackService } from 'src/app/shared/services/workpack.service';
 import { ChangeDetectorRef } from '@angular/core';
 import { WorkpackPropertyService } from 'src/app/shared/services/workpack-property.service';
+
 
 @Component({
   selector: 'app-indicator',
@@ -170,6 +171,26 @@ export class IndicatorComponent implements OnInit, OnDestroy {
         filter(() => this.formIndicator.dirty)
       )
       .subscribe(() => this.cancelButton.showButton());
+
+
+      ///adddddd ---------------------------------------------------------
+          combineLatest([
+      this.formIndicator.get('startDate').valueChanges,
+      this.formIndicator.get('endDate').valueChanges,
+    ])
+      .pipe(
+        takeUntil(this.$destroy),
+        debounceTime(300),
+        filter(([start, end]) => {
+          return (
+            start instanceof Date &&
+            end instanceof Date &&
+            !isNaN(start.getTime()) &&
+            !isNaN(end.getTime())
+          );
+        })
+      )
+      .subscribe(() => this.onDateChange());
   }
 
   async ngOnInit() {
@@ -384,47 +405,54 @@ export class IndicatorComponent implements OnInit, OnDestroy {
 
     this.cdr.detectChanges();
   }
+onDateChange(): void {
+  const startDate = this.formIndicator.value.startDate;
+  const endDate = this.formIndicator.value.endDate;
 
-  onDateChange(): void {
-    const startDate = this.formIndicator.value.startDate;
-    const endDate = this.formIndicator.value.endDate;
-
-    if (
-      !startDate ||
-      !endDate ||
-      isNaN(startDate.getTime()) ||
-      isNaN(endDate.getTime())
-    ) {
-      return;
-    }
-
-    if (startDate > endDate) {
-      this.messageSrv.add({
-        severity: 'warn',
-        summary: 'Atenção',
-        detail: 'A data de início deve ser anterior à data de fim.',
-      });
-      return;
-    }
-
-    if (!this.formIndicator.value.periodicity) {
-      this.formIndicator.patchValue({
-        periodicity: 'ANUAL',
-      });
-      this.selectedPeriodicity = 'ANUAL';
-    }
-
-    if (
-      startDate.getTime() !== this.currentStartDate?.getTime() ||
-      endDate.getTime() !== this.currentEndDate?.getTime()
-    ) {
-      this.generatePeriodData(startDate, endDate);
-      this.currentStartDate = startDate;
-      this.currentEndDate = endDate;
-    } else {
-      this.preparePeriodData();
-    }
+  if (
+    !startDate ||
+    !endDate ||
+    isNaN(startDate.getTime()) ||
+    isNaN(endDate.getTime())
+  ) {
+    return;
   }
+
+  if (startDate > endDate) {
+    this.saveButton.hideButton();
+
+    this.messageSrv.add({
+      severity: 'warn',
+      summary: 'Atenção',
+      detail: 'A data de início deve ser anterior à data de fim.',
+    });
+
+    return;
+  }
+
+  // Se as datas ficaram válidas novamente, mostra o botão
+  if (this.formIndicator.valid && this.formIndicator.dirty) {
+    this.saveButton.showButton();
+  }
+
+  if (!this.formIndicator.value.periodicity) {
+    this.formIndicator.patchValue({
+      periodicity: 'ANUAL',
+    });
+    this.selectedPeriodicity = 'ANUAL';
+  }
+
+  if (
+    startDate.getTime() !== this.currentStartDate?.getTime() ||
+    endDate.getTime() !== this.currentEndDate?.getTime()
+  ) {
+    this.generatePeriodData(startDate, endDate);
+    this.currentStartDate = startDate;
+    this.currentEndDate = endDate;
+  } else {
+    this.preparePeriodData();
+  }
+}
 
   onExpectedGoalChange(data: any): void {
     data.lastUpdate = this.getCurrentDate();
@@ -630,6 +658,7 @@ export class IndicatorComponent implements OnInit, OnDestroy {
         return isNaN(parsedValue) ? null : parsedValue;
       }
 
+      
       return null;
     };
     const periodGoals = this.periodData.map((data) => ({

@@ -29,11 +29,11 @@
     flex-direction: row;
     align-items: center;
     justify-content: center;
-    background-color: #d0d8d9;
+    background-color: v.$bgBreadcrumb;
     opacity: 0.4;
     left: 0;
     .app-card-loading {
-      background-color: #d0d8d9;
+      background-color: v.$bgBreadcrumb;
       opacity: 0.4;
     }
   }
@@ -171,7 +171,7 @@
       border-bottom: 1px solid #b6c8cd;
       border-radius: 0;
       background-color: transparent;
-      color: #004660;
+      color: v.$fontTitle;
     }
       .p-multiselect-label-container {
         color: v.$fontInput;
@@ -248,7 +248,7 @@
       width: 10%;
       padding-bottom: 0.5em;
       label {
-        color: #004660;
+        color: v.$fontTitle;
       }
     }
   }
@@ -426,11 +426,11 @@
     gap: 0.5rem;
     width: auto !important; 
     label {
-      color: #004660;
+      color: v.$fontTitle;
     }
     .event-prefix,
     .event-suffix {
-      color: #004660;
+      color: v.$fontTitle;
     }
     ::ng-deep .event-dropdown .p-dropdown {
       border: none;

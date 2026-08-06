@@ -1,13 +1,13 @@
 @use 'src/variables' as v;
 
 .admin {
-  border-color: #296D5E!important;
+  border-color: v.$bgMenuAdmin!important;
 }
 .management {
-  border-color: #023c55 !important
+  border-color: v.$bgMenuUser !important
 }
 .office {
-  border-color: #a7074b!important;
+  border-color: v.$bgMenuOffice!important;
 }
 .app-breadcrumb {
   display: flex;
@@ -114,12 +114,12 @@
       }
       &.last-crumb-highlighted {
         .link {
-          background-color: #44B39B;
+          background-color: v.$bgButtonSubmit;
           color: #ffff;
           font-weight: 700;
         }
         .info {
-          color: #44B39B;
+          color: v.$fontAccent;
           font-weight: 700;
         }
       }
@@ -164,12 +164,12 @@
 }
 
 ::ng-deep .p-button {
-  background: #44B39B;
-  border: 1px solid #44B39B;
+  background: v.$bgButtonSubmit;
+  border: 1px solid v.$bgButtonSubmit;
 }
 ::ng-deep .p-button:enabled:hover {
-  background: #44B39B !important;
-  border-color: #44B39B !important;
+  background: v.$bgButtonSubmit !important;
+  border-color: v.$bgButtonSubmit !important;
 }
 ::ng-deep .p-menu.p-menu-overlay {
   left: 259px;

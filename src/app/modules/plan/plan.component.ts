@@ -35,7 +35,6 @@ import { IUniversalSearch } from 'src/app/shared/interfaces/universal-search.int
 import { PageDef, SearchService } from 'src/app/shared/services/search.service';
 import { ITabViewScrolled } from 'src/app/shared/components/tabview-scrolled/tabview-scrolled.component';
 
-
 interface IWorkpackModelCard {
   idWorkpackModel: number;
   propertiesCard: ICard;
@@ -167,6 +166,8 @@ export class PlanComponent implements OnInit, OnDestroy {
       fullName: ['', Validators.required],
       start: [null, Validators.required],
       finish: [null, Validators.required],
+    }, {
+       validators: dateRangeValidator('start', 'finish') 
     });
     this.formPlan.controls.modelName.disable();
     this.formPlan.controls.modelFullName.disable();
@@ -246,7 +247,7 @@ export class PlanComponent implements OnInit, OnDestroy {
   async ngOnInit() {
     const today = moment();
     const yearStart = today.year();
-    this.yearRange = (yearStart - 10).toString() + ':' + (yearStart + 10).toString();
+    this.yearRange = (yearStart - 30).toString() + ':' + (yearStart + 30).toString();
     this.calendarFormat = this.translateSrv.instant('dateFormat');
   }
 
@@ -1254,3 +1255,23 @@ export class PlanComponent implements OnInit, OnDestroy {
   }
 
 }
+
+
+function dateRangeValidator(startControlName: string, finishControlName: string) {
+  return (group: FormGroup): { [key: string]: boolean } | null => {
+    const start = group.get(startControlName)?.value;
+    const finish = group.get(finishControlName)?.value;
+
+    if (!start || !finish) {
+      return null;
+    }
+
+    if (moment(finish).isBefore(moment(start), 'day')) {
+      group.get(finishControlName)?.setErrors({ dateRangeInvalid: true });
+      return { dateRangeInvalid: true };
+    }
+
+    return null;
+  };
+}
+

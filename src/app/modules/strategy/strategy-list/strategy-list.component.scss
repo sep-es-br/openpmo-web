@@ -1,3 +1,4 @@
+@use 'src/variables' as v;
 .app-strategy {
   width: 100%;
   .header-container {
@@ -22,11 +23,11 @@
     flex-direction: row;
     align-items: center;
     justify-content: center;
-    background-color: #d0d8d9;
+    background-color: v.$bgBreadcrumb;
     opacity: 0.4;
     left: 0;
     .app-card-loading {
-      background-color: #d0d8d9;
+      background-color: v.$bgBreadcrumb;
       opacity: 0.4;
     }
   }

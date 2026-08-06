@@ -241,7 +241,10 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
     if (this.isUserAdmin) {
       this.editPermission = !this.workpack.canceled;
     } else {
-      this.editPermission = (this.workpack.permissions && this.workpack.permissions.filter(p => p.level === 'EDIT').length > 0) && !this.workpack.canceled;
+      this.editPermission = (
+          this.workpack.permissions
+          && this.workpack.permissions.filter(p => p.level === 'EDIT').length > 0
+        ) && !this.workpack.canceled;
     }
     const resultPlan = await this.planSrv.getCurrentPlan(this.idPlan);
     if (resultPlan) {
@@ -587,7 +590,12 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
 
           if (stakeholderResult.success) {
             this.stakeholder = stakeholderResult.data;
-            this.person = this.stakeholder?.person;
+            const stakeholderPerson = this.stakeholder?.person;
+            this.person = {
+              ...stakeholderPerson,
+              contactEmail: stakeholderPerson?.contactEmail || result.data?.contactEmail
+            };
+            this.stakeholder.person = this.person;
             this.user = this.person.isUser;
             this.cardPerson.isLoading = false;
             this.setStakeholderForm();
@@ -690,7 +698,12 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
 
         if (stakeholderResult.success) {
           this.stakeholder = stakeholderResult.data;
-          this.person = this.stakeholder?.person;
+          const stakeholderPerson = this.stakeholder?.person;
+          this.person = {
+            ...stakeholderPerson,
+            contactEmail: stakeholderPerson?.contactEmail || result.data?.contactEmail
+          };
+          this.stakeholder.person = this.person;
           this.user = this.person.isUser;
           this.cardPerson.isLoading = false;
           this.setStakeholderForm();
@@ -721,7 +734,7 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
         address: '',
         phoneNumber: '',
         contactEmail: ''
-      })
+      });
       this.stakeholderRoles = null;
       this.stakeholderPermissions = [];
     }
@@ -802,7 +815,11 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
 
   async saveStakeholder() {
     this.cancelButton.hideButton();
-    if (!this.stakeholderForm.valid || !this.stakeholderForm.controls.fullName.value || this.stakeholderForm.controls.fullName.value.trim().length === 0) {
+    if (
+      !this.stakeholderForm.valid
+      || !this.stakeholderForm.controls.fullName.value
+      || this.stakeholderForm.controls.fullName.value.trim().length === 0
+    ) {
       return;
     }
     const validated = this.validateStakeholder();
@@ -908,9 +925,9 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
     // user should have permissions
     if (this.user) {
       return (this.stakeholderRolesCardItems && this.stakeholderRolesCardItems.filter( card => card.type !== 'new-role-card').length > 0)
-      || (this.stakeholderPermissions && this.stakeholderPermissions.length > 0)
+      || (this.stakeholderPermissions && this.stakeholderPermissions.length > 0);
     } else {
-      return (this.stakeholderRolesCardItems && this.stakeholderRolesCardItems.filter( card => card.type !== 'new-role-card').length > 0)
+      return (this.stakeholderRolesCardItems && this.stakeholderRolesCardItems.filter( card => card.type !== 'new-role-card').length > 0);
     }
   }
 

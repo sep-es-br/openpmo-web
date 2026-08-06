@@ -11,6 +11,7 @@ export interface ICard {
   cardTitle?: string;
   tabTitle?: string;
   toggleable: boolean;
+  disabledToggle?: boolean;
   toggleLabel?: string;
   initialStateToggle: boolean;
   showFilters?: boolean;

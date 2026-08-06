@@ -8,6 +8,8 @@ import {TranslateService} from '@ngx-translate/core';
 import {Subject, Subscription} from 'rxjs';
 import {MenuItem} from 'primeng/api';
 import {TranslateChangeService} from 'src/app/shared/services/translate-change.service';
+import {ThemeService} from 'src/app/shared/services/theme.service';
+import {ITheme} from 'src/app/shared/interfaces/ITheme';
 import {takeUntil} from 'rxjs/operators';
 
 @Component({
@@ -23,6 +25,7 @@ export class LoginComponent implements OnInit, OnDestroy {
   subTranslateSrv: Subscription;
   isLoginDenied = false;
   itemsLanguages: MenuItem[] = [];
+  theme: ITheme;
 
   $destroy = new Subject();
 
@@ -31,8 +34,11 @@ export class LoginComponent implements OnInit, OnDestroy {
     private authSrv: AuthService,
     private translateSrv: TranslateService,
     private translateChangeSrv: TranslateChangeService,
+    private themeSrv: ThemeService,
     @Inject(APP_CONFIG) appConfig: IAppConfig
   ) {
+
+    this.theme = this.themeSrv.theme;
 
     this.translateChangeSrv.getCurrentLang()
       .pipe(takeUntil(this.$destroy))

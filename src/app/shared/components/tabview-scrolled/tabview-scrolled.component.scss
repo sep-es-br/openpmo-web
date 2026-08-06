@@ -1,3 +1,4 @@
+@use 'src/variables' as v;
 .app-tabview-scrolled {
   width: 100%;
   display: flex;
@@ -76,7 +77,7 @@
     outline: none;
     transition: all .3s;
     color: #135460;
-    background-color: #EAEAE8;
+    background-color: v.$bg;
 
     i {
       font-size: 1.2rem;

@@ -8,7 +8,7 @@ import { debounceTime, takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
 import { MessageService } from 'primeng/api';
 
-import { IPlanPermission } from 'src/app/shared/interfaces/IPlanPermission';
+import { IPlanPermission, IPublicIdentityValidation } from 'src/app/shared/interfaces/IPlanPermission';
 import { PlanPermissionService } from 'src/app/shared/services/plan-permissions.service';
 import { ResponsiveService } from 'src/app/shared/services/responsive.service';
 import { ICardItemPermission } from 'src/app/shared/interfaces/ICardItemPermission';
@@ -71,6 +71,7 @@ export class PlanPermissionsComponent implements OnInit, OnDestroy {
   isUserAdmin = false;
   showMessageIsSamePerson = false;
   isSamePerson = false;
+  identityValidation: IPublicIdentityValidation;
 
   constructor(
     private actRouter: ActivatedRoute,
@@ -186,6 +187,7 @@ export class PlanPermissionsComponent implements OnInit, OnDestroy {
   }
 
   validateClearSearchByUser() {
+    this.identityValidation = undefined;
     this.person = undefined;
     this.publicServersResult = [];
     this.showListBoxPublicServers = false;
@@ -198,6 +200,7 @@ export class PlanPermissionsComponent implements OnInit, OnDestroy {
   }
 
   async searchCitizenUserByName() {
+    this.identityValidation = undefined;
     this.saveButton?.hideButton();
     this.cancelButton.showButton();
     this.publicServersResult = [];
@@ -219,6 +222,7 @@ export class PlanPermissionsComponent implements OnInit, OnDestroy {
 
   validateClearSearchByCpf(event) {
     if (!event || (event.length === 0)) {
+      this.identityValidation = undefined;
       this.person = undefined;
       this.loadNewPermission();
       this.validCpf = true;
@@ -228,6 +232,7 @@ export class PlanPermissionsComponent implements OnInit, OnDestroy {
   }
 
   async validateCpf() {
+    this.identityValidation = undefined;
     this.saveButton?.hideButton();
     this.cancelButton.showButton();
     this.citizenUserNotFoundByCpf = false;
@@ -246,6 +251,11 @@ export class PlanPermissionsComponent implements OnInit, OnDestroy {
           return;
         }
         this.person = result.data;
+        this.identityValidation = {
+          searchType: 'CPF',
+          cpf: this.searchedCpfUser,
+          sub: this.person.key,
+        };
         this.loadNewPermission();
       } else {
         this.citizenUserNotFoundByCpf = true;
@@ -265,6 +275,10 @@ export class PlanPermissionsComponent implements OnInit, OnDestroy {
         return;
       }
       this.person = result.data;
+      this.identityValidation = {
+        searchType: 'PUBLIC_AGENT',
+        sub: this.person.key,
+      };
       this.searchedNameUser = '';
       this.publicServersResult = [];
       this.showListBoxPublicServers = false;
@@ -363,7 +377,8 @@ export class PlanPermissionsComponent implements OnInit, OnDestroy {
         }
         this.showSearchInputMessage = false;
         this.person = data;
-        this.person.email = this.searchedEmailPerson
+        this.person.key = this.person.key ?? this.searchedEmailPerson;
+        this.person.email = this.searchedEmailPerson;
       } else {
         const email = this.searchedEmailPerson.split('@');
         const name = email[0];
@@ -371,6 +386,7 @@ export class PlanPermissionsComponent implements OnInit, OnDestroy {
           name,
           fullName: name,
           email: this.searchedEmailPerson,
+          key: this.searchedEmailPerson,
           roles: [ {role: 'citizen'} ]
         };
       }
@@ -411,7 +427,8 @@ export class PlanPermissionsComponent implements OnInit, OnDestroy {
       email: this.person.email,
       key: this.key ? this.key : this.person.key,
       person: this.person,
-      permissions: this.permission.permissions
+      permissions: this.permission.permissions,
+      identityValidation: this.identityValidation
     };
     const { success } = this.key
       ? await this.planPermissionSrv.put(permission)

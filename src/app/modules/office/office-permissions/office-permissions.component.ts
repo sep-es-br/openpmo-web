@@ -8,7 +8,7 @@ import { Subject } from 'rxjs';
 import { debounceTime, takeUntil } from 'rxjs/operators';
 import { MessageService } from 'primeng/api';
 
-import { IOfficePermission } from 'src/app/shared/interfaces/IOfficePermission';
+import { IOfficePermission, IPublicIdentityValidation } from 'src/app/shared/interfaces/IOfficePermission';
 import { OfficePermissionService } from 'src/app/shared/services/office-permission.service';
 import { ResponsiveService } from 'src/app/shared/services/responsive.service';
 import { ICardItemPermission } from 'src/app/shared/interfaces/ICardItemPermission';
@@ -100,6 +100,11 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
 
   isUserAdmin = false;
 
+  containsName = false;
+  containsEmail = false;
+
+  identityValidation: IPublicIdentityValidation;
+
   constructor(
     private actRouter: ActivatedRoute,
     private authSrv: AuthService,
@@ -144,6 +149,16 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
   async ngOnDestroy(): Promise<void> {
     this.$destroy.next();
     this.$destroy.complete();
+  }
+
+  reloadRequirements(){
+    if((this.containsName || this.person.name)
+      && (this.containsEmail || (this.person.email && this.person.email.indexOf('@') > -1))
+      && !this.cardItemsOfficePermission.some(permission => !permission.selectedOption)
+    ) {
+      this.saveButton.showButton(); this.cancelButton.showButton();
+    }
+
   }
 
   async ngOnInit() {
@@ -238,6 +253,9 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
           roles: this.permission.permissions.map((p) => ({ role: p.role })),
           guid: this.permission.person.guid,
         };
+
+        this.containsEmail = !!this.permission.person.email;
+        this.containsName = !!this.permission.person.name;
       }
       this.loadCardItemsPersonPermissions();
     } else {
@@ -245,69 +263,56 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
     }
   }
 
-  loadCardItemsPersonPermissions() {
-    if (this.permission) {
-      this.cardItemsOfficePermission =
-        this.permission?.permissions &&
-        this.permission?.permissions.map((p) => ({
+loadCardItemsPersonPermissions() {
+  if (this.permission) {
+    this.cardItemsOfficePermission =
+      this.permission?.permissions &&
+      this.permission?.permissions.map((p) => ({
+        typeCardItem: 'editItem',
+        titleCardItem: p.role,
+        levelListOptions: [
+          { label: this.translateSrv.instant('read'), value: 'READ' },
+          { label: this.translateSrv.instant('edit'), value: 'EDIT' },
+          { label: this.translateSrv.instant('none'), value: 'NONE' },
+        ],
+        selectedOption: p.level,  
+        isCCMMember: !!p.ccmMember,
+        itemId: p.id,
+      }));
+
+    const rolesNotPermissions = this.permission?.permissions
+      ? this.permission?.person?.roles?.filter(
+          (r) =>
+            this.permission?.permissions.filter((p) => p.role === (r.role ?? (r as any)))
+              .length === 0
+        )
+      : this.permission?.person?.roles;
+
+    if (rolesNotPermissions) {
+      rolesNotPermissions.forEach((r) => {
+        const newItem = {
           typeCardItem: 'editItem',
-          titleCardItem: p.role,
+          titleCardItem: r.role,
           levelListOptions: [
             { label: this.translateSrv.instant('read'), value: 'READ' },
             { label: this.translateSrv.instant('edit'), value: 'EDIT' },
-            // { label: this.translateSrv.instant('update'), value: 'UPDATE' },
             { label: this.translateSrv.instant('none'), value: 'NONE' },
           ],
-          selectedOption: p.level,
-          isCCMMember: !!p.ccmMember,
-          itemId: p.id,
-        }));
-      const rolesNotPermissions = this.permission?.permissions
-        ? this.permission?.person?.roles.filter(
-            (r) =>
-              this.permission?.permissions.filter((p) => p.role === (r.role ?? (r as any)))
-                .length === 0
-          )
-        : this.permission?.person?.roles;
-      if (rolesNotPermissions) {
-        rolesNotPermissions.forEach((r) => {
-          if (
-            this.cardItemsOfficePermission &&
-            this.cardItemsOfficePermission.length > 0
-          ) {
-            this.cardItemsOfficePermission.push({
-              typeCardItem: 'editItem',
-              titleCardItem: r.role,
-              levelListOptions: [
-                { label: this.translateSrv.instant('read'), value: 'READ' },
-                { label: this.translateSrv.instant('edit'), value: 'EDIT' },
-                // { label: this.translateSrv.instant('update'), value: 'UPDATE' },
-                { label: this.translateSrv.instant('none'), value: 'NONE' },
-              ],
-            });
-          } else {
-            this.cardItemsOfficePermission = [
-              {
-                typeCardItem: 'editItem',
-                titleCardItem: r.role,
-                levelListOptions: [
-                  { label: this.translateSrv.instant('read'), value: 'READ' },
-                  { label: this.translateSrv.instant('edit'), value: 'EDIT' },
-                  // {
-                  //   label: this.translateSrv.instant('update'),
-                  //   value: 'UPDATE',
-                  // },
-                  { label: this.translateSrv.instant('none'), value: 'NONE' },
-                ],
-              },
-            ];
-          }
-        });
-      }
-    } else {
-      this.cardItemsOfficePermission = null;
+          selectedOption: 'NONE', // add
+        };
+
+        if (this.cardItemsOfficePermission && this.cardItemsOfficePermission.length > 0) {
+          this.cardItemsOfficePermission.push(newItem);
+        } else {
+          this.cardItemsOfficePermission = [newItem];
+        }
+      });
     }
+  } else {
+    this.cardItemsOfficePermission = null;
   }
+}
+
 
   async loadCurrentUserInfo() {
     this.currentUserInfo = await this.authSrv.getInfoPerson();
@@ -334,6 +339,7 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
         }
         this.showSearchInputMessage = false;
         this.person = data;
+        this.person.key = this.person.key ?? this.searchedEmailPerson;
         this.person.email = this.searchedEmailPerson;
       } else {
         const email = this.searchedEmailPerson.split('@');
@@ -341,6 +347,7 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
         this.person = {
           name,
           email: this.searchedEmailPerson,
+          key: this.searchedEmailPerson,
           roles: [{ role: 'citizen' }],
         };
       }
@@ -360,6 +367,7 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
   }
 
   validateClearSearchByUser() {
+    this.identityValidation = undefined;
     this.person = undefined;
     this.publicServersResult = [];
     this.showListBoxPublicServers = false;
@@ -372,6 +380,7 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
   }
 
   async searchCitizenUserByName() {
+    this.identityValidation = undefined;
     this.saveButton?.hideButton();
     this.publicServersResult = [];
     if (this.person) {
@@ -394,6 +403,7 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
 
   validateClearSearchByCpf(event) {
     if (!event || event.length === 0) {
+      this.identityValidation = undefined;
       this.person = undefined;
       this.loadNewPermission();
       this.validCpf = true;
@@ -403,6 +413,7 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
   }
 
   async validateCpf() {
+    this.identityValidation = undefined;
     this.saveButton?.hideButton();
     this.citizenUserNotFoundByCpf = false;
     this.validCpf = cpfValidator(this.searchedCpfUser);
@@ -423,6 +434,13 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
           return;
         }
         this.person = result.data;
+        this.identityValidation = {
+          searchType: 'CPF',
+          cpf: this.searchedCpfUser,
+          sub: this.person.key,
+        };
+        this.containsName = !!this.person.name;
+        this.containsEmail = !!this.person.email;
         this.loadNewPermission();
       } else {
         this.citizenUserNotFoundByCpf = true;
@@ -448,6 +466,10 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
         return;
       }
       this.person = result.data;
+      this.identityValidation = {
+        searchType: 'PUBLIC_AGENT',
+        sub: this.person.key,
+      };
       this.searchedNameUser = '';
       this.publicServersResult = [];
       this.showListBoxPublicServers = false;
@@ -490,6 +512,7 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
       key: this.key ? this.key : this.person.key,
       person: this.person,
       permissions: this.permission.permissions,
+      identityValidation: this.identityValidation,
     };
     const result = this.key
       ? await this.officePermissionsSrv.put(permission)

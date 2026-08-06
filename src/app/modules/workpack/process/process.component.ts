@@ -61,7 +61,7 @@ export class ProcessComponent implements OnInit, OnDestroy {
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.responsive = value);
     this.formProcess = this.formBuilder.group({
       name: ['', [Validators.required, Validators.maxLength(50)]],
-      processNumber: ['', Validators.required],
+      processNumber: ['', [Validators.required, Validators.pattern(/^[0-9]{4}-[A-Z0-9]{5}$/i)]],
       subject: ['', Validators.required],
       currentOrganization: ['', Validators.required],
       lengthOfStayOn: ['', Validators.required],
@@ -84,12 +84,15 @@ export class ProcessComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.$destroy), filter(() => this.formProcess.dirty))
       .subscribe(() => this.cancelButton.showButton());
     this.debounceSearch.pipe(debounceTime(300), takeUntil(this.$destroy)).subscribe(() => {
-      this.processNumber = this.formProcess.controls.processNumber.value;
+      const rawValue: string = this.formProcess.controls.processNumber.value;
+      this.processNumber = rawValue ? rawValue.toUpperCase() : rawValue;
       this.resetFormProcess();
       this.process = undefined;
       this.showProcessHistory = false;
       this.cardProcessHistory = undefined;
-      if (this.formProcess.controls.processNumber.value && this.formProcess.controls.processNumber.value.length > 3) {
+
+      const processNumberRegex = /^[0-9]{4}-[A-Z0-9]{5}$/i; 
+      if (this.processNumber && processNumberRegex.test(this.processNumber)) {
         this.searchProcessByNumber();
       }
     });
@@ -102,10 +105,10 @@ export class ProcessComponent implements OnInit, OnDestroy {
     );
   }
 
+
   resetFormProcess() {
-    this.formProcess.reset({
+    this.formProcess.patchValue({
       name: '',
-      processNumber: this.processNumber,
       subject: '',
       currentOrganization: '',
       lengthOfStayOn: '',
@@ -141,7 +144,8 @@ export class ProcessComponent implements OnInit, OnDestroy {
 
   async searchProcessByNumber() {
     this.isLoading = true;
-    const result = await this.processSrv.GetProcessByNumber({ 'process-number': this.formProcess.controls.processNumber.value });
+    const value = this.formProcess.controls.processNumber.value?.toUpperCase();
+    const result = await this.processSrv.GetProcessByNumber({ 'process-number': value });
     this.isLoading = true;
     if (result.success && result.data) {
       this.process = result.data;
@@ -299,7 +303,7 @@ export class ProcessComponent implements OnInit, OnDestroy {
       status: this.formProcess.controls.status.value
     };
     const put = !!this.idProcess;
-    const result =  put ? await this.processSrv.put(sender) : await this.processSrv.post(sender);
+    const result = put ? await this.processSrv.put(sender) : await this.processSrv.post(sender);
 
     if (result.success) {
       this.messageSrv.add({
@@ -312,7 +316,7 @@ export class ProcessComponent implements OnInit, OnDestroy {
       if (!put) {
         this.process.name = sender.name;
         this.setBreadcrumb();
-        
+
       };
       this.formIsSaving = false;
     }
@@ -343,4 +347,21 @@ export class ProcessComponent implements OnInit, OnDestroy {
     }
   }
 
+
+  onProcessNumberInput() {
+    this.debounceSearch.next();
+  }
+
+
+/*
+onProcessNumberInput(event: any): void {
+  const value = event.target.value.toUpperCase();
+
+  this.formProcess.get('processNumber')?.setValue(value, {
+    emitEvent: false
+  });
+
+  this.debounceSearch.next();
+}
+*/
 }

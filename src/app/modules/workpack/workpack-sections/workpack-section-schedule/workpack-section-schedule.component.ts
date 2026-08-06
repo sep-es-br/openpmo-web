@@ -166,7 +166,7 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy, Afte
           : this.collapsePanelsStatus,
       },
     };
-
+    
 
   }
 
@@ -178,56 +178,48 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy, Afte
       .subscribe((reset) => {
         if (reset) {
           this.loadScheduleData();
+          this.runAllValidations();
         }
       });
 
-    if(this.runValidation) {
-      this.runAllValidations();
-      this.runValidation = false;
-    }
   }
 
   ngOnInit(): void {
 
-    this.route.queryParams.subscribe(async (params) => {
-      const idWorkpack = params.id;
-      if (!idWorkpack) return;
+  this.route.queryParams.subscribe(async (params) => {
+    const idWorkpack = params.id;
+    if (!idWorkpack) return;
 
-      try {
-        const response = await this.labelSrv
-          .getLabels(idWorkpack)
-          .toPromise();
+    try {
 
-        this.foreseenLabel = response.data[0].body.data;
-        this.tooltipLabel = response.data[0].body.data;
-        this.abbreviatedLabel = response.data[1].body.data;
+      const response = await this.labelSrv
+        .getLabels(idWorkpack)
+        .toPromise();
 
-        await this.loadScheduleData();
-        this.runValidation = true;
-      } catch (error) {
-        console.error(error);
-      }
-    });
+      this.foreseenLabel = response.data[0].body.data;
+      this.tooltipLabel = response.data[0].body.data;
+      this.abbreviatedLabel = response.data[1].body.data;
 
-    this.route.queryParams
-      .pipe(
-        map((params) => params.id),
-        switchMap((workpackId) => {
-          if (!workpackId) return EMPTY;
-          return this.scheduleCardItemSrv.getCurrentBaseline(workpackId);
-        })
-      )
-      .subscribe((response) => {
-        this.isCurrentBaseline = response.data;
-        this.scheduleCardItemSrv.isCurrentBaseline$.next(
-          this.isCurrentBaseline
-        );
-        this.loadBaseline = false;
+      const baselineResponse = await this.scheduleCardItemSrv
+        .getCurrentBaseline(idWorkpack)
+        .toPromise();
 
-        this.runValidation = true;
-      });
+      this.isCurrentBaseline = baselineResponse.data;
+      this.scheduleCardItemSrv.isCurrentBaseline$.next(
+        this.isCurrentBaseline
+      );
+      this.loadBaseline = false;
 
-  }
+      await this.loadScheduleData();
+
+      this.runAllValidations();
+
+    } catch (error) {
+      console.error(error);
+    }
+  });
+
+}
 
   ngOnDestroy(): void {
     this.$destroy.complete();

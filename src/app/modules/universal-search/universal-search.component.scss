@@ -1,9 +1,24 @@
+@use 'src/variables' as v;
 :host {
   display: flex;
   flex-direction: column;
 
   @media screen and (max-width: 768px) {
     padding-inline: 1em;
+  }
+
+  .back-to-management-container {
+    color: #13546C;
+    cursor: pointer;
+    margin-bottom: 1em;
+    width: max-content;
+    .fa-reply {
+      margin-right: 0.5em;
+    }
+    .text {
+      font-size: 0.8rem;
+      font-style: italic;
+    }
   }
 
   header {
@@ -46,7 +61,7 @@
 
           &.no-animation {
             padding: 0.45rem;
-            background: #44B39B;
+            background: v.$bgButtonSubmit;
             color: #FFF;
             top: 0;
             border-radius: 4px;

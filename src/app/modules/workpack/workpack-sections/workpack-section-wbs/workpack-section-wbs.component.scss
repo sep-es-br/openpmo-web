@@ -57,7 +57,7 @@
     }
     .selected {
       border-color: rgba(68, 179, 155, 1);
-      color: #44B39B;
+      color: v.$fontAccent;
     }
   }
   .constraint-content-cards{
@@ -86,10 +86,10 @@
         background-color: #B5B5B5;
       }
       .subtitle-box-actual {
-        background-color: #0083BB;
+        background-color: v.$fontBlue;
       }
       .subtitle-box-foreseen {
-        background-color: #44B39B;
+        background-color: v.$bgApproved;
       }
       .subtitle-label-planned {
         color: #B5B5B5;
@@ -246,10 +246,10 @@
         }
         .new-label {
           padding: 0.15rem 0.35rem;
-          border: 1px solid #0083BB;
+          border: 1px solid v.$fontBlue;
           border-radius: 20px;
           font-size: 14px;
-          color: #0083BB;
+          color: v.$fontBlue;
           text-transform: uppercase;
         }
       }
@@ -269,10 +269,10 @@
           width: 60px;
           align-items: center;
           justify-content: center;
-          border: 1px solid #0083BB;
+          border: 1px solid v.$fontBlue;
           border-radius: 20px;
           text-transform: uppercase;
-          color: #0083BB;
+          color: v.$fontBlue;
         }
 
         .milestone-column {
@@ -291,13 +291,13 @@
               margin-left: 0.5em;
             }
             .on-time {
-              color: #44B39B;
+              color: v.$fontApproved;
             }
             .late {
               color: #EA5C5C;
             }
             .concluded {
-              color: #0083BB;
+              color: v.$fontBlue;
             }
             .late-concluded {
               color: #806AAD;
@@ -355,12 +355,12 @@
             align-items: center;
             justify-content: center;
             .fa-info-circle {
-              color: #0083bb;
+              color: v.$fontBlue;
             }
             .fa-info {
-              color: #0083bb;
+              color: v.$fontBlue;
               padding: 3px 6.5px;
-              border: 1px solid #0083bb;
+              border: 1px solid v.$fontBlue;
               border-radius: 50%;
               font-size: 0.7rem;
               width: 19px;
@@ -383,7 +383,7 @@
               background-color: #fff;
               .ontime {
                   height: 12px;
-                  background-color: #44B39B;
+                  background-color: v.$bgApproved;
               }
               .late {
                   height: 12px;
@@ -391,7 +391,7 @@
               }
               .concluded {
                   height: 12px;
-                  background-color: #0083BB;
+                  background-color: v.$fontBlue;
               }
               .concluded-late {
                 height: 12px;
