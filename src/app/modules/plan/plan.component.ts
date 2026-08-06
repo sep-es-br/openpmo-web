@@ -86,6 +86,7 @@ export class PlanComponent implements OnInit, OnDestroy {
   propertiesPlanModel: IPlanModel;
   tabs: ITabViewScrolled[];
   selectedTab: ITabViewScrolled;
+  tabviewContextVersion = 0;
 
   
     showAnimationSearch = false;
@@ -278,6 +279,7 @@ export class PlanComponent implements OnInit, OnDestroy {
 
   async resetPlan() {
     this.planLoading = true;
+    this.tabviewContextVersion++;
     this.workpackSrv.nextPendingChanges(false);
     try {
       this.handleCloseSearching();

@@ -42,7 +42,10 @@
   </div>
   <ng-container *ngIf="!isSearching && !planLoading">
     <div class="tabview-container">
-      <app-tabview-scrolled [tabs]="tabs" (selectedTabChange)="changeTab($event)">
+      <app-tabview-scrolled
+        [tabs]="tabs"
+        [contextVersion]="tabviewContextVersion"
+        (selectedTabChange)="changeTab($event)">
         <div tabviewBody [hidden]="selectedTab?.key !== 'dashboard'">
           <app-plan-section-dashboard
             [planId]="idPlan"
