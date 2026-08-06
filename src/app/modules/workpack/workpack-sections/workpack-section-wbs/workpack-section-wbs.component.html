@@ -18,7 +18,10 @@
       <div class="container-custom-tree container-workpackmodel"
         [class.custom-padding]="node?.workpackModelType === typeWorkpackEnum.Milestone"
         *ngIf="node.workpacks; else workpackModels">
-        <div class="tree-label">{{ node.workpackModelName }}</div>
+        <div class="tree-label tree-label-row">
+          {{ node.workpackModelName }}
+          <span *ngIf="node.workpacks?.length" class="tree-label-count">({{ node.workpacks.length }})</span>
+        </div>
         <div class="container-milestone" *ngIf="node?.workpackModelType === typeWorkpackEnum.Milestone">
           <div class="milestone-column">{{ "baselinePlanned" | translate }}</div>
           <div class="milestone-column">{{ "estimatedConcluded" | translate }}</div>
@@ -29,17 +32,13 @@
       <!-- CHILDREN -->
       <ng-template #workpackModels>
         <div class="container-custom-tree container-workpack">
-          <div class="workpack-title-box" [pTooltip]="parseTooltipTranslatedStrings(shouldDisplayWarningStyles(node).textTooltipMessages)">
-            <i
-              *ngIf="shouldDisplayWarningStyles(node).displayWarningIcon"
-              class="warning-icon fa fa-exclamation-triangle"
-              aria-hidden="true"
-            ></i>
-            <div
-              class="tree-label link"
+          <div class="workpack-title-box"
+            [pTooltip]="parseTooltipTranslatedStrings(shouldDisplayWarningStyles(node).textTooltipMessages)">
+            <i *ngIf="shouldDisplayWarningStyles(node).displayWarningIcon"
+              class="warning-icon fa fa-exclamation-triangle" aria-hidden="true"></i>
+            <div class="tree-label link"
               [ngClass]="{ 'alert-text': shouldDisplayWarningStyles(node).displayColoredText, 'dashed-text': shouldDisplayWarningStyles(node).displayDashedText }"
-              (click)="navigateToWorkpack(node)"
-            >
+              (click)="navigateToWorkpack(node)">
               {{ node.workpackName }}
             </div>
           </div>
@@ -59,10 +58,12 @@
                 </ng-container>
 
                 <div class="milestone-column">
-                  {{ node.snapshotDate ? (language === 'pt' ? (node.snapshotDate | date:'dd/MM/yyyy') : (node.snapshotDate | date:'yyyy/MM/dd')) : '--' }}
+                  {{ node.snapshotDate ? (language === 'pt' ? (node.snapshotDate | date:'dd/MM/yyyy') :
+                  (node.snapshotDate | date:'yyyy/MM/dd')) : '--' }}
                 </div>
                 <div class="milestone-column">
-                  {{ node.expirationDate ?  (language === 'pt' ? (node.expirationDate|date:'dd/MM/yyyy') : (node.expirationDate|date:'yyyy/MM/dd')) : '--' }}
+                  {{ node.expirationDate ? (language === 'pt' ? (node.expirationDate|date:'dd/MM/yyyy') :
+                  (node.expirationDate|date:'yyyy/MM/dd')) : '--' }}
                 </div>
                 <div class="milestone-column">
                   <div class="icons-container">
@@ -81,85 +82,48 @@
               </div>
             </ng-template>
             <ng-template #schedule>
-              <ng-container
-                *ngIf="node?.deliverableStatus"
-                [ngTemplateOutlet]="iconConfig"
-                [ngTemplateOutletContext]="node.deliverableStatus | workpackStatusConfig"
-              >
-                <ng-template
-                  #iconConfig
-                  let-icon="icon"
-                  let-iconOrigin="iconOrigin"
-                  let-iconSrc="iconSrc"
-                  let-iconColor="iconColor"
-                  let-tooltip="tooltipMessage"
-                >
+              <ng-container *ngIf="node?.deliverableStatus" [ngTemplateOutlet]="iconConfig"
+                [ngTemplateOutletContext]="node.deliverableStatus | workpackStatusConfig">
+                <ng-template #iconConfig let-icon="icon" let-iconOrigin="iconOrigin" let-iconSrc="iconSrc"
+                  let-iconColor="iconColor" let-tooltip="tooltipMessage">
                   <div class="status-container">
                     <ng-container *ngIf="iconOrigin === 'img' else iconTemplate">
-                      <img
-                        class="img-status-icon"
-                        [ngStyle]="{ color: iconColor || 'black' }"
-                        [src]="'../../../../../../../..' + iconSrc"
-                        [pTooltip]="tooltip"
-                      >
+                      <img class="img-status-icon" [ngStyle]="{ color: iconColor || 'black' }"
+                        [src]="'../../../../../../../..' + iconSrc" [pTooltip]="tooltip">
                     </ng-container>
 
                     <ng-template #iconTemplate>
-                      <i
-                        class="i-status-icon"
-                        [ngClass]="iconSrc"
-                        [ngStyle]="{ color: iconColor || 'black' }"
-                        [pTooltip]="tooltip"
-                      >
+                      <i class="i-status-icon" [ngClass]="iconSrc" [ngStyle]="{ color: iconColor || 'black' }"
+                        [pTooltip]="tooltip">
                       </i>
                     </ng-template>
                   </div>
                 </ng-template>
               </ng-container>
-              
+
               <div class="header-values-cost-account" *ngIf="node?.properties?.progressBars">
                 <ng-container *ngIf="shouldDisplayNewTag(node)">
                   <div class="status-container">
                     <span class="new-label">{{ "new" | translate }}</span>
                   </div>
                 </ng-container>
-                <div
-                  *ngFor="let progressBar of node.properties.progressBars"
-                  class="progress-bar-cost-container"
-                  (mouseenter)="progressBarPanel.show($event)"
-                  (mouseleave)="progressBarPanel.hide()"
-                >
-                  <app-progress-bar
-                    [total]="progressBar.total"
-                    [progress]="progressBar.progress"
-                    [labelTotal]="progressBar.labelTotal"
-                    [labelProgress]="progressBar.labelProgress"
-                    [valueUnit]="progressBar.valueUnit"
-                    [baselineTotal]="progressBar.baselinePlanned"
-                    [color]="progressBar.color"
-                    [startDateBaseline]="progressBar.startDateBaseline"
-                    [endDateBaseline]="progressBar.endDateBaseline"
-                    [startDateTotal]="progressBar.startDateTotal"
-                    [endDateTotal]="progressBar.endDateTotal"
-                    [barHeight]="progressBar.barHeight"
-                    [disableLabels]="true"
-                  >
+                <div *ngFor="let progressBar of node.properties.progressBars" class="progress-bar-cost-container"
+                  (mouseenter)="progressBarPanel.show($event)" (mouseleave)="progressBarPanel.hide()">
+                  <app-progress-bar [total]="progressBar.total" [progress]="progressBar.progress"
+                    [labelTotal]="progressBar.labelTotal" [labelProgress]="progressBar.labelProgress"
+                    [valueUnit]="progressBar.valueUnit" [baselineTotal]="progressBar.baselinePlanned"
+                    [color]="progressBar.color" [startDateBaseline]="progressBar.startDateBaseline"
+                    [endDateBaseline]="progressBar.endDateBaseline" [startDateTotal]="progressBar.startDateTotal"
+                    [endDateTotal]="progressBar.endDateTotal" [barHeight]="progressBar.barHeight"
+                    [disableLabels]="true">
                   </app-progress-bar>
                   <p-overlayPanel #progressBarPanel class="progressbar-overlay-panel">
-                    <app-progress-bar
-                      [total]="progressBar.total"
-                      [progress]="progressBar.progress"
-                      [labelTotal]="progressBar.labelTotal"
-                      [labelProgress]="progressBar.labelProgress"
-                      [valueUnit]="progressBar.valueUnit"
-                      [baselineTotal]="progressBar.baselinePlanned"
-                      [color]="progressBar.color"
-                      [startDateBaseline]="progressBar.startDateBaseline"
-                      [endDateBaseline]="progressBar.endDateBaseline"
-                      [startDateTotal]="progressBar.startDateTotal"
-                      [endDateTotal]="progressBar.endDateTotal"
-                      [barHeight]="progressBar.barHeight"
-                    >
+                    <app-progress-bar [total]="progressBar.total" [progress]="progressBar.progress"
+                      [labelTotal]="progressBar.labelTotal" [labelProgress]="progressBar.labelProgress"
+                      [valueUnit]="progressBar.valueUnit" [baselineTotal]="progressBar.baselinePlanned"
+                      [color]="progressBar.color" [startDateBaseline]="progressBar.startDateBaseline"
+                      [endDateBaseline]="progressBar.endDateBaseline" [startDateTotal]="progressBar.startDateTotal"
+                      [endDateTotal]="progressBar.endDateTotal" [barHeight]="progressBar.barHeight">
                     </app-progress-bar>
                   </p-overlayPanel>
                 </div>
@@ -174,36 +138,19 @@
   <ng-template #rightContent let-properties="node">
     <div class="right-container">
       <div class="dashboard-items-container">
-        <ng-container
-          *ngIf="properties.projectStatus"
-          [ngTemplateOutlet]="iconConfig"
-          [ngTemplateOutletContext]="properties.projectStatus | workpackStatusConfig"
-        >
-          <ng-template
-            #iconConfig
-            let-icon="icon"
-            let-iconOrigin="iconOrigin"
-            let-iconSrc="iconSrc"
-            let-iconColor="iconColor"
-            let-tooltip="tooltipMessage"
-          >
+        <ng-container *ngIf="properties.projectStatus" [ngTemplateOutlet]="iconConfig"
+          [ngTemplateOutletContext]="properties.projectStatus | workpackStatusConfig">
+          <ng-template #iconConfig let-icon="icon" let-iconOrigin="iconOrigin" let-iconSrc="iconSrc"
+            let-iconColor="iconColor" let-tooltip="tooltipMessage">
             <div class="status-container">
               <ng-container *ngIf="iconOrigin === 'img' else iconTemplate">
-                <img
-                  class="img-status-icon"
-                  [ngStyle]="{ color: iconColor || 'black' }"
-                  [src]="'../../../../../../../..' + iconSrc"
-                  [pTooltip]="tooltip"
-                >
+                <img class="img-status-icon" [ngStyle]="{ color: iconColor || 'black' }"
+                  [src]="'../../../../../../../..' + iconSrc" [pTooltip]="tooltip">
               </ng-container>
 
               <ng-template #iconTemplate>
-                <i
-                  class="i-status-icon"
-                  [ngClass]="iconSrc"
-                  [ngStyle]="{ color: iconColor || 'black' }"
-                  [pTooltip]="tooltip"
-                >
+                <i class="i-status-icon" [ngClass]="iconSrc" [ngStyle]="{ color: iconColor || 'black' }"
+                  [pTooltip]="tooltip">
                 </i>
               </ng-template>
             </div>
@@ -211,41 +158,35 @@
         </ng-container>
 
         <div class="journal-container" *ngIf="properties?.properties?.journalInformation?.date; else statusEmpty">
-          <i
-            *ngIf="!properties?.properties?.journalInformation?.actual"
-            class="fas fa-info"
-            style="cursor: pointer"
-            (click)="handleShowJournalInformation(properties.properties.journalInformation); journalInformationPanel.show($event)" 
-          >
+          <i *ngIf="!properties?.properties?.journalInformation?.actual" class="fas fa-info" style="cursor: pointer"
+            (click)="handleShowJournalInformation(properties.properties.journalInformation); journalInformationPanel.show($event)">
           </i>
-          <i
-            *ngIf="properties?.properties?.journalInformation?.actual"
-            class="fas fa-info-circle"
+          <i *ngIf="properties?.properties?.journalInformation?.actual" class="fas fa-info-circle"
             [ngStyle]="{ fontSize: '1.2rem', cursor: 'pointer' }"
-            (click)="handleShowJournalInformation(properties.properties.journalInformation); journalInformationPanel.show($event)" 
-          >
+            (click)="handleShowJournalInformation(properties.properties.journalInformation); journalInformationPanel.show($event)">
           </i>
         </div>
-        
+
         <ng-template #statusEmpty>
           <div class="status-empty"></div>
         </ng-template>
-        <p-overlayPanel #journalInformationPanel class="journal-info-overlay-panel"  [showCloseIcon]="true" [dismissable]="false">
-          <div class="journal-info-panel-content" *ngIf="properties?.properties && properties?.properties?.journalInformation">
-            
+        <p-overlayPanel #journalInformationPanel class="journal-info-overlay-panel" [showCloseIcon]="true"
+          [dismissable]="false">
+          <div class="journal-info-panel-content"
+            *ngIf="properties?.properties && properties?.properties?.journalInformation">
+
             <div class="loading-menu-container" *ngIf="properties?.properties?.journalInformation?.loading">
               <div class="menu-loading">
-                <p-progressSpinner [style]="{width: '50px', height: '50px'}"
-                  styleClass="custom-spinner" strokeWidth="8"
+                <p-progressSpinner [style]="{width: '50px', height: '50px'}" styleClass="custom-spinner" strokeWidth="8"
                   fill="#EEEEEE" animationDuration=".5s">
                 </p-progressSpinner>
               </div>
             </div>
-            <div class="card-information-container" 
-            *ngIf="properties?.properties && properties?.properties?.journalInformation 
+            <div class="card-information-container" *ngIf="properties?.properties && properties?.properties?.journalInformation 
             && properties?.properties?.journalInformation?.information
             && !properties?.properties?.journalInformation?.loading">
-              <app-card-journal-information [information]="properties?.properties?.journalInformation" ></app-card-journal-information>
+              <app-card-journal-information
+                [information]="properties?.properties?.journalInformation"></app-card-journal-information>
             </div>
           </div>
         </p-overlayPanel>
