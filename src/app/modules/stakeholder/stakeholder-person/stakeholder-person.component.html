@@ -176,12 +176,25 @@
                 </label>
               </span>
               <app-input-message [form]="stakeholderForm" field="contactEmail"></app-input-message>
+            </div>  
+       
+                <div class="p-field">
+              <span class="p-float-label">
+                <p-autoComplete class="app-autocomplete" [(ngModel)]="selectedOrganization"
+                                [ngModelOptions]="{standalone: true}"
+                                [suggestions]="resultOrganizationsByName" [delay]="500" field="name"
+                                [forceSelection]="true"
+                                (completeMethod)="searchOrganizationByName($event)"
+                                (ngModelChange)="handleShowSaveButton()"
+                                (onClear)="selectedOrganization = $any(null)"></p-autoComplete>
+                <label class="app-input-label" for="float-organization">{{"organization" | translate}}</label>
+              </span>
             </div>
+          
           </div>
         </form>
-      </div>
-    </app-card>
-  </div>
+    
+
   <div class="card-roles" *ngIf="showFormPerson()">
     <app-card [properties]="cardRoles" *ngIf="cardRoles && stakeholderRolesCardItems && stakeholderRolesCardItems.length > 0">
       <div class="card-item-roles-container">

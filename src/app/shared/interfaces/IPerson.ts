@@ -1,4 +1,5 @@
 import {IFile} from './IFile';
+import { IOrganization } from './IOrganization';
 
 export interface IPerson {
   id?: number;
@@ -18,6 +19,7 @@ export interface IPerson {
   avatar?: IFile;
   isCcbMember?: boolean;
   workLocal?: IWorkLocal;
+  organization?: IOrganization;   ///add
 }
 
 export interface IWorkLocal {
