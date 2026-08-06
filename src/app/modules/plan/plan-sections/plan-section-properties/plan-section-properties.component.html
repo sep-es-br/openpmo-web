@@ -48,7 +48,7 @@
             <span class="p-float-label" [class.responsive]="responsive">
               <p-calendar id="float-finish" formControlName="finish" class="app-select-date" [showIcon]="true"
                 [monthNavigator]="true" [yearNavigator]="true" [yearRange]="yearRange" [class.responsive]="responsive"
-                icon="fas fa-calendar-alt" [dateFormat]="calendarFormat">
+                icon="fas fa-calendar-alt" [dateFormat]="calendarFormat" [minDate]="form.get('start')?.value">
               </p-calendar>
               <label class="app-input-label" for="float-finish">{{ "finish" | translate }} *
                 <i class="far fa-question-circle" [pTooltip]="'help.plan.finish' | translate"></i>
