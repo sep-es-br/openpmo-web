@@ -1,0 +1,48 @@
+@use "../../../workpack/workpack-sections/workpack-section-properties/workpack-section-properties.component";
+
+.card-properties-plan {
+  width: 100%;
+
+  form {
+    width: 100%;
+  }
+
+  .loading-container {
+    position: relative;
+    min-height: 150px;
+  }
+
+  .loading-form-container {
+    position: absolute;
+    z-index: 10000;
+    top: 0;
+    left: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    min-height: 150px;
+    background-color: rgba(208, 216, 217, 0.4);
+  }
+}
+
+::ng-deep .card-properties-plan {
+  .p-panel {
+    margin-top: 0 !important;
+  }
+
+  form {
+    .p-field.responsive {
+      margin-right: 0 !important;
+    }
+
+    .responsive {
+      width: 100% !important;
+
+      .p-calendar {
+        width: 100%;
+      }
+    }
+  }
+}

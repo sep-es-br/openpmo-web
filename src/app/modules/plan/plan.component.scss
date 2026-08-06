@@ -1,4 +1,5 @@
 @use "src/variables" as v;
+@use "../workpack/workpack.component";
 
 .app-plan {
   width: 100%;
@@ -42,25 +43,29 @@
   .header-container {
     display: flex;
     flex-direction: row;
+    margin-bottom: 1em;
 
-    .dataview-filters-text {
-        align-self: flex-end;
+    .container-actions {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+
+      .dataview-filters-text {
         margin-right: 0.5em;
-        margin-bottom: 0.5em;
         height: 2rem;
         display: flex;
         justify-content: flex-end;
         position: relative;
+        width: 100%;
 
         .app-input-text.p-inputtext {
           font-size: 0.8rem !important;
           width: 0 !important;
+          max-width: 25em;
           border-bottom: none !important;
           transition: width .3s;
-          margin-left: 2rem;
           &.animation-input {
-            width: 20rem !important;
-            margin-left: 0.5rem !important;
+            width: 100% !important;
             border-bottom: 1px solid #828f92 !important;
           }
 
@@ -100,12 +105,19 @@
           }
         }
       }
+    }
   }
   .app-content-header {
     display: flex;
     justify-content: flex-start;
-    align-items: flex-end;
+    align-items: center;
     flex: 1;
+    border-bottom: 1px solid #d4d4d4;
+  }
+  .actual-element {
+    color: #44b39b;
+    font-style: italic;
+    font-weight: bold;
   }
   .header-container.mobile {
     flex-direction: column;
@@ -113,6 +125,25 @@
   .mobile {
     width: 100%;
   }
+
+  .tabview-container {
+    background-color: transparent;
+  }
+
+  .search-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.3rem;
+
+    .app-dataview {
+      width: 100%;
+    }
+  }
+}
+
+::ng-deep .app-plan .panel-tab-view .p-panel {
+  margin-top: 0 !important;
 }
 
 
