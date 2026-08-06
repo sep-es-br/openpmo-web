@@ -130,7 +130,7 @@ export class ControlChangeBoardListComponent implements OnInit, OnDestroy {
         }
       }
     }
-    
+
   }
 
   handleChangeDisplayMode(event) {
@@ -143,6 +143,20 @@ export class ControlChangeBoardListComponent implements OnInit, OnDestroy {
 
   async loadControlChangeBoard() {
     const { success, data } = await this.controlChangeBoardSvr.getAllCcbMembers(this.idProject);
+
+
+    const mapIdWorkpackName: {[index: number]: string} = {};
+
+        for (const idWorkpack of data.map(ccb => ccb.idWorkpack)) {
+          const {success, data} = await this.workpackSrv.GetWorkpackById(idWorkpack);
+          if (success) {
+            mapIdWorkpackName[idWorkpack] = data.name;
+          } else {
+            mapIdWorkpackName[idWorkpack] = 'ERROR';
+          }
+
+        }
+
     const itemsProperties: ICardItem[] = this.editPermission ? [
       {
         typeCardItem: 'newCardItem',
@@ -163,14 +177,17 @@ export class ControlChangeBoardListComponent implements OnInit, OnDestroy {
         icon: IconsEnum.CCBMember,
         nameCardItem: controlChangeBoard.person.name,
         fullNameCardItem: controlChangeBoard.person.fullName,
-        roles: controlChangeBoard?.memberAs?.
+        roles:
+          this.idProject === controlChangeBoard.idWorkpack
+        ? controlChangeBoard?.memberAs?.
           filter(ccb => ccb.active).
-          map(ccb => `${ccb.workLocation || ''} ${this.translateSvr.instant(ccb.role)}`),
+          map(ccb => `${ccb.workLocation || ''} ${this.translateSvr.instant(ccb.role)}`)
+        : [mapIdWorkpackName[controlChangeBoard.idWorkpack]],
         itemId: controlChangeBoard.person.id,
         menuItems: [{
           label: this.translateSvr.instant('delete'), icon: 'fas fa-trash-alt',
           command: () => this.deleteControlChangeBoard(controlChangeBoard, controlChangeBoard.person.id),
-          disabled: !this.editPermission
+          disabled: !this.editPermission || this.idProject !== controlChangeBoard.idWorkpack
         }] as MenuItem[],
         urlCard: 'member',
         idAtributeName: 'idMember',
@@ -179,7 +196,8 @@ export class ControlChangeBoardListComponent implements OnInit, OnDestroy {
           { name: 'idPerson', value: controlChangeBoard.person.id },
           { name: 'idOffice', value: this.idOffice },
         ],
-        active: controlChangeBoard.active
+        active: controlChangeBoard.active,
+        disabled: this.idProject !== controlChangeBoard.idWorkpack,
       } as ICardItem)));
       this.isLoading = false;
     } else {

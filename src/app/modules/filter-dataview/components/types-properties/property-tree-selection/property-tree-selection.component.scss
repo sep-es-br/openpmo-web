@@ -12,7 +12,7 @@
   .app-tree-selection.single-selection {
     .p-tree-container .p-treenode .p-treenode-content.p-highlight {
       background: transparent;
-      border: solid 1px #44B39B;
+      border: solid 1px v.$bgButtonSubmit;
     }
   }
   .button-select-locality-container {
@@ -20,7 +20,7 @@
     flex-direction: column;
     width: 250px;
     .p-button {
-      background-color: #44B39B;
+      background-color: v.$bgButtonSubmit;
       border: none !important;
       margin: 0.5em 0 0;
       width: 100%;
@@ -33,7 +33,7 @@
 
   .p-treenode.green-node {
     .p-treenode-content .p-treenode-label {
-      color: #44B39B !important ;
+      color: v.$fontAccent !important ;
       font-weight: bold;
     }
    }

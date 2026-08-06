@@ -6,4 +6,5 @@ export interface IAppConfig {
     'en-US': string;
     'pt-BR': string;
   };
+  theme?: string;
 }

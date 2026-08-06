@@ -51,7 +51,7 @@
     }
 
     .progress-bar-total-container {
-      border: 1px solid #004660;
+      border: 1px solid v.$fontTitle;
     }
 
     .progress-bar-progress-container {
@@ -63,7 +63,7 @@
     }
 
     .total-bar {
-      border: 1px solid #004660;
+      border: 1px solid v.$fontTitle;
       height: 100%;
     }
   }

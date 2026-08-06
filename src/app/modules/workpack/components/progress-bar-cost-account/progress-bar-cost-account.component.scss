@@ -56,7 +56,7 @@
       flex-direction: row;
     }
     .progress-bar-total-container {
-      border: 1px solid #004660;
+      border: 1px solid v.$fontTitle;
       display: flex;
       flex-direction: row;
     }
@@ -72,7 +72,7 @@
     }
 
     .total-bar {
-      border: 1px solid #004660;
+      border: 1px solid v.$fontTitle;
       height: 100%;
     }
   }
