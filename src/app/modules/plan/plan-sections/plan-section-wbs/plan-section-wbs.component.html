@@ -18,7 +18,10 @@
       <div class="container-custom-tree container-workpackmodel"
         [class.custom-padding]="node?.workpackModelType === typeWorkpackEnum.Milestone"
         *ngIf="node.workpacks; else workpackModels">
-        <div class="tree-label">{{ node.workpackModelName }}</div>
+        <div class="tree-label tree-label-row">
+          {{ node.workpackModelName }}
+          <span *ngIf="node.workpacks?.length" class="tree-label-count">({{ node.workpacks.length }})</span>
+        </div>
         <div class="container-milestone" *ngIf="node?.workpackModelType === typeWorkpackEnum.Milestone">
           <div class="milestone-column">{{ "baselinePlanned" | translate }}</div>
           <div class="milestone-column">{{ "estimatedConcluded" | translate }}</div>

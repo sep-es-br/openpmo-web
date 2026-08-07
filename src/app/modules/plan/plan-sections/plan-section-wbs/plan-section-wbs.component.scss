@@ -152,8 +152,10 @@
       font-size: 14px;
       text-transform: uppercase;
       display: flex;
-      flex-direction: column;
       justify-content: center;
+    }
+    .tree-label-count {
+      margin-left: 4px;
     }
 
     .container-milestone {
