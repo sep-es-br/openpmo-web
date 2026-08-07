@@ -948,7 +948,7 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
 
   handleOnCancel() {
     this.saveButton.hideButton();
-    if (this.idPerson) {
+    if (this.idPerson || this.stakeholder) {
       const stakeholderRolesBk = localStorage.getItem('@pmo/stakeholderRolesBk');
       this.stakeholderRoles = JSON.parse(stakeholderRolesBk);
       this.setStakeholderForm();
