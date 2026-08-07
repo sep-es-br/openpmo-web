@@ -168,6 +168,7 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
     await this.getAuthServer();
     this.isUserAdmin = await this.authSrv.isUserAdmin();
     await this.loadWorkpack();
+    await this.loadOrganizations();
     await this.loadStakeholder();
     this.setBreadcrumb();
   }
@@ -964,18 +965,18 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
     }
   }
 
-  //add
-async searchOrganizationByName(event) {
-  this.isLoading = true;
-  const result = await this.organizationSrv.GetAll({
-    'id-office': this.idOffice,
-    term: event.query.toString()
-  });
-  this.isLoading = false;
-  if (result.success) {
-    this.resultOrganizationsByName = result.data;
+  async loadOrganizations() {
+    this.isLoading = true;
+    try {
+      const result = await this.organizationSrv.GetAll({
+        'id-office': this.idOffice
+      });
+      this.resultOrganizationsByName = result.success && result.data
+        ? result.data
+        : [];
+    } finally {
+      this.isLoading = false;
+    }
   }
-}
-
 
 }

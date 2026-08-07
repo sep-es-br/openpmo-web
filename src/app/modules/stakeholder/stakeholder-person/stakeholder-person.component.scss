@@ -390,6 +390,14 @@
         width: 30%;
       }
 
+      .organization-selection {
+        width: 20%;
+      }
+
+      .organization-selection.responsive {
+        width: 100%;
+      }
+
       .app-input-mask.short-input {
         .p-inputmask.p-inputtext {
           width: 20%;
