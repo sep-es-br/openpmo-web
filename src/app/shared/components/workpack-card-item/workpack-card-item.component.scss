@@ -37,7 +37,7 @@
         width: -webkit-fill-available;
         top: 20px;
         text-align: center;
-      
+
         .custom-spinner .p-progress-spinner-circle {
           animation: custom-progress-spinner-dash 1.5s ease-in-out infinite, custom-progress-spinner-color 6s ease-in-out infinite;
         }
@@ -447,7 +447,7 @@
                 padding: 5px 1em 5px 0;
             }
           }
-          
+
           .triple-constraint-container {
             width: 25%;
             justify-content: space-between;
@@ -472,6 +472,25 @@
         flex-direction: row !important;
         align-items: center;
         justify-content: flex-end;
+        gap: 5px;
+        > i {
+          display: inline-flex;
+          flex: 0 0 16px;
+          align-items: center;
+          justify-content: center;
+          width: 16px;
+          min-width: 16px;
+          max-width: 16px;
+          height: 14px;
+          font-size: 0.9rem;
+          line-height: 1;
+
+          &::before {
+            display: block;
+            width: 16px;
+            text-align: center;
+          }
+        }
         // padding: 0 5px 0 10px !important;
       }
     }
