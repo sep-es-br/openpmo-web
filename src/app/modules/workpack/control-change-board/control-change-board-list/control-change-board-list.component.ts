@@ -156,7 +156,6 @@ export class ControlChangeBoardListComponent implements OnInit, OnDestroy {
           }
 
         }
-
     const itemsProperties: ICardItem[] = this.editPermission ? [
       {
         typeCardItem: 'newCardItem',
@@ -171,6 +170,7 @@ export class ControlChangeBoardListComponent implements OnInit, OnDestroy {
       }
     ] : [];
     if (success) {
+
       itemsProperties.unshift(...data.map(controlChangeBoard => ({
         typeCardItem: 'listControlChangeBoard',
         iconSvg: true,
@@ -192,7 +192,7 @@ export class ControlChangeBoardListComponent implements OnInit, OnDestroy {
         urlCard: 'member',
         idAtributeName: 'idMember',
         paramsUrlCard: [
-          { name: 'idProject', value: this.idProject },
+          { name: 'idProject', value: controlChangeBoard.idWorkpack },
           { name: 'idPerson', value: controlChangeBoard.person.id },
           { name: 'idOffice', value: this.idOffice },
         ],

@@ -1,0 +1,40 @@
+@use "../../../workpack/workpack-sections/workpack-section-dashboard/workpack-section-dashboard.component";
+
+::ng-deep .app-plan-dashboard {
+  .charts-container {
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .triple-constraint-container,
+  .risk-milestone-charts-container {
+    flex: 1 1 650px;
+    width: auto !important;
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .risk-milestone-charts-container {
+    flex-wrap: wrap;
+    gap: 1rem 0;
+  }
+
+  .dashboard-item {
+    flex: 1 1 215px;
+    width: auto !important;
+    min-width: 215px;
+    max-width: 100%;
+  }
+
+  .empty-dashboard {
+    padding: 2rem;
+    text-align: center;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  ::ng-deep .app-plan-dashboard .dashboard-item {
+    width: 100% !important;
+    min-width: 0;
+  }
+}
