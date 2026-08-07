@@ -168,6 +168,7 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
     await this.getAuthServer();
     this.isUserAdmin = await this.authSrv.isUserAdmin();
     await this.loadWorkpack();
+    await this.loadOrganizations();
     await this.loadStakeholder();
     this.setBreadcrumb();
   }
@@ -222,7 +223,10 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
 
   async loadWorkpack() {
     const workpackData = this.workpackSrv.getWorkpackData();
-    if (workpackData && workpackData.workpack && workpackData.workpack.id === this.idWorkpack && workpackData.workpackModel) {
+    const cachedPermissionsAreAvailable = this.isUserAdmin
+      || Array.isArray(workpackData?.workpack?.permissions);
+    if (workpackData && workpackData.workpack && workpackData.workpack.id === this.idWorkpack
+      && workpackData.workpackModel && cachedPermissionsAreAvailable) {
       this.workpack = workpackData.workpack;
       this.personRolesOptions = workpackData.workpackModel.personRoles?.map(role => ({
         label: role,
@@ -483,9 +487,9 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
           };
         });
       localStorage.setItem('@pmo/stakeholderRolesBk', JSON.stringify(this.stakeholderRolesBk));
-      if (!this.editPermission) {
-        this.stakeholderForm.disable();
-      }
+      this.editPermission
+        ? this.stakeholderForm.enable()
+        : this.stakeholderForm.disable();
       if (!this.isUserAdmin && this.idPerson === Number(this.authSrv.getIdPerson() )) {
         this.isSamePerson = true;
       }
@@ -579,8 +583,7 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
       this.isLoading = true;
       const result = await this.citizenUserSrv.GetCitizenUserByCpf({
         cpf: this.searchedCpfUser,
-        idOffice: this.idOffice,
-        loadWorkLocation: false
+        idOffice: this.idOffice
       });
 
       this.isLoading = false;
@@ -601,7 +604,8 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
             const stakeholderPerson = this.stakeholder?.person;
             this.person = {
               ...stakeholderPerson,
-              contactEmail: stakeholderPerson?.contactEmail || result.data?.contactEmail
+              contactEmail: stakeholderPerson?.contactEmail || result.data?.contactEmail,
+              organization: stakeholderPerson?.organization || result.data?.organization
             };
             this.stakeholder.person = this.person;
             this.user = this.person.isUser;
@@ -677,8 +681,7 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
     const publicServer = event.value;
 
     const result = await this.citizenUserSrv.GetPublicServer(publicServer.sub, {
-      idOffice: this.idOffice,
-      loadWorkLocation: false
+      idOffice: this.idOffice
     });
 
     this.isLoading = false;
@@ -709,7 +712,8 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
           const stakeholderPerson = this.stakeholder?.person;
           this.person = {
             ...stakeholderPerson,
-            contactEmail: stakeholderPerson?.contactEmail || result.data?.contactEmail
+            contactEmail: stakeholderPerson?.contactEmail || result.data?.contactEmail,
+            organization: stakeholderPerson?.organization || result.data?.organization
           };
           this.stakeholder.person = this.person;
           this.user = this.person.isUser;
@@ -944,7 +948,7 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
 
   handleOnCancel() {
     this.saveButton.hideButton();
-    if (this.idPerson) {
+    if (this.idPerson || this.stakeholder) {
       const stakeholderRolesBk = localStorage.getItem('@pmo/stakeholderRolesBk');
       this.stakeholderRoles = JSON.parse(stakeholderRolesBk);
       this.setStakeholderForm();
@@ -961,18 +965,18 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
     }
   }
 
-  //add
-async searchOrganizationByName(event) {
-  this.isLoading = true;
-  const result = await this.organizationSrv.GetAll({
-    'id-office': this.idOffice,
-    term: event.query.toString()
-  });
-  this.isLoading = false;
-  if (result.success) {
-    this.resultOrganizationsByName = result.data;
+  async loadOrganizations() {
+    this.isLoading = true;
+    try {
+      const result = await this.organizationSrv.GetAll({
+        'id-office': this.idOffice
+      });
+      this.resultOrganizationsByName = result.success && result.data
+        ? result.data
+        : [];
+    } finally {
+      this.isLoading = false;
+    }
   }
-}
-
 
 }
