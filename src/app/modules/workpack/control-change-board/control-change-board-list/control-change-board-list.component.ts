@@ -187,7 +187,7 @@ export class ControlChangeBoardListComponent implements OnInit, OnDestroy {
         menuItems: [{
           label: this.translateSvr.instant('delete'), icon: 'fas fa-trash-alt',
           command: () => this.deleteControlChangeBoard(controlChangeBoard, controlChangeBoard.person.id),
-          disabled: !this.editPermission
+          disabled: !this.editPermission || this.idProject !== controlChangeBoard.idWorkpack
         }] as MenuItem[],
         urlCard: 'member',
         idAtributeName: 'idMember',

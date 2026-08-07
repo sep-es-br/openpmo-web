@@ -1,6 +1,8 @@
 /* You can add global styles to this file, and also import other style files */
+@use 'src/themes/tokens';
 @use 'src/variables' as v;
 @use 'src/assets/scss/bootstrap-5.3.8/bootstrap-grid';
+@use 'src/themes/primeng-overrides';
 
 :root {
   --font-family: v.$fontFamilyMedium !important;
@@ -9,7 +11,7 @@ body {
   font-family: v.$fontFamilyMedium;
   min-height: 100vh;
   height: 100%;
-  background-color: #EAEAE8;
+  background-color: v.$bg;
   margin: 0;
 }
 
@@ -63,7 +65,7 @@ body {
   padding: 0.5em;
   font-size: 0.8rem;
   font-family: "Montserrat Medium", "Montserrat Regular", "Montserrat", sans-serif !important;
-  color: #004660;
+  color: v.$fontTitle;
 }
 
 app-card {
@@ -407,14 +409,14 @@ div[class^='card-properties'] app-card .p-panel {
     box-shadow: none;
   }
   .p-calendar-w-btn .p-button {
-    color: #004660;
+    color: v.$fontTitle;
     background-color: transparent;
     border: none;
     border-bottom: 1px solid v.$borderInput;
     border-radius: 0;
   }
   .p-calendar-w-btn .p-button:hover {
-    color: #004660;
+    color: v.$fontTitle;
     background-color: transparent;
     border: none;
     border-bottom: 1px solid v.$borderInput;
@@ -431,10 +433,10 @@ div[class^='card-properties'] app-card .p-panel {
     align-content: center;
   }
   .p-inputswitch.p-focus .p-inputswitch-slider {
-    box-shadow: 0 0 0 0.1rem #44B39B;
+    box-shadow: 0 0 0 0.1rem v.$bgButtonSubmit;
   }
   .p-inputswitch-checked .p-inputswitch-slider{
-    background-color: #44B39B !important;
+    background-color: v.$bgButtonSubmit !important;
   }
   .p-inputswitch .p-inputswitch-slider {
     align-content: center;
@@ -487,15 +489,15 @@ div[class^='card-properties'] app-card .p-panel {
       background: transparent;
     }
     .p-checkbox:not(.p-checkbox-disabled) .p-checkbox-box.p-highlight {
-      border: #44B39B;
-      background: #44B39B;
+      border: v.$bgButtonSubmit;
+      background: v.$bgButtonSubmit;
     }
     .p-checkbox:not(.p-checkbox-disabled) .p-checkbox-box.p-highlight:hover {
-      border-color: #44B39B;
-      background: #44B39B;
+      border-color: v.$bgButtonSubmit;
+      background: v.$bgButtonSubmit;
     }
     .p-checkbox:not(.p-checkbox-disabled) .p-checkbox-box:hover {
-      border-color: #44B39B;
+      border-color: v.$bgButtonSubmit;
     }
     .p-tree-container .p-treenode .p-treenode-content .p-tree-toggler:focus {
       box-shadow: none;
@@ -534,7 +536,7 @@ div[class^='card-properties'] app-card .p-panel {
     font-family: v.$fontFamilyMedium;
     color: v.$fontInput;
     .p-dropdown-item.p-highlight {
-      background-color: #44B39B;
+      background-color: v.$bgButtonSubmit;
       color: #ffffff;
     }
   }
@@ -542,7 +544,7 @@ div[class^='card-properties'] app-card .p-panel {
     justify-content: flex-end;
   }
   .p-dropdown-trigger-icon {
-    color: #004660;
+    color: v.$fontTitle;
     font-size: 1rem;
   }
 }
@@ -580,7 +582,7 @@ div[class^='card-properties'] app-card .p-panel {
     justify-content: flex-end;
   }
   .p-multiselect-trigger-icon {
-    color: #004660;
+    color: v.$fontTitle;
     font-size: 0.8rem;
   }
   .p-multiselect-panel .p-multiselect-items {
@@ -602,15 +604,15 @@ div[class^='card-properties'] app-card .p-panel {
     }
   }
   .p-checkbox:not(.p-checkbox-disabled) .p-checkbox-box.p-highlight {
-    border: #44B39B;
-    background: #44B39B;
+    border: v.$bgButtonSubmit;
+    background: v.$bgButtonSubmit;
   }
   .p-checkbox:not(.p-checkbox-disabled) .p-checkbox-box.p-highlight:hover {
-    border-color: #44B39B;
-    background: #44B39B;
+    border-color: v.$bgButtonSubmit;
+    background: v.$bgButtonSubmit;
   }
   .p-checkbox:not(.p-checkbox-disabled) .p-checkbox-box:hover {
-    border-color: #44B39B;
+    border-color: v.$bgButtonSubmit;
   }
 }
 
@@ -688,15 +690,15 @@ div[class^='card-properties'] app-card .p-panel {
 // Component checkbox
 .app-checkbox {
   .p-checkbox:not(.p-checkbox-disabled) .p-checkbox-box.p-highlight {
-    border-color: #44B39B;
-    background: #44B39B;
+    border-color: v.$bgButtonSubmit;
+    background: v.$bgButtonSubmit;
   }
   .p-checkbox:not(.p-checkbox-disabled) .p-checkbox-box.p-highlight:hover {
-    border-color: #44B39B;
-    background: #44B39B;
+    border-color: v.$bgButtonSubmit;
+    background: v.$bgButtonSubmit;
   }
   .p-checkbox:not(.p-checkbox-disabled) .p-checkbox-box:hover {
-    border-color: #44B39B;
+    border-color: v.$bgButtonSubmit;
   }
   .p-checkbox:not(.p-checkbox-disabled) .p-checkbox-box.p-focus {
     border-color: #13bc75aa; // TODO: FIND BRIGHTER COLOR
@@ -707,7 +709,7 @@ div[class^='card-properties'] app-card .p-panel {
 // component button
 .app-button-green {
   .p-button {
-    background-color: #44b39b !important;
+    background-color: v.$bgButtonSubmit !important;
     border: none;
   }
 }

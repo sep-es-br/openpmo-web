@@ -63,14 +63,14 @@
     .fa-search {
       padding: 5px;
       margin-left: -1.5em;
-      color: #004660;
+      color: v.$fontTitle;
       font-size: 1rem;
       cursor: pointer;
     }
   }
   .p-treenode.green-node {
    .p-treenode-content .p-treenode-label {
-     color: #44B39B !important ;
+     color: v.$fontAccent !important ;
      font-weight: bold;
    }
   }

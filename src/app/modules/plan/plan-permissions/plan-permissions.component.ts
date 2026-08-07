@@ -386,6 +386,7 @@ export class PlanPermissionsComponent implements OnInit, OnDestroy {
           name,
           fullName: name,
           email: this.searchedEmailPerson,
+          key: this.searchedEmailPerson,
           roles: [ {role: 'citizen'} ]
         };
       }

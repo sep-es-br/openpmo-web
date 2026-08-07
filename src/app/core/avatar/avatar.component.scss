@@ -1,3 +1,4 @@
+@use 'src/variables' as v;
 ::ng-deep .app-avatar {
   .avatar {
     cursor: pointer;
@@ -55,7 +56,7 @@
     }
   }
  .p-fileupload-buttonbar .p-button {
-    background-color: #44b39b !important;
+    background-color: v.$bgButtonSubmit !important;
     border: none;
   }
   .p-fileupload-available {
@@ -75,11 +76,11 @@
     .p-button {
       margin-left: 1rem;
       &.save {
-        background-color: #44b39b !important;
+        background-color: v.$bgButtonSubmit !important;
         border: none;
       }
       &.cancel {
-        background-color: #a7074b !important;
+        background-color: v.$bgMenuOffice !important;
         border: none;
       }
     }

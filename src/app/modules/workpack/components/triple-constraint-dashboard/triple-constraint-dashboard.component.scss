@@ -27,10 +27,10 @@
         background-color: #B5B5B5;
       }
       .subtitle-box-actual {
-        background-color: #0083BB;
+        background-color: v.$fontBlue;
       }
       .subtitle-box-foreseen {
-        background-color: #44B39B;
+        background-color: v.$bgApproved;
       }
       .subtitle-label-planned {
         color: #B5B5B5;
@@ -81,7 +81,7 @@
             font-weight: 700;
             font-style: normal;
             font-size: 1rem;
-            color: #004660;
+            color: v.$fontTitle;
             > i {
               font-size: 1.5rem;
             }
@@ -102,7 +102,7 @@
             color: #EA5C5C;
           }
           .positive-variation {
-            color: #44B39B;
+            color: v.$fontApproved;
           }
           .not-variation {
             color: #fafaf9;
@@ -159,7 +159,7 @@
           .proposed {
             margin-top: 0.5em;
             label {
-              color: #0083BB !important;
+              color: v.$fontBlue !important;
             }
           }
           .content-card-item-schedule {
