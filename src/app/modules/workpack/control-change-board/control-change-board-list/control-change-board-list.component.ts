@@ -48,6 +48,8 @@ export class ControlChangeBoardListComponent implements OnInit, OnDestroy {
   isLoading = false;
   modelName: string;
 
+  mapIdWorkpackName: {[index: number]: string} = {};
+
   constructor(
     private controlChangeBoardSvr: ControlChangeBoardService,
     private translateSvr: TranslateService,
@@ -144,15 +146,14 @@ export class ControlChangeBoardListComponent implements OnInit, OnDestroy {
   async loadControlChangeBoard() {
     const { success, data } = await this.controlChangeBoardSvr.getAllCcbMembers(this.idProject);
 
-
-    const mapIdWorkpackName: {[index: number]: string} = {};
+    this.mapIdWorkpackName = {};
 
         for (const idWorkpack of data.map(ccb => ccb.idWorkpack)) {
           const {success, data} = await this.workpackSrv.GetWorkpackById(idWorkpack);
           if (success) {
-            mapIdWorkpackName[idWorkpack] = data.name;
+            this.mapIdWorkpackName[idWorkpack] = data.name;
           } else {
-            mapIdWorkpackName[idWorkpack] = 'ERROR';
+            this.mapIdWorkpackName[idWorkpack] = 'ERROR';
           }
 
         }
@@ -182,8 +183,8 @@ export class ControlChangeBoardListComponent implements OnInit, OnDestroy {
         ? controlChangeBoard?.memberAs?.
           filter(ccb => ccb.active).
           map(ccb => `${ccb.workLocation || ''} ${this.translateSvr.instant(ccb.role)}`)
-        : [mapIdWorkpackName[controlChangeBoard.idWorkpack]],
-        itemId: controlChangeBoard.person.id,
+        : [this.mapIdWorkpackName[controlChangeBoard.idWorkpack]],
+        itemId: Number(controlChangeBoard.person.id + controlChangeBoard.idWorkpack),
         menuItems: [{
           label: this.translateSvr.instant('delete'), icon: 'fas fa-trash-alt',
           command: () => this.deleteControlChangeBoard(controlChangeBoard, controlChangeBoard.person.id),
@@ -214,7 +215,9 @@ export class ControlChangeBoardListComponent implements OnInit, OnDestroy {
       'id-workpack': this.idProject,
     });
     if (success) {
-      this.cardItemsProperties = Array.from(this.cardItemsProperties.filter(element => element.itemId !== controlChangeBoard.person.id));
+      this.cardItemsProperties = Array.from(this.cardItemsProperties
+        .filter(element => element.itemId !== Number(controlChangeBoard.person.id + controlChangeBoard.idWorkpack)));
+
       this.totalRecords = this.cardItemsProperties && this.cardItemsProperties.length;
     }
   };
