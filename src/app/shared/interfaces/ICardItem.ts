@@ -42,5 +42,6 @@ export interface ICardItem {
   onClick?;
   file?: File;
   isUser?: boolean;
+  disabled?: boolean;
 }
 

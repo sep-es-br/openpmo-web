@@ -1,23 +1,26 @@
-import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import { Component, OnDestroy, OnInit, Output, EventEmitter } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { MenuItem } from 'primeng/api';
 import { IPerson } from 'src/app/shared/interfaces/IPerson';
 import { AuthService } from 'src/app/shared/services/auth.service';
 import { MenuService } from 'src/app/shared/services/menu.service';
 import { TranslateChangeService } from 'src/app/shared/services/translate-change.service';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-user-slide-menu',
   templateUrl: './user-slide-menu.component.html',
   styleUrls: ['./user-slide-menu.component.scss']
 })
-export class UserSlideMenuComponent implements OnInit {
+export class UserSlideMenuComponent implements OnInit, OnDestroy {
 
   @Output() onCloseUserMenu = new EventEmitter();
   isUserAdmin = false;
   currentUserInfo: IPerson;
   itemsLanguages: MenuItem[] = [];
   username = '';
+  private $destroy = new Subject<void>();
 
   constructor(
     public authSrv: AuthService,
@@ -28,6 +31,14 @@ export class UserSlideMenuComponent implements OnInit {
     if (this.currentUserInfo) {
       this.isUserAdmin = this.currentUserInfo.administrator;
     }
+    this.authSrv.infoPersonChanged$
+      .pipe(takeUntil(this.$destroy))
+      .subscribe(infoPerson => {
+        if (infoPerson) {
+          this.currentUserInfo = infoPerson;
+          this.isUserAdmin = infoPerson.administrator;
+        }
+      });
     this.loadItemsLanguage();
   }
 
@@ -79,6 +90,11 @@ export class UserSlideMenuComponent implements OnInit {
 
   closeUserMenu() {
     this.onCloseUserMenu.emit();
+  }
+
+  ngOnDestroy() {
+    this.$destroy.next();
+    this.$destroy.complete();
   }
 
 }

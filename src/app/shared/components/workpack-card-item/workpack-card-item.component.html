@@ -239,8 +239,6 @@
               [class.linked]="!!properties.linked || !!properties.shared" [ngStyle]="{ fontSize: '1.5rem' }"></i>
             <i [ngClass]="['app-icon', 'link-to', 'grey-icon', 'linked']" *ngIf="!!properties.linked"
               [ngStyle]="{ marginLeft: '5px' }"></i>
-            <i [ngClass]="['app-icon', 'sharing', 'grey-icon', 'linked']" [ngStyle]="{ marginLeft: '5px' }"
-              *ngIf="!!properties.shared && !properties.linked"></i>
           </div>
           <span class="card-item-name" [pTooltip]="properties.fullNameCardItem"
             tooltipPosition="bottom">{{properties.nameCardItem}}</span>
@@ -448,6 +446,8 @@
             </div>
           </p-header>
           <div class="footer-info">
+            <i [ngClass]="['app-icon', 'sharing', 'grey-icon', 'linked']"
+              *ngIf="!!properties.shared && !properties.linked"></i>
             <i class="app-icon baseline" *ngIf="!!properties?.hasBaseline" [pTooltip]="properties?.baselineName"></i>
             <span class="card-item-id">
               {{cardIdItem}}

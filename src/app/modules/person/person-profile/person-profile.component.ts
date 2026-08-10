@@ -16,6 +16,7 @@ import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
 import { MinLengthTextCustomValidator } from 'src/app/shared/utils/minLengthTextValidator';
 import { SetConfigWorkpackService } from 'src/app/shared/services/set-config-workpack.service';
 import { CancelButtonComponent } from 'src/app/shared/components/cancel-button/cancel-button.component';
+import { OrganizationService } from 'src/app/shared/services/organization.service';
 
 @Component({
   selector: 'app-person-profile',
@@ -39,6 +40,7 @@ export class PersonProfileComponent implements OnInit, OnDestroy {
   $destroy = new Subject();
   isUserAdmin: boolean;
   optionsOffices: SelectItem[] = [];
+  optionsOrganizations: SelectItem[] = [];
   propertiesPerson: IPerson;
   formPerson: FormGroup;
   phoneNumberPlaceholder = '';
@@ -60,7 +62,8 @@ export class PersonProfileComponent implements OnInit, OnDestroy {
     private translateSrv: TranslateService,
     private messageSrv: MessageService,
     private breadcrumbSrv: BreadcrumbService,
-    private setConfigWorkpackSrv: SetConfigWorkpackService
+    private setConfigWorkpackSrv: SetConfigWorkpackService,
+    private organizationSrv: OrganizationService
   ) {
     this.formPerson = this.formBuilder.group({
       name: ['', [Validators.required, MinLengthTextCustomValidator.minLengthText]],
@@ -68,6 +71,7 @@ export class PersonProfileComponent implements OnInit, OnDestroy {
       contactEmail: ['', Validators.email],
       phoneNumber: [''],
       address: [''],
+      idOrganization: [null],
       unify: [false]
     });
     this.formPerson.statusChanges
@@ -144,6 +148,7 @@ export class PersonProfileComponent implements OnInit, OnDestroy {
     this.loadIdPerson();
     await this.loadUserAdmin();
     await this.loadOptionsOffices();
+    await this.loadOrganizationsAndResolveWorkPlace();
     await this.loadPerson();
     this.isLoading = false;
     this.setBreadcrumb();
@@ -233,6 +238,23 @@ export class PersonProfileComponent implements OnInit, OnDestroy {
     }
   }
 
+  async loadOrganizationsAndResolveWorkPlace() {
+    this.optionsOrganizations = [];
+    if (!this.idOffice) {
+      return;
+    }
+
+    const organizations = await this.organizationSrv.GetAll({ 'id-office': this.idOffice });
+    if (organizations.success && organizations.data) {
+      this.optionsOrganizations = organizations.data.map(organization => ({
+        label: organization.name,
+        value: organization.id
+      }));
+    }
+
+    await this.personSrv.resolveAuthenticatedUserWorkPlace(this.idOffice);
+  }
+
   async loadUserAdmin() {
     this.isUserAdmin = await this.authSrv.isUserAdmin();
   }
@@ -255,6 +277,7 @@ export class PersonProfileComponent implements OnInit, OnDestroy {
       contactEmail: person?.contactEmail,
       phoneNumber: this.formatPhoneNumber(person.phoneNumber),
       address: person?.address,
+      idOrganization: person?.organization?.id ?? null,
       unify: false
     });
   }
@@ -283,6 +306,7 @@ export class PersonProfileComponent implements OnInit, OnDestroy {
 
   async handleChangeOffice(event) {
     this.idOffice = event.value;
+    await this.loadOrganizationsAndResolveWorkPlace();
     await this.loadPerson();
   }
 
@@ -345,6 +369,8 @@ export class PersonProfileComponent implements OnInit, OnDestroy {
       });
       if (success) {
         await this.loadPerson();
+        await this.authSrv.setInfoPerson();
+        this.setBreadcrumb();
         this.messageSrv.add({
           severity: 'success',
           summary: this.translateSrv.instant('success'),
@@ -355,6 +381,9 @@ export class PersonProfileComponent implements OnInit, OnDestroy {
     } else {
       const { success } = await this.personSrv.updateNameAdministradorPerson(this.idPerson, sender.name);
       if (success) {
+        await this.authSrv.setInfoPerson();
+        this.propertiesPerson = this.authSrv.getInfoPerson();
+        this.setBreadcrumb();
         this.messageSrv.add({
           severity: 'success',
           summary: this.translateSrv.instant('success'),

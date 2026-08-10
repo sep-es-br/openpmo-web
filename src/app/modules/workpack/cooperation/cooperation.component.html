@@ -1,0 +1,298 @@
+<div class="app-cooperation">
+    <div class="app-content-header" *ngIf="!isLoading">
+      <span *ngIf="!idCooperation">
+        {{ 'newCooperation' | translate }}
+      </span>
+  
+      <span
+        *ngIf="
+          idCooperation &&
+          cooperation
+        "
+      >
+        <span
+          [pTooltip]="cooperation.object"
+          tooltipPosition="bottom"
+        >
+          {{ truncateProcessLabel(cooperation.object, 150) }}
+        </span>
+      </span>
+    </div>
+  
+    <div
+      class="loading-form-container"
+      *ngIf="isLoading || formIsSaving"
+    >
+      <app-card-loading
+        [isCardLoading]="isLoading || formIsSaving"
+      >
+      </app-card-loading>
+    </div>
+  
+    <div
+      class="card-properties-cooperation"
+      *ngIf="cardCooperationProperties && !isLoading"
+      [class.responsive]="responsive"
+    >
+      <app-card
+        [properties]="cardCooperationProperties"
+        class="mt-0 inputs-float-label"
+      >
+        <form [formGroup]="formCooperation">
+  
+          <ng-container *ngIf="!idCooperation">
+          <div class="agreement-search-filters">
+          <span class="agreement-search-label">
+            {{ 'searchBy' | translate }}:
+          </span>
+
+          <div class="cooperation-field selection-year app-property-selection">
+            <span class="p-float-label">
+              <p-dropdown
+                class="app-single-selection"
+                inputId="year"
+                formControlName="year"
+                [options]="yearOptions"
+                optionLabel="label"
+                optionValue="value"
+                dropdownIcon="fas fa-caret-down"
+                [autoDisplayFirst]="false"
+                (onChange)="handleYearChange()"
+              >
+              </p-dropdown>
+  
+              <label
+                class="app-input-label"
+                for="year"
+              >
+                {{ 'year' | translate }}
+              </label>
+            </span>
+  
+            <app-input-message
+              [form]="formCooperation"
+              field="year"
+            >
+            </app-input-message>
+          </div>
+
+          <span class="agreement-search-connector">
+            {{ 'agreementSearchAnd' | translate }}
+          </span>
+
+          <div
+            class="cooperation-field selection-organization app-property-selection"
+          >
+            <span class="p-float-label">
+              <p-dropdown
+                class="app-single-selection"
+                inputId="managementUnit"
+                formControlName="managementUnit"
+                [options]="managementUnitOptions"
+                optionLabel="label"
+                optionValue="value"
+                dropdownIcon="fas fa-caret-down"
+                [autoDisplayFirst]="false"
+                (onChange)="
+                  handleManagementUnitChange()
+                "
+              >
+              </p-dropdown>
+  
+              <label
+                class="app-input-label"
+                for="managementUnit"
+              >
+                {{ 'managementUnit' | translate }}
+              </label>
+            </span>
+  
+            <app-input-message
+              [form]="formCooperation"
+              field="managementUnit"
+            >
+            </app-input-message>
+          </div>
+          <!-- Busca por protocolo temporariamente desabilitada.
+          <span class="agreement-search-connector">
+            {{ 'agreementSearchOr' | translate }}
+          </span>
+
+          <div class="cooperation-field protocol-search app-property-text">
+            <span class="p-float-label">
+              <p-inputMask
+                inputId="protocolSearch"
+                formControlName="protocolSearch"
+                mask="9999-*****"
+                [autoClear]="false"
+                (onInput)="handleProtocolInput()"
+                (onComplete)="handleProtocolComplete()"
+              ></p-inputMask>
+
+              <label class="app-input-label" for="protocolSearch">
+                {{ 'protocol' | translate }}
+              </label>
+            </span>
+          </div>
+          -->
+          </div>
+          </ng-container>
+  
+          <!-- Processo -->
+          <div
+            *ngIf="!idCooperation && processSearchCompleted"
+            class="cooperation-field selection-medium app-property-selection"
+          >
+            <span class="p-float-label">
+              <p-dropdown
+                class="app-single-selection"
+                inputId="process"
+                formControlName="process"
+                [options]="processOptions"
+                optionLabel="label"
+                optionValue="value"
+                dropdownIcon="fas fa-caret-down"
+                [autoDisplayFirst]="false"
+                [filter]="true"
+                [showClear]="true"
+                (onChange)="
+                  handleProcessChange($event)
+                "
+              >
+                <ng-template let-process pTemplate="selectedItem">
+                  <span
+                    class="process-option-label"
+                    [pTooltip]="process.label"
+                    tooltipPosition="bottom"
+                  >
+                    {{ truncateProcessLabel(process.label) }}
+                  </span>
+                </ng-template>
+
+                <ng-template let-process pTemplate="item">
+                  <span
+                    class="process-option-label"
+                    [pTooltip]="process.label"
+                    tooltipPosition="bottom"
+                  >
+                    {{ truncateProcessLabel(process.label) }}
+                  </span>
+                </ng-template>
+              </p-dropdown>
+  
+              <label
+                class="app-input-label"
+                for="process"
+              >
+                {{ 'cooperation' | translate }} *
+              </label>
+            </span>
+  
+            <app-input-message
+              [form]="formCooperation"
+              field="process"
+            >
+            </app-input-message>
+          </div>
+
+          <div
+            *ngIf="idCooperation"
+            class="cooperation-field text-medium app-property-text"
+          >
+            <div class="readonly-field">
+              <div class="app-input-label readonly-label">
+                {{ 'cooperation' | translate }}
+              </div>
+              <div
+                class="readonly-value"
+                [pTooltip]="processFullValue"
+                tooltipPosition="bottom"
+              >
+                {{ processFullValue || '-' }}
+              </div>
+            </div>
+          </div>
+  
+          <ng-container
+            *ngIf="
+              !isLoading &&
+              formCooperation
+                .controls
+                .process
+                .value
+            "
+          >
+            <!-- CNPJ -->
+            <div
+              class="cooperation-field text-medium app-property-text"
+            >
+              <div class="readonly-field">
+                <div class="app-input-label readonly-label">
+                  {{ 'cnpj' | translate }}
+                </div>
+                <div class="readonly-value">
+                  {{ formCooperation.controls.partyCnpj.value || '-' }}
+                </div>
+              </div>
+            </div>
+  
+            <!-- Concedente/Convenente -->
+            <div
+              class="cooperation-field text-medium app-property-text"
+            >
+              <div class="readonly-field">
+                <div class="app-input-label readonly-label">
+                  {{
+                    'grantorBeneficiaryName'
+                      | translate
+                  }}
+                </div>
+                <div class="readonly-value">
+                  {{ formCooperation.controls.partyName.value || '-' }}
+                </div>
+              </div>
+            </div>
+  
+            <!-- Protocolo -->
+            <div
+              class="cooperation-field text-medium app-property-text"
+            >
+              <div class="readonly-field">
+                <div class="app-input-label readonly-label">
+                  {{ 'protocol' | translate }}
+                </div>
+                <div class="readonly-value">
+                  {{ formCooperation.controls.protocol.value || '-' }}
+                </div>
+              </div>
+            </div>
+          </ng-container>
+        </form>
+      </app-card>
+    </div>
+  
+    <div
+      class="id-container"
+      *ngIf="
+        idCooperation &&
+        cardCooperationProperties &&
+        !isLoading
+      "
+    >
+      <span>{{ idCooperation }}</span>
+    </div>
+  </div>
+  
+  <app-buttons-container *ngIf="!isLoading && !idCooperation">
+    <app-save-button
+      #saveButton
+      (save)="saveCooperation()"
+    >
+    </app-save-button>
+  
+    <app-cancel-button
+      #cancelButton
+      (cancel)="handleOnCancel()"
+    >
+    </app-cancel-button>
+  </app-buttons-container>

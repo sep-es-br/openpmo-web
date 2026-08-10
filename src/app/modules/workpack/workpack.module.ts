@@ -14,8 +14,7 @@ import { BaselineComponent } from './baseline/baseline.component';
 import { BaselineCancellingComponent } from './baseline-cancelling/baseline-cancelling.component';
 import { JournalViewComponent } from './components/journal-view/journal-view.component';
 import { JournalComponent } from './journal/journal.component';
-import { TripleConstraintDashboardComponent } from './components/triple-constraint-dashboard/triple-constraint-dashboard.component';
-import { EarnedValueAnalysisDashboardComponent } from './components/earned-value-analysis-dashboard/earned-value-analysis-dashboard.component';
+import { WorkpackDashboardComponentsModule } from './components/workpack-dashboard-components.module';
 import { ProgressBarScheduleYearComponent } from './components/progress-bar-schedule-year/progress-bar-schedule-year.component';
 import { WorkpackSectionPropertiesComponent } from './workpack-sections/workpack-section-properties/workpack-section-properties.component';
 import { WorkpackSectionCostAccountsComponent } from './workpack-sections/workpack-section-cost-accounts/workpack-section-cost-accounts.component';
@@ -35,6 +34,13 @@ import { TooltipModule } from 'primeng/tooltip'
 import { Tooltip } from 'chart.js';
 import { CostAccountCardInstrumentComponent } from './cost-account/cost-account-card/cost-account-card.component';
 import { CostAccountCardComponent } from './components/cost-account-card/cost-account-card.component';
+import { WorkpackSectionObligationsComponent } from './workpack-sections/workpack-section-obligations/workpack-section-obligations.component';
+import { WorkpackSectionProcurementsComponent } from './workpack-sections/workpack-section-procurements/workpack-section-procurements.component';
+import { WorkpackSectionAgreementsComponent } from './workpack-sections/workpack-section-agreements/workpack-section-agreements.component';
+import { ObligationComponent } from './obligation/obligation.component';
+import { ProcurementComponent } from './procurement/procurement.component';
+import { CooperationComponent } from './cooperation/cooperation.component';
+import { ContractComponent } from './contract/contract.component';
 
 @NgModule({
   declarations: [
@@ -50,8 +56,10 @@ import { CostAccountCardComponent } from './components/cost-account-card/cost-ac
     BaselineCancellingComponent,
     JournalViewComponent,
     JournalComponent,
-    TripleConstraintDashboardComponent,
-    EarnedValueAnalysisDashboardComponent,
+    ObligationComponent,
+    ProcurementComponent,
+    CooperationComponent,
+    ContractComponent,
     ProgressBarScheduleYearComponent,
     WorkpackSectionPropertiesComponent,
     WorkpackSectionCostAccountsComponent,
@@ -67,6 +75,9 @@ import { CostAccountCardComponent } from './components/cost-account-card/cost-ac
     WorkpackSectionDashboardComponent,
     WorkpackSectionJournalComponent,
     WorkpackSectionWBSComponent,
+    WorkpackSectionObligationsComponent,
+    WorkpackSectionProcurementsComponent,
+    WorkpackSectionAgreementsComponent
   ],
   imports: [
       CommonModule,
@@ -75,7 +86,8 @@ import { CostAccountCardComponent } from './components/cost-account-card/cost-ac
       ComponentsModule,
       FormsModule,
       ReactiveFormsModule,
-      TooltipModule
+      TooltipModule,
+      WorkpackDashboardComponentsModule
     ],
 })
 export class WorkpackModule { }
