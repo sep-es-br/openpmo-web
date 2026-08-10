@@ -331,9 +331,9 @@
   "unlink": "Unlink",
   "nonPriority": "Non-priority",
   "changeControlBoard": "Change Control Board",
-  "ccbMember": "CCB Member",
-  "ccbMembers": "CCB Members",
-  "newCcbMember": "New CCB Member",
+  "ccbMember": "Member CCM",
+  "ccbMembers": "Members CCM",
+  "newCcbMember": "New Member CCM",
   "memberAs": "Member As",
   "partner": "Partner",
   "sponsor": "Sponsor",
@@ -663,7 +663,7 @@
     "invalidCPF": "Invalid CPF.",
     "loading": "Loading",
     "atentionCancellingMessage": "Heads up. This action cannot be undone.",
-    "textAtentionCancellingMessage": "Confirm sending this proposal to cancel the project to the CCB?",
+    "textAtentionCancellingMessage": "Confirm sending this proposal to cancel the project to the CCM?",
     "stateDepartmentFooterNotice": "State Department for Economy and Planning - Government of Espírito Santo",
     "proudlyFooterNotice": "Proudly produced and maintained by:",
     "licenseFooterNotice": "Distributed under the",
@@ -723,7 +723,7 @@
       "couldNotCheckParentProject": "Could not check if contains parent project",
       "ccb-member": {
         "not": {
-          "found": "CCB member not found"
+          "found": "CCM member not found"
         }
       },
       "office": {
