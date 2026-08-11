@@ -480,7 +480,7 @@
     </div>
   </p-card>
 
-  <p-card *ngSwitchCase="'listItemPermissionWorkpack'" class="app-card-item listItem" [class.mobile]="responsive"
+  <p-card *ngSwitchCase="'listItemPermissionWorkpack'" class="app-card-item listItem permission-workpack" [class.mobile]="responsive"
     [class.cardList]="displayModeCard === 'list'">
     <p-header class="card-item-header" [class.header-fixed]="!!properties.profileView">
       <button class="button-change" pButton [label]="' ' | translate"
@@ -491,7 +491,7 @@
     <div class="card-item-content" [class.card-link]="properties.urlCard" [class.cardList]="displayModeCard === 'list'">
       <i [ngClass]="properties.iconSvg ? [ 'app-icon', properties.icon, 'grey-icon'] : [ 'icon-card', properties.icon, 'grey-icon' ]"
         [class.risk-red]="properties.iconColor === 'high'" [class.risk-orange]="properties.iconColor === 'medium'"
-        [class.risk-yellow]="properties.iconColor === 'low'" [ngStyle]="(displayModeCard === 'list') ? { fontSize: '1.5rem' } : { fontSize: '2.5rem' }"></i>
+        [class.risk-yellow]="properties.iconColor === 'low'"></i>
       <span class="card-item-name" [pTooltip]="properties.fullNameCardItem"
         tooltipPosition="bottom">{{properties.nameCardItem}}</span>
       <span class="card-item-subtitle permission" *ngIf="properties.subtitleCardItem">{{properties.subtitleCardItem}}</span>

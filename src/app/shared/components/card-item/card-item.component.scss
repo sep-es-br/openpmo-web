@@ -950,6 +950,34 @@ $card-horizontal-space: 1rem;
   }
 }
 
+::ng-deep .app-card-item.permission-workpack:not(.cardList) {
+  .p-card {
+    min-height: 174px;
+  }
+
+  .card-item-content {
+    gap: v.$cardItemContentGap;
+
+    > .app-icon,
+    > .icon-card {
+      display: inline-flex;
+      flex: 0 0 v.$cardViewIconSize;
+      width: v.$cardViewIconSize;
+      height: v.$cardViewIconSize;
+      align-items: center;
+      justify-content: center;
+      font-size: v.$cardViewIconSize !important;
+      line-height: 1;
+    }
+
+    .card-item-name,
+    .card-item-subtitle {
+      padding-top: 0;
+      padding-bottom: 0;
+    }
+  }
+}
+
 ::ng-deep .new-carditem {
   .p-card {
     background-color: transparent;
