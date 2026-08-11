@@ -50,8 +50,8 @@
           tooltipPosition="bottom">{{properties.nameCardItem}}</span>
         <span class="card-item-subtitle" *ngIf="properties.subtitleCardItem"
           [class.subtitle-card-risk]="properties.statusItem">{{properties.subtitleCardItem}}</span>
-        <span class="card-item-subtitle" *ngIf="properties.statusItem"
-          [class.subtitle-card-risk]="properties.statusItem">{{properties.statusItem}}</span>
+        <!-- <span class="card-item-subtitle" *ngIf="properties.statusItem"
+          [class.subtitle-card-risk]="properties.statusItem">{{properties.statusItem}}</span> -->
       </div>
       <div class="right-side">
         <p-header *ngIf="properties.menuItems" class="card-item-header">
@@ -142,68 +142,68 @@
       <p-header *ngIf="properties.menuItems" class="card-item-header">
         <p-menu #menu [popup]="true" [model]="properties.menuItems">
         </p-menu>
-  
+
         <button type="button" pButton icon="pi pi-ellipsis-v" [class.hidden]="!properties.menuItems.length"
           (click)="menu.toggle($event)">
         </button>
       </p-header>
-  
+
       <p-header *ngIf="!properties.menuItems" class="card-item-header">
         <span class="menu-none"></span>
       </p-header>
-  
+
       <div class="card-item-content" [class.card-link]="properties.urlCard" (click)="handleNavigateToPage()"
         [class.cardList]="displayModeCard === 'list'">
         <div class="icons-container">
           <i [ngClass]="['fas', 'fa-' + properties.icon, 'icon-card']"></i>
         </div>
-  
+
         <span class="card-item-name" [pTooltip]="properties.fullNameCardItem" tooltipPosition="bottom">
           {{ properties.nameCardItem }}
         </span>
-  
+
         <span class="card-item-subtitle" *ngIf="properties.subtitleCardItem">
           {{ properties.subtitleCardItem }}
         </span>
       </div>
-  
+
       <div class="card-item-footer" *ngIf="cardIdItem">
         <span class="card-item-id">
           {{ cardIdItem }}
         </span>
       </div>
     </div>
-  
+
     <div class="display-mode-list" *ngIf="displayModeCard === 'list'">
       <div class="card-item-content" [class.card-link]="properties.urlCard" (click)="handleNavigateToPage()"
         [class.cardList]="displayModeCard === 'list'">
         <div class="icons-container">
           <i [ngClass]="['fas', 'fa-' + properties.icon, 'icon-card']"></i>
         </div>
-  
+
         <span class="card-item-name" [pTooltip]="properties.fullNameCardItem" tooltipPosition="bottom">
           {{ properties.nameCardItem }}
         </span>
-  
+
         <span class="card-item-subtitle" *ngIf="properties.subtitleCardItem">
           {{ properties.subtitleCardItem }}
         </span>
       </div>
-  
+
       <div class="right-side">
         <p-header *ngIf="properties.menuItems" class="card-item-header">
           <p-menu #menu [popup]="true" [model]="properties.menuItems">
           </p-menu>
-  
+
           <button type="button" pButton icon="pi pi-ellipsis-v" [class.hidden]="!properties.menuItems.length"
             (click)="menu.toggle($event)">
           </button>
         </p-header>
-  
+
         <p-header *ngIf="!properties.menuItems" class="card-item-header">
           <span class="menu-none"></span>
         </p-header>
-  
+
         <div class="card-item-footer" *ngIf="cardIdItem">
           <span class="card-item-id">
             {{ cardIdItem }}
@@ -309,25 +309,26 @@
     </div>
   </p-card>
   <!-- FIM ACORDOS -->
-  
+
 
   <p-card *ngSwitchCase="'listItemProcess'" class="app-card-item listItem process" [class.mobile]="responsive"
     [class.cardList]="displayModeCard === 'list'">
     <div class="display-mode-grid" *ngIf="displayModeCard !== 'list'">
       <p-header *ngIf="properties.menuItems" class="card-item-header">
-        <i [ngClass]="[ 'app-icon', 'process-selo']" [ngStyle]="{ fontSize: '1.2rem' }" *ngIf="!!properties.priority"></i>
         <p-menu #menu [popup]="true" [model]="properties.menuItems"></p-menu>
         <button type="button" pButton icon="pi pi-ellipsis-v" [class.hidden]="!properties.menuItems.length"
           (click)="menu.toggle($event)"></button>
       </p-header>
       <div class="card-item-content" [class.card-link]="properties.urlCard" [routerLink]="properties.urlCard"
         [class.cardList]="displayModeCard === 'list'" [queryParams]="getQueryParams()">
-        <i [ngClass]="properties.iconSvg ? [ 'app-icon', properties.icon, 'grey-icon'] : [ 'icon-card', properties.icon, 'grey-icon' ]"
+        <i [ngClass]="properties.priority ? [ 'app-icon', 'process-selo', 'process-priority-icon' ] : (properties.iconSvg ? [ 'app-icon', properties.icon, 'grey-icon'] : [ 'icon-card', properties.icon, 'grey-icon' ])"
           [ngStyle]="{ fontSize: '1.8rem' }"></i>
-        <span class="card-item-name" [pTooltip]="properties.fullNameCardItem"
-          tooltipPosition="bottom">{{properties.nameCardItem}}</span>
-        <span class="card-item-subtitle" *ngIf="properties.subtitleCardItem"
-          [class.subtitle-card-risk]="properties.statusItem">{{properties.subtitleCardItem}}</span>
+        <span class="process-card-identification" [pTooltip]="properties.nameCardItem" tooltipPosition="bottom">
+          <span class="process-card-number">{{properties.subtitleCardItem}}</span>
+          <span class="process-card-name">{{properties.nameCardItem}}</span>
+        </span>
+      </div>
+      <div class="process-card-organization">
         <span class="organization-name" *ngIf="properties.organizationName"
           [class.subtitle-card-risk]="properties.statusItem">{{properties.organizationName}}</span>
       </div>
@@ -340,18 +341,21 @@
     <div class="display-mode-list" *ngIf="displayModeCard === 'list'">
       <div class="card-item-content" [class.card-link]="properties.urlCard" [routerLink]="properties.urlCard"
         [class.cardList]="displayModeCard === 'list'" [queryParams]="getQueryParams()">
-        <i [ngClass]="properties.iconSvg ? [ 'app-icon', properties.icon, 'grey-icon'] : [ 'icon-card', properties.icon, 'grey-icon' ]"
-          [ngStyle]="{ fontSize: '1.5rem' }"></i>
-        <span class="card-item-name" [pTooltip]="properties.fullNameCardItem"
-          tooltipPosition="bottom">{{properties.nameCardItem}}</span>
-        <span class="card-item-subtitle" *ngIf="properties.subtitleCardItem"
-          [class.subtitle-card-risk]="properties.statusItem">{{properties.subtitleCardItem}}</span>
-        <span class="organization-name" *ngIf="properties.organizationName"
-          [class.subtitle-card-risk]="properties.statusItem">{{properties.organizationName}}</span>
+        <div class="process-left-content">
+          <i [ngClass]="properties.priority ? [ 'app-icon', 'process-selo', 'process-priority-icon' ] : (properties.iconSvg ? [ 'app-icon', properties.icon, 'grey-icon'] : [ 'icon-card', properties.icon, 'grey-icon' ])"
+            [ngStyle]="{ fontSize: '1.5rem' }"></i>
+          <span class="card-item-name" [pTooltip]="properties.fullNameCardItem"
+            tooltipPosition="bottom">{{properties.nameCardItem}}</span>
+        </div>
+        <div class="process-right-content" *ngIf="properties.subtitleCardItem || properties.organizationName">
+          <span class="card-item-subtitle" *ngIf="properties.subtitleCardItem"
+            [class.subtitle-card-risk]="properties.statusItem">{{properties.subtitleCardItem}}</span>
+          <span class="organization-name" *ngIf="properties.organizationName"
+            [class.subtitle-card-risk]="properties.statusItem">{{properties.organizationName}}</span>
+        </div>
       </div>
       <div class="right-side">
         <p-header *ngIf="properties.menuItems" class="card-item-header">
-          <i [ngClass]="[ 'app-icon', 'process-selo']" [ngStyle]="{ fontSize: '1rem' }"></i>
           <p-menu #menu [popup]="true" [model]="properties.menuItems"></p-menu>
           <button type="button" pButton icon="pi pi-ellipsis-v" [class.hidden]="!properties.menuItems.length"
             (click)="menu.toggle($event)"></button>
@@ -377,8 +381,13 @@
         (click)="navigateToPage(properties.urlCard, properties.paramsUrlCard)">
         <i [ngClass]="properties.iconSvg ? [ 'app-icon', properties.icon, 'grey-icon'] : [ 'icon-card', properties.icon, 'grey-icon' ]"
           [ngStyle]="{ fontSize: '2rem' }"></i>
-        <span class="card-item-name" [pTooltip]="properties.fullNameCardItem"
-          tooltipPosition="bottom">{{properties.nameCardItem}}</span>
+        <span class="stakeholder-card-identification" [pTooltip]="properties.fullNameCardItem"
+          tooltipPosition="bottom">
+          <span class="card-item-name">{{properties.nameCardItem}}</span>
+          <span class="card-item-full-name">{{properties.fullNameCardItem}}</span>
+        </span>
+      </div>
+      <div class="stakeholder-card-subtitle">
         <div class="subtitle" [innerHTML]="properties.subtitleCardItem"></div>
       </div>
       <div class="card-item-footer" *ngIf="cardIdItem">
@@ -391,11 +400,18 @@
       <div class="card-item-content" [class.card-link]="properties.urlCard"
         [class.cardList]="displayModeCard === 'list'"
         (click)="navigateToPage(properties.urlCard, properties.paramsUrlCard)">
-        <i [ngClass]="properties.iconSvg ? [ 'app-icon', properties.icon, 'grey-icon'] : [ 'icon-card', properties.icon, 'grey-icon' ]"
-          [ngStyle]="{ fontSize: '1.5rem' }"></i>
-        <span class="card-item-name" [pTooltip]="properties.fullNameCardItem"
-          tooltipPosition="bottom">{{properties.nameCardItem}}</span>
-        <div class="subtitle" [innerHTML]="properties.subtitleCardItem"></div>
+        <div class="stakeholder-left-content">
+          <i [ngClass]="properties.iconSvg ? [ 'app-icon', properties.icon, 'grey-icon'] : [ 'icon-card', properties.icon, 'grey-icon' ]"
+            [ngStyle]="{ fontSize: '1.5rem' }"></i>
+          <span class="stakeholder-list-identification" [pTooltip]="properties.fullNameCardItem"
+            tooltipPosition="bottom">
+            <span class="card-item-name">{{properties.nameCardItem}}</span>
+            <span class="card-item-full-name">{{properties.fullNameCardItem}}</span>
+          </span>
+        </div>
+        <div class="stakeholder-right-content" *ngIf="properties.subtitleCardItem">
+          <div class="subtitle" [innerHTML]="properties.subtitleCardItem"></div>
+        </div>
       </div>
       <div class="right-side">
         <p-header *ngIf="properties.menuItems" class="card-item-header">
@@ -535,18 +551,26 @@
     [class.cardList]="displayModeCard === 'list'">
     <div class="card-item-content" [class.card-link]="properties.urlCard" [routerLink]="properties.urlCard"
       [class.cardList]="displayModeCard === 'list'" [queryParams]="getQueryParams()">
-      <app-avatar [edit]="false" [avatar]="properties.avatar"> </app-avatar>
-      <span class="card-item-name">
-        {{ properties.fullNameCardItem }}
-        <span *ngIf="properties.isUser" class="user-label">
-          Usuário
+      <div class="person-left-content">
+        <app-avatar [edit]="false" [avatar]="properties.avatar"> </app-avatar>
+        <span class="person-identification" [pTooltip]="properties.fullNameCardItem" tooltipPosition="bottom">
+          <span class="card-item-name">{{ properties.nameCardItem }}</span>
+          <span class="card-item-full-name">{{ properties.fullNameCardItem }}</span>
         </span>
-      </span>
+      </div>
+      <div class="person-right-content">
+        <span class="user-label user-label-list" [class.user-label-hidden]="!properties.isUser">Usuário</span>
+      </div>
     </div>
-    <div class="card-item-footer" *ngIf="cardIdItem">
-      <span class="card-item-id">
-        {{cardIdItem}}
-      </span>
+    <div class="person-card-subtitle">
+      <span class="user-label user-label-card" [class.user-label-hidden]="!properties.isUser">Usuário</span>
+    </div>
+    <div class="person-metadata" *ngIf="properties.isUser || cardIdItem">
+      <div class="card-item-footer" *ngIf="cardIdItem">
+        <span class="card-item-id">
+          {{cardIdItem}}
+        </span>
+      </div>
     </div>
   </p-card>
 
