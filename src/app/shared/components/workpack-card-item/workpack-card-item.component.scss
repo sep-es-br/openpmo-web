@@ -401,6 +401,80 @@
             }
           }
 
+          .dashboard-status-container {
+            flex: 0 0 180px;
+            width: 180px;
+            justify-content: flex-start;
+
+            .dashboard-icon-slot {
+              display: inline-flex;
+              flex: 0 0 36px;
+              width: 36px;
+              height: 22px;
+              align-items: center;
+              justify-content: center;
+            }
+
+            .img-status-icon,
+            .i-status-icon,
+            .fa-info-circle,
+            .i-risk-icon,
+            .fa-stop-circle,
+            .fa-check-square {
+              margin: 0;
+            }
+
+            .i-status-icon,
+            .fa-info,
+            .fa-info-circle,
+            .i-risk-icon,
+            .fa-stop-circle,
+            .fa-check-square {
+              font-size: 20px;
+            }
+
+            .fa-info {
+              display: inline-flex;
+              box-sizing: border-box;
+              width: 20px;
+              height: 20px;
+              padding: 0;
+              align-items: center;
+              justify-content: center;
+              border: 1px solid #0083bb;
+              border-radius: 50%;
+              background: transparent;
+              color: #0083bb;
+              font-size: 0.7rem;
+              line-height: 1;
+
+              &::before {
+                display: block;
+                line-height: 1;
+              }
+            }
+
+            .fa-check-square {
+              display: inline-flex;
+              box-sizing: border-box;
+              width: 20px;
+              min-width: 20px;
+              height: 20px;
+              align-items: center;
+              justify-content: center;
+              vertical-align: middle;
+
+              &::before {
+                display: block;
+                width: 20px;
+                text-align: center;
+                transform: scaleY(1.05);
+                transform-origin: center;
+              }
+            }
+
+          }
+
           .milestones-progressbar-container {
             display: flex;
             flex-direction: row;
@@ -440,7 +514,7 @@
               flex-direction: row;
               align-items: center;
               justify-content: center;
-              width: 25%;
+              width: 20%;
             .index {
                 font-size: 12px;
                 font-weight: bold;
@@ -449,7 +523,7 @@
           }
 
           .triple-constraint-container {
-            width: 25%;
+            width: 20%;
             justify-content: space-between;
           }
         }

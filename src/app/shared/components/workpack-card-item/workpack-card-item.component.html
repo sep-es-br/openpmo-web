@@ -201,7 +201,7 @@
                   </p-progressSpinner>
                 </div>
               </div>
-              <div class="card-information-container" *ngIf="properties && properties?.journalInformation 
+              <div class="card-information-container" *ngIf="properties && properties?.journalInformation
                 && properties?.journalInformation?.date
                 && !properties?.journalInformation?.loading">
                 <app-card-journal-information
@@ -280,33 +280,47 @@
                 </ng-template>
               </ng-template>
             </ng-container>
-            
-            <i
-              *ngIf="properties?.journalInformation?.date && !properties?.journalInformation?.actual"
-              class="fas fa-info"
-              style="cursor: pointer"
-              (click)="handleShowJournalInformation(properties?.journalInformation); journalInformationPanelList.show($event)"
-            >
-            </i>
-            <i
-              *ngIf="properties?.journalInformation?.date && properties?.journalInformation?.actual"
-              class="fas fa-info-circle"
-              [ngStyle]="{ fontSize: '1.2rem' }"
-              style="cursor: pointer"
-              (click)="handleShowJournalInformation(properties.journalInformation); journalInformationPanelList.show($event)"
-            >
-            </i>
 
-            <i
-              *ngIf="showRiskIndex()"
-              class="app-icon risk i-risk-icon"
-              [class.risk-red]="riskImportance === 'high'"
-              [class.risk-yellow]="riskImportance === 'low'"
-              [class.risk-orange]="riskImportance === 'medium'"
-              (mouseenter)="riskPanelList.show($event)"
-              (mouseleave)="riskPanelList.hide()"
-            >
-            </i>
+            <span class="dashboard-icon-slot">
+              <i
+                *ngIf="properties?.journalInformation?.date && !properties?.journalInformation?.actual"
+                class="fas fa-info"
+                style="cursor: pointer"
+                (click)="handleShowJournalInformation(properties?.journalInformation); journalInformationPanelList.show($event)"
+              >
+              </i>
+              <i
+                *ngIf="properties?.journalInformation?.date && properties?.journalInformation?.actual"
+                class="fas fa-info-circle"
+                style="cursor: pointer"
+                (click)="handleShowJournalInformation(properties.journalInformation); journalInformationPanelList.show($event)"
+              >
+              </i>
+            </span>
+
+            <span class="dashboard-icon-slot">
+              <i
+                *ngIf="showRiskIndex()"
+                class="app-icon risk i-risk-icon"
+                [class.risk-red]="riskImportance === 'high'"
+                [class.risk-yellow]="riskImportance === 'low'"
+                [class.risk-orange]="riskImportance === 'medium'"
+                (mouseenter)="riskPanelList.show($event)"
+                (mouseleave)="riskPanelList.hide()"
+              >
+              </i>
+            </span>
+
+            <span class="dashboard-icon-slot dashboard-management-slot">
+              <i class="far fa-stop-circle"
+                *ngIf="showEndManagementIndex() && !!properties.endManagementDate && properties.endManagementDate !== null"
+                [pTooltip]="'managementEnded'|translate"></i>
+            </span>
+
+            <span class="dashboard-icon-slot dashboard-completed-scope-slot">
+              <i class="far fa-check-square" *ngIf="showEndManagementIndex() && !!properties.completed"
+                [pTooltip]="label|translate"></i>
+            </span>
           </div>
           <p-overlayPanel #journalInformationPanelList class="journal-info-overlay-panel" [showCloseIcon]="true" [dismissable]="false">
             <div class="journal-info-panel-content"
@@ -319,7 +333,7 @@
                   </p-progressSpinner>
                 </div>
               </div>
-              <div class="card-information-container" *ngIf="properties && properties?.journalInformation 
+              <div class="card-information-container" *ngIf="properties && properties?.journalInformation
                 && properties?.journalInformation?.date
                 && !properties?.journalInformation?.loading">
                 <app-card-journal-information
