@@ -321,8 +321,7 @@
       </p-header>
       <div class="card-item-content" [class.card-link]="properties.urlCard" [routerLink]="properties.urlCard"
         [class.cardList]="displayModeCard === 'list'" [queryParams]="getQueryParams()">
-        <i [ngClass]="properties.priority ? [ 'app-icon', 'process-selo', 'process-priority-icon' ] : (properties.iconSvg ? [ 'app-icon', properties.icon, 'grey-icon'] : [ 'icon-card', properties.icon, 'grey-icon' ])"
-          [ngStyle]="{ fontSize: '1.8rem' }"></i>
+        <i [ngClass]="properties.priority ? [ 'app-icon', 'process-selo', 'process-priority-icon' ] : (properties.iconSvg ? [ 'app-icon', properties.icon, 'grey-icon'] : [ 'icon-card', properties.icon, 'grey-icon' ])"></i>
         <span class="process-card-identification" [pTooltip]="properties.nameCardItem" tooltipPosition="bottom">
           <span class="process-card-number">{{properties.subtitleCardItem}}</span>
           <span class="process-card-name">{{properties.nameCardItem}}</span>
@@ -342,8 +341,7 @@
       <div class="card-item-content" [class.card-link]="properties.urlCard" [routerLink]="properties.urlCard"
         [class.cardList]="displayModeCard === 'list'" [queryParams]="getQueryParams()">
         <div class="process-left-content">
-          <i [ngClass]="properties.priority ? [ 'app-icon', 'process-selo', 'process-priority-icon' ] : (properties.iconSvg ? [ 'app-icon', properties.icon, 'grey-icon'] : [ 'icon-card', properties.icon, 'grey-icon' ])"
-            [ngStyle]="{ fontSize: '1.5rem' }"></i>
+          <i [ngClass]="properties.priority ? [ 'app-icon', 'process-selo', 'process-priority-icon' ] : (properties.iconSvg ? [ 'app-icon', properties.icon, 'grey-icon'] : [ 'icon-card', properties.icon, 'grey-icon' ])"></i>
           <span class="card-item-name" [pTooltip]="properties.fullNameCardItem"
             tooltipPosition="bottom">{{properties.nameCardItem}}</span>
         </div>

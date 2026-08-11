@@ -1,9 +1,9 @@
 @use "src/variables" as v;
 
-$card-view-icon-size: 34px;
-$list-view-icon-box-size: 28px;
-$list-view-icon-font-size: 1.2rem;
-$card-item-title-font-size: 0.80rem;
+$card-view-icon-size: v.$cardViewIconSize;
+$list-view-icon-box-size: v.$listViewIconBoxSize;
+$list-view-icon-font-size: v.$listViewIconFontSize;
+$card-item-title-font-size: v.$cardItemTitleFontSize;
 $card-item-secondary-font-size: 0.68rem;
 $list-item-secondary-font-size: 0.65rem;
 $list-item-metadata-font-size: 0.68rem;
@@ -775,7 +775,7 @@ $card-horizontal-space: 1rem;
       }
 
       .card-item-full-name {
-        font-size: 0.68rem;
+        font-size: v.$cardItemFullNameFontSize;
         color: #888e96;
       }
     }
@@ -786,6 +786,7 @@ $card-horizontal-space: 1rem;
     flex: 0 0 2rem;
     width: 100%;
     min-height: 2rem;
+    margin-top: v.$cardItemContentGap;
     display: flex;
     align-items: flex-start;
     justify-content: center;
@@ -837,20 +838,20 @@ $card-horizontal-space: 1rem;
       min-width: 0;
 
       > i {
-        flex: 0 0 28px;
-        width: 28px;
-        height: 28px;
+        flex: 0 0 v.$listViewIconBoxSize;
+        width: v.$listViewIconBoxSize;
+        height: v.$listViewIconBoxSize;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 1.2rem !important;
+        font-size: v.$listViewIconFontSize !important;
       }
 
       .card-item-name {
         min-width: 0;
         margin-left: 8px;
         padding: 0;
-        font-size: 0.80rem;
+        font-size: v.$cardItemTitleFontSize;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
@@ -918,12 +919,12 @@ $card-horizontal-space: 1rem;
       }
 
       .process-card-number {
-        margin: 0.5rem 0 0.2rem;
-        font-size: 0.80rem;
+        margin: v.$cardItemContentGap 0 0.2rem;
+        font-size: v.$cardItemTitleFontSize;
       }
 
       .process-card-name {
-        font-size: 0.68rem;
+        font-size: v.$cardItemFullNameFontSize;
         color: #888e96;
       }
     }
@@ -933,6 +934,7 @@ $card-horizontal-space: 1rem;
     flex: 0 0 1.2rem;
     width: 100%;
     min-height: 1.2rem;
+    margin-top: v.$cardItemContentGap;
     display: flex;
     align-items: flex-start;
     justify-content: center;
