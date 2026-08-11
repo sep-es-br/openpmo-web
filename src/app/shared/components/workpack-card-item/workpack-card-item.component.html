@@ -313,10 +313,13 @@
               </i>
             </span>
 
-            <span class="dashboard-icon-slot">
+            <span class="dashboard-icon-slot dashboard-management-slot">
               <i class="far fa-stop-circle"
                 *ngIf="showEndManagementIndex() && !!properties.endManagementDate && properties.endManagementDate !== null"
                 [pTooltip]="'managementEnded'|translate"></i>
+            </span>
+
+            <span class="dashboard-icon-slot dashboard-completed-scope-slot">
               <i class="far fa-check-square" *ngIf="showEndManagementIndex() && !!properties.completed"
                 [pTooltip]="label|translate"></i>
             </span>

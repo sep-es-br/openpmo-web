@@ -403,6 +403,8 @@
           }
 
           .dashboard-status-container {
+            flex: 0 0 180px;
+            width: 180px;
             justify-content: flex-start;
 
             .dashboard-icon-slot {
@@ -412,10 +414,6 @@
               height: 22px;
               align-items: center;
               justify-content: center;
-            }
-
-            .dashboard-icon-slot:empty {
-              display: none;
             }
 
             .img-status-icon,
@@ -517,7 +515,7 @@
               flex-direction: row;
               align-items: center;
               justify-content: center;
-              width: 25%;
+              width: 20%;
             .index {
                 font-size: 12px;
                 font-weight: bold;
@@ -526,7 +524,7 @@
           }
 
           .triple-constraint-container {
-            width: 25%;
+            width: 20%;
             justify-content: space-between;
           }
         }
