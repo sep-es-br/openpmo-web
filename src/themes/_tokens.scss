@@ -1,0 +1,122 @@
+:root {
+  /* FONT */
+  --op-font-title: #004660;
+  --op-font-label: #939393;
+  --op-font-dark: #333333;
+  --op-font-dark-light: #4a4a4a;
+  --op-font-red: #EA5C5C;
+  --op-font-error-message: #f44336;
+  --op-font-input: #004660;
+  --op-font-white: #ffffff;
+  --op-font-breadcrumb: #13546C;
+  --op-font-blue: #0083BB;
+  --op-font-breadcrumb-mobile: #888E96;
+  --op-font-gray: #888E96;
+  --op-font-approved: #44B39B;
+  --op-font-reject: #EA5C5C;
+  --op-font-accent: #44B39B;
+  --op-bg-approved: #44B39B;
+
+  --op-font-family: 'Montserrat', sans-serif;
+  --op-font-family-regular: 'Montserrat Regular', 'Montserrat', sans-serif;
+  --op-font-family-medium: 'Montserrat Medium', 'Montserrat Regular', 'Montserrat', sans-serif;
+  --op-font-family-semibold: 'Montserrat SemiBold', 'Montserrat Regular', 'Montserrat', sans-serif;
+  --op-font-family-bold: 'Montserrat Bold', 'Montserrat Regular', 'Montserrat', sans-serif;
+  --op-font-family-italic: 'Montserrat Italic', 'Montserrat', sans-serif;
+
+  /* BACKGROUND */
+  --op-bg: #eaeae8;
+  --op-bg-card: #F5F5F3;
+  --op-bg-card-item: #fafaf9;
+  --op-bg-menu-item: #00000019;
+  --op-bg-menu-admin: #296D5E;
+  --op-bg-menu-office: rgba(167, 7, 75, 1);
+  --op-bg-menu-user: rgba(2, 60, 85, 1);
+  --op-bg-button-green: #44B39B;
+  --op-bg-button-green-hover: rgba(68, 179, 155, 0.9);
+  --op-bg-button-submit: #44B39B;
+  --op-bg-button-submit-hover: rgba(68, 179, 155, 0.9);
+  --op-bg-button-draft: rgba(21, 147, 201, 0.75);
+  --op-bg-button-draft-hover: rgba(21, 147, 201, 0.6);
+  --op-bg-button-cancel: rgba(234, 92, 92, 1);
+  --op-bg-button-cancel-hover: rgba(234, 92, 92, 0.8);
+  --op-bg-button-gray: rgba(164, 164, 164, 1);
+  --op-bg-breadcrumb: #d0d8d9;
+  --op-bg-white: #ffffff;
+  --op-bg-white-light: #f5f5f5;
+  --op-bg-dark: #ea5c5c17;
+  --op-bg-gray: rgba(245, 245, 243, 1);
+  --op-bg-radio-button: #ffffff;
+
+  /* BORDER */
+  --op-border-input: #b6c8cd;
+  --op-border-input-hover: #5c6163;
+  --op-border-card: #D4D4D4;
+  --op-border-radio-button: #868181;
+  --op-border-check-box: #3b3636;
+  --op-border-light-grey: #e5e5e4;
+  --op-border-dark-grey: #ffffff;
+
+  /* ICON */
+  --op-icon-grey: #888e96;
+  --op-icon-light-grey: #d4d4d4;
+  --op-icon-light-blue: #70a7bf;
+  --op-icon-red: #EA5C5C;
+  --op-icon-dark-grey: #373435;
+  --op-icon-alert: orange;
+
+  /* LOADING */
+  --op-loading-dark-blue: rgba(0, 70, 96, 1);
+  --op-loading-blue: #489FB5;
+}
+
+[data-theme='pb'] {
+  /* FONT */
+  --op-font-title: #30599B;
+  --op-font-label: #505050;
+  --op-font-dark: #252525;
+  --op-font-dark-light: #505050;
+  --op-font-input: #252525;
+  --op-font-breadcrumb: #30599B;
+  --op-font-blue: #30599B;
+  --op-font-breadcrumb-mobile: #505050;
+  --op-font-gray: #505050;
+  --op-font-accent: #30599B;
+
+  --op-font-family: 'Inter', sans-serif;
+  --op-font-family-regular: 'Inter', sans-serif;
+  --op-font-family-medium: 'Inter', sans-serif;
+  --op-font-family-semibold: 'Inter', sans-serif;
+  --op-font-family-bold: 'Inter', sans-serif;
+  --op-font-family-italic: 'Inter', sans-serif;
+
+  /* BACKGROUND */
+  --op-bg: #F5F6F8;
+  --op-bg-card: #ffffff;
+  --op-bg-card-item: #F5F6F8;
+  --op-bg-menu-user: #30599B;
+  --op-bg-button-green: #30599B;
+  --op-bg-button-green-hover: #1F3D6B;
+  --op-bg-button-submit: #30599B;
+  --op-bg-button-submit-hover: #1F3D6B;
+  --op-bg-button-draft: rgba(48, 89, 155, 0.75);
+  --op-bg-button-draft-hover: rgba(48, 89, 155, 0.6);
+  --op-bg-breadcrumb: #EDF1F8;
+  --op-bg-gray: #F5F6F8;
+
+  /* BORDER */
+  --op-border-input: #E3E3E3;
+  --op-border-input-hover: #30599B;
+  --op-border-card: #E3E3E3;
+  --op-border-light-grey: #E3E3E3;
+
+  /* ICON */
+  --op-icon-grey: #505050;
+  --op-icon-light-grey: #E3E3E3;
+  --op-icon-light-blue: #6B8FC7;
+  --op-icon-dark-grey: #252525;
+
+  /* LOADING */
+  --op-loading-dark-blue: #30599B;
+  --op-loading-blue: #6B8FC7;
+}

@@ -1,0 +1,233 @@
+<div class="app-contract">
+    <div class="app-content-header" *ngIf="!isLoading">
+      <span *ngIf="!idContract">
+        {{ 'newContract' | translate }}
+      </span>
+  
+      <span *ngIf="idContract && contract">
+        <span
+          [pTooltip]="contract.object"
+          tooltipPosition="bottom"
+        >
+          {{ truncateProcessLabel(contract.object, 150) }}
+        </span>
+      </span>
+    </div>
+  
+    <div
+      class="loading-form-container"
+      *ngIf="isLoading || formIsSaving"
+    >
+      <app-card-loading
+        [isCardLoading]="isLoading || formIsSaving"
+      >
+      </app-card-loading>
+    </div>
+  
+    <div
+      class="card-properties-contract"
+      *ngIf="cardContractProperties && !isLoading"
+      [class.responsive]="responsive"
+    >
+      <app-card
+        [properties]="cardContractProperties"
+        class="mt-0 inputs-float-label"
+      >
+        <form [formGroup]="formContract">
+  
+          <ng-container *ngIf="!idContract">
+          <div class="agreement-search-filters">
+            <span class="agreement-search-label">
+              {{ 'searchBy' | translate }}:
+            </span>
+
+            <div class="contract-field selection-year app-property-selection">
+              <span class="p-float-label">
+                <p-dropdown
+                  class="app-single-selection"
+                  inputId="year"
+                  formControlName="year"
+                  [options]="yearOptions"
+                  optionLabel="label"
+                  optionValue="value"
+                  dropdownIcon="fas fa-caret-down"
+                  [autoDisplayFirst]="false"
+                  (onChange)="handleYearChange()"
+                >
+                </p-dropdown>
+
+                <label class="app-input-label" for="year">
+                  {{ 'year' | translate }}
+                </label>
+              </span>
+            </div>
+
+            <span class="agreement-search-connector">
+              {{ 'agreementSearchAnd' | translate }}
+            </span>
+
+            <div class="contract-field selection-organization app-property-selection">
+              <span class="p-float-label">
+                <p-dropdown
+                  class="app-single-selection"
+                  inputId="organization"
+                  formControlName="organization"
+                  [options]="organizationOptions"
+                  optionLabel="label"
+                  optionValue="value"
+                  dropdownIcon="fas fa-caret-down"
+                  [autoDisplayFirst]="false"
+                  (onChange)="handleOrganizationChange()"
+                >
+                </p-dropdown>
+
+                <label class="app-input-label" for="organization">
+                  {{ 'organization' | translate }}
+                </label>
+              </span>
+            </div>
+            <!-- Busca por protocolo temporariamente desabilitada.
+            <span class="agreement-search-connector">
+              {{ 'agreementSearchOr' | translate }}
+            </span>
+
+            <div class="contract-field protocol-search app-property-text">
+              <span class="p-float-label">
+                <p-inputMask
+                  inputId="protocolSearch"
+                  formControlName="protocolSearch"
+                  mask="9999-*****"
+                  [autoClear]="false"
+                  (onInput)="handleProtocolInput()"
+                  (onComplete)="handleProtocolComplete()"
+                ></p-inputMask>
+
+                <label class="app-input-label" for="protocolSearch">
+                  {{ 'protocol' | translate }}
+                </label>
+              </span>
+            </div>
+            -->
+          </div>
+          </ng-container>
+  
+          <div
+            *ngIf="!idContract && processSearchCompleted"
+            class="contract-field selection-medium app-property-selection"
+          >
+            <span class="p-float-label">
+              <p-dropdown
+                class="app-single-selection"
+                inputId="process"
+                formControlName="process"
+                [options]="processOptions"
+                optionLabel="label"
+                optionValue="value"
+                dropdownIcon="fas fa-caret-down"
+                [autoDisplayFirst]="false"
+                [filter]="true"
+                [showClear]="true"
+                (onChange)="handleProcessChange($event)"
+              >
+                <ng-template let-process pTemplate="selectedItem">
+                  <span
+                    class="process-option-label"
+                    [pTooltip]="process.label"
+                    tooltipPosition="bottom"
+                  >
+                    {{ truncateProcessLabel(process.label) }}
+                  </span>
+                </ng-template>
+
+                <ng-template let-process pTemplate="item">
+                  <span
+                    class="process-option-label"
+                    [pTooltip]="process.label"
+                    tooltipPosition="bottom"
+                  >
+                    {{ truncateProcessLabel(process.label) }}
+                  </span>
+                </ng-template>
+              </p-dropdown>
+  
+              <label class="app-input-label" for="process">
+                {{ 'contract' | translate }} *
+              </label>
+            </span>
+          </div>
+
+          <div
+            *ngIf="idContract"
+            class="contract-field text-medium app-property-text"
+          >
+            <div class="readonly-field">
+              <div class="app-input-label readonly-label">
+                {{ 'contract' | translate }}
+              </div>
+              <div
+                class="readonly-value"
+                [pTooltip]="processFullValue"
+                tooltipPosition="bottom"
+              >
+                {{ processFullValue || '-' }}
+              </div>
+            </div>
+          </div>
+  
+          <ng-container
+            *ngIf="
+              !isLoading &&
+              formContract.controls.process.value
+            "
+          >
+            <div class="contract-field text-small app-property-text">
+              <div class="readonly-field">
+                <div class="app-input-label readonly-label">
+                  {{ 'cnpj' | translate }}
+                </div>
+                <div class="readonly-value">
+                  {{ formContract.controls.partyCnpj.value || '-' }}
+                </div>
+              </div>
+            </div>
+  
+            <div class="contract-field text-small app-property-text">
+              <div class="readonly-field">
+                <div class="app-input-label readonly-label">
+                  {{ 'supplier' | translate }}
+                </div>
+                <div class="readonly-value">
+                  {{ formContract.controls.partyName.value || '-' }}
+                </div>
+              </div>
+            </div>
+  
+            <div class="contract-field text-small app-property-text">
+              <div class="readonly-field">
+                <div class="app-input-label readonly-label">
+                  {{ 'protocol' | translate }}
+                </div>
+                <div class="readonly-value">
+                  {{ formContract.controls.protocol.value || '-' }}
+                </div>
+              </div>
+            </div>
+          </ng-container>
+        </form>
+      </app-card>
+    </div>
+  </div>
+  
+  <app-buttons-container *ngIf="!isLoading && !idContract">
+    <app-save-button
+      #saveButton
+      (save)="saveContract()"
+    >
+    </app-save-button>
+  
+    <app-cancel-button
+      #cancelButton
+      (cancel)="handleOnCancel()"
+    >
+    </app-cancel-button>
+  </app-buttons-container>

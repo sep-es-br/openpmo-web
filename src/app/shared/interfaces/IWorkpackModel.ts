@@ -40,6 +40,9 @@ export interface IWorkpackModel {
   notificationsEventMilestoneDaysBefore?: number;
   notificationsEventScheduleEnabled?: boolean;
   notificationsEventScheduleDayOfMonth?: number;
+  obligationsSessionActive?: boolean;
+  procurementsSessionActive?: boolean;
+  agreementsSessionActive?: boolean;
 }
 
 export interface IReusableWorkpackModel {

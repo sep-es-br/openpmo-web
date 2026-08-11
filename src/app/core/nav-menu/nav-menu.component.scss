@@ -61,9 +61,9 @@ $mobileMenuHeight: 90px;
     }
     &.opened {
       background-color: #eeeeee;
-      color: #023c55;
+      color: v.$bgMenuUser;
       .app-icon, .far.fa-star, .fa-icon , .fa-file-alt {
-        color: #023c55;
+        color: v.$bgMenuUser;
       }
     }
   }
@@ -74,7 +74,7 @@ $mobileMenuHeight: 90px;
 
   .opened {
     .app-icon.offices {
-      color: #023c55 !important;
+      color: v.$bgMenuUser !important;
     }
   }
   

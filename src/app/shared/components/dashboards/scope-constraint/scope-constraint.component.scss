@@ -24,7 +24,7 @@
       font-weight: 700;
       font-style: normal;
       font-size: 0.9rem;
-      color: #004660;
+      color: v.$fontTitle;
       > i {
         font-size: 1.2rem;
       }
@@ -45,7 +45,7 @@
       color: #EA5C5C;
     }
     .positive-variation {
-      color: #44B39B;
+      color: v.$fontApproved;
     }
     .not-variation {
       color: #fafaf9;
@@ -89,7 +89,7 @@
     .proposed {
       margin-top: 0.5em;
       label {
-        color: #0083BB !important;
+        color: v.$fontBlue !important;
       }
     }
   }

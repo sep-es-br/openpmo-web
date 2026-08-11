@@ -8,7 +8,7 @@ import { Subject } from 'rxjs';
 import { debounceTime, takeUntil } from 'rxjs/operators';
 import { MessageService } from 'primeng/api';
 
-import { IOfficePermission } from 'src/app/shared/interfaces/IOfficePermission';
+import { IOfficePermission, IPublicIdentityValidation } from 'src/app/shared/interfaces/IOfficePermission';
 import { OfficePermissionService } from 'src/app/shared/services/office-permission.service';
 import { ResponsiveService } from 'src/app/shared/services/responsive.service';
 import { ICardItemPermission } from 'src/app/shared/interfaces/ICardItemPermission';
@@ -102,6 +102,8 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
 
   containsName = false;
   containsEmail = false;
+
+  identityValidation: IPublicIdentityValidation;
 
   constructor(
     private actRouter: ActivatedRoute,
@@ -365,6 +367,7 @@ loadCardItemsPersonPermissions() {
   }
 
   validateClearSearchByUser() {
+    this.identityValidation = undefined;
     this.person = undefined;
     this.publicServersResult = [];
     this.showListBoxPublicServers = false;
@@ -377,6 +380,7 @@ loadCardItemsPersonPermissions() {
   }
 
   async searchCitizenUserByName() {
+    this.identityValidation = undefined;
     this.saveButton?.hideButton();
     this.publicServersResult = [];
     if (this.person) {
@@ -399,6 +403,7 @@ loadCardItemsPersonPermissions() {
 
   validateClearSearchByCpf(event) {
     if (!event || event.length === 0) {
+      this.identityValidation = undefined;
       this.person = undefined;
       this.loadNewPermission();
       this.validCpf = true;
@@ -408,6 +413,7 @@ loadCardItemsPersonPermissions() {
   }
 
   async validateCpf() {
+    this.identityValidation = undefined;
     this.saveButton?.hideButton();
     this.citizenUserNotFoundByCpf = false;
     this.validCpf = cpfValidator(this.searchedCpfUser);
@@ -428,6 +434,11 @@ loadCardItemsPersonPermissions() {
           return;
         }
         this.person = result.data;
+        this.identityValidation = {
+          searchType: 'CPF',
+          cpf: this.searchedCpfUser,
+          sub: this.person.key,
+        };
         this.containsName = !!this.person.name;
         this.containsEmail = !!this.person.email;
         this.loadNewPermission();
@@ -455,6 +466,10 @@ loadCardItemsPersonPermissions() {
         return;
       }
       this.person = result.data;
+      this.identityValidation = {
+        searchType: 'PUBLIC_AGENT',
+        sub: this.person.key,
+      };
       this.searchedNameUser = '';
       this.publicServersResult = [];
       this.showListBoxPublicServers = false;
@@ -497,6 +512,7 @@ loadCardItemsPersonPermissions() {
       key: this.key ? this.key : this.person.key,
       person: this.person,
       permissions: this.permission.permissions,
+      identityValidation: this.identityValidation,
     };
     const result = this.key
       ? await this.officePermissionsSrv.put(permission)

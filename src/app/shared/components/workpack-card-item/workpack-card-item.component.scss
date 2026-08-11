@@ -8,7 +8,7 @@
     text-align: center !important;
     &:enabled {
       &:hover {
-        border-color: #44B39B !important;
+        border-color: v.$bgButtonSubmit !important;
       }
       &:focus {
         box-shadow: none !important;
@@ -20,7 +20,7 @@
     background-color: transparent !important;
     border: none !important;
     box-shadow: none !important;
-    color: #44B39B !important;
+    color: v.$fontAccent !important;
   }
 }
 
@@ -58,7 +58,7 @@
     padding-right: 0.5em;
     padding-top: 5px;
     .p-button {
-      background-color: #44b39b !important;
+      background-color: v.$bgButtonSubmit !important;
       border: none;
       margin-left: .5rem;
     }
@@ -89,14 +89,14 @@
 
 ::ng-deep .app-workpack-card-item {
   .fa-info-circle {
-    color: #0083bb;
+    color: v.$fontBlue;
     margin-right: 5px;
     margin-top: 5px;
   }
   .fa-info {
-    color: #0083bb;
+    color: v.$fontBlue;
     padding: 3px 7.5px;
-    border: 1px solid #0083bb;
+    border: 1px solid v.$fontBlue;
     border-radius: 50%;
     font-size: 0.7rem;
     width: 20px;
@@ -132,10 +132,10 @@
         background-color: #B5B5B5;
       }
       .subtitle-box-actual {
-        background-color: #0083BB;
+        background-color: v.$fontBlue;
       }
       .subtitle-box-foreseen {
-        background-color: #44B39B;
+        background-color: v.$bgApproved;
       }
       .subtitle-label-planned {
         color: #B5B5B5;
@@ -497,7 +497,7 @@
             background-color: #fff;
             .ontime {
                 height: 12px;
-                background-color: #44B39B;
+                background-color: v.$bgApproved;
             }
             .late {
                 height: 12px;
@@ -505,7 +505,7 @@
             }
             .concluded {
                 height: 12px;
-                background-color: #0083BB;
+                background-color: v.$fontBlue;
             }
             .concluded-late {
               height: 12px;
@@ -625,7 +625,7 @@
           overflow: hidden;
           .ontime {
             width: 100%;
-            background-color: #44B39B;
+            background-color: v.$bgApproved;
           }
           .late {
             width: 100%;
@@ -633,7 +633,7 @@
           }
           .concluded {
             width: 100%;
-            background-color: #0083BB;
+            background-color: v.$fontBlue;
           }
           .concluded-late {
             width: 100%;
@@ -951,13 +951,13 @@
       }
     }
     .on-time {
-      color: #44B39B;
+      color: v.$fontApproved;
     }
     .late {
       color: #EA5C5C;
     }
     .concluded {
-      color: #0083BB;
+      color: v.$fontBlue;
     }
     .late-concluded {
       color: #806AAD;
@@ -1001,13 +1001,13 @@
         font-weight: 500;
       }
       .on-time {
-        color: #44B39B;
+        color: v.$fontApproved;
       }
       .late {
         color: #EA5C5C;
       }
       .concluded {
-        color: #0083BB;
+        color: v.$fontBlue;
       }
       .late-concluded {
         color: #806AAD;

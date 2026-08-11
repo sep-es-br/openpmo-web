@@ -150,7 +150,7 @@
   .ccm-text {
     font-size: 0.8rem;
     font-family: "Montserrat Medium", "Montserrat Regular", "Montserrat", sans-serif;
-    color: #004660;
+    color: v.$fontTitle;
     flex: 1;
     display: -webkit-box;
     -webkit-line-clamp: 3;
@@ -163,7 +163,7 @@
 .ccm-text {
   font-size: 0.8rem;
   font-family: "Montserrat Medium", "Montserrat Regular", "Montserrat", sans-serif;
-  color: #004660;
+  color: v.$fontTitle;
   flex: 1;
   display: -webkit-box;
   -webkit-line-clamp: 3;
