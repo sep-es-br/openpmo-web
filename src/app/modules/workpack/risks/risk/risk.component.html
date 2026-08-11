@@ -18,7 +18,7 @@
               <span class="p-float-label">
                 <input class="app-input-text" id="float-name" formControlName="name" type="text"
                   [class.responsive]="responsive" [ngStyle]="{'width': '30%'}" pInputText />
-                <label class="app-input-label" for="float-name">{{ "name" | translate }} * 
+                <label class="app-input-label" for="float-name">{{ "name" | translate }} *
                   <i class="far fa-question-circle" [pTooltip]="'help.risk.name' | translate"></i>
                 </label>
               </span>
@@ -56,9 +56,9 @@
                 [label]="'opportunity' |translate"></p-radioButton>
             </div>
           </div>
-          <label class="status-title">{{'status' |translate}}
+          <!-- <label class="status-title">{{'status' |translate}}
             <i class="far fa-question-circle" [pTooltip]="'help.risk.status' | translate"></i>
-          </label>
+          </label> -->
           <div class="p-fluid">
             <div class="p-field status-container">
               <p-radioButton class="status-radio" value="OPEN" formControlName="status" [label]="'open' |translate">
@@ -92,7 +92,7 @@
                   icon="fas fa-calendar-alt" [dateFormat]="calendarFormat">
                 </p-calendar>
                 <label class="app-input-label properties-label" for="float-end">{{ "toNoDateEqualAny" | translate}}
-                <i class="far fa-question-circle" [pTooltip]="'help.risk.likelyToHappenTo' | translate"></i>  
+                <i class="far fa-question-circle" [pTooltip]="'help.risk.likelyToHappenTo' | translate"></i>
                 </label>
               </span>
             </div>
@@ -137,5 +137,5 @@
     <app-save-button (save)="saveRisk()"></app-save-button>
     <app-cancel-button (cancel)="handleOnCancel()"></app-cancel-button>
   </app-buttons-container>
-  
+
 </div>
