@@ -1,5 +1,18 @@
 @use "src/variables" as v;
 
+$card-view-icon-size: 34px;
+$list-view-icon-box-size: 28px;
+$list-view-icon-font-size: 1.2rem;
+$card-item-title-font-size: 0.80rem;
+$card-item-secondary-font-size: 0.68rem;
+$list-item-secondary-font-size: 0.65rem;
+$list-item-metadata-font-size: 0.68rem;
+$card-item-metadata-font-size: 0.72rem;
+$card-item-metadata-row-size: 1.2rem;
+$list-main-content-width: 95%;
+$list-side-content-width: 5%;
+$card-horizontal-space: 1rem;
+
 ::ng-deep .app-card-item {
 
 
@@ -328,6 +341,90 @@
         height: 68px;
       }
     }
+
+    &:not(.cardList) {
+      .card-item-content {
+        flex: 1;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        padding-top: 0.75rem !important;
+
+        .person-left-content {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+        }
+
+        .person-right-content {
+          display: none;
+        }
+
+        .person-identification {
+          width: calc(100% - $card-horizontal-space);
+          max-width: calc(100% - $card-horizontal-space);
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+
+          .card-item-name,
+          .card-item-full-name {
+            display: block;
+            max-width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+          }
+
+          .card-item-name {
+            padding-bottom: 0.2rem;
+            font-size: $card-item-title-font-size;
+          }
+
+          .card-item-full-name {
+            font-size: $card-item-secondary-font-size;
+            text-align: center;
+            color: #888e96;
+          }
+        }
+
+      }
+
+      .person-card-subtitle {
+        flex: 0 0 $card-item-metadata-row-size;
+        width: 100%;
+        min-height: $card-item-metadata-row-size;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        .user-label-card {
+          padding: 0 !important;
+          font-size: $card-item-metadata-font-size;
+        }
+      }
+
+      .app-avatar .avatar .p-avatar-xl {
+        width: $card-view-icon-size !important;
+        height: $card-view-icon-size !important;
+
+        .p-avatar-icon {
+          font-size: 1.5rem;
+        }
+      }
+
+      .person-metadata {
+        width: 100%;
+
+        .user-label-list {
+          display: none;
+        }
+
+        .card-item-footer {
+          margin-left: auto;
+        }
+      }
+    }
   }
 
   &.cardList {
@@ -377,8 +474,89 @@
     .p-card-body {
       padding-top: 0 !important;
 
+      .card-item-content {
+        min-width: 0;
+        width: $list-main-content-width;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+
+        .person-left-content,
+        .person-right-content {
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+        }
+
+        .person-left-content {
+          min-width: 0;
+        }
+
+        .person-right-content {
+          flex-shrink: 0;
+          margin-left: auto;
+
+          .user-label {
+            padding: 0.5em !important;
+            color: #009dd4;
+            font-size: 0.88rem;
+          }
+
+        }
+
+        .person-identification {
+          flex: 0 1 auto;
+          min-width: 0;
+          margin-left: 8px;
+          overflow: hidden;
+          display: flex;
+          flex-direction: column;
+          align-items: flex-start;
+
+          .card-item-name,
+          .card-item-full-name {
+            max-width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+          }
+
+          .card-item-name {
+            margin-left: 0;
+            padding: 0;
+            font-size: $card-item-title-font-size;
+            text-align: left;
+          }
+
+          .card-item-full-name {
+            margin-top: 2px;
+            font-size: $list-item-secondary-font-size;
+            text-align: left;
+            color: #888e96;
+          }
+        }
+
+      }
+
+      .person-card-subtitle {
+        display: none;
+      }
+
+      .person-metadata {
+        flex-shrink: 0;
+        width: $list-side-content-width;
+        height: 100%;
+        padding: 0;
+        align-self: stretch;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        justify-content: flex-end;
+      }
+
       .card-item-footer {
         width: auto;
+        padding: 0 0.5em 0.5em;
         flex-direction: row;
       }
       .p-card-content {
@@ -386,15 +564,16 @@
         justify-content: space-between;
       }
       .app-avatar .avatar .p-avatar-xl {
-        width: 40px;
-        height: 40px;
+        width: $list-view-icon-box-size;
+        height: $list-view-icon-box-size;
 
         .p-avatar-icon {
-          font-size: 1.8rem;
+          font-size: $list-view-icon-font-size;
         }
       }
     }
   }
+
 }
 
 ::ng-deep .node-disabled {
@@ -407,6 +586,10 @@
 
 ::ng-deep .app-card-item.process {
   .p-card {
+    .process-priority-icon {
+      color: v.$fontAccent;
+    }
+
     .card-item-header {
       width: 100%;
       display: flex;
@@ -442,13 +625,327 @@
       padding: 0 0.5em 0.5em 0.5em;
     }
   }
+
+}
+
+::ng-deep .app-card-item.listItemStakeholder.cardList {
+  .display-mode-list .right-side {
+    flex: 0 0 $list-side-content-width;
+    width: $list-side-content-width;
+    min-width: 0;
+    margin-left: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: space-between;
+  }
+
+  .card-item-content {
+    flex: 1 1 $list-main-content-width;
+    width: $list-main-content-width;
+    min-width: 0;
+    align-items: center;
+    justify-content: space-between;
+
+    .stakeholder-left-content,
+    .stakeholder-right-content {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+    }
+
+    .stakeholder-left-content {
+      min-width: 0;
+
+      > i {
+        flex: 0 0 $list-view-icon-box-size;
+        width: $list-view-icon-box-size;
+        height: $list-view-icon-box-size;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: $list-view-icon-font-size !important;
+      }
+    }
+
+    .stakeholder-right-content {
+      flex-shrink: 1;
+      min-width: 0;
+      margin-left: auto;
+
+      .stakeholder-status-date-space {
+        flex: 0 0 85px;
+        width: 85px;
+      }
+    }
+
+    .stakeholder-list-identification {
+      min-width: 0;
+      margin-left: 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+
+      .card-item-name,
+      .card-item-full-name {
+        max-width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        text-align: left;
+      }
+
+      .card-item-name {
+        margin-left: 0;
+        padding: 0;
+        font-size: $card-item-title-font-size;
+      }
+
+      .card-item-full-name {
+        margin-top: 2px;
+        font-size: $list-item-secondary-font-size;
+        color: #888e96;
+      }
+    }
+
+  }
+
+  .stakeholder-right-content {
+    .subtitle {
+      min-width: 0;
+      font-size: $list-item-metadata-font-size;
+      color: #009dd4;
+      line-height: 1rem;
+      text-align: right;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+
+      .card-item-subtitle {
+        white-space: nowrap;
+      }
+    }
+  }
+
+  .display-mode-list .right-side > .card-item-footer {
+    flex-shrink: 0;
+    width: auto;
+    padding: 0 0.5em 0.5em;
+    flex-direction: row;
+  }
+}
+
+::ng-deep .app-card-item.listItemStakeholder:not(.cardList) {
+  .card-item-content {
+    flex: 1;
+    justify-content: flex-start;
+    padding-top: 0.75rem !important;
+
+    > i {
+      flex: 0 0 $card-view-icon-size;
+      width: 34px !important;
+      height: 34px !important;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 34px !important;
+    }
+
+    .stakeholder-card-identification {
+      width: calc(100% - 1rem);
+      max-width: calc(100% - 1rem);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+
+      .card-item-name,
+      .card-item-full-name {
+        display: block;
+        max-width: 100%;
+        padding: 0;
+        text-align: center;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .card-item-name {
+        margin: 0.5rem 0 0.2rem;
+        font-size: 0.80rem;
+      }
+
+      .card-item-full-name {
+        font-size: 0.68rem;
+        color: #888e96;
+      }
+    }
+
+  }
+
+  .stakeholder-card-subtitle {
+    flex: 0 0 2rem;
+    width: 100%;
+    min-height: 2rem;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    overflow: hidden;
+
+    .subtitle {
+      width: 100%;
+      max-width: 100%;
+      padding: 0 0.5rem 0.5rem;
+      color: #009dd4;
+      font-size: 0.72rem;
+      text-align: center;
+      white-space: normal;
+      overflow-wrap: anywhere;
+
+      .card-item-subtitle {
+        display: inline;
+        width: auto !important;
+        font-size: 0.72rem;
+        white-space: normal !important;
+        overflow: visible !important;
+        text-align: center;
+      }
+    }
+  }
 }
 
 ::ng-deep .app-card-item.process.cardList {
-  .card-item-subtitle {
-    padding: 0.5rem 0.5rem 0;
+  .display-mode-list .right-side {
+    flex: 0 0 5%;
+    width: 5%;
+    min-width: 0;
   }
 
+  .card-item-content {
+    flex: 1 1 95%;
+    width: 95%;
+    min-width: 0;
+    justify-content: space-between;
+
+    .process-left-content,
+    .process-right-content {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+    }
+
+    .process-left-content {
+      min-width: 0;
+
+      > i {
+        flex: 0 0 28px;
+        width: 28px;
+        height: 28px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem !important;
+      }
+
+      .card-item-name {
+        min-width: 0;
+        margin-left: 8px;
+        padding: 0;
+        font-size: 0.80rem;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+    }
+
+    .process-right-content {
+      flex-shrink: 0;
+      margin-left: auto;
+
+      .card-item-subtitle {
+        padding: 0.5rem !important;
+        font-size: 0.68rem;
+        white-space: nowrap;
+      }
+
+      .organization-name {
+        flex-shrink: 0;
+        margin-left: 0.5rem;
+        font-size: 0.68rem;
+        white-space: nowrap;
+      }
+
+      .process-status-date-space {
+        flex: 0 0 85px;
+        width: 85px;
+      }
+    }
+  }
+
+}
+
+::ng-deep .app-card-item.process:not(.cardList) {
+  .card-item-content {
+    flex: 1;
+    justify-content: flex-start;
+    padding-top: 0.75rem !important;
+
+    > i {
+      flex: 0 0 $card-view-icon-size;
+      width: $card-view-icon-size !important;
+      height: $card-view-icon-size !important;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: $card-view-icon-size !important;
+    }
+
+    .process-card-identification {
+      width: calc(100% - #{$card-horizontal-space});
+      max-width: calc(100% - #{$card-horizontal-space});
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+
+      .process-card-number,
+      .process-card-name {
+        display: block;
+        max-width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        text-align: center;
+      }
+
+      .process-card-number {
+        margin: 0.5rem 0 0.2rem;
+        font-size: 0.80rem;
+      }
+
+      .process-card-name {
+        font-size: 0.68rem;
+        color: #888e96;
+      }
+    }
+  }
+
+  .process-card-organization {
+    flex: 0 0 1.2rem;
+    width: 100%;
+    min-height: 1.2rem;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+
+    .organization-name {
+      max-width: calc(100% - 1rem);
+      color: #009dd4;
+      font-size: 0.72rem;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
 }
 
 ::ng-deep .new-carditem {
@@ -483,11 +980,11 @@
               font-size: 0.9rem;
               font-family: v.$fontFamilyMedium;
               color: #939393;
-            }
-          }
-        }
+      }
       }
     }
+  }
+  }
 
     .p-card-body .p-card-content .carditem-content {
       padding: 1.5em;
@@ -639,4 +1136,9 @@
 .user-label {
   color: #009dd4;
   padding: 0 0.5rem 0 !important;
+
+  &.user-label-hidden {
+    visibility: hidden;
+  }
+
 }

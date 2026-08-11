@@ -71,7 +71,8 @@
             [class.date-none]="properties?.baselineStatusDate === 'NONE'">
             {{ properties?.baselineStatusDate !== 'NONE' ? (language === 'pt' ?
             (properties?.baselineStatusDate|date:'dd/MM/yyyy') :
-            (properties?.baselineStatusDate|date:'yyyy/MM/dd')) : ''}}</span>
+            (properties?.baselineStatusDate|date:'yyyy/MM/dd')) : ''}}
+          </span>
         </div>
       </div>
       <div class="right-side">
