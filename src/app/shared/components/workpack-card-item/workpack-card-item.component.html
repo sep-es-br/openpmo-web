@@ -81,8 +81,6 @@
               <i [ngClass]="properties.iconSvg ? [ 'app-icon', properties.icon, 'grey-icon'] : [ 'icon-card', properties.icon, 'grey-icon' ]"
                 [class.linked]="!!properties?.linked || !!properties.shared" [ngStyle]="{ fontSize: '2rem' }"></i>
               <i [ngClass]="['app-icon', 'link-to', 'grey-icon', 'linked']" *ngIf="!!properties?.linked"></i>
-              <i [ngClass]="['app-icon', 'sharing', 'grey-icon', 'linked']"
-                *ngIf="!!properties.shared && !properties.linked"></i>
             </div>
             <span class="card-item-name" [pTooltip]="properties.fullNameCardItem"
               tooltipPosition="bottom">{{properties.nameCardItem}}</span>
@@ -222,7 +220,12 @@
             </div>
           </p-overlayPanel>
           <div class="footer-info">
-            <i class="app-icon baseline" *ngIf="!!properties?.hasBaseline" [pTooltip]="properties?.baselineName"></i>
+            <div class="footer-icons">
+              <i class="app-icon sharing grey-icon"
+                *ngIf="!!properties.shared && !properties.linked"></i>
+              <i class="app-icon baseline grey-icon" *ngIf="!!properties?.hasBaseline"
+                [pTooltip]="properties?.baselineName"></i>
+            </div>
             <span class="card-item-id">
               {{cardIdItem}}
             </span>
@@ -313,16 +316,11 @@
               </i>
             </span>
 
-            <span class="dashboard-icon-slot dashboard-management-slot">
-              <i class="far fa-stop-circle"
-                *ngIf="showEndManagementIndex() && !!properties.endManagementDate && properties.endManagementDate !== null"
-                [pTooltip]="'managementEnded'|translate"></i>
-            </span>
-
             <span class="dashboard-icon-slot dashboard-completed-scope-slot">
               <i class="far fa-check-square" *ngIf="showEndManagementIndex() && !!properties.completed"
                 [pTooltip]="label|translate"></i>
             </span>
+
           </div>
           <p-overlayPanel #journalInformationPanelList class="journal-info-overlay-panel" [showCloseIcon]="true" [dismissable]="false">
             <div class="journal-info-panel-content"
