@@ -149,7 +149,7 @@ export class ControlChangeBoardListComponent implements OnInit, OnDestroy {
     this.mapIdWorkpackName = {};
 
         for (const idWorkpack of data.map(ccb => ccb.idWorkpack)) {
-          const {success, data} = await this.workpackSrv.GetWorkpackById(idWorkpack);
+          const {success, data} = await this.workpackSrv.GetWorkpackById(idWorkpack, {'id-plan': this.idPlan });
           if (success) {
             this.mapIdWorkpackName[idWorkpack] = data.name;
           } else {
