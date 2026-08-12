@@ -157,6 +157,15 @@ $card-horizontal-space: 1rem;
       .card-item-content {
         width: 100%;
 
+        .card-item-subtitle {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin-left: auto;
+          padding: 0 1rem;
+          text-align: center;
+        }
+
         .card-item-funder {
           padding: 0.6rem 0.5rem 0.5rem 0.5rem;
         }
