@@ -1,4 +1,5 @@
 @use "src/variables" as v;
+@use "src/card-item-mixins" as card-item;
 
 $card-view-icon-size: v.$cardViewIconSize;
 $list-view-icon-box-size: v.$listViewIconBoxSize;
@@ -229,14 +230,14 @@ $card-horizontal-space: 1rem;
         color: rgba(147, 147, 147, 0.5);
       }
 
+      .card-item-icon {
+        @include card-item.icon(1.8rem);
+      }
+
       .card-item-name {
-        max-width: 100%;
-        font-size: 0.9rem;
-        font-family: v.$fontFamilyMedium;
+        @include card-item.name;
         padding: 0.5rem 0.5rem 0.5rem 0.5rem;
         text-align: center;
-        white-space: wrap;
-        word-break: break-word;
       }
 
       .role {
@@ -282,6 +283,10 @@ $card-horizontal-space: 1rem;
         flex-direction: row;
         justify-content: flex-start;
         margin-left: 1em;
+
+        .card-item-icon {
+          @include card-item.icon(1.5rem);
+        }
       }
     }
 

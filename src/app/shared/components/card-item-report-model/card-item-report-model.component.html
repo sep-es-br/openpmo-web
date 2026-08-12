@@ -7,10 +7,14 @@
       </p-header>
       <div class="card-item-content" [class.card-link]="properties.urlCard" [routerLink]="properties.urlCard"
         [class.cardList]="displayModeCard === 'list'" [queryParams]="getQueryParams()">
-        <i [ngClass]="[ 'icon-card', properties.icon, 'grey-icon' ]"
-          [ngStyle]="{ fontSize: '2rem', color: properties.iconColor }"></i>
-        <span class="card-item-name">{{properties.nameCardItem}}</span>
-        <span class="card-item-fullName" *ngIf="properties.fullNameCardItem" [pTooltip]="properties.fullNameCardItem" >{{properties.fullNameCardItem}}</span>
+        <i [ngClass]="[ 'icon-card', 'card-item-icon', properties.icon, 'grey-icon' ]"
+          [ngStyle]="{ color: properties.iconColor }"></i>
+        <div class="card-item-text">
+          <span class="card-item-name" [pTooltip]="properties.nameCardItem"
+            tooltipPosition="bottom">{{properties.nameCardItem}}</span>
+          <span class="card-item-fullName" *ngIf="properties.fullNameCardItem"
+            [pTooltip]="properties.fullNameCardItem">{{properties.fullNameCardItem}}</span>
+        </div>
       </div>
       <div class="card-item-footer" *ngIf="cardIdItem">
         <span class="card-item-id">
@@ -21,10 +25,14 @@
     <div class="display-mode-list" *ngIf="displayModeCard === 'list'">
       <div class="card-item-content" [class.card-link]="properties.urlCard" [routerLink]="properties.urlCard"
         [class.cardList]="displayModeCard === 'list'" [queryParams]="getQueryParams()">
-        <i [ngClass]="properties.iconSvg ? [ 'app-icon', properties.icon, 'grey-icon'] : [ 'icon-card', properties.icon, 'grey-icon' ]"
-          [ngStyle]="{ fontSize: displayModeCard === 'list' ? '1.5rem' : '1.8rem' }"></i>
-        <span class="card-item-name">{{properties.nameCardItem}}</span>
-        <span class="card-item-fullName" *ngIf="properties.fullNameCardItem" [pTooltip]="properties.fullNameCardItem">{{properties.fullNameCardItem}}</span>
+        <i [ngClass]="properties.iconSvg ? [ 'app-icon', 'card-item-icon', properties.icon, 'grey-icon'] : [ 'icon-card', 'card-item-icon', properties.icon, 'grey-icon' ]"
+          [ngStyle]="{ color: properties.iconColor }"></i>
+        <div class="card-item-text">
+          <span class="card-item-name" [pTooltip]="properties.nameCardItem"
+            tooltipPosition="bottom">{{properties.nameCardItem}}</span>
+          <span class="card-item-fullName" *ngIf="properties.fullNameCardItem"
+            [pTooltip]="properties.fullNameCardItem">{{properties.fullNameCardItem}}</span>
+        </div>
       </div>
       <div class="right-side">
         <p-header class="card-item-header">

@@ -1,0 +1,26 @@
+@use "src/variables" as v;
+
+@mixin name {
+  min-width: 0;
+  max-width: 100%;
+  font-size: 0.9rem;
+  font-family: v.$fontFamilyMedium;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@mixin description {
+  min-width: 0;
+  max-width: 100%;
+  font-size: 0.8rem;
+  font-family: v.$fontFamilyMedium;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@mixin icon($size) {
+  flex: 0 0 auto;
+  font-size: $size;
+}
