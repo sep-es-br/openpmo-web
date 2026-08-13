@@ -64,6 +64,9 @@
   .header-container {
     display: flex;
     flex-direction: row;
+    align-items: flex-start;
+    column-gap: 0.5em;
+    padding-bottom: 0.5em;
     margin-bottom: 1em;
   }
   .actual-element {
@@ -74,18 +77,32 @@
   .app-content-header {
     display: flex;
     justify-content: flex-start;
-    align-items: center;
+    align-items: flex-start;
     flex: 1;
+    min-width: 0;
+    padding-bottom: 0.5em;
     border-bottom: 1px solid #D4D4D4;
 
+    .label {
+      flex-shrink: 0;
+    }
+
     .text {
-        flex-grow: 1;
+      flex: 1 1 auto;
+      min-width: 0;
+      overflow-wrap: anywhere;
     }
 
 
   }
   .header-container.mobile {
     flex-direction: column;
+
+    .container-actions {
+      width: 100%;
+      margin-top: 0.5em;
+      justify-content: flex-end;
+    }
   }
   .mobile {
     width: 100%;
@@ -94,15 +111,25 @@
   .container-actions {
     display: flex;
     justify-content: flex-end;
-    align-items: center;
+    align-items: flex-start;
+    flex-shrink: 0;
+    height: 30px;
 
     .dataview-filters-text {
+      flex: 0 0 35px;
       margin-right: 0.5em;
-      height: 2rem;
+      height: 30px;
       display: flex;
+      align-items: center;
       justify-content: flex-end;
       position: relative;
-      width: 100%;
+      width: 35px;
+
+      &.animation-input {
+        flex-basis: 25em;
+        width: 25em;
+        max-width: 25vw;
+      }
 
       .app-input-text.p-inputtext {
         font-size: 0.8rem !important;
@@ -129,7 +156,12 @@
         color: #959595;
 
         &.no-animation {
-          padding: 0.45rem;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 35px;
+          height: 30px;
+          padding: 0;
           background: v.$bgButtonSubmit;
           color: #FFF;
           top: 0;
@@ -159,9 +191,14 @@
     }
 
     .icon-favorite {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 35px;
+      height: 30px;
       color: #959595;
       font-size: 1.5rem;
-      padding-bottom: 5px;
+      padding: 0;
       cursor: pointer;
       &.icon-favorite-checked {
         color: #ffa000;
@@ -170,6 +207,23 @@
         padding-bottom: 0;
         padding-top: 0;
       }
+    }
+
+    .config-data-view-panel-app .display-config-header {
+      align-items: center;
+      padding-bottom: 0;
+    }
+
+    app-config-data-view-panel,
+    .config-data-view-panel-app,
+    .display-config-header {
+      display: flex;
+      align-items: flex-start;
+      height: 30px;
+    }
+
+    .config-data-view-panel-app.responsive {
+      padding-top: 0;
     }
   }
 
