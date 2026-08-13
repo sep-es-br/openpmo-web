@@ -65,7 +65,6 @@ export class PlanComponent implements OnInit, OnDestroy {
   $destroy = new Subject();
   editPermission = false;
   calendarFormat: string;
-  collapsePanelsStatus = true;
   displayModeAll = 'grid';
   pageSize = 5;
   totalRecords: number[] = [];
@@ -124,22 +123,6 @@ export class PlanComponent implements OnInit, OnDestroy {
     private searchSrv : SearchService,
     private thisElemRef : ElementRef<HTMLElement>
   ) {
-    this.configDataViewSrv.observableCollapsePanelsStatus.pipe(takeUntil(this.$destroy)).subscribe(collapsePanelStatus => {
-      this.collapsePanelsStatus = collapsePanelStatus === 'collapse' ? true : false;
-      this.cardPlanProperties = Object.assign({}, {
-        ...this.cardPlanProperties,
-        initialStateCollapse: this.collapsePanelsStatus
-      });
-      this.cardsPlanWorkPackModels = this.cardsPlanWorkPackModels && this.cardsPlanWorkPackModels.map(card => (
-        Object.assign({
-          ...card,
-          propertiesCard: {
-            ...card.propertiesCard,
-            initialStateCollapse: this.collapsePanelsStatus
-          }
-        })
-      ));
-    });
     this.configDataViewSrv.observableDisplayModeAll.pipe(takeUntil(this.$destroy)).subscribe(displayMode => {
       this.displayModeAll = displayMode;
     });
