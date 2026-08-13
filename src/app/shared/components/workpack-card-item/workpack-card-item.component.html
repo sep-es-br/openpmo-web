@@ -81,8 +81,6 @@
               <i [ngClass]="properties.iconSvg ? [ 'app-icon', properties.icon, 'grey-icon'] : [ 'icon-card', properties.icon, 'grey-icon' ]"
                 [class.linked]="!!properties?.linked || !!properties.shared" [ngStyle]="{ fontSize: '2rem' }"></i>
               <i [ngClass]="['app-icon', 'link-to', 'grey-icon', 'linked']" *ngIf="!!properties?.linked"></i>
-              <i [ngClass]="['app-icon', 'sharing', 'grey-icon', 'linked']"
-                *ngIf="!!properties.shared && !properties.linked"></i>
             </div>
             <span class="card-item-name" [pTooltip]="properties.fullNameCardItem"
               tooltipPosition="bottom">{{properties.nameCardItem}}</span>
@@ -153,14 +151,12 @@
                 (click)="handleShowJournalInformation(properties.journalInformation); journalInformationPanel.show($event)"></i>
             </div>
           </div>
-          <div
-            *ngIf="properties?.statusProperty"
-            class="status-box"
-          >
-            <ng-container
-              [ngTemplateOutlet]="iconConfig"
-              [ngTemplateOutletContext]="properties.statusProperty | workpackStatusConfig"
-            >
+          <div class="status-box">
+            <ng-container *ngIf="properties?.statusProperty">
+              <ng-container
+                [ngTemplateOutlet]="iconConfig"
+                [ngTemplateOutletContext]="properties.statusProperty | workpackStatusConfig"
+              >
               <ng-template
                 #iconConfig
                 let-icon="icon"
@@ -188,6 +184,7 @@
                   </i>
                 </ng-template>
               </ng-template>
+              </ng-container>
             </ng-container>
           </div>
           <p-overlayPanel #journalInformationPanel class="journal-info-overlay-panel" [showCloseIcon]="true" [dismissable]="false">
@@ -201,7 +198,7 @@
                   </p-progressSpinner>
                 </div>
               </div>
-              <div class="card-information-container" *ngIf="properties && properties?.journalInformation 
+              <div class="card-information-container" *ngIf="properties && properties?.journalInformation
                 && properties?.journalInformation?.date
                 && !properties?.journalInformation?.loading">
                 <app-card-journal-information
@@ -222,7 +219,16 @@
             </div>
           </p-overlayPanel>
           <div class="footer-info">
-            <i class="app-icon baseline" *ngIf="!!properties?.hasBaseline" [pTooltip]="properties?.baselineName"></i>
+            <div class="footer-icons">
+              <div class="footer-icons-content" [class.has-baseline]="!!properties?.hasBaseline">
+                <span class="footer-icon-slot" *ngIf="!!properties.shared && !properties.linked">
+                  <i class="app-icon sharing grey-icon"></i>
+                </span>
+                <span class="footer-icon-slot" *ngIf="!!properties?.hasBaseline">
+                  <i class="app-icon baseline grey-icon" [pTooltip]="properties?.baselineName"></i>
+                </span>
+              </div>
+            </div>
             <span class="card-item-id">
               {{cardIdItem}}
             </span>
@@ -239,8 +245,6 @@
               [class.linked]="!!properties.linked || !!properties.shared" [ngStyle]="{ fontSize: '1.5rem' }"></i>
             <i [ngClass]="['app-icon', 'link-to', 'grey-icon', 'linked']" *ngIf="!!properties.linked"
               [ngStyle]="{ marginLeft: '5px' }"></i>
-            <i [ngClass]="['app-icon', 'sharing', 'grey-icon', 'linked']" [ngStyle]="{ marginLeft: '5px' }"
-              *ngIf="!!properties.shared && !properties.linked"></i>
           </div>
           <span class="card-item-name" [pTooltip]="properties.fullNameCardItem"
             tooltipPosition="bottom">{{properties.nameCardItem}}</span>
@@ -248,67 +252,78 @@
       </div>
       <div class="right-container">
         <div class="dashboard-items-container">
-          <div class="status-container">
-            <ng-container
-              *ngIf="properties?.statusProperty"
-              [ngTemplateOutlet]="iconConfig"
-              [ngTemplateOutletContext]="properties.statusProperty | workpackStatusConfig"
-            >
-              <ng-template
-                #iconConfig
-                let-icon="icon"
-                let-iconOrigin="iconOrigin"
-                let-iconSrc="iconSrc"
-                let-iconColor="iconColor"
-                let-tooltip="tooltipMessage"
+          <div class="status-container dashboard-status-container">
+            <span class="dashboard-icon-slot">
+              <ng-container
+                *ngIf="properties?.statusProperty"
+                [ngTemplateOutlet]="iconConfig"
+                [ngTemplateOutletContext]="properties.statusProperty | workpackStatusConfig"
               >
-                <ng-container *ngIf="iconOrigin === 'img' else iconTemplate">
-                  <img
-                    class="img-status-icon"
-                    [ngStyle]="{ color: iconColor || 'black' }"
-                    [src]="'../../../../../../../..' + iconSrc"
-                    [pTooltip]="tooltip"
-                  >
-                </ng-container>
+                <ng-template
+                  #iconConfig
+                  let-icon="icon"
+                  let-iconOrigin="iconOrigin"
+                  let-iconSrc="iconSrc"
+                  let-iconColor="iconColor"
+                  let-tooltip="tooltipMessage"
+                >
+                  <ng-container *ngIf="iconOrigin === 'img' else iconTemplate">
+                    <img
+                      class="img-status-icon"
+                      [ngStyle]="{ color: iconColor || 'black' }"
+                      [src]="'../../../../../../../..' + iconSrc"
+                      [pTooltip]="tooltip"
+                    >
+                  </ng-container>
 
-                <ng-template #iconTemplate>
-                  <i
-                    class="i-status-icon"
-                    [ngClass]="iconSrc"
-                    [ngStyle]="{ color: iconColor || 'black' }"
-                    [pTooltip]="tooltip"
-                  >
-                  </i>
+                  <ng-template #iconTemplate>
+                    <i
+                      class="i-status-icon"
+                      [ngClass]="iconSrc"
+                      [ngStyle]="{ color: iconColor || 'black' }"
+                      [pTooltip]="tooltip"
+                    >
+                    </i>
+                  </ng-template>
                 </ng-template>
-              </ng-template>
-            </ng-container>
-            
-            <i
-              *ngIf="properties?.journalInformation?.date && !properties?.journalInformation?.actual"
-              class="fas fa-info"
-              style="cursor: pointer"
-              (click)="handleShowJournalInformation(properties?.journalInformation); journalInformationPanelList.show($event)"
-            >
-            </i>
-            <i
-              *ngIf="properties?.journalInformation?.date && properties?.journalInformation?.actual"
-              class="fas fa-info-circle"
-              [ngStyle]="{ fontSize: '1.2rem' }"
-              style="cursor: pointer"
-              (click)="handleShowJournalInformation(properties.journalInformation); journalInformationPanelList.show($event)"
-            >
-            </i>
+              </ng-container>
+            </span>
 
-            <i
-              *ngIf="showRiskIndex()"
-              class="app-icon risk i-risk-icon"
-              [class.risk-red]="riskImportance === 'high'"
-              [class.risk-yellow]="riskImportance === 'low'"
-              [class.risk-orange]="riskImportance === 'medium'"
-              (mouseenter)="riskPanelList.show($event)"
-              (mouseleave)="riskPanelList.hide()"
-            >
-            </i>
+            <span class="dashboard-icon-slot">
+              <i
+                *ngIf="properties?.journalInformation?.date && !properties?.journalInformation?.actual"
+                class="fas fa-info"
+                style="cursor: pointer"
+                (click)="handleShowJournalInformation(properties?.journalInformation); journalInformationPanelList.show($event)"
+              >
+              </i>
+              <i
+                *ngIf="properties?.journalInformation?.date && properties?.journalInformation?.actual"
+                class="fas fa-info-circle"
+                style="cursor: pointer"
+                (click)="handleShowJournalInformation(properties.journalInformation); journalInformationPanelList.show($event)"
+              >
+              </i>
+            </span>
+
+            <span class="dashboard-icon-slot">
+              <i
+                *ngIf="showRiskIndex()"
+                class="app-icon risk i-risk-icon"
+                [class.risk-red]="riskImportance === 'high'"
+                [class.risk-yellow]="riskImportance === 'low'"
+                [class.risk-orange]="riskImportance === 'medium'"
+                (mouseenter)="riskPanelList.show($event)"
+                (mouseleave)="riskPanelList.hide()"
+              >
+              </i>
+            </span>
+
+            <span class="dashboard-icon-slot dashboard-completed-scope-slot">
+              <i class="far fa-check-square" *ngIf="showEndManagementIndex() && !!properties.completed"
+                [pTooltip]="label|translate"></i>
+            </span>
+
           </div>
           <p-overlayPanel #journalInformationPanelList class="journal-info-overlay-panel" [showCloseIcon]="true" [dismissable]="false">
             <div class="journal-info-panel-content"
@@ -321,7 +336,7 @@
                   </p-progressSpinner>
                 </div>
               </div>
-              <div class="card-information-container" *ngIf="properties && properties?.journalInformation 
+              <div class="card-information-container" *ngIf="properties && properties?.journalInformation
                 && properties?.journalInformation?.date
                 && !properties?.journalInformation?.loading">
                 <app-card-journal-information
@@ -330,13 +345,6 @@
             </div>
           </p-overlayPanel>
 
-          <div class="status-container">
-            <i class="far fa-stop-circle"
-              *ngIf="showEndManagementIndex() && !!properties.endManagementDate && properties.endManagementDate !== null"
-              [pTooltip]="'managementEnded'|translate"></i>
-            <i class="far fa-check-square" *ngIf="showEndManagementIndex() && !!properties.completed"
-              [pTooltip]="label|translate"></i>
-          </div>
           <p-overlayPanel #riskPanelList class="risk-overlay-panel">
             <div class="risk-panel-content">
               <div class="title">
@@ -448,6 +456,8 @@
             </div>
           </p-header>
           <div class="footer-info">
+            <i [ngClass]="['app-icon', 'sharing', 'grey-icon', 'linked']"
+              *ngIf="!!properties.shared && !properties.linked"></i>
             <i class="app-icon baseline" *ngIf="!!properties?.hasBaseline" [pTooltip]="properties?.baselineName"></i>
             <span class="card-item-id">
               {{cardIdItem}}

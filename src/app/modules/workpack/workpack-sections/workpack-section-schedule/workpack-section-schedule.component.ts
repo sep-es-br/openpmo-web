@@ -161,6 +161,7 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy, Afte
         collapseble: this.showTabview ? false : true,
         isLoading: true,
         headerLabels: [],
+        progressBarValues: [],
         initialStateCollapse: this.showTabview
           ? false
           : this.collapsePanelsStatus,
@@ -802,6 +803,8 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy, Afte
         cardTitle: 'schedule',
         collapseble: this.showTabview ? false : true,
         isLoading: false,
+        headerLabels: [],
+        progressBarValues: [],
         initialStateCollapse: this.showTabview
           ? false
           : this.collapsePanelsStatus,
@@ -1745,8 +1748,8 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy, Afte
 
   validateTotalFinancialExceeded() {
     if(this.isCurrentBaseline){
-      const costBar = this.sectionSchedule.cardSection.progressBarValues
-      .find(bar => bar.type === 'cost');
+      const costBar = this.sectionSchedule?.cardSection?.progressBarValues
+        ?.find(bar => bar.type === 'cost');
 
       if (!costBar || costBar.progress === costBar.baselinePlanned) return;
       const planned = costBar.baselinePlanned;
@@ -1764,8 +1767,8 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy, Afte
 
   validatePhysicalReplannedDifferentFromPlanned() {
     if(this.isCurrentBaseline){
-      const bar = this.sectionSchedule.cardSection.progressBarValues
-        .find(b => b.type === 'scope');
+      const bar = this.sectionSchedule?.cardSection?.progressBarValues
+        ?.find(b => b.type === 'scope');
 
       if (!bar || bar.baselinePlanned == null || bar.baselinePlanned === 0) return;
 
@@ -1787,8 +1790,8 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy, Afte
   }
 
   validateTotalScopeReached() {
-    const scopeBar = this.sectionSchedule.cardSection.progressBarValues
-      .find(bar => bar.type === 'scope');
+    const scopeBar = this.sectionSchedule?.cardSection?.progressBarValues
+      ?.find(bar => bar.type === 'scope');
 
     if (!scopeBar) return;
 
@@ -1814,8 +1817,8 @@ export class WorkpackSectionScheduleComponent implements OnInit, OnDestroy, Afte
 
   validateReplannedFinancialTotal() {
     if(this.isCurrentBaseline){
-      const costBar = this.sectionSchedule.cardSection.progressBarValues
-        .find(bar => bar.type === 'cost');
+      const costBar = this.sectionSchedule?.cardSection?.progressBarValues
+        ?.find(bar => bar.type === 'cost');
 
       if (!costBar || costBar.total === costBar.baselinePlanned) return;
 

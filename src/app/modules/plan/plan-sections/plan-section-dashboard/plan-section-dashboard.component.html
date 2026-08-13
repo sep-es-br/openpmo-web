@@ -1,0 +1,106 @@
+<div
+  class="app-plan-dashboard app-dashboard"
+  [class.responsive]="responsive"
+  [class.expanded]="cardProperties.fullScreen">
+  <app-card
+    [properties]="cardProperties"
+    [class.card-expanded]="cardProperties.fullScreen"
+    class="panel-tab-view"
+    (changeFullScreen)="handleOnFullScreen($event)">
+    <div class="loading-container" *ngIf="isLoading">
+      <app-card-loading [isCardLoading]="isLoading"></app-card-loading>
+    </div>
+
+    <ng-container *ngIf="dashboard && !isLoading; else emptyDashboard">
+      <span class="workpack-fullName">{{ planFullName }}</span>
+
+      <div class="cards-list-container" *ngIf="dashboard.workpacksByModel?.length">
+        <div class="card-container" *ngFor="let model of dashboard.workpacksByModel">
+          <p-card>
+            <div class="card-item">
+              <div class="card-icon-container"><i [class]="model.icon"></i></div>
+              <div class="card-details">
+                <span class="quantity">{{ model.quantity }}</span>
+                <span class="type">{{ model.modelName }}</span>
+              </div>
+            </div>
+          </p-card>
+        </div>
+      </div>
+
+      <p-divider layout="horizontal"></p-divider>
+
+      <div class="top-container">
+        <div class="params-container" *ngIf="startDate && endDate">
+          <div class="param-item">
+            <label class="param-label">{{ 'reference' | translate }}</label>
+            <p-calendar
+              class="app-select-date"
+              [(ngModel)]="referenceMonth"
+              view="month"
+              [dateFormat]="calendarFormat"
+              [yearNavigator]="true"
+              [showIcon]="true"
+              icon="fas fa-calendar-alt"
+              [yearRange]="yearRange"
+              [minDate]="startDate"
+              [maxDate]="endDate"
+              [readonlyInput]="true"
+              inputId="monthpicker"
+              (ngModelChange)="handleSelectedReferenceMonth()">
+            </p-calendar>
+          </div>
+        </div>
+      </div>
+
+      <div class="charts-container d-flex flex-column w-100 mb-4 flex-xl-row">
+        <div class="triple-constraint-container col-12 col-xxl-6" *ngIf="dashboard.tripleConstraint">
+          <app-triple-constraint-dashboard
+            [tripleConstraint]="dashboard.tripleConstraint">
+          </app-triple-constraint-dashboard>
+        </div>
+
+        <div class="risk-milestone-charts-container d-flex flex-column flex-xl-row justify-content-center col-12 col-xxl-6">
+          <div class="dashboard-item col-12 col-xl-4 mb-4 mb-xl-0" *ngIf="statusData">
+            <app-doughnut-chart
+              [data]="statusData"
+              [middleText]="dashboard.dashboardStatusData.totalDeliverable.toString()"
+              [midleTextBottom]="'DeliverableLabelChart' | translate">
+            </app-doughnut-chart>
+          </div>
+          <div class="dashboard-item col-12 col-xl-4 mb-4 mb-xl-0" *ngIf="milestoneData">
+            <app-doughnut-chart
+              [data]="milestoneData"
+              [middleText]="dashboard.milestone.quantity.toString()"
+              [midleTextBottom]="'milestonesLabelChart' | translate">
+            </app-doughnut-chart>
+          </div>
+          <div class="dashboard-item col-12 col-xl-4 mb-4 mb-xl-0" *ngIf="riskData">
+            <app-doughnut-chart
+              [data]="riskData"
+              [middleText]="dashboard.risk.total.toString()"
+              [midleTextBottom]="'risksLabelChart' | translate">
+            </app-doughnut-chart>
+          </div>
+        </div>
+      </div>
+
+      <div
+        class="earned-value-analysis-container"
+        *ngIf="dashboard.earnedValueAnalysis?.earnedValueByStep?.length">
+        <app-earned-value-analysis-dashboard
+          [tripleConstraint]="dashboard.tripleConstraint"
+          [earnedValueAnalysis]="dashboard.earnedValueAnalysis"
+          [referenceMonth]="referenceMonth"
+          [skipBaselineCheck]="true">
+        </app-earned-value-analysis-dashboard>
+      </div>
+    </ng-container>
+
+    <ng-template #emptyDashboard>
+      <div class="empty-dashboard" *ngIf="!isLoading">
+        {{ 'noRecordsFound' | translate }}
+      </div>
+    </ng-template>
+  </app-card>
+</div>

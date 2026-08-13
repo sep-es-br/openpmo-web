@@ -1,4 +1,5 @@
 @use "src/variables" as v;
+@use "src/card-item-mixins" as card-item;
 
 ::ng-deep .app-card-item-report {
 
@@ -91,34 +92,52 @@
         font-size: 2.5rem;
         color: #888e96;
       }
-     .icon-new {
+      .icon-new {
         font-size: 3rem;
         color: rgba(147, 147, 147, 0.5);
       }
-      .card-item-name {
-        font-size: 0.9rem;
-        font-family: v.$fontFamilyMedium;
-        padding: 0.5em 5px 0;
+      .card-item-text {
         display: flex;
+        flex-direction: column;
         align-items: center;
+        min-width: 0;
+        max-width: 100%;
+      }
+      .card-item-name {
+        @include card-item.name;
+        padding: 0.5em 5px 0;
         text-align: center;
         font-weight: bold;
       }
       .card-item-fullName {
-        font-size: small;
-        font-family: v.$fontFamilyMedium;
-        text-align: left;
-        padding: 5px 5px 0px;
-        white-space: wrap;
-        word-break: break-word;
+        @include card-item.description;
+        text-align: center;
+        padding: 0 5px 5px;
         letter-spacing: normal;
+      }
+      .card-item-icon {
+        @include card-item.icon(1.8rem);
       }
       &.cardList {
         flex-direction: row;
         justify-content: flex-start;
         margin-left: 1em;
+        .card-item-text {
+          align-items: flex-start;
+          flex: 1;
+          margin-left: 0.8rem;
+          overflow: hidden;
+        }
         .card-item-name {
-          padding: 5px 15px 0;
+          padding: 0;
+          text-align: left;
+        }
+        .card-item-fullName {
+          padding: 0.2rem 0 0;
+          text-align: left;
+        }
+        .card-item-icon {
+          @include card-item.icon(1.5rem);
         }
       }
     }
