@@ -65,6 +65,69 @@
         }
       }
     }
+
+    .progress-bars-bootstrap-grid {
+      flex-wrap: wrap;
+
+      > .header-title {
+        flex: 0 0 100%;
+        width: 100%;
+        max-width: 100%;
+      }
+
+      > .d-flex.col-lg-8 {
+        flex: 0 0 100%;
+        width: 100%;
+        max-width: 100%;
+      }
+
+      @media screen and (min-width: 992px) {
+        > .header-title.col-lg-4 {
+          flex: 0 0 33.33333333%;
+          width: 33.33333333%;
+          max-width: 33.33333333%;
+        }
+
+        > .d-flex.col-lg-8 {
+          flex: 0 0 66.66666667%;
+          width: 66.66666667%;
+          max-width: 66.66666667%;
+        }
+      }
+
+      .header-values-cost-account.flex-row {
+        flex-direction: row;
+        box-sizing: border-box;
+        min-width: 0;
+        padding-right: 0;
+
+        > .progress-bar-cost-container.col-4 {
+          box-sizing: border-box;
+          flex: 0 0 33.33333333%;
+          width: 33.33333333%;
+          max-width: 33.33333333%;
+          min-width: 0;
+          margin-right: 0;
+          margin-left: 0;
+          padding-right: 0.25rem;
+          padding-left: 0.25rem;
+
+          app-progress-bar {
+            display: block;
+            width: 100%;
+            min-width: 0;
+          }
+
+          .app-progress,
+          .progress-header-values-container,
+          .progress-header-values-container.responsive {
+            width: 100%;
+            min-width: 0;
+          }
+        }
+      }
+
+    }
     .header-title-dates {
       display: flex;
       align-items: center;
