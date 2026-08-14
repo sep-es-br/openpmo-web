@@ -1,7 +1,7 @@
 import { DashboardService } from 'src/app/shared/services/dashboard.service';
 import { takeUntil } from 'rxjs/operators';
 import { MenuService } from 'src/app/shared/services/menu.service';
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { ResponsiveService } from 'src/app/shared/services/responsive.service';
 import { Subject } from 'rxjs';
 import { WorkpackShowTabviewService } from 'src/app/shared/services/workpack-show-tabview.service';
@@ -13,6 +13,10 @@ import { MobileViewService } from 'src/app/shared/services/mobile-view.service';
   styleUrls: ['./template.component.scss'],
 })
 export class TemplateComponent implements OnInit, OnDestroy {
+  private readonly defaultMenuWidthPercent = 15;
+
+  private readonly minimumOpenMenuWidth = 210;
+
   isMenuFixed = false;
 
   $destroy = new Subject();
@@ -158,6 +162,49 @@ export class TemplateComponent implements OnInit, OnDestroy {
     this.menuSrv.nextCloseMenuUser(true);
   }
 
+  @HostListener('window:resize')
+  handleWindowResize() {
+    if (this.menuMobile || this.menuWidth === 0.01) return;
+
+    this.setOpenMenuWidths();
+    this.applySplitterPanelWidths();
+    this.onResizeEnd(null);
+  }
+
+  private setOpenMenuWidths() {
+    const splitterContainer = document.querySelector(
+      '.splitter-container'
+    ) as HTMLElement;
+    const availableWidth =
+      splitterContainer?.clientWidth || Math.max(window.innerWidth - 64, 1);
+
+    const minimumWidthPercent =
+      (this.minimumOpenMenuWidth / availableWidth) * 100;
+
+    this.menuWidth = Math.min(
+      50,
+      Math.max(this.defaultMenuWidthPercent, minimumWidthPercent)
+    );
+    this.mainWidth = 100 - this.menuWidth;
+  }
+
+  private applySplitterPanelWidths() {
+    const splitterPanels = document.querySelectorAll(
+      '.p-splitter-panel-nested'
+    );
+
+    if (splitterPanels.length < 2) return;
+
+    splitterPanels[0].setAttribute(
+      'style',
+      `flex-basis: calc(${this.menuWidth}% - 4px); max-width: calc(${this.menuWidth}% - 4px);`
+    );
+    splitterPanels[1].setAttribute(
+      'style',
+      `flex-basis: calc(${this.mainWidth}% - 4px); max-width: calc(${this.mainWidth}% - 4px);`
+    );
+  }
+
   closeSlideMenu() {
     if (this.menuWidth === 0.01) {
       return;
@@ -181,21 +228,8 @@ export class TemplateComponent implements OnInit, OnDestroy {
   }
 
   openSlideMenu() {
-    this.menuWidth = 15;
-    this.mainWidth = 85;
-    const splitterPanels = document.querySelectorAll(
-      '.p-splitter-panel-nested'
-    );
-    if (splitterPanels.length > 1) {
-      splitterPanels[0].setAttribute(
-        'style',
-        `flex-basis: calc(${this.menuWidth}% - 4px);`
-      );
-      splitterPanels[1].setAttribute(
-        'style',
-        `flex-basis: calc(${this.mainWidth}% - 4px);`
-      );
-    }
+    this.setOpenMenuWidths();
+    this.applySplitterPanelWidths();
     this.onResizeEnd(null);
   }
 
