@@ -161,7 +161,7 @@
   "journal": "Journal",
   "obligations": "Obligations",
   "procurements": "Procurements",
-  "Agreements": "Agreements",
+  "Agreements": "Associated Instruments",
   "processId": "Process number",
   "object": "Object",
   "organizationIdentifier": "Organization/management unit code",
@@ -1104,6 +1104,7 @@
   "obligationNote": "Obligation Note",
   "cnpj": "CNPJ",
   "protocol": "Protocol",
+  "numOriginal": "Original Number",
   "agreementSearchAnd": "and",
   "agreementSearchOr": "or",
 
@@ -1112,8 +1113,8 @@
   "year": "Year",
   "modality": "Modality",
 
-  "cooperation": "Cooperation",
-  "newCooperation": "New Cooperation",
+  "cooperation": "Agreements and Cooperation Agreements",
+  "newCooperation": "New Agreement or Cooperation Agreement",
   "grantorBeneficiaryName": "Grantor / Beneficiary Name",
 
   "contract": "Contract",
