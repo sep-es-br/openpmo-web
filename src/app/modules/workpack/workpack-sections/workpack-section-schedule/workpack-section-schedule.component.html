@@ -2,6 +2,9 @@
   <app-card
     [properties]="sectionSchedule.cardSection"
     [class.panel-tab-view]="showTabview"
+    [class.schedule-collapsed]="sectionSchedule.cardSection.initialStateCollapse"
+    [progressBarsBootstrapGrid]="true"
+    [progressBarsBelowHeader]="false"
     [displayProgressBarIfTotalIsZero]="true"
     [displayFilledBarsWhenTotalIsZero]="false"
   >
@@ -79,7 +82,7 @@
             <ng-template let-step pTemplate="gridItem">
               <div
                 *ngIf="['newStart', 'newEnd'].includes(step.type)"
-                class="card-item-container show-details"
+                class="card-item-container show-details col-auto"
                 [class.new-card-item]="['newStart', 'newEnd'].includes(step.type)"
                 [class.mobile]="responsive"
               >
@@ -103,7 +106,7 @@
               </div>
               <div
                 *ngIf="step.type === 'listStep'"
-                class="card-item-container show-details"
+                class="card-item-container show-details col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2"
                 [class.new-card-item]="['newStart', 'newEnd'].includes(step.type)"
                 [class.mobile]="responsive"
               >
@@ -171,7 +174,7 @@
   <div class="id-container" *ngIf="workpackParams.idWorkpack">
     <span>{{workpackParams.idWorkpack}}</span>
   </div>
-  <app-buttons-container>
+  <app-buttons-container *ngIf="!sectionSchedule.cardSection.initialStateCollapse">
     <app-save-button #saveButton (save)="onSaveButtonClicked()"></app-save-button>
     <app-cancel-button (cancel)="handleOnCancel()"></app-cancel-button>
   </app-buttons-container>

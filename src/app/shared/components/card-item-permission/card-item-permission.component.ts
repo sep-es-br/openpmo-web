@@ -51,15 +51,6 @@ export class CardItemPermissionComponent implements OnInit {
   }
 
   handleSelect() {
-    const level = this.properties.selectedOption;
-    const isAllowed = level === 'READ' || level === 'EDIT';
-    if (!isAllowed) {
-      this.properties.isCCMMember = false;
-      setTimeout(() => {
-        this.changeSelected.next();
-      });
-      return;
-    }
     this.changeSelected.next();
   }
 

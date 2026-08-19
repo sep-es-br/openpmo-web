@@ -14,7 +14,7 @@ export class ResponsiveService {
   }
 
   next(nextValue: boolean) {
-    setTimeout(() => this.isMobileView.next(nextValue), 0);
+    this.isMobileView.next(nextValue);
   }
 
   get resizeEvent() {

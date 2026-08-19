@@ -11,7 +11,7 @@
       
     </div>
     <div class="container-actions">
-        <div class="dataview-filters-text" #searchBar *ngIf="!workpackLoading && idWorkpack">
+        <div class="dataview-filters-text" [class.animation-input]="showAnimationSearch" #searchBar *ngIf="!workpackLoading && idWorkpack">
         <input
           pInputText
           id="id-app-inputtext"
