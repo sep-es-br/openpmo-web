@@ -109,7 +109,7 @@
           [emptyMessage]="'loadingEllipsis' | translate">
           <ng-template let-cardItem pTemplate="gridItem">
             <div class="p-col-12 p-md-3 p-sm-12 card-item-container" [class.responsive]="responsive">
-              <app-card-item-permission [properties]="cardItem" (changeSelected)="saveButton.showButton()" [isReadOnly]="isSamePerson">
+              <app-card-item-permission [properties]="cardItem" (changeSelected)="handlePermissionChange()" [isReadOnly]="isSamePerson">
               </app-card-item-permission>
             </div>
           </ng-template>
