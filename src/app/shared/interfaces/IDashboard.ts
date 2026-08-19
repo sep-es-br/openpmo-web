@@ -49,6 +49,7 @@ export interface IDashboard {
     quantity: number;
     modelName: string;
     icon: string;
+    position?: number;
     menuItems?: MenuItem[];
     workpacks?: IWorkpackByModel[];
   }[];
@@ -70,6 +71,7 @@ export interface IDashboardData {
     quantity: number;
     modelName: string;
     icon: string;
+    position?: number;
     menuItems?: MenuItem[];
     workpacks?: IWorkpackByModel[];
   }[];

@@ -21,6 +21,7 @@ export class EarnedValueAnalysisDashboardComponent implements OnInit, OnChanges,
   @Input() earnedValueAnalysis: IEarnedValueAnalysisDashboard;
   @Input() referenceMonth;
   @Input() tripleConstraint: ITripleConstraintDashboard;
+  @Input() skipBaselineCheck = false;
   lineChartData: ChartData;
   lineChartOptions: ChartOptions;
   gaugeChartDataCPI: IGaugeChartData;
@@ -64,6 +65,11 @@ export class EarnedValueAnalysisDashboardComponent implements OnInit, OnChanges,
 
   ngOnInit(): void {
     this.setLanguage();
+
+    if (this.skipBaselineCheck) {
+      this.showContent = this.tripleConstraint?.cost?.plannedValue > 0 || this.sumPerformanceIndexes() > 0;
+      return;
+    }
 
     this.route.queryParams.subscribe(params => {
       const idWorkpack = params['id'];

@@ -1,10 +1,9 @@
 import { MilestoneStatusEnum } from './../../shared/enums/MilestoneStatusEnum';
 import { IWorkpackCardItem } from './../../shared/interfaces/IWorkpackCardItem';
 import { FilterDataviewService } from 'src/app/shared/services/filter-dataview.service';
-import { Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild, ViewChildren } from '@angular/core';
+import { Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Calendar } from 'primeng/calendar';
 import { Subject } from 'rxjs';
 import { filter, finalize, takeUntil } from 'rxjs/operators';
 import { TranslateService } from '@ngx-translate/core';
@@ -34,11 +33,13 @@ import { SetConfigWorkpackService } from 'src/app/shared/services/set-config-wor
 import { CancelButtonComponent } from 'src/app/shared/components/cancel-button/cancel-button.component';
 import { IUniversalSearch } from 'src/app/shared/interfaces/universal-search.interface';
 import { PageDef, SearchService } from 'src/app/shared/services/search.service';
+import { ITabViewScrolled } from 'src/app/shared/components/tabview-scrolled/tabview-scrolled.component';
 
 interface IWorkpackModelCard {
   idWorkpackModel: number;
   propertiesCard: ICard;
   workpackItemCardList?: IWorkpackCardItem[];
+  dashboardWorkpackItemCardList?: IWorkpackCardItem[];
 }
 
 @Component({
@@ -50,8 +51,7 @@ export class PlanComponent implements OnInit, OnDestroy {
 
   @ViewChild(SaveButtonComponent) saveButton: SaveButtonComponent;
   @ViewChild(CancelButtonComponent) cancelButton: CancelButtonComponent;
-  @ViewChildren(Calendar) calendarComponents: Calendar[];
-    @ViewChild('searchBar') searchBarRef : ElementRef<HTMLDivElement>
+  @ViewChild('searchBar') searchBarRef: ElementRef<HTMLDivElement>;
 
   responsive: boolean;
   idPlanModel: number;
@@ -65,7 +65,6 @@ export class PlanComponent implements OnInit, OnDestroy {
   $destroy = new Subject();
   editPermission = false;
   calendarFormat: string;
-  collapsePanelsStatus = true;
   displayModeAll = 'grid';
   pageSize = 5;
   totalRecords: number[] = [];
@@ -82,7 +81,11 @@ export class PlanComponent implements OnInit, OnDestroy {
   };
   language: string;
   formIsSaving = false;
+  planLoading = true;
   propertiesPlanModel: IPlanModel;
+  tabs: ITabViewScrolled[];
+  selectedTab: ITabViewScrolled;
+  tabviewContextVersion = 0;
 
   
     showAnimationSearch = false;
@@ -120,22 +123,6 @@ export class PlanComponent implements OnInit, OnDestroy {
     private searchSrv : SearchService,
     private thisElemRef : ElementRef<HTMLElement>
   ) {
-    this.configDataViewSrv.observableCollapsePanelsStatus.pipe(takeUntil(this.$destroy)).subscribe(collapsePanelStatus => {
-      this.collapsePanelsStatus = collapsePanelStatus === 'collapse' ? true : false;
-      this.cardPlanProperties = Object.assign({}, {
-        ...this.cardPlanProperties,
-        initialStateCollapse: this.collapsePanelsStatus
-      });
-      this.cardsPlanWorkPackModels = this.cardsPlanWorkPackModels && this.cardsPlanWorkPackModels.map(card => (
-        Object.assign({
-          ...card,
-          propertiesCard: {
-            ...card.propertiesCard,
-            initialStateCollapse: this.collapsePanelsStatus
-          }
-        })
-      ));
-    });
     this.configDataViewSrv.observableDisplayModeAll.pipe(takeUntil(this.$destroy)).subscribe(displayMode => {
       this.displayModeAll = displayMode;
     });
@@ -154,15 +141,8 @@ export class PlanComponent implements OnInit, OnDestroy {
         this.resetPlan();
       });
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.responsive = value);
-    this.translateSrv.onLangChange.pipe(takeUntil(this.$destroy)).subscribe(() => {
-      setTimeout(() => this.calendarComponents?.map(calendar => {
-        calendar.ngOnInit();
-        calendar.dateFormat = this.translateSrv.instant('dateFormat');
-        calendar.updateInputfield();
-      }, 150));
-    }
-    );
     this.calendarFormat = this.translateSrv.instant('dateFormat');
+    this.language = this.translateSrv.currentLang;
     this.formPlan = this.formBuilder.group({
       modelName: ['', Validators.required],
       modelFullName: ['', Validators.required],
@@ -187,6 +167,7 @@ export class PlanComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.$destroy), filter(() => this.formPlan.dirty))
       .subscribe(() => {
         this.cancelButton.showButton();
+        this.workpackSrv.nextPendingChanges(true);
       });
 
     localStorage.removeItem('open-pmo:WORKPACK_TABVIEW');
@@ -242,6 +223,7 @@ export class PlanComponent implements OnInit, OnDestroy {
     }
 
   ngOnDestroy(): void {
+    this.workpackSrv.nextPendingChanges(false);
     this.$destroy.next();
     this.$destroy.complete();
   }
@@ -279,18 +261,27 @@ export class PlanComponent implements OnInit, OnDestroy {
   }
 
   async resetPlan() {
-    this.handleCloseSearching()
-    if (!this.idPlan) {
-      this.planSrv.nextNewPlan(true);
+    this.planLoading = true;
+    this.tabviewContextVersion++;
+    this.workpackSrv.nextPendingChanges(false);
+    try {
+      this.handleCloseSearching();
+      if (!this.idPlan) {
+        this.planSrv.nextNewPlan(true);
+      }
+      if (this.idPlanModel) {
+        await this.loadPlanModelProperties(this.idPlanModel);
+      }
+      this.cardPlanProperties = undefined;
+      this.cardsPlanWorkPackModels = undefined;
+      this.tabs = [];
+      this.selectedTab = undefined;
+      this.planData = undefined;
+      this.editPermission = false;
+      await this.loadPropertiesPlan();
+    } finally {
+      this.planLoading = false;
     }
-    if (this.idPlanModel) {
-      await this.loadPlanModelProperties(this.idPlanModel);
-    }
-    this.cardPlanProperties = undefined;
-    this.cardsPlanWorkPackModels = undefined;
-    this.planData = undefined;
-    this.editPermission = false;
-    await this.loadPropertiesPlan();
   }
 
   async loadPropertiesPlan() {
@@ -298,9 +289,10 @@ export class PlanComponent implements OnInit, OnDestroy {
       toggleable: false,
       initialStateToggle: false,
       cardTitle: 'properties',
-      collapseble: true,
+      notShowCardTitle: true,
+      collapseble: false,
       isLoading: this.idPlan ? true : false,
-      initialStateCollapse: !!this.idPlan
+      initialStateCollapse: false
     };
 
     if (this.idPlan) {
@@ -317,7 +309,7 @@ export class PlanComponent implements OnInit, OnDestroy {
         } else {
           this.editPermission = true;
         }
-        this.loadWorkPackModels();
+        await this.loadWorkPackModels();
         this.formPlan.reset({
           modelName: this.propertiesPlanModel.name,
           modelFullName: this.propertiesPlanModel.fullName,
@@ -361,6 +353,7 @@ export class PlanComponent implements OnInit, OnDestroy {
       });
       this.formPlan.controls.modelName.disable();
       this.formPlan.controls.modelFullName.disable();
+      this.loadPlanTabs();
     }
 
     this.setWorkPlanUser();
@@ -389,6 +382,55 @@ export class PlanComponent implements OnInit, OnDestroy {
     const result = await this.planModelSrv.GetById(idPlanModel);
     if (result.success) {
       this.propertiesPlanModel = result.data;
+    }
+  }
+
+  loadPlanTabs() {
+    this.tabs = [];
+
+    if (this.idPlan) {
+      this.tabs.push({
+        menu: 'dashboard',
+        key: 'dashboard'
+      });
+    }
+
+    if (this.idPlan) {
+      this.tabs.push({
+        menu: 'WBS',
+        key: 'WBS'
+      });
+    }
+
+    this.tabs.push({
+      menu: 'properties',
+      key: 'properties'
+    });
+
+    if (this.cardsPlanWorkPackModels?.length) {
+      this.tabs.push(
+        ...this.cardsPlanWorkPackModels.map(model => ({
+          menu: model.propertiesCard.cardTitle,
+          key: model.propertiesCard.cardTitle
+        }))
+      );
+    }
+  }
+
+
+  changeTab(event: { tabs: ITabViewScrolled }) {
+    const discardPlanChanges = this.selectedTab?.key === 'properties'
+      && event.tabs?.key !== 'properties'
+      && this.formPlan?.dirty;
+    this.selectedTab = event.tabs;
+    if (discardPlanChanges) {
+      this.handleOnCancel();
+    }
+  }
+
+  handleOnHasWBS(hasWBS: boolean) {
+    if (!hasWBS && this.tabs?.some(tab => tab.key === 'WBS')) {
+      this.tabs = this.tabs.filter(tab => tab.key !== 'WBS');
     }
   }
 
@@ -439,7 +481,6 @@ export class PlanComponent implements OnInit, OnDestroy {
         this.planSrv.nextIDPlan(this.idPlan);
         localStorage.setItem('@pmo/propertiesCurrentPlan', JSON.stringify(this.planData));
         localStorage.setItem('@currentPlan', this.planData.id.toString());
-        await this.loadWorkPackModels();
       }
       localStorage.setItem('@pmo/propertiesCurrentPlan', JSON.stringify(this.planData));
       this.messageSrv.add({
@@ -447,16 +488,21 @@ export class PlanComponent implements OnInit, OnDestroy {
         summary: this.translateSrv.instant('success'),
         detail: this.translateSrv.instant('messages.savedSuccessfully')
       });
+      this.formPlan.markAsPristine();
+      this.workpackSrv.nextPendingChanges(false);
+      this.saveButton.hideButton();
       this.formIsSaving = false;
       this.setBreacrumb();
       this.menuSrv.reloadMenuOffice();
-      this.loadWorkPackModels();
+      await this.loadWorkPackModels();
       return;
     };
   }
 
   handleOnCancel() {
     this.saveButton.hideButton();
+    this.cancelButton?.hideButton();
+    this.workpackSrv.nextPendingChanges(false);
     if (this.idPlan) {
       this.formPlan.reset({
         modelName: this.propertiesPlanModel.name,
@@ -503,14 +549,14 @@ export class PlanComponent implements OnInit, OnDestroy {
     const result = await this.workpackModelSrv.GetAll({ 'id-plan-model': this.idPlanModel });
     const workpackModels = result.success && result.data;
     if (workpackModels) {
-      this.cardsPlanWorkPackModels = workpackModels.map((workpackModel) => {
+      const cards = workpackModels.map((workpackModel) => {
         const propertiesCard: ICard = {
           toggleable: false,
           initialStateToggle: false,
           cardTitle: workpackModel.modelNameInPlural,
-          collapseble: true,
+          collapseble: false,
           isLoading: true,
-          initialStateCollapse: this.collapsePanelsStatus,
+          initialStateCollapse: false,
           showFilters: true,
           hideTextFilter: true
         };
@@ -519,33 +565,37 @@ export class PlanComponent implements OnInit, OnDestroy {
           propertiesCard
         };
       });
-      workpackModels.forEach(async(workpackModel, index) => {
-        const resultFilters = await this.filterSrv.getAllFilters(`workpackModels/${workpackModel.id}/workpacks`);
-        if (resultFilters.success && Array.isArray(resultFilters.data)) {
-          this.cardsPlanWorkPackModels[index].propertiesCard.filters = resultFilters.data;
-        } else {
-          this.cardsPlanWorkPackModels[index].propertiesCard.filters = [];
-        }
-        const idFilterSelected = this.cardsPlanWorkPackModels[index].propertiesCard.filters &&
-          this.cardsPlanWorkPackModels[index].propertiesCard.filters.find(defaultFilter => !!defaultFilter.favorite) ?
-          this.cardsPlanWorkPackModels[index].propertiesCard.filters.find(defaultFilter => !!defaultFilter.favorite).id : undefined;
-        const cardListResult = await this.loadWorkpacksFromWorkpackModel(this.planData.id, workpackModel.id, index, idFilterSelected);
-        this.cardsPlanWorkPackModels[index].propertiesCard.showCreateNemElementButtonWorkpack = this.editPermission;
 
-        this.cardsPlanWorkPackModels[index] = {
-          ...this.cardsPlanWorkPackModels[index],
+      this.cardsPlanWorkPackModels = cards;
+      this.cardsPlanWorkPackModels = await Promise.all(workpackModels.map(async(workpackModel, index) => {
+        const resultFilters = await this.filterSrv.getAllFilters(`workpackModels/${workpackModel.id}/workpacks`);
+        const filters = resultFilters.success && Array.isArray(resultFilters.data) ? resultFilters.data : [];
+        const favoriteFilter = filters.find(defaultFilter => !!defaultFilter.favorite);
+        const idFilterSelected = favoriteFilter?.id;
+        const cardListResult = await this.loadWorkpacksFromWorkpackModel(this.planData.id, workpackModel.id, index, idFilterSelected);
+        const dashboardListResult = idFilterSelected
+          ? await this.loadWorkpacksFromWorkpackModel(this.planData.id, workpackModel.id, index, undefined)
+          : cardListResult;
+
+        return {
+          ...cards[index],
           workpackItemCardList: cardListResult && cardListResult.workpackItemCardList,
+          dashboardWorkpackItemCardList: dashboardListResult && dashboardListResult.workpackItemCardList,
           propertiesCard: {
-            ...this.cardsPlanWorkPackModels[index].propertiesCard,
+            ...cards[index].propertiesCard,
+            filters,
             isLoading: false,
+            showCreateNemElementButtonWorkpack: this.editPermission,
             onNewItem: () => this.loadNewItemMenu(this.planData.id, workpackModel.id, index),
           }
         };
-      });
+      }));
+
       this.cardsPlanWorkPackModels.forEach((workpackModel, i) => {
         this.totalRecords[i] = workpackModel.workpackItemCardList && workpackModel.workpackItemCardList.length;
       });
     }
+    this.loadPlanTabs();
   }
 
   async loadWorkpacksFromWorkpackModel(idPlan: number, workpackModelId: number, index: number, idFilterSelected: number, term?: string) {
@@ -1156,7 +1206,7 @@ export class PlanComponent implements OnInit, OnDestroy {
         detail: this.translateSrv.instant('messages.endManagementSuccess'),
         life: 3000
       });
-      this.loadWorkPackModels();
+      await this.loadWorkPackModels();
     }
   }
 

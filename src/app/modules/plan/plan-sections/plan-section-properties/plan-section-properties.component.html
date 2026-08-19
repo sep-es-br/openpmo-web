@@ -1,0 +1,63 @@
+<div class="card-properties-plan card-properties-workpack app-workpack-section-properties">
+  <app-card *ngIf="cardProperties" [properties]="cardProperties" class="mt-0 inputs-float-label panel-tab-view">
+    <div class="loading-container" *ngIf="cardProperties.isLoading">
+      <app-card-loading [isCardLoading]="cardProperties.isLoading"></app-card-loading>
+    </div>
+    <div class="loading-form-container" *ngIf="formIsSaving">
+      <app-card-loading [isCardLoading]="formIsSaving"></app-card-loading>
+    </div>
+    <div class="p-grid" *ngIf="!cardProperties.isLoading">
+      <form [formGroup]="form">
+        <div class="p-fluid">
+          <div class="p-field">
+            <span class="p-float-label">
+              <input class="app-input-text" [class.responsive]="responsive" id="float-name" name="name"
+                formControlName="name" type="text" [ngStyle]="{'width': '30%'}" pInputText />
+              <label class="app-input-label" for="float-name">{{ "name" | translate }} *
+                <i class="far fa-question-circle" [pTooltip]="'help.plan.name' | translate"></i>
+              </label>
+            </span>
+            <app-input-message [form]="form" field="name"></app-input-message>
+          </div>
+          <div class="p-field">
+            <span class="p-float-label">
+              <textarea pInputTextarea id="float-fullName" formControlName="fullName" class="app-text-area" rows="3"
+                [ngModel]="mirrorFullName ? form.value.name : form.value.fullName">
+              </textarea>
+              <label class="app-input-label" for="float-fullName">{{ "fullName" | translate }} *
+                <i class="far fa-question-circle" [pTooltip]="'help.plan.fullName' | translate"></i>
+              </label>
+            </span>
+            <app-input-message [form]="form" field="fullName"></app-input-message>
+          </div>
+        </div>
+        <div class="p-formgroup-inline">
+          <div class="p-field" [class.responsive]="responsive">
+            <span class="p-float-label" [class.responsive]="responsive">
+              <p-calendar id="float-start" formControlName="start" class="app-select-date" [showIcon]="true"
+                [monthNavigator]="true" [yearNavigator]="true" [yearRange]="yearRange" [class.responsive]="responsive"
+                icon="fas fa-calendar-alt" [dateFormat]="calendarFormat">
+              </p-calendar>
+              <label class="app-input-label" for="float-start">{{ "start" | translate }} *
+                <i class="far fa-question-circle" [pTooltip]="'help.plan.start' | translate"></i>
+              </label>
+            </span>
+            <app-input-message [form]="form" field="start"></app-input-message>
+          </div>
+          <div class="p-field" [class.responsive]="responsive">
+            <span class="p-float-label" [class.responsive]="responsive">
+              <p-calendar id="float-finish" formControlName="finish" class="app-select-date" [showIcon]="true"
+                [monthNavigator]="true" [yearNavigator]="true" [yearRange]="yearRange" [class.responsive]="responsive"
+                icon="fas fa-calendar-alt" [dateFormat]="calendarFormat" [minDate]="form.get('start')?.value">
+              </p-calendar>
+              <label class="app-input-label" for="float-finish">{{ "finish" | translate }} *
+                <i class="far fa-question-circle" [pTooltip]="'help.plan.finish' | translate"></i>
+              </label>
+            </span>
+            <app-input-message [form]="form" field="finish"></app-input-message>
+          </div>
+        </div>
+      </form>
+    </div>
+  </app-card>
+</div>

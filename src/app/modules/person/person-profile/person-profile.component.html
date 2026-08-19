@@ -33,7 +33,7 @@
             <span class="p-float-label property-input p-field">
               <input pInputText class="app-input-text" type="text" [class.responsive]="responsive"
                 formControlName="email" [readOnly]="true">
-              <label class="app-input-label profile">{{ 'accessEmail' | translate }} 
+              <label class="app-input-label profile">{{ 'accessEmail' | translate }}
                 <i class="far fa-question-circle" [pTooltip]="'help.person.accessEmail' | translate"></i>
               </label>
             </span>
@@ -47,6 +47,17 @@
             </p-dropdown>
             <label class="app-input-label">{{ 'office' | translate }} </label>
           </span>
+          <section class="section organization-section">
+            <form [formGroup]="formPerson" class="form">
+              <span class="p-float-label property-input p-field">
+                <p-dropdown class="app-single-selection" [options]="optionsOrganizations" optionLabel="label"
+                  optionValue="value" formControlName="idOrganization"
+                  [class.responsive]="responsive">
+                </p-dropdown>
+                <label class="app-input-label">{{ 'organization' | translate }}</label>
+              </span>
+            </form>
+          </section>
           <section class="section">
             <h3 class="subtitle">{{'myContactInformation' | translate}}</h3>
             <form [formGroup]="formPerson" class="form">
@@ -54,7 +65,7 @@
                 <span class="col-12 col-lg-6 email-box p-float-label property-input-text p-field">
                   <input pInputText class="app-input-text" type="text" [class.responsive]="responsive"
                     formControlName="contactEmail">
-                  <label class="app-input-label">{{ 'email' | translate }} 
+                  <label class="app-input-label">{{ 'email' | translate }}
                     <i class="far fa-question-circle" [pTooltip]="'help.person.contactEmail' | translate"></i>
                   </label>
                 </span>
@@ -63,7 +74,7 @@
                     (blur)="setPhoneNumberMask()" [placeholder]="phoneNumberPlaceholder"
                     (input)="setPhoneNumberPlaceholder()" (focusin)="setPhoneNumberPlaceholder()"
                     (focusout)="clearPhoneNumberPlaceholder()" />
-                  <label class="app-input-label">{{ 'phone' | translate }} 
+                  <label class="app-input-label">{{ 'phone' | translate }}
                     <i class="far fa-question-circle" [pTooltip]="'help.person.phoneNumber' | translate"></i>
                   </label>
                 </span>
@@ -71,7 +82,7 @@
               <span class="col-12 col-lg-6 address-box p-float-label property-input p-field">
                 <textarea pInputTextarea class="app-text-area" [class.responsive]="responsive" formControlName="address"
                   [rows]="1"></textarea>
-                <label class="app-input-label">{{ 'address' | translate }} 
+                <label class="app-input-label">{{ 'address' | translate }}
                   <i class="far fa-question-circle" [pTooltip]="'help.person.address' | translate"></i>
                 </label>
               </span>

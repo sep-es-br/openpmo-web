@@ -81,8 +81,6 @@
               <i [ngClass]="properties.iconSvg ? [ 'app-icon', properties.icon, 'grey-icon'] : [ 'icon-card', properties.icon, 'grey-icon' ]"
                 [class.linked]="!!properties?.linked || !!properties.shared" [ngStyle]="{ fontSize: '2rem' }"></i>
               <i [ngClass]="['app-icon', 'link-to', 'grey-icon', 'linked']" *ngIf="!!properties?.linked"></i>
-              <i [ngClass]="['app-icon', 'sharing', 'grey-icon', 'linked']"
-                *ngIf="!!properties.shared && !properties.linked"></i>
             </div>
             <span class="card-item-name" [pTooltip]="properties.fullNameCardItem"
               tooltipPosition="bottom">{{properties.nameCardItem}}</span>
@@ -153,14 +151,12 @@
                 (click)="handleShowJournalInformation(properties.journalInformation); journalInformationPanel.show($event)"></i>
             </div>
           </div>
-          <div
-            *ngIf="properties?.statusProperty"
-            class="status-box"
-          >
-            <ng-container
-              [ngTemplateOutlet]="iconConfig"
-              [ngTemplateOutletContext]="properties.statusProperty | workpackStatusConfig"
-            >
+          <div class="status-box">
+            <ng-container *ngIf="properties?.statusProperty">
+              <ng-container
+                [ngTemplateOutlet]="iconConfig"
+                [ngTemplateOutletContext]="properties.statusProperty | workpackStatusConfig"
+              >
               <ng-template
                 #iconConfig
                 let-icon="icon"
@@ -188,6 +184,7 @@
                   </i>
                 </ng-template>
               </ng-template>
+              </ng-container>
             </ng-container>
           </div>
           <p-overlayPanel #journalInformationPanel class="journal-info-overlay-panel" [showCloseIcon]="true" [dismissable]="false">
@@ -222,7 +219,16 @@
             </div>
           </p-overlayPanel>
           <div class="footer-info">
-            <i class="app-icon baseline" *ngIf="!!properties?.hasBaseline" [pTooltip]="properties?.baselineName"></i>
+            <div class="footer-icons">
+              <div class="footer-icons-content" [class.has-baseline]="!!properties?.hasBaseline">
+                <span class="footer-icon-slot" *ngIf="!!properties.shared && !properties.linked">
+                  <i class="app-icon sharing grey-icon"></i>
+                </span>
+                <span class="footer-icon-slot" *ngIf="!!properties?.hasBaseline">
+                  <i class="app-icon baseline grey-icon" [pTooltip]="properties?.baselineName"></i>
+                </span>
+              </div>
+            </div>
             <span class="card-item-id">
               {{cardIdItem}}
             </span>
@@ -239,8 +245,6 @@
               [class.linked]="!!properties.linked || !!properties.shared" [ngStyle]="{ fontSize: '1.5rem' }"></i>
             <i [ngClass]="['app-icon', 'link-to', 'grey-icon', 'linked']" *ngIf="!!properties.linked"
               [ngStyle]="{ marginLeft: '5px' }"></i>
-            <i [ngClass]="['app-icon', 'sharing', 'grey-icon', 'linked']" [ngStyle]="{ marginLeft: '5px' }"
-              *ngIf="!!properties.shared && !properties.linked"></i>
           </div>
           <span class="card-item-name" [pTooltip]="properties.fullNameCardItem"
             tooltipPosition="bottom">{{properties.nameCardItem}}</span>
@@ -315,13 +319,11 @@
               </i>
             </span>
 
-            <span class="dashboard-icon-slot">
-              <i class="far fa-stop-circle"
-                *ngIf="showEndManagementIndex() && !!properties.endManagementDate && properties.endManagementDate !== null"
-                [pTooltip]="'managementEnded'|translate"></i>
+            <span class="dashboard-icon-slot dashboard-completed-scope-slot">
               <i class="far fa-check-square" *ngIf="showEndManagementIndex() && !!properties.completed"
                 [pTooltip]="label|translate"></i>
             </span>
+
           </div>
           <p-overlayPanel #journalInformationPanelList class="journal-info-overlay-panel" [showCloseIcon]="true" [dismissable]="false">
             <div class="journal-info-panel-content"
@@ -454,6 +456,8 @@
             </div>
           </p-header>
           <div class="footer-info">
+            <i [ngClass]="['app-icon', 'sharing', 'grey-icon', 'linked']"
+              *ngIf="!!properties.shared && !properties.linked"></i>
             <i class="app-icon baseline" *ngIf="!!properties?.hasBaseline" [pTooltip]="properties?.baselineName"></i>
             <span class="card-item-id">
               {{cardIdItem}}

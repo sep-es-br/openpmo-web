@@ -14,8 +14,7 @@ import { BaselineComponent } from './baseline/baseline.component';
 import { BaselineCancellingComponent } from './baseline-cancelling/baseline-cancelling.component';
 import { JournalViewComponent } from './components/journal-view/journal-view.component';
 import { JournalComponent } from './journal/journal.component';
-import { TripleConstraintDashboardComponent } from './components/triple-constraint-dashboard/triple-constraint-dashboard.component';
-import { EarnedValueAnalysisDashboardComponent } from './components/earned-value-analysis-dashboard/earned-value-analysis-dashboard.component';
+import { WorkpackDashboardComponentsModule } from './components/workpack-dashboard-components.module';
 import { ProgressBarScheduleYearComponent } from './components/progress-bar-schedule-year/progress-bar-schedule-year.component';
 import { WorkpackSectionPropertiesComponent } from './workpack-sections/workpack-section-properties/workpack-section-properties.component';
 import { WorkpackSectionCostAccountsComponent } from './workpack-sections/workpack-section-cost-accounts/workpack-section-cost-accounts.component';
@@ -61,8 +60,6 @@ import { ContractComponent } from './contract/contract.component';
     ProcurementComponent,
     CooperationComponent,
     ContractComponent,
-    TripleConstraintDashboardComponent,
-    EarnedValueAnalysisDashboardComponent,
     ProgressBarScheduleYearComponent,
     WorkpackSectionPropertiesComponent,
     WorkpackSectionCostAccountsComponent,
@@ -89,7 +86,8 @@ import { ContractComponent } from './contract/contract.component';
       ComponentsModule,
       FormsModule,
       ReactiveFormsModule,
-      TooltipModule
+      TooltipModule,
+      WorkpackDashboardComponentsModule
     ],
 })
 export class WorkpackModule { }

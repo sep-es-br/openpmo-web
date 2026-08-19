@@ -11,5 +11,6 @@ export interface IOrganization{
   website?: string;
   suffix?: string;
   integration?: string;
+  guid?: string;
 }
 
