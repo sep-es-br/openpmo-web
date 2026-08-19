@@ -483,7 +483,7 @@
           <div class="icons-container" [routerLink]="properties.urlCard" [queryParams]="getQueryParams()">
             <i [ngClass]=" ['concluded', 'lateConcluded'].includes(properties.statusItem) ?
               [ 'app-icon', 'flag-check', 'grey-icon'] : ['app-icon', 'flag-unchecked', 'grey-icon']"
-              [class.linked]="!!properties.linked || !!properties.shared" [ngStyle]="{ fontSize: '1.8rem' }"
+              [ngStyle]="{ fontSize: '1.8rem' }"
               [class.on-time]="properties?.statusItem === 'ontime' && !properties?.canceled"
               [class.late]="properties?.statusItem === 'late'"
               [class.concluded]="properties?.statusItem === 'concluded' && !properties?.canceled"
@@ -553,7 +553,7 @@
         <div class="left-side">
           <div class="icons-container-list" [routerLink]="properties.urlCard" [queryParams]="getQueryParams()">
             <i [ngClass]=" ['concluded', 'lateConcluded'].includes(properties.statusItem) ?  [ 'app-icon', 'flag-check', 'grey-icon'] : ['app-icon', 'flag-unchecked', 'grey-icon']"
-              [class.linked]="!!properties.linked || !!properties.shared" [ngStyle]="{ fontSize: '1.5rem' }"
+              [ngStyle]="{ fontSize: '1.5rem' }"
               [class.on-time]="properties?.statusItem === 'ontime' && !properties?.canceled"
               [class.late]="properties?.statusItem === 'late' && !properties?.canceled"
               [class.concluded]="properties?.statusItem === 'concluded' && !properties?.canceled"
