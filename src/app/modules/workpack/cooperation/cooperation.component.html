@@ -266,6 +266,20 @@
                 </div>
               </div>
             </div>
+
+            <!-- Número original -->
+            <div
+              class="cooperation-field text-medium app-property-text"
+            >
+              <div class="readonly-field">
+                <div class="app-input-label readonly-label">
+                  {{ 'numOriginal' | translate }}
+                </div>
+                <div class="readonly-value">
+                  {{ formCooperation.controls.numOriginal.value || '-' }}
+                </div>
+              </div>
+            </div>
           </ng-container>
         </form>
       </app-card>

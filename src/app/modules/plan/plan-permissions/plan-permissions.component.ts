@@ -102,6 +102,8 @@ export class PlanPermissionsComponent implements OnInit, OnDestroy {
       } else {
         this.invalidMailMessage = this.translateSrv.instant('messages.invalidEmail');
         this.person = null;
+        this.saveButton?.hideButton();
+        this.cancelButton?.hideButton();
       }
     });
   }
@@ -197,12 +199,14 @@ export class PlanPermissionsComponent implements OnInit, OnDestroy {
     this.validCpf = true;
     this.searchedCpfUser = null;
     this.searchedNameUser = null;
+    this.saveButton?.hideButton();
+    this.cancelButton?.hideButton();
   }
 
   async searchCitizenUserByName() {
     this.identityValidation = undefined;
     this.saveButton?.hideButton();
-    this.cancelButton.showButton();
+    this.cancelButton?.hideButton();
     this.publicServersResult = [];
     if (this.person) {
       this.person = undefined;
@@ -217,7 +221,8 @@ export class PlanPermissionsComponent implements OnInit, OnDestroy {
       this.publicServersResult = result.data;
       this.showListBoxPublicServers = this.publicServersResult.length > 0;
     }
-    this.showMessagePublicServerNotFoundByName = !this.publicServersResult || (this.publicServersResult && this.publicServersResult.length === 0);
+    this.showMessagePublicServerNotFoundByName = !this.publicServersResult
+      || (this.publicServersResult && this.publicServersResult.length === 0);
   }
 
   validateClearSearchByCpf(event) {
@@ -228,13 +233,15 @@ export class PlanPermissionsComponent implements OnInit, OnDestroy {
       this.validCpf = true;
       this.citizenUserNotFoundByCpf = false;
       this.showMessageIsSamePerson = false;
+      this.saveButton?.hideButton();
+      this.cancelButton?.hideButton();
     }
   }
 
   async validateCpf() {
     this.identityValidation = undefined;
     this.saveButton?.hideButton();
-    this.cancelButton.showButton();
+    this.cancelButton?.hideButton();
     this.citizenUserNotFoundByCpf = false;
     this.validCpf = cpfValidator(this.searchedCpfUser);
     if (this.validCpf) {
@@ -311,6 +318,10 @@ export class PlanPermissionsComponent implements OnInit, OnDestroy {
         this.isSamePerson = !this.isUserAdmin && this.person.id === Number(this.authSrv.getIdPerson());
       }
       this.loadCardItemsPersonPermissions();
+      setTimeout(() => {
+        this.saveButton?.hideButton();
+        this.cancelButton?.showButton();
+      });
       this.isLoading = false;
     } else {
       this.isLoading = false;
@@ -329,7 +340,8 @@ export class PlanPermissionsComponent implements OnInit, OnDestroy {
         ],
         selectedOption: p.level,
         isCCMMember: !!p.ccmMember,
-        readOnly: this.isSamePerson
+        readOnly: this.isSamePerson,
+        itemId: p.id
       }));
       const rolesNotPermissions = this.permission?.permissions ? this.permission?.person?.roles
         .filter(r => this.permission?.permissions.filter(p => p.role === r.role).length === 0) : this.permission?.person?.roles;
@@ -343,7 +355,8 @@ export class PlanPermissionsComponent implements OnInit, OnDestroy {
                 { label: this.translateSrv.instant('read'), value: 'READ' },
                 { label: this.translateSrv.instant('edit'), value: 'EDIT' },
                 { label: this.translateSrv.instant('none'), value: 'NONE' }
-              ]
+              ],
+              selectedOption: 'NONE'
             });
           } else {
             this.cardItemsPlanPermission = [{
@@ -353,10 +366,11 @@ export class PlanPermissionsComponent implements OnInit, OnDestroy {
                 { label: this.translateSrv.instant('read'), value: 'READ' },
                 { label: this.translateSrv.instant('edit'), value: 'EDIT' },
                 { label: this.translateSrv.instant('none'), value: 'NONE' }
-              ]
+              ],
+              selectedOption: 'NONE'
             }];
           }
-        })
+        });
       }
     } else {
       this.cardItemsPlanPermission = null;
@@ -366,7 +380,7 @@ export class PlanPermissionsComponent implements OnInit, OnDestroy {
   async searchPerson() {
     this.showMessageIsSamePerson = false;
     this.saveButton?.hideButton();
-    this.cancelButton.showButton();
+    this.cancelButton?.hideButton();
     if (this.searchedEmailPerson) {
       const { data } = await this.personSrv.GetByKey(this.searchedEmailPerson);
       if (data) {
@@ -411,10 +425,53 @@ export class PlanPermissionsComponent implements OnInit, OnDestroy {
     this.loadCardItemsPersonPermissions();
   }
 
+  handlePermissionChange() {
+    if (!this.hasSelectedPermissionOrCcm()) {
+      this.saveButton?.hideButton();
+      this.cancelButton?.showButton();
+      return;
+    }
+
+    if (!this.key) {
+      this.saveButton?.showButton();
+      this.cancelButton?.showButton();
+      return;
+    }
+
+    const hasChanges = (this.cardItemsPlanPermission || []).some(cardItem => {
+      const originalPermission = this.permission?.permissions
+        ?.find(permission => permission.role === cardItem.titleCardItem);
+      const originalLevel = originalPermission?.level || 'NONE';
+      const originalCcmMember = !!originalPermission?.ccmMember;
+
+      return cardItem.selectedOption !== originalLevel
+        || !!cardItem.isCCMMember !== originalCcmMember;
+    });
+
+    if (hasChanges) {
+      this.saveButton?.showButton();
+    } else {
+      this.saveButton?.hideButton();
+    }
+    this.cancelButton?.showButton();
+  }
+
+  hasSelectedPermissionOrCcm(): boolean {
+    return (this.cardItemsPlanPermission || []).some(permission =>
+      (!!permission.selectedOption && permission.selectedOption !== 'NONE') || !!permission.isCCMMember
+    );
+  }
+
   async savePermission() {
+    if (!this.hasSelectedPermissionOrCcm()) {
+      this.saveButton?.hideButton();
+      return;
+    }
     this.cancelButton.hideButton();
     this.formIsSaving = true;
-    this.permission.permissions = this.cardItemsPlanPermission.filter( p => p.selectedOption && p.selectedOption !== 'NONE').map(cardItem => (
+    this.permission.permissions = this.cardItemsPlanPermission
+      .filter(p => p.selectedOption && (p.selectedOption !== 'NONE' || p.isCCMMember))
+      .map(cardItem => (
       {
         id: cardItem.itemId,
         role: cardItem.titleCardItem,

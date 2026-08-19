@@ -552,8 +552,12 @@
       <div class="person-left-content">
         <app-avatar [edit]="false" [avatar]="properties.avatar"> </app-avatar>
         <span class="person-identification" [pTooltip]="properties.fullNameCardItem" tooltipPosition="bottom">
-          <span class="card-item-name">{{ properties.nameCardItem }}</span>
-          <span class="card-item-full-name">{{ properties.fullNameCardItem }}</span>
+          <span class="card-item-name">
+            {{ properties.nameCardItem }}
+          </span>
+          <span class="card-item-full-name">
+            {{ properties.fullNameCardItem }}
+          </span>
         </span>
       </div>
       <div class="person-right-content">

@@ -78,7 +78,7 @@ export class ReportViewComponent implements OnInit, OnDestroy {
     });
     this.responsiveSvr.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.responsive = value);
     this.menuSrv.obsMenuPortfolioItems.pipe(takeUntil(this.$destroy)).subscribe(menuItems => {
-      if (menuItems && menuItems.length > 0 ) {this.loadScope(menuItems);}
+      if (menuItems) {this.loadScope(menuItems);}
     });
   }
 
@@ -439,6 +439,16 @@ export class ReportViewComponent implements OnInit, OnDestroy {
       format: this.reportFormat
     };
     const result = await this.reportSrv.generateReport(sender);
+
+    if(result.status === 400 && String(result.body).includes(this.reportSrv.REPORT_GENERATE_SCOPE_PARAMETER_INVALID)) {
+      this.messageSrv.add({
+        detail: this.translateSrv.instant('Nenhum projeto disponível para gerar o relatório'),
+        severity: 'error',
+        summary: this.translateSrv.instant('error')
+      });
+      return;
+    }
+
     if (result.body) {
       const contentDispositionTotal = result.headers.get('Content-Disposition');
       const contentDisposition = contentDispositionTotal && contentDispositionTotal.split('=');

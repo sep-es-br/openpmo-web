@@ -151,14 +151,12 @@
                 (click)="handleShowJournalInformation(properties.journalInformation); journalInformationPanel.show($event)"></i>
             </div>
           </div>
-          <div
-            *ngIf="properties?.statusProperty"
-            class="status-box"
-          >
-            <ng-container
-              [ngTemplateOutlet]="iconConfig"
-              [ngTemplateOutletContext]="properties.statusProperty | workpackStatusConfig"
-            >
+          <div class="status-box">
+            <ng-container *ngIf="properties?.statusProperty">
+              <ng-container
+                [ngTemplateOutlet]="iconConfig"
+                [ngTemplateOutletContext]="properties.statusProperty | workpackStatusConfig"
+              >
               <ng-template
                 #iconConfig
                 let-icon="icon"
@@ -186,6 +184,7 @@
                   </i>
                 </ng-template>
               </ng-template>
+              </ng-container>
             </ng-container>
           </div>
           <p-overlayPanel #journalInformationPanel class="journal-info-overlay-panel" [showCloseIcon]="true" [dismissable]="false">

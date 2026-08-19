@@ -845,6 +845,7 @@ export class ReportModelComponent implements OnInit, OnDestroy {
               ...result.data
             };
           }
+          return fileUploaded;
         })
       )
     ];

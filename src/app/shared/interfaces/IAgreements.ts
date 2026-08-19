@@ -23,6 +23,7 @@ export interface IAgreements {
   partyName?: string;
 
   protocol?: string;
+  numOriginal?: string;
 }
 
 export interface IAgreementCreate {
@@ -31,6 +32,7 @@ export interface IAgreementCreate {
   processId: number;
   object: string;
   organizationIdentifier: string;
+  numOriginal?: string;
 }
 
 export interface IAgreementUpdate extends IAgreementCreate {

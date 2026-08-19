@@ -108,6 +108,8 @@ export class ControlChangeBoardMemberComponent implements OnInit, OnDestroy {
       } else {
         this.invalidMailMessage = this.searchedEmailPerson.length > 0 ? this.translateSrv.instant('messages.invalidEmail') : '';
         this.ccbMember.person = null;
+        this.setMemberAsCcbMember(this.ccbMember.person);
+        this.saveButton?.hideButton();
       }
     });
     this.ccbMember.person = this.ccbMember.person || {} as IPerson;
@@ -270,8 +272,11 @@ export class ControlChangeBoardMemberComponent implements OnInit, OnDestroy {
   }
 
   setMemberAsCcbMember(person: IPerson) {
-    const current = this.ccbMember.memberAs || [];
+    const current = this.idPerson ? (this.ccbMember.memberAs || []) : [];
     const personRoles = person?.roles || [];
+    const activateCitizenByDefault = !this.idPerson
+      && personRoles.length === 1
+      && personRoles[0].role?.toLowerCase() === 'citizen';
 
     const normalizedPersonRoles = personRoles.map(role => ({
       role: this.translateSrv.instant(role.role),
@@ -285,7 +290,7 @@ export class ControlChangeBoardMemberComponent implements OnInit, OnDestroy {
 
       if (!exists) {
         acc.push({
-          active: 'active' in item ? item.active : false,
+          active: 'active' in item ? item.active : activateCitizenByDefault,
           role: item.role,
           workLocation: item.workLocation
         });
@@ -324,7 +329,6 @@ export class ControlChangeBoardMemberComponent implements OnInit, OnDestroy {
         this.showSearchInputMessage = false;
         this.ccbMember.person = data;
         this.ccbMember.person.email = this.searchedEmailPerson;
-        this.showSaveButton();
       } else {
         const email = this.searchedEmailPerson.split('@');
         const name = email[0];
@@ -333,13 +337,13 @@ export class ControlChangeBoardMemberComponent implements OnInit, OnDestroy {
           email: this.searchedEmailPerson,
           roles: [{ role: 'citizen', workLocation: undefined }]
         };
-        this.showSaveButton();
       }
     } else {
       this.ccbMember.person = null;
     }
     this.setFormPerson(this.ccbMember.person);
     this.setMemberAsCcbMember(this.ccbMember.person);
+    this.showSaveButton();
   }
 
   validateClearSearchUserName(event) {
@@ -361,6 +365,7 @@ export class ControlChangeBoardMemberComponent implements OnInit, OnDestroy {
     this.searchedNameUser = null;
     this.setFormPerson(this.ccbMember.person);
     this.setMemberAsCcbMember(this.ccbMember.person);
+    this.saveButton?.hideButton();
   }
 
   async searchCitizenUserByName() {
@@ -392,6 +397,7 @@ export class ControlChangeBoardMemberComponent implements OnInit, OnDestroy {
       this.citizenUserNotFoundByCpf = false;
       this.setFormPerson(this.ccbMember.person);
       this.setMemberAsCcbMember(this.ccbMember.person);
+      this.saveButton?.hideButton();
     }
   }
 
@@ -439,11 +445,23 @@ export class ControlChangeBoardMemberComponent implements OnInit, OnDestroy {
   }
 
   showSaveButton() {
-    this.saveButton.showButton();
-    this.cancelButton.showButton();
+    if (this.hasActiveMemberAs()) {
+      this.saveButton?.showButton();
+    } else {
+      this.saveButton?.hideButton();
+    }
+    this.cancelButton?.showButton();
+  }
+
+  hasActiveMemberAs(): boolean {
+    return (this.ccbMember.memberAs || []).some(memberAs => memberAs.active);
   }
 
   async saveCcbMember() {
+    if (!this.hasActiveMemberAs()) {
+      this.saveButton?.hideButton();
+      return;
+    }
     this.cancelButton.hideButton();
     let phoneNumber = this.formPerson.controls.phoneNumber.value;
     if (phoneNumber) {
