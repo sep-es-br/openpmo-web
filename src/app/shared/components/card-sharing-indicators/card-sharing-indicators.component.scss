@@ -1,0 +1,30 @@
+:host {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  height: 14px;
+}
+
+.indicator-icon {
+  display: inline-flex;
+  flex: 0 0 16px;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  min-width: 16px;
+  max-width: 16px;
+  height: 14px;
+  margin: 0 !important;
+  color: #888e96;
+  font-size: 0.8rem;
+  line-height: 1;
+  transform: translateY(-1px);
+
+  &::before {
+    display: block;
+    width: 16px;
+    text-align: center;
+  }
+}
