@@ -188,10 +188,15 @@
           flex-direction: row;
           align-items: center;
           justify-content: space-between;
-          width: 100%;
+          width: calc(100% - 0.5rem);
           height: 26px;
           margin-left: 0.5rem;
           .p-button {
+            display: inline-flex;
+            flex: 0 0 44px;
+            width: 44px;
+            align-items: center;
+            justify-content: center;
             padding: 0 !important;
           }
         }
@@ -295,10 +300,16 @@
 
       .right-content {
         .indexes {
+          display: flex;
+          flex: 0 0 25px;
+          min-height: 25px;
+
           .status-container {
             display: flex;
             align-items: center;
             justify-content: center;
+            min-width: 20px;
+            min-height: 20px;
             width: 100%;
 
             .fa-info,
@@ -310,9 +321,11 @@
 
         .status-box {
           display: flex;
+          flex: 0 0 25px;
           flex-direction: row;
           align-items: center;
           justify-content: center;
+          min-width: 20px;
           min-height: 25px;
 
           .img-status-icon {
@@ -624,7 +637,7 @@
         color: #888e96;
         font-size: 0.6rem;
         font-family: v.$fontFamilyMedium;
-        padding: 0.5em;
+        padding: 0 0.5em 0.5em;
       }
     }
     .card-item-content {
@@ -674,15 +687,20 @@
           display: flex;
           flex-direction: column;
           flex: 1;
+          align-items: center;
           max-width: 210px;
         }
         .workpack-container.card-link {
           cursor: pointer;
         }
         .card-item-name {
+          display: flex;
+          align-items: flex-start;
+          justify-content: center;
+          min-height: 2.25rem;
           font-size: 0.9rem;
           font-family: v.$fontFamilyMedium;
-          padding: 0.5em;
+          padding: 4px 0 0;
           width: 100%;
           white-space: wrap;
           word-break: break-word;
@@ -691,10 +709,12 @@
       }
       .right-content {
         display: flex;
+        flex: 0 0 44px;
         flex-direction: column;
-        width: 15%;
+        width: 44px;
+        min-width: 44px;
         height: 100%;
-        justify-content: space-between;
+        justify-content: flex-start;
         .indexes {
           display: flex;
           flex-direction: column;
@@ -705,6 +725,10 @@
             font-weight: bold;
             padding-top: 5px;
           }
+        }
+
+        .footer-info {
+          margin-top: auto;
         }
 
       }

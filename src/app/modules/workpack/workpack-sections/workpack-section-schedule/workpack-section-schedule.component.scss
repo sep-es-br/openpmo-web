@@ -1,6 +1,10 @@
 @use "src/variables" as v;
 
 ::ng-deep .app-workpack-section-schedule {
+  app-buttons-container .app-buttons-container-layout {
+    height: 0;
+  }
+
   .app-save-button-layout {
     height: auto !important;
   }
@@ -152,18 +156,13 @@
       .dataview-step-card-items {
         .p-dataview-content .p-grid {
           .card-item-container {
-            flex-basis: auto;
-
             &#card-labels-container {
               // background-color: red;
               flex-basis: 105px;
             }
     
             &.show-details {
-              flex-basis: 210px;
-              &.mobile:not(.new-card-item) {
-                flex-basis: 100% !important;
-              }
+              min-width: 0;
             }
             &.show-resumed {
               flex-basis: 130px;
@@ -185,12 +184,6 @@
                     height: 100%;
                   }
                 }
-              }
-            }
-            &.new-card-item {
-              flex-basis: auto !important;
-              &.mobile {
-                margin: 0 auto 15px auto !important;
               }
             }
           }
@@ -245,9 +238,14 @@
           .group-progress-bar-container {
             flex-direction: column;
             margin-top: 0.5em;
+            gap: 0.75rem;
+
             .progress-bar-container {
+              flex: 0 0 auto;
+              min-width: 0;
+              width: 100%;
               margin-left: 0;
-              margin-top: 0.5em;
+              margin-top: 0;
             }
           }
         }
@@ -339,6 +337,171 @@
       display: flex;
       justify-content: flex-end;
       gap: 10px;
+    }
+
+    // Bootstrap controls the three equal columns; only legacy fixed sizing is reset here.
+    .app-card .header-title-dates {
+      flex-wrap: nowrap;
+      white-space: nowrap;
+    }
+
+    .app-card .progress-bars-below-header {
+      box-sizing: border-box;
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      padding: 0 0 0.75rem;
+      overflow: hidden;
+
+      .header-values-cost-account {
+        box-sizing: border-box;
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        padding: 0;
+        align-items: flex-end;
+      }
+
+      .progress-bar-cost-container {
+        box-sizing: border-box;
+        min-width: 0;
+        max-width: 33.33333333%;
+        margin: 0;
+        padding: 0 0.25rem;
+
+        app-progress-bar {
+          display: block;
+          width: 100%;
+          min-width: 0;
+        }
+
+        .app-progress {
+          width: 100%;
+          min-width: 0;
+
+          .unit-container {
+            flex: 0 0 20px;
+            min-width: 20px;
+            margin-right: 4px;
+          }
+
+          .progress-header-values-container,
+          .progress-header-values-container.responsive {
+            flex: 1 1 auto;
+            width: auto !important;
+            min-width: 0;
+          }
+        }
+      }
+    }
+
+    app-card.schedule-collapsed {
+      .header-title-dates,
+      .header-labels {
+        display: none !important;
+      }
+
+      .header-values-cost-account {
+        display: none !important;
+      }
+
+      p-header.card-header > .d-flex.flex-row.col-12 > .d-flex.col-12.justify-content-center {
+        display: none !important;
+      }
+    }
+
+    .dataview-step-card-items .p-dataview-content .p-grid {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: stretch;
+
+      .card-item-container.show-details:not(.new-card-item) {
+        min-width: 0;
+        max-width: 100%;
+      }
+
+      .card-item-container.show-resumed,
+      .card-item-container.show-resumed.mobile:not(.new-card-item) {
+        flex: 1 1 130px !important;
+        min-width: 0;
+        max-width: 100%;
+      }
+    }
+
+    .card-item-container app-schedule-step-card-item {
+      display: block;
+      width: 100%;
+      min-width: 0;
+      height: 100%;
+    }
+
+    .card-item-container.new-card-item {
+      box-sizing: border-box;
+      display: flex;
+      align-items: flex-start;
+      flex: 0 0 80px !important;
+      width: 80px !important;
+      max-width: 80px !important;
+      margin: 0 15px 15px 0 !important;
+
+      @media screen and (max-width: 767.98px) {
+        flex: 0 0 100% !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 0 15px !important;
+
+        app-schedule-step-card-item {
+          flex: 0 0 100% !important;
+          width: 100% !important;
+        }
+      }
+
+      app-schedule-step-card-item {
+        flex: 0 0 80px;
+        width: 80px;
+        height: 66px;
+
+        .app-new-step-card-item,
+        .app-new-step-card-item .p-card,
+        .app-new-step-card-item .p-card-body,
+        .app-new-step-card-item .p-card-content {
+          box-sizing: border-box;
+          width: 100%;
+          height: 100%;
+        }
+      }
+    }
+
+    .card-item-container .app-step-card-item .p-card .card-item-content {
+      width: 100%;
+      max-width: 100%;
+      margin-left: 0;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+
+      .unitValues,
+      .costValues,
+      .unitInputs,
+      .costInputs,
+      .p-float-label,
+      .p-inputnumber,
+      .p-inputnumber-input,
+      .progress-bar-unit-container {
+        box-sizing: border-box;
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+      }
+
+      .unitInputs,
+      .costInputs {
+        padding-right: 0.5rem;
+        padding-left: 0.5rem;
+      }
+
+      label.app-input-label {
+        margin-left: 0;
+        max-width: 100%;
+      }
     }
     
 }

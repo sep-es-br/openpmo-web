@@ -8,8 +8,9 @@
   expandIcon="pi pi-angle-down" collapseIcon="pi pi-angle-up" [class.mobile]="responsive"
   (collapsedChange)="handleCollapsed($event)">
   <p-header class="card-header" [class.card-header-mobile]="responsive">
-    <div class="d-flex flex-row col-12">
-      <div class="header-title d-flex col-4" (click)="properties.collapseble && handleCollapsed()"
+    <div class="d-flex flex-row col-12" [class.progress-bars-bootstrap-grid]="progressBarsBootstrapGrid">
+      <div class="header-title d-flex" [ngClass]="progressBarsBootstrapGrid ? 'col-12 col-lg-4' : 'col-4'"
+        (click)="properties.collapseble && handleCollapsed()"
         [class.card-collapseble]="properties.collapseble">
         <div class="header-title-text">
           <span class="card-title" [class.card-title-mobile]="responsive" *ngIf="properties.cardTitle">{{
@@ -83,31 +84,13 @@
         </div>
       </div>
 
-      <div class="d-flex col-12 justify-content-center col-sm-5 justify-content-sm-end" *ngIf="properties.progressBarValues">
-        <div class="header-values-cost-account " [class.not-collapseble]="!properties.collapseble" [class.responsive]="responsive">
-          <div
-            *ngFor="let progressBar of properties.progressBarValues"
-            class="progress-bar-cost-container"
-          >
-            <app-progress-bar
-              [total]="progressBar.total"
-              [class.progress-bar-mobile]="responsive"
-              [progress]="progressBar.progress"
-              [labelTotal]="progressBar.labelTotal"
-              [labelProgress]="progressBar.labelProgress"
-              [valueUnit]="progressBar.valueUnit"
-              [baselineTotal]="progressBar.baselinePlanned"
-              [color]="progressBar.color"
-              [startDateBaseline]="progressBar.startDateBaseline"
-              [startDateTotal]="progressBar.startDateTotal"
-              [endDateBaseline]="progressBar.endDateBaseline"
-              [endDateTotal]="progressBar.endDateTotal"
-              [barHeight]="progressBar.barHeight"
-              [displayWhenTotalIsZero]="displayProgressBarIfTotalIsZero"
-              [displayFilledBarsWhenTotalIsZero]="displayFilledBarsWhenTotalIsZero"
-            >
-            </app-progress-bar>
-          </div>
+      <div class="d-flex justify-content-center justify-content-sm-end"
+        [ngClass]="progressBarsBootstrapGrid ? 'col-12 col-lg-8' : 'col-12 col-sm-5'"
+        *ngIf="properties.progressBarValues && !progressBarsBelowHeader">
+        <div class="header-values-cost-account" [class.not-collapseble]="!properties.collapseble"
+          [class.responsive]="responsive && !progressBarsBootstrapGrid"
+          [class.flex-row]="progressBarsBootstrapGrid">
+          <ng-container *ngTemplateOutlet="progressBarsTemplate"></ng-container>
         </div>
       </div>
 
@@ -200,5 +183,38 @@
       </div>
     </div>
   </p-header>
+  <div class="progress-bars-below-header col-12"
+    *ngIf="properties.progressBarValues && progressBarsBelowHeader && !properties.initialStateCollapse">
+    <div class="header-values-cost-account d-flex flex-row">
+      <ng-container *ngTemplateOutlet="progressBarsTemplate"></ng-container>
+    </div>
+  </div>
   <ng-content></ng-content>
 </p-panel>
+
+<ng-template #progressBarsTemplate>
+  <div
+    *ngFor="let progressBar of properties.progressBarValues"
+    class="progress-bar-cost-container"
+    [class.col-4]="progressBarsBootstrapGrid"
+  >
+    <app-progress-bar
+      [total]="progressBar.total"
+      [class.progress-bar-mobile]="responsive"
+      [progress]="progressBar.progress"
+      [labelTotal]="progressBar.labelTotal"
+      [labelProgress]="progressBar.labelProgress"
+      [valueUnit]="progressBar.valueUnit"
+      [baselineTotal]="progressBar.baselinePlanned"
+      [color]="progressBar.color"
+      [startDateBaseline]="progressBar.startDateBaseline"
+      [startDateTotal]="progressBar.startDateTotal"
+      [endDateBaseline]="progressBar.endDateBaseline"
+      [endDateTotal]="progressBar.endDateTotal"
+      [barHeight]="progressBar.barHeight"
+      [displayWhenTotalIsZero]="displayProgressBarIfTotalIsZero"
+      [displayFilledBarsWhenTotalIsZero]="displayFilledBarsWhenTotalIsZero"
+    >
+    </app-progress-bar>
+  </div>
+</ng-template>

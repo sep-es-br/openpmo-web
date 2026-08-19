@@ -2,6 +2,7 @@
 @use "src/card-item-mixins" as card-item;
 
 $card-view-icon-size: v.$cardViewIconSize;
+$card-view-icon-font-size: 1.5rem;
 $list-view-icon-box-size: v.$listViewIconBoxSize;
 $list-view-icon-font-size: v.$listViewIconFontSize;
 $card-item-title-font-size: v.$cardItemTitleFontSize;
@@ -19,7 +20,7 @@ $card-horizontal-space: 1rem;
 
   &.disabled {
     .p-card {
-      background-color: lightgray !important;
+      background-color: unset !important;
     }
 
   }
@@ -155,6 +156,15 @@ $card-horizontal-space: 1rem;
 
       .card-item-content {
         width: 100%;
+
+        .card-item-subtitle {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin-left: auto;
+          padding: 0 1rem;
+          text-align: center;
+        }
 
         .card-item-funder {
           padding: 0.6rem 0.5rem 0.5rem 0.5rem;
@@ -359,6 +369,8 @@ $card-horizontal-space: 1rem;
           display: flex;
           flex-direction: column;
           align-items: center;
+          width: 100%;
+          min-width: 0;
         }
 
         .person-right-content {
@@ -366,29 +378,19 @@ $card-horizontal-space: 1rem;
         }
 
         .person-identification {
-          width: calc(100% - $card-horizontal-space);
-          max-width: calc(100% - $card-horizontal-space);
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-
-          .card-item-name,
-          .card-item-full-name {
-            display: block;
-            max-width: 100%;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-          }
+          @include card-item.identification(
+            0.9rem,
+            $card-item-secondary-font-size,
+            v.$cardItemContentGap 0 0.2rem,
+            calc(100% - 2rem)
+          );
 
           .card-item-name {
+            margin: v.$cardItemContentGap 0 0;
             padding-bottom: 0.2rem;
-            font-size: $card-item-title-font-size;
           }
 
           .card-item-full-name {
-            font-size: $card-item-secondary-font-size;
-            text-align: center;
             color: #888e96;
           }
         }
@@ -414,7 +416,7 @@ $card-horizontal-space: 1rem;
         height: $card-view-icon-size !important;
 
         .p-avatar-icon {
-          font-size: 1.5rem;
+          font-size: $card-view-icon-font-size;
         }
       }
 
@@ -748,39 +750,22 @@ $card-horizontal-space: 1rem;
 
     > i {
       flex: 0 0 $card-view-icon-size;
-      width: 34px !important;
-      height: 34px !important;
+      width: $card-view-icon-size !important;
+      height: $card-view-icon-size !important;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 34px !important;
+      font-size: $card-view-icon-font-size !important;
     }
 
     .stakeholder-card-identification {
-      width: calc(100% - 1rem);
-      max-width: calc(100% - 1rem);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-
-      .card-item-name,
-      .card-item-full-name {
-        display: block;
-        max-width: 100%;
-        padding: 0;
-        text-align: center;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-      }
-
-      .card-item-name {
-        margin: 0.5rem 0 0.2rem;
-        font-size: 0.80rem;
-      }
+      @include card-item.identification(
+        0.80rem,
+        v.$cardItemFullNameFontSize,
+        v.$cardItemContentGap 0 0.2rem
+      );
 
       .card-item-full-name {
-        font-size: v.$cardItemFullNameFontSize;
         color: #888e96;
       }
     }
@@ -788,19 +773,19 @@ $card-horizontal-space: 1rem;
   }
 
   .stakeholder-card-subtitle {
-    flex: 0 0 2rem;
+    flex: 0 0 $card-item-metadata-row-size;
     width: 100%;
-    min-height: 2rem;
-    margin-top: v.$cardItemContentGap;
+    min-height: $card-item-metadata-row-size;
+    margin-top: 0;
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     justify-content: center;
     overflow: hidden;
 
     .subtitle {
       width: 100%;
       max-width: 100%;
-      padding: 0 0.5rem 0.5rem;
+      padding: 0 0.5rem;
       color: #009dd4;
       font-size: 0.72rem;
       text-align: center;
@@ -810,6 +795,7 @@ $card-horizontal-space: 1rem;
       .card-item-subtitle {
         display: inline;
         width: auto !important;
+        padding: 0;
         font-size: 0.72rem;
         white-space: normal !important;
         overflow: visible !important;
