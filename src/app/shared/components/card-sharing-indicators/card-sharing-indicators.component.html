@@ -1,0 +1,13 @@
+<i
+  class="app-icon link-to grey-icon indicator-icon"
+  *ngIf="showLinked && linked"
+></i>
+<i
+  class="app-icon sharing grey-icon indicator-icon"
+  *ngIf="shared && !linked"
+></i>
+<i
+  class="app-icon baseline grey-icon indicator-icon"
+  *ngIf="hasBaseline"
+  [pTooltip]="baselineName"
+></i>

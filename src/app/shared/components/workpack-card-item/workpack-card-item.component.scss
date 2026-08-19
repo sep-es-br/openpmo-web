@@ -556,7 +556,7 @@
         flex-direction: row !important;
         align-items: center;
         justify-content: flex-end;
-        gap: 5px;
+        gap: 6px;
         > i {
           display: inline-flex;
           flex: 0 0 16px;
@@ -615,27 +615,11 @@
     .footer-info {
       width: 100%;
       display: flex;
-      flex-direction: column;
+      flex-direction: row;
       align-items: center;
-      // padding: 0 3px 0 10px;
-      .footer-icons {
-        position: relative;
-        width: 100%;
-        height: 0.7rem;
+      justify-content: flex-end;
+      gap: 6px;
 
-        .app-icon {
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          font-size: 0.7rem;
-          color: #888e96;
-          transform: translate(-50%, -50%);
-        }
-
-        .sharing {
-          left: calc(50% - 0.9rem);
-        }
-      }
       .card-item-id {
         color: #888e96;
         font-size: 0.6rem;
@@ -744,8 +728,10 @@
     }
     .card-item-footer {
       display: flex;
-      flex-direction: column;
+      flex-direction: row;
+      align-items: center;
       justify-content: flex-end;
+      gap: 6px;
       padding: 0.5em;
       .card-item-id {
         color: #888e96;
