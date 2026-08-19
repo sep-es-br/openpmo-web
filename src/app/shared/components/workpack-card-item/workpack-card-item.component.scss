@@ -870,14 +870,36 @@
         width: 60%;
         .date-container {
           display: flex;
-          justify-content: flex-end;
           align-items: center;
+          justify-content: flex-end;
           width: calc(100% - 5rem);
+          gap: 1rem;
           padding: 0 1.5rem;
+
+          > .card-item-date,
+          > .calendar-container {
+            flex: 0 0 160px;
+            width: 160px;
+            min-width: 160px;
+            max-width: 160px;
+            margin-left: 0;
+          }
+
+          > .card-item-date {
+            display: flex;
+            box-sizing: border-box;
+            justify-content: center;
+          }
+
           .description-container {
             display: flex;
+            flex: 0 0 175px;
             flex-direction: row;
-            margin-left: 1em;
+            justify-content: flex-start;
+            min-width: 175px;
+            max-width: 175px;
+            width: 100%;
+            margin-left: 0;
             .card-item-name {
               font-size: 0.9rem;
               width: 100%;
@@ -885,9 +907,9 @@
               word-break: break-word;
             }
             .card-item-status {
-              width: 175px;
+              width: 100%;
               font-size: 0.8rem;
-              margin-left: 2em;
+              margin-left: 0;
             }
           }
           .calendar-container {
@@ -895,6 +917,30 @@
             flex-direction: row;
             width: 100%;
             justify-content: flex-end;
+
+            .p-calendar {
+              display: flex;
+              position: relative;
+              box-sizing: border-box;
+              justify-content: center;
+              width: 100%;
+              padding-right: 32px;
+
+              .p-inputtext {
+                flex: 0 0 10ch;
+                width: 10ch !important;
+                min-width: 0;
+              }
+
+              .p-datepicker-trigger {
+                position: absolute;
+                top: 0;
+                right: 0;
+                bottom: 0;
+                width: 32px;
+              }
+            }
+
             .reason-buttons {
               width: auto;
             }
