@@ -25,14 +25,16 @@
         <span class="column-title">{{properties.unitName}}</span>
 
         <span *ngIf="isCurrentBaseline" class="p-float-label p-field">
-          <p-inputNumber [class]="'app-input-number '+'unitBaseline '+'unitBaseline'+ properties.idStep" id="float-unitBaseline" 
+          <p-inputNumber [class]="'app-input-number '+'unitBaseline '+'unitBaseline'+ properties.idStep"
+            [inputId]="'float-unitBaseline-' + properties.idStep"
             (onInput)="handleStepCostChange($event, 'unitBaseline')"
             [ngClass]="{'disabled-field': true}"
             [(ngModel)]="properties.unitBaseline"
             [minFractionDigits]="properties.unitPrecision" [maxFractionDigits]="properties.unitPrecision"
             [locale]="language === 'pt-BR' ? 'pt-BR' : 'en-US'">
           </p-inputNumber>
-          <label pTooltip="{{ 'plannedBaseline' | translate }}" class="app-input-label" for="float-unitBaseline]">{{ "abbreviatedBaselineCardItem" | translate }}</label>
+          <label pTooltip="{{ 'plannedBaseline' | translate }}" class="app-input-label"
+            [for]="'float-unitBaseline-' + properties.idStep">{{ "abbreviatedBaselineCardItem" | translate }}</label>
         </span>
 
         <!-- Baseline superior esquerdo -->
@@ -49,7 +51,8 @@
 
         <!-- VALOR ESTIMADO/REPROGRAMADO -->
         <span class="p-float-label p-field" *ngIf="properties.idStep">
-          <p-inputNumber [class]="'app-input-number '+'unitPlanned '+'unitPlanned-'+ properties.idStep" id="float-unitPlanned"
+          <p-inputNumber [class]="'app-input-number '+'unitPlanned '+'unitPlanned-'+ properties.idStep"
+            [inputId]="'float-unitPlanned-' + properties.idStep"
             [ngClass]="{
               'disabled-field': !properties.editPermission
             }"
@@ -59,7 +62,8 @@
             [minFractionDigits]="properties.unitPrecision" [maxFractionDigits]="properties.unitPrecision"
             [locale]="language === 'pt-BR' ? 'pt-BR' : 'en-US'">
           </p-inputNumber>
-          <label pTooltip="{{ tooltipLabel | translate }}" class="app-input-label" for="float-unitPlanned">{{ foreseenLabel | translate}}</label>
+          <label pTooltip="{{ tooltipLabel | translate }}" class="app-input-label"
+            [for]="'float-unitPlanned-' + properties.idStep">{{ foreseenLabel | translate}}</label>
         </span>
         
         <!-- Reprogramado meio esquerdo -->
@@ -81,7 +85,8 @@
         
         <!-- VALOR REALIZADO -->
         <span class="p-float-label p-field" *ngIf="properties.idStep">
-          <p-inputNumber class="app-input-number" id="float-unitActual" (onInput)="handleStepChange($event, 'unitActual')"
+          <p-inputNumber class="app-input-number" [inputId]="'float-unitActual-' + properties.idStep"
+            (onInput)="handleStepChange($event, 'unitActual')"
             [(ngModel)]="properties.unitActual"
             [ngClass]="{'disabled-field': (permission !== 'UPDATE' && !properties.editPermission) || isActualValuesDisabled}"
             [class.red]="properties.unitActual < 0"
@@ -89,7 +94,8 @@
             (onInput)="handleStepCostChange($event, 'unitActual')"
             [locale]="language === 'pt-BR' ? 'pt-BR' : 'en-US'">
           </p-inputNumber>
-          <label pTooltip="{{ 'actual' | translate }}" class="app-input-label" for="float-unitActual">{{"abbreviatedActual" | translate}}</label>
+          <label pTooltip="{{ 'actual' | translate }}" class="app-input-label"
+            [for]="'float-unitActual-' + properties.idStep">{{"abbreviatedActual" | translate}}</label>
         </span>
         
         <!-- Real inferior esquerdo -->
@@ -110,7 +116,8 @@
         <span class="column-title"> $ </span>
         
         <span *ngIf="isCurrentBaseline" class="p-float-label p-field">
-          <p-inputNumber [class]="'app-input-number '+'costBaseline-'+properties.idStep" id="float-costBaseline"
+          <p-inputNumber [class]="'app-input-number '+'costBaseline-'+properties.idStep"
+            [inputId]="'float-costBaseline-' + properties.idStep"
             [ngClass]="{'disabled-field': true}"
             [(ngModel)]="properties.baselinePlannedCost" 
             (onInput)="handleStepCostChange($event, 'baselinePlannedCost')"
@@ -132,7 +139,8 @@
         </div>
         
         <span class="p-float-label p-field" *ngIf="properties.idStep">
-          <p-inputNumber [class]="'app-input-number '+'costPlanned-'+properties.idStep" id="float-costPlanned"
+          <p-inputNumber [class]="'app-input-number '+'costPlanned-'+properties.idStep"
+            [inputId]="'float-costPlanned-' + properties.idStep"
             (click)="properties.multipleCosts && handleEditCosts($event); properties.multipleCosts && disable()"
             (onFocus)="properties.multipleCosts && handleEditCosts($event); properties.multipleCosts && disable()"
             (mouseout)="multiCostsEdited = false"
@@ -166,7 +174,7 @@
             (click)="(properties.editCosts && properties.editPermission && showReplicateButton) && confirmReplicateValueDif('costActual')"></i>
         </div>
         <span class="p-float-label p-field" *ngIf="properties.idStep">
-          <p-inputNumber class="app-input-number" id="float-costActual"
+          <p-inputNumber class="app-input-number" [inputId]="'float-costActual-' + properties.idStep"
             (click)="properties.multipleCosts && handleEditCosts($event); properties.multipleCosts && disable()"
             (onFocus)="properties.multipleCosts && handleEditCosts($event); properties.multipleCosts && disable()"
             (mouseout)="multiCostsEdited = false"
