@@ -66,15 +66,17 @@ export class AuthService {
   }
 
   async signOut() {
-    this.http.post(`${this.appConfig.API}/logout`, {}).subscribe({
-      next: () => {
-        this.router.navigateByUrl('/');
-        this.clearStorage();
-        this.userLogout.next(true);
-        this.currentUserInfo = undefined;
-        this.infoPersonChanged.next(undefined);
-      }
-    });
+    this.clearStorage();
+    this.userLogout.next(true);
+    this.currentUserInfo = undefined;
+    this.infoPersonChanged.next(undefined);
+
+    const form = this.document.createElement('form');
+    form.method = 'POST';
+    form.action = `${this.appConfig.API}/logout`;
+    form.style.display = 'none';
+    this.document.body.appendChild(form);
+    form.submit();
   }
 
   async signOutCitizenAccess() {
