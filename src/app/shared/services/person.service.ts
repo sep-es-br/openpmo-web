@@ -9,6 +9,7 @@ import { IPersonProfile } from '../interfaces/IPersonProfile';
 import { PrepareHttpParams } from '../utils/query.util';
 import { BehaviorSubject, forkJoin, Observable, Subject } from 'rxjs';
 import { IPreferences } from '../interfaces/preferences.interface';
+import { IOrganization } from '../interfaces/IOrganization';
 import { finalize, map, mergeMap, take, takeUntil, tap } from 'rxjs/operators';
 
 @Injectable({ providedIn: 'root' })
@@ -86,6 +87,15 @@ export class PersonService extends BaseService<IPerson>{
   async PutWithContactOffice(data: IPerson) {
     const result = await this.http.put(`${this.urlBase}/office`, data).toPromise();
     return result as IHttpResult<IPerson>;
+  }
+
+  async resolveAuthenticatedUserWorkPlace(idOffice: number): Promise<IHttpResult<IOrganization>> {
+    const result = await this.http.post(
+      `${this.urlBase}/me/workplaces/resolve`,
+      null,
+      { params: { 'id-office': idOffice.toString() } }
+    ).toPromise();
+    return result as IHttpResult<IOrganization>;
   }
 
   public async updateNameAdministradorPerson(idPerson: number, name: string) {
