@@ -33,6 +33,7 @@ import {
 } from 'src/app/shared/services/pentaho.service';
 import { Dropdown } from 'primeng/dropdown';
 import { InputNumber } from 'primeng/inputnumber';
+import {map} from 'rxjs/operators';
 
 @Component({
   selector: 'app-cost-account',
@@ -126,6 +127,9 @@ export class CostAccountComponent implements OnInit {
   backupSelectedUo: any;
 
   backupSelectedPlano: any;
+
+  isUoPluginAvaliable = false;
+  isPoPluginAvaliable = false;
 
   newInstrumentFunc = () => {
     this.selectedInstruments.push({} as IInstrument);
@@ -291,7 +295,13 @@ export class CostAccountComponent implements OnInit {
       },
     ];
 
-    this.pentahoSrv.getUoOptions(idWorkpack, codPo).subscribe({
+    this.pentahoSrv.getUoOptions(idWorkpack, codPo)
+      .pipe(
+          map(resp => {
+              this.isUoPluginAvaliable = resp.isPluginAvaliable;
+              return resp.options;
+          })
+      ).subscribe({
       next: (data) => {
         this.uoOptions = [
           {
@@ -335,6 +345,12 @@ export class CostAccountComponent implements OnInit {
 
     this.pentahoSrv
       .getPlanoOrcamentarioOptions(uoValue, this.idWorkpack)
+      .pipe(
+        map(resp => {
+            this.isPoPluginAvaliable = resp.isPluginAvaliable;
+            return resp.options;
+        })
+      )
       .subscribe((data) => {
         this.planoOrcamentarioOptions = [
           {
@@ -423,6 +439,12 @@ export class CostAccountComponent implements OnInit {
     if (this.selectedUo) {
       this.pentahoSrv
         .getPlanoOrcamentarioOptions(this.selectedUo?.code, this.costAccount.id)
+        .pipe(
+          map(resp => {
+              this.isPoPluginAvaliable = resp.isPluginAvaliable;
+              return resp.options;
+          })
+        )
         .subscribe((poData) => {
           this.planoOrcamentarioOptions = [
             {

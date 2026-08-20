@@ -16,84 +16,74 @@ export class PentahoService {
     this.baseUrl = `${appConfig.API}`
   }
 
-  // getUoOptions(costAccountId: number): Observable<DropdownOption[]> {
-  //   const url = `${this.baseUrl}/cost-accounts/pentaho/budgetUnit/${costAccountId}`;
-  //   return this.http.get<any>(url, { responseType: 'json' }).pipe(
-  //     map(data => {
-  //       const options: DropdownOption[] = [];
-  //       for (const item of data.data.resultset) {
-  //         options.push({ code: item[0], name: item[1], fullName: item[2] });
-  //       }
-  //       return options;
-  //     })
-  //   );
-  // }
-  getUoOptions(costAccountId: number, codPo?: string): Observable<DropdownOption[]> {
+  getUoOptions(costAccountId: number, codPo?: string): Observable<{isPluginAvaliable: boolean; options: DropdownOption[]} > {
     const url = `${this.baseUrl}/cost-accounts/pentaho/budgetUnit/${costAccountId}`;
 
     let params = new HttpParams();
 
     if(codPo) {
-      params = params.set("codPo", codPo)
+      params = params.set('codPo', codPo);
     }
 
-    return this.http.get<any>(url, { responseType: 'json', params: params }).pipe(
+    return this.http.get<any>(url, { observe: 'response', params }).pipe(
       map(data => {
-        const options: DropdownOption[] = [];
-        if (data && data.data && data.data.resultset) {
-          for (const item of data.data.resultset) {
-            options.push({ code: item[0], name: item[1], fullName: item[2] });
-          }
+
+        if(data.status === 204) {
+          return {isPluginAvaliable: false, options: []};
         }
-        return options;
-      }),
-      catchError(error => {
-        console.error('Erro ao buscar opções de Unidade Orçamentária', error);
-        return of([]);
+
+        if (data.status === 200) {
+          const options: DropdownOption[] = [];
+          if (data && data.body.data && data.body.data) {
+            for (const item of data.body.data) {
+              options.push({ code: item[0], name: item[1], fullName: item[2] });
+            }
+          }
+          return {isPluginAvaliable: true, options} ;
+        }
+
+        console.error('Erro ao buscar opções de Unidade Orçamentária', data.body);
+        return {isPluginAvaliable: false, options: []};
+
       })
     );
   }
-  
 
-  // getPlanoOrcamentarioOptions(codUo: string, costAccountId: number): Observable<DropdownOption[]> {
-  //   const url = `${this.baseUrl}/cost-accounts/pentaho/budgetPlan?codUo=${codUo}&costAccountId=${costAccountId}`;
-  //   return this.http.get<any>(url, { responseType: 'json' }).pipe(
-  //     map(data => {
-  //       const options: DropdownOption[] = [];
-  //       for (const item of data.data.resultset) {
-  //         options.push({ name: item[0], code: item[1], fullName: item[2] });
-  //       }
-  //       return options;
-  //     })
-  //   );
-  // }
-  getPlanoOrcamentarioOptions(codUo: string, costAccountId: number): Observable<DropdownOption[]> {
-    
+
+  getPlanoOrcamentarioOptions(codUo: string, costAccountId: number): Observable<{isPluginAvaliable: boolean; options: DropdownOption[]}> {
+
 
     const url = `${this.baseUrl}/cost-accounts/pentaho/budgetPlan`;
 
-    let params = new HttpParams().set("costAccountId", costAccountId.toString()); 
+    let params = new HttpParams().set('costAccountId', costAccountId.toString());
 
-    if(codUo) params = params.set("codUo", codUo)
+    if(codUo) params = params.set('codUo', codUo);
 
-    return this.http.get<any>(url, { responseType: 'json', params: params }).pipe(
+    return this.http.get<any>(url, { observe: 'response', params }).pipe(
       map(data => {
-        const options: DropdownOption[] = [];
-        if (data && data.data && data.data.resultset) {
-          for (const item of data.data.resultset) {
-            options.push({ name: item[0], code: item[1], fullName: item[2] });
-          }
+
+        if(data.status === 204) {
+          return {isPluginAvaliable: false, options: []};
         }
-        return options;
-      }),
-      catchError(error => {
-        console.error('Erro ao buscar opções de Plano Orçamentário', error);
-        return of([]);
+
+        if(data.status === 200) {
+          const options: DropdownOption[] = [];
+          if (data && data.body.data && data.body.data) {
+            for (const item of data.body. data) {
+              options.push({ name: item[0], code: item[1], fullName: item[2] });
+            }
+          }
+          return {isPluginAvaliable: true, options } ;
+        }
+
+        console.error('Erro ao buscar opções de Plano Orçamentário', data.body);
+        return {isPluginAvaliable: false, options: []};
+
       })
     );
   }
 
-  
+
   getInstrumentsOptions(idCostAccount: number, codUo: string, startYear: number, endYear : number, codPo?: string): Observable<IInstrument[]> {
     const url = `${this.baseUrl}/cost-accounts/pentaho/instrumentsList?`;
     let params = new HttpParams()
@@ -126,7 +116,7 @@ export class PentahoService {
       })
     );
   }
-  
+
 
   getLiquidatedValues(codPo: string, codUo: string): Promise<IHttpResult<any>> {
     const url = `${this.baseUrl}/schedules/pentaho/po/liquidated/${codPo}/${codUo}`;
