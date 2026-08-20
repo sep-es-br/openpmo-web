@@ -24,7 +24,7 @@
       <div class="unitInputs p-fluid">
         <span class="column-title">{{properties.unitName}}</span>
 
-        <span *ngIf="isCurrentBaseline" class="p-float-label p-field">
+        <span *ngIf="isCurrentBaseline" class="p-float-label p-field unit-value-field">
           <p-inputNumber [class]="'app-input-number '+'unitBaseline '+'unitBaseline'+ properties.idStep"
             [inputId]="'float-unitBaseline-' + properties.idStep"
             (onInput)="handleStepCostChange($event, 'unitBaseline')"
@@ -50,7 +50,7 @@
         </div>
 
         <!-- VALOR ESTIMADO/REPROGRAMADO -->
-        <span class="p-float-label p-field" *ngIf="properties.idStep">
+        <span class="p-float-label p-field unit-value-field" *ngIf="properties.idStep">
           <p-inputNumber [class]="'app-input-number '+'unitPlanned '+'unitPlanned-'+ properties.idStep"
             [inputId]="'float-unitPlanned-' + properties.idStep"
             [ngClass]="{
@@ -84,7 +84,7 @@
         </div>
         
         <!-- VALOR REALIZADO -->
-        <span class="p-float-label p-field" *ngIf="properties.idStep">
+        <span class="p-float-label p-field unit-value-field" *ngIf="properties.idStep">
           <p-inputNumber class="app-input-number" [inputId]="'float-unitActual-' + properties.idStep"
             (onInput)="handleStepChange($event, 'unitActual')"
             [(ngModel)]="properties.unitActual"
