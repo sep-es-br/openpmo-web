@@ -628,16 +628,15 @@
     .footer-info {
       width: 100%;
       display: flex;
-      flex-direction: row;
-      align-items: center;
+      flex-direction: column;
+      align-items: flex-end;
       justify-content: flex-end;
-      gap: 6px;
 
       .card-item-id {
         color: #888e96;
         font-size: 0.6rem;
         font-family: v.$fontFamilyMedium;
-        padding: 0 0.5em 0.5em;
+        padding: 0 0 0.5em;
       }
     }
     .card-item-content {
@@ -729,6 +728,12 @@
 
         .footer-info {
           margin-top: auto;
+          box-sizing: border-box;
+          padding: 0 0.5em;
+
+          app-card-sharing-indicators {
+            margin-right: calc((44px - 16px) / 2 - 0.5em);
+          }
         }
 
       }
@@ -1062,6 +1067,8 @@
       display: flex;
       flex-direction: column;
       align-items: center;
+      justify-content: center;
+      gap: 4px;
       color: #888e96;
       padding: 0 !important;
       width: 100%;
@@ -1076,7 +1083,10 @@
         }
       }
       .card-item-name {
-        margin-top: 5px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 2.25rem;
         white-space: wrap;
         word-break: break-word;
         text-align: center;
@@ -1090,11 +1100,24 @@
         }
       }
       .card-item-date {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-sizing: border-box;
+        height: 2rem;
+        min-height: 2rem;
         font-size: 0.8rem;
+      }
+      .calendar-container {
+        box-sizing: border-box;
+        height: 2rem;
+        min-height: 2rem;
+        justify-content: center;
       }
       .card-item-status {
         font-size: 0.8rem;
         font-weight: 500;
+        min-height: 1rem;
       }
       .on-time {
         color: v.$fontApproved;
@@ -1125,12 +1148,15 @@
       flex-direction: column;
       justify-content: flex-end;
       align-items: flex-end;
+      box-sizing: border-box;
       padding: 0 0.5em;
       width: 100%;
+
       .card-item-id {
         color: #888e96;
         font-size: 0.6rem;
         font-family: v.$fontFamilyMedium;
+        padding-bottom: 0.5em;
       }
       .baseline-icon {
         font-size: 0.7rem;
