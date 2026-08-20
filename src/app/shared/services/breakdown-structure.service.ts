@@ -188,7 +188,7 @@ export class BreakdownStructureService extends BaseService<IWorkpackBreakdownStr
         leaf: isWorkpack ? !item.hasChildren : false,
         label: isWorkpack ? item.workpackName : item.workpackModelName,
         properties: this.buildProperties(item),
-        children: this.mapTreeNodesChildren(workpackOrWorkpackModels, !isWorkpack, level + 1)
+        children: this.mapTreeNodesChildren(workpackOrWorkpackModels, !isWorkpack, level + 1)    //contador de filhos
       };
       tree.push(node);
     });

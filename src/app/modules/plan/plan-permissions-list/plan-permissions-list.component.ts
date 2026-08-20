@@ -141,15 +141,18 @@ export class PlanPermissionsListComponent implements OnInit, OnDestroy {
 
   loadCardItemsPlanPermissions() {
     this.cardItemsPlanPermissions = this.planPermissions.map(p => {
+      const activePermissions = p.permissions.filter(permission => permission.level !== 'NONE');
       const fullName = p.person.name.split(' ');
       const name = fullName.length > 1 ? fullName[0] + ' ' + fullName[1] : fullName[0];
       return {
         typeCardItem: 'listItem',
         titleCardItem: name,
         fullNameUser: p.person.fullName,
-        roleDescription: (p.permissions.filter(r => r.level === 'EDIT').length > 0
-          ? this.translateSrv.instant('edit')
-          : this.translateSrv.instant('read')),
+        roleDescription: activePermissions.length === 0
+          ? null
+          : (activePermissions.some(permission => permission.level === 'EDIT')
+            ? this.translateSrv.instant('edit')
+            : this.translateSrv.instant('read')),
         isCCMMember: p.permissions.some(r => r.ccmMember === true),
         menuItems: [{
           label: this.translateSrv.instant('delete'),

@@ -7,12 +7,19 @@ import { CoreModule } from 'src/app/core/core.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { PlanPermissionsComponent } from './plan-permissions/plan-permissions.component';
 import { PlanPermissionsListComponent } from './plan-permissions-list/plan-permissions-list.component';
+import { PlanSectionDashboardComponent } from './plan-sections/plan-section-dashboard/plan-section-dashboard.component';
+import { PlanSectionPropertiesComponent } from './plan-sections/plan-section-properties/plan-section-properties.component';
+import { PlanSectionWBSComponent } from './plan-sections/plan-section-wbs/plan-section-wbs.component';
+import { WorkpackDashboardComponentsModule } from '../workpack/components/workpack-dashboard-components.module';
 
 @NgModule({
   declarations: [
     PlanComponent,
     PlanPermissionsComponent,
-    PlanPermissionsListComponent
+    PlanPermissionsListComponent,
+    PlanSectionDashboardComponent,
+    PlanSectionPropertiesComponent,
+    PlanSectionWBSComponent
   ],
   imports: [
     CommonModule,
@@ -21,6 +28,7 @@ import { PlanPermissionsListComponent } from './plan-permissions-list/plan-permi
     ComponentsModule,
     FormsModule,
     ReactiveFormsModule,
+    WorkpackDashboardComponentsModule,
   ]
 })
 export class PlanModule { }

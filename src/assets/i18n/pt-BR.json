@@ -165,7 +165,7 @@
   "journal": "Diário",
   "obligations": "Empenhos",
   "procurements": "Licitações",
-  "Agreements": "Acordos",
+  "Agreements": "Instrumentos Associados",
   "processId": "Número do processo",
   "object": "Objeto",
   "organizationIdentifier": "Código do órgão/UG",
@@ -344,9 +344,9 @@
   "unlink": "Excluir consumo...",
   "nonPriority": "Não prioritário",
   "changeControlBoard": "Comitê de Controle de Mudanças",
-  "ccbMember": "CCB Membro",
-  "ccbMembers": "CCB Membros",
-  "newCcbMember": "Novo CCB Membro",
+  "ccbMember": "Membro CCM",
+  "ccbMembers": "Membros CCM",
+  "newCcbMember": "Novo Membro CCM",
   "memberAs": "Membro Como",
   "partner": "Parceiro",
   "sponsor": "Patrocinador",
@@ -681,7 +681,7 @@
     "invalidCPF": "CPF inválido.",
     "loading": "Carregando",
     "atentionCancellingMessage": "Atenção. Esta ação não poderá ser desfeita",
-    "textAtentionCancellingMessage": "Confirma envio desta proposta de cancelamento do projeto ao CCB?",
+    "textAtentionCancellingMessage": "Confirma envio desta proposta de cancelamento do projeto ao CCM?",
     "stateDepartmentFooterNotice": "Secretaria de Economia e Planejamento - Governo do Estado do Espírito Santo",
     "proudlyFooterNotice": "Orgulhosamente produzido e mantido por:",
     "licenseFooterNotice": "Distribuído sob a licença",
@@ -760,7 +760,7 @@
       "couldNotCheckParentProject": "Não foi possível verificar se possui parente Projeto",
       "ccb-member": {
         "not": {
-          "found": "CCB membro não encontrado"
+          "found": "CCM membro não encontrado"
         }
       },
       "office": {
@@ -1139,6 +1139,7 @@
   "obligationNote": "Nota de Empenho",
   "cnpj": "CNPJ",
   "protocol": "Protocolo",
+  "numOriginal": "Número Original",
   "agreementSearchAnd": "e",
   "agreementSearchOr": "ou",
   "year": "Ano",
@@ -1147,8 +1148,8 @@
   "newProcurement": "Nova Licitação",
   "modality": "Modalidade",
 
-  "cooperation": "Convênio",
-  "newCooperation": "Novo Convênio",
+  "cooperation": "Acordos e Convênios",
+  "newCooperation": "Novo Acordo ou Convênio",
   "grantorBeneficiaryName": "Nome Concedente / Convenente",
 
   "contract": "Contrato",

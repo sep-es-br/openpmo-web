@@ -155,10 +155,19 @@ export class OfficePermissionsComponent implements OnInit, OnDestroy {
     if((this.containsName || this.person.name)
       && (this.containsEmail || (this.person.email && this.person.email.indexOf('@') > -1))
       && !this.cardItemsOfficePermission.some(permission => !permission.selectedOption)
+      && this.hasSelectedPermissionOrCcm()
     ) {
       this.saveButton.showButton(); this.cancelButton.showButton();
+    } else {
+      this.saveButton?.hideButton();
     }
 
+  }
+
+  hasSelectedPermissionOrCcm(): boolean {
+    return (this.cardItemsOfficePermission || []).some(permission =>
+      (!!permission.selectedOption && permission.selectedOption !== 'NONE') || !!permission.isCCMMember
+    );
   }
 
   async ngOnInit() {
@@ -275,7 +284,7 @@ loadCardItemsPersonPermissions() {
           { label: this.translateSrv.instant('edit'), value: 'EDIT' },
           { label: this.translateSrv.instant('none'), value: 'NONE' },
         ],
-        selectedOption: p.level,  
+        selectedOption: p.level,
         isCCMMember: !!p.ccmMember,
         itemId: p.id,
       }));
@@ -496,10 +505,14 @@ loadCardItemsPersonPermissions() {
   }
 
   async savePermission() {
+    if (!this.hasSelectedPermissionOrCcm()) {
+      this.saveButton?.hideButton();
+      return;
+    }
     this.cancelButton.hideButton();
     this.formIsSaving = true;
     this.permission.permissions = this.cardItemsOfficePermission
-      .filter(p => p.selectedOption && p.selectedOption !== 'NONE')
+      .filter(p => p.selectedOption && (p.selectedOption !== 'NONE' || p.isCCMMember))
       .map(cardItem => ({
         id: cardItem.itemId,
         role: cardItem.titleCardItem,

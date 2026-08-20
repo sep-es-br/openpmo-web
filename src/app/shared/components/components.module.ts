@@ -40,6 +40,7 @@ import { CancelButtonComponent } from './cancel-button/cancel-button.component';
 import { CardJournalInformationComponent } from './card-journal-information/card-journal-information.component';
 import { CardListComponent } from './card-list/card-list.component';
 import { SearchItemCardComponent } from './search-item-card/search-item-card.component';
+import { CardSharingIndicatorsComponent } from './card-sharing-indicators/card-sharing-indicators.component';
 
 @NgModule({
   declarations: [
@@ -79,7 +80,8 @@ import { SearchItemCardComponent } from './search-item-card/search-item-card.com
     CancelButtonComponent,
     CardJournalInformationComponent,
     CardListComponent,
-    SearchItemCardComponent
+    SearchItemCardComponent,
+    CardSharingIndicatorsComponent
   ],
   imports: [
     CommonModule,
@@ -115,7 +117,8 @@ import { SearchItemCardComponent } from './search-item-card/search-item-card.com
     ButtonsContainerComponent,
     CancelButtonComponent,
     CardJournalInformationComponent,
-    SearchItemCardComponent
+    SearchItemCardComponent,
+    CardSharingIndicatorsComponent
   ]
 })
 export class ComponentsModule { }
