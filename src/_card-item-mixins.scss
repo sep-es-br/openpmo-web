@@ -1,0 +1,63 @@
+@use "src/variables" as v;
+
+@mixin name {
+  min-width: 0;
+  max-width: 100%;
+  font-size: 0.9rem;
+  font-family: v.$fontFamilyMedium;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@mixin description {
+  min-width: 0;
+  max-width: 100%;
+  font-size: 0.8rem;
+  font-family: v.$fontFamilyMedium;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@mixin identification(
+  $name-size,
+  $description-size,
+  $name-margin: 0,
+  $available-width: calc(100% - 1rem)
+) {
+  width: $available-width;
+  max-width: $available-width;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow: hidden;
+
+  .card-item-name,
+  .card-item-full-name {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    padding: 0;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    box-sizing: border-box;
+  }
+
+  .card-item-name {
+    margin: $name-margin;
+    font-size: $name-size;
+  }
+
+  .card-item-full-name {
+    font-size: $description-size;
+  }
+}
+
+@mixin icon($size) {
+  flex: 0 0 auto;
+  font-size: $size;
+}

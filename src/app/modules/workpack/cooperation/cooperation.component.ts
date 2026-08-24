@@ -110,6 +110,8 @@ export class CooperationComponent implements OnInit, OnDestroy {
       partyName: [''],
 
       protocol: [''],
+
+      numOriginal: [''],
     });
 
     this.formCooperation.statusChanges
@@ -194,6 +196,7 @@ export class CooperationComponent implements OnInit, OnDestroy {
       partyCnpj: '',
       partyName: '',
       protocol: '',
+      numOriginal: '',
     });
     this.updateFilterControls();
   }
@@ -225,6 +228,7 @@ export class CooperationComponent implements OnInit, OnDestroy {
       partyCnpj: '',
       partyName: '',
       protocol: '',
+      numOriginal: '',
     });
   }
 
@@ -323,6 +327,8 @@ export class CooperationComponent implements OnInit, OnDestroy {
       partyName: selectedProcess?.data?.partyName || '',
 
       protocol: selectedProcess?.data?.protocol || '',
+
+      numOriginal: selectedProcess?.data?.numOriginal || '',
     });
   }
 
@@ -354,6 +360,9 @@ export class CooperationComponent implements OnInit, OnDestroy {
       partyName: this.cooperation.partyName || processData.partyName,
 
       protocol: this.cooperation.protocol || processData.protocol,
+
+      numOriginal:
+        this.cooperation.numOriginal || processData.numOriginal,
     });
 
     this.isLoading = false;
@@ -540,6 +549,8 @@ export class CooperationComponent implements OnInit, OnDestroy {
       processId: selectedProcess?.data?.processId,
       object: selectedProcess?.data?.object,
       organizationIdentifier: formValue.managementUnit,
+      numOriginal:
+        selectedProcess?.data?.numOriginal || this.cooperation?.numOriginal,
     };
 
     let result;
@@ -567,6 +578,7 @@ export class CooperationComponent implements OnInit, OnDestroy {
         type: 'COOPERATION',
         processId: sender.processId,
         object: sender.object,
+        numOriginal: sender.numOriginal,
 
         organizationName: this.managementUnitOptions.find(
           (option) => option.value === formValue.managementUnit

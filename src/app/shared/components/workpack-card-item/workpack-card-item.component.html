@@ -81,8 +81,6 @@
               <i [ngClass]="properties.iconSvg ? [ 'app-icon', properties.icon, 'grey-icon'] : [ 'icon-card', properties.icon, 'grey-icon' ]"
                 [class.linked]="!!properties?.linked || !!properties.shared" [ngStyle]="{ fontSize: '2rem' }"></i>
               <i [ngClass]="['app-icon', 'link-to', 'grey-icon', 'linked']" *ngIf="!!properties?.linked"></i>
-              <i [ngClass]="['app-icon', 'sharing', 'grey-icon', 'linked']"
-                *ngIf="!!properties.shared && !properties.linked"></i>
             </div>
             <span class="card-item-name" [pTooltip]="properties.fullNameCardItem"
               tooltipPosition="bottom">{{properties.nameCardItem}}</span>
@@ -153,14 +151,12 @@
                 (click)="handleShowJournalInformation(properties.journalInformation); journalInformationPanel.show($event)"></i>
             </div>
           </div>
-          <div
-            *ngIf="properties?.statusProperty"
-            class="status-box"
-          >
-            <ng-container
-              [ngTemplateOutlet]="iconConfig"
-              [ngTemplateOutletContext]="properties.statusProperty | workpackStatusConfig"
-            >
+          <div class="status-box">
+            <ng-container *ngIf="properties?.statusProperty">
+              <ng-container
+                [ngTemplateOutlet]="iconConfig"
+                [ngTemplateOutletContext]="properties.statusProperty | workpackStatusConfig"
+              >
               <ng-template
                 #iconConfig
                 let-icon="icon"
@@ -188,6 +184,7 @@
                   </i>
                 </ng-template>
               </ng-template>
+              </ng-container>
             </ng-container>
           </div>
           <p-overlayPanel #journalInformationPanel class="journal-info-overlay-panel" [showCloseIcon]="true" [dismissable]="false">
@@ -222,7 +219,12 @@
             </div>
           </p-overlayPanel>
           <div class="footer-info">
-            <i class="app-icon baseline" *ngIf="!!properties?.hasBaseline" [pTooltip]="properties?.baselineName"></i>
+            <app-card-sharing-indicators
+              [shared]="!!properties.shared"
+              [linked]="!!properties.linked"
+              [hasBaseline]="!!properties?.hasBaseline"
+              [baselineName]="properties?.baselineName">
+            </app-card-sharing-indicators>
             <span class="card-item-id">
               {{cardIdItem}}
             </span>
@@ -239,8 +241,6 @@
               [class.linked]="!!properties.linked || !!properties.shared" [ngStyle]="{ fontSize: '1.5rem' }"></i>
             <i [ngClass]="['app-icon', 'link-to', 'grey-icon', 'linked']" *ngIf="!!properties.linked"
               [ngStyle]="{ marginLeft: '5px' }"></i>
-            <i [ngClass]="['app-icon', 'sharing', 'grey-icon', 'linked']" [ngStyle]="{ marginLeft: '5px' }"
-              *ngIf="!!properties.shared && !properties.linked"></i>
           </div>
           <span class="card-item-name" [pTooltip]="properties.fullNameCardItem"
             tooltipPosition="bottom">{{properties.nameCardItem}}</span>
@@ -315,13 +315,11 @@
               </i>
             </span>
 
-            <span class="dashboard-icon-slot">
-              <i class="far fa-stop-circle"
-                *ngIf="showEndManagementIndex() && !!properties.endManagementDate && properties.endManagementDate !== null"
-                [pTooltip]="'managementEnded'|translate"></i>
+            <span class="dashboard-icon-slot dashboard-completed-scope-slot">
               <i class="far fa-check-square" *ngIf="showEndManagementIndex() && !!properties.completed"
                 [pTooltip]="label|translate"></i>
             </span>
+
           </div>
           <p-overlayPanel #journalInformationPanelList class="journal-info-overlay-panel" [showCloseIcon]="true" [dismissable]="false">
             <div class="journal-info-panel-content"
@@ -454,7 +452,12 @@
             </div>
           </p-header>
           <div class="footer-info">
-            <i class="app-icon baseline" *ngIf="!!properties?.hasBaseline" [pTooltip]="properties?.baselineName"></i>
+            <app-card-sharing-indicators
+              [shared]="!!properties.shared"
+              [linked]="!!properties.linked"
+              [hasBaseline]="!!properties?.hasBaseline"
+              [baselineName]="properties?.baselineName">
+            </app-card-sharing-indicators>
             <span class="card-item-id">
               {{cardIdItem}}
             </span>
@@ -480,14 +483,15 @@
           <div class="icons-container" [routerLink]="properties.urlCard" [queryParams]="getQueryParams()">
             <i [ngClass]=" ['concluded', 'lateConcluded'].includes(properties.statusItem) ?
               [ 'app-icon', 'flag-check', 'grey-icon'] : ['app-icon', 'flag-unchecked', 'grey-icon']"
-              [class.linked]="!!properties.linked || !!properties.shared" [ngStyle]="{ fontSize: '1.8rem' }"
+              [ngStyle]="{ fontSize: '1.8rem' }"
               [class.on-time]="properties?.statusItem === 'ontime' && !properties?.canceled"
               [class.late]="properties?.statusItem === 'late'"
               [class.concluded]="properties?.statusItem === 'concluded' && !properties?.canceled"
               [class.late-concluded]="properties?.statusItem === 'lateConcluded' && !properties?.canceled"></i>
-            <i [ngClass]="['app-icon', 'link-to', 'grey-icon', 'linked']" *ngIf="!!properties.linked"></i>
-            <i [ngClass]="['app-icon', 'sharing', 'grey-icon', 'linked']"
-              *ngIf="!!properties.shared && !properties.linked"></i>
+            <app-card-sharing-indicators
+              [linked]="!!properties.linked"
+              [showLinked]="true">
+            </app-card-sharing-indicators>
           </div>
           <span class="card-item-name" [routerLink]="properties.urlCard" [queryParams]="getQueryParams()"
             [pTooltip]="properties.fullNameCardItem" tooltipPosition="bottom">{{properties.nameCardItem}}</span>
@@ -500,8 +504,8 @@
             (properties?.subtitleCardItem|date:'yyyy/MM/dd')
             }}
           </span>
-          <div class="calendar-container">
-            <p-calendar  *ngIf="properties?.editPermission" [(ngModel)]="milestoneDate" [disabled]="properties?.canceled"
+          <div class="calendar-container" *ngIf="properties?.editPermission">
+            <p-calendar [(ngModel)]="milestoneDate" [disabled]="properties?.canceled"
               [dateFormat]="language === 'pt-BR' ? 'dd/mm/yy' : 'yy/mm/dd'" [showOnFocus]="false"
               (ngModelChange)="changeMilestoneDate($event)" [showIcon]="true" inputId="icon">
             </p-calendar>
@@ -532,10 +536,12 @@
         </ng-template>
       </div>
       <div class="card-item-footer" *ngIf="cardIdItem">
-        <span class="baseline-icon">
-          <i class="app-icon baseline grey-icon" *ngIf="!!properties?.hasBaseline"
-            [pTooltip]="properties?.baselineName"></i>
-        </span>
+        <app-card-sharing-indicators
+          [shared]="!!properties.shared"
+          [linked]="!!properties.linked"
+          [hasBaseline]="!!properties?.hasBaseline"
+          [baselineName]="properties?.baselineName">
+        </app-card-sharing-indicators>
         <span class="card-item-id">
           {{cardIdItem}}
         </span>
@@ -547,14 +553,15 @@
         <div class="left-side">
           <div class="icons-container-list" [routerLink]="properties.urlCard" [queryParams]="getQueryParams()">
             <i [ngClass]=" ['concluded', 'lateConcluded'].includes(properties.statusItem) ?  [ 'app-icon', 'flag-check', 'grey-icon'] : ['app-icon', 'flag-unchecked', 'grey-icon']"
-              [class.linked]="!!properties.linked || !!properties.shared" [ngStyle]="{ fontSize: '1.5rem' }"
+              [ngStyle]="{ fontSize: '1.5rem' }"
               [class.on-time]="properties?.statusItem === 'ontime' && !properties?.canceled"
               [class.late]="properties?.statusItem === 'late' && !properties?.canceled"
               [class.concluded]="properties?.statusItem === 'concluded' && !properties?.canceled"
               [class.late-concluded]="properties?.statusItem === 'lateConcluded' && !properties?.canceled"></i>
-            <i [ngClass]="['app-icon', 'link-to', 'grey-icon', 'linked']" *ngIf="!!properties.linked"></i>
-            <i [ngClass]="['app-icon', 'sharing', 'grey-icon', 'linked']"
-              *ngIf="!!properties.shared && !properties.linked"></i>
+            <app-card-sharing-indicators
+              [linked]="!!properties.linked"
+              [showLinked]="true">
+            </app-card-sharing-indicators>
           </div>
           <div class="description-container" [routerLink]="properties.urlCard" [queryParams]="getQueryParams()">
             <span class="card-item-name" [pTooltip]="properties.fullNameCardItem"
@@ -616,10 +623,12 @@
             </div>
           </p-header>
           <div class="card-item-footer" *ngIf="cardIdItem">
-            <span class="baseline-icon">
-              <i class="app-icon baseline grey-icon" *ngIf="!!properties?.hasBaseline"
-                [pTooltip]="properties?.baselineName"></i>
-            </span>
+            <app-card-sharing-indicators
+              [shared]="!!properties.shared"
+              [linked]="!!properties.linked"
+              [hasBaseline]="!!properties?.hasBaseline"
+              [baselineName]="properties?.baselineName">
+            </app-card-sharing-indicators>
             <span class="card-item-id">
               {{cardIdItem}}
             </span>

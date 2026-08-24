@@ -95,7 +95,7 @@
   }
   .fa-info {
     color: v.$fontBlue;
-    padding: 3px 7.5px;
+    padding: 4px 7px;
     border: 1px solid v.$fontBlue;
     border-radius: 50%;
     font-size: 0.7rem;
@@ -188,10 +188,15 @@
           flex-direction: row;
           align-items: center;
           justify-content: space-between;
-          width: 100%;
+          width: calc(100% - 0.5rem);
           height: 26px;
           margin-left: 0.5rem;
           .p-button {
+            display: inline-flex;
+            flex: 0 0 44px;
+            width: 44px;
+            align-items: center;
+            justify-content: center;
             padding: 0 !important;
           }
         }
@@ -295,16 +300,33 @@
 
       .right-content {
         .indexes {
+          display: flex;
+          flex: 0 0 25px;
+          min-height: 25px;
+
           .status-container {
-            margin-left: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 20px;
+            min-height: 20px;
+            width: 100%;
+
+            .fa-info,
+            .fa-info-circle {
+              margin: 0;
+            }
           }
         }
 
         .status-box {
           display: flex;
+          flex: 0 0 25px;
           flex-direction: row;
           align-items: center;
           justify-content: center;
+          min-width: 20px;
+          min-height: 25px;
 
           .img-status-icon {
             width: 20px;
@@ -403,6 +425,8 @@
           }
 
           .dashboard-status-container {
+            flex: 0 0 144px;
+            width: 144px;
             justify-content: flex-start;
 
             .dashboard-icon-slot {
@@ -412,10 +436,6 @@
               height: 22px;
               align-items: center;
               justify-content: center;
-            }
-
-            .dashboard-icon-slot:empty {
-              display: none;
             }
 
             .img-status-icon,
@@ -517,7 +537,7 @@
               flex-direction: row;
               align-items: center;
               justify-content: center;
-              width: 25%;
+              width: 20%;
             .index {
                 font-size: 12px;
                 font-weight: bold;
@@ -526,7 +546,7 @@
           }
 
           .triple-constraint-container {
-            width: 25%;
+            width: 20%;
             justify-content: space-between;
           }
         }
@@ -549,6 +569,25 @@
         flex-direction: row !important;
         align-items: center;
         justify-content: flex-end;
+        gap: 6px;
+        > i {
+          display: inline-flex;
+          flex: 0 0 16px;
+          align-items: center;
+          justify-content: center;
+          width: 16px;
+          min-width: 16px;
+          max-width: 16px;
+          height: 14px;
+          font-size: 0.9rem;
+          line-height: 1;
+
+          &::before {
+            display: block;
+            width: 16px;
+            text-align: center;
+          }
+        }
         // padding: 0 5px 0 10px !important;
       }
     }
@@ -590,17 +629,14 @@
       width: 100%;
       display: flex;
       flex-direction: column;
-      align-items: center;
-      // padding: 0 3px 0 10px;
-      .baseline {
-        font-size: 0.7rem;
-        color: #888e96;
-      }
+      align-items: flex-end;
+      justify-content: flex-end;
+
       .card-item-id {
         color: #888e96;
         font-size: 0.6rem;
         font-family: v.$fontFamilyMedium;
-        padding: 0.5em;
+        padding: 0 0 0.5em;
       }
     }
     .card-item-content {
@@ -650,15 +686,20 @@
           display: flex;
           flex-direction: column;
           flex: 1;
+          align-items: center;
           max-width: 210px;
         }
         .workpack-container.card-link {
           cursor: pointer;
         }
         .card-item-name {
+          display: flex;
+          align-items: flex-start;
+          justify-content: center;
+          min-height: 2.25rem;
           font-size: 0.9rem;
           font-family: v.$fontFamilyMedium;
-          padding: 0.5em;
+          padding: 4px 0 0;
           width: 100%;
           white-space: wrap;
           word-break: break-word;
@@ -667,10 +708,12 @@
       }
       .right-content {
         display: flex;
+        flex: 0 0 44px;
         flex-direction: column;
-        width: 15%;
+        width: 44px;
+        min-width: 44px;
         height: 100%;
-        justify-content: space-between;
+        justify-content: flex-start;
         .indexes {
           display: flex;
           flex-direction: column;
@@ -680,6 +723,16 @@
             font-size: 12px;
             font-weight: bold;
             padding-top: 5px;
+          }
+        }
+
+        .footer-info {
+          margin-top: auto;
+          box-sizing: border-box;
+          padding: 0 0.5em;
+
+          app-card-sharing-indicators {
+            margin-right: calc((44px - 16px) / 2 - 0.5em);
           }
         }
 
@@ -704,8 +757,10 @@
     }
     .card-item-footer {
       display: flex;
-      flex-direction: column;
+      flex-direction: row;
+      align-items: center;
       justify-content: flex-end;
+      gap: 6px;
       padding: 0.5em;
       .card-item-id {
         color: #888e96;
@@ -844,14 +899,36 @@
         width: 60%;
         .date-container {
           display: flex;
-          justify-content: flex-end;
           align-items: center;
+          justify-content: flex-end;
           width: calc(100% - 5rem);
+          gap: 1rem;
           padding: 0 1.5rem;
+
+          > .card-item-date,
+          > .calendar-container {
+            flex: 0 0 160px;
+            width: 160px;
+            min-width: 160px;
+            max-width: 160px;
+            margin-left: 0;
+          }
+
+          > .card-item-date {
+            display: flex;
+            box-sizing: border-box;
+            justify-content: center;
+          }
+
           .description-container {
             display: flex;
+            flex: 0 0 175px;
             flex-direction: row;
-            margin-left: 1em;
+            justify-content: flex-start;
+            min-width: 175px;
+            max-width: 175px;
+            width: 100%;
+            margin-left: 0;
             .card-item-name {
               font-size: 0.9rem;
               width: 100%;
@@ -859,9 +936,9 @@
               word-break: break-word;
             }
             .card-item-status {
-              width: 175px;
+              width: 100%;
               font-size: 0.8rem;
-              margin-left: 2em;
+              margin-left: 0;
             }
           }
           .calendar-container {
@@ -869,6 +946,30 @@
             flex-direction: row;
             width: 100%;
             justify-content: flex-end;
+
+            .p-calendar {
+              display: flex;
+              position: relative;
+              box-sizing: border-box;
+              justify-content: center;
+              width: 100%;
+              padding-right: 32px;
+
+              .p-inputtext {
+                flex: 0 0 10ch;
+                width: 10ch !important;
+                min-width: 0;
+              }
+
+              .p-datepicker-trigger {
+                position: absolute;
+                top: 0;
+                right: 0;
+                bottom: 0;
+                width: 32px;
+              }
+            }
+
             .reason-buttons {
               width: auto;
             }
@@ -966,6 +1067,8 @@
       display: flex;
       flex-direction: column;
       align-items: center;
+      justify-content: center;
+      gap: 4px;
       color: #888e96;
       padding: 0 !important;
       width: 100%;
@@ -980,7 +1083,10 @@
         }
       }
       .card-item-name {
-        margin-top: 5px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 2.25rem;
         white-space: wrap;
         word-break: break-word;
         text-align: center;
@@ -994,11 +1100,24 @@
         }
       }
       .card-item-date {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-sizing: border-box;
+        height: 2rem;
+        min-height: 2rem;
         font-size: 0.8rem;
+      }
+      .calendar-container {
+        box-sizing: border-box;
+        height: 2rem;
+        min-height: 2rem;
+        justify-content: center;
       }
       .card-item-status {
         font-size: 0.8rem;
         font-weight: 500;
+        min-height: 1rem;
       }
       .on-time {
         color: v.$fontApproved;
@@ -1029,12 +1148,19 @@
       flex-direction: column;
       justify-content: flex-end;
       align-items: flex-end;
+      box-sizing: border-box;
       padding: 0 0.5em;
       width: 100%;
+
+      app-card-sharing-indicators {
+        margin-right: 0.25rem;
+      }
+
       .card-item-id {
         color: #888e96;
         font-size: 0.6rem;
         font-family: v.$fontFamilyMedium;
+        padding-bottom: 0.5em;
       }
       .baseline-icon {
         font-size: 0.7rem;

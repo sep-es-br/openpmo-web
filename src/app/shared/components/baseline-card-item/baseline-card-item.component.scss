@@ -88,6 +88,30 @@
       width: 100%;
       flex-direction: row;
       justify-content: space-between;
+
+      .baseline-status-container,
+      .icons-container {
+        width: v.$listViewIconBoxSize;
+        height: v.$listViewIconBoxSize;
+        flex: 0 0 v.$listViewIconBoxSize;
+
+        .app-icon,
+        .icon-card {
+          display: inline-flex;
+          width: v.$listViewIconBoxSize;
+          height: v.$listViewIconBoxSize;
+          align-items: center;
+          justify-content: center;
+          font-size: v.$listViewIconFontSize !important;
+          line-height: 1;
+        }
+      }
+
+      .card-item-name {
+        font-size: v.$cardItemTitleFontSize;
+        line-height: 1.2;
+      }
+
       .right-side {
         display: flex;
         height: 100%;

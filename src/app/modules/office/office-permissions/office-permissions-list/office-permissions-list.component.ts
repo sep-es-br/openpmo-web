@@ -139,30 +139,38 @@ export class OfficePermissionsListComponent implements OnInit {
 
   loadCardItemsOfficePermissions() {
     if (this.officePermissions) {
-      this.cardItemsOfficePermissions = this.officePermissions.filter(p => p.permissions && p.permissions.filter( a => a.level !== 'NONE').length > 0).map(p => {
-        const fullName = p.person.name.split(' ');
-        const name = fullName.length > 1 ? fullName[0] + ' ' + fullName[1] : fullName[0];
-        return {
-          typeCardItem: 'listItem',
-          fullNameUser: p.person.fullName,
-          titleCardItem: name,
-          roleDescription: (p.permissions.filter(r => r.level === 'EDIT').length > 0
-            ? this.translateSrv.instant('edit')
-            : this.translateSrv.instant('read')),
-          isCCMMember: p.permissions.some(r => r.ccmMember === true),
-          menuItems: [{
-            label: this.translateSrv.instant('delete'),
-            icon: 'fas fa-trash-alt',
-            command: (event) => this.deleteOfficePermission(p)
-          }],
-          itemId: p.person.id,
-          urlCard: '/offices/permission/detail',
-          paramsUrlCard: [
-            { name: 'idOffice', value: this.idOffice },
-            { name: 'key', value: p.person.key }
-          ]
-        };
-      });
+      this.cardItemsOfficePermissions = this.officePermissions
+        .filter(p => p.permissions && (
+          p.permissions.some(permission => permission.level !== 'NONE')
+          || p.permissions.some(permission => permission.ccmMember === true)
+        ))
+        .map(p => {
+          const activePermissions = p.permissions.filter(permission => permission.level !== 'NONE');
+          const fullName = p.person.name.split(' ');
+          const name = fullName.length > 1 ? fullName[0] + ' ' + fullName[1] : fullName[0];
+          return {
+            typeCardItem: 'listItem',
+            fullNameUser: p.person.fullName,
+            titleCardItem: name,
+            roleDescription: activePermissions.length === 0
+              ? null
+              : (activePermissions.some(permission => permission.level === 'EDIT')
+                ? this.translateSrv.instant('edit')
+                : this.translateSrv.instant('read')),
+            isCCMMember: p.permissions.some(r => r.ccmMember === true),
+            menuItems: [{
+              label: this.translateSrv.instant('delete'),
+              icon: 'fas fa-trash-alt',
+              command: (event) => this.deleteOfficePermission(p)
+            }],
+            itemId: p.person.id,
+            urlCard: '/offices/permission/detail',
+            paramsUrlCard: [
+              { name: 'idOffice', value: this.idOffice },
+              { name: 'key', value: p.person.key }
+            ]
+          };
+        });
     }
     this.cardItemsOfficePermissions.push(
       {
