@@ -207,7 +207,10 @@ export class WorkpackPropertyService {
     property.label = propertyModel.label;
     property.name = propertyModel.name;
     property.required = propertyModel.required;
-    property.disabled = !this.workpackSrv.getEditPermission();
+    const isProjectStatus = propertyModel.name === 'Status' &&
+      this.workpackData.workpackModel?.type === TypeWorkpackModelEnum.ProjectModel;
+    const isCreatingProject = isProjectStatus && !this.workpackParams.idWorkpack;
+    property.disabled = !this.workpackSrv.getEditPermission() || isCreatingProject;
     property.helpText = propertyModel.helpText;
     property.sortIndex = propertyModel.sortIndex;
     property.multipleSelection = propertyModel.multipleSelection;
@@ -235,8 +238,16 @@ export class WorkpackPropertyService {
     }
 
     if (this.typePropertyModel[propertyModel.type] === TypePropertyModelEnum.SelectionModel) {
-      const listOptions = propertyModel.possibleValues ?
+      let listOptions = propertyModel.possibleValues ?
       (propertyModel.possibleValues as string).split(',').sort((a, b) => a.localeCompare(b)) : [];
+
+      if (isProjectStatus) {
+        const unavailableStatus = this.workpackData.workpack?.hasApprovedBaseline
+          ? 'Estruturação'
+          : 'Repactuação';
+        listOptions = listOptions.filter(option => option !== unavailableStatus);
+      }
+
       property.possibleValues = listOptions.map(op => ({ label: op, value: op }));
     }
 
