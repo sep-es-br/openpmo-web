@@ -815,6 +815,24 @@
             }
         }
       },
+      "project": {
+        "cannot": {
+          "return": {
+            "to": {
+              "structuring": "Um projeto que já possui Linha de Base aprovada não pode retornar ao status Estruturação."
+            }
+          },
+          "enter": {
+            "repactuation": {
+              "without": {
+                "approved": {
+                  "baseline": "Um projeto sem Linha de Base aprovada não pode assumir o status Repactuação."
+                }
+              }
+            }
+          }
+        }
+      },
       "permission": {
         "delete": {
           "relationship": {

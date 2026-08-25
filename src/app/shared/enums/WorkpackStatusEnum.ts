@@ -1,5 +1,6 @@
 export enum ProjectStatus {
   ESTRUTURACAO = 'Estruturação',
+  REPACTUACAO = 'Repactuação',
   EXECUCAO = 'Execução',
   SUSPENSO = 'Suspenso',
   CANCELADO = 'Cancelado',
@@ -52,6 +53,7 @@ export const WorkpackStatusMap = new Map<
   [
     [
       ProjectStatus.ESTRUTURACAO,
+      ProjectStatus.REPACTUACAO,
       ProjectStatus.PLANEJAMENTO,
       DeliverableStatus.ACOES_PREPARATORIAS,
       DeliverableStatus.PROJETO_EM_ELABORACAO,
