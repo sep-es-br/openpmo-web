@@ -116,6 +116,11 @@ const routes: Routes = [
     canActivate: [ AuthGuard ],
     loadChildren: () => import('./modules/universal-search/universal-search.module').then(m => m.UniversalSearchModule)
   },
+  {
+    path: 'preproject',
+    canActivate: [ AuthGuard ],
+    loadChildren: () => import('./modules/preproject/preproject.module').then(m => m.PreprojectModule)
+  },
 ];
 
 @NgModule({

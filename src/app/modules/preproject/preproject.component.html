@@ -1,0 +1,62 @@
+<div class="app-preproject">
+  <app-preproject-toolbar>
+  </app-preproject-toolbar>
+
+  <div class="card-preprojects">
+    <app-card
+      class="mt-0"
+      [properties]="cardProperties"
+      (createNewElement)="handleCreatePreproject()">
+      <p-dataView
+        *ngIf="displayMode === 'grid' || (displayMode === 'list' && responsive)"
+        class="app-dataview"
+        layout="grid"
+        [value]="preprojects"
+        [paginator]="true"
+        [rows]="pageSize"
+        [showJumpToPageDropdown]="true"
+        [showPageLinks]="false"
+        [emptyMessage]="'notFoundPreprojects' | translate">
+        <ng-template let-cardItem pTemplate="gridItem">
+          <div class="p-col-12 p-md-3 p-sm-12 card-item-container">
+            <app-card-item
+              *ngIf="cardItem.typeCardItem !== 'newCardItem'"
+              [properties]="cardItem">
+            </app-card-item>
+            <app-workpack-card-item
+              *ngIf="cardItem.typeCardItem === 'newCardItem'"
+              [properties]="cardItem"
+              displayModeCard="grid">
+            </app-workpack-card-item>
+          </div>
+        </ng-template>
+      </p-dataView>
+
+      <p-dataView
+        *ngIf="displayMode === 'list' && !responsive"
+        class="app-dataview app-dataview-list"
+        layout="list"
+        [value]="preprojects"
+        [paginator]="true"
+        [rows]="pageSize"
+        [showJumpToPageDropdown]="true"
+        [showPageLinks]="false"
+        [emptyMessage]="'notFoundPreprojects' | translate">
+        <ng-template let-cardItem pTemplate="listItem">
+          <div class="p-col-12">
+            <app-card-item
+              *ngIf="cardItem.typeCardItem !== 'newCardItem'"
+              [properties]="cardItem"
+              [displayModeCard]="displayMode">
+            </app-card-item>
+            <app-workpack-card-item
+              *ngIf="cardItem.typeCardItem === 'newCardItem'"
+              [properties]="cardItem"
+              displayModeCard="list">
+            </app-workpack-card-item>
+          </div>
+        </ng-template>
+      </p-dataView>
+    </app-card>
+  </div>
+</div>

@@ -10,6 +10,7 @@ export enum MenuButtons {
   PLAN_MODEL = 'plan-model',
   USER = 'user',
   MORE = 'more',
+  PREPROJECT = 'preproject'
 }
 
 export enum MenuAdminButtons {

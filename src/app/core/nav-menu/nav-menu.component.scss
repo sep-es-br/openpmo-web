@@ -36,8 +36,15 @@ $mobileMenuHeight: 90px;
       height: 2rem;
     }
   }
-  .app-icon, .far.fa-star, .fa-icon, .fa-file-alt {
+  .app-icon, .far.fa-star, .fa-icon, .fa-file-alt, .menu-svg-icon {
     color: #ffffff;
+  }
+  .menu-svg-icon {
+    width: 1.75rem;
+    height: 1.75rem;
+    display: inline-block;
+    vertical-align: middle;
+    fill: currentColor;
   }
   .item {
     color: #eeeeee;
@@ -62,7 +69,7 @@ $mobileMenuHeight: 90px;
     &.opened {
       background-color: #eeeeee;
       color: v.$bgMenuUser;
-      .app-icon, .far.fa-star, .fa-icon , .fa-file-alt {
+      .app-icon, .far.fa-star, .fa-icon , .fa-file-alt, .menu-svg-icon {
         color: v.$bgMenuUser;
       }
     }

@@ -169,6 +169,25 @@
             </div>
           </div>
         </div>
+
+        <div
+          class="new-element-button-container"
+          *ngIf="!properties.initialStateCollapse && !properties.showFilters && properties.showCreateNemElementButton"
+          [class.card-link]="!properties.createNewElementMenuItems"
+          (click)="!properties.createNewElementMenuItems && handleCreateNewElement()"
+        >
+          <i
+            class="app-icon plus"
+            [class.icon-link]="properties.createNewElementMenuItems"
+            (click)="properties.createNewElementMenuItems ? menuIconWithoutFilters.toggle($event) : ''"
+          >
+          </i>
+          <p-menu
+            #menuIconWithoutFilters
+            [popup]="true"
+            [model]="properties.createNewElementMenuItems">
+          </p-menu>
+        </div>
       </div>
 
       <div class="expanded-buttons-container"  *ngIf="showExpandedCollapseButtons">

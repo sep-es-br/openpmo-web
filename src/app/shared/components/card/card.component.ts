@@ -195,7 +195,7 @@ export class CardComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   handleCollapsed(event?) {
-    this.properties.initialStateCollapse = event
+    this.properties.initialStateCollapse = typeof event === 'boolean'
       ? event
       : !this.properties.initialStateCollapse;
   }

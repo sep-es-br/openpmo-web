@@ -46,6 +46,7 @@ export class NavMenuComponent implements OnInit, OnDestroy {
     { label: MenuButtons.CCB, isOpen: false },
     { label: MenuButtons.REPORTS, isOpen: false },
     { label: MenuButtons.UNIVERSAL_SEARCH, isOpen: false },
+    { label: MenuButtons.PREPROJECT, isOpen: false },
   ];
 
   menusAdmin: IMenuAdmin[] = [
@@ -226,6 +227,24 @@ export class NavMenuComponent implements OnInit, OnDestroy {
         } else {
           btn.isOpen = false;
         }
+      });
+
+      this.menuSrv.nextMenuState({
+        isFixed: false,
+      });
+
+      this.menuSrv.nextCloseAllMenus(true);
+      this.showUserMenu = false;
+    }
+
+    if (!url.startsWith(MenuButtons.PREPROJECT)) {
+      const preprojectButton = this.menus.find(
+        (btn) => btn.label === MenuButtons.PREPROJECT
+      );
+      if (preprojectButton) preprojectButton.isOpen = false;
+    } else {
+      this.menus.forEach((btn) => {
+        btn.isOpen = btn.label === MenuButtons.PREPROJECT;
       });
 
       this.menuSrv.nextMenuState({
