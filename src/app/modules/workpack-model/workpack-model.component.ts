@@ -648,11 +648,12 @@ export class WorkpackModelComponent implements OnInit {
               "A cancelar",
               "Execução",
               "Estruturação",
+              "Repactuação",
               "Suspenso",
               "Paralisado",
               "Planejamento"
             ],
-            defaultValue: "Execução",
+            defaultValue: "Estruturação",
             sortIndex: 3,
             fullLine: false,
             required: true,
