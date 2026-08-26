@@ -1,0 +1,121 @@
+<div class="app-preproject-form">
+  <div class="preproject-form-header">
+    <span>{{ 'newPreproject' | translate }}</span>
+    <app-config-data-view-panel></app-config-data-view-panel>
+  </div>
+
+  <app-card [properties]="cardProperties" class="mt-0 inputs-float-label">
+    <app-card-loading [isCardLoading]="isLoading"></app-card-loading>
+    <app-tabview-scrolled [tabs]="tabs" [contextVersion]="1" (selectedTabChange)="changeTab($event)">
+      <div tabviewBody *ngIf="selectedTab?.key === 'properties'">
+        <form [formGroup]="form">
+          <div class="p-fluid">
+            <div class="p-field">
+              <label class="app-input-label" for="preproject-name">{{ 'name' | translate }} *</label>
+              <input id="preproject-name" class="app-input-text" pInputText type="text" formControlName="name" />
+              <app-input-message [form]="form" field="name"></app-input-message>
+            </div>
+
+            <div class="p-field">
+              <label class="app-input-label" for="preproject-full-name">{{ 'fullName' | translate }} *</label>
+              <input id="preproject-full-name" class="app-input-text" pInputText type="text" formControlName="fullName" />
+              <app-input-message [form]="form" field="fullName"></app-input-message>
+            </div>
+
+            <div class="p-field">
+              <label class="app-input-label" for="preproject-organization">{{ 'organization' | translate }}</label>
+              <p-dropdown id="preproject-organization" class="app-single-selection" formControlName="organization" [options]="[]"
+                dropdownIcon="fas fa-caret-down"></p-dropdown>
+            </div>
+
+            <div class="p-field">
+              <label class="app-input-label" for="preproject-expected-completion">{{ 'expectedCompletion' | translate }}</label>
+              <p-calendar id="preproject-expected-completion" class="app-select-date" formControlName="expectedCompletion"
+                [showIcon]="true" icon="fas fa-calendar-alt"></p-calendar>
+            </div>
+
+            <section class="preproject-deliveries">
+              <div class="preproject-section-title">{{ 'expectedDeliveries' | translate }}</div>
+              <p-dataView [value]="deliveryCardItems" layout="grid" class="app-dataview preproject-delivery-list"
+                *ngIf="displayModeAll !== 'list'">
+                <ng-template let-cardItem pTemplate="gridItem">
+                  <div class="p-col-12 p-md-3 p-sm-12">
+                    <app-card-item [properties]="cardItem" [displayModeCard]="displayModeAll"></app-card-item>
+                  </div>
+                </ng-template>
+              </p-dataView>
+              <p-dataView [value]="deliveryCardItems" layout="list" class="app-dataview app-dataview-list preproject-delivery-list"
+                *ngIf="displayModeAll === 'list'">
+                <ng-template let-cardItem pTemplate="listItem">
+                  <div class="p-col-12">
+                    <app-card-item [properties]="cardItem" [displayModeCard]="displayModeAll"></app-card-item>
+                  </div>
+                </ng-template>
+              </p-dataView>
+            </section>
+          </div>
+        </form>
+      </div>
+
+      <div tabviewBody *ngIf="selectedTab?.key === 'relevance'" class="preproject-criteria-tab">
+        <div class="criteria-header">
+          <span class="criteria-title">{{ 'relevance' | translate }}</span>
+          <button
+            pButton
+            type="button"
+            class="p-button-text criteria-add-button"
+            icon="fas fa-plus"
+            [label]="'addProperty' | translate"
+            [pMenuTriggerFor]="menuRelevance">
+          </button>
+          <p-menu #menuRelevance [popup]="true" [model]="menuRelevanceProperties"></p-menu>
+        </div>
+
+        <div class="criteria-properties-list">
+          <ng-container *ngFor="let property of relevanceProperties; trackBy: trackByProperty">
+            <app-property-model
+              [property]="property"
+              (changed)="propertyChanged($event)"
+              (delete)="deleteProperty(property, 'relevance')">
+            </app-property-model>
+          </ng-container>
+        </div>
+      </div>
+
+      <div tabviewBody *ngIf="selectedTab?.key === 'viability'" class="preproject-criteria-tab">
+        <div class="criteria-header">
+          <span class="criteria-title">{{ 'viability' | translate }}</span>
+          <button
+            pButton
+            type="button"
+            class="p-button-text criteria-add-button"
+            icon="fas fa-plus"
+            [label]="'addProperty' | translate"
+            [pMenuTriggerFor]="menuViability">
+          </button>
+          <p-menu #menuViability [popup]="true" [model]="menuViabilityProperties"></p-menu>
+        </div>
+
+        <div class="criteria-properties-list">
+          <ng-container *ngFor="let property of viabilityProperties; trackBy: trackByProperty">
+            <app-property-model
+              [property]="property"
+              (changed)="propertyChanged($event)"
+              (delete)="deleteProperty(property, 'viability')">
+            </app-property-model>
+          </ng-container>
+        </div>
+      </div>
+
+      <div tabviewBody *ngIf="selectedTab?.key === 'evaluation'" class="preproject-evaluation-tab">
+        <span class="evaluation-label">{{ 'operation' | translate }}</span>
+        <span class="evaluation-value">{{ evaluationOperationTranslationKey | translate }}</span>
+      </div>
+    </app-tabview-scrolled>
+
+    <app-buttons-container>
+      <app-save-button [form]="form" (save)="save()"></app-save-button>
+      <app-cancel-button [form]="form" (cancel)="back()"></app-cancel-button>
+    </app-buttons-container>
+  </app-card>
+</div>

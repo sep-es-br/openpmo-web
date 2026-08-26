@@ -86,6 +86,12 @@
           pointer-events: none;
         }
       }
+      &.last-crumb.show-info {
+        .info {
+          opacity: 1;
+          pointer-events: auto;
+        }
+      }
       .link {
         padding: .3em 1em;
         max-width: 200px;

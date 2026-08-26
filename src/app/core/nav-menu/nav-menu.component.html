@@ -154,6 +154,21 @@
   >
     <i class="app-icon users" [ngStyle]="{ fontSize: '1.2rem' }"></i>
   </div>
+  <div
+    class="item"
+    [routerLink]="['/preproject-selection']"
+    [queryParams]="{ idOffice: currentIDOffice }"
+    [class.ofc-opened]="
+      isMenuOfficeConfigurationOpen(
+        MenuOfficeConfigurationButtons.PREPROJECT_SELECTION
+      )
+    "
+    [pTooltip]="'preprojectSelection' | translate"
+  >
+    <svg class="menu-svg-icon" aria-hidden="true" focusable="false">
+      <use href="assets/svg/icons.svg#preproject"></use>
+    </svg>
+  </div>
 </ng-template>
 
 <ng-template #menuAdmin>

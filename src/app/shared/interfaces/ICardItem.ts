@@ -6,6 +6,7 @@ export interface ICardItem {
   typeCardItem: string;
   icon?: string;
   iconSvg?: boolean;
+  iconSymbolId?: string;
   iconColor?: string;
   nameCardItem?: string;
   fullNameCardItem?: string;

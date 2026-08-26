@@ -1,0 +1,215 @@
+@use "src/variables" as v;
+
+.app-preproject-criterion-form {
+  width: 100%;
+}
+
+.criterion-form-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+
+  .app-content-header {
+    flex: 1;
+  }
+}
+
+.criterion-form {
+  display: grid;
+  grid-template-columns:
+    minmax(180px, 1.15fr)
+    minmax(110px, .65fr)
+    minmax(180px, 1fr)
+    minmax(110px, .65fr)
+    minmax(180px, 1fr)
+    auto;
+  align-items: start;
+  column-gap: 1rem;
+  min-height: 90px;
+  padding-top: 0;
+}
+
+.criterion-field {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  margin-bottom: 1.5rem;
+}
+
+.icon-item,
+.icon-item-selected {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+}
+
+.criterion-actions {
+  display: flex;
+  align-self: end;
+  justify-content: flex-end;
+  gap: .75rem;
+  margin-bottom: 0;
+  white-space: nowrap;
+}
+
+.criterion-group-card {
+  display: block;
+  margin-top: 1rem;
+}
+
+.criterion-group-form {
+  display: grid;
+  grid-template-columns:
+    minmax(180px, 1.1fr)
+    minmax(120px, .7fr)
+    minmax(110px, .65fr)
+    minmax(170px, .9fr)
+    auto
+    minmax(150px, .85fr)
+    minmax(150px, .85fr)
+    auto;
+  align-items: start;
+  column-gap: 1rem;
+  min-height: 75px;
+  padding-top: 0;
+}
+
+.group-field {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  margin-bottom: 1.25rem;
+}
+
+.enablement-key-field {
+  display: flex;
+  align-items: center;
+  gap: .45rem;
+  margin-bottom: 1.25rem;
+  white-space: nowrap;
+
+  label {
+    color: v.$fontLabel;
+    font-family: v.$fontFamilyMedium;
+    font-style: italic;
+  }
+
+  .fa-question-circle {
+    color: v.$fontLabel;
+  }
+}
+
+.group-actions {
+  display: flex;
+  align-self: end;
+  justify-content: flex-end;
+  margin-bottom: 0;
+  white-space: nowrap;
+}
+
+:host ::ng-deep {
+  .criterion-field .p-inputnumber,
+  .criterion-field .p-dropdown,
+  .criterion-field .p-inputtext {
+    width: 100%;
+  }
+
+  .criterion-actions .p-button {
+    background-color: v.$bgButtonGreen;
+    border: none !important;
+
+    &:hover {
+      background-color: v.$bgButtonGreenHover;
+    }
+  }
+
+  .group-actions .p-button {
+    background-color: v.$bgButtonGreen;
+    border: none !important;
+
+    &:hover {
+      background-color: v.$bgButtonGreenHover;
+    }
+  }
+
+  .criterion-property-menu .p-menu {
+    width: 215px;
+  }
+
+  .group-field .p-inputnumber,
+  .group-field .p-dropdown,
+  .group-field .p-inputtext {
+    width: 100%;
+  }
+}
+
+@media screen and (max-width: 1350px) {
+  .criterion-form {
+    grid-template-columns: repeat(5, minmax(120px, 1fr));
+  }
+
+  .criterion-actions {
+    grid-column: 1 / -1;
+    width: 100%;
+  }
+
+  .criterion-group-form {
+    grid-template-columns: repeat(4, minmax(150px, 1fr));
+  }
+
+  .group-actions {
+    grid-column: 1 / -1;
+  }
+}
+
+@media screen and (max-width: 800px) {
+  .criterion-form {
+    grid-template-columns: 1fr;
+  }
+
+  .criterion-actions {
+    grid-column: 1;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    margin-bottom: 0;
+  }
+
+  .criterion-group-form {
+    grid-template-columns: 1fr;
+  }
+
+  .group-actions {
+    grid-column: 1;
+    justify-content: flex-start;
+  }
+}
+
+// --- Lista de propriedades do critério e dos grupos ---
+
+.criterion-properties-list {
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
+  padding: 1rem 0 .5rem;
+}
+
+.criterion-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+  color: #8c9aa5;
+  gap: .75rem;
+  text-align: center;
+
+  i {
+    font-size: 1.75rem;
+    opacity: .45;
+  }
+
+  span {
+    font-size: .875rem;
+  }
+}
+

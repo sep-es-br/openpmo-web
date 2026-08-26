@@ -6,6 +6,7 @@ export interface IBreadcrumb {
   queryParams?: any;
   modelName?: string;
   admin?: boolean;
+  showInfo?: boolean;
 }
 
 export interface IResultBreadcrumb {

@@ -1,0 +1,245 @@
+<div class="app-preproject-criterion-form">
+  <div class="criterion-form-header">
+    <div class="app-content-header">
+      <span>{{ 'newCriteriaGuide' | translate }}</span>
+    </div>
+    <app-config-data-view-panel></app-config-data-view-panel>
+  </div>
+
+  <app-card [properties]="cardProperties" class="mt-0 inputs-float-label">
+    <app-card-loading [isCardLoading]="isLoading"></app-card-loading>
+
+    <form [formGroup]="form" class="criterion-form p-fluid">
+      <span class="p-float-label criterion-field p-field">
+        <input id="criterion-name" class="app-input-text" pInputText type="text" formControlName="name" />
+        <label class="app-input-label" for="criterion-name">
+          {{ 'name' | translate }} *
+          <i class="far fa-question-circle" [pTooltip]="'name' | translate"></i>
+        </label>
+      </span>
+
+      <span class="p-float-label criterion-field compact-field p-field">
+        <p-inputNumber
+          inputId="criterion-position"
+          class="app-input-number"
+          formControlName="position"
+          [min]="1"
+          [step]="1"
+        ></p-inputNumber>
+        <label class="app-input-label" for="criterion-position">
+          {{ 'position' | translate }} *
+          <i class="far fa-question-circle" [pTooltip]="'position' | translate"></i>
+        </label>
+      </span>
+
+      <span class="p-float-label criterion-field icon-field p-field">
+        <p-dropdown
+          inputId="criterion-icon"
+          class="app-single-selection"
+          [options]="icons"
+          optionValue="name"
+          formControlName="icon"
+          [autoDisplayFirst]="false"
+          [filter]="true"
+          filterBy="label"
+          [showClear]="true"
+          [virtualScroll]="true"
+          [itemSize]="50"
+          dropdownIcon="fas fa-caret-down"
+        >
+          <ng-template pTemplate="selectedItem">
+            <div class="icon-item-selected" *ngIf="form.controls.icon.value">
+              <i [ngClass]="form.controls.icon.value"></i>
+            </div>
+          </ng-template>
+          <ng-template let-icon pTemplate="item">
+            <div class="icon-item">
+              <i [ngClass]="icon.name"></i>
+              <span>{{ icon.label }}</span>
+            </div>
+          </ng-template>
+        </p-dropdown>
+        <label class="app-input-label" for="criterion-icon">
+          {{ 'icon' | translate }} *
+          <i class="far fa-question-circle" [pTooltip]="'icon' | translate"></i>
+        </label>
+      </span>
+
+      <span class="p-float-label criterion-field compact-field p-field">
+        <p-inputNumber
+          inputId="criterion-weight"
+          class="app-input-number"
+          formControlName="weight"
+          [min]="1"
+          [step]="1"
+        ></p-inputNumber>
+        <label class="app-input-label" for="criterion-weight">
+          {{ 'weight' | translate }} *
+          <i class="far fa-question-circle" [pTooltip]="'weight' | translate"></i>
+        </label>
+      </span>
+
+      <span class="p-float-label criterion-field operation-field p-field">
+        <p-dropdown
+          inputId="criterion-operation"
+          class="app-single-selection"
+          [options]="operationOptions"
+          formControlName="operation"
+          dropdownIcon="fas fa-caret-down"
+        ></p-dropdown>
+        <label class="app-input-label" for="criterion-operation">
+          {{ 'operation' | translate }} *
+          <i class="far fa-question-circle" [pTooltip]="'operation' | translate"></i>
+        </label>
+      </span>
+
+      <div class="criterion-actions">
+        <p-menu
+          #menuAddProperty
+          class="criterion-property-menu"
+          [popup]="true"
+          [model]="propertyMenuItems"
+        ></p-menu>
+        <p-button
+          [label]="'addProperty' | translate"
+          icon="fa fa-plus"
+          iconPos="right"
+          class="button-default-w8"
+          (click)="menuAddProperty.toggle($event)"
+        ></p-button>
+        <p-button
+          [label]="'addGroup' | translate"
+          icon="fa fa-plus"
+          iconPos="right"
+          class="button-default-w8"
+          (click)="addGroup()"
+        ></p-button>
+      </div>
+    </form>
+
+    <div class="criterion-properties-list">
+      <ng-container *ngFor="let property of rootProperties; trackBy: trackByProperty">
+        <app-property-model
+          [property]="property"
+          (changed)="propertyChanged($event)"
+          (delete)="deleteRootProperty(property)">
+        </app-property-model>
+      </ng-container>
+    </div>
+  </app-card>
+
+  <app-card
+    *ngFor="let group of groups.controls; let groupIndex = index"
+    [properties]="groupCardProperties"
+    class="criterion-group-card inputs-float-label"
+  >
+    <form [formGroup]="$any(group)" class="criterion-group-form p-fluid">
+      <span class="p-float-label group-field p-field">
+        <input [id]="'criterion-group-title-' + groupIndex" class="app-input-text" pInputText type="text" formControlName="title" />
+        <label class="app-input-label" [for]="'criterion-group-title-' + groupIndex">
+          {{ 'title' | translate }} *
+          <i class="far fa-question-circle" [pTooltip]="'title' | translate"></i>
+        </label>
+      </span>
+
+      <span class="p-float-label group-field compact-field p-field">
+        <p-inputNumber
+          [inputId]="'criterion-group-sort-index-' + groupIndex"
+          class="app-input-number"
+          formControlName="sortIndex"
+          [min]="1"
+          [step]="1"
+        ></p-inputNumber>
+        <label class="app-input-label" [for]="'criterion-group-sort-index-' + groupIndex">
+          {{ 'sortIndex' | translate }} *
+          <i class="far fa-question-circle" [pTooltip]="'sortIndex' | translate"></i>
+        </label>
+      </span>
+
+      <span class="p-float-label group-field compact-field p-field">
+        <p-inputNumber
+          [inputId]="'criterion-group-weight-' + groupIndex"
+          class="app-input-number"
+          formControlName="weight"
+          [min]="1"
+          [step]="1"
+        ></p-inputNumber>
+        <label class="app-input-label" [for]="'criterion-group-weight-' + groupIndex">
+          {{ 'weight' | translate }} *
+          <i class="far fa-question-circle" [pTooltip]="'weight' | translate"></i>
+        </label>
+      </span>
+
+      <span class="p-float-label group-field operation-field p-field">
+        <p-dropdown
+          [inputId]="'criterion-group-operation-' + groupIndex"
+          class="app-single-selection"
+          [options]="operationOptions"
+          formControlName="operation"
+          dropdownIcon="fas fa-caret-down"
+        ></p-dropdown>
+        <label class="app-input-label" [for]="'criterion-group-operation-' + groupIndex">
+          {{ 'operation' | translate }} *
+          <i class="far fa-question-circle" [pTooltip]="'operation' | translate"></i>
+        </label>
+      </span>
+
+      <div class="enablement-key-field">
+        <p-checkbox
+          [inputId]="'criterion-group-enable-key-' + groupIndex"
+          formControlName="enablementKey"
+          [binary]="true"
+        ></p-checkbox>
+        <label [for]="'criterion-group-enable-key-' + groupIndex">{{ 'enablementKey' | translate }}</label>
+        <i class="far fa-question-circle" [pTooltip]="'enablementKey' | translate"></i>
+      </div>
+
+      <span class="p-float-label group-field p-field">
+        <input [id]="'criterion-group-disabled-value-' + groupIndex" class="app-input-text" pInputText type="text" formControlName="disabledValue" />
+        <label class="app-input-label" [for]="'criterion-group-disabled-value-' + groupIndex">
+          {{ 'disabledValue' | translate }}
+          <i class="far fa-question-circle" [pTooltip]="'disabledValue' | translate"></i>
+        </label>
+      </span>
+
+      <span class="p-float-label group-field p-field">
+        <input [id]="'criterion-group-legend-' + groupIndex" class="app-input-text" pInputText type="text" formControlName="legend" />
+        <label class="app-input-label" [for]="'criterion-group-legend-' + groupIndex">
+          {{ 'legend' | translate }}
+          <i class="far fa-question-circle" [pTooltip]="'legend' | translate"></i>
+        </label>
+      </span>
+
+      <div class="group-actions">
+        <p-menu
+          #menuAddGroupProperty
+          class="criterion-property-menu"
+          [popup]="true"
+          [model]="groupPropertyMenuItems[groupIndex]"
+        ></p-menu>
+        <p-button
+          [label]="'addProperty' | translate"
+          icon="fa fa-plus"
+          iconPos="right"
+          class="button-default-w8"
+          (click)="menuAddGroupProperty.toggle($event)"
+        ></p-button>
+      </div>
+    </form>
+
+    <div class="criterion-properties-list">
+      <ng-container *ngFor="let property of groupProperties[groupIndex]; trackBy: trackByProperty">
+        <app-property-model
+          [property]="property"
+          (changed)="propertyChanged($event)"
+          (delete)="deleteGroupProperty(property, groupIndex)">
+        </app-property-model>
+      </ng-container>
+    </div>
+  </app-card>
+
+  <app-buttons-container>
+    <app-save-button [form]="form" (save)="save()"></app-save-button>
+    <app-cancel-button [form]="form" (cancel)="back()"></app-cancel-button>
+  </app-buttons-container>
+</div>

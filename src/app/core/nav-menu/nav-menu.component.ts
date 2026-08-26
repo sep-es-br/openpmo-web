@@ -59,6 +59,7 @@ export class NavMenuComponent implements OnInit, OnDestroy {
     { label: MenuOfficeConfigurationButtons.ORGANIZATIONS, isOpen: false },
     { label: MenuOfficeConfigurationButtons.OFFICES_PERMISSION, isOpen: false },
     { label: MenuOfficeConfigurationButtons.PERSONS, isOpen: false },
+    { label: MenuOfficeConfigurationButtons.PREPROJECT_SELECTION, isOpen: false },
   ];
 
   isUserAdmin = false;

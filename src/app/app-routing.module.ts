@@ -5,6 +5,8 @@ import { HomeComponent } from './modules/home/home.component';
 import { LoginComponent } from './modules/login/login.component';
 import { AdminOfficeConfigComponent } from './modules/admin-office-config/admin-office-config.component';
 import { AdministrationComponent } from './modules/administration/administration.component';
+import { PreprojectSelectionComponent } from './modules/preproject-selection/preproject-selection.component';
+import { PreprojectCriterionFormComponent } from './modules/preproject-selection/preproject-criterion-form/preproject-criterion-form.component';
 
 const routes: Routes = [
   {
@@ -44,6 +46,16 @@ const routes: Routes = [
     path: 'configuration-office',
     canActivate: [ AuthGuard],
     component: AdminOfficeConfigComponent
+  },
+  {
+    path: 'preproject-selection/criteria/new',
+    canActivate: [ AuthGuard ],
+    component: PreprojectCriterionFormComponent
+  },
+  {
+    path: 'preproject-selection',
+    canActivate: [ AuthGuard ],
+    component: PreprojectSelectionComponent
   },
   {
     path: 'administration',

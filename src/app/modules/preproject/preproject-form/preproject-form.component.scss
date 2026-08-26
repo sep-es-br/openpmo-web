@@ -1,0 +1,212 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.app-preproject-form {
+  padding: 0 1.5rem 2rem;
+
+  ::ng-deep .app-card.p-panel,
+  ::ng-deep .app-card .p-panel-content,
+  ::ng-deep .app-card .p-toggleable-content {
+    background: transparent;
+  }
+}
+
+.preproject-form-header {
+  display: flex;
+  align-items: flex-end;
+  min-height: 3rem;
+  color: #005b7a;
+  font-size: 1rem;
+  font-weight: 500;
+
+  > span {
+    flex: 1;
+    padding-bottom: .5em;
+  }
+}
+
+.p-fluid {
+  padding: 1.25rem .25rem;
+
+  .p-field {
+    margin-bottom: 1.5rem;
+
+    .app-input-label {
+      display: block;
+      margin-bottom: .35rem;
+    }
+
+    input,
+    p-dropdown,
+    p-calendar {
+      width: 100%;
+    }
+
+    .app-input-text {
+      width: 100%;
+    }
+  }
+}
+
+.preproject-deliveries {
+  margin-top: 1.5rem;
+}
+
+.preproject-section-title {
+  color: #005b7a;
+  margin-bottom: .75rem;
+  margin-left: 0;
+}
+
+.preproject-evaluation-tab {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  padding: 1.25rem .25rem;
+}
+
+.evaluation-label {
+  font-weight: 600;
+}
+
+.preproject-delivery-list {
+  margin-left: 0;
+  width: 100%;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 260px));
+  justify-content: start;
+}
+
+.preproject-delivery-list.list-mode {
+  grid-template-columns: 1fr;
+}
+
+:host ::ng-deep .preproject-delivery-list:not(.list-mode) .newItem {
+  width: 260px;
+}
+
+:host ::ng-deep .preproject-delivery-list.list-mode .newItem {
+  width: 100%;
+}
+
+.delivery-name {
+  width: 100%;
+  border: 0;
+  border-bottom: 1px solid #b7cbd4;
+  padding: .35rem 0;
+  margin-top: 1.25rem;
+}
+
+.delivery-icon {
+  display: block;
+  color: #8c9aa5;
+  font-size: 1.8rem;
+  text-align: center;
+  margin-top: 1rem;
+  margin-bottom: .25rem;
+}
+
+:host ::ng-deep .preproject-delivery-list .card-item,
+:host ::ng-deep .preproject-delivery-list .newItem {
+  min-height: 6rem;
+  height: 6rem;
+  box-sizing: border-box;
+}
+
+:host ::ng-deep .preproject-delivery-list .icon-remover {
+  font-size: 1rem;
+  display: block;
+}
+
+:host ::ng-deep .preproject-delivery-list .icon-remover::before {
+  content: '\f2ed';
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+:host ::ng-deep .preproject-delivery-list.list-mode .card-item {
+  display: flex;
+  align-items: center;
+}
+
+:host ::ng-deep .preproject-delivery-list.list-mode .delivery-icon {
+  flex: 0 0 2rem;
+  margin: 0 1rem 0 0;
+}
+
+:host ::ng-deep .preproject-delivery-list.list-mode .delivery-name {
+  flex: 1;
+  margin-top: 0;
+}
+
+:host ::ng-deep .preproject-delivery-list.list-mode .card-item,
+:host ::ng-deep .preproject-delivery-list.list-mode .newItem {
+  min-height: 50px;
+  height: 50px;
+}
+
+:host ::ng-deep .preproject-delivery-list.list-mode .newItem i::before {
+  font-size: 1.5rem;
+}
+
+// --- Abas de Critérios (Relevância e Viabilidade) ---
+
+.preproject-criteria-tab {
+  padding: 1.25rem .25rem;
+}
+
+.criteria-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid #d4e3e8;
+  padding-bottom: .75rem;
+}
+
+.criteria-title {
+  color: #005b7a;
+  font-size: .95rem;
+  font-weight: 600;
+}
+
+.criteria-add-button {
+  color: #005b7a;
+  font-size: .875rem;
+
+  &:hover {
+    background: rgba(0, 91, 122, .08);
+  }
+
+  .p-button-icon {
+    font-size: .8rem;
+  }
+}
+
+.criteria-properties-list {
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
+}
+
+.criteria-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2.5rem 1rem;
+  color: #8c9aa5;
+  gap: .75rem;
+  text-align: center;
+
+  i {
+    font-size: 2rem;
+    opacity: .5;
+  }
+
+  span {
+    font-size: .875rem;
+  }
+}
+

@@ -140,6 +140,14 @@ export class AdminOfficeConfigComponent implements OnInit {
         urlCard: '/persons',
         paramsUrlCard: [{ name: 'idOffice', value: this.idOffice }]
       },
+      {
+        typeCardItem: 'listItem',
+        iconSymbolId: 'preproject',
+        nameCardItem: this.translateSvr.instant('preprojectSelection'),
+        fullNameCardItem: this.translateSvr.instant('preprojectSelection'),
+        urlCard: '/preproject-selection',
+        paramsUrlCard: [{ name: 'idOffice', value: this.idOffice }]
+      },
     ];
     setTimeout( () => {
       this.isLoading = false;

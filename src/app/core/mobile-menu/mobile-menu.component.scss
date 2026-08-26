@@ -161,11 +161,18 @@ $mobileMenuHeight: 90px;
       padding: .8rem 0;
       display: flex;
       align-items: center;
-      .icon-wrapper {
-        margin-right: .5em;
-        min-width: 40px;
-        text-align: center;
-      }
+        .icon-wrapper {
+          margin-right: .5em;
+          min-width: 40px;
+          text-align: center;
+
+          .menu-svg-icon {
+            width: 1.8rem;
+            height: 1.8rem;
+            fill: #888e96;
+            vertical-align: middle;
+          }
+        }
       .menu-label {
         color: v.$fontDark;
       }

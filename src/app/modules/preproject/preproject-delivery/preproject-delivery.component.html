@@ -1,0 +1,11 @@
+<div class="preproject-delivery-form">
+  <div class="preproject-form-header">Nova entrega</div>
+  <app-card [properties]="cardProperties">
+    <label class="app-input-label" for="delivery-name">{{ 'name' | translate }} *</label>
+    <input id="delivery-name" class="app-input-text" pInputText type="text" [(ngModel)]="name" />
+    <app-buttons-container>
+      <app-save-button></app-save-button>
+      <app-cancel-button (cancel)="back()"></app-cancel-button>
+    </app-buttons-container>
+  </app-card>
+</div>

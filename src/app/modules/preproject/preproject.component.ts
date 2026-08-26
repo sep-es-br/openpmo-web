@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { TranslateService } from '@ngx-translate/core';
@@ -14,6 +14,8 @@ import { ICard } from 'src/app/shared/interfaces/ICard';
 import { ICardItem } from 'src/app/shared/interfaces/ICardItem';
 import { IWorkpackCardItem } from 'src/app/shared/interfaces/IWorkpackCardItem';
 import { IconsEnum } from 'src/app/shared/enums/IconsEnum';
+import { OfficeService } from 'src/app/shared/services/office.service';
+import { IBreadcrumb } from 'src/app/shared/interfaces/IBreadcrumb';
 
 interface IPreprojectMockItem {
   name: string;
@@ -54,15 +56,21 @@ export class PreprojectComponent implements OnInit, OnDestroy {
     private breadcrumbService: BreadcrumbService,
     private menuService: MenuService,
     private planService: PlanService,
+    private officeService: OfficeService,
     private configDataViewService: ConfigDataViewService,
     private responsiveService: ResponsiveService,
     private translateService: TranslateService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
     this.initDataViewSubscriptions();
-    this.initPlanAndBreadcrumb();
+    this.translateService.onLangChange
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => this.loadMockPreprojects());
+
+    void this.initPlanAndBreadcrumb();
     this.loadMockPreprojects();
   }
 
@@ -72,7 +80,10 @@ export class PreprojectComponent implements OnInit, OnDestroy {
   }
 
   handleCreatePreproject(): void {
-    // A navegação será conectada ao formulário de criação do Anteprojeto.
+    const idPlan = this.route.snapshot.queryParamMap.get('idPlan');
+    void this.router.navigate(['/preproject', 'new'], {
+      queryParams: idPlan ? { idPlan } : undefined
+    });
   }
 
   handleExistingProject(): void {
@@ -93,7 +104,9 @@ export class PreprojectComponent implements OnInit, OnDestroy {
     this.configDataViewService.observableDisplayModeAll
       .pipe(takeUntil(this.destroy$))
       .subscribe((displayMode: string) => {
-        this.displayMode = displayMode as 'list' | 'grid';
+        if (displayMode === 'list' || displayMode === 'grid') {
+          this.displayMode = displayMode;
+        }
       });
 
     this.configDataViewService.observablePageSize
@@ -109,23 +122,48 @@ export class PreprojectComponent implements OnInit, OnDestroy {
       });
   }
 
-  private initPlanAndBreadcrumb(): void {
+  private async initPlanAndBreadcrumb(): Promise<void> {
     const idPlan: string | null = this.route.snapshot.queryParamMap.get('idPlan');
     const idPlanNumber: number = Number(idPlan);
+    const breadcrumbs: IBreadcrumb[] = [];
 
     this.menuService.nextIsPlanMenu(true);
 
     if (Number.isFinite(idPlanNumber) && idPlanNumber > 0) {
-      this.planService.nextIDPlan(idPlanNumber);
+      await this.planService.nextIDPlan(idPlanNumber);
+      const plan = await this.planService.getCurrentPlan(idPlanNumber);
+
+      if (plan) {
+        const office = await this.officeService.getCurrentOffice(plan.idOffice);
+        this.officeService.nextIDOffice(plan.idOffice);
+
+        if (office) {
+          breadcrumbs.push({
+            key: 'office',
+            routerLink: ['/offices', 'office'],
+            queryParams: { id: office.id },
+            info: office.name,
+            tooltip: office.fullName
+          });
+        }
+
+        breadcrumbs.push({
+          key: 'plan',
+          routerLink: ['/plan'],
+          queryParams: { id: plan.id },
+          info: plan.name,
+          tooltip: plan.fullName
+        });
+      }
     }
 
-    this.breadcrumbService.setMenu([
-      {
-        key: 'preproject',
-        routerLink: ['/preproject'],
-        queryParams: idPlan ? { idPlan } : undefined
-      }
-    ]);
+    breadcrumbs.push({
+      key: 'preproject',
+      routerLink: ['/preproject'],
+      queryParams: idPlan ? { idPlan } : undefined
+    });
+
+    this.breadcrumbService.setMenu(breadcrumbs);
   }
 
   private loadMockPreprojects(): void {

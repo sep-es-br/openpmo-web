@@ -209,6 +209,15 @@
       </span>
       <span class="menu-label">{{ 'people' | translate }}</span>
     </div>
+    <div class="item" (click)="closeAllMenus()" [routerLink]="['/preproject-selection']"
+      [queryParams]="{ idOffice: currentIDOffice }">
+      <span class="icon-wrapper">
+        <svg class="menu-svg-icon" aria-hidden="true" focusable="false">
+          <use href="assets/svg/icons.svg#preproject"></use>
+        </svg>
+      </span>
+      <span class="menu-label">{{ 'preprojectSelection' | translate }}</span>
+    </div>
   </div>
   <div class="action-mobile">
     <i class="app-icon angle-down" [ngStyle]="{ fontSize: '1rem' }" (click)="toggleMenu('more')"></i>

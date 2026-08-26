@@ -13,7 +13,10 @@
       <div class="card-item-content" [class.card-link]="properties.urlCard" (click)="handleNavigateToPage()"
         [class.cardList]="displayModeCard === 'list'">
         <div class="icons-container">
-          <i [ngClass]="properties.iconSvg ? [ 'app-icon', 'card-item-icon', properties.icon, 'grey-icon'] : [ 'icon-card', 'card-item-icon', properties.icon, 'grey-icon' ]"
+          <svg *ngIf="properties.iconSymbolId" class="card-item-symbol grey-icon" aria-hidden="true" focusable="false">
+            <use [attr.href]="'assets/svg/icons.svg#' + properties.iconSymbolId"></use>
+          </svg>
+          <i *ngIf="!properties.iconSymbolId" [ngClass]="properties.iconSvg ? [ 'app-icon', 'card-item-icon', properties.icon, 'grey-icon'] : [ 'icon-card', 'card-item-icon', properties.icon, 'grey-icon' ]"
             [class.risk-red]="properties.iconColor === 'high'" [class.risk-orange]="properties.iconColor === 'medium'"
             [class.linked]="!!properties.linked || !!properties.shared"
             [class.risk-yellow]="properties.iconColor === 'low'"></i>
@@ -38,7 +41,10 @@
       <div class="card-item-content" [class.card-link]="properties.urlCard" (click)="handleNavigateToPage()"
         [class.cardList]="displayModeCard === 'list'">
         <div class="icons-container">
-          <i [ngClass]="properties.iconSvg ? [ 'app-icon', 'card-item-icon', properties.icon, 'grey-icon'] : [ 'icon-card', 'card-item-icon', properties.icon, 'grey-icon' ]"
+          <svg *ngIf="properties.iconSymbolId" class="card-item-symbol grey-icon" aria-hidden="true" focusable="false">
+            <use [attr.href]="'assets/svg/icons.svg#' + properties.iconSymbolId"></use>
+          </svg>
+          <i *ngIf="!properties.iconSymbolId" [ngClass]="properties.iconSvg ? [ 'app-icon', 'card-item-icon', properties.icon, 'grey-icon'] : [ 'icon-card', 'card-item-icon', properties.icon, 'grey-icon' ]"
             [class.risk-red]="properties.iconColor === 'high'" [class.risk-orange]="properties.iconColor === 'medium'"
             [class.linked]="!!properties.linked || !!properties.shared"
             [class.risk-yellow]="properties.iconColor === 'low'"></i>
@@ -505,11 +511,12 @@
   </p-card>
 
   <p-card *ngSwitchCase="'newCardItem'" class="new-carditem"
+    (click)="properties.urlCard && navigateToPage(properties.urlCard, properties.paramsUrlCard)"
     [ngStyle]="{ cursor: 'auto' }"
     [class.mobile]="responsive" [class.cardList]="displayModeCard === 'list'" [class.new-card-item-mobile]="responsive">
     <div class="carditem-content">
       <i [ngClass]="[ 'app-icon', properties.icon, 'light-grey-icon']"
-        (click)=" properties.iconMenuItems && menuIcon.toggle($event); properties.urlCard && navigateToPage(properties.urlCard, properties.paramsUrlCard)"
+        (click)="$event.stopPropagation(); properties.iconMenuItems ? menuIcon.toggle($event) : properties.urlCard && navigateToPage(properties.urlCard, properties.paramsUrlCard)"
         [ngStyle]="{ fontSize: (responsive ? 2 : (displayModeCard === 'list') ? 2 : 2.2) + 'rem', cursor: 'pointer' }" [class.card-link]="properties.iconMenuItems"></i>
       <p-tieredMenu #menuIcon [popup]="true" [model]="properties.iconMenuItems"></p-tieredMenu>
     </div>

@@ -85,7 +85,9 @@
     .model-property {
       display: inline-flex;
       flex-wrap: wrap;
+      align-items: flex-end;
       width: 100%;
+
 
       .input-label {
         font-size: 12px;
@@ -112,6 +114,7 @@
     .p-button {
       background-color: transparent;
       margin-left: 0;
+      border: none !important;
 
       .p-button-icon {
         color: v.$fontLabel;

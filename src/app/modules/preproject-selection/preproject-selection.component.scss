@@ -1,0 +1,36 @@
+.app-preproject-selection {
+  width: 100%;
+}
+
+.header-container {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+
+  .app-content-header {
+    flex: 1;
+  }
+}
+
+.evaluation-card {
+  display: block;
+  margin-top: 1rem !important;
+}
+
+.evaluation-operation {
+  padding: 1.25rem 0 .75rem;
+}
+
+.evaluation-operation-field {
+  display: block;
+  width: 260px;
+
+  .app-single-selection {
+    display: block;
+    width: 100%;
+  }
+}
+
+:host ::ng-deep .evaluation-operation-field .app-single-selection .p-dropdown {
+  width: 100%;
+}

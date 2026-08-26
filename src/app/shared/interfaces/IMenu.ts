@@ -23,7 +23,8 @@ export enum MenuAdminButtons {
 export enum MenuOfficeConfigurationButtons {
   ORGANIZATIONS = 'organizations',
   OFFICES_PERMISSION = 'offices/permission',
-  PERSONS = 'persons'
+  PERSONS = 'persons',
+  PREPROJECT_SELECTION = 'preproject-selection'
 }
 
 export interface IMenu {
