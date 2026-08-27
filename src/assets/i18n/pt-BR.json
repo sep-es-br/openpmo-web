@@ -816,6 +816,17 @@
         }
       },
       "project": {
+        "status": {
+          "cannot": {
+            "change": {
+              "without": {
+                "approved": {
+                  "baseline": "O status de um projeto sem Linha de Base aprovada deve permanecer como Estruturação."
+                }
+              }
+            }
+          }
+        },
         "cannot": {
           "return": {
             "to": {
