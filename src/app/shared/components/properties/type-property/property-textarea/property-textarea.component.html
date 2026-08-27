@@ -1,11 +1,22 @@
-<span class="p-float-label">
-  <textarea pInputTextarea [id]="property.name" class="app-text-area" [(ngModel)]="property.value"
-    [disabled]="property.disabled" [required]="property.required" [defaultValue]="property.defaultValue"
-    (blur)="changed.emit($event)" [minLength]="property.min" [maxlength]="property.max"
-    [class.ng-invalid]="property.invalid" [rows]="property.rows ? property.rows : 1"
-    (ngModelChange)="changed.emit($event)">
-  </textarea>
-  <label class="app-input-label" [for]="property.name">{{ property.label}} {{ property.required ? '*' : ''}}
-    <i class="far fa-question-circle" *ngIf="property.helpText && property.helpText.length > 0" [pTooltip]="property.helpText"></i>
+<span *ngIf="form; else propertyTextarea" class="p-float-label" [formGroup]="form">
+  <textarea pInputTextarea [id]="inputId || controlName" class="app-text-area"
+    [formControlName]="controlName" [required]="required" [rows]="rows"
+    (blur)="changed.emit($event)"></textarea>
+  <label class="app-input-label" [for]="inputId || controlName">
+    {{ label }} {{ required ? '*' : '' }}
   </label>
 </span>
+
+<ng-template #propertyTextarea>
+  <span class="p-float-label">
+    <textarea pInputTextarea [id]="property.name" class="app-text-area" [(ngModel)]="property.value"
+      [disabled]="property.disabled" [required]="property.required" [defaultValue]="property.defaultValue"
+      (blur)="changed.emit($event)" [minLength]="property.min" [maxlength]="property.max"
+      [class.ng-invalid]="property.invalid" [rows]="property.rows ? property.rows : 1"
+      (ngModelChange)="changed.emit($event)">
+    </textarea>
+    <label class="app-input-label" [for]="property.name">{{ property.label}} {{ property.required ? '*' : ''}}
+      <i class="far fa-question-circle" *ngIf="property.helpText && property.helpText.length > 0" [pTooltip]="property.helpText"></i>
+    </label>
+  </span>
+</ng-template>

@@ -41,6 +41,7 @@ import { CardJournalInformationComponent } from './card-journal-information/card
 import { CardListComponent } from './card-list/card-list.component';
 import { SearchItemCardComponent } from './search-item-card/search-item-card.component';
 import { CardSharingIndicatorsComponent } from './card-sharing-indicators/card-sharing-indicators.component';
+import { EditableCardItemComponent } from './editable-card-item/editable-card-item.component';
 
 @NgModule({
   declarations: [
@@ -81,7 +82,8 @@ import { CardSharingIndicatorsComponent } from './card-sharing-indicators/card-s
     CardJournalInformationComponent,
     CardListComponent,
     SearchItemCardComponent,
-    CardSharingIndicatorsComponent
+    CardSharingIndicatorsComponent,
+    EditableCardItemComponent
   ],
   imports: [
     CommonModule,
@@ -118,7 +120,8 @@ import { CardSharingIndicatorsComponent } from './card-sharing-indicators/card-s
     CancelButtonComponent,
     CardJournalInformationComponent,
     SearchItemCardComponent,
-    CardSharingIndicatorsComponent
+    CardSharingIndicatorsComponent,
+    EditableCardItemComponent
   ]
 })
 export class ComponentsModule { }

@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { MenuItem } from 'primeng/api';
@@ -19,6 +19,8 @@ import { IWorkpackModelProperty } from 'src/app/shared/interfaces/IWorkpackModel
 import { IBreadcrumb } from 'src/app/shared/interfaces/IBreadcrumb';
 import { TypePropertModelEnum as TypePropertyEnum } from 'src/app/shared/enums/TypePropertModelEnum';
 import { IconPropertyWorkpackModelEnum as IconPropertyEnum } from 'src/app/shared/enums/IconPropertyWorkpackModelEnum';
+import { IconsEnum } from 'src/app/shared/enums/IconsEnum';
+import { IEditableCardField } from 'src/app/shared/components/editable-card-item/editable-card-item.component';
 import { TypeOrganization } from 'src/app/shared/enums/TypeOrganization';
 import {
   PreprojectEvaluationConfigService,
@@ -26,6 +28,11 @@ import {
 } from 'src/app/shared/services/preproject-evaluation-config.service';
 
 type PropertyTarget = 'relevance' | 'viability';
+
+interface DeliveryCardItem extends ICardItem {
+  deliveryIndex?: number;
+  displayItemId?: string;
+}
 
 @Component({
   selector: 'app-preproject-form',
@@ -46,7 +53,21 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
 
   displayModeAll: string = 'grid';
 
-  deliveries: Array<{ name: string }> = [];
+  readonly editableDeliveryFields: IEditableCardField[] = [
+    {
+      controlName: 'name',
+      label: 'name',
+      type: 'textarea',
+      required: true,
+      rows: 3,
+      ellipsisAfter: 120
+    }
+  ];
+
+  deliveryCardItems: DeliveryCardItem[] = [{
+    typeCardItem: 'newCardItem',
+    icon: IconsEnum.Plus
+  }];
 
   form: FormGroup;
 
@@ -66,7 +87,8 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
     collapseble: false,
     toggleable: false,
     initialStateToggle: false,
-    initialStateCollapse: false
+    initialStateCollapse: false,
+    showCreateNemElementButton: false
   };
 
   /** Propriedades configuradas na aba de Relevância */
@@ -98,7 +120,8 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
       name: ['', [Validators.required, Validators.maxLength(25)]],
       fullName: ['', Validators.required],
       organization: [null],
-      expectedCompletion: [null]
+      expectedCompletion: [null],
+      deliveries: this.formBuilder.array([])
     });
   }
 
@@ -121,6 +144,7 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
       });
 
     this.buildPropertyMenus();
+    this.refreshDeliveryCardItems();
     void this.initBreadcrumb();
   }
 
@@ -138,6 +162,7 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
 
   changeTab(event: { tabs: ITabViewScrolled }): void {
     this.selectedTab = event.tabs;
+    this.updateCardPropertyMenu();
   }
 
   get evaluationOperationTranslationKey(): string {
@@ -152,37 +177,52 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
     // A integração com a API será adicionada quando o contrato estiver definido.
   }
 
-  get deliveryCardItems(): ICardItem[] {
-    const cards: ICardItem[] = this.deliveries.map((delivery: { name: string }, index: number) => ({
+  get deliveryForms(): FormArray {
+    return this.form.get('deliveries') as FormArray;
+  }
+
+  private refreshDeliveryCardItems(): void {
+    const cards: DeliveryCardItem[] = this.deliveryForms.controls.map((_delivery, index: number) => ({
       typeCardItem: 'listItem',
-      icon: 'cubes',
-      nameCardItem: delivery.name,
-      fullNameCardItem: delivery.name,
-      itemId: index
-    } as ICardItem));
+      icon: IconsEnum.Boxes,
+      deliveryIndex: index,
+      itemId: index + 1,
+      displayItemId: `${index + 1}`.padStart(2, '0'),
+      menuItems: [{
+        label: this.translateService.instant('delete'),
+        icon: 'fas fa-trash-alt',
+        command: () => this.removeDelivery(index)
+      }]
+    }));
 
     cards.push({
       typeCardItem: 'newCardItem',
-      icon: 'plus',
-      iconSvg: true,
-      iconMenuItems: this.deliveryCreationMenuItems
-    } as ICardItem);
+      icon: IconsEnum.Plus
+    });
 
-    return cards;
+    this.deliveryCardItems = cards;
   }
 
   trackByDelivery(index: number): number {
     return index;
   }
 
-  removeDelivery(delivery: { name: string }): void {
-    this.deliveries = this.deliveries.filter((item: { name: string }) => item !== delivery);
+  getDeliveryForm(index: number | undefined): FormGroup {
+    return this.deliveryForms.at(index || 0) as FormGroup;
+  }
+
+  removeDelivery(index: number): void {
+    this.deliveryForms.removeAt(index);
+    this.form.markAsDirty();
+    this.refreshDeliveryCardItems();
   }
 
   addDelivery(): void {
-    void this.router.navigate(['/preproject/delivery/new'], {
-      queryParams: this.idPlan ? { idPlan: this.idPlan } : undefined
-    });
+    this.deliveryForms.push(this.formBuilder.group({
+      name: ['', [Validators.required, Validators.maxLength(25)]]
+    }));
+    this.form.markAsDirty();
+    this.refreshDeliveryCardItems();
   }
 
   /**
@@ -289,14 +329,6 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
     return index;
   }
 
-  private get deliveryCreationMenuItems(): MenuItem[] {
-    return [{
-      label: this.translateService.instant('new'),
-      icon: 'fas fa-cog',
-      command: () => this.addDelivery()
-    }];
-  }
-
   /**
    * Constrói os menus de adição de propriedade para Relevância e Viabilidade,
    * listando todos os tipos de TypePropertModelEnum com seus ícones oficiais.
@@ -325,6 +357,19 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
 
     this.menuRelevanceProperties = buildMenu('relevance');
     this.menuViabilityProperties = buildMenu('viability');
+    this.updateCardPropertyMenu();
+  }
+
+  private updateCardPropertyMenu(): void {
+    const selectedKey: string = this.selectedTab?.key;
+    const showAddProperty: boolean = selectedKey === 'relevance' || selectedKey === 'viability';
+
+    this.cardProperties.showCreateNemElementButton = showAddProperty;
+    this.cardProperties.createNewElementMenuItems = selectedKey === 'relevance'
+      ? this.menuRelevanceProperties
+      : selectedKey === 'viability'
+        ? this.menuViabilityProperties
+        : undefined;
   }
 
   private async initBreadcrumb(): Promise<void> {

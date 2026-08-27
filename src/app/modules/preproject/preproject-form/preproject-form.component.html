@@ -39,8 +39,15 @@
               <p-dataView [value]="deliveryCardItems" layout="grid" class="app-dataview preproject-delivery-list"
                 *ngIf="displayModeAll !== 'list'">
                 <ng-template let-cardItem pTemplate="gridItem">
-                  <div class="p-col-12 p-md-3 p-sm-12">
-                    <app-card-item [properties]="cardItem" [displayModeCard]="displayModeAll"></app-card-item>
+                  <div class="p-col-12 p-sm-12 p-md-4 p-lg-3 delivery-card-container">
+                    <app-editable-card-item *ngIf="cardItem.typeCardItem === 'listItem'"
+                      [form]="getDeliveryForm(cardItem.deliveryIndex)" [fields]="editableDeliveryFields"
+                      [menuItems]="cardItem.menuItems || []" [itemId]="cardItem.displayItemId"
+                      [uniqueId]="cardItem.deliveryIndex" displayMode="grid">
+                    </app-editable-card-item>
+                    <app-editable-card-item *ngIf="cardItem.typeCardItem === 'newCardItem'" [newItem]="true"
+                      [newItemIcon]="cardItem.icon || 'plus'" displayMode="grid" (newItemClick)="addDelivery()">
+                    </app-editable-card-item>
                   </div>
                 </ng-template>
               </p-dataView>
@@ -48,7 +55,14 @@
                 *ngIf="displayModeAll === 'list'">
                 <ng-template let-cardItem pTemplate="listItem">
                   <div class="p-col-12">
-                    <app-card-item [properties]="cardItem" [displayModeCard]="displayModeAll"></app-card-item>
+                    <app-editable-card-item *ngIf="cardItem.typeCardItem === 'listItem'"
+                      [form]="getDeliveryForm(cardItem.deliveryIndex)" [fields]="editableDeliveryFields"
+                      [menuItems]="cardItem.menuItems || []" [itemId]="cardItem.displayItemId"
+                      [uniqueId]="cardItem.deliveryIndex" displayMode="list">
+                    </app-editable-card-item>
+                    <app-editable-card-item *ngIf="cardItem.typeCardItem === 'newCardItem'" [newItem]="true"
+                      [newItemIcon]="cardItem.icon || 'plus'" displayMode="list" (newItemClick)="addDelivery()">
+                    </app-editable-card-item>
                   </div>
                 </ng-template>
               </p-dataView>
@@ -58,19 +72,6 @@
       </div>
 
       <div tabviewBody *ngIf="selectedTab?.key === 'relevance'" class="preproject-criteria-tab">
-        <div class="criteria-header">
-          <span class="criteria-title">{{ 'relevance' | translate }}</span>
-          <button
-            pButton
-            type="button"
-            class="p-button-text criteria-add-button"
-            icon="fas fa-plus"
-            [label]="'addProperty' | translate"
-            (click)="menuRelevance.toggle($event)">
-          </button>
-          <p-menu #menuRelevance [popup]="true" [model]="menuRelevanceProperties"></p-menu>
-        </div>
-
         <div class="criteria-properties-list">
           <ng-container *ngFor="let property of relevanceProperties; trackBy: trackByProperty">
             <app-property-model
@@ -83,19 +84,6 @@
       </div>
 
       <div tabviewBody *ngIf="selectedTab?.key === 'viability'" class="preproject-criteria-tab">
-        <div class="criteria-header">
-          <span class="criteria-title">{{ 'viability' | translate }}</span>
-          <button
-            pButton
-            type="button"
-            class="p-button-text criteria-add-button"
-            icon="fas fa-plus"
-            [label]="'addProperty' | translate"
-            (click)="menuViability.toggle($event)">
-          </button>
-          <p-menu #menuViability [popup]="true" [model]="menuViabilityProperties"></p-menu>
-        </div>
-
         <div class="criteria-properties-list">
           <ng-container *ngFor="let property of viabilityProperties; trackBy: trackByProperty">
             <app-property-model

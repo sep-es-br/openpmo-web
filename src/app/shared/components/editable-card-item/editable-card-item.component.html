@@ -1,0 +1,50 @@
+<p-card *ngIf="!newItem" class="app-editable-card-item listItem"
+  [class.list-mode]="isListMode" [class.mobile]="responsive">
+  <p-header *ngIf="menuItems?.length" class="card-item-header">
+    <p-menu #menu [popup]="true" [model]="menuItems" [appendTo]="'body'"></p-menu>
+    <button type="button" pButton icon="pi pi-ellipsis-v" (click)="menu.toggle($event)"></button>
+  </p-header>
+  <div class="editable-card-layout">
+    <div class="card-item-content" [class.card-item-content-list]="isListMode"
+      [class.full-card-textarea]="hasTextarea" *ngIf="form" [formGroup]="form">
+      <div class="p-fluid editable-card-fields" [class.form-list-mode]="isListMode">
+        <ng-container *ngFor="let field of fields">
+          <div class="editable-card-field" [class.textarea-field]="field.type === 'textarea'">
+            <div class="p-field" [class.p-float-label]="field.type !== 'textarea'">
+              <input *ngIf="field.type !== 'number' && field.type !== 'textarea'"
+                [id]="inputId(field)" [formControlName]="field.controlName"
+                type="text" pInputText class="app-input-text" />
+              <p-inputNumber *ngIf="field.type === 'number'" [inputId]="inputId(field)"
+                [formControlName]="field.controlName" class="app-input-number"
+                [min]="field.min" [max]="field.max"></p-inputNumber>
+              <app-property-textarea *ngIf="field.type === 'textarea'" class="editable-card-textarea"
+                [form]="form" [controlName]="field.controlName" [inputId]="inputId(field)"
+                [label]="field.label | translate" [required]="!!field.required"
+                [rows]="field.rows || 3">
+              </app-property-textarea>
+              <span *ngIf="showTextareaEllipsis(field)" class="textarea-overflow-indicator">...</span>
+              <label *ngIf="field.type !== 'textarea'" class="app-input-label" [for]="inputId(field)">
+                {{ field.label | translate }}<span *ngIf="field.required" class="required-indicator">*</span>
+                <i *ngIf="field.helpTooltip" class="far fa-question-circle"
+                  [pTooltip]="field.helpTooltip | translate"></i>
+              </label>
+            </div>
+            <app-input-message *ngIf="field.type !== 'textarea'"
+              [form]="form" [field]="field.controlName"></app-input-message>
+          </div>
+        </ng-container>
+      </div>
+    </div>
+
+    <div class="card-item-footer" *ngIf="itemId !== undefined && itemId !== null">
+      <span class="card-item-id">{{ itemId }}</span>
+    </div>
+  </div>
+</p-card>
+
+<p-card *ngIf="newItem" class="app-editable-new-card-item" [class.list-mode]="isListMode"
+  [class.new-card-item-mobile]="responsive" (click)="newItemClick.emit()">
+  <div class="card-item-content">
+    <i [ngClass]="['app-icon', newItemIcon, 'light-grey-icon']"></i>
+  </div>
+</p-card>
