@@ -1,4 +1,3 @@
-import { HttpHeaders } from '@angular/common/http';
 import { Inject, Injectable, Injector } from '@angular/core';
 import { BaseService } from '../base/base.service';
 import { IHttpResult } from '../interfaces/IHttpResult';
@@ -17,10 +16,10 @@ export class ReportModelFileService extends BaseService<IReportModelFile> {
   }
 
   async sendSourceFile(file: FormData): Promise<IHttpResult<IReportModelFile>> {
-    const headers = new HttpHeaders({
-      'Form-Data': 'true'
-    });
-    const result = await this.http.post(`${this.urlBase}/upload`, file, { headers }).toPromise();
+    // Do not set a Content-Type header here: HttpClient/browser creates the
+    // multipart/form-data boundary. An extra custom header would also force a
+    // preflight header that is not part of the API CORS contract.
+    const result = await this.http.post(`${this.urlBase}/upload`, file).toPromise();
     return result as IHttpResult<IReportModelFile>;
   }
 
