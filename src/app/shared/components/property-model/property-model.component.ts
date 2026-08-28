@@ -32,6 +32,12 @@ export class PropertyModelComponent implements OnDestroy, OnChanges, AfterViewIn
   language: string;
   optionsSector: SelectItem[];
   typeOrganizationEnum = TypeOrganization;
+  financialSourceLevels = [
+    { label: 'Tipo', value: 'TYPE' },
+    { label: 'Grupo', value: 'GROUP' },
+    { label: 'Fonte', value: 'SOURCE' },
+    { label: 'Detalhamento da fonte', value: 'DETAIL' }
+  ];
 
 
   constructor(

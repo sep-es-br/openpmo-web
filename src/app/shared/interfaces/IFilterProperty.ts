@@ -6,7 +6,7 @@ export interface IFilterProperty {
   idPropertyModel?: number;
   label: string;
   name: string;
-  defaultValue?: number | string | boolean | string[] | number[] | Date;
+  defaultValue?: number | string | boolean | string[] | number[] | Date | object[];
   defaults?: number | number[];
   min?: number;
   max?: number;

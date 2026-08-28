@@ -912,6 +912,7 @@ export class WorkpackModelComponent implements OnInit {
       fullLine: true,
       required: false,
       multipleSelection: false,
+      selectionLevel: type === TypePropertyEnum.FinancialSourceSelectionModel ? 'DETAIL' : undefined,
       sectorsList: type === TypePropertyEnum.OrganizationSelectionModel ?
         [TypeOrganization.Private.toUpperCase(), TypeOrganization.Public.toUpperCase(), TypeOrganization.Third.toUpperCase()] : [],
       selectedLocalities: type === TypePropertyEnum.LocalitySelectionModel && this.translateSrv.instant('selectDefaultValue'),
@@ -959,6 +960,13 @@ export class WorkpackModelComponent implements OnInit {
         break;
       case TypePropertyEnum.SelectionModel:
         requiredFields = requiredFields.concat(['possibleValuesOptions', 'multipleSelection']);
+        break;
+      case TypePropertyEnum.BudgetPlanSelectionModel:
+        requiredFields = requiredFields.concat(['multipleSelection']);
+        break;
+      case TypePropertyEnum.FinancialSourceSelectionModel:
+        requiredFields = requiredFields.concat(['multipleSelection', 'selectionLevel']);
+        property.selectionLevel = property.selectionLevel || 'DETAIL';
         break;
       case TypePropertyEnum.GroupModel:
         requiredFields = ['name', 'sortIndex', 'groupedProperties'];

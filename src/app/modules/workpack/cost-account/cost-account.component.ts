@@ -649,6 +649,7 @@ export class CostAccountComponent implements OnInit {
     property.disabled = !this.editPermission;
     property.sortIndex = propertyModel.sortIndex;
     property.multipleSelection = propertyModel.multipleSelection;
+    property.selectionLevel = propertyModel.selectionLevel;
     property.rows = propertyModel.rows;
     property.decimals = propertyModel.decimals;
     property.helpText = propertyModel.helpText;
@@ -858,6 +859,7 @@ export class CostAccountComponent implements OnInit {
     property.collapsed = pro.collapsed;
     property.dirty = pro.dirty;
     property.helpText = pro.helpText;
+    property.selectionLevel = pro.selectionLevel;
     return property;
   }
 

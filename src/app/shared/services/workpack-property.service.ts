@@ -147,6 +147,7 @@ export class WorkpackPropertyService {
     property.collapsed = pro.collapsed;
     property.dirty = pro.dirty;
     property.helpText = pro.helpText;
+    property.selectionLevel = pro.selectionLevel;
     return property;
   }
 
@@ -211,6 +212,7 @@ export class WorkpackPropertyService {
     property.helpText = propertyModel.helpText;
     property.sortIndex = propertyModel.sortIndex;
     property.multipleSelection = propertyModel.multipleSelection;
+    property.selectionLevel = propertyModel.selectionLevel;
     property.rows = propertyModel.rows ? propertyModel.rows : 1;
     property.decimals = propertyModel.decimals;
     if (this.typePropertyModel[propertyModel.type] === TypePropertyModelEnum.ToggleModel) {

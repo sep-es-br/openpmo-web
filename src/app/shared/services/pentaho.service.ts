@@ -4,6 +4,11 @@ import { APP_CONFIG } from "../tokens/AppConfigToken";
 import { Observable, of } from "rxjs";
 import { catchError, map } from "rxjs/operators";
 import { IHttpResult } from "../interfaces/IHttpResult";
+import {
+  IBudgetPlanSelectionOption,
+  IBudgetUnitSelectionOption
+} from "../interfaces/IBudgetPlanSelection";
+import { IFinancialSourceSelectionValue } from "../interfaces/IFinancialSourceSelection";
 
 @Injectable({
   providedIn: "root"
@@ -126,6 +131,58 @@ export class PentahoService {
         console.error("Erro ao buscar valores liquidados.")
         return { success: false, data: { resultset: []}}
       })
+  }
+
+  getBudgetUnitsForProperty(): Observable<IBudgetUnitSelectionOption[]> {
+    return this.http.get<any>(`${this.baseUrl}/sigef-selections/budget-units`).pipe(
+      map(response => this.unwrapRows(response).map(item => ({
+        code: item[0],
+        acronym: item[1],
+        name: item[2]
+      }))),
+      catchError(error => {
+        console.error('Erro ao buscar unidades orçamentárias para a propriedade de PO.', error);
+        return of([]);
+      })
+    );
+  }
+
+  getBudgetPlansForProperty(budgetUnitCode: string): Observable<IBudgetPlanSelectionOption[]> {
+    const params = new HttpParams().set('budgetUnitCode', budgetUnitCode);
+    return this.http.get<any>(`${this.baseUrl}/sigef-selections/budget-plans`, { params }).pipe(
+      map(response => this.unwrapRows(response).map(item => ({
+        name: item[0],
+        code: item[1]
+      }))),
+      catchError(error => {
+        console.error('Erro ao buscar planos orçamentários para a propriedade de PO.', error);
+        return of([]);
+      })
+    );
+  }
+
+  getFinancialSourcesForProperty(): Observable<IFinancialSourceSelectionValue[]> {
+    return this.http.get<any>(`${this.baseUrl}/sigef-selections/financial-sources`).pipe(
+      map(response => this.unwrapRows(response).map(item => ({
+        sourceGroupCode: item[0],
+        sourceGroupName: item[1],
+        sourceCode: item[2],
+        sourceName: item[3],
+        detailedSourceCode: item[4],
+        detailedSourceName: item[5],
+        typeCode: item[6],
+        typeName: item[7]
+      }))),
+      catchError(error => {
+        console.error('Erro ao buscar fontes de recurso.', error);
+        return of([]);
+      })
+    );
+  }
+
+  private unwrapRows(response: any): any[] {
+    const value = response?.data !== undefined ? response.data : response;
+    return Array.isArray(value) ? value : (value?.resultset || []);
   }
 }
 

@@ -1,4 +1,6 @@
 import { SelectItem, MenuItem, TreeNode } from 'primeng/api';
+import { FinancialSourceSelectionLevel, IFinancialSourceSelectionValue } from './IFinancialSourceSelection';
+import { IBudgetPlanSelectionValue } from './IBudgetPlanSelection';
 
 export interface IWorkpackModelProperty {
   id?: number;
@@ -10,7 +12,8 @@ export interface IWorkpackModelProperty {
   name: string;
   required?: boolean;
   sortIndex?: number;
-  defaultValue?: number | number[] | string | string[] | boolean | Date;
+  defaultValue?: number | number[] | string | string[] | boolean | Date |
+    IBudgetPlanSelectionValue[] | IFinancialSourceSelectionValue[];
   defaults?: number | number[];
   defaultsDetails?: {id: number; name: string; fullName: string}[];
   min?: number;
@@ -37,4 +40,5 @@ export interface IWorkpackModelProperty {
   showIconButtonSelectLocality?: boolean; //only screen
   helpText?: string;
   disableMultipleSelection?: boolean;
+  selectionLevel?: FinancialSourceSelectionLevel;
 }

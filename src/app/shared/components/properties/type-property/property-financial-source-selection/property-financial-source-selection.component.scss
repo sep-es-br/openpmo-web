@@ -1,0 +1,10 @@
+.selection-property { display: flex; align-items: stretch; gap: .25rem; width: 100%; }
+.selection-input { flex: 1; }
+.selection-input input { width: 100%; text-overflow: ellipsis; }
+.open-button, .clear-button { flex: 0 0 auto; }
+.financial-source-dialog { display: flex; flex-direction: column; gap: .75rem; }
+.financial-source-dialog p-dropdown { width: 100%; }
+.loading { color: #666; padding: 1rem; text-align: center; }
+.selected-list { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; margin-top: .5rem; }
+.selected-item { background: #eef4f1; border-radius: 16px; padding: .35rem .65rem; }
+.selected-item button { background: none; border: 0; cursor: pointer; margin-left: .35rem; }

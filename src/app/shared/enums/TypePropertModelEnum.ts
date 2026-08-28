@@ -3,6 +3,8 @@ export enum TypePropertModelEnum {
   DateModel = 'DateModel',
   IntegerModel = 'IntegerModel',
   LocalitySelectionModel = 'LocalitySelectionModel',
+  BudgetPlanSelectionModel = 'BudgetPlanSelectionModel',
+  FinancialSourceSelectionModel = 'FinancialSourceSelectionModel',
   NumberModel = 'NumberModel',
   OrganizationSelectionModel = 'OrganizationSelectionModel',
   SelectionModel = 'SelectionModel',

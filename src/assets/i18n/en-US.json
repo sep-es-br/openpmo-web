@@ -896,6 +896,8 @@
     "CurrencyModel": "Currency",
     "LocalitySelectionModel": "Locality selection",
     "OrganizationSelectionModel": "Organization selection",
+    "BudgetPlanSelectionModel": "Budget Plan selection",
+    "FinancialSourceSelectionModel": "Financial Source selection",
     "ProgramModel": "Program",
     "OrganizerModel": "Organizer",
     "DeliverableModel": "Deliverable",

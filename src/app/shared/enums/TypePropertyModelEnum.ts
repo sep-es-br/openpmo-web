@@ -11,6 +11,7 @@ export const TypePropertyModelEnum = {
   LocalitySelectionModel: 'LocalitySelection',
   OrganizationSelectionModel: 'OrganizationSelection',
   BudgetPlanSelectionModel: 'BudgetPlanSelection',
+  FinancialSourceSelectionModel: 'FinancialSourceSelection',
   GroupModel: 'Group'
 };
 

@@ -9,5 +9,7 @@ export enum IconPropertyWorkpackModelEnum {
   NumberModel = 'app-icon number',
   CurrencyModel = 'fa fa-dollar-sign',
   LocalitySelectionModel = 'fas fa-map-marker-alt',
-  OrganizationSelectionModel = 'fas fa-landmark'
+  OrganizationSelectionModel = 'fas fa-landmark',
+  BudgetPlanSelectionModel = 'fas fa-file-invoice-dollar',
+  FinancialSourceSelectionModel = 'fas fa-coins'
 };

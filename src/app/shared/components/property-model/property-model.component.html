@@ -63,6 +63,13 @@
           <i class="far fa-question-circle" [pTooltip]="'help.propertyModel.possibleValues' | translate"></i>
         </label>
       </span>
+      <span class="p-float-label property-selection p-field"
+        *ngIf="property.type === 'FinancialSourceSelectionModel'">
+        <p-dropdown class="app-single-selection" [options]="financialSourceLevels"
+          [(ngModel)]="property.selectionLevel" [autoDisplayFirst]="false" [required]="true"
+          [disabled]="property.viewOnly" (ngModelChange)="changed.emit($event)"></p-dropdown>
+        <label class="input-label">Nível de seleção *</label>
+      </span>
       <span class="p-float-label property-selection p-field" *ngIf="property.type === 'LocalitySelectionModel'">
         <ng-container *ngIf="false; else singleDomainSelection">
           <p-multiSelect class="app-multiple-selection" dropdownIcon="fas fa-caret-down" [options]="property.list"
@@ -234,7 +241,8 @@
         </label>
       </span>
       <span class="property-checkbox p-field-checkbox"
-        *ngIf="[ 'SelectionModel', 'LocalitySelectionModel', 'OrganizationSelectionModel' ].includes(property.type)">
+        *ngIf="[ 'SelectionModel', 'LocalitySelectionModel', 'OrganizationSelectionModel',
+          'BudgetPlanSelectionModel', 'FinancialSourceSelectionModel' ].includes(property.type)">
         <p-checkbox class="app-checkbox" [(ngModel)]="property.multipleSelection" [binary]="true"
           [disabled]="property.viewOnly || property.disableMultipleSelection" [required]="true"
           (ngModelChange)="changed.emit({property: property, multipleSelectedChanged: true}); checkDefaultValue();">

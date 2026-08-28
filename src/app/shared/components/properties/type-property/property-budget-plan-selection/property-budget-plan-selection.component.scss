@@ -1,0 +1,14 @@
+.selection-property { display: flex; align-items: stretch; gap: .25rem; width: 100%; }
+.selection-input { flex: 1; }
+.selection-input input { width: 100%; text-overflow: ellipsis; }
+.open-button, .clear-button { flex: 0 0 auto; }
+.budget-plan-dialog { display: flex; flex-direction: column; gap: .75rem; }
+.budget-plan-dialog p-dropdown { width: 100%; }
+.plan-list { border: 1px solid #ddd; border-radius: 4px; max-height: 300px; overflow: auto; }
+.plan-option { align-items: flex-start; background: #fff; border: 0; border-bottom: 1px solid #eee; cursor: pointer; display: flex; gap: .75rem; padding: .75rem; text-align: left; width: 100%; }
+.plan-option:hover, .plan-option.selected { background: #f3f8f6; }
+.plan-option i { color: #28835c; margin-top: .15rem; }
+.loading, .empty { color: #666; padding: 1rem; text-align: center; }
+.selected-list { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; }
+.selected-item { background: #eef4f1; border-radius: 16px; padding: .35rem .65rem; }
+.selected-item button { background: none; border: 0; cursor: pointer; margin-left: .35rem; }

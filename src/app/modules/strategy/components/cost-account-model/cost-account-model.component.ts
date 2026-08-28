@@ -380,6 +380,13 @@ export class CostAccountModelComponent implements OnInit {
       case TypePropertyEnum.SelectionModel:
         requiredFields = requiredFields.concat(['possibleValuesOptions', 'multipleSelection']);
         break;
+      case TypePropertyEnum.BudgetPlanSelectionModel:
+        requiredFields = requiredFields.concat(['multipleSelection']);
+        break;
+      case TypePropertyEnum.FinancialSourceSelectionModel:
+        requiredFields = requiredFields.concat(['multipleSelection', 'selectionLevel']);
+        property.selectionLevel = property.selectionLevel || 'DETAIL';
+        break;
       case TypePropertyEnum.NumberModel:
         requiredFields = requiredFields.concat(['precision']);
         property.precision = 3;
@@ -585,6 +592,7 @@ export class CostAccountModelComponent implements OnInit {
       fullLine: true,
       required: false,
       multipleSelection: false,
+      selectionLevel: type === TypePropertyEnum.FinancialSourceSelectionModel ? 'DETAIL' : undefined,
       sectorsList: type === TypePropertyEnum.OrganizationSelectionModel ?
       [TypeOrganization.Private.toLocaleUpperCase(), TypeOrganization.Public.toLocaleUpperCase(), TypeOrganization.Third.toLocaleUpperCase()] : [],
       sectors: type === TypePropertyEnum.OrganizationSelectionModel ?

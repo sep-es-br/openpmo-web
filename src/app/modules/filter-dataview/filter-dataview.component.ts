@@ -550,7 +550,8 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
     if( workpackModel.type === TypeWorkpackModelEnum.MilestoneModel) {
       this.filterPropertiesList.push(this.instancePropertyStaticWorkpack('date', TypePropertyModelEnum.DateModel))
     }
-    const workpackModelActivesProperties = workpackModel.properties && workpackModel.properties.filter(w => w.active);
+    const workpackModelActivesProperties = workpackModel.properties && workpackModel.properties
+      .filter(w => w.active && this.isSupportedFilterProperty(w));
     const workpackModelPropertiesList = workpackModelActivesProperties && await Promise.all(workpackModelActivesProperties.map(p => this.instanceProperty(p)));
     this.filterPropertiesList = workpackModelPropertiesList ? [...this.filterPropertiesList, ...workpackModelPropertiesList] : this.filterPropertiesList;
   }
@@ -559,7 +560,8 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
     this.idCostAccountModel = await this.costAccountSrv.loadIdCostAccountModel();
     const resultCostAccountModel = await this.costAccountModelSrv.GetById(this.idCostAccountModel);
     const costAccountModel = resultCostAccountModel.success && resultCostAccountModel.data;
-    const costAccountModelActivesProperties = costAccountModel.properties.filter(w => w.active);
+    const costAccountModelActivesProperties = costAccountModel.properties
+      .filter(w => w.active && this.isSupportedFilterProperty(w));
     if (costAccountModelActivesProperties && costAccountModelActivesProperties
       .filter(prop => this.typePropertyModel[prop.type] === TypePropertyModelEnum.OrganizationSelectionModel).length > 0) {
       await this.loadOrganizationsOffice();
@@ -576,6 +578,13 @@ export class FilterDataviewComponent implements OnInit, OnDestroy {
       multipleSelection: false,
     };
     return property;
+  }
+
+  private isSupportedFilterProperty(propertyModel: IWorkpackModelProperty): boolean {
+    return ![
+      TypePropertyModelEnum.BudgetPlanSelectionModel,
+      TypePropertyModelEnum.FinancialSourceSelectionModel
+    ].includes(this.typePropertyModel[propertyModel.type]);
   }
 
   async instanceProperty(propertyModel: IWorkpackModelProperty): Promise<IFilterProperty> {

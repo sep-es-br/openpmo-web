@@ -11,7 +11,7 @@ export interface IProperty {
   required?: boolean;
   disabled?: boolean;
   sortIndex?: number;
-  defaultValue?: number | string | boolean | string[] | number[] | Date;
+  defaultValue?: number | string | boolean | string[] | number[] | Date | object[];
   defaults?: number | number[];
   min?: number | string;
   max?: number | string;
@@ -23,12 +23,13 @@ export interface IProperty {
   idDomain?: number;
   localityList?: TreeNode[];
   localitiesSelected?: TreeNode | TreeNode[];
-  value?: string | number | boolean | string[] | Date | number[];
+  value?: string | number | boolean | string[] | Date | number[] | object[];
   selectedValues?: number[] | number;
   selectedValue?: number;
   invalid?: boolean;
   message?: string;
   collapsed?: boolean;
   helpText?: string;
+  selectionLevel?: 'TYPE' | 'GROUP' | 'SOURCE' | 'DETAIL';
   getValues();
 }

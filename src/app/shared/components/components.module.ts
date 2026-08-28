@@ -35,6 +35,8 @@ import { PropertyToggleComponent } from './properties/type-property/property-tog
 import { PropertyTreeSelectionComponent } from './properties/type-property/property-tree-selection/property-tree-selection.component';
 import { PropertyUnitSelectionComponent } from './properties/type-property/property-unit-selection/property-unit-selection.component';
 import { PropertyGroupComponent } from './properties/type-property/property-group/property-group.component';
+import { PropertyBudgetPlanSelectionComponent } from './properties/type-property/property-budget-plan-selection/property-budget-plan-selection.component';
+import { PropertyFinancialSourceSelectionComponent } from './properties/type-property/property-financial-source-selection/property-financial-source-selection.component';
 import { ButtonsContainerComponent } from './buttons-container/buttons-container.component';
 import { CancelButtonComponent } from './cancel-button/cancel-button.component';
 import { CardJournalInformationComponent } from './card-journal-information/card-journal-information.component';
@@ -76,6 +78,8 @@ import { CardSharingIndicatorsComponent } from './card-sharing-indicators/card-s
     PropertyTreeSelectionComponent,
     PropertyUnitSelectionComponent,
     PropertyGroupComponent,
+    PropertyBudgetPlanSelectionComponent,
+    PropertyFinancialSourceSelectionComponent,
     ButtonsContainerComponent,
     CancelButtonComponent,
     CardJournalInformationComponent,

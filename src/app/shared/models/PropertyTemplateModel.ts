@@ -17,7 +17,7 @@ export class PropertyTemplateModel implements IProperty {
   required?: boolean;
   disabled?: boolean;
   sortIndex?: number;
-  defaultValue?: number | string | boolean | string[] | number[] | Date;
+  defaultValue?: number | string | boolean | string[] | number[] | Date | object[];
   defaults?: number | number[];
   min?: number;
   max?: number;
@@ -32,7 +32,7 @@ export class PropertyTemplateModel implements IProperty {
   localitiesSelected?: TreeNode | TreeNode[];
   labelButtonLocalitySelected?: string[];
   showIconButton?: boolean;
-  value?: string | number | boolean | string[] | Date | number[];
+  value?: string | number | boolean | string[] | Date | number[] | object[];
   selectedValues?: number[] | number;
   selectedValue?: number;
   invalid?: boolean;
@@ -45,6 +45,7 @@ export class PropertyTemplateModel implements IProperty {
   dirty = false;
   helpText?: string;
   typeWorkPack?: TypeWorkpackEnumWBS;
+  selectionLevel?: 'TYPE' | 'GROUP' | 'SOURCE' | 'DETAIL';
 
   getValues() {
     const {
@@ -107,7 +108,7 @@ export class PropertyTemplateModel implements IProperty {
         property.value = value as number;
         break;
       default:
-        property.value = value as string;
+        property.value = value as any;
         break;
     }
     return property;

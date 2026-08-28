@@ -712,7 +712,12 @@ export class ReportModelComponent implements OnInit, OnDestroy {
     if (this.currentLang && !['pt-BR', 'en-US'].includes(this.currentLang)) {
       return;
     }
-    const menu = Object.keys(TypePropertyEnum).filter(k => k !== TypePropertyEnum.GroupModel)
+    const unsupportedReportParameterTypes = [
+      TypePropertyEnum.GroupModel,
+      TypePropertyEnum.BudgetPlanSelectionModel,
+      TypePropertyEnum.FinancialSourceSelectionModel
+    ];
+    const menu = Object.keys(TypePropertyEnum).filter(k => !unsupportedReportParameterTypes.includes(k as TypePropertyEnum))
       .map(type => ({
         label: this.translateSrv.instant(`labels.${TypePropertyEnum[type]}`),
         icon: IconPropertyWorkpackModelEnum[TypePropertyEnum[type]],
