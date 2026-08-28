@@ -6,7 +6,7 @@
 
   <app-card [properties]="cardProperties" class="mt-0 inputs-float-label">
     <app-card-loading [isCardLoading]="isLoading"></app-card-loading>
-    <app-tabview-scrolled [tabs]="tabs" [contextVersion]="1" (selectedTabChange)="changeTab($event)">
+    <app-tabview-scrolled [tabs]="tabs" [contextVersion]="tabsVersion" (selectedTabChange)="changeTab($event)">
       <div tabviewBody *ngIf="selectedTab?.key === 'properties'">
         <form [formGroup]="form">
           <div class="p-fluid">
@@ -71,28 +71,13 @@
         </form>
       </div>
 
-      <div tabviewBody *ngIf="selectedTab?.key === 'relevance'" class="preproject-criteria-tab">
-        <div class="criteria-properties-list">
-          <ng-container *ngFor="let property of relevanceProperties; trackBy: trackByProperty">
-            <app-property-model
-              [property]="property"
-              (changed)="propertyChanged($event)"
-              (delete)="deleteProperty(property, 'relevance')">
-            </app-property-model>
-          </ng-container>
-        </div>
-      </div>
-
-      <div tabviewBody *ngIf="selectedTab?.key === 'viability'" class="preproject-criteria-tab">
-        <div class="criteria-properties-list">
-          <ng-container *ngFor="let property of viabilityProperties; trackBy: trackByProperty">
-            <app-property-model
-              [property]="property"
-              (changed)="propertyChanged($event)"
-              (delete)="deleteProperty(property, 'viability')">
-            </app-property-model>
-          </ng-container>
-        </div>
+      <div tabviewBody *ngIf="selectedCriteriaGuide" class="preproject-criteria-tab">
+        <app-preproject-criteria-guide
+          [guide]="selectedCriteriaGuide"
+          [displayMode]="displayModeAll"
+          (changed)="form.markAsDirty()"
+          (listAddRequested)="requestListPropertyItem($event)">
+        </app-preproject-criteria-guide>
       </div>
 
       <div tabviewBody *ngIf="selectedTab?.key === 'evaluation'" class="preproject-evaluation-tab">

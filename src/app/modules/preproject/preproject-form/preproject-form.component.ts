@@ -3,7 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { MenuItem } from 'primeng/api';
+import { MenuItem, MessageService } from 'primeng/api';
 import { TranslateService } from '@ngx-translate/core';
 
 import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
@@ -21,11 +21,16 @@ import { TypePropertModelEnum as TypePropertyEnum } from 'src/app/shared/enums/T
 import { IconPropertyWorkpackModelEnum as IconPropertyEnum } from 'src/app/shared/enums/IconPropertyWorkpackModelEnum';
 import { IconsEnum } from 'src/app/shared/enums/IconsEnum';
 import { IEditableCardField } from 'src/app/shared/components/editable-card-item/editable-card-item.component';
+import { IPropertyListItem } from 'src/app/shared/interfaces/IPropertyListItem';
 import { TypeOrganization } from 'src/app/shared/enums/TypeOrganization';
 import {
   PreprojectEvaluationConfigService,
   PreprojectEvaluationOperation
 } from 'src/app/shared/services/preproject-evaluation-config.service';
+import {
+  PreprojectCriteriaConfigService,
+  PreprojectCriterion
+} from 'src/app/shared/services/preproject-criteria-config.service';
 
 type PropertyTarget = 'relevance' | 'viability';
 
@@ -73,10 +78,12 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
 
   tabs: ITabViewScrolled[] = [
     { key: 'properties', menu: 'properties' },
-    { key: 'relevance', menu: 'relevance' },
-    { key: 'viability', menu: 'viability' },
     { key: 'evaluation', menu: 'evaluation' }
   ];
+
+  tabsVersion: number = 1;
+
+  criteriaGuides: PreprojectCriterion[] = [];
 
   selectedTab: ITabViewScrolled = this.tabs[0];
 
@@ -111,10 +118,12 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
     private readonly planService: PlanService,
     private readonly officeService: OfficeService,
     private readonly preprojectEvaluationConfigService: PreprojectEvaluationConfigService,
+    private readonly preprojectCriteriaConfigService: PreprojectCriteriaConfigService,
     private readonly configDataViewService: ConfigDataViewService,
     private readonly workpackShowTabviewService: WorkpackShowTabviewService,
     private readonly formBuilder: FormBuilder,
-    private readonly translateService: TranslateService
+    private readonly translateService: TranslateService,
+    private readonly messageService: MessageService
   ) {
     this.form = this.formBuilder.group({
       name: ['', [Validators.required, Validators.maxLength(25)]],
@@ -143,7 +152,6 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
         this.displayModeAll = mode === 'card' || mode === 'grid' ? 'grid' : 'list';
       });
 
-    this.buildPropertyMenus();
     this.refreshDeliveryCardItems();
     void this.initBreadcrumb();
   }
@@ -174,7 +182,16 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
       this.form.markAllAsTouched();
       return;
     }
-    // A integração com a API será adicionada quando o contrato estiver definido.
+    this.formIsSaving = true;
+    setTimeout(() => {
+      this.formIsSaving = false;
+      this.messageService.add({
+        severity: 'success',
+        summary: this.translateService.instant('success') || 'Sucesso',
+        detail: this.translateService.instant('messages.savedSuccessfully') || 'Salvo com sucesso'
+      });
+      this.back();
+    }, 1000);
   }
 
   get deliveryForms(): FormArray {
@@ -314,6 +331,34 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
     }
   }
 
+  get selectedCriteriaGuide(): PreprojectCriterion | undefined {
+    const criterionId: number = Number((this.selectedTab?.key || '').replace('criterion-', ''));
+    return this.criteriaGuides.find((criterion: PreprojectCriterion) => criterion.id === criterionId);
+  }
+
+  isListProperty(property: IWorkpackModelProperty): boolean {
+    return property.type === TypePropertyEnum.ChallengeListModel
+      || property.type === TypePropertyEnum.SdgListModel;
+  }
+
+  getListPropertyIcon(property: IWorkpackModelProperty): string {
+    return property.type === TypePropertyEnum.SdgListModel
+      ? IconsEnum.Cog
+      : IconsEnum.Selection;
+  }
+
+  updateListPropertyItems(property: IWorkpackModelProperty, items: IPropertyListItem[]): void {
+    property.selectedListItems = items;
+    this.form.markAsDirty();
+    this.propertyChanged({ property });
+  }
+
+  requestListPropertyItem(property: IWorkpackModelProperty): void {
+    // O componente publica este evento para o seletor de Desafios/ODS.
+    // A abertura do seletor será conectada ao serviço assim que o endpoint estiver disponível.
+    this.propertyChanged({ property });
+  }
+
   /**
    * Remove uma propriedade da lista da aba correspondente.
    */
@@ -346,6 +391,8 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
       { type: TypePropertyEnum.LocalitySelectionModel,    labelKey: 'localitySelectionProperty' },
       { type: TypePropertyEnum.OrganizationSelectionModel,labelKey: 'organizationSelectionProperty' },
       { type: TypePropertyEnum.UnitSelectionModel,        labelKey: 'unitSelectionProperty' },
+      { type: TypePropertyEnum.ChallengeListModel,        labelKey: 'challengeList' },
+      { type: TypePropertyEnum.SdgListModel,              labelKey: 'sdgList' },
     ];
 
     const buildMenu = (target: PropertyTarget): MenuItem[] =>
@@ -361,15 +408,24 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
   }
 
   private updateCardPropertyMenu(): void {
-    const selectedKey: string = this.selectedTab?.key;
-    const showAddProperty: boolean = selectedKey === 'relevance' || selectedKey === 'viability';
+    this.cardProperties.showCreateNemElementButton = false;
+    this.cardProperties.createNewElementMenuItems = undefined;
+  }
 
-    this.cardProperties.showCreateNemElementButton = showAddProperty;
-    this.cardProperties.createNewElementMenuItems = selectedKey === 'relevance'
-      ? this.menuRelevanceProperties
-      : selectedKey === 'viability'
-        ? this.menuViabilityProperties
-        : undefined;
+  private loadCriteriaGuides(idOffice: number): void {
+    this.criteriaGuides = this.preprojectCriteriaConfigService.getCriteria(idOffice)
+      .filter((criterion: PreprojectCriterion) => criterion.active !== false)
+      .sort((first: PreprojectCriterion, second: PreprojectCriterion) => first.position - second.position);
+
+    this.tabs = [
+      { key: 'properties', menu: 'properties' },
+      ...this.criteriaGuides.map((criterion: PreprojectCriterion) => ({
+        key: `criterion-${criterion.id}`,
+        menu: criterion.name
+      })),
+      { key: 'evaluation', menu: 'evaluation' }
+    ];
+    this.tabsVersion += 1;
   }
 
   private async initBreadcrumb(): Promise<void> {
@@ -382,6 +438,7 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
 
       if (plan) {
         this.evaluationOperation = this.preprojectEvaluationConfigService.getOperation(plan.idOffice);
+        this.loadCriteriaGuides(plan.idOffice);
         const office = await this.officeService.getCurrentOffice(plan.idOffice);
         this.officeService.nextIDOffice(plan.idOffice);
 

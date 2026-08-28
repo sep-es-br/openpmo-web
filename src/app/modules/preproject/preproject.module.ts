@@ -9,9 +9,18 @@ import { PreprojectToolbarComponent } from './preproject-toolbar/preproject-tool
 import { CoreModule } from 'src/app/core/core.module';
 import { PreprojectFormComponent } from './preproject-form/preproject-form.component';
 import { PreprojectDeliveryComponent } from './preproject-delivery/preproject-delivery.component';
+import { PreprojectCriteriaGuideComponent } from './preproject-criteria-guide/preproject-criteria-guide.component';
+import { PreprojectCriteriaGroupComponent } from './preproject-criteria-group/preproject-criteria-group.component';
 
 @NgModule({
-  declarations: [PreprojectComponent, PreprojectToolbarComponent, PreprojectFormComponent, PreprojectDeliveryComponent],
+  declarations: [
+    PreprojectComponent,
+    PreprojectToolbarComponent,
+    PreprojectFormComponent,
+    PreprojectDeliveryComponent,
+    PreprojectCriteriaGuideComponent,
+    PreprojectCriteriaGroupComponent
+  ],
   imports: [
     CommonModule,
     FormsModule,

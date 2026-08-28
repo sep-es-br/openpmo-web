@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, EventEmitter, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { MenuItem, SelectItem } from 'primeng/api';
@@ -17,6 +17,7 @@ import {
 } from 'src/app/shared/services/preproject-evaluation-config.service';
 import { ResponsiveService } from 'src/app/shared/services/responsive.service';
 import { PreprojectCriteriaConfigService } from 'src/app/shared/services/preproject-criteria-config.service';
+import { PreprojectActivationConfigService } from 'src/app/shared/services/preproject-activation-config.service';
 
 @Component({
   selector: 'app-preproject-selection',
@@ -24,6 +25,16 @@ import { PreprojectCriteriaConfigService } from 'src/app/shared/services/preproj
   styleUrls: ['./preproject-selection.component.scss']
 })
 export class PreprojectSelectionComponent implements OnInit, OnDestroy {
+
+  readonly activationCardProperties: ICard = {
+    cardTitle: 'configuration',
+    collapseble: false,
+    toggleable: true,
+    toggleLabel: 'enablePreprojectSelection',
+    initialStateCollapse: false,
+    initialStateToggle: false,
+    onToggle: new EventEmitter<boolean>()
+  };
 
   readonly cardProperties: ICard = {
     cardTitle: 'criteria',
@@ -59,6 +70,8 @@ export class PreprojectSelectionComponent implements OnInit, OnDestroy {
 
   evaluationOperations: SelectItem[] = [];
 
+  preprojectSelectionEnabled: boolean = false;
+
 
   private readonly destroy$ = new Subject<void>();
 
@@ -67,6 +80,7 @@ export class PreprojectSelectionComponent implements OnInit, OnDestroy {
     private readonly breadcrumbService: BreadcrumbService,
     private readonly configDataViewService: ConfigDataViewService,
     private readonly criteriaConfigService: PreprojectCriteriaConfigService,
+    private readonly activationConfigService: PreprojectActivationConfigService,
     private readonly officeService: OfficeService,
     private readonly preprojectEvaluationConfigService: PreprojectEvaluationConfigService,
     private readonly responsiveService: ResponsiveService,
@@ -84,11 +98,17 @@ export class PreprojectSelectionComponent implements OnInit, OnDestroy {
     this.responsiveService.observable
       .pipe(takeUntil(this.destroy$))
       .subscribe(responsive => this.responsive = responsive);
+
+    this.activationCardProperties.onToggle
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(enabled => this.saveActivation(enabled));
   }
 
   async ngOnInit(): Promise<void> {
     this.idOffice = Number(this.activeRoute.snapshot.queryParamMap.get('idOffice'));
     this.office = await this.officeService.getCurrentOffice(this.idOffice);
+    this.preprojectSelectionEnabled = this.activationConfigService.isEnabled(this.idOffice);
+    this.activationCardProperties.initialStateToggle = this.preprojectSelectionEnabled;
     this.evaluationOperations = [
       { label: this.translateService.instant('average'), value: 'AVERAGE' },
       { label: this.translateService.instant('sum'), value: 'SUM' }
@@ -108,6 +128,11 @@ export class PreprojectSelectionComponent implements OnInit, OnDestroy {
     this.preprojectEvaluationConfigService.saveOperation(this.idOffice, operation);
   }
 
+  private saveActivation(enabled: boolean): void {
+    this.preprojectSelectionEnabled = enabled;
+    this.activationConfigService.save(this.idOffice, enabled);
+  }
+
   private loadCriteria(): void {
     const criteria = this.criteriaConfigService.getCriteria(this.idOffice).map(criterion => ({
       typeCardItem: 'listItem',
@@ -116,6 +141,9 @@ export class PreprojectSelectionComponent implements OnInit, OnDestroy {
       nameCardItem: criterion.name,
       fullNameCardItem: criterion.name,
       itemId: criterion.id,
+      idAtributeName: 'criterionId',
+      urlCard: '/preproject-selection/criteria/edit',
+      paramsUrlCard: [{ name: 'idOffice', value: this.idOffice }],
       menuItems: [
         {
           label: this.translateService.instant('delete'),

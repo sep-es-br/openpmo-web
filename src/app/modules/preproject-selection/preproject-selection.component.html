@@ -7,6 +7,11 @@
     </app-config-data-view-panel>
   </div>
 
+  <app-card [properties]="activationCardProperties" class="mt-0 activation-card">
+  </app-card>
+
+  <div class="preproject-config-section" [class.preproject-config-disabled]="!preprojectSelectionEnabled"
+    [attr.aria-disabled]="!preprojectSelectionEnabled" [attr.inert]="!preprojectSelectionEnabled ? '' : null">
   <app-card [properties]="cardProperties" class="mt-0 preproject-selection-card">
     <p-dataView
       [value]="criteriaCardItems"
@@ -54,6 +59,7 @@
           [options]="evaluationOperations"
           [(ngModel)]="selectedEvaluationOperation"
           dropdownIcon="fas fa-caret-down"
+          [disabled]="!preprojectSelectionEnabled"
           (ngModelChange)="saveEvaluationOperation($event)"
         ></p-dropdown>
         <label class="app-input-label" for="preproject-evaluation-operation">
@@ -62,4 +68,5 @@
       </span>
     </div>
   </app-card>
+  </div>
 </div>

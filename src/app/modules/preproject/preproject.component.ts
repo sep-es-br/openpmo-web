@@ -170,7 +170,7 @@ export class PreprojectComponent implements OnInit, OnDestroy {
     const createPreprojectMenuItems: MenuItem[] = [
       {
         label: this.translateService.instant('new'),
-        icon: 'assets/svg/icons.svg#preproject',
+        icon: 'preproject-menu-icon',
         command: () => this.handleCreatePreproject()
       },
       {

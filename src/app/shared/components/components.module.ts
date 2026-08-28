@@ -42,6 +42,8 @@ import { CardListComponent } from './card-list/card-list.component';
 import { SearchItemCardComponent } from './search-item-card/search-item-card.component';
 import { CardSharingIndicatorsComponent } from './card-sharing-indicators/card-sharing-indicators.component';
 import { EditableCardItemComponent } from './editable-card-item/editable-card-item.component';
+import { PossibleValuesEditorComponent } from './possible-values-editor/possible-values-editor.component';
+import { PropertyListSelectionComponent } from './property-list-selection/property-list-selection.component';
 
 @NgModule({
   declarations: [
@@ -83,7 +85,9 @@ import { EditableCardItemComponent } from './editable-card-item/editable-card-it
     CardListComponent,
     SearchItemCardComponent,
     CardSharingIndicatorsComponent,
-    EditableCardItemComponent
+    EditableCardItemComponent,
+    PossibleValuesEditorComponent,
+    PropertyListSelectionComponent
   ],
   imports: [
     CommonModule,
@@ -121,7 +125,9 @@ import { EditableCardItemComponent } from './editable-card-item/editable-card-it
     CardJournalInformationComponent,
     SearchItemCardComponent,
     CardSharingIndicatorsComponent,
-    EditableCardItemComponent
+    EditableCardItemComponent,
+    PossibleValuesEditorComponent,
+    PropertyListSelectionComponent
   ]
 })
 export class ComponentsModule { }

@@ -1,0 +1,38 @@
+.property-list-selection {
+  width: 100%;
+}
+
+.property-list-title {
+  color: #005b7a;
+  margin-bottom: .75rem;
+}
+
+.property-list-dataview {
+  display: block;
+  width: 100%;
+}
+
+.property-list-card {
+  min-height: 0;
+}
+
+:host ::ng-deep {
+  .property-list-dataview:not(.list-mode) .p-dataview-content {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 260px));
+    gap: 1rem;
+    justify-content: start;
+  }
+
+  .property-list-dataview:not(.list-mode) .property-list-card,
+  .property-list-dataview:not(.list-mode) .app-card-item,
+  .property-list-dataview:not(.list-mode) .new-carditem {
+    width: 260px;
+  }
+
+  .property-list-dataview.list-mode .property-list-card,
+  .property-list-dataview.list-mode .app-card-item,
+  .property-list-dataview.list-mode .new-carditem {
+    width: 100%;
+  }
+}

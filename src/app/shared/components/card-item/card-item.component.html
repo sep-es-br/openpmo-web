@@ -511,12 +511,12 @@
   </p-card>
 
   <p-card *ngSwitchCase="'newCardItem'" class="new-carditem"
-    (click)="properties.urlCard && navigateToPage(properties.urlCard, properties.paramsUrlCard)"
+    (click)="handleNewItemClick()"
     [ngStyle]="{ cursor: 'auto' }"
     [class.mobile]="responsive" [class.cardList]="displayModeCard === 'list'" [class.new-card-item-mobile]="responsive">
     <div class="carditem-content">
       <i [ngClass]="[ 'app-icon', properties.icon, 'light-grey-icon']"
-        (click)="$event.stopPropagation(); properties.iconMenuItems ? menuIcon.toggle($event) : properties.urlCard && navigateToPage(properties.urlCard, properties.paramsUrlCard)"
+        (click)="$event.stopPropagation(); properties.iconMenuItems ? menuIcon.toggle($event) : handleNewItemClick()"
         [ngStyle]="{ fontSize: (responsive ? 2 : (displayModeCard === 'list') ? 2 : 2.2) + 'rem', cursor: 'pointer' }" [class.card-link]="properties.iconMenuItems"></i>
       <p-tieredMenu #menuIcon [popup]="true" [model]="properties.iconMenuItems"></p-tieredMenu>
     </div>

@@ -53,6 +53,11 @@ const routes: Routes = [
     component: PreprojectCriterionFormComponent
   },
   {
+    path: 'preproject-selection/criteria/edit',
+    canActivate: [ AuthGuard ],
+    component: PreprojectCriterionFormComponent
+  },
+  {
     path: 'preproject-selection',
     canActivate: [ AuthGuard ],
     component: PreprojectSelectionComponent

@@ -11,6 +11,7 @@ import { TypePropertModelEnum as TypePropertyModelEnum}  from 'src/app/shared/en
 import * as moment from 'moment';
 import { SelectItem, TreeNode } from 'primeng/api';
 import { TypeOrganization } from '../../enums/TypeOrganization';
+import { IPossibleValueOption } from '../../interfaces/IPossibleValueOption';
 
 @Component({
   selector: 'app-property-model',
@@ -22,6 +23,7 @@ export class PropertyModelComponent implements OnDestroy, OnChanges, AfterViewIn
   @ViewChild(Calendar) calendarComponent: Calendar;
   @Input() property: IWorkpackModelProperty;
   @Input() integrationSectorOptions: SelectItem[] = [];
+  @Input() scoredPossibleValues = false;
   @Output() delete = new EventEmitter();
   @Output() changed = new EventEmitter();
   IconsEnum = IconPropertyWorkpackModelEnum;
@@ -142,6 +144,15 @@ loadSectorOptions() {
     } else if (!isArray && this.property.defaultValue === value.trim()) {
       this.property.defaultValue = '';
     }
+  }
+
+  handlePossibleValuesChange(values: IPossibleValueOption[]): void {
+    this.property.possibleValuesDetails = values;
+    this.property.possibleValuesOptions = values
+      .map(item => item.label && item.label.trim())
+      .filter(label => !!label);
+    this.checkDefaultValue();
+    this.changed.emit({ property: this.property, possibleValuesChanged: true });
   }
 
   isProtected(value: string): boolean { 

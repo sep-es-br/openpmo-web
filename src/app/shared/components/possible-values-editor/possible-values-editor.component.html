@@ -1,0 +1,60 @@
+<div class="possible-values-trigger">
+  <span>
+    {{ values?.length || 0 }}
+    {{ ((values?.length || 0) === 1 ? 'valueConfigured' : 'valuesConfigured') | translate }}
+  </span>
+  <button type="button" pButton icon="fa fa-plus" class="p-button-sm possible-values-add-button"
+    [disabled]="disabled" (click)="open()"></button>
+</div>
+
+<p-dialog [(visible)]="displayModal" [modal]="true" [dismissableMask]="false" [closeOnEscape]="true"
+  [style]="{ width: '620px' }" [baseZIndex]="10000" styleClass="possible-values-dialog">
+  <p-header>
+    <div class="possible-values-dialog-title">{{ 'possibleValues' | translate }}</div>
+    <div class="possible-values-dialog-subtitle">{{ 'possibleValuesDescription' | translate }}</div>
+  </p-header>
+
+  <p-table [value]="editableValues" styleClass="possible-values-table"
+    (onRowReorder)="handleRowReorder()">
+    <ng-template pTemplate="header">
+      <tr>
+        <th class="reorder-column"></th>
+        <th>{{ 'optionLabel' | translate | uppercase }}</th>
+        <th>{{ 'value' | translate | uppercase }}</th>
+        <th class="actions-column">{{ 'actions' | translate | uppercase }}</th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-option let-index="rowIndex">
+      <tr [pReorderableRow]="index">
+        <td class="reorder-column">
+          <i class="fas fa-grip-vertical reorder-handle" [pReorderableRowHandle]="index"></i>
+        </td>
+        <td>
+          <input class="app-input-text" type="text" pInputText [(ngModel)]="option.label"
+            (blur)="commitValueChange()" />
+        </td>
+        <td>
+          <p-inputNumber inputStyleClass="app-input-text" [(ngModel)]="option.value"
+            (onBlur)="commitValueChange()"></p-inputNumber>
+        </td>
+        <td class="actions-column">
+          <button type="button" class="delete-value-button" [attr.aria-label]="'delete' | translate"
+            (click)="removeValue(index)">
+            <i class="fas fa-trash-alt"></i>
+          </button>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+
+  <button type="button" class="add-value-link" (click)="addValue()">
+    <i class="fa fa-plus"></i>
+    {{ 'addValue' | translate }}
+  </button>
+
+  <p-footer>
+    <span>{{ editableValues.length }} {{ 'values' | translate }}</span>
+    <span class="automatic-save-message">{{ 'changesSavedAutomatically' | translate }}</span>
+  </p-footer>
+</p-dialog>

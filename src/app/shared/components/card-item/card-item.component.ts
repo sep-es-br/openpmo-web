@@ -95,4 +95,15 @@ export class CardItemComponent implements OnInit {
   async handleLoadPermission() {
     await this.properties.onClick();
   }
+
+  handleNewItemClick(): void {
+    if (this.properties.onClick) {
+      this.properties.onClick();
+      return;
+    }
+
+    if (this.properties.urlCard) {
+      this.navigateToPage(this.properties.urlCard, this.properties.paramsUrlCard);
+    }
+  }
 }

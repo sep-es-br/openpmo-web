@@ -1,0 +1,29 @@
+<section class="property-list-selection">
+  <div class="property-list-title" *ngIf="label">{{ label }}</div>
+
+  <p-dataView
+    *ngIf="displayMode !== 'list'"
+    [value]="cardItems"
+    layout="grid"
+    class="app-dataview property-list-dataview"
+  >
+    <ng-template let-cardItem pTemplate="gridItem">
+      <div class="p-col-12 p-sm-12 p-md-4 p-lg-3 property-list-card">
+        <app-card-item [properties]="cardItem" displayModeCard="grid"></app-card-item>
+      </div>
+    </ng-template>
+  </p-dataView>
+
+  <p-dataView
+    *ngIf="displayMode === 'list'"
+    [value]="cardItems"
+    layout="list"
+    class="app-dataview app-dataview-list property-list-dataview list-mode"
+  >
+    <ng-template let-cardItem pTemplate="listItem">
+      <div class="p-col-12 property-list-card">
+        <app-card-item [properties]="cardItem" displayModeCard="list"></app-card-item>
+      </div>
+    </ng-template>
+  </p-dataView>
+</section>

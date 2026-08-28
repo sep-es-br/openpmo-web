@@ -1,0 +1,102 @@
+.preproject-criteria-group-card {
+  display: block;
+}
+
+.group-legend {
+  color: #6f7f88;
+  font-size: .875rem;
+  font-style: italic;
+  margin-bottom: 1rem;
+}
+
+.group-properties {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+
+  .property-container {
+    box-sizing: border-box;
+    margin-bottom: 1rem;
+  }
+
+  .fullLine {
+    width: 100%;
+  }
+
+  .not-fullLine {
+    width: 50%;
+
+    &:nth-child(odd) {
+      padding-right: .5rem;
+    }
+
+    &:nth-child(even) {
+      padding-left: .5rem;
+    }
+  }
+
+}
+
+.group-properties > app-property-list-selection {
+  width: 100%;
+  margin-right: 0;
+}
+
+.group-disabled {
+  opacity: .65;
+}
+
+:host ::ng-deep .group-properties {
+  app-property-selection .p-float-label {
+    display: flex;
+    flex-direction: column-reverse;
+    align-items: flex-start;
+
+    > .app-input-label {
+      display: flex;
+      position: static !important;
+      align-items: center;
+      width: 100%;
+      margin: 0 0 .35rem;
+      color: #6f7f88;
+      font-style: normal;
+      line-height: 1rem;
+      transform: none !important;
+
+      .fa-question-circle {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin-left: .35rem;
+        line-height: 1;
+      }
+    }
+
+  }
+
+  app-property-selection .workpack-selection-not-fullLine > .app-single-selection {
+    width: 25%;
+  }
+
+  app-property-selection .workpack-selection-not-fullLine > .app-single-selection .p-dropdown {
+    width: 100%;
+    max-width: 100%;
+  }
+}
+
+@media screen and (max-width: 800px) {
+  .group-properties {
+    flex-direction: column;
+
+    .property-container {
+      padding-right: 0;
+      width: 100%;
+    }
+  }
+
+  :host ::ng-deep .group-properties {
+    app-property-selection .workpack-selection-not-fullLine > .app-single-selection {
+      width: 100%;
+    }
+  }
+}

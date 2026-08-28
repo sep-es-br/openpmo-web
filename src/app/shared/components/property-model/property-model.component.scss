@@ -100,11 +100,35 @@
         }
       }
 
+      .possible-values-field {
+        app-possible-values-editor {
+          display: block;
+        }
+      }
+
       > span:not(:last-of-type) {
         margin-right: 1em;
       }
     }
   }
+
+  &.scored-values .p-toggleable-content .p-panel-content .model-property {
+    > .p-float-label > label {
+      top: 0 !important;
+      white-space: nowrap;
+    }
+
+    > .default-selection-field {
+      min-width: 150px;
+    }
+
+    > .property-checkbox,
+    > .p-field-checkbox {
+      min-height: 32px;
+      align-items: center;
+    }
+  }
+
   .p-toggleable-content {
     display: none;
   }

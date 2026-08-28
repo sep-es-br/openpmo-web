@@ -1,5 +1,5 @@
 <p-panel
-  [styleClass]="['app-model-property', property.isCollapsed ? 'collapsed' : 'open', responsive ? 'mobile' : ''].join(' ')"
+  [styleClass]="['app-model-property', property.isCollapsed ? 'collapsed' : 'open', responsive ? 'mobile' : '', scoredPossibleValues ? 'scored-values' : ''].join(' ')"
   [toggleable]="true" [collapsed]="property.isCollapsed" (collapsedChange)="handleCollapseChanged($event)"
   expandIcon="pi pi-angle-down" collapseIcon="pi pi-angle-up">
   <p-header class="model-property-header">
@@ -48,7 +48,8 @@
           <i class="far fa-question-circle" [pTooltip]="'help.propertyModel.precision' | translate"></i>
         </label>
       </span>
-      <span class="p-float-label property-input app-input-chips p-field" *ngIf="property.type === 'SelectionModel'">
+      <span class="p-float-label property-input app-input-chips p-field"
+        *ngIf="property.type === 'SelectionModel' && !scoredPossibleValues">
         <p-chips inputStyleClass="app-input-text" [(ngModel)]="property.possibleValuesOptions" [required]="true"
           [allowDuplicate]="false" (ngModelChange)="changed.emit($event)" [disabled]="property.viewOnly" separator=","
           (onRemove)="checkIfRemovedValueIsDefault($event)"
@@ -59,6 +60,18 @@
             </span>
           </ng-template>
         </p-chips>
+        <label class="input-label">{{ 'possibleValues' | translate }} *
+          <i class="far fa-question-circle" [pTooltip]="'help.propertyModel.possibleValues' | translate"></i>
+        </label>
+      </span>
+      <span class="p-float-label property-input p-field possible-values-field"
+        *ngIf="property.type === 'SelectionModel' && scoredPossibleValues">
+        <app-possible-values-editor
+          class="p-inputwrapper-filled"
+          [values]="property.possibleValuesDetails || []"
+          [disabled]="property.viewOnly"
+          (valuesChange)="handlePossibleValuesChange($event)">
+        </app-possible-values-editor>
         <label class="input-label">{{ 'possibleValues' | translate }} *
           <i class="far fa-question-circle" [pTooltip]="'help.propertyModel.possibleValues' | translate"></i>
         </label>
@@ -134,7 +147,7 @@
             <i class="far fa-question-circle" [pTooltip]="'help.propertyModel.defaultValue' | translate"></i>
           </label>
         </span>
-        <span *ngSwitchCase="'SelectionModel'" class="p-float-label property-input p-field">
+        <span *ngSwitchCase="'SelectionModel'" class="p-float-label property-input p-field default-selection-field">
           <ng-container *ngIf="property.multipleSelection; else singleSelectionDefault">
             <p-multiSelect class="app-multiple-selection" dropdownIcon="fas fa-caret-down"
               [options]="property.possibleValuesOptions | toSelectItem" [(ngModel)]="property.defaultValue"

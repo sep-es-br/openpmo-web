@@ -1,0 +1,18 @@
+<section class="preproject-criteria-guide">
+  <app-preproject-criteria-group
+    *ngIf="directPropertiesGroup"
+    [group]="directPropertiesGroup"
+    [showCardTitle]="false"
+    [displayMode]="displayMode"
+    (changed)="changed.emit()"
+    (listAddRequested)="listAddRequested.emit($event)">
+  </app-preproject-criteria-group>
+
+  <app-preproject-criteria-group
+    *ngFor="let group of groups"
+    [group]="group"
+    [displayMode]="displayMode"
+    (changed)="changed.emit()"
+    (listAddRequested)="listAddRequested.emit($event)">
+  </app-preproject-criteria-group>
+</section>

@@ -1090,3 +1090,11 @@ app-root p-toast .p-toast {
     content: "\e95f";
   }
 }
+
+.preproject-menu-icon {
+  width: 1rem;
+  height: 1rem;
+  background-color: #8d989f;
+  -webkit-mask: url('assets/svg/anteprojeto-branco.svg') center / contain no-repeat;
+  mask: url('assets/svg/anteprojeto-branco.svg') center / contain no-repeat;
+}

@@ -1,28 +1,13 @@
 import { Injectable } from '@angular/core';
+import {
+  CriteriaGroupModel,
+  CriteriaOperation,
+  CriteriaTabModel
+} from '../interfaces/IPreprojectCriteriaModel';
 
-export type PreprojectCriterionOperation = 'AVERAGE' | 'SUM';
-
-export interface PreprojectCriterionGroup {
-  title: string;
-  sortIndex: number;
-  weight: number;
-  operation: PreprojectCriterionOperation;
-  enablementKey: boolean;
-  disabledValue: string;
-  legend: string;
-  properties: string[];
-}
-
-export interface PreprojectCriterion {
-  id: number;
-  name: string;
-  position: number;
-  icon: string;
-  weight: number;
-  operation: PreprojectCriterionOperation;
-  properties?: string[];
-  groups?: PreprojectCriterionGroup[];
-}
+export type PreprojectCriterionOperation = CriteriaOperation;
+export type PreprojectCriterionGroup = CriteriaGroupModel;
+export type PreprojectCriterion = CriteriaTabModel;
 
 @Injectable({ providedIn: 'root' })
 export class PreprojectCriteriaConfigService {
@@ -37,7 +22,7 @@ export class PreprojectCriteriaConfigService {
     }
 
     try {
-      return JSON.parse(storedCriteria) as PreprojectCriterion[];
+      return this.normalizeCriteria(JSON.parse(storedCriteria) as Partial<PreprojectCriterion>[]);
     } catch {
       return [this.getDefaultCriterion()];
     }
@@ -63,8 +48,49 @@ export class PreprojectCriteriaConfigService {
     return `${this.storageKeyPrefix}.${idOffice}`;
   }
 
+  getCriterion(idOffice: number, criterionId: number): PreprojectCriterion | undefined {
+    return this.getCriteria(idOffice).find(criterion => criterion.id === criterionId);
+  }
+
+  updateCriterion(
+    idOffice: number,
+    criterionId: number,
+    criterion: Omit<PreprojectCriterion, 'id'>
+  ): PreprojectCriterion {
+    const updatedCriterion: PreprojectCriterion = {
+      ...criterion,
+      propertyModelType: 'CriteriaTabModel',
+      id: criterionId
+    };
+    const criteria = this.getCriteria(idOffice)
+      .map(item => item.id === criterionId ? updatedCriterion : item);
+
+    localStorage.setItem(this.getStorageKey(idOffice), JSON.stringify(criteria));
+    return updatedCriterion;
+  }
+
+  private normalizeCriteria(criteria: Partial<PreprojectCriterion>[]): PreprojectCriterion[] {
+    return (criteria || []).map((criterion: Partial<PreprojectCriterion>, index: number) => ({
+      propertyModelType: 'CriteriaTabModel',
+      id: criterion.id || index + 1,
+      name: criterion.name || '',
+      active: criterion.active !== false,
+      position: criterion.position || index + 1,
+      icon: criterion.icon || 'fas fa-cog',
+      weight: criterion.weight || 1,
+      operation: criterion.operation || 'SUM',
+      properties: criterion.properties || [],
+      groups: (criterion.groups || []).map((group: CriteriaGroupModel) => ({
+        ...group,
+        propertyModelType: 'CriteriaGroupModel',
+        properties: group.properties || []
+      }))
+    }));
+  }
+
   private getDefaultCriterion(): PreprojectCriterion {
     return {
+      propertyModelType: 'CriteriaTabModel',
       id: 3,
       name: 'Inglês',
       position: 1,

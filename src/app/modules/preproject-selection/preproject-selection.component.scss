@@ -17,6 +17,24 @@
   margin-top: 1rem !important;
 }
 
+.activation-card {
+  display: block;
+  margin-bottom: 1rem;
+}
+
+.preproject-config-section {
+  transition: opacity .2s ease;
+}
+
+.preproject-config-disabled {
+  opacity: .5;
+  pointer-events: none;
+}
+
+:host ::ng-deep .activation-card .p-panel-content {
+  display: none;
+}
+
 .evaluation-operation {
   padding: 1.25rem 0 .75rem;
 }

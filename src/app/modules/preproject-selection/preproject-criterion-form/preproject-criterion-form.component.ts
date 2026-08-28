@@ -22,6 +22,7 @@ import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
 import { ConfigDataViewService } from 'src/app/shared/services/config-dataview.service';
 import {
   PreprojectCriteriaConfigService,
+  PreprojectCriterion,
   PreprojectCriterionOperation
 } from 'src/app/shared/services/preproject-criteria-config.service';
 import { OfficeService } from 'src/app/shared/services/office.service';
@@ -67,6 +68,8 @@ export class PreprojectCriterionFormComponent implements OnInit, OnDestroy {
 
   idOffice: number;
 
+  criterionId: number | null = null;
+
   office: IOffice;
 
   isLoading: boolean = false;
@@ -91,7 +94,7 @@ export class PreprojectCriterionFormComponent implements OnInit, OnDestroy {
   ) {
     this.form = this.formBuilder.group({
       name: ['', [Validators.required, Validators.maxLength(50)]],
-      position: [1, [Validators.required, Validators.min(1)]],
+      position: [2, [Validators.required, Validators.min(2)]],
       icon: ['fas fa-cog', Validators.required],
       weight: [1, [Validators.required, Validators.min(1)]],
       operation: ['SUM' as PreprojectCriterionOperation, Validators.required],
@@ -102,8 +105,11 @@ export class PreprojectCriterionFormComponent implements OnInit, OnDestroy {
 
   async ngOnInit(): Promise<void> {
     this.idOffice = Number(this.activeRoute.snapshot.queryParamMap.get('idOffice'));
+    const criterionId: number = Number(this.activeRoute.snapshot.queryParamMap.get('criterionId'));
+    this.criterionId = Number.isFinite(criterionId) && criterionId > 0 ? criterionId : null;
     this.office = await this.officeService.getCurrentOffice(this.idOffice);
     this.loadTranslatedOptions();
+    this.loadCriterionForEditing();
     this.setBreadcrumb();
 
     this.translateService.onLangChange
@@ -126,7 +132,11 @@ export class PreprojectCriterionFormComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.criteriaConfigService.addCriterion(this.idOffice, this.form.value);
+    if (this.criterionId) {
+      this.criteriaConfigService.updateCriterion(this.idOffice, this.criterionId, this.form.value);
+    } else {
+      this.criteriaConfigService.addCriterion(this.idOffice, this.form.value);
+    }
     this.back();
   }
 
@@ -170,6 +180,8 @@ export class PreprojectCriterionFormComponent implements OnInit, OnDestroy {
     if (event?.property) {
       this.rootProperties = [...this.rootProperties];
       this.groupProperties = this.groupProperties.map((group: IWorkpackModelProperty[]) => [...group]);
+      this.form.markAsDirty();
+      this.form.updateValueAndValidity();
     }
   }
 
@@ -223,6 +235,50 @@ export class PreprojectCriterionFormComponent implements OnInit, OnDestroy {
       .map((_: MenuItem[], groupIndex: number) => this.createPropertyMenuItems(groupIndex));
   }
 
+  private loadCriterionForEditing(): void {
+    if (!this.criterionId) {
+      return;
+    }
+
+    const criterion: PreprojectCriterion | undefined =
+      this.criteriaConfigService.getCriterion(this.idOffice, this.criterionId);
+    if (!criterion) {
+      return;
+    }
+
+    this.form.patchValue({
+      name: criterion.name,
+      position: criterion.position,
+      icon: criterion.icon,
+      weight: criterion.weight,
+      operation: criterion.operation
+    });
+
+    const rootPropertiesForm: FormArray = this.form.get('properties') as FormArray;
+    rootPropertiesForm.clear();
+    this.rootProperties = (criterion.properties || []).map(property => ({ ...property }));
+    this.rootProperties.forEach(property => rootPropertiesForm.push(this.formBuilder.control(property)));
+
+    this.groups.clear();
+    this.groupProperties = [];
+    this.groupPropertyMenuItems = [];
+    (criterion.groups || []).forEach(group => {
+      const properties = (group.properties || []).map(property => ({ ...property }));
+      this.groups.push(this.formBuilder.group({
+        title: [group.title, Validators.required],
+        sortIndex: [group.sortIndex, [Validators.required, Validators.min(1)]],
+        weight: [group.weight, [Validators.required, Validators.min(1)]],
+        operation: [group.operation, Validators.required],
+        enablementKey: [group.enablementKey],
+        disabledValue: [group.disabledValue],
+        legend: [group.legend],
+        properties: this.formBuilder.array(properties.map(property => this.formBuilder.control(property)))
+      }));
+      this.groupProperties.push(properties);
+      this.groupPropertyMenuItems.push(this.createPropertyMenuItems(this.groups.length - 1));
+    });
+  }
+
   private updateCardsCollapseStatus(collapsed: boolean): void {
     this.cardProperties = {
       ...this.cardProperties,
@@ -246,8 +302,8 @@ export class PreprojectCriterionFormComponent implements OnInit, OnDestroy {
       TypePropertModelEnum.TextModel,
       TypePropertModelEnum.TextAreaModel,
       TypePropertModelEnum.UnitSelectionModel,
-      'ChallengeListModel',
-      'SdgListModel',
+      TypePropertModelEnum.ChallengeListModel,
+      TypePropertModelEnum.SdgListModel,
       TypePropertModelEnum.ToggleModel
     ];
 
@@ -269,11 +325,11 @@ export class PreprojectCriterionFormComponent implements OnInit, OnDestroy {
 
     if (groupIndex === undefined) {
       this.rootProperties = [...this.rootProperties, newProperty];
-      (this.form.get('properties') as FormArray).push(this.formBuilder.control(type));
+      (this.form.get('properties') as FormArray).push(this.formBuilder.control(newProperty));
     } else {
       this.groupProperties[groupIndex] = [...this.groupProperties[groupIndex], newProperty];
       const group: FormGroup = this.groups.at(groupIndex) as FormGroup;
-      (group.get('properties') as FormArray).push(this.formBuilder.control(type));
+      (group.get('properties') as FormArray).push(this.formBuilder.control(newProperty));
     }
   }
 
@@ -348,23 +404,29 @@ export class PreprojectCriterionFormComponent implements OnInit, OnDestroy {
   }
 
   private getPropertyTypeLabel(type: string): string {
+    if (type === TypePropertModelEnum.LocalitySelectionModel) {
+      return this.translateService.instant('locality');
+    }
+    if (type === TypePropertModelEnum.UnitSelectionModel) {
+      return this.translateService.instant('unit');
+    }
     if (type === TypePropertModelEnum.SelectionModel) {
       return this.translateService.instant('multipleValueSelection');
     }
-    if (type === 'ChallengeListModel') {
+    if (type === TypePropertModelEnum.ChallengeListModel) {
       return this.translateService.instant('challengeList');
     }
-    if (type === 'SdgListModel') {
+    if (type === TypePropertModelEnum.SdgListModel) {
       return this.translateService.instant('sdgList');
     }
     return this.translateService.instant(`labels.${type}`);
   }
 
   private getPropertyTypeIcon(type: string): string {
-    if (type === 'ChallengeListModel') {
+    if (type === TypePropertModelEnum.ChallengeListModel) {
       return 'fas fa-bars';
     }
-    if (type === 'SdgListModel') {
+    if (type === TypePropertModelEnum.SdgListModel) {
       return 'fas fa-bullseye';
     }
     return IconPropertyWorkpackModelEnum[type] || 'fas fa-list';

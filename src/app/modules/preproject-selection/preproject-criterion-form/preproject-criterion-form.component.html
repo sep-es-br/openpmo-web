@@ -1,7 +1,9 @@
 <div class="app-preproject-criterion-form">
   <div class="criterion-form-header">
     <div class="app-content-header">
-      <span>{{ 'newCriteriaGuide' | translate }}</span>
+      <span>
+        {{ criterionId ? (form.controls.name.value || ('criteria' | translate)) : ('newCriteriaGuide' | translate) }}
+      </span>
     </div>
     <app-config-data-view-panel></app-config-data-view-panel>
   </div>
@@ -10,6 +12,7 @@
     <app-card-loading [isCardLoading]="isLoading"></app-card-loading>
 
     <form [formGroup]="form" class="criterion-form p-fluid">
+      <div class="criterion-properties-fields">
       <span class="p-float-label criterion-field p-field">
         <input id="criterion-name" class="app-input-text" pInputText type="text" formControlName="name" />
         <label class="app-input-label" for="criterion-name">
@@ -23,7 +26,7 @@
           inputId="criterion-position"
           class="app-input-number"
           formControlName="position"
-          [min]="1"
+          [min]="2"
           [step]="1"
         ></p-inputNumber>
         <label class="app-input-label" for="criterion-position">
@@ -92,6 +95,7 @@
           <i class="far fa-question-circle" [pTooltip]="'operation' | translate"></i>
         </label>
       </span>
+      </div>
 
       <div class="criterion-actions">
         <p-menu
@@ -121,6 +125,7 @@
       <ng-container *ngFor="let property of rootProperties; trackBy: trackByProperty">
         <app-property-model
           [property]="property"
+          [scoredPossibleValues]="true"
           (changed)="propertyChanged($event)"
           (delete)="deleteRootProperty(property)">
         </app-property-model>
@@ -231,6 +236,7 @@
       <ng-container *ngFor="let property of groupProperties[groupIndex]; trackBy: trackByProperty">
         <app-property-model
           [property]="property"
+          [scoredPossibleValues]="true"
           (changed)="propertyChanged($event)"
           (delete)="deleteGroupProperty(property, groupIndex)">
         </app-property-model>
