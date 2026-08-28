@@ -209,8 +209,9 @@ export class WorkpackPropertyService {
     property.required = propertyModel.required;
     const isProjectStatus = propertyModel.name === 'Status' &&
       this.workpackData.workpackModel?.type === TypeWorkpackModelEnum.ProjectModel;
-    const isCreatingProject = isProjectStatus && !this.workpackParams.idWorkpack;
-    property.disabled = !this.workpackSrv.getEditPermission() || isCreatingProject;
+    const isProjectWithoutApprovedBaseline = isProjectStatus &&
+      !this.workpackData.workpack?.hasApprovedBaseline;
+    property.disabled = !this.workpackSrv.getEditPermission() || isProjectWithoutApprovedBaseline;
     property.helpText = propertyModel.helpText;
     property.sortIndex = propertyModel.sortIndex;
     property.multipleSelection = propertyModel.multipleSelection;
