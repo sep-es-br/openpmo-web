@@ -477,6 +477,21 @@ $card-horizontal-space: 1rem;
     }
   }
 
+    &.cardList.expanded {
+    .p-card {
+      height: auto;
+      min-height: 50px;
+      transition: height 0.15s ease;
+
+      .p-card-body .card-item-content .role-list {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 8px 0;
+        gap: 2px;
+      }
+    }
+  }
+
   &.cardList.listPerson {
     .p-card-body {
       padding-top: 0 !important;
@@ -581,6 +596,19 @@ $card-horizontal-space: 1rem;
     }
   }
 
+}
+
+::ng-deep .roles-tooltip .p-tooltip-text {
+  white-space: pre-line;
+  text-align: left;
+  max-width: 260px;
+}
+
+::ng-deep .app-card-item.cardList.expanded .card-item-subtitle.role {
+  white-space: normal;
+  overflow: visible !important;
+  width: auto;
+  text-align: left;
 }
 
 ::ng-deep .node-disabled {
@@ -1162,4 +1190,5 @@ $card-horizontal-space: 1rem;
     visibility: hidden;
   }
 
+  
 }
