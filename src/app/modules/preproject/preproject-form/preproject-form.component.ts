@@ -910,9 +910,13 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
       {
         key: 'preproject',
         routerLink: ['/preproject'],
-        queryParams: this.idPlan ? { idPlan: this.idPlan } : undefined
+        queryParams: this.idPlan ? { idPlan: this.idPlan } : undefined,
+        info: 'preproject'
       },
-      { key: this.formTitleTranslationKey }
+      {
+        key: 'preprojectElaboration',
+        info: this.formTitleTranslationKey
+      }
     );
 
     this.breadcrumbService.setMenu(breadcrumbs);
