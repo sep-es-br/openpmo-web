@@ -13,12 +13,12 @@ import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
 import { ConfigDataViewService } from 'src/app/shared/services/config-dataview.service';
 import { OfficeService } from 'src/app/shared/services/office.service';
 import {
-  PreprojectEvaluationConfigService,
   PreprojectEvaluationOperation
 } from 'src/app/shared/services/preproject-evaluation-config.service';
 import { ResponsiveService } from 'src/app/shared/services/responsive.service';
 import { PreprojectCriteriaConfigService } from 'src/app/shared/services/preproject-criteria-config.service';
-import { PreprojectActivationConfigService } from 'src/app/shared/services/preproject-activation-config.service';
+import { IPreprojectModelConfiguration } from 'src/app/shared/interfaces/IPreprojectModelConfiguration';
+import { PreprojectModelService } from 'src/app/shared/services/preproject-model.service';
 
 @Component({
   selector: 'app-preproject-selection',
@@ -73,6 +73,8 @@ export class PreprojectSelectionComponent implements OnInit, OnDestroy {
 
   preprojectSelectionEnabled: boolean = false;
 
+  preprojectModelId: number;
+
   readonly configurationForm: FormGroup = new FormGroup({
     enabled: new FormControl(false),
     operation: new FormControl('AVERAGE')
@@ -89,9 +91,8 @@ export class PreprojectSelectionComponent implements OnInit, OnDestroy {
     private readonly breadcrumbService: BreadcrumbService,
     private readonly configDataViewService: ConfigDataViewService,
     private readonly criteriaConfigService: PreprojectCriteriaConfigService,
-    private readonly activationConfigService: PreprojectActivationConfigService,
     private readonly officeService: OfficeService,
-    private readonly preprojectEvaluationConfigService: PreprojectEvaluationConfigService,
+    private readonly preprojectModelService: PreprojectModelService,
     private readonly responsiveService: ResponsiveService,
     private readonly router: Router,
     private readonly translateService: TranslateService
@@ -116,19 +117,11 @@ export class PreprojectSelectionComponent implements OnInit, OnDestroy {
   async ngOnInit(): Promise<void> {
     this.idOffice = Number(this.activeRoute.snapshot.queryParamMap.get('idOffice'));
     this.office = await this.officeService.getCurrentOffice(this.idOffice);
-    this.preprojectSelectionEnabled = this.activationConfigService.isEnabled(this.idOffice);
-    this.activationCardProperties.initialStateToggle = this.preprojectSelectionEnabled;
     this.evaluationOperations = [
       { label: this.translateService.instant('average'), value: 'AVERAGE' },
       { label: this.translateService.instant('sum'), value: 'SUM' }
     ];
-    this.selectedEvaluationOperation = this.preprojectEvaluationConfigService.getOperation(this.idOffice);
-    this.savedPreprojectSelectionEnabled = this.preprojectSelectionEnabled;
-    this.savedEvaluationOperation = this.selectedEvaluationOperation;
-    this.configurationForm.reset({
-      enabled: this.preprojectSelectionEnabled,
-      operation: this.selectedEvaluationOperation
-    });
+    await this.loadConfiguration();
     this.loadCriteria();
     this.setBreadcrumb();
   }
@@ -144,12 +137,23 @@ export class PreprojectSelectionComponent implements OnInit, OnDestroy {
     this.configurationForm.get('operation').setValue(operation);
   }
 
-  saveConfiguration(): void {
-    this.activationConfigService.save(this.idOffice, this.preprojectSelectionEnabled);
-    this.preprojectEvaluationConfigService.saveOperation(this.idOffice, this.selectedEvaluationOperation);
-    this.savedPreprojectSelectionEnabled = this.preprojectSelectionEnabled;
-    this.savedEvaluationOperation = this.selectedEvaluationOperation;
-    this.configurationForm.markAsPristine();
+  async saveConfiguration(): Promise<void> {
+    if (!this.preprojectModelId || this.configurationForm.invalid) {
+      this.configurationForm.markAllAsTouched();
+      return;
+    }
+
+    const result = await this.preprojectModelService.updateConfiguration(
+      this.preprojectModelId,
+      {
+        active: this.preprojectSelectionEnabled,
+        operation: this.selectedEvaluationOperation
+      }
+    );
+    if (result.success && result.data) {
+      this.applyConfiguration(result.data);
+      this.configurationForm.markAsPristine();
+    }
   }
 
   undoConfiguration(): void {
@@ -170,6 +174,26 @@ export class PreprojectSelectionComponent implements OnInit, OnDestroy {
 
   private markConfigurationAsDirty(): void {
     this.configurationForm.markAsDirty();
+  }
+
+  private async loadConfiguration(): Promise<void> {
+    const result = await this.preprojectModelService.findOrCreateByOfficeId(this.idOffice);
+    if (result.success && result.data) {
+      this.applyConfiguration(result.data);
+    }
+  }
+
+  private applyConfiguration(configuration: IPreprojectModelConfiguration): void {
+    this.preprojectModelId = configuration.id;
+    this.preprojectSelectionEnabled = configuration.active;
+    this.selectedEvaluationOperation = configuration.operation || 'AVERAGE';
+    this.savedPreprojectSelectionEnabled = this.preprojectSelectionEnabled;
+    this.savedEvaluationOperation = this.selectedEvaluationOperation;
+    this.activationCardProperties.initialStateToggle = this.preprojectSelectionEnabled;
+    this.configurationForm.reset({
+      enabled: this.preprojectSelectionEnabled,
+      operation: this.selectedEvaluationOperation
+    });
   }
 
   private loadCriteria(): void {
