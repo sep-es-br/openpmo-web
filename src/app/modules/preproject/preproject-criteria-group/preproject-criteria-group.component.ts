@@ -27,6 +27,26 @@ export class PreprojectCriteriaGroupComponent implements OnInit, OnChanges, OnDe
   cardProperties: ICard;
   properties: Array<{ config: IWorkpackModelProperty; value?: PropertyTemplateModel }> = [];
 
+  get isBudgetGroup(): boolean {
+    const title: string = (this.group?.title || '')
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toUpperCase();
+    return title.includes('ORCAMENTO') || title.includes('BUDGET');
+  }
+
+  getPropertyColumnClasses(property: IWorkpackModelProperty, index: number): string[] {
+    const budgetFullLineIndexes: number[] = [2, 5, 8];
+    const fullLine: boolean = this.isBudgetGroup
+      ? budgetFullLineIndexes.includes(index)
+      : property.fullLine
+        || property.type === TypePropertModelEnum.TextAreaModel
+        || property.type === TypePropertModelEnum.GroupModel
+        || this.isListProperty(property);
+
+    return fullLine ? ['col-12'] : ['col-6'];
+  }
+
   private readonly toggleChanged: EventEmitter<boolean> = new EventEmitter<boolean>();
 
   ngOnInit(): void {
@@ -35,7 +55,9 @@ export class PreprojectCriteriaGroupComponent implements OnInit, OnChanges, OnDe
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes.group?.currentValue) {
-      this.enabled = true;
+      this.enabled = this.group.currentEnabled !== undefined
+        ? this.group.currentEnabled
+        : !this.group.enablementKey;
       this.buildCard();
       this.buildProperties();
     }
@@ -59,7 +81,13 @@ export class PreprojectCriteriaGroupComponent implements OnInit, OnChanges, OnDe
     this.changed.emit();
   }
 
-  propertyChanged(): void {
+  propertyChanged(item: { config: IWorkpackModelProperty; value?: PropertyTemplateModel }): void {
+    if (item.value) {
+      item.config.currentValue = item.value.value;
+      item.config.currentSelectedValue = item.value.selectedValue;
+      item.config.currentSelectedValues = item.value.selectedValues;
+      item.config.currentLocalitiesSelected = item.value.localitiesSelected;
+    }
     this.changed.emit();
   }
 
@@ -72,7 +100,7 @@ export class PreprojectCriteriaGroupComponent implements OnInit, OnChanges, OnDe
       toggleable: this.group.enablementKey,
       collapseOnToggle: false,
       initialStateToggle: this.enabled,
-      toggleLabel: '',
+      toggleLabel: this.group.legend || '',
       onToggle: this.toggleChanged
     };
   }
@@ -93,7 +121,10 @@ export class PreprojectCriteriaGroupComponent implements OnInit, OnChanges, OnDe
       type: this.toRuntimeType(config.type),
       disabled: !this.enabled,
       possibleValues: (config.possibleValuesOptions || []).map((value: string) => ({ label: value, value })),
-      value: config.defaultValue
+      value: config.currentValue !== undefined ? config.currentValue : config.defaultValue,
+      selectedValue: config.currentSelectedValue,
+      selectedValues: config.currentSelectedValues,
+      localitiesSelected: config.currentLocalitiesSelected
     });
     return property;
   }
@@ -117,12 +148,10 @@ export class PreprojectCriteriaGroupComponent implements OnInit, OnChanges, OnDe
 
   private handleToggle(enabled: boolean): void {
     this.enabled = enabled;
+    this.group.currentEnabled = enabled;
     this.properties.forEach(item => {
       if (item.value) {
         item.value.disabled = !enabled;
-        if (!enabled) {
-          item.value.value = this.group.disabledValue;
-        }
       }
     });
     this.changed.emit();

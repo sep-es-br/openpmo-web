@@ -40,6 +40,7 @@ export interface CriteriaGroupModel {
   weight: number;
   operation: CriteriaOperation;
   enablementKey: boolean;
+  currentEnabled?: boolean;
   disabledValue: string;
   legend: string;
   properties: CriteriaPropertyModel[];

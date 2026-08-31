@@ -40,8 +40,10 @@ $mobileMenuHeight: 90px;
     color: #ffffff;
   }
   .menu-svg-icon {
-    width: 1.75rem;
-    height: 1.75rem;
+    // width: 3rem;
+    // height: 3rem;
+    width: 2.3em;
+    height: 2.3rem;
     display: inline-block;
     vertical-align: middle;
     fill: currentColor;
@@ -84,7 +86,7 @@ $mobileMenuHeight: 90px;
       color: v.$bgMenuUser !important;
     }
   }
-  
+
   &.admin-menu {
       background-color: v.$bgMenuAdmin;
       .item {
@@ -104,15 +106,15 @@ $mobileMenuHeight: 90px;
 
   &.office-menu {
     background-color: v.$bgMenuOffice;
-  
+
     .item {
       color: #ffffff !important;
     }
-  
+
     .item.ofc-opened {
       background-color: #eeeeee;
       color: v.$bgMenuOffice;
-  
+
       .app-icon, .menu-svg-icon {
         color: v.$bgMenuOffice !important;
       }

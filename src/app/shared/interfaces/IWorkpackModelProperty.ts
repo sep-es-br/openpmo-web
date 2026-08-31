@@ -42,4 +42,10 @@ export interface IWorkpackModelProperty {
   disableMultipleSelection?: boolean;
   selectedListItems?: IPropertyListItem[];
   availableListItems?: IPropertyListItem[];
+  weight?: number;
+  itemValue?: number;
+  currentValue?: number | number[] | string | string[] | boolean | Date;
+  currentSelectedValue?: number;
+  currentSelectedValues?: number | number[];
+  currentLocalitiesSelected?: TreeNode | TreeNode[];
 }

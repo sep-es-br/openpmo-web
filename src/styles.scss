@@ -7,12 +7,28 @@
 :root {
   --font-family: v.$fontFamilyMedium !important;
 }
+
+html {
+  height: 100%;
+}
+
 body {
   font-family: v.$fontFamilyMedium;
   min-height: 100vh;
   height: 100%;
   background-color: v.$bg;
   margin: 0;
+}
+
+// O template possui sua própria área de rolagem. Impede que o conteúdo das
+// rotas crie uma segunda barra no documento, sem afetar telas fora do template.
+body:has(app-template) {
+  overflow: hidden;
+}
+
+app-root {
+  display: block;
+  min-height: 100%;
 }
 
 .p-component {

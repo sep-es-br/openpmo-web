@@ -77,7 +77,7 @@
     auto;
   align-items: start;
   column-gap: 1rem;
-  min-height: 75px;
+  min-height: 86px;
   padding-top: 0;
 }
 
@@ -214,9 +214,30 @@
 
 .criterion-properties-list {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: flex-start;
   gap: .5rem;
   padding: 1rem 0 .5rem;
+
+  app-property-model {
+    display: block;
+    max-width: 100%;
+
+    &.property-collapsed {
+      width: auto;
+    }
+
+    &.property-open {
+      flex-basis: 100%;
+      width: 100%;
+    }
+  }
+}
+
+:host ::ng-deep .criterion-properties-list app-property-model.property-open .app-model-property.p-panel {
+  display: block;
+  width: 100%;
 }
 
 .criterion-empty-state {

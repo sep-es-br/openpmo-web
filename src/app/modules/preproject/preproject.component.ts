@@ -90,6 +90,16 @@ export class PreprojectComponent implements OnInit, OnDestroy {
     // A seleção de um projeto existente será conectada na próxima etapa.
   }
 
+  handleEditPreproject(preproject: IPreprojectMockItem): void {
+    const idPlan = this.route.snapshot.queryParamMap.get('idPlan');
+    void this.router.navigate(['/preproject', 'edit'], {
+      queryParams: {
+        ...(idPlan ? { idPlan } : {}),
+        idPreproject: preproject.id
+      }
+    });
+  }
+
   private initDataViewSubscriptions(): void {
     this.configDataViewService.observableCollapsePanelsStatus
       .pipe(takeUntil(this.destroy$))
@@ -185,11 +195,11 @@ export class PreprojectComponent implements OnInit, OnDestroy {
       createNewElementMenuItems: createPreprojectMenuItems
     };
 
-    const getItemMenuItems = (): MenuItem[] => [
+    const getItemMenuItems = (preproject: IPreprojectMockItem): MenuItem[] => [
       {
         label: this.translateService.instant('edit'),
         icon: 'fas fa-pencil-alt',
-        command: () => undefined
+        command: () => this.handleEditPreproject(preproject)
       },
       {
         label: this.translateService.instant('delete'),
@@ -212,7 +222,12 @@ export class PreprojectComponent implements OnInit, OnDestroy {
       nameCardItem: preproject.name,
       fullNameCardItem: preproject.name,
       itemId: preproject.id,
-      menuItems: getItemMenuItems()
+      urlCard: '/preproject/edit',
+      idAtributeName: 'idPreproject',
+      paramsUrlCard: this.route.snapshot.queryParamMap.get('idPlan')
+        ? [{ name: 'idPlan', value: this.route.snapshot.queryParamMap.get('idPlan') }]
+        : [],
+      menuItems: getItemMenuItems(preproject)
     }));
 
     this.newPreprojectCard = {

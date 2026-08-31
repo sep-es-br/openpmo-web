@@ -1,11 +1,11 @@
 .preproject-criteria-guide {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  // gap: 1rem;
   padding: 0;
 
   > app-preproject-criteria-group + app-preproject-criteria-group {
     border-top: 1px solid #d9e1e6;
-    padding-top: 1rem;
+    // padding-top: 1rem;
   }
 }

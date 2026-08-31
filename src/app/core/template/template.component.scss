@@ -25,7 +25,9 @@ $loadingBarHeight: .3rem;
     display: flex;
     flex-direction: column;
     flex: 1;
+    min-height: 0;
     overflow-x: hidden;
+    overflow-y: auto;
     height: 100%;
     .content {
       display: flex;
@@ -46,7 +48,8 @@ $loadingBarHeight: .3rem;
     background-color: transparent;
   }
   .p-splitter-panel {
-    overflow-x: hidden;
+    min-height: 0;
+    overflow: hidden;
   }
   .splitter-moveevent {
     position: absolute;

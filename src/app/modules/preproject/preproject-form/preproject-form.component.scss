@@ -50,6 +50,38 @@
   }
 }
 
+.preproject-standard-field {
+  width: 20rem;
+  max-width: 100%;
+  margin-bottom: 2rem !important;
+}
+
+.preproject-name-field {
+  width: 30%;
+  min-width: 20rem;
+  max-width: 100%;
+  margin-bottom: 2rem !important;
+}
+
+@media screen and (max-width: 768px) {
+  .preproject-name-field {
+    width: 100%;
+    min-width: 0;
+  }
+}
+
+:host ::ng-deep .preproject-date-field .app-select-date .p-calendar {
+  width: 100%;
+}
+
+:host ::ng-deep .app-preproject-form {
+  input.ng-invalid.ng-touched,
+  p-dropdown.ng-invalid.ng-touched .p-dropdown,
+  .evaluation-plan-tree.ng-invalid .p-tree {
+    border-color: var(--op-font-error-message) !important;
+  }
+}
+
 .preproject-deliveries {
   margin-top: 1.5rem;
 }
@@ -61,14 +93,153 @@
 }
 
 .preproject-evaluation-tab {
-  display: flex;
-  align-items: center;
-  gap: .75rem;
-  padding: 1.25rem .25rem;
+  display: block;
+  padding: 1.25rem 0;
 }
 
-.evaluation-label {
+.evaluation-summary-header,
+.evaluation-criterion-header,
+.evaluation-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.preproject-selection-section {
+  margin-top: 1.5rem;
+  padding: 1.25rem 1rem 0;
+  border-top: 1px solid #d6e0e5;
+  background: transparent;
+}
+
+.preproject-selection-toggle {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  color: #14364a;
   font-weight: 600;
+}
+
+.preproject-selection-fields {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1.25rem;
+  margin-top: 1.25rem;
+
+  .p-field {
+    width: 100%;
+    margin: 0;
+  }
+
+  .app-input-label {
+    display: block;
+    margin-bottom: .4rem;
+    font-style: italic;
+  }
+
+  .app-single-selection,
+  .app-text-area {
+    width: 100%;
+  }
+}
+
+:host ::ng-deep .preproject-selection-fields {
+  .app-single-selection .p-dropdown,
+  .app-text-area {
+    width: 100%;
+  }
+}
+
+.selection-disabled {
+  opacity: .55;
+}
+
+.evaluation-plan-tree {
+  position: relative;
+  width: 100%;
+  min-height: 3.4rem;
+
+  &.disabled {
+    pointer-events: none;
+  }
+}
+
+:host ::ng-deep .evaluation-plan-tree .p-tree {
+  width: 100%;
+  background: transparent;
+}
+
+.evaluation-tree-placeholder {
+  display: block;
+  padding: .75rem;
+  color: #8ba0aa;
+}
+
+.evaluation-summary-header {
+  min-height: 3rem;
+  padding: .5rem 1rem;
+  border: 1px solid #d6e0e5;
+  border-radius: .35rem .35rem 0 0;
+  background: #f8fafb;
+}
+
+.evaluation-summary-title,
+.evaluation-criterion-header > span:first-child {
+  color: #14364a;
+  font-weight: 600;
+}
+
+.evaluation-criterion-config {
+  margin-left: .75rem;
+  color: #758b96;
+  font-weight: 400;
+  text-transform: none;
+}
+
+.evaluation-score-badge {
+  padding: .3rem .75rem;
+  border: 1px solid #d6e0e5;
+  border-radius: .3rem;
+  background: #fff;
+  color: #476778;
+  white-space: nowrap;
+
+  small {
+    color: #78909c;
+  }
+}
+
+.evaluation-criterion {
+  border-right: 1px solid #d6e0e5;
+  border-bottom: 1px solid #d6e0e5;
+  border-left: 1px solid #d6e0e5;
+}
+
+.evaluation-criterion-header {
+  width: 100%;
+  min-height: 3rem;
+  padding: .5rem 1rem;
+  border: 0;
+  background: #f8fafb;
+  cursor: pointer;
+  text-align: left;
+
+  i {
+    width: 1rem;
+    margin-right: .35rem;
+    color: #527486;
+  }
+}
+
+.evaluation-row {
+  min-height: 2.6rem;
+  padding: .5rem 1rem .5rem 4.25rem;
+  border-top: 1px solid #e4eaed;
+  color: #526f7e;
+
+  > span:last-child {
+    white-space: nowrap;
+  }
 }
 
 .preproject-delivery-list {

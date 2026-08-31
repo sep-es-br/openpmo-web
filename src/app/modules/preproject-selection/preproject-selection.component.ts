@@ -1,4 +1,5 @@
 import { Component, EventEmitter, OnDestroy, OnInit } from '@angular/core';
+import { FormControl, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { MenuItem, SelectItem } from 'primeng/api';
@@ -72,6 +73,14 @@ export class PreprojectSelectionComponent implements OnInit, OnDestroy {
 
   preprojectSelectionEnabled: boolean = false;
 
+  readonly configurationForm: FormGroup = new FormGroup({
+    enabled: new FormControl(false),
+    operation: new FormControl('AVERAGE')
+  });
+
+  private savedPreprojectSelectionEnabled: boolean = false;
+
+  private savedEvaluationOperation: PreprojectEvaluationOperation = 'AVERAGE';
 
   private readonly destroy$ = new Subject<void>();
 
@@ -101,7 +110,7 @@ export class PreprojectSelectionComponent implements OnInit, OnDestroy {
 
     this.activationCardProperties.onToggle
       .pipe(takeUntil(this.destroy$))
-      .subscribe(enabled => this.saveActivation(enabled));
+      .subscribe(enabled => this.handleActivationChange(enabled));
   }
 
   async ngOnInit(): Promise<void> {
@@ -114,6 +123,12 @@ export class PreprojectSelectionComponent implements OnInit, OnDestroy {
       { label: this.translateService.instant('sum'), value: 'SUM' }
     ];
     this.selectedEvaluationOperation = this.preprojectEvaluationConfigService.getOperation(this.idOffice);
+    this.savedPreprojectSelectionEnabled = this.preprojectSelectionEnabled;
+    this.savedEvaluationOperation = this.selectedEvaluationOperation;
+    this.configurationForm.reset({
+      enabled: this.preprojectSelectionEnabled,
+      operation: this.selectedEvaluationOperation
+    });
     this.loadCriteria();
     this.setBreadcrumb();
   }
@@ -123,14 +138,38 @@ export class PreprojectSelectionComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  saveEvaluationOperation(operation: PreprojectEvaluationOperation): void {
+  handleEvaluationOperationChange(operation: PreprojectEvaluationOperation): void {
     this.selectedEvaluationOperation = operation;
-    this.preprojectEvaluationConfigService.saveOperation(this.idOffice, operation);
+    this.markConfigurationAsDirty();
+    this.configurationForm.get('operation').setValue(operation);
   }
 
-  private saveActivation(enabled: boolean): void {
+  saveConfiguration(): void {
+    this.activationConfigService.save(this.idOffice, this.preprojectSelectionEnabled);
+    this.preprojectEvaluationConfigService.saveOperation(this.idOffice, this.selectedEvaluationOperation);
+    this.savedPreprojectSelectionEnabled = this.preprojectSelectionEnabled;
+    this.savedEvaluationOperation = this.selectedEvaluationOperation;
+    this.configurationForm.markAsPristine();
+  }
+
+  undoConfiguration(): void {
+    this.preprojectSelectionEnabled = this.savedPreprojectSelectionEnabled;
+    this.selectedEvaluationOperation = this.savedEvaluationOperation;
+    this.activationCardProperties.initialStateToggle = this.savedPreprojectSelectionEnabled;
+    this.configurationForm.reset({
+      enabled: this.savedPreprojectSelectionEnabled,
+      operation: this.savedEvaluationOperation
+    });
+  }
+
+  private handleActivationChange(enabled: boolean): void {
     this.preprojectSelectionEnabled = enabled;
-    this.activationConfigService.save(this.idOffice, enabled);
+    this.markConfigurationAsDirty();
+    this.configurationForm.get('enabled').setValue(enabled);
+  }
+
+  private markConfigurationAsDirty(): void {
+    this.configurationForm.markAsDirty();
   }
 
   private loadCriteria(): void {

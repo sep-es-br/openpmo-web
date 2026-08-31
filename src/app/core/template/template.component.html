@@ -33,7 +33,7 @@
           </div>
         </ng-template>
         <ng-template>
-          <div class="main-content" (click)="handleClickContent()">
+          <div class="main-content" (click)="handleClickContent($event)">
             <app-breadcrumb
               [isOfficeConfigMenu]="isOfficeConfigMenu"
               [isAdminMenu]="isAdminMenu">

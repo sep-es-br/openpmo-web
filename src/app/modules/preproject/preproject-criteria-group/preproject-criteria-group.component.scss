@@ -2,36 +2,30 @@
   display: block;
 }
 
-.group-legend {
-  color: #6f7f88;
-  font-size: .875rem;
-  font-style: italic;
-  margin-bottom: 1rem;
-}
-
 .group-properties {
-  display: flex;
-  flex-wrap: wrap;
   align-items: flex-start;
 
   .property-container {
     box-sizing: border-box;
+    min-width: 0;
     margin-bottom: 1rem;
-  }
 
-  .fullLine {
-    width: 100%;
+    > app-property {
+      display: block;
+      width: 100%;
+    }
   }
 
   .not-fullLine {
-    width: 50%;
-
-    &:nth-child(odd) {
-      padding-right: .5rem;
+    app-property {
+      display: block;
+      width: 100%;
     }
+  }
 
-    &:nth-child(even) {
-      padding-left: .5rem;
+  .selection-property {
+    > app-property {
+      width: 100%;
     }
   }
 
@@ -47,6 +41,21 @@
 }
 
 :host ::ng-deep .group-properties {
+  app-property .app-workpack-property,
+  app-property-selection {
+    display: block;
+    width: 100%;
+  }
+
+  .workpack-input-number .p-inputnumber,
+  .workpack-input-text .p-inputtext,
+  .workpack-unit-selection .app-single-selection .p-dropdown,
+  .workpack-organization-selection .app-single-selection .p-dropdown,
+  .workpack-selection .app-single-selection .p-dropdown,
+  .p-float-label.workpack-date .app-select-date .p-calendar {
+    width: 100%;
+  }
+
   app-property-selection .p-float-label {
     display: flex;
     flex-direction: column-reverse;
@@ -75,9 +84,26 @@
   }
 
   app-property-selection .workpack-selection-not-fullLine > .app-single-selection {
-    width: 25%;
+    display: block;
+    width: 100%;
   }
 
+  app-property-selection .workpack-selection > .app-single-selection {
+    display: block;
+    width: 100%;
+  }
+
+  app-property-selection .app-multiple-selection {
+    display: block;
+    width: 100%;
+  }
+
+  app-property-selection .app-multiple-selection .p-multiselect {
+    width: 100% !important;
+    max-width: 100%;
+  }
+
+  app-property-selection .workpack-selection > .app-single-selection .p-dropdown,
   app-property-selection .workpack-selection-not-fullLine > .app-single-selection .p-dropdown {
     width: 100%;
     max-width: 100%;
@@ -86,15 +112,24 @@
 
 @media screen and (max-width: 800px) {
   .group-properties {
-    flex-direction: column;
-
     .property-container {
       padding-right: 0;
+      flex: 0 0 100%;
+      max-width: 100%;
+      width: 100%;
+
+      app-property {
+        width: 100%;
+      }
+    }
+
+    .selection-property {
       width: 100%;
     }
   }
 
   :host ::ng-deep .group-properties {
+    app-property-selection .workpack-selection > .app-single-selection,
     app-property-selection .workpack-selection-not-fullLine > .app-single-selection {
       width: 100%;
     }

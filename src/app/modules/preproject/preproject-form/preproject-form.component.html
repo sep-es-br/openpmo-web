@@ -1,6 +1,6 @@
 <div class="app-preproject-form">
   <div class="preproject-form-header">
-    <span>{{ 'newPreproject' | translate }}</span>
+    <span>{{ formTitleTranslationKey | translate }}</span>
     <app-config-data-view-panel></app-config-data-view-panel>
   </div>
 
@@ -10,25 +10,23 @@
       <div tabviewBody *ngIf="selectedTab?.key === 'properties'">
         <form [formGroup]="form">
           <div class="p-fluid">
-            <div class="p-field">
+            <div class="p-field preproject-name-field">
               <label class="app-input-label" for="preproject-name">{{ 'name' | translate }} *</label>
               <input id="preproject-name" class="app-input-text" pInputText type="text" formControlName="name" />
-              <app-input-message [form]="form" field="name"></app-input-message>
             </div>
 
-            <div class="p-field">
+            <div class="p-field preproject-name-field">
               <label class="app-input-label" for="preproject-full-name">{{ 'fullName' | translate }} *</label>
               <input id="preproject-full-name" class="app-input-text" pInputText type="text" formControlName="fullName" />
-              <app-input-message [form]="form" field="fullName"></app-input-message>
             </div>
 
-            <div class="p-field">
-              <label class="app-input-label" for="preproject-organization">{{ 'organization' | translate }}</label>
+            <div class="p-field preproject-standard-field">
+              <label class="app-input-label" for="preproject-organization">{{ 'organization' | translate }} *</label>
               <p-dropdown id="preproject-organization" class="app-single-selection" formControlName="organization" [options]="[]"
                 dropdownIcon="fas fa-caret-down"></p-dropdown>
             </div>
 
-            <div class="p-field">
+            <div class="p-field preproject-standard-field preproject-date-field">
               <label class="app-input-label" for="preproject-expected-completion">{{ 'expectedCompletion' | translate }}</label>
               <p-calendar id="preproject-expected-completion" class="app-select-date" formControlName="expectedCompletion"
                 [showIcon]="true" icon="fas fa-calendar-alt"></p-calendar>
@@ -75,14 +73,111 @@
         <app-preproject-criteria-guide
           [guide]="selectedCriteriaGuide"
           [displayMode]="displayModeAll"
-          (changed)="form.markAsDirty()"
+          (changed)="criteriaChanged()"
           (listAddRequested)="requestListPropertyItem($event)">
         </app-preproject-criteria-guide>
       </div>
 
       <div tabviewBody *ngIf="selectedTab?.key === 'evaluation'" class="preproject-evaluation-tab">
-        <span class="evaluation-label">{{ 'operation' | translate }}</span>
-        <span class="evaluation-value">{{ evaluationOperationTranslationKey | translate }}</span>
+        <div class="evaluation-summary-header">
+          <span class="evaluation-summary-title">{{ 'evaluation' | translate }}</span>
+          <span class="evaluation-score-badge">
+            {{ 'finalProjectScore' | translate }}:
+            <strong>{{ finalEvaluationScore | number:'1.1-2' }}</strong>
+          </span>
+        </div>
+
+        <section class="evaluation-criterion" *ngFor="let criterion of criteriaGuides">
+          <button type="button" class="evaluation-criterion-header"
+            (click)="toggleEvaluationCriterion(criterion.id)">
+            <span>
+              <i class="fas"
+                [ngClass]="evaluationCollapsed[criterion.id] ? 'fa-angle-right' : 'fa-angle-down'"></i>
+              {{ 'criterionEvaluation' | translate }} {{ criterion.name | uppercase }}
+              <small class="evaluation-criterion-config">
+                {{ 'weight' | translate }}: {{ criterion.weight }} ·
+                {{ 'operation' | translate }}: {{ getCriterionOperationTranslationKey(criterion) | translate }}
+              </small>
+            </span>
+            <span class="evaluation-score-badge">
+              {{ 'total' | translate }} {{ criterion.name }}:
+              <strong>{{ getCriterionScore(criterion) | number:'1.1-2' }}</strong>
+              <small>/ {{ getCriterionMaximumScore(criterion) | number:'1.1-2' }}</small>
+            </span>
+          </button>
+
+          <div class="evaluation-criterion-rows" *ngIf="!evaluationCollapsed[criterion.id]">
+            <div class="evaluation-row" *ngFor="let row of getEvaluationRows(criterion)">
+              <span>{{ row.name }}</span>
+              <span>{{ 'score' | translate }}: <strong>{{ row.score | number:'1.1-2' }}</strong></span>
+            </div>
+          </div>
+        </section>
+
+        <section class="preproject-selection-section" [formGroup]="form">
+          <div class="preproject-selection-toggle">
+            <p-checkbox
+              inputId="select-preproject"
+              formControlName="selectPreproject"
+              [binary]="true"
+              (ngModelChange)="handlePreprojectSelectionChange($event)">
+            </p-checkbox>
+            <label for="select-preproject">{{ 'selectPreproject' | translate }}</label>
+          </div>
+
+          <div class="preproject-selection-fields" [class.selection-disabled]="!preprojectSelectionEnabled">
+            <div class="p-field">
+              <label class="app-input-label" for="evaluation-plan">
+                {{ 'availablePlans' | translate }}
+                <span *ngIf="preprojectSelectionEnabled">*</span>
+              </label>
+              <p-dropdown
+                inputId="evaluation-plan"
+                class="app-single-selection"
+                formControlName="availablePlan"
+                [options]="availablePlans"
+                [placeholder]="'select' | translate"
+                dropdownIcon="fas fa-caret-down"
+                (ngModelChange)="handleAvailablePlanChange($event)">
+              </p-dropdown>
+            </div>
+
+            <div class="p-field">
+              <label class="app-input-label">
+                {{ 'whereInPlan' | translate }}
+                <span *ngIf="preprojectSelectionEnabled">*</span>
+              </label>
+              <div class="app-tree-selection single-selection evaluation-plan-tree"
+                [class.disabled]="!preprojectSelectionEnabled"
+                [class.ng-invalid]="form.get('planPosition').invalid && form.get('planPosition').touched">
+                <p-tree
+                  [value]="planStructure"
+                  selectionMode="checkbox"
+                  [(selection)]="selectedPlanPosition"
+                  [propagateSelectionUp]="false"
+                  [propagateSelectionDown]="false"
+                  (onNodeSelect)="handlePlanPositionSelect($event)"
+                  (onNodeUnselect)="handlePlanPositionUnselect()">
+                </p-tree>
+                <span class="evaluation-tree-placeholder" *ngIf="!planStructure.length">
+                  {{ 'selectPlanFirst' | translate }}
+                </span>
+              </div>
+            </div>
+
+            <div class="p-field">
+              <label class="app-input-label" for="evaluation-notes">{{ 'observations' | translate }}</label>
+              <textarea
+                id="evaluation-notes"
+                class="app-text-area"
+                pInputTextarea
+                formControlName="evaluationNotes"
+                rows="4"
+                [placeholder]="'preprojectObservationPlaceholder' | translate">
+              </textarea>
+            </div>
+          </div>
+        </section>
       </div>
     </app-tabview-scrolled>
 

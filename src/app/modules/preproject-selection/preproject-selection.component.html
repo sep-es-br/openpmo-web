@@ -3,8 +3,6 @@
     <div class="app-content-header">
       <span>{{ 'preprojectSelection' | translate }}</span>
     </div>
-    <app-config-data-view-panel [notShowCollapseOptions]="true">
-    </app-config-data-view-panel>
   </div>
 
   <app-card [properties]="activationCardProperties" class="mt-0 activation-card">
@@ -13,6 +11,9 @@
   <div class="preproject-config-section" [class.preproject-config-disabled]="!preprojectSelectionEnabled"
     [attr.aria-disabled]="!preprojectSelectionEnabled" [attr.inert]="!preprojectSelectionEnabled ? '' : null">
   <app-card [properties]="cardProperties" class="mt-0 preproject-selection-card">
+    <app-config-data-view-panel [notShowCollapseOptions]="true">
+    </app-config-data-view-panel>
+
     <p-dataView
       [value]="criteriaCardItems"
       layout="grid"
@@ -60,7 +61,7 @@
           [(ngModel)]="selectedEvaluationOperation"
           dropdownIcon="fas fa-caret-down"
           [disabled]="!preprojectSelectionEnabled"
-          (ngModelChange)="saveEvaluationOperation($event)"
+          (ngModelChange)="handleEvaluationOperationChange($event)"
         ></p-dropdown>
         <label class="app-input-label" for="preproject-evaluation-operation">
           {{ 'operation' | translate }}
@@ -69,4 +70,9 @@
     </div>
   </app-card>
   </div>
+
+  <app-buttons-container>
+    <app-save-button [form]="configurationForm" (save)="saveConfiguration()"></app-save-button>
+    <app-cancel-button [form]="configurationForm" (cancel)="undoConfiguration()"></app-cancel-button>
+  </app-buttons-container>
 </div>

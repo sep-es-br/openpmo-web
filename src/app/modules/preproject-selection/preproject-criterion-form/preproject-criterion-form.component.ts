@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
@@ -19,6 +19,8 @@ import { IconPropertyWorkpackModelEnum } from 'src/app/shared/enums/IconProperty
 import { TypePropertModelEnum } from 'src/app/shared/enums/TypePropertModelEnum';
 import { TypeOrganization } from 'src/app/shared/enums/TypeOrganization';
 import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
+import { CancelButtonComponent } from 'src/app/shared/components/cancel-button/cancel-button.component';
+import { SaveButtonComponent } from 'src/app/shared/components/save-button/save-button.component';
 import { ConfigDataViewService } from 'src/app/shared/services/config-dataview.service';
 import {
   PreprojectCriteriaConfigService,
@@ -38,6 +40,10 @@ interface CriterionIcon {
   styleUrls: ['./preproject-criterion-form.component.scss']
 })
 export class PreprojectCriterionFormComponent implements OnInit, OnDestroy {
+
+  @ViewChild('saveButton') saveButton: SaveButtonComponent;
+
+  @ViewChild('cancelButton') cancelButton: CancelButtonComponent;
 
   cardProperties: ICard = {
     cardTitle: 'properties',
@@ -107,6 +113,7 @@ export class PreprojectCriterionFormComponent implements OnInit, OnDestroy {
     this.idOffice = Number(this.activeRoute.snapshot.queryParamMap.get('idOffice'));
     const criterionId: number = Number(this.activeRoute.snapshot.queryParamMap.get('criterionId'));
     this.criterionId = Number.isFinite(criterionId) && criterionId > 0 ? criterionId : null;
+    this.cardProperties.initialStateCollapse = !this.criterionId;
     this.office = await this.officeService.getCurrentOffice(this.idOffice);
     this.loadTranslatedOptions();
     this.loadCriterionForEditing();
@@ -166,6 +173,7 @@ export class PreprojectCriterionFormComponent implements OnInit, OnDestroy {
 
     this.groupPropertyMenuItems.push(this.createPropertyMenuItems(groupIndex));
     this.groupProperties.push([]);
+    this.markFormChanged();
   }
 
   trackByProperty(index: number): number {
@@ -180,8 +188,7 @@ export class PreprojectCriterionFormComponent implements OnInit, OnDestroy {
     if (event?.property) {
       this.rootProperties = [...this.rootProperties];
       this.groupProperties = this.groupProperties.map((group: IWorkpackModelProperty[]) => [...group]);
-      this.form.markAsDirty();
-      this.form.updateValueAndValidity();
+      this.markFormChanged();
     }
   }
 
@@ -193,6 +200,7 @@ export class PreprojectCriterionFormComponent implements OnInit, OnDestroy {
     if (index >= 0) {
       this.rootProperties = this.rootProperties.filter((p: IWorkpackModelProperty) => p !== property);
       (this.form.get('properties') as FormArray).removeAt(index);
+      this.markFormChanged();
     }
   }
 
@@ -206,6 +214,7 @@ export class PreprojectCriterionFormComponent implements OnInit, OnDestroy {
         .filter((p: IWorkpackModelProperty) => p !== property);
       const group: FormGroup = this.groups.at(groupIndex) as FormGroup;
       (group.get('properties') as FormArray).removeAt(index);
+      this.markFormChanged();
     }
   }
 
@@ -284,10 +293,6 @@ export class PreprojectCriterionFormComponent implements OnInit, OnDestroy {
       ...this.cardProperties,
       initialStateCollapse: collapsed
     };
-    this.groupCardProperties = {
-      ...this.groupCardProperties,
-      initialStateCollapse: collapsed
-    };
   }
 
   private createPropertyMenuItems(groupIndex?: number): MenuItem[] {
@@ -331,6 +336,14 @@ export class PreprojectCriterionFormComponent implements OnInit, OnDestroy {
       const group: FormGroup = this.groups.at(groupIndex) as FormGroup;
       (group.get('properties') as FormArray).push(this.formBuilder.control(newProperty));
     }
+    this.markFormChanged();
+  }
+
+  private markFormChanged(): void {
+    this.form.markAsDirty();
+    this.form.updateValueAndValidity();
+    this.saveButton?.showButton();
+    this.cancelButton?.showButton();
   }
 
   /**

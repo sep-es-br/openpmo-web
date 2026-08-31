@@ -5,7 +5,6 @@
         {{ criterionId ? (form.controls.name.value || ('criteria' | translate)) : ('newCriteriaGuide' | translate) }}
       </span>
     </div>
-    <app-config-data-view-panel></app-config-data-view-panel>
   </div>
 
   <app-card [properties]="cardProperties" class="mt-0 inputs-float-label">
@@ -125,6 +124,8 @@
       <ng-container *ngFor="let property of rootProperties; trackBy: trackByProperty">
         <app-property-model
           [property]="property"
+          [class.property-collapsed]="property.isCollapsed"
+          [class.property-open]="!property.isCollapsed"
           [scoredPossibleValues]="true"
           (changed)="propertyChanged($event)"
           (delete)="deleteRootProperty(property)">
@@ -189,12 +190,12 @@
         </label>
       </span>
 
-      <div class="enablement-key-field">
-        <p-checkbox
+      <div class="enablement-key-field" (click)="$event.stopPropagation()">
+        <p-inputSwitch
+          class="app-toggle"
           [inputId]="'criterion-group-enable-key-' + groupIndex"
           formControlName="enablementKey"
-          [binary]="true"
-        ></p-checkbox>
+        ></p-inputSwitch>
         <label [for]="'criterion-group-enable-key-' + groupIndex">{{ 'enablementKey' | translate }}</label>
         <i class="far fa-question-circle" [pTooltip]="'enablementKey' | translate"></i>
       </div>
@@ -236,6 +237,8 @@
       <ng-container *ngFor="let property of groupProperties[groupIndex]; trackBy: trackByProperty">
         <app-property-model
           [property]="property"
+          [class.property-collapsed]="property.isCollapsed"
+          [class.property-open]="!property.isCollapsed"
           [scoredPossibleValues]="true"
           (changed)="propertyChanged($event)"
           (delete)="deleteGroupProperty(property, groupIndex)">
@@ -245,7 +248,7 @@
   </app-card>
 
   <app-buttons-container>
-    <app-save-button [form]="form" (save)="save()"></app-save-button>
-    <app-cancel-button [form]="form" (cancel)="back()"></app-cancel-button>
+    <app-save-button #saveButton [form]="form" (save)="save()"></app-save-button>
+    <app-cancel-button #cancelButton [form]="form" (cancel)="back()"></app-cancel-button>
   </app-buttons-container>
 </div>

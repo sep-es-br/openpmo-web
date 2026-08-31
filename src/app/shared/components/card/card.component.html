@@ -3,7 +3,7 @@
   expandIcon="pi pi-angle-down"
   collapseIcon="pi pi-angle-up"
   #cardPanel
-  [toggleable]="!properties?.fullScreen && properties?.collapseble && (!properties.toggleable || properties.collapseOnToggle !== false && properties.initialStateToggle && properties.toggleable)"
+  [toggleable]="!properties?.fullScreen && properties?.collapseble && (!properties.toggleable || properties.collapseOnToggle === false || properties.initialStateToggle)"
   [collapsed]="properties.initialStateCollapse || (properties.collapseOnToggle !== false && !(!properties.toggleable || (properties.toggleable && properties.initialStateToggle)))"
   expandIcon="pi pi-angle-down" collapseIcon="pi pi-angle-up" [class.mobile]="responsive"
   (collapsedChange)="handleCollapsed($event)">
@@ -17,6 +17,7 @@
             properties.notShowCardTitle ? '' : (properties.cardTitle | translate) }}</span>
           <p-inputSwitch class="app-toggle" *ngIf="properties.toggleable" [disabled]="properties.disabledToggle"
             [(ngModel)]="properties.initialStateToggle"
+            (click)="$event.stopPropagation()"
             (ngModelChange)="properties.onToggle?.emit($event)">
           </p-inputSwitch>
           <label class="label-toggle" *ngIf="properties.toggleLabel">{{properties.toggleLabel|translate}}</label>

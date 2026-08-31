@@ -1,10 +1,9 @@
 <app-card [properties]="cardProperties" class="preproject-criteria-group-card">
-  <div class="group-legend" *ngIf="group.legend">{{ group.legend }}</div>
-
-  <div class="group-properties" [class.group-disabled]="!enabled">
-    <div class="property-container" *ngFor="let item of properties"
-      [class.not-fullLine]="!item.config.fullLine && item.config.type !== 'TextArea' && item.config.type !== 'Group'"
-      [class.fullLine]="item.config.fullLine || item.config.type === 'TextArea' || item.config.type === 'Group' || isListProperty(item.config)">
+  <div class="group-properties row" [class.group-disabled]="!enabled">
+    <div class="property-container" *ngFor="let item of properties; let propertyIndex = index"
+      [ngClass]="getPropertyColumnClasses(item.config, propertyIndex)"
+      [class.selection-property]="item.config.type === 'SelectionModel'"
+      [class.not-fullLine]="!item.config.fullLine && item.config.type !== 'TextArea' && item.config.type !== 'Group'">
 
       <app-property-list-selection
         *ngIf="isListProperty(item.config); else standardProperty"
@@ -21,7 +20,7 @@
         <app-property
           *ngIf="item.value"
           [property]="item.value"
-          (changed)="propertyChanged()">
+          (changed)="propertyChanged(item)">
         </app-property>
       </ng-template>
     </div>

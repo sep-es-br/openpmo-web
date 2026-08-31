@@ -14,6 +14,10 @@ const routes: Routes = [
     component: PreprojectFormComponent
   },
   {
+    path: 'edit',
+    component: PreprojectFormComponent
+  },
+  {
     path: '',
     pathMatch: 'full',
     component: PreprojectComponent
