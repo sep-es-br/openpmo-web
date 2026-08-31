@@ -151,8 +151,9 @@ export class PentahoService {
     const params = new HttpParams().set('budgetUnitCode', budgetUnitCode);
     return this.http.get<any>(`${this.baseUrl}/sigef-selections/budget-plans`, { params }).pipe(
       map(response => this.unwrapRows(response).map(item => ({
-        name: item[0],
-        code: item[1]
+        uo: item[0],
+        code: item[1],
+        name: item[2]
       }))),
       catchError(error => {
         console.error('Erro ao buscar planos orçamentários para a propriedade de PO.', error);

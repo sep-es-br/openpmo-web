@@ -17,8 +17,8 @@ export interface ICostAccount {
     limit: number;
     planed: number;
   }
-  unidadeOrcamentaria: IBudgetUnit;
-  planoOrcamentario: IBudgetPlan; 
+  unidadeOrcamentaria?: IBudgetUnit;
+  planoOrcamentario?: IBudgetPlan;
   instruments : IInstrument[];
 }
 

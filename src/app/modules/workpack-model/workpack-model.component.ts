@@ -134,7 +134,10 @@ export class WorkpackModelComponent implements OnInit {
   pluginAvailability: IPluginAvailability = {
     agreements: false,
     procurements: false,
-    obligations: false
+    obligations: false,
+    edocs: false,
+    budgetPlans: false,
+    financialSources: false
   };
 
   notificationsStakeholderRolesOptions: SelectItem[] = [];
@@ -416,13 +419,21 @@ export class WorkpackModelComponent implements OnInit {
       const result = await this.pluginAvailabilitySrv.getAvailability();
       if (result.success && result.data) {
         this.pluginAvailability = result.data;
+        this.loadMenuProperty();
+        this.modelProperties
+          .filter(prop => prop.type === TypePropertyEnum.GroupModel)
+          .forEach(group => group.menuModelProperties = this.loadMenuPropertyGroup(group));
       }
     } catch (_) {
       this.pluginAvailability = {
         agreements: false,
         procurements: false,
-        obligations: false
+        obligations: false,
+        edocs: false,
+        budgetPlans: false,
+        financialSources: false
       };
+      this.loadMenuProperty();
     }
   }
 
@@ -755,7 +766,8 @@ export class WorkpackModelComponent implements OnInit {
             if (p.possibleValues) {
               p.possibleValuesOptions = (p.possibleValues as string).split(',');
             }
-            if (p.defaultValue && p.multipleSelection) {
+            this.normalizeDynamicSelectionDefaultValue(p);
+            if (typeof p.defaultValue === 'string' && p.defaultValue && p.multipleSelection) {
               p.defaultValue = (p.defaultValue as string).split(',');
             }
             if (p.idDomain) {
@@ -798,7 +810,8 @@ export class WorkpackModelComponent implements OnInit {
                 if (gp.possibleValues) {
                   gp.possibleValuesOptions = (gp.possibleValues as string).split(',');
                 }
-                if (gp.defaultValue && gp.multipleSelection) {
+                this.normalizeDynamicSelectionDefaultValue(gp);
+                if (typeof gp.defaultValue === 'string' && gp.defaultValue && gp.multipleSelection) {
                   gp.defaultValue = (gp.defaultValue as string).split(',');
                 }
                 if (gp.sectors) {
@@ -848,7 +861,9 @@ export class WorkpackModelComponent implements OnInit {
         const dataProperties = dataPropertiesAndIndex
           .sort((a, b) => a[1] > b[1] ? 1 : -1)
           .map(prop => prop[0] as IWorkpackModelProperty);
-        this.modelProperties = this.sortPropertiesBySortIndex(dataProperties);
+        this.modelProperties = this.filterAvailableProperties(
+          this.sortPropertiesBySortIndex(dataProperties)
+        );
       }
       this.getSortedByList();
       this.cardPropertiesCostAccount.initialStateToggle = data.costSessionActive;
@@ -912,6 +927,7 @@ export class WorkpackModelComponent implements OnInit {
       fullLine: true,
       required: false,
       multipleSelection: false,
+      defaultValue: this.isDynamicSelectionProperty(type) ? [] : undefined,
       selectionLevel: type === TypePropertyEnum.FinancialSourceSelectionModel ? 'DETAIL' : undefined,
       sectorsList: type === TypePropertyEnum.OrganizationSelectionModel ?
         [TypeOrganization.Private.toUpperCase(), TypeOrganization.Public.toUpperCase(), TypeOrganization.Third.toUpperCase()] : [],
@@ -928,6 +944,18 @@ export class WorkpackModelComponent implements OnInit {
     return groupProperty
       ? groupProperty.groupedProperties.push(newProperty)
       : this.modelProperties.push(newProperty);
+  }
+
+  private isDynamicSelectionProperty(type: TypePropertyEnum | string): boolean {
+    return type === TypePropertyEnum.BudgetPlanSelectionModel ||
+      type === TypePropertyEnum.FinancialSourceSelectionModel;
+  }
+
+  private normalizeDynamicSelectionDefaultValue(property: IWorkpackModelProperty): void {
+    if (this.isDynamicSelectionProperty(property.type) &&
+      (property.defaultValue === undefined || property.defaultValue === null || property.defaultValue === '')) {
+      property.defaultValue = [];
+    }
   }
 
   sortPropertiesBySortIndex(properties: IWorkpackModelProperty[] = []): IWorkpackModelProperty[] {
@@ -1333,7 +1361,9 @@ get integrationSectorOptions(): SelectItem[] {
     if (this.currentLang && !['pt-BR', 'en-US'].includes(this.currentLang)) {
       return;
     }
-    const menu = Object.keys(TypePropertyEnum).filter(k => k !== TypePropertyEnum.GroupModel)
+    const menu = Object.keys(TypePropertyEnum)
+      .filter(k => k !== TypePropertyEnum.GroupModel)
+      .filter(k => this.isPropertyTypeAvailable(TypePropertyEnum[k]))
       .map(type => ({
         label: this.translateSrv.instant(`labels.${TypePropertyEnum[type]}`),
         icon: IconPropertyEnum[TypePropertyEnum[type]],
@@ -1347,13 +1377,38 @@ get integrationSectorOptions(): SelectItem[] {
       return;
     }
     if (groupProperty) {
-      return Object.keys(TypePropertyEnum).filter(k => k !== TypePropertyEnum.GroupModel)
+      return Object.keys(TypePropertyEnum)
+        .filter(k => k !== TypePropertyEnum.GroupModel)
+        .filter(k => this.isPropertyTypeAvailable(TypePropertyEnum[k]))
         .map(type => ({
           label: this.translateSrv.instant(`labels.${TypePropertyEnum[type]}`),
           icon: IconPropertyEnum[TypePropertyEnum[type]],
           command: () => this.addProperty(TypePropertyEnum[type], groupProperty)
         }));
     }
+  }
+
+  private isPropertyTypeAvailable(type: string): boolean {
+    if (type === TypePropertyEnum.BudgetPlanSelectionModel) {
+      return this.pluginAvailability.budgetPlans;
+    }
+    if (type === TypePropertyEnum.FinancialSourceSelectionModel) {
+      return this.pluginAvailability.financialSources;
+    }
+    return true;
+  }
+
+  private filterAvailableProperties(
+    properties: IWorkpackModelProperty[] = []
+  ): IWorkpackModelProperty[] {
+    return properties
+      .filter(property => this.isPropertyTypeAvailable(property.type))
+      .map(property => {
+        if (property.type === TypePropertyEnum.GroupModel && property.groupedProperties) {
+          property.groupedProperties = this.filterAvailableProperties(property.groupedProperties);
+        }
+        return property;
+      });
   }
 
   loadIcons() {
@@ -1621,6 +1676,7 @@ get integrationSectorOptions(): SelectItem[] {
     this.cancelButton.hideButton();
     this.formIsSaving = true;
     this.modelProperties.forEach(prop => {
+      this.normalizeDynamicSelectionDefaultValue(prop);
       delete prop.extraList;
       delete prop.extraListDefaults;
       prop.possibleValues = prop.possibleValuesOptions && prop.possibleValuesOptions.join(',');
@@ -1629,7 +1685,8 @@ get integrationSectorOptions(): SelectItem[] {
       JSON.parse(JSON.stringify([...this.modelProperties.filter(prop => prop.type !== TypePropertyEnum.GroupModel)]));
     propertiesClone.map(prop => {
       Object.keys(prop).map(key => {
-        if (prop[key] && prop[key] instanceof Array && key !== 'defaults') {
+        if (prop[key] && prop[key] instanceof Array && key !== 'defaults' &&
+          !(key === 'defaultValue' && this.isDynamicSelectionProperty(prop.type))) {
           prop[key] = prop[key].map(v => typeof v == 'string' ? v.trim() : v).join(',') as string;
         }
         if (prop[key] && !(prop[key] instanceof Array) && key === 'defaults' && prop.type !== 'UnitSelectionModel') {
@@ -1648,6 +1705,7 @@ get integrationSectorOptions(): SelectItem[] {
     const propertiesGroupClone = [...this.modelProperties.filter(prop => prop.type === TypePropertyEnum.GroupModel)];
     propertiesGroupClone.forEach(propGroup => {
       propGroup.groupedProperties.forEach(p => {
+        this.normalizeDynamicSelectionDefaultValue(p);
         delete p.extraList;
         delete p.extraListDefaults;
         p.possibleValues = p.possibleValuesOptions && p.possibleValuesOptions.join(',');
@@ -1656,7 +1714,8 @@ get integrationSectorOptions(): SelectItem[] {
       propGroup.groupedProperties = JSON.parse(JSON.stringify([...propGroup.groupedProperties]));
       propGroup.groupedProperties.map(propGrouped => {
         Object.keys(propGrouped).map(key => {
-          if (propGrouped[key] && propGrouped[key] instanceof Array && key !== 'defaults') {
+          if (propGrouped[key] && propGrouped[key] instanceof Array && key !== 'defaults' &&
+            !(key === 'defaultValue' && this.isDynamicSelectionProperty(propGrouped.type))) {
             propGrouped[key] = propGrouped[key].map(v => typeof v == 'string' ? v.trim() : v).join(',') as string;
           }
           if (propGrouped[key] && !(propGrouped[key] instanceof Array) && key === 'defaults' && propGrouped.type !== 'UnitSelectionModel') {
@@ -1922,7 +1981,8 @@ get integrationSectorOptions(): SelectItem[] {
         if (p.possibleValues) {
           p.possibleValuesOptions = (p.possibleValues as string).split(',');
         }
-        if (p.defaultValue && p.multipleSelection) {
+        this.normalizeDynamicSelectionDefaultValue(p);
+        if (typeof p.defaultValue === 'string' && p.defaultValue && p.multipleSelection) {
           p.defaultValue = (p.defaultValue as string).split(',');
         }
         if (p.idDomain) {

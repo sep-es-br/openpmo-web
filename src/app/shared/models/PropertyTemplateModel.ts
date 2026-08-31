@@ -5,6 +5,8 @@ import { IProperty } from '../interfaces/IProperty';
 import { IWorkpackProperty } from '../interfaces/IWorkpackProperty';
 import { IMilestonePropertyData } from '../interfaces/IMilestonePropertyData';
 import { TypeWorkpackEnumWBS } from '../enums/TypeWorkpackEnum';
+import { IBudgetPlanSelectionValue } from '../interfaces/IBudgetPlanSelection';
+import { IFinancialSourceSelectionValue } from '../interfaces/IFinancialSourceSelection';
 
 export class PropertyTemplateModel implements IProperty {
   id?: number;
@@ -33,7 +35,7 @@ export class PropertyTemplateModel implements IProperty {
   labelButtonLocalitySelected?: string[];
   showIconButton?: boolean;
   value?: string | number | boolean | string[] | Date | number[] | object[];
-  selectedValues?: number[] | number;
+  selectedValues?: number[] | number | IBudgetPlanSelectionValue[] | IFinancialSourceSelectionValue[];
   selectedValue?: number;
   invalid?: boolean;
   message?: string;
@@ -97,6 +99,12 @@ export class PropertyTemplateModel implements IProperty {
             )
             .map(l => l.data);
         }
+        break;
+      case TypePropertyModelEnum.BudgetPlanSelectionModel:
+      case TypePropertyModelEnum.FinancialSourceSelectionModel:
+        property.value = (selectedValues instanceof Array
+          ? selectedValues
+          : value instanceof Array ? value : []) as any;
         break;
       case TypePropertyModelEnum.CurrencyModel:
         property.value = value as number;

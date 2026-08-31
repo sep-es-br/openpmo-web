@@ -32,6 +32,10 @@
         (changed)="changed.emit($event)"></app-property-organization-selection>
       <app-property-unit-selection *ngSwitchCase="types.UnitSelectionModel" [property]="groupedProp"
         (changed)="changed.emit($event)"></app-property-unit-selection>
+      <app-property-budget-plan-selection *ngSwitchCase="types.BudgetPlanSelectionModel" [property]="groupedProp"
+        (changed)="changed.emit($event)"></app-property-budget-plan-selection>
+      <app-property-financial-source-selection *ngSwitchCase="types.FinancialSourceSelectionModel" [property]="groupedProp"
+        (changed)="changed.emit($event)"></app-property-financial-source-selection>
     </ng-container>
   </div>
 </p-panel>

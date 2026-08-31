@@ -1,10 +1,176 @@
-.selection-property { display: flex; align-items: stretch; gap: .25rem; width: 100%; }
-.selection-input { flex: 1; }
-.selection-input input { width: 100%; text-overflow: ellipsis; }
-.open-button, .clear-button { flex: 0 0 auto; }
-.financial-source-dialog { display: flex; flex-direction: column; gap: .75rem; }
-.financial-source-dialog p-dropdown { width: 100%; }
-.loading { color: #666; padding: 1rem; text-align: center; }
-.selected-list { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; margin-top: .5rem; }
-.selected-item { background: #eef4f1; border-radius: 16px; padding: .35rem .65rem; }
-.selected-item button { background: none; border: 0; cursor: pointer; margin-left: .35rem; }
+.selection-property {
+  display: flex;
+  align-items: center;
+  gap: .25rem;
+  width: 100%;
+
+  .selection-input {
+    flex: 1 1 auto;
+    min-width: 0;
+
+    input {
+      width: 100%;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+
+  .open-button,
+  .clear-button {
+    flex: 0 0 auto;
+    align-self: flex-end;
+    height: 2.5rem;
+    min-height: 2.5rem;
+    margin: 0 0 10px;
+  }
+
+  .open-button {
+    width: 2.5rem;
+  }
+}
+
+.financial-source-dialog {
+  display: flex;
+  flex-direction: column;
+  gap: .75rem;
+
+  .financial-source-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+
+    .filter-field {
+      display: flex;
+      flex: 1 1 calc(25% - .75rem);
+      flex-direction: column;
+      gap: .35rem;
+      min-width: 13rem;
+
+      label {
+        color: #6c757d;
+        font-size: .9rem;
+      }
+
+      input,
+      p-dropdown {
+        display: block;
+        max-width: 100%;
+        min-width: 0;
+        width: 100%;
+      }
+
+      ::ng-deep .p-dropdown {
+        max-width: 100%;
+        min-width: 0;
+        width: 100%;
+
+        .p-dropdown-label {
+          min-width: 0;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+
+        .p-dropdown-panel {
+          width: 100%;
+        }
+      }
+    }
+  }
+
+  .dropdown-option-label {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .source-list {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    max-height: 300px;
+    overflow: auto;
+  }
+
+  .source-option {
+    display: flex;
+    align-items: flex-start;
+    gap: .75rem;
+    width: 100%;
+    padding: .75rem;
+    border: 0;
+    border-bottom: 1px solid #eee;
+    background: #fff;
+    cursor: pointer;
+    text-align: left;
+
+    &:hover,
+    &.selected {
+      background: #f3f8f6;
+    }
+
+    i {
+      flex: 0 0 auto;
+      margin-top: .15rem;
+      color: #28835c;
+    }
+
+    span {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+
+  .loading,
+  .empty {
+    padding: 1rem;
+    color: #666;
+    text-align: center;
+  }
+
+  .selected-list {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: .5rem;
+    margin-top: .5rem;
+
+    .selected-item {
+      max-width: 100%;
+      overflow: hidden;
+      border-radius: 16px;
+      padding: .35rem .65rem;
+      background: #eef4f1;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+
+      button {
+        margin-left: .35rem;
+        border: 0;
+        background: none;
+        cursor: pointer;
+      }
+    }
+  }
+}
+
+::ng-deep p-dialog {
+  .p-dialog-content {
+    overflow: unset;
+  }
+}
+
+@media screen and (max-width: 600px) {
+  .financial-source-dialog {
+    .financial-source-filters {
+      .filter-field {
+        flex-basis: 100%;
+        min-width: 0;
+      }
+    }
+  }
+}

@@ -22,7 +22,7 @@ export class PropertyBudgetPlanSelectionComponent {
   loadingPlans = false;
   budgetUnits: IBudgetUnitSelectionOption[] = [];
   budgetPlans: IBudgetPlanSelectionOption[] = [];
-  selectedBudgetUnit: IBudgetUnitSelectionOption;
+  selectedBudgetUnit: IBudgetUnitSelectionOption | undefined = undefined;
   draftValues: IBudgetPlanSelectionValue[] = [];
   searchTerm = '';
 
@@ -30,7 +30,9 @@ export class PropertyBudgetPlanSelectionComponent {
   }
 
   get selectedValues(): IBudgetPlanSelectionValue[] {
-    return (this.property?.value as IBudgetPlanSelectionValue[]) || [];
+    return (this.property?.selectedValues as IBudgetPlanSelectionValue[])
+      || (this.property?.value as IBudgetPlanSelectionValue[])
+      || [];
   }
 
   get displayValue(): string {
@@ -47,6 +49,18 @@ export class PropertyBudgetPlanSelectionComponent {
     return this.budgetPlans.filter(plan =>
       this.normalize(plan.code).includes(term) || this.normalize(plan.name).includes(term)
     );
+  }
+
+  planDisplayName(plan: IBudgetPlanSelectionOption): string {
+    const name = plan && plan.name ? plan.name : '';
+    const namePart = name.split('-', 2)[1];
+    return namePart && namePart.trim() ? namePart.trim() : name;
+  }
+
+  planSelectionDisplayName(plan: IBudgetPlanSelectionValue): string {
+    const name = plan && plan.budgetPlanName ? plan.budgetPlanName : '';
+    const namePart = name.split('-', 2)[1];
+    return namePart && namePart.trim() ? namePart.trim() : name;
   }
 
   open(): void {
@@ -70,14 +84,21 @@ export class PropertyBudgetPlanSelectionComponent {
     });
   }
 
-  onBudgetUnitChange(): void {
+  onBudgetUnitChange(budgetUnit: IBudgetUnitSelectionOption | undefined): void {
+    this.selectedBudgetUnit = budgetUnit;
     this.budgetPlans = [];
     this.searchTerm = '';
-    if (!this.selectedBudgetUnit) {
+    this.loadingPlans = false;
+
+    if (!budgetUnit?.code) {
       return;
     }
+
     this.loadingPlans = true;
-    this.pentahoService.getBudgetPlansForProperty(this.selectedBudgetUnit.code).subscribe(plans => {
+    this.pentahoService.getBudgetPlansForProperty(budgetUnit.code).subscribe(plans => {
+      if (this.selectedBudgetUnit?.code !== budgetUnit.code) {
+        return;
+      }
       this.budgetPlans = plans.sort((a, b) =>
         `${a.code} ${a.name}`.localeCompare(`${b.code} ${b.name}`)
       );
@@ -119,16 +140,16 @@ export class PropertyBudgetPlanSelectionComponent {
   }
 
   confirm(): void {
-    this.property.value = this.draftValues.map(value => ({ ...value }));
+    this.property.selectedValues = this.draftValues.map(value => ({ ...value }));
     this.property.invalid = false;
     this.visible = false;
-    this.changed.emit(this.property.value);
+    this.changed.emit(this.property.selectedValues);
   }
 
   clear(): void {
-    this.property.value = [];
+    this.property.selectedValues = [];
     this.draftValues = [];
-    this.changed.emit(this.property.value);
+    this.changed.emit(this.property.selectedValues);
   }
 
   private normalize(value: string): string {

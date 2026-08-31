@@ -1,4 +1,6 @@
 import { TreeNode } from 'primeng/api';
+import { IBudgetPlanSelectionValue } from './IBudgetPlanSelection';
+import { IFinancialSourceSelectionValue } from './IFinancialSourceSelection';
 
 export interface IProperty {
   id?: number;
@@ -24,7 +26,7 @@ export interface IProperty {
   localityList?: TreeNode[];
   localitiesSelected?: TreeNode | TreeNode[];
   value?: string | number | boolean | string[] | Date | number[] | object[];
-  selectedValues?: number[] | number;
+  selectedValues?: number[] | number | IBudgetPlanSelectionValue[] | IFinancialSourceSelectionValue[];
   selectedValue?: number;
   invalid?: boolean;
   message?: string;

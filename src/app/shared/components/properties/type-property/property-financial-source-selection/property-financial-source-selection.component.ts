@@ -25,10 +25,10 @@ export class PropertyFinancialSourceSelectionComponent {
   loading = false;
   rows: IFinancialSourceSelectionValue[] = [];
   draftValues: IFinancialSourceSelectionValue[] = [];
-  selectedType: SourceOption;
-  selectedGroup: SourceOption;
-  selectedSource: SourceOption;
-  selectedDetail: SourceOption;
+  selectedType: SourceOption | undefined = undefined;
+  selectedGroup: SourceOption | undefined = undefined;
+  selectedSource: SourceOption | undefined = undefined;
+  searchTerm = '';
 
   constructor(private pentahoService: PentahoService) {
   }
@@ -38,7 +38,9 @@ export class PropertyFinancialSourceSelectionComponent {
   }
 
   get selectedValues(): IFinancialSourceSelectionValue[] {
-    return (this.property?.value as IFinancialSourceSelectionValue[]) || [];
+    return (this.property?.selectedValues as IFinancialSourceSelectionValue[])
+      || (this.property?.value as IFinancialSourceSelectionValue[])
+      || [];
   }
 
   get displayValue(): string {
@@ -70,12 +72,81 @@ export class PropertyFinancialSourceSelectionComponent {
     })));
   }
 
-  get canSelect(): boolean {
+  get finalOptions(): SourceOption[] {
     switch (this.level) {
-      case 'TYPE': return !!this.selectedType;
-      case 'GROUP': return !!this.selectedGroup;
-      case 'SOURCE': return !!this.selectedGroup && !!this.selectedSource;
-      case 'DETAIL': return !!this.selectedType && !!this.selectedGroup && !!this.selectedSource && !!this.selectedDetail;
+      case 'TYPE': return this.typeOptions;
+      case 'GROUP': return this.groupOptions;
+      case 'SOURCE': return this.sourceOptions;
+      case 'DETAIL': return this.detailOptions;
+    }
+  }
+
+  get filteredFinalOptions(): SourceOption[] {
+    const term = this.normalize(this.searchTerm);
+    if (!term) {
+      return this.finalOptions;
+    }
+    return this.finalOptions.filter(option =>
+      this.normalize(option.code).includes(term) || this.normalize(option.name).includes(term)
+    );
+  }
+
+  get canSearch(): boolean {
+    switch (this.level) {
+      case 'TYPE':
+      case 'GROUP':
+        return true;
+      case 'SOURCE':
+        return !!this.selectedGroup;
+      case 'DETAIL':
+        return !!this.selectedType && !!this.selectedGroup && !!this.selectedSource;
+    }
+  }
+
+  get searchLabel(): string {
+    switch (this.level) {
+      case 'TYPE': return 'Buscar tipo de fonte por código ou nome';
+      case 'GROUP': return 'Buscar grupo por código ou nome';
+      case 'SOURCE': return 'Buscar fonte por código ou nome';
+      case 'DETAIL': return 'Buscar detalhamento da fonte por código ou nome';
+    }
+  }
+
+  get searchPlaceholder(): string {
+    switch (this.level) {
+      case 'TYPE': return 'Digite o código ou o nome do tipo de fonte';
+      case 'GROUP': return 'Digite o código ou o nome do grupo';
+      case 'SOURCE': return 'Digite o código ou o nome da fonte';
+      case 'DETAIL': return 'Digite o código ou o nome do detalhamento';
+    }
+  }
+
+  get missingFiltersMessage(): string {
+    switch (this.level) {
+      case 'SOURCE':
+        return 'Selecione um grupo para carregar as fontes disponíveis.';
+      case 'DETAIL':
+        return 'Selecione um tipo, um grupo e uma fonte para carregar os detalhamentos disponíveis.';
+      default:
+        return '';
+    }
+  }
+
+  get noOptionsMessage(): string {
+    switch (this.level) {
+      case 'TYPE': return 'Nenhum tipo de fonte disponível.';
+      case 'GROUP': return 'Nenhum grupo disponível para os filtros informados.';
+      case 'SOURCE': return 'Nenhuma fonte disponível para os filtros informados.';
+      case 'DETAIL': return 'Nenhum detalhamento disponível para os filtros informados.';
+    }
+  }
+
+  get noResultsMessage(): string {
+    switch (this.level) {
+      case 'TYPE': return 'Nenhum tipo de fonte encontrado para a busca informada.';
+      case 'GROUP': return 'Nenhum grupo encontrado para a busca informada.';
+      case 'SOURCE': return 'Nenhuma fonte encontrada para a busca informada.';
+      case 'DETAIL': return 'Nenhum detalhamento encontrado para a busca informada.';
     }
   }
 
@@ -96,32 +167,40 @@ export class PropertyFinancialSourceSelectionComponent {
   }
 
   onTypeChange(): void {
-    this.selectedGroup = null;
-    this.selectedSource = null;
-    this.selectedDetail = null;
+    this.selectedGroup = undefined;
+    this.selectedSource = undefined;
+    this.searchTerm = '';
   }
 
   onGroupChange(): void {
-    this.selectedSource = null;
-    this.selectedDetail = null;
+    this.selectedSource = undefined;
+    this.searchTerm = '';
   }
 
   onSourceChange(): void {
-    this.selectedDetail = null;
+    this.searchTerm = '';
   }
 
-  addSelection(): void {
-    if (!this.canSelect) {
+  isSelected(option: SourceOption): boolean {
+    if (!this.canSearch) {
+      return false;
+    }
+    const key = this.valueKey(this.currentValue(option));
+    return this.draftValues.some(value => this.valueKey(value) === key);
+  }
+
+  toggleOption(option: SourceOption): void {
+    if (!this.canSearch) {
       return;
     }
-    const value = this.currentValue();
+    const value = this.currentValue(option);
     const key = this.valueKey(value);
-    if (!this.draftValues.some(item => this.valueKey(item) === key)) {
-      this.draftValues = this.property.multipleSelection ? [...this.draftValues, value] : [value];
+    const existingIndex = this.draftValues.findIndex(item => this.valueKey(item) === key);
+    if (existingIndex >= 0) {
+      this.draftValues.splice(existingIndex, 1);
+      return;
     }
-    if (!this.property.multipleSelection) {
-      this.confirm();
-    }
+    this.draftValues = this.property.multipleSelection ? [...this.draftValues, value] : [value];
   }
 
   removeDraft(value: IFinancialSourceSelectionValue): void {
@@ -130,16 +209,16 @@ export class PropertyFinancialSourceSelectionComponent {
   }
 
   confirm(): void {
-    this.property.value = this.draftValues.map(value => ({ ...value }));
+    this.property.selectedValues = this.draftValues.map(value => ({ ...value }));
     this.property.invalid = false;
     this.visible = false;
-    this.changed.emit(this.property.value);
+    this.changed.emit(this.property.selectedValues);
   }
 
   clear(): void {
-    this.property.value = [];
+    this.property.selectedValues = [];
     this.draftValues = [];
-    this.changed.emit(this.property.value);
+    this.changed.emit(this.property.selectedValues);
   }
 
   valueLabel(value: IFinancialSourceSelectionValue): string {
@@ -155,21 +234,21 @@ export class PropertyFinancialSourceSelectionComponent {
     return `${value.typeCode} - ${value.typeName}`;
   }
 
-  private currentValue(): IFinancialSourceSelectionValue {
+  private currentValue(option: SourceOption): IFinancialSourceSelectionValue {
     switch (this.level) {
       case 'TYPE':
-        return { typeCode: this.selectedType.code, typeName: this.selectedType.name };
+        return { typeCode: option.code, typeName: option.name };
       case 'GROUP':
         return {
-          sourceGroupCode: this.selectedGroup.code,
-          sourceGroupName: this.selectedGroup.name
+          sourceGroupCode: option.code,
+          sourceGroupName: option.name
         };
       case 'SOURCE':
         return {
           sourceGroupCode: this.selectedGroup.code,
           sourceGroupName: this.selectedGroup.name,
-          sourceCode: this.selectedSource.code,
-          sourceName: this.selectedSource.name
+          sourceCode: option.code,
+          sourceName: option.name
         };
       case 'DETAIL':
         return {
@@ -179,8 +258,8 @@ export class PropertyFinancialSourceSelectionComponent {
           sourceGroupName: this.selectedGroup.name,
           sourceCode: this.selectedSource.code,
           sourceName: this.selectedSource.name,
-          detailedSourceCode: this.selectedDetail.code,
-          detailedSourceName: this.selectedDetail.name
+          detailedSourceCode: option.code,
+          detailedSourceName: option.name
         };
     }
   }
@@ -205,9 +284,13 @@ export class PropertyFinancialSourceSelectionComponent {
   }
 
   private resetFilters(): void {
-    this.selectedType = null;
-    this.selectedGroup = null;
-    this.selectedSource = null;
-    this.selectedDetail = null;
+    this.selectedType = undefined;
+    this.selectedGroup = undefined;
+    this.selectedSource = undefined;
+    this.searchTerm = '';
+  }
+
+  private normalize(value: string): string {
+    return (value || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
   }
 }

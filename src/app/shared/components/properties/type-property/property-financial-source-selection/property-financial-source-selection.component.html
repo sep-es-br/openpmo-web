@@ -1,60 +1,84 @@
 <div class="selection-property" [class.full-line]="property.fullLine">
   <span class="p-float-label selection-input">
-    <input pInputText [id]="property.name" [value]="displayValue" readonly
+    <input class="app-input-text" pInputText [id]="property.name" [value]="displayValue" readonly
       [disabled]="property.disabled" [class.ng-invalid]="property.invalid" />
-    <label [for]="property.name">{{property.label}} {{property.required ? '*' : ''}}</label>
+    <label class="app-input-label" [for]="property.name">{{property.label}} {{property.required ? '*' : ''}}</label>
   </span>
-  <button pButton type="button" icon="fas fa-search" class="p-button-outlined open-button"
-    [disabled]="property.disabled" (click)="open()"></button>
   <button *ngIf="selectedValues.length && !property.disabled" pButton type="button" icon="fas fa-times"
     class="p-button-text clear-button" (click)="clear()"></button>
+  <button pButton type="button" icon="fas fa-search" class="p-button-outlined open-button"
+    [disabled]="property.disabled" (click)="open()"></button>
 </div>
 <small class="input-message-error" *ngIf="property.invalid">{{property.message}}</small>
 
-<p-dialog [(visible)]="visible" [modal]="true" [style]="{width: '720px'}"
+<p-dialog [(visible)]="visible" [modal]="true" [style]="{width: '1180px', maxWidth: 'calc(100vw - 2rem)'}"
   header="Selecionar Fonte de Recurso">
   <div class="financial-source-dialog">
     <div class="loading" *ngIf="loading">Carregando fontes de recurso...</div>
 
     <ng-container *ngIf="!loading">
-      <label>Tipo de fonte</label>
-      <p-dropdown [options]="typeOptions" [(ngModel)]="selectedType" [filter]="true"
-        filterBy="code,name" [showClear]="true" (onChange)="onTypeChange()" placeholder="Todos os tipos">
-        <ng-template let-option pTemplate="item">{{option.code}} - {{option.name}}</ng-template>
-        <ng-template let-option pTemplate="selectedItem">{{option.code}} - {{option.name}}</ng-template>
-      </p-dropdown>
+      <div class="financial-source-filters">
+        <div class="filter-field" *ngIf="level !== 'TYPE'">
+          <label for="financial-source-type">Tipo de fonte</label>
+          <p-dropdown inputId="financial-source-type" [options]="typeOptions" [(ngModel)]="selectedType" [filter]="true"
+            filterBy="code,name" [autoDisplayFirst]="false" [showClear]="true"
+            (ngModelChange)="onTypeChange()" placeholder="Todos os tipos">
+            <ng-template let-option pTemplate="item">
+              <span class="dropdown-option-label">{{option.code}} - {{option.name}}</span>
+            </ng-template>
+            <ng-template let-option pTemplate="selectedItem">
+              <span class="dropdown-option-label">{{option.code}} - {{option.name}}</span>
+            </ng-template>
+          </p-dropdown>
+        </div>
 
-      <ng-container *ngIf="level !== 'TYPE'">
-        <label>Grupo</label>
-        <p-dropdown [options]="groupOptions" [(ngModel)]="selectedGroup" [filter]="true"
-          filterBy="code,name" [showClear]="true" (onChange)="onGroupChange()" placeholder="Selecione o grupo">
-          <ng-template let-option pTemplate="item">{{option.code}} - {{option.name}}</ng-template>
-          <ng-template let-option pTemplate="selectedItem">{{option.code}} - {{option.name}}</ng-template>
-        </p-dropdown>
-      </ng-container>
+        <div class="filter-field" *ngIf="level === 'SOURCE' || level === 'DETAIL'">
+          <label for="financial-source-group">Grupo</label>
+          <p-dropdown inputId="financial-source-group" [options]="groupOptions" [(ngModel)]="selectedGroup"
+            [filter]="true" filterBy="code,name" [autoDisplayFirst]="false" [showClear]="true"
+            (ngModelChange)="onGroupChange()" placeholder="Selecione o grupo">
+            <ng-template let-option pTemplate="item">
+              <span class="dropdown-option-label">{{option.code}} - {{option.name}}</span>
+            </ng-template>
+            <ng-template let-option pTemplate="selectedItem">
+              <span class="dropdown-option-label">{{option.code}} - {{option.name}}</span>
+            </ng-template>
+          </p-dropdown>
+        </div>
 
-      <ng-container *ngIf="level === 'SOURCE' || level === 'DETAIL'">
-        <label>Fonte</label>
-        <p-dropdown [options]="sourceOptions" [(ngModel)]="selectedSource" [filter]="true"
-          filterBy="code,name" [showClear]="true" [disabled]="!selectedGroup"
-          (onChange)="onSourceChange()" placeholder="Selecione a fonte">
-          <ng-template let-option pTemplate="item">{{option.code}} - {{option.name}}</ng-template>
-          <ng-template let-option pTemplate="selectedItem">{{option.code}} - {{option.name}}</ng-template>
-        </p-dropdown>
-      </ng-container>
+        <div class="filter-field" *ngIf="level === 'DETAIL'">
+          <label for="financial-source-source">Fonte</label>
+          <p-dropdown inputId="financial-source-source" [options]="sourceOptions" [(ngModel)]="selectedSource"
+            [filter]="true" filterBy="code,name" [autoDisplayFirst]="false" [showClear]="true"
+            [disabled]="!selectedGroup" (ngModelChange)="onSourceChange()" placeholder="Selecione a fonte">
+            <ng-template let-option pTemplate="item">
+              <span class="dropdown-option-label">{{option.code}} - {{option.name}}</span>
+            </ng-template>
+            <ng-template let-option pTemplate="selectedItem">
+              <span class="dropdown-option-label">{{option.code}} - {{option.name}}</span>
+            </ng-template>
+          </p-dropdown>
+        </div>
 
-      <ng-container *ngIf="level === 'DETAIL'">
-        <label>Detalhamento da fonte</label>
-        <p-dropdown [options]="detailOptions" [(ngModel)]="selectedDetail" [filter]="true"
-          filterBy="code,name" [showClear]="true" [disabled]="!selectedSource"
-          placeholder="Selecione o detalhamento">
-          <ng-template let-option pTemplate="item">{{option.code}} - {{option.name}}</ng-template>
-          <ng-template let-option pTemplate="selectedItem">{{option.code}} - {{option.name}}</ng-template>
-        </p-dropdown>
-      </ng-container>
+        <div class="filter-field">
+          <label for="financial-source-search">{{searchLabel}}</label>
+          <input id="financial-source-search" pInputText [(ngModel)]="searchTerm" [disabled]="!canSearch"
+            [placeholder]="searchPlaceholder" />
+        </div>
+      </div>
 
-      <button pButton type="button" [label]="property.multipleSelection ? 'Adicionar seleção' : 'Selecionar'"
-        icon="fas fa-plus" [disabled]="!canSelect" (click)="addSelection()"></button>
+      <div class="source-list" *ngIf="canSearch && filteredFinalOptions.length">
+        <button type="button" class="source-option" *ngFor="let option of filteredFinalOptions"
+          [class.selected]="isSelected(option)" (click)="toggleOption(option)">
+          <i [class]="isSelected(option) ? 'fas fa-check-circle' : 'far fa-circle'"></i>
+          <span><strong>{{option.code}}</strong> - {{option.name}}</span>
+        </button>
+      </div>
+
+      <div class="empty" *ngIf="!canSearch">{{missingFiltersMessage}}</div>
+      <div class="empty" *ngIf="canSearch && finalOptions.length === 0">{{noOptionsMessage}}</div>
+      <div class="empty"
+        *ngIf="canSearch && finalOptions.length > 0 && filteredFinalOptions.length === 0">{{noResultsMessage}}</div>
     </ng-container>
 
     <div class="selected-list" *ngIf="draftValues.length">
@@ -67,7 +91,6 @@
   </div>
   <p-footer>
     <button pButton type="button" label="Cancelar" class="p-button-text" (click)="visible = false"></button>
-    <button *ngIf="property.multipleSelection" pButton type="button" label="Confirmar"
-      [disabled]="!draftValues.length" (click)="confirm()"></button>
+    <button pButton type="button" label="Confirmar" [disabled]="!draftValues.length" (click)="confirm()"></button>
   </p-footer>
 </p-dialog>

@@ -254,7 +254,8 @@ export class WorkpackSectionPropertiesComponent implements OnInit, OnDestroy {
           ? (prop.value.length > 0)
           : typeof prop.value == 'boolean' || typeof prop.value == 'number'
           || !!prop.value || (prop.value !== null && prop.value !== undefined && prop.value !== ''));
-        if (['OrganizationSelection', 'UnitSelection', 'LocalitySelection'].includes(prop.type)) {
+        if (['OrganizationSelection', 'UnitSelection', 'LocalitySelection',
+          'BudgetPlanSelection', 'FinancialSourceSelection'].includes(prop.type)) {
           if (prop.type === 'LocalitySelection') {
             if (!prop.multipleSelection) {
               const selectedLocality = prop.localitiesSelected as TreeNode;

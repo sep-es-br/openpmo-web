@@ -34,6 +34,7 @@ import {
 import { Dropdown } from 'primeng/dropdown';
 import { InputNumber } from 'primeng/inputnumber';
 import {map} from 'rxjs/operators';
+import { IPluginAvailability, PluginAvailabilityService } from 'src/app/shared/services/plugin-availability.service';
 
 @Component({
   selector: 'app-cost-account',
@@ -130,6 +131,14 @@ export class CostAccountComponent implements OnInit {
 
   isUoPluginAvaliable = false;
   isPoPluginAvaliable = false;
+  pluginAvailability: IPluginAvailability = {
+    agreements: false,
+    procurements: false,
+    obligations: false,
+    edocs: false,
+    budgetPlans: false,
+    financialSources: false
+  };
 
   newInstrumentFunc = () => {
     this.selectedInstruments.push({} as IInstrument);
@@ -181,7 +190,8 @@ export class CostAccountComponent implements OnInit {
     private unitMeasureSrv: MeasureUnitService,
     private router: Router,
     private costAccountModelSrv: CostAccountModelService,
-    private pentahoSrv: PentahoService
+    private pentahoSrv: PentahoService,
+    private pluginAvailabilitySrv: PluginAvailabilityService
   ) {
     this.actRouter.queryParams.subscribe(async (queryParams) => {
       this.idCostAccount = queryParams.idCostAccount;
@@ -395,22 +405,20 @@ export class CostAccountComponent implements OnInit {
 
   async loadProperties() {
     this.idPlan = Number(localStorage.getItem('@currentPlan'));
+    await this.loadPluginAvailability();
     if (this.idWorkpack) {
-      this.loadUoOptions(this.idWorkpack);
       await this.loadWorkpack();
     }
     if (this.idCostAccount) {
       await this.loadCostAccount();
-      this.loadUoOptions(this.idCostAccount, () => {
-        this.setupUoAndPlano();
-      });
     } else {
       this.setBreadcrumb();
       this.cardCostAccountProperties.isLoading = false;
       this.instrumentProperty.isLoading = false;
     }
-    const costAccountModelActiveProperties =
-      this.costAccountModel.properties.filter((w) => w.active);
+    const costAccountModelActiveProperties = this.filterAvailableProperties(
+      this.costAccountModel.properties.filter((w) => w.active)
+    );
     if (
       costAccountModelActiveProperties &&
       costAccountModelActiveProperties.filter(
@@ -674,6 +682,12 @@ export class CostAccountComponent implements OnInit {
     property.defaultValue = propertyCostAccount?.value
       ? propertyCostAccount?.value
       : propertyModel.defaultValue;
+    if ([
+      TypePropertyModelEnum.BudgetPlanSelectionModel,
+      TypePropertyModelEnum.FinancialSourceSelectionModel
+    ].includes(this.typePropertyModel[propertyModel.type])) {
+      property.selectedValues = (property.value instanceof Array ? property.value : []) as any;
+    }
     property.min = propertyModel.min;
     property.max = propertyModel.max;
     property.precision = propertyModel.precision;
@@ -1046,6 +1060,8 @@ export class CostAccountComponent implements OnInit {
               'OrganizationSelection',
               'UnitSelection',
               'LocalitySelection',
+              'BudgetPlanSelection',
+              'FinancialSourceSelection',
             ].includes(prop.type)
           ) {
             if (prop.type === 'LocalitySelection') {
@@ -1131,8 +1147,6 @@ export class CostAccountComponent implements OnInit {
         idWorkpack: this.costAccount.idWorkpack,
         idCostAccountModel: this.costAccount.idCostAccountModel,
         properties: this.costAccountProperties,
-        unidadeOrcamentaria: this.selectedUo?.code ? this.selectedUo : null,
-        planoOrcamentario: this.selectedPlano ? this.selectedPlano : null,
         instruments:
           this.selectedInstruments.map((si) =>
             this.instrumentsList.find((fi) => fi.sigefesCode === si.sigefesCode)
@@ -1155,8 +1169,6 @@ export class CostAccountComponent implements OnInit {
         idWorkpack: this.idWorkpack,
         idCostAccountModel: this.costAccountModel.id,
         properties: this.costAccountProperties,
-        unidadeOrcamentaria: this.selectedUo ? this.selectedUo : null,
-        planoOrcamentario: this.selectedPlano ? this.selectedPlano : null,
         instruments: this.selectedInstruments ?? [],
       };
       const result = await this.costAccountSrv.post(costAccount);
@@ -1178,7 +1190,43 @@ export class CostAccountComponent implements OnInit {
     this.sectionCostAccountProperties = this.backupProperties.map((prop) =>
       this.instanceBackupProperty(prop)
     );
-    this.selectedPlano = this.backupSelectedPlano;
-    this.selectedUo = this.backupSelectedUo;
+  }
+
+  private async loadPluginAvailability(): Promise<void> {
+    try {
+      const result = await this.pluginAvailabilitySrv.getAvailability();
+      if (result.success && result.data) {
+        this.pluginAvailability = result.data;
+      }
+    } catch (_) {
+      this.pluginAvailability = {
+        agreements: false,
+        procurements: false,
+        obligations: false,
+        edocs: false,
+        budgetPlans: false,
+        financialSources: false
+      };
+    }
+  }
+
+  private filterAvailableProperties(
+    properties: IWorkpackModelProperty[] = []
+  ): IWorkpackModelProperty[] {
+    return properties
+      .filter(property =>
+        property.type !== TypePropertyModelEnum.BudgetPlanSelectionModel
+          || this.pluginAvailability.budgetPlans
+      )
+      .filter(property =>
+        property.type !== TypePropertyModelEnum.FinancialSourceSelectionModel
+          || this.pluginAvailability.financialSources
+      )
+      .map(property => {
+        if (property.type === TypePropertyModelEnum.GroupModel && property.groupedProperties) {
+          property.groupedProperties = this.filterAvailableProperties(property.groupedProperties);
+        }
+        return property;
+      });
   }
 }

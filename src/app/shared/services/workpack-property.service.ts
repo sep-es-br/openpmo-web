@@ -16,6 +16,7 @@ import { IDomain } from '../interfaces/IDomain';
 import { ILocalityList } from '../interfaces/ILocality';
 import { TranslateService } from '@ngx-translate/core';
 import { TypeWorkpackModelEnum } from '../enums/TypeWorkpackModelEnum';
+import { IPluginAvailability, PluginAvailabilityService } from './plugin-availability.service';
 
 @Injectable({
   providedIn: 'root'
@@ -31,6 +32,14 @@ export class WorkpackPropertyService {
   domain;
   loading;
   private resetWorkpackProperties = new BehaviorSubject<boolean>(false);
+  private pluginAvailability: IPluginAvailability = {
+    agreements: false,
+    procurements: false,
+    obligations: false,
+    edocs: false,
+    budgetPlans: false,
+    financialSources: false
+  };
 
   constructor(
     @Inject(Injector) injector: Injector,
@@ -39,7 +48,8 @@ export class WorkpackPropertyService {
     private localitySrv: LocalityService,
     private organizationSrv: OrganizationService,
     private unitMeasureSrv: MeasureUnitService,
-    private translateSrv: TranslateService
+    private translateSrv: TranslateService,
+    private pluginAvailabilitySrv: PluginAvailabilityService
   ) {
   }
 
@@ -51,11 +61,14 @@ export class WorkpackPropertyService {
 
   async loadProperties() {
     this.properties = [];
+    await this.loadPluginAvailability();
     this.workpackData = this.workpackSrv.getWorkpackData();
     this.workpackParams = this.workpackSrv.getWorkpackParams();
-    const workpackModelActivesProperties = (!!this.workpackParams.idWorkpackModelLinked) ?
-      this.workpackData.workpack.model?.properties?.filter(w => w.active) :
-      this.workpackData.workpackModel?.properties?.filter(w => w.active);
+    const workpackModelActivesProperties = this.filterAvailableProperties(
+      ((!!this.workpackParams.idWorkpackModelLinked)
+        ? this.workpackData.workpack.model?.properties
+        : this.workpackData.workpackModel?.properties)?.filter(w => w.active)
+    );
     if (workpackModelActivesProperties && workpackModelActivesProperties
       .filter(prop => this.typePropertyModel[prop.type] === TypePropertyModelEnum.OrganizationSelectionModel).length > 0) {
       await this.loadOrganizationsOffice(this.workpackParams.idOfficeOwnerWorkpackLinked ?
@@ -77,6 +90,47 @@ export class WorkpackPropertyService {
     this.backupProperties = this.properties && this.properties.map(prop => this.instanceBackupProperty(prop));
     this.loading = false;
     this.nextResetWorkpackProperties(true);
+  }
+
+  private async loadPluginAvailability(): Promise<void> {
+    try {
+      const result = await this.pluginAvailabilitySrv.getAvailability();
+      if (result.success && result.data) {
+        this.pluginAvailability = result.data;
+      }
+    } catch (_) {
+      this.pluginAvailability = {
+        agreements: false,
+        procurements: false,
+        obligations: false,
+        edocs: false,
+        budgetPlans: false,
+        financialSources: false
+      };
+    }
+  }
+
+  private isPropertyAvailable(type: string): boolean {
+    if (type === TypePropertyModelEnum.BudgetPlanSelectionModel) {
+      return this.pluginAvailability.budgetPlans;
+    }
+    if (type === TypePropertyModelEnum.FinancialSourceSelectionModel) {
+      return this.pluginAvailability.financialSources;
+    }
+    return true;
+  }
+
+  private filterAvailableProperties(
+    properties: IWorkpackModelProperty[] = []
+  ): IWorkpackModelProperty[] {
+    return properties
+      .filter(property => this.isPropertyAvailable(property.type))
+      .map(property => {
+        if (property.type === TypePropertyModelEnum.GroupModel && property.groupedProperties) {
+          property.groupedProperties = this.filterAvailableProperties(property.groupedProperties);
+        }
+        return property;
+      });
   }
 
   async getPropertiesData() {
@@ -222,6 +276,12 @@ export class WorkpackPropertyService {
       property.value = propertyWorkpack?.value ? propertyWorkpack?.value : propertyModel.defaultValue;
     }
     property.defaultValue = propertyWorkpack?.value ? propertyWorkpack?.value : propertyModel.defaultValue;
+    if ([
+      TypePropertyModelEnum.BudgetPlanSelectionModel,
+      TypePropertyModelEnum.FinancialSourceSelectionModel
+    ].includes(this.typePropertyModel[propertyModel.type])) {
+      property.selectedValues = (property.value instanceof Array ? property.value : []) as any;
+    }
     property.min = propertyModel.min && propertyModel.min !== null ? Number(propertyModel.min) : propertyModel.min;
     property.max = propertyModel.max && propertyModel.max !== null ? Number(propertyModel.max) : propertyModel.max;
     property.precision = propertyModel.precision;

@@ -1,49 +1,64 @@
 <div class="selection-property" [class.full-line]="property.fullLine">
   <span class="p-float-label selection-input">
-    <input pInputText [id]="property.name" [value]="displayValue" readonly
+    <input class="app-input-text" pInputText [id]="property.name" [value]="displayValue" readonly
       [disabled]="property.disabled" [class.ng-invalid]="property.invalid" />
-    <label [for]="property.name">{{property.label}} {{property.required ? '*' : ''}}</label>
+    <label class="app-input-label" [for]="property.name">{{property.label}} {{property.required ? '*' : ''}}</label>
   </span>
+  <button *ngIf="selectedValues.length && !property.disabled" pButton type="button" icon="fas fa-times"
+          class="p-button-text clear-button" (click)="clear()"></button>
   <button pButton type="button" icon="fas fa-search" class="p-button-outlined open-button"
     [disabled]="property.disabled" (click)="open()"></button>
-  <button *ngIf="selectedValues.length && !property.disabled" pButton type="button" icon="fas fa-times"
-    class="p-button-text clear-button" (click)="clear()"></button>
 </div>
 <small class="input-message-error" *ngIf="property.invalid">{{property.message}}</small>
 
-<p-dialog [(visible)]="visible" [modal]="true" [style]="{width: '760px'}"
+<p-dialog [(visible)]="visible" [modal]="true" [style]="{width: '760px', maxWidth: 'calc(100vw - 2rem)'}"
   header="Selecionar Plano Orçamentário">
   <div class="budget-plan-dialog">
-    <label>Unidade Orçamentária</label>
-    <p-dropdown [options]="budgetUnits" [(ngModel)]="selectedBudgetUnit" [filter]="true"
-      filterBy="code,acronym,name" [showClear]="true"
-      (onChange)="onBudgetUnitChange()" placeholder="Selecione uma UO">
-      <ng-template let-unit pTemplate="item">
-        <span>{{unit.code}} - {{unit.acronym}} - {{unit.name}}</span>
-      </ng-template>
-      <ng-template let-unit pTemplate="selectedItem">
-        <span>{{unit.code}} - {{unit.acronym}} - {{unit.name}}</span>
-      </ng-template>
-    </p-dropdown>
+    <div class="budget-plan-filters">
+      <div class="filter-field">
+        <label for="budget-unit-select">Unidade Orçamentária</label>
+        <p-dropdown inputId="budget-unit-select" [options]="budgetUnits" [(ngModel)]="selectedBudgetUnit" [filter]="true"
+          filterBy="code,acronym,name" optionLabel="name" [autoDisplayFirst]="false" [showClear]="true"
+          (ngModelChange)="onBudgetUnitChange($event)" placeholder="Selecione uma UO">
+          <ng-template let-unit pTemplate="item">
+            <span class="dropdown-option-label">{{unit.code}} - ({{unit.acronym}}) {{unit.name}}</span>
+          </ng-template>
+          <ng-template let-unit pTemplate="selectedItem">
+            <span class="dropdown-option-label">{{unit.code}} - ({{unit.acronym}}) {{unit.name}}</span>
+          </ng-template>
+        </p-dropdown>
+      </div>
 
-    <label>Buscar PO por código ou nome</label>
-    <input pInputText [(ngModel)]="searchTerm" [disabled]="!selectedBudgetUnit"
-      placeholder="Digite o código ou o nome do PO" />
+      <div class="filter-field">
+        <label for="budget-plan-search">Buscar PO por código ou nome</label>
+        <input id="budget-plan-search" pInputText [(ngModel)]="searchTerm" [disabled]="!selectedBudgetUnit"
+          placeholder="Digite o código ou o nome do PO" />
+      </div>
+    </div>
 
     <div class="plan-list" *ngIf="selectedBudgetUnit">
       <div class="loading" *ngIf="loadingPlans">Carregando planos orçamentários...</div>
       <button type="button" class="plan-option" *ngFor="let plan of filteredBudgetPlans"
         [class.selected]="isSelected(plan)" (click)="togglePlan(plan)">
         <i [class]="isSelected(plan) ? 'fas fa-check-circle' : 'far fa-circle'"></i>
-        <span><strong>{{plan.code}}</strong> - {{plan.name}}</span>
+        <span><strong>{{plan.code}}</strong> - {{planDisplayName(plan)}}</span>
       </button>
-      <div class="empty" *ngIf="!loadingPlans && !filteredBudgetPlans.length">Nenhum PO encontrado.</div>
+
+    </div>
+    <div class="empty" *ngIf="!selectedBudgetUnit && !loadingUnits">
+      Selecione uma UO para carregar os POs disponíveis.
+    </div>
+    <div class="empty" *ngIf="selectedBudgetUnit && !loadingPlans && budgetPlans.length === 0">
+      Nenhum PO disponível para esta UO.
+    </div>
+    <div class="empty" *ngIf="selectedBudgetUnit && !loadingPlans && budgetPlans.length > 0 && filteredBudgetPlans.length === 0">
+      Nenhum PO encontrado para o filtro informado.
     </div>
 
     <div class="selected-list" *ngIf="draftValues.length">
       <strong>Selecionado{{property.multipleSelection ? 's' : ''}}:</strong>
       <span class="selected-item" *ngFor="let value of draftValues">
-        {{value.budgetPlanCode}} - {{value.budgetPlanName}}
+        {{value.budgetPlanCode}} - {{planSelectionDisplayName(value)}}
         <button type="button" (click)="removeDraft(value)"><i class="fas fa-times"></i></button>
       </span>
     </div>

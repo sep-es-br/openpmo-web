@@ -14,6 +14,7 @@ export interface IBudgetPlanSelectionValue {
 }
 
 export interface IBudgetPlanSelectionOption {
+  uo: string;
   code: string;
   name: string;
 }
