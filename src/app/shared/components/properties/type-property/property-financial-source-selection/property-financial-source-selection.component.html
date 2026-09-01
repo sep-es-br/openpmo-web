@@ -20,7 +20,7 @@
       <div class="financial-source-filters">
         <div class="filter-field" *ngIf="level !== 'TYPE'">
           <label for="financial-source-type">Tipo de fonte</label>
-          <p-dropdown inputId="financial-source-type" [options]="typeOptions" [(ngModel)]="selectedType" [filter]="true"
+          <p-dropdown inputId="financial-source-type" [options]="typeOptions" optionLabel="name" [(ngModel)]="selectedType" [filter]="true"
             filterBy="code,name" [autoDisplayFirst]="false" [showClear]="true"
             (ngModelChange)="onTypeChange()" placeholder="Todos os tipos">
             <ng-template let-option pTemplate="item">
@@ -34,7 +34,7 @@
 
         <div class="filter-field" *ngIf="level === 'SOURCE' || level === 'DETAIL'">
           <label for="financial-source-group">Grupo</label>
-          <p-dropdown inputId="financial-source-group" [options]="groupOptions" [(ngModel)]="selectedGroup"
+          <p-dropdown inputId="financial-source-group" [options]="groupOptions" optionLabel="name" [(ngModel)]="selectedGroup"
             [filter]="true" filterBy="code,name" [autoDisplayFirst]="false" [showClear]="true"
             (ngModelChange)="onGroupChange()" placeholder="Selecione o grupo">
             <ng-template let-option pTemplate="item">
@@ -48,7 +48,7 @@
 
         <div class="filter-field" *ngIf="level === 'DETAIL'">
           <label for="financial-source-source">Fonte</label>
-          <p-dropdown inputId="financial-source-source" [options]="sourceOptions" [(ngModel)]="selectedSource"
+          <p-dropdown inputId="financial-source-source" [options]="sourceOptions" optionLabel="name" [(ngModel)]="selectedSource"
             [filter]="true" filterBy="code,name" [autoDisplayFirst]="false" [showClear]="true"
             [disabled]="!selectedGroup" (ngModelChange)="onSourceChange()" placeholder="Selecione a fonte">
             <ng-template let-option pTemplate="item">

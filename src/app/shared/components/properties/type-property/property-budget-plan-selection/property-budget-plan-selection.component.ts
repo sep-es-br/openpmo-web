@@ -37,7 +37,7 @@ export class PropertyBudgetPlanSelectionComponent {
 
   get displayValue(): string {
     return this.selectedValues
-      .map(value => `${value.budgetPlanCode} - ${value.budgetPlanName}`)
+      .map(value => `${value.budgetPlanCode} - ${this.planSelectionDisplayName(value)}`)
       .join('; ');
   }
 
@@ -52,15 +52,11 @@ export class PropertyBudgetPlanSelectionComponent {
   }
 
   planDisplayName(plan: IBudgetPlanSelectionOption): string {
-    const name = plan && plan.name ? plan.name : '';
-    const namePart = name.split('-', 2)[1];
-    return namePart && namePart.trim() ? namePart.trim() : name;
+    return this.removeCodePrefix(plan?.code, plan?.name);
   }
 
   planSelectionDisplayName(plan: IBudgetPlanSelectionValue): string {
-    const name = plan && plan.budgetPlanName ? plan.budgetPlanName : '';
-    const namePart = name.split('-', 2)[1];
-    return namePart && namePart.trim() ? namePart.trim() : name;
+    return this.removeCodePrefix(plan?.budgetPlanCode, plan?.budgetPlanName);
   }
 
   open(): void {
@@ -154,5 +150,20 @@ export class PropertyBudgetPlanSelectionComponent {
 
   private normalize(value: string): string {
     return (value || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+  }
+
+  private removeCodePrefix(code: string, name: string): string {
+    const normalizedCode = (code || '').trim();
+    const normalizedName = (name || '').trim();
+    if (!normalizedCode || !normalizedName) {
+      return normalizedName;
+    }
+
+    const separatorIndex = normalizedName.indexOf('-');
+    if (separatorIndex < 0 || normalizedName.slice(0, separatorIndex).trim() !== normalizedCode) {
+      return normalizedName;
+    }
+
+    return normalizedName.slice(separatorIndex + 1).trim();
   }
 }

@@ -76,7 +76,7 @@ export class WorkpackPropertyService {
     }
     const propertiesEntity =
       [this.loadProperty('name', TypePropertyModelEnum.TextModel), this.loadProperty('fullName', TypePropertyModelEnum.TextAreaModel)];
-    if (this.workpackData.workpackModel.type === TypeWorkpackModelEnum.MilestoneModel) {
+    if (this.workpackData.workpackModel?.type === TypeWorkpackModelEnum.MilestoneModel) {
       propertiesEntity.push(this.loadProperty('date', TypePropertyModelEnum.DateModel));
     }
     if (workpackModelActivesProperties && workpackModelActivesProperties.length > 0) {
@@ -124,7 +124,7 @@ export class WorkpackPropertyService {
     properties: IWorkpackModelProperty[] = []
   ): IWorkpackModelProperty[] {
     return properties
-      .filter(property => this.isPropertyAvailable(property.type))
+      .filter(property => this.isPropertyAvailable(this.typePropertyModel[property.type]))
       .map(property => {
         if (property.type === TypePropertyModelEnum.GroupModel && property.groupedProperties) {
           property.groupedProperties = this.filterAvailableProperties(property.groupedProperties);

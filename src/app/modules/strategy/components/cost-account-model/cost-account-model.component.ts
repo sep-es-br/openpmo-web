@@ -27,6 +27,7 @@ import { ICostAccountModel } from 'src/app/shared/interfaces/ICostAccountModel';
 import { IOrganization } from 'src/app/shared/interfaces/IOrganization';
 import { TypeOrganization } from 'src/app/shared/enums/TypeOrganization';
 import { CancelButtonComponent } from 'src/app/shared/components/cancel-button/cancel-button.component';
+import { IPluginAvailability, PluginAvailabilityService } from 'src/app/shared/services/plugin-availability.service';
 
 @Component({
   selector: 'app-cost-account-model',
@@ -62,6 +63,14 @@ export class CostAccountModelComponent implements OnInit {
   listOrganizations: IOrganization[] = [];
   listMeasureUnits: SelectItem[] = [];
   typeOrganizationEnum = TypeOrganization;
+  pluginAvailability: IPluginAvailability = {
+    agreements: false,
+    procurements: false,
+    obligations: false,
+    edocs: false,
+    budgetPlans: false,
+    financialSources: false
+  };
 
   constructor(
     private translateSrv: TranslateService,
@@ -77,7 +86,8 @@ export class CostAccountModelComponent implements OnInit {
     private officePermissionSrv: OfficePermissionService,
     private authSrv: AuthService,
     private confirmationSrv: ConfirmationService,
-    private costAccountModelSrv: CostAccountModelService
+    private costAccountModelSrv: CostAccountModelService,
+    private pluginAvailabilitySrv: PluginAvailabilityService
   ) {
     this.translateSrv.onLangChange.pipe(takeUntil(this.$destroy)).subscribe(() => {
       setTimeout(() => this.setLanguage(), 200);
@@ -87,6 +97,7 @@ export class CostAccountModelComponent implements OnInit {
       this.idModel = +id;
       this.idOffice = +idOffice;
       await this.checkPermissions();
+      await this.loadPluginAvailability();
       if (this.idModel) {
         this.cardProperties.isLoading = true;
         this.loadModel();
@@ -307,8 +318,8 @@ export class CostAccountModelComponent implements OnInit {
     const dataProperties = dataPropertiesAndIndex
       .sort((a, b) => a[1] > b[1] ? 1 : -1)
       .map(prop => prop[0] as IWorkpackModelProperty);
-    this.modelProperties = dataProperties;
-    this.resetModelProperties = dataProperties.map( propertie => ({...propertie}));
+    this.modelProperties = this.filterAvailableProperties(dataProperties);
+    this.resetModelProperties = this.modelProperties.map( propertie => ({...propertie}));
     this.cardProperties.isLoading = false;
   }
 
@@ -574,12 +585,46 @@ export class CostAccountModelComponent implements OnInit {
       return;
     }
     const menu = Object.keys(TypePropertyEnum).filter(k => k !== TypePropertyEnum.GroupModel)
+      .filter(k => this.isPropertyTypeAvailable(TypePropertyEnum[k]))
       .map(type => ({
         label: this.translateSrv.instant(`labels.${TypePropertyEnum[type]}`),
         icon: IconPropertyWorkpackModelEnum[TypePropertyEnum[type]],
         command: () => this.addProperty(TypePropertyEnum[type])
       }));
     this.menuModelProperties = menu;
+  }
+
+  private async loadPluginAvailability(): Promise<void> {
+    try {
+      const result = await this.pluginAvailabilitySrv.getAvailability();
+      if (result.success && result.data) {
+        this.pluginAvailability = result.data;
+      }
+    } catch (_) {
+      this.pluginAvailability = {
+        agreements: false,
+        procurements: false,
+        obligations: false,
+        edocs: false,
+        budgetPlans: false,
+        financialSources: false
+      };
+    }
+    this.loadMenuProperty();
+  }
+
+  private isPropertyTypeAvailable(type: string): boolean {
+    if (type === TypePropertyEnum.BudgetPlanSelectionModel) {
+      return this.pluginAvailability.budgetPlans;
+    }
+    if (type === TypePropertyEnum.FinancialSourceSelectionModel) {
+      return this.pluginAvailability.financialSources;
+    }
+    return true;
+  }
+
+  private filterAvailableProperties(properties: IWorkpackModelProperty[] = []): IWorkpackModelProperty[] {
+    return properties.filter(property => this.isPropertyTypeAvailable(property.type));
   }
 
   async addProperty(type: TypePropertyEnum) {

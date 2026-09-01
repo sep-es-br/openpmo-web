@@ -1215,11 +1215,11 @@ export class CostAccountComponent implements OnInit {
   ): IWorkpackModelProperty[] {
     return properties
       .filter(property =>
-        property.type !== TypePropertyModelEnum.BudgetPlanSelectionModel
+        this.typePropertyModel[property.type] !== TypePropertyModelEnum.BudgetPlanSelectionModel
           || this.pluginAvailability.budgetPlans
       )
       .filter(property =>
-        property.type !== TypePropertyModelEnum.FinancialSourceSelectionModel
+        this.typePropertyModel[property.type] !== TypePropertyModelEnum.FinancialSourceSelectionModel
           || this.pluginAvailability.financialSources
       )
       .map(property => {

@@ -38,13 +38,17 @@ export class PropertyFinancialSourceSelectionComponent {
   }
 
   get selectedValues(): IFinancialSourceSelectionValue[] {
-    return (this.property?.selectedValues as IFinancialSourceSelectionValue[])
-      || (this.property?.value as IFinancialSourceSelectionValue[])
-      || [];
+    if (Array.isArray(this.property?.selectedValues)) {
+      return this.property.selectedValues as IFinancialSourceSelectionValue[];
+    }
+    if (Array.isArray(this.property?.value)) {
+      return this.property.value as IFinancialSourceSelectionValue[];
+    }
+    return [];
   }
 
   get displayValue(): string {
-    return this.selectedValues.map(value => this.valueLabel(value)).join('; ');
+    return this.selectedValues.map(value => this.valueLabel(value)).filter(Boolean).join('; ');
   }
 
   get typeOptions(): SourceOption[] {
@@ -99,16 +103,16 @@ export class PropertyFinancialSourceSelectionComponent {
       case 'SOURCE':
         return !!this.selectedGroup;
       case 'DETAIL':
-        return !!this.selectedType && !!this.selectedGroup && !!this.selectedSource;
+        return !!this.selectedGroup && !!this.selectedSource && (!!this.selectedType || this.typeOptions.length === 0);
     }
   }
 
   get searchLabel(): string {
     switch (this.level) {
-      case 'TYPE': return 'Buscar tipo de fonte por código ou nome';
-      case 'GROUP': return 'Buscar grupo por código ou nome';
-      case 'SOURCE': return 'Buscar fonte por código ou nome';
-      case 'DETAIL': return 'Buscar detalhamento da fonte por código ou nome';
+      case 'TYPE': return 'Buscar tipo de fonte';
+      case 'GROUP': return 'Buscar grupo';
+      case 'SOURCE': return 'Buscar fonte';
+      case 'DETAIL': return 'Buscar detalhamento da fonte';
     }
   }
 
@@ -126,7 +130,7 @@ export class PropertyFinancialSourceSelectionComponent {
       case 'SOURCE':
         return 'Selecione um grupo para carregar as fontes disponíveis.';
       case 'DETAIL':
-        return 'Selecione um tipo, um grupo e uma fonte para carregar os detalhamentos disponíveis.';
+        return 'Selecione um grupo e uma fonte para carregar os detalhamentos disponíveis.';
       default:
         return '';
     }
@@ -209,7 +213,9 @@ export class PropertyFinancialSourceSelectionComponent {
   }
 
   confirm(): void {
-    this.property.selectedValues = this.draftValues.map(value => ({ ...value }));
+    const copied = this.draftValues.map(value => ({ ...value }));
+    this.property.selectedValues = copied;
+    this.property.value = copied;
     this.property.invalid = false;
     this.visible = false;
     this.changed.emit(this.property.selectedValues);
@@ -217,21 +223,36 @@ export class PropertyFinancialSourceSelectionComponent {
 
   clear(): void {
     this.property.selectedValues = [];
+    this.property.value = [];
     this.draftValues = [];
     this.changed.emit(this.property.selectedValues);
   }
 
   valueLabel(value: IFinancialSourceSelectionValue): string {
+    if (!value) {
+      return '';
+    }
     if (value.detailedSourceCode) {
-      return `${value.detailedSourceCode} - ${value.detailedSourceName}`;
+      return value.detailedSourceName
+        ? `${value.detailedSourceCode} - ${value.detailedSourceName}`
+        : value.detailedSourceCode;
     }
     if (value.sourceCode) {
-      return `${value.sourceCode} - ${value.sourceName}`;
+      return value.sourceName
+        ? `${value.sourceCode} - ${value.sourceName}`
+        : value.sourceCode;
     }
     if (value.sourceGroupCode) {
-      return `${value.sourceGroupCode} - ${value.sourceGroupName}`;
+      return value.sourceGroupName
+        ? `${value.sourceGroupCode} - ${value.sourceGroupName}`
+        : value.sourceGroupCode;
     }
-    return `${value.typeCode} - ${value.typeName}`;
+    if (value.typeCode) {
+      return value.typeName
+        ? `${value.typeCode} - ${value.typeName}`
+        : value.typeCode;
+    }
+    return '';
   }
 
   private currentValue(option: SourceOption): IFinancialSourceSelectionValue {
@@ -245,19 +266,19 @@ export class PropertyFinancialSourceSelectionComponent {
         };
       case 'SOURCE':
         return {
-          sourceGroupCode: this.selectedGroup.code,
-          sourceGroupName: this.selectedGroup.name,
+          sourceGroupCode: this.selectedGroup?.code,
+          sourceGroupName: this.selectedGroup?.name,
           sourceCode: option.code,
           sourceName: option.name
         };
       case 'DETAIL':
         return {
-          typeCode: this.selectedType.code,
-          typeName: this.selectedType.name,
-          sourceGroupCode: this.selectedGroup.code,
-          sourceGroupName: this.selectedGroup.name,
-          sourceCode: this.selectedSource.code,
-          sourceName: this.selectedSource.name,
+          typeCode: this.selectedType?.code,
+          typeName: this.selectedType?.name,
+          sourceGroupCode: this.selectedGroup?.code,
+          sourceGroupName: this.selectedGroup?.name,
+          sourceCode: this.selectedSource?.code,
+          sourceName: this.selectedSource?.name,
           detailedSourceCode: option.code,
           detailedSourceName: option.name
         };
@@ -275,12 +296,26 @@ export class PropertyFinancialSourceSelectionComponent {
 
   private distinct(options: SourceOption[]): SourceOption[] {
     const mapped = new Map<string, SourceOption>();
-    options.filter(option => option.code).forEach(option => mapped.set(`${option.code}|${option.name}`, option));
+    options.filter(option => option && option.code).forEach(option => mapped.set(`${option.code}|${option.name}`, option));
     return Array.from(mapped.values()).sort((a, b) => `${a.code} ${a.name}`.localeCompare(`${b.code} ${b.name}`));
   }
 
   private valueKey(value: IFinancialSourceSelectionValue): string {
-    return [value.typeCode, value.sourceGroupCode, value.sourceCode, value.detailedSourceCode].join('|');
+    if (!value) {
+      return '';
+    }
+    switch (this.level) {
+      case 'TYPE':
+        return value.typeCode || '';
+      case 'GROUP':
+        return [value.typeCode, value.sourceGroupCode].filter(Boolean).join('|') || value.sourceGroupCode || '';
+      case 'SOURCE':
+        return [value.sourceGroupCode, value.sourceCode].filter(Boolean).join('|') || value.sourceCode || '';
+      case 'DETAIL':
+        return [value.typeCode, value.sourceGroupCode, value.sourceCode, value.detailedSourceCode]
+          .filter(Boolean)
+          .join('|');
+    }
   }
 
   private resetFilters(): void {
