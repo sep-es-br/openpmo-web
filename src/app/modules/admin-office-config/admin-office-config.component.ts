@@ -142,7 +142,8 @@ export class AdminOfficeConfigComponent implements OnInit {
       },
       {
         typeCardItem: 'listItem',
-        iconSymbolId: 'preproject',
+        iconSvg: true,
+        icon: IconsEnum.Preproject,
         nameCardItem: this.translateSvr.instant('preprojectSelection'),
         fullNameCardItem: this.translateSvr.instant('preprojectSelection'),
         urlCard: '/preproject-selection',

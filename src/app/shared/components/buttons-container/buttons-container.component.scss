@@ -4,6 +4,15 @@
   display: flex;
   height: calc(75px + 1.25rem + 20px);
   width: 100%;
+
+  &.compact:not(.mobile) {
+    height: 3.5rem;
+  }
+
+  &.inline {
+    height: auto;
+    margin-top: 1.5rem;
+  }
   
   &.mobile {
     display: flex;
@@ -22,6 +31,18 @@
     display: flex;
     flex-direction: row;
     align-items: center;
+
+    &.compact:not(.mobile) {
+      bottom: 50px;
+      margin-bottom: 0;
+    }
+
+    &.inline {
+      position: static;
+      width: 100%;
+      margin: 0;
+      overflow: visible;
+    }
   
     ::ng-deep .button-label {
       pointer-events: auto;

@@ -796,11 +796,11 @@ app-root p-toast .p-toast {
 
 @font-face {
   font-family: 'icopmo';
-  src:  url('assets/fonts/icopmo.eot?3w7r9');
-  src:  url('assets/fonts/icopmo.eot?3w7r9#iefix') format('embedded-opentype'),
-    url('assets/fonts/icopmo.ttf?3w7r9') format('truetype'),
-    url('assets/fonts/icopmo.woff?3w7r9') format('woff'),
-    url('assets/fonts/icopmo.svg?3w7r9#icopmo') format('svg');
+  src:  url('assets/fonts/icopmo.eot?168act');
+  src:  url('assets/fonts/icopmo.eot?168act#iefix') format('embedded-opentype'),
+    url('assets/fonts/icopmo.ttf?168act') format('truetype'),
+    url('assets/fonts/icopmo.woff?168act') format('woff'),
+    url('assets/fonts/icopmo.svg?168act#icopmo') format('svg');
   font-weight: normal;
   font-style: normal;
   font-display: block;
@@ -822,6 +822,10 @@ app-root p-toast .p-toast {
 }
 
 .app-icon {
+
+  &.anteprojeto-cinza:before {
+    content: "\e961";
+  }
 
   &.folder-open2:before {
     content: "\e904";
@@ -1107,10 +1111,8 @@ app-root p-toast .p-toast {
   }
 }
 
-.preproject-menu-icon {
-  width: 1rem;
-  height: 1rem;
-  background-color: #8d989f;
-  -webkit-mask: url('assets/svg/anteprojeto-branco.svg') center / contain no-repeat;
-  mask: url('assets/svg/anteprojeto-branco.svg') center / contain no-repeat;
+.p-menuitem-icon.app-icon.anteprojeto-cinza {
+  width: 1.25rem;
+  font-size: 1.5rem !important;
+  text-align: center;
 }

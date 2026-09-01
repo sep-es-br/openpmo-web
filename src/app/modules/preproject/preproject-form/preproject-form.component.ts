@@ -8,7 +8,6 @@ import { TranslateService } from '@ngx-translate/core';
 
 import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
 import { MenuService } from 'src/app/shared/services/menu.service';
-import { ConfigDataViewService } from 'src/app/shared/services/config-dataview.service';
 import { PlanService } from 'src/app/shared/services/plan.service';
 import { OfficeService } from 'src/app/shared/services/office.service';
 import { WorkpackShowTabviewService } from 'src/app/shared/services/workpack-show-tabview.service';
@@ -64,8 +63,6 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
   idPlan: string | null;
 
   idPreproject: number | null = null;
-
-  collapsed: boolean = false;
 
   isLoading: boolean = false;
 
@@ -149,7 +146,6 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
     private readonly officeService: OfficeService,
     private readonly preprojectEvaluationConfigService: PreprojectEvaluationConfigService,
     private readonly preprojectCriteriaConfigService: PreprojectCriteriaConfigService,
-    private readonly configDataViewService: ConfigDataViewService,
     private readonly workpackShowTabviewService: WorkpackShowTabviewService,
     private readonly formBuilder: FormBuilder,
     private readonly translateService: TranslateService,
@@ -180,19 +176,6 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
       .subscribe(() => this.persistEvaluationSelection());
     this.menuService.nextIsPlanMenu(true);
     this.workpackShowTabviewService.next(true);
-
-    this.configDataViewService.observableCollapsePanelsStatus
-      .pipe(takeUntil(this.destroy$))
-      .subscribe((status: string) => {
-        this.collapsed = status === 'collapse';
-      });
-
-    this.configDataViewService.observableDisplayModeAll
-      .pipe(takeUntil(this.destroy$))
-      .subscribe((displayMode: string) => {
-        const mode: string = displayMode.toLowerCase();
-        this.displayModeAll = mode === 'card' || mode === 'grid' ? 'grid' : 'list';
-      });
 
     this.refreshDeliveryCardItems();
     void this.initBreadcrumb();

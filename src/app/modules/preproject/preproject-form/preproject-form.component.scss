@@ -63,6 +63,10 @@
   margin-bottom: 2rem !important;
 }
 
+.preproject-full-name-field {
+  width: 100%;
+}
+
 @media screen and (max-width: 768px) {
   .preproject-name-field {
     width: 100%;
@@ -253,6 +257,10 @@
   grid-template-columns: 1fr;
 }
 
+:host ::ng-deep .preproject-delivery-list .p-dataview-content {
+  padding-inline: 0;
+}
+
 :host ::ng-deep .preproject-delivery-list:not(.list-mode) .newItem {
   width: 260px;
 }
@@ -263,6 +271,7 @@
 
 .delivery-card-container {
   min-height: 9rem;
+  padding-left: 0;
 }
 
 // --- Abas de Critérios (Relevância e Viabilidade) ---

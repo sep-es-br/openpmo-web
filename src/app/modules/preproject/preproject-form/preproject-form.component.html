@@ -1,7 +1,6 @@
 <div class="app-preproject-form">
   <div class="preproject-form-header">
     <span>{{ formTitleTranslationKey | translate }}</span>
-    <app-config-data-view-panel></app-config-data-view-panel>
   </div>
 
   <app-card [properties]="cardProperties" class="mt-0 inputs-float-label">
@@ -15,7 +14,7 @@
               <input id="preproject-name" class="app-input-text" pInputText type="text" formControlName="name" />
             </div>
 
-            <div class="p-field preproject-name-field">
+            <div class="p-field preproject-name-field preproject-full-name-field">
               <label class="app-input-label" for="preproject-full-name">{{ 'fullName' | translate }} *</label>
               <input id="preproject-full-name" class="app-input-text" pInputText type="text" formControlName="fullName" />
             </div>
@@ -102,7 +101,6 @@
             <span class="evaluation-score-badge">
               {{ 'total' | translate }} {{ criterion.name }}:
               <strong>{{ getCriterionScore(criterion) | number:'1.1-2' }}</strong>
-              <small>/ {{ getCriterionMaximumScore(criterion) | number:'1.1-2' }}</small>
             </span>
           </button>
 
@@ -181,7 +179,7 @@
       </div>
     </app-tabview-scrolled>
 
-    <app-buttons-container>
+    <app-buttons-container [compact]="true">
       <app-save-button [form]="form" (save)="save()"></app-save-button>
       <app-cancel-button [form]="form" (cancel)="back()"></app-cancel-button>
     </app-buttons-container>
