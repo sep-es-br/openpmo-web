@@ -102,7 +102,7 @@ export class PreprojectSelectionComponent implements OnInit, OnDestroy {
       { label: this.translateService.instant('sum'), value: 'SUM' }
     ];
     await this.loadConfiguration();
-    this.loadCriteria();
+    await this.loadCriteria();
     this.setBreadcrumb();
   }
 
@@ -176,8 +176,9 @@ export class PreprojectSelectionComponent implements OnInit, OnDestroy {
     });
   }
 
-  private loadCriteria(): void {
-    const criteria = this.criteriaConfigService.getCriteria(this.idOffice).map(criterion => ({
+  private async loadCriteria(): Promise<void> {
+    const fetchedCriteria = await this.criteriaConfigService.getCriteria(this.idOffice);
+    const criteria = fetchedCriteria.map(criterion => ({
       typeCardItem: 'listItem',
       iconSvg: criterion.icon === 'fas fa-cog',
       icon: criterion.icon === 'fas fa-cog' ? IconsEnum.Cog : criterion.icon,
@@ -213,9 +214,9 @@ export class PreprojectSelectionComponent implements OnInit, OnDestroy {
     this.totalRecords = this.criteriaCardItems.length;
   }
 
-  private deleteCriterion(id: number): void {
-    this.criteriaConfigService.deleteCriterion(this.idOffice, id);
-    this.loadCriteria();
+  private async deleteCriterion(id: number): Promise<void> {
+    await this.criteriaConfigService.deleteCriterion(this.idOffice, id);
+    await this.loadCriteria();
   }
 
   private createCriterion(): void {

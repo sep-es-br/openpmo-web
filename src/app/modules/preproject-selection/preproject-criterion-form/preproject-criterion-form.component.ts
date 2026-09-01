@@ -21,7 +21,6 @@ import { TypeOrganization } from 'src/app/shared/enums/TypeOrganization';
 import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
 import { CancelButtonComponent } from 'src/app/shared/components/cancel-button/cancel-button.component';
 import { SaveButtonComponent } from 'src/app/shared/components/save-button/save-button.component';
-import { ConfigDataViewService } from 'src/app/shared/services/config-dataview.service';
 import {
   PreprojectCriteriaConfigService,
   PreprojectCriterion,
@@ -91,7 +90,6 @@ export class PreprojectCriterionFormComponent implements OnInit, OnDestroy {
   constructor(
     private readonly activeRoute: ActivatedRoute,
     private readonly breadcrumbService: BreadcrumbService,
-    private readonly configDataViewService: ConfigDataViewService,
     private readonly criteriaConfigService: PreprojectCriteriaConfigService,
     private readonly formBuilder: FormBuilder,
     private readonly officeService: OfficeService,
@@ -100,7 +98,7 @@ export class PreprojectCriterionFormComponent implements OnInit, OnDestroy {
   ) {
     this.form = this.formBuilder.group({
       name: ['', [Validators.required, Validators.maxLength(50)]],
-      position: [2, [Validators.required, Validators.min(2)]],
+      position: [1, [Validators.required, Validators.min(1)]],
       icon: ['fas fa-cog', Validators.required],
       weight: [1, [Validators.required, Validators.min(1)]],
       operation: ['SUM' as PreprojectCriterionOperation, Validators.required],
@@ -113,19 +111,16 @@ export class PreprojectCriterionFormComponent implements OnInit, OnDestroy {
     this.idOffice = Number(this.activeRoute.snapshot.queryParamMap.get('idOffice'));
     const criterionId: number = Number(this.activeRoute.snapshot.queryParamMap.get('criterionId'));
     this.criterionId = Number.isFinite(criterionId) && criterionId > 0 ? criterionId : null;
-    this.cardProperties.initialStateCollapse = !this.criterionId;
+    this.cardProperties.initialStateCollapse = false;
     this.office = await this.officeService.getCurrentOffice(this.idOffice);
     this.loadTranslatedOptions();
-    this.loadCriterionForEditing();
+    await this.loadCriterionForEditing();
     this.setBreadcrumb();
 
     this.translateService.onLangChange
       .pipe(takeUntil(this.destroy$))
       .subscribe(() => this.loadTranslatedOptions());
 
-    this.configDataViewService.observableCollapsePanelsStatus
-      .pipe(takeUntil(this.destroy$))
-      .subscribe((status: string) => this.updateCardsCollapseStatus(status === 'collapse'));
   }
 
   ngOnDestroy(): void {
@@ -133,18 +128,24 @@ export class PreprojectCriterionFormComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  save(): void {
+  async save(): Promise<void> {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
     }
 
-    if (this.criterionId) {
-      this.criteriaConfigService.updateCriterion(this.idOffice, this.criterionId, this.form.value);
-    } else {
-      this.criteriaConfigService.addCriterion(this.idOffice, this.form.value);
+    try {
+      if (this.criterionId) {
+        await this.criteriaConfigService.updateCriterion(this.idOffice, this.criterionId, this.form.value);
+      } else {
+        await this.criteriaConfigService.addCriterion(this.idOffice, this.form.value);
+      }
+      this.form.markAsPristine();
+      this.back();
+    } catch {
+      this.saveButton?.showButton();
+      this.cancelButton?.showButton();
     }
-    this.back();
   }
 
   back(): void {
@@ -244,13 +245,14 @@ export class PreprojectCriterionFormComponent implements OnInit, OnDestroy {
       .map((_: MenuItem[], groupIndex: number) => this.createPropertyMenuItems(groupIndex));
   }
 
-  private loadCriterionForEditing(): void {
+  private async loadCriterionForEditing(): Promise<void> {
     if (!this.criterionId) {
       return;
     }
 
     const criterion: PreprojectCriterion | undefined =
-      this.criteriaConfigService.getCriterion(this.idOffice, this.criterionId);
+      await this.criteriaConfigService.getCriterion(this.idOffice, this.criterionId);
+    console.log('CRITERION LOADED FROM API:', criterion);
     if (!criterion) {
       return;
     }
@@ -265,14 +267,14 @@ export class PreprojectCriterionFormComponent implements OnInit, OnDestroy {
 
     const rootPropertiesForm: FormArray = this.form.get('properties') as FormArray;
     rootPropertiesForm.clear();
-    this.rootProperties = (criterion.properties || []).map(property => ({ ...property }));
+    this.rootProperties = (criterion.properties || []).map(property => ({ ...property, isCollapsed: true }));
     this.rootProperties.forEach(property => rootPropertiesForm.push(this.formBuilder.control(property)));
 
     this.groups.clear();
     this.groupProperties = [];
     this.groupPropertyMenuItems = [];
     (criterion.groups || []).forEach(group => {
-      const properties = (group.properties || []).map(property => ({ ...property }));
+      const properties = (group.properties || []).map(property => ({ ...property, isCollapsed: true }));
       this.groups.push(this.formBuilder.group({
         title: [group.title, Validators.required],
         sortIndex: [group.sortIndex, [Validators.required, Validators.min(1)]],
@@ -286,13 +288,6 @@ export class PreprojectCriterionFormComponent implements OnInit, OnDestroy {
       this.groupProperties.push(properties);
       this.groupPropertyMenuItems.push(this.createPropertyMenuItems(this.groups.length - 1));
     });
-  }
-
-  private updateCardsCollapseStatus(collapsed: boolean): void {
-    this.cardProperties = {
-      ...this.cardProperties,
-      initialStateCollapse: collapsed
-    };
   }
 
   private createPropertyMenuItems(groupIndex?: number): MenuItem[] {

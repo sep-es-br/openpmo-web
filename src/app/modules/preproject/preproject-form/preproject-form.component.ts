@@ -193,10 +193,10 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
     });
   }
 
-  changeTab(event: { tabs: ITabViewScrolled }): void {
+  async changeTab(event: { tabs: ITabViewScrolled }): Promise<void> {
     this.selectedTab = event.tabs;
     if (this.selectedTab?.key?.startsWith('criterion-') && this.criteriaOfficeId) {
-      this.criteriaGuides = this.restoreCriteriaValues(this.getActiveCriteriaGuides(this.criteriaOfficeId));
+      this.criteriaGuides = this.restoreCriteriaValues(await this.getActiveCriteriaGuides(this.criteriaOfficeId));
     }
     this.updateCardPropertyMenu();
   }
@@ -384,11 +384,7 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
     this.refreshDeliveryCardItems();
   }
 
-  /**
-   * Cria e adiciona uma nova propriedade na aba especificada.
-   * Segue o mesmo fluxo do workpack-model: instancia IWorkpackModelProperty,
-   * chama checkProperty() para preparar campos obrigatórios e listas, e empurra na lista.
-   */
+
   addProperty(type: string, target: PropertyTarget): void {
     const list: IWorkpackModelProperty[] =
       target === 'relevance' ? this.relevanceProperties : this.viabilityProperties;
@@ -425,10 +421,6 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
     }
   }
 
-  /**
-   * Prepara campos obrigatórios e listas específicas por tipo de propriedade.
-   * Reproduz a lógica do checkProperty() do workpack-model para os tipos suportados.
-   */
   checkProperty(property: IWorkpackModelProperty): void {
     let requiredFields: string[] = ['name', 'label', 'sortIndex'];
 
@@ -462,11 +454,8 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
     property.obligatory = false;
   }
 
-  /**
-   * Callback emitido pelo app-property-model quando o usuário altera um campo.
-   */
+
   propertyChanged(event: { property: IWorkpackModelProperty }): void {
-    // Atualizações reativas de localidades serão conectadas quando o serviço de domínio estiver disponível.
     if (event?.property) {
       this.relevanceProperties = [...this.relevanceProperties];
       this.viabilityProperties = [...this.viabilityProperties];
@@ -501,14 +490,9 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
   }
 
   requestListPropertyItem(property: IWorkpackModelProperty): void {
-    // O componente publica este evento para o seletor de Desafios/ODS.
-    // A abertura do seletor será conectada ao serviço assim que o endpoint estiver disponível.
     this.propertyChanged({ property });
   }
 
-  /**
-   * Remove uma propriedade da lista da aba correspondente.
-   */
   deleteProperty(property: IWorkpackModelProperty, target: PropertyTarget): void {
     if (target === 'relevance') {
       this.relevanceProperties = this.relevanceProperties.filter((p: IWorkpackModelProperty) => p !== property);
@@ -521,10 +505,6 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
     return index;
   }
 
-  /**
-   * Constrói os menus de adição de propriedade para Relevância e Viabilidade,
-   * listando todos os tipos de TypePropertModelEnum com seus ícones oficiais.
-   */
   private buildPropertyMenus(): void {
     const propertyTypes: Array<{ type: TypePropertyEnum; labelKey: string }> = [
       { type: TypePropertyEnum.TextModel,                 labelKey: 'textProperty' },
@@ -559,8 +539,8 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
     this.cardProperties.createNewElementMenuItems = undefined;
   }
 
-  private loadCriteriaGuides(idOffice: number): void {
-    this.criteriaGuides = this.restoreCriteriaValues(this.getActiveCriteriaGuides(idOffice));
+  private async loadCriteriaGuides(idOffice: number): Promise<void> {
+    this.criteriaGuides = this.restoreCriteriaValues(await this.getActiveCriteriaGuides(idOffice));
 
     this.tabs = [
       { key: 'properties', menu: 'properties' },
@@ -573,8 +553,9 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
     this.tabsVersion += 1;
   }
 
-  private getActiveCriteriaGuides(idOffice: number): PreprojectCriterion[] {
-    return this.preprojectCriteriaConfigService.getCriteria(idOffice)
+  private async getActiveCriteriaGuides(idOffice: number): Promise<PreprojectCriterion[]> {
+    const criteria = await this.preprojectCriteriaConfigService.getCriteria(idOffice);
+    return criteria
       .filter((criterion: PreprojectCriterion) => criterion.active !== false)
       .sort((first: PreprojectCriterion, second: PreprojectCriterion) => first.position - second.position);
   }
@@ -865,7 +846,7 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
       if (plan) {
         this.criteriaOfficeId = plan.idOffice;
         this.evaluationOperation = this.preprojectEvaluationConfigService.getOperation(plan.idOffice);
-        this.loadCriteriaGuides(plan.idOffice);
+        await this.loadCriteriaGuides(plan.idOffice);
         const office = await this.officeService.getCurrentOffice(plan.idOffice);
         this.officeService.nextIDOffice(plan.idOffice);
 

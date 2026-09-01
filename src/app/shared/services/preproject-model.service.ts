@@ -28,4 +28,30 @@ export class PreprojectModelService extends BaseService<IPreprojectModelConfigur
       .put<IHttpResult<IPreprojectModelConfiguration>>(`${this.urlBase}/${id}`, configuration)
       .toPromise();
   }
+
+  createCriteriaTab(id: number, request: any): Promise<IHttpResult<any>> {
+    return this.http
+      .post<IHttpResult<any>>(`${this.urlBase}/${id}/criteria-tabs`, request)
+      .toPromise();
+  }
+
+  findCriteriaTabById(id: number, idOffice: number): Promise<IHttpResult<any>> {
+    return this.http
+      .get<IHttpResult<any>>(`${this.urlBase}/criteria-tabs/${id}`, {
+        params: { 'id-office': idOffice.toString() }
+      })
+      .toPromise();
+  }
+
+  updateCriteriaTab(id: number, request: any): Promise<IHttpResult<any>> {
+    return this.http
+      .put<IHttpResult<any>>(`${this.urlBase}/criteria-tabs/${id}`, request)
+      .toPromise();
+  }
+
+  deleteCriteriaTab(id: number): Promise<IHttpResult<void>> {
+    return this.http
+      .delete<IHttpResult<void>>(`${this.urlBase}/criteria-tabs/${id}`)
+      .toPromise();
+  }
 }
