@@ -15,4 +15,5 @@ export interface IMemberAs {
   active: boolean;
   level?: 'WORKPACK' | 'PLAN' | 'OFFICE';
   levelName?: string;
+  levelId?: number;
 }

@@ -81,7 +81,7 @@ export class ControlChangeBoardListComponent implements OnInit, OnDestroy {
     await this.loadPropertiesProject();
     await this.loadControlChangeBoard();
 
-    let breadcrumbItems = this.breadcrumbSrv.get;
+    const breadcrumbItems = this.breadcrumbSrv.get;
 
     const newBreadcrumb = [
       ...breadcrumbItems,
@@ -118,7 +118,8 @@ export class ControlChangeBoardListComponent implements OnInit, OnDestroy {
       if (this.isUserAdmin) {
         this.editPermission = true;
       } else {
-        this.editPermission = workpackData.workpack.permissions && workpackData.workpack.permissions.filter(p => p.level === 'EDIT').length > 0;
+        this.editPermission = workpackData.workpack.permissions
+          && workpackData.workpack.permissions.filter(p => p.level === 'EDIT').length > 0;
       }
     } else {
       const { success, data } = await this.workpackSrv.GetWorkpackById(this.idProject, { 'id-plan': this.idPlan });
@@ -170,59 +171,62 @@ export class ControlChangeBoardListComponent implements OnInit, OnDestroy {
         ],
       }
     ] : [];
-  if (success) {
-  const flattenedCards = data.flatMap(controlChangeBoard => {
-    const activeMemberAs = (controlChangeBoard.memberAs || []).filter(ccb => ccb.active);
+    if (success) {
+      const seenAuthorizations = new Set<string>();
+      const flattenedCards = data.flatMap(controlChangeBoard => {
+        const uniqueMemberAs = [...(controlChangeBoard.memberAs || [])]
+          .sort((first, second) => Number(second.active) - Number(first.active))
+          .filter(ccb => {
+            const level = ccb.level || 'WORKPACK';
+            const levelIdentifier = level === 'WORKPACK'
+              ? controlChangeBoard.idWorkpack
+              : ccb.levelId || ccb.levelName;
+            const authorizationKey = `${controlChangeBoard.person.id}|${level}|${levelIdentifier}`;
 
-    // dedupe defensivo (caso ainda haja duplicata de relação no banco)
-    const seen = new Set<string>();
-    const uniqueMemberAs = activeMemberAs.filter(ccb => {
-      const key = `${ccb.level || 'WORKPACK'}|${ccb.levelName || ''}`;
-      if (seen.has(key)) { return false; }
-      seen.add(key);
-      return true;
-    });
+            if (seenAuthorizations.has(authorizationKey)) { return false; }
+            seenAuthorizations.add(authorizationKey);
+            return true;
+          });
 
-    return uniqueMemberAs.map((ccb, index) => {
-      const isWorkpackLevel = !ccb.level || ccb.level === 'WORKPACK';
-      // nunca mostra role/workLocation aqui — só a tag de nível
-      const roleText = isWorkpackLevel
-        ? this.mapIdWorkpackName[controlChangeBoard.idWorkpack]
-        : `${this.translateSvr.instant(ccb.level === 'PLAN' ? 'plan' : 'office')}: ${ccb.levelName}`;
+        return uniqueMemberAs.map((ccb, index) => {
+          const isWorkpackLevel = !ccb.level || ccb.level === 'WORKPACK';
+          const roleText = isWorkpackLevel
+            ? this.mapIdWorkpackName[controlChangeBoard.idWorkpack]
+            : `${ccb.levelName}`;
 
-      return {
-        typeCardItem: 'listControlChangeBoard',
-        iconSvg: true,
-        icon: IconsEnum.CCBMember,
-        nameCardItem: controlChangeBoard.person.name,
-        fullNameCardItem: controlChangeBoard.person.fullName,
-        roles: [roleText], // sempre 1 item — 1 card = 1 autorização
-        itemId: Number(`${controlChangeBoard.person.id}${controlChangeBoard.idWorkpack}${index}`),
-        personId: controlChangeBoard.person.id,
-        cardWorkpackId: controlChangeBoard.idWorkpack,
-        menuItems: [{
-          label: this.translateSvr.instant('delete'), icon: 'fas fa-trash-alt',
-          command: () => this.deleteControlChangeBoard(controlChangeBoard, controlChangeBoard.person.id),
-          disabled: !this.editPermission || this.idProject !== controlChangeBoard.idWorkpack
-        }] as MenuItem[],
-        urlCard: 'member',
-        idAtributeName: 'idMember',
-        paramsUrlCard: [
-          { name: 'idProject', value: controlChangeBoard.idWorkpack },
-          { name: 'idPerson', value: controlChangeBoard.person.id },
-          { name: 'idOffice', value: this.idOffice },
-        ],
-        active: controlChangeBoard.active,
-        disabled: this.idProject !== controlChangeBoard.idWorkpack,
-      } as ICardItem;
-    });
-  });
+          return {
+            typeCardItem: 'listControlChangeBoard',
+            iconSvg: true,
+            icon: IconsEnum.CCBMember,
+            nameCardItem: controlChangeBoard.person.name,
+            fullNameCardItem: controlChangeBoard.person.fullName,
+            roles: [roleText],
+            itemId: Number(`${controlChangeBoard.person.id}${controlChangeBoard.idWorkpack}${index}`),
+            personId: controlChangeBoard.person.id,
+            cardWorkpackId: controlChangeBoard.idWorkpack,
+            menuItems: [{
+              label: this.translateSvr.instant('delete'), icon: 'fas fa-trash-alt',
+              command: () => this.deleteControlChangeBoard(controlChangeBoard, controlChangeBoard.person.id),
+              disabled: !this.editPermission || !isWorkpackLevel || this.idProject !== controlChangeBoard.idWorkpack
+            }] as MenuItem[],
+            urlCard: 'member',
+            idAtributeName: 'idMember',
+            paramsUrlCard: [
+              { name: 'idProject', value: controlChangeBoard.idWorkpack },
+              { name: 'idPerson', value: controlChangeBoard.person.id },
+              { name: 'idOffice', value: this.idOffice },
+            ],
+            active: ccb.active,
+            disabled: !isWorkpackLevel || this.idProject !== controlChangeBoard.idWorkpack,
+          } as ICardItem;
+        });
+      });
 
-  itemsProperties.unshift(...flattenedCards);
-  this.isLoading = false;
-} else {
-  this.isLoading = false;
-}
+      itemsProperties.unshift(...flattenedCards);
+      this.isLoading = false;
+    } else {
+      this.isLoading = false;
+    }
     this.cardItemsProperties = itemsProperties;
     this.totalRecords = this.cardItemsProperties && this.cardItemsProperties.length;
 
