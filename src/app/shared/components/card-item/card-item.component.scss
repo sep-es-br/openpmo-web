@@ -23,6 +23,19 @@ $card-horizontal-space: 1rem;
       background-color: unset !important;
     }
 
+    .card-item-content {
+      cursor: default;
+      pointer-events: none;
+
+      .icon-card,
+      .app-icon,
+      .card-item-name,
+      .card-item-subtitle,
+      .role,
+      .ocult {
+        color: v.$fontLabel !important;
+      }
+    }
   }
 
   .p-card {
