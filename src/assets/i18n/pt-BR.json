@@ -966,6 +966,7 @@
     "ToggleModel": "Chave",
     "UnitSelectionModel": "Seleção de unidade",
     "SelectionModel": "Seleção",
+    "CriteriaSelectionModel": "Seleção Multivalor",
     "TextAreaModel": "Área de texto",
     "NumberModel": "Número",
     "CurrencyModel": "Moeda",

@@ -22,6 +22,7 @@ import { IconsEnum } from 'src/app/shared/enums/IconsEnum';
 import { IEditableCardField } from 'src/app/shared/components/editable-card-item/editable-card-item.component';
 import { IPropertyListItem } from 'src/app/shared/interfaces/IPropertyListItem';
 import { TypeOrganization } from 'src/app/shared/enums/TypeOrganization';
+import { ITreeViewScopePlan, ITreeViewScopeWorkpack } from 'src/app/shared/interfaces/ITreeScopePersons';
 import {
   PreprojectEvaluationConfigService,
   PreprojectEvaluationOperation
@@ -105,12 +106,9 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
 
   evaluationCollapsed: { [criterionId: number]: boolean } = {};
 
-  readonly availablePlans: SelectItem[] = [
-    { label: 'Realiza +', value: 'REALIZA_PLUS' },
-    { label: 'Cesan', value: 'CESAN' },
-    { label: 'Direção Geral', value: 'DIRECAO_GERAL' },
-    { label: 'PCIES', value: 'PCIES' }
-  ];
+  availablePlans: SelectItem[] = [];
+
+  private officePlans: ITreeViewScopePlan[] = [];
 
   planStructure: TreeNode[] = [];
 
@@ -302,7 +300,7 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
     this.configureEvaluationSelection(enabled, true);
   }
 
-  handleAvailablePlanChange(planId: string): void {
+  handleAvailablePlanChange(planId: number | string): void {
     this.planStructure = this.buildPlanStructure(planId);
     this.selectedPlanPosition = [];
     this.form.get('planPosition').setValue(null);
@@ -651,32 +649,54 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
     }
   }
 
-  private buildPlanStructure(planId: string): TreeNode[] {
+  private buildPlanStructure(planId: number | string): TreeNode[] {
     if (!planId) {
       return [];
     }
-    const selectedPlan: SelectItem | undefined = this.availablePlans.find(plan => plan.value === planId);
-    const planLabel: string = selectedPlan?.label || planId;
+    const selectedPlan: ITreeViewScopePlan | undefined = this.officePlans
+      .find(plan => String(plan.id) === String(planId));
+    if (!selectedPlan) {
+      return [];
+    }
     return [{
-      label: planLabel,
-      data: `${planId}`,
+      label: selectedPlan.name,
+      data: `PLAN_${selectedPlan.id}`,
       expanded: true,
       icon: 'fas fa-briefcase',
-      children: [1, 2].map(axis => ({
-        label: `Eixo ${axis}`,
-        data: `${planId}/EIXO_${axis}`,
-        children: [1, 2].map(area => ({
-          label: `Área ${area}`,
-          data: `${planId}/EIXO_${axis}/AREA_${area}`,
-          children: [1, 2].map(action => ({
-            label: `Ação/Projeto ${action}`,
-            data: `${planId}/EIXO_${axis}/AREA_${area}/ACAO_${action}`,
-            icon: 'fas fa-project-diagram',
-            leaf: true
-          }))
-        }))
-      }))
+      selectable: false,
+      children: this.buildWorkpackStructure(selectedPlan.workpacks || [])
     }];
+  }
+
+  private buildWorkpackStructure(workpacks: ITreeViewScopeWorkpack[]): TreeNode[] {
+    return workpacks.map(workpack => ({
+      label: workpack.name,
+      data: `WORKPACK_${workpack.id}`,
+      icon: workpack.icon || 'fas fa-project-diagram',
+      leaf: !workpack.children?.length,
+      children: this.buildWorkpackStructure(workpack.children || [])
+    }));
+  }
+
+  private async loadOfficePlans(idOffice: number): Promise<void> {
+    const result = await this.officeService.GetTreeScopePersons(idOffice);
+    this.officePlans = result.success ? result.data?.plans || [] : [];
+    this.availablePlans = [
+      {
+        label: this.translateService.instant('select'),
+        value: null
+      },
+      ...this.officePlans.map(plan => ({
+        label: plan.name,
+        value: plan.id
+      }))
+    ];
+
+    const availablePlanControl = this.form.get('availablePlan');
+    availablePlanControl.setValue(null, { emitEvent: false });
+    this.form.get('planPosition').setValue(null, { emitEvent: false });
+    this.planStructure = [];
+    this.selectedPlanPosition = [];
   }
 
   private persistEvaluationSelection(): void {
@@ -847,6 +867,7 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
         this.criteriaOfficeId = plan.idOffice;
         this.evaluationOperation = this.preprojectEvaluationConfigService.getOperation(plan.idOffice);
         await this.loadCriteriaGuides(plan.idOffice);
+        await this.loadOfficePlans(plan.idOffice);
         const office = await this.officeService.getCurrentOffice(plan.idOffice);
         this.officeService.nextIDOffice(plan.idOffice);
 

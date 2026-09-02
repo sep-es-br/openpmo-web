@@ -935,6 +935,7 @@
     "ToggleModel": "Toggle",
     "UnitSelectionModel": "Unit Selection",
     "SelectionModel": "Selection",
+    "CriteriaSelectionModel": "Multiple-value Selection",
     "TextAreaModel": "Text Area",
     "NumberModel": "Number",
     "CurrencyModel": "Currency",

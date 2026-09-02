@@ -7,7 +7,8 @@
     [disabled]="disabled" (click)="open()"></button>
 </div>
 
-<p-dialog [(visible)]="displayModal" [modal]="true" [dismissableMask]="false" [closeOnEscape]="true"
+<p-dialog [(visible)]="displayModal" [modal]="true" [dismissableMask]="true" [closeOnEscape]="true"
+  (onHide)="commitValueChange()"
   [style]="{ width: '620px' }" [baseZIndex]="10000" styleClass="possible-values-dialog">
   <p-header>
     <div class="possible-values-dialog-title">{{ 'possibleValues' | translate }}</div>

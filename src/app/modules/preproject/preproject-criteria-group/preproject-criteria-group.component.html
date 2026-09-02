@@ -2,7 +2,7 @@
   <div class="group-properties row" [class.group-disabled]="!enabled">
     <div class="property-container" *ngFor="let item of properties; let propertyIndex = index"
       [ngClass]="getPropertyColumnClasses(item.config, propertyIndex)"
-      [class.selection-property]="item.config.type === 'SelectionModel'"
+      [class.selection-property]="['SelectionModel', 'CriteriaSelectionModel'].includes(item.config.type)"
       [class.not-fullLine]="!item.config.fullLine && item.config.type !== 'TextArea' && item.config.type !== 'Group'">
 
       <app-property-list-selection

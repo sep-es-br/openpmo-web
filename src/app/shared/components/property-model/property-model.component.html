@@ -20,14 +20,16 @@
     <div class="model-property p-fluid">
       <span class="p-float-label property-input p-field">
         <input class="app-input-text" type="text" pInputText [(ngModel)]="property.name" [required]="true"
-          (ngModelChange)="changed.emit($event)" [disabled]="property.obligatory || property.viewOnly" />
+          (ngModelChange)="changed.emit($event)"
+          [disabled]="property.obligatory || property.viewOnly || isFixedNameProperty()" />
         <label class="input-label">{{ 'name' | translate }} *
           <i class="far fa-question-circle" [pTooltip]="'help.propertyModel.name' | translate"></i>
         </label>
       </span>
       <span class="p-float-label property-input p-field">
         <input class="app-input-text" type="text" pInputText [(ngModel)]="property.label"
-          (ngModelChange)="changed.emit($event)" [disabled]="property.viewOnly" />
+          (ngModelChange)="changed.emit($event)"
+          [disabled]="property.viewOnly && !isFixedNameProperty()" />
         <label class="input-label">{{ 'label' | translate }} *
           <i class="far fa-question-circle" [pTooltip]="'help.propertyModel.label' | translate"></i>
         </label>
@@ -65,7 +67,7 @@
         </label>
       </span>
       <span class="p-float-label property-input p-field possible-values-field"
-        *ngIf="property.type === 'SelectionModel' && scoredPossibleValues">
+        *ngIf="property.type === 'CriteriaSelectionModel' && scoredPossibleValues">
         <app-possible-values-editor
           class="p-inputwrapper-filled"
           [values]="property.possibleValuesDetails || []"
@@ -147,7 +149,8 @@
             <i class="far fa-question-circle" [pTooltip]="'help.propertyModel.defaultValue' | translate"></i>
           </label>
         </span>
-        <span *ngSwitchCase="'SelectionModel'" class="p-float-label property-input p-field default-selection-field">
+        <span *ngIf="['SelectionModel', 'CriteriaSelectionModel'].includes(property.type)"
+          class="p-float-label property-input p-field default-selection-field">
           <ng-container *ngIf="property.multipleSelection; else singleSelectionDefault">
             <p-multiSelect class="app-multiple-selection" dropdownIcon="fas fa-caret-down"
               [options]="property.possibleValuesOptions | toSelectItem" [(ngModel)]="property.defaultValue"
@@ -247,7 +250,7 @@
         </label>
       </span>
       <span class="property-checkbox p-field-checkbox"
-        *ngIf="[ 'SelectionModel', 'LocalitySelectionModel', 'OrganizationSelectionModel' ].includes(property.type)">
+        *ngIf="[ 'SelectionModel', 'CriteriaSelectionModel', 'LocalitySelectionModel', 'OrganizationSelectionModel' ].includes(property.type)">
         <p-checkbox class="app-checkbox" [(ngModel)]="property.multipleSelection" [binary]="true"
           [disabled]="property.viewOnly || property.disableMultipleSelection" [required]="true"
           (ngModelChange)="changed.emit({property: property, multipleSelectedChanged: true}); checkDefaultValue();">

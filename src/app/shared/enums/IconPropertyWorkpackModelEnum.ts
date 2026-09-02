@@ -5,6 +5,7 @@ export enum IconPropertyWorkpackModelEnum {
   ToggleModel = 'fas fa-toggle-on',
   UnitSelectionModel = 'fas fa-ruler-horizontal',
   SelectionModel = 'fas fa-list',
+  CriteriaSelectionModel = 'fas fa-list',
   TextAreaModel = 'fas fa-text-width',
   NumberModel = 'app-icon number',
   CurrencyModel = 'fa fa-dollar-sign',

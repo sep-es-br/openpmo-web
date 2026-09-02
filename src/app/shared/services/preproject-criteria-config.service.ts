@@ -72,31 +72,66 @@ export class PreprojectCriteriaConfigService {
 
   private toBackendCriterion(criterion: Partial<PreprojectCriterion>): any {
     const mapTypeToBackend = (type: string): string => {
-      if (type === 'ChallengeListModel' || type === 'SdgListModel') return 'ListModel';
+      if (type === 'ChallengeListModel' || type === 'SdgListModel') return 'CriteriaListModel';
       return type;
     };
+    const getDefaultValues = (property: any): any[] => Array.isArray(property.defaultValue)
+      ? property.defaultValue
+      : property.defaultValue !== undefined && property.defaultValue !== null && property.defaultValue !== ''
+        ? [property.defaultValue]
+        : [];
 
-    const properties = (criterion.properties || []).map((p: any) => ({
-      ...p,
-      type: mapTypeToBackend(p.type),
-      sortIndex: p.sortIndex || p.position || 1,
-      label: p.label || p.name
-    }));
-    const groups = (criterion.groups || []).map((g: any) => ({
-      ...g,
-      type: 'CriteriaGroupModel',
-      name: g.title || g.name,
-      label: g.title || g.name || g.label,
-      sortIndex: g.sortIndex || g.position || 1,
-      groupedProperties: (g.properties || []).map((p: any) => ({
-        ...p,
-        type: mapTypeToBackend(p.type),
+    const toBackendProperty = (p: any): any => {
+      const {
+        requiredFields, list, extraList, extraListDefaults, selectedLocalities,
+        showIconButtonSelectLocality, isCollapsed, viewOnly, obligatory,
+        disableMultipleSelection, sectorsList, possibleValuesOptions,
+        possibleValuesDetails, propertyModelType, ...property
+      } = p;
+      const backendType: string = mapTypeToBackend(p.type);
+      return {
+        ...property,
+        type: backendType,
         sortIndex: p.sortIndex || p.position || 1,
-        label: p.label || p.name
-      }))
-    }));
+        label: p.label || p.name,
+        ...(p.type === 'SelectionModel' ? {
+          possibleValues: (possibleValuesOptions || []).join(','),
+          defaultValue: Array.isArray(p.defaultValue) ? p.defaultValue.join(',') : p.defaultValue,
+          multipleSelection: !!p.multipleSelection
+        } : {}),
+        ...(p.type === 'CriteriaSelectionModel' ? {
+          weight: p.weight ?? 1,
+          acceptedOptions: (possibleValuesDetails || []).map((option: any, index: number) => ({
+            ...option,
+            position: option.position || index + 1,
+            defaultOption: getDefaultValues(p).includes(option.label)
+          }))
+        } : {}),
+        ...(backendType === 'CriteriaListModel' ? {
+          weight: p.weight ?? 1,
+          itemValue: p.itemValue ?? 1
+        } : {})
+      };
+    };
+
+    const properties = (criterion.properties || []).map(toBackendProperty);
+    const groups = (criterion.groups || []).map((g: any) => {
+      const {
+        properties: groupProperties, groupedProperties: ignoredGroupedProperties, propertyModelType,
+        title, currentEnabled, ...group
+      } = g;
+      return {
+        ...group,
+        type: 'CriteriaGroupModel',
+        name: title || g.name,
+        label: title || g.name || g.label,
+        sortIndex: g.sortIndex || g.position || 1,
+        properties: (groupProperties || []).map(toBackendProperty)
+      };
+    });
+    const { properties: ignoredProperties, groups: ignoredGroups, propertyModelType, position, ...criterionData } = criterion as any;
     return {
-      ...criterion,
+      ...criterionData,
       type: 'CriteriaTabModel',
       active: true,
       name: criterion.name,
@@ -107,7 +142,7 @@ export class PreprojectCriteriaConfigService {
   }
 
   private mapTypeToFrontend(p: any): string {
-    if (p.type === 'ListModel') {
+    if (p.type === 'ListModel' || p.type === 'CriteriaListModel') {
       const name = (p.name || '').toLowerCase();
       if (name.includes('desafio') || name.includes('challenge')) return 'ChallengeListModel';
       if (name.includes('ods') || name.includes('sustentável') || name.includes('desenvolvimento')) return 'SdgListModel';
@@ -122,10 +157,37 @@ export class PreprojectCriteriaConfigService {
       const organizedProperties = [...(criterion.organizedProperties || [])]
         .sort(sortByIndex);
       const groups = organizedProperties.filter((p: any) => p.type === 'CriteriaGroupModel');
-      const properties = organizedProperties.filter((p: any) => p.type !== 'CriteriaGroupModel').map((p: any) => ({
-        ...p,
-        type: this.mapTypeToFrontend(p)
-      }));
+      const normalizeProperty = (p: any): any => {
+        const criteriaDefaults: string[] = (p.acceptedOptions || [])
+          .filter((option: any) => option.defaultOption)
+          .map((option: any) => option.label);
+        return {
+          ...p,
+          type: this.mapTypeToFrontend(p),
+          ...(p.type === 'SelectionModel' ? {
+            possibleValuesOptions: p.possibleValues
+              ? String(p.possibleValues).split(',').filter((value: string) => !!value)
+              : [],
+            defaultValue: p.multipleSelection && p.defaultValue
+              ? String(p.defaultValue).split(',').filter((value: string) => !!value)
+              : (p.defaultValue || '')
+          } : {}),
+          ...(p.type === 'CriteriaSelectionModel' ? {
+            possibleValuesDetails: p.acceptedOptions || [],
+            possibleValuesOptions: (p.acceptedOptions || []).map((option: any) => option.label),
+            defaultValue: p.multipleSelection === false ? (criteriaDefaults[0] || '') : criteriaDefaults,
+            multipleSelection: p.multipleSelection !== undefined ? p.multipleSelection : true,
+            disableMultipleSelection: false
+          } : {}),
+          ...(p.type === 'CriteriaListModel' ? {
+            weight: p.weight ?? 1,
+            itemValue: p.itemValue ?? 1
+          } : {})
+        };
+      };
+      const properties = organizedProperties
+        .filter((p: any) => p.type !== 'CriteriaGroupModel')
+        .map(normalizeProperty);
 
       return {
         propertyModelType: 'CriteriaTabModel',
@@ -137,17 +199,17 @@ export class PreprojectCriteriaConfigService {
         weight: criterion.weight || 1,
         operation: criterion.operation || 'SUM',
         properties: properties,
-        groups: groups.map((group: any) => ({
-          ...group,
-          propertyModelType: 'CriteriaGroupModel',
-          title: group.name || group.label || group.title,
-          properties: [...(group.groupedProperties || [])]
-            .sort(sortByIndex)
-            .map((p: any) => ({
-              ...p,
-              type: this.mapTypeToFrontend(p)
-            }))
-        }))
+        groups: groups.map((group: any) => {
+          const { groupedProperties: ignoredGroupedProperties, ...groupData } = group;
+          return {
+            ...groupData,
+            propertyModelType: 'CriteriaGroupModel',
+            title: group.name || group.label || group.title,
+            properties: [...(group.properties || [])]
+              .sort(sortByIndex)
+              .map(normalizeProperty)
+          };
+        })
       };
     });
   }

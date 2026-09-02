@@ -100,7 +100,10 @@
         <p-menu
           #menuAddProperty
           class="criterion-property-menu"
+          styleClass="criterion-property-menu-overlay"
           [popup]="true"
+          appendTo="body"
+          [style]="{ width: '260px' }"
           [model]="propertyMenuItems"
         ></p-menu>
         <p-button
@@ -124,21 +127,27 @@
       <ng-container *ngFor="let property of rootProperties; trackBy: trackByProperty">
         <app-property-model
           [property]="property"
+          [integrationSectorOptions]="integrationSectorOptions"
           [class.property-collapsed]="property.isCollapsed"
           [class.property-open]="!property.isCollapsed"
-          [scoredPossibleValues]="true"
+          [scoredPossibleValues]="property.type === 'CriteriaSelectionModel'"
           (changed)="propertyChanged($event)"
           (delete)="deleteRootProperty(property)">
         </app-property-model>
       </ng-container>
     </div>
-  </app-card>
-
-  <app-card
+  <div
     *ngFor="let group of groups.controls; let groupIndex = index"
-    [properties]="groupCardProperties"
-    class="criterion-group-card inputs-float-label"
+    class="criterion-group-card workpack-model-group inputs-float-label"
   >
+    <div class="group-card-header">
+      <i
+        class="app-icon trash-alt grey-icon"
+        [ngStyle]="{ fontSize: '1.25rem' }"
+        (click)="deleteGroup(groupIndex)"
+        [pTooltip]="'delete' | translate">
+      </i>
+    </div>
     <form [formGroup]="$any(group)" class="criterion-group-form p-fluid">
       <span class="p-float-label group-field p-field">
         <input [id]="'criterion-group-title-' + groupIndex" class="app-input-text" pInputText type="text" formControlName="title" />
@@ -220,7 +229,10 @@
         <p-menu
           #menuAddGroupProperty
           class="criterion-property-menu"
+          styleClass="criterion-property-menu-overlay"
           [popup]="true"
+          appendTo="body"
+          [style]="{ width: '260px' }"
           [model]="groupPropertyMenuItems[groupIndex]"
         ></p-menu>
         <p-button
@@ -237,14 +249,16 @@
       <ng-container *ngFor="let property of groupProperties[groupIndex]; trackBy: trackByProperty">
         <app-property-model
           [property]="property"
+          [integrationSectorOptions]="integrationSectorOptions"
           [class.property-collapsed]="property.isCollapsed"
           [class.property-open]="!property.isCollapsed"
-          [scoredPossibleValues]="true"
+          [scoredPossibleValues]="property.type === 'CriteriaSelectionModel'"
           (changed)="propertyChanged($event)"
           (delete)="deleteGroupProperty(property, groupIndex)">
         </app-property-model>
       </ng-container>
     </div>
+  </div>
   </app-card>
 
   <app-buttons-container>

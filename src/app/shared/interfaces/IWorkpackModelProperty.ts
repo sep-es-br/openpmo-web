@@ -20,6 +20,7 @@ export interface IWorkpackModelProperty {
   possibleValues?: string;
   possibleValuesOptions?: string[];
   possibleValuesDetails?: IPossibleValueOption[];
+  acceptedOptions?: Array<IPossibleValueOption & { position?: number; defaultOption?: boolean }>;
   sectorsList?: string[];
   sectors?: string;
   multipleSelection?: boolean;

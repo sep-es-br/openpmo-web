@@ -134,6 +134,7 @@
                 class="app-single-selection"
                 formControlName="availablePlan"
                 [options]="availablePlans"
+                [autoDisplayFirst]="false"
                 [placeholder]="'select' | translate"
                 dropdownIcon="fas fa-caret-down"
                 (ngModelChange)="handleAvailablePlanChange($event)">
@@ -146,10 +147,10 @@
                 <span *ngIf="preprojectSelectionEnabled">*</span>
               </label>
               <div class="app-tree-selection single-selection evaluation-plan-tree"
-                [class.disabled]="!preprojectSelectionEnabled"
-                [class.ng-invalid]="form.get('planPosition').invalid && form.get('planPosition').touched">
+                [class.disabled]="!preprojectSelectionEnabled">
                 <p-tree
                   [value]="planStructure"
+                  [emptyMessage]="'selectPlanFirst' | translate"
                   selectionMode="checkbox"
                   [(selection)]="selectedPlanPosition"
                   [propagateSelectionUp]="false"
@@ -157,9 +158,6 @@
                   (onNodeSelect)="handlePlanPositionSelect($event)"
                   (onNodeUnselect)="handlePlanPositionUnselect()">
                 </p-tree>
-                <span class="evaluation-tree-placeholder" *ngIf="!planStructure.length">
-                  {{ 'selectPlanFirst' | translate }}
-                </span>
               </div>
             </div>
 

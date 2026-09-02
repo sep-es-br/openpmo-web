@@ -45,6 +45,7 @@ export class PropertyModelComponent implements OnDestroy, OnChanges, AfterViewIn
       setTimeout(() => {
         this.setLanguage();
         this.loadSectorOptions();
+        this.setFixedPropertyName();
       }, 200);
     });
     this.calendarFormat = this.translateSrv.instant('dateFormat');
@@ -76,11 +77,29 @@ export class PropertyModelComponent implements OnDestroy, OnChanges, AfterViewIn
   if (changes.integrationSectorOptions) {
     this.loadSectorOptions();
   }
-  if (this.property?.extraList && this.property?.multipleSelection) {
+  if (this.property?.extraList?.length && this.property?.multipleSelection) {
     this.selectedSelectAllIfChildrenAllSelecteds(this.property.extraList[0]);
   }
   this.setDefaultMax();
-}
+  this.setFixedPropertyName();
+ }
+
+  isFixedNameProperty(): boolean {
+    return this.property?.type === TypePropertyModelEnum.ChallengeListModel
+      || this.property?.type === TypePropertyModelEnum.SdgListModel;
+  }
+
+  private setFixedPropertyName(): void {
+    if (!this.property) {
+      return;
+    }
+    if (this.property.type === TypePropertyModelEnum.ChallengeListModel) {
+      this.property.name = this.translateSrv.instant('challengeList');
+    }
+    if (this.property.type === TypePropertyModelEnum.SdgListModel) {
+      this.property.name = this.translateSrv.instant('sdgList');
+    }
+  }
 
   
 loadSectorOptions() {

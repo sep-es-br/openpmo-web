@@ -120,7 +120,8 @@ export class PreprojectCriteriaGroupComponent implements OnInit, OnChanges, OnDe
     const property: PropertyTemplateModel = Object.assign(new PropertyTemplateModel(), config, {
       type: this.toRuntimeType(config.type),
       disabled: !this.enabled,
-      possibleValues: (config.possibleValuesOptions || []).map((value: string) => ({ label: value, value })),
+      multipleSelection: config.multipleSelection,
+      possibleValues: this.getPossibleValues(config),
       value: config.currentValue !== undefined ? config.currentValue : config.defaultValue,
       selectedValue: config.currentSelectedValue,
       selectedValues: config.currentSelectedValues,
@@ -137,6 +138,7 @@ export class PreprojectCriteriaGroupComponent implements OnInit, OnChanges, OnDe
       [TypePropertModelEnum.ToggleModel]: TypePropertyModelEnum.ToggleModel,
       [TypePropertModelEnum.UnitSelectionModel]: TypePropertyModelEnum.UnitSelectionModel,
       [TypePropertModelEnum.SelectionModel]: TypePropertyModelEnum.SelectionModel,
+      [TypePropertModelEnum.CriteriaSelectionModel]: TypePropertyModelEnum.SelectionModel,
       [TypePropertModelEnum.TextAreaModel]: TypePropertyModelEnum.TextAreaModel,
       [TypePropertModelEnum.NumberModel]: TypePropertyModelEnum.NumberModel,
       [TypePropertModelEnum.CurrencyModel]: TypePropertyModelEnum.CurrencyModel,
@@ -144,6 +146,13 @@ export class PreprojectCriteriaGroupComponent implements OnInit, OnChanges, OnDe
       [TypePropertModelEnum.OrganizationSelectionModel]: TypePropertyModelEnum.OrganizationSelectionModel
     };
     return types[type] || type;
+  }
+
+  private getPossibleValues(config: IWorkpackModelProperty): Array<{ label: string; value: string }> {
+    const values: string[] = config.type === TypePropertModelEnum.CriteriaSelectionModel
+      ? (config.possibleValuesDetails || []).map(option => option.label)
+      : (config.possibleValuesOptions || []);
+    return values.map((value: string) => ({ label: value, value }));
   }
 
   private handleToggle(enabled: boolean): void {

@@ -1,5 +1,9 @@
 @use "src/variables" as v;
 
+::ng-deep .criterion-property-menu-overlay .p-menuitem-text {
+  white-space: nowrap;
+}
+
 .app-preproject-criterion-form {
   width: 100%;
 }
@@ -60,8 +64,27 @@
 }
 
 .criterion-group-card {
+  position: relative;
   display: block;
   margin-top: 1rem;
+  padding: .75rem 1rem 1rem;
+  border: 1px solid #d9e1e6;
+  border-radius: .3rem;
+  background: transparent;
+}
+
+.group-card-header {
+  position: absolute;
+  top: .55rem;
+  right: .75rem;
+  z-index: 1;
+  display: flex;
+  justify-content: flex-end;
+  min-height: 1.5rem;
+
+  .app-icon {
+    cursor: pointer;
+  }
 }
 
 .criterion-group-form {
@@ -77,8 +100,8 @@
     auto;
   align-items: start;
   column-gap: 1rem;
-  min-height: 86px;
-  padding-top: 0;
+  min-height: 106px;
+  padding-top: 1.25rem;
 }
 
 .group-field {

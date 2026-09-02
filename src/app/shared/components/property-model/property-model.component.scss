@@ -106,6 +106,22 @@
         }
       }
 
+      .default-selection-field {
+        min-width: 150px;
+
+        .p-dropdown,
+        .p-multiselect {
+          width: 100%;
+        }
+
+        > label {
+          display: inline-flex;
+          align-items: center;
+          gap: .25rem;
+          white-space: nowrap;
+        }
+      }
+
       > span:not(:last-of-type) {
         margin-right: 1em;
       }
@@ -116,10 +132,6 @@
     > .p-float-label > label {
       top: 0 !important;
       white-space: nowrap;
-    }
-
-    > .default-selection-field {
-      min-width: 150px;
     }
 
     > .property-checkbox,
