@@ -35,16 +35,29 @@ export class PreprojectCriteriaGroupComponent implements OnInit, OnChanges, OnDe
     return title.includes('ORCAMENTO') || title.includes('BUDGET');
   }
 
-  getPropertyColumnClasses(property: IWorkpackModelProperty, index: number): string[] {
-    const budgetFullLineIndexes: number[] = [2, 5, 8];
+  getPropertyColumnClasses(property: IWorkpackModelProperty): string[] {
     const fullLine: boolean = this.isBudgetGroup
-      ? budgetFullLineIndexes.includes(index)
+      ? true
       : property.fullLine
         || property.type === TypePropertModelEnum.TextAreaModel
         || property.type === TypePropertModelEnum.GroupModel
         || this.isListProperty(property);
 
-    return fullLine ? ['col-12'] : ['col-6'];
+    const classes: string[] = fullLine ? ['col-12'] : ['col-6'];
+    if (this.isCompactBudgetProperty(property)) {
+      classes.push('compact-budget-property');
+    }
+    return classes;
+  }
+
+  private isCompactBudgetProperty(property: IWorkpackModelProperty): boolean {
+    if (!this.isBudgetGroup) {
+      return false;
+    }
+    const label: string = this.normalizeLabel(property.label);
+    return label.includes('CUSTO PREVISTO TOTAL')
+      || label.includes('STATUS CAPTACAO')
+      || label.includes('QUAL VALOR PREVISTO NA LOA');
   }
 
   private readonly toggleChanged: EventEmitter<boolean> = new EventEmitter<boolean>();
@@ -122,12 +135,27 @@ export class PreprojectCriteriaGroupComponent implements OnInit, OnChanges, OnDe
       disabled: !this.enabled,
       multipleSelection: config.multipleSelection,
       possibleValues: this.getPossibleValues(config),
+      rows: this.isFinancialSourcesDescription(config) ? 3 : config.rows,
       value: config.currentValue !== undefined ? config.currentValue : config.defaultValue,
       selectedValue: config.currentSelectedValue,
       selectedValues: config.currentSelectedValues,
       localitiesSelected: config.currentLocalitiesSelected
     });
     return property;
+  }
+
+  private isFinancialSourcesDescription(config: IWorkpackModelProperty): boolean {
+    const label: string = this.normalizeLabel(config.label);
+    return config.type === TypePropertModelEnum.TextAreaModel
+      && label.includes('DESCRICAO')
+      && label.includes('FONTES FINANCEIRAS');
+  }
+
+  private normalizeLabel(value: string): string {
+    return (value || '')
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toUpperCase();
   }
 
   private toRuntimeType(type: string): string {

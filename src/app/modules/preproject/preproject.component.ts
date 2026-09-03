@@ -65,6 +65,7 @@ export class PreprojectComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
+    this.configDataViewService.nextCollapsePanelsStatus('expand');
     this.initDataViewSubscriptions();
     this.translateService.onLangChange
       .pipe(takeUntil(this.destroy$))
