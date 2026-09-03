@@ -54,11 +54,16 @@ export class HttpRequestInterceptor implements HttpInterceptor {
     if(accessToken) header = { Authorization: `Bearer ${accessToken}` };
 
 
-    req = req.clone({ setHeaders: header , withCredentials: true });
+    const useRequestCache = !req.headers.has('X-Skip-Request-Cache');
+    req = req.clone({
+      headers: req.headers.delete('X-Skip-Request-Cache'),
+      setHeaders: header,
+      withCredentials: true
+    });
 
-    const thisKey = this.stableStringify({url: req.urlWithParams, body: req.body});
+    const thisKey = this.stableStringify({method: req.method, url: req.urlWithParams, body: req.body});
 
-    if (this.requestCache.has(thisKey)) {
+    if (useRequestCache && this.requestCache.has(thisKey)) {
       return this.requestCache.get(thisKey);
     }
 
@@ -127,12 +132,16 @@ export class HttpRequestInterceptor implements HttpInterceptor {
       }),
       finalize(() => {
             this.requestCount--;
-            setTimeout(() => this.requestCache.delete(thisKey), 5_000);
+            if (useRequestCache) {
+              setTimeout(() => this.requestCache.delete(thisKey), 5_000);
+            }
         }),
         shareReplay(1)
     );
 
-    this.requestCache.set(thisKey, obs);
+    if (useRequestCache) {
+      this.requestCache.set(thisKey, obs);
+    }
     return obs;
   }
 

@@ -2,7 +2,7 @@ import { Component, EventEmitter, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import { MenuItem, SelectItem } from 'primeng/api';
+import { ConfirmationService, MenuItem, MessageService, SelectItem } from 'primeng/api';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { IconsEnum } from 'src/app/shared/enums/IconsEnum';
@@ -14,7 +14,7 @@ import { OfficeService } from 'src/app/shared/services/office.service';
 import {
   PreprojectEvaluationOperation
 } from 'src/app/shared/services/preproject-evaluation-config.service';
-import { PreprojectCriteriaConfigService } from 'src/app/shared/services/preproject-criteria-config.service';
+import { PreprojectCriteriaConfigService, PreprojectCriterion } from 'src/app/shared/services/preproject-criteria-config.service';
 import { IPreprojectModelConfiguration } from 'src/app/shared/interfaces/IPreprojectModelConfiguration';
 import { PreprojectModelService } from 'src/app/shared/services/preproject-model.service';
 
@@ -87,7 +87,9 @@ export class PreprojectSelectionComponent implements OnInit, OnDestroy {
     private readonly officeService: OfficeService,
     private readonly preprojectModelService: PreprojectModelService,
     private readonly router: Router,
-    private readonly translateService: TranslateService
+    private readonly translateService: TranslateService,
+    private readonly confirmationService: ConfirmationService,
+    private readonly messageService: MessageService
   ) {
     this.activationCardProperties.onToggle
       .pipe(takeUntil(this.destroy$))
@@ -133,6 +135,11 @@ export class PreprojectSelectionComponent implements OnInit, OnDestroy {
     if (result.success && result.data) {
       this.applyConfiguration(result.data);
       this.configurationForm.markAsPristine();
+      this.messageService.add({
+        severity: 'success',
+        summary: this.translateService.instant('success'),
+        detail: this.translateService.instant('messages.savedSuccessfully')
+      });
     }
   }
 
@@ -192,7 +199,7 @@ export class PreprojectSelectionComponent implements OnInit, OnDestroy {
         {
           label: this.translateService.instant('delete'),
           icon: 'fas fa-trash-alt',
-          command: () => this.deleteCriterion(criterion.id)
+          command: () => this.deleteCriterion(criterion)
         }
       ] as MenuItem[]
     } as ICardItem));
@@ -214,9 +221,27 @@ export class PreprojectSelectionComponent implements OnInit, OnDestroy {
     this.totalRecords = this.criteriaCardItems.length;
   }
 
-  private async deleteCriterion(id: number): Promise<void> {
-    await this.criteriaConfigService.deleteCriterion(this.idOffice, id);
-    await this.loadCriteria();
+  private deleteCriterion(criterion: PreprojectCriterion): void {
+    this.confirmationService.confirm({
+      message: `${this.translateService.instant('messages.deleteConfirmation')} ${criterion.name}?`,
+      key: 'deleteConfirm',
+      acceptLabel: this.translateService.instant('yes'),
+      rejectLabel: this.translateService.instant('no'),
+      accept: async () => {
+        try {
+          await this.criteriaConfigService.deleteCriterion(criterion.id);
+        } catch {
+          // O interceptor já exibe a falha; mantém a lista quando a exclusão não é confirmada.
+          return;
+        }
+        this.messageService.add({
+          severity: 'success',
+          summary: this.translateService.instant('success'),
+          detail: this.translateService.instant('messages.deleteSuccessful')
+        });
+        await this.loadCriteria();
+      }
+    });
   }
 
   private createCriterion(): void {

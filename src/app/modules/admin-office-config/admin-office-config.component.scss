@@ -41,13 +41,18 @@
   padding: 0 !important;
 }
 
+::ng-deep .admin-config .app-icon.anteprojeto-cinza {
+  font-size: 2rem !important;
+  line-height: 1;
+}
+
 ::ng-deep .admin-config .app-dataview-list .app-icon.anteprojeto-cinza {
   display: flex;
   align-items: center;
   justify-content: center;
   width: 2rem;
   height: 2rem;
-  font-size: 1.8rem !important;
+  font-size: 1.5rem !important;
   line-height: 1;
 }
 

@@ -16,10 +16,10 @@
           <svg *ngIf="properties.iconSymbolId" class="card-item-symbol grey-icon" aria-hidden="true" focusable="false">
             <use [attr.href]="'assets/svg/icons.svg#' + properties.iconSymbolId"></use>
           </svg>
-          <i *ngIf="!properties.iconSymbolId" [ngClass]="properties.iconSvg ? [ 'app-icon', 'card-item-icon', properties.icon, 'grey-icon'] : [ 'icon-card', 'card-item-icon', properties.icon, 'grey-icon' ]"
+          <span *ngIf="!properties.iconSymbolId" [ngClass]="properties.iconSvg ? [ 'app-icon', 'card-item-icon', properties.icon, 'grey-icon'] : [ 'icon-card', 'card-item-icon', properties.icon, 'grey-icon' ]"
             [class.risk-red]="properties.iconColor === 'high'" [class.risk-orange]="properties.iconColor === 'medium'"
             [class.linked]="!!properties.linked || !!properties.shared"
-            [class.risk-yellow]="properties.iconColor === 'low'"></i>
+            [class.risk-yellow]="properties.iconColor === 'low'"></span>
           <i [ngClass]="['app-icon', 'link-to', 'grey-icon', 'linked']" *ngIf="!!properties.linked"></i>
           <i [ngClass]="['app-icon', 'sharing', 'grey-icon', 'linked']"
             *ngIf="!!properties.shared && !properties.linked"></i>
@@ -44,10 +44,10 @@
           <svg *ngIf="properties.iconSymbolId" class="card-item-symbol grey-icon" aria-hidden="true" focusable="false">
             <use [attr.href]="'assets/svg/icons.svg#' + properties.iconSymbolId"></use>
           </svg>
-          <i *ngIf="!properties.iconSymbolId" [ngClass]="properties.iconSvg ? [ 'app-icon', 'card-item-icon', properties.icon, 'grey-icon'] : [ 'icon-card', 'card-item-icon', properties.icon, 'grey-icon' ]"
+          <span *ngIf="!properties.iconSymbolId" [ngClass]="properties.iconSvg ? [ 'app-icon', 'card-item-icon', properties.icon, 'grey-icon'] : [ 'icon-card', 'card-item-icon', properties.icon, 'grey-icon' ]"
             [class.risk-red]="properties.iconColor === 'high'" [class.risk-orange]="properties.iconColor === 'medium'"
             [class.linked]="!!properties.linked || !!properties.shared"
-            [class.risk-yellow]="properties.iconColor === 'low'"></i>
+            [class.risk-yellow]="properties.iconColor === 'low'"></span>
           <i [ngClass]="['app-icon', 'link-to', 'grey-icon', 'linked']" *ngIf="!!properties.linked"></i>
           <i [ngClass]="['app-icon', 'sharing', 'grey-icon', 'linked']"
             *ngIf="!!properties.shared && !properties.linked"></i>

@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import { MenuItem, SelectItem, TreeNode } from 'primeng/api';
+import { MenuItem, MessageService, SelectItem, TreeNode } from 'primeng/api';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
@@ -24,6 +24,7 @@ import { SaveButtonComponent } from 'src/app/shared/components/save-button/save-
 import {
   PreprojectCriteriaConfigService,
   PreprojectCriterion,
+  PreprojectCriterionGroup,
   PreprojectCriterionOperation
 } from 'src/app/shared/services/preproject-criteria-config.service';
 import { OfficeService } from 'src/app/shared/services/office.service';
@@ -101,7 +102,8 @@ export class PreprojectCriterionFormComponent implements OnInit, OnDestroy {
     private readonly officeService: OfficeService,
     private readonly organizationService: OrganizationService,
     private readonly router: Router,
-    private readonly translateService: TranslateService
+    private readonly translateService: TranslateService,
+    private readonly messageService: MessageService
   ) {
     this.form = this.formBuilder.group({
       name: ['', [Validators.required, Validators.maxLength(50)]],
@@ -142,12 +144,18 @@ export class PreprojectCriterionFormComponent implements OnInit, OnDestroy {
     }
 
     try {
+      const criterion = this.getCriterionPayload();
       if (this.criterionId) {
-        await this.criteriaConfigService.updateCriterion(this.idOffice, this.criterionId, this.form.value);
+        await this.criteriaConfigService.updateCriterion(this.criterionId, criterion);
       } else {
-        await this.criteriaConfigService.addCriterion(this.idOffice, this.form.value);
+        await this.criteriaConfigService.addCriterion(this.idOffice, criterion);
       }
       this.form.markAsPristine();
+      this.messageService.add({
+        severity: 'success',
+        summary: this.translateService.instant('success'),
+        detail: this.translateService.instant('messages.savedSuccessfully')
+      });
       this.back();
     } catch {
       this.saveButton?.showButton();
@@ -165,10 +173,35 @@ export class PreprojectCriterionFormComponent implements OnInit, OnDestroy {
     return this.form.get('groups') as FormArray;
   }
 
+  private getCriterionPayload(): Omit<PreprojectCriterion, 'id'> {
+    const formValue = this.form.getRawValue();
+    return {
+      ...formValue,
+      properties: this.rootProperties.length
+        ? [...this.rootProperties]
+        : [...(formValue.properties || [])],
+      groups: (formValue.groups || []).map((group: PreprojectCriterionGroup, groupIndex: number) => {
+        const renderedProperties = this.groupProperties[groupIndex] || [];
+        return {
+          ...group,
+          properties: renderedProperties.length
+            ? [...renderedProperties]
+            : [...(group.properties || [])]
+        };
+      })
+    };
+  }
+
   addGroup(): void {
     const groupIndex: number = this.groups.length;
 
     this.groups.push(this.formBuilder.group({
+      id: [null],
+      type: ['CriteriaGroupModel'],
+      active: [true],
+      fullLine: [false],
+      required: [false],
+      helpText: [null],
       title: [`${this.translateService.instant('group')} ${groupIndex + 1}`, Validators.required],
       sortIndex: [groupIndex + 1, [Validators.required, Validators.min(1)]],
       weight: [1, [Validators.required, Validators.min(1)]],
@@ -301,8 +334,7 @@ export class PreprojectCriterionFormComponent implements OnInit, OnDestroy {
     }
 
     const criterion: PreprojectCriterion | undefined =
-      await this.criteriaConfigService.getCriterion(this.idOffice, this.criterionId);
-    console.log('CRITERION LOADED FROM API:', criterion);
+      await this.criteriaConfigService.getCriterion(this.criterionId);
     if (!criterion) {
       return;
     }
@@ -328,6 +360,12 @@ export class PreprojectCriterionFormComponent implements OnInit, OnDestroy {
       const properties = await Promise.all((group.properties || [])
         .map(property => this.prepareProperty({ ...property, isCollapsed: true })));
       this.groups.push(this.formBuilder.group({
+        id: [group.id],
+        type: [group.type || 'CriteriaGroupModel'],
+        active: [group.active !== undefined ? group.active : true],
+        fullLine: [group.fullLine !== undefined ? group.fullLine : false],
+        required: [group.required !== undefined ? group.required : false],
+        helpText: [group.helpText],
         title: [group.title, Validators.required],
         sortIndex: [group.sortIndex, [Validators.required, Validators.min(1)]],
         weight: [group.weight, [Validators.required, Validators.min(1)]],

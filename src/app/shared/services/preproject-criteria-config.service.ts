@@ -24,10 +24,11 @@ export class PreprojectCriteriaConfigService {
         if (!summary.id) {
           return summary;
         }
-        const detailResponse = await this.preprojectModelService.findCriteriaTabById(summary.id, idOffice);
+        const detailResponse = await this.preprojectModelService.findCriteriaTabById(summary.id);
         return detailResponse.success && detailResponse.data ? detailResponse.data : summary;
       }));
-      return this.normalizeCriteria(criteriaDetails);
+      return this.normalizeCriteria(criteriaDetails)
+        .sort((first, second) => first.position - second.position || first.id - second.id);
     }
     return [];
   }
@@ -45,12 +46,15 @@ export class PreprojectCriteriaConfigService {
     throw new Error('Failed to create criterion');
   }
 
-  async deleteCriterion(idOffice: number, criterionId: number): Promise<void> {
-    await this.preprojectModelService.deleteCriteriaTab(criterionId);
+  async deleteCriterion(criterionId: number): Promise<void> {
+    const response = await this.preprojectModelService.deleteCriteriaTab(criterionId);
+    if (!response.success) {
+      throw new Error('Failed to delete criterion');
+    }
   }
 
-  async getCriterion(idOffice: number, criterionId: number): Promise<PreprojectCriterion | undefined> {
-    const response = await this.preprojectModelService.findCriteriaTabById(criterionId, idOffice);
+  async getCriterion(criterionId: number): Promise<PreprojectCriterion | undefined> {
+    const response = await this.preprojectModelService.findCriteriaTabById(criterionId);
     if (response.success && response.data) {
       return this.normalizeCriteria([response.data as any])[0];
     }
@@ -58,7 +62,6 @@ export class PreprojectCriteriaConfigService {
   }
 
   async updateCriterion(
-    idOffice: number,
     criterionId: number,
     criterion: Omit<PreprojectCriterion, 'id'>
   ): Promise<PreprojectCriterion> {
@@ -137,15 +140,16 @@ export class PreprojectCriteriaConfigService {
       name: criterion.name,
       label: criterion.name,
       sortIndex: criterion.position || 1,
-      organizedProperties: [...properties, ...groups]
+      organized: groups,
+      properties
     };
   }
 
   private mapTypeToFrontend(p: any): string {
     if (p.type === 'ListModel' || p.type === 'CriteriaListModel') {
       const name = (p.name || '').toLowerCase();
-      if (name.includes('desafio') || name.includes('challenge')) return 'ChallengeListModel';
       if (name.includes('ods') || name.includes('sustentável') || name.includes('desenvolvimento')) return 'SdgListModel';
+      return 'ChallengeListModel'; // Fallback para renderizar como lista mesmo se o nome não for reconhecido
     }
     return p.type;
   }
@@ -154,9 +158,7 @@ export class PreprojectCriteriaConfigService {
     return (criteria || []).map((criterion: any, index: number) => {
       const sortByIndex = (first: any, second: any): number =>
         (first.sortIndex || 0) - (second.sortIndex || 0);
-      const organizedProperties = [...(criterion.organizedProperties || [])]
-        .sort(sortByIndex);
-      const groups = organizedProperties.filter((p: any) => p.type === 'CriteriaGroupModel');
+
       const normalizeProperty = (p: any): any => {
         const criteriaDefaults: string[] = (p.acceptedOptions || [])
           .filter((option: any) => option.defaultOption)
@@ -185,8 +187,17 @@ export class PreprojectCriteriaConfigService {
           } : {})
         };
       };
-      const properties = organizedProperties
-        .filter((p: any) => p.type !== 'CriteriaGroupModel')
+
+      const groups = [...(criterion.organized || [])]
+        .filter((property: any) => property.type === 'CriteriaGroupModel')
+        .sort(sortByIndex)
+        .map((group: any) => ({
+          ...group,
+          properties: (group.properties || []).map(normalizeProperty).sort(sortByIndex)
+        }));
+
+      const properties = [...(criterion.properties || [])]
+        .sort(sortByIndex)
         .map(normalizeProperty);
 
       return {
@@ -206,8 +217,6 @@ export class PreprojectCriteriaConfigService {
             propertyModelType: 'CriteriaGroupModel',
             title: group.name || group.label || group.title,
             properties: [...(group.properties || [])]
-              .sort(sortByIndex)
-              .map(normalizeProperty)
           };
         })
       };

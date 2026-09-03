@@ -24,7 +24,7 @@
 
 .criterion-properties-fields {
   display: flex;
-  align-items: flex-end;
+  align-items: flex-start;
   flex-wrap: wrap;
 }
 
@@ -139,16 +139,6 @@
 }
 
 :host ::ng-deep {
-  .criterion-properties-fields .p-float-label > label {
-    top: 0 !important;
-    white-space: nowrap;
-  }
-
-  .criterion-group-form .p-float-label > label {
-    top: 0 !important;
-    white-space: nowrap;
-  }
-
   .criterion-field .p-inputnumber,
   .criterion-field .p-dropdown,
   .criterion-field .p-inputtext {

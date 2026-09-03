@@ -2,7 +2,7 @@
   <textarea pInputTextarea [id]="inputId || controlName" class="app-text-area"
     [formControlName]="controlName" [required]="required" [rows]="rows"
     (blur)="changed.emit($event)"></textarea>
-  <label class="app-input-label" [for]="inputId || controlName">
+  <label class="app-input-label" [for]="inputId || controlName" [class.p-disabled]="form.get(controlName)?.disabled">
     {{ label }} {{ required ? '*' : '' }}
   </label>
 </span>

@@ -12,88 +12,103 @@
 
     <form [formGroup]="form" class="criterion-form p-fluid">
       <div class="criterion-properties-fields">
-      <span class="p-float-label criterion-field p-field">
-        <input id="criterion-name" class="app-input-text" pInputText type="text" formControlName="name" />
-        <label class="app-input-label" for="criterion-name">
-          {{ 'name' | translate }} *
-          <i class="far fa-question-circle" [pTooltip]="'name' | translate"></i>
-        </label>
-      </span>
+      <div class="criterion-field p-field">
+        <span class="p-float-label">
+          <input id="criterion-name" class="app-input-text" pInputText type="text" formControlName="name" />
+          <label class="app-input-label" for="criterion-name">
+            {{ 'name' | translate }} *
+            <i class="far fa-question-circle" [pTooltip]="'name' | translate"></i>
+          </label>
+        </span>
+        <app-input-message [form]="form" field="name"></app-input-message>
+      </div>
 
-      <span class="p-float-label criterion-field compact-field p-field">
-        <p-inputNumber
-          inputId="criterion-position"
-          class="app-input-number"
-          formControlName="position"
-          [min]="1"
-          [step]="1"
-        ></p-inputNumber>
-        <label class="app-input-label" for="criterion-position">
-          {{ 'position' | translate }} *
-          <i class="far fa-question-circle" [pTooltip]="'position' | translate"></i>
-        </label>
-      </span>
+      <div class="criterion-field compact-field p-field">
+        <span class="p-float-label">
+          <p-inputNumber
+            inputId="criterion-position"
+            class="app-input-number"
+            formControlName="position"
+            [min]="1"
+            [step]="1"
+          ></p-inputNumber>
+          <label class="app-input-label" for="criterion-position">
+            {{ 'position' | translate }} *
+            <i class="far fa-question-circle" [pTooltip]="'position' | translate"></i>
+          </label>
+        </span>
+        <app-input-message [form]="form" field="position"></app-input-message>
+      </div>
 
-      <span class="p-float-label criterion-field icon-field p-field">
-        <p-dropdown
-          inputId="criterion-icon"
-          class="app-single-selection"
-          [options]="icons"
-          optionValue="name"
-          formControlName="icon"
-          [autoDisplayFirst]="false"
-          [filter]="true"
-          filterBy="label"
-          [showClear]="true"
-          [virtualScroll]="true"
-          [itemSize]="50"
-          dropdownIcon="fas fa-caret-down"
-        >
-          <ng-template pTemplate="selectedItem">
-            <div class="icon-item-selected" *ngIf="form.controls.icon.value">
-              <i [ngClass]="form.controls.icon.value"></i>
-            </div>
-          </ng-template>
-          <ng-template let-icon pTemplate="item">
-            <div class="icon-item">
-              <i [ngClass]="icon.name"></i>
-              <span>{{ icon.label }}</span>
-            </div>
-          </ng-template>
-        </p-dropdown>
-        <label class="app-input-label" for="criterion-icon">
-          {{ 'icon' | translate }} *
-          <i class="far fa-question-circle" [pTooltip]="'icon' | translate"></i>
-        </label>
-      </span>
+      <div class="criterion-field icon-field p-field">
+        <span class="p-float-label">
+          <p-dropdown
+            inputId="criterion-icon"
+            class="app-single-selection"
+            [options]="icons"
+            optionValue="name"
+            formControlName="icon"
+            [autoDisplayFirst]="false"
+            [filter]="true"
+            filterBy="label"
+            [showClear]="true"
+            [virtualScroll]="true"
+            [itemSize]="50"
+            dropdownIcon="fas fa-caret-down"
+          >
+            <ng-template pTemplate="selectedItem">
+              <div class="icon-item-selected" *ngIf="form.controls.icon.value">
+                <i [ngClass]="form.controls.icon.value"></i>
+              </div>
+            </ng-template>
+            <ng-template let-icon pTemplate="item">
+              <div class="icon-item">
+                <i [ngClass]="icon.name"></i>
+                <span>{{ icon.label }}</span>
+              </div>
+            </ng-template>
+          </p-dropdown>
+          <label class="app-input-label" for="criterion-icon">
+            {{ 'icon' | translate }} *
+            <i class="far fa-question-circle" [pTooltip]="'icon' | translate"></i>
+          </label>
+        </span>
+        <app-input-message [form]="form" field="icon"></app-input-message>
+      </div>
 
-      <span class="p-float-label criterion-field compact-field p-field">
-        <p-inputNumber
-          inputId="criterion-weight"
-          class="app-input-number"
-          formControlName="weight"
-          [min]="1"
-          [step]="1"
-        ></p-inputNumber>
-        <label class="app-input-label" for="criterion-weight">
-          {{ 'weight' | translate }} *
-          <i class="far fa-question-circle" [pTooltip]="'weight' | translate"></i>
-        </label>
-      </span>
+      <div class="criterion-field compact-field p-field">
+        <span class="p-float-label">
+          <p-inputNumber
+            inputId="criterion-weight"
+            class="app-input-number"
+            formControlName="weight"
+            [min]="1"
+            [step]="1"
+          ></p-inputNumber>
+          <label class="app-input-label" for="criterion-weight">
+            {{ 'weight' | translate }} *
+            <i class="far fa-question-circle" [pTooltip]="'weight' | translate"></i>
+          </label>
+        </span>
+        <app-input-message [form]="form" field="weight"></app-input-message>
+      </div>
 
-      <span class="p-float-label criterion-field operation-field p-field">
-        <p-dropdown
-          inputId="criterion-operation"
-          class="app-single-selection"
-          [options]="operationOptions"
-          formControlName="operation"
-          dropdownIcon="fas fa-caret-down"
-        ></p-dropdown>
-        <label class="app-input-label" for="criterion-operation">
-          {{ 'operation' | translate }} *
-          <i class="far fa-question-circle" [pTooltip]="'operation' | translate"></i>
-        </label>
-      </span>
+      <div class="criterion-field operation-field p-field">
+        <span class="p-float-label">
+          <p-dropdown
+            inputId="criterion-operation"
+            class="app-single-selection"
+            [options]="operationOptions"
+            formControlName="operation"
+            dropdownIcon="fas fa-caret-down"
+          ></p-dropdown>
+          <label class="app-input-label" for="criterion-operation">
+            {{ 'operation' | translate }} *
+            <i class="far fa-question-circle" [pTooltip]="'operation' | translate"></i>
+          </label>
+        </span>
+        <app-input-message [form]="form" field="operation"></app-input-message>
+      </div>
       </div>
 
       <div class="criterion-actions">
@@ -149,55 +164,67 @@
       </i>
     </div>
     <form [formGroup]="$any(group)" class="criterion-group-form p-fluid">
-      <span class="p-float-label group-field p-field">
-        <input [id]="'criterion-group-title-' + groupIndex" class="app-input-text" pInputText type="text" formControlName="title" />
-        <label class="app-input-label" [for]="'criterion-group-title-' + groupIndex">
-          {{ 'title' | translate }} *
-          <i class="far fa-question-circle" [pTooltip]="'title' | translate"></i>
-        </label>
-      </span>
+      <div class="group-field p-field">
+        <span class="p-float-label">
+          <input [id]="'criterion-group-title-' + groupIndex" class="app-input-text" pInputText type="text" formControlName="title" />
+          <label class="app-input-label" [for]="'criterion-group-title-' + groupIndex">
+            {{ 'title' | translate }} *
+            <i class="far fa-question-circle" [pTooltip]="'title' | translate"></i>
+          </label>
+        </span>
+        <app-input-message [form]="$any(group)" field="title"></app-input-message>
+      </div>
 
-      <span class="p-float-label group-field compact-field p-field">
-        <p-inputNumber
-          [inputId]="'criterion-group-sort-index-' + groupIndex"
-          class="app-input-number"
-          formControlName="sortIndex"
-          [min]="1"
-          [step]="1"
-        ></p-inputNumber>
-        <label class="app-input-label" [for]="'criterion-group-sort-index-' + groupIndex">
-          {{ 'sortIndex' | translate }} *
-          <i class="far fa-question-circle" [pTooltip]="'sortIndex' | translate"></i>
-        </label>
-      </span>
+      <div class="group-field compact-field p-field">
+        <span class="p-float-label">
+          <p-inputNumber
+            [inputId]="'criterion-group-sort-index-' + groupIndex"
+            class="app-input-number"
+            formControlName="sortIndex"
+            [min]="1"
+            [step]="1"
+          ></p-inputNumber>
+          <label class="app-input-label" [for]="'criterion-group-sort-index-' + groupIndex">
+            {{ 'sortIndex' | translate }} *
+            <i class="far fa-question-circle" [pTooltip]="'sortIndex' | translate"></i>
+          </label>
+        </span>
+        <app-input-message [form]="$any(group)" field="sortIndex"></app-input-message>
+      </div>
 
-      <span class="p-float-label group-field compact-field p-field">
-        <p-inputNumber
-          [inputId]="'criterion-group-weight-' + groupIndex"
-          class="app-input-number"
-          formControlName="weight"
-          [min]="1"
-          [step]="1"
-        ></p-inputNumber>
-        <label class="app-input-label" [for]="'criterion-group-weight-' + groupIndex">
-          {{ 'weight' | translate }} *
-          <i class="far fa-question-circle" [pTooltip]="'weight' | translate"></i>
-        </label>
-      </span>
+      <div class="group-field compact-field p-field">
+        <span class="p-float-label">
+          <p-inputNumber
+            [inputId]="'criterion-group-weight-' + groupIndex"
+            class="app-input-number"
+            formControlName="weight"
+            [min]="1"
+            [step]="1"
+          ></p-inputNumber>
+          <label class="app-input-label" [for]="'criterion-group-weight-' + groupIndex">
+            {{ 'weight' | translate }} *
+            <i class="far fa-question-circle" [pTooltip]="'weight' | translate"></i>
+          </label>
+        </span>
+        <app-input-message [form]="$any(group)" field="weight"></app-input-message>
+      </div>
 
-      <span class="p-float-label group-field operation-field p-field">
-        <p-dropdown
-          [inputId]="'criterion-group-operation-' + groupIndex"
-          class="app-single-selection"
-          [options]="operationOptions"
-          formControlName="operation"
-          dropdownIcon="fas fa-caret-down"
-        ></p-dropdown>
-        <label class="app-input-label" [for]="'criterion-group-operation-' + groupIndex">
-          {{ 'operation' | translate }} *
-          <i class="far fa-question-circle" [pTooltip]="'operation' | translate"></i>
-        </label>
-      </span>
+      <div class="group-field operation-field p-field">
+        <span class="p-float-label">
+          <p-dropdown
+            [inputId]="'criterion-group-operation-' + groupIndex"
+            class="app-single-selection"
+            [options]="operationOptions"
+            formControlName="operation"
+            dropdownIcon="fas fa-caret-down"
+          ></p-dropdown>
+          <label class="app-input-label" [for]="'criterion-group-operation-' + groupIndex">
+            {{ 'operation' | translate }} *
+            <i class="far fa-question-circle" [pTooltip]="'operation' | translate"></i>
+          </label>
+        </span>
+        <app-input-message [form]="$any(group)" field="operation"></app-input-message>
+      </div>
 
       <div class="enablement-key-field" (click)="$event.stopPropagation()">
         <p-inputSwitch
@@ -262,7 +289,7 @@
   </app-card>
 
   <app-buttons-container>
-    <app-save-button #saveButton [form]="form" (save)="save()"></app-save-button>
+    <app-save-button #saveButton [form]="form" [pTooltip]="'save' | translate" (save)="save()"></app-save-button>
     <app-cancel-button #cancelButton [form]="form" (cancel)="back()"></app-cancel-button>
   </app-buttons-container>
 </div>

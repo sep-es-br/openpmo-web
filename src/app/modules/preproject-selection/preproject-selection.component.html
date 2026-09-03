@@ -51,7 +51,7 @@
   </div>
 
   <app-buttons-container [inline]="true">
-    <app-save-button [form]="configurationForm" (save)="saveConfiguration()"></app-save-button>
+    <app-save-button [form]="configurationForm" [pTooltip]="'save' | translate" (save)="saveConfiguration()"></app-save-button>
     <app-cancel-button [form]="configurationForm" (cancel)="undoConfiguration()"></app-cancel-button>
   </app-buttons-container>
 </div>

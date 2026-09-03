@@ -120,6 +120,7 @@ import { PropertyListSelectionComponent } from './property-list-selection/proper
     CardItemReportModelComponent,
     PropertyModelComponent,
     PropertyComponent,
+    PropertyTextareaComponent,
     ButtonsContainerComponent,
     CancelButtonComponent,
     CardJournalInformationComponent,

@@ -34,6 +34,12 @@ export interface CriteriaPropertyModel extends IWorkpackModelProperty {
 }
 
 export interface CriteriaGroupModel {
+  id?: number;
+  type?: 'CriteriaGroupModel';
+  active?: boolean;
+  fullLine?: boolean;
+  required?: boolean;
+  helpText?: string;
   propertyModelType?: 'CriteriaGroupModel';
   title: string;
   sortIndex: number;

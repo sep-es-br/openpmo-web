@@ -41,14 +41,14 @@ export class PreprojectComponent implements OnInit, OnDestroy {
 
   responsive: boolean = false;
 
-  collapsePanelsStatus: boolean = true;
+  collapsePanelsStatus: boolean = false;
 
   cardProperties: ICard = {
     cardTitle: 'preprojects',
     collapseble: true,
     toggleable: false,
     initialStateToggle: false,
-    initialStateCollapse: true,
+    initialStateCollapse: false,
     showCreateNemElementButton: true
   };
 

@@ -22,7 +22,11 @@ import { IconsEnum } from 'src/app/shared/enums/IconsEnum';
 import { IEditableCardField } from 'src/app/shared/components/editable-card-item/editable-card-item.component';
 import { IPropertyListItem } from 'src/app/shared/interfaces/IPropertyListItem';
 import { TypeOrganization } from 'src/app/shared/enums/TypeOrganization';
+import { IPlan } from 'src/app/shared/interfaces/IPlan';
 import { ITreeViewScopePlan, ITreeViewScopeWorkpack } from 'src/app/shared/interfaces/ITreeScopePersons';
+import { IconsTypeWorkpackEnum, IconsTypeWorkpackModelEnum } from 'src/app/shared/enums/IconsTypeWorkpackModelEnum';
+import { PlanBreakdownStructureService } from 'src/app/shared/services/plan-breakdown-structure.service';
+import { WorkpackService } from 'src/app/shared/services/workpack.service';
 import {
   PreprojectEvaluationConfigService,
   PreprojectEvaluationOperation
@@ -104,13 +108,26 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
 
   evaluationOperation: PreprojectEvaluationOperation = 'AVERAGE';
 
-  evaluationCollapsed: { [criterionId: number]: boolean } = {};
+  readonly evaluationCardProperties: ICard = {
+    cardTitle: 'evaluation',
+    collapseble: false,
+    toggleable: false,
+    initialStateToggle: false,
+    initialStateCollapse: false
+  };
+
+
+  collapsedEvaluationCriteria: { [criterionId: number]: boolean } = {};
 
   availablePlans: SelectItem[] = [];
 
-  private officePlans: ITreeViewScopePlan[] = [];
+  private officePlans: IPlan[] = [];
 
   planStructure: TreeNode[] = [];
+
+  isPlanStructureLoading: boolean = false;
+
+  private planStructureRequestVersion: number = 0;
 
   selectedPlanPosition: TreeNode[] = [];
 
@@ -141,7 +158,9 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
     private readonly breadcrumbService: BreadcrumbService,
     private readonly menuService: MenuService,
     private readonly planService: PlanService,
+    private readonly planBreakdownStructureService: PlanBreakdownStructureService,
     private readonly officeService: OfficeService,
+    private readonly workpackService: WorkpackService,
     private readonly preprojectEvaluationConfigService: PreprojectEvaluationConfigService,
     private readonly preprojectCriteriaConfigService: PreprojectCriteriaConfigService,
     private readonly workpackShowTabviewService: WorkpackShowTabviewService,
@@ -163,6 +182,9 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    // A elaboração possui seu próprio estado de edição e não deve herdar
+    // alterações pendentes deixadas pelo módulo de planos nas abas compartilhadas.
+    this.workpackService.nextPendingChanges(false);
     this.idPlan = this.route.snapshot.queryParamMap.get('idPlan');
     const idPreproject: number = Number(this.route.snapshot.queryParamMap.get('idPreproject'));
     this.idPreproject = Number.isFinite(idPreproject) && idPreproject > 0 ? idPreproject : null;
@@ -191,11 +213,8 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
     });
   }
 
-  async changeTab(event: { tabs: ITabViewScrolled }): Promise<void> {
+  changeTab(event: { tabs: ITabViewScrolled }): void {
     this.selectedTab = event.tabs;
-    if (this.selectedTab?.key?.startsWith('criterion-') && this.criteriaOfficeId) {
-      this.criteriaGuides = this.restoreCriteriaValues(await this.getActiveCriteriaGuides(this.criteriaOfficeId));
-    }
     this.updateCardPropertyMenu();
   }
 
@@ -205,10 +224,6 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
 
   get formTitleTranslationKey(): string {
     return this.idPreproject ? 'editPreproject' : 'newPreproject';
-  }
-
-  toggleEvaluationCriterion(criterionId: number): void {
-    this.evaluationCollapsed[criterionId] = !this.evaluationCollapsed[criterionId];
   }
 
   getEvaluationRows(criterion: PreprojectCriterion): EvaluationCriterionRow[] {
@@ -300,11 +315,12 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
     this.configureEvaluationSelection(enabled, true);
   }
 
-  handleAvailablePlanChange(planId: number | string): void {
-    this.planStructure = this.buildPlanStructure(planId);
+  async handleAvailablePlanChange(planId: number | string): Promise<void> {
+    this.planStructure = [];
     this.selectedPlanPosition = [];
-    this.form.get('planPosition').setValue(null);
-    this.form.get('planPosition').markAsTouched();
+    this.form.get('planPosition').reset(null);
+
+    await this.loadSelectedPlanStructure(planId, []);
   }
 
   handlePlanPositionSelect(event: { node: TreeNode }): void {
@@ -316,15 +332,29 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
   }
 
   handlePlanPositionUnselect(): void {
+    if (!this.preprojectSelectionEnabled) {
+      return;
+    }
     this.updateSelectedPlanPositions();
     this.form.get('planPosition').markAsDirty();
+  }
+
+  async handlePlanNodeExpand(event: { node: TreeNode }): Promise<void> {
+    if (!this.preprojectSelectionEnabled) {
+      return;
+    }
+    await this.planBreakdownStructureService.expandPlanNode(event);
+    event.node.children = (event.node.children || [])
+      .map(child => this.mapPlanStructureNode(child));
   }
 
   private updateSelectedPlanPositions(): void {
     const positions: string[] = (this.selectedPlanPosition || [])
       .filter((node: TreeNode) => node?.data)
       .map((node: TreeNode) => String(node.data));
-    this.form.get('planPosition').setValue(positions);
+    const planPositionControl = this.form.get('planPosition');
+    planPositionControl.setValue(positions);
+    planPositionControl.markAsTouched();
   }
 
   private refreshDeliveryCardItems(): void {
@@ -467,7 +497,7 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
 
   get selectedCriteriaGuide(): PreprojectCriterion | undefined {
     const criterionId: number = Number((this.selectedTab?.key || '').replace('criterion-', ''));
-    return this.criteriaGuides.find((criterion: PreprojectCriterion) => criterion.id === criterionId);
+    return this.criteriaGuides.find((criterion: PreprojectCriterion) => Number(criterion.id) === criterionId);
   }
 
   isListProperty(property: IWorkpackModelProperty): boolean {
@@ -630,15 +660,20 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
       notesControl.enable({ emitEvent: false });
       availablePlanControl.setValidators(Validators.required);
       planPositionControl.setValidators(Validators.required);
-      this.planStructure = this.buildPlanStructure(availablePlanControl.value);
-      this.restoreSelectedPlanPosition(planPositionControl.value);
+      if (availablePlanControl.value) {
+        void this.loadSelectedPlanStructure(
+          availablePlanControl.value,
+          planPositionControl.value
+        );
+      }
     } else {
       availablePlanControl.clearValidators();
       planPositionControl.clearValidators();
       availablePlanControl.disable({ emitEvent: false });
       planPositionControl.disable({ emitEvent: false });
       notesControl.disable({ emitEvent: false });
-      this.selectedPlanPosition = [];
+      ++this.planStructureRequestVersion;
+      this.isPlanStructureLoading = false;
     }
 
     availablePlanControl.updateValueAndValidity({ emitEvent: false });
@@ -649,23 +684,98 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
     }
   }
 
-  private buildPlanStructure(planId: number | string): TreeNode[] {
-    if (!planId) {
-      return [];
+  private async loadOfficePlans(idOffice: number): Promise<void> {
+    ++this.planStructureRequestVersion;
+    this.isPlanStructureLoading = false;
+    const result = await this.planService.GetAll({ 'id-office': idOffice });
+    this.officePlans = result.success ? result.data || [] : [];
+    this.availablePlans = this.officePlans.map(plan => ({
+      label: plan.name,
+      value: plan.id
+    }));
+
+    const availablePlanControl = this.form.get('availablePlan');
+    availablePlanControl.setValue(null, { emitEvent: false });
+    this.form.get('planPosition').setValue(null, { emitEvent: false });
+    this.planStructure = [];
+    this.selectedPlanPosition = [];
+  }
+
+  private async loadSelectedPlanStructure(
+    planId: number | string,
+    selectedPosition: string | string[]
+  ): Promise<void> {
+    const requestVersion: number = ++this.planStructureRequestVersion;
+    const selectedPlanId: number = Number(planId);
+    if (!Number.isFinite(selectedPlanId) || selectedPlanId <= 0) {
+      this.isPlanStructureLoading = false;
+      this.planStructure = [];
+      this.selectedPlanPosition = [];
+      return;
     }
-    const selectedPlan: ITreeViewScopePlan | undefined = this.officePlans
-      .find(plan => String(plan.id) === String(planId));
-    if (!selectedPlan) {
-      return [];
+
+    this.isPlanStructureLoading = true;
+    try {
+      const loadedFromTreeView = await this.loadPlanFromTreeView(selectedPlanId, requestVersion);
+      if (requestVersion !== this.planStructureRequestVersion) {
+        return;
+      }
+      if (loadedFromTreeView) {
+        this.restoreSelectedPlanPosition(selectedPosition);
+        return;
+      }
+      const structure = await this.planBreakdownStructureService
+        .loadPlanBreakdownStructure(selectedPlanId, false);
+      if (requestVersion !== this.planStructureRequestVersion
+        || Number(this.form.get('availablePlan').value) !== selectedPlanId) {
+        return;
+      }
+      this.planStructure = (structure || []).map(node => this.mapPlanStructureNode(node));
+      this.restoreSelectedPlanPosition(selectedPosition);
+    } catch {
+      if (requestVersion === this.planStructureRequestVersion) {
+        this.planStructure = [];
+        this.selectedPlanPosition = [];
+      }
+    } finally {
+      if (requestVersion === this.planStructureRequestVersion) {
+        this.isPlanStructureLoading = false;
+      }
     }
-    return [{
-      label: selectedPlan.name,
-      data: `PLAN_${selectedPlan.id}`,
-      expanded: true,
-      icon: 'fas fa-briefcase',
-      selectable: false,
-      children: this.buildWorkpackStructure(selectedPlan.workpacks || [])
-    }];
+  }
+
+  private async loadPlanFromTreeView(planId: number, requestVersion: number): Promise<boolean> {
+    if (!this.criteriaOfficeId) {
+      return false;
+    }
+
+    try {
+      const result = await this.officeService.GetTreeScopePersons(this.criteriaOfficeId);
+      const selectedPlan: ITreeViewScopePlan | undefined = result.success
+        ? (result.data?.plans || []).find(plan => String(plan.id) === String(planId))
+        : undefined;
+      if (!selectedPlan) {
+        return false;
+      }
+
+      if (requestVersion !== this.planStructureRequestVersion
+        || Number(this.form.get('availablePlan').value) !== planId) {
+        return true;
+      }
+
+      this.planStructure = [{
+        label: selectedPlan.name,
+        data: `PLAN_${selectedPlan.id}`,
+        expanded: true,
+        icon: 'fas fa-briefcase',
+        selectable: false,
+        leaf: false,
+        children: this.buildWorkpackStructure(selectedPlan.workpacks || [])
+      }];
+      return true;
+    } catch {
+      return false;
+    }
   }
 
   private buildWorkpackStructure(workpacks: ITreeViewScopeWorkpack[]): TreeNode[] {
@@ -678,25 +788,35 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
     }));
   }
 
-  private async loadOfficePlans(idOffice: number): Promise<void> {
-    const result = await this.officeService.GetTreeScopePersons(idOffice);
-    this.officePlans = result.success ? result.data?.plans || [] : [];
-    this.availablePlans = [
-      {
-        label: this.translateService.instant('select'),
-        value: null
-      },
-      ...this.officePlans.map(plan => ({
-        label: plan.name,
-        value: plan.id
-      }))
-    ];
+  private mapPlanStructureNode(node: any): TreeNode {
+    const isPlan: boolean = Boolean(node?.idPlan);
+    const isWorkpack: boolean = Boolean(node?.idWorkpack);
+    const type: string = node?.workpackType || node?.workpackModelType;
+    const children: TreeNode[] = (node?.children || [])
+      .map(child => this.mapPlanStructureNode(child));
 
-    const availablePlanControl = this.form.get('availablePlan');
-    availablePlanControl.setValue(null, { emitEvent: false });
-    this.form.get('planPosition').setValue(null, { emitEvent: false });
-    this.planStructure = [];
-    this.selectedPlanPosition = [];
+    const mappedNode: TreeNode = {
+      label: node?.label || node?.workpackName || node?.workpackModelName,
+      data: isPlan
+        ? `PLAN_${node.idPlan}`
+        : isWorkpack ? `WORKPACK_${node.idWorkpack}` : null,
+      icon: this.getPlanStructureIcon(type, isPlan),
+      selectable: isWorkpack,
+      expanded: true,
+      leaf: node?.hasChildren === false || children.length === 0,
+      children
+    };
+    (mappedNode as any).idWorkpack = node?.idWorkpack;
+    return mappedNode;
+  }
+
+  private getPlanStructureIcon(type: string, isPlan: boolean): string {
+    if (isPlan) {
+      return 'fas fa-briefcase';
+    }
+    return IconsTypeWorkpackEnum[type]
+      || IconsTypeWorkpackModelEnum[type]
+      || 'fas fa-project-diagram';
   }
 
   private persistEvaluationSelection(): void {
