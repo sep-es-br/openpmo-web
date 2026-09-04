@@ -1,6 +1,6 @@
 import { ITheme } from '../interfaces/ITheme';
 
-export const DEFAULT_THEME_NAME = 'es';
+export const DEFAULT_THEME_NAME = 'es2.0';
 
 const ES_THEME: ITheme = {
   name: 'es2.0',
