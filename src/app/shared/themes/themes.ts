@@ -3,7 +3,7 @@ import { ITheme } from '../interfaces/ITheme';
 export const DEFAULT_THEME_NAME = 'es';
 
 const ES_THEME: ITheme = {
-  name: 'es',
+  name: 'es2.0',
   documentTitle: 'Open PMO',
   favicon: 'assets/svg/favicon.svg',
   loginLogo: {
