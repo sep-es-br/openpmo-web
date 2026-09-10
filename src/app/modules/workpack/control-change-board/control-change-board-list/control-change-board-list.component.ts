@@ -48,7 +48,7 @@ export class ControlChangeBoardListComponent implements OnInit, OnDestroy {
   isLoading = false;
   modelName: string;
 
-  mapIdWorkpackName: {[index: number]: string} = {};
+  mapIdWorkpackName: { [index: number]: string } = {};
 
   constructor(
     private controlChangeBoardSvr: ControlChangeBoardService,
@@ -81,7 +81,7 @@ export class ControlChangeBoardListComponent implements OnInit, OnDestroy {
     await this.loadPropertiesProject();
     await this.loadControlChangeBoard();
 
-    let breadcrumbItems = this.breadcrumbSrv.get;
+    const breadcrumbItems = this.breadcrumbSrv.get;
 
     const newBreadcrumb = [
       ...breadcrumbItems,
@@ -118,7 +118,8 @@ export class ControlChangeBoardListComponent implements OnInit, OnDestroy {
       if (this.isUserAdmin) {
         this.editPermission = true;
       } else {
-        this.editPermission = workpackData.workpack.permissions && workpackData.workpack.permissions.filter(p => p.level === 'EDIT').length > 0;
+        this.editPermission = workpackData.workpack.permissions
+          && workpackData.workpack.permissions.filter(p => p.level === 'EDIT').length > 0;
       }
     } else {
       const { success, data } = await this.workpackSrv.GetWorkpackById(this.idProject, { 'id-plan': this.idPlan });
@@ -148,15 +149,15 @@ export class ControlChangeBoardListComponent implements OnInit, OnDestroy {
 
     this.mapIdWorkpackName = {};
 
-        for (const idWorkpack of data.map(ccb => ccb.idWorkpack)) {
-          const {success, data} = await this.workpackSrv.GetWorkpackById(idWorkpack, {'id-plan': this.idPlan });
-          if (success) {
-            this.mapIdWorkpackName[idWorkpack] = data.name;
-          } else {
-            this.mapIdWorkpackName[idWorkpack] = 'ERROR';
-          }
+    for (const idWorkpack of data.map(ccb => ccb.idWorkpack)) {
+      const { success, data } = await this.workpackSrv.GetWorkpackById(idWorkpack, { 'id-plan': this.idPlan });
+      if (success) {
+        this.mapIdWorkpackName[idWorkpack] = data.name;
+      } else {
+        this.mapIdWorkpackName[idWorkpack] = 'ERROR';
+      }
 
-        }
+    }
     const itemsProperties: ICardItem[] = this.editPermission ? [
       {
         typeCardItem: 'newCardItem',
@@ -166,40 +167,62 @@ export class ControlChangeBoardListComponent implements OnInit, OnDestroy {
         active: true,
         paramsUrlCard: [
           { name: 'idProject', value: this.idProject },
-          { name: 'idOffice', value: this.idOffice}
+          { name: 'idOffice', value: this.idOffice }
         ],
       }
     ] : [];
     if (success) {
+      const seenAuthorizations = new Set<string>();
+      const flattenedCards = data.flatMap(controlChangeBoard => {
+        const uniqueMemberAs = [...(controlChangeBoard.memberAs || [])]
+          .sort((first, second) => Number(second.active) - Number(first.active))
+          .filter(ccb => {
+            const level = ccb.level || 'WORKPACK';
+            const levelIdentifier = level === 'WORKPACK'
+              ? controlChangeBoard.idWorkpack
+              : ccb.levelId || ccb.levelName;
+            const authorizationKey = `${controlChangeBoard.person.id}|${level}|${levelIdentifier}`;
 
-      itemsProperties.unshift(...data.map(controlChangeBoard => ({
-        typeCardItem: 'listControlChangeBoard',
-        iconSvg: true,
-        icon: IconsEnum.CCBMember,
-        nameCardItem: controlChangeBoard.person.name,
-        fullNameCardItem: controlChangeBoard.person.fullName,
-        roles:
-          this.idProject === controlChangeBoard.idWorkpack
-        ? controlChangeBoard?.memberAs?.
-          filter(ccb => ccb.active).
-          map(ccb => `${ccb.workLocation || ''} ${this.translateSvr.instant(ccb.role)}`)
-        : [this.mapIdWorkpackName[controlChangeBoard.idWorkpack]],
-        itemId: Number(controlChangeBoard.person.id + controlChangeBoard.idWorkpack),
-        menuItems: [{
-          label: this.translateSvr.instant('delete'), icon: 'fas fa-trash-alt',
-          command: () => this.deleteControlChangeBoard(controlChangeBoard, controlChangeBoard.person.id),
-          disabled: !this.editPermission || this.idProject !== controlChangeBoard.idWorkpack
-        }] as MenuItem[],
-        urlCard: 'member',
-        idAtributeName: 'idMember',
-        paramsUrlCard: [
-          { name: 'idProject', value: controlChangeBoard.idWorkpack },
-          { name: 'idPerson', value: controlChangeBoard.person.id },
-          { name: 'idOffice', value: this.idOffice },
-        ],
-        active: controlChangeBoard.active,
-        disabled: this.idProject !== controlChangeBoard.idWorkpack,
-      } as ICardItem)));
+            if (seenAuthorizations.has(authorizationKey)) { return false; }
+            seenAuthorizations.add(authorizationKey);
+            return true;
+          });
+
+        return uniqueMemberAs.map((ccb, index) => {
+          const isWorkpackLevel = !ccb.level || ccb.level === 'WORKPACK';
+          const roleText = isWorkpackLevel
+            ? this.mapIdWorkpackName[controlChangeBoard.idWorkpack]
+            : `${ccb.levelName}`;
+
+          return {
+            typeCardItem: 'listControlChangeBoard',
+            iconSvg: true,
+            icon: IconsEnum.CCBMember,
+            nameCardItem: controlChangeBoard.person.name,
+            fullNameCardItem: controlChangeBoard.person.fullName,
+            roles: [roleText],
+            itemId: Number(`${controlChangeBoard.person.id}${controlChangeBoard.idWorkpack}${index}`),
+            personId: controlChangeBoard.person.id,
+            cardWorkpackId: controlChangeBoard.idWorkpack,
+            menuItems: [{
+              label: this.translateSvr.instant('delete'), icon: 'fas fa-trash-alt',
+              command: () => this.deleteControlChangeBoard(controlChangeBoard, controlChangeBoard.person.id),
+              disabled: !this.editPermission || !isWorkpackLevel || this.idProject !== controlChangeBoard.idWorkpack
+            }] as MenuItem[],
+            urlCard: 'member',
+            idAtributeName: 'idMember',
+            paramsUrlCard: [
+              { name: 'idProject', value: controlChangeBoard.idWorkpack },
+              { name: 'idPerson', value: controlChangeBoard.person.id },
+              { name: 'idOffice', value: this.idOffice },
+            ],
+            active: ccb.active,
+            disabled: !isWorkpackLevel || this.idProject !== controlChangeBoard.idWorkpack,
+          } as ICardItem;
+        });
+      });
+
+      itemsProperties.unshift(...flattenedCards);
       this.isLoading = false;
     } else {
       this.isLoading = false;
@@ -209,18 +232,18 @@ export class ControlChangeBoardListComponent implements OnInit, OnDestroy {
 
   }
 
-  async deleteControlChangeBoard(controlChangeBoard: IControlChangeBoard, idPerson: number) {
-    const { success } = await this.controlChangeBoardSvr.Delete(controlChangeBoard, {
-      'id-person': idPerson,
-      'id-workpack': this.idProject,
-    });
-    if (success) {
-      this.cardItemsProperties = Array.from(this.cardItemsProperties
-        .filter(element => element.itemId !== Number(controlChangeBoard.person.id + controlChangeBoard.idWorkpack)));
-
-      this.totalRecords = this.cardItemsProperties && this.cardItemsProperties.length;
-    }
-  };
+ async deleteControlChangeBoard(controlChangeBoard: IControlChangeBoard, idPerson: number) {
+  const { success } = await this.controlChangeBoardSvr.Delete(controlChangeBoard, {
+    'id-person': idPerson,
+    'id-workpack': this.idProject,
+  });
+  if (success) {
+    this.cardItemsProperties = this.cardItemsProperties.filter(element =>
+      !((element as any).personId === idPerson && (element as any).cardWorkpackId === controlChangeBoard.idWorkpack)
+    );
+    this.totalRecords = this.cardItemsProperties && this.cardItemsProperties.length;
+  }
+}
 
   createNewControlChangeBoard() {
     this.router.navigate(['/workpack/change-control-board/member'], { queryParams: { idProject: this.idProject } });

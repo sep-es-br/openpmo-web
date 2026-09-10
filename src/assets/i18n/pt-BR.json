@@ -815,6 +815,35 @@
             }
         }
       },
+      "project": {
+        "status": {
+          "cannot": {
+            "change": {
+              "without": {
+                "approved": {
+                  "baseline": "O status de um projeto sem Linha de Base aprovada deve permanecer como Estruturação."
+                }
+              }
+            }
+          }
+        },
+        "cannot": {
+          "return": {
+            "to": {
+              "structuring": "Um projeto que já possui Linha de Base aprovada não pode retornar ao status Estruturação."
+            }
+          },
+          "enter": {
+            "repactuation": {
+              "without": {
+                "approved": {
+                  "baseline": "Um projeto sem Linha de Base aprovada não pode assumir o status Repactuação."
+                }
+              }
+            }
+          }
+        }
+      },
       "permission": {
         "delete": {
           "relationship": {
@@ -1148,9 +1177,9 @@
   "newProcurement": "Nova Licitação",
   "modality": "Modalidade",
 
-  "cooperation": "Acordos e Convênios",
+  "cooperation": "Acordo/ Convênio",
   "newCooperation": "Novo Acordo ou Convênio",
-  "grantorBeneficiaryName": "Nome Concedente / Convenente",
+  "grantorBeneficiaryName": "Concedente/ Convenente",
 
   "contract": "Contrato",
   "newContract": "Novo Contrato",

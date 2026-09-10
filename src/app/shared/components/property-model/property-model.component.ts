@@ -146,7 +146,17 @@ loadSectorOptions() {
 
   isProtected(value: string): boolean { 
     if (this.property.name === 'Situação' || this.property.name === 'Status') {
-      return ['Concluída', 'Concluído', 'Cancelada', 'Cancelado', 'A cancelar', 'Em execução', 'Execução'].includes(value.trim());
+      return [
+        'Concluída',
+        'Concluído',
+        'Cancelada',
+        'Cancelado',
+        'A cancelar',
+        'Em execução',
+        'Execução',
+        'Estruturação',
+        'Repactuação'
+      ].includes(value.trim());
     }
     return false;
   }

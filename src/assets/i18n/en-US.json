@@ -1113,9 +1113,9 @@
   "year": "Year",
   "modality": "Modality",
 
-  "cooperation": "Agreements and Cooperation Agreements",
+  "cooperation": "Agreement/ Cooperation Agreement",
   "newCooperation": "New Agreement or Cooperation Agreement",
-  "grantorBeneficiaryName": "Grantor / Beneficiary Name",
+  "grantorBeneficiaryName": "Grantor/ Beneficiary",
 
   "contract": "Contract",
   "newContract": "New Contract",

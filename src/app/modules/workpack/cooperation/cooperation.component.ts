@@ -306,7 +306,10 @@ export class CooperationComponent implements OnInit, OnDestroy {
     this.managementUnitOptions = result.success && Array.isArray(result.data)
       ? result.data
           .map((item: IAgreementOrganization) => ({
-            label: item.name.toUpperCase(),
+            label: [item.identifier, item.name]
+              .filter(Boolean)
+              .join(' - ')
+              .toUpperCase(),
             value: item.identifier,
             data: item
           }))
