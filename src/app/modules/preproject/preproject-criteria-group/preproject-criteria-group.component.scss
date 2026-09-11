@@ -29,6 +29,12 @@
     }
   }
 
+  .compact-budget-property {
+    flex: 0 0 25%;
+    max-width: 25%;
+    margin-right: 75%;
+  }
+
 }
 
 .group-properties > app-property-list-selection {
@@ -54,33 +60,6 @@
   .workpack-selection .app-single-selection .p-dropdown,
   .p-float-label.workpack-date .app-select-date .p-calendar {
     width: 100%;
-  }
-
-  app-property-selection .p-float-label {
-    display: flex;
-    flex-direction: column-reverse;
-    align-items: flex-start;
-
-    > .app-input-label {
-      display: flex;
-      position: static !important;
-      align-items: center;
-      width: 100%;
-      margin: 0 0 .35rem;
-      color: #6f7f88;
-      font-style: normal;
-      line-height: 1rem;
-      transform: none !important;
-
-      .fa-question-circle {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        margin-left: .35rem;
-        line-height: 1;
-      }
-    }
-
   }
 
   app-property-selection .workpack-selection-not-fullLine > .app-single-selection {

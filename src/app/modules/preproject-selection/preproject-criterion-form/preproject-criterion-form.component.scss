@@ -238,6 +238,7 @@
     max-width: 100%;
 
     &.property-collapsed {
+      flex: 0 1 auto;
       width: auto;
     }
 
@@ -245,6 +246,11 @@
       flex-basis: 100%;
       width: 100%;
     }
+  }
+
+  &.list-layout app-property-model.property-open {
+    flex-basis: 100%;
+    width: 100%;
   }
 }
 

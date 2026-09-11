@@ -5,6 +5,7 @@
         {{ criterionId ? (form.controls.name.value || ('criteria' | translate)) : ('newCriteriaGuide' | translate) }}
       </span>
     </div>
+    <app-config-data-view-panel></app-config-data-view-panel>
   </div>
 
   <app-card [properties]="cardProperties" class="mt-0 inputs-float-label">
@@ -138,7 +139,7 @@
       </div>
     </form>
 
-    <div class="criterion-properties-list">
+    <div class="criterion-properties-list" [class.list-layout]="displayModeAll === 'list'">
       <ng-container *ngFor="let property of rootProperties; trackBy: trackByProperty">
         <app-property-model
           [property]="property"
@@ -272,7 +273,7 @@
       </div>
     </form>
 
-    <div class="criterion-properties-list">
+    <div class="criterion-properties-list" [class.list-layout]="displayModeAll === 'list'">
       <ng-container *ngFor="let property of groupProperties[groupIndex]; trackBy: trackByProperty">
         <app-property-model
           [property]="property"

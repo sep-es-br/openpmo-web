@@ -1,7 +1,7 @@
 <app-card [properties]="cardProperties" class="preproject-criteria-group-card">
   <div class="group-properties row" [class.group-disabled]="!enabled">
-    <div class="property-container" *ngFor="let item of properties; let propertyIndex = index"
-      [ngClass]="getPropertyColumnClasses(item.config, propertyIndex)"
+    <div class="property-container" *ngFor="let item of properties"
+      [ngClass]="getPropertyColumnClasses(item.config)"
       [class.selection-property]="['SelectionModel', 'CriteriaSelectionModel'].includes(item.config.type)"
       [class.not-fullLine]="!item.config.fullLine && item.config.type !== 'TextArea' && item.config.type !== 'Group'">
 

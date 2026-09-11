@@ -34,6 +34,7 @@ import { MeasureUnitService } from 'src/app/shared/services/measure-unit.service
 import { OrganizationService } from 'src/app/shared/services/organization.service';
 import { ILocalityList } from 'src/app/shared/interfaces/ILocality';
 import { IOrganization } from 'src/app/shared/interfaces/IOrganization';
+import { ConfigDataViewService } from 'src/app/shared/services/config-dataview.service';
 
 interface CriterionIcon {
   name: string;
@@ -77,6 +78,8 @@ export class PreprojectCriterionFormComponent implements OnInit, OnDestroy {
 
   isLoading: boolean = false;
 
+  displayModeAll: string = 'list';
+
   listDomains: SelectItem[] = [];
 
   listOrganizations: IOrganization[] = [];
@@ -95,6 +98,7 @@ export class PreprojectCriterionFormComponent implements OnInit, OnDestroy {
     private readonly activeRoute: ActivatedRoute,
     private readonly breadcrumbService: BreadcrumbService,
     private readonly criteriaConfigService: PreprojectCriteriaConfigService,
+    private readonly configDataViewService: ConfigDataViewService,
     private readonly formBuilder: FormBuilder,
     private readonly domainService: DomainService,
     private readonly localityService: LocalityService,
@@ -117,6 +121,12 @@ export class PreprojectCriterionFormComponent implements OnInit, OnDestroy {
   }
 
   async ngOnInit(): Promise<void> {
+    this.configDataViewService.observableDisplayModeAll
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(displayMode => this.displayModeAll = displayMode);
+    this.configDataViewService.observableCollapsePanelsStatus
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(status => this.applyCollapsedState(status === 'collapse'));
     this.idOffice = Number(this.activeRoute.snapshot.queryParamMap.get('idOffice'));
     const criterionId: number = Number(this.activeRoute.snapshot.queryParamMap.get('criterionId'));
     this.criterionId = Number.isFinite(criterionId) && criterionId > 0 ? criterionId : null;
@@ -171,6 +181,15 @@ export class PreprojectCriterionFormComponent implements OnInit, OnDestroy {
 
   get groups(): FormArray {
     return this.form.get('groups') as FormArray;
+  }
+
+  private applyCollapsedState(collapsed: boolean): void {
+    this.cardProperties = { ...this.cardProperties, initialStateCollapse: collapsed };
+    this.rootProperties.forEach(property => property.isCollapsed = collapsed);
+    this.groupProperties.forEach(properties =>
+      properties.forEach(property => property.isCollapsed = collapsed));
+    this.rootProperties = [...this.rootProperties];
+    this.groupProperties = this.groupProperties.map(properties => [...properties]);
   }
 
   private getCriterionPayload(): Omit<PreprojectCriterion, 'id'> {
