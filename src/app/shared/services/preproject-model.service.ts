@@ -23,12 +23,18 @@ export class PreprojectModelService extends BaseService<IPreprojectModelConfigur
       .toPromise();
   }
 
+  isActiveByOfficeId(idOffice: number): Promise<IHttpResult<boolean>> {
+    return this.http
+      .get<IHttpResult<boolean>>(`${this.urlBase}/office/${idOffice}/active`, this.requestOptions)
+      .toPromise();
+  }
+
   updateConfiguration(
     id: number,
     configuration: IUpdatePreprojectModelConfiguration
   ): Promise<IHttpResult<IPreprojectModelConfiguration>> {
     return this.http
-      .patch<IHttpResult<IPreprojectModelConfiguration>>(`${this.urlBase}/${id}`, configuration, this.requestOptions)
+      .put<IHttpResult<IPreprojectModelConfiguration>>(`${this.urlBase}/${id}`, configuration, this.requestOptions)
       .toPromise();
   }
 

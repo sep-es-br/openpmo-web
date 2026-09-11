@@ -10,7 +10,7 @@ import { ICard } from 'src/app/shared/interfaces/ICard';
 export class PreprojectDeliveryComponent {
   name: string = '';
 
-  readonly idPlan: string | null = this.route.snapshot.queryParamMap.get('idPlan');
+  readonly idOffice: string | null = this.route.snapshot.queryParamMap.get('idOffice');
 
   readonly cardProperties: ICard = {
     cardTitle: 'deliverable',
@@ -24,6 +24,8 @@ export class PreprojectDeliveryComponent {
   constructor(private readonly route: ActivatedRoute, private readonly router: Router) {}
 
   back(): void {
-    void this.router.navigate(['/preproject/new'], { queryParams: this.idPlan ? { idPlan: this.idPlan } : undefined });
+    void this.router.navigate(['/preproject/new'], {
+      queryParams: this.idOffice ? { idOffice: this.idOffice } : undefined
+    });
   }
 }

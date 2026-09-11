@@ -25,6 +25,7 @@ import { OfficeService } from 'src/app/shared/services/office.service';
 import { PersonService } from 'src/app/shared/services/person.service';
 import { PlanService } from 'src/app/shared/services/plan.service';
 import { ReportService } from 'src/app/shared/services/report.service';
+import { PreprojectModelService } from 'src/app/shared/services/preproject-model.service';
 
 @Component({
   selector: 'app-nav-menu',
@@ -86,6 +87,10 @@ export class NavMenuComponent implements OnInit, OnDestroy {
 
   currentIDOffice: number;
 
+  hasActivePreprojectModel = false;
+
+  private preprojectModelRequestVersion = 0;
+
   showUserMenu = false;
 
   constructor(
@@ -96,7 +101,8 @@ export class NavMenuComponent implements OnInit, OnDestroy {
     private planSrv: PlanService,
     private cookieSrv: CookieService,
     private reportSrv: ReportService,
-    private personSrv: PersonService
+    private personSrv: PersonService,
+    private preprojectModelSrv: PreprojectModelService
   ) {
     this.menuSrv.isOfficeConfigMenu
       .pipe(takeUntil(this.$destroy))
@@ -121,6 +127,7 @@ export class NavMenuComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.$destroy))
       .subscribe(async (id) => {
         this.currentIDOffice = id;
+        await this.loadPreprojectMenu(id);
       });
 
     this.planSrv
@@ -300,6 +307,26 @@ export class NavMenuComponent implements OnInit, OnDestroy {
     });
     if (result.success) {
       this.hasReports = result.data;
+    }
+  }
+
+  private async loadPreprojectMenu(idOffice: number): Promise<void> {
+    const requestVersion = ++this.preprojectModelRequestVersion;
+    this.hasActivePreprojectModel = false;
+
+    if (!idOffice || idOffice === 0 || !this.authSrv.getAccessToken()) {
+      return;
+    }
+
+    try {
+      const result = await this.preprojectModelSrv.isActiveByOfficeId(idOffice);
+      if (requestVersion === this.preprojectModelRequestVersion) {
+        this.hasActivePreprojectModel = result.success && result.data === true;
+      }
+    } catch {
+      if (requestVersion === this.preprojectModelRequestVersion) {
+        this.hasActivePreprojectModel = false;
+      }
     }
   }
 

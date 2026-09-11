@@ -87,10 +87,10 @@
   </div>
   <div
     class="item"
-    *ngIf="!!currentIDPlan && isPlanMenu"
+    *ngIf="!!currentIDOffice && hasActivePreprojectModel"
     [routerLink]="['/preproject']"
     [class.opened]="isMenuOpen(MenuButtons.PREPROJECT)"
-    [queryParams]="{ idPlan: currentPlan?.id }"
+    [queryParams]="{ idOffice: currentIDOffice }"
     [pTooltip]="'preproject' | translate"
   >
     <svg class="menu-svg-icon" aria-hidden="true" focusable="false" [ngStyle]="{ fontSize: '1.5rem' }">

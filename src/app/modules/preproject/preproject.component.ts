@@ -7,7 +7,6 @@ import { MenuItem } from 'primeng/api';
 
 import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
 import { MenuService } from 'src/app/shared/services/menu.service';
-import { PlanService } from 'src/app/shared/services/plan.service';
 import { ConfigDataViewService } from 'src/app/shared/services/config-dataview.service';
 import { ResponsiveService } from 'src/app/shared/services/responsive.service';
 import { ICard } from 'src/app/shared/interfaces/ICard';
@@ -55,7 +54,6 @@ export class PreprojectComponent implements OnInit, OnDestroy {
   constructor(
     private breadcrumbService: BreadcrumbService,
     private menuService: MenuService,
-    private planService: PlanService,
     private officeService: OfficeService,
     private configDataViewService: ConfigDataViewService,
     private responsiveService: ResponsiveService,
@@ -70,7 +68,7 @@ export class PreprojectComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe(() => this.loadMockPreprojects());
 
-    void this.initPlanAndBreadcrumb();
+    void this.initOfficeAndBreadcrumb();
     this.loadMockPreprojects();
   }
 
@@ -80,9 +78,9 @@ export class PreprojectComponent implements OnInit, OnDestroy {
   }
 
   handleCreatePreproject(): void {
-    const idPlan = this.route.snapshot.queryParamMap.get('idPlan');
+    const idOffice = this.route.snapshot.queryParamMap.get('idOffice');
     void this.router.navigate(['/preproject', 'new'], {
-      queryParams: idPlan ? { idPlan } : undefined
+      queryParams: idOffice ? { idOffice } : undefined
     });
   }
 
@@ -91,10 +89,10 @@ export class PreprojectComponent implements OnInit, OnDestroy {
   }
 
   handleEditPreproject(preproject: IPreprojectMockItem): void {
-    const idPlan = this.route.snapshot.queryParamMap.get('idPlan');
+    const idOffice = this.route.snapshot.queryParamMap.get('idOffice');
     void this.router.navigate(['/preproject', 'edit'], {
       queryParams: {
-        ...(idPlan ? { idPlan } : {}),
+        ...(idOffice ? { idOffice } : {}),
         idPreproject: preproject.id
       }
     });
@@ -132,37 +130,24 @@ export class PreprojectComponent implements OnInit, OnDestroy {
       });
   }
 
-  private async initPlanAndBreadcrumb(): Promise<void> {
-    const idPlan: string | null = this.route.snapshot.queryParamMap.get('idPlan');
-    const idPlanNumber: number = Number(idPlan);
+  private async initOfficeAndBreadcrumb(): Promise<void> {
+    const idOffice: string | null = this.route.snapshot.queryParamMap.get('idOffice');
+    const idOfficeNumber: number = Number(idOffice);
     const breadcrumbs: IBreadcrumb[] = [];
 
-    this.menuService.nextIsPlanMenu(true);
+    this.menuService.nextIsPlanMenu(false);
 
-    if (Number.isFinite(idPlanNumber) && idPlanNumber > 0) {
-      await this.planService.nextIDPlan(idPlanNumber);
-      const plan = await this.planService.getCurrentPlan(idPlanNumber);
+    if (Number.isFinite(idOfficeNumber) && idOfficeNumber > 0) {
+      const office = await this.officeService.getCurrentOffice(idOfficeNumber);
+      this.officeService.nextIDOffice(idOfficeNumber);
 
-      if (plan) {
-        const office = await this.officeService.getCurrentOffice(plan.idOffice);
-        this.officeService.nextIDOffice(plan.idOffice);
-
-        if (office) {
-          breadcrumbs.push({
-            key: 'office',
-            routerLink: ['/offices', 'office'],
-            queryParams: { id: office.id },
-            info: office.name,
-            tooltip: office.fullName
-          });
-        }
-
+      if (office) {
         breadcrumbs.push({
-          key: 'plan',
-          routerLink: ['/plan'],
-          queryParams: { id: plan.id },
-          info: plan.name,
-          tooltip: plan.fullName
+          key: 'office',
+          routerLink: ['/offices', 'office'],
+          queryParams: { id: office.id },
+          info: office.name,
+          tooltip: office.fullName
         });
       }
     }
@@ -170,7 +155,7 @@ export class PreprojectComponent implements OnInit, OnDestroy {
     breadcrumbs.push({
       key: 'preproject',
       routerLink: ['/preproject'],
-      queryParams: idPlan ? { idPlan } : undefined
+      queryParams: idOffice ? { idOffice } : undefined
     });
 
     this.breadcrumbService.setMenu(breadcrumbs);
@@ -224,8 +209,8 @@ export class PreprojectComponent implements OnInit, OnDestroy {
       itemId: preproject.id,
       urlCard: '/preproject/edit',
       idAtributeName: 'idPreproject',
-      paramsUrlCard: this.route.snapshot.queryParamMap.get('idPlan')
-        ? [{ name: 'idPlan', value: this.route.snapshot.queryParamMap.get('idPlan') }]
+      paramsUrlCard: this.route.snapshot.queryParamMap.get('idOffice')
+        ? [{ name: 'idOffice', value: this.route.snapshot.queryParamMap.get('idOffice') }]
         : [],
       menuItems: getItemMenuItems(preproject)
     }));

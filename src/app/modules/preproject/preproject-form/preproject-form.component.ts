@@ -65,7 +65,7 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
 
   private readonly destroy$: Subject<void> = new Subject<void>();
 
-  idPlan: string | null;
+  idOffice: string | null;
 
   idPreproject: number | null = null;
 
@@ -185,7 +185,7 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
     // A elaboração possui seu próprio estado de edição e não deve herdar
     // alterações pendentes deixadas pelo módulo de planos nas abas compartilhadas.
     this.workpackService.nextPendingChanges(false);
-    this.idPlan = this.route.snapshot.queryParamMap.get('idPlan');
+    this.idOffice = this.route.snapshot.queryParamMap.get('idOffice');
     const idPreproject: number = Number(this.route.snapshot.queryParamMap.get('idPreproject'));
     this.idPreproject = Number.isFinite(idPreproject) && idPreproject > 0 ? idPreproject : null;
     this.loadPreproject();
@@ -194,7 +194,7 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
     this.form.valueChanges
       .pipe(takeUntil(this.destroy$))
       .subscribe(() => this.persistEvaluationSelection());
-    this.menuService.nextIsPlanMenu(true);
+    this.menuService.nextIsPlanMenu(false);
     this.workpackShowTabviewService.next(true);
 
     this.refreshDeliveryCardItems();
@@ -209,7 +209,7 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
 
   back(): void {
     void this.router.navigate(['/preproject'], {
-      queryParams: this.idPlan ? { idPlan: this.idPlan } : undefined
+      queryParams: this.idOffice ? { idOffice: this.idOffice } : undefined
     });
   }
 
@@ -646,7 +646,7 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
 
   private getCriteriaValuesStorageKey(): string {
     const preprojectKey: string = this.idPreproject ? String(this.idPreproject) : 'new';
-    return `openpmo.preproject.values.${this.idPlan || 'no-plan'}.${preprojectKey}`;
+    return `openpmo.preproject.values.${this.idOffice || 'no-office'}.${preprojectKey}`;
   }
 
   private configureEvaluationSelection(enabled: boolean, markAsDirty: boolean): void {
@@ -868,7 +868,7 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
 
   private getEvaluationSelectionStorageKey(): string {
     const preprojectKey: string = this.idPreproject ? String(this.idPreproject) : 'new';
-    return `openpmo.preproject.evaluation-selection.${this.idPlan || 'no-plan'}.${preprojectKey}`;
+    return `openpmo.preproject.evaluation-selection.${this.idOffice || 'no-office'}.${preprojectKey}`;
   }
 
   private getGroupScore(group: PreprojectCriterionGroup): number {
@@ -976,37 +976,24 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
   }
 
   private async initBreadcrumb(): Promise<void> {
-    const idPlanNumber: number = Number(this.idPlan);
+    const idOfficeNumber: number = Number(this.idOffice);
     const breadcrumbs: IBreadcrumb[] = [];
 
-    if (Number.isFinite(idPlanNumber) && idPlanNumber > 0) {
-      await this.planService.nextIDPlan(idPlanNumber);
-      const plan = await this.planService.getCurrentPlan(idPlanNumber);
+    if (Number.isFinite(idOfficeNumber) && idOfficeNumber > 0) {
+      this.criteriaOfficeId = idOfficeNumber;
+      this.evaluationOperation = this.preprojectEvaluationConfigService.getOperation(idOfficeNumber);
+      await this.loadCriteriaGuides(idOfficeNumber);
+      await this.loadOfficePlans(idOfficeNumber);
+      const office = await this.officeService.getCurrentOffice(idOfficeNumber);
+      this.officeService.nextIDOffice(idOfficeNumber);
 
-      if (plan) {
-        this.criteriaOfficeId = plan.idOffice;
-        this.evaluationOperation = this.preprojectEvaluationConfigService.getOperation(plan.idOffice);
-        await this.loadCriteriaGuides(plan.idOffice);
-        await this.loadOfficePlans(plan.idOffice);
-        const office = await this.officeService.getCurrentOffice(plan.idOffice);
-        this.officeService.nextIDOffice(plan.idOffice);
-
-        if (office) {
-          breadcrumbs.push({
-            key: 'office',
-            routerLink: ['/offices', 'office'],
-            queryParams: { id: office.id },
-            info: office.name,
-            tooltip: office.fullName
-          });
-        }
-
+      if (office) {
         breadcrumbs.push({
-          key: 'plan',
-          routerLink: ['/plan'],
-          queryParams: { id: plan.id },
-          info: plan.name,
-          tooltip: plan.fullName
+          key: 'office',
+          routerLink: ['/offices', 'office'],
+          queryParams: { id: office.id },
+          info: office.name,
+          tooltip: office.fullName
         });
       }
     }
@@ -1015,7 +1002,7 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
       {
         key: 'preproject',
         routerLink: ['/preproject'],
-        queryParams: this.idPlan ? { idPlan: this.idPlan } : undefined,
+        queryParams: this.idOffice ? { idOffice: this.idOffice } : undefined,
         info: 'preproject'
       },
       {
