@@ -90,6 +90,64 @@
   padding: 1.25rem 0;
 }
 
+.evaluation-summary-row,
+.evaluation-section-header,
+.evaluation-group-row,
+.evaluation-item-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.evaluation-summary-row {
+  padding: .85rem 1rem;
+  border: 1px solid v.$borderLightGrey;
+  color: v.$fontTitle;
+  font-size: 1rem;
+}
+
+.evaluation-section {
+  margin-top: 1rem;
+  border: 1px solid v.$borderLightGrey;
+}
+
+.evaluation-section-header,
+.evaluation-group-row,
+.evaluation-item-row {
+  padding: .7rem 1rem;
+  border-bottom: 1px solid v.$borderLightGrey;
+}
+
+.evaluation-group-row {
+  padding: .6rem 1.5rem;
+  color: v.$fontTitle;
+  background: rgba(214, 224, 229, .08);
+  border-bottom: 1px solid v.$borderLightGrey;
+}
+
+.evaluation-group-item-row {
+  padding-left: 2rem;
+}
+
+.evaluation-section-header {
+  color: v.$fontTitle;
+  background: rgba(214, 224, 229, .18);
+}
+
+.evaluation-section:last-child .evaluation-item-row:last-child {
+  border-bottom: 0;
+}
+
+.evaluation-item-row {
+  color: v.$fontInput;
+  font-size: .9rem;
+
+  small {
+    color: v.$fontTitle;
+  }
+}
+
 .preproject-selection-section {
   margin-top: 1.5rem;
   padding: 1.25rem 1rem 0;
@@ -240,7 +298,7 @@
   padding-left: 0;
 }
 
-// --- Abas de Critérios (Relevância e Viabilidade) ---
+// --- Abas de critérios configuradas no modelo ---
 
 .preproject-criteria-tab {
   padding: 1.25rem 0;

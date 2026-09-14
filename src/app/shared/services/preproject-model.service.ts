@@ -29,6 +29,12 @@ export class PreprojectModelService extends BaseService<IPreprojectModelConfigur
       .toPromise();
   }
 
+  findById(id: number): Promise<IHttpResult<IPreprojectModelConfiguration>> {
+    return this.http
+      .get<IHttpResult<IPreprojectModelConfiguration>>(`${this.urlBase}/${id}`, this.requestOptions)
+      .toPromise();
+  }
+
   updateConfiguration(
     id: number,
     configuration: IUpdatePreprojectModelConfiguration

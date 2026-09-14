@@ -15,11 +15,8 @@ import { IWorkpackCardItem } from 'src/app/shared/interfaces/IWorkpackCardItem';
 import { IconsEnum } from 'src/app/shared/enums/IconsEnum';
 import { OfficeService } from 'src/app/shared/services/office.service';
 import { IBreadcrumb } from 'src/app/shared/interfaces/IBreadcrumb';
-
-interface IPreprojectMockItem {
-  name: string;
-  id: number;
-}
+import { PreprojectService } from 'src/app/shared/services/preproject.service';
+import { IPreprojectListItem } from 'src/app/shared/interfaces/IPreproject';
 
 @Component({
   selector: 'app-preproject',
@@ -59,7 +56,8 @@ export class PreprojectComponent implements OnInit, OnDestroy {
     private responsiveService: ResponsiveService,
     private translateService: TranslateService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private preprojectService: PreprojectService
   ) {}
 
   ngOnInit(): void {
@@ -67,10 +65,10 @@ export class PreprojectComponent implements OnInit, OnDestroy {
     this.initDataViewSubscriptions();
     this.translateService.onLangChange
       .pipe(takeUntil(this.destroy$))
-      .subscribe(() => this.loadMockPreprojects());
+      .subscribe(() => void this.loadPreprojects());
 
     void this.initOfficeAndBreadcrumb();
-    this.loadMockPreprojects();
+    void this.loadPreprojects();
   }
 
   ngOnDestroy(): void {
@@ -89,7 +87,7 @@ export class PreprojectComponent implements OnInit, OnDestroy {
     // A seleção de um projeto existente será conectada na próxima etapa.
   }
 
-  handleEditPreproject(preproject: IPreprojectMockItem): void {
+  handleEditPreproject(preproject: IPreprojectListItem): void {
     const idOffice = this.route.snapshot.queryParamMap.get('idOffice');
     void this.router.navigate(['/preproject', 'edit'], {
       queryParams: {
@@ -162,7 +160,7 @@ export class PreprojectComponent implements OnInit, OnDestroy {
     this.breadcrumbService.setMenu(breadcrumbs);
   }
 
-  private loadMockPreprojects(): void {
+  private async loadPreprojects(): Promise<void> {
     const createPreprojectMenuItems: MenuItem[] = [
       {
         label: this.translateService.instant('new'),
@@ -181,7 +179,7 @@ export class PreprojectComponent implements OnInit, OnDestroy {
       createNewElementMenuItems: createPreprojectMenuItems
     };
 
-    const getItemMenuItems = (preproject: IPreprojectMockItem): MenuItem[] => [
+    const getItemMenuItems = (preproject: IPreprojectListItem): MenuItem[] => [
       {
         label: this.translateService.instant('edit'),
         icon: 'fas fa-pencil-alt',
@@ -194,19 +192,18 @@ export class PreprojectComponent implements OnInit, OnDestroy {
       }
     ];
 
-    const mockData: IPreprojectMockItem[] = [
-      { name: 'Valorização das Culturas Populares', id: 199 },
-      { name: 'Modernização TVE e Rad ES', id: 204 },
-      { name: 'TVE Revista', id: 209 },
-      { name: 'PE 2023-2026', id: 211 }
-    ];
+    const idOffice = Number(this.route.snapshot.queryParamMap.get('idOffice'));
+    const response = Number.isFinite(idOffice) && idOffice > 0
+      ? await this.preprojectService.findAllByOfficeId(idOffice)
+      : { success: true, data: [] as IPreprojectListItem[] };
+    const preprojects = response.success ? response.data || [] : [];
 
-    const mappedItems: ICardItem[] = mockData.map((preproject: IPreprojectMockItem) => ({
+    const mappedItems: ICardItem[] = preprojects.map((preproject: IPreprojectListItem) => ({
       typeCardItem: 'listItem',
       icon: 'fas fa-cog project-icon',
       iconSvg: false,
       nameCardItem: preproject.name,
-      fullNameCardItem: preproject.name,
+      fullNameCardItem: preproject.fullName || preproject.name,
       itemId: preproject.id,
       urlCard: '/preproject/edit',
       idAtributeName: 'idPreproject',

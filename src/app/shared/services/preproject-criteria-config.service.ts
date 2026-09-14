@@ -33,6 +33,20 @@ export class PreprojectCriteriaConfigService {
     return [];
   }
 
+  async getCriteriaByModelId(idPreprojectModel: number): Promise<PreprojectCriterion[]> {
+    const response = await this.preprojectModelService.findById(idPreprojectModel);
+    if (!response.success || !response.data) {
+      return [];
+    }
+    const activeCriteriaTabs = ((response.data.properties || []) as any[])
+      .filter(property =>
+        property.type === 'CriteriaTabModel'
+        && property.active !== false
+      );
+    return this.normalizeCriteria(activeCriteriaTabs)
+      .sort((first, second) => first.position - second.position || first.id - second.id);
+  }
+
   async addCriterion(idOffice: number, criterion: Omit<PreprojectCriterion, 'id'>): Promise<PreprojectCriterion> {
     const modelResponse = await this.preprojectModelService.findOrCreateByOfficeId(idOffice);
     if (modelResponse.success && modelResponse.data) {
@@ -154,7 +168,7 @@ export class PreprojectCriteriaConfigService {
     return p.type;
   }
 
-  private normalizeCriteria(criteria: any[]): PreprojectCriterion[] {
+  normalizeCriteria(criteria: any[]): PreprojectCriterion[] {
     return (criteria || []).map((criterion: any, index: number) => {
       const sortByIndex = (first: any, second: any): number =>
         (first.sortIndex || 0) - (second.sortIndex || 0);
@@ -204,7 +218,8 @@ export class PreprojectCriteriaConfigService {
         propertyModelType: 'CriteriaTabModel',
         id: criterion.id || index + 1,
         name: criterion.name || '',
-        active: true,
+        label: criterion.label || criterion.name || '',
+        active: criterion.active !== false,
         position: criterion.sortIndex || criterion.position || index + 1,
         icon: criterion.icon || 'fas fa-cog',
         weight: criterion.weight || 1,

@@ -1,60 +1,54 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Location } from '@angular/common';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { MenuItem, MessageService, SelectItem, TreeNode } from 'primeng/api';
+import { MessageService, SelectItem } from 'primeng/api';
 import { TranslateService } from '@ngx-translate/core';
 
 import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
 import { MenuService } from 'src/app/shared/services/menu.service';
-import { PlanService } from 'src/app/shared/services/plan.service';
 import { OfficeService } from 'src/app/shared/services/office.service';
-import { WorkpackShowTabviewService } from 'src/app/shared/services/workpack-show-tabview.service';
-import { ICard } from 'src/app/shared/interfaces/ICard';
-import { ICardItem } from 'src/app/shared/interfaces/ICardItem';
-import { ITabViewScrolled } from 'src/app/shared/components/tabview-scrolled/tabview-scrolled.component';
-import { IWorkpackModelProperty } from 'src/app/shared/interfaces/IWorkpackModelProperty';
-import { IBreadcrumb } from 'src/app/shared/interfaces/IBreadcrumb';
-import { TypePropertModelEnum as TypePropertyEnum } from 'src/app/shared/enums/TypePropertModelEnum';
-import { IconPropertyWorkpackModelEnum as IconPropertyEnum } from 'src/app/shared/enums/IconPropertyWorkpackModelEnum';
-import { IconsEnum } from 'src/app/shared/enums/IconsEnum';
-import { IEditableCardField } from 'src/app/shared/components/editable-card-item/editable-card-item.component';
-import { IPropertyListItem } from 'src/app/shared/interfaces/IPropertyListItem';
-import { TypeOrganization } from 'src/app/shared/enums/TypeOrganization';
-import { IPlan } from 'src/app/shared/interfaces/IPlan';
-import { ITreeViewScopePlan, ITreeViewScopeWorkpack } from 'src/app/shared/interfaces/ITreeScopePersons';
-import { IconsTypeWorkpackEnum, IconsTypeWorkpackModelEnum } from 'src/app/shared/enums/IconsTypeWorkpackModelEnum';
-import { PlanBreakdownStructureService } from 'src/app/shared/services/plan-breakdown-structure.service';
+import { OrganizationService } from 'src/app/shared/services/organization.service';
+import { PreprojectService } from 'src/app/shared/services/preproject.service';
 import { WorkpackService } from 'src/app/shared/services/workpack.service';
-import {
-  PreprojectEvaluationConfigService,
-  PreprojectEvaluationOperation
-} from 'src/app/shared/services/preproject-evaluation-config.service';
+import { WorkpackShowTabviewService } from 'src/app/shared/services/workpack-show-tabview.service';
 import {
   PreprojectCriteriaConfigService,
-  PreprojectCriterion,
-  PreprojectCriterionGroup
+  PreprojectCriterion
 } from 'src/app/shared/services/preproject-criteria-config.service';
-
-type PropertyTarget = 'relevance' | 'viability';
+import { ICard } from 'src/app/shared/interfaces/ICard';
+import { ICardItem } from 'src/app/shared/interfaces/ICardItem';
+import { IOrganization } from 'src/app/shared/interfaces/IOrganization';
+import { IWorkpackModelProperty } from 'src/app/shared/interfaces/IWorkpackModelProperty';
+import { IPropertyListItem } from 'src/app/shared/interfaces/IPropertyListItem';
+import { IBreadcrumb } from 'src/app/shared/interfaces/IBreadcrumb';
+import {
+  ICreatePreprojectRequest,
+  IPreproject,
+  IPreprojectCriteriaListValue,
+  IPreprojectCriteriaGroupValue,
+  IPreprojectCriteriaSelectionValue,
+  IPreprojectCriteriaTabValues,
+  IPreprojectCriteriaValue,
+  IPreprojectEvaluation,
+  IUpdatePreprojectRequest
+} from 'src/app/shared/interfaces/IPreproject';
+import { ITabViewScrolled } from 'src/app/shared/components/tabview-scrolled/tabview-scrolled.component';
+import { IEditableCardField } from 'src/app/shared/components/editable-card-item/editable-card-item.component';
+import { SaveButtonComponent } from 'src/app/shared/components/save-button/save-button.component';
+import { CancelButtonComponent } from 'src/app/shared/components/cancel-button/cancel-button.component';
+import { IconsEnum } from 'src/app/shared/enums/IconsEnum';
 
 interface DeliveryCardItem extends ICardItem {
   deliveryIndex?: number;
   displayItemId?: string;
 }
 
-interface EvaluationCriterionRow {
-  name: string;
-  score: number;
+interface CriteriaListDisplayItem extends IPropertyListItem {
+  foreignKey?: string;
 }
-
-const PREPROJECT_MOCK_DATA: { [id: number]: { name: string; fullName: string } } = {
-  199: { name: 'Culturas Populares', fullName: 'Valorização das Culturas Populares' },
-  204: { name: 'Modernização TVE', fullName: 'Modernização TVE e Rad ES' },
-  209: { name: 'TVE Revista', fullName: 'TVE Revista' },
-  211: { name: 'PE 2023-2026', fullName: 'PE 2023-2026' }
-};
 
 @Component({
   selector: 'app-preproject-form',
@@ -63,75 +57,54 @@ const PREPROJECT_MOCK_DATA: { [id: number]: { name: string; fullName: string } }
 })
 export class PreprojectFormComponent implements OnInit, OnDestroy {
 
-  private readonly destroy$: Subject<void> = new Subject<void>();
+  @ViewChild(SaveButtonComponent) private saveButton: SaveButtonComponent;
+  @ViewChild(CancelButtonComponent) private cancelButton: CancelButtonComponent;
+
+  private readonly destroy$ = new Subject<void>();
+  private syncingForm = false;
+  private propertiesDirty = false;
+  private criteriaDirtyByTab: { [id: number]: boolean } = {};
+  private criteriaValuesByTab: { [id: number]: IPreprojectCriteriaTabValues } = {};
+  private nextTemporaryListItemId = -1;
 
   idOffice: string | null;
-
   idPreproject: number | null = null;
+  idPreProjectModel: number | null = null;
 
-  isLoading: boolean = false;
+  isLoading = false;
+  isModelLoading = false;
+  isEvaluationLoading = false;
+  formIsSaving = false;
+  displayModeAll = 'grid';
+  criteriaLoadingByTab: { [id: number]: boolean } = {};
+  criteriaErrorsByTab: { [id: number]: boolean } = {};
 
-  formIsSaving: boolean = false;
+  organizations: SelectItem[] = [];
+  criteriaGuides: PreprojectCriterion[] = [];
+  evaluation: IPreprojectEvaluation | null = null;
+  tabs: ITabViewScrolled[] = [{ key: 'properties', menu: 'properties' }];
+  selectedTab: ITabViewScrolled = this.tabs[0];
+  tabsVersion = 1;
 
-  displayModeAll: string = 'grid';
+  displayListItemDialog = false;
+  newListItemLabel = '';
+  pendingListProperty: IWorkpackModelProperty | null = null;
 
-  readonly editableDeliveryFields: IEditableCardField[] = [
-    {
-      controlName: 'name',
-      label: 'name',
-      type: 'textarea',
-      required: true,
-      rows: 3,
-      ellipsisAfter: 120
-    }
-  ];
+  readonly editableDeliveryFields: IEditableCardField[] = [{
+    controlName: 'name',
+    label: 'name',
+    type: 'textarea',
+    required: true,
+    rows: 3,
+    ellipsisAfter: 120
+  }];
 
   deliveryCardItems: DeliveryCardItem[] = [{
     typeCardItem: 'newCardItem',
     icon: IconsEnum.Plus
   }];
 
-  form: FormGroup;
-
-  tabs: ITabViewScrolled[] = [
-    { key: 'properties', menu: 'properties' },
-    { key: 'evaluation', menu: 'evaluation' }
-  ];
-
-  tabsVersion: number = 1;
-
-  criteriaGuides: PreprojectCriterion[] = [];
-
-  criteriaOfficeId: number | null = null;
-
-  selectedTab: ITabViewScrolled = this.tabs[0];
-
-  evaluationOperation: PreprojectEvaluationOperation = 'AVERAGE';
-
-  readonly evaluationCardProperties: ICard = {
-    cardTitle: 'evaluation',
-    collapseble: false,
-    toggleable: false,
-    initialStateToggle: false,
-    initialStateCollapse: false
-  };
-
-
-  collapsedEvaluationCriteria: { [criterionId: number]: boolean } = {};
-
-  availablePlans: SelectItem[] = [];
-
-  private officePlans: IPlan[] = [];
-
-  planStructure: TreeNode[] = [];
-
-  isPlanStructureLoading: boolean = false;
-
-  private planStructureRequestVersion: number = 0;
-
-  selectedPlanPosition: TreeNode[] = [];
-
-  cardProperties: ICard = {
+  readonly cardProperties: ICard = {
     cardTitle: 'properties',
     collapseble: false,
     toggleable: false,
@@ -140,71 +113,80 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
     showCreateNemElementButton: false
   };
 
-  /** Propriedades configuradas na aba de Relevância */
-  relevanceProperties: IWorkpackModelProperty[] = [];
-
-  /** Propriedades configuradas na aba de Viabilidade */
-  viabilityProperties: IWorkpackModelProperty[] = [];
-
-  /** Menu de tipos de propriedade para a aba Relevância */
-  menuRelevanceProperties: MenuItem[] = [];
-
-  /** Menu de tipos de propriedade para a aba Viabilidade */
-  menuViabilityProperties: MenuItem[] = [];
+  form: FormGroup;
 
   constructor(
     private readonly route: ActivatedRoute,
     private readonly router: Router,
+    private readonly location: Location,
     private readonly breadcrumbService: BreadcrumbService,
     private readonly menuService: MenuService,
-    private readonly planService: PlanService,
-    private readonly planBreakdownStructureService: PlanBreakdownStructureService,
     private readonly officeService: OfficeService,
-    private readonly workpackService: WorkpackService,
-    private readonly preprojectEvaluationConfigService: PreprojectEvaluationConfigService,
+    private readonly organizationService: OrganizationService,
+    private readonly preprojectService: PreprojectService,
     private readonly preprojectCriteriaConfigService: PreprojectCriteriaConfigService,
+    private readonly workpackService: WorkpackService,
     private readonly workpackShowTabviewService: WorkpackShowTabviewService,
     private readonly formBuilder: FormBuilder,
     private readonly translateService: TranslateService,
     private readonly messageService: MessageService
   ) {
     this.form = this.formBuilder.group({
-      name: ['', [Validators.required, Validators.maxLength(25)]],
-      fullName: ['', Validators.required],
+      name: ['', [Validators.required, Validators.maxLength(50)]],
+      fullName: ['', [Validators.required, Validators.maxLength(600)]],
       organization: [null, Validators.required],
       expectedCompletion: [null],
-      selectPreproject: [false],
-      availablePlan: [{ value: null, disabled: true }],
-      planPosition: [{ value: null, disabled: true }],
-      evaluationNotes: [{ value: '', disabled: true }],
       deliveries: this.formBuilder.array([])
     });
   }
 
   ngOnInit(): void {
-    // A elaboração possui seu próprio estado de edição e não deve herdar
-    // alterações pendentes deixadas pelo módulo de planos nas abas compartilhadas.
-    this.workpackService.nextPendingChanges(false);
     this.idOffice = this.route.snapshot.queryParamMap.get('idOffice');
-    const idPreproject: number = Number(this.route.snapshot.queryParamMap.get('idPreproject'));
+    const idPreproject = Number(this.route.snapshot.queryParamMap.get('idPreproject'));
     this.idPreproject = Number.isFinite(idPreproject) && idPreproject > 0 ? idPreproject : null;
-    this.loadPreproject();
-    this.restoreEvaluationSelection();
-    this.configureEvaluationSelection(this.form.get('selectPreproject').value, false);
+
+    this.menuService.nextIsPlanMenu(false);
+    this.workpackService.nextPendingChanges(false);
+    this.workpackShowTabviewService.next(true);
+    this.refreshDeliveryCardItems();
+
     this.form.valueChanges
       .pipe(takeUntil(this.destroy$))
-      .subscribe(() => this.persistEvaluationSelection());
-    this.menuService.nextIsPlanMenu(false);
-    this.workpackShowTabviewService.next(true);
+      .subscribe(() => {
+        if (!this.syncingForm && this.selectedTab?.key === 'properties') {
+          this.propertiesDirty = true;
+          this.syncPendingChanges();
+        }
+      });
 
-    this.refreshDeliveryCardItems();
-    void this.initBreadcrumb();
+    void this.initialize();
   }
 
   ngOnDestroy(): void {
+    this.workpackService.nextPendingChanges(false);
     this.workpackShowTabviewService.next(false);
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+  get formTitleTranslationKey(): string {
+    return this.idPreproject ? 'editPreproject' : 'newPreproject';
+  }
+
+  get deliveryForms(): FormArray {
+    return this.form.get('deliveries') as FormArray;
+  }
+
+  get selectedCriteriaGuide(): PreprojectCriterion | undefined {
+    const criterionId = this.getSelectedCriteriaTabId();
+    return criterionId
+      ? this.criteriaGuides.find(criterion => Number(criterion.id) === criterionId)
+      : undefined;
+  }
+
+  get isSelectedCriteriaLoading(): boolean {
+    const criterionId = this.getSelectedCriteriaTabId();
+    return !!criterionId && this.criteriaLoadingByTab[criterionId] === true;
   }
 
   back(): void {
@@ -213,152 +195,481 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
     });
   }
 
-  changeTab(event: { tabs: ITabViewScrolled }): void {
+  async changeTab(event: { tabs: ITabViewScrolled }): Promise<void> {
+    const previousTab = this.selectedTab;
+    if (event.tabs?.key !== previousTab?.key && this.hasTabChanges(previousTab)) {
+      await this.discardTabChanges(previousTab);
+    }
     this.selectedTab = event.tabs;
-    this.updateCardPropertyMenu();
+    this.refreshActionButtons();
+    if (this.selectedTab?.key === 'evaluation') {
+      void this.loadEvaluation();
+      return;
+    }
+    const criterion = this.selectedCriteriaGuide;
+    if (criterion) {
+      void this.loadCriteriaValues(criterion);
+    }
   }
 
-  get evaluationOperationTranslationKey(): string {
-    return this.evaluationOperation === 'SUM' ? 'sum' : 'average';
+  async save(): Promise<void> {
+    if (this.selectedTab?.key === 'properties') {
+      await this.saveProperties();
+      return;
+    }
+
+    const criterion = this.selectedCriteriaGuide;
+    if (criterion) {
+      await this.saveCriteriaValues(criterion);
+    }
   }
 
-  get formTitleTranslationKey(): string {
-    return this.idPreproject ? 'editPreproject' : 'newPreproject';
+  async undo(): Promise<void> {
+    if (this.selectedTab?.key === 'evaluation') {
+      return;
+    }
+    await this.discardTabChanges(this.selectedTab);
   }
 
-  getEvaluationRows(criterion: PreprojectCriterion): EvaluationCriterionRow[] {
-    const directRows: EvaluationCriterionRow[] = (criterion.properties || []).map(property => ({
-      name: property.label || property.name,
-      score: this.getPropertyScore(property)
+  getDeliveryForm(index: number | undefined): FormGroup {
+    return this.deliveryForms.at(index || 0) as FormGroup;
+  }
+
+  removeDelivery(index: number): void {
+    this.deliveryForms.removeAt(index);
+    this.refreshDeliveryCardItems();
+  }
+
+  addDelivery(): void {
+    this.deliveryForms.push(this.formBuilder.group({
+      name: ['', Validators.required]
     }));
-    const groupRows: EvaluationCriterionRow[] = (criterion.groups || [])
-      .sort((first, second) => first.sortIndex - second.sortIndex)
-      .map(group => ({
-        name: group.title,
-        score: this.getGroupScore(group)
-      }));
-    return [...directRows, ...groupRows];
+    this.refreshDeliveryCardItems();
   }
 
-  getCriterionScore(criterion: PreprojectCriterion): number {
-    const weightedScores: Array<{ score: number; weight: number }> = [
-      ...(criterion.properties || []).map(property => ({
-        score: this.getPropertyScore(property),
-        weight: property.weight || 1
-      })),
-      ...(criterion.groups || []).map(group => ({
-        score: this.getGroupScore(group),
-        weight: group.weight || 1
-      }))
+  requestListPropertyItem(property: IWorkpackModelProperty): void {
+    this.pendingListProperty = property;
+    this.newListItemLabel = '';
+    this.displayListItemDialog = true;
+  }
+
+  confirmListPropertyItem(): void {
+    const label = this.newListItemLabel.trim();
+    if (!label || !this.pendingListProperty) {
+      return;
+    }
+
+    const item: CriteriaListDisplayItem = {
+      id: this.nextTemporaryListItemId--,
+      name: label,
+      fullName: label,
+      foreignKey: `criteria-${this.pendingListProperty.id}-${Date.now()}`
+    };
+    this.pendingListProperty.selectedListItems = [
+      ...(this.pendingListProperty.selectedListItems || []),
+      item
     ];
-    return this.applyOperation(weightedScores, criterion.operation);
+    this.closeListItemDialog();
+    this.criteriaChanged();
   }
 
-  getCriterionMaximumScore(criterion: PreprojectCriterion): number {
-    const weightedScores: Array<{ score: number; weight: number }> = [
-      ...(criterion.properties || []).map(property => ({
-        score: this.getPropertyMaximumScore(property),
-        weight: property.weight || 1
-      })),
-      ...(criterion.groups || []).map(group => ({
-        score: this.getGroupMaximumScore(group),
-        weight: group.weight || 1
-      }))
-    ];
-    return this.applyOperation(weightedScores, criterion.operation);
+  closeListItemDialog(): void {
+    this.displayListItemDialog = false;
+    this.newListItemLabel = '';
+    this.pendingListProperty = null;
   }
 
-  getCriterionContribution(criterion: PreprojectCriterion): number {
-    const maximumScore: number = this.getCriterionMaximumScore(criterion);
-    return maximumScore
-      ? (this.getCriterionScore(criterion) / maximumScore) * (criterion.weight || 1)
-      : 0;
+  criteriaChanged(): void {
+    const criterionId = this.getSelectedCriteriaTabId();
+    if (!criterionId) {
+      return;
+    }
+    this.criteriaDirtyByTab[criterionId] = true;
+    this.syncPendingChanges();
+    this.saveButton?.showButton();
+    this.cancelButton?.showButton();
   }
 
-  getCriterionOperationTranslationKey(criterion: PreprojectCriterion): string {
-    return criterion.operation === 'SUM' ? 'sum' : 'average';
+  private async initialize(): Promise<void> {
+    this.isLoading = true;
+    try {
+      await Promise.all([this.initBreadcrumb(), this.loadOrganizations()]);
+      if (this.idPreproject) {
+        await this.loadPreproject();
+      } else {
+        this.form.markAsPristine();
+        this.propertiesDirty = false;
+        this.syncPendingChanges();
+      }
+    } catch (error) {
+      this.showError(error, 'Não foi possível carregar o anteprojeto.');
+    } finally {
+      this.isLoading = false;
+    }
   }
 
-  get finalEvaluationScore(): number {
-    return this.criteriaGuides
-      .reduce((total, criterion) => total + this.getCriterionContribution(criterion), 0);
+  private async loadOrganizations(): Promise<void> {
+    const idOffice = Number(this.idOffice);
+    if (!Number.isFinite(idOffice) || idOffice <= 0) {
+      return;
+    }
+    const response = await this.organizationService.GetAll({ 'id-office': idOffice });
+    this.organizations = response.success
+      ? (response.data || [])
+        .sort((first: IOrganization, second: IOrganization) => first.name.localeCompare(second.name))
+        .map((organization: IOrganization) => ({ label: organization.name, value: organization.id }))
+      : [];
   }
 
-  save(): void {
+  private async loadPreproject(): Promise<void> {
+    if (!this.idPreproject) {
+      return;
+    }
+    const response = await this.preprojectService.findById(this.idPreproject);
+    if (!response.success || !response.data) {
+      throw new Error(response.message || 'Preproject not found');
+    }
+
+    this.applyPreproject(response.data);
+    await this.loadModelCriteria(response.data.idPreProjectModel);
+  }
+
+  private applyPreproject(preproject: IPreproject): void {
+    this.idPreProjectModel = preproject.idPreProjectModel;
+    this.syncingForm = true;
+    this.form.patchValue({
+      name: preproject.name,
+      fullName: preproject.fullName,
+      organization: preproject.idOrganization,
+      expectedCompletion: this.parseLocalDate(preproject.expectedCompletionDate)
+    }, { emitEvent: false });
+    this.setDeliveries(preproject.expectedDeliveries);
+    this.form.markAsPristine();
+    this.syncingForm = false;
+    this.propertiesDirty = false;
+    this.syncPendingChanges();
+  }
+
+  private async loadModelCriteria(idPreProjectModel: number): Promise<void> {
+    this.isModelLoading = true;
+    try {
+      this.criteriaGuides = await this.preprojectCriteriaConfigService
+        .getCriteriaByModelId(idPreProjectModel);
+      this.tabs = [
+        { key: 'properties', menu: 'properties' },
+        ...this.criteriaGuides.map(criterion => ({
+          key: `criterion-${criterion.id}`,
+          menu: criterion.name || criterion.label
+        })),
+        { key: 'evaluation', menu: 'evaluation' }
+      ];
+      this.selectedTab = this.tabs[0];
+      this.tabsVersion += 1;
+    } catch (error) {
+      this.criteriaGuides = [];
+      this.tabs = [{ key: 'properties', menu: 'properties' }];
+      this.showError(error, 'Não foi possível carregar o modelo do anteprojeto.');
+    } finally {
+      this.isModelLoading = false;
+    }
+  }
+
+  private async loadCriteriaValues(criterion: PreprojectCriterion, force = false): Promise<void> {
+    if (!this.idPreproject || (!force && this.criteriaValuesByTab[criterion.id])) {
+      return;
+    }
+
+    this.criteriaLoadingByTab[criterion.id] = true;
+    this.criteriaErrorsByTab[criterion.id] = false;
+    try {
+      const response = await this.preprojectService
+        .findCriteriaTabValues(this.idPreproject, criterion.id);
+      if (!response.success || !response.data) {
+        throw new Error(response.message || 'Criteria values not found');
+      }
+      this.criteriaValuesByTab[criterion.id] = response.data;
+      this.mergeCriteriaValues(criterion.id, response.data);
+    } catch (error) {
+      this.criteriaErrorsByTab[criterion.id] = true;
+      this.showError(error, 'Não foi possível carregar os valores deste critério.');
+    } finally {
+      this.criteriaLoadingByTab[criterion.id] = false;
+    }
+  }
+
+  private async loadEvaluation(): Promise<void> {
+    if (!this.idPreproject || this.isEvaluationLoading) {
+      return;
+    }
+    this.isEvaluationLoading = true;
+    try {
+      const response = await this.preprojectService.findEvaluation(this.idPreproject);
+      if (!response.success || !response.data) {
+        throw new Error(response.message || 'Evaluation not found');
+      }
+      this.evaluation = response.data;
+    } catch (error) {
+      this.evaluation = null;
+      this.showError(error, 'Não foi possível carregar a avaliação.');
+    } finally {
+      this.isEvaluationLoading = false;
+    }
+  }
+
+  private mergeCriteriaValues(
+    criterionId: number,
+    tabValues: IPreprojectCriteriaTabValues
+  ): void {
+    const valuesByPropertyModelId = new Map<number, IPreprojectCriteriaValue>(
+      (tabValues.values || []).map(value => [value.idPropertyModel, value])
+    );
+    this.criteriaGuides = this.criteriaGuides.map(criterion => {
+      if (criterion.id !== criterionId) {
+        return criterion;
+      }
+      return {
+        ...criterion,
+        properties: (criterion.properties || []).map(property =>
+          this.mergePropertyValue(property, valuesByPropertyModelId.get(property.id))),
+        groups: (criterion.groups || []).map(group => {
+          const groupValue = (tabValues.values || [])
+            .find(value => value.type === 'CriteriaGroup' && value.idPropertyModel === group.id) as
+            IPreprojectCriteriaGroupValue | undefined;
+          const legacyGroupValue = (tabValues.groups || [])
+            .find(value => value.idPropertyModel === group.id || value.id === group.id);
+          return {
+            ...group,
+            currentEnabled: groupValue
+              ? groupValue.active
+              : legacyGroupValue ? legacyGroupValue.active : group.currentEnabled,
+            properties: (group.properties || []).map(property =>
+              this.mergePropertyValue(property, valuesByPropertyModelId.get(property.id)))
+          };
+        })
+      };
+    });
+  }
+
+  private mergePropertyValue(
+    property: IWorkpackModelProperty,
+    value: IPreprojectCriteriaValue | undefined
+  ): IWorkpackModelProperty {
+    if (!value) {
+      return { ...property };
+    }
+    if (value.type === 'CriteriaGroup') {
+      return { ...property };
+    }
+    if (value.type === 'CriteriaList') {
+      return {
+        ...property,
+        selectedListItems: (value.items || []).map((item, index) => ({
+          id: item.id || this.nextTemporaryListItemId--,
+          name: item.label || '',
+          fullName: item.label || '',
+          foreignKey: item.foreignKey || `criteria-${property.id}-${index + 1}`
+        } as CriteriaListDisplayItem))
+      };
+    }
+
+    const selectedOptionIds = (value as IPreprojectCriteriaSelectionValue).selectedOptionIds || [];
+    const selectedLabels = (property.acceptedOptions || [])
+      .filter(option => selectedOptionIds.includes(option.id))
+      .map(option => option.label);
+    return {
+      ...property,
+      currentValue: property.multipleSelection === false
+        ? (selectedLabels[0] || null)
+        : selectedLabels
+    };
+  }
+
+  private async saveProperties(): Promise<void> {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
     }
-    this.persistCriteriaValues();
-    this.persistEvaluationSelection();
+    const idOffice = Number(this.idOffice);
+    if (!this.idPreproject && (!Number.isFinite(idOffice) || idOffice <= 0)) {
+      this.showError(null, 'Escritório inválido.');
+      return;
+    }
+
     this.formIsSaving = true;
-    setTimeout(() => {
+    try {
+      const commonRequest = this.buildPropertiesRequest();
+      const response = this.idPreproject
+        ? await this.preprojectService.update(this.idPreproject, commonRequest)
+        : await this.preprojectService.create({ ...commonRequest, idOffice } as ICreatePreprojectRequest);
+
+      if (!response.success || !response.data) {
+        throw new Error(response.message || 'Failed to save preproject');
+      }
+
+      this.showSuccess();
+      if (!this.idPreproject) {
+        this.idPreproject = response.data.id;
+        this.idPreProjectModel = response.data.idPreProjectModel;
+        this.propertiesDirty = false;
+        this.form.markAsPristine();
+        this.location.replaceState(
+          '/preproject/edit',
+          `idOffice=${encodeURIComponent(this.idOffice || '')}&idPreproject=${this.idPreproject}`
+        );
+        await this.loadModelCriteria(this.idPreProjectModel);
+        await this.initBreadcrumb();
+      } else {
+        this.applyPreproject(response.data);
+      }
+    } catch (error) {
+      this.showError(error, 'Não foi possível salvar as propriedades do anteprojeto.');
+    } finally {
       this.formIsSaving = false;
-      this.messageService.add({
-        severity: 'success',
-        summary: this.translateService.instant('success') || 'Sucesso',
-        detail: this.translateService.instant('messages.savedSuccessfully') || 'Salvo com sucesso'
-      });
-      this.back();
-    }, 1000);
+      this.syncPendingChanges();
+      this.refreshActionButtons();
+    }
   }
 
-  get deliveryForms(): FormArray {
-    return this.form.get('deliveries') as FormArray;
-  }
-
-  get preprojectSelectionEnabled(): boolean {
-    return this.form.get('selectPreproject').value === true;
-  }
-
-  handlePreprojectSelectionChange(enabled: boolean): void {
-    this.configureEvaluationSelection(enabled, true);
-  }
-
-  async handleAvailablePlanChange(planId: number | string): Promise<void> {
-    this.planStructure = [];
-    this.selectedPlanPosition = [];
-    this.form.get('planPosition').reset(null);
-
-    await this.loadSelectedPlanStructure(planId, []);
-  }
-
-  handlePlanPositionSelect(event: { node: TreeNode }): void {
-    if (!this.preprojectSelectionEnabled || event.node?.selectable === false) {
+  private async saveCriteriaValues(criterion: PreprojectCriterion): Promise<void> {
+    if (!this.idPreproject) {
       return;
     }
-    this.updateSelectedPlanPositions();
-    this.form.get('planPosition').markAsDirty();
-  }
-
-  handlePlanPositionUnselect(): void {
-    if (!this.preprojectSelectionEnabled) {
+    if (!this.criteriaValuesByTab[criterion.id]) {
+      await this.loadCriteriaValues(criterion);
+    }
+    const currentValues = this.criteriaValuesByTab[criterion.id];
+    if (!currentValues) {
       return;
     }
-    this.updateSelectedPlanPositions();
-    this.form.get('planPosition').markAsDirty();
-  }
 
-  async handlePlanNodeExpand(event: { node: TreeNode }): Promise<void> {
-    if (!this.preprojectSelectionEnabled) {
-      return;
+    this.formIsSaving = true;
+    try {
+      const values = this.buildCriteriaRequest(criterion, currentValues);
+      const groups = this.buildCriteriaGroupsRequest(criterion, currentValues);
+      const response = await this.preprojectService.saveCriteriaTabValues(
+        this.idPreproject,
+        criterion.id,
+        { values, groups }
+      );
+      if (!response.success || !response.data) {
+        throw new Error(response.message || 'Failed to save criteria');
+      }
+      this.criteriaValuesByTab[criterion.id] = response.data;
+      this.mergeCriteriaValues(criterion.id, response.data);
+      this.criteriaDirtyByTab[criterion.id] = false;
+      this.showSuccess();
+    } catch (error) {
+      this.showError(error, 'Não foi possível salvar os valores deste critério.');
+    } finally {
+      this.formIsSaving = false;
+      this.syncPendingChanges();
+      this.refreshActionButtons();
     }
-    await this.planBreakdownStructureService.expandPlanNode(event);
-    event.node.children = (event.node.children || [])
-      .map(child => this.mapPlanStructureNode(child));
   }
 
-  private updateSelectedPlanPositions(): void {
-    const positions: string[] = (this.selectedPlanPosition || [])
-      .filter((node: TreeNode) => node?.data)
-      .map((node: TreeNode) => String(node.data));
-    const planPositionControl = this.form.get('planPosition');
-    planPositionControl.setValue(positions);
-    planPositionControl.markAsTouched();
+  private buildPropertiesRequest(): IUpdatePreprojectRequest {
+    const value = this.form.getRawValue();
+    return {
+      name: String(value.name || '').trim(),
+      fullName: String(value.fullName || '').trim(),
+      idOrganization: Number(value.organization),
+      expectedCompletionDate: this.formatLocalDate(value.expectedCompletion),
+      expectedDeliveries: this.deliveryForms.controls
+        .map(control => String(control.get('name').value || '').trim())
+        .filter(label => !!label)
+        .join('\n') || null
+    };
+  }
+
+  private buildCriteriaRequest(
+    criterion: PreprojectCriterion,
+    currentValues: IPreprojectCriteriaTabValues
+  ): IPreprojectCriteriaValue[] {
+    const propertiesById = new Map<number, IWorkpackModelProperty>();
+    [...(criterion.properties || []),
+      ...(criterion.groups || []).reduce(
+        (all, group) => [...all, ...(group.properties || [])],
+        [] as IWorkpackModelProperty[]
+      )
+    ].forEach(property => propertiesById.set(property.id, property));
+
+    return (currentValues.values || []).map(value => {
+      if (value.type === 'CriteriaGroup') {
+        const group = (criterion.groups || []).find(item => item.id === value.idPropertyModel);
+        return {
+          ...value,
+          active: group ? group.currentEnabled !== false : value.active
+        } as IPreprojectCriteriaGroupValue;
+      }
+      const property = propertiesById.get(value.idPropertyModel);
+      if (!property) {
+        return value;
+      }
+
+      if (value.type === 'CriteriaList') {
+        const items = (property.selectedListItems || []).map((item, index) => ({
+          foreignKey: (item as CriteriaListDisplayItem).foreignKey
+            || `criteria-${property.id}-${index + 1}`,
+          label: item.name
+        }));
+        return { ...value, items } as IPreprojectCriteriaListValue;
+      }
+
+      const selectedLabels = Array.isArray(property.currentValue)
+        ? (property.currentValue as Array<number | string>)
+          .map(selectedValue => String(selectedValue))
+        : property.currentValue !== undefined && property.currentValue !== null && property.currentValue !== ''
+          ? [String(property.currentValue)]
+          : [];
+      const selectedOptionIds = (property.acceptedOptions || [])
+        .filter(option => selectedLabels.includes(option.label))
+        .map(option => option.id)
+        .filter((id): id is number => id !== undefined && id !== null);
+      return { ...value, selectedOptionIds } as IPreprojectCriteriaSelectionValue;
+    });
+  }
+
+  private buildCriteriaGroupsRequest(
+    criterion: PreprojectCriterion,
+    currentValues: IPreprojectCriteriaTabValues
+  ): IPreprojectCriteriaGroupValue[] {
+    const groupsById = new Map<number, PreprojectCriterion['groups'][number]>();
+    (criterion.groups || []).forEach(group => {
+      if (group.id) {
+        groupsById.set(group.id, group);
+      }
+    });
+    return (currentValues.groups || [])
+      .map(group => {
+        const modelId = group.idPropertyModel || group.id;
+        const modelGroup = groupsById.get(modelId);
+        return modelGroup
+          ? { id: group.id, idPropertyModel: modelId, active: modelGroup.currentEnabled !== false, type: 'CriteriaGroup' }
+          : null;
+      })
+      .filter((group): group is IPreprojectCriteriaGroupValue => !!group);
+  }
+
+  private setDeliveries(expectedDeliveries?: string | null): void {
+    this.clearDeliveries();
+    (expectedDeliveries || '')
+      .split(/\r?\n/)
+      .map(label => label.trim())
+      .filter(label => !!label)
+      .forEach(label => this.deliveryForms.push(this.formBuilder.group({
+        name: [label, Validators.required]
+      })));
+    this.refreshDeliveryCardItems();
+  }
+
+  private clearDeliveries(): void {
+    while (this.deliveryForms.length) {
+      this.deliveryForms.removeAt(0);
+    }
   }
 
   private refreshDeliveryCardItems(): void {
-    const cards: DeliveryCardItem[] = this.deliveryForms.controls.map((_delivery, index: number) => ({
+    const cards: DeliveryCardItem[] = this.deliveryForms.controls.map((_delivery, index) => ({
       typeCardItem: 'listItem',
       icon: IconsEnum.Boxes,
       deliveryIndex: index,
@@ -370,623 +681,124 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
         command: () => this.removeDelivery(index)
       }]
     }));
-
-    cards.push({
-      typeCardItem: 'newCardItem',
-      icon: IconsEnum.Plus
-    });
-
+    cards.push({ typeCardItem: 'newCardItem', icon: IconsEnum.Plus });
     this.deliveryCardItems = cards;
   }
 
-  private loadPreproject(): void {
-    if (!this.idPreproject) {
-      return;
+  private getSelectedCriteriaTabId(): number | null {
+    const key = this.selectedTab?.key || '';
+    if (!key.startsWith('criterion-')) {
+      return null;
     }
+    const id = Number(key.replace('criterion-', ''));
+    return Number.isFinite(id) && id > 0 ? id : null;
+  }
 
-    const preproject = PREPROJECT_MOCK_DATA[this.idPreproject];
-    if (preproject) {
-      this.form.patchValue(preproject);
+  private parseLocalDate(value?: string | null): Date | null {
+    if (!value) {
+      return null;
     }
+    const [year, month, day] = value.split('-').map(Number);
+    return year && month && day ? new Date(year, month - 1, day) : null;
   }
 
-  trackByDelivery(index: number): number {
-    return index;
+  private formatLocalDate(value: Date | string | null): string | null {
+    if (!value) {
+      return null;
+    }
+    if (typeof value === 'string') {
+      return value.slice(0, 10);
+    }
+    const year = value.getFullYear();
+    const month = `${value.getMonth() + 1}`.padStart(2, '0');
+    const day = `${value.getDate()}`.padStart(2, '0');
+    return `${year}-${month}-${day}`;
   }
 
-  getDeliveryForm(index: number | undefined): FormGroup {
-    return this.deliveryForms.at(index || 0) as FormGroup;
-  }
-
-  removeDelivery(index: number): void {
-    this.deliveryForms.removeAt(index);
-    this.form.markAsDirty();
-    this.refreshDeliveryCardItems();
-  }
-
-  addDelivery(): void {
-    this.deliveryForms.push(this.formBuilder.group({
-      name: ['', [Validators.required, Validators.maxLength(25)]]
-    }));
-    this.form.markAsDirty();
-    this.refreshDeliveryCardItems();
-  }
-
-
-  addProperty(type: string, target: PropertyTarget): void {
-    const list: IWorkpackModelProperty[] =
-      target === 'relevance' ? this.relevanceProperties : this.viabilityProperties;
-
-    const newProperty: IWorkpackModelProperty = {
-      type,
-      active: true,
-      label: '',
-      name: '',
-      sortIndex: list.length + 1,
-      fullLine: true,
-      required: false,
-      multipleSelection: false,
-      isCollapsed: false,
-      sectorsList: type === TypePropertyEnum.OrganizationSelectionModel
-        ? [
-          TypeOrganization.Private.toUpperCase(),
-          TypeOrganization.Public.toUpperCase(),
-          TypeOrganization.Third.toUpperCase()
-        ]
-        : [],
-      selectedLocalities: type === TypePropertyEnum.LocalitySelectionModel
-        ? this.translateService.instant('selectDefaultValue')
-        : undefined,
-      showIconButtonSelectLocality: type === TypePropertyEnum.LocalitySelectionModel
-    };
-
-    this.checkProperty(newProperty);
-
-    if (target === 'relevance') {
-      this.relevanceProperties = [...this.relevanceProperties, newProperty];
+  private refreshActionButtons(): void {
+    const selectedCriterionId = this.getSelectedCriteriaTabId();
+    const hasSelectedTabChanges = this.selectedTab?.key === 'properties'
+      ? this.propertiesDirty
+      : this.selectedTab?.key !== 'evaluation'
+        && !!selectedCriterionId && this.criteriaDirtyByTab[selectedCriterionId] === true;
+    if (hasSelectedTabChanges) {
+      this.saveButton?.showButton();
+      this.cancelButton?.showButton();
     } else {
-      this.viabilityProperties = [...this.viabilityProperties, newProperty];
+      this.saveButton?.hideButton();
+      this.cancelButton?.hideButton();
     }
   }
 
-  checkProperty(property: IWorkpackModelProperty): void {
-    let requiredFields: string[] = ['name', 'label', 'sortIndex'];
-
-    switch (property.type) {
-      case TypePropertyEnum.LocalitySelectionModel:
-        requiredFields = [...requiredFields, 'idDomain', 'multipleSelection'];
-        break;
-
-      case TypePropertyEnum.OrganizationSelectionModel:
-        requiredFields = [...requiredFields, 'multipleSelection', 'sectors'];
-        property.sectors = (property.sectorsList || [])
-          .map((sec: string) => sec.toLowerCase())
-          .join(',');
-        break;
-
-      case TypePropertyEnum.SelectionModel:
-        requiredFields = [...requiredFields, 'possibleValuesOptions', 'multipleSelection'];
-        break;
-
-      case TypePropertyEnum.NumberModel:
-        requiredFields = [...requiredFields, 'precision'];
-        property.precision = 3;
-        break;
-
-      default:
-        break;
+  private hasTabChanges(tab: ITabViewScrolled | undefined): boolean {
+    if (tab?.key === 'properties') {
+      return this.propertiesDirty;
     }
-
-    property.requiredFields = requiredFields;
-    property.viewOnly = false;
-    property.obligatory = false;
-  }
-
-
-  propertyChanged(event: { property: IWorkpackModelProperty }): void {
-    if (event?.property) {
-      this.relevanceProperties = [...this.relevanceProperties];
-      this.viabilityProperties = [...this.viabilityProperties];
+    if (!tab?.key?.startsWith('criterion-')) {
+      return false;
     }
+    const id = Number(tab.key.replace('criterion-', ''));
+    return Number.isFinite(id) && this.criteriaDirtyByTab[id] === true;
   }
 
-  criteriaChanged(): void {
-    this.form.markAsDirty();
-    this.persistCriteriaValues();
-  }
-
-  get selectedCriteriaGuide(): PreprojectCriterion | undefined {
-    const criterionId: number = Number((this.selectedTab?.key || '').replace('criterion-', ''));
-    return this.criteriaGuides.find((criterion: PreprojectCriterion) => Number(criterion.id) === criterionId);
-  }
-
-  isListProperty(property: IWorkpackModelProperty): boolean {
-    return property.type === TypePropertyEnum.ChallengeListModel
-      || property.type === TypePropertyEnum.SdgListModel;
-  }
-
-  getListPropertyIcon(property: IWorkpackModelProperty): string {
-    return property.type === TypePropertyEnum.SdgListModel
-      ? IconsEnum.Cog
-      : IconsEnum.Selection;
-  }
-
-  updateListPropertyItems(property: IWorkpackModelProperty, items: IPropertyListItem[]): void {
-    property.selectedListItems = items;
-    this.form.markAsDirty();
-    this.propertyChanged({ property });
-  }
-
-  requestListPropertyItem(property: IWorkpackModelProperty): void {
-    this.propertyChanged({ property });
-  }
-
-  deleteProperty(property: IWorkpackModelProperty, target: PropertyTarget): void {
-    if (target === 'relevance') {
-      this.relevanceProperties = this.relevanceProperties.filter((p: IWorkpackModelProperty) => p !== property);
-    } else {
-      this.viabilityProperties = this.viabilityProperties.filter((p: IWorkpackModelProperty) => p !== property);
-    }
-  }
-
-  trackByProperty(index: number): number {
-    return index;
-  }
-
-  private buildPropertyMenus(): void {
-    const propertyTypes: Array<{ type: TypePropertyEnum; labelKey: string }> = [
-      { type: TypePropertyEnum.TextModel,                 labelKey: 'textProperty' },
-      { type: TypePropertyEnum.TextAreaModel,             labelKey: 'textAreaProperty' },
-      { type: TypePropertyEnum.NumberModel,               labelKey: 'numberProperty' },
-      { type: TypePropertyEnum.IntegerModel,              labelKey: 'integerProperty' },
-      { type: TypePropertyEnum.CurrencyModel,             labelKey: 'currencyProperty' },
-      { type: TypePropertyEnum.DateModel,                 labelKey: 'dateProperty' },
-      { type: TypePropertyEnum.ToggleModel,               labelKey: 'toggleProperty' },
-      { type: TypePropertyEnum.SelectionModel,            labelKey: 'selectionProperty' },
-      { type: TypePropertyEnum.LocalitySelectionModel,    labelKey: 'localitySelectionProperty' },
-      { type: TypePropertyEnum.OrganizationSelectionModel,labelKey: 'organizationSelectionProperty' },
-      { type: TypePropertyEnum.UnitSelectionModel,        labelKey: 'unitSelectionProperty' },
-      { type: TypePropertyEnum.ChallengeListModel,        labelKey: 'challengeList' },
-      { type: TypePropertyEnum.SdgListModel,              labelKey: 'sdgList' },
-    ];
-
-    const buildMenu = (target: PropertyTarget): MenuItem[] =>
-      propertyTypes.map(({ type, labelKey }) => ({
-        label: this.translateService.instant(labelKey),
-        icon: IconPropertyEnum[type] || 'fas fa-cube',
-        command: () => this.addProperty(type, target)
-      }));
-
-    this.menuRelevanceProperties = buildMenu('relevance');
-    this.menuViabilityProperties = buildMenu('viability');
-    this.updateCardPropertyMenu();
-  }
-
-  private updateCardPropertyMenu(): void {
-    this.cardProperties.showCreateNemElementButton = false;
-    this.cardProperties.createNewElementMenuItems = undefined;
-  }
-
-  private async loadCriteriaGuides(idOffice: number): Promise<void> {
-    this.criteriaGuides = this.restoreCriteriaValues(await this.getActiveCriteriaGuides(idOffice));
-
-    this.tabs = [
-      { key: 'properties', menu: 'properties' },
-      ...this.criteriaGuides.map((criterion: PreprojectCriterion) => ({
-        key: `criterion-${criterion.id}`,
-        menu: criterion.name
-      })),
-      { key: 'evaluation', menu: 'evaluation' }
-    ];
-    this.tabsVersion += 1;
-  }
-
-  private async getActiveCriteriaGuides(idOffice: number): Promise<PreprojectCriterion[]> {
-    const criteria = await this.preprojectCriteriaConfigService.getCriteria(idOffice);
-    return criteria
-      .filter((criterion: PreprojectCriterion) => criterion.active !== false)
-      .sort((first: PreprojectCriterion, second: PreprojectCriterion) => first.position - second.position);
-  }
-
-  private persistCriteriaValues(): void {
-    localStorage.setItem(this.getCriteriaValuesStorageKey(), JSON.stringify(this.criteriaGuides));
-  }
-
-  private restoreCriteriaValues(criteria: PreprojectCriterion[]): PreprojectCriterion[] {
-    const storedValue: string | null = localStorage.getItem(this.getCriteriaValuesStorageKey());
-    if (!storedValue) {
-      return criteria;
-    }
-
-    try {
-      const storedCriteria: PreprojectCriterion[] = JSON.parse(storedValue);
-      criteria.forEach((criterion: PreprojectCriterion) => {
-        const storedCriterion: PreprojectCriterion | undefined = storedCriteria
-          .find((stored: PreprojectCriterion) => stored.id === criterion.id);
-        if (!storedCriterion) {
-          return;
+  private async discardTabChanges(tab: ITabViewScrolled): Promise<void> {
+    if (tab.key === 'properties') {
+      if (this.idPreproject) {
+        const response = await this.preprojectService.findById(this.idPreproject);
+        if (!response.success || !response.data) {
+          throw new Error(response.message || 'Preproject not found');
         }
-
-        this.restorePropertyValues(criterion.properties, storedCriterion.properties);
-        criterion.groups.forEach(group => {
-          const storedGroup = storedCriterion.groups.find(candidate =>
-            candidate.sortIndex === group.sortIndex && candidate.title === group.title);
-          if (storedGroup) {
-            group.currentEnabled = storedGroup.currentEnabled;
-            this.restorePropertyValues(group.properties, storedGroup.properties);
-          }
-        });
-      });
-      return criteria;
-    } catch {
-      return criteria;
+        this.applyPreproject(response.data);
+      } else {
+        this.syncingForm = true;
+        this.form.reset();
+        this.clearDeliveries();
+        this.refreshDeliveryCardItems();
+        this.form.markAsPristine();
+        this.syncingForm = false;
+        this.propertiesDirty = false;
+      }
+    } else if (tab.key.startsWith('criterion-')) {
+      const criterionId = Number(tab.key.replace('criterion-', ''));
+      const criterion = this.criteriaGuides.find(item => item.id === criterionId);
+      if (criterion) {
+        await this.loadCriteriaValues(criterion, true);
+        this.criteriaDirtyByTab[criterion.id] = false;
+      }
     }
+    this.syncPendingChanges();
+    this.refreshActionButtons();
   }
 
-  private restorePropertyValues(
-    properties: IWorkpackModelProperty[],
-    storedProperties: IWorkpackModelProperty[]
-  ): void {
-    properties.forEach((property: IWorkpackModelProperty) => {
-      const storedProperty: IWorkpackModelProperty | undefined = storedProperties.find(candidate =>
-        candidate.type === property.type
-        && candidate.sortIndex === property.sortIndex
-        && candidate.name === property.name);
-      if (!storedProperty) {
-        return;
-      }
+  private syncPendingChanges(): void {
+    const criteriaHasChanges = Object.keys(this.criteriaDirtyByTab)
+      .some(key => this.criteriaDirtyByTab[Number(key)] === true);
+    this.workpackService.nextPendingChanges(this.propertiesDirty || criteriaHasChanges);
+  }
 
-      property.currentValue = storedProperty.currentValue;
-      property.currentSelectedValue = storedProperty.currentSelectedValue;
-      property.currentSelectedValues = storedProperty.currentSelectedValues;
-      property.currentLocalitiesSelected = storedProperty.currentLocalitiesSelected;
-      property.selectedListItems = storedProperty.selectedListItems;
+  private showSuccess(): void {
+    this.messageService.add({
+      severity: 'success',
+      summary: this.translateService.instant('success'),
+      detail: this.translateService.instant('messages.savedSuccessfully')
     });
   }
 
-  private getCriteriaValuesStorageKey(): string {
-    const preprojectKey: string = this.idPreproject ? String(this.idPreproject) : 'new';
-    return `openpmo.preproject.values.${this.idOffice || 'no-office'}.${preprojectKey}`;
-  }
-
-  private configureEvaluationSelection(enabled: boolean, markAsDirty: boolean): void {
-    const availablePlanControl = this.form.get('availablePlan');
-    const planPositionControl = this.form.get('planPosition');
-    const notesControl = this.form.get('evaluationNotes');
-
-    if (enabled) {
-      availablePlanControl.enable({ emitEvent: false });
-      planPositionControl.enable({ emitEvent: false });
-      notesControl.enable({ emitEvent: false });
-      availablePlanControl.setValidators(Validators.required);
-      planPositionControl.setValidators(Validators.required);
-      if (availablePlanControl.value) {
-        void this.loadSelectedPlanStructure(
-          availablePlanControl.value,
-          planPositionControl.value
-        );
-      }
-    } else {
-      availablePlanControl.clearValidators();
-      planPositionControl.clearValidators();
-      availablePlanControl.disable({ emitEvent: false });
-      planPositionControl.disable({ emitEvent: false });
-      notesControl.disable({ emitEvent: false });
-      ++this.planStructureRequestVersion;
-      this.isPlanStructureLoading = false;
-    }
-
-    availablePlanControl.updateValueAndValidity({ emitEvent: false });
-    planPositionControl.updateValueAndValidity({ emitEvent: false });
-    if (markAsDirty) {
-      this.form.markAsDirty();
-      this.persistEvaluationSelection();
-    }
-  }
-
-  private async loadOfficePlans(idOffice: number): Promise<void> {
-    ++this.planStructureRequestVersion;
-    this.isPlanStructureLoading = false;
-    const result = await this.planService.GetAll({ 'id-office': idOffice });
-    this.officePlans = result.success ? result.data || [] : [];
-    this.availablePlans = this.officePlans.map(plan => ({
-      label: plan.name,
-      value: plan.id
-    }));
-
-    const availablePlanControl = this.form.get('availablePlan');
-    availablePlanControl.setValue(null, { emitEvent: false });
-    this.form.get('planPosition').setValue(null, { emitEvent: false });
-    this.planStructure = [];
-    this.selectedPlanPosition = [];
-  }
-
-  private async loadSelectedPlanStructure(
-    planId: number | string,
-    selectedPosition: string | string[]
-  ): Promise<void> {
-    const requestVersion: number = ++this.planStructureRequestVersion;
-    const selectedPlanId: number = Number(planId);
-    if (!Number.isFinite(selectedPlanId) || selectedPlanId <= 0) {
-      this.isPlanStructureLoading = false;
-      this.planStructure = [];
-      this.selectedPlanPosition = [];
-      return;
-    }
-
-    this.isPlanStructureLoading = true;
-    try {
-      const loadedFromTreeView = await this.loadPlanFromTreeView(selectedPlanId, requestVersion);
-      if (requestVersion !== this.planStructureRequestVersion) {
-        return;
-      }
-      if (loadedFromTreeView) {
-        this.restoreSelectedPlanPosition(selectedPosition);
-        return;
-      }
-      const structure = await this.planBreakdownStructureService
-        .loadPlanBreakdownStructure(selectedPlanId, false);
-      if (requestVersion !== this.planStructureRequestVersion
-        || Number(this.form.get('availablePlan').value) !== selectedPlanId) {
-        return;
-      }
-      this.planStructure = (structure || []).map(node => this.mapPlanStructureNode(node));
-      this.restoreSelectedPlanPosition(selectedPosition);
-    } catch {
-      if (requestVersion === this.planStructureRequestVersion) {
-        this.planStructure = [];
-        this.selectedPlanPosition = [];
-      }
-    } finally {
-      if (requestVersion === this.planStructureRequestVersion) {
-        this.isPlanStructureLoading = false;
-      }
-    }
-  }
-
-  private async loadPlanFromTreeView(planId: number, requestVersion: number): Promise<boolean> {
-    if (!this.criteriaOfficeId) {
-      return false;
-    }
-
-    try {
-      const result = await this.officeService.GetTreeScopePersons(this.criteriaOfficeId);
-      const selectedPlan: ITreeViewScopePlan | undefined = result.success
-        ? (result.data?.plans || []).find(plan => String(plan.id) === String(planId))
-        : undefined;
-      if (!selectedPlan) {
-        return false;
-      }
-
-      if (requestVersion !== this.planStructureRequestVersion
-        || Number(this.form.get('availablePlan').value) !== planId) {
-        return true;
-      }
-
-      this.planStructure = [{
-        label: selectedPlan.name,
-        data: `PLAN_${selectedPlan.id}`,
-        expanded: true,
-        icon: 'fas fa-briefcase',
-        selectable: false,
-        leaf: false,
-        children: this.buildWorkpackStructure(selectedPlan.workpacks || [])
-      }];
-      return true;
-    } catch {
-      return false;
-    }
-  }
-
-  private buildWorkpackStructure(workpacks: ITreeViewScopeWorkpack[]): TreeNode[] {
-    return workpacks.map(workpack => ({
-      label: workpack.name,
-      data: `WORKPACK_${workpack.id}`,
-      icon: workpack.icon || 'fas fa-project-diagram',
-      leaf: !workpack.children?.length,
-      children: this.buildWorkpackStructure(workpack.children || [])
-    }));
-  }
-
-  private mapPlanStructureNode(node: any): TreeNode {
-    const isPlan: boolean = Boolean(node?.idPlan);
-    const isWorkpack: boolean = Boolean(node?.idWorkpack);
-    const type: string = node?.workpackType || node?.workpackModelType;
-    const children: TreeNode[] = (node?.children || [])
-      .map(child => this.mapPlanStructureNode(child));
-
-    const mappedNode: TreeNode = {
-      label: node?.label || node?.workpackName || node?.workpackModelName,
-      data: isPlan
-        ? `PLAN_${node.idPlan}`
-        : isWorkpack ? `WORKPACK_${node.idWorkpack}` : null,
-      icon: this.getPlanStructureIcon(type, isPlan),
-      selectable: isWorkpack,
-      expanded: true,
-      leaf: node?.hasChildren === false || children.length === 0,
-      children
-    };
-    (mappedNode as any).idWorkpack = node?.idWorkpack;
-    return mappedNode;
-  }
-
-  private getPlanStructureIcon(type: string, isPlan: boolean): string {
-    if (isPlan) {
-      return 'fas fa-briefcase';
-    }
-    return IconsTypeWorkpackEnum[type]
-      || IconsTypeWorkpackModelEnum[type]
-      || 'fas fa-project-diagram';
-  }
-
-  private persistEvaluationSelection(): void {
-    localStorage.setItem(
-      this.getEvaluationSelectionStorageKey(),
-      JSON.stringify(this.form.getRawValue())
-    );
-  }
-
-  private restoreEvaluationSelection(): void {
-    const storedValue: string | null = localStorage.getItem(this.getEvaluationSelectionStorageKey());
-    if (!storedValue) {
-      return;
-    }
-    try {
-      const storedFormValue = JSON.parse(storedValue);
-      this.form.patchValue({
-        selectPreproject: storedFormValue.selectPreproject === true,
-        availablePlan: storedFormValue.availablePlan || null,
-        planPosition: storedFormValue.planPosition || null,
-        evaluationNotes: storedFormValue.evaluationNotes || ''
-      }, { emitEvent: false });
-    } catch {
-      return;
-    }
-  }
-
-  private restoreSelectedPlanPosition(position: string | string[]): void {
-    const positions: string[] = Array.isArray(position)
-      ? position
-      : position ? [position] : [];
-    this.selectedPlanPosition = positions
-      .map((value: string) => this.findTreeNode(this.planStructure, value))
-      .filter((node: TreeNode | null): node is TreeNode => node !== null);
-  }
-
-  private findTreeNode(nodes: TreeNode[], data: string): TreeNode | null {
-    for (const node of nodes || []) {
-      if (node.data === data) {
-        return node;
-      }
-      const childNode: TreeNode | null = this.findTreeNode(node.children || [], data);
-      if (childNode) {
-        return childNode;
-      }
-    }
-    return null;
-  }
-
-  private getEvaluationSelectionStorageKey(): string {
-    const preprojectKey: string = this.idPreproject ? String(this.idPreproject) : 'new';
-    return `openpmo.preproject.evaluation-selection.${this.idOffice || 'no-office'}.${preprojectKey}`;
-  }
-
-  private getGroupScore(group: PreprojectCriterionGroup): number {
-    const groupEnabled: boolean = group.currentEnabled !== undefined
-      ? group.currentEnabled
-      : !group.enablementKey;
-    if (group.enablementKey && !groupEnabled) {
-      return this.toNumber(group.disabledValue);
-    }
-
-    return this.applyOperation(
-      (group.properties || []).map(property => ({
-        score: this.getPropertyScore(property),
-        weight: property.weight || 1
-      })),
-      group.operation
-    );
-  }
-
-  private getPropertyScore(property: IWorkpackModelProperty): number {
-    if (property.selectedListItems?.length && property.itemValue !== undefined) {
-      return property.selectedListItems.length * property.itemValue;
-    }
-
-    const currentValue = property.currentValue !== undefined
-      ? property.currentValue
-      : property.defaultValue;
-    const selectedValues: unknown[] = Array.isArray(currentValue) ? currentValue : [currentValue];
-    const possibleValueScores: number[] = selectedValues
-      .map(selectedValue => property.possibleValuesDetails
-        ?.find(option => option.label === selectedValue)?.value)
-      .filter((value): value is number => typeof value === 'number');
-
-    if (possibleValueScores.length) {
-      return possibleValueScores.reduce((total, value) => total + value, 0) / possibleValueScores.length;
-    }
-    if (typeof currentValue === 'boolean') {
-      return currentValue ? 1 : 0;
-    }
-    return this.toNumber(currentValue);
-  }
-
-  private getGroupMaximumScore(group: PreprojectCriterionGroup): number {
-    const enabledMaximum: number = this.applyOperation(
-      (group.properties || []).map(property => ({
-        score: this.getPropertyMaximumScore(property),
-        weight: property.weight || 1
-      })),
-      group.operation
-    );
-    return group.enablementKey
-      ? Math.max(enabledMaximum, this.toNumber(group.disabledValue))
-      : enabledMaximum;
-  }
-
-  private getPropertyMaximumScore(property: IWorkpackModelProperty): number {
-    const possibleScores: number[] = (property.possibleValuesDetails || [])
-      .map(option => option.value)
-      .filter((value): value is number => typeof value === 'number');
-    if (possibleScores.length) {
-      return Math.max(...possibleScores);
-    }
-    if (property.itemValue !== undefined) {
-      const itemCount: number = property.availableListItems?.length
-        || property.selectedListItems?.length
-        || 0;
-      return itemCount * property.itemValue;
-    }
-    if (typeof property.max === 'number') {
-      return property.max;
-    }
-    if (property.type === TypePropertyEnum.ToggleModel) {
-      return 1;
-    }
-    return Math.max(0, this.getPropertyScore(property));
-  }
-
-  private applyOperation(
-    values: Array<{ score: number; weight: number }>,
-    operation: PreprojectEvaluationOperation
-  ): number {
-    if (!values.length) {
-      return 0;
-    }
-
-    const weightedTotal: number = values
-      .reduce((total, item) => total + (item.score * item.weight), 0);
-    if (operation === 'SUM') {
-      return weightedTotal;
-    }
-
-    const weightTotal: number = values.reduce((total, item) => total + item.weight, 0);
-    return weightTotal ? weightedTotal / weightTotal : 0;
-  }
-
-  private toNumber(value: unknown): number {
-    if (typeof value === 'number') {
-      return Number.isFinite(value) ? value : 0;
-    }
-    if (typeof value !== 'string' || !value.trim()) {
-      return 0;
-    }
-    const parsedValue: number = Number(value.replace(',', '.'));
-    return Number.isFinite(parsedValue) ? parsedValue : 0;
+  private showError(error: any, fallback: string): void {
+    const detail = error?.error?.message || error?.message || fallback;
+    this.messageService.add({
+      severity: 'error',
+      summary: this.translateService.instant('error'),
+      detail
+    });
   }
 
   private async initBreadcrumb(): Promise<void> {
-    const idOfficeNumber: number = Number(this.idOffice);
+    const idOffice = Number(this.idOffice);
     const breadcrumbs: IBreadcrumb[] = [];
-
-    if (Number.isFinite(idOfficeNumber) && idOfficeNumber > 0) {
-      this.criteriaOfficeId = idOfficeNumber;
-      this.evaluationOperation = this.preprojectEvaluationConfigService.getOperation(idOfficeNumber);
-      await this.loadCriteriaGuides(idOfficeNumber);
-      await this.loadOfficePlans(idOfficeNumber);
-      const office = await this.officeService.getCurrentOffice(idOfficeNumber);
-      this.officeService.nextIDOffice(idOfficeNumber);
-
+    if (Number.isFinite(idOffice) && idOffice > 0) {
+      const office = await this.officeService.getCurrentOffice(idOffice);
+      this.officeService.nextIDOffice(idOffice);
       if (office) {
         breadcrumbs.push({
           key: 'office',
@@ -997,7 +809,6 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
         });
       }
     }
-
     breadcrumbs.push(
       {
         key: 'preproject',
@@ -1010,8 +821,6 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
         info: this.formTitleTranslationKey
       }
     );
-
     this.breadcrumbService.setMenu(breadcrumbs);
   }
-
 }

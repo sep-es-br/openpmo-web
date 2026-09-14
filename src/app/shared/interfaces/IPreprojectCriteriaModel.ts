@@ -4,13 +4,16 @@ import { IOffice } from './IOffice';
 export type CriteriaOperation = 'AVERAGE' | 'SUM';
 
 export interface CriteriaSelectionOption {
+  id?: number;
   value: number;
   label: string;
   position: number;
   default?: boolean;
+  defaultOption?: boolean;
 }
 
 export interface PreProjectListItem {
+  id?: number;
   foreignKey: string;
   label: string;
 }
@@ -47,7 +50,7 @@ export interface CriteriaGroupModel {
   operation: CriteriaOperation;
   enablementKey: boolean;
   currentEnabled?: boolean;
-  disabledValue: string;
+  disabledValue: number | string;
   legend: string;
   properties: CriteriaPropertyModel[];
 }
@@ -56,6 +59,7 @@ export interface CriteriaTabModel {
   propertyModelType?: 'CriteriaTabModel';
   id: number;
   name: string;
+  label?: string;
   active?: boolean;
   position: number;
   icon: string;

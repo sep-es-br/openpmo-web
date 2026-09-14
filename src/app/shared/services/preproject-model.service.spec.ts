@@ -175,7 +175,7 @@ describe('Preproject criteria request freshness', () => {
     for (let index = 0; index < 2; index++) {
       const save = models.updateConfiguration(10, { active: true, operation: 'SUM' });
       const request = requests.expectOne(`${modelUrl}/10`);
-      expect(request.request.method).toBe('PATCH');
+      expect(request.request.method).toBe('PUT');
       expect(request.request.headers.has('X-Skip-Request-Cache')).toBe(false);
       expect(request.request.headers.get('Authorization')).toBe('Bearer token');
       expect(request.request.withCredentials).toBe(true);

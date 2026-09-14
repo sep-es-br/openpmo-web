@@ -4,8 +4,15 @@
   </div>
 
   <app-card [properties]="cardProperties" class="mt-0 inputs-float-label">
-    <app-card-loading [isCardLoading]="isLoading"></app-card-loading>
-    <app-tabview-scrolled [tabs]="tabs" [contextVersion]="tabsVersion" (selectedTabChange)="changeTab($event)">
+    <app-card-loading
+      [isCardLoading]="isLoading || isModelLoading || isSelectedCriteriaLoading || isEvaluationLoading || formIsSaving">
+    </app-card-loading>
+
+    <app-tabview-scrolled
+      [tabs]="tabs"
+      [contextVersion]="tabsVersion"
+      (selectedTabChange)="changeTab($event)">
+
       <div tabviewBody *ngIf="selectedTab?.key === 'properties'">
         <form [formGroup]="form">
           <div class="p-fluid preproject-properties-fields">
@@ -30,48 +37,86 @@
 
             <div class="p-field preproject-standard-field">
               <span class="p-float-label">
-                <p-dropdown inputId="preproject-organization" class="app-single-selection" formControlName="organization" [options]="[]"
-                  [autoDisplayFirst]="false" dropdownIcon="fas fa-caret-down"></p-dropdown>
+                <p-dropdown
+                  inputId="preproject-organization"
+                  class="app-single-selection"
+                  formControlName="organization"
+                  [options]="organizations"
+                  [autoDisplayFirst]="false"
+                  [showClear]="true"
+                  dropdownIcon="fas fa-caret-down">
+                </p-dropdown>
                 <label class="app-input-label" for="preproject-organization">{{ 'organization' | translate }} *</label>
               </span>
               <app-input-message [form]="form" field="organization"></app-input-message>
             </div>
 
             <span class="p-float-label p-field preproject-standard-field preproject-date-field">
-              <p-calendar inputId="preproject-expected-completion" class="app-select-date" formControlName="expectedCompletion"
-                [dateFormat]="'dateFormat' | translate" [monthNavigator]="true"
-                [showIcon]="true" icon="fas fa-calendar-alt"></p-calendar>
-              <label class="app-input-label" for="preproject-expected-completion">{{ 'expectedCompletion' | translate }}</label>
+              <p-calendar
+                inputId="preproject-expected-completion"
+                class="app-select-date"
+                formControlName="expectedCompletion"
+                [dateFormat]="'dateFormat' | translate"
+                [monthNavigator]="true"
+                [showIcon]="true"
+                icon="fas fa-calendar-alt">
+              </p-calendar>
+              <label class="app-input-label" for="preproject-expected-completion">
+                {{ 'expectedCompletion' | translate }}
+              </label>
             </span>
 
             <section class="preproject-deliveries">
               <div class="preproject-section-title">{{ 'expectedDeliveries' | translate }}</div>
-              <p-dataView [value]="deliveryCardItems" layout="grid" class="app-dataview preproject-delivery-list"
+              <p-dataView
+                [value]="deliveryCardItems"
+                layout="grid"
+                class="app-dataview preproject-delivery-list"
                 *ngIf="displayModeAll !== 'list'">
                 <ng-template let-cardItem pTemplate="gridItem">
                   <div class="p-col-12 p-sm-12 p-md-4 p-lg-3 delivery-card-container">
-                    <app-editable-card-item *ngIf="cardItem.typeCardItem === 'listItem'"
-                      [form]="getDeliveryForm(cardItem.deliveryIndex)" [fields]="editableDeliveryFields"
-                      [menuItems]="cardItem.menuItems || []" [itemId]="cardItem.displayItemId"
-                      [uniqueId]="cardItem.deliveryIndex" displayMode="grid">
+                    <app-editable-card-item
+                      *ngIf="cardItem.typeCardItem === 'listItem'"
+                      [form]="getDeliveryForm(cardItem.deliveryIndex)"
+                      [fields]="editableDeliveryFields"
+                      [menuItems]="cardItem.menuItems || []"
+                      [itemId]="cardItem.displayItemId"
+                      [uniqueId]="cardItem.deliveryIndex"
+                      displayMode="grid">
                     </app-editable-card-item>
-                    <app-editable-card-item *ngIf="cardItem.typeCardItem === 'newCardItem'" [newItem]="true"
-                      [newItemIcon]="cardItem.icon || 'plus'" displayMode="grid" (newItemClick)="addDelivery()">
+                    <app-editable-card-item
+                      *ngIf="cardItem.typeCardItem === 'newCardItem'"
+                      [newItem]="true"
+                      [newItemIcon]="cardItem.icon || 'plus'"
+                      displayMode="grid"
+                      (newItemClick)="addDelivery()">
                     </app-editable-card-item>
                   </div>
                 </ng-template>
               </p-dataView>
-              <p-dataView [value]="deliveryCardItems" layout="list" class="app-dataview app-dataview-list preproject-delivery-list"
+
+              <p-dataView
+                [value]="deliveryCardItems"
+                layout="list"
+                class="app-dataview app-dataview-list preproject-delivery-list"
                 *ngIf="displayModeAll === 'list'">
                 <ng-template let-cardItem pTemplate="listItem">
                   <div class="p-col-12">
-                    <app-editable-card-item *ngIf="cardItem.typeCardItem === 'listItem'"
-                      [form]="getDeliveryForm(cardItem.deliveryIndex)" [fields]="editableDeliveryFields"
-                      [menuItems]="cardItem.menuItems || []" [itemId]="cardItem.displayItemId"
-                      [uniqueId]="cardItem.deliveryIndex" displayMode="list">
+                    <app-editable-card-item
+                      *ngIf="cardItem.typeCardItem === 'listItem'"
+                      [form]="getDeliveryForm(cardItem.deliveryIndex)"
+                      [fields]="editableDeliveryFields"
+                      [menuItems]="cardItem.menuItems || []"
+                      [itemId]="cardItem.displayItemId"
+                      [uniqueId]="cardItem.deliveryIndex"
+                      displayMode="list">
                     </app-editable-card-item>
-                    <app-editable-card-item *ngIf="cardItem.typeCardItem === 'newCardItem'" [newItem]="true"
-                      [newItemIcon]="cardItem.icon || 'plus'" displayMode="list" (newItemClick)="addDelivery()">
+                    <app-editable-card-item
+                      *ngIf="cardItem.typeCardItem === 'newCardItem'"
+                      [newItem]="true"
+                      [newItemIcon]="cardItem.icon || 'plus'"
+                      displayMode="list"
+                      (newItemClick)="addDelivery()">
                     </app-editable-card-item>
                   </div>
                 </ng-template>
@@ -91,120 +136,73 @@
       </div>
 
       <div tabviewBody *ngIf="selectedTab?.key === 'evaluation'" class="preproject-evaluation-tab">
-        <app-card [properties]="evaluationCardProperties" class="mt-0">
-          <p-table [value]="criteriaGuides" dataKey="id" styleClass="evaluation-table">
-            <ng-template pTemplate="header">
-              <tr>
-                <th scope="col">{{ 'project' | translate | uppercase }}</th>
-                <th scope="col" class="evaluation-score-column">{{ 'finalProjectScore' | translate }}: <strong>{{ finalEvaluationScore | number:'1.2-2' }}</strong></th>
-              </tr>
-              <tr *ngIf="form.get('name')?.value?.trim()">
-                <th colspan="2" class="evaluation-project-name">{{ form.get('name')?.value }}</th>
-              </tr>
-            </ng-template>
-            <ng-template pTemplate="body" let-criterion>
-              <tr class="evaluation-criterion-row">
-                <td>
-                  <button type="button" class="evaluation-criterion-toggle"
-                    [attr.aria-expanded]="!collapsedEvaluationCriteria[criterion.id]"
-                    (click)="collapsedEvaluationCriteria[criterion.id] = !collapsedEvaluationCriteria[criterion.id]">
-                    <i class="pi" aria-hidden="true"
-                      [class.pi-chevron-right]="collapsedEvaluationCriteria[criterion.id]"
-                      [class.pi-chevron-down]="!collapsedEvaluationCriteria[criterion.id]"></i>
-                    <strong>{{ criterion.name | uppercase }}</strong>
-                  </button>
-                </td>
-                <td class="evaluation-score-column">{{ 'total' | translate }} {{ criterion.name }}: <strong>{{ getCriterionScore(criterion) | number:'1.1-2' }}</strong></td>
-              </tr>
-              <ng-container *ngIf="!collapsedEvaluationCriteria[criterion.id]">
-                <tr *ngFor="let row of getEvaluationRows(criterion)">
-                  <td class="evaluation-detail-name">{{ row.name }}</td>
-                  <td class="evaluation-score-column">{{ 'score' | translate }}: <strong>{{ row.score | number:'1.1-2' }}</strong></td>
-                </tr>
-              </ng-container>
-            </ng-template>
-          </p-table>
-        </app-card>
-
-        <section class="preproject-selection-section" [formGroup]="form">
-          <div class="p-field-checkbox preproject-selection-toggle">
-            <p-checkbox
-              class="app-checkbox"
-              inputId="select-preproject"
-              formControlName="selectPreproject"
-              [binary]="true"
-              (onChange)="handlePreprojectSelectionChange($event.checked)">
-            </p-checkbox>
-            <label for="select-preproject">{{ 'selectPreproject' | translate }}</label>
+        <ng-container *ngIf="evaluation as evaluationData">
+          <div class="evaluation-summary-row">
+            <span>{{ 'finalProjectScore' | translate }}</span>
+            <strong>{{ evaluationData.finalNote | number:'1.2-2' }}</strong>
           </div>
 
-          <div class="p-fluid preproject-selection-fields"
-            [attr.aria-disabled]="!preprojectSelectionEnabled"
-            [attr.inert]="!preprojectSelectionEnabled ? '' : null">
-            <div class="p-field preproject-selection-plan-field">
-              <span class="p-float-label">
-                <p-dropdown
-                  inputId="evaluation-plan"
-                  class="app-single-selection"
-                  formControlName="availablePlan"
-                  [options]="availablePlans"
-                  [autoDisplayFirst]="false"
-                  [showClear]="true"
-                  dropdownIcon="fas fa-caret-down"
-                  (onChange)="handleAvailablePlanChange($event.value)">
-                </p-dropdown>
-                <label class="app-input-label" for="evaluation-plan" [class.p-disabled]="!preprojectSelectionEnabled">
-                  {{ 'availablePlans' | translate }}
-                  <span *ngIf="preprojectSelectionEnabled">*</span>
-                </label>
-              </span>
-              <app-input-message [form]="form" field="availablePlan"></app-input-message>
+          <section class="evaluation-section" *ngFor="let criterion of evaluationData.criteria">
+            <div class="evaluation-section-header">
+              <strong>{{ criterion.name || criterion.label }}</strong>
+              <span>{{ 'total' | translate }}: {{ criterion.total | number:'1.2-2' }}</span>
             </div>
-
-            <div class="p-field">
-              <label class="app-input-label evaluation-plan-tree-label" [class.p-disabled]="!preprojectSelectionEnabled">
-                {{ 'whereInPlan' | translate }}
-                <span *ngIf="preprojectSelectionEnabled">*</span>
-              </label>
-              <div class="app-tree-selection single-selection evaluation-plan-tree"
-                [class.loading]="isPlanStructureLoading"
-                [attr.aria-busy]="isPlanStructureLoading"
-                [class.p-disabled]="!preprojectSelectionEnabled">
-                <app-card-loading [isCardLoading]="isPlanStructureLoading"></app-card-loading>
-                <p-tree
-                  *ngIf="!isPlanStructureLoading"
-                  [value]="planStructure"
-                  [emptyMessage]="'selectPlanFirst' | translate"
-                  selectionMode="checkbox"
-                  [(selection)]="selectedPlanPosition"
-                  [propagateSelectionUp]="false"
-                  [propagateSelectionDown]="false"
-                  (onNodeExpand)="handlePlanNodeExpand($event)"
-                  (onNodeSelect)="handlePlanPositionSelect($event)"
-                  (onNodeUnselect)="handlePlanPositionUnselect()">
-                </p-tree>
+            <ng-container *ngFor="let group of criterion.groups">
+              <div class="evaluation-group-row">
+                <strong>{{ group.name || group.label }}</strong>
+                <span>{{ 'total' | translate }}: {{ group.total | number:'1.2-2' }}</span>
               </div>
-              <app-input-message *ngIf="!isPlanStructureLoading" [form]="form" field="planPosition"></app-input-message>
+              <div class="evaluation-item-row evaluation-group-item-row" *ngFor="let item of group.items">
+                <span>{{ item.label || item.name }}</span>
+                <span>{{ 'score' | translate }}: {{ item.note | number:'1.2-2' }}
+                  <small>({{ 'weight' | translate }}: {{ item.weight | number:'1.2-2' }})</small>
+                </span>
+              </div>
+            </ng-container>
+            <div class="evaluation-item-row" *ngFor="let item of criterion.items">
+              <span>{{ item.label || item.name }}</span>
+              <span>{{ 'score' | translate }}: {{ item.note | number:'1.2-2' }}
+                <small>({{ 'weight' | translate }}: {{ item.weight | number:'1.2-2' }})</small>
+              </span>
             </div>
-
-            <div class="p-field">
-              <app-property-textarea
-                [form]="form"
-                controlName="evaluationNotes"
-                inputId="evaluation-notes"
-                [rows]="3"
-                [label]="'observations' | translate">
-              </app-property-textarea>
-              <app-input-message [form]="form" field="evaluationNotes"></app-input-message>
-            </div>
-          </div>
-        </section>
+          </section>
+        </ng-container>
       </div>
     </app-tabview-scrolled>
 
     <app-buttons-container [compact]="true">
       <app-save-button [form]="form" (save)="save()"></app-save-button>
-      <app-cancel-button [form]="form" (cancel)="back()"></app-cancel-button>
+      <app-cancel-button [form]="form" (cancel)="undo()"></app-cancel-button>
     </app-buttons-container>
   </app-card>
 </div>
+
+<p-dialog
+  [(visible)]="displayListItemDialog"
+  [modal]="true"
+  [dismissableMask]="true"
+  [closeOnEscape]="true"
+  [style]="{ width: '480px' }"
+  (onHide)="closeListItemDialog()">
+  <p-header>{{ pendingListProperty?.label || ('addValue' | translate) }}</p-header>
+  <div class="p-fluid">
+    <span class="p-float-label">
+      <input
+        id="preproject-criteria-list-value"
+        class="app-input-text"
+        pInputText
+        type="text"
+        [(ngModel)]="newListItemLabel"
+        (keyup.enter)="confirmListPropertyItem()" />
+      <label for="preproject-criteria-list-value">{{ 'value' | translate }}</label>
+    </span>
+  </div>
+  <p-footer>
+    <button type="button" pButton class="p-button-text" (click)="closeListItemDialog()">
+      {{ 'cancel' | translate }}
+    </button>
+    <button type="button" pButton [disabled]="!newListItemLabel.trim()" (click)="confirmListPropertyItem()">
+      {{ 'addValue' | translate }}
+    </button>
+  </p-footer>
+</p-dialog>
