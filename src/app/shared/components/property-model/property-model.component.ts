@@ -24,6 +24,7 @@ export class PropertyModelComponent implements OnDestroy, OnChanges, AfterViewIn
   @Input() property: IWorkpackModelProperty;
   @Input() integrationSectorOptions: SelectItem[] = [];
   @Input() scoredPossibleValues = false;
+  @Input() showWeight = false;
   @Output() delete = new EventEmitter();
   @Output() changed = new EventEmitter();
   IconsEnum = IconPropertyWorkpackModelEnum;

@@ -111,6 +111,7 @@ export class PreprojectCriteriaConfigService {
         type: backendType,
         sortIndex: p.sortIndex || p.position || 1,
         label: p.label || p.name,
+        weight: p.weight ?? 1,
         ...(p.type === 'SelectionModel' ? {
           possibleValues: (possibleValuesOptions || []).join(','),
           defaultValue: Array.isArray(p.defaultValue) ? p.defaultValue.join(',') : p.defaultValue,
@@ -180,6 +181,7 @@ export class PreprojectCriteriaConfigService {
         return {
           ...p,
           type: this.mapTypeToFrontend(p),
+          weight: p.weight ?? 1,
           ...(p.type === 'SelectionModel' ? {
             possibleValuesOptions: p.possibleValues
               ? String(p.possibleValues).split(',').filter((value: string) => !!value)

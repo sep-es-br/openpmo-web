@@ -475,11 +475,7 @@ export class PreprojectCriterionFormComponent implements OnInit, OnDestroy {
       disableMultipleSelection: false,
       possibleValuesOptions: type === TypePropertModelEnum.SelectionModel ? [] : undefined,
       possibleValuesDetails: type === TypePropertModelEnum.CriteriaSelectionModel ? [] : undefined,
-      weight: ([
-        TypePropertModelEnum.CriteriaSelectionModel,
-        TypePropertModelEnum.ChallengeListModel,
-        TypePropertModelEnum.SdgListModel
-      ] as string[]).includes(type) ? 1 : undefined,
+      weight: 1,
       itemValue: ([TypePropertModelEnum.ChallengeListModel, TypePropertModelEnum.SdgListModel] as string[])
         .includes(type) ? 1 : undefined,
       defaultValue: type === TypePropertModelEnum.SelectionModel
@@ -507,7 +503,7 @@ export class PreprojectCriterionFormComponent implements OnInit, OnDestroy {
    * replicando a lógica do checkProperty() do workpack-model.
    */
   private async checkProperty(property: IWorkpackModelProperty): Promise<void> {
-    let requiredFields: string[] = ['name', 'label', 'sortIndex'];
+    let requiredFields: string[] = ['name', 'label', 'sortIndex', 'weight'];
     let list: SelectItem[] = [];
 
     switch (property.type) {
@@ -533,12 +529,12 @@ export class PreprojectCriterionFormComponent implements OnInit, OnDestroy {
         break;
 
       case TypePropertModelEnum.CriteriaSelectionModel:
-        requiredFields = [...requiredFields, 'possibleValuesDetails', 'weight'];
+        requiredFields = [...requiredFields, 'possibleValuesDetails'];
         break;
 
       case TypePropertModelEnum.ChallengeListModel:
       case TypePropertModelEnum.SdgListModel:
-        requiredFields = [...requiredFields, 'weight', 'itemValue'];
+        requiredFields = [...requiredFields, 'itemValue'];
         break;
 
       case TypePropertModelEnum.NumberModel:

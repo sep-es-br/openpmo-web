@@ -143,6 +143,7 @@
       <ng-container *ngFor="let property of rootProperties; trackBy: trackByProperty">
         <app-property-model
           [property]="property"
+          [showWeight]="true"
           [integrationSectorOptions]="integrationSectorOptions"
           [class.property-collapsed]="property.isCollapsed"
           [class.property-open]="!property.isCollapsed"
@@ -277,6 +278,7 @@
       <ng-container *ngFor="let property of groupProperties[groupIndex]; trackBy: trackByProperty">
         <app-property-model
           [property]="property"
+          [showWeight]="true"
           [integrationSectorOptions]="integrationSectorOptions"
           [class.property-collapsed]="property.isCollapsed"
           [class.property-open]="!property.isCollapsed"
