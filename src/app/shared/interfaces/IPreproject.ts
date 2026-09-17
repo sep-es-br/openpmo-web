@@ -6,13 +6,24 @@ export interface IPreproject {
   expectedDeliveries?: string | null;
   idOrganization: number;
   idPreProjectModel: number;
+  status?: PreprojectStatus;
+  approved?: boolean;
+  idPlan?: number;
+  idWorkpack?: number;
 }
 
 export interface IPreprojectListItem {
   id: number;
   name: string;
   fullName: string;
+  idOrganization?: number;
+  status?: PreprojectStatus;
+  approved?: boolean;
+  idPlan?: number;
+  idWorkpack?: number;
 }
+
+export type PreprojectStatus = 'Estruturação' | 'Elaboração';
 
 export interface IPreprojectEvaluationItem {
   idPropertyModel: number;

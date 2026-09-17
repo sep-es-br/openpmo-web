@@ -11,7 +11,7 @@
         [items]="item.config.selectedListItems || []"
         [displayMode]="displayMode"
         [itemIcon]="getListIcon(item.config)"
-        [disabled]="!enabled"
+        [disabled]="readOnly || !enabled"
         (itemsChange)="updateListItems(item.config, $event)"
         (addRequested)="listAddRequested.emit(item.config)">
       </app-property-list-selection>

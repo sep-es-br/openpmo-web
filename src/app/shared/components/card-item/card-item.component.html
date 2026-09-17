@@ -1,6 +1,7 @@
 <ng-container [ngSwitch]="properties.typeCardItem">
   <p-card *ngSwitchCase="'listItem'" class="app-card-item listItem" [class.mobile]="responsive"
-    [class.cardList]="displayModeCard === 'list'" [class.canceled]="properties.canceled">
+    [class.cardList]="displayModeCard === 'list'" [class.canceled]="properties.canceled"
+    [class.card-metadata-inline]="properties.statusItemAsSubtitle">
     <div class="display-mode-grid" *ngIf="displayModeCard !== 'list'">
       <p-header *ngIf="properties.menuItems" class="card-item-header">
         <p-menu #menu [popup]="true" [model]="properties.menuItems"></p-menu>
@@ -26,10 +27,11 @@
         </div>
         <span class="card-item-name" [pTooltip]="properties.fullNameCardItem"
           tooltipPosition="bottom">{{properties.nameCardItem}}</span>
-        <span class="card-item-subtitle" *ngIf="properties.subtitleCardItem"
-          [class.subtitle-card-risk]="properties.statusItem">{{properties.subtitleCardItem}}</span>
-        <span class="card-item-subtitle" *ngIf="properties.statusItem"
-          [class.subtitle-card-risk]="properties.statusItem">{{properties.statusItem}}</span>
+        <span class="card-item-organization" *ngIf="properties.organizationName">{{properties.organizationName}}</span>
+        <span class="card-item-subtitle card-item-plan" *ngIf="properties.subtitleCardItem"
+          [class.subtitle-card-risk]="properties.statusItem && !properties.statusItemAsSubtitle">{{properties.subtitleCardItem}}</span>
+        <span class="card-item-subtitle card-item-status" *ngIf="properties.statusItem"
+          [class.subtitle-card-risk]="!properties.statusItemAsSubtitle">{{properties.statusItem}}</span>
       </div>
       <div class="card-item-footer" *ngIf="cardIdItem">
         <span class="card-item-id">
@@ -54,10 +56,13 @@
         </div>
         <span class="card-item-name" [pTooltip]="properties.fullNameCardItem"
           tooltipPosition="bottom">{{properties.nameCardItem}}</span>
-        <span class="card-item-subtitle" *ngIf="properties.subtitleCardItem"
-          [class.subtitle-card-risk]="properties.statusItem">{{properties.subtitleCardItem}}</span>
-        <!-- <span class="card-item-subtitle" *ngIf="properties.statusItem"
-          [class.subtitle-card-risk]="properties.statusItem">{{properties.statusItem}}</span> -->
+        <div class="card-item-metadata">
+          <span class="card-item-organization" *ngIf="properties.organizationName">{{properties.organizationName}}</span>
+          <span class="card-item-subtitle card-item-plan" *ngIf="properties.subtitleCardItem"
+            [class.subtitle-card-risk]="properties.statusItem && !properties.statusItemAsSubtitle">{{properties.subtitleCardItem}}</span>
+          <span class="card-item-subtitle card-item-status" *ngIf="properties.statusItem && properties.showStatusInList"
+            [class.subtitle-card-risk]="!properties.statusItemAsSubtitle">{{properties.statusItem}}</span>
+        </div>
       </div>
       <div class="right-side">
         <p-header *ngIf="properties.menuItems" class="card-item-header">
@@ -118,7 +123,7 @@
         <span class="card-item-name" [pTooltip]="properties.fullNameCardItem"
           tooltipPosition="bottom">{{properties.nameCardItem}}</span>
         <span class="card-item-subtitle" *ngIf="properties.subtitleCardItem"
-          [class.subtitle-card-risk]="properties.statusItem">{{properties.subtitleCardItem}}</span>
+          [class.subtitle-card-risk]="properties.statusItem && !properties.statusItemAsSubtitle">{{properties.subtitleCardItem}}</span>
         <span class="card-item-subtitle" *ngIf="properties.statusItem"
           [class.subtitle-card-risk]="properties.statusItem">{{properties.statusItem}}</span>
       </div>

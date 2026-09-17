@@ -1,9 +1,9 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { AfterViewInit, Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { TranslateService } from '@ngx-translate/core';
-import { MenuItem } from 'primeng/api';
+import { MenuItem, SelectItem } from 'primeng/api';
 
 import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
 import { MenuService } from 'src/app/shared/services/menu.service';
@@ -16,18 +16,30 @@ import { IconsEnum } from 'src/app/shared/enums/IconsEnum';
 import { OfficeService } from 'src/app/shared/services/office.service';
 import { IBreadcrumb } from 'src/app/shared/interfaces/IBreadcrumb';
 import { PreprojectService } from 'src/app/shared/services/preproject.service';
-import { IPreprojectListItem } from 'src/app/shared/interfaces/IPreproject';
+import { IOrganization } from 'src/app/shared/interfaces/IOrganization';
+import { IHttpResult } from 'src/app/shared/interfaces/IHttpResult';
+import { IPreproject, IPreprojectListItem, PreprojectStatus } from 'src/app/shared/interfaces/IPreproject';
+import { IPlan } from 'src/app/shared/interfaces/IPlan';
+import { OrganizationService } from 'src/app/shared/services/organization.service';
+import { PlanService } from 'src/app/shared/services/plan.service';
+import { WorkpackService } from 'src/app/shared/services/workpack.service';
 
 @Component({
   selector: 'app-preproject',
   templateUrl: './preproject.component.html',
   styleUrls: ['./preproject.component.scss']
 })
-export class PreprojectComponent implements OnInit, OnDestroy {
+export class PreprojectComponent implements OnInit, OnDestroy, AfterViewInit {
 
   private destroy$: Subject<void> = new Subject<void>();
 
   preprojects: (ICardItem | IWorkpackCardItem)[] = [];
+
+  private allPreprojectCards: ICardItem[] = [];
+
+  statusFilterOptions: SelectItem[] = [];
+
+  selectedStatus: PreprojectStatus | 'all' = 'all';
 
   newPreprojectCard: IWorkpackCardItem;
 
@@ -40,7 +52,7 @@ export class PreprojectComponent implements OnInit, OnDestroy {
   collapsePanelsStatus: boolean = false;
 
   cardProperties: ICard = {
-    cardTitle: 'preprojects',
+    cardTitle: 'preproject',
     collapseble: true,
     toggleable: false,
     initialStateToggle: false,
@@ -57,15 +69,22 @@ export class PreprojectComponent implements OnInit, OnDestroy {
     private translateService: TranslateService,
     private route: ActivatedRoute,
     private router: Router,
-    private preprojectService: PreprojectService
+    private preprojectService: PreprojectService,
+    private organizationService: OrganizationService,
+    private planService: PlanService,
+    private workpackService: WorkpackService
   ) {}
 
   ngOnInit(): void {
     this.configDataViewService.nextCollapsePanelsStatus('expand');
     this.initDataViewSubscriptions();
+    this.loadStatusFilterOptions();
     this.translateService.onLangChange
       .pipe(takeUntil(this.destroy$))
-      .subscribe(() => void this.loadPreprojects());
+      .subscribe(() => {
+        this.loadStatusFilterOptions();
+        void this.loadPreprojects();
+      });
 
     void this.initOfficeAndBreadcrumb();
     void this.loadPreprojects();
@@ -95,6 +114,21 @@ export class PreprojectComponent implements OnInit, OnDestroy {
         idPreproject: preproject.id
       }
     });
+  }
+
+  handleViewPreproject(preproject: IPreprojectListItem): void {
+    const idOffice = this.route.snapshot.queryParamMap.get('idOffice');
+    void this.router.navigate(['/preproject', 'view'], {
+      queryParams: {
+        ...(idOffice ? { idOffice } : {}),
+        idPreproject: preproject.id
+      }
+    });
+  }
+
+  handleStatusFilterChange(status: PreprojectStatus | 'all'): void {
+    this.selectedStatus = status;
+    this.applyStatusFilter();
   }
 
   private initDataViewSubscriptions(): void {
@@ -179,7 +213,12 @@ export class PreprojectComponent implements OnInit, OnDestroy {
       createNewElementMenuItems: createPreprojectMenuItems
     };
 
-    const getItemMenuItems = (preproject: IPreprojectListItem): MenuItem[] => [
+    const getItemMenuItems = (preproject: IPreprojectListItem, status: PreprojectStatus): MenuItem[] => [
+      ...(status === 'Estruturação' ? [{
+        label: this.translateService.instant('viewPreproject'),
+        icon: 'fas fa-eye',
+        command: () => this.handleViewPreproject(preproject)
+      }] : []),
       {
         label: this.translateService.instant('edit'),
         icon: 'fas fa-pencil-alt',
@@ -193,25 +232,85 @@ export class PreprojectComponent implements OnInit, OnDestroy {
     ];
 
     const idOffice = Number(this.route.snapshot.queryParamMap.get('idOffice'));
-    const response = Number.isFinite(idOffice) && idOffice > 0
-      ? await this.preprojectService.findAllByOfficeId(idOffice)
-      : { success: true, data: [] as IPreprojectListItem[] };
+    let response: IHttpResult<IPreprojectListItem[]>;
+    let organizationsResponse: IHttpResult<IOrganization[]>;
+    let plansResponse: IHttpResult<IPlan[]>;
+    if (Number.isFinite(idOffice) && idOffice > 0) {
+      [response, organizationsResponse, plansResponse] = await Promise.all([
+        this.preprojectService.findAllByOfficeId(idOffice),
+        this.organizationService.GetAll({ 'id-office': idOffice }),
+        this.planService.GetAll({ 'id-office': idOffice })
+      ]);
+    } else {
+      response = { success: true, data: [] };
+      organizationsResponse = { success: true, data: [] };
+      plansResponse = { success: true, data: [] };
+    }
     const preprojects = response.success ? response.data || [] : [];
-
-    const mappedItems: ICardItem[] = preprojects.map((preproject: IPreprojectListItem) => ({
-      typeCardItem: 'listItem',
-      icon: 'fas fa-cog project-icon',
-      iconSvg: false,
-      nameCardItem: preproject.name,
-      fullNameCardItem: preproject.fullName || preproject.name,
-      itemId: preproject.id,
-      urlCard: '/preproject/edit',
-      idAtributeName: 'idPreproject',
-      paramsUrlCard: this.route.snapshot.queryParamMap.get('idOffice')
-        ? [{ name: 'idOffice', value: this.route.snapshot.queryParamMap.get('idOffice') }]
-        : [],
-      menuItems: getItemMenuItems(preproject)
+    const organizationsById = new Map<number, string>(
+      (organizationsResponse.success ? organizationsResponse.data || [] : [])
+        .filter((organization: IOrganization) => !!organization.id)
+        .map((organization: IOrganization) => [organization.id as number, organization.name])
+    );
+    const preprojectDetails = await Promise.all(preprojects.map(async preproject => {
+      try {
+        const detailResponse = await this.preprojectService.findById(preproject.id);
+        return detailResponse.success && detailResponse.data ? detailResponse.data : null;
+      } catch {
+        return null;
+      }
     }));
+    const detailsById = new Map<number, IPreproject>(
+      preprojectDetails
+        .filter((preproject): preproject is IPreproject => !!preproject)
+        .map(preproject => [preproject.id, preproject])
+    );
+    const plans = plansResponse.success ? plansResponse.data || [] : [];
+    const planNamesById = new Map<number, string>(
+      plans
+        .filter((plan): plan is IPlan => !!plan?.id)
+        .map(plan => [plan.id as number, plan.name])
+    );
+    const mockPlan = plans.find(plan => (plan.name || '').trim().toLocaleUpperCase() === 'PMO-ES');
+    const structuredPlanIds = Array.from(new Set(
+      preprojects
+        .filter(preproject => this.getPreprojectStatus(preproject, detailsById.get(preproject.id)) === 'Estruturação')
+        .map(preproject => this.getPreprojectPlanId(preproject, detailsById.get(preproject.id), mockPlan))
+        .filter((idPlan): idPlan is number => Number.isFinite(idPlan) && idPlan > 0)
+    ));
+    const workpackIdsByPlan = await this.loadRepresentativeWorkpackIds(structuredPlanIds);
+
+    const mappedItems: ICardItem[] = preprojects.map((preproject: IPreprojectListItem) => {
+      const detail = detailsById.get(preproject.id);
+      const status = this.getPreprojectStatus(preproject, detail);
+      const organizationName = organizationsById.get(detail?.idOrganization || preproject.idOrganization || 0);
+      const idPlan = this.getPreprojectPlanId(preproject, detail, mockPlan);
+      const idWorkpack = detail?.idWorkpack
+        || preproject.idWorkpack
+        || workpackIdsByPlan.get(idPlan || 0);
+      const navigation = this.getPreprojectCardNavigation(preproject, status, idPlan, idWorkpack);
+      const planName = idPlan
+        ? planNamesById.get(idPlan)
+        : this.isMockStructuredPreproject(preproject) ? 'PMO-ES' : '';
+      return {
+        typeCardItem: 'listItem',
+        icon: 'fas fa-cog project-icon',
+        iconSvg: false,
+        nameCardItem: preproject.name,
+        fullNameCardItem: preproject.fullName || preproject.name,
+        organizationName: organizationName || '',
+        subtitleCardItem: planName || '',
+        statusItem: status,
+        showStatusInList: true,
+        statusItemAsSubtitle: true,
+        itemId: preproject.id,
+        navigationItemId: navigation.itemId,
+        urlCard: navigation.url,
+        idAtributeName: navigation.idAttributeName,
+        paramsUrlCard: navigation.params,
+        menuItems: getItemMenuItems(preproject, status)
+      };
+    });
 
     this.newPreprojectCard = {
       typeCardItem: 'newCardItem',
@@ -220,7 +319,97 @@ export class PreprojectComponent implements OnInit, OnDestroy {
       iconMenuItems: createPreprojectMenuItems
     };
 
-    this.preprojects = [...mappedItems, this.newPreprojectCard];
+    this.allPreprojectCards = mappedItems;
+    this.applyStatusFilter();
+  }
+
+  ngAfterViewInit(): void {
+    // O painel de controles pode restaurar a preferência global após a abertura da tela.
+    // Anteprojetos deve iniciar aberto, sem alterar a preferência para as próximas ações do usuário.
+    setTimeout(() => this.configDataViewService.nextCollapsePanelsStatus('expand'));
+  }
+
+  private getPreprojectStatus(preproject: IPreprojectListItem, detail?: IPreproject): PreprojectStatus {
+    // Mock temporário para validar o fluxo de estruturação somente no frontend.
+    // Remover quando a API passar a devolver o status atualizado após a aprovação.
+    if (this.isMockStructuredPreproject(preproject)) {
+      return 'Estruturação';
+    }
+    return preproject.status || detail?.status || 'Elaboração';
+  }
+
+  private loadStatusFilterOptions(): void {
+    this.statusFilterOptions = [
+      { label: this.translateService.instant('all'), value: 'all' },
+      { label: this.translateService.instant('preprojectElaboration'), value: 'Elaboração' },
+      { label: this.translateService.instant('structuring'), value: 'Estruturação' }
+    ];
+  }
+
+  private applyStatusFilter(): void {
+    const filteredCards = this.selectedStatus === 'all'
+      ? this.allPreprojectCards
+      : this.allPreprojectCards.filter(card => card.statusItem === this.selectedStatus);
+
+    this.preprojects = [...filteredCards, this.newPreprojectCard];
+  }
+
+  private getPreprojectCardNavigation(
+    preproject: IPreprojectListItem,
+    status: PreprojectStatus,
+    idPlan?: number,
+    idWorkpack?: number
+  ): {
+    url: string;
+    idAttributeName: string;
+    itemId: number;
+    params: Array<{ name: string; value: string | number }>;
+  } {
+    const idOffice = this.route.snapshot.queryParamMap.get('idOffice');
+
+    if (status === 'Estruturação') {
+      return {
+        url: '/workpack',
+        idAttributeName: 'id',
+        itemId: idWorkpack || preproject.id,
+        params: idPlan ? [{ name: 'idPlan', value: idPlan }] : []
+      };
+    }
+
+    return {
+      url: '/preproject/edit',
+      idAttributeName: 'idPreproject',
+      itemId: preproject.id,
+      params: idOffice ? [{ name: 'idOffice', value: idOffice }] : []
+    };
+  }
+
+  private async loadRepresentativeWorkpackIds(planIds: number[]): Promise<Map<number, number>> {
+    const entries = await Promise.all(planIds.map(async idPlan => {
+      try {
+        const response = await this.workpackService.GetWorkpackListCards({ 'id-plan': idPlan });
+        const workpacks = response.success ? response.data || [] : [];
+        const workpack = workpacks.find(item => item.type === 'Project') || workpacks[0];
+        return workpack?.id ? [idPlan, workpack.id] as [number, number] : null;
+      } catch {
+        return null;
+      }
+    }));
+    return new Map(entries.filter((entry): entry is [number, number] => !!entry));
+  }
+
+  private getPreprojectPlanId(
+    preproject: IPreprojectListItem,
+    detail: IPreproject | undefined,
+    mockPlan: IPlan | undefined
+  ): number | undefined {
+    return detail?.idPlan
+      || preproject.idPlan
+      || (this.isMockStructuredPreproject(preproject) ? mockPlan?.id : undefined);
+  }
+
+  private isMockStructuredPreproject(preproject: IPreprojectListItem): boolean {
+    return preproject.name.trim().toLocaleLowerCase() === 'teste';
   }
 
 }

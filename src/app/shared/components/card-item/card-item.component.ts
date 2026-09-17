@@ -67,10 +67,11 @@ export class CardItemComponent implements OnInit {
     if (!!this.properties.breadcrumbWorkpackModel) {
       this.breadcrumbSrv.setBreadcrumbStorage(this.properties.breadcrumbWorkpackModel);
     }
-    const params = this.properties?.paramsUrlCard ? this.properties?.paramsUrlCard : [];
-    if (this.properties?.itemId) {
+    const params = this.properties?.paramsUrlCard ? [...this.properties.paramsUrlCard] : [];
+    const navigationItemId = this.properties?.navigationItemId || this.properties?.itemId;
+    if (navigationItemId) {
       const idAtributeName = this.properties.idAtributeName ? this.properties.idAtributeName : 'id';
-      params.push({name: idAtributeName, value: this.properties?.itemId});
+      params.push({name: idAtributeName, value: navigationItemId});
     }
 
     this.navigateToPage(this.properties.urlCard, params);
@@ -78,7 +79,8 @@ export class CardItemComponent implements OnInit {
 
   getQueryParams() {
     const idAtributeName = this.properties.idAtributeName ? this.properties.idAtributeName : 'id';
-    let params = this.properties?.itemId ? { [idAtributeName]: this.properties.itemId } : {};
+    const navigationItemId = this.properties?.navigationItemId || this.properties?.itemId;
+    let params = navigationItemId ? { [idAtributeName]: navigationItemId } : {};
     if (this.properties.paramsUrlCard) {
       params = {
         ...params,

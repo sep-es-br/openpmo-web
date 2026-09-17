@@ -1,8 +1,4 @@
 <div class="app-preproject-form">
-  <div class="preproject-form-header">
-    <span>{{ formTitleTranslationKey | translate }}</span>
-  </div>
-
   <app-card [properties]="cardProperties" class="mt-0 inputs-float-label">
     <app-card-loading
       [isCardLoading]="isLoading || isModelLoading || isSelectedCriteriaLoading || isEvaluationLoading || formIsSaving">
@@ -130,6 +126,7 @@
         <app-preproject-criteria-guide
           [guide]="selectedCriteriaGuide"
           [displayMode]="displayModeAll"
+          [readOnly]="isReadOnly"
           (changed)="criteriaChanged()"
           (listAddRequested)="requestListPropertyItem($event)">
         </app-preproject-criteria-guide>
@@ -154,23 +151,19 @@
               </div>
               <div class="evaluation-item-row evaluation-group-item-row" *ngFor="let item of group.items">
                 <span>{{ item.label || item.name }}</span>
-                <span>{{ 'score' | translate }}: {{ item.note | number:'1.2-2' }}
-                  <small>({{ 'weight' | translate }}: {{ item.weight | number:'1.2-2' }})</small>
-                </span>
+                <span>{{ 'score' | translate }}: {{ item.note | number:'1.2-2' }}</span>
               </div>
             </ng-container>
             <div class="evaluation-item-row" *ngFor="let item of criterion.items">
               <span>{{ item.label || item.name }}</span>
-              <span>{{ 'score' | translate }}: {{ item.note | number:'1.2-2' }}
-                <small>({{ 'weight' | translate }}: {{ item.weight | number:'1.2-2' }})</small>
-              </span>
+              <span>{{ 'score' | translate }}: {{ item.note | number:'1.2-2' }}</span>
             </div>
           </section>
         </ng-container>
       </div>
     </app-tabview-scrolled>
 
-    <app-buttons-container [compact]="true">
+    <app-buttons-container *ngIf="!isReadOnly" [compact]="true">
       <app-save-button [form]="form" (save)="save()"></app-save-button>
       <app-cancel-button [form]="form" (cancel)="undo()"></app-cancel-button>
     </app-buttons-container>

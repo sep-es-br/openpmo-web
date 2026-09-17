@@ -220,6 +220,8 @@
   "average": "Average",
   "sum": "Sum",
   "preprojectElaboration": "Elaboration",
+  "elaborate": "Elaborate",
+  "viewPreproject": "View pre-project",
   "newPreproject": "New elaboration",
   "editPreproject": "Edit elaboration",
   "expectedDeliveries": "Expected deliveries",

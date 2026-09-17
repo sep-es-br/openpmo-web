@@ -5,6 +5,24 @@
 .app-preproject {
   width: 100%;
 
+  .preproject-status-filter {
+    align-items: center;
+    display: flex;
+    gap: 0.5rem;
+    margin-left: 0.75rem;
+    margin-right: 1.25rem;
+
+    .preproject-status-filter-label {
+      color: #005b7a;
+      font-size: 0.8rem;
+      white-space: nowrap;
+    }
+
+    ::ng-deep .p-dropdown {
+      min-width: 10rem;
+    }
+  }
+
   .preproject-card-content {
     min-height: 8rem;
   }

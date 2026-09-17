@@ -1,6 +1,7 @@
 <span *ngIf="form; else propertyTextarea" class="p-float-label" [formGroup]="form">
   <textarea pInputTextarea [id]="inputId || controlName" class="app-text-area"
     [formControlName]="controlName" [required]="required" [rows]="rows"
+    [class.p-filled]="form.get(controlName)?.value"
     (blur)="changed.emit($event)"></textarea>
   <label class="app-input-label" [for]="inputId || controlName" [class.p-disabled]="form.get(controlName)?.disabled">
     {{ label }} {{ required ? '*' : '' }}
@@ -11,6 +12,7 @@
   <span class="p-float-label">
     <textarea pInputTextarea [id]="property.name" class="app-text-area" [(ngModel)]="property.value"
       [disabled]="property.disabled" [required]="property.required" [defaultValue]="property.defaultValue"
+      [class.p-filled]="property.value"
       (blur)="changed.emit($event)" [minLength]="property.min" [maxlength]="property.max"
       [class.ng-invalid]="property.invalid" [rows]="property.rows ? property.rows : 1"
       (ngModelChange)="changed.emit($event)">

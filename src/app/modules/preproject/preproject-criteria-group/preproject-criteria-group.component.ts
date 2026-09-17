@@ -19,6 +19,7 @@ export class PreprojectCriteriaGroupComponent implements OnInit, OnChanges, OnDe
   @Input() group: PreprojectCriterionGroup;
   @Input() displayMode: string = 'grid';
   @Input() showCardTitle: boolean = true;
+  @Input() readOnly: boolean = false;
 
   @Output() changed: EventEmitter<void> = new EventEmitter<void>();
   @Output() listAddRequested: EventEmitter<IWorkpackModelProperty> = new EventEmitter<IWorkpackModelProperty>();
@@ -67,7 +68,7 @@ export class PreprojectCriteriaGroupComponent implements OnInit, OnChanges, OnDe
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes.group?.currentValue) {
+    if (changes.group?.currentValue || changes.readOnly) {
       this.enabled = this.group.currentEnabled !== undefined
         ? this.group.currentEnabled
         : !this.group.enablementKey;
@@ -90,11 +91,17 @@ export class PreprojectCriteriaGroupComponent implements OnInit, OnChanges, OnDe
   }
 
   updateListItems(property: IWorkpackModelProperty, items: IPropertyListItem[]): void {
+    if (this.readOnly) {
+      return;
+    }
     property.selectedListItems = items;
     this.changed.emit();
   }
 
   propertyChanged(item: { config: IWorkpackModelProperty; value?: PropertyTemplateModel }): void {
+    if (this.readOnly) {
+      return;
+    }
     if (item.value) {
       item.config.currentValue = item.value.value;
       item.config.currentSelectedValue = item.value.selectedValue;
@@ -110,7 +117,7 @@ export class PreprojectCriteriaGroupComponent implements OnInit, OnChanges, OnDe
       notShowCardTitle: !this.showCardTitle,
       collapseble: this.showCardTitle,
       initialStateCollapse: false,
-      toggleable: this.group.enablementKey,
+      toggleable: this.group.enablementKey && !this.readOnly,
       collapseOnToggle: false,
       initialStateToggle: this.enabled,
       toggleLabel: this.group.legend || '',
@@ -132,7 +139,7 @@ export class PreprojectCriteriaGroupComponent implements OnInit, OnChanges, OnDe
   private toPropertyTemplate(config: IWorkpackModelProperty): PropertyTemplateModel {
     const property: PropertyTemplateModel = Object.assign(new PropertyTemplateModel(), config, {
       type: this.toRuntimeType(config.type),
-      disabled: !this.enabled,
+      disabled: this.readOnly || !this.enabled,
       multipleSelection: config.multipleSelection,
       possibleValues: this.getPossibleValues(config),
       rows: this.isFinancialSourcesDescription(config) ? 3 : config.rows,
@@ -184,6 +191,9 @@ export class PreprojectCriteriaGroupComponent implements OnInit, OnChanges, OnDe
   }
 
   private handleToggle(enabled: boolean): void {
+    if (this.readOnly) {
+      return;
+    }
     this.enabled = enabled;
     this.group.currentEnabled = enabled;
     this.properties.forEach(item => {

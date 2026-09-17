@@ -11,6 +11,7 @@ import { PreprojectCriterion, PreprojectCriterionGroup } from 'src/app/shared/se
 export class PreprojectCriteriaGuideComponent {
   @Input() guide: PreprojectCriterion;
   @Input() displayMode: string = 'grid';
+  @Input() readOnly: boolean = false;
 
   @Output() changed: EventEmitter<void> = new EventEmitter<void>();
   @Output() listAddRequested: EventEmitter<IWorkpackModelProperty> = new EventEmitter<IWorkpackModelProperty>();

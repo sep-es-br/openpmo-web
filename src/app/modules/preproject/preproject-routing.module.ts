@@ -18,6 +18,11 @@ const routes: Routes = [
     component: PreprojectFormComponent
   },
   {
+    path: 'view',
+    component: PreprojectFormComponent,
+    data: { readOnly: true }
+  },
+  {
     path: '',
     pathMatch: 'full',
     component: PreprojectComponent

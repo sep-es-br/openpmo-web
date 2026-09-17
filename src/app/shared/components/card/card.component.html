@@ -41,6 +41,8 @@
         </div>
       </div>      
 
+      <ng-content select="[card-header-actions]"></ng-content>
+
       <div class="header-title-check-completed d-flex col-4 justify-content-end" [class.mr-0]="!properties.initialStateCollapse && !properties.collapseble"
         *ngIf="!properties.initialStateCollapse && properties.showFullScreen && !properties.fullScreen"
         [class.responsive]="responsive">

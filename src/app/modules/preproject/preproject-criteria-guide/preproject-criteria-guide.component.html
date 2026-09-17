@@ -4,6 +4,7 @@
     [group]="directPropertiesGroup"
     [showCardTitle]="false"
     [displayMode]="displayMode"
+    [readOnly]="readOnly"
     (changed)="changed.emit()"
     (listAddRequested)="listAddRequested.emit($event)">
   </app-preproject-criteria-group>
@@ -12,6 +13,7 @@
     *ngFor="let group of groups"
     [group]="group"
     [displayMode]="displayMode"
+    [readOnly]="readOnly"
     (changed)="changed.emit()"
     (listAddRequested)="listAddRequested.emit($event)">
   </app-preproject-criteria-group>

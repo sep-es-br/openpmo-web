@@ -226,6 +226,8 @@
   "average": "Média",
   "sum": "Soma",
   "preprojectElaboration": "Elaboração",
+  "elaborate": "Elaborar",
+  "viewPreproject": "Visualizar anteprojeto",
   "newPreproject": "Nova Elaboração",
   "editPreproject": "Editar elaboração",
   "expectedDeliveries": "Entregas previstas",

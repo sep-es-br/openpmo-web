@@ -14,9 +14,12 @@ export interface ICardItem {
   urlImg?: string;
   subtitleCardItem?: string;
   statusItem?: string;
+  showStatusInList?: boolean;
+  statusItemAsSubtitle?: boolean;
   organizationName?: string;
   costAccountsValue?: number;
   itemId?: number;
+  navigationItemId?: number;
   menuItems?: MenuItem[];
   menuConfig?: boolean;
   urlMenuConfig?: string;

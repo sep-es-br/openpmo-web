@@ -70,6 +70,7 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
   idOffice: string | null;
   idPreproject: number | null = null;
   idPreProjectModel: number | null = null;
+  isReadOnly = false;
 
   isLoading = false;
   isModelLoading = false;
@@ -105,7 +106,7 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
   }];
 
   readonly cardProperties: ICard = {
-    cardTitle: 'properties',
+    cardTitle: 'preprojectElaboration',
     collapseble: false,
     toggleable: false,
     initialStateToggle: false,
@@ -141,6 +142,7 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.isReadOnly = this.route.snapshot.data.readOnly === true;
     this.idOffice = this.route.snapshot.queryParamMap.get('idOffice');
     const idPreproject = Number(this.route.snapshot.queryParamMap.get('idPreproject'));
     this.idPreproject = Number.isFinite(idPreproject) && idPreproject > 0 ? idPreproject : null;
@@ -167,10 +169,6 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
     this.workpackShowTabviewService.next(false);
     this.destroy$.next();
     this.destroy$.complete();
-  }
-
-  get formTitleTranslationKey(): string {
-    return this.idPreproject ? 'editPreproject' : 'newPreproject';
   }
 
   get deliveryForms(): FormArray {
@@ -213,6 +211,9 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
   }
 
   async save(): Promise<void> {
+    if (this.isReadOnly) {
+      return;
+    }
     if (this.selectedTab?.key === 'properties') {
       await this.saveProperties();
       return;
@@ -225,6 +226,9 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
   }
 
   async undo(): Promise<void> {
+    if (this.isReadOnly) {
+      return;
+    }
     if (this.selectedTab?.key === 'evaluation') {
       return;
     }
@@ -236,11 +240,17 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
   }
 
   removeDelivery(index: number): void {
+    if (this.isReadOnly) {
+      return;
+    }
     this.deliveryForms.removeAt(index);
     this.refreshDeliveryCardItems();
   }
 
   addDelivery(): void {
+    if (this.isReadOnly) {
+      return;
+    }
     this.deliveryForms.push(this.formBuilder.group({
       name: ['', Validators.required]
     }));
@@ -248,12 +258,18 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
   }
 
   requestListPropertyItem(property: IWorkpackModelProperty): void {
+    if (this.isReadOnly) {
+      return;
+    }
     this.pendingListProperty = property;
     this.newListItemLabel = '';
     this.displayListItemDialog = true;
   }
 
   confirmListPropertyItem(): void {
+    if (this.isReadOnly) {
+      return;
+    }
     const label = this.newListItemLabel.trim();
     if (!label || !this.pendingListProperty) {
       return;
@@ -280,6 +296,9 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
   }
 
   criteriaChanged(): void {
+    if (this.isReadOnly) {
+      return;
+    }
     const criterionId = this.getSelectedCriteriaTabId();
     if (!criterionId) {
       return;
@@ -345,6 +364,9 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
     }, { emitEvent: false });
     this.setDeliveries(preproject.expectedDeliveries);
     this.form.markAsPristine();
+    if (this.isReadOnly) {
+      this.form.disable({ emitEvent: false });
+    }
     this.syncingForm = false;
     this.propertiesDirty = false;
     this.syncPendingChanges();
@@ -675,13 +697,15 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
       deliveryIndex: index,
       itemId: index + 1,
       displayItemId: `${index + 1}`.padStart(2, '0'),
-      menuItems: [{
+      menuItems: this.isReadOnly ? [] : [{
         label: this.translateService.instant('delete'),
         icon: 'fas fa-trash-alt',
         command: () => this.removeDelivery(index)
       }]
     }));
-    cards.push({ typeCardItem: 'newCardItem', icon: IconsEnum.Plus });
+    if (!this.isReadOnly) {
+      cards.push({ typeCardItem: 'newCardItem', icon: IconsEnum.Plus });
+    }
     this.deliveryCardItems = cards;
   }
 
@@ -716,6 +740,11 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
   }
 
   private refreshActionButtons(): void {
+    if (this.isReadOnly) {
+      this.saveButton?.hideButton();
+      this.cancelButton?.hideButton();
+      return;
+    }
     const selectedCriterionId = this.getSelectedCriteriaTabId();
     const hasSelectedTabChanges = this.selectedTab?.key === 'properties'
       ? this.propertiesDirty
@@ -817,8 +846,7 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
         info: 'preproject'
       },
       {
-        key: 'preprojectElaboration',
-        info: this.formTitleTranslationKey
+        key: 'preprojectElaboration'
       }
     );
     this.breadcrumbService.setMenu(breadcrumbs);

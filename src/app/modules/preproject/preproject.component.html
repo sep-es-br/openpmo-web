@@ -7,6 +7,19 @@
       class="mt-0"
       [properties]="cardProperties"
       (createNewElement)="handleCreatePreproject()">
+      <div card-header-actions class="preproject-status-filter" (click)="$event.stopPropagation()">
+        <span class="preproject-status-filter-label">{{ 'status' | translate }}</span>
+        <p-dropdown
+          class="app-single-selection"
+          [options]="statusFilterOptions"
+          [(ngModel)]="selectedStatus"
+          [autoDisplayFirst]="false"
+          dropdownIcon="fas fa-caret-down"
+          appendTo="body"
+          (onChange)="handleStatusFilterChange($event.value)">
+        </p-dropdown>
+      </div>
+
       <p-dataView
         *ngIf="displayMode === 'grid' || (displayMode === 'list' && responsive)"
         class="app-dataview"
