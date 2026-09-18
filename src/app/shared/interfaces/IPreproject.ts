@@ -78,6 +78,16 @@ export interface ICreatePreprojectRequest {
 
 export type IUpdatePreprojectRequest = Omit<ICreatePreprojectRequest, 'idOffice'>;
 
+export interface ICreateProjectFromPreprojectRequest {
+  idPlan: number;
+  idParent: number;
+  observations?: string;
+}
+
+export interface ICreatedProjectFromPreproject {
+  id: number;
+}
+
 export interface IPreprojectListItemValue {
   id?: number;
   foreignKey?: string;

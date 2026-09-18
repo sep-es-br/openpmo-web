@@ -4,13 +4,15 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { MessageService, SelectItem } from 'primeng/api';
+import { MessageService, SelectItem, TreeNode } from 'primeng/api';
 import { TranslateService } from '@ngx-translate/core';
 
 import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
 import { MenuService } from 'src/app/shared/services/menu.service';
 import { OfficeService } from 'src/app/shared/services/office.service';
 import { OrganizationService } from 'src/app/shared/services/organization.service';
+import { PlanBreakdownStructureService } from 'src/app/shared/services/plan-breakdown-structure.service';
+import { PlanService } from 'src/app/shared/services/plan.service';
 import { PreprojectService } from 'src/app/shared/services/preproject.service';
 import { WorkpackService } from 'src/app/shared/services/workpack.service';
 import { WorkpackShowTabviewService } from 'src/app/shared/services/workpack-show-tabview.service';
@@ -25,6 +27,7 @@ import { IWorkpackModelProperty } from 'src/app/shared/interfaces/IWorkpackModel
 import { IPropertyListItem } from 'src/app/shared/interfaces/IPropertyListItem';
 import { IBreadcrumb } from 'src/app/shared/interfaces/IBreadcrumb';
 import {
+  ICreateProjectFromPreprojectRequest,
   ICreatePreprojectRequest,
   IPreproject,
   IPreprojectCriteriaListValue,
@@ -75,12 +78,18 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
   isLoading = false;
   isModelLoading = false;
   isEvaluationLoading = false;
+  isPlansLoading = false;
+  isPlanTreeLoading = false;
+  isProjectCreationLoading = false;
   formIsSaving = false;
   displayModeAll = 'grid';
   criteriaLoadingByTab: { [id: number]: boolean } = {};
   criteriaErrorsByTab: { [id: number]: boolean } = {};
 
   organizations: SelectItem[] = [];
+  availablePlans: SelectItem[] = [];
+  planTree: TreeNode[] = [];
+  selectedParentWorkpacks: TreeNode[] = [];
   criteriaGuides: PreprojectCriterion[] = [];
   evaluation: IPreprojectEvaluation | null = null;
   tabs: ITabViewScrolled[] = [{ key: 'properties', menu: 'properties' }];
@@ -115,6 +124,7 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
   };
 
   form: FormGroup;
+  projectCreationForm: FormGroup;
 
   constructor(
     private readonly route: ActivatedRoute,
@@ -124,6 +134,8 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
     private readonly menuService: MenuService,
     private readonly officeService: OfficeService,
     private readonly organizationService: OrganizationService,
+    private readonly planService: PlanService,
+    private readonly planBreakdownStructureService: PlanBreakdownStructureService,
     private readonly preprojectService: PreprojectService,
     private readonly preprojectCriteriaConfigService: PreprojectCriteriaConfigService,
     private readonly workpackService: WorkpackService,
@@ -139,6 +151,13 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
       expectedCompletion: [null],
       deliveries: this.formBuilder.array([])
     });
+    this.projectCreationForm = this.formBuilder.group({
+      idPlan: [null, Validators.required],
+      idParent: [null, Validators.required],
+      observations: ['', [Validators.required, Validators.maxLength(2000)]],
+      selected: [false]
+    });
+    this.toggleProjectCreation(false);
   }
 
   ngOnInit(): void {
@@ -202,6 +221,7 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
     this.refreshActionButtons();
     if (this.selectedTab?.key === 'evaluation') {
       void this.loadEvaluation();
+      void this.loadAvailablePlans();
       return;
     }
     const criterion = this.selectedCriteriaGuide;
@@ -233,6 +253,114 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
       return;
     }
     await this.discardTabChanges(this.selectedTab);
+  }
+
+  get isProjectCreationSelected(): boolean {
+    return this.projectCreationForm.get('selected')?.value === true;
+  }
+
+  toggleProjectCreation(selected: boolean): void {
+    const fields = ['idPlan', 'idParent', 'observations'];
+    fields.forEach(field => {
+      const control = this.projectCreationForm.get(field);
+      if (selected) {
+        control?.enable({ emitEvent: false });
+      } else {
+        control?.disable({ emitEvent: false });
+      }
+    });
+  }
+
+  async selectPlanForProject(idPlan: number | null): Promise<void> {
+    const selectedPlanId = Number(idPlan);
+    const isValidPlan = Number.isFinite(selectedPlanId) && selectedPlanId > 0;
+    this.projectCreationForm.patchValue({
+      idPlan: isValidPlan ? selectedPlanId : null,
+      idParent: null
+    });
+    this.selectedParentWorkpacks = [];
+    this.planTree = [];
+
+    if (!isValidPlan) {
+      return;
+    }
+
+    this.isPlanTreeLoading = true;
+    try {
+      const tree = await this.planBreakdownStructureService
+        .loadPlanBreakdownStructure(selectedPlanId, false);
+      if (Number(this.projectCreationForm.get('idPlan')?.value) !== selectedPlanId) {
+        return;
+      }
+      this.planTree = this.setSelectableWorkpackNodes(tree || []);
+    } catch (error) {
+      this.showError(error, 'Não foi possível carregar a estrutura do plano.');
+    } finally {
+      this.isPlanTreeLoading = false;
+    }
+  }
+
+  handleParentWorkpackSelection(selection: TreeNode[] | null): void {
+    const selectedWorkpack = selection && selection.length
+      ? selection[selection.length - 1]
+      : null;
+    const idParent = Number((selectedWorkpack as any)?.idWorkpack);
+    if (!Number.isFinite(idParent) || idParent <= 0) {
+      this.selectedParentWorkpacks = [];
+      this.projectCreationForm.patchValue({ idParent: null });
+      return;
+    }
+    this.selectedParentWorkpacks = [selectedWorkpack];
+    this.projectCreationForm.patchValue({ idParent });
+  }
+
+  async expandPlanNode(event: { node?: TreeNode }): Promise<void> {
+    this.isPlanTreeLoading = true;
+    try {
+      await this.planBreakdownStructureService.expandPlanNode(event);
+      if (event.node?.children) {
+        event.node.children = this.setSelectableWorkpackNodes(event.node.children);
+      }
+    } catch (error) {
+      this.showError(error, 'Não foi possível carregar os itens do plano.');
+    } finally {
+      this.isPlanTreeLoading = false;
+    }
+  }
+
+  async createProjectFromPreproject(): Promise<void> {
+    if (!this.idPreproject || !this.isProjectCreationSelected
+      || this.projectCreationForm.invalid || this.isProjectCreationLoading) {
+      this.projectCreationForm.markAllAsTouched();
+      return;
+    }
+
+    const formValue = this.projectCreationForm.getRawValue();
+    const observations = String(formValue.observations || '').trim();
+    const request: ICreateProjectFromPreprojectRequest = {
+      idPlan: Number(formValue.idPlan),
+      idParent: Number(formValue.idParent),
+      ...(observations ? { observations } : {})
+    };
+
+    this.isProjectCreationLoading = true;
+    try {
+      const response = await this.preprojectService.createProject(this.idPreproject, request);
+      if (!response.success || !response.data?.id) {
+        throw new Error(response.message || 'Project not created');
+      }
+      this.showSuccess();
+      await this.router.navigate(['/workpack'], {
+        queryParams: {
+          id: response.data.id,
+          idPlan: request.idPlan
+        }
+      });
+    } catch (error) {
+      this.showError(error, 'Não foi possível criar o projeto a partir do anteprojeto.');
+    } finally {
+      this.isProjectCreationLoading = false;
+    }
   }
 
   getDeliveryForm(index: number | undefined): FormGroup {
@@ -340,6 +468,31 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
       : [];
   }
 
+  private async loadAvailablePlans(): Promise<void> {
+    if (this.isReadOnly || this.isPlansLoading || this.availablePlans.length > 0) {
+      return;
+    }
+    const idOffice = Number(this.idOffice);
+    if (!Number.isFinite(idOffice) || idOffice <= 0) {
+      return;
+    }
+
+    this.isPlansLoading = true;
+    try {
+      const response = await this.planService.GetAll({ 'id-office': idOffice });
+      this.availablePlans = response.success
+        ? (response.data || [])
+          .sort((first, second) => first.name.localeCompare(second.name))
+          .map(plan => ({ label: plan.name, value: plan.id }))
+        : [];
+    } catch (error) {
+      this.availablePlans = [];
+      this.showError(error, 'Não foi possível carregar os planos disponíveis.');
+    } finally {
+      this.isPlansLoading = false;
+    }
+  }
+
   private async loadPreproject(): Promise<void> {
     if (!this.idPreproject) {
       return;
@@ -436,6 +589,14 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
     } finally {
       this.isEvaluationLoading = false;
     }
+  }
+
+  private setSelectableWorkpackNodes(nodes: TreeNode[]): TreeNode[] {
+    return nodes.map(node => ({
+      ...node,
+      selectable: Number.isFinite(Number((node as any).idWorkpack)) && Number((node as any).idWorkpack) > 0,
+      children: node.children ? this.setSelectableWorkpackNodes(node.children) : []
+    }));
   }
 
   private mergeCriteriaValues(

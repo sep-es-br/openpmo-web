@@ -3,7 +3,9 @@ import { Inject, Injectable, Injector } from '@angular/core';
 import { BaseService } from '../base/base.service';
 import { IHttpResult } from '../interfaces/IHttpResult';
 import {
+  ICreatedProjectFromPreproject,
   ICreatePreprojectRequest,
+  ICreateProjectFromPreprojectRequest,
   IPreproject,
   IPreprojectCriteriaTabValues,
   IPreprojectEvaluation,
@@ -77,6 +79,19 @@ export class PreprojectService extends BaseService<IPreproject> {
   findEvaluation(idPreproject: number): Promise<IHttpResult<IPreprojectEvaluation>> {
     return this.http
       .get<IHttpResult<IPreprojectEvaluation>>(`${this.urlBase}/${idPreproject}/evaluation`, this.requestOptions)
+      .toPromise();
+  }
+
+  createProject(
+    idPreproject: number,
+    request: ICreateProjectFromPreprojectRequest
+  ): Promise<IHttpResult<ICreatedProjectFromPreproject>> {
+    return this.http
+      .post<IHttpResult<ICreatedProjectFromPreproject>>(
+        `${this.urlBase}/${idPreproject}/projects`,
+        request,
+        this.requestOptions
+      )
       .toPromise();
   }
 }

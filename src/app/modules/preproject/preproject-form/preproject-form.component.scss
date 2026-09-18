@@ -159,6 +159,7 @@
   display: flex;
   align-items: center;
   gap: .6rem;
+  color: v.$fontTitle;
 }
 
 .preproject-selection-fields {
@@ -173,9 +174,27 @@
   }
 
   .preproject-selection-plan-field {
+    display: block;
     width: 20rem;
     max-width: 100%;
+
+    .app-single-selection {
+      display: block;
+      width: 100%;
+    }
   }
+}
+
+.preproject-selection-help {
+  color: v.$fontTitle;
+}
+
+.preproject-observations-field {
+  max-width: 42rem;
+}
+
+.preproject-convert-button {
+  justify-self: start;
 }
 
 .evaluation-plan-tree-label {
@@ -200,6 +219,14 @@
 :host ::ng-deep .evaluation-plan-tree .p-tree {
   width: 100%;
   background: transparent;
+}
+
+:host ::ng-deep .preproject-selection-plan-field .app-single-selection .p-dropdown {
+  width: 100%;
+}
+
+:host ::ng-deep .evaluation-plan-tree .node-disabled {
+  color: #989fa2;
 }
 
 :host ::ng-deep .evaluation-table {
