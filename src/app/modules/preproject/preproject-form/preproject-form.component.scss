@@ -193,10 +193,6 @@
   max-width: 42rem;
 }
 
-.preproject-convert-button {
-  justify-self: start;
-}
-
 .evaluation-plan-tree-label {
   display: block;
   margin-bottom: .4rem;
@@ -207,13 +203,14 @@
   width: 100%;
   min-height: 3.4rem;
 
-  &.loading {
-    min-height: 5rem;
-  }
-
   &.p-disabled {
     pointer-events: none;
   }
+}
+
+.preproject-tree-loading {
+  position: relative;
+  min-height: 5rem;
 }
 
 :host ::ng-deep .evaluation-plan-tree .p-tree {

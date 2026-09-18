@@ -11,7 +11,6 @@ import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
 import { MenuService } from 'src/app/shared/services/menu.service';
 import { OfficeService } from 'src/app/shared/services/office.service';
 import { OrganizationService } from 'src/app/shared/services/organization.service';
-import { PlanBreakdownStructureService } from 'src/app/shared/services/plan-breakdown-structure.service';
 import { PlanService } from 'src/app/shared/services/plan.service';
 import { PreprojectService } from 'src/app/shared/services/preproject.service';
 import { WorkpackService } from 'src/app/shared/services/workpack.service';
@@ -43,6 +42,7 @@ import { IEditableCardField } from 'src/app/shared/components/editable-card-item
 import { SaveButtonComponent } from 'src/app/shared/components/save-button/save-button.component';
 import { CancelButtonComponent } from 'src/app/shared/components/cancel-button/cancel-button.component';
 import { IconsEnum } from 'src/app/shared/enums/IconsEnum';
+import { IMenuWorkpack } from 'src/app/shared/interfaces/IMenu';
 
 interface DeliveryCardItem extends ICardItem {
   deliveryIndex?: number;
@@ -135,7 +135,6 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
     private readonly officeService: OfficeService,
     private readonly organizationService: OrganizationService,
     private readonly planService: PlanService,
-    private readonly planBreakdownStructureService: PlanBreakdownStructureService,
     private readonly preprojectService: PreprojectService,
     private readonly preprojectCriteriaConfigService: PreprojectCriteriaConfigService,
     private readonly workpackService: WorkpackService,
@@ -179,6 +178,10 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
           this.syncPendingChanges();
         }
       });
+
+    this.projectCreationForm.valueChanges
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => this.syncPendingChanges());
 
     void this.initialize();
   }
@@ -238,6 +241,10 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
       await this.saveProperties();
       return;
     }
+    if (this.selectedTab?.key === 'evaluation') {
+      await this.createProjectFromPreproject();
+      return;
+    }
 
     const criterion = this.selectedCriteriaGuide;
     if (criterion) {
@@ -250,6 +257,8 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
       return;
     }
     if (this.selectedTab?.key === 'evaluation') {
+      this.resetProjectCreationForm();
+      this.syncPendingChanges();
       return;
     }
     await this.discardTabChanges(this.selectedTab);
@@ -287,12 +296,17 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
 
     this.isPlanTreeLoading = true;
     try {
-      const tree = await this.planBreakdownStructureService
-        .loadPlanBreakdownStructure(selectedPlanId, false);
+      const response = await this.menuService.getItemsPortfolio(
+        Number(this.idOffice),
+        selectedPlanId
+      );
       if (Number(this.projectCreationForm.get('idPlan')?.value) !== selectedPlanId) {
         return;
       }
-      this.planTree = this.setSelectableWorkpackNodes(tree || []);
+      if (!response.success || !response.data) {
+        throw new Error(response.message || 'Plan tree not found');
+      }
+      this.planTree = this.mapMenuWorkpacks(response.data || []);
     } catch (error) {
       this.showError(error, 'Não foi possível carregar a estrutura do plano.');
     } finally {
@@ -300,38 +314,34 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
     }
   }
 
-  handleParentWorkpackSelection(selection: TreeNode[] | null): void {
-    const selectedWorkpack = selection && selection.length
-      ? selection[selection.length - 1]
-      : null;
+  selectParentWorkpack(event: { node?: TreeNode }): void {
+    const selectedWorkpack = event.node;
     const idParent = Number((selectedWorkpack as any)?.idWorkpack);
     if (!Number.isFinite(idParent) || idParent <= 0) {
       this.selectedParentWorkpacks = [];
       this.projectCreationForm.patchValue({ idParent: null });
       return;
     }
-    this.selectedParentWorkpacks = [selectedWorkpack];
+    selectedWorkpack.expanded = true;
+    this.selectedParentWorkpacks = this.getWorkpackPath(selectedWorkpack);
     this.projectCreationForm.patchValue({ idParent });
   }
 
-  async expandPlanNode(event: { node?: TreeNode }): Promise<void> {
-    this.isPlanTreeLoading = true;
-    try {
-      await this.planBreakdownStructureService.expandPlanNode(event);
-      if (event.node?.children) {
-        event.node.children = this.setSelectableWorkpackNodes(event.node.children);
-      }
-    } catch (error) {
-      this.showError(error, 'Não foi possível carregar os itens do plano.');
-    } finally {
-      this.isPlanTreeLoading = false;
-    }
+  unselectParentWorkpack(event: { node?: TreeNode }): void {
+    const parent = event.node?.parent;
+    this.selectedParentWorkpacks = parent ? this.getWorkpackPath(parent) : [];
+    const idParent = Number((parent as any)?.idWorkpack);
+    this.projectCreationForm.patchValue({
+      idParent: Number.isFinite(idParent) && idParent > 0 ? idParent : null
+    });
   }
 
   async createProjectFromPreproject(): Promise<void> {
     if (!this.idPreproject || !this.isProjectCreationSelected
       || this.projectCreationForm.invalid || this.isProjectCreationLoading) {
       this.projectCreationForm.markAllAsTouched();
+      this.saveButton?.showButton();
+      this.cancelButton?.showButton();
       return;
     }
 
@@ -358,6 +368,8 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
       });
     } catch (error) {
       this.showError(error, 'Não foi possível criar o projeto a partir do anteprojeto.');
+      this.saveButton?.showButton();
+      this.cancelButton?.showButton();
     } finally {
       this.isProjectCreationLoading = false;
     }
@@ -591,12 +603,30 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
     }
   }
 
-  private setSelectableWorkpackNodes(nodes: TreeNode[]): TreeNode[] {
-    return nodes.map(node => ({
-      ...node,
-      selectable: Number.isFinite(Number((node as any).idWorkpack)) && Number((node as any).idWorkpack) > 0,
-      children: node.children ? this.setSelectableWorkpackNodes(node.children) : []
-    }));
+  private mapMenuWorkpacks(workpacks: IMenuWorkpack[], parent?: TreeNode): TreeNode[] {
+    return workpacks.map(workpack => {
+      const node = {
+        label: workpack.name,
+        icon: workpack.fontIcon,
+        idWorkpack: Number(workpack.id),
+        parent,
+        selectable: true,
+        expanded: false,
+        children: []
+      } as TreeNode & { idWorkpack: number };
+      node.children = this.mapMenuWorkpacks(workpack.children || [], node);
+      return node;
+    });
+  }
+
+  private getWorkpackPath(node: TreeNode): TreeNode[] {
+    const path: TreeNode[] = [];
+    let current: TreeNode | undefined = node;
+    while (current) {
+      path.unshift(current);
+      current = current.parent;
+    }
+    return path;
   }
 
   private mergeCriteriaValues(
@@ -924,6 +954,9 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
     if (tab?.key === 'properties') {
       return this.propertiesDirty;
     }
+    if (tab?.key === 'evaluation') {
+      return this.projectCreationForm.dirty;
+    }
     if (!tab?.key?.startsWith('criterion-')) {
       return false;
     }
@@ -948,6 +981,8 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
         this.syncingForm = false;
         this.propertiesDirty = false;
       }
+    } else if (tab.key === 'evaluation') {
+      this.resetProjectCreationForm();
     } else if (tab.key.startsWith('criterion-')) {
       const criterionId = Number(tab.key.replace('criterion-', ''));
       const criterion = this.criteriaGuides.find(item => item.id === criterionId);
@@ -963,7 +998,23 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
   private syncPendingChanges(): void {
     const criteriaHasChanges = Object.keys(this.criteriaDirtyByTab)
       .some(key => this.criteriaDirtyByTab[Number(key)] === true);
-    this.workpackService.nextPendingChanges(this.propertiesDirty || criteriaHasChanges);
+    this.workpackService.nextPendingChanges(
+      this.propertiesDirty || criteriaHasChanges || this.projectCreationForm.dirty
+    );
+  }
+
+  private resetProjectCreationForm(): void {
+    this.projectCreationForm.reset({
+      idPlan: null,
+      idParent: null,
+      observations: '',
+      selected: false
+    }, { emitEvent: false });
+    this.toggleProjectCreation(false);
+    this.selectedParentWorkpacks = [];
+    this.planTree = [];
+    this.projectCreationForm.markAsPristine();
+    this.projectCreationForm.markAsUntouched();
   }
 
   private showSuccess(): void {

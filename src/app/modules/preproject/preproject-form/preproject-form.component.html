@@ -200,18 +200,20 @@
                 <ng-container *ngIf="projectCreationForm.get('idPlan')?.value; else selectPlanFirst">
                   <div
                     class="app-tree-selection evaluation-plan-tree"
-                    [class.loading]="isPlanTreeLoading"
                     [class.p-disabled]="!isProjectCreationSelected"
                     [class.ng-invalid]="projectCreationForm.get('idParent')?.invalid && projectCreationForm.get('idParent')?.touched">
+                    <div class="preproject-tree-loading" *ngIf="isPlanTreeLoading">
+                      <app-card-loading [isCardLoading]="isPlanTreeLoading"></app-card-loading>
+                    </div>
                     <p-tree
+                      *ngIf="!isPlanTreeLoading"
                       [value]="planTree"
-                      [loading]="isPlanTreeLoading"
                       selectionMode="checkbox"
-                      [selection]="selectedParentWorkpacks"
+                      [(selection)]="selectedParentWorkpacks"
                       [propagateSelectionUp]="false"
                       [propagateSelectionDown]="false"
-                      (selectionChange)="handleParentWorkpackSelection($event)"
-                      (onNodeExpand)="expandPlanNode($event)">
+                      (onNodeSelect)="selectParentWorkpack($event)"
+                      (onNodeUnselect)="unselectParentWorkpack($event)">
                       <ng-template let-node pTemplate="default">
                         <span [class.node-disabled]="!node.selectable">{{ node.label }}</span>
                       </ng-template>
@@ -236,13 +238,6 @@
                 <app-input-message [form]="projectCreationForm" field="observations"></app-input-message>
               </div>
 
-              <p-button
-                type="button"
-                class="app-button-green preproject-convert-button"
-                [label]="'convertToProject' | translate"
-                [disabled]="!isProjectCreationSelected || projectCreationForm.invalid || isProjectCreationLoading"
-                (onClick)="createProjectFromPreproject()">
-              </p-button>
             </div>
           </form>
         </ng-container>
@@ -250,8 +245,14 @@
     </app-tabview-scrolled>
 
     <app-buttons-container *ngIf="!isReadOnly" [compact]="true">
-      <app-save-button [form]="form" (save)="save()"></app-save-button>
-      <app-cancel-button [form]="form" (cancel)="undo()"></app-cancel-button>
+      <app-save-button
+        [form]="selectedTab?.key === 'evaluation' ? projectCreationForm : form"
+        (save)="save()">
+      </app-save-button>
+      <app-cancel-button
+        [form]="selectedTab?.key === 'evaluation' ? projectCreationForm : form"
+        (cancel)="undo()">
+      </app-cancel-button>
     </app-buttons-container>
   </app-card>
 </div>
