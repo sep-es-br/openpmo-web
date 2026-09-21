@@ -3,6 +3,7 @@ import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, S
 import { ICard } from 'src/app/shared/interfaces/ICard';
 import { IPropertyListItem } from 'src/app/shared/interfaces/IPropertyListItem';
 import { IWorkpackModelProperty } from 'src/app/shared/interfaces/IWorkpackModelProperty';
+import { ListSelectionDialogItem } from 'src/app/shared/components/list-selection-dialog/list-selection-dialog.component';
 import { PropertyTemplateModel } from 'src/app/shared/models/PropertyTemplateModel';
 import { PreprojectCriterionGroup } from 'src/app/shared/services/preproject-criteria-config.service';
 import { TypePropertModelEnum } from 'src/app/shared/enums/TypePropertModelEnum';
@@ -22,11 +23,13 @@ export class PreprojectCriteriaGroupComponent implements OnInit, OnChanges, OnDe
   @Input() readOnly: boolean = false;
 
   @Output() changed: EventEmitter<void> = new EventEmitter<void>();
-  @Output() listAddRequested: EventEmitter<IWorkpackModelProperty> = new EventEmitter<IWorkpackModelProperty>();
 
   enabled: boolean = true;
   cardProperties: ICard;
   properties: Array<{ config: IWorkpackModelProperty; value?: PropertyTemplateModel }> = [];
+  displayListSelectionDialog = false;
+  activeListProperty: IWorkpackModelProperty | null = null;
+  private nextTemporaryListItemId = -1;
 
   get isBudgetGroup(): boolean {
     const title: string = (this.group?.title || '')
@@ -90,6 +93,54 @@ export class PreprojectCriteriaGroupComponent implements OnInit, OnChanges, OnDe
     return property.type === TypePropertModelEnum.SdgListModel ? IconsEnum.Cog : IconsEnum.Selection;
   }
 
+  get listDialogItems(): ListSelectionDialogItem[] {
+    const property = this.activeListProperty;
+    if (!property) {
+      return [];
+    }
+
+    return [...(property.availableListItems || []), ...(property.selectedListItems || [])]
+      .reduce((items: IPropertyListItem[], item: IPropertyListItem) =>
+        items.some(current => String(current.id) === String(item.id)) ? items : [...items, item], [])
+      .map((item: IPropertyListItem) => ({
+        id: item.id,
+        label: item.name,
+        description: item.fullName && item.fullName !== item.name ? item.fullName : undefined
+      }));
+  }
+
+  get selectedListDialogItems(): ListSelectionDialogItem[] {
+    return (this.activeListProperty?.selectedListItems || []).map(item => ({
+      id: item.id,
+      label: item.name,
+      description: item.fullName && item.fullName !== item.name ? item.fullName : undefined
+    }));
+  }
+
+  openListSelectionDialog(property: IWorkpackModelProperty): void {
+    if (this.readOnly || !this.enabled) {
+      return;
+    }
+    this.activeListProperty = property;
+    this.displayListSelectionDialog = true;
+  }
+
+  confirmListSelection(items: ListSelectionDialogItem[]): void {
+    const property = this.activeListProperty;
+    if (!property || this.readOnly) {
+      return;
+    }
+
+    property.selectedListItems = items.map(item => this.toListItem(property, item));
+    this.closeListSelectionDialog();
+    this.changed.emit();
+  }
+
+  closeListSelectionDialog(): void {
+    this.displayListSelectionDialog = false;
+    this.activeListProperty = null;
+  }
+
   updateListItems(property: IWorkpackModelProperty, items: IPropertyListItem[]): void {
     if (this.readOnly) {
       return;
@@ -122,6 +173,24 @@ export class PreprojectCriteriaGroupComponent implements OnInit, OnChanges, OnDe
       initialStateToggle: this.enabled,
       toggleLabel: this.group.legend || '',
       onToggle: this.toggleChanged
+    };
+  }
+
+  private toListItem(
+    property: IWorkpackModelProperty,
+    item: ListSelectionDialogItem
+  ): IPropertyListItem {
+    const selectedItem = (property.selectedListItems || [])
+      .find(current => String(current.id) === String(item.id));
+    if (selectedItem) {
+      return selectedItem;
+    }
+
+    const id = Number(item.id);
+    return {
+      id: Number.isFinite(id) ? id : this.nextTemporaryListItemId--,
+      name: item.label,
+      fullName: item.description || item.label
     };
   }
 

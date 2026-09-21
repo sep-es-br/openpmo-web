@@ -297,29 +297,57 @@
 .preproject-delivery-list {
   margin-left: 0;
   width: 100%;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 260px));
-  justify-content: start;
-}
-
-.preproject-delivery-list.list-mode {
-  grid-template-columns: 1fr;
 }
 
 :host ::ng-deep .preproject-delivery-list .p-dataview-content {
   padding-inline: 0;
 }
 
-:host ::ng-deep .preproject-delivery-list:not(.list-mode) .newItem {
+:host ::ng-deep .preproject-delivery-list:not(.app-dataview-list) .p-dataview-content > .p-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 260px);
+  gap: 1rem;
+  justify-content: start;
+  margin: 0 !important;
+}
+
+:host ::ng-deep .preproject-delivery-list .delivery-card-container {
+  box-sizing: border-box;
+  min-height: 10rem;
+  padding: 0 !important;
   width: 260px;
 }
 
-:host ::ng-deep .preproject-delivery-list.list-mode .newItem {
+:host ::ng-deep .preproject-delivery-list .delivery-card-container > app-editable-card-item {
+  display: block;
+  height: 100%;
   width: 100%;
 }
 
-.delivery-card-container {
-  min-height: 9rem;
-  padding-left: 0;
+:host ::ng-deep .preproject-delivery-list.app-dataview-list .p-dataview-content > .p-grid {
+  margin: 0 !important;
+}
+
+:host ::ng-deep .preproject-delivery-list .delivery-card-list-container {
+  width: 100%;
+}
+
+@media screen and (max-width: 768px) {
+  .app-preproject-form {
+    padding: 0 .75rem 1.25rem;
+  }
+
+  .preproject-properties-fields {
+    padding-inline: 0;
+  }
+
+  :host ::ng-deep .preproject-delivery-list:not(.app-dataview-list) .p-dataview-content > .p-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  :host ::ng-deep .preproject-delivery-list .delivery-card-container {
+    width: 100%;
+  }
 }
 
 // --- Abas de critérios configuradas no modelo ---

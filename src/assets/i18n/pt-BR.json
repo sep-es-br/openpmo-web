@@ -1110,6 +1110,7 @@
   "dateFormatMonthYear": "mm/yy",
   "reference": "Referência",
   "statusCompleted": "Concluído",
+  "preprojectDestinationWithoutProjectModel": "O local selecionado não possui um modelo de projeto disponível.",
   "projectManagement": "Gestão do Projeto",
   "agreement": "Convênio",
   "environmentalLicensing": "Licenciamento Ambiental",

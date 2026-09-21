@@ -1,6 +1,5 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 
-import { IWorkpackModelProperty } from 'src/app/shared/interfaces/IWorkpackModelProperty';
 import { PreprojectCriterion, PreprojectCriterionGroup } from 'src/app/shared/services/preproject-criteria-config.service';
 
 @Component({
@@ -14,7 +13,6 @@ export class PreprojectCriteriaGuideComponent {
   @Input() readOnly: boolean = false;
 
   @Output() changed: EventEmitter<void> = new EventEmitter<void>();
-  @Output() listAddRequested: EventEmitter<IWorkpackModelProperty> = new EventEmitter<IWorkpackModelProperty>();
 
   get directPropertiesGroup(): PreprojectCriterionGroup | undefined {
     if (!this.guide?.properties?.length) {

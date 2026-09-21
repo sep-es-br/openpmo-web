@@ -1,0 +1,89 @@
+@use "src/variables" as v;
+
+::ng-deep .list-selection-dialog {
+  .p-dialog-header {
+    align-items: flex-start;
+    padding: 1.8rem 1.5rem .85rem;
+    border: 0;
+  }
+
+  .list-selection-dialog-title {
+    font-family: v.$fontFamilyBold;
+    color: v.$fontTitle;
+  }
+
+  .list-selection-dialog-subtitle {
+    margin-top: .25rem;
+    font-size: .8rem;
+    color: v.$fontLabel;
+  }
+
+  .p-dialog-content {
+    padding: .85rem 1.5rem 1.5rem;
+  }
+
+  .list-selection-dialog-multiselect {
+    width: 100%;
+  }
+
+  .list-selection-dialog-item {
+    display: flex;
+    flex-direction: column;
+
+    small {
+      margin-top: .2rem;
+      color: v.$fontLabel;
+    }
+  }
+
+  .list-selection-dialog-empty,
+  .list-selection-dialog-loading {
+    display: block;
+    padding: .75rem;
+    font-size: .8rem;
+    color: v.$fontLabel;
+  }
+
+  .p-dialog-footer {
+    padding: 0 1.5rem 1.8rem;
+    border: 0;
+
+    .list-selection-dialog-actions {
+      display: flex;
+      justify-content: center;
+      gap: 9rem;
+    }
+
+    .list-selection-dialog-action.p-button {
+      min-width: 96px;
+      border: 0;
+      background: transparent;
+      color: v.$fontDark;
+      box-shadow: none;
+
+      &:enabled:hover,
+      &:enabled:focus {
+        border: 0;
+        background: transparent;
+        color: v.$fontDark;
+        box-shadow: none;
+      }
+
+      .p-button-icon {
+        margin-right: .6rem;
+      }
+    }
+  }
+}
+
+::ng-deep .list-selection-dialog-multiselect-panel {
+  .p-multiselect-items {
+    max-height: 300px;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  ::ng-deep .list-selection-dialog .p-dialog-footer .list-selection-dialog-actions {
+    gap: 2rem;
+  }
+}

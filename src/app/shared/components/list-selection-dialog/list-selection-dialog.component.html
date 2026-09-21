@@ -1,0 +1,54 @@
+<p-dialog [(visible)]="visible" [modal]="true" [dismissableMask]="true" [closeOnEscape]="true"
+  [style]="{ width: width }" [baseZIndex]="10000" styleClass="list-selection-dialog" (onHide)="handleHide()">
+  <p-header>
+    <div class="list-selection-dialog-title">{{ title }}</div>
+    <div *ngIf="subtitle" class="list-selection-dialog-subtitle">{{ subtitle }}</div>
+  </p-header>
+
+  <div class="list-selection-dialog-content">
+    <p-multiSelect *ngIf="!loading && dialogItems.length"
+      class="app-multiple-selection list-selection-dialog-multiselect"
+      [options]="dialogItems"
+      [(ngModel)]="draftSelection"
+      optionLabel="label"
+      optionDisabled="disabled"
+      dataKey="id"
+      dropdownIcon="fas fa-caret-down"
+      [filter]="true"
+      filterBy="label,description"
+      [filterPlaceHolder]="filterPlaceholder | translate"
+      [defaultLabel]="'select' | translate"
+      [selectedItemsLabel]="'{0} ' + ('selectedItems' | translate)"
+      [emptyFilterMessage]="emptyMessage | translate"
+      [showToggleAll]="false"
+      [maxSelectedLabels]="2"
+      display="chip"
+      [style]="{ width: '100%' }"
+      [baseZIndex]="10001"
+      panelStyleClass="list-selection-dialog-multiselect-panel">
+      <ng-template let-item pTemplate="item">
+        <div class="list-selection-dialog-item">
+          <span>{{ item.label }}</span>
+          <small *ngIf="item.description">{{ item.description }}</small>
+        </div>
+      </ng-template>
+    </p-multiSelect>
+
+    <span *ngIf="!loading && !dialogItems.length" class="list-selection-dialog-empty">
+      {{ emptyMessage | translate }}
+    </span>
+    <span *ngIf="loading" class="list-selection-dialog-loading">{{ 'loading' | translate }}</span>
+  </div>
+
+  <p-footer>
+    <div class="list-selection-dialog-actions">
+      <button type="button" pButton class="p-button-text list-selection-dialog-action"
+        icon="fas fa-times" iconPos="left" [label]="cancelLabel | translate" (click)="cancel()">
+      </button>
+      <button type="button" pButton class="p-button-text list-selection-dialog-action"
+        icon="fas fa-check" iconPos="left" [label]="confirmLabel | translate" (click)="confirm()"
+        [disabled]="requireSelection && !hasSelection">
+      </button>
+    </div>
+  </p-footer>
+</p-dialog>

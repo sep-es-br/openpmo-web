@@ -271,11 +271,10 @@ export class PreprojectComponent implements OnInit, OnDestroy, AfterViewInit {
         .filter((plan): plan is IPlan => !!plan?.id)
         .map(plan => [plan.id as number, plan.name])
     );
-    const mockPlan = plans.find(plan => (plan.name || '').trim().toLocaleUpperCase() === 'PMO-ES');
     const structuredPlanIds = Array.from(new Set(
       preprojects
         .filter(preproject => this.getPreprojectStatus(preproject, detailsById.get(preproject.id)) === 'Estruturação')
-        .map(preproject => this.getPreprojectPlanId(preproject, detailsById.get(preproject.id), mockPlan))
+        .map(preproject => this.getPreprojectPlanId(preproject, detailsById.get(preproject.id)))
         .filter((idPlan): idPlan is number => Number.isFinite(idPlan) && idPlan > 0)
     ));
     const workpackIdsByPlan = await this.loadRepresentativeWorkpackIds(structuredPlanIds);
@@ -284,14 +283,15 @@ export class PreprojectComponent implements OnInit, OnDestroy, AfterViewInit {
       const detail = detailsById.get(preproject.id);
       const status = this.getPreprojectStatus(preproject, detail);
       const organizationName = organizationsById.get(detail?.idOrganization || preproject.idOrganization || 0);
-      const idPlan = this.getPreprojectPlanId(preproject, detail, mockPlan);
+      const idPlan = this.getPreprojectPlanId(preproject, detail);
       const idWorkpack = detail?.idWorkpack
         || preproject.idWorkpack
         || workpackIdsByPlan.get(idPlan || 0);
       const navigation = this.getPreprojectCardNavigation(preproject, status, idPlan, idWorkpack);
-      const planName = idPlan
-        ? planNamesById.get(idPlan)
-        : this.isMockStructuredPreproject(preproject) ? 'PMO-ES' : '';
+      const breadcrumbWorkpackModel = status === 'Estruturação'
+        ? this.getStructuringWorkpackBreadcrumb(idOffice, idPlan, navigation.itemId)
+        : undefined;
+      const planName = idPlan ? planNamesById.get(idPlan) : '';
       return {
         typeCardItem: 'listItem',
         icon: 'fas fa-cog project-icon',
@@ -308,6 +308,7 @@ export class PreprojectComponent implements OnInit, OnDestroy, AfterViewInit {
         urlCard: navigation.url,
         idAtributeName: navigation.idAttributeName,
         paramsUrlCard: navigation.params,
+        breadcrumbWorkpackModel,
         menuItems: getItemMenuItems(preproject, status)
       };
     });
@@ -330,11 +331,6 @@ export class PreprojectComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   private getPreprojectStatus(preproject: IPreprojectListItem, detail?: IPreproject): PreprojectStatus {
-    // Mock temporário para validar o fluxo de estruturação somente no frontend.
-    // Remover quando a API passar a devolver o status atualizado após a aprovação.
-    if (this.isMockStructuredPreproject(preproject)) {
-      return 'Estruturação';
-    }
     return preproject.status || detail?.status || 'Elaboração';
   }
 
@@ -384,6 +380,29 @@ export class PreprojectComponent implements OnInit, OnDestroy, AfterViewInit {
     };
   }
 
+  private getStructuringWorkpackBreadcrumb(
+    idOffice: number,
+    idPlan: number | undefined,
+    idWorkpack: number
+  ): IBreadcrumb[] {
+    return [
+      {
+        key: 'preproject',
+        routerLink: ['/preproject'],
+        queryParams: Number.isFinite(idOffice) && idOffice > 0 ? { idOffice } : undefined
+      },
+      {
+        key: 'project',
+        info: this.translateService.instant('structuring'),
+        tooltip: this.translateService.instant('structuring'),
+        queryParams: {
+          id: idWorkpack,
+          ...(idPlan ? { idPlan } : {})
+        }
+      }
+    ];
+  }
+
   private async loadRepresentativeWorkpackIds(planIds: number[]): Promise<Map<number, number>> {
     const entries = await Promise.all(planIds.map(async idPlan => {
       try {
@@ -400,16 +419,10 @@ export class PreprojectComponent implements OnInit, OnDestroy, AfterViewInit {
 
   private getPreprojectPlanId(
     preproject: IPreprojectListItem,
-    detail: IPreproject | undefined,
-    mockPlan: IPlan | undefined
+    detail: IPreproject | undefined
   ): number | undefined {
     return detail?.idPlan
-      || preproject.idPlan
-      || (this.isMockStructuredPreproject(preproject) ? mockPlan?.id : undefined);
-  }
-
-  private isMockStructuredPreproject(preproject: IPreprojectListItem): boolean {
-    return preproject.name.trim().toLocaleLowerCase() === 'teste';
+      || preproject.idPlan;
   }
 
 }

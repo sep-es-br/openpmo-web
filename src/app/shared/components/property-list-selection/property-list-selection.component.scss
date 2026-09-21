@@ -17,11 +17,12 @@
 }
 
 :host ::ng-deep {
-  .property-list-dataview:not(.list-mode) .p-dataview-content {
+  .property-list-dataview:not(.list-mode) .p-dataview-content > .p-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(260px, 260px));
+    grid-template-columns: repeat(auto-fill, 260px);
     gap: 1rem;
     justify-content: start;
+    margin: 0 !important;
   }
 
   .property-list-dataview:not(.list-mode) .property-list-card,
@@ -34,5 +35,21 @@
   .property-list-dataview.list-mode .app-card-item,
   .property-list-dataview.list-mode .new-carditem {
     width: 100%;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  :host ::ng-deep {
+    .property-list-dataview:not(.list-mode) .p-dataview-content > .p-grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .property-list-dataview:not(.list-mode) .property-list-card,
+    .property-list-dataview:not(.list-mode) .app-card-item,
+    .property-list-dataview:not(.list-mode) .new-carditem,
+    .property-list-dataview:not(.list-mode) .new-carditem .p-card {
+      max-width: none;
+      width: 100%;
+    }
   }
 }

@@ -14,6 +14,7 @@ import { OrganizationService } from 'src/app/shared/services/organization.servic
 import { PlanService } from 'src/app/shared/services/plan.service';
 import { PreprojectService } from 'src/app/shared/services/preproject.service';
 import { WorkpackService } from 'src/app/shared/services/workpack.service';
+import { WorkpackModelService } from 'src/app/shared/services/workpack-model.service';
 import { WorkpackShowTabviewService } from 'src/app/shared/services/workpack-show-tabview.service';
 import {
   PreprojectCriteriaConfigService,
@@ -43,6 +44,7 @@ import { SaveButtonComponent } from 'src/app/shared/components/save-button/save-
 import { CancelButtonComponent } from 'src/app/shared/components/cancel-button/cancel-button.component';
 import { IconsEnum } from 'src/app/shared/enums/IconsEnum';
 import { IMenuWorkpack } from 'src/app/shared/interfaces/IMenu';
+import { TypeWorkpackModelEnum } from 'src/app/shared/enums/TypeWorkpackModelEnum';
 
 interface DeliveryCardItem extends ICardItem {
   deliveryIndex?: number;
@@ -96,10 +98,6 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
   selectedTab: ITabViewScrolled = this.tabs[0];
   tabsVersion = 1;
 
-  displayListItemDialog = false;
-  newListItemLabel = '';
-  pendingListProperty: IWorkpackModelProperty | null = null;
-
   readonly editableDeliveryFields: IEditableCardField[] = [{
     controlName: 'name',
     label: 'name',
@@ -138,6 +136,7 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
     private readonly preprojectService: PreprojectService,
     private readonly preprojectCriteriaConfigService: PreprojectCriteriaConfigService,
     private readonly workpackService: WorkpackService,
+    private readonly workpackModelService: WorkpackModelService,
     private readonly workpackShowTabviewService: WorkpackShowTabviewService,
     private readonly formBuilder: FormBuilder,
     private readonly translateService: TranslateService,
@@ -306,7 +305,7 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
       if (!response.success || !response.data) {
         throw new Error(response.message || 'Plan tree not found');
       }
-      this.planTree = this.mapMenuWorkpacks(response.data || []);
+      this.planTree = await this.mapMenuWorkpacks(response.data || []);
     } catch (error) {
       this.showError(error, 'Não foi possível carregar a estrutura do plano.');
     } finally {
@@ -336,6 +335,25 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
     });
   }
 
+  handleParentWorkpackSelection(selection: TreeNode[] | null): void {
+    const selectedWorkpack = selection?.length ? selection[selection.length - 1] : null;
+    const idParent = Number((selectedWorkpack as any)?.idWorkpack);
+    if (!selectedWorkpack || !Number.isFinite(idParent) || idParent <= 0) {
+      this.selectedParentWorkpacks = [];
+      this.projectCreationForm.patchValue({ idParent: null });
+      return;
+    }
+    selectedWorkpack.expanded = true;
+    this.selectedParentWorkpacks = this.getWorkpackPath(selectedWorkpack);
+    this.projectCreationForm.patchValue({ idParent });
+  }
+
+  expandPlanNode(event: { node?: TreeNode }): void {
+    if (event.node) {
+      event.node.expanded = true;
+    }
+  }
+
   async createProjectFromPreproject(): Promise<void> {
     if (!this.idPreproject || !this.isProjectCreationSelected
       || this.projectCreationForm.invalid || this.isProjectCreationLoading) {
@@ -345,14 +363,26 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
       return;
     }
 
+    const selectedDestination = this.selectedParentWorkpacks[
+      this.selectedParentWorkpacks.length - 1
+    ] as (TreeNode & { hasProjectModel?: boolean }) | undefined;
+    if (!selectedDestination?.hasProjectModel) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: this.translateService.instant('warn'),
+        detail: this.translateService.instant('preprojectDestinationWithoutProjectModel')
+      });
+      this.saveButton?.showButton();
+      this.cancelButton?.showButton();
+      return;
+    }
+
     const formValue = this.projectCreationForm.getRawValue();
-    const observations = String(formValue.observations || '').trim();
     const request: ICreateProjectFromPreprojectRequest = {
       idPlan: Number(formValue.idPlan),
       idParent: Number(formValue.idParent),
-      ...(observations ? { observations } : {})
+      observations: String(formValue.observations || '').trim()
     };
-
     this.isProjectCreationLoading = true;
     try {
       const response = await this.preprojectService.createProject(this.idPreproject, request);
@@ -360,11 +390,8 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
         throw new Error(response.message || 'Project not created');
       }
       this.showSuccess();
-      await this.router.navigate(['/workpack'], {
-        queryParams: {
-          id: response.data.id,
-          idPlan: request.idPlan
-        }
+      await this.router.navigate(['/preproject'], {
+        queryParams: this.idOffice ? { idOffice: this.idOffice } : undefined
       });
     } catch (error) {
       this.showError(error, 'Não foi possível criar o projeto a partir do anteprojeto.');
@@ -395,44 +422,6 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
       name: ['', Validators.required]
     }));
     this.refreshDeliveryCardItems();
-  }
-
-  requestListPropertyItem(property: IWorkpackModelProperty): void {
-    if (this.isReadOnly) {
-      return;
-    }
-    this.pendingListProperty = property;
-    this.newListItemLabel = '';
-    this.displayListItemDialog = true;
-  }
-
-  confirmListPropertyItem(): void {
-    if (this.isReadOnly) {
-      return;
-    }
-    const label = this.newListItemLabel.trim();
-    if (!label || !this.pendingListProperty) {
-      return;
-    }
-
-    const item: CriteriaListDisplayItem = {
-      id: this.nextTemporaryListItemId--,
-      name: label,
-      fullName: label,
-      foreignKey: `criteria-${this.pendingListProperty.id}-${Date.now()}`
-    };
-    this.pendingListProperty.selectedListItems = [
-      ...(this.pendingListProperty.selectedListItems || []),
-      item
-    ];
-    this.closeListItemDialog();
-    this.criteriaChanged();
-  }
-
-  closeListItemDialog(): void {
-    this.displayListItemDialog = false;
-    this.newListItemLabel = '';
-    this.pendingListProperty = null;
   }
 
   criteriaChanged(): void {
@@ -603,20 +592,29 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
     }
   }
 
-  private mapMenuWorkpacks(workpacks: IMenuWorkpack[], parent?: TreeNode): TreeNode[] {
-    return workpacks.map(workpack => {
+  private async mapMenuWorkpacks(workpacks: IMenuWorkpack[], parent?: TreeNode): Promise<TreeNode[]> {
+    return Promise.all(workpacks.map(async workpack => {
+      const idWorkpackModel = Number(workpack.idWorkpackModel);
+      const modelResponse = Number.isFinite(idWorkpackModel) && idWorkpackModel > 0
+        ? await this.workpackModelService.GetById(idWorkpackModel)
+        : null;
+      const hasProjectModel = !!modelResponse?.success && !!modelResponse.data?.children?.some(
+        model => model.type === TypeWorkpackModelEnum.ProjectModel
+      );
       const node = {
         label: workpack.name,
         icon: workpack.fontIcon,
         idWorkpack: Number(workpack.id),
+        idWorkpackModel: Number(workpack.idWorkpackModel),
+        hasProjectModel,
         parent,
         selectable: true,
         expanded: false,
         children: []
       } as TreeNode & { idWorkpack: number };
-      node.children = this.mapMenuWorkpacks(workpack.children || [], node);
+      node.children = await this.mapMenuWorkpacks(workpack.children || [], node);
       return node;
-    });
+    }));
   }
 
   private getWorkpackPath(node: TreeNode): TreeNode[] {

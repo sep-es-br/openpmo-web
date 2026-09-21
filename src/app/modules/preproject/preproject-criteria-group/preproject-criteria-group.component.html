@@ -13,7 +13,7 @@
         [itemIcon]="getListIcon(item.config)"
         [disabled]="readOnly || !enabled"
         (itemsChange)="updateListItems(item.config, $event)"
-        (addRequested)="listAddRequested.emit(item.config)">
+        (addRequested)="openListSelectionDialog(item.config)">
       </app-property-list-selection>
 
       <ng-template #standardProperty>
@@ -26,3 +26,12 @@
     </div>
   </div>
 </app-card>
+
+<app-list-selection-dialog
+  [(visible)]="displayListSelectionDialog"
+  [title]="activeListProperty?.label || ''"
+  [items]="listDialogItems"
+  [selectedItems]="selectedListDialogItems"
+  (confirmed)="confirmListSelection($event)"
+  (cancelled)="closeListSelectionDialog()">
+</app-list-selection-dialog>

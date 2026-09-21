@@ -1079,6 +1079,7 @@
   "dateFormatMonthYear": "yy/mm",
   "reference": "Reference",
   "statusCompleted": "Status Completed",
+  "preprojectDestinationWithoutProjectModel": "The selected location does not have an available project model.",
   "projectManagement": "Project Management",
   "agreement": "Agreement",
   "environmentalLicensing": "Environmental Licensing",

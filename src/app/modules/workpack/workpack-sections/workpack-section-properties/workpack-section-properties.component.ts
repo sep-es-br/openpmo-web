@@ -133,15 +133,7 @@ export class WorkpackSectionPropertiesComponent implements OnInit, OnDestroy {
       prop.name === 'Status' || prop.name === 'Situação';
       const isProject = prop.typeWorkPack === TypeWorkpackEnumWBS.Project;
     
-      const currentValue =
-        (prop.value as string) ||
-        (prop.defaultValue as string) ||
-        '';
-    
-      const isFinalStatus =
-        currentValue === 'A cancelar' || currentValue === 'Concluído';
-    
-      if (isStatusOrSituation && isProject && isFinalStatus) {
+      if (isStatusOrSituation && isProject) {
         prop.disabled = true;
       }
     });

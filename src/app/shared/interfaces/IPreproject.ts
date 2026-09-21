@@ -81,7 +81,7 @@ export type IUpdatePreprojectRequest = Omit<ICreatePreprojectRequest, 'idOffice'
 export interface ICreateProjectFromPreprojectRequest {
   idPlan: number;
   idParent: number;
-  observations?: string;
+  observations: string;
 }
 
 export interface ICreatedProjectFromPreproject {

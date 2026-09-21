@@ -70,7 +70,7 @@
                 class="app-dataview preproject-delivery-list"
                 *ngIf="displayModeAll !== 'list'">
                 <ng-template let-cardItem pTemplate="gridItem">
-                  <div class="p-col-12 p-sm-12 p-md-4 p-lg-3 delivery-card-container">
+                  <div class="delivery-card-container">
                     <app-editable-card-item
                       *ngIf="cardItem.typeCardItem === 'listItem'"
                       [form]="getDeliveryForm(cardItem.deliveryIndex)"
@@ -97,7 +97,7 @@
                 class="app-dataview app-dataview-list preproject-delivery-list"
                 *ngIf="displayModeAll === 'list'">
                 <ng-template let-cardItem pTemplate="listItem">
-                  <div class="p-col-12">
+                  <div class="delivery-card-container delivery-card-list-container">
                     <app-editable-card-item
                       *ngIf="cardItem.typeCardItem === 'listItem'"
                       [form]="getDeliveryForm(cardItem.deliveryIndex)"
@@ -127,8 +127,7 @@
           [guide]="selectedCriteriaGuide"
           [displayMode]="displayModeAll"
           [readOnly]="isReadOnly"
-          (changed)="criteriaChanged()"
-          (listAddRequested)="requestListPropertyItem($event)">
+          (changed)="criteriaChanged()">
         </app-preproject-criteria-guide>
       </div>
 
@@ -200,20 +199,18 @@
                 <ng-container *ngIf="projectCreationForm.get('idPlan')?.value; else selectPlanFirst">
                   <div
                     class="app-tree-selection evaluation-plan-tree"
+                    [class.loading]="isPlanTreeLoading"
                     [class.p-disabled]="!isProjectCreationSelected"
                     [class.ng-invalid]="projectCreationForm.get('idParent')?.invalid && projectCreationForm.get('idParent')?.touched">
-                    <div class="preproject-tree-loading" *ngIf="isPlanTreeLoading">
-                      <app-card-loading [isCardLoading]="isPlanTreeLoading"></app-card-loading>
-                    </div>
                     <p-tree
-                      *ngIf="!isPlanTreeLoading"
                       [value]="planTree"
+                      [loading]="isPlanTreeLoading"
                       selectionMode="checkbox"
-                      [(selection)]="selectedParentWorkpacks"
+                      [selection]="selectedParentWorkpacks"
                       [propagateSelectionUp]="false"
                       [propagateSelectionDown]="false"
-                      (onNodeSelect)="selectParentWorkpack($event)"
-                      (onNodeUnselect)="unselectParentWorkpack($event)">
+                      (selectionChange)="handleParentWorkpackSelection($event)"
+                      (onNodeExpand)="expandPlanNode($event)">
                       <ng-template let-node pTemplate="default">
                         <span [class.node-disabled]="!node.selectable">{{ node.label }}</span>
                       </ng-template>
@@ -256,33 +253,3 @@
     </app-buttons-container>
   </app-card>
 </div>
-
-<p-dialog
-  [(visible)]="displayListItemDialog"
-  [modal]="true"
-  [dismissableMask]="true"
-  [closeOnEscape]="true"
-  [style]="{ width: '480px' }"
-  (onHide)="closeListItemDialog()">
-  <p-header>{{ pendingListProperty?.label || ('addValue' | translate) }}</p-header>
-  <div class="p-fluid">
-    <span class="p-float-label">
-      <input
-        id="preproject-criteria-list-value"
-        class="app-input-text"
-        pInputText
-        type="text"
-        [(ngModel)]="newListItemLabel"
-        (keyup.enter)="confirmListPropertyItem()" />
-      <label for="preproject-criteria-list-value">{{ 'value' | translate }}</label>
-    </span>
-  </div>
-  <p-footer>
-    <button type="button" pButton class="p-button-text" (click)="closeListItemDialog()">
-      {{ 'cancel' | translate }}
-    </button>
-    <button type="button" pButton [disabled]="!newListItemLabel.trim()" (click)="confirmListPropertyItem()">
-      {{ 'addValue' | translate }}
-    </button>
-  </p-footer>
-</p-dialog>
