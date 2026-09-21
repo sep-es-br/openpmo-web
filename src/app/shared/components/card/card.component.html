@@ -41,8 +41,6 @@
         </div>
       </div>      
 
-      <ng-content select="[card-header-actions]"></ng-content>
-
       <div class="header-title-check-completed d-flex col-4 justify-content-end" [class.mr-0]="!properties.initialStateCollapse && !properties.collapseble"
         *ngIf="!properties.initialStateCollapse && properties.showFullScreen && !properties.fullScreen"
         [class.responsive]="responsive">
@@ -107,6 +105,8 @@
         *ngIf="properties.showFilters || properties.showCreateNemElementButton"
         class="dataview-filters-container d-flex me-4"
       >
+        <ng-content select="[card-header-actions]"></ng-content>
+
         <div class="dataview-filters" *ngIf="!properties.initialStateCollapse && properties.showFilters">
           <label>{{'show'|translate}}</label>
           <div class="options-container d-flex flex-row justify-content-between align-items-center">

@@ -9,8 +9,8 @@
     align-items: center;
     display: flex;
     gap: 0.5rem;
-    margin-left: 0.75rem;
-    margin-right: 1.25rem;
+    align-self: center;
+    margin-right: 0.75rem !important;
 
     .preproject-status-filter-label {
       color: #005b7a;
@@ -23,8 +23,47 @@
     }
   }
 
+  // Mantém as ações do anteprojeto na mesma linha do título também no responsivo.
+  ::ng-deep .card-preprojects .dataview-filters-container {
+    align-items: center !important;
+    flex-direction: row !important;
+    flex: 0 0 auto;
+    margin-left: auto;
+    margin-right: 0.75rem !important;
+    width: auto !important;
+
+    .preproject-status-filter {
+      margin-right: 0.75rem !important;
+    }
+
+    > .new-element-button-container {
+      margin-top: 0 !important;
+    }
+  }
+
   .preproject-card-content {
     min-height: 8rem;
+  }
+
+  .preproject-grid-card > app-card-item {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  ::ng-deep .preproject-dataview-grid .new-carditem.new-card-item-mobile {
+    display: block;
+    width: 100%;
+    min-height: 10rem;
+    padding: 0;
+
+    .p-card {
+      width: 100%;
+      max-width: none;
+      height: 10rem;
+      min-height: 10rem;
+      padding: 0;
+    }
   }
 
 }

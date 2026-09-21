@@ -7,7 +7,11 @@
       class="mt-0"
       [properties]="cardProperties"
       (createNewElement)="handleCreatePreproject()">
-      <div card-header-actions class="preproject-status-filter" (click)="$event.stopPropagation()">
+      <div
+        *ngIf="!cardProperties.initialStateCollapse"
+        card-header-actions
+        class="preproject-status-filter"
+        (click)="$event.stopPropagation()">
         <span class="preproject-status-filter-label">{{ 'status' | translate }}</span>
         <p-dropdown
           class="app-single-selection"
@@ -22,7 +26,7 @@
 
       <p-dataView
         *ngIf="displayMode === 'grid' || (displayMode === 'list' && responsive)"
-        class="app-dataview"
+        class="app-dataview preproject-dataview-grid"
         layout="grid"
         [value]="preprojects"
         [paginator]="true"
@@ -31,23 +35,18 @@
         [showPageLinks]="false"
         [emptyMessage]="'notFoundPreprojects' | translate">
         <ng-template let-cardItem pTemplate="gridItem">
-          <div class="p-col-12 p-md-3 p-sm-12 card-item-container">
+          <div class="p-col-12 p-md-3 p-sm-12 card-item-container preproject-grid-card">
             <app-card-item
-              *ngIf="cardItem.typeCardItem !== 'newCardItem'"
-              [properties]="cardItem">
-            </app-card-item>
-            <app-workpack-card-item
-              *ngIf="cardItem.typeCardItem === 'newCardItem'"
               [properties]="cardItem"
               displayModeCard="grid">
-            </app-workpack-card-item>
+            </app-card-item>
           </div>
         </ng-template>
       </p-dataView>
 
       <p-dataView
         *ngIf="displayMode === 'list' && !responsive"
-        class="app-dataview app-dataview-list"
+        class="app-dataview app-dataview-list preproject-dataview-list"
         layout="list"
         [value]="preprojects"
         [paginator]="true"
@@ -58,15 +57,9 @@
         <ng-template let-cardItem pTemplate="listItem">
           <div class="p-col-12">
             <app-card-item
-              *ngIf="cardItem.typeCardItem !== 'newCardItem'"
               [properties]="cardItem"
               [displayModeCard]="displayMode">
             </app-card-item>
-            <app-workpack-card-item
-              *ngIf="cardItem.typeCardItem === 'newCardItem'"
-              [properties]="cardItem"
-              displayModeCard="list">
-            </app-workpack-card-item>
           </div>
         </ng-template>
       </p-dataView>
