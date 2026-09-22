@@ -8,6 +8,7 @@ import {
 } from '@angular/core';
 import { CookieService } from 'ngx-cookie';
 import { Subject } from 'rxjs';
+import { Router } from '@angular/router';
 import { takeUntil } from 'rxjs/operators';
 import {
   IMenu,
@@ -26,6 +27,7 @@ import { PersonService } from 'src/app/shared/services/person.service';
 import { PlanService } from 'src/app/shared/services/plan.service';
 import { ReportService } from 'src/app/shared/services/report.service';
 import { PreprojectModelService } from 'src/app/shared/services/preproject-model.service';
+import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
 
 @Component({
   selector: 'app-nav-menu',
@@ -102,7 +104,9 @@ export class NavMenuComponent implements OnInit, OnDestroy {
     private cookieSrv: CookieService,
     private reportSrv: ReportService,
     private personSrv: PersonService,
-    private preprojectModelSrv: PreprojectModelService
+    private preprojectModelSrv: PreprojectModelService,
+    private breadcrumbSrv: BreadcrumbService,
+    private router: Router
   ) {
     this.menuSrv.isOfficeConfigMenu
       .pipe(takeUntil(this.$destroy))
@@ -181,6 +185,13 @@ export class NavMenuComponent implements OnInit, OnDestroy {
   }
 
   selectMenuActive(url: string) {
+    const navigationState = this.router.getCurrentNavigation()?.extras.state || history.state;
+    const isPreprojectContext = url.startsWith('preproject')
+      || (url.startsWith('workpack') && (
+        navigationState?.preprojectContext === true
+        || this.breadcrumbSrv.get?.some(item => item.key === 'preproject')
+      ));
+
     if (!url.startsWith('ccbmember-baselines-view')) {
       const ccbButton = this.menus.find((btn) => btn.label === MenuButtons.CCB);
       if (ccbButton) ccbButton.isOpen = false;
@@ -245,7 +256,7 @@ export class NavMenuComponent implements OnInit, OnDestroy {
       this.showUserMenu = false;
     }
 
-    if (!url.startsWith(MenuButtons.PREPROJECT)) {
+    if (!isPreprojectContext) {
       const preprojectButton = this.menus.find(
         (btn) => btn.label === MenuButtons.PREPROJECT
       );

@@ -51,10 +51,13 @@ export class CardItemComponent implements OnInit {
 
   navigateToPage(url: string, params?: { name: string; value: string | number }[]) {
     const queryParams = params && params.reduce((obj, item) => ((obj[item.name] = item.value), obj), {});
+    const preprojectContext = url === '/workpack'
+      && this.properties.breadcrumbWorkpackModel?.some(item => item.key === 'preproject');
     this.router.navigate(
       [url],
       {
-        queryParams
+        queryParams,
+        state: preprojectContext ? { preprojectContext: true } : undefined
       }
     );
   }
