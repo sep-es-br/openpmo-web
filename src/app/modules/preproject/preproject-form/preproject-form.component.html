@@ -76,6 +76,7 @@
                       [form]="getDeliveryForm(cardItem.deliveryIndex)"
                       [fields]="editableDeliveryFields"
                       [menuItems]="cardItem.menuItems || []"
+                      [reserveMenuSpace]="isReadOnly"
                       [itemId]="cardItem.displayItemId"
                       [uniqueId]="cardItem.deliveryIndex"
                       displayMode="grid">
@@ -103,6 +104,7 @@
                       [form]="getDeliveryForm(cardItem.deliveryIndex)"
                       [fields]="editableDeliveryFields"
                       [menuItems]="cardItem.menuItems || []"
+                      [reserveMenuSpace]="isReadOnly"
                       [itemId]="cardItem.displayItemId"
                       [uniqueId]="cardItem.deliveryIndex"
                       displayMode="list">
@@ -158,11 +160,12 @@
               <span>{{ 'score' | translate }}: {{ item.note | number:'1.2-2' }}</span>
             </div>
           </section>
+        </ng-container>
 
-          <form
-            *ngIf="!isReadOnly"
-            [formGroup]="projectCreationForm"
-            class="preproject-selection-section">
+        <form
+          *ngIf="!isReadOnly"
+          [formGroup]="projectCreationForm"
+          class="preproject-selection-section">
             <div class="preproject-selection-toggle">
               <p-checkbox
                 class="app-checkbox"
@@ -199,12 +202,15 @@
                 <ng-container *ngIf="projectCreationForm.get('idPlan')?.value; else selectPlanFirst">
                   <div
                     class="app-tree-selection evaluation-plan-tree"
-                    [class.loading]="isPlanTreeLoading"
                     [class.p-disabled]="!isProjectCreationSelected"
                     [class.ng-invalid]="projectCreationForm.get('idParent')?.invalid && projectCreationForm.get('idParent')?.touched">
+                    <div *ngIf="isPlanTreeLoading" class="preproject-tree-loading">
+                      <app-card-loading [isCardLoading]="true"></app-card-loading>
+                    </div>
                     <p-tree
+                      *ngIf="!isPlanTreeLoading"
                       [value]="planTree"
-                      [loading]="isPlanTreeLoading"
+                      [emptyMessage]="'noRecordsFound' | translate"
                       selectionMode="checkbox"
                       [selection]="selectedParentWorkpacks"
                       [propagateSelectionUp]="false"
@@ -236,8 +242,7 @@
               </div>
 
             </div>
-          </form>
-        </ng-container>
+        </form>
       </div>
     </app-tabview-scrolled>
 

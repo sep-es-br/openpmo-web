@@ -169,6 +169,15 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
     this.workpackShowTabviewService.next(true);
     this.refreshDeliveryCardItems();
 
+    this.form.get('name').valueChanges
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(name => {
+        const fullNameControl = this.form.get('fullName');
+        if (!this.idPreproject && fullNameControl.pristine) {
+          fullNameControl.setValue(name || '');
+        }
+      });
+
     this.form.valueChanges
       .pipe(takeUntil(this.destroy$))
       .subscribe(() => {

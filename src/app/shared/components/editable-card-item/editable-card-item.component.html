@@ -1,8 +1,11 @@
 <p-card *ngIf="!newItem" class="app-editable-card-item listItem"
-  [class.list-mode]="isListMode" [class.mobile]="responsive" [class.has-menu]="menuItems?.length">
-  <p-header *ngIf="menuItems?.length" class="card-item-header">
-    <p-menu #menu [popup]="true" [model]="menuItems" [appendTo]="'body'"></p-menu>
-    <button type="button" pButton icon="pi pi-ellipsis-v" (click)="menu.toggle($event)"></button>
+  [class.list-mode]="isListMode" [class.mobile]="responsive"
+  [class.has-menu]="menuItems?.length || reserveMenuSpace">
+  <p-header *ngIf="menuItems?.length || reserveMenuSpace" class="card-item-header">
+    <ng-container *ngIf="menuItems?.length">
+      <p-menu #menu [popup]="true" [model]="menuItems" [appendTo]="'body'"></p-menu>
+      <button type="button" pButton icon="pi pi-ellipsis-v" (click)="menu.toggle($event)"></button>
+    </ng-container>
   </p-header>
   <div class="editable-card-layout">
     <div class="card-item-content" [class.card-item-content-list]="isListMode"

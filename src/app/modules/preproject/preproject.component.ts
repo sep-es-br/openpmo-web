@@ -219,11 +219,11 @@ export class PreprojectComponent implements OnInit, OnDestroy, AfterViewInit {
         icon: 'fas fa-eye',
         command: () => this.handleViewPreproject(preproject)
       }] : []),
-      {
+      ...(status !== 'Estruturação' ? [{
         label: this.translateService.instant('edit'),
         icon: 'fas fa-pencil-alt',
         command: () => this.handleEditPreproject(preproject)
-      },
+      }] : []),
       {
         label: this.translateService.instant('delete'),
         icon: 'fas fa-trash-alt',

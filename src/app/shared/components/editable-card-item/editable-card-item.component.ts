@@ -29,6 +29,7 @@ export class EditableCardItemComponent {
   @Input() responsive = false;
   @Input() newItem = false;
   @Input() newItemIcon = 'plus';
+  @Input() reserveMenuSpace = false;
 
   @Output() newItemClick = new EventEmitter<void>();
 

@@ -67,3 +67,43 @@
   }
 
 }
+
+@media screen and (max-width: 480px) {
+  .app-preproject {
+    ::ng-deep .card-preprojects .app-card p-header.card-header > .d-flex {
+      align-items: center;
+      flex-wrap: wrap;
+
+      > .header-title {
+        flex: 0 0 100%;
+        max-width: 100%;
+        padding-right: 2rem;
+        width: 100%;
+      }
+
+      > .dataview-filters-container {
+        flex: 0 0 100%;
+        justify-content: flex-end;
+        margin: 0 !important;
+        padding-top: 0.5rem;
+        width: 100% !important;
+
+        .preproject-status-filter {
+          flex: 1 1 auto;
+          justify-content: flex-end;
+          margin-right: 0.5rem !important;
+          min-width: 0;
+
+          ::ng-deep .p-dropdown {
+            min-width: 0;
+            width: 8.5rem;
+          }
+        }
+
+        > .new-element-button-container {
+          flex: 0 0 53px;
+        }
+      }
+    }
+  }
+}

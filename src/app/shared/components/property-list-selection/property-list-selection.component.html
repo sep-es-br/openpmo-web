@@ -4,6 +4,7 @@
   <p-dataView
     *ngIf="displayMode !== 'list'"
     [value]="cardItems"
+    [emptyMessage]="'noRecordsFound' | translate"
     layout="grid"
     class="app-dataview property-list-dataview"
   >
@@ -17,6 +18,7 @@
   <p-dataView
     *ngIf="displayMode === 'list'"
     [value]="cardItems"
+    [emptyMessage]="'noRecordsFound' | translate"
     layout="list"
     class="app-dataview app-dataview-list property-list-dataview list-mode"
   >
