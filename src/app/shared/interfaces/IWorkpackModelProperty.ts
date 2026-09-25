@@ -1,4 +1,5 @@
 import { SelectItem, MenuItem, TreeNode } from 'primeng/api';
+import { ITransversalView } from './ITransversal';
 
 export interface IWorkpackModelProperty {
   id?: number;
@@ -37,4 +38,7 @@ export interface IWorkpackModelProperty {
   showIconButtonSelectLocality?: boolean; //only screen
   helpText?: string;
   disableMultipleSelection?: boolean;
+  key?: string;
+  values?: number[];
+  transversalViewOptions?: ITransversalView[];
 }

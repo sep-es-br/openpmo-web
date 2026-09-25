@@ -10,6 +10,7 @@ export const TypePropertyModelEnum = {
   CurrencyModel: 'Currency',
   LocalitySelectionModel: 'LocalitySelection',
   OrganizationSelectionModel: 'OrganizationSelection',
-  GroupModel: 'Group'
+  GroupModel: 'Group',
+  TransversalViewSelectionModel: 'TransversalViewSelection'
 };
 

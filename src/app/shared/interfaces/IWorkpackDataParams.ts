@@ -14,6 +14,8 @@ export interface  IWorkpackParams {
   idWorkpackModel: number;
   idWorkpackParent: number;
   idWorkpackModelLinked?: number;
+  idTransversalView?: number;
+  idTransversalProgram?: number;
   idWorkpackLinkedParent?: number;
   idOfficeOwnerWorkpackLinked?: number;
   idOffice?: number;

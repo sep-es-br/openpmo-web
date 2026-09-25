@@ -1,10 +1,12 @@
 import { TypeWorkpackModelEnum } from '../enums/TypeWorkpackModelEnum';
 import { IWorkpackModelProperty } from './IWorkpackModelProperty';
+import { WorkpackModelClassificationEnum } from '../enums/WorkpackModelClassificationEnum';
 
 export interface IWorkpackModel {
   id?: number;
   idPlanModel?: number;
   type: TypeWorkpackModelEnum;
+  classification?: WorkpackModelClassificationEnum;
   modelName: string;
   modelNameInPlural?: string;
   position?: number;
