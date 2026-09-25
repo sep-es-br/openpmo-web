@@ -1,9 +1,25 @@
 import { ITheme } from '../interfaces/ITheme';
 
-export const DEFAULT_THEME_NAME = 'es2.0';
+export const DEFAULT_THEME_NAME = 'es';
+
+const ES_THEME_2: ITheme = {
+  name: 'es2.0',
+  documentTitle: 'Open PMO',
+  favicon: 'assets/svg/favicon.svg',
+  loginLogo: {
+    src: 'assets/images/logo-openpmo-horizontal.png',
+    alt: 'Open PMO'
+  },
+  footerBrandLogos: [
+    {
+      src: 'assets/images/brasao_rodape.png',
+      alt: 'Governo do Estado do Espírito Santo'
+    }
+  ]
+};
 
 const ES_THEME: ITheme = {
-  name: 'es2.0',
+  name: 'es',
   documentTitle: 'Open PMO',
   favicon: 'assets/svg/favicon.svg',
   loginLogo: {
@@ -41,6 +57,7 @@ const PB_THEME: ITheme = {
 };
 
 const THEMES: { [name: string]: ITheme } = {
+  [ES_THEME_2.name]: ES_THEME_2,
   [ES_THEME.name]: ES_THEME,
   [PB_THEME.name]: PB_THEME
 };
