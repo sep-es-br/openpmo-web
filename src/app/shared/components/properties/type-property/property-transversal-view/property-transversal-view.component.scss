@@ -1,0 +1,45 @@
+@use "src/variables" as v;
+
+.transversal-view-property {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .75rem;
+  width: 100%;
+}
+
+.transversal-view-card {
+  align-items: center;
+  background: v.$bgWhite;
+  border: 1px solid v.$borderLightGrey;
+  border-radius: 4px;
+  color: v.$fontInput;
+  cursor: pointer;
+  display: flex;
+  font-family: v.$fontFamilyRegular;
+  font-size: .85rem;
+  min-height: 3rem;
+  padding: .65rem .8rem;
+  text-align: left;
+  transition: border-color .15s ease, background-color .15s ease;
+}
+
+.transversal-view-card:hover:not(:disabled),
+.transversal-view-card.selected {
+  background: rgba(68, 179, 155, .1);
+  border-color: v.$fontAccent;
+}
+
+.transversal-view-card:disabled {
+  cursor: default;
+  opacity: .7;
+}
+
+.transversal-view-card-check {
+  color: v.$fontAccent;
+  margin-right: .55rem;
+}
+
+.transversal-view-empty {
+  color: v.$fontLabel;
+  font-style: italic;
+}

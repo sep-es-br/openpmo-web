@@ -1,8 +1,10 @@
 import { MenuItem } from 'primeng/api';
+import { WorkpackModelClassificationEnum } from '../enums/WorkpackModelClassificationEnum';
 
 export enum MenuButtons {
   OFFICE = 'office',
   PORTFOLIO = 'portfolio',
+  TRANSVERSAL_VIEWS = 'transversal-views',
   FAVORITES = 'favorites',
   CCB = 'ccb',
   REPORTS = 'reports',
@@ -61,6 +63,7 @@ export interface IMenuWorkpackModel {
   nameInPlural?: string;
   fullName?: string;
   type?: string;
+  classification?: WorkpackModelClassificationEnum;
   fontIcon: string;
   children: IMenuWorkpackModel[];
 }

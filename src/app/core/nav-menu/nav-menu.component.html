@@ -33,6 +33,11 @@
       *ngIf="!!currentIDPlan && isPlanMenu">
       <i class="app-icon briefcase" [ngStyle]="{ fontSize: '1.3rem' }"></i>
     </div>
+    <div class="item" (click)="toggleMenu(MenuButtons.TRANSVERSAL_VIEWS)"
+      [pTooltip]="'transversalViews' | translate" [class.opened]="isMenuOpen(MenuButtons.TRANSVERSAL_VIEWS)"
+      *ngIf="!!currentIDPlan && isPlanMenu">
+      <i class="fas fa-project-diagram" [ngStyle]="{ fontSize: '1.3rem' }"></i>
+    </div>
     <div class="item" (click)="toggleMenu(MenuButtons.FAVORITES)" [class.opened]="isMenuOpen(MenuButtons.FAVORITES)"
       *ngIf="hasFavoriteItems && !!currentIDPlan && isPlanMenu"
       [pTooltip]="'myFavorites' | translate">

@@ -76,7 +76,7 @@
 
         <div tabviewBody>
           <ng-container *ngFor="let workpackModel of cardsPlanWorkPackModels; let i = index">
-            <div class="card-workpack-model" *ngIf="selectedTab?.key === workpackModel.propertiesCard.cardTitle">
+            <div class="card-workpack-model" *ngIf="selectedTab?.key === 'workpack-model-' + workpackModel.idWorkpackModel">
               <app-card
                 class="panel-tab-view"
                 [properties]="workpackModel.propertiesCard"

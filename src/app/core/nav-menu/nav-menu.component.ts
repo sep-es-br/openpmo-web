@@ -41,6 +41,7 @@ export class NavMenuComponent implements OnInit, OnDestroy {
   menus: IMenu[] = [
     { label: MenuButtons.OFFICE, isOpen: false },
     { label: MenuButtons.PORTFOLIO, isOpen: false },
+    { label: MenuButtons.TRANSVERSAL_VIEWS, isOpen: false },
     { label: MenuButtons.PLAN_MODEL, isOpen: false },
     { label: MenuButtons.FAVORITES, isOpen: false },
     { label: MenuButtons.CCB, isOpen: false },

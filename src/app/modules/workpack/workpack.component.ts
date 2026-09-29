@@ -31,6 +31,7 @@ import { IOrganization } from 'src/app/shared/interfaces/IOrganization';
 import { IMeasureUnit } from 'src/app/shared/interfaces/IMeasureUnit';
 import { PlanService } from 'src/app/shared/services/plan.service';
 import { TypeWorkpackEnum } from 'src/app/shared/enums/TypeWorkpackEnum';
+import { WorkpackModelClassificationEnum } from 'src/app/shared/enums/WorkpackModelClassificationEnum';
 import { MeasureUnitService } from 'src/app/shared/services/measure-unit.service';
 import { ScheduleService } from 'src/app/shared/services/schedule.service';
 import { OfficeService } from 'src/app/shared/services/office.service';
@@ -519,7 +520,6 @@ export class WorkpackComponent implements OnDestroy, OnInit {
         return;
       }
     }
-    this.propertySrv.loadProperties();
     if(! this.dashboardSrv.referenceMonth) this.dashboardSrv.calculateReferenceMonth();
     await this.propertySrv.loadProperties();
     const linked = this.idWorkpackModelLinked ? true : false;
@@ -725,7 +725,7 @@ export class WorkpackComponent implements OnDestroy, OnInit {
     if (this.workpackModel.journalManagementSessionActive) {
 
     }
-    if (this.workpackModel.childWorkpackModelSessionActive && this.workpackModel?.children) {
+    if (this.workpackModel.childWorkpackModelSessionActive && this.getStructuralWorkpackModelChildren().length) {
       this.sectionWorkpackModelChildren = true;
       if (!this.idWorkpackModelLinked) {
         await this.loadSectionsWorkpackChildren();
@@ -736,7 +736,8 @@ export class WorkpackComponent implements OnDestroy, OnInit {
   }
 
   async loadSectionsWorkpackChildren() {
-    this.cardsWorkPackModelChildren = this.workpackModel?.children ? this.workpackModel?.children?.map(workpackModel => {
+    const childWorkpackModels = this.getStructuralWorkpackModelChildren();
+    this.cardsWorkPackModelChildren = childWorkpackModels.map(workpackModel => {
       const propertiesCard: ICard = {
         toggleable: false,
         initialStateToggle: false,
@@ -756,9 +757,9 @@ export class WorkpackComponent implements OnDestroy, OnInit {
         cardSection: propertiesCard,
         workpackShowCancelleds: this.workpack && this.workpack.canceled ? true : false
       };
-    }) : [];
-    if (this.workpackModel?.children && this.cardsWorkPackModelChildren && this.cardsWorkPackModelChildren.length > 0) {
-      this.workpackModel?.children?.forEach(async(workpackModel, index) => {
+    });
+    if (childWorkpackModels.length && this.cardsWorkPackModelChildren.length > 0) {
+      childWorkpackModels.forEach(async(workpackModel, index) => {
         if (this.cardsWorkPackModelChildren[index].cardSection) {
           this.cardsWorkPackModelChildren[index].cardSection.isLoading = true;
           const resultFilters = await this.filterSrv.getAllFilters(`workpackModels/${workpackModel.id}/workpacks`);
@@ -1760,6 +1761,12 @@ export class WorkpackComponent implements OnDestroy, OnInit {
     this.selectedTab = event.tabs;
   }
 
+  private getStructuralWorkpackModelChildren() {
+    return (this.workpackModel?.children || []).filter(workpackModel =>
+      workpackModel.classification !== WorkpackModelClassificationEnum.TRANSVERSAL
+    );
+  }
+
   loadWorkpackTabs(loadId?: number) {
     if (loadId !== undefined && this.isStaleWorkpackLoad(loadId)) {
       return;
@@ -1792,9 +1799,10 @@ export class WorkpackComponent implements OnDestroy, OnInit {
           key: 'schedule'
         });
       }
-      if (this.idWorkpack && this.workpackModel && this.workpackModel.childWorkpackModelSessionActive && this.workpackModel?.children) {
+      const structuralChildren = this.getStructuralWorkpackModelChildren();
+      if (this.idWorkpack && this.workpackModel && this.workpackModel.childWorkpackModelSessionActive && structuralChildren.length) {
         this.tabs.push(
-          ...this.workpackModel?.children?.map(workpackModel => ({
+          ...structuralChildren.map(workpackModel => ({
             menu: workpackModel.modelNameInPlural,
             key: workpackModel.modelNameInPlural
           }))

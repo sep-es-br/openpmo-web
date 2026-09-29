@@ -23,6 +23,7 @@ export interface ICardItem {
   urlCard?: string;
   paramsUrlCard?: {name: string; value: string | number}[];
   iconMenuItems?: MenuItem[];
+  hideReuseModel?: boolean;
   editPermission?: boolean;
   reuseModelMenuItems?: TreeNode[];
   avatar?: IFile;

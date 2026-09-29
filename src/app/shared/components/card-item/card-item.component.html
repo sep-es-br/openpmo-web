@@ -526,7 +526,7 @@
     <div class="carditem-content menu-model-container" *ngIf="showMenuNewModel">
       <ul class="menuNewModelContainer">
         <li (click)="menuModel.toggle($event)">{{'new'|translate}}</li>
-        <li (click)="opReuseModel.toggle($event)">{{'reuse'|translate}}</li>
+        <li *ngIf="!properties.hideReuseModel" (click)="opReuseModel.toggle($event)">{{'reuse'|translate}}</li>
       </ul>
       <p-overlayPanel #opReuseModel [dismissable]="true" [showCloseIcon]="true">
         <ng-template pTemplate>

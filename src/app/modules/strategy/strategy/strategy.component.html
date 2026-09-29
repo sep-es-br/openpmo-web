@@ -46,20 +46,42 @@
         <div class="loading-container" *ngIf="isLoading">
           <app-card-loading [isCardLoading]="isLoading"></app-card-loading>
         </div>
-        <p-dataView [value]="cardItemsModels" class="app-dataview" layout="grid" styleClass="dataview-card-items"
+        <h3 *ngIf="!isLoading" class="workpack-model-section-title">{{ 'structuralModels' | translate }}</h3>
+        <p-dataView [value]="cardItemsStructuralModels" class="app-dataview" layout="grid" styleClass="dataview-card-items"
           *ngIf="(displayModeAll === 'grid' || (displayModeAll === 'list' && !!responsive)) && !isLoading"
           [paginator]="true" [rows]="pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false"
-          [totalRecords]="totalRecords" [emptyMessage]="'loadingEllipsis' | translate">
+          [totalRecords]="cardItemsStructuralModels.length" [emptyMessage]="'loadingEllipsis' | translate">
           <ng-template let-cardItem pTemplate="gridItem">
             <div class="p-col-12 p-md-3 p-sm-12 card-item-container">
               <app-card-item [properties]="cardItem"></app-card-item>
             </div>
           </ng-template>
         </p-dataView>
-        <p-dataView [value]="cardItemsModels" class="app-dataview app-dataview-list" layout="list"
+        <p-dataView [value]="cardItemsStructuralModels" class="app-dataview app-dataview-list" layout="list"
           styleClass="dataview-card-items" *ngIf="(displayModeAll === 'list' && !responsive) && !isLoading"
           [paginator]="true" [rows]="pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false"
-          [totalRecords]="totalRecords" [emptyMessage]="'loadingEllipsis' | translate">
+          [totalRecords]="cardItemsStructuralModels.length" [emptyMessage]="'loadingEllipsis' | translate">
+          <ng-template let-cardItem pTemplate="listItem">
+            <div class="p-col-12">
+              <app-card-item [properties]="cardItem" [displayModeCard]="displayModeAll"></app-card-item>
+            </div>
+          </ng-template>
+        </p-dataView>
+        <h3 *ngIf="!isLoading" class="workpack-model-section-title">{{ 'transversalViews' | translate }}</h3>
+        <p-dataView [value]="cardItemsTransversalViews" class="app-dataview" layout="grid" styleClass="dataview-card-items"
+          *ngIf="(displayModeAll === 'grid' || (displayModeAll === 'list' && !!responsive)) && !isLoading"
+          [paginator]="true" [rows]="pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false"
+          [totalRecords]="cardItemsTransversalViews.length" [emptyMessage]="'loadingEllipsis' | translate">
+          <ng-template let-cardItem pTemplate="gridItem">
+            <div class="p-col-12 p-md-3 p-sm-12 card-item-container">
+              <app-card-item [properties]="cardItem"></app-card-item>
+            </div>
+          </ng-template>
+        </p-dataView>
+        <p-dataView [value]="cardItemsTransversalViews" class="app-dataview app-dataview-list" layout="list"
+          styleClass="dataview-card-items" *ngIf="(displayModeAll === 'list' && !responsive) && !isLoading"
+          [paginator]="true" [rows]="pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false"
+          [totalRecords]="cardItemsTransversalViews.length" [emptyMessage]="'loadingEllipsis' | translate">
           <ng-template let-cardItem pTemplate="listItem">
             <div class="p-col-12">
               <app-card-item [properties]="cardItem" [displayModeCard]="displayModeAll"></app-card-item>

@@ -76,6 +76,47 @@
     min-width: 20%;
     flex: 1;
   }
+  .transversal-view-options {
+    min-width: 260px;
+    flex: 1 1 100%;
+
+    .input-label {
+      display: block;
+      margin-bottom: .5rem;
+    }
+
+    .transversal-view-options-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .5rem;
+    }
+
+    .transversal-view-option,
+    .transversal-view-empty {
+      align-items: center;
+      border: 1px solid v.$borderLightGrey;
+      border-radius: 3px;
+      display: inline-flex;
+      font-size: .8rem;
+      min-height: 2rem;
+      padding: .35rem .65rem;
+    }
+
+    .transversal-view-option {
+      background: rgba(68, 179, 155, .08);
+      color: v.$fontInput;
+
+      i {
+        color: v.$fontAccent;
+        margin-right: .4rem;
+      }
+    }
+
+    .transversal-view-empty {
+      color: v.$fontLabel;
+      font-style: italic;
+    }
+  }
   .p-toggleable-content  .p-panel-content {
     background-color: rgba(250, 250, 249, 1);
     border-color: v.$borderLightGrey;;

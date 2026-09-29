@@ -15,6 +15,7 @@ import { PlanModelService } from 'src/app/shared/services/plan-model.service';
 import { WorkpackModelService } from 'src/app/shared/services/workpack-model.service';
 import { IWorkpackModel } from 'src/app/shared/interfaces/IWorkpackModel';
 import { TypeWorkpackModelEnum } from 'src/app/shared/enums/TypeWorkpackModelEnum';
+import { WorkpackModelClassificationEnum } from 'src/app/shared/enums/WorkpackModelClassificationEnum';
 import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
 import { SaveButtonComponent } from 'src/app/shared/components/save-button/save-button.component';
 import { OfficeService } from 'src/app/shared/services/office.service';
@@ -54,6 +55,10 @@ export class StrategyComponent implements OnDestroy {
   cardCostAccountModel: ICard;
   models: IWorkpackModel[];
   cardItemsModels: ICardItem[];
+  structuralModels: IWorkpackModel[] = [];
+  transversalViews: IWorkpackModel[] = [];
+  cardItemsStructuralModels: ICardItem[] = [];
+  cardItemsTransversalViews: ICardItem[] = [];
   cardItemPlanMenu: MenuItem[];
   $destroy = new Subject();
   isUserAdmin: boolean;
@@ -325,16 +330,22 @@ export class StrategyComponent implements OnDestroy {
     this.isLoading = true;
     const result = await this.workpackModelSvr.GetAll({ 'id-plan-model': this.idStrategy });
     if (result.success) {
-      this.totalRecords = result.data.length ? result.data.length + 1 : 1;
       this.models = result.data;
+      this.structuralModels = result.data.filter(model =>
+        model.classification !== WorkpackModelClassificationEnum.TRANSVERSAL
+      );
+      this.transversalViews = result.data.filter(model =>
+        model.classification === WorkpackModelClassificationEnum.TRANSVERSAL
+      );
     }
     this.loadCardItemsModels();
   }
 
-  navigateToWorkpackModel(type: string) {
+  navigateToWorkpackModel(type: string, classification?: WorkpackModelClassificationEnum) {
     this.router.navigate(['/workpack-model'], {
       queryParams: {
         type,
+        classification,
         idStrategy: this.idStrategy,
         idOffice: this.idOffice
       }
@@ -342,7 +353,7 @@ export class StrategyComponent implements OnDestroy {
   }
 
   loadCardItemsModels() {
-    const itemsModels: ICardItem[] = this.editPermission ? [
+    const structuralItems: ICardItem[] = this.editPermission ? [
       {
         typeCardItem: 'newCardItem',
         iconSvg: true,
@@ -372,8 +383,25 @@ export class StrategyComponent implements OnDestroy {
         paramsUrlCard: [{ name: 'idStrategy', value: this.idStrategy }]
       }
     ] : [];
-    if (this.models) {
-      itemsModels.unshift(...this.models.map(workpackModel => (
+    const transversalItems: ICardItem[] = this.editPermission ? [
+      {
+        typeCardItem: 'newCardItem',
+        iconSvg: true,
+        icon: IconsEnum.Plus,
+        urlCard: '/workpack-model',
+        paramsUrlCard: [
+          { name: 'type', value: TypeWorkpackModelEnum.ProgramModel },
+          { name: 'classification', value: WorkpackModelClassificationEnum.TRANSVERSAL },
+          { name: 'idStrategy', value: this.idStrategy },
+          { name: 'idOffice', value: this.idOffice }
+        ]
+      }
+    ] : [];
+    const buildModelItems = (models: IWorkpackModel[]) => {
+      if (!models) {
+        return [];
+      }
+      return models.map(workpackModel => (
         {
           typeCardItem: 'listItem',
           icon: workpackModel.fontIcon,
@@ -391,14 +419,18 @@ export class StrategyComponent implements OnDestroy {
           paramsUrlCard: [
             { name: 'id', value: workpackModel.id },
             { name: 'type', value: TypeWorkpackModelEnum[workpackModel.type] },
+            { name: 'classification', value: workpackModel.classification || WorkpackModelClassificationEnum.STRUCTURAL },
             { name: 'idStrategy', value: this.idStrategy },
             { name: 'idOffice', value: this.idOffice }
           ],
           breadcrumbWorkpackModel: this.getCurrentBreadcrumb(workpackModel)
         }
-      )));
-    }
-    this.cardItemsModels = itemsModels;
+      ));
+    };
+    this.cardItemsStructuralModels = [...buildModelItems(this.structuralModels), ...structuralItems];
+    this.cardItemsTransversalViews = [...buildModelItems(this.transversalViews), ...transversalItems];
+    this.cardItemsModels = [...this.cardItemsStructuralModels, ...this.cardItemsTransversalViews];
+    this.totalRecords = this.cardItemsModels.length;
     setTimeout(() => {
       this.isLoading = false;
     }, 300);

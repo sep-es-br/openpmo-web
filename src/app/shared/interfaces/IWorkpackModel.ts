@@ -7,6 +7,7 @@ export interface IWorkpackModel {
   idPlanModel?: number;
   type: TypeWorkpackModelEnum;
   classification?: WorkpackModelClassificationEnum;
+  idsUses?: number[];
   modelName: string;
   modelNameInPlural?: string;
   position?: number;

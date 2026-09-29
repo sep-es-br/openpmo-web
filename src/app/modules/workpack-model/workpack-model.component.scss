@@ -383,6 +383,20 @@
   }
 }
 
+.transversal-uses-data-view {
+  width: 100%;
+
+  .new-carditem {
+    width: 100%;
+  }
+}
+
+.transversal-uses-tree-selection {
+  min-width: 270px;
+  max-height: 360px;
+  overflow: auto;
+}
+
 .app-workpack-model.mobile {
   .card-properties {
     .workpack-model-properties {
@@ -392,6 +406,7 @@
       }
     }
   }
+
   .workpack-model-addicional-properties {
     .addicional-properties-container {
       width: 100%;

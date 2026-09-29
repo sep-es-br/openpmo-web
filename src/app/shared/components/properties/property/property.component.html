@@ -5,6 +5,7 @@
   <app-property-integer *ngSwitchCase="types.NumberModel" [property]="property" (changed)="changed.emit($event)"></app-property-integer>
   <app-property-integer *ngSwitchCase="types.CurrencyModel" [property]="property" (changed)="changed.emit($event)"></app-property-integer>
   <app-property-selection *ngSwitchCase="types.SelectionModel" [property]="property" (changed)="changed.emit($event)"></app-property-selection>
+  <app-property-transversal-view *ngSwitchCase="types.TransversalViewSelectionModel" [property]="property" (changed)="changed.emit($event)"></app-property-transversal-view>
   <app-property-textarea *ngSwitchCase="types.TextAreaModel" [property]="property" (changed)="changed.emit($event)"></app-property-textarea>
   <app-property-toggle *ngSwitchCase="types.ToggleModel" [property]="property" (changed)="changed.emit($event)"></app-property-toggle>
   <app-property-tree-selection *ngSwitchCase="types.LocalitySelectionModel" [property]="property" (changed)="changed.emit($event)"></app-property-tree-selection>

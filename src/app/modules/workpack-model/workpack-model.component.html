@@ -99,7 +99,53 @@
         </div>
       </app-card>
     </div>
-  
+
+    <div class="card transversal-uses" *ngIf="classification === 'TRANSVERSAL' && !cardProperties?.isLoading">
+      <app-card [properties]="cardPropertiesUses" *ngIf="cardPropertiesUses" class="inputs-float-label">
+        <p-dataView [value]="cardItemsUses" layout="grid" class="app-dataview transversal-uses-data-view"
+          *ngIf="(displayModeAll === 'grid' || (displayModeAll === 'list' && !!isMobileView)) && !isLoading"
+          [paginator]="true" [rows]="pageSize" [showJumpToPageDropdown]="true" [showPageLinks]="false"
+          [totalRecords]="totalUsesRecords">
+          <ng-template let-cardItem pTemplate="gridItem">
+            <div class="p-col-12 p-md-3 p-sm-12 card-item-container">
+              <ng-container *ngIf="cardItem.typeCardItem !== 'newCardItem'; else addUseCard">
+                <app-card-item [properties]="cardItem"></app-card-item>
+              </ng-container>
+            </div>
+          </ng-template>
+        </p-dataView>
+        <p-dataView [value]="cardItemsUses" layout="list" class="app-dataview app-dataview-list transversal-uses-data-view"
+          *ngIf="displayModeAll === 'list' && !isMobileView && !isLoading" [paginator]="true" [rows]="pageSize"
+          [showJumpToPageDropdown]="true" [showPageLinks]="false" [totalRecords]="totalUsesRecords"
+          [emptyMessage]="'loadingEllipsis' | translate">
+          <ng-template let-cardItem pTemplate="listItem">
+            <div class="p-col-12">
+              <ng-container *ngIf="cardItem.typeCardItem !== 'newCardItem'; else addUseCard">
+                <app-card-item [properties]="cardItem" [displayModeCard]="displayModeAll"></app-card-item>
+              </ng-container>
+            </div>
+          </ng-template>
+        </p-dataView>
+        <p-overlayPanel #usesSelector [showCloseIcon]="true" [dismissable]="true">
+          <div class="app-tree-selection transversal-uses-tree-selection">
+            <p-tree [value]="usesTreeOptions" selectionMode="single" (onNodeSelect)="selectUseFromTree($event)">
+              <ng-template let-node pTemplate="default">
+                <span [class.node-disabled]="node.selectable === false">{{ node.label }}</span>
+              </ng-template>
+            </p-tree>
+          </div>
+        </p-overlayPanel>
+      </app-card>
+    </div>
+
+    <ng-template #addUseCard>
+      <p-card class="new-carditem cardList card-link">
+        <div class="carditem-content" [title]="'addLink' | translate" (click)="openUsesSelector($event)">
+          <i class="app-icon plus light-grey-icon" [ngStyle]="{ fontSize: '2rem', cursor: 'pointer' }"></i>
+        </div>
+      </p-card>
+    </ng-template>
+
     <ng-container *ngIf="workpackModelType !== 'MilestoneModel' && !cardProperties?.isLoading" >
       <div class="card stakeholders">
         <app-card [properties]="cardPropertiesStakeholders" *ngIf="cardPropertiesStakeholders" class="inputs-float-label">

@@ -27,6 +27,18 @@
       </div>
     </div>
     <div
+      *ngIf="!!currentIDPlan && isPlanMenu"
+      class="item"
+      [ngStyle]="{ width: '20%' }"
+      [pTooltip]="'transversalViews' | translate"
+      (click)="toggleMenu('transversal-views')"
+    >
+      <i class="fas fa-project-diagram"></i>
+      <div class="item-label">
+        {{ 'transversalViews' | translate }}
+      </div>
+    </div>
+    <div
       *ngIf="itemsFavorites?.length > 0 && !!currentIDOffice && !!currentIDPlan && isPlanMenu"
       class="item"
       [ngStyle]="{width: '20%'}"
@@ -129,6 +141,21 @@
   <p-panelMenu *ngIf="!loadingMenuPortfolio" [model]="itemsPortfolio"></p-panelMenu>
   <div class="action-mobile" *ngIf="isMobileView">
     <i class="app-icon angle-down" [ngStyle]="{ fontSize: '1rem' }" (click)="toggleMenu('portfolio')"></i>
+  </div>
+</div>
+
+<div class="app-menu-slide" #menuSliderTransversalViews [class.open]="isMenuOpen('transversal-views')"
+  [class.mobile]="isMobileView" [class.changing]="isChangingView">
+  <div class="top-bar">
+    <div class="title" (click)="closeAllMenus()">{{ 'transversalViews' | translate }}</div>
+    <div class="action" *ngIf="!isMobileView">
+      <i class="app-icon arrow-left" [ngStyle]="{ fontSize: '1rem' }" (click)="closeAllMenus()"></i>
+    </div>
+  </div>
+  <span *ngIf="loadingTransversalViews" style="padding: 1em">{{ 'loadingEllipsis' | translate }}</span>
+  <p-panelMenu *ngIf="!loadingTransversalViews" [model]="itemsTransversalViews"></p-panelMenu>
+  <div class="action-mobile" *ngIf="isMobileView">
+    <i class="app-icon angle-down" [ngStyle]="{ fontSize: '1rem' }" (click)="toggleMenu('transversal-views')"></i>
   </div>
 </div>
 

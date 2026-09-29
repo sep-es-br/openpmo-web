@@ -34,10 +34,12 @@ import { CancelButtonComponent } from 'src/app/shared/components/cancel-button/c
 import { IUniversalSearch } from 'src/app/shared/interfaces/universal-search.interface';
 import { PageDef, SearchService } from 'src/app/shared/services/search.service';
 import { ITabViewScrolled } from 'src/app/shared/components/tabview-scrolled/tabview-scrolled.component';
+import { WorkpackModelClassificationEnum } from 'src/app/shared/enums/WorkpackModelClassificationEnum';
 
 interface IWorkpackModelCard {
   idWorkpackModel: number;
   propertiesCard: ICard;
+  classification?: WorkpackModelClassificationEnum;
   workpackItemCardList?: IWorkpackCardItem[];
   dashboardWorkpackItemCardList?: IWorkpackCardItem[];
 }
@@ -410,8 +412,12 @@ export class PlanComponent implements OnInit, OnDestroy {
     if (this.cardsPlanWorkPackModels?.length) {
       this.tabs.push(
         ...this.cardsPlanWorkPackModels.map(model => ({
-          menu: model.propertiesCard.cardTitle,
-          key: model.propertiesCard.cardTitle
+          menu: `${this.translateSrv.instant(
+            model.classification === WorkpackModelClassificationEnum.TRANSVERSAL
+              ? 'transversalViews'
+              : 'structuralModels'
+          )} · ${model.propertiesCard.cardTitle}`,
+          key: `workpack-model-${model.idWorkpackModel}`
         }))
       );
     }
@@ -547,7 +553,7 @@ export class PlanComponent implements OnInit, OnDestroy {
 
   async loadWorkPackModels() {
     const result = await this.workpackModelSrv.GetAll({ 'id-plan-model': this.idPlanModel });
-    const workpackModels = result.success && result.data;
+    const workpackModels = result.success && result.data ? result.data : undefined;
     if (workpackModels) {
       const cards = workpackModels.map((workpackModel) => {
         const propertiesCard: ICard = {
@@ -562,6 +568,7 @@ export class PlanComponent implements OnInit, OnDestroy {
         };
         return {
           idWorkpackModel: workpackModel.id,
+          classification: workpackModel.classification || WorkpackModelClassificationEnum.STRUCTURAL,
           propertiesCard
         };
       });

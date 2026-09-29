@@ -8,10 +8,12 @@ import { TranslateService } from '@ngx-translate/core';
 import { filter, takeUntil } from 'rxjs/operators';
 import { Subject, Subscription } from 'rxjs';
 import { ConfirmationService, MenuItem, MessageService, SelectItem, TreeNode } from 'primeng/api';
+import { OverlayPanel } from 'primeng/overlaypanel';
 
 import { IconPropertyWorkpackModelEnum as IconPropertyEnum } from 'src/app/shared/enums/IconPropertyWorkpackModelEnum';
 import { TypePropertModelEnum as TypePropertyEnum } from 'src/app/shared/enums/TypePropertModelEnum';
 import { TypeWorkpackModelEnum } from 'src/app/shared/enums/TypeWorkpackModelEnum';
+import { WorkpackModelClassificationEnum } from 'src/app/shared/enums/WorkpackModelClassificationEnum';
 import {
   IconsRegularEng,
   IconsRegularPt,
@@ -21,6 +23,7 @@ import {
 import { ICard } from 'src/app/shared/interfaces/ICard';
 import { IWorkpackModelProperty } from 'src/app/shared/interfaces/IWorkpackModelProperty';
 import { IWorkpackModel } from 'src/app/shared/interfaces/IWorkpackModel';
+import { IMenuPlanModel, IMenuWorkpackModel } from 'src/app/shared/interfaces/IMenu';
 import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
 import { DomainService } from 'src/app/shared/services/domain.service';
 import { LocalityService } from 'src/app/shared/services/locality.service';
@@ -65,6 +68,7 @@ export class WorkpackModelComponent implements OnInit {
 
   @ViewChild(SaveButtonComponent) saveButton: SaveButtonComponent;
   @ViewChild(CancelButtonComponent) cancelButton: CancelButtonComponent;
+  @ViewChild('usesSelector') usesSelector: OverlayPanel;
 
   idOffice: number;
   idStrategy: number;
@@ -73,11 +77,18 @@ export class WorkpackModelComponent implements OnInit {
   modelNamePlural: string;
   idParentWorkpack: number;
   workpackModelType: TypeWorkpackModelEnum;
+  classification: WorkpackModelClassificationEnum = WorkpackModelClassificationEnum.STRUCTURAL;
+  usesOptions: IWorkpackModel[] = [];
+  selectedUsesIds: number[] = [];
+  usesTreeOptions: TreeNode[] = [];
+  cardItemsUses: ICardItem[] = [];
+  totalUsesRecords = 0;
   cardProperties: ICard;
   cardPropertiesStakeholders: ICard;
   cardPropertiesCostAccount: ICard;
   cardPropertiesJournal: ICard;
   cardPropertiesModels: ICard;
+  cardPropertiesUses: ICard;
   cardPropertiesSchedule: ICard;
   cardPropertiesRiskAndIssues: ICard;
   cardPropertiesProcesses: ICard;
@@ -200,6 +211,10 @@ export class WorkpackModelComponent implements OnInit {
         ...this.cardPropertiesModels,
         initialStateCollapse: this.collapsePanelsStatus
       });
+      this.cardPropertiesUses = Object.assign({}, {
+        ...this.cardPropertiesUses,
+        initialStateCollapse: this.collapsePanelsStatus
+      });
       this.cardPropertiesSchedule = Object.assign({}, {
         ...this.cardPropertiesSchedule,
         initialStateCollapse: this.collapsePanelsStatus
@@ -227,7 +242,7 @@ export class WorkpackModelComponent implements OnInit {
     this.configDataViewSrv.observablePageSize.pipe(takeUntil(this.$destroy)).subscribe(pageSize => {
       this.pageSize = pageSize;
     });
-    this.activeRoute.queryParams.subscribe(async ({ idOffice, idStrategy, id, idParent, type }) => {
+    this.activeRoute.queryParams.subscribe(async ({ idOffice, idStrategy, id, idParent, type, classification }) => {
       if (id && this.idWorkpackModel === Number(id)) {
         // refresh on adding id to query
         return;
@@ -237,6 +252,7 @@ export class WorkpackModelComponent implements OnInit {
       this.idWorkpackModel = +id;
       this.idParentWorkpack = +idParent;
       this.workpackModelType = type;
+      this.classification = classification || WorkpackModelClassificationEnum.STRUCTURAL;
       this.posibleRolesOrg = this.rolesOrgOptions.map(role => this.translateSrv.instant(role));
       this.posibleRolesPerson = this.rolesPersonOptions.map(role => this.translateSrv.instant(role));
       this.notificationsStakeholderRolesOptions = this.posibleRolesPerson.map(item => ({
@@ -253,6 +269,8 @@ export class WorkpackModelComponent implements OnInit {
       await this.getOfficeById();
       if (!this.idParentWorkpack) await this.getPlanModelById();
       await this.loadDetails();
+      await this.loadUsesOptions();
+      this.loadMenuProperty();
     });
     this.currentBreadcrumbItems = [];
     this.currentBreadcrumbItems = this.breadcrumbSrv.get;
@@ -286,8 +304,8 @@ export class WorkpackModelComponent implements OnInit {
       }
     }
     this.formProperties = this.fb.group({
-      name: ['', [Validators.required, Validators.maxLength(50)]],
-      nameInPlural: ['', [Validators.required, Validators.maxLength(600)]],
+      name: ['', [Validators.required, Validators.pattern(/\S/), Validators.maxLength(50)]],
+      nameInPlural: ['', [Validators.required, Validators.pattern(/\S/), Validators.maxLength(600)]],
       icon: this.workpackModelType ? [IconsTypeWorkpackModelEnum[this.workpackModelType], Validators.required] :
         [undefined, Validators.required],
       position: [this.nextPosition || 1, Validators.required],
@@ -371,6 +389,11 @@ export class WorkpackModelComponent implements OnInit {
     this.posibleRolesPerson = this.rolesPersonOptions.map(role => this.translateSrv.instant(role));
     this.posibleRolesOrg = this.rolesOrgOptions.map(role => this.translateSrv.instant(role));
     this.modelProperties = [];
+    this.usesOptions = [];
+    this.selectedUsesIds = [];
+    this.usesTreeOptions = [];
+    this.cardItemsUses = [];
+    this.totalUsesRecords = 0;
     this.childrenModels = [];
     this.cardItemsModels = [];
     this.cardProperties = null;
@@ -382,6 +405,7 @@ export class WorkpackModelComponent implements OnInit {
     this.cardPropertiesProcesses = null;
     this.cardPropertiesJournal = null;
     this.cardPropertiesModels = null;
+    this.cardPropertiesUses = null;
     this.cardPropertiesSchedule = null;
     this.cardPropertiesSchedule = null;
     this.cardPropertiesObligations = null;
@@ -405,10 +429,85 @@ export class WorkpackModelComponent implements OnInit {
       }
       await this.loadWorkpackModel();
     } else if (this.editPermission) {
-      this.loadDefaultProperties();
+      await this.loadDefaultProperties();
       await this.loadCardItemsModels();
     }
     this.setCurrentBreadcrumb();
+  }
+
+  private normalizeTransversalViewProperties(properties: IWorkpackModelProperty[] = []): IWorkpackModelProperty[] {
+    if (this.workpackModelType !== TypeWorkpackModelEnum.ProjectModel) {
+      return properties;
+    }
+
+    const transversalPropertyName = 'TransversalidadeProj';
+    let fixedProperty = properties.find(property =>
+      property.type === TypePropertyEnum.TransversalViewSelectionModel
+      || (property.type === TypePropertyEnum.SelectionModel && property.name === transversalPropertyName)
+    );
+
+    const legacyGroup = properties.find(property =>
+      property.type === TypePropertyEnum.GroupModel
+      && (property.name === 'Transversalidade do Projeto'
+        || property.label === 'Transversalidade do Projeto'
+        || property.groupedProperties?.some(groupedProperty => groupedProperty.name === transversalPropertyName))
+    );
+    const legacyProperty = legacyGroup?.groupedProperties?.find(property => property.name === transversalPropertyName);
+    const requiresTypeMigration = !!fixedProperty && fixedProperty.type !== TypePropertyEnum.TransversalViewSelectionModel;
+
+    if (legacyProperty) {
+      if (!fixedProperty) {
+        fixedProperty = legacyProperty;
+      }
+      fixedProperty.type = TypePropertyEnum.TransversalViewSelectionModel;
+      legacyGroup.groupedProperties = legacyGroup.groupedProperties.filter(property => property !== legacyProperty);
+    }
+
+    if (!fixedProperty) {
+      return properties.filter(property => property !== legacyGroup || legacyGroup.groupedProperties?.length > 0);
+    }
+
+    fixedProperty.type = TypePropertyEnum.TransversalViewSelectionModel;
+    if (requiresTypeMigration || (legacyProperty && !properties.includes(fixedProperty))) {
+      // The API treats the specialized subtype as a different persisted node.
+      // Do not reuse the old SelectionModel id when promoting legacy data.
+      fixedProperty.id = undefined;
+    }
+    fixedProperty.fixed = false;
+    fixedProperty.required = false;
+    fixedProperty.active = true;
+    fixedProperty.name = fixedProperty.name || transversalPropertyName;
+    const transversalViewLabel = this.translateSrv.instant('rootTransversalView');
+    fixedProperty.label = fixedProperty.label ||
+      (transversalViewLabel === 'rootTransversalView' ? 'Visão Raiz' : transversalViewLabel);
+    fixedProperty.multipleSelection = fixedProperty.multipleSelection ?? true;
+    fixedProperty.helpText = fixedProperty.helpText || '';
+    delete fixedProperty.defaultValue;
+    delete fixedProperty.possibleValues;
+    delete fixedProperty.possibleValuesOptions;
+    delete fixedProperty.transversalViewOptions;
+
+    const normalizedProperties = properties.filter(property => property !== legacyGroup || legacyGroup.groupedProperties?.length > 0);
+    if (!normalizedProperties.includes(fixedProperty)) {
+      normalizedProperties.push(fixedProperty);
+    }
+    return normalizedProperties;
+  }
+
+  private createRootTransversalViewProperty(sortIndex: number): IWorkpackModelProperty {
+    const translatedLabel = this.translateSrv.instant('rootTransversalView');
+    return {
+      active: true,
+      label: translatedLabel === 'rootTransversalView' ? 'Visão Raiz' : translatedLabel,
+      name: 'TransversalidadeProj',
+      type: TypePropertyEnum.TransversalViewSelectionModel,
+      sortIndex,
+      fullLine: false,
+      required: false,
+      multipleSelection: true,
+      fixed: false,
+      helpText: ''
+    };
   }
 
   async loadPluginAvailability(): Promise<void> {
@@ -424,6 +523,148 @@ export class WorkpackModelComponent implements OnInit {
         obligations: false
       };
     }
+  }
+
+  async loadUsesOptions() {
+    this.usesOptions = [];
+    this.selectedUsesIds = [];
+    if (this.classification !== WorkpackModelClassificationEnum.TRANSVERSAL || !this.idStrategy) {
+      return;
+    }
+
+    const usesResult = this.idWorkpackModel
+      ? await this.workpackModelSrv.getUses(this.idWorkpackModel)
+      : undefined;
+    const linkedModels = usesResult?.success ? (usesResult.data || []) : [];
+    this.selectedUsesIds = linkedModels.map(model => model.id);
+
+    const menuResult = await this.menuSrv.getItemsPlanModel(this.idOffice);
+    const planModel = menuResult.success
+      ? (menuResult.data || []).find((item: IMenuPlanModel) => item.id === this.idStrategy)
+      : undefined;
+
+    if (planModel?.workpackModels?.length) {
+      this.usesOptions = this.flattenStructuralModels(planModel.workpackModels)
+        .filter(model => model.id !== this.idWorkpackModel);
+      this.usesTreeOptions = this.buildUsesTree(planModel.workpackModels);
+    } else {
+      const modelsResult = await this.workpackModelSrv.GetAll({ 'id-plan-model': this.idStrategy });
+      if (modelsResult.success) {
+        this.usesOptions = (modelsResult.data || [])
+          .filter(model => model.id !== this.idWorkpackModel
+            && model.classification !== WorkpackModelClassificationEnum.TRANSVERSAL);
+        this.usesTreeOptions = this.buildFlatUsesTree(this.usesOptions);
+      }
+    }
+
+    linkedModels
+      .filter(model => model.id !== this.idWorkpackModel
+        && model.classification !== WorkpackModelClassificationEnum.TRANSVERSAL
+        && !this.usesOptions.some(option => option.id === model.id))
+      .forEach(model => this.usesOptions.push(model));
+    this.refreshUsesPresentation();
+  }
+
+  isUseSelected(idWorkpackModel: number): boolean {
+    return this.selectedUsesIds.includes(idWorkpackModel);
+  }
+
+  toggleUse(idWorkpackModel: number): void {
+    if (!this.editPermission) {
+      return;
+    }
+
+    this.selectedUsesIds = this.isUseSelected(idWorkpackModel)
+      ? this.selectedUsesIds.filter(id => id !== idWorkpackModel)
+      : [...this.selectedUsesIds, idWorkpackModel];
+    this.refreshUsesPresentation();
+    this.saveButton?.showButton();
+  }
+
+  openUsesSelector(event: Event): void {
+    this.usesSelector?.toggle(event);
+  }
+
+  selectUseFromTree(event: { node: TreeNode }): void {
+    const idWorkpackModel = Number(event?.node?.data);
+    if (!idWorkpackModel || event?.node?.selectable === false) {
+      return;
+    }
+    this.toggleUse(idWorkpackModel);
+    this.usesSelector?.hide();
+  }
+
+  private refreshUsesPresentation(): void {
+    const linkedModels = this.usesOptions.filter(model => this.isUseSelected(model.id));
+    this.cardItemsUses = linkedModels.map(model => ({
+      typeCardItem: 'listItem',
+      icon: model.fontIcon,
+      nameCardItem: model.modelName,
+      itemId: model.id,
+      menuItems: this.editPermission ? [{
+        label: this.translateSrv.instant('delete'),
+        icon: 'fas fa-unlink',
+        command: () => this.toggleUse(model.id)
+      }] : []
+    }));
+    if (this.editPermission) {
+      this.cardItemsUses.push({
+        typeCardItem: 'newCardItem',
+        iconSvg: true,
+        icon: IconsEnum.Plus
+      });
+    }
+    this.totalUsesRecords = this.cardItemsUses.length;
+    this.updateUsesTreeSelection(this.usesTreeOptions);
+  }
+
+  private flattenStructuralModels(models: IMenuWorkpackModel[]): IWorkpackModel[] {
+    return (models || []).reduce((flattened, model) => {
+      if (model.classification !== WorkpackModelClassificationEnum.TRANSVERSAL) {
+        flattened.push({
+          id: Number(model.id),
+          idPlanModel: model.idPlanModel,
+          type: model.type as TypeWorkpackModelEnum,
+          classification: model.classification,
+          modelName: model.name,
+          modelNameInPlural: model.nameInPlural,
+          fontIcon: model.fontIcon,
+          sortBy: undefined,
+          notificationsSelectedRoles: []
+        });
+      }
+      flattened.push(...this.flattenStructuralModels(model.children || []));
+      return flattened;
+    }, [] as IWorkpackModel[]);
+  }
+
+  private buildUsesTree(models: IMenuWorkpackModel[]): TreeNode[] {
+    return (models || [])
+      .filter(model => model.classification !== WorkpackModelClassificationEnum.TRANSVERSAL)
+      .map(model => ({
+        label: model.name,
+        icon: model.fontIcon,
+        data: Number(model.id),
+        expanded: true,
+        selectable: !this.isUseSelected(Number(model.id)),
+        children: this.buildUsesTree(model.children || [])
+      }));
+  }
+
+  private buildFlatUsesTree(models: IWorkpackModel[]): TreeNode[] {
+    return models.map(model => ({
+      label: model.modelName,
+      icon: model.fontIcon,
+      data: model.id,
+      selectable: !this.isUseSelected(model.id)
+    }));
+  }
+
+  private updateUsesTreeSelection(nodes: TreeNode[]): void {
+    (nodes || []).forEach(node => {
+      node.selectable = !this.isUseSelected(Number(node.data));
+      this.updateUsesTreeSelection(node.children || []);
+    });
   }
 
   async getOfficeById() {
@@ -476,13 +717,13 @@ export class WorkpackModelComponent implements OnInit {
           tooltip: this.modelNamePlural,
           routerLink: ['/workpack-model'],
           admin: true,
-          queryParams: { idStrategy, id: this.idWorkpackModel, type, idOffice }
+          queryParams: { idStrategy, id: this.idWorkpackModel, type, idOffice, classification: this.classification }
         }]
         : [{
           key: 'workpackModel',
           routerLink: ['/workpack-model'],
           admin: true,
-          queryParams: { idStrategy, type, idOffice, idParent: this.idParentWorkpack }
+          queryParams: { idStrategy, type, idOffice, idParent: this.idParentWorkpack, classification: this.classification }
         }]
     ];
   }
@@ -506,7 +747,8 @@ export class WorkpackModelComponent implements OnInit {
             tooltip: this.modelNamePlural,
             admin: true,
             routerLink: ['/workpack-model'],
-            queryParams: { idStrategy, id: this.idWorkpackModel, type, idOffice, idParent: this.idParentWorkpack }
+            queryParams: { idStrategy, id: this.idWorkpackModel, type, idOffice, idParent: this.idParentWorkpack,
+              classification: this.classification }
           }]
           ];
         } else {
@@ -520,7 +762,7 @@ export class WorkpackModelComponent implements OnInit {
     }
   }
 
-  loadDefaultProperties() {
+  async loadDefaultProperties() {
 
     const defaultProperties: IWorkpackModelProperty[] = [];
     switch (this.workpackModelType) {
@@ -710,7 +952,7 @@ export class WorkpackModelComponent implements OnInit {
             required: true,
             rows: 3,
             max: 500
-          }
+          },
         );
         break;
       case TypeWorkpackModelEnum.MilestoneModel:
@@ -731,8 +973,14 @@ export class WorkpackModelComponent implements OnInit {
         );
         break;
     }
-    defaultProperties.forEach(prop => this.checkProperty(prop));
     this.modelProperties = defaultProperties;
+    this.modelProperties.forEach(prop => this.checkProperty(prop));
+    const rootTransversalViewProperty = this.modelProperties.find(property =>
+      property.type === TypePropertyEnum.TransversalViewSelectionModel
+    );
+    if (rootTransversalViewProperty) {
+      await this.checkProperty(rootTransversalViewProperty);
+    }
   }
 
   async loadWorkpackModel() {
@@ -748,6 +996,7 @@ export class WorkpackModelComponent implements OnInit {
         position: data.position || 1,
         sortedBy: data.sortBy ? data.sortBy.name : (data.sortByField || 'name' ) 
       });
+      this.classification = data.classification || WorkpackModelClassificationEnum.STRUCTURAL;
       this.posibleRolesOrg = data.organizationRoles || [];
       this.posibleRolesPerson = data.personRoles || [];
       if (data.properties) {
@@ -849,7 +1098,17 @@ export class WorkpackModelComponent implements OnInit {
         const dataProperties = dataPropertiesAndIndex
           .sort((a, b) => a[1] > b[1] ? 1 : -1)
           .map(prop => prop[0] as IWorkpackModelProperty);
-        this.modelProperties = this.sortPropertiesBySortIndex(dataProperties);
+        this.modelProperties = this.sortPropertiesBySortIndex(
+          this.normalizeTransversalViewProperties(dataProperties)
+        );
+      } else {
+        this.modelProperties = this.normalizeTransversalViewProperties([]);
+      }
+      const rootTransversalViewProperty = this.modelProperties.find(property =>
+        property.type === TypePropertyEnum.TransversalViewSelectionModel
+      );
+      if (rootTransversalViewProperty) {
+        await this.checkProperty(rootTransversalViewProperty);
       }
       this.getSortedByList();
       this.cardPropertiesCostAccount.initialStateToggle = data.costSessionActive;
@@ -904,6 +1163,22 @@ export class WorkpackModelComponent implements OnInit {
   }
 
   async addProperty(type: TypePropertyEnum, groupProperty?: IWorkpackModelProperty) {
+    if (type === TypePropertyEnum.TransversalViewSelectionModel) {
+      if (this.workpackModelType !== TypeWorkpackModelEnum.ProjectModel || groupProperty || this.modelProperties.some(
+        property => property.type === TypePropertyEnum.TransversalViewSelectionModel
+      )) {
+        return;
+      }
+      const property = this.createRootTransversalViewProperty(this.modelProperties.length);
+      property.isCollapsed = false;
+      await this.checkProperty(property);
+      this.modelProperties.push(property);
+      this.loadMenuProperty();
+      this.saveButton?.hideButton();
+      this.checkProperties();
+      return property;
+    }
+
     const newProperty: IWorkpackModelProperty = {
       type,
       active: true,
@@ -961,6 +1236,9 @@ export class WorkpackModelComponent implements OnInit {
       case TypePropertyEnum.SelectionModel:
         requiredFields = requiredFields.concat(['possibleValuesOptions', 'multipleSelection']);
         break;
+      case TypePropertyEnum.TransversalViewSelectionModel:
+        requiredFields = requiredFields.concat(['multipleSelection']);
+        break;
       case TypePropertyEnum.GroupModel:
         requiredFields = ['name', 'sortIndex', 'groupedProperties'];
         break;
@@ -1015,6 +1293,8 @@ export class WorkpackModelComponent implements OnInit {
         if (property.id) {
           this.saveButton?.showButton();
         }
+        this.loadMenuProperty();
+        this.checkProperties();
       }
     });
   }
@@ -1326,7 +1606,13 @@ get integrationSectorOptions(): SelectItem[] {
     if (this.currentLang && !['pt-BR', 'en-US'].includes(this.currentLang)) {
       return;
     }
-    const menu = Object.keys(TypePropertyEnum).filter(k => k !== TypePropertyEnum.GroupModel)
+    const propertyTypes = Object.keys(TypePropertyEnum).filter(k =>
+      TypePropertyEnum[k] !== TypePropertyEnum.GroupModel
+      && (TypePropertyEnum[k] !== TypePropertyEnum.TransversalViewSelectionModel
+        || (this.workpackModelType === TypeWorkpackModelEnum.ProjectModel
+          && !this.modelProperties.some(property => property.type === TypePropertyEnum.TransversalViewSelectionModel)))
+    );
+    const menu = propertyTypes
       .map(type => ({
         label: this.translateSrv.instant(`labels.${TypePropertyEnum[type]}`),
         icon: IconPropertyEnum[TypePropertyEnum[type]],
@@ -1340,7 +1626,10 @@ get integrationSectorOptions(): SelectItem[] {
       return;
     }
     if (groupProperty) {
-      return Object.keys(TypePropertyEnum).filter(k => k !== TypePropertyEnum.GroupModel)
+      return Object.keys(TypePropertyEnum).filter(k =>
+        TypePropertyEnum[k] !== TypePropertyEnum.GroupModel
+        && TypePropertyEnum[k] !== TypePropertyEnum.TransversalViewSelectionModel
+      )
         .map(type => ({
           label: this.translateSrv.instant(`labels.${TypePropertyEnum[type]}`),
           icon: IconPropertyEnum[TypePropertyEnum[type]],
@@ -1551,6 +1840,13 @@ get integrationSectorOptions(): SelectItem[] {
       onToggle: new EventEmitter<boolean>()
     };
     this.cardPropertiesModels.onToggle.pipe(takeUntil(this.$destroy)).subscribe(() => this.checkProperties());
+    this.cardPropertiesUses = {
+      toggleable: true,
+      initialStateToggle: true,
+      cardTitle: 'links',
+      collapseble: true,
+      initialStateCollapse: false
+    };
     if (this.workpackModelType === TypeWorkpackModelEnum.DeliverableModel) {
       this.cardPropertiesSchedule = {
         toggleable: this.editPermission,
@@ -1635,8 +1931,10 @@ get integrationSectorOptions(): SelectItem[] {
       delete prop.isCollapsed;
       delete prop.viewOnly;
       delete prop.obligatory;
+      delete prop.fixed;
       delete prop.defaultsDetails;
       delete prop.disableMultipleSelection;
+      delete prop.transversalViewOptions;
     });
     const propertiesGroupClone = [...this.modelProperties.filter(prop => prop.type === TypePropertyEnum.GroupModel)];
     propertiesGroupClone.forEach(propGroup => {
@@ -1662,6 +1960,8 @@ get integrationSectorOptions(): SelectItem[] {
         delete propGrouped.isCollapsed;
         delete propGrouped.viewOnly;
         delete propGrouped.obligatory;
+        delete propGrouped.fixed;
+        delete propGrouped.transversalViewOptions;
       });
     });
     const { name: modelName, nameInPlural: modelNameInPlural, icon, sortedBy: sortBy, position } = this.formProperties.value;
@@ -1689,6 +1989,10 @@ get integrationSectorOptions(): SelectItem[] {
       agreementsSessionActive: !!this.cardPropertiesAgreements?.initialStateToggle,
       fontIcon: icon,
       type: this.workpackModelType,
+      classification: this.classification,
+      idsUses: this.classification === WorkpackModelClassificationEnum.TRANSVERSAL
+        ? this.selectedUsesIds
+        : undefined,
       idPlanModel: this.idStrategy,
       modelName,
       modelNameInPlural,
@@ -1721,6 +2025,7 @@ get integrationSectorOptions(): SelectItem[] {
             idStrategy: this.idStrategy,
             idOffice: this.idOffice,
             id: this.idWorkpackModel,
+            classification: this.classification,
             ...this.idParentWorkpack ? { idParent: this.idParentWorkpack } : {}
           }
         });
@@ -1765,13 +2070,17 @@ get integrationSectorOptions(): SelectItem[] {
         typeCardItem: 'newCardItemModel',
         iconSvg: true,
         icon: IconsEnum.Plus,
+        hideReuseModel: this.classification === WorkpackModelClassificationEnum.TRANSVERSAL,
         iconMenuItems: Object.keys(TypeWorkpackModelEnum)
           .map(type => ({
             label: this.translateSrv.instant(`labels.${TypeWorkpackModelEnum[type]}`),
             command: () => this.navigateToWorkpackModel(TypeWorkpackModelEnum[type]),
             icon: IconsTypeWorkpackModelEnum[type]
           })),
-        paramsUrlCard: [{ name: 'idStrategy', value: this.idStrategy }]
+        paramsUrlCard: [
+          { name: 'idStrategy', value: this.idStrategy },
+          { name: 'classification', value: this.classification }
+        ]
       }]
       : [];
     if (this.reusableWorkpackModelsList && this.reusableWorkpackModelsList.length > 0 && itemsModels.length > 0) {
@@ -1797,7 +2106,8 @@ get integrationSectorOptions(): SelectItem[] {
           { name: 'type', value: TypeWorkpackModelEnum[workpackModel.type] },
           { name: 'idStrategy', value: this.idStrategy },
           { name: 'idOffice', value: this.idOffice },
-          { name: 'idParent', value: this.idWorkpackModel }
+          { name: 'idParent', value: this.idWorkpackModel },
+          { name: 'classification', value: this.classification }
         ],
         breadcrumbWorkpackModel: this.getCurrentBreadcrumb()
       })));
@@ -1867,7 +2177,8 @@ get integrationSectorOptions(): SelectItem[] {
         type,
         idStrategy: this.idStrategy,
         idOffice: this.idOffice,
-        idParent: this.idWorkpackModel
+        idParent: this.idWorkpackModel,
+        classification: this.classification
       }
     });
   }

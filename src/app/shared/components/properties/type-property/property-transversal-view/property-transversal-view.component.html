@@ -1,0 +1,16 @@
+<div class="transversal-view-property" [class.disabled]="property.disabled">
+  <button type="button" class="transversal-view-card" *ngFor="let option of property.possibleValues"
+    [class.selected]="isSelected(option)" [disabled]="property.disabled || isDisabled(option)"
+    (click)="toggle(option)">
+    <span class="transversal-view-card-check" aria-hidden="true">
+      <i class="fas" [ngClass]="isSelected(option) ? 'fa-check-square' : 'fa-square'"></i>
+    </span>
+    <span class="transversal-view-card-label">{{ option.label }}</span>
+  </button>
+  <span class="transversal-view-empty" *ngIf="!property.possibleValues?.length">
+    Nenhuma visão transversal disponível.
+  </span>
+  <span class="input-message-error" *ngIf="property.invalid">
+    {{ property.message }}
+  </span>
+</div>

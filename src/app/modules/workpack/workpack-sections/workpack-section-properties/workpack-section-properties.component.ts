@@ -252,8 +252,8 @@ export class WorkpackSectionPropertiesComponent implements OnInit, OnDestroy {
       .map((prop) => {
         let valid = (prop.value instanceof Array
           ? (prop.value.length > 0)
-          : typeof prop.value == 'boolean' || typeof prop.value == 'number'
-          || !!prop.value || (prop.value !== null && prop.value !== undefined && prop.value !== ''));
+          : typeof prop.value === 'string' ? prop.value.trim().length > 0
+          : prop.value !== null && prop.value !== undefined);
         if (['OrganizationSelection', 'UnitSelection', 'LocalitySelection'].includes(prop.type)) {
           if (prop.type === 'LocalitySelection') {
             if (!prop.multipleSelection) {

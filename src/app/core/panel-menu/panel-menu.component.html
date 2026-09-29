@@ -59,6 +59,21 @@
     </div>
   </div>
 
+  <div class="app-menu-slide-fixed" #menuSliderTransversalViews
+    [class.hidden]="!isMenuOpen('transversal-views')">
+    <div class="slide-wrapper">
+      <div class="top-bar">
+        <div class="title" (click)="closeAllMenus()">{{ 'transversalViews' | translate }}</div>
+        <div class="action" *ngIf="!loadingTransversalViews">
+          <i [class]="isFixed ? 'app-icon pin-on' : 'app-icon pin-off'" [ngStyle]="{ fontSize: '0.9rem' }"
+            (click)="handleChangeMenuMode()"></i>
+        </div>
+      </div>
+      <span *ngIf="loadingTransversalViews" style="padding: 1em">{{ 'loadingEllipsis' | translate }}</span>
+      <p-panelMenu *ngIf="!loadingTransversalViews" [model]="itemsTransversalViews"></p-panelMenu>
+    </div>
+  </div>
+
   <div class="app-menu-slide-fixed" #menuSliderPlanModel [class.hidden]="!menus[2].isOpen">
     <div class="slide-wrapper">
       <div class="top-bar">

@@ -9,10 +9,10 @@
         || '( '+ ('labels.' + property.type | translate) + ' )' }}</span>
     </span>
     <span class="right-side">
-      <i *ngIf="!property.isCollapsed && !property.obligatory && !property.viewOnly"
+      <i *ngIf="!property.isCollapsed && !property.obligatory && !property.fixed && !property.viewOnly"
         [ngClass]="[ 'app-icon', 'trash-alt', 'grey-icon' ]" [ngStyle]="{ fontSize: '1.25rem' }"
         (click)="delete.emit(property)" alt="Delete Property"></i>
-      <p-inputSwitch *ngIf="!property.obligatory && !property.viewOnly" class="app-toggle" [(ngModel)]="property.active"
+      <p-inputSwitch *ngIf="!property.obligatory && !property.fixed && !property.viewOnly" class="app-toggle" [(ngModel)]="property.active"
         (ngModelChange)="changed.emit($event)"></p-inputSwitch>
     </span>
   </p-header>
@@ -48,7 +48,8 @@
           <i class="far fa-question-circle" [pTooltip]="'help.propertyModel.precision' | translate"></i>
         </label>
       </span>
-      <span class="p-float-label property-input app-input-chips p-field" *ngIf="property.type === 'SelectionModel'">
+      <span class="p-float-label property-input app-input-chips p-field"
+        *ngIf="property.type === 'SelectionModel'">
         <p-chips inputStyleClass="app-input-text" [(ngModel)]="property.possibleValuesOptions" [required]="true"
           [allowDuplicate]="false" (ngModelChange)="changed.emit($event)" [disabled]="property.viewOnly" separator=","
           (onRemove)="checkIfRemovedValueIsDefault($event)"
@@ -234,7 +235,7 @@
         </label>
       </span>
       <span class="property-checkbox p-field-checkbox"
-        *ngIf="[ 'SelectionModel', 'LocalitySelectionModel', 'OrganizationSelectionModel' ].includes(property.type)">
+        *ngIf="[ 'SelectionModel', 'TransversalViewSelectionModel', 'LocalitySelectionModel', 'OrganizationSelectionModel' ].includes(property.type)">
         <p-checkbox class="app-checkbox" [(ngModel)]="property.multipleSelection" [binary]="true"
           [disabled]="property.viewOnly || property.disableMultipleSelection" [required]="true"
           (ngModelChange)="changed.emit({property: property, multipleSelectedChanged: true}); checkDefaultValue();">

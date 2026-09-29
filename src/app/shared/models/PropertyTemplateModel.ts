@@ -72,6 +72,7 @@ export class PropertyTemplateModel implements IProperty {
         property.reason = reason;
         break;
       case TypePropertyModelEnum.SelectionModel:
+      case TypePropertyModelEnum.TransversalViewSelectionModel:
         const selectedOptions = multipleSelection && value as string[];
         const stringValue = !!selectedOptions ? selectedOptions.join(',') : value as string;
         property.value = stringValue;

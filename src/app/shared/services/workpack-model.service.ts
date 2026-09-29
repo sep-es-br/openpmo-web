@@ -30,6 +30,16 @@ export class WorkpackModelService extends BaseService<IWorkpackModel> {
     return this.http.get<IHttpResult<any>>(`${this.urlBase}/next-position`, { params: PrepareHttpParams(options) }).toPromise();
   }
 
+  getUses(idWorkpackModel: number) {
+    return this.http.get<IHttpResult<IWorkpackModel[]>>(`${this.urlBase}/${idWorkpackModel}/uses`).toPromise();
+  }
+
+  replaceUses(idWorkpackModel: number, idsWorkpackModel: number[]) {
+    return this.http.put<IHttpResult<IWorkpackModel[]>>(`${this.urlBase}/${idWorkpackModel}/uses`, {
+      idsWorkpackModel
+    }).toPromise();
+  }
+
   reuseWorkpackModel(idWorkpackModel: number, idWorkpackModelParent) {
     return this.http.get<IHttpResult<IWorkpackModel>>(`${this.urlBase}/${idWorkpackModelParent}/reuse/${idWorkpackModel}`).toPromise();
   }
