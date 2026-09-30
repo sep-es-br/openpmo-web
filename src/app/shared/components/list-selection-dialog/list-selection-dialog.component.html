@@ -1,15 +1,19 @@
-<p-dialog [(visible)]="visible" [modal]="true" [dismissableMask]="true" [closeOnEscape]="true"
-  [style]="{ width: width }" [baseZIndex]="10000" styleClass="list-selection-dialog" (onHide)="handleHide()">
+<p-dialog [(visible)]="visible" [modal]="true" [dismissableMask]="dismissableMask" [closeOnEscape]="true"
+  [style]="{ width: width, maxHeight: maxHeight }" [baseZIndex]="10000" styleClass="list-selection-dialog" (onHide)="handleHide()">
   <p-header>
     <div class="list-selection-dialog-title">{{ title }}</div>
     <div *ngIf="subtitle" class="list-selection-dialog-subtitle">{{ subtitle }}</div>
   </p-header>
 
   <div class="list-selection-dialog-content">
-    <p-multiSelect *ngIf="!loading && dialogItems.length"
+    <ng-content select="[listSelectionFilters]"></ng-content>
+
+    <span *ngIf="!loading && dialogItems.length" class="p-float-label list-selection-dialog-field">
+    <p-multiSelect #selectionList
       class="app-multiple-selection list-selection-dialog-multiselect"
       [options]="dialogItems"
       [(ngModel)]="draftSelection"
+      (ngModelChange)="handleSelectionChange($event)"
       optionLabel="label"
       optionDisabled="disabled"
       dataKey="id"
@@ -17,14 +21,16 @@
       [filter]="true"
       filterBy="label,description"
       [filterPlaceHolder]="filterPlaceholder | translate"
-      [defaultLabel]="'select' | translate"
+      [defaultLabel]="selectionLabel ? '' : (selectionPlaceholder | translate)"
       [selectedItemsLabel]="'{0} ' + ('selectedItems' | translate)"
       [emptyFilterMessage]="emptyMessage | translate"
       [showToggleAll]="false"
       [maxSelectedLabels]="2"
       display="chip"
       [style]="{ width: '100%' }"
+      [panelStyle]="{ width: width, maxWidth: 'calc(100vw - 2rem)' }"
       [baseZIndex]="10001"
+      appendTo="body"
       panelStyleClass="list-selection-dialog-multiselect-panel">
       <ng-template let-item pTemplate="item">
         <div class="list-selection-dialog-item">
@@ -33,14 +39,16 @@
         </div>
       </ng-template>
     </p-multiSelect>
+    <label *ngIf="selectionLabel" class="app-input-label">{{ selectionLabel | translate }}</label>
+    </span>
 
-    <span *ngIf="!loading && !dialogItems.length" class="list-selection-dialog-empty">
+    <span *ngIf="showEmptyMessage && !loading && !dialogItems.length" class="list-selection-dialog-empty">
       {{ emptyMessage | translate }}
     </span>
     <span *ngIf="loading" class="list-selection-dialog-loading">{{ 'loading' | translate }}</span>
   </div>
 
-  <p-footer>
+  <p-footer *ngIf="showActions">
     <div class="list-selection-dialog-actions">
       <button type="button" pButton class="p-button-text list-selection-dialog-action"
         icon="fas fa-times" iconPos="left" [label]="cancelLabel | translate" (click)="cancel()">

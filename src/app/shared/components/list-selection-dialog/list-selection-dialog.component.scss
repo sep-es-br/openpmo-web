@@ -22,8 +22,33 @@
     padding: .85rem 1.5rem 1.5rem;
   }
 
+  .list-selection-dialog-field {
+    display: block;
+    margin-top: 1rem;
+  }
+
   .list-selection-dialog-multiselect {
+    display: block;
     width: 100%;
+  }
+
+  .list-selection-dialog-multiselect .p-multiselect-label {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: .35rem .5rem;
+    padding: .4rem 0;
+  }
+
+  .list-selection-dialog-multiselect .p-multiselect-token {
+    display: inline-flex;
+    align-items: center;
+    margin: 0 !important;
+    line-height: 1.2;
+  }
+
+  .list-selection-dialog-multiselect .p-multiselect-token-icon {
+    margin-left: .4rem;
   }
 
   .list-selection-dialog-item {
@@ -79,6 +104,25 @@
 ::ng-deep .list-selection-dialog-multiselect-panel {
   .p-multiselect-items {
     max-height: 300px;
+  }
+
+  .p-multiselect-item {
+    align-items: flex-start;
+    min-width: 0;
+  }
+
+  .list-selection-dialog-item {
+    min-width: 0;
+    width: 100%;
+
+    > span {
+      display: -webkit-box;
+      overflow: hidden;
+      white-space: normal;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+      line-clamp: 2;
+    }
   }
 }
 

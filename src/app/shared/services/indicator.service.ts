@@ -6,6 +6,36 @@ import { WorkpackService } from './workpack.service';
 import { FilterDataviewService } from './filter-dataview.service';
 import { IWorkpackData, IWorkpackParams } from '../interfaces/IWorkpackDataParams';
 import { PrepareHttpParams } from '../utils/query.util';
+import { IHttpResult } from '../interfaces/IHttpResult';
+
+export interface ISustainableDevelopmentGoal {
+    order: number;
+    description: string;
+    name: string;
+}
+
+export interface IStrategicChallenge {
+    managementId: number;
+    management: string;
+    groupId: number;
+    groupType: string;
+    group: string;
+    subgroupId: number;
+    subgroupType: string;
+    subgroup: string;
+    challengeId: number;
+    challenge: string;
+    gestaoId?: number;
+    gestao?: string;
+    grupoId?: number;
+    grupoTipo?: string;
+    grupo?: string;
+    subgrupoId?: number;
+    subgrupoTipo?: string;
+    subgrupo?: string;
+    desafioId?: number;
+    desafio?: string;
+}
 
 @Injectable({
     providedIn: 'root'
@@ -13,6 +43,7 @@ import { PrepareHttpParams } from '../utils/query.util';
 export class IndicatorService extends BaseService<IIndicator> {
 
     private resetIndicator = new BehaviorSubject<boolean>(false);
+    private challengeCatalogRequest: Promise<IHttpResult<IStrategicChallenge[]>>;
     workpackData: IWorkpackData;
     workpackParams: IWorkpackParams;
     filters;
@@ -102,5 +133,24 @@ export class IndicatorService extends BaseService<IIndicator> {
 
     loadUnitMeasure() {
         return this.http.get(`${this.urlBase}/unitMeasure`)
+    }
+
+    getOdsCatalog(): Promise<IHttpResult<ISustainableDevelopmentGoal[]>> {
+        return this.http
+            .get<IHttpResult<ISustainableDevelopmentGoal[]>>(`${this.urlBase}/ods`)
+            .toPromise();
+    }
+
+    getChallengeCatalog(): Promise<IHttpResult<IStrategicChallenge[]>> {
+        if (!this.challengeCatalogRequest) {
+            this.challengeCatalogRequest = this.http
+                .get<IHttpResult<IStrategicChallenge[]>>(`${this.urlBase}/challenges`)
+                .toPromise()
+                .catch(error => {
+                    this.challengeCatalogRequest = null;
+                    throw error;
+                });
+        }
+        return this.challengeCatalogRequest;
     }
 }

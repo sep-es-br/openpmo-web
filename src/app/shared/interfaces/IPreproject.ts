@@ -92,6 +92,7 @@ export interface IPreprojectListItemValue {
   id?: number;
   foreignKey?: string;
   label?: string;
+  fullName?: string;
 }
 
 export interface IPreprojectCriteriaValueBase {

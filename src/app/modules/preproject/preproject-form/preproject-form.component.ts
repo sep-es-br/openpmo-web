@@ -686,7 +686,7 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
         selectedListItems: (value.items || []).map((item, index) => ({
           id: item.id || this.nextTemporaryListItemId--,
           name: item.label || '',
-          fullName: item.label || '',
+          fullName: item.fullName || item.label || '',
           foreignKey: item.foreignKey || `criteria-${property.id}-${index + 1}`
         } as CriteriaListDisplayItem))
       };
@@ -830,7 +830,8 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
         const items = (property.selectedListItems || []).map((item, index) => ({
           foreignKey: (item as CriteriaListDisplayItem).foreignKey
             || `criteria-${property.id}-${index + 1}`,
-          label: item.name
+          label: item.name,
+          fullName: item.fullName
         }));
         return { ...value, items } as IPreprojectCriteriaListValue;
       }

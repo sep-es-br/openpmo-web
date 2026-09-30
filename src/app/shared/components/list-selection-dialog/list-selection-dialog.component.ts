@@ -1,4 +1,5 @@
-import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, ViewChild } from '@angular/core';
+import { MultiSelect } from 'primeng/multiselect';
 
 export interface ListSelectionDialogItem {
   id: string | number;
@@ -26,26 +27,53 @@ export class ListSelectionDialogComponent implements OnChanges {
   @Input() confirmLabel = 'save';
   @Input() cancelLabel = 'cancel';
   @Input() emptyMessage = 'noContent';
+  @Input() selectionPlaceholder = 'select';
+  @Input() selectionLabel = '';
   @Input() width = '620px';
+  @Input() maxHeight = '80vh';
+  @Input() showActions = true;
+  @Input() showEmptyMessage = true;
+  @Input() filterResetKey = 0;
+  @Input() selectionResetKey = 0;
+  @Input() dismissableMask = true;
 
   @Output() visibleChange = new EventEmitter<boolean>();
   @Output() confirmed = new EventEmitter<ListSelectionDialogItem[]>();
+  @Output() selectionChanged = new EventEmitter<ListSelectionDialogItem[]>();
   @Output() cancelled = new EventEmitter<void>();
 
   draftSelection: ListSelectionDialogItem[] = [];
   dialogItems: ListSelectionDialogItem[] = [];
 
+  @ViewChild('selectionList') selectionList: MultiSelect;
+
   private closedByAction = false;
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes.visible && changes.visible.currentValue && !changes.visible.previousValue) {
+    if (changes.selectionResetKey && !changes.selectionResetKey.firstChange) {
       this.resetDraftSelection();
+    } else if (changes.visible && changes.visible.currentValue && !changes.visible.previousValue) {
+      this.resetDraftSelection();
+    } else if (this.visible && (changes.items || changes.selectedItems)) {
+      this.syncDialogItems(true);
+    }
+    if (this.visible && changes.filterResetKey && !changes.filterResetKey.firstChange) {
+      if (this.selectionList) {
+        this.selectionList.filterValue = '';
+      }
     }
   }
 
   confirm(): void {
     this.confirmed.emit(this.getSelectedItems());
     this.closeByAction();
+  }
+
+  handleSelectionChange(items: ListSelectionDialogItem[]): void {
+    this.draftSelection = items || [];
+    if (!this.showActions) {
+      this.selectionChanged.emit(this.getSelectedItems());
+    }
   }
 
   cancel(): void {
@@ -75,9 +103,25 @@ export class ListSelectionDialogComponent implements OnChanges {
   }
 
   private resetDraftSelection(): void {
-    const selectedIds = this.selectedItems.map(item => item.id);
+    this.draftSelection = [];
+    this.syncDialogItems(false);
+  }
+
+  private syncDialogItems(preserveDraft: boolean): void {
+    const previousSelection = preserveDraft
+      ? [...this.draftSelection]
+      : [...this.selectedItems];
+    const selectedById = previousSelection.reduce(
+      (items, item) => items.has(String(item.id)) ? items : items.set(String(item.id), item),
+      new Map<string, ListSelectionDialogItem>()
+    );
+
     this.dialogItems = [...this.items];
-    this.draftSelection = this.dialogItems.filter(item => selectedIds.includes(item.id));
+    const currentById = new Map(
+      this.dialogItems.map(item => [String(item.id), item] as [string, ListSelectionDialogItem])
+    );
+    this.draftSelection = Array.from(selectedById.entries())
+      .map(([id, item]) => currentById.get(id) || item);
   }
 
   private getSelectedItems(): ListSelectionDialogItem[] {

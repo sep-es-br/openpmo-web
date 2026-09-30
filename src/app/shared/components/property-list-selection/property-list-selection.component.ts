@@ -35,6 +35,7 @@ export class PropertyListSelectionComponent implements OnChanges {
       itemId: item.id,
       nameCardItem: item.name,
       fullNameCardItem: item.fullName || item.name,
+      subtitleCardItem: item.fullName && item.fullName !== item.name ? item.fullName : undefined,
       menuItems: this.disabled ? undefined : this.createItemMenu(item)
     }));
 

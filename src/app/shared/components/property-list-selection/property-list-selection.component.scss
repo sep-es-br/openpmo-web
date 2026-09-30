@@ -36,6 +36,55 @@
   .property-list-dataview.list-mode .new-carditem {
     width: 100%;
   }
+
+  .property-list-dataview:not(.list-mode) .app-card-item.listItem .card-item-name {
+    display: -webkit-box !important;
+    max-height: 2.3rem;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: normal !important;
+    line-height: 1.15rem !important;
+    overflow-wrap: anywhere;
+    box-sizing: border-box;
+    max-width: 100%;
+    padding: 0 .75rem !important;
+    text-align: center;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+  }
+}
+
+:host(.challenge-list-selection) ::ng-deep {
+  .property-list-dataview:not(.list-mode) .app-card-item.listItem .p-card,
+  .property-list-dataview:not(.list-mode) .new-carditem .p-card {
+    height: 174px;
+    min-height: 174px;
+  }
+
+  .property-list-dataview:not(.list-mode) .app-card-item.listItem .card-item-content {
+    justify-content: center;
+    gap: .35rem;
+    padding: 0 .75rem !important;
+  }
+
+  .property-list-dataview:not(.list-mode) .app-card-item.listItem .card-item-icon {
+    font-size: 1.3rem !important;
+    line-height: 1;
+  }
+
+  .property-list-dataview:not(.list-mode) .app-card-item.listItem .card-item-subtitle {
+    display: block;
+    max-width: 100%;
+    overflow: hidden;
+    margin-top: 0;
+    padding: 0 !important;
+    color: #009dd4;
+    font-size: .65rem;
+    line-height: 1rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
 }
 
 @media screen and (max-width: 768px) {

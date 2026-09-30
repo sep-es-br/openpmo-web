@@ -7,6 +7,7 @@
 
       <app-property-list-selection
         *ngIf="isListProperty(item.config); else standardProperty"
+        [class.challenge-list-selection]="item.config.type === 'ChallengeListModel'"
         [label]="item.config.label"
         [items]="item.config.selectedListItems || []"
         [displayMode]="displayMode"
@@ -32,6 +33,72 @@
   [title]="activeListProperty?.label || ''"
   [items]="listDialogItems"
   [selectedItems]="selectedListDialogItems"
+  [loading]="catalogLoading"
+  [width]="isChallengeDialog ? '800px' : '620px'"
+  [maxHeight]="'80vh'"
+  [showActions]="true"
+  [showEmptyMessage]="!isChallengeDialog || challengeFiltersComplete"
+  [filterResetKey]="challengeFilterResetKey"
+  [selectionResetKey]="listSelectionResetKey"
+  [dismissableMask]="false"
+  [selectionPlaceholder]="isChallengeDialog ? 'selectChallenges' : 'select'"
+  [selectionLabel]="isChallengeDialog ? 'selectChallenges' : ''"
   (confirmed)="confirmListSelection($event)"
   (cancelled)="closeListSelectionDialog()">
+  <div listSelectionFilters *ngIf="isChallengeDialog" class="challenge-list-filters p-fluid">
+    <span class="p-float-label">
+      <p-dropdown
+        inputId="challenge-management-filter"
+        class="app-single-selection"
+        [options]="managementOptions"
+        [ngModel]="selectedManagementIds.length ? selectedManagementIds[0] : null"
+        [autoDisplayFirst]="false"
+        [showClear]="true"
+        [disabled]="catalogLoading"
+        appendTo="body"
+        [baseZIndex]="10001"
+        dropdownIcon="fas fa-caret-down"
+        (onChange)="managementChanged($event.value == null ? [] : [$event.value])">
+      </p-dropdown>
+      <label class="app-input-label" for="challenge-management-filter">{{ 'management' | translate }}</label>
+    </span>
+
+    <span class="p-float-label" *ngIf="showGroupFilter">
+      <p-multiSelect
+        inputId="challenge-group-filter"
+        class="app-multiple-selection"
+        [options]="groupOptions"
+        [ngModel]="selectedGroupIds"
+        [defaultLabel]="''"
+        [maxSelectedLabels]="1"
+        [selectedItemsLabel]="'{0} ' + ('selectedItems' | translate)"
+        [showToggleAll]="false"
+        [disabled]="catalogLoading"
+        appendTo="body"
+        [baseZIndex]="10001"
+        dropdownIcon="fas fa-caret-down"
+        (onChange)="groupChanged($event.value)">
+      </p-multiSelect>
+      <label class="app-input-label" for="challenge-group-filter">{{ groupFilterLabel }}</label>
+    </span>
+
+    <span class="p-float-label" *ngIf="showSubgroupFilter">
+      <p-multiSelect
+        inputId="challenge-subgroup-filter"
+        class="app-multiple-selection"
+        [options]="subgroupOptions"
+        [ngModel]="selectedSubgroupIds"
+        [defaultLabel]="''"
+        [maxSelectedLabels]="1"
+        [selectedItemsLabel]="'{0} ' + ('selectedItems' | translate)"
+        [showToggleAll]="false"
+        [disabled]="catalogLoading"
+        appendTo="body"
+        [baseZIndex]="10001"
+        dropdownIcon="fas fa-caret-down"
+        (onChange)="subgroupChanged($event.value)">
+      </p-multiSelect>
+      <label class="app-input-label" for="challenge-subgroup-filter">{{ subgroupFilterLabel }}</label>
+    </span>
+  </div>
 </app-list-selection-dialog>

@@ -1,3 +1,5 @@
+@use "src/variables" as v;
+
 .preproject-criteria-group-card {
   display: block;
 }
@@ -46,6 +48,48 @@
   opacity: .65;
 }
 
+.challenge-list-filters {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+  padding-top: .75rem;
+
+  .p-float-label,
+  .app-single-selection,
+  .app-multiple-selection {
+    display: block;
+    min-width: 0;
+    width: 100%;
+  }
+}
+
+:host ::ng-deep .challenge-list-filters .app-single-selection .p-dropdown {
+  width: 100%;
+}
+
+:host ::ng-deep .challenge-list-filters .app-multiple-selection .p-multiselect {
+  width: 100%;
+}
+
+:host ::ng-deep .challenge-list-filters .app-multiple-selection {
+  .p-multiselect-label-container {
+    min-width: 0;
+  }
+
+  .p-multiselect-label {
+    display: block !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+}
+
+:host ::ng-deep .challenge-list-filters .app-multiple-selection .p-multiselect.p-focus {
+  border: 0 !important;
+  border-bottom: 1px solid v.$borderInputHover !important;
+  box-shadow: none !important;
+}
+
 :host ::ng-deep .group-properties {
   app-property .app-workpack-property,
   app-property-selection {
@@ -90,6 +134,10 @@
 }
 
 @media screen and (max-width: 800px) {
+  .challenge-list-filters {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
   .group-properties {
     .property-container {
       padding-right: 0;
