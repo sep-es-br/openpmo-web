@@ -164,9 +164,7 @@ export class PreprojectCriteriaGroupComponent implements OnInit, OnChanges, OnDe
 
     this.activeListProperty = property;
     this.resetChallengeFilters();
-    this.selectedListDialogItems = this.isChallengeDialog
-      ? []
-      : (property.selectedListItems || []).map(item => this.toDialogItem(item));
+    this.selectedListDialogItems = [];
     this.refreshDialogItems();
     this.listSelectionResetKey++;
     this.displayListSelectionDialog = true;
@@ -215,9 +213,7 @@ export class PreprojectCriteriaGroupComponent implements OnInit, OnChanges, OnDe
     }
 
     const newItems = items.map(item => this.toListItem(property, item));
-    property.selectedListItems = this.isChallengeDialog
-      ? this.mergeListItems(property.selectedListItems || [], newItems)
-      : newItems;
+    property.selectedListItems = this.mergeListItems(property.selectedListItems || [], newItems);
     this.selectedListDialogItems = [...items];
     this.changed.emit();
   }
@@ -304,14 +300,9 @@ export class PreprojectCriteriaGroupComponent implements OnInit, OnChanges, OnDe
     }
 
     const selectedKeys = new Set((property.selectedListItems || []).map(item => this.listItemKey(item)));
-    if (property.type === TypePropertModelEnum.ChallengeListModel) {
-      availableItems = availableItems.filter(item => !selectedKeys.has(this.listItemKey(item)));
-    }
+    availableItems = availableItems.filter(item => !selectedKeys.has(this.listItemKey(item)));
 
-    const persistedItems = property.type === TypePropertModelEnum.ChallengeListModel
-      ? []
-      : (property.selectedListItems || []);
-    const uniqueItems = [...availableItems, ...persistedItems]
+    const uniqueItems = availableItems
       .reduce((items: Map<string, IPropertyListItem>, item: IPropertyListItem) => {
         const key = this.listItemKey(item);
         if (!items.has(key)) {

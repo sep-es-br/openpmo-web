@@ -57,6 +57,31 @@ describe('PreprojectCriteriaGroupComponent', () => {
     expect(component.listDialogItems[0].description).toBeUndefined();
   });
 
+  it('opens ODS without previous selections and appends only new items', async () => {
+    const property = listProperty(TypePropertModelEnum.SdgListModel);
+    property.selectedListItems = [{
+      id: 1,
+      foreignKey: 'ods:1',
+      name: 'ODS 1'
+    }];
+    indicatorService.getOdsCatalog.and.returnValue(Promise.resolve({
+      success: true,
+      data: [
+        { order: 1, name: 'ODS 1', description: 'Primeiro objetivo' },
+        { order: 2, name: 'ODS 2', description: 'Segundo objetivo' }
+      ]
+    }));
+
+    await component.openListSelectionDialog(property);
+
+    expect(component.selectedListDialogItems).toEqual([]);
+    expect(component.listDialogItems.map(item => item.id)).toEqual(['ods:2']);
+
+    component.confirmListSelection([component.listDialogItems[0]]);
+
+    expect(property.selectedListItems.map(item => item.foreignKey)).toEqual(['ods:1', 'ods:2']);
+  });
+
   it('filters challenges by management and resets dependent filters', async () => {
     const property = listProperty(TypePropertModelEnum.ChallengeListModel);
     indicatorService.getChallengeCatalog.and.returnValue(Promise.resolve({ success: true, data: challenges }));
