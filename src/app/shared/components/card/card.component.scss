@@ -531,15 +531,17 @@
   }
   .p-panel .p-panel-header {
     background-color: v.$bgCard;
-    border-color: v.$bgCard;
+    border-color: #d4ddf3;
+    border-bottom: 0;
   }
   p-panel .p-toggleable-content {
     background-color: v.$bgCard;
-    border-color: v.$bgCard;
+    border-color: #d4ddf3;
   }
   .p-panel .p-toggleable-content .p-panel-content {
     background-color: v.$bgCard;
-    border-color: v.$bgCard;
+    border-color: #d4ddf3;
+    border-top: 0;
   }
   &.mobile {
     .p-panel .p-toggleable-content .p-panel-content {
