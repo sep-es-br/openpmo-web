@@ -28,6 +28,7 @@ export interface IWorkpack {
     hasScheduleSectionActive?: boolean;
     hasChildren?: boolean;
     milestoneStatus?: string;
+    fromPreProjectInStructuring?: boolean;
 
     hasWBS?: boolean; //only screen
     // only workpacks linked

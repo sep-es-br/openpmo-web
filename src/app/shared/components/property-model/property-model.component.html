@@ -51,6 +51,16 @@
           <i class="far fa-question-circle" [pTooltip]="'weight' | translate"></i>
         </label>
       </span>
+      <span class="p-float-label property-input p-field input-number-scroll"
+        *ngIf="property.type === 'ChallengeListModel' || property.type === 'SdgListModel'">
+        <p-inputNumber inputStyleClass="app-input-text" [(ngModel)]="property.itemValue" [showButtons]="true"
+          [min]="0" [step]="1" [required]="true" (ngModelChange)="changed.emit($event)"
+          [disabled]="property.viewOnly">
+        </p-inputNumber>
+        <label class="input-label">{{ 'value' | translate }} *
+          <i class="far fa-question-circle" [pTooltip]="'value' | translate"></i>
+        </label>
+      </span>
       <span class="p-float-label property-input p-field input-number-scroll" *ngIf="property.type === 'NumberModel'">
         <p-inputNumber inputStyleClass="app-input-text" [(ngModel)]="property.precision" [showButtons]="true" [min]="1"
           [max]="6" (ngModelChange)="changed.emit($event)" [disabled]="property.viewOnly">

@@ -36,6 +36,9 @@ import {
   IPreprojectCriteriaTabValues,
   IPreprojectCriteriaValue,
   IPreprojectEvaluation,
+  IPreprojectEvaluationCriterion,
+  IPreprojectEvaluationGroup,
+  IPreprojectEvaluationItem,
   IUpdatePreprojectRequest
 } from 'src/app/shared/interfaces/IPreproject';
 import { ITabViewScrolled } from 'src/app/shared/components/tabview-scrolled/tabview-scrolled.component';
@@ -588,17 +591,153 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
     }
     this.isEvaluationLoading = true;
     try {
+      await Promise.all(this.criteriaGuides.map(criterion => this.loadCriteriaValues(criterion)));
       const response = await this.preprojectService.findEvaluation(this.idPreproject);
       if (!response.success || !response.data) {
         throw new Error(response.message || 'Evaluation not found');
       }
-      this.evaluation = response.data;
+      this.evaluation = this.mergeEvaluationWithConfiguredLists(response.data);
     } catch (error) {
       this.evaluation = null;
       this.showError(error, 'Não foi possível carregar a avaliação.');
     } finally {
       this.isEvaluationLoading = false;
     }
+  }
+
+  private mergeEvaluationWithConfiguredLists(evaluation: IPreprojectEvaluation): IPreprojectEvaluation {
+    const criteria = this.criteriaGuides.map(criterionModel => {
+      const current = evaluation.criteria.find(item => item.idCriteriaTabModel === criterionModel.id);
+      const tabValues = this.criteriaValuesByTab[criterionModel.id];
+      const directItems = this.orderEvaluationItems(
+        criterionModel.properties || [],
+        current?.items || [],
+        tabValues
+      );
+      const groups = (criterionModel.groups || [])
+        .slice()
+        .sort((first, second) => (first.sortIndex || 0) - (second.sortIndex || 0))
+        .map(groupModel => {
+          const currentGroup = (current?.groups || []).find(group =>
+            this.sameEvaluationName(group.name || group.label, groupModel.title)
+          );
+          const groupValue = [
+            ...((tabValues?.values || []).filter(value => value.type === 'CriteriaGroup') as IPreprojectCriteriaGroupValue[]),
+            ...(tabValues?.groups || [])
+          ].find(value => value.idPropertyModel === groupModel.id || value.id === groupModel.id);
+          const active = groupValue ? groupValue.active : (currentGroup?.active ?? true);
+          const items = this.orderEvaluationItems(
+            groupModel.properties || [],
+            currentGroup?.items || [],
+            tabValues
+          );
+          return this.calculateEvaluationGroup({
+            idGroup: currentGroup?.idGroup || groupValue?.id || groupModel.id || 0,
+            name: currentGroup?.name || groupModel.title,
+            label: currentGroup?.label || groupModel.title,
+            weight: groupModel.weight ?? currentGroup?.weight ?? 1,
+            operation: groupModel.operation || currentGroup?.operation || 'SUM',
+            active,
+            disabledValue: Number(groupModel.disabledValue ?? currentGroup?.disabledValue ?? 0),
+            items,
+            total: 0,
+            maximum: 0
+          });
+        });
+
+      return this.calculateEvaluationCriterion({
+        idCriteriaTabModel: criterionModel.id,
+        name: current?.name || criterionModel.name,
+        label: current?.label || criterionModel.label || criterionModel.name,
+        weight: criterionModel.weight ?? current?.weight ?? 1,
+        operation: criterionModel.operation || current?.operation || 'SUM',
+        items: directItems,
+        groups,
+        total: 0,
+        maximum: 0
+      });
+    });
+    const total = criteria.reduce((sum, criterion) => sum + criterion.total, 0);
+    const totalWeight = criteria.reduce((sum, criterion) => sum + criterion.weight, 0);
+    return {
+      ...evaluation,
+      criteria,
+      finalNote: evaluation.operation === 'AVERAGE' && totalWeight > 0 ? total / totalWeight : total
+    };
+  }
+
+  private orderEvaluationItems(
+    propertyModels: IWorkpackModelProperty[],
+    currentItems: IPreprojectEvaluationItem[],
+    tabValues?: IPreprojectCriteriaTabValues
+  ): IPreprojectEvaluationItem[] {
+    return propertyModels
+      .filter(property => property.active !== false)
+      .slice()
+      .sort((first, second) => (first.sortIndex || 0) - (second.sortIndex || 0))
+      .map(property => {
+        const current = currentItems.find(item => item.idPropertyModel === property.id);
+        if (current) {
+          return current;
+        }
+        if (property.type !== 'ChallengeListModel' && property.type !== 'SdgListModel') {
+          return null;
+        }
+        const selectedList = (tabValues?.values || []).find(value =>
+          value.type === 'CriteriaList' && value.idPropertyModel === property.id
+        ) as IPreprojectCriteriaListValue | undefined;
+        const itemValue = property.itemValue ?? 1;
+        const note = selectedList?.items?.length ? itemValue : 0;
+        const weight = property.weight ?? 1;
+        return {
+          idPropertyModel: property.id || 0,
+          name: property.name,
+          label: property.label,
+          note,
+          weight,
+          weightedNote: note * weight,
+          maximumNote: itemValue
+        };
+      })
+      .filter((item): item is IPreprojectEvaluationItem => !!item);
+  }
+
+  private calculateEvaluationGroup(group: IPreprojectEvaluationGroup): IPreprojectEvaluationGroup {
+    const aggregate = group.items.reduce((sum, item) => sum + item.weightedNote, 0);
+    const maximumAggregate = group.items.reduce(
+      (sum, item) => sum + item.maximumNote * item.weight,
+      0
+    );
+    const totalWeight = group.items.reduce((sum, item) => sum + item.weight, 0);
+    const average = group.operation === 'AVERAGE' && totalWeight > 0;
+    return {
+      ...group,
+      total: group.active ? (average ? aggregate / totalWeight : aggregate) * group.weight : group.disabledValue,
+      maximum: group.active
+        ? (average ? maximumAggregate / totalWeight : maximumAggregate) * group.weight
+        : group.disabledValue
+    };
+  }
+
+  private calculateEvaluationCriterion(
+    criterion: IPreprojectEvaluationCriterion
+  ): IPreprojectEvaluationCriterion {
+    const aggregate = criterion.groups.reduce((sum, group) => sum + group.total, 0)
+      + criterion.items.reduce((sum, item) => sum + item.weightedNote, 0);
+    const maximumAggregate = criterion.groups.reduce((sum, group) => sum + group.maximum, 0)
+      + criterion.items.reduce((sum, item) => sum + item.maximumNote * item.weight, 0);
+    const totalWeight = criterion.groups.reduce((sum, group) => sum + group.weight, 0)
+      + criterion.items.reduce((sum, item) => sum + item.weight, 0);
+    const average = criterion.operation === 'AVERAGE' && totalWeight > 0;
+    return {
+      ...criterion,
+      total: (average ? aggregate / totalWeight : aggregate) * criterion.weight,
+      maximum: (average ? maximumAggregate / totalWeight : maximumAggregate) * criterion.weight
+    };
+  }
+
+  private sameEvaluationName(first?: string, second?: string): boolean {
+    return (first || '').trim().toLocaleLowerCase() === (second || '').trim().toLocaleLowerCase();
   }
 
   private async mapMenuWorkpacks(workpacks: IMenuWorkpack[], parent?: TreeNode): Promise<TreeNode[]> {

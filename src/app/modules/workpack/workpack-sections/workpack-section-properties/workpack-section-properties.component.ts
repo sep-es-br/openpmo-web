@@ -125,6 +125,11 @@ export class WorkpackSectionPropertiesComponent implements OnInit, OnDestroy {
       }
       return true;
     });
+
+    if (this.isStructuringPreProject()) {
+      this.workpackData.workpack.fromPreProjectInStructuring = true;
+      this.clearRequiredValidation(this.sectionPropertiesProperties);
+    }
     
     this.sectionPropertiesProperties.forEach((prop) => {
       prop.typeWorkPack = typeWorkPack as unknown as TypeWorkpackEnumWBS;
@@ -238,6 +243,10 @@ export class WorkpackSectionPropertiesComponent implements OnInit, OnDestroy {
 
   checkPropertiesRequiredValid(property: PropertyTemplateModel, groupedProperties?: PropertyTemplateModel[]) {
     const properties = !groupedProperties ? this.sectionPropertiesProperties : groupedProperties;
+    if (this.workpackData?.workpack?.fromPreProjectInStructuring) {
+      this.clearRequiredValidation(properties);
+      return true;
+    }
     const validated = properties
       .filter(propReq => !!propReq.required || (propReq.type === 'Group' && propReq.groupedProperties
         .filter(gp => !!gp.required).length > 0))
@@ -283,13 +292,15 @@ export class WorkpackSectionPropertiesComponent implements OnInit, OnDestroy {
         p.groupedProperties.filter(gp => ((gp.min || gp.max) && (typeof gp.value == 'string' && gp.type !== 'Number'))).length > 0)))
       .map((prop) => {
         let valid = true;
-        valid = prop.min ? String(prop.value).length >= Number(prop.min) : true;
+        const required = prop.required && !this.workpackData?.workpack?.fromPreProjectInStructuring;
+        const empty = prop.value === null || prop.value === undefined || prop.value === '';
+        valid = prop.min ? (!required && empty) || String(prop.value).length >= Number(prop.min) : true;
         if (property.idPropertyModel === prop.idPropertyModel) {
           prop.invalid = !valid;
           prop.message = !valid ? prop.message = this.translateSrv.instant('minLenght') : '';
         }
         if (valid) {
-          valid = prop.max ? (!prop.required ? String(prop.value).length <= Number(prop.max)
+          valid = prop.max ? (!required ? String(prop.value || '').length <= Number(prop.max)
             : String(prop.value).length <= Number(prop.max) && String(prop.value).length > 0) : true;
           if (property.idPropertyModel === prop.idPropertyModel) {
             prop.invalid = !valid;
@@ -316,13 +327,16 @@ export class WorkpackSectionPropertiesComponent implements OnInit, OnDestroy {
         p.groupedProperties.filter(gp => ((gp.min || gp.max) && (gp.type === 'Num'))).length > 0)))
       .map((prop) => {
         let valid = true;
-        valid = prop.min ? Number(prop.value) >= Number(prop.min) : true;
+        const required = prop.required && !this.workpackData?.workpack?.fromPreProjectInStructuring;
+        const empty = prop.value === null || prop.value === undefined || prop.value === '';
+        valid = prop.min ? (!required && empty) || Number(prop.value) >= Number(prop.min) : true;
         if (property.idPropertyModel === prop.idPropertyModel) {
           prop.invalid = !valid;
           prop.message = !valid ? prop.message = this.translateSrv.instant('minValue') : '';
         }
         if (valid) {
-          valid = prop.max ? (!prop.required ? Number(prop.value) <= Number(prop.max)
+          valid = prop.max ? (!required ? (prop.value === null || prop.value === undefined || prop.value === ''
+            || Number(prop.value) <= Number(prop.max))
             : Number(prop.value) <= Number(prop.max) && Number(prop.value) > 0) : true;
           if (property.idPropertyModel === prop.idPropertyModel) {
             prop.invalid = !valid;
@@ -337,6 +351,36 @@ export class WorkpackSectionPropertiesComponent implements OnInit, OnDestroy {
         return valid;
       })
       .reduce((a, b) => a ? b : a, true);
+  }
+
+  private clearRequiredValidation(properties: PropertyTemplateModel[]): void {
+    const requiredMessage = this.translateSrv.instant('required');
+    properties.forEach(prop => {
+      if (prop.type === TypePropertyModelEnum.GroupModel && prop.groupedProperties) {
+        this.clearRequiredValidation(prop.groupedProperties);
+      }
+      if (prop.required && prop.message === requiredMessage) {
+        prop.invalid = false;
+        prop.message = '';
+      }
+    });
+  }
+
+  private isStructuringPreProject(): boolean {
+    if (this.workpackData?.workpack?.fromPreProjectInStructuring) {
+      return true;
+    }
+    return this.hasStructuringStatus(this.sectionPropertiesProperties);
+  }
+
+  private hasStructuringStatus(properties: PropertyTemplateModel[]): boolean {
+    return properties.some(prop => {
+      if (prop.type === TypePropertyModelEnum.GroupModel && prop.groupedProperties) {
+        return this.hasStructuringStatus(prop.groupedProperties);
+      }
+      return ['Status', 'Situação'].includes(prop.name)
+        && String(prop.value || '').trim() === 'Estruturação';
+    });
   }
 
   mirrorToFullName(nameProperty: PropertyTemplateModel, fullNameProperty: PropertyTemplateModel) {

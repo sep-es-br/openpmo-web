@@ -35,6 +35,10 @@ import { OrganizationService } from 'src/app/shared/services/organization.servic
 import { ILocalityList } from 'src/app/shared/interfaces/ILocality';
 import { IOrganization } from 'src/app/shared/interfaces/IOrganization';
 import { ConfigDataViewService } from 'src/app/shared/services/config-dataview.service';
+import {
+  IPluginAvailability,
+  PluginAvailabilityService
+} from 'src/app/shared/services/plugin-availability.service';
 
 interface CriterionIcon {
   name: string;
@@ -69,6 +73,13 @@ export class PreprojectCriterionFormComponent implements OnInit, OnDestroy {
   propertyMenuItems: MenuItem[] = [];
 
   groupPropertyMenuItems: MenuItem[][] = [];
+
+  pluginAvailability: IPluginAvailability = {
+    agreements: false,
+    procurements: false,
+    obligations: false,
+    indicators: false
+  };
 
   idOffice: number;
 
@@ -105,6 +116,7 @@ export class PreprojectCriterionFormComponent implements OnInit, OnDestroy {
     private readonly measureUnitService: MeasureUnitService,
     private readonly officeService: OfficeService,
     private readonly organizationService: OrganizationService,
+    private readonly pluginAvailabilityService: PluginAvailabilityService,
     private readonly router: Router,
     private readonly translateService: TranslateService,
     private readonly messageService: MessageService
@@ -132,6 +144,7 @@ export class PreprojectCriterionFormComponent implements OnInit, OnDestroy {
     this.criterionId = Number.isFinite(criterionId) && criterionId > 0 ? criterionId : null;
     this.cardProperties.initialStateCollapse = false;
     this.office = await this.officeService.getCurrentOffice(this.idOffice);
+    await this.loadPluginAvailability();
     this.loadTranslatedOptions();
     await this.loadCriterionForEditing();
     this.setBreadcrumb();
@@ -412,16 +425,37 @@ export class PreprojectCriterionFormComponent implements OnInit, OnDestroy {
       TypePropertModelEnum.TextModel,
       TypePropertModelEnum.TextAreaModel,
       TypePropertModelEnum.UnitSelectionModel,
-      TypePropertModelEnum.ChallengeListModel,
-      TypePropertModelEnum.SdgListModel,
       TypePropertModelEnum.ToggleModel
     ];
+
+    if (this.pluginAvailability.indicators) {
+      propertyTypes.splice(propertyTypes.length - 1, 0,
+        TypePropertModelEnum.ChallengeListModel,
+        TypePropertModelEnum.SdgListModel
+      );
+    }
 
     return propertyTypes.map((type: string) => ({
       label: this.getPropertyTypeLabel(type),
       icon: this.getPropertyTypeIcon(type),
       command: () => this.addProperty(type, groupIndex)
     }));
+  }
+
+  private async loadPluginAvailability(): Promise<void> {
+    try {
+      const response = await this.pluginAvailabilityService.getAvailability();
+      if (response.success && response.data) {
+        this.pluginAvailability = response.data;
+      }
+    } catch {
+      this.pluginAvailability = {
+        agreements: false,
+        procurements: false,
+        obligations: false,
+        indicators: false
+      };
+    }
   }
 
   /**
