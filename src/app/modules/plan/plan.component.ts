@@ -772,7 +772,13 @@ export class PlanComponent implements OnInit, OnDestroy {
     const iconMenuItems: MenuItem[] = [
       {
         label: this.translateSrv.instant('new'),
-        command: () => this.handleNewWorkpack(idPlan, idWorkpackModel)
+        command: () => this.handleNewWorkpack(
+          idPlan,
+          idWorkpackModel,
+          this.cardsPlanWorkPackModels[index]?.classification === WorkpackModelClassificationEnum.TRANSVERSAL
+            ? idWorkpackModel
+            : undefined
+        )
       }
     ];
     if (sharedWorkpackList && sharedWorkpackList.length > 0) {
@@ -940,11 +946,12 @@ export class PlanComponent implements OnInit, OnDestroy {
     this.cardsPlanWorkPackModels[modelCardIndex].propertiesCard.isLoading = false;
   }
 
-  handleNewWorkpack(idPlan, idWorkpackModel) {
+  handleNewWorkpack(idPlan, idWorkpackModel, idTransversalView?: number) {
     this.router.navigate(['workpack'], {
       queryParams: {
         idPlan,
         idWorkpackModel,
+        idTransversalView,
       }
     });
   }

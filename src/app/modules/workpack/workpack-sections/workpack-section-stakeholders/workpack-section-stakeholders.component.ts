@@ -129,8 +129,7 @@ export class WorkpackSectionStakeholdersComponent implements OnInit, OnDestroy {
     this.stakeholders = stakeholders;
     this.idFilterSelected = idFilterSelected;
     this.term = term;
-    this.activeSection = this.workpackData && this.workpackData?.workpack?.id && this.workpackData?.workpackModel
-      && this.workpackData.workpackModel.stakeholderSessionActive;
+    this.activeSection = this.stakeholderSrv.isSectionAvailable(this.workpackData);
     if (!loading) this.loadStakeholderSection();
   }
 

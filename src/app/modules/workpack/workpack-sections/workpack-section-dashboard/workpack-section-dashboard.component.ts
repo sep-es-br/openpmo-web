@@ -308,7 +308,8 @@ export class WorkpackSectionDashboardComponent
       !!workpackData.workpack.id &&
       !workpackData.workpack.canceled &&
       !!workpackData.workpackModel &&
-      !!workpackData.workpackModel.dashboardSessionActive;
+      (workpackData.workpackModel.classification === 'TRANSVERSAL' ||
+        !!workpackData.workpackModel.dashboardSessionActive);
 
     if (this.dashboard && !loading && this.sectionActive) {
       this.setDashboardMilestonesData();

@@ -41,5 +41,8 @@ export interface IWorkpackModelProperty {
   key?: string;
   values?: number[];
   transversalViewOptions?: ITransversalView[];
+  idRootTransversalViewModel?: number;
+  rootTransversalViewOptions?: SelectItem[];
+  transversalDefaultOptions?: SelectItem[];
   fixed?: boolean; // only screen: fixed properties cannot be removed or disabled
 }

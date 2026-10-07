@@ -38,7 +38,7 @@
         [pTooltip]="(workpack?.favoritedBy ? 'removeFavorite' : 'addFavorite') | translate" (click)="!favoriteProcessing && handleFavorite()" [class.responsive]="responsive"
         [class]="(workpack?.favoritedBy ? 'fas icon-favorite-checked ' : 'far ') + 'fa-star icon-favorite'">
       </i>
-      <app-config-data-view-panel  [notShowCollapseOptions]="showTabview"></app-config-data-view-panel>
+      <app-config-data-view-panel  [notShowCollapseOptions]="useTabview"></app-config-data-view-panel>
     </div>
   </div>
   <div class="app-content-header" *ngIf="workpackModel && !idWorkpack && !workpackLoading" [class.mobile]="responsive">
@@ -46,9 +46,10 @@
     <span class="text">{{workpackModel?.modelName}}</span>
   </div>
   <ng-container *ngIf="!isSearching">
-    <div class="tabview-container" *ngIf="showTabview && !workpackLoading">
+    <div class="tabview-container" *ngIf="useTabview && !workpackLoading">
         <app-tabview-scrolled [tabs]="tabs" (selectedTabChange)="changeTab($event)"
-          [idWorkpack]="tabviewIdWorkpack" [contextVersion]="tabviewContextVersion">
+          [idWorkpack]="tabviewIdWorkpack" [contextVersion]="tabviewContextVersion"
+          [forceTabview]="isTransversalProgram">
         <div tabviewBody *ngIf="selectedTab?.key === 'WBS'">
             <div class="card-WBS">
             <app-workpack-section-wbs
@@ -137,6 +138,13 @@
             <app-workpack-section-stakeholders></app-workpack-section-stakeholders>
             </div>
         </div>
+        <div tabviewBody *ngFor="let model of transversalLinkedModels">
+          <app-transversal-workpacks *ngIf="selectedTab?.key === transversalTabKey(model)"
+            [idTransversalProgram]="idWorkpack" [idPlan]="idPlan"
+            [linkedModel]="model" [canEdit]="isUserAdmin || getEditPermission()"
+            [displayMode]="displayModeAll" [responsive]="responsive" [pageSize]="pageSize">
+          </app-transversal-workpacks>
+        </div>
         <div tabviewBody *ngIf="selectedTab?.key === 'costAccounts'">
             <div class="card-cost-accounts">
             <app-workpack-section-cost-accounts></app-workpack-section-cost-accounts>
@@ -193,7 +201,7 @@
         </app-tabview-scrolled>
     </div>
 
-    <div class="panels-container" *ngIf="!showTabview  && !workpackLoading">
+    <div class="panels-container" *ngIf="!useTabview  && !workpackLoading">
         <div class="card-dashboard"
         *ngIf="!!idWorkpack && !!workpack && !workpack.canceled && !!workpackModel && !!workpackModel.dashboardSessionActive">
         <app-workpack-section-dashboard [idWorkpack]="idWorkpack" [workpackFullName]="workpack?.fullName"

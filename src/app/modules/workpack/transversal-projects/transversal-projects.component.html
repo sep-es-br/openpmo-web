@@ -1,0 +1,40 @@
+<section class="transversal-projects">
+  <h3>{{ 'transversalProjects' | translate }}</h3>
+  <div *ngIf="isLoading" class="transversal-projects-loading">{{ 'loadingEllipsis' | translate }}</div>
+  <ng-container *ngIf="!isLoading">
+    <div class="transversal-projects-add">
+      <p-dropdown
+        class="app-single-selection transversal-project-select"
+        inputId="transversal-project-select"
+        [options]="eligibleProjects"
+        optionLabel="displayName"
+        optionValue="idProject"
+        [filter]="true"
+        filterBy="displayName"
+        [autoDisplayFirst]="false"
+        [placeholder]="'selectProject' | translate"
+        [(ngModel)]="selectedProjectId"
+        [disabled]="isSaving || !eligibleProjects.length">
+      </p-dropdown>
+      <p-button
+        class="app-button-green"
+        [label]="'include' | translate"
+        [disabled]="!selectedProjectId || isSaving"
+        (onClick)="includeSelected()">
+      </p-button>
+    </div>
+    <p *ngIf="!includedProjects.length">{{ 'noProjectsIncluded' | translate }}</p>
+    <ul *ngIf="includedProjects.length">
+      <li *ngFor="let project of includedProjects">
+        <span>{{ project.fullName || project.name }}</span>
+        <small *ngIf="!project.currentlyEligible">{{ 'projectNoLongerEligible' | translate }}</small>
+        <p-button
+          styleClass="p-button-text p-button-danger"
+          [label]="'removeParticipation' | translate"
+          [disabled]="isSaving"
+          (onClick)="remove(project)">
+        </p-button>
+      </li>
+    </ul>
+  </ng-container>
+</section>

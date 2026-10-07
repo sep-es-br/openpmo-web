@@ -16,10 +16,9 @@ import { IDomain } from '../interfaces/IDomain';
 import { ILocalityList } from '../interfaces/ILocality';
 import { TranslateService } from '@ngx-translate/core';
 import { TypeWorkpackModelEnum } from '../enums/TypeWorkpackModelEnum';
-import { WorkpackModelClassificationEnum } from '../enums/WorkpackModelClassificationEnum';
-import { IMenuPlanModel, IMenuWorkpackModel } from '../interfaces/IMenu';
-import { MenuService } from './menu.service';
-import { WorkpackModelService } from './workpack-model.service';
+import { TransversalService } from './transversal.service';
+import { ITransversalSelectionOption } from '../interfaces/ITransversal';
+import { orderTransversalSelectionOptions } from '../utils/transversal-selection.util';
 
 @Injectable({
   providedIn: 'root'
@@ -44,8 +43,7 @@ export class WorkpackPropertyService {
     private organizationSrv: OrganizationService,
     private unitMeasureSrv: MeasureUnitService,
     private translateSrv: TranslateService,
-    private menuSrv: MenuService,
-    private workpackModelSrv: WorkpackModelService
+    private transversalSrv: TransversalService
   ) {
   }
 
@@ -132,6 +130,7 @@ export class WorkpackPropertyService {
     property.max = pro.max;
     property.precision = pro.precision;
     property.possibleValues = pro.possibleValues;
+    property.unavailableTransversalViewSelections = pro.unavailableTransversalViewSelections;
     property.possibleValuesIds = pro.possibleValuesIds;
     property.multipleSelection = pro.multipleSelection;
     property.rows = pro.rows;
@@ -220,6 +219,7 @@ export class WorkpackPropertyService {
     property.disabled = !this.workpackSrv.getEditPermission() || isProjectWithoutApprovedBaseline;
     property.helpText = propertyModel.helpText;
     property.sortIndex = propertyModel.sortIndex;
+    property.idRootTransversalViewModel = propertyModel.idRootTransversalViewModel;
     property.multipleSelection = propertyModel.multipleSelection;
     property.rows = propertyModel.rows ? propertyModel.rows : 1;
     property.decimals = propertyModel.decimals;
@@ -240,12 +240,12 @@ export class WorkpackPropertyService {
     }
     if ([TypePropertyModelEnum.SelectionModel, TypePropertyModelEnum.TransversalViewSelectionModel]
       .includes(this.typePropertyModel[propertyModel.type]) && propertyModel.multipleSelection) {
-      const listValues = propertyWorkpack?.value ? propertyWorkpack?.value as string : propertyModel.defaultValue as string;
+      const listValues = (propertyWorkpack?.value || propertyModel.defaultValue) as string;
       property.defaultValue = listValues && listValues.length > 0 ? listValues.split(',') : null;
       property.value = listValues && listValues.length > 0 ? listValues.split(',') : null;
     }
     if (this.typePropertyModel[propertyModel.type] === TypePropertyModelEnum.TransversalViewSelectionModel) {
-      const storedValue = propertyWorkpack?.value as string;
+      const storedValue = (propertyWorkpack?.value || propertyModel.defaultValue) as string;
       const selection = storedValue
         ? property.multipleSelection ? storedValue.split(',') : storedValue
         : null;
@@ -268,7 +268,23 @@ export class WorkpackPropertyService {
     }
 
     if (this.typePropertyModel[propertyModel.type] === TypePropertyModelEnum.TransversalViewSelectionModel) {
-      property.possibleValues = await this.loadTransversalViewOptions(property, propertyModel);
+      const options = await this.loadTransversalViewOptions(property, propertyModel);
+      const selectedValues = Array.isArray(property.value) ? property.value : property.value ? [property.value] : [];
+      const selectedTokens = selectedValues.map(value => String(value));
+      const availableIds = new Set(options.map(option => option.id));
+      property.unavailableTransversalViewSelections = selectedTokens
+        .filter(value => !Number.isFinite(Number(value)) || !availableIds.has(Number(value)))
+        .map(value => {
+          const id = Number(value);
+          const label = Number.isFinite(id)
+            ? `${this.translateSrv.instant('unavailableTransversalView')} (ID ${id})`
+            : `${this.translateSrv.instant('unavailableTransversalView')}: ${value}`;
+          return { id: Number.isFinite(id) ? id : undefined, value, label };
+        });
+      property.possibleValues = options.map(option => ({
+        label: option.displayName || option.fullName || option.name,
+        value: String(option.id)
+      }));
     }
 
     if (this.typePropertyModel[propertyModel.type] === TypePropertyModelEnum.LocalitySelectionModel) {
@@ -336,67 +352,24 @@ export class WorkpackPropertyService {
   private async loadTransversalViewOptions(
     property: PropertyTemplateModel,
     propertyModel: IWorkpackModelProperty
-  ): Promise<Array<{ label: string; value: string; disabled?: boolean }>> {
+  ): Promise<ITransversalSelectionOption[]> {
     const projectModel = this.workpackData?.workpackModel;
-    const idOffice = this.workpackParams?.idOffice;
-    const idPlanModel = projectModel?.idPlanModel || projectModel?.planModel?.id;
-    const idStructuralModel = projectModel?.id;
-
-    if (projectModel?.type !== TypeWorkpackModelEnum.ProjectModel || !idOffice || !idPlanModel || !idStructuralModel) {
+    if (projectModel?.type !== TypeWorkpackModelEnum.ProjectModel || !this.workpackParams?.idPlan) {
       return [];
     }
 
     try {
-      const menuResult = await this.menuSrv.getItemsPlanModel(idOffice);
-      if (!menuResult?.success) {
+      if (!propertyModel.idRootTransversalViewModel) {
         return [];
       }
-
-      const planModel = (menuResult.data || []).find((plan: IMenuPlanModel) => plan.id === idPlanModel);
-      const transversalModels = this.flattenWorkpackModels(planModel?.workpackModels || [])
-        .filter(model => model.classification === WorkpackModelClassificationEnum.TRANSVERSAL);
-      const eligibilityResults = await Promise.all(transversalModels.map(async model => {
-        try {
-          const result = await this.workpackModelSrv.getUses(Number(model.id));
-          const isEligible = result?.success && (result.data || []).some(
-            usedModel => Number(usedModel.id) === Number(idStructuralModel)
-          );
-          return { model, isEligible: !!isEligible };
-        } catch (_) {
-          return { model, isEligible: false };
-        }
-      }));
-
-      const selectedValues = Array.isArray(property.value) ? property.value : property.value ? [property.value] : [];
-      const selectedIds = new Set(selectedValues.map(String));
-      const options = eligibilityResults
-        .filter(({ model, isEligible }) => isEligible || selectedIds.has(String(model.id)))
-        .map(({ model, isEligible }) => ({
-          label: model.name || model.modelName || model.fullName || String(model.id),
-          value: String(model.id),
-          ...(!isEligible ? { disabled: true } : {})
-        }));
-
-      const hasStoredSelection = this.workpackData.workpack?.properties?.some(
-        storedProperty => storedProperty.idPropertyModel === propertyModel.id
+      const result = await this.transversalSrv.getSelectionOptions(
+        propertyModel.idRootTransversalViewModel,
+        { idPlan: this.workpackParams.idPlan }
       );
-      if (!hasStoredSelection && !property.value && options.length) {
-        const defaultSelection = property.multipleSelection ? [options[0].value] : options[0].value;
-        property.value = defaultSelection;
-        property.defaultValue = defaultSelection;
-      }
-      return options;
+      return result?.success ? orderTransversalSelectionOptions(result.data || []) : [];
     } catch (_) {
       return [];
     }
-  }
-
-  private flattenWorkpackModels(models: IMenuWorkpackModel[]): IMenuWorkpackModel[] {
-    return (models || []).reduce((all, model) => [
-      ...all,
-      model,
-      ...this.flattenWorkpackModels(model.children || [])
-    ], [] as IMenuWorkpackModel[]);
   }
 
   loadSelectedLocality(seletectedIds: number[], list: TreeNode[]) {

@@ -7,6 +7,8 @@ import { PrepareHttpParams } from '../utils/query.util';
 import { IWorkpackData, IWorkpackParams } from '../interfaces/IWorkpackDataParams';
 import { FilterDataviewService } from './filter-dataview.service';
 import { WorkpackService } from './workpack.service';
+import { WorkpackModelClassificationEnum } from '../enums/WorkpackModelClassificationEnum';
+import { TypeWorkpackEnum } from '../enums/TypeWorkpackEnum';
 
 @Injectable({ providedIn: 'root' })
 export class StakeholderService extends BaseService<IStakeholder> {
@@ -61,11 +63,18 @@ export class StakeholderService extends BaseService<IStakeholder> {
     return this.resetStakeholders.asObservable();
   }
 
+  isSectionAvailable(workpackData: IWorkpackData): boolean {
+    return !!workpackData?.workpack?.id && !!workpackData?.workpackModel &&
+      (workpackData.workpackModel.stakeholderSessionActive ||
+        (workpackData.workpack.type === TypeWorkpackEnum.ProgramModel &&
+          workpackData.workpackModel.classification === WorkpackModelClassificationEnum.TRANSVERSAL));
+  }
+
 
   async loadStakeholders(params?) {
     this.workpackData = this.workpackSrv.getWorkpackData();
     this.workpackParams = this.workpackSrv.getWorkpackParams();
-    if (this.workpackData && this.workpackData?.workpack?.id && this.workpackData?.workpackModel && this.workpackData.workpackModel.stakeholderSessionActive) {
+    if (this.isSectionAvailable(this.workpackData)) {
       if (!this.workpackParams.idWorkpackModelLinked || (this.workpackSrv.getEditPermission() && !!this.workpackParams.idWorkpackModelLinked)) {
         if (params) {
           this.idFilterSelected = params.idFilterSelected;

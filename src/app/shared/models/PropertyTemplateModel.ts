@@ -10,6 +10,7 @@ export class PropertyTemplateModel implements IProperty {
   id?: number;
   type: string;
   idPropertyModel?: number;
+  idRootTransversalViewModel?: number;
   active: boolean;
   fullLine?: boolean;
   label: string;
@@ -23,6 +24,7 @@ export class PropertyTemplateModel implements IProperty {
   max?: number;
   precision?: number;
   possibleValues?: { label: string; value: string }[];
+  unavailableTransversalViewSelections?: Array<{ id?: number; value: string; label: string }>;
   possibleValuesIds?: { label: string; value: number }[];
   multipleSelection?: boolean;
   rows?: number;

@@ -1,6 +1,7 @@
 <ng-container [ngSwitch]="cardType">
   <p-card *ngSwitchCase="'standard'" class="app-workpack-card-item listItem" [class.mobile]="responsive"
-    [class.cardList]="displayModeCard === 'list' && !responsive" [class.canceled]="properties.canceled">
+    [class.cardList]="displayModeCard === 'list' && !responsive" [class.canceled]="properties.canceled"
+    [class.read-only]="readOnly">
     <div class="display-mode-grid" *ngIf="displayModeCard !== 'list' || (displayModeCard === 'list' && !!responsive)">
       <p-header *ngIf="properties.menuItems" class="card-item-header">
         <div class="header-content">

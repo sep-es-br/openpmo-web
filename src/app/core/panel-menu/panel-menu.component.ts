@@ -25,6 +25,8 @@ import { ReportService } from 'src/app/shared/services/report.service';
 import { WorkpackBreadcrumbStorageService } from 'src/app/shared/services/workpack-breadcrumb-storage.service';
 import { PersonService } from 'src/app/shared/services/person.service';
 import { WorkpackModelClassificationEnum } from 'src/app/shared/enums/WorkpackModelClassificationEnum';
+import { TransversalService } from 'src/app/shared/services/transversal.service';
+import { ITransversalProgram, ITransversalProgramModel } from 'src/app/shared/interfaces/ITransversal';
 
 @Component({
   selector: 'app-panel-menu',
@@ -99,7 +101,8 @@ export class PanelMenuComponent implements OnInit {
     private confirmationSrv: ConfirmationService,
     private breadcrumbSrv: BreadcrumbService,
     private workpackBreadcrumbStorageSrv: WorkpackBreadcrumbStorageService,
-    private personSrv: PersonService
+    private personSrv: PersonService,
+    private transversalSrv: TransversalService
   ) {
     this.menuSrv.getMenuState.pipe(takeUntil(this.$destroy)).subscribe(async (menuState) => {
       this.isFixed = menuState.isFixed;
@@ -553,16 +556,22 @@ export class PanelMenuComponent implements OnInit {
   }
 
   async loadPortfolioMenu(idNewWorkpack?: number) {
+    let menuPortfolioData: IMenuWorkpack[] | null = null;
     if (this.currentIDOffice && this.currentIDPlan) {
       this.loadingMenuPortfolio = true;
       const { success, data } = await this.menuSrv.getItemsPortfolio(this.currentIDOffice, this.currentIDPlan);
       if (success) {
-        const menuPortfolioData = data || [];
+        menuPortfolioData = data || [];
         this.menuSrv.nextMenuPortfolioItems(menuPortfolioData);
-        this.itemsPortfolio = this.buildMenuItemPortfolio(menuPortfolioData, 0);
       }
     }
     await this.loadTransversalViewsMenu();
+    await this.loadPlanModelMenu();
+    if (menuPortfolioData) {
+      this.itemsPortfolio = this.buildMenuItemPortfolio(
+        this.filterTransversalWorkpacksFromPortfolio(menuPortfolioData), 0
+      );
+    }
     this.loadingMenuPortfolio = false;
     if (this.currentIDPlan && (!this.changedUrl || this.linkEvent)) {
       this.selectMenuActive(this.router.url.slice(1), idNewWorkpack);
@@ -591,6 +600,41 @@ export class PanelMenuComponent implements OnInit {
       pending.push(...(item.items || []));
     }
     return false;
+  }
+
+  private filterTransversalWorkpacksFromPortfolio(items: IMenuWorkpack[]): IMenuWorkpack[] {
+    const transversalWorkpackIds = new Set<number>();
+    const transversalModelIds = new Set<number>();
+    const pending = [...this.itemsTransversalViews];
+    while (pending.length) {
+      const item = pending.pop() as any;
+      if (item.workpackId != null) {
+        transversalWorkpackIds.add(Number(item.workpackId));
+      }
+      if (item.workpackModelId != null) {
+        transversalModelIds.add(Number(item.workpackModelId));
+      }
+      pending.push(...(item.items || []));
+    }
+    const models = [...this.itemsPlanModel];
+    while (models.length) {
+      const item = models.pop() as any;
+      if (item.classification === WorkpackModelClassificationEnum.TRANSVERSAL) {
+        transversalModelIds.add(Number(item.id));
+      }
+      models.push(...(item.items || []));
+    }
+    const filterItems = (branch: IMenuWorkpack[]): IMenuWorkpack[] => branch.reduce((filtered, item) => {
+      if (!transversalWorkpackIds.has(Number(item.id)) &&
+        !transversalModelIds.has(Number(item.idWorkpackModel))) {
+        filtered.push({
+          ...item,
+          children: filterItems(item.children || [])
+        });
+      }
+      return filtered;
+    }, [] as IMenuWorkpack[]);
+    return filterItems(items);
   }
 
   private expandTransversalMenuRoot(id: number): void {
@@ -839,12 +883,12 @@ export class PanelMenuComponent implements OnInit {
     );
 
     return Promise.all(transversalViews.map(async view => {
-      const programsResult = await this.workpackSrv.GetWorkpackListCards({
-        'id-plan': this.currentIDPlan,
-        'id-plan-model': idPlanModel,
-        'id-workpack-model': view.id
-      });
+      const [programsResult, modelsResult] = await Promise.all([
+        this.transversalSrv.getPrograms(Number(view.id), this.currentIDPlan),
+        this.transversalSrv.getProgramModels(Number(view.id))
+      ]);
       const programs = programsResult.success ? programsResult.data || [] : [];
+      const programModels = modelsResult.success ? modelsResult.data || [] : [];
 
       return {
         id: `transversal-view-${view.id}`,
@@ -853,26 +897,79 @@ export class PanelMenuComponent implements OnInit {
         title: view.fullName,
         tooltip: view.fullName,
         styleClass: `transversal-view-${view.id}`,
-        items: programs.map(program => ({
-          id: String(program.id),
-          workpackId: program.id,
-          label: program.name,
-          icon: program.fontIcon,
-          title: program.fullName,
-          tooltip: program.fullName,
-          styleClass: `transversal-program-${program.id}`,
-          command: () => {
-            this.router.navigate(['/workpack'], {
-              queryParams: {
-                id: program.id,
-                idPlan: this.currentIDPlan
-              }
-            });
-            this.closeAllMenus();
-          }
-        }))
+        items: [
+          ...this.buildTransversalProgramItems(Number(view.id), programs, programModels),
+          ...programModels.filter(model => model.id === Number(view.id) ||
+            (view.type !== 'ProgramModel' && model.idParentModel === Number(view.id)))
+            .map(model => this.newTransversalProgramItem(Number(view.id), model))
+        ]
       };
     }));
+  }
+
+  private buildTransversalProgramItems(
+    idView: number,
+    programs: ITransversalProgram[],
+    models: ITransversalProgramModel[],
+    idParent?: number,
+    visited = new Set<number>()
+  ): MenuItem[] {
+    const programIds = new Set(programs.map(program => program.idTransversalProgram));
+    return programs.filter(program => idParent
+      ? program.idParent === idParent
+      : !program.idParent || !programIds.has(program.idParent)
+    ).filter(program => !visited.has(program.idTransversalProgram)).map(program => {
+      const branch = new Set(visited);
+      branch.add(program.idTransversalProgram);
+      return {
+        id: String(program.idTransversalProgram),
+        workpackId: program.idTransversalProgram,
+        workpackModelId: program.idWorkpackModel,
+        label: program.name,
+        icon: program.fontIcon,
+        title: program.fullName,
+        tooltip: program.fullName,
+        styleClass: `transversal-program-${program.idTransversalProgram}`,
+        items: [
+          ...this.buildTransversalProgramItems(idView, programs, models, program.idTransversalProgram, branch),
+          ...models.filter(model => model.idParentModel === program.idWorkpackModel)
+            .map(model => this.newTransversalProgramItem(idView, model, program.idTransversalProgram))
+        ],
+        command: (event) => {
+          if (event.originalEvent?.target?.classList?.contains('p-panelmenu-icon')) {
+            return;
+          }
+          this.router.navigate(['/workpack'], {
+            queryParams: { id: program.idTransversalProgram, idPlan: this.currentIDPlan }
+          });
+          this.closeAllMenus();
+        }
+      } as MenuItem;
+    });
+  }
+
+  private newTransversalProgramItem(
+    idView: number,
+    model: ITransversalProgramModel,
+    idParent?: number
+  ): MenuItem {
+    return {
+      id: `new-transversal-program-${idView}-${model.id}-${idParent || 'root'}`,
+      ...({ workpackModelId: model.id } as any),
+      label: `${this.translateSrv.instant('new')} ${model.name}`,
+      icon: 'pi pi-plus',
+      command: () => {
+        this.router.navigate(['/workpack'], {
+          queryParams: {
+            idPlan: this.currentIDPlan,
+            idWorkpackModel: model.id,
+            idWorkpackParent: idParent,
+            idTransversalView: idView
+          }
+        });
+        this.closeAllMenus();
+      }
+    };
   }
 
   async setWorkpackBreadcrumbStorage(idWorkpack, idPlan) {

@@ -130,6 +130,7 @@ interface IWorkpackDashboard {
     scopeActualVariationPercent: number;
     scopePlannedValue: number;
     scopeForeseenValue: number;
+    scopeActualValue?: number;
     scopeForeseenWorkRefMonth: number;
   };
   performanceIndex: {
@@ -137,6 +138,7 @@ interface IWorkpackDashboard {
     costPerformanceIndexVariation: number;
     schedulePerformanceIndexValue: number;
     schedulePerformanceIndexVariation: number;
+    earnedValue?: number;
   };
   earnedValue?: number;
 }

@@ -76,6 +76,33 @@
     min-width: 20%;
     flex: 1;
   }
+  .transversal-default-selection {
+    width: 200px;
+    max-width: 100%;
+
+    .app-single-selection,
+    .app-multiple-selection {
+      display: block;
+      width: 100%;
+    }
+
+    .p-dropdown,
+    .p-multiselect {
+      display: flex;
+      width: 100%;
+    }
+
+    .p-multiselect-label-container {
+      min-width: 0;
+    }
+
+    .p-dropdown-label,
+    .p-multiselect-label {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
   .transversal-view-options {
     min-width: 260px;
     flex: 1 1 100%;

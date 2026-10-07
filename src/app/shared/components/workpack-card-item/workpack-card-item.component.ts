@@ -23,6 +23,8 @@ export class WorkpackCardItemComponent implements OnInit, OnDestroy {
 
   @Input() displayModeCard: string;
 
+  @Input() readOnly = false;
+
   @ViewChild('newItemIcon') newItemIcon: ElementRef;
 
   cardIdItem: string;
@@ -485,7 +487,9 @@ export class WorkpackCardItemComponent implements OnInit, OnDestroy {
     this.enable = false;
     await this.properties.onNewItem();
     this.enable = true;
-    this.newItemIcon.nativeElement.click();
+    if (this.properties.iconMenuItems?.length) {
+      this.newItemIcon.nativeElement.click();
+    }
   }
 }
 

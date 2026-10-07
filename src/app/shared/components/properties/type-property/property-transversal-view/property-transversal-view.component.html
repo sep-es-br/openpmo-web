@@ -1,15 +1,31 @@
 <div class="transversal-view-property" [class.disabled]="property.disabled">
-  <button type="button" class="transversal-view-card" *ngFor="let option of property.possibleValues"
-    [class.selected]="isSelected(option)" [disabled]="property.disabled || isDisabled(option)"
-    (click)="toggle(option)">
-    <span class="transversal-view-card-check" aria-hidden="true">
-      <i class="fas" [ngClass]="isSelected(option) ? 'fa-check-square' : 'fa-square'"></i>
+  <ng-container *ngIf="property.multipleSelection; else singleTransversalView">
+    <span class="p-float-label">
+      <p-multiSelect class="app-multiple-selection" dropdownIcon="fas fa-caret-down"
+        [options]="property.possibleValues || []" [ngModel]="property.value"
+        [disabled]="property.disabled" display="chip" [maxSelectedLabels]="2"
+        (onChange)="updateSelection($event.value)">
+      </p-multiSelect>
+      <label class="app-input-label">{{ property.label }}</label>
     </span>
-    <span class="transversal-view-card-label">{{ option.label }}</span>
-  </button>
-  <span class="transversal-view-empty" *ngIf="!property.possibleValues?.length">
-    Nenhuma visão transversal disponível.
-  </span>
+  </ng-container>
+  <ng-template #singleTransversalView>
+    <span class="p-float-label">
+      <p-dropdown class="app-single-selection" dropdownIcon="fas fa-caret-down"
+        [options]="property.possibleValues || []" [ngModel]="property.value"
+        [disabled]="property.disabled" [autoDisplayFirst]="false"
+        (onChange)="updateSelection($event.value)">
+      </p-dropdown>
+      <label class="app-input-label">{{ property.label }}</label>
+    </span>
+  </ng-template>
+  <div class="transversal-view-unavailable" *ngIf="property.unavailableTransversalViewSelections?.length">
+    <span *ngFor="let item of property.unavailableTransversalViewSelections">
+      {{ item.label }}
+      <button type="button" [disabled]="property.disabled" (click)="removeUnavailable(item.value)"
+        [attr.aria-label]="'Remover ' + item.label">×</button>
+    </span>
+  </div>
   <span class="input-message-error" *ngIf="property.invalid">
     {{ property.message }}
   </span>

@@ -1,5 +1,4 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { SelectItem } from 'primeng/api';
 import { PropertyTemplateModel } from 'src/app/shared/models/PropertyTemplateModel';
 
 @Component({
@@ -12,31 +11,28 @@ export class PropertyTransversalViewComponent {
   @Input() property: PropertyTemplateModel;
   @Output() changed = new EventEmitter();
 
-  isSelected(option: SelectItem): boolean {
-    const value = this.property?.value;
-    return Array.isArray(value) ? (value as any[]).includes(option.value) : value === option.value;
+  updateSelection(selection: string | number | Array<string | number>): void {
+    const selectedValues = Array.isArray(selection) ? selection : selection ? [selection] : [];
+    const values = selectedValues.map(value => String(value));
+    if (this.property.multipleSelection) {
+      (this.property.unavailableTransversalViewSelections || []).forEach(item => values.push(item.value));
+    }
+    this.property.value = this.property.multipleSelection ? values : values[0] || null;
+    this.changed.emit(this.property.value);
   }
 
-  isDisabled(option: SelectItem): boolean {
-    return !!(option as any).disabled;
-  }
-
-  toggle(option: SelectItem): void {
-    if (!this.property || this.property.disabled || this.isDisabled(option)) {
+  removeUnavailable(value: string): void {
+    if (!this.property || this.property.disabled) {
       return;
     }
-
-    if (this.property.multipleSelection) {
-      const currentValues: any[] = Array.isArray(this.property.value)
-        ? [...this.property.value as any[]]
-        : this.property.value ? [this.property.value] : [];
-      this.property.value = this.isSelected(option)
-        ? currentValues.filter(value => value !== option.value)
-        : [...currentValues, option.value];
-    } else {
-      this.property.value = this.isSelected(option) ? null : option.value;
-    }
-
+    const storedValue = this.property.value;
+    const values: string[] = Array.isArray(storedValue)
+      ? Array.from(storedValue as Array<string | number>, item => String(item))
+      : storedValue ? [String(storedValue)] : [];
+    const remaining = values.filter(item => item !== value);
+    this.property.value = this.property.multipleSelection ? remaining : remaining[0] || null;
+    this.property.unavailableTransversalViewSelections =
+      this.property.unavailableTransversalViewSelections.filter(item => item.value !== value);
     this.changed.emit(this.property.value);
   }
 }

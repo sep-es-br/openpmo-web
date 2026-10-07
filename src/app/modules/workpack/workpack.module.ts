@@ -41,6 +41,7 @@ import { ObligationComponent } from './obligation/obligation.component';
 import { ProcurementComponent } from './procurement/procurement.component';
 import { CooperationComponent } from './cooperation/cooperation.component';
 import { ContractComponent } from './contract/contract.component';
+import { TransversalWorkpacksComponent } from './transversal-projects/transversal-workpacks.component';
 
 @NgModule({
   declarations: [
@@ -77,7 +78,8 @@ import { ContractComponent } from './contract/contract.component';
     WorkpackSectionWBSComponent,
     WorkpackSectionObligationsComponent,
     WorkpackSectionProcurementsComponent,
-    WorkpackSectionAgreementsComponent
+    WorkpackSectionAgreementsComponent,
+    TransversalWorkpacksComponent
   ],
   imports: [
       CommonModule,

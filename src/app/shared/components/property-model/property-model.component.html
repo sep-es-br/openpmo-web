@@ -95,6 +95,33 @@
       </span>
       <!-- Default Value -->
       <ng-container [ngSwitch]="property.type">
+        <span *ngSwitchCase="'TransversalViewSelectionModel'" class="p-float-label property-selection p-field">
+          <p-dropdown class="app-single-selection" [options]="property.rootTransversalViewOptions"
+            [(ngModel)]="property.idRootTransversalViewModel" optionLabel="label" optionValue="value"
+            [autoDisplayFirst]="false" [required]="(property.rootTransversalViewOptions?.length || 0) > 0"
+            [disabled]="property.viewOnly || !property.rootTransversalViewOptions?.length"
+            (onChange)="changed.emit({ property: property, rootTransversalModelChanged: true })">
+          </p-dropdown>
+          <label class="input-label">{{ 'rootTransversalView' | translate }}
+            <span *ngIf="property.rootTransversalViewOptions?.length"> *</span>
+            <i class="far fa-question-circle" [pTooltip]="'help.propertyModel.defaultValue' | translate"></i>
+          </label>
+        </span>
+        <span *ngSwitchCase="'TransversalViewSelectionModel'" class="p-float-label property-selection transversal-default-selection p-field">
+          <p-multiSelect *ngIf="property.multipleSelection" class="app-multiple-selection"
+            [options]="property.transversalDefaultOptions" [(ngModel)]="property.defaultValue"
+            optionLabel="label" optionValue="value" [disabled]="property.viewOnly"
+            (ngModelChange)="changed.emit($event)">
+          </p-multiSelect>
+          <p-dropdown *ngIf="!property.multipleSelection" class="app-single-selection"
+            [options]="property.transversalDefaultOptions" [(ngModel)]="property.defaultValue"
+            optionLabel="label" optionValue="value" [autoDisplayFirst]="false"
+            [disabled]="property.viewOnly" (onChange)="changed.emit($event)">
+          </p-dropdown>
+          <label class="input-label">{{ 'defaultValue' | translate }}
+            <i class="far fa-question-circle" [pTooltip]="'help.propertyModel.defaultValue' | translate"></i>
+          </label>
+        </span>
         <span *ngSwitchCase="'IntegerModel'" class="p-float-label property-input p-field input-number-scroll">
           <p-inputNumber class="app-input-number" [(ngModel)]="property.defaultValue" [disabled]="property.viewOnly"
             [min]="property.min" [max]="property.max" (ngModelChange)="changed.emit($event)" [showButtons]="true">

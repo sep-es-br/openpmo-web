@@ -2,12 +2,14 @@ import { Inject, Injectable, Injector } from '@angular/core';
 import { BaseService } from '../base/base.service';
 import { IHttpResult } from '../interfaces/IHttpResult';
 import {
-  ICreateTransversalProgram,
   IEligibleProject,
-  ITransversalContext,
   ITransversalProgram,
+  ITransversalProgramModel,
   ITransversalProjectParticipation,
-  ITransversalView
+  ITransversalSelectionOption,
+  ITransversalLinkedModel,
+  ITransversalWorkpack,
+  ITransversalWorkpackParticipation
 } from '../interfaces/ITransversal';
 import { PrepareHttpParams } from '../utils/query.util';
 
@@ -18,15 +20,13 @@ export class TransversalService extends BaseService<ITransversalProgram> {
     super('transversal', injector);
   }
 
-  getViewOptions(idPlan: number): Promise<IHttpResult<ITransversalView[]>> {
-    return this.http.get<IHttpResult<ITransversalView[]>>(`${this.urlBase}/views/options`, {
-      params: PrepareHttpParams({ 'id-plan': idPlan })
-    }).toPromise();
-  }
-
-  getViewContext(idTransversalView: number, idPlan: number): Promise<IHttpResult<ITransversalContext>> {
-    return this.http.get<IHttpResult<ITransversalContext>>(`${this.urlBase}/views/${idTransversalView}/context`, {
-      params: PrepareHttpParams({ 'id-plan': idPlan })
+  getSelectionOptions(idRootTransversalViewModel: number, params: { idPlan?: number; idPlanModel?: number }) {
+    return this.http.get<IHttpResult<ITransversalSelectionOption[]>>(`${this.urlBase}/selection-options`, {
+      params: PrepareHttpParams({
+        'id-root-transversal-view-model': idRootTransversalViewModel,
+        'id-plan': params?.idPlan,
+        'id-plan-model': params?.idPlanModel
+      })
     }).toPromise();
   }
 
@@ -36,19 +36,71 @@ export class TransversalService extends BaseService<ITransversalProgram> {
     }).toPromise();
   }
 
-  createProgram(
-    idTransversalView: number,
-    payload: ICreateTransversalProgram
-  ): Promise<IHttpResult<ITransversalProgram>> {
-    return this.http.post<IHttpResult<ITransversalProgram>>(
-      `${this.urlBase}/views/${idTransversalView}/programs`,
-      payload
+  getProgramModels(idTransversalView: number): Promise<IHttpResult<ITransversalProgramModel[]>> {
+    return this.http.get<IHttpResult<ITransversalProgramModel[]>>(
+      `${this.urlBase}/views/${idTransversalView}/program-models`
     ).toPromise();
   }
 
   getEligibleProjects(idTransversalProgram: number): Promise<IHttpResult<IEligibleProject[]>> {
     return this.http.get<IHttpResult<IEligibleProject[]>>(
       `${this.urlBase}/programs/${idTransversalProgram}/eligible-projects`
+    ).toPromise();
+  }
+
+  getLinkedModels(idTransversalProgram: number): Promise<IHttpResult<ITransversalLinkedModel[]>> {
+    return this.http.get<IHttpResult<ITransversalLinkedModel[]>>(
+      `${this.urlBase}/programs/${idTransversalProgram}/linked-models`
+    ).toPromise();
+  }
+
+  getEligibleWorkpacks(
+    idTransversalProgram: number,
+    idWorkpackModel: number,
+    page = 0,
+    pageSize = 20
+  ): Promise<IHttpResult<ITransversalWorkpack[]>> {
+    return this.http.get<IHttpResult<ITransversalWorkpack[]>>(
+      `${this.urlBase}/programs/${idTransversalProgram}/eligible-workpacks`,
+      { params: PrepareHttpParams({ 'id-workpack-model': idWorkpackModel, page, pageSize }) }
+    ).toPromise();
+  }
+
+  getIncludedWorkpacks(
+    idTransversalProgram: number,
+    idWorkpackModel: number,
+    page = 0,
+    pageSize = 20,
+    showCanceled = false
+  ): Promise<IHttpResult<ITransversalWorkpack[]>> {
+    return this.http.get<IHttpResult<ITransversalWorkpack[]>>(
+      `${this.urlBase}/programs/${idTransversalProgram}/workpacks`,
+      { params: PrepareHttpParams({ 'id-workpack-model': idWorkpackModel, page, pageSize, 'show-canceled': showCanceled }) }
+    ).toPromise();
+  }
+
+  includeWorkpack(
+    idTransversalProgram: number,
+    idWorkpack: number
+  ): Promise<IHttpResult<ITransversalWorkpackParticipation>> {
+    return this.http.post<IHttpResult<ITransversalWorkpackParticipation>>(
+      `${this.urlBase}/programs/${idTransversalProgram}/workpacks/${idWorkpack}`,
+      {}
+    ).toPromise();
+  }
+
+  removeWorkpack(
+    idTransversalProgram: number,
+    idWorkpack: number
+  ): Promise<IHttpResult<ITransversalWorkpackParticipation>> {
+    return this.http.delete<IHttpResult<ITransversalWorkpackParticipation>>(
+      `${this.urlBase}/programs/${idTransversalProgram}/workpacks/${idWorkpack}`
+    ).toPromise();
+  }
+
+  getIncludedProjects(idTransversalProgram: number): Promise<IHttpResult<IEligibleProject[]>> {
+    return this.http.get<IHttpResult<IEligibleProject[]>>(
+      `${this.urlBase}/programs/${idTransversalProgram}/projects`
     ).toPromise();
   }
 

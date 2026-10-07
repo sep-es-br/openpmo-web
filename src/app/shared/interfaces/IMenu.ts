@@ -70,6 +70,7 @@ export interface IMenuWorkpackModel {
 
 export interface IMenuWorkpack {
   id: string;
+  idWorkpackModel?: number;
   idWorkpackModelLinked?: string;
   fullName?: string;
   name: string;

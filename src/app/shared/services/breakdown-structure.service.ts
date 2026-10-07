@@ -574,4 +574,9 @@ export class BreakdownStructureService extends BaseService<IWorkpackBreakdownStr
       (`${this.urlBase}/${idWorkpack}`, { params: PrepareHttpParams(options) }).toPromise();
   }
 
+  async getPlanStructureById(idPlan: number, options = {}): Promise<IHttpResult<any>> {
+    return await this.http.get<IHttpResult<any>>
+      (`${this.urlBase}/plan/${idPlan}`, { params: PrepareHttpParams(options) }).toPromise();
+  }
+
 }

@@ -86,7 +86,12 @@ export class DashboardService extends BaseService<IDashboard> {
     this.workpackParams = this.workpackSrv.getWorkpackParams();
     if (!!this.workpackData.workpack && !!this.workpackData.workpack.id &&
       !this.workpackData.workpack.canceled && !!this.workpackData.workpackModel &&
-      !!this.workpackData.workpackModel.dashboardSessionActive) {
+      (this.workpackData.workpackModel.classification === 'TRANSVERSAL' ||
+        !!this.workpackData.workpackModel.dashboardSessionActive)) {
+        if (this.isTransversalDashboard()) {
+          this.referenceMonth = undefined;
+          this.selectedBaseline = undefined;
+        }
         if (this.workpackData.workpack.type === 'Project') {
           const result = await this.GetBaselines({ 'id-workpack': this.workpackData.workpack.id });
           if (result.success) {
@@ -106,6 +111,9 @@ export class DashboardService extends BaseService<IDashboard> {
     if (params) {
       this.referenceMonth = params.referenceMonth;
       this.selectedBaseline = params.selectedBaseline;
+    }
+    if (this.isTransversalDashboard()) {
+      this.selectedBaseline = undefined;
     }
     if (this.referenceMonth && this.referenceMonth !== null) {
       const referenceMonth = moment(this.referenceMonth).format('MM-yyyy');
@@ -158,6 +166,10 @@ export class DashboardService extends BaseService<IDashboard> {
         this.validateDashboard();
       }
     }
+  }
+
+  private isTransversalDashboard(): boolean {
+    return this.workpackData?.workpackModel?.classification === 'TRANSVERSAL';
   }
 
   setScheduleInterval(data: IDashboard) {

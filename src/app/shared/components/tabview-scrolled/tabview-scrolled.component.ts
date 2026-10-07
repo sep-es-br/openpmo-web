@@ -28,6 +28,8 @@ export class TabviewScrolledComponent implements OnChanges, OnDestroy {
 
   @Input() contextVersion: number;
 
+  @Input() forceTabview = false;
+
   selectedTab: ITabViewScrolled;
 
   tabBody: string;
@@ -171,7 +173,7 @@ export class TabviewScrolledComponent implements OnChanges, OnDestroy {
   }
 
   prepareScrolls() {
-    if (!this.showTabview) {
+    if (!this.showTabview && !this.forceTabview) {
       return;
     }
     const tabs = document.querySelectorAll('.app-tabview-scrolled-header-item');

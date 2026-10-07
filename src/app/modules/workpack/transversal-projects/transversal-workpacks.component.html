@@ -1,0 +1,70 @@
+<section class="transversal-workpacks">
+  <app-card [properties]="cardSection" [loading]="isLoading">
+    <div class="transversal-workpacks-toolbar">
+    <div class="transversal-workpacks-canceled">
+      <p-inputSwitch [(ngModel)]="showCanceled" (onChange)="handleCanceledChange()"></p-inputSwitch>
+      <label>{{ 'showCanceled' | translate }}</label>
+    </div>
+  </div>
+
+  <div *ngIf="isLoading" class="transversal-workpacks-loading">{{ 'loadingEllipsis' | translate }}</div>
+
+  <ng-container *ngIf="!isLoading">
+    <p-dataView [value]="workpackCards" [trackBy]="trackByWorkpackCard" layout="grid" styleClass="dataview-card-items"
+      *ngIf="(displayMode === 'grid' || (displayMode === 'list' && !!responsive))"
+      [paginator]="true" [lazy]="true" [rows]="pageSize" [first]="includedPage * pageSize"
+      [totalRecords]="totalRecords" [showJumpToPageDropdown]="true" [showPageLinks]="false"
+      (onPage)="handleIncludedPageChange($event)"
+      [emptyMessage]="'notFoundWorkpacksToThisModel' | translate">
+      <ng-template let-cardItem pTemplate="gridItem">
+        <div class="p-col-12 p-md-3 p-sm-12 card-item-container">
+          <app-workpack-card-item [properties]="cardItem" [displayModeCard]="displayMode"></app-workpack-card-item>
+          <span *ngIf="!cardItem.currentlyEligible"
+            class="p-tag p-tag-warning transversal-workpack-legacy">{{ 'transversalNoLongerEligible' | translate }}</span>
+        </div>
+      </ng-template>
+    </p-dataView>
+
+    <p-dataView [value]="workpackCards" [trackBy]="trackByWorkpackCard" layout="list" class="app-dataview app-dataview-list"
+      styleClass="dataview-card-items"
+      *ngIf="(displayMode === 'list' && !responsive)" [paginator]="true" [lazy]="true" [rows]="pageSize"
+      [first]="includedPage * pageSize" [totalRecords]="totalRecords" [showJumpToPageDropdown]="true"
+      [showPageLinks]="false" (onPage)="handleIncludedPageChange($event)"
+      [emptyMessage]="'notFoundWorkpacksToThisModel' | translate">
+      <ng-template let-cardItem pTemplate="listItem">
+        <div class="p-col-12">
+          <app-workpack-card-item [properties]="cardItem" [displayModeCard]="displayMode"></app-workpack-card-item>
+          <span *ngIf="!cardItem.currentlyEligible"
+            class="p-tag p-tag-warning transversal-workpack-legacy">{{ 'transversalNoLongerEligible' | translate }}</span>
+        </div>
+      </ng-template>
+    </p-dataView>
+  </ng-container>
+
+  </app-card>
+  <p-dialog [(visible)]="showPicker" [modal]="true" [style]="{ width: '48rem', maxWidth: '95vw' }"
+    [header]="'transversalChooseWorkpacks' | translate: { modelName: linkedModel?.modelNameInPlural || linkedModel?.modelName }"
+    [dismissableMask]="false">
+    <div *ngIf="isPickerLoading" class="transversal-workpacks-loading">{{ 'loadingEllipsis' | translate }}</div>
+    <p-tree *ngIf="!isPickerLoading" [value]="eligibleTree" (onNodeExpand)="expandEligibleNode($event)"
+      [emptyMessage]="'noRecordsFound' | translate">
+      <ng-template let-node pTemplate="default">
+        <div class="transversal-workpack-option">
+          <p-checkbox *ngIf="node.selectable" [binary]="true"
+            [ngModel]="selectedWorkpackIds.includes(node.idWorkpack)"
+            (onChange)="toggleSelection(node.idWorkpack, $event.checked)"></p-checkbox>
+          <i *ngIf="node.fontIcon" [ngClass]="node.fontIcon" class="transversal-workpack-option-icon"
+            aria-hidden="true"></i>
+          <span class="transversal-workpack-option-label">{{ node.label }}</span>
+          <i *ngIf="node.loading" class="pi pi-spin pi-spinner" aria-hidden="true"></i>
+        </div>
+      </ng-template>
+    </p-tree>
+    <p-footer>
+      <p-button styleClass="p-button-text" [label]="'cancel' | translate"
+        (onClick)="showPicker = false"></p-button>
+      <p-button class="app-button-green" [label]="'select' | translate"
+        [disabled]="!selectedWorkpackIds.length || isSaving || isPickerLoading" (onClick)="confirmSelection()"></p-button>
+    </p-footer>
+  </p-dialog>
+</section>

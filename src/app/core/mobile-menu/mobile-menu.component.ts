@@ -25,6 +25,7 @@ import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
 import { ReportService } from 'src/app/shared/services/report.service';
 import { WorkpackBreadcrumbStorageService } from 'src/app/shared/services/workpack-breadcrumb-storage.service';
 import { WorkpackModelClassificationEnum } from 'src/app/shared/enums/WorkpackModelClassificationEnum';
+import { TransversalService } from 'src/app/shared/services/transversal.service';
 
 @Component({
   selector: 'app-mobile-menu',
@@ -134,6 +135,7 @@ export class MobileMenuComponent implements OnInit, OnDestroy {
     private breadcrumbSrv: BreadcrumbService,
     private workpackBreadcrumbStorageSrv: WorkpackBreadcrumbStorageService,
     private reportSrv: ReportService,
+    private transversalSrv: TransversalService
   ) {
     this.translateChangeSrv.getCurrentLang()
       .pipe(takeUntil(this.$destroy))
@@ -583,17 +585,23 @@ export class MobileMenuComponent implements OnInit, OnDestroy {
   }
 
   async loadPortfolioMenu(idNewWorkpack?: number) {
+    let menuPortfolioData: IMenuWorkpack[] | null = null;
     if (this.currentIDOffice && this.currentIDPlan) {
       this.loadingMenuPortfolio = true;
 
       const { success, data } = await this.menuSrv.getItemsPortfolio(this.currentIDOffice, this.currentIDPlan);
       if (success) {
-        const menuPortfolioData = data || [];
+        menuPortfolioData = data || [];
         this.menuSrv.nextMenuPortfolioItems(menuPortfolioData);
-        this.itemsPortfolio = this.buildMenuItemPortfolio(menuPortfolioData, 0);
       }
     }
     await this.loadTransversalViewsMenu();
+    await this.loadPlanModelMenu();
+    if (menuPortfolioData) {
+      this.itemsPortfolio = this.buildMenuItemPortfolio(
+        this.filterTransversalWorkpacksFromPortfolio(menuPortfolioData), 0
+      );
+    }
     this.loadingMenuPortfolio = false;
     if (this.currentIDPlan && (!this.changedUrl || this.linkEvent)) {
       this.selectMenuActive(this.router.url.slice(1), idNewWorkpack);
@@ -620,6 +628,41 @@ export class MobileMenuComponent implements OnInit, OnDestroy {
       pending.push(...(item.items || []));
     }
     return false;
+  }
+
+  private isTransversalWorkpackModel(idWorkpackModel: number): boolean {
+    const pending = [...this.itemsTransversalViews];
+    while (pending.length) {
+      const item = pending.pop() as any;
+      if (Number(item.workpackModelId) === Number(idWorkpackModel)) {
+        return true;
+      }
+      pending.push(...(item.items || []));
+    }
+    const models = [...this.itemsPlanModel];
+    while (models.length) {
+      const item = models.pop() as any;
+      if (Number(item.id) === Number(idWorkpackModel) &&
+        item.classification === WorkpackModelClassificationEnum.TRANSVERSAL) {
+        return true;
+      }
+      models.push(...(item.items || []));
+    }
+    return false;
+  }
+
+  private filterTransversalWorkpacksFromPortfolio(items: IMenuWorkpack[]): IMenuWorkpack[] {
+    return items.reduce((filtered, item) => {
+      if (this.isTransversalMenuWorkpack(Number(item.id)) ||
+        this.isTransversalWorkpackModel(Number(item.idWorkpackModel))) {
+        return filtered;
+      }
+      filtered.push({
+        ...item,
+        children: this.filterTransversalWorkpacksFromPortfolio(item.children || [])
+      });
+      return filtered;
+    }, [] as IMenuWorkpack[]);
   }
 
   private expandTransversalMenuRoot(id: number): void {
@@ -890,12 +933,12 @@ export class MobileMenuComponent implements OnInit, OnDestroy {
     );
 
     return Promise.all(transversalViews.map(async view => {
-      const programsResult = await this.workpackSrv.GetWorkpackListCards({
-        'id-plan': this.currentIDPlan,
-        'id-plan-model': idPlanModel,
-        'id-workpack-model': view.id
-      });
+      const [programsResult, modelsResult] = await Promise.all([
+        this.transversalSrv.getPrograms(Number(view.id), this.currentIDPlan),
+        this.transversalSrv.getProgramModels(Number(view.id))
+      ]);
       const programs = programsResult.success ? programsResult.data || [] : [];
+      const programModels = modelsResult.success ? modelsResult.data || [] : [];
 
       return {
         id: `transversal-view-${view.id}`,
@@ -904,24 +947,43 @@ export class MobileMenuComponent implements OnInit, OnDestroy {
         title: view.fullName,
         tooltip: view.fullName,
         styleClass: `transversal-view-${view.id}`,
-        items: programs.map(program => ({
-          id: String(program.id),
-          workpackId: program.id,
+        items: [
+          ...programs.map(program => ({
+          id: String(program.idTransversalProgram),
+          workpackId: program.idTransversalProgram,
+          workpackModelId: program.idWorkpackModel,
           label: program.name,
           icon: program.fontIcon,
           title: program.fullName,
           tooltip: program.fullName,
-          styleClass: `transversal-program-${program.id}`,
+          styleClass: `transversal-program-${program.idTransversalProgram}`,
           command: () => {
             this.router.navigate(['/workpack'], {
               queryParams: {
-                id: program.id,
+                id: program.idTransversalProgram,
                 idPlan: this.currentIDPlan
               }
             });
             this.closeAllMenus();
           }
-        }))
+          })),
+          ...programModels.map(model => ({
+            id: `new-transversal-program-${view.id}-${model.id}`,
+            ...({ workpackModelId: model.id } as any),
+            label: `${this.translateSrv.instant('new')} ${model.name}`,
+            icon: 'pi pi-plus',
+            command: () => {
+              this.router.navigate(['/workpack'], {
+                queryParams: {
+                  idPlan: this.currentIDPlan,
+                  idWorkpackModel: model.id,
+                  idTransversalView: view.id
+                }
+              });
+              this.closeAllMenus();
+            }
+          }))
+        ]
       };
     }));
   }

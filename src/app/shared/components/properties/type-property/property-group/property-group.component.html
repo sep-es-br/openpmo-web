@@ -21,8 +21,6 @@
       <app-property-selection *ngSwitchCase="types.SelectionModel" [property]="groupedProp"
         (changed)="changed.emit($event)">
       </app-property-selection>
-      <app-property-transversal-view *ngSwitchCase="types.TransversalViewSelectionModel" [property]="groupedProp"
-        (changed)="changed.emit($event)"></app-property-transversal-view>
       <app-property-textarea *ngSwitchCase="types.TextAreaModel" [property]="groupedProp"
         (changed)="changed.emit($event)">
       </app-property-textarea>

@@ -55,7 +55,7 @@
         </div>
       </div>
       <span *ngIf="loadingMenuPortfolio" style="padding: 1em">{{'loadingEllipsis'|translate}}</span>
-      <p-panelMenu *ngIf="!loadingMenuPortfolio" [model]="itemsPortfolio"></p-panelMenu>
+      <p-panelMenu *ngIf="menus[1].isOpen && !loadingMenuPortfolio" [model]="itemsPortfolio"></p-panelMenu>
     </div>
   </div>
 

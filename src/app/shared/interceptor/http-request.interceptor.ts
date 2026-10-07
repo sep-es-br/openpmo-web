@@ -56,9 +56,10 @@ export class HttpRequestInterceptor implements HttpInterceptor {
 
     req = req.clone({ setHeaders: header , withCredentials: true });
 
-    const thisKey = this.stableStringify({url: req.urlWithParams, body: req.body});
+    const cacheable = req.method === 'GET';
+    const thisKey = cacheable ? req.urlWithParams : undefined;
 
-    if (this.requestCache.has(thisKey)) {
+    if (cacheable && this.requestCache.has(thisKey)) {
       return this.requestCache.get(thisKey);
     }
 
@@ -127,12 +128,16 @@ export class HttpRequestInterceptor implements HttpInterceptor {
       }),
       finalize(() => {
             this.requestCount--;
-            setTimeout(() => this.requestCache.delete(thisKey), 5_000);
+            if (cacheable && this.requestCache.get(thisKey) === obs) {
+              this.requestCache.delete(thisKey);
+            }
         }),
         shareReplay(1)
     );
 
-    this.requestCache.set(thisKey, obs);
+    if (cacheable) {
+      this.requestCache.set(thisKey, obs);
+    }
     return obs;
   }
 
