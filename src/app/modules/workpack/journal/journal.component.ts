@@ -138,7 +138,8 @@ export class JournalComponent implements OnInit {
       this.cardItemsEvidences.push({
         typeCardItem: 'listItem',
         urlImg: newFile.url,
-        nameCardItem: newFile.name,
+        nameCardItem: this.limitFileName(newFile.name),
+        fullNameCardItem: newFile.name,
         icon: this.getIconFromMimeTypeFile(newFile.mimeType),
         givenName: newFile.givenName,
         file: file,
@@ -157,7 +158,12 @@ export class JournalComponent implements OnInit {
       icon: IconsEnum.Plus,
     });
   }
-  
+
+  limitFileName(fileName: string): string {
+    return fileName.length > 50
+      ? `${fileName.substring(0, 47)}...`
+      : fileName;
+  }
 
   createObjectUrl(file: File): SafeResourceUrl {
     return this.sanatizer.bypassSecurityTrustResourceUrl(URL.createObjectURL(file));
