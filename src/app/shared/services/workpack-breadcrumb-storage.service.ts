@@ -4,6 +4,10 @@ import { BreadcrumbService } from './breadcrumb.service';
 import { Injectable } from '@angular/core';
 import { IWorkpackParams } from '../interfaces/IWorkpackDataParams';
 import { IBreadcrumb } from '../interfaces/IBreadcrumb';
+import { IWorkpack } from '../interfaces/IWorkpack';
+import { PreprojectService } from './preproject.service';
+import { TranslateService } from '@ngx-translate/core';
+import { TypeWorkpackEnum } from '../enums/TypeWorkpackEnum';
 
 @Injectable({
   providedIn: 'root'
@@ -20,6 +24,8 @@ export class WorkpackBreadcrumbStorageService {
   constructor(
     private breadcrumbSrv: BreadcrumbService,
     private workpackSrv: WorkpackService,
+    private preprojectSrv: PreprojectService,
+    private translateSrv: TranslateService,
   ) {
   }
 
@@ -39,10 +45,142 @@ export class WorkpackBreadcrumbStorageService {
         queryParams: { id: p.id, idWorkpackModelLinked: p.idWorkpackModelLinked, idPlan },
         modelName: p.modelName
       }));
-      return [...breadcrumbItemsWorkpack];
+      return await this.getPreprojectChildBreadcrumb(idWorkpack, idPlan, breadcrumbItemsWorkpack)
+        || await this.getStructuringBreadcrumb(idWorkpack, idPlan, breadcrumbItemsWorkpack)
+        || breadcrumbItemsWorkpack;
     }
 
-    return [];
+    return await this.getPreprojectChildBreadcrumb(idWorkpack, idPlan, [])
+      || await this.getStructuringBreadcrumb(idWorkpack, idPlan, [])
+      || [];
+  }
+
+  private async getPreprojectChildBreadcrumb(
+    idWorkpack: number, idPlan: number, apiBreadcrumb: IBreadcrumb[]
+  ): Promise<IBreadcrumb[] | null> {
+    const current = this.breadcrumbSrv.get || [];
+    if (!current.some(item => item.key === 'preproject')) {
+      return null;
+    }
+
+    const currentIndex = current.findIndex(item =>
+      +item.queryParams?.id === +idWorkpack && +item.queryParams?.idPlan === +idPlan
+    );
+    if (currentIndex > -1) {
+      return current.slice(0, currentIndex + 1);
+    }
+
+    const descendants: IWorkpack[] = [];
+    const visited = new Set<number>();
+    let nextId = idWorkpack;
+    while (nextId && !visited.has(nextId)) {
+      visited.add(nextId);
+      let response;
+      try {
+        response = await this.workpackSrv.GetWorkpackDataById(nextId, { 'id-plan': idPlan });
+      } catch {
+        return null;
+      }
+      if (!response.success || !response.data) {
+        return null;
+      }
+      const workpack = response.data;
+      descendants.unshift(workpack);
+      const parentIndex = current.findIndex(item =>
+        +item.queryParams?.id === workpack.idParent && +item.queryParams?.idPlan === +idPlan
+      );
+      if (parentIndex > -1) {
+        return [
+          ...current.slice(0, parentIndex + 1),
+          ...descendants.map(child =>
+            apiBreadcrumb.find(item => +item.queryParams?.id === child.id)
+            || this.workpackCrumb(child, idPlan)
+          )
+        ];
+      }
+      nextId = workpack.idParent;
+    }
+    return null;
+  }
+
+  private async getStructuringBreadcrumb(
+    idWorkpack: number, idPlan: number, apiBreadcrumb: IBreadcrumb[]
+  ): Promise<IBreadcrumb[] | null> {
+    const officeId = this.workpackSrv.getWorkpackParams()?.idOffice
+      || apiBreadcrumb.find(item => item.key === 'office')?.queryParams?.id;
+    if (!officeId) {
+      return null;
+    }
+
+    const descendants: IWorkpack[] = [];
+    const visited = new Set<number>();
+    let nextId = +idWorkpack;
+    while (nextId && !visited.has(nextId)) {
+      visited.add(nextId);
+      const loaded = this.workpackSrv.getWorkpackData()?.workpack;
+      let workpack = loaded?.id === nextId ? loaded : null;
+      if (!workpack) {
+        try {
+          const response = await this.workpackSrv.GetWorkpackDataById(nextId, { 'id-plan': idPlan });
+          workpack = response.success ? response.data : null;
+        } catch {
+          return null;
+        }
+      }
+      if (!workpack) {
+        return null;
+      }
+      descendants.unshift(workpack);
+      nextId = workpack.idParent;
+    }
+
+    const projectIndex = descendants.findIndex(item => item.type === TypeWorkpackEnum.ProjectModel);
+    if (projectIndex < 0) {
+      return null;
+    }
+    const project = descendants[projectIndex];
+    if (apiBreadcrumb.some(item => +item.queryParams?.id === project.id)) {
+      return null;
+    }
+
+    let preprojects;
+    try {
+      const response = await this.preprojectSrv.findAllByOfficeId(+officeId);
+      preprojects = response.success ? response.data : [];
+    } catch {
+      return null;
+    }
+    if (!preprojects?.some(item =>
+      +item.idWorkpack === project.id && item.status === 'Estruturação'
+    )) {
+      return null;
+    }
+
+    const structuring = this.translateSrv.instant('structuring');
+    return [
+      ...apiBreadcrumb.filter(item => ['office', 'plan'].includes(item.key)),
+      { key: 'preproject', routerLink: ['/preproject'], queryParams: { idOffice: +officeId } },
+      {
+        key: 'project', info: structuring, tooltip: structuring,
+        routerLink: ['/workpack'], queryParams: { id: project.id, idPlan }
+      },
+      ...descendants.slice(projectIndex + 1).map(child =>
+        apiBreadcrumb.find(item => +item.queryParams?.id === child.id)
+        || this.workpackCrumb(child, idPlan)
+      )
+    ];
+  }
+
+  private workpackCrumb(workpack: IWorkpack, idPlan: number, modelName?: string): IBreadcrumb {
+    const name = modelName || workpack.model?.modelName;
+    return {
+      key: name || workpack.type.toLowerCase(),
+      info: workpack.name,
+      tooltip: workpack.fullName,
+      routerLink: ['/workpack'],
+      queryParams: { id: workpack.id, idPlan },
+      modelName: name
+    };
   }
 
   async getCurrentBreadcrumb(linkEvent = false) {
@@ -56,6 +194,14 @@ export class WorkpackBreadcrumbStorageService {
       const breadcrumbIndex = this.currentBreadcrumbItems.findIndex(item => item.queryParams?.id === idWorkpack);
       if (breadcrumbIndex > -1) {
         breadcrumb = this.currentBreadcrumbItems.slice(0, breadcrumbIndex + 1);
+        if (idWorkpack && idPlan && !breadcrumb.some(item => item.key === 'preproject')
+          && (this.workpackData?.workpack?.type === TypeWorkpackEnum.ProjectModel
+            || (this.idParent && !breadcrumb.some(item => +item.queryParams?.id === this.idParent)))) {
+          const rebuilt = await this.getBreadcrumbs(idWorkpack, idPlan);
+          if (rebuilt.some(item => item.key === 'preproject')) {
+            return rebuilt;
+          }
+        }
       } else {
         const breadcrumbOfficeIndex =
           this.currentBreadcrumbItems.findIndex(item => item.key === 'office' && item.queryParams?.id === idOffice);
@@ -63,7 +209,33 @@ export class WorkpackBreadcrumbStorageService {
         const breadcrumbParentIndex =
           this.currentBreadcrumbItems
           .findIndex(item => !['office', 'plan'].includes(item.key) && this.idParent && item.queryParams?.id === this.idParent);
-        if (breadcrumbOfficeIndex > -1 && breadcrumbPlanIndex > -1 && (breadcrumbParentIndex > -1)) {
+        if (breadcrumbParentIndex < 0 && idWorkpack && this.currentBreadcrumbItems.some(item => item.key === 'preproject')) {
+          const descendantBreadcrumb = await this.getPreprojectChildBreadcrumb(idWorkpack, idPlan, []);
+          if (descendantBreadcrumb) {
+            return descendantBreadcrumb;
+          }
+        }
+        const parentCrumb = this.currentBreadcrumbItems[breadcrumbParentIndex];
+        if (
+          this.currentBreadcrumbItems.some(item => item.key === 'preproject')
+          && parentCrumb?.queryParams?.idPlan === idPlan
+          && this.workpackData?.workpack && idWorkpack
+        ) {
+          const childCrumb = this.workpackCrumb(
+            this.workpackData.workpack, idPlan, this.workpackData.workpackModel?.modelName
+          );
+          if (this.workpackParams.idWorkpackModelLinked) {
+            childCrumb.queryParams = {
+              ...childCrumb.queryParams,
+              idWorkpackModelLinked: this.workpackParams.idWorkpackModelLinked,
+              idWorkpackLinkedParent: this.workpackParams.idWorkpackLinkedParent
+            };
+          }
+          breadcrumb = [
+            ...this.currentBreadcrumbItems.slice(0, breadcrumbParentIndex + 1),
+            childCrumb
+          ];
+        } else if (breadcrumbOfficeIndex > -1 && breadcrumbPlanIndex > -1 && (breadcrumbParentIndex > -1)) {
           breadcrumb = [...this.currentBreadcrumbItems.slice(0, breadcrumbParentIndex + 1),
           ... this.workpackParams.idWorkpack
             ? [

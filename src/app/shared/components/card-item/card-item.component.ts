@@ -74,7 +74,12 @@ export class CardItemComponent implements OnInit {
     const navigationItemId = this.properties?.navigationItemId || this.properties?.itemId;
     if (navigationItemId) {
       const idAtributeName = this.properties.idAtributeName ? this.properties.idAtributeName : 'id';
-      params.push({name: idAtributeName, value: navigationItemId});
+      const idParam = {name: idAtributeName, value: navigationItemId};
+      if (this.properties.urlCard === '/workpack' && this.properties.breadcrumbWorkpackModel?.some(item => item.key === 'preproject')) {
+        params.unshift(idParam);
+      } else {
+        params.push(idParam);
+      }
     }
 
     this.navigateToPage(this.properties.urlCard, params);

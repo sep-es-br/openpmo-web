@@ -126,8 +126,7 @@ export class WorkpackSectionPropertiesComponent implements OnInit, OnDestroy {
       return true;
     });
 
-    if (this.isStructuringPreProject()) {
-      this.workpackData.workpack.fromPreProjectInStructuring = true;
+    if (this.workpackData?.workpack?.fromPreProjectInStructuring) {
       this.clearRequiredValidation(this.sectionPropertiesProperties);
     }
     
@@ -138,7 +137,19 @@ export class WorkpackSectionPropertiesComponent implements OnInit, OnDestroy {
       prop.name === 'Status' || prop.name === 'Situação';
       const isProject = prop.typeWorkPack === TypeWorkpackEnumWBS.Project;
     
-      if (isStatusOrSituation && isProject) {
+      const currentValue =
+        (prop.value as string) ||
+        (prop.defaultValue as string) ||
+        '';
+
+      const isFinalStatus =
+        currentValue === 'A cancelar' || currentValue === 'Concluído';
+      const isStructuringPreProjectStatus =
+        prop.name === 'Status' &&
+        this.workpackData?.workpack?.fromPreProjectInStructuring &&
+        currentValue === 'Estruturação';
+
+      if (isStatusOrSituation && isProject && (isFinalStatus || isStructuringPreProjectStatus)) {
         prop.disabled = true;
       }
     });
@@ -366,22 +377,6 @@ export class WorkpackSectionPropertiesComponent implements OnInit, OnDestroy {
     });
   }
 
-  private isStructuringPreProject(): boolean {
-    if (this.workpackData?.workpack?.fromPreProjectInStructuring) {
-      return true;
-    }
-    return this.hasStructuringStatus(this.sectionPropertiesProperties);
-  }
-
-  private hasStructuringStatus(properties: PropertyTemplateModel[]): boolean {
-    return properties.some(prop => {
-      if (prop.type === TypePropertyModelEnum.GroupModel && prop.groupedProperties) {
-        return this.hasStructuringStatus(prop.groupedProperties);
-      }
-      return ['Status', 'Situação'].includes(prop.name)
-        && String(prop.value || '').trim() === 'Estruturação';
-    });
-  }
 
   mirrorToFullName(nameProperty: PropertyTemplateModel, fullNameProperty: PropertyTemplateModel) {
     const fullNameIndex = this.sectionPropertiesProperties.findIndex((p) => (p.name === 'fullName'));

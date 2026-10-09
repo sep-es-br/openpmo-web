@@ -22,6 +22,7 @@ export interface IWorkpack {
     endManagementDate?: string;
     delayInDays?: number;
     baselineDate?: Date;
+    hasApprovedBaseline?: boolean;
     cancelPropose?: boolean;
     pendingBaseline?: boolean;
     permissions?: IPermission[];
