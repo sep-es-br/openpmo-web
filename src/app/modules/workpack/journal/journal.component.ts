@@ -133,7 +133,7 @@ export class JournalComponent implements OnInit {
         url,
         mimeType: file.type,
         name: file.name,
-        givenName: file.name.split('.')[0],
+        givenName: file.name.split('.')[0].substring(0, 50),
       };
       this.cardItemsEvidences.push({
         typeCardItem: 'listItem',
