@@ -1,0 +1,260 @@
+<div class="app-preproject-form">
+  <app-card [properties]="cardProperties" class="mt-0 inputs-float-label">
+    <app-card-loading
+      [isCardLoading]="isLoading || isModelLoading || isSelectedCriteriaLoading || isEvaluationLoading || formIsSaving">
+    </app-card-loading>
+
+    <app-tabview-scrolled
+      [tabs]="tabs"
+      [contextVersion]="tabsVersion"
+      (selectedTabChange)="changeTab($event)">
+
+      <div tabviewBody *ngIf="selectedTab?.key === 'properties'">
+        <form [formGroup]="form">
+          <div class="p-fluid preproject-properties-fields">
+            <div class="p-field preproject-name-field">
+              <span class="p-float-label">
+                <input id="preproject-name" class="app-input-text" pInputText type="text" formControlName="name" />
+                <label class="app-input-label" for="preproject-name">{{ 'name' | translate }} *</label>
+              </span>
+              <app-input-message [form]="form" field="name"></app-input-message>
+            </div>
+
+            <div class="p-field preproject-name-field preproject-full-name-field">
+              <app-property-textarea
+                [form]="form"
+                controlName="fullName"
+                inputId="preproject-full-name"
+                [label]="'fullName' | translate"
+                [required]="true">
+              </app-property-textarea>
+              <app-input-message [form]="form" field="fullName"></app-input-message>
+            </div>
+
+            <div class="p-field preproject-standard-field">
+              <span class="p-float-label">
+                <p-dropdown
+                  inputId="preproject-organization"
+                  class="app-single-selection"
+                  formControlName="organization"
+                  [options]="organizations"
+                  [autoDisplayFirst]="false"
+                  [showClear]="true"
+                  dropdownIcon="fas fa-caret-down">
+                </p-dropdown>
+                <label class="app-input-label" for="preproject-organization">{{ 'organization' | translate }} *</label>
+              </span>
+              <app-input-message [form]="form" field="organization"></app-input-message>
+            </div>
+
+            <span class="p-float-label p-field preproject-standard-field preproject-date-field">
+              <p-calendar
+                inputId="preproject-expected-completion"
+                class="app-select-date"
+                formControlName="expectedCompletion"
+                [dateFormat]="'dateFormat' | translate"
+                [monthNavigator]="true"
+                [showIcon]="true"
+                icon="fas fa-calendar-alt">
+              </p-calendar>
+              <label class="app-input-label" for="preproject-expected-completion">
+                {{ 'expectedCompletion' | translate }}
+              </label>
+            </span>
+
+            <section class="preproject-deliveries">
+              <div class="preproject-section-title">{{ 'expectedDeliveries' | translate }}</div>
+              <p-dataView
+                [value]="deliveryCardItems"
+                layout="grid"
+                class="app-dataview preproject-delivery-list"
+                *ngIf="displayModeAll !== 'list'">
+                <ng-template let-cardItem pTemplate="gridItem">
+                  <div class="delivery-card-container">
+                    <app-editable-card-item
+                      *ngIf="cardItem.typeCardItem === 'listItem'"
+                      [form]="getDeliveryForm(cardItem.deliveryIndex)"
+                      [fields]="editableDeliveryFields"
+                      [menuItems]="cardItem.menuItems || []"
+                      [reserveMenuSpace]="isReadOnly"
+                      [itemId]="cardItem.displayItemId"
+                      [uniqueId]="cardItem.deliveryIndex"
+                      displayMode="grid">
+                    </app-editable-card-item>
+                    <app-editable-card-item
+                      *ngIf="cardItem.typeCardItem === 'newCardItem'"
+                      [newItem]="true"
+                      [newItemIcon]="cardItem.icon || 'plus'"
+                      displayMode="grid"
+                      (newItemClick)="addDelivery()">
+                    </app-editable-card-item>
+                  </div>
+                </ng-template>
+              </p-dataView>
+
+              <p-dataView
+                [value]="deliveryCardItems"
+                layout="list"
+                class="app-dataview app-dataview-list preproject-delivery-list"
+                *ngIf="displayModeAll === 'list'">
+                <ng-template let-cardItem pTemplate="listItem">
+                  <div class="delivery-card-container delivery-card-list-container">
+                    <app-editable-card-item
+                      *ngIf="cardItem.typeCardItem === 'listItem'"
+                      [form]="getDeliveryForm(cardItem.deliveryIndex)"
+                      [fields]="editableDeliveryFields"
+                      [menuItems]="cardItem.menuItems || []"
+                      [reserveMenuSpace]="isReadOnly"
+                      [itemId]="cardItem.displayItemId"
+                      [uniqueId]="cardItem.deliveryIndex"
+                      displayMode="list">
+                    </app-editable-card-item>
+                    <app-editable-card-item
+                      *ngIf="cardItem.typeCardItem === 'newCardItem'"
+                      [newItem]="true"
+                      [newItemIcon]="cardItem.icon || 'plus'"
+                      displayMode="list"
+                      (newItemClick)="addDelivery()">
+                    </app-editable-card-item>
+                  </div>
+                </ng-template>
+              </p-dataView>
+            </section>
+          </div>
+        </form>
+      </div>
+
+      <div tabviewBody *ngIf="selectedCriteriaGuide" class="preproject-criteria-tab">
+        <app-preproject-criteria-guide
+          [guide]="selectedCriteriaGuide"
+          [displayMode]="displayModeAll"
+          [readOnly]="isReadOnly"
+          (changed)="criteriaChanged()">
+        </app-preproject-criteria-guide>
+      </div>
+
+      <div tabviewBody *ngIf="selectedTab?.key === 'evaluation'" class="preproject-evaluation-tab">
+        <ng-container *ngIf="evaluation as evaluationData">
+          <div class="evaluation-summary-row">
+            <span>{{ 'finalProjectScore' | translate }}</span>
+            <strong>{{ evaluationData.finalNote | number:'1.2-2' }}</strong>
+          </div>
+
+          <section class="evaluation-section" *ngFor="let criterion of evaluationData.criteria">
+            <div class="evaluation-section-header">
+              <strong>{{ criterion.name || criterion.label }}</strong>
+              <span>{{ 'total' | translate }}: {{ criterion.total | number:'1.2-2' }}</span>
+            </div>
+            <ng-container *ngFor="let group of criterion.groups">
+              <div class="evaluation-group-row">
+                <strong>{{ group.name || group.label }}</strong>
+                <span>{{ 'total' | translate }}: {{ group.total | number:'1.2-2' }}</span>
+              </div>
+              <div class="evaluation-item-row evaluation-group-item-row" *ngFor="let item of group.items">
+                <span>{{ item.label || item.name }}</span>
+                <span>{{ 'score' | translate }}: {{ item.note | number:'1.2-2' }}</span>
+              </div>
+            </ng-container>
+            <div class="evaluation-item-row" *ngFor="let item of criterion.items">
+              <span>{{ item.label || item.name }}</span>
+              <span>{{ 'score' | translate }}: {{ item.note | number:'1.2-2' }}</span>
+            </div>
+          </section>
+        </ng-container>
+
+        <form
+          *ngIf="!isReadOnly"
+          [formGroup]="projectCreationForm"
+          class="preproject-selection-section">
+            <div class="preproject-selection-toggle">
+              <p-checkbox
+                class="app-checkbox"
+                formControlName="selected"
+                [binary]="true"
+                [label]="'selectPreproject' | translate"
+                (onChange)="toggleProjectCreation($event.checked)">
+              </p-checkbox>
+            </div>
+
+            <div class="preproject-selection-fields">
+              <div class="p-field preproject-selection-plan-field">
+                <span class="p-float-label">
+                  <p-dropdown
+                    inputId="preproject-project-plan"
+                    class="app-single-selection"
+                    formControlName="idPlan"
+                    [options]="availablePlans"
+                    [autoDisplayFirst]="false"
+                    [showClear]="true"
+                    [disabled]="!isProjectCreationSelected || isPlansLoading"
+                    dropdownIcon="fas fa-caret-down"
+                    (onChange)="selectPlanForProject($event.value)">
+                  </p-dropdown>
+                  <label class="app-input-label" for="preproject-project-plan">
+                    {{ 'availablePlans' | translate }} *
+                  </label>
+                </span>
+                <app-input-message [form]="projectCreationForm" field="idPlan"></app-input-message>
+              </div>
+
+              <div class="p-field">
+                <label class="app-input-label evaluation-plan-tree-label">{{ 'whereInPlan' | translate }} *</label>
+                <ng-container *ngIf="projectCreationForm.get('idPlan')?.value; else selectPlanFirst">
+                  <div
+                    class="app-tree-selection evaluation-plan-tree"
+                    [class.p-disabled]="!isProjectCreationSelected"
+                    [class.ng-invalid]="projectCreationForm.get('idParent')?.invalid && projectCreationForm.get('idParent')?.touched">
+                    <div *ngIf="isPlanTreeLoading" class="preproject-tree-loading">
+                      <app-card-loading [isCardLoading]="true"></app-card-loading>
+                    </div>
+                    <p-tree
+                      *ngIf="!isPlanTreeLoading"
+                      [value]="planTree"
+                      [emptyMessage]="'noRecordsFound' | translate"
+                      selectionMode="checkbox"
+                      [selection]="selectedParentWorkpacks"
+                      [propagateSelectionUp]="false"
+                      [propagateSelectionDown]="false"
+                      (selectionChange)="handleParentWorkpackSelection($event)"
+                      (onNodeExpand)="expandPlanNode($event)">
+                      <ng-template let-node pTemplate="default">
+                        <span [class.node-disabled]="!node.selectable">{{ node.label }}</span>
+                      </ng-template>
+                    </p-tree>
+                  </div>
+                  <app-input-message [form]="projectCreationForm" field="idParent"></app-input-message>
+                </ng-container>
+                <ng-template #selectPlanFirst>
+                  <small class="preproject-selection-help">{{ 'selectPlanFirst' | translate }}</small>
+                </ng-template>
+              </div>
+
+              <div class="p-field preproject-observations-field">
+                <app-property-textarea
+                  [form]="projectCreationForm"
+                  controlName="observations"
+                  inputId="preproject-project-observations"
+                  [label]="'observations' | translate"
+                  [required]="true"
+                  [rows]="3">
+                </app-property-textarea>
+                <app-input-message [form]="projectCreationForm" field="observations"></app-input-message>
+              </div>
+
+            </div>
+        </form>
+      </div>
+    </app-tabview-scrolled>
+
+    <app-buttons-container *ngIf="!isReadOnly" [compact]="true">
+      <app-save-button
+        [form]="selectedTab?.key === 'evaluation' ? projectCreationForm : form"
+        (save)="save()">
+      </app-save-button>
+      <app-cancel-button
+        [form]="selectedTab?.key === 'evaluation' ? projectCreationForm : form"
+        (cancel)="undo()">
+      </app-cancel-button>
+    </app-buttons-container>
+  </app-card>
+</div>

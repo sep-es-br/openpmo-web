@@ -327,6 +327,17 @@ export class PanelMenuComponent implements OnInit {
     for (const el of els) {
       el.classList.remove('active');
     }
+
+    const navigationState = this.router.getCurrentNavigation()?.extras.state || history.state;
+    const isPreprojectWorkpack = url.startsWith('workpack') && (
+      navigationState?.preprojectContext === true
+      || this.breadcrumbSrv.get?.some(item => item.key === 'preproject')
+    );
+    if (isPreprojectWorkpack) {
+      this.closeAllMenus();
+      return;
+    }
+
     const id = idNewWorkpack ? idNewWorkpack : this.getIdFromURL(url);
     if ((url.startsWith('strategies') || url.startsWith('configuration-office')) && (isNaN(id) || !id)) {
       this.itemsPlanModel = this.itemsPlanModel ? [...this.expandedMenuModelSelectedItem(this.itemsPlanModel, [], 0)] : undefined;

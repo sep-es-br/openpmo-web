@@ -85,7 +85,9 @@
     .model-property {
       display: inline-flex;
       flex-wrap: wrap;
+      align-items: flex-end;
       width: 100%;
+
 
       .input-label {
         font-size: 12px;
@@ -98,11 +100,47 @@
         }
       }
 
+      .possible-values-field {
+        app-possible-values-editor {
+          display: block;
+        }
+      }
+
+      .default-selection-field {
+        min-width: 150px;
+
+        .p-dropdown,
+        .p-multiselect {
+          width: 100%;
+        }
+
+        > label {
+          display: inline-flex;
+          align-items: center;
+          gap: .25rem;
+          white-space: nowrap;
+        }
+      }
+
       > span:not(:last-of-type) {
         margin-right: 1em;
       }
     }
   }
+
+  &.scored-values .p-toggleable-content .p-panel-content .model-property {
+    > .p-float-label > label {
+      top: 0 !important;
+      white-space: nowrap;
+    }
+
+    > .property-checkbox,
+    > .p-field-checkbox {
+      min-height: 32px;
+      align-items: center;
+    }
+  }
+
   .p-toggleable-content {
     display: none;
   }
@@ -112,6 +150,7 @@
     .p-button {
       background-color: transparent;
       margin-left: 0;
+      border: none !important;
 
       .p-button-icon {
         color: v.$fontLabel;

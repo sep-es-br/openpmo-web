@@ -6,9 +6,12 @@ export enum TypePropertModelEnum {
   NumberModel = 'NumberModel',
   OrganizationSelectionModel = 'OrganizationSelectionModel',
   SelectionModel = 'SelectionModel',
+  CriteriaSelectionModel = 'CriteriaSelectionModel',
   TextModel = 'TextModel',
   TextAreaModel = 'TextAreaModel',
   UnitSelectionModel = 'UnitSelectionModel',
+  ChallengeListModel = 'ChallengeListModel',
+  SdgListModel = 'SdgListModel',
   ToggleModel = 'ToggleModel',
   GroupModel = 'GroupModel'
 };

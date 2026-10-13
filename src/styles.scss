@@ -7,12 +7,28 @@
 :root {
   --font-family: v.$fontFamilyMedium !important;
 }
+
+html {
+  height: 100%;
+}
+
 body {
   font-family: v.$fontFamilyMedium;
   min-height: 100vh;
   height: 100%;
   background-color: v.$bg;
   margin: 0;
+}
+
+// O template possui sua própria área de rolagem. Impede que o conteúdo das
+// rotas crie uma segunda barra no documento, sem afetar telas fora do template.
+body:has(app-template) {
+  overflow: hidden;
+}
+
+app-root {
+  display: block;
+  min-height: 100%;
 }
 
 .p-component {
@@ -780,11 +796,11 @@ app-root p-toast .p-toast {
 
 @font-face {
   font-family: 'icopmo';
-  src:  url('assets/fonts/icopmo.eot?3w7r9');
-  src:  url('assets/fonts/icopmo.eot?3w7r9#iefix') format('embedded-opentype'),
-    url('assets/fonts/icopmo.ttf?3w7r9') format('truetype'),
-    url('assets/fonts/icopmo.woff?3w7r9') format('woff'),
-    url('assets/fonts/icopmo.svg?3w7r9#icopmo') format('svg');
+  src:  url('assets/fonts/icopmo.eot?preproject-20260902');
+  src:  url('assets/fonts/icopmo.eot?preproject-20260902#iefix') format('embedded-opentype'),
+    url('assets/fonts/icopmo.ttf?preproject-20260902') format('truetype'),
+    url('assets/fonts/icopmo.woff?preproject-20260902') format('woff'),
+    url('assets/fonts/icopmo.svg?preproject-20260902#icopmo') format('svg');
   font-weight: normal;
   font-style: normal;
   font-display: block;
@@ -806,6 +822,10 @@ app-root p-toast .p-toast {
 }
 
 .app-icon {
+
+  &.anteprojeto-cinza:before {
+    content: "\e961";
+  }
 
   &.folder-open2:before {
     content: "\e904";
@@ -1089,4 +1109,10 @@ app-root p-toast .p-toast {
   &.jrxml:before {
     content: "\e95f";
   }
+}
+
+.p-menuitem-icon.app-icon.anteprojeto-cinza {
+  width: 1.25rem;
+  font-size: 1.5rem !important;
+  text-align: center;
 }

@@ -1,0 +1,383 @@
+@use "src/variables" as v;
+
+:host {
+  display: block;
+  width: 100%;
+}
+
+.app-preproject-form {
+  padding: 0 1.5rem 2rem;
+
+  ::ng-deep .app-card.p-panel,
+  ::ng-deep .app-card .p-panel-content,
+  ::ng-deep .app-card .p-toggleable-content {
+    background: transparent;
+  }
+}
+
+.preproject-form-header {
+  display: flex;
+  align-items: flex-end;
+  min-height: 3rem;
+  color: #005b7a;
+  font-size: 1rem;
+  font-weight: 500;
+
+  > span {
+    flex: 1;
+    padding-bottom: .5em;
+  }
+}
+
+.preproject-properties-fields {
+  padding: 1.25rem .25rem;
+
+  .p-field {
+    display: block;
+    margin-bottom: 1.5rem;
+  }
+}
+
+.preproject-standard-field {
+  width: 20rem;
+  max-width: 100%;
+  margin-bottom: 2rem !important;
+}
+
+.preproject-name-field {
+  width: 30%;
+  min-width: 20rem;
+  max-width: 100%;
+  margin-bottom: 2rem !important;
+}
+
+.preproject-full-name-field {
+  width: 100%;
+}
+
+@media screen and (max-width: 768px) {
+  .preproject-name-field {
+    width: 100%;
+    min-width: 0;
+  }
+}
+
+:host ::ng-deep .preproject-date-field .app-select-date .p-calendar {
+  width: 100%;
+}
+
+:host ::ng-deep .app-preproject-form {
+  input.ng-invalid.ng-touched,
+  textarea.ng-invalid.ng-touched,
+  p-dropdown.ng-invalid.ng-touched .p-dropdown,
+  .evaluation-plan-tree.ng-invalid .p-tree {
+    border-color: var(--op-font-error-message) !important;
+  }
+}
+
+.preproject-deliveries {
+  margin-top: 1.5rem;
+}
+
+.preproject-section-title {
+  color: #005b7a;
+  margin-bottom: .75rem;
+  margin-left: 0;
+}
+
+.preproject-evaluation-tab {
+  display: block;
+  padding: 1.25rem 0;
+}
+
+.evaluation-summary-row,
+.evaluation-section-header,
+.evaluation-group-row,
+.evaluation-item-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.evaluation-summary-row {
+  padding: .85rem 1rem;
+  border: 1px solid v.$borderLightGrey;
+  color: v.$fontTitle;
+  font-size: 1rem;
+}
+
+.evaluation-section {
+  margin-top: 1rem;
+  border: 1px solid v.$borderLightGrey;
+}
+
+.evaluation-section-header,
+.evaluation-group-row,
+.evaluation-item-row {
+  padding: .7rem 1rem;
+  border-bottom: 1px solid v.$borderLightGrey;
+}
+
+.evaluation-group-row {
+  padding: .6rem 1.5rem;
+  color: v.$fontTitle;
+  background: rgba(214, 224, 229, .08);
+  border-bottom: 1px solid v.$borderLightGrey;
+}
+
+.evaluation-group-item-row {
+  padding-left: 2rem;
+}
+
+.evaluation-section-header {
+  color: v.$fontTitle;
+  background: rgba(214, 224, 229, .18);
+}
+
+.evaluation-section:last-child .evaluation-item-row:last-child {
+  border-bottom: 0;
+}
+
+.evaluation-item-row {
+  color: v.$fontInput;
+  font-size: .9rem;
+
+  small {
+    color: v.$fontTitle;
+  }
+}
+
+.preproject-selection-section {
+  margin-top: 1.5rem;
+  padding: 1.25rem 1rem 0;
+  border-top: 1px solid #d6e0e5;
+  background: transparent;
+}
+
+.preproject-selection-toggle {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  color: v.$fontTitle;
+}
+
+.preproject-selection-fields {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1.25rem;
+  margin-top: 1.25rem;
+
+  .p-field {
+    width: 100%;
+    margin: 0;
+  }
+
+  .preproject-selection-plan-field {
+    display: block;
+    width: 20rem;
+    max-width: 100%;
+
+    .app-single-selection {
+      display: block;
+      width: 100%;
+    }
+  }
+}
+
+.preproject-selection-help {
+  color: v.$fontTitle;
+}
+
+.preproject-observations-field {
+  max-width: 42rem;
+}
+
+.evaluation-plan-tree-label {
+  display: block;
+  margin-bottom: .4rem;
+}
+
+.evaluation-plan-tree {
+  position: relative;
+  width: 100%;
+  min-height: 3.4rem;
+
+  &.p-disabled {
+    pointer-events: none;
+  }
+}
+
+.preproject-tree-loading {
+  position: relative;
+  min-height: 5rem;
+}
+
+:host ::ng-deep .evaluation-plan-tree .p-tree {
+  width: 100%;
+  background: transparent;
+}
+
+:host ::ng-deep .preproject-selection-plan-field .app-single-selection .p-dropdown {
+  width: 100%;
+}
+
+:host ::ng-deep .evaluation-plan-tree .node-disabled {
+  color: #989fa2;
+}
+
+:host ::ng-deep .evaluation-table {
+  font-family: inherit;
+  font-size: .9rem;
+
+  .p-datatable-thead > tr > th,
+  .p-datatable-tbody > tr > td,
+  .p-datatable-tfoot > tr > td {
+    padding: .65rem .75rem;
+    color: v.$fontInput;
+    background: transparent;
+    border: 0;
+    border-bottom: 1px solid v.$borderLightGrey;
+    overflow-wrap: anywhere;
+  }
+
+  .p-datatable-tbody > tr {
+    background: transparent;
+  }
+
+  .p-datatable-thead > tr > th,
+  .p-datatable-tfoot > tr > td {
+    color: v.$fontTitle;
+  }
+
+  .p-datatable-tfoot > tr > td {
+    border-bottom: 0;
+  }
+
+  .evaluation-score-column {
+    width: 18rem;
+    text-align: right;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .p-datatable-tbody > tr > .evaluation-detail-name {
+    padding-left: 2.5rem;
+  }
+
+  .p-datatable-thead > tr > .evaluation-project-name {
+    padding-left: 1.5rem;
+    font-weight: normal;
+  }
+
+  .p-datatable-tbody > .evaluation-criterion-row > td:first-child {
+    padding-left: 1.5rem;
+  }
+
+  .evaluation-criterion-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+
+    .pi { font-size: .7rem; }
+
+    &:focus-visible {
+      outline: 2px solid v.$fontTitle;
+      outline-offset: 3px;
+    }
+  }
+}
+
+.preproject-delivery-list {
+  margin-left: 0;
+  width: 100%;
+}
+
+:host ::ng-deep .preproject-delivery-list .p-dataview-content {
+  padding-inline: 0;
+}
+
+:host ::ng-deep .preproject-delivery-list:not(.app-dataview-list) .p-dataview-content > .p-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 260px);
+  gap: 1rem;
+  justify-content: start;
+  margin: 0 !important;
+}
+
+:host ::ng-deep .preproject-delivery-list .delivery-card-container {
+  box-sizing: border-box;
+  min-height: 10rem;
+  padding: 0 !important;
+  width: 260px;
+}
+
+:host ::ng-deep .preproject-delivery-list .delivery-card-container > app-editable-card-item {
+  display: block;
+  height: 100%;
+  width: 100%;
+}
+
+:host ::ng-deep .preproject-delivery-list.app-dataview-list .p-dataview-content > .p-grid {
+  margin: 0 !important;
+}
+
+:host ::ng-deep .preproject-delivery-list .delivery-card-list-container {
+  width: 100%;
+}
+
+@media screen and (max-width: 768px) {
+  .app-preproject-form {
+    padding: 0 .75rem 1.25rem;
+  }
+
+  .preproject-properties-fields {
+    padding-inline: 0;
+  }
+
+  :host ::ng-deep .preproject-delivery-list:not(.app-dataview-list) .p-dataview-content > .p-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  :host ::ng-deep .preproject-delivery-list .delivery-card-container {
+    width: 100%;
+  }
+}
+
+// --- Abas de critérios configuradas no modelo ---
+
+.preproject-criteria-tab {
+  padding: 1.25rem 0;
+}
+
+.criteria-properties-list {
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
+}
+
+.criteria-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2.5rem 1rem;
+  color: #8c9aa5;
+  gap: .75rem;
+  text-align: center;
+
+  i {
+    font-size: 2rem;
+    opacity: .5;
+  }
+
+  span {
+    font-size: .875rem;
+  }
+}

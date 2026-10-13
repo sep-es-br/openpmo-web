@@ -20,14 +20,18 @@ import { AdminOfficeConfigComponent } from './modules/admin-office-config/admin-
 import { ComponentsModule } from './shared/components/components.module';
 import { CardListComponent } from './shared/components/card-list/card-list.component';
 import { AdministrationComponent } from './modules/administration/administration.component';
+import { PreprojectSelectionComponent } from './modules/preproject-selection/preproject-selection.component';
+import { PreprojectCriterionFormComponent } from './modules/preproject-selection/preproject-criterion-form/preproject-criterion-form.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     LoginComponent,
     HomeComponent,
-    AdminOfficeConfigComponent,
-    AdministrationComponent
+      AdminOfficeConfigComponent,
+      AdministrationComponent,
+      PreprojectSelectionComponent,
+      PreprojectCriterionFormComponent
   ],
   imports: [
     BrowserModule,

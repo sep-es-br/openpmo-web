@@ -1,0 +1,127 @@
+@use "src/variables" as v;
+
+.possible-values-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-width: 285px;
+  min-height: 32px;
+  border-bottom: 1px solid v.$borderLightGrey;
+  color: v.$fontLabel;
+
+  .possible-values-add-button {
+    width: 25px;
+    height: 25px;
+    margin: 0;
+    padding: 0;
+  }
+}
+
+::ng-deep .possible-values-dialog {
+  .p-dialog-header {
+    align-items: flex-start;
+    border-bottom: 1px solid v.$borderLightGrey;
+  }
+
+  .possible-values-dialog-title {
+    font-family: v.$fontFamilyBold;
+    color: v.$fontDark;
+  }
+
+  .possible-values-dialog-subtitle {
+    margin-top: .25rem;
+    font-size: .8rem;
+    color: v.$fontLabel;
+  }
+
+  .p-dialog-content {
+    padding: 1rem 1.5rem 1.25rem;
+  }
+
+  .possible-values-table {
+    .p-datatable-wrapper {
+      overflow: visible;
+    }
+
+    table {
+      border-collapse: separate;
+      border-spacing: 0;
+    }
+
+    .p-datatable-thead > tr > th {
+      padding: .5rem .45rem .65rem;
+      border: 0;
+      background: transparent;
+      font-size: .7rem;
+      color: v.$fontLabel;
+    }
+
+    .p-datatable-tbody > tr > td {
+      padding: .3rem .45rem;
+      border: 0;
+      background: transparent;
+    }
+
+    .reorder-column {
+      width: 30px;
+      text-align: center;
+    }
+
+    .actions-column {
+      width: 55px;
+      text-align: center;
+    }
+
+    .reorder-handle {
+      color: v.$iconGrey;
+      cursor: move;
+    }
+
+    .app-input-text {
+      width: 100%;
+      height: 32px;
+      padding: .25rem 0;
+      border: 0;
+      border-bottom: 1px solid v.$borderLightGrey;
+      border-radius: 0;
+      background: transparent;
+      box-shadow: none;
+    }
+
+    .p-inputnumber {
+      width: 100%;
+    }
+  }
+
+  .delete-value-button,
+  .add-value-link {
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+  }
+
+  .delete-value-button {
+    color: v.$iconGrey;
+  }
+
+  .add-value-link {
+    margin-top: .75rem;
+    color: v.$fontAccent;
+
+    i {
+      margin-right: .35rem;
+    }
+  }
+
+  .p-dialog-footer {
+    display: flex;
+    align-items: center;
+    border-top: 1px solid v.$borderLightGrey;
+    font-size: .75rem;
+    color: v.$fontLabel;
+
+    .automatic-save-message {
+      margin-left: .35rem;
+    }
+  }
+}

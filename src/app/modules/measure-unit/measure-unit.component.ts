@@ -24,6 +24,7 @@ import { OfficeService } from 'src/app/shared/services/office.service';
 import { ResponsiveService } from 'src/app/shared/services/responsive.service';
 import { ConfigDataViewService } from 'src/app/shared/services/config-dataview.service';
 import { CancelButtonComponent } from 'src/app/shared/components/cancel-button/cancel-button.component';
+import { IEditableCardField } from 'src/app/shared/components/editable-card-item/editable-card-item.component';
 
 @Component({
   selector: 'app-measure-unit',
@@ -45,6 +46,19 @@ export class MeasureUnitComponent implements OnInit {
   editPermission: boolean;
   responsive: boolean;
   validatorsPrecision = [Validators.required, Validators.min(0), Validators.max(5)];
+  readonly editableCardFields: IEditableCardField[] = [
+    { controlName: 'name', label: 'name', required: true, helpTooltip: 'help.measureUnit.name' },
+    { controlName: 'fullName', label: 'fullName', required: true, helpTooltip: 'help.measureUnit.fullName' },
+    {
+      controlName: 'precision',
+      label: 'precision',
+      type: 'number',
+      required: true,
+      helpTooltip: 'help.measureUnit.precision',
+      min: 0,
+      max: 5
+    }
+  ];
   displayModeAll = 'grid';
   pageSize = 5;
   totalRecords: number;

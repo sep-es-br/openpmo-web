@@ -29,7 +29,7 @@
               <i class="far fa-question-circle" [pTooltip]="'help.workpackModel.modelName' | translate"></i>
             </label>
           </span>
-          <span class="p-float-label property-input p-field" [class.desktop-width]="!isMobileView">
+          <span class="p-float-label property-input p-field">
             <input class="app-input-text" id="input-name-plural" type="text" pInputText formControlName="nameInPlural"
               (change)="propertyChanged($event);" />
             <label class="app-input-label" for="input-name-plural">{{ 'modelNameInPlural' | translate }} *

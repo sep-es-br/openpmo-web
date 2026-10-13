@@ -52,10 +52,13 @@ export class CardItemComponent implements OnInit {
 
   navigateToPage(url: string, params?: { name: string; value: string | number }[]) {
     const queryParams = params && params.reduce((obj, item) => ((obj[item.name] = item.value), obj), {});
+    const preprojectContext = url === '/workpack'
+      && this.properties.breadcrumbWorkpackModel?.some(item => item.key === 'preproject');
     this.router.navigate(
       [url],
       {
-        queryParams
+        queryParams,
+        state: preprojectContext ? { preprojectContext: true } : undefined
       }
     );
   }
@@ -68,10 +71,16 @@ export class CardItemComponent implements OnInit {
     if (!!this.properties.breadcrumbWorkpackModel) {
       this.breadcrumbSrv.setBreadcrumbStorage(this.properties.breadcrumbWorkpackModel);
     }
-    const params = this.properties?.paramsUrlCard ? this.properties?.paramsUrlCard : [];
-    if (this.properties?.itemId) {
+    const params = this.properties?.paramsUrlCard ? [...this.properties.paramsUrlCard] : [];
+    const navigationItemId = this.properties?.navigationItemId || this.properties?.itemId;
+    if (navigationItemId) {
       const idAtributeName = this.properties.idAtributeName ? this.properties.idAtributeName : 'id';
-      params.push({name: idAtributeName, value: this.properties?.itemId});
+      const idParam = {name: idAtributeName, value: navigationItemId};
+      if (this.properties.urlCard === '/workpack' && this.properties.breadcrumbWorkpackModel?.some(item => item.key === 'preproject')) {
+        params.unshift(idParam);
+      } else {
+        params.push(idParam);
+      }
     }
 
     this.navigateToPage(this.properties.urlCard, params);
@@ -79,7 +88,8 @@ export class CardItemComponent implements OnInit {
 
   getQueryParams() {
     const idAtributeName = this.properties.idAtributeName ? this.properties.idAtributeName : 'id';
-    let params = this.properties?.itemId ? { [idAtributeName]: this.properties.itemId } : {};
+    const navigationItemId = this.properties?.navigationItemId || this.properties?.itemId;
+    let params = navigationItemId ? { [idAtributeName]: navigationItemId } : {};
     if (this.properties.paramsUrlCard) {
       params = {
         ...params,
@@ -97,14 +107,14 @@ export class CardItemComponent implements OnInit {
     await this.properties.onClick();
   }
 
-  
-  toggleRoles(event: Event): void {
-    event.stopPropagation();
-    event.preventDefault();
-    this.showAllRoles = !this.showAllRoles;
-  }
+  handleNewItemClick(): void {
+    if (this.properties.onClick) {
+      this.properties.onClick();
+      return;
+    }
 
-  getRolesTooltip(): string {
-  return (this.properties.roles || []).slice(1).join('\n');
-}
+    if (this.properties.urlCard) {
+      this.navigateToPage(this.properties.urlCard, this.properties.paramsUrlCard);
+    }
+  }
 }

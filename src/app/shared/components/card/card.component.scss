@@ -328,6 +328,24 @@
       flex-direction: row;
       align-items: flex-end;
       justify-content: flex-end;
+
+      > .new-element-button-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 53px;
+        height: 38px;
+        border: 1px solid rgba(212, 212, 212, 0.5);
+
+        .plus {
+          color: #d4d4d4;
+          font-size: 1.3rem;
+        }
+
+        .icon-link {
+          cursor: pointer;
+        }
+      }
       
       .dataview-filters {
         display: flex;

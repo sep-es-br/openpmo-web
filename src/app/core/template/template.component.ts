@@ -94,7 +94,12 @@ export class TemplateComponent implements OnInit, OnDestroy {
     this.isOfficeConfigMenu = isOfficeConfig;
   }
 
-  handleClickContent() {
+  handleClickContent(event: MouseEvent): void {
+    const target = event.target as HTMLElement | null;
+    if (target?.closest('p-checkbox, .p-checkbox, input[type="checkbox"]')) {
+      return;
+    }
+
     if (!this.isMenuFixed) this.closeAllMenus();
   }
 

@@ -8,6 +8,7 @@ import {
 } from '@angular/core';
 import { CookieService } from 'ngx-cookie';
 import { Subject } from 'rxjs';
+import { Router } from '@angular/router';
 import { takeUntil } from 'rxjs/operators';
 import {
   IMenu,
@@ -25,6 +26,8 @@ import { OfficeService } from 'src/app/shared/services/office.service';
 import { PersonService } from 'src/app/shared/services/person.service';
 import { PlanService } from 'src/app/shared/services/plan.service';
 import { ReportService } from 'src/app/shared/services/report.service';
+import { PreprojectModelService } from 'src/app/shared/services/preproject-model.service';
+import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
 
 @Component({
   selector: 'app-nav-menu',
@@ -46,6 +49,7 @@ export class NavMenuComponent implements OnInit, OnDestroy {
     { label: MenuButtons.CCB, isOpen: false },
     { label: MenuButtons.REPORTS, isOpen: false },
     { label: MenuButtons.UNIVERSAL_SEARCH, isOpen: false },
+    { label: MenuButtons.PREPROJECT, isOpen: false },
   ];
 
   menusAdmin: IMenuAdmin[] = [
@@ -58,6 +62,7 @@ export class NavMenuComponent implements OnInit, OnDestroy {
     { label: MenuOfficeConfigurationButtons.ORGANIZATIONS, isOpen: false },
     { label: MenuOfficeConfigurationButtons.OFFICES_PERMISSION, isOpen: false },
     { label: MenuOfficeConfigurationButtons.PERSONS, isOpen: false },
+    { label: MenuOfficeConfigurationButtons.PREPROJECT_SELECTION, isOpen: false },
   ];
 
   isUserAdmin = false;
@@ -84,6 +89,10 @@ export class NavMenuComponent implements OnInit, OnDestroy {
 
   currentIDOffice: number;
 
+  hasActivePreprojectModel = false;
+
+  private preprojectModelRequestVersion = 0;
+
   showUserMenu = false;
 
   constructor(
@@ -94,7 +103,10 @@ export class NavMenuComponent implements OnInit, OnDestroy {
     private planSrv: PlanService,
     private cookieSrv: CookieService,
     private reportSrv: ReportService,
-    private personSrv: PersonService
+    private personSrv: PersonService,
+    private preprojectModelSrv: PreprojectModelService,
+    private breadcrumbSrv: BreadcrumbService,
+    private router: Router
   ) {
     this.menuSrv.isOfficeConfigMenu
       .pipe(takeUntil(this.$destroy))
@@ -119,6 +131,7 @@ export class NavMenuComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.$destroy))
       .subscribe(async (id) => {
         this.currentIDOffice = id;
+        await this.loadPreprojectMenu(id);
       });
 
     this.planSrv
@@ -172,6 +185,13 @@ export class NavMenuComponent implements OnInit, OnDestroy {
   }
 
   selectMenuActive(url: string) {
+    const navigationState = this.router.getCurrentNavigation()?.extras.state || history.state;
+    const isPreprojectContext = url.startsWith('preproject')
+      || (url.startsWith('workpack') && (
+        navigationState?.preprojectContext === true
+        || this.breadcrumbSrv.get?.some(item => item.key === 'preproject')
+      ));
+
     if (!url.startsWith('ccbmember-baselines-view')) {
       const ccbButton = this.menus.find((btn) => btn.label === MenuButtons.CCB);
       if (ccbButton) ccbButton.isOpen = false;
@@ -236,6 +256,24 @@ export class NavMenuComponent implements OnInit, OnDestroy {
       this.showUserMenu = false;
     }
 
+    if (!isPreprojectContext) {
+      const preprojectButton = this.menus.find(
+        (btn) => btn.label === MenuButtons.PREPROJECT
+      );
+      if (preprojectButton) preprojectButton.isOpen = false;
+    } else {
+      this.menus.forEach((btn) => {
+        btn.isOpen = btn.label === MenuButtons.PREPROJECT;
+      });
+
+      this.menuSrv.nextMenuState({
+        isFixed: false,
+      });
+
+      this.menuSrv.nextCloseAllMenus(true);
+      this.showUserMenu = false;
+    }
+
     this.menusAdmin.forEach((adminBtn) => {
       if (url.startsWith(adminBtn.label)) {
         adminBtn.isOpen = true;
@@ -280,6 +318,26 @@ export class NavMenuComponent implements OnInit, OnDestroy {
     });
     if (result.success) {
       this.hasReports = result.data;
+    }
+  }
+
+  private async loadPreprojectMenu(idOffice: number): Promise<void> {
+    const requestVersion = ++this.preprojectModelRequestVersion;
+    this.hasActivePreprojectModel = false;
+
+    if (!idOffice || idOffice === 0 || !this.authSrv.getAccessToken()) {
+      return;
+    }
+
+    try {
+      const result = await this.preprojectModelSrv.isActiveByOfficeId(idOffice);
+      if (requestVersion === this.preprojectModelRequestVersion) {
+        this.hasActivePreprojectModel = result.success && result.data === true;
+      }
+    } catch {
+      if (requestVersion === this.preprojectModelRequestVersion) {
+        this.hasActivePreprojectModel = false;
+      }
     }
   }
 
