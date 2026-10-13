@@ -11,6 +11,9 @@ export interface IControlChangeBoard {
 
 export interface IMemberAs {
   role: string;
-  workLocation: string;
+  workLocation?: string;
   active: boolean;
+  level?: 'WORKPACK' | 'PLAN' | 'OFFICE';
+  levelName?: string;
+  levelId?: number;
 }

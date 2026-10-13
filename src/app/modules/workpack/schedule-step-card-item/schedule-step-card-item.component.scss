@@ -165,6 +165,36 @@
       flex-direction: column;
       padding: 0.2em 1em;
       background: #ffffff;
+
+      .unit-value-field {
+        display: block;
+        position: relative;
+        width: 100%;
+
+        p-inputnumber {
+          display: block;
+          width: 100%;
+
+          .p-inputnumber {
+            width: 100%;
+          }
+        }
+
+        .app-input-label {
+          display: flex;
+          position: absolute !important;
+          top: 0.45rem !important;
+          left: 0 !important;
+          align-items: center;
+          width: 35px !important;
+          max-width: none;
+          margin: 0 !important;
+          text-align: left;
+          transform: translateY(-50%);
+          pointer-events: none;
+        }
+      }
+
       .column-title {
         font-size: 0.7rem;
         text-align: center;
@@ -274,13 +304,6 @@
 
   .card-item-liquidated-label {
     font-weight: bold;
-  }
-
-  label.app-input-label {
-    display: flex;
-    align-items: center;
-    margin-top: 5px;
-    margin-left: -30px;
   }
 
   .card-item-content {

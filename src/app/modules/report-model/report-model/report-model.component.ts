@@ -356,6 +356,8 @@ export class ReportModelComponent implements OnInit, OnDestroy {
           card.main = false;
         }
       });
+
+      this.loadCardItemsFiles();
     }
   }
 

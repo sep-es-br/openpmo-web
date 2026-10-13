@@ -8,7 +8,7 @@
     </p-header>
     <div class="card-item-content" 
       [class.cardList]="displayModeCard === 'list'">
-      <span class="card-item-name" [pTooltip]="properties.fullNameCardItem"
+      <span class="card-item-name" [pTooltip]="properties.fullNameCardItem" tooltipStyleClass="file-name-tooltip"
         tooltipPosition="bottom">{{properties.nameCardItem}}
       </span>
       <div class="icons-container">
@@ -17,7 +17,7 @@
       </div>
       <form class="card-item-description">
         <span class="p-float-label p-field">
-          <input class="app-input-text" pInputText type="text" [(ngModel)]="properties.givenName"
+          <input class="app-input-text" pInputText type="text" maxlength="50" [(ngModel)]="properties.givenName"
           [ngModelOptions]="{standalone: true}">
           <label for="float-input" class="app-input-label">{{'briefDescription' | translate}}</label>
         </span>

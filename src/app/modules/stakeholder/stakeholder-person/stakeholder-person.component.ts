@@ -1,28 +1,28 @@
 import { AuthService } from './../../../shared/services/auth.service';
-import {PlanService} from 'src/app/shared/services/plan.service';
-import {AuthServerService} from '../../../shared/services/auth-server.service';
-import {CitizenUserService} from '../../../shared/services/citizen-user.service';
-import {Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import {ActivatedRoute, Router} from '@angular/router';
-import {FormBuilder, FormGroup, Validators} from '@angular/forms';
-import {TranslateService} from '@ngx-translate/core';
-import {MessageService} from 'primeng/api';
-import {Subject} from 'rxjs';
+import { PlanService } from 'src/app/shared/services/plan.service';
+import { AuthServerService } from '../../../shared/services/auth-server.service';
+import { CitizenUserService } from '../../../shared/services/citizen-user.service';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { TranslateService } from '@ngx-translate/core';
+import { MessageService } from 'primeng/api';
+import { Subject } from 'rxjs';
 import { takeUntil, filter } from 'rxjs/operators';
 
-import {ResponsiveService} from 'src/app/shared/services/responsive.service';
-import {ICard} from 'src/app/shared/interfaces/ICard';
-import {StakeholderService} from 'src/app/shared/services/stakeholder.service';
-import {IStakeholder, IStakeholderPermission, IStakeholderRole} from 'src/app/shared/interfaces/IStakeholder';
-import {IWorkpack} from 'src/app/shared/interfaces/IWorkpack';
-import {WorkpackService} from 'src/app/shared/services/workpack.service';
-import {IPerson} from 'src/app/shared/interfaces/IPerson';
-import {PersonService} from 'src/app/shared/services/person.service';
-import {enterLeave} from '../../../shared/animations/enterLeave.animation';
-import {formatDateToString} from 'src/app/shared/utils/formatDateToString';
-import {BreadcrumbService} from 'src/app/shared/services/breadcrumb.service';
-import {SaveButtonComponent} from 'src/app/shared/components/save-button/save-button.component';
-import {cpfValidator} from 'src/app/shared/utils/cpfValidator';
+import { ResponsiveService } from 'src/app/shared/services/responsive.service';
+import { ICard } from 'src/app/shared/interfaces/ICard';
+import { StakeholderService } from 'src/app/shared/services/stakeholder.service';
+import { IStakeholder, IStakeholderPermission, IStakeholderRole } from 'src/app/shared/interfaces/IStakeholder';
+import { IWorkpack } from 'src/app/shared/interfaces/IWorkpack';
+import { WorkpackService } from 'src/app/shared/services/workpack.service';
+import { IPerson } from 'src/app/shared/interfaces/IPerson';
+import { PersonService } from 'src/app/shared/services/person.service';
+import { enterLeave } from '../../../shared/animations/enterLeave.animation';
+import { formatDateToString } from 'src/app/shared/utils/formatDateToString';
+import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
+import { SaveButtonComponent } from 'src/app/shared/components/save-button/save-button.component';
+import { cpfValidator } from 'src/app/shared/utils/cpfValidator';
 import { MinLengthTextCustomValidator } from 'src/app/shared/utils/minLengthTextValidator';
 import { WorkpackModelService } from 'src/app/shared/services/workpack-model.service';
 import { CancelButtonComponent } from 'src/app/shared/components/cancel-button/cancel-button.component';
@@ -42,7 +42,7 @@ interface ICardItemRole {
   templateUrl: './stakeholder-person.component.html',
   styleUrls: ['./stakeholder-person.component.scss'],
   animations: [
-    enterLeave({opacity: 0, pointerEvents: 'none'}, {opacity: 1, pointerEvents: 'all'}, 300)
+    enterLeave({ opacity: 0, pointerEvents: 'none' }, { opacity: 1, pointerEvents: 'all' }, 300)
   ]
 })
 export class StakeholderPersonComponent implements OnInit, OnDestroy {
@@ -95,10 +95,10 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
   showMessageInvalidEmail = false;
   isSamePerson = false;
   permissionLevelListOptions = [
-    {label: this.translateSrv.instant('read'), value: 'READ'},
-    {label: this.translateSrv.instant('update'), value: 'UPDATE' },
-    {label: this.translateSrv.instant('edit'), value: 'EDIT'},
-    {label: this.translateSrv.instant('none'), value: 'None'},
+    { label: this.translateSrv.instant('read'), value: 'READ' },
+    { label: this.translateSrv.instant('update'), value: 'UPDATE' },
+    { label: this.translateSrv.instant('edit'), value: 'EDIT' },
+    { label: this.translateSrv.instant('none'), value: 'None' },
 
   ];
   $destroy = new Subject();
@@ -251,9 +251,9 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
       this.editPermission = !this.workpack.canceled;
     } else {
       this.editPermission = (
-          this.workpack.permissions
-          && this.workpack.permissions.filter(p => p.level === 'EDIT').length > 0
-        ) && !this.workpack.canceled;
+        this.workpack.permissions
+        && this.workpack.permissions.filter(p => p.level === 'EDIT').length > 0
+      ) && !this.workpack.canceled;
     }
     const resultPlan = await this.planSrv.getCurrentPlan(this.idPlan);
     if (resultPlan) {
@@ -453,10 +453,10 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
         address: this.stakeholder.person.address,
         phoneNumber: this.formatPhoneNumber(this.stakeholder.person.phoneNumber),
         contactEmail: this.stakeholder.person.contactEmail
-        
+
       });
 
-       this.selectedOrganization = this.stakeholder.person.organization ?? null //add
+      this.selectedOrganization = this.stakeholder.person.organization ?? null //add
       const now = new Date();
 
       this.stakeholderRoles =
@@ -466,7 +466,7 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
 
           return {
             id: role.id,
-            active: expired ? false : role.active, 
+            active: expired ? false : role.active,
             role: role.role,
             from: new Date(role.from + 'T00:00:00'),
             to: toDate
@@ -490,7 +490,7 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
       this.editPermission
         ? this.stakeholderForm.enable()
         : this.stakeholderForm.disable();
-      if (!this.isUserAdmin && this.idPerson === Number(this.authSrv.getIdPerson() )) {
+      if (!this.isUserAdmin && this.idPerson === Number(this.authSrv.getIdPerson())) {
         this.isSamePerson = true;
       }
       this.setStakeholderPermissionsCards();
@@ -499,20 +499,27 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
   }
 
   setStakeholderPermissionsCards() {
-    this.stakeholderPermissions = this.stakeholder.permissions.map( p => ({...p}));
-    const rolesNotPermissions = this.stakeholder.person.roles.filter(r =>
-      this.stakeholderPermissions.filter(p => p.role.toLowerCase() === (r.role ?? (r as any)).toLowerCase()).length === 0);
+    this.stakeholderPermissions = this.stakeholder.permissions.map(p => ({ ...p }));
+
+    const rolesNotPermissions = this.stakeholder.person.roles.filter(role =>
+      !this.stakeholderPermissions.some(permission =>
+        this.isSameRole(permission, role)
+      )
+    );
+
     if (rolesNotPermissions && rolesNotPermissions.length > 0) {
       rolesNotPermissions.forEach(r => {
         if (this.stakeholderPermissions && this.stakeholderPermissions.length > 0) {
           this.stakeholderPermissions.push({
             role: r.role ?? (r as any),
+            roleGuid: r.roleGuid,
             level: 'None'
           });
         } else {
           this.stakeholderPermissions = [
             {
               role: r.role ?? (r as any),
+              roleGuid: r.roleGuid,
               level: 'None'
             }
           ];
@@ -524,7 +531,7 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
   async searchUserByEmail() {
     if (this.searchedEmailUser && this.searchedEmailUser.length > 5 && this.searchedEmailUser.split('@').length > 1) {
       this.isLoading = true;
-      const {data} = await this.personSrv.GetByKey(this.searchedEmailUser, {
+      const { data } = await this.personSrv.GetByKey(this.searchedEmailUser, {
         idOffice: this.idOffice,
       });
       this.isLoading = false;
@@ -738,6 +745,7 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
       if (this.person.roles && this.user) {
         this.stakeholderPermissions = this.person.roles.map(r => ({
           role: r.role ?? (r as any),
+          roleGuid: r.roleGuid,
           level: 'None'
         }));
       }
@@ -750,9 +758,20 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
       });
       this.stakeholderRoles = null;
       this.stakeholderPermissions = [];
-        this.selectedOrganization = null; 
+      this.selectedOrganization = null;
     }
     this.loadStakeholderRolesCardsItems();
+  }
+
+  private isSameRole(
+    permission: IStakeholderPermission,
+    role: { role: string; roleGuid?: string }
+  ): boolean {
+   if (permission.roleGuid || role.roleGuid) {
+      return permission.roleGuid === role.roleGuid;
+    }
+
+    return permission.role.toLowerCase() === role.role.toLowerCase();
   }
 
   loadStakeholderRolesCardsItems() {
@@ -772,11 +791,11 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
       }
 
     } else {
-     if (this.editPermission) {
-      this.stakeholderRolesCardItems = [{
-        type: 'new-role-card'
-      }];
-     }
+      if (this.editPermission) {
+        this.stakeholderRolesCardItems = [{
+          type: 'new-role-card'
+        }];
+      }
     }
   }
 
@@ -939,10 +958,10 @@ export class StakeholderPersonComponent implements OnInit, OnDestroy {
     }
     // user should have permissions
     if (this.user) {
-      return (this.stakeholderRolesCardItems && this.stakeholderRolesCardItems.filter( card => card.type !== 'new-role-card').length > 0)
-      || (this.stakeholderPermissions && this.stakeholderPermissions.length > 0);
+      return (this.stakeholderRolesCardItems && this.stakeholderRolesCardItems.filter(card => card.type !== 'new-role-card').length > 0)
+        || (this.stakeholderPermissions && this.stakeholderPermissions.length > 0);
     } else {
-      return (this.stakeholderRolesCardItems && this.stakeholderRolesCardItems.filter( card => card.type !== 'new-role-card').length > 0);
+      return (this.stakeholderRolesCardItems && this.stakeholderRolesCardItems.filter(card => card.type !== 'new-role-card').length > 0);
     }
   }
 

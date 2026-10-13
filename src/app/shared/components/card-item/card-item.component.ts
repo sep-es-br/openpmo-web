@@ -26,6 +26,7 @@ export class CardItemComponent implements OnInit {
   iconImg;
   responsive: boolean;
   showMenuNewModel = false;
+  showAllRoles = false;  //add
   language: string;
   $destroy = new Subject();
 
