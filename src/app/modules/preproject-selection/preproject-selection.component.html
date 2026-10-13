@@ -7,6 +7,9 @@
 
   <app-card [properties]="activationCardProperties" class="mt-0 activation-card">
   </app-card>
+  <p class="preproject-deactivation-note" *ngIf="preprojectSelectionEnabled && hasPreProjects">
+    {{ 'preprojectDeactivationBlocked' | translate }}
+  </p>
 
   <div class="preproject-config-section" [class.preproject-config-disabled]="!preprojectSelectionEnabled"
     [attr.aria-disabled]="!preprojectSelectionEnabled" [attr.inert]="!preprojectSelectionEnabled ? '' : null">

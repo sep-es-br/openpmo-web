@@ -3,6 +3,7 @@ import { PreprojectEvaluationOperation } from '../services/preproject-evaluation
 export interface IPreprojectModelConfiguration {
   id: number;
   active: boolean;
+  hasPreProjects?: boolean;
   operation: PreprojectEvaluationOperation;
   properties?: unknown[];
 }

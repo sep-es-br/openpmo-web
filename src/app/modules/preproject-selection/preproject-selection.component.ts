@@ -32,6 +32,7 @@ export class PreprojectSelectionComponent implements OnInit, OnDestroy {
     toggleLabel: 'enablePreprojectSelection',
     initialStateCollapse: false,
     initialStateToggle: false,
+    disabledToggle: true,
     onToggle: new EventEmitter<boolean>()
   };
 
@@ -66,6 +67,8 @@ export class PreprojectSelectionComponent implements OnInit, OnDestroy {
   evaluationOperations: SelectItem[] = [];
 
   preprojectSelectionEnabled: boolean = false;
+
+  hasPreProjects: boolean = false;
 
   preprojectModelId: number;
 
@@ -125,21 +128,25 @@ export class PreprojectSelectionComponent implements OnInit, OnDestroy {
       return;
     }
 
-    const result = await this.preprojectModelService.updateConfiguration(
-      this.preprojectModelId,
-      {
-        active: this.preprojectSelectionEnabled,
-        operation: this.selectedEvaluationOperation
+    try {
+      const result = await this.preprojectModelService.updateConfiguration(
+        this.preprojectModelId,
+        {
+          active: this.preprojectSelectionEnabled,
+          operation: this.selectedEvaluationOperation
+        }
+      );
+      if (result.success && result.data) {
+        this.applyConfiguration(result.data);
+        this.configurationForm.markAsPristine();
+        this.messageService.add({
+          severity: 'success',
+          summary: this.translateService.instant('success'),
+          detail: this.translateService.instant('messages.savedSuccessfully')
+        });
       }
-    );
-    if (result.success && result.data) {
-      this.applyConfiguration(result.data);
-      this.configurationForm.markAsPristine();
-      this.messageService.add({
-        severity: 'success',
-        summary: this.translateService.instant('success'),
-        detail: this.translateService.instant('messages.savedSuccessfully')
-      });
+    } catch {
+      await this.loadConfiguration();
     }
   }
 
@@ -154,6 +161,10 @@ export class PreprojectSelectionComponent implements OnInit, OnDestroy {
   }
 
   private handleActivationChange(enabled: boolean): void {
+    if (!enabled && this.hasPreProjects) {
+      this.activationCardProperties.initialStateToggle = true;
+      return;
+    }
     this.preprojectSelectionEnabled = enabled;
     this.markConfigurationAsDirty();
     this.configurationForm.get('enabled').setValue(enabled);
@@ -173,6 +184,8 @@ export class PreprojectSelectionComponent implements OnInit, OnDestroy {
   private applyConfiguration(configuration: IPreprojectModelConfiguration): void {
     this.preprojectModelId = configuration.id;
     this.preprojectSelectionEnabled = configuration.active;
+    this.hasPreProjects = configuration.hasPreProjects === true;
+    this.activationCardProperties.disabledToggle = this.preprojectSelectionEnabled && this.hasPreProjects;
     this.selectedEvaluationOperation = configuration.operation || 'AVERAGE';
     this.savedPreprojectSelectionEnabled = this.preprojectSelectionEnabled;
     this.savedEvaluationOperation = this.selectedEvaluationOperation;

@@ -208,6 +208,7 @@
   "preprojects": "Pre-projects",
   "preprojectSelection": "Pre-project Selection",
   "enablePreprojectSelection": "Enable Pre-project Selection",
+  "preprojectDeactivationBlocked": "Pre-project selection cannot be disabled because this office already has registered pre-projects.",
   "criteria": "Criteria",
   "newCriteriaGuide": "New Criteria Guide",
   "weight": "Weight",

@@ -214,6 +214,7 @@
   "preprojects": "Anteprojetos",
   "preprojectSelection": "Seleção de Anteprojeto",
   "enablePreprojectSelection": "Habilitar Seleção de Anteprojeto",
+  "preprojectDeactivationBlocked": "A seleção de anteprojetos não pode ser desativada porque este escritório já possui anteprojetos cadastrados.",
   "criteria": "Critérios",
   "newCriteriaGuide": "Nova Guia de Critérios",
   "weight": "Peso",
