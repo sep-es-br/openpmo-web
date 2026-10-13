@@ -18,11 +18,10 @@ import { IBreadcrumb } from 'src/app/shared/interfaces/IBreadcrumb';
 import { PreprojectService } from 'src/app/shared/services/preproject.service';
 import { IOrganization } from 'src/app/shared/interfaces/IOrganization';
 import { IHttpResult } from 'src/app/shared/interfaces/IHttpResult';
-import { IPreproject, IPreprojectListItem, PreprojectStatus } from 'src/app/shared/interfaces/IPreproject';
+import { IPreprojectListItem, PreprojectStatus } from 'src/app/shared/interfaces/IPreproject';
 import { IPlan } from 'src/app/shared/interfaces/IPlan';
 import { OrganizationService } from 'src/app/shared/services/organization.service';
 import { PlanService } from 'src/app/shared/services/plan.service';
-import { WorkpackService } from 'src/app/shared/services/workpack.service';
 
 @Component({
   selector: 'app-preproject',
@@ -71,8 +70,7 @@ export class PreprojectComponent implements OnInit, OnDestroy, AfterViewInit {
     private router: Router,
     private preprojectService: PreprojectService,
     private organizationService: OrganizationService,
-    private planService: PlanService,
-    private workpackService: WorkpackService
+    private planService: PlanService
   ) {}
 
   ngOnInit(): void {
@@ -252,41 +250,17 @@ export class PreprojectComponent implements OnInit, OnDestroy, AfterViewInit {
         .filter((organization: IOrganization) => !!organization.id)
         .map((organization: IOrganization) => [organization.id as number, organization.name])
     );
-    const preprojectDetails = await Promise.all(preprojects.map(async preproject => {
-      try {
-        const detailResponse = await this.preprojectService.findById(preproject.id);
-        return detailResponse.success && detailResponse.data ? detailResponse.data : null;
-      } catch {
-        return null;
-      }
-    }));
-    const detailsById = new Map<number, IPreproject>(
-      preprojectDetails
-        .filter((preproject): preproject is IPreproject => !!preproject)
-        .map(preproject => [preproject.id, preproject])
-    );
     const plans = plansResponse.success ? plansResponse.data || [] : [];
     const planNamesById = new Map<number, string>(
       plans
         .filter((plan): plan is IPlan => !!plan?.id)
         .map(plan => [plan.id as number, plan.name])
     );
-    const structuredPlanIds = Array.from(new Set(
-      preprojects
-        .filter(preproject => this.getPreprojectStatus(preproject, detailsById.get(preproject.id)) === 'Estruturação')
-        .map(preproject => this.getPreprojectPlanId(preproject, detailsById.get(preproject.id)))
-        .filter((idPlan): idPlan is number => Number.isFinite(idPlan) && idPlan > 0)
-    ));
-    const workpackIdsByPlan = await this.loadRepresentativeWorkpackIds(structuredPlanIds);
-
     const mappedItems: ICardItem[] = preprojects.map((preproject: IPreprojectListItem) => {
-      const detail = detailsById.get(preproject.id);
-      const status = this.getPreprojectStatus(preproject, detail);
-      const organizationName = organizationsById.get(detail?.idOrganization || preproject.idOrganization || 0);
-      const idPlan = this.getPreprojectPlanId(preproject, detail);
-      const idWorkpack = detail?.idWorkpack
-        || preproject.idWorkpack
-        || workpackIdsByPlan.get(idPlan || 0);
+      const status = this.getPreprojectStatus(preproject);
+      const organizationName = organizationsById.get(preproject.idOrganization || 0);
+      const idPlan = preproject.idPlan;
+      const idWorkpack = preproject.idWorkpack;
       const navigation = this.getPreprojectCardNavigation(preproject, status, idPlan, idWorkpack);
       const breadcrumbWorkpackModel = status === 'Estruturação'
         ? this.getStructuringWorkpackBreadcrumb(idOffice, idPlan, navigation.itemId)
@@ -330,8 +304,8 @@ export class PreprojectComponent implements OnInit, OnDestroy, AfterViewInit {
     setTimeout(() => this.configDataViewService.nextCollapsePanelsStatus('expand'));
   }
 
-  private getPreprojectStatus(preproject: IPreprojectListItem, detail?: IPreproject): PreprojectStatus {
-    return preproject.status || detail?.status || 'Elaboração';
+  private getPreprojectStatus(preproject: IPreprojectListItem): PreprojectStatus {
+    return preproject.status || 'Elaboração';
   }
 
   private loadStatusFilterOptions(): void {
@@ -401,28 +375,6 @@ export class PreprojectComponent implements OnInit, OnDestroy, AfterViewInit {
         }
       }
     ];
-  }
-
-  private async loadRepresentativeWorkpackIds(planIds: number[]): Promise<Map<number, number>> {
-    const entries = await Promise.all(planIds.map(async idPlan => {
-      try {
-        const response = await this.workpackService.GetWorkpackListCards({ 'id-plan': idPlan });
-        const workpacks = response.success ? response.data || [] : [];
-        const workpack = workpacks.find(item => item.type === 'Project') || workpacks[0];
-        return workpack?.id ? [idPlan, workpack.id] as [number, number] : null;
-      } catch {
-        return null;
-      }
-    }));
-    return new Map(entries.filter((entry): entry is [number, number] => !!entry));
-  }
-
-  private getPreprojectPlanId(
-    preproject: IPreprojectListItem,
-    detail: IPreproject | undefined
-  ): number | undefined {
-    return detail?.idPlan
-      || preproject.idPlan;
   }
 
 }

@@ -60,6 +60,7 @@ import { IUniversalSearch } from 'src/app/shared/interfaces/universal-search.int
 import { ObligationsService } from 'src/app/shared/services/obligations.service';
 import { ProcurementsService } from 'src/app/shared/services/procurements.service';
 import { AgreementsService } from 'src/app/shared/services/agreements.service';
+import { PreprojectModelService } from 'src/app/shared/services/preproject-model.service';
 
 @Component({
   selector: 'app-workpack',
@@ -182,6 +183,8 @@ export class WorkpackComponent implements OnDestroy, OnInit {
 
   private workpackLoadId = 0;
 
+  private hasActivePreprojectModel = true;
+
   constructor(
     private actRouter: ActivatedRoute,
     private workpackModelSrv: WorkpackModelService,
@@ -221,6 +224,7 @@ export class WorkpackComponent implements OnDestroy, OnInit {
     private location: Location,
     private setConfigWorkpackSrv: SetConfigWorkpackService,
     private searchSrv: SearchService,
+    private preprojectModelSrv: PreprojectModelService,
     private thisElemRef: ElementRef<HTMLElement>
   ) {
     this.breadcrumbSrv.ready.pipe(takeUntil(this.$destroy)).subscribe(data => {
@@ -450,6 +454,7 @@ export class WorkpackComponent implements OnDestroy, OnInit {
     this.workpackProperties = [];
     this.sectionWorkpackModelChildren = undefined;
     this.cardsWorkPackModelChildren = [];
+    this.hasActivePreprojectModel = true;
     this.changedStatusCompleted = false;
     this.workpackSrv.setEditPermission(false);
     this.workpackSrv.setUnitMeansure(undefined);
@@ -499,6 +504,18 @@ export class WorkpackComponent implements OnDestroy, OnInit {
     if (loadId !== undefined && this.isStaleWorkpackLoad(loadId)) {
       return;
     }
+    try {
+      const result = await this.preprojectModelSrv.isActiveByOfficeId(planProperties.idOffice);
+      if (loadId !== undefined && this.isStaleWorkpackLoad(loadId)) {
+        return;
+      }
+      this.hasActivePreprojectModel = !result.success || result.data === true;
+    } catch {
+      if (loadId !== undefined && this.isStaleWorkpackLoad(loadId)) {
+        return;
+      }
+      this.hasActivePreprojectModel = true;
+    }
     this.workpackSrv.setWorkpackParams({
       ...params,
       idPlan: this.idPlan,
@@ -516,6 +533,14 @@ export class WorkpackComponent implements OnDestroy, OnInit {
     } else {
       await this.loadWorkpackModel(this.idWorkpackModel, loadId);
       if (loadId !== undefined && this.isStaleWorkpackLoad(loadId)) {
+        return;
+      }
+      if (this.workpackModel?.type === TypeWorkpackModelEnum.ProjectModel && this.hasActivePreprojectModel) {
+        this.router.navigate(this.idWorkpackParent ? ['/workpack'] : ['/plan'], {
+          queryParams: this.idWorkpackParent
+            ? { id: this.idWorkpackParent, idPlan: this.idPlan }
+            : { id: this.idPlan, idOffice: planProperties.idOffice }
+        });
         return;
       }
     }
@@ -735,6 +760,12 @@ export class WorkpackComponent implements OnDestroy, OnInit {
     }
   }
 
+  private canCreateChildWorkpack(idWorkpackModel: number): boolean {
+    const childModel = this.workpackModel?.children?.find(model => model.id === idWorkpackModel);
+    return this.workpackSrv.getEditPermission() && !!childModel &&
+      (childModel.type !== TypeWorkpackModelEnum.ProjectModel || !this.hasActivePreprojectModel);
+  }
+
   async loadSectionsWorkpackChildren() {
     this.cardsWorkPackModelChildren = this.workpackModel?.children ? this.workpackModel?.children?.map(workpackModel => {
       const propertiesCard: ICard = {
@@ -747,7 +778,7 @@ export class WorkpackComponent implements OnDestroy, OnInit {
         initialStateCollapse: this.collapsePanelsStatus,
         showFilters: true,
         hideTextFilter: true,
-        showCreateNemElementButtonWorkpack: this.workpackSrv.getEditPermission() ? true : false,
+        showCreateNemElementButtonWorkpack: this.canCreateChildWorkpack(workpackModel.id),
         createNewElementMenuItemsWorkpack: [],
         filters: []
       };
@@ -772,7 +803,8 @@ export class WorkpackComponent implements OnDestroy, OnInit {
           if (!this.cardsWorkPackModelChildren[index]?.cardSection?.createNewElementMenuItemsWorkpack) {
             return;
           }
-          this.cardsWorkPackModelChildren[index].cardSection.showCreateNemElementButtonWorkpack = this.workpackSrv.getEditPermission();
+          this.cardsWorkPackModelChildren[index].cardSection.showCreateNemElementButtonWorkpack =
+            this.canCreateChildWorkpack(workpackModel.id);
           this.cardsWorkPackModelChildren[index].cardSection.onNewItem =
             () => this.loadNewItemMenu(this.workpack.plan.id, workpackModel.id);
           this.cardsWorkPackModelChildren[index].cardItemsSection = resultItemsList && resultItemsList.workpackItemCardList;
@@ -974,7 +1006,7 @@ export class WorkpackComponent implements OnDestroy, OnInit {
           statusProperty: workpack?.statusProperty || undefined,
         };
       });
-      if (this.workpackSrv.getEditPermission() && !idWorkpackModelLinked) {
+      if (this.canCreateChildWorkpack(idWorkpackModel) && !idWorkpackModelLinked) {
         workpackItemCardList.push(
           {
             typeCardItem: 'newCardItem',
@@ -987,7 +1019,7 @@ export class WorkpackComponent implements OnDestroy, OnInit {
       const resultItemsList = { workpackItemCardList };
       return resultItemsList;
     }
-    if ((!workpacks || workpacks.length === 0) && this.workpackSrv.getEditPermission() && !idWorkpackModelLinked) {
+    if ((!workpacks || workpacks.length === 0) && this.canCreateChildWorkpack(idWorkpackModel) && !idWorkpackModelLinked) {
       const workpackItemCardList = [
         {
           typeCardItem: 'newCardItem',
@@ -1002,6 +1034,9 @@ export class WorkpackComponent implements OnDestroy, OnInit {
   }
 
   async loadNewItemMenu(idPlan, idWorkpackModel) {
+    if (!this.canCreateChildWorkpack(idWorkpackModel)) {
+      return;
+    }
     const sharedWorkpackList = await this.loadSharedWorkpackList(idWorkpackModel, idPlan);
     const iconMenuItems: MenuItem[] = [
       {
@@ -1373,6 +1408,9 @@ export class WorkpackComponent implements OnDestroy, OnInit {
   }
 
   handleNewWorkpack(idPlan, idWorkpackModel, idWorkpackParent) {
+    if (!this.canCreateChildWorkpack(idWorkpackModel)) {
+      return;
+    }
     this.router.navigate(['workpack'], {
       queryParams: {
         idPlan,
@@ -1422,6 +1460,9 @@ export class WorkpackComponent implements OnDestroy, OnInit {
   }
 
   handleCreateNewWorkpack(idWorkpackModel: number) {
+    if (!this.canCreateChildWorkpack(idWorkpackModel)) {
+      return;
+    }
     this.router.navigate(['/workpack'], {
       queryParams: {
         idPlan: this.idPlan,
@@ -1482,6 +1523,9 @@ export class WorkpackComponent implements OnDestroy, OnInit {
   }
 
   async saveWorkpack(event) {
+    if (!this.idWorkpack && this.workpackModel?.type === TypeWorkpackModelEnum.ProjectModel && this.hasActivePreprojectModel) {
+      return;
+    }
     const properties = event.properties;
     let updateSuccess = true;
     if (!!this.changedStatusCompleted) {
