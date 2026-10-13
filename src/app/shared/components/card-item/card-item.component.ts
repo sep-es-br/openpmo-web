@@ -26,7 +26,7 @@ export class CardItemComponent implements OnInit {
   iconImg;
   responsive: boolean;
   showMenuNewModel = false;
-  showAllRoles = false;  //add
+  showAllRoles = false;
   language: string;
   $destroy = new Subject();
 
@@ -105,6 +105,12 @@ export class CardItemComponent implements OnInit {
 
   async handleLoadPermission() {
     await this.properties.onClick();
+  }
+
+  toggleRoles(event: Event): void {
+    event.stopPropagation();
+    event.preventDefault();
+    this.showAllRoles = !this.showAllRoles;
   }
 
   handleNewItemClick(): void {
