@@ -28,6 +28,7 @@ export class PropertyTemplateModel implements IProperty {
   unavailableTransversalViewSelections?: Array<{ id?: number; value: string; label: string }>;
   possibleValuesIds?: { label: string; value: number }[];
   multipleSelection?: boolean;
+  principalProgramId?: number | null;
   rows?: number;
   decimals?: number;
   localityList?: TreeNode[];
@@ -79,6 +80,9 @@ export class PropertyTemplateModel implements IProperty {
         const selectedOptions = multipleSelection && value as string[];
         const stringValue = !!selectedOptions ? selectedOptions.join(',') : value as string;
         property.value = stringValue;
+        if (this.type === TypePropertyModelEnum.TransversalViewSelectionModel) {
+          property.principalProgramId = this.principalProgramId;
+        }
         break;
       case TypePropertyModelEnum.UnitSelectionModel:
         property.selectedValue = selectedValue;

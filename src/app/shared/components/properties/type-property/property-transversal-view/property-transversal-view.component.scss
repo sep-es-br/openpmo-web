@@ -17,13 +17,31 @@
 }
 
 .transversal-view-input {
+  align-items: center;
   cursor: pointer;
+  display: flex;
+  min-height: 2.5rem;
   padding-right: 2.75rem;
   width: 100%;
 }
 
-.transversal-view-input:disabled {
+.transversal-view-input[aria-disabled="true"] {
   cursor: default;
+}
+
+.transversal-view-input:focus {
+  outline: 0;
+}
+
+.transversal-view-input:focus ~ label,
+.transversal-view-input.has-value ~ label {
+  top: 0 !important;
+  left: 0rem !important;
+}
+
+.transversal-view-principal {
+  font-family: v.$fontFamilyBold;
+  font-weight: 700;
 }
 
 .transversal-view-open-button {
@@ -84,4 +102,40 @@
 ::ng-deep .transversal-view-property .p-dialog-content .p-tree-container {
   max-height: 55vh;
   overflow-y: auto;
+}
+
+.transversal-selection-columns {
+  display: flex;
+  justify-content: flex-end;
+  padding: 0 1.1rem .4rem 0;
+  color: v.$fontLabel;
+  font-size: .85rem;
+  font-weight: 600;
+}
+
+::ng-deep .transversal-view-property .p-tree .p-treenode-label {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.transversal-selection-row {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  min-width: 0;
+  width: 100%;
+}
+
+.transversal-selection-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.transversal-principal-checkbox {
+  cursor: pointer;
+  flex: 0 0 auto;
+  height: 1rem;
+  margin: 0 1.1rem 0 .75rem;
+  width: 1rem;
 }

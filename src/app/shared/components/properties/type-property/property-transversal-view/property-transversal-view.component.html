@@ -1,14 +1,21 @@
 <div class="transversal-view-property" [class.disabled]="property.disabled">
   <span class="p-float-label transversal-view-input-container">
-    <input class="app-input-text transversal-view-input" pInputText [id]="property.name"
-      [value]="selectedLabels" [required]="property.required" [disabled]="property.disabled" readonly
-      [class.ng-invalid]="property.invalid" [attr.aria-haspopup]="'dialog'"
-      (click)="openSelection()" (keydown.enter)="openSelection()" (keydown.space)="openSelection()" />
+    <div class="app-input-text p-inputtext transversal-view-input" [class.has-value]="!!selectedLabels"
+      [class.ng-invalid]="property.invalid" [attr.aria-labelledby]="property.name + '-label'"
+      [attr.aria-disabled]="property.disabled" [attr.aria-haspopup]="'dialog'"
+      [attr.aria-expanded]="showSelection" [attr.tabindex]="property.disabled ? -1 : 0" role="button"
+      (click)="openSelection()" (keydown.enter)="$event.preventDefault(); openSelection()"
+      (keydown.space)="$event.preventDefault(); openSelection()">
+      <ng-container *ngFor="let label of selectedProgramLabels; let first = first; let last = last">
+        <span [class.transversal-view-principal]="first && !!principalProgramLabel">{{ label }}</span>
+        <span *ngIf="!last">, </span>
+      </ng-container>
+    </div>
     <button type="button" class="transversal-view-open-button" [disabled]="property.disabled"
       [attr.aria-label]="property.label" (click)="openSelection()">
       <i class="pi pi-sitemap" aria-hidden="true"></i>
     </button>
-    <label class="app-input-label" [for]="property.name">
+    <label class="app-input-label" [id]="property.name + '-label'">
       {{ property.label }} {{ property.required ? '*' : '' }}
     </label>
   </span>
@@ -21,12 +28,26 @@
     </span>
   </div>
 
-  <p-dialog [(visible)]="showSelection" [modal]="true" [style]="{ width: '34rem', maxWidth: '95vw' }"
+  <p-dialog [(visible)]="showSelection" [modal]="true" [style]="{ width: '50rem', maxWidth: '95vw' }"
     [header]="property.label" [dismissableMask]="false">
+    <div class="transversal-selection-columns" *ngIf="property.multipleSelection">
+      <span>{{ 'principalProgram' | translate }}</span>
+    </div>
     <p-tree [value]="property.transversalViewTree" [filter]="true" filterBy="label"
       [filterPlaceholder]="'search' | translate" [selectionMode]="property.multipleSelection ? 'checkbox' : 'single'"
-      [(selection)]="draftSelection" [propagateSelectionUp]="false" [propagateSelectionDown]="false"
+      [(selection)]="draftSelection" (selectionChange)="onDraftSelectionChange($event)"
+      [propagateSelectionUp]="false" [propagateSelectionDown]="false"
       [emptyMessage]="'noRecordsFound' | translate">
+      <ng-template let-node pTemplate="default">
+        <div class="transversal-selection-row">
+          <span class="transversal-selection-name">{{ node.label }}</span>
+          <input *ngIf="property.multipleSelection" type="checkbox" class="transversal-principal-checkbox"
+            [checked]="isPrincipalProgram(node)"
+            [attr.aria-label]="('principalProgram' | translate) + ': ' + node.label"
+            (click)="$event.stopPropagation()"
+            (change)="onPrincipalProgramChange(node, $event)" />
+        </div>
+      </ng-template>
     </p-tree>
     <p-footer>
       <p-button styleClass="p-button-text" [label]="'cancel' | translate"

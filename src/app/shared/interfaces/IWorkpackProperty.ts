@@ -5,6 +5,7 @@ export interface IWorkpackProperty {
   session?: string;
   idPropertyModel: number;
   value?: string | number | boolean | string[] | number[] | Date;
+  principalProgramId?: number | null;
   selectedValues?: number[];
   selectedValuesDetails?: {id: number; name: string; fullName: string}[];
   selectedValue?: number;

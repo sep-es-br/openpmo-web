@@ -133,6 +133,7 @@ export class WorkpackPropertyService {
     property.unavailableTransversalViewSelections = pro.unavailableTransversalViewSelections;
     property.possibleValuesIds = pro.possibleValuesIds;
     property.multipleSelection = pro.multipleSelection;
+    property.principalProgramId = pro.principalProgramId;
     property.rows = pro.rows;
     property.decimals = pro.decimals;
     property.localityList = pro.localityList;
@@ -205,6 +206,7 @@ export class WorkpackPropertyService {
       group.groupedProperties && group.groupedProperties.find(gp => gp.idPropertyModel === propertyModel.id);
 
     property.id = propertyWorkpack && propertyWorkpack.id;
+    property.principalProgramId = propertyWorkpack?.principalProgramId;
     property.idPropertyModel = propertyModel.id;
     property.type = TypePropertyModelEnum[propertyModel.type];
     property.active = propertyModel.active;
