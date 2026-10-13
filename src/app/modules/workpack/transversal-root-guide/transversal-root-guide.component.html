@@ -1,0 +1,38 @@
+<section class="transversal-root-guide">
+  <div *ngIf="loading" class="transversal-root-guide-loading">{{ 'loadingEllipsis' | translate }}</div>
+  <ng-container *ngIf="!loading">
+    <div class="expanded-buttons-container">
+      <div class="button-container">
+        <i class="fas fa-angle-double-down" [pTooltip]="'expandAll' | translate" [class.selected]="!collapsed"
+          (click)="toggleTree(true)"></i>
+      </div>
+      <div class="button-container">
+        <i class="fas fa-angle-double-up" [class.selected]="collapsed" [pTooltip]="'collapseAll' | translate"
+          (click)="toggleTree(false)"></i>
+      </div>
+    </div>
+    <p-tree [value]="tree" [emptyMessage]="null">
+      <ng-template let-node pTemplate="default">
+        <div *ngIf="node.data.kind === 'model'; else workpackNode" class="container-custom-tree container-workpackmodel">
+          <div class="tree-label tree-label-row">
+            {{ node.data.modelName | uppercase }}
+            <span class="tree-label-count">({{ node.children?.length || 0 }})</span>
+          </div>
+        </div>
+        <ng-template #workpackNode>
+          <div class="container-custom-tree container-workpack">
+            <div class="workpack-title-box">
+              <i *ngIf="node.data.item.fontIcon" [class]="node.data.item.fontIcon"></i>
+              <div class="tree-label"
+                [class.disabled-link]="!node.data.item.clickable"
+                [class.transversal-root-guide-clickable]="node.data.item.clickable"
+                (click)="openNode(node)">
+                {{ node.data.item.name }}
+              </div>
+            </div>
+          </div>
+        </ng-template>
+      </ng-template>
+    </p-tree>
+  </ng-container>
+</section>

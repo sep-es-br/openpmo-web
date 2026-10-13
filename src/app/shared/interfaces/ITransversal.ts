@@ -92,6 +92,21 @@ export interface ITransversalWorkpackParticipation {
   included: boolean;
 }
 
+export interface ITransversalStructuralLink {
+  idTransversalProgram: number;
+  idWorkpack: number;
+  idWorkpackModel: number;
+  idParentWorkpack?: number;
+  idRootWorkpackModel: number;
+  rootModelName: string;
+  name: string;
+  fullName?: string;
+  modelName: string;
+  fontIcon?: string;
+  directlyLinked: boolean;
+  clickable: boolean;
+}
+
 export interface ITransversalSelectionOption {
   id: number;
   parentId?: number;

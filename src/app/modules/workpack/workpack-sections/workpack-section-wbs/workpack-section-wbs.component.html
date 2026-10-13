@@ -37,6 +37,8 @@
             <i *ngIf="shouldDisplayWarningStyles(node).displayWarningIcon"
               class="warning-icon fa fa-exclamation-triangle" aria-hidden="true"></i>
             <div class="tree-label link"
+              [class.disabled-link]="node?.isTransversalStructuralLink && !node?.structuralLinkClickable"
+              [class.transversal-structural-link]="node?.isTransversalStructuralLink"
               [ngClass]="{ 'alert-text': shouldDisplayWarningStyles(node).displayColoredText, 'dashed-text': shouldDisplayWarningStyles(node).displayDashedText }"
               (click)="navigateToWorkpack(node)">
               {{ node.workpackName }}

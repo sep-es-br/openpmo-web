@@ -4,5 +4,5 @@ export interface IPreferences {
     idWorkpackModelLinked: number;
     pageSize: number;
     fixedMenu: boolean;
-    displayMode: 'LIST' | 'CARD';
+    displayMode: 'LIST' | 'GRID';
 }

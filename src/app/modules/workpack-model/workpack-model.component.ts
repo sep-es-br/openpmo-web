@@ -70,7 +70,6 @@ export class WorkpackModelComponent implements OnInit {
 
   @ViewChild(SaveButtonComponent) saveButton: SaveButtonComponent;
   @ViewChild(CancelButtonComponent) cancelButton: CancelButtonComponent;
-  @ViewChild('usesSelector') usesSelector: OverlayPanel;
 
   idOffice: number;
   idStrategy: number;
@@ -80,17 +79,11 @@ export class WorkpackModelComponent implements OnInit {
   idParentWorkpack: number;
   workpackModelType: TypeWorkpackModelEnum;
   classification: WorkpackModelClassificationEnum = WorkpackModelClassificationEnum.STRUCTURAL;
-  usesOptions: IWorkpackModel[] = [];
-  selectedUsesIds: number[] = [];
-  usesTreeOptions: TreeNode[] = [];
-  cardItemsUses: ICardItem[] = [];
-  totalUsesRecords = 0;
   cardProperties: ICard;
   cardPropertiesStakeholders: ICard;
   cardPropertiesCostAccount: ICard;
   cardPropertiesJournal: ICard;
   cardPropertiesModels: ICard;
-  cardPropertiesUses: ICard;
   cardPropertiesSchedule: ICard;
   cardPropertiesRiskAndIssues: ICard;
   cardPropertiesProcesses: ICard;
@@ -214,10 +207,6 @@ export class WorkpackModelComponent implements OnInit {
         ...this.cardPropertiesModels,
         initialStateCollapse: this.collapsePanelsStatus
       });
-      this.cardPropertiesUses = Object.assign({}, {
-        ...this.cardPropertiesUses,
-        initialStateCollapse: this.collapsePanelsStatus
-      });
       this.cardPropertiesSchedule = Object.assign({}, {
         ...this.cardPropertiesSchedule,
         initialStateCollapse: this.collapsePanelsStatus
@@ -272,7 +261,6 @@ export class WorkpackModelComponent implements OnInit {
       await this.getOfficeById();
       if (!this.idParentWorkpack) await this.getPlanModelById();
       await this.loadDetails();
-      await this.loadUsesOptions();
       this.loadMenuProperty();
     });
     this.currentBreadcrumbItems = [];
@@ -392,11 +380,6 @@ export class WorkpackModelComponent implements OnInit {
     this.posibleRolesPerson = this.rolesPersonOptions.map(role => this.translateSrv.instant(role));
     this.posibleRolesOrg = this.rolesOrgOptions.map(role => this.translateSrv.instant(role));
     this.modelProperties = [];
-    this.usesOptions = [];
-    this.selectedUsesIds = [];
-    this.usesTreeOptions = [];
-    this.cardItemsUses = [];
-    this.totalUsesRecords = 0;
     this.childrenModels = [];
     this.cardItemsModels = [];
     this.cardProperties = null;
@@ -408,7 +391,6 @@ export class WorkpackModelComponent implements OnInit {
     this.cardPropertiesProcesses = null;
     this.cardPropertiesJournal = null;
     this.cardPropertiesModels = null;
-    this.cardPropertiesUses = null;
     this.cardPropertiesSchedule = null;
     this.cardPropertiesSchedule = null;
     this.cardPropertiesObligations = null;
@@ -439,17 +421,17 @@ export class WorkpackModelComponent implements OnInit {
   }
 
   private createRootTransversalViewProperty(sortIndex: number): IWorkpackModelProperty {
-    const translatedLabel = this.translateSrv.instant('rootTransversalView');
+    const translatedLabel = this.translateSrv.instant('transversalViewRootProperty');
     return {
       active: true,
-      label: translatedLabel === 'rootTransversalView' ? 'Visão Raiz' : translatedLabel,
-      name: 'Transversalidade',
+      label: translatedLabel === 'transversalViewRootProperty' ? 'Visão Raiz' : translatedLabel,
+      name: 'Visão Raiz',
       type: TypePropertyEnum.TransversalViewSelectionModel,
       sortIndex,
       fullLine: false,
       required: false,
       multipleSelection: true,
-      fixed: false,
+      fixed: true,
       helpText: ''
     };
   }
@@ -467,160 +449,6 @@ export class WorkpackModelComponent implements OnInit {
         obligations: false
       };
     }
-  }
-
-  async loadUsesOptions() {
-    this.usesOptions = [];
-    this.selectedUsesIds = [];
-    if (this.classification !== WorkpackModelClassificationEnum.TRANSVERSAL || !this.idStrategy) {
-      return;
-    }
-
-    const usesResult = this.idWorkpackModel
-      ? await this.workpackModelSrv.getUses(this.idWorkpackModel)
-      : undefined;
-    const linkedModels = usesResult?.success ? (usesResult.data || []) : [];
-    this.selectedUsesIds = linkedModels.map(model => model.id);
-
-    const menuResult = await this.menuSrv.getItemsPlanModel(this.idOffice);
-    const planModel = menuResult.success
-      ? (menuResult.data || []).find((item: IMenuPlanModel) => item.id === this.idStrategy)
-      : undefined;
-
-    if (planModel?.workpackModels?.length) {
-      this.usesOptions = this.flattenStructuralModels(planModel.workpackModels)
-        .filter(model => model.id !== this.idWorkpackModel);
-      this.usesTreeOptions = this.buildUsesTree(planModel.workpackModels);
-    } else {
-      const modelsResult = await this.workpackModelSrv.GetAll({ 'id-plan-model': this.idStrategy });
-      if (modelsResult.success) {
-        this.usesOptions = (modelsResult.data || [])
-          .filter(model => model.id !== this.idWorkpackModel
-            && model.classification !== WorkpackModelClassificationEnum.TRANSVERSAL);
-        this.usesTreeOptions = this.buildFlatUsesTree(this.usesOptions);
-      }
-    }
-
-    linkedModels
-      .filter(model => model.id !== this.idWorkpackModel
-        && model.classification !== WorkpackModelClassificationEnum.TRANSVERSAL
-        && !this.usesOptions.some(option => option.id === model.id))
-      .forEach(model => this.usesOptions.push(model));
-    this.refreshUsesPresentation();
-  }
-
-  isUseSelected(idWorkpackModel: number): boolean {
-    return this.selectedUsesIds.includes(idWorkpackModel);
-  }
-
-  toggleUse(idWorkpackModel: number): void {
-    if (!this.editPermission) {
-      return;
-    }
-
-    this.selectedUsesIds = this.isUseSelected(idWorkpackModel)
-      ? this.selectedUsesIds.filter(id => id !== idWorkpackModel)
-      : [...this.selectedUsesIds, idWorkpackModel];
-    this.refreshUsesPresentation();
-    this.saveButton?.showButton();
-  }
-
-  openUsesSelector(event: Event): void {
-    this.usesSelector?.toggle(event);
-  }
-
-  selectUseFromTree(event: { node: TreeNode }): void {
-    const idWorkpackModel = Number(event?.node?.data);
-    if (!idWorkpackModel || event?.node?.selectable === false) {
-      return;
-    }
-    this.toggleUse(idWorkpackModel);
-    this.usesSelector?.hide();
-  }
-
-  private refreshUsesPresentation(): void {
-    const linkedModels = this.usesOptions
-      .filter(model => this.isUseSelected(model.id))
-      .filter((model, index, models) => models.findIndex(candidate => candidate.id === model.id) === index);
-    this.cardItemsUses = linkedModels.map(model => ({
-      typeCardItem: 'listItem',
-      icon: model.fontIcon,
-      nameCardItem: model.modelName,
-      itemId: model.id,
-      menuItems: this.editPermission ? [{
-        label: this.translateSrv.instant('delete'),
-        icon: 'fas fa-unlink',
-        command: () => this.toggleUse(model.id)
-      }] : []
-    }));
-    if (this.editPermission) {
-      this.cardItemsUses.push({
-        typeCardItem: 'newCardItem',
-        iconSvg: true,
-        icon: IconsEnum.Plus
-      });
-    }
-    this.totalUsesRecords = this.cardItemsUses.length;
-    this.updateUsesTreeSelection(this.usesTreeOptions);
-  }
-
-  private flattenStructuralModels(models: IMenuWorkpackModel[], seen = new Set<number>()): IWorkpackModel[] {
-    return (models || []).reduce((flattened, model) => {
-      if (model.classification !== WorkpackModelClassificationEnum.TRANSVERSAL) {
-        const id = Number(model.id);
-        if (!seen.has(id)) {
-          seen.add(id);
-          flattened.push({
-            id,
-            idPlanModel: model.idPlanModel,
-            type: model.type as TypeWorkpackModelEnum,
-            classification: model.classification,
-            modelName: model.name,
-            modelNameInPlural: model.nameInPlural,
-            fontIcon: model.fontIcon,
-            sortBy: undefined,
-            notificationsSelectedRoles: []
-          });
-        }
-      }
-      flattened.push(...this.flattenStructuralModels(model.children || [], seen));
-      return flattened;
-    }, [] as IWorkpackModel[]);
-  }
-
-  private buildUsesTree(models: IMenuWorkpackModel[], seen = new Set<number>()): TreeNode[] {
-    return (models || []).reduce((nodes, model) => {
-      const id = Number(model.id);
-      if (model.classification === WorkpackModelClassificationEnum.TRANSVERSAL || seen.has(id)) {
-        return nodes;
-      }
-      seen.add(id);
-      nodes.push({
-        label: model.name,
-        icon: model.fontIcon,
-        data: id,
-        expanded: true,
-        selectable: !this.isUseSelected(id),
-        children: this.buildUsesTree(model.children || [], seen)
-      });
-      return nodes;
-    }, [] as TreeNode[]);
-  }
-
-  private buildFlatUsesTree(models: IWorkpackModel[]): TreeNode[] {
-    return models.map(model => ({
-      label: model.modelName,
-      icon: model.fontIcon,
-      data: model.id,
-      selectable: !this.isUseSelected(model.id)
-    }));
-  }
-
-  private updateUsesTreeSelection(nodes: TreeNode[]): void {
-    (nodes || []).forEach(node => {
-      node.selectable = !this.isUseSelected(Number(node.data));
-      this.updateUsesTreeSelection(node.children || []);
-    });
   }
 
   async getOfficeById() {
@@ -958,6 +786,14 @@ export class WorkpackModelComponent implements OnInit {
       if (data.properties) {
         const dataPropertiesAndIndex = (await Promise.all(data.properties.filter(property => property.session !== 'COST')
           .map(async (p, i) => {
+            if (p.type === TypePropertyEnum.TransversalViewSelectionModel) {
+              p.name = 'Visão Raiz';
+              if (p.label === 'Visão' || p.label === 'View' || !p.label) {
+                p.label = this.translateSrv.instant('transversalViewRootProperty');
+              }
+              p.active = true;
+              p.fixed = true;
+            }
             if (p.possibleValues) {
               p.possibleValuesOptions = (p.possibleValues as string).split(',');
             }
@@ -1118,7 +954,7 @@ export class WorkpackModelComponent implements OnInit {
 
   async addProperty(type: TypePropertyEnum, groupProperty?: IWorkpackModelProperty) {
     if (type === TypePropertyEnum.TransversalViewSelectionModel) {
-      if (this.workpackModelType !== TypeWorkpackModelEnum.ProjectModel || groupProperty || this.modelProperties.some(
+      if (groupProperty || this.modelProperties.some(
         property => property.type === TypePropertyEnum.TransversalViewSelectionModel
       )) {
         return;
@@ -1191,11 +1027,9 @@ export class WorkpackModelComponent implements OnInit {
         requiredFields = requiredFields.concat(['possibleValuesOptions', 'multipleSelection']);
         break;
       case TypePropertyEnum.TransversalViewSelectionModel:
-        requiredFields = requiredFields.concat(['multipleSelection']);
-        await this.loadTransversalRootModels(property);
-        if (property.rootTransversalViewOptions?.length) {
-          requiredFields.push('idRootTransversalViewModel');
-        }
+        requiredFields = requiredFields.concat(['multipleSelection', 'idRootTransversalViewModel']);
+        await this.loadRootTransversalViewOptions(property);
+        await this.loadTransversalDefaultOptions(property);
         break;
       case TypePropertyEnum.GroupModel:
         requiredFields = ['name', 'sortIndex', 'groupedProperties'];
@@ -1302,42 +1136,8 @@ export class WorkpackModelComponent implements OnInit {
     this.checkProperties();
   }
 
-  private async loadTransversalRootModels(property: IWorkpackModelProperty): Promise<void> {
-    if (this.workpackModelType !== TypeWorkpackModelEnum.ProjectModel || !this.idStrategy) {
-      property.rootTransversalViewOptions = [];
-      property.transversalDefaultOptions = [];
-      property.idRootTransversalViewModel = undefined;
-      return;
-    }
-    const result = await this.workpackModelSrv.GetAll({ 'id-plan-model': this.idStrategy });
-    const models = result?.success
-      ? this.findTransversalRootModels(result.data || [])
-      : [];
-    property.rootTransversalViewOptions = models.map(model => ({
-      label: model.modelName,
-      value: model.id
-    }));
-    const hasConfiguredModel = models.some(model => Number(model.id) === Number(property.idRootTransversalViewModel));
-    if (!hasConfiguredModel) {
-      property.idRootTransversalViewModel = models.length ? Number(models[0].id) : undefined;
-      property.defaultValue = property.multipleSelection ? [] : null;
-    }
-    await this.loadTransversalDefaultOptions(property);
-  }
-
-  private findTransversalRootModels(models: IWorkpackModel[]): IWorkpackModel[] {
-    return (models || []).reduce((roots, model) => {
-      if (model.classification === WorkpackModelClassificationEnum.TRANSVERSAL) {
-        roots.push(model);
-      } else {
-        roots.push(...this.findTransversalRootModels(model.children || []));
-      }
-      return roots;
-    }, [] as IWorkpackModel[]);
-  }
-
   private async loadTransversalDefaultOptions(property: IWorkpackModelProperty): Promise<void> {
-    if (!property.idRootTransversalViewModel || !this.idStrategy) {
+    if (!this.idStrategy) {
       property.transversalDefaultOptions = [];
       property.defaultValue = property.multipleSelection ? [] : null;
       return;
@@ -1355,6 +1155,22 @@ export class WorkpackModelComponent implements OnInit {
       : property.defaultValue ? [String(property.defaultValue)] : [];
     const retained = configured.filter(value => available.has(value));
     property.defaultValue = property.multipleSelection ? retained : retained[0] || null;
+  }
+
+  private async loadRootTransversalViewOptions(property: IWorkpackModelProperty): Promise<void> {
+    property.rootTransversalViewOptions = [];
+    if (!this.idStrategy) {
+      property.idRootTransversalViewModel = undefined;
+      return;
+    }
+    const result = await this.workpackModelSrv.GetAll({ 'id-plan-model': this.idStrategy });
+    const models = result?.success ? result.data || [] : [];
+    property.rootTransversalViewOptions = models
+      .filter(model => model.classification === WorkpackModelClassificationEnum.TRANSVERSAL && !!model.id)
+      .map(model => ({ label: model.modelName, value: model.id }));
+    if (!property.rootTransversalViewOptions.some(option => option.value === property.idRootTransversalViewModel)) {
+      property.idRootTransversalViewModel = undefined;
+    }
   }
 
   checkProperties(changeStakeholderRoles = false) {
@@ -1626,8 +1442,7 @@ get integrationSectorOptions(): SelectItem[] {
     const propertyTypes = Object.keys(TypePropertyEnum).filter(k =>
       TypePropertyEnum[k] !== TypePropertyEnum.GroupModel
       && (TypePropertyEnum[k] !== TypePropertyEnum.TransversalViewSelectionModel
-        || (this.workpackModelType === TypeWorkpackModelEnum.ProjectModel
-          && !this.modelProperties.some(property => property.type === TypePropertyEnum.TransversalViewSelectionModel)))
+        || !this.modelProperties.some(property => property.type === TypePropertyEnum.TransversalViewSelectionModel))
     );
     const menu = propertyTypes
       .map(type => ({
@@ -1857,13 +1672,6 @@ get integrationSectorOptions(): SelectItem[] {
       onToggle: new EventEmitter<boolean>()
     };
     this.cardPropertiesModels.onToggle.pipe(takeUntil(this.$destroy)).subscribe(() => this.checkProperties());
-    this.cardPropertiesUses = {
-      toggleable: true,
-      initialStateToggle: true,
-      cardTitle: 'links',
-      collapseble: true,
-      initialStateCollapse: false
-    };
     if (this.workpackModelType === TypeWorkpackModelEnum.DeliverableModel) {
       this.cardPropertiesSchedule = {
         toggleable: this.editPermission,
@@ -2009,9 +1817,6 @@ get integrationSectorOptions(): SelectItem[] {
       fontIcon: icon,
       type: this.workpackModelType,
       classification: this.classification,
-      idsUses: this.classification === WorkpackModelClassificationEnum.TRANSVERSAL
-        ? this.selectedUsesIds
-        : undefined,
       idPlanModel: this.idStrategy,
       modelName,
       modelNameInPlural,

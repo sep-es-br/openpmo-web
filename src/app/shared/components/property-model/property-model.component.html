@@ -20,14 +20,15 @@
     <div class="model-property p-fluid">
       <span class="p-float-label property-input p-field">
         <input class="app-input-text" type="text" pInputText [(ngModel)]="property.name" [required]="true"
-          (ngModelChange)="changed.emit($event)" [disabled]="property.obligatory || property.viewOnly" />
+          (ngModelChange)="changed.emit($event)" [disabled]="property.obligatory || property.viewOnly || property.fixed" />
         <label class="input-label">{{ 'name' | translate }} *
           <i class="far fa-question-circle" [pTooltip]="'help.propertyModel.name' | translate"></i>
         </label>
       </span>
       <span class="p-float-label property-input p-field">
         <input class="app-input-text" type="text" pInputText [(ngModel)]="property.label"
-          (ngModelChange)="changed.emit($event)" [disabled]="property.viewOnly" />
+          (ngModelChange)="changed.emit($event)"
+          [disabled]="property.viewOnly || (property.fixed && property.type !== 'TransversalViewSelectionModel')" />
         <label class="input-label">{{ 'label' | translate }} *
           <i class="far fa-question-circle" [pTooltip]="'help.propertyModel.label' | translate"></i>
         </label>
@@ -95,15 +96,13 @@
       </span>
       <!-- Default Value -->
       <ng-container [ngSwitch]="property.type">
-        <span *ngSwitchCase="'TransversalViewSelectionModel'" class="p-float-label property-selection p-field">
+        <span *ngSwitchCase="'TransversalViewSelectionModel'" class="p-float-label property-selection transversal-default-selection p-field">
           <p-dropdown class="app-single-selection" [options]="property.rootTransversalViewOptions"
             [(ngModel)]="property.idRootTransversalViewModel" optionLabel="label" optionValue="value"
-            [autoDisplayFirst]="false" [required]="(property.rootTransversalViewOptions?.length || 0) > 0"
-            [disabled]="property.viewOnly || !property.rootTransversalViewOptions?.length"
-            (onChange)="changed.emit({ property: property, rootTransversalModelChanged: true })">
+            [autoDisplayFirst]="false" [required]="true" [disabled]="property.viewOnly"
+            (onChange)="changed.emit({property: property, rootTransversalModelChanged: true})">
           </p-dropdown>
-          <label class="input-label">{{ 'rootTransversalView' | translate }}
-            <span *ngIf="property.rootTransversalViewOptions?.length"> *</span>
+          <label class="input-label">{{ 'rootTransversalView' | translate }} *
             <i class="far fa-question-circle" [pTooltip]="'help.propertyModel.defaultValue' | translate"></i>
           </label>
         </span>

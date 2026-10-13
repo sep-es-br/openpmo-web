@@ -4,6 +4,7 @@ import { BreadcrumbService } from './breadcrumb.service';
 import { Injectable } from '@angular/core';
 import { IWorkpackParams } from '../interfaces/IWorkpackDataParams';
 import { IBreadcrumb } from '../interfaces/IBreadcrumb';
+import { TransversalService } from './transversal.service';
 
 @Injectable({
   providedIn: 'root'
@@ -20,6 +21,7 @@ export class WorkpackBreadcrumbStorageService {
   constructor(
     private breadcrumbSrv: BreadcrumbService,
     private workpackSrv: WorkpackService,
+    private transversalSrv: TransversalService
   ) {
   }
 
@@ -195,7 +197,57 @@ export class WorkpackBreadcrumbStorageService {
   }
 
   public async setBreadcrumb(linkEvent = false) {
-    const breadcrumb = await this.getCurrentBreadcrumb(linkEvent);
+    let breadcrumb = await this.getCurrentBreadcrumb(linkEvent);
+    const idTransversalRoot = Number(this.workpackParams?.idTransversalRoot);
+    if (idTransversalRoot && this.workpackParams?.idPlan) {
+      const transversalBreadcrumb: IBreadcrumb[] = await this.getBreadcrumbs(idTransversalRoot, this.workpackParams.idPlan);
+      let transversalRootIndex = transversalBreadcrumb.findIndex(item =>
+        Number(item.queryParams?.id) === idTransversalRoot);
+      let prefix: IBreadcrumb[] = transversalRootIndex >= 0
+        ? transversalBreadcrumb.slice(0, transversalRootIndex + 1)
+        : [];
+      if (!prefix.length) {
+        const storedBreadcrumb = this.breadcrumbSrv.get || [];
+        transversalRootIndex = storedBreadcrumb.findIndex(item =>
+          Number(item.queryParams?.id) === idTransversalRoot);
+        if (transversalRootIndex >= 0) {
+          prefix = storedBreadcrumb.slice(0, transversalRootIndex + 1);
+        }
+      }
+      if (prefix.length) {
+        transversalRootIndex = prefix.length - 1;
+        prefix[transversalRootIndex] = {
+          ...prefix[transversalRootIndex],
+          queryParams: {
+            ...prefix[transversalRootIndex].queryParams,
+            idTransversalRoot
+          }
+        };
+
+        const planIndex = breadcrumb.findIndex(item => item.key === 'plan');
+        let structuralPathStart = planIndex >= 0
+          ? breadcrumb.slice(planIndex + 1)
+          : breadcrumb.filter(item => !['office', 'plan'].includes(item.key));
+        const rootModelName = await this.transversalSrv.getRootModelName(idTransversalRoot);
+        if (rootModelName) {
+          const rootModelIndex = structuralPathStart.findIndex(item =>
+            item.modelName?.toLowerCase() === rootModelName.toLowerCase());
+          if (rootModelIndex >= 0) {
+            structuralPathStart = structuralPathStart.slice(rootModelIndex);
+          }
+        }
+        const structuralPath = structuralPathStart
+          .filter(item => item.queryParams?.id && Number(item.queryParams.id) !== idTransversalRoot)
+          .map(item => ({
+            ...item,
+            queryParams: {
+              ...item.queryParams,
+              idTransversalRoot
+            }
+          }));
+        breadcrumb = [...prefix, ...structuralPath];
+      }
+    }
     this.breadcrumbSrv.setMenu([
       ...breadcrumb,
     ]);

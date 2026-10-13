@@ -7,10 +7,10 @@ import { IOffice } from '../interfaces/IOffice';
 import { IPerson, IWorkLocal } from '../interfaces/IPerson';
 import { IPersonProfile } from '../interfaces/IPersonProfile';
 import { PrepareHttpParams } from '../utils/query.util';
-import { BehaviorSubject, forkJoin, Observable, Subject } from 'rxjs';
+import { BehaviorSubject, Observable, of, Subject } from 'rxjs';
 import { IPreferences } from '../interfaces/preferences.interface';
 import { IOrganization } from '../interfaces/IOrganization';
-import { finalize, map, mergeMap, take, takeUntil, tap } from 'rxjs/operators';
+import { finalize, mergeMap, shareReplay, take, takeUntil, tap } from 'rxjs/operators';
 
 @Injectable({ providedIn: 'root' })
 export class PersonService extends BaseService<IPerson>{
@@ -18,6 +18,10 @@ export class PersonService extends BaseService<IPerson>{
   private avatarChanged = new BehaviorSubject<boolean>(false);
   avatarFile: IFile;
   private readonly preferences = new BehaviorSubject<IPreferences>(undefined);
+  private preferencesLoaded = false;
+  private preferencesRequest: Observable<IHttpResult<IPreferences>>;
+  private preferenceOverrides: Partial<IPreferences> = {};
+  private preferenceSaveQueue: Promise<void> = Promise.resolve();
 
 
   constructor(
@@ -250,6 +254,10 @@ export class PersonService extends BaseService<IPerson>{
     return this.preferences.asObservable();
   }
 
+  getPreferencesSnapshot(): IPreferences {
+    return this.preferences.value;
+  }
+
   nextPreferences(preferences: Partial<IPreferences>) {
     this.preferences.pipe(take(1)).subscribe({
         next: (inPreferences) => {
@@ -263,27 +271,33 @@ export class PersonService extends BaseService<IPerson>{
   }
 
   nextAndSavePreferences(preferences: Partial<IPreferences>) {
-    forkJoin({
-        preferencesResp: this.updatePreferences()
-    }).pipe(map(({preferencesResp}) => ({inPreferences: preferencesResp.data})))
-    .subscribe({
-        next: ({inPreferences}) => {
-            inPreferences = inPreferences ?? {} as IPreferences;
-
-            Object.assign(inPreferences, preferences);
-
-            this.preferences.next(inPreferences as IPreferences);
-
-            this.http.put(`${this.urlBase}/preferences`, inPreferences).subscribe();
-        }
-    });
-
+    this.preferenceOverrides = { ...this.preferenceOverrides, ...preferences };
+    const currentPreferences = this.preferences.value || {} as IPreferences;
+    this.preferences.next({ ...currentPreferences, ...preferences });
+    this.preferenceSaveQueue = this.preferenceSaveQueue
+      .catch(() => undefined)
+      .then(() => this.http.put(`${this.urlBase}/preferences`, preferences).toPromise())
+      .then(() => undefined, () => undefined);
   }
 
   updatePreferences(): Observable<IHttpResult<IPreferences>> {
-    return this.http.get<IHttpResult<IPreferences>>(`${this.urlBase}/preferences`)
-    .pipe(tap(({success, data}) => success ? this.preferences.next(data) : undefined));
-
+    if (this.preferencesLoaded) {
+      return of({ success: true, data: this.preferences.value } as IHttpResult<IPreferences>);
+    }
+    if (!this.preferencesRequest) {
+      this.preferencesRequest = this.http.get<IHttpResult<IPreferences>>(`${this.urlBase}/preferences`)
+        .pipe(
+          tap(({ success, data }) => {
+            if (success) {
+              this.preferencesLoaded = true;
+              this.preferences.next({ ...(data || {} as IPreferences), ...this.preferenceOverrides });
+            }
+          }),
+          finalize(() => this.preferencesRequest = undefined),
+          shareReplay(1)
+        );
+    }
+    return this.preferencesRequest;
   }
 
 }

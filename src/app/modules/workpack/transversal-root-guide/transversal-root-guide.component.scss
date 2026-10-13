@@ -1,0 +1,154 @@
+@use "src/variables" as v;
+
+::ng-deep .transversal-root-guide {
+  min-height: 200px;
+
+  .expanded-buttons-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    border: 1px solid #dee2e6;
+    background: #ffffff;
+    color: #495057;
+    padding: 0.5rem;
+    border-radius: 3px;
+
+    .button-container {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+    }
+
+    i {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 25px;
+      height: 25px;
+      border: none;
+      color: #959595;
+      margin-left: 0.5em;
+      font-size: 1.2rem;
+      cursor: pointer;
+      padding-top: 3px;
+    }
+
+    .selected {
+      border-color: rgba(68, 179, 155, 1);
+      color: v.$fontAccent;
+    }
+  }
+
+  .p-tree .p-tree-container .p-treenode .p-treenode-content:focus,
+  .p-tree .p-tree-container .p-treenode .p-treenode-content .p-tree-toggler:focus {
+    outline: 0 none;
+    outline-offset: 0;
+    box-shadow: none !important;
+  }
+
+  .p-tree .p-tree-container .p-treenode {
+    padding: 0.143rem 0 !important;
+  }
+
+  .p-tree .p-treenode-children {
+    padding: 0 0 0 0.5rem;
+  }
+
+  .p-tree-toggler-icon.pi-fw {
+    font-size: 0.9rem;
+  }
+
+  .p-tree .p-tree-container .p-treenode .p-treenode-content .p-tree-toggler {
+    margin-right: 0;
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+
+  .container-custom-tree {
+    padding: 5px 0.5rem;
+  }
+
+  .container-workpackmodel {
+    background-color: #f8f9fb;
+    display: flex;
+    justify-content: space-between;
+
+    .tree-label {
+      font-weight: 700;
+      font-size: 14px;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+    }
+
+    .tree-label-row {
+      display: flex;
+      flex-direction: row;
+      align-items: baseline;
+    }
+
+    .tree-label-count {
+      margin-left: 4px;
+      color: #534f4f;
+      font-weight: inherit;
+    }
+  }
+
+  .container-workpack {
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px solid #dee2e6;
+
+    .workpack-title-box {
+      display: flex;
+      align-items: center;
+
+      .tree-label {
+        display: flex;
+        font-size: 14px;
+        flex-direction: column;
+        justify-content: center;
+      }
+    }
+  }
+
+  .tree-label.disabled-link {
+    cursor: default;
+    pointer-events: none;
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .p-tree {
+    .p-treenode .p-treenode-content {
+      padding: 0;
+    }
+
+    .p-treenode-label {
+      width: 100%;
+    }
+
+    .p-tree-loading-icon {
+      display: none;
+    }
+  }
+
+  .transversal-root-guide-clickable {
+    cursor: pointer;
+  }
+
+  .transversal-root-guide-model-name {
+    color: #8a8a8a;
+    font-size: 0.8rem;
+  }
+}
+
+.transversal-root-guide-loading {
+  padding: 1rem;
+}
+
+@media screen and (min-width: 769px) {
+  ::ng-deep .transversal-root-guide .p-tree {
+    padding: 3.5rem;
+  }
+}

@@ -9,18 +9,23 @@ import {
   ITransversalSelectionOption,
   ITransversalLinkedModel,
   ITransversalWorkpack,
-  ITransversalWorkpackParticipation
+  ITransversalWorkpackParticipation,
+  ITransversalStructuralLink
 } from '../interfaces/ITransversal';
 import { PrepareHttpParams } from '../utils/query.util';
 
 @Injectable({ providedIn: 'root' })
 export class TransversalService extends BaseService<ITransversalProgram> {
 
+  private rootModelNames = new Map<number, string>();
+
+  private rootModelNameRequests = new Map<number, Promise<string | undefined>>();
+
   constructor(@Inject(Injector) injector: Injector) {
     super('transversal', injector);
   }
 
-  getSelectionOptions(idRootTransversalViewModel: number, params: { idPlan?: number; idPlanModel?: number }) {
+  getSelectionOptions(idRootTransversalViewModel: number | undefined, params: { idPlan?: number; idPlanModel?: number }) {
     return this.http.get<IHttpResult<ITransversalSelectionOption[]>>(`${this.urlBase}/selection-options`, {
       params: PrepareHttpParams({
         'id-root-transversal-view-model': idRootTransversalViewModel,
@@ -52,6 +57,65 @@ export class TransversalService extends BaseService<ITransversalProgram> {
     return this.http.get<IHttpResult<ITransversalLinkedModel[]>>(
       `${this.urlBase}/programs/${idTransversalProgram}/linked-models`
     ).toPromise();
+  }
+
+  getStructuralLinks(
+    idTransversalProgram: number,
+    includeDescendants = false,
+    includeStructuralDescendants = true
+  ): Promise<IHttpResult<ITransversalStructuralLink[]>> {
+    return this.http.get<IHttpResult<ITransversalStructuralLink[]>>(
+      `${this.urlBase}/programs/${idTransversalProgram}/structural-links`,
+      { params: PrepareHttpParams({
+        'include-descendants': includeDescendants,
+        'include-structural-descendants': includeStructuralDescendants
+      }) }
+    ).toPromise().then(result => {
+      this.rememberRootModelNames(result?.data || []);
+      return result;
+    });
+  }
+
+  getStructuralLinksForView(idTransversalView: number, idPlan: number): Promise<IHttpResult<ITransversalStructuralLink[]>> {
+    return this.http.get<IHttpResult<ITransversalStructuralLink[]>>(
+      `${this.urlBase}/views/${idTransversalView}/structural-links`,
+      { params: PrepareHttpParams({ 'id-plan': idPlan }) }
+    ).toPromise().then(result => {
+      this.rememberRootModelNames(result?.data || []);
+      return result;
+    });
+  }
+
+  getRootModelName(idTransversalProgram: number): Promise<string | undefined> {
+    const cachedName = this.rootModelNames.get(Number(idTransversalProgram));
+    if (cachedName) {
+      return Promise.resolve(cachedName);
+    }
+
+    const pendingRequest = this.rootModelNameRequests.get(Number(idTransversalProgram));
+    if (pendingRequest) {
+      return pendingRequest;
+    }
+
+    const request = this.getStructuralLinks(Number(idTransversalProgram)).then(result => {
+      const rootModelName = result?.success
+        ? result.data?.find(link => link.rootModelName)?.rootModelName
+        : undefined;
+      if (rootModelName) {
+        this.rootModelNames.set(Number(idTransversalProgram), rootModelName);
+      }
+      return rootModelName;
+    }).finally(() => this.rootModelNameRequests.delete(Number(idTransversalProgram)));
+    this.rootModelNameRequests.set(Number(idTransversalProgram), request);
+    return request;
+  }
+
+  private rememberRootModelNames(links: ITransversalStructuralLink[]): void {
+    (links || []).forEach(link => {
+      if (link.idTransversalProgram && link.rootModelName) {
+        this.rootModelNames.set(Number(link.idTransversalProgram), link.rootModelName);
+      }
+    });
   }
 
   getEligibleWorkpacks(

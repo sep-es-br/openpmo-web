@@ -60,6 +60,7 @@ export class PlanComponent implements OnInit, OnDestroy {
   idOffice: number;
   propertiesOffice: IOffice;
   idPlan: number;
+  viewClassification?: WorkpackModelClassificationEnum;
   cardPlanProperties: ICard;
   cardsPlanWorkPackModels: IWorkpackModelCard[];
   formPlan: FormGroup;
@@ -136,10 +137,13 @@ export class PlanComponent implements OnInit, OnDestroy {
       setTimeout(() => this.language = this.translateSrv.currentLang, 200);
     });
     this.actRouter.queryParams
-      .subscribe(({ id, idOffice, idPlanModel }) => {
+      .subscribe(({ id, idOffice, idPlanModel, classification }) => {
         this.idOffice = +idOffice;
         this.idPlanModel = +idPlanModel;
         this.idPlan = +id;
+        this.viewClassification = classification === WorkpackModelClassificationEnum.TRANSVERSAL
+          ? WorkpackModelClassificationEnum.TRANSVERSAL
+          : WorkpackModelClassificationEnum.STRUCTURAL;
         this.resetPlan();
       });
     this.responsiveSrv.observable.pipe(takeUntil(this.$destroy)).subscribe(value => this.responsive = value);
@@ -409,14 +413,13 @@ export class PlanComponent implements OnInit, OnDestroy {
       key: 'properties'
     });
 
-    if (this.cardsPlanWorkPackModels?.length) {
+    const visibleModels = this.viewClassification
+      ? this.cardsPlanWorkPackModels?.filter(model => model.classification === this.viewClassification)
+      : this.cardsPlanWorkPackModels;
+    if (visibleModels?.length) {
       this.tabs.push(
-        ...this.cardsPlanWorkPackModels.map(model => ({
-          menu: `${this.translateSrv.instant(
-            model.classification === WorkpackModelClassificationEnum.TRANSVERSAL
-              ? 'transversalViews'
-              : 'structuralModels'
-          )} · ${model.propertiesCard.cardTitle}`,
+        ...visibleModels.map(model => ({
+          menu: model.propertiesCard.cardTitle,
           key: `workpack-model-${model.idWorkpackModel}`
         }))
       );

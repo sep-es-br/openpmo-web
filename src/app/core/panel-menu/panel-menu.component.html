@@ -45,7 +45,7 @@
   <div class="app-menu-slide-fixed" #menuSliderPortfolio [class.hidden]="!menus[1].isOpen">
     <div class="slide-wrapper">
       <div class="top-bar">
-        <div *ngIf="currentPlan" class="title" [routerLink]="['/plan']" [queryParams]="{id: currentPlan?.id}">{{ currentPlan?.name }}
+        <div *ngIf="currentPlan" class="title" [routerLink]="['/plan']" [queryParams]="{id: currentPlan?.id, classification: 'STRUCTURAL'}">{{ currentPlan?.name }}
         </div>
         <div *ngIf="!currentPlan" class="title">
           {{'newPlan'| translate}}</div>
@@ -63,7 +63,7 @@
     [class.hidden]="!isMenuOpen('transversal-views')">
     <div class="slide-wrapper">
       <div class="top-bar">
-        <div class="title" (click)="closeAllMenus()">{{ 'transversalViews' | translate }}</div>
+        <div *ngIf="currentPlan" class="title" [routerLink]="['/plan']" [queryParams]="{id: currentPlan?.id, classification: 'TRANSVERSAL'}">{{ currentPlan?.name }}</div>
         <div class="action" *ngIf="!loadingTransversalViews">
           <i [class]="isFixed ? 'app-icon pin-on' : 'app-icon pin-off'" [ngStyle]="{ fontSize: '0.9rem' }"
             (click)="handleChangeMenuMode()"></i>

@@ -61,8 +61,8 @@ import { IUniversalSearch } from 'src/app/shared/interfaces/universal-search.int
 import { ObligationsService } from 'src/app/shared/services/obligations.service';
 import { ProcurementsService } from 'src/app/shared/services/procurements.service';
 import { AgreementsService } from 'src/app/shared/services/agreements.service';
-import { ITransversalLinkedModel } from 'src/app/shared/interfaces/ITransversal';
 import { TransversalService } from 'src/app/shared/services/transversal.service';
+import { ITransversalStructuralLink } from 'src/app/shared/interfaces/ITransversal';
 
 @Component({
   selector: 'app-workpack',
@@ -96,11 +96,15 @@ export class WorkpackComponent implements OnDestroy, OnInit {
 
   idTransversalView: number;
 
+  idTransversalRoot: number;
+
   idWorkpackModelLinked: number;
 
   workpackModel: IWorkpackModel;
 
-  transversalLinkedModels: ITransversalLinkedModel[] = [];
+  transversalRootModelName = 'Visão';
+
+  transversalStructuralLinks: ITransversalStructuralLink[];
 
   typePropertyModel = TypePropertyModelEnum;
 
@@ -192,7 +196,6 @@ export class WorkpackComponent implements OnDestroy, OnInit {
   constructor(
     private actRouter: ActivatedRoute,
     private workpackModelSrv: WorkpackModelService,
-    private transversalSrv: TransversalService,
     public workpackSrv: WorkpackService,
     private responsiveSrv: ResponsiveService,
     public translateSrv: TranslateService,
@@ -229,7 +232,8 @@ export class WorkpackComponent implements OnDestroy, OnInit {
     private location: Location,
     private setConfigWorkpackSrv: SetConfigWorkpackService,
     private searchSrv: SearchService,
-    private thisElemRef: ElementRef<HTMLElement>
+    private thisElemRef: ElementRef<HTMLElement>,
+    private transversalSrv: TransversalService
   ) {
     this.breadcrumbSrv.ready.pipe(takeUntil(this.$destroy)).subscribe(data => {
       this.workpackBreadcrumbStorageSrv.setBreadcrumb();
@@ -313,7 +317,7 @@ export class WorkpackComponent implements OnDestroy, OnInit {
   }
 
   private areSameWorkpackQueryParams(prev: Params, curr: Params): boolean {
-    const keys = ['id', 'idPlan', 'idWorkpackModel', 'idWorkpackParent', 'idWorkpackModelLinked', 'idTransversalView', 'linkEvent'];
+    const keys = ['id', 'idPlan', 'idWorkpackModel', 'idWorkpackParent', 'idWorkpackModelLinked', 'idTransversalView', 'idTransversalRoot', 'linkEvent'];
     return keys.every(key => prev[key] === curr[key]);
   }
 
@@ -324,6 +328,7 @@ export class WorkpackComponent implements OnDestroy, OnInit {
     idWorkpackParent,
     idWorkpackModelLinked,
     idTransversalView,
+    idTransversalRoot,
     linkEvent
   }: Params) {
     this.idWorkpack = id && +id;
@@ -331,6 +336,8 @@ export class WorkpackComponent implements OnDestroy, OnInit {
     this.idWorkpackModel = idWorkpackModel && +idWorkpackModel;
     this.idWorkpackParent = idWorkpackParent && +idWorkpackParent;
     this.idTransversalView = idTransversalView && +idTransversalView;
+    const transversalRootId = idTransversalRoot && +idTransversalRoot;
+    this.idTransversalRoot = transversalRootId;
     this.idWorkpackModelLinked = idWorkpackModelLinked && +idWorkpackModelLinked;
     this.linkEvent = linkEvent;
     this.workpackSrv.setWorkpackParams({
@@ -339,7 +346,8 @@ export class WorkpackComponent implements OnDestroy, OnInit {
       idWorkpackModel: idWorkpackModel && +idWorkpackModel,
       idWorkpackParent: idWorkpackParent && +idWorkpackParent,
       idWorkpackModelLinked: idWorkpackModelLinked && +idWorkpackModelLinked,
-        idTransversalView: idTransversalView && +idTransversalView,
+      idTransversalView: idTransversalView && +idTransversalView,
+      idTransversalRoot: transversalRootId,
     });
     this.selectedTab = null;
   }
@@ -437,7 +445,7 @@ export class WorkpackComponent implements OnDestroy, OnInit {
   }
 
   get isTransversalProgram(): boolean {
-    return !!this.idWorkpack && this.workpack?.type === 'Program' &&
+    return !this.idTransversalRoot && !!this.idWorkpack && this.workpack?.type === 'Program' &&
       this.workpackModel?.classification === WorkpackModelClassificationEnum.TRANSVERSAL;
   }
 
@@ -445,8 +453,10 @@ export class WorkpackComponent implements OnDestroy, OnInit {
     return this.showTabview || this.isTransversalProgram;
   }
 
-  transversalTabKey(model: ITransversalLinkedModel): string {
-    return `transversal-model-${model.idWorkpackModel}`;
+  setTransversalRootModelName(modelName: string): void {
+    if (!modelName) { return; }
+    this.transversalRootModelName = modelName;
+    this.tabs = this.tabs.map(tab => tab.key === 'transversal-root' ? { ...tab, menu: modelName } : tab);
   }
 
   handleChangePageSize(event) {
@@ -470,7 +480,8 @@ export class WorkpackComponent implements OnDestroy, OnInit {
     this.isLoading = true;
     this.hasWBS = false;
     this.workpackModel = undefined;
-    this.transversalLinkedModels = [];
+    this.transversalRootModelName = 'Visão';
+    this.transversalStructuralLinks = undefined;
     this.workpack = undefined;
     this.workpackProperties = [];
     this.sectionWorkpackModelChildren = undefined;
@@ -695,11 +706,6 @@ export class WorkpackComponent implements OnDestroy, OnInit {
     }
     if (result.success) {
       this.workpackModel = result.data;
-      if (this.isTransversalProgram) {
-        const linkedModels = await this.transversalSrv.getLinkedModels(this.idWorkpack);
-        if (loadId !== undefined && this.isStaleWorkpackLoad(loadId)) { return; }
-        this.transversalLinkedModels = linkedModels?.success ? linkedModels.data || [] : [];
-      }
       const workpackData = this.workpackSrv.getWorkpackData();
       this.workpackSrv.setWorkpackData({
         ...workpackData,
@@ -712,6 +718,14 @@ export class WorkpackComponent implements OnDestroy, OnInit {
       }
       if (loadId !== undefined && this.isStaleWorkpackLoad(loadId)) {
         return;
+      }
+      if (this.isTransversalProgram) {
+        const linksResult = await this.transversalSrv.getStructuralLinks(this.idWorkpack);
+        if (loadId !== undefined && this.isStaleWorkpackLoad(loadId)) {
+          return;
+        }
+        this.transversalStructuralLinks = linksResult?.success ? linksResult.data || [] : [];
+        this.setTransversalRootModelName(this.transversalStructuralLinks[0]?.rootModelName || 'Visão');
       }
       this.loadWorkpackTabs(loadId);
     } else {
@@ -820,7 +834,6 @@ export class WorkpackComponent implements OnDestroy, OnInit {
   }
 
   getShowStakeHolderSection() {
-    if (this.isTransversalProgram) { return true; }
     return this.idWorkpack && this.workpackModel && this.workpackModel.stakeholderSessionActive &&
       !this.idWorkpackModelLinked || (this.workpackSrv.getEditPermission()
       && !!this.idWorkpackModelLinked && this.workpackModel.stakeholderSessionActive);
@@ -1808,8 +1821,7 @@ export class WorkpackComponent implements OnDestroy, OnInit {
     this.tabs = [];
     if (this.idWorkpack) {
       if (!!this.idWorkpack && !!this.workpack &&
-        !this.workpack.canceled && !!this.workpackModel &&
-        (this.isTransversalProgram || !!this.workpackModel.dashboardSessionActive)) {
+        !this.workpack.canceled && !!this.workpackModel && this.workpackModel.dashboardSessionActive) {
         this.tabs.push({
           menu: 'dashboard',
           key: 'dashboard'
@@ -1820,6 +1832,9 @@ export class WorkpackComponent implements OnDestroy, OnInit {
           menu: 'WBS',
           key: 'WBS'
         });
+      }
+      if (this.isTransversalProgram) {
+        this.tabs.push({ menu: this.transversalRootModelName, key: 'transversal-root' });
       }
       this.tabs.push({
         menu: 'properties',
@@ -1839,12 +1854,6 @@ export class WorkpackComponent implements OnDestroy, OnInit {
             key: workpackModel.modelNameInPlural
           }))
         );
-      }
-      if (this.isTransversalProgram) {
-        this.tabs.push(...this.transversalLinkedModels.map(model => ({
-          menu: model.modelNameInPlural || model.modelName,
-          key: this.transversalTabKey(model)
-        })));
       }
       if (this.getShowStakeHolderSection()) {
         this.tabs.push({

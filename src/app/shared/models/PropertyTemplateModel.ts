@@ -24,6 +24,7 @@ export class PropertyTemplateModel implements IProperty {
   max?: number;
   precision?: number;
   possibleValues?: { label: string; value: string }[];
+  transversalViewTree?: TreeNode[];
   unavailableTransversalViewSelections?: Array<{ id?: number; value: string; label: string }>;
   possibleValuesIds?: { label: string; value: number }[];
   multipleSelection?: boolean;

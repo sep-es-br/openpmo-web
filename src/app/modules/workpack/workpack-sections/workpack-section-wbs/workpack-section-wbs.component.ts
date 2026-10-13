@@ -1,6 +1,7 @@
-import { Component, OnDestroy, Output, EventEmitter } from '@angular/core';
+import { Component, Input, OnChanges, OnDestroy, Output, EventEmitter, SimpleChanges } from '@angular/core';
 import { IWorkpackBreakdownStructure } from 'src/app/shared/interfaces/IWorkpackBreakdownStructure';
 import { TypeWorkpackEnumWBS } from 'src/app/shared/enums/TypeWorkpackEnum';
+import { WorkpackModelClassificationEnum } from 'src/app/shared/enums/WorkpackModelClassificationEnum';
 import { Subject } from 'rxjs';
 import { MilestoneStatusEnum } from 'src/app/shared/enums/MilestoneStatusEnum';
 import { TranslateService } from '@ngx-translate/core';
@@ -12,6 +13,7 @@ import { WorkpackService } from 'src/app/shared/services/workpack.service';
 import { WorkpackBreadcrumbStorageService } from 'src/app/shared/services/workpack-breadcrumb-storage.service';
 import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
 import { JournalService } from 'src/app/shared/services/journal.service';
+import { TransversalService } from 'src/app/shared/services/transversal.service';
 import {
   DeliverableStatus,
   ProjectStatus,
@@ -24,7 +26,9 @@ import {
   templateUrl: './workpack-section-wbs.component.html',
   styleUrls: ['./workpack-section-wbs.component.scss'],
 })
-export class WorkpackSectionWBSComponent implements OnDestroy {
+export class WorkpackSectionWBSComponent implements OnChanges, OnDestroy {
+  @Input() idTransversalProgram: number;
+
   @Output() onHasWBS = new EventEmitter();
 
   typeWorkpackEnum = TypeWorkpackEnumWBS;
@@ -51,6 +55,12 @@ export class WorkpackSectionWBSComponent implements OnDestroy {
 
   workpackParams: IWorkpackParams;
 
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes.idTransversalProgram && this.idTransversalProgram) {
+      this.loadBreakdownStructureData();
+    }
+  }
+
   constructor(
     private breakdownStructureSrv: BreakdownStructureService,
     private translateSrv: TranslateService,
@@ -59,7 +69,8 @@ export class WorkpackSectionWBSComponent implements OnDestroy {
     private workpackSrv: WorkpackService,
     private workpackBreadcrumbStorageSrv: WorkpackBreadcrumbStorageService,
     private breadcrumbSrv: BreadcrumbService,
-    private journalSrv: JournalService
+    private journalSrv: JournalService,
+    private transversalSrv: TransversalService
   ) {
     this.isLoading = true;
     this.actRouter.queryParams.subscribe(async ({ idPlan }) => {
@@ -96,12 +107,91 @@ export class WorkpackSectionWBSComponent implements OnDestroy {
     }
   }
 
-  loadBreakdownStructureData() {
+  async loadBreakdownStructureData() {
     this.setLanguage();
     this.workpackParams = this.workpackSrv.getWorkpackParams();
     const { wbsTree, loading } = this.breakdownStructureSrv.getWBSTree();
     this.wbsTree = wbsTree;
     this.isLoading = loading;
+    const workpackData = this.workpackSrv.getWorkpackData();
+    if (this.idTransversalProgram) {
+      try {
+        const result = await this.transversalSrv.getStructuralLinks(this.idTransversalProgram, true, true);
+        if (result?.success) {
+          this.attachTransversalStructuralLinks(result.data || []);
+        }
+      } catch (error) {
+        // A falha ao carregar vínculos não deve impedir o EAP transversal existente.
+      }
+    }
+  }
+
+  private attachTransversalStructuralLinks(links: any[]): void {
+    if (!this.wbsTree?.length || !links.length) { return; }
+    const byProgram = new Map<number, any[]>();
+    links.forEach(link => {
+      const items = byProgram.get(Number(link.idTransversalProgram)) || [];
+      if (!items.some(item => Number(item.idWorkpack) === Number(link.idWorkpack))) {
+        items.push(link);
+      }
+      byProgram.set(Number(link.idTransversalProgram), items);
+    });
+    const attachedWorkpackIds = new Set<number>();
+    const findNode = (nodes: any[], id: number): any => {
+      for (const node of nodes || []) {
+        if (Number(node.idWorkpack) === id) { return node; }
+        const child = findNode(node.children, id);
+        if (child) { return child; }
+      }
+      return undefined;
+    };
+    byProgram.forEach((programLinks, idProgram) => {
+      const programNode = findNode(this.wbsTree, idProgram);
+      if (!programNode) { return; }
+      programNode.leaf = false;
+      programNode.hasChildren = true;
+      const linksToInsert = programLinks.filter(link => {
+        const id = Number(link.idWorkpack);
+        const existingNode = findNode(this.wbsTree, id);
+        if (existingNode) {
+          Object.assign(existingNode, {
+            idWorkpaModelLinked: link.idWorkpackModel,
+            fontIcon: link.fontIcon || existingNode.fontIcon,
+            isTransversalStructuralLink: true,
+            structuralLinkClickable: link.clickable
+          });
+          attachedWorkpackIds.add(id);
+          return false;
+        }
+        if (attachedWorkpackIds.has(id)) { return false; }
+        return true;
+      });
+      const nodes = new Map<number, any>();
+      linksToInsert.forEach(link => {
+        if (attachedWorkpackIds.has(Number(link.idWorkpack))) { return; }
+        attachedWorkpackIds.add(Number(link.idWorkpack));
+        nodes.set(Number(link.idWorkpack), {
+          idWorkpack: link.idWorkpack,
+          idWorkpaModelLinked: link.idWorkpackModel,
+          workpackName: link.name,
+          workpackModelName: link.modelName,
+          fontIcon: link.fontIcon,
+          workpackType: TypeWorkpackEnumWBS.Program,
+          isTransversalStructuralLink: true,
+          structuralLinkClickable: link.clickable,
+          leaf: false,
+          expanded: false,
+          children: []
+        });
+      });
+      linksToInsert.forEach(link => {
+        const node = nodes.get(Number(link.idWorkpack));
+        if (!node) { return; }
+        const parent = link.idParentWorkpack && nodes.get(Number(link.idParentWorkpack));
+        if (parent) { parent.children.push(node); }
+        else { programNode.children = [...(programNode.children || []), node]; }
+      });
+    });
   }
 
   nodeCollapse(nodeList, level) {
@@ -121,7 +211,23 @@ export class WorkpackSectionWBSComponent implements OnDestroy {
     this.getTopPosLoading();
     this.isLoading = true;
     await this.breakdownStructureSrv.nodeExpand(event);
+    if (this.workpackSrv.getWorkpackData()?.workpackModel?.classification === WorkpackModelClassificationEnum.TRANSVERSAL) {
+      this.markTransversalStructuralDescendants(event.node?.children || []);
+    }
     this.isLoading = false;
+  }
+
+  private markTransversalStructuralDescendants(nodes: any[]): void {
+    (nodes || []).forEach(node => {
+      if (node.workpacks) {
+        this.markTransversalStructuralDescendants(node.workpacks);
+      } else if (node.idWorkpack) {
+        node.idWorkpaModelLinked = node.idWorkpackModel;
+        node.isTransversalStructuralLink = true;
+        node.structuralLinkClickable = true;
+        this.markTransversalStructuralDescendants(node.children || []);
+      }
+    });
   }
 
   getTopPosLoading() {
@@ -169,15 +275,22 @@ export class WorkpackSectionWBSComponent implements OnDestroy {
   }
 
   navigateToWorkpack(item) {
+    if (item?.isTransversalStructuralLink && !item.structuralLinkClickable) { return; }
     if (item.idWorkpack === this.workpackParams.idWorkpack) {
       return;
     }
-    this.setWorkpackBreadcrumbStorage(item.idWorkpack, this.idPlan);
+    const idTransversalRoot = this.workpackParams.idTransversalRoot || this.workpackParams.idWorkpack;
+    if (!item?.isTransversalStructuralLink) {
+      this.setWorkpackBreadcrumbStorage(item.idWorkpack, this.idPlan);
+    }
     this.route.navigate(['/workpack'], {
       queryParams: {
         id: item.idWorkpack,
         idWorkpaModelLinked: item.idWorkpaModelLinked,
         idPlan: this.idPlan,
+        ...(item?.isTransversalStructuralLink ? {
+          idTransversalRoot
+        } : {})
       },
     });
   }

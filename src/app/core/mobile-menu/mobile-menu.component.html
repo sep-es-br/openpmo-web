@@ -17,9 +17,10 @@
     <div
       *ngIf="!!currentIDOffice && !!currentIDPlan && isPlanMenu"
       class="item"
+      [class.opened]="activePlanView === 'STRUCTURAL' || isMenuOpen('portfolio')"
       [ngStyle]="{ width: itemsFavorites?.length > 0 && !!currentIDOffice && !!currentIDPlan && isPlanMenu ? '20%' : '25%' }"
       [pTooltip]="currentPlan?.name"
-      (click)="toggleMenu('portfolio')"
+      (click)="openPlanView('STRUCTURAL')"
     >
       <i class="app-icon briefcase"></i>
       <div class="item-label">
@@ -29,13 +30,14 @@
     <div
       *ngIf="!!currentIDPlan && isPlanMenu"
       class="item"
+      [class.opened]="activePlanView === 'TRANSVERSAL' || isMenuOpen('transversal-views')"
       [ngStyle]="{ width: '20%' }"
-      [pTooltip]="'transversalViews' | translate"
-      (click)="toggleMenu('transversal-views')"
+      [pTooltip]="'transversalViewMenu' | translate"
+      (click)="openPlanView('TRANSVERSAL')"
     >
       <i class="fas fa-project-diagram"></i>
       <div class="item-label">
-        {{ 'transversalViews' | translate }}
+        {{ 'transversalViewMenu' | translate }}
       </div>
     </div>
     <div
@@ -129,7 +131,7 @@
   [class.changing]="isChangingView">
   <div class="top-bar">
     <div *ngIf="currentPlan" class="title" (click)="closeAllMenus()" [routerLink]="['/plan']"
-      [queryParams]="{id: currentPlan?.id}">
+      [queryParams]="{id: currentPlan?.id, classification: 'STRUCTURAL'}">
       {{currentPlan?.name}}</div>
     <div class="action" *ngIf="!isMobileView && currentPlan">
       <i class="app-icon arrow-left" [ngStyle]="{ fontSize: '1rem' }" (click)="closeAllMenus()"></i>
@@ -147,7 +149,7 @@
 <div class="app-menu-slide" #menuSliderTransversalViews [class.open]="isMenuOpen('transversal-views')"
   [class.mobile]="isMobileView" [class.changing]="isChangingView">
   <div class="top-bar">
-    <div class="title" (click)="closeAllMenus()">{{ 'transversalViews' | translate }}</div>
+    <div *ngIf="currentPlan" class="title" [routerLink]="['/plan']" [queryParams]="{id: currentPlan?.id, classification: 'TRANSVERSAL'}">{{ currentPlan?.name }}</div>
     <div class="action" *ngIf="!isMobileView">
       <i class="app-icon arrow-left" [ngStyle]="{ fontSize: '1rem' }" (click)="closeAllMenus()"></i>
     </div>

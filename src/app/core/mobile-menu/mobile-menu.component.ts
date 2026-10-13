@@ -90,6 +90,8 @@ export class MobileMenuComponent implements OnInit, OnDestroy {
 
   isPlanMenu = false;
 
+  activePlanView: 'STRUCTURAL' | 'TRANSVERSAL' = 'STRUCTURAL';
+
   currentPlan: IPlan;
 
   currentIDPlan = 0;
@@ -409,6 +411,10 @@ export class MobileMenuComponent implements OnInit, OnDestroy {
         this.menuPlanModel?.nativeElement.querySelector('.workpackModel-' + id)?.classList.add('active');
       }
     } else if (url.startsWith('plan')) {
+      const classification = new URLSearchParams(url.split('?')[1] || '').get('classification');
+      this.activePlanView = classification === WorkpackModelClassificationEnum.TRANSVERSAL
+        ? WorkpackModelClassificationEnum.TRANSVERSAL
+        : WorkpackModelClassificationEnum.STRUCTURAL;
       this.menuOffices?.nativeElement.querySelector('.plan-' + id)?.classList.add('active');
       this.itemsOffice = this.itemsOffice ? [...this.expandMenuOffice()] : this.itemsOffice;
       const itemsMenu = this.itemsPortfolio ? [...Array.from(this.itemsPortfolio)] : undefined;
@@ -422,10 +428,13 @@ export class MobileMenuComponent implements OnInit, OnDestroy {
         this.menuOffices?.nativeElement.querySelector('.office-' + this.currentIDOffice)?.classList.add('active');
       }
       const idPlan = this.currentIDPlan && this.currentIDPlan !== 0 ? this.currentIDPlan : this.getIdPlanFromURL(url);
-      if (this.isTransversalMenuWorkpack(id)) {
+      const isTransversalContext = new URLSearchParams(url.split('?')[1] || '').has('idTransversalRoot');
+      if (this.isTransversalMenuWorkpack(id) || isTransversalContext) {
+        this.activePlanView = WorkpackModelClassificationEnum.TRANSVERSAL;
         this.expandTransversalMenuRoot(id);
         this.menuTransversalViews?.nativeElement.querySelector('.transversal-program-' + id)?.classList.add('active');
       } else {
+        this.activePlanView = WorkpackModelClassificationEnum.STRUCTURAL;
         const itemsMenu = this.itemsPortfolio ? [...Array.from(this.itemsPortfolio)] : undefined;
         const result = itemsMenu && itemsMenu.length > 0 && await this.menuSrv.getParentsItemsPortfolio(id, idPlan);
         if (result.success) {
@@ -621,8 +630,9 @@ export class MobileMenuComponent implements OnInit, OnDestroy {
   private isTransversalMenuWorkpack(id: number): boolean {
     const pending = [...this.itemsTransversalViews];
     while (pending.length) {
-      const item = pending.pop();
-      if (Number((item as any).workpackId) === Number(id)) {
+      const item = pending.pop() as any;
+      if (item.styleClass?.startsWith('transversal-program-') &&
+        Number(item.workpackId) === Number(id)) {
         return true;
       }
       pending.push(...(item.items || []));
@@ -694,6 +704,24 @@ export class MobileMenuComponent implements OnInit, OnDestroy {
       return setTimeout(() => menuFound.isOpen = true, 250);
     }
     return menuFound.isOpen = !menuFound.isOpen;
+  }
+
+  openPlanView(classification: 'STRUCTURAL' | 'TRANSVERSAL'): void {
+    if (!this.currentIDPlan) {
+      return;
+    }
+    const selectedMenu = classification === WorkpackModelClassificationEnum.TRANSVERSAL
+      ? 'transversal-views'
+      : 'portfolio';
+    const currentClassification = new URLSearchParams(this.router.url.split('?')[1] || '').get('classification');
+    if (this.router.url.startsWith('/plan') && currentClassification === classification) {
+      this.toggleMenu(selectedMenu);
+      return;
+    }
+    this.toggleMenu(selectedMenu);
+    this.router.navigate(['/plan'], {
+      queryParams: { id: this.currentIDPlan, classification }
+    });
   }
 
   buildMenuItemPlanModel(root: IMenuPlanModel[]): MenuItem[] {
@@ -933,59 +961,88 @@ export class MobileMenuComponent implements OnInit, OnDestroy {
     );
 
     return Promise.all(transversalViews.map(async view => {
-      const [programsResult, modelsResult] = await Promise.all([
+      const [programsResult, linksResult] = await Promise.all([
         this.transversalSrv.getPrograms(Number(view.id), this.currentIDPlan),
-        this.transversalSrv.getProgramModels(Number(view.id))
+        this.transversalSrv.getStructuralLinksForView(Number(view.id), this.currentIDPlan)
       ]);
       const programs = programsResult.success ? programsResult.data || [] : [];
-      const programModels = modelsResult.success ? modelsResult.data || [] : [];
+      const links = linksResult.success ? linksResult.data || [] : [];
 
       return {
         id: `transversal-view-${view.id}`,
         label: view.name || view.modelName,
-        icon: view.fontIcon,
         title: view.fullName,
         tooltip: view.fullName,
         styleClass: `transversal-view-${view.id}`,
-        items: [
-          ...programs.map(program => ({
-          id: String(program.idTransversalProgram),
-          workpackId: program.idTransversalProgram,
-          workpackModelId: program.idWorkpackModel,
-          label: program.name,
-          icon: program.fontIcon,
-          title: program.fullName,
-          tooltip: program.fullName,
-          styleClass: `transversal-program-${program.idTransversalProgram}`,
-          command: () => {
-            this.router.navigate(['/workpack'], {
-              queryParams: {
-                id: program.idTransversalProgram,
-                idPlan: this.currentIDPlan
-              }
-            });
-            this.closeAllMenus();
-          }
-          })),
-          ...programModels.map(model => ({
-            id: `new-transversal-program-${view.id}-${model.id}`,
-            ...({ workpackModelId: model.id } as any),
-            label: `${this.translateSrv.instant('new')} ${model.name}`,
-            icon: 'pi pi-plus',
-            command: () => {
-              this.router.navigate(['/workpack'], {
-                queryParams: {
-                  idPlan: this.currentIDPlan,
-                  idWorkpackModel: model.id,
-                  idTransversalView: view.id
-                }
-              });
-              this.closeAllMenus();
-            }
-          }))
-        ]
+        items: this.buildMobileTransversalProgramItems(programs, links)
       };
     }));
+  }
+
+  private buildMobileTransversalProgramItems(programs: any[], links: any[], parentId?: number, visited = new Set<number>()): MenuItem[] {
+    const ids = new Set(programs.map(program => Number(program.idTransversalProgram)));
+    return programs.filter(program => parentId
+      ? Number(program.idParent) === Number(parentId)
+      : !program.idParent || !ids.has(Number(program.idParent))
+    ).filter(program => !visited.has(Number(program.idTransversalProgram))).map(program => {
+      const branch = new Set(visited);
+      branch.add(Number(program.idTransversalProgram));
+      return {
+        id: String(program.idTransversalProgram),
+        workpackId: program.idTransversalProgram,
+        workpackModelId: program.idWorkpackModel,
+        label: program.name,
+        icon: program.fontIcon,
+        title: program.fullName,
+        tooltip: program.fullName,
+        styleClass: `transversal-program-${program.idTransversalProgram}`,
+        items: [
+          ...this.buildMobileTransversalProgramItems(programs, links, program.idTransversalProgram, branch),
+          ...this.buildMobileTransversalStructuralItems(program.idTransversalProgram, links)
+        ],
+        command: (event) => {
+          if (this.isPanelMenuExpansionClick(event)) { return; }
+          this.router.navigate(['/workpack'], { queryParams: { id: program.idTransversalProgram, idPlan: this.currentIDPlan } });
+          this.closeAllMenus();
+        }
+      } as MenuItem;
+    });
+  }
+
+  private buildMobileTransversalStructuralItems(idProgram: number, allLinks: any[], parentId?: number, visited = new Set<number>()): MenuItem[] {
+    const links = allLinks.filter(link => Number(link.idTransversalProgram) === Number(idProgram));
+    return links.filter(link => parentId
+      ? Number(link.idParentWorkpack) === Number(parentId)
+      : !link.idParentWorkpack || !links.some(candidate => Number(candidate.idWorkpack) === Number(link.idParentWorkpack))
+    ).filter(link => !visited.has(Number(link.idWorkpack))).map(link => {
+      const branch = new Set(visited);
+      branch.add(Number(link.idWorkpack));
+      return {
+        id: `transversal-structural-${link.idWorkpack}`,
+        workpackId: link.idWorkpack,
+        workpackModelId: link.idWorkpackModel,
+        label: link.name,
+        title: link.fullName,
+        tooltip: link.fullName,
+        styleClass: link.clickable ? 'transversal-structural-link' : 'transversal-structural-link non-clickable',
+        items: this.buildMobileTransversalStructuralItems(idProgram, allLinks, link.idWorkpack, branch),
+        command: (event) => {
+          if (this.isPanelMenuExpansionClick(event)) { return; }
+          if (!link.clickable) { return; }
+          this.router.navigate(['/workpack'], { queryParams: {
+            id: link.idWorkpack,
+            idPlan: this.currentIDPlan,
+            idTransversalRoot: idProgram
+          }});
+          this.closeAllMenus();
+        }
+      } as MenuItem;
+    });
+  }
+
+  private isPanelMenuExpansionClick(event: any): boolean {
+    const target = event?.originalEvent?.target as HTMLElement;
+    return !!target?.closest?.('.p-panelmenu-icon');
   }
 
   async setWorkpackBreadcrumbStorage(idWorkpack, idPlan) {

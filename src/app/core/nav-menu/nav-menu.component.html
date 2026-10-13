@@ -29,12 +29,12 @@
       [pTooltip]="'changeControlBoard' | translate" [class.opened]="isMenuOpen(MenuButtons.CCB)">
       <i class="app-icon ccb-view" [ngStyle]="{ fontSize: '1.67rem' }"></i>
     </div>
-    <div class="item" (click)="toggleMenu(MenuButtons.PORTFOLIO)" [pTooltip]="currentPlan?.name" [class.opened]="isMenuOpen(MenuButtons.PORTFOLIO)"
+    <div class="item" (click)="openPlanView('STRUCTURAL')" [pTooltip]="'structuralViewMenu' | translate" [class.opened]="isMenuOpen(MenuButtons.PORTFOLIO)"
       *ngIf="!!currentIDPlan && isPlanMenu">
       <i class="app-icon briefcase" [ngStyle]="{ fontSize: '1.3rem' }"></i>
     </div>
-    <div class="item" (click)="toggleMenu(MenuButtons.TRANSVERSAL_VIEWS)"
-      [pTooltip]="'transversalViews' | translate" [class.opened]="isMenuOpen(MenuButtons.TRANSVERSAL_VIEWS)"
+    <div class="item" (click)="openPlanView('TRANSVERSAL')"
+      [pTooltip]="'transversalViewMenu' | translate" [class.opened]="isMenuOpen(MenuButtons.TRANSVERSAL_VIEWS)"
       *ngIf="!!currentIDPlan && isPlanMenu">
       <i class="fas fa-project-diagram" [ngStyle]="{ fontSize: '1.3rem' }"></i>
     </div>

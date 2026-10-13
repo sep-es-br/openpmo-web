@@ -1,24 +1,18 @@
 <div class="transversal-view-property" [class.disabled]="property.disabled">
-  <ng-container *ngIf="property.multipleSelection; else singleTransversalView">
-    <span class="p-float-label">
-      <p-multiSelect class="app-multiple-selection" dropdownIcon="fas fa-caret-down"
-        [options]="property.possibleValues || []" [ngModel]="property.value"
-        [disabled]="property.disabled" display="chip" [maxSelectedLabels]="2"
-        (onChange)="updateSelection($event.value)">
-      </p-multiSelect>
-      <label class="app-input-label">{{ property.label }}</label>
-    </span>
-  </ng-container>
-  <ng-template #singleTransversalView>
-    <span class="p-float-label">
-      <p-dropdown class="app-single-selection" dropdownIcon="fas fa-caret-down"
-        [options]="property.possibleValues || []" [ngModel]="property.value"
-        [disabled]="property.disabled" [autoDisplayFirst]="false"
-        (onChange)="updateSelection($event.value)">
-      </p-dropdown>
-      <label class="app-input-label">{{ property.label }}</label>
-    </span>
-  </ng-template>
+  <span class="p-float-label transversal-view-input-container">
+    <input class="app-input-text transversal-view-input" pInputText [id]="property.name"
+      [value]="selectedLabels" [required]="property.required" [disabled]="property.disabled" readonly
+      [class.ng-invalid]="property.invalid" [attr.aria-haspopup]="'dialog'"
+      (click)="openSelection()" (keydown.enter)="openSelection()" (keydown.space)="openSelection()" />
+    <button type="button" class="transversal-view-open-button" [disabled]="property.disabled"
+      [attr.aria-label]="property.label" (click)="openSelection()">
+      <i class="pi pi-sitemap" aria-hidden="true"></i>
+    </button>
+    <label class="app-input-label" [for]="property.name">
+      {{ property.label }} {{ property.required ? '*' : '' }}
+    </label>
+  </span>
+  <span class="input-message-error" *ngIf="property.invalid">{{ property.message }}</span>
   <div class="transversal-view-unavailable" *ngIf="property.unavailableTransversalViewSelections?.length">
     <span *ngFor="let item of property.unavailableTransversalViewSelections">
       {{ item.label }}
@@ -26,7 +20,18 @@
         [attr.aria-label]="'Remover ' + item.label">×</button>
     </span>
   </div>
-  <span class="input-message-error" *ngIf="property.invalid">
-    {{ property.message }}
-  </span>
+
+  <p-dialog [(visible)]="showSelection" [modal]="true" [style]="{ width: '34rem', maxWidth: '95vw' }"
+    [header]="property.label" [dismissableMask]="false">
+    <p-tree [value]="property.transversalViewTree" [filter]="true" filterBy="label"
+      [filterPlaceholder]="'search' | translate" [selectionMode]="property.multipleSelection ? 'checkbox' : 'single'"
+      [(selection)]="draftSelection" [propagateSelectionUp]="false" [propagateSelectionDown]="false"
+      [emptyMessage]="'noRecordsFound' | translate">
+    </p-tree>
+    <p-footer>
+      <p-button styleClass="p-button-text" [label]="'cancel' | translate"
+        (onClick)="showSelection = false"></p-button>
+      <p-button class="app-button-green" [label]="'select' | translate" (onClick)="confirmSelection()"></p-button>
+    </p-footer>
+  </p-dialog>
 </div>

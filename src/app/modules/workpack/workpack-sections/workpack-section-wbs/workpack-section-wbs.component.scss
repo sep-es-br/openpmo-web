@@ -568,6 +568,13 @@
     }
   }
 
+  .tree-label.disabled-link {
+    cursor: default;
+    pointer-events: none;
+    color: inherit;
+    text-decoration: none;
+  }
+
 
   .p-tree {
 

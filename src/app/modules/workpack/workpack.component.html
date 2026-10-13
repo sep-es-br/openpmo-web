@@ -53,6 +53,7 @@
         <div tabviewBody *ngIf="selectedTab?.key === 'WBS'">
             <div class="card-WBS">
             <app-workpack-section-wbs
+                [idTransversalProgram]="isTransversalProgram ? idWorkpack : undefined"
                 (onHasWBS)="handleOnHasWBS($event)"></app-workpack-section-wbs>
             </div>
         </div>
@@ -138,12 +139,11 @@
             <app-workpack-section-stakeholders></app-workpack-section-stakeholders>
             </div>
         </div>
-        <div tabviewBody *ngFor="let model of transversalLinkedModels">
-          <app-transversal-workpacks *ngIf="selectedTab?.key === transversalTabKey(model)"
-            [idTransversalProgram]="idWorkpack" [idPlan]="idPlan"
-            [linkedModel]="model" [canEdit]="isUserAdmin || getEditPermission()"
-            [displayMode]="displayModeAll" [responsive]="responsive" [pageSize]="pageSize">
-          </app-transversal-workpacks>
+        <div tabviewBody *ngIf="selectedTab?.key === 'transversal-root'">
+          <app-transversal-root-guide [idTransversalProgram]="idWorkpack" [idPlan]="idPlan"
+            [structuralLinks]="transversalStructuralLinks"
+            (rootModelNameChange)="setTransversalRootModelName($event)">
+          </app-transversal-root-guide>
         </div>
         <div tabviewBody *ngIf="selectedTab?.key === 'costAccounts'">
             <div class="card-cost-accounts">

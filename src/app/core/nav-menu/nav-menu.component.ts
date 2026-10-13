@@ -1,4 +1,5 @@
 import { Location } from '@angular/common';
+import { Router } from '@angular/router';
 import {
   Component,
   EventEmitter,
@@ -91,6 +92,7 @@ export class NavMenuComponent implements OnInit, OnDestroy {
     private menuSrv: MenuService,
     public authSrv: AuthService,
     private locationSrv: Location,
+    private router: Router,
     private officeSrv: OfficeService,
     private planSrv: PlanService,
     private cookieSrv: CookieService,
@@ -361,5 +363,23 @@ export class NavMenuComponent implements OnInit, OnDestroy {
     this.closeAllMenus();
     this.menuSrv.nextCloseAllMenus(true);
     this.showUserMenu = true;
+  }
+
+  openPlanView(classification: 'STRUCTURAL' | 'TRANSVERSAL'): void {
+    if (!this.currentIDPlan) {
+      return;
+    }
+    const currentClassification = new URLSearchParams(this.currentURL.split('?')[1] || '').get('classification');
+    if (this.currentURL.startsWith('plan') && currentClassification === classification) {
+      this.toggleMenu(classification === 'TRANSVERSAL' ? MenuButtons.TRANSVERSAL_VIEWS : MenuButtons.PORTFOLIO);
+      return;
+    }
+    const selectedMenu = classification === 'TRANSVERSAL'
+      ? MenuButtons.TRANSVERSAL_VIEWS
+      : MenuButtons.PORTFOLIO;
+    this.menuSrv.nextToggleMenu({ menu: selectedMenu, open: true });
+    this.router.navigate(['/plan'], {
+      queryParams: { id: this.currentIDPlan, classification }
+    });
   }
 }

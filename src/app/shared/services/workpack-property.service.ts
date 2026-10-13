@@ -18,7 +18,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { TypeWorkpackModelEnum } from '../enums/TypeWorkpackModelEnum';
 import { TransversalService } from './transversal.service';
 import { ITransversalSelectionOption } from '../interfaces/ITransversal';
-import { orderTransversalSelectionOptions } from '../utils/transversal-selection.util';
+import { buildTransversalSelectionTree, orderTransversalSelectionOptions } from '../utils/transversal-selection.util';
 
 @Injectable({
   providedIn: 'root'
@@ -219,7 +219,6 @@ export class WorkpackPropertyService {
     property.disabled = !this.workpackSrv.getEditPermission() || isProjectWithoutApprovedBaseline;
     property.helpText = propertyModel.helpText;
     property.sortIndex = propertyModel.sortIndex;
-    property.idRootTransversalViewModel = propertyModel.idRootTransversalViewModel;
     property.multipleSelection = propertyModel.multipleSelection;
     property.rows = propertyModel.rows ? propertyModel.rows : 1;
     property.decimals = propertyModel.decimals;
@@ -353,20 +352,18 @@ export class WorkpackPropertyService {
     property: PropertyTemplateModel,
     propertyModel: IWorkpackModelProperty
   ): Promise<ITransversalSelectionOption[]> {
-    const projectModel = this.workpackData?.workpackModel;
-    if (projectModel?.type !== TypeWorkpackModelEnum.ProjectModel || !this.workpackParams?.idPlan) {
+    if (!this.workpackData?.workpackModel || !this.workpackParams?.idPlan) {
       return [];
     }
 
     try {
-      if (!propertyModel.idRootTransversalViewModel) {
-        return [];
-      }
       const result = await this.transversalSrv.getSelectionOptions(
         propertyModel.idRootTransversalViewModel,
         { idPlan: this.workpackParams.idPlan }
       );
-      return result?.success ? orderTransversalSelectionOptions(result.data || []) : [];
+      const options = result?.success ? orderTransversalSelectionOptions(result.data || []) : [];
+      property.transversalViewTree = buildTransversalSelectionTree(result?.success ? result.data || [] : []);
+      return options;
     } catch (_) {
       return [];
     }
