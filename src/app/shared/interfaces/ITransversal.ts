@@ -89,6 +89,8 @@ export interface ITransversalStructuralLink {
   name: string;
   fullName?: string;
   modelName: string;
+  modelNameInPlural?: string;
+  workpackModelType?: string;
   fontIcon?: string;
   directlyLinked: boolean;
   clickable: boolean;

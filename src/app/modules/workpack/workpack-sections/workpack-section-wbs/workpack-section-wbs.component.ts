@@ -15,6 +15,7 @@ import { WorkpackBreadcrumbStorageService } from 'src/app/shared/services/workpa
 import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
 import { JournalService } from 'src/app/shared/services/journal.service';
 import { TransversalService } from 'src/app/shared/services/transversal.service';
+import { ITransversalProgram, ITransversalProgramModel, ITransversalStructuralLink } from 'src/app/shared/interfaces/ITransversal';
 import {
   DeliverableStatus,
   ProjectStatus,
@@ -119,7 +120,19 @@ export class WorkpackSectionWBSComponent implements OnChanges, OnDestroy {
       try {
         const result = await this.transversalSrv.getStructuralLinks(this.idTransversalProgram, true, true);
         if (result?.success) {
-          this.attachTransversalStructuralLinks(result.data || [], workpackData?.workpack);
+          const transversalViewId = this.workpackParams?.idTransversalView || workpackData?.workpackModel?.id;
+          const programsResult = transversalViewId
+            ? await this.transversalSrv.getPrograms(transversalViewId, this.idPlan)
+            : undefined;
+          const programModelsResult = transversalViewId
+            ? await this.transversalSrv.getProgramModels(transversalViewId).catch(() => undefined)
+            : undefined;
+          this.attachTransversalStructuralLinks(
+            result.data || [],
+            workpackData?.workpack,
+            programsResult?.success ? programsResult.data || [] : [],
+            programModelsResult?.success ? programModelsResult.data || [] : []
+          );
         }
       } catch (error) {
         // A falha ao carregar vínculos não deve impedir o EAP transversal existente.
@@ -127,78 +140,176 @@ export class WorkpackSectionWBSComponent implements OnChanges, OnDestroy {
     }
   }
 
-  private attachTransversalStructuralLinks(links: any[], transversalProgram?: IWorkpack): void {
+  private attachTransversalStructuralLinks(
+    links: ITransversalStructuralLink[],
+    transversalProgram?: IWorkpack,
+    programs: ITransversalProgram[] = [],
+    programModels: ITransversalProgramModel[] = []
+  ): void {
     if (!links.length) { return; }
-    const byProgram = new Map<number, any[]>();
-    links.forEach(link => {
-      const items = byProgram.get(Number(link.idTransversalProgram)) || [];
-      if (!items.some(item => Number(item.idWorkpack) === Number(link.idWorkpack))) {
-        items.push(link);
-      }
-      byProgram.set(Number(link.idTransversalProgram), items);
-    });
-    const attachedWorkpackIds = new Set<number>();
-    const findNode = (nodes: any[], id: number): any => {
-      for (const node of nodes || []) {
-        if (Number(node.idWorkpack) === id) { return node; }
-        const child = findNode(node.children, id);
-        if (child) { return child; }
-      }
-      return undefined;
+    const existingNodes = new Map<number, any>();
+    const indexNodes = (nodes: any[]): void => {
+      (nodes || []).forEach(node => {
+        if (node.idWorkpack) { existingNodes.set(Number(node.idWorkpack), node); }
+        indexNodes(node.children);
+      });
     };
-    byProgram.forEach((programLinks, idProgram) => {
-      let programNode = findNode(this.wbsTree, idProgram);
-      if (!programNode && Number(idProgram) === Number(this.idTransversalProgram)) {
-        programNode = this.createTransversalProgramRoot(transversalProgram);
-        if (programNode) {
-          this.wbsTree = [programNode];
-        }
+    indexNodes(this.wbsTree);
+
+    const linksByProgram = new Map<number, Map<number, ITransversalStructuralLink>>();
+    links.forEach(link => {
+      const programId = Number(link.idTransversalProgram);
+      const programLinks = linksByProgram.get(programId) || new Map<number, ITransversalStructuralLink>();
+      const id = Number(link.idWorkpack);
+      const current = programLinks.get(id);
+      if (!current || (!current.directlyLinked && link.directlyLinked)) {
+        programLinks.set(id, link);
       }
-      if (!programNode) { return; }
-      programNode.leaf = false;
-      programNode.hasChildren = true;
-      const linksToInsert = programLinks.filter(link => {
+      linksByProgram.set(programId, programLinks);
+    });
+
+    const rootId = Number(this.idTransversalProgram);
+    const programNode = existingNodes.get(rootId) || this.createTransversalProgramRoot(transversalProgram);
+    if (!programNode) { return; }
+
+    const programsById = new Map<number, ITransversalProgram>();
+    programs.forEach(program => programsById.set(Number(program.idTransversalProgram), program));
+    const programModelsById = new Map<number, ITransversalProgramModel>();
+    programModels.forEach(model => programModelsById.set(Number(model.id), model));
+    const subprogramsByParent = new Map<number, ITransversalProgram[]>();
+    programs.forEach(program => {
+      const id = Number(program.idTransversalProgram);
+      const parentId = Number(program.idParent);
+      if (id === rootId || !programsById.has(parentId)) { return; }
+      const children = subprogramsByParent.get(parentId) || [];
+      children.push(program);
+      subprogramsByParent.set(parentId, children);
+    });
+
+    const buildModelGroups = (programId: number): any[] => {
+      const programLinks = programsById.size
+        ? linksByProgram.get(programId) || new Map<number, ITransversalStructuralLink>()
+        : new Map<number, ITransversalStructuralLink>(
+          Array.from(linksByProgram.values()).flatMap(programItems => Array.from(programItems.entries()))
+        );
+      const childrenByParent = new Map<number, ITransversalStructuralLink[]>();
+      programLinks.forEach(link => {
         const id = Number(link.idWorkpack);
-        const existingNode = findNode(this.wbsTree, id);
-        if (existingNode) {
-          Object.assign(existingNode, {
+        const requestedParentId = Number(link.idParentWorkpack);
+        const parentId = programLinks.has(requestedParentId) ? requestedParentId : programId;
+        const siblings = childrenByParent.get(parentId) || [];
+        siblings.push(link);
+        childrenByParent.set(parentId, siblings);
+      });
+
+      const buildGroupsForParent = (parentId: number, ancestorIds: Set<number>): any[] => {
+      const groupedByModel = new Map<number, any[]>();
+      (childrenByParent.get(parentId) || []).filter(link => !ancestorIds.has(Number(link.idWorkpack))).forEach(link => {
+        const modelId = Number(link.idWorkpackModel);
+        const workpacks = groupedByModel.get(modelId) || [];
+        workpacks.push(link);
+        groupedByModel.set(modelId, workpacks);
+      });
+
+      return Array.from(groupedByModel.entries()).map(([modelId, modelLinks]) => {
+        const firstLink = modelLinks[0];
+        const workpacks = modelLinks.map(link => {
+          const id = Number(link.idWorkpack);
+          const existingNode = existingNodes.get(id) || {};
+          const nextAncestors = new Set(ancestorIds);
+          nextAncestors.add(id);
+          const children = buildGroupsForParent(id, nextAncestors);
+          return {
+            ...existingNode,
+            idWorkpack: id,
             idWorkpaModelLinked: link.idWorkpackModel,
+            workpackName: link.name || existingNode.workpackName,
+            workpackModelName: link.modelName || existingNode.workpackModelName,
+            workpackType: link.workpackModelType || existingNode.workpackType,
             fontIcon: link.fontIcon || existingNode.fontIcon,
             isTransversalStructuralLink: true,
-            structuralLinkClickable: link.clickable
-          });
-          attachedWorkpackIds.add(id);
-          return false;
-        }
-        if (attachedWorkpackIds.has(id)) { return false; }
-        return true;
-      });
-      const nodes = new Map<number, any>();
-      linksToInsert.forEach(link => {
-        if (attachedWorkpackIds.has(Number(link.idWorkpack))) { return; }
-        attachedWorkpackIds.add(Number(link.idWorkpack));
-        nodes.set(Number(link.idWorkpack), {
-          idWorkpack: link.idWorkpack,
-          idWorkpaModelLinked: link.idWorkpackModel,
-          workpackName: link.name,
-          workpackModelName: link.modelName,
-          fontIcon: link.fontIcon,
-          workpackType: TypeWorkpackEnumWBS.Program,
-          isTransversalStructuralLink: true,
-          structuralLinkClickable: link.clickable,
-          leaf: false,
-          expanded: false,
-          children: []
+            structuralLinkClickable: link.clickable,
+            expanded: true,
+            leaf: children.length === 0,
+            hasChildren: children.length > 0,
+            children
+          };
         });
+        return {
+          idWorkpackModel: modelId,
+          workpackModelName: firstLink.modelNameInPlural || firstLink.modelName,
+          workpackModelType: firstLink.workpackModelType,
+          workpacks,
+          children: workpacks,
+          expanded: true,
+          leaf: false
+        };
       });
-      linksToInsert.forEach(link => {
-        const node = nodes.get(Number(link.idWorkpack));
-        if (!node) { return; }
-        const parent = link.idParentWorkpack && nodes.get(Number(link.idParentWorkpack));
-        if (parent) { parent.children.push(node); }
-        else { programNode.children = [...(programNode.children || []), node]; }
+      };
+
+      return buildGroupsForParent(programId, new Set([programId]));
+    };
+
+    const hasProgramContent = (programId: number, visited = new Set<number>()): boolean => {
+      if (visited.has(programId)) { return false; }
+      visited.add(programId);
+      if ((linksByProgram.get(programId)?.size || 0) > 0) { return true; }
+      return (subprogramsByParent.get(programId) || [])
+        .some(child => hasProgramContent(Number(child.idTransversalProgram), visited));
+    };
+
+    const buildProgramChildren = (programId: number): any[] => {
+      const structuralChildren = buildModelGroups(programId);
+      const subprogramChildren = (subprogramsByParent.get(programId) || [])
+        .filter(child => hasProgramContent(Number(child.idTransversalProgram)))
+        .map(child => {
+          const childId = Number(child.idTransversalProgram);
+          const children = buildProgramChildren(childId);
+          return {
+            idWorkpack: child.idWorkpack,
+            idWorkpaModelLinked: child.idWorkpackModel,
+            workpackName: child.name || child.fullName,
+            workpackType: TypeWorkpackEnumWBS.Program,
+            fontIcon: child.fontIcon,
+            isTransversalStructuralLink: true,
+            structuralLinkClickable: true,
+            expanded: true,
+            leaf: children.length === 0,
+            hasChildren: children.length > 0,
+            children
+          };
+        });
+      const subprogramGroups = Array.from(subprogramChildren.reduce((groups, child) => {
+        const modelId = Number(child.idWorkpaModelLinked);
+        const group = groups.get(modelId) || [];
+        group.push(child);
+        groups.set(modelId, group);
+        return groups;
+      }, new Map<number, any[]>()).entries()).map(([modelId, workpacks]) => {
+        const model = programModelsById.get(modelId);
+        return {
+          idWorkpackModel: modelId,
+          workpackModelName: model?.nameInPlural || this.translateSrv.instant('subprograms'),
+          workpacks,
+          children: workpacks,
+          expanded: true,
+          leaf: false
+        };
       });
-    });
+      return [...subprogramGroups, ...structuralChildren];
+    };
+
+    const children = this.applyExpansionState(buildProgramChildren(rootId));
+    Object.assign(programNode, { leaf: false, hasChildren: children.length > 0, expanded: true, children });
+    this.wbsTree = [programNode];
+  }
+
+  private applyExpansionState(nodes: any[], level = 1): any[] {
+    return (nodes || []).map(node => ({
+      ...node,
+      expanded: !this.collapsed || level <= 1,
+      children: this.applyExpansionState(node.children, level + 1)
+    }));
   }
 
   private createTransversalProgramRoot(workpack?: IWorkpack): any {
