@@ -369,14 +369,17 @@ export class NavMenuComponent implements OnInit, OnDestroy {
     if (!this.currentIDPlan) {
       return;
     }
-    const currentClassification = new URLSearchParams(this.currentURL.split('?')[1] || '').get('classification');
-    if (this.currentURL.startsWith('plan') && currentClassification === classification) {
-      this.toggleMenu(classification === 'TRANSVERSAL' ? MenuButtons.TRANSVERSAL_VIEWS : MenuButtons.PORTFOLIO);
-      return;
-    }
     const selectedMenu = classification === 'TRANSVERSAL'
       ? MenuButtons.TRANSVERSAL_VIEWS
       : MenuButtons.PORTFOLIO;
+    const currentClassification = new URLSearchParams(this.currentURL.split('?')[1] || '').get('classification') || 'STRUCTURAL';
+    const isCurrentPlanView = this.currentURL.startsWith('plan') && currentClassification === classification;
+    const isCurrentWorkpackView = this.currentURL.startsWith('workpack') && this.isMenuOpen(selectedMenu);
+
+    if (isCurrentPlanView || isCurrentWorkpackView) {
+      this.toggleMenu(selectedMenu);
+      return;
+    }
     this.menuSrv.nextToggleMenu({ menu: selectedMenu, open: true });
     this.router.navigate(['/plan'], {
       queryParams: { id: this.currentIDPlan, classification }
