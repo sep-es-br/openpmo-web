@@ -382,7 +382,11 @@ export class WorkpackComponent implements OnDestroy, OnInit {
       idOffice: this.idOffice,
       idPlan: this.idPlan,
       idWorkpack: this.idWorkpack ? this.idWorkpack : null,
-      idWorkpackModelLinked: this.idWorkpackModelLinked ? this.idWorkpackModelLinked : null
+      idWorkpackModelLinked: this.idWorkpackModelLinked ? this.idWorkpackModelLinked : null,
+      classification: this.idTransversalRoot || this.isTransversalProgram
+        ? WorkpackModelClassificationEnum.TRANSVERSAL
+        : this.workpackModel?.classification || WorkpackModelClassificationEnum.STRUCTURAL,
+      idTransversalRoot: this.idTransversalRoot || null
     });
   }
 
@@ -1617,7 +1621,11 @@ export class WorkpackComponent implements OnDestroy, OnInit {
           idOffice: this.idOffice,
           idPlan: this.idPlan,
           idWorkpack: data.id,
-          idWorkpackModelLinked: null
+          idWorkpackModelLinked: null,
+          classification: this.idTransversalRoot
+            ? WorkpackModelClassificationEnum.TRANSVERSAL
+            : this.workpackModel?.classification || WorkpackModelClassificationEnum.STRUCTURAL,
+          idTransversalRoot: this.idTransversalRoot || null
         });
         if ((this.workpack && this.workpack.type !== TypeWorkpackEnum.MilestoneModel)
           || (this.workpackModel && TypeWorkpackEnum[this.workpackModel.type] !== TypeWorkpackEnum.MilestoneModel)) {

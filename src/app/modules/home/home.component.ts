@@ -97,6 +97,7 @@ export class HomeComponent implements OnInit {
 
   async navigateWorkPerson() {
     const workLocal = this.infoPerson.workLocal;
+      const classification = workLocal.classification;
       if (workLocal.idWorkpackModelLinked && workLocal.idWorkpack && workLocal.idPlan && workLocal.idOffice) {
         this.officeSrv.nextIDOffice(workLocal.idOffice);
         this.planSrv.nextIDPlan(workLocal.idPlan);
@@ -104,7 +105,9 @@ export class HomeComponent implements OnInit {
           queryParams: {
             id: Number(workLocal.idWorkpack),
             idPlan: Number(workLocal.idPlan),
-            idWorkpackModelLinked: Number(workLocal.idWorkpackModelLinked)
+            idWorkpackModelLinked: Number(workLocal.idWorkpackModelLinked),
+            classification,
+            idTransversalRoot: workLocal.idTransversalRoot
           }
         });
         return;
@@ -116,6 +119,8 @@ export class HomeComponent implements OnInit {
           queryParams: {
             id: Number(workLocal.idWorkpack),
             idPlan: Number(workLocal.idPlan),
+            classification,
+            idTransversalRoot: workLocal.idTransversalRoot
           }
         });
         return;
@@ -126,7 +131,8 @@ export class HomeComponent implements OnInit {
         this.router.navigate(['plan'], {
           queryParams: {
             id: Number(workLocal.idPlan),
-            idOffice: Number(workLocal.idOffice)
+            idOffice: Number(workLocal.idOffice),
+            classification
           }
         });
         return;

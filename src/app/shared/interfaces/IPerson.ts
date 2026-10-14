@@ -28,6 +28,8 @@ export interface IWorkLocal {
   idPlan: number;
   idWorkpack: number;
   idWorkpackModelLinked: number;
+  classification?: 'STRUCTURAL' | 'TRANSVERSAL';
+  idTransversalRoot?: number;
 }
 
 export interface IPersonOfficePermission {
