@@ -1,5 +1,6 @@
 import { Component, Input, OnChanges, OnDestroy, Output, EventEmitter, SimpleChanges } from '@angular/core';
 import { IWorkpackBreakdownStructure } from 'src/app/shared/interfaces/IWorkpackBreakdownStructure';
+import { IWorkpack } from 'src/app/shared/interfaces/IWorkpack';
 import { TypeWorkpackEnumWBS } from 'src/app/shared/enums/TypeWorkpackEnum';
 import { WorkpackModelClassificationEnum } from 'src/app/shared/enums/WorkpackModelClassificationEnum';
 import { Subject } from 'rxjs';
@@ -118,7 +119,7 @@ export class WorkpackSectionWBSComponent implements OnChanges, OnDestroy {
       try {
         const result = await this.transversalSrv.getStructuralLinks(this.idTransversalProgram, true, true);
         if (result?.success) {
-          this.attachTransversalStructuralLinks(result.data || []);
+          this.attachTransversalStructuralLinks(result.data || [], workpackData?.workpack);
         }
       } catch (error) {
         // A falha ao carregar vínculos não deve impedir o EAP transversal existente.
@@ -126,8 +127,8 @@ export class WorkpackSectionWBSComponent implements OnChanges, OnDestroy {
     }
   }
 
-  private attachTransversalStructuralLinks(links: any[]): void {
-    if (!this.wbsTree?.length || !links.length) { return; }
+  private attachTransversalStructuralLinks(links: any[], transversalProgram?: IWorkpack): void {
+    if (!links.length) { return; }
     const byProgram = new Map<number, any[]>();
     links.forEach(link => {
       const items = byProgram.get(Number(link.idTransversalProgram)) || [];
@@ -146,7 +147,13 @@ export class WorkpackSectionWBSComponent implements OnChanges, OnDestroy {
       return undefined;
     };
     byProgram.forEach((programLinks, idProgram) => {
-      const programNode = findNode(this.wbsTree, idProgram);
+      let programNode = findNode(this.wbsTree, idProgram);
+      if (!programNode && Number(idProgram) === Number(this.idTransversalProgram)) {
+        programNode = this.createTransversalProgramRoot(transversalProgram);
+        if (programNode) {
+          this.wbsTree = [programNode];
+        }
+      }
       if (!programNode) { return; }
       programNode.leaf = false;
       programNode.hasChildren = true;
@@ -192,6 +199,23 @@ export class WorkpackSectionWBSComponent implements OnChanges, OnDestroy {
         else { programNode.children = [...(programNode.children || []), node]; }
       });
     });
+  }
+
+  private createTransversalProgramRoot(workpack?: IWorkpack): any {
+    if (!workpack?.id || Number(workpack.id) !== Number(this.idTransversalProgram)) {
+      return undefined;
+    }
+    const workpackName = workpack.name || workpack.fullName;
+    return {
+      idWorkpack: workpack.id,
+      workpackName,
+      workpackType: TypeWorkpackEnumWBS.Program,
+      label: workpackName,
+      expanded: true,
+      leaf: false,
+      hasChildren: true,
+      children: []
+    };
   }
 
   nodeCollapse(nodeList, level) {
