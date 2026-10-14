@@ -2,7 +2,6 @@ import { Inject, Injectable, Injector } from '@angular/core';
 import { BaseService } from '../base/base.service';
 import { IHttpResult } from '../interfaces/IHttpResult';
 import {
-  IEligibleProject,
   ITransversalProgram,
   ITransversalProgramModel,
   ITransversalProjectParticipation,
@@ -44,12 +43,6 @@ export class TransversalService extends BaseService<ITransversalProgram> {
   getProgramModels(idTransversalView: number): Promise<IHttpResult<ITransversalProgramModel[]>> {
     return this.http.get<IHttpResult<ITransversalProgramModel[]>>(
       `${this.urlBase}/views/${idTransversalView}/program-models`
-    ).toPromise();
-  }
-
-  getEligibleProjects(idTransversalProgram: number): Promise<IHttpResult<IEligibleProject[]>> {
-    return this.http.get<IHttpResult<IEligibleProject[]>>(
-      `${this.urlBase}/programs/${idTransversalProgram}/eligible-projects`
     ).toPromise();
   }
 
@@ -159,12 +152,6 @@ export class TransversalService extends BaseService<ITransversalProgram> {
   ): Promise<IHttpResult<ITransversalWorkpackParticipation>> {
     return this.http.delete<IHttpResult<ITransversalWorkpackParticipation>>(
       `${this.urlBase}/programs/${idTransversalProgram}/workpacks/${idWorkpack}`
-    ).toPromise();
-  }
-
-  getIncludedProjects(idTransversalProgram: number): Promise<IHttpResult<IEligibleProject[]>> {
-    return this.http.get<IHttpResult<IEligibleProject[]>>(
-      `${this.urlBase}/programs/${idTransversalProgram}/projects`
     ).toPromise();
   }
 

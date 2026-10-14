@@ -45,19 +45,6 @@ export interface ICreateTransversalProgram {
   properties?: any[];
 }
 
-export interface IEligibleProject {
-  idProject: number;
-  idWorkpack: number;
-  idPlan: number;
-  idWorkpackModel: number;
-  idStructuralModel: number;
-  name: string;
-  fullName?: string;
-  originalParentId?: number;
-  alreadyIncluded: boolean;
-  currentlyEligible?: boolean;
-}
-
 export interface ITransversalProjectParticipation {
   idTransversalProgram: number;
   idProject: number;
@@ -105,6 +92,15 @@ export interface ITransversalStructuralLink {
   fontIcon?: string;
   directlyLinked: boolean;
   clickable: boolean;
+  scopeCounts?: ITransversalProjectScopeCount[];
+}
+
+export interface ITransversalProjectScopeCount {
+  idWorkpackModel: number;
+  modelNameInPlural: string;
+  fontIcon?: string;
+  linkedCount: number;
+  totalCount: number;
 }
 
 export interface ITransversalSelectionOption {

@@ -29,6 +29,16 @@
                 (click)="openNode(node)">
                 {{ node.data.item.name }}
               </div>
+              <span class="transversal-project-scope-counts" *ngIf="node.data.item.scopeCounts?.length">
+                (
+                <ng-container *ngFor="let count of node.data.item.scopeCounts; let last = last">
+                  <span [attr.title]="count.modelNameInPlural">
+                    <i *ngIf="count.fontIcon" [class]="count.fontIcon" aria-hidden="true"></i>
+                    {{ count.linkedCount }}/{{ count.totalCount }}
+                  </span><span *ngIf="!last">, </span>
+                </ng-container>
+                )
+              </span>
             </div>
           </div>
         </ng-template>
