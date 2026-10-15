@@ -107,12 +107,6 @@ export class CardItemComponent implements OnInit {
     await this.properties.onClick();
   }
 
-  toggleRoles(event: Event): void {
-    event.stopPropagation();
-    event.preventDefault();
-    this.showAllRoles = !this.showAllRoles;
-  }
-
   handleNewItemClick(): void {
     if (this.properties.onClick) {
       this.properties.onClick();
