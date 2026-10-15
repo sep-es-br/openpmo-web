@@ -1,4 +1,5 @@
-import { Component, EventEmitter, HostBinding, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
+import { AfterViewChecked, Component, EventEmitter, HostBinding, Input, OnChanges, Output, QueryList, SimpleChanges, ViewChildren } from '@angular/core';
+import { MultiSelect } from 'primeng/multiselect';
 import { TranslateService } from '@ngx-translate/core';
 import { MenuItem, MessageService, SelectItem } from 'primeng/api';
 import { ListSelectionDialogItem } from '../../../list-selection-dialog/list-selection-dialog.component';
@@ -21,7 +22,8 @@ interface IChallengeHierarchyNode {
   templateUrl: './property-list-selection.component.html',
   styleUrls: ['./property-list-selection.component.scss']
 })
-export class PropertyListSelectionComponent implements OnChanges {
+export class PropertyListSelectionComponent implements OnChanges, AfterViewChecked {
+  @ViewChildren(MultiSelect) filterSelects: QueryList<MultiSelect>;
   @Input() property: PropertyTemplateModel;
   @Input() displayMode: string = 'grid';
   @Output() changed = new EventEmitter<PropertyTemplateModel>();
@@ -42,6 +44,7 @@ export class PropertyListSelectionComponent implements OnChanges {
   challengeFilterResetKey = 0;
   listSelectionResetKey = 0;
   private nextTemporaryListItemId = -1;
+  private realignFilterOverlays = false;
 
   constructor(
     private readonly indicatorService: IndicatorService,
@@ -61,6 +64,18 @@ export class PropertyListSelectionComponent implements OnChanges {
     }
   }
 
+  ngAfterViewChecked(): void {
+    if (!this.realignFilterOverlays) {
+      return;
+    }
+    this.realignFilterOverlays = false;
+    this.filterSelects.forEach(select => {
+      if (select.overlayVisible) {
+        select.alignOverlay();
+      }
+    });
+  }
+
   private refreshCards(): void {
     if (!this.property) {
       this.cardItems = [];
@@ -77,13 +92,12 @@ export class PropertyListSelectionComponent implements OnChanges {
       subtitleCardItem: item.fullName && item.fullName !== item.name ? item.fullName : undefined,
       menuItems: this.property.disabled ? undefined : this.createItemMenu(item)
     }));
-    if (!this.property.disabled) {
-      this.cardItems.push({
-        typeCardItem: 'newCardItem',
-        icon: IconsEnum.Plus,
-        onClick: () => { void this.openListSelectionDialog(); }
-      });
-    }
+    this.cardItems.push({
+      typeCardItem: 'newCardItem',
+      icon: IconsEnum.Plus,
+      disabled: this.property.disabled,
+      onClick: () => { void this.openListSelectionDialog(); }
+    });
   }
 
   private createItemMenu(item: IPropertyListItem): MenuItem[] {
@@ -161,6 +175,7 @@ export class PropertyListSelectionComponent implements OnChanges {
   }
 
   managementChanged(value: number[] = this.selectedManagementIds): void {
+    this.realignFilterOverlays = true;
     this.selectedManagementIds = value || [];
     this.selectedGroupIds = [];
     this.selectedSubgroupIds = [];
@@ -174,6 +189,7 @@ export class PropertyListSelectionComponent implements OnChanges {
   }
 
   groupChanged(value: number[] = this.selectedGroupIds): void {
+    this.realignFilterOverlays = true;
     this.selectedGroupIds = value || [];
     this.selectedSubgroupIds = [];
     this.subgroupOptions = this.uniqueHierarchyNodes(
@@ -185,6 +201,7 @@ export class PropertyListSelectionComponent implements OnChanges {
   }
 
   subgroupChanged(value: number[] = this.selectedSubgroupIds): void {
+    this.realignFilterOverlays = true;
     this.selectedSubgroupIds = value || [];
     this.challengeFilterResetKey++;
     this.refreshDialogItems();

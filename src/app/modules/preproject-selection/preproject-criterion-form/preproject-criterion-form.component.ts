@@ -91,6 +91,7 @@ export class PreprojectCriterionFormComponent implements OnInit, OnDestroy {
   office: IOffice;
 
   isLoading: boolean = false;
+  formIsSaving = false;
 
   displayModeAll: string = 'list';
 
@@ -165,11 +166,15 @@ export class PreprojectCriterionFormComponent implements OnInit, OnDestroy {
   }
 
   async save(): Promise<void> {
+    if (this.formIsSaving) {
+      return;
+    }
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
     }
 
+    this.formIsSaving = true;
     try {
       const criterion = this.getCriterionPayload();
       if (this.criterionId) {
@@ -187,6 +192,8 @@ export class PreprojectCriterionFormComponent implements OnInit, OnDestroy {
     } catch {
       this.saveButton?.showButton();
       this.cancelButton?.showButton();
+    } finally {
+      this.formIsSaving = false;
     }
   }
 
@@ -244,7 +251,7 @@ export class PreprojectCriterionFormComponent implements OnInit, OnDestroy {
       operation: ['SUM' as PreprojectCriterionOperation, Validators.required],
       enablementKey: [false],
       disabledValue: [''],
-      legend: [''],
+      legend: [{ value: '', disabled: true }],
       properties: this.formBuilder.array([])
     }));
 
@@ -297,6 +304,16 @@ export class PreprojectCriterionFormComponent implements OnInit, OnDestroy {
 
       this.rootProperties = [...this.rootProperties];
       this.groupProperties = this.groupProperties.map((group: IWorkpackModelProperty[]) => [...group]);
+    }
+    this.markFormChanged();
+  }
+
+  groupEnablementChanged(enabled: boolean, groupIndex: number): void {
+    const legend = this.groups.at(groupIndex).get('legend');
+    if (enabled) {
+      legend.enable({ emitEvent: false });
+    } else {
+      legend.disable({ emitEvent: false });
     }
     this.markFormChanged();
   }
@@ -408,7 +425,7 @@ export class PreprojectCriterionFormComponent implements OnInit, OnDestroy {
         operation: [group.operation, Validators.required],
         enablementKey: [group.enablementKey],
         disabledValue: [group.disabledValue],
-        legend: [group.legend],
+        legend: [{ value: group.legend, disabled: !group.enablementKey }],
         properties: this.formBuilder.array(properties.map(property => this.formBuilder.control(property)))
       }));
       this.groupProperties.push(properties);

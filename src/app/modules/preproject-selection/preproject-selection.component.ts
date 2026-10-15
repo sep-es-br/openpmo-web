@@ -107,7 +107,6 @@ export class PreprojectSelectionComponent implements OnInit, OnDestroy {
       { label: this.translateService.instant('sum'), value: 'SUM' }
     ];
     await this.loadConfiguration();
-    await this.loadCriteria();
     this.setBreadcrumb();
   }
 
@@ -182,6 +181,11 @@ export class PreprojectSelectionComponent implements OnInit, OnDestroy {
   }
 
   private applyConfiguration(configuration: IPreprojectModelConfiguration): void {
+    const criteria = this.criteriaConfigService.mapCriteriaFromResponse(
+      ((configuration.properties || []) as any[])
+        .filter(property => property.type === 'CriteriaTabModel')
+    ).sort((first, second) => first.position - second.position || first.id - second.id);
+    this.updateCriteriaCards(criteria);
     this.preprojectModelId = configuration.id;
     this.preprojectSelectionEnabled = configuration.active;
     this.hasPreProjects = configuration.hasPreProjects === true;
@@ -196,8 +200,7 @@ export class PreprojectSelectionComponent implements OnInit, OnDestroy {
     });
   }
 
-  private async loadCriteria(): Promise<void> {
-    const fetchedCriteria = await this.criteriaConfigService.getCriteria(this.idOffice);
+  private updateCriteriaCards(fetchedCriteria: PreprojectCriterion[]): void {
     const criteria = fetchedCriteria.map(criterion => ({
       typeCardItem: 'listItem',
       iconSvg: criterion.icon === 'fas fa-cog',
@@ -252,7 +255,7 @@ export class PreprojectSelectionComponent implements OnInit, OnDestroy {
           summary: this.translateService.instant('success'),
           detail: this.translateService.instant('messages.deleteSuccessful')
         });
-        await this.loadCriteria();
+        await this.loadConfiguration();
       }
     });
   }

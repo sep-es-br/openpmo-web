@@ -1,9 +1,11 @@
 <div class="app-preproject-form">
-  <app-card [properties]="cardProperties" class="mt-0 inputs-float-label">
-    <app-card-loading
-      [isCardLoading]="isLoading || isModelLoading || isSelectedCriteriaLoading || isEvaluationLoading || formIsSaving">
-    </app-card-loading>
+  <div class="loading-form-container"
+    *ngIf="isLoading || isModelLoading || isSelectedCriteriaLoading || isEvaluationLoading || formIsSaving || isProjectCreationLoading"
+    role="status" aria-live="polite" [attr.aria-label]="'loading' | translate">
+    <app-card-loading [isCardLoading]="true"></app-card-loading>
+  </div>
 
+  <app-card [properties]="cardProperties" class="mt-0 inputs-float-label">
     <app-tabview-scrolled
       [tabs]="tabs"
       [contextVersion]="tabsVersion"

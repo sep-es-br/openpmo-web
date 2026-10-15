@@ -1,4 +1,8 @@
 <div class="app-preproject-criterion-form">
+  <div class="loading-form-container" *ngIf="isLoading || formIsSaving"
+    role="status" aria-live="polite" [attr.aria-label]="'loading' | translate">
+    <app-card-loading [isCardLoading]="true"></app-card-loading>
+  </div>
   <div class="criterion-form-header">
     <div class="app-content-header">
       <span>
@@ -9,8 +13,6 @@
   </div>
 
   <app-card [properties]="cardProperties" class="mt-0 inputs-float-label">
-    <app-card-loading [isCardLoading]="isLoading"></app-card-loading>
-
     <form [formGroup]="form" class="criterion-form p-fluid">
       <div class="criterion-properties-fields">
       <div class="criterion-field p-field">
@@ -233,6 +235,7 @@
           class="app-toggle"
           [inputId]="'criterion-group-enable-key-' + groupIndex"
           formControlName="enablementKey"
+          (onChange)="groupEnablementChanged($event.checked, groupIndex)"
         ></p-inputSwitch>
         <label [for]="'criterion-group-enable-key-' + groupIndex">{{ 'enablementKey' | translate }}</label>
         <i class="far fa-question-circle" [pTooltip]="'enablementKey' | translate"></i>
@@ -248,7 +251,8 @@
 
       <span class="p-float-label group-field p-field">
         <input [id]="'criterion-group-legend-' + groupIndex" class="app-input-text" pInputText type="text" formControlName="legend" />
-        <label class="app-input-label" [for]="'criterion-group-legend-' + groupIndex">
+        <label class="app-input-label" [for]="'criterion-group-legend-' + groupIndex"
+          [class.p-disabled]="group.get('legend').disabled">
           {{ 'legend' | translate }}
           <i class="far fa-question-circle" [pTooltip]="'legend' | translate"></i>
         </label>

@@ -198,7 +198,9 @@ describe('PropertyListSelectionComponent', () => {
     await component.openListSelectionDialog();
 
     expect(component.displayListSelectionDialog).toBe(false);
-    expect(component.cardItems.length).toBe(0);
+    expect(component.cardItems.length).toBe(1);
+    expect(component.cardItems[0].typeCardItem).toBe('newCardItem');
+    expect(component.cardItems[0].disabled).toBe(true);
     expect(indicatorService.getOdsCatalog).not.toHaveBeenCalled();
   });
 

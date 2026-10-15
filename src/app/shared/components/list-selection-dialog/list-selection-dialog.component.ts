@@ -29,6 +29,7 @@ export class ListSelectionDialogComponent implements OnChanges {
   @Input() emptyMessage = 'noContent';
   @Input() selectionPlaceholder = 'select';
   @Input() selectionLabel = '';
+  @Input() summarizeSelection = false;
   @Input() width = '620px';
   @Input() maxHeight = '80vh';
   @Input() showActions = true;
@@ -65,6 +66,9 @@ export class ListSelectionDialogComponent implements OnChanges {
   }
 
   confirm(): void {
+    if (this.loading) {
+      return;
+    }
     this.confirmed.emit(this.getSelectedItems());
     this.closeByAction();
   }

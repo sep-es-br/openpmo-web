@@ -2,28 +2,26 @@
   <div class="property-list-title" *ngIf="property.label">{{ property.label }}</div>
 
   <p-dataView
-    *ngIf="displayMode !== 'list'"
+    *ngIf="displayMode !== 'list' && cardItems.length > 0"
     [value]="cardItems"
-    [emptyMessage]="'noRecordsFound' | translate"
     layout="grid"
     class="app-dataview property-list-dataview"
   >
     <ng-template let-cardItem pTemplate="gridItem">
-      <div class="property-list-card">
+      <div class="p-col-12 p-md-3 p-sm-12 card-item-container">
         <app-card-item [properties]="cardItem" displayModeCard="grid"></app-card-item>
       </div>
     </ng-template>
   </p-dataView>
 
   <p-dataView
-    *ngIf="displayMode === 'list'"
+    *ngIf="displayMode === 'list' && cardItems.length > 0"
     [value]="cardItems"
-    [emptyMessage]="'noRecordsFound' | translate"
     layout="list"
     class="app-dataview app-dataview-list property-list-dataview list-mode"
   >
     <ng-template let-cardItem pTemplate="listItem">
-      <div class="property-list-card">
+      <div class="p-col-12">
         <app-card-item [properties]="cardItem" displayModeCard="list"></app-card-item>
       </div>
     </ng-template>
@@ -46,12 +44,14 @@
   [dismissableMask]="false"
   [selectionPlaceholder]="isChallengeDialog ? 'selectChallenges' : 'select'"
   [selectionLabel]="isChallengeDialog ? 'selectChallenges' : ''"
+  [summarizeSelection]="isChallengeDialog"
   (confirmed)="confirmListSelection($event)"
   (cancelled)="closeListSelectionDialog()">
   <div listSelectionFilters *ngIf="isChallengeDialog" class="challenge-list-filters p-fluid">
-    <span class="p-float-label">
+    <span #managementField class="p-float-label">
       <p-dropdown
         inputId="challenge-management-filter"
+        [panelStyle]="{ width: managementField.offsetWidth + 'px', maxWidth: 'calc(100vw - 2rem)' }"
         class="app-single-selection"
         [options]="managementOptions"
         [ngModel]="selectedManagementIds.length ? selectedManagementIds[0] : null"
@@ -66,9 +66,11 @@
       <label class="app-input-label" for="challenge-management-filter">{{ 'management' | translate }}</label>
     </span>
 
-    <span class="p-float-label" *ngIf="showGroupFilter">
+    <span #groupField class="p-float-label" *ngIf="showGroupFilter">
       <p-multiSelect
         inputId="challenge-group-filter"
+        [panelStyle]="{ width: groupField.offsetWidth + 'px', maxWidth: 'calc(100vw - 2rem)' }"
+        panelStyleClass="list-selection-dialog-multiselect-panel"
         class="app-multiple-selection"
         [options]="groupOptions"
         [ngModel]="selectedGroupIds"
@@ -81,13 +83,20 @@
         [baseZIndex]="10001"
         dropdownIcon="fas fa-caret-down"
         (onChange)="groupChanged($event.value)">
+        <ng-template let-option pTemplate="item">
+          <div class="list-selection-dialog-item" [pTooltip]="option.label">
+            <span>{{ option.label }}</span>
+          </div>
+        </ng-template>
       </p-multiSelect>
       <label class="app-input-label" for="challenge-group-filter">{{ groupFilterLabel }}</label>
     </span>
 
-    <span class="p-float-label" *ngIf="showSubgroupFilter">
+    <span #subgroupField class="p-float-label" *ngIf="showSubgroupFilter">
       <p-multiSelect
         inputId="challenge-subgroup-filter"
+        [panelStyle]="{ width: subgroupField.offsetWidth + 'px', maxWidth: 'calc(100vw - 2rem)' }"
+        panelStyleClass="list-selection-dialog-multiselect-panel"
         class="app-multiple-selection"
         [options]="subgroupOptions"
         [ngModel]="selectedSubgroupIds"
@@ -100,6 +109,11 @@
         [baseZIndex]="10001"
         dropdownIcon="fas fa-caret-down"
         (onChange)="subgroupChanged($event.value)">
+        <ng-template let-option pTemplate="item">
+          <div class="list-selection-dialog-item" [pTooltip]="option.label">
+            <span>{{ option.label }}</span>
+          </div>
+        </ng-template>
       </p-multiSelect>
       <label class="app-input-label" for="challenge-subgroup-filter">{{ subgroupFilterLabel }}</label>
     </span>
