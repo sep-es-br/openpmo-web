@@ -19,23 +19,11 @@
 
 ::ng-deep .possible-values-dialog {
   .p-dialog-header {
-    align-items: flex-start;
     border-bottom: 1px solid v.$borderLightGrey;
   }
 
-  .possible-values-dialog-title {
-    font-family: v.$fontFamilyBold;
-    color: v.$fontDark;
-  }
-
-  .possible-values-dialog-subtitle {
-    margin-top: .25rem;
-    font-size: .8rem;
-    color: v.$fontLabel;
-  }
-
-  .p-dialog-content {
-    padding: 1rem 1.5rem 1.25rem;
+  .p-dialog-footer {
+    border-top: 1px solid v.$borderLightGrey;
   }
 
   .possible-values-table {
@@ -54,6 +42,10 @@
       background: transparent;
       font-size: .7rem;
       color: v.$fontLabel;
+    }
+
+    .p-datatable-tbody > tr {
+      background: transparent;
     }
 
     .p-datatable-tbody > tr > td {
@@ -113,15 +105,4 @@
     }
   }
 
-  .p-dialog-footer {
-    display: flex;
-    align-items: center;
-    border-top: 1px solid v.$borderLightGrey;
-    font-size: .75rem;
-    color: v.$fontLabel;
-
-    .automatic-save-message {
-      margin-left: .35rem;
-    }
-  }
 }

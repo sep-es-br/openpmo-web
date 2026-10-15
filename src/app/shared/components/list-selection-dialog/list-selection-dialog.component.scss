@@ -32,7 +32,7 @@
     width: 100%;
   }
 
-  .list-selection-dialog-multiselect .p-multiselect-label {
+  .list-selection-dialog-multiselect .p-multiselect-label-container .p-multiselect-label {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
@@ -40,7 +40,7 @@
     padding: .4rem 0;
   }
 
-  .list-selection-dialog-multiselect .p-multiselect-token {
+  .list-selection-dialog-multiselect .p-multiselect-label-container .p-multiselect-label .p-multiselect-token {
     display: inline-flex;
     align-items: center;
     margin: 0 !important;
@@ -67,6 +67,11 @@
     padding: .75rem;
     font-size: .8rem;
     color: v.$fontLabel;
+  }
+
+  .list-selection-dialog-loading {
+    position: relative;
+    min-height: 150px;
   }
 
   .p-dialog-footer {

@@ -32,7 +32,7 @@
                   [pTooltip]="field.helpTooltip | translate"></i>
               </label>
             </div>
-            <app-input-message *ngIf="field.type !== 'textarea'"
+            <app-input-message
               [form]="form" [field]="field.controlName"></app-input-message>
           </div>
         </ng-container>

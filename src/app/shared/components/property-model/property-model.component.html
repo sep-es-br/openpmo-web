@@ -29,8 +29,9 @@
       <span class="p-float-label property-input p-field">
         <input class="app-input-text" type="text" pInputText [(ngModel)]="property.label"
           (ngModelChange)="changed.emit($event)"
-          [disabled]="property.viewOnly && !isFixedNameProperty()" />
-        <label class="input-label">{{ 'label' | translate }} *
+          [disabled]="(property.viewOnly && !isFixedNameProperty()) || property.active === false" />
+        <label class="input-label"
+          [class.p-disabled]="(property.viewOnly && !isFixedNameProperty()) || property.active === false">{{ 'label' | translate }} *
           <i class="far fa-question-circle" [pTooltip]="'help.propertyModel.label' | translate"></i>
         </label>
       </span>

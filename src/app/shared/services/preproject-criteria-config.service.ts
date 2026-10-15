@@ -16,24 +16,6 @@ export class PreprojectCriteriaConfigService {
 
   constructor(private readonly preprojectModelService: PreprojectModelService) {}
 
-  async getCriteria(idOffice: number): Promise<PreprojectCriterion[]> {
-    const response = await this.preprojectModelService.findOrCreateByOfficeId(idOffice);
-    if (response.success && response.data && response.data.properties) {
-      const criteriaSummaries = (response.data.properties as any[])
-        .filter(property => property.type === 'CriteriaTabModel');
-      const criteriaDetails = await Promise.all(criteriaSummaries.map(async summary => {
-        if (!summary.id) {
-          return summary;
-        }
-        const detailResponse = await this.preprojectModelService.findCriteriaTabById(summary.id);
-        return detailResponse.success && detailResponse.data ? detailResponse.data : summary;
-      }));
-      return this.normalizeCriteria(criteriaDetails)
-        .sort((first, second) => first.position - second.position || first.id - second.id);
-    }
-    return [];
-  }
-
   async getCriteriaByModelId(idPreprojectModel: number): Promise<PreprojectCriterion[]> {
     const response = await this.preprojectModelService.findById(idPreprojectModel);
     if (!response.success || !response.data) {
@@ -44,7 +26,7 @@ export class PreprojectCriteriaConfigService {
         property.type === 'CriteriaTabModel'
         && property.active !== false
       );
-    return this.normalizeCriteria(activeCriteriaTabs)
+    return this.mapCriteriaFromResponse(activeCriteriaTabs)
       .sort((first, second) => first.position - second.position || first.id - second.id);
   }
 
@@ -55,7 +37,7 @@ export class PreprojectCriteriaConfigService {
       const requestPayload = this.toBackendCriterion(criterion);
       const response = await this.preprojectModelService.createCriteriaTab(idModel, requestPayload);
       if (response.success && response.data) {
-        return this.normalizeCriteria([response.data as any])[0];
+        return this.mapCriteriaFromResponse([response.data as any])[0];
       }
     }
     throw new Error('Failed to create criterion');
@@ -71,7 +53,7 @@ export class PreprojectCriteriaConfigService {
   async getCriterion(criterionId: number): Promise<PreprojectCriterion | undefined> {
     const response = await this.preprojectModelService.findCriteriaTabById(criterionId);
     if (response.success && response.data) {
-      return this.normalizeCriteria([response.data as any])[0];
+      return this.mapCriteriaFromResponse([response.data as any])[0];
     }
     return undefined;
   }
@@ -83,7 +65,7 @@ export class PreprojectCriteriaConfigService {
     const requestPayload = this.toBackendCriterion({ ...criterion, id: criterionId } as PreprojectCriterion);
     const response = await this.preprojectModelService.updateCriteriaTab(criterionId, requestPayload);
     if (response.success && response.data) {
-      return this.normalizeCriteria([response.data as any])[0];
+      return this.mapCriteriaFromResponse([response.data as any])[0];
     }
     throw new Error('Failed to update criterion');
   }
@@ -170,7 +152,7 @@ export class PreprojectCriteriaConfigService {
     return p.type;
   }
 
-  normalizeCriteria(criteria: any[]): PreprojectCriterion[] {
+  mapCriteriaFromResponse(criteria: any[]): PreprojectCriterion[] {
     return (criteria || []).map((criterion: any, index: number) => {
       const sortByIndex = (first: any, second: any): number =>
         (first.sortIndex || 0) - (second.sortIndex || 0);

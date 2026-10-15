@@ -7,13 +7,17 @@
     [disabled]="disabled" (click)="open()"></button>
 </div>
 
-<p-dialog [(visible)]="displayModal" [modal]="true" [dismissableMask]="true" [closeOnEscape]="true"
-  (onHide)="commitValueChange()"
-  [style]="{ width: '620px' }" [baseZIndex]="10000" styleClass="possible-values-dialog">
-  <p-header>
-    <div class="possible-values-dialog-title">{{ 'possibleValues' | translate }}</div>
-    <div class="possible-values-dialog-subtitle">{{ 'possibleValuesDescription' | translate }}</div>
-  </p-header>
+<p-dialog [visible]="displayModal" (visibleChange)="!$event && cancel()"
+  [modal]="true" [dismissableMask]="false" [closeOnEscape]="true"
+  [style]="{ width: '620px', maxWidth: '90vw' }"
+  styleClass="p-confirm-dialog possible-values-dialog">
+  <ng-template pTemplate="header">
+    <div>
+      <span class="p-dialog-title">{{ 'possibleValues' | translate }}</span>
+      <small class="app-input-label p-d-block p-mt-2">{{ 'possibleValuesDescription' | translate }}</small>
+    </div>
+  </ng-template>
+  <div class="p-col-12 p-p-0">
 
   <p-table [value]="editableValues" styleClass="possible-values-table"
     (onRowReorder)="handleRowReorder()">
@@ -21,7 +25,7 @@
       <tr>
         <th class="reorder-column"></th>
         <th>{{ 'optionLabel' | translate | uppercase }}</th>
-        <th>{{ 'value' | translate | uppercase }}</th>
+        <th class="p-col-3">{{ 'value' | translate | uppercase }}</th>
         <th class="actions-column">{{ 'actions' | translate | uppercase }}</th>
       </tr>
     </ng-template>
@@ -33,15 +37,15 @@
         </td>
         <td>
           <input class="app-input-text" type="text" pInputText [(ngModel)]="option.label"
-            (blur)="commitValueChange()" />
+            [disabled]="disabled" [attr.aria-label]="'optionLabel' | translate" />
         </td>
         <td>
           <p-inputNumber inputStyleClass="app-input-text" [(ngModel)]="option.value"
-            (onBlur)="commitValueChange()"></p-inputNumber>
+            [disabled]="disabled" [ariaLabel]="'value' | translate"></p-inputNumber>
         </td>
         <td class="actions-column">
           <button type="button" class="delete-value-button" [attr.aria-label]="'delete' | translate"
-            (click)="removeValue(index)">
+            [disabled]="disabled" (click)="removeValue(index)">
             <i class="fas fa-trash-alt"></i>
           </button>
         </td>
@@ -49,13 +53,17 @@
     </ng-template>
   </p-table>
 
-  <button type="button" class="add-value-link" (click)="addValue()">
+  <button type="button" class="add-value-link" [disabled]="disabled" (click)="addValue()">
     <i class="fa fa-plus"></i>
     {{ 'addValue' | translate }}
   </button>
 
-  <p-footer>
-    <span>{{ editableValues.length }} {{ 'values' | translate }}</span>
-    <span class="automatic-save-message">{{ 'changesSavedAutomatically' | translate }}</span>
-  </p-footer>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <button type="button" pButton class="p-mt-3" icon="fas fa-times"
+      [label]="'cancel' | translate" (click)="cancel()"></button>
+    <button type="button" pButton class="p-mt-3" icon="fas fa-check" [label]="'save' | translate"
+      [disabled]="disabled" (click)="save()"></button>
+  </ng-template>
 </p-dialog>

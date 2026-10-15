@@ -108,6 +108,9 @@ export class CardItemComponent implements OnInit {
   }
 
   handleNewItemClick(): void {
+    if (this.properties.disabled) {
+      return;
+    }
     if (this.properties.onClick) {
       this.properties.onClick();
       return;

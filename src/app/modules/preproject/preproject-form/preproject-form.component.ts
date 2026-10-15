@@ -247,7 +247,7 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
   }
 
   async save(): Promise<void> {
-    if (this.isReadOnly) {
+    if (this.isReadOnly || this.formIsSaving || this.isProjectCreationLoading) {
       return;
     }
     if (this.selectedTab?.key === 'properties') {

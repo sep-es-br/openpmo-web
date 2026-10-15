@@ -14,31 +14,7 @@
   width: 100%;
 }
 
-.property-list-card {
-  min-height: 0;
-}
-
 :host ::ng-deep {
-  .property-list-dataview:not(.list-mode) .p-dataview-content > .p-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, 260px);
-    gap: 1rem;
-    justify-content: start;
-    margin: 0 !important;
-  }
-
-  .property-list-dataview:not(.list-mode) .property-list-card,
-  .property-list-dataview:not(.list-mode) .app-card-item,
-  .property-list-dataview:not(.list-mode) .new-carditem {
-    width: 260px;
-  }
-
-  .property-list-dataview.list-mode .property-list-card,
-  .property-list-dataview.list-mode .app-card-item,
-  .property-list-dataview.list-mode .new-carditem {
-    width: 100%;
-  }
-
   .property-list-dataview:not(.list-mode) .app-card-item.listItem .card-item-name {
     display: -webkit-box !important;
     max-height: 2.3rem;
@@ -58,12 +34,6 @@
 }
 
 :host(.challenge-list-selection) ::ng-deep {
-  .property-list-dataview:not(.list-mode) .app-card-item.listItem .p-card,
-  .property-list-dataview:not(.list-mode) .new-carditem .p-card {
-    height: 174px;
-    min-height: 174px;
-  }
-
   .property-list-dataview:not(.list-mode) .app-card-item.listItem .card-item-content {
     justify-content: center;
     gap: .35rem;
@@ -89,26 +59,10 @@
   }
 }
 
-@media screen and (max-width: 768px) {
-  :host ::ng-deep {
-    .property-list-dataview:not(.list-mode) .p-dataview-content > .p-grid {
-      grid-template-columns: minmax(0, 1fr);
-    }
-
-    .property-list-dataview:not(.list-mode) .property-list-card,
-    .property-list-dataview:not(.list-mode) .app-card-item,
-    .property-list-dataview:not(.list-mode) .new-carditem,
-    .property-list-dataview:not(.list-mode) .new-carditem .p-card {
-      max-width: none;
-      width: 100%;
-    }
-  }
-}
-
 
 .challenge-list-filters {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 1rem;
   padding-top: .75rem;
 
