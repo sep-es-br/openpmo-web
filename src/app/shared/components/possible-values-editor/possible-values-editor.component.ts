@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { ConfirmationService } from 'primeng/api';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 
 import { IPossibleValueOption } from '../../interfaces/IPossibleValueOption';
 
@@ -19,6 +20,21 @@ export class PossibleValuesEditorComponent implements OnChanges {
   editableValues: IPossibleValueOption[] = [];
   private initialValues: IPossibleValueOption[] = [];
   private confirmationPending = false;
+  private valueForms = new WeakMap<IPossibleValueOption, FormGroup>();
+
+  getValueForm(option: IPossibleValueOption): FormGroup {
+    let form = this.valueForms.get(option);
+    if (!form) {
+      form = new FormGroup({ value: new FormControl(option.value, Validators.required) });
+      form.get('value').valueChanges.subscribe(value => option.value = value);
+      this.valueForms.set(option, form);
+    }
+    return form;
+  }
+
+  get numericLocale(): string {
+    return this.translateService.currentLang || 'pt-BR';
+  }
 
   constructor(
     private readonly confirmationService: ConfirmationService,
@@ -50,6 +66,11 @@ export class PossibleValuesEditorComponent implements OnChanges {
 
   save(): void {
     if (this.disabled) {
+      return;
+    }
+    const forms = this.editableValues.map(option => this.getValueForm(option));
+    if (forms.some(form => form.invalid)) {
+      forms.forEach(form => form.markAllAsTouched());
       return;
     }
     this.values = this.cloneValues(this.editableValues);

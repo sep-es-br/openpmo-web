@@ -72,6 +72,10 @@
   .list-selection-dialog-loading {
     position: relative;
     min-height: 150px;
+
+    .app-card-loading {
+      background: transparent;
+    }
   }
 
   .p-dialog-footer {

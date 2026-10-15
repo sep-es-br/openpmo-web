@@ -45,7 +45,8 @@
       </span>
       <span class="p-float-label property-input p-field input-number-scroll" *ngIf="showWeight && supportsWeight(property.type)">
         <p-inputNumber inputStyleClass="app-input-text" [(ngModel)]="property.weight" [showButtons]="true"
-          [min]="1" [step]="1" [required]="true" (ngModelChange)="changed.emit($event)"
+          mode="decimal" [locale]="language || 'pt-BR'"
+          [min]="1" [step]="0.01" [minFractionDigits]="2" [maxFractionDigits]="2" [required]="true" (ngModelChange)="changed.emit($event)"
           [disabled]="property.viewOnly">
         </p-inputNumber>
         <label class="input-label">{{ 'weight' | translate }} *

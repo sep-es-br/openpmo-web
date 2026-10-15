@@ -39,9 +39,13 @@
           <input class="app-input-text" type="text" pInputText [(ngModel)]="option.label"
             [disabled]="disabled" [attr.aria-label]="'optionLabel' | translate" />
         </td>
-        <td>
-          <p-inputNumber inputStyleClass="app-input-text" [(ngModel)]="option.value"
+        <td [formGroup]="getValueForm(option)">
+          <p-inputNumber inputStyleClass="app-input-text" formControlName="value"
+            [required]="true"
+            [minFractionDigits]="2" [maxFractionDigits]="2" [step]="0.01"
+            mode="decimal" [locale]="numericLocale"
             [disabled]="disabled" [ariaLabel]="'value' | translate"></p-inputNumber>
+          <app-input-message [form]="getValueForm(option)" field="value"></app-input-message>
         </td>
         <td class="actions-column">
           <button type="button" class="delete-value-button" [attr.aria-label]="'delete' | translate"

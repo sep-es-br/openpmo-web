@@ -109,6 +109,10 @@ export class PreprojectCriterionFormComponent implements OnInit, OnDestroy {
 
   private readonly destroy$: Subject<void> = new Subject<void>();
 
+  get numericLocale(): string {
+    return this.translateService.currentLang || 'pt-BR';
+  }
+
   constructor(
     private readonly activeRoute: ActivatedRoute,
     private readonly breadcrumbService: BreadcrumbService,

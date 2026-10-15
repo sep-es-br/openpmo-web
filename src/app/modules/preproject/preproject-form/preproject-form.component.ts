@@ -99,6 +99,12 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
   selectedParentWorkpacks: TreeNode[] = [];
   criteriaGuides: PreprojectCriterion[] = [];
   evaluation: IPreprojectEvaluation | null = null;
+  readonly collapsedEvaluationCriteria = new Set<object>();
+  readonly expandedEvaluationGroups = new Set<object>();
+
+  toggleEvaluationRow(rows: Set<object>, row: object): void {
+    rows.has(row) ? rows.delete(row) : rows.add(row);
+  }
   tabs: ITabViewScrolled[] = [{ key: 'properties', menu: 'properties' }];
   selectedTab: ITabViewScrolled = this.tabs[0];
   tabsVersion = 1;
@@ -424,8 +430,10 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
     if (this.isReadOnly) {
       return;
     }
+    this.deliveryForms.markAsDirty();
     this.deliveryForms.removeAt(index);
     this.refreshDeliveryCardItems();
+    this.refreshActionButtons();
   }
 
   addDelivery(): void {
@@ -599,6 +607,8 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
         throw new Error(response.message || 'Evaluation not found');
       }
       this.evaluation = this.mergeEvaluationWithConfiguredLists(response.data);
+      this.collapsedEvaluationCriteria.clear();
+      this.expandedEvaluationGroups.clear();
     } catch (error) {
       this.evaluation = null;
       this.showError(error, 'Não foi possível carregar a avaliação.');
