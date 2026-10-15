@@ -1,3 +1,4 @@
+import { hasPropertyWeight } from '../utils/property-weight.util';
 import { Injectable } from '@angular/core';
 import {
   CriteriaGroupModel,
@@ -103,7 +104,7 @@ export class PreprojectCriteriaConfigService {
         requiredFields, list, extraList, extraListDefaults, selectedLocalities,
         showIconButtonSelectLocality, isCollapsed, viewOnly, obligatory,
         disableMultipleSelection, sectorsList, possibleValuesOptions,
-        possibleValuesDetails, propertyModelType, ...property
+        possibleValuesDetails, propertyModelType, weight, ...property
       } = p;
       const backendType: string = mapTypeToBackend(p.type);
       return {
@@ -111,7 +112,7 @@ export class PreprojectCriteriaConfigService {
         type: backendType,
         sortIndex: p.sortIndex || p.position || 1,
         label: p.label || p.name,
-        weight: p.weight ?? 1,
+        ...(hasPropertyWeight(p.type) ? { weight: weight ?? 1 } : {}),
         ...(p.type === 'SelectionModel' ? {
           possibleValues: (possibleValuesOptions || []).join(','),
           defaultValue: Array.isArray(p.defaultValue) ? p.defaultValue.join(',') : p.defaultValue,

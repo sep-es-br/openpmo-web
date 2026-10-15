@@ -42,7 +42,7 @@
           <i class="far fa-question-circle" [pTooltip]="'help.propertyModel.sortIndex' | translate"></i>
         </label>
       </span>
-      <span class="p-float-label property-input p-field input-number-scroll" *ngIf="showWeight">
+      <span class="p-float-label property-input p-field input-number-scroll" *ngIf="showWeight && supportsWeight(property.type)">
         <p-inputNumber inputStyleClass="app-input-text" [(ngModel)]="property.weight" [showButtons]="true"
           [min]="1" [step]="1" [required]="true" (ngModelChange)="changed.emit($event)"
           [disabled]="property.viewOnly">

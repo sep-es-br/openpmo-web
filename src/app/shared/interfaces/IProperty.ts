@@ -1,4 +1,5 @@
 import { TreeNode } from 'primeng/api';
+import { IPropertyListItem, PropertyListCatalog } from './IPropertyListItem';
 
 export interface IProperty {
   id?: number;
@@ -26,6 +27,9 @@ export interface IProperty {
   value?: string | number | boolean | string[] | Date | number[];
   selectedValues?: number[] | number;
   selectedValue?: number;
+  listCatalog?: PropertyListCatalog;
+  selectedListItems?: IPropertyListItem[];
+  availableListItems?: IPropertyListItem[];
   invalid?: boolean;
   message?: string;
   collapsed?: boolean;

@@ -9,10 +9,10 @@ import { PropertyTemplateModel } from 'src/app/shared/models/PropertyTemplateMod
 })
 export class PropertyComponent {
 
+  @Input() displayMode: string = 'grid';
   @Input() property: PropertyTemplateModel;
   @Output() changed = new EventEmitter();
 
   types = TypePropertyModelEnum;
 
 }
-

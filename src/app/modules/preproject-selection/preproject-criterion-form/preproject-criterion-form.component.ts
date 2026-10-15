@@ -17,6 +17,7 @@ import { IOffice } from 'src/app/shared/interfaces/IOffice';
 import { IWorkpackModelProperty } from 'src/app/shared/interfaces/IWorkpackModelProperty';
 import { IconPropertyWorkpackModelEnum } from 'src/app/shared/enums/IconPropertyWorkpackModelEnum';
 import { TypePropertModelEnum } from 'src/app/shared/enums/TypePropertModelEnum';
+import { hasPropertyWeight } from 'src/app/shared/utils/property-weight.util';
 import { TypeOrganization } from 'src/app/shared/enums/TypeOrganization';
 import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
 import { CancelButtonComponent } from 'src/app/shared/components/cancel-button/cancel-button.component';
@@ -65,6 +66,8 @@ export class PreprojectCriterionFormComponent implements OnInit, OnDestroy {
   };
 
   readonly operationOptions: SelectItem[] = [];
+
+  readonly propertySupportsWeight = hasPropertyWeight;
 
   form: FormGroup;
 
@@ -147,6 +150,7 @@ export class PreprojectCriterionFormComponent implements OnInit, OnDestroy {
     await this.loadPluginAvailability();
     this.loadTranslatedOptions();
     await this.loadCriterionForEditing();
+    this.configDataViewService.nextCollapsePanelsStatus('expand');
     this.setBreadcrumb();
 
     this.translateService.onLangChange
@@ -509,7 +513,7 @@ export class PreprojectCriterionFormComponent implements OnInit, OnDestroy {
       disableMultipleSelection: false,
       possibleValuesOptions: type === TypePropertModelEnum.SelectionModel ? [] : undefined,
       possibleValuesDetails: type === TypePropertModelEnum.CriteriaSelectionModel ? [] : undefined,
-      weight: 1,
+      weight: hasPropertyWeight(type) ? 1 : undefined,
       itemValue: ([TypePropertModelEnum.ChallengeListModel, TypePropertModelEnum.SdgListModel] as string[])
         .includes(type) ? 1 : undefined,
       defaultValue: type === TypePropertModelEnum.SelectionModel
@@ -537,7 +541,10 @@ export class PreprojectCriterionFormComponent implements OnInit, OnDestroy {
    * replicando a lógica do checkProperty() do workpack-model.
    */
   private async checkProperty(property: IWorkpackModelProperty): Promise<void> {
-    let requiredFields: string[] = ['name', 'label', 'sortIndex', 'weight'];
+    let requiredFields: string[] = ['name', 'label', 'sortIndex'];
+    if (hasPropertyWeight(property.type)) {
+      requiredFields.push('weight');
+    }
     let list: SelectItem[] = [];
 
     switch (property.type) {
@@ -784,4 +791,3 @@ export class PreprojectCriterionFormComponent implements OnInit, OnDestroy {
   }
 
 }
-

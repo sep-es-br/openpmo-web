@@ -43,7 +43,7 @@ import { SearchItemCardComponent } from './search-item-card/search-item-card.com
 import { CardSharingIndicatorsComponent } from './card-sharing-indicators/card-sharing-indicators.component';
 import { EditableCardItemComponent } from './editable-card-item/editable-card-item.component';
 import { PossibleValuesEditorComponent } from './possible-values-editor/possible-values-editor.component';
-import { PropertyListSelectionComponent } from './property-list-selection/property-list-selection.component';
+import { PropertyListSelectionComponent } from './properties/type-property/property-list-selection/property-list-selection.component';
 import { ListSelectionDialogComponent } from './list-selection-dialog/list-selection-dialog.component';
 
 @NgModule({
