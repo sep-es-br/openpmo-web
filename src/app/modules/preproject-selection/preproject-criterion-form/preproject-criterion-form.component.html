@@ -83,10 +83,13 @@
         <span class="p-float-label">
           <p-inputNumber
             inputId="criterion-weight"
+            mode="decimal" [locale]="numericLocale"
             class="app-input-number"
             formControlName="weight"
             [min]="1"
-            [step]="1"
+            [step]="0.01"
+            [minFractionDigits]="2"
+            [maxFractionDigits]="2"
           ></p-inputNumber>
           <label class="app-input-label" for="criterion-weight">
             {{ 'weight' | translate }} *
@@ -200,10 +203,13 @@
         <span class="p-float-label">
           <p-inputNumber
             [inputId]="'criterion-group-weight-' + groupIndex"
+            mode="decimal" [locale]="numericLocale"
             class="app-input-number"
             formControlName="weight"
             [min]="1"
-            [step]="1"
+            [step]="0.01"
+            [minFractionDigits]="2"
+            [maxFractionDigits]="2"
           ></p-inputNumber>
           <label class="app-input-label" [for]="'criterion-group-weight-' + groupIndex">
             {{ 'weight' | translate }} *
