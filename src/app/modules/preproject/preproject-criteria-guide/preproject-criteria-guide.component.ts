@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 
 import { PreprojectCriterion, PreprojectCriterionGroup } from 'src/app/shared/services/preproject-criteria-config.service';
 
@@ -7,19 +7,24 @@ import { PreprojectCriterion, PreprojectCriterionGroup } from 'src/app/shared/se
   templateUrl: './preproject-criteria-guide.component.html',
   styleUrls: ['./preproject-criteria-guide.component.scss']
 })
-export class PreprojectCriteriaGuideComponent {
+export class PreprojectCriteriaGuideComponent implements OnChanges {
   @Input() guide: PreprojectCriterion;
   @Input() displayMode: string = 'grid';
   @Input() readOnly: boolean = false;
 
   @Output() changed: EventEmitter<void> = new EventEmitter<void>();
 
-  get directPropertiesGroup(): PreprojectCriterionGroup | undefined {
-    if (!this.guide?.properties?.length) {
-      return undefined;
+  directPropertiesGroup: PreprojectCriterionGroup | undefined;
+  groups: PreprojectCriterionGroup[] = [];
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (!changes.guide) {
+      return;
     }
 
-    return {
+    // This wrapper only reuses the group renderer for root properties; it is
+    // not a configured group. Keep its identity stable between view checks.
+    this.directPropertiesGroup = this.guide?.properties?.length ? {
       propertyModelType: 'CriteriaGroupModel',
       title: '',
       sortIndex: 0,
@@ -29,11 +34,8 @@ export class PreprojectCriteriaGuideComponent {
       disabledValue: '',
       legend: '',
       properties: this.guide.properties
-    };
-  }
-
-  get groups(): PreprojectCriterionGroup[] {
-    return [...(this.guide?.groups || [])]
+    } : undefined;
+    this.groups = [...(this.guide?.groups || [])]
       .sort((first, second) => first.sortIndex - second.sortIndex);
   }
 }

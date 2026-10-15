@@ -7,7 +7,8 @@ import { Calendar } from 'primeng/calendar';
 import { IconPropertyWorkpackModelEnum } from 'src/app/shared/enums/IconPropertyWorkpackModelEnum';
 import { IWorkpackModelProperty } from 'src/app/shared/interfaces/IWorkpackModelProperty';
 import { ResponsiveService } from 'src/app/shared/services/responsive.service';
-import { TypePropertModelEnum as TypePropertyModelEnum}  from 'src/app/shared/enums/TypePropertModelEnum';
+import { TypePropertModelEnum as TypePropertyModelEnum } from 'src/app/shared/enums/TypePropertModelEnum';
+import { hasPropertyWeight } from 'src/app/shared/utils/property-weight.util';
 import * as moment from 'moment';
 import { SelectItem, TreeNode } from 'primeng/api';
 import { TypeOrganization } from '../../enums/TypeOrganization';
@@ -27,6 +28,7 @@ export class PropertyModelComponent implements OnDestroy, OnChanges, AfterViewIn
   @Input() showWeight = false;
   @Output() delete = new EventEmitter();
   @Output() changed = new EventEmitter();
+  supportsWeight = hasPropertyWeight;
   IconsEnum = IconPropertyWorkpackModelEnum;
   responsive = false;
   $destroy = new Subject();
@@ -273,4 +275,3 @@ loadSectorOptions() {
     return node.key?.includes('SELECTALL');
   }
 }
-

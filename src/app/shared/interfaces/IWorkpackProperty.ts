@@ -1,3 +1,5 @@
+import { IPropertyListValueItem } from './IPropertyListItem';
+
 export interface IWorkpackProperty {
   id?: number;
   type: string;
@@ -8,6 +10,7 @@ export interface IWorkpackProperty {
   selectedValues?: number[];
   selectedValuesDetails?: {id: number; name: string; fullName: string}[];
   selectedValue?: number;
+  items?: IPropertyListValueItem[];
   reason?: string;
   groupedProperties?: IWorkpackProperty[];
 }

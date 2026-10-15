@@ -1,3 +1,5 @@
+import { PropertyTemplateModel } from 'src/app/shared/models/PropertyTemplateModel';
+import { TypePropertyModelEnum } from 'src/app/shared/enums/TypePropertyModelEnum';
 import { Location } from '@angular/common';
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -966,12 +968,12 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
       }
 
       if (value.type === 'CriteriaList') {
-        const items = (property.selectedListItems || []).map((item, index) => ({
-          foreignKey: (item as CriteriaListDisplayItem).foreignKey
-            || `criteria-${property.id}-${index + 1}`,
-          label: item.name,
-          fullName: item.fullName
-        }));
+        const listProperty = Object.assign(new PropertyTemplateModel(), {
+          type: TypePropertyModelEnum.ListModel,
+          idPropertyModel: property.id,
+          selectedListItems: property.selectedListItems || []
+        });
+        const { items } = listProperty.getValues();
         return { ...value, items } as IPreprojectCriteriaListValue;
       }
 

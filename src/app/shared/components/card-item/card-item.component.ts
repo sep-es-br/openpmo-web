@@ -123,4 +123,10 @@ export class CardItemComponent implements OnInit {
       this.navigateToPage(this.properties.urlCard, this.properties.paramsUrlCard);
     }
   }
+
+  toggleRoles(event: Event): void {
+  event.stopPropagation();
+  event.preventDefault();
+  this.showAllRoles = !this.showAllRoles;
+}
 }
