@@ -158,9 +158,11 @@
                 </i>
                 <p-slideMenu
                   #menuIconWorkpack
+                  [style]="{ width: menuIconWorkpack.menuWidth + 'px' }"
+                  [styleClass]="menuIconWorkpack.left ? 'workpack-create-menu' : 'workpack-create-menu workpack-create-menu-root'"
                   [showTransitionOptions]="'0ms'"
                   [hideTransitionOptions]="'0ms'"
-                  [backLabel]="'back'|translate"
+                  [backLabel]="'back' | translate"
                   [model]="properties.createNewElementMenuItemsWorkpack"
                   [popup]="true"
                 >

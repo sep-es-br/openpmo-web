@@ -1,5 +1,16 @@
 @use "src/variables" as v;
 
+// Keep the first level compact; nested levels retain SlideMenu's scrolling viewport.
+::ng-deep .workpack-create-menu.workpack-create-menu-root {
+  .p-slidemenu-content {
+    height: auto !important;
+  }
+
+  .p-slidemenu-rootlist {
+    position: relative;
+  }
+}
+
 ::ng-deep .app-card {
   background-color: v.$bgCard;
   width: 100%;
