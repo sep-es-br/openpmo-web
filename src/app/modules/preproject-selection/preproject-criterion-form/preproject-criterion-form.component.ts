@@ -88,6 +88,8 @@ export class PreprojectCriterionFormComponent implements OnInit, OnDestroy {
 
   criterionId: number | null = null;
 
+  private criterionActive = true;
+
   office: IOffice;
 
   isLoading: boolean = false;
@@ -224,6 +226,7 @@ export class PreprojectCriterionFormComponent implements OnInit, OnDestroy {
     const formValue = this.form.getRawValue();
     return {
       ...formValue,
+      active: this.criterionActive,
       properties: this.rootProperties.length
         ? [...this.rootProperties]
         : [...(formValue.properties || [])],
@@ -395,6 +398,8 @@ export class PreprojectCriterionFormComponent implements OnInit, OnDestroy {
     if (!criterion) {
       return;
     }
+
+    this.criterionActive = criterion.active !== false;
 
     this.form.patchValue({
       name: criterion.name,

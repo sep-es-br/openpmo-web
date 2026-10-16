@@ -1,7 +1,37 @@
 import { PreprojectCriteriaConfigService } from './preproject-criteria-config.service';
 import { PreprojectModelService } from './preproject-model.service';
 
-describe('Preproject criterion property weights', () => {
+describe('Preproject criteria configuration', () => {
+  it('shows inactive guides only for pre-projects already linked to them', async () => {
+    const modelService = jasmine.createSpyObj('PreprojectModelService', ['findById']);
+    modelService.findById.and.returnValue(Promise.resolve({
+      success: true,
+      data: { properties: [
+        { id: 1, type: 'CriteriaTabModel', name: 'Ativa', active: true },
+        { id: 2, type: 'CriteriaTabModel', name: 'Inativa', active: false }
+      ] }
+    }));
+    const service = new PreprojectCriteriaConfigService(modelService as PreprojectModelService);
+
+    expect((await service.getCriteriaByModelId(10)).map(guide => guide.id)).toEqual([1]);
+    expect((await service.getCriteriaByModelId(10, [2])).map(guide => guide.id)).toEqual([1, 2]);
+  });
+
+  it('keeps a guide inactive when its properties are edited', async () => {
+    const modelService = jasmine.createSpyObj('PreprojectModelService', ['updateCriteriaTab']);
+    modelService.updateCriteriaTab.and.callFake((_id, payload) => Promise.resolve({
+      success: true,
+      data: { ...payload, id: 2 }
+    }));
+    const service = new PreprojectCriteriaConfigService(modelService as PreprojectModelService);
+
+    await service.updateCriterion(2, {
+      name: 'Inativa', active: false, position: 1, icon: 'fas fa-cog',
+      weight: 1, operation: 'SUM', properties: [], groups: []
+    });
+
+    expect(modelService.updateCriteriaTab.calls.mostRecent().args[1].active).toBeFalse();
+  });
   it('preserves false for multiple selection when saving and reloading root and grouped properties', async () => {
     const modelService = jasmine.createSpyObj('PreprojectModelService', ['updateCriteriaTab', 'findCriteriaTabById']);
     let saved: any;

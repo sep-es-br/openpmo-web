@@ -41,6 +41,13 @@ export class PreprojectService extends BaseService<IPreproject> {
       .toPromise();
   }
 
+  deletePreproject(id: number, idProject?: number): Promise<void> {
+    return this.http.delete<void>(`${this.urlBase}/${id}`, {
+      ...this.requestOptions,
+      ...(idProject ? { params: { idProject: idProject.toString() } } : {})
+    }).toPromise();
+  }
+
   findCriteriaTabValues(
     idPreproject: number,
     idCriteriaTabModel: number
@@ -50,6 +57,12 @@ export class PreprojectService extends BaseService<IPreproject> {
         `${this.urlBase}/${idPreproject}/criteria-tabs/${idCriteriaTabModel}/values`,
         this.requestOptions
       )
+      .toPromise();
+  }
+
+  findLinkedCriteriaTabModelIds(idPreproject: number): Promise<IHttpResult<number[]>> {
+    return this.http
+      .get<IHttpResult<number[]>>(`${this.urlBase}/${idPreproject}/criteria-tabs/linked`, this.requestOptions)
       .toPromise();
   }
 

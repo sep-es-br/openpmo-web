@@ -16,15 +16,19 @@ export class PreprojectCriteriaConfigService {
 
   constructor(private readonly preprojectModelService: PreprojectModelService) {}
 
-  async getCriteriaByModelId(idPreprojectModel: number): Promise<PreprojectCriterion[]> {
+  async getCriteriaByModelId(
+    idPreprojectModel: number,
+    linkedCriterionIds: number[] = []
+  ): Promise<PreprojectCriterion[]> {
     const response = await this.preprojectModelService.findById(idPreprojectModel);
     if (!response.success || !response.data) {
       return [];
     }
+    const linkedIds = new Set(linkedCriterionIds);
     const activeCriteriaTabs = ((response.data.properties || []) as any[])
       .filter(property =>
         property.type === 'CriteriaTabModel'
-        && property.active !== false
+        && (property.active !== false || linkedIds.has(property.id))
       );
     return this.mapCriteriaFromResponse(activeCriteriaTabs)
       .sort((first, second) => first.position - second.position || first.id - second.id);
@@ -47,6 +51,18 @@ export class PreprojectCriteriaConfigService {
     const response = await this.preprojectModelService.deleteCriteriaTab(criterionId);
     if (!response.success) {
       throw new Error('Failed to delete criterion');
+    }
+  }
+
+  async canDeleteCriterion(criterionId: number): Promise<boolean> {
+    const response = await this.preprojectModelService.canDeleteCriteriaTab(criterionId);
+    return response.success && response.data === true;
+  }
+
+  async setCriterionActive(criterionId: number, active: boolean): Promise<void> {
+    const response = await this.preprojectModelService.setCriteriaTabActive(criterionId, active);
+    if (!response.success) {
+      throw new Error('Failed to update criterion status');
     }
   }
 
@@ -134,7 +150,7 @@ export class PreprojectCriteriaConfigService {
     return {
       ...criterionData,
       type: 'CriteriaTabModel',
-      active: true,
+      active: criterion.active !== false,
       name: criterion.name,
       label: criterion.name,
       sortIndex: criterion.position || 1,

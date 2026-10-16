@@ -3,7 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { TranslateService } from '@ngx-translate/core';
-import { MenuItem, SelectItem } from 'primeng/api';
+import { ConfirmationService, MenuItem, MessageService, SelectItem } from 'primeng/api';
 
 import { BreadcrumbService } from 'src/app/shared/services/breadcrumb.service';
 import { MenuService } from 'src/app/shared/services/menu.service';
@@ -22,6 +22,7 @@ import { IPreprojectListItem, PreprojectStatus } from 'src/app/shared/interfaces
 import { IPlan } from 'src/app/shared/interfaces/IPlan';
 import { OrganizationService } from 'src/app/shared/services/organization.service';
 import { PlanService } from 'src/app/shared/services/plan.service';
+import { SetConfigWorkpackService } from 'src/app/shared/services/set-config-workpack.service';
 
 @Component({
   selector: 'app-preproject',
@@ -70,7 +71,10 @@ export class PreprojectComponent implements OnInit, OnDestroy, AfterViewInit {
     private router: Router,
     private preprojectService: PreprojectService,
     private organizationService: OrganizationService,
-    private planService: PlanService
+    private planService: PlanService,
+    private setConfigWorkpackService: SetConfigWorkpackService,
+    private confirmationService: ConfirmationService,
+    private messageService: MessageService
   ) {}
 
   ngOnInit(): void {
@@ -120,6 +124,46 @@ export class PreprojectComponent implements OnInit, OnDestroy, AfterViewInit {
       queryParams: {
         ...(idOffice ? { idOffice } : {}),
         idPreproject: preproject.id
+      }
+    });
+  }
+
+  async handleChangeControlBoard(preproject: IPreprojectListItem): Promise<void> {
+    if (!preproject.idPlan || !preproject.idWorkpack) {
+      return;
+    }
+    await this.setConfigWorkpackService.setWorkpackConfig(preproject.idPlan, preproject.idWorkpack);
+    void this.router.navigate(['/workpack/change-control-board'], {
+      queryParams: {
+        idProject: preproject.idWorkpack,
+        idOffice: this.route.snapshot.queryParamMap.get('idOffice')
+      }
+    });
+  }
+
+  handleDeletePreproject(preproject: IPreprojectListItem, status: PreprojectStatus): void {
+    const target = status === 'Estruturação'
+      ? this.translateService.instant('project')
+      : this.translateService.instant('preproject');
+    this.confirmationService.confirm({
+      key: 'deleteConfirm',
+      message: `${this.translateService.instant('messages.deleteConfirmation')} ${target} ${preproject.name}?`,
+      acceptLabel: this.translateService.instant('yes'),
+      rejectLabel: this.translateService.instant('no'),
+      accept: async() => {
+        await this.preprojectService.deletePreproject(
+          preproject.id,
+          status === 'Estruturação' ? preproject.idWorkpack : undefined
+        );
+        this.messageService.add({
+          severity: 'success',
+          summary: this.translateService.instant('success'),
+          detail: this.translateService.instant('messages.deleteSuccessful')
+        });
+        if (status === 'Estruturação' && this.selectedStatus === 'Estruturação') {
+          this.selectedStatus = 'Elaboração';
+        }
+        await this.loadPreprojects();
       }
     });
   }
@@ -222,10 +266,15 @@ export class PreprojectComponent implements OnInit, OnDestroy, AfterViewInit {
         icon: 'fas fa-pencil-alt',
         command: () => this.handleEditPreproject(preproject)
       }] : []),
+      ...(status === 'Estruturação' && preproject.idWorkpack && preproject.idPlan ? [{
+        label: this.translateService.instant('changeControlBoard'),
+        icon: 'app-icon ccb-member',
+        command: () => void this.handleChangeControlBoard(preproject)
+      }] : []),
       {
-        label: this.translateService.instant('delete'),
+        label: this.translateService.instant(status === 'Estruturação' ? 'deletePreprojectProject' : 'delete'),
         icon: 'fas fa-trash-alt',
-        command: () => undefined
+        command: () => this.handleDeletePreproject(preproject, status)
       }
     ];
 
