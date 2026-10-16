@@ -53,6 +53,12 @@ export class PreprojectService extends BaseService<IPreproject> {
       .toPromise();
   }
 
+  findLinkedCriteriaTabModelIds(idPreproject: number): Promise<IHttpResult<number[]>> {
+    return this.http
+      .get<IHttpResult<number[]>>(`${this.urlBase}/${idPreproject}/criteria-tabs/linked`, this.requestOptions)
+      .toPromise();
+  }
+
   saveCriteriaTabValues(
     idPreproject: number,
     idCriteriaTabModel: number,

@@ -67,4 +67,16 @@ export class PreprojectModelService extends BaseService<IPreprojectModelConfigur
       .delete<IHttpResult<void>>(`${this.urlBase}/criteria-tabs/${id}`, this.requestOptions)
       .toPromise();
   }
+
+  canDeleteCriteriaTab(id: number): Promise<IHttpResult<boolean>> {
+    return this.http
+      .get<IHttpResult<boolean>>(`${this.urlBase}/criteria-tabs/${id}/deletable`, this.requestOptions)
+      .toPromise();
+  }
+
+  setCriteriaTabActive(id: number, active: boolean): Promise<IHttpResult<any>> {
+    return this.http
+      .put<IHttpResult<any>>(`${this.urlBase}/criteria-tabs/${id}/active`, { active }, this.requestOptions)
+      .toPromise();
+  }
 }

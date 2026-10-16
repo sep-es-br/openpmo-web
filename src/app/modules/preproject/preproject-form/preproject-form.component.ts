@@ -526,7 +526,14 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
     }
 
     this.applyPreproject(response.data);
-    await this.loadModelCriteria(response.data.idPreProjectModel);
+    const linkedResponse = await this.preprojectService.findLinkedCriteriaTabModelIds(this.idPreproject);
+    if (!linkedResponse.success) {
+      throw new Error(linkedResponse.message || 'Linked criteria tabs not found');
+    }
+    await this.loadModelCriteria(
+      response.data.idPreProjectModel,
+      linkedResponse.data || []
+    );
   }
 
   private applyPreproject(preproject: IPreproject): void {
@@ -548,11 +555,14 @@ export class PreprojectFormComponent implements OnInit, OnDestroy {
     this.syncPendingChanges();
   }
 
-  private async loadModelCriteria(idPreProjectModel: number): Promise<void> {
+  private async loadModelCriteria(
+    idPreProjectModel: number,
+    linkedCriterionIds: number[] = []
+  ): Promise<void> {
     this.isModelLoading = true;
     try {
       this.criteriaGuides = await this.preprojectCriteriaConfigService
-        .getCriteriaByModelId(idPreProjectModel);
+        .getCriteriaByModelId(idPreProjectModel, linkedCriterionIds);
       this.tabs = [
         { key: 'properties', menu: 'properties' },
         ...this.criteriaGuides.map(criterion => ({

@@ -58,6 +58,12 @@ export class PreprojectSelectionComponent implements OnInit, OnDestroy {
 
   criteriaCardItems: ICardItem[] = [];
 
+  showInactiveCriteria = false;
+
+  private allCriteria: PreprojectCriterion[] = [];
+
+  private deletableCriteria = new Map<number, boolean>();
+
   pageSize: number = 5;
 
   totalRecords: number = 0;
@@ -136,7 +142,7 @@ export class PreprojectSelectionComponent implements OnInit, OnDestroy {
         }
       );
       if (result.success && result.data) {
-        this.applyConfiguration(result.data);
+        await this.applyConfiguration(result.data);
         this.configurationForm.markAsPristine();
         this.messageService.add({
           severity: 'success',
@@ -176,16 +182,16 @@ export class PreprojectSelectionComponent implements OnInit, OnDestroy {
   private async loadConfiguration(): Promise<void> {
     const result = await this.preprojectModelService.findOrCreateByOfficeId(this.idOffice);
     if (result.success && result.data) {
-      this.applyConfiguration(result.data);
+      await this.applyConfiguration(result.data);
     }
   }
 
-  private applyConfiguration(configuration: IPreprojectModelConfiguration): void {
+  private async applyConfiguration(configuration: IPreprojectModelConfiguration): Promise<void> {
     const criteria = this.criteriaConfigService.mapCriteriaFromResponse(
       ((configuration.properties || []) as any[])
         .filter(property => property.type === 'CriteriaTabModel')
     ).sort((first, second) => first.position - second.position || first.id - second.id);
-    this.updateCriteriaCards(criteria);
+    await this.updateCriteriaCards(criteria);
     this.preprojectModelId = configuration.id;
     this.preprojectSelectionEnabled = configuration.active;
     this.hasPreProjects = configuration.hasPreProjects === true;
@@ -200,24 +206,52 @@ export class PreprojectSelectionComponent implements OnInit, OnDestroy {
     });
   }
 
-  private updateCriteriaCards(fetchedCriteria: PreprojectCriterion[]): void {
-    const criteria = fetchedCriteria.map(criterion => ({
+  private async updateCriteriaCards(fetchedCriteria: PreprojectCriterion[]): Promise<void> {
+    this.allCriteria = fetchedCriteria;
+    const deletionStates = await Promise.all(fetchedCriteria.map(async criterion => {
+      try {
+        return [criterion.id, await this.criteriaConfigService.canDeleteCriterion(criterion.id)] as const;
+      } catch {
+        return [criterion.id, false] as const;
+      }
+    }));
+    this.deletableCriteria = new Map(deletionStates);
+    this.renderCriteriaCards();
+  }
+
+  renderCriteriaCards(): void {
+    const criteria = this.allCriteria
+      .filter(criterion => this.showInactiveCriteria || criterion.active !== false)
+      .map(criterion => ({
       typeCardItem: 'listItem',
       iconSvg: criterion.icon === 'fas fa-cog',
       icon: criterion.icon === 'fas fa-cog' ? IconsEnum.Cog : criterion.icon,
       nameCardItem: criterion.name,
       fullNameCardItem: criterion.name,
+      statusItem: criterion.active === false ? this.translateService.instant('inactive') : undefined,
+      showStatusInList: criterion.active === false,
+      canceled: criterion.active === false,
       itemId: criterion.id,
       idAtributeName: 'criterionId',
       urlCard: '/preproject-selection/criteria/edit',
       paramsUrlCard: [{ name: 'idOffice', value: this.idOffice }],
-      menuItems: [
-        {
-          label: this.translateService.instant('delete'),
-          icon: 'fas fa-trash-alt',
-          command: () => this.deleteCriterion(criterion)
+      menuItems: [criterion.active === false
+        ? {
+          label: this.translateService.instant('reactivateCriterion'),
+          icon: 'fas fa-check',
+          command: () => this.setCriterionActive(criterion, true)
         }
-      ] as MenuItem[]
+        : this.deletableCriteria.get(criterion.id) === true
+          ? {
+            label: this.translateService.instant('delete'),
+            icon: 'fas fa-trash-alt',
+            command: () => this.deleteCriterion(criterion)
+          }
+          : {
+            label: this.translateService.instant('inactivateCriterion'),
+            icon: 'fas fa-ban',
+            command: () => this.confirmInactivation(criterion)
+          }] as MenuItem[]
     } as ICardItem));
 
     const newCriterion: ICardItem = {
@@ -247,7 +281,7 @@ export class PreprojectSelectionComponent implements OnInit, OnDestroy {
         try {
           await this.criteriaConfigService.deleteCriterion(criterion.id);
         } catch {
-          // O interceptor já exibe a falha; mantém a lista quando a exclusão não é confirmada.
+          await this.loadConfiguration();
           return;
         }
         this.messageService.add({
@@ -258,6 +292,30 @@ export class PreprojectSelectionComponent implements OnInit, OnDestroy {
         await this.loadConfiguration();
       }
     });
+  }
+
+  private confirmInactivation(criterion: PreprojectCriterion): void {
+    this.confirmationService.confirm({
+      message: `${this.translateService.instant('inactivateCriterionConfirmation')} ${criterion.name}?`,
+      key: 'deleteConfirm',
+      acceptLabel: this.translateService.instant('yes'),
+      rejectLabel: this.translateService.instant('no'),
+      accept: () => this.setCriterionActive(criterion, false)
+    });
+  }
+
+  private async setCriterionActive(criterion: PreprojectCriterion, active: boolean): Promise<void> {
+    try {
+      await this.criteriaConfigService.setCriterionActive(criterion.id, active);
+      this.messageService.add({
+        severity: 'success',
+        summary: this.translateService.instant('success'),
+        detail: this.translateService.instant(active ? 'criterionReactivated' : 'criterionInactivated')
+      });
+      await this.loadConfiguration();
+    } catch {
+      await this.loadConfiguration();
+    }
   }
 
   private createCriterion(): void {
