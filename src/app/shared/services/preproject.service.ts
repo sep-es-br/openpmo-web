@@ -41,6 +41,13 @@ export class PreprojectService extends BaseService<IPreproject> {
       .toPromise();
   }
 
+  deletePreproject(id: number, idProject?: number): Promise<void> {
+    return this.http.delete<void>(`${this.urlBase}/${id}`, {
+      ...this.requestOptions,
+      ...(idProject ? { params: { idProject: idProject.toString() } } : {})
+    }).toPromise();
+  }
+
   findCriteriaTabValues(
     idPreproject: number,
     idCriteriaTabModel: number

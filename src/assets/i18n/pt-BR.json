@@ -218,6 +218,7 @@
   "deliverable": "Entrega",
   "project": "Projeto",
   "preproject": "Anteprojeto",
+  "deletePreprojectProject": "Excluir projeto",
   "preprojects": "Anteprojetos",
   "preprojectSelection": "Seleção de Anteprojeto",
   "enablePreprojectSelection": "Habilitar Seleção de Anteprojeto",
