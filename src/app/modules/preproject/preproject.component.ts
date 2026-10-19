@@ -133,6 +133,7 @@ export class PreprojectComponent implements OnInit, OnDestroy, AfterViewInit {
       return;
     }
     await this.setConfigWorkpackService.setWorkpackConfig(preproject.idPlan, preproject.idWorkpack);
+    localStorage.setItem('@currentPlan', preproject.idPlan.toString());
     void this.router.navigate(['/workpack/change-control-board'], {
       queryParams: {
         idProject: preproject.idWorkpack,
