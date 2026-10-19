@@ -458,7 +458,7 @@ export class ControlChangeBoardMemberComponent implements OnInit, OnDestroy {
   }
 
   async saveCcbMember() {
-    if (!this.hasActiveMemberAs()) {
+    if (!this.hasActiveMemberAs() || !this.ccbMember.person) {
       this.saveButton?.hideButton();
       return;
     }
@@ -471,36 +471,49 @@ export class ControlChangeBoardMemberComponent implements OnInit, OnDestroy {
     const filteredMemberAs = (this.ccbMember.memberAs || [])
     .filter(m => m.active);
 
+    const person = { ...this.ccbMember.person };
+    delete person.roles;
+
     const sender = {
       ...this.ccbMember,
       memberAs: filteredMemberAs,
       idOffice: this.plan.idOffice,
       idWorkpack: this.idProject,
       person: {
-        ...this.ccbMember.person,
+        ...person,
         ...this.formPerson.value,
         phoneNumber,
         isUser: this.isUser
       }
     } as IControlChangeBoard;
     this.formIsSaving = true;
-    if (this.idPerson) {
-      await this.ccbMemberSrv.Put(sender);
-    } else {
-      await this.ccbMemberSrv.post(sender);
-    }
-    this.formIsSaving = false;
-    this.messageSrv.add({
-      severity: 'success',
-      summary: this.translateSrv.instant('success'),
-      detail: this.translateSrv.instant('messages.savedSuccessfully')
-    });
-    await this.router.navigate(['/workpack/change-control-board'], {
-      queryParams: {
-        idProject: this.idProject,
-        idOffice: this.idOffice
+    try {
+      const result = this.idPerson
+        ? await this.ccbMemberSrv.Put(sender)
+        : await this.ccbMemberSrv.post(sender);
+      if (!result?.success) {
+        this.saveButton?.showButton();
+        this.cancelButton?.showButton();
+        return;
       }
-    });
+      this.messageSrv.add({
+        severity: 'success',
+        summary: this.translateSrv.instant('success'),
+        detail: this.translateSrv.instant('messages.savedSuccessfully')
+      });
+      await this.router.navigate(['/workpack/change-control-board'], {
+        queryParams: {
+          idProject: this.idProject,
+          idOffice: this.idOffice
+        }
+      });
+    } catch (error) {
+      this.saveButton?.showButton();
+      this.cancelButton?.showButton();
+      throw error;
+    } finally {
+      this.formIsSaving = false;
+    }
   }
 
   handleOnCancel() {
