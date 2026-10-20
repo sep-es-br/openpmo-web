@@ -14,6 +14,8 @@ export class PropertyTransversalViewComponent {
   showSelection = false;
   draftSelection: TreeNode | TreeNode[];
   draftPrincipalProgramId: string | null = null;
+  draftFilter = '';
+  principalSelectionInvalid = false;
 
   updateSelection(selection: string | number | Array<string | number> | null | undefined): void {
     const selectedValues = Array.isArray(selection) ? selection : selection ? [selection] : [];
@@ -32,18 +34,23 @@ export class PropertyTransversalViewComponent {
       : this.property.value ? [String(this.property.value)] : [];
     const selectedNodes = this.findSelectedNodes(this.property.transversalViewTree || [], new Set(selectedValues));
     this.draftSelection = this.property.multipleSelection ? selectedNodes : selectedNodes[0] || null;
+    this.draftFilter = '';
     this.draftPrincipalProgramId = this.property.principalProgramId != null
       ? String(this.property.principalProgramId)
       : null;
+    if (!this.hasSelectedPrincipalProgram) {
+      this.draftPrincipalProgramId = null;
+    }
+    this.principalSelectionInvalid = this.requiresPrincipalProgram && !this.hasSelectedPrincipalProgram;
     this.showSelection = true;
   }
 
   onDraftSelectionChange(selection: TreeNode | TreeNode[] | null): void {
-    if (!this.draftPrincipalProgramId) { return; }
     const selectedNodes = Array.isArray(selection) ? selection : selection ? [selection] : [];
     if (!selectedNodes.some(node => String(node.data) === this.draftPrincipalProgramId)) {
       this.draftPrincipalProgramId = null;
     }
+    this.principalSelectionInvalid = this.requiresPrincipalProgram && !this.hasSelectedPrincipalProgram;
   }
 
   setPrincipalProgram(node: TreeNode, checked: boolean): void {
@@ -56,6 +63,7 @@ export class PropertyTransversalViewComponent {
       if (this.draftPrincipalProgramId === programId) {
         this.draftPrincipalProgramId = null;
       }
+      this.principalSelectionInvalid = this.requiresPrincipalProgram && !this.hasSelectedPrincipalProgram;
       return;
     }
     if (!selectedNodes.some(selected => String(selected.data) === programId)) {
@@ -63,6 +71,7 @@ export class PropertyTransversalViewComponent {
       this.draftSelection = selectedNodes;
     }
     this.draftPrincipalProgramId = programId;
+    this.principalSelectionInvalid = false;
   }
 
   isPrincipalProgram(node: TreeNode): boolean {
@@ -77,6 +86,10 @@ export class PropertyTransversalViewComponent {
     const selectedNodes = Array.isArray(this.draftSelection)
       ? this.draftSelection
       : this.draftSelection ? [this.draftSelection] : [];
+    if (selectedNodes.length > 1 && !this.hasSelectedPrincipalProgram) {
+      this.principalSelectionInvalid = true;
+      return;
+    }
     const selectedValues = selectedNodes
       .map(node => String(node.data))
       .filter(value => !!value);
@@ -85,6 +98,45 @@ export class PropertyTransversalViewComponent {
       : null;
     this.updateSelection(this.property.multipleSelection ? selectedValues : selectedValues[0] || null);
     this.showSelection = false;
+  }
+
+  get requiresPrincipalProgram(): boolean {
+    const selectedNodes = Array.isArray(this.draftSelection)
+      ? this.draftSelection
+      : this.draftSelection ? [this.draftSelection] : [];
+    return !!this.property?.multipleSelection && selectedNodes.length > 1;
+  }
+
+  get filteredTransversalViewTree(): TreeNode[] {
+    const filter = this.draftFilter.trim().toLocaleLowerCase();
+    if (!filter) { return this.property?.transversalViewTree || []; }
+    return this.filterTransversalViewTree(this.property?.transversalViewTree || [], filter);
+  }
+
+  private get hasSelectedPrincipalProgram(): boolean {
+    const selectedNodes = Array.isArray(this.draftSelection)
+      ? this.draftSelection
+      : this.draftSelection ? [this.draftSelection] : [];
+    return !!this.draftPrincipalProgramId && selectedNodes.some(node =>
+      String(node.data) === this.draftPrincipalProgramId
+    );
+  }
+
+  private filterTransversalViewTree(nodes: TreeNode[], filter: string): TreeNode[] {
+    return (nodes || []).reduce((filteredNodes, node) => {
+      const children = this.filterTransversalViewTree(node.children || [], filter);
+      const labelMatches = String(node.label || '').toLocaleLowerCase().includes(filter);
+      if (labelMatches) {
+        filteredNodes.push(node);
+      } else if (children.length) {
+        filteredNodes.push({ ...node, children });
+      }
+      return filteredNodes;
+    }, [] as TreeNode[]);
+  }
+
+  updateDraftFilter(event: Event): void {
+    this.draftFilter = (event.target as HTMLInputElement).value;
   }
 
   get selectedLabels(): string {

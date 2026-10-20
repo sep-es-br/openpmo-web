@@ -105,12 +105,22 @@
 }
 
 .transversal-selection-columns {
+  align-items: flex-end;
   display: flex;
+  flex-direction: column;
+  gap: .25rem;
   justify-content: flex-end;
-  padding: 0 1.1rem .4rem 0;
+  padding: 0 0 .4rem;
   color: v.$fontLabel;
   font-size: .85rem;
   font-weight: 600;
+  text-align: right;
+}
+
+.transversal-principal-error {
+  color: v.$fontErrorMessage;
+  font-size: .8rem;
+  font-weight: 400;
 }
 
 ::ng-deep .transversal-view-property .p-tree .p-treenode-label {
@@ -138,4 +148,18 @@
   height: 1rem;
   margin: 0 1.1rem 0 .75rem;
   width: 1rem;
+}
+
+.transversal-selection-search {
+  margin-bottom: .5rem;
+  width: 100%;
+}
+
+.transversal-selection-search .p-input-icon-left {
+  display: block;
+  width: 100%;
+}
+
+.transversal-selection-search input {
+  width: 100%;
 }

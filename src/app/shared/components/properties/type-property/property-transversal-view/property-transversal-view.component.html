@@ -30,11 +30,21 @@
 
   <p-dialog [(visible)]="showSelection" [modal]="true" [style]="{ width: '50rem', maxWidth: '95vw' }"
     [header]="property.label" [dismissableMask]="false">
-    <div class="transversal-selection-columns" *ngIf="property.multipleSelection">
-      <span>{{ 'principalProgram' | translate }}</span>
+    <div class="transversal-selection-search">
+      <span class="p-input-icon-left">
+        <i class="pi pi-search" aria-hidden="true"></i>
+        <input class="p-inputtext p-component" type="text" [value]="draftFilter"
+          [placeholder]="'search' | translate" [attr.aria-label]="'search' | translate"
+          (input)="updateDraftFilter($event)" />
+      </span>
     </div>
-    <p-tree [value]="property.transversalViewTree" [filter]="true" filterBy="label"
-      [filterPlaceholder]="'search' | translate" [selectionMode]="property.multipleSelection ? 'checkbox' : 'single'"
+    <div class="transversal-selection-columns" *ngIf="property.multipleSelection">
+      <span>{{ 'principalProgram' | translate }}<span *ngIf="requiresPrincipalProgram"> *</span></span>
+      <span class="transversal-principal-error" *ngIf="principalSelectionInvalid">
+        {{ 'required' | translate }}
+      </span>
+    </div>
+    <p-tree [value]="filteredTransversalViewTree" [selectionMode]="property.multipleSelection ? 'checkbox' : 'single'"
       [(selection)]="draftSelection" (selectionChange)="onDraftSelectionChange($event)"
       [propagateSelectionUp]="false" [propagateSelectionDown]="false"
       [emptyMessage]="'noRecordsFound' | translate">
