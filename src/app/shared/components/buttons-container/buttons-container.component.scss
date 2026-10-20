@@ -15,13 +15,16 @@
     margin-bottom: 75px;
     z-index: 100;
     position: fixed;
-    width: 100%;
+    left: 64px;
+    right: 0;
+    width: auto;
     height: auto;
     bottom: 50px;
     overflow: hidden;
     display: flex;
     flex-direction: row;
     align-items: center;
+    justify-content: flex-end;
   
     ::ng-deep .button-label {
       pointer-events: auto;
@@ -36,18 +39,20 @@
       
     }
     &.mobile {
-      width: 96%;
       display: flex;
       flex-direction: row;
       align-items: center;
-      justify-content: center;
+      justify-content: flex-end;
       bottom: 190px;
       .button-label {
         display: flex;
         flex-direction: row;
         justify-content: center;
-        width: 100%;
       }
     }
   }
+}
+
+::ng-deep .app-template.mobile .app-button-wrapper {
+  left: 0;
 }
