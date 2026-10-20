@@ -350,6 +350,19 @@
     padding-bottom: 15px !important;
   }
 
+  .card.invalid ::ng-deep p-panel.app-card .p-panel {
+    border: 1px solid v.$fontRed !important;
+    border-radius: 4px;
+  }
+
+  .card.stakeholders .app-input-chips.invalid .app-input-label {
+    color: v.$fontRed !important;
+  }
+
+  .card.stakeholders .app-input-chips.invalid ::ng-deep .p-chips-multiple-container {
+    border-bottom-color: v.$fontRed !important;
+  }
+
   &.mobile {
     .workpack-model-addicional-properties {
       .addicional-properties {

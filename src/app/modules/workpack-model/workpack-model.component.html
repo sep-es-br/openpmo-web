@@ -19,7 +19,8 @@
   </div>
   
   <div class="app-workpack-model-main-content">
-    <div class="card-properties card workpack-model" *ngIf="!cardProperties?.isLoading">
+    <div class="card-properties card workpack-model" *ngIf="!cardProperties?.isLoading"
+      [class.invalid]="hasInvalidPropertiesPanel">
       <app-card [properties]="cardProperties" *ngIf="cardProperties" class="mt-0 inputs-float-label">
         <div class="workpack-model-properties p-fluid" [formGroup]="formProperties">
           <span class="p-float-label property-input p-field">
@@ -103,9 +104,9 @@
     </div>
   
     <ng-container *ngIf="workpackModelType !== 'MilestoneModel' && !cardProperties?.isLoading" >
-      <div class="card stakeholders">
+      <div class="card stakeholders" [class.invalid]="hasInvalidStakeholderRoles">
         <app-card [properties]="cardPropertiesStakeholders" *ngIf="cardPropertiesStakeholders" class="inputs-float-label">
-          <span class="p-float-label app-input-chips">
+          <span class="p-float-label app-input-chips" [class.invalid]="hasInvalidStakeholderPersonRoles">
             <p-chips [(ngModel)]="posibleRolesPerson" separator="," [allowDuplicate]="false"
               (ngModelChange)="checkProperties(true)"
               [class.p-inputwrapper-filled]="posibleRolesPerson && !!posibleRolesPerson.length"
@@ -115,7 +116,7 @@
             </label>
             <span class="under-label">{{ 'useCommaToSeparateValues' | translate }}</span>
           </span>
-          <span class="p-float-label app-input-chips">
+          <span class="p-float-label app-input-chips" [class.invalid]="hasInvalidStakeholderOrganizationRoles">
             <p-chips [(ngModel)]="posibleRolesOrg" separator="," [allowDuplicate]="false"
               (ngModelChange)="checkProperties(true)"
               [class.p-inputwrapper-filled]="posibleRolesOrg && !!posibleRolesOrg?.length" [disabled]="!editPermission">
