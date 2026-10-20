@@ -26,6 +26,7 @@ import { ReportService } from 'src/app/shared/services/report.service';
 import { WorkpackBreadcrumbStorageService } from 'src/app/shared/services/workpack-breadcrumb-storage.service';
 import { WorkpackModelClassificationEnum } from 'src/app/shared/enums/WorkpackModelClassificationEnum';
 import { TransversalService } from 'src/app/shared/services/transversal.service';
+import { PlanEntryNavigationService } from 'src/app/shared/services/plan-entry-navigation.service';
 
 @Component({
   selector: 'app-mobile-menu',
@@ -80,6 +81,12 @@ export class MobileMenuComponent implements OnInit, OnDestroy {
 
   isUserAdmin = false;
 
+  hasDirectStructuralAccess = false;
+
+  hasDirectTransversalAccess = false;
+
+  hasDirectPlanAccess = false;
+
   currentURL = '';
 
   currentUserInfo: IPerson;
@@ -132,6 +139,7 @@ export class MobileMenuComponent implements OnInit, OnDestroy {
     private officePermissionSrv: OfficePermissionService,
     private planSrv: PlanService,
     private workpackSrv: WorkpackService,
+    private planEntryNavigationSrv: PlanEntryNavigationService,
     private cookieSrv: CookieService,
     private confirmationSrv: ConfirmationService,
     private breadcrumbSrv: BreadcrumbService,
@@ -155,8 +163,9 @@ export class MobileMenuComponent implements OnInit, OnDestroy {
       if (id === 0) {
         await this.loadPropertiesPlan();
       }
-      if (this.currentIDPlan !== 0 && this.currentIDPlan !== id) {
+      if (id && this.currentIDPlan !== id) {
         this.currentIDPlan = id;
+        await this.loadViewAccess();
         await this.loadPropertiesPlan();
         this.loadPortfolioMenu();
         this.loadFavoritesMenu();
@@ -234,6 +243,38 @@ export class MobileMenuComponent implements OnInit, OnDestroy {
 
   async loadCurrentInfo() {
     this.currentUserInfo = await this.authSrv.getInfoPerson();
+    await this.loadViewAccess();
+  }
+
+  private async loadViewAccess() {
+    if (this.isUserAdmin) {
+      this.hasDirectPlanAccess = true;
+      this.hasDirectStructuralAccess = true;
+      this.hasDirectTransversalAccess = true;
+      return;
+    }
+    if (!this.currentIDPlan) {
+      this.hasDirectPlanAccess = false;
+      this.hasDirectStructuralAccess = false;
+      this.hasDirectTransversalAccess = false;
+      return;
+    }
+    try {
+      const [structural, transversal, directPlanAccess] = await Promise.all([
+        this.transversalSrv.getDirectStructuralAccessContexts(),
+        this.transversalSrv.getAccessibleContexts(),
+        this.planSrv.hasDirectAccess(this.currentIDPlan)
+      ]);
+      this.hasDirectPlanAccess = directPlanAccess;
+      this.hasDirectStructuralAccess = this.hasDirectPlanAccess || (!!structural?.success &&
+        !!structural.data?.some(context => Number(context.idPlan) === Number(this.currentIDPlan)));
+      this.hasDirectTransversalAccess = this.hasDirectPlanAccess || (!!transversal?.success &&
+        !!transversal.data?.some(context => Number(context.idPlan) === Number(this.currentIDPlan)));
+    } catch (error) {
+      this.hasDirectPlanAccess = false;
+      this.hasDirectStructuralAccess = false;
+      this.hasDirectTransversalAccess = false;
+    }
   }
 
   async getPropertiesOffice(idOffice) {
@@ -354,8 +395,8 @@ export class MobileMenuComponent implements OnInit, OnDestroy {
             icon: 'app-icon plan',
             title: plan.fullName,
             styleClass: `plan-${plan.id} ${this.currentURL === `plan?id=${plan.id}` ? 'active' : ''}`,
-            command: (e) => {
-              this.router.navigate(['/plan'], { queryParams: { id: plan.id } });
+            command: async (e) => {
+              await this.planEntryNavigationSrv.navigateToPlanEntry(Number(plan.id));
               this.closeAllMenus();
             }
           })

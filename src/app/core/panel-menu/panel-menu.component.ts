@@ -27,6 +27,7 @@ import { PersonService } from 'src/app/shared/services/person.service';
 import { WorkpackModelClassificationEnum } from 'src/app/shared/enums/WorkpackModelClassificationEnum';
 import { TransversalService } from 'src/app/shared/services/transversal.service';
 import { ITransversalProgram } from 'src/app/shared/interfaces/ITransversal';
+import { PlanEntryNavigationService } from 'src/app/shared/services/plan-entry-navigation.service';
 
 type PortfolioMenuItem = MenuItem & {
   children?: PortfolioMenuItem[];
@@ -112,7 +113,8 @@ export class PanelMenuComponent implements OnInit, AfterViewInit {
     private breadcrumbSrv: BreadcrumbService,
     private workpackBreadcrumbStorageSrv: WorkpackBreadcrumbStorageService,
     private personSrv: PersonService,
-    private transversalSrv: TransversalService
+    private transversalSrv: TransversalService,
+    private planEntryNavigationSrv: PlanEntryNavigationService
   ) {
     this.menuSrv.getMenuState.pipe(takeUntil(this.$destroy)).subscribe(async (menuState) => {
       this.isFixed = menuState.isFixed;
@@ -301,7 +303,12 @@ export class PanelMenuComponent implements OnInit, AfterViewInit {
     this.currentIDPlan = Number(currentPlan) !== 0 ? Number(currentPlan) : undefined;
     if (this.currentIDPlan) {
       if (this.authSrv.getAccessToken()) {
-        this.currentPlan = await this.planSrv.getCurrentPlan(this.currentIDPlan);
+        try {
+          const result = await this.planSrv.GetById(this.currentIDPlan);
+          this.currentPlan = result?.success ? result.data : undefined;
+        } catch (error) {
+          this.currentPlan = undefined;
+        }
         if (this.currentPlan) {
           if (this.currentIDOffice !== this.currentPlan.idOffice) {
             this.currentIDOffice = this.currentPlan.idOffice;
@@ -340,8 +347,8 @@ export class PanelMenuComponent implements OnInit, AfterViewInit {
             icon: 'app-icon plan',
             title: plan.fullName,
             styleClass: `plan-${plan.id} ${this.currentURL === `plan?id=${plan.id}` ? 'active' : ''}`,
-            command: (e) => {
-              this.router.navigate(['/plan'], { queryParams: { id: plan.id } });
+            command: async (e) => {
+              await this.planEntryNavigationSrv.navigateToPlanEntry(Number(plan.id));
               this.closeAllMenus();
             }
           })
@@ -902,8 +909,38 @@ export class PanelMenuComponent implements OnInit, AfterViewInit {
 
   private async buildMenuItemTransversalViews(): Promise<MenuItem[]> {
     const idPlanModel = this.currentPlan?.planModel?.id || this.currentPlan?.idPlanModel;
-    if (!idPlanModel || !this.currentIDPlan || !this.currentIDOffice) {
+    if (!this.currentIDPlan) {
       return [];
+    }
+
+    if (!this.currentPlan || !idPlanModel || !this.currentIDOffice) {
+      const contextsResult = await this.transversalSrv.getAccessibleContexts();
+      const contexts = contextsResult?.success ? contextsResult.data || [] : [];
+      const views = new Map<number, { id: number; name: string; idPlan: number }>();
+      contexts.forEach(context => {
+        if (!views.has(context.idTransversalView)) {
+          views.set(context.idTransversalView, {
+            id: context.idTransversalView,
+            name: context.viewName,
+            idPlan: context.idPlan
+          });
+        }
+      });
+      return Promise.all(Array.from(views.values()).map(async view => {
+        const [programsResult, linksResult] = await Promise.all([
+          this.transversalSrv.getPrograms(view.id, view.idPlan),
+          this.transversalSrv.getStructuralLinksForView(view.id, view.idPlan)
+        ]);
+        const programs = programsResult?.success ? programsResult.data || [] : [];
+        const links = linksResult?.success ? linksResult.data || [] : [];
+        return {
+          id: `transversal-view-${view.id}`,
+          label: view.name,
+          title: view.name,
+          styleClass: `transversal-view-${view.id}`,
+          items: this.buildTransversalProgramItems(programs, links, undefined, new Set<number>(), view.id)
+        } as MenuItem;
+      }));
     }
 
     const result = await this.menuSrv.getItemsPlanModel(this.currentIDOffice);
@@ -930,7 +967,7 @@ export class PanelMenuComponent implements OnInit, AfterViewInit {
         title: view.fullName,
         tooltip: view.fullName,
         styleClass: `transversal-view-${view.id}`,
-        items: this.buildTransversalProgramItems(programs, links)
+        items: this.buildTransversalProgramItems(programs, links, undefined, new Set<number>(), Number(view.id))
       };
     }));
   }
@@ -939,7 +976,8 @@ export class PanelMenuComponent implements OnInit, AfterViewInit {
     programs: ITransversalProgram[],
     links: any[],
     idParent?: number,
-    visited = new Set<number>()
+    visited = new Set<number>(),
+    idTransversalView?: number
   ): MenuItem[] {
     const programIds = new Set(programs.map(program => program.idTransversalProgram));
     return programs.filter(program => idParent
@@ -953,20 +991,27 @@ export class PanelMenuComponent implements OnInit, AfterViewInit {
         workpackId: program.idTransversalProgram,
         workpackModelId: program.idWorkpackModel,
         label: program.name,
+        expanded: false,
         icon: program.fontIcon,
         title: program.fullName,
         tooltip: program.fullName,
         styleClass: `transversal-program-${program.idTransversalProgram}`,
         items: [
-          ...this.buildTransversalProgramItems(programs, links, program.idTransversalProgram, branch),
-          ...this.buildTransversalStructuralItems(program.idTransversalProgram, links)
+          ...this.buildTransversalProgramItems(programs, links, program.idTransversalProgram, branch, idTransversalView),
+          ...this.buildTransversalStructuralItems(program.idTransversalProgram, links, undefined, new Set<number>(), idTransversalView)
         ],
         command: (event) => {
           if (this.isPanelMenuExpansionClick(event)) {
             return;
           }
           this.router.navigate(['/workpack'], {
-            queryParams: { id: program.idTransversalProgram, idPlan: this.currentIDPlan }
+            queryParams: {
+              id: program.idTransversalProgram,
+              idPlan: this.currentIDPlan,
+              classification: 'TRANSVERSAL',
+              idTransversalRoot: program.idTransversalProgram,
+              idTransversalView
+            }
           });
           this.closeAllMenus();
         }
@@ -974,7 +1019,13 @@ export class PanelMenuComponent implements OnInit, AfterViewInit {
     });
   }
 
-  private buildTransversalStructuralItems(idProgram: number, allLinks: any[], parentId?: number, visited = new Set<number>()): MenuItem[] {
+  private buildTransversalStructuralItems(
+    idProgram: number,
+    allLinks: any[],
+    parentId?: number,
+    visited = new Set<number>(),
+    idTransversalView?: number
+  ): MenuItem[] {
     const links = allLinks.filter(link => Number(link.idTransversalProgram) === Number(idProgram));
     return links.filter(link => parentId
       ? Number(link.idParentWorkpack) === Number(parentId)
@@ -987,18 +1038,21 @@ export class PanelMenuComponent implements OnInit, AfterViewInit {
         workpackId: link.idWorkpack,
         workpackModelId: link.idWorkpackModel,
         label: link.name,
+        expanded: false,
         icon: link.fontIcon,
         title: link.fullName,
         tooltip: link.fullName,
         styleClass: link.clickable ? 'transversal-structural-link' : 'transversal-structural-link non-clickable',
-        items: this.buildTransversalStructuralItems(idProgram, allLinks, link.idWorkpack, branch),
+        items: this.buildTransversalStructuralItems(idProgram, allLinks, link.idWorkpack, branch, idTransversalView),
         command: (event) => {
           if (this.isPanelMenuExpansionClick(event)) { return; }
           if (!link.clickable) { return; }
           this.router.navigate(['/workpack'], { queryParams: {
             id: link.idWorkpack,
             idPlan: this.currentIDPlan,
-            idTransversalRoot: idProgram
+            classification: 'TRANSVERSAL',
+            idTransversalRoot: idProgram,
+            idTransversalView
           }});
           this.closeAllMenus();
         }

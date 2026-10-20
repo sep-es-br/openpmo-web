@@ -15,7 +15,7 @@
       </div>
     </div>
     <div
-      *ngIf="!!currentIDOffice && !!currentIDPlan && isPlanMenu"
+      *ngIf="!!currentIDOffice && !!currentIDPlan && isPlanMenu && (isUserAdmin || hasDirectPlanAccess || hasDirectStructuralAccess)"
       class="item"
       [class.opened]="activePlanView === 'STRUCTURAL' || isMenuOpen('portfolio')"
       [ngStyle]="{ width: itemsFavorites?.length > 0 && !!currentIDOffice && !!currentIDPlan && isPlanMenu ? '20%' : '25%' }"
@@ -28,7 +28,7 @@
       </div>
     </div>
     <div
-      *ngIf="!!currentIDPlan && isPlanMenu"
+      *ngIf="!!currentIDPlan && isPlanMenu && (isUserAdmin || hasDirectPlanAccess || hasDirectTransversalAccess)"
       class="item"
       [class.opened]="activePlanView === 'TRANSVERSAL' || isMenuOpen('transversal-views')"
       [ngStyle]="{ width: '20%' }"

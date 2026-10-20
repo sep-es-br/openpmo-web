@@ -41,16 +41,20 @@ export class SearchService extends BaseService<IUniversalSearch> {
     super('search', injector);
   }
 
-  public doSimpleSearch(term: string, workpackId?: number, pageData? : PageDef) {
+  public doSimpleSearch(term: string, workpackId?: number, pageData? : PageDef, idPlan?: number) {
 
-    
     const storedPlan = localStorage.getItem('@pmo/propertiesCurrentPlan');
     this._propertiesPlan = storedPlan ? JSON.parse(storedPlan) : undefined;
+    const currentPlanId = idPlan || this._propertiesPlan?.id;
 
-    return of(this._propertiesPlan).pipe(
+    return of(currentPlanId).pipe(
       tap(() => this._loading$.next(true)),
-      switchMap(({ id }) => {
-        let params = new HttpParams().set('id-plan', id.toString());
+      switchMap((planId) => {
+        if (!planId) {
+          return of({ success: false, data: undefined } as IHttpResult<any>);
+        }
+
+        let params = new HttpParams().set('id-plan', planId.toString());
         if (workpackId) params = params.set('id-workpack', workpackId.toString());
         if (term) params = params.set('term', term);
         pageData = pageData ?? this._pageData;

@@ -48,6 +48,9 @@ export class dashboardResolver implements Resolve<any> {
     idWorkpackModel;
     idWorkpackParent;
     idWorkpackModelLinked;
+    idTransversalRoot;
+    idTransversalView;
+    classification;
     linkEvent;
     isUserAdmin;
     workpack;
@@ -88,7 +91,11 @@ export class dashboardResolver implements Resolve<any> {
             idWorkpackModel,
             idWorkpackParent,
             idWorkpackModelLinked,
-            linkEvent
+            linkEvent,
+            idTransversalRoot,
+            idTransversalView,
+            classification,
+            idOffice
         } = route.queryParams;
 
         this.idWorkpack = id && +id;
@@ -96,6 +103,10 @@ export class dashboardResolver implements Resolve<any> {
         this.idWorkpackModel = idWorkpackModel && +idWorkpackModel;
         this.idWorkpackParent = idWorkpackParent && +idWorkpackParent;
         this.idWorkpackModelLinked = idWorkpackModelLinked && +idWorkpackModelLinked;
+        this.idTransversalRoot = idTransversalRoot && +idTransversalRoot;
+        this.idTransversalView = idTransversalView && +idTransversalView;
+        this.classification = classification;
+        this.idOffice = idOffice && +idOffice;
         this.linkEvent = linkEvent;
         this.workpackSrv.setWorkpackParams({
             idWorkpack: id && +id,
@@ -103,6 +114,11 @@ export class dashboardResolver implements Resolve<any> {
             idWorkpackModel: idWorkpackModel && +idWorkpackModel,
             idWorkpackParent: idWorkpackParent && +idWorkpackParent,
             idWorkpackModelLinked: idWorkpackModelLinked && +idWorkpackModelLinked,
+            idTransversalRoot: this.idTransversalRoot,
+            idTransversalProgram: this.idTransversalRoot,
+            idTransversalView: this.idTransversalView,
+            classification: this.classification,
+            idOffice: this.idOffice,
         });
         await this.resetWorkpackSections();
         await this.loadWorkpackData();
@@ -115,12 +131,27 @@ export class dashboardResolver implements Resolve<any> {
             this.workpackSrv.setEditPermission(true);
         }
         const params = this.workpackSrv.getWorkpackParams();
-        const planProperties = await this.planSrv.getCurrentPlan(this.idPlan);
-        this.idOffice = planProperties.idOffice;
+        let planProperties;
+        try {
+          const result = await this.planSrv.GetById(this.idPlan);
+          planProperties = result?.success ? result.data : undefined;
+        } catch (error) {
+          planProperties = undefined;
+        }
+        if (!planProperties && !['TRANSVERSAL', 'STRUCTURAL'].includes(this.classification)) {
+          this.router.navigate(['/offices']);
+          return;
+        }
+        this.idOffice = planProperties?.idOffice || this.idOffice;
         this.workpackSrv.setWorkpackParams({
             ...params,
             idPlan: this.idPlan,
-            idOffice: planProperties.idOffice
+            idOffice: this.idOffice,
+            propertiesPlan: planProperties,
+            idTransversalRoot: this.idTransversalRoot,
+            idTransversalProgram: this.idTransversalRoot,
+            idTransversalView: this.idTransversalView,
+            classification: this.classification
         });
         if (this.idWorkpack) {
         if (!this.idWorkpackModelLinked) {
@@ -235,8 +266,13 @@ export class dashboardResolver implements Resolve<any> {
     }
     const workpackParams = this.workpackSrv.getWorkpackParams();
     setTimeout(() => { this.workpackSrv.nextLoadingWorkpack(false); }, 300);
-    this.propertiesPlan = await this.planSrv.getCurrentPlan(workpackParams.idPlan);
-    if (this.propertiesPlan.id) {this.planSrv.nextIDPlan(this.propertiesPlan.id);}
+    try {
+      const result = await this.planSrv.GetById(workpackParams.idPlan);
+      this.propertiesPlan = result?.success ? result.data : undefined;
+    } catch (error) {
+      this.propertiesPlan = undefined;
+    }
+    if (this.propertiesPlan?.id) {this.planSrv.nextIDPlan(this.propertiesPlan.id);}
     if (this.propertiesPlan) {
       this.propertiesOffice = await this.officeSrv.getCurrentOffice(this.propertiesPlan.idOffice);
       this.idOffice = this.propertiesOffice.id;
@@ -248,6 +284,16 @@ export class dashboardResolver implements Resolve<any> {
       });
       this.officeSrv.nextIDOffice(this.propertiesPlan.idOffice);
       this.setWorkWorkpack();
+    } else if (this.classification === 'TRANSVERSAL' || this.classification === 'STRUCTURAL') {
+      this.workpackSrv.setWorkpackParams({
+        ...workpackParams,
+        idOffice: this.idOffice,
+        idTransversalRoot: this.idTransversalRoot,
+        idTransversalProgram: this.idTransversalRoot,
+        idTransversalView: this.idTransversalView,
+        classification: this.classification
+      });
+      this.setWorkWorkpack();
     }
   }
   
@@ -256,7 +302,10 @@ export class dashboardResolver implements Resolve<any> {
       idOffice: this.idOffice,
       idPlan: this.idPlan,
       idWorkpack: this.idWorkpack ? this.idWorkpack : null,
-      idWorkpackModelLinked: this.idWorkpackModelLinked ? this.idWorkpackModelLinked : null
+      idWorkpackModelLinked: this.idWorkpackModelLinked ? this.idWorkpackModelLinked : null,
+      classification: this.classification,
+      idTransversalRoot: this.idTransversalRoot,
+      idTransversalView: this.idTransversalView
     });
   }
 

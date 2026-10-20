@@ -29,6 +29,10 @@ export class PlanService extends BaseService<IPlan> {
     }, 300)
   }
 
+  setCurrentIDPlan(idPlan: number) {
+    this.currentIDPlan.next(idPlan || 0);
+  }
+
   observableNewPlan() {
     return this.newPlan.asObservable();
   }
@@ -60,6 +64,15 @@ export class PlanService extends BaseService<IPlan> {
         return plan;
       }
     }
+  }
+
+  async hasDirectAccess(idPlan: number): Promise<boolean> {
+    const result = await this.http.get<any>(`${this.urlBase}/${idPlan}/direct-access`).toPromise();
+    return !!result?.success && !!result.data;
+  }
+
+  async getDirectAccessContexts(): Promise<{ success: boolean; data: { idPlan: number; idOffice: number }[] }> {
+    return this.http.get<any>(`${this.urlBase}/access-contexts/direct`).toPromise();
   }
 
 }

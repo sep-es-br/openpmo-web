@@ -30,12 +30,12 @@
       <i class="app-icon ccb-view" [ngStyle]="{ fontSize: '1.67rem' }"></i>
     </div>
     <div class="item" (click)="openPlanView('STRUCTURAL')" [pTooltip]="'structuralViewMenu' | translate" [class.opened]="isMenuOpen(MenuButtons.PORTFOLIO)"
-      *ngIf="!!currentIDPlan && isPlanMenu">
+      *ngIf="!!currentIDPlan && isPlanMenu && (isUserAdmin || hasDirectPlanAccess || hasDirectStructuralAccess)">
       <i class="app-icon briefcase" [ngStyle]="{ fontSize: '1.3rem' }"></i>
     </div>
     <div class="item" (click)="openPlanView('TRANSVERSAL')"
       [pTooltip]="'transversalViewMenu' | translate" [class.opened]="isMenuOpen(MenuButtons.TRANSVERSAL_VIEWS)"
-      *ngIf="!!currentIDPlan && isPlanMenu">
+      *ngIf="!!currentIDPlan && isPlanMenu && (isUserAdmin || hasDirectPlanAccess || hasDirectTransversalAccess)">
       <i class="fas fa-project-diagram" [ngStyle]="{ fontSize: '1.3rem' }"></i>
     </div>
     <div class="item" (click)="toggleMenu(MenuButtons.FAVORITES)" [class.opened]="isMenuOpen(MenuButtons.FAVORITES)"
@@ -43,11 +43,11 @@
       [pTooltip]="'myFavorites' | translate">
       <i class="favorite-icon far fa-star" [ngStyle]="{ fontSize: '1.7rem' }"></i>
     </div>
-    <div class="item" *ngIf="!!currentIDPlan && isPlanMenu && hasReports" [routerLink]="['/reports']"
+    <div class="item" *ngIf="!!currentIDPlan && isPlanMenu && (isUserAdmin || hasDirectPlanAccess || hasDirectStructuralAccess || hasDirectTransversalAccess) && hasReports" [routerLink]="['/reports']"
       [queryParams]="{idPlan: currentPlan?.id}" [pTooltip]="'reports' | translate" [class.opened]="isMenuOpen(MenuButtons.REPORTS)">
       <i class="far fa-file-alt" [ngStyle]="{ fontSize: '1.5rem' }"></i>
     </div>
-    <div class="item" *ngIf="!!currentIDPlan && isPlanMenu" [routerLink]="['/search']" [class.opened]="isMenuOpen(MenuButtons.UNIVERSAL_SEARCH)"
+    <div class="item" *ngIf="!!currentIDPlan && isPlanMenu && (isUserAdmin || hasDirectPlanAccess || hasDirectStructuralAccess || hasDirectTransversalAccess)" [routerLink]="['/search']" [class.opened]="isMenuOpen(MenuButtons.UNIVERSAL_SEARCH)"
       [queryParams]="{idPlan: currentPlan?.id}" [pTooltip]="'search' | translate" >
       <i class="fas fa-search" [ngStyle]="{ fontSize: '1.5rem' }"></i>
     </div>

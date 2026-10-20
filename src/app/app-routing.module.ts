@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { AuthGuard } from './shared/guards/auth-guard';
+import { PlanAccessGuard } from './shared/guards/plan-access-guard';
 import { HomeComponent } from './modules/home/home.component';
 import { LoginComponent } from './modules/login/login.component';
 import { AdminOfficeConfigComponent } from './modules/admin-office-config/admin-office-config.component';
@@ -22,7 +23,7 @@ const routes: Routes = [
   },
   {
     path: 'plan',
-    canActivate: [ AuthGuard ],
+    canActivate: [ AuthGuard, PlanAccessGuard ],
     loadChildren: () => import('./modules/plan/plan.module').then(m => m.PlanModule)
   },
   {

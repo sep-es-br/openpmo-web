@@ -147,7 +147,7 @@ export class UniversalSearchComponent implements OnDestroy {
 
   doSearch(term?: any, dataPage?: any) {
     this.loading = true;
-    this.searchSrv.doSimpleSearch(term ?? this.searchTerm, undefined, dataPage ?? this.pageData)
+    this.searchSrv.doSimpleSearch(term ?? this.searchTerm, undefined, dataPage ?? this.pageData, this.propertiesPlan?.id)
       .pipe(finalize(() => this.loading = false))
       .subscribe(_result => {
           if (_result?.success) {

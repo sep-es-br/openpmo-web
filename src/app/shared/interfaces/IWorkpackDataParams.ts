@@ -17,6 +17,7 @@ export interface  IWorkpackParams {
   idTransversalView?: number;
   idTransversalProgram?: number;
   idTransversalRoot?: number;
+  classification?: 'STRUCTURAL' | 'TRANSVERSAL';
   idWorkpackLinkedParent?: number;
   idOfficeOwnerWorkpackLinked?: number;
   idOffice?: number;

@@ -79,6 +79,7 @@ export interface IMenuWorkpack {
   fontIcon: string;
   children: IMenuWorkpack[];
   expanded?: boolean;
+  selectable?: boolean;
 }
 
 export interface PlanMenuItem extends MenuItem {

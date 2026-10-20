@@ -410,7 +410,7 @@ export class WorkpackComponent implements OnDestroy, OnInit {
     ) {
         this.page = pageData.page;
         this.workpackLoading = true;
-        this.searchSrv.doSimpleSearch(this.searchTerm, this.idWorkpack, pageData)
+        this.searchSrv.doSimpleSearch(this.searchTerm, this.idWorkpack, pageData, this.idPlan)
             .pipe(finalize(() => this.workpackLoading = false))
             .subscribe(_result => {
                 if(_result?.success) {
@@ -1707,7 +1707,7 @@ export class WorkpackComponent implements OnDestroy, OnInit {
         } as PageDef;
 
         this.workpackLoading = true;
-        this.searchSrv.doSimpleSearch(this.searchTerm, this.idWorkpack, pageData)
+        this.searchSrv.doSimpleSearch(this.searchTerm, this.idWorkpack, pageData, this.idPlan)
             .pipe(finalize(() => this.workpackLoading = false))
             .subscribe(_result => {
                 if(_result?.success) {

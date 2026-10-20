@@ -57,6 +57,10 @@ export class PersonService extends BaseService<IPerson>{
     return result as IHttpResult<IPerson>;
   }
 
+  public async getCurrentUserAdministrator(): Promise<IHttpResult<boolean>> {
+    return this.http.get<IHttpResult<boolean>>(`${this.urlBase}/is-administrator`).toPromise();
+  }
+
   public async GetPersonByFullName(options): Promise<IHttpResult<IPerson[]>> {
     const result = await this.http.get<IHttpResult<IPerson[]>>(`${this.urlBase}/fullname`,
       {

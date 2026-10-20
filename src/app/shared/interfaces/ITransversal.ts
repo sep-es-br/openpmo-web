@@ -113,3 +113,21 @@ export interface ITransversalSelectionOption {
   idPlan: number;
   displayName?: string;
 }
+
+export interface ITransversalAccessContext {
+  idPlan: number;
+  idPlanModel: number;
+  idTransversalView: number;
+  viewName: string;
+  idTransversalProgram: number;
+  idWorkpackModel: number;
+  idWorkpack: number;
+  idOffice: number;
+}
+
+export interface IStructuralAccessContext {
+  idPlan: number;
+  idWorkpack: number;
+  idWorkpackModel: number;
+  idOffice: number;
+}

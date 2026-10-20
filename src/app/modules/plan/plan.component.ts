@@ -213,7 +213,7 @@ export class PlanComponent implements OnInit, OnDestroy {
       ) {
           this.page = pageData.page;
           this.searchLoading = true;
-          this.searchSrv.doSimpleSearch(this.searchTerm, undefined, pageData)
+          this.searchSrv.doSimpleSearch(this.searchTerm, undefined, pageData, this.idPlan)
               .pipe(finalize(() => this.searchLoading = false))
               .subscribe(_result => {
                   if(_result?.success) {
@@ -1138,7 +1138,7 @@ export class PlanComponent implements OnInit, OnDestroy {
   
           
           this.searchLoading = true;
-          this.searchSrv.doSimpleSearch(this.searchTerm, undefined, pageData)
+          this.searchSrv.doSimpleSearch(this.searchTerm, undefined, pageData, this.idPlan)
               .pipe(finalize(() => this.searchLoading = false))
               .subscribe(_result => {
                   if(_result?.success) {

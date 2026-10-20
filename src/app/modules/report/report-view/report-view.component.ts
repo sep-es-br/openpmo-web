@@ -27,6 +27,8 @@ import { ReportPreferredFormatEnum } from 'src/app/shared/enums/ReportPreferredF
 import { IReportGenerate } from 'src/app/shared/interfaces/IReportGenerate';
 import { MenuService } from 'src/app/shared/services/menu.service';
 import { IMenuWorkpack } from 'src/app/shared/interfaces/IMenu';
+import { ITransversalProgram, ITransversalStructuralLink } from 'src/app/shared/interfaces/ITransversal';
+import { TransversalService } from 'src/app/shared/services/transversal.service';
 
 @Component({
   selector: 'app-report-view',
@@ -53,6 +55,8 @@ export class ReportViewComponent implements OnInit, OnDestroy {
   isGenerating = false;
   generateReportEnabled = false;
   scope = [];
+  private transversalProgramIds = new Set<number>();
+  private transversalProgramModelIds = new Set<number>();
 
   constructor(
     private responsiveSvr: ResponsiveService,
@@ -66,7 +70,8 @@ export class ReportViewComponent implements OnInit, OnDestroy {
     private unitMeasureSrv: MeasureUnitService,
     private reportSrv: ReportService,
     private messageSrv: MessageService,
-    private menuSrv: MenuService
+    private menuSrv: MenuService,
+    private transversalSrv: TransversalService
   ) {
     this.setPreferredFormatOptions();
     const plan = localStorage.getItem('@currentPlan');
@@ -129,7 +134,13 @@ export class ReportViewComponent implements OnInit, OnDestroy {
     if (this.reportViewProperties) {this.reportViewProperties.isLoading = true;}
     const planStorage = localStorage.getItem('@pmo/propertiesCurrentPlan');
     const planProperties = JSON.parse(planStorage);
-    const scopeData = menuItems;
+    this.selectedWorkpacks = [];
+    const transversalScope = await this.loadTransversalScope(planProperties?.id || this.idPlan);
+    const structuralScope = this.filterTransversalProgramsFromPortfolio(menuItems || []);
+    const scopeData = [
+      ...structuralScope,
+      ...transversalScope
+    ];
     const rootNode = {
       label: planProperties && planProperties.name,
       icon: IconsEnum.Plan,
@@ -147,6 +158,135 @@ export class ReportViewComponent implements OnInit, OnDestroy {
     this.checkProperties();
   }
 
+  private async loadTransversalScope(idPlan: number): Promise<IMenuWorkpack[]> {
+    this.transversalProgramIds = new Set<number>();
+    this.transversalProgramModelIds = new Set<number>();
+    if (!idPlan) {
+      return [];
+    }
+
+    try {
+      const contextsResult = await this.transversalSrv.getAccessibleContexts();
+      const contexts = contextsResult?.success
+        ? (contextsResult.data || []).filter(context => Number(context.idPlan) === Number(idPlan))
+        : [];
+      const views = Array.from(new Map(contexts.map(context => [
+        Number(context.idTransversalView),
+        { id: Number(context.idTransversalView), name: context.viewName }
+      ])).values());
+
+      const viewItems = await Promise.all(views.map(async view => {
+        const [programsResult, linksResult] = await Promise.all([
+          this.transversalSrv.getPrograms(view.id, idPlan),
+          this.transversalSrv.getStructuralLinksForView(view.id, idPlan)
+        ]);
+        const programs = programsResult?.success ? programsResult.data || [] : [];
+        const links = linksResult?.success ? linksResult.data || [] : [];
+        programs.forEach(program => {
+          this.transversalProgramIds.add(Number(program.idTransversalProgram));
+          this.transversalProgramModelIds.add(Number(program.idWorkpackModel));
+        });
+        const programItems = this.buildTransversalProgramScope(programs, links);
+
+        if (!programItems.length) {
+          return [];
+        }
+
+        return [{
+          id: `transversal-view-${view.id}`,
+          name: view.name,
+          fontIcon: 'fas fa-sitemap',
+          children: programItems,
+          selectable: true
+        } as IMenuWorkpack];
+      }));
+
+      return viewItems.reduce((items, view) => items.concat(view), [] as IMenuWorkpack[]);
+    } catch (error) {
+      return [];
+    }
+  }
+
+  private filterTransversalProgramsFromPortfolio(items: IMenuWorkpack[]): IMenuWorkpack[] {
+    return (items || []).reduce((filtered, item) => {
+      if (this.transversalProgramIds.has(Number(item.id)) ||
+        this.transversalProgramModelIds.has(Number(item.idWorkpackModel))) {
+        return filtered;
+      }
+      filtered.push({
+        ...item,
+        children: this.filterTransversalProgramsFromPortfolio(item.children || [])
+      });
+      return filtered;
+    }, [] as IMenuWorkpack[]);
+  }
+
+  private buildTransversalProgramScope(
+    programs: ITransversalProgram[],
+    links: ITransversalStructuralLink[],
+    parentId?: number,
+    visited = new Set<number>()
+  ): IMenuWorkpack[] {
+    const programIds = new Set((programs || []).map(program => Number(program.idTransversalProgram)));
+    const currentPrograms = (programs || []).filter(program => parentId
+      ? Number(program.idParent) === Number(parentId)
+      : !program.idParent || !programIds.has(Number(program.idParent))
+    );
+
+    return currentPrograms.filter(program => !visited.has(Number(program.idTransversalProgram))).map(program => {
+      const idProgram = Number(program.idTransversalProgram);
+      const branch = new Set(visited);
+      branch.add(idProgram);
+      const rootModelIds = Array.from(new Set((links || [])
+        .filter(link => Number(link.idTransversalProgram) === idProgram && link.idRootWorkpackModel)
+        .map(link => Number(link.idRootWorkpackModel))));
+      const structuralItems = rootModelIds.reduce((items, idRootWorkpackModel) => items.concat(
+        this.buildTransversalStructuralScope(idProgram, idRootWorkpackModel, links)
+      ), [] as IMenuWorkpack[]);
+      const childPrograms = this.buildTransversalProgramScope(programs, links, idProgram, branch);
+      return {
+        id: String(idProgram),
+        name: program.name,
+        fullName: program.fullName,
+        fontIcon: program.fontIcon,
+        children: [...childPrograms, ...structuralItems]
+      } as IMenuWorkpack;
+    });
+  }
+
+  private buildTransversalStructuralScope(
+    idProgram: number,
+    idRootWorkpackModel: number,
+    links: ITransversalStructuralLink[],
+    parentId?: number,
+    visited = new Set<number>()
+  ): IMenuWorkpack[] {
+    const programLinks = (links || []).filter(link =>
+      Number(link.idTransversalProgram) === Number(idProgram) &&
+      Number(link.idRootWorkpackModel) === Number(idRootWorkpackModel)
+    );
+    const currentLinks = programLinks.filter(link => parentId
+      ? Number(link.idParentWorkpack) === Number(parentId)
+      : !link.idParentWorkpack || !programLinks.some(candidate =>
+        Number(candidate.idWorkpack) === Number(link.idParentWorkpack)
+      )
+    );
+
+    return currentLinks.filter(link => !visited.has(Number(link.idWorkpack))).map(link => {
+      const idWorkpack = Number(link.idWorkpack);
+      const branch = new Set(visited);
+      branch.add(idWorkpack);
+      return {
+        id: String(idWorkpack),
+        idWorkpackModel: link.idWorkpackModel,
+        name: link.name,
+        fullName: link.fullName,
+        fontIcon: link.fontIcon,
+        children: this.buildTransversalStructuralScope(idProgram, idRootWorkpackModel, programLinks, idWorkpack, branch)
+      } as IMenuWorkpack;
+    });
+  }
+
   loadTreeNodeScope(children: IMenuWorkpack[], parent?: TreeNode): TreeNode[] {
     if (!children) {
       return [];
@@ -156,22 +296,26 @@ export class ReportViewComponent implements OnInit, OnDestroy {
         const node = {
           label: workpack.name,
           icon: workpack.fontIcon,
-          data: workpack.id,
+          data: workpack.selectable === false ? undefined : Number(workpack.id),
           children: undefined,
           parent,
           type: 'workpack',
           expanded: false,
+          selectable: workpack.selectable,
         };
-        this.selectedWorkpacks.push(node);
+        if (workpack.selectable !== false) {
+          this.selectedWorkpacks.push(node);
+        }
         node.children = this.loadTreeNodeScope(workpack.children, node);
         return node;
       }
       return {
         label: workpack.name,
-        data: workpack.id,
+        data: workpack.selectable === false ? undefined : Number(workpack.id),
         children: undefined,
         parent,
         icon: workpack.fontIcon,
+        selectable: workpack.selectable,
       };
     });
   }
@@ -471,12 +615,14 @@ export class ReportViewComponent implements OnInit, OnDestroy {
     this.scope = [...this.selectedWorkpacks];
     const scopeSelected = [...this.scope];
     scopeSelected.forEach(item => {
-      if (item.children) {
-        const children = item.children.map(child => child.data);
+      if (item.children && Number.isFinite(Number(item.data))) {
+        const children = item.children.map(child => Number(child.data));
         this.scope = this.scope.filter(itemScope => !children.includes(itemScope.data));
       }
     });
-    this.scope = this.scope.map(item => item.data);
+    this.scope = Array.from(new Set(this.scope
+      .map(item => Number(item.data))
+      .filter(id => Number.isFinite(id))));
   }
 
   checkProperties(property?: PropertyTemplateModel) {

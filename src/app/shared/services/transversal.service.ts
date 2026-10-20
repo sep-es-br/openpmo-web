@@ -9,7 +9,9 @@ import {
   ITransversalLinkedModel,
   ITransversalWorkpack,
   ITransversalWorkpackParticipation,
-  ITransversalStructuralLink
+  ITransversalStructuralLink,
+  ITransversalAccessContext,
+  IStructuralAccessContext
 } from '../interfaces/ITransversal';
 import { PrepareHttpParams } from '../utils/query.util';
 
@@ -32,6 +34,16 @@ export class TransversalService extends BaseService<ITransversalProgram> {
         'id-plan-model': params?.idPlanModel
       })
     }).toPromise();
+  }
+
+  getAccessibleContexts(): Promise<IHttpResult<ITransversalAccessContext[]>> {
+    return this.http.get<IHttpResult<ITransversalAccessContext[]>>(`${this.urlBase}/access-contexts`).toPromise();
+  }
+
+  getDirectStructuralAccessContexts(): Promise<IHttpResult<IStructuralAccessContext[]>> {
+    return this.http.get<IHttpResult<IStructuralAccessContext[]>>(
+      `${this.urlBase}/structural-access-contexts`
+    ).toPromise();
   }
 
   getPrograms(idTransversalView: number, idPlan: number): Promise<IHttpResult<ITransversalProgram[]>> {

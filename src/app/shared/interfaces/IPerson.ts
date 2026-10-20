@@ -30,6 +30,7 @@ export interface IWorkLocal {
   idWorkpackModelLinked: number;
   classification?: 'STRUCTURAL' | 'TRANSVERSAL';
   idTransversalRoot?: number;
+  idTransversalView?: number;
 }
 
 export interface IPersonOfficePermission {

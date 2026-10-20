@@ -28,6 +28,8 @@ export class AuthService {
   userLogout = new Subject();
   private isLoginDenied = new BehaviorSubject<boolean>(false);
   private infoPersonChanged = new Subject<IPerson>();
+  private administratorStatus?: boolean;
+  private administratorStatusRequest?: Promise<boolean>;
 
 
   constructor(
@@ -86,6 +88,8 @@ export class AuthService {
   saveToken(data: any) {
     localStorage.setItem(StoreKeys.ACCESS_TOKEN, data.token);
     localStorage.setItem(StoreKeys.REFRESH_TOKEN, data.refreshToken);
+    this.administratorStatus = undefined;
+    this.administratorStatusRequest = undefined;
   }
 
   clearTokens() {
@@ -95,6 +99,8 @@ export class AuthService {
 
   clearStorage() {
     localStorage.clear();
+    this.administratorStatus = undefined;
+    this.administratorStatusRequest = undefined;
   }
 
   getAccessToken() {
@@ -109,16 +115,32 @@ export class AuthService {
     return this.getAccessToken() ? jwtDecode(this.getAccessToken()) : undefined;
   }
 
-  async setInfoPerson() {
-    const authenticated = await this.isAuthenticated();
-    if (authenticated) {
-      const { success, data } = await this.personSrv.GetByKey(this.getTokenPayload()?.key);
-      if (success) {
-        this.currentUserInfo = data;
-        localStorage.setItem('@PMO/infoPerson', JSON.stringify(this.currentUserInfo));
-        this.infoPersonChanged.next(this.currentUserInfo);
+  async setInfoPerson(): Promise<boolean> {
+    try {
+      const authenticated = await this.isAuthenticated();
+      if (!authenticated) {
+        this.clearCachedPersonInfo();
+        return false;
       }
+      const { success, data } = await this.personSrv.GetByKey(this.getTokenPayload()?.key);
+      if (!success || !data) {
+        this.clearCachedPersonInfo();
+        return false;
+      }
+      this.currentUserInfo = data;
+      localStorage.setItem('@PMO/infoPerson', JSON.stringify(this.currentUserInfo));
+      this.infoPersonChanged.next(this.currentUserInfo);
+      return true;
+    } catch (error) {
+      this.clearCachedPersonInfo();
+      return false;
     }
+  }
+
+  private clearCachedPersonInfo() {
+    this.currentUserInfo = undefined;
+    localStorage.removeItem('@PMO/infoPerson');
+    this.infoPersonChanged.next(undefined);
   }
 
   getInfoPerson() {
@@ -152,21 +174,24 @@ export class AuthService {
   }
 
   async isUserAdmin(): Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      let tries = 0;
-      const interval = setInterval(() => {
-        const payload = this.getTokenPayload();
-        if (payload) {
-          clearInterval(interval);
-          resolve(payload.administrator);
-        }
-        if (tries > 20) {
-          clearInterval(interval);
-          resolve(false);
-        }
-        tries++;
-      }, 500);
-    });
+    if (this.administratorStatus !== undefined) {
+      return this.administratorStatus;
+    }
+    if (!this.administratorStatusRequest) {
+      this.administratorStatusRequest = this.personSrv.getCurrentUserAdministrator()
+        .then(result => {
+          this.administratorStatus = !!result?.success && !!result.data;
+          return this.administratorStatus;
+        })
+        .catch(() => {
+          this.administratorStatus = false;
+          return false;
+        })
+        .finally(() => {
+          this.administratorStatusRequest = undefined;
+        });
+    }
+    return this.administratorStatusRequest;
   }
 
   private getUrlForAuth() {

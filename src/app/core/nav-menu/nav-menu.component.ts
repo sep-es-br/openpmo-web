@@ -26,6 +26,7 @@ import { OfficeService } from 'src/app/shared/services/office.service';
 import { PersonService } from 'src/app/shared/services/person.service';
 import { PlanService } from 'src/app/shared/services/plan.service';
 import { ReportService } from 'src/app/shared/services/report.service';
+import { TransversalService } from 'src/app/shared/services/transversal.service';
 
 @Component({
   selector: 'app-nav-menu',
@@ -84,6 +85,14 @@ export class NavMenuComponent implements OnInit, OnDestroy {
 
   currentPlan: IPlan;
 
+  hasDirectPlanAccess = false;
+
+  hasDirectStructuralAccess = false;
+
+  hasDirectTransversalAccess = false;
+
+  isTransversalContext = false;
+
   currentIDOffice: number;
 
   showUserMenu = false;
@@ -97,7 +106,8 @@ export class NavMenuComponent implements OnInit, OnDestroy {
     private planSrv: PlanService,
     private cookieSrv: CookieService,
     private reportSrv: ReportService,
-    private personSrv: PersonService
+    private personSrv: PersonService,
+    private transversalSrv: TransversalService
   ) {
     this.menuSrv.isOfficeConfigMenu
       .pipe(takeUntil(this.$destroy))
@@ -132,6 +142,7 @@ export class NavMenuComponent implements OnInit, OnDestroy {
           this.currentIDPlan = id;
         }
 
+        await this.loadViewAccess();
         await this.loadPropertiesPlan();
         if (this.currentIDPlan && this.currentIDPlan !== 0)
           this.loadReportsMenu();
@@ -139,6 +150,8 @@ export class NavMenuComponent implements OnInit, OnDestroy {
 
     this.locationSrv.onUrlChange((url) => {
       this.currentURL = url.slice(2);
+      const query = new URLSearchParams(this.currentURL.split('?')[1] || '');
+      this.isTransversalContext = query.get('classification') === 'TRANSVERSAL';
     });
 
     this.menuSrv.isPlanMenu
@@ -275,6 +288,38 @@ export class NavMenuComponent implements OnInit, OnDestroy {
 
   async loadCurrentInfo() {
     this.currentUserInfo = await this.authSrv.getInfoPerson();
+    await this.loadViewAccess();
+  }
+
+  private async loadViewAccess() {
+    if (this.isUserAdmin) {
+      this.hasDirectPlanAccess = true;
+      this.hasDirectStructuralAccess = true;
+      this.hasDirectTransversalAccess = true;
+      return;
+    }
+    if (!this.currentIDPlan) {
+      this.hasDirectPlanAccess = false;
+      this.hasDirectStructuralAccess = false;
+      this.hasDirectTransversalAccess = false;
+      return;
+    }
+    try {
+      const [structural, transversal, directPlanAccess] = await Promise.all([
+        this.transversalSrv.getDirectStructuralAccessContexts(),
+        this.transversalSrv.getAccessibleContexts(),
+        this.planSrv.hasDirectAccess(this.currentIDPlan)
+      ]);
+      this.hasDirectPlanAccess = directPlanAccess;
+      this.hasDirectStructuralAccess = this.hasDirectPlanAccess || (!!structural?.success &&
+        !!structural.data?.some(context => Number(context.idPlan) === Number(this.currentIDPlan)));
+      this.hasDirectTransversalAccess = this.hasDirectPlanAccess || (!!transversal?.success &&
+        !!transversal.data?.some(context => Number(context.idPlan) === Number(this.currentIDPlan)));
+    } catch (error) {
+      this.hasDirectPlanAccess = false;
+      this.hasDirectStructuralAccess = false;
+      this.hasDirectTransversalAccess = false;
+    }
   }
 
   async loadReportsMenu() {
@@ -295,9 +340,12 @@ export class NavMenuComponent implements OnInit, OnDestroy {
       Number(currentPlan) !== 0 ? Number(currentPlan) : undefined;
     if (this.currentIDPlan) {
       if (this.authSrv.getAccessToken()) {
-        this.currentPlan = await this.planSrv.getCurrentPlan(
-          this.currentIDPlan
-        );
+        try {
+          const result = await this.planSrv.GetById(this.currentIDPlan);
+          this.currentPlan = result?.success ? result.data : undefined;
+        } catch (error) {
+          this.currentPlan = undefined;
+        }
         if (this.currentPlan) {
           if (this.currentIDOffice !== this.currentPlan.idOffice) {
             this.currentIDOffice = this.currentPlan.idOffice;
