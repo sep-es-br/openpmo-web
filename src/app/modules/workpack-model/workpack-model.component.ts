@@ -1087,9 +1087,7 @@ export class WorkpackModelComponent implements OnInit {
     });
     const arePropertiesValid = propertiesChecks.reduce((a, b) => a ? b.valid : a, true);
     // Stakeholder
-    const arePossiblesValuesValid = (this.posibleRolesOrg.length > 0 || this.posibleRolesPerson.length > 0)
-      || !this.cardPropertiesStakeholders.initialStateToggle
-      || this.workpackModelType === TypeWorkpackModelEnum.MilestoneModel;
+    const arePossiblesValuesValid = this.areStakeholderRolesValid();
 
     if (this.formProperties.invalid || !arePropertiesValid || !arePossiblesValuesValid) {
       this.saveButton?.hideButton();
@@ -1157,9 +1155,7 @@ export class WorkpackModelComponent implements OnInit {
       .filter(property => property.type === TypePropertyEnum.GroupModel)
       .every(property => this.checkPropertiesGroupeds(property.groupedProperties));
     // Stakeholder
-    const arePossiblesValuesValid = (this.posibleRolesOrg.length > 0 && this.posibleRolesPerson.length > 0)
-      || !this.cardPropertiesStakeholders.initialStateToggle
-      || this.workpackModelType === TypeWorkpackModelEnum.MilestoneModel;
+    const arePossiblesValuesValid = this.areStakeholderRolesValid();
 
     if (this.formProperties.invalid || !arePropertiesValid || hasInvalidMax || !areNestedGroupsValid || !arePossiblesValuesValid) {
       return false;
@@ -1183,6 +1179,28 @@ export class WorkpackModelComponent implements OnInit {
         ? value.length > 0
         : typeof value === 'boolean' || typeof value === 'number' || !!value);
     });
+  }
+
+  get hasInvalidStakeholderRoles(): boolean {
+    return !!this.cardPropertiesStakeholders?.initialStateToggle && !this.areStakeholderRolesValid();
+  }
+
+  get hasInvalidStakeholderPersonRoles(): boolean {
+    return !!this.cardPropertiesStakeholders?.initialStateToggle && !this.posibleRolesPerson?.length;
+  }
+
+  get hasInvalidStakeholderOrganizationRoles(): boolean {
+    return !!this.cardPropertiesStakeholders?.initialStateToggle && !this.posibleRolesOrg?.length;
+  }
+
+  get hasInvalidPropertiesPanel(): boolean {
+    return !!this.formProperties?.invalid || this.invalidProperties.size > 0;
+  }
+
+  private areStakeholderRolesValid(): boolean {
+    return this.workpackModelType === TypeWorkpackModelEnum.MilestoneModel
+      || !this.cardPropertiesStakeholders?.initialStateToggle
+      || (!!this.posibleRolesPerson?.length && !!this.posibleRolesOrg?.length);
   }
 
   private updateInvalidProperties(): void {
