@@ -1,4 +1,4 @@
-import {IFile} from './IFile';
+import { IFile } from './IFile';
 import { IOrganization } from './IOrganization';
 
 export interface IPerson {
@@ -14,7 +14,11 @@ export interface IPerson {
   cpf?: string;
   isUser?: boolean;
   officePermission?: IPersonOfficePermission;
-  roles?: { role: string; workLocation?: string }[];
+  roles?: {
+    role: string;
+    workLocation?: string;
+    roleGuid?: string;
+  }[];
   administrator?: boolean;
   avatar?: IFile;
   isCcbMember?: boolean;

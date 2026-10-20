@@ -98,9 +98,13 @@
         font-family: v.$fontFamilyMedium;
         padding: 0.5em;
         padding-top: 0;
-        display: flex;
+        display: block;
         flex: 1;
-        align-items: center;
+        width: 100%;
+        box-sizing: border-box;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
         text-align: center;
       }
       .card-item-description {
@@ -311,6 +315,16 @@
 ::ng-deep .app-card-item-file.read-only {
   .p-card {
     background-color: transparent !important;
+  }
+}
+
+::ng-deep .file-name-tooltip {
+  max-width: 280px;
+
+  .p-tooltip-text {
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: break-word;
   }
 }
 
