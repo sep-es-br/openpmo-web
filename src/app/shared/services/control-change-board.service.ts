@@ -24,9 +24,8 @@ export class ControlChangeBoardService extends BaseService<IControlChangeBoard> 
     return result as IHttpResult<IControlChangeBoard>;
   }
 
-  async Put(ccbMember: IControlChangeBoard) {
-    const result = await this.http.put(`${this.urlBase}`, ccbMember).toPromise();
-    return result;
+  async Put(ccbMember: IControlChangeBoard): Promise<IHttpResult<void>> {
+    return this.http.put<IHttpResult<void>>(`${this.urlBase}`, ccbMember).toPromise();
   }
 
   async Delete(ccbMember: IControlChangeBoard, options?): Promise<IHttpResult<any>> {

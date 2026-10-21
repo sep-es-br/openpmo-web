@@ -1,0 +1,241 @@
+import { hasPropertyWeight } from '../utils/property-weight.util';
+import { Injectable } from '@angular/core';
+import {
+  CriteriaGroupModel,
+  CriteriaOperation,
+  CriteriaTabModel
+} from '../interfaces/IPreprojectCriteriaModel';
+import { PreprojectModelService } from './preproject-model.service';
+
+export type PreprojectCriterionOperation = CriteriaOperation;
+export type PreprojectCriterionGroup = CriteriaGroupModel;
+export type PreprojectCriterion = CriteriaTabModel;
+
+@Injectable({ providedIn: 'root' })
+export class PreprojectCriteriaConfigService {
+
+  constructor(private readonly preprojectModelService: PreprojectModelService) {}
+
+  async getCriteriaByModelId(
+    idPreprojectModel: number,
+    linkedCriterionIds: number[] = []
+  ): Promise<PreprojectCriterion[]> {
+    const response = await this.preprojectModelService.findById(idPreprojectModel);
+    if (!response.success || !response.data) {
+      return [];
+    }
+    const linkedIds = new Set(linkedCriterionIds);
+    const activeCriteriaTabs = ((response.data.properties || []) as any[])
+      .filter(property =>
+        property.type === 'CriteriaTabModel'
+        && (property.active !== false || linkedIds.has(property.id))
+      );
+    return this.mapCriteriaFromResponse(activeCriteriaTabs)
+      .sort((first, second) => first.position - second.position || first.id - second.id);
+  }
+
+  async addCriterion(idOffice: number, criterion: Omit<PreprojectCriterion, 'id'>): Promise<PreprojectCriterion> {
+    const modelResponse = await this.preprojectModelService.findOrCreateByOfficeId(idOffice);
+    if (modelResponse.success && modelResponse.data) {
+      const idModel = modelResponse.data.id;
+      const requestPayload = this.toBackendCriterion(criterion);
+      const response = await this.preprojectModelService.createCriteriaTab(idModel, requestPayload);
+      if (response.success && response.data) {
+        return this.mapCriteriaFromResponse([response.data as any])[0];
+      }
+    }
+    throw new Error('Failed to create criterion');
+  }
+
+  async deleteCriterion(criterionId: number): Promise<void> {
+    const response = await this.preprojectModelService.deleteCriteriaTab(criterionId);
+    if (!response.success) {
+      throw new Error('Failed to delete criterion');
+    }
+  }
+
+  async canDeleteCriterion(criterionId: number): Promise<boolean> {
+    const response = await this.preprojectModelService.canDeleteCriteriaTab(criterionId);
+    return response.success && response.data === true;
+  }
+
+  async setCriterionActive(criterionId: number, active: boolean): Promise<void> {
+    const response = await this.preprojectModelService.setCriteriaTabActive(criterionId, active);
+    if (!response.success) {
+      throw new Error('Failed to update criterion status');
+    }
+  }
+
+  async getCriterion(criterionId: number): Promise<PreprojectCriterion | undefined> {
+    const response = await this.preprojectModelService.findCriteriaTabById(criterionId);
+    if (response.success && response.data) {
+      return this.mapCriteriaFromResponse([response.data as any])[0];
+    }
+    return undefined;
+  }
+
+  async updateCriterion(
+    criterionId: number,
+    criterion: Omit<PreprojectCriterion, 'id'>
+  ): Promise<PreprojectCriterion> {
+    const requestPayload = this.toBackendCriterion({ ...criterion, id: criterionId } as PreprojectCriterion);
+    const response = await this.preprojectModelService.updateCriteriaTab(criterionId, requestPayload);
+    if (response.success && response.data) {
+      return this.mapCriteriaFromResponse([response.data as any])[0];
+    }
+    throw new Error('Failed to update criterion');
+  }
+
+  private toBackendCriterion(criterion: Partial<PreprojectCriterion>): any {
+    const mapTypeToBackend = (type: string): string => {
+      if (type === 'ChallengeListModel' || type === 'SdgListModel') return 'CriteriaListModel';
+      return type;
+    };
+    const getDefaultValues = (property: any): any[] => Array.isArray(property.defaultValue)
+      ? property.defaultValue
+      : property.defaultValue !== undefined && property.defaultValue !== null && property.defaultValue !== ''
+        ? [property.defaultValue]
+        : [];
+
+    const toBackendProperty = (p: any): any => {
+      const {
+        requiredFields, list, extraList, extraListDefaults, selectedLocalities,
+        showIconButtonSelectLocality, isCollapsed, viewOnly, obligatory,
+        disableMultipleSelection, sectorsList, possibleValuesOptions,
+        possibleValuesDetails, propertyModelType, weight, ...property
+      } = p;
+      const backendType: string = mapTypeToBackend(p.type);
+      return {
+        ...property,
+        type: backendType,
+        sortIndex: p.sortIndex || p.position || 1,
+        label: p.label || p.name,
+        ...(hasPropertyWeight(p.type) ? { weight: weight ?? 1 } : {}),
+        ...(p.type === 'SelectionModel' ? {
+          possibleValues: (possibleValuesOptions || []).join(','),
+          defaultValue: Array.isArray(p.defaultValue) ? p.defaultValue.join(',') : p.defaultValue,
+          multipleSelection: !!p.multipleSelection
+        } : {}),
+        ...(p.type === 'CriteriaSelectionModel' ? {
+          weight: p.weight ?? 1,
+          acceptedOptions: (possibleValuesDetails || []).map((option: any, index: number) => ({
+            ...option,
+            position: option.position || index + 1,
+            defaultOption: getDefaultValues(p).includes(option.label)
+          }))
+        } : {}),
+        ...(backendType === 'CriteriaListModel' ? {
+          weight: p.weight ?? 1,
+          itemValue: p.itemValue ?? 1
+        } : {})
+      };
+    };
+
+    const properties = (criterion.properties || []).map(toBackendProperty);
+    const groups = (criterion.groups || []).map((g: any) => {
+      const {
+        properties: groupProperties, groupedProperties: ignoredGroupedProperties, propertyModelType,
+        title, currentEnabled, ...group
+      } = g;
+      return {
+        ...group,
+        type: 'CriteriaGroupModel',
+        name: title || g.name,
+        label: title || g.name || g.label,
+        sortIndex: g.sortIndex || g.position || 1,
+        properties: (groupProperties || []).map(toBackendProperty)
+      };
+    });
+    const { properties: ignoredProperties, groups: ignoredGroups, propertyModelType, position, ...criterionData } = criterion as any;
+    return {
+      ...criterionData,
+      type: 'CriteriaTabModel',
+      active: criterion.active !== false,
+      name: criterion.name,
+      label: criterion.name,
+      sortIndex: criterion.position || 1,
+      organized: groups,
+      properties
+    };
+  }
+
+  private mapTypeToFrontend(p: any): string {
+    if (p.type === 'ListModel' || p.type === 'CriteriaListModel') {
+      const name = (p.name || '').toLowerCase();
+      if (name.includes('ods') || name.includes('sustentável') || name.includes('desenvolvimento')) return 'SdgListModel';
+      return 'ChallengeListModel'; // Fallback para renderizar como lista mesmo se o nome não for reconhecido
+    }
+    return p.type;
+  }
+
+  mapCriteriaFromResponse(criteria: any[]): PreprojectCriterion[] {
+    return (criteria || []).map((criterion: any, index: number) => {
+      const sortByIndex = (first: any, second: any): number =>
+        (first.sortIndex || 0) - (second.sortIndex || 0);
+
+      const normalizeProperty = (p: any): any => {
+        const criteriaDefaults: string[] = (p.acceptedOptions || [])
+          .filter((option: any) => option.defaultOption)
+          .map((option: any) => option.label);
+        return {
+          ...p,
+          type: this.mapTypeToFrontend(p),
+          weight: p.weight ?? 1,
+          ...(p.type === 'SelectionModel' ? {
+            possibleValuesOptions: p.possibleValues
+              ? String(p.possibleValues).split(',').filter((value: string) => !!value)
+              : [],
+            defaultValue: p.multipleSelection && p.defaultValue
+              ? String(p.defaultValue).split(',').filter((value: string) => !!value)
+              : (p.defaultValue || '')
+          } : {}),
+          ...(p.type === 'CriteriaSelectionModel' ? {
+            possibleValuesDetails: p.acceptedOptions || [],
+            possibleValuesOptions: (p.acceptedOptions || []).map((option: any) => option.label),
+            defaultValue: p.multipleSelection === false ? (criteriaDefaults[0] || '') : criteriaDefaults,
+            multipleSelection: p.multipleSelection !== undefined ? p.multipleSelection : true,
+            disableMultipleSelection: false
+          } : {}),
+          ...(p.type === 'CriteriaListModel' ? {
+            weight: p.weight ?? 1,
+            itemValue: p.itemValue ?? 1
+          } : {})
+        };
+      };
+
+      const groups = [...(criterion.organized || [])]
+        .filter((property: any) => property.type === 'CriteriaGroupModel')
+        .sort(sortByIndex)
+        .map((group: any) => ({
+          ...group,
+          properties: (group.properties || []).map(normalizeProperty).sort(sortByIndex)
+        }));
+
+      const properties = [...(criterion.properties || [])]
+        .sort(sortByIndex)
+        .map(normalizeProperty);
+
+      return {
+        propertyModelType: 'CriteriaTabModel',
+        id: criterion.id || index + 1,
+        name: criterion.name || '',
+        label: criterion.label || criterion.name || '',
+        active: criterion.active !== false,
+        position: criterion.sortIndex || criterion.position || index + 1,
+        icon: criterion.icon || 'fas fa-cog',
+        weight: criterion.weight || 1,
+        operation: criterion.operation || 'SUM',
+        properties: properties,
+        groups: groups.map((group: any) => {
+          const { groupedProperties: ignoredGroupedProperties, ...groupData } = group;
+          return {
+            ...groupData,
+            propertyModelType: 'CriteriaGroupModel',
+            title: group.name || group.label || group.title,
+            properties: [...(group.properties || [])]
+          };
+        })
+      };
+    });
+  }
+}

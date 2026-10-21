@@ -1,0 +1,108 @@
+@use "src/variables" as v;
+
+.property-list-selection {
+  width: 100%;
+}
+
+.property-list-title {
+  color: #005b7a;
+  margin-bottom: .75rem;
+}
+
+.property-list-dataview {
+  display: block;
+  width: 100%;
+}
+
+:host ::ng-deep {
+  .property-list-dataview:not(.list-mode) .app-card-item.listItem .card-item-name {
+    display: -webkit-box !important;
+    max-height: 2.3rem;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: normal !important;
+    line-height: 1.15rem !important;
+    overflow-wrap: anywhere;
+    box-sizing: border-box;
+    max-width: 100%;
+    padding: 0 .75rem !important;
+    text-align: center;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+  }
+}
+
+:host(.challenge-list-selection) ::ng-deep {
+  .property-list-dataview:not(.list-mode) .app-card-item.listItem .card-item-content {
+    justify-content: center;
+    gap: .35rem;
+    padding: 0 .75rem !important;
+  }
+
+  .property-list-dataview:not(.list-mode) .app-card-item.listItem .card-item-icon {
+    font-size: 1.3rem !important;
+    line-height: 1;
+  }
+
+  .property-list-dataview:not(.list-mode) .app-card-item.listItem .card-item-subtitle {
+    display: block;
+    max-width: 100%;
+    overflow: hidden;
+    margin-top: 0;
+    padding: 0 !important;
+    color: #009dd4;
+    font-size: .65rem;
+    line-height: 1rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+
+.challenge-list-filters {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  padding-top: .75rem;
+
+  .p-float-label,
+  .app-single-selection,
+  .app-multiple-selection {
+    display: block;
+    min-width: 0;
+    width: 100%;
+  }
+}
+
+:host ::ng-deep .challenge-list-filters .app-single-selection .p-dropdown {
+  width: 100%;
+}
+
+:host ::ng-deep .challenge-list-filters .app-multiple-selection .p-multiselect {
+  width: 100%;
+}
+
+:host ::ng-deep .challenge-list-filters .app-multiple-selection {
+  .p-multiselect-label-container {
+    min-width: 0;
+  }
+
+  .p-multiselect-label {
+    display: block !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+}
+
+:host ::ng-deep .challenge-list-filters .app-multiple-selection .p-multiselect.p-focus {
+  border: 0 !important;
+  border-bottom: 1px solid v.$borderInputHover !important;
+  box-shadow: none !important;
+}
+
+
+@media screen and (max-width: 800px) {
+  .challenge-list-filters { grid-template-columns: minmax(0, 1fr); }
+}

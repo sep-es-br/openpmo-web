@@ -1,5 +1,5 @@
 import { takeUntil } from 'rxjs/operators';
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { ResponsiveService } from '../../services/responsive.service';
 import { Subject } from 'rxjs';
 
@@ -9,6 +9,10 @@ import { Subject } from 'rxjs';
   styleUrls: ['./buttons-container.component.scss']
 })
 export class ButtonsContainerComponent implements OnInit {
+
+  @Input() compact = false;
+
+  @Input() inline = false;
 
   responsive = false;
   $destroy = new Subject();

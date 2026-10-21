@@ -1,0 +1,65 @@
+<p-dialog [(visible)]="visible" [modal]="true" [dismissableMask]="dismissableMask" [closeOnEscape]="true"
+  [style]="{ width: width, maxWidth: '90vw', maxHeight: maxHeight }" [baseZIndex]="10000" styleClass="list-selection-dialog" (onHide)="handleHide()">
+  <p-header>
+    <div class="list-selection-dialog-title">{{ title }}</div>
+    <div *ngIf="subtitle" class="list-selection-dialog-subtitle">{{ subtitle }}</div>
+  </p-header>
+
+  <div class="list-selection-dialog-content">
+    <ng-content select="[listSelectionFilters]"></ng-content>
+
+    <span #selectionField *ngIf="!loading && dialogItems.length" class="p-float-label list-selection-dialog-field">
+    <p-multiSelect #selectionList
+      class="app-multiple-selection list-selection-dialog-multiselect"
+      [options]="dialogItems"
+      [(ngModel)]="draftSelection"
+      (ngModelChange)="handleSelectionChange($event)"
+      optionLabel="label"
+      optionDisabled="disabled"
+      dataKey="id"
+      dropdownIcon="fas fa-caret-down"
+      [filter]="true"
+      filterBy="label,description"
+      [filterPlaceHolder]="filterPlaceholder | translate"
+      [defaultLabel]="selectionLabel ? '' : (selectionPlaceholder | translate)"
+      [selectedItemsLabel]="'{0} ' + ('selectedItems' | translate)"
+      [emptyFilterMessage]="emptyMessage | translate"
+      [showToggleAll]="false"
+      [maxSelectedLabels]="summarizeSelection ? 0 : 2"
+      [display]="summarizeSelection ? 'comma' : 'chip'"
+      [style]="{ width: '100%' }"
+      [panelStyle]="{ width: selectionField.offsetWidth + 'px', maxWidth: 'calc(100vw - 2rem)' }"
+      [baseZIndex]="10001"
+      appendTo="body"
+      panelStyleClass="list-selection-dialog-multiselect-panel">
+      <ng-template let-item pTemplate="item">
+        <div class="list-selection-dialog-item">
+          <span>{{ item.label }}</span>
+          <small *ngIf="item.description">{{ item.description }}</small>
+        </div>
+      </ng-template>
+    </p-multiSelect>
+    <label *ngIf="selectionLabel" class="app-input-label">{{ selectionLabel | translate }}</label>
+    </span>
+
+    <span *ngIf="showEmptyMessage && !loading && !dialogItems.length" class="list-selection-dialog-empty">
+      {{ emptyMessage | translate }}
+    </span>
+    <div *ngIf="loading" class="list-selection-dialog-loading"
+      role="status" aria-live="polite" [attr.aria-label]="'loading' | translate">
+      <app-card-loading [isCardLoading]="true"></app-card-loading>
+    </div>
+  </div>
+
+  <p-footer *ngIf="showActions">
+    <div class="list-selection-dialog-actions">
+      <button type="button" pButton class="p-button-text list-selection-dialog-action"
+        icon="fas fa-times" iconPos="left" [label]="cancelLabel | translate" (click)="cancel()">
+      </button>
+      <button type="button" pButton class="p-button-text list-selection-dialog-action"
+        icon="fas fa-check" iconPos="left" [label]="confirmLabel | translate" (click)="confirm()"
+        [disabled]="loading || (requireSelection && !hasSelection)">
+      </button>
+    </div>
+  </p-footer>
+</p-dialog>

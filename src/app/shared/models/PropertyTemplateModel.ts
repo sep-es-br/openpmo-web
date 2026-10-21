@@ -1,5 +1,6 @@
 import { TranslateService } from '@ngx-translate/core';
 import { TreeNode } from 'primeng/api';
+import { IPropertyListItem, PropertyListCatalog } from '../interfaces/IPropertyListItem';
 import { TypePropertyModelEnum } from '../enums/TypePropertyModelEnum';
 import { IProperty } from '../interfaces/IProperty';
 import { IWorkpackProperty } from '../interfaces/IWorkpackProperty';
@@ -35,6 +36,9 @@ export class PropertyTemplateModel implements IProperty {
   value?: string | number | boolean | string[] | Date | number[];
   selectedValues?: number[] | number;
   selectedValue?: number;
+  listCatalog?: PropertyListCatalog;
+  selectedListItems?: IPropertyListItem[];
+  availableListItems?: IPropertyListItem[];
   invalid?: boolean;
   message?: string;
   groupedProperties?: PropertyTemplateModel[];
@@ -67,6 +71,13 @@ export class PropertyTemplateModel implements IProperty {
       name
     };
     switch (this.type) {
+      case TypePropertyModelEnum.ListModel:
+        property.items = (this.selectedListItems || []).map((item, index) => ({
+          foreignKey: item.foreignKey || `criteria-${idPropertyModel || id}-${index + 1}`,
+          label: item.name,
+          fullName: item.fullName
+        }));
+        break;
       case TypePropertyModelEnum.DateModel:
         property.value = value as Date;
         property.reason = reason;

@@ -1,0 +1,109 @@
+:host {
+  display: block;
+}
+
+.app-preproject {
+  width: 100%;
+
+  .preproject-status-filter {
+    align-items: center;
+    display: flex;
+    gap: 0.5rem;
+    align-self: center;
+    margin-right: 0.75rem !important;
+
+    .preproject-status-filter-label {
+      color: #005b7a;
+      font-size: 0.8rem;
+      white-space: nowrap;
+    }
+
+    ::ng-deep .p-dropdown {
+      min-width: 10rem;
+    }
+  }
+
+  // Mantém as ações do anteprojeto na mesma linha do título também no responsivo.
+  ::ng-deep .card-preprojects .dataview-filters-container {
+    align-items: center !important;
+    flex-direction: row !important;
+    flex: 0 0 auto;
+    margin-left: auto;
+    margin-right: 0.75rem !important;
+    width: auto !important;
+
+    .preproject-status-filter {
+      margin-right: 0.75rem !important;
+    }
+
+    > .new-element-button-container {
+      margin-top: 0 !important;
+    }
+  }
+
+  .preproject-card-content {
+    min-height: 8rem;
+  }
+
+  .preproject-grid-card > app-card-item {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  ::ng-deep .preproject-dataview-grid .new-carditem.new-card-item-mobile {
+    display: block;
+    width: 100%;
+    min-height: 10rem;
+    padding: 0;
+
+    .p-card {
+      width: 100%;
+      max-width: none;
+      height: 10rem;
+      min-height: 10rem;
+      padding: 0;
+    }
+  }
+
+}
+
+@media screen and (max-width: 480px) {
+  .app-preproject {
+    ::ng-deep .card-preprojects .app-card p-header.card-header > .d-flex {
+      align-items: center;
+      flex-wrap: wrap;
+
+      > .header-title {
+        flex: 0 0 100%;
+        max-width: 100%;
+        padding-right: 2rem;
+        width: 100%;
+      }
+
+      > .dataview-filters-container {
+        flex: 0 0 100%;
+        justify-content: flex-end;
+        margin: 0 !important;
+        padding-top: 0.5rem;
+        width: 100% !important;
+
+        .preproject-status-filter {
+          flex: 1 1 auto;
+          justify-content: flex-end;
+          margin-right: 0.5rem !important;
+          min-width: 0;
+
+          ::ng-deep .p-dropdown {
+            min-width: 0;
+            width: 8.5rem;
+          }
+        }
+
+        > .new-element-button-container {
+          flex: 0 0 53px;
+        }
+      }
+    }
+  }
+}

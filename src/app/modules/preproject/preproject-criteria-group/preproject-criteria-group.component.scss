@@ -1,0 +1,111 @@
+.preproject-criteria-group-card {
+  display: block;
+}
+
+.group-properties {
+  align-items: flex-start;
+
+  .property-container {
+    box-sizing: border-box;
+    min-width: 0;
+    margin-bottom: 1rem;
+
+    > app-property {
+      display: block;
+      width: 100%;
+    }
+  }
+
+  .not-fullLine {
+    app-property {
+      display: block;
+      width: 100%;
+    }
+  }
+
+  .selection-property {
+    > app-property {
+      width: 100%;
+    }
+  }
+
+  .compact-budget-property {
+    flex: 0 0 25%;
+    max-width: 25%;
+    margin-right: 75%;
+  }
+
+}
+
+.group-disabled {
+  opacity: .65;
+}
+
+:host ::ng-deep .group-properties {
+  app-property .app-workpack-property,
+  app-property-selection {
+    display: block;
+    width: 100%;
+  }
+
+  .workpack-input-number .p-inputnumber,
+  .workpack-input-text .p-inputtext,
+  .workpack-unit-selection .app-single-selection .p-dropdown,
+  .workpack-organization-selection .app-single-selection .p-dropdown,
+  .workpack-selection .app-single-selection .p-dropdown,
+  .p-float-label.workpack-date .app-select-date .p-calendar {
+    width: 100%;
+  }
+
+  app-property-selection .workpack-selection-not-fullLine > .app-single-selection {
+    display: block;
+    width: 100%;
+  }
+
+  app-property-selection .workpack-selection > .app-single-selection {
+    display: block;
+    width: 100%;
+  }
+
+  app-property-selection .app-multiple-selection {
+    display: block;
+    width: 100%;
+  }
+
+  app-property-selection .app-multiple-selection .p-multiselect {
+    width: 100% !important;
+    max-width: 100%;
+  }
+
+  app-property-selection .workpack-selection > .app-single-selection .p-dropdown,
+  app-property-selection .workpack-selection-not-fullLine > .app-single-selection .p-dropdown {
+    width: 100%;
+    max-width: 100%;
+  }
+}
+
+@media screen and (max-width: 800px) {
+  .group-properties {
+    .property-container {
+      padding-right: 0;
+      flex: 0 0 100%;
+      max-width: 100%;
+      width: 100%;
+
+      app-property {
+        width: 100%;
+      }
+    }
+
+    .selection-property {
+      width: 100%;
+    }
+  }
+
+  :host ::ng-deep .group-properties {
+    app-property-selection .workpack-selection > .app-single-selection,
+    app-property-selection .workpack-selection-not-fullLine > .app-single-selection {
+      width: 100%;
+    }
+  }
+}

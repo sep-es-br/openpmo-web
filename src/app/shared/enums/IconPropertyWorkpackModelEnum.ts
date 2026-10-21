@@ -5,9 +5,12 @@ export enum IconPropertyWorkpackModelEnum {
   ToggleModel = 'fas fa-toggle-on',
   UnitSelectionModel = 'fas fa-ruler-horizontal',
   SelectionModel = 'fas fa-list',
+  CriteriaSelectionModel = 'fas fa-list',
   TextAreaModel = 'fas fa-text-width',
   NumberModel = 'app-icon number',
   CurrencyModel = 'fa fa-dollar-sign',
   LocalitySelectionModel = 'fas fa-map-marker-alt',
-  OrganizationSelectionModel = 'fas fa-landmark'
+  OrganizationSelectionModel = 'fas fa-landmark',
+  ChallengeListModel = 'fas fa-bars',
+  SdgListModel = 'fas fa-bullseye'
 };

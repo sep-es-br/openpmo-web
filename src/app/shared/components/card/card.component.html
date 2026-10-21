@@ -3,8 +3,8 @@
   expandIcon="pi pi-angle-down"
   collapseIcon="pi pi-angle-up"
   #cardPanel
-  [toggleable]="!properties?.fullScreen && properties?.collapseble && (!properties.toggleable || properties.initialStateToggle && properties.toggleable)"
-  [collapsed]="properties.initialStateCollapse || !(!properties.toggleable || (properties.toggleable && properties.initialStateToggle))"
+  [toggleable]="!properties?.fullScreen && properties?.collapseble && (!properties.toggleable || properties.collapseOnToggle === false || properties.initialStateToggle)"
+  [collapsed]="properties.initialStateCollapse || (properties.collapseOnToggle !== false && !(!properties.toggleable || (properties.toggleable && properties.initialStateToggle)))"
   expandIcon="pi pi-angle-down" collapseIcon="pi pi-angle-up" [class.mobile]="responsive"
   (collapsedChange)="handleCollapsed($event)">
   <p-header class="card-header" [class.card-header-mobile]="responsive">
@@ -17,6 +17,7 @@
             properties.notShowCardTitle ? '' : (properties.cardTitle | translate) }}</span>
           <p-inputSwitch class="app-toggle" *ngIf="properties.toggleable" [disabled]="properties.disabledToggle"
             [(ngModel)]="properties.initialStateToggle"
+            (click)="$event.stopPropagation()"
             (ngModelChange)="properties.onToggle?.emit($event)">
           </p-inputSwitch>
           <label class="label-toggle" *ngIf="properties.toggleLabel">{{properties.toggleLabel|translate}}</label>
@@ -104,6 +105,8 @@
         *ngIf="properties.showFilters || properties.showCreateNemElementButton"
         class="dataview-filters-container d-flex me-4"
       >
+        <ng-content select="[card-header-actions]"></ng-content>
+
         <div class="dataview-filters" *ngIf="!properties.initialStateCollapse && properties.showFilters">
           <label>{{'show'|translate}}</label>
           <div class="options-container d-flex flex-row justify-content-between align-items-center">
@@ -168,6 +171,25 @@
               </div>
             </div>
           </div>
+        </div>
+
+        <div
+          class="new-element-button-container"
+          *ngIf="!properties.initialStateCollapse && !properties.showFilters && properties.showCreateNemElementButton"
+          [class.card-link]="!properties.createNewElementMenuItems"
+          (click)="!properties.createNewElementMenuItems && handleCreateNewElement()"
+        >
+          <i
+            class="app-icon plus"
+            [class.icon-link]="properties.createNewElementMenuItems"
+            (click)="properties.createNewElementMenuItems ? menuIconWithoutFilters.toggle($event) : ''"
+          >
+          </i>
+          <p-menu
+            #menuIconWithoutFilters
+            [popup]="true"
+            [model]="properties.createNewElementMenuItems">
+          </p-menu>
         </div>
       </div>
 

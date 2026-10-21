@@ -1,4 +1,6 @@
 import { SelectItem, MenuItem, TreeNode } from 'primeng/api';
+import { IPossibleValueOption } from './IPossibleValueOption';
+import { IPropertyListItem } from './IPropertyListItem';
 
 export interface IWorkpackModelProperty {
   id?: number;
@@ -17,6 +19,8 @@ export interface IWorkpackModelProperty {
   max?: number;
   possibleValues?: string;
   possibleValuesOptions?: string[];
+  possibleValuesDetails?: IPossibleValueOption[];
+  acceptedOptions?: Array<IPossibleValueOption & { id?: number; position?: number; defaultOption?: boolean }>;
   sectorsList?: string[];
   sectors?: string;
   multipleSelection?: boolean;
@@ -37,4 +41,12 @@ export interface IWorkpackModelProperty {
   showIconButtonSelectLocality?: boolean; //only screen
   helpText?: string;
   disableMultipleSelection?: boolean;
+  selectedListItems?: IPropertyListItem[];
+  availableListItems?: IPropertyListItem[];
+  weight?: number;
+  itemValue?: number;
+  currentValue?: number | number[] | string | string[] | boolean | Date;
+  currentSelectedValue?: number;
+  currentSelectedValues?: number | number[];
+  currentLocalitiesSelected?: TreeNode | TreeNode[];
 }

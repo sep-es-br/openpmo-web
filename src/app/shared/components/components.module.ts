@@ -41,6 +41,10 @@ import { CardJournalInformationComponent } from './card-journal-information/card
 import { CardListComponent } from './card-list/card-list.component';
 import { SearchItemCardComponent } from './search-item-card/search-item-card.component';
 import { CardSharingIndicatorsComponent } from './card-sharing-indicators/card-sharing-indicators.component';
+import { EditableCardItemComponent } from './editable-card-item/editable-card-item.component';
+import { PossibleValuesEditorComponent } from './possible-values-editor/possible-values-editor.component';
+import { PropertyListSelectionComponent } from './properties/type-property/property-list-selection/property-list-selection.component';
+import { ListSelectionDialogComponent } from './list-selection-dialog/list-selection-dialog.component';
 
 @NgModule({
   declarations: [
@@ -81,7 +85,11 @@ import { CardSharingIndicatorsComponent } from './card-sharing-indicators/card-s
     CardJournalInformationComponent,
     CardListComponent,
     SearchItemCardComponent,
-    CardSharingIndicatorsComponent
+    CardSharingIndicatorsComponent,
+    EditableCardItemComponent,
+    PossibleValuesEditorComponent,
+    PropertyListSelectionComponent,
+    ListSelectionDialogComponent
   ],
   imports: [
     CommonModule,
@@ -114,11 +122,16 @@ import { CardSharingIndicatorsComponent } from './card-sharing-indicators/card-s
     CardItemReportModelComponent,
     PropertyModelComponent,
     PropertyComponent,
+    PropertyTextareaComponent,
     ButtonsContainerComponent,
     CancelButtonComponent,
     CardJournalInformationComponent,
     SearchItemCardComponent,
-    CardSharingIndicatorsComponent
+    CardSharingIndicatorsComponent,
+    EditableCardItemComponent,
+    PossibleValuesEditorComponent,
+    PropertyListSelectionComponent,
+    ListSelectionDialogComponent
   ]
 })
 export class ComponentsModule { }

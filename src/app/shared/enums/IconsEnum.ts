@@ -29,6 +29,7 @@ export enum IconsEnum {
   Permission = 'permission',
   PermissionAlt = 'permission2',
   Plan = 'plan',
+  Preproject = 'anteprojeto-cinza',
   Plus = 'plus',
   Portfolio = 'portfolio',
   Selection = 'selection',

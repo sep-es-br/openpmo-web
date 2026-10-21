@@ -7,10 +7,12 @@ import { Calendar } from 'primeng/calendar';
 import { IconPropertyWorkpackModelEnum } from 'src/app/shared/enums/IconPropertyWorkpackModelEnum';
 import { IWorkpackModelProperty } from 'src/app/shared/interfaces/IWorkpackModelProperty';
 import { ResponsiveService } from 'src/app/shared/services/responsive.service';
-import { TypePropertModelEnum as TypePropertyModelEnum}  from 'src/app/shared/enums/TypePropertModelEnum';
+import { TypePropertModelEnum as TypePropertyModelEnum } from 'src/app/shared/enums/TypePropertModelEnum';
+import { hasPropertyWeight } from 'src/app/shared/utils/property-weight.util';
 import * as moment from 'moment';
 import { SelectItem, TreeNode } from 'primeng/api';
 import { TypeOrganization } from '../../enums/TypeOrganization';
+import { IPossibleValueOption } from '../../interfaces/IPossibleValueOption';
 
 @Component({
   selector: 'app-property-model',
@@ -24,8 +26,11 @@ export class PropertyModelComponent implements OnDestroy, OnChanges, AfterViewIn
   @Input() invalid = false;
   @Input() invalidFields: string[] = [];
   @Input() integrationSectorOptions: SelectItem[] = [];
+  @Input() scoredPossibleValues = false;
+  @Input() showWeight = false;
   @Output() delete = new EventEmitter();
   @Output() changed = new EventEmitter();
+  supportsWeight = hasPropertyWeight;
   IconsEnum = IconPropertyWorkpackModelEnum;
   responsive = false;
   $destroy = new Subject();
@@ -45,6 +50,7 @@ export class PropertyModelComponent implements OnDestroy, OnChanges, AfterViewIn
       setTimeout(() => {
         this.setLanguage();
         this.loadSectorOptions();
+        this.setFixedPropertyName();
       }, 200);
     });
     this.calendarFormat = this.translateSrv.instant('dateFormat');
@@ -76,11 +82,29 @@ export class PropertyModelComponent implements OnDestroy, OnChanges, AfterViewIn
   if (changes.integrationSectorOptions) {
     this.loadSectorOptions();
   }
-  if (this.property?.extraList && this.property?.multipleSelection) {
+  if (this.property?.extraList?.length && this.property?.multipleSelection) {
     this.selectedSelectAllIfChildrenAllSelecteds(this.property.extraList[0]);
   }
   this.setDefaultMax();
-}
+  this.setFixedPropertyName();
+ }
+
+  isFixedNameProperty(): boolean {
+    return this.property?.type === TypePropertyModelEnum.ChallengeListModel
+      || this.property?.type === TypePropertyModelEnum.SdgListModel;
+  }
+
+  private setFixedPropertyName(): void {
+    if (!this.property) {
+      return;
+    }
+    if (this.property.type === TypePropertyModelEnum.ChallengeListModel) {
+      this.property.name = this.translateSrv.instant('challengeList');
+    }
+    if (this.property.type === TypePropertyModelEnum.SdgListModel) {
+      this.property.name = this.translateSrv.instant('sdgList');
+    }
+  }
 
   
 loadSectorOptions() {
@@ -144,6 +168,15 @@ loadSectorOptions() {
     } else if (!isArray && this.property.defaultValue === value.trim()) {
       this.property.defaultValue = '';
     }
+  }
+
+  handlePossibleValuesChange(values: IPossibleValueOption[]): void {
+    this.property.possibleValuesDetails = values;
+    this.property.possibleValuesOptions = values
+      .map(item => item.label && item.label.trim())
+      .filter(label => !!label);
+    this.checkDefaultValue();
+    this.changed.emit({ property: this.property, possibleValuesChanged: true });
   }
 
   isProtected(value: string): boolean { 
@@ -244,4 +277,3 @@ loadSectorOptions() {
     return node.key?.includes('SELECTALL');
   }
 }
-

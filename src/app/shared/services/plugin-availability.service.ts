@@ -6,6 +6,8 @@ export interface IPluginAvailability {
   agreements: boolean;
   procurements: boolean;
   obligations: boolean;
+  indicators?: boolean;
+  edocs?: boolean;
 }
 
 @Injectable({ providedIn: 'root' })

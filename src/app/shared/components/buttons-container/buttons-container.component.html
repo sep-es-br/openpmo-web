@@ -1,5 +1,7 @@
-<div class="app-buttons-container-layout" [class.mobile]="responsive">
-  <div class="app-button-wrapper" [class.mobile]="responsive">
+<div class="app-buttons-container-layout" [class.mobile]="responsive" [class.compact]="compact"
+  [class.inline]="inline">
+  <div class="app-button-wrapper" [class.mobile]="responsive" [class.compact]="compact"
+    [class.inline]="inline">
     <ng-content></ng-content>
   </div>
 </div>

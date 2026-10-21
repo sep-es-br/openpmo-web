@@ -10,6 +10,7 @@ export enum MenuButtons {
   PLAN_MODEL = 'plan-model',
   USER = 'user',
   MORE = 'more',
+  PREPROJECT = 'preproject'
 }
 
 export enum MenuAdminButtons {
@@ -22,7 +23,8 @@ export enum MenuAdminButtons {
 export enum MenuOfficeConfigurationButtons {
   ORGANIZATIONS = 'organizations',
   OFFICES_PERMISSION = 'offices/permission',
-  PERSONS = 'persons'
+  PERSONS = 'persons',
+  PREPROJECT_SELECTION = 'preproject-selection'
 }
 
 export interface IMenu {
@@ -67,6 +69,7 @@ export interface IMenuWorkpackModel {
 
 export interface IMenuWorkpack {
   id: string;
+  idWorkpackModel?: string;
   idWorkpackModelLinked?: string;
   fullName?: string;
   name: string;
