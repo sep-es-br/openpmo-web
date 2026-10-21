@@ -89,8 +89,6 @@
           <i class="far fa-question-circle" [pTooltip]="'help.propertyModel.possibleValues' | translate"></i>
         </label>
       </span>
-      <span class="p-float-label property-input property-selection p-field" *ngIf="property.type === 'LocalitySelectionModel'"
-        [class.invalid]="invalidFields.includes('idDomain')">
       <span class="p-float-label property-input p-field possible-values-field"
         *ngIf="property.type === 'CriteriaSelectionModel' && scoredPossibleValues">
         <app-possible-values-editor
@@ -103,6 +101,8 @@
           <i class="far fa-question-circle" [pTooltip]="'help.propertyModel.possibleValues' | translate"></i>
         </label>
       </span>
+      <span class="p-float-label property-input property-selection p-field" *ngIf="property.type === 'LocalitySelectionModel'"
+        [class.invalid]="invalidFields.includes('idDomain')">
         <ng-container *ngIf="false; else singleDomainSelection">
           <p-multiSelect class="app-multiple-selection" dropdownIcon="fas fa-caret-down" [options]="property.list"
             [selectedItemsLabel]="language === 'pt-BR' ? '{0} itens selecionados' : '{0} items selected'"
