@@ -11,12 +11,25 @@
     margin-left: 0!important;
     font-size: 12px;
   }
+  .manual-link {
+    display: inline-flex;
+    align-items: center;
+    color: inherit;
+    font-size: 12px;
+    text-decoration: none;
+    white-space: nowrap;
+
+    .fas {
+      margin-left: 5px;
+    }
+  }
   .versions {
     display: flex;
     flex: inherit;
     align-items: flex-end;
     font-size: 12px;
     margin: auto;
+    margin-left: 20px;
     margin-right: 0!important;
     cursor: pointer;
 
