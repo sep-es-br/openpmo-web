@@ -19,7 +19,8 @@
   </div>
   
   <div class="app-workpack-model-main-content">
-    <div class="card-properties card workpack-model" *ngIf="!cardProperties?.isLoading">
+    <div class="card-properties card workpack-model" *ngIf="!cardProperties?.isLoading"
+      [class.invalid]="hasInvalidPropertiesPanel">
       <app-card [properties]="cardProperties" *ngIf="cardProperties" class="mt-0 inputs-float-label">
         <div class="workpack-model-properties p-fluid" [formGroup]="formProperties">
           <span class="p-float-label property-input p-field">
@@ -88,6 +89,8 @@
             [class.open]="!property.isCollapsed">
            <app-property-model class="addicional-properties"
             *ngIf="property.type !== typePropertyEnum.GroupModel" [property]="property"
+            [invalid]="invalidProperties.has(property)"
+            [invalidFields]="invalidPropertyFields.get(property) || []"
             [integrationSectorOptions]="integrationSectorOptions"
             [class.open]="!property.isCollapsed" (delete)="deleteProperty($event)" (changed)="propertyChanged($event);">
           </app-property-model>
@@ -101,9 +104,9 @@
     </div>
   
     <ng-container *ngIf="workpackModelType !== 'MilestoneModel' && !cardProperties?.isLoading" >
-      <div class="card stakeholders">
+      <div class="card stakeholders" [class.invalid]="hasInvalidStakeholderRoles">
         <app-card [properties]="cardPropertiesStakeholders" *ngIf="cardPropertiesStakeholders" class="inputs-float-label">
-          <span class="p-float-label app-input-chips">
+          <span class="p-float-label app-input-chips" [class.invalid]="hasInvalidStakeholderPersonRoles">
             <p-chips [(ngModel)]="posibleRolesPerson" separator="," [allowDuplicate]="false"
               (ngModelChange)="checkProperties(true)"
               [class.p-inputwrapper-filled]="posibleRolesPerson && !!posibleRolesPerson.length"
@@ -113,7 +116,7 @@
             </label>
             <span class="under-label">{{ 'useCommaToSeparateValues' | translate }}</span>
           </span>
-          <span class="p-float-label app-input-chips">
+          <span class="p-float-label app-input-chips" [class.invalid]="hasInvalidStakeholderOrganizationRoles">
             <p-chips [(ngModel)]="posibleRolesOrg" separator="," [allowDuplicate]="false"
               (ngModelChange)="checkProperties(true)"
               [class.p-inputwrapper-filled]="posibleRolesOrg && !!posibleRolesOrg?.length" [disabled]="!editPermission">
@@ -329,15 +332,16 @@
 </div>
 
 <ng-template let-group #groupProperty>
-  <div class="workpack-model-group" [class.mobile]="isMobileView">
+  <div class="workpack-model-group" [class.mobile]="isMobileView" [class.invalid]="invalidProperties.has(group)">
     <div class="p-fluid group-header">
       <div class="left-side">
-        <span class="p-float-label property-input p-field">
+        <span class="p-float-label property-input p-field" [class.invalid]="(invalidPropertyFields.get(group) || []).includes('name')">
           <input class="app-input-text" id="input-name" type="text" pInputText [(ngModel)]="group.name"
-            (change)="propertyChanged($event);" [required]="true" />
+            (ngModelChange)="propertyChanged($event);" [required]="true" />
           <label class="app-input-label" for="input-name">{{ 'title' | translate }} *</label>
         </span>
-        <span class="p-float-label property-input p-field input-number-scroll sort-index-group">
+        <span class="p-float-label property-input p-field input-number-scroll sort-index-group"
+          [class.invalid]="(invalidPropertyFields.get(group) || []).includes('sortIndex')">
           <p-inputNumber inputStyleClass="app-input-text" [(ngModel)]="group.sortIndex" [showButtons]="true"
             (onInput)="propertyChanged($event);">
           </p-inputNumber>
@@ -360,6 +364,8 @@
         [class.open]="!groupProp.isCollapsed" [class.addicional-properties-container]="groupProp.isCollapsed"
         [class.addicional-properties-group-container]="groupProp.type === typePropertyEnum.GroupModel">
        <app-property-model class="addicional-properties" [property]="groupProp"
+         [invalid]="invalidProperties.has(groupProp)"
+         [invalidFields]="invalidPropertyFields.get(groupProp) || []"
         [integrationSectorOptions]="integrationSectorOptions"
         [class.open]="!groupProp.isCollapsed" *ngIf="groupProp.type !== typePropertyEnum.GroupModel"
         (delete)="deleteProperty($event, group)" (changed)="propertyChanged($event);">

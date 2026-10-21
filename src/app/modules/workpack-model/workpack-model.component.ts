@@ -93,6 +93,8 @@ export class WorkpackModelComponent implements OnInit {
   formProperties: FormGroup;
   icons: IIcon[];
   modelProperties: IWorkpackModelProperty[] = [];
+  invalidProperties = new Set<IWorkpackModelProperty>();
+  invalidPropertyFields = new Map<IWorkpackModelProperty, string[]>();
   menuModelProperties: MenuItem[] = [];
   menuCostProperties: MenuItem[] = [];
   listDomains: SelectItem[] = [];
@@ -408,6 +410,7 @@ export class WorkpackModelComponent implements OnInit {
       this.loadDefaultProperties();
       await this.loadCardItemsModels();
     }
+    this.updateInvalidProperties();
     this.setCurrentBreadcrumb();
   }
 
@@ -795,7 +798,7 @@ export class WorkpackModelComponent implements OnInit {
             p.helpText = p.helpText ? p.helpText : '';
             if (p.type === TypePropertyEnum.GroupModel) {
               p.menuModelProperties = this.loadMenuPropertyGroup(p);
-              p.groupedProperties.forEach(async (gp) => {
+              await Promise.all(p.groupedProperties.map(async (gp) => {
                 if (gp.possibleValues) {
                   gp.possibleValuesOptions = (gp.possibleValues as string).split(',');
                 }
@@ -838,7 +841,7 @@ export class WorkpackModelComponent implements OnInit {
                 }
                 delete gp.defaultsDetails;
                 await this.checkProperty(gp);
-              });
+              }));
               p.groupedProperties = this.sortPropertiesBySortIndex(p.groupedProperties);
             }
             delete p.defaultsDetails;
@@ -925,9 +928,11 @@ export class WorkpackModelComponent implements OnInit {
       newProperty.groupedProperties = [];
       newProperty.menuModelProperties = this.loadMenuPropertyGroup(newProperty);
     }
-    return groupProperty
+    const addedProperty = groupProperty
       ? groupProperty.groupedProperties.push(newProperty)
       : this.modelProperties.push(newProperty);
+    this.updateInvalidProperties();
+    return addedProperty;
   }
 
   sortPropertiesBySortIndex(properties: IWorkpackModelProperty[] = []): IWorkpackModelProperty[] {
@@ -1012,9 +1017,7 @@ export class WorkpackModelComponent implements OnInit {
         } else {
           this.modelProperties = this.modelProperties.filter(p => p !== property);
         }
-        if (property.id) {
-          this.saveButton?.showButton();
-        }
+        this.checkProperties();
       }
     });
   }
@@ -1061,6 +1064,7 @@ export class WorkpackModelComponent implements OnInit {
   }
 
   checkProperties(changeStakeholderRoles = false) {
+    this.updateInvalidProperties();
     this.cancelButton.showButton();
     if (this.formProperties.invalid) {
       this.saveButton?.hideButton();
@@ -1077,23 +1081,13 @@ export class WorkpackModelComponent implements OnInit {
       return;
     }
     // Value check
-    const propertiesChecks: { valid: boolean; invalidKeys: string[]; prop: IWorkpackModelProperty }[] = properties.map(p => ({
-      valid: p.requiredFields
-        .map(r => (p[r] instanceof Array
-          ? p[r].length > 0
-          : typeof p[r] == 'boolean' || typeof p[r] == 'number' || !!p[r]))
-        .reduce((acc, v) => acc ? v : acc, true),
-      invalidKeys: p.requiredFields
-        .filter(r => !(p[r] instanceof Array
-          ? p[r].length > 0
-          : typeof p[r] == 'boolean' || typeof p[r] == 'number' || !!p[r])),
-      prop: p
-    }));
+    const propertiesChecks: { valid: boolean; invalidKeys: string[]; prop: IWorkpackModelProperty }[] = properties.map(p => {
+      const invalidKeys = this.getMissingRequiredFields(p);
+      return { valid: invalidKeys.length === 0, invalidKeys, prop: p };
+    });
     const arePropertiesValid = propertiesChecks.reduce((a, b) => a ? b.valid : a, true);
     // Stakeholder
-    const arePossiblesValuesValid = (this.posibleRolesOrg.length > 0 || this.posibleRolesPerson.length > 0)
-      || !this.cardPropertiesStakeholders.initialStateToggle
-      || this.workpackModelType === TypeWorkpackModelEnum.MilestoneModel;
+    const arePossiblesValuesValid = this.areStakeholderRolesValid();
 
     if (this.formProperties.invalid || !arePropertiesValid || !arePossiblesValuesValid) {
       this.saveButton?.hideButton();
@@ -1149,25 +1143,21 @@ export class WorkpackModelComponent implements OnInit {
   checkPropertiesGroupeds(groupedProperties?: IWorkpackModelProperty[]) {
     const properties: IWorkpackModelProperty[] = [...groupedProperties];
     // Value check
-    const propertiesChecks: { valid: boolean; invalidKeys: string[]; prop: IWorkpackModelProperty }[] = properties.map(p => ({
-      valid: p.requiredFields
-        .map(r => (p[r] instanceof Array
-          ? p[r].length > 0
-          : typeof p[r] == 'boolean' || typeof p[r] == 'number' || !!p[r]))
-        .reduce((acc, v) => acc ? v : acc, true),
-      invalidKeys: p.requiredFields
-        .filter(r => !(p[r] instanceof Array
-          ? p[r].length > 0
-          : typeof p[r] == 'boolean' || typeof p[r] == 'number' || !!p[r])),
-      prop: p
-    }));
+    const propertiesChecks: { valid: boolean; invalidKeys: string[]; prop: IWorkpackModelProperty }[] = properties.map(p => {
+      const invalidKeys = this.getMissingRequiredFields(p);
+      return { valid: invalidKeys.length === 0, invalidKeys, prop: p };
+    });
     const arePropertiesValid = propertiesChecks.reduce((a, b) => a ? b.valid : a, true);
+    const invalidMaxTypes = [TypePropertyEnum.IntegerModel, TypePropertyEnum.TextModel, TypePropertyEnum.TextAreaModel];
+    const hasInvalidMax = properties.some(property => invalidMaxTypes.includes(property.type as TypePropertyEnum) &&
+      (property.max === null || property.max === undefined || property.max <= 0));
+    const areNestedGroupsValid = properties
+      .filter(property => property.type === TypePropertyEnum.GroupModel)
+      .every(property => this.checkPropertiesGroupeds(property.groupedProperties));
     // Stakeholder
-    const arePossiblesValuesValid = (this.posibleRolesOrg.length > 0 && this.posibleRolesPerson.length > 0)
-      || !this.cardPropertiesStakeholders.initialStateToggle
-      || this.workpackModelType === TypeWorkpackModelEnum.MilestoneModel;
+    const arePossiblesValuesValid = this.areStakeholderRolesValid();
 
-    if (this.formProperties.invalid || !arePropertiesValid || !arePossiblesValuesValid) {
+    if (this.formProperties.invalid || !arePropertiesValid || hasInvalidMax || !areNestedGroupsValid || !arePossiblesValuesValid) {
       return false;
     }
     const separationForDuplicateCheck = properties.map(prop => [prop.name, prop.label])
@@ -1178,6 +1168,65 @@ export class WorkpackModelComponent implements OnInit {
     }
     // Duplicated label check
     return new Set(separationForDuplicateCheck[1]).size === properties.length;
+  }
+
+  private getMissingRequiredFields(property: IWorkpackModelProperty): string[] {
+    const requiredFields = property.requiredFields ||
+      (property.type === TypePropertyEnum.GroupModel ? ['name'] : []);
+    return requiredFields.filter(field => {
+      const value = property[field];
+      return !(value instanceof Array
+        ? value.length > 0
+        : typeof value === 'boolean' || typeof value === 'number' || !!value);
+    });
+  }
+
+  get hasInvalidStakeholderRoles(): boolean {
+    return !!this.cardPropertiesStakeholders?.initialStateToggle && !this.areStakeholderRolesValid();
+  }
+
+  get hasInvalidStakeholderPersonRoles(): boolean {
+    return !!this.cardPropertiesStakeholders?.initialStateToggle && !this.posibleRolesPerson?.length;
+  }
+
+  get hasInvalidStakeholderOrganizationRoles(): boolean {
+    return !!this.cardPropertiesStakeholders?.initialStateToggle && !this.posibleRolesOrg?.length;
+  }
+
+  get hasInvalidPropertiesPanel(): boolean {
+    return !!this.formProperties?.invalid || this.invalidProperties.size > 0;
+  }
+
+  private areStakeholderRolesValid(): boolean {
+    return this.workpackModelType === TypeWorkpackModelEnum.MilestoneModel
+      || !this.cardPropertiesStakeholders?.initialStateToggle
+      || (!!this.posibleRolesPerson?.length && !!this.posibleRolesOrg?.length);
+  }
+
+  private updateInvalidProperties(): void {
+    const invalidProperties = new Set<IWorkpackModelProperty>();
+    const invalidPropertyFields = new Map<IWorkpackModelProperty, string[]>();
+    const invalidMaxTypes = [TypePropertyEnum.IntegerModel, TypePropertyEnum.TextModel, TypePropertyEnum.TextAreaModel];
+
+    const visitProperty = (property: IWorkpackModelProperty, checkMaximum: boolean) => {
+      const invalidFields = this.getMissingRequiredFields(property);
+      const hasInvalidMaximum = checkMaximum && invalidMaxTypes.includes(property.type as TypePropertyEnum) &&
+        (property.max === null || property.max === undefined || property.max <= 0);
+
+      if (hasInvalidMaximum) {
+        invalidFields.push('max');
+      }
+      if (invalidFields.length > 0) {
+        invalidProperties.add(property);
+        invalidPropertyFields.set(property, invalidFields);
+      }
+
+      (property.groupedProperties || []).forEach(groupedProperty => visitProperty(groupedProperty, true));
+    };
+
+    this.modelProperties.forEach(property => visitProperty(property, true));
+    this.invalidProperties = invalidProperties;
+    this.invalidPropertyFields = invalidPropertyFields;
   }
 
   addGroup(groupProperty?: IWorkpackModelProperty) {

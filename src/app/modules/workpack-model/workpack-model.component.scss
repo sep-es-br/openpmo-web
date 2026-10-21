@@ -122,6 +122,9 @@
     border: 1px solid rgba(229, 229, 228, 1);
     border-radius: 5px;
     margin-top: 1.5em;
+    &.invalid {
+      border-color: v.$fontRed;
+    }
     .group-header {
       display: flex;
       flex-direction: row;
@@ -138,6 +141,10 @@
           display: flex;
           cursor: pointer;
         }
+      }
+      .property-input.invalid .app-input-text,
+      .property-input.invalid .p-inputnumber-input {
+        border-color: v.$fontRed !important;
       }
     }
   }
@@ -351,6 +358,19 @@
   }
   .card.processes .p-panel-content {
     padding-bottom: 15px !important;
+  }
+
+  .card.invalid ::ng-deep p-panel.app-card .p-panel {
+    border: 1px solid v.$fontRed !important;
+    border-radius: 4px;
+  }
+
+  .card.stakeholders .app-input-chips.invalid .app-input-label {
+    color: v.$fontRed !important;
+  }
+
+  .card.stakeholders .app-input-chips.invalid ::ng-deep .p-chips-multiple-container {
+    border-bottom-color: v.$fontRed !important;
   }
 
   &.mobile {
