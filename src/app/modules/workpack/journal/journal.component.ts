@@ -133,13 +133,12 @@ export class JournalComponent implements OnInit {
         url,
         mimeType: file.type,
         name: file.name,
-        givenName: file.name.split('.')[0].substring(0, 50),
+        givenName: file.name.split('.')[0],
       };
       this.cardItemsEvidences.push({
         typeCardItem: 'listItem',
         urlImg: newFile.url,
-        nameCardItem: this.limitFileName(newFile.name),
-        fullNameCardItem: newFile.name,
+        nameCardItem: newFile.name,
         icon: this.getIconFromMimeTypeFile(newFile.mimeType),
         givenName: newFile.givenName,
         file: file,
@@ -158,12 +157,7 @@ export class JournalComponent implements OnInit {
       icon: IconsEnum.Plus,
     });
   }
-
-  limitFileName(fileName: string): string {
-    return fileName.length > 50
-      ? `${fileName.substring(0, 47)}...`
-      : fileName;
-  }
+  
 
   createObjectUrl(file: File): SafeResourceUrl {
     return this.sanatizer.bypassSecurityTrustResourceUrl(URL.createObjectURL(file));
