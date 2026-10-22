@@ -317,7 +317,7 @@
     <span>{{idWorkpack}}</span>
   </div>
 
-  <app-buttons-container>
+  <app-buttons-container [alignToContent]="true">
     <app-save-button #saveButton (save)="onSaveButtonClicked()"></app-save-button>
     <app-cancel-button (cancel)="handleOnCancel()"></app-cancel-button>
   </app-buttons-container>
