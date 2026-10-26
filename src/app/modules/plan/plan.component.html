@@ -167,7 +167,7 @@
     <span>{{ idPlan }}</span>
   </div>
 
-  <app-buttons-container *ngIf="!planLoading" [alignToContent]="true">
+  <app-buttons-container *ngIf="!planLoading">
     <app-save-button (save)="savePlan()"></app-save-button>
     <app-cancel-button (cancel)="handleOnCancel()"></app-cancel-button>
   </app-buttons-container>
