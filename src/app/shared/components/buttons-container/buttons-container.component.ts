@@ -1,5 +1,5 @@
 import { takeUntil } from 'rxjs/operators';
-import { AfterViewInit, Component, ElementRef, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ResponsiveService } from '../../services/responsive.service';
 import { Subject } from 'rxjs';
 
@@ -12,7 +12,6 @@ export class ButtonsContainerComponent implements OnInit, AfterViewInit, OnDestr
 
   responsive = false;
   $destroy = new Subject();
-  @Input() alignToContent = false;
   @ViewChild('buttonLayout', { static: true }) buttonLayout: ElementRef;
   @ViewChild('buttonWrapper', { static: true }) buttonWrapper: ElementRef;
   private resizeObserver: any;
@@ -28,8 +27,6 @@ export class ButtonsContainerComponent implements OnInit, AfterViewInit, OnDestr
   }
 
   ngAfterViewInit(): void {
-    if (!this.alignToContent) return;
-
     this.alignButtonsToContent();
     const ResizeObserverConstructor = (window as any).ResizeObserver;
     if (ResizeObserverConstructor) {
