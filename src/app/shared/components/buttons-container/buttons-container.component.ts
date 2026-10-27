@@ -1,5 +1,5 @@
 import { takeUntil } from 'rxjs/operators';
-import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ResponsiveService } from '../../services/responsive.service';
 import { Subject } from 'rxjs';
 
