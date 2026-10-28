@@ -941,8 +941,9 @@ export class WorkpackComponent implements OnDestroy, OnInit {
               command: (event) => this.handleCutWorkpack(workpack),
             });
           }
+            // Compartilhamento disponÃ­vel apenas para projetos.
           if (
-            workpack.type !== TypeWorkpackEnum.DeliverableModel &&
+            workpack.type === TypeWorkpackEnum.ProjectModel &&
             !workpack.canceled &&
             workpack.idWorkpackModel === idWorkpackModel &&
             this.workpackSrv.getEditPermission() &&
