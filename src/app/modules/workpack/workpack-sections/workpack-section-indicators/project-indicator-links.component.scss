@@ -1,0 +1,56 @@
+:host ::ng-deep .indicator-links-card .p-panel {
+  margin-top: 0;
+}
+
+:host ::ng-deep .indicator-links-card .card-header {
+  min-height: 38px;
+}
+
+:host ::ng-deep .indicator-links-card .app-card-item .display-mode-grid .card-item-content {
+  justify-content: flex-start;
+}
+
+:host ::ng-deep .indicator-links-card .app-card-item .display-mode-grid .card-item-name {
+  display: -webkit-box;
+  flex-shrink: 0;
+  min-height: 2.4em;
+  max-height: 2.4em;
+  padding: 0 0.75rem;
+  line-height: 1.2em;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+:host ::ng-deep .indicator-links-card .app-card-item .display-mode-grid .card-item-subtitle {
+  box-sizing: border-box;
+  flex-shrink: 0;
+  width: 100%;
+  max-height: 2.4em;
+  margin: 0.35rem 0 0.8rem;
+  padding: 0 0.9rem;
+  line-height: 1.2em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.links-loading-container {
+  min-height: 260px;
+  min-height: max(260px, calc(100vh - 18rem));
+  position: relative;
+}
+
+.loading-message {
+  color: #004660;
+  font-size: 1rem;
+  font-weight: 600;
+  left: 0;
+  position: absolute;
+  right: 0;
+  text-align: center;
+  top: calc(50% + 36px);
+  z-index: 1;
+}

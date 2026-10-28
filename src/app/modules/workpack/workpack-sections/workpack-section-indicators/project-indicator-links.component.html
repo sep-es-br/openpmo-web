@@ -1,0 +1,33 @@
+<app-card [properties]="cardSection" class="indicator-links-card" [loading]="loading"
+  (searchText)="handleSearchText($event)"
+  (createNewElement)="openAddScreen()">
+  <div class="loading-container links-loading-container" *ngIf="loading">
+    <app-card-loading [isCardLoading]="loading"></app-card-loading>
+    <span class="loading-message" *ngIf="savingLinks" role="status" aria-live="polite">
+      {{ (category === 'ODS' ? 'savingOdsLinks' : 'savingIndicatorLinks') | translate }}
+    </span>
+  </div>
+
+  <div class="indicator-links-dataview">
+    <p-dataView [value]="cardItems" layout="grid" class="app-dataview"
+      [emptyMessage]="'noLinkedIndicators' | translate" [paginator]="true" [rows]="pageSize"
+      [showJumpToPageDropdown]="true" [showPageLinks]="false" [totalRecords]="cardItems.length"
+      *ngIf="(displayModeAll === 'grid' || (displayModeAll === 'list' && !!responsive)) && !loading">
+      <ng-template let-cardItem pTemplate="gridItem">
+        <div class="p-col-12 p-md-3 p-sm-12 card-item-container">
+          <app-card-item [properties]="cardItem" [displayModeCard]="displayModeAll"></app-card-item>
+        </div>
+      </ng-template>
+    </p-dataView>
+    <p-dataView [value]="cardItems" layout="list" class="app-dataview app-dataview-list"
+      [emptyMessage]="'noLinkedIndicators' | translate" [paginator]="true" [rows]="pageSize"
+      [showJumpToPageDropdown]="true" [showPageLinks]="false" [totalRecords]="cardItems.length"
+      *ngIf="displayModeAll === 'list' && !responsive && !loading">
+      <ng-template let-cardItem pTemplate="listItem">
+        <div class="p-col-12">
+          <app-card-item [properties]="cardItem" [displayModeCard]="displayModeAll"></app-card-item>
+        </div>
+      </ng-template>
+    </p-dataView>
+  </div>
+</app-card>

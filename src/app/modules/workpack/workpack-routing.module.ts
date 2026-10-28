@@ -13,6 +13,8 @@ import { ObligationComponent } from './obligation/obligation.component';
 import { ProcurementComponent } from './procurement/procurement.component';
 import { ContractComponent } from './contract/contract.component';
 import { CooperationComponent } from './cooperation/cooperation.component';
+import { ProjectIndicatorLinkFormComponent } from './workpack-sections/workpack-section-indicators/project-indicator-link-form.component';
+import { StrategicIndicatorDetailsComponent } from './workpack-sections/workpack-section-indicators/strategic-indicator-details.component';
 
 const routes: Routes = [
   {
@@ -22,6 +24,7 @@ const routes: Routes = [
         path: '',
         resolve: {data: dashboardResolver},
         runGuardsAndResolvers: 'always',
+        data: { reuseForIndicatorForm: true },
         component: WorkpackComponent
       },
       {
@@ -47,6 +50,14 @@ const routes: Routes = [
       {
         path: 'indicators',
         component: IndicatorComponent
+      },
+      {
+        path: 'indicator-links/strategic/details',
+        component: StrategicIndicatorDetailsComponent
+      },
+      {
+        path: 'indicator-links/:category',
+        component: ProjectIndicatorLinkFormComponent
       },
       {
         path: 'sharing',

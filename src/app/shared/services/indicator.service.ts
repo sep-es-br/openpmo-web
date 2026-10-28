@@ -36,6 +36,56 @@ export interface IStrategicChallenge {
     desafioId?: number;
     desafio?: string;
 }
+export interface IEs500Indicator {
+    id: number;
+    code: string;
+    strategicObjectiveCode: string;
+    targetCode: string;
+    appId: number;
+    title: string;
+    description: string;
+    targetValue: string;
+    unit: string;
+    polarity: string;
+    source: string;
+}
+
+export interface IStrategicIndicator {
+    managementId: number;
+    management: string;
+    groupId: number;
+    groupType: string;
+    group: string;
+    subgroupId: number;
+    subgroupType: string;
+    subgroup: string;
+    indicatorId: number;
+    indicator: string;
+}
+
+export interface IStrategicIndicatorDetail {
+    indicatorId: number;
+    indicator: string;
+    source: string;
+    unitOfMeasure: string;
+    referenceYear: number;
+    referenceValue: number;
+    goalYear: number;
+    goalValue: number;
+    polarity: string;
+}
+
+export type IndicatorLinkCategory = 'STRATEGIC' | 'ODS' | 'ES500';
+
+export interface IProjectIndicatorLink {
+    id: number;
+    category: IndicatorLinkCategory;
+    externalId: string;
+    name: string;
+    description?: string;
+    active: boolean;
+    projectGoals?: { [year: string]: number };
+}
 
 @Injectable({
     providedIn: 'root'
@@ -43,6 +93,7 @@ export interface IStrategicChallenge {
 export class IndicatorService extends BaseService<IIndicator> {
 
     private resetIndicator = new BehaviorSubject<boolean>(false);
+    private projectIndicatorLinksSavingState = new BehaviorSubject<Record<string, boolean>>({});
     private challengeCatalogRequest: Promise<IHttpResult<IStrategicChallenge[]>>;
     workpackData: IWorkpackData;
     workpackParams: IWorkpackParams;
@@ -152,5 +203,89 @@ export class IndicatorService extends BaseService<IIndicator> {
                 });
         }
         return this.challengeCatalogRequest;
+    }
+
+    getEs500IndicatorCatalog(): Promise<IHttpResult<IEs500Indicator[]>> {
+        return this.http
+            .get<IHttpResult<IEs500Indicator[]>>(`${this.urlBase}/es500/indicators`)
+            .toPromise();
+    }
+
+    getStrategicIndicatorCatalog(): Promise<IHttpResult<IStrategicIndicator[]>> {
+        return this.http
+            .get<IHttpResult<IStrategicIndicator[]>>(`${this.urlBase}/strategic`)
+            .toPromise();
+    }
+
+    getStrategicIndicatorDetails(indicatorIds: number[]): Promise<IHttpResult<IStrategicIndicatorDetail[]>> {
+        return this.http
+            .get<IHttpResult<IStrategicIndicatorDetail[]>>(`${this.urlBase}/strategic/details`, {
+                params: { indicatorIds: indicatorIds.join(',') }
+            })
+            .toPromise();
+    }
+
+    getProjectIndicatorLinks(
+        idWorkpack: number,
+        category: IndicatorLinkCategory
+    ): Promise<IHttpResult<IProjectIndicatorLink[]>> {
+        return this.http
+            .get<IHttpResult<IProjectIndicatorLink[]>>(`${this.urlBase}/associations/${idWorkpack}`, { params: { category } })
+            .toPromise();
+    }
+
+    createProjectIndicatorLink(
+        idWorkpack: number,
+        item: Pick<IProjectIndicatorLink, 'category' | 'externalId' | 'name' | 'description' | 'projectGoals'>
+    ): Promise<IHttpResult<IProjectIndicatorLink>> {
+        return this.http
+            .post<IHttpResult<IProjectIndicatorLink>>(`${this.urlBase}/associations/${idWorkpack}`, item)
+            .toPromise();
+    }
+
+    updateProjectIndicatorLinkStatus(
+        idWorkpack: number,
+        idLink: number,
+        active: boolean
+    ): Promise<IHttpResult<IProjectIndicatorLink>> {
+        return this.http
+            .patch<IHttpResult<IProjectIndicatorLink>>(
+                `${this.urlBase}/associations/${idWorkpack}/${idLink}/active`,
+                active
+            )
+            .toPromise();
+    }
+
+    updateProjectIndicatorLinkGoals(
+        idWorkpack: number,
+        idLink: number,
+        projectGoals: { [year: string]: number }
+    ): Promise<IHttpResult<IProjectIndicatorLink>> {
+        return this.http
+            .patch<IHttpResult<IProjectIndicatorLink>>(
+                `${this.urlBase}/associations/${idWorkpack}/${idLink}/project-goals`,
+                projectGoals
+            )
+            .toPromise();
+    }
+
+    isProjectIndicatorLinksSaving(idWorkpack: number, category: IndicatorLinkCategory): boolean {
+        return !!this.projectIndicatorLinksSavingState.value[this.projectIndicatorLinksSavingKey(idWorkpack, category)];
+    }
+
+    setProjectIndicatorLinksSaving(idWorkpack: number, category: IndicatorLinkCategory, saving: boolean): void {
+        const key = this.projectIndicatorLinksSavingKey(idWorkpack, category);
+        this.projectIndicatorLinksSavingState.next({
+            ...this.projectIndicatorLinksSavingState.value,
+            [key]: saving
+        });
+    }
+
+    get observableProjectIndicatorLinksSaving() {
+        return this.projectIndicatorLinksSavingState.asObservable();
+    }
+
+    private projectIndicatorLinksSavingKey(idWorkpack: number, category: IndicatorLinkCategory): string {
+        return `${idWorkpack}:${category}`;
     }
 }

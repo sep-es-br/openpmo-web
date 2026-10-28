@@ -1,0 +1,78 @@
+<div class="app-strategic-indicator-details">
+  <div class="app-content-header">
+    <span class="header-title">{{ 'strategicIndicators' | translate }}</span>
+  </div>
+
+  <app-card [properties]="cardSection" class="mt-0">
+    <div class="loading-container" *ngIf="loading">
+      <app-card-loading [isCardLoading]="loading"></app-card-loading>
+    </div>
+
+    <div class="strategic-indicator-details-content" *ngIf="!loading && indicator">
+      <section class="strategic-indicator-details-grid">
+        <div class="strategic-indicator-detail">
+          <span>{{ 'indicatorName' | translate }}</span>
+          <strong>{{ indicator.indicator || '—' }}</strong>
+        </div>
+        <div class="strategic-indicator-detail">
+          <span>{{ indicator.groupType || ('strategicAxis' | translate) }}</span>
+          <strong>{{ indicator.group || '—' }}</strong>
+        </div>
+        <div class="strategic-indicator-detail">
+          <span>{{ indicator.subgroupType || ('strategicArea' | translate) }}</span>
+          <strong>{{ indicator.subgroup || ('withoutSubgroup' | translate) }}</strong>
+        </div>
+        <div class="strategic-indicator-detail">
+          <span>{{ 'source' | translate }}</span>
+          <strong>{{ source || '—' }}</strong>
+        </div>
+        <div class="strategic-indicator-detail">
+          <span>{{ 'unitOfMeasure' | translate }}</span>
+          <strong>{{ unitOfMeasure || '—' }}</strong>
+        </div>
+        <div class="strategic-indicator-detail">
+          <span>{{ 'referenceBase' | translate }}</span>
+          <strong>{{ indicator.management || '—' }}</strong>
+        </div>
+      </section>
+
+      <section class="strategic-indicator-annual-goals">
+        <h2>{{ 'indicatorAnnualGoals' | translate }}</h2>
+        <div class="strategic-indicator-goals-grid" *ngIf="details.length > 0">
+          <div class="strategic-indicator-goal" *ngFor="let goal of details">
+            <span class="strategic-indicator-goal-year">{{ goal.goalYear }}</span>
+            <div class="strategic-indicator-goal-values">
+              <div class="strategic-indicator-goal-value">
+                <span>{{ 'indicatorAnnualGoals' | translate }}</span>
+                <strong>{{ goal.goalValue | number:'1.0-10':'pt-BR' }}</strong>
+              </div>
+              <div class="strategic-indicator-goal-value project-goal-value">
+                <span>{{ 'projectGoal' | translate }}</span>
+                <p-inputNumber class="strategic-project-goal-input"
+                  [inputStyleClass]="'app-input-text strategic-project-goal-input' + (shouldShowProjectGoalInvalid(goal) ? ' strategic-project-goal-invalid' : '')"
+                  [inputId]="'project-goal-' + goal.goalYear"
+                  mode="decimal" locale="pt-BR" [useGrouping]="true"
+                  [minFractionDigits]="0" [maxFractionDigits]="10"
+                  [required]="true" [disabled]="saving"
+                  [attr.aria-invalid]="shouldShowProjectGoalInvalid(goal)"
+                  [placeholder]="'projectGoalPlaceholder' | translate"
+                  [ngModel]="getProjectGoalValue(goal.goalYear)"
+                  (ngModelChange)="setProjectGoalValue(goal.goalYear, $event)"
+                  (onBlur)="markProjectGoalTouched(goal.goalYear)">
+                </p-inputNumber>
+              </div>
+            </div>
+          </div>
+        </div>
+        <p class="no-annual-goals" *ngIf="details.length === 0">
+          {{ 'indicatorHasNoAnnualGoals' | translate }}
+        </p>
+      </section>
+    </div>
+  </app-card>
+
+  <app-buttons-container *ngIf="!loading">
+    <app-save-button #saveButton (save)="saveProjectGoals()"></app-save-button>
+    <app-cancel-button #cancelButton (cancel)="returnToIndicators()"></app-cancel-button>
+  </app-buttons-container>
+</div>

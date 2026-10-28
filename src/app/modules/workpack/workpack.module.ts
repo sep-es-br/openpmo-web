@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { TranslateModule } from '@ngx-translate/core';
 import { WorkpackComponent } from './workpack.component';
 import { WorkpackRoutingModule } from './workpack-routing.module';
 import { CoreModule } from 'src/app/core/core.module';
@@ -19,6 +20,9 @@ import { ProgressBarScheduleYearComponent } from './components/progress-bar-sche
 import { WorkpackSectionPropertiesComponent } from './workpack-sections/workpack-section-properties/workpack-section-properties.component';
 import { WorkpackSectionCostAccountsComponent } from './workpack-sections/workpack-section-cost-accounts/workpack-section-cost-accounts.component';
 import { WorkpackSectionIndicatorsComponent} from './workpack-sections/workpack-section-indicators/workpack-section-indicators.component';
+import { ProjectIndicatorLinksComponent } from './workpack-sections/workpack-section-indicators/project-indicator-links.component';
+import { ProjectIndicatorLinkFormComponent } from './workpack-sections/workpack-section-indicators/project-indicator-link-form.component';
+import { StrategicIndicatorDetailsComponent } from './workpack-sections/workpack-section-indicators/strategic-indicator-details.component';
 import { WorkpackSectionScheduleComponent } from './workpack-sections/workpack-section-schedule/workpack-section-schedule.component';
 import { WorkpackSectionStakeholdersComponent } from './workpack-sections/workpack-section-stakeholders/workpack-section-stakeholders.component';
 import { WorkpackSectionBaselinesComponent } from './workpack-sections/workpack-section-baselines/workpack-section-baselines.component';
@@ -64,6 +68,9 @@ import { ContractComponent } from './contract/contract.component';
     WorkpackSectionPropertiesComponent,
     WorkpackSectionCostAccountsComponent,
     WorkpackSectionIndicatorsComponent,
+    ProjectIndicatorLinksComponent,
+    ProjectIndicatorLinkFormComponent,
+    StrategicIndicatorDetailsComponent,
     WorkpackSectionScheduleComponent,
     WorkpackSectionStakeholdersComponent,
     WorkpackSectionBaselinesComponent,
@@ -83,6 +90,7 @@ import { ContractComponent } from './contract/contract.component';
       CommonModule,
       WorkpackRoutingModule,
       CoreModule,
+      TranslateModule,
       ComponentsModule,
       FormsModule,
       ReactiveFormsModule,

@@ -18,6 +18,7 @@ import { IFilterProperty } from '../../../../shared/interfaces/IFilterProperty';
 import { FilterDataviewService } from '../../../../shared/services/filter-dataview.service';
 import { IconsEnum } from '../../../../shared/enums/IconsEnum';
 import { WorkpackShowTabviewService } from '../../../../shared/services/workpack-show-tabview.service';
+import { ITabViewScrolled } from '../../../../shared/components/tabview-scrolled/tabview-scrolled.component';
 
 @Component({
   selector: 'app-workpack-section-indicators',
@@ -41,6 +42,15 @@ export class WorkpackSectionIndicatorsComponent implements OnInit {
   term = '';
   filters;
   sectionActive = false;
+  selectedIndicatorTab: ITabViewScrolled;
+
+  readonly tabContextVersion = 1;
+  readonly indicatorTabs: ITabViewScrolled[] = [
+    { menu: 'projectIndicators', key: 'project' },
+    { menu: 'strategicIndicators', key: 'strategic' },
+    { menu: 'es500Years', key: 'es500' },
+    { menu: 'ods', key: 'ods' }
+  ];
 
   constructor(
     private filterSrv: FilterDataviewService,
@@ -95,6 +105,10 @@ export class WorkpackSectionIndicatorsComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadIndicatorsData();
+  }
+
+  handleSelectedIndicatorTab(event: { tabs: ITabViewScrolled }): void {
+    this.selectedIndicatorTab = event.tabs;
   }
 
   loadIndicatorsData() {

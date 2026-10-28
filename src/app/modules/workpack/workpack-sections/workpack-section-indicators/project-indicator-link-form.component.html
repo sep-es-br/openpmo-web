@@ -1,0 +1,200 @@
+<div class="app-indicator-link-form">
+  <div class="app-content-header">
+    <span class="header-title">
+      {{ (category === 'ES500' ? 'includeEs500Indicator' : category === 'STRATEGIC' ? 'includeStrategicIndicator' : 'includeOdsIndicators') | translate }}
+    </span>
+  </div>
+
+  <app-card [properties]="{cardTitle: 'properties', toggleable: false, initialStateToggle: false, collapseble: false, isLoading: loading}"
+    class="mt-0">
+    <div class="loading-container" *ngIf="loading">
+      <app-card-loading [isCardLoading]="loading"></app-card-loading>
+    </div>
+
+    <ng-container *ngIf="!loading">
+      <p class="catalog-empty" *ngIf="catalog.length === 0">
+        {{ 'indicatorCatalogEmpty' | translate }}
+      </p>
+      <div *ngIf="catalog.length > 0">
+        <div class="strategic-filter-flow" *ngIf="category === 'STRATEGIC'">
+          <div class="strategic-filter-field">
+            <label for="strategic-management">{{ 'management' | translate }}</label>
+            <p-dropdown inputId="strategic-management" class="app-single-selection"
+              [options]="managementOptions" optionLabel="label" optionValue="value"
+              [(ngModel)]="selectedManagementId" [placeholder]="'select' | translate"
+              [disabled]="managementOptions.length === 0" (onChange)="onStrategicManagementChange()">
+            </p-dropdown>
+          </div>
+
+          <div class="strategic-filter-field">
+            <label for="strategic-group">{{ strategicGroupLabel }}</label>
+            <p-dropdown inputId="strategic-group" class="app-single-selection"
+              [options]="groupOptions" optionLabel="label" optionValue="value"
+              [(ngModel)]="selectedGroupId" [placeholder]="'select' | translate"
+              [disabled]="selectedManagementId == null || groupOptions.length === 0"
+              (onChange)="onStrategicGroupChange()">
+            </p-dropdown>
+          </div>
+
+          <div class="strategic-filter-field">
+            <label for="strategic-subgroups">{{ strategicSubgroupLabel }}</label>
+            <p-multiSelect inputId="strategic-subgroups" class="app-multiple-selection"
+              [options]="subgroupOptions" optionLabel="label" optionValue="value"
+              [(ngModel)]="selectedSubgroupIds" [defaultLabel]="'select' | translate"
+              [disabled]="selectedGroupId == null || subgroupOptions.length === 0"
+              (onChange)="onStrategicSubgroupsChange()">
+            </p-multiSelect>
+          </div>
+
+          <div class="strategic-filter-field strategic-indicator-field"
+            *ngIf="selectedSubgroupIds.length > 0">
+            <label for="strategic-indicators">{{ 'strategicIndicators' | translate }}</label>
+            <p-multiSelect inputId="strategic-indicators" class="app-multiple-selection"
+              [options]="filteredStrategicIndicators" optionLabel="name" optionValue="id"
+              [(ngModel)]="selectedStrategicIndicatorIds" [defaultLabel]="'select' | translate"
+              [filter]="true" [filterPlaceHolder]="'search' | translate" [showToggleAll]="true"
+              [maxSelectedLabels]="1" [selectedItemsLabel]="'{0} ' + ('strategicItemsSelected' | translate)"
+              (ngModelChange)="onStrategicIndicatorsChange($event)">
+              <ng-template let-item pTemplate="item">
+                <span class="strategic-indicator-option">
+                  <strong>{{ item.name }}</strong>
+                  <small *ngIf="item.description">{{ item.description }}</small>
+                </span>
+              </ng-template>
+            </p-multiSelect>
+          </div>
+
+          <div class="strategic-filter-actions">
+            <button type="button" class="restore-strategic-filters" (click)="resetStrategicFilters()">
+              {{ 'restoreFilters' | translate }}
+            </button>
+          </div>
+        </div>
+
+        <div class="p-field search-field" *ngIf="category !== 'STRATEGIC'">
+          <span class="p-input-icon-left">
+            <i class="fas fa-search"></i>
+            <input pInputText type="text" [(ngModel)]="searchTerm" (ngModelChange)="applySearch()"
+              [placeholder]="'search' | translate" />
+          </span>
+        </div>
+        <p class="catalog-empty strategic-next-step" *ngIf="category === 'STRATEGIC' && selectedManagementId == null">
+          {{ 'selectManagementToContinue' | translate }}
+        </p>
+        <p class="catalog-empty strategic-next-step" *ngIf="category === 'STRATEGIC' && selectedManagementId != null && selectedGroupId == null">
+          {{ 'selectGroupToContinue' | translate }}
+        </p>
+        <p class="catalog-empty strategic-next-step" *ngIf="category === 'STRATEGIC' && selectedGroupId != null && selectedSubgroupIds.length === 0">
+          {{ 'selectSubgroupToContinue' | translate }}
+        </p>
+
+        <div class="catalog-list" *ngIf="category === 'ODS'; else nonOdsSelection">
+          <label class="catalog-option" *ngFor="let item of filteredCatalog">
+            <input type="checkbox" [checked]="selectedIds.has(item.id)"
+              (change)="toggleSelection(item.id, $event)" />
+            <span class="catalog-option-content">
+              <strong>{{ item.name }}</strong>
+              <small *ngIf="item.description">{{ item.description }}</small>
+            </span>
+          </label>
+        </div>
+        <ng-template #nonOdsSelection>
+          <ng-container *ngIf="category !== 'STRATEGIC'">
+            <ng-container *ngTemplateOutlet="singleIndicatorSelection"></ng-container>
+          </ng-container>
+        </ng-template>
+        <ng-template #singleIndicatorSelection>
+          <label class="catalog-option" *ngFor="let item of filteredCatalog">
+            <input type="radio" name="indicator" [checked]="selectedIds.has(item.id)"
+              (change)="selectSingle(item.id)" />
+            <span class="catalog-option-content">
+              <strong>{{ item.name }}</strong>
+              <small *ngIf="item.description">{{ item.description }}</small>
+            </span>
+          </label>
+        </ng-template>
+        <p class="catalog-empty" *ngIf="category !== 'STRATEGIC' && filteredCatalog.length === 0">
+          {{ 'noIndicatorsMatchSearch' | translate }}
+        </p>
+
+        <section class="selected-strategic-indicators" *ngIf="category === 'STRATEGIC' && selectedStrategicIndicators.length > 0">
+          <h2>{{ 'strategicSelectedIndicators' | translate }} ({{ selectedStrategicIndicators.length }})</h2>
+          <div class="selected-strategic-indicator-grid">
+          <article class="selected-strategic-indicator" *ngFor="let item of selectedStrategicIndicators; trackBy: trackByStrategicIndicatorId">
+            <div class="selected-strategic-indicator-heading">
+              <h3>{{ item.name }}</h3>
+              <button type="button" class="remove-strategic-indicator" [attr.aria-label]="'remove' | translate"
+                (click)="removeStrategicIndicator(item.id)">&times;</button>
+            </div>
+
+            <div class="strategic-indicator-facts">
+              <div class="strategic-indicator-fact">
+                <span>{{ 'source' | translate }}</span>
+                <strong>{{ item.details?.source || '—' }}</strong>
+              </div>
+              <div class="strategic-indicator-fact">
+                <span>{{ 'unitOfMeasure' | translate }}</span>
+                <strong>{{ item.details?.unitOfMeasure || '—' }}</strong>
+              </div>
+              <div class="strategic-indicator-fact">
+                <span>{{ 'referenceBase' | translate }}</span>
+                <strong>{{ item.management || '—' }}</strong>
+              </div>
+            </div>
+
+            <p class="strategic-details-state" *ngIf="item.detailsLoading">
+              <i class="pi pi-spin pi-spinner" aria-hidden="true"></i> {{ 'strategicDetailsLoading' | translate }}
+            </p>
+            <p class="strategic-details-state strategic-details-error" *ngIf="item.detailsError && item.indicatorId != null">
+              {{ 'strategicDetailsLoadError' | translate }}
+              <button type="button" (click)="retryStrategicIndicatorDetails(item.indicatorId)">
+                {{ 'retry' | translate }}
+              </button>
+            </p>
+
+            <div class="strategic-indicator-prototype-goals" *ngIf="item.details && !item.detailsLoading">
+              <strong class="strategic-card-section-label">{{ 'indicatorAnnualGoals' | translate }}</strong>
+              <div class="strategic-goals-grid" *ngIf="item.details.goals.length > 0">
+                <div class="strategic-goal-field" *ngFor="let goal of item.details.goals">
+                  <span class="app-input-label">{{ goal.year }}</span>
+                  <input class="app-input-text strategic-goal-value-input" pInputText type="text"
+                    [value]="goal.value | number:'1.0-10':'pt-BR'" disabled />
+                </div>
+              </div>
+              <p class="prototype-details-unavailable" *ngIf="item.details.goals.length === 0">
+                {{ 'indicatorHasNoAnnualGoals' | translate }}
+              </p>
+            </div>
+
+            <div class="strategic-indicator-project-goals">
+              <strong class="strategic-card-section-label">{{ 'projectGoal' | translate }}</strong>
+              <div class="strategic-goals-grid">
+                <div class="p-field strategic-project-goal-field" *ngFor="let goal of item.details?.goals">
+                  <label class="app-input-label" [for]="'project-goal-' + item.id + '-' + goal.year">{{ goal.year }}</label>
+                  <p-inputNumber class="strategic-project-goal-input"
+                    [inputStyleClass]="'app-input-text strategic-project-goal-input' + (shouldShowProjectGoalInvalid(item, goal) ? ' strategic-project-goal-invalid' : '')"
+                    [inputId]="'project-goal-' + item.id + '-' + goal.year"
+                    mode="decimal" locale="pt-BR" [useGrouping]="true"
+                    [minFractionDigits]="0" [maxFractionDigits]="10"
+                    [required]="true"
+                    [attr.aria-invalid]="shouldShowProjectGoalInvalid(item, goal)"
+                    [placeholder]="'projectGoalPlaceholder' | translate"
+                    [ngModel]="getProjectGoalValue(item.id, goal.year)"
+                    (ngModelChange)="setProjectGoalValue(item.id, goal.year, $event)"
+                    (onBlur)="markProjectGoalTouched(item.id, goal.year)">
+                  </p-inputNumber>
+                </div>
+              </div>
+            </div>
+          </article>
+          </div>
+        </section>
+      </div>
+    </ng-container>
+  </app-card>
+
+  <app-buttons-container *ngIf="!loading">
+    <app-save-button #saveButton (save)="addSelectedItems()"></app-save-button>
+    <app-cancel-button #cancelButton (cancel)="returnToIndicators()"></app-cancel-button>
+  </app-buttons-container>
+</div>

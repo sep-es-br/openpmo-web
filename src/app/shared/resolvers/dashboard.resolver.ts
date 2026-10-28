@@ -18,6 +18,7 @@ import { WorkpackModelService } from "../services/workpack-model.service";
 import { OfficeService } from "../services/office.service";
 import { PersonService } from "../services/person.service";
 import { BreakdownStructureService } from "../services/breakdown-structure.service";
+import { WorkpackIndicatorRouteReuseStrategy } from "../services/workpack-indicator-route-reuse.strategy";
 
 @Injectable({providedIn: 'root'})
 export class dashboardResolver implements Resolve<any> {
@@ -81,6 +82,11 @@ export class dashboardResolver implements Resolve<any> {
     }
 
     async resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
+
+        const routeReuseStrategy = this.injector.get(WorkpackIndicatorRouteReuseStrategy);
+        if (routeReuseStrategy.shouldSkipWorkpackReload(route)) {
+            return;
+        }
         
         const {
             id,

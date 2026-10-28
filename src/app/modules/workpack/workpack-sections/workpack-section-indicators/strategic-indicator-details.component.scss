@@ -1,0 +1,148 @@
+.app-strategic-indicator-details {
+  padding: 0 1.25rem 1rem;
+}
+
+.strategic-indicator-details-content {
+  padding: 0.5rem 0.25rem 0.75rem;
+}
+
+.strategic-indicator-details-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0;
+}
+
+.strategic-indicator-detail {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.4rem 0 0.65rem;
+  border-bottom: 1px solid #edf0f1;
+}
+
+.strategic-indicator-detail span {
+  color: #6c757d;
+  font-size: 0.82rem;
+}
+
+.strategic-indicator-detail strong {
+  color: #427f79;
+  font-size: 0.9rem;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.strategic-indicator-annual-goals {
+  margin-top: 1.5rem;
+}
+
+.strategic-indicator-annual-goals h2 {
+  margin: 0 0 0.65rem;
+  color: #495057;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.strategic-indicator-goals-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+  gap: 0.6rem;
+}
+
+.strategic-indicator-goal {
+  display: grid;
+  grid-template-columns: minmax(2.5rem, auto) minmax(0, 1fr);
+  align-items: start;
+  gap: 0.75rem;
+  padding: 0.75rem 0.9rem;
+  border: 1px solid #d7dfe3;
+  border-radius: 3px;
+  background: #fff;
+}
+
+.strategic-indicator-goal-year {
+  align-self: center;
+  color: #6c757d;
+}
+
+.strategic-indicator-goal-values {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+}
+
+.strategic-indicator-goal-value {
+  display: flex;
+  min-width: 0;
+  min-height: 2.625rem;
+  box-sizing: border-box;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.25rem 0;
+}
+
+.strategic-indicator-goal-value span {
+  flex: 0 0 auto;
+  color: #6c757d;
+  font-size: 0.75rem;
+  line-height: 1.25;
+  white-space: nowrap;
+}
+
+.strategic-indicator-goal-value strong {
+  flex: 0 0 auto;
+  overflow-wrap: anywhere;
+  color: #427f79;
+  font-weight: 600;
+  text-align: right;
+}
+
+.project-goal-value {
+  margin-top: 0;
+  padding: 0;
+  border-top: 1px solid #edf0f1;
+}
+
+.strategic-project-goal-input {
+  display: block;
+  flex: 1 1 14rem;
+  min-width: 0;
+  width: auto;
+}
+
+.strategic-project-goal-input ::ng-deep input.strategic-project-goal-input {
+  width: 100%;
+  text-align: right;
+}
+
+.strategic-project-goal-input ::ng-deep input.strategic-project-goal-input::placeholder {
+  font-size: 11px;
+  text-align: right;
+}
+
+.strategic-project-goal-input ::ng-deep input.strategic-project-goal-invalid {
+  border-color: #dc3545;
+  color: #dc3545;
+}
+
+.strategic-project-goal-input ::ng-deep input.strategic-project-goal-invalid::placeholder {
+  color: #dc3545;
+  opacity: 1;
+}
+
+.strategic-project-goal-input ::ng-deep input.strategic-project-goal-invalid:focus {
+  box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.2);
+}
+
+@media (max-width: 600px) {
+  .strategic-indicator-goal {
+    grid-template-columns: minmax(2.5rem, auto) minmax(0, 1fr);
+  }
+}
+
+.no-annual-goals {
+  margin: 0;
+  color: #6c757d;
+}

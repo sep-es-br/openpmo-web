@@ -22,6 +22,8 @@ import { CardListComponent } from './shared/components/card-list/card-list.compo
 import { AdministrationComponent } from './modules/administration/administration.component';
 import { PreprojectSelectionComponent } from './modules/preproject-selection/preproject-selection.component';
 import { PreprojectCriterionFormComponent } from './modules/preproject-selection/preproject-criterion-form/preproject-criterion-form.component';
+import { RouteReuseStrategy } from '@angular/router';
+import { WorkpackIndicatorRouteReuseStrategy } from './shared/services/workpack-indicator-route-reuse.strategy';
 
 @NgModule({
   declarations: [
@@ -64,7 +66,11 @@ import { PreprojectCriterionFormComponent } from './modules/preproject-selection
       multi: true
     },
     MessageService,
-    ConfirmationService
+    ConfirmationService,
+    {
+      provide: RouteReuseStrategy,
+      useExisting: WorkpackIndicatorRouteReuseStrategy
+    }
   ],
   bootstrap: [AppComponent]
 })

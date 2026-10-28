@@ -26,7 +26,7 @@
   <app-nav-menu></app-nav-menu>
   <main>
     <div class="splitter-container">
-      <p-splitter [panelSizes]="[menuWidth, mainWidth]" (onResizeEnd)="onResizeEnd($event)" [minSizes]="[0.01, 50]" layout="horizontal">
+      <p-splitter [panelSizes]="[menuWidth, mainWidth]" (onResizeEnd)="onResizeEnd($event)" [minSizes]="[0.01, 50]" [panelStyleClass]="'p-splitter-panel p-splitter-panel-nested'" layout="horizontal">
         <ng-template>
           <div class="menu-fixed-container">
             <app-panel-menu></app-panel-menu>

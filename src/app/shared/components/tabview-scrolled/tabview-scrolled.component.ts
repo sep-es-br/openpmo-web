@@ -28,6 +28,8 @@ export class TabviewScrolledComponent implements OnChanges, OnDestroy {
 
   @Input() contextVersion: number;
 
+  @Input() storageContext: string;
+
   selectedTab: ITabViewScrolled;
 
   tabBody: string;
@@ -77,13 +79,17 @@ export class TabviewScrolledComponent implements OnChanges, OnDestroy {
       return false;
     }
     const selectedTabStorage = JSON.parse(storageTab);
-    return selectedTabStorage.some(tab => tab.idWorkpack === idWorkpack);
+    return selectedTabStorage.some(tab =>
+      tab.idWorkpack === idWorkpack && tab.storageContext === this.storageContext
+    );
   }
 
   findIndexTabStorage(idWorkpack = this.idWorkpack) {
     const storageTab = localStorage.getItem(this.tabViewStorage);
     const selectedTabStorage = JSON.parse(storageTab);
-    const index = selectedTabStorage.findIndex(tab => tab.idWorkpack === idWorkpack);
+    const index = selectedTabStorage.findIndex(tab =>
+      tab.idWorkpack === idWorkpack && tab.storageContext === this.storageContext
+    );
     if (index === -1) {
       return 0;
     }
@@ -100,7 +106,7 @@ export class TabviewScrolledComponent implements OnChanges, OnDestroy {
       return;
     }
 
-    if (changes.tabs && !changes.contextVersion && !changes.idWorkpack) {
+    if (changes.tabs && !changes.contextVersion && !changes.idWorkpack && !changes.storageContext) {
       return;
     }
 
@@ -149,6 +155,7 @@ export class TabviewScrolledComponent implements OnChanges, OnDestroy {
     if (!idWorkpack) return;
     const tabview = {
       idWorkpack,
+      storageContext: this.storageContext,
       tab: this.selectedTab,
     };
     const tabs = localStorage.getItem(this.tabViewStorage);
@@ -161,7 +168,9 @@ export class TabviewScrolledComponent implements OnChanges, OnDestroy {
       localStorage.setItem(this.tabViewStorage, JSON.stringify([tabview]));
       return;
     }
-    const findIndex = storageTab?.findIndex(tab => tab.idWorkpack === idWorkpack);
+    const findIndex = storageTab?.findIndex(tab =>
+      tab.idWorkpack === idWorkpack && tab.storageContext === this.storageContext
+    );
     if (findIndex !== -1) {
       storageTab[findIndex] = tabview;
     } else {

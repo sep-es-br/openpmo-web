@@ -17,6 +17,8 @@ export class TemplateComponent implements OnInit, OnDestroy {
 
   private readonly minimumOpenMenuWidth = 210;
 
+  private resizeInitTimeout: ReturnType<typeof setTimeout> | null = null;
+
   isMenuFixed = false;
 
   $destroy = new Subject();
@@ -57,7 +59,8 @@ export class TemplateComponent implements OnInit, OnDestroy {
         this.isMenuFixed = menuState.isFixed;
       });
     if (!this.menuMobile) {
-      setTimeout(() => {
+      this.resizeInitTimeout = setTimeout(() => {
+        this.resizeInitTimeout = null;
         this.onResizeEnd(null);
       });
     }
@@ -85,6 +88,10 @@ export class TemplateComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    if (this.resizeInitTimeout !== null) {
+      clearTimeout(this.resizeInitTimeout);
+      this.resizeInitTimeout = null;
+    }
     this.$destroy.next();
     this.$destroy.complete();
   }
@@ -106,7 +113,9 @@ export class TemplateComponent implements OnInit, OnDestroy {
     if (event?.sizes?.length >= 2) {
       [this.menuWidth, this.mainWidth] = event.sizes;
     }
-    const mainContent = document.querySelector('.main-content');
+    const mainContent = document.querySelector('.main-content') as HTMLElement | null;
+    if (!mainContent) return;
+
     const mainContentWidth = mainContent.clientWidth;
     if (mainContentWidth <= 900) {
       this.workpackShowTabViewSrv.next(false);
