@@ -1009,7 +1009,6 @@ export class PanelMenuComponent implements OnInit, AfterViewInit {
               id: program.idTransversalProgram,
               idPlan: this.currentIDPlan,
               classification: 'TRANSVERSAL',
-              idTransversalRoot: program.idTransversalProgram,
               idTransversalView
             }
           });

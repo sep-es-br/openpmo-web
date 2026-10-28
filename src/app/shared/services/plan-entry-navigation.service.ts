@@ -86,7 +86,6 @@ export class PlanEntryNavigationService {
           idPlan: context.idPlan,
           idOffice: context.idOffice,
           classification: 'TRANSVERSAL',
-          idTransversalRoot: context.idTransversalProgram,
           idTransversalView: context.idTransversalView
         }
       });
