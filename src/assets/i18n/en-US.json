@@ -811,6 +811,15 @@
           }
         }
       },
+      "transversal": {
+        "view": {
+          "delete": {
+            "relationship": {
+              "error": "The transversal view cannot be deleted or removed while it has linked structural items or child transversal views."
+            }
+          }
+        }
+      },
 
       "planModel": {
         "delete": {

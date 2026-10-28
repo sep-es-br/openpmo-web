@@ -880,6 +880,15 @@
           }
         }
       },
+      "transversal": {
+        "view": {
+          "delete": {
+            "relationship": {
+              "error": "A Visão Transversal não pode ser excluída ou removida enquanto possuir itens estruturais vinculados ou visões transversais filhas."
+            }
+          }
+        }
+      },
       "planModel": {
         "delete": {
           "relationship": {
