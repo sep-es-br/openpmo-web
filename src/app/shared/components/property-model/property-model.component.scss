@@ -58,6 +58,40 @@
       }
     }
   }
+  &.invalid {
+    position: relative;
+    border: 1px solid transparent !important;
+    border-radius: 5px;
+
+    &::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      box-sizing: border-box;
+      border: 1px solid v.$fontRed;
+      border-radius: inherit;
+      pointer-events: none;
+    }
+  }
+  &.invalid .p-panel-header {
+    border-color: transparent !important;
+    border-radius: 4px 4px 0 0;
+  }
+  &.invalid .p-toggleable-content .p-panel-content {
+    border-color: transparent !important;
+    border-radius: 0 0 4px 4px;
+  }
+  .property-input.invalid {
+    .app-input-text,
+    .p-inputnumber-input,
+    .p-dropdown,
+    .p-multiselect,
+    .p-chips .p-inputtext,
+    .p-chips-multiple-container {
+      border-color: v.$fontRed !important;
+    }
+  }
   .button-select-locality-container {
     display: flex;
     flex-direction: column;

@@ -21,6 +21,8 @@ export class PropertyModelComponent implements OnDestroy, OnChanges, AfterViewIn
 
   @ViewChild(Calendar) calendarComponent: Calendar;
   @Input() property: IWorkpackModelProperty;
+  @Input() invalid = false;
+  @Input() invalidFields: string[] = [];
   @Input() integrationSectorOptions: SelectItem[] = [];
   @Output() delete = new EventEmitter();
   @Output() changed = new EventEmitter();

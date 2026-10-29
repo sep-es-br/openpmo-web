@@ -59,7 +59,6 @@ export class TemplateComponent implements OnInit, OnDestroy {
     if (!this.menuMobile) {
       setTimeout(() => {
         this.onResizeEnd(null);
-        this.prepareLineSplitter();
       });
     }
     this.menuSrv.obsToggleMenu
@@ -98,49 +97,9 @@ export class TemplateComponent implements OnInit, OnDestroy {
     if (!this.isMenuFixed) this.closeAllMenus();
   }
 
-  prepareLineSplitter() {
-    const splitter = document.querySelector('.p-splitter-gutter');
-    const appTemplateWidth =
-      document.querySelector('.app-template').clientWidth;
-    const maxWidth = appTemplateWidth * 0.99;
-    const minWidth = appTemplateWidth * 0.01;
-    if (splitter) {
-      splitter.addEventListener('mousedown', () => {
-        document.onmousemove = (event) => {
-          splitter.classList.add('splitter-moveevent');
-          if (event.clientX > minWidth && event.clientX < maxWidth) {
-            splitter.setAttribute('style', `left: ${event.clientX}px`);
-          }
-        };
-        document.onmouseup = () => {
-          document.onmousemove = null;
-          document.onmouseup = null;
-          splitter.classList.remove('splitter-moveevent');
-          splitter.setAttribute('style', 'width: 4px;');
-        };
-      });
-    }
-  }
-
-  onResizeEnd(event) {
-    const splitterPanels = document.querySelectorAll(
-      '.p-splitter-panel-nested'
-    );
-    if (splitterPanels.length > 1) {
-      const maxWidth = splitterPanels[1]
-        .getAttribute('style')
-        .split(';')[0]
-        .split(':')[1]
-        .trim();
-      const perc = maxWidth.split('(')[1];
-      const mainWidthPerc = perc && perc.split('%')[0];
-      this.mainWidth = Number(mainWidthPerc);
-      const menuWidthPerc = (100 - this.mainWidth).toFixed(2);
-      this.menuWidth = Number(menuWidthPerc);
-      splitterPanels[1].setAttribute(
-        'style',
-        `flex-basis: ${maxWidth}; max-width: ${maxWidth};`
-      );
+  onResizeEnd(event?: { sizes?: number[] } | null) {
+    if (event?.sizes?.length >= 2) {
+      [this.menuWidth, this.mainWidth] = event.sizes;
     }
     const mainContent = document.querySelector('.main-content');
     const mainContentWidth = mainContent.clientWidth;
@@ -197,11 +156,11 @@ export class TemplateComponent implements OnInit, OnDestroy {
 
     splitterPanels[0].setAttribute(
       'style',
-      `flex-basis: calc(${this.menuWidth}% - 4px); max-width: calc(${this.menuWidth}% - 4px);`
+      `flex-basis: calc(${this.menuWidth}% - 4px);`
     );
     splitterPanels[1].setAttribute(
       'style',
-      `flex-basis: calc(${this.mainWidth}% - 4px); max-width: calc(${this.mainWidth}% - 4px);`
+      `flex-basis: calc(${this.mainWidth}% - 4px);`
     );
   }
 

@@ -1,5 +1,5 @@
 <p-panel
-  [styleClass]="['app-model-property', property.isCollapsed ? 'collapsed' : 'open', responsive ? 'mobile' : ''].join(' ')"
+  [styleClass]="['app-model-property', property.isCollapsed ? 'collapsed' : 'open', responsive ? 'mobile' : '', invalid ? 'invalid' : ''].join(' ')"
   [toggleable]="true" [collapsed]="property.isCollapsed" (collapsedChange)="handleCollapseChanged($event)"
   expandIcon="pi pi-angle-down" collapseIcon="pi pi-angle-up">
   <p-header class="model-property-header">
@@ -18,14 +18,14 @@
   </p-header>
   <div class="content" [class.mobile]="responsive">
     <div class="model-property p-fluid">
-      <span class="p-float-label property-input p-field">
+      <span class="p-float-label property-input p-field" [class.invalid]="invalidFields.includes('name')">
         <input class="app-input-text" type="text" pInputText [(ngModel)]="property.name" [required]="true"
           (ngModelChange)="changed.emit($event)" [disabled]="property.obligatory || property.viewOnly || property.fixed" />
         <label class="input-label">{{ 'name' | translate }} *
           <i class="far fa-question-circle" [pTooltip]="'help.propertyModel.name' | translate"></i>
         </label>
       </span>
-      <span class="p-float-label property-input p-field">
+      <span class="p-float-label property-input p-field" [class.invalid]="invalidFields.includes('label')">
         <input class="app-input-text" type="text" pInputText [(ngModel)]="property.label"
           (ngModelChange)="changed.emit($event)"
           [disabled]="property.viewOnly || (property.fixed && property.type !== 'TransversalViewSelectionModel')" />
@@ -33,7 +33,7 @@
           <i class="far fa-question-circle" [pTooltip]="'help.propertyModel.label' | translate"></i>
         </label>
       </span>
-      <span class="p-float-label property-input p-field input-number-scroll">
+      <span class="p-float-label property-input p-field input-number-scroll" [class.invalid]="invalidFields.includes('sortIndex')">
         <p-inputNumber inputStyleClass="app-input-text" [(ngModel)]="property.sortIndex" [showButtons]="true"
           (ngModelChange)="changed.emit($event)" [disabled]="property.viewOnly">
         </p-inputNumber>
@@ -41,7 +41,8 @@
           <i class="far fa-question-circle" [pTooltip]="'help.propertyModel.sortIndex' | translate"></i>
         </label>
       </span>
-      <span class="p-float-label property-input p-field input-number-scroll" *ngIf="property.type === 'NumberModel'">
+      <span class="p-float-label property-input p-field input-number-scroll" *ngIf="property.type === 'NumberModel'"
+        [class.invalid]="invalidFields.includes('precision')">
         <p-inputNumber inputStyleClass="app-input-text" [(ngModel)]="property.precision" [showButtons]="true" [min]="1"
           [max]="6" (ngModelChange)="changed.emit($event)" [disabled]="property.viewOnly">
         </p-inputNumber>
@@ -49,8 +50,8 @@
           <i class="far fa-question-circle" [pTooltip]="'help.propertyModel.precision' | translate"></i>
         </label>
       </span>
-      <span class="p-float-label property-input app-input-chips p-field"
-        *ngIf="property.type === 'SelectionModel'">
+      <span class="p-float-label property-input app-input-chips p-field" *ngIf="property.type === 'SelectionModel'"
+        [class.invalid]="invalidFields.includes('possibleValuesOptions')">
         <p-chips inputStyleClass="app-input-text" [(ngModel)]="property.possibleValuesOptions" [required]="true"
           [allowDuplicate]="false" (ngModelChange)="changed.emit($event)" [disabled]="property.viewOnly" separator=","
           (onRemove)="checkIfRemovedValueIsDefault($event)"
@@ -65,7 +66,8 @@
           <i class="far fa-question-circle" [pTooltip]="'help.propertyModel.possibleValues' | translate"></i>
         </label>
       </span>
-      <span class="p-float-label property-selection p-field" *ngIf="property.type === 'LocalitySelectionModel'">
+      <span class="p-float-label property-input property-selection p-field" *ngIf="property.type === 'LocalitySelectionModel'"
+        [class.invalid]="invalidFields.includes('idDomain')">
         <ng-container *ngIf="false; else singleDomainSelection">
           <p-multiSelect class="app-multiple-selection" dropdownIcon="fas fa-caret-down" [options]="property.list"
             [selectedItemsLabel]="language === 'pt-BR' ? '{0} itens selecionados' : '{0} items selected'"
@@ -84,7 +86,7 @@
         </label>
       </span>
       <span class="p-float-label property-input app-input-chips p-field"
-        *ngIf="property.type === 'OrganizationSelectionModel'">
+        *ngIf="property.type === 'OrganizationSelectionModel'" [class.invalid]="invalidFields.includes('sectors')">
         <p-multiSelect class="app-multiple-selection" dropdownIcon="fas fa-caret-down" [options]="optionsSector"
           [(ngModel)]="property.sectorsList"
           [selectedItemsLabel]="language === 'pt-BR' ? '{0} itens selecionados' : '{0} items selected'"
@@ -288,7 +290,8 @@
       </span>
 
       <span class="p-float-label property-input p-field input-number-scroll"
-        *ngIf="[ 'IntegerModel', 'TextModel', 'TextAreaModel' ].includes(property.type)">
+        *ngIf="[ 'IntegerModel', 'TextModel', 'TextAreaModel' ].includes(property.type)"
+        [class.invalid]="invalidFields.includes('max')">
         <p-inputNumber inputStyleClass="app-input-text" [(ngModel)]="property.max" [showButtons]="true"
           (ngModelChange)="changed.emit($event)"  [required]="true" [disabled]="property.viewOnly"></p-inputNumber>
         <label class="input-label">{{ 'maximum' | translate }} *
